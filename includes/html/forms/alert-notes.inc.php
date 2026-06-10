@@ -33,22 +33,20 @@ $sub_type = $vars['sub_type'] ?? '';
 $note = isset($vars['note']) ? strip_tags($vars['note']) : '';
 
 if (! is_numeric($alert_id) || ! ($alert = Alert::find($alert_id))) {
-    http_response_code(404);
-    exit(json_encode([
+    abort(response()->json([
         'status' => 'error',
         'message' => 'Invalid alert id',
         'note' => '',
-    ]));
+    ], 404));
 }
 
 $ability = $sub_type === 'get_note' ? 'view' : 'update';
 if (Gate::denies($ability, $alert)) {
-    http_response_code(403);
-    exit(json_encode([
+    abort(response()->json([
         'status' => 'error',
         'message' => 'You are not authorised to access this alert',
         'note' => '',
-    ]));
+    ], 403));
 }
 
 if ($sub_type === 'get_note') {
