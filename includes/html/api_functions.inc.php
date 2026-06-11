@@ -474,8 +474,12 @@ function add_device(Illuminate\Http\Request $request)
         }
 
         (new ValidateDeviceAndCreate($device, $force_add, ! empty($data['ping_fallback'])))->execute();
-    } catch (Exception $e) {
+    } catch (\LibreNMS\Exceptions\HostExistsException|\LibreNMS\Exceptions\HostUnreachableException|\LibreNMS\Exceptions\SnmpVersionUnsupportedException $e) {
         return api_error(500, $e->getMessage());
+    } catch (Exception $e) {
+        report($e);
+
+        return api_error(500, 'Failed to add device');
     }
 
     $message = "Device $device->hostname ($device->device_id) has been added successfully";
@@ -1297,7 +1301,7 @@ function get_port_info(Illuminate\Http\Request $request)
 
     return check_port_permission($port_id, null, function ($port_id) {
         $with = request()->input('with');
-        $allowed = ['vlans', 'device'];
+        $allowed = ['vlans', 'device', 'statistics'];
         $port = Port::where('port_id', $port_id)
                     ->when(in_array($with, $allowed), fn ($q) => $q->with($with))
                     ->get();
@@ -3496,14 +3500,17 @@ function add_eventlog(Illuminate\Http\Request $request)
     if (! $device || ! isset($device['device_id'])) {
         return api_error(404, $hostname . ' device does not exist');
     }
-    $data = json_decode($request->getContent(), true);
-    if (array_key_exists('text', $data)) {
-        Eventlog::log($data['text'], $device['device_id'], $data['type'] ?? 'API', Severity::from($data['severity'] ?? 2), $data['reference'] ?? null);
 
-        return api_success_noresult(200, 'Eventlog received for ' . $hostname);
-    }
+    return check_device_permission($device['device_id'], function () use ($device, $hostname, $request) {
+        $data = json_decode($request->getContent(), true);
+        if (array_key_exists('text', $data)) {
+            Eventlog::log($data['text'], $device['device_id'], $data['type'] ?? 'API', Severity::from($data['severity'] ?? 2), $data['reference'] ?? null);
 
-    return api_error(400, 'No Eventlog text provided.');
+            return api_success_noresult(200, 'Eventlog received for ' . $hostname);
+        }
+
+        return api_error(400, 'No Eventlog text provided.');
+    });
 }
 
 function list_logs(Illuminate\Http\Request $request, Router $router)
@@ -3942,12 +3949,13 @@ function search_by_mac(Illuminate\Http\Request $request)
         return api_error(422, $validate->messages());
     }
 
-    $ports = Port::whereHas('fdbEntries', function ($fdbDownlink) use ($macAddress): void {
-        $fdbDownlink->where('mac_address', $macAddress);
-    })
-         ->withCount('fdbEntries')
-         ->orderBy('fdb_entries_count')
-         ->get();
+    $ports = Port::hasAccess(Auth::user())
+        ->whereHas('fdbEntries', function ($fdbDownlink) use ($macAddress): void {
+            $fdbDownlink->where('mac_address', $macAddress);
+        })
+        ->withCount('fdbEntries')
+        ->orderBy('fdb_entries_count')
+        ->get();
 
     if ($ports->count() == 0) {
         return api_error(404, 'mac not found');

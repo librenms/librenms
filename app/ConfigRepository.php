@@ -539,7 +539,7 @@ class ConfigRepository
             $list = trim(substr((string) $output, strpos((string) $output, ':') + 1));
             $targets = explode(' ', $list);
             foreach ($targets as $target) {
-                if (is_executable($target)) {
+                if (is_executable($target) && ! is_dir($target)) {
                     return $target;
                 }
             }
