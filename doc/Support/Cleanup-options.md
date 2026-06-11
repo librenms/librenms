@@ -32,6 +32,14 @@ updated for the set amount of days automatically - only enable this if
 you are comfortable with that happening. (All active RRD files are
 updated every polling period.)
 
+**NOTE**: Please be aware that `rrd_purge` is NOT working if you are 
+using rrdcached AND your librenms server running daily.sh does NOT has file access to the RRD files.
+This will most likly be the case for docker and kubernetes.
+
+a workaround for docker and kubernetes could be to create a custom image.
+This image can include a custom s6 service that is starting a custom cleanup bash script.
+
+
 ## Ports Purge
 
 Over time as you add devices some interfaces will need to be purged as
