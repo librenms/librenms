@@ -20,7 +20,7 @@ devices in Unimus.
 Go to Unimus settings in the External Settings section of Global
 Settings (`Settings -> Global Settings -> External -> Unimus
 Integration`). Enable the integration, enter the URL of your Unimus
-instance, select the API version and enter your API token.
+instance and enter your API token.
 
 Alternatively, configure it from the CLI:
 
@@ -28,7 +28,6 @@ Alternatively, configure it from the CLI:
     ```bash
     lnms config:set unimus.enabled true
     lnms config:set unimus.url http://127.0.0.1:8085
-    lnms config:set unimus.api_version v2
     lnms config:set unimus.token YOUR_API_TOKEN
     ```
 

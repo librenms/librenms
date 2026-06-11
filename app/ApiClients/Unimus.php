@@ -191,7 +191,7 @@ class Unimus extends BaseApi
         $content = null;
 
         if ($include_content && $type === 'TEXT' && isset($backup['bytes'])) {
-            $content = base64_decode($backup['bytes'], true) ?: null;
+            $content = base64_decode((string) $backup['bytes'], true) ?: null;
         }
 
         return [

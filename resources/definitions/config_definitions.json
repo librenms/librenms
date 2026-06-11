@@ -7285,10 +7285,8 @@
             "group": "external",
             "section": "unimus",
             "order": 2,
-            "type": "select",
-            "options": {
-                "v2": "v2"
-            }
+            "type": "text",
+            "hidden": true
         },
         "unimus.token": {
             "group": "external",
