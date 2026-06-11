@@ -289,7 +289,7 @@ class RrdProcessTest extends TestCase
         $this->process->shouldReceive('getOutput')->andReturn("OK u:0.01\n");
 
         $this->logger->shouldReceive('debug')
-            ->with('RRD[%gupdate /test.rrd N:1%n]', ['color' => true])
+            ->with('RRD[%gupdate test.rrd N:1%n]', ['color' => true])
             ->once();
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
