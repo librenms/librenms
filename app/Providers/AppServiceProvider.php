@@ -41,6 +41,7 @@ class AppServiceProvider extends ServiceProvider
         $this->registerGeocoder();
 
         $this->app->singleton('permissions', fn () => new PermissionsCache());
+        $this->app->singleton(\App\ConfigBackup\ConfigBackupManager::class);
         $this->app->singleton('device-cache', fn () => new \LibreNMS\Cache\Device());
         $this->app->singleton('port-cache', fn () => new \LibreNMS\Cache\Port());
         $this->app->singleton('git', fn () => new \LibreNMS\Util\Git());
