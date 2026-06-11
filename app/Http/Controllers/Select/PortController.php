@@ -44,6 +44,7 @@ class PortController extends SelectController
         return [
             'device' => 'nullable|int',
             'devices' => 'nullable|array',
+            'field' => 'nullable|in:ifAlias,ifName,ifDescr,devices.hostname,devices.sysName',
         ];
     }
 
