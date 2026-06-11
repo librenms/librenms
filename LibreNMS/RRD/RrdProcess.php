@@ -5,7 +5,6 @@ namespace LibreNMS\RRD;
 use App\Facades\LibrenmsConfig;
 use Closure;
 use Illuminate\Support\Str;
-use LibreNMS\Exceptions\RrdCachedConnectionException;
 use LibreNMS\Exceptions\RrdException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\InputStream;
@@ -31,7 +30,7 @@ class RrdProcess
         // set up process factory
         if ($processFactory === null) {
             $command = [LibrenmsConfig::get('rrdtool', 'rrdtool'), '-'];
-            $env = [];
+            $env = ['LC_ALL' => 'C']; // force english/standard output
             if (LibrenmsConfig::get('rrdcached', '')) {
                 $env['RRDCACHED_ADDRESS'] = LibrenmsConfig::get('rrdcached', '');
             }
