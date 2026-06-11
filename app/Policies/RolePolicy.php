@@ -14,10 +14,7 @@ class RolePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'view')
-            || $this->hasGlobalPermission($user, 'create')
-            || $this->hasGlobalPermission($user, 'update')
-            || $this->hasGlobalPermission($user, 'delete');
+        return $this->hasGlobalPermission($user, 'update');
     }
 
     /**
@@ -25,7 +22,7 @@ class RolePolicy
      */
     public function view(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'view');
+        return $this->hasGlobalPermission($user, 'update');
     }
 
     /**
@@ -33,7 +30,7 @@ class RolePolicy
      */
     public function create(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'create');
+        return $this->hasGlobalPermission($user, 'update');
     }
 
     /**
@@ -53,6 +50,6 @@ class RolePolicy
             return false;
         }
 
-        return $this->hasGlobalPermission($user, 'delete');
+        return $this->hasGlobalPermission($user, 'update');
     }
 }

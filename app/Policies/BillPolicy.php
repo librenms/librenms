@@ -5,7 +5,9 @@ namespace App\Policies;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Permissions;
 use App\Models\Bill;
+use App\Models\Port;
 use App\Models\User;
+use Illuminate\Support\Collection;
 
 class BillPolicy
 {
@@ -70,5 +72,20 @@ class BillPolicy
     public function delete(User $user): bool
     {
         return $this->hasGlobalPermission($user, 'delete');
+    }
+
+    public function attachPorts(User $user, Bill $bill, Port $port): bool
+    {
+        return $this->update($user);
+    }
+
+    public function syncPorts(User $user, Bill $bill, Collection $ports): bool
+    {
+        return $this->update($user);
+    }
+
+    public function detachPorts(User $user, Bill $bill, Port $port): bool
+    {
+        return $this->update($user);
     }
 }

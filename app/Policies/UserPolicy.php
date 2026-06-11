@@ -2,7 +2,12 @@
 
 namespace App\Policies;
 
+use App\Models\Bill;
+use App\Models\Device;
+use App\Models\DeviceGroup;
+use App\Models\Port;
 use App\Models\User;
+use Illuminate\Support\Collection;
 
 class UserPolicy
 {
@@ -66,5 +71,65 @@ class UserPolicy
         }
 
         return $this->hasGlobalPermission($user, 'delete');
+    }
+
+    public function attachDevicesOwned(User $user, User $target, Device $device): bool
+    {
+        return $this->update($user, $target);
+    }
+
+    public function syncDevicesOwned(User $user, User $target, Collection $devices): bool
+    {
+        return $this->update($user, $target);
+    }
+
+    public function detachDevicesOwned(User $user, User $target, Device $device): bool
+    {
+        return $this->update($user, $target);
+    }
+
+    public function attachPortsOwned(User $user, User $target, Port $port): bool
+    {
+        return $this->update($user, $target);
+    }
+
+    public function syncPortsOwned(User $user, User $target, Collection $ports): bool
+    {
+        return $this->update($user, $target);
+    }
+
+    public function detachPortsOwned(User $user, User $target, Port $port): bool
+    {
+        return $this->update($user, $target);
+    }
+
+    public function attachBills(User $user, User $target, Bill $bill): bool
+    {
+        return $this->update($user, $target);
+    }
+
+    public function syncBills(User $user, User $target, Collection $bills): bool
+    {
+        return $this->update($user, $target);
+    }
+
+    public function detachBills(User $user, User $target, Bill $bill): bool
+    {
+        return $this->update($user, $target);
+    }
+
+    public function attachDeviceGroups(User $user, User $target, DeviceGroup $group): bool
+    {
+        return $this->update($user, $target);
+    }
+
+    public function syncDeviceGroups(User $user, User $target, Collection $groups): bool
+    {
+        return $this->update($user, $target);
+    }
+
+    public function detachDeviceGroups(User $user, User $target, DeviceGroup $group): bool
+    {
+        return $this->update($user, $target);
     }
 }

@@ -4,7 +4,9 @@ namespace App\Policies;
 
 use App\Facades\Permissions;
 use App\Models\Port;
+use App\Models\PortGroup;
 use App\Models\User;
+use Illuminate\Support\Collection;
 
 class PortPolicy
 {
@@ -63,19 +65,18 @@ class PortPolicy
                 || Permissions::canAccessPort($port, $user));
     }
 
-    /**
-     * Determine whether the user can restore the port.
-     */
-    public function restore(User $user): bool
+    public function attachGroups(User $user, Port $port, PortGroup $group): bool
     {
-        return $this->hasGlobalPermission($user, 'restore');
+        return $this->update($user, $port);
     }
 
-    /**
-     * Determine whether the user can permanently delete the port.
-     */
-    public function forceDelete(User $user): bool
+    public function syncGroups(User $user, Port $port, Collection $groups): bool
     {
-        return $this->hasGlobalPermission($user, 'forceDelete');
+        return $this->update($user, $port);
+    }
+
+    public function detachGroups(User $user, Port $port, PortGroup $group): bool
+    {
+        return $this->update($user, $port);
     }
 }

@@ -37,6 +37,14 @@ class Bill extends BaseModel
 
     public $timestamps = false;
     protected $primaryKey = 'bill_id';
+    protected $fillable = [
+        'bill_name',
+        'bill_type',
+        'bill_day',
+        'bill_custid',
+        'bill_ref',
+        'bill_notes',
+    ];
 
     // ---- Query Scopes ----
 

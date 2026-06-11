@@ -124,11 +124,18 @@ class AlertRule extends BaseModel
             return $query;
         }
 
-        if (! $this->isJoined($query, 'alerts')) {
-            $query->join('alerts', 'alerts.rule_id', 'alert_rules.id');
+        if (Gate::forUser($user)->allows('viewAll', Device::class)) {
+            return $query;
         }
 
-        return $this->hasDeviceAccess($query, $user, 'alerts');
+        // Use a correlated subquery rather than a join: joining alerts pulls its `id`
+        // into scope, making an unqualified `where id = ?` (e.g. Restify's single-resource
+        // lookup) ambiguous, and can duplicate alert_rules rows.
+        return $query->whereExists(function ($sub) use ($user) {
+            $sub->from('alerts')
+                ->whereColumn('alerts.rule_id', 'alert_rules.id')
+                ->whereIntegerInRaw('alerts.device_id', \Permissions::devicesForUser($user));
+        });
     }
 
     // ---- Define Relationships ----
@@ -187,6 +194,14 @@ class AlertRule extends BaseModel
     public function alertOperation(): BelongsTo
     {
         return $this->belongsTo(AlertOperation::class, 'alert_operation_id');
+    }
+
+    /**
+     * @return BelongsToMany<AlertTemplate, $this>
+     */
+    public function templates(): BelongsToMany
+    {
+        return $this->belongsToMany(AlertTemplate::class, 'alert_template_map', 'alert_rule_id', 'alert_templates_id');
     }
 
     /**

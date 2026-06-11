@@ -1,3 +1,12 @@
+## API v1
+
+A modern REST API is available at `/api/v1` with Sanctum token authentication,
+pagination, search, and JSON:API response format. See the [API v1 documentation](V1.md)
+for usage, and [Creating API Resources](../Developing/Creating-API-Resources.md)
+for adding new endpoints.
+
+## API v0 (Legacy)
+
 ## Versioning
 
 Versioning an API is a minefield which saw us looking at numerous

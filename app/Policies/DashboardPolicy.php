@@ -49,8 +49,7 @@ class DashboardPolicy
     public function update(User $user, Dashboard $dashboard): bool
     {
         return $dashboard->user_id == $user->user_id
-            || $dashboard->access > 2
-            || ($dashboard->access > 1 && $this->hasGlobalPermission($user, 'update'));
+            || $dashboard->access > 2;
     }
 
     /**
@@ -61,8 +60,7 @@ class DashboardPolicy
      */
     public function delete(User $user, Dashboard $dashboard): bool
     {
-        return $dashboard->user_id == $user->user_id
-            || $this->hasGlobalPermission($user, 'delete');
+        return $dashboard->user_id == $user->user_id;
     }
 
     /**
