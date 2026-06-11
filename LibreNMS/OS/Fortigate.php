@@ -119,7 +119,7 @@ class Fortigate extends OS implements
         }
 
         return new Location([
-            'location' => "GPS {$lat},{$lon}",
+            'location' => $this->getDevice()->sysName ?: $this->getDevice()->hostname,
             'lat' => $lat,
             'lng' => $lon,
         ]);
