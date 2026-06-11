@@ -7311,6 +7311,26 @@
                 "release": "release"
             }
         },
+        "update_on_days": {
+            "default": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+            "type": "array",
+            "options": {
+                "monday": "Monday",
+                "tuesday": "Tuesday",
+                "wednesday": "Wednesday",
+                "thursday": "Thursday",
+                "friday": "Friday",
+                "saturday": "Saturday",
+                "sunday": "Sunday"
+            },
+            "validate": {
+                "value": "array",
+                "value.*": "in:monday,tuesday,wednesday,thursday,friday,saturday,sunday"
+            },
+            "group": "system",
+            "section": "updates",
+            "order": 2
+        },
         "uptime_warning": {
             "group": "webui",
             "section": "device",
