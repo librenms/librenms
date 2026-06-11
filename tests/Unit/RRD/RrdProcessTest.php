@@ -188,7 +188,7 @@ class RrdProcessTest extends TestCase
         $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
 
         $this->expectException(RrdPermissionException::class);
-        $this->expectExceptionMessage("Cannot create temporary file");
+        $this->expectExceptionMessage('Cannot create temporary file');
 
         $rrdProcess->run('update test.rrd N:1');
     }
