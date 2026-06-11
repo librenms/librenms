@@ -26,6 +26,55 @@
 
 namespace LibreNMS\Exceptions;
 
-class RrdException extends \Exception
+abstract class RrdException extends \Exception
 {
+    public static function parse(string $message): self
+    {
+        if (preg_match('/ERROR: (.*)/', $message, $matches)) {
+            $message = $matches[1];
+        }
+        $error = trim($message);
+
+        if (str_contains($error, 'Unable to connect to rrdcached')) {
+            return new RrdCachedConnectionException($error);
+        }
+
+        if (str_contains($error, 'No such file')) {
+            return new RrdNotFoundException($error);
+        }
+
+        if (str_contains($error, 'illegal attempt to update using time')) {
+            return new RrdUpdateTooFrequentException($error);
+        }
+
+        if (str_contains($error, 'expected') && str_contains($error, 'data source readings')) {
+            return new RrdDsMismatchException($error);
+        }
+
+        if (str_contains($error, 'unknown DS name')) {
+            return new RrdDsMismatchException($error);
+        }
+
+        if (str_contains($error, 'found extra data on update argument')) {
+            return new RrdDsMismatchException($error);
+        }
+
+        if (str_contains($error, 'expected timestamp not found in data source')) {
+            return new RrdDsMismatchException($error);
+        }
+
+        if (str_contains($error, 'Permission denied') || str_contains($error, 'Cannot create temporary file')) {
+            return new RrdPermissionException($error);
+        }
+
+        if (str_contains($error, 'reached EOF while loading header')) {
+            return new RrdCorruptionException($error);
+        }
+
+        if (str_contains($error, 'rrdtool: not found')) {
+            return new RrdExecutableNotFoundException($error);
+        }
+
+        return new RrdUnknownException($message);
+    }
 }
