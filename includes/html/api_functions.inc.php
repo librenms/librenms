@@ -3945,12 +3945,13 @@ function search_by_mac(Illuminate\Http\Request $request)
         return api_error(422, $validate->messages());
     }
 
-    $ports = Port::whereHas('fdbEntries', function ($fdbDownlink) use ($macAddress): void {
-        $fdbDownlink->where('mac_address', $macAddress);
-    })
-         ->withCount('fdbEntries')
-         ->orderBy('fdb_entries_count')
-         ->get();
+    $ports = Port::hasAccess(Auth::user())
+        ->whereHas('fdbEntries', function ($fdbDownlink) use ($macAddress): void {
+            $fdbDownlink->where('mac_address', $macAddress);
+        })
+        ->withCount('fdbEntries')
+        ->orderBy('fdb_entries_count')
+        ->get();
 
     if ($ports->count() == 0) {
         return api_error(404, 'mac not found');
