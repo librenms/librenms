@@ -323,7 +323,7 @@ Socialite can specify scopes that should be included with in the authentication 
 
 === "Microsoft"
 
-    For example in Microsoft EntraID you need to configure roles that are send back to LibreNMS
+    For example in Microsoft EntraID you need to configure roles that are sent back to LibreNMS
 
     This requires configuration in EntraID.
     
