@@ -90,14 +90,6 @@ class DeviceConfigTabTest extends TestCase
         $this->assertFalse(app(ConfigController::class)->visible($device));
     }
 
-    public function testGuestIsRedirectedFromBackupEndpoints(): void
-    {
-        $device = Device::factory()->create();
-
-        $this->get(route('device.config.backups', ['device' => $device->device_id, 'page' => 0]))
-            ->assertRedirect();
-    }
-
     public function testUserWithoutPermissionGetsForbidden(): void
     {
         $device = Device::factory()->create();

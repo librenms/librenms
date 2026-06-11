@@ -63,6 +63,9 @@ class ConfigController extends Controller implements DeviceTab
         return __('Config');
     }
 
+    /**
+     * @return array{error: ?string, provider: ?string, latest: ?array{id: string, date: ?int, until: ?int, type: string, content: ?string}, backups: list<array{id: string, date: ?int, until: ?int, type: string, content: ?string}>, total: int, totalPages: int}
+     */
     public function data(Device $device, Request $request): array
     {
         $empty = [

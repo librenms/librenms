@@ -60,7 +60,7 @@ final class UnimusApiClientTest extends TestCase
         $this->assertSame(7, $client->findDeviceId($this->makeDevice()));
 
         Http::assertSentCount(1);
-        Http::assertSent(fn ($request) => str_contains($request->url(), 'findByAddress/router.example.com')
+        Http::assertSent(fn ($request) => str_contains((string) $request->url(), 'findByAddress/router.example.com')
             && $request->hasHeader('Authorization', 'Bearer test-token'));
     }
 
@@ -225,6 +225,6 @@ final class UnimusApiClientTest extends TestCase
         $this->assertSame(['line' => 2, 'text' => 'mtu 1500'], $diff[1]['original'][0]);
         $this->assertSame(['line' => 2, 'text' => 'mtu 9000'], $diff[1]['revised'][0]);
 
-        Http::assertSent(fn ($request) => str_contains($request->url(), 'origId=1') && str_contains($request->url(), 'revId=2'));
+        Http::assertSent(fn ($request) => str_contains((string) $request->url(), 'origId=1') && str_contains((string) $request->url(), 'revId=2'));
     }
 }

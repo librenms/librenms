@@ -124,7 +124,7 @@ class Unimus extends BaseApi
     }
 
     /**
-     * @return array{backups: array, total: int, totalPages: int, page: int}|null
+     * @return array{backups: list<array{id: int, date: ?int, until: ?int, type: string, content: ?string}>, total: int, totalPages: int, page: int}|null
      */
     public function getBackups(int $unimusDeviceId, int $page = 0, int $size = 50): ?array
     {
@@ -160,7 +160,7 @@ class Unimus extends BaseApi
                 && (int) $backup['id'] === $backupId
                 && ($backup['type'] ?? 'TEXT') === 'TEXT'
             ) {
-                return base64_decode($backup['bytes'], true) ?: null;
+                return base64_decode((string) $backup['bytes'], true) ?: null;
             }
         }
 
@@ -168,7 +168,7 @@ class Unimus extends BaseApi
     }
 
     /**
-     * @return list<array{type: string, original: array, revised: array}>|null
+     * @return list<array{type: string, original: list<array{line: ?int, text: string}>, revised: list<array{line: ?int, text: string}>}>|null
      */
     public function getDiff(int $origId, int $revId): ?array
     {
@@ -182,6 +182,7 @@ class Unimus extends BaseApi
     }
 
     /**
+     * @param  array<string, mixed>  $backup
      * @return array{id: int, date: ?int, until: ?int, type: string, content: ?string}
      */
     private function normalizeBackup(array $backup, bool $include_content = false): array
@@ -203,7 +204,8 @@ class Unimus extends BaseApi
     }
 
     /**
-     * @return list<array{type: string, original: array, revised: array}>
+     * @param  array<mixed>  $data
+     * @return list<array{type: string, original: list<array{line: ?int, text: string}>, revised: list<array{line: ?int, text: string}>}>
      */
     private function normalizeDiff(array $data): array
     {
@@ -225,6 +227,7 @@ class Unimus extends BaseApi
     }
 
     /**
+     * @param  array<mixed>  $lines
      * @return list<array{line: ?int, text: string}>
      */
     private function normalizeDiffLines(array $lines): array
@@ -261,6 +264,9 @@ class Unimus extends BaseApi
         return array_values(array_unique(array_filter($candidates)));
     }
 
+    /**
+     * @param  array<string, int|string>  $query
+     */
     private function get(string $uri, array $query = []): ?Response
     {
         if (! $this->enabled) {
