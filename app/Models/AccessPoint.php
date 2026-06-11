@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class AccessPoint extends DeviceRelatedModel implements Keyable
 {
+    use HasFactory;
     protected $primaryKey = 'accesspoint_id';
     public $timestamps = false;
     protected $fillable = [

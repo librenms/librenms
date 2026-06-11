@@ -13,9 +13,10 @@ class OspfNbrFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => $this->faker->randomDigit(),
+            'ospf_nbr_id' => $this->faker->unique()->ipv4(),
             'ospfNbrIpAddr' => $this->faker->ipv4(),
             'ospfNbrAddressLessIndex' => $this->faker->randomDigit(),
+            'ospfNbrState' => $this->faker->randomElement(['full', 'init', 'twoWay']),
             'ospfNbrRtrId' => $this->faker->ipv4(),
             'ospfNbrOptions' => 0,
             'ospfNbrPriority' => 1,
