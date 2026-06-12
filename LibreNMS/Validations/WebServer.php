@@ -46,9 +46,9 @@ class WebServer extends BaseValidation
     {
         if (! app()->runningInConsole()) {
             $url = $this->removeStandardPorts(request()->url());
-            $base_url = LibrenmsConfig::get('base_url');
-            $expected = $this->removeStandardPorts(Str::finish($base_url, '/') . 'validate/results/webserver');
             $correct_base = str_replace('/validate/results/webserver', '', $url);
+            $app_url = rtrim((string) \config('app.url'), '/');
+            $expected = $this->removeStandardPorts($app_url . '/validate/results/webserver');
 
             if ($url !== $expected) {
                 preg_match($this->host_regex, $url, $actual_host_match);
@@ -56,18 +56,19 @@ class WebServer extends BaseValidation
                 $actual_host = $actual_host_match[1] ?? '';
                 $expected_host = $expected_host_match[1] ?? "parse failure ($expected)";
 
-                if ($base_url == '/' && ! str_contains($actual_host, '/') || ! Str::startsWith($base_url, 'http')) {
-                    $validator->warn('base_url could be more specific', "lnms config:set base_url $correct_base");
-                } elseif ($actual_host != $expected_host) {
+                if ($actual_host !== $expected_host) {
                     $nginx = Str::startsWith(request()->server->get('SERVER_SOFTWARE'), 'nginx');
                     $server_name = $nginx ? 'server_name' : 'ServerName';
                     $fix = $nginx ? "server_name $actual_host;" : "ServerName $actual_host";
                     $validator->fail("$server_name is set incorrectly for your webserver, update your webserver config. $actual_host $expected_host", $fix);
                 } else {
-                    $validator->fail('base_url is not set correctly', "lnms config:set base_url $correct_base");
+                    $validator->fail("APP_URL is not set correctly, it should be $correct_base", "Set APP_URL=$correct_base in .env and run: lnms config:cache");
                 }
-            } elseif (preg_replace('#/$#', '', (string) \config('app.url')) !== $correct_base) {
-                $validator->fail("APP_URL is not set correctly. It should be set to $correct_base");
+            }
+
+            if (LibrenmsConfig::get('base_url')) {
+                $legacy = rtrim((string) LibrenmsConfig::get('base_url'), '/');
+                $validator->warn("base_url is deprecated and ignored. Remove it from config.php and set APP_URL=$legacy in .env, then run: lnms config:cache");
             }
 
             if (request()->secure() && ! \config('session.secure')) {

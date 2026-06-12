@@ -394,14 +394,6 @@ class ConfigRepository
         Arr::set($this->config, 'log_dir', $this->get('install_dir') . '/logs');
         Arr::set($this->config, 'distributed_poller_name', php_uname('n'));
 
-        // set base_url from access URL
-        if (isset($_SERVER['SERVER_NAME']) && isset($_SERVER['SERVER_PORT'])) {
-            $port = $_SERVER['SERVER_PORT'] != 80 ? ':' . $_SERVER['SERVER_PORT'] : '';
-            // handle literal IPv6
-            $server = Str::contains($_SERVER['SERVER_NAME'], ':') ? "[{$_SERVER['SERVER_NAME']}]" : $_SERVER['SERVER_NAME'];
-            Arr::set($this->config, 'base_url', "http://$server$port/");
-        }
-
         // graph color copying
         Arr::set($this->config, 'graph_colours.mega', array_merge(
             (array) Arr::get($this->config, 'graph_colours.psychedelic', []),
@@ -477,15 +469,6 @@ class ConfigRepository
 
     private function loadRuntimeSettings(): void
     {
-        // If we're on SSL, let's properly detect it
-        if (
-            isset($_SERVER['HTTPS']) ||
-            (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
-        ) {
-            $this->set('base_url', preg_replace('/^http:/', 'https:', (string) $this->get('base_url', '')));
-        }
-        $this->set('base_url', Str::finish($this->get('base_url', ''), '/'));
-
         $this->set('applied_site_style', $this->get('site_style'));
 
         $this->populateTime();
