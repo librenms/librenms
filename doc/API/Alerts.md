@@ -301,6 +301,8 @@ Input (JSON):
 - devices: This is either an array of device ids or -1 for a global rule
 - groups: Array of device group ids
 - locations: Array of location ids
+- invert_map: Optional boolean. When `true`, the rule applies to all
+  devices except the selected devices, groups and locations.
 - builder: The rule which should be in the format entity.condition
   value (i.e devices.status != 0 for devices marked as down). It must
   be json encoded in the format rules are currently stored.
@@ -350,6 +352,8 @@ Input (JSON):
 - devices: This is either an array of device ids or -1 for a global rule
 - groups: Array of device group ids
 - locations: Array of location ids
+- invert_map: Optional boolean. When `true`, the rule applies to all
+  devices except the selected devices, groups and locations.
 - builder: The rule which should be in the format entity.condition
   value (i.e devices.status != 0 for devices marked as down). It must
   be json encoded in the format rules are currently stored.
