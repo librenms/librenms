@@ -1105,12 +1105,6 @@
                 "notPresent"
             ]
         },
-        "base_url": {
-            "group": "system",
-            "section": "server",
-            "order": 5,
-            "type": "text"
-        },
         "billing.95th_default_agg": {
             "default": false,
             "type": "boolean",
