@@ -92,7 +92,7 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
 
     $response[] = [
         'datetime' => "<span class='alert-status " . eventlog_severity($severity_colour) . " eventlog-status'></span>" . $eventlog['humandate'],
-        'hostname' => Url::deviceLink($device, shorthost($device->hostname)),
+        'hostname' => Url::deviceLink($device, $device->shortDisplayName()),
         'type' => $type,
         'message' => htmlspecialchars((string) $eventlog['message']),
         'username' => $eventlog['username'],

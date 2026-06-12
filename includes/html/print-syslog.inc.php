@@ -3,8 +3,6 @@
 if (device_permitted($entry['device_id'])) {
     $syslog_output .= '<tr>';
 
-    // Stop shortening hostname. Issue #61
-    // $entry['hostname'] = shorthost($entry['hostname'], 20);
     if ($vars['page'] != 'device') {
         $syslog_output .= '<td>' . e($entry['date']) . '</td>
                         <td><strong>' . generate_device_link($entry) . '</strong></td>

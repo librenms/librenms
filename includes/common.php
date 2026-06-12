@@ -93,25 +93,6 @@ function external_exec($command)
     return $output;
 }
 
-function shorthost($hostname, $len = 12)
-{
-    // IP addresses should not be shortened
-    if (filter_var($hostname, FILTER_VALIDATE_IP)) {
-        return $hostname;
-    }
-    $len = LibrenmsConfig::get('shorthost_target_length', $len);
-
-    $parts = explode('.', (string) $hostname);
-    $shorthost = $parts[0];
-    $i = 1;
-    while ($i < count($parts) && strlen($shorthost . '.' . $parts[$i]) < $len) {
-        $shorthost = $shorthost . '.' . $parts[$i];
-        $i++;
-    }
-
-    return $shorthost;
-}
-
 function print_error($text)
 {
     if (Laravel::isCli()) {

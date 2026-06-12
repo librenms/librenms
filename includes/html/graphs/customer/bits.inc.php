@@ -1,28 +1,28 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Port;
 use LibreNMS\Util\Rewrite;
 
 // Generate a list of ports and then call the multi_bits grapher to generate from the list
 
-$cust_descrs = (array) LibrenmsConfig::get('customers_descr', ['cust']);
+$rrd_list = Port::with('device')
+    ->where('port_descr_descr', $vars['id'])
+    ->whereIn('port_descr_type', LibrenmsConfig::get('customers_descr', ['cust']))
+    ->get()
+    ->reduce(function (array $rrd, $port) {
+        $rrd_filename = get_port_rrdfile_path($port->hostname, $port->port_id);
+        if (Rrd::checkRrdExists($rrd_filename)) {
+            $rrd[] = [
+                'filename' => $rrd_filename,
+                'descr' => ($port->device?->hostname ?? __('Unknown device')) . '-' . $port->ifDescr,
+                'descr_in' => $port->device?->shortDisplayName() ?? __('Unknown device'),
+                'descr_out' => Rewrite::shortenIfName($port->ifDescr),
+            ];
+        }
 
-$sql = 'SELECT * FROM `ports` AS I, `devices` AS D WHERE `port_descr_descr` = ? AND D.device_id = I.device_id AND `port_descr_type` IN ' . dbGenPlaceholders(count($cust_descrs));
-$param = $cust_descrs;
-array_unshift($param, $vars['id']);
-
-$rrd_list = [];
-foreach (dbFetchRows($sql, $param) as $port) {
-    $rrd_filename = get_port_rrdfile_path($port['hostname'], $port['port_id']); // FIXME: Unification OK?
-    if (Rrd::checkRrdExists($rrd_filename)) {
-        $rrd_list[] = [
-            'filename' => $rrd_filename,
-            'descr' => $port['hostname'] . '-' . $port['ifDescr'],
-            'descr_in' => shorthost($port['hostname']),
-            'descr_out' => Rewrite::shortenIfName($port['ifDescr']),
-        ];
-    }
-}
+        return $rrd;
+    }, []);
 
 $units = 'bps';
 $total_units = 'B';
