@@ -1936,6 +1936,10 @@ function add_edit_rule(Illuminate\Http\Request $request)
         $saveData['alert_operation_id'] = ($v === null || $v === '') ? null : (int) $v;
     }
 
+    if (array_key_exists('invert_map', $data)) {
+        $saveData['invert_map'] = filter_var($data['invert_map'], FILTER_VALIDATE_BOOLEAN);
+    }
+
     if (is_numeric($rule_id)) {
         $alertRule = \App\Models\AlertRule::find($rule_id);
         if (! $alertRule) {
