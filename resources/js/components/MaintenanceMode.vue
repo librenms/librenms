@@ -258,6 +258,7 @@ export default {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
         },
         body: new URLSearchParams({
           type: 'schedule-maintenance',
@@ -302,6 +303,7 @@ export default {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
         },
         body: new URLSearchParams({
           type: 'schedule-maintenance',
