@@ -598,10 +598,6 @@ return [
             'description' => 'Tipos de Portas de Clientes',
             'help' => 'Portas do(s) tipo(s) de descrição listados serão exibidas no menu de portas de clientes. Veja a documentação de Análise de Descrição de Interface para mais informações.',
         ],
-        'base_url' => [
-            'description' => 'URL Específica',
-            'help' => 'Isso deve *apenas* ser definido se você quiser *forçar* um determinado nome de host/porta. Isso impedirá que a interface web seja utilizável a partir de qualquer outro nome de host',
-        ],
         'discovery_modules' => [
             'arp-table' => [
                 'description' => 'Tabela ARP',

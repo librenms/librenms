@@ -721,10 +721,6 @@ return [
             'description' => 'Customer Port Types',
             'help' => 'Ports of the listed description type(s) will be shown under the customers ports menu entry.  See Interface Description Parsing docs for more info.',
         ],
-        'base_url' => [
-            'description' => 'Base URL',
-            'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname',
-        ],
         'disabled_sensors' => [
             'description' => 'Disabled Sensors',
             'help' => 'Sensors that should not be polled or displayed in the web interface.',
