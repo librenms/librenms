@@ -408,7 +408,7 @@ At a minimum: X-Forwarded-For and X-Forwarded-Proto (X-Forwarded-Port if needed)
 You also need to [Set the proxy or proxies as trusted](../Support/Environment-Variables.md#trusted-reverse-proxies)
 
 If you are using a subdirectory on the reverse proxy and not on the actual web server,
-you may need to set [APP_URL](../Support/Environment-Variables.md#base-url) and `$config['base_url']`.
+you may need to set [APP_URL](../Support/Environment-Variables.md#base-url) in `.env`.
 
 ### <a name='my-alerts-aren't-being-delivered-on-time'>My alerts aren't being delivered on time</a>
 
