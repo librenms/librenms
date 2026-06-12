@@ -37,14 +37,5 @@ if (isset($_GET['ave'])) {
     $urlargs['ave'] = $_GET['ave'];
 }
 
-$url = url('graph.php') . '?';
-$i = 0;
-foreach ($urlargs as $name => $value) {
-    if ($i++ > 0) {
-        $url .= '&';
-    }
-    $url .= "$name=$value";
-}
-
-header("Location: $url", false, 301);
+header('Location: ' . url()->query('graph.php', $urlargs), false, 301);
 exit;
