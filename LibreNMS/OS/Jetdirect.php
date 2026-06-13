@@ -27,15 +27,23 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use SnmpQuery;
 
 class Jetdirect extends Shared\Printer
 {
+    private const SNMP_CONTEXT = 'Jetdirect';
+
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
         $device = $this->getDevice();
 
-        $info = $this->parseDeviceId(snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.11.2.3.9.1.1.7.0', '-OQv'));
+        $jetdirect_id = SnmpQuery::get('.1.3.6.1.4.1.11.2.3.9.1.1.7.0')->value();
+        if (empty($jetdirect_id)) {
+            $jetdirect_id = SnmpQuery::context(self::SNMP_CONTEXT)->get('.1.3.6.1.4.1.11.2.3.9.1.1.7.0')->value();
+        }
+
+        $info = $this->parseDeviceId($jetdirect_id);
         $hardware = $info['MDL'] ?? $info['MODEL'] ?? $info['DES'] ?? $info['DESCRIPTION'] ?? null;
         if (! empty($hardware)) {
             $hardware = str_ireplace([
