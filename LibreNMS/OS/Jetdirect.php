@@ -36,12 +36,10 @@ class Jetdirect extends Shared\Printer
         parent::discoverOS($device); // yaml
         $device = $this->getDevice();
 
-        $jetdirect_id = SnmpQuery::get('HP-LASERJET-COMMON-MIB::gdStatusId.0')->value();
-        if (empty($jetdirect_id)) {
-            $jetdirect_id = SnmpQuery::context('Jetdirect')->get('HP-LASERJET-COMMON-MIB::gdStatusId.0')->value();
-        }
-
+        $jetdirect_id = SnmpQuery::get('HP-LASERJET-COMMON-MIB::gdStatusId.0')->value()
+            ?: SnmpQuery::context('Jetdirect')->get('HP-LASERJET-COMMON-MIB::gdStatusId.0')->value();
         $info = $this->parseDeviceId($jetdirect_id);
+
         $hardware = $info['MDL'] ?? $info['MODEL'] ?? $info['DES'] ?? $info['DESCRIPTION'] ?? null;
         if (! empty($hardware)) {
             $hardware = str_ireplace([
