@@ -31,8 +31,6 @@ use SnmpQuery;
 
 class Jetdirect extends Shared\Printer
 {
-    private const SNMP_CONTEXT = 'Jetdirect';
-
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
@@ -40,7 +38,7 @@ class Jetdirect extends Shared\Printer
 
         $jetdirect_id = SnmpQuery::get('.1.3.6.1.4.1.11.2.3.9.1.1.7.0')->value();
         if (empty($jetdirect_id)) {
-            $jetdirect_id = SnmpQuery::context(self::SNMP_CONTEXT)->get('.1.3.6.1.4.1.11.2.3.9.1.1.7.0')->value();
+            $jetdirect_id = SnmpQuery::context('Jetdirect')->get('.1.3.6.1.4.1.11.2.3.9.1.1.7.0')->value();
         }
 
         $info = $this->parseDeviceId($jetdirect_id);
