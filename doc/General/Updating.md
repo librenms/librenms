@@ -50,7 +50,7 @@ array and is blank by default.
 
 !!! setting "system/updates"
     ```bash
-    lnms config:get update_._on_days
+    lnms config:get update_on_days
     ```
     ```bash
     lnms config:set update_on_days.+ "monday"
