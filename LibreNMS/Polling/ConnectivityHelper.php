@@ -29,15 +29,59 @@ namespace LibreNMS\Polling;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 
-class ConnectivityHelper
+readonly class ConnectivityHelper
 {
-    public static function snmpIsAllowed(Device $device): bool
+    public function __construct(
+        private Device $device,
+    ) {}
+
+    public function isAvailable(): bool
     {
-        return $device->snmp_disable === false;
+        return $this->device->status;
     }
 
-    public static function pingIsAllowed(Device $device): bool
+    public function hasAvailability(): bool
     {
-        return LibrenmsConfig::get('icmp_check') && ! ($device->exists && $device->getAttrib('override_icmp_disable') === 'true');
+        return $this->icmpIsEnabled() || $this->snmpIsAvailable();
+    }
+
+    public function snmpIsEnabled(): bool
+    {
+        return $this->device->snmp_disable === false;
+    }
+
+    public function icmpIsEnabled(): bool
+    {
+        return LibrenmsConfig::get('icmp_check') && ! ($this->device->exists && $this->device->getAttrib('override_icmp_disable') === 'true');
+    }
+
+    public function snmpIsAvailable(): bool
+    {
+        return $this->snmpIsEnabled() && $this->isAvailable() && ! str_contains($this->device->status_reason, 'snmp');
+    }
+
+    public function icmpIsAvailable(): bool
+    {
+        return $this->icmpIsEnabled() && $this->isAvailable() &&! str_contains($this->device->status_reason, 'icmp');
+    }
+
+    public function ipmiIsEnabled(): bool
+    {
+        return $this->device->exists && $this->device->getAttrib('ipmi_hostname');
+    }
+
+    public function ipmiIsAvailable(): bool
+    {
+        return $this->ipmiIsEnabled();
+    }
+
+    public function unixAgentIsEnabled(): bool
+    {
+        return false;
+    }
+
+    public function unixAgentIsAvailable(): bool
+    {
+        return $this->unixAgentIsEnabled();
     }
 }

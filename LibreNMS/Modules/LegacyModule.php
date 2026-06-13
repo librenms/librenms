@@ -34,6 +34,7 @@ use LibreNMS\Component;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\Debug;
 use Symfony\Component\Yaml\Yaml;
@@ -61,9 +62,9 @@ class LegacyModule implements Module
     {
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $this->shouldPoll($os, $status);
+        return $this->shouldPoll($os, $status, $connectivity);
     }
 
     public function discover(OS $os): void
@@ -85,10 +86,14 @@ class LegacyModule implements Module
         Debug::enableErrorReporting(); // and back to normal
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
         // all legacy modules require snmp except ipmi and unix-agent
-        return $status->isEnabledAndDeviceUp($os->getDevice(), check_snmp: ! in_array($this->name, ['ipmi', 'unix-agent']));
+        return $status->isEnabled() && match ($this->name) {
+                'ipmi' => $connectivity->ipmiIsAvailable(),
+                'unix-agent' => $connectivity->unixAgentIsAvailable(),
+                default => $connectivity->snmpIsAvailable(),
+            };
     }
 
     public function poll(OS $os, DataStorageInterface $datastore): void

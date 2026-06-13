@@ -47,6 +47,7 @@ use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Time;
@@ -127,20 +128,20 @@ class RunAlerts
         $obj['proc'] = $alert['proc'];
         $obj['status'] = $device->status;
         $obj['status_reason'] = $device->status_reason;
-        if (ConnectivityHelper::pingIsAllowed($device)) {
+
+        if ((new ConnectivityHelper($device))->icmpIsEnabled()) {
             try {
                 $last_ping = Rrd::lastUpdate(Rrd::name($device->hostname, 'icmp-perf'));
-            } catch (\Exception $e) {
+                if ($last_ping) {
+                    $obj['ping_timestamp'] = $last_ping->timestamp;
+                    $obj['ping_loss'] = Number::calculatePercent($last_ping->get('xmt') - $last_ping->get('rcv'), $last_ping->get('xmt'));
+                    $obj['ping_min'] = $last_ping->get('min');
+                    $obj['ping_max'] = $last_ping->get('max');
+                    $obj['ping_avg'] = $last_ping->get('avg');
+                    $obj['debug'] = 'unsupported';
+                }
+            } catch (RrdException $e) {
                 Log::error("Error getting last ping for device {$device->hostname}: {$e->getMessage()}");
-                $last_ping = null;
-            }
-            if ($last_ping) {
-                $obj['ping_timestamp'] = $last_ping->timestamp;
-                $obj['ping_loss'] = Number::calculatePercent($last_ping->get('xmt') - $last_ping->get('rcv'), $last_ping->get('xmt'));
-                $obj['ping_min'] = $last_ping->get('min');
-                $obj['ping_max'] = $last_ping->get('max');
-                $obj['ping_avg'] = $last_ping->get('avg');
-                $obj['debug'] = 'unsupported';
             }
         }
         $extra = $alert['details'];
