@@ -90,10 +90,10 @@ class LegacyModule implements Module
     {
         // all legacy modules require snmp except ipmi and unix-agent
         return $status->isEnabled() && match ($this->name) {
-                'ipmi' => $connectivity->ipmiIsAvailable(),
-                'unix-agent' => $connectivity->unixAgentIsAvailable(),
-                default => $connectivity->snmpIsAvailable(),
-            };
+            'ipmi' => $connectivity->ipmiIsAvailable(),
+            'unix-agent' => $connectivity->unixAgentIsAvailable(),
+            default => $connectivity->snmpIsAvailable(),
+        };
     }
 
     public function poll(OS $os, DataStorageInterface $datastore): void

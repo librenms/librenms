@@ -33,7 +33,8 @@ readonly class ConnectivityHelper
 {
     public function __construct(
         private Device $device,
-    ) {}
+    ) {
+    }
 
     public function isAvailable(): bool
     {
@@ -62,7 +63,7 @@ readonly class ConnectivityHelper
 
     public function icmpIsAvailable(): bool
     {
-        return $this->icmpIsEnabled() && $this->isAvailable() &&! str_contains($this->device->status_reason, 'icmp');
+        return $this->icmpIsEnabled() && $this->isAvailable() && ! str_contains($this->device->status_reason, 'icmp');
     }
 
     public function ipmiIsEnabled(): bool
