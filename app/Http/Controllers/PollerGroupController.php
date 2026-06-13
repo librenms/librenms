@@ -49,7 +49,7 @@ class PollerGroupController extends Controller
 
         $request->validate([
             'group_name' => 'required|string|max:255',
-            'descr' => 'nullable|string|max:255',
+            'descr' => 'string|max:255',
         ]);
 
         $pollergroup = PollerGroup::create([
@@ -77,7 +77,7 @@ class PollerGroupController extends Controller
 
         $request->validate([
             'group_name' => 'required|string|max:255',
-            'descr' => 'nullable|string|max:255',
+            'descr' => 'string|max:255',
         ]);
 
         if ($pollergroup->update([
