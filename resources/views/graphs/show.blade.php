@@ -25,9 +25,9 @@
 </div>
 
 @unless ($showCommand)
-<table width="100%" class="thumbnail_graph_table"><tr>
+<table class="thumbnail_graph_table tw:w-full"><tr>
 @foreach ($periodThumbs as $thumb)
-    <td style="text-align: center;">
+    <td class="tw:text-center">
         <b>{{ $thumb['text'] }}</b>
         <a href="{{ $thumb['link'] }}">
             {!! \LibreNMS\Util\Url::lazyGraphTag($thumb['vars']) !!}
@@ -38,34 +38,34 @@
 <hr />
 @endunless
 
-<div style="text-align: center;">
+<div class="tw:w-fit tw:min-w-[20rem] tw:mx-auto tw:whitespace-nowrap">
     <x-date-range-picker :start="$graphFrom" :end="$graphTo"></x-date-range-picker>
 </div>
 
-<div style="padding-top: 5px"></div>
-<center>
+<div class="tw:pt-[5px]"></div>
+<div class="tw:text-center">
 @foreach ($toggles as $toggle)
     @if (! $loop->first) | @endif
     <a href="{{ $toggle['link'] }}">{{ $toggle['text'] }}</a>
 @endforeach
 @if ($trendHint) | {{ __('To show trend, set to future date') }} @endif
-</center>
+</div>
 
 {!! $graphJsState !!}
 
-<div style="width: {{ $graphWidth }}; margin: auto;"><center>
+<div class="tw:w-fit tw:mx-auto tw:text-center">
 @if ($dynamicGraphHtml !== null)
 {!! $dynamicGraphHtml !!}
 @else
 {!! $mainGraphTag !!}
 @endif
-</center></div>
+</div>
 
 @if ($graphDescr !== null)
 <div class="panel panel-default">
     <div class="panel-heading">
-        <div style="float: left; width: 30px;">
-            <div style="margin: auto auto;">
+        <div class="tw:float-left tw:w-[30px]">
+            <div class="tw:m-auto">
                 <i class="fa-solid fa-circle-info fa-lg icon-theme" aria-hidden="true"></i>
             </div>
         </div>

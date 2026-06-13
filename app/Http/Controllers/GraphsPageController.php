@@ -127,7 +127,6 @@ class GraphsPageController extends Controller
             'trendHint' => $trendHint,
             'graphFrom' => $request->input('from', '-1d'),
             'graphTo' => $request->input('to'),
-            'graphWidth' => $graphWidth,
             'graphJsState' => $graphJsState,
             'dynamicGraphHtml' => $dynamicGraphHtml,
             'mainGraphTag' => $mainGraphTag,
