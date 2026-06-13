@@ -39,7 +39,8 @@
 @endunless
 
 <div class="tw:w-fit tw:min-w-[20rem] tw:mx-auto tw:whitespace-nowrap">
-    <x-date-range-picker :start="$graphFrom" :end="$graphTo"></x-date-range-picker>
+    <x-date-range-picker :start="$graphFrom" :end="$graphTo"
+                         class="tw:w-full tw:text-center tw:px-3 tw:py-2 tw:border tw:border-gray-300 tw:rounded-md"></x-date-range-picker>
 </div>
 
 <div class="tw:pt-[5px]"></div>
