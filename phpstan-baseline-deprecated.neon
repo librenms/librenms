@@ -51,7 +51,7 @@ parameters:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
 			identifier: function.deprecated
-			count: 2
+			count: 1
 			path: LibreNMS/Alert/AlertUtil.php
 
 		-
