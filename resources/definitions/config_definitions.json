@@ -7325,7 +7325,7 @@
             },
             "validate": {
                 "value": "array",
-                "value.*": "in:monday,tuesday,wednesday,thursday,friday,saturday,sunday"
+                "value.*": "distinct|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday"
             },
             "group": "system",
             "section": "updates",
