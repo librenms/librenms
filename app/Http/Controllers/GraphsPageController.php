@@ -66,18 +66,25 @@ class GraphsPageController extends Controller
             $subtypeSelected = $graphUrl(['type' => $type . '_' . $subtype]);
         }
 
-        // Thumbnail period row.
+        // Thumbnail period row. A thumbnail is "active" when its duration matches the range
+        // currently shown in the main graph (comparing durations stays correct even though the
+        // absolute now-anchored timestamps drift between requests).
         $thumbTo = LibrenmsConfig::get('time.now');
+        $currentDuration = (int) $vars['to'] - (int) $vars['from'];
         $periodThumbs = [];
         foreach (LibrenmsConfig::get('graphs.row.normal') as $period => $text) {
             $from = LibrenmsConfig::get("time.$period");
+            $periodDuration = (int) $thumbTo - (int) $from;
             $periodThumbs[] = [
                 'text' => $text,
-                'link' => $graphUrl(['from' => $from, 'to' => $thumbTo]),
+                'active' => $periodDuration > 0 && abs($currentDuration - $periodDuration) <= 0.1 * $periodDuration,
+                'link' => $graphUrl(['from' => $this->relativeOffset($periodDuration), 'to' => null]),
                 'vars' => array_merge($vars, [
-                    'height' => '60',
-                    'width' => $thumbWidth,
+                    'height' => '90',
+                    'width' => (int) round($thumbWidth * 1.5),
                     'legend' => 'no',
+                    'absolute' => 1, // full-size-mode: PNG renders at exactly width x height, so the
+                                     // thumbnail can reserve its space and load without layout shift
                     'from' => $from,
                     'to' => $thumbTo,
                 ]),
@@ -256,6 +263,28 @@ class GraphsPageController extends Controller
         }
 
         return ['width' => $width, 'height' => $height, 'thumbWidth' => $thumbWidth];
+    }
+
+    /**
+     * Express a duration in seconds as a relative "ago" offset (e.g. "-6h", "-1w", "-1mo") using
+     * the units understood by Time::parseAt() and the date-range picker. Using this for thumbnail
+     * links makes the picker show a friendly "X ago to now" range instead of raw timestamps, and
+     * keeps the range anchored to "now" on each load rather than freezing at click time.
+     *
+     * The duration is snapped to the largest unit that rounds to a whole count, so LibreNMS's
+     * 31-day month / 365-day year periods read as "1 month" / "1 year" rather than "31 days" /
+     * "365 days". Unit sizes match the date-range picker's own relative formatting.
+     */
+    private function relativeOffset(int $seconds): string
+    {
+        foreach (['y' => 31536000, 'mo' => 2592000, 'w' => 604800, 'd' => 86400, 'h' => 3600, 'm' => 60] as $unit => $size) {
+            $count = (int) round($seconds / $size);
+            if ($count >= 1) {
+                return '-' . $count . $unit;
+            }
+        }
+
+        return '-' . $seconds . 's';
     }
 
     /**
