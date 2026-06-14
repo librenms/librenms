@@ -3,7 +3,7 @@
 use App\Facades\DeviceCache;
 use Illuminate\Support\Facades\Gate;
 
-if ($_POST['editing']) {
+if (isset($_POST['editing'])) {
     $device=DeviceCache::getPrimary();
     if (Gate::allows('update', $device)) {
         $ipmi_hostname = $_POST['ipmi_hostname'];
@@ -63,11 +63,14 @@ if ($_POST['editing']) {
     }//end if
 }//end if
 
-if ($updated && $update_message) {
-    print_message($update_message);
-} elseif ($update_message) {
-    print_error($update_message);
+if (isset($update_message)) {
+    if (isset($updated)) {
+        print_message($update_message);
+    } else {
+        print_error($update_message);
+    }
 }
+
 
 ?>
 

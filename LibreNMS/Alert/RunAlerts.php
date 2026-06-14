@@ -35,12 +35,14 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\Alert;
+use App\Models\AlertLog;
 use App\Models\AlertTransport;
 use App\Models\ApplicationMetric;
 use App\Models\Eventlog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Alerting\QueryBuilderParser;
+use LibreNMS\Enum\AlertRuleOperationPhase;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\Severity;
@@ -227,6 +229,13 @@ class RunAlerts
         $obj['state'] = $alert['state'];
         $obj['alerted'] = $alert['alerted'];
         $obj['template'] = $template;
+
+        $obj['operation_phase'] = AlertUtil::mapAlertStateToOperationPhase((int) $alert['state']);
+        $detailCount = (int) ($extra['count'] ?? 0);
+        $obj['escalation_step'] = max(1, $detailCount);
+        if ($obj['operation_phase'] !== AlertRuleOperationPhase::PROBLEM) {
+            $obj['escalation_step'] = 1;
+        }
 
         return $obj;
     }
@@ -507,6 +516,17 @@ class RunAlerts
                 $rextra['recovery'] = true;
             }
 
+            if (in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED], true)) {
+                AlertUtil::mergeProblemPhaseTimingFromOperations((int) $alert['rule_id'], $alert['details'], $rextra);
+            }
+
+            if (! empty($rextra['_stop_notifications'])) {
+                unset($rextra['_stop_notifications']);
+                echo 'Max escalation steps reached for Alert-UID #' . $alert['id'] . "\r\n";
+
+                continue;
+            }
+
             if (! isset($alert['details']['count'])) {
                 // make sure count is set for below code, in legacy code null would get type juggled to 0
                 $alert['details']['count'] = 0;
@@ -518,7 +538,7 @@ class RunAlerts
 
             if ($status_check === null) {
                 Log::warning("Alert #{$alert['id']} references non-existent device {$alert['device_id']}, cleaning up");
-                Alert::query()->where('id', $alert['id'])->delete();
+                AlertLog::query()->where('id', $alert['id'])->delete();
 
                 continue;
             }
@@ -633,10 +653,23 @@ class RunAlerts
         $type = new Template;
 
         // If alert transport mapping exists, override the default transports
-        $transport_maps = AlertUtil::getAlertTransports($obj['alert_id']);
+        $transport_maps = AlertUtil::getAlertTransports(
+            $obj['alert_id'],
+            $obj['operation_phase'] ?? null,
+            (int) ($obj['escalation_step'] ?? 1)
+        );
 
+        $ruleId = (int) ($obj['rule_id'] ?? 0);
         if (! $transport_maps) {
-            $transport_maps = AlertUtil::getDefaultAlertTransports();
+            $reason = 'No mapped transport for this operation';
+            if ($ruleId > 0 && ! AlertUtil::ruleHasAlertOperations($ruleId)) {
+                $reason = 'No operations configured for this rule';
+            }
+
+            Eventlog::log($reason . ' (notification skipped)', $obj['device_id'], 'alert', Severity::Notice);
+            c_echo(" :: Skipped => $reason");
+
+            return;
         }
 
         // alerting for default contacts, etc

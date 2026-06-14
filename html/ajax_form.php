@@ -21,6 +21,13 @@ if (! Auth::check()) {
     exit('Unauthorized');
 }
 
+// Validate the CSRF token for this legacy POST dispatcher.
+$token = $_POST['_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+if (! hash_equals(csrf_token(), (string) $token)) {
+    http_response_code(419);
+    exit(json_encode(['status' => 'error', 'message' => 'CSRF token mismatch']));
+}
+
 Debug::set(isset($_REQUEST['debug']));
 
 $ajax_form = match ($_POST['type'] ?? '') {
@@ -61,9 +68,6 @@ $ajax_form = match ($_POST['type'] ?? '') {
     'show-alert-transport' => 'includes/html/forms/show-alert-transport.inc.php',
     'show-transport-group' => 'includes/html/forms/show-transport-group.inc.php',
     'storage-update' => 'includes/html/forms/storage-update.inc.php',
-    'token-item-create' => 'includes/html/forms/token-item-create.inc.php',
-    'token-item-disable' => 'includes/html/forms/token-item-disable.inc.php',
-    'token-item-remove' => 'includes/html/forms/token-item-remove.inc.php',
     'transport-groups' => 'includes/html/forms/transport-groups.inc.php',
     'update-ifalias' => 'includes/html/forms/update-ifalias.inc.php',
     'update-ifspeed' => 'includes/html/forms/update-ifspeed.inc.php',

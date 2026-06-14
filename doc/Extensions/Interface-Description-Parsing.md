@@ -52,9 +52,10 @@ The following config options can be set to enable more custom types:
     ```bash
     lnms config:set customers_descr.+ 'cust'
     lnms config:set transit_descr.+ 'transit'
-    lnms config:set peering_descr.+ 'peering'";'
+    lnms config:set peering_descr.+ 'peering'
     lnms config:set core_descr.+ 'core'
-    lnms config:set custom_descr.+ 'something_made_up'
+    lnms config:set custom_descr.+ 'ptp'
+    lnms config:set custom_descr.+ 'anything'
     ```
 
 ## Custom interface parser
@@ -93,7 +94,7 @@ Fields you can fill in your returned array
  - type: port type (only defined types will show as graphs)
  - descr: description of the port
  - circuit: usually a circuit id
- - speed: can be a plan name or a numeric speed 10G (or asymmetric 10G/500M), numeric speeds
+ - speed: can be a plan name or a numeric speed 10G or asymmetric egress/ingress numeric speeds (eg 10G/500M)
    can used by custom maps and some graphs
  - notes: notes
 

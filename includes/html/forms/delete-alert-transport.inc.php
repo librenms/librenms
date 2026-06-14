@@ -10,14 +10,15 @@
  * the source code distribution for details.
  */
 
+use App\Models\AlertOperationTransportMap;
 use App\Models\AlertTransport;
-use App\Models\AlertTransportMap;
 use App\Models\TransportGroupTransport;
 use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
 
-if (Gate::denies('delete', AlertTransport::class)) {
+$transport = AlertTransport::findOrFail($vars['transport_id']);
+if (Gate::denies('delete', $transport)) {
     exit(json_encode([
         'status' => 'error',
         'message' => 'You need permission.',
@@ -31,8 +32,8 @@ if (! is_numeric($vars['transport_id'])) {
     $status = 'error';
     $message = 'No transport selected';
 } else {
-    if (AlertTransport::where('transport_id', $vars['transport_id'])->delete()) {
-        AlertTransportMap::where('target_type', 'single')->where('transport_or_group_id', $vars['transport_id'])->delete();
+    if ($transport->delete()) {
+        AlertOperationTransportMap::where('transport_or_group_id', $vars['transport_id'])->where('target_type', 'single')->delete();
         TransportGroupTransport::where('transport_id', $vars['transport_id'])->delete();
 
         $message = 'Alert transport has been deleted';

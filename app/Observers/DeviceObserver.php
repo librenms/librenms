@@ -15,6 +15,11 @@ use Log;
 
 class DeviceObserver
 {
+    public function creating(Device $device): void
+    {
+        $device->regenerateDisplayName();
+    }
+
     /**
      * Handle the device "created" event.
      *
@@ -60,6 +65,10 @@ class DeviceObserver
 
     public function updating(Device $device): void
     {
+        if ($device->isDirty(['display_template', 'hostname', 'sysName', 'ip', 'overwrite_ip'])) {
+            $device->regenerateDisplayName();
+        }
+
         // handle device renames
         if ($device->isDirty('hostname')) {
             $new_name = $device->hostname;

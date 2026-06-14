@@ -193,7 +193,7 @@
                 "critical": "Critical"
             }
         },
-        "alert_rule.max_alerts": {
+        "alert_rule.default_operation_steps_to": {
             "default": 1,
             "units": "count",
             "group": "alerting",
@@ -201,7 +201,7 @@
             "order": 1,
             "type": "integer"
         },
-        "alert_rule.delay": {
+        "alert_rule.default_operation_start_in": {
             "default": 1,
             "units": "minutes",
             "group": "alerting",
@@ -209,7 +209,7 @@
             "order": 2,
             "type": "integer"
         },
-        "alert_rule.interval": {
+        "alert_rule.default_operation_step_duration": {
             "default": 5,
             "units": "minutes",
             "group": "alerting",
@@ -217,7 +217,7 @@
             "order": 3,
             "type": "integer"
         },
-        "alert_rule.mute_alerts": {
+        "alert_rule.default_operation_notifications_suppressed": {
             "default": false,
             "type": "boolean",
             "group": "alerting",
@@ -560,7 +560,7 @@
             "type": "select",
             "default": "none",
             "options" : {
-                "none" : "No Access",
+                "none" : "No Permissions",
                 "normal" : "Normal Access",
                 "global-read" : "Global Viewing Access",
                 "admin" : "Global Administrative Access"
@@ -979,6 +979,22 @@
                 "value.*": "is_regex"
             }
         },
+        "availablity.threshold_ok": {
+            "default": 99.9,
+            "group": "webui",
+            "section": "device",
+            "order": 101,
+            "type": "float",
+            "units": "percent"
+        },
+        "availablity.threshold_warning": {
+            "default": 95,
+            "group": "webui",
+            "section": "device",
+            "order": 102,
+            "type": "float",
+            "units": "percent"
+        },
         "bad_entity_sensor_regex": {
             "type": "array",
             "validate": {
@@ -1144,7 +1160,7 @@
             "type": "array",
             "group": "webui",
             "section": "port-descr",
-            "order": 2
+            "order": 41
         },
         "cpu_details_overview": {
             "default": false,
@@ -1155,7 +1171,7 @@
             "type": "array",
             "group": "webui",
             "section": "port-descr",
-            "order": 4
+            "order": 51
         },
         "custom_map.background_type": {
             "default": "none",
@@ -1380,7 +1396,7 @@
             "type": "array",
             "group": "webui",
             "section": "port-descr",
-            "order": 3
+            "order": 11
         },
         "dateformat.byminute": {
             "default": "Y-m-d H:i",
@@ -1388,6 +1404,10 @@
         },
         "dateformat.compact": {
             "default": "Y-m-d H:i:s",
+            "type": "text"
+        },
+        "dateformat.date": {
+            "default": "D, M j, Y",
             "type": "text"
         },
         "dateformat.long": {
@@ -2230,13 +2250,6 @@
             "section": "device",
             "order": 8
         },
-        "enable_footer": {
-            "default": false,
-            "type": "boolean",
-            "group": "webui",
-            "section": "general",
-            "order": 0
-        },
         "enable_inventory": {
             "default": true,
             "type": "boolean",
@@ -2894,6 +2907,14 @@
             },
             "type": "graph"
         },
+        "graph_types.device.cambium_epmp_gps": {
+            "default": {
+                "section": "wireless",
+                "order": 5,
+                "descr": "GPS Satellites"
+            },
+            "type": "graph"
+        },
         "graph_types.device.cambium_epmp_freq": {
             "default": {
                 "section": "wireless",
@@ -2905,8 +2926,8 @@
         "graph_types.device.cambium_epmp_gpsSync": {
             "default": {
                 "section": "wireless",
-                "order": 5,
-                "descr": "GPS Sync Status"
+                "order": 8,
+                "descr": "GPS Sync State"
             },
             "type": "graph"
         },
@@ -2915,6 +2936,14 @@
                 "section": "wireless",
                 "order": 2,
                 "descr": "ePMP Modulation"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.cambium_epmp_traffic": {
+            "default": {
+                "section": "wireless",
+                "order": 1,
+                "descr": "Traffic"
             },
             "type": "graph"
         },
@@ -4502,6 +4531,13 @@
             "section": "graylog",
             "order": 10
         },
+        "graylog.match-any-address": {
+            "default": false,
+            "type": "boolean",
+            "group": "external",
+            "section": "graylog",
+            "order": 11
+        },
         "group": {
             "type": "text",
             "default": "librenms"
@@ -5049,16 +5085,16 @@
         "int_core": {
             "default": true,
             "group": "webui",
-            "section": "menu",
+            "section": "port-descr",
             "type": "boolean",
-            "order": 3
+            "order": 40
         },
         "int_customers": {
             "default": true,
             "group": "webui",
-            "section": "menu",
+            "section": "port-descr",
             "type": "boolean",
-            "order": 4
+            "order": 10
         },
         "int_l2tp": {
             "default": false,
@@ -5070,16 +5106,16 @@
         "int_peering": {
             "default": true,
             "group": "webui",
-            "section": "menu",
+            "section": "port-descr",
             "type": "boolean",
-            "order": 6
+            "order": 30
         },
         "int_transit": {
             "default": true,
             "group": "webui",
-            "section": "menu",
+            "section": "port-descr",
             "type": "boolean",
-            "order": 7
+            "order": 20
         },
         "ipmi.type": {
             "default": [
@@ -5737,8 +5773,8 @@
                         {"match": "ciscosb", "value": "ciscosmb"},
                         {"match": "f5", "value": "tmos"},
                         {"match": "fireware", "value": "firewareos"},
-                        {"match": "fortigate", "value": "fortios"},
                         {"match": "fortiswitch", "value": "fortios"},
+                        {"match": "siklu-mhtg", "value": "siklumhtg"},
                         {"match": "vyos", "value": "vyatta"},
                         {"match": "slms", "value": "zhoneolt"},
                         {"match": "oneaccess", "value": "oneos"}
@@ -5863,7 +5899,7 @@
             "type": "array",
             "group": "webui",
             "section": "port-descr",
-            "order": 0
+            "order": 31
         },
         "peeringdb.enabled": {
             "default": false,
@@ -6875,7 +6911,7 @@
             "group": "poller",
             "section": "snmp",
             "order": 2,
-            "type": "array",
+            "type": "password-array",
             "default": [
                 "public"
             ]
@@ -7212,7 +7248,7 @@
             "type": "array",
             "group": "webui",
             "section": "port-descr",
-            "order": 1
+            "order": 21
         },
         "twofactor": {
             "default": false,

@@ -13,7 +13,7 @@ if ($sensors->isNotEmpty()) {
     echo '
         <div class="row">
         <div class="col-md-12">
-        <div class="panel panel-default panel-condensed">
+        <div class="panel panel-default panel-condensed overview-panel">
         <div class="panel-heading">';
     echo '<a href="device/device=' . $device['device_id'] . '/tab=health/metric=' . $sensor_class->value . '/"><i class="fa ' . $sensor_fa_icon . ' fa-lg icon-theme" aria-hidden="true"></i><strong> ' . $sensor_class->label() . '</strong></a>';
     echo '      </div>
