@@ -45,7 +45,7 @@ if (! empty($gpio_mon_data)) {
                         $sensor_data['low_warn_limit'] = $sensor_data_parts[4];
                         $sensor_data['warn_limit'] = $sensor_data_parts[5];
                         $sensor_data['high_limit'] = $sensor_data_parts[6];
-                        $sensor_data['group'] = $sensor_data_parts[7];
+                        $sensor_data['group'] = $sensor_data_parts[7] ?? null;
                     }
                 } else {
                     if (isset($sensor_data_parts[0]) && isset($sensor_data_parts[1]) && isset($sensor_data_parts[2])) {
