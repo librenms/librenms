@@ -8,6 +8,7 @@
         const disabled_alerts = {{ Js::from($disabled_alerts) }};
         const map_config = {{ Js::from($map_config) }};
         const group_radius = {{ (int) $group_radius }};
+        const show_error_count = {{ Js::from($show_error_count) }};
 
         function populate_map_markers(map_id, group_radius = 10, status = [0,1], device_group = 0) {
             $.ajax({
@@ -49,6 +50,7 @@
                             iconCreateFunction: function (cluster) {
                                 var markers = cluster.getAllChildMarkers();
                                 var color = "green";
+                                var errorCount = 0;
                                 var newClass = "Cluster marker-cluster marker-cluster-small leaflet-zoom-animated leaflet-clickable";
                                 for (var i = 0; i < markers.length; i++) {
                                     if (markers[i].options.icon.options.markerColor == "blue" && color != "red") {
@@ -56,10 +58,18 @@
                                     }
                                     if (markers[i].options.icon.options.markerColor == "red") {
                                         color = "red";
+                                        errorCount++;
                                     }
                                 }
+                                var hasErrorLabel = show_error_count && errorCount > 0;
+                                var label = hasErrorLabel
+                                    ? errorCount + '/' + cluster.getChildCount()
+                                    : cluster.getChildCount();
+                                var html = hasErrorLabel
+                                    ? '<span style="font-size:9px;">' + label + '</span>'
+                                    : label;
                                 return L.divIcon({
-                                    html: cluster.getChildCount(),
+                                    html: html,
                                     className: color + newClass,
                                     iconSize: L.point(40, 40)
                                 });
