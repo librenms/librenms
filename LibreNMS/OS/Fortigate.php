@@ -100,28 +100,19 @@ class Fortigate extends OS implements
 
     public function fetchLocation(): Location
     {
-        $lat_raw = trim((string) SnmpQuery::get('.1.3.6.1.4.1.12356.101.19.6.1.3.1')->value());
-        $lon_raw = trim((string) SnmpQuery::get('.1.3.6.1.4.1.12356.101.19.6.1.4.1')->value());
+        $location = parent::fetchLocation();
 
-        $lat = null;
-        $lon = null;
+        $lat = SnmpQuery::get('FORTINET-FORTIGATE-MIB::fgLatitude.1')->value();
+        $lng = SnmpQuery::get('FORTINET-FORTIGATE-MIB::fgLongitude.1')->value();
 
-        if (preg_match('/^([\d.]+)\s+([NS])$/', trim((string) $lat_raw), $m)) {
-            $lat = (float) $m[1] * ($m[2] === 'S' ? -1 : 1);
+        if (preg_match('/^([\d.]+)\s+([NS])$/', (string) $lat, $m)) {
+            $location->lat = (float) $m[1] * ($m[2] === 'S' ? -1 : 1);
         }
 
-        if (preg_match('/^([\d.]+)\s+([EW])$/', trim((string) $lon_raw), $m)) {
-            $lon = (float) $m[1] * ($m[2] === 'W' ? -1 : 1);
+        if (preg_match('/^([\d.]+)\s+([EW])$/', (string) $lng, $m)) {
+            $location->lng = (float) $m[1] * ($m[2] === 'W' ? -1 : 1);
         }
 
-        if ($lat === null || $lon === null) {
-            return parent::fetchLocation(); // no GPS data, fall back to sysLocation
-        }
-
-        return new Location([
-            'location' => $this->getDevice()->sysName ?: $this->getDevice()->hostname,
-            'lat' => $lat,
-            'lng' => $lon,
-        ]);
+        return $location;
     }
 }
