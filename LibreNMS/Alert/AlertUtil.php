@@ -337,7 +337,9 @@ class AlertUtil
             $email = $device->getAttrib('override_sysContact_bool')
                 ? $device->getAttrib('override_sysContact_string')
                 : $device->sysContact;
-            $contacts[$email] = '';
+            if ($email) {
+                $contacts[$email] = '';
+            }
         }
 
         return $contacts;
