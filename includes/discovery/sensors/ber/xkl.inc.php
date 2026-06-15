@@ -35,9 +35,9 @@ foreach ($rxData as $index => $entry) {
     if ($entry['XKL-MIB::xklWaveHostSideRxBERWaveStatus'] != 2 && $entry['XKL-MIB::xklWaveHostSideRxBERPreFECCurrentMantissa'] != 0) {
         $oid = '.1.3.6.1.4.1.21150.1.1.39.1.7.' . $index;
         $mantissa = $entry['XKL-MIB::xklWaveHostSideRxBERPreFECCurrentMantissa'] / 100;
-		$exponent = intval($entry['XKL-MIB::xklWaveHostSideRxBERPreFECCurrentExponent']);
-		$rxBer = $mantissa * pow(10, $exponent);
-		$waveDescr = $entry['XKL-MIB::xklWaveHostSideRxBERWaveDescr'];
+        $exponent = intval($entry['XKL-MIB::xklWaveHostSideRxBERPreFECCurrentExponent']);
+        $rxBer = $mantissa * pow(10, $exponent);
+        $waveDescr = $entry['XKL-MIB::xklWaveHostSideRxBERWaveDescr'];
 			
         discover_sensor(
             null,
