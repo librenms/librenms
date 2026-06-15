@@ -5,7 +5,7 @@
  *
  * -Description-
  *
- * XKL sends BER in two OIDS. The first contains an integer value 
+ * XKL sends BER in two OIDS. The first contains an integer value
  * multiplied by 100. The second is a mantissa exponent.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -33,8 +33,8 @@ $txData = SnmpQuery::walk('XKL-MIB::xklWaveHostSideTxBERTable')->valuesByIndex()
 
 foreach ($rxData as $index => $entry) {
     if ($entry['XKL-MIB::xklWaveHostSideRxBERWaveStatus'] != 2 && $entry['XKL-MIB::xklWaveHostSideRxBERPreFECCurrentMantissa'] != 0) {
-	    $oid = '.1.3.6.1.4.1.21150.1.1.39.1.7.' . $index;
-		$mantissa = $entry['XKL-MIB::xklWaveHostSideRxBERPreFECCurrentMantissa'] / 100;
+        $oid = '.1.3.6.1.4.1.21150.1.1.39.1.7.' . $index;
+        $mantissa = $entry['XKL-MIB::xklWaveHostSideRxBERPreFECCurrentMantissa'] / 100;
 		$exponent = intval($entry['XKL-MIB::xklWaveHostSideRxBERPreFECCurrentExponent']);
 		$rxBer = $mantissa * pow(10, $exponent);
 		$waveDescr = $entry['XKL-MIB::xklWaveHostSideRxBERWaveDescr'];
@@ -47,12 +47,12 @@ foreach ($rxData as $index => $entry) {
             'xklWaveHostSideRxBERPreFECCurrentMantissa.' . $index,
             'xkl',
             $waveDescr . ' Hostside RX Pre-FEC BER',
-            '1', 
-            '1', 
+            '1',
+            '1',
             null,
             null,
             null,
-            null, 
+            null,
             $rxBer,
         );
     }

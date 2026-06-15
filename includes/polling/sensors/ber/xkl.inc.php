@@ -5,7 +5,7 @@
  *
  * -Description-
  *
- * XKL sends BER in two OIDS. The first contains an integer value 
+ * XKL sends BER in two OIDS. The first contains an integer value
  * multiplied by 100. The second is a mantissa exponent.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,4 +38,3 @@ if (str_starts_with('.1.3.6.1.4.1.21150.1.1.39.1.8.', $sensor['sensor_oid'])) {
 }
 
 $sensor_value = $mantissa * pow(10, $exponent);
-
