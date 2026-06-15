@@ -468,7 +468,10 @@ modules:
                     states:
                         - { descr: off, value: 0, generic: 0 }
                         - { descr: on, value: 1, generic: 1 }
-                # 2D / 5D / 16D output relays (outRelayStatus = active(0)/inactive(1))
+                # 2D / 5D / 16D output relays (outRelayStatus = active(0)/inactive(1)).
+                # No outRelayNormalValue exists, so we can't know which side the operator
+                # considers "normal"; both states are mapped to generic 0 (informational)
+                # and the user can override per-sensor in LibreNMS as needed.
                 -
                     oid: ENVIROMUX2D::outRelayTable
                     value: ENVIROMUX2D::outRelayStatus
@@ -479,7 +482,7 @@ modules:
                     group: Relays
                     states:
                         - { descr: active, value: 0, generic: 0 }
-                        - { descr: inactive, value: 1, generic: 1 }
+                        - { descr: inactive, value: 1, generic: 0 }
                 -
                     oid: ENVIROMUX5D::outRelayTable
                     value: ENVIROMUX5D::outRelayStatus
@@ -490,7 +493,7 @@ modules:
                     group: Relays
                     states:
                         - { descr: active, value: 0, generic: 0 }
-                        - { descr: inactive, value: 1, generic: 1 }
+                        - { descr: inactive, value: 1, generic: 0 }
                 -
                     oid: ENVIROMUX16D::outRelayTable
                     value: ENVIROMUX16D::outRelayStatus
@@ -501,7 +504,7 @@ modules:
                     group: Relays
                     states:
                         - { descr: active, value: 0, generic: 0 }
-                        - { descr: inactive, value: 1, generic: 1 }
+                        - { descr: inactive, value: 1, generic: 0 }
                 # 2D / 5D / 16D power supplies; pwrSupplyStatus = failed(0)/ok(1)/na(2).
                 # Operators can silence a known-empty bay via the device's web UI which
                 # reports back as na(2); na is mapped to generic 0 so it does not alert.
