@@ -660,7 +660,7 @@ class RunAlerts
         );
 
         $ruleId = (int) ($obj['rule_id'] ?? 0);
-        if (! $transport_maps) {
+        if (! $transport_maps || count($transport_maps) === 0) {
             $reason = 'No mapped transport for this operation';
             if ($ruleId > 0 && ! AlertUtil::ruleHasAlertOperations($ruleId)) {
                 $reason = 'No operations configured for this rule';
@@ -706,10 +706,6 @@ class RunAlerts
                 unset($instance);
                 echo PHP_EOL;
             }
-        }
-
-        if (count($transport_maps) === 0) {
-            echo 'No configured transports';
         }
     }
 
