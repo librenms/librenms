@@ -153,6 +153,9 @@ class LdapAuthorizer extends AuthorizerBase
 
     public function getUserid($username)
     {
+        // Without this we consume the user OTP fetching their username, which we already have.
+        $this->userloginname = $username;
+        
         try {
             $connection = $this->getLdapConnection();
 
