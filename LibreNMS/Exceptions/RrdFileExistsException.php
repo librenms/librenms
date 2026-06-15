@@ -26,6 +26,6 @@
 
 namespace LibreNMS\Exceptions;
 
-class FileExistsException extends \Exception
+class RrdFileExistsException extends RrdException
 {
 }

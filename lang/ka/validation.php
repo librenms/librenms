@@ -64,7 +64,8 @@ return [
     'validations' => [
         'rrd' => [
             'CheckRrdVersion' => [
-                'fail' => 'rrdtool-ის ვერსია, რომელიც მიუთითეთ, უფრო ახალია იმაზე, რაც დაყენებული გაქვთ. კონფიგურაცია: :config_version დაყენებული :installed_version',
+                'fail' => 'rrdtool-ის ვერსია :installed_version ძალიან ძველია, LibreNMS-ს სჭირდება მინიმალური ვერსია 1.5.5',
+                'fail_config' => 'თქვენ მიერ მითითებული rrdtool_version :config_version ძალიან ძველია, LibreNMS-ს სჭირდება მინიმალური ვერსია 1.5.5',
                 'fix' => 'ან დააკომენტარეთ, ან წაშალეთ $config[\'rrdtool_version\'] = \':version\'; თქვენი ფაილიდან config.php',
                 'ok' => 'rrdtool-ის ვერსია კარგია',
             ],
