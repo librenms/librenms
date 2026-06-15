@@ -33,8 +33,8 @@ $mantissa = $sensor_value / 100;
 
 $exponent = intval(SnmpQuery::walk('XKL-MIB::xklWaveHostSideRxBERTable')->value('XKL-MIB::xklWaveHostSideRxBERPreFECCurrentExponent'));
 
-if (str_starts_with('.1.3.6.1.4.1.21150.1.1.39.1.8.', $sensor['sensor_oid'])) {
+if (str_starts_with('.1.3.6.1.4.1.21150.1.1.39.1.8.', (string) $sensor['sensor_oid'])) {
     $exponent = intval(SnmpQuery::walk('XKL-MIB::xklWaveHostSideTxBERTable')->value('XKL-MIB::xklWaveHostSideTxBERPreFECCurrentExponent'));
 }
 
-$sensor_value = $mantissa * pow(10, $exponent);
+$sensor_value = $mantissa * 10 ** $exponent;

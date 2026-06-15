@@ -36,9 +36,9 @@ foreach ($rxData as $index => $entry) {
         $oid = '.1.3.6.1.4.1.21150.1.1.39.1.7.' . $index;
         $mantissa = $entry['XKL-MIB::xklWaveHostSideRxBERPreFECCurrentMantissa'] / 100;
         $exponent = intval($entry['XKL-MIB::xklWaveHostSideRxBERPreFECCurrentExponent']);
-        $rxBer = $mantissa * pow(10, $exponent);
+        $rxBer = $mantissa * 10 ** $exponent;
         $waveDescr = $entry['XKL-MIB::xklWaveHostSideRxBERWaveDescr'];
-			
+
         discover_sensor(
             null,
             'ber',
@@ -63,7 +63,7 @@ foreach ($txData as $index => $entry) {
         $oid = '.1.3.6.1.4.1.21150.1.1.39.1.8.' . $index;
         $mantissa = $entry['XKL-MIB::xklWaveHostSideTxBERPreFECCurrentMantissa'] / 100;
         $exponent = intval($entry['XKL-MIB::xklWaveHostSideTxBERPreFECCurrentExponent']);
-        $txBer = $mantissa * pow(10, $exponent);
+        $txBer = $mantissa * 10 ** $exponent;
         $waveDescr = $entry['XKL-MIB::xklWaveHostSideTxBERWaveDescr'];
 
         discover_sensor(
