@@ -15347,6 +15347,57 @@
 		-- 1.3.6.1.4.1.37950.1.1.5.10.13
 		v1600dAlarm OBJECT IDENTIFIER ::= { v1600dSwitch 13 }
 
+		gponPonOpticalTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponPonOpticalEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Per PON port optical DDM (TX/RX power) for V1600G GPON OLTs."
+			::= { v1600dAlarm 7 }
+
+		gponPonOpticalEntry OBJECT-TYPE
+			SYNTAX GponPonOpticalEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Per PON port optical DDM entry."
+			INDEX { gponPonIndex }
+			::= { gponPonOpticalTable 1 }
+
+		GponPonOpticalEntry ::=
+			SEQUENCE {
+				gponPonIndex
+					INTEGER,
+				gponPonTxPower
+					OCTET STRING,
+				gponPonRxPower
+					OCTET STRING
+			 }
+
+		gponPonIndex OBJECT-TYPE
+			SYNTAX INTEGER (1..16)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"PON port index."
+			::= { gponPonOpticalEntry 1 }
+
+		gponPonTxPower OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"PON port transmit optical power in dBm as ASCII decimal string."
+			::= { gponPonOpticalEntry 5 }
+
+		gponPonRxPower OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"PON port receive optical power in dBm as ASCII decimal string."
+			::= { gponPonOpticalEntry 6 }
+
 		
 --  1.3.6.1.4.1.37950.1.1.5.10.13.1
 		-- 1.3.6.1.4.1.37950.1.1.5.10.13.1
