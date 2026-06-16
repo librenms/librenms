@@ -42,9 +42,8 @@ $('#alert-template-removal').on("click", function(event) {
     event.preventDefault();
     var template_id = $("#template_id").val();
     $.ajax({
-        type: 'POST',
-        url: 'ajax_form.php',
-        data: { type: "delete-alert-template", template_id: template_id },
+        type: 'DELETE',
+        url: '<?php echo route("alert-templates.destroy", ["alert_template" => ":alert_template"]) ?>'.replace(':alert_template', template_id),
         dataType: "html",
         success: function(msg) {
             if(msg.indexOf("ERROR:") <= -1) {
