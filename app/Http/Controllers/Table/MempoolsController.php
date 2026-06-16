@@ -116,7 +116,7 @@ class MempoolsController extends TableController
         /** @var Mempool $model */
         return [
             'hostname' => Blade::render('<x-device-link :device="$device"/>', ['device' => $model->device]),
-            'mempool_descr' => $model->mempool_descr,
+            'mempool_descr' => htmlspecialchars((string) $model->mempool_descr),
             'graph' => $this->miniGraph($model),
             'mempool_used' => $this->barLink($model),
             'mempool_perc' => $model->mempool_perc . '%',
