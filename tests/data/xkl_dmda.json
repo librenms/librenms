@@ -328,11 +328,11 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": null,
-                    "port_descr_descr": null,
+                    "port_descr_type": "ethernet 4",
+                    "port_descr_descr": "OSC 0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
-                    "port_descr_notes": null,
+                    "port_descr_notes": "OSC 0",
                     "ifDescr": "Ethernet 4 (OSC 0)",
                     "ifName": "Ethernet 4 (OSC 0)",
                     "portName": null,
