@@ -554,7 +554,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
           ->map(fn ($value, $key) => "$key: $value")
           ->implode(', ');
 
-        $fault_detail .= Url::sensorLink($sensor, $tmp_alerts['name']) . ';&nbsp; <br>' . $details;
+        $fault_detail .= Url::sensorLink($sensor, $tmp_alerts['name'] ?? null) . ';&nbsp; <br>' . $details;
         $fallback = false;
     }
 
