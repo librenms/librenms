@@ -128,7 +128,12 @@ class RunAlerts
         $obj['status'] = $device->status;
         $obj['status_reason'] = $device->status_reason;
         if (ConnectivityHelper::pingIsAllowed($device)) {
-            $last_ping = Rrd::lastUpdate(Rrd::name($device->hostname, 'icmp-perf'));
+            try {
+                $last_ping = Rrd::lastUpdate(Rrd::name($device->hostname, 'icmp-perf'));
+            } catch (\Exception $e) {
+                Log::error("Error getting last ping for device {$device->hostname}: {$e->getMessage()}");
+                $last_ping = null;
+            }
             if ($last_ping) {
                 $obj['ping_timestamp'] = $last_ping->timestamp;
                 $obj['ping_loss'] = Number::calculatePercent($last_ping->get('xmt') - $last_ping->get('rcv'), $last_ping->get('xmt'));
