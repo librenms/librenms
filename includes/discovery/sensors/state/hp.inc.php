@@ -38,6 +38,8 @@ $tables = [
         ['value' => 7, 'generic' => 1, 'descr' => 'eraseQueued'],
         ['value' => 8, 'generic' => 2, 'descr' => 'ssdWearOut'],
         ['value' => 9, 'generic' => 3, 'descr' => 'notAuthenticated'],
+        // value 10 (hotSpare) is not in the bundled MIB but is emitted by Gen10 firmware (observed on DL360 Gen10)
+        ['value' => 10, 'generic' => 0, 'descr' => 'hotSpare'],
     ]],
     ['cpqDaPhyDrvSmartStatus', '.1.3.6.1.4.1.232.3.2.5.1.1.57.', 'S.M.A.R.T.', 'CPQIDA-MIB', [
         ['value' => 1, 'generic' => 3, 'descr' => 'other'],
