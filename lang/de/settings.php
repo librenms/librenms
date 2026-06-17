@@ -445,15 +445,13 @@ return [
                 'description' => 'Base URI',
                 'help' => 'Überschreibt die base uri falls Sie den Graylog Standardwert geändert haben.',
             ],
-            'device-page' => [
-                'loglevel' => [
-                    'description' => 'Geräteübersicht Log Level',
-                    'help' => 'Definiert den maximalen Log Level welcher in der Geräteübersicht angezeigt wird.',
-                ],
-                'rowCount' => [
-                    'description' => 'Geräteübersicht Anzahl an Zeilen',
-                    'help' => 'Definiert die Anzahl an Zeilen welche in der Geräteübersicht angezeigt werden.',
-                ],
+            'loglevel' => [
+                'description' => 'Geräteübersicht Log Level',
+                'help' => 'Definiert den maximalen Log Level welcher in der Geräteübersicht angezeigt wird.',
+            ],
+            'rowCount' => [
+                'description' => 'Geräteübersicht Anzahl an Zeilen',
+                'help' => 'Definiert die Anzahl an Zeilen welche in der Geräteübersicht angezeigt werden.',
             ],
             'password' => [
                 'description' => 'Passwort',

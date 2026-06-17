@@ -1103,15 +1103,25 @@ return [
                 'description' => 'Base URI',
                 'help' => 'Override the base uri in the case you have modified the Graylog default.',
             ],
-            'device-page' => [
-                'loglevel' => [
-                    'description' => 'Device Overview Log Level',
-                    'help' => 'Sets the maximum log level shown on the device overview page.',
-                ],
-                'rowCount' => [
-                    'description' => 'Device Overview Row Count',
-                    'help' => 'Sets the number of rows show on the device overview page.',
-                ],
+            'loglevel' => [
+                'description' => 'Recent Graylog Log Level',
+                'help' => 'Sets the maximum log level shown on the device overview "Recent Graylog" panel.',
+            ],
+            'rowCount' => [
+                'description' => 'Default Row Count',
+                'help' => 'Default number of rows shown on the Graylog log tables (device tab and /graylog).',
+            ],
+            'default-stream-id' => [
+                'description' => 'Default Stream ID',
+                'help' => 'Graylog stream ID the default search scopes to. Leave blank to use the first stream the configured account can see. Set explicitly to pin a particular stream as the default; switch via the dropdown to look at another.',
+            ],
+            'fields' => [
+                'description' => 'Displayed Columns',
+                'help' => 'Ordered list of columns to show on the Graylog log tables (Timestamp is always shown). Built-in column names are: severity, origin, level, source, message, facility. Any other value is treated as a raw Graylog message field and rendered as-is (e.g. msg, source_ip for vendor-specific fields).',
+            ],
+            'hidden-fields' => [
+                'description' => 'Hidden Detail Field Prefixes',
+                'help' => 'Field-name prefixes to hide from the row-expand detail panel. Any field whose key starts with a listed prefix is omitted. Defaults to hiding Graylog internal fields (gl2_).',
             ],
             'password' => [
                 'description' => 'Password',
