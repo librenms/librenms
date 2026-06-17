@@ -8,6 +8,7 @@ use App\Models\Poller;
 use App\Models\PollerCluster;
 use App\Models\PollerGroup;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
@@ -111,5 +112,57 @@ class PollerController extends Controller
         $groups = PollerGroup::list();
 
         return $pollers->map->configDefinition($groups);
+    }
+
+    /**
+     * Remove the specified poller from storage.
+     *
+     * @param  Poller  $poller
+     * @return JsonResponse
+     */
+    public function destroy(Poller $poller): JsonResponse
+    {
+        $this->authorize('delete', $poller);
+
+        $id = $poller->id;
+        $poller_name = e($poller->poller_name);
+
+        if ($poller->delete()) {
+            return response()->json([
+                'status' => 0,
+                'message' => "Poller: <i>$poller_name ($id), has been deleted.</i>",
+            ]);
+        }
+
+        return response()->json([
+            'status' => 1,
+            'message' => "Poller: <i>$poller_name ($id), has NOT been deleted.</i>",
+        ]);
+    }
+
+    /**
+     * Remove the specified poller cluster node from storage.
+     *
+     * @param  PollerCluster  $pollerCluster
+     * @return JsonResponse
+     */
+    public function destroyCluster(PollerCluster $pollerCluster): JsonResponse
+    {
+        $this->authorize('delete', $pollerCluster);
+
+        $id = $pollerCluster->id;
+        $poller_name = e($pollerCluster->poller_name);
+
+        if ($pollerCluster->stats()->delete() !== false && $pollerCluster->delete()) {
+            return response()->json([
+                'status' => 0,
+                'message' => "Poller: <i>$poller_name ($id), has been deleted.</i>",
+            ]);
+        }
+
+        return response()->json([
+            'status' => 1,
+            'message' => "Poller: <i>$poller_name ($id), has NOT been deleted.</i>",
+        ]);
     }
 }
