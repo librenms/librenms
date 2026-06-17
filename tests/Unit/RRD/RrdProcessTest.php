@@ -205,12 +205,40 @@ class RrdProcessTest extends TestCase
         $rrdProcess->run('info test.rrd');
     }
 
-    public function testHandlesErrorOutputOnStderr(): void
+    public function testThrowsExceptionOnErrorOutputOnStderr(): void
     {
-        $this->logger->shouldReceive('warning')->with('RRDtool stderr: Some stderr error message')->once();
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::ERR, "ERROR: some error occurred\n"));
+
+        $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
+
+        $this->expectException(RrdException::class);
+        $this->expectExceptionMessage('some error occurred');
+
+        $rrdProcess->run('update test.rrd N:1');
+    }
+
+    public function testLogsWarningOnGenericStderrOutput(): void
+    {
+        $this->logger->shouldReceive('warning')->with('RRDtool stderr: Fontconfig warning: something')->once();
 
         $this->process->shouldReceive('waitUntil')->andReturnUsing(function ($callback) {
-            $callback(Process::ERR, "Some stderr error message\n");
+            $this->assertFalse($callback(Process::ERR, "Fontconfig warning: something\n"));
+            return $callback(Process::OUT, "OK u:0.01 s:0.02 r:0.03\n");
+        });
+        $this->process->shouldReceive('getOutput')->andReturn("OK u:0.01 s:0.02 r:0.03\n");
+
+        $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
+        $output = $rrdProcess->run('update test.rrd N:1');
+
+        $this->assertEquals('', $output);
+    }
+
+    public function testIgnoresEmptyStderrOutput(): void
+    {
+        $this->logger->shouldNotReceive('warning');
+
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(function ($callback) {
+            $this->assertFalse($callback(Process::ERR, "  \n  "));
             return $callback(Process::OUT, "OK u:0.01 s:0.02 r:0.03\n");
         });
         $this->process->shouldReceive('getOutput')->andReturn("OK u:0.01 s:0.02 r:0.03\n");
