@@ -207,14 +207,18 @@ class RrdProcessTest extends TestCase
 
     public function testHandlesErrorOutputOnStderr(): void
     {
-        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::ERR, "Some stderr error message\n"));
+        $this->logger->shouldReceive('warning')->with('RRDtool stderr: Some stderr error message')->once();
+
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(function ($callback) {
+            $callback(Process::ERR, "Some stderr error message\n");
+            return $callback(Process::OUT, "OK u:0.01 s:0.02 r:0.03\n");
+        });
+        $this->process->shouldReceive('getOutput')->andReturn("OK u:0.01 s:0.02 r:0.03\n");
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
+        $output = $rrdProcess->run('update test.rrd N:1');
 
-        $this->expectException(RrdException::class);
-        $this->expectExceptionMessage('Some stderr error message');
-
-        $rrdProcess->run('update test.rrd N:1');
+        $this->assertEquals('', $output);
     }
 
     public function testThrowsExceptionWhenRrdtoolNotFound(): void
