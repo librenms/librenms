@@ -1,11 +1,11 @@
 <?php
 
 /**
- * xkl.inc.php
+ * dxmos.inc.php
  *
  * -Description-
  *
- * XKL sends BER in two OIDS. The first contains an integer value
+ * DXMOS sends BER in two OIDS. The first contains an integer value
  * multiplied by 100. The second is a mantissa exponent.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@
  * @copyright  2026 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
-echo 'XKL BER';
+echo 'DXMOS BER';
 
 $rxData = SnmpQuery::walk('XKL-MIB::xklWaveHostSideRxBERTable')->valuesByIndex();
 $txData = SnmpQuery::walk('XKL-MIB::xklWaveHostSideTxBERTable')->valuesByIndex();

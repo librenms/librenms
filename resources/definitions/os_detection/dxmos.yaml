@@ -1,5 +1,5 @@
-os: xkl
-text: 'XKL'
+os: dxmos
+text: 'DXM Operating System'
 type: network
 icon: xkl
 mib_dir: xkl
