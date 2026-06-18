@@ -64,7 +64,7 @@ if ($sensors->isNotEmpty()) {
         $sensor_current = Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue());
 
         echo '<div class="tw:flex tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
-            <div class="tw:w-36 tw:min-w-0 tw:shrink-0 tw:truncate">' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Rewrite::shortenIfName($sensor->sensor_descr), $overlib_content, $sensor_class->value) . '</div>
+            <div class="tw:w-36 tw:min-w-150 tw:shrink-0 tw:whitespace-nowrap">' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Rewrite::shortenIfName($sensor->sensor_descr), $overlib_content, $sensor_class->value) . '</div>
             <div class="tw:flex tw:min-w-0 tw:flex-1 tw:justify-center">' . \LibreNMS\Util\Url::overlibLink($link, $sensor_minigraph, $overlib_content, $sensor_class->value) . '</div>
             <div class="tw:text-right">' . \LibreNMS\Util\Url::overlibLink($link, $sensor_current, $overlib_content, $sensor_class->value) . '</div>
             </div>';
