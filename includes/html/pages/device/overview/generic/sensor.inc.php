@@ -11,18 +11,16 @@ if ($sensors->isNotEmpty()) {
     $sensor_fa_icon = 'fa-' . $sensor_class->icon();
 
     echo '
-        <div class="row">
-        <div class="col-md-12">
-        <div class="panel panel-default panel-condensed overview-panel">
-        <div class="panel-heading">';
+        <div class="overview-panel tw:mb-5">
+        <div class="tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:border-b tw:border-gray-300 tw:text-neutral-700 tw:dark:bg-dark-gray-200 tw:dark:border-zinc-800 tw:dark:text-dark-white-200">';
     echo '<a href="device/device=' . $device['device_id'] . '/tab=health/metric=' . $sensor_class->value . '/"><i class="fa ' . $sensor_fa_icon . ' fa-lg icon-theme" aria-hidden="true"></i><strong> ' . $sensor_class->label() . '</strong></a>';
     echo '      </div>
-        <table class="table table-hover table-condensed table-striped">';
+        <div class="tw:flex tw:min-w-0 tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-zinc-800">';
     $group = '';
     foreach ($sensors as $sensor) {
         if ($group != $sensor->group) {
             $group = $sensor->group;
-            echo "<tr><td colspan='3'><strong>$group</strong></td></tr>";
+            echo '<div class="tw:px-2 tw:py-2 tw:font-bold"><strong>' . $group . '</strong></div>';
         }
 
         // FIXME - make this "four graphs in popup" a function/include and "small graph" a function.
@@ -65,15 +63,13 @@ if ($sensors->isNotEmpty()) {
 
         $sensor_current = Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue());
 
-        echo '<tr><td><div style="display: grid; grid-gap: 10px; grid-template-columns: 3fr 1fr 1fr;">
-            <div>' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Rewrite::shortenIfName($sensor->sensor_descr), $overlib_content, $sensor_class->value) . '</div>
-            <div>' . \LibreNMS\Util\Url::overlibLink($link, $sensor_minigraph, $overlib_content, $sensor_class->value) . '</div>
-            <div>' . \LibreNMS\Util\Url::overlibLink($link, $sensor_current, $overlib_content, $sensor_class->value) . '</div>
-            </div></td></tr>';
+        echo '<div class="tw:flex tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
+            <div class="tw:w-36 tw:min-w-150 tw:shrink-0 tw:whitespace-nowrap">' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Rewrite::shortenIfName($sensor->sensor_descr), $overlib_content, $sensor_class->value) . '</div>
+            <div class="tw:flex tw:min-w-0 tw:flex-1 tw:justify-center">' . \LibreNMS\Util\Url::overlibLink($link, $sensor_minigraph, $overlib_content, $sensor_class->value) . '</div>
+            <div class="tw:text-right">' . \LibreNMS\Util\Url::overlibLink($link, $sensor_current, $overlib_content, $sensor_class->value) . '</div>
+            </div>';
     }//end foreach
 
-    echo '</table>';
-    echo '</div>';
     echo '</div>';
     echo '</div>';
 }//end if
