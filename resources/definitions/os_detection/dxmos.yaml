@@ -3,7 +3,6 @@ text: 'DXM Operating System'
 type: network
 icon: xkl
 mib_dir: xkl
-group: xkl
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:

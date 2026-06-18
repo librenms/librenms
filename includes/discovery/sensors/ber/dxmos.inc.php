@@ -28,10 +28,9 @@
  */
 echo 'DXMOS BER';
 
-$rxData = SnmpQuery::walk('XKL-MIB::xklWaveHostSideRxBERTable')->valuesByIndex();
-$txData = SnmpQuery::walk('XKL-MIB::xklWaveHostSideTxBERTable')->valuesByIndex();
+$data = SnmpQuery::walk(['XKL-MIB::xklWaveHostSideRxBERTable', 'XKL-MIB::xklWaveHostSideTxBERTable'])->valuesByIndex();
 
-foreach ($rxData as $index => $entry) {
+foreach ($data as $index => $entry) {
     if (isset($entry['XKL-MIB::xklWaveHostSideRxBERWaveStatus']) && $entry['XKL-MIB::xklWaveHostSideRxBERWaveStatus'] != 2 && $entry['XKL-MIB::xklWaveHostSideRxBERPreFECCurrentMantissa'] != 0) {
         $oid = '.1.3.6.1.4.1.21150.1.1.39.1.7.' . $index;
         $mantissa = $entry['XKL-MIB::xklWaveHostSideRxBERPreFECCurrentMantissa'] / 100;
@@ -46,7 +45,7 @@ foreach ($rxData as $index => $entry) {
             $oid,
             'xklWaveHostSideRxBERPreFECCurrentMantissa.' . $index,
             'xkl',
-            $waveDescr . ' Hostside RX Pre-FEC BER',
+            $waveDescr . ' RX Pre-FEC BER',
             '1',
             '1',
             null,
@@ -56,9 +55,7 @@ foreach ($rxData as $index => $entry) {
             $rxBer,
         );
     }
-}
 
-foreach ($txData as $index => $entry) {
     if (isset($entry['XKL-MIB::xklWaveHostSideTxBERWaveStatus']) && $entry['XKL-MIB::xklWaveHostSideTxBERWaveStatus'] != 2 && $entry['XKL-MIB::xklWaveHostSideTxBERPreFECCurrentMantissa'] != 0) {
         $oid = '.1.3.6.1.4.1.21150.1.1.39.1.8.' . $index;
         $mantissa = $entry['XKL-MIB::xklWaveHostSideTxBERPreFECCurrentMantissa'] / 100;
@@ -73,7 +70,7 @@ foreach ($txData as $index => $entry) {
             $oid,
             'xklWaveHostSideTxBERPreFECCurrentMantissa.' . $index,
             'xkl',
-            $waveDescr . ' Hostside Tx Pre-FEC BER',
+            $waveDescr . ' Tx Pre-FEC BER',
             '1',
             '1',
             null,
