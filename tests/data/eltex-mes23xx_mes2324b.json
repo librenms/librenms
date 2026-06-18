@@ -15791,7 +15791,8 @@
                     "ifStackStatus": "active"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "transceivers": {
         "discovery": {

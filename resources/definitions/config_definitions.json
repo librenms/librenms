@@ -6040,6 +6040,13 @@
             "default": true,
             "type": "boolean"
         },
+        "poller_modules.ports-stack": {
+            "order": 341,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "poller_modules.xdsl": {
             "order": 345,
             "group": "poller",

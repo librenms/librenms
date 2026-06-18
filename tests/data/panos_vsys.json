@@ -14144,7 +14144,8 @@
                     "ifStackStatus": "active"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "hr-device": {
         "discovery": {

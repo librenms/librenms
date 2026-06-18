@@ -1740,6 +1740,9 @@ return [
             'ports' => [
                 'description' => 'Ports',
             ],
+            'ports-stack' => [
+                'description' => 'Ports Stack',
+            ],
             'bgp-peers' => [
                 'description' => 'BGP Peers',
             ],
