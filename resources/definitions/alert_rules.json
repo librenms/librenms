@@ -4,7 +4,7 @@
     "builder": {"condition":"AND","rules":[{"id":"macros.device_down","field":"macros.device_down","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
   },
   {
-    "builder": {"condition":"AND","rules":[{"id":"macros.device_down","field":"macros.device_down","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"devices.status_reason","field":"devices.status_reason","type":"string","input":"text","operator":"equal","value":"icmp"}],"valid":true},
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_down","field":"macros.device_down","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"devices.status_reason","field":"devices.status_reason","type":"string","input":"text","operator":"contains","value":"icmp"}],"valid":true},
     "name": "Device Down! Due to no ICMP response.",
     "default": true
   },
