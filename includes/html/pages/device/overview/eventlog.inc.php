@@ -18,7 +18,7 @@ foreach ($eventlog as $entry) {
     echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[auto_auto_100px_1fr]">';
     echo '<div>' . $icon . '</div>';
     echo '<div class="tw:whitespace-nowrap">' . Time::format($entry['datetime'], 'compact') . '</div>';
-    echo '<div class="tw:truncate">';
+    echo '<div class="tw:whitespace-nowrap">';
 
     if ($entry['type'] == 'interface') {
         echo '<b>' . \LibreNMS\Util\Url::portLink(Port::find($entry['reference'])) . '</b>';
