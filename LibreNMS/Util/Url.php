@@ -414,7 +414,7 @@ class Url
         $now = CarbonImmutable::now();
 
         $graph = $content ?: self::graphTag($args);
-        $popup = "<div class='list-large'>$popup_title</div>";
+        $popup = "<div class=\'list-large\'>$popup_title</div>";
         $popup .= '<div style="width: 850px">';
         $args['width'] = 340;
         $args['height'] = 100;
