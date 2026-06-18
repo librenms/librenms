@@ -69,6 +69,18 @@ class DeviceObserver
             $device->regenerateDisplayName();
         }
 
+        if ($device->isDirty('snmp_disable') && $device->snmp_disable) {
+            $reasons = collect(explode(',', (string) $device->status_reason))
+                ->reject(fn ($v) => $v === 'snmp')
+                ->filter()
+                ->implode(',');
+            $device->status_reason = $reasons;
+            if ($device->status == 0 && empty($reasons)) {
+                $device->status = 1;
+            }
+        }
+
+
         // handle device renames
         if ($device->isDirty('hostname')) {
             $new_name = $device->hostname;
