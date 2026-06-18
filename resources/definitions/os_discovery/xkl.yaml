@@ -27,7 +27,7 @@ modules:
                     group: 'transciever'
                     low_limit: XKL-MIB::xklTransportTempLoAlrmThreshold
                     low_warn_limit: XKL-MIB::xklTransportTempLoWarnThreshold
-                    high_warn_limit: XKL-MIB::xklTransportTempHiWarnThreshold
+                    warn_limit: XKL-MIB::xklTransportTempHiWarnThreshold
                     high_limit: XKL-MIB::xklTransportTempHiAlrmThreshold
                     skip_values:
                     -
@@ -43,7 +43,7 @@ modules:
                     group: 'System Temperature'
                     low_limit: XKL-MIB::xklSensorLowAlarm
                     low_warn_limit: XKL-MIB::xklSensorLowWarn
-                    high_warn_limit: XKL-MIB::xklSensorHighWarn
+                    warn_limit: XKL-MIB::xklSensorHighWarn
                     high_limit: XKL-MIB::xklSensorHighAlarm
                     skip_values:
                     -
@@ -77,7 +77,7 @@ modules:
                     group: 'transciever'
                     low_limit: XKL-MIB::xklTransportTxPowerLoAlrmThresh
                     low_warn_limit: XKL-MIB::xklTransportTxPowerLoWarnThresh
-                    high_warn_limit: XKL-MIB::xklTransportTxPowerHiWarnThresh
+                    warn_limit: XKL-MIB::xklTransportTxPowerHiWarnThresh
                     high_limit: XKL-MIB::xklTransportTxPowerHiAlrmThresh
                     divisor: 10
                     skip_values:
@@ -94,7 +94,7 @@ modules:
                     group: 'transciever'
                     low_limit: XKL-MIB::xklTransportRxPowerLoAlrmThresh
                     low_warn_limit: XKL-MIB::xklTransportRxPowerLoWarnThresh
-                    high_warn_limit: XKL-MIB::xklTransportRxPowerHiWarnThresh
+                    warn_limit: XKL-MIB::xklTransportRxPowerHiWarnThresh
                     high_limit: XKL-MIB::xklTransportRxPowerHiAlrmThresh
                     divisor: 10
                     skip_values:
@@ -184,7 +184,7 @@ modules:
                     group: 'transciever'
                     low_limit: XKL-MIB::xklTransportVoltageLoAlrmThresh
                     low_warn_limit: XKL-MIB::xklTransportVoltageLoWarnThresh
-                    high_warn_limit: XKL-MIB::xklTransportVoltageHiWarnThresh
+                    warn_limit: XKL-MIB::xklTransportVoltageHiWarnThresh
                     high_limit: XKL-MIB::xklTransportVoltageHiAlrmThresh
                     divisor: 10000
                     skip_values:
