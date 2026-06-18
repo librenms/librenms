@@ -36,8 +36,6 @@ updated every polling period.)
     Please be aware that `rrd_purge` does not work over rrdcached. The rrd folder needs to be accessible via the local file system or remote file share.
     This is the same for docker and Kubernetes.
 
-
-
 ## Ports Purge
 
 Over time as you add devices some interfaces will need to be purged as
