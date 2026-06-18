@@ -30,15 +30,14 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
-use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Exceptions\FileExistsException;
 use LibreNMS\Exceptions\RrdException;
+use LibreNMS\Exceptions\RrdFileExistsException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdNotFoundException;
-use LibreNMS\Exceptions\RrdUpdateTooFrequentException;
+use LibreNMS\Exceptions\RrdStoreException;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Rewrite;
@@ -46,6 +45,7 @@ use LibreNMS\Util\Rewrite;
 class Rrd extends BaseDatastore
 {
     private $disabled = false;
+    private int $updateErrorCount = 0;
 
     private ?RrdProcess $rrd = null;
     /** @var string */
@@ -139,14 +139,23 @@ class Rrd extends BaseDatastore
         }
 
         try {
-            $this->update($rrd, $fields);
-        } catch (RrdUpdateTooFrequentException) {
-            Log::debug("RRD warning: update too soon for $rrd");
-        } catch (RrdNotFoundException) {
-            if (isset($rrd_def)) {
-                $this->command('create', $rrd, ['--step', $step, ...$rrd_def->getArguments(), ...$this->rra]);
+            try {
                 $this->update($rrd, $fields);
+            } catch (RrdNotFoundException) {
+                if (isset($rrd_def)) {
+                    $this->command('create', $rrd, ['--step', $step, ...$rrd_def->getArguments(), ...$this->rra]);
+                    $this->update($rrd, $fields);
+                }
             }
+        } catch (RrdStoreException $e) {
+            Log::error('RRD Error %r' . $e->getMessage() . '%n', ['color' => true]);
+
+            if (++$this->updateErrorCount >= 3) {
+                $this->disabled = true;
+                Eventlog::log('RRD updates disabled, too many errors. Final error: ' . $e->getMessage(), $device_model, 'rrd', Severity::Error);
+            }
+        } catch (RrdException $e) {
+            Log::error('RRD Error %r' . $e->getMessage() . '%n', ['color' => true]);
         }
     }
 
@@ -174,7 +183,6 @@ class Rrd extends BaseDatastore
      * @param  array  $data
      *
      * @throws RrdException
-     * @throws Exception
      *
      * @internal
      */
@@ -226,7 +234,13 @@ class Rrd extends BaseDatastore
             foreach ($fields as $field) {
                 array_push($options, '--maximum', $field . ':' . $max);
             }
-            $this->command('tune', $filename, $options);
+            try {
+                $this->command('tune', $filename, $options);
+            } catch (RrdException $e) {
+                if (! $e instanceof RrdNotFoundException) {
+                    Log::debug('RRD tune failed: ' . $e->getMessage());
+                }
+            }
         }
 
         return true;
@@ -331,7 +345,7 @@ class Rrd extends BaseDatastore
      * @param  array  $options  rrdtool command options
      * @return string the output of the command
      *
-     * @throws Exception thrown when the rrdtool process(s) cannot be started
+     * @throws RrdException thrown when the rrdtool process(s) cannot be started
      */
     private function command(string $command, string $filename, array $options = []): string
     {
@@ -340,7 +354,7 @@ class Rrd extends BaseDatastore
 
         try {
             $cmd = self::buildCommand($command, $filename, $options);
-        } catch (FileExistsException) {
+        } catch (RrdFileExistsException) {
             Log::debug("RRD[%g$filename already exists%n]", ['color' => true]);
 
             return $output;
@@ -380,7 +394,7 @@ class Rrd extends BaseDatastore
      * @param  array  $options  Options for the command possibly including the rrd definition
      * @return array returns a full command array ready to be used by rrdtool
      *
-     * @throws FileExistsException if rrdtool <1.4.3 and the rrd file exists locally
+     * @throws RrdFileExistsException if rrdtool <1.4.3 and the rrd file exists locally
      */
     public function buildCommand(string $command, string $filename, array $options = []): array
     {
@@ -388,7 +402,7 @@ class Rrd extends BaseDatastore
             // <1.4.3 doesn't support -O, so make sure the file doesn't exist
             if (version_compare($this->version, '1.4.3', '<')) {
                 if (is_file($filename)) {
-                    throw new FileExistsException();
+                    throw new RrdFileExistsException();
                 }
             } else {
                 $options[] = '-O';

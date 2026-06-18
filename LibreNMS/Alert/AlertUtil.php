@@ -252,18 +252,6 @@ class AlertUtil
     }
 
     /**
-     * Returns the default transports
-     *
-     * @return array
-     */
-    public static function getDefaultAlertTransports()
-    {
-        $query = 'SELECT transport_id, transport_type, transport_name FROM alert_transports WHERE is_default=true';
-
-        return dbFetchRows($query);
-    }
-
-    /**
      * Find contacts for alert
      *
      * @param  array  $results  Rule-Result
@@ -349,7 +337,9 @@ class AlertUtil
             $email = $device->getAttrib('override_sysContact_bool')
                 ? $device->getAttrib('override_sysContact_string')
                 : $device->sysContact;
-            $contacts[$email] = '';
+            if ($email) {
+                $contacts[$email] = '';
+            }
         }
 
         return $contacts;
