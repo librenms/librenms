@@ -40,6 +40,26 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         } elseif ($device['os'] === 'cumulus') {
             $peers_data = snmp_walk($device, 'bgpPeerRemoteAs', '-Oq', 'CUMULUS-BGPUN-MIB');
             $peer2 = ! empty($peers_data);
+        } elseif ($device['os'] === 'vyos') {
+            foreach (\SnmpQuery::walk('BGP4V2-MIB::bgp4V2PeerRemoteAs')->valuesByIndex() as $index => $data) {
+                $remote_as = $data['BGP4V2-MIB::bgp4V2PeerRemoteAs'] ?? null;
+                if (! is_numeric($remote_as)) {
+                    continue;
+                }
+                // With the BGP4V2-MIB loaded, SnmpQuery formats the OID index as:
+                // "1.ipv4..192.0.2.1"  (dot-notation, real FRR devices)
+                // "1.ipv4.\"192.0.2.1\""  (quoted, some snmpsim/implementations)
+                if (! preg_match('/\.(ipv4|ipv6)\.(?:\.([0-9.]+)|"([^"]+)")$/', (string) $index, $m)) {
+                    continue;
+                }
+                $addrStr = $m[2] !== '' ? $m[2] : $m[3];
+                try {
+                    $ip = str_contains($addrStr, ':') ? IP::fromHexString($addrStr) : IP::fromSnmpString($addrStr);
+                    // toSnmpString() produces the colon-hex-byte format build_bgp_peers expects for IPv6
+                    $peers_data .= $ip->toSnmpString() . " $remote_as\n";
+                } catch (InvalidIpException) {
+                }
+            }
         }
 
         if (empty($peers_data)) {
