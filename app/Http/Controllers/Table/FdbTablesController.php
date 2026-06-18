@@ -180,7 +180,7 @@ class FdbTablesController extends TableController
 
         if ($model->port) {
             $item['interface'] = Blade::render('<x-port-link :port="$port">{{ $port->getShortLabel() }}</x-port-link>', ['port' => $model->port]);
-            $item['description'] = $model->port->ifAlias;
+            $item['description'] = htmlspecialchars((string) $model->port->ifAlias);
             if ($model->port->ifInErrors_delta > 0 || $model->port->ifOutErrors_delta > 0) {
                 $item['interface'] .= Blade::render(' <x-port-link :port="$port"><i class="fa fa-flag fa-lg" style="color:red" aria-hidden="true"></i></x-port-link>', ['port' => $model->port]);
             }

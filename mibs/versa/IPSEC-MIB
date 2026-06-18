@@ -1,0 +1,726 @@
+IPSEC-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    orgServices
+        FROM VERSA-MIB
+;
+
+ipsec MODULE-IDENTITY
+    LAST-UPDATED "201507090000Z"
+    ORGANIZATION "Versa Networks"
+    CONTACT-INFO "
+        2953 Bunker Hill Lane, Suite 210
+        Santa Clara, CA - 95035 (USA)
+        Email: support@versa-networks.com"
+    DESCRIPTION "Enterprise MIB for Versa Networks IPSec"
+    REVISION "201507090000Z"
+    DESCRIPTION "Initial revision"
+    ::= { orgServices 9 }
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+ipsecMibIpsecStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpsecMibIpsecStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipsec 1 }
+
+ipsecMibIpsecStatsEntry OBJECT-TYPE
+    SYNTAX      IpsecMibIpsecStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ipsecMibIpsecStatsOrgId }
+        ::= { ipsecMibIpsecStatsTable 1 }
+
+IpsecMibIpsecStatsEntry ::=
+    SEQUENCE {
+        ipsecMibIpsecStatsOrgId Unsigned32,
+        ipsecMibIpsecStatsOrgName String,
+        ipsecMibIpsecStatsInPkts Counter64,
+        ipsecMibIpsecStatsInBytes Counter64,
+        ipsecMibIpsecStatsInPlain Counter64,
+        ipsecMibIpsecStatsInNatt Counter64,
+        ipsecMibIpsecStatsInAntireplayOow Counter64,
+        ipsecMibIpsecStatsInAntireplayDup Counter64,
+        ipsecMibIpsecStatsInInvalid Counter64,
+        ipsecMibIpsecStatsInDropAntireplay Counter64,
+        ipsecMibIpsecStatsInDropMac Counter64,
+        ipsecMibIpsecStatsOutPkts Counter64,
+        ipsecMibIpsecStatsOutBytes Counter64,
+        ipsecMibIpsecStatsOutEspAh Counter64,
+        ipsecMibIpsecStatsOutPrefragSubmit Counter64,
+        ipsecMibIpsecStatsOutPrefragDone Counter64,
+        ipsecMibIpsecStatsOutPrefragPkt Counter64,
+        ipsecMibIpsecStatsOutEgressSuccess Counter64,
+        ipsecMibIpsecStatsOutDropNoSa Counter64,
+        ipsecMibIpsecStatsOutDropNoMbuf Counter64,
+        ipsecMibIpsecStatsOutDropCoalesceFail Counter64,
+        ipsecMibIpsecStatsOutDropInvalid Counter64,
+        ipsecMibIpsecStatsInIke Counter64,
+        ipsecMibIpsecStatsInIkeTrigger Counter64,
+        ipsecMibIpsecStatsInEsp Counter64,
+        ipsecMibIpsecStatsInAh Counter64,
+        ipsecMibIpsecStatsInNattKeepAlive Counter64,
+        ipsecMibIpsecStatsInDropIkeInvalid Counter64,
+        ipsecMibIpsecStatsInDropSpiUnknown Counter64,
+        ipsecMibIpsecStatsInDropSpiInvalid Counter64,
+        ipsecMibIpsecStatsInDropNoSa Counter64,
+        ipsecMibIpsecStatsOutIke Counter64,
+        ipsecMibIpsecStatsOutPmTrigger Counter64,
+        ipsecMibIpsecStatsOutNoRule Counter64,
+        ipsecMibIpsecStatsOutSpiHits Counter64,
+        ipsecMibIpsecStatsOutDropPmRateLimit Counter64,
+        ipsecMibIpsecStatsIkeConnects Counter64,
+        ipsecMibIpsecStatsIkeRekey Counter64,
+        ipsecMibIpsecStatsIpsecRekey Counter64,
+        ipsecMibIpsecStatsIkeDisconnects Counter64
+    }
+
+ipsecMibIpsecStatsOrgId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipsecMibIpsecStatsEntry 1 }
+
+ipsecMibIpsecStatsOrgName OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipsecMibIpsecStatsEntry 2 }
+
+ipsecMibIpsecStatsInPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound packets"
+    ::= { ipsecMibIpsecStatsEntry 5 }
+
+ipsecMibIpsecStatsInBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound bytes"
+    ::= { ipsecMibIpsecStatsEntry 6 }
+
+ipsecMibIpsecStatsInPlain OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Decrypted plain text packets"
+    ::= { ipsecMibIpsecStatsEntry 7 }
+
+ipsecMibIpsecStatsInNatt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound NAT-T packets"
+    ::= { ipsecMibIpsecStatsEntry 8 }
+
+ipsecMibIpsecStatsInAntireplayOow OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Anti-replay failure (out of window)"
+    ::= { ipsecMibIpsecStatsEntry 9 }
+
+ipsecMibIpsecStatsInAntireplayDup OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Anti-replay failure (duplicate)"
+    ::= { ipsecMibIpsecStatsEntry 10 }
+
+ipsecMibIpsecStatsInInvalid OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound packets dropped - Invalid packets"
+    ::= { ipsecMibIpsecStatsEntry 11 }
+
+ipsecMibIpsecStatsInDropAntireplay OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound packets dropped - Anti-replay check failure"
+    ::= { ipsecMibIpsecStatsEntry 12 }
+
+ipsecMibIpsecStatsInDropMac OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound packets dropped - Auth failure"
+    ::= { ipsecMibIpsecStatsEntry 13 }
+
+ipsecMibIpsecStatsOutPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound packets"
+    ::= { ipsecMibIpsecStatsEntry 14 }
+
+ipsecMibIpsecStatsOutBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound bytes"
+    ::= { ipsecMibIpsecStatsEntry 15 }
+
+ipsecMibIpsecStatsOutEspAh OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound ESP/AH packets"
+    ::= { ipsecMibIpsecStatsEntry 16 }
+
+ipsecMibIpsecStatsOutPrefragSubmit OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound packets submitted for pre-fragmentation"
+    ::= { ipsecMibIpsecStatsEntry 17 }
+
+ipsecMibIpsecStatsOutPrefragDone OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound packets with successful pre-fragmentation"
+    ::= { ipsecMibIpsecStatsEntry 18 }
+
+ipsecMibIpsecStatsOutPrefragPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound pre-fragmented packets"
+    ::= { ipsecMibIpsecStatsEntry 19 }
+
+ipsecMibIpsecStatsOutEgressSuccess OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound encrypted packets"
+    ::= { ipsecMibIpsecStatsEntry 20 }
+
+ipsecMibIpsecStatsOutDropNoSa OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound packets dropped - No SA"
+    ::= { ipsecMibIpsecStatsEntry 21 }
+
+ipsecMibIpsecStatsOutDropNoMbuf OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound packets dropped - No mbuf"
+    ::= { ipsecMibIpsecStatsEntry 22 }
+
+ipsecMibIpsecStatsOutDropCoalesceFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound packets dropped - Coalesce failure"
+    ::= { ipsecMibIpsecStatsEntry 23 }
+
+ipsecMibIpsecStatsOutDropInvalid OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound dropped packets - Invalid"
+    ::= { ipsecMibIpsecStatsEntry 24 }
+
+ipsecMibIpsecStatsInIke OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound ike"
+    ::= { ipsecMibIpsecStatsEntry 25 }
+
+ipsecMibIpsecStatsInIkeTrigger OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound IKE trigger packets"
+    ::= { ipsecMibIpsecStatsEntry 26 }
+
+ipsecMibIpsecStatsInEsp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound ESP packets"
+    ::= { ipsecMibIpsecStatsEntry 27 }
+
+ipsecMibIpsecStatsInAh OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound AH packets"
+    ::= { ipsecMibIpsecStatsEntry 28 }
+
+ipsecMibIpsecStatsInNattKeepAlive OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound NAT-T keep-alive packets"
+    ::= { ipsecMibIpsecStatsEntry 29 }
+
+ipsecMibIpsecStatsInDropIkeInvalid OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound dropped packets - Invalid IKE"
+    ::= { ipsecMibIpsecStatsEntry 30 }
+
+ipsecMibIpsecStatsInDropSpiUnknown OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound dropped packets - Unknown SPI"
+    ::= { ipsecMibIpsecStatsEntry 31 }
+
+ipsecMibIpsecStatsInDropSpiInvalid OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound dropped packets - Invalid SPI"
+    ::= { ipsecMibIpsecStatsEntry 32 }
+
+ipsecMibIpsecStatsInDropNoSa OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound dropped packets - No SA"
+    ::= { ipsecMibIpsecStatsEntry 33 }
+
+ipsecMibIpsecStatsOutIke OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound IKE packets"
+    ::= { ipsecMibIpsecStatsEntry 34 }
+
+ipsecMibIpsecStatsOutPmTrigger OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound policy manager trigger packets"
+    ::= { ipsecMibIpsecStatsEntry 35 }
+
+ipsecMibIpsecStatsOutNoRule OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound packets not hitting any rule"
+    ::= { ipsecMibIpsecStatsEntry 36 }
+
+ipsecMibIpsecStatsOutSpiHits OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound packets hitting existing SA"
+    ::= { ipsecMibIpsecStatsEntry 37 }
+
+ipsecMibIpsecStatsOutDropPmRateLimit OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound dropped packets - PM rate limit"
+    ::= { ipsecMibIpsecStatsEntry 38 }
+
+ipsecMibIpsecStatsIkeConnects OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IKE Established"
+    ::= { ipsecMibIpsecStatsEntry 39 }
+
+ipsecMibIpsecStatsIkeRekey OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IKE Rekey count"
+    ::= { ipsecMibIpsecStatsEntry 40 }
+
+ipsecMibIpsecStatsIpsecRekey OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IPsec Rekey count"
+    ::= { ipsecMibIpsecStatsEntry 41 }
+
+ipsecMibIpsecStatsIkeDisconnects OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IKE Disconnects"
+    ::= { ipsecMibIpsecStatsEntry 42 }
+
+ipsecMibProfileStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpsecMibProfileStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipsec 2 }
+
+ipsecMibProfileStatsEntry OBJECT-TYPE
+    SYNTAX      IpsecMibProfileStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ipsecMibProfileStatsOrgId, ipsecMibProfileStatsProfileId }
+        ::= { ipsecMibProfileStatsTable 1 }
+
+IpsecMibProfileStatsEntry ::=
+    SEQUENCE {
+        ipsecMibProfileStatsOrgId Unsigned32,
+        ipsecMibProfileStatsProfileId Unsigned32,
+        ipsecMibProfileStatsOrgName String,
+        ipsecMibProfileStatsProfileName String,
+        ipsecMibProfileStatsInPkts Counter64,
+        ipsecMibProfileStatsInBytes Counter64,
+        ipsecMibProfileStatsInPlain Counter64,
+        ipsecMibProfileStatsInNatt Counter64,
+        ipsecMibProfileStatsInAntireplayOow Counter64,
+        ipsecMibProfileStatsInAntireplayDup Counter64,
+        ipsecMibProfileStatsInInvalid Counter64,
+        ipsecMibProfileStatsInDropAntireplay Counter64,
+        ipsecMibProfileStatsInDropMac Counter64,
+        ipsecMibProfileStatsOutPkts Counter64,
+        ipsecMibProfileStatsOutBytes Counter64,
+        ipsecMibProfileStatsOutEspAh Counter64,
+        ipsecMibProfileStatsOutPrefragSubmit Counter64,
+        ipsecMibProfileStatsOutPrefragDone Counter64,
+        ipsecMibProfileStatsOutPrefragPkt Counter64,
+        ipsecMibProfileStatsOutEgressSuccess Counter64,
+        ipsecMibProfileStatsOutDropNoSa Counter64,
+        ipsecMibProfileStatsOutDropNoMbuf Counter64,
+        ipsecMibProfileStatsOutDropCoalesceFail Counter64,
+        ipsecMibProfileStatsOutDropInvalid Counter64,
+        ipsecMibProfileStatsInIke Counter64,
+        ipsecMibProfileStatsInIkeTrigger Counter64,
+        ipsecMibProfileStatsInEsp Counter64,
+        ipsecMibProfileStatsInAh Counter64,
+        ipsecMibProfileStatsInNattKeepAlive Counter64,
+        ipsecMibProfileStatsInDropIkeInvalid Counter64,
+        ipsecMibProfileStatsInDropSpiUnknown Counter64,
+        ipsecMibProfileStatsInDropSpiInvalid Counter64,
+        ipsecMibProfileStatsInDropNoSa Counter64,
+        ipsecMibProfileStatsOutIke Counter64,
+        ipsecMibProfileStatsOutPmTrigger Counter64,
+        ipsecMibProfileStatsOutNoRule Counter64,
+        ipsecMibProfileStatsOutSpiHits Counter64,
+        ipsecMibProfileStatsOutDropPmRateLimit Counter64,
+        ipsecMibProfileStatsIkeConnects Counter64,
+        ipsecMibProfileStatsIkeRekey Counter64,
+        ipsecMibProfileStatsIpsecRekey Counter64,
+        ipsecMibProfileStatsIkeDisconnects Counter64
+    }
+
+ipsecMibProfileStatsOrgId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipsecMibProfileStatsEntry 1 }
+
+ipsecMibProfileStatsProfileId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipsecMibProfileStatsEntry 2 }
+
+ipsecMibProfileStatsOrgName OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipsecMibProfileStatsEntry 3 }
+
+ipsecMibProfileStatsProfileName OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ipsecMibProfileStatsEntry 4 }
+
+ipsecMibProfileStatsInPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound packets"
+    ::= { ipsecMibProfileStatsEntry 5 }
+
+ipsecMibProfileStatsInBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound bytes"
+    ::= { ipsecMibProfileStatsEntry 6 }
+
+ipsecMibProfileStatsInPlain OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Decrypted plain text packets"
+    ::= { ipsecMibProfileStatsEntry 7 }
+
+ipsecMibProfileStatsInNatt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound NAT-T packets"
+    ::= { ipsecMibProfileStatsEntry 8 }
+
+ipsecMibProfileStatsInAntireplayOow OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Anti-replay failure (out of window)"
+    ::= { ipsecMibProfileStatsEntry 9 }
+
+ipsecMibProfileStatsInAntireplayDup OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Anti-replay failure (duplicate)"
+    ::= { ipsecMibProfileStatsEntry 10 }
+
+ipsecMibProfileStatsInInvalid OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound packets dropped - Invalid packets"
+    ::= { ipsecMibProfileStatsEntry 11 }
+
+ipsecMibProfileStatsInDropAntireplay OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound packets dropped - Anti-replay check failure"
+    ::= { ipsecMibProfileStatsEntry 12 }
+
+ipsecMibProfileStatsInDropMac OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound packets dropped - Auth failure"
+    ::= { ipsecMibProfileStatsEntry 13 }
+
+ipsecMibProfileStatsOutPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound packets"
+    ::= { ipsecMibProfileStatsEntry 14 }
+
+ipsecMibProfileStatsOutBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound bytes"
+    ::= { ipsecMibProfileStatsEntry 15 }
+
+ipsecMibProfileStatsOutEspAh OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound ESP/AH packets"
+    ::= { ipsecMibProfileStatsEntry 16 }
+
+ipsecMibProfileStatsOutPrefragSubmit OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound packets submitted for pre-fragmentation"
+    ::= { ipsecMibProfileStatsEntry 17 }
+
+ipsecMibProfileStatsOutPrefragDone OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound packets with successful pre-fragmentation"
+    ::= { ipsecMibProfileStatsEntry 18 }
+
+ipsecMibProfileStatsOutPrefragPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound pre-fragmented packets"
+    ::= { ipsecMibProfileStatsEntry 19 }
+
+ipsecMibProfileStatsOutEgressSuccess OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound encrypted packets"
+    ::= { ipsecMibProfileStatsEntry 20 }
+
+ipsecMibProfileStatsOutDropNoSa OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound packets dropped - No SA"
+    ::= { ipsecMibProfileStatsEntry 21 }
+
+ipsecMibProfileStatsOutDropNoMbuf OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound packets dropped - No mbuf"
+    ::= { ipsecMibProfileStatsEntry 22 }
+
+ipsecMibProfileStatsOutDropCoalesceFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound packets dropped - Coalesce failure"
+    ::= { ipsecMibProfileStatsEntry 23 }
+
+ipsecMibProfileStatsOutDropInvalid OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound dropped packets - Invalid"
+    ::= { ipsecMibProfileStatsEntry 24 }
+
+ipsecMibProfileStatsInIke OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound ike"
+    ::= { ipsecMibProfileStatsEntry 25 }
+
+ipsecMibProfileStatsInIkeTrigger OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound IKE trigger packets"
+    ::= { ipsecMibProfileStatsEntry 26 }
+
+ipsecMibProfileStatsInEsp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound ESP packets"
+    ::= { ipsecMibProfileStatsEntry 27 }
+
+ipsecMibProfileStatsInAh OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound AH packets"
+    ::= { ipsecMibProfileStatsEntry 28 }
+
+ipsecMibProfileStatsInNattKeepAlive OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound NAT-T keep-alive packets"
+    ::= { ipsecMibProfileStatsEntry 29 }
+
+ipsecMibProfileStatsInDropIkeInvalid OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound dropped packets - Invalid IKE"
+    ::= { ipsecMibProfileStatsEntry 30 }
+
+ipsecMibProfileStatsInDropSpiUnknown OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound dropped packets - Unknown SPI"
+    ::= { ipsecMibProfileStatsEntry 31 }
+
+ipsecMibProfileStatsInDropSpiInvalid OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound dropped packets - Invalid SPI"
+    ::= { ipsecMibProfileStatsEntry 32 }
+
+ipsecMibProfileStatsInDropNoSa OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound dropped packets - No SA"
+    ::= { ipsecMibProfileStatsEntry 33 }
+
+ipsecMibProfileStatsOutIke OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound IKE packets"
+    ::= { ipsecMibProfileStatsEntry 34 }
+
+ipsecMibProfileStatsOutPmTrigger OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound policy manager trigger packets"
+    ::= { ipsecMibProfileStatsEntry 35 }
+
+ipsecMibProfileStatsOutNoRule OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound packets not hitting any rule"
+    ::= { ipsecMibProfileStatsEntry 36 }
+
+ipsecMibProfileStatsOutSpiHits OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound packets hitting existing SA"
+    ::= { ipsecMibProfileStatsEntry 37 }
+
+ipsecMibProfileStatsOutDropPmRateLimit OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound dropped packets - PM rate limit"
+    ::= { ipsecMibProfileStatsEntry 38 }
+
+ipsecMibProfileStatsIkeConnects OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IKE Established"
+    ::= { ipsecMibProfileStatsEntry 39 }
+
+ipsecMibProfileStatsIkeRekey OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IKE Rekey count"
+    ::= { ipsecMibProfileStatsEntry 40 }
+
+ipsecMibProfileStatsIpsecRekey OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IPsec Rekey count"
+    ::= { ipsecMibProfileStatsEntry 41 }
+
+ipsecMibProfileStatsIkeDisconnects OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IKE Disconnects"
+    ::= { ipsecMibProfileStatsEntry 42 }
+
+END
