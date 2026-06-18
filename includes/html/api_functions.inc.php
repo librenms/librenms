@@ -49,6 +49,7 @@ use App\Models\ServiceTemplate;
 use App\Models\UserPref;
 use App\Models\Vlan;
 use App\Models\Vrf;
+use App\Models\WirelessSensor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -474,8 +475,12 @@ function add_device(Illuminate\Http\Request $request)
         }
 
         (new ValidateDeviceAndCreate($device, $force_add, ! empty($data['ping_fallback'])))->execute();
-    } catch (Exception $e) {
+    } catch (\LibreNMS\Exceptions\HostExistsException|\LibreNMS\Exceptions\HostUnreachableException|\LibreNMS\Exceptions\SnmpVersionUnsupportedException $e) {
         return api_error(500, $e->getMessage());
+    } catch (Exception $e) {
+        report($e);
+
+        return api_error(500, 'Failed to add device');
     }
 
     $message = "Device $device->hostname ($device->device_id) has been added successfully";
@@ -1160,6 +1165,64 @@ function get_device_ports(Illuminate\Http\Request $request): JsonResponse
     return api_success($ports, 'ports');
 }
 
+function get_device_wireless_sensors(Illuminate\Http\Request $request): JsonResponse
+{
+    $device = DeviceCache::get($request->route('hostname'));
+    $class = $request->input('class');
+
+    if ($class && ! in_array($class, \LibreNMS\Enum\WirelessSensorType::values(), true)) {
+        return api_error(400, "Invalid wireless sensor class '$class'");
+    }
+
+    $columns = validate_column_list($request->input('columns'), 'wireless_sensors', [
+        'sensor_id',
+        'sensor_deleted',
+        'sensor_class',
+        'device_id',
+        'sensor_index',
+        'sensor_type',
+        'sensor_descr',
+        'sensor_divisor',
+        'sensor_multiplier',
+        'sensor_aggregator',
+        'sensor_current',
+        'sensor_prev',
+        'sensor_limit',
+        'sensor_limit_warn',
+        'sensor_limit_low',
+        'sensor_limit_low_warn',
+        'sensor_alert',
+        'sensor_custom',
+        'entPhysicalIndex',
+        'entPhysicalIndex_measured',
+        'lastupdate',
+        'sensor_oids',
+        'access_point_id',
+        'rrd_type',
+    ]);
+
+    $wireless_sensors = WirelessSensor::query()
+        ->hasAccess(Auth::user())
+        ->where('sensor_deleted', 0)
+        ->where('device_id', $device->device_id)
+        ->when($class, fn ($q) => $q->where('sensor_class', $class))
+        ->select($columns)
+        ->orderBy('sensor_class')
+        ->orderBy('sensor_index')
+        ->orderBy('sensor_descr')
+        ->get();
+
+    if ($wireless_sensors->isEmpty()) {
+        $message = $class
+            ? "No wireless sensors found for class '$class'"
+            : 'No wireless sensors found';
+
+        return api_error(404, $message);
+    }
+
+    return api_success($wireless_sensors, 'wireless_sensors', count: $wireless_sensors->count());
+}
+
 function get_device_ip_addresses(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
@@ -1239,7 +1302,7 @@ function get_port_info(Illuminate\Http\Request $request)
 
     return check_port_permission($port_id, null, function ($port_id) {
         $with = request()->input('with');
-        $allowed = ['vlans', 'device'];
+        $allowed = ['vlans', 'device', 'statistics'];
         $port = Port::where('port_id', $port_id)
                     ->when(in_array($with, $allowed), fn ($q) => $q->with($with))
                     ->get();
@@ -1900,6 +1963,10 @@ function add_edit_rule(Illuminate\Http\Request $request)
     if (array_key_exists('alert_operation_id', $data)) {
         $v = $data['alert_operation_id'];
         $saveData['alert_operation_id'] = ($v === null || $v === '') ? null : (int) $v;
+    }
+
+    if (array_key_exists('invert_map', $data)) {
+        $saveData['invert_map'] = filter_var($data['invert_map'], FILTER_VALIDATE_BOOLEAN);
     }
 
     if (is_numeric($rule_id)) {
@@ -3462,14 +3529,17 @@ function add_eventlog(Illuminate\Http\Request $request)
     if (! $device || ! isset($device['device_id'])) {
         return api_error(404, $hostname . ' device does not exist');
     }
-    $data = json_decode($request->getContent(), true);
-    if (array_key_exists('text', $data)) {
-        Eventlog::log($data['text'], $device['device_id'], $data['type'] ?? 'API', Severity::from($data['severity'] ?? 2), $data['reference'] ?? null);
 
-        return api_success_noresult(200, 'Eventlog received for ' . $hostname);
-    }
+    return check_device_permission($device['device_id'], function () use ($device, $hostname, $request) {
+        $data = json_decode($request->getContent(), true);
+        if (array_key_exists('text', $data)) {
+            Eventlog::log($data['text'], $device['device_id'], $data['type'] ?? 'API', Severity::from($data['severity'] ?? 2), $data['reference'] ?? null);
 
-    return api_error(400, 'No Eventlog text provided.');
+            return api_success_noresult(200, 'Eventlog received for ' . $hostname);
+        }
+
+        return api_error(400, 'No Eventlog text provided.');
+    });
 }
 
 function list_logs(Illuminate\Http\Request $request, Router $router)
@@ -3908,12 +3978,13 @@ function search_by_mac(Illuminate\Http\Request $request)
         return api_error(422, $validate->messages());
     }
 
-    $ports = Port::whereHas('fdbEntries', function ($fdbDownlink) use ($macAddress): void {
-        $fdbDownlink->where('mac_address', $macAddress);
-    })
-         ->withCount('fdbEntries')
-         ->orderBy('fdb_entries_count')
-         ->get();
+    $ports = Port::hasAccess(Auth::user())
+        ->whereHas('fdbEntries', function ($fdbDownlink) use ($macAddress): void {
+            $fdbDownlink->where('mac_address', $macAddress);
+        })
+        ->withCount('fdbEntries')
+        ->orderBy('fdb_entries_count')
+        ->get();
 
     if ($ports->count() == 0) {
         return api_error(404, 'mac not found');

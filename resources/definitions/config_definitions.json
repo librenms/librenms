@@ -560,7 +560,7 @@
             "type": "select",
             "default": "none",
             "options" : {
-                "none" : "No Access",
+                "none" : "No Permissions",
                 "normal" : "Normal Access",
                 "global-read" : "Global Viewing Access",
                 "admin" : "Global Administrative Access"
@@ -2249,13 +2249,6 @@
             "group": "webui",
             "section": "device",
             "order": 8
-        },
-        "enable_footer": {
-            "default": false,
-            "type": "boolean",
-            "group": "webui",
-            "section": "general",
-            "order": 0
         },
         "enable_inventory": {
             "default": true,
@@ -4537,6 +4530,13 @@
             "group": "external",
             "section": "graylog",
             "order": 10
+        },
+        "graylog.match-any-address": {
+            "default": false,
+            "type": "boolean",
+            "group": "external",
+            "section": "graylog",
+            "order": 11
         },
         "group": {
             "type": "text",
@@ -7310,6 +7310,26 @@
                 "master": "master",
                 "release": "release"
             }
+        },
+        "update_on_days": {
+            "default": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+            "type": "array",
+            "options": {
+                "monday": "Monday",
+                "tuesday": "Tuesday",
+                "wednesday": "Wednesday",
+                "thursday": "Thursday",
+                "friday": "Friday",
+                "saturday": "Saturday",
+                "sunday": "Sunday"
+            },
+            "validate": {
+                "value": "array",
+                "value.*": "distinct|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday"
+            },
+            "group": "system",
+            "section": "updates",
+            "order": 2
         },
         "uptime_warning": {
             "group": "webui",

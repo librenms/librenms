@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
 
-if (Gate::denies('update', Mempool::class)) {
+if (Gate::denies('mempool.update')) {
     $response = [
         'status' => 'error',
         'message' => 'Need to be admin',

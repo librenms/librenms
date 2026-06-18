@@ -178,6 +178,14 @@ trait Filterable
 
         $not = $config['not'] ?? false;
 
+        if ($config['null'] ?? false) {
+            $not
+                ? ($boolean === 'or' ? $query->orWhereHas($relation) : $query->whereHas($relation))
+                : ($boolean === 'or' ? $query->orWhereDoesntHave($relation) : $query->whereDoesntHave($relation));
+
+            return;
+        }
+
         // Callback to apply the logic inside the relationship scope
         $callback = function (Builder $q) use ($column, $value, $config): void {
             // When negating a relation (whereDoesntHave), we must use "positive" internal logic
@@ -200,7 +208,7 @@ trait Filterable
     /**
      * @return array{
      * filter: list<string>,
-     * 'filter.*': array{0: string, 1: \Closure(string, mixed, \Closure(string): void): void},
+     * 'filter.*': array{0: string, 1: string, 2: \Closure(string, mixed, \Closure(string): void): void},
      * 'filter.*.*': list<string>
      * }
      */
@@ -209,6 +217,7 @@ trait Filterable
         return [
             'filter' => ['nullable', 'array'],
             'filter.*' => [
+                'bail',
                 'array',
                 function ($attribute, $value, $fail): void {
                     $operator = array_key_first($value);

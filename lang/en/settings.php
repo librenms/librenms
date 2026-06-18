@@ -961,10 +961,6 @@ return [
             'description' => 'Enable Clear Discovery',
             'help' => 'Enables the ability to clear discovery date and time for a device. This will force a rediscovery of the device.',
         ],
-        'enable_footer' => [
-            'description' => 'Enable Footer',
-            'help' => 'Enables the footer on all pages.',
-        ],
         'enable_inventory' => [
             'description' => 'Enable Inventory',
             'help' => 'Enables the inventory page, which shows the hardware inventory of devices.',
@@ -1146,6 +1142,10 @@ return [
                     'description' => 'Query api field',
                     'help' => 'Changes the default field to query graylog API.',
                 ],
+            ],
+            'match-any-address' => [
+                'description' => 'Match any address',
+                'help' => 'This is used to match any address of a device to the source of a graylog log message, by default, only the primary address is used',
             ],
         ],
         'html' => [
@@ -2409,6 +2409,10 @@ return [
                 'master' => 'Daily',
                 'release' => 'Monthly',
             ],
+        ],
+        'update_on_days' => [
+            'description' => 'Only run updates on these days',
+            'help' => 'If set (non-empty), daily.sh will only run code updates when today matches one of these values: monday-sunday or mon-sun. Leave empty to allow updates every day.',
         ],
         'uptime_warning' => [
             'description' => 'Show Device as warning if Uptime below (seconds)',

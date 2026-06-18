@@ -20,7 +20,7 @@ class VrfPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'view')
+        return $this->hasGlobalPermission($user, 'view', true)
             || $this->hasGlobalPermission($user, 'viewAll')
             || $this->hasGlobalPermission($user, 'update');
     }
@@ -42,15 +42,16 @@ class VrfPolicy
             return true;
         }
 
-        return $this->hasGlobalPermission($user, 'view')
+        return $this->hasGlobalPermission($user, 'view', true)
             && Permissions::canAccessDevice($vrf->device_id, $user);
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user): bool
+    public function update(User $user, Vrf $vrf): bool
     {
-        return $this->hasGlobalPermission($user, 'update');
+        return $this->hasGlobalPermission($user, 'update')
+            && Permissions::canAccessDevice($vrf->device_id, $user);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Traits\Filterable;
 use App\View\SimpleTemplate;
 use Carbon\Carbon;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
@@ -38,7 +39,7 @@ use LibreNMS\Util\Url;
  */
 class Device extends BaseModel
 {
-    use PivotEventTrait, HasFactory;
+    use PivotEventTrait, HasFactory, Filterable;
 
     private ?MaintenanceStatus $maintenanceStatus = null;
 
@@ -81,11 +82,34 @@ class Device extends BaseModel
         'sysDescr',
         'sysName',
         'sysObjectID',
+        'snmpEngineID',
         'timeout',
         'transport',
         'type',
         'version',
         'uptime',
+    ];
+
+    protected array $filterable = [
+        'device_id',
+        'hostname',
+        'sysName',
+        'display',
+        'hardware',
+        'os',
+        'location_id',
+        'version',
+        'features',
+        'type',
+        'status',
+        'disabled',
+        'ignore',
+        'disable_notify',
+        'poller_group',
+        'groups.id',
+        'serviceTemplates.id',
+        'search',
+        'state',
     ];
 
     /**
@@ -539,6 +563,25 @@ class Device extends BaseModel
     }
 
     // ---- Query scopes ----
+
+    public function filterState(Builder $query, mixed $value, array $config): void
+    {
+        $this->applyMappedFilter($query, $value, $config, fn (Builder $q, $state) => match ($state) {
+            'up' => $q->where('status', 1)->where('disabled', 0)->where('disable_notify', 0),
+            'down' => $q->where('status', 0)->where('disabled', 0)->where('disable_notify', 0),
+            default => $q,
+        });
+    }
+
+    public function filterSearch(Builder $query, mixed $value, array $config): void
+    {
+        $this->applyFilterSearch(
+            ['sysName', 'hostname', 'display', 'hardware', 'os', 'location.location'],
+            $query,
+            $value,
+            $config,
+        );
+    }
 
     public function scopeIsUp($query)
     {

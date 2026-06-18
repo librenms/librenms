@@ -3,6 +3,8 @@
 namespace LibreNMS\RRD;
 
 use App\Facades\LibrenmsConfig;
+use Closure;
+use Illuminate\Support\Str;
 use LibreNMS\Exceptions\RrdException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\InputStream;
@@ -14,32 +16,41 @@ class RrdProcess
 
     private readonly string $rrdcached;
     private readonly string $rrd_dir;
-    private readonly string $rrdtool_exec;
-    private array $env = [];
     private readonly InputStream $input;
 
     private ?Process $process = null;
+    private Closure $processFactory;
 
-    public function __construct(private readonly LoggerInterface $logger, private readonly int $timeout = 300)
+    public function __construct(private readonly LoggerInterface $logger, private readonly int $timeout = 300, ?Closure $processFactory = null)
     {
-        $this->rrdtool_exec = LibrenmsConfig::get('rrdtool', 'rrdtool');
         $this->rrdcached = (string) LibrenmsConfig::get('rrdcached', '');
-        $this->rrd_dir = LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd');
+        $this->rrd_dir = Str::finish(LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd'), '/');
         $this->input = new InputStream();
 
-        if ($this->rrdcached) {
-            $this->env['RRDCACHED_ADDRESS'] = $this->rrdcached;
+        // set up process factory
+        if ($processFactory === null) {
+            $command = [LibrenmsConfig::get('rrdtool', 'rrdtool'), '-'];
+            $env = ['LC_ALL' => 'C']; // force english/standard output
+            if (LibrenmsConfig::get('rrdcached', '')) {
+                $env['RRDCACHED_ADDRESS'] = LibrenmsConfig::get('rrdcached', '');
+            }
+            if (session('preferences.timezone')) {
+                $env['TZ'] = session('preferences.timezone');
+            }
+            $this->processFactory = fn () => new Process(
+                command: $command,
+                cwd: $this->rrd_dir,
+                env: $env,
+            );
+        } else {
+            $this->processFactory = $processFactory;
         }
     }
 
     public function start(): void
     {
-        if ($this->process === null) {
-            $this->process = new Process(
-                command: [$this->rrdtool_exec, '-'],
-                cwd: $this->rrd_dir,
-                env: $this->env,
-            );
+        if ($this->process === null || ! $this->process->isRunning()) {
+            $this->process = ($this->processFactory)();
             $this->process->setInput($this->input);
             $this->process->setTimeout($this->timeout);
             $this->process->setIdleTimeout($this->timeout);
@@ -63,15 +74,9 @@ class RrdProcess
     {
         $this->runAsync($command);
 
-        $this->process->clearOutput();
         $this->process->waitUntil(function ($type, $buffer) use ($waitFor) {
-            if ($type === Process::ERR) {
-                throw new RrdException($buffer);
-            }
-
-            if (str_contains($buffer, 'ERROR: ')) {
-                preg_match('/ERROR: (.*)/', $buffer, $matches);
-                throw new RrdException($matches[1]);
+            if ($type === Process::ERR || str_contains($buffer, 'ERROR: ')) {
+                throw RrdException::parse($buffer);
             }
 
             return str_contains($buffer, $waitFor);
@@ -86,7 +91,7 @@ class RrdProcess
         return rtrim($output);
     }
 
-    public function runAsync(string $command): void
+    private function runAsync(string $command): void
     {
         $this->start();
 
@@ -96,6 +101,7 @@ class RrdProcess
         }
 
         $this->logger->debug("RRD[%g$command%n]", ['color' => true]);
+        $this->process->clearOutput();
         $this->input->write("$command\n");
     }
 

@@ -4,7 +4,7 @@ use App\Models\Port;
 
 header('Content-type: application/json');
 
-if (Gate::denies('update', Port::class)) {
+if (Gate::denies('port.update')) {
     $response = [
         'status' => 'error',
         'message' => 'You need permission',
@@ -26,7 +26,7 @@ foreach ($_POST as $key => $val) {
         $port_id = intval(substr((string) $key, 7));
 
         $oldign = intval($val) ? 1 : 0;
-        $newign = $_POST['ignore_' . $port_id] ? 1 : 0;
+        $newign = isset($_POST['ignore_' . $port_id]) ? 1 : 0;
 
         // As checkboxes are not posted when unset - we effectively need to do a diff to work
         // out a set->unset case.
@@ -47,7 +47,7 @@ foreach ($_POST as $key => $val) {
         $port_id = intval(substr((string) $key, 7));
 
         $olddis = intval($val) ? 1 : 0;
-        $newdis = $_POST['disabled_' . $port_id] ? 1 : 0;
+        $newdis = isset($_POST['disabled_' . $port_id]) ? 1 : 0;
 
         // As checkboxes are not posted when unset - we effectively need to do a diff to work
         // out a set->unset case.

@@ -4,6 +4,11 @@
 
 @section('content')
 <div class="container-fluid">
+    @if($ports->count() == 0)
+    <div class="row">
+        <div class=col-md-12><span class=list-large>{{ __("No ports in port group") }} {{ $group->name }}</span></div>
+    </div>
+    @else
     <x-graph-row type="multiport_bits_separate" :vars="['id' => $ports->pluck('port_id')->implode(',')]" columns="responsive">
         <x-slot name="title">
             <div class="row">
@@ -11,6 +16,7 @@
             </div>
         </x-slot>
     </x-graph-row>
+    @endif
     @foreach($ports as $port)
         <x-graph-row type="port_bits" :port=$port columns="responsive" legend=true>
             <x-slot name="title">
