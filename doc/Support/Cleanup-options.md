@@ -36,8 +36,6 @@ updated every polling period.)
     Please be aware that `rrd_purge` does not work over rrdcached. The rrd folder needs to be accessible via the local file system or remote file share.
     This is the same for docker and Kubernetes.
 
-a workaround for docker and kubernetes could be to create a custom image.
-This image can include a custom s6 service that is starting a custom cleanup bash script.
 
 
 ## Ports Purge
