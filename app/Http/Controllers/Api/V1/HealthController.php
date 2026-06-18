@@ -14,7 +14,7 @@ class HealthController extends Controller
     {
         $checks = [
             'database' => $this->check(fn () => DB::connection()->select('SELECT 1')),
-            'cache' => $this->check(function () {
+            'cache' => $this->check(function (): void {
                 $key = 'health:ping:' . bin2hex(random_bytes(4));
                 Cache::put($key, '1', 5);
                 if (Cache::get($key) !== '1') {
@@ -33,6 +33,9 @@ class HealthController extends Controller
         ], $httpStatus);
     }
 
+    /**
+     * @return array{ok: bool, error?: string}
+     */
     private function check(callable $probe): array
     {
         try {

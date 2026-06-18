@@ -13,9 +13,7 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
 {
     protected function gate(): void
     {
-        Gate::define('viewRestify', function ($user = null) {
-            return true;
-        });
+        Gate::define('viewRestify', fn($user = null) => true);
     }
 
     protected function routes(): void
