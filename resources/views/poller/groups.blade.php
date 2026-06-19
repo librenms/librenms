@@ -143,9 +143,8 @@ $('#poller-groups').on('show.bs.modal', function (event) {
     if(group_id != '') {
         $('#group_id').val(group_id);
         $.ajax({
-            type: "POST",
-            url: "ajax_form.php",
-            data: { type: "parse-poller-groups", group_id: group_id },
+            type: "GET",
+            url: '{{ route("pollergroup.show", ["pollergroup" => ":pollergroup"]) }}'.replace(':pollergroup', group_id),
             dataType: "json",
             success: function(output) {
                 $('#group_name').val(output['group_name']);
@@ -160,10 +159,12 @@ $('#create-group').on("click", function(e) {
     var group_name = $("#group_name").val();
     var descr = $("#descr").val();
     var group_id = $('#group_id').val();
+    var url = group_id ? '{{ route("pollergroup.update", ["pollergroup" => ":pollergroup"]) }}'.replace(':pollergroup', group_id) : '{{ route("pollergroup.store") }}';
+    var type = group_id ? 'PUT' : 'POST';
     $.ajax({
-        type: "POST",
-        url: "ajax_form.php",
-        data: { type: "poller-groups", group_name: group_name, descr: descr, group_id: group_id },
+        type: type,
+        url: url,
+        data: { group_name: group_name, descr: descr },
         dataType: "html",
         success: function(msg){
             if(msg.indexOf("ERROR:") <= -1) {

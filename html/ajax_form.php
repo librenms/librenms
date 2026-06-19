@@ -21,6 +21,13 @@ if (! Auth::check()) {
     exit('Unauthorized');
 }
 
+// Validate the CSRF token for this legacy POST dispatcher.
+$token = $_POST['_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+if (! hash_equals(csrf_token(), (string) $token)) {
+    http_response_code(419);
+    exit(json_encode(['status' => 'error', 'message' => 'CSRF token mismatch']));
+}
+
 Debug::set(isset($_REQUEST['debug']));
 
 $ajax_form = match ($_POST['type'] ?? '') {
@@ -32,23 +39,14 @@ $ajax_form = match ($_POST['type'] ?? '') {
     'convert-template' => 'includes/html/forms/convert-template.inc.php',
     'create-service' => 'includes/html/forms/create-service.inc.php',
     'customoid' => 'includes/html/forms/customoid.inc.php',
-    'delete-alert-template' => 'includes/html/forms/delete-alert-template.inc.php',
-    'delete-alert-transport' => 'includes/html/forms/delete-alert-transport.inc.php',
-    'delete-cluster-poller' => 'includes/html/forms/delete-cluster-poller.inc.php',
     'delete-customoid' => 'includes/html/forms/delete-customoid.inc.php',
     'delete-host-dependency' => 'includes/html/forms/delete-host-dependency.inc.php',
-    'delete-poller' => 'includes/html/forms/delete-poller.inc.php',
-    'delete-service' => 'includes/html/forms/delete-service.inc.php',
-    'delete-transport-group' => 'includes/html/forms/delete-transport-group.inc.php',
     'get-host-dependencies' => 'includes/html/forms/get-host-dependencies.inc.php',
     'mempool-update' => 'includes/html/forms/mempool-update.inc.php',
     'notifications' => 'includes/html/forms/notifications.inc.php',
     'override-config' => 'includes/html/forms/override-config.inc.php',
     'parse-alert-template' => 'includes/html/forms/parse-alert-template.inc.php',
     'parse-customoid' => 'includes/html/forms/parse-customoid.inc.php',
-    'parse-poller-groups' => 'includes/html/forms/parse-poller-groups.inc.php',
-    'parse-service' => 'includes/html/forms/parse-service.inc.php',
-    'poller-groups' => 'includes/html/forms/poller-groups.inc.php',
     'processor-update' => 'includes/html/forms/processor-update.inc.php',
     'rediscover-device' => 'includes/html/forms/rediscover-device.inc.php',
     'refresh-oxidized-node' => 'includes/html/forms/refresh-oxidized-node.inc.php',

@@ -1,16 +1,6 @@
 <?php
 
 return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Sensors Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines are used to translate names and units of sensors
-    |
-    */
-
     'title' => '感測器',
     'airflow' => [
         'short' => '風量',
@@ -178,6 +168,8 @@ return [
         'long' => '溫度',
         'unit' => '°C',
         'unit_long' => '攝氏度',
+        'unit_f' => '°F',
+        'unit_long_f' => '° 華氏',
     ],
     'voltage' => [
         'short' => '電壓',

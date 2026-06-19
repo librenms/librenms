@@ -5,18 +5,8 @@ $app = \App\Models\Application::query()->where('device_id', $device['device_id']
 // show only if Puppet Agent Application discovered
 if ($app) {
     $metrics = $app->metrics->pluck('value', 'metric');
-    ?><div class='row'>
-          <div class='col-md-12'>
-              <div class='panel panel-default panel-condensed device-overview overview-panel'>
-                  <div class='panel-heading'>
-                      <a href="device/device=<?php echo $device['device_id']?>/tab=apps/app=puppet-agent/">
-                          <i class="fa fa-cogs fa-lg icon-theme" aria-hidden="true"></i>
-                          <strong>Puppet Agent</strong>
-                      </a>
-                  </div>
-              <div class="panel-body">
-    <?php
-        $graph_array = [];
+
+    $graph_array = [];
     $graph_array['height'] = '100';
     $graph_array['width'] = '210';
     $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
@@ -76,26 +66,42 @@ if ($app) {
     $overlib_content_events = generate_overlib_content($graph_array_events, $device['hostname'] . ' - ' . $title_events);
     $overlib_link_events = \LibreNMS\Util\Url::overlibLink($link_events, $title_events, $overlib_content_events);
 
-    echo '<div class="row">
-      <div class="col-sm-4">Summary</div>
-        <div class="col-sm-8">
-          <table width=100%><tr>
-            <td><span>' . $overlib_link_last_run . ': ' . $metrics['last_run_last_run'] . 'min</span></td>
-            <td><span>' . $overlib_link_runtime . ': ' . $metrics['time_total'] . 's</span></td>
-            <td><span>' . $overlib_link_resources . ': ' . $metrics['resources_total'] . '</span></td>
-          </tr></table>
+    $row_class = 'tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]';
+    $success_class = $metrics['events_success'] ? 'tw:text-blue-600' : '';
+    $failure_class = $metrics['events_failure'] ? 'tw:text-red-500' : '';
+
+    echo '<div class="overview-panel tw:mb-5">
+        <div class="tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:border-b tw:border-gray-300 tw:text-neutral-700 tw:dark:bg-dark-gray-200 tw:dark:border-zinc-800 tw:dark:text-dark-white-200">
+            <a href="device/device=' . $device['device_id'] . '/tab=apps/app=puppet-agent/">
+                <i class="fa fa-cogs fa-lg icon-theme" aria-hidden="true"></i>
+                <strong>Puppet Agent</strong>
+            </a>
         </div>
-        <div class="col-sm-4">' . $overlib_link_events . '</div>
-        <div class="col-sm-8">
-          <table width=100%><tr>
-            <td><span ' . ($metrics['events_success'] ? 'class="blue"' : '') . '>Success: ' . $metrics['events_success'] . '</span></td>
-            <td><span ' . ($metrics['events_failure'] ? 'class="red"' : '') . '>Failure: ' . $metrics['events_failure'] . '</span></td>
-            <td><span>Total: ' . $metrics['events_total'] . '</span></td>
-          </tr></table>
+        <div class="tw:flex tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-zinc-800">
+            <div class="' . $row_class . '">
+                <div class="tw:font-medium">Summary</div>
+                <div class="tw:min-w-0">
+                    <table class="tw:w-full tw:table-fixed">
+                        <tr>
+                            <td class="tw:px-2"><span>' . $overlib_link_last_run . ': ' . $metrics['last_run_last_run'] . 'min</span></td>
+                            <td class="tw:px-2"><span>' . $overlib_link_runtime . ': ' . $metrics['time_total'] . 's</span></td>
+                            <td class="tw:px-2"><span>' . $overlib_link_resources . ': ' . $metrics['resources_total'] . '</span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="' . $row_class . '">
+                <div>' . $overlib_link_events . '</div>
+                <div class="tw:min-w-0">
+                    <table class="tw:w-full tw:table-fixed">
+                        <tr>
+                            <td class="tw:px-2"><span class="' . $success_class . '">Success: ' . $metrics['events_success'] . '</span></td>
+                            <td class="tw:px-2"><span class="' . $failure_class . '">Failure: ' . $metrics['events_failure'] . '</span></td>
+                            <td class="tw:px-2"><span>Total: ' . $metrics['events_total'] . '</span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
         </div>
-      </div>
-      </div>
-    </div>
-  </div>
-</div>';
+    </div>';
 }
