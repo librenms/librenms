@@ -213,8 +213,20 @@ class ModuleTestHelper
             $mibdir = $mibdir_matches[1];
             $method = $snmp_matches[1][$index];
             $oids = explode("' '", trim($snmp_matches[3][$index]));
-            preg_match("/('-c' '.*@([^']+)'|'-n' '([^']+)')/", $line, $context_matches);
-            $context = $context_matches[2] ?? $context_matches[3] ?? null;
+            // Recover the SNMP context used for this query. SNMPv3 passes it via -n.
+            // SNMPv2c encodes it onto the community as "community@context" (see NetSnmpQuery),
+            // so derive it by stripping the device's known community rather than splitting on
+            // the last '@' -- the community itself may contain '@' (e.g. Juniper routing-instance
+            // access "@community"), which would otherwise be misread as a context.
+            $context = null;
+            if (preg_match("/'-n' '([^']+)'/", $line, $v3_context)) {
+                $context = $v3_context[1];
+            } elseif (preg_match("/'-c' '([^']*)'/", $line, $community_match)) {
+                $base_community = (string) ($device['community'] ?? '');
+                if ($base_community !== '' && Str::startsWith($community_match[1], $base_community . '@')) {
+                    $context = substr($community_match[1], strlen($base_community) + 1);
+                }
+            }
 
             foreach ($oids as $oid) {
                 $snmp_oids[$context]["{$oid}_$method"] = [
