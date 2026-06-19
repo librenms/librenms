@@ -54,14 +54,6 @@
         </select>
     </div>
 
-    <div class="form-group">
-        <div class="checkbox">
-            <label for="show_error_count-{{ $id }}">
-                <input type="checkbox" name="show_error_count" id="show_error_count-{{ $id }}" value="1" @if($show_error_count) checked @endif>
-                {{ __('Show error count in clusters (e.g. "2/5")') }}
-            </label>
-        </div>
-    </div>
 @endsection
 
 @section('javascript')

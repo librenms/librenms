@@ -45,7 +45,6 @@ class WorldMapController extends WidgetController
             'group_radius' => LibrenmsConfig::get('leaflet.group_radius'),
             'status' => '0,1',
             'device_group' => null,
-            'show_error_count' => false,
         ];
     }
 

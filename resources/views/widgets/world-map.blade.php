@@ -8,7 +8,6 @@
         const disabled_alerts = {{ Js::from($disabled_alerts) }};
         const map_config = {{ Js::from($map_config) }};
         const group_radius = {{ (int) $group_radius }};
-        const show_error_count = {{ Js::from($show_error_count) }};
 
         function populate_map_markers(map_id, group_radius = 10, status = [0,1], device_group = 0) {
             $.ajax({
@@ -61,7 +60,7 @@
                                         errorCount++;
                                     }
                                 }
-                                var hasErrorLabel = show_error_count && errorCount > 0;
+                                var hasErrorLabel = errorCount > 0;
                                 var label = hasErrorLabel
                                     ? errorCount + '/' + cluster.getChildCount()
                                     : cluster.getChildCount();
