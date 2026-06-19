@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use App\Models\Location;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Enum\WirelessSensorType;
@@ -36,6 +37,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use SnmpQuery;
 
 class Fortigate extends OS implements
     OSPolling,
@@ -94,5 +96,23 @@ class Fortigate extends OS implements
         return [
             new WirelessSensor(WirelessSensorType::ApCount, $this->getDeviceId(), $oid, 'fortigate', 1, 'Connected APs'),
         ];
+    }
+
+    public function fetchLocation(): Location
+    {
+        $location = parent::fetchLocation();
+
+        $lat = SnmpQuery::get('FORTINET-FORTIGATE-MIB::fgLatitude.1')->value();
+        $lng = SnmpQuery::get('FORTINET-FORTIGATE-MIB::fgLongitude.1')->value();
+
+        if (preg_match('/^([\d.]+)\s+([NS])$/', (string) $lat, $m)) {
+            $location->lat = (float) $m[1] * ($m[2] === 'S' ? -1 : 1);
+        }
+
+        if (preg_match('/^([\d.]+)\s+([EW])$/', (string) $lng, $m)) {
+            $location->lng = (float) $m[1] * ($m[2] === 'W' ? -1 : 1);
+        }
+
+        return $location;
     }
 }
