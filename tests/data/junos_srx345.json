@@ -1,0 +1,24 @@
+{
+    "cipsec-tunnels": {
+        "poller": {
+            "ipsec_tunnels": [
+                {
+                    "tunnel_index": 131073,
+                    "peer_port": 0,
+                    "peer_addr": "203.0.113.1",
+                    "local_port": 0,
+                    "tunnel_name": "INET-LTE_to_siteA_001",
+                    "tunnel_status": "active"
+                },
+                {
+                    "tunnel_index": 131074,
+                    "peer_port": 0,
+                    "peer_addr": "203.0.113.1",
+                    "local_port": 0,
+                    "tunnel_name": "INET_to_siteA_001",
+                    "tunnel_status": "active"
+                }
+            ]
+        }
+    }
+}
