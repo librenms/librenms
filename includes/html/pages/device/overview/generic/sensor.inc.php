@@ -27,7 +27,7 @@ if ($sensors->isNotEmpty()) {
         ]);
     });
 
-    echo view('device.overview.generic.sensor', [
+    echo view('device.overview.sensor', [
         'sensor_class' => $sensor_class,
         'sensor_link' => route('device', ['device' => DeviceCache::getPrimary()->device_id, 'tab' => 'health', 'vars' => 'metric=' . $sensor_class->value]),
         'groupedSensors' => $sensors->groupBy('group'),
