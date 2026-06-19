@@ -26,13 +26,58 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Shared\Unix;
 use LibreNMS\RRD\RrdDefinition;
+use SnmpQuery;
 
 class Pfsense extends Unix implements OSPolling
 {
+    public function discoverOS(Device $device): void
+    {
+        parent::discoverOS($device);
+
+        if (empty($device->version)) {
+            $device->version = $this->discoverVersionFromPackages();
+        }
+
+        if (empty($device->hardware) || $this->isArchitectureOnly($device->hardware)) {
+            $device->hardware = $this->discoverProcessorDescription() ?? $device->hardware;
+        }
+    }
+
+    private function discoverVersionFromPackages(): ?string
+    {
+        foreach (SnmpQuery::walk('HOST-RESOURCES-MIB::hrSWInstalledName')->values() as $package) {
+            if (preg_match('/^pfSense(?:-base)?-(?<version>\d+(?:\.\d+)+(?:-\S+)?)$/i', trim((string) $package), $matches)) {
+                return $matches['version'];
+            }
+        }
+
+        return null;
+    }
+
+    private function discoverProcessorDescription(): ?string
+    {
+        $processor_load = SnmpQuery::numericIndex()->walk('HOST-RESOURCES-MIB::hrProcessorLoad')->pluck();
+        $processor_index = array_key_first($processor_load);
+
+        if ($processor_index === null) {
+            return null;
+        }
+
+        $description = SnmpQuery::get("HOST-RESOURCES-MIB::hrDeviceDescr.$processor_index")->value();
+
+        return is_string($description) && $description !== '' ? $description : null;
+    }
+
+    private function isArchitectureOnly(string $hardware): bool
+    {
+        return preg_match('/^(?:aarch64|alpha|amd64|arm\w*|i386|ia64|mips\w*|pc98|powerpc\w*|risc\w*|sparc\w*|x86_64)$/i', trim($hardware)) === 1;
+    }
+
     public function pollOS(DataStorageInterface $datastore): void
     {
         $oids = snmp_get_multi($this->getDeviceArray(), [
