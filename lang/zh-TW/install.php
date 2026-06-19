@@ -16,7 +16,7 @@ return [
         'password' => '密碼',
         'port' => '通訊埠',
         'port_placeholder' => '若使用 Unix-Socket 可留空',
-        'socket' => 'Unix-Socket',
+        'socket' => 'Unix Socket',
         'socket_placeholder' => '僅在使用自訂 Socket 路徑時填寫',
         'test' => '檢查連線',
         'title' => '設定資料庫',

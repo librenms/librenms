@@ -10,6 +10,9 @@ return [
     'alertlog-stats' => [
         'title' => '警報歷程統計',
     ],
+    'alert-map' => [
+        'title' => '警報地圖',
+    ],
     'availability-map' => [
         'title' => '可用性地圖',
     ],
@@ -29,7 +32,7 @@ return [
         'title' => '裝置類型',
     ],
     'eventlog' => [
-        'title' => 'Eventlog',
+        'title' => '事件記錄',
     ],
     'generic-graph' => [
         'title' => '圖表',
@@ -42,6 +45,9 @@ return [
     ],
     'graylog' => [
         'title' => 'Graylog',
+    ],
+    'health-sensors' => [
+        'title' => '健康感測器',
     ],
     'notes' => [
         'title' => '備註',
