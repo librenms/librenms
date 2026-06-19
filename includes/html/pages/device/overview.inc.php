@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Enum\Sensor;
 use LibreNMS\Interfaces\Plugins\Hooks\DeviceOverviewHook;
 
 $overview = 1;
@@ -35,37 +36,43 @@ require 'overview/processors.inc.php';
 require 'overview/mempools.inc.php';
 require 'overview/storage.inc.php';
 require 'overview/toner.inc.php';
-require 'overview/sensors/charge.inc.php';
-require 'overview/sensors/temperature.inc.php';
-require 'overview/sensors/humidity.inc.php';
-require 'overview/sensors/fanspeed.inc.php';
-require 'overview/sensors/dbm.inc.php';
-require 'overview/sensors/voltage.inc.php';
-require 'overview/sensors/current.inc.php';
-require 'overview/sensors/runtime.inc.php';
-require 'overview/sensors/power.inc.php';
-require 'overview/sensors/power_consumed.inc.php';
-require 'overview/sensors/power_factor.inc.php';
-require 'overview/sensors/frequency.inc.php';
-require 'overview/sensors/load.inc.php';
-require 'overview/sensors/state.inc.php';
-require 'overview/sensors/count.inc.php';
-require 'overview/sensors/percent.inc.php';
-require 'overview/sensors/signal.inc.php';
-require 'overview/sensors/tv_signal.inc.php';
-require 'overview/sensors/bitrate.inc.php';
-require 'overview/sensors/airflow.inc.php';
-require 'overview/sensors/snr.inc.php';
-require 'overview/sensors/pressure.inc.php';
-require 'overview/sensors/cooling.inc.php';
-require 'overview/sensors/delay.inc.php';
-require 'overview/sensors/quality_factor.inc.php';
-require 'overview/sensors/chromatic_dispersion.inc.php';
-require 'overview/sensors/ber.inc.php';
-require 'overview/sensors/eer.inc.php';
-require 'overview/sensors/waterflow.inc.php';
-require 'overview/sensors/loss.inc.php';
-require 'overview/sensors/signal_loss.inc.php';
+// Sensor overview panels, rendered in this order. Each empty class is skipped by the generic include.
+$sensor_overview_order = [
+    Sensor::Charge,
+    Sensor::Temperature,
+    Sensor::Humidity,
+    Sensor::Fanspeed,
+    Sensor::Dbm,
+    Sensor::Voltage,
+    Sensor::Current,
+    Sensor::Runtime,
+    Sensor::Power,
+    Sensor::PowerConsumed,
+    Sensor::PowerFactor,
+    Sensor::Frequency,
+    Sensor::Load,
+    Sensor::State,
+    Sensor::Count,
+    Sensor::Percent,
+    Sensor::Signal,
+    Sensor::TvSignal,
+    Sensor::Bitrate,
+    Sensor::Airflow,
+    Sensor::Snr,
+    Sensor::Pressure,
+    Sensor::Cooling,
+    Sensor::Delay,
+    Sensor::QualityFactor,
+    Sensor::ChromaticDispersion,
+    Sensor::Ber,
+    Sensor::Eer,
+    Sensor::Waterflow,
+    Sensor::Loss,
+    Sensor::SignalLoss,
+];
+foreach ($sensor_overview_order as $sensor_class) {
+    require 'includes/html/pages/device/overview/generic/sensor.inc.php';
+}
 require 'overview/eventlog.inc.php';
 require 'overview/services.inc.php';
 require 'overview/syslog.inc.php';
