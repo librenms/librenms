@@ -43,7 +43,7 @@ class Pfsense extends Unix implements OSPolling
             $device->version = $this->discoverVersionFromPackages();
         }
 
-        if (empty($device->hardware) || $this->isArchitectureOnly($device->hardware)) {
+        if (empty($device->hardware)) {
             $device->hardware = $this->discoverProcessorDescription() ?? $device->hardware;
         }
     }
@@ -70,12 +70,7 @@ class Pfsense extends Unix implements OSPolling
 
         $description = SnmpQuery::get("HOST-RESOURCES-MIB::hrDeviceDescr.$processor_index")->value();
 
-        return is_string($description) && $description !== '' ? $description : null;
-    }
-
-    private function isArchitectureOnly(string $hardware): bool
-    {
-        return preg_match('/^(?:aarch64|alpha|amd64|arm\w*|i386|ia64|mips\w*|pc98|powerpc\w*|risc\w*|sparc\w*|x86_64)$/i', trim($hardware)) === 1;
+        return $description !== '' ? $description : null;
     }
 
     public function pollOS(DataStorageInterface $datastore): void

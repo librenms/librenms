@@ -10,5 +10,4 @@ modules:
             - 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."serial"'
         sysDescr_regex:
             - '/pfSense(?:\s+Plus)?(?:\s+\S+)?\s+(?<version>\d+\.\d\S+)/i'
-            - '/(?<features>FreeBSD\s+\d+\.\d+(?:-[A-Z0-9]+)?)/i'
             - '/(?<hardware>aarch64|alpha|amd64|arm\w*|i386|ia64|mips\w*|pc98|powerpc\w*|risc\w*|sparc\w*)/i'
