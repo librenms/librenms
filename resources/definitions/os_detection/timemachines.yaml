@@ -1,0 +1,23 @@
+os: timemachines
+text: 'TimeMachines'
+type: timing
+group: unix
+icon: timemachines
+mib_dir: timemachines
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_storage, text: 'Storage Usage' }
+discovery:
+    -
+        sysDescr_regex: '/^Linux am335x-evm/'
+        snmpget:
+            oid: .1.3.6.1.4.1.54414.1.1.1.0
+            op: '!='
+            value: false
+    -
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+        snmpget:
+            oid: .1.3.6.1.4.1.54414.1.1.13.0
+            op: contains
+            value: UTC
