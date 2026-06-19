@@ -12,7 +12,7 @@ $sensors = DeviceCache::getPrimary()->sensors->where('sensor_class', $sensor_cla
 if ($sensors->isNotEmpty()) {
     // prepare each sensor for display: normalise the description (ipmi sensors get a
     // friendly name, all are truncated) and build the link through to the graphs page
-    $sensors->each(function ($sensor) use ($device, $sensor_class) {
+    $sensors->each(function ($sensor) use ($device, $sensor_class): void {
         $descr = $sensor->poller_type == 'ipmi'
             ? ipmiSensorName($device['hardware'], $sensor->sensor_descr)
             : $sensor->sensor_descr;
