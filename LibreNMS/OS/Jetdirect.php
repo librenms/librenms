@@ -27,10 +27,16 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use LibreNMS\Interfaces\PrinterSuppliesContext;
 use SnmpQuery;
 
-class Jetdirect extends Shared\Printer
+class Jetdirect extends Shared\Printer implements PrinterSuppliesContext
 {
+    public function getPrinterSuppliesContext(): string
+    {
+        return 'Jetdirect';
+    }
+
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml

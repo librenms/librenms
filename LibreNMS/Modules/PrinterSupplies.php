@@ -32,11 +32,13 @@ use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
+use LibreNMS\Interfaces\PrinterSuppliesContext;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\StringHelpers;
+use SnmpQuery;
 
 class PrinterSupplies implements Module
 {
@@ -63,15 +65,13 @@ class PrinterSupplies implements Module
      */
     public function discover(OS $os): void
     {
-        $device = $os->getDeviceArray();
-
         ModuleModelObserver::observe(PrinterSupply::class, __('Printer Supplies'));
-        $levels = $this->discoveryLevels($device);
+        $levels = $this->discoveryLevels($os);
         $this->syncModelsByGroup($os->getDevice(), 'printerSupplies', $levels, [['supply_type', '!=', 'input']]);
         ModuleModelObserver::done();
 
         ModuleModelObserver::observe(PrinterSupply::class, __('Tray Paper Level'));
-        $papers = $this->discoveryPapers($device);
+        $papers = $this->discoveryPapers($os);
         $this->syncModelsByGroup($os->getDevice(), 'printerSupplies', $papers, ['supply_type' => 'input']);
         ModuleModelObserver::done();
     }
@@ -97,7 +97,15 @@ class PrinterSupplies implements Module
             return; // no data to poll
         }
 
-        $toner_snmp = snmp_get_multi_oid($device, $toner_data->pluck('supply_oid')->toArray());
+        $toner_oids = $toner_data->pluck('supply_oid')->toArray();
+        $toner_snmp = snmp_get_multi_oid($device, $toner_oids);
+        if (empty($toner_snmp) && $os instanceof PrinterSuppliesContext) {
+            $toner_snmp = SnmpQuery::device($os->getDevice())
+                ->context($os->getPrinterSuppliesContext())
+                ->numeric()
+                ->get($toner_oids)
+                ->values();
+        }
 
         foreach ($toner_data as $toner) {
             $raw_toner = $toner_snmp[$toner['supply_oid']] ?? null;
@@ -165,15 +173,23 @@ class PrinterSupplies implements Module
         ];
     }
 
-    private function discoveryLevels($device): Collection
+    private function discoveryLevels(OS $os): Collection
     {
         $levels = new Collection();
+        $device = $os->getDeviceArray();
 
         $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesLevel', [], 'Printer-MIB');
         if (! empty($oids)) {
             $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesType', $oids, 'Printer-MIB');
             $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesMaxCapacity', $oids, 'Printer-MIB');
             $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesDescription', $oids, 'Printer-MIB', null, '-OQUs');
+        } elseif ($os instanceof PrinterSuppliesContext) {
+            $oids = $this->walkPrinterMibWithContext($os, [
+                'Printer-MIB::prtMarkerSuppliesLevel',
+                'Printer-MIB::prtMarkerSuppliesType',
+                'Printer-MIB::prtMarkerSuppliesMaxCapacity',
+                'Printer-MIB::prtMarkerSuppliesDescription',
+            ]);
         }
 
         foreach ($oids as $index => $data) {
@@ -240,14 +256,21 @@ class PrinterSupplies implements Module
         return $levels;
     }
 
-    private function discoveryPapers($device): Collection
+    private function discoveryPapers(OS $os): Collection
     {
         $papers = new Collection();
+        $device = $os->getDeviceArray();
 
         $tray_oids = snmpwalk_cache_oid($device, 'prtInputName', [], 'Printer-MIB');
         if (! empty($tray_oids)) {
             $tray_oids = snmpwalk_cache_oid($device, 'prtInputCurrentLevel', $tray_oids, 'Printer-MIB');
             $tray_oids = snmpwalk_cache_oid($device, 'prtInputMaxCapacity', $tray_oids, 'Printer-MIB');
+        } elseif ($os instanceof PrinterSuppliesContext) {
+            $tray_oids = $this->walkPrinterMibWithContext($os, [
+                'Printer-MIB::prtInputName',
+                'Printer-MIB::prtInputCurrentLevel',
+                'Printer-MIB::prtInputMaxCapacity',
+            ]);
         }
 
         foreach ($tray_oids as $index => $data) {
@@ -280,6 +303,16 @@ class PrinterSupplies implements Module
         }
 
         return $papers;
+    }
+
+    private function walkPrinterMibWithContext(OS $os, array $oids): array
+    {
+        return SnmpQuery::device($os->getDevice())
+            ->context($os->getPrinterSuppliesContext())
+            ->hideMib()
+            ->enumStrings()
+            ->walk($oids)
+            ->valuesByIndex();
     }
 
     /**
