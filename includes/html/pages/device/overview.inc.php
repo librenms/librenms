@@ -71,7 +71,7 @@ $sensor_overview_order = [
     Sensor::SignalLoss,
 ];
 foreach ($sensor_overview_order as $sensor_class) {
-    require 'includes/html/pages/device/overview/generic/sensor.inc.php';
+    require 'includes/html/pages/device/overview/sensor.inc.php';
 }
 require 'overview/eventlog.inc.php';
 require 'overview/services.inc.php';
