@@ -1456,7 +1456,7 @@ Input (JSON):
 Fields:
 
 - hostname (required): device hostname or IP
-- display_name: A string to display as the name of this device, defaults to 
+- display_template: A string to display as the name of this device, defaults to 
   hostname (or device_display_default setting). May be a simple
   template using replacements: {{ $hostname }}, {{ $sysName }},
   {{ $sysName_fallback }}, {{ $ip }}. This will then generate the display field.
