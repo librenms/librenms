@@ -6040,6 +6040,13 @@
             "default": true,
             "type": "boolean"
         },
+        "poller_modules.ports-stack": {
+            "order": 341,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "poller_modules.xdsl": {
             "order": 345,
             "group": "poller",
@@ -7310,6 +7317,26 @@
                 "master": "master",
                 "release": "release"
             }
+        },
+        "update_on_days": {
+            "default": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+            "type": "array",
+            "options": {
+                "monday": "Monday",
+                "tuesday": "Tuesday",
+                "wednesday": "Wednesday",
+                "thursday": "Thursday",
+                "friday": "Friday",
+                "saturday": "Saturday",
+                "sunday": "Sunday"
+            },
+            "validate": {
+                "value": "array",
+                "value.*": "distinct|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday"
+            },
+            "group": "system",
+            "section": "updates",
+            "order": 2
         },
         "uptime_warning": {
             "group": "webui",

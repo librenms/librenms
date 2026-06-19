@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\InsufficientDataException;
 use LibreNMS\Interfaces\Models\Keyable;
@@ -9,6 +10,8 @@ use LibreNMS\Util\Number;
 
 class Storage extends DeviceRelatedModel implements Keyable
 {
+    use HasFactory;
+
     protected $table = 'storage';
     protected $primaryKey = 'storage_id';
     public $timestamps = false;

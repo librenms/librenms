@@ -78,6 +78,10 @@ class AlertRules
             }
             $sql = $rule['query'];
 
+            if (empty($sql)) {
+                continue; // no sql
+            }
+
             // set fetch assoc
             try {
                 $query = DB::connection()->getPdo()->prepare($sql);
