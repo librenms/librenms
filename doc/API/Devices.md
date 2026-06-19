@@ -1456,10 +1456,10 @@ Input (JSON):
 Fields:
 
 - hostname (required): device hostname or IP
-- display: A string to display as the name of this device, defaults to 
+- display_name: A string to display as the name of this device, defaults to 
   hostname (or device_display_default setting). May be a simple
   template using replacements: {{ $hostname }}, {{ $sysName }},
-  {{ $sysName_fallback }}, {{ $ip }}
+  {{ $sysName_fallback }}, {{ $ip }}. This will then generate the display field.
 - snmpver: SNMP version to use, v1, v2c or v3. During checks detection order is v2c,v3,v1
 - port: SNMP port (defaults to port defined in config).
 - transport: SNMP protocol (udp,tcp,udp6,tcp6) Defaults to transport defined in config.
