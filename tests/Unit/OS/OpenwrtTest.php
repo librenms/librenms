@@ -31,6 +31,9 @@ final class OpenwrtTest extends TestCase
         );
     }
 
+    /**
+     * @return array<int, string>|null
+     */
     private function parseInterfaceLine(string $line): ?array
     {
         $reflectionClass = new \ReflectionClass(Openwrt::class);
