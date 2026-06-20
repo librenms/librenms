@@ -80,7 +80,6 @@ class DeviceObserver
             }
         }
 
-
         // handle device renames
         if ($device->isDirty('hostname')) {
             $new_name = $device->hostname;

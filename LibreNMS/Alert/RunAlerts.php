@@ -762,7 +762,7 @@ class RunAlerts
             return false;
         }
 
-        $down_parent_count = dbFetchCell("SELECT count(*) from devices as d LEFT JOIN device_relationships as r ON d.device_id=r.parent_device_id WHERE d.status=0 AND d.ignore=0 AND d.disabled=0 AND r.child_device_id=?", [$device]);
+        $down_parent_count = dbFetchCell('SELECT count(*) from devices as d LEFT JOIN device_relationships as r ON d.device_id=r.parent_device_id WHERE d.status=0 AND d.ignore=0 AND d.disabled=0 AND r.child_device_id=?', [$device]);
         if ($down_parent_count == $parent_count) {
             return true;
         }

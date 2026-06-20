@@ -67,6 +67,7 @@ return new class extends Migration
                 $changed = true;
             }
         }
+
         return $changed;
     }
 
@@ -85,6 +86,7 @@ return new class extends Migration
             if ($newStr !== $str) {
                 $changed = true;
             }
+
             return $newStr;
         };
 
