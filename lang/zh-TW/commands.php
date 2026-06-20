@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'errors' => [
+        'db_connect' => '無法連線到資料庫。請確認資料庫服務執行中且連線設定正確。',
+        'db_auth' => '無法連線到資料庫。請確認認證資訊：:error',
+        'no_devices' => '找不到符合指定條件的裝置。',
+        'no_new_devices' => '沒有新裝置',
+    ],
     'config:clear' => [
         'description' => '清除設定快取。這會讓自上次完整載入後的變更，反映到目前的設定中。',
     ],
@@ -84,7 +90,8 @@ return [
             'v1' => '使用 SNMP v1',
             'v2c' => '使用 SNMP v2c',
             'v3' => '使用 SNMP v3',
-            'display-name' => "用於顯示的裝置名稱，預設為主機名稱。\n可用簡易範本與替代：{{ \$hostname }}、{{ \$sysName }}、{{ \$sysName_fallback }}、{{ \$ip }}",
+            'display-name' => '用於顯示的裝置名稱，預設為主機名稱。
+可用簡易範本與替代：{{ $hostname }}、{{ $sysName }}、{{ $sysName_fallback }}、{{ $ip }}',
             'force' => '直接新增裝置，不進行安全檢查',
             'group' => '輪詢器群組（分散式輪詢）',
             'ping-fallback' => '若不回應 SNMP，則以僅 Ping 模式加入',
@@ -103,8 +110,8 @@ return [
             'sysName' => '僅 Ping：指定 sysName',
         ],
         'validation-errors' => [
-            'port.between' => '連接埠應介於 1 到 65535',
-            'poller-group.in' => '指定的輪詢器群組不存在',
+            'port.between' => 'Port 應介於 1-65535',
+            'poller-group.in' => '指定的 poller-group 不存在',
         ],
         'messages' => [
             'save_failed' => '無法儲存裝置 :hostname',
@@ -112,10 +119,33 @@ return [
             'added' => '已新增裝置 :hostname (:device_id)',
         ],
     ],
+    'device:discover' => [
+        'description' => '探索現有裝置的相關資訊，定義將輪詢哪些項目',
+        'arguments' => [
+            'device spec' => '要探索的裝置規格：device_id、hostname、萬用字元 (*)、odd、even、all',
+        ],
+        'options' => [
+            'modules' => '指定要執行的模組，可用 / 附加子模組。允許多個值。',
+            'os' => '僅探索指定作業系統的裝置',
+            'type' => '僅探索指定類型的裝置',
+        ],
+        'errors' => [
+            'none_up' => '裝置已離線，無法探索。|所有裝置皆已離線，無法探索。',
+            'none_actioned' => '未探索到任何裝置。',
+        ],
+        'actioned' => '已於 :time 內探索 :count 台裝置',
+        'starting' => '開始探索：',
+    ],
     'device:ping' => [
         'description' => 'Ping 裝置並記錄回應資料',
         'arguments' => [
             'device spec' => '要 Ping 的裝置：<裝置 ID>、<主機名稱/IP>、all 其一',
+        ],
+        'options' => [
+            'groups' => '要 ping 的群組 ID，可指定多次以涵蓋多個群組。（僅在 fast 模式下有效）',
+        ],
+        'errors' => [
+            'groups_without_fast' => '--groups (-g) 選項僅支援「fast」裝置規格。',
         ],
     ],
     'device:poll' => [
@@ -126,15 +156,15 @@ return [
         'options' => [
             'modules' => '指定要執行的單一模組。可用逗號分隔，多層子模組以 / 指定',
             'no-data' => '不更新資料存放區（RRD、InfluxDB 等）',
+            'os' => '僅輪詢指定作業系統的裝置',
+            'type' => '僅輪詢指定類型的裝置',
         ],
         'errors' => [
-            'db_connect' => '無法連線到資料庫。請確認資料庫服務執行中且連線設定正確。',
-            'db_auth' => '無法連線到資料庫。請確認認證資訊：:error',
-            'no_devices' => '找不到符合指定條件的裝置。',
             'none_up' => '裝置離線，無法輪詢。|所有裝置皆離線，無法輪詢。',
-            'none_polled' => '沒有任何裝置被輪詢。',
+            'none_actioned' => '未輪詢任何裝置。',
         ],
-        'polled' => '已於 :time 內輪詢 :count 台裝置',
+        'actioned' => '已於 :time 內輪詢 :count 台裝置',
+        'starting' => '開始輪詢執行：',
     ],
     'device:remove' => [
         'doesnt_exists' => '沒有此裝置：:device',
@@ -172,6 +202,9 @@ return [
             'optionValue' => '所選的 :option 無效，應為下列其一：:values',
         ],
     ],
+    'maintenance:cleanup-database' => [
+        'description' => '清理資料庫中的孤立項目。',
+    ],
     'maintenance:cleanup-networks' => [
         'delete' => '正在刪除 :count 個未使用的網路',
     ],
@@ -192,6 +225,49 @@ return [
         'success' => '已成功更新 OUI/廠商對應。修改了 :count 筆 OUI|已成功更新。修改了 :count 筆 OUI',
         'error' => '處理 Mac OUI 時發生錯誤：',
         'vendor_update' => '新增 OUI :oui（:vendor）',
+    ],
+    'maintenance:rrd-step' => [
+        'description' => '轉換 RRD 檔案以符合設定的 step 與 heartbeat',
+        'arguments' => [
+            'device' => '主機名稱、裝置 ID 或 all',
+        ],
+        'options' => [
+            'confirm' => '確認您已備份 rrd 檔案。',
+        ],
+        'errors' => [
+            'invalid' => '指定的主機名稱或裝置 ID 無效',
+        ],
+        'confirm_backup' => '繼續之前，請確認您已備份 rrd 檔案。',
+        'mismatched_heartbeat' => ':file：heartbeat 不符。:ds != :hb',
+        'skipping' => '略過 :file，step 已經是 :step。',
+        'converting' => '正在轉換 :file：',
+        'summary' => '已轉換：:converted  失敗：:failed  略過：:skipped',
+    ],
+    'maintenance:cleanup-syslog' => [
+        'description' => '清除超過指定天數的 syslog 記錄',
+        'arguments' => [
+            'days' => '要保留 syslog 記錄的天數（預設：syslog_purge 設定值）',
+        ],
+        'bad_days_input' => '天數必須為數字',
+        'bad_days_setting' => '因 syslog_purge 設定無效，syslog 清除已停用',
+        'delete' => '已清除超過 :days 天的 syslog 記錄（:count 筆）',
+        'disabled' => 'syslog 清除已停用，天數 <= 0',
+    ],
+    'maintenance:discover-ssl-certificates' => [
+        'description' => '探索裝置上的 SSL 憑證（HTTPS 連接埠 443）',
+        'options' => [
+            'device' => '要探索的裝置規格：device_id、hostname 或 all',
+        ],
+        'no_devices' => '找不到裝置',
+        'summary' => '已建立：:created，已更新：:updated，失敗：:failed',
+    ],
+    'maintenance:refresh-ssl-certificates' => [
+        'description' => '重新整理已儲存 SSL 憑證的憑證資料',
+        'options' => [
+            'id' => '要重新整理的憑證 ID（省略則重新整理所有已啟用的憑證）',
+        ],
+        'none' => '沒有已啟用的憑證可重新整理',
+        'summary' => '已重新整理：:refreshed，失敗：:failed',
     ],
     'plugin:disable' => [
         'description' => '停用符合名稱的所有外掛',
@@ -291,11 +367,15 @@ return [
             'full-name' => '使用者全名',
             'role' => '設定使用者角色：:roles',
         ],
-        'password-request' => '請輸入該使用者的密碼',
+        'form' => [
+            'username' => '使用者名稱',
+            'password' => '密碼',
+            'roles' => '選擇使用者角色',
+            'email' => '電子郵件（選填）',
+            'full-name' => '全名（選填）',
+            'descr' => '描述（選填）',
+        ],
         'success' => '已成功新增使用者：:username',
         'wrong-auth' => '警告！由於未使用 MySQL 驗證，您將無法以此使用者登入',
-    ],
-    'maintenance:cleanup-database' => [
-        'description' => '清理資料庫中的孤立項目。',
     ],
 ];
