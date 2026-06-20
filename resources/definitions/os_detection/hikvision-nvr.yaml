@@ -7,7 +7,6 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
     - { graph: device_storage, text: 'Storage Usage' }
     - { graph: device_state, text: 'Disk Status' }
-    - { graph: device_uptime, text: 'Device Uptime' }
 discovery:
     -
         sysObjectID:
