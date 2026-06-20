@@ -63,6 +63,7 @@ class AlertProblem extends DeviceRelatedModel
 
     /**
      * @param  Builder<AlertProblem>  $query
+     * @return Builder<AlertProblem>
      */
     public function scopeOpen($query): Builder
     {
@@ -71,6 +72,7 @@ class AlertProblem extends DeviceRelatedModel
 
     /**
      * @param  Builder<AlertProblem>  $query
+     * @return Builder<AlertProblem>
      */
     public function scopeActive($query): Builder
     {
@@ -79,6 +81,7 @@ class AlertProblem extends DeviceRelatedModel
 
     /**
      * @param  Builder<AlertProblem>  $query
+     * @return Builder<AlertProblem>
      */
     public function scopeAcknowledged($query): Builder
     {
@@ -105,6 +108,8 @@ class AlertProblem extends DeviceRelatedModel
 
     /**
      * The entity this problem is about (Port, Sensor, Device, ...), resolved via the morph map.
+     *
+     * @return MorphTo<\Illuminate\Database\Eloquent\Model, $this>
      */
     public function entity(): MorphTo
     {
