@@ -11,8 +11,4 @@ discovery_modules:
     processors: false
 discovery:
     -
-        sysObjectID:
-            - .1.3.6.1.4.1.34278
-    -
-        sysDescr:
-            - 'Janitza'
+        sysObjectID: .1.3.6.1.4.1.34278.10.

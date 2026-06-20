@@ -10,11 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class SslCertificateController extends Controller
 {
-    public function __construct()
-    {
-        $this->authorizeResource(SslCertificate::class);
-    }
-
     /**
      * Display a listing of SSL certificates.
      */
@@ -86,7 +81,8 @@ class SslCertificateController extends Controller
      */
     public function show(SslCertificate $ssl_certificate)
     {
-        $this->authorize('viewAny', SslCertificate::class);
+        $this->authorize('view', $ssl_certificate);
+
         $ssl_certificate->load('device');
         $options = [
             'days_until_expiry_warning' => (int) LibrenmsConfig::get('ssl_certificates.days_until_expiry_warning', 30),
@@ -102,6 +98,7 @@ class SslCertificateController extends Controller
     public function update(Request $request, SslCertificate $ssl_certificate)
     {
         $this->authorize('update', $ssl_certificate);
+
         $request->validate([
             'disabled' => 'sometimes|boolean',
         ]);
@@ -125,6 +122,7 @@ class SslCertificateController extends Controller
     public function destroy(Request $request, SslCertificate $ssl_certificate)
     {
         $this->authorize('delete', $ssl_certificate);
+
         $ssl_certificate->delete();
 
         if ($request->wantsJson()) {

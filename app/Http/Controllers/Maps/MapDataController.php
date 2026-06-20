@@ -39,6 +39,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\IfOperStatus;
 
 class MapDataController extends Controller
 {
@@ -457,6 +458,8 @@ class MapDataController extends Controller
     // GET Device
     public function getDevices(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', Device::class);
+
         // Get all device ids under maintenance (may contain duplicates, but we don't care for this usage)
         $deviceIdsUnderMaintenance = AlertSchedule::isActive()
             ->with([
@@ -626,6 +629,8 @@ class MapDataController extends Controller
     // GET Device Links by device
     public function getDeviceLinks(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', Device::class);
+
         // List all links
         $link_list = [];
         $port_assoc_seen = [];
@@ -678,7 +683,7 @@ class MapDataController extends Controller
                                 'color' => LibrenmsConfig::get('network_map_legend.dn.edge'),
                             ],
                         ];
-                    } elseif ($port->ifOperStatus == 'down' || $remote_port->ifOperStatus == 'down') {
+                    } elseif ($port->ifOperStatus == IfOperStatus::Down || $remote_port->ifOperStatus == IfOperStatus::Down) {
                         // If either port is offline, mark the link as being down
                         $link_style = [
                             'dashes' => [8, 12],
@@ -725,6 +730,8 @@ class MapDataController extends Controller
     // GET Device Links grouped by geographic locations
     public function getGeographicLinks(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', Device::class);
+
         // List all links
         $link_list = [];
         foreach (self::geoLinks($request) as $location) {
@@ -759,6 +766,8 @@ class MapDataController extends Controller
     // GET Device services
     public function getServices(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', Service::class);
+
         $group_id = $request->device_group;
         $services = Service::hasAccess($request->user())->with('device');
 

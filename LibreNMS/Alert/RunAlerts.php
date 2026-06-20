@@ -35,12 +35,14 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\Alert;
+use App\Models\AlertLog;
 use App\Models\AlertTransport;
 use App\Models\ApplicationMetric;
 use App\Models\Eventlog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Alerting\QueryBuilderParser;
+use LibreNMS\Enum\AlertRuleOperationPhase;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\Severity;
@@ -126,7 +128,12 @@ class RunAlerts
         $obj['status'] = $device->status;
         $obj['status_reason'] = $device->status_reason;
         if (ConnectivityHelper::pingIsAllowed($device)) {
-            $last_ping = Rrd::lastUpdate(Rrd::name($device->hostname, 'icmp-perf'));
+            try {
+                $last_ping = Rrd::lastUpdate(Rrd::name($device->hostname, 'icmp-perf'));
+            } catch (\Exception $e) {
+                Log::error("Error getting last ping for device {$device->hostname}: {$e->getMessage()}");
+                $last_ping = null;
+            }
             if ($last_ping) {
                 $obj['ping_timestamp'] = $last_ping->timestamp;
                 $obj['ping_loss'] = Number::calculatePercent($last_ping->get('xmt') - $last_ping->get('rcv'), $last_ping->get('xmt'));
@@ -227,6 +234,13 @@ class RunAlerts
         $obj['state'] = $alert['state'];
         $obj['alerted'] = $alert['alerted'];
         $obj['template'] = $template;
+
+        $obj['operation_phase'] = AlertUtil::mapAlertStateToOperationPhase((int) $alert['state']);
+        $detailCount = (int) ($extra['count'] ?? 0);
+        $obj['escalation_step'] = max(1, $detailCount);
+        if ($obj['operation_phase'] !== AlertRuleOperationPhase::PROBLEM) {
+            $obj['escalation_step'] = 1;
+        }
 
         return $obj;
     }
@@ -507,6 +521,17 @@ class RunAlerts
                 $rextra['recovery'] = true;
             }
 
+            if (in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED], true)) {
+                AlertUtil::mergeProblemPhaseTimingFromOperations((int) $alert['rule_id'], $alert['details'], $rextra);
+            }
+
+            if (! empty($rextra['_stop_notifications'])) {
+                unset($rextra['_stop_notifications']);
+                echo 'Max escalation steps reached for Alert-UID #' . $alert['id'] . "\r\n";
+
+                continue;
+            }
+
             if (! isset($alert['details']['count'])) {
                 // make sure count is set for below code, in legacy code null would get type juggled to 0
                 $alert['details']['count'] = 0;
@@ -518,7 +543,7 @@ class RunAlerts
 
             if ($status_check === null) {
                 Log::warning("Alert #{$alert['id']} references non-existent device {$alert['device_id']}, cleaning up");
-                Alert::query()->where('id', $alert['id'])->delete();
+                AlertLog::query()->where('id', $alert['id'])->delete();
 
                 continue;
             }
@@ -633,10 +658,23 @@ class RunAlerts
         $type = new Template;
 
         // If alert transport mapping exists, override the default transports
-        $transport_maps = AlertUtil::getAlertTransports($obj['alert_id']);
+        $transport_maps = AlertUtil::getAlertTransports(
+            $obj['alert_id'],
+            $obj['operation_phase'] ?? null,
+            (int) ($obj['escalation_step'] ?? 1)
+        );
 
-        if (! $transport_maps) {
-            $transport_maps = AlertUtil::getDefaultAlertTransports();
+        $ruleId = (int) ($obj['rule_id'] ?? 0);
+        if (! $transport_maps || count($transport_maps) === 0) {
+            $reason = 'No mapped transport for this operation';
+            if ($ruleId > 0 && ! AlertUtil::ruleHasAlertOperations($ruleId)) {
+                $reason = 'No operations configured for this rule';
+            }
+
+            Eventlog::log($reason . ' (notification skipped)', $obj['device_id'], 'alert', Severity::Notice);
+            c_echo(" :: Skipped => $reason");
+
+            return;
         }
 
         // alerting for default contacts, etc
@@ -673,10 +711,6 @@ class RunAlerts
                 unset($instance);
                 echo PHP_EOL;
             }
-        }
-
-        if (count($transport_maps) === 0) {
-            echo 'No configured transports';
         }
     }
 

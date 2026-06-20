@@ -15,7 +15,8 @@ class StoragePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'view')
+        return $this->hasGlobalPermission($user, 'view', true)
+            || $this->hasGlobalPermission($user, 'viewAll')
             || $this->hasGlobalPermission($user, 'update');
     }
 
@@ -35,8 +36,9 @@ class StoragePolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user): bool
+    public function update(User $user, Storage $storage): bool
     {
-        return $this->hasGlobalPermission($user, 'update');
+        return $this->hasGlobalPermission($user, 'update')
+            && Permissions::canAccessDevice($storage->device_id, $user);
     }
 }

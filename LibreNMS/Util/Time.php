@@ -89,17 +89,19 @@ class Time
             return $time < 0 ? time() + $time : intval($time);
         }
 
-        if (preg_match('/^[+-]\d+[hdmy]$/', $time)) {
+        if (preg_match('/^([+-])(\d+)(mo|[smhdwy])$/', $time, $matches)) {
             $units = [
+                's' => 1,
                 'm' => 60,
                 'h' => 3600,
                 'd' => 86400,
+                'w' => 604800,
+                'mo' => 2592000,
                 'y' => 31557600,
             ];
-            $value = Number::cast(substr($time, 1, -1));
-            $unit = substr($time, -1);
+            $value = Number::cast($matches[2]);
 
-            $offset = ($time[0] == '-' ? -1 : 1) * $units[$unit] * $value;
+            $offset = ($matches[1] == '-' ? -1 : 1) * $units[$matches[3]] * $value;
 
             return time() + $offset;
         }
@@ -161,19 +163,19 @@ class Time
 
     public static function durationToSeconds(string $duration): int
     {
-        if (preg_match('/(\d+)([mhd]?)/', $duration, $matches)) {
-            $multipliers = [
-                'm' => 60,
-                'h' => 3600,
-                'd' => 86400,
-            ];
-
-            $multiplier = $multipliers[$matches[2]] ?? 1;
-
-            return $matches[1] * $multiplier;
+        if (! preg_match('/(\d+)([mhd]?)/', $duration, $matches)) {
+            return $duration === '' ? 0 : 300;
         }
 
-        return $duration === '' ? 0 : 300;
+        $multipliers = [
+            'm' => 60,
+            'h' => 3600,
+            'd' => 86400,
+        ];
+
+        $multiplier = $multipliers[$matches[2]] ?? 1;
+
+        return $matches[1] * $multiplier;
     }
 
     /**
@@ -217,8 +219,8 @@ class Time
         }
 
         $format = match ($format) {
-            'long', 'compact', 'byminute', 'time' => LibrenmsConfig::get("dateformat.$format"),
-            default => throw new \Exception('Format needs to be one of log, compact, byminute or time'),
+            'long', 'compact', 'byminute', 'time', 'date' => LibrenmsConfig::get("dateformat.$format"),
+            default => throw new \Exception('Format needs to be one of log, compact, byminute, date or time'),
         };
 
         $timezone = session('preferences.timezone');
@@ -227,5 +229,10 @@ class Time
         }
 
         return $input->format($format);
+    }
+
+    public static function now(): Carbon
+    {
+        return Carbon::now(session('preferences.timezone'));
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+use App\Facades\DeviceCache;
+
 require 'includes/html/graphs/common.inc.php';
 
 $graph_params->scale_min = 0;
@@ -44,7 +46,7 @@ foreach (dbFetchRows('SELECT * FROM printer_supplies where device_id = ?', [$dev
         }//end switch
     }//end if
 
-    $hostname = gethostbyid($toner['device_id']);
+    $hostname = DeviceCache::get((int) $toner['device_id'])->hostname;
 
     $descr = \LibreNMS\Data\Store\Rrd::safeDescr(substr(str_pad((string) $toner['supply_descr'], 16), 0, 16));
     $rrd_filename = Rrd::name($device['hostname'], ['toner', $toner['supply_type'], $toner['supply_index']]);

@@ -12,6 +12,8 @@
  *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
 */
+use LibreNMS\Enum\IfOperStatus;
+
 echo 'Comware ';
 
 $multiplier = 1;
@@ -21,7 +23,7 @@ $hh3cTransceiverInfoTable = SnmpQuery::cache()->enumStrings()->walk('HH3C-TRANSC
 foreach ($hh3cTransceiverInfoTable as $index => $entry) {
     if (is_numeric($entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverVoltage']) && $entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverVoltage'] != 2147483647 && isset($entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverDiagnostic'])) {
         $port = PortCache::getByIfIndex($index, $device['device_id']);
-        if ($port?->ifAdminStatus != 'up') {
+        if ($port?->ifAdminStatus != IfOperStatus::Up) {
             continue;
         }
 

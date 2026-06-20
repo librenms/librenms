@@ -8290,7 +8290,7 @@
                     "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "",
+                    "bgpPeerDescr": "ChBiArtr01",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,
@@ -8313,7 +8313,7 @@
                     "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "",
+                    "bgpPeerDescr": "ChBiBrtr01",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,
@@ -8336,7 +8336,7 @@
                     "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "",
+                    "bgpPeerDescr": "Casper POE",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,
@@ -8363,7 +8363,7 @@
                     "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "",
+                    "bgpPeerDescr": "ChBiArtr01",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 2790648,
@@ -8386,7 +8386,7 @@
                     "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "",
+                    "bgpPeerDescr": "ChBiBrtr01",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 2790762,
@@ -8409,7 +8409,7 @@
                     "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "",
+                    "bgpPeerDescr": "Casper POE",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 2794804,
@@ -8458,7 +8458,8 @@
                     "ifStackStatus": "active"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "entity-physical": {
         "discovery": {

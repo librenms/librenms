@@ -32,6 +32,7 @@ return [
             'powerdns-recursor' => ['name' => 'PowerDNS Recursor'],
             'oslv_monitor' => ['name' => 'OSLV Monitor'],
             'sneck' => ['name' => 'Sneck'],
+            'ssl-certificates' => ['name' => 'SSL Certificates'],
         ],
         'auth' => [
             'general' => ['name' => 'General Authentication Settings'],
@@ -111,6 +112,7 @@ return [
             'front-page' => ['name' => 'Front Page Settings'],
             'menu' => ['name' => 'Menu Settings'],
             'scheduled-maintenance' => ['name' => 'Scheduled Maintenance'],
+            'alert-map' => ['name' => 'Alert Map Settings'],
         ],
     ],
     'settings' => [
@@ -133,21 +135,21 @@ return [
                 'description' => 'Severity',
                 'help' => 'Severity for an Alert',
             ],
-            'max_alerts' => [
-                'description' => 'Max Alerts',
-                'help' => 'Count of Alerts to be sent',
+            'default_operation_steps_to' => [
+                'description' => 'Default operation: Steps to',
+                'help' => 'Default escalation end step for created operation rows (-1 means no limit)',
             ],
-            'delay' => [
-                'description' => 'Delay',
-                'help' => 'Delay before an Alert will be sent',
+            'default_operation_start_in' => [
+                'description' => 'Default operation: Start in',
+                'help' => 'Default delay before an operation notification is sent',
             ],
-            'interval' => [
-                'description' => 'Interval',
-                'help' => 'Interval to be checked for this Alert',
+            'default_operation_step_duration' => [
+                'description' => 'Default operation: Step duration',
+                'help' => 'Default operation step duration (minutes)',
             ],
-            'mute_alerts' => [
-                'description' => 'Mute Alerts',
-                'help' => 'Should Alert only be seen in WebUI',
+            'default_operation_notifications_suppressed' => [
+                'description' => 'Default operation: Suppress notifications',
+                'help' => 'Suppress notifications by default for created operation rows',
             ],
             'invert_rule_match' => [
                 'description' => 'Invert Rule Match',
@@ -579,6 +581,16 @@ return [
             'description' => 'Auth log entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
+        'availablity' => [
+            'threshold_ok' => [
+                'description' => 'Availability Ok Threshold',
+                'help' => 'Threshold for green color',
+            ],
+            'threshold_warning' => [
+                'description' => 'Availablilty Warning Threshold',
+                'help' => 'Threshold for orange color',
+            ],
+        ],
         'bad_entity_sensor_regex' => [
             'description' => 'Bad Entity Sensor Regex',
             'help' => 'Regex to match bad entity sensors, these will not be displayed in the web interface.',
@@ -949,10 +961,6 @@ return [
             'description' => 'Enable Clear Discovery',
             'help' => 'Enables the ability to clear discovery date and time for a device. This will force a rediscovery of the device.',
         ],
-        'enable_footer' => [
-            'description' => 'Enable Footer',
-            'help' => 'Enables the footer on all pages.',
-        ],
         'enable_inventory' => [
             'description' => 'Enable Inventory',
             'help' => 'Enables the inventory page, which shows the hardware inventory of devices.',
@@ -1134,6 +1142,10 @@ return [
                     'description' => 'Query api field',
                     'help' => 'Changes the default field to query graylog API.',
                 ],
+            ],
+            'match-any-address' => [
+                'description' => 'Match any address',
+                'help' => 'This is used to match any address of a device to the source of a graylog log message, by default, only the primary address is used',
             ],
         ],
         'html' => [
@@ -1728,6 +1740,9 @@ return [
             'ports' => [
                 'description' => 'Ports',
             ],
+            'ports-stack' => [
+                'description' => 'Ports Stack',
+            ],
             'bgp-peers' => [
                 'description' => 'BGP Peers',
             ],
@@ -2279,6 +2294,14 @@ return [
                 'description' => 'Skip Hosts',
                 'help' => 'Skip hosts from SSL certificate discovery',
             ],
+            'days_until_expiry_warning' => [
+                'description' => 'Warning (days)',
+                'help' => 'Number of days until certificate expiry to trigger a warning',
+            ],
+            'days_until_expiry_danger' => [
+                'description' => 'Danger (days)',
+                'help' => 'Number of days until certificate expiry to trigger a danger alert',
+            ],
         ],
         'sso' => [
             'create_users' => [
@@ -2390,6 +2413,10 @@ return [
                 'release' => 'Monthly',
             ],
         ],
+        'update_on_days' => [
+            'description' => 'Only run updates on these days',
+            'help' => 'If set (non-empty), daily.sh will only run code updates when today matches one of these values: monday-sunday or mon-sun. Leave empty to allow updates every day.',
+        ],
         'uptime_warning' => [
             'description' => 'Show Device as warning if Uptime below (seconds)',
             'help' => 'Shows Device as warning if Uptime is below this value. Custom maps status will reflect this setting. 0 disables warning. Default 24h',
@@ -2405,6 +2432,22 @@ return [
             'scheduled_maintenance_default_behavior' => [
                 'description' => 'Default Behaviour',
                 'help' => 'When managing scheduled maintenances, this will be the default option for the Behavior option.',
+            ],
+            'alert_map_compact' => [
+                'description' => 'Alert map compact view',
+                'help' => 'Alert map view with small indicators',
+            ],
+            'alert_map_sort_status' => [
+                'description' => 'Sort by status',
+                'help' => 'Sort alerts by status',
+            ],
+            'alert_map_use_device_groups' => [
+                'description' => 'Use device groups filter',
+                'help' => 'Enable usage of device groups filter',
+            ],
+            'alert_map_box_size' => [
+                'description' => 'Alert box width',
+                'help' => 'Input desired tile width in pixels for box size in full view',
             ],
             'availability_map_box_size' => [
                 'description' => 'Availability box width',
@@ -2510,6 +2553,7 @@ return [
         'days' => 'days',
         'ms' => 'ms',
         'seconds' => 'seconds',
+        'percent' => '%',
     ],
     'validate' => [
         'boolean' => ':value is not a valid boolean',
@@ -2521,6 +2565,7 @@ return [
         'select' => ':value is not an allowed value',
         'text' => ':value is not allowed',
         'array' => 'Invalid format',
+        'password-array' => 'Invalid format',
         'executable' => ':value is not a valid executable',
         'directory' => ':value is not a valid directory',
     ],

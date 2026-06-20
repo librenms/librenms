@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL as LaravelUrl;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\DeviceStatus;
+use LibreNMS\Enum\IfOperStatus;
 use Request;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
@@ -55,10 +56,32 @@ class Url
             DeviceStatus::Disabled => 'device-link-disabled',
         };
 
-        return sprintf('<a href="%s" class="%s" x-data="deviceLink()">%s</a>%s',
-            route('device', $device->device_id),
+        return sprintf('<a href="%s" class="%s" x-data="deviceLink({device_id: %d})">%s</a>%s',
+            self::deviceUrl($device),
             $class,
+            $device->device_id,
             e($text ?: $device->displayName()),
+            $extra ? '<br />' . e($extra) : $extra
+        );
+    }
+
+    /**
+     * Provisional port link generation
+     */
+    public static function modernPortLink(?Port $port, string $text = '', string $extra = ''): string
+    {
+        if ($port === null) {
+            return e($text);
+        }
+
+        $label = Rewrite::normalizeIfName($port->getLabel());
+        $text = $text ?: $label;
+
+        return sprintf('<a href="%s" class="%s" x-data="portLink({port_id: %d})">%s</a>%s',
+            self::portUrl($port),
+            self::portLinkDisplayClass($port),
+            $port->port_id,
+            e($text),
             $extra ? '<br />' . e($extra) : $extra
         );
     }
@@ -153,18 +176,10 @@ class Url
         return $link;
     }
 
-    /**
-     * @param  Port  $port
-     * @param  string  $text
-     * @param  string  $type
-     * @param  bool  $overlib
-     * @param  bool  $single_graph
-     * @return mixed|string
-     */
-    public static function portLink($port, $text = null, $type = null, $overlib = true, $single_graph = false)
+    public static function portLink(?Port $port, ?string $text = null, ?string $type = null, bool $overlib = true, bool $single_graph = false, ?string $url = null): string
     {
         if ($port === null) {
-            return $text;
+            return (string) $text;
         }
 
         $label = Rewrite::normalizeIfName($port->getLabel());
@@ -204,7 +219,7 @@ class Url
         if (! $overlib) {
             return $content;
         } elseif (Gate::allows('view', $port)) {
-            return self::overlibLink(self::portUrl($port), $text, $content, self::portLinkDisplayClass($port));
+            return self::overlibLink($url ?? self::portUrl($port), $text, $content, self::portLinkDisplayClass($port));
         }
 
         return Rewrite::normalizeIfName($text);
@@ -374,7 +389,7 @@ class Url
 
     public static function graphPageUrl(string $type, array $args = []): string
     {
-        return url('graphs', ['type' => $type, ...$args]);
+        return url()->query('graphs', ['type' => $type, ...$args]);
     }
 
     /**
@@ -399,7 +414,7 @@ class Url
         $now = CarbonImmutable::now();
 
         $graph = $content ?: self::graphTag($args);
-        $popup = "<div class='list-large'>$popup_title</div>";
+        $popup = "<div class=\'list-large\'>$popup_title</div>";
         $popup .= '<div style="width: 850px">';
         $args['width'] = 340;
         $args['height'] = 100;
@@ -421,7 +436,7 @@ class Url
         return self::overlibLink($args['link'], $graph, $popup, null);
     }
 
-    public static function lazyGraphTag($args)
+    public static function lazyGraphTag($args, string $class = 'img-responsive'): string
     {
         $urlargs = [];
 
@@ -429,7 +444,7 @@ class Url
             $urlargs[] = $key . '=' . ($arg === null ? '' : urlencode($arg));
         }
 
-        $tag = '<img class="graph-image img-responsive" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;"';
+        $tag = '<img class="graph-image ' . $class . '" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;"';
 
         if (LibrenmsConfig::get('enable_lazy_load', true)) {
             return $tag . ' loading="lazy" />';
@@ -521,11 +536,11 @@ class Url
      */
     public static function portLinkDisplayClass($port)
     {
-        if ($port->ifAdminStatus == 'down') {
+        if ($port->ifAdminStatus == IfOperStatus::Down) {
             return 'interface-admindown';
         }
 
-        if ($port->ifAdminStatus == 'up' && $port->ifOperStatus != 'up') {
+        if ($port->ifAdminStatus == IfOperStatus::Up && $port->ifOperStatus != IfOperStatus::Up) {
             return 'interface-updown';
         }
 

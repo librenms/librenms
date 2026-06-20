@@ -6,6 +6,7 @@ use App\Facades\PortCache;
 use App\Models\EntPhysical;
 use App\Models\Transceiver;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
@@ -86,6 +87,8 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
 
         foreach ($transceivers as $cmmStackUnitIndex => $chassisTransceivers) {
             foreach ($chassisTransceivers as $cmmTransIndex => $transceiver) {
+                $ifName = $this->guessIfName($cmmTransIndex, $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransType'] ?? 'missing', $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransEEPROMEntry.60'] ?? '');
+
                 $inventory->push(new EntPhysical([
                     'entPhysicalIndex' => $cmmStackUnitIndex * 10000 + $cmmTransIndex,
                     'entPhysicalDescr' => $this->describeTransceiver($transceiver),
@@ -98,7 +101,7 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
                     'entPhysicalParentRelPos' => $cmmTransIndex,
                     'entPhysicalHardwareRev' => $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransVendorRevision'] ?? null,
                     'entPhysicalIsFRU' => 'true',
-                    'ifIndex' => $ifNameToIndex[$this->guessIfName($cmmTransIndex, $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransType'] ?? 'missing')] ?? null,
+                    'ifIndex' => $ifNameToIndex[$ifName] ?? null,
                 ]));
             }
         }
@@ -161,7 +164,7 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
         return $description;
     }
 
-    public function guessIfName($cmmTransIndex, $cmmTransType): ?string
+    public function guessIfName($cmmTransIndex, $cmmTransType, $cmmTransInterfaceIdentifier = ''): ?string
     {
         // IP Infusion has no reliable way of mapping a transceiver to a port it varies by hardware
 
@@ -171,11 +174,15 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
             default => 'ge',
         };
 
+        if (! empty($cmmTransInterfaceIdentifier)) {
+            return Str::startsWith($cmmTransInterfaceIdentifier, 'cd') ? $cmmTransInterfaceIdentifier . '/1' : $cmmTransInterfaceIdentifier;
+        }
+
         return match ($this->getDevice()->hardware) {
             'Ufi Space S9600-32X-B' => $prefix . ($this->portBreakoutEnabled() ? ($cmmTransType == 'qsfp' ? $cmmTransIndex - 5 : $cmmTransIndex - 2) : $cmmTransIndex - 1),
             'Ufi Space S9600-32X-R' => $prefix . ($this->portBreakoutEnabled() ? ($cmmTransType == 'qsfp' ? $cmmTransIndex - 5 : $cmmTransIndex - 2) : $cmmTransIndex - 1),
             'Ufi Space S9510-28DC-B' => $prefix . ($cmmTransIndex - 1),
-            'Ufi Space S9610-36D-R' => 'cd' . $cmmTransIndex . '/1',
+            'Ufi Space S9610-36D-R' => 'cd' . ($this->portBreakoutEnabled() ? ($cmmTransType == 'qsfp' ? $cmmTransIndex - 3 : $cmmTransIndex - 1) : $cmmTransIndex - 1) . '/1',
             'Ufi Space S9502-12SM-8' => $prefix . ($cmmTransIndex - 1),
             'Ufi Space S9500-30XS-P' => $prefix . ($cmmTransType == 'qsfp' ? $cmmTransIndex - 29 : $cmmTransIndex - 1),
             'Ufi Space S9600-72XC-R' => $prefix . ($this->portBreakoutEnabled() ? ($cmmTransType == 'qsfp' ? $cmmTransIndex - 3 : $cmmTransIndex - 1) : $cmmTransIndex - 1),
@@ -225,9 +232,10 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
             };
 
             $cmmTransType = $data['IPI-CMM-CHASSIS-MIB::cmmTransType'] ?? 'missing';
+            $cmmTransInterfaceIdentifier = $data['IPI-CMM-CHASSIS-MIB::cmmTransEEPROMEntry.60'] ?? '';
 
             return new Transceiver([
-                'port_id' => (int) PortCache::getIdFromIfName($this->guessIfName($cmmTransIndex, $cmmTransType), $this->getDevice()),
+                'port_id' => (int) PortCache::getIdFromIfName($this->guessIfName($cmmTransIndex, $cmmTransType, $cmmTransInterfaceIdentifier), $this->getDevice()),
                 'index' => "$cmmStackUnitIndex.$cmmTransIndex",
                 'type' => $cmmTransType,
                 'vendor' => $data['IPI-CMM-CHASSIS-MIB::cmmTransVendorName'] ?? 'missing',
