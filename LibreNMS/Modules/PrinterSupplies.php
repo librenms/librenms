@@ -305,7 +305,7 @@ class PrinterSupplies implements Module
         return $papers;
     }
 
-    private function walkPrinterMibWithContext(OS $os, array $oids): array
+    private function walkPrinterMibWithContext(OS&PrinterSuppliesContext $os, array $oids): array
     {
         return SnmpQuery::device($os->getDevice())
             ->context($os->getPrinterSuppliesContext())
