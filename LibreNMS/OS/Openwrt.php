@@ -49,10 +49,10 @@ class Openwrt extends OS implements
      */
     public function discoverOS(Device $device): void
     {
-        $distro = trim((string) snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."distro"', '-Osqnv'));
+        $distro = trim((string) \SnmpQuery::get('NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."distro"')->value());
         $distroParts = preg_split('/\s+/', $distro, 2);
         $device->version = $distroParts[1] ?? $distro;
-        $device->hardware = snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."hardware"', '-Osqnv');
+        $device->hardware = \SnmpQuery::get('NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."hardware"')->value();
     }
 
     /**
@@ -63,7 +63,7 @@ class Openwrt extends OS implements
      */
     private function getInterfaces()
     {
-        $rawInterfaces = (string) snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."interfaces"', '-Osqnv');
+        $rawInterfaces = (string) \SnmpQuery::get('NET-SNMP-EXTEND-MIB::nsExtendOutputFull."interfaces"')->value();
         $interfaces = preg_split('/\r\n|\r|\n/', trim($rawInterfaces)) ?: [];
         $arrIfaces = [];
         foreach ($interfaces as $interface) {
