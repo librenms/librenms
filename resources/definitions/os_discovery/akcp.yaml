@@ -1,45 +1,37 @@
 modules:
     os:
         hardware: SNMPv2-MIB::sysDescr.0
-
     sensors:
-
         state:
             data:
-
                 # securityProbe family
                 -
                     oid: SPAGENT-MIB::spSummary
                     value: SPAGENT-MIB::spStatus
                     num_oid: '.1.3.6.1.4.1.3854.1.1.2.{{ $index }}'
-                    descr: 'Probe-Status'
+                    descr: 'Probe Status'
                     group: Probes
-
                     states:
-                        - { value: 1, descr: noStatus, generic: 3 }
-                        - { value: 2, descr: normal, generic: 0 }
-                        - { value: 4, descr: critical, generic: 2 }
-                        - { value: 7, descr: sensorError, generic: 3 }
-
+                        - { descr: noStatus, value: 1, generic: 3 }
+                        - { descr: normal, value: 2, generic: 0 }
+                        - { descr: critical, value: 4, generic: 2 }
+                        - { descr: sensorError, value: 7, generic: 3 }
                 -
                     oid: SPAGENT-MIB::sensorProbeSwitchTable
                     value: SPAGENT-MIB::sensorProbeSwitchStatus
                     num_oid: '.1.3.6.1.4.1.3854.1.2.2.1.18.1.3.{{ $index }}'
                     descr: SPAGENT-MIB::sensorProbeSwitchDescription
                     group: Switches
-
                     skip_values:
                         -
                             oid: SPAGENT-MIB::sensorProbeSwitchStatus
                             op: '='
                             value: 0
-
                     states:
-                        - { value: 1, descr: noStatus, generic: 3 }
-                        - { value: 2, descr: normal, generic: 0 }
-                        - { value: 4, descr: critical, generic: 2 }
-                        - { value: 7, descr: sensorError, generic: 3 }
-
+                        - { descr: noStatus, value: 1, generic: 3 }
+                        - { descr: normal, value: 2, generic: 0 }
+                        - { descr: critical, value: 4, generic: 2 }
+                        - { descr: sensorError, value: 7, generic: 3 }
                 # SPx+ / H7 family
                 -
                     oid: SPAGENT-MIB::commonTable
@@ -47,53 +39,44 @@ modules:
                     num_oid: '.1.3.6.1.4.1.3854.3.5.1.1.6.{{ $index }}'
                     descr: SPAGENT-MIB::commonDescription
                     group: Probes
-
                     states:
-                        - { value: 1, descr: noStatus, generic: 3 }
-                        - { value: 2, descr: normal, generic: 0 }
-                        - { value: 4, descr: critical, generic: 2 }
-                        - { value: 7, descr: sensorError, generic: 3 }
-                        - { value: 8, descr: off, generic: 0 }
-
+                        - { descr: noStatus, value: 1, generic: 3 }
+                        - { descr: normal, value: 2, generic: 0 }
+                        - { descr: critical, value: 4, generic: 2 }
+                        - { descr: sensorError, value: 7, generic: 3 }
+                        - { descr: off, value: 8, generic: 0 } 
         humidity:
             data:
-
                 # securityProbe
                 -
                     oid: SPAGENT-MIB::sensorProbeHumidityTable
                     value: SPAGENT-MIB::sensorProbeHumidityPercent
                     num_oid: '.1.3.6.1.4.1.3854.1.2.2.1.17.1.3.{{ $index }}'
                     descr: SPAGENT-MIB::sensorProbeHumidityDescription
-
                     low_limit: SPAGENT-MIB::sensorProbeHumidityLowCritical
                     low_warn_limit: SPAGENT-MIB::sensorProbeHumidityLowWarning
                     warn_limit: SPAGENT-MIB::sensorProbeHumidityHighWarning
                     high_limit: SPAGENT-MIB::sensorProbeHumidityHighCritical
-
                     skip_values:
                         -
                             oid: SPAGENT-MIB::sensorProbeHumidityOnline
                             op: '!='
                             value: 1
-
                 # SPx+/H7
                 -
                     oid: SPAGENT-MIB::humidityTable
                     value: SPAGENT-MIB::humidityPercent
                     num_oid: '.1.3.6.1.4.1.3854.3.5.3.1.4.{{ $index }}'
                     descr: SPAGENT-MIB::humidityDescription
-
                     low_limit: SPAGENT-MIB::humidityLowCritical
                     low_warn_limit: SPAGENT-MIB::humidityLowWarning
                     warn_limit: SPAGENT-MIB::humidityHighWarning
                     high_limit: SPAGENT-MIB::humidityHighCritical
-
                     skip_values:
                         -
                             oid: SPAGENT-MIB::humidityGoOffline
                             op: '!='
                             value: 1
-
         current:
             data:
                 -
@@ -102,12 +85,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.3854.2.5.5.1.4.{{ $index }}'
                     descr: SPAGENT-MIB::current4to20mASensorDescription
                     divisor: 10
-
                     low_limit: SPAGENT-MIB::current4to20mASensorLowCritical
                     low_warn_limit: SPAGENT-MIB::current4to20mASensorLowWarning
                     warn_limit: SPAGENT-MIB::current4to20mASensorHighWarning
                     high_limit: SPAGENT-MIB::current4to20mASensorHighCritical
-
         voltage:
             data:
                 -
@@ -116,12 +97,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.3854.2.5.6.1.20.{{ $index }}'
                     descr: SPAGENT-MIB::dcVoltageSensorDescription
                     divisor: 10
-
                     low_limit: SPAGENT-MIB::dcVoltageSensorLowCritical
                     low_warn_limit: SPAGENT-MIB::dcVoltageSensorLowWarning
                     warn_limit: SPAGENT-MIB::dcVoltageSensorHighWarning
                     high_limit: SPAGENT-MIB::dcVoltageSensorHighCritical
-
         airflow:
             data:
                 -
@@ -130,7 +109,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.3854.2.5.7.1.20.{{ $index }}'
                     descr: SPAGENT-MIB::airflowSensorDescription
                     divisor: 10
-
                     low_limit: SPAGENT-MIB::airflowSensorLowCritical
                     low_warn_limit: SPAGENT-MIB::airflowSensorLowWarning
                     warn_limit: SPAGENT-MIB::airflowSensorHighWarning

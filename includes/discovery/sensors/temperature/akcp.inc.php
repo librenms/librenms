@@ -6,7 +6,7 @@ $SXoids = SnmpQuery::enumStrings()->hideMib()->walk('SPAGENT-MIB::temperatureTab
 // Old SensorProbe devices
 foreach ($SPoids as $entry) {
     if ($entry['temperatureSensorGoOffline'] == 'online' || $entry['temperatureSensorGoOffline'] == '1') {
-        $clean_index = trim($entry['temperatureSensorIndex'], '"');
+        $clean_index = trim((string) $entry['temperatureSensorIndex'], '"');
 
         $scale = $entry['temperatureSensorUnit'] == 'F' ? 'fahrenheit' : $entry['temperatureSensorUnit'];
 
@@ -46,7 +46,7 @@ foreach ($SPoids as $entry) {
 // Newer SPx Devices
 foreach ($SXoids as $entry) {
     if ($entry['temperatureGoOffline'] == 'online' || $entry['temperatureGoOffline'] == '1') {
-        $clean_index = trim($entry['temperatureIndex'], '"');
+        $clean_index = trim((string) $entry['temperatureIndex'], '"');
 
         $scale = $entry['temperatureUnit'] == 'F' ? 'fahrenheit' : $entry['temperatureUnit'];
 
