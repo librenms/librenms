@@ -362,7 +362,7 @@ if (Gate::allows('showConfig', DeviceCache::getPrimary())) {
         $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS);
         $geshi->set_overall_style('color: black;');
         // $geshi->set_line_style('color: #999999');
-        echo '<div class="config">';
+        echo '<div class="config device-config-output">';
         echo '<input id="linenumbers" class="btn btn-primary" type="submit" value="Hide line numbers"/>';
         echo $geshi->parse_code();
         echo '</div>';
