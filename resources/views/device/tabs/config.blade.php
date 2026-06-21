@@ -5,20 +5,7 @@
         @if($data['error'])
             <div class="tw:mt-4 tw:rounded-xl tw:border tw:border-gray-300 tw:dark:border-dark-gray-200 tw:bg-white tw:dark:bg-dark-gray-400 tw:p-6 tw:text-gray-700 tw:dark:text-dark-white-300">
                 <h3 class="tw:font-semibold tw:text-lg tw:mb-2 tw:text-gray-800 tw:dark:text-dark-white-100">{{ __('Device Configuration') }}</h3>
-                @php($provider = $data['provider'] ?? __('the backup provider'))
-                @switch($data['error'])
-                    @case('unreachable')
-                        {{ __(':provider is not reachable. Check the configured URL and that :provider is running.', ['provider' => $provider]) }}
-                        @break
-                    @case('error')
-                        {{ __(':provider returned an error. Check the configured API token.', ['provider' => $provider]) }}
-                        @break
-                    @case('no_backups')
-                        {{ __('No configuration backups exist for this device in :provider yet.', ['provider' => $provider]) }}
-                        @break
-                    @default
-                        {{ __('This device could not be found in :provider. It is matched by hostname or IP address.', ['provider' => $provider]) }}
-                @endswitch
+                {{ $data['error_message'] }}
             </div>
         @else
             <div x-data="configBackups({
@@ -92,7 +79,7 @@
                         <button type="button"
                                 x-on:click="loadMore()"
                                 :disabled="loadingMore"
-                                class="tw:w-full tw:rounded-lg tw:px-3 tw:py-1.5 tw:bg-gray-100 tw:hover:bg-gray-200 tw:text-gray-700 tw:dark:bg-dark-gray-300 tw:dark:hover:bg-dark-gray-200 tw:dark:text-dark-white-300 tw:transition-colors tw:disabled:opacity-50"
+                                class="lnms-btn lnms-btn-default tw:w-full"
                                 x-text="loadingMore ? @js(__('Loading...')) : @js(__('Load more'))">
                         </button>
                     </div>
@@ -108,7 +95,7 @@
                                     : @js(__('Diff'))"></span>
                             </template>
                             <template x-if="!diffMode">
-                                <span x-text="selected ? @js(__('Configuration')) + ' — ' + formatDate(selected.date) : @js(__('Configuration'))"></span>
+                                <span x-text="selected ? @js(__('Configuration')) + ' - ' + formatDate(selected.date) : @js(__('Configuration'))"></span>
                             </template>
                         </h3>
                     </div>
