@@ -13,20 +13,18 @@ $mempools = \DeviceCache::getPrimary()->mempools;
 if ($mempools->isNotEmpty()) {
     $mempools_url = url('device') . '/device=' . DeviceCache::getPrimary()->device_id . '/tab=health/metric=mempool/';
     echo '
-        <div class="row">
-        <div class="col-md-12">
-        <div class="panel panel-default panel-condensed overview-panel">
-        <div class="panel-heading">
+        <div class="overview-panel tw:mb-5">
+        <div class="tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:border-b tw:border-gray-300 tw:text-neutral-700 tw:dark:bg-dark-gray-200 tw:dark:border-zinc-800 tw:dark:text-dark-white-200">
         ';
     echo '<a href="' . $mempools_url . '">';
     echo '<i class="fas fa-memory fa-lg icon-theme" aria-hidden="true"></i> <strong>Memory</strong></a>';
     echo '
         </div>
-        <table class="table table-hover table-condensed table-striped">
+        <div class="tw:flex tw:min-w-0 tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-zinc-800">
         ';
 
-    echo '<tr>
-              <td colspan="4">';
+    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
+              <div>';
     $graph = \App\Http\Controllers\Device\Tabs\OverviewController::setGraphWidth([
         'device' => DeviceCache::getPrimary()->device_id,
         'type' => 'device_mempool',
@@ -34,9 +32,9 @@ if ($mempools->isNotEmpty()) {
         'legend' => 'no',
         'popup_title' => DeviceCache::getPrimary()->hostname . ' - Memory Usage',
     ]);
-    echo \LibreNMS\Util\Url::graphPopup($graph, \LibreNMS\Util\Url::lazyGraphTag($graph), $mempools_url);
-    echo '  </td>
-            </tr>';
+    echo \LibreNMS\Util\Url::graphPopup($graph, \LibreNMS\Util\Url::lazyGraphTag($graph, 'tw:w-full tw:h-auto'), $mempools_url);
+    echo '  </div>
+            </div>';
 
     // percentage line items
     foreach ($mempools as $mempool) {
@@ -80,16 +78,13 @@ if ($mempools->isNotEmpty()) {
             default => Html::percentageBar(400, 10, $mempool->mempool_perc, "$used ($mempool->mempool_perc%)", '', $mempool->mempool_perc_warn),
         };
 
-        echo '<tr>
-            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $mempool->mempool_descr, $overlib_content) . '</td>
-            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</td>
-            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $percentageBar, $overlib_content) . '
-            </a></td>
-            </tr>';
+        echo '<div class="tw:flex tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
+            <div class="tw:w-36 tw:min-w-0 tw:shrink-0 tw:whitespace-nowrap">' . \LibreNMS\Util\Url::overlibLink($link, $mempool->mempool_descr, $overlib_content) . '</div>
+            <div class="tw:flex tw:min-w-0 tw:flex-1 tw:justify-center">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</div>
+            <div>' . \LibreNMS\Util\Url::overlibLink($link, $percentageBar, $overlib_content) . '</div>
+            </div>';
     }//end foreach
 
-    echo '</table>
-        </div>
-        </div>
+    echo '</div>
         </div>';
 }//end if

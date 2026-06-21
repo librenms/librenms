@@ -102,7 +102,7 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
         include_once base_path('includes/snmp.inc.php');
 
         // update availability status
-        app(CheckDeviceAvailability::class)->execute($this->device, true);
+        app(CheckDeviceAvailability::class)->execute($this->device);
         $this->deviceArray['status'] = $this->device->status;
         $this->deviceArray['status_reason'] = $this->device->status_reason;
         $os = OS::make($this->deviceArray);
