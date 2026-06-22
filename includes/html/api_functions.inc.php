@@ -436,7 +436,7 @@ function add_device(Illuminate\Http\Request $request)
     try {
         $device = new Device(Arr::only($data, [
             'hostname',
-            'display',
+            'display_template',
             'overwrite_ip',
             'location_id',
             'override_sysLocation',
