@@ -36,7 +36,7 @@
                         </h3>
                         <button type="button"
                                 x-on:click="toggleDiffMode()"
-                                x-text="diffMode ? @js(__('Cancel')) : @js(__('Diff'))"
+                                x-text="diffMode ? '{{ __('Cancel') }}' : '{{ __('Diff') }}'"
                                 :class="diffMode
                                     ? 'lnms-btn-default'
                                     : 'lnms-btn-primary'"
@@ -65,7 +65,7 @@
                                     <span class="tw:flex-1">
                                         <span class="tw:block tw:text-base tw:text-gray-800 tw:dark:text-dark-white-100" x-text="formatDate(backup.date)"></span>
                                         <span class="tw:block tw:text-base tw:text-gray-500 tw:dark:text-dark-white-400"
-                                              x-show="backup.until" x-text="@js(__('Valid until')) + ' ' + formatDate(backup.until)"></span>
+                                              x-show="backup.until" x-text="'{{ __('Valid until') }}' + ' ' + formatDate(backup.until)"></span>
                                     </span>
                                     <span x-show="backup.type !== 'TEXT'"
                                           class="tw:text-xs tw:font-medium tw:rounded tw:px-1.5 tw:py-0.5 tw:bg-gray-200 tw:text-gray-700 tw:dark:bg-dark-gray-200 tw:dark:text-dark-white-300"
@@ -80,7 +80,7 @@
                                 x-on:click="loadMore()"
                                 :disabled="loadingMore"
                                 class="lnms-btn lnms-btn-default tw:w-full"
-                                x-text="loadingMore ? @js(__('Loading...')) : @js(__('Load more'))">
+                                x-text="loadingMore ? '{{ __('Loading...') }}' : '{{ __('Load more') }}'">
                         </button>
                     </div>
                 </div>
@@ -91,11 +91,11 @@
                         <h3 class="tw:text-gray-800 tw:dark:text-dark-white-100">
                             <template x-if="diffMode">
                                 <span x-text="diffSelection.length === 2
-                                    ? @js(__('Diff')) + ': ' + formatDate(Math.min(diffSelection[0].date, diffSelection[1].date) ) + ' → ' + formatDate(Math.max(diffSelection[0].date, diffSelection[1].date))
-                                    : @js(__('Diff'))"></span>
+                                    ? '{{ __('Diff') }}' + ': ' + formatDate(Math.min(diffSelection[0].date, diffSelection[1].date) ) + ' → ' + formatDate(Math.max(diffSelection[0].date, diffSelection[1].date))
+                                    : '{{ __('Diff') }}'"></span>
                             </template>
                             <template x-if="!diffMode">
-                                <span x-text="selected ? @js(__('Configuration')) + ' - ' + formatDate(selected.date) : @js(__('Configuration'))"></span>
+                                <span x-text="selected ? '{{ __('Configuration') }}' + ' - ' + formatDate(selected.date) : '{{ __('Configuration') }}'"></span>
                             </template>
                         </h3>
                     </div>
