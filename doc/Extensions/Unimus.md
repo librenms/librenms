@@ -42,7 +42,7 @@ trying the following values in order until one matches:
 1. The LibreNMS hostname
 1. The hostname with the domain stripped
 1. The hostname with `mydomain` appended (if configured)
-1. The device IP address (overwritten IP first, if set)
+1. The device IP address
 
 Successful matches are cached for one hour, so a device freshly
 added to Unimus may take a few minutes to appear.

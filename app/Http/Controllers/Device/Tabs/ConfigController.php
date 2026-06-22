@@ -112,7 +112,7 @@ class ConfigController extends Controller implements DeviceTab
 
     private function errorMessage(string $error, ?string $provider): string
     {
-        $provider = $provider ?? __('the backup provider');
+        $provider ??= __('the backup provider');
 
         return match ($error) {
             ConfigBackupProvider::ERROR_UNREACHABLE => __(':provider is not reachable. Check the configured URL and that :provider is running.', ['provider' => $provider]),
