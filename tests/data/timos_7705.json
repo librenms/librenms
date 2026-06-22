@@ -8765,6 +8765,61 @@
                     "sapLastMgmtChange": 373497,
                     "sapLastStatusChange": 997886
                 },
+                    "entPhysicalIndex": 201327107,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": "flashDiskModule",
+                    "entPhysicalName": "cf3:",
+                    "entPhysicalHardwareRev": "1.0",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 150994977,
+                    "entPhysicalParentRelPos": 3,
+                    "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 40108032,
+                    "low_ifIndex": 5,
+                    "ifStackStatus": "active"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "SITEA-7750",
+                    "remote_port": "35913728",
+                    "remote_platform": null,
+                    "remote_version": "TiMOS-C-15.1.R6 cpm/hops64 Nokia 7750 SR Copyright (c) 2000-2018 Nokia.\nAll rights reserved. All use subject to applicable license agreements.\r\nBuilt on Wed Aug 15 13:44:27 PDT 2018 by builder in /builds/151B/R6/panos/main",
+                    "ifAlias": "SAR: to-SITEA-7750 1/1/8",
+                    "ifDescr": "1/3/8, 10/100/Gig Ethernet SFP, \\SAR: to-SITEA-7750 1/1/8",
+                    "ifName": "1/3/8"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
                 {
                     "svc_oid": 14,
                     "sapPortId": 40042496,

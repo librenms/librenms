@@ -126,10 +126,15 @@
         e.preventDefault();
         var id = $("#id").val();
         var pollertype = $("#pollertype").val();
+        var url;
+        if (pollertype === 'delete-poller') {
+            url = '{{ route("poller.destroy", ["poller" => ":poller"]) }}'.replace(':poller', id);
+        } else {
+            url = '{{ route("poller-cluster.destroy", ["poller_cluster" => ":poller_cluster"]) }}'.replace(':poller_cluster', id);
+        }
         $.ajax({
-            type: 'POST',
-            url: 'ajax_form.php',
-            data: {type: pollertype, id: id},
+            type: 'DELETE',
+            url: url,
             success: function (result) {
                 if (result.status == 0) {
                     toastr.success(result.message);

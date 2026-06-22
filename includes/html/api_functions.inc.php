@@ -435,7 +435,7 @@ function add_device(Illuminate\Http\Request $request)
     try {
         $device = new Device(Arr::only($data, [
             'hostname',
-            'display',
+            'display_template',
             'overwrite_ip',
             'location_id',
             'override_sysLocation',
@@ -1938,6 +1938,10 @@ function add_edit_rule(Illuminate\Http\Request $request)
     if (array_key_exists('alert_operation_id', $data)) {
         $v = $data['alert_operation_id'];
         $saveData['alert_operation_id'] = ($v === null || $v === '') ? null : (int) $v;
+    }
+
+    if (array_key_exists('invert_map', $data)) {
+        $saveData['invert_map'] = filter_var($data['invert_map'], FILTER_VALIDATE_BOOLEAN);
     }
 
     if (is_numeric($rule_id)) {

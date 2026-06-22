@@ -17311,7 +17311,8 @@
                     "state_generic_value": 3
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "discovery-protocols": {
         "discovery": {
