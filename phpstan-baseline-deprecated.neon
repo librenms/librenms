@@ -4120,24 +4120,6 @@ parameters:
 			'''
 			identifier: function.deprecated
 			count: 1
-			path: includes/html/graphs/device/sla_IcmpEcho.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRow\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/graphs/device/sla_IcmpTimeStamp.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRow\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
 			path: includes/html/graphs/device/sla_icmpAppl.inc.php
 
 		-
@@ -4238,6 +4220,33 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/html/graphs/device/sla_jitter.inc.php
+
+		-
+			message: '''
+				#^Call to deprecated function dbFetchRow\(\)\:
+				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
+			'''
+			identifier: function.deprecated
+			count: 1
+			path: includes/html/graphs/device/sla_jitter_rtt.inc.php
+
+		-
+			message: '''
+				#^Call to deprecated function dbFetchRow\(\)\:
+				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
+			'''
+			identifier: function.deprecated
+			count: 1
+			path: includes/html/graphs/device/sla_loss.inc.php
+
+		-
+			message: '''
+				#^Call to deprecated function dbFetchRow\(\)\:
+				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
+			'''
+			identifier: function.deprecated
+			count: 1
+			path: includes/html/graphs/device/sla_spread.inc.php
 
 		-
 			message: '''
