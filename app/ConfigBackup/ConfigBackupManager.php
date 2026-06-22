@@ -41,24 +41,7 @@ class ConfigBackupManager
         // future: OxidizedProvider::class, RancidProvider::class
     ];
 
-    /** @var array<int, ConfigBackupProvider|null> */
-    private array $resolved = [];
-
     public function providerFor(Device $device): ?ConfigBackupProvider
-    {
-        if (! array_key_exists($device->device_id, $this->resolved)) {
-            $this->resolved[$device->device_id] = $this->resolve($device);
-        }
-
-        return $this->resolved[$device->device_id];
-    }
-
-    public function handles(Device $device): bool
-    {
-        return $this->providerFor($device) !== null;
-    }
-
-    private function resolve(Device $device): ?ConfigBackupProvider
     {
         foreach (self::$providers as $class) {
             if (! $class::isConfigured()) {
@@ -72,5 +55,10 @@ class ConfigBackupManager
         }
 
         return null;
+    }
+
+    public function handles(Device $device): bool
+    {
+        return $this->providerFor($device) !== null;
     }
 }
