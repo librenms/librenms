@@ -32,6 +32,9 @@
 
 namespace LibreNMS\Alert;
 
+use App\Facades\DeviceCache;
+use App\Models\Alert;
+use App\Models\AlertLog;
 use App\Models\Eventlog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -40,38 +43,39 @@ use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\Severity;
-use PDO;
 use PDOException;
 
 class AlertRules
 {
-    public function runRules($device_id): bool
+    public function runRules(int $device_id): bool
     {
+        $device = DeviceCache::get($device_id);
+
         //Check to see if under maintenance
         if (AlertUtil::getMaintenanceStatus($device_id) === MaintenanceStatus::SkipAlerts) {
             echo "Under Maintenance, skipping alert rules check.\r\n";
 
             return false;
         }
+
         //Check to see if disable alerting is set
         if (AlertUtil::hasDisableNotify($device_id)) {
             echo "Disable alerting is set, Clearing active alerts and skipping alert rules check\r\n";
-            $device_alert['state'] = AlertState::CLEAR;
-            $device_alert['alerted'] = 0;
-            $device_alert['open'] = 0;
-            dbUpdate($device_alert, 'alerts', '`device_id` = ?', [$device_id]);
+            Alert::where('device_id', $device_id)
+                ->update([
+                    'state' => AlertState::CLEAR,
+                    'alerted' => 0,
+                    'open' => 0,
+                ]);
 
             return false;
         }
+
         //Checks each rule.
         foreach (AlertUtil::getRules($device_id) as $rule) {
             Log::info('Rule %p#' . $rule['id'] . ' (' . $rule['name'] . '):%n ', ['color' => true]);
             $extra = json_decode((string) $rule['extra'], true);
-            if (isset($extra['invert'])) {
-                $inv = (bool) $extra['invert'];
-            } else {
-                $inv = false;
-            }
+            $invert = (bool) ($extra['invert'] ?? false);
             d_echo(PHP_EOL);
             if (empty($rule['query'])) {
                 $rule['query'] = QueryBuilderParser::fromJson($rule['builder'])->toSql();
@@ -84,10 +88,7 @@ class AlertRules
 
             // set fetch assoc
             try {
-                $query = DB::connection()->getPdo()->prepare($sql);
-                $query->execute([$device_id]);
-
-                $qry = $query->fetchAll(PDO::FETCH_ASSOC);
+                $qry = array_map(fn ($row) => (array) $row, DB::select($sql, [$device_id]));
             } catch (PDOException $e) {
                 c_echo('%RError: %n' . $e->getMessage() . PHP_EOL);
                 Eventlog::log("Error in alert rule {$rule['name']} ({$rule['id']}): " . $e->getMessage(), $device_id, 'alert', Severity::Error);
@@ -101,9 +102,13 @@ class AlertRules
             }
 
             $matched = ! empty($qry);
-            $doalert = $matched !== $inv;
+            $doalert = $matched !== $invert;
 
-            $current_state = dbFetchCell('SELECT state FROM alerts WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$rule['id'], $device_id]);
+            $current_state = Alert::where('rule_id', $rule['id'])
+                ->where('device_id', $device_id)
+                ->latest('id')
+                ->value('state');
+
             if ($doalert) {
                 if ($current_state == AlertState::ACKNOWLEDGED) {
                     Log::info('Status: %ySKIP%n', ['color' => true]);
@@ -111,23 +116,29 @@ class AlertRules
                     Log::info('Status: %bNOCHG%n', ['color' => true]);
                     // NOCHG here doesn't mean no change full stop. It means no change to the alert state
                     // So we update the details column with any fresh changes to the alert output we might have.
-                    $alert_log = dbFetchRow('SELECT alert_log.id, alert_log.details FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0
-     ORDER BY alert_log.id DESC LIMIT 1', [$device_id, $rule['id']]);
-                    $details = [];
-                    if (! empty($alert_log['details'])) {
-                        $details = json_decode(gzuncompress($alert_log['details']), true);
+                    $alert_log = AlertLog::join('alert_rules', 'alert_log.rule_id', '=', 'alert_rules.id')
+                        ->where('alert_log.device_id', $device_id)
+                        ->where('alert_log.rule_id', $rule['id'])
+                        ->where('alert_rules.disabled', 0)
+                        ->select('alert_log.*')
+                        ->latest('alert_log.id')
+                        ->first();
+
+                    if ($alert_log) {
+                        $details = $alert_log->details ?? [];
+                        $details['contacts'] = AlertUtil::getContacts($qry);
+                        $details['rule'] = $qry;
+                        $alert_log->update(['details' => $details]);
                     }
-                    $details['contacts'] = AlertUtil::getContacts($qry);
-                    $details['rule'] = $qry;
-                    $details = gzcompress(json_encode($details), 9);
-                    dbUpdate(['details' => $details], 'alert_log', 'id = ?', [$alert_log['id']]);
                 } else {
-                    $extra = gzcompress(json_encode(['contacts' => AlertUtil::getContacts($qry), 'rule' => $qry]), 9);
-                    if (dbInsert(['state' => AlertState::ACTIVE, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'details' => $extra], 'alert_log')) {
+                    $extra = ['contacts' => AlertUtil::getContacts($qry), 'rule' => $qry];
+                    if (AlertLog::create(['state' => AlertState::ACTIVE, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'details' => $extra])) {
                         if (is_null($current_state)) {
-                            dbInsert(['state' => AlertState::ACTIVE, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0], 'alerts');
+                            Alert::create(['state' => AlertState::ACTIVE, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0, 'info' => []]);
                         } else {
-                            dbUpdate(['state' => AlertState::ACTIVE, 'open' => 1, 'alerted' => 0, 'timestamp' => Carbon::now()], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
+                            Alert::where('device_id', $device_id)
+                                ->where('rule_id', $rule['id'])
+                                ->update(['state' => AlertState::ACTIVE, 'open' => 1, 'alerted' => 0, 'timestamp' => Carbon::now()]);
                         }
                         Log::info(PHP_EOL . 'Status: %rALERT%n', ['color' => true]);
                     }
@@ -136,11 +147,13 @@ class AlertRules
                 if (! is_null($current_state) && $current_state == AlertState::RECOVERED) {
                     Log::info('Status: %bNOCHG%n', ['color' => true]);
                 } else {
-                    if (dbInsert(['state' => AlertState::RECOVERED, 'device_id' => $device_id, 'rule_id' => $rule['id']], 'alert_log')) {
+                    if (AlertLog::create(['state' => AlertState::RECOVERED, 'device_id' => $device_id, 'rule_id' => $rule['id']])) {
                         if (is_null($current_state)) {
-                            dbInsert(['state' => AlertState::RECOVERED, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0], 'alerts');
+                            Alert::create(['state' => AlertState::RECOVERED, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0, 'info' => []]);
                         } else {
-                            dbUpdate(['state' => AlertState::RECOVERED, 'open' => 1, 'note' => '', 'timestamp' => Carbon::now()], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
+                            Alert::where('device_id', $device_id)
+                                ->where('rule_id', $rule['id'])
+                                ->update(['state' => AlertState::RECOVERED, 'open' => 1, 'note' => '', 'timestamp' => Carbon::now()]);
                         }
 
                         Log::info(PHP_EOL . 'Status: %gOK%n', ['color' => true]);

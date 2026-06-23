@@ -37,6 +37,14 @@ class Alert extends Model
 {
     use HasFactory;
     public $timestamps = false;
+    protected $fillable = [
+        'device_id',
+        'rule_id',
+        'state',
+        'open',
+        'alerted',
+        'info',
+    ];
 
     /**
      * @return array{info: 'array'}
