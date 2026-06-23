@@ -28,5 +28,4 @@ return new class extends Migration
             $table->dropColumn('voice');
         });
     }
-    
 };
