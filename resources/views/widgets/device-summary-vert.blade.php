@@ -18,7 +18,7 @@
             <tr>
                 <th><span class="green">{{ __('Up') }}</span></th>
                 <td><a href="{{ route('devices', ['detail', 'filter' => ['state' => ['eq' => 'up']]]) }}"><span class="green"> {{ $devices['up'] }}</span></a></td>
-                <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'up']]]) }}"><span class="green"> {{ $ports['up'] }}</span></a></td>
+                <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'up'], 'active' => ['eq' => 1]]]) }}"><span class="green"> {{ $ports['up'] }}</span></a></td>
                 @if($show_services)
                     <td><a href="{{ url('services/view=details/state=ok') }}"><span class="green"> {{ $services['ok'] }}</span></a></td>
                 @endif
@@ -29,7 +29,7 @@
             <tr>
                 <th><span class="red">{{ __('Down') }}</span></th>
                 <td><a href="{{ route('devices', ['detail', 'filter' => ['state' => ['eq' => 'down']]]) }}"><span class="red"> {{ $devices['down'] }}</span></a></td>
-                <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'down']]]) }}"><span class="red"> {{ $ports['down'] }}</span></a></td>
+                <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'down'], 'active' => ['eq' => 1]]]) }}"><span class="red"> {{ $ports['down'] }}</span></a></td>
                 @if($show_services)
                     <td><a href="{{ url('services/view=details/state=critical') }}"><span class="red"> {{ $services['critical'] }}</span></a></td>
                 @endif
