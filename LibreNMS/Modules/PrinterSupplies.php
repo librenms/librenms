@@ -223,6 +223,7 @@ class PrinterSupplies implements Module
             if (Str::contains($descr, "\n")) {
                 $new_descr = '';
                 foreach (explode("\n", (string) $descr) as $line) {
+                    $line = trim($line);
                     if (preg_match('/^([A-F\d]{2} )*[A-F\d]{1,2} ?$/', $line)) {
                         $line = StringHelpers::hexToAscii($line, ' ');
                     }
@@ -284,12 +285,10 @@ class PrinterSupplies implements Module
                 $query->context($context);
             }
 
-            $tray_oids = $query->walk([
-                'Printer-MIB::prtInputName',
-                'Printer-MIB::prtInputCurrentLevel',
-                'Printer-MIB::prtInputMaxCapacity',
-            ])->valuesByIndex();
+            $tray_oids = $query->walk('Printer-MIB::prtInputName')->valuesByIndex();
             if (! empty($tray_oids)) {
+                $query->walk('Printer-MIB::prtInputCurrentLevel')->valuesByIndex($tray_oids);
+                $query->walk('Printer-MIB::prtInputMaxCapacity')->valuesByIndex($tray_oids);
                 break;
             }
         }
