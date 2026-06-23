@@ -97,14 +97,18 @@ class PrinterSupplies implements Module
             return; // no data to poll
         }
 
-        $toner_oids = $toner_data->pluck('supply_oid')->toArray();
-        $toner_snmp = snmp_get_multi_oid($device, $toner_oids);
-        if (empty($toner_snmp) && $os instanceof PrinterSuppliesContext) {
-            $toner_snmp = SnmpQuery::device($os->getDevice())
-                ->context($os->getPrinterSuppliesContext())
-                ->numeric()
-                ->get($toner_oids)
-                ->values();
+        $toner_snmp = [];
+        $contexts = $os instanceof PrinterSuppliesContext ? $os->getPrinterSuppliesContexts() : [null];
+        foreach ($contexts as $context) {
+            $query = SnmpQuery::device($os->getDevice())->numeric();
+            if ($context !== null) {
+                $query->context($context);
+            }
+
+            $toner_snmp = $query->get($toner_data->pluck('supply_oid')->toArray())->values();
+            if (! empty($toner_snmp)) {
+                break;
+            }
         }
 
         foreach ($toner_data as $toner) {
@@ -178,18 +182,26 @@ class PrinterSupplies implements Module
         $levels = new Collection();
         $device = $os->getDeviceArray();
 
-        $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesLevel', [], 'Printer-MIB');
-        if (! empty($oids)) {
-            $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesType', $oids, 'Printer-MIB');
-            $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesMaxCapacity', $oids, 'Printer-MIB');
-            $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesDescription', $oids, 'Printer-MIB', null, '-OQUs');
-        } elseif ($os instanceof PrinterSuppliesContext) {
-            $oids = $this->walkPrinterMibWithContext($os, [
+        $oids = [];
+        $contexts = $os instanceof PrinterSuppliesContext ? $os->getPrinterSuppliesContexts() : [null];
+        foreach ($contexts as $context) {
+            $query = SnmpQuery::device($os->getDevice())
+                ->mibs(['Printer-MIB'])
+                ->hideMib()
+                ->enumStrings();
+            if ($context !== null) {
+                $query->context($context);
+            }
+
+            $oids = $query->walk([
                 'Printer-MIB::prtMarkerSuppliesLevel',
                 'Printer-MIB::prtMarkerSuppliesType',
                 'Printer-MIB::prtMarkerSuppliesMaxCapacity',
                 'Printer-MIB::prtMarkerSuppliesDescription',
-            ]);
+            ])->valuesByIndex();
+            if (! empty($oids)) {
+                break;
+            }
         }
 
         foreach ($oids as $index => $data) {
@@ -261,16 +273,25 @@ class PrinterSupplies implements Module
         $papers = new Collection();
         $device = $os->getDeviceArray();
 
-        $tray_oids = snmpwalk_cache_oid($device, 'prtInputName', [], 'Printer-MIB');
-        if (! empty($tray_oids)) {
-            $tray_oids = snmpwalk_cache_oid($device, 'prtInputCurrentLevel', $tray_oids, 'Printer-MIB');
-            $tray_oids = snmpwalk_cache_oid($device, 'prtInputMaxCapacity', $tray_oids, 'Printer-MIB');
-        } elseif ($os instanceof PrinterSuppliesContext) {
-            $tray_oids = $this->walkPrinterMibWithContext($os, [
+        $tray_oids = [];
+        $contexts = $os instanceof PrinterSuppliesContext ? $os->getPrinterSuppliesContexts() : [null];
+        foreach ($contexts as $context) {
+            $query = SnmpQuery::device($os->getDevice())
+                ->mibs(['Printer-MIB'])
+                ->hideMib()
+                ->enumStrings();
+            if ($context !== null) {
+                $query->context($context);
+            }
+
+            $tray_oids = $query->walk([
                 'Printer-MIB::prtInputName',
                 'Printer-MIB::prtInputCurrentLevel',
                 'Printer-MIB::prtInputMaxCapacity',
-            ]);
+            ])->valuesByIndex();
+            if (! empty($tray_oids)) {
+                break;
+            }
         }
 
         foreach ($tray_oids as $index => $data) {
@@ -303,16 +324,6 @@ class PrinterSupplies implements Module
         }
 
         return $papers;
-    }
-
-    private function walkPrinterMibWithContext(OS&PrinterSuppliesContext $os, array $oids): array
-    {
-        return SnmpQuery::device($os->getDevice())
-            ->context($os->getPrinterSuppliesContext())
-            ->hideMib()
-            ->enumStrings()
-            ->walk($oids)
-            ->valuesByIndex();
     }
 
     /**
