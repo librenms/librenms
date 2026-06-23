@@ -22,6 +22,35 @@ A small shell script that reports the status of PHP-FPM (FastCGI Process Manager
     dnf install perl-JSON perl-File-Slurp perl-String-ShellQuote
     ```
 
+## PHP-FPM status page preparation
+
+In order to use the status page, it must be activated (at least on Debian).
+(Original code from https://www.tecmint.com/enable-monitor-php-fpm-status-in-nginx/)
+
+    1. uncomment and edit the according options in your pool.conf.
+    
+        ´´´
+        pm.status_path = /www-fpm-status
+        pm.status_listen = 127.0.0.1:9001
+        ping.path = /www-ping (optional)
+        ```
+    2.  add the status page to your webserver config (here nginx).
+        ´´´nginx
+        location ~ ^/(www-fpm-status|www-ping)$ {
+            allow 127.0.0.1;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_index index.php;
+            include fastcgi_params;
+            fastcgi_pass 127.0.0.1:9001;
+            #fastcgi_pass   unix:/var/run/php/php8.4-fpm.sock;
+        }
+        ```
+    3. restart nginx and PHP-FPM
+         ```bash
+        sudo systemctl reload nginx
+        sudo systemctl restart php8.4-fpm
+        ```
+
 ## Agent or SNMP Extend
 
 === "SNMP Extend"
@@ -51,6 +80,7 @@ A small shell script that reports the status of PHP-FPM (FastCGI Process Manager
         ```json
         {
         "pools":{
+                "www": "http://localhost/www-fpm-status",
                 "thefrog": "https://thefrog/fpm-status",
                 "foobar": "https://foo.bar/fpm-status"
             }
