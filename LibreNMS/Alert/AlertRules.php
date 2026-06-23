@@ -45,7 +45,7 @@ use PDOException;
 
 class AlertRules
 {
-    public function runRules($device_id)
+    public function runRules($device_id): bool
     {
         //Check to see if under maintenance
         if (AlertUtil::getMaintenanceStatus($device_id) === MaintenanceStatus::SkipAlerts) {
@@ -94,22 +94,14 @@ class AlertRules
                 continue; // skip this rule
             }
 
-            $cnt = count($qry);
-            for ($i = 0; $i < $cnt; $i++) {
-                if (isset($qry[$i]['ip'])) {
-                    $qry[$i]['ip'] = inet6_ntop($qry[$i]['ip']);
+            foreach ($qry as &$row) {
+                if (isset($row['ip'])) {
+                    $row['ip'] = inet6_ntop($row['ip']);
                 }
             }
-            $s = count($qry);
-            if ($s == 0 && $inv === false) {
-                $doalert = false;
-            } elseif ($s > 0 && $inv === false) {
-                $doalert = true;
-            } elseif ($s == 0 && $inv === true) {
-                $doalert = true;
-            } else {
-                $doalert = false;
-            }
+
+            $matched = ! empty($qry);
+            $doalert = $matched !== $inv;
 
             $current_state = dbFetchCell('SELECT state FROM alerts WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$rule['id'], $device_id]);
             if ($doalert) {
@@ -156,5 +148,7 @@ class AlertRules
                 }
             }
         }
+
+        return true;
     }
 }
