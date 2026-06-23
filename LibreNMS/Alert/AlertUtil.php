@@ -83,11 +83,15 @@ class AlertUtil
      * (delay, interval, count) so RunAlerts can reuse existing scheduling logic.
      * When the rule has no operations at all, notifications are treated as suppressed (mute).
      *
-     * @param  array<string, mixed>  $details  alert_log details (decoded)
+     * @param  array<string, mixed>|null  $details  alert_log details (decoded); null is treated as no prior notifications
      * @param  array<string, mixed>  $rextra  rule extra (decoded)
      */
-    public static function mergeProblemPhaseTimingFromOperations(int $ruleId, array &$details, array &$rextra): void
+    public static function mergeProblemPhaseTimingFromOperations(int $ruleId, ?array &$details, array &$rextra): void
     {
+        if ($details === null) {
+            $details = [];
+        }
+
         unset($rextra['_stop_notifications']);
 
         $ruleRow = AlertRule::query()
