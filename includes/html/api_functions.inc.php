@@ -43,6 +43,7 @@ use App\Models\PortGroup;
 use App\Models\PortSecurity;
 use App\Models\PortsFdb;
 use App\Models\PortsNac;
+use App\Models\PortVlan;
 use App\Models\Sensor;
 use App\Models\ServiceTemplate;
 use App\Models\UserPref;
@@ -1445,6 +1446,30 @@ function get_port_security(Illuminate\Http\Request $request)
         $port = PortSecurity::hasAccess(Auth::user())->get();
 
         return api_success($port, 'port');
+    }
+}
+
+function get_port_vlan_info(Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname') ?? null;
+    $port_id = $request->route('portid') ?? null;
+
+    if ($port_id) {
+        return check_port_permission($port_id, null, function ($port_id) {
+            $port = PortVlan::where('port_id', $port_id)->get()->toArray();
+
+            return api_success($port, 'ports');
+        });
+    } elseif ($hostname) {
+        $device = DeviceCache::get($hostname);
+
+        return check_device_permission($device->device_id, function () use ($device) {
+            $port = PortVlan::where('device_id', $device->device_id)->get()->toArray();
+
+            return api_success($port, 'ports');
+        });
+    } else {
+        return api_error(500, 'No port_id or hostname has been provided');
     }
 }
 
