@@ -391,8 +391,7 @@ class Port extends DeviceRelatedModel
                 [$this->qualifyColumn('disabled'), '=', 0],
             ]);
         }
-        return;
-     }
+    }
 
     /**
      * Handle a global text search across multiple port fields

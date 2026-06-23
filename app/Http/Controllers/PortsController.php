@@ -236,7 +236,7 @@ class PortsController extends Controller
                 'key' => 'active',
                 'label' => __('Active'),
                 'type' => 'boolean',
-            ]
+            ],
         ];
     }
 
