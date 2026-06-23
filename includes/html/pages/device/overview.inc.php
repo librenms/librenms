@@ -1,6 +1,5 @@
 <?php
 
-use LibreNMS\Enum\Sensor;
 use LibreNMS\Interfaces\Plugins\Hooks\DeviceOverviewHook;
 
 $overview = 1;
@@ -36,43 +35,7 @@ require 'overview/processors.inc.php';
 require 'overview/mempools.inc.php';
 require 'overview/storage.inc.php';
 require 'overview/toner.inc.php';
-// Sensor overview panels, rendered in this order. Each empty class is skipped by the generic include.
-$sensor_overview_order = [
-    Sensor::Charge,
-    Sensor::Temperature,
-    Sensor::Humidity,
-    Sensor::Fanspeed,
-    Sensor::Dbm,
-    Sensor::Voltage,
-    Sensor::Current,
-    Sensor::Runtime,
-    Sensor::Power,
-    Sensor::PowerConsumed,
-    Sensor::PowerFactor,
-    Sensor::Frequency,
-    Sensor::Load,
-    Sensor::State,
-    Sensor::Count,
-    Sensor::Percent,
-    Sensor::Signal,
-    Sensor::TvSignal,
-    Sensor::Bitrate,
-    Sensor::Airflow,
-    Sensor::Snr,
-    Sensor::Pressure,
-    Sensor::Cooling,
-    Sensor::Delay,
-    Sensor::QualityFactor,
-    Sensor::ChromaticDispersion,
-    Sensor::Ber,
-    Sensor::Eer,
-    Sensor::Waterflow,
-    Sensor::Loss,
-    Sensor::SignalLoss,
-];
-foreach ($sensor_overview_order as $sensor_class) {
-    require 'includes/html/pages/device/overview/sensor.inc.php';
-}
+require 'overview/sensor.inc.php';
 require 'overview/eventlog.inc.php';
 require 'overview/services.inc.php';
 require 'overview/syslog.inc.php';
