@@ -201,7 +201,7 @@ Route::prefix('v0')->group(function (): void {
         Route::get('port/{portid}', [App\Api\Controllers\LegacyApiController::class, 'get_port_vlan_info'])->name('get_port_vlan_info_by_port');
         Route::get('device/{hostname}', [App\Api\Controllers\LegacyApiController::class, 'get_port_vlan_info'])->name('get_port_vlan_info_by_hostname');
     });
-    
+
     // Route not found
     Route::any('/{path?}', [App\Api\Controllers\LegacyApiController::class, 'api_not_found'])->where('path', '.*');
 });
