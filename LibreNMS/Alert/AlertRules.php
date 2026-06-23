@@ -53,14 +53,14 @@ class AlertRules
 
         //Check to see if under maintenance
         if (AlertUtil::getMaintenanceStatus($device_id) === MaintenanceStatus::SkipAlerts) {
-            echo "Under Maintenance, skipping alert rules check.\r\n";
+            Log::info("Under Maintenance, skipping alert rules check.");
 
             return false;
         }
 
         //Check to see if disable alerting is set
         if (AlertUtil::hasDisableNotify($device_id)) {
-            echo "Disable alerting is set, Clearing active alerts and skipping alert rules check\r\n";
+            Log::info('Disable alerting is set, Clearing active alerts and skipping alert rules check');
             Alert::where('device_id', $device_id)
                 ->update([
                     'state' => AlertState::CLEAR,
@@ -76,7 +76,7 @@ class AlertRules
             Log::info('Rule %p#' . $rule['id'] . ' (' . $rule['name'] . '):%n ', ['color' => true]);
             $extra = json_decode((string) $rule['extra'], true);
             $invert = (bool) ($extra['invert'] ?? false);
-            d_echo(PHP_EOL);
+
             if (empty($rule['query'])) {
                 $rule['query'] = QueryBuilderParser::fromJson($rule['builder'])->toSql();
             }
@@ -90,7 +90,7 @@ class AlertRules
             try {
                 $qry = array_map(fn ($row) => (array) $row, DB::select($sql, [$device_id]));
             } catch (PDOException $e) {
-                c_echo('%RError: %n' . $e->getMessage() . PHP_EOL);
+                Log::error('%RError: %n' . $e->getMessage(), ['color' => true]);
                 Eventlog::log("Error in alert rule {$rule['name']} ({$rule['id']}): " . $e->getMessage(), $device_id, 'alert', Severity::Error);
                 continue; // skip this rule
             }
