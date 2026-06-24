@@ -64,7 +64,7 @@ if ($options['f'] === 'update') {
     }
 
     if (LibrenmsConfig::get('update_channel') == 'master') {
-        exit(1);
+        exit(2);
     } elseif (LibrenmsConfig::get('update_channel') == 'release') {
         exit(3);
     }

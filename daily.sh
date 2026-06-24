@@ -293,7 +293,7 @@ main () {
         git checkout --quiet -- composer.json composer.lock
 
         update_res=0
-        if [[ "$up" == "1" ]] || [[ "$php_ver_ret" == "1" ]]; then
+        if [[ "$up" == "2" ]] || [[ "$php_ver_ret" == "1" ]]; then
             # Update current branch to latest
             branch=$(git rev-parse --abbrev-ref HEAD)
             if [[ "$branch" == "HEAD" ]]; then
