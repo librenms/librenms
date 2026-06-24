@@ -266,7 +266,7 @@ class RunAlerts
     {
         global $rulescache;
         if (empty($rulescache[$device_id]) || ! isset($rulescache[$device_id])) {
-            foreach (AlertRules::getRulesForDevice($device_id) as $chk) {
+            foreach ((new AlertRules($device_id))->get() as $chk) {
                 $rulescache[$device_id][$chk->id] = true;
             }
         }

@@ -27,6 +27,7 @@
 use App\Facades\DeviceCache;
 use App\Models\Device;
 use Illuminate\Support\Facades\Gate;
+use LibreNMS\Alert\AlertRules;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alerting\QueryBuilderParser;
 
@@ -42,7 +43,7 @@ switch ($type) {
     case 'alerts':
         $filename = "alerts-$hostname.txt";
         $device = DeviceCache::getByHostname($hostname);
-        $rules = \LibreNMS\Alert\AlertRules::getRulesForDevice($device);
+        $rules = (new AlertRules($device))->get();
         $output = '';
         $results = [];
         foreach ($rules as $rule) {

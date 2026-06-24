@@ -58,17 +58,6 @@ readonly class AlertRules
     }
 
     /**
-     * Static helper to get rules for a device.
-     *
-     * @param  Device|int  $device
-     * @return Collection<int, AlertRule>
-     */
-    public static function getRulesForDevice(Device|int $device): Collection
-    {
-        return (new self($device))->get();
-    }
-
-    /**
      * Run all alert rules for the given device.
      *
      * @return bool
