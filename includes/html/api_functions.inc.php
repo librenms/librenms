@@ -30,6 +30,7 @@ use App\Models\Ipv6Address;
 use App\Models\Ipv6Network;
 use App\Models\Link;
 use App\Models\Location;
+use App\Models\Mempool;
 use App\Models\MplsSap;
 use App\Models\MplsService;
 use App\Models\OspfPort;
@@ -43,8 +44,10 @@ use App\Models\PortGroup;
 use App\Models\PortSecurity;
 use App\Models\PortsFdb;
 use App\Models\PortsNac;
+use App\Models\Processor;
 use App\Models\Sensor;
 use App\Models\ServiceTemplate;
+use App\Models\Storage;
 use App\Models\UserPref;
 use App\Models\Vlan;
 use App\Models\Vrf;
@@ -1046,24 +1049,27 @@ function list_available_health_graphs(Illuminate\Http\Request $request)
         $graphs = [];
 
         // processors, storage and mempools are not stored in the `sensors` table,
-        // so they need to be looked up in their own tables.
-        $health_tables = [
-            'processor' => ['table' => 'processors', 'id' => 'processor_id', 'descr' => 'processor_descr'],
-            'storage' => ['table' => 'storage', 'id' => 'storage_id', 'descr' => 'storage_descr'],
-            'mempool' => ['table' => 'mempools', 'id' => 'mempool_id', 'descr' => 'mempool_descr', 'deleted' => 'mempool_deleted'],
+        // so they need to be looked up via their own models.
+        $health_models = [
+            'processor' => ['model' => Processor::class, 'id' => 'processor_id', 'descr' => 'processor_descr'],
+            'storage' => ['model' => Storage::class, 'id' => 'storage_id', 'descr' => 'storage_descr'],
+            'mempool' => ['model' => Mempool::class, 'id' => 'mempool_id', 'descr' => 'mempool_descr', 'deleted' => 'mempool_deleted'],
         ];
 
         if (isset($type)) {
-            if (isset($health_tables[$type])) {
-                $health = $health_tables[$type];
+            if (isset($health_models[$type])) {
+                $health = $health_models[$type];
                 if (isset($sensor_id)) {
-                    $graphs = dbFetchRows("SELECT * FROM `{$health['table']}` WHERE `{$health['id']}` = ?", [$sensor_id]);
+                    $graphs = $health['model']::where($health['id'], $sensor_id)->get()->toArray();
                 } else {
-                    $where = "`device_id` = ?" . (isset($health['deleted']) ? " AND `{$health['deleted']}` = 0" : '');
-                    foreach (dbFetchRows("SELECT `{$health['id']}`, `{$health['descr']}` FROM `{$health['table']}` WHERE $where", [$device_id]) as $graph) {
+                    $query = $health['model']::where('device_id', $device_id);
+                    if (isset($health['deleted'])) {
+                        $query->where($health['deleted'], 0);
+                    }
+                    foreach ($query->get() as $graph) {
                         $graphs[] = [
-                            'sensor_id' => $graph[$health['id']],
-                            'desc' => $graph[$health['descr']],
+                            'sensor_id' => $graph->{$health['id']},
+                            'desc' => $graph->{$health['descr']},
                         ];
                     }
                 }
