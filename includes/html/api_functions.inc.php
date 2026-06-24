@@ -1045,8 +1045,29 @@ function list_available_health_graphs(Illuminate\Http\Request $request)
         $sensor_id = $request->route('sensor_id');
         $graphs = [];
 
+        // processors, storage and mempools are not stored in the `sensors` table,
+        // so they need to be looked up in their own tables.
+        $health_tables = [
+            'processor' => ['table' => 'processors', 'id' => 'processor_id', 'descr' => 'processor_descr'],
+            'storage' => ['table' => 'storage', 'id' => 'storage_id', 'descr' => 'storage_descr'],
+            'mempool' => ['table' => 'mempools', 'id' => 'mempool_id', 'descr' => 'mempool_descr', 'deleted' => 'mempool_deleted'],
+        ];
+
         if (isset($type)) {
-            if (isset($sensor_id)) {
+            if (isset($health_tables[$type])) {
+                $health = $health_tables[$type];
+                if (isset($sensor_id)) {
+                    $graphs = dbFetchRows("SELECT * FROM `{$health['table']}` WHERE `{$health['id']}` = ?", [$sensor_id]);
+                } else {
+                    $where = "`device_id` = ?" . (isset($health['deleted']) ? " AND `{$health['deleted']}` = 0" : '');
+                    foreach (dbFetchRows("SELECT `{$health['id']}`, `{$health['descr']}` FROM `{$health['table']}` WHERE $where", [$device_id]) as $graph) {
+                        $graphs[] = [
+                            'sensor_id' => $graph[$health['id']],
+                            'desc' => $graph[$health['descr']],
+                        ];
+                    }
+                }
+            } elseif (isset($sensor_id)) {
                 $graphs = dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_id` = ?', [$sensor_id]);
             } else {
                 foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', [$device_id, $type]) as $graph) {

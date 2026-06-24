@@ -250,6 +250,11 @@ Route: `/api/v0/devices/:hostname/health(/:type)(/:sensor_id)`
 - type (optional) is health type / sensor class
 - sensor_id (optional) is the sensor id to retrieve specific information.
 
+`type` may be a sensor class (e.g. `device_voltage`) or one of the special
+classes `device_processor`, `device_storage` and `device_mempool`, which are
+stored in their own tables rather than the `sensors` table. The `device_`
+prefix is optional, so `processor` and `device_processor` are equivalent.
+
 Input:
 
   -
@@ -343,6 +348,28 @@ Output:
             "entPhysicalIndex_measured": null,
             "lastupdate": "2017-01-13 13:50:26",
             "sensor_prev": "1"
+        }
+    ]
+}
+```
+
+Example (processor list):
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/health/processor
+```
+
+Output:
+
+```
+{
+    "status": "ok",
+    "message": "",
+    "count": 1,
+    "graphs": [
+        {
+            "sensor_id": "1",
+            "desc": "Processor"
         }
     ]
 }
