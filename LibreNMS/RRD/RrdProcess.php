@@ -6,6 +6,7 @@ use App\Facades\LibrenmsConfig;
 use Closure;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\RrdException;
+use LibreNMS\Exceptions\RrdExecutableNotFoundException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\Process;
@@ -75,7 +76,23 @@ class RrdProcess
         $this->runAsync($command);
 
         $this->process->waitUntil(function ($type, $buffer) use ($waitFor) {
-            if ($type === Process::ERR || str_contains($buffer, 'ERROR: ')) {
+            if ($type === Process::ERR) {
+                if (str_contains($buffer, 'rrdtool: not found')) {
+                    throw new RrdExecutableNotFoundException(trim($buffer));
+                }
+
+                if (str_contains($buffer, 'ERROR: ')) {
+                    throw RrdException::parse($buffer);
+                }
+
+                if (trim($buffer) !== '') {
+                    $this->logger->warning('RRDtool stderr: ' . trim($buffer));
+                }
+
+                return false;
+            }
+
+            if (str_contains($buffer, 'ERROR: ')) {
                 throw RrdException::parse($buffer);
             }
 
