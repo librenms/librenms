@@ -1049,11 +1049,12 @@ function list_available_health_graphs(Illuminate\Http\Request $request)
                 ->map(fn ($sensor_class) => ['desc' => ucfirst((string) $sensor_class), 'name' => 'device_' . $sensor_class])
                 ->all();
 
-            foreach ([
-                         'processors' => ['desc' => 'Processors', 'name' => 'device_processor'],
-                         'storage' => ['desc' => 'Storage', 'name' => 'device_storage'],
-                         'mempools' => ['desc' => 'Memory Pools', 'name' => 'device_mempool'],
-                     ] as $relation => $entry) {
+            $extraTypes = [
+                'processors' => ['desc' => 'Processors', 'name' => 'device_processor'],
+                'storage' => ['desc' => 'Storage', 'name' => 'device_storage'],
+                'mempools' => ['desc' => 'Memory Pools', 'name' => 'device_mempool'],
+            ];
+            foreach ($extraTypes as $relation => $entry) {
                 if ($device->{$relation}()->count() > 0) {
                     $graphs[] = $entry;
                 }
