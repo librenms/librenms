@@ -8,6 +8,7 @@ use App\Facades\LibrenmsConfig;
 use App\Jobs\PingCheck;
 use App\Models\Device;
 use Illuminate\Support\Arr;
+use LibreNMS\Util\Debug;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -25,6 +26,7 @@ class DevicePing extends LnmsCommand
         parent::__construct();
         $this->addArgument('device spec', InputArgument::REQUIRED);
         $this->addOption('groups', 'g', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED);
+        $this->addOption('scheduler', 'S', InputOption::VALUE_REQUIRED, 'The scheduler invoking this command');
     }
 
     /**
@@ -34,6 +36,16 @@ class DevicePing extends LnmsCommand
      */
     public function handle(DeviceIsPingable $deviceIsPingable): int
     {
+        $invokedScheduler = $this->option('scheduler');
+        $configuredScheduler = LibrenmsConfig::get('schedule_type.ping');
+        if ($invokedScheduler && $configuredScheduler !== 'legacy' && $invokedScheduler !== $configuredScheduler) {
+            if (Debug::isEnabled() || $this->getOutput()->isVerbose()) {
+                $this->info("Ping is not enabled for $invokedScheduler scheduling. (Configured: $configuredScheduler)");
+            }
+
+            return 0;
+        }
+
         $spec = $this->argument('device spec');
 
         if ($spec == 'fast') {

@@ -1686,7 +1686,7 @@ return [
                 'help' => 'Método de agendamento de tarefas de alerta. O modo legado usará cron se a entrada do crontab existir e o serviço de dispatcher se a opção de configuração legada service_billing_enabled estiver definida como verdadeiro.',
                 'options' => [
                     'legacy' => 'Legado (Irrestrito)',
-                    'cron' => 'Cron (alerts.php)',
+                    'cron' => 'Cron (lnms alerts:notify)',
                     'dispatcher' => 'Serviço de Dispatcher',
                 ],
             ],
@@ -1714,7 +1714,7 @@ return [
                 'options' => [
                     'legacy' => 'Legado (Irrestrito)',
                     'disabled' => 'Desativado (Pings apenas durante coleta de dados)',
-                    'cron' => 'Cron (ping.php)',
+                    'cron' => 'Cron (lnms device:ping fast)',
                     'dispatcher' => 'Serviço de Dispatcher',
                 ],
             ],

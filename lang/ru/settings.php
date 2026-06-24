@@ -1539,7 +1539,7 @@ return [
                 'help' => 'Метод планирования задач оповещения. Устаревший метод будет использовать cron, если запись crontab существует, и службу диспетчера, если устаревшая конфигурация service_billing_enabled установлена в true.',
                 'options' => [
                     'legacy' => 'Устаревший (Без ограничений)',
-                    'cron' => 'Cron (alerts.php)',
+                    'cron' => 'Cron (lnms alerts:notify)',
                     'dispatcher' => 'Служба диспетчера',
                 ],
             ],
@@ -1567,7 +1567,7 @@ return [
                 'options' => [
                     'legacy' => 'Устаревший (Без ограничений)',
                     'disabled' => 'Отключено (пинги только во время опроса)',
-                    'cron' => 'Cron (ping.php)',
+                    'cron' => 'Cron (lnms device:ping fast)',
                     'dispatcher' => 'Служба диспетчера',
                 ],
             ],

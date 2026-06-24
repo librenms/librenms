@@ -403,9 +403,9 @@ class PingQueueManager(TimedQueueManager):
                 logger.info("Running fast ping")
 
                 args = (
-                    ("device:ping", "fast", "-vv", "-g", group)
+                    ("device:ping", "fast", "--scheduler=dispatcher", "-vv", "-g", group)
                     if self.config.debug
-                    else ("device:ping", "fast", "-q", "-g", group)
+                    else ("device:ping", "fast", "--scheduler=dispatcher", "-q", "-g", group)
                 )
                 exit_code, output = LibreNMS.call_script("lnms", args)
 
@@ -495,7 +495,7 @@ class AlertQueueManager(TimedQueueManager):
         self.post_work("alerts", 0)
 
     def do_work(self, device_id, group):
-        logger.info("Checking alerts")
+        logger.info("Delivering alert notifications")
 
         output = (
             "{}/dispatch_alerts.log".format(self.config.logdir)
@@ -503,8 +503,14 @@ class AlertQueueManager(TimedQueueManager):
             else self.config.log_output
         )
 
-        args = ("-d", "-f") if self.config.debug else ("-f",)
-        exit_code, output = LibreNMS.call_script("alerts.php", args, output)
+        args_list = ["alerts:notify", "--scheduler=dispatcher"]
+        if self.config.debug:
+            args_list.append("-vv")
+        elif self.config.log_output is LibreNMS.LogOutput.NONE:
+            args_list.append("-q")
+        args = tuple(args_list)
+
+        exit_code, output = LibreNMS.call_script("lnms", args, output)
 
         if exit_code != 0:
             if exit_code == 1:
