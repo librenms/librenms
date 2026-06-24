@@ -65,7 +65,7 @@
                                     <span class="tw:flex-1">
                                         <span class="tw:block tw:text-base tw:text-gray-800 tw:dark:text-dark-white-100" x-text="formatDate(backup.date)"></span>
                                         <span class="tw:block tw:text-base tw:text-gray-500 tw:dark:text-dark-white-400"
-                                              x-show="backup.until" x-text="'{{ __('Valid until') }}' + ' ' + formatDate(backup.until)"></span>
+                                              x-show="backup.until">{{ __('Valid until') }}<span x-show="backup.until" x-text="' ' + formatDate(backup.until)"></span></span>
                                     </span>
                                     <span x-show="backup.type !== 'TEXT'"
                                           class="tw:text-xs tw:font-medium tw:rounded tw:px-1.5 tw:py-0.5 tw:bg-gray-200 tw:text-gray-700 tw:dark:bg-dark-gray-200 tw:dark:text-dark-white-300"
