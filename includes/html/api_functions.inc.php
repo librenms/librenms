@@ -1053,7 +1053,7 @@ function list_available_health_graphs(Illuminate\Http\Request $request)
         $health_models = [
             'processor' => ['model' => Processor::class, 'id' => 'processor_id', 'descr' => 'processor_descr'],
             'storage' => ['model' => Storage::class, 'id' => 'storage_id', 'descr' => 'storage_descr'],
-            'mempool' => ['model' => Mempool::class, 'id' => 'mempool_id', 'descr' => 'mempool_descr', 'deleted' => 'mempool_deleted'],
+            'mempool' => ['model' => Mempool::class, 'id' => 'mempool_id', 'descr' => 'mempool_descr'],
         ];
 
         if (isset($type)) {
@@ -1062,11 +1062,7 @@ function list_available_health_graphs(Illuminate\Http\Request $request)
                 if (isset($sensor_id)) {
                     $graphs = $health['model']::where($health['id'], $sensor_id)->get()->toArray();
                 } else {
-                    $query = $health['model']::where('device_id', $device_id);
-                    if (isset($health['deleted'])) {
-                        $query->where($health['deleted'], 0);
-                    }
-                    foreach ($query->get() as $graph) {
+                    foreach ($health['model']::where('device_id', $device_id)->get() as $graph) {
                         $graphs[] = [
                             'sensor_id' => $graph->{$health['id']},
                             'desc' => $graph->{$health['descr']},
