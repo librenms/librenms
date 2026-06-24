@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Api\V1\PingController;
 use Binaryk\LaravelRestify\Bootstrap\RoutesBoot;
 use Binaryk\LaravelRestify\Restify;
 use Binaryk\LaravelRestify\RestifyApplicationServiceProvider;
@@ -18,10 +19,15 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
 
     protected function routes(): void
     {
-        // v1 custom endpoints that are not Restify repositories. The health
-        // endpoint is intentionally public (no auth middleware).
+        // v1 custom endpoints that are not Restify repositories.
         Route::prefix('api/v1')->group(function (): void {
-            Route::get('health', HealthController::class)->name('v1.health');
+            // Public, unauthenticated liveness probe.
+            Route::get('ping', PingController::class)->name('v1.ping');
+
+            // Health check requires authentication (exposes subsystem status).
+            Route::get('health', HealthController::class)
+                ->middleware('auth:sanctum')
+                ->name('v1.health');
         });
 
         parent::routes();
