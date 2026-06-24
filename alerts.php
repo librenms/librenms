@@ -37,7 +37,7 @@ c_echo('%RWarning: alerts.php is deprecated!%n Use %9lnms alerts:notify%n instea
 
 $arguments = [];
 
-if (!isset($options['f'])) {
+if (! isset($options['f'])) {
     $arguments['--scheduler'] = 'cron';
 }
 
