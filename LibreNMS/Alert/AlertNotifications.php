@@ -235,12 +235,12 @@ class AlertNotifications
     public function clearStaleAlerts(): void
     {
         Alert::where('state', '!=', AlertState::CLEAR)
-            ->where(function ($query) {
+            ->where(function ($query): void {
                 $query->whereDoesntHave('device')
                     ->orWhereDoesntHave('rule');
             })
             ->get()
-            ->each(function (Alert $alert) {
+            ->each(function (Alert $alert): void {
                 echo "Stale-alert: #{$alert->id}" . PHP_EOL;
                 $alert->delete();
             });
@@ -312,7 +312,7 @@ class AlertNotifications
     public function runAcks(): void
     {
         $this->loadAlerts('alerts.state = ' . AlertState::ACKNOWLEDGED . ' && alerts.open = ' . AlertState::ACTIVE)
-            ->each(function (Alert $alert) {
+            ->each(function (Alert $alert): void {
                 $rextra = $alert->rule->extra;
                 if ($rextra['acknowledgement'] ?? true) {
                     $this->issueAlert($alert);
@@ -329,7 +329,7 @@ class AlertNotifications
     public function runFollowUp(): void
     {
         $this->loadAlerts('alerts.state > ' . AlertState::CLEAR . ' && alerts.open = 0')
-            ->each(function (Alert $alert) {
+            ->each(function (Alert $alert): void {
                 $this->processFollowUp($alert);
             });
     }
@@ -518,7 +518,7 @@ class AlertNotifications
     public function runAlerts(): void
     {
         $this->loadAlerts('alerts.state != ' . AlertState::ACKNOWLEDGED . ' && alerts.open = 1')
-            ->each(function (Alert $alert) {
+            ->each(function (Alert $alert): void {
                 $this->processAlert($alert);
             });
     }
