@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AlertNotificationsTest.php
  *

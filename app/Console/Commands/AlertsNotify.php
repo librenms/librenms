@@ -49,15 +49,15 @@ class AlertsNotify extends LnmsCommand
         $alerts_lock = Cache::lock('alerts', LibrenmsConfig::get('service_alerting_frequency'));
         if ($alerts_lock->get()) {
             $alerts = new AlertNotifications();
-            if (!LibrenmsConfig::get('alert.disable')) {
+            if (! LibrenmsConfig::get('alert.disable')) {
                 $this->line('Start: ' . date('r'));
                 $this->line('ClearStaleAlerts():');
                 $alerts->clearStaleAlerts();
-                $this->line("RunFollowUp():");
+                $this->line('RunFollowUp():');
                 $alerts->runFollowUp();
-                $this->line("AlertNotifications():");
+                $this->line('AlertNotifications():');
                 $alerts->runAlerts();
-                $this->line("RunAcks():");
+                $this->line('RunAcks():');
                 $alerts->runAcks();
                 $this->line('End  : ' . date('r'));
             }
