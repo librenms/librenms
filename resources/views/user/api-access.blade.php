@@ -100,6 +100,7 @@
             <i class="fas fa-exclamation-triangle tw:mr-2"></i>
             <strong>{{ __('Beta') }}:</strong>
             {{ __('The v1 API is in beta. Endpoints and behaviour may change without notice.') }}
+            <a href="https://docs.librenms.org/API/v1/" target="_blank" rel="noopener">{{ __('Documentation') }}</a>.
         </div>
 
         <div id="v1-token-plain-alert" class="alert alert-warning hidden">

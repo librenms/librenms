@@ -245,6 +245,7 @@ nav:
 
   - API:
     - Using the API: API/index.md
+    - API v1 (Beta): API/v1.md
     - Endpoints:
       - Alerts: API/Alerts.md
       - ARP: API/ARP.md
