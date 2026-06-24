@@ -28,7 +28,7 @@
  * @author: Heath Barnhart <hbarnhart@kanren.net>
  */
 
-use LibreNMS\Alert\RunAlerts;
+use LibreNMS\Alert\AlertNotifications;
 use LibreNMS\Util\Debug;
 
 $init_modules = ['alerts', 'laravel'];
@@ -50,14 +50,14 @@ if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
 
 $alerts_lock = Cache::lock('alerts', \App\Facades\LibrenmsConfig::get('service_alerting_frequency'));
 if ($alerts_lock->get()) {
-    $alerts = new RunAlerts();
+    $alerts = new AlertNotifications();
     if (! defined('TEST') && \App\Facades\LibrenmsConfig::get('alert.disable') != 'true') {
         echo 'Start: ' . date('r') . "\r\n";
         echo 'ClearStaleAlerts():' . PHP_EOL;
         $alerts->clearStaleAlerts();
         echo "RunFollowUp():\r\n";
         $alerts->runFollowUp();
-        echo "RunAlerts():\r\n";
+        echo "AlertNotifications():\r\n";
         $alerts->runAlerts();
         echo "RunAcks():\r\n";
         $alerts->runAcks();
