@@ -55,6 +55,7 @@ class Alert extends Model
     {
         return [
             'info' => 'array',
+            'timestamp' => 'datetime',
         ];
     }
 

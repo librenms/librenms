@@ -35,6 +35,7 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\AlertLog;
+use App\Models\AlertRule;
 use App\Models\AlertTransport;
 use App\Models\ApplicationMetric;
 use App\Models\Eventlog;
@@ -266,7 +267,7 @@ class RunAlerts
     {
         global $rulescache;
         if (empty($rulescache[$device_id]) || ! isset($rulescache[$device_id])) {
-            foreach ((new AlertRules($device_id))->get() as $chk) {
+            foreach (AlertRule::enabled()->forDevice(DeviceCache::get($device_id))->get() as $chk) {
                 $rulescache[$device_id][$chk->id] = true;
             }
         }

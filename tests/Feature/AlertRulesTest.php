@@ -406,4 +406,65 @@ class AlertRulesTest extends TestCase
             'rule_id' => $otherRule->id,
         ]);
     }
+
+    public function testRunRulesHandlesWorseStateAsNoChange(): void
+    {
+        $this->runActiveStateTest(AlertState::WORSE);
+    }
+
+    public function testRunRulesHandlesBetterStateAsNoChange(): void
+    {
+        $this->runActiveStateTest(AlertState::BETTER);
+    }
+
+    public function testRunRulesHandlesChangedStateAsNoChange(): void
+    {
+        $this->runActiveStateTest(AlertState::CHANGED);
+    }
+
+    private function runActiveStateTest(int $state): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        $initialTimestamp = \Carbon\Carbon::now()->subHour();
+
+        // Pre-existing alert in given state
+        $alert = Alert::create([
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => $state,
+            'open' => 1,
+            'alerted' => 1,
+            'info' => [],
+            'timestamp' => $initialTimestamp,
+        ]);
+
+        AlertLog::create([
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => $state,
+            'details' => ['old' => 'data'],
+        ]);
+
+        $alertRules = new AlertRules($device);
+        $alertRules->run();
+
+        // State should still be the same, not reset to ACTIVE
+        $alert->refresh();
+        $this->assertEquals($state, $alert->state, "Alert state was reset from $state to ACTIVE");
+
+        // Timestamp should NOT have changed
+        $this->assertEquals($initialTimestamp->toDateTimeString(), $alert->timestamp->toDateTimeString(), 'Alert timestamp was reset');
+
+        // AlertLog should have been updated but state remains same
+        $updatedLog = AlertLog::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->latest('id')
+            ->first();
+        $this->assertEquals($state, $updatedLog->state->value, "Latest AlertLog state was changed from $state");
+        $this->assertArrayHasKey('contacts', $updatedLog->details);
+    }
 }
