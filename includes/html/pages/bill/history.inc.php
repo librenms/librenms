@@ -82,13 +82,11 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
 
         if ($type == 'CDR') {
             $allowed = Number::formatSi($history['bill_allowed'], 2, 0, 'bps');
-            $used = Number::formatSi($history['rate_95th'], 2, 0, 'bps');
             $in = Number::formatSi($history['rate_95th_in'], 2, 0, 'bps');
             $out = Number::formatSi($history['rate_95th_out'], 2, 0, 'bps');
             $overuse = (($history['bill_overuse'] <= 0) ? '-' : '<span style="color: #' . $background['left'] . '; font-weight: bold;">' . Number::formatSi($history['bill_overuse'], 2, 0, 'bps') . '</span>');
         } elseif ($type == 'Quota') {
             $allowed = Number::formatBase($history['bill_allowed'], \App\Facades\LibrenmsConfig::get('billing.base'), 2, 0, '');
-            $used = Number::formatBase($history['total_data'], \App\Facades\LibrenmsConfig::get('billing.base'), 2, 0, '');
             $in = Number::formatBase($history['traf_in'], \App\Facades\LibrenmsConfig::get('billing.base'), 2, 0, '');
             $out = Number::formatBase($history['traf_out'], \App\Facades\LibrenmsConfig::get('billing.base'), 2, 0, '');
             $overuse = (($history['bill_overuse'] <= 0) ? '-' : '<span style="color: #' . $background['left'] . '; font-weight: bold;">' . Number::formatBase($history['bill_overuse'], \App\Facades\LibrenmsConfig::get('billing.base')) . '</span>');

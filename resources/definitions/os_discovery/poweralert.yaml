@@ -30,9 +30,12 @@ modules:
                   group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "Circuit {{ $subindex1 }}"
 
-                - oid: "TRIPPLITE-PRODUCTS::tlpAtsOutputCurrent"
-                  num_oid: ".1.3.6.1.4.1.850.1.1.3.4.3.2.1.1.5.1.{{ $index }}"
-                  descr: "Current"
+                - oid: "TRIPPLITE-PRODUCTS::tlpAtsOutputTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpAtsOutputCurrent"
+                  num_oid: ".1.3.6.1.4.1.850.1.1.3.4.3.2.1.1.5.{{ $index }}"
+                  index: "tlpAtsOutputCurrent.{{ $index }}"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
+                  descr: "Output Current"
                   divisor: 100
                 - oid: "TRIPPLITE-PRODUCTS::tlpPduOutputCurrent"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.2.1.1.5.{{ $index }}"
@@ -90,6 +93,20 @@ modules:
                   index: "tlpUpsOutputFrequency.{{ $index }}"
                   descr: "Output"
                   divisor: 10
+                - oid: "TRIPPLITE-PRODUCTS::tlpAtsInputPhaseTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpAtsInputPhaseFrequency"
+                  num_oid: ".1.3.6.1.4.1.850.1.1.3.4.3.1.2.1.4.{{ $index }}"
+                  index: "tlpAtsInputPhaseFrequency.{{ $index }}"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
+                  descr: "Input Src {{ $subindex1 }}"
+                  divisor: 10
+                - oid: "TRIPPLITE-PRODUCTS::tlpAtsOutputTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpAtsOutputFrequency"
+                  num_oid: ".1.3.6.1.4.1.850.1.1.3.4.3.2.1.1.11.{{ $index }}"
+                  index: "tlpAtsOutputFrequency.{{ $index }}"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
+                  descr: "Output"
+                  divisor: 10
         humidity:
             data:
                 - oid: "TRIPPLITE-PRODUCTS::tlpEnvHumidityHumidity"
@@ -133,6 +150,12 @@ modules:
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.3.2.1.4.{{ $index }}"
                   index: "tlpUpsOutputLineIndex.{{ $index }}"
                   descr: "Output"
+                - oid: "TRIPPLITE-PRODUCTS::tlpAtsOutputTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpAtsOutputActivePower"
+                  num_oid: ".1.3.6.1.4.1.850.1.1.3.4.3.2.1.1.8.{{ $index }}"
+                  index: "tlpAtsOutputActivePower.{{ $index }}"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
+                  descr: "Output Active"
         state:
             data:
                 - oid: "TRIPPLITE-PRODUCTS::tlpEnvDetail"
@@ -271,11 +294,20 @@ modules:
                   value: "TRIPPLITE-PRODUCTS::tlpAtsInputPhaseVoltage"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.4.3.1.2.1.5.{{ $index }}"
                   group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
-                  descr: "Input"
+                  descr: "Input Src {{ $subindex1 }}"
                   index: "tlpAtsInputLineIndex.{{ $index }}"
                   divisor: 10
                   low_limit: "TRIPPLITE-PRODUCTS::tlpAtsInputPhaseVoltageMin"
                   high_limit: "TRIPPLITE-PRODUCTS::tlpAtsInputPhaseVoltageMax"
+                - oid: "TRIPPLITE-PRODUCTS::tlpAtsOutputTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpAtsOutputVoltage"
+                  num_oid: ".1.3.6.1.4.1.850.1.1.3.4.3.2.1.1.4.{{ $index }}"
+                  index: "tlpAtsOutputVoltage.{{ $index }}"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
+                  descr: "Output"
+                  divisor: 10
+                  low_limit: 110
+                  high_limit: 240
                 - oid: "TRIPPLITE-PRODUCTS::tlpPduInputPhaseTable"
                   value: "TRIPPLITE-PRODUCTS::tlpPduInputPhaseVoltage"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.1.2.1.4.{{ $index }}"
@@ -283,14 +315,6 @@ modules:
                   descr: "Input (Phase {{ $subindex0 }})"
                   index: "tlpPduInputPhaseIndex.{{ $index }}"
                   divisor: 10
-                  low_limit: 110
-                  high_limit: 240
-                - oid: "TRIPPLITE-PRODUCTS::tlpAtsInputPhaseVoltage"
-                  num_oid: ".1.3.6.1.4.1.850.1.1.3.4.3.1.2.1.5.1.1.{{ $index }}"
-                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
-                  descr: "Input"
-                  divisor: 10
-                  multiplier: 1
                   low_limit: 110
                   high_limit: 240
                 - oid: "TRIPPLITE-PRODUCTS::tlpPduOutputVoltage"
