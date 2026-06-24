@@ -403,9 +403,12 @@ class PingQueueManager(TimedQueueManager):
                 logger.info("Running fast ping")
 
                 args = (
-                    ("device:ping", "fast", "--scheduler=dispatcher", "-vv", "-g", group)
-                    if self.config.debug
-                    else ("device:ping", "fast", "--scheduler=dispatcher", "-q", "-g", group)
+                    "device:ping",
+                    "fast",
+                    "--scheduler=dispatcher",
+                    "-vv" if self.config.debug else "-q",
+                    "-g",
+                    group,
                 )
                 exit_code, output = LibreNMS.call_script("lnms", args)
 

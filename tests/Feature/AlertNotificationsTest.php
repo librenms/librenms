@@ -118,7 +118,7 @@ class AlertNotificationsTest extends TestCase
         $alerts->runAlerts();
         $output = ob_get_clean();
 
-        if (strpos($output, 'Muted') !== false) {
+        if (str_contains($output, 'Muted')) {
             echo "\nDEBUG OUTPUT:\n" . $output . "\n";
             $loaded = $alerts->loadAlerts('alerts.id = ' . $alert->id);
             var_dump($loaded);
