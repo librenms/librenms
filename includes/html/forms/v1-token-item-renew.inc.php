@@ -13,8 +13,8 @@ if (! is_numeric($tokenId)) {
     exit(json_encode(['status' => 'error', 'message' => 'ERROR: Invalid token']));
 }
 
-if (! is_numeric($extendDays) || (int) $extendDays < 1) {
-    exit(json_encode(['status' => 'error', 'message' => 'ERROR: Days must be a positive number']));
+if (! is_numeric($extendDays) || (int) $extendDays < 0) {
+    exit(json_encode(['status' => 'error', 'message' => 'ERROR: Days must be a positive number, or 0 for no expiration']));
 }
 
 $token = \Laravel\Sanctum\PersonalAccessToken::where('id', $tokenId)
@@ -26,11 +26,12 @@ if (! $token) {
     exit(json_encode(['status' => 'error', 'message' => 'ERROR: Token not found']));
 }
 
-$token->expires_at = now()->addDays((int) $extendDays);
+// 0 days means the token never expires
+$token->expires_at = (int) $extendDays === 0 ? null : now()->addDays((int) $extendDays);
 $token->save();
 
 echo json_encode([
     'status' => 'ok',
     'message' => 'Token expiration updated successfully.',
-    'expires_at' => $token->expires_at->diffForHumans(),
+    'expires_at' => $token->expires_at ? $token->expires_at->diffForHumans() : 'never',
 ]);

@@ -244,7 +244,8 @@
                     <div class="form-group">
                         <label for="v1-token-extend" class="col-sm-4 control-label">{{ __('Extend by (days)') }}</label>
                         <div class="col-sm-8">
-                            <input type="number" class="form-control" id="v1-token-extend" name="extend_days" min="1" value="30" required>
+                            <input type="number" class="form-control" id="v1-token-extend" name="extend_days" min="0" value="30" required>
+                            <p class="help-block">{{ __('Enter 0 for no expiration.') }}</p>
                         </div>
                     </div>
                 </div>
