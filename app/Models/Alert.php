@@ -44,6 +44,8 @@ class Alert extends Model
         'open',
         'alerted',
         'info',
+        'timestamp',
+        'note',
     ];
 
     /**
