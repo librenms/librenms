@@ -257,4 +257,153 @@ class AlertRulesTest extends TestCase
             'severity' => Severity::Error,
         ]);
     }
+
+    public function testRulesFiltering(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $otherDevice = Device::factory()->create(['status' => 0]);
+
+        // 1. Rule mapped to this device - should trigger
+        $ruleMapped = AlertRule::factory()->create([
+            'name' => 'Mapped Rule',
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+        $ruleMapped->devices()->attach($device->device_id);
+
+        // 2. Rule mapped to OTHER device - should NOT trigger
+        $ruleOtherMapped = AlertRule::factory()->create([
+            'name' => 'Other Mapped Rule',
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+        $ruleOtherMapped->devices()->attach($otherDevice->device_id);
+
+        // 3. Global rule - should trigger
+        $ruleGlobal = AlertRule::factory()->create([
+            'name' => 'Global Rule',
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        $alertRules = new AlertRules($device);
+        $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $ruleMapped->id,
+            'state' => AlertState::ACTIVE,
+        ]);
+
+        $this->assertDatabaseMissing('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $ruleOtherMapped->id,
+        ]);
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $ruleGlobal->id,
+            'state' => AlertState::ACTIVE,
+        ]);
+    }
+
+    public function testRulesFilteringInverted(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+
+        // 1. Rule mapped to this device, BUT inverted - should NOT trigger
+        $ruleInvertedMapped = AlertRule::factory()->create([
+            'name' => 'Inverted Mapped Rule',
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+            'invert_map' => 1,
+        ]);
+        $ruleInvertedMapped->devices()->attach($device->device_id);
+
+        // 2. Rule mapped to OTHER device, inverted - should trigger
+        $otherDevice = Device::factory()->create();
+        $ruleInvertedOtherMapped = AlertRule::factory()->create([
+            'name' => 'Inverted Other Mapped Rule',
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+            'invert_map' => 1,
+        ]);
+        $ruleInvertedOtherMapped->devices()->attach($otherDevice->device_id);
+
+        $alertRules = new AlertRules($device);
+        $alertRules->run();
+
+        $this->assertDatabaseMissing('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $ruleInvertedMapped->id,
+        ]);
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $ruleInvertedOtherMapped->id,
+            'state' => AlertState::ACTIVE,
+        ]);
+    }
+
+    public function testRulesFilteringGroups(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $group = \App\Models\DeviceGroup::factory()->create();
+        $group->devices()->attach($device->device_id);
+
+        $rule = AlertRule::factory()->create([
+            'name' => 'Group Rule',
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+        $rule->groups()->attach($group->id);
+
+        $otherGroup = \App\Models\DeviceGroup::factory()->create();
+        $otherRule = AlertRule::factory()->create([
+            'name' => 'Other Group Rule',
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+        $otherRule->groups()->attach($otherGroup->id);
+
+        $alertRules = new AlertRules($device);
+        $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+        ]);
+
+        $this->assertDatabaseMissing('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $otherRule->id,
+        ]);
+    }
+
+    public function testRulesFilteringLocations(): void
+    {
+        $location = \App\Models\Location::factory()->create();
+        $device = Device::factory()->create(['status' => 0, 'location_id' => $location->id]);
+
+        $rule = AlertRule::factory()->create([
+            'name' => 'Location Rule',
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+        $rule->locations()->attach($location->id);
+
+        $otherLocation = \App\Models\Location::factory()->create();
+        $otherRule = AlertRule::factory()->create([
+            'name' => 'Other Location Rule',
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+        $otherRule->locations()->attach($otherLocation->id);
+
+        $alertRules = new AlertRules($device);
+        $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+        ]);
+
+        $this->assertDatabaseMissing('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $otherRule->id,
+        ]);
+    }
 }

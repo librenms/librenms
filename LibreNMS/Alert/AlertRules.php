@@ -34,9 +34,11 @@ namespace LibreNMS\Alert;
 
 use App\Facades\DeviceCache;
 use App\Models\Alert;
+use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\Eventlog;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Alerting\QueryBuilderParser;
@@ -51,9 +53,19 @@ readonly class AlertRules
 
     public function __construct(
         Device|int $device
-    )
-    {
+    ) {
         $this->device = is_int($device) ? DeviceCache::get($device) : $device;
+    }
+
+    /**
+     * Static helper to get rules for a device.
+     *
+     * @param  Device|int  $device
+     * @return Collection<int, AlertRule>
+     */
+    public static function getRulesForDevice(Device|int $device): Collection
+    {
+        return (new self($device))->get();
     }
 
     /**
@@ -81,36 +93,65 @@ readonly class AlertRules
             return false;
         }
 
-        foreach (AlertUtil::getRules($this->device->device_id) as $rule_data) {
-            $this->processRule($rule_data);
+        foreach ($this->get() as $rule) {
+            $this->processRule($rule);
         }
 
         return true;
     }
 
     /**
+     * Get all alert rules that apply to this device.
+     *
+     * @return Collection<int, AlertRule>
+     */
+    public function get(): Collection
+    {
+        return AlertRule::enabled()
+            ->where(function ($query) {
+                $query->where(function ($query) {
+                    $query->whereDoesntHave('devices')
+                        ->whereDoesntHave('groups')
+                        ->whereDoesntHave('locations');
+                })->orWhere(function ($query) {
+                    $query->where('invert_map', 0)
+                        ->where(function ($query) {
+                            $query->whereHas('devices', fn ($q) => $q->where('devices.device_id', $this->device->device_id))
+                                ->orWhereHas('groups', fn ($q) => $q->whereHas('devices', fn ($dq) => $dq->where('devices.device_id', $this->device->device_id)))
+                                ->orWhereHas('locations', fn ($q) => $q->where('locations.id', $this->device->location_id));
+                        });
+                })->orWhere(function ($query) {
+                    $query->where('invert_map', 1)
+                        ->whereDoesntHave('devices', fn ($q) => $q->where('devices.device_id', $this->device->device_id))
+                        ->whereDoesntHave('groups', fn ($q) => $q->whereHas('devices', fn ($dq) => $dq->where('devices.device_id', $this->device->device_id)))
+                        ->whereDoesntHave('locations', fn ($q) => $q->where('locations.id', $this->device->location_id));
+                });
+            })
+            ->get();
+    }
+
+    /**
      * Process a single alert rule for a device.
      *
-     * @param array $rule
+     * @param  AlertRule  $rule
      */
-    private function processRule(array $rule): void
+    private function processRule(AlertRule $rule): void
     {
-        Log::info('Rule %p#' . $rule['id'] . ' (' . $rule['name'] . '):%n ', ['color' => true]);
+        Log::info('Rule %p#' . $rule->id . ' (' . $rule->name . '):%n ', ['color' => true]);
 
-        $extra = json_decode((string) ($rule['extra'] ?? ''), true);
-        $invert = (bool) ($extra['invert'] ?? false);
+        $invert = (bool) ($rule->extra['invert'] ?? false);
 
-        $sql = $rule['query'] ?: QueryBuilderParser::fromJson($rule['builder'])->toSql();
+        $sql = $rule->query ?: QueryBuilderParser::fromJson($rule->builder)->toSql();
 
         if (empty($sql)) {
             return;
         }
 
         try {
-            $rows = array_map(fn($row) => (array) $row, DB::select($sql, [$this->device->device_id]));
+            $rows = array_map(fn ($row) => (array) $row, DB::select($sql, [$this->device->device_id]));
         } catch (PDOException $e) {
             Log::error('%RError: %n' . $e->getMessage(), ['color' => true]);
-            Eventlog::log("Error in alert rule {$rule['name']} ({$rule['id']}): " . $e->getMessage(), $this->device, 'alert', Severity::Error);
+            Eventlog::log("Error in alert rule {$rule->name} ({$rule->id}): " . $e->getMessage(), $this->device, 'alert', Severity::Error);
 
             return;
         }
@@ -124,14 +165,14 @@ readonly class AlertRules
         $do_alert = ! empty($rows) !== $invert;
 
         $alert = $this->device->alerts()
-            ->where('rule_id', $rule['id'])
+            ->where('rule_id', $rule->id)
             ->latest('id')
             ->first();
 
         if ($do_alert) {
-            $this->handleAlertTrigger($rule['id'], $rows, $alert);
+            $this->handleAlertTrigger($rule->id, $rows, $alert);
         } else {
-            $this->handleAlertRecovery($rule['id'], $alert);
+            $this->handleAlertRecovery($rule->id, $alert);
         }
     }
 

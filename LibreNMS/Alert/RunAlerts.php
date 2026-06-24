@@ -34,7 +34,6 @@ namespace LibreNMS\Alert;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
-use App\Models\Alert;
 use App\Models\AlertLog;
 use App\Models\AlertTransport;
 use App\Models\ApplicationMetric;
@@ -267,8 +266,8 @@ class RunAlerts
     {
         global $rulescache;
         if (empty($rulescache[$device_id]) || ! isset($rulescache[$device_id])) {
-            foreach (AlertUtil::getRules($device_id) as $chk) {
-                $rulescache[$device_id][$chk['id']] = true;
+            foreach (AlertRules::getRulesForDevice($device_id) as $chk) {
+                $rulescache[$device_id][$chk->id] = true;
             }
         }
 
@@ -604,7 +603,7 @@ class RunAlerts
                 $noacc = false;
             }
 
-            $maintenance_status = AlertUtil::getMaintenanceStatus($alert['device_id']);
+            $maintenance_status = DeviceCache::get($alert['device_id'])->getMaintenanceStatus();
             // Do not send alert notifications for these types of scheduled maintenance
             if ($maintenance_status == MaintenanceStatus::MuteAlerts) {
                 $noiss = true;
