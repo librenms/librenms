@@ -30,6 +30,7 @@ use App\Models\Ipv6Address;
 use App\Models\Ipv6Network;
 use App\Models\Link;
 use App\Models\Location;
+use App\Models\Mempool;
 use App\Models\MplsSap;
 use App\Models\MplsService;
 use App\Models\OspfPort;
@@ -43,8 +44,10 @@ use App\Models\PortGroup;
 use App\Models\PortSecurity;
 use App\Models\PortsFdb;
 use App\Models\PortsNac;
+use App\Models\Processor;
 use App\Models\Sensor;
 use App\Models\ServiceTemplate;
+use App\Models\Storage;
 use App\Models\UserPref;
 use App\Models\Vlan;
 use App\Models\Vrf;
@@ -1045,8 +1048,28 @@ function list_available_health_graphs(Illuminate\Http\Request $request)
         $sensor_id = $request->route('sensor_id');
         $graphs = [];
 
+        // processors, storage and mempools are not stored in the `sensors` table,
+        // so they need to be looked up via their own models.
+        $health_models = [
+            'processor' => ['model' => Processor::class, 'id' => 'processor_id', 'descr' => 'processor_descr'],
+            'storage' => ['model' => Storage::class, 'id' => 'storage_id', 'descr' => 'storage_descr'],
+            'mempool' => ['model' => Mempool::class, 'id' => 'mempool_id', 'descr' => 'mempool_descr'],
+        ];
+
         if (isset($type)) {
-            if (isset($sensor_id)) {
+            if (isset($health_models[$type])) {
+                $health = $health_models[$type];
+                if (isset($sensor_id)) {
+                    $graphs = $health['model']::where($health['id'], $sensor_id)->get()->toArray();
+                } else {
+                    foreach ($health['model']::where('device_id', $device_id)->get() as $graph) {
+                        $graphs[] = [
+                            'sensor_id' => $graph->{$health['id']},
+                            'desc' => $graph->{$health['descr']},
+                        ];
+                    }
+                }
+            } elseif (isset($sensor_id)) {
                 $graphs = dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_id` = ?', [$sensor_id]);
             } else {
                 foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', [$device_id, $type]) as $graph) {
