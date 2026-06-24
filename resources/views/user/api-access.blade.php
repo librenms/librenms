@@ -390,10 +390,15 @@
       $('#remove_token_form').attr('action', baseUrl + '/' + token_id);
     });
 
-    var v1FormUrl = "{{ url('ajax_form.php') }}";
-
-    function v1Post(type, data) {
-      return $.post(v1FormUrl, $.extend({ type: type }, data), null, 'json');
+    function v1FailMessage(xhr, fallback) {
+      var j = xhr.responseJSON;
+      if (j && j.errors) {
+        return Object.values(j.errors)[0][0];
+      }
+      if (j && j.message) {
+        return j.message;
+      }
+      return fallback;
     }
 
     function v1ToastError(msg) {
@@ -411,12 +416,16 @@
     $('#v1-create-token-form').on('submit', function (e) {
       e.preventDefault();
       var $form = $(this);
-      v1Post('v1-token-item-create', {
-        token_name: $form.find('[name=token_name]').val(),
-        expires_in: $form.find('[name=expires_in]').val()
+      $.ajax({
+        type: 'POST',
+        url: baseUrl + '/v1',
+        contentType: 'application/json',
+        data: JSON.stringify({
+          token_name: $form.find('[name=token_name]').val(),
+          expires_in: $form.find('[name=expires_in]').val()
+        }),
+        dataType: 'json'
       }).done(function (data) {
-        if (data.status !== 'ok') { v1ToastError(data.message || 'Error'); return; }
-
         $('#v1-tokens-empty').remove();
         $('#v1-tokens-table tbody').append(
           '<tr id="v1-token-row-' + data.token_id + '">' +
@@ -433,8 +442,8 @@
         $('#v1-token-plain-alert').removeClass('hidden');
         $('#v1-create-token').modal('hide');
         $form[0].reset();
-      }).fail(function () {
-        v1ToastError(@json(__('Could not create token.')));
+      }).fail(function (xhr) {
+        v1ToastError(v1FailMessage(xhr, @json(__('Could not create token.'))));
       });
     });
 
@@ -446,15 +455,19 @@
       e.preventDefault();
       var $form = $(this);
       var tokenId = $form.find('[name=v1_token_id]').val();
-      v1Post('v1-token-item-renew', {
-        v1_token_id: tokenId,
-        extend_days: $form.find('[name=extend_days]').val()
+      $.ajax({
+        type: 'PATCH',
+        url: baseUrl + '/v1/' + tokenId + '/renew',
+        contentType: 'application/json',
+        data: JSON.stringify({
+          extend_days: $form.find('[name=extend_days]').val()
+        }),
+        dataType: 'json'
       }).done(function (data) {
-        if (data.status !== 'ok') { v1ToastError(data.message || 'Error'); return; }
         $('#v1-token-row-' + tokenId).find('.v1-token-expires').text(data.expires_at);
         $('#v1-renew-token').modal('hide');
-      }).fail(function () {
-        v1ToastError(@json(__('Could not renew token.')));
+      }).fail(function (xhr) {
+        v1ToastError(v1FailMessage(xhr, @json(__('Could not renew token.'))));
       });
     });
 
@@ -466,18 +479,18 @@
       e.preventDefault();
       var $form = $(this);
       var tokenId = $form.find('[name=v1_token_id]').val();
-      v1Post('v1-token-item-remove', {
-        v1_token_id: tokenId,
-        confirm: 'yes'
-      }).done(function (data) {
-        if (data.status !== 'ok') { v1ToastError(data.message || 'Error'); return; }
+      $.ajax({
+        type: 'DELETE',
+        url: baseUrl + '/v1/' + tokenId,
+        dataType: 'json'
+      }).done(function () {
         $('#v1-token-row-' + tokenId).remove();
         if ($('#v1-tokens-table tbody tr').length === 0) {
           $('#v1-tokens-table tbody').append('<tr id="v1-tokens-empty"><td colspan="6">' + @json(__('No v1 API tokens yet.')) + '</td></tr>');
         }
         $('#v1-confirm-delete').modal('hide');
-      }).fail(function () {
-        v1ToastError(@json(__('Could not delete token.')));
+      }).fail(function (xhr) {
+        v1ToastError(v1FailMessage(xhr, @json(__('Could not delete token.'))));
       });
     });
   })();
