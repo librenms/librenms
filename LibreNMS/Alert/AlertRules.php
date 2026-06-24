@@ -114,22 +114,12 @@ readonly class AlertRules
             return;
         }
 
-        $rows = array_map(function ($row) {
-            $row = (array) $row;
-            if (isset($row['ip'])) {
-                $row['ip'] = inet6_ntop($row['ip']);
-            }
-
-            return $row;
-        }, $rows);
-
-        $do_alert = ! empty($rows) !== $invert;
-
         $alert = $this->device->alerts()
             ->where('rule_id', $rule->id)
             ->latest('id')
             ->first();
 
+        $do_alert = ! empty($rows) !== $invert;
         if ($do_alert) {
             $this->handleAlertTrigger($rule, $rows, $alert);
         } else {
@@ -153,6 +143,16 @@ readonly class AlertRules
 
             return;
         }
+
+        // Cast to array rows and make sure ip is a string
+        $rows = array_map(function ($row) {
+            $row = (array) $row;
+            if (isset($row['ip'])) {
+                $row['ip'] = inet6_ntop($row['ip']);
+            }
+
+            return $row;
+        }, $rows);
 
         if (in_array($current_state, [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED], true)) {
             Log::info('Status: %bNOCHG%n', ['color' => true]);
