@@ -94,7 +94,13 @@
 
         <hr>
 
-        <legend>{{ __('API v1 tokens') }}</legend>
+        <legend>{{ __('API v1 tokens') }} <span class="label label-info">{{ __('Beta') }}</span></legend>
+
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle tw:mr-2"></i>
+            <strong>{{ __('Beta') }}:</strong>
+            {{ __('The v1 API is in beta. Endpoints and behaviour may change without notice.') }}
+        </div>
 
         <div id="v1-token-plain-alert" class="alert alert-warning hidden">
             <p><strong>{{ __('Copy this v1 token now; it will not be shown again.') }}</strong></p>
@@ -206,7 +212,7 @@
             <form id="v1-create-token-form" class="form-horizontal">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h5 class="modal-title" id="v1-create-title">{{ __('Create v1 API token') }}</h5>
+                    <h5 class="modal-title" id="v1-create-title">{{ __('Create v1 API token') }} <span class="label label-info">{{ __('Beta') }}</span></h5>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
@@ -238,7 +244,7 @@
                 <input type="hidden" name="v1_token_id" value="">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h5 class="modal-title">{{ __('Renew v1 API token') }}</h5>
+                    <h5 class="modal-title">{{ __('Renew v1 API token') }} <span class="label label-info">{{ __('Beta') }}</span></h5>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
@@ -266,7 +272,7 @@
                 <input type="hidden" name="confirm" value="yes">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h5 class="modal-title">{{ __('Confirm delete') }}</h5>
+                    <h5 class="modal-title">{{ __('Confirm delete') }} <span class="label label-info">{{ __('Beta') }}</span></h5>
                 </div>
                 <div class="modal-body">
                     <p>{{ __('Delete this v1 API token? This cannot be undone.') }}</p>
