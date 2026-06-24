@@ -6,6 +6,7 @@ use App\Models\Alert;
 use App\Models\AlertLog;
 use App\Models\AlertRule;
 use App\Models\Device;
+use Illuminate\Support\Carbon;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\Severity;
@@ -457,7 +458,8 @@ class AlertRulesTest extends TestCase
         $this->assertEquals($state, $alert->state, "Alert state was reset from $state to ACTIVE");
 
         // Timestamp should NOT have changed
-        $this->assertEquals($initialTimestamp->toDateTimeString(), $alert->timestamp->toDateTimeString(), 'Alert timestamp was reset');
+        $actual = $alert->timestamp instanceof Carbon ? $alert->timestamp->toDateTimeString() : $alert->timestamp;
+        $this->assertEquals($initialTimestamp->toDateTimeString(), $actual, 'Alert timestamp was reset');
 
         // AlertLog should have been updated but state remains same
         $updatedLog = AlertLog::where('device_id', $device->device_id)
