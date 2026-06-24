@@ -78,7 +78,7 @@ class AlertUtil
 
     /**
      * Merge timing for the problem phase from alert_rule_operations into $rextra
-     * (delay, interval, count) so RunAlerts can reuse existing scheduling logic.
+     * (delay, interval, count) so AlertNotifications can reuse existing scheduling logic.
      * When the rule has no operations at all, notifications are treated as suppressed (mute).
      *
      * @param  array<string, mixed>  $details  alert_log details (decoded)

@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-use LibreNMS\Alert\RunAlerts;
+use LibreNMS\Alert\AlertNotifications;
 use LibreNMS\Util\Debug;
 
 $init_modules = ['alerts', 'laravel'];
@@ -11,7 +11,7 @@ $options = getopt('t:h:r:p:s:d::');
 
 if (isset($options['r']) && isset($options['h'])) {
     Debug::set(isset($options['d']));
-    $runAlerts = new RunAlerts();
+    $runAlerts = new AlertNotifications();
 
     $rule_id = (int) $options['r'];
     $device_id = ctype_digit($options['h']) ? $options['h'] : getidbyname($options['h']);
@@ -22,9 +22,8 @@ if (isset($options['r']) && isset($options['h'])) {
         exit(2);
     }
     $alert = $alerts[0];
-
-    $alert['details']['delay'] = 0;
-    $alert['note'] = 'Testing';
+    $alert->latestLog->details = array_merge($alert->latestLog->details, ['delay' => 0]);
+    $alert->note = 'Testing';
     $runAlerts->issueAlert($alert);
 } else {
     c_echo('
