@@ -32,11 +32,9 @@ use SnmpQuery;
 
 class Jetdirect extends Shared\Printer implements PrinterSuppliesContext
 {
-    private const SNMP_CONTEXT = 'Jetdirect';
-
     public function getPrinterSuppliesContexts(): array
     {
-        return [null, self::SNMP_CONTEXT];
+        return [null, 'Jetdirect'];
     }
 
     public function discoverOS(Device $device): void
@@ -45,7 +43,7 @@ class Jetdirect extends Shared\Printer implements PrinterSuppliesContext
         $device = $this->getDevice();
 
         $jetdirect_id = SnmpQuery::get('HP-LASERJET-COMMON-MIB::gdStatusId.0')->value()
-            ?: SnmpQuery::context(self::SNMP_CONTEXT)->get('HP-LASERJET-COMMON-MIB::gdStatusId.0')->value();
+            ?: SnmpQuery::context('Jetdirect')->get('HP-LASERJET-COMMON-MIB::gdStatusId.0')->value();
         $info = $this->parseDeviceId($jetdirect_id);
 
         $hardware = $info['MDL'] ?? $info['MODEL'] ?? $info['DES'] ?? $info['DESCRIPTION'] ?? null;
