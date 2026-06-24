@@ -467,4 +467,171 @@ class AlertRulesTest extends TestCase
         $this->assertEquals($state, $updatedLog->state->value, "Latest AlertLog state was changed from $state");
         $this->assertArrayHasKey('contacts', $updatedLog->details);
     }
+
+    public function testRunRulesWithDeviceId(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        $alertRules = new AlertRules($device->device_id);
+        $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+        ]);
+    }
+
+    public function testRunRulesSkipsDisabledRule(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+            'disabled' => 1,
+        ]);
+
+        $alertRules = new AlertRules($device);
+        $alertRules->run();
+
+        $this->assertDatabaseMissing('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+        ]);
+    }
+
+    public function testRunRulesUsesQueryBuilderJson(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $builderJson = [
+            'condition' => 'AND',
+            'rules' => [
+                [
+                    'field' => 'devices.status',
+                    'operator' => 'equal',
+                    'value' => '0',
+                ],
+            ],
+        ];
+        $rule = AlertRule::factory()->create([
+            'query' => '',
+            'builder' => $builderJson,
+        ]);
+
+        $alertRules = new AlertRules($device);
+        $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+        ]);
+    }
+
+    public function testRunRulesSkipsEmptySql(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $rule = AlertRule::factory()->create([
+            'query' => '',
+            'builder' => [],
+        ]);
+
+        $alertRules = new AlertRules($device);
+        $result = $alertRules->run();
+
+        $this->assertTrue($result);
+        $this->assertDatabaseMissing('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+        ]);
+    }
+
+    public function testRunRulesConvertsBinaryIp(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        // MySQL INET6_ATON converts string to binary
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT INET6_ATON("192.0.2.1") AS ip FROM devices WHERE device_id = ?',
+        ]);
+
+        $alertRules = new AlertRules($device);
+        $alertRules->run();
+
+        $updatedLog = AlertLog::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($updatedLog);
+        $details = $updatedLog->details;
+        $this->assertEquals('192.0.2.1', $details['rule'][0]['ip']);
+    }
+
+    public function testRunRulesRecoveryWithoutPreExistingAlert(): void
+    {
+        $device = Device::factory()->create(['status' => 1]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        $alertRules = new AlertRules($device);
+        $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::RECOVERED,
+        ]);
+    }
+
+    public function testRunRulesNoChangeOnActiveAlertWithoutLog(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        Alert::create([
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+            'open' => 1,
+            'alerted' => 0,
+            'info' => [],
+        ]);
+
+        // Note: No AlertLog is created in DB for this rule.
+
+        $alertRules = new AlertRules($device);
+        $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+        ]);
+        // AlertLog was not created beforehand, and shouldn't cause errors.
+    }
+
+    public function testRunRulesInvertsResultToTriggerAlert(): void
+    {
+        $device = Device::factory()->create(['status' => 1]);
+        // The query returns empty for status = 0.
+        // With invert = true, empty means trigger alert (do_alert = true).
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+            'extra' => ['invert' => true],
+        ]);
+
+        $alertRules = new AlertRules($device);
+        $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+        ]);
+    }
 }
