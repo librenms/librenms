@@ -28,5 +28,4 @@ namespace LibreNMS\Alert;
 
 class AlertNotifications
 {
-
 }
