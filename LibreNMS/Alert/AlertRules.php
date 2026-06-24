@@ -64,7 +64,7 @@ readonly class AlertRules
     public function run(): bool
     {
         if ($this->device->getMaintenanceStatus() === MaintenanceStatus::SkipAlerts) {
-            Log::info("Under Maintenance, skipping alert rules check.");
+            Log::info('Under Maintenance, skipping alert rules check.');
 
             return false;
         }
