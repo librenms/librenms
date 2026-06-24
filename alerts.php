@@ -28,40 +28,23 @@
  * @author: Heath Barnhart <hbarnhart@kanren.net>
  */
 
-use LibreNMS\Alert\AlertNotifications;
-use LibreNMS\Util\Debug;
-
 $init_modules = ['alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('fd::');
 
-if (Debug::set(isset($options['d']))) {
-    echo "DEBUG!\n";
+c_echo('%RWarning: alerts.php is deprecated!%n Use %9lnms alerts:notify%n instead.' . PHP_EOL . PHP_EOL);
+
+$arguments = [];
+
+if (!isset($options['f'])) {
+    $arguments['--scheduler'] = 'cron';
 }
 
-$scheduler = \App\Facades\LibrenmsConfig::get('schedule_type.alerting');
-if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
-    if (Debug::isEnabled()) {
-        echo "Alerts are not enabled for cron scheduling.  Add the -f command argument if you want to force this command to run.\n";
-    }
-    exit(0);
+if (isset($options['d'])) {
+    $arguments['-v'] = true;
 }
 
-$alerts_lock = Cache::lock('alerts', \App\Facades\LibrenmsConfig::get('service_alerting_frequency'));
-if ($alerts_lock->get()) {
-    $alerts = new AlertNotifications();
-    if (! defined('TEST') && \App\Facades\LibrenmsConfig::get('alert.disable') != 'true') {
-        echo 'Start: ' . date('r') . "\r\n";
-        echo 'ClearStaleAlerts():' . PHP_EOL;
-        $alerts->clearStaleAlerts();
-        echo "RunFollowUp():\r\n";
-        $alerts->runFollowUp();
-        echo "AlertNotifications():\r\n";
-        $alerts->runAlerts();
-        echo "RunAcks():\r\n";
-        $alerts->runAcks();
-        echo 'End  : ' . date('r') . "\r\n";
-    }
-    $alerts_lock->release();
-}
+$return = Artisan::call('alerts:notify', $arguments);
+echo Artisan::output();
+exit($return);

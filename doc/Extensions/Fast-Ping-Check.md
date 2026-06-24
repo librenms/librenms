@@ -6,7 +6,7 @@ which is normally 5 minutes. This means it may take up to 5 minutes
 to find out if a device is down.
 
 Some users may want to know if devices stop responding to ping more
-quickly than that. LibreNMS offers a `ping.php` script to run ping
+quickly than that. LibreNMS offers a `lnms device:ping fast` command to run ping
 checks as quickly as possible without increasing snmp load on your
 devices by switching to 1 minute polling.
 
@@ -31,27 +31,42 @@ To use the dispatcher service to run the fast pings:
 If you are still using CRON:
 
 ```title="/etc/cron.d/librenms"
-*    *    * * *   librenms    /opt/librenms/ping.php >> /dev/null 2>&1
+*    *    * * *   librenms    /opt/librenms/lnms device:ping fast --scheduler=cron >> /dev/null 2>&1
 ```
 
 !!! note
 
     If you are using distributed pollers you can restrict a
     poller to a group by appending `-g` to the cron entry. Alternatively,
-    you should only run `ping.php` on a single node.
+    you should only run `lnms device:ping fast` on a single node.
+
+## Sub minute ping check
+
+Cron only has a resolution of one minute, so for sub-minute ping checks we need to adapt both `ping`
+and `alerts` entries. We add two entries per function, but add a delay before one of these entries.
+
+Remember, you need to remove the original `lnms device:ping fast` and `lnms alerts:notify` entries in crontab before
+proceeding! (removing any other `lnms device:ping fast` or `lnms alerts:notify` entries)
+
+```title="/etc/cron.d/librenms"
+*    *    * * *   librenms    /opt/librenms/lnms device:ping fast --scheduler=cron >> /dev/null 2>&1
+*    *    * * *   librenms    sleep 30 && /opt/librenms/lnms device:ping fast --scheduler=cron >> /dev/null 2>&1
+*    *    * * *   librenms    sleep 15 && /opt/librenms/lnms alerts:notify --scheduler=cron >> /dev/null 2>&1
+*    *    * * *   librenms    sleep 45 && /opt/librenms/lnms alerts:notify --scheduler=cron >> /dev/null 2>&1
+```
 
 ## Device dependencies
 
-The `ping.php` script respects device dependencies, but the main poller
+The `lnms device:ping fast` command respects device dependencies, but the main poller
 does not (for technical reasons). However, using this script does not
 disable the icmp check in the poller and a child may be reported as
 down before the parent.
 
 ## Settings
 
-`ping.php` uses much the same settings as the poller fping with one
+`lnms device:ping fast` uses much the same settings as the poller fping with one
 exception: retries is used instead of count.
-`ping.php` does not measure loss and avg response time, only up/down, so
+`lnms device:ping fast` does not measure loss and avg response time, only up/down, so
 once a device responds it stops pinging it.
 
 !!! setting "poller/ping"

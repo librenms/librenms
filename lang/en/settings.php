@@ -2046,7 +2046,7 @@ return [
                 'help' => 'Alerting task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_billing_enabled is set to true.',
                 'options' => [
                     'legacy' => 'Legacy (Unrestricted)',
-                    'cron' => 'Cron (alerts.php)',
+                    'cron' => 'Cron (lnms alerts:notify)',
                     'dispatcher' => 'Dispatcher Service',
                 ],
             ],
@@ -2074,7 +2074,7 @@ return [
                 'options' => [
                     'legacy' => 'Legacy (Unrestricted)',
                     'disabled' => 'Disabled (pings only during polling)',
-                    'cron' => 'Cron (ping.php)',
+                    'cron' => 'Cron (lnms device:ping fast)',
                     'dispatcher' => 'Dispatcher Service',
                 ],
             ],
