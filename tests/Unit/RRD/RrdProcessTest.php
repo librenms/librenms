@@ -223,6 +223,7 @@ class RrdProcessTest extends TestCase
 
         $this->process->shouldReceive('waitUntil')->andReturnUsing(function ($callback) {
             $this->assertFalse($callback(Process::ERR, "Fontconfig warning: something\n"));
+
             return $callback(Process::OUT, "OK u:0.01 s:0.02 r:0.03\n");
         });
         $this->process->shouldReceive('getOutput')->andReturn("OK u:0.01 s:0.02 r:0.03\n");
@@ -239,6 +240,7 @@ class RrdProcessTest extends TestCase
 
         $this->process->shouldReceive('waitUntil')->andReturnUsing(function ($callback) {
             $this->assertFalse($callback(Process::ERR, "  \n  "));
+
             return $callback(Process::OUT, "OK u:0.01 s:0.02 r:0.03\n");
         });
         $this->process->shouldReceive('getOutput')->andReturn("OK u:0.01 s:0.02 r:0.03\n");
