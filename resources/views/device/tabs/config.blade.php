@@ -89,14 +89,12 @@
                 <div class="tw:lg:col-span-3 tw:rounded-xl tw:border tw:border-gray-300 tw:dark:border-dark-gray-200 tw:bg-white tw:dark:bg-dark-gray-400 tw:overflow-hidden tw:self-start">
                     <div class="tw:px-4 tw:py-3 tw:border-b tw:border-gray-200 tw:dark:border-dark-gray-200">
                         <h3 class="tw:text-gray-800 tw:dark:text-dark-white-100">
-                            <template x-if="diffMode">
-                                <span x-text="diffSelection.length === 2
-                                    ? '{{ __('Diff') }}' + ': ' + formatDate(Math.min(diffSelection[0].date, diffSelection[1].date) ) + ' → ' + formatDate(Math.max(diffSelection[0].date, diffSelection[1].date))
-                                    : '{{ __('Diff') }}'"></span>
-                            </template>
-                            <template x-if="!diffMode">
-                                <span x-text="selected ? '{{ __('Configuration') }}' + ' - ' + formatDate(selected.date) : '{{ __('Configuration') }}'"></span>
-                            </template>
+                            <span x-show="diffMode">{{ __('Diff') }}<span
+                                    x-show="diffSelection.length === 2"
+                                    x-text="': ' + formatDate(Math.min(diffSelection[0]?.date, diffSelection[1]?.date) ) + ' → ' + formatDate(Math.max(diffSelection[0]?.date, diffSelection[1]?.date))"></span></span>
+                            <span x-show="!diffMode">{{ __('Configuration') }}<span
+                                    x-show="selected"
+                                    x-text="' - ' + formatDate(selected?.date)"></span></span>
                         </h3>
                     </div>
 
