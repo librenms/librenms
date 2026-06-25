@@ -6,8 +6,8 @@ use App\Actions\Device\CheckDeviceAvailability;
 use App\Actions\Device\DeviceIsSnmpable;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use LibreNMS\Data\Source\Fping;
-use LibreNMS\Data\Source\FpingResponse;
+use LibreNMS\Data\Source\Icmp\FpingMetricService;
+use LibreNMS\Data\Source\Icmp\FpingResponse;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Tests\TestCase;
 use Mockery;
@@ -18,8 +18,8 @@ final class ConnectivityHelperTest extends TestCase
     public function testDeviceStatus(): void
     {
         // not called when ping is disabled
-        $this->app->singleton(Fping::class, function () {
-            $mock = Mockery::mock(Fping::class);
+        $this->app->singleton(FpingMetricService::class, function () {
+            $mock = Mockery::mock(FpingMetricService::class);
             $up = FpingResponse::artificialUp();
             $down = FpingResponse::artificialDown();
             $mock->shouldReceive('ping')
