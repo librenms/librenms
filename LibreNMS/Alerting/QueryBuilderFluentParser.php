@@ -55,7 +55,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
      * @param  array{condition: string, rules: array<array{field: string, operator: string, value: mixed}>}  $rule
      * @param  string|null  $parent_condition  AND or OR  (for root, this should be null)
      */
-    protected function parseGroupToQuery(Builder $query, array $rule, string $parent_condition = null): Builder
+    protected function parseGroupToQuery(Builder $query, array $rule, ?string $parent_condition = null): Builder
     {
         return $query->where(function ($query) use ($rule): void {
             foreach ($rule['rules'] as $group_rule) {
