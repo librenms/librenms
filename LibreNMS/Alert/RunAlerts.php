@@ -495,6 +495,8 @@ class RunAlerts
                 $alert['note'] = $alert_status['note'];
                 if (! empty($alert['details'])) {
                     $alert['details'] = json_decode(gzuncompress($alert['details']), true);
+                } else {
+                    $alert['details'] = [];
                 }
                 $alert['info'] = json_decode((string) $alert_status['info'], true);
                 $alerts[] = $alert;
