@@ -42,6 +42,7 @@ return [
             'failed' => 'Failed to set :setting',
             'invalid' => 'This is not a valid setting. Please check your input',
             'invalid_os' => 'Specified OS (:os) does not exist',
+            'invalid_path' => 'Unknown OS setting (:path) is not defined in the schema',
             'nodb' => 'Database is not connected',
             'no-validation' => 'Cannot set :setting, it is missing validation definition.',
         ],

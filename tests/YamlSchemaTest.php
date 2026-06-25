@@ -58,6 +58,42 @@ final class YamlSchemaTest extends TestCase
         $this->validateYamlFilesAgainstSchema(resource_path('definitions/os_detection'), resource_path('definitions/schema/os_schema.json'));
     }
 
+    #[TestDox('OS schema module enums stay in sync with config_definitions.json')]
+    public function testOSSchemaModuleEnumsInSync(): void
+    {
+        $definitions = json_decode((string) file_get_contents(resource_path('definitions/config_definitions.json')), true)['config'];
+        $schema = json_decode((string) file_get_contents(resource_path('definitions/schema/os_schema.json')), true);
+
+        // module keys actually used by OS definition yaml files: these legacy names must
+        // remain valid in the schema even if they are not (or no longer) real modules.
+        $used = ['poller_modules' => [], 'discovery_modules' => []];
+        foreach (glob(resource_path('definitions/os_detection') . '/*.yaml') as $file) {
+            $data = Yaml::parseFile($file) ?: [];
+            foreach (array_keys($used) as $section) {
+                $used[$section] = array_merge($used[$section], array_keys($data[$section] ?? []));
+            }
+        }
+
+        foreach (['poller_modules', 'discovery_modules'] as $section) {
+            $expected = collect(array_keys($definitions))
+                ->filter(fn ($key) => Str::startsWith($key, "$section."))
+                ->map(fn ($key) => Str::after($key, "$section."))
+                ->merge($used[$section])
+                ->unique()->sort()->values()->all();
+
+            $actual = collect(array_keys($schema['properties'][$section]['properties'] ?? []))
+                ->sort()->values()->all();
+
+            $this->assertEquals(
+                $expected,
+                $actual,
+                "os_schema.json '$section' enum is out of sync.\n"
+                . 'Missing (real module or used by an OS yaml): ' . (implode(', ', array_diff($expected, $actual)) ?: '(none)') . "\n"
+                . 'Stale (in schema, not a real module and unused by any OS yaml): ' . (implode(', ', array_diff($actual, $expected)) ?: '(none)')
+            );
+        }
+    }
+
     #[TestDox('OS match filename')]
     public function testOSMatchFilename(): void
     {
