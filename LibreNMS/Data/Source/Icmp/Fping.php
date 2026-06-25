@@ -41,7 +41,7 @@ class Fping
     private readonly int $timeout;
     private readonly int $retries;
     private readonly int $tos;
-    private readonly array $fping_bin;
+    private readonly string $fping_bin;
     /** @var string[] */
     private readonly array $fping4_cmd;
     /** @var string[] */
