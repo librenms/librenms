@@ -342,7 +342,7 @@ if (LibrenmsConfig::get('enable_vrfs')) {
     $sql = "SELECT * FROM vrfs WHERE device_id = '" . $device['device_id'] . "'";
     foreach (dbFetchRows($sql) as $row) {
         $vrf_id = $row['vrf_id'];
-        if (! $valid_vrf[$vrf_id]) {
+        if (empty($valid_vrf[$vrf_id])) {
             echo '-';
             \App\Models\Vrf::where('vrf_id', $vrf_id)->delete();
         } else {
