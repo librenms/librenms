@@ -41,7 +41,9 @@ class Fping
     private readonly int $timeout;
     private readonly int $retries;
     private readonly int $tos;
+    /** @var string[] */
     private readonly array $fping4_cmd;
+    /** @var string[] */
     private readonly array $fping6_cmd;
 
     public function __construct()
@@ -62,6 +64,8 @@ class Fping
 
     /**
      * Get the fping command for a given address family
+     *
+     * @return string[]
      */
     public function fpingCommand(AddressFamily $af): array
     {
