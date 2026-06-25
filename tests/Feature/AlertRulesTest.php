@@ -4,6 +4,7 @@ namespace LibreNMS\Tests\Feature;
 
 use App\Models\Alert;
 use App\Models\AlertLog;
+use App\Models\AlertProblem;
 use App\Models\AlertRule;
 use App\Models\Device;
 use Illuminate\Support\Carbon;
@@ -136,15 +137,23 @@ class AlertRulesTest extends TestCase
             'state' => AlertState::ACTIVE,
             'open' => 1,
             'alerted' => 0,
+            'open_problem_count' => 1,
             'info' => [],
         ]);
 
-        $log = AlertLog::create([
-            'device_id' => $device->device_id,
+        AlertProblem::create([
             'rule_id' => $rule->id,
+            'device_id' => $device->device_id,
+            'entity_key' => (string) $device->device_id,
             'state' => AlertState::ACTIVE,
+            'open' => 1,
+            'alerted' => 0,
             'details' => ['old' => 'data'],
         ]);
+
+        $logCount = AlertLog::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->count();
 
         $alertRules = new AlertRules($device);
         $alertRules->run();
@@ -156,10 +165,15 @@ class AlertRulesTest extends TestCase
             'state' => AlertState::ACTIVE,
         ]);
 
-        // AlertLog should be updated with new details (contacts and rule)
-        $updatedLog = AlertLog::find($log->id);
-        $this->assertArrayHasKey('contacts', $updatedLog->details);
-        $this->assertArrayHasKey('rule', $updatedLog->details);
+        $this->assertEquals($logCount, AlertLog::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->count());
+
+        $problem = AlertProblem::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->first();
+        $this->assertArrayHasKey('contacts', $problem->details);
+        $this->assertArrayHasKey('rule', $problem->details);
     }
 
     public function testRunRulesSkipsAcknowledgedAlert(): void
@@ -207,7 +221,18 @@ class AlertRulesTest extends TestCase
             'state' => AlertState::ACTIVE,
             'open' => 1,
             'alerted' => 0,
+            'open_problem_count' => 1,
             'info' => [],
+        ]);
+
+        AlertProblem::create([
+            'rule_id' => $rule->id,
+            'device_id' => $device->device_id,
+            'entity_key' => (string) $device->device_id,
+            'state' => AlertState::ACTIVE,
+            'open' => 1,
+            'alerted' => 0,
+            'details' => ['old' => 'data'],
         ]);
 
         $alertRules = new AlertRules($device);
@@ -442,16 +467,24 @@ class AlertRulesTest extends TestCase
             'state' => $state,
             'open' => 1,
             'alerted' => 1,
+            'open_problem_count' => 1,
             'info' => [],
             'timestamp' => $initialTimestamp,
         ]);
 
-        AlertLog::create([
-            'device_id' => $device->device_id,
+        AlertProblem::create([
             'rule_id' => $rule->id,
-            'state' => $state,
+            'device_id' => $device->device_id,
+            'entity_key' => (string) $device->device_id,
+            'state' => AlertState::ACTIVE,
+            'open' => 1,
+            'alerted' => 0,
             'details' => ['old' => 'data'],
         ]);
+
+        $logCount = AlertLog::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->count();
 
         $alertRules = new AlertRules($device);
         $alertRules->run();
@@ -464,13 +497,14 @@ class AlertRulesTest extends TestCase
         $actual = $alert->timestamp instanceof Carbon ? $alert->timestamp->toDateTimeString() : $alert->timestamp;
         $this->assertEquals($initialTimestamp->toDateTimeString(), $actual, 'Alert timestamp was reset');
 
-        // AlertLog should have been updated but state remains same
-        $updatedLog = AlertLog::where('device_id', $device->device_id)
+        $this->assertEquals($logCount, AlertLog::where('device_id', $device->device_id)
             ->where('rule_id', $rule->id)
-            ->latest('id')
+            ->count());
+
+        $problem = AlertProblem::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
             ->first();
-        $this->assertEquals($state, $updatedLog->state->value, "Latest AlertLog state was changed from $state");
-        $this->assertArrayHasKey('contacts', $updatedLog->details);
+        $this->assertArrayHasKey('contacts', $problem->details);
     }
 
     public function testRunRulesWithDeviceId(): void
