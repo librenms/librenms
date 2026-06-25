@@ -65,13 +65,16 @@ class PrinterSupplies implements Module
      */
     public function discover(OS $os): void
     {
+        $device = $os->getDeviceArray();
+        $contexts = $os instanceof PrinterSuppliesContext ? $os->getPrinterSuppliesContexts() : [''];
+
         ModuleModelObserver::observe(PrinterSupply::class, __('Printer Supplies'));
-        $levels = $this->discoveryLevels($os);
+        $levels = $this->discoveryLevels($device, $contexts);
         $this->syncModelsByGroup($os->getDevice(), 'printerSupplies', $levels, [['supply_type', '!=', 'input']]);
         ModuleModelObserver::done();
 
         ModuleModelObserver::observe(PrinterSupply::class, __('Tray Paper Level'));
-        $papers = $this->discoveryPapers($os);
+        $papers = $this->discoveryPapers($device, $contexts);
         $this->syncModelsByGroup($os->getDevice(), 'printerSupplies', $papers, ['supply_type' => 'input']);
         ModuleModelObserver::done();
     }
@@ -176,17 +179,14 @@ class PrinterSupplies implements Module
         ];
     }
 
-    private function discoveryLevels(OS $os): Collection
+    private function discoveryLevels(array $device, array $contexts): Collection
     {
         $levels = new Collection();
-        $device = $os->getDeviceArray();
 
         $oids = [];
-        $contexts = $os instanceof PrinterSuppliesContext ? $os->getPrinterSuppliesContexts() : [''];
         foreach ($contexts as $context) {
             $oids = SnmpQuery::hideMib()
                 ->enumStrings()
-                ->abortOnFailure()
                 ->context($context)
                 ->walk([
                     'Printer-MIB::prtMarkerSuppliesLevel',
@@ -223,7 +223,6 @@ class PrinterSupplies implements Module
             if (Str::contains($descr, "\n")) {
                 $new_descr = '';
                 foreach (explode("\n", (string) $descr) as $line) {
-                    $line = trim($line);
                     if (preg_match('/^([A-F\d]{2} )*[A-F\d]{1,2} ?$/', $line)) {
                         $line = StringHelpers::hexToAscii($line, ' ');
                     }
@@ -269,17 +268,14 @@ class PrinterSupplies implements Module
         return $levels;
     }
 
-    private function discoveryPapers(OS $os): Collection
+    private function discoveryPapers(array $device, array $contexts): Collection
     {
         $papers = new Collection();
-        $device = $os->getDeviceArray();
 
         $tray_oids = [];
-        $contexts = $os instanceof PrinterSuppliesContext ? $os->getPrinterSuppliesContexts() : [''];
         foreach ($contexts as $context) {
             $tray_oids = SnmpQuery::hideMib()
                 ->enumStrings()
-                ->abortOnFailure()
                 ->context($context)
                 ->walk([
                     'Printer-MIB::prtInputName',
