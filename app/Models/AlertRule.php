@@ -91,26 +91,26 @@ class AlertRule extends BaseModel
     /**
      * @param  Builder<AlertRule>  $query
      * @param  Device  $device
-     * @return Builder
+     * @return Builder<AlertRule>
      */
     public function scopeForDevice(Builder $query, Device $device): Builder
     {
-        return $query->where(function ($query) use ($device): void {
-            $query->where(function ($query): void {
+        return $query->where(function (Builder $query) use ($device): void {
+            $query->where(function (Builder $query): void {
                 $query->whereDoesntHave('devices')
                     ->whereDoesntHave('groups')
                     ->whereDoesntHave('locations');
-            })->orWhere(function ($query) use ($device): void {
+            })->orWhere(function (Builder $query) use ($device): void {
                 $query->where('invert_map', 0)
-                    ->where(function ($query) use ($device): void {
+                    ->where(function (Builder $query) use ($device): void {
                         $query->whereHas('devices', fn ($q) => $q->where('devices.device_id', $device->device_id))
-                            ->orWhereHas('groups', fn ($q) => $q->whereHas('devices', fn ($dq) => $dq->where('devices.device_id', $device->device_id)))
+                            ->orWhereHas('groups.devices', fn ($q) => $q->where('devices.device_id', $device->device_id))
                             ->orWhereHas('locations', fn ($q) => $q->where('locations.id', $device->location_id));
                     });
-            })->orWhere(function ($query) use ($device): void {
+            })->orWhere(function (Builder $query) use ($device): void {
                 $query->where('invert_map', 1)
                     ->whereDoesntHave('devices', fn ($q) => $q->where('devices.device_id', $device->device_id))
-                    ->whereDoesntHave('groups', fn ($q) => $q->whereHas('devices', fn ($dq) => $dq->where('devices.device_id', $device->device_id)))
+                    ->whereDoesntHave('groups.devices', fn ($q) => $q->where('devices.device_id', $device->device_id))
                     ->whereDoesntHave('locations', fn ($q) => $q->where('locations.id', $device->location_id));
             });
         });
