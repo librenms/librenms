@@ -98,11 +98,11 @@ class PrinterSupplies implements Module
         }
 
         $toner_snmp = [];
-        $contexts = $os instanceof PrinterSuppliesContext ? $os->getPrinterSuppliesContexts() : [null];
+        $contexts = $os instanceof PrinterSuppliesContext ? $os->getPrinterSuppliesContexts() : [''];
         foreach ($contexts as $context) {
             $query = SnmpQuery::device($os->getDevice())
                 ->numeric()
-                ->context($context ?? '');
+                ->context($context);
 
             $toner_snmp = $query->get($toner_data->pluck('supply_oid')->toArray())->values();
             if (! empty($toner_snmp)) {
@@ -182,13 +182,13 @@ class PrinterSupplies implements Module
         $device = $os->getDeviceArray();
 
         $oids = [];
-        $contexts = $os instanceof PrinterSuppliesContext ? $os->getPrinterSuppliesContexts() : [null];
+        $contexts = $os instanceof PrinterSuppliesContext ? $os->getPrinterSuppliesContexts() : [''];
         foreach ($contexts as $context) {
             $query = SnmpQuery::device($os->getDevice())
                 ->hideMib()
                 ->enumStrings()
                 ->abortOnFailure()
-                ->context($context ?? '');
+                ->context($context);
 
             $oids = $query->walk('Printer-MIB::prtMarkerSuppliesLevel')->valuesByIndex();
             if (! empty($oids)) {
@@ -274,13 +274,13 @@ class PrinterSupplies implements Module
         $device = $os->getDeviceArray();
 
         $tray_oids = [];
-        $contexts = $os instanceof PrinterSuppliesContext ? $os->getPrinterSuppliesContexts() : [null];
+        $contexts = $os instanceof PrinterSuppliesContext ? $os->getPrinterSuppliesContexts() : [''];
         foreach ($contexts as $context) {
             $query = SnmpQuery::device($os->getDevice())
                 ->hideMib()
                 ->enumStrings()
                 ->abortOnFailure()
-                ->context($context ?? '');
+                ->context($context);
 
             $tray_oids = $query->walk('Printer-MIB::prtInputName')->valuesByIndex();
             if (! empty($tray_oids)) {
@@ -291,6 +291,10 @@ class PrinterSupplies implements Module
         }
 
         foreach ($tray_oids as $index => $data) {
+            if (! isset($data['prtInputName'], $data['prtInputCurrentLevel'], $data['prtInputMaxCapacity'])) {
+                continue;
+            }
+
             $last_index = substr((string) $index, strrpos((string) $index, '.') + 1);
 
             $capacity = $data['prtInputMaxCapacity'];

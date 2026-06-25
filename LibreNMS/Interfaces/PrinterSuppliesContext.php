@@ -24,7 +24,7 @@ namespace LibreNMS\Interfaces;
 interface PrinterSuppliesContext
 {
     /**
-     * @return array<int, string|null>
+     * @return list<string>
      */
     public function getPrinterSuppliesContexts(): array;
 }

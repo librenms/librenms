@@ -34,7 +34,7 @@ class Jetdirect extends Shared\Printer implements PrinterSuppliesContext
 {
     public function getPrinterSuppliesContexts(): array
     {
-        return [null, 'Jetdirect'];
+        return ['', 'Jetdirect'];
     }
 
     public function discoverOS(Device $device): void
