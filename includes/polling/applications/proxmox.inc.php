@@ -72,9 +72,11 @@ if (! empty($proxmox)) {
         $pmxcache = [];
 
         foreach ($pmxlines as $vm) {
-            $vm = str_replace('"', '', $vm);
-            [$vmid, $vmport, $vmpin, $vmpout, $vmdesc] = explode('/', $vm, 5);
-            echo "Proxmox ($pmxcluster): $vmdesc: $vmpin/$vmpout/$vmport\n";
+            $vm = trim(str_replace('"', '', $vm));
+            if (! preg_match('#^([^/]+)/([^/]+)/([^/]+)/([^/]+)/(.+)$#', $vm, $matches)) {
+                continue;
+            }
+            [, $vmid, $vmport, $vmpin, $vmpout, $vmdesc] = $matches;
 
             $rrd_def = RrdDefinition::make()
                 ->addDataset('INOCTETS', 'DERIVE', 0, 12500000000)
