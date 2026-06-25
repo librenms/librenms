@@ -108,6 +108,9 @@
                 "cisco-vpdn": {
                     "type": "boolean"
                 },
+                "cisco-vrf-lite": {
+                    "type": "boolean"
+                },
                 "core": {
                     "type": "boolean"
                 },
@@ -120,10 +123,16 @@
                 "entity-state": {
                     "type": "boolean"
                 },
+                "fdb-table": {
+                    "type": "boolean"
+                },
                 "hr-mib": {
                     "type": "boolean"
                 },
                 "ip-system-stats": {
+                    "type": "boolean"
+                },
+                "ipSystemStats": {
                     "type": "boolean"
                 },
                 "ipmi": {
@@ -148,6 +157,9 @@
                     "type": "boolean"
                 },
                 "mempools": {
+                    "type": "boolean"
+                },
+                "mib": {
                     "type": "boolean"
                 },
                 "mpls": {
@@ -192,7 +204,13 @@
                 "qos": {
                     "type": "boolean"
                 },
+                "route": {
+                    "type": "boolean"
+                },
                 "sensors": {
+                    "type": "boolean"
+                },
+                "services": {
                     "type": "boolean"
                 },
                 "slas": {
@@ -202,6 +220,9 @@
                     "type": "boolean"
                 },
                 "stp": {
+                    "type": "boolean"
+                },
+                "tnms-nbi": {
                     "type": "boolean"
                 },
                 "transceivers": {
@@ -252,6 +273,9 @@
                 "bgp-peers": {
                     "type": "boolean"
                 },
+                "charge": {
+                    "type": "boolean"
+                },
                 "cisco-cef": {
                     "type": "boolean"
                 },
@@ -276,6 +300,9 @@
                 "discovery-protocols": {
                     "type": "boolean"
                 },
+                "diskio": {
+                    "type": "boolean"
+                },
                 "entity-physical": {
                     "type": "boolean"
                 },
@@ -288,7 +315,16 @@
                 "hr-device": {
                     "type": "boolean"
                 },
+                "ip6-addresses": {
+                    "type": "boolean"
+                },
+                "ipmi": {
+                    "type": "boolean"
+                },
                 "ipv4-addresses": {
+                    "type": "boolean"
+                },
+                "ipv6-address": {
                     "type": "boolean"
                 },
                 "ipv6-addresses": {
@@ -322,6 +358,9 @@
                     "type": "boolean"
                 },
                 "os": {
+                    "type": "boolean"
+                },
+                "ospf": {
                     "type": "boolean"
                 },
                 "ospfv3": {
@@ -364,6 +403,12 @@
                     "type": "boolean"
                 },
                 "ucd-diskio": {
+                    "type": "boolean"
+                },
+                "ucd-dsktable": {
+                    "type": "boolean"
+                },
+                "ucd-mib": {
                     "type": "boolean"
                 },
                 "vlans": {
