@@ -18,6 +18,9 @@ use Illuminate\Support\Facades\Route;
  */
 class RoutesBoot extends BaseRoutesBoot
 {
+    /**
+     * @param  array<string, mixed>  $config  Route group config (prefix, middleware, name, ...).
+     */
     public function defaultRoutes($config): self
     {
         Route::group($config, function (): void {
