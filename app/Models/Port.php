@@ -52,7 +52,6 @@ class Port extends DeviceRelatedModel
         'ignore',
         'disabled',
         'deleted',
-        'active',
         'state',
         'search',
         'errors',
@@ -374,23 +373,6 @@ class Port extends DeviceRelatedModel
             default => $q->where('ifOperStatus', '!=', 'up')
                 ->where(fn (Builder $sub) => $sub->where('ifAdminStatus', '!=', 'down')->orWhereNull('ifAdminStatus')),
         });
-    }
-
-    /**
-     * Handle the "Active" filter.
-     * When true, restrict to ports that are not deleted, ignored, or disabled.
-     */
-    public function filterActive(Builder $query, mixed $value, array $config): void
-    {
-        $active = filter_var($value, FILTER_VALIDATE_BOOLEAN);
-
-        if ($active === true) {
-            $query->where([
-                [$this->qualifyColumn('deleted'), '=', 0],
-                [$this->qualifyColumn('ignore'), '=', 0],
-                [$this->qualifyColumn('disabled'), '=', 0],
-            ]);
-        }
     }
 
     /**

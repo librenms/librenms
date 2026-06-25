@@ -20,7 +20,6 @@ return [
     'port_group' => 'Port Group',
     'port_type' => 'Port Type',
     'errors' => 'Errors',
-    'active' => 'Active',
     'groups' => [
         'updated' => ':port: groups updated',
         'none' => ':port no update requested',

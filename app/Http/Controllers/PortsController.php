@@ -232,11 +232,6 @@ class PortsController extends Controller
                 'label' => __('Deleted'),
                 'type' => 'boolean',
             ],
-            [
-                'key' => 'active',
-                'label' => __('Active'),
-                'type' => 'boolean',
-            ],
         ];
     }
 
