@@ -188,7 +188,10 @@ class AlertRulesTest extends TestCase
         ]);
 
         // No new AlertLog should be created for ACTIVE
-        $this->assertEquals(0, AlertLog::where('state', AlertState::ACTIVE)->count());
+        $this->assertEquals(0, AlertLog::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->where('state', AlertState::ACTIVE)
+            ->count());
     }
 
     public function testRunRulesClearsAlert(): void

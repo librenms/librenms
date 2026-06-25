@@ -71,12 +71,11 @@ readonly class AlertRules
 
         if ($this->device->disable_notify) {
             Log::info('Disable alerting is set, Clearing active alerts and skipping alert rules check');
-            $this->device->alerts()
-                ->update([
-                    'state' => AlertState::CLEAR,
-                    'alerted' => 0,
-                    'open' => 0,
-                ]);
+            $this->device->alerts()->update([
+                'state' => AlertState::CLEAR,
+                'alerted' => 0,
+                'open' => 0,
+            ]);
 
             return false;
         }
@@ -165,10 +164,12 @@ readonly class AlertRules
                 ->first();
 
             if ($alert_log) {
-                $details = $alert_log->details ?? [];
-                $details['contacts'] = AlertUtil::getContacts($rows);
-                $details['rule'] = $rows;
-                $alert_log->update(['details' => $details]);
+                $alert_log->details = [
+                    ...($alert_log->details ?? []),
+                    'contacts' => AlertUtil::getContacts($rows),
+                    'rule' => $rows,
+                ];
+                $alert_log->save();
             }
 
             return;
