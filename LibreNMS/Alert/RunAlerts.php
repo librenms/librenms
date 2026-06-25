@@ -128,7 +128,12 @@ class RunAlerts
         $obj['status'] = $device->status;
         $obj['status_reason'] = $device->status_reason;
         if (ConnectivityHelper::pingIsAllowed($device)) {
-            $last_ping = Rrd::lastUpdate(Rrd::name($device->hostname, 'icmp-perf'));
+            try {
+                $last_ping = Rrd::lastUpdate(Rrd::name($device->hostname, 'icmp-perf'));
+            } catch (\Exception $e) {
+                Log::error("Error getting last ping for device {$device->hostname}: {$e->getMessage()}");
+                $last_ping = null;
+            }
             if ($last_ping) {
                 $obj['ping_timestamp'] = $last_ping->timestamp;
                 $obj['ping_loss'] = Number::calculatePercent($last_ping->get('xmt') - $last_ping->get('rcv'), $last_ping->get('xmt'));
@@ -490,6 +495,8 @@ class RunAlerts
                 $alert['note'] = $alert_status['note'];
                 if (! empty($alert['details'])) {
                     $alert['details'] = json_decode(gzuncompress($alert['details']), true);
+                } else {
+                    $alert['details'] = [];
                 }
                 $alert['info'] = json_decode((string) $alert_status['info'], true);
                 $alerts[] = $alert;
@@ -660,7 +667,7 @@ class RunAlerts
         );
 
         $ruleId = (int) ($obj['rule_id'] ?? 0);
-        if (! $transport_maps) {
+        if (! $transport_maps || count($transport_maps) === 0) {
             $reason = 'No mapped transport for this operation';
             if ($ruleId > 0 && ! AlertUtil::ruleHasAlertOperations($ruleId)) {
                 $reason = 'No operations configured for this rule';
@@ -706,10 +713,6 @@ class RunAlerts
                 unset($instance);
                 echo PHP_EOL;
             }
-        }
-
-        if (count($transport_maps) === 0) {
-            echo 'No configured transports';
         }
     }
 

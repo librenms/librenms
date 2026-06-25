@@ -48,6 +48,8 @@ class ApplicationController extends SelectController
      */
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Application::class);
+
         $query = Application::hasAccess($request->user())->with(['device' => function ($query): void {
             $query->select('device_id', 'hostname', 'sysName', 'display');
         }]);

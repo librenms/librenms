@@ -69,6 +69,8 @@ class EventlogController extends SelectController
      */
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Eventlog::class);
+
         $query = Eventlog::hasAccess($request->user())
             ->select($request->input('field'))->distinct();
 

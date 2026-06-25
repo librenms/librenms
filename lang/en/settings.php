@@ -961,10 +961,6 @@ return [
             'description' => 'Enable Clear Discovery',
             'help' => 'Enables the ability to clear discovery date and time for a device. This will force a rediscovery of the device.',
         ],
-        'enable_footer' => [
-            'description' => 'Enable Footer',
-            'help' => 'Enables the footer on all pages.',
-        ],
         'enable_inventory' => [
             'description' => 'Enable Inventory',
             'help' => 'Enables the inventory page, which shows the hardware inventory of devices.',
@@ -1700,9 +1696,8 @@ return [
             'description' => 'Bad Interface ifType',
             'help' => 'Network interface IF-MIB:!:ifType which should be ignored',
         ],
-        'ping_rrd_step' => [
-            'description' => 'Ping Frequency',
-            'help' => 'How often to check. Sets the default value for all nodes. Warning! If you change this you must make additional changes.  Check the Fast Ping docs.',
+        'ping' => [
+            'description' => 'Path to ping',
         ],
         'poller_modules' => [
             'unix-agent' => [
@@ -1743,6 +1738,9 @@ return [
             ],
             'ports' => [
                 'description' => 'Ports',
+            ],
+            'ports-stack' => [
+                'description' => 'Ports Stack',
             ],
             'bgp-peers' => [
                 'description' => 'BGP Peers',
@@ -2108,6 +2106,10 @@ return [
             'description' => 'Master Dispatcher Timeout',
             'help' => 'The amount of time before the master lock expires.  If master goes away, it will take this much time for another node to take over.  However if it takes longer than the timeout to dispatch the work, you will have multiple masters',
         ],
+        'service_ping_frequency' => [
+            'description' => 'Ping Frequency',
+            'help' => 'How often to run fast ping on all devices.',
+        ],
         'service_poller_workers' => [
             'description' => 'Poller Workers',
             'help' => 'Amount of poller workers to spawn. Sets the default value for all nodes.',
@@ -2413,6 +2415,10 @@ return [
                 'master' => 'Daily',
                 'release' => 'Monthly',
             ],
+        ],
+        'update_on_days' => [
+            'description' => 'Only run updates on these days',
+            'help' => 'If set (non-empty), daily.sh will only run code updates when today matches one of these values: monday-sunday or mon-sun. Leave empty to allow updates every day.',
         ],
         'uptime_warning' => [
             'description' => 'Show Device as warning if Uptime below (seconds)',

@@ -273,7 +273,7 @@ class DevicesController extends Controller
 
         if ($legacy->has('location')) {
             $v = $legacy->get('location');
-            $locationId = is_numeric($v) ? (int) $v : Location::where('location', $v)->value('id');
+            $locationId = is_numeric($v) ? (int) $v : Location::where('location', urldecode((string) $v))->value('id');
             if ($locationId) {
                 $filters['location_id'] = ['eq' => $locationId];
             }

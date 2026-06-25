@@ -59,12 +59,6 @@ class NeighboursController implements DeviceTab
     {
         $selection = Url::parseOptions('selection', 'list');
 
-        $devices[$device->device_id] = [
-            'url' => Url::deviceLink($device, null, [], 0, 0, 0, 1),
-            'hw' => $device->hardware,
-            'name' => $device->shortDisplayName(),
-        ];
-
         if ($selection == 'list') {
             $linksQuery = $device->links()->with('port', 'remoteDevice', 'remotePort');
 

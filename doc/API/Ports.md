@@ -248,7 +248,7 @@ Get all info for a particular port.
 Route: `/api/v0/ports/:portid?with=vlans`
 
 - portid must be an integer
-- it's possible to add allowed associated relations to the port using the `with` option. Allowed: `vlans`,`device`
+- it's possible to add allowed associated relations to the port using the `with` option. Allowed: `vlans`,`device`,`statistics`
 
 Input:
 

@@ -6,17 +6,19 @@ use App\Http\Interfaces\ToastInterface;
 use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
 use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\Yaml\Yaml;
 
 class RoleController
 {
+    use AuthorizesRequests;
+
     public function index(): View
     {
-        Gate::authorize('viewAny', Role::class);
+        $this->authorize('viewAny', Role::class);
 
         return view('roles.index', [
             'roles' => Role::with('permissions')->orderBy('name')->get(),
@@ -26,14 +28,14 @@ class RoleController
 
     public function create(): View
     {
-        Gate::authorize('create', Role::class);
+        $this->authorize('create', Role::class);
 
         return view('roles.create', $this->getPermissionData());
     }
 
     public function store(StoreRoleRequest $request, ToastInterface $toast): RedirectResponse
     {
-        Gate::authorize('create', Role::class);
+        $this->authorize('create', Role::class);
 
         $validated = $request->validated();
 
@@ -48,7 +50,7 @@ class RoleController
 
     public function edit(Role $role): View
     {
-        Gate::authorize('update', $role);
+        $this->authorize('update', $role);
 
         return view('roles.edit', array_merge(
             ['role' => $role],
@@ -58,7 +60,7 @@ class RoleController
 
     public function update(UpdateRoleRequest $request, Role $role, ToastInterface $toast): RedirectResponse
     {
-        Gate::authorize('update', Role::class);
+        $this->authorize('update', $role);
 
         $validated = $request->validated();
         $permissions = $validated['permissions'] ?? [];
@@ -74,7 +76,7 @@ class RoleController
 
     public function destroy(Role $role, ToastInterface $toast): RedirectResponse
     {
-        Gate::authorize('delete', $role);
+        $this->authorize('delete', $role);
 
         $role->delete();
 

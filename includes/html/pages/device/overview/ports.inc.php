@@ -4,10 +4,8 @@ use LibreNMS\Util\ObjectCache;
 use LibreNMS\Util\Rewrite;
 
 if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
-    echo '<div class="row">
-          <div class="col-md-12">
-            <div class="panel panel-default panel-condensed">
-              <div class="panel-heading">
+    echo '<div class="overview-panel tw:mb-5">
+            <div class="tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:border-b tw:border-gray-300 tw:text-neutral-700 tw:dark:bg-dark-gray-200 tw:dark:border-zinc-800 tw:dark:text-dark-white-200">
               <i class="fa fa-road fa-lg icon-theme" aria-hidden="true"></i><strong> Overall Traffic</strong>
             </div>';
 
@@ -17,7 +15,7 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     $graph_array['type'] = 'device_bits';
     $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
     $graph_array['legend'] = 'no';
-    $graph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
+    $graph = \LibreNMS\Util\Url::lazyGraphTag($graph_array, 'tw:w-full tw:h-auto');
 
     //Generate tooltip
     $graph_array['width'] = 210;
@@ -30,17 +28,20 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     $graph_array['width'] = '210';
     $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . ' - Device Traffic');
 
+    echo '<div class="tw:flex tw:min-w-0 tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-zinc-800">';
+    echo '<div class="tw:px-2 tw:py-2">';
     echo \LibreNMS\Util\Url::overlibLink($link, $graph, $overlib_content);
+    echo '</div>';
 
     $ports = ObjectCache::portCounts(['total', 'up', 'down', 'disabled'], $device['device_id']);
-    echo '<div class="panel-body tw:flex tw:flex-wrap tw:gap-3">
+    echo '<div class="tw:flex tw:flex-wrap tw:gap-3 tw:p-3">
     <a class="lnms-btn lnms-btn-default" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports']) . '">Total: <span class="lnms-btn-badge">' . $ports['total'] . '</span></a>
-    <a class="lnms-btn lnms-btn-success" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports', 'filter' => ['state' => ['eq' => 'up'], 'disabled' => ['eq' => '0'], 'ignore' => ['eq' => '0'], 'deleted' => ['eq' => '0']]]) . '">Up: <span class="lnms-btn-badge">' . $ports['up'] . '</span></a>
-    <a class="lnms-btn lnms-btn-danger" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports', 'filter' => ['state' => ['eq' => 'down'], 'disabled' => ['eq' => '0'], 'ignore' => ['eq' => '0'], 'deleted' => ['eq' => '0']]]) . '">Down: <span class="lnms-btn-badge">' . $ports['down'] . '</span></a>
+    <a class="lnms-btn lnms-btn-success" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports', 'filter' => ['state' => ['eq' => 'up'], 'ignore' => ['eq' => 0], 'disabled' => ['eq' => 0], 'deleted' => ['eq' => 0]]]) . '">Up: <span class="lnms-btn-badge">' . $ports['up'] . '</span></a>
+    <a class="lnms-btn lnms-btn-danger" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports', 'filter' => ['state' => ['eq' => 'down'], 'ignore' => ['eq' => 0], 'disabled' => ['eq' => 0], 'deleted' => ['eq' => 0]]]) . '">Down: <span class="lnms-btn-badge">' . $ports['down'] . '</span></a>
     <a class="lnms-btn lnms-btn-primary" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports', 'filter' => ['disabled' => ['eq' => '1']]]) . '">Disabled: <span class="lnms-btn-badge">' . $ports['disabled'] . '</span></a>
     </div>';
 
-    echo '<div class="panel-footer">';
+    echo '<div class="tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:border-t tw:border-gray-300 tw:dark:bg-dark-gray-200 tw:dark:border-zinc-800">';
 
     $ifsep = '';
 
@@ -52,7 +53,6 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     }
 
     unset($ifsep);
-    echo '</div>';
     echo '</div>';
     echo '</div>';
     echo '</div>';
