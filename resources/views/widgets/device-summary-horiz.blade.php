@@ -31,8 +31,8 @@
             <tr>
                 <td><a href="{{ route('ports') }}">{{ __('Ports') }}</a></td>
                 <td><a href="{{ route('ports') }}"><span>{{ $ports['total'] }}</span></a></td>
-                <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'up']]]) }}"><span class="green"> {{ $ports['up'] }}</span></a></td>
-                <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'down']]]) }}"><span class="red"> {{ $ports['down'] }}</span></a></td>
+                <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'up'], 'ignore' => ['eq' => 0], 'disabled' => ['eq' => 0], 'deleted' => ['eq' => 0]]]) }}"><span class="green"> {{ $ports['up'] }}</span></a></td>
+                <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'down'], 'ignore' => ['eq' => 0], 'disabled' => ['eq' => 0], 'deleted' => ['eq' => 0]]]) }}"><span class="red"> {{ $ports['down'] }}</span></a></td>
                 <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['ignore' => ['eq' => '1']]]) }}"><span class="blue"> {{ $ports['ignored'] }}</span></a></td>
                 <td><span class="grey"> -</span></td>
                 <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'shutdown'], 'disabled' => ['eq' => '0'], 'ignore' => ['eq' => '0'], 'deleted' => ['eq' => '0']]]) }}"><span class="black"> {{ $ports['shutdown'] }}</span></a></td>
