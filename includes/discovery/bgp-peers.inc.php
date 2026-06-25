@@ -28,7 +28,15 @@ if (! empty($bgpLocalAs) && $bgpLocalAs == '23456') { // 4Byte ASN
     }
 }
 
-foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
+$routing_snmp_contexts_raw = DeviceCache::getPrimary()->getAttrib('routing_snmp_contexts', '[]');
+$routing_snmp_contexts = json_decode((string) $routing_snmp_contexts_raw, true);
+
+$contexts = array_values(array_unique(array_merge(
+    DeviceCache::getPrimary()->getVrfContexts(),
+    $routing_snmp_contexts
+)));
+
+foreach ($contexts as $context_name) {
     $device['context_name'] = $context_name;
     $peer2 = false;
     $peers_data = '';
@@ -189,7 +197,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     }
 
     // clean up peers
-    $bgpQuery = \App\Models\BgpPeer::where('device_id', $device['device_id'])
+    $bgpQuery = BgpPeer::where('device_id', $device['device_id'])
         ->where('context_name', $device['context_name']);
     $cbgpQuery = BgpPeerCbgp::where('device_id', $device['device_id'])
         ->where('context_name', $device['context_name']);
@@ -216,10 +224,13 @@ $contexts = BgpPeer::where('device_id', $device['device_id'])
     ->pluck('context_name')
     ->all();
 
-$existing_contexts = DeviceCache::getPrimary()->getVrfContexts();
+$existing_contexts = array_values(array_unique(array_merge(
+    DeviceCache::getPrimary()->getVrfContexts(),
+    $routing_snmp_contexts
+)));
 foreach ($contexts as $context) {
     if (! in_array($context, $existing_contexts)) {
-        \App\Models\BgpPeer::where('device_id', $device['device_id'])->where('context_name', $context)->delete();
+        BgpPeer::where('device_id', $device['device_id'])->where('context_name', $context)->delete();
         BgpPeerCbgp::where('device_id', $device['device_id'])->where('context_name', $context)->delete();
         echo '-';
     }
