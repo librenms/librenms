@@ -184,17 +184,18 @@ class PrinterSupplies implements Module
         $oids = [];
         $contexts = $os instanceof PrinterSuppliesContext ? $os->getPrinterSuppliesContexts() : [''];
         foreach ($contexts as $context) {
-            $query = SnmpQuery::device($os->getDevice())
-                ->hideMib()
+            $oids = SnmpQuery::hideMib()
                 ->enumStrings()
                 ->abortOnFailure()
-                ->context($context);
+                ->context($context)
+                ->walk([
+                    'Printer-MIB::prtMarkerSuppliesLevel',
+                    'Printer-MIB::prtMarkerSuppliesType',
+                    'Printer-MIB::prtMarkerSuppliesMaxCapacity',
+                    'Printer-MIB::prtMarkerSuppliesDescription',
+                ])->valuesByIndex();
 
-            $oids = $query->walk('Printer-MIB::prtMarkerSuppliesLevel')->valuesByIndex();
             if (! empty($oids)) {
-                $query->walk('Printer-MIB::prtMarkerSuppliesType')->valuesByIndex($oids);
-                $query->walk('Printer-MIB::prtMarkerSuppliesMaxCapacity')->valuesByIndex($oids);
-                $query->walk('Printer-MIB::prtMarkerSuppliesDescription')->valuesByIndex($oids);
                 break;
             }
         }
@@ -276,16 +277,17 @@ class PrinterSupplies implements Module
         $tray_oids = [];
         $contexts = $os instanceof PrinterSuppliesContext ? $os->getPrinterSuppliesContexts() : [''];
         foreach ($contexts as $context) {
-            $query = SnmpQuery::device($os->getDevice())
-                ->hideMib()
+            $tray_oids = SnmpQuery::hideMib()
                 ->enumStrings()
                 ->abortOnFailure()
-                ->context($context);
+                ->context($context)
+                ->walk([
+                    'Printer-MIB::prtInputName',
+                    'Printer-MIB::prtInputCurrentLevel',
+                    'Printer-MIB::prtInputMaxCapacity',
+                ])->valuesByIndex();
 
-            $tray_oids = $query->walk('Printer-MIB::prtInputName')->valuesByIndex();
             if (! empty($tray_oids)) {
-                $query->walk('Printer-MIB::prtInputCurrentLevel')->valuesByIndex($tray_oids);
-                $query->walk('Printer-MIB::prtInputMaxCapacity')->valuesByIndex($tray_oids);
                 break;
             }
         }
