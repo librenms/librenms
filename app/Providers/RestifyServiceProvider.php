@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\PingController;
+use App\Restify\RoutesBoot as CustomRoutesBoot;
 use Binaryk\LaravelRestify\Bootstrap\RoutesBoot;
 use Binaryk\LaravelRestify\Restify;
 use Binaryk\LaravelRestify\RestifyApplicationServiceProvider;
@@ -41,6 +42,14 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
 
     public function boot(): void
     {
+        // Swap Restify's route booter for one that omits the built-in
+        // default routes (profile, global search, restifyjs/setup). The only
+        // v1 routes should be those we explicitly add: registered
+        // repositories and our own custom controllers (ping/health). This
+        // must be bound before parent::boot() triggers route registration,
+        // and persists for the RestifyInjector middleware at request time.
+        $this->app->bind(RoutesBoot::class, CustomRoutesBoot::class);
+
         parent::boot();
 
         // No model repositories are registered yet. Add repository classes
