@@ -41,6 +41,7 @@ class Fping
     private readonly int $timeout;
     private readonly int $retries;
     private readonly int $tos;
+    private readonly array $fping_bin;
     /** @var string[] */
     private readonly array $fping4_cmd;
     /** @var string[] */
@@ -54,25 +55,12 @@ class Fping
         $this->retries = (int) LibrenmsConfig::get('fping_options.retries', 2);
         $this->tos = (int) LibrenmsConfig::get('fping_options.tos', 0);
 
-        $fping_bin = LibrenmsConfig::get('fping', 'fping');
+        $this->fping_bin = LibrenmsConfig::get('fping', 'fping');
         $fping6 = LibrenmsConfig::get('fping6', 'fping6');
         $fping6_bin = is_executable($fping6) ? $fping6 : false;
 
-        $this->fping4_cmd = $fping6_bin === false ? [$fping_bin, '-4'] : [$fping_bin];
-        $this->fping6_cmd = $fping6_bin === false ? [$fping_bin, '-6'] : [$fping6_bin];
-    }
-
-    /**
-     * Get the fping command for a given address family
-     *
-     * @return string[]
-     */
-    public function fpingCommand(AddressFamily $af): array
-    {
-        return match ($af) {
-            AddressFamily::IPv4 => $this->fping4_cmd,
-            AddressFamily::IPv6 => $this->fping6_cmd,
-        };
+        $this->fping4_cmd = $fping6_bin === false ? [$this->fping_bin, '-4'] : [$this->fping_bin];
+        $this->fping6_cmd = $fping6_bin === false ? [$this->fping_bin, '-6'] : [$fping6_bin];
     }
 
     /**
@@ -131,7 +119,7 @@ class Fping
             '-r', (string) $this->retries,
             '-O', (string) $this->tos,
         ];
-        $cmd = array_merge($this->fpingCommand(AddressFamily::IPv4), $args);
+        $cmd = array_merge($this->fpingCommand(), $args);
 
         $process = app()->make(Process::class, ['command' => $cmd]);
         $process->setTimeout(LibrenmsConfig::get('rrd.step', 300) * 2);
@@ -197,5 +185,19 @@ class Fping
         $process->run();
 
         return $process->isSuccessful();
+    }
+
+    /**
+     * Get the fping command for a given address family
+     *
+     * @return string[]
+     */
+    private function fpingCommand(?AddressFamily $af = null): array
+    {
+        return match ($af) {
+            AddressFamily::IPv4 => $this->fping4_cmd,
+            AddressFamily::IPv6 => $this->fping6_cmd,
+            default => [$this->fping_bin],
+        };
     }
 }
