@@ -66,73 +66,106 @@
         "poller_modules": {
             "type": "object",
             "properties": {
-                "cisco-qfp": {
+                "applications": {
                     "type": "boolean"
                 },
-                "cisco-cef": {
+                "arp-table": {
                     "type": "boolean"
                 },
-                "mac-accounting": {
+                "aruba-controller": {
                     "type": "boolean"
                 },
-                "cisco-remote-access-monitor": {
+                "availability": {
                     "type": "boolean"
                 },
-                "slas": {
-                    "type": "boolean"
-                },
-                "cisco-ipsec-flow-monitor": {
+                "bgp-peers": {
                     "type": "boolean"
                 },
                 "cipsec-tunnels": {
                     "type": "boolean"
                 },
-                "cisco-otv": {
+                "cisco-ace-loadbalancer": {
                     "type": "boolean"
                 },
                 "cisco-ace-serverfarms": {
                     "type": "boolean"
                 },
-                "cisco-ace-loadbalancer": {
+                "cisco-cef": {
                     "type": "boolean"
                 },
-                "entity-state": {
+                "cisco-ipsec-flow-monitor": {
                     "type": "boolean"
                 },
-                "ipmi": {
+                "cisco-otv": {
                     "type": "boolean"
                 },
-                "isis": {
+                "cisco-qfp": {
+                    "type": "boolean"
+                },
+                "cisco-remote-access-monitor": {
+                    "type": "boolean"
+                },
+                "cisco-vpdn": {
+                    "type": "boolean"
+                },
+                "core": {
+                    "type": "boolean"
+                },
+                "customoid": {
                     "type": "boolean"
                 },
                 "entity-physical": {
                     "type": "boolean"
                 },
-                "processors": {
-                    "type": "boolean"
-                },
-                "mempools": {
-                    "type": "boolean"
-                },
-                "storage": {
-                    "type": "boolean"
-                },
-                "netstats": {
+                "entity-state": {
                     "type": "boolean"
                 },
                 "hr-mib": {
                     "type": "boolean"
                 },
-                "ucd-mib": {
+                "ip-system-stats": {
                     "type": "boolean"
                 },
-                "ipSystemStats": {
+                "ipmi": {
                     "type": "boolean"
                 },
-                "ports": {
+                "ipv6-nd": {
                     "type": "boolean"
                 },
-                "bgp-peers": {
+                "isis": {
+                    "type": "boolean"
+                },
+                "junose-atm-vp": {
+                    "type": "boolean"
+                },
+                "loadbalancers": {
+                    "type": "boolean"
+                },
+                "mac-accounting": {
+                    "type": "boolean"
+                },
+                "mef": {
+                    "type": "boolean"
+                },
+                "mempools": {
+                    "type": "boolean"
+                },
+                "mpls": {
+                    "type": "boolean"
+                },
+                "nac": {
+                    "type": "boolean"
+                },
+                "netscaler-vsvr": {
+                    "type": "boolean"
+                },
+                "netstats": {
+                    "type": "boolean"
+                },
+                "ntp": {
+                    "type": "boolean"
+                },
+                "os": {
                     "type": "boolean"
                 },
                 "ospf": {
@@ -141,79 +174,58 @@
                 "ospfv3": {
                     "type": "boolean"
                 },
-                "ucd-diskio": {
+                "port-security": {
                     "type": "boolean"
                 },
-                "sensors": {
+                "ports": {
                     "type": "boolean"
                 },
-                "services": {
-                    "type": "boolean"
-                },
-                "route": {
-                    "type": "boolean"
-                },
-                "stp": {
-                    "type": "boolean"
-                },
-                "ntp": {
-                    "type": "boolean"
-                },
-                "wireless": {
-                    "type": "boolean"
-                },
-                "fdb-table": {
-                    "type": "boolean"
-                },
-                "applications": {
-                    "type": "boolean"
-                },
-                "aruba-controller": {
-                    "type": "boolean"
-                },
-                "mib": {
+                "ports-stack": {
                     "type": "boolean"
                 },
                 "printer-supplies": {
                     "type": "boolean"
                 },
-                "cisco-vpdn": {
+                "processors": {
                     "type": "boolean"
                 },
-                "vminfo": {
+                "qos": {
+                    "type": "boolean"
+                },
+                "sensors": {
+                    "type": "boolean"
+                },
+                "slas": {
+                    "type": "boolean"
+                },
+                "storage": {
+                    "type": "boolean"
+                },
+                "stp": {
+                    "type": "boolean"
+                },
+                "transceivers": {
+                    "type": "boolean"
+                },
+                "ucd-diskio": {
+                    "type": "boolean"
+                },
+                "ucd-mib": {
+                    "type": "boolean"
+                },
+                "unix-agent": {
                     "type": "boolean"
                 },
                 "vlans": {
                     "type": "boolean"
                 },
-                "arp-table": {
+                "vminfo": {
                     "type": "boolean"
                 },
-                "mef": {
-                    "type": "boolean"
-                },
-                "cisco-vrf-lite": {
-                    "type": "boolean"
-                },
-                "tnms-nbi": {
-                    "type": "boolean"
-                },
-                "loadbalancers": {
-                    "type": "boolean"
-                },
-                "junose-atm-vp": {
-                    "type": "boolean"
-                },
-                "mpls": {
-                    "type": "boolean"
-                },
-                "netscaler-vsvr": {
+                "wireless": {
                     "type": "boolean"
                 },
                 "xdsl": {
-                    "type": "boolean"
-                },
-                "port-security": {
                     "type": "boolean"
                 }
             },
@@ -231,16 +243,16 @@
         "discovery_modules": {
             "type": "object",
             "properties": {
-                "cisco-qfp": {
+                "applications": {
+                    "type": "boolean"
+                },
+                "arp-table": {
+                    "type": "boolean"
+                },
+                "bgp-peers": {
                     "type": "boolean"
                 },
                 "cisco-cef": {
-                    "type": "boolean"
-                },
-                "slas": {
-                    "type": "boolean"
-                },
-                "mac-accounting": {
                     "type": "boolean"
                 },
                 "cisco-otv": {
@@ -249,73 +261,31 @@
                 "cisco-pw": {
                     "type": "boolean"
                 },
-                "entity-state": {
-                    "type": "boolean"
-                },
-                "vrf": {
+                "cisco-qfp": {
                     "type": "boolean"
                 },
                 "cisco-vrf-lite": {
                     "type": "boolean"
                 },
-                "ports": {
+                "core": {
                     "type": "boolean"
                 },
-                "ports-stack": {
-                    "type": "boolean"
-                },
-                "entity-physical": {
-                    "type": "boolean"
-                },
-                "processors": {
-                    "type": "boolean"
-                },
-                "mempools": {
-                    "type": "boolean"
-                },
-                "storage": {
-                    "type": "boolean"
-                },
-                "hr-device": {
-                    "type": "boolean"
-                },
-                "isis": {
+                "discovery-arp": {
                     "type": "boolean"
                 },
                 "discovery-protocols": {
                     "type": "boolean"
                 },
-                "bgp-peers": {
+                "entity-physical": {
                     "type": "boolean"
                 },
-                "vlans": {
-                    "type": "boolean"
-                },
-                "ucd-diskio": {
-                    "type": "boolean"
-                },
-                "ucd-dsktable": {
-                    "type": "boolean"
-                },
-                "services": {
-                    "type": "boolean"
-                },
-                "stp": {
-                    "type": "boolean"
-                },
-                "ntp": {
-                    "type": "boolean"
-                },
-                "wireless": {
+                "entity-state": {
                     "type": "boolean"
                 },
                 "fdb-table": {
                     "type": "boolean"
                 },
-                "arp-table": {
-                    "type": "boolean"
-                },
-                "printer-supplies": {
+                "hr-device": {
                     "type": "boolean"
                 },
                 "ipv4-addresses": {
@@ -324,46 +294,88 @@
                 "ipv6-addresses": {
                     "type": "boolean"
                 },
-                "charge": {
+                "ipv6-nd": {
                     "type": "boolean"
                 },
-                "ospf": {
-                    "type": "boolean"
-                },
-                "ucd-mib": {
-                    "type": "boolean"
-                },
-                "ipmi": {
-                    "type": "boolean"
-                },
-                "mef": {
-                    "type": "boolean"
-                },
-                "ipv6-address": {
-                    "type": "boolean"
-                },
-                "loadbalancers": {
-                    "type": "boolean"
-                },
-                "applications": {
-                    "type": "boolean"
-                },
-                "sensors": {
-                    "type": "boolean"
-                },
-                "diskio": {
+                "isis": {
                     "type": "boolean"
                 },
                 "junose-atm-vp": {
                     "type": "boolean"
                 },
-                "vminfo": {
+                "loadbalancers": {
+                    "type": "boolean"
+                },
+                "mac-accounting": {
+                    "type": "boolean"
+                },
+                "mef": {
+                    "type": "boolean"
+                },
+                "mempools": {
                     "type": "boolean"
                 },
                 "mpls": {
                     "type": "boolean"
                 },
-                "ip6-addresses": {
+                "ntp": {
+                    "type": "boolean"
+                },
+                "os": {
+                    "type": "boolean"
+                },
+                "ospfv3": {
+                    "type": "boolean"
+                },
+                "ports": {
+                    "type": "boolean"
+                },
+                "ports-stack": {
+                    "type": "boolean"
+                },
+                "printer-supplies": {
+                    "type": "boolean"
+                },
+                "processors": {
+                    "type": "boolean"
+                },
+                "qos": {
+                    "type": "boolean"
+                },
+                "route": {
+                    "type": "boolean"
+                },
+                "sensors": {
+                    "type": "boolean"
+                },
+                "services": {
+                    "type": "boolean"
+                },
+                "slas": {
+                    "type": "boolean"
+                },
+                "storage": {
+                    "type": "boolean"
+                },
+                "stp": {
+                    "type": "boolean"
+                },
+                "transceivers": {
+                    "type": "boolean"
+                },
+                "ucd-diskio": {
+                    "type": "boolean"
+                },
+                "vlans": {
+                    "type": "boolean"
+                },
+                "vminfo": {
+                    "type": "boolean"
+                },
+                "vrf": {
+                    "type": "boolean"
+                },
+                "wireless": {
                     "type": "boolean"
                 },
                 "xdsl": {

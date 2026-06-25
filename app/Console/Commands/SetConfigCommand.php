@@ -223,13 +223,35 @@ class SetConfigCommand extends LnmsCommand
             $value = $container;
         }
 
-        Arr::set($os_data, $setting, $value);
-        unset($os_data['definition_loaded']);
+        // Validate only the sub-tree that is actually being changed. Validating the
+        // whole merged os.<os> object means any single pre-existing/unrelated property
+        // the schema doesn't model blocks *every* os.<os>.* write (see issue #19960).
+        $parts = explode('.', $setting);
+        $section = array_shift($parts);
+
+        // load the os schema and pull out the definition for just this top-level section
+        $schema = json_decode((string) file_get_contents(resource_path('definitions/schema/os_schema.json')));
+        $section_schema = $schema->properties->{$section} ?? null;
+
+        if ($section_schema === null) {
+            // unknown top-level setting (the schema uses additionalProperties: false)
+            throw new ValidationException(trans('commands.config:set.errors.invalid_path', ['path' => $section]), 1);
+        }
+
+        // build a minimal object containing only the value being changed
+        $section_value = $value;
+        if (! empty($parts)) {
+            $section_value = [];
+            Arr::set($section_value, implode('.', $parts), $value);
+        }
+
+        // normalise to the structure json-schema expects (objects, not assoc arrays)
+        $data = json_decode((string) json_encode([$section => $section_value]));
 
         $validator = new Validator;
         $validator->validate(
-            $os_data,
-            (object) ['$ref' => 'file://' . resource_path('definitions/schema/os_schema.json')],
+            $data,
+            (object) ['type' => 'object', 'properties' => (object) [$section => $section_schema]],
             Constraint::CHECK_MODE_TYPE_CAST
         );
 
@@ -255,7 +277,14 @@ class SetConfigCommand extends LnmsCommand
         });
 
         if ($errors->isNotEmpty()) {
-            throw new ValidationException($errors->pluck('message')->implode(PHP_EOL), $code);
+            // include the failing property path so operators get an actionable message
+            $messages = $errors->map(function ($error) {
+                $path = trim((string) $error['property'], '.');
+
+                return $path === '' ? $error['message'] : "$path: {$error['message']}";
+            });
+
+            throw new ValidationException($messages->implode(PHP_EOL), $code);
         }
     }
 }
