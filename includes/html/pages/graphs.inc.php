@@ -18,16 +18,14 @@ if (session('widescreen')) {
 $vars['from'] = Time::parseAt($vars['from'] ?? '') ?: LibrenmsConfig::get('time.day');
 $vars['to'] = Time::parseAt($vars['to'] ?? '') ?: LibrenmsConfig::get('time.now');
 
-preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $vars['type'], $graphtype);
+preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', (string) $vars['type'], $graphtype);
 
 $type = basename($graphtype['type']);
 $subtype = basename($graphtype['subtype']);
 $id = $vars['id'] ?? null;
 
 if (isset($vars['device'])) {
-    $device = is_numeric($vars['device'])
-        ? device_by_id_cache($vars['device'])
-        : device_by_name($vars['device']);
+    $device = DeviceCache::get($vars['device']);
 }
 
 $auth = false;
@@ -63,20 +61,23 @@ if (! $auth) {
     echo $title;
 
     // FIXME allow switching between types for sensor and wireless also restrict types to ones that have data
-    if ($type != 'sensor') {
-        echo '<div style="float: right;"><form action="">';
-        echo csrf_field();
-        echo "<select name='type' id='type' onchange=\"window.open(this.options[this.selectedIndex].value,'_top')\" class='devices-graphs-select'>";
+    if (! in_array($type, ['sensor', 'wireless'])) {
+        $graph_subtypes = get_graph_subtypes($type);
+        if (count($graph_subtypes) > 1) {
+            echo '<div style="float: right;"><form action="">';
+            echo csrf_field();
+            echo "<select name='type' id='type' onchange=\"window.open(this.options[this.selectedIndex].value,'_top')\" class='devices-graphs-select'>";
 
-        foreach (get_graph_subtypes($type, $device) as $avail_type) {
-            echo "<option value='" . \LibreNMS\Util\Url::generate($vars, ['type' => $type . '_' . $avail_type, 'page' => 'graphs']) . "'";
-            if ($avail_type == $subtype) {
-                echo ' selected';
+            foreach ($graph_subtypes as $avail_type) {
+                echo "<option value='" . \LibreNMS\Util\Url::generate($vars, ['type' => $type . '_' . $avail_type, 'page' => 'graphs']) . "'";
+                if ($avail_type == $subtype) {
+                    echo ' selected';
+                }
+                $display_type = \LibreNMS\Util\StringHelpers::niceCase($avail_type);
+                echo ">$display_type</option>";
             }
-            $display_type = \LibreNMS\Util\StringHelpers::niceCase($avail_type);
-            echo ">$display_type</option>";
+            echo '</select></form></div>';
         }
-        echo '</select></form></div>';
     }
 
     print_optionbar_end();
@@ -166,7 +167,7 @@ if (! $auth) {
         echo ' | To show trend, set to future date';
     }
 
-    if (str_contains($vars['type'], 'sensor_')) {
+    if (str_contains((string) $vars['type'], 'sensor_')) {
         echo ' | To show trend, set to future date';
     }
 
@@ -190,7 +191,7 @@ if (! $auth) {
             <i class="fa-solid fa-circle-info fa-lg icon-theme" aria-hidden="true"></i>
             </div>
             </div>';
-        echo LibrenmsConfig::get('graph_descr.' . $vars['type']);
+        echo e(LibrenmsConfig::get('graph_descr.' . $vars['type']));
         print_optionbar_end();
     }
 

@@ -58,7 +58,7 @@ if (! $port_id && ! $port_id_file || ($port_id && $port_id_file)) {
 if ($port_id) {
     try {
         Port::findOrFail($port_id)->delete();
-    } catch (ModelNotFoundException $e) {
+    } catch (ModelNotFoundException) {
         echo "Port ID $port_id not found!\n";
     }
 }
@@ -79,7 +79,7 @@ if ($port_id_file) {
     while ($port_id = trim(fgets($fh))) {
         try {
             Port::findOrFail($port_id)->delete();
-        } catch (ModelNotFoundException $e) {
+        } catch (ModelNotFoundException) {
             echo "Port ID $port_id not found!\n";
         }
     }

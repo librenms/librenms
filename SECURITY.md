@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Only the most recent monthly release and daily release recieve security updates.
+Only the most recent monthly release and daily release receive security updates.
 LibreNMS is supported by volunteers, they all do their best to keep LibreNMS secure.
 
 ## Finding a Vulnerability

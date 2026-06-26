@@ -22,27 +22,21 @@
 
 
       alcatelIND1OpenflowMIB MODULE-IDENTITY
-          LAST-UPDATED  "201403260000Z"
-          ORGANIZATION  "Alcatel-Lucent"
+          LAST-UPDATED "201911270000Z"
+          ORGANIZATION "ALE USA Inc."
           CONTACT-INFO
-              "Please consult with Customer Service to ensure the most appropriate
-               version of this document is used with the products in question:
+           "Please consult with Customer Service to ensure the most appropriate
+            version of this document is used with the products in question:
 
-                        Alcatel-Lucent, Enterprise Solutions Division
-                      (Formerly Alcatel Internetworking, Incorporated)
-                                 26801 West Agoura Road
-                              Agoura Hills, CA  91301-5122
-                                United States Of America
+                            ALE USA Inc. Enterprise
+                              26801 West Agoura Road
+                           Agoura Hills, CA  91301-5122
+                             United States Of America
 
-              Telephone:               North America  +1 800 995 2696
-                                       Latin America  +1 877 919 9526
-                                       Europe         +31 23 556 0100
-                                       Asia           +65 394 7933
-                                       All Other      +1 818 878 4507
+           Telephone:          +1 800 995 2696
 
-              Electronic Mail:         support@ind.alcatel.com
-              World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-              File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+           Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+           World Wide Web:     https://www.al-enterprise.com"
 
           DESCRIPTION
               "This module describes an authoritative enterprise-specific Simple
@@ -61,8 +55,13 @@
                non-exclusive license to use this specification in connection with
                management of the products for which it is intended to be used.
 
-                           Copyright (C) 2013 Alcatel-Lucent
-                               ALL RIGHTS RESERVED WORLDWIDE"
+                       Copyright (C) ALE USA Inc. 2014-2019
+                       Copyright (C) 2013 Alcatel-Lucent
+                           ALL RIGHTS RESERVED WORLDWIDE"
+
+          REVISION      "201911270000Z"
+          DESCRIPTION
+              "Updated the latest contact and Copyright information for ALE USA Inc."
 
           REVISION      "201403260000Z"
           DESCRIPTION
@@ -348,7 +347,8 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-              "Information about the Openflow Controllers attached to Logical Switches. "
+              "Information about the Openflow Controllers attached to Logical Switches. 
+               The MAX size available for alaOpenflowControllerIp is 93 because the table index cannot exceed MAX 128 dotted values."
             INDEX { alaOpenflowControllerLogicalSwitch, alaOpenflowControllerIpType, alaOpenflowControllerIp, alaOpenflowControllerPort }
     ::= { alaOpenflowControllerTable 1 }
 
@@ -374,15 +374,15 @@
         ::= { alaOpenflowControllerEntry 1 }
 
   alaOpenflowControllerIpType OBJECT-TYPE
-        SYNTAX      InetAddressType(1)
+        SYNTAX      InetAddressType { ipv4(1), dns(16) }
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION
-         "Openflow Controller IP Address Type. The only type currently supported is ipv4(1)"
+         "Openflow Controller IP Address Type. The only type currently supported is ipv4(1) and fqdn(16)"
         ::= { alaOpenflowControllerEntry 2 }
 
   alaOpenflowControllerIp OBJECT-TYPE
-        SYNTAX      InetAddress(SIZE (4|16))
+        SYNTAX      InetAddress(SIZE(1..128))
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION

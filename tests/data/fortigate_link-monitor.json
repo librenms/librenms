@@ -8,7 +8,7 @@
                     "sysDescr": null,
                     "sysContact": null,
                     "version": "v6.4.8,build1914,211117 (GA)",
-                    "hardware": "FortiGate 100",
+                    "hardware": null,
                     "features": null,
                     "location": null,
                     "os": "fortigate",
@@ -253,14 +253,12 @@
                 {
                     "state_name": "fgLinkMonitorTable",
                     "state_descr": "Alive",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "fgLinkMonitorTable",
                     "state_descr": "Dead",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 }

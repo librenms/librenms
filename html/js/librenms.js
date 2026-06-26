@@ -85,12 +85,12 @@ function submitCustomRange(frmdata) {
     return true;
 }
 
-function updateTimezone(tz, static)
+function updateTimezone(tz, staticTz)
 {
     $.post(ajax_url + '/set_timezone',
         {
             timezone: tz,
-            static: static
+            static: staticTz
         },
         function(data) {
             if(data === tz) {
@@ -264,7 +264,8 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
                     '<i class="fa fa-download"></i> <span class="caret"></span>' +
                     '</button>' +
                     '<ul class="dropdown-menu">' +
-                    '<li><a href="' + exportUrl + '" class="export-link" data-grid-id="' + tableId + '"><i class="fa fa-file-text-o"></i> Export to CSV</a></li>' +
+                    '<li><a href="' + exportUrl + '" class="export-link" data-grid-id="' + tableId + '" data-export-type="visible"><i class="fa-solid fa-fw fa-file-csv"></i> Export page</a></li>' +
+                    '<li><a href="' + exportUrl + '" class="export-link" data-grid-id="' + tableId + '" data-export-type="all"><i class="fa-solid fa-fw fa-file-csv"></i> Export all results</a></li>' +
                     '</ul>' +
                     '</div>'
                 );
@@ -277,6 +278,7 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
                     e.preventDefault();
 
                     var gridId = $(this).data('grid-id');
+                    var exportType = $(this).data('export-type');
                     var grid = $('#' + gridId);
                     var currentUrl = $(this).attr('href');
                     var urlParams = [];
@@ -286,11 +288,13 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
                         urlParams.push('searchPhrase=' + encodeURIComponent(searchPhrase));
                     }
 
-                    // pagination and row count
-                    var currentPage = grid.bootgrid('getCurrentPage');
-                    var rowCount = grid.bootgrid('getRowCount');
-                    urlParams.push('current=' + currentPage);
-                    urlParams.push('rowCount=' + rowCount);
+                    // Only include pagination for visible records export
+                    if (exportType === 'visible') {
+                        var currentPage = grid.bootgrid('getCurrentPage');
+                        var rowCount = grid.bootgrid('getRowCount');
+                        urlParams.push('current=' + currentPage);
+                        urlParams.push('rowCount=' + rowCount);
+                    }
 
                     // get all filters from the header
                     var headerContainer = $('.' + gridId + '-headers-table-menu');
@@ -652,9 +656,10 @@ function init_select2(selector, type, data, selected, placeholder, config) {
 
     // allow function to be assigned to pass data
     const data_function = $.isFunction(data) ? data : function (params) {
-        data.term = params.term;
-        data.page = params.page || 1;
-        return data;
+        return Object.assign({}, data, {
+            term: params.term,
+            page: params.page || 1
+        });
     };
 
     const init = {
@@ -667,7 +672,21 @@ function init_select2(selector, type, data, selected, placeholder, config) {
         ajax: {
             url: ajax_url + '/select/' + type,
             delay: 150,
-            data: data_function
+            data: data_function,
+            error: function (jqXHR) {
+                if (jqXHR.status === 403 && jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                    $select.data('select2-last-error', jqXHR.responseJSON.message);
+                }
+            }
+        },
+        language: {
+            errorLoading: function () {
+                var message = $select.data('select2-last-error') || "The results could not be loaded.";
+
+                $select.removeData('select2-last-error');
+
+                return message;
+            }
         }
     };
 
@@ -741,3 +760,25 @@ function applySiteStyle(newStyle) {
         });
     }
 }
+
+// prevent dropdown menus from overflowing the viewport
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.dropdown-submenu:not(:has(.dropdown-submenu))').forEach(function (submenuParent) {
+        const submenu = submenuParent.querySelector('.dropdown-menu');
+        if (!submenu) return;
+
+        submenuParent.addEventListener('mouseenter', function () {
+            const rect = submenu.getBoundingClientRect();
+            const availableHeight = window.innerHeight - rect.top - 10;
+
+            if (rect.bottom > window.innerHeight) {
+                submenu.style.maxHeight = availableHeight + 'px';
+                submenu.style.overflowY = 'auto';
+            }
+        });
+
+        submenuParent.addEventListener('mouseleave', function () {
+            submenu.style.maxHeight = '';
+        });
+    });
+});

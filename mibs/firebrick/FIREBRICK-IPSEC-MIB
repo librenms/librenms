@@ -4,8 +4,6 @@
 -- * June 2020, Cliff Hones
 -- *
 -- * Copyright (c) 2020 by Andrews & Arnold
--- * 
--- * See the Firebrick Manuals for more information
 -- *------------------------------------------------
 
 FIREBRICK-IPSEC-MIB DEFINITIONS ::= BEGIN
@@ -13,7 +11,8 @@ FIREBRICK-IPSEC-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     MODULE-IDENTITY,
     OBJECT-TYPE,
-    enterprises
+    enterprises,
+    TimeTicks
         FROM SNMPv2-SMI
     DisplayString
         FROM SNMPv2-TC
@@ -21,11 +20,11 @@ IMPORTS
     InetAddress
         FROM INET-ADDRESS-MIB
     firebrickNewStyle
-	FROM FIREBRICK-MIB
+        FROM FIREBRICK-MIB
         ;
 
 fbIPsecMib MODULE-IDENTITY
-    LAST-UPDATED "202006160000Z"
+    LAST-UPDATED "202207150000Z"
     ORGANIZATION "Andrews & Arnold Limited"
     CONTACT-INFO
         "Andrews & Arnold
@@ -36,8 +35,9 @@ fbIPsecMib MODULE-IDENTITY
         Tel: +44 3333 400 999
         Email: support@aa.net.uk"
     DESCRIPTION
-        "This is a MIB Module for monitoring the Firebrick-specific structures
-        for IPSec."
+        "Firebrick-specific structures for IPSec"
+    REVISION "202207150000Z"
+    DESCRIPTION "Additional validation"
     REVISION "202006160000Z"
     DESCRIPTION "Initial version of this MIB module"
     ::= { firebrickNewStyle 500 }
@@ -80,10 +80,10 @@ fbIPsecConnectionEntry OBJECT-TYPE
 FbIPsecConnectionEntry ::= SEQUENCE {
     fbIPsecConnectionIndex        Integer32,
     fbIPsecConnectionName         DisplayString,
-    fbIPsecConnectionState        Integer32,
+    fbIPsecConnectionState        FbIPsecConState,
     fbIPsecConnectionUptime       TimeTicks,
-    fbIPsecConnectionLocalId      DisplayString,
-    fbIPsecConnectionPeerId       DisplayString,
+    fbIPsecConnectionLocalID      DisplayString,
+    fbIPsecConnectionPeerID       DisplayString,
     fbIPsecConnectionPeerAddress  DisplayString
 }
 
@@ -104,7 +104,7 @@ fbIPsecConnectionName OBJECT-TYPE
     ::= { fbIPsecConnectionEntry 2 }
 
 fbIPsecConnectionState OBJECT-TYPE
-    SYNTAX  Integer32
+    SYNTAX  FbIPsecConState
     MAX-ACCESS  read-only
     STATUS  current
     DESCRIPTION
@@ -142,5 +142,24 @@ fbIPsecConnectionPeerAddress OBJECT-TYPE
     DESCRIPTION
         "The peer's IP address for this connection"
     ::= { fbIPsecConnectionEntry 7 }
+
+FbIPsecConState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION "The state of an IPsec connection"
+    SYNTAX  INTEGER {
+        badConfig(0),   -- Bad config (item ignored)
+        profileOff(1),  -- disabled by profile
+        awaitPeer(2),   -- Not up (waiting for peer to initiate)
+        awaitDemand(3), -- Not up (on-demand connection)
+        lingering(4),   -- Lingering (old connection waiting to be cleared)
+        awaitRecon(5),  -- Waiting to reconnect after failure
+        down(6),        -- Down
+        initEAP(7),     -- Initiating - processing EAP
+        initAuth(8),    -- Initiating - processing authorization
+        initNeg(9),     -- Initiating - initial negotiation
+        closing(10),    -- Closing
+        childless(11),  -- Childless - IKE connection established but no data channel present
+        connected(12)   -- Connected
+    }
 
 END

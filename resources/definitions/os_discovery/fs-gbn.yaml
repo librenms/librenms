@@ -1,6 +1,6 @@
 modules:
     mempools:
-        pre-cache:
+        additional_oids:
             oids:
                 - GBNPlatformOAM-MIB::cpuDescription
         data:

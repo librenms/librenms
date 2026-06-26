@@ -273,7 +273,7 @@ return [
         'success' => 'წარმატებით დაემატა მომხმარებელი: :username',
         'wrong-auth' => 'ფრთხილად! You will not be able to log in with this user because you are not using MySQL auth',
     ],
-    'maintenance:database-cleanup' => [
+    'maintenance:cleanup-database' => [
         'description' => 'მონაცემთა ბაზის გასუფთავება მიტოვებული ელემენტებისგან.',
     ],
 ];

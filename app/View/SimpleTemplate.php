@@ -28,7 +28,7 @@ namespace App\View;
 
 use LibreNMS\Util\StringHelpers;
 
-class SimpleTemplate
+class SimpleTemplate implements \Stringable
 {
     private string $regex = '/{{ \$?([a-zA-Z0-9\-_.:]+)(\|[^}]+)? }}/';
     private bool $keepEmpty = false;
@@ -268,7 +268,7 @@ class SimpleTemplate
 
     public function __toString(): string
     {
-        return preg_replace_callback($this->regex, $this->callback ?? function ($matches) {
+        return (string) preg_replace_callback($this->regex, $this->callback ?? function ($matches) {
             $variableName = $matches[1];
             $value = $this->variables[$variableName] ?? ($this->keepEmpty ? $matches[0] : '');
 

@@ -26,7 +26,8 @@
 
 namespace LibreNMS\Util;
 
-use App;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
 class Laravel
@@ -43,6 +44,7 @@ class Laravel
         $app = require_once $install_dir . '/bootstrap/app.php';
         $kernel = $app->make(\Illuminate\Contracts\Console\Kernel::class);
         $kernel->bootstrap();
+        Log::setDefaultDriver('console');
     }
 
     /**
@@ -73,7 +75,7 @@ class Laravel
 
     public static function isBooted()
     {
-        return function_exists('app') && ! empty(app()->isAlias('Illuminate\Foundation\Application')) && app()->isBooted();
+        return function_exists('app') && ! empty(app()->isAlias(\Illuminate\Foundation\Application::class)) && app()->isBooted();
     }
 
     /**

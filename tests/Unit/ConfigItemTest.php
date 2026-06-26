@@ -5,7 +5,7 @@ namespace LibreNMS\Tests\Unit;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\DynamicConfigItem;
 
-class ConfigItemTest extends TestCase
+final class ConfigItemTest extends TestCase
 {
     public function testExecutableValidation(): void
     {

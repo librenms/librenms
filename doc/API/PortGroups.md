@@ -19,7 +19,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/portgroups/transit,peering
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/portgroups/transit,peering
 ```
 
 Output:
@@ -47,7 +47,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/portgroups/multiport/bits/1,2,3
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/portgroups/multiport/bits/1,2,3
 ```
 
 Output:

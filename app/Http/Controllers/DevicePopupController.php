@@ -28,22 +28,47 @@ namespace App\Http\Controllers;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 use LibreNMS\Util\Graph;
 
 class DevicePopupController
 {
-    public function __invoke(Device $device)
+    public function __invoke(Request $request, Device $device)
     {
         if (! LibrenmsConfig::get('web_mouseover', true)) {
             return response('Disabled');
         }
 
         // Check access permissions
-        if (! $device->canAccess(auth()->user())) {
-            return response('Unauthorized', 403);
+        Gate::authorize('view', $device);
+
+        return view('device.popup', [
+            'device' => $device,
+            'osText' => LibrenmsConfig::getOsSetting($device->os ?? '', 'text'),
+            'href' => route('device', ['device' => $device->device_id]),
+            'graphs' => $this->buildGraphs($request, $device),
+        ]);
+    }
+
+    /**
+     * @return array[]
+     */
+    private function buildGraphs(Request $request, Device $device): array
+    {
+        $type = $request->string('type');
+        if ($type->isNotEmpty()) {
+            return [
+                [
+                    'device' => $device,
+                    'type' => $type,
+                    'title' => Str::title($type),
+                    'graphs' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-14d'], ['from' => '-30d']],
+                ],
+            ];
         }
 
-        // Build graphs HTML using existing graph-row component
         $graphs = [];
         foreach (Graph::getOverviewGraphsForDevice($device) as $graph) {
             if (isset($graph['text'], $graph['graph'])) {
@@ -56,11 +81,6 @@ class DevicePopupController
             }
         }
 
-        return view('device.popup', [
-            'device' => $device,
-            'osText' => LibrenmsConfig::getOsSetting($device->os ?? '', 'text'),
-            'href' => route('device', ['device' => $device->device_id]),
-            'graphs' => $graphs,
-        ]);
+        return $graphs;
     }
 }

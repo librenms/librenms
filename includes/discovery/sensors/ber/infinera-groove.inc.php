@@ -26,7 +26,7 @@
  * Modified for FEC, Magnus Bergroth
  */
 foreach ($pre_cache['infineragroove_portTable'] as $index => $data) {
-    $portAliasIndex = preg_replace('/\.0$/', '', $index);
+    $portAliasIndex = preg_replace('/\.0$/', '', (string) $index);
     $portAlias = (string) $pre_cache['infineragroove_portTable'][$portAliasIndex]['portAlias'];
 
     if (isset($data['bitErrorRatePreFecInstant']) && is_numeric($data['bitErrorRatePreFecInstant']) && in_array($pre_cache['infineragroove_portTable'][$portAliasIndex]['portAdminStatus'], ['up', '3'], true)) {

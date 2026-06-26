@@ -10,6 +10,9 @@ return [
     'alertlog-stats' => [
         'title' => '警報歷程統計',
     ],
+    'alert-map' => [
+        'title' => '警報地圖',
+    ],
     'availability-map' => [
         'title' => '可用性地圖',
     ],
@@ -29,7 +32,7 @@ return [
         'title' => '裝置類型',
     ],
     'eventlog' => [
-        'title' => 'Eventlog',
+        'title' => '事件記錄',
     ],
     'generic-graph' => [
         'title' => '圖表',
@@ -43,8 +46,14 @@ return [
     'graylog' => [
         'title' => 'Graylog',
     ],
+    'health-sensors' => [
+        'title' => '健康感測器',
+    ],
     'notes' => [
         'title' => '備註',
+    ],
+    'placeholder' => [
+        'title' => '提示文字',
     ],
     'server-stats' => [
         'title' => '伺服器統計數據',
@@ -61,7 +70,7 @@ return [
     'top-interfaces' => [
         'title' => '網路介面排行榜',
     ],
-    'worldmap' => [
+    'world-map' => [
         'title' => '世界地圖',
     ],
 ];

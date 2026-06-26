@@ -22,6 +22,6 @@ lnms config:set webui.availability_map_box_size 165
 # Sort by status instead of hostname
 lnms config:set webui.availability_map_sort_status false
 
-# Show the device group drop-down on the availabiltiy map page
+# Show the device group drop-down on the availability map page
 lnms config:set webui.availability_map_use_device_groups true
 ```

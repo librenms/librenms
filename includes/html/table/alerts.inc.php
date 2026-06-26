@@ -14,6 +14,9 @@
  * @author     LibreNMS Contributors
 */
 
+use Illuminate\Support\Facades\Gate;
+use LibreNMS\Util\Time;
+
 $where = ' `devices`.`disabled` = 0';
 $param = [];
 $alert_states = [
@@ -87,7 +90,7 @@ if (! empty($searchPhrase)) {
 
 $sql = ' FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`';
 
-if (! Auth::user()->hasGlobalRead()) {
+if (Gate::denies('viewAll', \App\Models\Alert::class)) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
     $where .= ' AND `devices`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
@@ -120,19 +123,14 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-if (session('preferences.timezone')) {
-    $sql = "SELECT `alerts`.*, IFNULL(CONVERT_TZ(`alerts`.`timestamp`, @@global.time_zone, ?),`alerts`.`timestamp`) AS timestamp_display, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`name`, `alert_rules`.`severity`, `alert_rules`.`builder` $sql";
-    $param = array_merge([session('preferences.timezone')], $param);
-} else {
-    $sql = "SELECT `alerts`.*, `alerts`.`timestamp` AS timestamp_display, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`name`, `alert_rules`.`severity`, `alert_rules`.`builder` $sql";
-}
+$sql = "SELECT `alerts`.*, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`name`, `alert_rules`.`severity`, `alert_rules`.`builder` $sql";
 
 $rulei = 0;
 foreach (dbFetchRows($sql, $param) as $alert) {
     $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alert['rule_id'], $alert['device_id']]);
     $alert_log_id = dbFetchCell('SELECT id FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alert['rule_id'], $alert['device_id']]);
     [$fault_detail, $max_row_length] = alert_details($log);
-    $info = json_decode($alert['info'], true);
+    $info = json_decode((string) $alert['info'], true);
 
     $alert_to_ack = '<button type="button" class="btn btn-danger command-ack-alert fa fa-eye" aria-hidden="true" title="Mark as acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" data-alert_state="' . $alert['state'] . '" name="ack-alert"></button>';
     $alert_to_nack = '<button type="button" class="btn btn-primary command-ack-alert fa fa-eye-slash" aria-hidden="true" title="Mark as not acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" data-alert_state="' . $alert['state'] . '" name="ack-alert"></button>';
@@ -158,7 +156,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         }
     }
 
-    $hostname = '<div class="incident">' . generate_device_link($alert, shorthost(format_hostname($alert))) . '<div id="incident' . $alert['id'] . '"';
+    $hostname = '<div class="incident">' . \LibreNMS\Util\Url::modernDeviceLink(DeviceCache::get($alert['device_id'] ?? null)) . '<div id="incident' . $alert['id'] . '"';
     if (isset($vars['uncollapse_key_count']) && is_numeric($vars['uncollapse_key_count'])) {
         $hostname .= $max_row_length < (int) $vars['uncollapse_key_count'] ? '' : ' class="collapse"';
     } else {
@@ -183,7 +181,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     if (($proc == '') || ($proc == 'NULL')) {
         $has_proc = '';
     } else {
-        if (! preg_match('#^https?://#', $proc)) {
+        if (! preg_match('#^https?://#', (string) $proc)) {
             $has_proc = '';
         } else {
             $has_proc = '<a href="' . $proc . '" target="_blank"><button type="button" class="btn btn-info fa fa-external-link" aria-hidden="true"></button></a>';
@@ -198,16 +196,16 @@ foreach (dbFetchRows($sql, $param) as $alert) {
 
     $response[] = [
         'id' => $rulei++,
-        'rule' => '<i title="' . htmlentities($alert['builder']) . '"><a href="' . \LibreNMS\Util\Url::generate(['page' => 'alert-rules']) . '">' . htmlentities($alert['name']) . '</a></i>',
+        'rule' => '<i title="' . htmlentities((string) $alert['builder']) . '"><a href="' . \LibreNMS\Util\Url::generate(['page' => 'alert-rules']) . '">' . htmlentities((string) $alert['name']) . '</a></i>',
         'details' => '<a class="fa-solid fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . $alert['id'] . '" data-parent="#alerts"></a>',
         'verbose_details' => "<button type='button' class='btn btn-alert-details command-alert-details' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'><i class='fa-solid fa-circle-info'></i></button>",
         'hostname' => $hostname,
         'location' => generate_link(htmlspecialchars($alert['location'] ?? 'N/A'), ['page' => 'devices', 'location' => $alert['location'] ?? '']),
-        'timestamp' => ($alert['timestamp_display'] ? $alert['timestamp_display'] : 'N/A'),
+        'timestamp' => ($alert['timestamp'] ? Time::format($alert['timestamp'], 'compact') : 'N/A'),
         'severity' => $severity_ico,
         'state' => $alert['state'],
         'alert_id' => $alert['id'],
-        'ack_ico' => $ack_ico,
+        'ack_ico' => Gate::allows('alert.update') ? $ack_ico : '',
         'proc' => $has_proc,
         'notes' => "<button type='button' class='btn btn-$note_class fa fa-sticky-note-o command-alert-note' aria-label='Notes' id='alert-notes' data-alert_id='{$alert['id']}'></button>",
     ];

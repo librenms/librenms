@@ -1,10 +1,12 @@
 #!/usr/bin/env php
 <?php
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\ModuleList;
 use LibreNMS\Util\ModuleTestHelper;
 
 $install_dir = realpath(__DIR__ . '/..');
@@ -42,14 +44,10 @@ if (isset($options['h'])) {
 }
 
 if (isset($hostname)) {
-    if (is_numeric($hostname)) {
-        $device = device_by_id_cache($hostname);
-    } elseif (! empty($hostname)) {
-        $device = device_by_name($hostname);
-    }
+    $device = DeviceCache::get($hostname);
 
-    if (isset($device['os']) && $device['os'] != 'generic') {
-        $target_os = $device['os'];
+    if ($device->os != 'generic') {
+        $target_os = $device->os;
     } elseif (isset($options['o'])) {
         $target_os = $options['o'];
     } elseif (isset($options['os'])) {
@@ -91,7 +89,6 @@ Examples:
 }
 
 Debug::set(isset($options['d']) || isset($options['debug']));
-\Log::setDefaultDriver('console');
 
 if (isset($options['m'])) {
     $modules_input = $options['m'];
@@ -116,7 +113,7 @@ if ($variant) {
 echo PHP_EOL;
 
 try {
-    $capture = new ModuleTestHelper($modules, $target_os, $variant);
+    $capture = new ModuleTestHelper(ModuleList::fromUserOverrides($modules), $target_os, $variant);
 
     if (isset($options['f'])) {
         $capture->setSnmprecSavePath($options['f']);
@@ -129,7 +126,7 @@ try {
 
     echo 'Capturing Data: ';
     LibrenmsConfig::invalidateAndReload();
-    $capture->captureFromDevice($device['device_id'], $prefer_new_snmprec, $full);
+    $capture->captureFromDevice($device->device_id, $prefer_new_snmprec, $full);
     echo "\nVerify these file(s) do not contain any private data before sharing!\n";
 } catch (InvalidModuleException $e) {
     echo $e->getMessage() . PHP_EOL;

@@ -27,10 +27,15 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\EntPhysical;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 
+/**
+ * @extends SelectController<EntPhysical>
+ */
 class InventoryController extends SelectController
 {
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'field' => 'required|in:name,model,descr,class',
@@ -38,19 +43,21 @@ class InventoryController extends SelectController
         ];
     }
 
-    protected function filterFields($request)
+    protected function filterFields(Request $request): array
     {
         return ['device_id'];
     }
 
-    protected function searchFields($request)
+    protected function searchFields(Request $request): array
     {
-        return [$this->fieldToColumn($request->get('field'))];
+        return [$this->fieldToColumn($request->input('field'))];
     }
 
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
-        $column = $this->fieldToColumn($request->get('field'));
+        $this->authorize('viewAny', EntPhysical::class);
+
+        $column = $this->fieldToColumn($request->input('field'));
 
         return EntPhysical::hasAccess($request->user())
             ->select($column)

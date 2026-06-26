@@ -22,6 +22,7 @@ if (isset($searchPhrase) && ! empty($searchPhrase)) {
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
 }
 
 $count_sql = "SELECT COUNT(`bgpPeer_id`) $sql";
@@ -54,6 +55,7 @@ foreach (dbFetchRows($sql, $param) as $routing) {
         'hostname' => generate_device_link($routing),
         'bgpPeerIdentifier' => $routing['bgpPeerIdentifier'],
         'bgpPeerRemoteAs' => $routing['bgpPeerRemoteAs'],
+        'context_name' => $routing['context_name'],
         'bgpPeerDescr' => $routing['bgpPeerDescr'], ];
 }
 

@@ -62,8 +62,8 @@ class FinalizeController extends InstallationController implements InstallerStep
             'site_style' => 'in:device,light,dark',
         ]);
 
-        $this->saveSetting('update_channel', $request->get('update_channel', 'master'));
-        $this->saveSetting('site_style', $request->get('site_style'));
+        $this->saveSetting('update_channel', $request->input('update_channel', 'master'));
+        $this->saveSetting('site_style', $request->input('site_style'));
         $this->saveSetting('reporting.error', $request->has('error_reporting'));
         $this->saveSetting('reporting.usage', $request->has('usage_reporting'));
 

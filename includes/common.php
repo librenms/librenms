@@ -101,7 +101,7 @@ function shorthost($hostname, $len = 12)
     }
     $len = LibrenmsConfig::get('shorthost_target_length', $len);
 
-    $parts = explode('.', $hostname);
+    $parts = explode('.', (string) $hostname);
     $shorthost = $parts[0];
     $i = 1;
     while ($i < count($parts) && strlen($shorthost . '.' . $parts[$i]) < $len) {
@@ -130,11 +130,6 @@ function print_message($text)
     }
 }
 
-function get_sensor_rrd($device, $sensor)
-{
-    return Rrd::name($device['hostname'], get_sensor_rrd_name($device, $sensor));
-}
-
 function get_sensor_rrd_name($device, $sensor)
 {
     // For IPMI, sensors tend to change order, and there is no index, so we prefer to use the description as key here.
@@ -150,54 +145,18 @@ function get_port_rrdfile_path($hostname, $port_id, $suffix = '')
     return Rrd::name($hostname, Rrd::portName($port_id, $suffix));
 }
 
-function get_port_by_ifIndex($device_id, $ifIndex)
-{
-    return dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device_id, $ifIndex]);
-}
-
-function get_port_by_id($port_id)
-{
-    if (is_numeric($port_id)) {
-        $port = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$port_id]);
-        if (is_array($port)) {
-            return $port;
-        } else {
-            return false;
-        }
-    }
-}
-
 function ifclass($ifOperStatus, $ifAdminStatus)
 {
     // fake a port model
-    return \LibreNMS\Util\Url::portLinkDisplayClass((object) ['ifOperStatus' => $ifOperStatus, 'ifAdminStatus' => $ifAdminStatus]);
+    return \LibreNMS\Util\Url::portLinkDisplayClass((object) [
+        'ifOperStatus' => $ifOperStatus instanceof \LibreNMS\Enum\IfOperStatus ? $ifOperStatus : \LibreNMS\Enum\IfOperStatus::tryFrom($ifOperStatus),
+        'ifAdminStatus' => $ifAdminStatus instanceof \LibreNMS\Enum\IfOperStatus ? $ifAdminStatus : \LibreNMS\Enum\IfOperStatus::tryFrom($ifAdminStatus),
+    ]);
 }
 
-function device_by_name($name)
+function device_by_id_cache($device_id)
 {
-    return device_by_id_cache(getidbyname($name));
-}
-
-function device_by_id_cache($device_id, $refresh = false)
-{
-    $model = $refresh ? DeviceCache::refresh((int) $device_id) : DeviceCache::get((int) $device_id);
-
-    $device = $model->toArray();
-    $device['location'] = $model->location->location ?? null;
-    $device['lat'] = $model->location->lat ?? null;
-    $device['lng'] = $model->location->lng ?? null;
-
-    return $device;
-}
-
-function gethostbyid($device_id)
-{
-    return DeviceCache::get((int) $device_id)->hostname;
-}
-
-function getifbyid($id)
-{
-    return dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$id]);
+    return DeviceCache::get((int) $device_id)->toArray();
 }
 
 function getidbyname($hostname)
@@ -205,19 +164,9 @@ function getidbyname($hostname)
     return DeviceCache::getByHostname($hostname)->device_id;
 }
 
-function set_dev_attrib($device, $attrib_type, $attrib_value)
-{
-    return DeviceCache::get((int) $device['device_id'])->setAttrib($attrib_type, $attrib_value);
-}
-
 function get_dev_attrib($device, $attrib_type)
 {
     return DeviceCache::get((int) $device['device_id'])->getAttrib($attrib_type);
-}
-
-function del_dev_attrib($device, $attrib_type)
-{
-    return DeviceCache::get((int) $device['device_id'])->forgetAttrib($attrib_type);
 }
 
 /**
@@ -280,7 +229,7 @@ function is_client_authorized($clientip)
 
                 return true;
             }
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             d_echo("Client IP ($clientip) is invalid.\n");
         }
     }
@@ -291,25 +240,29 @@ function is_client_authorized($clientip)
 /*
  * @return an array of all graph subtypes for the given type
  */
-function get_graph_subtypes($type, $device = null)
+function get_graph_subtypes(string $type): array
 {
-    $type = basename($type);
+    $dir = base_path('includes/html/graphs/' . basename($type));
+
+    if (! is_dir($dir)) {
+        return [];
+    }
+
     $types = [];
 
-    // find the subtypes defined in files
-    if ($handle = opendir(LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/")) {
-        while (false !== ($file = readdir($handle))) {
-            if ($file != '.' && $file != '..' && $file != 'auth.inc.php' && strstr($file, '.inc.php')) {
-                $types[] = str_replace('.inc.php', '', $file);
+    foreach (new DirectoryIterator($dir) as $file) {
+        if ($file->isFile() && str_ends_with($file->getFilename(), '.inc.php')) {
+            $name = $file->getBasename('.inc.php');
+            if ($name !== 'auth') {
+                $types[] = $name;
             }
         }
-        closedir($handle);
     }
 
     sort($types);
 
     return $types;
-} // get_graph_subtypes
+}
 
 function generate_smokeping_file($device, $file = '')
 {
@@ -491,10 +444,10 @@ function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
             if (count($glues) == 1 && $glues[0]['COLUMN_NAME'] != $target) {
                 //Search for new candidates to expand
                 $ntables = [];
-                [$tmp] = explode('_', $glues[0]['COLUMN_NAME'], 2);
+                [$tmp] = explode('_', (string) $glues[0]['COLUMN_NAME'], 2);
                 $ntables[] = $tmp;
                 $ntables[] = $tmp . 's';
-                $tmp = dbFetchRows('SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_NAME LIKE "' . substr($table, 0, -1) . '_%" && TABLE_NAME != "' . $table . '"');
+                $tmp = dbFetchRows('SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_NAME LIKE "' . substr((string) $table, 0, -1) . '_%" && TABLE_NAME != "' . $table . '"');
                 foreach ($tmp as $expand) {
                     $ntables[] = $expand['TABLE_NAME'];
                 }
@@ -507,7 +460,7 @@ function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
                     if ($glue['COLUMN_NAME'] == $target) {
                         return array_merge($last, [$table . '.' . $target]);
                     } else {
-                        [$tmp] = explode('_', $glue['COLUMN_NAME']);
+                        [$tmp] = explode('_', (string) $glue['COLUMN_NAME']);
                         $tmp .= 's';
                         if (! in_array($tmp, $tables) && ! in_array($tmp, $hist)) {
                             //Expand table
@@ -601,7 +554,7 @@ function celsius_to_fahrenheit($value, $scale = 'celsius')
 function kelvin_to_celsius($value, $scale = 'celsius')
 {
     if ($scale === 'celsius') {
-        $value = $value - 273.15;
+        $value -= 273.15;
     }
 
     return sprintf('%.02f', $value);
@@ -650,12 +603,12 @@ function mw_to_dbm($value)
 }
 
 /**
- * @param  $value
- * @param  null  $default
- * @param  int  $min
- * @return null
+ * @param  mixed  $value
+ * @param  mixed  $default
+ * @param  int|null  $min
+ * @return mixed
  */
-function set_null($value, $default = null, $min = null)
+function set_null(mixed $value, mixed $default = null, ?int $min = null)
 {
     if (! is_numeric($value)) {
         return $default;
@@ -708,10 +661,10 @@ function ieee754_to_decimal($value)
     $mantissa_value = 1;
     for ($i = 0; $i < strlen($mantissa); $i++) {
         if ($mantissa[$i] == '1') {
-            $mantissa_value += pow(2, -($i + 1));
+            $mantissa_value += 2 ** -($i + 1);
         }
     }
-    $value = pow(-1, $sign) * $mantissa_value * pow(2, $exponent);
+    $value = (-1) ** $sign * $mantissa_value * 2 ** $exponent;
 
     return $value;
 }

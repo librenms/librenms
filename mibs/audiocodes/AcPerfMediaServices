@@ -40,11 +40,10 @@ acPerfMediaServices  MODULE-IDENTITY
             acPerfTt   - performance measurements related to the Test Trunk service"
 
 
-    REVISION "200311200000Z"
-       DESCRIPTION
-         "Version 4.4. November 20, 2003. Made these changes:
-             o  Initial revision"
+    REVISION "202102160955Z"          --Tuesday, February 16 2021
+	DESCRIPTION  "obsoleted acPerfMediaServices"
 
+	
     ::= {acPerformance 2}
 
 --
@@ -139,7 +138,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfIvrPlayRequests OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The total number of announcement requests received from the call
      agent.
@@ -151,7 +150,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfIvrPlaySuccessful OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Number of announcement requests processed successfully.
      Products:     IPmedia 2000"
@@ -162,7 +161,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfIvrPlayFailedDueToLackOfResources OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Number of announcement requests which failed to be played because
      some resource was not available.
@@ -174,7 +173,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfIvrPlayInProgress OBJECT-TYPE
        SYNTAX Gauge32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of announcement operations that are currently in progress.
      Products:     IPmedia 2000"
@@ -185,7 +184,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfIvrPlayDuration OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The duration, in seconds, of all successful announcement
     requests. The average duration of all requests (average hold time)
@@ -198,7 +197,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfIvrPlayFailedDueToProvMismatch OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Number of announcement requests which failed because of a provisioning mismatch.
      Products:     IPmedia 2000"
@@ -209,7 +208,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfIvrPlayCollectRequests OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of play collect requests.
      Products:     IPmedia 2000"
@@ -220,7 +219,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfIvrPlayCollectSuccessful OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Number of play collects completed successfully. A request is considered successful
      if the entire sequence, from initial prompt to success/failure prompt, is played out
@@ -235,7 +234,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfIvrPlayCollectFailedDueToLackOfResources OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of play collect requests that failed due to lack of resources.
      Products:     IPmedia 2000"
@@ -246,7 +245,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfIvrPlayCollectFailedDueToProvMismatch OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of play collect requests that failed due a provisioning mismatch.
      Products:     IPmedia 2000"
@@ -257,7 +256,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfIvrPlayCollectInProgress OBJECT-TYPE
        SYNTAX Gauge32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of play collect operations that are currently in progress.
      Products:     IPmedia 2000"
@@ -268,7 +267,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfIvrPlayCollectDuration OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The duration, in seconds, of all successful play collect
     requests. The average duration of all requests
@@ -281,7 +280,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfIvrContDigitCollectRequests OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of continuous digit collect requests.
      Products:     IPmedia 2000"
@@ -292,7 +291,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfIvrContDigitCollectSuccessful OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Number of continuous digit collects completed successfully.
      Products:     IPmedia 2000"
@@ -303,7 +302,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfIvrContDigitCollectFailedDueToLackOfResources OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of continuous digit collect requests that failed due to lack of resources.
      Products:     IPmedia 2000"
@@ -314,7 +313,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfIvrContDigitCollectInProgress OBJECT-TYPE
        SYNTAX Gauge32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of continuous digit collect operations that are currently in progress.
      Products:     IPmedia 2000"
@@ -325,7 +324,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfIvrContDigitCollectDuration OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The duration, in seconds, of all successful continuous digit collect
     requests. The average duration of all requests
@@ -341,7 +340,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfBctRequests OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The total number of BCT contexts opened since the media server initialized
      Products:     IPmedia 2000"
@@ -352,7 +351,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfBctSuccessful OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Number of BCT requests processed successfully.
      Products:     IPmedia 2000"
@@ -363,7 +362,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfBctFailedDueToLackOfResources OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Number of BCT requests which failed to be played because
      some resource was not available.
@@ -375,7 +374,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfBctInProgress OBJECT-TYPE
        SYNTAX Gauge32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of BCT calls that are currently in progress.
      Products:     IPmedia 2000"
@@ -386,7 +385,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfBctDuration OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The duration, in seconds, of all successful BCT contexts. The average
     duration of all contexts can be computed by dividing acPerfBCTDuration
@@ -399,7 +398,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfBctTotalParticipants OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The total number of BCT participants since the media server initialized
      Products:     IPmedia 2000"
@@ -410,7 +409,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfBctCurrentNumberOfParticipants OBJECT-TYPE
        SYNTAX Gauge32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of participants in all BCT calls that are currently in progress.
      Products:     IPmedia 2000"
@@ -424,7 +423,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfConfRequests OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The total number of conferences processed since the last application restart.   This is the number of conferences created
     and not the number of members.
@@ -436,7 +435,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfConfSuccessful OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Number of conference requests processed successfully. 
      Products:     IPmedia 2000"
@@ -447,7 +446,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfConfInProgress OBJECT-TYPE
        SYNTAX Gauge32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of conferences currently in progress.
      Products:     IPmedia 2000"
@@ -458,7 +457,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfConfDuration OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The duration, in seconds, of all successful conference requests. The average
     duration of all requests can be computed by dividing acPerfConfDuration
@@ -471,7 +470,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfConfFailedDueToLackOfResources OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of times a conference request was rejected due to lack of resources
      since the last application restart.
@@ -483,7 +482,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfConfAddRequests OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of requests to add a conferee to an existing conference.
      Products:     IPmedia 2000"
@@ -494,7 +493,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfConfAddSuccessful OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of times a conferee was added successfuly to an existing conference.
      Products:     IPmedia 2000"
@@ -505,7 +504,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfConfAddFailedDueToLackOfResources OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of times a conferee could not be added to an existing conference
      due to a lack of resources.
@@ -517,7 +516,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfConfPortsUsed OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The total number of ports that were reserved for conferences since the last
      application restart.
@@ -529,7 +528,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfConfPortsReserved OBJECT-TYPE
        SYNTAX Gauge32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of conference ports currently reserved. This includes
      play ports, monitor ports and regular conferee ports.
@@ -549,7 +548,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfTtRequests OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of test trunk calls requested.
      Products:     IPmedia 2000"
@@ -560,7 +559,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfTtSuccessful OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of test trunk calls that were successfully setup and torn down. 
     This PM is not a reflection on whether  the test actually passed or failed.
@@ -572,7 +571,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfTtInProgress OBJECT-TYPE
        SYNTAX Gauge32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of test trunk calls that are currently in progress.
      Products:     IPmedia 2000"
@@ -583,7 +582,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfTtDuration OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The duration, in seconds, of all successful test trunk requests.  This number
     is  The time between a test trunk call being initiated and completed.  The average duration
@@ -596,7 +595,7 @@ acPerfMediaServices  MODULE-IDENTITY
      acPerfTtFailedDueToLackOfResources OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of times a test trunk request was rejected due to lack of resources
      since the last application restart.

@@ -26,7 +26,7 @@ Script to monitor your Redis Server
 
     ### SELINUX
 
-    (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can get redis informations and write them:
+    (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can get redis information and write them:
 
     ```
     cat << EOF > snmpd_redis.te

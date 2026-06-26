@@ -82,13 +82,11 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
 
         if ($type == 'CDR') {
             $allowed = Number::formatSi($history['bill_allowed'], 2, 0, 'bps');
-            $used = Number::formatSi($history['rate_95th'], 2, 0, 'bps');
             $in = Number::formatSi($history['rate_95th_in'], 2, 0, 'bps');
             $out = Number::formatSi($history['rate_95th_out'], 2, 0, 'bps');
             $overuse = (($history['bill_overuse'] <= 0) ? '-' : '<span style="color: #' . $background['left'] . '; font-weight: bold;">' . Number::formatSi($history['bill_overuse'], 2, 0, 'bps') . '</span>');
         } elseif ($type == 'Quota') {
             $allowed = Number::formatBase($history['bill_allowed'], \App\Facades\LibrenmsConfig::get('billing.base'), 2, 0, '');
-            $used = Number::formatBase($history['total_data'], \App\Facades\LibrenmsConfig::get('billing.base'), 2, 0, '');
             $in = Number::formatBase($history['traf_in'], \App\Facades\LibrenmsConfig::get('billing.base'), 2, 0, '');
             $out = Number::formatBase($history['traf_out'], \App\Facades\LibrenmsConfig::get('billing.base'), 2, 0, '');
             $overuse = (($history['bill_overuse'] <= 0) ? '-' : '<span style="color: #' . $background['left'] . '; font-weight: bold;">' . Number::formatBase($history['bill_overuse'], \App\Facades\LibrenmsConfig::get('billing.base')) . '</span>');
@@ -104,7 +102,7 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
         echo '
             <tr>
                 <td></td>
-                <td><span style="font-weight: bold;" class="interface">' . date('Y-m-d', strtotime($datefrom)) . ' to ' . date('Y-m-d', strtotime($dateto)) . "</span></td>
+                <td><span style="font-weight: bold;" class="interface">' . date('Y-m-d', strtotime((string) $datefrom)) . ' to ' . date('Y-m-d', strtotime((string) $dateto)) . "</span></td>
                 <td>$type</td>
                 <td>$allowed</td>
                 <td>$in</td>
@@ -114,7 +112,12 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
                 <td>$total_data</td>
                 <td>$rate_95th</td>
                 <td style=\"text-align: center;\">$overuse</td>
-                <td width=\"250\">" . print_percentage_bar(250, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']) . '</td>
+                <td width=\"250\">" . \LibreNMS\Util\Html::percentageBar(250, 10, $percent, null, $percent . '%', null, null, [
+                    'left' => $background['left'],
+                    'left_text' => null,
+                    'right' => $background['right'],
+                    'right_text' => null,
+                ]) . '</td>
                 <td>
                     <a href="' . $url . '"><i class="fa fa-bar-chart fa-lg icon-theme" aria-hidden="true" title="Show details"></i></a>
                 </td>
@@ -125,7 +128,7 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
             $img['bw_day'] = showDetails($bill_id, 'day', $history['bill_hist_id']);
             $img['bw_hour'] = showDetails($bill_id, 'hour', $history['bill_hist_id']);
             echo '
-                <tr style="background: #fff; border-top: 1px solid ' . $row_colour . '; border-bottom: 1px solid #ccc;">
+                <tr style="background: #fff; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc;">
                     <td colspan="11">
                     <!-- <b>Accuate Graph</b><br /> //-->
                     ' . $img['bitrate'] . '<br />

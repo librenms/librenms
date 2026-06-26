@@ -27,41 +27,71 @@
 namespace LibreNMS\Util;
 
 use App\Models\Device;
+use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Interfaces\Geocoder;
 use Net_DNS2_Resolver;
 
 class Dns implements Geocoder
 {
-    protected Net_DNS2_Resolver $resolver;
-
-    public function __construct(Net_DNS2_Resolver $resolver)
+    public function __construct(protected Net_DNS2_Resolver $resolver)
     {
-        $this->resolver = $resolver;
     }
 
     public static function lookupIp(Device $device): ?string
     {
+        if ($device->overwrite_ip) {
+            return $device->overwrite_ip;
+        }
+
         if (IP::isValid($device->hostname)) {
             return $device->hostname;
         }
 
-        try {
-            if ($device->transport == 'udp6' || $device->transport == 'tcp6') {
-                return dns_get_record($device['hostname'], DNS_AAAA)[0]['ipv6'] ?? null;
-            }
+        $addresses = app(self::class)->getAddresses($device->hostname);
 
-            return dns_get_record($device['hostname'], DNS_A)[0]['ip'] ?? null;
-        } catch (\Exception $e) {
-            return null;
+        if ($device->transport == 'udp6' || $device->transport == 'tcp6') {
+            foreach ($addresses as $address) {
+                if (IPv6::isValid($address)) {
+                    return $address;
+                }
+            }
         }
+
+        return array_first($addresses);
+    }
+
+    /**
+     * Get all IPs for a hostname
+     *
+     * @return string[]
+     */
+    public function getAddresses(string $hostname, ?AddressFamily $family = null): array
+    {
+        $hints = match ($family) {
+            AddressFamily::IPv4 => ['ai_family' => AF_INET, 'ai_socktype' => SOCK_RAW],
+            AddressFamily::IPv6 => ['ai_family' => AF_INET6, 'ai_socktype' => SOCK_RAW],
+            default => ['ai_socktype' => SOCK_RAW],
+        };
+
+        $result = socket_addrinfo_lookup($hostname, null, $hints);
+
+        if ($result === false) {
+            return [];
+        }
+
+        return array_map(function ($info) {
+            $explaned = socket_addrinfo_explain($info);
+
+            return $explaned['ai_addr']['sin6_addr'] ?? $explaned['ai_addr']['sin_addr'];
+        }, $result);
     }
 
     /**
      * @param  string  $domain  Domain which has to be parsed
      * @param  string  $record  DNS Record which should be searched
-     * @return array List of matching records
+     * @return array<\Net_DNS2_RR> List of matching records
      */
-    public function getRecord($domain, $record = 'A')
+    public function getRecord(string $domain, string $record = 'A'): array
     {
         try {
             $ret = $this->resolver->query($domain, $record);
@@ -74,7 +104,11 @@ class Dns implements Geocoder
         }
     }
 
-    public function getCoordinates($hostname)
+    /**
+     * @param  string  $hostname
+     * @return array
+     */
+    public function getCoordinates($hostname): array
     {
         $r = $this->getRecord($hostname, 'LOC');
 

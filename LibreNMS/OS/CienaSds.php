@@ -165,7 +165,7 @@ class CienaSds extends OS
 
         foreach ($transceivers as $index => $contents) {
             if (! empty($contents['cienaCesEttpConfigName'])) {
-                $nameArr = explode('/', $contents['cienaCesEttpConfigName']);
+                $nameArr = explode('/', (string) $contents['cienaCesEttpConfigName']);
                 $slotIndex = isset($nameArr[1]) ? $nameArr[0] : 1;
 
                 $inventory->push(new EntPhysical([

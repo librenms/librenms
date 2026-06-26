@@ -20,13 +20,13 @@
  *  down(3),
  *  notpresent(4)
  */
-$voss_fan = snmpwalk_cache_multi_oid($device, 'rcVossSystemFanInfoOperStatus', [], 'RAPID-CITY');
+$voss_fan = snmpwalk_cache_multi_oid($device, 'rcVossSystemFanInfoOperStatus', [], 'RAPID-CITY', null, '-OeQUs');
 $fan = snmpwalk_cache_multi_oid($device, 'rcChasFanOperStatus', [], 'RAPID-CITY');
 
 if (is_array($voss_fan)) {
     foreach ($voss_fan as $oid => $array) {
         $state = current($array);
-        $split_oid = explode('.', $oid);
+        $split_oid = explode('.', (string) $oid);
         $tray_num = $split_oid[count($split_oid) - 2];
         $fan_num = $split_oid[count($split_oid) - 1];
         $current_oid = ".1.3.6.1.4.1.2272.1.101.1.1.4.1.4.$tray_num.$fan_num";
@@ -34,10 +34,10 @@ if (is_array($voss_fan)) {
 
         $state_name = 'rcVossSystemFanInfoOperStatus';
         $states = [
-            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
-            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'up'],
-            ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'down'],
-            ['value' => 4, 'generic' => 3, 'graph' => 0, 'descr' => 'notPresent'],
+            ['value' => 1, 'generic' => 3, 'descr' => 'unknown'],
+            ['value' => 2, 'generic' => 0, 'descr' => 'up'],
+            ['value' => 3, 'generic' => 1, 'descr' => 'down'],
+            ['value' => 4, 'generic' => 3, 'descr' => 'notPresent'],
         ];
         create_state_index($state_name, $states);
 
@@ -46,17 +46,17 @@ if (is_array($voss_fan)) {
 } elseif (is_array($fan)) {
     foreach ($fan as $oid => $array) {
         $state = current($array);
-        $split_oid = explode('.', $oid);
+        $split_oid = explode('.', (string) $oid);
         $index = $split_oid[count($split_oid) - 1];
         $current_oid = ".1.3.6.1.4.1.2272.1.4.7.1.1.2.$index";
         $descr = "VOSS Fan $index";
 
         $state_name = 'rcChasFanOperStatus';
         $states = [
-            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
-            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'up'],
-            ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'down'],
-            ['value' => 4, 'generic' => 3, 'graph' => 0, 'descr' => 'notPresent'],
+            ['value' => 1, 'generic' => 3, 'descr' => 'unknown'],
+            ['value' => 2, 'generic' => 0, 'descr' => 'up'],
+            ['value' => 3, 'generic' => 1, 'descr' => 'down'],
+            ['value' => 4, 'generic' => 3, 'descr' => 'notPresent'],
         ];
         create_state_index($state_name, $states);
 
@@ -71,22 +71,22 @@ if (is_array($voss_fan)) {
  *  down(4)
 */
 
-$power_supply = snmpwalk_cache_multi_oid($device, 'rcChasPowerSupplyOperStatus', [], 'RAPID-CITY');
+$power_supply = snmpwalk_cache_multi_oid($device, 'rcChasPowerSupplyOperStatus', [], 'RAPID-CITY', null, '-OeQUs');
 
 if (is_array($power_supply)) {
     foreach ($power_supply as $oid => $array) {
         $state = current($array);
-        $split_oid = explode('.', $oid);
+        $split_oid = explode('.', (string) $oid);
         $index = $split_oid[count($split_oid) - 1];
         $current_oid = ".1.3.6.1.4.1.2272.1.4.8.1.1.2.$index";
         $descr = "VOSS Power Supply $index";
 
         $state_name = 'rcChasPowerSupplyOperStatus';
         $states = [
-            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
-            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'empty'],
-            ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'up'],
-            ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'down'],
+            ['value' => 1, 'generic' => 3, 'descr' => 'unknown'],
+            ['value' => 2, 'generic' => 0, 'descr' => 'empty'],
+            ['value' => 3, 'generic' => 0, 'descr' => 'up'],
+            ['value' => 4, 'generic' => 1, 'descr' => 'down'],
         ];
         create_state_index($state_name, $states);
 

@@ -11,7 +11,7 @@ if ($device['os_group'] == 'cisco') {
     }
 
     foreach ($rserver_array as $index => $serverfarm) {
-        $farm_id = preg_replace('@\d+\."(.*?)"\.\d+@', '\\1', $index);
+        $farm_id = preg_replace('@\d+\."(.*?)"\.\d+@', '\\1', (string) $index);
 
         $oids = [
             'cesServerFarmRserverTotalConns',

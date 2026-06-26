@@ -2638,70 +2638,70 @@
                     "vlan_domain": 1,
                     "vlan_name": "<private>",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2010,
                     "vlan_domain": 1,
                     "vlan_name": "<private>",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2012,
                     "vlan_domain": 1,
                     "vlan_name": "<private>",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2013,
                     "vlan_domain": 1,
                     "vlan_name": "<private>",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2015,
                     "vlan_domain": 1,
                     "vlan_name": "<private>",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2018,
                     "vlan_domain": 1,
                     "vlan_name": "<private>",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2019,
                     "vlan_domain": 1,
                     "vlan_name": "<private>",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2100,
                     "vlan_domain": 1,
                     "vlan_name": "<private>",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2512,
                     "vlan_domain": 1,
                     "vlan_name": "<private>",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2701,
                     "vlan_domain": 1,
                     "vlan_name": "<private>",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

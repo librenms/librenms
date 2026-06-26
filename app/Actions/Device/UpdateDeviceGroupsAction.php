@@ -32,14 +32,8 @@ use Log;
 
 class UpdateDeviceGroupsAction
 {
-    /**
-     * @var Device
-     */
-    private $device;
-
-    public function __construct(Device $device)
+    public function __construct(private readonly Device $device)
     {
-        $this->device = $device;
     }
 
     /**
@@ -57,7 +51,7 @@ class UpdateDeviceGroupsAction
         }
 
         $device_group_ids = DeviceGroup::query()
-            ->with(['devices' => function ($query) {
+            ->with(['devices' => function ($query): void {
                 $query->select('devices.device_id');
             }])
             ->get()
@@ -66,8 +60,8 @@ class UpdateDeviceGroupsAction
                     try {
                         return $device_group->getParser()
                             ->toQuery()
-                            ->where('devices.device_id', $this->device->device_id)
-                            ->exists();
+                            ?->where('devices.device_id', $this->device->device_id)
+                            ?->exists();
                     } catch (\Illuminate\Database\QueryException $e) {
                         Log::error("Device Group '$device_group->name' generates invalid query: " . $e->getMessage());
 

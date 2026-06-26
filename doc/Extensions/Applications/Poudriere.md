@@ -1,6 +1,6 @@
 # Poudriere
 
-## Intall prerequisites
+## Install prerequisites
 
 === "FreeBSD"
 

@@ -4,8 +4,8 @@
 
 @section('content')
     <div class="container-fluid">
-        <x-panel body-class="tw:p-0!">
-            <x-slot name="heading">
+        <x-panel>
+            <x-slot:heading>
                 <h2 class="panel-title">{{ __('VLAN') }}
                 <select id="vlan-select">
                     @foreach($vlanIds as $vlanId)
@@ -13,8 +13,8 @@
                     @endforeach
                 </select>
                 </h2>
-            </x-slot>
-
+            </x-slot:heading>
+            <x-slot:slot class="tw:p-0!">
             <x-tabs>
                 <x-tab name="{{ __('Devices') }}">
                     <table id="vlan-devices" class="table table-hover table-condensed table-striped">
@@ -25,7 +25,7 @@
                             <th data-column-id="name">{{ __('Local Name') }}</th>
                             <th data-column-id="domain" data-visible="false">{{ __('Domain') }}</th>
                             <th data-column-id="type">{{ __('Type') }}</th>
-                            <th data-column-id="mtu">{{ __('MTU') }}</th>
+                            <th data-column-id="state" data-formatter="state">{{ __('State') }}</th>
                         </tr>
                         </thead>
                     </table>
@@ -44,6 +44,7 @@
                     </table>
                 </x-tab>
             </x-tabs>
+            </x-slot:slot>
         </x-panel>
     </div>
 @endsection
@@ -63,7 +64,17 @@
             post: function () {
                 return {vlan: vlan_id}
             },
-            url: "{{ route('table.vlan-devices') }}"
+            url: "{{ route('table.vlan-devices') }}",
+            formatters: {
+                state: function(column, row) {
+                    console.log(column, row);
+                    const isOperational = row[column.id];
+                    const statusText = isOperational ? "operational" : "suspended";
+                    const cssClass = isOperational ? "text-success" : "text-danger";
+
+                    return `<span class="${cssClass}">${statusText}</span>`;
+                }
+            }
         });
 
         $('#vlan-select').on('change', function () {

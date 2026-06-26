@@ -5,7 +5,7 @@ use App\Models\Ipv6Address;
 use App\Models\Port;
 use App\Models\Storage;
 
-include 'includes/nfs-shared.inc.php';
+require base_path('includes/nfs-shared.inc.php');
 
 if (! isset($vars['flat_mount_options'])) {
     $vars['flat_mount_options'] = 1;
@@ -194,7 +194,7 @@ if ($vars['app_page'] == 'general') {
         'rows' => [],
     ];
     $mounted_by = $app->data['mounted_by'] ?? [];
-    foreach ($mounted_by as $array_location => $data) {
+    foreach ($mounted_by as $data) {
         $new_host = ['data' => ''];
         $new_path = ['data' => ''];
         if (isset($data['host'])) {
@@ -304,7 +304,7 @@ if ($vars['app_page'] == 'general') {
         $table_info['headers'][] = 'Mount Options';
     }
     $mounts = $app->data['mounts'] ?? [];
-    foreach ($mounts as $array_location => $data) {
+    foreach ($mounts as $data) {
         $new_host = ['data' => ''];
         $new_rpath = ['data' => ''];
         $new_lpath = ['data' => ''];

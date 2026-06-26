@@ -28,7 +28,7 @@ namespace LibreNMS\Data\Graphing;
 
 use LibreNMS\Enum\ImageFormat;
 
-class GraphImage
+class GraphImage implements \Stringable
 {
     public function __construct(public readonly ImageFormat $format, public readonly string $title, public readonly string $data)
     {
@@ -54,7 +54,7 @@ class GraphImage
         return $this->format->contentType();
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->data;
     }

@@ -35,7 +35,7 @@ use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('datastores')]
-class OpenTSDBStoreTest extends TestCase
+final class OpenTSDBStoreTest extends TestCase
 {
     protected $timestamp = 1190464400;
 
@@ -62,7 +62,7 @@ class OpenTSDBStoreTest extends TestCase
         $mockFactory = \Mockery::mock(\Socket\Raw\Factory::class);
 
         $mockFactory->shouldReceive('createClient')
-            ->andThrow('Socket\Raw\Exception', 'Failed to handle connect exception')->once();
+            ->andThrow(\Socket\Raw\Exception::class, 'Failed to handle connect exception')->once();
 
         new OpenTSDB($mockFactory);
     }
@@ -73,7 +73,7 @@ class OpenTSDBStoreTest extends TestCase
         $opentsdb = $this->mockOpenTSDB($mockSocket);
 
         $mockSocket->shouldReceive('write')
-            ->andThrow('Socket\Raw\Exception', 'Did not handle socket exception')->once();
+            ->andThrow(\Socket\Raw\Exception::class, 'Did not handle socket exception')->once();
 
         $opentsdb->write('fake', ['one' => 1]);
     }

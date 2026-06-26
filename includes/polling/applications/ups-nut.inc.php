@@ -65,7 +65,7 @@ if (! $ups_nut) {
     $UPSUPSBoost,
     $UPSForcedShutdown,
     $UPSAlarm
-] = array_pad(explode("\n", $ups_nut), 23, 0);
+] = array_pad(explode("\n", (string) $ups_nut), 23, 0);
 
 $rrd_def = RrdDefinition::make()
     ->addDataset('charge', 'GAUGE', 0, 100)
@@ -106,7 +106,7 @@ $sensors = [
     ['state_name' => 'UPSAlarm', 'value' => $UPSAlarm],
 ];
 
-foreach ($sensors as $index => $sensor) {
+foreach ($sensors as $sensor) {
     $rrd_def->addDataset($sensor['state_name'], 'GAUGE', 0);
     $fields[$sensor['state_name']] = $sensor['value'];
 }

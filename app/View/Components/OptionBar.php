@@ -21,12 +21,6 @@ class OptionBar extends Component
      * @var array
      */
     public $options;
-    /**
-     * Selected option
-     *
-     * @var mixed
-     */
-    public $selected;
 
     /**
      * Create a new component instance.
@@ -35,11 +29,13 @@ class OptionBar extends Component
      * @param  array  $options
      * @param  mixed  $selected
      */
-    public function __construct(string $name = '', array $options = [], $selected = null)
+    public function __construct(string $name = '', array $options = [], /**
+     * Selected option
+     */
+    public $selected = null)
     {
         $this->name = $name;
         $this->options = $options;
-        $this->selected = $selected;
     }
 
     /**

@@ -11,7 +11,7 @@ if (! empty($agent_data['app'][$name])) {
     $rawdata = SnmpQuery::get($oid)->value();
 }
 //Format Data
-$lines = explode("\n", $rawdata);
+$lines = explode("\n", (string) $rawdata);
 $unbound = [];
 $metrics = [];
 foreach ($lines as $line) {

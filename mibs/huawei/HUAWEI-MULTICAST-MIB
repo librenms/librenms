@@ -1,26 +1,25 @@
 -- ============================================================================
--- Copyright (C) by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description:  
 -- Reference:  
--- Version: V1.0
+-- Version: V2.04
 -- History:
---    Modified by yuzhenjiang 60008725 2006-11-12
--- 
+
 -- ============================================================================
 
 HUAWEI-MULTICAST-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS 
     MODULE-IDENTITY,OBJECT-TYPE, 
-    Counter32,Integer32,Unsigned32,IpAddress
+    Counter32,Integer32,Unsigned32,IpAddress, NOTIFICATION-TYPE
         FROM SNMPv2-SMI
 
     TruthValue,TEXTUAL-CONVENTION,
     RowStatus,MacAddress,DisplayString
         FROM SNMPv2-TC
 
-    MODULE-COMPLIANCE, OBJECT-GROUP
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
         FROM SNMPv2-CONF
     
     InterfaceIndex,InterfaceIndexOrZero
@@ -33,19 +32,21 @@ IMPORTS
             FROM HUAWEI-MIB
 
     Ipv6Address, Ipv6IfIndexOrZero    
-            FROM IPV6-TC;
+            FROM IPV6-TC
+    InetAddress, InetAddressType
+            FROM INET-ADDRESS-MIB;
     
 hwMultiCastMIB MODULE-IDENTITY
-    LAST-UPDATED "200508220000Z" 
-    ORGANIZATION "Huawei Technologies co.,Ltd."
+    LAST-UPDATED "202202210000Z" 
+    ORGANIZATION "Huawei Technologies Co.,Ltd."
     CONTACT-INFO 
-            " R&D BeiJing, Huawei Technologies co.,Ltd.
-            Huawei Bld.,NO.3 Xinxi Rd., 
-            Shang-Di Information Industry Base,
-            Hai-Dian District Beijing P.R. China
-            Zip:100085 
-            Http://www.huawei.com                                       
-            E-mail:support@huawei.com "
+        "Huawei Industrial Base
+          Bantian, Longgang
+           Shenzhen 518129
+           People's Republic of China
+           Website: http://www.huawei.com
+           Email: support@huawei.com
+         "
     DESCRIPTION 
         "The MIB module for IGMP Snooping feature. 
 
@@ -57,7 +58,24 @@ hwMultiCastMIB MODULE-IDENTITY
          IGMP Snooping listens to the IGMP messages exchanged between 
          the hosts and router, then provides selective transmission of 
          multicast traffic based on multicast mac destination address
-         or multicast group address."      
+         or multicast group address."
+
+    REVISION "202202210000Z"-- 21 Feb 2022
+    DESCRIPTION 
+        "modify alarm name and description."  
+    
+    REVISION "202202110000Z"-- 11 Feb 2022
+    DESCRIPTION 
+        "modify Hisotry."  
+
+    REVISION "202202100000Z"-- 10 Feb 2022
+    DESCRIPTION 
+        "Add MIBs about igmp bras user."  
+
+    REVISION "201608160000Z"-- 16 Aug 2016
+    DESCRIPTION 
+        "Add MIBs about proxy and querier."  
+      
     ::= { hwDatacomm 44 }
 
 -- Textual Convention
@@ -73,26 +91,26 @@ EnabledStatus ::= TEXTUAL-CONVENTION
     }
  
 VlanIndex ::= TEXTUAL-CONVENTION
-   		STATUS current
-		DESCRIPTION
-			"A 12-bit VLAN ID used in the VLAN Tag header."
-		SYNTAX INTEGER (1..4094)  
+           STATUS current
+        DESCRIPTION
+            "A 12-bit VLAN ID used in the VLAN Tag header."
+        SYNTAX Integer32(1..4094)  
 
 VlanIndexOrZero ::= TEXTUAL-CONVENTION
-   		STATUS current
-		DESCRIPTION
-			"A 12-bit VLAN ID used in the VLAN Tag header.
-			 0:all vlans"
-		SYNTAX INTEGER (0|1..4094) 
-		
+           STATUS current
+        DESCRIPTION
+            "A 12-bit VLAN ID used in the VLAN Tag header.
+             0:all vlans"
+        SYNTAX Integer32(0|1..4094)  
+        
 PortFlag ::= TEXTUAL-CONVENTION
      STATUS  current
      DESCRIPTION 
         "type that port created:
-	         none(0):not host port or not router port,       
-	         dynamic(1) :  dynamic learn,
-	         static(2) :  static config,
-	         staticANDdynamic(3): dynamic and static"
+             none(0):not host port or not router port,       
+             dynamic(1) :  dynamic learn,
+             static(2) :  static config,
+             staticANDdynamic(3): dynamic and static"
      SYNTAX   INTEGER
      {   
          none(0),     
@@ -146,7 +164,7 @@ hwSsmPolicyAclNum OBJECT-TYPE
          -1: unvalid value "
     ::= { hwIGSPSystemInfo 2 }
 
-hwSendQueryEnabled 		OBJECT-TYPE
+hwSendQueryEnabled         OBJECT-TYPE
     SYNTAX       EnabledStatus
     MAX-ACCESS   read-write
     STATUS       current
@@ -161,7 +179,7 @@ hwSendQuerySourceIpAddr OBJECT-TYPE
     STATUS       current
     DESCRIPTION  
         "This object indicates sended IGMP query packet's source ip address.
-		223.255.255.255: the maximum ip"
+        223.255.255.255: the maximum ip"
     ::= { hwIGSPSystemInfo  4}
     
 hwSnmpTrapEnable    OBJECT-TYPE
@@ -183,20 +201,20 @@ hwIgmpSnoopingSuppressionTime OBJECT-TYPE
     ::= { hwIGSPSystemInfo  6}
     
 hwIgmpProxyEnabled OBJECT-TYPE
-	SYNTAX EnabledStatus
-	MAX-ACCESS read-write
-	STATUS current
-	DESCRIPTION
-		"This object indicates whether IGMP Proxy has been enabled for system."
-	::= { hwIGSPSystemInfo 7 }
-	
+    SYNTAX EnabledStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object indicates whether IGMP Proxy has been enabled for system."
+    ::= { hwIGSPSystemInfo 7 }
+    
 hwIgmpSnoopingProxyEnabled OBJECT-TYPE
-	SYNTAX EnabledStatus
-	MAX-ACCESS read-write
-	STATUS current
-	DESCRIPTION
-		"This object indicates whether IGMP snooping proxy has been enabled for system."
-	::= { hwIGSPSystemInfo 8 }
+    SYNTAX EnabledStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object indicates whether IGMP snooping proxy has been enabled for system."
+    ::= { hwIGSPSystemInfo 8 }
 --
 --  The hwVlanCfgInfo group.
 --
@@ -233,8 +251,10 @@ HWVlanCfgEntry ::= SEQUENCE {
     hwVlanIgmpVersion          INTEGER,  
     hwVlanPromptLeaveEnable    EnabledStatus,
     hwVlanPromptLeaveAclNum    Integer32, 
-    hwVlanDropUnknown	       EnabledStatus,
-    hwVlanLimitAction          EnabledStatus
+    hwVlanDropUnknown           EnabledStatus,
+    hwVlanLimitAction          EnabledStatus,
+    hwVlanIgmpSnoopingQuerierEnabled          EnabledStatus,
+    hwVlanIgmpSnoopingProxy          EnabledStatus
     }
    
 hwVlanIndex  OBJECT-TYPE
@@ -365,220 +385,236 @@ hwVlanDropUnknown OBJECT-TYPE
         "When this object is set to 'enabled(1)' table limit action on port."
     ::= { hwVlanCfgEntry 14}                           
  
- 		hwVlanIgmpProxyTable OBJECT-TYPE
-			SYNTAX SEQUENCE OF HwVlanIgmpProxyEntry
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"Table contains VLAN based configuration information for IGMP Proxy."
-			::= { hwVlanCfgInfo 2 }
+hwVlanIgmpSnoopingQuerierEnabled OBJECT-TYPE
+    SYNTAX EnabledStatus {enable(1), disable(2)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Description."
+    ::= { hwVlanCfgEntry 15 }
 
-		
+hwVlanIgmpSnoopingProxy OBJECT-TYPE
+    SYNTAX EnabledStatus {enable(1), disable(2)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Description."
+    ::= { hwVlanCfgEntry 16 }
 
-		hwVlanIgmpProxyEntry OBJECT-TYPE
-			SYNTAX HwVlanIgmpProxyEntry
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"IGMP Proxy table entry."
-			INDEX { hwVlanIgmpProxyIndex }
-			::= { hwVlanIgmpProxyTable 1 }
+         hwVlanIgmpProxyTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVlanIgmpProxyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table contains VLAN based configuration information for IGMP Proxy."
+            ::= { hwVlanCfgInfo 2 }
 
-		
-		HwVlanIgmpProxyEntry ::=
-			SEQUENCE { 
-				hwVlanIgmpProxyIndex
-					VlanIndex,
-				hwVlanIgmpProxyEnabled
-					EnabledStatus,
-				hwVlanQueryInterval
-					Integer32,
-				hwVlanMaxResponseTime
-					Integer32,
-				hwVlanLastMemQueryInterval
-					Integer32,
-				hwVlanIgmpRouterAgingTime
-					Integer32,
-				hwVlanMaxIgmpVersion
-					Integer32,
-				hwVlanIgmpRobustCount
-					Integer32,
-				hwVlanRequireRouterAlert
-					TruthValue,
-				hwVlanIgmpSendRouterAlert
-					TruthValue,
-				hwVlanIgmpPromptLeaveEnable
-					EnabledStatus
-			 }
+        
 
-		hwVlanIgmpProxyIndex OBJECT-TYPE
-			SYNTAX VlanIndex 
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"This object indicates the VLAN in which IGMP Proxy is configured."
-			::= { hwVlanIgmpProxyEntry 1 }
+        hwVlanIgmpProxyEntry OBJECT-TYPE
+            SYNTAX HwVlanIgmpProxyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "IGMP Proxy table entry."
+            INDEX { hwVlanIgmpProxyIndex }
+            ::= { hwVlanIgmpProxyTable 1 }
 
-		
-		hwVlanIgmpProxyEnabled OBJECT-TYPE
-			SYNTAX EnabledStatus
-			MAX-ACCESS read-write
-			STATUS current
-			DESCRIPTION
-				"This object indicates enable or disable IGMP Proxy."
-			DEFVAL { 2 }
-			::= { hwVlanIgmpProxyEntry 2 }
+        
+        HwVlanIgmpProxyEntry ::=
+            SEQUENCE { 
+                hwVlanIgmpProxyIndex
+                    VlanIndex,
+                hwVlanIgmpProxyEnabled
+                    EnabledStatus,
+                hwVlanQueryInterval
+                    Integer32,
+                hwVlanMaxResponseTime
+                    Integer32,
+                hwVlanLastMemQueryInterval
+                    Integer32,
+                hwVlanIgmpRouterAgingTime
+                    Integer32,
+                hwVlanMaxIgmpVersion
+                    Integer32,
+                hwVlanIgmpRobustCount
+                    Integer32,
+                hwVlanRequireRouterAlert
+                    TruthValue,
+                hwVlanIgmpSendRouterAlert
+                    TruthValue,
+                hwVlanIgmpPromptLeaveEnable
+                    EnabledStatus
+             }
 
-		
-		hwVlanQueryInterval OBJECT-TYPE
-			SYNTAX Integer32 (0..1000)
-			MAX-ACCESS read-write
-			STATUS current
-			DESCRIPTION
-				"IGMP query interval."
-			DEFVAL { 60 }
-			::= { hwVlanIgmpProxyEntry 3 }
+        hwVlanIgmpProxyIndex OBJECT-TYPE
+            SYNTAX VlanIndex 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VLAN in which IGMP Proxy is configured."
+            ::= { hwVlanIgmpProxyEntry 1 }
 
-		
-		hwVlanMaxResponseTime OBJECT-TYPE
-			SYNTAX Integer32 (1..25)
-			MAX-ACCESS read-write
-			STATUS current
-			DESCRIPTION
-				"Maximum query response time."
-			DEFVAL { 10 }
-			::= { hwVlanIgmpProxyEntry 4 }
+        
+        hwVlanIgmpProxyEnabled OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates enable or disable IGMP Proxy."
+            DEFVAL { 2 }
+            ::= { hwVlanIgmpProxyEntry 2 }
 
-		
-		hwVlanLastMemQueryInterval OBJECT-TYPE
-			SYNTAX Integer32 (1..5)
-			MAX-ACCESS read-write
-			STATUS current
-			DESCRIPTION
-				"Last member query interval."
-			DEFVAL { 1 }
-			::= { hwVlanIgmpProxyEntry 5 }
+        
+        hwVlanQueryInterval OBJECT-TYPE
+            SYNTAX Integer32 (0..1000)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "IGMP query interval."
+            DEFVAL { 60 }
+            ::= { hwVlanIgmpProxyEntry 3 }
 
-		
-		hwVlanIgmpRouterAgingTime OBJECT-TYPE
-			SYNTAX Integer32 (1..1000)
-			MAX-ACCESS read-write
-			STATUS current
-			DESCRIPTION
-				"Specify router port aging time."
-			DEFVAL { 0 }
-			::= { hwVlanIgmpProxyEntry 6 }
+        
+        hwVlanMaxResponseTime OBJECT-TYPE
+            SYNTAX Integer32 (1..25)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Maximum query response time."
+            DEFVAL { 10 }
+            ::= { hwVlanIgmpProxyEntry 4 }
 
-		
-		hwVlanMaxIgmpVersion OBJECT-TYPE
-			SYNTAX Integer32 (1..2)
-			MAX-ACCESS read-write
-			STATUS current
-			DESCRIPTION
-				"Specify the highest IGMP version to deal, 1:IGMP V1, 2:IGMP v1 and IGMP v2."
-			DEFVAL { 2 }
-			::= { hwVlanIgmpProxyEntry 7 }
+        
+        hwVlanLastMemQueryInterval OBJECT-TYPE
+            SYNTAX Integer32 (1..5)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Last member query interval."
+            DEFVAL { 1 }
+            ::= { hwVlanIgmpProxyEntry 5 }
 
-		
-		hwVlanIgmpRobustCount OBJECT-TYPE
-			SYNTAX Integer32 (2..5)
-			MAX-ACCESS read-write
-			STATUS current
-			DESCRIPTION
-				"Robust coefficient."
-			DEFVAL { 2 }
-			::= { hwVlanIgmpProxyEntry 8 }
+        
+        hwVlanIgmpRouterAgingTime OBJECT-TYPE
+            SYNTAX Integer32 (1..1000)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Specify router port aging time."
+            DEFVAL { 0 }
+            ::= { hwVlanIgmpProxyEntry 6 }
 
-		
-		hwVlanRequireRouterAlert OBJECT-TYPE
-			SYNTAX TruthValue
-			MAX-ACCESS read-write
-			STATUS current
-			DESCRIPTION
-				"When this object is set to 'true' ,Received IGMP messages
+        
+        hwVlanMaxIgmpVersion OBJECT-TYPE
+            SYNTAX Integer32 (1..2)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Specify the highest IGMP version to deal, 1:IGMP V1, 2:IGMP v1 and IGMP v2."
+            DEFVAL { 2 }
+            ::= { hwVlanIgmpProxyEntry 7 }
+
+        
+        hwVlanIgmpRobustCount OBJECT-TYPE
+            SYNTAX Integer32 (2..5)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Robust coefficient."
+            DEFVAL { 2 }
+            ::= { hwVlanIgmpProxyEntry 8 }
+
+        
+        hwVlanRequireRouterAlert OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "When this object is set to 'true' ,Received IGMP messages
                  must contain the IP Router Alert option in their IPheader.
                  Ignore IGMP messages without Router Alert options ,and require 
                  that routers not forward these messages."
-			DEFVAL { 1 }
-			::= { hwVlanIgmpProxyEntry 9 }
+            DEFVAL { true }
+            ::= { hwVlanIgmpProxyEntry 9 }
 
-		
-		hwVlanIgmpSendRouterAlert OBJECT-TYPE
-			SYNTAX TruthValue
-			MAX-ACCESS read-write
-			STATUS current
-			DESCRIPTION
-				"When this object is set to 'true' ,Sended IGMP messages
+        
+        hwVlanIgmpSendRouterAlert OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "When this object is set to 'true' ,Sended IGMP messages
                  must contain the IP Router Alert option in their Ipheader."
-			DEFVAL { 1 }
-			::= { hwVlanIgmpProxyEntry 10 }
-		
-		hwVlanIgmpPromptLeaveEnable OBJECT-TYPE
-			SYNTAX EnabledStatus
-			MAX-ACCESS read-write
-			STATUS current
-			DESCRIPTION
-				"Indicates whether enable 'Quick leave'."
-			DEFVAL { 2 }
-			::= { hwVlanIgmpProxyEntry 11 }
+            DEFVAL { true }
+            ::= { hwVlanIgmpProxyEntry 10 }
+        
+        hwVlanIgmpPromptLeaveEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether enable 'Quick leave'."
+            DEFVAL { 2 }
+            ::= { hwVlanIgmpProxyEntry 11 }
 
 
 
-		hwL2McastVlanCfgTable OBJECT-TYPE
-			SYNTAX SEQUENCE OF HwL2McastVlanCfgEntry
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"Table to config L2 multicast." 
-			::= { hwVlanCfgInfo 3 }
+        hwL2McastVlanCfgTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwL2McastVlanCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table to config L2 multicast." 
+            ::= { hwVlanCfgInfo 3 }
 
-		
-		hwL2McastVlanCfgEntry OBJECT-TYPE
-			SYNTAX HwL2McastVlanCfgEntry
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"This object indicates the VLAN in which Multicast is configured."
-			INDEX { hwL2McastVlanIndex }
-			::= { hwL2McastVlanCfgTable 1 }
+        
+        hwL2McastVlanCfgEntry OBJECT-TYPE
+            SYNTAX HwL2McastVlanCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VLAN in which Multicast is configured."
+            INDEX { hwL2McastVlanIndex }
+            ::= { hwL2McastVlanCfgTable 1 }
 
-		
-		HwL2McastVlanCfgEntry ::=
-			SEQUENCE { 
-				hwL2McastVlanIndex
-					VlanIndex,
-				hwVlanL2FlowTriggerEnabled
-					EnabledStatus,
-				hwVlanL2StaticFlow
-					IpAddress
-			 }
+        
+        HwL2McastVlanCfgEntry ::=
+            SEQUENCE { 
+                hwL2McastVlanIndex
+                    VlanIndex,
+                hwVlanL2FlowTriggerEnabled
+                    EnabledStatus,
+                hwVlanL2StaticFlow
+                    IpAddress
+             }
 
-		hwL2McastVlanIndex OBJECT-TYPE
-			SYNTAX VlanIndex 
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"This object indicates the VLAN in which Multicast is configured."
-			::= { hwL2McastVlanCfgEntry 1 }
+        hwL2McastVlanIndex OBJECT-TYPE
+            SYNTAX VlanIndex 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VLAN in which Multicast is configured."
+            ::= { hwL2McastVlanCfgEntry 1 }
 
-		
-		hwVlanL2FlowTriggerEnabled OBJECT-TYPE
-			SYNTAX EnabledStatus
-			MAX-ACCESS read-write
-			STATUS current
-			DESCRIPTION
-				"This object indicates whether flow trigger was enabled."
-			DEFVAL { 2 }
-			::= { hwL2McastVlanCfgEntry 2 }
+        
+        hwVlanL2FlowTriggerEnabled OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether flow trigger was enabled."
+            DEFVAL { 2 }
+            ::= { hwL2McastVlanCfgEntry 2 }
 
-		
-		hwVlanL2StaticFlow OBJECT-TYPE
-			SYNTAX IpAddress
-			MAX-ACCESS read-write
-			STATUS current
-			DESCRIPTION
-				"configure static flow."
-			::= { hwL2McastVlanCfgEntry 3 }
+        
+        hwVlanL2StaticFlow OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "configure static flow."
+            ::= { hwL2McastVlanCfgEntry 3 }
 
 
 
@@ -747,7 +783,7 @@ hwVlanRecvIGMPV1ReportNum   OBJECT-TYPE
     STATUS       current
     DESCRIPTION
         "The statistics of IGMP V1 report packets received on
- 	the device."
+     the device."
     ::= { hwVlanStatisticsEntry 2 }
 
 hwVlanRecvIGMPV2ReportNum   OBJECT-TYPE 
@@ -756,7 +792,7 @@ hwVlanRecvIGMPV2ReportNum   OBJECT-TYPE
     STATUS       current
     DESCRIPTION
         "The statistics of IGMP V2 report packets received on
- 	the device."
+     the device."
     ::= { hwVlanStatisticsEntry 3 }
 
 hwVlanRecvIGMPV3ReportNum   OBJECT-TYPE 
@@ -765,7 +801,7 @@ hwVlanRecvIGMPV3ReportNum   OBJECT-TYPE
     STATUS       current
     DESCRIPTION
         "The statistics of IGMP V3 report packets received on
- 	the device."
+     the device."
     ::= { hwVlanStatisticsEntry 4 }
 
 hwVlanRecvIGMPLeaveNum      OBJECT-TYPE
@@ -774,7 +810,7 @@ hwVlanRecvIGMPLeaveNum      OBJECT-TYPE
     STATUS       current
     DESCRIPTION 
         "The statistics of IGMP leave packets received on
- 	the device."
+     the device."
     ::= { hwVlanStatisticsEntry 5 }
 
 hwVlanRecvIGMPV1QueryNum     OBJECT-TYPE
@@ -783,7 +819,7 @@ hwVlanRecvIGMPV1QueryNum     OBJECT-TYPE
     STATUS       current
     DESCRIPTION
         "The statistics of IGMP V1 query packets received on
- 	the device."
+     the device."
     ::= { hwVlanStatisticsEntry 6 }
 
 hwVlanRecvIGMPV2QueryNum     OBJECT-TYPE
@@ -792,7 +828,7 @@ hwVlanRecvIGMPV2QueryNum     OBJECT-TYPE
     STATUS       current
     DESCRIPTION
         "The statistics of IGMP V2 query packets received on
- 	the device."
+     the device."
     ::= { hwVlanStatisticsEntry 7 }
 
 
@@ -802,7 +838,7 @@ hwVlanRecvIGMPV3QueryNum     OBJECT-TYPE
     STATUS       current
     DESCRIPTION
         "The statistics of IGMP V3 query packets received on
- 	the device."
+     the device."
     ::= { hwVlanStatisticsEntry 8 }
  
 hwVlanRecvPimHelloNum     OBJECT-TYPE
@@ -811,7 +847,7 @@ hwVlanRecvPimHelloNum     OBJECT-TYPE
     STATUS       current
     DESCRIPTION
         "The statistics of pim hello packets received on
- 	the device."
+     the device."
     ::= { hwVlanStatisticsEntry 9}
     
 hwVlanSendQueryNum     OBJECT-TYPE
@@ -820,7 +856,7 @@ hwVlanSendQueryNum     OBJECT-TYPE
     STATUS       current
     DESCRIPTION
         "The statistics of query packets sended on
- 	the device."
+     the device."
     ::= { hwVlanStatisticsEntry 10}    
     
 hwVlanIGMPPacketClearStats     OBJECT-TYPE
@@ -837,7 +873,7 @@ hwVlanSendSourceIPSpecQueryNum     OBJECT-TYPE
     STATUS       current
     DESCRIPTION
         "The statistics of source-ip-specific query packets sent from
- 	the device."
+     the device."
     ::= { hwVlanStatisticsEntry 12} 
                                                       
                                                                                                                                       
@@ -900,7 +936,7 @@ hwIPGrpAddress          OBJECT-TYPE
     STATUS       current
     DESCRIPTION  
         "This object indicates IP multicast address learned by 
- 	IGMP Snooping."
+     IGMP Snooping."
     ::= { hwIPGrpInfoEntry 3 }     
   
 hwIPGrpUpTime         OBJECT-TYPE
@@ -1007,198 +1043,198 @@ hwMACGrpAddress   OBJECT-TYPE
         "This object indicates mac group address."
     ::= { hwMACGrpInfoEntry 3}  
     
-		
-		hwMcastGrpCfgTable OBJECT-TYPE
-			SYNTAX SEQUENCE OF HwMcastGrpCfgEntry
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"Table used to config multicast group."
-			::= { hwMCGrpInfo 3 }
+        
+        hwMcastGrpCfgTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMcastGrpCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table used to config multicast group."
+            ::= { hwMCGrpInfo 3 }
 
-		
-		hwMcastGrpCfgEntry OBJECT-TYPE
-			SYNTAX HwMcastGrpCfgEntry
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"Table entry."
-			INDEX { hwGrpProfileNameIndex, hwGrpListNameIndex, hwGrpNameIndex  }
-			::= { hwMcastGrpCfgTable 1 }
+        
+        hwMcastGrpCfgEntry OBJECT-TYPE
+            SYNTAX HwMcastGrpCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table entry."
+            INDEX { hwGrpProfileNameIndex, hwGrpListNameIndex, hwGrpNameIndex  }
+            ::= { hwMcastGrpCfgTable 1 }
 
-		
-		HwMcastGrpCfgEntry ::=
-			SEQUENCE { 
-				hwGrpProfileNameIndex
-					DisplayString,
-				hwGrpListNameIndex
-					DisplayString,
-				hwGrpNameIndex 
-					DisplayString,
-				hwGrpIpAddress
-					IpAddress, 
-				hwGrpRowStatus
-				    RowStatus
-			 }
+        
+        HwMcastGrpCfgEntry ::=
+            SEQUENCE { 
+                hwGrpProfileNameIndex
+                    DisplayString,
+                hwGrpListNameIndex
+                    DisplayString,
+                hwGrpNameIndex 
+                    DisplayString,
+                hwGrpIpAddress
+                    IpAddress, 
+                hwGrpRowStatus
+                    RowStatus
+             }
 
-		hwGrpProfileNameIndex OBJECT-TYPE
-			SYNTAX DisplayString 
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"Multicast profile name."
-			::= { hwMcastGrpCfgEntry 1 }
+        hwGrpProfileNameIndex OBJECT-TYPE
+            SYNTAX DisplayString 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Multicast profile name."
+            ::= { hwMcastGrpCfgEntry 1 }
 
-		
-		hwGrpListNameIndex OBJECT-TYPE
-			SYNTAX DisplayString 
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"Multicast list name."
-			::= { hwMcastGrpCfgEntry 2 }
+        
+        hwGrpListNameIndex OBJECT-TYPE
+            SYNTAX DisplayString 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Multicast list name."
+            ::= { hwMcastGrpCfgEntry 2 }
 
-		
-		hwGrpNameIndex  OBJECT-TYPE
-			SYNTAX DisplayString 
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"Multicast group name."
-			::= { hwMcastGrpCfgEntry 3 }
+        
+        hwGrpNameIndex  OBJECT-TYPE
+            SYNTAX DisplayString 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Multicast group name."
+            ::= { hwMcastGrpCfgEntry 3 }
 
-		
-		hwGrpIpAddress OBJECT-TYPE
-			SYNTAX IpAddress
-			MAX-ACCESS read-create
-			STATUS current
-			DESCRIPTION
-				"Multicast group address."
-			::= { hwMcastGrpCfgEntry 4 }  
-			
-		hwGrpRowStatus  OBJECT-TYPE
-			SYNTAX RowStatus
-			MAX-ACCESS read-create
-			STATUS current
-			DESCRIPTION
-				"This object is used to create or delete a row
+        
+        hwGrpIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Multicast group address."
+            ::= { hwMcastGrpCfgEntry 4 }  
+            
+        hwGrpRowStatus  OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is used to create or delete a row
                  and represent the current status of this row."
-			::= { hwMcastGrpCfgEntry 100 }
-					
-		hwVlanMcastGrpTable OBJECT-TYPE
-			SYNTAX SEQUENCE OF HwVlanMcastGrpEntry
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"Table to apply a multicast profile on vlan."
-			::= { hwMCGrpInfo 4 }
+            ::= { hwMcastGrpCfgEntry 100 }
+                    
+        hwVlanMcastGrpTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVlanMcastGrpEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table to apply a multicast profile on vlan."
+            ::= { hwMCGrpInfo 4 }
 
-		
-		hwVlanMcastGrpEntry OBJECT-TYPE
-			SYNTAX HwVlanMcastGrpEntry
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"Table entry."
-			INDEX { hwVlanMcastIndex }
-			::= { hwVlanMcastGrpTable 1 }
+        
+        hwVlanMcastGrpEntry OBJECT-TYPE
+            SYNTAX HwVlanMcastGrpEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table entry."
+            INDEX { hwVlanMcastIndex }
+            ::= { hwVlanMcastGrpTable 1 }
 
-		
-		HwVlanMcastGrpEntry ::=
-			SEQUENCE { 
-				hwVlanMcastIndex
-					VlanIndex,
-				hwVlanMcastProfileName
-					DisplayString
-			 }
+        
+        HwVlanMcastGrpEntry ::=
+            SEQUENCE { 
+                hwVlanMcastIndex
+                    VlanIndex,
+                hwVlanMcastProfileName
+                    DisplayString
+             }
 
-		hwVlanMcastIndex OBJECT-TYPE
-			SYNTAX VlanIndex 
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"This object indicates the VLAN in which 
-				Multicast is configured."
-			::= { hwVlanMcastGrpEntry 1 }
+        hwVlanMcastIndex OBJECT-TYPE
+            SYNTAX VlanIndex 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VLAN in which 
+                Multicast is configured."
+            ::= { hwVlanMcastGrpEntry 1 }
 
-		
-		hwVlanMcastProfileName OBJECT-TYPE
-			SYNTAX DisplayString 
-			MAX-ACCESS read-write
-			STATUS current
-			DESCRIPTION
-				"Multicast profile name."
-			::= { hwVlanMcastGrpEntry 2 }
+        
+        hwVlanMcastProfileName OBJECT-TYPE
+            SYNTAX DisplayString 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Multicast profile name."
+            ::= { hwVlanMcastGrpEntry 2 }
 
-		
-		hwMcastGrpProfileTable OBJECT-TYPE
-			SYNTAX SEQUENCE OF HwMcastGrpProfileEntry
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"Table to config multicast profile."
-			::= { hwMCGrpInfo 5 }
+        
+        hwMcastGrpProfileTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMcastGrpProfileEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table to config multicast profile."
+            ::= { hwMCGrpInfo 5 }
 
-		
-		hwMcastGrpProfileEntry OBJECT-TYPE
-			SYNTAX HwMcastGrpProfileEntry
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"Table entry."
-			INDEX { hwVlanMulticastProfileName }
-			::= { hwMcastGrpProfileTable 1 }
+        
+        hwMcastGrpProfileEntry OBJECT-TYPE
+            SYNTAX HwMcastGrpProfileEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table entry."
+            INDEX { hwVlanMulticastProfileName }
+            ::= { hwMcastGrpProfileTable 1 }
 
-		
-		HwMcastGrpProfileEntry ::=
-			SEQUENCE { 
-				hwVlanMulticastProfileName
-					DisplayString,
-				hwMulticastProfilePreviewTimes
-					Integer32,
-				hwMulticastProfilePreviewMinutes
-					Integer32,
-				hwMulticastProfilePreviewInterval
-					Integer32
-			 }
+        
+        HwMcastGrpProfileEntry ::=
+            SEQUENCE { 
+                hwVlanMulticastProfileName
+                    DisplayString,
+                hwMulticastProfilePreviewTimes
+                    Integer32,
+                hwMulticastProfilePreviewMinutes
+                    Integer32,
+                hwMulticastProfilePreviewInterval
+                    Integer32
+             }
 
-		hwVlanMulticastProfileName OBJECT-TYPE
-			SYNTAX DisplayString 
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"Multicast profile name."
-			::= { hwMcastGrpProfileEntry 1 }
+        hwVlanMulticastProfileName OBJECT-TYPE
+            SYNTAX DisplayString 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Multicast profile name."
+            ::= { hwMcastGrpProfileEntry 1 }
 
-		
-		hwMulticastProfilePreviewTimes OBJECT-TYPE
-			SYNTAX Integer32 (1..100)
-			MAX-ACCESS read-write
-			STATUS current
-			DESCRIPTION
-				"Multicast profile preview times."
-			DEFVAL { 10 }
-			::= { hwMcastGrpProfileEntry 2 }
+        
+        hwMulticastProfilePreviewTimes OBJECT-TYPE
+            SYNTAX Integer32 (1..100)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Multicast profile preview times."
+            DEFVAL { 10 }
+            ::= { hwMcastGrpProfileEntry 2 }
 
-		
-		hwMulticastProfilePreviewMinutes OBJECT-TYPE
-			SYNTAX Integer32 (1..30)
-			MAX-ACCESS read-write
-			STATUS current
-			DESCRIPTION
-				"Multicast profile preview minutes."
-			DEFVAL { 10 }
-			::= { hwMcastGrpProfileEntry 3 }
+        
+        hwMulticastProfilePreviewMinutes OBJECT-TYPE
+            SYNTAX Integer32 (1..30)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Multicast profile preview minutes."
+            DEFVAL { 10 }
+            ::= { hwMcastGrpProfileEntry 3 }
 
-		
-		hwMulticastProfilePreviewInterval OBJECT-TYPE
-			SYNTAX Integer32 (1..30)
-			MAX-ACCESS read-write
-			STATUS current
-			DESCRIPTION
-				"Multicast profile preview interval."
-			DEFVAL { 10 }
-			::= { hwMcastGrpProfileEntry 4 }
+        
+        hwMulticastProfilePreviewInterval OBJECT-TYPE
+            SYNTAX Integer32 (1..30)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Multicast profile preview interval."
+            DEFVAL { 10 }
+            ::= { hwMcastGrpProfileEntry 4 }
 
 --
 --  hwExternIpGrpInfoTable
@@ -1260,7 +1296,7 @@ hwExternIpGrpAddress          OBJECT-TYPE
     STATUS       current
     DESCRIPTION  
         "This object indicates IP multicast address learned by 
- 	IGMP snooping."
+     IGMP snooping."
     ::= { hwExternIpGrpInfoEntry 3 }     
   
 hwExternIpGrpUpTime         OBJECT-TYPE
@@ -1317,7 +1353,7 @@ hwExternIpRtFlag      OBJECT-TYPE
     STATUS       current
     DESCRIPTION  
         "Router port flag."
-    ::= { hwExternIpGrpInfoEntry 10}		     
+    ::= { hwExternIpGrpInfoEntry 10}             
 
 hwExternIpSourceAddress          OBJECT-TYPE
     SYNTAX       IpAddress
@@ -1386,8 +1422,8 @@ hwPortStaticGrpRowStatus  OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This object is used to create or delete a row
- 	and represent the current status of this row.
- 	Now support state:CreateAndGo,Destroy."
+     and represent the current status of this row.
+     Now support state:CreateAndGo,Destroy."
     ::= { hwPortStaticGrpEntry 100}      
 
  
@@ -1445,8 +1481,8 @@ hwGrpPolicyRowStatus    OBJECT-TYPE
     STATUS       current
     DESCRIPTION  
         "This object is used to create or delete a row
- 	and represent the current status of this row.
- 	Now support three state:CreateAndGo,Active,Destroy."
+     and represent the current status of this row.
+     Now support three state:CreateAndGo,Active,Destroy."
     ::= { hwGrpPolicyCfgEntry 100}
       
 
@@ -1560,7 +1596,7 @@ hwRouterPortCfgRowStatus  OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This object is used to create or delete a row
- 	and represent the current status of this row."
+     and represent the current status of this row."
     ::= { hwRouterPortCfgEntry 100}
     
 hwPortLimitTable     OBJECT-TYPE
@@ -1611,7 +1647,7 @@ hwPortLimitTable     OBJECT-TYPE
     STATUS       current
     DESCRIPTION  
         "This object is used to create or delete a row
- 	and represent the current status of this row."
+     and represent the current status of this row."
     ::= { hwPortLimitEntry 100 }
 
 hwPortGroupPolicyTable     OBJECT-TYPE
@@ -1748,8 +1784,8 @@ hwExternPortStaticGrpRowStatus  OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This object is used to create or delete a row
- 	and represent the current status of this row.
- 	Now support state:CreateAndGo,Destroy."
+     and represent the current status of this row.
+     Now support state:CreateAndGo,Destroy."
     ::= { hwExternPortStaticGrpEntry 51 } 
 
 --
@@ -1814,7 +1850,7 @@ hwPortVlanLimitTable     OBJECT-TYPE
     STATUS       current
     DESCRIPTION  
         "This object is used to create or delete a row
- 	and represent the current status of this row."
+     and represent the current status of this row."
     ::= { hwPortVlanLimitEntry 51 }
     
 -- 
@@ -1852,7 +1888,7 @@ hwMldSnoopingEnabled OBJECT-TYPE
          enabled for the system."
     ::= { hwMldSnpgSystemInfo 1 }     
 
-hwMldSendQueryEnabled 		OBJECT-TYPE
+hwMldSendQueryEnabled         OBJECT-TYPE
     SYNTAX       EnabledStatus
     MAX-ACCESS   read-write
     STATUS       current
@@ -1914,7 +1950,9 @@ HwMldVlanCfgEntry ::= SEQUENCE {
     hwVlanMldVersion          INTEGER,  
     hwMldVlanPromptLeaveEnable    EnabledStatus,
     hwMldVlanPromptLeaveAclNum    Integer32, 
-    hwMldVlanDropUnknown	       EnabledStatus
+    hwMldVlanDropUnknown           EnabledStatus,
+    hwVlanMldSnoopingQuerierEnabled           EnabledStatus,
+    hwVlanMldSnoopingProxy           EnabledStatus
     }
    
 hwMldVlanIndex  OBJECT-TYPE
@@ -2037,6 +2075,21 @@ hwMldVlanDropUnknown OBJECT-TYPE
         is droped on this VLAN else disabled."
     ::= { hwMldVlanCfgEntry 13}                           
  
+hwVlanMldSnoopingQuerierEnabled OBJECT-TYPE
+    SYNTAX EnabledStatus {enable(1), disable(2)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Description."
+    ::= { hwMldVlanCfgEntry 14 }
+
+hwVlanMldSnoopingProxy OBJECT-TYPE
+    SYNTAX EnabledStatus  {enable(1), disable(2)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Description."
+    ::= { hwMldVlanCfgEntry 15 }
                    
 -- 
 -- The hwMldStatisticsInfo group.
@@ -2200,7 +2253,7 @@ hwVlanRecvMldV1ReportNum   OBJECT-TYPE
     STATUS       current
     DESCRIPTION
         "The statistics of MLD V1 report packets received on
- 	the device."
+     the device."
     ::= { hwMldVlanStatisticsEntry 2 }
 
 hwVlanRecvMldV2ReportNum   OBJECT-TYPE 
@@ -2209,7 +2262,7 @@ hwVlanRecvMldV2ReportNum   OBJECT-TYPE
     STATUS       current
     DESCRIPTION
         "The statistics of MLD V2 report packets received on
- 	the device."
+     the device."
     ::= { hwMldVlanStatisticsEntry 3 }
 
 hwVlanRecvMldDoneNum      OBJECT-TYPE
@@ -2218,7 +2271,7 @@ hwVlanRecvMldDoneNum      OBJECT-TYPE
     STATUS       current
     DESCRIPTION 
         "The statistics of MLD leave packets received on
- 	the device."
+     the device."
     ::= { hwMldVlanStatisticsEntry 4 }
 
 hwVlanRecvMldV1QueryNum     OBJECT-TYPE
@@ -2227,7 +2280,7 @@ hwVlanRecvMldV1QueryNum     OBJECT-TYPE
     STATUS       current
     DESCRIPTION
         "The statistics of MLD V1 query packets received on
- 	the device."
+     the device."
     ::= { hwMldVlanStatisticsEntry 5 }
 
 hwVlanRecvMldV2QueryNum     OBJECT-TYPE
@@ -2236,7 +2289,7 @@ hwVlanRecvMldV2QueryNum     OBJECT-TYPE
     STATUS       current
     DESCRIPTION
         "The statistics of MLD V2 query packets received on
- 	the device."
+     the device."
     ::= { hwMldVlanStatisticsEntry 6 }
 
  
@@ -2246,7 +2299,7 @@ hwVlanRecvIpv6PimHelloNum     OBJECT-TYPE
     STATUS       current
     DESCRIPTION
         "The statistics of PIM hello packets received on
- 	the device."
+     the device."
     ::= { hwMldVlanStatisticsEntry 7}
     
 hwVlanSendMldQueryNum     OBJECT-TYPE
@@ -2255,7 +2308,7 @@ hwVlanSendMldQueryNum     OBJECT-TYPE
     STATUS       current
     DESCRIPTION
         "The statistics of query packets sended on
- 	the device."
+     the device."
     ::= { hwMldVlanStatisticsEntry 8}    
     
 hwVlanMldPacketClearStats     OBJECT-TYPE
@@ -2335,7 +2388,7 @@ hwMldIpGrpAddress          OBJECT-TYPE
     STATUS       current
     DESCRIPTION  
         "This object indicates IP multicast address learned by 
- 	MLD snooping."
+     MLD snooping."
     ::= { hwMldIpGrpInfoEntry 3 }     
   
 hwMldIpGrpUpTime         OBJECT-TYPE
@@ -2400,7 +2453,7 @@ hwMldIpSourceAddress          OBJECT-TYPE
     STATUS       current
     DESCRIPTION  
         "This object indicates IP source address learned by 
- 	MLD snooping."
+     MLD snooping."
     ::= { hwMldIpGrpInfoEntry 11 }                    
 -- 
 -- The hwMldPortInfo group.
@@ -2469,8 +2522,8 @@ hwMldPortStaticGrpRowStatus  OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This object is used to create or delete a row
- 	and represent the current status of this row.
- 	Now support state:CreateAndGo,Destroy."
+     and represent the current status of this row.
+     Now support state:CreateAndGo,Destroy."
     ::= { hwMldPortStaticGrpEntry 51}      
 
  
@@ -2528,8 +2581,8 @@ hwMldGrpPolicyRowStatus    OBJECT-TYPE
     STATUS       current
     DESCRIPTION  
         "This object is used to create or delete a row
- 	and represent the current status of this row.
- 	Now support three state:CreateAndGo,Active,Destroy."
+     and represent the current status of this row.
+     Now support three state:CreateAndGo,Active,Destroy."
     ::= { hwMldGrpPolicyCfgEntry 51}
       
 
@@ -2643,7 +2696,7 @@ hwMldRouterPortCfgRowStatus  OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This object is used to create or delete a row
- 	and represent the current status of this row."
+     and represent the current status of this row."
     ::= { hwMldRouterPortCfgEntry 51}
     
 hwMldPortLimitTable     OBJECT-TYPE
@@ -2704,7 +2757,7 @@ hwMldPortLimitTable     OBJECT-TYPE
     STATUS       current
     DESCRIPTION  
         "This object is used to create or delete a row
- 	and represent the current status of this row."
+     and represent the current status of this row."
     ::= { hwMldPortLimitEntry 51 }
 
 hwMldPortGroupPolicyTable     OBJECT-TYPE
@@ -2757,7 +2810,7 @@ hwMldPortGroupPolicyTable     OBJECT-TYPE
     ::= { hwMldPortGroupPolicyEntry 3 }
 
  hwMldPortGroupPolicyVersion    OBJECT-TYPE
-    SYNTAX       INTEGER {mldV1(1), mldV2(2)}
+    SYNTAX       INTEGER {mldV1(1), mldV2(2), mldV1V2(3)}
     MAX-ACCESS   read-create
     STATUS       current
     DESCRIPTION  
@@ -2787,11 +2840,11 @@ hwMVlanSystemInfo
 hwMVlanVlanCfgInfo 
               OBJECT IDENTIFIER ::= { hwMVlanMibObject 2 } 
 hwMVlanGrpInfo                                             
-			  OBJECT IDENTIFIER ::= { hwMVlanMibObject 3 } 
+              OBJECT IDENTIFIER ::= { hwMVlanMibObject 3 } 
 --
 --1 hwMVlanSystemInfo
 --
-hwMVlanEnabled 		OBJECT-TYPE
+hwMVlanEnabled         OBJECT-TYPE
     SYNTAX       EnabledStatus
     MAX-ACCESS   read-write
     STATUS       current
@@ -2806,7 +2859,7 @@ hwMVlanEnabled 		OBJECT-TYPE
 --   hwMVlanEnableTable
 --
     
-hwMVlanEnableTable 	OBJECT-TYPE
+hwMVlanEnableTable     OBJECT-TYPE
     SYNTAX       SEQUENCE OF HwMVlanEnableEntry
     MAX-ACCESS   not-accessible
     STATUS       current
@@ -2893,57 +2946,57 @@ hwUserVlanCfgRowStatus  OBJECT-TYPE
 --   hwUserVlanTable
 --
 hwUserVlanTable OBJECT-TYPE
-	SYNTAX SEQUENCE OF HwUserVlanEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Table which indicates which vlan had been
-		 configured as flow trigger."
-	::= { hwMVlanVlanCfgInfo 3 }
-	
+    SYNTAX SEQUENCE OF HwUserVlanEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table which indicates which vlan had been
+         configured as flow trigger."
+    ::= { hwMVlanVlanCfgInfo 3 }
+    
 hwUserVlanEntry OBJECT-TYPE
-	SYNTAX HwUserVlanEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Entry for vlan which had been configured
-		 as flow trigger."
-	INDEX { hwUserVlanIndex }
-	::= { hwUserVlanTable 1 }
+    SYNTAX HwUserVlanEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry for vlan which had been configured
+         as flow trigger."
+    INDEX { hwUserVlanIndex }
+    ::= { hwUserVlanTable 1 }
 
 HwUserVlanEntry ::= SEQUENCE { 
     hwUserVlanFlowTriggerEnable           EnabledStatus
     }
 
 hwUserVlanFlowTriggerEnable OBJECT-TYPE
-	SYNTAX EnabledStatus
-	MAX-ACCESS read-write
-	STATUS current
-	DESCRIPTION
-		"This object indicates user vlan's flow trigger status."
-	::= { hwUserVlanEntry 1 }
+    SYNTAX EnabledStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object indicates user vlan's flow trigger status."
+    ::= { hwUserVlanEntry 1 }
 
 --
 --   hwMcSourceDenyTable
 --
 hwMcSourceDenyTable OBJECT-TYPE
-	SYNTAX SEQUENCE OF HwMcSourceDenyEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Table which indicates which vlan and which port had been 
-		configured as source deny."
-	::= { hwMVlanVlanCfgInfo 4 }
-	
+    SYNTAX SEQUENCE OF HwMcSourceDenyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table which indicates which vlan and which port had been 
+        configured as source deny."
+    ::= { hwMVlanVlanCfgInfo 4 }
+    
 hwMcSourceDenyEntry OBJECT-TYPE
-	SYNTAX HwMcSourceDenyEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Entry for vlan and port which had been configured 
-		source deny."
-	INDEX { hwMcSourceDenyVlanIndex, hwMcSourceDenyIfIndex }
-	::= { hwMcSourceDenyTable 1 }
+    SYNTAX HwMcSourceDenyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry for vlan and port which had been configured 
+        source deny."
+    INDEX { hwMcSourceDenyVlanIndex, hwMcSourceDenyIfIndex }
+    ::= { hwMcSourceDenyTable 1 }
 
 HwMcSourceDenyEntry ::= SEQUENCE { 
     hwMcSourceDenyVlanIndex           VlanIndex,
@@ -2952,12 +3005,12 @@ HwMcSourceDenyEntry ::= SEQUENCE {
     }
 
 hwMcSourceDenyVlanIndex OBJECT-TYPE
-	SYNTAX VlanIndex
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"VLAN index."
-	::= { hwMcSourceDenyEntry 1 }
+    SYNTAX VlanIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "VLAN index."
+    ::= { hwMcSourceDenyEntry 1 }
 
 hwMcSourceDenyIfIndex  OBJECT-TYPE
     SYNTAX          InterfaceIndex
@@ -2968,13 +3021,13 @@ hwMcSourceDenyIfIndex  OBJECT-TYPE
      ::= { hwMcSourceDenyEntry 2 }
     
 hwMcSourceDenyRowStatus OBJECT-TYPE
-	SYNTAX RowStatus
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"This object is used to create or delete a row and represent
-		 the current status of this row."
-	::= { hwMcSourceDenyEntry 51 }
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object is used to create or delete a row and represent
+         the current status of this row."
+    ::= { hwMcSourceDenyEntry 51 }
     
 
 --
@@ -3036,63 +3089,63 @@ hwMVlanGrpUserVlanIndex  OBJECT-TYPE
 --
 
 hwMVlanStaticFlowTable OBJECT-TYPE
-	SYNTAX SEQUENCE OF HwMVlanStaticFlowEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Table which indicates Mvlan static flow group information."
-	::= { hwMVlanGrpInfo 2 }
+    SYNTAX SEQUENCE OF HwMVlanStaticFlowEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table which indicates Mvlan static flow group information."
+    ::= { hwMVlanGrpInfo 2 }
 
 hwMVlanStaticFlowEntry OBJECT-TYPE
-	SYNTAX HwMVlanStaticFlowEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Entry for Mvlan static flow group information."
-	INDEX { hwMVlanIndex, hwMVlanStaticFlowGrpAddress }
-	::= { hwMVlanStaticFlowTable 1 }
-	
+    SYNTAX HwMVlanStaticFlowEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry for Mvlan static flow group information."
+    INDEX { hwMVlanIndex, hwMVlanStaticFlowGrpAddress }
+    ::= { hwMVlanStaticFlowTable 1 }
+    
 HwMVlanStaticFlowEntry ::= SEQUENCE { 
     hwMVlanStaticFlowGrpAddress         IpAddress,
     hwMVlanStaticFlowRowStatus          RowStatus
     }
 hwMVlanStaticFlowGrpAddress OBJECT-TYPE
-	SYNTAX IpAddress
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Static flow address."
-	::= { hwMVlanStaticFlowEntry 1 }
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Static flow address."
+    ::= { hwMVlanStaticFlowEntry 1 }
 
 hwMVlanStaticFlowRowStatus OBJECT-TYPE
-	SYNTAX RowStatus
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"This object is used to create or delete a row and
-		 represent the current status of this row."
-	::= { hwMVlanStaticFlowEntry 2 }
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object is used to create or delete a row and
+         represent the current status of this row."
+    ::= { hwMVlanStaticFlowEntry 2 }
 --
 --    hwMVlanIpv6StaticFlowTable
 --
 
 hwMVlanIpv6StaticFlowTable OBJECT-TYPE
-	SYNTAX SEQUENCE OF HwMVlanIpv6StaticFlowEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Table which indicates Mvlan static flow group information."
-	::= { hwMVlanGrpInfo 3 }
+    SYNTAX SEQUENCE OF HwMVlanIpv6StaticFlowEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table which indicates Mvlan static flow group information."
+    ::= { hwMVlanGrpInfo 3 }
 
 hwMVlanIpv6StaticFlowEntry OBJECT-TYPE
-	SYNTAX HwMVlanIpv6StaticFlowEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Entry for Mvlan static flow group information."
-	INDEX { hwMVlanIndex, hwMVlanStaticFlowIpv6GrpAddress, hwMVlanStaticFlowIpv6SourceAddress }
-	::= { hwMVlanIpv6StaticFlowTable 1 }
-	
+    SYNTAX HwMVlanIpv6StaticFlowEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry for Mvlan static flow group information."
+    INDEX { hwMVlanIndex, hwMVlanStaticFlowIpv6GrpAddress, hwMVlanStaticFlowIpv6SourceAddress }
+    ::= { hwMVlanIpv6StaticFlowTable 1 }
+    
 HwMVlanIpv6StaticFlowEntry ::= SEQUENCE { 
     hwMVlanStaticFlowIpv6GrpAddress         Ipv6Address,
     hwMVlanStaticFlowIpv6SourceAddress      Ipv6Address,
@@ -3100,50 +3153,50 @@ HwMVlanIpv6StaticFlowEntry ::= SEQUENCE {
     }
     
 hwMVlanStaticFlowIpv6GrpAddress OBJECT-TYPE
-	SYNTAX Ipv6Address
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Static flow address."
-	::= { hwMVlanIpv6StaticFlowEntry 1 }
+    SYNTAX Ipv6Address
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Static flow address."
+    ::= { hwMVlanIpv6StaticFlowEntry 1 }
 
 hwMVlanStaticFlowIpv6SourceAddress OBJECT-TYPE
-	SYNTAX Ipv6Address
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Static flow source IP address."
-	::= { hwMVlanIpv6StaticFlowEntry 2 }
+    SYNTAX Ipv6Address
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Static flow source IP address."
+    ::= { hwMVlanIpv6StaticFlowEntry 2 }
 
 hwMVlanIpv6StaticFlowRowStatus OBJECT-TYPE
-	SYNTAX RowStatus
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"This object is used to create or delete a row and represent the current status of this row."
-	::= { hwMVlanIpv6StaticFlowEntry 51 }
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object is used to create or delete a row and represent the current status of this row."
+    ::= { hwMVlanIpv6StaticFlowEntry 51 }
 
 --
 --    hwExternMVlanStaticFlowTable
 --        
 
 hwExternMVlanStaticFlowTable OBJECT-TYPE
-	SYNTAX SEQUENCE OF HwExternMVlanStaticFlowEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Table which indicates MVLAN static flow group information."
-	::= { hwMVlanGrpInfo 4 }
+    SYNTAX SEQUENCE OF HwExternMVlanStaticFlowEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table which indicates MVLAN static flow group information."
+    ::= { hwMVlanGrpInfo 4 }
 
 hwExternMVlanStaticFlowEntry OBJECT-TYPE
-	SYNTAX HwExternMVlanStaticFlowEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Entry for MVLAN static flow group information."
-	INDEX { hwMVlanIndex, hwExternMVlanStaticFlowGrpAddress,hwExternMVlanStaticFlowSourceAddress }
-	::= { hwExternMVlanStaticFlowTable 1 }
-	
+    SYNTAX HwExternMVlanStaticFlowEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry for MVLAN static flow group information."
+    INDEX { hwMVlanIndex, hwExternMVlanStaticFlowGrpAddress,hwExternMVlanStaticFlowSourceAddress }
+    ::= { hwExternMVlanStaticFlowTable 1 }
+    
 HwExternMVlanStaticFlowEntry ::= SEQUENCE { 
     hwExternMVlanStaticFlowGrpAddress         IpAddress,
     hwExternMVlanStaticFlowSourceAddress      IpAddress,
@@ -3151,30 +3204,30 @@ HwExternMVlanStaticFlowEntry ::= SEQUENCE {
     }
     
 hwExternMVlanStaticFlowGrpAddress OBJECT-TYPE
-	SYNTAX IpAddress
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Static flow address."
-	::= { hwExternMVlanStaticFlowEntry 1 }
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Static flow address."
+    ::= { hwExternMVlanStaticFlowEntry 1 }
 
 hwExternMVlanStaticFlowSourceAddress OBJECT-TYPE
-	SYNTAX IpAddress
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Static flow source IP address."
-	::= { hwExternMVlanStaticFlowEntry 2 }
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Static flow source IP address."
+    ::= { hwExternMVlanStaticFlowEntry 2 }
 
 hwExternMVlanStaticFlowRowStatus OBJECT-TYPE
-	SYNTAX RowStatus
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"This object is used to create or delete a row and
-		 represent the current status of this row."
-	::= { hwExternMVlanStaticFlowEntry 51 }
-	 
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object is used to create or delete a row and
+         represent the current status of this row."
+    ::= { hwExternMVlanStaticFlowEntry 51 }
+     
 --
 --             hwMultiCastCommonObject  
 --
@@ -3282,7 +3335,71 @@ hwL2mcCacRemoteSiteId OBJECT-TYPE
     DESCRIPTION
         "This object indicates the remote site ID."
     ::= { hwL2CacTrapObject 10 }
+    
+hwL2mcCacIfName OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "This object indicates the interface name."
+    ::= { hwL2CacTrapObject 11 }  
+    
+hwL2mcCacSourceAddress OBJECT-TYPE
+    SYNTAX       IpAddress
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "This object indicates the source IP address denied by CAC."
+    ::= { hwL2CacTrapObject 12 } 
 
+hwL2mcCacPeVid OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "This object indicates the PeVid of QinQ interface."
+    ::= { hwL2CacTrapObject 13 }  
+    
+hwL2mcCacCeVid OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "This object indicates the CeVid of QinQ interface."
+    ::= { hwL2CacTrapObject 14 } 
+
+hwL2mcRecvIgmpCount OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "This object indicates the received igmp packet count."
+    ::= { hwL2CacTrapObject 15 }    
+         
+hwL2mcDropIgmpCount OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "This object indicates the dropped igmp packet count."
+    ::= { hwL2CacTrapObject 16 } 
+    
+hwL2mcTrapVlanIndex OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "This object indicates the VLAN ID."
+    ::= { hwL2CacTrapObject 17 } 
+
+hwL2mcTrapVsiName OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "This object indicates the name of VSI."
+    ::= { hwL2CacTrapObject 18 } 
+    
 --
 --             hwBtvMibObject  
 --
@@ -3293,31 +3410,31 @@ hwBtvSystemInfo OBJECT IDENTIFIER   ::= { hwBtvMibObject 1 }
 hwBtvCfgInfo OBJECT IDENTIFIER      ::= { hwBtvMibObject 2 }
 
 hwBtvEnabled OBJECT-TYPE
-	SYNTAX EnabledStatus
-	MAX-ACCESS read-write
-	STATUS current
-	DESCRIPTION
-		"Object which indicates whether BTV Function has been enabled for the system."
-	::= { hwBtvSystemInfo 1 }
+    SYNTAX EnabledStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Object which indicates whether BTV Function has been enabled for the system."
+    ::= { hwBtvSystemInfo 1 }
 
 
 hwMcastGroupTable OBJECT-TYPE
-	SYNTAX SEQUENCE OF HwMcastGroupEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Table contains multicast group config information."
-	::= { hwBtvCfgInfo 1 }
-	
+    SYNTAX SEQUENCE OF HwMcastGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table contains multicast group config information."
+    ::= { hwBtvCfgInfo 1 }
+    
 hwMcastGroupEntry OBJECT-TYPE
-	SYNTAX HwMcastGroupEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"An entry contains multicast group config information."
-	INDEX { hwMcastGroupIndex }
-	::= { hwMcastGroupTable 1 }
-	
+    SYNTAX HwMcastGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry contains multicast group config information."
+    INDEX { hwMcastGroupIndex }
+    ::= { hwMcastGroupTable 1 }
+    
 HwMcastGroupEntry ::= SEQUENCE { 
     hwMcastGroupIndex           Integer32,
     hwMcastGroupName            DisplayString,
@@ -3327,111 +3444,111 @@ HwMcastGroupEntry ::= SEQUENCE {
     }
     
 hwMcastGroupIndex OBJECT-TYPE
-	SYNTAX Integer32 (1..1024)
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Multicast group index."
-	::= { hwMcastGroupEntry 1 }
-	
+    SYNTAX Integer32 (1..1024)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Multicast group index."
+    ::= { hwMcastGroupEntry 1 }
+    
 hwMcastGroupName OBJECT-TYPE
-	SYNTAX DisplayString
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"Multicast group name."
-	::= { hwMcastGroupEntry 2 }
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Multicast group name."
+    ::= { hwMcastGroupEntry 2 }
 
 hwMcastGroupAddress OBJECT-TYPE
-	SYNTAX IpAddress
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"Multicast group address."
-	::= { hwMcastGroupEntry 3 }
-	
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Multicast group address."
+    ::= { hwMcastGroupEntry 3 }
+    
 hwMcastGroupRowStatus OBJECT-TYPE
-	SYNTAX RowStatus
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"This object is used to create or delete a row
-		 and represent the current status of this row."
-	::= { hwMcastGroupEntry 4 }
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object is used to create or delete a row
+         and represent the current status of this row."
+    ::= { hwMcastGroupEntry 4 }
 
 hwMcastSourceAddress OBJECT-TYPE
-	SYNTAX IpAddress
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"Source IP address."
-	::= { hwMcastGroupEntry 5 }
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Source IP address."
+    ::= { hwMcastGroupEntry 5 }
 
 hwMcastListTable OBJECT-TYPE
-	SYNTAX SEQUENCE OF HwMcastListEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Table which indicates multicast list information."
-	::= { hwBtvCfgInfo 2 }
+    SYNTAX SEQUENCE OF HwMcastListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table which indicates multicast list information."
+    ::= { hwBtvCfgInfo 2 }
 
 hwMcastListEntry OBJECT-TYPE
-	SYNTAX HwMcastListEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"An entry contains multicast list config information."
-	INDEX { hwMcastListIndex }
-	::= { hwMcastListTable 1 }
+    SYNTAX HwMcastListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry contains multicast list config information."
+    INDEX { hwMcastListIndex }
+    ::= { hwMcastListTable 1 }
 
 HwMcastListEntry ::= SEQUENCE { 
     hwMcastListIndex            Integer32,
     hwMcastListName             DisplayString,
     hwMcastListRowStatus        RowStatus
     }   
-    	
+        
 hwMcastListIndex OBJECT-TYPE
-	SYNTAX Integer32 (1..128)
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Multicast list index."
-	::= { hwMcastListEntry 1 }
+    SYNTAX Integer32 (1..128)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Multicast list index."
+    ::= { hwMcastListEntry 1 }
 
 hwMcastListName OBJECT-TYPE
-	SYNTAX DisplayString
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"Multicast list name."
-	::= { hwMcastListEntry 2 }
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Multicast list name."
+    ::= { hwMcastListEntry 2 }
 
 hwMcastListRowStatus OBJECT-TYPE
-	SYNTAX RowStatus
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"This object is used to create or delete a row and represent the current status of this row."
-	::= { hwMcastListEntry 3 }
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object is used to create or delete a row and represent the current status of this row."
+    ::= { hwMcastListEntry 3 }
 
 
 hwMcastProfileTable OBJECT-TYPE
-	SYNTAX SEQUENCE OF HwMcastProfileEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Table which indicates multicast profile information."
-	::= { hwBtvCfgInfo 3 }
+    SYNTAX SEQUENCE OF HwMcastProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table which indicates multicast profile information."
+    ::= { hwBtvCfgInfo 3 }
 
 hwMcastProfileEntry OBJECT-TYPE
-	SYNTAX HwMcastProfileEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"An entry contains multicast profile config information."
-	INDEX { hwMcastProfileIndex }
-	::= { hwMcastProfileTable 1 }
-	
+    SYNTAX HwMcastProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry contains multicast profile config information."
+    INDEX { hwMcastProfileIndex }
+    ::= { hwMcastProfileTable 1 }
+    
 HwMcastProfileEntry ::= SEQUENCE { 
     hwMcastProfileIndex            Integer32,
     hwMcastProfileName             DisplayString,
@@ -3439,46 +3556,46 @@ HwMcastProfileEntry ::= SEQUENCE {
     } 
 
 hwMcastProfileIndex OBJECT-TYPE
-	SYNTAX Integer32 (1..64)
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Multicast profile index."
-	::= { hwMcastProfileEntry 1 }
+    SYNTAX Integer32 (1..64)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Multicast profile index."
+    ::= { hwMcastProfileEntry 1 }
 
 hwMcastProfileName OBJECT-TYPE
-	SYNTAX DisplayString
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"Multicast profile name."
-	::= { hwMcastProfileEntry 2 }
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Multicast profile name."
+    ::= { hwMcastProfileEntry 2 }
 
 hwMcastProfileRowStatus OBJECT-TYPE
-	SYNTAX RowStatus
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"This object is used to create or delete a row and represent the current status of this row.."
-	::= { hwMcastProfileEntry 3 }
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object is used to create or delete a row and represent the current status of this row.."
+    ::= { hwMcastProfileEntry 3 }
 
 hwMcastProfileCfgTable OBJECT-TYPE
-	SYNTAX SEQUENCE OF HwMcastProfileCfgEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Table contains multicast profile based configuration information for IPTV."
-	::= { hwBtvCfgInfo 4 }
+    SYNTAX SEQUENCE OF HwMcastProfileCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table contains multicast profile based configuration information for IPTV."
+    ::= { hwBtvCfgInfo 4 }
 
 hwMcastProfileCfgEntry OBJECT-TYPE
-	SYNTAX HwMcastProfileCfgEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"An entry contains configuration for multicast profile."
-	INDEX { hwMcastProfileIndex }
-	::= { hwMcastProfileCfgTable 1 }
-	
+    SYNTAX HwMcastProfileCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry contains configuration for multicast profile."
+    INDEX { hwMcastProfileIndex }
+    ::= { hwMcastProfileCfgTable 1 }
+    
 HwMcastProfileCfgEntry ::= SEQUENCE { 
     hwMcastProfileCfgPreviewTimes           Integer32,
     hwMcastProfileCfgPreviewMinute          Integer32,
@@ -3487,82 +3604,82 @@ HwMcastProfileCfgEntry ::= SEQUENCE {
     }
 
 hwMcastProfileCfgPreviewTimes OBJECT-TYPE
-	SYNTAX Integer32
-	MAX-ACCESS read-write
-	STATUS current
-	DESCRIPTION
-		"Times of preview a multicast group one day."
-	::= { hwMcastProfileCfgEntry 1 }
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Times of preview a multicast group one day."
+    ::= { hwMcastProfileCfgEntry 1 }
 
 hwMcastProfileCfgPreviewMinute OBJECT-TYPE
-	SYNTAX Integer32
-	MAX-ACCESS read-write
-	STATUS current
-	DESCRIPTION
-		"Preview time(in minutes)."
-	::= { hwMcastProfileCfgEntry 2 }
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Preview time(in minutes)."
+    ::= { hwMcastProfileCfgEntry 2 }
 
 hwMcastProfileCfgPreviewInterval OBJECT-TYPE
-	SYNTAX Integer32
-	MAX-ACCESS read-write
-	STATUS current
-	DESCRIPTION
-		"Preview interval(in minutes)."
-	::= { hwMcastProfileCfgEntry 3 }
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Preview interval(in minutes)."
+    ::= { hwMcastProfileCfgEntry 3 }
 
 hwMcastProfileCfgMaxNumProgram OBJECT-TYPE
-	SYNTAX Integer32
-	MAX-ACCESS read-write
-	STATUS current
-	DESCRIPTION
-		"Max number of the multicast program watching and previewing."
-	::= { hwMcastProfileCfgEntry 4 }
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Max number of the multicast program watching and previewing."
+    ::= { hwMcastProfileCfgEntry 4 }
 
 hwMcastListReferTable OBJECT-TYPE
-	SYNTAX SEQUENCE OF HwMcastListReferEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Table contains multicast list refers to multicast group."
-	::= { hwBtvCfgInfo 5 }
+    SYNTAX SEQUENCE OF HwMcastListReferEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table contains multicast list refers to multicast group."
+    ::= { hwBtvCfgInfo 5 }
 
 hwMcastListReferEntry OBJECT-TYPE
-	SYNTAX HwMcastListReferEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"An entry contains multicast list refers to multicast group."
-	INDEX { hwMcastListIndex, hwMcastGroupIndex }
-	::= { hwMcastListReferTable 1 }
-	
+    SYNTAX HwMcastListReferEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry contains multicast list refers to multicast group."
+    INDEX { hwMcastListIndex, hwMcastGroupIndex }
+    ::= { hwMcastListReferTable 1 }
+    
 HwMcastListReferEntry ::= SEQUENCE { 
     hwMcastListReferRowStatus              RowStatus
     }
 
 hwMcastListReferRowStatus OBJECT-TYPE
-	SYNTAX RowStatus
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"This object is used to create or delete a row and represent the current status of this row."
-	::= { hwMcastListReferEntry 5 }
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object is used to create or delete a row and represent the current status of this row."
+    ::= { hwMcastListReferEntry 5 }
 
 hwMcastProfileReferTable OBJECT-TYPE
-	SYNTAX SEQUENCE OF HwMcastProfileReferEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Table contains multicast profile refers to multicast list."
-	::= { hwBtvCfgInfo 6 }
+    SYNTAX SEQUENCE OF HwMcastProfileReferEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table contains multicast profile refers to multicast list."
+    ::= { hwBtvCfgInfo 6 }
 
 hwMcastProfileReferEntry OBJECT-TYPE
-	SYNTAX HwMcastProfileReferEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"An entry contains multicast profile refers to multicast list."
-	INDEX { hwMcastProfileIndex, hwMcastListIndex }
-	::= { hwMcastProfileReferTable 1 }
+    SYNTAX HwMcastProfileReferEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry contains multicast profile refers to multicast list."
+    INDEX { hwMcastProfileIndex, hwMcastListIndex }
+    ::= { hwMcastProfileReferTable 1 }
 
 HwMcastProfileReferEntry ::= SEQUENCE { 
     hwMcastPreviewStatus                      EnabledStatus,
@@ -3570,67 +3687,67 @@ HwMcastProfileReferEntry ::= SEQUENCE {
     }
 
 hwMcastPreviewStatus OBJECT-TYPE
-	SYNTAX EnabledStatus
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"This object is used to create or delete a row and represent the current status of this row."
-	::= { hwMcastProfileReferEntry 1 }
+    SYNTAX EnabledStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object is used to create or delete a row and represent the current status of this row."
+    ::= { hwMcastProfileReferEntry 1 }
 
 hwMcastProfileReferRowStatus OBJECT-TYPE
-	SYNTAX RowStatus
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"Table contains vlan apply multicast profile."
-	::= { hwMcastProfileReferEntry 5 }
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Table contains vlan apply multicast profile."
+    ::= { hwMcastProfileReferEntry 5 }
 
 hwVlanApplyProfileTable OBJECT-TYPE
-	SYNTAX SEQUENCE OF HwVlanApplyProfileEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"An entry contains attach a vlan to a multicast profile."
-	::= { hwBtvCfgInfo 7 }
+    SYNTAX SEQUENCE OF HwVlanApplyProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry contains attach a vlan to a multicast profile."
+    ::= { hwBtvCfgInfo 7 }
 
 hwVlanApplyProfileEntry OBJECT-TYPE
-	SYNTAX HwVlanApplyProfileEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Description."
-	INDEX { hwUserVlanIndex, hwMcastProfileIndex }
-	::= { hwVlanApplyProfileTable 1 }
+    SYNTAX HwVlanApplyProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Description."
+    INDEX { hwUserVlanIndex, hwMcastProfileIndex }
+    ::= { hwVlanApplyProfileTable 1 }
 
 HwVlanApplyProfileEntry ::= SEQUENCE { 
     hwVlanApplyProfileRowStatus              RowStatus
     }
     
 hwVlanApplyProfileRowStatus OBJECT-TYPE
-	SYNTAX RowStatus
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"This object is used to create or delete a row and represent the current status of this row."
-	::= { hwVlanApplyProfileEntry 5 }
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object is used to create or delete a row and represent the current status of this row."
+    ::= { hwVlanApplyProfileEntry 5 }
     
 hwMcastIpv6GroupTable OBJECT-TYPE
-	SYNTAX SEQUENCE OF HwMcastIpv6GroupEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Table contains multicast group config information."
-	::= { hwBtvCfgInfo 8 }
-	
+    SYNTAX SEQUENCE OF HwMcastIpv6GroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table contains multicast group config information."
+    ::= { hwBtvCfgInfo 8 }
+    
 hwMcastIpv6GroupEntry OBJECT-TYPE
-	SYNTAX HwMcastIpv6GroupEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"An entry contains multicast group config information."
-	INDEX { hwMcastIpv6GroupIndex }
-	::= { hwMcastIpv6GroupTable 1 }
-	
+    SYNTAX HwMcastIpv6GroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry contains multicast group config information."
+    INDEX { hwMcastIpv6GroupIndex }
+    ::= { hwMcastIpv6GroupTable 1 }
+    
 HwMcastIpv6GroupEntry ::= SEQUENCE { 
     hwMcastIpv6GroupIndex           Integer32,
     hwMcastIpv6GroupName            DisplayString,
@@ -3640,97 +3757,97 @@ HwMcastIpv6GroupEntry ::= SEQUENCE {
     }
     
 hwMcastIpv6GroupIndex OBJECT-TYPE
-	SYNTAX Integer32 (1..1024)
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Multicast group index."
-	::= { hwMcastIpv6GroupEntry 1 }
-	
+    SYNTAX Integer32 (1..1024)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Multicast group index."
+    ::= { hwMcastIpv6GroupEntry 1 }
+    
 hwMcastIpv6GroupName OBJECT-TYPE
-	SYNTAX DisplayString
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"Multicast group name."
-	::= { hwMcastIpv6GroupEntry 2 }
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Multicast group name."
+    ::= { hwMcastIpv6GroupEntry 2 }
 
 hwMcastIpv6GroupAddress OBJECT-TYPE
-	SYNTAX Ipv6Address
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"Multicast group address."
-	::= { hwMcastIpv6GroupEntry 3 }
+    SYNTAX Ipv6Address
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Multicast group address."
+    ::= { hwMcastIpv6GroupEntry 3 }
 
 hwMcastIpv6SourceAddress OBJECT-TYPE
-	SYNTAX Ipv6Address
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"Source IP address."
-	::= { hwMcastIpv6GroupEntry 4 }
-	
+    SYNTAX Ipv6Address
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Source IP address."
+    ::= { hwMcastIpv6GroupEntry 4 }
+    
 hwMcastIpv6GroupRowStatus OBJECT-TYPE
-	SYNTAX RowStatus
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"This object is used to create or delete a row
-		 and represent the current status of this row."
-	::= { hwMcastIpv6GroupEntry 51}   
-	
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object is used to create or delete a row
+         and represent the current status of this row."
+    ::= { hwMcastIpv6GroupEntry 51}   
+    
 --
 --  hwExternVlanApplyProfileTable
 --
 
 hwExternVlanApplyProfileTable OBJECT-TYPE
-	SYNTAX SEQUENCE OF HwExternVlanApplyProfileEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Table contains attach a vlan to a multicast profile."
-	::= { hwBtvCfgInfo 9 }
+    SYNTAX SEQUENCE OF HwExternVlanApplyProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table contains attach a vlan to a multicast profile."
+    ::= { hwBtvCfgInfo 9 }
 
 hwExternVlanApplyProfileEntry OBJECT-TYPE
-	SYNTAX HwExternVlanApplyProfileEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"An entry contains attach a vlan to a multicast profile.."
-	INDEX { hwUserVlanIndex, hwMcastProfileIndex, hwExternPortIfIndex, hwExternSourceMacAddress }
-	::= { hwExternVlanApplyProfileTable 1 }
+    SYNTAX HwExternVlanApplyProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry contains attach a vlan to a multicast profile.."
+    INDEX { hwUserVlanIndex, hwMcastProfileIndex, hwExternPortIfIndex, hwExternSourceMacAddress }
+    ::= { hwExternVlanApplyProfileTable 1 }
 
 HwExternVlanApplyProfileEntry ::= SEQUENCE { 
-	hwExternPortIfIndex                            InterfaceIndex,
-	hwExternSourceMacAddress                       MacAddress,
+    hwExternPortIfIndex                            InterfaceIndex,
+    hwExternSourceMacAddress                       MacAddress,
         hwExternVlanApplyProfileRowStatus              RowStatus
     }
 
 hwExternPortIfIndex OBJECT-TYPE
-	SYNTAX InterfaceIndex
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"This object indicates port index."
-	::= { hwExternVlanApplyProfileEntry 1 }
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This object indicates port index."
+    ::= { hwExternVlanApplyProfileEntry 1 }
 
 hwExternSourceMacAddress OBJECT-TYPE
-	SYNTAX MacAddress
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Source MAC address."
-	::= { hwExternVlanApplyProfileEntry 2 }
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Source MAC address."
+    ::= { hwExternVlanApplyProfileEntry 2 }
 
 hwExternVlanApplyProfileRowStatus OBJECT-TYPE
-	SYNTAX RowStatus
-	MAX-ACCESS read-create
-	STATUS current
-	DESCRIPTION
-		"This object is used to create or delete a row and represent the current status of this row."
-	::= { hwExternVlanApplyProfileEntry 51 }	
-	
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object is used to create or delete a row and represent the current status of this row."
+    ::= { hwExternVlanApplyProfileEntry 51 }    
+    
 --
 --hwMcastAlarmObject
 --
@@ -3800,65 +3917,71 @@ hwMcastAlarmObject
     hwL2mcCacGlobalCountExceed NOTIFICATION-TYPE
         OBJECTS {
             hwL2mcCacCount,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:currently configured limit count,group IP address."
+            "Trap information about l2-multicast CAC:currently configured limit count,group IP address,source IP address."
         ::= { hwMcastAlarmObject 8 }    
         
     hwL2mcCacGlobalBandwidthExceed NOTIFICATION-TYPE
         OBJECTS {
             hwL2mcCacBandwidth,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:currently configured limit bandwidth,group IP address."
+            "Trap information about l2-multicast CAC:currently configured limit bandwidth,group IP address,source IP address."
         ::= { hwMcastAlarmObject 9 } 
         
          hwL2mcCacGlobalChannelCountExceed NOTIFICATION-TYPE
         OBJECTS {  
             hwL2mcCacChannelName,
             hwL2mcCacCount,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:channel name,currently configured limit count,group IP address."
+            "Trap information about l2-multicast CAC:channel name,currently configured limit count,group IP address,source IP address."
         ::= { hwMcastAlarmObject 10 }    
         
         hwL2mcCacGlobalChannelBandwidthExceed NOTIFICATION-TYPE
         OBJECTS {  
             hwL2mcCacChannelName,
             hwL2mcCacBandwidth,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:channel name,currently configured limit bandwidth,group IP address."
+            "Trap information about l2-multicast CAC:channel name,currently configured limit bandwidth,group IP address,source IP address."
         ::= { hwMcastAlarmObject 11 }  
         
         hwL2mcCacVlanCountExceed NOTIFICATION-TYPE
         OBJECTS {  
             hwL2mcCacVlanIndex,
             hwL2mcCacCount,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:VLAN ID,currently configured limit count,group IP address."
+            "Trap information about l2-multicast CAC:VLAN ID,currently configured limit count,group IP address,source IP address."
         ::= { hwMcastAlarmObject 12 }  
         
         hwL2mcCacVlanBandwidthExceed NOTIFICATION-TYPE
         OBJECTS {  
             hwL2mcCacVlanIndex,
             hwL2mcCacBandwidth,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:VLAN ID,currently configured limit bandwidth,group IP address."
+            "Trap information about l2-multicast CAC:VLAN ID,currently configured limit bandwidth,group IP address,source IP address."
         ::= { hwMcastAlarmObject 13 }  
         
         hwL2mcCacVlanChannelCountExceed NOTIFICATION-TYPE
@@ -3866,11 +3989,12 @@ hwMcastAlarmObject
             hwL2mcCacChannelName,
             hwL2mcCacVlanIndex,
             hwL2mcCacCount,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:channel name,VLAN ID,currently configured limit count,group IP address."
+            "Trap information about l2-multicast CAC:channel name,VLAN ID,currently configured limit count,group IP address,source IP address."
         ::= { hwMcastAlarmObject 14 }
         
         hwL2mcCacVlanChannelBandwidthExceed NOTIFICATION-TYPE
@@ -3878,33 +4002,36 @@ hwMcastAlarmObject
             hwL2mcCacChannelName,
             hwL2mcCacVlanIndex,
             hwL2mcCacBandwidth,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:channel name,VLAN ID,currently configured limit bandwidth,group IP address."
+            "Trap information about l2-multicast CAC:channel name,VLAN ID,currently configured limit bandwidth,group IP address,source IP address."
         ::= { hwMcastAlarmObject 15 }                           
         
         hwL2mcCacVsiCountExceed NOTIFICATION-TYPE
         OBJECTS {    
             hwL2mcCacVsiName,
             hwL2mcCacCount,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:VSI name,currently configured limit count,group IP address."
+            "Trap information about l2-multicast CAC:VSI name,currently configured limit count,group IP address,source IP address."
         ::= { hwMcastAlarmObject 16 }           
 
         hwL2mcCacVsiBandwidthExceed NOTIFICATION-TYPE
         OBJECTS {    
             hwL2mcCacVsiName,
             hwL2mcCacBandwidth,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:VSI name,currently configured limit bandwidth,group IP address."
+            "Trap information about l2-multicast CAC:VSI name,currently configured limit bandwidth,group IP address,source IP address."
         ::= { hwMcastAlarmObject 17 }   
         
         hwL2mcCacVsiChannelCountExceed NOTIFICATION-TYPE
@@ -3912,11 +4039,12 @@ hwMcastAlarmObject
             hwL2mcCacChannelName,   
             hwL2mcCacVsiName,
             hwL2mcCacCount,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:channel name,VSI name,currently configured limit count,group IP address."
+            "Trap information about l2-multicast CAC:channel name,VSI name,currently configured limit count,group IP address,source IP address."
         ::= { hwMcastAlarmObject 18 } 
         
         hwL2mcCacVsiChannelBandwidthExceed NOTIFICATION-TYPE
@@ -3924,153 +4052,178 @@ hwMcastAlarmObject
             hwL2mcCacChannelName,   
             hwL2mcCacVsiName,
             hwL2mcCacBandwidth,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:channel name,VSI name,currently configured limit bandwidth,group IP address."
+            "Trap information about l2-multicast CAC:channel name,VSI name,currently configured limit bandwidth,group IP address,source IP address."
         ::= { hwMcastAlarmObject 19 }  
         
         hwL2mcCacPortCountExceed NOTIFICATION-TYPE
         OBJECTS { 
-            hwL2mcCacIfIndex,   
+            hwL2mcCacIfIndex,
             hwL2mcCacCount,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress,
+            hwL2mcCacIfName
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:interface index,currently configured limit count,group IP address."
+            "Trap information about l2-multicast CAC:interface index,currently configured limit count,group IP address,source IP address,interface name."
         ::= { hwMcastAlarmObject 20 }    
         
         hwL2mcCacPortBandwidthExceed NOTIFICATION-TYPE
         OBJECTS { 
-            hwL2mcCacIfIndex,   
+            hwL2mcCacIfIndex,
             hwL2mcCacBandwidth,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress,
+            hwL2mcCacIfName
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:interface index,currently configured limit bandwidth,group IP address."
+            "Trap information about l2-multicast CAC:interface index,currently configured limit bandwidth,group IP address,source IP address,interface name."
         ::= { hwMcastAlarmObject 21 }  
         
         hwL2mcCacPortChannelCountExceed NOTIFICATION-TYPE
         OBJECTS { 
             hwL2mcCacChannelName,
-            hwL2mcCacIfIndex,   
+            hwL2mcCacIfIndex,
             hwL2mcCacCount,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress,
+            hwL2mcCacIfName
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:channel name,interface index,currently configured limit count,group IP address."
+            "Trap information about l2-multicast CAC:channel name,interface index,currently configured limit count,group IP address,source IP address,interface name."
         ::= { hwMcastAlarmObject 22 } 
         
         hwL2mcCacPortChannelBandwidthExceed NOTIFICATION-TYPE
         OBJECTS { 
             hwL2mcCacChannelName,
-            hwL2mcCacIfIndex,   
+            hwL2mcCacIfIndex,
             hwL2mcCacBandwidth,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress,
+            hwL2mcCacIfName
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:channel name,interface index,currently configured limit bandwidth,group IP address."
+            "Trap information about l2-multicast CAC:channel name,interface index,currently configured limit bandwidth,group IP address,source IP address,interface name."
         ::= { hwMcastAlarmObject 23 }        
 
         hwL2mcCacPortVlanCountExceed NOTIFICATION-TYPE
         OBJECTS { 
             hwL2mcCacVlanIndex,
-            hwL2mcCacIfIndex,   
+            hwL2mcCacIfIndex,
             hwL2mcCacCount,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress,
+            hwL2mcCacIfName
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:VLAN ID,interface index,currently configured limit count,group IP address."
+            "Trap information about l2-multicast CAC:VLAN ID,interface index,currently configured limit count,group IP address,source IP address,interface name."
         ::= { hwMcastAlarmObject 24 }                                           
 
         hwL2mcCacPortVlanBandwidthExceed NOTIFICATION-TYPE
         OBJECTS { 
             hwL2mcCacVlanIndex,
-            hwL2mcCacIfIndex,   
+            hwL2mcCacIfIndex,
             hwL2mcCacBandwidth,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress,
+            hwL2mcCacIfName
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:VLAN ID,interface index,currently configured limit bandwidth,group IP address."
+            "Trap information about l2-multicast CAC:VLAN ID,interface index,currently configured limit bandwidth,group IP address,source IP address,interface name."
         ::= { hwMcastAlarmObject 25 }     
 
         hwL2mcCacPortVlanChannelCountExceed NOTIFICATION-TYPE
         OBJECTS {  
             hwL2mcCacChannelName,
             hwL2mcCacVlanIndex,
-            hwL2mcCacIfIndex,   
+            hwL2mcCacIfIndex,
             hwL2mcCacCount,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress,
+            hwL2mcCacIfName
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:channel name,VLAN ID,interface index,currently configured limit count,group IP address."
+            "Trap information about l2-multicast CAC:channel name,VLAN ID,interface index,currently configured limit count,group IP address,source IP address,interface name."
         ::= { hwMcastAlarmObject 26 }   
 
         hwL2mcCacPortVlanChannelBandwidthExceed NOTIFICATION-TYPE
         OBJECTS {  
             hwL2mcCacChannelName,
             hwL2mcCacVlanIndex,
-            hwL2mcCacIfIndex,   
+            hwL2mcCacIfIndex,
             hwL2mcCacBandwidth,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress,
+            hwL2mcCacIfName
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:channel name,VLAN ID,interface index,currently configured limit bandwidth,group IP address."
+            "Trap information about l2-multicast CAC:channel name,VLAN ID,interface index,currently configured limit bandwidth,group IP address,source IP address,interface name."
         ::= { hwMcastAlarmObject 27 }   
         
         hwL2mcCacSubIfCountExceed NOTIFICATION-TYPE
         OBJECTS {  
-            hwL2mcCacIfIndex,   
+            hwL2mcCacIfIndex,
             hwL2mcCacCount,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress,
+            hwL2mcCacIfName
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:interface index,currently configured limit count,group IP address."
+            "Trap information about l2-multicast CAC:interface index,currently configured limit count,group IP address,source IP address,interface name."
         ::= { hwMcastAlarmObject 28 }        
         
         hwL2mcCacSubIfBandwidthExceed NOTIFICATION-TYPE
         OBJECTS {  
-            hwL2mcCacIfIndex,   
+            hwL2mcCacIfIndex,
             hwL2mcCacBandwidth,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress,
+            hwL2mcCacIfName
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:interface index,currently configured limit bandwidth,group IP address."
+            "Trap information about l2-multicast CAC:interface index,currently configured limit bandwidth,group IP address,source IP address,interface name."
         ::= { hwMcastAlarmObject 29 }      
         
         hwL2mcCacSubIfChannelCountExceed NOTIFICATION-TYPE
         OBJECTS { 
             hwL2mcCacChannelName, 
-            hwL2mcCacIfIndex,   
+            hwL2mcCacIfIndex,
             hwL2mcCacCount,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress,
+            hwL2mcCacIfName
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:channel name,interface index,currently configured limit count,group IP address."
+            "Trap information about l2-multicast CAC:channel name,interface index,currently configured limit count,group IP address,source IP address,interface name."
         ::= { hwMcastAlarmObject 30 } 
         
         hwL2mcCacSubIfChannelBandwidthExceed NOTIFICATION-TYPE
         OBJECTS { 
             hwL2mcCacChannelName, 
-            hwL2mcCacIfIndex,   
+            hwL2mcCacIfIndex,
             hwL2mcCacBandwidth,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress,
+            hwL2mcCacIfName
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:channel name,interface index,currently configured limit bandwidth,group IP address."
+            "Trap information about l2-multicast CAC:channel name,interface index,currently configured limit bandwidth,group IP address,source IP address,interface name."
         ::= { hwMcastAlarmObject 31 }         
 
         hwL2mcCacLdpPwCountExceed NOTIFICATION-TYPE
@@ -4078,11 +4231,12 @@ hwMcastAlarmObject
             hwL2mcCacPwId,
             hwL2mcCacRemoteIpAddress,  
             hwL2mcCacCount,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:PW ID,currently configured limit count,group IP address."
+            "Trap information about l2-multicast CAC:PW ID,currently configured limit count,group IP address,source IP address."
         ::= { hwMcastAlarmObject 32 }   
         
         hwL2mcCacLdpPwBandwidthExceed NOTIFICATION-TYPE
@@ -4090,7 +4244,8 @@ hwMcastAlarmObject
             hwL2mcCacPwId,   
             hwL2mcCacRemoteIpAddress,
             hwL2mcCacBandwidth,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
@@ -4103,11 +4258,12 @@ hwMcastAlarmObject
             hwL2mcCacPwId, 
             hwL2mcCacRemoteIpAddress, 
             hwL2mcCacCount,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:channel name,PW ID,currently configured limit count,group IP address."
+            "Trap information about l2-multicast CAC:channel name,PW ID,currently configured limit count,group IP address,source IP address."
         ::= { hwMcastAlarmObject 34 }   
          
         hwL2mcCacLdpPwChannelBandwidthExceed NOTIFICATION-TYPE
@@ -4116,33 +4272,36 @@ hwMcastAlarmObject
             hwL2mcCacPwId,  
             hwL2mcCacRemoteIpAddress,
             hwL2mcCacBandwidth,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:channel name,PW ID,currently configured limit bandwidth,group IP address."
+            "Trap information about l2-multicast CAC:channel name,PW ID,currently configured limit bandwidth,group IP address,source IP address."
         ::= { hwMcastAlarmObject 35 }     
         
         hwL2mcCacBgpPwCountExceed NOTIFICATION-TYPE
         OBJECTS {
             hwL2mcCacRemoteSiteId,
             hwL2mcCacCount,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:remote site ID,PW ID,currently configured limit count,group IP address."
+            "Trap information about l2-multicast CAC:remote site ID,PW ID,currently configured limit count,group IP address,source IP address."
         ::= { hwMcastAlarmObject 36 } 
         
         hwL2mcCacBgpPwBandwidthExceed NOTIFICATION-TYPE
         OBJECTS {
             hwL2mcCacRemoteSiteId,
             hwL2mcCacBandwidth,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:remote site ID,PW ID,currently configured limit bandwidth,group IP address."
+            "Trap information about l2-multicast CAC:remote site ID,PW ID,currently configured limit bandwidth,group IP address,source IP address."
         ::= { hwMcastAlarmObject 37 }  
         
         hwL2mcCacBgpPwChannelCountExceed NOTIFICATION-TYPE
@@ -4150,11 +4309,12 @@ hwMcastAlarmObject
             hwL2mcCacChannelName,
             hwL2mcCacRemoteSiteId,
             hwL2mcCacCount,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:channel name,remote site ID,PW ID,currently configured limit count,group IP address."
+            "Trap information about l2-multicast CAC:channel name,remote site ID,PW ID,currently configured limit count,group IP address,source IP address."
         ::= { hwMcastAlarmObject 38 }  
         
         hwL2mcCacBgpPwChannelBandwidthExceed NOTIFICATION-TYPE
@@ -4162,43 +4322,277 @@ hwMcastAlarmObject
             hwL2mcCacChannelName,
             hwL2mcCacRemoteSiteId,
             hwL2mcCacBandwidth,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:channel name,remote site ID,PW ID,currently configured limit bandwidth,group IP address."
+            "Trap information about l2-multicast CAC:channel name,remote site ID,PW ID,currently configured limit bandwidth,group IP address,source IP address."
         ::= { hwMcastAlarmObject 39 }
         
         hwL2mcCacVlanUnspecifiedChannelDeny NOTIFICATION-TYPE
         OBJECTS {     
             hwL2mcCacVlanIndex,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:VLAN ID."
+            "Trap information about l2-multicast CAC:VLAN ID,group IP address,source IP address."
         ::= { hwMcastAlarmObject 40 }             
         
         hwL2mcCacVsiUnspecifiedChannelDeny NOTIFICATION-TYPE
         OBJECTS {     
             hwL2mcCacVsiName,
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC:VSI name."
+            "Trap information about l2-multicast CAC:VSI name,group IP address,source IP address."
         ::= { hwMcastAlarmObject 41 }         
         
         hwL2mcCacGlobalUnspecifiedChannelDeny NOTIFICATION-TYPE
         OBJECTS {     
-            hwL2mcCacGroupAddress
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress
             }
         STATUS             current
         DESCRIPTION
-            "Trap information about l2-multicast CAC."
+            "Trap information about l2-multicast CAC:group IP address,source IP address."
         ::= { hwMcastAlarmObject 42 }
-                 
-     
+        hwL2mcCacQinQIfCountExceed NOTIFICATION-TYPE
+        OBJECTS {    
+            hwL2mcCacIfIndex,
+            hwL2mcCacIfName,
+            hwL2mcCacCount,
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress,
+            hwL2mcCacPeVid,
+            hwL2mcCacCeVid
+            }
+        STATUS             current
+        DESCRIPTION
+            "Trap information about l2-multicast CAC:interface index,interface name,currently configured limit count,group IP address,source IP address,pe id,ce id."
+        ::= { hwMcastAlarmObject 43 }
+        
+        hwL2mcCacQinQIfBandwidthExceed NOTIFICATION-TYPE
+        OBJECTS {     
+            hwL2mcCacIfIndex,
+            hwL2mcCacIfName,
+            hwL2mcCacBandwidth,
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress,
+            hwL2mcCacPeVid,
+            hwL2mcCacCeVid
+            }
+        STATUS             current
+        DESCRIPTION
+            "Trap information about l2-multicast CAC:interface index,interface name,currently configured limit bandwidth,group IP address,source IP address,pe id,ce id."
+        ::= { hwMcastAlarmObject 44 }
+        
+        hwL2mcCacQinQIfChannelCountExceed NOTIFICATION-TYPE
+        OBJECTS {     
+            hwL2mcCacChannelName,
+            hwL2mcCacIfIndex,
+            hwL2mcCacIfName,
+            hwL2mcCacCount,
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress,
+            hwL2mcCacPeVid,
+            hwL2mcCacCeVid
+            }
+        STATUS             current
+        DESCRIPTION
+            "Trap information about l2-multicast CAC:channel name,interface index,interface name,currently configured limit count,group IP address,source IP address,pe id,ce id."
+        ::= { hwMcastAlarmObject 45 }
+        
+        hwL2mcCacQinQIfChannelBandwidthExceed NOTIFICATION-TYPE
+        OBJECTS {     
+            hwL2mcCacChannelName,
+            hwL2mcCacIfIndex,
+            hwL2mcCacIfName,
+            hwL2mcCacBandwidth,
+            hwL2mcCacGroupAddress,
+            hwL2mcCacSourceAddress,
+            hwL2mcCacPeVid,
+            hwL2mcCacCeVid
+            }
+        STATUS             current
+        DESCRIPTION
+            "Trap information about l2-multicast CAC:channel name,interface index,interface name,currently configured bandwidth count,group IP address,source IP address,pe id,ce id."
+        ::= { hwMcastAlarmObject 46 }
+  ---
+  ---Trap for l2-multicast perfermance statistic
+  ---               
+         hwL2mcReceiveIgmpVlanAlarm NOTIFICATION-TYPE
+        OBJECTS {    
+            hwL2mcTrapVlanIndex,
+            hwL2mcRecvIgmpCount
+            }
+        STATUS             current
+        DESCRIPTION
+            "Trap information about receive igmp packet in a vlan alarm."
+        ::= { hwMcastAlarmObject 47 }   
+        
+        
+        hwL2mcReceiveIgmpVsiAlarm NOTIFICATION-TYPE
+        OBJECTS {    
+            hwL2mcTrapVsiName,
+            hwL2mcRecvIgmpCount
+            }
+        STATUS             current
+        DESCRIPTION
+            "Trap information about receive igmp packet in a VSI alarm.."
+        ::= { hwMcastAlarmObject 48 }   
+        
+        hwL2mcReceiveIgmpVlanRecover NOTIFICATION-TYPE
+        OBJECTS {    
+            hwL2mcTrapVlanIndex,
+            hwL2mcRecvIgmpCount
+            }
+        STATUS             current
+        DESCRIPTION
+            "Trap information about receive igmp packet in a vlan alarm clear."
+        ::= { hwMcastAlarmObject 49 }   
+        
+        
+        hwL2mcReceiveIgmpVsiRecover NOTIFICATION-TYPE
+        OBJECTS {    
+            hwL2mcTrapVsiName,
+            hwL2mcRecvIgmpCount
+            }
+        STATUS             current
+        DESCRIPTION
+            "Trap information about receive igmp packet in a VSI alarm clear."
+        ::= { hwMcastAlarmObject 50 }   
+        
+        hwL2mcDropIgmpVlanAlarm NOTIFICATION-TYPE
+        OBJECTS {    
+            hwL2mcTrapVlanIndex,
+            hwL2mcDropIgmpCount
+            }
+        STATUS             current
+        DESCRIPTION
+            "Trap information about drop igmp packet in a vlan alarm."
+        ::= { hwMcastAlarmObject 51 }   
+        
+        
+        hwL2mcDropIgmpVsiAlarm NOTIFICATION-TYPE
+        OBJECTS {    
+            hwL2mcTrapVsiName,
+            hwL2mcDropIgmpCount
+            }
+        STATUS             current
+        DESCRIPTION
+            "Trap information about drop igmp packet in a VSI alarm."
+        ::= { hwMcastAlarmObject 52 }   
+        
+        hwL2mcDropIgmpVlanRecover NOTIFICATION-TYPE
+        OBJECTS {    
+            hwL2mcTrapVlanIndex,
+            hwL2mcDropIgmpCount
+            }
+        STATUS             current
+        DESCRIPTION
+            "Trap information about drop igmp packet in a vlan alarm clear."
+        ::= { hwMcastAlarmObject 53 }   
+        
+        
+        hwL2mcDropIgmpVsiRecover NOTIFICATION-TYPE
+        OBJECTS {    
+            hwL2mcTrapVsiName,
+            hwL2mcDropIgmpCount
+            }
+        STATUS             current
+        DESCRIPTION
+            "Trap information about drop igmp packet in a VSI alarm clear."
+        ::= { hwMcastAlarmObject 54 }   
+        
+         hwL2mc24HReceiveIgmpVlanAlarm NOTIFICATION-TYPE
+        OBJECTS {    
+            hwL2mcTrapVlanIndex,
+            hwL2mcRecvIgmpCount
+            }
+        STATUS             current
+        DESCRIPTION
+            "Trap information about receive igmp packet in a vlan alarm in 24 hour."
+        ::= { hwMcastAlarmObject 55 }   
+        
+        
+        hwL2mc24HReceiveIgmpVsiAlarm NOTIFICATION-TYPE
+        OBJECTS {    
+            hwL2mcTrapVsiName,
+            hwL2mcRecvIgmpCount
+            }
+        STATUS             current
+        DESCRIPTION
+            "Trap information about receive igmp packet in a vsi alarm in 24 hour."
+        ::= { hwMcastAlarmObject 56 }   
+        
+        hwL2mc24HReceiveIgmpVlanRecover NOTIFICATION-TYPE
+        OBJECTS {    
+            hwL2mcTrapVlanIndex,
+            hwL2mcRecvIgmpCount
+            }
+        STATUS             current
+        DESCRIPTION
+            "Trap information about receive igmp packet in a vlan alarm clear in 24 hour."
+        ::= { hwMcastAlarmObject 57 }   
+        
+        
+        hwL2mc24HReceiveIgmpVsiRecover NOTIFICATION-TYPE
+        OBJECTS {    
+            hwL2mcTrapVsiName,
+            hwL2mcRecvIgmpCount
+            }
+        STATUS             current
+        DESCRIPTION
+            "Trap information about receive igmp packet in a VSI alarm clear in 24 hour."
+        ::= { hwMcastAlarmObject 58 }   
+        
+        hwL2mc24HDropIgmpVlanAlarm NOTIFICATION-TYPE
+        OBJECTS {    
+            hwL2mcTrapVlanIndex,
+            hwL2mcDropIgmpCount
+            }
+        STATUS             current
+        DESCRIPTION
+            "Trap information about drop igmp packet in a vlan alarm in 24 hour."
+        ::= { hwMcastAlarmObject 59 }   
+        
+        
+        hwL2mc24HDropIgmpVsiAlarm NOTIFICATION-TYPE
+        OBJECTS {    
+            hwL2mcTrapVsiName,
+            hwL2mcDropIgmpCount
+            }
+        STATUS             current
+        DESCRIPTION
+            "Trap information about drop igmp packet in a VSI alarm in 24 hour."
+        ::= { hwMcastAlarmObject 60 }   
+        
+        hwL2mc24HDropIgmpVlanRecover NOTIFICATION-TYPE
+        OBJECTS {    
+            hwL2mcTrapVlanIndex,
+            hwL2mcDropIgmpCount
+            }
+        STATUS             current
+        DESCRIPTION
+            "Trap information about receive igmp packet in a vlan alarm clear in 24 hour."
+        ::= { hwMcastAlarmObject 61 }   
+        
+        
+        hwL2mc24HDropIgmpVsiRecover NOTIFICATION-TYPE
+        OBJECTS {    
+            hwL2mcTrapVsiName,
+            hwL2mcDropIgmpCount
+            }
+        STATUS             current
+        DESCRIPTION
+            "Trap information about receive igmp packet in a VSI alarm clear in 24 hour."
+        ::= { hwMcastAlarmObject 62 }           
+        
 --
 -- Conformance Information
 --
@@ -4474,7 +4868,11 @@ hwL2CacTrapGroup OBJECT-GROUP
                 hwL2mcCacIfIndex,
                 hwL2mcCacPwId,
                 hwL2mcCacRemoteIpAddress, 
-                hwL2mcCacRemoteSiteId          
+                hwL2mcCacRemoteSiteId,
+                hwL2mcCacIfName,
+                hwL2mcCacSourceAddress,
+                hwL2mcCacPeVid,
+                hwL2mcCacCeVid                          
                }                  
         STATUS current            
         DESCRIPTION               
@@ -4541,18 +4939,18 @@ hwGrpMcastProfileGroup OBJECT-GROUP
             "."
         ::= { hwMCMibGroups 24 }
 hwUserVlanGroup OBJECT-GROUP
-	OBJECTS { hwUserVlanFlowTriggerEnable }
-	STATUS current
-	DESCRIPTION 
-		"The group of user vlan config flow-trigger."
-	::= { hwMCMibGroups 25 } 
-	
+    OBJECTS { hwUserVlanFlowTriggerEnable }
+    STATUS current
+    DESCRIPTION 
+        "The group of user vlan config flow-trigger."
+    ::= { hwMCMibGroups 25 } 
+    
 hwMVlanStaticFlowGroup OBJECT-GROUP
-	OBJECTS { hwMVlanStaticFlowRowStatus }
-	STATUS current
-	DESCRIPTION 
-		"The group of multicast vlan config static-flow."
-	::= { hwMCMibGroups 26 }
+    OBJECTS { hwMVlanStaticFlowRowStatus }
+    STATUS current
+    DESCRIPTION 
+        "The group of multicast vlan config static-flow."
+    ::= { hwMCMibGroups 26 }
 
 
 hwBtvSystemGroup OBJECT-GROUP
@@ -4562,7 +4960,7 @@ hwBtvSystemGroup OBJECT-GROUP
         STATUS current                            
         DESCRIPTION                               
             "The group of enable Btv function."                                   
-        ::= { hwMCMibGroups 27 }	
+        ::= { hwMCMibGroups 27 }    
 
 hwMcastGroupGroup OBJECT-GROUP
        OBJECTS {               
@@ -4803,14 +5201,14 @@ hwMcSourceDenyGroup OBJECT-GROUP
         ::= { hwMCMibGroups 47 } 
         
 hwMVlanIpv6StaticFlowGroup OBJECT-GROUP
-	OBJECTS { 
-		hwMVlanIpv6StaticFlowRowStatus
-		}
-	STATUS current
-	DESCRIPTION 
-		"The group of multicast vlan config IPv6 static-flow."
-	::= { hwMCMibGroups 48 }
-	
+    OBJECTS { 
+        hwMVlanIpv6StaticFlowRowStatus
+        }
+    STATUS current
+    DESCRIPTION 
+        "The group of multicast vlan config IPv6 static-flow."
+    ::= { hwMCMibGroups 48 }
+    
 hwMcastIpv6GroupGroup OBJECT-GROUP
        OBJECTS {               
                 hwMcastIpv6GroupName,
@@ -4874,7 +5272,19 @@ hwExternVlanApplyProfileGroup OBJECT-GROUP
         DESCRIPTION                               
             "The group of extern vlan attach multicast-profile."                                   
         ::= { hwMCMibGroups 54 }
-
+        
+hwL2mcNotificationObjGroup OBJECT-GROUP   
+       OBJECTS {                  
+                hwL2mcRecvIgmpCount,
+                hwL2mcDropIgmpCount,
+                hwL2mcTrapVlanIndex,
+                hwL2mcTrapVsiName                          
+               }                  
+        STATUS current            
+        DESCRIPTION               
+            "The group of l2-multicast notifications."                   
+        ::= { hwMCMibGroups 55 }   
+         
 hwMcastAlarmGroup NOTIFICATION-GROUP   
        NOTIFICATIONS {                  
                 hwCfgRefreshFailAlarm,
@@ -4918,12 +5328,95 @@ hwMcastAlarmGroup NOTIFICATION-GROUP
                 hwL2mcCacBgpPwChannelBandwidthExceed,             
                 hwL2mcCacVlanUnspecifiedChannelDeny,
                 hwL2mcCacVsiUnspecifiedChannelDeny,
-                hwL2mcCacGlobalUnspecifiedChannelDeny         
+                hwL2mcCacGlobalUnspecifiedChannelDeny,
+                hwL2mcCacQinQIfCountExceed,
+                hwL2mcCacQinQIfBandwidthExceed,
+                hwL2mcCacQinQIfChannelCountExceed,
+                hwL2mcCacQinQIfChannelBandwidthExceed,
+                hwL2mcReceiveIgmpVlanAlarm,
+                hwL2mcReceiveIgmpVsiAlarm,
+                hwL2mcReceiveIgmpVlanRecover,
+                hwL2mcReceiveIgmpVsiRecover,
+                hwL2mcDropIgmpVlanAlarm,
+                hwL2mcDropIgmpVsiAlarm,
+                hwL2mcDropIgmpVlanRecover,
+                hwL2mcDropIgmpVsiRecover,
+                hwL2mc24HReceiveIgmpVlanAlarm,
+                hwL2mc24HReceiveIgmpVsiAlarm,
+                hwL2mc24HReceiveIgmpVlanRecover,
+                hwL2mc24HReceiveIgmpVsiRecover,
+                hwL2mc24HDropIgmpVlanAlarm,
+                hwL2mc24HDropIgmpVsiAlarm,
+                hwL2mc24HDropIgmpVlanRecover,
+                hwL2mc24HDropIgmpVsiRecover
                }                  
         STATUS current            
         DESCRIPTION               
             "."                   
-        ::= { hwMCMibGroups 99 }       
+        ::= { hwMCMibGroups 99 } 
+
+--
+--hwMgmdBrasMibObject
+--
+hwMgmdBrasMibObject   
+               OBJECT IDENTIFIER ::= { hwMultiCastMIB 101 }
+hwMgmdBrasAlarmObject   
+               OBJECT IDENTIFIER ::= { hwMultiCastMIB 102 }
+
+hwMgmdBrasUserAddressType  OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+             "The address type of the Bras User."
+    ::= { hwMgmdBrasMibObject 1 }
+
+hwMgmdBrasUserLimitCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..350000)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "The limit number of Bras user on the board."
+    ::= { hwMgmdBrasMibObject 2 }
+
+hwMgmdBrasUserCurrentCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..350000)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "The current number of Bras user on the board."
+    ::= { hwMgmdBrasMibObject 3 }
+
+hwMgmdBrasNotificationSlot OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "The name of slot."
+    ::= { hwMgmdBrasMibObject 4 }
+
+hwMgmdBrasUserLimit NOTIFICATION-TYPE
+    OBJECTS { hwMgmdBrasUserAddressType,
+              hwMgmdBrasNotificationSlot,
+              hwMgmdBrasUserLimitCount
+            }
+    STATUS   current
+    DESCRIPTION
+            "A hwMgmdBrasUserLimit notification signifies that the number of multicast users that join dynamic groups on the board reaches the upper limit.
+            This trap message is generated when the number of multicast users that join dynamic groups on the board reaches the upper limit."
+ 
+    ::= { hwMgmdBrasAlarmObject 1 }
+
+hwMgmdBrasUserLimitClear NOTIFICATION-TYPE
+    OBJECTS { hwMgmdBrasUserAddressType,
+              hwMgmdBrasNotificationSlot,
+              hwMgmdBrasUserCurrentCount
+            }
+    STATUS   current
+    DESCRIPTION
+            "A hwMgmdBrasUserLimitClear notification signifies that The total number of multicast users that join dynamic groups on the board fell below the upper limit.
+            This trap message is generated when The total number of multicast users that join dynamic groups on the board fell below the upper limit."
+ 
+    ::= { hwMgmdBrasAlarmObject 2 }
+      
 END
-
-

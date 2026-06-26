@@ -17,7 +17,7 @@ foreach ($stats as $stat) {
     $rrd_list[$i]['filename'] = $rrd_filename;
     $rrd_list[$i]['descr'] = str_replace('snmp', '', $stat);
     $rrd_list[$i]['ds'] = $stat;
-    if (strpos($stat, 'Out') !== false) {
+    if (str_contains($stat, 'Out')) {
         $rrd_list[$i]['invert'] = true;
     }
 }

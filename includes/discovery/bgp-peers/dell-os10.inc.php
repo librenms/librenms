@@ -32,7 +32,7 @@ use LibreNMS\Util\IP;
 if ($device['os'] == 'dell-os10') {
     $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'os10bgp4V2PeerTable', [], 'DELLEMC-OS10-BGP4V2-MIB', 'dell');
     foreach ($bgpPeersCache as $key => $value) {
-        $oid = explode('.', $key);
+        $oid = explode('.', (string) $key);
         $vrfInstance = array_shift($oid);       // os10bgp4V2PeerInstance
         $remoteAddressType = array_shift($oid); // os10bgp4V2PeerRemoteAddrType
         $address = IP::fromSnmpString(implode(' ', $oid))->compressed(); // os10bgp4V2PeerRemoteAddr
@@ -86,7 +86,7 @@ if ($device['os'] == 'dell-os10') {
 
     $af_data = snmpwalk_cache_oid($device, 'os10bgp4V2PrefixInPrefixes', [], 'DELLEMC-OS10-BGP4V2-MIB', 'dell');
     foreach ($af_data as $key => $value) {
-        $oid = explode('.', $key);
+        $oid = explode('.', (string) $key);
         $vrfInstance = array_shift($oid);       // os10bgp4V2PeerInstance
         $remoteAddressType = array_shift($oid); // os10bgp4V2PeerRemoteAddrType
         $safi = array_pop($oid);                // os10bgp4V2PrefixGaugesSafi

@@ -26,12 +26,12 @@
                     "sysDescr": "Linux, Cisco Systems, Inc WAP371 (WAP371-A-K9), Version 1.3.0.4",
                     "sysContact": "<private>",
                     "version": "Software 1.3.0.4",
-                    "hardware": "",
+                    "hardware": "WAP371-A-K9 V03",
                     "features": null,
                     "location": "<private>",
                     "os": "ciscosb",
                     "type": "network",
-                    "serial": null,
+                    "serial": "CCQ22111GBS",
                     "icon": "cisco.svg"
                 }
             ]
@@ -1994,6 +1994,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Cisco Systems, Inc",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]
@@ -2029,7 +2030,8 @@
                     "ifStackStatus": "active"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ipv4-addresses": {
         "discovery": {

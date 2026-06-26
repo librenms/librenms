@@ -20,19 +20,11 @@ class HpFault implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $type = $trap->getOidData($trap->findOid('HP-ICF-FAULT-FINDER-MIB::hpicfFfLogFaultType'));
-        switch ($type) {
-            case 'badXcvr':
-                $trap->log('Fault - CRC Error ' . $trap->getOidData($trap->findOid('HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL')), Severity::Warning, $type);
-                break;
-            case 'badCable':
-                $trap->log('Fault - Bad Cable ' . $trap->getOidData($trap->findOid('HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL')), Severity::Warning, $type);
-                break;
-            case 'bcastStorm':
-                $trap->log('Fault - Broadcaststorm ' . $trap->getOidData($trap->findOid('HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL')), Severity::Error, $type);
-                break;
-            default:
-                $trap->log('Fault - Unhandled ' . $trap->getOidData($trap->findOid('HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL')), Severity::Info, $type);
-                break;
-        }
+        match ($type) {
+            'badXcvr' => $trap->log('Fault - CRC Error ' . $trap->getOidData($trap->findOid('HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL')), Severity::Warning, $type),
+            'badCable' => $trap->log('Fault - Bad Cable ' . $trap->getOidData($trap->findOid('HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL')), Severity::Warning, $type),
+            'bcastStorm' => $trap->log('Fault - Broadcaststorm ' . $trap->getOidData($trap->findOid('HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL')), Severity::Error, $type),
+            default => $trap->log('Fault - Unhandled ' . $trap->getOidData($trap->findOid('HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL')), Severity::Info, $type),
+        };
     }
 }

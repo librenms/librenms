@@ -12,7 +12,7 @@
                     "features": null,
                     "location": null,
                     "os": "drac",
-                    "type": "appliance",
+                    "type": "management",
                     "serial": null,
                     "icon": "dell.svg"
                 }

@@ -23,29 +23,47 @@
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
+use App\Models\Alert;
+use Illuminate\Support\Facades\Gate;
+
 header('Content-type: application/json');
 
-$alert_id = $vars['alert_id'];
-$sub_type = $vars['sub_type'];
-$note = strip_tags($vars['note']) ?: '';
-$status = 'error';
+$alert_id = $vars['alert_id'] ?? null;
+$sub_type = $vars['sub_type'] ?? '';
+$note = isset($vars['note']) ? strip_tags($vars['note']) : '';
 
-if (is_numeric($alert_id)) {
-    if ($sub_type === 'get_note') {
-        $note = dbFetchCell('SELECT `note` FROM `alerts` WHERE `id` = ?', [$alert_id]);
-        $message = 'Alert note retrieved';
-        $status = 'ok';
-    } else {
-        if (dbUpdate(['note' => $note], 'alerts', '`id` = ?', [$alert_id])) {
-            $status = 'ok';
-            $message = 'Note updated';
-        } else {
-            $message = 'Could not update note';
-        }
-    }
-} else {
-    $message = 'Invalid alert id';
+if (! is_numeric($alert_id) || ! ($alert = Alert::find($alert_id))) {
+    abort(response()->json([
+        'status' => 'error',
+        'message' => 'Invalid alert id',
+        'note' => '',
+    ]));
 }
+
+$ability = $sub_type === 'get_note' ? 'view' : 'update';
+if (Gate::denies($ability, $alert)) {
+    abort(response()->json([
+        'status' => 'error',
+        'message' => 'You are not authorised to access this alert',
+        'note' => '',
+    ]));
+}
+
+if ($sub_type === 'get_note') {
+    $status = 'ok';
+    $message = 'Alert note retrieved';
+    $note = (string) $alert->note;
+} else {
+    $alert->note = $note;
+    if ($alert->save()) {
+        $status = 'ok';
+        $message = 'Note updated';
+    } else {
+        $status = 'error';
+        $message = 'Could not update note';
+    }
+}
+
 exit(json_encode([
     'status' => $status,
     'message' => $message,

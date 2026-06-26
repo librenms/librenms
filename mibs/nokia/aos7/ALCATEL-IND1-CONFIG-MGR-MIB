@@ -16,33 +16,27 @@ ALCATEL-IND1-CONFIG-MGR-MIB DEFINITIONS ::= BEGIN
 
 
         alcatelIND1ConfigMgrMIB   MODULE-IDENTITY
-                LAST-UPDATED     "200704030000Z"
-                ORGANIZATION     "Alcatel-Lucent"
-                CONTACT-INFO
-                        "Please consult with Customer Service to ensure the most appropriate
-                         version of this document is used with the products in question:
+            LAST-UPDATED "201911270000Z"
+            ORGANIZATION "ALE USA Inc."
+            CONTACT-INFO
+             "Please consult with Customer Service to ensure the most appropriate
+              version of this document is used with the products in question:
 
-                         Alcatel-Lucent, Enterprise Solutions Division
-                         (Formerly Alcatel Internetworking, Incorporated)
-                               26801 West Agoura Road
-                              Agoura Hills, CA  91301-5122
-                              United States Of America
+                              ALE USA Inc. Enterprise
+                                26801 West Agoura Road
+                             Agoura Hills, CA  91301-5122
+                               United States Of America
 
-                         Telephone:        North America  +1 800 995 2696
-                                           Latin America  +1 877 919 9526
-                                           Europe         +31 23 556 0100
-                                           Asia           +65 394 7933
-                                           All Other      +1 818 878 4507
+             Telephone:          +1 800 995 2696
 
-                         Electronic Mail:         support@ind.alcatel.com
-                         World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-                         File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+             Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+             World Wide Web:     https://www.al-enterprise.com"
 
         DESCRIPTION
             "This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                 For the Birds Of Prey Product Line
+                 For the OmniSwitch Product Line
                  Configuration Manager Subsystem.
 
              The right to make changes in specification and other information
@@ -56,13 +50,17 @@ ALCATEL-IND1-CONFIG-MGR-MIB DEFINITIONS ::= BEGIN
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2007 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
+
+        REVISION      "201911270000Z"
+        DESCRIPTION
+                "Updated the latest contact and Copyright information for ALE USA Inc."
 
         REVISION         "200704030000Z"
         DESCRIPTION
                 "The latest version of this MIB Module."
-
         ::= { softentIND1Confmgr 1}
 
 
@@ -452,7 +450,7 @@ ALCATEL-IND1-CONFIG-MGR-MIB DEFINITIONS ::= BEGIN
         configSnapshotBootPSelect       OBJECT-TYPE
                 SYNTAX                  Integer32 (0..1)
                 MAX-ACCESS              read-write
-                STATUS                  current
+                STATUS                  deprecated
                 DESCRIPTION
                         "A set of this object causes
                          bootp configuration data to
@@ -675,8 +673,11 @@ ALCATEL-IND1-CONFIG-MGR-MIB DEFINITIONS ::= BEGIN
                                            techSupportL3Isis(14),
                                            techSupportL3Pim6(15),
                                            techSupportL3IPsec(16),
-                                           techSupportL3Bfd(17)
-
+                                           techSupportL3Bfd(17),
+                                           techSupportL3Mpls(18),
+                                           techSupportQoS(19),
+                                           techSupportAfn(20),
+                                           techSupportSvcMgr(21)
                                 }
                 MAX-ACCESS              read-write
                 STATUS                  current
@@ -893,7 +894,7 @@ ALCATEL-IND1-CONFIG-MGR-MIB DEFINITIONS ::= BEGIN
         configSnapshotNETSECSelect        OBJECT-TYPE
                 SYNTAX                  Integer32 (0..1)
                 MAX-ACCESS              read-write
-                STATUS                  current
+                STATUS                  deprecated 
                 DESCRIPTION
                         "A set of this object causes
                          NETSEC configuration data to
@@ -1502,6 +1503,282 @@ ALCATEL-IND1-CONFIG-MGR-MIB DEFINITIONS ::= BEGIN
                 DEFVAL  { 0 }
                 ::= { configManager 108 }
 
+        configSnapshotKEYMGRSelect  OBJECT-TYPE
+                SYNTAX                  Integer32 (0..1)
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION
+                        "A set of this object causes
+                         Key manager configuration data to
+                         be included in the snap-shot file generated
+                         by the device."
+                DEFVAL  { 0 }
+                ::= { configManager 109 }
+
+        configSnapshotZeroConfSelect    OBJECT-TYPE
+                SYNTAX                  Integer32 (0..1)
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION
+                        "A set of this object causes
+                         Zero configuration data to
+                         be included in the snap-shot file generated
+                         by the device."
+                DEFVAL  { 0 }
+                ::= { configManager 110 }
+        configSnapshotMacSecSelect    OBJECT-TYPE 
+                SYNTAX                  Integer32 (0..1) 
+                MAX-ACCESS              read-write 
+                STATUS                  current 
+                DESCRIPTION
+                         "A set of this object causes 
+                         MAC security data to 
+                         be included in the snap-shot file generated
+                          by the device."
+                DEFVAL  { 0 }
+                ::= { configManager 111 }
+
+        configSnapshotCloudAgentSelect    OBJECT-TYPE 
+                SYNTAX                  Integer32 (0..1)
+                MAX-ACCESS              read-write 
+                STATUS                  current 
+                DESCRIPTION
+                         "A set of this object causes 
+                         MAC security data to 
+                         be included in the snap-shot file generated
+                          by the device."
+                DEFVAL  { 0 }
+                ::= { configManager 112 }
+
+        configSnapshotAlarmManagerSelect    OBJECT-TYPE 
+                SYNTAX                  Integer32 (0..1)
+                MAX-ACCESS              read-write 
+                STATUS                  current 
+                DESCRIPTION
+                         "A set of this object causes 
+                         Alarm manager data to 
+                         be included in the snap-shot file generated
+                          by the device."
+                DEFVAL  { 0 }
+                ::= { configManager 113 }
+
+        configSnapshotDeviceProfileSelect    OBJECT-TYPE 
+                SYNTAX                  Integer32 (0..1)
+                MAX-ACCESS              read-write 
+                STATUS                  current 
+                DESCRIPTION
+                         "A set of this object causes device profile data 
+                         to be included in the snap-shot file generated 
+                         by the device."
+                DEFVAL  { 0 }
+                ::= { configManager 114 }
+
+        configSnapshotPtpSelect         OBJECT-TYPE 
+                SYNTAX                  Integer32 (0..1)
+                MAX-ACCESS              read-write 
+                STATUS                  current 
+                DESCRIPTION
+                         "A set of this object causes PTP data 
+                         to be included in the snap-shot file generated 
+                         by the device."
+                DEFVAL  { 0 }
+                ::= { configManager 115 }
+                
+        configSnapshotIpDhcpRelaySelect OBJECT-TYPE
+                SYNTAX Integer32 (0..1)
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION 
+                         "A set of this object causes ip dhcp relay data 
+                         to be included in the snap-shot file generated 
+                         by the device."
+                DEFVAL { 0 }
+                ::= { configManager 116 }
+
+        configSnapshotDhcpv6SnoopingSelect    OBJECT-TYPE
+                SYNTAX                  Integer32 (0..1)
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION       
+                        "A set of this object causes 
+                        DHCPv6 Guard/Snooping configuration data to 
+                        be included in the snap-shot file generated
+                        by the device."
+                DEFVAL  { 0 }
+                ::= { configManager 117 }
+
+        configSnapshotTestOamSelect    OBJECT-TYPE
+                SYNTAX                  Integer32 (0..1)
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION       
+                        "A set of this object causes 
+                        Test Oam configuration data togenerated 
+                        be included in the snap-shot file generated
+                        by the device."
+                DEFVAL  { 0 }
+                ::= { configManager 118 }
+
+        configSnapshotLoopbackTestSelect OBJECT-TYPE
+                SYNTAX                  Integer32 (0..1)
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION
+                        "A set of this object causes
+                         Loopback Test configuration data togenerated 
+                         be included in the snap-shot file generated
+                         by the device."
+                DEFVAL  { 0 }
+                ::= { configManager 119 }
+
+        configSnapshotUdpv6RelaySelect        OBJECT-TYPE
+                SYNTAX                  Integer32 (0..1)
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION
+                        "A set of this object causes
+                         IPv6 UDP RELAY configuration data to
+                         be included in the snap-shot file generated
+                         by the device."
+                DEFVAL  { 0 }
+                ::= { configManager 120 }
+
+    configNetworkSyncFileName          OBJECT-TYPE
+                SYNTAX          SnmpAdminString (SIZE (0..45))
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "The name of the configuration file to be
+                         read by the device. The file specified
+                         should be present on the device."
+                DEFVAL  { "" }
+                ::= { configManager 121 }
+
+    configNetworkSyncFileAction        OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                none(1),
+                                apply(2),
+                                localApply(3)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "Triggers application of the configuration
+                         file specified by the configNetworkSyncFileName.
+                         A value of Apply causes the configNetworkSyncFileName
+                         to be applied to the device configuration.
+                         A value of none indicates no action has been triggered."
+                DEFVAL  { none }
+                ::= { configManager 122 }
+
+    configNetworkSyncCommunity        OBJECT-TYPE
+                SYNTAX          SnmpAdminString (SIZE (0..64))
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "The name of the community to which the network
+                         synchronization configuration file specified by the
+                         configNetworkSyncFileName are applied."
+                DEFVAL  { "" }
+                ::= { configManager 123 }
+
+    configSnapshotMgmtAgentSelect        OBJECT-TYPE
+                SYNTAX                  Integer32 (0..1)
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION
+                        "A set of this object causes
+                         management agent configuration data to
+                         be included in the snap-shot file generated
+                         by the device."
+                DEFVAL  { 0 }
+                ::= { configManager 124 }
+
+    configSnapshotMRPSelect        OBJECT-TYPE
+                SYNTAX                  Integer32 (0..1)
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION
+                        "A set of this object causes
+                         MRP configuration data to
+                         be included in the snap-shot file generated
+                         by the device."
+                DEFVAL  { 0 }
+                ::= { configManager 125 }
+
+    configSnapshotPkgMgrSelect        OBJECT-TYPE
+                SYNTAX                  Integer32 (0..1)
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION
+                        "A set of this object causes
+                         Package Manager configuration data to
+                         be included in the snap-shot file generated
+                         by the device."
+                DEFVAL  { 0 }
+                ::= { configManager 126 }
+
+    configFileBackupRestore     OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                backup(1),
+                                restore(2)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "Backup or restore the configuration files."
+                DEFVAL  { backup }
+                ::= { configManager 127 }
+
+    configSnapshotSiteLicenseServerSelect        OBJECT-TYPE
+                SYNTAX                           Integer32 (0..1)
+                MAX-ACCESS                       read-write
+                STATUS                           current
+                DESCRIPTION
+                        "A set of this object causes
+                         site license server configuration data to
+                         be included in the snap-shot file generated
+                         by the device."
+                DEFVAL  { 0 }
+                ::= { configManager 128 }
+
+    configSnapshotSiteLicenseClientSelect        OBJECT-TYPE
+                SYNTAX                           Integer32 (0..1)
+                MAX-ACCESS                       read-write
+                STATUS                           current
+                DESCRIPTION
+                        "A set of this object causes
+                         site license client configuration data to
+                         be included in the snap-shot file generated
+                         by the device."
+                DEFVAL  { 0 }
+                ::= { configManager 129 }
+
+    configSnapshotTcamSelect        OBJECT-TYPE
+                SYNTAX                           Integer32 (0..1)
+                MAX-ACCESS                       read-write
+                STATUS                           current
+                DESCRIPTION
+                        "A set of this object causes
+                         tcam configuration data to
+                         be included in the snap-shot file generated
+                         by the device."
+                DEFVAL  { 0 }
+                ::= { configManager 130 }
+
+    configSnapshotProfinetSelect        OBJECT-TYPE
+                SYNTAX                           Integer32 (0..1)
+                MAX-ACCESS                       read-write
+                STATUS                           current
+                DESCRIPTION
+                        "A set of this object causes
+                         profinet configuration data to
+                         be included in the snap-shot file generated
+                         by the device."
+                DEFVAL  { 0 }
+                ::= { configManager 131 }
+
+
 --
 -- Compliance Statements
 --
@@ -1538,7 +1815,10 @@ ALCATEL-IND1-CONFIG-MGR-MIB DEFINITIONS ::= BEGIN
                   configFileStatus,
                   configFileMode,
                   configErrorFileMaximum,
-                  configChangeStatus
+                  configChangeStatus,
+                  configNetworkSyncFileName,
+                  configNetworkSyncFileAction,
+                  configNetworkSyncCommunity
                 }
                 STATUS  current
                 DESCRIPTION
@@ -1639,21 +1919,41 @@ ALCATEL-IND1-CONFIG-MGR-MIB DEFINITIONS ::= BEGIN
                   configSnapshotOpenflowSelect,
                   configSnapshotWlanSelect,
                   configSnapshotDhcpSrvSelect,
-		  configSnapshotDPISelect,
-		  configSnapshotMsgSrvSelect,
-		  configSnapshotAlSrvSelect,
-		  configSnapshotDhcpv6SrvSelect,
+                  configSnapshotDPISelect,
+                  configSnapshotMsgSrvSelect,
+                  configSnapshotAlSrvSelect,
+                  configSnapshotDhcpv6SrvSelect,
                   configSnapshotAGSelect,
                   configSnapshotQMRSelect,
                   configSnapshotVCSPSelect,
                   configSnapshotDhcpSnoopingSelect,
-		  configSnapshotAppMonSelect,
-		  configSnapshotVMSnoopSelect,
-		  configSnapshotLbdSelect,
-		  configSnapshotPppoeIaSelect,
-		  configSnapshotPmPortViolationSelect,
+                  configSnapshotAppMonSelect,
+                  configSnapshotVMSnoopSelect,
+                  configSnapshotLbdSelect,
+                  configSnapshotPppoeIaSelect,
+                  configSnapshotPmPortViolationSelect,
                   configSnapshotLanPowerSelect,
-                  configSnapshotPVLANSelect
+                  configSnapshotPVLANSelect,
+                  configSnapshotKEYMGRSelect,
+                  configSnapshotZeroConfSelect,
+                  configSnapshotMacSecSelect,
+                  configSnapshotCloudAgentSelect,
+                  configSnapshotAlarmManagerSelect,
+                  configSnapshotDeviceProfileSelect,
+                  configSnapshotPtpSelect,
+                  configSnapshotIpDhcpRelaySelect,
+                  configSnapshotDhcpv6SnoopingSelect,
+                  configSnapshotTestOamSelect,
+                  configSnapshotLoopbackTestSelect,
+                  configSnapshotUdpv6RelaySelect,
+                  configSnapshotMgmtAgentSelect,
+                  configSnapshotMRPSelect,
+                  configSnapshotPkgMgrSelect,
+                  configFileBackupRestore,
+                  configSnapshotSiteLicenseServerSelect,
+                  configSnapshotSiteLicenseClientSelect,
+                  configSnapshotTcamSelect,
+                  configSnapshotProfinetSelect
                 }
                 STATUS  current
                 DESCRIPTION

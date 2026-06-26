@@ -29,7 +29,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
-class HpicfBridgeLoopProtectLoopDetectedNotificationTest extends SnmpTrapTestCase
+final class HpicfBridgeLoopProtectLoopDetectedNotificationTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;

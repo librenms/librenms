@@ -42,12 +42,6 @@ interface SnmpQueryInterface
     public function device(Device $device): SnmpQueryInterface;
 
     /**
-     * Specify a device by a device array.
-     * The device will be fetched from the cache if it is loaded, otherwise, it will fill the array into a new Device
-     */
-    public function deviceArray(array $device): SnmpQueryInterface;
-
-    /**
      * Cache the data for the rest of the runtime (or retrieve from cache if available)
      */
     public function cache(): SnmpQueryInterface;
@@ -56,7 +50,7 @@ interface SnmpQueryInterface
      * Set a context for the snmp query
      * This is most commonly used to fetch alternate sets of data, such as different VRFs
      */
-    public function context(string $context): SnmpQueryInterface;
+    public function context(string $context, ?string $v3_prefix = null): SnmpQueryInterface;
 
     /**
      * Set an additional MIB directory to search for MIBs.

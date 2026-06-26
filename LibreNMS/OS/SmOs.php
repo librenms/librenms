@@ -3,9 +3,9 @@
 namespace LibreNMS\OS;
 
 use App\Models\Transceiver;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessMseDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -43,7 +43,7 @@ class SmOs extends OS implements
                     $txOid = '.1.3.6.1.4.1.3373.1103.80.17.1.10.' . $index;
                     $totalOids['tx'][] = $txOid;
                     $sensors[] = new WirelessSensor(
-                        'rate',
+                        WirelessSensorType::Rate,
                         $this->getDeviceId(),
                         $txOid,
                         'tx',
@@ -58,7 +58,7 @@ class SmOs extends OS implements
                     $rxOid = '.1.3.6.1.4.1.3373.1103.80.17.1.11.' . $index;
                     $totalOids['rx'][] = $rxOid;
                     $sensors[] = new WirelessSensor(
-                        'rate',
+                        WirelessSensorType::Rate,
                         $this->getDeviceId(),
                         $rxOid,
                         'rx',
@@ -72,11 +72,11 @@ class SmOs extends OS implements
 
             if (! empty($totalOids['rx'])) {
                 $sensors[] = new WirelessSensor(
-                    'rate',
+                    WirelessSensorType::Rate,
                     $this->getDeviceId(),
                     $totalOids['rx'],
                     'total-rx',
-                    $index,
+                    $link,
                     $this->getLinkLabel($link) . ' Total Rx',
                     array_sum(array_column($radioEntry, 'linkRxETHCapacity')),
                     1000
@@ -85,11 +85,11 @@ class SmOs extends OS implements
 
             if (! empty($totalOids['tx'])) {
                 $sensors[] = new WirelessSensor(
-                    'rate',
+                    WirelessSensorType::Rate,
                     $this->getDeviceId(),
                     $totalOids['tx'],
                     'total-tx',
-                    $index,
+                    $link,
                     $this->getLinkLabel($link) . ' Total Tx',
                     array_sum(array_column($radioEntry, 'linkTxETHCapacity')),
                     1000
@@ -98,7 +98,7 @@ class SmOs extends OS implements
         }
 
         $sensors[] = new WirelessSensor(
-            'rate',
+            WirelessSensorType::Rate,
             $this->getDeviceId(),
             '.1.3.6.1.4.1.3373.1103.15.4.1.17.1',
             'alfo80hdx-tx-rate',
@@ -110,7 +110,7 @@ class SmOs extends OS implements
         );
 
         $sensors[] = new WirelessSensor(
-            'rate',
+            WirelessSensorType::Rate,
             $this->getDeviceId(),
             '.1.3.6.1.4.1.3373.1103.15.4.1.18.1',
             'alfo80hdx-rx-rate',
@@ -127,7 +127,7 @@ class SmOs extends OS implements
     public function discoverWirelessRssi()
     {
         $sensors[] = new WirelessSensor(
-            'rssi',
+            WirelessSensorType::Rssi,
             $this->getDeviceId(),
             '.1.3.6.1.4.1.3373.1103.39.2.1.12.1',
             'alfo80hdx-rx',
@@ -146,7 +146,7 @@ class SmOs extends OS implements
 
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.3373.1103.80.12.1.3.' . $index,
                 'sm-os',
@@ -155,7 +155,7 @@ class SmOs extends OS implements
                 $entry['radioPrx']
             );
             $sensors[] = new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.3373.1103.80.12.1.4.' . $index,
                 'sm-os',
@@ -167,7 +167,7 @@ class SmOs extends OS implements
 
         $oid = '.1.3.6.1.4.1.3373.1103.39.2.1.13.1';
 
-        $sensors[] = new WirelessSensor('power', $this->getDeviceId(), $oid, 'alfo80hd-tx', 1, 'Tx Power');
+        $sensors[] = new WirelessSensor(WirelessSensorType::Power, $this->getDeviceId(), $oid, 'alfo80hd-tx', 1, 'Tx Power');
 
         return $sensors;
     }
@@ -179,7 +179,7 @@ class SmOs extends OS implements
 
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.3373.1103.80.9.1.4.' . $index,
                 'sm-os',
@@ -192,7 +192,7 @@ class SmOs extends OS implements
         }
 
         $sensors[] = new WirelessSensor(
-            'frequency',
+            WirelessSensorType::Frequency,
             $this->getDeviceId(),
             '.1.3.6.1.4.1.3373.1103.39.2.1.2.1',
             'alfo80hdx-tx-freq',
@@ -213,7 +213,7 @@ class SmOs extends OS implements
 
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'mse',
+                WirelessSensorType::Mse,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.3373.1103.80.12.1.5.' . $index,
                 'sm-os',
@@ -240,7 +240,7 @@ class SmOs extends OS implements
         foreach ($radioStatusTable as $index => $entry) {
             $oid = '.1.3.6.1.4.1.3373.1103.80.12.1.28.';
             $sensors[] = new WirelessSensor(
-                'snr',
+                WirelessSensorType::Snr,
                 $this->getDeviceId(),
                 $oid . $index,
                 'sm-os',
@@ -277,7 +277,7 @@ class SmOs extends OS implements
                 'entity_physical_index' => $ifIndex,
                 'type' => null,
                 'vendor' => $data['SIAE-SFP-MIB::sfpVendorName'] ?? null,
-                'date' => empty($data['SIAE-SFP-MIB::sfpVendorDateCode']) ? null : Carbon::createFromFormat('ymd', $data['SIAE-SFP-MIB::sfpVendorDateCode'])->toDateString(),
+                'date' => $data['SIAE-SFP-MIB::sfpVendorDateCode'] ?? null,
                 'model' => $data['SIAE-SFP-MIB::sfpVendorPartNumber'] ?? null,
                 'serial' => $data['SIAE-SFP-MIB::sfpVendorSN'] ?? null,
                 'ddm' => empty($data['SIAE-SFP-MIB::sfpDiagMonitorCode']) ? 0 : 1,

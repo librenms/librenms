@@ -31,9 +31,15 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
+/**
+ * @template TModel of Model
+ *
+ * @extends PaginatedAjaxController<TModel>
+ */
 abstract class SelectController extends PaginatedAjaxController
 {
     protected ?string $idField = null;
@@ -45,49 +51,55 @@ abstract class SelectController extends PaginatedAjaxController
             'limit' => 'int',
             'page' => 'int',
             'term' => 'nullable|string',
+            'id' => 'nullable|string',
         ];
     }
 
     /**
      * The default method called by the route handler
-     *
-     * @param  Request  $request
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): JsonResponse
     {
         $this->validate($request, $this->rules());
-        $limit = $request->get('limit', 50);
 
-        $query = $this->baseQuery($request);
-        if ($this->idField && $this->textField) {
-            $query->select([$this->idField, $this->textField]);
+        $limit = $request->input('limit', 50);
+        $paginator = $this->buildQuery($this, $request)->simplePaginate($limit);
+
+        return $this->formatResponse($paginator, $paginator->hasMorePages());
+    }
+
+    protected function buildQuery(SelectController $controller, Request $request): EloquentBuilder|Builder
+    {
+        $query = $controller->baseQuery($request);
+        if ($controller->idField && $controller->textField) {
+            $query->select([$controller->idField, $controller->textField]);
         }
-        $this->filterById($query, $request->get('id'));
-        $this->filter($request, $query, $this->filterFields($request));
-        $this->search($request->get('term'), $query, $this->searchFields($request));
-        $this->sort($request, $query);
-        $paginator = $query->simplePaginate($limit);
 
-        return $this->formatResponse($paginator);
+        $controller->filterById($query, $request->input('id'));
+        $controller->filter($request, $query, $controller->filterFields($request));
+        $controller->search($request->input('term'), $query, $controller->searchFields($request));
+        $controller->sort($request, $query);
+
+        return $query;
     }
 
     /**
-     * @param  Paginator|Collection  $paginator
-     * @return \Illuminate\Http\JsonResponse
+     * @param  Paginator|Collection<int, mixed>  $paginator
+     * @param  bool  $hasMore
+     * @return JsonResponse
      */
-    protected function formatResponse($paginator)
+    protected function formatResponse($paginator, bool $hasMore = false): JsonResponse
     {
-        $results = collect($paginator->items())->map([$this, 'formatItem']);
+        $results = ($paginator instanceof Paginator ? collect($paginator->items()) : $paginator)
+            ->map(fn ($model) => $this->formatItem($model));
 
-        // prepend the initial item, unless filtered out
         if ($this->canPrependFirstItem(request())) {
             $results->prepend($this->prependItem());
         }
 
         return response()->json([
-            'results' => $results,
-            'pagination' => ['more' => $paginator->hasMorePages()],
+            'results' => $results->filter(),
+            'pagination' => ['more' => $hasMore],
         ]);
     }
 
@@ -97,10 +109,10 @@ abstract class SelectController extends PaginatedAjaxController
      * Default implementation uses primary key and the first value in the model
      * If only one value is in the model attributes, that is the id and text.
      *
-     * @param  Model  $model
-     * @return array
+     * @param  TModel  $model
+     * @return array{id: int|string, text: string, icon?: string}
      */
-    public function formatItem($model)
+    public function formatItem(Model $model): array
     {
         if ($this->idField && $this->textField) {
             return [
@@ -114,10 +126,13 @@ abstract class SelectController extends PaginatedAjaxController
 
         return [
             'id' => $attributes->count() == 1 ? $attributes->first() : $model->getKey(),
-            'text' => $attributes->forget($model->getKeyName())->first(),
+            'text' => $attributes->forget([$model->getKeyName()])->first(),
         ];
     }
 
+    /**
+     * @return array{id: int|string, text: string, icon?: string}|null
+     */
     protected function prependItem(): ?array
     {
         return null;
@@ -139,7 +154,7 @@ abstract class SelectController extends PaginatedAjaxController
             return false;
         }
 
-        if ($request->has('term') && ! str_contains(strtolower($item['text']), strtolower($request->term))) {
+        if ($request->has('term') && ! str_contains(strtolower((string) $item['text']), strtolower($request->term))) {
             return false;
         }
 

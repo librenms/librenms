@@ -37,9 +37,9 @@ use Log;
 
 class PluginManager implements PluginManagerInterface
 {
-    /** @var Collection */
+    /** @var Collection<string, Collection<int, array{plugin_name: string, instance: object}>> */
     private $hooks;
-    /** @var Collection */
+    /** @var Collection<string, \App\Models\Plugin> */
     private $plugins;
 
     /** @var array */
@@ -127,9 +127,7 @@ class PluginManager implements PluginManagerInterface
 
                     return 'HOOK FAILED';
                 }
-            })->filter(function ($hook) {
-                return $hook !== 'HOOK FAILED';
-            })->values()->all();
+            })->filter(fn ($hook) => $hook !== 'HOOK FAILED')->values()->all();
     }
 
     /**
@@ -212,7 +210,7 @@ class PluginManager implements PluginManagerInterface
                     'version' => 2,
                 ]);
                 $this->getPlugins()->put($name, $plugin);
-            } catch (QueryException $e) {
+            } catch (QueryException) {
                 // DB not migrated/connected
             }
         }
@@ -220,12 +218,15 @@ class PluginManager implements PluginManagerInterface
         return $plugin;
     }
 
+    /**
+     * @return Collection<string, \App\Models\Plugin>
+     */
     protected function getPlugins(): Collection
     {
         if ($this->plugins === null) {
             try {
                 $this->plugins = Plugin::versionTwo()->get()->keyBy('plugin_name');
-            } catch (QueryException $e) {
+            } catch (QueryException) {
                 // DB not migrated/connected
                 $this->plugins = new Collection;
             }
@@ -238,7 +239,7 @@ class PluginManager implements PluginManagerInterface
      * @param  string  $hookType
      * @param  array  $args
      * @param  string|null  $onlyPlugin
-     * @return Collection
+     * @return Collection<int, array{plugin_name: string, instance: object}>
      */
     protected function hooksFor(string $hookType, array $args, ?string $onlyPlugin): Collection
     {
@@ -247,12 +248,8 @@ class PluginManager implements PluginManagerInterface
         }
 
         return $this->hooks->get($hookType)
-            ->when($onlyPlugin, function (Collection $hooks, $only) {
-                return $hooks->where('plugin_name', $only);
-            })
-            ->filter(function ($hook) use ($args) {
-                return app()->call([$hook['instance'], 'authorize'], $this->fillArgs($args, $hook['plugin_name']));
-            });
+            ->when($onlyPlugin, fn (Collection $hooks, $only) => $hooks->where('plugin_name', $only))
+            ->filter(fn ($hook) => app()->call([$hook['instance'], 'authorize'], $this->fillArgs($args, $hook['plugin_name'])));
     }
 
     protected function fillArgs(array $args, string $pluginName): array

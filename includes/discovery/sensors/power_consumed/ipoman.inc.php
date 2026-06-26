@@ -18,7 +18,7 @@ $oidsPowOut = SnmpQuery::hideMib()->walk([
 foreach ($oidsPowOut as $index => $entry) {
     $oid = '.1.3.6.1.4.1.2468.1.4.2.1.3.2.3.1.4.' . $index;
     $divisor = 1000;
-    $descr = (trim($oidsOut[$index]['outletConfigDesc'], '"') != '' ? trim($oidsOut[$index]['outletConfigDesc'], '"') : "Output $index");
+    $descr = (trim((string) $oidsOut[$index]['outletConfigDesc'], '"') != '' ? trim((string) $oidsOut[$index]['outletConfigDesc'], '"') : "Output $index");
 
     app('sensor-discovery')->discover(new \App\Models\Sensor([
         'poller_type' => 'snmp',

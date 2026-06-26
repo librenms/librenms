@@ -46,7 +46,7 @@ abstract class MenuEntryHook implements \LibreNMS\Interfaces\Plugins\Hooks\MenuE
 
     final public function handle(string $pluginName, array $settings, Application $app): array
     {
-        return [Str::start($this->view, "$pluginName::"), $app->call([$this, 'data'], [
+        return [Str::start($this->view, "$pluginName::"), $app->call($this->data(...), [
             'settings' => $settings,
         ])];
     }

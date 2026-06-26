@@ -8,6 +8,8 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
             FROM SNMPv2-TC
         SnmpAdminString
             FROM SNMP-FRAMEWORK-MIB
+        InterfaceIndexOrZero
+            FROM IF-MIB
         MODULE-COMPLIANCE, OBJECT-GROUP
             FROM SNMPv2-CONF
         ospfIfEntry, ospfVirtIfEntry, ospfNbrEntry, ospfVirtNbrEntry,
@@ -18,27 +20,21 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
 
 
     alcatelIND1OSPFMIB MODULE-IDENTITY
-        LAST-UPDATED  "201102150000Z"
-        ORGANIZATION  "Alcatel-Lucent"
+        LAST-UPDATED "201911270000Z"
+        ORGANIZATION "ALE USA Inc."
         CONTACT-INFO
-            "Please consult with Customer Service to ensure the most appropriate
-             version of this document is used with the products in question:
+         "Please consult with Customer Service to ensure the most appropriate
+          version of this document is used with the products in question:
 
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
-                               26801 West Agoura Road
-                            Agoura Hills, CA  91301-5122
-                              United States Of America
+                          ALE USA Inc. Enterprise
+                            26801 West Agoura Road
+                         Agoura Hills, CA  91301-5122
+                           United States Of America
 
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
+         Telephone:          +1 800 995 2696
 
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+         Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+        World Wide Web:     https://www.al-enterprise.com"
 
         DESCRIPTION
             "This module describes an authoritative enterprise-specific Simple
@@ -57,13 +53,17 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2007 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
 
-        REVISION      "200704030000Z"
+        REVISION      "201911270000Z"
         DESCRIPTION
-            "The latest version of this MIB Module."
+            "Updated the latest contact and Copyright information for ALE USA Inc."
 
+        REVISION     "201905140000Z"
+        DESCRIPTION
+            "Deprecated alaOspfIfVlanId. Added alaOspf2IfIfIndex and alaOspfNbrIfIndex."
         ::= { routingIND1Ospf 1 }
 
 
@@ -346,7 +346,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
 
     alaOspfRouteStatus OBJECT-TYPE
         SYNTAX      RowStatus
-        MAX-ACCESS  read-only
+        MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION
            "The row status variable, used according to
@@ -498,7 +498,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
 
     alaOspfBdrRouterStatus OBJECT-TYPE
         SYNTAX      RowStatus
-        MAX-ACCESS  read-only
+        MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION
            "The row status variable, used according to
@@ -668,135 +668,139 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
 -- ************************************************************************
 -- Expansion of ospfIfTable
 -- ************************************************************************
-        alaOspfIfAugTable OBJECT-TYPE
-                SYNTAX SEQUENCE OF AlaOspfIfAugEntry
-                MAX-ACCESS not-accessible
-                STATUS current
-                DESCRIPTION
-                        "Expansion for ospfIfTable"
-                ::= { alaProtocolOspf 17 }
 
-        alaOspfIfAugEntry OBJECT-TYPE
-                SYNTAX   AlaOspfIfAugEntry
-                MAX-ACCESS   not-accessible
-                STATUS   current
-                DESCRIPTION
-                        "An entry of alaOspfIfAugTable"
-                AUGMENTS { ospfIfEntry }
-                ::= { alaOspfIfAugTable 1 }
+    alaOspfIfAugTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF AlaOspfIfAugEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+           "Expansion for ospfIfTable"
+        ::= { alaProtocolOspf 17 }
 
-        AlaOspfIfAugEntry ::=
-                SEQUENCE {
-                        alaOspfIfEncryptKey     AlaAuthenticationEncryptKey,
-                        alaOspfIfIpMask         IpAddress,
-                        alaOspfIfVlanId         Integer32,
-                        alaOspfIfDrRouterid     IpAddress,
-                        alaOspfIfBdrRouterid    IpAddress,
-                        alaOspfIfMTU            Counter32,
-                        alaOspfIfInitNbrs       Counter32,
-                        alaOspfIfExchNbrs       Counter32,
-                        alaOspfIfFullNbrs       Counter32,
-                        alaOspfIfLinkType       INTEGER,
-                        alaOspfIfOperStatus     INTEGER,
-                        alaOspfIfIntfName       SnmpAdminString,
-                        alaOspfIf2WayNbrs       Counter32,
-                        alaOspfIfBfdStatus      INTEGER,
-                        alaOspfIfBfdDrsOnly     INTEGER
-                }
-
-        alaOspfIfEncryptKey OBJECT-TYPE
-                SYNTAX                  AlaAuthenticationEncryptKey
-                MAX-ACCESS      read-create
-                STATUS                  current
-                DESCRIPTION
-                        "The authentication encryption key that is used to decypher
-                        OSPF passwords."
-                ::= { alaOspfIfAugEntry 1 }
-
-    alaOspfIfIpMask OBJECT-TYPE
-        SYNTAX   IpAddress
-        MAX-ACCESS   read-only
+    alaOspfIfAugEntry OBJECT-TYPE
+        SYNTAX   AlaOspfIfAugEntry
+        MAX-ACCESS   not-accessible
         STATUS   current
         DESCRIPTION
+           "An entry of alaOspfIfAugTable"
+        AUGMENTS { ospfIfEntry }
+        ::= { alaOspfIfAugTable 1 }
+
+    AlaOspfIfAugEntry ::=
+        SEQUENCE {
+            alaOspfIfEncryptKey     AlaAuthenticationEncryptKey,
+            alaOspfIfIpMask         IpAddress,
+            alaOspfIfVlanId         Integer32,
+            alaOspfIfDrRouterid     IpAddress,
+            alaOspfIfBdrRouterid    IpAddress,
+            alaOspfIfMTU            Counter32,
+            alaOspfIfInitNbrs       Counter32,
+            alaOspfIfExchNbrs       Counter32,
+            alaOspfIfFullNbrs       Counter32,
+            alaOspfIfLinkType       INTEGER,
+            alaOspfIfOperStatus     INTEGER,
+            alaOspfIfIntfName       SnmpAdminString,
+            alaOspfIf2WayNbrs       Counter32,
+            alaOspfIfBfdStatus      INTEGER,
+            alaOspfIfBfdDrsOnly     INTEGER,
+            alaOspfIfKeyChainId     Integer32,
+            alaOspfIfIfIndex        InterfaceIndexOrZero
+        }
+
+    alaOspfIfEncryptKey OBJECT-TYPE
+        SYNTAX       AlaAuthenticationEncryptKey
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+           "The authentication encryption key that is used to decypher
+            OSPF passwords."
+        ::= { alaOspfIfAugEntry 1 }
+
+    alaOspfIfIpMask OBJECT-TYPE
+        SYNTAX       IpAddress
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
            "The IP mask of this OSPF interface."
-                ::= { alaOspfIfAugEntry 2 }
+        ::= { alaOspfIfAugEntry 2 }
 
         alaOspfIfVlanId OBJECT-TYPE
         SYNTAX       Integer32 (0..4097)
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated 
         DESCRIPTION
-           "Vlan Identifier associated with this interface"
-                ::= { alaOspfIfAugEntry 3 }
+           "Vlan Identifier associated with this interface.
+            This object is deprecated.  It is replaced by alaOspfIfIfIndex."
+        ::= { alaOspfIfAugEntry 3 }
 
     alaOspfIfDrRouterid OBJECT-TYPE
-        SYNTAX   IpAddress
+        SYNTAX       IpAddress
         MAX-ACCESS   read-only
-        STATUS   current
+        STATUS       current
         DESCRIPTION
            "Router Id of Designated router for this interface"
-                ::= { alaOspfIfAugEntry 4 }
+        ::= { alaOspfIfAugEntry 4 }
 
     alaOspfIfBdrRouterid OBJECT-TYPE
-        SYNTAX   IpAddress
+        SYNTAX       IpAddress
         MAX-ACCESS   read-only
-        STATUS   current
+        STATUS       current
         DESCRIPTION
            "Router Id of Backup Designated router for this interface"
-                ::= { alaOspfIfAugEntry 5 }
+        ::= { alaOspfIfAugEntry 5 }
 
     alaOspfIfMTU OBJECT-TYPE
-        SYNTAX   Counter32
+        SYNTAX       Counter32
         MAX-ACCESS   read-only
-        STATUS   current
+        STATUS       current
         DESCRIPTION
            "Max Transfer size of OSPF packets on this interface"
-                ::= { alaOspfIfAugEntry 6 }
+        ::= { alaOspfIfAugEntry 6 }
 
     alaOspfIfInitNbrs OBJECT-TYPE
-        SYNTAX   Counter32
+        SYNTAX       Counter32
         MAX-ACCESS   read-only
-        STATUS   current
+        STATUS       current
         DESCRIPTION
            "Number of ospf INIT state neighbors on this interface"
-                ::= { alaOspfIfAugEntry 7 }
+        ::= { alaOspfIfAugEntry 7 }
 
     alaOspfIfExchNbrs OBJECT-TYPE
-        SYNTAX   Counter32
+        SYNTAX       Counter32
         MAX-ACCESS   read-only
-        STATUS   current
+        STATUS       current
         DESCRIPTION
            "Number of ospf EXCHANGE state neighbors on this interface"
-                ::= { alaOspfIfAugEntry 8 }
+        ::= { alaOspfIfAugEntry 8 }
 
     alaOspfIfFullNbrs OBJECT-TYPE
-        SYNTAX   Counter32
+        SYNTAX       Counter32
         MAX-ACCESS   read-only
-        STATUS   current
+        STATUS       current
         DESCRIPTION
            "Number of ospf FULL state neighbors on this interface"
-                ::= { alaOspfIfAugEntry 9 }
+        ::= { alaOspfIfAugEntry 9 }
 
     alaOspfIfLinkType OBJECT-TYPE
-        SYNTAX   INTEGER    {
+        SYNTAX   INTEGER {
                     broadcast (1)
-                  }
+                 }
         MAX-ACCESS   read-only
-        STATUS   current
+        STATUS       current
         DESCRIPTION
            "Type of physical medium used for transmission of OSPF packets"
        ::= { alaOspfIfAugEntry 10 }
 
         alaOspfIfOperStatus OBJECT-TYPE
-        SYNTAX       INTEGER {
-                                 down (0),
-                                 up (1)
-                             }
+        SYNTAX   INTEGER {
+                    down (0),
+                    up (1)
+                 }
         MAX-ACCESS   read-only
         STATUS       current
         DESCRIPTION
            "Operational status of this interface"
-                ::= { alaOspfIfAugEntry 11 }
+        ::= { alaOspfIfAugEntry 11 }
 
         alaOspfIfIntfName OBJECT-TYPE
         SYNTAX       SnmpAdminString
@@ -804,40 +808,55 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
         STATUS       current
         DESCRIPTION
            "The user defined name used to identify the IP interface"
-                ::= { alaOspfIfAugEntry 12 }
+        ::= { alaOspfIfAugEntry 12 }
 
     alaOspfIf2WayNbrs OBJECT-TYPE
-        SYNTAX   Counter32
+        SYNTAX       Counter32
         MAX-ACCESS   read-only
-        STATUS   current
+        STATUS       current
         DESCRIPTION
            "Number of ospf 2-WAY state neighbors on this interface"
-                ::= { alaOspfIfAugEntry 13 }
+        ::= { alaOspfIfAugEntry 13 }
 
     alaOspfIfBfdStatus OBJECT-TYPE
-                SYNTAX          INTEGER
-                {
-                        enable(1),
-                        disable(2)
-                }
-                MAX-ACCESS  read-create
-                STATUS  current
-                DESCRIPTION
-                        "Enables/Disables OSPF for a BFD interface"
-                ::= { alaOspfIfAugEntry 14}
+        SYNTAX   INTEGER {
+                    enable(1),
+                    disable(2)
+                 }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+           "Enables/Disables OSPF for a BFD interface"
+        ::= { alaOspfIfAugEntry 14}
 
-        alaOspfIfBfdDrsOnly OBJECT-TYPE
-                SYNTAX          INTEGER
-                {
-                        enable(1),
-                        disable(2)
-                }
-                MAX-ACCESS  read-create
-                STATUS  current
-                DESCRIPTION
-                        "Enables/Disables Drs Only option for a BFD interface"
-                ::= { alaOspfIfAugEntry 15}
+    alaOspfIfBfdDrsOnly OBJECT-TYPE
+        SYNTAX   INTEGER {
+                    enable(1),
+                    disable(2)
+                 }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+           "Enables/Disables Drs Only option for a BFD interface"
+        ::= { alaOspfIfAugEntry 15}
 
+    alaOspfIfKeyChainId OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+           "Key chain Id associated with this interface."
+        ::= { alaOspfIfAugEntry 16 }
+
+    alaOspfIfIfIndex OBJECT-TYPE
+        SYNTAX       InterfaceIndexOrZero
+        MAX-ACCESS   read-only
+        STATUS       current 
+        DESCRIPTION
+           "The ifIndex value that identifies the local
+            interface on which OSPF is configured."
+        DEFVAL   { 0 }
+        ::= { alaOspfIfAugEntry 17 }
 
 -- ************************************************************************
 -- Expansion of ospfVirtIfTable
@@ -1090,10 +1109,11 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
                         alaOspfNbrLastHello                     Counter32,
                         alaOspfNbrPendingLSreq                  Counter32,
                         alaOspfNbrPendingLSack                  Counter32,
-                        alaOspfNbrPendingLSupd                  Counter32
+                        alaOspfNbrPendingLSupd                  Counter32,
+                        alaOspfNbrIfIndex                       InterfaceIndexOrZero
         }
 
-        alaOspfNbrRestartHelperStatus OBJECT-TYPE
+   alaOspfNbrRestartHelperStatus OBJECT-TYPE
         SYNTAX       INTEGER { notHelping (1),
                                helping (2)
                              }
@@ -1102,9 +1122,9 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
            "Indicates whether the router is acting
            as a hitless restart helper for the neighbor."
-       ::= { alaOspfNbrAugEntry 1 }
+        ::= { alaOspfNbrAugEntry 1 }
 
-        alaOspfNbrRestartHelperAge OBJECT-TYPE
+   alaOspfNbrRestartHelperAge OBJECT-TYPE
         SYNTAX       Unsigned32
         UNITS        "seconds"
         MAX-ACCESS   read-only
@@ -1113,7 +1133,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
            "Remaining time in current OSPF hitless restart
            interval, if the router is acting as a restart
            helper for the neighbor."
-                ::= { alaOspfNbrAugEntry 2 }
+        ::= { alaOspfNbrAugEntry 2 }
 
 
    alaOspfNbrRestartHelperExitReason OBJECT-TYPE
@@ -1132,7 +1152,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
            "Describes the outcome of the last attempt at acting
             as a hitless restart helper for the neighbor."
-       ::= { alaOspfNbrAugEntry 3 }
+        ::= { alaOspfNbrAugEntry 3 }
 
     alaOspfNbrAreaId OBJECT-TYPE
         SYNTAX   IpAddress
@@ -1140,7 +1160,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
         STATUS   current
         DESCRIPTION
            "The area to which this neighbor belongs"
-       ::= { alaOspfNbrAugEntry 4 }
+        ::= { alaOspfNbrAugEntry 4 }
 
     alaOspfNbrDrAddress OBJECT-TYPE
         SYNTAX   IpAddress
@@ -1196,7 +1216,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
            "No of seconds elapsed since the last hello was received from this neighbor"
         ::= { alaOspfNbrAugEntry 10 }
 
-        alaOspfNbrPendingLSreq OBJECT-TYPE
+   alaOspfNbrPendingLSreq OBJECT-TYPE
         SYNTAX       Counter32
         MAX-ACCESS   read-only
         STATUS       current
@@ -1204,7 +1224,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
            "Number of outstanding link state requests to be sent to this neighbor"
         ::= { alaOspfNbrAugEntry 11 }
 
-        alaOspfNbrPendingLSack OBJECT-TYPE
+   alaOspfNbrPendingLSack OBJECT-TYPE
         SYNTAX       Counter32
         MAX-ACCESS   read-only
         STATUS       current
@@ -1212,7 +1232,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
            "Number of outstanding link state acknowledgements to be sent to this neighbor"
         ::= { alaOspfNbrAugEntry 12 }
 
-        alaOspfNbrPendingLSupd OBJECT-TYPE
+   alaOspfNbrPendingLSupd OBJECT-TYPE
         SYNTAX       Counter32
         MAX-ACCESS   read-only
         STATUS       current
@@ -1220,6 +1240,15 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
            "Number of outstanding link state update packets to be sent to this neighbor"
         ::= { alaOspfNbrAugEntry 13 }
 
+   alaOspfNbrIfIndex OBJECT-TYPE
+        SYNTAX       InterfaceIndexOrZero
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+           "The ifIndex value which identifies the local interface 
+            on which the neighbor is learned."
+        DEFVAL { 0 }
+        ::= { alaOspfNbrAugEntry 14 }
 
 
 -- ************************************************************************
@@ -1874,7 +1903,18 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
                 DEFVAL      { enable }
                 ::= { alaProtocolOspf 44}
 
-
+    alaOspfRedistBgpInternal  OBJECT-TYPE
+                SYNTAX      INTEGER
+                {
+                        enable(1),
+                        disable(2)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                "Redistribution of internal BGP routes into OSPF"
+                DEFVAL     { disable }
+                ::= { alaProtocolOspf 45}
 
 --
 -- Compliance Statements
@@ -1922,19 +1962,20 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
             alaOspfRestartHelperStrictLSAChecking,
             alaOspfRestartHelperStatus,
             alaOspfRFC1583Compatibility,
-			alaOspfOpaqueLsaSupport,
-			alaOspfTrafficEngineeringSupport,
-			alaOspfReferenceBandwidth,
-			alaOspfRestartSupport,
-			alaOspfRestartInterval,
-			alaOspfRestartStatus,
-			alaOspfRestartAge,
-			alaOspfRestartExitReason,
-			alaOspfDefaultOriginate,
-			alaOspfDefaultOriginateMetricType,
-			alaOspfDefaultOriginateMetric,
-         alaOspfRestartInitiate,
-         alaOspfOpaqueTransitCapability
+            alaOspfOpaqueLsaSupport,
+            alaOspfTrafficEngineeringSupport,
+            alaOspfReferenceBandwidth,
+            alaOspfRestartSupport,
+            alaOspfRestartInterval,
+            alaOspfRestartStatus,
+            alaOspfRestartAge,
+            alaOspfRestartExitReason,
+            alaOspfDefaultOriginate,
+            alaOspfDefaultOriginateMetricType,
+            alaOspfDefaultOriginateMetric,
+            alaOspfRestartInitiate,
+            alaOspfOpaqueTransitCapability,
+            alaOspfRedistBgpInternal
         }
         STATUS  current
         DESCRIPTION
@@ -2023,21 +2064,21 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
         alaOspfAreaAugEntryGroup OBJECT-GROUP
         OBJECTS
         {
-        	alaOspfAreaOperStatus,
-        	alaOspfAreaLastSpfRun,
-        	alaOspfAreaActiveVlinks,
-        	alaOspfAreaIncrSpfRuns,
-        	alaOspfAreaInitNbrs,
-        	alaOspfAreaExchNbrs,
-        	alaOspfAreaFullNbrs,
-        	alaOspfAreaNumIntfs,
-        	alaOspfAreaAttachedIntfs,
-        	alaOspfArea2WayNbrs,
-        	alaOspfAreaNssaTranslatorRole,
-        	alaOspfAreaNssaTranslatorStabilityInterval,
-        	alaOspfAreaNssaImportSetPbit,
-        	alaOspfAreaNssaTranslatorState,
-        	alaOspfAreaNssaElectedTranslatorRouterId
+                alaOspfAreaOperStatus,
+                alaOspfAreaLastSpfRun,
+                alaOspfAreaActiveVlinks,
+                alaOspfAreaIncrSpfRuns,
+                alaOspfAreaInitNbrs,
+                alaOspfAreaExchNbrs,
+                alaOspfAreaFullNbrs,
+                alaOspfAreaNumIntfs,
+                alaOspfAreaAttachedIntfs,
+                alaOspfArea2WayNbrs,
+                alaOspfAreaNssaTranslatorRole,
+                alaOspfAreaNssaTranslatorStabilityInterval,
+                alaOspfAreaNssaImportSetPbit,
+                alaOspfAreaNssaTranslatorState,
+                alaOspfAreaNssaElectedTranslatorRouterId
         }
         STATUS  current
         DESCRIPTION
@@ -2047,7 +2088,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
 alaOspfAreaAggregateAugEntryGroup OBJECT-GROUP
         OBJECTS
         {
-        	alaOspfAreaAggregateMetric
+                alaOspfAreaAggregateMetric
         }
         STATUS  current
         DESCRIPTION
@@ -2070,7 +2111,9 @@ alaOspfIfAugGroup OBJECT-GROUP
                         alaOspfIfIntfName ,
                         alaOspfIf2WayNbrs ,
                         alaOspfIfBfdStatus ,
-                        alaOspfIfBfdDrsOnly
+                        alaOspfIfBfdDrsOnly,
+                        alaOspfIfKeyChainId ,
+                        alaOspfIfIfIndex
                 }
         STATUS  current
         DESCRIPTION
@@ -2107,7 +2150,8 @@ alaOspfNbrAugGroup OBJECT-GROUP
                         alaOspfNbrLastHello ,
                         alaOspfNbrPendingLSreq ,
                         alaOspfNbrPendingLSack ,
-                        alaOspfNbrPendingLSupd
+                        alaOspfNbrPendingLSupd ,
+                        alaOspfNbrIfIndex
         }
         STATUS  current
         DESCRIPTION

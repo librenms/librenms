@@ -1,6 +1,11 @@
 <?php
 
 return [
+    'errors' => [
+        'db_connect' => 'Falha ao conectar ao banco de dados. Verifique se o serviço de banco de dados está em execução e as configurações de conexão.',
+        'db_auth' => 'Falha ao conectar ao banco de dados. Verifique as credenciais: :error',
+        'no_devices' => 'Nenhum dispositivo encontrado correspondendo à especificação fornecida.',
+    ],
     'config:clear' => [
         'description' => 'Limpa o cache de configuração. Isso permitirá que quaisquer alterações feitas desde o último carregamento completo da configuração sejam refletidas na configuração atual.',
     ],
@@ -121,13 +126,10 @@ return [
             'no-data' => 'Não atualizar datastores (RRD, InfluxDB, etc)',
         ],
         'errors' => [
-            'db_connect' => 'Falha ao conectar ao banco de dados. Verifique se o serviço de banco de dados está em execução e as configurações de conexão.',
-            'db_auth' => 'Falha ao conectar ao banco de dados. Verifique as credenciais: :error',
-            'no_devices' => 'Nenhum dispositivo encontrado correspondendo à especificação fornecida.',
             'none_up' => 'Dispositivo estava fora do ar, não foi possível fazer a coleta dos dados.|Todos os dispositivos estavam fora do ar, não foi possível fazer a coleta dos dados.',
-            'none_polled' => 'Nenhum dispositivo teve dados coletados.',
+            'none_actioned' => 'Nenhum dispositivo teve dados coletados.',
         ],
-        'polled' => 'Fez a coleta de dados em :count dispositivos em :time',
+        'actioned' => 'Fez a coleta de dados em :count dispositivos em :time',
     ],
     'key:rotate' => [
         'description' => 'Rotacionar APP_KEY, isso descriptografa todos os dados criptografados com a chave antiga fornecida e os armazena com a nova chave em APP_KEY.',
@@ -268,7 +270,7 @@ return [
         'success' => 'Usuário adicionado com sucesso: :username',
         'wrong-auth' => 'Aviso! Você não poderá fazer login com este usuário porque não está usando autenticação MySQL',
     ],
-    'maintenance:database-cleanup' => [
+    'maintenance:cleanup-database' => [
         'description' => 'Limpeza do banco de dados para remover itens órfãos.',
     ],
 ];

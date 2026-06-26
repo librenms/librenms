@@ -4,18 +4,29 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\Processor;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Url;
 
+/**
+ * @extends TableController<Processor>
+ */
 class ProcessorsController extends TableController
 {
-    protected $model = Processor::class;
+    protected ?string $model = Processor::class;
 
-    protected $default_sort = ['device_hostname' => 'asc', 'processor_descr' => 'asc'];
+    protected array $default_sort = ['device_hostname' => 'asc', 'processor_descr' => 'asc'];
 
-    protected function sortFields($request): array
+    protected function rules(): array
+    {
+        return [
+            'status' => 'nullable|string',
+        ];
+    }
+
+    protected function sortFields(Request $request): array
     {
         return [
             'device_hostname',
@@ -28,37 +39,46 @@ class ProcessorsController extends TableController
     {
         return [
             'hostname',
+            'display',
             'processor_descr',
         ];
     }
 
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Processor::class);
+
         return Processor::query()
             ->hasAccess($request->user())
-            ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'processors.device_id'))
-            ->withAggregate('device', 'hostname');
+            ->when($request->input('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'processors.device_id'))
+            ->withAggregate('device', 'hostname')
+            ->when($request->input('status') == 'warning', function ($q): void {
+                // show only entries in warning state
+                $q->where('processor_perc_warn', '>', 0)
+                    ->whereColumn('processor_usage', '>=', 'processor_perc_warn');
+            });
     }
 
     /**
-     * @param  Processor  $processor
+     * @param  Processor  $model
+     * @return array<string, scalar>
      */
-    public function formatItem($processor): array
+    public function formatItem(Model $model): array
     {
-        $perc = round($processor->processor_usage);
+        $perc = round($model->processor_usage);
         $graph_array = [
             'type' => 'processor_usage',
-            'popup_title' => htmlentities(strip_tags($processor->device->displayName() . ': ' . $processor->processor_descr)),
-            'id' => $processor->processor_id,
+            'popup_title' => htmlentities(strip_tags($model->device->displayName() . ': ' . $model->processor_descr)),
+            'id' => $model->processor_id,
             'from' => '-1d',
             'height' => 20,
             'width' => 80,
         ];
 
-        $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $processor->device]);
-        $descr = $processor->processor_descr;
+        $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $model->device]);
+        $descr = htmlspecialchars((string) $model->processor_descr);
         $mini_graph = Url::graphPopup($graph_array);
-        $bar = Html::percentageBar(400, 20, $perc, $perc . '%', (100 - $perc) . '%', $processor->processor_perc_warn);
+        $bar = Html::percentageBar(400, 10, $perc, $perc . '%', (100 - $perc) . '%', $model->processor_perc_warn);
         $usage = Url::graphPopup($graph_array, $bar);
 
         if (\Request::input('view') == 'graphs') {
@@ -79,10 +99,8 @@ class ProcessorsController extends TableController
 
     /**
      * Get headers for CSV export
-     *
-     * @return array
      */
-    protected function getExportHeaders()
+    protected function getExportHeaders(): array
     {
         return [
             'Device Hostname',
@@ -95,9 +113,9 @@ class ProcessorsController extends TableController
      * Format a row for CSV export
      *
      * @param  Processor  $processor
-     * @return array
+     * @return array<scalar>
      */
-    protected function formatExportRow($processor)
+    protected function formatExportRow(Model $processor): array
     {
         return [
             $processor->device ? $processor->device->displayName() : '',

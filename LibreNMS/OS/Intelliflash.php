@@ -61,7 +61,7 @@ class Intelliflash extends OS implements StorageDiscovery, StoragePolling
             'TEGILE-MIB::projectFreeSizeLow',
         ])->valuesByIndex();
 
-        return $storages->each(function (Storage $storage) use ($pools, $projects) {
+        return $storages->each(function (Storage $storage) use ($pools, $projects): void {
             if ($storage->type == 'intelliflash-pl') {
                 $size = ($pools[$storage->storage_index]['TEGILE-MIB::poolSizeHigh'] << 32) + $pools[$storage->storage_index]['TEGILE-MIB::poolSizeLow'];
                 $used = ($pools[$storage->storage_index]['TEGILE-MIB::poolUsedSizeHigh'] << 32) + $pools[$storage->storage_index]['TEGILE-MIB::poolUsedSizeLow'];

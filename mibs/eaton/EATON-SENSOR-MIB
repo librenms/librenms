@@ -12,13 +12,18 @@ IMPORTS
         FROM EATON-OIDS;
 
 eatonSensor MODULE-IDENTITY
-    LAST-UPDATED "201812171200Z"
+    LAST-UPDATED "202205061200Z"
     ORGANIZATION 
         "Eaton Corporation"
     CONTACT-INFO 
         "http://powerquality.eaton.com"
     DESCRIPTION 
         "The MIB module for Eaton Sensors."
+
+    REVISION "202205061200Z"
+    DESCRIPTION 
+        "Fix typo on possible values of AlarmSeverityType and AlarmLevelType."
+
     REVISION "201812171200Z"
     DESCRIPTION 
         "Initial release."
@@ -121,7 +126,7 @@ AlarmSeverityType ::= TEXTUAL-CONVENTION
     STATUS  current
     DESCRIPTION "Describes the alarm severity."
     SYNTAX  INTEGER {
-        informationnal(1),
+        informational(1),
         warning(2),
         critical(3)
         }
@@ -131,7 +136,7 @@ AlarmLevelType ::= TEXTUAL-CONVENTION
     DESCRIPTION "Describes the alarm level."
     SYNTAX  INTEGER {
         good(0),
-        informationnal(1),
+        informational(1),
         warning(2),
         critical(3)
         }

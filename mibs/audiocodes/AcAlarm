@@ -1,0 +1,553 @@
+
+AcAlarm DEFINITIONS ::= BEGIN
+
+IMPORTS
+  MODULE-IDENTITY, OBJECT-TYPE, enterprises, Integer32, Unsigned32
+    FROM SNMPv2-SMI
+  AcAlarmEventType, AcAlarmProbableCause, AcAlarmSeverity
+    FROM AC-FAULT-TC
+  SnmpAdminString, SnmpEngineID
+    FROM SNMP-FRAMEWORK-MIB
+  DateAndTime, DisplayString, RowStatus, TEXTUAL-CONVENTION,
+  TimeStamp, TruthValue
+    FROM SNMPv2-TC;
+
+audioCodes OBJECT IDENTIFIER  ::=  { enterprises 5003 }
+acFault    OBJECT IDENTIFIER  ::=  { audioCodes 11 }
+
+acAlarm MODULE-IDENTITY
+       LAST-UPDATED "200312180000Z"
+       ORGANIZATION "Audiocodes"
+	   CONTACT-INFO
+	   "Postal: Support
+	    		AudioCodes LTD
+		    	1 Hayarden Street
+			    Airport City 
+			    Lod 70151, ISRAEL
+        Tel:    972-3-9764000
+	    Fax:    972-3-9764040
+	    Email:  support@audiocodes.com
+	    Web:    www.audiocodes.com"		
+
+       DESCRIPTION
+         "This MIB defines the enterprise-specific objects needed
+         to support fault management of Audiocodes products. The 
+         MIB consists of:
+
+             o  Active alarm table
+             o  Alarm history table
+             o  Alarm notification varbinds"
+
+       REVISION "200312180000Z"
+       DESCRIPTION
+         "4.4. Dec. 18, 2003. Made these changes:
+             o  Initial version"
+
+       ::= { acFault 1 }
+
+-- Note on use of SnmpAdminString instead of DisplayString
+--
+--   IETF Generic and Common Textual Conventions (http://ops.ietf.org/mib-common-tcs.html )
+--         "DisplayString does not support internationalized text.
+--          It MUST NOT be used for objects that are required to
+--          hold internationalized text (which is always the case
+--          if the object is intended for use by humans [RFC2277]).
+--          Designers SHOULD consider using SnmpAdminString,
+--          Utf8String, or LongUtf8String for such objects."
+
+
+
+     -- ****************************************
+     -- acActiveAlarm
+     -- ****************************************
+
+     acActiveAlarm                 OBJECT IDENTIFIER ::= {acAlarm 1}
+
+
+     -- ****************************************
+     -- acActiveAlarm table decleration
+     -- ****************************************
+     acActiveAlarmTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcActiveAlarmEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Table of active alarms."
+       ::= {acActiveAlarm 1}
+
+
+
+     -- ****************************************
+     -- acActiveAlarm table entry
+     -- ****************************************
+     acActiveAlarmEntry OBJECT-TYPE
+       SYNTAX AcActiveAlarmEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "A conceptual row in the acActiveAlarmTable"
+       INDEX { acActiveAlarmSequenceNumber }
+       ::= {acActiveAlarmTable 1}
+
+
+
+     -- ****************************************
+     -- acActiveAlarm TABLE
+     -- ****************************************
+     AcActiveAlarmEntry ::= SEQUENCE {
+       acActiveAlarmSequenceNumber                     Unsigned32,
+       acActiveAlarmSysuptime                          TimeStamp,
+       acActiveAlarmTrapOID                            OBJECT IDENTIFIER,
+       acActiveAlarmDateAndTime                        DateAndTime,
+       acActiveAlarmName                               Unsigned32,
+       acActiveAlarmTextualDescription                 SnmpAdminString,
+       acActiveAlarmSource                             SnmpAdminString,
+       acActiveAlarmSeverity                           AcAlarmSeverity,
+       acActiveAlarmEventType                          AcAlarmEventType,
+       acActiveAlarmProbableCause                      AcAlarmProbableCause,
+       acActiveAlarmAdditionalInfo1                    SnmpAdminString,
+       acActiveAlarmAdditionalInfo2                    SnmpAdminString,
+       acActiveAlarmAdditionalInfo3                    SnmpAdminString
+     }
+
+
+
+     acActiveAlarmSequenceNumber OBJECT-TYPE
+       SYNTAX Unsigned32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The sequence number of the alarm raise trap."
+       ::= {acActiveAlarmEntry 1}
+
+
+
+     acActiveAlarmSysuptime OBJECT-TYPE
+       SYNTAX TimeStamp
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The value of sysuptime at the time the alarm raise trap was sent"
+       ::= {acActiveAlarmEntry 2}
+
+
+
+     acActiveAlarmTrapOID OBJECT-TYPE
+       SYNTAX OBJECT IDENTIFIER
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The OID of the notification trap"
+       ::= {acActiveAlarmEntry 3}
+
+
+
+     acActiveAlarmDateAndTime OBJECT-TYPE
+       SYNTAX DateAndTime
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The date and time at the time the alarm raise trap was sent."
+       ::= {acActiveAlarmEntry 4}
+
+
+
+     acActiveAlarmName OBJECT-TYPE
+       SYNTAX Unsigned32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The name of the alarm that was raised. This actually in the form of a number. Each kind of alarm has a unique number associated with it."
+       ::= {acActiveAlarmEntry 5}
+
+
+
+     acActiveAlarmTextualDescription OBJECT-TYPE
+       SYNTAX SnmpAdminString
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Text that descries the alarm condition."
+       ::= {acActiveAlarmEntry 6}
+
+
+
+     acActiveAlarmSource OBJECT-TYPE
+       SYNTAX SnmpAdminString
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The component in the system which raised the alarm."
+       ::= {acActiveAlarmEntry 7}
+
+
+
+     acActiveAlarmSeverity OBJECT-TYPE
+       SYNTAX AcAlarmSeverity
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The severity of the alarm."
+       ::= {acActiveAlarmEntry 8}
+
+
+
+     acActiveAlarmEventType OBJECT-TYPE
+       SYNTAX AcAlarmEventType
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The event type of the alarm."
+       ::= {acActiveAlarmEntry 9}
+
+
+
+     acActiveAlarmProbableCause OBJECT-TYPE
+       SYNTAX AcAlarmProbableCause
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The probable cause of the alarm."
+       ::= {acActiveAlarmEntry 10}
+
+
+
+     acActiveAlarmAdditionalInfo1 OBJECT-TYPE
+       SYNTAX SnmpAdminString
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Additional miscellaneous info regarding this alarm."
+       ::= {acActiveAlarmEntry 11}
+
+
+
+     acActiveAlarmAdditionalInfo2 OBJECT-TYPE
+       SYNTAX SnmpAdminString
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Additional miscellaneous info regarding this alarm."
+       ::= {acActiveAlarmEntry 12}
+
+
+
+     acActiveAlarmAdditionalInfo3 OBJECT-TYPE
+       SYNTAX SnmpAdminString
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Additional miscellaneous info regarding this alarm."
+       ::= {acActiveAlarmEntry 13}
+
+
+
+     -- ****************************************
+     -- acAlarmHistory
+     -- ****************************************
+
+     acAlarmHistory                OBJECT IDENTIFIER ::= {acAlarm 2}
+
+
+     -- ****************************************
+     -- acAlarmHistory table decleration
+     -- ****************************************
+     acAlarmHistoryTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcAlarmHistoryEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "A table of all raise-alarm and clear-alarm traps sent by the system.
+            Internal to the system, this table of traps is a fixed size. 
+            Once the table reaches this size, older traps are removed to make
+            room for new traps. The size of the table is the value of 
+            the nlmConfigLogEntryLimit (NOTIFICATION-LOG-MIB)."
+       ::= {acAlarmHistory 1}
+
+
+
+     -- ****************************************
+     -- acAlarmHistory table entry
+     -- ****************************************
+     acAlarmHistoryEntry OBJECT-TYPE
+       SYNTAX AcAlarmHistoryEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "A conceptual row in the acAlarmHistoryTable"
+       INDEX { acAlarmHistorySequenceNumber }
+       ::= {acAlarmHistoryTable 1}
+
+
+
+     -- ****************************************
+     -- acAlarmHistory TABLE
+     -- ****************************************
+     AcAlarmHistoryEntry ::= SEQUENCE {
+       acAlarmHistorySequenceNumber                    Unsigned32,
+       acAlarmHistorySysuptime                         TimeStamp,
+       acAlarmHistoryTrapOID                           OBJECT IDENTIFIER,
+       acAlarmHistoryDateAndTime                       DateAndTime,
+       acAlarmHistoryName                              Unsigned32,
+       acAlarmHistoryTextualDescription                SnmpAdminString,
+       acAlarmHistorySource                            SnmpAdminString,
+       acAlarmHistorySeverity                          AcAlarmSeverity,
+       acAlarmHistoryEventType                         AcAlarmEventType,
+       acAlarmHistoryProbableCause                     AcAlarmProbableCause,
+       acAlarmHistoryAdditionalInfo1                   SnmpAdminString,
+       acAlarmHistoryAdditionalInfo2                   SnmpAdminString,
+       acAlarmHistoryAdditionalInfo3                   SnmpAdminString
+     }
+
+
+
+     acAlarmHistorySequenceNumber  OBJECT-TYPE
+       SYNTAX Unsigned32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The sequence number of the alarm raise or clear trap."
+       ::= {acAlarmHistoryEntry 1}
+
+
+
+     acAlarmHistorySysuptime OBJECT-TYPE
+       SYNTAX TimeStamp
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The value of sysuptime at the time the alarm raise or clear trap was sent"
+       ::= {acAlarmHistoryEntry 2}
+
+
+
+     acAlarmHistoryTrapOID OBJECT-TYPE
+       SYNTAX OBJECT IDENTIFIER
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The OID of the notification trap"
+       ::= {acAlarmHistoryEntry 3}
+
+
+
+     acAlarmHistoryDateAndTime OBJECT-TYPE
+       SYNTAX DateAndTime
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The date and time at the time the alarm raise or clear trap was sent."
+       ::= {acAlarmHistoryEntry 4}
+
+
+
+     acAlarmHistoryName OBJECT-TYPE
+       SYNTAX Unsigned32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The name of the alarm that was raised or cleared. This actually in the form of a number. Each kind of alarm has a unique number associated with it."
+       ::= {acAlarmHistoryEntry 5}
+
+
+
+     acAlarmHistoryTextualDescription OBJECT-TYPE
+       SYNTAX SnmpAdminString
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Text that descries the alarm condition."
+       ::= {acAlarmHistoryEntry 6}
+
+
+
+     acAlarmHistorySource OBJECT-TYPE
+       SYNTAX SnmpAdminString
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The component in the system which raised or cleared the alarm."
+       ::= {acAlarmHistoryEntry 7}
+
+
+
+     acAlarmHistorySeverity OBJECT-TYPE
+       SYNTAX AcAlarmSeverity
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The severity of the alarm. A severity of warning, minor, major or critical indicates a raise trap. A severity of cleared indicates a clear trap."
+       ::= {acAlarmHistoryEntry 8}
+
+
+
+     acAlarmHistoryEventType OBJECT-TYPE
+       SYNTAX AcAlarmEventType
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The event type of the alarm."
+       ::= {acAlarmHistoryEntry 9}
+
+
+
+     acAlarmHistoryProbableCause OBJECT-TYPE
+       SYNTAX AcAlarmProbableCause
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The probable cause of the alarm."
+       ::= {acAlarmHistoryEntry 10}
+
+
+
+     acAlarmHistoryAdditionalInfo1 OBJECT-TYPE
+       SYNTAX SnmpAdminString
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Additional miscellaneous info regarding this alarm."
+       ::= {acAlarmHistoryEntry 11}
+
+
+
+     acAlarmHistoryAdditionalInfo2 OBJECT-TYPE
+       SYNTAX SnmpAdminString
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Additional miscellaneous info regarding this alarm."
+       ::= {acAlarmHistoryEntry 12}
+
+
+
+     acAlarmHistoryAdditionalInfo3 OBJECT-TYPE
+       SYNTAX SnmpAdminString
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Additional miscellaneous info regarding this alarm."
+       ::= {acAlarmHistoryEntry 13}
+
+
+
+     -- ****************************************
+     -- acAlarmVarbinds
+     -- ****************************************
+
+     acAlarmVarbinds               OBJECT IDENTIFIER ::= {acAlarm 3}
+
+
+     acAlarmVarbindsSequenceNumber  OBJECT-TYPE
+       SYNTAX Unsigned32
+       MAX-ACCESS accessible-for-notify
+       STATUS current
+       DESCRIPTION
+           "The sequence number of the alarm raise or clear trap."
+       ::= {acAlarmVarbinds 1}
+
+
+
+     acAlarmVarbindsDateAndTime OBJECT-TYPE
+       SYNTAX DateAndTime
+       MAX-ACCESS accessible-for-notify
+       STATUS current
+       DESCRIPTION
+           "The date and time at the time the alarm raise or clear trap was sent."
+       ::= {acAlarmVarbinds 2}
+
+
+
+     acAlarmVarbindsAlarmName OBJECT-TYPE
+       SYNTAX Unsigned32
+       MAX-ACCESS accessible-for-notify
+       STATUS current
+       DESCRIPTION
+           "The name of the alarm that was raised or cleared. This actually in the form of a number. Each kind of alarm has a unique number associated with it."
+       ::= {acAlarmVarbinds 3}
+
+
+
+     acAlarmVarbindsTextualDescription OBJECT-TYPE
+       SYNTAX SnmpAdminString
+       MAX-ACCESS accessible-for-notify
+       STATUS current
+       DESCRIPTION
+           "Text that descries the alarm condition."
+       ::= {acAlarmVarbinds 4}
+
+
+
+     acAlarmVarbindsSource OBJECT-TYPE
+       SYNTAX SnmpAdminString
+       MAX-ACCESS accessible-for-notify
+       STATUS current
+       DESCRIPTION
+           "The component in the system which raised or cleared the alarm."
+       ::= {acAlarmVarbinds 5}
+
+
+
+     acAlarmVarbindsSeverity OBJECT-TYPE
+       SYNTAX AcAlarmSeverity
+       MAX-ACCESS accessible-for-notify
+       STATUS current
+       DESCRIPTION
+           "The severity of the alarm. A severity of warning, minor, major or critical indicates a raise trap. A severity of cleared indicates a clear trap."
+       ::= {acAlarmVarbinds 6}
+
+
+
+     acAlarmVarbindsEventType OBJECT-TYPE
+       SYNTAX AcAlarmEventType
+       MAX-ACCESS accessible-for-notify
+       STATUS current
+       DESCRIPTION
+           "The event type of the alarm."
+       ::= {acAlarmVarbinds 7}
+
+
+
+     acAlarmVarbindsProbableCause OBJECT-TYPE
+       SYNTAX AcAlarmProbableCause
+       MAX-ACCESS accessible-for-notify
+       STATUS current
+       DESCRIPTION
+           "The probable cause of the alarm."
+       ::= {acAlarmVarbinds 8}
+
+
+
+     acAlarmVarbindsAdditionalInfo1 OBJECT-TYPE
+       SYNTAX SnmpAdminString
+       MAX-ACCESS accessible-for-notify
+       STATUS current
+       DESCRIPTION
+           "Additional miscellaneous info regarding this alarm."
+       ::= {acAlarmVarbinds 9}
+
+
+
+     acAlarmVarbindsAdditionalInfo2 OBJECT-TYPE
+       SYNTAX SnmpAdminString
+       MAX-ACCESS accessible-for-notify
+       STATUS current
+       DESCRIPTION
+           "Additional miscellaneous info regarding this alarm."
+       ::= {acAlarmVarbinds 10}
+
+
+
+     acAlarmVarbindsAdditionalInfo3 OBJECT-TYPE
+       SYNTAX SnmpAdminString
+       MAX-ACCESS accessible-for-notify
+       STATUS current
+       DESCRIPTION
+           "Additional miscellaneous info regarding this alarm."
+       ::= {acAlarmVarbinds 11}
+
+
+
+
+
+END

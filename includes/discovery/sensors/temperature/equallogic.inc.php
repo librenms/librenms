@@ -18,7 +18,7 @@ $oids = snmp_walk($device, 'eqlMemberHealthDetailsTemperatureName', '-OQn', 'EQL
 d_echo($oids . "\n");
 if (! empty($oids)) {
     echo 'EQLCONTROLLER-MIB ';
-    foreach (explode("\n", $oids) as $data) {
+    foreach (explode("\n", (string) $oids) as $data) {
         $data = trim($data);
         if (! empty($data)) {
             [$oid,$descr] = explode(' = ', $data, 2);

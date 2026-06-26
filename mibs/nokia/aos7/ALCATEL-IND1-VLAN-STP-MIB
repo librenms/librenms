@@ -21,27 +21,21 @@
                         ;
 
         alcatelIND1VLANSTPMIB MODULE-IDENTITY
-                LAST-UPDATED "201005130000Z"
-                ORGANIZATION "Alcatel-Lucent"
-                CONTACT-INFO
-                    "Please consult with Customer Service to ensure the most appropriate
-                     version of this document is used with the products in question:
+            LAST-UPDATED "201911270000Z"
+            ORGANIZATION "ALE USA Inc."
+            CONTACT-INFO
+             "Please consult with Customer Service to ensure the most appropriate
+              version of this document is used with the products in question:
 
-                                Alcatel-Lucent, Enterprise Solutions Division
-                               (Formerly Alcatel Internetworking, Incorporated)
-                                       26801 West Agoura Road
-                                   Agoura Hills, CA  91301-5122
-                                        United States Of America
+                              Alcatel-Lucent Enterprise
+                                26801 West Agoura Road
+                             Agoura Hills, CA  91301-5122
+                               United States Of America
 
-                     Telephone:              North America  +1 800 995 2696
-                                             Latin America  +1 877 919 9526
-                                                 Europe         +31 23 556 0100
-                                             Asia           +65 394 7933
-                                             All Other      +1 818 878 4507
+             Telephone:          +1 800 995 2696
 
-                     Electronic Mail:         support@ind.alcatel.com
-                     World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-                     File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+             Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+             World Wide Web:     https://www.al-enterprise.com"
                 DESCRIPTION
                                  "The Spanning Tree parameters for Vlans and ports that
                                   support the Spanning Tree protocol.
@@ -59,13 +53,17 @@
                 non-exclusive license to use this specification in connection with
                 management of the products for which it is intended to be used.
 
-                               Copyright (C) 1995-2006 Alcatel-Lucent
-                                         ALL RIGHTS RESERVED WORLDWIDE"
+                       Copyright (C) ALE USA Inc. 2014-2019
+                       Copyright (C) 1995-2013 Alcatel-Lucent
+                           ALL RIGHTS RESERVED WORLDWIDE"
+
+        REVISION      "201911270000Z"
+        DESCRIPTION
+            "Updated the latest contact and Copyright information for ALE USA Inc."
 
         REVISION      "201005130000Z"
         DESCRIPTION
             "Fixed the Notifications to use MIB Module OID.0 as Notifications root."
-
                 ::= { softentIND1VlanStp 1}
 
 -- -------------------------------------------------------------
@@ -2275,7 +2273,7 @@ vl4095(4095)
             }
 
          vStpMstInstanceNumber  OBJECT-TYPE
-                SYNTAX  Integer32 (0..63)
+                SYNTAX  Integer32 (0..4095)
                 MAX-ACCESS  not-accessible
                 STATUS  current
                 DESCRIPTION

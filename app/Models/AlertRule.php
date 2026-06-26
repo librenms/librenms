@@ -27,15 +27,94 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\AlertState;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $severity
+ * @property array<string, mixed>|null $extra
+ * @property bool|int $disabled
+ * @property string|null $proc
+ * @property string|null $notes
+ * @property string $query
+ * @property array<string, mixed>|null $builder
+ * @property bool|int $invert_map
+ * @property int|null $alert_operation_id
+ * @property AlertOperation|null $alertOperation
+ */
 class AlertRule extends BaseModel
 {
+    use HasFactory;
+
     public $timestamps = false;
 
+    protected static function booted(): void
+    {
+        static::deleting(function (AlertRule $rule): void {
+            $rule->alerts()->delete();
+            $rule->logs()->delete();
+            $rule->templateMaps()->delete();
+
+            $rule->devices()->detach();
+            $rule->groups()->detach();
+            $rule->locations()->detach();
+        });
+    }
+
+    protected $fillable = [
+        'severity',
+        'extra',
+        'disabled',
+        'name',
+        'proc',
+        'notes',
+        'query',
+        'builder',
+        'invert_map',
+        'alert_operation_id',
+    ];
+
+    protected $casts = [
+        'builder' => 'array',
+        'extra' => 'array',
+        'alert_operation_id' => 'integer',
+    ];
+
     // ---- Query scopes ----
+
+    /**
+     * @param  Builder<AlertRule>  $query
+     * @param  Device  $device
+     * @return Builder<AlertRule>
+     */
+    public function scopeForDevice(Builder $query, Device $device): Builder
+    {
+        return $query->where(function (Builder $query) use ($device): void {
+            $query->where(function (Builder $query): void {
+                $query->whereDoesntHave('devices')
+                    ->whereDoesntHave('groups')
+                    ->whereDoesntHave('locations');
+            })->orWhere(function (Builder $query) use ($device): void {
+                $query->where('invert_map', 0)
+                    ->where(function (Builder $query) use ($device): void {
+                        $query->whereHas('devices', fn ($q) => $q->where('devices.device_id', $device->device_id))
+                            ->orWhereHas('groups.devices', fn ($q) => $q->where('devices.device_id', $device->device_id))
+                            ->orWhereHas('locations', fn ($q) => $q->where('locations.id', $device->location_id));
+                    });
+            })->orWhere(function (Builder $query) use ($device): void {
+                $query->where('invert_map', 1)
+                    ->whereDoesntHave('devices', fn ($q) => $q->where('devices.device_id', $device->device_id))
+                    ->whereDoesntHave('groups.devices', fn ($q) => $q->where('devices.device_id', $device->device_id))
+                    ->whereDoesntHave('locations', fn ($q) => $q->where('locations.id', $device->location_id));
+            });
+        });
+    }
 
     /**
      * @param  Builder<AlertRule>  $query
@@ -69,7 +148,7 @@ class AlertRule extends BaseModel
      */
     public function scopeHasAccess($query, User $user)
     {
-        if ($user->hasGlobalRead()) {
+        if (Gate::allows('viewAll', AlertRule::class)) {
             return $query;
         }
 
@@ -81,12 +160,29 @@ class AlertRule extends BaseModel
     }
 
     // ---- Define Relationships ----
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Alert, $this>
      */
     public function alerts(): HasMany
     {
         return $this->hasMany(Alert::class, 'rule_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AlertLog, $this>
+     */
+    public function logs(): HasMany
+    {
+        return $this->hasMany(AlertLog::class, 'rule_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AlertTemplateMap, $this>
+     */
+    public function templateMaps(): HasMany
+    {
+        return $this->hasMany(AlertTemplateMap::class, 'alert_rule_id');
     }
 
     /**
@@ -111,5 +207,40 @@ class AlertRule extends BaseModel
     public function locations(): BelongsToMany
     {
         return $this->belongsToMany(Location::class, 'alert_location_map', 'rule_id');
+    }
+
+    /**
+     * @return BelongsTo<AlertOperation, $this>
+     */
+    public function alertOperation(): BelongsTo
+    {
+        return $this->belongsTo(AlertOperation::class, 'alert_operation_id');
+    }
+
+    /**
+     * Backwards-compatible shape: one array entry per segment (same as legacy multi-row operations).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function toOperationsApiArray(): array
+    {
+        $this->load([
+            'alertOperation.segments.transportSingles:alert_transports.transport_id,transport_type,transport_name',
+            'alertOperation.segments.transportGroups:alert_transport_groups.transport_group_id,transport_group_name',
+        ]);
+
+        if ($this->alertOperation === null) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($this->alertOperation->segments as $segment) {
+            $out[] = array_merge($segment->toApiArray(), [
+                'alert_operation_id' => $this->alertOperation->id,
+                'name' => $this->alertOperation->name,
+            ]);
+        }
+
+        return $out;
     }
 }

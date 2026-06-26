@@ -122,13 +122,11 @@ class Ospf implements Module
             $ospf_areas = SnmpQuery::context($context_name)
                 ->hideMib()->enumStrings()
                 ->walk('OSPF-MIB::ospfAreaTable')
-                ->mapTable(function ($ospf_area, $ospf_area_id) use ($context_name, $os) {
-                    return OspfArea::updateOrCreate([
-                        'device_id' => $os->getDeviceId(),
-                        'ospfAreaId' => $ospf_area_id,
-                        'context_name' => $context_name,
-                    ], $ospf_area);
-                });
+                ->mapTable(fn ($ospf_area, $ospf_area_id) => OspfArea::updateOrCreate([
+                    'device_id' => $os->getDeviceId(),
+                    'ospfAreaId' => $ospf_area_id,
+                    'context_name' => $context_name,
+                ], $ospf_area));
 
             // cleanup
             $os->getDevice()->ospfAreas()
@@ -203,7 +201,7 @@ class Ospf implements Module
 
                     if (! $port) {
                         // didn't find port by IP, try harder
-                        $port = $ospf_ports_by_ip->where(fn ($p) => str_starts_with($p->ospf_port_id, $ip))->first();
+                        $port = $ospf_ports_by_ip->where(fn ($p) => str_starts_with((string) $p->ospf_port_id, $ip))->first();
                     }
 
                     if ($port) {
@@ -217,24 +215,22 @@ class Ospf implements Module
 
             Log::info('Total TOS metrics: ' . $ospf_tos_metrics->count());
 
-            if ($instance_count) {
-                // Create device-wide statistics RRD
-                $rrd_def = RrdDefinition::make()
-                    ->addDataset('instances', 'GAUGE', 0, 1000000)
-                    ->addDataset('areas', 'GAUGE', 0, 1000000)
-                    ->addDataset('ports', 'GAUGE', 0, 1000000)
-                    ->addDataset('neighbours', 'GAUGE', 0, 1000000);
+            // Create device-wide statistics RRD
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('instances', 'GAUGE', 0, 1000000)
+                ->addDataset('areas', 'GAUGE', 0, 1000000)
+                ->addDataset('ports', 'GAUGE', 0, 1000000)
+                ->addDataset('neighbours', 'GAUGE', 0, 1000000);
 
-                $fields = [
-                    'instances' => $instance_count,
-                    'areas' => $ospf_areas->count(),
-                    'ports' => $ospf_ports->count(),
-                    'neighbours' => $ospf_neighbours->count(),
-                ];
+            $fields = [
+                'instances' => $instance_count,
+                'areas' => $ospf_areas->count(),
+                'ports' => $ospf_ports->count(),
+                'neighbours' => $ospf_neighbours->count(),
+            ];
 
-                $tags = ['rrd_def' => $rrd_def];
-                $datastore->put($os->getDeviceArray(), 'ospf-statistics', $tags, $fields);
-            }
+            $tags = ['rrd_def' => $rrd_def];
+            $datastore->put($os->getDeviceArray(), 'ospf-statistics', $tags, $fields);
         }
     }
 

@@ -34,7 +34,7 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 use LibreNMS\Util\AutonomousSystem;
 
-class BgpTrapTest extends SnmpTrapTestCase
+final class BgpTrapTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;

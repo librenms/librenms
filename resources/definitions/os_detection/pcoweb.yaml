@@ -14,8 +14,7 @@ discovery:
     -
         sysObjectID: .1.3.6.1.4.1.8072.3.2.10
         snmpget:
-            oid: roomTemp.0
-            mib: CAREL-ug40cdz-MIB
+            oid: CAREL-ug40cdz-MIB::roomTemp.0
             mib_dir: carel
             op: '!='
             value: false

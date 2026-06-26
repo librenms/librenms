@@ -59,7 +59,7 @@ trait VminfoVmware
              * If VMware Tools is not running then don't overwrite the GuestOS with the error
              * message, but just leave it as it currently is.
              */
-            if (str_contains($data['vmwVmGuestOS'], 'tools not ')) {
+            if (str_contains((string) $data['vmwVmGuestOS'], 'tools not ')) {
                 unset($data['vmwVmGuestOS']);
             }
 

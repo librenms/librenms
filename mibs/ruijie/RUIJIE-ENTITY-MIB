@@ -1,0 +1,1467 @@
+-- *****************************************************************
+-- RUIJIE-ENTITY-MIB.mib:  Ruijie Entity MIB file
+--
+-- March 2002, Wuzg
+--
+-- Copyright (c) 2002 by Ruijie Networks Co.,Ltd.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+RUIJIE-ENTITY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Integer32,
+        Unsigned32
+                FROM SNMPv2-SMI
+        DisplayString,
+        MacAddress
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        ruijieMgmt
+                FROM RUIJIE-SMI
+        entPhysicalName
+                FROM ENTITY-MIB;
+
+ruijieEntityMIB MODULE-IDENTITY
+	LAST-UPDATED "202109080000Z"
+	ORGANIZATION "Ruijie Networks Co.,Ltd."
+	CONTACT-INFO
+        " 
+		    Tel: 4008-111-000 
+
+		    E-mail: service@ruijie.com.cn"
+	DESCRIPTION
+		"This module defines ruijie entity mibs."
+	REVISION      "202109080000Z"
+	DESCRIPTION
+		"Initial version of this MIB module."
+	::= { ruijieMgmt 21}
+
+ruijieDeviceMIBObjects OBJECT IDENTIFIER ::= { ruijieEntityMIB 1 }
+
+
+--
+-- device information
+--
+ruijieDeviceMaxNumber OBJECT-TYPE
+          SYNTAX Integer32
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "Max number of devices of the system permitting."
+          ::= { ruijieDeviceMIBObjects 1 }
+        
+ruijieDeviceInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RuijieDeviceInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "List of devices."
+        ::= { ruijieDeviceMIBObjects 2 }
+        
+ruijieDeviceInfoEntry OBJECT-TYPE
+        SYNTAX RuijieDeviceInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry of a device information."
+        INDEX { ruijieDeviceInfoIndex }
+        ::= { ruijieDeviceInfoTable 1 }
+    
+RuijieDeviceInfoEntry ::=
+        SEQUENCE {
+            ruijieDeviceInfoIndex Integer32,
+            ruijieDeviceInfoDescr DisplayString,
+            ruijieDeviceInfoSlotNumber Integer32,
+            ruijieDevicePowerStatus  INTEGER,
+            ruijieDeviceMacAddress MacAddress,
+            ruijieDevicePriority Integer32,
+            ruijieDeviceAlias  DisplayString,
+            ruijieDeviceSWVersion DisplayString,
+            ruijieDeviceHWVersion DisplayString,
+            ruijieDeviceSerialNumber DisplayString,
+            ruijieDeviceOid OBJECT IDENTIFIER,
+            ruijieDeviceProductionDate DisplayString,
+            ruijieDeviceOutPower Integer32
+        }
+
+ruijieDeviceInfoIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "An unique value of each devices in system. Its value ranges between
+            1 and the value of the object ruijieDeviceNumber."
+        ::= { ruijieDeviceInfoEntry 1 }
+              
+ruijieDeviceInfoDescr OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the device."
+        ::= { ruijieDeviceInfoEntry 2 }
+        
+ruijieDeviceInfoSlotNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of slots exists on the device."
+        ::= { ruijieDeviceInfoEntry 3 }
+        
+          
+ruijieDevicePowerStatus OBJECT-TYPE
+          SYNTAX  INTEGER {
+                    rpsNoLink   (1), -- no rps link or rps not electrifying,
+                    rpsLinkAndNoPower (2), -- rps linked but not electrifying,
+                    rpsLinkAndReadyForPower (3), -- rps is ready for power,
+                    rpsLinkAndPower (4)  -- rps is serving as a power
+                }
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "The power status of device"
+          ::= { ruijieDeviceInfoEntry 4 }
+        
+ruijieDeviceMacAddress OBJECT-TYPE
+          SYNTAX  MacAddress
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "The physical address of device"
+          ::= { ruijieDeviceInfoEntry 5 }
+
+ruijieDevicePriority OBJECT-TYPE
+          SYNTAX  Integer32(1..10)
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "The device priority value"
+          ::= { ruijieDeviceInfoEntry 6 }
+          
+ruijieDeviceAlias OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Alias of the device."
+        ::= { ruijieDeviceInfoEntry 7 }     
+
+
+ruijieDeviceSWVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the device."
+        ::= { ruijieDeviceInfoEntry 8 }
+        
+ruijieDeviceHWVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the device."
+        ::= { ruijieDeviceInfoEntry 9 }  
+
+ruijieDeviceSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Serial number of the device. For a chassis device, it refers to the serial number of the chassis."
+        ::= { ruijieDeviceInfoEntry 10 }
+
+ruijieDeviceOid OBJECT-TYPE
+        SYNTAX OBJECT IDENTIFIER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Oid number of the device."
+        ::= { ruijieDeviceInfoEntry 11 }
+
+ruijieDeviceProductionDate OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..16))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Production date of the device."
+        ::= { ruijieDeviceInfoEntry 12 }
+ruijieDeviceOutPower OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The output power of the device (Unit W)."
+        ::= { ruijieDeviceInfoEntry 13 }
+
+--
+-- module information  
+--
+--ruijieModuleNumber OBJECT-TYPE
+--        SYNTAX Integer32
+--        MAX-ACCESS read-only
+--        STATUS current
+--        DESCRIPTION
+--            "Current number of modules in the system."
+--        ::= { ruijieDeviceMIBObjects 2 }
+
+ruijieSlotInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RuijieSlotInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "a list of module Entries."
+        ::= { ruijieDeviceMIBObjects 3 }
+    
+ruijieSlotInfoEntry OBJECT-TYPE
+        SYNTAX RuijieSlotInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry containing status information about one slot."
+        INDEX { ruijieSlotInfoDeviceIndex, ruijieSlotInfoIndex }
+        ::= { ruijieSlotInfoTable 1 }
+
+RuijieSlotInfoEntry ::= 
+        SEQUENCE {
+            ruijieSlotInfoDeviceIndex Integer32,
+            ruijieSlotInfoIndex Integer32,
+            ruijieSlotModuleInfoDescr DisplayString,
+            ruijieSlotInfoPortNumber Integer32,
+            ruijieSlotInfoPortMaxNumber Integer32,
+            ruijieSlotInfoDesc  DisplayString,
+            ruijieSlotConfigModuleInfoDescr DisplayString,
+            ruijieSlotUserStatus Integer32,
+            ruijieSlotSoftwareStatus Integer32,
+            ruijieSlotSerialNumber DisplayString,
+            ruijieSlotHWVersion DisplayString,
+            slotSocID DisplayString,
+            ruijieSlotServiceState INTEGER,
+            ruijieSlotModuleProductionDate DisplayString,
+            ruijieSlotSoftwareVersion DisplayString
+        }
+
+ruijieSlotInfoDeviceIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index of the device, that the slot exists on."
+        ::= { ruijieSlotInfoEntry 1 }
+    
+ruijieSlotInfoIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "A unique value for each slot exist on the device specified by
+            the field ruijieSlotInfoDeviceIndex, Its value ranges
+            between 1 and the value of the solt num  of this device."
+        ::= { ruijieSlotInfoEntry 2 }
+    
+ruijieSlotModuleInfoDescr OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Descriptions for the module in the Slot. just like 's1902m' etc. It is a 
+             unique value for identifing a kind of module.This value will be null string
+             if slot is empty is NULL"
+        ::= { ruijieSlotInfoEntry 3 }
+    
+ruijieSlotInfoPortNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of ports on this slot.This value will be 0  if slot is empty"
+        ::= { ruijieSlotInfoEntry 4 }
+
+ruijieSlotInfoPortMaxNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Max number of ports on this slot has possibly."
+        ::= { ruijieSlotInfoEntry 5 }
+                      
+ruijieSlotInfoDesc OBJECT-TYPE
+        SYNTAX  DisplayString(SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the slot,the same as the pannel show."
+        ::= { ruijieSlotInfoEntry 6 }
+        
+ruijieSlotConfigModuleInfoDescr OBJECT-TYPE
+        SYNTAX  DisplayString(SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the configured module name on the slot, such as 'M8600-48GT/4SFP','NMX-8E1/CE1H',etc.
+            This value will be 'none' if module on the slot isn't configured, or 'N/A' if not allowed to configure."
+        ::= { ruijieSlotInfoEntry 7 }        
+        
+ruijieSlotUserStatus OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "User status of the slot.
+	             value      status          	description
+			     0          NONE  	  			not configured(for linecard)
+			     1          INSTALLED 			configured to install(for linecard)
+			     2          UNINSTALLED			configured to uninstall(for linecard)
+			     3          NA             		not allowed to configure(for mainboard or Cassette switch)
+            "
+        ::= { ruijieSlotInfoEntry 8 }
+        
+ruijieSlotSoftwareStatus OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Software status of the slot.
+                value       status                  description
+                0           NONE                    not running(for all)
+                1           OK                      running(for linecard or Cassette switch)
+                2           CONFLICT                confilct with installed module(for linecard)  
+                3           REMOVED                 module removed(for linecard)
+                4           VERSION_IMCOMPATIBLE    version error(for linecard)
+                5           CANNOT_STARTUP          can not start(for all)
+                6           RESETTING               restarting(for linecard)
+                7           MASTER                  master board(for mainboard)
+                8           BACKUP                  slave board(for mainboard)
+                9           UNINSTALL               uninstall(for all)
+                10          POWER_OFF               power off(for all)
+                11          OFFLINE                 offline(for all)
+            "
+        ::= { ruijieSlotInfoEntry 9 } 
+
+ruijieSlotSerialNumber OBJECT-TYPE
+        SYNTAX  DisplayString(SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Serial number of the module in the Slot."
+        ::= { ruijieSlotInfoEntry 10 }
+ 
+ruijieSlotHWVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the slot."
+        ::= { ruijieSlotInfoEntry 11 }
+
+slotSocID OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Soc ID of global master."
+        ::= { ruijieSlotInfoEntry 12 }
+
+ruijieSlotServiceState OBJECT-TYPE
+        SYNTAX INTEGER{
+            inService(1),      -- 单板处于正常工作状态
+            outOfService(2),  -- 单板无法正常工作
+            servNA(3)          -- 未知状态
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Service state of the module in the slot."
+        ::= { ruijieSlotInfoEntry 13 }
+
+ruijieSlotModuleProductionDate OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..16))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Production date of the module in slot."
+        ::= { ruijieSlotInfoEntry 14 }
+
+ruijieSlotSoftwareVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Software version of the module in the slot."
+        ::= { ruijieSlotInfoEntry 15 }
+
+--
+--ModuleTempState
+--
+ruijieModuleTempStateTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RuijieModuleTempStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table of entrance to module temperature state table."
+        ::= { ruijieDeviceMIBObjects 4 }
+    
+ruijieModuleTempStateEntry OBJECT-TYPE
+        SYNTAX RuijieModuleTempStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entrance to module temperature state." 
+        INDEX { ruijieModuleTempStateDeviceIndex, ruijieModuleTempStateIndex }
+        ::= { ruijieModuleTempStateTable 1 }
+
+RuijieModuleTempStateEntry ::= 
+        SEQUENCE {
+	     ruijieModuleTempStateDeviceIndex Integer32, 
+             ruijieModuleTempStateIndex Integer32,
+             ruijieModuleTempState  INTEGER
+        }
+
+ruijieModuleTempStateDeviceIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index number for the device which the module is in." 
+        ::= { ruijieModuleTempStateEntry 1 }
+  
+ruijieModuleTempStateIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The module index number, ranging from 1 to the maximal slot number." 
+        ::= { ruijieModuleTempStateEntry 2 }
+    
+ruijieModuleTempState OBJECT-TYPE
+        SYNTAX INTEGER{
+        	tempNormal(1),
+        	tempWarning(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The module temperature state." 
+        ::= { ruijieModuleTempStateEntry 3 }
+
+ruijiePowerStateTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RuijiePowerStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table of entrance to the power state." 
+        ::= { ruijieDeviceMIBObjects 5 }
+    
+ruijiePowerStateEntry OBJECT-TYPE
+        SYNTAX RuijiePowerStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entrance to the power state." 
+        INDEX { ruijiePowerStateDeviceIndex, ruijiePowerStateIndex }
+        ::= { ruijiePowerStateTable 1 }
+
+RuijiePowerStateEntry ::= 
+        SEQUENCE {
+	     ruijiePowerStateDeviceIndex Integer32,
+             ruijiePowerStateIndex Integer32,
+             ruijiePowerState  INTEGER,
+             ruijiePowerStatePowerDescr  DisplayString,
+             ruijiePowerStateSerialNumber DisplayString
+        }
+
+ruijiePowerStateDeviceIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+             "The index number for the device which the power is in." 
+        ::= { ruijiePowerStateEntry 1 }
+    
+ruijiePowerStateIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The power index number."
+        ::= { ruijiePowerStateEntry 2 }
+    
+ruijiePowerState OBJECT-TYPE
+        SYNTAX INTEGER{
+        	noLink(1),                 --no exist
+        	linkAndNoPower(2),         --exist but no power
+        	linkAndReadyForPower(3),   --exist and ready for power
+        	linkAndPower(4),           --normal power 
+		linkAndPowerAbnormal(5),   --power,but abnormal at fan
+        	linkAndUnknow(6),          --unknow 
+		linkAndLineFail(7)         --line fail
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Power state."
+        ::= { ruijiePowerStateEntry 3 }
+
+ruijiePowerStatePowerDescr OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the power."
+        ::= { ruijiePowerStateEntry 4 }
+
+ruijiePowerStateSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Serial number of the power."
+        ::= { ruijiePowerStateEntry 5 }
+		
+ruijieFanStateTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RuijieFanStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table of entrance to the fan state." 
+        ::= { ruijieDeviceMIBObjects 6 }
+    
+ruijieFanStateEntry OBJECT-TYPE
+        SYNTAX RuijieFanStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entrance to the fan state."
+        INDEX {  ruijieFanStateDeviceIndex, ruijieFanStateIndex }
+        ::= { ruijieFanStateTable 1 }
+
+RuijieFanStateEntry ::= 
+        SEQUENCE {
+	     ruijieFanStateDeviceIndex Integer32,
+             ruijieFanStateIndex Integer32,
+             ruijieFanState  INTEGER,
+             ruijieFanStateFanDescr  DisplayString,
+             ruijieFanStateSerialNumber DisplayString
+        }
+
+ruijieFanStateDeviceIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index number for the device which the fan is in."
+        ::= { ruijieFanStateEntry 1 }
+    
+ruijieFanStateIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Fan index number."  
+        ::= { ruijieFanStateEntry 2 }
+    
+ruijieFanState OBJECT-TYPE
+        SYNTAX INTEGER{
+        	work(1),      --fan working
+        	stop(2)      --fan stopping or no exist 
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Fan state."  
+        ::= { ruijieFanStateEntry 3 }
+           
+ruijieFanStateFanDescr OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the fan."
+        ::= { ruijieFanStateEntry 4 }
+ 
+ruijieFanStateSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Serial number of the fan."
+        ::= { ruijieFanStateEntry 5 } 
+
+ruijieHolderInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RuijieHolderInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Holder info table."
+        ::= { ruijieDeviceMIBObjects 7 }
+
+ruijieHolderInfoEntry OBJECT-TYPE
+        SYNTAX RuijieHolderInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Holder info entry" 
+        INDEX { ruijieHolderInfoDeviceIndex, ruijieHolderInfoSlotIndex, ruijieHolderInfoSubSlotIndex }
+        ::= { ruijieHolderInfoTable 1 }
+
+RuijieHolderInfoEntry ::=
+        SEQUENCE {
+            ruijieHolderInfoDeviceIndex Integer32,
+            ruijieHolderInfoSlotIndex Integer32,
+            ruijieHolderInfoSubSlotIndex Integer32,
+            ruijieHolderNumber Integer32,
+            ruijieHolderState INTEGER,
+            ruijieHolderType INTEGER,
+            ruijieHolderName DisplayString
+        }
+
+ruijieHolderInfoDeviceIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Holder info's device index."
+        ::= { ruijieHolderInfoEntry 1 }
+
+ruijieHolderInfoSlotIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Holder info's slot index."
+        ::= { ruijieHolderInfoEntry 2 }
+
+ruijieHolderInfoSubSlotIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Holder info's sub slot index."
+        ::= { ruijieHolderInfoEntry 3 }
+
+ruijieHolderNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Holder's number."
+        ::= { ruijieHolderInfoEntry 4 }
+
+ruijieHolderState OBJECT-TYPE
+        SYNTAX INTEGER {
+            empty(1),           --空
+            installed(2),       --已安装
+            unavailable(3),     --该槽位没有安装单板，但是该槽位已经被其他单板占用不能再安装单板，单一板占用槽时会出现此状态
+            unknown(4)          --其他情况
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Holder's state."
+        ::= { ruijieHolderInfoEntry 5 }
+
+ruijieHolderType OBJECT-TYPE
+        SYNTAX INTEGER {
+            rack(1),        --机架
+            subRack(2),    --子架
+            shelf(3),       --机框
+            subShelf(4),   --子框
+            slot(5),        --机槽
+            subSlot(6)     --子槽
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Holder's type."
+        ::= { ruijieHolderInfoEntry 6 }
+
+ruijieHolderName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "Holder's name."
+        ::= { ruijieHolderInfoEntry 7 }
+
+--
+--SubslotInfoTable
+--
+ruijieSubslotInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RuijieSubslotInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table of entrance to the subslot information of chassis device."
+        ::= { ruijieDeviceMIBObjects 8 }
+
+ruijieSubslotInfoEntry OBJECT-TYPE
+        SYNTAX RuijieSubslotInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry containing status information about one subslot of chassis device."
+        INDEX { ruijieSubslotInfoDeviceIndex, ruijieSubslotInfoSlotIndex, ruijieSubslotInfoIndex }
+        ::= { ruijieSubslotInfoTable 1 }
+
+RuijieSubslotInfoEntry ::= 
+        SEQUENCE {
+            ruijieSubslotInfoDeviceIndex Integer32,
+            ruijieSubslotInfoSlotIndex Integer32,
+            ruijieSubslotInfoIndex Integer32,
+            ruijieSubslotModuleInfoDescr DisplayString,
+            ruijieSubslotInfoPortNumber Integer32,
+            ruijieSubslotInfoPortMaxNumber Integer32,
+            ruijieSubslotInfoDesc  DisplayString,
+            ruijieSubslotConfigModuleInfoDescr DisplayString,
+            ruijieSubslotUserStatus Integer32,
+            ruijieSubslotSoftwareStatus Integer32,
+            ruijieSubslotSerialNumber DisplayString,
+            ruijieSubslotHWVersion DisplayString,
+            ruijieSubslotSoftwareVersion DisplayString,
+            ruijieSubslotServiceState INTEGER
+        }
+
+ruijieSubslotInfoDeviceIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index of the device, that the subslot exists on."
+        ::= { ruijieSubslotInfoEntry 1 }
+
+ruijieSubslotInfoSlotIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "A unique value for each slot exist on the device specified by
+            the field ruijieSubslotInfoDeviceIndex, Its value ranges
+            between 1 and the value of the solt num  of this device."
+        ::= { ruijieSubslotInfoEntry 2 }
+
+ruijieSubslotInfoIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "A unique value for each subslot exist on the slot specified by
+            the field ruijieSubslotInfoSlotIndex, Its value ranges
+            between 1 and the value of the subsolt num  of this slot."
+        ::= { ruijieSubslotInfoEntry 3 }
+
+ruijieSubslotModuleInfoDescr OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Descriptions for the module in the subslot. just like 'HPIC-24SFP' etc. It is a 
+             unique value for identifing a kind of module.This value will be null string
+             if subslot is empty is NULL."
+        ::= { ruijieSubslotInfoEntry 4 }
+
+ruijieSubslotInfoPortNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of ports on this subslot.This value will be 0  if subslot is empty."
+        ::= { ruijieSubslotInfoEntry 5 }
+
+ruijieSubslotInfoPortMaxNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Max number of ports on this subslot has possibly."
+        ::= { ruijieSubslotInfoEntry 6 }
+
+ruijieSubslotInfoDesc OBJECT-TYPE
+        SYNTAX  DisplayString(SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the subslot,the same as the pannel show."
+        ::= { ruijieSubslotInfoEntry 7 }
+
+ruijieSubslotConfigModuleInfoDescr OBJECT-TYPE
+        SYNTAX  DisplayString(SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the configured module name on the subslot, such as 'HPIC-24SFP',etc.
+            This value will be 'none' if module on the subslot isn't configured, or 'N/A' if not allowed to configure."
+        ::= { ruijieSubslotInfoEntry 8 }
+
+ruijieSubslotUserStatus OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "User status of the subslot.
+                 value      status              description
+                 0          NONE                not configured(for subcard)
+                 1          INSTALLED           configured to install(for subcard)
+                 2          UNINSTALLED         configured to uninstall(for subcard)
+                 3          NA                  not allowed to configure(for subcard)
+            "
+        ::= { ruijieSubslotInfoEntry 9 }
+
+ruijieSubslotSoftwareStatus OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Software status of the subslot.
+                value       status                  description
+                0           NONE                    not running(for all)
+                1           OK                      running(for subcard)
+                2           CONFLICT                confilct with installed module(for subcard)  
+                3           REMOVED                 module removed(for subcard)
+                4           VERSION_IMCOMPATIBLE    version error(for subcard)
+                5           CANNOT_STARTUP          can not start(for subcard)
+                6           RESETTING               restarting(for subcard)
+                9           UNINSTALL               uninstall(for subcard)
+                10          POWER_OFF               power off(for subcard)
+            "
+        ::= { ruijieSubslotInfoEntry 10 } 
+
+ruijieSubslotSerialNumber OBJECT-TYPE
+        SYNTAX  DisplayString(SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Serial number of the module in the subslot."
+        ::= { ruijieSubslotInfoEntry 11 }
+
+ruijieSubslotHWVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Hardware version of the module in the subslot."
+        ::= { ruijieSubslotInfoEntry 12 }
+
+ruijieSubslotSoftwareVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Software version of the module in the subslot."
+        ::= { ruijieSubslotInfoEntry 13 }
+
+ruijieSubslotServiceState OBJECT-TYPE
+        SYNTAX INTEGER{
+            inService(1),      -- 单板处于正常工作状态
+            outOfService(2),  -- 单板无法正常工作
+            servNA(3)          -- 未知状态
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Service state of the module in the subslot."
+        ::= { ruijieSubslotInfoEntry 14 }
+ruijieSystemTotalOutPower OBJECT-TYPE
+          SYNTAX Integer32
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "The output power of the all devices. (Unit W)"
+          ::= { ruijieDeviceMIBObjects 9 }
+
+ruijieComponentMIBObjects OBJECT IDENTIFIER ::= { ruijieDeviceMIBObjects 10 }
+
+--
+-- component MIB
+--
+ruijieComponentLicense OBJECT-TYPE
+          SYNTAX OCTET STRING
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "The ciphertext of the license number for component information."
+          ::= { ruijieComponentMIBObjects 1 }
+
+ruijieComponentInfo OBJECT IDENTIFIER ::= { ruijieComponentMIBObjects 2 }
+
+ruijieComponentKeyPos OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The subscript of the key for component information. 65535 indicates the authentication failure."
+        ::= { ruijieComponentInfo 1 }
+
+--
+-- component board information
+--
+ruijieComponentBoardTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RuijieComponentBoardEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of board information."
+        ::= { ruijieComponentInfo 2 }
+
+ruijieComponentBoardEntry OBJECT-TYPE
+        SYNTAX RuijieComponentBoardEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry of board information."
+        INDEX { ruijieComponentBoardDeviceIndex,
+        ruijieComponentBoardSlotIndex,
+        ruijieComponentBoardSubslotIndex }
+        ::= { ruijieComponentBoardTable 1 }
+
+RuijieComponentBoardEntry ::=
+        SEQUENCE {
+            ruijieComponentBoardDeviceIndex Unsigned32,
+            ruijieComponentBoardSlotIndex Unsigned32,
+            ruijieComponentBoardSubslotIndex Unsigned32,
+            ruijieComponentSlotName DisplayString,
+            ruijieComponentBoardName DisplayString
+        }
+
+ruijieComponentBoardDeviceIndex OBJECT-TYPE
+        SYNTAX Unsigned32 (1..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index number for the device which the board is in."
+        ::= { ruijieComponentBoardEntry 1 }
+
+ruijieComponentBoardSlotIndex OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index number for the slot which the board is in."
+        ::= { ruijieComponentBoardEntry 2 }
+
+ruijieComponentBoardSubslotIndex OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index number for the sub slot which the board is in."
+        ::= { ruijieComponentBoardEntry 3 }
+
+ruijieComponentSlotName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the slot."
+        ::= { ruijieComponentBoardEntry 4 }
+
+ruijieComponentBoardName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Board name."
+        ::= { ruijieComponentBoardEntry 5 }
+--
+-- Component information
+--
+ruijieComponentTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RuijieComponentEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of component information."
+        ::= { ruijieComponentInfo 3 }
+
+ruijieComponentEntry OBJECT-TYPE
+        SYNTAX RuijieComponentEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry of component information."
+        INDEX { ruijieComponentDeviceIndex,
+        ruijieComponentSlotIndex,
+        ruijieComponentSubslotIndex,
+        ruijieComponentType,
+        ruijieComponentTypeIndex }
+        ::= { ruijieComponentTable 1 }
+
+RuijieComponentEntry ::=
+        SEQUENCE {
+            ruijieComponentDeviceIndex Unsigned32,
+            ruijieComponentSlotIndex Unsigned32,
+            ruijieComponentSubslotIndex Unsigned32,
+            ruijieComponentType Unsigned32,
+            ruijieComponentTypeIndex Unsigned32,
+            ruijieComponentTypeName DisplayString,
+            ruijieComponentTypeCount DisplayString
+        }
+
+ruijieComponentDeviceIndex OBJECT-TYPE
+        SYNTAX Unsigned32 (1..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index number for the device which the component is in."
+        ::= { ruijieComponentEntry 1 }
+
+ruijieComponentSlotIndex OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index number for the slot which the component is in."
+        ::= { ruijieComponentEntry 2 }
+
+ruijieComponentSubslotIndex OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index number for the sub slot which the component is in."
+        ::= { ruijieComponentEntry 3 }
+
+ruijieComponentType OBJECT-TYPE
+        SYNTAX Unsigned32 (0..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The ID of the component type."
+        ::= { ruijieComponentEntry 4 }
+
+ruijieComponentTypeIndex OBJECT-TYPE
+        SYNTAX Unsigned32 (0..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index of the component model."
+        ::= { ruijieComponentEntry 5 }
+
+ruijieComponentTypeName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The model name of the component."
+        ::= { ruijieComponentEntry 6 }
+
+ruijieComponentTypeCount OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of the same component model."
+        ::= { ruijieComponentEntry 7 }
+
+-- Traps
+ruijieEntityMIBTraps OBJECT IDENTIFIER ::= { ruijieEntityMIB 2 }
+
+ruijieEntityStateChgDesc OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          "The description of entity change."
+        ::= { ruijieEntityMIBTraps 1 }       
+        
+ruijieEntityStatusChange NOTIFICATION-TYPE
+        OBJECTS   {ruijieEntityStateChgDesc}
+        STATUS     current
+        DESCRIPTION
+                "while status of the entity changed, then this trap will be sent."
+        ::= { ruijieEntityMIBTraps 2 }                    
+        
+ruijieTemperatureWarningDesc OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          "Description on the temperature state changes." 
+        ::= { ruijieEntityMIBTraps 3 }       
+        
+ruijieTemperatureWarning NOTIFICATION-TYPE
+        OBJECTS   { ruijieTemperatureWarningDesc }
+        STATUS     current
+        DESCRIPTION
+            " When the temperature state of this module changes, this trap will be sent." 
+        ::= { ruijieEntityMIBTraps 4 }
+        
+ruijieEntityPhyInsert NOTIFICATION-TYPE
+        OBJECTS   { entPhysicalName }
+        STATUS     current
+        DESCRIPTION
+            " When the module is physically inserted , this trap will be sent. " 
+        ::= { ruijieEntityMIBTraps 5 }
+
+ruijieEntityPhyRemove NOTIFICATION-TYPE
+        OBJECTS   { entPhysicalName }
+        STATUS     current
+        DESCRIPTION
+            " When the module is physically removed, this trap will be sent." 
+        ::= { ruijieEntityMIBTraps 6 }
+
+ruijieTemperatureWarningRecov NOTIFICATION-TYPE
+        OBJECTS   { ruijieTemperatureWarningDesc }
+        STATUS     current
+        DESCRIPTION
+            " When the temperature state of this module changes, this trap will be sent." 
+        ::= { ruijieEntityMIBTraps 7 }
+
+ruijieTemperaturePoeWarning NOTIFICATION-TYPE
+        OBJECTS   { ruijieTemperatureWarningDesc }
+        STATUS     current
+        DESCRIPTION
+            " When the poe state of this module changes, this trap will be sent." 
+        ::= { ruijieEntityMIBTraps 8 }
+
+ruijieTemperaturePoeWarningRecov NOTIFICATION-TYPE
+        OBJECTS   { ruijieTemperatureWarningDesc }
+        STATUS     current
+        DESCRIPTION
+            " When the poe state of this module changes, this trap will be sent." 
+        ::= { ruijieEntityMIBTraps 9 }
+
+ruijieEntityStateWarningDesc OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          "The description of the entity warning state."
+        ::= { ruijieEntityMIBTraps 10 }       
+
+ruijieEntityStateWarningActive NOTIFICATION-TYPE
+        OBJECTS   { ruijieEntityStateWarningDesc }
+        STATUS     current
+        DESCRIPTION
+            " When the state of the entity is abnormal, this trap will be sent." 
+        ::= { ruijieEntityMIBTraps 11 }
+
+ruijieEntityStateWarningClear NOTIFICATION-TYPE
+        OBJECTS   { ruijieEntityStateWarningDesc }
+        STATUS     current
+        DESCRIPTION
+            " When the state of the entity recovers from abnormal, this trap will be sent." 
+        ::= { ruijieEntityMIBTraps 12 }
+
+ruijieEntityDeviceIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          "The device index of the entity."
+        ::= { ruijieEntityMIBTraps 13 }
+
+ruijieEntityPhysicalDescr OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          "The physical description of the entity."
+        ::= { ruijieEntityMIBTraps 14 }
+
+ruijieEntityCheckType OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The type of the entity check."
+        ::= { ruijieEntityMIBTraps 15 }
+
+ruijieRelatedEntityPhysicalDescr OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          "The physical description of the related entity."
+        ::= { ruijieEntityMIBTraps 16 }
+
+ruijieEntityCheckDescription OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          "The description for the entity check."
+        ::= { ruijieEntityMIBTraps 17 }
+
+ruijieEntityCheckFailActive NOTIFICATION-TYPE
+        OBJECTS   { 
+            ruijieEntityDeviceIndex,
+            ruijieEntityPhysicalDescr,
+            ruijieEntityCheckType,
+            ruijieEntityCheckDescription
+        }
+        STATUS     current
+        DESCRIPTION
+            "The entity check failed." 
+        ::= { ruijieEntityMIBTraps 18 }
+
+ruijieEntityCheckFailClear NOTIFICATION-TYPE
+        OBJECTS   { 
+            ruijieEntityDeviceIndex,
+            ruijieEntityPhysicalDescr,
+            ruijieEntityCheckType,
+            ruijieEntityCheckDescription
+        }
+        STATUS     current
+        DESCRIPTION
+            "The entity check resumed from failure." 
+        ::= { ruijieEntityMIBTraps 19 }
+
+ruijieBoardCheckFailActive NOTIFICATION-TYPE
+        OBJECTS   { 
+            ruijieEntityDeviceIndex,
+            ruijieEntityPhysicalDescr,
+            ruijieEntityCheckType,
+            ruijieRelatedEntityPhysicalDescr,
+            ruijieEntityCheckDescription
+        }
+        STATUS     current
+        DESCRIPTION
+            "The board check failed." 
+        ::= { ruijieEntityMIBTraps 20 }
+
+ruijieBoardCheckFailClear NOTIFICATION-TYPE
+        OBJECTS   { 
+            ruijieEntityDeviceIndex,
+            ruijieEntityPhysicalDescr,
+            ruijieEntityCheckType,
+            ruijieRelatedEntityPhysicalDescr,
+            ruijieEntityCheckDescription
+        }
+        STATUS     current
+        DESCRIPTION
+            "The board check resumed from failure." 
+        ::= { ruijieEntityMIBTraps 21 }
+
+-- conformance information
+
+ruijieDeviceMIBConformance OBJECT IDENTIFIER ::= { ruijieEntityMIB 3 }
+ruijieDeviceMIBCompliances OBJECT IDENTIFIER ::= { ruijieDeviceMIBConformance 1 }
+ruijieDeviceMIBGroups      OBJECT IDENTIFIER ::= { ruijieDeviceMIBConformance 2 }
+
+
+-- compliance statements
+
+ruijieDeviceMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the Ruijie Device MIB"
+        MODULE  -- this module
+                MANDATORY-GROUPS { ruijieDeviceInfoMIBGroup,
+                                   ruijieModuleInfoMIBGroup
+                }
+                GROUP      ruijieOptionalDevInfoMIBGroup
+                DESCRIPTION
+                    "This group is optional for those system which support device priority,alias and macaddress 
+                    information"
+
+                GROUP   ruijieEntityChgDescGroup
+                DESCRIPTION
+                    "This group is mandatory only for those system which support entity
+                    change notification."
+
+                GROUP   ruijieDeviceMIBNotificationGroup
+                DESCRIPTION
+                    "This group is mandatory only for those system which support entity
+                    change notification."
+
+                GROUP   ruijieModuleTempStateGroup
+                DESCRIPTION
+                    "This group is mandatory when the system supports temperature state detection."
+
+                GROUP   ruijiePowerStateGroup
+                DESCRIPTION  
+                    "This group is mandatory when the system supports power state identification."
+
+                GROUP   ruijieFanStateGroup
+                DESCRIPTION  
+                    "This group is mandatory when the system supports fan state identification."
+
+                GROUP  ruijieTemperatureWarningDescGroup 
+                DESCRIPTION
+                    "This group is mandatory when the system supports temperature state notification."
+
+                GROUP   ruijieTemperatureWarningGroup
+                DESCRIPTION
+                    "This group is mandatory when the system supports temperature state notification."
+
+                GROUP   ruijieHolderInfoGroup
+                DESCRIPTION
+                    "This group is mandatory when the system supports holder info identification."
+
+                GROUP   ruijieComponentBoardGroup
+                DESCRIPTION
+                    "This group is mandatory when the system supports board information."
+
+                GROUP   ruijieComponentGroup
+                DESCRIPTION
+                    "This group is mandatory when the system supports component information."
+
+        ::= { ruijieDeviceMIBCompliances 1 }
+                
+-- units of conformance
+
+ruijieDeviceInfoMIBGroup OBJECT-GROUP
+        OBJECTS {
+            ruijieDeviceMaxNumber, 
+            ruijieDeviceInfoIndex,
+            ruijieDeviceInfoDescr,
+            ruijieDeviceInfoSlotNumber,
+            ruijieDevicePowerStatus
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing device information to a
+                Ruijie agent."
+        ::= { ruijieDeviceMIBGroups 1 } 
+
+ruijieOptionalDevInfoMIBGroup OBJECT-GROUP
+        OBJECTS {
+            ruijieDeviceMacAddress,
+            ruijieDevicePriority,
+            ruijieDeviceAlias,
+            ruijieDeviceSWVersion,
+            ruijieDeviceHWVersion,
+            ruijieDeviceSerialNumber,
+            ruijieDeviceOid,
+            ruijieDeviceProductionDate
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing optional device information to a
+                Ruijie agent."
+        ::= { ruijieDeviceMIBGroups 2 } 
+
+ruijieModuleInfoMIBGroup OBJECT-GROUP
+        OBJECTS {
+            ruijieSlotInfoDeviceIndex,
+            ruijieSlotInfoIndex,
+            ruijieSlotModuleInfoDescr,
+            ruijieSlotInfoPortNumber,
+            ruijieSlotInfoPortMaxNumber,
+            ruijieSlotInfoDesc, 
+            ruijieSlotConfigModuleInfoDescr,
+            ruijieSlotUserStatus,
+            ruijieSlotSoftwareStatus,
+            ruijieSlotSerialNumber,
+            ruijieSlotHWVersion,
+            slotSocID,
+            ruijieSlotServiceState,
+            ruijieSlotModuleProductionDate,
+            ruijieSlotSoftwareVersion
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing module information to a
+                Ruijie agent."
+        ::= { ruijieDeviceMIBGroups 3 }
+                               
+ruijieEntityChgDescGroup OBJECT-GROUP
+        OBJECTS {ruijieEntityStateChgDesc}
+        STATUS  current
+        DESCRIPTION
+                "Objects that providing a literal description of entity's change."
+        ::= { ruijieDeviceMIBGroups 4 }
+        
+ruijieDeviceMIBNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {ruijieEntityStatusChange}
+    STATUS        current
+    DESCRIPTION
+            "The collection of notifications which used to inform entity general status information"
+    ::= { ruijieDeviceMIBGroups 5}
+
+ruijieModuleTempStateGroup OBJECT-GROUP
+        OBJECTS {
+	     ruijieModuleTempStateDeviceIndex, 
+             ruijieModuleTempStateIndex,
+             ruijieModuleTempState
+		}
+        STATUS  current
+        DESCRIPTION
+                "Collection of information on temperature state."
+        ::= { ruijieDeviceMIBGroups 6 }             
+
+ruijiePowerStateGroup OBJECT-GROUP
+        OBJECTS {
+	     ruijiePowerStateDeviceIndex,
+             ruijiePowerStateIndex,
+             ruijiePowerState,
+             ruijiePowerStatePowerDescr
+		}
+        STATUS  current
+        DESCRIPTION
+                 "Collection of information on power state." 
+        ::= { ruijieDeviceMIBGroups 7 } 
+            
+ruijieFanStateGroup OBJECT-GROUP
+        OBJECTS {
+	     ruijieFanStateDeviceIndex,
+             ruijieFanStateIndex,
+             ruijieFanState,
+             ruijieFanStateFanDescr
+		}
+        STATUS  current
+        DESCRIPTION
+                 "Collection of information on fan state." 
+        ::= { ruijieDeviceMIBGroups 8 }   
+
+ruijieTemperatureWarningDescGroup OBJECT-GROUP
+        OBJECTS { ruijieTemperatureWarningDesc }
+        STATUS  current
+        DESCRIPTION
+                 "Collection of description on temperature change notification." 
+        ::= { ruijieDeviceMIBGroups 9 } 
+
+ruijieTemperatureWarningGroup NOTIFICATION-GROUP
+	NOTIFICATIONS { ruijieTemperatureWarning }
+	STATUS        current
+	DESCRIPTION
+             "Collection of temperature change notification." 
+    ::= { ruijieDeviceMIBGroups 10 }
+
+ruijieHolderInfoGroup OBJECT-GROUP
+        OBJECTS {
+            ruijieHolderNumber,
+            ruijieHolderState,
+            ruijieHolderType,
+            ruijieHolderName
+            }
+        STATUS current
+        DESCRIPTION
+            "Collection of information of holder."
+        ::= { ruijieDeviceMIBGroups 11 }
+        
+ruijieComponentBoardGroup OBJECT-GROUP
+        OBJECTS {
+            ruijieComponentSlotName,
+            ruijieComponentBoardName
+            }
+        STATUS current
+        DESCRIPTION
+            "The collection of information on the board."
+        ::= { ruijieDeviceMIBGroups 12 }
+
+ruijieComponentGroup OBJECT-GROUP
+        OBJECTS {
+            ruijieComponentTypeName,
+            ruijieComponentTypeCount
+            }
+        STATUS current
+        DESCRIPTION
+            "The collection of information on the component."
+        ::= { ruijieDeviceMIBGroups 13 }
+
+-- definitions in RFC 1213 made
+
+END
+

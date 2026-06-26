@@ -9,7 +9,7 @@
             <tr>
                 <th data-column-id="deviceid" data-visible="false" data-css-class="deviceid">No</th>
                 <th data-column-id="sysname" data-visible="false">Sysname</th>
-                <th data-column-id="vmwVmDisplayName">{{ __('Device') }}</th>
+                <th data-column-id="vmwVmDisplayName">{{ __('VM Name') }}</th>
                 <th data-column-id="vmwVmState">{{ __('Power Status') }}</th>
                 <th data-column-id="hostname">{{ __('Host') }}</th>
                 <th data-column-id="vmwVmGuestOS" data-searchable="false">{{ __('Operating System') }}</th>

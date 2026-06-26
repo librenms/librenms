@@ -12,7 +12,7 @@ $shoutcast = SnmpQuery::get($oid)->value();
 $servers = explode("\n", $shoutcast);
 
 $metrics = [];
-foreach ($servers as $item => $server) {
+foreach ($servers as $server) {
     $server = trim($server);
 
     if (! empty($server)) {

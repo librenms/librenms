@@ -1,9 +1,9 @@
 --  ==================================================================
--- Copyright (C) 2006 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI CCC Management MIB
 -- Reference:
--- Version:     V1.0
+-- Version:     V2.02
 -- History:
 --              V1.0 PanJun, 2006-05-11, publish
 -- ==================================================================
@@ -15,7 +15,7 @@
                 FROM HUAWEI-MIB         
             HWL2VpnVcEncapsType, HWEnableValue, HWL2VpnStateChangeReason            
                 FROM HUAWEI-VPLS-EXT-MIB            
-            InterfaceIndexOrZero,InterfaceIndex         
+            InterfaceIndexOrZero,InterfaceIndex, ifName         
                 FROM IF-MIB         
             OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP         
                 FROM SNMPv2-CONF            
@@ -27,24 +27,30 @@
     
     
         hwL2VpnCCC MODULE-IDENTITY 
-            LAST-UPDATED "200605110900Z"        -- May 11, 2006 at 09:00 GMT
+            LAST-UPDATED "201701230900Z"        -- Jan 23, 2017 at 09:00 GMT
             ORGANIZATION 
-                "Huawei Technologies Co., Ltd."
+                "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
-                "R&D BeiJing, Huawei Technologies co.,Ltd.
-                Huawei Bld.,NO.3 Xinxi Rd., 
-                Shang-Di Information Industry Base,
-                Hai-Dian District Beijing P.R. China
-                Zip:100085 
-                Http://www.huawei.com                                       
-                E-mail:support@huawei.com"
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
             DESCRIPTION 
                 "The HUAWEI-CCC-MIB contains objects to
                 manage KOMPELLA."
-            ::= { hwL2Vpn 3 }
-        
-    
-    
+
+           REVISION "201701230900Z" --Jan 23, 2017 at 09:00 GMT
+           DESCRIPTION
+           "ModifySINGLE CCC MIB Trap(hwSingleCCCVcDown, hwSingleCCCVcUp)."
+
+           REVISION "201701120900Z" --Jan 11, 2017 at 09:00 GMT
+           DESCRIPTION
+           "Add SINGLE CCC MIB Trap(hwSingleCCCVcDown, hwSingleCCCVcUp)."
+
+            ::= { hwL2Vpn 3 }   
 --
 -- Node definitions
 --
@@ -114,6 +120,10 @@
                     Unsigned32, 
                 hwCCCVcIpInterworking
                     HWEnableValue,
+                hwCCCVcRawOrTagged1
+                    INTEGER,
+                hwCCCVcRawOrTagged2
+                    INTEGER,
                 hwCCCVcRowStatus
                     RowStatus
             }
@@ -308,6 +318,34 @@
             ::= { hwCCCVcEntry 19 }
 
 
+        hwCCCVcRawOrTagged1 OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+            raw(1),
+            tagged(2),
+            rawTagNotConfiged(3)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies whether the VLAN tag of the VC entry is attached or stripped."
+            ::= { hwCCCVcEntry 20 }
+
+
+        hwCCCVcRawOrTagged2 OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+            raw(1),
+            tagged(2),
+            rawTagNotConfiged(3)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies whether the VLAN tag of the VC entry is attached or stripped."
+            ::= { hwCCCVcEntry 21 }
+
+
         hwCCCVcRowStatus OBJECT-TYPE
             SYNTAX RowStatus
             MAX-ACCESS read-create
@@ -403,8 +441,8 @@
             STATUS current
             DESCRIPTION
                 "This object indicates the enable sign of CCC
-                VC state change notification."
-            DEFVAL { disable }
+                VC state change notification. 
+                The default value is disable (2)."
             ::= { hwCCCMIBObjects 3 }
         
         hwCCCVcDeletedNotifEnable OBJECT-TYPE
@@ -413,8 +451,8 @@
             STATUS current
             DESCRIPTION
                 "This object indicates the enable sign of CCC
-                VC deletion notification."
-            DEFVAL { disable }
+                VC deletion notification. 
+                The default value is disable (2)."
             ::= { hwCCCMIBObjects 4 }
         
         hwCCCVcStateChangeReason OBJECT-TYPE
@@ -425,6 +463,56 @@
                 "This object indicates the reason of CCC VC
                 state change."
             ::= { hwCCCMIBObjects 5 }
+
+			
+--         
+-- The Single CCC's VC Table
+-- 
+        hwSingleCCCVcTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWSingleCCCVcEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is the CCC's configuration table. Users can 
+                create or delete the CCC by it."
+            ::= { hwCCCMIBObjects 6 }
+        
+        hwSingleCCCVcEntry  OBJECT-TYPE
+            SYNTAX HWSingleCCCVcEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of a CCC entry."
+                INDEX { hwSingleCCCVcIfIndex,hwSingleCCCVcOutIfIndex }
+            ::= { hwSingleCCCVcTable 1 }
+        
+        HWSingleCCCVcEntry ::=
+            SEQUENCE { 
+                hwSingleCCCVcIfIndex
+                    InterfaceIndexOrZero,
+                hwSingleCCCVcOutIfIndex
+                    InterfaceIndexOrZero
+            }
+
+        hwSingleCCCVcIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the AC ifIndex.
+                0 is invalid ifIndex."
+            ::= { hwSingleCCCVcEntry  1 }
+
+        hwSingleCCCVcOutIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the ifIndex of the out interface
+                in the side of PSN, or the ifIndex of the out interface
+                in the side of AC if the CCC is local cross.
+                0 is invalid ifIndex."
+            ::= { hwSingleCCCVcEntry  2 }
         
 --         
 -- CCC MIB Trap Definitions
@@ -432,14 +520,14 @@
         hwCCCMIBTraps OBJECT IDENTIFIER ::= { hwL2VpnCCC 2 }
         
         hwCCCVcDown NOTIFICATION-TYPE
-            OBJECTS { hwCCCVcIfIndex, hwCCCVcStateChangeReason }
+            OBJECTS { hwCCCVcIfIndex, hwCCCVcStateChangeReason, ifName }
             STATUS current
             DESCRIPTION 
                 "This notification indicates the VC's state changes to down."
             ::= { hwCCCMIBTraps 1 }
         
         hwCCCVcUp NOTIFICATION-TYPE
-            OBJECTS { hwCCCVcIfIndex, hwCCCVcStateChangeReason }
+            OBJECTS { hwCCCVcIfIndex, hwCCCVcStateChangeReason, ifName }
             STATUS current
             DESCRIPTION 
                 "This notification indicates the VC's state changes to up."
@@ -451,6 +539,20 @@
             DESCRIPTION 
                 "This notification indicates the VC is deleted."
             ::= { hwCCCMIBTraps 3 }
+
+        hwSingleCCCVcDown NOTIFICATION-TYPE
+            OBJECTS { hwSingleCCCVcIfIndex, hwSingleCCCVcOutIfIndex , hwCCCVcStateChangeReason, ifName, ifName }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the single VC's state changes to down."
+            ::= { hwCCCMIBTraps 4}
+        
+        hwSingleCCCVcUp NOTIFICATION-TYPE
+            OBJECTS {  hwSingleCCCVcIfIndex, hwSingleCCCVcOutIfIndex , hwCCCVcStateChangeReason, ifName , ifName }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the single VC's state changes to up."
+            ::= { hwCCCMIBTraps 5 }
         
 --  Conformance information
 -- 
@@ -474,7 +576,8 @@
         hwCCCVcGroup OBJECT-GROUP
             OBJECTS { hwCCCVcConnectionType, hwCCCVcEncapType, hwCCCVcIfIndex, hwCCCVcInboundlabel, hwCCCVcOutboundlabel, hwCCCVcOutIfIndex, 
                         hwCCCVcNextHop, hwCCCVcCtrlWord, hwCCCVcOperStatus, hwCCCVcUpStartTime, hwCCCVcUpSumTime, hwCCCVcMaxAtmCells, hwCCCVcAtmPackOvertime, 
-                        hwCCCVcPwJitterBufferDepth, hwCCCVcPwTdmEncapsulationNum, hwCCCVcPwIdleCode, hwCCCVcPwRtpHeader, hwCCCVcIpInterworking, hwCCCVcRowStatus }
+                        hwCCCVcPwJitterBufferDepth, hwCCCVcPwTdmEncapsulationNum, hwCCCVcPwIdleCode, hwCCCVcPwRtpHeader, hwCCCVcIpInterworking, hwCCCVcRawOrTagged1, 
+                        hwCCCVcRawOrTagged2, hwCCCVcRowStatus }
         STATUS current
         DESCRIPTION 
             "The CCC's VC group."
@@ -502,7 +605,7 @@
             ::= { hwCCCMIBGroups 4 }
         
         hwCCCNotificationGroup NOTIFICATION-GROUP
-            NOTIFICATIONS { hwCCCVcDown, hwCCCVcUp, hwCCCVcDeleted }
+            NOTIFICATIONS { hwCCCVcDown, hwCCCVcUp, hwCCCVcDeleted,  hwSingleCCCVcDown, hwSingleCCCVcUp }
             STATUS current
             DESCRIPTION 
                 "The CCC Notification group."
@@ -510,5 +613,3 @@
         
     
     END
-
-

@@ -23,34 +23,28 @@ ALCATEL-IND1-SAA-MIB DEFINITIONS ::= BEGIN
             Dot1agCfmMaintAssocName                   FROM IEEE8021-CFM-MIB;
 
          alcatelIND1SaaMIB MODULE-IDENTITY
-	    LAST-UPDATED "200907210000Z"     -- 07/21/2009 00:00GMT
-            ORGANIZATION "Alcatel - Architects Of An Internet World"
-            CONTACT-INFO
-                "Please consult with Customer Service to insure the most appropriate
-                 version of this document is used with the products in question:
+             LAST-UPDATED "201911270000Z"
+             ORGANIZATION "ALE USA Inc."
+             CONTACT-INFO
+              "Please consult with Customer Service to ensure the most appropriate
+               version of this document is used with the products in question:
 
-                        Alcatel Internetworking, Incorporated
-                       (Division 1, Formerly XYLAN Corporation)
-                               26801 West Agoura Road
-                            Agoura Hills, CA  91301-5122
-                              United States Of America
+                               ALE USA Inc. Enterprise
+                                 26801 West Agoura Road
+                              Agoura Hills, CA  91301-5122
+                                United States Of America
 
-                Telephone:           North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
+              Telephone:          +1 800 995 2696
 
-                Electronic Mail:         support@ind.alcatel.com
-                World Wide Web:          http://www.ind.alcatel.com
-                File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+              Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+              World Wide Web:     https://www.al-enterprise.com"
 
             DESCRIPTION
                 "This module describes an authoritative enterprise-
                 specific Simple Network Management Protocol (SNMP) Management
                 Information Base (MIB):
 
-                For the Birds Of Prey Product Line
+                For the OmniSwitch Product Line
                 Service Assurance agent.
 
 
@@ -65,11 +59,15 @@ ALCATEL-IND1-SAA-MIB DEFINITIONS ::= BEGIN
                 non-exclusive license to use this specification in connection with
                 management of the products for which it is intended to be used.
 
-                Copyright (C) 1995-2002 Alcatel Internetworking, Incorporated
-                             ALL RIGHTS RESERVED WORLDWIDE"
+                           Copyright (C) ALE USA Inc. 2014-2019
+                           Copyright (C) 1995-2013 Alcatel-Lucent
+                               ALL RIGHTS RESERVED WORLDWIDE"
+
+            REVISION      "201911270000Z"
+            DESCRIPTION
+                "Updated the latest contact and Copyright information for ALE USA Inc."
 
             REVISION      "200907210000Z"
-
             DESCRIPTION
                 "The mib for SAA module"
                 ::= { softentIND1Saa 1}
@@ -772,7 +770,7 @@ ALCATEL-IND1-SAA-MIB DEFINITIONS ::= BEGIN
         ::= { alaSaaIpResultsEntry 5 }
 
        alaSaaIpResultsRunResultReason  OBJECT-TYPE
-        SYNTAX      OCTET STRING
+        SYNTAX      OCTET STRING (SIZE(0..255))
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1135,7 +1133,7 @@ alaSaaEthoamCtrlPktData OBJECT-TYPE
 alaSaaEthoamCtrlVlanPriority OBJECT-TYPE
     SYNTAX      Integer32 (0..7)
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
        "Priority. 3 bit value to be used in the VLAN tag, if present
         in the transmitted frame.
@@ -1145,7 +1143,7 @@ alaSaaEthoamCtrlVlanPriority OBJECT-TYPE
 alaSaaEthoamCtrlDropEligible OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
        "Drop Enable bit value to be used in the VLAN tag, if present
         in the transmitted frame."
@@ -1375,7 +1373,7 @@ alaSaaEthoamResultsRunResult  OBJECT-TYPE
     ::= { alaSaaEthoamResultsEntry 5 }
 
 alaSaaEthoamResultsRunResultReason  OBJECT-TYPE
-    SYNTAX      OCTET STRING
+    SYNTAX      OCTET STRING (SIZE(0..255))
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -1648,7 +1646,7 @@ alaSaaEthoamHistoryPktJitter  OBJECT-TYPE
       alaSaaMacCtrlVlanPriority OBJECT-TYPE
           SYNTAX      Integer32 (0..7)
           MAX-ACCESS  read-create
-          STATUS      current
+          STATUS      obsolete
           DESCRIPTION
              "Priority. 3 bit value to be used in the VLAN tag, if present
               in the transmitted frame.
@@ -1683,7 +1681,7 @@ alaSaaEthoamHistoryPktJitter  OBJECT-TYPE
       alaSaaMacCtrlDropEligible OBJECT-TYPE
           SYNTAX      TruthValue 
           MAX-ACCESS  read-create
-          STATUS      current
+          STATUS      obsolete
           DESCRIPTION
              "Drop Enable bit value to be used in the VLAN tag, if present
               in the transmitted frame."
@@ -1951,7 +1949,7 @@ alaSaaEthoamHistoryPktJitter  OBJECT-TYPE
          ::= { alaSaaMacResultsEntry 5 }
      
      alaSaaMacResultsRunResultReason  OBJECT-TYPE
-         SYNTAX      OCTET STRING
+         SYNTAX      OCTET STRING (SIZE(0..255))
          MAX-ACCESS  read-only
          STATUS      current
          DESCRIPTION
@@ -2377,7 +2375,7 @@ alaSaaEthoamHistoryPktJitter  OBJECT-TYPE
     alaSaaSpbVlanPriority OBJECT-TYPE
         SYNTAX      Integer32 (0..7)
         MAX-ACCESS  read-write
-        STATUS      current
+        STATUS      obsolete
         DESCRIPTION
         "Priority. 3 bit value to be used in the VLAN tag, if present
             in the transmitted frame.
@@ -2388,7 +2386,7 @@ alaSaaEthoamHistoryPktJitter  OBJECT-TYPE
     alaSaaSpbDropEligible OBJECT-TYPE
         SYNTAX      TruthValue
         MAX-ACCESS  read-write
-        STATUS      current
+        STATUS      obsolete
         DESCRIPTION
         "Drop Enable bit value to be used in the VLAN tag, if present
             in the transmitted frame."
@@ -2457,7 +2455,23 @@ alaSaaEthoamHistoryPktJitter  OBJECT-TYPE
 	  DEFVAL { false }
         ::= { alaSaaSpbFeature 14 }
 
-    
+-- -------------------------------------------------------------
+-- SAA Jitter Calculation
+-- -------------------------------------------------------------
+      alaSaaJitterCalculationConfig OBJECT IDENTIFIER ::= { alcatelIND1SaaMIBObjects 16 }
+
+      alaSaaJitterCalculation OBJECT-TYPE
+        SYNTAX        INTEGER {
+                                 default(1),
+                                 enhanced(2)
+                                 }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+             "Configure Jitter Calculation mode as Enhanced. When not configured explicitly it is set to default."
+        DEFVAL { default }
+        ::= { alaSaaJitterCalculationConfig 1}
+
 -- -------------------------------------------------------------
 -- SAA Event Notification
 -- -------------------------------------------------------------
@@ -2590,7 +2604,7 @@ alcatelIND1SaaMIBCompliance MODULE-COMPLIANCE
           alaSaaCtrlConfigGroup,
           alaSaaIpCtrlConfigGroup,
           alaSaaIpResultsGroup,
-    	    alaSaaIpHistoryGroup,
+          alaSaaIpHistoryGroup,
           alaSaaEthoamCtrlConfigGroup,
           alaSaaEthoamResultsGroup,
           alaSaaEthoamHistoryGroup,
@@ -2600,7 +2614,8 @@ alcatelIND1SaaMIBCompliance MODULE-COMPLIANCE
           alaSaaMacResultsPortGroup,
           alaSaaXmlGroup,
           alaSaaSpbGroup,
-          alaSaaNotificationsGroup
+          alaSaaNotificationsGroup,
+          alaSaaJitterCalculationConfigGroup
         }
    ::= { alcatelIND1SaaMIBCompliances 1 }
 
@@ -2903,5 +2918,15 @@ alaSaaSpbGroup OBJECT-GROUP
    DESCRIPTION
         "Collection of objects for management of profile bindings."
    ::= { alcatelIND1SaaMIBGroups 14 }
+
+alaSaaJitterCalculationConfigGroup OBJECT-GROUP
+   OBJECTS
+   {
+        alaSaaJitterCalculation
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for management of jitter calculation."
+   ::= { alcatelIND1SaaMIBGroups 15 }
 
 END

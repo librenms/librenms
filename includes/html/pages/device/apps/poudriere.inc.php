@@ -33,7 +33,7 @@ echo ' | Sets: ';
 
 $index_int = 0;
 foreach ($app_data['sets'] as $index => $set_name) {
-    $set_name = htmlspecialchars($set_name);
+    $set_name = htmlspecialchars((string) $set_name);
     $label = (! isset($vars['poudriere_set']) || $vars['poudriere_set'] != $set_name)
         ? $set_name
         : '<span class="pagemenu-selected">' . $set_name . '</span>';
@@ -74,7 +74,7 @@ if (isset($vars['poudriere_page']) && $vars['poudriere_page'] == 'details') {
         $status_split_int = 1;
         while (isset($status_split[$status_split_int])) {
             $line = preg_replace("/^\s+/", '', $status_split[$status_split_int]);
-            $row = preg_split("/\s+/", $line, 14);
+            $row = preg_split("/\s+/", (string) $line, 14);
             if (isset($row[13])) {
                 $table['rows'][] = [
                     ['data' => $row[0]],
@@ -119,8 +119,8 @@ if (isset($vars['poudriere_page']) && $vars['poudriere_page'] == 'details') {
         $build_split_int = 0;
         while (isset($build_split[$build_split_int])) {
             $line = preg_replace("/^\s+/", '', $build_split[$build_split_int]);
-            if (preg_match('/\[.*\]\ +\[.*\]\ +\[.*\]/', $line)) {
-                $row = preg_split("/\s+/", $line, 14);
+            if (preg_match('/\[.*\]\ +\[.*\]\ +\[.*\]/', (string) $line)) {
+                $row = preg_split("/\s+/", (string) $line, 14);
                 if (isset($row[0])) {
                     $current_set = preg_replace("/[\[\]]/", '', $row[0]);
                 } else {
@@ -131,8 +131,8 @@ if (isset($vars['poudriere_page']) && $vars['poudriere_page'] == 'details') {
                 } else {
                     $current_build = '';
                 }
-            } elseif (preg_match('/^\[.*\]/', $line)) {
-                $line_split = preg_split("/[^\w\d\-\,\.\:\/\@\%]+/", $line, 14);
+            } elseif (preg_match('/^\[.*\]/', (string) $line)) {
+                $line_split = preg_split("/[^\w\d\-\,\.\:\/\@\%]+/", (string) $line, 14);
                 if (isset($line_split[9])) {
                     $tmp_fs = $line_split[7];
                     $cpu_perc = $line_split[8];
@@ -186,7 +186,7 @@ if (isset($vars['poudriere_page']) && $vars['poudriere_page'] == 'details') {
         $status_split_int = 1;
         while (isset($status_split[$status_split_int])) {
             $line = preg_replace("/^\s+/", '', $status_split[$status_split_int]);
-            $row = preg_split("/\s+/", $line, 14);
+            $row = preg_split("/\s+/", (string) $line, 14);
             if (isset($row[13])) {
                 $table['rows'][] = [
                     ['data' => $row[0]],

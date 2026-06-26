@@ -45,36 +45,32 @@ class NetSnmpQuery implements SnmpQueryInterface
 {
     private const DEFAULT_FLAGS = '-OQXUte';
 
-    /**
-     * @var array
-     */
-    private $cleanup = [
-        'command' => [
-            [
-                '/-c\' \'[\S]+\'/',
-                '/-u\' \'[\S]+\'/',
-                '/-U\' \'[\S]+\'/',
-                '/-A\' \'[\S]+\'/',
-                '/-X\' \'[\S]+\'/',
-                '/-P\' \'[\S]+\'/',
-                '/-H\' \'[\S]+\'/',
-                '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
-            ], [
-                '-c\' \'COMMUNITY\'',
-                '-u\' \'USER\'',
-                '-U\' \'USER\'',
-                '-A\' \'PASSWORD\'',
-                '-X\' \'PASSWORD\'',
-                '-P\' \'PASSWORD\'',
-                '-H\' \'HOSTNAME\'',
-                '\1:HOSTNAME:\3',
-            ],
-        ],
-        'output' => [
-            '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/',
-            '*',
-        ],
+    /** @var string[] */
+    private array $commandCleanupPatterns = [
+        '/-c\' \'[\S]+\'/',
+        '/-u\' \'[\S]+\'/',
+        '/-U\' \'[\S]+\'/',
+        '/-A\' \'[\S]+\'/',
+        '/-X\' \'[\S]+\'/',
+        '/-P\' \'[\S]+\'/',
+        '/-H\' \'[\S]+\'/',
+        '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
     ];
+
+    /** @var string[] */
+    private array $commandReplacementPatterns = [
+        '-c\' \'COMMUNITY\'',
+        '-u\' \'USER\'',
+        '-U\' \'USER\'',
+        '-A\' \'PASSWORD\'',
+        '-X\' \'PASSWORD\'',
+        '-P\' \'PASSWORD\'',
+        '-H\' \'HOSTNAME\'',
+        '\1:HOSTNAME:\3',
+    ];
+
+    private string $output_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
+    private string $output_replacement = '*';
 
     /**
      * @var string[]
@@ -112,23 +108,6 @@ class NetSnmpQuery implements SnmpQueryInterface
         return $this;
     }
 
-    /**
-     * Specify a device by a device array.
-     * The device will be fetched from the cache if it is loaded, otherwise, it will fill the array into a new Device
-     */
-    public function deviceArray(array $device): SnmpQueryInterface
-    {
-        if (isset($device['device_id']) && DeviceCache::has($device['device_id'])) {
-            $this->device = DeviceCache::get($device['device_id']);
-
-            return $this;
-        }
-
-        $this->device = new Device($device);
-
-        return $this;
-    }
-
     public function cache(): SnmpQueryInterface
     {
         $this->cache = true;
@@ -140,11 +119,11 @@ class NetSnmpQuery implements SnmpQueryInterface
      * Set a context for the snmp query
      * This is most commonly used to fetch alternate sets of data, such as different VRFs
      *
-     * @param  string|null  $context  Version 2/3 context name
+     * @param  string  $context  Version 2/3 context name
      * @param  string|null  $v3_prefix  Optional context prefix to prepend for Version 3 queries
      * @return SnmpQueryInterface
      */
-    public function context(?string $context, ?string $v3_prefix = null): SnmpQueryInterface
+    public function context(string $context, ?string $v3_prefix = null): SnmpQueryInterface
     {
         if ($context && $this->device->snmpver === 'v3') {
             $context = $v3_prefix . $context;
@@ -365,7 +344,7 @@ class NetSnmpQuery implements SnmpQueryInterface
             array_push($cmd, '-v3', '-l', $this->device->authlevel);
             array_push($cmd, '-n', $this->context);
 
-            switch (strtolower($this->device->authlevel)) {
+            switch (strtolower((string) $this->device->authlevel)) {
                 case 'authpriv':
                     array_push($cmd, '-x', $this->device->cryptoalgo);
                     array_push($cmd, '-X', $this->device->cryptopass);
@@ -506,9 +485,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         }
 
         // remove trailing /, remove empty dirs, and remove duplicates
-        $dirs = array_unique(array_filter(array_map(function ($dir) {
-            return rtrim($dir, '/');
-        }, $dirs)));
+        $dirs = array_unique(array_filter(array_map(fn ($dir) => rtrim((string) $dir, '/'), $dirs)));
 
         return implode(':', $dirs);
     }
@@ -528,7 +505,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     private function logCommand(string $command): void
     {
         if (Debug::isEnabled() && ! Debug::isVerbose()) {
-            $debug_command = preg_replace($this->cleanup['command'][0], $this->cleanup['command'][1], $command);
+            $debug_command = preg_replace($this->commandCleanupPatterns, $this->commandReplacementPatterns, $command);
             Log::debug('SNMP[%c' . $debug_command . '%n]', ['color' => true]);
         } elseif (Debug::isVerbose()) {
             Log::debug('SNMP[%c' . $command . '%n]', ['color' => true]);
@@ -538,7 +515,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     private function logOutput(string $output, string $error): void
     {
         if (Debug::isEnabled() && ! Debug::isVerbose()) {
-            Log::debug(preg_replace($this->cleanup['output'][0], $this->cleanup['output'][1], $output));
+            Log::debug(preg_replace($this->output_regex, $this->output_replacement, $output));
         } elseif (Debug::isVerbose()) {
             Log::debug($output);
         }

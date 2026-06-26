@@ -25,31 +25,14 @@
  * @subpackage Pages
  */
 
-switch ($vars['order'] ?? '') {
-    case 'vsz':
-        $order = '`vsz`';
-        break;
-
-    case 'rss':
-        $order = '`rss`';
-        break;
-
-    case 'cputime':
-        $order = '`cputime`';
-        break;
-
-    case 'user':
-        $order = '`user`';
-        break;
-
-    case 'command':
-        $order = '`command`';
-        break;
-
-    default:
-        $order = '`pid`';
-        break;
-}//end switch
+$order = match ($vars['order'] ?? '') {
+    'vsz' => '`vsz`',
+    'rss' => '`rss`',
+    'cputime' => '`cputime`',
+    'user' => '`user`',
+    'command' => '`command`',
+    default => '`pid`',
+}; //end switch
 
 if (isset($vars['by']) && $vars['by'] == 'desc') {
     $by = 'desc';
@@ -98,12 +81,12 @@ echo '</tr></thead><tbody>';
 
 foreach (dbFetchRows('SELECT * FROM `processes` WHERE `device_id` = ? ORDER BY ' . $order . ' ' . $by, [$device['device_id']]) as $entry) {
     echo '<tr>';
-    echo '<td>' . $entry['pid'] . '</td>';
+    echo '<td>' . e($entry['pid']) . '</td>';
     echo '<td>' . \LibreNMS\Util\Number::formatSi($entry['vsz'] * 1024, 2, 0, '') . '</td>';
     echo '<td>' . \LibreNMS\Util\Number::formatSi($entry['rss'] * 1024, 2, 0, '') . '</td>';
-    echo '<td>' . $entry['cputime'] . '</td>';
-    echo '<td>' . $entry['user'] . '</td>';
-    echo '<td>' . $entry['command'] . '</td>';
+    echo '<td>' . e($entry['cputime']) . '</td>';
+    echo '<td>' . e($entry['user']) . '</td>';
+    echo '<td>' . e($entry['command']) . '</td>';
     echo '</tr>';
 }
 

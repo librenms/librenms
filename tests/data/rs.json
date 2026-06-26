@@ -303,168 +303,144 @@
                 {
                     "state_name": "dvbSTActiveInput",
                     "state_descr": "Undefined",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "dvbSTActiveInput",
                     "state_descr": "Input 1",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dvbSTActiveInput",
                     "state_descr": "HierarchicalModulation",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dvbSTFault",
                     "state_descr": "Undefined",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "dvbSTFault",
                     "state_descr": "Fault",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "dvbSTFault",
                     "state_descr": "OK",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dvbSTInput1OK",
                     "state_descr": "Undefined",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "dvbSTInput1OK",
                     "state_descr": "Ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dvbSTInput1OK",
                     "state_descr": "No Signal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "dvbSTInput2OK",
                     "state_descr": "Undefined",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "dvbSTInput2OK",
                     "state_descr": "Ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dvbSTInput2OK",
                     "state_descr": "No Signal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "dvbSTLocalMode",
                     "state_descr": "Undefined",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "dvbSTLocalMode",
                     "state_descr": "Local",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dvbSTLocalMode",
                     "state_descr": "Remote",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dvbSTRFPresent",
                     "state_descr": "Undefined",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "dvbSTRFPresent",
                     "state_descr": "Present",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dvbSTRFPresent",
                     "state_descr": "Not Present",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "dvbSTTransmitterOpMode",
                     "state_descr": "Undefined",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "dvbSTTransmitterOpMode",
                     "state_descr": "ON",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dvbSTTransmitterOpMode",
                     "state_descr": "OFF",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "dvbSTWarning",
                     "state_descr": "Undefined",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "dvbSTWarning",
                     "state_descr": "Warning",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "dvbSTWarning",
                     "state_descr": "OK",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 }

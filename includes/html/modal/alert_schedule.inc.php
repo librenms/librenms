@@ -15,8 +15,7 @@
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\MaintenanceBehavior;
 
-if (\Auth::user()->hasGlobalAdmin()) {
-    $default_behavior = MaintenanceBehavior::tryFrom((int) LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior'));
+$default_behavior = MaintenanceBehavior::tryFrom((int) LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior'));
     ?>
 
 <div class="modal fade bs-example-modal-sm" id="schedule-maintenance" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
@@ -116,13 +115,13 @@ if (\Auth::user()->hasGlobalAdmin()) {
                         <label for='behavior' class='col-sm-4 control-label'>Behavior <exp>*</exp> </label>
                         <div class="col-sm-8">
                             <select id="behavior" name="behavior" class="form-control">
-                                <option value='<?= MaintenanceBehavior::SKIP_ALERTS->value; ?>' <?= $default_behavior === MaintenanceBehavior::SKIP_ALERTS ? 'selected' : '' ?>>
+                                <option value='<?= MaintenanceBehavior::SkipAlerts->value; ?>' <?= $default_behavior === MaintenanceBehavior::SkipAlerts ? 'selected' : '' ?>>
                                     <?= __('alerting.maintenance.behavior.options.skip_alerts') ?>
                                 </option>
-                                <option value='<?= MaintenanceBehavior::MUTE_ALERTS->value; ?>' <?= $default_behavior === MaintenanceBehavior::MUTE_ALERTS ? 'selected' : '' ?>>
+                                <option value='<?= MaintenanceBehavior::MuteAlerts->value; ?>' <?= $default_behavior === MaintenanceBehavior::MuteAlerts ? 'selected' : '' ?>>
                                     <?= __('alerting.maintenance.behavior.options.mute_alerts') ?>
                                 </option>
-                                <option value='<?= MaintenanceBehavior::RUN_ALERTS->value; ?>' <?= $default_behavior === MaintenanceBehavior::RUN_ALERTS ? 'selected' : '' ?>>
+                                <option value='<?= MaintenanceBehavior::RunAlerts->value; ?>' <?= $default_behavior === MaintenanceBehavior::RunAlerts ? 'selected' : '' ?>>
                                     <?= __('alerting.maintenance.behavior.options.run_alerts') ?>
                                 </option>
                             </select>
@@ -198,11 +197,7 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                 $('#notes').val(output['notes']);
                 $('#behavior').find('option[value="'+output['behavior']+'"]').prop('selected', true);
                 if (output['recurring'] == 0){
-                    var start = $('#start').data("DateTimePicker");
-                    if (output['start']) {
-                        start.minDate(moment(output['start']));
-                    }
-                    start.date(moment(output['start']));
+                    $('#start').data("DateTimePicker").date(moment(output['start']));
                     $('#end').data("DateTimePicker").date(moment(output['end']));
 
                     $('#norecurringgroup').show();
@@ -307,14 +302,8 @@ $("#maps").select2({
     width: '100%',
     placeholder: "Devices, Groups or Locations",
     ajax: {
-        url: 'ajax_list.php',
-        delay: 250,
-        data: function (params) {
-            return {
-                type: 'devices_groups_locations',
-                search: params.term
-            };
-        }
+        url: '<?php echo route('ajax.select.devices-groups-locations'); ?>',
+        delay: 150
     }
 });
 
@@ -433,5 +422,3 @@ $(function () {
 
 $("[name='recurring']").bootstrapSwitch();
 </script>
-    <?php
-}

@@ -33,6 +33,7 @@ use App\Models\User;
 use Cache;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Validations\Php;
 
@@ -53,7 +54,7 @@ class Checks
         /** @var User $user */
         $user = Auth::user();
 
-        if ($user->isAdmin()) {
+        if (Gate::allows('notification.update')) { // FIXME correct permission check?
             $notifications = Notification::isUnread($user)->where('severity', '>', Severity::Ok->value)->get();
             foreach ($notifications as $notification) {
                 toast()->warning($notification->title, "<a href='notifications/'>$notification->body</a>");
@@ -82,50 +83,6 @@ class Checks
             } elseif (! is_writable($temp_dir)) {
                 toast()->error("Temp Directory is not writable ($temp_dir).  Graphing may fail. <a href='" . url('validate') . "'>Validate your install</a>");
             }
-        }
-    }
-
-    /**
-     * Check the script is running as the right user (works before config is available)
-     */
-    public static function runningUser()
-    {
-        if (function_exists('posix_getpwuid') && posix_getpwuid(posix_geteuid())['name'] !== get_current_user()) {
-            if (get_current_user() == 'root') {
-                self::printMessage(
-                    'Error: lnms file is owned by root, it should be owned and ran by a non-privileged user.',
-                    null,
-                    true
-                );
-            }
-
-            self::printMessage(
-                'Error: You must run lnms as the user ' . get_current_user(),
-                null,
-                true
-            );
-        }
-    }
-
-    private static function printMessage($title, $content, $exit = false)
-    {
-        $content = (array) $content;
-
-        if (PHP_SAPI == 'cli') {
-            $format = "%s\n\n%s\n\n";
-            $message = implode(PHP_EOL, $content);
-        } else {
-            $format = "<h3 style='color: firebrick;'>%s</h3><p>%s</p>";
-            $message = '';
-            foreach ($content as $line) {
-                $message .= "<p style='margin:0.5em'>$line</p>\n";
-            }
-        }
-
-        printf($format, $title, $message);
-
-        if ($exit) {
-            exit(1);
         }
     }
 }

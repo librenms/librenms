@@ -3744,490 +3744,420 @@
                 {
                     "state_name": "autodisconnectService",
                     "state_descr": "Running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "autodisconnectService",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "autodisconnectService",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "debugValue",
                     "state_descr": "Emergency",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "debugValue",
                     "state_descr": "Alert",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "debugValue",
                     "state_descr": "Critical",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "debugValue",
                     "state_descr": "Error",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "debugValue",
                     "state_descr": "Warning",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "debugValue",
                     "state_descr": "Notice",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "debugValue",
                     "state_descr": "Informational",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "debugValue",
                     "state_descr": "Debug",
-                    "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dhcpServerService",
                     "state_descr": "Running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dhcpServerService",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "dhcpServerService",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dnsServerService",
                     "state_descr": "Running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dnsServerService",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "dnsServerService",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "highAvailabilityService",
                     "state_descr": "Running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "highAvailabilityService",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "highAvailabilityService",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "highAvailabilityStatus",
                     "state_descr": "Standalone",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "highAvailabilityStatus",
                     "state_descr": "Master",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "highAvailabilityStatus",
                     "state_descr": "Active",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "highAvailabilityStatus",
                     "state_descr": "Passive",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "highAvailabilityStatus",
                     "state_descr": "Fault",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ldapDirectoryService",
                     "state_descr": "Running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ldapDirectoryService",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ldapDirectoryService",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ldapReplicationManagerService",
                     "state_descr": "Running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ldapReplicationManagerService",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ldapReplicationManagerService",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pmsClientService",
                     "state_descr": "Running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pmsClientService",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "pmsClientService",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "portalService",
                     "state_descr": "Running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "portalService",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "portalService",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "printingServerService",
                     "state_descr": "Running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "printingServerService",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "printingServerService",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "radiusServerService",
                     "state_descr": "Running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "radiusServerService",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "radiusServerService",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "sambaService",
                     "state_descr": "Running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "sambaService",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "sambaService",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "sqlServerService",
                     "state_descr": "Running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "sqlServerService",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "sqlServerService",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "sshService",
                     "state_descr": "Running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "sshService",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "sshService",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "staticIpManagerService",
                     "state_descr": "Running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "staticIpManagerService",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "staticIpManagerService",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "syslogService",
                     "state_descr": "Running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "syslogService",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "syslogService",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "timeServerService",
                     "state_descr": "Running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "timeServerService",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "timeServerService",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "urlSnifferService",
                     "state_descr": "Running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "urlSnifferService",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "urlSnifferService",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "webProxyService",
                     "state_descr": "Running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "webProxyService",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "webProxyService",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "webServerService",
                     "state_descr": "Running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "webServerService",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "webServerService",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 }

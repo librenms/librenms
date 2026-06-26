@@ -10,7 +10,7 @@ if (is_numeric($vars['id'])) {
         $rrd_filename = Rrd::name($device['hostname'], ['vserver', $vserver['classmap_id']]);
 
         $title = generate_device_link($device);
-        $title .= ' :: Serverfarm :: ' . htmlentities($vserver['classmap_id']);
+        $title .= ' :: Serverfarm :: ' . htmlentities((string) $vserver['classmap_id']);
         $auth = true;
     }
 }

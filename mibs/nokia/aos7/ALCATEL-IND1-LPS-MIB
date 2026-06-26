@@ -6,7 +6,7 @@ IMPORTS
      NOTIFICATION-TYPE,
      MODULE-IDENTITY,
      IpAddress,
-     Integer32                FROM SNMPv2-SMI
+     Integer32, Unsigned32    FROM SNMPv2-SMI
      MacAddress,
      RowStatus                FROM SNMPv2-TC
      SnmpAdminString
@@ -21,33 +21,27 @@ IMPORTS
 
 
 alcatelIND1LearnedPortSecurityMIB MODULE-IDENTITY
-    LAST-UPDATED "201005130000Z"
-    ORGANIZATION "Alcatel-Lucent, Enterprise Solutions Division"
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc."
     CONTACT-INFO
      "Please consult with Customer Service to ensure the most appropriate
       version of this document is used with the products in question:
 
-                 Alcatel-Lucent, Enterprise Solutions Division
-                (Formerly Alcatel Internetworking, Incorporated)
+                      ALE USA Inc. Enterprise
                         26801 West Agoura Road
                      Agoura Hills, CA  91301-5122
                        United States Of America
 
-     Telephone:               North America  +1 800 995 2696
-                              Latin America  +1 877 919 9526
-                              Europe         +31 23 556 0100
-                              Asia           +65 394 7933
-                              All Other      +1 818 878 4507
+     Telephone:          +1 800 995 2696
 
-     Electronic Mail:         support@ind.alcatel.com
-     World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-     File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
 
      DESCRIPTION
        "This module describes an authoritative enterprise-specific Simple
         Network Management Protocol (SNMP) Management Information Base (MIB):
 
-        For the Birds Of Prey Product Line, this is the MIB module for
+        For the OmniSwitch Product Line, this is the MIB module for
         address learning mac addresses entity.
 
         The right to make changes in specification and other information
@@ -61,15 +55,19 @@ alcatelIND1LearnedPortSecurityMIB MODULE-IDENTITY
         non-exclusive license to use this specification in connection with
         management of the products for which it is intended to be used.
 
-                   Copyright (C) 1995-2007 Alcatel-Lucent
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
                        ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "201911270000Z"
+    DESCRIPTION
+        "Updated the latest contact and Copyright information for ALE USA Inc."
 
     REVISION      "201005130000Z"
     DESCRIPTION
         "Fixed the Notifications to use MIB Module OID.0 as Notifications root."
 
     REVISION      "200704030000Z"
-
     DESCRIPTION
         "The MIB module for Learned Port Security entity."
     ::= { softentIND1MacAddress 2 }
@@ -142,9 +140,9 @@ LearnedPortSecurityEntry ::=
   INTEGER,
  lpsMaxMacNum
   Integer32,
- lpsLoMacRange
+ lpsLoMacRange  -- deprecated
   MacAddress,
- lpsHiMacRange
+ lpsHiMacRange  -- deprecated
   MacAddress,
  lpsAdminStatus
   INTEGER,
@@ -159,7 +157,9 @@ LearnedPortSecurityEntry ::=
  lpsLearnTrapThreshold
   Integer32,
  lpsViolatingMac
-  MacAddress
+  MacAddress,
+ lpsPacketRelay
+  INTEGER
 }
 
 lpsViolationOption OBJECT-TYPE
@@ -187,20 +187,22 @@ lpsMaxMacNum OBJECT-TYPE
 lpsLoMacRange OBJECT-TYPE
     SYNTAX   MacAddress
     MAX-ACCESS   read-create
-    STATUS   current
+    STATUS   deprecated
     DESCRIPTION
     "The low end of Mac range which is allowed to be learned on LPS
-     port"
+     port.
+     Deprecated by lpsL2LowMacAddress."
     DEFVAL  { '000000000000'h }
     ::= { learnedPortSecurityEntry 3 }
 
 lpsHiMacRange OBJECT-TYPE
     SYNTAX   MacAddress
     MAX-ACCESS   read-create
-    STATUS   current
+    STATUS   deprecated
     DESCRIPTION
     "The high end of Mac range which is allowed to be learned on LPS
-     port"
+     port.
+     Deprecated by lpsL2HighMacAddress."
     DEFVAL  { 'ffffffffffff'h }
     ::= { learnedPortSecurityEntry 4 }
 
@@ -283,6 +285,18 @@ lpsViolatingMac OBJECT-TYPE
     DEFVAL  { '000000000000'H }
     ::= { learnedPortSecurityEntry 11 }
 
+lpsPacketRelay OBJECT-TYPE
+    SYNTAX   INTEGER {
+    enable (1),
+    disable (2)
+    }
+    MAX-ACCESS   read-create
+    STATUS   current
+    DESCRIPTION
+    "Enable/disable packet relay on a port-security port."
+    DEFVAL { disable }
+    ::= { learnedPortSecurityEntry 12 }
+
 -- Learned Port Security Global Group for configurable paramaters applying to the whole switch.
 
 learnedPortSecurityGlobalGroup OBJECT IDENTIFIER ::= {alcatelIND1LearnedPortSecurityMIBObjects 3 }
@@ -310,12 +324,12 @@ lpsLearningWindowTimeWithStaticConversion OBJECT-TYPE
     ::= { learnedPortSecurityGlobalGroup 2 }
 
 lpsConvertToStatic OBJECT-TYPE
-    SYNTAX  Integer32 (2147483647 | 1001..17000)
+    SYNTAX  Integer32 (0 | 2147483647 | 1001..17000)
     MAX-ACCESS   read-write
     STATUS   current
     DESCRIPTION
     "It converts the L2 addresses learned on the given port in IfIndex format from dynamic to static,
-     Value 2147483647 converts the L2 addresses learned for all ports."
+     Value 2147483647 converts the L2 addresses learned for all ports.Zero indicates no port in convert-to-static state."
     ::= { learnedPortSecurityGlobalGroup 3 }
 
 lpsLearningWindowNoAging OBJECT-TYPE
@@ -514,6 +528,693 @@ lpsAgL2MacAddressRowStatus OBJECT-TYPE
     "The RowStatus for this table."
     ::= { learnedPortSecurityAgL2MacAddressEntry 4 }
 
+-- Learned Port Security L2 Mac Range MIB Table
+
+learnedPortSecurityL2MacRangeTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF LearnedPortSecurityL2MacRangeEntry
+    MAX-ACCESS    not-accessible
+    STATUS   current
+    DESCRIPTION
+    "A table contains Learned Port Security L2 Mac Range addresses."
+    ::= { alcatelIND1LearnedPortSecurityMIBObjects 7}
+
+learnedPortSecurityL2MacRangeEntry  OBJECT-TYPE
+    SYNTAX   LearnedPortSecurityL2MacRangeEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+    "Definition of the Learned Port Security port security mac range table entries."
+    INDEX { ifIndex , lpsL2LowMacAddress}
+    ::= { learnedPortSecurityL2MacRangeTable 1 }
+
+LearnedPortSecurityL2MacRangeEntry ::=
+    SEQUENCE {
+      lpsL2LowMacAddress  MacAddress,
+      lpsL2HighMacAddress  MacAddress,
+      lpsL2MacRangeRowStatus  RowStatus
+}
+
+lpsL2LowMacAddress OBJECT-TYPE
+    SYNTAX   MacAddress
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+    "The Low MacAddress is configured by the user on the LPS port for validation."
+    ::= { learnedPortSecurityL2MacRangeEntry 1 }
+
+lpsL2HighMacAddress OBJECT-TYPE
+    SYNTAX   MacAddress
+    MAX-ACCESS   read-create
+    STATUS   current
+    DESCRIPTION
+    "The High MacAddress is configured by the user on the LPS port for validation."
+    ::= { learnedPortSecurityL2MacRangeEntry 2 }
+
+lpsL2MacRangeRowStatus OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS   read-create
+    STATUS   current
+    DESCRIPTION
+    "The RowStatus for this table."
+    ::= { learnedPortSecurityL2MacRangeEntry 3 }
+
+-- Learned Port Security support over services (service access port)
+
+learnedPortSecuritySAPTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF LearnedPortSecuritySAPEntry
+    MAX-ACCESS    not-accessible
+    STATUS   obsolete
+    DESCRIPTION
+    "A table contains Learned Port Security service access port."
+    ::= { alcatelIND1LearnedPortSecurityMIBObjects 8}
+
+learnedPortSecuritySAPEntry  OBJECT-TYPE
+    SYNTAX   LearnedPortSecuritySAPEntry
+    MAX-ACCESS   not-accessible
+    STATUS   obsolete
+    DESCRIPTION
+    "Definition of the Learned Port Security service access port table entries."
+    INDEX { lpsSAPEncapValue , lpsSAPPortId}
+    ::= { learnedPortSecuritySAPTable 1 }
+
+LearnedPortSecuritySAPEntry ::=
+    SEQUENCE {
+        lpsSAPPortId                    InterfaceIndex,
+        lpsSAPEncapValue                Unsigned32,
+        lpsSAPAdminStatus               INTEGER,
+        lpsSAPConvertToStatic           Integer32,
+        lpsSAPLearnTrapThreshold        Integer32,
+        lpsSAPMaxMacNum                 Integer32,
+        lpsSAPMaxFilteredMacNum         Integer32,
+        lpsSAPViolationRestrict         INTEGER,
+        lpsSAPViolationRecoveryMax      Integer32,
+        lpsSAPViolationRecoveryTime     Integer32,
+        lpsSAPRowStatus                 RowStatus,
+        lpsSAPViolationClear            INTEGER,
+        lpsSAPOperStatus                INTEGER,
+        lpsSAPViolatingMac              MacAddress
+}
+
+lpsSAPPortId OBJECT-TYPE
+    SYNTAX   InterfaceIndex
+    MAX-ACCESS   not-accessible
+    STATUS   obsolete
+    DESCRIPTION
+        "The ID of the access port where this SAP is defined."
+    ::= { learnedPortSecuritySAPEntry 1 }
+
+lpsSAPEncapValue OBJECT-TYPE
+    SYNTAX   Unsigned32
+    MAX-ACCESS   not-accessible
+    STATUS   obsolete
+    DESCRIPTION
+        "The value of the label used to identify this
+         SAP on the access port specified by sapPortId."
+    ::= { learnedPortSecuritySAPEntry 2 }
+
+lpsSAPAdminStatus OBJECT-TYPE
+    SYNTAX   INTEGER {
+        enabled (1),
+        disabled (2),
+        locked (3)
+    }
+    MAX-ACCESS   read-create
+    STATUS   obsolete
+    DESCRIPTION
+        "This object specifies the desired administrative state of
+         the Learned Port Security SAP feature."
+    DEFVAL { disabled }
+    ::= { learnedPortSecuritySAPEntry 3 }
+
+lpsSAPConvertToStatic OBJECT-TYPE
+    SYNTAX  Integer32 (0 | 2147483647 | 1001..17000)
+    MAX-ACCESS   read-create
+    STATUS   obsolete
+    DESCRIPTION
+        "It converts the L2 addresses learned on the given port in IfIndex format from dynamic to static,
+         Value 2147483647 converts the L2 addresses learned for all ports. Zero indicates no port in convert-to-static state."
+    ::= { learnedPortSecuritySAPEntry 4 }
+
+lpsSAPLearnTrapThreshold OBJECT-TYPE
+    SYNTAX   Integer32 (0 .. 1000)
+    MAX-ACCESS   read-create
+    STATUS   obsolete
+    DESCRIPTION
+        "When the number of bridged MACs learned goes over this value, a trap will
+         be generated for every additional MAC that is learned."
+    DEFVAL  {5}
+    ::= { learnedPortSecuritySAPEntry 5 }
+
+lpsSAPMaxMacNum OBJECT-TYPE
+    SYNTAX   Integer32 (1 .. 1000)
+    MAX-ACCESS   read-create
+    STATUS   obsolete
+    DESCRIPTION
+        "The maximum number of MAC addresses that the LPS SAP could learn."
+    DEFVAL  {1}
+    ::= { learnedPortSecuritySAPEntry 6 }
+
+lpsSAPMaxFilteredMacNum OBJECT-TYPE
+    SYNTAX   Integer32 (0 .. 100)
+    MAX-ACCESS   read-create
+    STATUS   obsolete
+    DESCRIPTION
+        "The maximum number of Filtered MAC addresses that the LPS SAP
+         could learn. The default is 5."
+    DEFVAL  {5}
+    ::= { learnedPortSecuritySAPEntry 7 }
+
+lpsSAPViolationRestrict OBJECT-TYPE
+    SYNTAX   INTEGER {
+        enable (1),
+        disable (2)
+    }
+    MAX-ACCESS   read-create
+    STATUS   obsolete
+    DESCRIPTION
+        "The handle option for LPS SAP violation restrict."
+    DEFVAL  {disable}
+    ::= { learnedPortSecuritySAPEntry 8 }
+
+lpsSAPViolationRecoveryMax OBJECT-TYPE
+    SYNTAX   Integer32 (-1..50)
+    MAX-ACCESS   read-create
+    STATUS   obsolete
+    DESCRIPTION
+        "SAP violation recovery maximum.
+         Value 0 means SAP recovery is disabled for any ports using this value.
+         Value -1 means SAP recovery will infinitely for any ports using this value."
+    DEFVAL  {10}
+    ::= { learnedPortSecuritySAPEntry 9 }
+
+lpsSAPViolationRecoveryTime OBJECT-TYPE
+    SYNTAX   Integer32 (30..600)
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "Time (in seconds) between SAP violation recovery for any ports using this value."
+    DEFVAL { 300 }
+    ::= { learnedPortSecuritySAPEntry 10 }
+
+lpsSAPRowStatus OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS   read-create
+    STATUS   obsolete
+    DESCRIPTION
+        "The RowStatus for this table."
+    ::= { learnedPortSecuritySAPEntry 14 }
+
+lpsSAPViolationClear OBJECT-TYPE
+    SYNTAX   INTEGER {
+        default (1),
+        clear (2)
+    }
+    MAX-ACCESS   read-create
+    STATUS   obsolete
+    DESCRIPTION
+        "The handle option for LPS SAP violation clear."
+    DEFVAL  {default}
+    ::= { learnedPortSecuritySAPEntry 15 }
+
+lpsSAPOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+    up(1),
+    down(2),
+    securityViolated(3),
+    locked(4)
+    }
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION
+      "This object identifies the current operational state of the
+       LPS SAP port."
+    ::= { learnedPortSecuritySAPEntry 16 }
+
+lpsSAPViolatingMac OBJECT-TYPE
+    SYNTAX   MacAddress
+    MAX-ACCESS   read-only
+    STATUS   obsolete
+    DESCRIPTION
+    "The MAC Address which cause the Violation on this Port.
+    This field is set when LPS SAP port is in Violated state,
+    it is cleared when Port comes out of violation"
+    DEFVAL  { '000000000000'H }
+    ::= { learnedPortSecuritySAPEntry 17 }
+
+-- Learned Port Security mac address support over services (service access port)
+
+learnedPortSecuritySAPMacAddressTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF LearnedPortSecuritySAPMacAddressEntry
+    MAX-ACCESS    not-accessible
+    STATUS   obsolete
+    DESCRIPTION
+    "A table contains Learned Port Security service access port mac addresses."
+    ::= { alcatelIND1LearnedPortSecurityMIBObjects 9}
+
+learnedPortSecuritySAPMacAddressEntry  OBJECT-TYPE
+    SYNTAX   LearnedPortSecuritySAPMacAddressEntry
+    MAX-ACCESS   not-accessible
+    STATUS   obsolete
+    DESCRIPTION
+    "Definition of the Learned Port Security service access port mac address table entries."
+    INDEX { lpsSAPEncapValue, lpsSAPPortId , lpsSAPL2LowMacAddress}
+    ::= { learnedPortSecuritySAPMacAddressTable 1 }
+
+LearnedPortSecuritySAPMacAddressEntry ::=
+    SEQUENCE {
+        lpsSAPL2LowMacAddress           MacAddress,     --obsolete
+        lpsSAPL2HighMacAddress          MacAddress,     --obsolete
+        lpsSAPMacAddressRowStatus       RowStatus,      --obsolete
+        lpsSAPL2MacAddressLearnType     INTEGER         --obsolete
+}
+
+lpsSAPL2LowMacAddress OBJECT-TYPE
+    SYNTAX   MacAddress
+    MAX-ACCESS   not-accessible
+    STATUS   obsolete
+    DESCRIPTION
+    "The Low MacAddress is configured by the user on the LPS SAP port for validation."
+    ::= { learnedPortSecuritySAPMacAddressEntry 1 }
+
+lpsSAPL2HighMacAddress OBJECT-TYPE
+    SYNTAX   MacAddress
+    MAX-ACCESS   read-create
+    STATUS   obsolete
+    DESCRIPTION
+    "The High MacAddress is configured by the user on the LPS SAP port for validation.
+     Value '00:00:00:00:00:00' means this table will be destroyed."
+    ::= { learnedPortSecuritySAPMacAddressEntry 2 }
+
+lpsSAPMacAddressRowStatus OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS   read-create
+    STATUS   obsolete
+    DESCRIPTION
+        "The RowStatus for this table."
+    ::= { learnedPortSecuritySAPMacAddressEntry 3 }
+
+lpsSAPL2MacAddressLearnType OBJECT-TYPE
+    SYNTAX   INTEGER {
+        configured (1),
+        dynamic (2),
+        filtered (3),
+        quarantined (4),
+        configuredFiltered (5),
+        pseudoStatic (6)
+    }
+    MAX-ACCESS   read-only
+    STATUS   obsolete
+    DESCRIPTION
+        "Learned port security SAP MAC address type."
+    ::= { learnedPortSecuritySAPMacAddressEntry 4 }
+
+
+-- Learned Port Security support over services (service access port)
+
+learnedSAPPortSecurityTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF LearnedSAPPortSecurityEntry
+    MAX-ACCESS    not-accessible
+    STATUS   current
+    DESCRIPTION
+    "A table contains Learned Port Security service access port."
+    ::= { alcatelIND1LearnedPortSecurityMIBObjects 11 }
+
+learnedSAPPortSecurityEntry  OBJECT-TYPE
+    SYNTAX   LearnedSAPPortSecurityEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+    "Definition of the Learned Port Security service access port table entries."
+    INDEX { learnedSAPPortId, learnedSAPEncapValue }
+    ::= { learnedSAPPortSecurityTable 1 }
+
+LearnedSAPPortSecurityEntry ::=
+    SEQUENCE {
+        learnedSAPPortId                    InterfaceIndex,
+        learnedSAPEncapValue                Unsigned32,
+        learnedSAPAdminStatus               INTEGER,
+        learnedSAPConvertToStatic           Integer32,
+        learnedSAPLearnTrapThreshold        Integer32,
+        learnedSAPMaxMacNum                 Integer32,
+        learnedSAPMaxFilteredMacNum         Integer32,
+        learnedSAPViolationRestrict         INTEGER,
+        learnedSAPViolationRecoveryMax      Integer32,
+        learnedSAPViolationRecoveryTime     Integer32,
+        learnedSAPRowStatus                 RowStatus,
+        learnedSAPViolationClear            INTEGER,
+        learnedSAPOperStatus                INTEGER,
+        learnedSAPViolatingMac              MacAddress
+}
+
+learnedSAPPortId OBJECT-TYPE
+    SYNTAX   InterfaceIndex
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+        "The ID of the access port where this SAP is defined."
+    ::= { learnedSAPPortSecurityEntry 1 }
+
+learnedSAPEncapValue OBJECT-TYPE
+    SYNTAX   Unsigned32
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+        "The value of the label used to identify this
+         SAP on the access port specified by sapPortId."
+    ::= { learnedSAPPortSecurityEntry 2 }
+
+learnedSAPAdminStatus OBJECT-TYPE
+    SYNTAX   INTEGER {
+        enabled (1),
+        disabled (2),
+        locked (3)
+    }
+    MAX-ACCESS   read-create
+    STATUS   current
+    DESCRIPTION
+        "This object specifies the desired administrative state of
+         the Learned Port Security SAP feature."
+    DEFVAL { disabled }
+    ::= { learnedSAPPortSecurityEntry 3 }
+
+learnedSAPConvertToStatic OBJECT-TYPE
+    SYNTAX  Integer32 (0 | 2147483647 | 1001..17000)
+    MAX-ACCESS   read-create
+    STATUS   current
+    DESCRIPTION
+        "It converts the L2 addresses learned on the given port in IfIndex format from dynamic to static,
+         Value 2147483647 converts the L2 addresses learned for all ports. Zero indicates no port in convert-to-static state."
+    ::= { learnedSAPPortSecurityEntry 4 }
+
+learnedSAPLearnTrapThreshold OBJECT-TYPE
+    SYNTAX   Integer32 (0 .. 1000)
+    MAX-ACCESS   read-create
+    STATUS   current
+    DESCRIPTION
+        "When the number of bridged MACs learned goes over this value, a trap will
+         be generated for every additional MAC that is learned."
+    DEFVAL  {5}
+    ::= { learnedSAPPortSecurityEntry 5 }
+
+learnedSAPMaxMacNum OBJECT-TYPE
+    SYNTAX   Integer32 (1 .. 1000)
+    MAX-ACCESS   read-create
+    STATUS   current
+    DESCRIPTION
+        "The maximum number of MAC addresses that the LPS SAP could learn."
+    DEFVAL  {1}
+    ::= { learnedSAPPortSecurityEntry 6 }
+
+learnedSAPMaxFilteredMacNum OBJECT-TYPE
+    SYNTAX   Integer32 (0 .. 100)
+    MAX-ACCESS   read-create
+    STATUS   current
+    DESCRIPTION
+        "The maximum number of Filtered MAC addresses that the LPS SAP
+         could learn. The default is 5."
+    DEFVAL  {5}
+    ::= { learnedSAPPortSecurityEntry 7 }
+
+learnedSAPViolationRestrict OBJECT-TYPE
+    SYNTAX   INTEGER {
+        enable (1),
+        disable (2)
+    }
+    MAX-ACCESS   read-create
+    STATUS   current
+    DESCRIPTION
+        "The handle option for LPS SAP violation restrict."
+    DEFVAL  {disable}
+    ::= { learnedSAPPortSecurityEntry 8 }
+
+learnedSAPViolationRecoveryMax OBJECT-TYPE
+    SYNTAX   Integer32 (-1..50)
+    MAX-ACCESS   read-create
+    STATUS   current
+    DESCRIPTION
+        "SAP violation recovery maximum.
+         Value 0 means SAP recovery is disabled for any ports using this value.
+         Value -1 means SAP recovery will infinitely for any ports using this value."
+    DEFVAL  {10}
+    ::= { learnedSAPPortSecurityEntry 9 }
+
+learnedSAPViolationRecoveryTime OBJECT-TYPE
+    SYNTAX   Integer32 (30..600)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Time (in seconds) between SAP violation recovery for any ports using this value."
+    DEFVAL { 300 }
+    ::= { learnedSAPPortSecurityEntry 10 }
+
+learnedSAPRowStatus OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS   read-create
+    STATUS   current
+    DESCRIPTION
+        "The RowStatus for this table."
+    ::= { learnedSAPPortSecurityEntry 14 }
+
+learnedSAPViolationClear OBJECT-TYPE
+    SYNTAX   INTEGER {
+        default (1),
+        clear (2)
+    }
+    MAX-ACCESS   read-create
+    STATUS   current
+    DESCRIPTION
+        "The handle option for LPS SAP violation clear."
+    DEFVAL  {default}
+    ::= { learnedSAPPortSecurityEntry 15 }
+
+learnedSAPOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+    up(1),
+    down(2),
+    securityViolated(3),
+    locked(4)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "This object identifies the current operational state of the
+       LPS SAP port."
+    ::= { learnedSAPPortSecurityEntry 16 }
+
+learnedSAPViolatingMac OBJECT-TYPE
+    SYNTAX   MacAddress
+    MAX-ACCESS   read-only
+    STATUS   current
+    DESCRIPTION
+    "The MAC Address which cause the Violation on this Port.
+    This field is set when LPS SAP port is in Violated state,
+    it is cleared when Port comes out of violation"
+    DEFVAL  { '000000000000'H }
+    ::= { learnedSAPPortSecurityEntry 17 }
+
+
+-- Learned Port Security mac range address support over services (service access port)
+
+learnedPortSecuritySAPMacRangeTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF LearnedPortSecuritySAPMacRangeEntry
+    MAX-ACCESS    not-accessible
+    STATUS   current
+    DESCRIPTION
+    "A table contains Learned Port Security service access port mac range addresses."
+    ::= { alcatelIND1LearnedPortSecurityMIBObjects 12}
+
+learnedPortSecuritySAPMacRangeEntry  OBJECT-TYPE
+    SYNTAX   LearnedPortSecuritySAPMacRangeEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+    "Definition of the Learned Port Security service access port mac range address table entries."
+    INDEX { learnedSAPPortId, learnedSAPEncapValue , lpsSAPLowMacRange}
+    ::= { learnedPortSecuritySAPMacRangeTable 1 }
+
+LearnedPortSecuritySAPMacRangeEntry ::=
+    SEQUENCE {
+        lpsSAPLowMacRange           MacAddress,
+        lpsSAPHighMacRange          MacAddress,
+        lpsSAPMacRangeRowStatus     RowStatus
+}
+
+lpsSAPLowMacRange OBJECT-TYPE
+    SYNTAX   MacAddress
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+    "The Low Mac Range Address is configured by the user on the LPS SAP port for validation."
+    ::= { learnedPortSecuritySAPMacRangeEntry 1 }
+
+lpsSAPHighMacRange OBJECT-TYPE
+    SYNTAX   MacAddress
+    MAX-ACCESS   read-create
+    STATUS   current
+    DESCRIPTION
+    "The High Mac Range Address is configured by the user on the LPS SAP port for validation.
+     Value '00:00:00:00:00:00' means this table will be destroyed."
+    ::= { learnedPortSecuritySAPMacRangeEntry 2 }
+
+lpsSAPMacRangeRowStatus OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS   read-create
+    STATUS   current
+    DESCRIPTION
+        "The RowStatus for this table."
+    ::= { learnedPortSecuritySAPMacRangeEntry 3 }
+
+-- Learned Port Security mac static address support over services (service access port)
+
+learnedPortSecuritySAPMacStaticTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF LearnedPortSecuritySAPMacStaticEntry
+    MAX-ACCESS    not-accessible
+    STATUS   current
+    DESCRIPTION
+    "A table contains Learned Port Security service access port mac static addresses."
+    ::= { alcatelIND1LearnedPortSecurityMIBObjects 13}
+
+learnedPortSecuritySAPMacStaticEntry  OBJECT-TYPE
+    SYNTAX   LearnedPortSecuritySAPMacStaticEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+    "Definition of the Learned Port Security service access port mac static address table entries."
+    INDEX { learnedSAPPortId, learnedSAPEncapValue , lpsSAPMacStatic}
+    ::= { learnedPortSecuritySAPMacStaticTable 1 }
+
+LearnedPortSecuritySAPMacStaticEntry ::=
+    SEQUENCE {
+        lpsSAPMacStatic               MacAddress,
+        lpsSAPMacStaticRowStatus      RowStatus,
+        lpsSAPMacStaticLearnType      INTEGER
+}
+
+lpsSAPMacStatic OBJECT-TYPE
+    SYNTAX   MacAddress
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+    "The Low Mac Static Address is configured by the user on the LPS SAP port for validation."
+    ::= { learnedPortSecuritySAPMacStaticEntry 1 }
+
+lpsSAPMacStaticRowStatus OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS   read-create
+    STATUS   current
+    DESCRIPTION
+        "The RowStatus for this table."
+    ::= { learnedPortSecuritySAPMacStaticEntry 2 }
+
+lpsSAPMacStaticLearnType OBJECT-TYPE
+    SYNTAX   INTEGER {
+        configured (1),
+        dynamic (2),
+        filtered (3),
+        quarantined (4),
+        configuredFiltered (5),
+        pseudoStatic (6)
+    }
+    MAX-ACCESS   read-only
+    STATUS   current
+    DESCRIPTION
+        "Learned port security SAP MAC static address type."
+    ::= { learnedPortSecuritySAPMacStaticEntry 3 }
+
+
+learnedPortSecurityPacketRelayProtocol OBJECT IDENTIFIER ::= {alcatelIND1LearnedPortSecurityMIBObjects 10 }
+
+lpsPacketRelayIcmpStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "Enable/disable packets with Icmp protocol as filter for packet relay."
+    DEFVAL { disable }
+    ::= { learnedPortSecurityPacketRelayProtocol 1 }
+
+lpsPacketRelayIgmpStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "Enable/disable packets with Igmp protocol as filter for packet relay."
+    DEFVAL { disable }
+    ::= { learnedPortSecurityPacketRelayProtocol 2 }
+
+lpsPacketRelayUdpStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "Enable/disable packets with UDP protocol as filter for packet relay."
+    DEFVAL { disable }
+    ::= { learnedPortSecurityPacketRelayProtocol 3 }
+
+lpsPacketRelaySourceUdpPortStart OBJECT-TYPE
+    SYNTAX  Integer32 (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "Source UDP port range start for packet relay feature."
+    ::= { learnedPortSecurityPacketRelayProtocol 4 }
+
+lpsPacketRelaySourceUdpPortEnd OBJECT-TYPE
+    SYNTAX  Integer32 (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "Source UDP port range end for packet relay feature."
+    ::= { learnedPortSecurityPacketRelayProtocol 5 }
+
+lpsPacketRelaySourceUdpStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "Enable/disable source UDP port range."
+    DEFVAL { disable }
+    ::= { learnedPortSecurityPacketRelayProtocol 6 }
+
+lpsPacketRelayDestinationUdpPortStart OBJECT-TYPE
+    SYNTAX  Integer32 (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "Destination UDP port range start for packet relay feature."
+    ::= { learnedPortSecurityPacketRelayProtocol 7 }
+
+lpsPacketRelayDestinationUdpPortEnd OBJECT-TYPE
+    SYNTAX  Integer32 (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "Destination UDP port range end for packet relay feature."
+    ::= { learnedPortSecurityPacketRelayProtocol 8 }
+
+lpsPacketRelayDestinationUdpStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "Enable/disable destination UDP port range."
+    DEFVAL { disable }
+    ::= { learnedPortSecurityPacketRelayProtocol 9 }
 
 --
 -- LPS Traps
@@ -679,7 +1380,11 @@ alcatelIND1LearnedPortSecurityMIBCompliance MODULE-COMPLIANCE
             learnedPortSecurityGroup,
             learnedPortSecurityGlobGroup,
             learnedPortSecurityTrapsGroup,
-            learnedPortSecurityTrapsObjGroup
+            learnedPortSecurityTrapsObjGroup,
+            learnedPortSecurityL2MacRangeGroup,
+            learnedPortSecuritySAPGroup,
+            learnedPortSecuritySAPMacAddressGroup,
+            learnedPortSecurityPacketRelayProtocolGroup
         }
     ::= { alcatelIND1LearnedPortSecurityMIBCompliances 1 }
 
@@ -701,7 +1406,8 @@ learnedPortSecurityGroup OBJECT-GROUP
       lpsRelease,
       lpsMaxFilteredMacNum,
       lpsLearnTrapThreshold,
-      lpsViolatingMac
+      lpsViolatingMac,
+      lpsPacketRelay
    }
    STATUS  current
    DESCRIPTION
@@ -780,5 +1486,85 @@ learnedPortSecurityNotificationGroup NOTIFICATION-GROUP
    DESCRIPTION
         "Collection of notifications for LPS."
    ::= { alcatelIND1LearnedPortSecurityMIBGroups 7 }
+
+learnedPortSecurityL2MacRangeGroup OBJECT-GROUP
+   OBJECTS
+   {
+      lpsL2HighMacAddress,
+      lpsL2MacRangeRowStatus
+
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for learned port security L2MacRange table."
+   ::= { alcatelIND1LearnedPortSecurityMIBGroups 8 }
+
+learnedPortSecuritySAPGroup OBJECT-GROUP
+   OBJECTS
+   {
+        lpsSAPAdminStatus,            --obsolete
+        lpsSAPConvertToStatic,        --obsolete
+        lpsSAPLearnTrapThreshold,     --obsolete
+        lpsSAPMaxMacNum,              --obsolete
+        lpsSAPMaxFilteredMacNum,      --obsolete
+        lpsSAPViolationRestrict,      --obsolete
+        lpsSAPViolationRecoveryMax,   --obsolete
+        lpsSAPViolationRecoveryTime,  --obsolete
+        lpsSAPRowStatus,              --obsolete
+        lpsSAPViolationClear,         --obsolete
+        lpsSAPOperStatus,             --obsolete
+        lpsSAPViolatingMac,
+        learnedSAPAdminStatus,
+        learnedSAPConvertToStatic,
+        learnedSAPLearnTrapThreshold,
+        learnedSAPMaxMacNum,
+        learnedSAPMaxFilteredMacNum,
+        learnedSAPViolationRestrict,
+        learnedSAPViolationRecoveryMax,
+        learnedSAPViolationRecoveryTime,
+        learnedSAPRowStatus,
+        learnedSAPViolationClear,
+        learnedSAPOperStatus,
+        learnedSAPViolatingMac
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for learned port security SAP table."
+   ::= { alcatelIND1LearnedPortSecurityMIBGroups 9 }
+
+learnedPortSecuritySAPMacAddressGroup OBJECT-GROUP
+   OBJECTS
+   {
+        lpsSAPL2HighMacAddress,         --obsolete
+        lpsSAPMacAddressRowStatus,      --obsolete
+        lpsSAPL2MacAddressLearnType,    --obsolete
+        lpsSAPHighMacRange,
+        lpsSAPMacRangeRowStatus,
+        lpsSAPMacStaticRowStatus,
+        lpsSAPMacStaticLearnType
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for learned port security SAP mac address table."
+   ::= { alcatelIND1LearnedPortSecurityMIBGroups 10 }
+
+learnedPortSecurityPacketRelayProtocolGroup OBJECT-GROUP
+   OBJECTS
+   {
+        lpsPacketRelayIcmpStatus,
+        lpsPacketRelayIgmpStatus,
+        lpsPacketRelayUdpStatus,
+        lpsPacketRelaySourceUdpPortStart,
+        lpsPacketRelaySourceUdpPortEnd,
+        lpsPacketRelaySourceUdpStatus,
+        lpsPacketRelayDestinationUdpPortStart,
+        lpsPacketRelayDestinationUdpPortEnd,
+        lpsPacketRelayDestinationUdpStatus
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for learned port security packet relay protocol table."
+   ::= { alcatelIND1LearnedPortSecurityMIBGroups 11 }
+
 
 END

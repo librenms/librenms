@@ -11848,126 +11848,108 @@
                 {
                     "state_name": "cHsrpGrpTable",
                     "state_descr": "initial",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cHsrpGrpTable",
                     "state_descr": "learn",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cHsrpGrpTable",
                     "state_descr": "listen",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cHsrpGrpTable",
                     "state_descr": "speak",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cHsrpGrpTable",
                     "state_descr": "standby",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cHsrpGrpTable",
                     "state_descr": "active",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ciscoEnvMonFanState",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ciscoEnvMonFanState",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ciscoEnvMonFanState",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ciscoEnvMonFanState",
                     "state_descr": "shutdown",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ciscoEnvMonFanState",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ciscoEnvMonFanState",
                     "state_descr": "notFunctioning",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ciscoEnvMonSupplyState",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ciscoEnvMonSupplyState",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ciscoEnvMonSupplyState",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ciscoEnvMonSupplyState",
                     "state_descr": "shutdown",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ciscoEnvMonSupplyState",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ciscoEnvMonSupplyState",
                     "state_descr": "notFunctioning",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
                 }
@@ -12006,143 +11988,179 @@
                     "vlan_domain": 1,
                     "vlan_name": "default",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0002",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0003",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 10,
                     "vlan_domain": 1,
                     "vlan_name": "DC-A-Private",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 11,
                     "vlan_domain": 1,
                     "vlan_name": "1-A-Private",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 12,
                     "vlan_domain": 1,
                     "vlan_name": "2-A-Private",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 20,
                     "vlan_domain": 1,
                     "vlan_name": "DC-A-Open",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 21,
                     "vlan_domain": 1,
                     "vlan_name": "1-A-Open",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 22,
                     "vlan_domain": 1,
                     "vlan_name": "2-A-Open",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 30,
                     "vlan_domain": 1,
                     "vlan_name": "DC-B-Private",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 31,
                     "vlan_domain": 1,
                     "vlan_name": "1-B-Private",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 32,
                     "vlan_domain": 1,
                     "vlan_name": "2-B-Private",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 40,
                     "vlan_domain": 1,
                     "vlan_name": "DC-B-Open",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 41,
                     "vlan_domain": 1,
                     "vlan_name": "1-B-Open",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 42,
                     "vlan_domain": 1,
                     "vlan_name": "2-B-Open",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 178,
                     "vlan_domain": 1,
                     "vlan_name": "LAN-Thuis",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
-                },
-                {
-                    "vlan_vlan": 1002,
-                    "vlan_domain": 1,
-                    "vlan_name": "fddi-default",
-                    "vlan_type": "fddi",
-                    "vlan_mtu": null
-                },
-                {
-                    "vlan_vlan": 1003,
-                    "vlan_domain": 1,
-                    "vlan_name": "token-ring-default",
-                    "vlan_type": "tokenRing",
-                    "vlan_mtu": null
-                },
-                {
-                    "vlan_vlan": 1004,
-                    "vlan_domain": 1,
-                    "vlan_name": "fddinet-default",
-                    "vlan_type": "fddiNet",
-                    "vlan_mtu": null
-                },
-                {
-                    "vlan_vlan": 1005,
-                    "vlan_domain": 1,
-                    "vlan_name": "trnet-default",
-                    "vlan_type": "trNet",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 }
             ],
             "ports_vlans": [
+                {
+                    "vlan": 1,
+                    "baseport": 0,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 0,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 0,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 0,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 0,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 0,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 0,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 0,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
                 {
                     "vlan": 1,
                     "baseport": 1,
@@ -12161,26 +12179,10 @@
                 },
                 {
                     "vlan": 1,
-                    "baseport": 3,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
                     "baseport": 4,
                     "priority": 0,
                     "state": "forwarding",
                     "cost": 19,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 5,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
                     "untagged": 1
                 },
                 {
@@ -12289,23 +12291,7 @@
                 },
                 {
                     "vlan": 1,
-                    "baseport": 19,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
                     "baseport": 20,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 21,
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
@@ -12393,23 +12379,7 @@
                 },
                 {
                     "vlan": 1,
-                    "baseport": 33,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
                     "baseport": 34,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 35,
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
@@ -12521,23 +12491,7 @@
                 },
                 {
                     "vlan": 1,
-                    "baseport": 49,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
                     "baseport": 50,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 51,
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
@@ -12553,183 +12507,15 @@
                 },
                 {
                     "vlan": 2,
-                    "baseport": 52,
+                    "baseport": 0,
                     "priority": 0,
-                    "state": "forwarding",
-                    "cost": 19,
+                    "state": "unknown",
+                    "cost": 0,
                     "untagged": 1
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 35,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 11,
-                    "baseport": 35,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 11,
-                    "baseport": 49,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 12,
-                    "baseport": 35,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 12,
-                    "baseport": 51,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 20,
-                    "baseport": 21,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 21,
-                    "baseport": 21,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 21,
-                    "baseport": 49,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 22,
-                    "baseport": 21,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 22,
-                    "baseport": 51,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 30,
-                    "baseport": 33,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 31,
-                    "baseport": 5,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 31,
-                    "baseport": 33,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 32,
-                    "baseport": 3,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 32,
-                    "baseport": 33,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 40,
-                    "baseport": 19,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 41,
-                    "baseport": 5,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 41,
-                    "baseport": 19,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 42,
-                    "baseport": 3,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 42,
-                    "baseport": 19,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
                     "vlan": 178,
-                    "baseport": 21,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 178,
-                    "baseport": 29,
+                    "baseport": 0,
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
@@ -12758,6 +12544,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12777,6 +12564,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12796,6 +12584,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12815,6 +12604,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12834,6 +12624,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12853,6 +12644,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12872,6 +12664,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12891,6 +12684,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12910,6 +12704,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12929,6 +12724,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12948,6 +12744,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12967,6 +12764,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12986,6 +12784,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13005,6 +12804,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13024,6 +12824,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13043,6 +12844,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13062,6 +12864,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13081,6 +12884,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13100,6 +12904,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13119,6 +12924,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13138,6 +12944,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13157,6 +12964,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13176,6 +12984,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13195,6 +13004,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13214,6 +13024,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13233,6 +13044,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13252,6 +13064,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13271,6 +13084,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13290,6 +13104,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13309,6 +13124,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13328,6 +13144,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13347,6 +13164,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13366,6 +13184,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13385,6 +13204,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13404,6 +13224,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13423,6 +13244,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13442,6 +13264,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13461,6 +13284,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13480,6 +13304,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13499,6 +13324,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13518,6 +13344,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13537,6 +13364,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13556,6 +13384,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13575,6 +13404,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13594,6 +13424,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13613,6 +13444,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13632,6 +13464,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13651,6 +13484,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13670,6 +13504,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13689,6 +13524,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13708,6 +13544,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13727,6 +13564,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13746,6 +13584,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13765,6 +13604,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13784,6 +13624,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13803,6 +13644,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13822,6 +13664,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]
@@ -13837,7 +13680,8 @@
                     "ifStackStatus": "active"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ipv4-addresses": {
         "discovery": {

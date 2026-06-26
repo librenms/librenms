@@ -24,7 +24,7 @@ if (isset($vars['sub_state_type'])) {
     // displaying ALL of the service type's sub states.
     foreach ($systemd_mapper as $flattened_type => $state_statuses) {
         // Ternary-depth systemd type check.
-        if (! preg_match('/^(.+)_(.+)$/', $flattened_type, $regex_matches)) {
+        if (! preg_match('/^(.+)_(.+)$/', (string) $flattened_type, $regex_matches)) {
             continue;
         }
         if ($regex_matches[1] !== $state_type) {

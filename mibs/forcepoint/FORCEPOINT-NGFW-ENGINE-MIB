@@ -16,10 +16,16 @@ IMPORTS
         FROM HCNUM-TC;
 
 forcepointNGFWEngineMib MODULE-IDENTITY
-	LAST-UPDATED	"202112110000Z"
+	LAST-UPDATED	"202409060000Z"
 	ORGANIZATION	"Forcepoint LLC"
 	CONTACT-INFO	"email: mib.stonesoft@forcepoint.com"
 	DESCRIPTION	"Top level enterprise MIB for Forcepoint NGFW"
+	REVISION	"202409060000Z"
+	DESCRIPTION	"Added fwInspectionPercentageUsed"
+	REVISION	"202409020000Z"
+	DESCRIPTION	"Added fwInspectionBytesUsed"
+	REVISION	"202403280000Z"
+	DESCRIPTION	"Added fwIfStatsProcTable"
 	REVISION	"202112110000Z"
 	DESCRIPTION	"First public revision"
 	::= { enterprises 47565 1 1 }
@@ -1005,6 +1011,22 @@ fwMemBytesAvailable OBJECT-TYPE
               DESCRIPTION "Amount of memory available"
               ::= { fwMemoryInfo 10 }
 
+fwInspectionBytesUsed OBJECT-TYPE
+              SYNTAX      CounterBasedGauge64
+              UNITS       "bytes"
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION "Amount of inspection memory being used"
+              ::= { fwMemoryInfo 11 }
+
+fwInspectionPercentageUsed OBJECT-TYPE
+              SYNTAX      Unsigned32 (0..100)
+              UNITS       "percent"
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION "Amount of inspection memory being used as a percentage of memory given to inspection"
+              ::= { fwMemoryInfo 12 }
+
 -- disk(s) statistics
 
 fwDiskStatsTable  OBJECT-TYPE
@@ -1386,7 +1408,8 @@ firewallMbrInterfaceGroup   OBJECT-GROUP
 firewallPerformanceGroup OBJECT-GROUP
       OBJECTS   { fwCpuNice, fwCpuIdle, fwCpuIoWait, fwSwapBytesUsed,
                   fwSwapBytesUnused, fwMemBytesUsed, fwMemBytesUnused,
-                  fwMemBytesCached, fwMemBytesAvailable,
+                  fwMemBytesCached, fwMemBytesAvailable, fwInspectionBytesUsed,
+                  fwInspectionPercentageUsed,
                   fwMemBytesSReclaimable, fwPartitionUsed, fwPartitionAvail,
                   fwNewConnectionsS, fwDiscardedConnectionsS,
                   fwRefusedConnectionsS}
@@ -1486,6 +1509,23 @@ nodeHwmonGroup		OBJECT-GROUP
 		 hardware monitoring events in the node"
 	::= { engineGroups 17 }
 
+firewallIfaceStatsProcGroup  OBJECT-GROUP
+      OBJECTS { fwIfProcName,
+                fwIfProcReceivedBytes, fwIfProcReceivedPackets,
+                fwIfProcReceivedErrs, fwIfProcReceivedDrop,
+                fwIfProcReceivedFifo, fwIfProcReceivedFrame,
+                fwIfProcReceivedCompressed, fwIfProcReceivedMulticast,
+                fwIfProcTransmitBytes, fwIfProcTransmitPackets,
+                fwIfProcTransmitErrs, fwIfProcTransmitDrop,
+                fwIfProcTransmitFifo, fwIfProcTransmitColls,
+                fwIfProcTransmitCarrier, fwIfProcTransmitCompressed
+                }
+      STATUS current
+      DESCRIPTION
+          "A collection of objects giving information about the
+           current firewall interface related traffic statistics"
+      ::= { engineGroups 19 }
+
 -- Virtual Engine Information
 
 fwVETable     OBJECT-TYPE
@@ -1550,6 +1590,246 @@ engineVEGroup OBJECT-GROUP
               "A collection of objects giving information about
                Virtual Engines in the Engine"
               ::= { engineGroups 18 }
+
+-- interface stats from proc
+
+fwIfStatsProcTable  OBJECT-TYPE
+              SYNTAX        SEQUENCE OF FwIfStatsProcEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                  "This table contains an entry for each
+                   interface in system"
+              ::= { engineObjects 22 }
+
+-- Statistics
+
+fwIfStatsProcEntry OBJECT-TYPE
+              SYNTAX        FwIfStatsProcEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION   "Row for an interface"
+              INDEX         { fwIfStatsProcIndex }
+              ::= { fwIfStatsProcTable 1 }
+
+FwIfStatsProcEntry ::=
+    SEQUENCE {
+            fwIfStatsProcIndex        INTEGER,
+            fwIfProcName                DisplayString,
+            fwIfProcReceivedBytes       Counter64,
+            fwIfProcReceivedPackets     Counter64,
+            fwIfProcReceivedErrs        Counter64,
+            fwIfProcReceivedDrop        Counter64,
+            fwIfProcReceivedFifo        Counter64,
+            fwIfProcReceivedFrame       Counter64,
+            fwIfProcReceivedCompressed  Counter64,
+            fwIfProcReceivedMulticast   Counter64,
+            fwIfProcTransmitBytes       Counter64,
+            fwIfProcTransmitPackets     Counter64,
+            fwIfProcTransmitErrs        Counter64,
+            fwIfProcTransmitDrop        Counter64,
+            fwIfProcTransmitFifo        Counter64,
+            fwIfProcTransmitColls       Counter64,
+            fwIfProcTransmitCarrier     Counter64,
+            fwIfProcTransmitCompressed  Counter64
+            }
+
+fwIfStatsProcIndex OBJECT-TYPE
+              SYNTAX        Integer32(1..2147483647)
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                "A unique value, greater than zero, for each interface or
+                 interface sub-layer in the managed system."
+              ::= { fwIfStatsProcEntry 1 }
+
+fwIfProcName	OBJECT-TYPE
+              SYNTAX        DisplayString
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Name of interface."
+              ::= { fwIfStatsProcEntry 2 }
+
+fwIfProcReceivedBytes OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of good received bytes, corresponding to rx_packets.
+                   For IEEE 802.3 devices should count the length of Ethernet
+                   Frames excluding the FCS."
+              ::= { fwIfStatsProcEntry 3 }
+
+fwIfProcReceivedPackets OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of good packets received by the interface.
+                   For hardware interfaces counts all good packets received from
+                   the device by the host, including packets which host had to
+                   drop at various stages of processing (even in the driver)."
+              ::= { fwIfStatsProcEntry 4 }
+
+fwIfProcReceivedErrs OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Total number of bad packets received on this network device.
+                   This counter must include events counted by rx_length_errors,
+                   rx_crc_errors, rx_frame_errors and other errors not otherwise
+                   counted."
+              ::= { fwIfStatsProcEntry 5 }
+
+fwIfProcReceivedDrop OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of packets received but not processed,
+                   e.g. due to lack of resources or unsupported protocol.
+                   For hardware interfaces this counter may include packets
+                   discarded due to L2 address filtering but should not include
+                   packets dropped by the device due to buffer exhaustion which
+                   are counted separately in rx_missed_errors (since procfs
+                   folds those two counters together)."
+              ::= { fwIfStatsProcEntry 6 }
+
+fwIfProcReceivedFifo OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Historically the count of overflow events. Those events may be
+                   reported in the receive descriptors or via interrupts, and may
+                   not correspond one-to-one with dropped packets.
+                   This statistics was used interchangeably with rx_over_errors.
+                   Not recommended for use in drivers for high speed interfaces.
+                   This statistic is used on software devices, e.g. to count
+                   software packet queue overflow (can) or sequencing errors
+                   (GRE)."
+              ::= { fwIfStatsProcEntry 7 }
+
+fwIfProcReceivedFrame	OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Receiver frame alignment errors.
+                   Part of aggregate frame errors in /proc/net/dev.
+                   For IEEE 802.3 devices this counter should be equivalent to:
+                   - 30.3.1.1.7 aAlignmentErrors"
+              ::= { fwIfStatsProcEntry 8 }
+
+fwIfProcReceivedCompressed	OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of correctly received compressed packets.
+                   This counters is only meaningful for interfaces which support
+                   packet compression (e.g. CSLIP, PPP)."
+              ::= { fwIfStatsProcEntry 9 }
+
+fwIfProcReceivedMulticast	OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Multicast packets received.
+                   For hardware interfaces this statistic is commonly calculated
+                   at the device level (unlike rx_packets) and therefore may
+                   include packets which did not reach the host.
+                   For IEEE 802.3 devices this counter may be equivalent to:
+                   - 30.3.1.1.21 aMulticastFramesReceivedOK"
+              ::= { fwIfStatsProcEntry 10 }
+
+fwIfProcTransmitBytes OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of good transmitted bytes, corresponding to tx_packets.
+                   For IEEE 802.3 devices should count the length of Ethernet
+                   Frames excluding the FCS."
+              ::= { fwIfStatsProcEntry 11 }
+
+fwIfProcTransmitPackets OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of packets successfully transmitted.
+                   For hardware interfaces counts packets which host was able to
+                   successfully hand over to the device, which does not
+                   necessarily mean that packets had been successfully
+                   transmitted out of the device, only that device acknowledged
+                   it copied them out of host memory."
+              ::= { fwIfStatsProcEntry 12 }
+
+fwIfProcTransmitErrs OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Total number of transmit problems.
+                   This counter must include events counter by tx_aborted_errors,
+                   tx_carrier_errors, tx_fifo_errors, tx_heartbeat_errors,
+                   tx_window_errors and other errors not otherwise counted."
+              ::= { fwIfStatsProcEntry 13 }
+
+fwIfProcTransmitDrop OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of packets dropped on their way to transmission,
+                   e.g. due to lack of resources."
+              ::= { fwIfStatsProcEntry 14 }
+
+fwIfProcTransmitFifo OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of frame transmission errors due to device
+                   FIFO underrun / underflow. This condition occurs when the
+                   device begins transmission of a frame but is unable to deliver
+                   the entire frame to the transmitter in time for transmission.
+                   Part of aggregate carrier errors in /proc/net/dev."
+              ::= { fwIfStatsProcEntry 15 }
+
+fwIfProcTransmitColls	OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of collisions during packet transmissions."
+              ::= { fwIfStatsProcEntry 16 }
+
+fwIfProcTransmitCarrier	OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of frame transmission errors due to loss of carrier
+                  during transmission.
+                  Part of aggregate carrier errors in /proc/net/dev.
+                  For IEEE 802.3 devices this counter must be equivalent to:
+                 - 30.3.1.1.13 aCarrierSenseErrors"
+              ::= { fwIfStatsProcEntry 17 }
+
+fwIfProcTransmitCompressed	OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of transmitted compressed packets.
+                   This counters is only meaningful for interfaces which support
+                   packet compression (e.g. CSLIP, PPP)."
+              ::= { fwIfStatsProcEntry 18 }
 
 
 END

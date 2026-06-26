@@ -30,7 +30,7 @@ $oids = SnmpQuery::walk([
     'PowerNet-MIB::emsInputContactStatusEntry',
 ])->table(1);
 
-foreach ($oids as $id => $contact) {
+foreach ($oids as $contact) {
     $index = $contact['PowerNet-MIB::emsInputContactStatusInputContactIndex'];
     $oid = '.1.3.6.1.4.1.318.1.1.10.3.14.1.1.3.' . $index;
     $descr = $contact['PowerNet-MIB::emsInputContactStatusInputContactName'];
@@ -39,15 +39,15 @@ foreach ($oids as $id => $contact) {
     if (is_array($oids) && $normalstate == '1') {
         $state_name = 'emsInputContactNormalState_NC';
         $states = [
-            ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Closed'],
-            ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'Open'],
+            ['value' => 1, 'generic' => 0, 'descr' => 'Closed'],
+            ['value' => 2, 'generic' => 1, 'descr' => 'Open'],
         ];
         create_state_index($state_name, $states);
     } elseif (is_array($oids) && $normalstate == '2') {
         $state_name = 'emsInputContactNormalState_NO';
         $states = [
-            ['value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'Closed'],
-            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'Open'],
+            ['value' => 1, 'generic' => 1, 'descr' => 'Closed'],
+            ['value' => 2, 'generic' => 0, 'descr' => 'Open'],
         ];
         create_state_index($state_name, $states);
     }
@@ -78,7 +78,7 @@ $oids = SnmpQuery::walk([
     'PowerNet-MIB::emsOutputRelayStatusEntry',
 ])->table(1);
 
-foreach ($oids as $id => $relay) {
+foreach ($oids as $relay) {
     $index = $relay['PowerNet-MIB::emsOutputRelayStatusOutputRelayIndex'];
     $oid = '.1.3.6.1.4.1.318.1.1.10.3.15.1.1.3.' . $index;
     $descr = $relay['PowerNet-MIB::emsOutputRelayStatusOutputRelayName'];
@@ -87,15 +87,15 @@ foreach ($oids as $id => $relay) {
     if (is_array($oids) && $normalstate == '1') {
         $state_name = 'emsOutputRelayNormalState_NC';
         $states = [
-            ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Closed'],
-            ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'Open'],
+            ['value' => 1, 'generic' => 0, 'descr' => 'Closed'],
+            ['value' => 2, 'generic' => 1, 'descr' => 'Open'],
         ];
         create_state_index($state_name, $states);
     } elseif (is_array($oids) && $normalstate == '2') {
         $state_name = 'emsOutputRelayNormalState_NO';
         $states = [
-            ['value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'Closed'],
-            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'Open'],
+            ['value' => 1, 'generic' => 1, 'descr' => 'Closed'],
+            ['value' => 2, 'generic' => 0, 'descr' => 'Open'],
         ];
         create_state_index($state_name, $states);
     }
@@ -126,7 +126,7 @@ $oids = SnmpQuery::walk([
     'PowerNet-MIB::emsOutletStatusEntry',
 ])->table(1);
 
-foreach ($oids as $id => $outlet) {
+foreach ($oids as $outlet) {
     $index = $outlet['PowerNet-MIB::emsOutletStatusOutletIndex'];
     $oid = '.1.3.6.1.4.1.318.1.1.10.3.16.1.1.3.' . $index;
     $descr = $outlet['PowerNet-MIB::emsOutletStatusOutletName'];
@@ -135,15 +135,15 @@ foreach ($oids as $id => $outlet) {
     if (is_array($oids) && $normalstate == '1') {
         $state_name = 'emsOutletNormalState_ON';
         $states = [
-            ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'On'],
-            ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'Off'],
+            ['value' => 1, 'generic' => 0, 'descr' => 'On'],
+            ['value' => 2, 'generic' => 1, 'descr' => 'Off'],
         ];
         create_state_index($state_name, $states);
     } elseif (is_array($oids) && $normalstate == '2') {
         $state_name = 'emsOutletNormalState_OFF';
         $states = [
-            ['value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'On'],
-            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'Off'],
+            ['value' => 1, 'generic' => 1, 'descr' => 'On'],
+            ['value' => 2, 'generic' => 0, 'descr' => 'Off'],
         ];
         create_state_index($state_name, $states);
     }

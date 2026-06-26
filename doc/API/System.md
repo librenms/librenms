@@ -1,3 +1,27 @@
+### `ping`
+
+Simple endpoint to check API availability.
+
+Route: `/api/v0/ping`
+
+Input:
+
+-
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ping
+```
+
+Output:
+
+```json
+{
+    "message": "pong"
+}
+```
+
 ### `system`
 
 Display Librenms instance information.
@@ -11,7 +35,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/system
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/system
 ```
 
 Output:

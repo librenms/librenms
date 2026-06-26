@@ -2,10 +2,31 @@
 
 // FIXME svn stuff still using optc etc, won't work, needs updating!
 use App\Facades\LibrenmsConfig;
+use Illuminate\Support\Facades\Gate;
 use Symfony\Component\Process\Process;
 
-if (Auth::user()->hasGlobalAdmin()) {
-    if (! empty($rancid_file)) {
+if (Gate::allows('showConfig', DeviceCache::getPrimary())) {
+    if (LibrenmsConfig::get('rancid_repo_type') == 'git-bare' && is_dir($rancid_path)) {
+        echo '<div style="clear: both;">';
+
+        print_optionbar_start('', '');
+        echo is_null(LibrenmsConfig::get('rancid_repo_url')) ? 'Git repository non-browsable'
+            : '<a href="' . htmlspecialchars(LibrenmsConfig::get('rancid_repo_url')) . '/?a=blob;hb=HEAD;p=' . basename((string) $rancid_path) . ';f=' . $rancid_file . '">Git repository</a>';
+        print_optionbar_end();
+
+        $process = new Process(['git', 'ls-tree', '-r', 'HEAD'], $rancid_path);
+        $process->run();
+        $full_tree = explode(PHP_EOL, $process->getOutput());
+        foreach ($full_tree as $ft) {
+            [$perm, $type, $hash_path] = explode(' ', $ft, 3);
+            [$hash, $file] = explode("\t", $hash_path);
+            if (strcmp($file, (string) $rancid_file) === 0) {
+                $process = new Process(['git', 'cat-file', $type, $hash], $rancid_path);
+                $process->run();
+                $text = $process->getOutput();
+            }
+        }
+    } elseif (! empty($rancid_file)) {
         echo '<div style="clear: both;">';
 
         print_optionbar_start('', '');
@@ -150,14 +171,14 @@ if (Auth::user()->hasGlobalAdmin()) {
         }
 
         if (LibrenmsConfig::get('rancid_ignorecomments')) {
-            $lines = explode("\n", $text);
+            $lines = explode("\n", (string) $text);
             for ($i = 0; $i < count($lines); $i++) {
                 if ($lines[$i][0] == '#') {
                     unset($lines[$i]);
                 }
             }
 
-            $text = join("\n", $lines);
+            $text = implode("\n", $lines);
         }
     } elseif (LibrenmsConfig::get('oxidized.enabled') === true && LibrenmsConfig::has('oxidized.url')) {
         // Try with hostname as set in librenms first
@@ -166,15 +187,15 @@ if (Auth::user()->hasGlobalAdmin()) {
         $response = (new \App\ApiClients\Oxidized())->getContent('/node/show/' . $oxidized_hostname . '?format=json');
         $node_info = json_decode($response, true);
         if (! empty($node_info['last']['start'])) {
-            $node_info['last']['start'] = date(LibrenmsConfig::get('dateformat.long'), strtotime($node_info['last']['start']));
+            $node_info['last']['start'] = date(LibrenmsConfig::get('dateformat.long'), strtotime((string) $node_info['last']['start']));
         }
         if (! empty($node_info['last']['end'])) {
-            $node_info['last']['end'] = date(LibrenmsConfig::get('dateformat.long'), strtotime($node_info['last']['end']));
+            $node_info['last']['end'] = date(LibrenmsConfig::get('dateformat.long'), strtotime((string) $node_info['last']['end']));
         }
         // Try other hostname format if Oxidized request failed
         if (! $node_info) {
             // Adjust hostname based on whether domain was already in it or not
-            if (strpos($oxidized_hostname, '.') !== false) {
+            if (str_contains((string) $oxidized_hostname, '.')) {
                 // Use short name
                 $oxidized_hostname = strtok($device['hostname'], '.');
             } elseif (LibrenmsConfig::get('mydomain')) {
@@ -188,7 +209,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         }
 
         if (LibrenmsConfig::get('oxidized.features.versioning') === true) { // fetch a list of versions
-            $config_versions = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/version?node_full=' . (isset($node_info['full_name']) ? $node_info['full_name'] : $oxidized_hostname) . '&format=json'), true);
+            $config_versions = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/version?node_full=' . ($node_info['full_name'] ?? $oxidized_hostname) . '&format=json'), true);
         }
 
         $config_total = 1;
@@ -199,7 +220,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         if ($config_total > 1) {
             // populate current_version
             if (isset($_POST['config'])) {
-                [$oid,$date,$version] = explode('|', htmlspecialchars($_POST['config']));
+                [$oid,$date,$version] = explode('|', htmlspecialchars((string) $_POST['config']));
                 $current_config = ['oid' => $oid, 'date' => $date, 'version' => $version];
             } else { // no version selected
                 $current_config = ['oid' => $config_versions[0]['oid'], 'date' => $config_versions[0]['date'], 'version' => $config_total];
@@ -207,7 +228,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
             // populate previous_version
             if (isset($_POST['diff'])) { // diff requested
-                [$oid,$date,$version] = explode('|', $_POST['prevconfig']);
+                [$oid,$date,$version] = explode('|', (string) $_POST['prevconfig']);
                 if (isset($oid) && $oid != $current_config['oid']) {
                     $previous_config = ['oid' => $oid, 'date' => $date, 'version' => $version];
                 } elseif ($current_config['version'] != 1) {  // assume previous, unless current is first config
@@ -230,12 +251,12 @@ if (Auth::user()->hasGlobalAdmin()) {
                 if (! empty($node_info['group'])) {
                     $uri .= '&group=' . $node_info['group'];
                 }
-                $uri .= '&oid=' . urlencode($current_config['oid']) . '&date=' . urlencode($current_config['date']) . '&num=' . urlencode($current_config['version']) . '&oid2=' . $previous_config['oid'] . '&format=text';
+                $uri .= '&oid=' . urlencode((string) $current_config['oid']) . '&date=' . urlencode((string) $current_config['date']) . '&num=' . urlencode((string) $current_config['version']) . '&oid2=' . $previous_config['oid'] . '&format=text';
 
                 $text = (new \App\ApiClients\Oxidized())->getContent($uri); // fetch diff
             } else {
                 // fetch current_version
-                $text = (new \App\ApiClients\Oxidized())->getContent('/node/version/view?node=' . $oxidized_hostname . (! empty($node_info['group']) ? '&group=' . $node_info['group'] : '') . '&oid=' . urlencode($current_config['oid']) . '&date=' . urlencode($current_config['date']) . '&num=' . urlencode($current_config['version']) . '&format=text');
+                $text = (new \App\ApiClients\Oxidized())->getContent('/node/version/view?node=' . $oxidized_hostname . (! empty($node_info['group']) ? '&group=' . $node_info['group'] : '') . '&oid=' . urlencode((string) $current_config['oid']) . '&date=' . urlencode((string) $current_config['date']) . '&num=' . urlencode((string) $current_config['version']) . '&format=text');
             }
         } else {  // just fetch the only version
             $text = (new \App\ApiClients\Oxidized())->getContent('/node/fetch/' . (! empty($node_info['group']) ? $node_info['group'] . '/' : '') . $oxidized_hostname);
@@ -250,12 +271,12 @@ if (Auth::user()->hasGlobalAdmin()) {
                 echo '
                       <div class="col-sm-4">
                           <div class="panel panel-primary">
-                              <div class="panel-heading">Sync status: <strong>' . $node_info['last']['status'] . '</strong></div>
+                              <div class="panel-heading">Sync status: <strong>' . e($node_info['last']['status']) . '</strong></div>
                               <ul class="list-group">
-                                  <li class="list-group-item"><strong>Node:</strong> ' . $node_info['name'] . '</li>
-                                  <li class="list-group-item"><strong>IP:</strong> ' . $node_info['ip'] . '</li>
-                                  <li class="list-group-item"><strong>Model:</strong> ' . $node_info['model'] . '</li>
-                                  <li class="list-group-item" style="overflow:hidden"><strong>Last Sync:</strong> ' . $node_info['last']['end'] . ' &nbsp;<button class="btn btn-primary btn-xs" style="float: right;" name="queue-refresh"  onclick=\'refresh_oxidized_node("' . $device['hostname'] . '")\'>Refresh</button></li>
+                                  <li class="list-group-item"><strong>Node:</strong> ' . e($node_info['name']) . '</li>
+                                  <li class="list-group-item"><strong>IP:</strong> ' . e($node_info['ip']) . '</li>
+                                  <li class="list-group-item"><strong>Model:</strong> ' . e($node_info['model']) . '</li>
+                                  <li class="list-group-item" style="overflow:hidden"><strong>Last Sync:</strong> ' . e($node_info['last']['end']) . ' &nbsp;<button class="btn btn-primary btn-xs" style="float: right;" name="queue-refresh"  onclick=\'refresh_oxidized_node("' . e($device['hostname']) . '")\'>Refresh</button></li>
                               </ul>
                           </div>
                       </div>
@@ -275,7 +296,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
                 $i = $config_total;
                 foreach ($config_versions as $version) {
-                    echo '<option value="' . $version['oid'] . '|' . $version['date'] . '|' . $config_total . '" ';
+                    echo '<option value="' . e($version['oid']) . '|' . e($version['date']) . '|' . $config_total . '" ';
                     if ($current_config['oid'] == $version['oid']) {
                         $author = $version['author']['name'];
                         $msg = $version['message'];
@@ -289,7 +310,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                     } else {
                         echo '>&nbsp;&nbsp;';
                     }
-                    echo $i . ' :: ' . $version['date'] . '</option>';
+                    echo $i . ' :: ' . e($version['date']) . '</option>';
                     $i--;
                 }
 
@@ -314,7 +335,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             echo '</div>';
         } else {
             echo '<br />';
-            print_error("We couldn't retrieve the device information from Oxidized");
+            print_error(__('device.oxidized.connection_error'));
             if (isset($response) && preg_match('#<title>(.*)</title>#', $response, $error_matches)) {
                 print_error(strip_tags($error_matches[1]));
             }
@@ -325,11 +346,11 @@ if (Auth::user()->hasGlobalAdmin()) {
     if (! empty($author)) {
         echo '
                           <div class="panel panel-primary">
-                              <div class="panel-heading">Author: <strong>' . $author . '</strong></div>';
+                              <div class="panel-heading">Author: <strong>' . e($author) . '</strong></div>';
         if (! empty($msg)) {
             echo '
                               <ul class="list-group">
-                                  <li class="list-group-item"><strong>Message:</strong> ' . $msg . '</li>
+                                  <li class="list-group-item"><strong>Message:</strong> ' . e($msg) . '</li>
                               </ul>';
         }
         echo '
@@ -337,7 +358,7 @@ if (Auth::user()->hasGlobalAdmin()) {
     }
     if (! empty($text)) {
         $language = isset($previous_config) ? 'diff' : LibrenmsConfig::getOsSetting($device['os'], 'config_highlighting', 'ios');
-        $geshi = new GeSHi(htmlspecialchars_decode($text, ENT_QUOTES | ENT_HTML5), $language);
+        $geshi = new GeSHi(htmlspecialchars_decode((string) $text, ENT_QUOTES | ENT_HTML5), $language);
         $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS);
         $geshi->set_overall_style('color: black;');
         // $geshi->set_line_style('color: #999999');

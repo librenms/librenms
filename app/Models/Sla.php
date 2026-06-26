@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class Sla extends DeviceRelatedModel implements Keyable
 {
+    use HasFactory;
     protected $table = 'slas';
     protected $primaryKey = 'sla_id';
     public $timestamps = false;
@@ -24,7 +26,7 @@ class Sla extends DeviceRelatedModel implements Keyable
         'deleted' => 0,
     ];
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return "$this->owner-$this->tag";
     }

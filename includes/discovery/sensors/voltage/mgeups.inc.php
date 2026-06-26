@@ -1,7 +1,7 @@
 <?php
 
 echo 'MGE ';
-$oids = trim(snmp_walk($device, 'mgoutputVoltage', '-OsqnU', 'MG-SNMP-UPS-MIB'));
+$oids = trim((string) snmp_walk($device, 'mgoutputVoltage', '-OsqnU', 'MG-SNMP-UPS-MIB'));
 d_echo($oids . "\n");
 
 $numPhase = count(explode("\n", $oids));
@@ -12,10 +12,10 @@ for ($i = 1; $i <= $numPhase; $i++) {
         $descr .= " Phase $i";
     }
 
-    $current = snmp_get($device, $volt_oid, '-Oqv');
+    $current = SnmpQuery::get($volt_oid)->value();
     if (! $current) {
         $volt_oid .= '.0';
-        $current = snmp_get($device, $volt_oid, '-Oqv');
+        $current = SnmpQuery::get($volt_oid)->value();
     }
 
     $current /= 10;
@@ -26,7 +26,7 @@ for ($i = 1; $i <= $numPhase; $i++) {
     discover_sensor(null, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
 
-$oids = trim(snmp_walk($device, 'mgeinputVoltage', '-OsqnU', 'MG-SNMP-UPS-MIB'));
+$oids = trim((string) snmp_walk($device, 'mgeinputVoltage', '-OsqnU', 'MG-SNMP-UPS-MIB'));
 d_echo($oids . "\n");
 
 $numPhase = count(explode("\n", $oids));
@@ -37,10 +37,10 @@ for ($i = 1; $i <= $numPhase; $i++) {
         $descr .= " Phase $i";
     }
 
-    $current = snmp_get($device, $volt_oid, '-Oqv');
+    $current = SnmpQuery::get($volt_oid)->value();
     if (! $current) {
         $volt_oid .= '.0';
-        $current = snmp_get($device, $volt_oid, '-Oqv');
+        $current = SnmpQuery::get($volt_oid)->value();
     }
 
     $current /= 10;

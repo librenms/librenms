@@ -24,28 +24,6 @@ require 'includes/html/collectd/definitions.php';
 global $MetaGraphDefs;
 load_graph_definitions();
 
-/**
- * Send back new list content
- *
- * @param  array  $items  Array of options values to return to browser
- * @param  string  $method  Name of Javascript method that will be called to process data
- */
-function dhtml_response_list(&$items, $method)
-{
-    header('Content-Type: text/xml');
-
-    echo '<?xml version="1.0" encoding="utf-8" ?>' . "\n";
-    echo "<response>\n";
-    printf(" <method>%s</method>\n", htmlspecialchars($method));
-    echo " <result>\n";
-    foreach ($items as &$item) {
-        printf('  <option>%s</option>' . "\n", htmlspecialchars($item));
-    }
-
-    echo " </result>\n";
-    echo '</response>';
-}//end dhtml_response_list()
-
 print_optionbar_start();
 
 $link_array = [
@@ -66,7 +44,7 @@ foreach ($plugins as &$plugin) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link(htmlspecialchars($plugin), $link_array, ['plugin' => $plugin]);
+    echo generate_link(htmlspecialchars((string) $plugin), $link_array, ['plugin' => $plugin]);
     if ($vars['plugin'] == $plugin) {
         echo '</span>';
     }
@@ -92,7 +70,7 @@ foreach ($pinsts as &$instance) {
 
         foreach ($typeinstances as &$tinst) {
             $i++;
-            if (! is_integer($i / 2)) {
+            if (! is_int($i / 2)) {
                 $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
             } else {
                 $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');

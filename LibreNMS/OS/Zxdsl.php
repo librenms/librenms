@@ -42,7 +42,7 @@ class Zxdsl extends \LibreNMS\OS
     protected function parseVariant($oid)
     {
         $variant = ' ';
-        $parts = explode('.', trim($oid, '.'));
+        $parts = explode('.', trim((string) $oid, '.'));
         foreach ($parts as $part) {
             $variant .= chr(64 + (int) $part);
         }

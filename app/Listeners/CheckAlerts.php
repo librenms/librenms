@@ -28,13 +28,15 @@ class CheckAlerts
     public function handle(DevicePolled $event): void
     {
         if (LibrenmsConfig::get('alert.disable')) {
+            Log::info('#### Alerting disabled ####');
+
             return;
         }
 
         Log::info('#### Start Alerts ####');
         $start = microtime(true);
 
-        Action::execute(RunAlertRulesAction::class, $event->device);
+        Action::execute(RunAlertRulesAction::class, device: $event->device);
 
         $end = round(microtime(true) - $start, 4);
         Log::info("#### End Alerts ({$end}s) ####\n");

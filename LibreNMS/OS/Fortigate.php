@@ -27,16 +27,19 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use App\Models\Location;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
-use LibreNMS\OS\Shared\Fortinet;
+use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use SnmpQuery;
 
-class Fortigate extends Fortinet implements
+class Fortigate extends OS implements
     OSPolling,
     WirelessClientsDiscovery,
     WirelessApCountDiscovery
@@ -44,8 +47,6 @@ class Fortigate extends Fortinet implements
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
-
-        $device->hardware = $device->hardware ?: $this->getHardwareName();
     }
 
     public function pollOS(DataStorageInterface $datastore): void
@@ -84,7 +85,7 @@ class Fortigate extends Fortinet implements
         $oid = '.1.3.6.1.4.1.12356.101.14.2.7.0';
 
         return [
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'fortigate', 1, 'Clients: Total'),
+            new WirelessSensor(WirelessSensorType::Clients, $this->getDeviceId(), $oid, 'fortigate', 1, 'Clients: Total'),
         ];
     }
 
@@ -93,7 +94,25 @@ class Fortigate extends Fortinet implements
         $oid = '.1.3.6.1.4.1.12356.101.14.2.5.0';
 
         return [
-            new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'fortigate', 1, 'Connected APs'),
+            new WirelessSensor(WirelessSensorType::ApCount, $this->getDeviceId(), $oid, 'fortigate', 1, 'Connected APs'),
         ];
+    }
+
+    public function fetchLocation(): Location
+    {
+        $location = parent::fetchLocation();
+
+        $lat = SnmpQuery::get('FORTINET-FORTIGATE-MIB::fgLatitude.1')->value();
+        $lng = SnmpQuery::get('FORTINET-FORTIGATE-MIB::fgLongitude.1')->value();
+
+        if (preg_match('/^([\d.]+)\s+([NS])$/', (string) $lat, $m)) {
+            $location->lat = (float) $m[1] * ($m[2] === 'S' ? -1 : 1);
+        }
+
+        if (preg_match('/^([\d.]+)\s+([EW])$/', (string) $lng, $m)) {
+            $location->lng = (float) $m[1] * ($m[2] === 'W' ? -1 : 1);
+        }
+
+        return $location;
     }
 }

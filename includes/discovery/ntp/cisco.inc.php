@@ -102,7 +102,7 @@ if (is_null($cntpPeersVarEntry)) {
         // Guilty until proven innocent
         $found = false;
 
-        foreach ($tblComponents as $k => $v) {
+        foreach ($tblComponents as $v) {
             if ($array['UID'] == $v['UID']) {
                 // Yay, we found it...
                 $found = true;
@@ -127,5 +127,5 @@ if (! empty($components)) {
         dbInsert(['device_id' => $device['device_id'], 'app_type' => $module, 'app_status' => '', 'app_instance' => ''], 'applications');
     }
 } else {
-    dbDelete('applications', '`device_id` = ? AND `app_type` = ?', [$device['device_id'], $module]);
+    \App\Models\Application::where('device_id', $device['device_id'])->where('app_type', $module)->delete();
 }

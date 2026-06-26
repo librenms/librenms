@@ -30,7 +30,7 @@ class LegacyExternalAuth
             if (LegacyAuth::get()->authIsExternal()) {
                 $credentials = [
                     'username' => LegacyAuth::get()->getExternalUsername(),
-                    'password' => isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : '',
+                    'password' => $_SERVER['PHP_AUTH_PW'] ?? '',
                 ];
 
                 if (! Auth::guard($guard)->attempt($credentials)) {

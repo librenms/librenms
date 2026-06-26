@@ -5,24 +5,25 @@ AC-ANALOG-MIB DEFINITIONS ::= BEGIN
     IMPORTS
        
 
-        OBJECT-TYPE, 
-        MODULE-IDENTITY                             FROM SNMPv2-SMI
-        TAddress, 
-        DisplayString, 
-        DateAndTime, TEXTUAL-CONVENTION             FROM SNMPv2-TC
-        IpAddress                                   FROM RFC1155-SMI
-        Unsigned32,
-		Integer32,
-        enterprises                                 FROM SNMPv2-SMI
-		SnmpAdminString								FROM SNMP-FRAMEWORK-MIB
-		audioCodes,       
-		acRegistrations,
-		acGeneric, 
-		acProducts,acBoardMibs						FROM AUDIOCODES-TYPES-MIB;
+	OBJECT-TYPE, 
+	MODULE-IDENTITY                             FROM SNMPv2-SMI
+	TAddress, 
+	DisplayString, 
+	DateAndTime, TEXTUAL-CONVENTION             FROM SNMPv2-TC
+	IpAddress                                   FROM RFC1155-SMI
+	Unsigned32,
+	Integer32,
+	Gauge32,
+	enterprises                                 FROM SNMPv2-SMI
+	SnmpAdminString                             FROM SNMP-FRAMEWORK-MIB
+	audioCodes,       
+	acRegistrations,
+	acGeneric, 
+	acProducts,acBoardMibs                      FROM AUDIOCODES-TYPES-MIB;
 
        
 acAnalog  MODULE-IDENTITY       
-    LAST-UPDATED "201207260446Z"          --Thursday, July 26 2012
+    LAST-UPDATED "201708171225Z"          --Thursday, August 17 2017
     ORGANIZATION "AudioCodes Ltd"
     CONTACT-INFO
     "Postal: Support
@@ -110,7 +111,7 @@ AC INI-Param: FLASHHOOKPERIOD"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS deprecated
        DESCRIPTION
            "Enables/disables the analog ground key detection.
 0 = Disable
@@ -118,6 +119,71 @@ AC INI-Param: FLASHHOOKPERIOD"
 Access: Offline.
 AC INI-Param: GroundKeyDetection"
        ::= {acAnalogMisc 3}
+
+
+
+     -- ****************************************
+     -- acAnalogGroundStart table declaration
+     -- ****************************************
+     acAnalogGroundStartTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcAnalogGroundStartEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acAnalogMisc 21}
+
+
+
+     -- ****************************************
+     -- acAnalogGroundStart table entry
+     -- ****************************************
+     acAnalogGroundStartEntry OBJECT-TYPE
+       SYNTAX AcAnalogGroundStartEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acAnalogGroundStartPort}
+       ::= {acAnalogGroundStartTable 1}
+
+
+
+     -- ****************************************
+     -- acAnalogGroundStart TABLE
+     -- ****************************************
+     AcAnalogGroundStartEntry ::= SEQUENCE {
+       acAnalogGroundStartPort                         Unsigned32,
+       acAnalogGroundStartEnable                       INTEGER
+     }
+
+
+
+     acAnalogGroundStartPort OBJECT-TYPE
+       SYNTAX Unsigned32 (0..23)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Port index.
+AC INI-Param: N/A"
+       ::= {acAnalogGroundStartEntry 1}
+
+
+
+     acAnalogGroundStartEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables/disables the analog port ground start.
+Access: Offline.
+AC INI-Param: GroundKeyDetection"
+       ::= {acAnalogGroundStartEntry 2}
 
 
 
@@ -143,8 +209,6 @@ AC INI-Param: FXSCOEFFILENAME"
        STATUS current
        DESCRIPTION
            "Defines the FXO loop coefficient filename.
-
-Max. 47 characters.
 AC INI-Param: FXOCOEFFILENAME"
        ::= {acAuxiliaryFiles 2}
 
@@ -1039,7 +1103,7 @@ AC INI-Param: N/A"
 
 
      acAnalogFxsFxoIndex OBJECT-TYPE
-       SYNTAX Unsigned32 (0..24)
+       SYNTAX Unsigned32 (0..288)
        MAX-ACCESS not-accessible
        STATUS current
        DESCRIPTION
@@ -1091,6 +1155,172 @@ AC INI-Param: N/A"
            "The hook state of the analog line.
 AC INI-Param: N/A"
        ::= {acAnalogFxsFxoEntry 4}
+
+
+
+     acAnalogLegs OBJECT IDENTIFIER ::= {acAnalogStatus 21}
+
+
+     -- ****************************************
+     -- acAnalogLegs table declaration
+     -- ****************************************
+     acAnalogLegsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcAnalogLegsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acAnalogLegs 1}
+
+
+
+     -- ****************************************
+     -- acAnalogLegs table entry
+     -- ****************************************
+     acAnalogLegsEntry OBJECT-TYPE
+       SYNTAX AcAnalogLegsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acAnalogLegsLegIndex}
+       ::= {acAnalogLegsTable 1}
+
+
+
+     -- ****************************************
+     -- acAnalogLegs TABLE
+     -- ****************************************
+     AcAnalogLegsEntry ::= SEQUENCE {
+       acAnalogLegsLegIndex                            Unsigned32,
+       acAnalogLegsCallIndex                           Unsigned32,
+       acAnalogLegsAnalogType                          INTEGER,
+       acAnalogLegsEchoCanceller                       INTEGER,
+       acAnalogLegsHighPassFilter                      INTEGER,
+       acAnalogLegsDTMFDetection                       INTEGER,
+       acAnalogLegsVoiceVolume                         Unsigned32,
+       acAnalogLegsInputGain                           Unsigned32,
+       acAnalogLegsLegName                             SnmpAdminString
+     }
+
+
+
+     acAnalogLegsLegIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..5000)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Decribes The Digital EndPoint In A Call.
+AC INI-Param: N/A"
+       ::= {acAnalogLegsEntry 1}
+
+
+
+     acAnalogLegsCallIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..5000)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Decribes The Call which The Rtp EndPoint Participant In It.
+AC INI-Param: N/A"
+       ::= {acAnalogLegsEntry 2}
+
+
+
+     acAnalogLegsAnalogType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  fxs(1)
+,
+                  fxo(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describs whether the board is FXS or FXO.
+AC INI-Param: N/A"
+       ::= {acAnalogLegsEntry 3}
+
+
+
+     acAnalogLegsEchoCanceller OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Enables or Disables the Echo Canceller.
+AC INI-Param: N/A"
+       ::= {acAnalogLegsEntry 4}
+
+
+
+     acAnalogLegsHighPassFilter OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Enables or Disables theHigh Pass Filter.
+AC INI-Param: N/A"
+       ::= {acAnalogLegsEntry 5}
+
+
+
+     acAnalogLegsDTMFDetection OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Enables or Disables the DTMF Detection.
+AC INI-Param: N/A"
+       ::= {acAnalogLegsEntry 6}
+
+
+
+     acAnalogLegsVoiceVolume OBJECT-TYPE
+       SYNTAX Unsigned32 (0..20000)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describs the volume of the voice in dB.
+AC INI-Param: N/A"
+       ::= {acAnalogLegsEntry 7}
+
+
+
+     acAnalogLegsInputGain OBJECT-TYPE
+       SYNTAX Unsigned32 (0..20000)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the Input Gain on the leg in dB.
+AC INI-Param: N/A"
+       ::= {acAnalogLegsEntry 8}
+
+
+
+     acAnalogLegsLegName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..64))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the Leg Name as in the Control Protocol.
+AC INI-Param: N/A"
+       ::= {acAnalogLegsEntry 9}
 
 
 
@@ -1360,7 +1590,7 @@ AC INI-Param: N/A"
 
 
      acAnalogFxsLineTestIndex OBJECT-TYPE
-       SYNTAX Unsigned32 (0..24)
+       SYNTAX Unsigned32 (0..288)
        MAX-ACCESS not-accessible
        STATUS current
        DESCRIPTION
@@ -1601,172 +1831,6 @@ AC INI-Param: N/A"
 for Analog channels only.
 AC INI-Param: N/A"
        ::= {acAnalogCommonChannelEntry 2}
-
-
-
-     acAnalogLegs OBJECT IDENTIFIER ::= {acAnalogStatus 21}
-
-
-     -- ****************************************
-     -- acAnalogLegs table declaration
-     -- ****************************************
-     acAnalogLegsTable OBJECT-TYPE
-       SYNTAX SEQUENCE OF AcAnalogLegsEntry
-       MAX-ACCESS not-accessible
-       STATUS current
-       DESCRIPTION
-           ""
-       ::= {acAnalogLegs 1}
-
-
-
-     -- ****************************************
-     -- acAnalogLegs table entry
-     -- ****************************************
-     acAnalogLegsEntry OBJECT-TYPE
-       SYNTAX AcAnalogLegsEntry
-       MAX-ACCESS not-accessible
-       STATUS current
-       DESCRIPTION
-           ""
-       INDEX {acAnalogLegsLegIndex}
-       ::= {acAnalogLegsTable 1}
-
-
-
-     -- ****************************************
-     -- acAnalogLegs TABLE
-     -- ****************************************
-     AcAnalogLegsEntry ::= SEQUENCE {
-       acAnalogLegsLegIndex                            Unsigned32,
-       acAnalogLegsCallIndex                           Unsigned32,
-       acAnalogLegsAnalogType                          INTEGER,
-       acAnalogLegsEchoCanceller                       INTEGER,
-       acAnalogLegsHighPassFilter                      INTEGER,
-       acAnalogLegsDTMFDetection                       INTEGER,
-       acAnalogLegsVoiceVolume                         Unsigned32,
-       acAnalogLegsInputGain                           Unsigned32,
-       acAnalogLegsLegName                             SnmpAdminString
-     }
-
-
-
-     acAnalogLegsLegIndex OBJECT-TYPE
-       SYNTAX Unsigned32 (0..5000)
-       MAX-ACCESS not-accessible
-       STATUS current
-       DESCRIPTION
-           "Decribes The Digital EndPoint In A Call.
-AC INI-Param: N/A"
-       ::= {acAnalogLegsEntry 1}
-
-
-
-     acAnalogLegsCallIndex OBJECT-TYPE
-       SYNTAX Unsigned32 (0..5000)
-       MAX-ACCESS read-only
-       STATUS current
-       DESCRIPTION
-           "Decribes The Call which The Rtp EndPoint Participant In It.
-AC INI-Param: N/A"
-       ::= {acAnalogLegsEntry 2}
-
-
-
-     acAnalogLegsAnalogType OBJECT-TYPE
-       SYNTAX INTEGER {
-                  fxs(1)
-,
-                  fxo(2)
-
-                  }
-       MAX-ACCESS read-only
-       STATUS current
-       DESCRIPTION
-           "Describs whether the board is FXS or FXO.
-AC INI-Param: N/A"
-       ::= {acAnalogLegsEntry 3}
-
-
-
-     acAnalogLegsEchoCanceller OBJECT-TYPE
-       SYNTAX INTEGER {
-                  disable(0)
-,
-                  enable(1)
-
-                  }
-       MAX-ACCESS read-only
-       STATUS current
-       DESCRIPTION
-           "Enables or Disables the Echo Canceller.
-AC INI-Param: N/A"
-       ::= {acAnalogLegsEntry 4}
-
-
-
-     acAnalogLegsHighPassFilter OBJECT-TYPE
-       SYNTAX INTEGER {
-                  disable(0)
-,
-                  enable(1)
-
-                  }
-       MAX-ACCESS read-only
-       STATUS current
-       DESCRIPTION
-           "Enables or Disables theHigh Pass Filter.
-AC INI-Param: N/A"
-       ::= {acAnalogLegsEntry 5}
-
-
-
-     acAnalogLegsDTMFDetection OBJECT-TYPE
-       SYNTAX INTEGER {
-                  disable(0)
-,
-                  enable(1)
-
-                  }
-       MAX-ACCESS read-only
-       STATUS current
-       DESCRIPTION
-           "Enables or Disables the DTMF Detection.
-AC INI-Param: N/A"
-       ::= {acAnalogLegsEntry 6}
-
-
-
-     acAnalogLegsVoiceVolume OBJECT-TYPE
-       SYNTAX Unsigned32 (0..20000)
-       MAX-ACCESS read-only
-       STATUS current
-       DESCRIPTION
-           "Describs the volume of the voice in dB.
-AC INI-Param: N/A"
-       ::= {acAnalogLegsEntry 7}
-
-
-
-     acAnalogLegsInputGain OBJECT-TYPE
-       SYNTAX Unsigned32 (0..20000)
-       MAX-ACCESS read-only
-       STATUS current
-       DESCRIPTION
-           "Describes the Input Gain on the leg in dB.
-AC INI-Param: N/A"
-       ::= {acAnalogLegsEntry 8}
-
-
-
-     acAnalogLegsLegName OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..64))
-       MAX-ACCESS read-only
-       STATUS current
-       DESCRIPTION
-           "Describes the Leg Name as in the Control Protocol.
-AC INI-Param: N/A"
-       ::= {acAnalogLegsEntry 9}
 
 
 

@@ -43,7 +43,7 @@ class Enterasys extends \LibreNMS\OS implements MempoolsDiscovery
             foreach ($mem_data['ram'] ?? [] as $mem_id => $ram) {
                 $descr = $ram['etsysResourceStorageDescr'];
                 if ($index > 1000) {
-                    $descr = 'Slot #' . substr($index, -1) . " $descr";
+                    $descr = 'Slot #' . substr((string) $index, -1) . " $descr";
                 }
 
                 $mempools->push((new Mempool([

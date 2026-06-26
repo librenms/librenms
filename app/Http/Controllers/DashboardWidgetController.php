@@ -19,7 +19,7 @@ class DashboardWidgetController extends Controller
             'widget_type' => Rule::in(DashboardController::listWidgets()->keys()),
         ]);
 
-        $type = $request->get('widget_type');
+        $type = $request->input('widget_type');
         $widget = new UserWidget([
             'user_id' => Auth::id(),
             'widget' => $type,
@@ -69,7 +69,7 @@ class DashboardWidgetController extends Controller
         $this->authorize('update', $dashboard);
 
         $validated = $this->getValidationFactory()->make(
-            json_decode($request->get('data', '[]'), true), [
+            json_decode($request->string('data', '[]'), true), [
                 '*' => 'array',
                 '*.id' => 'integer',
                 '*.col' => 'integer',
@@ -79,7 +79,7 @@ class DashboardWidgetController extends Controller
             ])->validate();
 
         foreach ($validated as $item) {
-            if ($widget = UserWidget::find($item['id'])) {
+            if ($widget = $dashboard->widgets()->find($item['id'])) {
                 $widget->fill($item);
                 $widget->save();
             }

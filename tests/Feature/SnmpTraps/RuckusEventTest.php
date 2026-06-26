@@ -28,7 +28,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class RuckusEventTest extends SnmpTrapTestCase
+final class RuckusEventTest extends SnmpTrapTestCase
 {
     public function testRuckusAssocTrap(): void
     {

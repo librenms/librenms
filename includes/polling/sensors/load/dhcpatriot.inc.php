@@ -14,7 +14,7 @@ $prev_divisor = $sensor['sensor_divisor'];
 $new_divisor = snmp_get($device, str_replace('.1.3.6.1.4.1.2021.50.120', '.1.3.6.1.4.1.2021.50.130', $sensor['sensor_oid']), '-Oqv');
 
 $prev_descr = $sensor['sensor_descr'];
-$new_descr = explode('(', $sensor['sensor_descr'])[0] . '(' . $sensor_value . '/' . $new_divisor . ')';
+$new_descr = explode('(', (string) $sensor['sensor_descr'])[0] . '(' . $sensor_value . '/' . $new_divisor . ')';
 
 if ($new_divisor != $prev_divisor) {
     $sensor['sensor_divisor'] = $new_divisor;

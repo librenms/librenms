@@ -1,0 +1,166 @@
+
+ALCATEL-IND1-SSH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE,
+	OBJECT-IDENTITY,
+	MODULE-IDENTITY		FROM SNMPv2-SMI
+        OBJECT-GROUP,
+	MODULE-COMPLIANCE       FROM SNMPv2-CONF
+	softentIND1Ssh	        FROM ALCATEL-IND1-BASE;
+
+
+alcatelIND1SshMIB  MODULE-IDENTITY
+	LAST-UPDATED  "201910070000Z"
+	ORGANIZATION  "ALE USA Inc"
+	CONTACT-INFO
+	    "Please consult with Customer Service to ensure the most appropriate
+	     version of this document is used with the products in question:
+ 
+			    Alcatel-Lucent Enterprise,
+			       26801 West Agoura Road
+			    Agoura Hills, CA  91301-5122
+			      United States Of America
+	
+	    Telephone:               +1 800 995 2696 				                
+	
+	    Electronic Mail:         ebg_global_supportcenter@al-enterprise.com
+	    World Wide Web:          https://www.al-enterprise.com"
+ 
+	DESCRIPTION
+	    "This module describes an authoritative enterprise-specific 
+             SSH Management Information Base (MIB):
+         
+                 For the OmniSwitch Product Line
+                 SSH Subsystem.
+         
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+         
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+         
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+         
+                          Copyright (C) ALE USA Inc. 2014-2019
+			  Copyright (C) 1995-2013 Alcatel-Lucent
+                          ALL RIGHTS RESERVED WORLDWIDE"
+
+	REVISION      "201910070000Z"
+        DESCRIPTION
+            "Updated the latest contact and Copyright information for ALE USA Inc."
+	::= { softentIND1Ssh 1 }
+
+    alcatelIND1SshMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For SNMP Agent Subsystem Managed Objects."
+        ::= { alcatelIND1SshMIB 1 }
+
+
+    alcatelIND1SshMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For SSH Subsystem Conformance Information."
+        ::= { alcatelIND1SshMIB 2 }
+
+
+    alcatelIND1SshMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For SSH Subsystem Units Of Conformance."
+        ::= { alcatelIND1SshMIBConformance 1 }
+
+
+    alcatelIND1SshMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For SSH Subsystem Compliance Statements."
+        ::= { alcatelIND1SshMIBConformance 2 }
+
+
+--
+-- SSH configuration
+--
+
+alaSshAdminStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		enabled(1),
+		disabled(2) }
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		 "Indicates whether the SSH service is enabled on the switch."
+	DEFVAL { enabled }
+	::= { alcatelIND1SshMIBObjects 1 }
+
+alaScpSftpAdminStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		enabled(1),
+		disabled(2) }
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		 "Indicates whether the SCP/SFTP service is enabled 
+		  on the switch."
+	DEFVAL { enabled }
+	::= { alcatelIND1SshMIBObjects 2 }
+
+alaSshPubKeyEnforceAdminStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		enabled(1),
+		disabled(2) }
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		 "Indicates whether the Public Key Authentication is enforced 
+		  on the switch."
+	DEFVAL { disabled }
+	::= { alcatelIND1SshMIBObjects 3 }
+
+alaSshPortNumber OBJECT-TYPE            
+                  SYNTAX  INTEGER (1..65535)            
+              MAX-ACCESS  read-write            
+                  STATUS  current            
+                  DESCRIPTION            
+                          "Indicates the SSH port number"            
+                  ::= { alcatelIND1SshMIBObjects 4 }
+--
+-- Compliance Statements
+--
+
+    alcatelIND1SshMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for SSH Subsystem."
+        MODULE  -- this module
+
+            MANDATORY-GROUPS
+            {
+                alaSshConfigGroup
+            }
+
+        ::= { alcatelIND1SshMIBCompliances 1 }
+
+
+--
+-- Units Of Conformance
+--
+
+     alaSshConfigGroup OBJECT-GROUP
+        OBJECTS
+        {
+	    alaSshAdminStatus,
+	    alaScpSftpAdminStatus,
+	    alaSshPubKeyEnforceAdminStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for SSH configuration."
+        ::= { alcatelIND1SshMIBGroups 1 }
+
+
+END

@@ -67,19 +67,12 @@ class SnmpQueryMock implements SnmpQueryInterface
         return $this;
     }
 
-    public function deviceArray(array $device): SnmpQueryInterface
-    {
-        $this->device = new Device($device);
-
-        return $this;
-    }
-
     public function cache(): SnmpQueryInterface
     {
         return $this; // ignore, always cached
     }
 
-    public function context(string $context): SnmpQueryInterface
+    public function context(string $context, ?string $v3_prefix = null): SnmpQueryInterface
     {
         $this->context = $context;
 
@@ -260,7 +253,7 @@ class SnmpQueryMock implements SnmpQueryInterface
                 ])) {
                     $data = Mac::parse($data)->readable();
                 } else {
-                    $data = hex2str($data);
+                    $data = hex2bin($data);
                 }
             }
 

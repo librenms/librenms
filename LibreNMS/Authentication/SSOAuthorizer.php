@@ -79,10 +79,10 @@ class SSOAuthorizer extends MysqlAuthorizer
      * Return an attribute from the configured attribute store.
      * Returns null if the attribute cannot be found
      *
-     * @param  string  $attr  The name of the attribute to find
+     * @param  string|null  $attr  The name of the attribute to find
      * @return string|null
      */
-    public function authSSOGetAttr($attr, $prefix = 'HTTP_')
+    public function authSSOGetAttr(?string $attr, string $prefix = 'HTTP_')
     {
         // Check attribute originates from a trusted proxy - we check it on every attribute just in case this gets called after initial login
         if ($this->authSSOProxyTrusted()) {
@@ -129,9 +129,6 @@ class SSOAuthorizer extends MysqlAuthorizer
                 if (is_array($proxies)) {
                     foreach ($proxies as $value) {
                         $proxy = IP::parse($value);
-                        if ($proxies == '8.8.8.0/25') {
-                            dd($source->inNetwork((string) $proxy));
-                        }
 
                         if ($source->inNetwork((string) $proxy)) {
                             // Proxy matches trusted subnet
@@ -142,7 +139,7 @@ class SSOAuthorizer extends MysqlAuthorizer
 
                 // No match, proxy is untrusted
                 return false;
-            } catch (InvalidIpException $e) {
+            } catch (InvalidIpException) {
                 // Webserver is talking nonsense (or, IPv10 has been deployed, or maybe something weird like a domain socket is in use?)
                 return false;
             }

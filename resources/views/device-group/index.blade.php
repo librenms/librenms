@@ -11,10 +11,12 @@
 
             <div class="row">
                 <div class="col-md-12">
+                    @can('create', App\Models\DeviceGroup::class)
                     <a type="button" class="btn btn-primary" href="{{ route('device-groups.create') }}">
                         <i class="fa fa-plus"></i> {{ __('New Device Group') }}
                     </a>
-                    <a type="button" class="btn btn-default" href="{{ url('devices/group=none')  }}">
+                    @endcan
+                    <a type="button" class="btn btn-default" href="{{ route('devices', ['filter' => ['groups.id' => ['is_empty' => 1]]]) }}">
                         <i class="fas fa-border-none"></i> {{ __('View Ungrouped Devices') }}
                     </a>
                 </div>
@@ -39,24 +41,30 @@
                             <td>{{ $device_group->desc }}</td>
                             <td>{{ __(ucfirst($device_group->type)) }}</td>
                             <td>
-                                <a href="{{ url("/devices/group=$device_group->id") }}">{{ $device_group->devices_count }}</a>
+                                <a href="{{ route('devices', ['filter' => ['groups.id' => ['eq' => $device_group->id]]]) }}">{{ $device_group->devices_count }}</a>
                             </td>
                             <td>
-                                <a href="{{ url("/ports/devicegroup=$device_group->id") }}">View</a>
+                                <a href="{{ route('ports', ['filter' => ['device.groups.id' => ['eq' => $device_group->id]]]) }}">View</a>
                             </td>
                             <td>{{ $device_group->type == 'dynamic' ? $device_group->getParser()->toSql(false) : '' }}</td>
                             <td>
+                                @can('device.update')
                                 <button type="button" title="{{ __('Rediscover all Devices of Device Group') }}" class="btn btn-warning btn-sm" aria-label="{{ __('Rediscover Group') }}"
                                         onclick="discover_dg(this, '{{ $device_group->id }}')">
                                     <i
                                         class="fa fa-retweet" aria-hidden="true"></i></button>
+                                @endcan
+                                @can('update', $device_group)
                                 <a type="button" title="{{ __('edit Device Group') }}" class="btn btn-primary btn-sm" aria-label="{{ __('Edit') }}"
                                    href="{{ route('device-groups.edit', $device_group->id) }}">
                                     <i class="fa fa-pencil" aria-hidden="true"></i></a>
+                                @endcan
+                                @can('delete', $device_group)
                                 <button type="button" class="btn btn-danger btn-sm" title="{{ __('delete Device Group') }}" aria-label="{{ __('Delete') }}"
-                                        onclick="delete_dg(this, '{{ $device_group->name }}', '{{ route('device-groups.destroy', $device_group->id) }}')">
-                                    <i
-                                        class="fa fa-trash" aria-hidden="true"></i></button>
+                                        data-group-name="{{ $device_group->name }}"
+                                        onclick="delete_dg(this, '{{ route('device-groups.destroy', $device_group->id) }}')">
+                                    <i class="fa fa-trash" aria-hidden="true"></i></button>
+                                @endcan
                             </td>
                         </tr>
                     @endforeach
@@ -69,8 +77,9 @@
 
 @section('scripts')
     <script>
-        function delete_dg(button, name, url) {
+        function delete_dg(button, url) {
             var index = button.parentNode.parentNode.rowIndex;
+            var name = button.dataset.groupName;
 
             if (confirm('{{ __('Are you sure you want to delete ') }}' + name + '?')) {
                 $.ajax({

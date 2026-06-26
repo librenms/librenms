@@ -56,7 +56,7 @@ enable it manually.
 
 ## Cron
 
-If you are having timeouts or there is privelege seperation issues,
+If you are having timeouts or there is privilege separation issues,
 then it can be ran via cron like below. `-w` can be used to write it
 out and `-o` can be used to control where it is written to. See
 `--help` for more information.

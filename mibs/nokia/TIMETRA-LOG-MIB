@@ -28,14 +28,11 @@ IMPORTS
     timetraSRMIBModules, tmnxSRConfs,
     tmnxSRNotifyPrefix, tmnxSRObjs
                                                          FROM TIMETRA-GLOBAL-MIB
-    THsmdaCounterIdOrZero,
-    THsmdaCounterIdOrZeroOrAll,
     TItemDescription, TLNamedItemOrEmpty,
     TNamedItem, TNamedItemOrEmpty, TQueueId,
-    TQueueIdOrAll, TmnxAccPlcyAACounters,
+    TQueueIdOrAll, TXLNamedItemOrEmpty,
+    TmnxAccPlcyAACounters,
     TmnxAccPlcyAASubAttributes,
-    TmnxAccPlcyOECounters,
-    TmnxAccPlcyOICounters,
     TmnxAccPlcyPolicerECounters,
     TmnxAccPlcyPolicerICounters,
     TmnxAccPlcyQECounters,
@@ -180,6 +177,22 @@ TmnxPerceivedSeverity            ::= TEXTUAL-CONVENTION
         warning       (6)
     }
 
+TmnxSnmpSetErrsSeverity          ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxSnmpSetErrsSeverity identifies the severity of the
+         SNMP SET error."
+    SYNTAX      INTEGER {
+        none          (0),
+        cleared       (1),
+        indeterminate (2),
+        critical      (3),
+        major         (4),
+        minor         (5),
+        warning       (6),
+        info          (7)
+    }
+
 TmnxSyslogId                     ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -293,7 +306,6 @@ TmnxLogExRbkOperationType        ::= TEXTUAL-CONVENTION
         unknown  (0),
         exec     (1),
         rollback (2),
-        vsd      (3),
         load     (4)
     }
 
@@ -481,6 +493,106 @@ tmnxEhsHEntryMinDelayInterval    OBJECT-TYPE
          tmnxEhsHEntryLastExecuted."
     ::= { tmnxLogNotificationObjects 17 }
 
+logCustomEventSubject            OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..33))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of the object logCustomEventSubject custom text which will
+         be used as subject in Logger 2020 - 2025 tmnxCustomEvent1 - 6 event."
+    ::= { tmnxLogNotificationObjects 19 }
+
+logCustomEventMessageString      OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..2001))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of the object logCustomEventMessageString custom text which
+         will be used as message in Logger 2020 - 2025 tmnxCustomEvent1 - 6
+         event."
+    ::= { tmnxLogNotificationObjects 20 }
+
+logCustomEventParameter1         OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..2001))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of the object logCustomEventParameter1 custom text which
+         will be used in Logger 2020 - 2025 tmnxCustomEvent1 - 6 event."
+    ::= { tmnxLogNotificationObjects 21 }
+
+logCustomEventParameter2         OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..2001))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of the object logCustomEventParameter2 custom text which
+         will be used in Logger 2020 - 2025 tmnxCustomEvent1 - 6 event."
+    ::= { tmnxLogNotificationObjects 22 }
+
+logCustomEventParameter3         OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..2001))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of the object logCustomEventParameter3 custom text which
+         will be used in Logger 2020 - 2025 tmnxCustomEvent1 - 6 event."
+    ::= { tmnxLogNotificationObjects 23 }
+
+logCustomEventParameter4         OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..2001))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of the object logCustomEventParameter4 custom text which
+         will be used in Logger 2020 - 2025 tmnxCustomEvent1 - 6 event."
+    ::= { tmnxLogNotificationObjects 24 }
+
+logCustomEventParameter5         OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..2001))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of the object logCustomEventParameter5 custom text which
+         will be used in Logger 2020 - 2025 tmnxCustomEvent1 - 6 event."
+    ::= { tmnxLogNotificationObjects 25 }
+
+logCustomEventParameter6         OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..2001))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of the object logCustomEventParameter6 custom text which
+         will be used in Logger 2020 - 2025 tmnxCustomEvent1 - 6 event."
+    ::= { tmnxLogNotificationObjects 26 }
+
+logCustomEventParameter7         OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..2001))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of the object logCustomEventParameter7 custom text which
+         will be used in Logger 2020 - 2025 tmnxCustomEvent1 - 6 event."
+    ::= { tmnxLogNotificationObjects 27 }
+
+logCustomEventParameter8         OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..2001))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of the object logCustomEventParameter8 custom text which
+         will be used in Logger 2020 - 2025 tmnxCustomEvent1 - 6 event."
+    ::= { tmnxLogNotificationObjects 28 }
+
+tmnxNetconfStreamDropCount       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNetconfStreamDropCount indicates number of dropped
+         Netconf Notifications per Netconf stream."
+    ::= { tmnxLogNotificationObjects 29 }
+
 tmnxLogMaxLogs                   OBJECT-TYPE
     SYNTAX      Unsigned32
     UNITS       "logs"
@@ -608,7 +720,9 @@ tmnxLogFileIdAdminLocation       OBJECT-TYPE
          available to both secondary and primary CPMs.
 
          If no location is specified, 0, the compact flash cf1: is used to
-         store the log files or cf2: is used to store accounting files."
+         store the log files, if not available then cf2: then cf4 then cf3: ;
+         or cf2: is used to store accounting files, if not available then cf1:
+         then cf4: then cf3: ."
     DEFVAL      { 0 }
     ::= { tmnxLogFileIdEntry 6 }
 
@@ -667,7 +781,7 @@ tmnxLogFileIdPathName            OBJECT-TYPE
     ::= { tmnxLogFileIdEntry 11 }
 
 tmnxLogFileIdCreateTime          OBJECT-TYPE
-    SYNTAX      DateAndTime
+    SYNTAX      DateAndTime (SIZE (11))
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -938,7 +1052,8 @@ tmnxLogApRecord                  OBJECT-TYPE
         combinedAccessEgress        (74),
         combinedNetworkEgress       (75),
         completeSvcActivTestHead    (76),
-        combinedMplsSrteEgress      (77)
+        combinedMplsSrteEgress      (77),
+        combinedSrPolicyEgress      (78)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -995,7 +1110,8 @@ tmnxLogApPortType                OBJECT-TYPE
         networkIntf   (16),
         accessPort    (17),
         svcActvTest   (18),
-        mplsSrteEgr   (19)
+        mplsSrteEgr   (19),
+        srPolEgr      (20)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -1085,7 +1201,7 @@ tmnxLogApAlign                   OBJECT-TYPE
          by collection-interval value. After that it continues with
          collection-interval. This is important for synchronization of
          statistics interval between various nodes in network. If false,
-         generation of accounting statistis is triggered right after command
+         generation of accounting statistics is triggered right after command
          execution and continues after configured collection-interval. type
          that do not have an accounting policy."
     DEFVAL      { false }
@@ -1134,7 +1250,8 @@ TmnxLogIdEntry                   ::= SEQUENCE
     tmnxLogIdPythonPolicy            TNamedItemOrEmpty,
     tmnxLogIdOperDestination         INTEGER,
     tmnxLogIdNetconfStream           TNamedItemOrEmpty,
-    tmnxLogIdName                    TLNamedItemOrEmpty
+    tmnxLogIdName                    TLNamedItemOrEmpty,
+    tmnxLogLiUsingVPRNvRtrID         Unsigned32
 }
 
 tmnxLogIdIndex                   OBJECT-TYPE
@@ -1497,6 +1614,16 @@ tmnxLogIdName                    OBJECT-TYPE
         "The value of tmnxLogIdName specifies an event stream log."
     DEFVAL      { "" }
     ::= { tmnxLogIdEntry 20 }
+
+tmnxLogLiUsingVPRNvRtrID         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogLiUsingVPRNvRtrID specifies vRtrID for send LI
+         traps using related VPRN."
+    DEFVAL      { 0 }
+    ::= { tmnxLogIdEntry 21 }
 
 tmnxLogFilterTable               OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxLogFilterEntry
@@ -1933,7 +2060,11 @@ TmnxSyslogTargetEntry            ::= SEQUENCE
     tmnxSyslogTargetAddrType         InetAddressType,
     tmnxSyslogTargetAddr             InetAddress,
     tmnxSyslogTargetName             TLNamedItemOrEmpty,
-    tmnxSyslogTlsClntProfileName     TNamedItemOrEmpty
+    tmnxSyslogTlsClntProfileName     TNamedItemOrEmpty,
+    tmnxSyslogHostname               TXLNamedItemOrEmpty,
+    tmnxSyslogHostnameUseSystem      TruthValue,
+    tmnxSyslogHostnameUseVprn        TruthValue,
+    tmnxSyslogTimestampFormat        INTEGER
 }
 
 tmnxSyslogTargetIndex            OBJECT-TYPE
@@ -2095,6 +2226,52 @@ tmnxSyslogTlsClntProfileName     OBJECT-TYPE
     DEFVAL      { "" }
     ::= { tmnxSyslogTargetEntry 13 }
 
+tmnxSyslogHostname               OBJECT-TYPE
+    SYNTAX      TXLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSyslogHostname specifies manual Hostname
+         string which will be used in Syslog packets."
+    DEFVAL      { "" }
+    ::= { tmnxSyslogTargetEntry 14 }
+
+tmnxSyslogHostnameUseSystem      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSyslogHostnameUseSystem is forcing usage
+         of configured system name as Hostname in Syslog packets."
+    DEFVAL      { false }
+    ::= { tmnxSyslogTargetEntry 15 }
+
+tmnxSyslogHostnameUseVprn        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSyslogHostnameUseVprn is forcing usage of
+         configured vprn name as Hostname in Syslog packets."
+    DEFVAL      { false }
+    ::= { tmnxSyslogTargetEntry 16 }
+
+tmnxSyslogTimestampFormat        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        standard    (0),
+        millisecond (1)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyslogTimestampFormat specifies the syslog
+         timestamp-format.
+
+         The value millisecond is configured, then the timestamp in  the syslog
+         messages for that particular syslog include 3  fractional second
+         digits."
+    ::= { tmnxSyslogTargetEntry 17 }
+
 tmnxEventAppTable                OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxEventAppEntry
     MAX-ACCESS  not-accessible
@@ -2179,7 +2356,8 @@ TmnxEventEntry                   ::= SEQUENCE
     tmnxEventSpecThrottleDef         TruthValue,
     tmnxEventSpecThrottleLimitDef    Unsigned32,
     tmnxEventSpecThrottleIntvalDef   Unsigned32,
-    tmnxEventRepeat                  TruthValue
+    tmnxEventRepeat                  TruthValue,
+    tmnxSourceStream                 INTEGER
 }
 
 tmnxEventID                      OBJECT-TYPE
@@ -2368,6 +2546,21 @@ tmnxEventRepeat                  OBJECT-TYPE
         "repeat"
     DEFVAL      { false }
     ::= { tmnxEventEntry 15 }
+
+tmnxSourceStream                 OBJECT-TYPE
+    SYNTAX      INTEGER {
+        main     (0),
+        security (1),
+        change   (2),
+        debug    (3),
+        li       (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSourceStream indicates from which stream is logger
+         event generated."
+    ::= { tmnxEventEntry 16 }
 
 tmnxSnmpTrapGroupTable           OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxSnmpTrapGroupEntry
@@ -2646,7 +2839,7 @@ TmnxSnmpSetErrsEntry             ::= SEQUENCE
     tmnxSseSnmpPort                  TmnxUdpPort,
     tmnxSseRequestId                 Unsigned32,
     tmnxSseVersion                   SnmpMessageProcessingModel,
-    tmnxSseSeverityLevel             TmnxPerceivedSeverity,
+    tmnxSseSeverityLevel             TmnxSnmpSetErrsSeverity,
     tmnxSseModuleId                  Unsigned32,
     tmnxSseModuleName                TNamedItem,
     tmnxSseErrorCode                 Unsigned32,
@@ -2709,7 +2902,7 @@ tmnxSseVersion                   OBJECT-TYPE
     ::= { tmnxSnmpSetErrsEntry 5 }
 
 tmnxSseSeverityLevel             OBJECT-TYPE
-    SYNTAX      TmnxPerceivedSeverity
+    SYNTAX      TmnxSnmpSetErrsSeverity
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -2751,7 +2944,7 @@ tmnxSseErrorCode                 OBJECT-TYPE
     ::= { tmnxSnmpSetErrsEntry 9 }
 
 tmnxSseErrorName                 OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE (1..64))
+    SYNTAX      DisplayString (SIZE (0..64))
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -2763,7 +2956,7 @@ tmnxSseErrorName                 OBJECT-TYPE
     ::= { tmnxSnmpSetErrsEntry 10 }
 
 tmnxSseErrorMsg                  OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE (1..255))
+    SYNTAX      DisplayString (SIZE (0..255))
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -3141,11 +3334,8 @@ TmnxLogApCustRecordEntry         ::= SEQUENCE
     tmnxLogApCrLastChanged           TimeStamp,
     tmnxLogApCrSignChangeDelta       Unsigned32,
     tmnxLogApCrSignChangeQueue       TQueueIdOrAll,
-    tmnxLogApCrSignChangeOCntr       THsmdaCounterIdOrZeroOrAll,
     tmnxLogApCrSignChangeQICounters  TmnxAccPlcyQICounters,
     tmnxLogApCrSignChangeQECounters  TmnxAccPlcyQECounters,
-    tmnxLogApCrSignChangeOICounters  TmnxAccPlcyOICounters,
-    tmnxLogApCrSignChangeOECounters  TmnxAccPlcyOECounters,
     tmnxLogApCrSignChangeAACounters  TmnxAccPlcyAACounters,
     tmnxLogApCrAACounters            TmnxAccPlcyAACounters,
     tmnxLogApCrAASubAttributes       TmnxAccPlcyAASubAttributes,
@@ -3186,17 +3376,6 @@ tmnxLogApCrSignChangeQueue       OBJECT-TYPE
     DEFVAL      { 0 }
     ::= { tmnxLogApCustRecordEntry 3 }
 
-tmnxLogApCrSignChangeOCntr       OBJECT-TYPE
-    SYNTAX      THsmdaCounterIdOrZeroOrAll
-    MAX-ACCESS  read-write
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxLogApCrSignChangeOCntr specifies the counter-id that
-         will be taken as reference to which the significant change defined in
-         tmnxLogApCrSignChangeDelta applies."
-    DEFVAL      { 0 }
-    ::= { tmnxLogApCustRecordEntry 4 }
-
 tmnxLogApCrSignChangeQICounters  OBJECT-TYPE
     SYNTAX      TmnxAccPlcyQICounters
     MAX-ACCESS  read-write
@@ -3227,36 +3406,6 @@ tmnxLogApCrSignChangeQECounters  OBJECT-TYPE
     DEFVAL      { {} }
     ::= { tmnxLogApCustRecordEntry 6 }
 
-tmnxLogApCrSignChangeOICounters  OBJECT-TYPE
-    SYNTAX      TmnxAccPlcyOICounters
-    MAX-ACCESS  read-write
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxLogApCrSignChangeOICounters specifies the ingress
-         counter Ids in the counter-group defined by tmnxLogApCrSignChangeOCntr
-         to be taken as reference to which the significant change defined in
-         tmnxLogApCrSignChangeDelta applies.
-
-         A non-zero value of this object is only allowed if the object
-         tmnxLogApCrSignChangeOCntr has a non-zero value."
-    DEFVAL      { {} }
-    ::= { tmnxLogApCustRecordEntry 7 }
-
-tmnxLogApCrSignChangeOECounters  OBJECT-TYPE
-    SYNTAX      TmnxAccPlcyOECounters
-    MAX-ACCESS  read-write
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxLogApCrSignChangeOECounters specifies the egress
-         counter Ids in the counter-group defined by tmnxLogApCrSignChangeOCntr
-         to be taken as reference to which the significant change defined in
-         tmnxLogApCrSignChangeDelta applies.
-
-         A non-zero value of this object is only allowed if the object
-         tmnxLogApCrSignChangeOCntr has a non-zero value."
-    DEFVAL      { {} }
-    ::= { tmnxLogApCustRecordEntry 8 }
-
 tmnxLogApCrSignChangeAACounters  OBJECT-TYPE
     SYNTAX      TmnxAccPlcyAACounters
     MAX-ACCESS  read-write
@@ -3267,8 +3416,6 @@ tmnxLogApCrSignChangeAACounters  OBJECT-TYPE
          which the significant change defined in tmnxLogApCrSignChangeDelta
          applies.
 
-         A non-zero value of this object is only allowed if both the objects
-         tmnxLogApCrSignChangeOCntr and tmnxLogApCrSignChangeQueue are zero.
 
          Also, a non-zero value for this object is only allowed if the object
          tmnxLogApCrSignChangeDelta is either 0 or 1."
@@ -3433,97 +3580,6 @@ tmnxLogApCrQueueECounters        OBJECT-TYPE
     DEFVAL      { {} }
     ::= { tmnxLogApCustRecordQueueEntry 5 }
 
-tmnxLogApCrOverrideCntrTable     OBJECT-TYPE
-    SYNTAX      SEQUENCE OF TmnxLogApCrOverrideCntrEntry
-    MAX-ACCESS  not-accessible
-    STATUS      obsolete
-    DESCRIPTION
-        "The Nokia SROS series tmnxLogApCrOverrideCntrTable allows to create
-         custom record counter override information for a given accounting
-         policy.
-
-         Rows can only be created for existing accounting policies (as defined
-         in tmnxLogApTable)."
-    ::= { tmnxLogObjs 22 }
-
-tmnxLogApCrOverrideCntrEntry     OBJECT-TYPE
-    SYNTAX      TmnxLogApCrOverrideCntrEntry
-    MAX-ACCESS  not-accessible
-    STATUS      obsolete
-    DESCRIPTION
-        "Defines an entry in the tmnxLogApCrOverrideCntrTable. Entries in this
-         table are created and destroyed via SNMP Set requests."
-    INDEX       {
-        tmnxLogApPolicyId,
-        tmnxLogApCrOverrideCntrId
-    }
-    ::= { tmnxLogApCrOverrideCntrTable 1 }
-
-TmnxLogApCrOverrideCntrEntry     ::= SEQUENCE
-{
-    tmnxLogApCrOverrideCntrId        THsmdaCounterIdOrZero,
-    tmnxLogApCrOverrideCntrRowStatus RowStatus,
-    tmnxLogApCrOverrideCntrLastChngd TimeStamp,
-    tmnxLogApCrOverrideCntrICounters TmnxAccPlcyOICounters,
-    tmnxLogApCrOverrideCntrECounters TmnxAccPlcyOECounters
-}
-
-tmnxLogApCrOverrideCntrId        OBJECT-TYPE
-    SYNTAX      THsmdaCounterIdOrZero (1..8)
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The value of tmnxLogApCrOverrideCntrId specifies the counter group for
-         which counters will be collected in this custom record. The counters
-         that will be collected are defined in tmnxLogApCrOverrideCntrICounters
-         and tmnxLogApCrOverrideCntrECounters."
-    ::= { tmnxLogApCrOverrideCntrEntry 1 }
-
-tmnxLogApCrOverrideCntrRowStatus OBJECT-TYPE
-    SYNTAX      RowStatus
-    MAX-ACCESS  read-create
-    STATUS      obsolete
-    DESCRIPTION
-        "Row Status of the entry. This allows creation/deletion of rows in this
-         table."
-    ::= { tmnxLogApCrOverrideCntrEntry 2 }
-
-tmnxLogApCrOverrideCntrLastChngd OBJECT-TYPE
-    SYNTAX      TimeStamp
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxLogApCrOverrideCntrLastChngd indicates the sysUpTime
-         when an object in this table was last modified. A Value 0 means that
-         no change was made to this row since it was created."
-    ::= { tmnxLogApCrOverrideCntrEntry 3 }
-
-tmnxLogApCrOverrideCntrICounters OBJECT-TYPE
-    SYNTAX      TmnxAccPlcyOICounters
-    MAX-ACCESS  read-create
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxLogApCrOverrideCntrICounters specifies the list of
-         ingress counters that need to be collected in this custom record.
-
-         At least one of the objects tmnxLogApCrOverrideCntrICounters or
-         tmnxLogApCrOverrideCntrECounters must have a non-zero value."
-    DEFVAL      { {} }
-    ::= { tmnxLogApCrOverrideCntrEntry 4 }
-
-tmnxLogApCrOverrideCntrECounters OBJECT-TYPE
-    SYNTAX      TmnxAccPlcyOECounters
-    MAX-ACCESS  read-create
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxLogApCrOverrideCntrECounters specifies the list of
-         egress counters that need to be collected in this custom record.
-
-         At least one of the objects tmnxLogApCrOverrideCntrICounters or
-         tmnxLogApCrOverrideCntrECounters must have a non-zero value."
-    DEFVAL      { {} }
-    ::= { tmnxLogApCrOverrideCntrEntry 5 }
-
 tmnxEventPrimaryRoutePref        OBJECT-TYPE
     SYNTAX      INTEGER {
         inband  (1),
@@ -3603,7 +3659,7 @@ tmnxLogConfigEventsDamped        OBJECT-TYPE
          can result in the NMS system database being out of sync because
          of missed change events.  On the other hand, if the damping
          is disabled, 'false', it may take much longer for a large
-         CLI configuration file to be processed when manually 'exec'ed
+         CLI configuration file to be processed by CLI command 'exec'
          after system bootup."
     DEFVAL      { true }
     ::= { tmnxLogObjs 25 }
@@ -3767,7 +3823,7 @@ tmnxLogExRbkOpNumEvents          OBJECT-TYPE
          row entries in the associated tmnxLogExecRollbackEventTable
          for this exec, load, rollback revert, or vsd operation.
          It is updated only when the exec, load, rollback revert, or vsd
-         operation ends.  A value of zero (0) means that the operatio
+         operation ends.  A value of zero (0) means that the operation
          has not completed."
     ::= { tmnxLogExecRollbackOpEntry 9 }
 
@@ -4951,6 +5007,50 @@ tmnxLogApCrPolicerECounters      OBJECT-TYPE
     DEFVAL      { {} }
     ::= { tmnxLogApCustRecordPolicerEntry 5 }
 
+tmnxLogFileEncryptKey            OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFileEncryptKey specifies the key used when
+         decrypting log files. A get request to this object will always return
+         an empty string. By default, tmnxLogFileEncryptKey will be an empty
+         string."
+    DEFVAL      { "" }
+    ::= { tmnxLogObjs 32 }
+
+tmnxLogFilesTotalSize            OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4194304)
+    UNITS       "megabytes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFilesTotalSize specifies the maximum log files
+         size. The value zero specifies that no limit is specified."
+    DEFVAL      { 0 }
+    ::= { tmnxLogObjs 33 }
+
+tmnxLogApFilesTotalSize          OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4194304)
+    UNITS       "megabytes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApFilesTotalSize specifies the maximum accounting
+         log files size. The value zero specifies that no limit is specified."
+    DEFVAL      { 0 }
+    ::= { tmnxLogObjs 34 }
+
+tmnxLogEventTestCustomText       OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..801))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxLogEventTestCustomText custom text which
+         will be used in Logger 2011 tmnxTestEvent event."
+    DEFVAL      { "" }
+    ::= { tmnxLogObjs 35 }
+
 tmnxLogConformance               OBJECT IDENTIFIER ::= { tmnxSRConfs 12 }
 
 tmnxLogCompliances               OBJECT IDENTIFIER ::= { tmnxLogConformance 1 }
@@ -5344,9 +5444,46 @@ tmnxLogV22v0Compliance           MODULE-COMPLIANCE
         "The compliance statement for revision 22 of TIMETRA-LOG-MIB."
     MODULE
         MANDATORY-GROUPS {
-            tmnxSnmpTrapDestV22v0Group
+            tmnxSnmpTrapDestV22v0Group,
+            tmnxLogFileEncryptionGroup,
+            tmnxLogFilesTotalSizeGroup
         }
     ::= { tmnxLogCompliances 20 }
+
+tmnxLogV23v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for revision 23 of TIMETRA-LOG-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxSyslogHostnameGroup,
+            tmnxLogEventsSourceStreamGroup,
+            tmnxLogLiUsingVPRNvRtrIDGroup
+        }
+    ::= { tmnxLogCompliances 21 }
+
+tmnxLogV24v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for revision 24 of TIMETRA-LOG-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxLogEventTestCustomTextGroup,
+            tmnxSyslogTimestampFormatGroup,
+            tmnxLogNotifyObjsV24v0Group,
+            tmnxLogNotificationV24v0Group
+        }
+    ::= { tmnxLogCompliances 22 }
+
+tmnxLogV25v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for revision 25 of TIMETRA-LOG-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxLogNotificationV25v0Group
+        }
+    ::= { tmnxLogCompliances 23 }
 
 tmnxLogGroups                    OBJECT IDENTIFIER ::= { tmnxLogConformance 2 }
 
@@ -6155,7 +6292,7 @@ tmnxLogSnmpTrapGroupNameGroup    OBJECT-GROUP
     }
     STATUS      current
     DESCRIPTION
-        "The group of additonal objects supporting the Log Snmp-trap-group Id
+        "The group of additional objects supporting the Log Snmp-trap-group Id
          vs Name feature on Nokia SROS series systems in release 20."
     ::= { tmnxLogGroups 60 }
 
@@ -6165,7 +6302,7 @@ tmnxLogFilterParamsNameGroup     OBJECT-GROUP
     }
     STATUS      current
     DESCRIPTION
-        "The group of additonal objects supporting the Log Filter Entry Id vs
+        "The group of additional objects supporting the Log Filter Entry Id vs
          Name feature on Nokia SROS series systems in release 20."
     ::= { tmnxLogGroups 61 }
 
@@ -6175,7 +6312,7 @@ tmnxSyslogTargetNameGroup        OBJECT-GROUP
     }
     STATUS      current
     DESCRIPTION
-        "The group of additonal objects supporting the Log Syslog Id vs Name
+        "The group of additional objects supporting the Log Syslog Id vs Name
          feature on Nokia SROS series systems in release 20."
     ::= { tmnxLogGroups 63 }
 
@@ -6185,25 +6322,9 @@ tmnxSyslogTlsClntProfilNameGroup OBJECT-GROUP
     }
     STATUS      current
     DESCRIPTION
-        "The group of additonal objects supporting the Log Syslog over TLS
+        "The group of additional objects supporting the Log Syslog over TLS
          feature on Nokia SROS series systems in release 20."
     ::= { tmnxLogGroups 64 }
-
-tmnxLogApObsoleteObjsV21v0Group  OBJECT-GROUP
-    OBJECTS     {
-        tmnxLogApCrSignChangeOCntr,
-        tmnxLogApCrSignChangeOECounters,
-        tmnxLogApCrSignChangeOICounters,
-        tmnxLogApCrOverrideCntrRowStatus,
-        tmnxLogApCrOverrideCntrLastChngd,
-        tmnxLogApCrOverrideCntrICounters,
-        tmnxLogApCrOverrideCntrECounters
-    }
-    STATUS      current
-    DESCRIPTION
-        "The group of objects supporting custom record counter override
-         information obsoleted on Nokia SROS series systems in release 21.0."
-    ::= { tmnxLogGroups 65 }
 
 tmnxLogFileNameGroup             OBJECT-GROUP
     OBJECTS     {
@@ -6224,6 +6345,133 @@ tmnxSnmpTrapDestV22v0Group       OBJECT-GROUP
         "The group of objects added to support SNMP trap destinations in the
          Nokia SROS series systems release 22.0."
     ::= { tmnxLogGroups 67 }
+
+tmnxLogFileEncryptionGroup       OBJECT-GROUP
+    OBJECTS     {
+        tmnxLogFileEncryptKey
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the log on Nokia SROS
+         series system added in SROS release 22."
+    ::= { tmnxLogGroups 68 }
+
+tmnxLogFilesTotalSizeGroup       OBJECT-GROUP
+    OBJECTS     {
+        tmnxLogFilesTotalSize,
+        tmnxLogApFilesTotalSize
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the log on Nokia SROS
+         series system added in SROS release 22.10"
+    ::= { tmnxLogGroups 69 }
+
+tmnxSyslogHostnameGroup          OBJECT-GROUP
+    OBJECTS     {
+        tmnxSyslogHostname,
+        tmnxSyslogHostnameUseSystem,
+        tmnxSyslogHostnameUseVprn
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects supporting the Log Syslog Hostname
+         feature on Nokia SROS series systems in release 23."
+    ::= { tmnxLogGroups 70 }
+
+tmnxLogEventsSourceStreamGroup   OBJECT-GROUP
+    OBJECTS     {
+        tmnxSourceStream
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Log Events added for
+         Nokia SROS series systems release 23.7."
+    ::= { tmnxLogGroups 71 }
+
+tmnxLogLiUsingVPRNvRtrIDGroup    OBJECT-GROUP
+    OBJECTS     {
+        tmnxLogLiUsingVPRNvRtrID
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of LI Log added for Nokia
+         SROS series systems release 23.10."
+    ::= { tmnxLogGroups 72 }
+
+tmnxLogEventTestCustomTextGroup  OBJECT-GROUP
+    OBJECTS     {
+        tmnxLogEventTestCustomText
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the log on Nokia SROS
+         series system added in SROS release 24.3."
+    ::= { tmnxLogGroups 73 }
+
+tmnxSyslogTimestampFormatGroup   OBJECT-GROUP
+    OBJECTS     {
+        tmnxSyslogTimestampFormat
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of timestamp format  for
+         syslog added for Nokia SROS series systems release 24.x."
+    ::= { tmnxLogGroups 74 }
+
+tmnxLogNotifyObjsV24v0Group      OBJECT-GROUP
+    OBJECTS     {
+        logCustomEventSubject,
+        logCustomEventMessageString,
+        logCustomEventParameter1,
+        logCustomEventParameter2,
+        logCustomEventParameter3,
+        logCustomEventParameter4,
+        logCustomEventParameter5,
+        logCustomEventParameter6,
+        logCustomEventParameter7,
+        logCustomEventParameter8
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of accessible-for-notify objects added to Nokia SROS series
+         systems release 24.10."
+    ::= { tmnxLogGroups 75 }
+
+tmnxLogNotificationV24v0Group    NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxCustomEvent1,
+        tmnxCustomEvent2,
+        tmnxCustomEvent3,
+        tmnxCustomEvent4,
+        tmnxCustomEvent5,
+        tmnxCustomEvent6
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting the Log feature on Nokia SROS
+         series systems added in release 24.10."
+    ::= { tmnxLogGroups 76 }
+
+tmnxLogNotifyObjsV25v0Group      OBJECT-GROUP
+    OBJECTS     {
+        tmnxNetconfStreamDropCount
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of accessible-for-notify objects added to Nokia SROS series
+         systems release 25.3."
+    ::= { tmnxLogGroups 77 }
+
+tmnxLogNotificationV25v0Group    NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxNetconfNotifyOverrun
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting the Log feature on Nokia SROS
+         series systems added in release 25.3."
+    ::= { tmnxLogGroups 78 }
 
 tmnxLogNotifyPrefix              OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 12 }
 
@@ -6322,7 +6570,8 @@ tmnxLogFileDeleted               NOTIFICATION-TYPE
 tmnxTestEvent                    NOTIFICATION-TYPE
     OBJECTS     {
         sysDescr,
-        sysObjectID
+        sysObjectID,
+        tmnxLogEventTestCustomText
     }
     STATUS      current
     DESCRIPTION
@@ -6444,5 +6693,176 @@ tmnxLogEventOverrun              NOTIFICATION-TYPE
          especially those going to remote destinations such as file,
          syslog and snmp notification logs."
     ::= { tmnxLogNotifications 12 }
+
+tmnxCustomEvent1                 NOTIFICATION-TYPE
+    OBJECTS     {
+        logCustomEventSubject,
+        logCustomEventMessageString,
+        logCustomEventParameter1,
+        logCustomEventParameter2,
+        logCustomEventParameter3,
+        logCustomEventParameter4,
+        logCustomEventParameter5,
+        logCustomEventParameter6,
+        logCustomEventParameter7,
+        logCustomEventParameter8
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] A tmnxCustomEvent1 notification is generated on demand when
+         operator types perform log custom-event from MD interface, or
+         equivalent is received from NETCONF interface, with severity critical.
+
+         [EFFECT] tmnxCustomEvent1 notification with all custom set fields is
+         sent to all supported interfaces, Log, NETCONF, SNMP.
+
+         [RECOVERY] No action needed."
+    ::= { tmnxLogNotifications 13 }
+
+tmnxCustomEvent2                 NOTIFICATION-TYPE
+    OBJECTS     {
+        logCustomEventSubject,
+        logCustomEventMessageString,
+        logCustomEventParameter1,
+        logCustomEventParameter2,
+        logCustomEventParameter3,
+        logCustomEventParameter4,
+        logCustomEventParameter5,
+        logCustomEventParameter6,
+        logCustomEventParameter7,
+        logCustomEventParameter8
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] A tmnxCustomEvent2 notification is generated on demand when
+         operator types perform log custom-event from MD interface, or
+         equivalent is received from NETCONF interface, with severity major.
+
+         [EFFECT] tmnxCustomEvent2 notification with all custom set fields is
+         sent to all supported interfaces, Log, NETCONF, SNMP.
+
+         [RECOVERY] No action needed."
+    ::= { tmnxLogNotifications 14 }
+
+tmnxCustomEvent3                 NOTIFICATION-TYPE
+    OBJECTS     {
+        logCustomEventSubject,
+        logCustomEventMessageString,
+        logCustomEventParameter1,
+        logCustomEventParameter2,
+        logCustomEventParameter3,
+        logCustomEventParameter4,
+        logCustomEventParameter5,
+        logCustomEventParameter6,
+        logCustomEventParameter7,
+        logCustomEventParameter8
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] A tmnxCustomEvent3 notification is generated on demand when
+         operator types perform log custom-event from MD interface, or
+         equivalent is received from NETCONF interface, with severity minor.
+
+         [EFFECT] tmnxCustomEvent3 notification with all custom set fields is
+         sent to all supported interfaces, Log, NETCONF, SNMP.
+
+         [RECOVERY] No action needed."
+    ::= { tmnxLogNotifications 15 }
+
+tmnxCustomEvent4                 NOTIFICATION-TYPE
+    OBJECTS     {
+        logCustomEventSubject,
+        logCustomEventMessageString,
+        logCustomEventParameter1,
+        logCustomEventParameter2,
+        logCustomEventParameter3,
+        logCustomEventParameter4,
+        logCustomEventParameter5,
+        logCustomEventParameter6,
+        logCustomEventParameter7,
+        logCustomEventParameter8
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] A tmnxCustomEvent4 notification is generated on demand when
+         operator types perform log custom-event from MD interface, or
+         equivalent is received from NETCONF interface, with severity warning.
+
+         [EFFECT] tmnxCustomEvent4 notification with all custom set fields is
+         sent to all supported interfaces, Log, NETCONF, SNMP.
+
+         [RECOVERY] No action needed."
+    ::= { tmnxLogNotifications 16 }
+
+tmnxCustomEvent5                 NOTIFICATION-TYPE
+    OBJECTS     {
+        logCustomEventSubject,
+        logCustomEventMessageString,
+        logCustomEventParameter1,
+        logCustomEventParameter2,
+        logCustomEventParameter3,
+        logCustomEventParameter4,
+        logCustomEventParameter5,
+        logCustomEventParameter6,
+        logCustomEventParameter7,
+        logCustomEventParameter8
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] A tmnxCustomEvent5 notification is generated on demand when
+         operator types perform log custom-event from MD interface, or
+         equivalent is received from NETCONF interface, with severity cleared.
+
+         [EFFECT] tmnxCustomEvent5 notification with all custom set fields is
+         sent to all supported interfaces, Log, NETCONF, SNMP.
+
+         [RECOVERY] No action needed."
+    ::= { tmnxLogNotifications 17 }
+
+tmnxCustomEvent6                 NOTIFICATION-TYPE
+    OBJECTS     {
+        logCustomEventSubject,
+        logCustomEventMessageString,
+        logCustomEventParameter1,
+        logCustomEventParameter2,
+        logCustomEventParameter3,
+        logCustomEventParameter4,
+        logCustomEventParameter5,
+        logCustomEventParameter6,
+        logCustomEventParameter7,
+        logCustomEventParameter8
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] A tmnxCustomEvent6 notification is generated on demand when
+         operator types perform log custom-event from MD interface, or
+         equivalent is received from NETCONF interface, with severity
+         indeterminate.
+
+         [EFFECT] tmnxCustomEvent6 notification with all custom set fields is
+         sent to all supported interfaces, Log, NETCONF, SNMP.
+
+         [RECOVERY] No action needed."
+    ::= { tmnxLogNotifications 18 }
+
+tmnxNetconfNotifyOverrun         NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxLogIdNetconfStream,
+        tmnxNetconfStreamDropCount
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] A tmnxNetconfNotifyOverrun notification is generated when
+         Netconf Notify queue is overrun. This queue is responsible for sending
+         log events into Netconf servers as Netconf Notifications. Link to
+         Netconf server is too slow for current log event rate or link to
+         Netconf server is down.
+
+         [EFFECT] Logger events have been dropped and were not sent to
+         particular Netconf stream destination.
+
+         [RECOVERY] Use faster link to Netconf server, or implement throttle
+         policies, to decrease number of reported events."
+    ::= { tmnxLogNotifications 19 }
 
 END

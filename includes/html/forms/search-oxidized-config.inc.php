@@ -10,11 +10,14 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
+Gate::authorize('oxidized.search');
+
 header('Content-type: application/json');
 
 $status = 'error';
 $message = 'unknown error';
-$parameters = strip_tags($_POST['search_in_conf_textbox']);
+$parameters = strip_tags((string) $_POST['search_in_conf_textbox']);
 if (isset($parameters)) {
     $message = 'Queried';
     if ($output = search_oxidized_config($parameters)) {

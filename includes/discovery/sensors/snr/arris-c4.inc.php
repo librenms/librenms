@@ -38,7 +38,7 @@ foreach ($oids as $index => $data) {
         $oid = '.1.3.6.1.2.1.10.127.1.1.4.1.5.' . $index;
         $divisor = 10;
         $value = $data['DOCS-IF-MIB::docsIfSigQSignalNoise'];
-        if (preg_match('/.0$/', $port?->ifName)) {
+        if (preg_match('/.0$/', (string) $port?->ifName)) {
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
                 'sensor_class' => 'snr',

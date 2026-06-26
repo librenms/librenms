@@ -49,7 +49,7 @@ trait EntityMib
             $entityPhysical = new EntPhysical($data);
             $entityPhysical->entPhysicalIndex = $entityPhysicalIndex;
             // get ifIndex. also if parent has an ifIndex, set it too
-            $entityPhysical->ifIndex = $entPhysicalToIfIndexMap[$entityPhysicalIndex] ?? $entPhysicalToIfIndexMap[$entityPhysical->entPhysicalContainedIn] ?? null;
+            $entityPhysical->ifIndex = $entPhysicalToIfIndexMap[$entityPhysicalIndex] ?? $entPhysicalToIfIndexMap[(int) $entityPhysical->entPhysicalContainedIn] ?? null;
 
             return $entityPhysical;
         });
@@ -65,7 +65,7 @@ trait EntityMib
 
         foreach ($mapping as $entityPhysicalIndex => $data) {
             $id = $data[0]['ENTITY-MIB::entAliasMappingIdentifier'] ?? $data[1]['ENTITY-MIB::entAliasMappingIdentifier'] ?? null;
-            if ($id && preg_match('/ifIndex[\[.](\d+)/', $id, $matches)) {
+            if ($id && preg_match('/ifIndex[\[.](\d+)/', (string) $id, $matches)) {
                 $map[(int) $entityPhysicalIndex] = (int) $matches[1];
             }
         }

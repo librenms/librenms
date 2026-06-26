@@ -3,55 +3,51 @@ FOUNDRY-SN-AGENT-MIB DEFINITIONS ::= BEGIN
 IMPORTS
 	MODULE-IDENTITY, OBJECT-TYPE,TimeTicks, IpAddress, Counter32, Gauge32,Unsigned32,Integer32
 		FROM SNMPv2-SMI
-	TEXTUAL-CONVENTION, RowStatus, TruthValue, TimeStamp
+	TEXTUAL-CONVENTION, RowStatus
 		FROM SNMPv2-TC
 	InterfaceIndex
 		FROM IF-MIB
-	InetAddressType, InetAddress
+	InetAddressType, InetAddress		
 		FROM INET-ADDRESS-MIB		-- [RFC 4001]
 	CounterBasedGauge64
 		FROM HCNUM-TC
+	EnabledStatus
+		FROM P-BRIDGE-MIB
 	snChassis, snAgentSys, snStack
 		FROM FOUNDRY-SN-ROOT-MIB;
 
 snAgent MODULE-IDENTITY
-    LAST-UPDATED "201112220000Z"  -- 22 December 2011
-    ORGANIZATION "Brocade Communications Systems, Inc."
-    CONTACT-INFO
-             "Technical Support Center
-              130 Holger Way,
-              San Jose, CA  95134
-              Email:  ipsupport@brocade.com
-              Phone: 1-800-752-8061
-              URL:  www.brocade.com"
-    DESCRIPTION
-             "Copyright 1996-2010 Brocade Communications Systems, Inc.
-              All rights reserved.
-              This Brocade Communications Systems SNMP Management Information Base Specification
-              embodies Brocade Communications Systems' confidential and proprietary
-              intellectual property. Brocade Communications Systems retains all
-              title and ownership in the Specification, including any revisions.
-
-              This Specification is supplied AS IS, and Brocade Communications Systems makes
-              no warranty, either express or implied, as to the use,
-              operation, condition, or performance of the specification, and any unintended
-              consequence it may on the user environment."
-
-    REVISION        "201112220000Z"  -- 22 December 2011
-    DESCRIPTION
-        "Major Changes in NI 5.3: Added MIBs for Simplified Upgrade,
-        Fixes for status for 100G module in blocked slot,
-        SNMP support for MR2 module
-        Description Updates."
-
-    REVISION        "201006020000Z"  -- 04 June 2010
-    DESCRIPTION
-        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
-
-    REVISION     "200909300000Z" -- September 30, 2009
-    DESCRIPTION
+	LAST-UPDATED "201708070000Z" -- Aug 7, 2017
+	ORGANIZATION "Ruckus Wireless, Inc."
+	CONTACT-INFO
+			"
+			Technical Support Center, Ruckus Wireless, Inc,
+			350 West Java Drive,
+			Sunnyvale, CA 94089, USA
+			Support URL: https://support.ruckuswireless.com
+			Phone: +1-855-782-5871
+			ROW TF Numbers: https://support.ruckuswireless.com/contact-us"
+	DESCRIPTION
+			"
+			Copyright 1996-2017 Ruckus Wireless, Inc..
+			All rights reserved.
+			This Ruckus Wireless, Inc SNMP Management Information Base Specification
+			embodies Ruckus Wireless, Inc' confidential and proprietary
+			intellectual property. Ruckus Wireless, Inc retains all
+			title and ownership in the Specification, including any
+			revisions.
+			
+			This Specification is supplied AS IS, and Ruckus Wireless, Inc makes
+			no warranty, either express or implied, as to the use,
+			operation, condition, or performance of the Specification.			
+			"        	
+	REVISION     "200909300000Z" -- September 30, 2009
+	DESCRIPTION
 			"convert from SMIv1 to SMIv2"
-   ::= { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) 1991 4}
+	REVISION     "201708070000Z" -- Aug 7, 2017
+	DESCRIPTION
+        	     "Modified contact Info, Organization and Decscription"
+   ::= { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) foundry(1991) 4}
 
 		-- textual conventions
 
@@ -62,10 +58,10 @@ snAgent MODULE-IDENTITY
 			   This data type is used to model media addresses.  For many
 			   types of media, this will be in a binary representation.
 			   For example, an ethernet address would be represented as
-			   a string of 6 octets.
+			   a string of 6 octets.			
 			"
-		SYNTAX	OCTET STRING (SIZE(6))
-
+		SYNTAX	OCTET STRING (SIZE(6))        
+		
 	DisplayString ::= TEXTUAL-CONVENTION
 		STATUS	  current
 		DESCRIPTION
@@ -73,41 +69,7 @@ snAgent MODULE-IDENTITY
 			 from the NVT ASCII character set.  By convention, objects
 			 with this syntax are declared as having
 				SIZE (0..255)"
-		SYNTAX	OCTET STRING
-
-
-	BrcdImageType ::= TEXTUAL-CONVENTION
-		STATUS	  current
-		DESCRIPTION
-			"Image types supported by XMR/MLX and CES/CER"
-		SYNTAX	INTEGER {
-			unknown(1),
-			managementModuleBoot(2),
-			managementModuleMonitor(3),
-			managementModuleApplication(4),
-			interfaceModuleBoot(5),
-			interfaceModuleMonitor(6),
-			interfaceModuleApplication(7),
-			mgmtAndIntfModuleCombinedApp(8),
-			fpgaMBridge(9),
-			fpgaMBridge32(10),
-			fpgaSBridge(11),
-			fpgaHBridge(12),
-			fpgaBundled(13),
-			fpgaPbifOc(14),
-			fpgaStatsOc(15),
-			fpgaXppOc(16),
-			fpgaPbifMrj(17),
-			fpgaStatsMrj(18),
-			fpgaXppMrj(19),
-			fpgaPbifSp2(20),
-			fpgaXgmacSp2(21),
-			fpgaXppSp2(22),
-			fpgaPbif8x10(23),
-			fpgaXpp8x10(24),
-			fpgaXpp2x100(25),
-			fpgaPbifMetro(26)
-			}
+		SYNTAX	OCTET STRING        
 
 -- Groups
 
@@ -127,8 +89,8 @@ snChasType OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS	current
 	DESCRIPTION
-		"The chassis type represents the type
-		of Foundry product being managed. "
+		"The chassis type represents the type 
+		of Ruckus Wireless product being managed. "
 	::= { snChasGen 1 }
 
 
@@ -154,11 +116,11 @@ snChasPwrSupplyStatus OBJECT-TYPE
 	STATUS	deprecated
 	DESCRIPTION
 		"This object is being deprecated, please use snChasPwrSupplyTable instead.
-
+	
 		A bit array that contains the value of the
 		Chassis Power Supplies. This is a packed bit string;
 		the 2 power supplies status are encoded into 4 bits
-		(a nibble).
+		(a nibble). 
 
 		There are multiple power supplies per chassis in this release.
 		The following shows the meaning of each bit:
@@ -196,7 +158,7 @@ snChasFanStatus OBJECT-TYPE
 	STATUS	deprecated
 	DESCRIPTION
 		"This object is being deprecated, please use snChasFanTable instead.
-
+	
 		A bit array that contains the value of the
 		fan status. This is a packed bit string. The
 		status of each fan is encoded into one bit.
@@ -269,25 +231,25 @@ snChasStatusLeds OBJECT-TYPE
 	STATUS	current
 	DESCRIPTION
 		"A bit array that contains the value of the
-		front panel status LEDs. This is a bit-map;
+		front panel status LEDs. This is a bit-map; 
 		each LED is encoded into 1 bit for each switch
-		port.  The maximum number of ports in one chassis
-		is 24 that means 24 Ports Status LEDs. The expansion port
-		number always begins from the last main port number.
-		The following shows the meaning of each bit for each
+		port.  The maximum number of ports in one chassis 
+		is 24 that means 24 Ports Status LEDs. The expansion port 
+		number always begins from the last main port number.  
+		The following shows the meaning of each bit for each 
 		switch port:
 
 		  bit value  meaning
-		  --------   ---------
+		  --------   ---------  
 			 0         off (Link off)
 			 1         on  (Link on)
 
-		The bitmap of LEDs are as following:
-
+		The bitmap of LEDs are as following: 
+			  
 				 (Port1)            (Port4)                    (Port8)
 		Bit      (Bit0)             (Bit3)                      (Bit7)
-		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8
-		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16
+		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8    
+		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16     
 		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24
 		--------"
 	::= { snChasGen 9 }
@@ -299,25 +261,25 @@ snChasTrafficLeds OBJECT-TYPE
 	STATUS	current
 	DESCRIPTION
 		"A bit array that contains the value of the
-		front panel traffic LEDs. This is a packed bit string;
+		front panel traffic LEDs. This is a packed bit string; 
 		each LED is encoded into 1 bit for each switch
-		port.  The maximum number of ports in one chassis
-		is 24 that means 24 Ports Traffic LEDs. The expansion port
-		number always begins from the last main port number.
-		The following shows the meaning of each bit for each
+		port.  The maximum number of ports in one chassis 
+		is 24 that means 24 Ports Traffic LEDs. The expansion port 
+		number always begins from the last main port number.  
+		The following shows the meaning of each bit for each 
 		switch port:
 
 		  bit value  meaning
-		  --------   ---------
+		  --------   ---------  
 			 0         off (no traffic)
 			 1         on  (traffic)
 
-		The bitmap of LEDs are as following:
-
+		The bitmap of LEDs are as following: 
+			  
 				 (Port1)            (Port4)                    (Port8)
 		Bit      (Bit0)             (Bit3)                      (Bit7)
-		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8
-		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16
+		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8    
+		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16     
 		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24
 		--------"
 	::= { snChasGen 10 }
@@ -329,25 +291,25 @@ snChasMediaLeds OBJECT-TYPE
 	STATUS	current
 	DESCRIPTION
 		"A bit array that contains the value of the
-		front panel media LEDs. This is a packed bit string;
-		each LED is encoded into 1 bit for each switch port.
-		The maximum number of ports in one chassis is 24
-		that means 24 Ports Media LEDs.  The expansion port
-		number always begins from the last main port number.
-		The following shows the meaning of each bit for each
+		front panel media LEDs. This is a packed bit string; 
+		each LED is encoded into 1 bit for each switch port.  
+		The maximum number of ports in one chassis is 24 
+		that means 24 Ports Media LEDs.  The expansion port 
+		number always begins from the last main port number. 
+		The following shows the meaning of each bit for each 
 		switch port:
 
-		bit value  meaning
+		bit value  meaning   
 		---------  -------
 		  0        half duplex
 		  1        full duplex
 
-		The bitmap of LEDs are as following:
+		The bitmap of LEDs are as following: 
 				 (Port1)            (Port4)                    (Port8)
 		Bit      (Bit0)             (Bit3)                      (Bit7)
-		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8
-		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16
-		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24
+		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8    
+		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16     
+		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24			  
 		---------"
 	::= { snChasGen 11 }
 
@@ -381,7 +343,7 @@ snChasMainBrdId OBJECT-TYPE
 
 		If format version octet has the value 2, the octets after the
 		version octet have the following meaning:
-		  octet 1  - product type:
+		  octet 1  - product type: 
 						BI_WG					0x57
 						BI_BB					0x42
 						BI_NI					0x4E
@@ -406,9 +368,9 @@ snChasMainBrdId OBJECT-TYPE
 						SLAVE_COPPER_16_2		0xF
 						STACK_FIBER_8G			0x10
 						STACK_COPPER_8G			0x11
-						MASTER_FIBER_2G			0x12
+						MASTER_FIBER_2G			0x12	
 						SLAVE_100FX_24			0x13
-						MASTER_FIBER_0G			0x14
+						MASTER_FIBER_0G			0x14	
 						POS_622M				0x15
 						POS_155M				0x16
 						SLAVE_FIBER_2G			0x17
@@ -426,15 +388,15 @@ snChasMainBrdId OBJECT-TYPE
 						MASTER_M4_8G			0x23
 						MASTER_M4_4G			0x24
 						MASTER_M4_2G			0x25
-						MASTER_M4_0G			0x26
-						MASTER_M5_0G			0x27
-						POS_2488M				0x28
-						SLAVE_M5_0G				0x29
-						POS_N2488M				0x2A
-						STACK_IPC_48_2			0x2B
-						SLAVE_NPA_FIBER_4G		0x2C
-						ATM_2PORT				0x2D
-						ATM_4PORT				0x2E
+						MASTER_M4_0G			0x26	
+						MASTER_M5_0G			0x27	
+						POS_2488M				0x28	
+						SLAVE_M5_0G				0x29	
+						POS_N2488M				0x2A	
+						STACK_IPC_48_2			0x2B	
+						SLAVE_NPA_FIBER_4G		0x2C	
+						ATM_2PORT				0x2D	
+						ATM_4PORT				0x2E	
 						SLAVE_FIBER_10G			0x2F
 						STACK_FES_48_2			0x30
 						STACK_FES_24_2			0x31
@@ -452,13 +414,13 @@ snChasMainBrdId OBJECT-TYPE
 						SUPERX_FI_24GF  		0x43
 						SUPERX_FI_2P10G_WAN 	0x44
 						SUPERX_FI_MGMT_II       0x4a
-						SLAVE_JC_48E			0xC3
-						SLAVE_JC_48T			0xC4
+						SLAVE_JC_48E			0xC3	
+						SLAVE_JC_48T			0xC4	
 						MASTER_JC_M4_8G		0xC5
-						SLAVE_JC_8G				0xC6
-						SLAVE_JC_B16GF			0xC8
-						MASTER_JC_B2404			0xC9
-						SLAVE_JC_B16GC			0xCA
+						SLAVE_JC_8G				0xC6	
+						SLAVE_JC_B16GF			0xC8	
+						MASTER_JC_B2404			0xC9	
+						SLAVE_JC_B16GC			0xCA	
 
 		  The length of the octet string is 28.
 
@@ -469,11 +431,11 @@ snChasMainBrdId OBJECT-TYPE
 		  octet 5  - processor speed in MHz
 		  octet 6  - MAC type:
 						MAC_NONE=0
-						MAC_SEEQ_10_100=1,
+						MAC_SEEQ_10_100=1, 
 						MAC_DEC_10_100=2,
 						MAC_3COM_10_100=3,
 						MAC_X10GMAC_10000=4,
-						MAC_SEEQ_1000=5,
+						MAC_SEEQ_1000=5, 
 						MAC_GMAC_1000=6,
 						MAC_VLSI_1000=7
 		  octet 7  - PHY type, PHY_NONE=0, PHY_QSI=1, PHY_BROADCOM=2,
@@ -495,7 +457,7 @@ snChasMainBrdId OBJECT-TYPE
 		  octet 27 - serial number.
 
 		  Format version 1 only:
-		  octet 28 - chassis backplane type.
+		  octet 28 - chassis backplane type. 
 			chassis4000	= 	0x00
 			chassis8000	=	0x02
 			chassis15000	=	0x01
@@ -533,25 +495,25 @@ snChasSpeedLeds OBJECT-TYPE
 	STATUS	current
 	DESCRIPTION
 		"A bit array that contains the value of the
-		front panel media LEDs. This is a packed bit string;
-		each LED is encoded into 1 bit for each switch port.
-		The maximum number of ports in one chassis is 24
-		that means 24 Ports Speed LEDs.  The expansion port
-		number always begins from the last main port number.
-		The following shows the meaning of each bit for each
+		front panel media LEDs. This is a packed bit string; 
+		each LED is encoded into 1 bit for each switch port.  
+		The maximum number of ports in one chassis is 24 
+		that means 24 Ports Speed LEDs.  The expansion port 
+		number always begins from the last main port number. 
+		The following shows the meaning of each bit for each 
 		switch port:
 
-		bit value  meaning
+		bit value  meaning   
 		---------  -------
 		  0        10 MBit
 		  1        100 MBit
 
-		The bitmap of LEDs are as following:
+		The bitmap of LEDs are as following: 
 				 (Port1)            (Port4)                    (Port8)
 		Bit      (Bit0)             (Bit3)                      (Bit7)
-		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8
-		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16
-		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24
+		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8    
+		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16     
+		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24			  
 		---------"
 	::= { snChasGen 15 }
 
@@ -659,14 +621,14 @@ snChasFlashCardLeds OBJECT-TYPE
 	STATUS	current
 	DESCRIPTION
 		"A bit array that contains the value of the
-		flash card LEDs. This is a packed bit string;
+		flash card LEDs. This is a packed bit string; 
 		each LED is encoded into 1 bit for each flash card.
 
 		  bit value  meaning
-		  --------   ---------
-			 0         off
-			 1         on
-		"
+		  --------   ---------  
+			 0         off 
+			 1         on 
+		"	  
 	::= { snChasGen 23 }
 
 
@@ -713,10 +675,6 @@ snChasProductType OBJECT-TYPE
 		biRx32(15),
 		niCES2000Series(16),
 		niCER2000Series(17),
-		brMlxE4(18),
-		brMlxE8(19),
-		brMlxE16(20),
-		brMlxE32(21),
 		biNI2(50),
 		biBB(66),
 		biM4(77),
@@ -730,38 +688,20 @@ snChasProductType OBJECT-TYPE
 		"Product type."
 	::= { snChasGen 26 }
 
-snChasSystemMode OBJECT-TYPE
-	SYNTAX		INTEGER {
-		xmr(1),
-		mlx(2)
-	}
-	MAX-ACCESS	read-only
-	STATUS	current
-	DESCRIPTION
-		"System Mode.  This object is only applicable to XMR/MLX/MLXe products.
-		For example, if snChasProductType is niMlx4/niMlx8/niMlx16/niMlx32 then the
-		this object returns mlx(2).  If snChasProductType is niXmr4000/niXmr8000
-		niXmr160000/niXmr32000 this object returns xmr(1).  If snChasProductType
-		is brMlxE4/brMlxE8/brMlxE16/brMlxE32 this object
-		returns either xmr(1) or mlx(2) depending on the mode of the system.
-		This object is not supported for the other products."
-	::= { snChasGen 27 }
+snChasGlobalIgnoreShutdownTemperature OBJECT-TYPE
+    SYNTAX  INTEGER { disabled(0), enabled(1) }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+         "Enable/Disable the temperature threshold shutdown (Battleshort mode) feature at global level.
+        Able to fetch the temperature threshold shutdown (Battleshort mode) feature status enabled (1)/disabled (0) at global level
+        The set operation is allowed at global level.
+        Set to 1 to enable the temperature threshold shutdown (Battleshort mode) feature at global level.
+        Set to 0 to disable the temperature threshold shutdown (Battleshort mode) feature at global level.
+        The default status is disabled."
 
-snChasFactoryPartNumber OBJECT-TYPE
-	SYNTAX  DisplayString (SIZE (0..64))
-	MAX-ACCESS  read-only
-	STATUS  current
-	DESCRIPTION
-		"Factory Part number assigned by the manufacturer."
-	::= { snChasGen 28 }
-
-snChasFactorySerialNumber OBJECT-TYPE
-	SYNTAX	DisplayString (SIZE(0..128))
-	MAX-ACCESS	read-only
-	STATUS	current
-	DESCRIPTION
-		"Factory serial number assigned by the manufacturer."
-	::= { snChasGen 29 }
+    DEFVAL { disabled }
+    ::= { snChasGen 30 }
 
 -- Power Supply Table
 
@@ -988,7 +928,7 @@ snChasFan2Unit OBJECT-TYPE
 	DESCRIPTION
 		"The index to fan table."
 	::= { snChasFan2Entry 1 }
-
+	
 snChasFan2Index OBJECT-TYPE
 	SYNTAX	Integer32
 	MAX-ACCESS	read-only
@@ -1052,7 +992,11 @@ SnChasUnitEntry ::= SEQUENCE {
 	snChasUnitShutdownTemperature
 		INTEGER,
 	snChasUnitPartNum
-		DisplayString
+		DisplayString,
+    snChasUnitIgnoreShutdownTemperature
+        INTEGER,
+	snChasUnitFanless
+		INTEGER
 	}
 
 snChasUnitIndex OBJECT-TYPE
@@ -1081,7 +1025,7 @@ snChasUnitNumSlots OBJECT-TYPE
 		"Number of slots of the chassis for each unit."
 	::= { snChasUnitEntry 3 }
 
-
+	
 snChasUnitActualTemperature OBJECT-TYPE
 	SYNTAX  INTEGER (-110..250)
 	MAX-ACCESS	read-only
@@ -1129,6 +1073,37 @@ snChasUnitPartNum OBJECT-TYPE
 		the value should be a zero length string."
 	::= { snChasUnitEntry 7 }
 
+snChasUnitIgnoreShutdownTemperature OBJECT-TYPE
+    SYNTAX  INTEGER { disabled(0), enabled(1) }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable/Disable the temperature threshold shutdown (Battleshort mode) feature on the unit specific.
+        Able to fetch the temperature threshold shutdown (Battleshort mode) feature status enabled (1)/disabled (0) on the unit specific
+        The set operation is allowed at unit specific.
+        Set to 1 to enable the temperature threshold shutdown (Battleshort mode) feature on the unit specific.
+        Set to 0 to disable the temperature threshold shutdown (Battleshort mode) feature on the unit specific.
+        The default status is disabled."
+    DEFVAL { disabled }
+    ::= { snChasUnitEntry 8 }
+
+snChasUnitFanless OBJECT-TYPE
+	SYNTAX  INTEGER {
+		 none(0),
+		 enabled(1), 
+		 disabled(2)
+		 }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+	"Fanless mode can be enabled or disabled on certain FI devices.
+	none (0): not applicable to the device.
+	enabled(1): fanless mode is enabled on the device
+	disabled(2): fanless mode is disabled on the device.
+	The default value is disabled (2) .
+	Note: that Fanless mode can be applicable to ICX7150-24P and ICX7150-48P only"
+	DEFVAL { disabled }
+	::= { snChasUnitEntry 9 }
 
 -- Agent Groups
 
@@ -1147,16 +1122,14 @@ snAgentHw			    OBJECT IDENTIFIER ::= { snAgentSys 12 }
 snAgentTemp			    OBJECT IDENTIFIER ::= { snAgentSys 13 }
 snAgentPoe				OBJECT IDENTIFIER ::= { snAgentSys 14 }
 snAgentLicense			OBJECT IDENTIFIER ::= { snAgentSys 15 }
-brcdSw					OBJECT IDENTIFIER ::= { snAgentSys 16 }
+  
 
-brcdSwPackageGroup		OBJECT IDENTIFIER ::= { brcdSw 1 }
-brcdSwPackageUpgrade 	OBJECT IDENTIFIER ::= { brcdSwPackageGroup 1 }
-brcdSwIntfModAutoUpgrade 	OBJECT IDENTIFIER ::= { brcdSwPackageGroup 2 }
+
 -- SECTION 2: MIB Objects
 
 
 -- Agent's Global Group
-
+	
 snAgReload OBJECT-TYPE
 	SYNTAX	INTEGER {
 		other(1),
@@ -1185,7 +1158,7 @@ snAgEraseNVRAM OBJECT-TYPE
 		normal(1),
 		error(2),
 		erase(3),
-		erasing(4),
+		erasing(4),		
 		busy(5)
 		}
 	MAX-ACCESS	read-write
@@ -1199,7 +1172,7 @@ snAgEraseNVRAM OBJECT-TYPE
 		  busy(5).......operation not allowed at this time, flash is busy
 
 		The following value can be written:
-		  erase(3).....do erase
+		  erase(3).....do erase 
 
 		The agent will return a response even before the erase is done.
 		And the read value will be erasing until erase is done.
@@ -1211,7 +1184,7 @@ snAgWriteNVRAM OBJECT-TYPE
 		normal(1),
 		error(2),
 		write(3),
-		writing(4),
+		writing(4),		
 		busy(5)
 		}
 	MAX-ACCESS	read-write
@@ -1226,7 +1199,7 @@ snAgWriteNVRAM OBJECT-TYPE
 		  busy(5).......operation not allowed at this time, flash is busy
 
 		The following value can be written:
-		  write(3).....do write
+		  write(3).....do write 
 
 		The agent will return a response even before the write is done.
 		And the read value will be writing until write is done.
@@ -1241,24 +1214,22 @@ snAgConfigFromNVRAM OBJECT-TYPE
 		configing(4),
 		busy(5)
 	}
-	MAX-ACCESS	read-write
+	MAX-ACCESS	not-accessible
 	STATUS	current
 	DESCRIPTION
-		"This object is no more supported by FastIron and NetIron agents and
-		should not be used.
-		Action object to config the switch from NVRAM of the agent.
+		"Action object to config the switch from NVRAM of the agent.
 		The following values can only be read:
 		  normal(1)
 		  error(2)... operation failed or bad flash
 		  configing(4)...configing from NVRAM flash is in process.
 		  busy(5).......operation not allowed at this time, flash is busy
 		The following value can be written:
-		  config(3).....do config
+		  config(3).....do config 
 
 		The agent will return a response after config is done."
 	::= { snAgentGbl 4 }
-	
---  image and config file down/up load
+
+--  image and config file down/up load 
 
 -- snAgTftpServerIp object is deprecated, and added following 2 new objects.
 -- 1. "snAgTftpServerAddrType" represents Ipv4 and Ipv6 address types
@@ -1294,14 +1265,14 @@ snAgImgLoad OBJECT-TYPE
 		tftpTimeoutError(6),
 		tftpOutOfBufferSpace(7),
 		tftpBusy(8),
-		tftpRemoteOtherErrors(9),
-		tftpRemoteNoFile(10),
-		tftpRemoteBadAccess(11),
-		tftpRemoteDiskFull(12),
-		tftpRemoteBadOperation(13),
-		tftpRemoteBadId(14),
-		tftpRemoteFileExists(15),
-		tftpRemoteNoUser(16),
+		tftpRemoteOtherErrors(9), 
+		tftpRemoteNoFile(10), 
+		tftpRemoteBadAccess(11), 
+		tftpRemoteDiskFull(12), 
+		tftpRemoteBadOperation(13), 
+		tftpRemoteBadId(14), 
+		tftpRemoteFileExists(15), 
+		tftpRemoteNoUser(16), 
 		operationError(17),
 		loading(18),
 		uploadMPPrimary(19),
@@ -1317,7 +1288,9 @@ snAgImgLoad OBJECT-TYPE
 		downloadMPBootTFTP(29),
 		uploadMPMonitor(30),
 		downloadMPMonitor(31),
-		downloadSPBootROM(32)
+		downloadSPBootROM(32),
+		downloadUfiPrimary(34),
+        downloadUfiSecondary(35)
 		}
 	MAX-ACCESS	read-write
 	STATUS	current
@@ -1341,14 +1314,16 @@ snAgImgLoad OBJECT-TYPE
 		  uploadMPMonitor(30)..upload the Monitor image from MP flash to tftp server.
 		  downloadMPMonitor(31)..download the Monitor image from tftp server to MP flash.
 		  downloadSPBootROM(32)..download the Boot image from tftp server to SP flash.
-
+		  downloadUfiPrimary(34)..download the Primary UFI image from tftp server to flash.
+          downloadUfiSecondary(35)..download the Secondary UFI image from tftp server to flash.
+	
 		MP is the management processor, SP is the switch processor.
 
 		The image filename is defined in
 		snAgImgFname. The tftp server address is defined in snAgTftpServerIp.
-		Atomic set of snAgImgLoad, snAgImgFname and
-		snAgTftpServerIp is required to allow down/up load to happen.
-		And the write request will be rejected during loading until error
+		Atomic set of snAgImgLoad, snAgImgFname and  
+		snAgTftpServerIp is required to allow down/up load to happen. 
+		And the write request will be rejected during loading until error 
 		or normal."
 	::= { snAgentGbl 7 }
 
@@ -1377,14 +1352,14 @@ snAgCfgLoad OBJECT-TYPE
 		tftpTimeoutError(6),
 		tftpOutOfBufferSpace(7),
 		tftpBusy(8),
-		tftpRemoteOtherErrors(9),
-		tftpRemoteNoFile(10),
-		tftpRemoteBadAccess(11),
-		tftpRemoteDiskFull(12),
-		tftpRemoteBadOperation(13),
-		tftpRemoteBadId(14),
-		tftpRemoteFileExists(15),
-		tftpRemoteNoUser(16),
+		tftpRemoteOtherErrors(9), 
+		tftpRemoteNoFile(10), 
+		tftpRemoteBadAccess(11), 
+		tftpRemoteDiskFull(12), 
+		tftpRemoteBadOperation(13), 
+		tftpRemoteBadId(14), 
+		tftpRemoteFileExists(15), 
+		tftpRemoteNoUser(16), 
 		operationError(17),
 		loading(18),
 		uploadFromFlashToServer(20),
@@ -1411,10 +1386,10 @@ snAgCfgLoad OBJECT-TYPE
 
 		The following value can be used to set:
 		  uploadFromFlashToServer(20)..upload the config from flash
-											  to tftp server.
+											  to tftp server. 
 		  downloadToFlashFromServer(21)..download the config to flash
 												from tftp server.
-		  uploadFromDramToServer(22)..upload the config from DRAM
+		  uploadFromDramToServer(22)..upload the config from DRAM 
 											 to tftp server.
 		  downloadToDramFromServer(23)..download the config to DRAM
 											   from tftp server.
@@ -1423,7 +1398,7 @@ snAgCfgLoad OBJECT-TYPE
 											   and overwrite with the new config.
 
 		The following value can be used to set:
-		  uploadFromFlashToNMS(24)..upload the config from flash to NMS.
+		  uploadFromFlashToNMS(24)..upload the config from flash to NMS. 
 		  downloadToFlashFromNMS(25)..download the config to flash from NMS.
 		  uploadFromDramToNMS(26)..upload the config from DRAM to NMS.
 		  downloadToDramFromNMS(27)..download the config to DRAM from NMS.
@@ -1431,10 +1406,10 @@ snAgCfgLoad OBJECT-TYPE
 		The config filename is defined in
 		snAgCfgFname. The tftp server address is defined in snAgTftpServerIp.
 		Atomic set of snAgCfgLoad, snAgCfgFname and  snAgTftpServerIp is
-		required to allow down/up load to happen. And the write request
+		required to allow down/up load to happen. And the write request 
 		will be rejected during loading until error or normal.
 		For those NMS commands from (24) to (27), The snAgCfgEosTable MIB must
-		be sent along in one PDU.  A seperate write memory cli or set
+		be sent along in one PDU.  A seperate write memory cli or set 
 		snAgWriteNVRAM is required to save the config to NVRAM."
 	::= { snAgentGbl 9 }
 
@@ -1445,7 +1420,7 @@ snAgDefGwayIp OBJECT-TYPE
 	MAX-ACCESS	read-write
 	STATUS	current
 	DESCRIPTION
-		"The default gateway (router) address."
+		"The default gateway (router) address." 	
 	::= { snAgentGbl 10 }
 
 
@@ -1493,7 +1468,7 @@ snAgGblPassword OBJECT-TYPE
 	MAX-ACCESS	read-write
 	STATUS	current
 	DESCRIPTION
-		"System Security Access Password and this is only
+		"System Security Access Password and this is only 
 		 allowed to use for setting but not for reading.
 		   An SNMP-Get will get an null string.
 		   By default, this object needs to be in the same PDU while
@@ -1503,15 +1478,15 @@ snAgGblPassword OBJECT-TYPE
 		   The value of this object depends on the authentication
 		 method configured for SNMP.
 		   If there's no AAA authentication configuration for SNMP,
-		this object will have the enable superuser password.
-		   If the AAA authentication for SNMP is configured and has
-		leading method as enable or line, this object will have
+		this object will have the enable superuser password. 
+		   If the AAA authentication for SNMP is configured and has 
+		leading method as enable or line, this object will have 
 		the corresponding enable or line password.
 		   If the switch has AAA authentication for SNMP operation,
 		and the method specified is one of local, TACACS+, or RADIUS,
-		this object will have format '<username> <password>'
+		this object will have format '<username> <password>' 
 		(note one space character in between).
-		  The max size allows concatenation of max 48 octets of
+		  The max size allows concatenation of max 48 octets of 
 		 username and 48 octets of password, with one blank character"
 	::= { snAgentGbl 15 }
 
@@ -1520,13 +1495,13 @@ snAgTrpRcvrCurEntry OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS	current
 	DESCRIPTION
-		"The current total entries of the Trap
+		"The current total entries of the Trap 
 		Receiver Table are created."
 	::= { snAgentGbl 16 }
 
 snAgGblDataRetrieveMode OBJECT-TYPE
 	SYNTAX  INTEGER {
-		nextbootCfg(0),
+		nextbootCfg(0),             
 		operationalData(1)
 		}
 	MAX-ACCESS  read-write
@@ -1536,24 +1511,24 @@ snAgGblDataRetrieveMode OBJECT-TYPE
 		 The VLAN Table and Port-STP Table data will be retrieved
 		 according to this mode.
 		 nextbootCfg(0).........the nextboot configuration data are retrieved
-		 operationalData(1)..........the current running data are retrieved"
+		 operationalData(1)..........the current running data are retrieved"  
 	::= { snAgentGbl 19 }
 
 
 snAgSystemLog OBJECT-TYPE
-	SYNTAX	OCTET STRING (SIZE(5))
+	SYNTAX	OCTET STRING (SIZE(5))	
 	MAX-ACCESS	read-write
 	STATUS	current
 	DESCRIPTION
 		"The system log object to indicate whether any Network
 		 Management Station(NMS) has login.  The first byte
-		 of the octet string is the value decribed below and
+		 of the octet string is the value decribed below and 
 		 followed by 4 bytes of secret code.
 		  login(1)..... a value for a NMS to login.
-		  heartbeat(2)... a value for the login NMS periodically to
+		  heartbeat(2)... a value for the login NMS periodically to 
 						checkin; Otherwise, the Agent will automatically
-						set this object to logout(3) after a timeout
-						period.
+						set this object to logout(3) after a timeout 
+						period. 
 		  logout(3).... a value for a NMS to logout.
 		  changePassword(4).... a value for the login NMS to change
 						password, only if snAgGblPasswordChangeMode
@@ -1664,7 +1639,7 @@ snAgGblSecurityLevelSet OBJECT-TYPE
 	::= { snAgentGbl 28 }
 
 snAgGblLevelPasswordsMask OBJECT-TYPE
-	SYNTAX   Integer32
+	SYNTAX   Integer32 
 	MAX-ACCESS	read-only
 	STATUS	current
 	DESCRIPTION
@@ -1672,7 +1647,7 @@ snAgGblLevelPasswordsMask OBJECT-TYPE
 	::= { snAgentGbl 29 }
 
 snAgGblQueueOverflow OBJECT-TYPE
-	SYNTAX	INTEGER	{ false(0), true(1) }
+	SYNTAX	INTEGER	{ false(0), true(1) } 
 	MAX-ACCESS	read-only
 	STATUS	current
 	DESCRIPTION
@@ -1681,7 +1656,7 @@ snAgGblQueueOverflow OBJECT-TYPE
 	::= { snAgentGbl 30 }
 
 snAgGblBufferShortage OBJECT-TYPE
-	SYNTAX	INTEGER	{ false(0), true(1) }
+	SYNTAX	INTEGER	{ false(0), true(1) } 
 	MAX-ACCESS	read-only
 	STATUS	current
 	DESCRIPTION
@@ -1690,7 +1665,7 @@ snAgGblBufferShortage OBJECT-TYPE
 	::= { snAgentGbl 31 }
 
 snAgGblDmaFailure OBJECT-TYPE
-	SYNTAX	INTEGER	{ false(0), true(1) }
+	SYNTAX	INTEGER	{ false(0), true(1) } 
 	MAX-ACCESS	read-only
 	STATUS	current
 	DESCRIPTION
@@ -1699,7 +1674,7 @@ snAgGblDmaFailure OBJECT-TYPE
 	::= { snAgentGbl 32 }
 
 snAgGblResourceLowWarning OBJECT-TYPE
-	SYNTAX	INTEGER	{ false(0), true(1) }
+	SYNTAX	INTEGER	{ false(0), true(1) } 
 	MAX-ACCESS	read-only
 	STATUS	current
 	DESCRIPTION
@@ -1708,7 +1683,7 @@ snAgGblResourceLowWarning OBJECT-TYPE
 	::= { snAgentGbl 33 }
 
 snAgGblExcessiveErrorWarning OBJECT-TYPE
-	SYNTAX	INTEGER	{ false(0), true(1) }
+	SYNTAX	INTEGER	{ false(0), true(1) } 
 	MAX-ACCESS	read-only
 	STATUS	current
 	DESCRIPTION
@@ -1721,9 +1696,7 @@ snAgGblCpuUtilData OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS	current
 	DESCRIPTION
-		"The statistics collection of utilization of the CPU in the device.
-		In NetIron and FastIron platforms, reading this object resets all the counters.
-		Therefore, a user need not set snAgGblUtilCollect."
+		"The statistics collection of utilization of the CPU in the device. Reading this object resets all the counters.  Therefore, a user need not set snAgGblUtilCollect."
 	::= { snAgentGbl 35 }
 
 snAgGblCpuUtilCollect OBJECT-TYPE
@@ -1737,13 +1710,13 @@ snAgGblCpuUtilCollect OBJECT-TYPE
 	::= { snAgentGbl 36 }
 
 snAgGblTelnetTimeout OBJECT-TYPE
-	SYNTAX	Integer32
+	SYNTAX	INTEGER (0..240)
 	MAX-ACCESS	read-write
 	STATUS	current
 	DESCRIPTION
-		"Telnet session idling timeout value. Each value unit is one minute.
-		FastIron and NetIron platforms support value upto 240 minutes.
-		On these platforms, value 0 means telnet sessions do not timeout."
+		"Telnet session idling timeout value. Writing value 0 to
+		this object never timeouts any telnet sessions. Each value
+		unit is one minute."
 	::= { snAgentGbl 37 }
 
 snAgGblEnableWebMgmt OBJECT-TYPE
@@ -1881,7 +1854,7 @@ snAgGblTelnetPassword OBJECT-TYPE
 	MAX-ACCESS	read-write
 	STATUS	current
 	DESCRIPTION
-		"Telnet Access Password and this is only
+		"Telnet Access Password and this is only 
 		 useful for write operation. A read operation
 		 get a null string.
 		  Set operation on this object is allowed only if command
@@ -1915,7 +1888,8 @@ snAgBuildVer OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS	current
 	DESCRIPTION
-		"The image label of the built software"
+		"The version of the built software in the form
+		'major.minor.maintenance[letters]'."
 	::= { snAgentGbl 49 }
 
 snAgGblCpuUtil1SecAvg OBJECT-TYPE
@@ -1948,18 +1922,16 @@ snAgGblDynMemUtil OBJECT-TYPE
 	STATUS  deprecated
 	DESCRIPTION
 		"The system dynamic memory utilization, in unit of percentage.
-		Deprecated: Refer to snAgSystemDRAMUtil.
-		For NI platforms, refer to snAgentBrdMemoryUtil100thPercent"
+		Deprecated: Refer to snAgSystemDRAMUtil"
 	::= { snAgentGbl 53 }
 
 snAgGblDynMemTotal OBJECT-TYPE
-	SYNTAX   Integer32
+	SYNTAX   Gauge32
 	MAX-ACCESS	read-only
 	STATUS  deprecated
 	DESCRIPTION
 		"The total amount of system dynamic memory, in number of bytes.
-		Deprecated: Refer to snAgSystemDRAMTotal.
-		For NI platforms, refer to snAgentBrdMemoryTotal"
+		Deprecated: Refer to snAgSystemDRAMTotal"
 	::= { snAgentGbl 54 }
 
 snAgGblDynMemFree OBJECT-TYPE
@@ -1968,8 +1940,7 @@ snAgGblDynMemFree OBJECT-TYPE
 	STATUS  deprecated
 	DESCRIPTION
 		"The free amount of system dynamic memory, in number of bytes.
-		Deprecated: Refer to snAgSystemDRAMFree.
-		For NI platforms, refer to snAgentBrdMemoryAvailable"
+		Deprecated: Refer to snAgSystemDRAMFree"
 	::= { snAgentGbl 55 }
 
 snAgImgLoadSPModuleType OBJECT-TYPE
@@ -2022,12 +1993,11 @@ snAgSFlowSourceInterface OBJECT-TYPE
 	::= { snAgentGbl 59 }
 
 snAgGblTelnetLoginTimeout OBJECT-TYPE
-	SYNTAX	Integer32
+	SYNTAX	INTEGER (1..10)
 	MAX-ACCESS	read-write
 	STATUS	current
 	DESCRIPTION
-		"Telnet session login timeout value in minutes.
-		FastIron and NetIron platforms support value upto 10 minutes, and default of 1 minute."
+		"Telnet session login timeout value in minutes. Default is 2 minutes."
 	::= { snAgentGbl 60 }
 
 snAgGblBannerExec OBJECT-TYPE
@@ -2062,7 +2032,7 @@ snAgWebMgmtServerTcpPort OBJECT-TYPE
 		"The TCP port number of web management interface."
 	::= { snAgentGbl 64 }
 
---  image and config file down/up load
+--  image and config file down/up load 
 
 snAgTftpServerAddrType			 OBJECT-TYPE
 	SYNTAX	InetAddressType
@@ -2081,24 +2051,37 @@ snAgTftpServerAddr			 OBJECT-TYPE
 		  "TFTP server IP address."
 	::= { snAgentGbl 66 }
 
-snAgGblDeleteFirstBeforeDownload OBJECT-TYPE
-	SYNTAX	TruthValue
+snAgGblPasswordCheckMode OBJECT-TYPE
+	SYNTAX	EnabledStatus
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"enabled(1)  - The password checking for SNMP set requests is enabled. The default value is enable.
+		 disabled(2) -  The password checking for SNMP set requests is disabled. 
+		When enabled all image/file related MIB object set requests  PDU must include the password using the snAgGblPassword."
+	DEFVAL { enabled }
+	::= { snAgentGbl 68 }
+
+snAgGblEnableTelnetAuthentication OBJECT-TYPE
+	SYNTAX	INTEGER { disabled(0), enabled(1) }
 	MAX-ACCESS	read-write
 	STATUS	current
 	DESCRIPTION
-		  "When set to true deletes the existing target file on the
-		   Management module flash. This object can be set to true only
-		   when the snAgImgLoad is set to downloadMPPrimary(20),
-		   downloadMPSecondary(22), downloadSPPrimary(24),
-		   downloadSPSecondary(25) or downloadMPMonitor(31) in the same
-		   SNMP set request PDU.
+		"Enable or disable telnet authentication in device."
+	DEFVAL { disabled }
+	::= { snAgentGbl 69 }
 
-		   This object is reset to false after successful or unsuccessful
-		   download of specified file to flash.
-
-		   Reading this object returns false(2)."
-	::= { snAgentGbl 67 }
-
+snAgGblManager2FactorAuthentication OBJECT-TYPE
+	SYNTAX  INTEGER { disabled(0), enabled(1) }
+	MAX-ACCESS      read-write
+	STATUS  current
+	DESCRIPTION
+		"enabled(1) - The manager two-factor authentication is enabled. Only revSSH access through SZ is allowed
+		and all incoming SSH sessions to device are closed when two-factor authentication is enabled.
+		disabled(0) - The manager two-factor authentication is disabled. SSH access to device from sources
+		other than SZ is allowed after manager two-factor authentication is disabled"
+	DEFVAL { disabled }
+	::= { snAgentGbl 70 }
 
 -- Agent Board Table
 
@@ -2135,23 +2118,23 @@ SnAgentBrdEntry ::= SEQUENCE {
 		OCTET STRING,
 	snAgentBrdExpPortTotal
 		INTEGER,
-	snAgentBrdStatusLeds
+	snAgentBrdStatusLeds 
 		Integer32,
-	snAgentBrdTrafficLeds
+	snAgentBrdTrafficLeds 
 		Integer32,
-	snAgentBrdMediaLeds
+	snAgentBrdMediaLeds 
 		Integer32,
-	snAgentBrdSpeedLeds
+	snAgentBrdSpeedLeds 
 		Integer32,
 	snAgentBrdModuleStatus
 		INTEGER,
 	snAgentBrdRedundantStatus
 		INTEGER,
-	snAgentBrdAlarmLeds
+	snAgentBrdAlarmLeds 
 		Integer32,
-	snAgentBrdTxTrafficLeds
+	snAgentBrdTxTrafficLeds 
 		Integer32,
-	snAgentBrdRxTrafficLeds
+	snAgentBrdRxTrafficLeds 
 		Integer32,
 	snAgentBrdStatusLedString
 		OCTET STRING,
@@ -2174,13 +2157,11 @@ SnAgentBrdEntry ::= SEQUENCE {
 	snAgentBrdSerialNumber
 		DisplayString,
 	snAgentBrdPartNumber
-		DisplayString,
-	snAgentBrdMemoryUtil100thPercent
-		Unsigned32
+		DisplayString
 	}
 
 snAgentBrdIndex OBJECT-TYPE
-	SYNTAX	Integer32
+	SYNTAX	Integer32 
 	MAX-ACCESS	read-only
 	STATUS	current
 	DESCRIPTION
@@ -2206,7 +2187,7 @@ snAgentBrdMainBrdId OBJECT-TYPE
 					 format of this string.
 		If format version octet has the value 2, the octets after the
 		version octet have the following meaning:
-		  octet 1  - product type:
+		  octet 1  - product type: 
 						BI_WG					0x57
 						BI_BB					0x42
 						BI_NI					0x4E
@@ -2232,9 +2213,9 @@ snAgentBrdMainBrdId OBJECT-TYPE
 						SLAVE_COPPER_16_2		0xF
 						STACK_FIBER_8G			0x10
 						STACK_COPPER_8G			0x11
-						MASTER_FIBER_2G			0x12
+						MASTER_FIBER_2G			0x12	
 						SLAVE_100FX_24			0x13
-						MASTER_FIBER_0G			0x14
+						MASTER_FIBER_0G			0x14	
 						POS_622M				0x15
 						POS_155M				0x16
 						SLAVE_FIBER_2G			0x17
@@ -2252,15 +2233,15 @@ snAgentBrdMainBrdId OBJECT-TYPE
 						MASTER_M4_8G			0x23
 						MASTER_M4_4G			0x24
 						MASTER_M4_2G			0x25
-						MASTER_M4_0G			0x26
-						MASTER_M5_0G			0x27
-						POS_2488M				0x28
-						SLAVE_M5_0G				0x29
-						POS_N2488M				0x2A
-						STACK_IPC_48_2			0x2B
-						SLAVE_NPA_FIBER_4G		0x2C
-						ATM_2PORT				0x2D
-						ATM_4PORT				0x2E
+						MASTER_M4_0G			0x26	
+						MASTER_M5_0G			0x27	
+						POS_2488M				0x28	
+						SLAVE_M5_0G				0x29	
+						POS_N2488M				0x2A	
+						STACK_IPC_48_2			0x2B	
+						SLAVE_NPA_FIBER_4G		0x2C	
+						ATM_2PORT				0x2D	
+						ATM_4PORT				0x2E	
 						SLAVE_FIBER_10G			0x2F
 						STACK_FES_48_2			0x30
 						STACK_FES_24_2			0x31
@@ -2278,12 +2259,12 @@ snAgentBrdMainBrdId OBJECT-TYPE
 						SUPERX_FI_24GF  		0x43
 						SUPERX_FI_2P10G_WAN 	0x44
 						SUPERX_FI_MGMT_II       0x4a
-						SLAVE_JC_48E			0xC3
-						SLAVE_JC_48T			0xC4
-						MASTER_JC_M4_8G			0xC5
-						SLAVE_JC_8G				0xC6
-						SLAVE_JC_B16GF			0xC8
-						MASTER_JC_B2404			0xC9
+						SLAVE_JC_48E			0xC3	
+						SLAVE_JC_48T			0xC4	
+						MASTER_JC_M4_8G			0xC5	
+						SLAVE_JC_8G				0xC6	
+						SLAVE_JC_B16GF			0xC8	
+						MASTER_JC_B2404			0xC9	
 						SLAVE_JC_B16GC			0xCA
 						SLAVE_JC_B24FX			0xCE
 		  octet 3  - processor type, PVR_M603=3, PVR_M604=4, PVR_M603E=6,
@@ -2292,11 +2273,11 @@ snAgentBrdMainBrdId OBJECT-TYPE
 		  octet 5  - processor speed in MHz
 		  octet 6  - MAC type:
 						MAC_NONE=0
-						MAC_SEEQ_10_100=1,
+						MAC_SEEQ_10_100=1, 
 						MAC_DEC_10_100=2,
 						MAC_3COM_10_100=3,
 						MAC_X10GMAC_10000=4,
-						MAC_SEEQ_1000=5,
+						MAC_SEEQ_1000=5, 
 						MAC_GMAC_1000=6,
 						MAC_VLSI_1000=7
 		  octet 7  - PHY type, PHY_NONE=0, PHY_QSI=1, PHY_BROADCOM=2,
@@ -2316,7 +2297,7 @@ snAgentBrdMainBrdId OBJECT-TYPE
 		  octet 21 - code flash size in KBytes
 		  octet 22 to
 		  octet 27 - serial number.
-		  octet 28 - chassis backplane type.
+		  octet 28 - chassis backplane type. 
 			chassis4000	= 	0x00
 			chassis8000	=	0x02
 			chassis15000	=	0x01
@@ -2381,25 +2362,25 @@ snAgentBrdStatusLeds OBJECT-TYPE
 	STATUS  deprecated
 	DESCRIPTION
 		"A bit array that contains the value of the
-		front panel status LEDs. This is a bit-map;
+		front panel status LEDs. This is a bit-map; 
 		each LED is encoded into 1 bit for each switch
-		port.  The maximum number of ports in one chassis
-		is 32 that means 32 Ports Status LEDs. The expansion port
-		number always begins from the last main port number.
-		The following shows the meaning of each bit for each
+		port.  The maximum number of ports in one chassis 
+		is 32 that means 32 Ports Status LEDs. The expansion port 
+		number always begins from the last main port number.  
+		The following shows the meaning of each bit for each 
 		switch port:
 
 		  bit value  meaning
-		  --------   ---------
+		  --------   ---------  
 			 0         off (Link off)
 			 1         on  (Link on)
 
-		The bitmap of LEDs are as following:
-
+		The bitmap of LEDs are as following: 
+			  
 				 (Port1)            (Port4)                    (Port8)
 		Bit      (Bit0)             (Bit3)                      (Bit7)
-		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8
-		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16
+		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8    
+		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16     
 		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24
 		(It was obsoleted after release 07100, replaced by snAgentBrdStatusLedString)"
 	::= { snAgentBrdEntry 8 }
@@ -2411,25 +2392,25 @@ snAgentBrdTrafficLeds OBJECT-TYPE
 	STATUS  deprecated
 	DESCRIPTION
 		"A bit array that contains the value of the
-		front panel traffic LEDs. This is a packed bit string;
+		front panel traffic LEDs. This is a packed bit string; 
 		each LED is encoded into 1 bit for each switch
-		port.  The maximum number of ports in one chassis
-		is 24 that means 24 Ports Traffic LEDs. The expansion port
-		number always begins from the last main port number.
-		The following shows the meaning of each bit for each
+		port.  The maximum number of ports in one chassis 
+		is 24 that means 24 Ports Traffic LEDs. The expansion port 
+		number always begins from the last main port number.  
+		The following shows the meaning of each bit for each 
 		switch port:
 
 		  bit value  meaning
-		  --------   ---------
+		  --------   ---------  
 			 0         off (no traffic)
 			 1         on  (traffic)
 
-		The bitmap of LEDs are as following:
-
+		The bitmap of LEDs are as following: 
+			  
 				 (Port1)            (Port4)                    (Port8)
 		Bit      (Bit0)             (Bit3)                      (Bit7)
-		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8
-		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16
+		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8    
+		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16     
 		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24
 		(It was obsoleted after release 07100, replaced by snAgentBrdTrafficLedString)"
 	::= { snAgentBrdEntry 9 }
@@ -2441,25 +2422,25 @@ snAgentBrdMediaLeds OBJECT-TYPE
 	STATUS  deprecated
 	DESCRIPTION
 		"A bit array that contains the value of the
-		front panel media LEDs. This is a packed bit string;
-		each LED is encoded into 1 bit for each switch port.
-		The maximum number of ports in one chassis is 24
-		that means 24 Ports Media LEDs.  The expansion port
-		number always begins from the last main port number.
-		The following shows the meaning of each bit for each
+		front panel media LEDs. This is a packed bit string; 
+		each LED is encoded into 1 bit for each switch port.  
+		The maximum number of ports in one chassis is 24 
+		that means 24 Ports Media LEDs.  The expansion port 
+		number always begins from the last main port number. 
+		The following shows the meaning of each bit for each 
 		switch port:
 
-		bit value  meaning
+		bit value  meaning   
 		---------  -------
 		  0        half duplex
 		  1        full duplex
 
-		The bitmap of LEDs are as following:
+		The bitmap of LEDs are as following: 
 				 (Port1)            (Port4)                    (Port8)
 		Bit      (Bit0)             (Bit3)                      (Bit7)
-		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8
-		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16
-		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24
+		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8    
+		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16     
+		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24			  
 		(It was obsoleted after release 07100, replaced by snAgentBrdMediaLedString)"
 	::= { snAgentBrdEntry 10 }
 
@@ -2471,38 +2452,37 @@ snAgentBrdSpeedLeds OBJECT-TYPE
 	STATUS  deprecated
 	DESCRIPTION
 		"A bit array that contains the value of the
-		front panel media LEDs. This is a packed bit string;
-		each LED is encoded into 1 bit for each switch port.
-		The maximum number of ports in one chassis is 24
-		that means 24 Ports Speed LEDs.  The expansion port
-		number always begins from the last main port number.
-		The following shows the meaning of each bit for each
+		front panel media LEDs. This is a packed bit string; 
+		each LED is encoded into 1 bit for each switch port.  
+		The maximum number of ports in one chassis is 24 
+		that means 24 Ports Speed LEDs.  The expansion port 
+		number always begins from the last main port number. 
+		The following shows the meaning of each bit for each 
 		switch port:
 
-		bit value  meaning
+		bit value  meaning   
 		---------  -------
 		  0        10 MBit
 		  1        100 MBit
 
-		The bitmap of LEDs are as following:
+		The bitmap of LEDs are as following: 
 				 (Port1)            (Port4)                    (Port8)
 		Bit      (Bit0)             (Bit3)                      (Bit7)
-		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8
-		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16
-		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24
+		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8    
+		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16     
+		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24			  
 		(It was obsoleted after release 07100, replaced by snAgentBrdSpeedLedString)"
 	::= { snAgentBrdEntry 11 }
 
 snAgentBrdModuleStatus OBJECT-TYPE
 	SYNTAX  INTEGER {
-		moduleEmpty(0),
+		moduleEmpty(0),             
 		moduleGoingDown(2),
 		moduleRejected(3),
 		moduleBad(4),
 		moduleConfigured(8),
 		moduleComingUp(9),
-		moduleRunning(10),
-		moduleBlocked(11)
+		moduleRunning(10)
 		}
 	MAX-ACCESS  read-only
 	STATUS  current
@@ -2514,14 +2494,13 @@ snAgentBrdModuleStatus OBJECT-TYPE
 		moduleBad(4) ........... The module Hardware is bad.
 		moduleConfigured(8) ...... The module is configured (stacking)
 		moduleComingUp(9) ...... The module is in power-up cycle.
-		moduleRunning(10) ....... The module is running.
-		moduleBlocked(11) ....... The module is blocked, for full height card."
+		moduleRunning(10) ....... The module is running."
 	::= { snAgentBrdEntry 12 }
 
 snAgentBrdRedundantStatus OBJECT-TYPE
 	SYNTAX  INTEGER {
 		other(1),
-		active(2),
+		active(2),             
 		standby(3),
 		crashed(4),
 		comingUp(5)
@@ -2540,25 +2519,25 @@ snAgentBrdAlarmLeds OBJECT-TYPE
 	STATUS  deprecated
 	DESCRIPTION
 		"A bit array that contains the value of the
-		front panel media LEDs (for POS Module Only). This is a packed bit string;
-		each LED is encoded into 1 bit for each switch port.
-		The maximum number of ports in one chassis is 24
-		that means 24 Ports Speed LEDs.  The expansion port
-		number always begins from the last main port number.
-		The following shows the meaning of each bit for each
+		front panel media LEDs (for POS Module Only). This is a packed bit string; 
+		each LED is encoded into 1 bit for each switch port.  
+		The maximum number of ports in one chassis is 24 
+		that means 24 Ports Speed LEDs.  The expansion port 
+		number always begins from the last main port number. 
+		The following shows the meaning of each bit for each 
 		switch port:
 
-		bit value  meaning
+		bit value  meaning   
 		---------  -------
 		  0        no alarm
 		  1        alarm
 
-		The bitmap of LEDs are as following:
+		The bitmap of LEDs are as following: 
 				 (Port1)            (Port4)                    (Port8)
 		Bit      (Bit0)             (Bit3)                      (Bit7)
-		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8
-		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16
-		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24
+		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8    
+		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16     
+		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24			  
 		(It was obsoleted after release 07100, replaced by snAgentBrdAlarmLedString)"
 	::= { snAgentBrdEntry 14 }
 
@@ -2569,25 +2548,25 @@ snAgentBrdTxTrafficLeds OBJECT-TYPE
 	STATUS  deprecated
 	DESCRIPTION
 		"A bit array that contains the value of the
-		front panel transmit traffic LEDs (for POS Module Only). This is a packed bit string;
+		front panel transmit traffic LEDs (for POS Module Only). This is a packed bit string; 
 		each LED is encoded into 1 bit for each switch
-		port.  The maximum number of ports in one chassis
-		is 24 that means 24 Ports Transmit Traffic LEDs. The expansion port
-		number always begins from the last main port number.
-		The following shows the meaning of each bit for each
+		port.  The maximum number of ports in one chassis 
+		is 24 that means 24 Ports Transmit Traffic LEDs. The expansion port 
+		number always begins from the last main port number.  
+		The following shows the meaning of each bit for each 
 		switch port:
 
 		  bit value  meaning
-		  --------   ---------
+		  --------   ---------  
 			 0         off (no transmit traffic)
 			 1         on  (transmit traffic)
 
-		The bitmap of LEDs are as following:
-
+		The bitmap of LEDs are as following: 
+			  
 				 (Port1)            (Port4)                    (Port8)
 		Bit      (Bit0)             (Bit3)                      (Bit7)
-		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8
-		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16
+		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8    
+		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16     
 		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24
 		(It was obsoleted after release 07100, replaced by snAgentBrdTxTrafficLedString)"
 	::= { snAgentBrdEntry 15 }
@@ -2598,25 +2577,25 @@ snAgentBrdRxTrafficLeds OBJECT-TYPE
 	STATUS  deprecated
 	DESCRIPTION
 		"A bit array that contains the value of the
-		front panel receive traffic LEDs (for POS Module Only). This is a packed bit string;
+		front panel receive traffic LEDs (for POS Module Only). This is a packed bit string; 
 		each LED is encoded into 1 bit for each switch
-		port.  The maximum number of ports in one chassis
-		is 24 that means 24 Ports Receive Traffic LEDs. The expansion port
-		number always begins from the last main port number.
-		The following shows the meaning of each bit for each
+		port.  The maximum number of ports in one chassis 
+		is 24 that means 24 Ports Receive Traffic LEDs. The expansion port 
+		number always begins from the last main port number.  
+		The following shows the meaning of each bit for each 
 		switch port:
 
 		  bit value  meaning
-		  --------   ---------
+		  --------   ---------  
 			 0         off (no receive traffic)
 			 1         on  (receive traffic)
 
-		The bitmap of LEDs are as following:
-
+		The bitmap of LEDs are as following: 
+			  
 				 (Port1)            (Port4)                    (Port8)
 		Bit      (Bit0)             (Bit3)                      (Bit7)
-		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8
-		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16
+		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8    
+		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16     
 		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24
 		(It was obsoleted after release 07100, replaced by snAgentBrdRxTrafficLedString)"
 	::= { snAgentBrdEntry 16 }
@@ -2627,22 +2606,22 @@ snAgentBrdStatusLedString OBJECT-TYPE
 	STATUS	current
 	DESCRIPTION
 		"A bit array that contains the value of the
-		front panel status LEDs. This is a bit-map;
+		front panel status LEDs. This is a bit-map; 
 		each LED is encoded into 1 bit for each switch
 		port. The following shows the meaning of each
 		bit for each switch port:
 
 		  bit value  meaning
-		  --------   ---------
+		  --------   ---------  
 			 0         off (Link off)
 			 1         on  (Link on)
 
-		The bitmap of LEDs are as following:
-
+		The bitmap of LEDs are as following: 
+			  
 				 (Port1)            (Port4)                    (Port8)
 		Bit      (Bit0)             (Bit3)                      (Bit7)
-		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8
-		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16
+		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8    
+		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16     
 		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24
 		--------"
 	::= { snAgentBrdEntry 17 }
@@ -2653,22 +2632,22 @@ snAgentBrdTrafficLedString OBJECT-TYPE
 	STATUS	current
 	DESCRIPTION
 		"A bit array that contains the value of the
-		front panel traffic LEDs. This is a packed bit string;
+		front panel traffic LEDs. This is a packed bit string; 
 		each LED is encoded into 1 bit for each switch
 		port. The following shows the meaning of each
 		bit for each switch port:
 
 		  bit value  meaning
-		  --------   ---------
+		  --------   ---------  
 			 0         off (no traffic)
 			 1         on  (traffic)
 
-		The bitmap of LEDs are as following:
-
+		The bitmap of LEDs are as following: 
+			  
 				 (Port1)            (Port4)                    (Port8)
 		Bit      (Bit0)             (Bit3)                      (Bit7)
-		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8
-		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16
+		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8    
+		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16     
 		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24
 		--------"
 	::= { snAgentBrdEntry 18 }
@@ -2684,17 +2663,17 @@ snAgentBrdMediaLedString OBJECT-TYPE
 		The following shows the meaning of each bit for each
 		switch port:
 
-		bit value  meaning
+		bit value  meaning   
 		---------  -------
 		  0        half duplex
 		  1        full duplex
 
-		The bitmap of LEDs are as following:
+		The bitmap of LEDs are as following: 
 				 (Port1)            (Port4)                    (Port8)
 		Bit      (Bit0)             (Bit3)                      (Bit7)
-		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8
-		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16
-		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24
+		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8    
+		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16     
+		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24			  
 		---------"
 	::= { snAgentBrdEntry 19 }
 
@@ -2709,17 +2688,17 @@ snAgentBrdSpeedLedString OBJECT-TYPE
 		The following shows the meaning of each bit for each
 		switch port:
 
-		bit value  meaning
+		bit value  meaning   
 		---------  -------
 		  0        10 MBit
 		  1        100 MBit
 
-		The bitmap of LEDs are as following:
+		The bitmap of LEDs are as following: 
 				 (Port1)            (Port4)                    (Port8)
 		Bit      (Bit0)             (Bit3)                      (Bit7)
-		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8
-		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16
-		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24
+		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8    
+		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16     
+		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24			  
 		---------"
 	::= { snAgentBrdEntry 20 }
 
@@ -2734,17 +2713,17 @@ snAgentBrdAlarmLedString OBJECT-TYPE
 		into 1 bit for each switch port. The following
 		shows the meaning of each bit for each switch port:
 
-		bit value  meaning
+		bit value  meaning   
 		---------  -------
 		  0        no alarm
 		  1        alarm
 
-		The bitmap of LEDs are as following:
+		The bitmap of LEDs are as following: 
 				 (Port1)            (Port4)                    (Port8)
 		Bit      (Bit0)             (Bit3)                      (Bit7)
-		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8
-		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16
-		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24
+		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8    
+		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16     
+		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24			  
 		---------"
 	::= { snAgentBrdEntry 21 }
 
@@ -2760,16 +2739,16 @@ snAgentBrdTxTrafficLedString OBJECT-TYPE
 		meaning of each bit for each switch port:
 
 		  bit value  meaning
-		  --------   ---------
+		  --------   ---------  
 			 0         off (no transmit traffic)
 			 1         on  (transmit traffic)
 
-		The bitmap of LEDs are as following:
-
+		The bitmap of LEDs are as following: 
+			  
 				 (Port1)            (Port4)                    (Port8)
 		Bit      (Bit0)             (Bit3)                      (Bit7)
-		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8
-		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16
+		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8    
+		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16     
 		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24
 		--------"
 	::= { snAgentBrdEntry 22 }
@@ -2786,16 +2765,16 @@ snAgentBrdRxTrafficLedString OBJECT-TYPE
 		meaning of each bit for each switch port:
 
 		  bit value  meaning
-		  --------   ---------
+		  --------   ---------  
 			 0         off (no receive traffic)
 			 1         on  (receive traffic)
 
-		The bitmap of LEDs are as following:
-
+		The bitmap of LEDs are as following: 
+			  
 				 (Port1)            (Port4)                    (Port8)
 		Bit      (Bit0)             (Bit3)                      (Bit7)
-		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8
-		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16
+		Byte 1:	 LED1	LED2   LED3  LED4   LED5   LED6   LED7   LED8    
+		Byte 2:	 LED9	LED10  LED11 LED12  LED13  LED14  LED15  LED16     
 		Byte 3:	 LED17	LED18  LED19 LED20  LED21  LED22  LED23  LED24
 		--------"
 	::= { snAgentBrdEntry 23 }
@@ -2822,29 +2801,19 @@ snAgentBrdSerialNumber  OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 		"The Board Serial number. Zero length string indicates that
-		module serial number has not been programmed within
+		module serial number has not been programmed within 
 		EEPROM or the module does not support serial number within EEPROM."
 	::= { snAgentBrdEntry 26 }
 
 snAgentBrdPartNumber  OBJECT-TYPE
-	SYNTAX		DisplayString
+	SYNTAX		DisplayString 
 	MAX-ACCESS		read-only
 	STATUS		current
 	DESCRIPTION
 		"The Board Part number. Zero length string indicates that
-		module part number has not been programmed within
+		module part number has not been programmed within 
 		EEPROM or the module does not support part number within EEPROM."
 	::= { snAgentBrdEntry 27 }
-
-snAgentBrdMemoryUtil100thPercent OBJECT-TYPE
-	SYNTAX		Unsigned32 (0..10000)
-	MAX-ACCESS		read-only
-	STATUS		current
-	DESCRIPTION
-		" Dynamic memory utilization within this module in units
-		of one-hundredth of a percent. "
-	::= { snAgentBrdEntry 28 }
-
 
 
 -- Agent Stacking Board Table
@@ -2877,7 +2846,7 @@ SnAgentBrd2Entry ::= SEQUENCE {
 	snAgentBrd2MainBrdId
 		OCTET STRING,
 	snAgentBrd2MainPortTotal
-		Integer32,
+		Integer32,	
 	snAgentBrd2ModuleStatus
 		INTEGER,
 	snAgentBrd2RedundantStatus
@@ -2885,7 +2854,7 @@ SnAgentBrd2Entry ::= SEQUENCE {
 	}
 
 snAgentBrd2Unit OBJECT-TYPE
-	SYNTAX   Integer32
+	SYNTAX   Integer32 
 	MAX-ACCESS	read-only
 	STATUS	current
 	DESCRIPTION
@@ -2919,7 +2888,7 @@ snAgentBrd2MainBrdId OBJECT-TYPE
 					 format of this string.
 		If format version octet has the value 2, the octets after the
 		version octet have the following meaning:
-		  octet 1  - product type:
+		  octet 1  - product type: 
 						BI_WG					0x57
 						BI_BB					0x42
 						BI_NI					0x4E
@@ -2945,9 +2914,9 @@ snAgentBrd2MainBrdId OBJECT-TYPE
 						SLAVE_COPPER_16_2		0xF
 						STACK_FIBER_8G			0x10
 						STACK_COPPER_8G			0x11
-						MASTER_FIBER_2G			0x12
+						MASTER_FIBER_2G			0x12	
 						SLAVE_100FX_24			0x13
-						MASTER_FIBER_0G			0x14
+						MASTER_FIBER_0G			0x14	
 						POS_622M				0x15
 						POS_155M				0x16
 						SLAVE_FIBER_2G			0x17
@@ -2965,15 +2934,15 @@ snAgentBrd2MainBrdId OBJECT-TYPE
 						MASTER_M4_8G			0x23
 						MASTER_M4_4G			0x24
 						MASTER_M4_2G			0x25
-						MASTER_M4_0G			0x26
-						MASTER_M5_0G			0x27
-						POS_2488M				0x28
-						SLAVE_M5_0G				0x29
-						POS_N2488M				0x2A
-						STACK_IPC_48_2			0x2B
-						SLAVE_NPA_FIBER_4G		0x2C
-						ATM_2PORT				0x2D
-						ATM_4PORT				0x2E
+						MASTER_M4_0G			0x26	
+						MASTER_M5_0G			0x27	
+						POS_2488M				0x28	
+						SLAVE_M5_0G				0x29	
+						POS_N2488M				0x2A	
+						STACK_IPC_48_2			0x2B	
+						SLAVE_NPA_FIBER_4G		0x2C	
+						ATM_2PORT				0x2D	
+						ATM_4PORT				0x2E	
 						SLAVE_FIBER_10G			0x2F
 						STACK_FES_48_2			0x30
 						STACK_FES_24_2			0x31
@@ -2991,24 +2960,24 @@ snAgentBrd2MainBrdId OBJECT-TYPE
 						SUPERX_FI_24GF  		0x43
 						SUPERX_FI_2P10G_WAN 	0x44
 						SUPERX_FI_MGMT_II       0x4a
-						SLAVE_JC_48E			0xC3
-						SLAVE_JC_48T			0xC4
-						MASTER_JC_M4_8G			0xC5
-						SLAVE_JC_8G				0xC6
-						SLAVE_JC_B16GF			0xC8
-						MASTER_JC_B2404			0xC9
-						SLAVE_JC_B16GC			0xCA
+						SLAVE_JC_48E			0xC3	
+						SLAVE_JC_48T			0xC4	
+						MASTER_JC_M4_8G			0xC5	
+						SLAVE_JC_8G				0xC6	
+						SLAVE_JC_B16GF			0xC8	
+						MASTER_JC_B2404			0xC9	
+						SLAVE_JC_B16GC			0xCA	
 		  octet 3  - processor type, PVR_M603=3, PVR_M604=4, PVR_M603E=6,
 					 PVR_M603EV=7, PVR_M750=8, PVR_M604E=9, PVR_M8245=81
 		  octet 4 to
 		  octet 5  - processor speed in MHz
 		  octet 6  - MAC type:
 						MAC_NONE=0
-						MAC_SEEQ_10_100=1,
+						MAC_SEEQ_10_100=1, 
 						MAC_DEC_10_100=2,
 						MAC_3COM_10_100=3,
 						MAC_X10GMAC_10000=4,
-						MAC_SEEQ_1000=5,
+						MAC_SEEQ_1000=5, 
 						MAC_GMAC_1000=6,
 						MAC_VLSI_1000=7
 		  octet 7  - PHY type, PHY_NONE=0, PHY_QSI=1, PHY_BROADCOM=2,
@@ -3028,7 +2997,7 @@ snAgentBrd2MainBrdId OBJECT-TYPE
 		  octet 21 - code flash size in KBytes
 		  octet 22 to
 		  octet 27 - serial number.
-		  octet 28 - chassis backplane type.
+		  octet 28 - chassis backplane type. 
 			chassis4000	= 	0x00
 			chassis8000	=	0x02
 			chassis15000	=	0x01
@@ -3048,14 +3017,13 @@ snAgentBrd2MainPortTotal OBJECT-TYPE
 
 snAgentBrd2ModuleStatus OBJECT-TYPE
 	SYNTAX  INTEGER {
-		moduleEmpty(0),
+		moduleEmpty(0),             
 		moduleGoingDown(2),
 		moduleRejected(3),
 		moduleBad(4),
 		moduleConfigured(8),
 		moduleComingUp(9),
-		moduleRunning(10),
-		moduleBlocked(11)
+		moduleRunning(10)
 		}
 	MAX-ACCESS  read-only
 	STATUS  current
@@ -3067,14 +3035,13 @@ snAgentBrd2ModuleStatus OBJECT-TYPE
 		moduleBad(4) ........... The module Hardware is bad.
 		moduleConfigured(8) ...... The module is configured (stacking)
 		moduleComingUp(9) ...... The module is in power-up cycle.
-		moduleRunning(10) ....... The module is running.
-		moduleBlocked(11) ....... The module is blocked, for full height card."
+		moduleRunning(10) ....... The module is running."
 	::= { snAgentBrd2Entry 6 }
 
 snAgentBrd2RedundantStatus OBJECT-TYPE
 	SYNTAX  INTEGER {
 		other(1),
-		active(2),
+		active(2),             
 		standby(3),
 		crashed(4),
 		comingUp(5)
@@ -3092,7 +3059,7 @@ snAgentBrd2RedundantStatus OBJECT-TYPE
 
 -- Trap Receiver Table
 -- snAgTrpRcvrTable is deprecated, replaced by fdryTrapReceiverTable.
--- The new table "fdryTrapReceiverTable" combines Ipv4 and Ipv6 configuration of
+-- The new table "fdryTrapReceiverTable" combines Ipv4 and Ipv6 configuration of 
 -- trap Receiver/managers which to send traps.
 
 snAgTrpRcvrTable OBJECT-TYPE
@@ -3112,7 +3079,7 @@ snAgTrpRcvrEntry OBJECT-TYPE
 		The column snAgTrpRcvrStatus is used to create
 		and delete rows in the table. Creation requires
 		a SET PDU with objects snAgTrpRcvrIndex,
-		snAgTrpRcvrIpAddr, snAgTrpRcvrComm and
+		snAgTrpRcvrIpAddr, snAgTrpRcvrComm and 
 		snAgTrpRcvrStatus."
 	INDEX	{ snAgTrpRcvrIndex }
 	::= { snAgTrpRcvrTable 1 }
@@ -3366,12 +3333,12 @@ snAgSpBootSeqSpNumber OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS	current
 	DESCRIPTION
-		"The slot numner of a slave/witch processor module for which
+		"The slot numner of a slave/witch processor module for which 
 		this boot sequence applies. Setting value 0 applies to all SP
 		modules. Index 0 is valid only for setting to simplify the set
 		operation for all the modules."
 	::= { snAgSpBootSeqEntry 1 }
-
+	
 snAgSpBootSeqIndex OBJECT-TYPE
 	SYNTAX	Integer32
 	MAX-ACCESS  not-accessible
@@ -3437,36 +3404,36 @@ snAgCfgEosTable OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS	current
 	DESCRIPTION
-		"This table represents the fragmented Configuration File data packet
+		"This table represents the fragmented Configuration File data packet 
 		with checksum include in each rows of this table.  A SNMP-SET
 		represents configuration file download, and a SNMP-GET represents
 		configuration file upload.  This action is only if the SNMP-SET of
-		snAgCfgLoad command is sent along with this table consecutively.  The
+		snAgCfgLoad command is sent along with this table consecutively.  The 
 		applicable snAgCfgLoad command value is as followings:
 		uploadFromFlashToNMS(23),
 		downloadToFlashFromNMS(24),
 		uploadFromDramToNMS(25),
-		downloadToDramFromNMS(26)."
+		downloadToDramFromNMS(26)." 
 	::= { snAgCfgEos 1 }
 
 
 snAgCfgEosEntry OBJECT-TYPE
-	SYNTAX	SnAgCfgEosEntry
+	SYNTAX	SnAgCfgEosEntry	
 	MAX-ACCESS	not-accessible
 	STATUS	current
 	DESCRIPTION
-		"An EOS row in the table of encoded octet strings for table
+		"An EOS row in the table of encoded octet strings for table 
 		snAgCfgEosTable. "
 	INDEX  { snAgCfgEosIndex }
 	::= { snAgCfgEosTable 1 }
 
 
 
-SnAgCfgEosEntry ::=
+SnAgCfgEosEntry ::= 
 	SEQUENCE {
 	snAgCfgEosIndex
 		Integer32,
-	snAgCfgEosPacket
+	snAgCfgEosPacket 
 		OCTET STRING,
 	snAgCfgEosChkSum
 		Integer32
@@ -3478,7 +3445,7 @@ snAgCfgEosIndex OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		 "Each VLAN EOS Buffer Identifier have a multiple
+		 "Each VLAN EOS Buffer Identifier have a multiple 
 		 VLAN table entries."
 	::= { snAgCfgEosEntry 1 }
 
@@ -3487,8 +3454,8 @@ snAgCfgEosPacket OBJECT-TYPE
 	MAX-ACCESS	read-write
 	STATUS	current
 	DESCRIPTION
-		"An encoded octet string. On reads it contains an integral
-		number of configuration file data packets. The size
+		"An encoded octet string. On reads it contains an integral 
+		number of configuration file data packets. The size 
 		of each encoded octet string is less than or equal to 1400
 		bytes."
 	::= { snAgCfgEosEntry 2 }
@@ -3499,7 +3466,7 @@ snAgCfgEosChkSum OBJECT-TYPE
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
-		 "A checksum of each configuration file data packet."
+		 "A checksum of each configuration file data packet." 
 	::= { snAgCfgEosEntry 3 }
 
 
@@ -3515,17 +3482,17 @@ snStackSecSwitchInfo	OBJECT IDENTIFIER ::= { snStack 2 }
 
 snStackPriSwitchMode OBJECT-TYPE
 	SYNTAX  INTEGER {
-		disabled(0),
+		disabled(0),             
 		enabled(1)
 		}
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
 		"The Stackable Management Primary Switch mode
-		 either enabled or disabled and the default is
+		 either enabled or disabled and the default is 
 		 disabled mode.
 		 enabled(1)...........primary switch enabled
-		 disabled(0)..........primary switch disabled"
+		 disabled(0)..........primary switch disabled"  
 	::= { snStackGen 1 }
 
 snStackMaxSecSwitch OBJECT-TYPE
@@ -3560,11 +3527,11 @@ snStackSyncAllSecSwitch OBJECT-TYPE
 		"Synchronize all the secondary switches in the
 		 Stackable Management Group with the following commands.
 		 device(2)...........device related parameters.
-		 global(3)...........global parameters.
+		 global(3)...........global parameters.  
 		 local(4)............local parameters.
 		 The return result of the above commands are either
 		 normal(0)...........normal condition.
-		 invalid(1)...........invalid result."
+		 invalid(1)...........invalid result."  
 	::= { snStackGen 4 }
 
 snStackSmSlotIndex OBJECT-TYPE
@@ -3572,15 +3539,15 @@ snStackSmSlotIndex OBJECT-TYPE
 	MAX-ACCESS	read-write
 	STATUS	current
 	DESCRIPTION
-		"The Slot 0 is the Master slot and Slot 1-8 are slaves.
-		 All the slot-based MIB data can be retrieved with respect to
+		"The Slot 0 is the Master slot and Slot 1-8 are slaves. 
+		 All the slot-based MIB data can be retrieved with respect to 
 		 this slot index such as snChassis global MIB. "
 	::= { snStackGen 5 }
 
 snStackFmpSetProcess OBJECT-TYPE
-	SYNTAX	INTEGER {
-						normal(0),
-						pending(1),
+	SYNTAX	INTEGER { 
+						normal(0), 
+						pending(1), 
 						failure(2)
 					}
 	MAX-ACCESS	read-only
@@ -3614,9 +3581,9 @@ snStackSecSwitchEntry OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS  current
 	DESCRIPTION
-		"An entry in the Stackable Management Secondary Switch
+		"An entry in the Stackable Management Secondary Switch 
 		 Information table."
-	INDEX   {
+	INDEX   { 
 		snStackSecSwitchIndex
 	}
 	::= { snStackSecSwitchTable 1 }
@@ -3636,13 +3603,13 @@ SnStackSecSwitchEntry ::= SEQUENCE {
 	snStackSecSwitchMacAddr
 		MacAddress,
 	snStackSecSwitchSyncCmd
-		INTEGER,
+		INTEGER, 
 	snStackSecSwitchIpAddr
 		IpAddress,
 	snStackSecSwitchSubnetMask
 		IpAddress,
 	snStackSecSwitchCfgCmd
-		INTEGER
+		INTEGER 
 	}
 
 snStackSecSwitchIndex OBJECT-TYPE
@@ -3659,8 +3626,8 @@ snStackSecSwitchSlotId OBJECT-TYPE
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
-		"The secondary switch slot ID must be set before the Configuration
-		 command sent from the primary switch to the secondary switch
+		"The secondary switch slot ID must be set before the Configuration 
+		 command sent from the primary switch to the secondary switch 
 		 either manually or automatically - snStackSecSwitchCfgCmd."
 	::= { snStackSecSwitchEntry 2 }
 
@@ -3674,7 +3641,7 @@ snStackSecSwitchPortCnts OBJECT-TYPE
 
 snStackSecSwitchEnabled OBJECT-TYPE
 	SYNTAX  INTEGER {
-		disabled(0),
+		disabled(0),             
 		enabled(1)
 		}
 	MAX-ACCESS  read-write
@@ -3685,7 +3652,7 @@ snStackSecSwitchEnabled OBJECT-TYPE
 
 snStackSecSwitchAck OBJECT-TYPE
 	SYNTAX  INTEGER {
-		disabled(0),
+		disabled(0),             
 		enabled(1)
 		}
 	MAX-ACCESS  read-only
@@ -3699,7 +3666,7 @@ snStackSecSwitchMacAddr OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"The secondary switch physical address. The physical address
+		"The secondary switch physical address. The physical address 
 		represents a MAC Station."
 	::= { snStackSecSwitchEntry 6 }
 
@@ -3717,11 +3684,11 @@ snStackSecSwitchSyncCmd OBJECT-TYPE
 		"Synchronize the secondary switches in the
 		 Stackable Management Group with the following commands.
 		 device(2)...........device related parameters.
-		 global(3)...........global parameters.
+		 global(3)...........global parameters.  
 		 local(4)............local parameters.
 		 The return result of the above commands are either
 		 normal(0)...........normal condition.
-		 invalid(1)...........invalid result."
+		 invalid(1)...........invalid result."  
 	::= { snStackSecSwitchEntry 7 }
 
 snStackSecSwitchIpAddr OBJECT-TYPE
@@ -3729,7 +3696,7 @@ snStackSecSwitchIpAddr OBJECT-TYPE
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
-		"The secondary switch IP Address and is used for
+		"The secondary switch IP Address and is used for 
 		 manual-command of snStackSecSwitchCfgCmd."
 	::= { snStackSecSwitchEntry 8 }
 
@@ -3738,7 +3705,7 @@ snStackSecSwitchSubnetMask OBJECT-TYPE
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
-		"The secondary switch IP Subnet Mask and is used for
+		"The secondary switch IP Subnet Mask and is used for 
 		 manual-command of snStackSecSwitchCfgCmd."
 	::= { snStackSecSwitchEntry 9 }
 
@@ -3752,8 +3719,8 @@ snStackSecSwitchCfgCmd OBJECT-TYPE
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
-		"snStackSecSwitchSlotId must be set before the Configuration
-		 command sent from the primary switch to the secondary switch
+		"snStackSecSwitchSlotId must be set before the Configuration 
+		 command sent from the primary switch to the secondary switch 
 		 either manually or automatically.
 		 auto(2)...........auto-configuration command sent.
 		 manual(3).........manual-configuration command sent.
@@ -3762,7 +3729,7 @@ snStackSecSwitchCfgCmd OBJECT-TYPE
 						   first set before this command is sent.
 		 The return result of the above commands are either
 		 normal(0)...........normal condition.
-		 invalid(1)..........invalid result."
+		 invalid(1)..........invalid result."  
 	::= { snStackSecSwitchEntry 10 }
 
 -- System Logging Group
@@ -4173,9 +4140,9 @@ SnAgentSysParaConfigEntry ::= SEQUENCE {
 		DisplayString,
 	snAgentSysParaConfigMin
 		Integer32,
-	snAgentSysParaConfigMax
+	snAgentSysParaConfigMax 
 		Integer32,
-	snAgentSysParaConfigDefault
+	snAgentSysParaConfigDefault 
 		Integer32,
 	snAgentSysParaConfigCurrent
 		Integer32
@@ -4367,31 +4334,31 @@ snAgentConfigModuleType OBJECT-TYPE
 		mlx2Port10GigSPModule(93), --unused
 		mlx20PortGigCopperSPModule(94), --unused
 		mlx20PortGigFXSPModule(95), --unused
-		mlx48PortGigMrj21SPModule(103), --unused
+		mlx48PortGigMrj21SPModule(103), --unused		
 		fesx24GigFiberGigCopperModule(112),
 		fesx24GigFiber2TenGigModule(113),
 		fesx24GigFiber1TenGigModule(114),
 
 		-- Modules for FGS/FLS family
-		fgs24PortManagementModule(144),
-		fgs48PortManagementModule(145),
-		fgsXfp2Port10gModule(152),
-		fgsCx42Port10gModule(153),
-		fgsXfp1Cx41Port10gModule(154),
-		fgsXpf1Port10gModule(155),
-		fls24PortCopperBaseModule(160),
-		fls48PortCopperBaseModule(161),
-		flsXfp1Port10gModule(168),
-		flsCx41Port10gModule(169),
+		fgs24PortManagementModule(144),  
+		fgs48PortManagementModule(145),   
+		fgsXfp2Port10gModule(152),  
+		fgsCx42Port10gModule(153), 
+		fgsXfp1Cx41Port10gModule(154),  
+		fgsXpf1Port10gModule(155),    
+		fls24PortCopperBaseModule(160),   
+		fls48PortCopperBaseModule(161),   
+		flsXfp1Port10gModule(168),   
+		flsCx41Port10gModule(169),  
 
 		--Modules for FCX family
-		fcx624SBaseModule(176),
-		fcx648SBaseModule(177),
-		fcx624SPoeBaseModule(180),
-		fcx648SPoeBaseModule(181),
-		fcxXfp2Port10gModule(184),
-		fcxCx42Port16gModule(185),
-		fcx624SFBaseModule(192),
+		fcx624SBaseModule(176),   
+		fcx648SBaseModule(177),   
+		fcx624SPoeBaseModule(180),   
+		fcx648SPoeBaseModule(181),   
+		fcxXfp2Port10gModule(184),    
+		fcxCx42Port16gModule(185),   
+		fcx624SFBaseModule(192),   
 
 		biFiJc48ePort100fxIpcModule(195),
 		biFiJc48tPort100fxIpcModule(196),
@@ -4408,7 +4375,7 @@ snAgentConfigModuleType OBJECT-TYPE
 		biJc2PortGigIgcM4ManagementModule(214),
 
 		--Modules for MG-8, RX, XMR, MLX
-
+		
 		fdryBi4Port10GigModule(1048), --
 		fdryBi40PortGigModule(1049), --
 		fdryBi1Port100FXManagementModule(1050),
@@ -4446,16 +4413,14 @@ snAgentConfigModuleType OBJECT-TYPE
 		fdryMlx2Port10GigSPModule(1089), --
 		fdryMlx20PortGigCopperSPModule(1090), --
 		fdryMlx20PortGigFXSPModule(1091), --
-		brMlx4Port10GigXModule(1093),
-		brMlx24PortGigCopperXModule(1094),
-		brMlx24PortGigSfpXModule(1095),
+		niMlx8Port10GigSPModule (1092),
 		niCes24PortFiberModule(1096),
 		niCes24PortCopperModule(1097),
 		niCes2Port10GigModule(1098),
 		niCes48PortFiberModule(1099),
 		niCes48PortCopperModule(1100),
 		niCes48PortFiberWith2Port10GModule(1101),
-		niCes48PortCopperWith2Port10GModule(1102),
+		niCes48PortCopperWith2Port10GModule(1102),		
 		fdryMlx48PortGigMrj21SPModule(1103), --
 		fdryXmr2PortOC192SPModule(1104), --
 		fdryXmr1PortOC192SPModule(1105), --
@@ -4463,49 +4428,41 @@ snAgentConfigModuleType OBJECT-TYPE
 		fdryXmr4PortOC48SPModule(1107), --
 		fdryXmr2PortOC48SPModule(1108), --
 		fdryNiMlxMrManagementModule(1109),--
-		niMlx8Port10GigMModule (1110),
-		niMlx8Port10GigDModule (1111),
-		brMlx8Port10GigXModule (1112),
-		brMlx2Port100GigXModule (1113),
-		brcdMlxMr2ManagementModule(1114), 	-- for (BR-MLX-MR2-M board)
-		brcdXmrMr2ManagementModule(1115), 	-- for (BR-MLX-MR2-X board)
-		brcdMlx32Mr2ManagementModule(1116), 	-- for (BR-MLX32-MR2-M board)
-		brcdXmr32Mr2ManagementModule(1117), 	-- for (BR-MLX32-MR2-X board)
-		brcdNiXmr32MrManagementModule(1118),
-		brcdNiMlx32MrManagementModule(1119),
+		
+		--Modules for FastIron Superx, SXR8, SXR16, V4 and V6 Modules (unused after FI8.0.50)
 
-		--Modules for FastIron Superx, SXR8, SXR16, V4 and V6 Modules
+		--fdryFiV4Sx12ComboPortManagementModule(2064),
+		--fdryFiV4Sx2Port10gModule(2065),
+		--fdryFiV4Sx24PortGigCopperModule(2066),
+		--fdryFiV4Sx24PortGigFiberModule(2067),
+		--fdryFiV4Sx2Port10gLanWanModule(2068),		
+		--fdryFiV4Sx24Port100m1gFiberModule(2069),		
+		--fdryFiV4Sx12ComboPortManagement2Module(2074),
+		--fdryFiV4Sx210gPortManagementModule(2080),
+		--fdryFiSx0PortManagementModule(2081),
+		--fdryFiV4Sx4g4fPortManagementModule(2083),
+		--fdryFiV6Sx12ComboPortManagementModule(2096),
+		--fdryFiV6Sx24PortGigCopperModule(2098),
+		--fdryFiV6Sx2Port10gModule(2100),
+		--fdryFiV6Sx24Port100m1gFiberModule(2101),
+		--fdryFiV6Sx210gPortManagementModule(2102),
+		--fdryFiV6Sx48PortGigCopperPoeModule(2103),
+		--fdryFiV6Sx4g4fPortManagementModule(2104),
+		--fdryFiV6Sx12ComboPortManagement2Module(2105),		
+		--fdryFiV6Sx48PortGigCopperModule(2106),
+		--fdryFiV6SxXl0PortManagementModule(2112),
+		--fdryFiV6SxXl210gPortManagementModule(2113),
 
-		fdryFiV4Sx12ComboPortManagementModule(2064),
-		fdryFiV4Sx2Port10gModule(2065),
-		fdryFiV4Sx24PortGigCopperModule(2066),
-		fdryFiV4Sx24PortGigFiberModule(2067),
-		fdryFiV4Sx2Port10gLanWanModule(2068),
-		fdryFiV4Sx24Port100m1gFiberModule(2069),
-		fdryFiV4Sx12ComboPortManagement2Module(2074),
-		fdryFiV4Sx210gPortManagementModule(2080),
-		fdryFiSx0PortManagementModule(2081),
-		fdryFiV4Sx4g4fPortManagementModule(2083),
-		fdryFiV6Sx12ComboPortManagementModule(2096),
-		fdryFiV6Sx24PortGigCopperModule(2098),
-		fdryFiV6Sx2Port10gModule(2100),
-		fdryFiV6Sx24Port100m1gFiberModule(2101),
-		fdryFiV6Sx210gPortManagementModule(2102),
-		fdryFiV6Sx48PortGigCopperPoeModule(2103),
-		fdryFiV6Sx4g4fPortManagementModule(2104),
-		fdryFiV6Sx12ComboPortManagement2Module(2105),
-		fdryFiV6Sx48PortGigCopperModule(2106),
+		-- Modules for FWS family (unused after FI8.0.20)
+		--fdryFws24PortCopperBaseModule(2224),  
+		--fdryFws48PortCopperBaseModule(2225),   
+		--fdryFws24GPortCopperBaseModule(2226),  
+		--fdryFws48GPortCopperBaseModule(2227),  
 
-		-- Modules for FWS family
-		fdryFws24PortCopperBaseModule(2224),
-		fdryFws48PortCopperBaseModule(2225),
-		fdryFws24GPortCopperBaseModule(2226),
-		fdryFws48GPortCopperBaseModule(2227),
-
-		--Modules for FCX family
-		fdryFcx624BaseModule(2208),
-		fdryFcx648BaseModule(2209),
-		fdryFcxSfpPlus4Port10gModule(2220),
+		--Modules for FCX family  (unused after FI8.0.95)
+		--fdryFcx624BaseModule(2208),
+		--fdryFcx648BaseModule(2209),
+		--fdryFcxSfpPlus4Port10gModule(2220),
 
 		--Modules for ICX6610 family
 		fdryIcx6610624BaseModule(2240),
@@ -4522,14 +4479,105 @@ snAgentConfigModuleType OBJECT-TYPE
 		fdryIcx6430624PoeBaseModule(2020),
 		fdryIcx6430648PoeBaseModule(2021),
 		fdryIcx6430sfp4Port4gModule(2024),
+		-- fdryIcx6430612CBaseModule(2137),
+		fdryIcx6430Copper2Port2gModule(2138),
+		fdryIcx6430sfp2Port2gModule(2139),
 	
 		--Modules for ICX6450 family
 		fdryIcx6450624BaseModule(2032),
 		fdryIcx6450648BaseModule(2033),
 		fdryIcx6450624PoeBaseModule(2036),
 		fdryIcx6450648PoeBaseModule(2037),
-		fdryIcx6450sfp4Port40gModule(2040)		 
-		}
+		fdryIcx6450sfp4Port40gModule(2040),
+		fdryIcx6450612CPDBaseModule(2140),
+		fdryIcx6450Copper2Port2gModule(2141),
+		fdryIcx6450sfp2Port2gModule(2142),
+
+		--Modules for ICX6650 family
+		fdryIcx665056BaseModule(2055),
+		fdryIcx6650sfp4Port40gModule(2056),
+		fdryIcx6650sfp8Port10gModule(2057),
+
+		--Modules for ICX7750 family
+		fdryIcx775048CBaseModule(2134),
+		fdryIcx775048FBaseModule(2133),
+		fdryIcx775026QBaseModule(2132),
+		fdryIcx7750QSFP6port40gModule(2136),
+		fdryIcx77506Q6port40gModule(2137),
+
+		--Modules for ICX7450 family
+		fdryIcx7450624BaseModule(2224),
+		fdryIcx7450648BaseModule(2225),
+		fdryIcx7450648FBaseModule(2227),
+		fdryIcx7450624PoeBaseModule(2228),
+		fdryIcx7450648PoeBaseModule(2229),
+		fdryIcx7450632ZPBaseModule(2230),
+		fdryIcx7400ServiceModule(2232),
+		fdryIcx7400sfpplus4Port40gModule(2233),
+		fdryIcx7400copper4Port40gModule(2234),
+		fdryIcx7400sfp4Port4gModule(2235),
+		fdryIcx7400qsfpplus1Port40gModule(2236),
+		
+		--Modules for ICX7250 family
+		fdryIcx7250624BaseModule(2162),
+		fdryIcx7250648BaseModule(2163),
+		fdryIcx7250624GBaseModule(2160),
+		fdryIcx7250624PoeBaseModule(2164),
+		fdryIcx7250648PoeBaseModule(2165),
+		fdryIcx7250sfpplus8Port80gModule(2169),
+		fdryIcx7250sfpplus4Port4gModule(2168),
+
+		--Modules for ICX7150 family
+		fdryIcx7150624BaseModule(2064),
+		fdryIcx7150648BaseModule(2065),
+		fdryIcx7150648ZPBaseModule(2066),
+		fdryIcx7150612CPoeBaseModule(2068),
+		fdryIcx7150624PoeBaseModule(2069),
+		fdryIcx7150648PoeBaseModule(2070),
+		fdryIcx7150648PoeFBaseModule(2071),
+		fdryIcx7150gc2Port2gModule(2072),
+		fdryIcx7150sfpplus4Port40gModule(2073),
+		fdryIcx7150sfpplus2Port20gModule(2074),
+		fdryIcx7150sfpplus8Port80gModule(2075),
+		fdryIcx7150C08PBaseModule(2176),
+		fdryIcx7150C10ZPBaseModule(2177),
+		fdryIcx7150624FBaseModule(2178),
+        fdryIcx7150C08PTBaseModule(2179),
+		fdryIcx7150sfp2Port2gModule(2184),
+		fdryIcx7150gc2Port20gModule(2185),
+
+
+		--Modules for ICX7650 family
+		fdryIcx7650648FBaseModule(2144),
+		fdryIcx7650648ZPBaseModule(2148),
+		fdryIcx7650648PBaseModule(2149),
+		fdryIcx76001Port100gModule(2152),
+		fdryIcx76002Port80gModule(2153),
+		fdryIcx76004Port40gModule(2154),
+		fdryIcx76504Port160gModule(2155),
+		fdryIcx76502Port200gModule(2156),
+		fdryIcx76502Port80gModule(2157),
+
+		--Modules for ICX7850 family
+		fdryIcx7850632QBaseModule(2192),
+		fdryIcx7850648FBaseModule(2193),
+		fdryIcx7850648FSBaseModule(2194),
+		fdryIcx780012Port1200gModule(2200),
+		fdryIcx78008Port800gModule(2201),
+
+	    --Modules for ICX7550 family
+		fdryIcx7550624BaseModule(2208),
+		fdryIcx7550648BaseModule(2209),
+		fdryIcx7550624FBaseModule(2210),
+		fdryIcx7550648FBaseModule(2211),
+		fdryIcx7550624PBaseModule(2212),
+		fdryIcx7550648PBaseModule(2213),
+		fdryIcx7550624ZPBaseModule(2214),
+		fdryIcx7550648ZPBaseModule(2215),
+	    fdryIcx75502Port200gModule(2216),
+		fdryIcx75502Port80gModule(2217)
+
+		}	
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
@@ -4599,7 +4647,7 @@ snAgentConfigModuleMgmtModuleType OBJECT-TYPE
 		m3ManagementModule(6),
 		m4ManagementModule(7),
 		m5ManagementModule(8),
-		jetcoreStackManagementModule(9),
+		jetcoreStackManagementModule(9), 
 		muchoManagementModule(10),
 		rottWeilerManagementModule(11),
 		fesXStackManagementModule(12),
@@ -4608,8 +4656,10 @@ snAgentConfigModuleMgmtModuleType OBJECT-TYPE
 		fastIronSuperXManagementModule(15),
 		fastIronSXRManagementModule(16),
 		fastIronV6SuperXManagementModule(17),
-		fastIronV6SXRManagementModule(18)
-		}
+		fastIronV6SXRManagementModule(18),
+		icxStackManagementModule(19),
+		icxManagementModule(20)
+		}	
 	MAX-ACCESS	read-only
 	STATUS	current
 	DESCRIPTION
@@ -4642,8 +4692,8 @@ snAgentConfigModule2Entry OBJECT-TYPE
 	STATUS	current
 	DESCRIPTION
 		"A row in the Agent Configured Stacking Module table."
-	INDEX	{ snAgentConfigModule2Unit,
-					 snAgentConfigModule2Slot
+	INDEX	{ snAgentConfigModule2Unit, 
+					 snAgentConfigModule2Slot 
 	}
 	::= { snAgentConfigModule2Table 1 }
 
@@ -4677,7 +4727,7 @@ snAgentConfigModule2Unit OBJECT-TYPE
 	DESCRIPTION
 		"The index to the Agent Configured Module Table."
 	::= { snAgentConfigModule2Entry 1 }
-
+	
 snAgentConfigModule2Slot OBJECT-TYPE
 	SYNTAX   Integer32
 	MAX-ACCESS	read-only
@@ -4688,113 +4738,35 @@ snAgentConfigModule2Slot OBJECT-TYPE
 
 snAgentConfigModule2Type OBJECT-TYPE
 	SYNTAX	INTEGER	{
-		bi8PortGigManagementModule(0),
-		bi4PortGigManagementModule(1),
-		bi16PortCopperManagementModule(2),
-		bi4PortGigModule(3),
-		fi2PortGigManagementModule(4),
-		fi4PortGigManagementModule(5),
-		bi8PortGigCopperManagementModule(6),
-		fi8PortGigManagementModule(7),
-		bi8PortGigModule(8),
-		bi12PortGigCopper2PortGigFiberManagement(9),
-		bi24PortCopperModule(10),
-		fi24PortCopperModule(11),
-		bi16Port100FXModule(12),
-		bi8Port100FXModule(13),
-		bi8PortGigCopperModule(14),
-		bi12PortGigCopper2PortGigFiber(15),
-		bi2PortGigManagementModule(18),
-		bi24Port100FXModule(19),
-		bi0PortManagementModule(20),
-		pos622MbsModule(21),
-		pos155MbsModule(22),
-		bi2PortGigModule(23),
-		bi2PortGigCopperModule(24),
-		fi2PortGigModule(25),
-		fi4PortGigModule(26),
-		fi8PortGigModule(27),
-		fi8PortGigCopperModule(28),
-		fi8PortGigCopperManagementModule(29),
-		pos155Mbs2PModule(30),
-		fi4PortGigCopperManagementModule(31),
-		fi2PortGigCopperManagementModule(32),
-		bi4PortGigCopperManagementModule(33),
-		bi2PortGigCopperManagementModule(34),
-		bi8PortGigM4ManagementModule(35),
-		bi4PortGigM4ManagementModule(36),
-		bi2PortGigM4ManagementModule(37),
-		bi0PortGigM4ManagementModule(38),
-		bi0PortWSMManagementModule(39),
-		biPos2Port2488MbsModule(40),
-		bi0PortWSMModule(41),
-		niPos2Port2488MbsModule(42),
-		ni4802(43),
-		bi4PortGigNPAModule(44),
-		biAtm2Port155MbsModule(45),
-		biAtm4Port155MbsModule(46),
-		bi1Port10GigModule(47),
-		fes4802Module(48),
-		fes2402Module(49),
-		fes9604Module(50),
-		fes12GigCopperAndGigFiberModule(51),
-		fesx24GigModule(52),
-		fesx24Gig2TenGigModule(53),
-		fesx24Gig1TenGigModule(54),
-		fesx48GigModule(55),
-		fesx48Gig2TenGigModule(56),
-		fesx48Gig1TenGigModule(57),
-		superx12ComboPortManagementModule(64),
-		superx2PortTenGigModule(65),
-		superx24PortGigCopperModule(66),
-		superx24PortGigFiberModule(67),
-		superx2PortTenGigLanWanModule(68),
-		superx24Port100tx1PortGigFiberModule(69),
-		superx12ComboPortManagement2Module(74),
-		superxR2PortTenGigManagementModule(80),
-		superxRManagementModule(81),
-		fesx24GigFiberGigCopperModule(112),
-		fesx24GigFiber2TenGigModule(113),
-		fesx24GigFiber1TenGigModule(114),
-		fgs24PortManagementModule(144),
-		fgs48PortManagementModule(145),
-		fgsXfp2Port10gModule(152),
-		fgsCx42Port10gModule(153),
-		fgsXfp1Cx41Port10gModule(154),
-		fgsXpf1Port10gModule(155),
-		fls24PortCopperBaseModule(160),
-		fls48PortCopperBaseModule(161),
-		flsXfp1Port10gModule(168),
-		flsCx41Port10gModule(169),
-		fcx624SBaseModule(176),
-		fcx648SBaseModule(177),
-		fcx624SPoeBaseModule(180),
-		fcx648SPoeBaseModule(181),
-		fcxXfp2Port10gModule(184),
-		fcxCx42Port16gModule(185),
-		fcx624SFBaseModule(192),
-		biFiJc48ePort100fxIpcModule(195),
-		biFiJc48tPort100fxIpcModule(196),
-		biFiJc8PortGigM4ManagementModule(197),
-		biFiJc8PortGigIgcModule(198),
-		biFiJc16PortGigIgcModule(200),
-		biJc24PortCopperIpc4GigIgcModule(201),
-		biJc16PortGigCopperIgcModule(202),
-		biFiJc24Port100fxIpcModule(206),
-		bi2Port10GigModule(207),
-		biJc48tPortRJ21OmpModule(208),
-		biJc48ePortRJ45OmpModule(209),
-		biJc24PortIpcRJ45PoeModule(212),
-		biJc2PortGigIgcM4ManagementModule(214),
-		-- Modules for FWS family
-		fdryFws24PortCopperBaseModule(2224),
-		fdryFws48PortCopperBaseModule(2225),
-		fdryFws24GPortCopperBaseModule(2226),
-		fdryFws48GPortCopperBaseModule(2227),
-		--Modules for FCX family
-		fdryFcx624BaseModule(2208),
-		fdryFcx648BaseModule(2209),
-		fdryFcxSfpPlus4Port10gModule(2220),
+		fgs24PortManagementModule(144),     
+		fgs48PortManagementModule(145),   
+		fgsXfp2Port10gModule(152),  
+		fgsCx42Port10gModule(153),  
+		fgsXfp1Cx41Port10gModule(154),  
+		fgsXpf1Port10gModule(155),   
+		fls24PortCopperBaseModule(160),   
+		fls48PortCopperBaseModule(161),   
+		flsXfp1Port10gModule(168),   
+		flsCx41Port10gModule(169),  
+		fcx624SBaseModule(176),   
+		fcx648SBaseModule(177),   
+		fcx624SPoeBaseModule(180),   
+		fcx648SPoeBaseModule(181),   
+		fcxXfp2Port10gModule(184),   
+		fcxCx42Port16gModule(185),   
+		fcx624SFBaseModule(192), 
+		
+		-- Modules for FWS family (unused after FI8.0.20)
+		--fdryFws24PortCopperBaseModule(2224),   
+		--fdryFws48PortCopperBaseModule(2225),  
+		--fdryFws24GPortCopperBaseModule(2226),  
+		--fdryFws48GPortCopperBaseModule(2227), 
+		
+		--Modules for FCX family  (unused after FI8.0.95)
+		--fdryFcx624BaseModule(2208),
+		--fdryFcx648BaseModule(2209),
+		--fdryFcxSfpPlus4Port10gModule(2220),
+		
 		--Modules for ICX6610 family
 		fdryIcx6610624BaseModule(2240),
 		fdryIcx6610648BaseModule(2241),
@@ -4810,14 +4782,104 @@ snAgentConfigModule2Type OBJECT-TYPE
 		fdryIcx6430624PoeBaseModule(2020),
 		fdryIcx6430648PoeBaseModule(2021),
 		fdryIcx6430sfp4Port4gModule(2024),
+		-- fdryIcx6430612CBaseModule(2137),
+		fdryIcx6430Copper2Port2gModule(2138),
+		fdryIcx6430sfp2Port2gModule(2139),
 	
 		--Modules for ICX6450 family
 		fdryIcx6450624BaseModule(2032),
 		fdryIcx6450648BaseModule(2033),
 		fdryIcx6450624PoeBaseModule(2036),
 		fdryIcx6450648PoeBaseModule(2037),
-		fdryIcx6450sfp4Port40gModule(2040)
-		}
+		fdryIcx6450sfp4Port40gModule(2040),
+		fdryIcx6450612CPDBaseModule(2140),
+		fdryIcx6450Copper2Port2gModule(2141),
+		fdryIcx6450sfp2Port2gModule(2142),
+
+		--Modules for ICX6650 family
+		fdryIcx665056BaseModule(2055),
+		fdryIcx6650sfp4Port40gModule(2056),
+		fdryIcx6650sfp8Port10gModule(2057),
+
+		--Modules for ICX7750 family
+		fdryIcx775048CBaseModule(2134),
+		fdryIcx775048FBaseModule(2133),
+		fdryIcx775026QBaseModule(2132),
+		fdryIcx7750QSFP6port40gModule(2136),
+		fdryIcx77506Q6port40gModule(2137),
+
+		--Modules for ICX7450 family
+		fdryIcx7450624BaseModule(2224),
+		fdryIcx7450648BaseModule(2225),
+		fdryIcx7450648FBaseModule(2227),
+		fdryIcx7450624PoeBaseModule(2228),
+		fdryIcx7450648PoeBaseModule(2229),
+		fdryIcx7450632ZPBaseModule(2230),
+		fdryIcx7400ServiceModule(2232),
+		fdryIcx7400sfpplus4Port40gModule(2233),
+		fdryIcx7400copper4Port40gModule(2234),
+		fdryIcx7400sfp4Port4gModule(2235),
+		fdryIcx7400qsfpplus1Port40gModule(2236),
+
+		--Modules for ICX7250 family
+		fdryIcx7250624BaseModule(2162),
+		fdryIcx7250648BaseModule(2163),
+		fdryIcx7250624GBaseModule(2160),
+		fdryIcx7250624PoeBaseModule(2164),
+		fdryIcx7250648PoeBaseModule(2165),
+		fdryIcx7250sfpplus8Port80gModule(2169),
+		fdryIcx7250sfpplus4Port4gModule(2168),
+
+		--Modules for ICX7150 family
+		fdryIcx7150624BaseModule(2064),
+		fdryIcx7150648BaseModule(2065),
+		fdryIcx7150648ZPBaseModule(2066),
+		fdryIcx7150612CPoeBaseModule(2068),
+		fdryIcx7150624PoeBaseModule(2069),
+		fdryIcx7150648PoeBaseModule(2070),
+		fdryIcx7150648PoeFBaseModule(2071),
+		fdryIcx7150gc2Port2gModule(2072),
+		fdryIcx7150sfpplus4Port40gModule(2073),
+		fdryIcx7150sfpplus2Port20gModule(2074),
+		fdryIcx7150sfpplus8Port80gModule(2075),
+		fdryIcx7150C08PBaseModule(2176),
+		fdryIcx7150C10ZPBaseModule(2177),
+		fdryIcx7150624FBaseModule(2178),
+		fdryIcx7150C08PTBaseModule(2179),
+		fdryIcx7150sfp2Port2gModule(2184),
+		fdryIcx7150gc2Port20gModule(2185),
+
+		--Modules for ICX7650 family
+		fdryIcx7650648FBaseModule(2144),
+		fdryIcx7650648ZPBaseModule(2148),
+		fdryIcx7650648PBaseModule(2149),
+		fdryIcx76001Port100gModule(2152),
+		fdryIcx76002Port80gModule(2153),
+		fdryIcx76004Port40gModule(2154),
+		fdryIcx76504Port160gModule(2155),
+		fdryIcx76502Port200gModule(2156),
+		fdryIcx76502Port80gModule(2157),
+
+		--Modules for ICX7850 family
+		fdryIcx7850632QBaseModule(2192),
+		fdryIcx7850648FBaseModule(2193),
+		fdryIcx7850648FSBaseModule(2194),
+		fdryIcx780012Port1200gModule(2200),
+		fdryIcx78008Port800gModule(2201),
+
+		--Modules for ICX7550 family
+		fdryIcx7550624BaseModule(2208),
+		fdryIcx7550648BaseModule(2209),
+		fdryIcx7550624FBaseModule(2210),
+		fdryIcx7550648FBaseModule(2211),
+		fdryIcx7550624PBaseModule(2212),
+		fdryIcx7550648PBaseModule(2213),
+		fdryIcx7550624ZPBaseModule(2214),
+		fdryIcx7550648ZPBaseModule(2215),
+	    fdryIcx75502Port200gModule(2216),
+		fdryIcx75502Port80gModule(2217)
+
+		}	
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
@@ -4891,7 +4953,10 @@ snAgentConfigModule2MgmtModuleType OBJECT-TYPE
 		muchoManagementModule(10),
 		rottWeilerManagementModule(11),
 		fesXStackManagementModule(12),
-		fgsStackManagementModule(13) }
+		fgsStackManagementModule(13),
+		icxStackManagementModule(19),
+		icxManagementModule(20)
+		}
 	MAX-ACCESS	read-only
 	STATUS	current
 	DESCRIPTION
@@ -5106,7 +5171,7 @@ snAgentCpuUtilEntry	OBJECT-TYPE
 	STATUS	current
 	DESCRIPTION
 		"A row in the CPU utilization table."
-	INDEX	{
+	INDEX	{ 
 		snAgentCpuUtilSlotNum,
 		snAgentCpuUtilCpuId,
 		snAgentCpuUtilInterval
@@ -5201,7 +5266,7 @@ snCpuProcessEntry	OBJECT-TYPE
 	STATUS	current
 	DESCRIPTION
 		"A row in the CPU process table."
-	INDEX	{
+	INDEX	{ 
 		snCpuProcessName
 	}
 	::= { snCpuProcessTable 1 }
@@ -5286,7 +5351,7 @@ snAgentHwICBMCounterEntry	OBJECT-TYPE
 	STATUS	current
 	DESCRIPTION
 		"A row representing ICBM counter values for that slot."
-	INDEX	{
+	INDEX	{ 
 		snAgentHwICBMCounterSlot,
 		snAgentHwICBMCounterDMA
 	}
@@ -5394,7 +5459,7 @@ snCAMIpStatEntry	OBJECT-TYPE
 	STATUS	current
 	DESCRIPTION
 		"A row representing IP CAM statistics for a given interface and level."
-	INDEX	{
+	INDEX	{ 
 		snCAMIpStatIfIndex,
 		snCAMIpStatLevel
 	}
@@ -5456,7 +5521,7 @@ snCAMStatEntry	OBJECT-TYPE
 	STATUS	current
 	DESCRIPTION
 		"A row representing CAM statistics for a given DMA Id number."
-	INDEX	{
+	INDEX	{ 
 		snCamStatDMAIdNumber
 	}
 	::= { snCAMStatTable 1 }
@@ -5707,7 +5772,7 @@ snCamStatDeleteDMACamCount OBJECT-TYPE
 			"CAM delete DMA CAM count."
 	::= { snCAMStatEntry 27 }
 
--- System DRAM info Group.
+-- System DRAM info Group. 
 snAgSystemDRAM       OBJECT IDENTIFIER ::= { snAgentHw 4 }
 
 snAgSystemDRAMUtil OBJECT-TYPE
@@ -6044,7 +6109,7 @@ snAgentTemp2SensorId  OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 		"The temperature sensor identifier of Slave module whose temperature is
-		 represented by this row, for FastIron management module: sensor#1 -  Intake Side Temperature
+		 represented by this row, for management module: sensor#1 -  Intake Side Temperature
 		 sensor# 2 - Exhaust Side Temperature."
 	::= { snAgentTemp2Entry 3 }
 
@@ -6082,7 +6147,7 @@ fdryLicenseEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "An entry in a license table."
-    INDEX	{fdryLicensePackageName, fdryLicenseLid, IMPLIED fdryLicenseHash}
+    INDEX	{fdryLicensePackageName, fdryLicenseLid, fdryLicenseHash}
     ::= { fdryLicenseTable 1 }
 
 FdryLicenseEntry ::= SEQUENCE {
@@ -6107,6 +6172,12 @@ FdryLicenseEntry ::= SEQUENCE {
 	fdryLicenseVendorInfo
 		DisplayString,
 	fdryLicenseSlot
+		Integer32,
+	fdryLicenseMode	
+		INTEGER,
+	fdryLicenseSerialNumber	
+		DisplayString,
+	fdryLicenseCapacity
 		Integer32
     }
 
@@ -6117,16 +6188,17 @@ fdryLicensePackageName OBJECT-TYPE
 	DESCRIPTION
 		"Name of the package, whose license information, this entry displays."
 	::= { fdryLicenseEntry 1 }
-
+	
 fdryLicenseLid OBJECT-TYPE
 	SYNTAX		DisplayString (SIZE(1..11))
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"License Id (LID) of the chassis or the line module for which, this entry
-		 displays license information."
+		"License Id (LID) of the license from the package. For the node locked license, 
+		this LID is same as LID of the device. For the non-node locked license, this LID 
+		is set as 2.0. This entry displays license information."
 	::= { fdryLicenseEntry 2 }
-
+	
 fdryLicenseHash OBJECT-TYPE
 	SYNTAX		DisplayString (SIZE(1..17))
 	MAX-ACCESS	not-accessible
@@ -6135,7 +6207,7 @@ fdryLicenseHash OBJECT-TYPE
 		"A unique hash for identifying a license entry in the system. This helps
 		 traverse through the entries with same package name and LID."
 	::= { fdryLicenseEntry 3 }
-
+	
 fdryLicenseType OBJECT-TYPE
 	SYNTAX		INTEGER {
 					normal(1),
@@ -6157,7 +6229,7 @@ fdryLicensePrecedence OBJECT-TYPE
 		 license to use, when there are many trial and normal licenses with same
 		 package name and LID."
 	::= { fdryLicenseEntry 5 }
-
+	
 fdryLicenseTrialDays OBJECT-TYPE
 	SYNTAX		Unsigned32 (0..65535)
 	MAX-ACCESS	read-only
@@ -6173,11 +6245,11 @@ fdryLicenseTrialTimeElapsed OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The number of trial hours for the license, if it's a trial license.
-		 Otherwise, the value has no meaning for normal licenses and read
-		 as 0 on Get operation."
+		"The cumulative number of hours used for this trial license. This
+		 counts all the usages of the trial license. For a normal license,
+		 this is 0."
 	::= { fdryLicenseEntry 7 }
-
+	
 fdryLicenseTrialTimeLeft OBJECT-TYPE
 	SYNTAX		Unsigned32 (0..65535)
 	MAX-ACCESS	read-only
@@ -6193,15 +6265,19 @@ fdryLicenseTrialState OBJECT-TYPE
 					invalid(1),
 					unused(2),
 					active(3),
-					expired(4)
+					expired(4),
+					duplicated (5)
 				}
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"This indicates the state of the trial license. Invalid means the
+		"This indicates the state of the trial license. Invalid means the 
 		 license is not valid for this box, unused means the license is
 		 never used, avtive means it has been used at least once and expired
-		 means it has expired and can't be used any more."
+		 means it has expired and can't be used any more. Duplicated means 
+		 the license has same package name with other license and but both 
+		 serial numbers are different in the same device, this is only for 
+		 the non-node locked license"
 	::= { fdryLicenseEntry 9 }
 
 fdryLicenseVendorInfo OBJECT-TYPE
@@ -6209,7 +6285,7 @@ fdryLicenseVendorInfo OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"This is the Brocade specific package data which is an octet string.
+		"This is the Ruckus Wireless specific package data which is an octet string.
 		 This contains encoded information of license specific information
 		 such as package bit mask, number of ports, etc."
 	::= { fdryLicenseEntry 10 }
@@ -6223,233 +6299,225 @@ fdryLicenseSlot OBJECT-TYPE
 		 There is a one to one mapping between LID and slot number, as each
 		 module has unique LID and can be present only in one slot."
 	::= { fdryLicenseEntry 11 }
-
-fdryLicensedFeatureInfo OBJECT-TYPE
-	SYNTAX       BITS {
-				ospf(0),
-				isis(1),
-				bgp(2),
-				mpls(3)
-			    }
+	
+fdryLicenseMode OBJECT-TYPE
+	SYNTAX		INTEGER {
+					nodeLocked(1),
+					nonNodeLocked(2)
+				}
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The features or packages enabled/licensed on the system."
-  ::= { snAgentLicense 2 }
+		"The mode of the license, which can be either node locked or non-node locked mode."
+	::= { fdryLicenseEntry 12 }
+
+fdryLicenseSerialNumber OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This is the serial number of the license. This is only for the non-node locked license"
+	::= { fdryLicenseEntry 13 }
+
+fdryLicenseCapacity OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The capacity of the license. For POD license, this is the number of ports.
+		For premium or advance license, it is 1"
+	::= { fdryLicenseEntry 14 }
 
 
-brcdSwPackageFname  OBJECT-TYPE
-	SYNTAX	DisplayString (SIZE (0..128))
-	MAX-ACCESS	read-write
+-- the port table contains the port which requirs the port license
+
+brcdPortLicenseTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF BrcdPortLicenseEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+        "A list of ports which require the port license."
+	::= { snAgentLicense 3 }
+
+brcdPortLicenseEntry OBJECT-TYPE
+    SYNTAX      BrcdPortLicenseEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in a licensed port table."
+    INDEX	{ brcdPortLicenseIndex }
+    ::= { brcdPortLicenseTable 1 }
+
+BrcdPortLicenseEntry ::= SEQUENCE {
+	brcdPortLicenseIndex
+		InterfaceIndex,
+	brcdPortLicenseStatus
+		INTEGER
+    }
+
+brcdPortLicenseIndex OBJECT-TYPE
+	SYNTAX	InterfaceIndex
+	MAX-ACCESS  not-accessible
 	STATUS	current
 	DESCRIPTION
-		"Name of the release package file or manifest file (including path)
-		 currently associated with the system.
-		 When the object is not used, the value is a zero length string."
-	::= { brcdSwPackageUpgrade  1 }
+		"The port/interface index (ifindex)."
+	::= { brcdPortLicenseEntry 1 }
 
-brcdSwPackageLoad   OBJECT-TYPE
-	SYNTAX	INTEGER {
-		none(1),
-		tftpToPrimary(2),
-		tftpToSecondary(3),
-		tftpToMgmtModulePrimaryIntfModuleSecondary(4),
-		tftpToMgmtModuleSecondaryIntfModulePrimary(5)
-	}
-	MAX-ACCESS	 read-write
-	STATUS	current
+brcdPortLicenseStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+				validLic(1),       
+				noLic(2)  
+			}
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
-		"Action object to upgrade the system using a release package.
-		none(1) is the value after the system comes up and should not be used for set-request.
-		The following values will download the release package from a TFTP server and upgrade the  system :
-		tftpToPrimary(2) installs both MP and LP application images to primary code.
-		tftpToSecondary(3) installs both MP and LP application images to secondary code.
-		tftpToMgmtModulePrimaryIntfModuleSecondary (4) installs MP application image to primary code and the LP
-			application images to secondary code.
-		tftpToMgmtModuleSecondaryIntfModulePrimary (5) installs MP application image to secondary code and the LP
-			application images to primary code."
-	::= { brcdSwPackageUpgrade  2 }
+		"The current license state of the port.
+		 validLic(1)  ............ the port requires port license, and has valid license      
+		 noLic(2)      ........... the port requires port license, and doesn't have valid license "
+	::= { brcdPortLicenseEntry 2 }
 
-brcdSwPackageLoadStatus   OBJECT-TYPE
-	SYNTAX	INTEGER {
-		normal(1),
-		started(2),
-		internalError(3),
-		manifestFileDownloadError(4),
-		manifestFileValidationError(5),
-		downloadingManagementModuleBoot (6),
-		downloadingManagementModuleMonitor (7),
-		downloadingManagementModuleApplication (8),
-		downloadingInterfaceModuleBoot (9),
-		downloadingInterfaceModuleMonitor (10),
-		downloadingInterfaceModuleApplication (11),
-		downloadingInterfaceModuleFpga (12),
-		downloadingFpgaMBridge (13),
-		downloadingFpgaSBridge (14),
-		downloadingFpgaHBridge (15),
-		upgradingManagementModuleBoot (16),
-		upgradingManagementModuleMonitor (17),
-		upgradingManagementModuleApplication (18),
-		upgradingInterfaceModuleBoot (19),
-		upgradingInterfaceModuleMonitor (20),
-		upgradingInterfaceModuleApplication (21),
-		upgradingInterfaceModuleFpga (22),
-		upgradingFpgaMBridge (23),
-		upgradingFpgaSBridge (24),
-		upgradingFpgaHBridge (25)
-	}
-	MAX-ACCESS	 read-only
-	STATUS	current
+
+-- SAU license unit table
+
+snSAULicenseUnitTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnSAULicenseUnitEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
-		"This object indicates the progress of the upgrade operation.
-		<TBD: more description> "
-	::= { brcdSwPackageUpgrade  3 }
+        "A list of SAU licenses maintained by each unit."
+	::= { snAgentLicense 4 }
 
-brcdSwPackageUpgradeAllImages OBJECT-TYPE
-	SYNTAX	TruthValue
-	MAX-ACCESS	read-write
-	STATUS	current
-	DESCRIPTION
-		"To specify an all-image upgrade.
-		If set to true(1), the upgrade sequence will include the MP and
-		LP BOOT images, and MP FPGA images (MBRIDGE/MBRIDGE32 and
-		SBRIDGE/HSBRIDGE). For CES/CER the upgrade sequence
-		includes the boot image.
-		Default is false(2) which will upgrade only the MP and LP Monitor
-		images, MP and LP Application images, and LP Bundled FPGA. For
-		CES/CER, only the monitor, application, and FPGA images will be upgraded.
-		For a read operation, this will always return false(2)."
-	DEFVAL { false }
-	::= { brcdSwPackageUpgrade 4 }
+snSAULicenseUnitEntry OBJECT-TYPE
+    SYNTAX      SnSAULicenseUnitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in SAU license table."
+    INDEX	{snSAULicenseUnitIndex }
+    ::= { snSAULicenseUnitTable 1 }
 
-brcdSwPackageUpgradeResultTable  OBJECT-TYPE
-	SYNTAX	SEQUENCE OF BrcdSwPackageUpgradeResultEntry
-	MAX-ACCESS	 not-accessible
-	STATUS	current
-	DESCRIPTION
-		"A table containing the summary of the upgrade operation."
-	::= { brcdSwPackageUpgrade 5 }
-
-brcdSwPackageUpgradeResultEntry OBJECT-TYPE
-	SYNTAX	BrcdSwPackageUpgradeResultEntry
+SnSAULicenseUnitEntry ::= SEQUENCE {
+	snSAULicenseUnitIndex		      Integer32,	
+	snSAULicensePackageName	          DisplayString,
+	snSAUIsPremLicensePresent	      INTEGER,
+	snSAUIsPoDLicensePresent	      INTEGER,
+	snSAUPoDLicensedSpeed		      INTEGER,
+	snSAUPoDLicensedPorts		      Integer32,
+	snSAUIsMACSecLicensePresent	      INTEGER,
+	snSAUPremSerialNumber	          DisplayString,
+    snSAUPoDSerialNumber	          DisplayString,
+    snSAUMACsecSerialNumber           DisplayString,
+	snSAUICX7150SerialNumber          DisplayString
+}
+    
+snSAULicenseUnitIndex OBJECT-TYPE
+	SYNTAX Integer32
 	MAX-ACCESS not-accessible
-	STATUS	current
+	STATUS     current
 	DESCRIPTION
-		"<TBD>"
-	INDEX	{ brcdSwPackageUpgradeResultIndex }
-	::= { brcdSwPackageUpgradeResultTable 1 }
+		"The stacking unit Id"
+	::= { snSAULicenseUnitEntry 1 }
 
-BrcdSwPackageUpgradeResultEntry::= SEQUENCE {
-	brcdSwPackageUpgradeResultIndex
-		Unsigned32,
-	brcdSwPackageUpgradeResultImageType
-		BrcdImageType,
-	brcdSwPackageUpgradeResultStatus
-		INTEGER,
-	brcdSwPackageUpgradeResultTimeStamp
-		TimeStamp,
-	brcdSwPackageUpgradeResultDescription
-		DisplayString
-	}
-
-brcdSwPackageUpgradeResultIndex OBJECT-TYPE
-	SYNTAX   Unsigned32
-	MAX-ACCESS not-accessible
-	STATUS	current
+snSAULicensePackageName OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only
+	STATUS		current
 	DESCRIPTION
-		"The sequential index, or upgrade step."
-	::= { brcdSwPackageUpgradeResultEntry 1 }
+		"Name of the license package."
+	::= { snSAULicenseUnitEntry 2 }
 
-brcdSwPackageUpgradeResultImageType OBJECT-TYPE
-	SYNTAX   BrcdImageType
-	MAX-ACCESS read-only
-	STATUS	current
-	DESCRIPTION
-		"The associated image type for this step of upgrade process."
-	::= { brcdSwPackageUpgradeResultEntry 2 }
-
-brcdSwPackageUpgradeResultStatus OBJECT-TYPE
-	SYNTAX   INTEGER {
-			ok(1),
-			downloadFailed(2),
-			installFailed(3)
+ snSAUIsPremLicensePresent OBJECT-TYPE
+	SYNTAX INTEGER {
+			none (0),
+			yes (1),
+			no (2)
 	}
 	MAX-ACCESS read-only
-	STATUS	current
+	STATUS     current
 	DESCRIPTION
-		"The upgrade status for this particular image upgrade."
-	::= { brcdSwPackageUpgradeResultEntry 3 }
+		"The present state of L3 premium license.
+		 none means the license is not applicable to this device"
+	::= { snSAULicenseUnitEntry 3 }
 
-brcdSwPackageUpgradeResultTimeStamp OBJECT-TYPE
-	SYNTAX   TimeStamp
-	MAX-ACCESS read-only
-	STATUS	current
-	DESCRIPTION
-		"The timestamp when this upgrade step was performed."
-	::= { brcdSwPackageUpgradeResultEntry 4 }
-
-brcdSwPackageUpgradeResultDescription OBJECT-TYPE
-	SYNTAX	DisplayString (SIZE(0..255))
-	MAX-ACCESS read-only
-	STATUS	current
-	DESCRIPTION
-		"Summary description for this particular image upgrade.
-		This is empty when brcdSwPackageLoadResultStatus is 'ok'."
-	::= { brcdSwPackageUpgradeResultEntry 5 }
-
-brcdSwIntfModAutoUpgradeMode OBJECT-TYPE
-	SYNTAX	INTEGER {
-		unknown(1),
-		disabled(2),
-		tftp(3),
-		slot1(4),
-		slot2(5)
+snSAUIsPoDLicensePresent OBJECT-TYPE
+	SYNTAX INTEGER {
+			none (0),
+			yes (1),
+			no (2)
 	}
-	MAX-ACCESS	 read-write
-	STATUS	current
+	MAX-ACCESS read-only
+	STATUS     current
 	DESCRIPTION
-		"Specifies the mode of LP Auto-upgrade.
-		<TBD: more description> "
-	::= { brcdSwIntfModAutoUpgrade 1 }
+		"The present state of PoD license.
+		none means the license is not applicable to this device"
+	::= { snSAULicenseUnitEntry 4 }
 
-brcdSwIntfModAutoUpgradeTftpAddrType	OBJECT-TYPE
-	SYNTAX	InetAddressType
-	MAX-ACCESS	read-write
-	STATUS	current
+snSAUPoDLicensedSpeed OBJECT-TYPE
+	SYNTAX INTEGER {
+			none (0),
+			speed10G (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
 	DESCRIPTION
-		  "TFTP server IP address Type. Supported address types are ipv4(1) and ipv6(2).
-		  <TBD: more description>"
-	::= { brcdSwIntfModAutoUpgrade 2 }
+		"The port speed of PoD license.
+		 none means the license is not applicable to this device"
+	::= { snSAULicenseUnitEntry 5 }
 
-brcdSwIntfModAutoUpgradeTftpAddr	OBJECT-TYPE
-	SYNTAX	InetAddress
-	MAX-ACCESS	read-write
-	STATUS	current
+snSAUPoDLicensedPorts OBJECT-TYPE
+	SYNTAX Integer32 
+	MAX-ACCESS read-only
+	STATUS     current
 	DESCRIPTION
-		  "TFTP server IP address. <TBD: more description>"
-	::= { brcdSwIntfModAutoUpgrade 3 }
+		"The number of licensed ports. The capacity of PoD License.
+		 Zero means no PoD license or the license is not applicable to this device"
+	::= { snSAULicenseUnitEntry 6 }
 
-brcdSwIntfModAutoUpgradeSrcPath  OBJECT-TYPE
-	SYNTAX	DisplayString (SIZE (0..128))
-	MAX-ACCESS	read-write
-	STATUS	current
+snSAUIsMACSecLicensePresent OBJECT-TYPE
+	SYNTAX INTEGER {
+			none (0),
+			yes (1),
+			no (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
 	DESCRIPTION
-		"Specifies the path to the topmost directory of the release
-		package relative to the root directory.
-		If the source is a TFTP server, the root is the TFTP root.
-		If the source is slot1 or slot2, the root is top-level directory '/'"
-	::= { brcdSwIntfModAutoUpgrade 4 }
+		"The present state of MACSec license.
+		none means the license is not applicable to this device"
+	::= { snSAULicenseUnitEntry 7 }
 
-brcdSwIntfModAutoUpgradeAllImages  OBJECT-TYPE
-	SYNTAX	TruthValue
-	MAX-ACCESS	read-write
-	STATUS	current
+snSAUPremSerialNumber OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
 	DESCRIPTION
-		"Used to specify an all-image upgrade. If set to true(1),
-		the upgrade sequence will include the LP BOOT image.
-		Default is false(2), which will upgrade only the LP FPGA images.
-		For a read operation, this will return the configured value."
-	DEFVAL { false }
-	::= { brcdSwIntfModAutoUpgrade 5 }
+		"This is the serial number of CoE L3 premium license."
+	::= { snSAULicenseUnitEntry 8 }
+
+snSAUPoDSerialNumber OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This is the serial number of CoE PoD license."
+	::= { snSAULicenseUnitEntry 9 }
+
+snSAUMACsecSerialNumber OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This is the serial number of CoE MACsec license."
+	::= { snSAULicenseUnitEntry 10 }
+
+snSAUICX7150SerialNumber OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This is the serial number of CoE ICX7150 license. 
+		FOR ICX7150 platform, only one SAU license option can be installed. e.g. 4x10gr,
+		It is combination of l3 premium and PoD license, thus there is only a license serial number at one time"
+	::= { snSAULicenseUnitEntry 11 }
 
 END

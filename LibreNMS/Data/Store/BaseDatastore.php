@@ -34,7 +34,7 @@ use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 
 abstract class BaseDatastore implements DatastoreContract
 {
-    private MeasurementCollection $stats;
+    private readonly MeasurementCollection $stats;
 
     public function __construct()
     {

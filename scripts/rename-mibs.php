@@ -55,9 +55,9 @@ function rename_mib_file($file)
     }
 
     $mib_name = extract_mib_name($file);
-    $filename = basename($file);
+    $filename = basename((string) $file);
     if ($mib_name != $filename) {
-        $new_file = dirname($file) . '/' . $mib_name;
+        $new_file = dirname((string) $file) . '/' . $mib_name;
         echo "$file -> $new_file\n";
 
         return rename($file, $new_file);
@@ -74,12 +74,12 @@ function extract_mib_name($file)
         while (($line = fgets($handle)) !== false) {
             $trimmed = trim($line);
 
-            if (empty($trimmed) || substr($trimmed, 0, 2) == '--') {
+            if (empty($trimmed) || str_starts_with($trimmed, '--')) {
                 continue;
             }
 
             $header .= " $trimmed";
-            if (strpos($trimmed, 'DEFINITIONS') !== false) {
+            if (str_contains($trimmed, 'DEFINITIONS')) {
                 preg_match('/(\S+)\s+(?=DEFINITIONS)/', $header, $matches);
                 fclose($handle);
 

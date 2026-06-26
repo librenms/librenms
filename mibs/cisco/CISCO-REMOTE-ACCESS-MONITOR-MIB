@@ -1,2273 +1,2245 @@
 -- * $Source$
 -- *------------------------------------------------------------------
--- * CISCO-REMOTE-ACCESS-MONITOR-MIB.my:  Cisco Remote Access MIB
+-- * CISCO-REMOTE-ACCESS-MONITOR-MIB.my:  Cisco   Remote Access MIB
 -- *
 -- * May 2003, S Ramakrishnan
 -- *
--- * Copyright (c) 2003, 2008 by cisco Systems, Inc.
--- * All rights reserved.
+-- * Copyright (c) 2003, 2008, 2020 by cisco Systems Inc.
+-- * All rights   reserved.
 -- *
 -- *------------------------------------------------------------------
 
 CISCO-REMOTE-ACCESS-MONITOR-MIB DEFINITIONS ::= BEGIN
 
-   IMPORTS
-      MODULE-IDENTITY, 
-      OBJECT-TYPE, 
-      NOTIFICATION-TYPE,
-      Counter32, 
-      Counter64, 
-      Gauge32, 
-      Integer32,
-      Unsigned32,
-	  zeroDotZero
-             FROM SNMPv2-SMI
-      TEXTUAL-CONVENTION, 
-      TimeStamp,
-      TruthValue
-             FROM SNMPv2-TC
-      MODULE-COMPLIANCE, 
-      OBJECT-GROUP, 
-      NOTIFICATION-GROUP
-             FROM SNMPv2-CONF
-      InetAddressType,
-      InetAddress
-             FROM INET-ADDRESS-MIB
-      SnmpAdminString
-              FROM SNMP-FRAMEWORK-MIB
-      ciscoMgmt 
-             FROM CISCO-SMI;
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Counter32,
+    Counter64,
+    Gauge32,
+    Integer32,
+    Unsigned32,
+    zeroDotZero
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    TimeStamp,
+    TruthValue
+        FROM SNMPv2-TC
+    InetAddressType,
+    InetAddress
+        FROM INET-ADDRESS-MIB
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    ciscoMgmt
+        FROM CISCO-SMI;
 
-   ciscoRemoteAccessMonitorMIB MODULE-IDENTITY
-      LAST-UPDATED "200402030000Z"
-      ORGANIZATION "Cisco Systems"
-      CONTACT-INFO
-         "
-          Cisco Systems
-          Customer Service
 
-          Postal: 170 W Tasman Drive
-                  San Jose, CA  95134
-                  USA
+ciscoRemoteAccessMonitorMIB MODULE-IDENTITY
+    LAST-UPDATED    "202010040000Z"
+    ORGANIZATION    "Cisco Systems"
+    CONTACT-INFO
+            "Cisco        Systems
+            Customer Service
 
-             Tel: +1 800 553-NETS
-          E-mail: cs-snmp@cisco.com"
+            Postal: 170 W        Tasman Drive
+                    San Jose, CA        95134
+                    USA
 
- DESCRIPTION
-   "
-   Acronyms and Definitions
-    The following acronyms and terms are used in this 
-    document:
+               Tel: +1 800 553-NETS
+            E-mail: cs-snmp@cisco.com"
+    DESCRIPTION
+        "Acronyms and        Definitions
+         The        following acronyms and terms are used in this
+         document:
 
-      IPSec: Secure IP Protocol
-  
-      VPN:   Virtual Private Network
+           IPSec: Secure IP Protocol
 
-      RAS:   Remote Access Service
+           VPN:   Virtual Private Network
 
-      ISP:   Internet Service Provider.
+           RAS:   Remote Access Service
 
-      LAN:   Local Area Network
+           ISP:   Internet Service Provider.
 
-      Group: A collection of remote access users grouped
-             and managed together as a single entity for
-             administrative convenience.
+           LAN:   Local Area        Network
 
-      Session: A Remote Access Session.
-      
-      SVC:    SSL VPN Client
-      
-      Webvpn: VPN connection established using web browser.
+           Group: A collection of remote access users grouped
+                  and managed together as a single entity for
+                  administrative convenience.
 
-   Overview of the MIB
+           Session: A Remote        Access Session.
 
-    This is a MIB Module for monitoring the structures in Virtual 
-    Private Networks based remote access networks. The MIB seeks 
-    to create a common model of Remote Access across implementations 
-    of the service on layer 2 (PPTP, L2TP, L2F), layer 3 (IPsec) and 
-    layer 4 (SSL) virtual private networks. The MIB defines counters 
-    and objects of interest to performance/fault monitoring in a 
-    way which is independent of the technology of the remote access 
-    implementation.
+           SVC:    SSL VPN Client
+           Webvpn: VPN connection established using web browser.
 
-    MIB contains eight major groups of objects which are used 
-    to manage Remote Access connections:
-     a) Remote Access capacity group
-          This section defines metrics to gauge the limits of 
-          resources on this device which are critical to RAS 
-          service.
+        Overview of the MIB
 
-     b) Remote Access resource usage group
-          This section defines metrics to gauge the usage of 
-          resources on this device which are critical to RAS 
-          service service.
+         This is a MIB Module for monitoring        the structures in Virtual
+         Private Networks based remote access networks. The MIB seeks
+         to create a        common model of        Remote Access across implementations
+         of the service on layer 2 (PPTP, L2TP, L2F), layer 3 (IPsec) and
+         layer 4 (SSL) virtual private networks. The        MIB defines counters
+         and        objects        of interest to performance/fault monitoring in a
+         way        which is independent of        the technology of the remote access
+         implementation.
 
-     c) Current activity and performance of RAS service
-          This section defines metrics to gauge the current 
-          remote access activity.
+         MIB        contains eight major groups of objects which are used
+         to manage Remote Access connections:
+          a)        Remote Access capacity group
+               This section defines metrics to gauge        the limits of
+               resources on this device which are critical to RAS
+               service.
 
-     d) Remote Access Service failures
-          This section defines metrics to monitor session
-          failures and failures of the service itself, measured
-          at aggregate level, session level and group level.
+          b)        Remote Access resource usage group
+               This section defines metrics to gauge        the usage of
+               resources on this device which are critical to RAS
+               service service.
 
-     e) Security violations in the Remote Access service
-          This section defines metrics which reflect the state 
-          of remote access service of interest to Security 
-          Operations staff in an enterprise.
+          c)        Current        activity and performance of RAS        service
+               This section defines metrics to gauge        the current
+               remote access        activity.
 
-     f) Threshold group (allows definition of high water marks)
-          This section allows the management entity to define 
-          thresholds to set high water marks on critical metrics.
+          d)        Remote Access Service failures
+               This section defines metrics to monitor session
+               failures and failures        of the service itself, measured
+               at aggregate level, session level and        group level.
 
-     g) Notifications
-          This section defines notifications to signal
-          significant events pertaining to the Remote Access
-          Service.
-   "
-   REVISION "200808280000Z"
-   DESCRIPTION
-            "Added crasEmailNumSessions 
-	           crasEmailCumulateSessions 
-                   crasEmailPeakConcurrentSessions
-                   crasIPSecNumSessions 
-                   crasIPSecCumulateSessions 
-                   crasIPSecPeakConcurrentSessions 
-                   crasL2LNumSessions 
-		   crasL2LCumulateSessions 
-                   crasL2LPeakConcurrentSessions 
-                   crasLBNumSessions 
-                   crasLBCumulateSessions 
-                   crasLBPeakConcurrentSessions
-                   crasSVCNumSessions 
-  		   crasSVCCumulateSessions 
-                   crasSVCPeakConcurrentSessions
-                   crasWebvpnNumSessions 
-	           crasWebvpnCumulateSessions 
-                   crasWebvpnPeakConcurrentSessions objects
-	
-   "         
-      ::= { ciscoMgmt 392 }
+          e)        Security violations in the Remote Access service
+               This section defines metrics which reflect the state
+               of remote access service of interest to Security
+               Operations staff in an enterprise.
+
+          f)        Threshold group        (allows        definition of high water marks)
+               This section allows the management entity to define
+               thresholds to        set high water marks on        critical metrics.
+
+          g)        Notifications
+               This section defines notifications to        signal
+               significant events pertaining        to the Remote Access
+               Service."
+    REVISION        "202010040000Z"
+    DESCRIPTION
+        "Added crasNumPeakSessions object"
+    REVISION        "200808280000Z"
+    DESCRIPTION
+        "Added crasEmailNumSessions
+        crasEmailCumulateSessions 
+        crasEmailPeakConcurrentSessions
+        crasIPSecNumSessions 
+        crasIPSecCumulateSessions 
+        crasIPSecPeakConcurrentSessions 
+        crasL2LNumSessions 
+        crasL2LCumulateSessions 
+        crasL2LPeakConcurrentSessions 
+        crasLBNumSessions 
+        crasLBCumulateSessions 
+        crasLBPeakConcurrentSessions
+        crasSVCNumSessions 
+          crasSVCCumulateSessions 
+        crasSVCPeakConcurrentSessions
+        crasWebvpnNumSessions 
+        crasWebvpnCumulateSessions 
+        crasWebvpnPeakConcurrentSessions objects"
+    ::= { ciscoMgmt 392 }
+
+
 
 -- Tentative anchor under ciscoMgmt
-
+--   
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Local Textual Conventions
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++
-   RasProtocol  ::= TEXTUAL-CONVENTION
-      STATUS     current
-      DESCRIPTION
-         "The protocol immediately underlying the remote 
-         access session. 
-         
-         The value 'other' has been listed to allow for the
-         MIB to be supported on proprietary protocols not 
-         listed here.
-         "
-      SYNTAX INTEGER {
-                other(1),
-                ipsec(2),
-                l2tp(3),
-                l2tpoveripsec(4),
-                pptp(5),
-                l2f(6),
-                ssl(7)
-             }
 
-   UserAuthenMethod ::= TEXTUAL-CONVENTION
-      STATUS     current
-      DESCRIPTION
-         "The mechanism used to authenticate the user.
+RasProtocol ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The protocol immediately underlying the remote
+        access        session.
 
-         The value 'other' has been listed to allow for the
-         MIB to support proprietary authentication methods 
-         not listed here.
-         "
-      SYNTAX INTEGER {
-                none(1),
-                other(2),
-                radius(3),
-                tacacsplus(4),
-                kerberos(5),
-                local(6),
-                ldap(7),
-                ntlm(8),
-                sdi(9)
-             }
+        The value 'other' has been listed to allow for        the
+        MIB to        be supported on        proprietary protocols not
+        listed        here."
+    SYNTAX          INTEGER  {
+                        other(1),
+                        ipsec(2),
+                        l2tp(3),
+                        l2tpoveripsec(4),
+                        pptp(5),
+                        l2f(6),
+                        ssl(7)
+                    }
 
-   UserAuthorMethod ::= TEXTUAL-CONVENTION
-      STATUS     current
-      DESCRIPTION
-         "The mechanism used to authorize the user.
-         The value 'other' has been listed to allow for the
-         MIB to support proprietary authorization mechanisms 
-         not listed here.
-         "
-      SYNTAX INTEGER {
-                none(1),
-                other(2),
-                radius(3),
-                tacacsplus(4),
-                kerberos(5),
-                local(6),
-                ldap(7)
-             }
+UserAuthenMethod ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The mechanism        used to        authenticate the user.
 
-   SessionEncrAlgo   ::= TEXTUAL-CONVENTION
-      STATUS     current
-      DESCRIPTION
-         "The encryption algorithm used to secure the remote
-         access session.
-         "
-      SYNTAX INTEGER {
-                none(1),
-                des(2),
-                des3(3),
-                rc4(4),
-                rc5(5),
-                idea(6),
-                cast(7),
-                blowfish(8),
-                aes(9)
-             }
+        The value 'other' has been listed to allow for        the
+        MIB to        support        proprietary authentication methods
+        not listed here."
+    SYNTAX          INTEGER  {
+                        none(1),
+                        other(2),
+                        radius(3),
+                        tacacsplus(4),
+                        kerberos(5),
+                        local(6),
+                        ldap(7),
+                        ntlm(8),
+                        sdi(9)
+                    }
 
-   SessionAuthAlgo      ::= TEXTUAL-CONVENTION
-      STATUS     current
-      DESCRIPTION
-         "The authentication algorithm used by to perform
-          packet authentication in the remote access session.
+UserAuthorMethod ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The mechanism        used to        authorize the user.
+        The value 'other' has been listed to allow for        the
+        MIB to        support        proprietary authorization mechanisms
+        not listed here."
+    SYNTAX          INTEGER  {
+                        none(1),
+                        other(2),
+                        radius(3),
+                        tacacsplus(4),
+                        kerberos(5),
+                        local(6),
+                        ldap(7)
+                    }
 
-         The value 'other' has been listed to allow for the
-         MIB to support packet validation algorithms not 
-         listed here.
-         "
-      SYNTAX INTEGER{
-                none(1),
-                other(2),
-                hmacMd5(3),
-                hmacSha(4)
-             }
+SessionEncrAlgo ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The encryption algorithm used        to secure the remote
+        access        session."
+    SYNTAX          INTEGER  {
+                        none(1),
+                        des(2),
+                        des3(3),
+                        rc4(4),
+                        rc5(5),
+                        idea(6),
+                        cast(7),
+                        blowfish(8),
+                        aes(9)
+                    }
 
-   SessionCompressionAlgo      ::= TEXTUAL-CONVENTION
-      STATUS     current
-      DESCRIPTION
-         "The compression algorithm used in the remote access
-          session.
+SessionAuthAlgo ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The authentication algorithm used by to perform
+        packet authentication        in the remote access session.
 
-          The value 'other' has been listed to allow for the
-          MIB to support compression not listed here.
-         "
-      SYNTAX INTEGER{
-                none(1),
-                other(2),
-                lzs(3)
-             }
+        The value 'other' has been listed to allow for        the
+        MIB to        support        packet validation algorithms not
+        listed        here."
+    SYNTAX          INTEGER  {
+                        none(1),
+                        other(2),
+                        hmacMd5(3),
+                        hmacSha(4)
+                    }
 
-   SessionStatus  ::= TEXTUAL-CONVENTION
-      STATUS     current
-      DESCRIPTION
-         "The status of a remote access session. 
+SessionCompressionAlgo ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The compression algorithm used in the        remote access
+        session.
 
-           initializing: the session is in the process 
-                         of being established
+        The value 'other' has        been listed to allow for the
+        MIB to support compression not listed        here."
+    SYNTAX          INTEGER  {
+                        none(1),
+                        other(2),
+                        lzs(3)
+                    }
 
-           established : the session is established and
-                         is ready to carry application
-                         traffic. Sessions in this state
-                         may also be referred to as 
-                         'active' sessions.
+SessionStatus ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The status of        a remote access        session.
 
-           terminating : the session is in the process 
-                         of termination.
-         
-         Objects of this type may be used to terminate an
-         established session by setting value of the object 
-         to terminating(3). 
-         
-         Management entity may not write values initializing(1)
-         or established(2) onto objects of this type. Doing so 
-         would cause the managed entity to return an error
-         condition.
-         "
-      SYNTAX INTEGER {
-                initializing(1),
-                established(2),
-                terminating(3)
-             }
+        initializing: the session is        in the process
+                      of being established
 
-   SessionIndex    ::= TEXTUAL-CONVENTION
-      STATUS     current
-      DESCRIPTION
-         "The type used to index a remote access session."
-      SYNTAX Integer32 (1..2147483647)
+        established : the session is        established and
+                      is ready to carry application
+                      traffic. Sessions in this state
+                      may also be referred to as
+                      'active' sessions.
 
-   FailureRecordIndex    ::= TEXTUAL-CONVENTION
-      STATUS     current
-      DESCRIPTION
-         "The type used to index failure records in the
-         failure archive."
-      SYNTAX Unsigned32 (1..4294967295)
+        terminating : the session is        in the process
+                      of termination.
 
+        Objects of this type may be used to terminate an
+        established session by        setting        value of the object
+        to terminating(3).
+
+        Management entity may not write values        initializing(1)
+        or established(2) onto        objects        of this        type. Doing so
+        would cause the managed entity        to return an error
+        condition."
+    SYNTAX          INTEGER  {
+                        initializing(1),
+                        established(2),
+                        terminating(3)
+                    }
+
+SessionIndex ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The type used        to index a remote access session."
+    SYNTAX          Integer32 (1..2147483647)
+
+FailureRecordIndex ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The type used        to index failure records in the
+        failure archive."
+    SYNTAX          Unsigned32 (1..4294967295)
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Remote Access MIB Object Groups
---
--- This MIB module contains the following groups:
--- 1) Remote Access capacity group 
--- 2) Remote Access resource usage group 
+--   
+-- This   MIB module contains the   following groups:
+-- 1) Remote Access capacity group
+-- 2) Remote Access resource usage group
 -- 3) Current activity and performance
 -- 4) Failures
 -- 5) Security violations
--- 6) Threshold group
+-- 6) Threshold   group
 -- 7) Notifications:
--- 7a)  Controls
--- 7b)  Notification definitions
+-- 7a)   Controls
+-- 7b)   Notification definitions
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   ciscoRasMonitorMIBNotifs  OBJECT IDENTIFIER
-              ::= { ciscoRemoteAccessMonitorMIB 0}
 
-   ciscoRasMonitorMIBObjects OBJECT IDENTIFIER
-              ::= {ciscoRemoteAccessMonitorMIB 1}
+ciscoRasMonitorMIBNotifs  OBJECT IDENTIFIER
+    ::= { ciscoRemoteAccessMonitorMIB 0 }
 
-   ciscoRasMonitorMIBConform OBJECT IDENTIFIER
-              ::= { ciscoRemoteAccessMonitorMIB 2 }
+ciscoRasMonitorMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoRemoteAccessMonitorMIB 1 }
 
-   crasCapacity OBJECT IDENTIFIER  
-                  ::= { ciscoRasMonitorMIBObjects 1 }
-   crasResourceUsage           OBJECT IDENTIFIER  
-                  ::= { ciscoRasMonitorMIBObjects 2 }
-   crasActivity            OBJECT IDENTIFIER  
-                  ::= { ciscoRasMonitorMIBObjects 3 }
-   crasFailures           OBJECT IDENTIFIER  
-                  ::= { ciscoRasMonitorMIBObjects 4 }
-   crasSecurity           OBJECT IDENTIFIER  
-                  ::= { ciscoRasMonitorMIBObjects 5 }
-   crasThresholds         OBJECT IDENTIFIER  
-                  ::= { ciscoRasMonitorMIBObjects 6 }
-   crasNotifCntl         OBJECT IDENTIFIER  
-                  ::= { ciscoRasMonitorMIBObjects 7 }
+ciscoRasMonitorMIBConform  OBJECT IDENTIFIER
+    ::= { ciscoRemoteAccessMonitorMIB 2 }
+
+crasCapacity  OBJECT IDENTIFIER
+    ::= { ciscoRasMonitorMIBObjects 1 }
+
+crasResourceUsage  OBJECT IDENTIFIER
+    ::= { ciscoRasMonitorMIBObjects 2 }
+
+crasActivity  OBJECT IDENTIFIER
+    ::= { ciscoRasMonitorMIBObjects 3 }
+
+crasFailures  OBJECT IDENTIFIER
+    ::= { ciscoRasMonitorMIBObjects 4 }
+
+crasSecurity  OBJECT IDENTIFIER
+    ::= { ciscoRasMonitorMIBObjects 5 }
+
+crasThresholds  OBJECT IDENTIFIER
+    ::= { ciscoRasMonitorMIBObjects 6 }
+
+crasNotifCntl  OBJECT IDENTIFIER
+    ::= { ciscoRasMonitorMIBObjects 7 }
+
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- The Remote Access capacity group.
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   crasMaxSessionsSupportable OBJECT-TYPE
-      SYNTAX Integer32 (0..2147483647)
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The maximum number of remote access sessions
-         that may be supported on this device.
 
-         If the device imposes no arbitrary limit on the
-         maximum number of sessions, it should return a 
-         value of 0."
-      ::= { crasCapacity 1 }
+crasMaxSessionsSupportable OBJECT-TYPE
+    SYNTAX          Integer32 (0..2147483647)
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The maximum number of        remote access sessions
+        that may be supported on this device.
 
-   crasMaxUsersSupportable OBJECT-TYPE
-      SYNTAX Integer32 (0..2147483647)
-      UNITS "Users"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The maximum number of remote access users
-         for whom Remote Access sessions may be supported on 
-         this device.
+        If the        device imposes no arbitrary limit on the
+        maximum number        of sessions, it        should return a
+        value of 0." 
+    ::= { crasCapacity 1 }
 
-         If the device imposes no arbitrary limit on the
-         maximum number of users, it should return a 
-         value of 0."
-      ::= { crasCapacity 2 }
+crasMaxUsersSupportable OBJECT-TYPE
+    SYNTAX          Integer32 (0..2147483647)
+    UNITS           "Users"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The maximum number of        remote access users
+        for whom Remote Access        sessions may be        supported on
+        this device.
 
-   crasMaxGroupsSupportable OBJECT-TYPE
-      SYNTAX Integer32 (0..2147483647)
-      UNITS "Groups"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The maximum number of remote access groups
-         that may be defined on this device. 'Group'
-         refers to a collection of users grouped together
-         for administrative convenience.
+        If the        device imposes no arbitrary limit on the
+        maximum number        of users, it should return a
+        value of 0." 
+    ::= { crasCapacity 2 }
 
-         If the device imposes no arbitrary limit on
-         the maximum number of groups, it should return
-         a value of 0."
-      ::= { crasCapacity 3 }
+crasMaxGroupsSupportable OBJECT-TYPE
+    SYNTAX          Integer32 (0..2147483647)
+    UNITS           "Groups"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The maximum number of        remote access groups
+        that may be defined on        this device. 'Group'
+        refers        to a collection        of users grouped together
+        for administrative convenience.
 
-   crasNumCryptoAccelerators OBJECT-TYPE
-      SYNTAX Integer32 (0..2147483647)
-      UNITS "Users"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The maximum number of hardware crypto accelerators
-         which can be installed on this device to support
-         remote access sessions. 'cryptoaccelerator' denotes
-         a hardware/software entity which the managed entity 
-         uses to offload some or all computations pertaining 
-         to cryptographic operations.
+        If the        device imposes no arbitrary limit on
+        the maximum number of groups, it should return
+        a value of 0." 
+    ::= { crasCapacity 3 }
 
-         If the device imposes no arbitrary limit on the
-         number of crypto accelerators to support Remote Access
-         function, it should return a value of 0."
-      ::= { crasCapacity 4 }
+crasNumCryptoAccelerators OBJECT-TYPE
+    SYNTAX          Integer32 (0..2147483647)
+    UNITS           "Users"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The maximum number of        hardware crypto        accelerators
+        which can be installed        on this        device to support
+        remote        access sessions. 'cryptoaccelerator' denotes
+        a hardware/software entity which the managed entity
+        uses to offload some or all computations pertaining
+        to cryptographic operations.
+
+        If the        device imposes no arbitrary limit on the
+        number        of crypto accelerators to support Remote Access
+        function, it should return a value of 0." 
+    ::= { crasCapacity 4 }
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- The Remote Access resource usage group.
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   crasGlobalBwUsage OBJECT-TYPE
-      SYNTAX Gauge32
-      UNITS "MBytes/second"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The average bandwidth used by all the active 
-         remote access sessions."
-      ::= { crasResourceUsage 1 }
+
+crasGlobalBwUsage OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "MBytes/second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The average bandwidth        used by        all the        active
+        remote        access sessions." 
+    ::= { crasResourceUsage 1 }
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- The Remote Access activity usage group.
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   crasNumSessions OBJECT-TYPE
-      SYNTAX Gauge32
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of currently active sessions.
 
-         A session is a connection terminating on the managed 
-         entity which has been established to provide remote 
-         access connectivity to a user. A session is said to be 
-         'active' if it is ready to carry application traffic
-         between the user and the managed entity. A session which 
-         is not active is defined to be 'dormant'.
-         "
+crasNumSessions OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of        currently active sessions.
 
-      ::= { crasActivity 1 }
+        A session is a        connection terminating on the managed
+        entity        which has been established to provide remote
+        access        connectivity to        a user.        A session is said to be
+        'active' if it        is ready to carry application traffic
+        between the user and the managed entity. A session which
+        is not        active is defined to be        'dormant'." 
+    ::= { crasActivity 1 }
 
-   crasNumPrevSessions OBJECT-TYPE
-      SYNTAX Counter32
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of remote access sessions which were 
-         previously active but which where since terminated.
-         
-         Measured since the last reboot of the device."
-      ::= { crasActivity 2 }
+crasNumPrevSessions OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of        remote access sessions which were
+        previously active but which where since terminated.
 
-   crasNumUsers OBJECT-TYPE
-      SYNTAX Gauge32
-      UNITS "Users"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of users who have active sessions.
-         "
-      ::= { crasActivity 3 }
+        Measured since        the last reboot        of the device." 
+    ::= { crasActivity 2 }
 
-   crasNumGroups OBJECT-TYPE
-      SYNTAX Gauge32
-      UNITS "Groups"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of user groups whose members have
-         active sessions."
-      ::= { crasActivity 4 }
+crasNumUsers OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "Users"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of        users who have active sessions." 
+    ::= { crasActivity 3 }
 
-   crasGlobalInPkts OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Packets"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The total number of packets received by all
-         currently and previously active remote access 
-         sessions."
-      ::= { crasActivity 5 }
+crasNumGroups OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "Groups"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of        user groups whose members have
+        active        sessions." 
+    ::= { crasActivity 4 }
 
-   crasGlobalOutPkts OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Packets"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The total number of packets transmitted by all
-         currently and previously active remote access 
-         sessions."
-      ::= { crasActivity 6 }
+crasGlobalInPkts OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of packets received by all
+        currently and previously active remote        access
+        sessions." 
+    ::= { crasActivity 5 }
 
-   crasGlobalInOctets OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Octets"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The total number of octets received by all currently
-          and previously active remote access sessions.
-          This value is accumulated BEFORE determining whether 
-          or not the packet should be decompressed.
-         "
-      ::= { crasActivity 7 }
+crasGlobalOutPkts OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of packets transmitted by all
+        currently and previously active remote        access
+        sessions." 
+    ::= { crasActivity 6 }
 
-   crasGlobalInDecompOctets OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Octets"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The total number of decompressed octets received 
-         by all current and previous remote access sessions.  
-         This value is accumulated AFTER the packet is 
-         decompressed. If compression is not being used, 
-         this value will match the value of crasGlobalInOctets. 
-         "
-      ::= { crasActivity 8 }
+crasGlobalInOctets OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Octets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of octets received by all currently
+        and previously active        remote access sessions.
+        This value is        accumulated BEFORE determining whether
+        or not the packet should be decompressed." 
+    ::= { crasActivity 7 }
 
-   crasGlobalOutOctets OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Octets"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The total number of octets transmitted by all 
-          currently and previously active remote access 
-          sessions.
+crasGlobalInDecompOctets OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Octets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of decompressed octets received
+        by all        current        and previous remote access sessions.
+        This value is accumulated AFTER the packet is
+        decompressed. If compression is not being used,
+        this value will match the value of crasGlobalInOctets." 
+    ::= { crasActivity 8 }
 
-         This value is accumulated AFTER determining 
-         whether or not the packet should be compressed.  
-        "
-      ::= { crasActivity 9 }
+crasGlobalOutOctets OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Octets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of octets transmitted by all
+        currently and        previously active remote access
+        sessions.
 
-   crasGlobalOutUncompOctets OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Octets"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-       "The total number of uncompressed octets sent 
-       by all current and previous remote access sessions.  
-       This value is accumulated BEFORE the packet is 
-       compressed. If compression is not being used, this 
-       value will match the value of crasGlobalOutOctets. 
-       "
-      ::= { crasActivity 10 }
+        This value is accumulated AFTER determining
+        whether or not        the packet should be compressed." 
+    ::= { crasActivity 9 }
 
-    crasGlobalInDropPkts OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Packets"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The total number of packets which were dropped
-         during receive processing by all currently and 
-         previously active remote access sessions."
-      ::= { crasActivity 11 }
+crasGlobalOutUncompOctets OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Octets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of uncompressed octets        sent
+        by all current and previous remote access sessions.
+        This value is accumulated BEFORE        the packet is
+        compressed. If compression is not being used, this
+        value will match        the value of crasGlobalOutOctets." 
+    ::= { crasActivity 10 }
 
-    crasGlobalOutDropPkts OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Packets"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The total number of packets which were
-         dropped during receive processing by all
-         currently and previously active remote access 
-         sessions."
-      ::= { crasActivity 12 }
+crasGlobalInDropPkts OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of packets which were dropped
+        during        receive        processing by all currently and
+        previously active remote access sessions." 
+    ::= { crasActivity 11 }
 
-
+crasGlobalOutDropPkts OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of packets which were
+        dropped during        receive        processing by all
+        currently and previously active remote        access
+        sessions." 
+    ::= { crasActivity 12 }
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- The Remote Access session table
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   crasSessionTable OBJECT-TYPE
-      SYNTAX SEQUENCE OF CrasSessionEntry
-      MAX-ACCESS not-accessible
-      STATUS current
-      DESCRIPTION
-         "This table lists all the currently active sessions.
-          For each session, it lists the attributes (user, 
-          group, protocol, security), statistics (packet and
-          octets) and status."
-     ::= { crasActivity 21 }
 
-   crasSessionEntry OBJECT-TYPE
-      SYNTAX CrasSessionEntry
-      MAX-ACCESS not-accessible
-      STATUS current
-      DESCRIPTION
-            "Each entry contains the attributes, statistics and
-             status of an active session."
-      INDEX { crasUsername,
-              crasSessionIndex}
-      ::= { crasSessionTable 1}
+crasSessionTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CrasSessionEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table lists all the currently active sessions.
+        For each session, it lists the attributes (user,
+        group, protocol, security), statistics (packet and
+        octets) and status."
+    ::= { crasActivity 21 }
 
-   CrasSessionEntry ::= SEQUENCE {
-      crasUsername                     SnmpAdminString,
-      crasGroup                        SnmpAdminString,
-      crasSessionIndex                 SessionIndex,
-      crasAuthenMethod                 UserAuthenMethod,
-      crasAuthorMethod                 UserAuthorMethod,
-      crasSessionDuration              Counter32,
-      crasLocalAddressType             InetAddressType,
-      crasLocalAddress                 InetAddress,
-      crasISPAddressType               InetAddressType,
-      crasISPAddress                   InetAddress,
-      crasSessionProtocol              RasProtocol,
-      crasProtocolElement              OBJECT IDENTIFIER,
-      crasSessionEncryptionAlgo        SessionEncrAlgo,
-      crasSessionPktAuthenAlgo         SessionAuthAlgo,
-      crasSessionCompressionAlgo       SessionCompressionAlgo,
-      crasHeartbeatInterval            Unsigned32,
-      crasClientVendorString           SnmpAdminString,
-      crasClientVersionString          SnmpAdminString,
-      crasClientOSVendorString         SnmpAdminString,
-      crasClientOSVersionString        SnmpAdminString,
-      --
-      crasPrimWINSServerAddrType       InetAddressType,
-      crasPrimWINSServer               InetAddress,
-      crasSecWINSServerAddrType        InetAddressType,
-      crasSecWINSServer                InetAddress,
-      crasPrimDNSServerAddrType        InetAddressType,
-      crasPrimDNSServer                InetAddress,
-      crasSecDNSServerAddrType         InetAddressType,
-      crasSecDNSServer                 InetAddress,
-      crasDHCPServerAddrType           InetAddressType,
-      crasDHCPServer                   InetAddress,
-      --
-      crasSessionInPkts                Counter64,
-      crasSessionOutPkts               Counter64,
-      crasSessionInDropPkts            Counter64,
-      crasSessionOutDropPkts           Counter64,
-      crasSessionInOctets              Counter64,
-      crasSessionOutOctets             Counter64,
-      crasSessionState                 SessionStatus
-      --
-   }
+crasSessionEntry OBJECT-TYPE
+    SYNTAX          CrasSessionEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry        contains the attributes, statistics and
+        status of an active session."
+    INDEX           {
+                        crasUsername,
+                        crasSessionIndex
+                    } 
+    ::= { crasSessionTable 1 }
 
-   crasUsername OBJECT-TYPE
-      SYNTAX SnmpAdminString (SIZE(0..128))
-      MAX-ACCESS not-accessible
-      STATUS current
-      DESCRIPTION
-         "The name of the user associated with this remote 
-          access session."
-      ::= { crasSessionEntry 1 }
+CrasSessionEntry ::= SEQUENCE {
+        crasUsername               SnmpAdminString,
+        crasGroup                  SnmpAdminString,
+        crasSessionIndex           SessionIndex,
+        crasAuthenMethod           UserAuthenMethod,
+        crasAuthorMethod           UserAuthorMethod,
+        crasSessionDuration        Counter32,
+        crasLocalAddressType       InetAddressType,
+        crasLocalAddress           InetAddress,
+        crasISPAddressType         InetAddressType,
+        crasISPAddress             InetAddress,
+        crasSessionProtocol        RasProtocol,
+        crasProtocolElement        OBJECT IDENTIFIER,
+        crasSessionEncryptionAlgo  SessionEncrAlgo,
+        crasSessionPktAuthenAlgo   SessionAuthAlgo,
+        crasSessionCompressionAlgo SessionCompressionAlgo,
+        crasHeartbeatInterval      Unsigned32,
+        crasClientVendorString     SnmpAdminString,
+        crasClientVersionString    SnmpAdminString,
+        crasClientOSVendorString   SnmpAdminString,
+        crasClientOSVersionString  SnmpAdminString,
+        crasPrimWINSServerAddrType InetAddressType,
+        crasPrimWINSServer         InetAddress,
+        crasSecWINSServerAddrType  InetAddressType,
+        crasSecWINSServer          InetAddress,
+        crasPrimDNSServerAddrType  InetAddressType,
+        crasPrimDNSServer          InetAddress,
+        crasSecDNSServerAddrType   InetAddressType,
+        crasSecDNSServer           InetAddress,
+        crasDHCPServerAddrType     InetAddressType,
+        crasDHCPServer             InetAddress,
+        crasSessionInPkts          Counter64,
+        crasSessionOutPkts         Counter64,
+        crasSessionInDropPkts      Counter64,
+        crasSessionOutDropPkts     Counter64,
+        crasSessionInOctets        Counter64,
+        crasSessionOutOctets       Counter64,
+        crasSessionState           SessionStatus
+}
 
-   crasGroup OBJECT-TYPE
-      SYNTAX SnmpAdminString
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The name of the user group to which this remote 
-          access session belongs."
-      ::= { crasSessionEntry 2 }
+crasUsername OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..128))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The name of the user associated with this remote
+        access session." 
+    ::= { crasSessionEntry 1 }
 
-   crasSessionIndex OBJECT-TYPE
-      SYNTAX SessionIndex
-      MAX-ACCESS not-accessible
-      STATUS current
-      DESCRIPTION
-       "Unique index to distinguish between multiple 
-       Remote Access Sessions associated with the same 
-       user. 
+crasGroup OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The name of the user group to        which this remote
+        access session belongs." 
+    ::= { crasSessionEntry 2 }
 
-       The value of crasSessionIndex must increase monotonically
-       till it wraps. An implementation may choose to wrap this 
-       index before the value of 2147483647. 
-       "
-      ::= { crasSessionEntry 3 }
+crasSessionIndex OBJECT-TYPE
+    SYNTAX          SessionIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Unique index to        distinguish between multiple
+        Remote Access Sessions associated with the same
+        user.
 
+        The value of crasSessionIndex must increase monotonically
+        till it wraps. An implementation        may choose to wrap this
+        index before the        value of 2147483647." 
+    ::= { crasSessionEntry 3 }
 
-   crasAuthenMethod OBJECT-TYPE
-      SYNTAX UserAuthenMethod
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The method used to authenticate the user prior to
-          establishing the session."
-      ::= { crasSessionEntry 4 }
+crasAuthenMethod OBJECT-TYPE
+    SYNTAX          UserAuthenMethod
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The method used to authenticate the user prior to
+        establishing the session." 
+    ::= { crasSessionEntry 4 }
 
-   crasAuthorMethod OBJECT-TYPE
-      SYNTAX UserAuthorMethod
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The method used to authorize the user prior to
-          establishing the session."
-      ::= { crasSessionEntry 5 }
+crasAuthorMethod OBJECT-TYPE
+    SYNTAX          UserAuthorMethod
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The method used to authorize the user        prior to
+        establishing the session." 
+    ::= { crasSessionEntry 5 }
 
-   crasSessionDuration OBJECT-TYPE
-      SYNTAX Counter32
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of seconds elapsed since this session
-          was established."
-      ::= { crasSessionEntry 6 }
+crasSessionDuration OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of        seconds        elapsed        since this session
+        was established." 
+    ::= { crasSessionEntry 6 }
 
-   crasLocalAddressType OBJECT-TYPE
-      SYNTAX InetAddressType
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The type of the address returned in 'crasLocalAddress'.
-         "
-      ::= { crasSessionEntry 7 }
+crasLocalAddressType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The type of the address returned in 'crasLocalAddress'." 
+    ::= { crasSessionEntry 7 }
 
-   crasLocalAddress OBJECT-TYPE
-      SYNTAX InetAddress
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The IP address assigned to the client of this session 
-          in the private network assigned by the managed entity."
-      ::= { crasSessionEntry 8 }
+crasLocalAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP address assigned to the client        of this        session
+        in the private network assigned by the managed entity." 
+    ::= { crasSessionEntry 8 }
 
-   crasISPAddressType   OBJECT-TYPE
-      SYNTAX InetAddressType
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The type of the address returned in 'crasISPAddress'.
-         "
-      ::= { crasSessionEntry 9 }
+crasISPAddressType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The type of the address returned in 'crasISPAddress'." 
+    ::= { crasSessionEntry 9 }
 
-   crasISPAddress OBJECT-TYPE
-      SYNTAX InetAddress
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-       "The IP address of the peer (client) assigned by the ISP.
-       This is the address of the client device in the public
-       network."
-     ::= { crasSessionEntry 10 }
+crasISPAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP address of the peer (client) assigned by        the ISP.
+        This is the address of the client device        in the public
+        network." 
+    ::= { crasSessionEntry 10 }
 
-   crasSessionProtocol OBJECT-TYPE
-      SYNTAX RasProtocol
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-       "The protocol underlying this remote access session."
-      ::= { crasSessionEntry 11 }
+crasSessionProtocol OBJECT-TYPE
+    SYNTAX          RasProtocol
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The protocol underlying        this remote access session." 
+    ::= { crasSessionEntry 11 }
 
-   crasProtocolElement  OBJECT-TYPE
-       SYNTAX      OBJECT IDENTIFIER
-       MAX-ACCESS  read-only
-       STATUS      current
-       DESCRIPTION
-        "A reference to MIB definitions specific to the protocol
-		underlying corresponding to the session or tunnel
-		used to realized the remote access session corresponding 
-		to this conceptual row. 
+crasProtocolElement OBJECT-TYPE
+    SYNTAX          OBJECT IDENTIFIER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "A reference to        MIB definitions        specific to the        protocol
+        underlying corresponding to the        session        or tunnel
+        used to        realized the remote access session corresponding
+        to this        conceptual row.
 
         For instance, if this remote access session is based on
-		IPsec, then this object must contain the complete
-		instance identifier of the IPsec tunnel corresponding 
-		to this remote access session.
+        IPsec, then this object        must contain the complete
+        instance identifier of the IPsec tunnel        corresponding
+        to this        remote access session.
 
         If no MIB definitions specific to the underlying
-		protocol are available, the value should be set to the 
-		OBJECT IDENTIFIER { 0 0 }.
-        "
-    DEFVAL { zeroDotZero }
-      ::= { crasSessionEntry 12 }
+        protocol are available,        the value should be set        to the
+        OBJECT IDENTIFIER { 0 0        }."
+    DEFVAL          { zeroDotZero } 
+    ::= { crasSessionEntry 12 }
 
-   crasSessionEncryptionAlgo OBJECT-TYPE
-      SYNTAX SessionEncrAlgo
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-       "The algorithm used by this remote access session to
-       encrypt its payload."
-      ::= { crasSessionEntry 13 }
+crasSessionEncryptionAlgo OBJECT-TYPE
+    SYNTAX          SessionEncrAlgo
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The algorithm used by this remote access session to
+        encrypt its payload." 
+    ::= { crasSessionEntry 13 }
 
-   crasSessionPktAuthenAlgo OBJECT-TYPE
-      SYNTAX SessionAuthAlgo
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-       "The algorithm used by this remote access session to
-       to validate packets."
-      ::= { crasSessionEntry 14 }
+crasSessionPktAuthenAlgo OBJECT-TYPE
+    SYNTAX          SessionAuthAlgo
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The algorithm used by this remote access session to
+        to validate packets." 
+    ::= { crasSessionEntry 14 }
 
-   crasSessionCompressionAlgo OBJECT-TYPE
-      SYNTAX SessionCompressionAlgo
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-       "The algorithm used by this remote access session to
-       compress packets."
-      ::= { crasSessionEntry 15 }
+crasSessionCompressionAlgo OBJECT-TYPE
+    SYNTAX          SessionCompressionAlgo
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The algorithm used by this remote access session to
+        compress        packets." 
+    ::= { crasSessionEntry 15 }
 
-   crasHeartbeatInterval OBJECT-TYPE
-      SYNTAX Unsigned32 (0..4294967295)
-      UNITS "Seconds"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The interval in seconds between two successive heartbeats
-          employed by this session. Value of 0 denotes that no
-          heartbeat is used."
-      ::= { crasSessionEntry 16 }
+crasHeartbeatInterval OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..4294967295)
+    UNITS           "Seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The interval in seconds between two successive heartbeats
+        employed by this session. Value of 0 denotes that no
+        heartbeat is used." 
+    ::= { crasSessionEntry 16 }
 
-   crasClientVendorString           OBJECT-TYPE
-      SYNTAX SnmpAdminString
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The string identifying the vendor of the client 
-         application initiating this Remote Access session."
-      ::= { crasSessionEntry 17 }
+crasClientVendorString OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The string identifying the vendor of the client
+        application initiating        this Remote Access session." 
+    ::= { crasSessionEntry 17 }
 
-   crasClientVersionString          OBJECT-TYPE
-      SYNTAX SnmpAdminString
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The string identifying the version of the of the client 
-         application initiating the Remote Access session.
-         This can be used by the administrator to identify which 
-         users are running unsupported client versions."
-      ::= { crasSessionEntry 18 }
+crasClientVersionString OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The string identifying the version of        the of the client
+        application initiating        the Remote Access session.
+        This can be used by the administrator to identify which
+        users are running unsupported client versions." 
+    ::= { crasSessionEntry 18 }
 
-   crasClientOSVendorString         OBJECT-TYPE
-      SYNTAX SnmpAdminString
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The string identifying the vendor of the operating system 
-         on which the client application initiating the Remote Access 
-         Session is running."
-      ::= { crasSessionEntry 19 }
+crasClientOSVendorString OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The string identifying the vendor of the operating system
+        on which the client application initiating the        Remote Access
+        Session is running." 
+    ::= { crasSessionEntry 19 }
 
-   crasClientOSVersionString        OBJECT-TYPE
-      SYNTAX SnmpAdminString
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The string identifying the version of the operating 
-         system of the entity which initiated this Remote Access 
-         session."
-      ::= { crasSessionEntry 20 }
+crasClientOSVersionString OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The string identifying the version of        the operating
+        system        of the entity which initiated this Remote Access
+        session." 
+    ::= { crasSessionEntry 20 }
 
-   crasPrimWINSServerAddrType       OBJECT-TYPE
-      SYNTAX InetAddressType
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The type of the address returned in 
-          'crasPrimWINSServer'.
-         "
-      ::= { crasSessionEntry 21 }
+crasPrimWINSServerAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The type of the address returned in
+        'crasPrimWINSServer'." 
+    ::= { crasSessionEntry 21 }
 
-   crasPrimWINSServer OBJECT-TYPE
-      SYNTAX InetAddress
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The IP address of the primary WINS server assigned 
-          managed entity to this client session."
-      ::= { crasSessionEntry 22 }
+crasPrimWINSServer OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP address of the        primary        WINS server assigned
+        managed entity to this client        session." 
+    ::= { crasSessionEntry 22 }
 
-   crasSecWINSServerAddrType        OBJECT-TYPE
-      SYNTAX InetAddressType
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The type of the address returned in 
-          'crasSecWINSServer'.
-         "
-      ::= { crasSessionEntry 23 }
+crasSecWINSServerAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The type of the address returned in
+        'crasSecWINSServer'." 
+    ::= { crasSessionEntry 23 }
 
-   crasSecWINSServer OBJECT-TYPE
-      SYNTAX InetAddress
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The IP address of the secondary WINS server assigned 
-         by the managed entity to this client session."
-      ::= { crasSessionEntry 24 }
+crasSecWINSServer OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP address of the        secondary WINS server assigned
+        by the        managed        entity to this client session." 
+    ::= { crasSessionEntry 24 }
 
-   crasPrimDNSServerAddrType        OBJECT-TYPE
-      SYNTAX InetAddressType
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The type of the address returned in 
-          'crasPrimDNSServer'.
-         "
-      ::= { crasSessionEntry 25 }
+crasPrimDNSServerAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The type of the address returned in
+        'crasPrimDNSServer'." 
+    ::= { crasSessionEntry 25 }
 
-   crasPrimDNSServer OBJECT-TYPE
-      SYNTAX InetAddress
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The IP address of the primary DNS server assigned by 
-          the managed entity to this client session."
-      ::= { crasSessionEntry 26 }
+crasPrimDNSServer OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP address of the        primary        DNS server assigned by
+        the managed entity to        this client session." 
+    ::= { crasSessionEntry 26 }
 
-   crasSecDNSServerAddrType         OBJECT-TYPE
-      SYNTAX InetAddressType
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The type of the address returned in 
-          'crasSecDNSServer'.
-         "
-      ::= { crasSessionEntry 27 }
+crasSecDNSServerAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The type of the address returned in
+        'crasSecDNSServer'." 
+    ::= { crasSessionEntry 27 }
 
-   crasSecDNSServer OBJECT-TYPE
-      SYNTAX InetAddress
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The IP address of the secondary DNS server assigned
-          by the managed entity to this client session."
-      ::= { crasSessionEntry 28 }
+crasSecDNSServer OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP address of the        secondary DNS server assigned
+        by the managed entity        to this        client session." 
+    ::= { crasSessionEntry 28 }
 
-   crasDHCPServerAddrType           OBJECT-TYPE
-      SYNTAX InetAddressType
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The type of the address returned in 
-          'crasDHCPServer'.
-         "
-      ::= { crasSessionEntry 29 }
+crasDHCPServerAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The type of the address returned in
+        'crasDHCPServer'." 
+    ::= { crasSessionEntry 29 }
 
-   crasDHCPServer OBJECT-TYPE
-      SYNTAX InetAddress
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The IP address of the DHCP server assigned by the 
-          managed entity to this client session."
-      ::= { crasSessionEntry 30 }
+crasDHCPServer OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP address of the        DHCP server assigned by        the
+        managed entity to this client        session." 
+    ::= { crasSessionEntry 30 }
 
-   crasSessionInPkts OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Packets"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The total number of packets received by this Remote
-         Access session."
-      ::= { crasSessionEntry 31 }
+crasSessionInPkts OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of packets received by this Remote
+        Access        session." 
+    ::= { crasSessionEntry 31 }
 
-   crasSessionOutPkts OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Packets"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The total number of packets transmitted by this 
-         Remote Access Session."
-      ::= { crasSessionEntry 32 }
+crasSessionOutPkts OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of packets transmitted by this
+        Remote        Access Session." 
+    ::= { crasSessionEntry 32 }
 
-    crasSessionInDropPkts OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Packets"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The total number of packets received for processing
-         on this session which were dropped by the managed entity."
-      ::= { crasSessionEntry 33 }
+crasSessionInDropPkts OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of packets received for processing
+        on this session which were dropped by the managed entity." 
+    ::= { crasSessionEntry 33 }
 
-    crasSessionOutDropPkts OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Packets"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The total number of outgoing packets on this session
-         which were dropped during transmit processing by the 
-         managed entity."
-      ::= { crasSessionEntry 34 }
+crasSessionOutDropPkts OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of outgoing packets on this session
+        which were dropped during transmit processing by the
+        managed entity." 
+    ::= { crasSessionEntry 34 }
 
-   crasSessionInOctets OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Octets"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-       "The total number of octets received by this Remote
-       Access Session.
+crasSessionInOctets OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Octets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of octets received by this Remote
+        Access Session.
 
-       This value is accumulated BEFORE determining whether 
-	   or not the packet should be decompressed.
-       "
-      ::= { crasSessionEntry 35 }
+        This value is accumulated BEFORE        determining whether
+            or not the packet should be decompressed." 
+    ::= { crasSessionEntry 35 }
 
-   crasSessionOutOctets OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Octets"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-       "The total number of octets transmitted by this Remote
-       Access Session.
+crasSessionOutOctets OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Octets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of octets transmitted by this Remote
+        Access Session.
 
-       This value is accumulated AFTER determining whether
-       or not the packet should be compressed.
-       "
-      ::= { crasSessionEntry 36 }
+        This value is accumulated AFTER determining whether
+        or not the packet should        be compressed." 
+    ::= { crasSessionEntry 36 }
 
-   crasSessionState     OBJECT-TYPE
-      SYNTAX SessionStatus
-      MAX-ACCESS read-write
-      STATUS current
-      DESCRIPTION
-         "The state of the remote access session corresponding
-         to this conceptual row. 
+crasSessionState OBJECT-TYPE
+    SYNTAX          SessionStatus
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The state of the remote access session corresponding
+        to this conceptual row.
 
-		 The management entity may use this object to terminate 
-		 an established session by setting value of the object
-         to 'terminating'.
-		 "
-      ::= { crasSessionEntry 37 }
+                The management        entity may use this object to terminate
+                an established        session        by setting value of the        object
+        to 'terminating'." 
+    ::= { crasSessionEntry 37 }
+ 
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
--- The Remote Access session table organized by user group
+-- The Remote Access session table organized by   user group
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   crasActGroupTable OBJECT-TYPE
-      SYNTAX SEQUENCE OF CrasActGroupEntry
-      MAX-ACCESS not-accessible
-      STATUS current
-      DESCRIPTION
-         "This table lists all the currently active remote
-         access user groups. For each group, it lists the 
-         attributes (group, aggregate activity, aggregate 
-         traffic), and status."
-     ::= { crasActivity 22 }
 
-   crasActGroupEntry OBJECT-TYPE
-      SYNTAX CrasActGroupEntry
-      MAX-ACCESS not-accessible
-      STATUS current
-      DESCRIPTION
-            "Each entry contains the attributes, statistics and
-             status of an active session."
-      INDEX { crasActGrpName }
-      ::= { crasActGroupTable 1}
+crasActGroupTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CrasActGroupEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table lists all the currently active remote
+        access        user groups. For each group, it        lists the
+        attributes (group, aggregate activity,        aggregate
+        traffic), and status."
+    ::= { crasActivity 22 }
 
-   CrasActGroupEntry ::= SEQUENCE {
-      crasActGrpName                  SnmpAdminString,
-      crasActGrNumUsers               Integer32,
-      crasActGrpInPkts                Counter64,
-      crasActGrpOutPkts               Counter64,
-      crasActGrpInDropPkts            Counter64,
-      crasActGrpOutDropPkts           Counter64,
-      crasActGrpInOctets              Counter64,
-      crasActGrpOutOctets             Counter64
-   }
+crasActGroupEntry OBJECT-TYPE
+    SYNTAX          CrasActGroupEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry        contains the attributes, statistics and
+        status of an active session."
+    INDEX           { crasActGrpName } 
+    ::= { crasActGroupTable 1 }
 
-   crasActGrpName OBJECT-TYPE
-      SYNTAX SnmpAdminString (SIZE(0..64))
-      MAX-ACCESS not-accessible
-      STATUS current
-      DESCRIPTION
-         "The name of the active user group corresponding to 
-         this entry."
-      ::= { crasActGroupEntry 1 }
+CrasActGroupEntry ::= SEQUENCE {
+        crasActGrpName        SnmpAdminString,
+        crasActGrNumUsers     Integer32,
+        crasActGrpInPkts      Counter64,
+        crasActGrpOutPkts     Counter64,
+        crasActGrpInDropPkts  Counter64,
+        crasActGrpOutDropPkts Counter64,
+        crasActGrpInOctets    Counter64,
+        crasActGrpOutOctets   Counter64
+}
 
-   crasActGrNumUsers OBJECT-TYPE
-      SYNTAX Integer32 (1..2147483647)
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of users in this group currently connected
-         to the managed device."
-      ::= { crasActGroupEntry 2 }
+crasActGrpName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The name of the active user group corresponding to
+        this entry." 
+    ::= { crasActGroupEntry 1 }
 
-   crasActGrpInPkts OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Packets"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The total number of packets received by this session."
-      ::= { crasActGroupEntry 3 }
+crasActGrNumUsers OBJECT-TYPE
+    SYNTAX          Integer32 (1..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of        users in this group currently connected
+        to the        managed        device." 
+    ::= { crasActGroupEntry 2 }
 
-   crasActGrpOutPkts OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Packets"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The total number of packets transmitted by this session."
-      ::= { crasActGroupEntry 4 }
+crasActGrpInPkts OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of packets received by this session." 
+    ::= { crasActGroupEntry 3 }
 
-    crasActGrpInDropPkts OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Packets"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The total number of packets dropped by this session 
-          which were received for processing."
-      ::= { crasActGroupEntry 5 }
+crasActGrpOutPkts OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of packets transmitted by this session." 
+    ::= { crasActGroupEntry 4 }
 
-    crasActGrpOutDropPkts OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Packets"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The total number of outgoing packets which were
-         dropped during transmit processing by this session."
-      ::= { crasActGroupEntry 6 }
+crasActGrpInDropPkts OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of packets dropped by this session
+        which        were received for processing." 
+    ::= { crasActGroupEntry 5 }
 
-   crasActGrpInOctets OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Octets"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The total number of octets received by this session."
-      ::= { crasActGroupEntry 7 }
+crasActGrpOutDropPkts OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of outgoing packets which were
+        dropped during        transmit processing by this session." 
+    ::= { crasActGroupEntry 6 }
 
-   crasActGrpOutOctets OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Octets"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-       "The total number of octets transmitted by this session."
-      ::= { crasActGroupEntry 8 }
+crasActGrpInOctets OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Octets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of octets received by this session." 
+    ::= { crasActGroupEntry 7 }
+
+crasActGrpOutOctets OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Octets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of octets transmitted by this session." 
+    ::= { crasActGroupEntry 8 }
+ 
+
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- The Remote Access session activity global statistics.
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   crasEmailNumSessions OBJECT-TYPE 
-      SYNTAX Gauge32 
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of currently active Email proxy sessions."
-      ::= { crasActivity 23 }
 
+crasEmailNumSessions OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of currently active Email proxy sessions." 
+    ::= { crasActivity 23 }
 
-   crasEmailCumulateSessions OBJECT-TYPE 
-      SYNTAX Counter32
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of cumulative Email proxy sessions since system up."
-      ::= { crasActivity 24 }
+crasEmailCumulateSessions OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of cumulative Email proxy sessions since system up." 
+    ::= { crasActivity 24 }
 
-   crasEmailPeakConcurrentSessions OBJECT-TYPE 
-      SYNTAX Unsigned32
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of peak concurrent Email proxy sessions since system up."
-      ::= { crasActivity 25 }
+crasEmailPeakConcurrentSessions OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of peak concurrent Email proxy sessions since system up." 
+    ::= { crasActivity 25 }
 
-   crasIPSecNumSessions OBJECT-TYPE 
-      SYNTAX Gauge32 
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of currently active IPSec sessions."
-      ::= { crasActivity 26 }
+crasIPSecNumSessions OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of currently active IPSec sessions." 
+    ::= { crasActivity 26 }
 
+crasIPSecCumulateSessions OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of cumulative IPSec sessions since system up." 
+    ::= { crasActivity 27 }
 
-   crasIPSecCumulateSessions OBJECT-TYPE 
-      SYNTAX Counter32
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of cumulative IPSec sessions since system up."
-      ::= { crasActivity 27 }
+crasIPSecPeakConcurrentSessions OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of peak concurrent Email proxy sessions since system up." 
+    ::= { crasActivity 28 }
 
-   crasIPSecPeakConcurrentSessions OBJECT-TYPE 
-      SYNTAX Unsigned32
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of peak concurrent Email proxy sessions since system up."
-      ::= { crasActivity 28 }
+crasL2LNumSessions OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of currently active LAN to LAN sessions." 
+    ::= { crasActivity 29 }
 
-   crasL2LNumSessions OBJECT-TYPE 
-      SYNTAX Gauge32 
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of currently active LAN to LAN sessions."
-      ::= { crasActivity 29 }
+crasL2LCumulateSessions OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of cumulative LAN to LAN sessions since system up." 
+    ::= { crasActivity 30 }
 
+crasL2LPeakConcurrentSessions OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of peak concurrent LAN to LAN sessions since system up." 
+    ::= { crasActivity 31 }
 
-   crasL2LCumulateSessions OBJECT-TYPE 
-      SYNTAX Counter32
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of cumulative LAN to LAN sessions since system up."
-      ::= { crasActivity 30 }
+crasLBNumSessions OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of currently active Load Balancing sessions." 
+    ::= { crasActivity 32 }
 
-   crasL2LPeakConcurrentSessions OBJECT-TYPE 
-      SYNTAX Unsigned32
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of peak concurrent LAN to LAN sessions since system up."
-      ::= { crasActivity 31 }
+crasLBCumulateSessions OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of cumulative Load Balancing sessions since system up." 
+    ::= { crasActivity 33 }
 
-   crasLBNumSessions OBJECT-TYPE 
-      SYNTAX Gauge32 
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of currently active Load Balancing sessions."
-      ::= { crasActivity 32 }
+crasLBPeakConcurrentSessions OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of peak concurrent Load Balancing sessions since system up." 
+    ::= { crasActivity 34 }
 
+crasSVCNumSessions OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of currently active SVC sessions." 
+    ::= { crasActivity 35 }
 
-   crasLBCumulateSessions OBJECT-TYPE 
-      SYNTAX Counter32
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of cumulative Load Balancing sessions since system up."
-      ::= { crasActivity 33 }
+crasSVCCumulateSessions OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of cumulative SVC sessions since system up." 
+    ::= { crasActivity 36 }
 
-   crasLBPeakConcurrentSessions OBJECT-TYPE 
-      SYNTAX Unsigned32
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of peak concurrent Load Balancing sessions since system up."
-      ::= { crasActivity 34 }
+crasSVCPeakConcurrentSessions OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of peak concurrent SVC sessions since system up." 
+    ::= { crasActivity 37 }
 
-   crasSVCNumSessions OBJECT-TYPE 
-      SYNTAX Gauge32 
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of currently active SVC sessions."
-      ::= { crasActivity 35 }
+crasWebvpnNumSessions OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of currently active Webvpn sessions." 
+    ::= { crasActivity 38 }
 
+crasWebvpnCumulateSessions OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of cumulative Webvpn sessions since system up." 
+    ::= { crasActivity 39 }
 
-   crasSVCCumulateSessions OBJECT-TYPE 
-      SYNTAX Counter32
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of cumulative SVC sessions since system up."
-      ::= { crasActivity 36 }
-
-   crasSVCPeakConcurrentSessions OBJECT-TYPE 
-      SYNTAX Unsigned32
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of peak concurrent SVC sessions since system up."
-      ::= { crasActivity 37 }
-
-   crasWebvpnNumSessions OBJECT-TYPE 
-      SYNTAX Gauge32 
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of currently active Webvpn sessions."
-      ::= { crasActivity 38 }
-
-
-   crasWebvpnCumulateSessions OBJECT-TYPE 
-      SYNTAX Counter32
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of cumulative Webvpn sessions since system up."
-      ::= { crasActivity 39 }
-
-   crasWebvpnPeakConcurrentSessions OBJECT-TYPE 
-      SYNTAX Unsigned32
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of peak concurrent Webvpn sessions since system up."
-      ::= { crasActivity 40 }
-
+crasWebvpnPeakConcurrentSessions OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of peak concurrent Webvpn sessions since system up." 
+    ::= { crasActivity 40 }
+    
+crasNumPeakSessions OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of peak RA sessions since system up." 
+    ::= { crasActivity 41 }
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Remote Access Failures Group
---
--- This group consists of:
+--   
+-- This   group consists of:
 -- 1) Remote Access global failures
 -- 2) Remote Access session failures
 -- 3) Remote Access Group failures
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
+--   
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- The global failures group
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-   crasFailuresGlobals OBJECT IDENTIFIER 
-                    ::= { crasFailures 1 }
-
-   crasNumTotalFailures OBJECT-TYPE
-      SYNTAX Counter64
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of attempts to establish sessions which 
-         failed, since the last reboot of the managed device."
-      ::= { crasFailuresGlobals 1 }
-
-   crasNumDeclinedSessions OBJECT-TYPE
-      SYNTAX Unsigned32 (0..4294967295)
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of session setup attempts, counted since
-         the last time the notification 
-         'ciscoRasTooManyFailedAuths' was issued, which were 
-         declined due to authentication or authorization 
-         failure.
-         "
-      ::= { crasFailuresGlobals 2 }
-
-   crasNumSetupFailInsufResources OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of session setup attempts that failed
-         due to insufficient resources."
-      ::= { crasFailuresGlobals 3 }
-
-   crasNumAbortedSessions OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of sessions which were successfully
-         setup but were since terminated abnormally."
-      ::= { crasFailuresGlobals 4 }
+crasFailuresGlobals  OBJECT IDENTIFIER
+    ::= { crasFailures 1 }
 
 
+crasNumTotalFailures OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of        attempts to establish sessions which
+        failed, since the last        reboot of the managed device." 
+    ::= { crasFailuresGlobals 1 }
+
+crasNumDeclinedSessions OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..4294967295)
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of        session        setup attempts,        counted        since
+        the last time the notification
+        'ciscoRasTooManyFailedAuths' was issued, which        were
+        declined due to authentication        or authorization
+        failure." 
+    ::= { crasFailuresGlobals 2 }
+
+crasNumSetupFailInsufResources OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of        session        setup attempts that failed
+        due to        insufficient resources." 
+    ::= { crasFailuresGlobals 3 }
+
+crasNumAbortedSessions OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of        sessions which were successfully
+        setup but were        since terminated abnormally." 
+    ::= { crasFailuresGlobals 4 }
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- The Failure Global Control Objects
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   crasFailGlobalCntl  OBJECT IDENTIFIER    
-                   ::= {  crasFailures 2 }
 
-   crasFailTableSize  OBJECT-TYPE
-      SYNTAX Unsigned32 (0..4294967295)
-      MAX-ACCESS read-write
-      STATUS current
-      DESCRIPTION
-         "The window size of the Remote Access Failure tables.
+crasFailGlobalCntl  OBJECT IDENTIFIER
+    ::= { crasFailures 2 }
 
-          The failure tables for session and group failures 
-          maintain only the last  crasFailTableSize number of 
-          failure records. A value of 0 for this MIB variable
-          indicates that archiving of the failures is disabled.
 
-          An implementation may choose suitable minimum and 
-          maximum values for this element based on the local 
-          policy and available resources. If an SNMP SET request 
-          specifies a value outside this window for this element, 
-          a BAD VALUE may be returned."
+crasFailTableSize OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..4294967295)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The window size of the Remote        Access Failure tables.
 
-      ::= { crasFailGlobalCntl 1 }
+        The failure tables for session and group failures
+        maintain only        the last  crasFailTableSize number of
+        failure records. A value of 0        for this MIB variable
+        indicates that archiving of the failures is disabled.
 
+        An implementation may        choose suitable        minimum        and
+        maximum values for this element based        on the local
+        policy and available resources. If an        SNMP SET request
+        specifies a value outside this window        for this element,
+        a BAD        VALUE may be returned." 
+    ::= { crasFailGlobalCntl 1 }
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- The Remote Access Service failure history
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   crasSessFailures OBJECT IDENTIFIER 
-                    ::= { crasFailures 3 }
+
+crasSessFailures  OBJECT IDENTIFIER
+    ::= { crasFailures 3 }
 
 
-   crasSessFailTable OBJECT-TYPE
-      SYNTAX SEQUENCE OF CrasSessFailEntry
-      MAX-ACCESS not-accessible
-      STATUS current
-      DESCRIPTION
-       "
-         This table records the last 'N' session failures,
-         where 'N' is the value of the MIB element 
-         'crasFailTableSize' defined earlier. 
-         
-         A failure could be a failure to establish a session 
-         ('setup' failure) or a failure of a session after it 
-         was established ('operational' failure).
-       "
-      ::= { crasSessFailures 1 }
+crasSessFailTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CrasSessFailEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table records the        last 'N' session failures,
+        where 'N' is the value        of the MIB element
+        'crasFailTableSize' defined earlier.
 
-   crasSessFailEntry OBJECT-TYPE
-      SYNTAX CrasSessFailEntry
-      MAX-ACCESS not-accessible
-      STATUS current
-      DESCRIPTION
-         "Each entry contains the attributes associated with
-          a remote access session failure."
-      INDEX { crasSessFailIndex }
-      ::= { crasSessFailTable 1 }
+        A failure could be a failure to establish a session
+        ('setup' failure) or a        failure        of a session after it
+        was established ('operational'        failure)."
+    ::= { crasSessFailures 1 }
 
-   CrasSessFailEntry ::= SEQUENCE {
-      crasSessFailIndex                FailureRecordIndex,
-      crasSessFailUsername             SnmpAdminString,
-      crasSessFailGroupname            SnmpAdminString,
-      crasSessFailType                 INTEGER,
-      crasSessFailReason               INTEGER,
-      crasSessFailTime                 TimeStamp,
-      crasSessFailSessionIndex         SessionIndex,
-      crasSessFailISPAddrType          InetAddressType,
-      crasSessFailISPAddr              InetAddress,
-      crasSessFailLocalAddrType        InetAddressType,
-      crasSessFailLocalAddr            InetAddress
-   }
+crasSessFailEntry OBJECT-TYPE
+    SYNTAX          CrasSessFailEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry contains the attributes associated        with
+        a remote access session failure."
+    INDEX           { crasSessFailIndex } 
+    ::= { crasSessFailTable 1 }
 
-   crasSessFailIndex OBJECT-TYPE
-      SYNTAX FailureRecordIndex
-      MAX-ACCESS not-accessible
-      STATUS current
-      DESCRIPTION
-         "The index of the session failure table. 
-          The value of the index is a number which 
-          begins at one and is incremented with each 
-          session failure. The value of this object will 
-          wrap at 4,294,967,295."
-      ::= { crasSessFailEntry 1 }
+CrasSessFailEntry ::= SEQUENCE {
+        crasSessFailIndex         FailureRecordIndex,
+        crasSessFailUsername      SnmpAdminString,
+        crasSessFailGroupname     SnmpAdminString,
+        crasSessFailType          INTEGER,
+        crasSessFailReason        INTEGER,
+        crasSessFailTime          TimeStamp,
+        crasSessFailSessionIndex  SessionIndex,
+        crasSessFailISPAddrType   InetAddressType,
+        crasSessFailISPAddr       InetAddress,
+        crasSessFailLocalAddrType InetAddressType,
+        crasSessFailLocalAddr     InetAddress
+}
 
-   crasSessFailUsername OBJECT-TYPE
-      SYNTAX SnmpAdminString
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The name of the user associated with this failed 
-         remote access session."
-      ::= { crasSessFailEntry 2 }
+crasSessFailIndex OBJECT-TYPE
+    SYNTAX          FailureRecordIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The index of the session failure table.
+        The value of the index is a number which
+        begins at one        and is incremented with        each
+        session failure. The value of        this object will
+        wrap at 4,294,967,295." 
+    ::= { crasSessFailEntry 1 }
 
-   crasSessFailGroupname OBJECT-TYPE
-      SYNTAX SnmpAdminString
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The name of the user group to which this failed
-          remote access session belongs."
-      ::= { crasSessFailEntry 3 }
+crasSessFailUsername OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The name of the user associated with this failed
+        remote        access session." 
+    ::= { crasSessFailEntry 2 }
 
-   crasSessFailType OBJECT-TYPE
-      SYNTAX INTEGER{
-               setupFailure(1),
-               operationalFailure(2)
-             }
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The type of the failure:
-           1 = failure occurred during session setup
-           2 = failed occurred after the session was setup 
-               successfully.
-         "
-      ::= { crasSessFailEntry 4 }
+crasSessFailGroupname OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The name of the user group to        which this failed
+        remote access        session        belongs." 
+    ::= { crasSessFailEntry 3 }
 
-   crasSessFailReason OBJECT-TYPE
-      SYNTAX INTEGER{
-               other(1),
-               internalError(2),
-               authenticationFailure(3),
-               authorizationFailure(4),
-               sysCapExceeded(5),
-               peerAbortRequest(6),
-               peerLost(7),
-               operRequest(8)
-             }
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The reason for the failure.  Possible reasons 
-         include:
-           1 = other (error which cannot be classified in 
-               any of the types listed below).
-           2 = internal error occurred
-           3 = failed to authenticate the peer/user
-           4 = failed to authorize the peer/user
-           5 = system capacity exceeded (memory, cpu, max 
-               users etc)
-           6 = peer requested to abort the session or the 
-               setup
-           7 = lost peer's heartbeat
-           8 = local management request."
-      ::= { crasSessFailEntry 5 }
+crasSessFailType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        setupFailure(1),
+                        operationalFailure(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The type of the failure:
+        1 = failure occurred        during session setup
+        2 = failed occurred after the session was setup
+            successfully." 
+    ::= { crasSessFailEntry 4 }
 
-   crasSessFailTime OBJECT-TYPE
-      SYNTAX TimeStamp
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The value of the MIB element 'sysUpTime' 
-         at the time of the failure."
-      ::= { crasSessFailEntry 6 }
+crasSessFailReason OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        other(1),
+                        internalError(2),
+                        authenticationFailure(3),
+                        authorizationFailure(4),
+                        sysCapExceeded(5),
+                        peerAbortRequest(6),
+                        peerLost(7),
+                        operRequest(8)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The reason for the failure.  Possible        reasons
+        include:
+          1 = other (error which cannot be classified in
+              any of the types        listed below).
+          2 = internal        error occurred
+          3 = failed to authenticate the peer/user
+          4 = failed to authorize the peer/user
+          5 = system capacity exceeded        (memory, cpu, max
+              users etc)
+          6 = peer requested to abort the session or the
+              setup
+          7 = lost peer's heartbeat
+          8 = local management        request." 
+    ::= { crasSessFailEntry 5 }
 
-   crasSessFailSessionIndex OBJECT-TYPE
-      SYNTAX SessionIndex
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-       "The index of the session which failed (in case 
-       this was an operational failure). In case of setup 
-       failures (where the value of 'crasSessFailType' of 
-       this conceptual row is 'operationalFailure'), the 
-       value of this object is undefined and should not be 
-       processed."
-      ::= { crasSessFailEntry 7 }
+crasSessFailTime OBJECT-TYPE
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the MIB element 'sysUpTime'
+        at the        time of        the failure." 
+    ::= { crasSessFailEntry 6 }
 
-   crasSessFailISPAddrType OBJECT-TYPE
-      SYNTAX InetAddressType
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The type of the address returned in 
-         'crasSessFailISPAddr'.
-         "
-      ::= { crasSessFailEntry 8 }
+crasSessFailSessionIndex OBJECT-TYPE
+    SYNTAX          SessionIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The index of the session which failed (in case
+        this was        an operational failure). In case of setup
+        failures        (where the value of 'crasSessFailType' of
+        this conceptual row is 'operationalFailure'), the
+        value of        this object is undefined and should not        be
+        processed." 
+    ::= { crasSessFailEntry 7 }
 
-   crasSessFailISPAddr  OBJECT-TYPE
-      SYNTAX InetAddress
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The public address of the peer."
-      ::= { crasSessFailEntry 9 }
+crasSessFailISPAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The type of the address returned in
+        'crasSessFailISPAddr'." 
+    ::= { crasSessFailEntry 8 }
 
-   crasSessFailLocalAddrType OBJECT-TYPE
-      SYNTAX InetAddressType
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The type of the address returned in 
-         'crasSessFailLocalAddr'.
-         "
-      ::= { crasSessFailEntry 10 }
+crasSessFailISPAddr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The public address of        the peer." 
+    ::= { crasSessFailEntry 9 }
 
-   crasSessFailLocalAddr  OBJECT-TYPE
-      SYNTAX InetAddress
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The address assigned to the peer by the local
-         address management mechanism. In case no address
-         was assigned to the peer when the failure occurred,
-         this MIB variable would contain the IPv4 address
-         value 0.0.0.0"
-      ::= { crasSessFailEntry 11 }
+crasSessFailLocalAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The type of the address returned in
+        'crasSessFailLocalAddr'." 
+    ::= { crasSessFailEntry 10 }
+
+crasSessFailLocalAddr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The address assigned to the peer by the local
+        address management mechanism. In case no address
+        was assigned to the peer when the failure occurred,
+        this MIB variable would contain the IPv4 address
+        value 0.0.0.0" 
+    ::= { crasSessFailEntry 11 }
+ 
 
 
-   crasFailLastFailIndex  OBJECT-TYPE
-      SYNTAX FailureRecordIndex
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The value of column 'crasSessFailIndex'
-         corresponding to the last row added to the 
-         crasSessFailTable.
+crasFailLastFailIndex OBJECT-TYPE
+    SYNTAX          FailureRecordIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of column 'crasSessFailIndex'
+        corresponding to the last row added to        the
+        crasSessFailTable.
 
-         The value of this object is undefined and should 
-         not be processed by the management entity if the 
-         value of the object 'crasFailTableSize' is 0.
-         "
-      ::= { crasSessFailures 2 }
-
+        The value of this object is undefined and should
+        not be        processed by the management entity if the
+        value of the object 'crasFailTableSize' is 0." 
+    ::= { crasSessFailures 2 }
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
--- Remote Access session failure history, catalogued by 
--- user group
+-- Remote Access session failure history, catalogued by
+-- user   group
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-   crasGroupFailures       OBJECT IDENTIFIER 
-                   ::= { crasFailures 4 }
+crasGroupFailures  OBJECT IDENTIFIER
+    ::= { crasFailures 4 }
 
-   crasGrpFailTable OBJECT-TYPE
-      SYNTAX SEQUENCE OF CrasGrpFailEntry
-      MAX-ACCESS not-accessible
-      STATUS current
-      DESCRIPTION
-       "This table records the last 'N' occurrences of 
-       failures (setup or operational) per user group,
-       where 'N' is the value of the MIB element 
-       'crasFailTableSize' defined earlier.
 
-       When 'N' entries have been created, the failure 
-       information about a new user group must be created by 
-       deleting the oldest entry in this table.
-       "
-      ::= { crasGroupFailures 1 }
+crasGrpFailTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CrasGrpFailEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table records the last 'N'        occurrences of
+        failures        (setup or operational) per user        group,
+        where 'N' is the        value of the MIB element
+        'crasFailTableSize' defined earlier.
 
-   crasGrpFailEntry OBJECT-TYPE
-      SYNTAX CrasGrpFailEntry
-      MAX-ACCESS not-accessible
-      STATUS current
-      DESCRIPTION
-       "Each entry contains the summary of failures for a 
-       specific user group."
-      INDEX { crasGrpFailGroupname }
-      ::= { crasGrpFailTable 1 }
+        When 'N'        entries        have been created, the failure
+        information about a new user group must be created by
+        deleting        the oldest entry in this table."
+    ::= { crasGroupFailures 1 }
 
-   CrasGrpFailEntry ::= SEQUENCE {
-      crasGrpFailGroupname            SnmpAdminString,
-      crasGrpFailNumFailAuths         Counter64,
-      crasGrpFailNumResourceFailures  Counter64,
-      crasGrpFailNumDeclined          Counter64,
-      crasGrpFailNumTerminatedMgmt    Counter64,
-      crasGrpFailNumTerminatedOther   Counter64
-   }
+crasGrpFailEntry OBJECT-TYPE
+    SYNTAX          CrasGrpFailEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry contains the        summary        of failures for        a
+        specific        user group."
+    INDEX           { crasGrpFailGroupname } 
+    ::= { crasGrpFailTable 1 }
 
-   crasGrpFailGroupname OBJECT-TYPE
-      SYNTAX SnmpAdminString (SIZE(0..64))
-      MAX-ACCESS not-accessible
-      STATUS current
-      DESCRIPTION
-         "The name of the user group to which this failure 
-         record corresponds.
+CrasGrpFailEntry ::= SEQUENCE {
+        crasGrpFailGroupname           SnmpAdminString,
+        crasGrpFailNumFailAuths        Counter64,
+        crasGrpFailNumResourceFailures Counter64,
+        crasGrpFailNumDeclined         Counter64,
+        crasGrpFailNumTerminatedMgmt   Counter64,
+        crasGrpFailNumTerminatedOther  Counter64
+}
 
-         This is the index of the group failure table."
-      ::= { crasGrpFailEntry 1 }
+crasGrpFailGroupname OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The name of the user group to        which this failure
+        record        corresponds.
 
-   crasGrpFailNumFailAuths OBJECT-TYPE
-      SYNTAX Counter64
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The number of sessions belonging to this group which
-          failed authentication; counted since last reboot."
-      ::= { crasGrpFailEntry 2 }
+        This is the index of the group        failure        table." 
+    ::= { crasGrpFailEntry 1 }
 
-   crasGrpFailNumResourceFailures OBJECT-TYPE
-      SYNTAX Counter64
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-       "The number of session setup attempts which failed due 
-       to insufficient resources."
-      ::= { crasGrpFailEntry 3 }
+crasGrpFailNumFailAuths OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of        sessions belonging to this group which
+        failed authentication; counted since last reboot." 
+    ::= { crasGrpFailEntry 2 }
 
-   crasGrpFailNumDeclined OBJECT-TYPE
-      SYNTAX Counter64
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-       "The number of session setup attempts which were declined
-       by the managed entity due to local policy. These would 
-       include sessions which were denied due to rate control
-       settings."
-      ::= { crasGrpFailEntry 4 }
+crasGrpFailNumResourceFailures OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of session setup attempts which failed due
+        to insufficient resources." 
+    ::= { crasGrpFailEntry 3 }
 
-   crasGrpFailNumTerminatedMgmt OBJECT-TYPE
-      SYNTAX Counter64
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-       "The number of established sessions which were terminated 
-       by explicit management action. The termination may have 
-       been triggered locally or based on a request from the peer."
-      ::= { crasGrpFailEntry 5 }
+crasGrpFailNumDeclined OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of session setup attempts which were        declined
+        by the managed entity due to local policy. These        would
+        include sessions        which were denied due to rate control
+        settings." 
+    ::= { crasGrpFailEntry 4 }
 
-   crasGrpFailNumTerminatedOther OBJECT-TYPE
-      SYNTAX Counter64
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-        "The number of established sessions which were 
-        terminated due to insufficient reasons, internal error 
-        or other reasons not caused by management action."
-      ::= { crasGrpFailEntry 6 }
+crasGrpFailNumTerminatedMgmt OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of established sessions which were terminated
+        by explicit management action. The termination may have
+        been triggered locally or based on a request from the peer." 
+    ::= { crasGrpFailEntry 5 }
 
+crasGrpFailNumTerminatedOther OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of established sessions which were
+        terminated due to insufficient reasons,        internal error
+        or other reasons not caused by management action." 
+    ::= { crasGrpFailEntry 6 }
+ 
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
--- RAS Security Group
---
--- This group consists of:
+-- RAS Security   Group
+--   
+-- This   group consists of:
 -- 1) RAS security global counters
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-   crasSecurityGlobals OBJECT IDENTIFIER 
-                    ::= { crasSecurity 1 }
+crasSecurityGlobals  OBJECT IDENTIFIER
+    ::= { crasSecurity 1 }
 
-   crasNumDisabledAccounts OBJECT-TYPE
-      SYNTAX Counter64
-      UNITS "Users"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "The total number of user accounts which were 
-         disabled due to repeated login failures."
-      ::= { crasSecurityGlobals 1 }
+
+crasNumDisabledAccounts OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Users"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of user accounts which were
+        disabled due to repeated login        failures." 
+    ::= { crasSecurityGlobals 1 }
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
--- RAS Thrshold Group
---
--- This group consists of threshold values for RAS parameters
+-- RAS Thrshold   Group
+--   
+-- This   group consists of threshold values for RAS parameters
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   crasThrMaxSessions OBJECT-TYPE
-      SYNTAX Integer32 (0..2147483647)
-      UNITS "Sessions"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-        "The maximum number of sessions which are successfully 
-        setup after which the managed entity should alert the 
-        network management entity using the notification
+
+crasThrMaxSessions OBJECT-TYPE
+    SYNTAX          Integer32 (0..2147483647)
+    UNITS           "Sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The maximum number of sessions        which are successfully
+        setup after which the managed entity should alert the
+        network        management entity using        the notification
         'ciscoRasTooManySessions', if the notification has been
         enabled.
 
-        A value of 0 indicates that the threshold has not been 
+        A value        of 0 indicates that the        threshold has not been
         set."
-      DEFVAL { 0 }
-      ::= { crasThresholds 1 }
+    DEFVAL          { 0 } 
+    ::= { crasThresholds 1 }
 
-   crasThrMaxFailedAuths OBJECT-TYPE
-      SYNTAX Unsigned32 (0..4294967295)
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-       "The value of object 'crasNumDeclinedSessions' at
-       which the managed entity should alert the network 
-       management entity using the notification 
-       'ciscoRasTooManyFailedAuths', if the notification 
-       has been enabled.
+crasThrMaxFailedAuths OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..4294967295)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of object 'crasNumDeclinedSessions' at
+        which the managed entity        should alert the network
+        management entity using the notification
+        'ciscoRasTooManyFailedAuths', if        the notification
+        has been        enabled.
 
-        A value of 0 indicates that the threshold has not been 
+         A value        of 0 indicates that the        threshold has not been
+         set."
+    DEFVAL          { 4294967295 } 
+    ::= { crasThresholds 2 }
+
+crasThrMaxThroughput OBJECT-TYPE
+    SYNTAX          Integer32 (0..2147483647)
+    UNITS           "Octets Per	Second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The highest throughput of the Remote Access Service at
+        which the managed entity        should alert the network management
+        entity using the        notification 'ciscoRasTooHighThroughput',
+        if the notification has been enabled.
+
+        The notification        is disabled till the value of the
+        aggregate throughput of the managed entity drops        below
+        the value of this object.
+
+        A value of 0 indicates that the threshold has not been
         set."
-      DEFVAL { 4294967295 }
-      ::= { crasThresholds 2 }
-
-   crasThrMaxThroughput OBJECT-TYPE
-      SYNTAX Integer32 (0..2147483647)
-      UNITS "Octets Per Second"
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-       "The highest throughput of the Remote Access Service at 
-       which the managed entity should alert the network management 
-       entity using the notification 'ciscoRasTooHighThroughput', 
-       if the notification has been enabled. 
-       
-       The notification is disabled till the value of the 
-       aggregate throughput of the managed entity drops below 
-       the value of this object.
-
-       A value of 0 indicates that the threshold has not been 
-       set."
-      DEFVAL { 0 }
-      ::= { crasThresholds 3 }
+    DEFVAL          { 0 } 
+    ::= { crasThresholds 3 }
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
--- Notification Control Group
---
--- This group of objects controls the sending of 
+-- Notification   Control   Group
+--   
+-- This   group of objects controls the sending of
 -- Remote Access MIB TRAPs.
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   crasCntlTooManySessions OBJECT-TYPE
-      SYNTAX TruthValue
-      MAX-ACCESS read-write
-      STATUS current
-      DESCRIPTION
-         "This object defines the administrative state of 
-         sending the trap to signal the violation of the 
-         Max session threshold."
-      DEFVAL { false }
-      ::= { crasNotifCntl 1 }
 
-   crasCntlTooManyFailedAuths OBJECT-TYPE
-      SYNTAX TruthValue
-      MAX-ACCESS read-write
-      STATUS current
-      DESCRIPTION
-         "This object defines the administrative state of 
-         sending the trap to signal the violation of the 
-         Max authentication failure count threshold."
-      DEFVAL { false }
-      ::= { crasNotifCntl 2 }
+crasCntlTooManySessions OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object defines the administrative state of
+        sending the trap to signal the        violation of the
+        Max session threshold."
+    DEFVAL          { false } 
+    ::= { crasNotifCntl 1 }
 
-   crasCntlTooHighThroughput OBJECT-TYPE
-      SYNTAX TruthValue
-      MAX-ACCESS read-write
-      STATUS current
-      DESCRIPTION
-         "This object defines the administrative state of 
-         sending the trap to signal the violation of the 
-         Max throughput threshold."
-      DEFVAL { false }
-      ::= { crasNotifCntl 3 }
+crasCntlTooManyFailedAuths OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object defines the administrative state of
+        sending the trap to signal the        violation of the
+        Max authentication failure count threshold."
+    DEFVAL          { false } 
+    ::= { crasNotifCntl 2 }
+
+crasCntlTooHighThroughput OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object defines the administrative state of
+        sending the trap to signal the        violation of the
+        Max throughput        threshold."
+    DEFVAL          { false } 
+    ::= { crasNotifCntl 3 }
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
--- Cisco Remote Access Notifications - TRAPs
+-- Cisco Remote   Access Notifications - TRAPs
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   ciscoRasTooManySessions NOTIFICATION-TYPE
-      OBJECTS {
-                crasNumSessions,
-                crasNumUsers,
-                crasMaxSessionsSupportable,
-                crasMaxUsersSupportable,
-                crasThrMaxSessions
-              }
-      STATUS  current
-      DESCRIPTION
-         "This notification is generated when the managed entity
-          detects that the number of sessions established exceeds 
-          the set threshold crasThrMaxSessions.
 
-          Once the notification has been issued, further 
-          notifications are suppressed till the value returns 
-          below the specified threshold."
-      ::= { ciscoRasMonitorMIBNotifs 1 }
+ciscoRasTooManySessions NOTIFICATION-TYPE
+    OBJECTS         {
+                        crasNumSessions,
+                        crasNumUsers,
+                        crasMaxSessionsSupportable,
+                        crasMaxUsersSupportable,
+                        crasThrMaxSessions
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification is generated when the managed entity
+        detects that the number of sessions established exceeds
+        the set threshold crasThrMaxSessions.
 
-   ciscoRasTooManyFailedAuths NOTIFICATION-TYPE
-      OBJECTS {
-                crasNumDeclinedSessions,
-                crasThrMaxFailedAuths
-              }
-      STATUS  current
-      DESCRIPTION
-         "This notification is generated when the managed entity
-          detects that the number of login attempts (over all 
-          users) exceeds the set threshold for throughput 
-          (crasThrMaxFailedAuths).
+        Once the notification        has been issued, further
+        notifications        are suppressed till the        value returns
+        below        the specified threshold."
+   ::= { ciscoRasMonitorMIBNotifs 1 }
 
-          Once the notification has been issued, further 
-          notifications are suppressed till the value returns 
-          below the specified threshold."
-      ::= { ciscoRasMonitorMIBNotifs 2 }
+ciscoRasTooManyFailedAuths NOTIFICATION-TYPE
+    OBJECTS         {
+                        crasNumDeclinedSessions,
+                        crasThrMaxFailedAuths
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification is generated when the managed entity
+        detects that the number of login attempts (over all
+        users) exceeds the set threshold for throughput
+        (crasThrMaxFailedAuths).
 
-   ciscoRasTooHighThroughput NOTIFICATION-TYPE
-      OBJECTS {
-                crasGlobalInOctets,
-                crasGlobalOutOctets,
-                crasThrMaxThroughput
-              }
-      STATUS  current
-      DESCRIPTION
-       "This notification is generated when the managed entity
-       detects that the current throughput of the device exceeds
-       the set threshold for throughput (crasThrMaxThroughput).
+        Once the notification        has been issued, further
+        notifications        are suppressed till the        value returns
+        below        the specified threshold."
+   ::= { ciscoRasMonitorMIBNotifs 2 }
 
-       Once the notification has been issued, further 
-       notiifcations are suppressed till the value returns 
-       below the specified threshold."
-      ::= { ciscoRasMonitorMIBNotifs 3 }
+ciscoRasTooHighThroughput NOTIFICATION-TYPE
+    OBJECTS         {
+                        crasGlobalInOctets,
+                        crasGlobalOutOctets,
+                        crasThrMaxThroughput
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification is generated when the        managed        entity
+        detects that the        current        throughput of the device exceeds
+        the set threshold for throughput        (crasThrMaxThroughput).
 
+        Once the        notification has been issued, further
+        notiifcations are suppressed till the value returns
+        below the specified threshold."
+   ::= { ciscoRasMonitorMIBNotifs 3 }
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Conformance Information
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   ciscoRasMonitorMIBCompliances   OBJECT IDENTIFIER 
-                   ::= { ciscoRasMonitorMIBConform 1 }
 
-   ciscoRasMonitorMIBGroups        OBJECT IDENTIFIER 
-                   ::= { ciscoRasMonitorMIBConform 2 }
+ciscoRasMonitorMIBCompliances  OBJECT IDENTIFIER
+    ::= { ciscoRasMonitorMIBConform 1 }
+
+ciscoRasMonitorMIBGroups  OBJECT IDENTIFIER
+    ::= { ciscoRasMonitorMIBConform 2 }
+
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Compliance Statements
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   ciscoRasMonitorMIBCompliance       MODULE-COMPLIANCE
-      STATUS      deprecated
-      DESCRIPTION
-        "The compliance statement for SNMP entities
-         the Cisco Remote Access Monitoring MIB."
 
-      MODULE -- this module
-        MANDATORY-GROUPS  { 
-                     ciscoRasCapacityGroup,
-                     ciscoRasResourceUsageGroup,
-                     ciscoRasActivityGroup,
-                     ciscoRasMandatoryFailureGroup
-                     }
+ciscoRasMonitorMIBCompliance MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance        statement for SNMP entities
+        the Cisco Remote Access Monitoring MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoRasCapacityGroup,
+                        ciscoRasResourceUsageGroup,
+                        ciscoRasActivityGroup,
+                        ciscoRasMandatoryFailureGroup
+                    }
 
-        GROUP  ciscoRasGrpActivityGroup
-        DESCRIPTION
-               "This group is optional."
+    GROUP           ciscoRasGrpActivityGroup
+    DESCRIPTION
+        "This group is optional."
 
-        GROUP  ciscoRasOptionalFailureGroup
-        DESCRIPTION
-               "This group is optional."
+    GROUP           ciscoRasOptionalFailureGroup
+    DESCRIPTION
+        "This group is optional."
 
-        GROUP  ciscoRasSecurityGroup
-        DESCRIPTION
-               "This group is optional."
+    GROUP           ciscoRasSecurityGroup
+    DESCRIPTION
+        "This group is optional."
 
-        GROUP  ciscoRasThresholdsGroup
-        DESCRIPTION
-               "This group is optional."
+    GROUP           ciscoRasThresholdsGroup
+    DESCRIPTION
+        "This group is optional."
 
-        GROUP  ciscoRasNotificationsGroup
-        DESCRIPTION
-               "This group is mandatory if and only if 
-               the SNMP agent on the managed entity 
-               implements the group 
-               'ciscoRasThresholdsGroup'."
+    GROUP           ciscoRasNotificationsGroup
+    DESCRIPTION
+        "This group is mandatory        if and only if
+        the SNMP        agent on the managed entity
+        implements the group
+        'ciscoRasThresholdsGroup'."
 
-        GROUP  ciscoRasNotificationCntlGroup
-        DESCRIPTION
-               "This group is mandatory if and only if 
-               the SNMP agent on the managed entity 
-               implements the group 
-               'ciscoRasNotificationsGroup'."
+    GROUP           ciscoRasNotificationCntlGroup
+    DESCRIPTION
+        "This group is mandatory        if and only if
+        the SNMP        agent on the managed entity
+        implements the group
+        'ciscoRasNotificationsGroup'."
 
-        OBJECT   crasSessionState
-        MIN-ACCESS read-only
-        DESCRIPTION
-          "Write access is not required."
+    OBJECT          crasSessionState
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access        is not required."
 
+    OBJECT          crasCntlTooManySessions
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access        is not required."
 
-        OBJECT   crasCntlTooManySessions
-        MIN-ACCESS read-only
-        DESCRIPTION
-          "Write access is not required."
+    OBJECT          crasCntlTooManyFailedAuths
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access        is not required."
 
-        OBJECT   crasCntlTooManyFailedAuths
-        MIN-ACCESS read-only
-        DESCRIPTION
-          "Write access is not required."
+    OBJECT          crasCntlTooHighThroughput
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access        is not required."
+    ::= { ciscoRasMonitorMIBCompliances 1 }
 
-        OBJECT   crasCntlTooHighThroughput
-        MIN-ACCESS read-only
-        DESCRIPTION
-          "Write access is not required."
+ciscoRasMonitorMIBComplianceRev1 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance        statement for SNMP entities
+        the Cisco Remote Access Monitoring MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoRasCapacityGroup,
+                        ciscoRasResourceUsageGroup,
+                        ciscoRasActivityGroup,
+                        ciscoRasActivityGroupRev1,
+                        ciscoRasMandatoryFailureGroup
+                    }
 
-        ::= { ciscoRasMonitorMIBCompliances 1 }
+    GROUP           ciscoRasGrpActivityGroup
+    DESCRIPTION
+        "This group is optional."
 
-   ciscoRasMonitorMIBComplianceRev1	      MODULE-COMPLIANCE
-      STATUS	  current
-      DESCRIPTION
-	"The compliance	statement for SNMP entities
-	 the Cisco Remote Access Monitoring MIB."
+    GROUP           ciscoRasOptionalFailureGroup
+    DESCRIPTION
+        "This group is optional."
 
-      MODULE --	this module
-	MANDATORY-GROUPS  {
-		     ciscoRasCapacityGroup,
-		     ciscoRasResourceUsageGroup,
-		     ciscoRasActivityGroup,
-	             ciscoRasActivityGroupRev1, 
-		     ciscoRasMandatoryFailureGroup
-		     }
+    GROUP           ciscoRasSecurityGroup
+    DESCRIPTION
+        "This group is optional."
 
-	GROUP  ciscoRasGrpActivityGroup
-	DESCRIPTION
-	       "This group is optional."
+    GROUP           ciscoRasThresholdsGroup
+    DESCRIPTION
+        "This group is optional."
 
-	GROUP  ciscoRasOptionalFailureGroup
-	DESCRIPTION
-	       "This group is optional."
+    GROUP           ciscoRasNotificationsGroup
+    DESCRIPTION
+        "This group is mandatory        if and only if
+        the SNMP        agent on the managed entity
+        implements the group
+        'ciscoRasThresholdsGroup'."
 
-	GROUP  ciscoRasSecurityGroup
-	DESCRIPTION
-	       "This group is optional."
+    GROUP           ciscoRasNotificationCntlGroup
+    DESCRIPTION
+        "This group is mandatory        if and only if
+        the SNMP        agent on the managed entity
+        implements the group
+        'ciscoRasNotificationsGroup'."
 
-	GROUP  ciscoRasThresholdsGroup
-	DESCRIPTION
-	       "This group is optional."
+    OBJECT          crasSessionState
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access        is not required."
 
-	GROUP  ciscoRasNotificationsGroup
-	DESCRIPTION
-	       "This group is mandatory	if and only if
-	       the SNMP	agent on the managed entity
-	       implements the group
-	       'ciscoRasThresholdsGroup'."
+    OBJECT          crasCntlTooManySessions
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access        is not required."
 
-	GROUP  ciscoRasNotificationCntlGroup
-	DESCRIPTION
-	       "This group is mandatory	if and only if
-	       the SNMP	agent on the managed entity
-	       implements the group
-	       'ciscoRasNotificationsGroup'."
+    OBJECT          crasCntlTooManyFailedAuths
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access        is not required."
 
-	OBJECT	 crasSessionState
-	MIN-ACCESS read-only
-	DESCRIPTION
-	  "Write access	is not required."
-
-
-	OBJECT	 crasCntlTooManySessions
-	MIN-ACCESS read-only
-	DESCRIPTION
-	  "Write access	is not required."
-
-	OBJECT	 crasCntlTooManyFailedAuths
-	MIN-ACCESS read-only
-	DESCRIPTION
-	  "Write access	is not required."
-
-	OBJECT	 crasCntlTooHighThroughput
-	MIN-ACCESS read-only
-	DESCRIPTION
-	  "Write access	is not required."
-
-	::= { ciscoRasMonitorMIBCompliances 2 }
+    OBJECT          crasCntlTooHighThroughput
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access        is not required."
+    ::= { ciscoRasMonitorMIBCompliances 2 }
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Units of Conformance
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   ciscoRasCapacityGroup OBJECT-GROUP
-      OBJECTS {
-                -- The RAS capacity group
-          crasMaxSessionsSupportable ,
-          crasMaxUsersSupportable ,
-          crasMaxGroupsSupportable ,
-          crasNumCryptoAccelerators
-      }
-      STATUS current
-      DESCRIPTION
-        "This group consists of the MIB objects pertaining 
+
+ciscoRasCapacityGroup OBJECT-GROUP
+    OBJECTS         {
+                        crasMaxSessionsSupportable,
+                        crasMaxUsersSupportable,
+                        crasMaxGroupsSupportable,
+                        crasNumCryptoAccelerators
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group consists of        the MIB        objects        pertaining
         to Remote Access Service capacity parameters defined
         in the Cisco Remote Access MIB."
-      ::= { ciscoRasMonitorMIBGroups 1 }
+    ::= { ciscoRasMonitorMIBGroups 1 }
 
-   ciscoRasResourceUsageGroup OBJECT-GROUP
-      OBJECTS {
-          crasGlobalBwUsage
-      }
-      STATUS current
-      DESCRIPTION
-        "This group consists of the MIB objects pertaining 
-        to Remote Access Service resource usage parameters 
-        defined in the Cisco Remote Access MIB."
-      ::= { ciscoRasMonitorMIBGroups 2 }
+ciscoRasResourceUsageGroup OBJECT-GROUP
+    OBJECTS         { crasGlobalBwUsage }
+    STATUS          current
+    DESCRIPTION
+        "This group consists of        the MIB        objects        pertaining
+        to Remote Access Service resource usage        parameters
+        defined        in the Cisco Remote Access MIB."
+    ::= { ciscoRasMonitorMIBGroups 2 }
 
-   ciscoRasActivityGroup OBJECT-GROUP
-      OBJECTS {
-          crasNumSessions ,
-          crasNumPrevSessions ,
-          crasNumUsers ,
-          crasGlobalInPkts ,
-          crasGlobalOutPkts ,
-          crasGlobalInOctets ,
-          crasGlobalOutOctets ,
-          crasGlobalInDecompOctets,
-          crasGlobalOutUncompOctets,
-          crasGlobalInDropPkts ,
-          crasGlobalOutDropPkts ,
-          crasGroup                        ,
-             crasAuthenMethod                 ,
-             crasAuthorMethod                 ,
-             crasSessionDuration              ,
-             crasLocalAddressType,
-             crasLocalAddress                 ,
-             crasISPAddressType               ,
-             crasISPAddress                   ,
-             crasSessionProtocol              ,
-          crasProtocolElement,
-             crasSessionEncryptionAlgo ,
-             crasSessionPktAuthenAlgo ,
-             crasSessionCompressionAlgo ,
-             crasHeartbeatInterval            ,
-             crasClientVendorString           ,
-             crasClientVersionString          ,
-             crasClientOSVendorString         ,
-             crasClientOSVersionString        ,
-      --
-             crasPrimWINSServerAddrType    ,
-             crasPrimWINSServer                   ,
-             crasSecWINSServerAddrType     ,
-             crasSecWINSServer                   ,
-             crasPrimDNSServerAddrType,
-             crasPrimDNSServer ,
-             crasSecDNSServerAddrType         ,
-             crasSecDNSServer ,
-             crasDHCPServerAddrType           ,
-             crasDHCPServer                   ,
-             --
-             crasSessionInPkts                ,
-             crasSessionOutPkts               ,
-             crasSessionInDropPkts            ,
-             crasSessionOutDropPkts           ,
-             crasSessionInOctets               ,
-             crasSessionOutOctets,
-             crasSessionState
-             --
-          }
-      STATUS current
-      DESCRIPTION
-         "This group consists of the MIB objects pertaining 
-          to the Cisco Remote Access MIB Activity group.
-
-          Following are definitions of some terms used in
-          this compliance group:
-
-          User:
-             A remote access user.
-
-          Group: 
-             A collection of remote access users grouped
-             and managed together as a single entity for
-             administrative convenience.
-
-          ISP:
-             Internet Service Provider.
-
-          Crypto Accelerator
-             'Crypto Accelerator' denotes a device which 
-             the managed entity uses to offload some or all 
-             computations pertaining to cryptographic 
-             operations.
-
-          Session
-             A connection terminating on the managed device 
-             which has been established to provide remote access 
-             connectivity to a user.
-         "
-      ::= { ciscoRasMonitorMIBGroups 3 }
-
-   ciscoRasGrpActivityGroup OBJECT-GROUP
-      OBJECTS {
-            crasNumGroups,
-            crasActGrNumUsers,
-            crasActGrpInPkts,
-            crasActGrpOutPkts,
-            crasActGrpInDropPkts,
-            crasActGrpOutDropPkts,
-            crasActGrpInOctets,
-            crasActGrpOutOctets
-          }
-      STATUS current
-      DESCRIPTION
-         "This group consists of the MIB objects pertaining 
-          to activity of user groups.
-         "
-      ::= { ciscoRasMonitorMIBGroups 4 }
-
-
-   ciscoRasMandatoryFailureGroup OBJECT-GROUP
-      OBJECTS {
-               crasNumTotalFailures,
-               crasNumDeclinedSessions,
-               crasNumAbortedSessions,
-               crasFailTableSize
-              }
-      STATUS current
-      DESCRIPTION
-       "This group categorizes objects pertaining to
-       failures in the Remote Access Service which are
-       essential for successful monitoring of the
-       service.
-       "
-      ::= { ciscoRasMonitorMIBGroups 5 }
-
-   ciscoRasOptionalFailureGroup OBJECT-GROUP
-      OBJECTS {
-               crasNumSetupFailInsufResources,
-               crasSessFailUsername,
-               crasSessFailGroupname,
-               crasSessFailType,
-               crasSessFailReason,
-               crasSessFailTime,
-               crasSessFailSessionIndex,
-               crasSessFailISPAddr,
-               crasSessFailLocalAddr,
-               crasSessFailISPAddrType,
-               crasSessFailLocalAddrType,
-               crasFailLastFailIndex,
-               crasGrpFailNumFailAuths,
-               crasGrpFailNumResourceFailures,
-               crasGrpFailNumDeclined,
-               crasGrpFailNumTerminatedMgmt,
-               crasGrpFailNumTerminatedOther
-              }
-      STATUS current
-      DESCRIPTION
-       "This group categorizes optional objects pertaining 
-       to failures in the Remote Access Service."
-      ::= { ciscoRasMonitorMIBGroups 6 }
-
-   ciscoRasSecurityGroup OBJECT-GROUP
-      OBJECTS {
-               crasNumDisabledAccounts
-              }
-      STATUS current
-      DESCRIPTION
-       "This group categorizes objects pertaining to the 
-       monitoring state of security in the Remote Access
-       Service."
-      ::= { ciscoRasMonitorMIBGroups 7 }
-
-   ciscoRasThresholdsGroup OBJECT-GROUP
-      OBJECTS {
-               crasThrMaxSessions,
-               crasThrMaxFailedAuths,
-               crasThrMaxThroughput 
-              }
-      STATUS current
-      DESCRIPTION
-         "This group categorizes objects which are used to 
-         establish baseline values of metrics instrumenting
-         the Remote Access Service."
-      ::= { ciscoRasMonitorMIBGroups 8 }
-
-   ciscoRasNotificationCntlGroup OBJECT-GROUP
-      OBJECTS {
-               crasCntlTooManySessions,
-               crasCntlTooManyFailedAuths,
-               crasCntlTooHighThroughput
-              }
-      STATUS current
-      DESCRIPTION
-       "This group of objects controls the sending of 
-       notifications defined in this MIB module."
-      ::= { ciscoRasMonitorMIBGroups 9 }
-
-   ciscoRasNotificationsGroup    NOTIFICATION-GROUP
-      NOTIFICATIONS {
-               ciscoRasTooHighThroughput,
-               ciscoRasTooManyFailedAuths,
-               ciscoRasTooManySessions
+ciscoRasActivityGroup OBJECT-GROUP
+    OBJECTS         {
+                        crasNumSessions,
+                        crasNumPrevSessions,
+                        crasNumUsers,
+                        crasGlobalInPkts,
+                        crasGlobalOutPkts,
+                        crasGlobalInOctets,
+                        crasGlobalOutOctets,
+                        crasGlobalInDecompOctets,
+                        crasGlobalOutUncompOctets,
+                        crasGlobalInDropPkts,
+                        crasGlobalOutDropPkts,
+                        crasGroup,
+                        crasAuthenMethod,
+                        crasAuthorMethod,
+                        crasSessionDuration,
+                        crasLocalAddressType,
+                        crasLocalAddress,
+                        crasISPAddressType,
+                        crasISPAddress,
+                        crasSessionProtocol,
+                        crasProtocolElement,
+                        crasSessionEncryptionAlgo,
+                        crasSessionPktAuthenAlgo,
+                        crasSessionCompressionAlgo,
+                        crasHeartbeatInterval,
+                        crasClientVendorString,
+                        crasClientVersionString,
+                        crasClientOSVendorString,
+                        crasClientOSVersionString,
+                        crasPrimWINSServerAddrType,
+                        crasPrimWINSServer,
+                        crasSecWINSServerAddrType,
+                        crasSecWINSServer,
+                        crasPrimDNSServerAddrType,
+                        crasPrimDNSServer,
+                        crasSecDNSServerAddrType,
+                        crasSecDNSServer,
+                        crasDHCPServerAddrType,
+                        crasDHCPServer,
+                        crasSessionInPkts,
+                        crasSessionOutPkts,
+                        crasSessionInDropPkts,
+                        crasSessionOutDropPkts,
+                        crasSessionInOctets,
+                        crasSessionOutOctets,
+                        crasSessionState
                     }
-      STATUS current
-      DESCRIPTION
-         "This group contains the notifications for the 
-         Remote Access MIB."
-      ::= { ciscoRasMonitorMIBGroups 10 }
+    STATUS          current
+    DESCRIPTION
+        "This group consists of the MIB objects pertaining
+        to the Cisco Remote Access MIB Activity group.
 
-   ciscoRasActivityGroupRev1 OBJECT-GROUP
-      OBJECTS { 
-	       crasEmailNumSessions,
-	       crasEmailCumulateSessions,
-               crasEmailPeakConcurrentSessions,
-               crasIPSecNumSessions,
-               crasIPSecCumulateSessions,
-               crasIPSecPeakConcurrentSessions,
-               crasL2LNumSessions,
-               crasL2LCumulateSessions,
-               crasL2LPeakConcurrentSessions,
-               crasLBNumSessions,
-               crasLBCumulateSessions,
-               crasLBPeakConcurrentSessions,
-               crasSVCNumSessions,
-               crasSVCCumulateSessions,
-               crasSVCPeakConcurrentSessions,
-               crasWebvpnNumSessions,
-               crasWebvpnCumulateSessions,
-               crasWebvpnPeakConcurrentSessions
-              }
-      STATUS current
-      DESCRIPTION
-       "This group contains activity information related
+        Following are        definitions of some terms used in
+        this compliance group:
+
+        User:
+           A remote access user.
+
+        Group:
+           A collection of remote access users grouped
+           and managed together as a single entity for
+           administrative convenience.
+
+        ISP:
+           Internet Service Provider.
+
+        Crypto Accelerator
+           'Crypto Accelerator' denotes a device which
+           the managed entity        uses to        offload        some or        all
+           computations pertaining to        cryptographic
+           operations.
+
+        Session
+           A connection terminating on the managed device
+           which has been established        to provide remote access
+           connectivity to a user."
+    ::= { ciscoRasMonitorMIBGroups 3 }
+
+ciscoRasGrpActivityGroup OBJECT-GROUP
+    OBJECTS         {
+                        crasNumGroups,
+                        crasActGrNumUsers,
+                        crasActGrpInPkts,
+                        crasActGrpOutPkts,
+                        crasActGrpInDropPkts,
+                        crasActGrpOutDropPkts,
+                        crasActGrpInOctets,
+                        crasActGrpOutOctets
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group consists of the MIB objects pertaining
+        to activity of user groups."
+    ::= { ciscoRasMonitorMIBGroups 4 }
+
+ciscoRasMandatoryFailureGroup OBJECT-GROUP
+    OBJECTS         {
+                        crasNumTotalFailures,
+                        crasNumDeclinedSessions,
+                        crasNumAbortedSessions,
+                        crasFailTableSize
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group categorizes objects pertaining to
+        failures        in the Remote Access Service which are
+        essential for successful        monitoring of the
+        service."
+    ::= { ciscoRasMonitorMIBGroups 5 }
+
+ciscoRasOptionalFailureGroup OBJECT-GROUP
+    OBJECTS         {
+                        crasNumSetupFailInsufResources,
+                        crasSessFailUsername,
+                        crasSessFailGroupname,
+                        crasSessFailType,
+                        crasSessFailReason,
+                        crasSessFailTime,
+                        crasSessFailSessionIndex,
+                        crasSessFailISPAddr,
+                        crasSessFailLocalAddr,
+                        crasSessFailISPAddrType,
+                        crasSessFailLocalAddrType,
+                        crasFailLastFailIndex,
+                        crasGrpFailNumFailAuths,
+                        crasGrpFailNumResourceFailures,
+                        crasGrpFailNumDeclined,
+                        crasGrpFailNumTerminatedMgmt,
+                        crasGrpFailNumTerminatedOther
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group categorizes optional        objects        pertaining
+        to failures in the Remote Access        Service."
+    ::= { ciscoRasMonitorMIBGroups 6 }
+
+ciscoRasSecurityGroup OBJECT-GROUP
+    OBJECTS         { crasNumDisabledAccounts }
+    STATUS          current
+    DESCRIPTION
+        "This group categorizes objects pertaining to the
+        monitoring state        of security in the Remote Access
+        Service."
+    ::= { ciscoRasMonitorMIBGroups 7 }
+
+ciscoRasThresholdsGroup OBJECT-GROUP
+    OBJECTS         {
+                        crasThrMaxSessions,
+                        crasThrMaxFailedAuths,
+                        crasThrMaxThroughput
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group categorizes objects which are used        to
+        establish baseline values of metrics instrumenting
+        the Remote Access Service."
+    ::= { ciscoRasMonitorMIBGroups 8 }
+
+ciscoRasNotificationCntlGroup OBJECT-GROUP
+    OBJECTS         {
+                        crasCntlTooManySessions,
+                        crasCntlTooManyFailedAuths,
+                        crasCntlTooHighThroughput
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group of objects controls the sending of
+        notifications defined in        this MIB module."
+    ::= { ciscoRasMonitorMIBGroups 9 }
+
+ciscoRasNotificationsGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    {
+                        ciscoRasTooHighThroughput,
+                        ciscoRasTooManyFailedAuths,
+                        ciscoRasTooManySessions
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains the notifications        for the
+        Remote        Access MIB."
+    ::= { ciscoRasMonitorMIBGroups 10 }
+
+ciscoRasActivityGroupRev1 OBJECT-GROUP
+    OBJECTS         {
+                        crasEmailNumSessions,
+                        crasEmailCumulateSessions,
+                        crasEmailPeakConcurrentSessions,
+                        crasIPSecNumSessions,
+                        crasIPSecCumulateSessions,
+                        crasIPSecPeakConcurrentSessions,
+                        crasL2LNumSessions,
+                        crasL2LCumulateSessions,
+                        crasL2LPeakConcurrentSessions,
+                        crasLBNumSessions,
+                        crasLBCumulateSessions,
+                        crasLBPeakConcurrentSessions,
+                        crasSVCNumSessions,
+                        crasSVCCumulateSessions,
+                        crasSVCPeakConcurrentSessions,
+                        crasWebvpnNumSessions,
+                        crasWebvpnCumulateSessions,
+                        crasWebvpnPeakConcurrentSessions
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains activity information related
         to sessions."
-      ::= { ciscoRasMonitorMIBGroups 11 }
+    ::= { ciscoRasMonitorMIBGroups 11 }
 
 END
+
+

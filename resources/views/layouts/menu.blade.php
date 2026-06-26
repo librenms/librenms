@@ -6,7 +6,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href>
+            <a class="navbar-brand" href="{{ route('home') }}">
                 <x-logo responsive="lg" class="tw:h-full tw:max-w-[170px]" />
             </a>
         </div>
@@ -36,7 +36,7 @@
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
-                        @if(auth()->user()->isAdmin() || $has_v1_plugins || $has_v2_plugins)
+                        @if(Gate::allows('plugin.admin') || $has_v1_plugins || $has_v2_plugins)
                         <li class="dropdown-submenu">
                             <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> {{ __('Plugins') }}</a>
                             <ul class="dropdown-menu">
@@ -44,7 +44,7 @@
                                 @foreach($menu_hooks as [$view, $data])
                                     <li>@include($view, $data)</li>
                                 @endforeach
-                                @admin
+                                @can('plugin.admin')
                                 @if($has_v1_plugins || $has_v2_plugins)
                                     <li role="presentation" class="divider"></li>
                                 @endif
@@ -53,7 +53,7 @@
                                         <i class="fa fa-lock fa-fw fa-lg" aria-hidden="true"></i>{{ __('Plugin Admin') }}
                                     </a>
                                 </li>
-                                @endadmin
+                                @endcan
                             </ul>
                         </li>
                         @endif
@@ -61,24 +61,33 @@
                             <a><i class="fa fa-wrench fa-fw fa-lg"
                                                                aria-hidden="true"></i> {{ __('Tools') }}</a>
                             <ul class="dropdown-menu">
+                                @can('tools.ripe')
                                 <li><a href="{{ url('ripenccapi') }}"><i class="fa fa-star fa-fw fa-lg"
                                                                          aria-hidden="true"></i> {{ __('RIPE NCC API') }}
                                     </a></li>
+                                @endcan
                                 @config('smokeping.integration')
                                 <li><a href="{{ \App\Facades\LibrenmsConfig::get('smokeping.url') }}"><i class="fa fa-line-chart fa-fw fa-lg"
                                                                        aria-hidden="true"></i> {{ __('Smokeping') }}</a>
                                 </li>
                                 @endconfig
                                 @config('mac_oui.enabled')
-                                <li><a href="{{ route('tool.oui-lookup') }}"><i class="fa fa-magnifying-glass fa-fw fa-lg"
-                                                                                              aria-hidden="true"></i> {{ __('tools.oui.title') }}</a>
-                                </li>
+                                    @can('tools.oui')
+                                    <li><a href="{{ route('tool.oui-lookup') }}"><i class="fa fa-magnifying-glass fa-fw fa-lg"
+                                                                                                  aria-hidden="true"></i> {{ __('tools.oui.title') }}</a>
+                                    </li>
+                                    @endcan
                                 @endconfig
                                 @config('oxidized.enabled')
                                 <li><a href="{{ url('oxidized') }}"><i class="fa fa-stack-overflow fa-fw fa-lg"
                                                                        aria-hidden="true"></i> {{ __('Oxidized') }}</a>
                                 </li>
                                 @endconfig
+                                @can('viewAny', \App\Models\SslCertificate::class)
+                                <li><a href="{{ url('ssl-certificates') }}"><i class="fa fa-lock fa-fw fa-lg fa-nav-icons"
+                                    aria-hidden="true"></i> {{ __('SSL Certificates') }}</a>
+                                </li>
+                                @endcan
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
@@ -95,8 +104,6 @@
 
                         <li><a href="{{ route('inventory') }}"><i class="fa fa-cube fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Inventory') }}</a></li>
-                        <li><a href="{{ url('outages') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
-                                                               aria-hidden="true"></i> {{ __('Outages') }}</a></li>
                         @if($package_count)
                             <li><a href="{{ url('search/search=packages') }}"><i class="fa fa-archive fa-fw fa-lg"
                                                                                  aria-hidden="true"></i> {{ __('Packages') }}
@@ -122,19 +129,20 @@
                     </ul>
                 </li>
 {{-- Devices --}}
+            @if(! $no_devices_added || Gate::allows('create', \App\Models\Device::class))
                 <li class="dropdown">
-                    <a href="{{ url('devices/') }}" class="dropdown-toggle" data-hover="dropdown"
+                    <a href="{{ route('devices') }}" class="dropdown-toggle" data-hover="dropdown"
                        data-toggle="dropdown"><i class="fa fa-server fa-fw fa-lg fa-nav-icons"
                                                  aria-hidden="true"></i> <span>{{ __('Devices') }}</span></a>
                     <ul class="dropdown-menu">
                     @if($no_devices_added)
                     <li><a href="#"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ __('No Devices') }}</a>
                     @else
-                    <li @class(['dropdown-submenu' => $device_types->isNotEmpty()])><a href="{{ url('devices') }}"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Devices') }}</a>
+                    <li @class(['dropdown-submenu' => $device_types->isNotEmpty()])><a href="{{ route('devices') }}"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Devices') }}</a>
                         @if($device_types->isNotEmpty())
                         <ul class="dropdown-menu scrollable-menu">
-                        @foreach($device_types as $type)
-                            <li><a href="{{ url("devices/type=$type") }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($type) }}</a></li>
+                        @foreach($device_types as $type => $icon)
+                            <li><a href="{{ route('devices', ['filter' => ['type' => ['eq' => $type]]]) }}"><i class="fa fa-{{ $icon }} fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($type) }}</a></li>
                         @endforeach
                         </ul>
                         @endif
@@ -147,45 +155,58 @@
                                 </a>
                             <ul class="dropdown-menu scrollable-menu">
                             @foreach($device_groups as $group)
-                                <li><a href="{{ url("devices/group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($group->name) }}</a></li>
+                                <li><a href="{{ route('devices', ['filter' => ['groups.id' => ['eq' => $group->id]]]) }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($group->name) }}</a></li>
                             @endforeach
                             </ul>
                         </li>
                     @endif
-
+                    @can('viewAny', \App\Models\Location::class)
                     @if($locations->isNotEmpty())
-                        <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> {{ __('Geo Locations') }}</a>
                             <ul class="dropdown-menu scrollable-menu">
                                 <li><a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Locations') }}</a></li>
                             @foreach($locations as $location)
-                                    <li><a href="{{ url("devices/location=" . $location->id) }}"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> {{ $location->display() }}</a></li>
+                                    <li><a href="{{ route('devices', ['filter' => ['location_id' => ['eq' => $location->id]]]) }}"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> {{ $location->display() }}</a></li>
                             @endforeach
                             </ul>
                         </li>
                     @endif
-                    @admin
+                    @endcan
+                        @can('viewAny', \App\Models\DeviceOutage::class)
                         <li role="presentation" class="divider"></li>
-                        @can('manage', \App\Models\DeviceGroup::class)
+                        <li><a href="{{ route('outages') }}"><i class="fa fa-exclamation-triangle fa-fw fa-lg"
+                                                              aria-hidden="true"></i> {{ __('Outages') }}</a></li>
+                        @endcan
+                        @if($show_device_extra_divider)
+                        <li role="presentation" class="divider"></li>
+                        @endif
+                        @can('viewAny', \App\Models\DeviceGroup::class)
                             <li><a href="{{ url('device-groups') }}"><i class="fa fa-th fa-fw fa-lg"
                                                                         aria-hidden="true"></i> {{ __('Manage Groups') }}
                                 </a></li>
                         @endcan
+                        @can('device.update')
                         <li><a href="{{ url('device-dependencies') }}"><i class="fa fa-group fa-fw fa-lg"></i> {{ __('Device Dependencies') }}</a></li>
+                        @endcan
                         @if($show_vmwinfo)
                             <li><a href="{{ url('vminfo') }}"><i
                                         class="fa fa-cog fa-fw fa-lg"></i> {{ __('Virtual Machines') }}</a></li>
                         @endif
+                        @canany(['device.create', 'device.delete'])
                         <li role="presentation" class="divider"></li>
+                        @endcanany
+                        @can('device.create')
                         <li><a href="{{ url('addhost') }}"><i class="fa fa-plus fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Add Device') }}</a></li>
-                        <li><a href="{{ url('delhost') }}"><i class="fa fa-trash fa-fw fa-lg"
+                        @endcan
+                        @can('device.delete')
+                        <li><a href="{{ route('device.delete') }}"><i class="fa fa-trash fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Delete Device') }}</a></li>
-                    @endadmin
-
+                        @endcan
                     </ul>
                 </li>
+            @endif
 {{-- Maps --}}
                 <li class="dropdown">
                     <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown"
@@ -232,32 +253,40 @@
                                 </ul></li>
                         @endif
 
-                        @if($custommaps->isNotEmpty())
+                        @if($custommaps_groups->isNotEmpty() || $custommaps->isNotEmpty())
                             <li role="presentation" class="divider"></li>
-                                @if($custommaps->count() == 1)
-                                <li class="dropdown-submenu"><a><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{__('Custom Maps') }}</a>
-                                    <ul class="dropdown-menu scrollable-menu">
-                                @endif
-                                        @foreach($custommaps as $map_group => $group_maps)
-                                            @if($map_group && $custommaps->count() > 1)
-                                            <li class="dropdown-submenu">
-                                            <a><i class="fa fa-map-marked fa-fw fa-lg"aria-hidden="true"></i> {{ $map_group  }}
-                                            </a>
-                                                <ul class="dropdown-menu scrollable-menu">
-                                            @endif
-                                            @foreach($group_maps as $map)
-                                            <li><a href="{{ route('maps.custom.show', ['map' => $map->custom_map_id]) }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
-                                                    {{ ucfirst($map->name) }}
-                                                </a></li>
-                                            @endforeach
-                                            @if($map_group && $custommaps->count() > 1)</ul></li>@endif
-                                        @endforeach
-                                @if($custommaps->count() == 1)
-                                    </ul>
-                                </li>
-                                @endif
+                            @foreach($custommaps as $map)
+                                <li><a href="{{ route('maps.custom.show', ['map' => $map->custom_map_id]) }}">
+                                        <i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
+                                        {{ $map->name }}
+                                    </a></li>
+                            @endforeach
+                        @if($custommaps_groups->count() < 20)
+                            @foreach($custommaps_groups as $map_group => $group_maps)
+                            <li class="dropdown-submenu">
+                                <a href="{{ route('maps.custom.list', ['group' => $map_group]) }}"><i class="fa fa-map fa-fw fa-lg" aria-hidden="true"></i> {{ $map_group  }}</a>
+                                <ul class="dropdown-menu scrollable-menu">
+                                @foreach($group_maps as $map)
+                                <li><a href="{{ route('maps.custom.show', ['map' => $map->custom_map_id]) }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
+                                    {{ $map->name }}
+                                </a></li>
+                                @endforeach
+                                </ul>
+                            </li>
+                            @endforeach
+                        @else
+                            <li class="dropdown-submenu"><a href="{{ route('maps.custom.list') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{__('Custom Map Groups') }}</a>
+                                <ul class="dropdown-menu scrollable-menu">
+                                    @foreach($custommaps_groups as $map_group => $group_maps)
+                                        <li><a href="{{ route('maps.custom.list', ['group' => $map_group]) }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
+                                                {{ $map_group }}
+                                            </a></li>
+                                    @endforeach
+                                </ul>
+                            </li>
                         @endif
-                        @admin
+                        @endif
+                        @can('custom-map.update')
                         <li role="presentation" class="divider"></li>
                         <li><a href="{{ route('maps.custom.index') }}">
                             <i class="fa fa-pen fa-fw fa-lg" aria-hidden="true"></i> {{ __('Custom Map Editor') }}
@@ -270,38 +299,43 @@
                         <li><a href="{{ route('maps.nodeimage.index') }}">
                             <i class="fa fa-image fa-fw fa-lg" aria-hidden="true"></i> {{ __('Custom Node Image Manager') }}
                         </a></li>
-                        @endadmin
+                        @endcan
 
                     </ul>
                 </li>
 {{-- Ports --}}
+            @if($show_ports_menu)
                 <li class="dropdown">
-                    <a href="{{ url('ports') }}" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i
+                    <a href="{{ route('ports') }}" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i
                             class="fa fa-link fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span
                             class="tw:md:hidden tw:lg:inline-block">{{ __('Ports') }}</span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ url('ports') }}"><i class="fa fa-link fa-fw fa-lg"
+                        @can('viewAny', \App\Models\Port::class)
+                        <li><a href="{{ route('ports') }}"><i class="fa fa-link fa-fw fa-lg"
                                                             aria-hidden="true"></i> {{ __('All Ports') }}</a></li>
 
                         @if($port_counts['errored'] > 0)
-                            <li><a href="{{ url('ports/errors=1') }}"><i class="fa fa-exclamation-circle fa-fw fa-lg"
+                            <li><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['errors' => ['eq' => '1']]]) }}"><i class="fa fa-exclamation-circle fa-fw fa-lg"
                                                                            aria-hidden="true"></i> {{ __('Errored :port_count', ['port_count' => $port_counts['errored']]) }}
                                 </a></li>
                         @endif
 
                         @if($port_counts['ignored'] > 0)
-                            <li><a href="{{ url('ports/ignore=1') }}"><i class="fa fa-question-circle fa-fw fa-lg"
+                            <li><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['ignore' => ['eq' => '1']]]) }}"><i class="fa fa-question-circle fa-fw fa-lg"
                                                                            aria-hidden="true"></i> {{ __('Ignored :port_count', ['port_count' => $port_counts['ignored']]) }}
                                 </a></li>
                         @endif
+                        @endcan
 
+                        @can('viewAny', \App\Models\Vlan::class)
                         <li><a href="{{ route('vlans.index') }}"><i class="fa fa-tasks fa-fw fa-lg"
                                                             aria-hidden="true"></i> {{ __('VLANs') }}</a></li>
+                        @endcan
 
-                        @config('enable_billing')
+                        @can('viewAny', \App\Models\Bill::class)
                         <li><a href="{{ url('bills') }}"><i class="fa fa-money fa-fw fa-lg"
                                                             aria-hidden="true"></i> {{ __('Traffic Bills') }}</a></li>
-                        @endconfig
+                        @endCan
 
                         @if($port_counts['pseudowire'] > 0)
                             <li><a href="{{ url('pseudowires') }}"><i class="fa fa-arrows-alt fa-fw fa-lg"
@@ -309,13 +343,17 @@
                             </li>
                         @endif
 
+                        @can('viewAny', \App\Models\Port::class)
+                            <li><a href="{{ route('port-security.index') }}"><i class="fa fa-shield fa-fw fa-lg"
+                                                                         aria-hidden="true"></i> {{ __('Port Security') }}</a>
+                            </li>
 
-                        @if($port_nac)
-                            <li role="presentation" class="divider"></li>
-                            <li><a href="{{ url('nac') }}"><i class="fa fa-lock fa-fw fa-lg"
-                                                              aria-hidden="true"></i> NAC</a></li>
-                        @endif
-                        @if(auth()->user()->hasGlobalRead())
+                            @if($port_nac)
+                                <li role="presentation" class="divider"></li>
+                                <li><a href="{{ url('nac') }}"><i class="fa fa-lock fa-fw fa-lg"
+                                                                  aria-hidden="true"></i> NAC</a></li>
+                            @endif
+
                             @if($port_groups_exist)
                                 <li role="presentation" class="divider"></li>
                                 @config('int_customers')
@@ -324,43 +362,45 @@
                                 </li>
                                 @endconfig
                                 @config('int_l2tp')
-                                <li><a href="{{ url('iftype/type=l2tp') }}"><i class="fa fa-link fa-fw fa-lg"
+                                <li><a href="{{ route('porttype.graph', ['l2tp']) }}"><i class="fa fa-link fa-fw fa-lg"
                                                                                aria-hidden="true"></i> {{ __('L2TP') }}</a>
                                 </li>
                                 @endconfig
                                 @config('int_transit')
-                                <li><a href="{{ url('iftype/type=transit') }}"><i class="fa fa-truck fa-fw fa-lg"
+                                <li><a href="{{ route('porttype.graph', ['transit']) }}"><i class="fa fa-truck fa-fw fa-lg"
                                                                                   aria-hidden="true"></i> {{ __('Transit') }}
                                     </a></li>
                                 @endconfig
                                 @config('int_peering')
-                                <li><a href="{{ url('iftype/type=peering') }}"><i class="fa fa-handshake-o fa-fw fa-lg"
+                                <li><a href="{{ route('porttype.graph', ['peering']) }}"><i class="fa fa-handshake-o fa-fw fa-lg"
                                                                                   aria-hidden="true"></i> {{ __('Peering') }}
                                     </a></li>
                                 @endconfig
                                 @if(\App\Facades\LibrenmsConfig::get('int_peering') && \App\Facades\LibrenmsConfig::get('int_transit'))
-                                    <li><a href="{{ url('iftype/type=peering,transit') }}"><i
+                                    <li><a href="{{ route('porttype.graph', ['peering,transit']) }}"><i
                                                 class="fa fa-rocket fa-fw fa-lg"
                                                 aria-hidden="true"></i> {{ __('Peering + Transit') }}</a></li>
                                 @endif
                                 @config('int_core')
-                                <li><a href="{{ url('iftype/type=core') }}"><i class="fa fa-code-fork fa-fw fa-lg"
+                                <li><a href="{{ route('porttype.graph', ['core']) }}"><i class="fa fa-code-fork fa-fw fa-lg"
                                                                                aria-hidden="true"></i> {{ __('Core') }}</a>
                                 </li>
                                 @endconfig
                                 @foreach($custom_port_descr as $custom_descr)
-                                    <li><a href="{{ url('iftype/type=' . urlencode($custom_descr['name'])) }}"><i class="fa {{$custom_descr['icon']}} fa-fw fa-lg" aria-hidden="true"></i> {{ ucwords($custom_descr['name']) }}</a></li>
+                                    <li><a href="{{ route('porttype.graph', [urlencode($custom_descr['name'])]) }}"><i class="fa {{$custom_descr['icon']}} fa-fw fa-lg" aria-hidden="true"></i> {{ ucwords($custom_descr['name']) }}</a></li>
                                 @endforeach
                             @endif
 
                             <li role="presentation" class="divider"></li>
+                            @can('manage', \App\Models\PortGroup::class)
                             <li><a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Manage Groups') }} </a></li>
+                            @endcan
                             @if($port_groups->isNotEmpty())
                                 <li class="dropdown-submenu">
                                 <a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Port Groups') }}</a>
                                 <ul class="dropdown-menu scrollable-menu">
                                 @foreach($port_groups as $group)
-                                    <li><a href="{{ url("ports/group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($group->name) }}</a></li>
+                                    <li><a href="{{ route('ports', ['filter' => ['groups.id' => ['eq' => $group->id]]]) }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($group->name) }}</a></li>
                                 @endforeach
                                 </ul>
                                 </li>
@@ -368,44 +408,61 @@
 
                             <li role="presentation" class="divider"></li>
                             @if($port_counts['alerted'])
-                                <li><a href="{{ url('ports/alerted=1') }}"><i
+                                <li><a href="{{ route('ports', ['view' => 'detail', 'errors' => 1]) }}"><i
                                             class="fa fa-exclamation-circle fa-fw fa-lg"
                                             aria-hidden="true"></i> {{ __('Alerts :port_count', ['port_count' => $port_counts['alerted']]) }}
                                     </a></li>
                             @endif
 
-                            <li><a href="{{ url('ports/state=down') }}"><i class="fa fa-arrow-circle-down fa-fw fa-lg"
+                            <li><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'down']]]) }}"><i class="fa fa-arrow-circle-down fa-fw fa-lg"
                                                                            aria-hidden="true"></i> {{ __('Down :port_count', ['port_count' => $port_counts['down']]) }}
                                 </a></li>
-                            <li><a href="{{ url('ports/state=admindown') }}"><i
+                            <li><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'shutdown'], 'disabled' => ['eq' => '0'], 'ignore' => ['eq' => '0'], 'deleted' => ['eq' => '0']]]) }}"><i
                                         class="fa fa-arrow-circle-o-down fa-fw fa-lg"
                                         aria-hidden="true"></i> {{ __('Disabled :port_count', ['port_count' => $port_counts['shutdown']]) }}
                                 </a></li>
 
+                            @can('port.delete')
                             @if($port_counts['deleted'])
-                                <li><a href="{{ url('ports/deleted=1') }}"><i class="fa fa-minus-circle fa-fw fa-lg"
+                                <li><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['deleted' => ['eq' => '1']]]) }}"><i class="fa fa-minus-circle fa-fw fa-lg"
                                                                                 aria-hidden="true"></i> {{ __('Deleted :port_count', ['port_count' => $port_counts['deleted']]) }}
                                     </a></li>
                             @endif
-                        @endif
+                            @endcan
+                        @endcan
                     </ul>
                 </li>
+            @endif
 {{-- Sensors --}}
+                @if($show_health_menu)
                 <li class="dropdown">
                     <a href="{{ url('health') }}" class="dropdown-toggle" data-hover="dropdown"
                        data-toggle="dropdown"><i class="fa fa-heartbeat fa-fw fa-lg fa-nav-icons"
                                                  aria-hidden="true"></i> <span class="tw:md:hidden tw:lg:inline-block">{{ __('Health') }}</span></a>
                     <ul class="dropdown-menu">
+                        @can('viewAny', \App\Models\Sensor::class)
+                        <li><a href="{{ url('health/metric=all?status=alert') }}"><i class="fas fa-bell fa-fw fa-lg"
+                                                                            aria-hidden="true"></i> {{ __('Alerts') }}</a>
+                        </li>
+                        <li role="presentation" class="divider"></li>
+                        @endcan
+                        @can('viewAny', \App\Models\Mempool::class)
                         <li><a href="{{ url('health/metric=mempool') }}"><i class="fas fa-memory fa-fw fa-lg"
                                                                             aria-hidden="true"></i> {{ __('Memory') }}</a>
                         </li>
+                        @endcan
+                        @can('viewAny', \App\Models\Processor::class)
                         <li><a href="{{ url('health/metric=processor') }}"><i class="fa fa-microchip fa-fw fa-lg"
                                                                               aria-hidden="true"></i> {{ __('Processor') }}
                             </a></li>
+                        @endcan
+                        @can('viewAny', \App\Models\Storage::class)
                         <li><a href="{{ url('health/metric=storage') }}"><i class="fa fa-database fa-fw fa-lg"
                                                                             aria-hidden="true"></i> {{ __('Storage') }}</a>
                         </li>
+                        @endcan
 
+                        @can('viewAny', \App\Models\Sensor::class)
                         @foreach($sensor_menu as $sensor_menu_group)
                             @foreach($sensor_menu_group as $sensor_menu_entry)
                                 @if($loop->first)
@@ -414,10 +471,12 @@
                                 <li><a href="{{ url('health/metric=' . $sensor_menu_entry['class']) }}"><i class="fa fa-{{ $sensor_menu_entry['icon'] }} fa-fw fa-lg" aria-hidden="true"></i> {{ $sensor_menu_entry['descr'] }}</a></li>
                             @endforeach
                         @endforeach
-
+                        @endcan
                     </ul>
                 </li>
+                @endif
 {{-- Wireless --}}
+                @can('viewAny', \App\Models\WirelessSensor::class)
                 @if($wireless_menu->isNotEmpty())
                     <li class="dropdown">
                         <a href="{{ url('wireless') }}" class="dropdown-toggle" data-hover="dropdown"
@@ -426,13 +485,15 @@
                                 class="tw:md:hidden tw:2xl:inline-block">{{ __('wireless.title') }}</span></a>
                         <ul class="dropdown-menu">
                         @foreach($wireless_menu as $wireless_menu_entry)
-                                <li><a href="{{ url('wireless/metric=' . $wireless_menu_entry->sensor_class) }}"><i class="fa fa-{{ $wireless_menu_entry->icon() }} fa-fw fa-lg" aria-hidden="true"></i> {{ $wireless_menu_entry->classDescr() }}</a></li>
+                                <li><a href="{{ url('wireless/metric=' . $wireless_menu_entry->sensor_class->value) }}"><i class="fa fa-{{ $wireless_menu_entry->icon() }} fa-fw fa-lg" aria-hidden="true"></i> {{ $wireless_menu_entry->classDescr() }}</a></li>
                         @endforeach
                         </ul>
                     </li>
                 @endif
+                @endcan
 {{-- Services --}}
-            @config('show_services')
+        @config('show_services')
+            @can('viewAny', \App\Models\Service::class)
             <li class="dropdown">
                 <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown"
                    data-toggle="dropdown"><i class="fa fa-cogs fa-fw fa-lg fa-nav-icons"
@@ -441,11 +502,13 @@
                 <ul class="dropdown-menu">
                     <li><a href="{{ url('services') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Services') }}</a>
                     </li>
+                    @can('viewAny', \App\Models\ServiceTemplate::class)
                     <li><a href="{{ route('services.templates.index') }}"><span class="fa-stack" aria-hidden="true" style="font-size: 12px">
                                   <i class="fa fa-square fa-stack-2x"></i>
                                   <i class="fa fa-cogs fa-stack-1x fa-inverse"></i>
                                 </span> {{ __('Services Templates') }}</a>
                     </li>
+                    @endcan
                     @if($service_counts['warning'] || $service_counts['critical'])
                         <li role="presentation" class="divider"></li>
                         @if($service_counts['warning'])
@@ -461,16 +524,17 @@
                                 </a></li>
                         @endif
                     @endif
-                    @admin
+                    @can('service.create')
                     <li role="presentation" class="divider"></li>
                     <li><a href="{{ url('addsrv') }}"><i class="fa fa-plus fa-fw fa-lg"
                                                          aria-hidden="true"></i> {{ __('Add Service') }}</a></li>
-                    @endadmin
+                    @endcan
                 </ul>
             </li>
-            @endconfig
+            @endcan
+        @endconfig
 {{-- App --}}
-                @if($app_menu->isNotEmpty())
+                @if(Gate::allows('viewAny', \App\Models\Application::class) && $app_menu->isNotEmpty())
                     <li class="dropdown">
                         <a href="{{ url('apps') }}" class="dropdown-toggle" data-hover="dropdown"
                            data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons"
@@ -520,14 +584,14 @@
                                             aria-hidden="true"></i> {{ __('Alerted BGP :alert_count', ['alert_count' => $bgp_alerts]) }}
                                     </a></li>
                         @endif
-                        @admin
+                        @can('peering-db.view')
                             @if($show_peeringdb)
                                 <li role="presentation" class="divider"></li>
                                 <li><a href="{{ url('peering') }}"><i class="fa fa-hand-o-right fa-fw fa-lg"
                                                                       aria-hidden="true"></i> {{ __('PeeringDB') }}</a>
                                 </li>
                             @endif
-                        @endadmin
+                        @endcan
                         </ul>
                     </li>
                 @endif
@@ -543,20 +607,32 @@
                                                                 aria-hidden="true"></i> {{ __('Alert History') }}</a></li>
                         <li><a href="{{ url('alert-stats') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
                                                                   aria-hidden="true"></i> {{ __('Statistics') }}</a></li>
-                        @admin
+                        @if($show_alert_divider)
                         <li role="presentation" class="divider"></li>
+                        @endif
+                        @can('viewAny', \App\Models\AlertRule::class)
                         <li><a href="{{ url('alert-rules') }}"><i class="fa fa-list fa-fw fa-lg"
                                                                   aria-hidden="true"></i> {{ __('Alert Rules') }}</a></li>
+                        @endcan
+                        @can('viewAny', \App\Models\AlertOperation::class)
+                        <li><a href="{{ route('alert-operations.index') }}"><i class="fa fa-sliders fa-fw fa-lg"
+                                                                       aria-hidden="true"></i> {{ __('Operations') }}</a></li>
+                        @endcan
+                        @can('viewAny', \App\Models\AlertSchedule::class)
                         <li><a href="{{ url('alert-schedule') }}"><i class="fa fa-calendar fa-fw fa-lg"
                                                                      aria-hidden="true"></i> {{ __('Scheduled Maintenance') }}
                             </a></li>
+                        @endcan
+                        @can('viewAny', \App\Models\AlertTemplate::class)
                         <li><a href="{{ url('templates') }}"><i class="fa fa-file fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Alert Templates') }}</a>
                         </li>
+                        @endcan
+                        @can('viewAny', \App\Models\AlertTransport::class)
                         <li><a href="{{ url('alert-transports') }}"><i class="fa fa-bus fa-fw fa-lg"
                                                                        aria-hidden="true"></i> {{ __('Alert Transports') }}
                             </a></li>
-                        @endadmin
+                        @endcan
                     </ul>
                 </li>
                 @includeIf('menu.custom')
@@ -601,46 +677,58 @@
                        style="margin-left:5px"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
                         <span class="visible-xs-inline-block">{{ __('settings.title') }}</span></a>
                     <ul class="dropdown-menu">
-                        @admin
+                        @canany(['settings.view', 'settings.update'])
                         <li><a href="{{ url('settings') }}"><i class="fa fa-cogs fa-fw fa-lg"
                                                                aria-hidden="true"></i> {{ __('Global Settings') }}</a></li>
                         <li><a href="{{ url('validate') }}"><i class="fa fa-check-circle fa-fw fa-lg"
                                                                aria-hidden="true"></i> {{ __('Validate Config') }}</a></li>
+                        @endcanany
+                        @can('viewAny', \App\Models\User::class)
                         <li role="presentation" class="divider"></li>
                         <li><a href="{{ route('users.index') }}"><i class="fa fa-user-circle-o fa-fw fa-lg"
                                                                     aria-hidden="true"></i> {{ __('Manage Users') }}</a>
                         </li>
-                        <li><a href="{{ url('authlog') }}"><i class="fa fa-shield fa-fw fa-lg"
+                        @endcan
+                        @can('auth-log.view')
+                        <li><a href="{{ route('auth-log') }}"><i class="fa fa-shield fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Auth History') }}</a></li>
+                        @endcan
+                        @if(Gate::allows('viewAny', \App\Models\PollerCluster::class) || Gate::allows('viewAny', \App\Models\PollerGroup::class))
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> {{ __('Poller') }}</a>
                             <ul class="dropdown-menu">
+                                @can('viewAny', \App\Models\PollerCluster::class)
                                 <li><a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> {{ __('Poller') }}</a></li>
-                                @config('distributed_poller')
+                                @endcan
+                                @can('viewAny', \App\Models\PollerGroup::class)
                                 <li><a href="{{ route('poller.groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Groups') }}</a></li>
-                                @endconfig
-                                @if($poller_clusters)
+                                @endcan
+                                @can('poller.update')
                                 <li><a href="{{ route('poller.settings') }}"><i class="fa fa-gears fa-fw fa-lg" aria-hidden="true"></i> {{ __('Settings') }}</a></li>
-                                @endif
+                                @endcan
+                                @can('viewAny', \App\Models\PollerCluster::class)
                                 <li><a href="{{ route('poller.performance') }}"><i class="fa fa-line-chart fa-fw fa-lg" aria-hidden="true"></i> {{ __('Performance') }}</a></li>
                                 <li><a href="{{ route('poller.log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> {{ __('Log') }}</a></li>
+                                @endcan
                             </ul>
                         </li>
+                        @endif
+                        @can('api.access')
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a href="#"><i class="fa fa-code fa-fw fa-lg" aria-hidden="true"></i> {{ __('API') }}</a>
                             <ul class="dropdown-menu">
-                                <li><a href="{{ url('api-access') }}"><i class="fa fa-cog fa-fw fa-lg"
-                                                                         aria-hidden="true"></i> {{ __('API Settings') }}
+                                <li><a href="{{ route('api-access.index') }}"><i class="fa fa-cog fa-fw fa-lg"
+                                                                         aria-hidden="true"></i> {{ __('API Tokens') }}
                                     </a></li>
                                 <li><a href="https://docs.librenms.org/API/" target="_blank" rel="noopener"><i
                                             class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> {{ __('API Docs') }}</a>
                                 </li>
                             </ul>
                         </li>
+                        @endcan
                         <li role="presentation" class="divider"></li>
-                        @endadmin
                         <li class="dropdown-submenu" id="countdown_timer_menu" style="display: none">
                             <a href="#"><i class="fa fa-clock-o fa-fw fa-lg"></i> <span id="countdown_timer"></span></a>
                             <ul class="dropdown-menu">
@@ -779,7 +867,7 @@
             }
         });
 
-    var hideDashboardEditor = {{ (int)$hide_dashboard_editor }};
+    var hideDashboardEditor = {{ (int) $hide_dashboard_editor }};
     function toggleDashboardEditor() {
         $.ajax({
             url: '{{ route('preferences.store') }}',
@@ -792,15 +880,6 @@
             success: function () {
                 hideDashboardEditor = hideDashboardEditor ? 0 : 1;
                 $('#toggle-dashboard-editor-text').text(hideDashboardEditor ? '{{ __('Show Dashboard Editor') }}' : '{{ __('Hide Dashboard Editor') }}')
-
-                // disable and hide editing
-                if (typeof gridster !== 'undefined') {
-                    gridster.disable();
-                    gridster.disable_resize();
-                    gridster_state = 0;
-                    $('.fade-edit').fadeOut();
-                    dashboard_collapse("#hide_edit");
-                }
 
                 $('#dashboard-editor').collapse(hideDashboardEditor ? 'hide' : 'show');
             }

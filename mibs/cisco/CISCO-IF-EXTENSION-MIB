@@ -7,7 +7,7 @@
 -- %DNP% Aug 2003, Jayakumar Kadirvelu
 -- %DNP% Aug 2004, Arul Mozhi
 --   
--- Copyright (c) 2002-2016, 2020 by cisco Systems Inc.
+-- Copyright (c) 2002-2016-2021 by cisco Systems Inc.
 --   
 -- All rights reserved.
 -- *************************************************************
@@ -51,7 +51,7 @@ IMPORTS
 
 
 ciscoIfExtensionMIB MODULE-IDENTITY
-    LAST-UPDATED    "202011030000Z"
+    LAST-UPDATED    "202102120000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -91,6 +91,10 @@ ciscoIfExtensionMIB MODULE-IDENTITY
 
         Drop Virtual Link - According to 802.3 standard,
             Traffic drop may occur on this virtual Link."
+    REVISION        "202102120000Z"
+    DESCRIPTION
+        "Added enumerated value eightSixteenThirtyTwoSixtyFourG to
+        cieIfSpeedGroupConfig."
     REVISION        "202011030000Z"
     DESCRIPTION
         "Added cieIfDuplexCfgStatus and cieIfDuplexDetectStatus."
@@ -1016,7 +1020,8 @@ cieIfSpeedGroupConfig OBJECT-TYPE
                         tenG(2),
                         oneTwoFourEightG(3),
                         twoFourEightSixteenG(4),
-                        fourEightSixteenThirtyTwoG(5)
+                        fourEightSixteenThirtyTwoG(5),
+                        eightSixteenThirtyTwoSixtyFourG(6)
                     }
     MAX-ACCESS      read-write
     STATUS          current
@@ -1034,7 +1039,9 @@ cieIfSpeedGroupConfig OBJECT-TYPE
         '2G-4G-8G-16G' - the interface speed group configuration 
                     on this interface as 2G-4G-8G-16G.
         '4G-8G-16G-32G' - the interface speed group configuration 
-                    on this interface as 4G-8G-16G-32G." 
+                    on this interface as 4G-8G-16G-32G.
+        '8G-16G-32G-64G' - the interface speed group configuration 
+                    on this interface as 8G-16G-32G-64G." 
     ::= { cieIfInterfaceEntry 15 }
 
 cieIfTransceiverFrequencyConfig OBJECT-TYPE

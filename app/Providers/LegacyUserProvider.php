@@ -145,7 +145,7 @@ class LegacyUserProvider implements UserProvider
             }
             toast()->error($auth_message);
 
-            $username = $username ?? Session::get('username', $credentials['username']);
+            $username = Session::get('username', $credentials['username']);
 
             DB::table('authlog')->insert(['user' => $username, 'address' => Request::ip(), 'result' => $auth_message]);
         }
@@ -193,9 +193,7 @@ class LegacyUserProvider implements UserProvider
         unset($new_user['user_id']);
 
         // remove null fields
-        $new_user = array_filter($new_user, function ($var) {
-            return ! is_null($var);
-        });
+        $new_user = array_filter($new_user, fn ($var) => ! is_null($var));
 
         // always create an entry in the users table, but separate by type
         $user = User::thisAuth()->firstOrNew(['username' => $username], $new_user);

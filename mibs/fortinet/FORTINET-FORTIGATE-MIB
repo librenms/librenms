@@ -802,6 +802,7 @@ fwf41F           OBJECT IDENTIFIER ::= { fgModel 446 }
 fwf50G           OBJECT IDENTIFIER ::= { fgModel 455 }
 fwf50GD          OBJECT IDENTIFIER ::= { fgModel 457 }
 fwf51G           OBJECT IDENTIFIER ::= { fgModel 456 }
+fwf60D           OBJECT IDENTIFIER ::= { fgModel 626 }
 fwf60E           OBJECT IDENTIFIER ::= { fgModel 639 }
 fwf60EJ          OBJECT IDENTIFIER ::= { fgModel 662 }
 fwf60EV          OBJECT IDENTIFIER ::= { fgModel 664 }

@@ -30,11 +30,7 @@ use Exception;
 
 class GitHub
 {
-    protected $tag;
-    protected $from;
     protected $token;
-    protected $file;
-    protected $pr;
     protected $stop = false;
     protected $pull_requests = [];
     protected $changelog = [
@@ -75,12 +71,8 @@ class GitHub
     protected $github = 'https://api.github.com/repos/librenms/librenms';
     protected $graphql = 'https://api.github.com/graphql';
 
-    public function __construct($tag, $from, $file, $token = null, $pr = null)
+    public function __construct(protected $tag, protected $from, protected $file, $token = null, protected $pr = null)
     {
-        $this->tag = $tag;
-        $this->from = $from;
-        $this->file = $file;
-        $this->pr = $pr;
         if (! is_null($token) || getenv('GH_TOKEN')) {
             $this->token = $token ?: getenv('GH_TOKEN');
         }
@@ -207,7 +199,7 @@ GRAPHQL;
     private function parseLabels($labels)
     {
         return array_map(function ($label) {
-            $name = preg_replace('/ :[\S]+:/', '', strtolower($label['name']));
+            $name = preg_replace('/ :[\S]+:/', '', strtolower((string) $label['name']));
 
             return str_replace('-', ' ', $name);
         }, $labels);
@@ -220,7 +212,7 @@ GRAPHQL;
     {
         $valid_labels = array_keys($this->changelog);
 
-        foreach ($this->pull_requests as $k => $pr) {
+        foreach ($this->pull_requests as $pr) {
             // check valid labels in order
             $category = 'misc';
             foreach ($valid_labels as $valid_label) {
@@ -237,7 +229,7 @@ GRAPHQL;
 
             // only add the changelog if it isn't set to ignore
             if (! in_array('ignore changelog', $pr['labels'])) {
-                $title = addcslashes(ucfirst(trim(preg_replace('/^[\S]+: /', '', $pr['title']))), '<>');
+                $title = addcslashes(ucfirst(trim((string) preg_replace('/^[\S]+: /', '', (string) $pr['title']))), '<>');
                 $this->changelog[$category][] = "$title ([#{$pr['number']}]({$pr['url']})) - [{$pr['author']['login']}]({$pr['author']['url']})" . PHP_EOL;
             }
 
@@ -298,7 +290,7 @@ GRAPHQL;
 
         foreach ($this->changelog as $section => $items) {
             if (! empty($items)) {
-                $tmp_markdown .= '#### ' . ucwords($section) . PHP_EOL;
+                $tmp_markdown .= '#### ' . ucwords((string) $section) . PHP_EOL;
                 $tmp_markdown .= '* ' . implode('* ', $items) . PHP_EOL;
             }
         }

@@ -48,7 +48,7 @@ class AlertSchedule extends Model
     protected $table = 'alert_schedule';
     protected $primaryKey = 'schedule_id';
     protected $appends = ['start_recurring_dt', 'end_recurring_dt', 'start_recurring_hr', 'end_recurring_hr', 'status'];
-    protected $fillable = ['title', 'notes', 'recurring'];
+    protected $fillable = ['title', 'notes', 'recurring', 'behavior'];
 
     private $timezone;
     private $days = [
@@ -176,33 +176,33 @@ class AlertSchedule extends Model
 
     public function scopeIsActive($query)
     {
-        return $query->where(function ($query) {
+        return $query->where(function ($query): void {
             $now = CarbonImmutable::now('UTC');
             $localDayNum = CarbonImmutable::now()->format('N');
             $query->where('start', '<=', $now)
                 ->where('end', '>=', $now)
-                ->where(function ($query) use ($now, $localDayNum) {
+                ->where(function ($query) use ($now, $localDayNum): void {
                     $query->where('recurring', 0) // Non recurring simply between start and end
-                    ->orWhere(function ($query) use ($now, $localDayNum) {
+                    ->orWhere(function ($query) use ($now, $localDayNum): void {
                         $query->where('recurring', 1)
                             // Check the time is after the start date and before the end date, or end date is not set
-                            ->where(function ($query) use ($now) {
-                                $query->where(function ($query) use ($now) {
+                            ->where(function ($query) use ($now): void {
+                                $query->where(function ($query) use ($now): void {
                                     // normal, inside one day
                                     $query->whereTime('start', '<', DB::raw('time(`end`)'))
                                         ->whereTime('start', '<=', $now->toTimeString())
                                         ->whereTime('end', '>', $now->toTimeString());
-                                })->orWhere(function ($query) use ($now) {
+                                })->orWhere(function ($query) use ($now): void {
                                     // outside, spans days
                                     $query->whereTime('start', '>', DB::raw('time(`end`)'))
-                                        ->where(function ($query) use ($now) {
+                                        ->where(function ($query) use ($now): void {
                                             $query->whereTime('start', '<=', $now->toTimeString())
                                                 ->orWhereTime('end', '>', $now->toTimeString());
                                         });
                                 });
                             })
                             // Check we are on the correct day of the week
-                            ->where(function ($query) use ($localDayNum) {
+                            ->where(function ($query) use ($localDayNum): void {
                                 $query->where('recurring_day', 'like', "%{$localDayNum}%")
                                     ->orWhereNull('recurring_day');
                             });
@@ -236,7 +236,7 @@ class AlertSchedule extends Model
         return $this->morphedByMany(Location::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'alert_schedulable_id');
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return ($this->recurring ?
             'Recurring Alert Schedule (' . implode(',', $this->recurring_day) . ') ' :

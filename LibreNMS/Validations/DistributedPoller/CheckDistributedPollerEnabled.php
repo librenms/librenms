@@ -41,14 +41,14 @@ class CheckDistributedPollerEnabled implements Validation, ValidationFixer
         if (! LibrenmsConfig::get('distributed_poller')) {
             return ValidationResult::fail(trans('validation.validations.distributedpoller.CheckDistributedPollerEnabled.not_enabled'))
                 ->setFix('lnms config:set distributed_poller true')
-                ->setFixer(__CLASS__);
+                ->setFixer(self::class);
         }
 
         $db_config = \App\Models\Config::firstWhere('config_name', 'distributed_poller');
         if ($db_config === null || ! $db_config->config_value) {
             return ValidationResult::fail(trans('validation.validations.distributedpoller.CheckDistributedPollerEnabled.not_enabled_globally'))
                 ->setFix('lnms config:set distributed_poller true')
-                ->setFixer(__CLASS__);
+                ->setFixer(self::class);
         }
 
         return ValidationResult::ok(trans('validation.validations.distributedpoller.CheckDistributedPollerEnabled.ok'));

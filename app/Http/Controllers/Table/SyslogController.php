@@ -27,12 +27,18 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Syslog;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Enum\SyslogSeverity;
 
+/**
+ * @extends TableController<Syslog>
+ */
 class SyslogController extends TableController
 {
-    public function rules()
+    public function rules(): array
     {
         return [
             'device' => 'nullable|int',
@@ -45,12 +51,12 @@ class SyslogController extends TableController
         ];
     }
 
-    public function searchFields($request)
+    public function searchFields(Request $request): array
     {
         return ['msg'];
     }
 
-    public function filterFields($request)
+    public function filterFields(Request $request): array
     {
         return [
             'device_id' => 'device',
@@ -59,31 +65,30 @@ class SyslogController extends TableController
         ];
     }
 
-    public function sortFields($request)
+    public function sortFields(Request $request): array
     {
         return ['label', 'timestamp', 'level', 'device_id', 'program', 'msg', 'priority'];
     }
 
     /**
      * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    public function baseQuery($request)
+    public function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Syslog::class);
+
         return Syslog::hasAccess($request->user())
             ->with('device')
-            ->when($request->device_group, function ($query, $group) {
+            ->when($request->device_group, function ($query, $group): void {
                 $query->inDeviceGroup($group);
             })
-            ->when($request->from, function ($query, $from) {
+            ->when($request->from, function ($query, $from): void {
                 $query->where('timestamp', '>=', $from);
             })
-            ->when($request->to, function ($query, $to) {
+            ->when($request->to, function ($query, $to): void {
                 $query->where('timestamp', '<=', $to);
             })
-            ->when($request->level, function ($query, $level) {
+            ->when($request->level, function ($query, $level): void {
                 if ($level >= 7) {
                     return;  // include everything
                 }
@@ -94,22 +99,23 @@ class SyslogController extends TableController
     }
 
     /**
-     * @param  Syslog  $syslog
+     * @param  Syslog  $model
+     * @return array<string, scalar>
      */
-    public function formatItem($syslog)
+    public function formatItem(Model $model): array
     {
         return [
-            'label' => $this->setLabel($syslog),
-            'timestamp' => $syslog->timestamp,
-            'level' => htmlentities($syslog->level),
-            'device_id' => Blade::render('<x-device-link :device="$device"/>', ['device' => $syslog->device]),
-            'program' => htmlentities($syslog->program),
-            'msg' => htmlentities($syslog->msg),
-            'priority' => htmlentities($syslog->priority),
+            'label' => $this->setLabel($model),
+            'timestamp' => $model->timestamp,
+            'level' => htmlentities((string) $model->level),
+            'device_id' => Blade::render('<x-device-link :device="$device"/>', ['device' => $model->device]),
+            'program' => htmlentities((string) $model->program),
+            'msg' => htmlentities((string) $model->msg),
+            'priority' => htmlentities((string) $model->priority),
         ];
     }
 
-    private function setLabel($syslog)
+    private function setLabel(Syslog $syslog): string
     {
         $output = "<span class='alert-status ";
         $output .= $this->priorityLabel($syslog->priority);
@@ -119,33 +125,15 @@ class SyslogController extends TableController
         return $output;
     }
 
-    /**
-     * @param  int  $syslog_priority
-     * @return string
-     */
-    private function priorityLabel($syslog_priority)
+    private function priorityLabel(string $syslog_priority): string
     {
-        switch ($syslog_priority) {
-            case 'debug':
-                return 'label-default'; //Debug
-            case 'info':
-                return 'label-info'; //Informational
-            case 'notice':
-                return 'label-primary'; //Notice
-            case 'warning':
-                return 'label-warning'; //Warning
-            case 'err':
-                return 'label-danger'; //Error
-            case 'crit':
-                return 'label-danger'; //Critical
-            case 'alert':
-                return 'label-danger'; //Alert
-            case 'emerg':
-                return 'label-danger'; //Emergency
-            default:
-                return '';
-        }
+        return match ($syslog_priority) {
+            'debug' => 'label-default',
+            'info' => 'label-info',
+            'notice' => 'label-primary',
+            'warning' => 'label-warning',
+            'err', 'crit', 'alert', 'emerg' => 'label-danger',
+            default => '',
+        };
     }
-
-    // end syslog_priority
 }

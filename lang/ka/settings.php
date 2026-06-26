@@ -621,8 +621,8 @@ return [
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC აღრიცხვა',
+            'mac-accounting' => [
+                'description' => 'MAC აღრიცხვა',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
@@ -1052,9 +1052,21 @@ return [
                 'description' => 'მომხმარებლის სახელი',
                 'help' => 'მომხმარებლის სახელი InfluxDB-სთან მისაერთებლად, თუ აუცილებელია',
             ],
+            'batch_size' => [
+                'description' => 'Batch Size',
+                'help' => 'Number of metrics to send in a single batch, 0 means no batching',
+            ],
+            'measurements' => [
+                'description' => 'Measurements',
+                'help' => 'List of measurements to send to InfluxDB, leave empty to send all',
+            ],
             'verifySSL' => [
                 'description' => 'SSL-ის გადამოწმება',
                 'help' => 'SSL სერტიფიკატების გადამოწმება მათ სანდოობაზე და სისწორეზე',
+            ],
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'To enable or disable verbose output to CLI',
             ],
         ],
         'influxdbv2' => [
@@ -1207,9 +1219,6 @@ return [
             'description' => 'ფაილის სახელის სუფიქსი',
             'help' => 'ეს ძალიან მნიშვნელოვანი ნაწილია, რადგან მოწყობილობის სახელები NfSen-ში შეზღუდულია 21 სიმბოლოზე. ეს ნიშნავს, რომ სრული დომენის სახელები მოწყობილობებისთვის შეიძლება, პრობლემატური იყოს, ჩაატიოთ. ასე რომ ეს ნაწილი ჩვეულებრივ იშლება.',
         ],
-        'nmap' => [
-            'description' => 'ბილიკი nmap-მდე',
-        ],
         'no_proxy' => [
             'description' => 'პროქსის გამონაკლისები',
             'help' => 'დააყენეთ, თუ გარემოს ცვლადი no_proxy ხელმისაწვდომი არაა. წარმოადგენს მძიმით გამოყოფილ სიას IP მისამართების, ჰოსტების და დომენების, რომლებიც გნებავთ, გამოტოვებული იყოს.',
@@ -1318,10 +1327,6 @@ return [
         'ping' => [
             'description' => 'ბილიკი ping-მდე',
         ],
-        'ping_rrd_step' => [
-            'description' => 'პინგის სიხშირე',
-            'help' => 'რამდენად ხშირად მოხდება შემოწმება. აყენებს ნაგულისხმევ მნიშვნელობას ყველა კვანძისთვის. ფრთხილად! თუ ამას შეცვლით, საჭირო იქნება დამატებითი ცვლილებებიც.  გადახედეთ სწრაფი პინგის დოკუმენტაციას.',
-        ],
         'poller_modules' => [
             'unix-agent' => [
                 'description' => 'Unix-ის აგენტი',
@@ -1395,8 +1400,8 @@ return [
             'slas' => [
                 'description' => 'მომსახურების დონის შესახებ შეთანხმების თვალყურის დევნება',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC აღრიცხვა',
+            'mac-accounting' => [
+                'description' => 'MAC აღრიცხვა',
             ],
             'cipsec-tunnels' => [
                 'description' => 'Cipsec გვირაბები',
@@ -1742,9 +1747,6 @@ return [
             'description' => 'სერვისის ჯანმრთელობის ფაილი',
             'help' => 'ბილიკი ჯანმრთელობის ფაილამდე, რომ დავრწმუნდეთ, რომ დისპეჩერის სერვისი გაშვებულია',
         ],
-        'sfdp' => [
-            'description' => 'ბილიკი sfdp-მდე',
-        ],
         'shorthost_target_length' => [
             'description' => 'შემოკლებული ჰოსტის სახელის მაქსიმალური სიგრძე',
             'help' => 'შეამოკლებს ჰოსტის სახელს მაქსიმალურ სიგრძემდე, მაგრამ ყოველთვის სრული ქვედომენის ნაწილებით',
@@ -1968,9 +1970,6 @@ return [
         'device_location_map_show_device_dependencies' => [
             'description' => 'მოწყობილობის დამოკიდებულებების ჩვენება მდებარეობის რუკაზე',
             'help' => 'მოწყობილობებს შორის ბმულების ჩვენება მდებარეობის რუკაზე მშობელი დამოკიდებულებების მიხედვით',
-        ],
-        'whois' => [
-            'description' => 'ბილიკი პროგრამამდე whois',
         ],
         'smokeping.integration' => [
             'description' => 'ჩართვა',

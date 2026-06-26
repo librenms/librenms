@@ -22,7 +22,7 @@ class ModuleController extends Controller
         ]);
 
         if ($request->has('discovery')) {
-            $discovery = $request->get('discovery');
+            $discovery = $request->input('discovery');
             if ($discovery == 'clear') {
                 $device->forgetAttrib('discover_' . $module);
             } else {
@@ -31,7 +31,7 @@ class ModuleController extends Controller
         }
 
         if ($request->has('polling')) {
-            $polling = $request->get('polling');
+            $polling = $request->input('polling');
             if ($polling == 'clear') {
                 $device->forgetAttrib('poll_' . $module);
             } else {

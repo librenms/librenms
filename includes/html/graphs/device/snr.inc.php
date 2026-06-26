@@ -1,7 +1,5 @@
 <?php
 
-$class = 'snr';
-$unit = 'dB';
-$unit_long = 'SNR (dB)';
+$class = \LibreNMS\Enum\Sensor::Snr;
 
 require 'includes/html/graphs/device/sensor.inc.php';

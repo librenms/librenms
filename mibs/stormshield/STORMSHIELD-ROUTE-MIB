@@ -1,0 +1,234 @@
+STORMSHIELD-ROUTE-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32   FROM SNMPv2-SMI
+      DisplayString                             FROM RFC1213-MIB
+      SnmpAdminString                           FROM SNMP-FRAMEWORK-MIB
+      stormshieldMIB                            FROM STORMSHIELD-SMI-MIB;
+
+   snsRoute MODULE-IDENTITY
+      LAST-UPDATED  "202106030000Z"
+      ORGANIZATION  "Stormshield"
+      CONTACT-INFO
+         "Customer Support
+
+         22 rue du Gouverneur General Eboue
+         92130 Issy-les-Moulineaux
+         FRANCE
+
+         Tel: +33 (0)9 69 32 96 29
+         E-mail: support@stormshield.eu
+         http://www.stormshield.eu"
+      DESCRIPTION   "stormshield routes"
+      REVISION      "202106030000Z"
+      DESCRIPTION   "Initial"
+      ::= { stormshieldMIB 14 }
+
+   snsRouteTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SnsRouteEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+         "State of routes"
+      ::= { snsRoute 1 }
+
+   snsRouteEntry OBJECT-TYPE
+      SYNTAX SnsRouteEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "Each entry in the snsRouteTable describe the state of a route."
+      INDEX { snsRouteIndex }
+      ::= { snsRouteTable 1 }
+
+   SnsRouteEntry ::= SEQUENCE {
+      snsRouteIndex                        INTEGER,
+      snsRouteType                         DisplayString,
+      snsRouteIPVersion                    Integer32,
+      snsRouteRouterName                   SnmpAdminString,
+      snsRouteGatewayName                  SnmpAdminString,
+      snsRouteGatewayAddr                  DisplayString,
+      snsRouteGatewayType                  DisplayString,
+      snsRouteLastCheck                    DisplayString,
+      snsRouteState                        DisplayString,
+      snsRouteStateLastChange              DisplayString,
+      snsRouteActive                       Integer32,
+      snsRouteActiveLastChange             DisplayString,
+      snsRouteSysDefaultGateway            Integer32,
+      snsRouteSysDefaultGatewayLastChange  DisplayString,
+      snsRouteRtid                         Integer32,
+      snsRouteUsagePrct                    DisplayString,
+      snsRouteMonitoringMethod             DisplayString,
+      snsRouteLatency                      Unsigned32,
+      snsRouteJitter                       Unsigned32,
+      snsRoutePacketLossPrct               DisplayString,
+      snsRouteUnreachPrct                  DisplayString
+   }
+
+   snsRouteIndex OBJECT-TYPE
+      SYNTAX INTEGER (1..65535)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "A unique value for the table. Its value
+          ranges between 1 and 65535 and may not be contigous.
+          the index has no other meaning but a pure index"
+      ::= { snsRouteEntry 1 }
+
+   snsRouteType OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Route type (DefaultRoute|PBR)"
+      ::= { snsRouteEntry 2 }
+
+   snsRouteIPVersion OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Route IP version (4|6)"
+      ::= { snsRouteEntry 3 }
+
+   snsRouteRouterName OBJECT-TYPE
+      SYNTAX SnmpAdminString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Name of the router object in which the gateway belongs to"
+      ::= { snsRouteEntry 4 }
+
+   snsRouteGatewayName OBJECT-TYPE
+      SYNTAX SnmpAdminString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Gateway name"
+      ::= { snsRouteEntry 5 }
+
+   snsRouteGatewayAddr OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "IPv4 or IPv6 of the gateway"
+      ::= { snsRouteEntry 6 }
+
+   snsRouteGatewayType OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Gateway type (Principal|Backup)"
+      ::= { snsRouteEntry 7 }
+
+   snsRouteLastCheck OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Date of the last reachability
+                   check of the gateway (%Y-%m-%d %H:%M:%S)"
+      ::= { snsRouteEntry 8 }
+
+   snsRouteState OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Gateway current reachability state (UP|DOWN|UNDEF)"
+      ::= { snsRouteEntry 9 }
+
+   snsRouteStateLastChange OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Date since the gateway is in this reachability
+                   state (%Y-%m-%d %H:%M:%S)"
+      ::= { snsRouteEntry 10 }
+
+   snsRouteActive OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Indicates if the gateway is currently used for the routing"
+      ::= { snsRouteEntry 11 }
+
+   snsRouteActiveLastChange OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Date since the gateway is active or not (%Y-%m-%d %H:%M:%S)"
+      ::= { snsRouteEntry 12 }
+
+   snsRouteSysDefaultGateway OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Indicates if the gateway is currently
+                   used as the system default route"
+      ::= { snsRouteEntry 13 }
+
+   snsRouteSysDefaultGatewayLastChange OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Date since the gateway is used or not
+                   as the system default route (%Y-%m-%d %H:%M:%S)"
+      ::= { snsRouteEntry 14 }
+
+   snsRouteRtid OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "system rtid of this gateway"
+      ::= { snsRouteEntry 15 }
+
+   snsRouteUsagePrct OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Usage percentage of this gateway
+                   among all the gateways member of this router"
+      ::= { snsRouteEntry 16 }
+
+   snsRouteMonitoringMethod OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Monitoring method used to retrieve
+                   gateway's metrics (ICMP|TCP_PROBE)"
+      ::= { snsRouteEntry 17 }
+
+   snsRouteLatency OBJECT-TYPE
+      SYNTAX Unsigned32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Gateway latency expressed in ms.
+                   A value of zero means that the monitored host could not be reached."
+      ::= { snsRouteEntry 18 }
+
+   snsRouteJitter OBJECT-TYPE
+      SYNTAX Unsigned32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Gateway jitter expressed in ms.
+                   If the latency is zero, the jitter metric is not valid."
+      ::= { snsRouteEntry 19 }
+
+   snsRoutePacketLossPrct OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Percentage of packet loss for one message.
+                   A negative value means that this route is not monitored or has not yet been monitored."
+      ::= { snsRouteEntry 20 }
+
+   snsRouteUnreachPrct OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Percentage of time in a period when gateway was unreachable.
+                   A negative value means that this route is not monitored or has not yet been monitored."
+      ::= { snsRouteEntry 21 }
+END

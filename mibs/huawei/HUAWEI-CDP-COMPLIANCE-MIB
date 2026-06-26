@@ -1,18 +1,18 @@
 -- ======================================================================================
--- Copyright (C)  2009   by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C)  2019   by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description:    CDP-COMPLIANCE-MIB
 -- Reference:     
--- Version:          1.0
+-- Version:          V1.01
 -- History:           
 -- ======================================================================================
 HUAWEI-CDP-COMPLIANCE-MIB DEFINITIONS ::= BEGIN
 IMPORTS
- 	TEXTUAL-CONVENTION, TimeStamp, TruthValue
-		FROM SNMPv2-TC
-
-    MODULE-IDENTITY, OBJECT-TYPE, Integer32,
-    OBJECT-IDENTITY
+ 	  TEXTUAL-CONVENTION, TimeStamp, TruthValue
+		    FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF            
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, NOTIFICATION-TYPE, OBJECT-IDENTITY
         FROM SNMPv2-SMI
  
  	TimeFilter, ZeroBasedCounter32
@@ -28,21 +28,27 @@ IMPORTS
         FROM HUAWEI-MIB;
  
     hwCdpComplianceMIB MODULE-IDENTITY
-        LAST-UPDATED "200905050000Z"  
-        ORGANIZATION 
-            "Huawei Technologies co.,Ltd."
+        LAST-UPDATED "201909170000Z"  
+        ORGANIZATION "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
-            "VRP Team Huawei Technologies co.,Ltd.
-            Huawei Bld.,NO.3 Xinxi Rd., 
-            Shang-Di Information Industry Base,
-            Hai-Dian District Beijing P.R. China
-            http://www.huawei.com
-        Zip:100085
-            "
+           "Huawei Industrial Base            
+             Bantian, Longgang                 
+              Shenzhen 518129                   
+              People's Republic of China        
+              Website: http://www.huawei.com    
+              Email: support@huawei.com"        
         DESCRIPTION
             "This file is an file for CDP compliance. It provides such functions of 
            globally enabling or disabling the CDP compliance function, enabling the global
            alarm, querying and clearing statistics on ports."
+        
+        REVISION "201909170000Z"
+        DESCRIPTION
+            "Change the default value of hwCdpCompliancePortConfigAdminStatus from disabled(1) to rxOnly(2)." 
+        REVISION "200905050000Z"
+        DESCRIPTION
+            "The CDP compliance function." 
+       
             ::= { hwDatacomm 198 }  
 	
     -- ============================================================================
@@ -80,10 +86,10 @@ IMPORTS
 	DESCRIPTION
 		"The administratively desired status of the global CDP compliance function.
 		If the associated hwCdpComplianceEnable object has a
-		value of 'disable(2)', then the system will discard CDP packets.
+		value of 'disabled(2)', then the system will discard CDP packets.
 		If the associated hwCdpComplianceEnable object has a
-		value of 'enable(1)', then the system will counter and keep the latest CDP packets."
-	DEFVAL { disable }
+		value of 'enabled(1)', then the system will counter and keep the latest CDP packets."
+	DEFVAL { disabled }
 	::= { hwCdpComplianceConfiguration 1 }   
 		
 	hwCdpComplianceNotificationInterval OBJECT-TYPE
@@ -153,7 +159,7 @@ IMPORTS
 		If the associated hwCdpCompliancePortConfigAdminStatus object has a
 		value of 'rxOnly(2)', then the port will receive and store the CDP packet,
 		but it will not transmit CDP frames on this port."
-	DEFVAL { disabled }
+	DEFVAL { rxOnly }
 	::= { hwCdpCompliancePortConfigEntry 2 }   
 	
 	hwCdpCompliancePortConfigHoldTime OBJECT-TYPE

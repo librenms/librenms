@@ -29,7 +29,7 @@ IMPORTS
 
 
 ciscoAAAServerMIB MODULE-IDENTITY
-	LAST-UPDATED	"200311170000Z"
+    LAST-UPDATED    "202304060000Z"
 	ORGANIZATION	"Cisco Systems,	Inc."
 	CONTACT-INFO
 		"	Cisco Systems
@@ -46,6 +46,16 @@ ciscoAAAServerMIB MODULE-IDENTITY
 		"The MIB module	for monitoring communications and status
 		 of AAA	Server operation
 		"
+        REVISION         "202304060000Z"
+        DESCRIPTION
+                "Added mib objects to support aaa server authen/author/acct and wireless server parameters"
+	REVISION	 "202303010000Z"
+	DESCRIPTION
+            "Added objects to support AAA server state monitoring and
+            counter for authentication retransmissions
+                        casWiredServerState
+                        casAuthenRetrans
+            "
         REVISION    "200311170000Z"
         DESCRIPTION
            "Expanded the list of AAA protocols to include LDAP,
@@ -438,7 +448,93 @@ CasStatisticsEntry::=
 	    casCurrentStateDuration	   TimeInterval,
 	    casPreviousStateDuration	   TimeInterval,
 	    casTotalDeadTime		   TimeInterval,
-	    casDeadCount		   Counter32
+	    casDeadCount		   Counter32,
+            casWiredServerState            INTEGER,
+            casAuthenRetrans               Counter32,
+            casAuthenRequestFailover          Counter32,
+            casAuthenResponseAccept           Counter32,
+            casAuthenResponseReject           Counter32,
+            casAuthenResponseChallenge        Counter32,
+            casAuthenThrottledTransaction     Counter32,
+            casAuthenThrottledTimeout         Counter32,
+            casAuthenThrottledFailure         Counter32,
+            casAuthenMalformedResponses       Counter32,
+            casAuthenBadAuthenticators        Counter32,
+            casAuthenDot1xTotalResponses      Counter32,
+            casAuthenDot1xAvgResponseTime     TimeInterval,
+            casAuthenDot1xTransactionTimeouts Counter32,
+            casAuthenDot1xTransactionFailover Counter32,
+            casAuthenDot1xTransactionTotal    Counter32,
+            casAuthenDot1xTransactionSuccess  Counter32,
+            casAuthenDot1xTransactionFailure  Counter32,
+            casAuthenMACTotalResponses        Counter32,
+            casAuthenMACAvgResponseTime       TimeInterval,
+            casAuthenMACTransactionTimeouts   Counter32,
+            casAuthenMACTransactionFailover   Counter32,
+            casAuthenMACTransactionTotal      Counter32,
+            casAuthenMACTransactionSuccess    Counter32,
+            casAuthenMACTransactionFailure    Counter32,
+            casAuthorRequestFailover          Counter32,
+            casAuthorRequestRetransmission    Counter32,
+            casAuthorResponseAccept           Counter32,
+            casAuthorResponseReject           Counter32,
+            casAuthorResponseChallenge        Counter32,
+            casAuthorThrottledTransaction     Counter32,
+            casAuthorThrottledTimeout         Counter32,
+            casAuthorThrottledFailure         Counter32,
+            casAuthorMalformedResponses       Counter32,
+            casAuthorBadAuthenticators        Counter32,
+            casAuthorMACTotalResponses        Counter32,
+            casAuthorMACAvgResponseTime       TimeInterval,
+            casAuthorMACTransactionTimeouts   Counter32,
+            casAuthorMACTransactionFailover   Counter32,
+            casAuthorMACTransactionTotal      Counter32,
+            casAuthorMACTransactionSuccess    Counter32,
+            casAuthorMACTransactionFailure    Counter32,
+            casAcctRequestFailover            Counter32,
+            casAcctRequestRetransmission      Counter32,
+            casAcctRequestStart               Counter32,
+            casAcctRequestInterim             Counter32,
+            casAcctRequestStop                Counter32,
+            casAcctResponseStart              Counter32,
+            casAcctResponseInterim            Counter32,
+            casAcctResponseStop               Counter32,
+            casAcctThrottledTransaction       Counter32,
+            casAcctThrottledTimeout           Counter32,
+            casAcctThrottledFailure           Counter32,
+            casAcctMalformedResponses         Counter32,
+            casAcctBadAuthenticators          Counter32,
+            casWiredDuration                  TimeInterval,
+            casWiredPreDuration               TimeInterval,
+            casWiredTotalDeadTime             TimeInterval,
+            casWiredDeadCount                 INTEGER,
+            casWirelessServerState0           INTEGER,
+            casWirelessServerState1           INTEGER,
+            casWirelessServerState2           INTEGER,
+            casWirelessServerState3           INTEGER,
+            casWirelessServerState4           INTEGER,
+            casWirelessServerState5           INTEGER,
+            casWirelessServerState6           INTEGER,
+            casWirelessServerState7           INTEGER,
+            casWirelessDuration0              TimeInterval,
+            casWirelessDuration1              TimeInterval,
+            casWirelessDuration2              TimeInterval,
+            casWirelessDuration3              TimeInterval,
+            casWirelessDuration4              TimeInterval,
+            casWirelessDuration5              TimeInterval,
+            casWirelessDuration6              TimeInterval,
+            casWirelessDuration7              TimeInterval,
+            casWirelessPreDuration0           TimeInterval,
+            casWirelessPreDuration1           TimeInterval,
+            casWirelessPreDuration2           TimeInterval,
+            casWirelessPreDuration3           TimeInterval,
+            casWirelessPreDuration4           TimeInterval,
+            casWirelessPreDuration5           TimeInterval,
+            casWirelessPreDuration6           TimeInterval,
+            casWirelessPreDuration7           TimeInterval,
+            casWirelessTotalDeadTime          TimeInterval,
+            casWirelessDeadCount              Counter32,
+            casQuarantined                    INTEGER
 	}
 
 --
@@ -823,21 +919,21 @@ casState OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS	    current
 	DESCRIPTION
-	    "Current state of this server.
+	    "Current state of this server at system.
 
-		 up(1)	 - Server responding to	requests
+		 up(1)	 - Server is alive and responding to requests
 
-		 dead(2) - Server failed to respond
+		 dead(2) - Server is dead and fails to respond to requests
 
-	     A server is marked	dead if	it does	not respond after
-	     maximum retransmissions.
+	     A server is marked	dead if	dead-criteria is met
 
-	     A server is marked	up again either	after a	waiting
-	     period or if some response	is received from it.
+         A server is marked up again when
+         1. configured dead timer expires 
+         2. when server responds to probes AAA client
 
 	     The initial value of casState is 'up(1)' at system
 	     re-initialization.	This will only transistion to 'dead(2)'
-	     if	an attempt to communicate fails.
+	     if	an attempt to communicate fails and dead-criteria is met.
 	    "
 	::= { casStatisticsEntry 25 }
 
@@ -884,7 +980,1030 @@ casDeadCount OBJECT-TYPE
 	    "
 	::= { casStatisticsEntry 29 }
 
+casWiredServerState OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up(1),
+                        dead(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current state of this server for wired sessions.
+                 up(1)   - Server is alive and responding to requests.
+                 dead(2) - Server is dead and fails to respond to requests
+             A server is marked dead if dead-criteria is met
 
+             A server is marked up again when
+             1. configured dead timer expires 
+             2. when server responds to probes AAA client
+
+             The initial value of casWiredServerState is 'up(1)' at system
+             re-initialization. This will only transistion to 'dead(2)'
+             if an attempt to communicate fails and dead-criteria is met
+            "
+        ::= { casStatisticsEntry 30 }
+
+casAuthenRetrans OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of authentication retransmissions sent to
+             this server since the first request times out.
+             Retransmissions due to request timeouts are
+             counted as distinct requests.
+            "
+        ::= { casStatisticsEntry 31 }
+
+casAuthenRequestFailover OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of authentication requests which have failover
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 32 }
+
+casAuthenResponseAccept OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of authentication accepts received by the device
+             as a result of successful authentication. since it is made active.
+            "
+        ::= { casStatisticsEntry 33 }
+
+casAuthenResponseReject OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of authentication rejects received by the device
+             as a result of failed authentication. since it is made active.
+            "
+        ::= { casStatisticsEntry 34 }
+
+casAuthenResponseChallenge OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of authentication challenges received by the device
+             as part of authentication transaction. since it is made active.
+            "
+        ::= { casStatisticsEntry 35 }
+
+casAuthenThrottledTransaction OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of authentication throttled transactions with this server
+            since it is made active.
+            "
+        ::= { casStatisticsEntry 36 }
+
+casAuthenThrottledTimeout OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of authentication throttled requests which have timed out
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 37 }
+
+casAuthenThrottledFailure OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "  The number of authentication-throttled transactions that have failed
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 38 }
+
+casAuthenMalformedResponses OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of malformed authentication packets received from this server
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 39 }
+
+casAuthenBadAuthenticators OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of bad authenticator packets received from this server
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 40 }
+
+casAuthenDot1xTotalResponses OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The sum of all the Dot1x authentication responses from this server
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 41 }
+
+casAuthenDot1xAvgResponseTime OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The average response time in milliseconds for Dot1x authentication requests sent to this server
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 42 }
+
+casAuthenDot1xTransactionTimeouts OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of Dot1x authentication transactions which have timed out
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 43 }
+
+casAuthenDot1xTransactionFailover OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of Dot1x authentication transactions that have failed over to other servers
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 44 }
+
+casAuthenDot1xTransactionTotal OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The sum of all the Dot1x authentication transactions from this server
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 45 }
+
+casAuthenDot1xTransactionSuccess OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of Dot1x authentication transactions with this server
+             that have succeeded since it is made active.
+            "
+        ::= { casStatisticsEntry 46 }
+
+casAuthenDot1xTransactionFailure OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of Dot1x authentication transactions with this server
+             that have failed since it is made active.
+            "
+        ::= { casStatisticsEntry 47 }
+
+casAuthenMACTotalResponses OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The sum of all the MAC authentication responses from this server
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 48 }
+
+casAuthenMACAvgResponseTime OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The average response time in milliseconds for MAC authentication requests sent to this server
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 49 }
+
+casAuthenMACTransactionTimeouts OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of MAC authentication requests which have timed out
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 50 }
+
+casAuthenMACTransactionFailover OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of MAC authentication transactions that have failed over to other servers
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 51 }
+
+casAuthenMACTransactionTotal OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The sum of all the MAC authentication transactions from this server
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 52 }
+
+casAuthenMACTransactionSuccess OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of MAC authentication transactions with this server
+             that have succeeded since it is made active.
+            "
+        ::= { casStatisticsEntry 53 }
+
+casAuthenMACTransactionFailure OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of MAC authentication transactions with this server
+             that have failed since it is made active.
+            "
+        ::= { casStatisticsEntry 54 }
+
+casAuthorRequestFailover OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of authorization requests sent to this server
+             that has failed over to other servers since it is made active.
+            "
+        ::= { casStatisticsEntry 55 }
+
+casAuthorRequestRetransmission OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of authorization retransmissions sent to this server
+             since the first request times out.
+            "
+        ::= { casStatisticsEntry 56 }
+
+casAuthorResponseAccept OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of authorization accept responses received from this server
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 57 }
+
+casAuthorResponseReject OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of authorization reject responses received from this server
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 58 }
+
+casAuthorResponseChallenge OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of authorization challenge responses received from this server
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 59 }
+
+casAuthorThrottledTransaction OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "  The number of authorization throttled transactions with
+             this server since it is made active.
+            "
+        ::= { casStatisticsEntry 60 }
+
+casAuthorThrottledTimeout OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of authorization throttled requests which have timed out
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 61 }
+
+casAuthorThrottledFailure OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "  The number of authorization throttled failures
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 62 }
+
+casAuthorMalformedResponses OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of malformed authorization responses received from this server
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 63 }
+
+casAuthorBadAuthenticators OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of bad authenticators received as part of authorization from this server
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 64 }
+
+casAuthorMACTotalResponses OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The sum of all the MAC authorization responses from this server
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 65 }
+
+casAuthorMACAvgResponseTime OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The average response time in milliseconds for MAC authorization sent to this server
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 66 }
+
+casAuthorMACTransactionTimeouts OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of MAC authorization transactions that have timed out
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 67 }
+
+casAuthorMACTransactionFailover OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "  The number of MAC authorizations transactions that have failed over
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 68 }
+
+casAuthorMACTransactionTotal OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "  The sum of all the MAC authorization transactions from this server
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 69 }
+
+casAuthorMACTransactionSuccess OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of successful MAC authorization transactions with this server
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 70 }
+
+casAuthorMACTransactionFailure OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of failed MAC authorization transactions with this server
+             since it is made active.
+            "
+        ::= { casStatisticsEntry 71 }
+
+casAcctRequestFailover OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of accounting requests which have failed over to other servers
+             since system re-initialization.
+            "
+        ::= { casStatisticsEntry 72 }
+
+casAcctRequestRetransmission OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of accounting request retransmissions sent to this server
+             since the first request times out.
+            "
+        ::= { casStatisticsEntry 73 }
+
+casAcctRequestStart OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of accounting requests of type START sent to this server
+             since system re-initialization.
+            "
+        ::= { casStatisticsEntry 74 }
+
+casAcctRequestInterim OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of accounting requests of type INTERIM sent to this server
+             since system re-initialization.
+            "
+        ::= { casStatisticsEntry 75 }
+
+casAcctRequestStop OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of accounting requests of type STOP sent to this server
+             since system re-initialization.
+            "
+        ::= { casStatisticsEntry 76 }
+
+casAcctResponseStart OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of accounting responses of type START received from this server
+             since system re-initialization.
+            "
+        ::= { casStatisticsEntry 77 }
+
+casAcctResponseInterim OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "  The number of accounting responses of type INTERIM received from this server
+             since system re-initialization.
+            "
+        ::= { casStatisticsEntry 78 }
+
+casAcctResponseStop OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of accounting responses of type STOP received from this server
+             since system re-initialization.
+            "
+        ::= { casStatisticsEntry 79 }
+
+casAcctThrottledTransaction OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The number of throttled accounting transactions with
+            this server since the system re-initialization.
+            "
+        ::= { casStatisticsEntry 80 }
+
+casAcctThrottledTimeout OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "  The number of throttled accounting requests which have timed out
+             since system re-initialization.
+            "
+        ::= { casStatisticsEntry 81 }
+
+casAcctThrottledFailure OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "  The number of throttled accounting transactions that have failed
+             since system re-initialization.
+            "
+        ::= { casStatisticsEntry 82 }
+
+casAcctMalformedResponses OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "  The number of malformed accounting responses received from this server
+             since system re-initialization.
+            "
+        ::= { casStatisticsEntry 83 }
+
+casAcctBadAuthenticators OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "  The number of bad authenticators received as part of accounting from this server
+             since system re-initialization.
+            "
+        ::= { casStatisticsEntry 84 }
+
+casWiredDuration OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object provides the elapsed time of the wired instance
+             in its current state as shown in casWiredServerState.
+            "
+        ::= { casStatisticsEntry 85 }
+
+casWiredPreDuration OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object provides the elapsed time of the Server
+            in the wired instance in its previous state prior
+            to the most recent transition of casWiredServerState.
+            "
+        ::= { casStatisticsEntry 86 }
+
+casWiredTotalDeadTime OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total elapsed time of the wired server's
+            casWiredServerState has had the value 'dead(2)'
+             since system re-initialization.
+            "
+        ::= { casStatisticsEntry 87 }
+
+casWiredDeadCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of times the wired server's
+            casWiredServerState have transitioned to 'dead(2)'
+             since system re-initialization.
+            "
+        ::= { casStatisticsEntry 88 }
+
+casWirelessServerState0 OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up(1),
+                        dead(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The wireless server state of the 0th wireless instance.
+
+                 up(1)   - The server is alive and responding to requests.
+
+                 dead(2) - The server is dead and fails to respond to requests.
+
+             A server is marked dead if dead criteria are met
+
+             A server is marked up again when
+             1. configured dead timer expires
+             2. when the server responds to probes AAA client
+
+             The initial value of casWirelessServerState0 is 'up(1)' at system
+             re-initialization. This will only transition to 'dead(2)'
+             if an attempt to communicate fails and dead criteria are met.
+            "
+        ::= { casStatisticsEntry 89 }
+
+casWirelessServerState1 OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up(1),
+                        dead(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The wireless server state of the 1st wireless instance.
+
+                 up(1)   - The server is alive and responding to requests.
+
+                 dead(2) - The server is dead and fails to respond to requests.
+
+             A server is marked dead if dead criteria are met
+
+             A server is marked up again when
+             1. configured dead timer expires
+             2. when the server responds to probes AAA client
+
+             The initial value of casWirelessServerState1 is 'up(1)' at system
+             re-initialization. This will only transition to 'dead(2)'
+             if an attempt to communicate fails and dead criteria are met.
+            "
+        ::= { casStatisticsEntry 90 }
+
+casWirelessServerState2 OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up(1),
+                        dead(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The wireless server state of the 2nd wireless instance.
+
+                 up(1)   - The server is alive and responding to requests.
+
+                 dead(2) - The server is dead and fails to respond to requests.
+
+             A server is marked dead if dead criteria are met
+
+             A server is marked up again when
+             1. configured dead timer expires
+             2. when the server responds to probes AAA client
+
+             The initial value of casWirelessServerState2 is 'up(1)' at system
+             re-initialization. This will only transition to 'dead(2)'
+             if an attempt to communicate fails and dead criteria are met.
+            "
+        ::= { casStatisticsEntry 91 }
+
+casWirelessServerState3 OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up(1),
+                        dead(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The wireless server state of the 3rd wireless instance.
+
+                 up(1)   - The server is alive and responding to requests.
+
+                 dead(2) - The server is dead and fails to respond to requests.
+
+             A server is marked dead if dead criteria are met
+
+             A server is marked up again when
+             1. configured dead timer expires
+             2. when the server responds to probes AAA client
+
+             The initial value of casWirelessServerState3 is 'up(1)' at system
+             re-initialization. This will only transition to 'dead(2)'
+             if an attempt to communicate fails and dead criteria are met.
+            "
+        ::= { casStatisticsEntry 92 }
+
+casWirelessServerState4 OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up(1),
+                        dead(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The wireless server state of the 4th wireless instance.
+
+                 up(1)   - The server is alive and responding to requests.
+
+                 dead(2) - The server is dead and fails to respond to requests.
+
+             A server is marked dead if dead criteria are met
+
+             A server is marked up again when
+             1. configured dead timer expires
+             2. when the server responds to probes AAA client
+
+             The initial value of casWirelessServerState4 is 'up(1)' at system
+             re-initialization. This will only transition to 'dead(2)'
+             if an attempt to communicate fails and dead criteria are met.
+            "
+        ::= { casStatisticsEntry 93 }
+
+casWirelessServerState5 OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up(1),
+                        dead(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The wireless server state of the 5th wireless instance.
+
+                 up(1)   - The server is alive and responding to requests.
+
+                 dead(2) - The server is dead and fails to respond to requests.
+
+             A server is marked dead if dead criteria are met
+
+             A server is marked up again when
+             1. configured dead timer expires
+             2. when the server responds to probes AAA client
+
+             The initial value of casWirelessServerState5 is 'up(1)' at system
+             re-initialization. This will only transition to 'dead(2)'
+             if an attempt to communicate fails and dead criteria are met.
+            "
+        ::= { casStatisticsEntry 94 }
+
+casWirelessServerState6 OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up(1),
+                        dead(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The wireless server state of the 6th wireless instance.
+
+                 up(1)   - The server is alive and responding to requests.
+
+                 dead(2) - The server is dead and fails to respond to requests.
+
+             A server is marked dead if dead criteria are met
+
+             A server is marked up again when
+             1. configured dead timer expires
+             2. when the server responds to probes AAA client
+
+             The initial value of casWirelessServerState6 is 'up(1)' at system
+             re-initialization. This will only transition to 'dead(2)'
+             if an attempt to communicate fails and dead criteria are met.
+            "
+        ::= { casStatisticsEntry 95 }
+
+casWirelessServerState7 OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up(1),
+                        dead(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The wireless server state of the 7th wireless instance.
+
+                 up(1)   - The server is alive and responding to requests.
+
+                 dead(2) - The server is dead and fails to respond to requests.
+
+             A server is marked dead if dead criteria are met
+
+             A server is marked up again when
+             1. configured dead timer expires
+             2. when the server responds to probes AAA client
+
+             The initial value of casWirelessServerState7 is 'up(1)' at system
+             re-initialization. This will only transition to 'dead(2)'
+             if an attempt to communicate fails and dead criteria are met.
+            "
+        ::= { casStatisticsEntry 96 }
+
+casWirelessDuration0 OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object provides the elapsed time of the 0th wireless instance
+             in its current state as shown in casWirelessServerState0.
+            "
+        ::= { casStatisticsEntry 97 }
+
+casWirelessDuration1 OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object provides the elapsed time of the 1st wireless instance
+             in its current state as shown in casWirelessServerState1.
+            "
+        ::= { casStatisticsEntry 98 }
+
+casWirelessDuration2 OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object provides the elapsed time of the 2nd wireless instance
+             in its current state as shown in casWirelessServerState2.
+            "
+        ::= { casStatisticsEntry 99 }
+
+casWirelessDuration3 OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object provides the elapsed time of the 3rd wireless instance
+             in its current state as shown in casWirelessServerState3.
+            "
+        ::= { casStatisticsEntry 100 }
+
+casWirelessDuration4 OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object provides the elapsed time of the 4th wireless instance
+             in its current state as shown in casWirelessServerState4.
+            "
+        ::= { casStatisticsEntry 101 }
+
+casWirelessDuration5 OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object provides the elapsed time of the 5th wireless instance
+             in its current state as shown in casWirelessServerState5.
+            "
+        ::= { casStatisticsEntry 102 }
+
+casWirelessDuration6 OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object provides the elapsed time of the 6th wireless instance
+             in its current state as shown in casWirelessServerState6.
+            "
+        ::= { casStatisticsEntry 103 }
+
+casWirelessDuration7 OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object provides the elapsed time of the 7th wireless instance
+             in its current state as shown in casWirelessServerState7.
+            "
+        ::= { casStatisticsEntry 104 }
+
+casWirelessPreDuration0 OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This object provides the elapsed time of the Server
+            in the 0th wireless instance in its previous state prior
+            to the most recent transition of casWirelessServerState0.
+            "
+        ::= { casStatisticsEntry 105 }
+
+casWirelessPreDuration1 OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This object provides the elapsed time of the Server
+            in the 1st wireless instance in its previous state prior
+            to the most recent transition of casWirelessServerState1.
+            "
+        ::= { casStatisticsEntry 106 }
+
+casWirelessPreDuration2 OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This object provides the elapsed time of the Server
+            in the 2nd wireless instance in its previous state prior
+            to the most recent transition of casWirelessServerState2.
+            "
+        ::= { casStatisticsEntry 107 }
+
+casWirelessPreDuration3 OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This object provides the elapsed time of the Server
+            in the 3rd wireless instance in its previous state prior
+            to the most recent transition of casWirelessServerState3.
+            "
+        ::= { casStatisticsEntry 108 }
+
+casWirelessPreDuration4 OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object provides the elapsed time of the Server
+            in the 4th wireless instance in its previous state prior
+            to the most recent transition of casWirelessServerState4.
+            "
+        ::= { casStatisticsEntry 109 }
+
+casWirelessPreDuration5 OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object provides the elapsed time of the Server
+            in the 5th wireless instance in its previous state prior
+            to the most recent transition of casWirelessServerState5.
+            "
+        ::= { casStatisticsEntry 110 }
+
+casWirelessPreDuration6 OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object provides the elapsed time of the Server
+            in the 6th wireless instance in its previous state prior
+            to the most recent transition of casWirelessServerState6.
+            "
+        ::= { casStatisticsEntry 111 }
+
+casWirelessPreDuration7 OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object provides the elapsed time of the Server
+            in the 7th wireless instance in its previous state prior
+            to the most recent transition of casWirelessServerState7.
+            "
+        ::= { casStatisticsEntry 112 }
+
+casWirelessTotalDeadTime OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total elapsed time all 8 server's
+            casWirelessServerState has had the value 'dead(2)'
+             since system re-initialization.
+            "
+        ::= { casStatisticsEntry 113 }
+
+casWirelessDeadCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of times all 8 server's
+            casWirelessServerState have transitioned to 'dead(2)'
+             since system re-initialization.
+            "
+        ::= { casStatisticsEntry 114 }
+
+casQuarantined OBJECT-TYPE
+        SYNTAX      INTEGER  {
+                        yes(1),
+                        no(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "current test requests outstanding for the specified server.
+
+            yes(1)   - server has outstanding requests.
+            no(2)    - server has no outstanding requests.
+
+            The initial value of casQuarantined is 'no(2)' at system
+             re-initialization. This will only transition to 'yes(1)'
+             if the specified server has been quarantined.
+            "
+        ::= { casStatisticsEntry 115 }
 
 
 -- ******************************************************************

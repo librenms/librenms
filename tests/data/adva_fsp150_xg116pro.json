@@ -130,7 +130,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.2544.1.12.25.1.1.1.24.1.1",
                     "sensor_index": "f3ErpGroupNodeState.1.1",
                     "sensor_type": "f3ErpGroupNodeState",
-                    "sensor_descr": "",
+                    "sensor_descr": "Node 1.1 State:",
                     "group": "ERP Status",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -155,7 +155,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.2544.1.12.25.1.3.1.4.1.1.1",
                     "sensor_index": "f3ErpUnitPortRole.1.1.1",
                     "sensor_type": "f3ErpUnitPortRole",
-                    "sensor_descr": "Port : cmEthernetTrafficPortIndex.1.1.1.7",
+                    "sensor_descr": "Port: 1",
                     "group": "ERP Node State",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -180,7 +180,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.2544.1.12.25.1.3.1.4.1.1.2",
                     "sensor_index": "f3ErpUnitPortRole.1.1.2",
                     "sensor_type": "f3ErpUnitPortRole",
-                    "sensor_descr": "Port : cmEthernetTrafficPortIndex.1.1.1.8",
+                    "sensor_descr": "Port: 2",
                     "group": "ERP Node State",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -205,7 +205,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.2544.1.12.25.1.3.1.5.1.1.1",
                     "sensor_index": "f3ErpUnitPortStatus.1.1.1",
                     "sensor_type": "f3ErpUnitPortStatus",
-                    "sensor_descr": "Port : cmEthernetTrafficPortIndex.1.1.1.7",
+                    "sensor_descr": "Port: 1",
                     "group": "ERP Port Status",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -230,7 +230,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.2544.1.12.25.1.3.1.5.1.1.2",
                     "sensor_index": "f3ErpUnitPortStatus.1.1.2",
                     "sensor_type": "f3ErpUnitPortStatus",
-                    "sensor_descr": "Port : cmEthernetTrafficPortIndex.1.1.1.8",
+                    "sensor_descr": "Port: 2",
                     "group": "ERP Port Status",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -247,6 +247,156 @@
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "f3ErpUnitPortStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2544.1.12.3.1.4.1.3.1.1.6",
+                    "sensor_index": "CM-ENTITY-MIB::fanAdminState.1.1.6",
+                    "sensor_type": "fanAdminState",
+                    "sensor_descr": "fan Admin State",
+                    "group": "Fan",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "fanAdminState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2544.1.12.3.1.4.1.3.1.1.6",
+                    "sensor_index": "CM-ENTITY-MIB::fanOperationalState.1.1.6",
+                    "sensor_type": "fanOperationalState",
+                    "sensor_descr": "fan Oper State",
+                    "group": "Fan",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "fanOperationalState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2544.1.12.3.1.4.1.3.1.1.4",
+                    "sensor_index": "CM-ENTITY-MIB::psuAdminState.1.1.4",
+                    "sensor_type": "psuAdminState",
+                    "sensor_descr": "dc psu 4 Admin State",
+                    "group": "Psu  id 4",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "psuAdminState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2544.1.12.3.1.4.1.3.1.1.5",
+                    "sensor_index": "CM-ENTITY-MIB::psuAdminState.1.1.5",
+                    "sensor_type": "psuAdminState",
+                    "sensor_descr": "dc psu 5 Admin State",
+                    "group": "Psu  id 5",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "psuAdminState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2544.1.12.3.1.4.1.3.1.1.4",
+                    "sensor_index": "CM-ENTITY-MIB::psuOperationalState.1.1.4",
+                    "sensor_type": "psuOperationalState",
+                    "sensor_descr": "dc psu 4 Oper State",
+                    "group": "Psu  id 4",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "psuOperationalState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2544.1.12.3.1.4.1.3.1.1.5",
+                    "sensor_index": "CM-ENTITY-MIB::psuOperationalState.1.1.5",
+                    "sensor_type": "psuOperationalState",
+                    "sensor_descr": "dc psu 5 Oper State",
+                    "group": "Psu  id 5",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "psuOperationalState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -353,268 +503,314 @@
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Primary NTP Server Failed",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Secondary NTP Server Failed",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Equipment Fault",
-                    "state_draw_graph": 0,
                     "state_value": 27,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "PSU A Failed",
-                    "state_draw_graph": 0,
                     "state_value": 34,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "PSU B Failed",
-                    "state_draw_graph": 0,
                     "state_value": 35,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "SFP Mismatch",
-                    "state_draw_graph": 0,
                     "state_value": 53,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Over Temperature",
-                    "state_draw_graph": 0,
                     "state_value": 59,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Under Temperature",
-                    "state_draw_graph": 0,
                     "state_value": 60,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Input Power Fault",
-                    "state_draw_graph": 0,
                     "state_value": 65,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "SNMP Dying Gasp - Host Unreachable",
-                    "state_draw_graph": 0,
                     "state_value": 86,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "SFP Non Qualified",
-                    "state_draw_graph": 0,
                     "state_value": 90,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Power No Input Unit Fault",
-                    "state_draw_graph": 0,
                     "state_value": 93,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "XFP Mismatch",
-                    "state_draw_graph": 0,
                     "state_value": 121,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "XFP Non Qualified",
-                    "state_draw_graph": 0,
                     "state_value": 122,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "LAG Member Failed",
-                    "state_draw_graph": 0,
                     "state_value": 125,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "DB Corruption",
-                    "state_draw_graph": 0,
                     "state_value": 135,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "XFP Wavelength Mismatch",
-                    "state_draw_graph": 0,
                     "state_value": 284,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Loopback Active",
-                    "state_draw_graph": 0,
                     "state_value": 288,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Key Exchange Failed",
-                    "state_draw_graph": 0,
                     "state_value": 347,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Key Exchange Auth Password Missing",
-                    "state_draw_graph": 0,
                     "state_value": 348,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Power No Input 2",
-                    "state_draw_graph": 0,
                     "state_value": 389,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Key Exchange Stop",
-                    "state_draw_graph": 0,
                     "state_value": 390,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "HTTPS SSL Certificate Expired",
-                    "state_draw_graph": 0,
                     "state_value": 403,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Fan Fail",
-                    "state_draw_graph": 0,
                     "state_value": 409,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "PSU A Input Fail",
-                    "state_draw_graph": 0,
                     "state_value": 417,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "PSU B Input Fail",
-                    "state_draw_graph": 0,
                     "state_value": 418,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "f3ErpGroupNodeState",
                     "state_descr": "IDLE",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "f3ErpGroupNodeState",
                     "state_descr": "PROTECTION",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "f3ErpGroupNodeState",
                     "state_descr": "MANUAL",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "f3ErpGroupNodeState",
                     "state_descr": "FORCED",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "f3ErpGroupNodeState",
                     "state_descr": "PENDING",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "f3ErpUnitPortRole",
                     "state_descr": "NONE",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "f3ErpUnitPortRole",
                     "state_descr": "NEIGHBOR",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "f3ErpUnitPortRole",
                     "state_descr": "RPL OWNER",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "f3ErpUnitPortStatus",
                     "state_descr": "unblocked",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "f3ErpUnitPortStatus",
                     "state_descr": "blocked RPL",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "f3ErpUnitPortStatus",
                     "state_descr": "blocked pending",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "f3ErpUnitPortStatus",
                     "state_descr": "subring interconnect",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 3
+                },
+                {
+                    "state_name": "fanAdminState",
+                    "state_descr": "in-service",
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "fanAdminState",
+                    "state_descr": "management",
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "fanAdminState",
+                    "state_descr": "maintenance",
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "fanAdminState",
+                    "state_descr": "disabled",
+                    "state_value": 4,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "fanAdminState",
+                    "state_descr": "unassigned",
+                    "state_value": 5,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "fanOperationalState",
+                    "state_descr": "normal",
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "fanOperationalState",
+                    "state_descr": "outage",
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "psuAdminState",
+                    "state_descr": "in-service",
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "psuAdminState",
+                    "state_descr": "management",
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "psuAdminState",
+                    "state_descr": "maintenance",
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "psuAdminState",
+                    "state_descr": "disabled",
+                    "state_value": 4,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "psuAdminState",
+                    "state_descr": "unassigned",
+                    "state_value": 5,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "psuOperationalState",
+                    "state_descr": "normal",
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "psuOperationalState",
+                    "state_descr": "outage",
+                    "state_value": 2,
+                    "state_generic_value": 2
                 }
             ]
         },
@@ -727,7 +923,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.2544.1.12.25.1.1.1.24.1.1",
                     "sensor_index": "f3ErpGroupNodeState.1.1",
                     "sensor_type": "f3ErpGroupNodeState",
-                    "sensor_descr": "",
+                    "sensor_descr": "Node 1.1 State:",
                     "group": "ERP Status",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -752,7 +948,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.2544.1.12.25.1.3.1.4.1.1.1",
                     "sensor_index": "f3ErpUnitPortRole.1.1.1",
                     "sensor_type": "f3ErpUnitPortRole",
-                    "sensor_descr": "Port : cmEthernetTrafficPortIndex.1.1.1.7",
+                    "sensor_descr": "Port: 1",
                     "group": "ERP Node State",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -777,7 +973,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.2544.1.12.25.1.3.1.4.1.1.2",
                     "sensor_index": "f3ErpUnitPortRole.1.1.2",
                     "sensor_type": "f3ErpUnitPortRole",
-                    "sensor_descr": "Port : cmEthernetTrafficPortIndex.1.1.1.8",
+                    "sensor_descr": "Port: 2",
                     "group": "ERP Node State",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -802,7 +998,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.2544.1.12.25.1.3.1.5.1.1.1",
                     "sensor_index": "f3ErpUnitPortStatus.1.1.1",
                     "sensor_type": "f3ErpUnitPortStatus",
-                    "sensor_descr": "Port : cmEthernetTrafficPortIndex.1.1.1.7",
+                    "sensor_descr": "Port: 1",
                     "group": "ERP Port Status",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -827,7 +1023,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.2544.1.12.25.1.3.1.5.1.1.2",
                     "sensor_index": "f3ErpUnitPortStatus.1.1.2",
                     "sensor_type": "f3ErpUnitPortStatus",
-                    "sensor_descr": "Port : cmEthernetTrafficPortIndex.1.1.1.8",
+                    "sensor_descr": "Port: 2",
                     "group": "ERP Port Status",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -844,6 +1040,156 @@
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "f3ErpUnitPortStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2544.1.12.3.1.4.1.3.1.1.6",
+                    "sensor_index": "CM-ENTITY-MIB::fanAdminState.1.1.6",
+                    "sensor_type": "fanAdminState",
+                    "sensor_descr": "fan Admin State",
+                    "group": "Fan",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": 1,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "fanAdminState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2544.1.12.3.1.4.1.3.1.1.6",
+                    "sensor_index": "CM-ENTITY-MIB::fanOperationalState.1.1.6",
+                    "sensor_type": "fanOperationalState",
+                    "sensor_descr": "fan Oper State",
+                    "group": "Fan",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": 1,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "fanOperationalState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2544.1.12.3.1.4.1.3.1.1.4",
+                    "sensor_index": "CM-ENTITY-MIB::psuAdminState.1.1.4",
+                    "sensor_type": "psuAdminState",
+                    "sensor_descr": "dc psu 4 Admin State",
+                    "group": "Psu  id 4",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "psuAdminState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2544.1.12.3.1.4.1.3.1.1.5",
+                    "sensor_index": "CM-ENTITY-MIB::psuAdminState.1.1.5",
+                    "sensor_type": "psuAdminState",
+                    "sensor_descr": "dc psu 5 Admin State",
+                    "group": "Psu  id 5",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "psuAdminState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2544.1.12.3.1.4.1.3.1.1.4",
+                    "sensor_index": "CM-ENTITY-MIB::psuOperationalState.1.1.4",
+                    "sensor_type": "psuOperationalState",
+                    "sensor_descr": "dc psu 4 Oper State",
+                    "group": "Psu  id 4",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "psuOperationalState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2544.1.12.3.1.4.1.3.1.1.5",
+                    "sensor_index": "CM-ENTITY-MIB::psuOperationalState.1.1.5",
+                    "sensor_type": "psuOperationalState",
+                    "sensor_descr": "dc psu 5 Oper State",
+                    "group": "Psu  id 5",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "psuOperationalState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -950,268 +1296,314 @@
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Primary NTP Server Failed",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Secondary NTP Server Failed",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Equipment Fault",
-                    "state_draw_graph": 0,
                     "state_value": 27,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "PSU A Failed",
-                    "state_draw_graph": 0,
                     "state_value": 34,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "PSU B Failed",
-                    "state_draw_graph": 0,
                     "state_value": 35,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "SFP Mismatch",
-                    "state_draw_graph": 0,
                     "state_value": 53,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Over Temperature",
-                    "state_draw_graph": 0,
                     "state_value": 59,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Under Temperature",
-                    "state_draw_graph": 0,
                     "state_value": 60,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Input Power Fault",
-                    "state_draw_graph": 0,
                     "state_value": 65,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "SNMP Dying Gasp - Host Unreachable",
-                    "state_draw_graph": 0,
                     "state_value": 86,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "SFP Non Qualified",
-                    "state_draw_graph": 0,
                     "state_value": 90,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Power No Input Unit Fault",
-                    "state_draw_graph": 0,
                     "state_value": 93,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "XFP Mismatch",
-                    "state_draw_graph": 0,
                     "state_value": 121,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "XFP Non Qualified",
-                    "state_draw_graph": 0,
                     "state_value": 122,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "LAG Member Failed",
-                    "state_draw_graph": 0,
                     "state_value": 125,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "DB Corruption",
-                    "state_draw_graph": 0,
                     "state_value": 135,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "XFP Wavelength Mismatch",
-                    "state_draw_graph": 0,
                     "state_value": 284,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Loopback Active",
-                    "state_draw_graph": 0,
                     "state_value": 288,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Key Exchange Failed",
-                    "state_draw_graph": 0,
                     "state_value": 347,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Key Exchange Auth Password Missing",
-                    "state_draw_graph": 0,
                     "state_value": 348,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Power No Input 2",
-                    "state_draw_graph": 0,
                     "state_value": 389,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Key Exchange Stop",
-                    "state_draw_graph": 0,
                     "state_value": 390,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "HTTPS SSL Certificate Expired",
-                    "state_draw_graph": 0,
                     "state_value": 403,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "Fan Fail",
-                    "state_draw_graph": 0,
                     "state_value": 409,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "PSU A Input Fail",
-                    "state_draw_graph": 0,
                     "state_value": 417,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmSysCondType",
                     "state_descr": "PSU B Input Fail",
-                    "state_draw_graph": 0,
                     "state_value": 418,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "f3ErpGroupNodeState",
                     "state_descr": "IDLE",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "f3ErpGroupNodeState",
                     "state_descr": "PROTECTION",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "f3ErpGroupNodeState",
                     "state_descr": "MANUAL",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "f3ErpGroupNodeState",
                     "state_descr": "FORCED",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "f3ErpGroupNodeState",
                     "state_descr": "PENDING",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "f3ErpUnitPortRole",
                     "state_descr": "NONE",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "f3ErpUnitPortRole",
                     "state_descr": "NEIGHBOR",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "f3ErpUnitPortRole",
                     "state_descr": "RPL OWNER",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "f3ErpUnitPortStatus",
                     "state_descr": "unblocked",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "f3ErpUnitPortStatus",
                     "state_descr": "blocked RPL",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "f3ErpUnitPortStatus",
                     "state_descr": "blocked pending",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "f3ErpUnitPortStatus",
                     "state_descr": "subring interconnect",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 3
+                },
+                {
+                    "state_name": "fanAdminState",
+                    "state_descr": "in-service",
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "fanAdminState",
+                    "state_descr": "management",
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "fanAdminState",
+                    "state_descr": "maintenance",
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "fanAdminState",
+                    "state_descr": "disabled",
+                    "state_value": 4,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "fanAdminState",
+                    "state_descr": "unassigned",
+                    "state_value": 5,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "fanOperationalState",
+                    "state_descr": "normal",
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "fanOperationalState",
+                    "state_descr": "outage",
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "psuAdminState",
+                    "state_descr": "in-service",
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "psuAdminState",
+                    "state_descr": "management",
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "psuAdminState",
+                    "state_descr": "maintenance",
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "psuAdminState",
+                    "state_descr": "disabled",
+                    "state_value": 4,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "psuAdminState",
+                    "state_descr": "unassigned",
+                    "state_value": 5,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "psuOperationalState",
+                    "state_descr": "normal",
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "psuOperationalState",
+                    "state_descr": "outage",
+                    "state_value": 2,
+                    "state_generic_value": 2
                 }
             ]
         }
@@ -3046,6 +3438,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Sanmina",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3065,6 +3458,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Sanmina",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3084,6 +3478,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Sanmina",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3103,6 +3498,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3122,6 +3518,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3141,6 +3538,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3160,6 +3558,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3179,6 +3578,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3198,6 +3598,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3217,6 +3618,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3236,6 +3638,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3255,6 +3658,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3274,6 +3678,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3293,6 +3698,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "VAPEL",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3312,6 +3718,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "VAPEL",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3331,6 +3738,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Sanmina",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3350,6 +3758,7 @@
                     "entPhysicalContainedIn": 16,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Sanmina",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3369,6 +3778,7 @@
                     "entPhysicalContainedIn": 14,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "VAPEL",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3388,6 +3798,7 @@
                     "entPhysicalContainedIn": 15,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "VAPEL",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

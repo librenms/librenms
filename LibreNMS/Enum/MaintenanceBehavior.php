@@ -26,7 +26,16 @@ namespace LibreNMS\Enum;
 
 enum MaintenanceBehavior: int
 {
-    case SKIP_ALERTS = 1;
-    case MUTE_ALERTS = 2;
-    case RUN_ALERTS = 3;
+    case SkipAlerts = 1;
+    case MuteAlerts = 2;
+    case RunAlerts = 3;
+
+    public function descr(): string
+    {
+        return match ($this) {
+            self::SkipAlerts => __('alerting.maintenance.behavior.options.skip_alerts') ,
+            self::MuteAlerts => __('alerting.maintenance.behavior.options.mute_alerts'),
+            self::RunAlerts => __('alerting.maintenance.behavior.options.run_alerts'),
+        };
+    }
 }

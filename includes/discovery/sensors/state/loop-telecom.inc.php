@@ -6,14 +6,14 @@ if (! empty($oids)) {
     //Create State Index
     $state_name = 'ccCardState';
     $states = [
-        ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'Empty'],
-        ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'Initializing'],
-        ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'Working'],
-        ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'Unplugged'],
-        ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'Failed'],
-        ['value' => 6, 'generic' => 1, 'graph' => 0, 'descr' => 'UnknownCard'],
-        ['value' => 11, 'generic' => 1, 'graph' => 0, 'descr' => 'BrandMismatch'],
-        ['value' => 12, 'generic' => 1, 'graph' => 0, 'descr' => 'cardTypeMismatch'],
+        ['value' => 1, 'generic' => 3, 'descr' => 'Empty'],
+        ['value' => 2, 'generic' => 1, 'descr' => 'Initializing'],
+        ['value' => 3, 'generic' => 0, 'descr' => 'Working'],
+        ['value' => 4, 'generic' => 1, 'descr' => 'Unplugged'],
+        ['value' => 5, 'generic' => 2, 'descr' => 'Failed'],
+        ['value' => 6, 'generic' => 1, 'descr' => 'UnknownCard'],
+        ['value' => 11, 'generic' => 1, 'descr' => 'BrandMismatch'],
+        ['value' => 12, 'generic' => 1, 'descr' => 'cardTypeMismatch'],
     ];
     //Model names corresponding to ccModelType
     $models = [
@@ -83,7 +83,7 @@ if (! empty($oids)) {
         'ctrl' => 100,
     ];
 
-    $test = create_state_index($state_name, $states);
+    create_state_index($state_name, $states);
     $num_oid = '.1.3.6.1.4.1.823.34441.1.9.1.9.';
     $num_index = 1; //Create a seperate index since $index = the slotname and not the number.
     foreach ($oids as $index => $entry) {
@@ -99,6 +99,6 @@ if (! empty($oids)) {
         }
 
         discover_sensor(null, 'state', $device, $num_oid . $num_index, $index, $state_name, $description, '1', '1', null, null, null, null, $currentValue, 'snmp', null, null, null, 'Line cards');
-        $num_index = $num_index + 1;
+        $num_index += 1;
     }
 }

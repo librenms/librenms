@@ -7,7 +7,7 @@ foreach (dbFetchRows('SELECT * FROM `ports` AS P, `devices` AS D WHERE D.device_
     $ignore = 0;
     if (is_array(\App\Facades\LibrenmsConfig::get('device_traffic_iftype'))) {
         foreach (\App\Facades\LibrenmsConfig::get('device_traffic_iftype') as $iftype) {
-            if (preg_match($iftype . 'i', $port['ifType'])) {
+            if (preg_match($iftype . 'i', (string) $port['ifType'])) {
                 $ignore = 1;
             }
         }
@@ -15,7 +15,7 @@ foreach (dbFetchRows('SELECT * FROM `ports` AS P, `devices` AS D WHERE D.device_
 
     if (is_array(\App\Facades\LibrenmsConfig::get('device_traffic_descr'))) {
         foreach (\App\Facades\LibrenmsConfig::get('device_traffic_descr') as $ifdescr) {
-            if (preg_match($ifdescr . 'i', $port['ifDescr']) || preg_match($ifdescr . 'i', $port['ifName'])) {
+            if (preg_match($ifdescr . 'i', (string) $port['ifDescr']) || preg_match($ifdescr . 'i', (string) $port['ifName'])) {
                 $ignore = 1;
             }
         }

@@ -102,7 +102,7 @@ discovery:
         }
         rename(LibrenmsConfig::get('temp_dir') . "/{$options['o']}.mib", LibrenmsConfig::get('install_dir') . "/mibs/$vendor/$mib_name");
     } elseif ($mib_name) {
-        $tmp_mib = explode('/', $mib_name);
+        $tmp_mib = explode('/', (string) $mib_name);
         $mib_name = array_pop($tmp_mib);
     }
 

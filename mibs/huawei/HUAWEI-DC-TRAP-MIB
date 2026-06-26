@@ -1,10 +1,10 @@
 -- =================================================================
--- Copyright (C) 2004 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: The HUAWEI-DC-TRAP-MIB provides information about DataComm TRAPS
 -- 
 -- Reference:
--- Version:     V1.0
+-- Version:     V2.01
 -- History:
 -- 
 -- =================================================================
@@ -22,26 +22,27 @@
                 FROM SNMPv2-TC     
             OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
                 FROM SNMPv2-CONF            
-            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32
                 FROM SNMPv2-SMI;
     
     
         hwDCTrapMIB MODULE-IDENTITY 
-            LAST-UPDATED "200604240000Z"        -- April 24, 2006 at 00:00 GMT
+            LAST-UPDATED "201507220000Z"        -- April 24, 2006 at 00:00 GMT
             ORGANIZATION 
-                "Huawei Technologies co.,Ltd."
+                "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
-                " R&D BeiJing, Huawei Technologies co.,Ltd.
-                Huawei Bld.,NO.3 Xinxi Rd.,
-                Shang-Di Information Industry Base,
-                Hai-Dian District Beijing P.R. China
-                Zip:100085
-                Http://www.huawei.com
-                E-mail:support@huawei.com "
-            DESCRIPTION 
-                "
-                The HUAWEI-DC-TRAP-MIB provides information about DataComm TRAPS.
-                "
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
+            DESCRIPTION "The HUAWEI-DC-TRAP-MIB provides information about DataComm TRAPS."
+            
+            REVISION    "201507220000Z"
+			      DESCRIPTION "modify name hwFanFail->hwDCFanFail;hwFanFailResume->hwDCFanFailResume"	
+			      
             ::= { hwDatacomm 37 }
         
     
@@ -64,7 +65,7 @@
             ::= { hwDCTrapControl 1 }
         
         hwTunnelGroupID OBJECT-TYPE
-            SYNTAX INTEGER (0..2047)
+            SYNTAX Integer32 (0..2047)
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
@@ -432,14 +433,14 @@
                 "Fan hardware failure!"
             ::= { hwDCTraps 50 }
         
-        hwFanFail NOTIFICATION-TYPE
+        hwDCFanFail NOTIFICATION-TYPE
             OBJECTS { entPhysicalName }
             STATUS current
             DESCRIPTION 
                 "Fan failure!"
             ::= { hwDCTraps 51 }
         
-        hwFanFailResume NOTIFICATION-TYPE
+        hwDCFanFailResume NOTIFICATION-TYPE
             OBJECTS { entPhysicalName }
             STATUS current
             DESCRIPTION 
@@ -975,6 +976,14 @@
             DESCRIPTION 
                 "Command lines can be entered because data smooth ends."
             ::= { hwDCTraps 157 }
+            
+        hwFanUp NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Fan register!"
+            ::= { hwDCTraps 158 }
+    
         hwDCTrapConformance OBJECT IDENTIFIER ::= { hwDCTrapMIB 3 }
         
 --    conformance information
@@ -999,8 +1008,8 @@
                 hwVoltSensorFail, hwVoltSensorFailResume, hwVoltBtmC, hwVoltBtmCResume, hwVoltSprC, 
                 hwVoltSprCResume, hwVoltBtmM, hwVoltBtmMResume, hwVoltSprM, hwVoltSprMResume, 
                 hwTempSensorFail, hwTempSensorFailResume, hwTempMnr, hwTempMnrResume, hwTempMjr, 
-                hwTempMjrResume, hwTempCtl, hwTempCtlResume, hwFanHFail, hwFanFail, 
-                hwFanFailResume, hwFanAbsent, hwFanAbsentResume, hwFanCabUN, hwFanCabUNResume, 
+                hwTempMjrResume, hwTempCtl, hwTempCtlResume, hwFanHFail, hwDCFanFail, 
+                hwDCFanFailResume, hwFanAbsent, hwFanAbsentResume, hwFanCabUN, hwFanCabUNResume, 
                 hwPwrFail, hwPwrFailResume, hwPwrAbsent, hwPwrAbsentResume, hwPwrCabUN, 
                 hwPwrCabUNResume, hwLCDHFail, hwLCDFail, hwLCDAbsent, hwLCDAbsentResume, 
                 hwLCDCabUN, hwLCDCabUNResume, hwROMFail, hwMonitorBUSFail, hwMonitorBUSFailResume, 
@@ -1014,7 +1023,7 @@
                 hwSuperChangeSuccesful, hwSuperChangeFailure, hwEpldAbnormal, hwPhyChipAbnormal, hwSerdesAbnormal, 
                 hwBoardAbnormal, hwFeChannelAbnormal, hwParityCheckAbnormal, hwPhyClockAbnormal, hwPortAutoNegotiateFail, hwPortSemiduplex,
                 hwScuStartModeSetFail, hwMemoryExhaust, hwMemoryExhaustClear, hwMethAbnormal, hwLpuNotTight,hwLicenseFail,
-                hwHaBatchBegin,hwHaBatchEnd,hwHaSmoothBegin,hwHaSmoothEnd}
+                hwHaBatchBegin,hwHaBatchEnd,hwHaSmoothBegin,hwHaSmoothEnd,hwFanUp}
             STATUS current
             DESCRIPTION 
                 "The notification group defined for Datacomm products."

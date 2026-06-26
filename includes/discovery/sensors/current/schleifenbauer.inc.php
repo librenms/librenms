@@ -5,7 +5,7 @@ $divisor = 100;
 
 foreach ($pre_cache['sdbMgmtCtrlDevUnitAddress'] ?? [] as $sdbMgmtCtrlDevUnitAddress => $sdbDevIdIndex) {
     foreach ($pre_cache['sdbDevInActualCurrent'][$sdbDevIdIndex] as $sdbDevInIndex => $sdbDevInActualCurrent) {
-        $name = trim($pre_cache['sdbDevInName'][$sdbDevIdIndex][$sdbDevInIndex], '"');
+        $name = trim((string) $pre_cache['sdbDevInName'][$sdbDevIdIndex][$sdbDevInIndex], '"');
         $current_oid = ".1.3.6.1.4.1.31034.12.1.1.2.6.1.1.5.$sdbDevIdIndex.$sdbDevInIndex";
         $current = $sdbDevInActualCurrent / $divisor;
         $serial_input = $pre_cache['sdbDevIdSerialNumber'][$sdbDevIdIndex] . '-L' . $sdbDevInIndex;
@@ -24,7 +24,7 @@ if (isset($pre_cache['sdbDevOutMtActualCurrent']) && is_array($pre_cache['sdbDev
     $unit = current($pre_cache['sdbMgmtCtrlDevUnitAddress']);
 
     foreach ($pre_cache['sdbDevOutMtActualCurrent'] as $sdbDevOutMtIndex => $sdbDevOutMtActualCurrent) {
-        $name = trim($pre_cache['sdbDevOutName'][$sdbDevOutMtIndex], '"');
+        $name = trim((string) $pre_cache['sdbDevOutName'][$sdbDevOutMtIndex], '"');
         $current_oid = ".1.3.6.1.4.1.31034.12.1.1.2.7.2.1.5.$unit.$sdbDevOutMtIndex";
         $current = $sdbDevOutMtActualCurrent / $divisor;
         $serial_output = $pre_cache['sdbDevIdSerialNumber'][$unit] . ' Outlet ' . $sdbDevOutMtIndex;

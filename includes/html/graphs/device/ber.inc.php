@@ -1,8 +1,6 @@
 <?php
 
-$class = 'ber';
-$unit = '';
-$unit_long = '';
+$class = \LibreNMS\Enum\Sensor::Ber;
 
-$rrd_options .= ' -o';
+$graph_params->logarithmic = true;
 require 'includes/html/graphs/device/sensor.inc.php';

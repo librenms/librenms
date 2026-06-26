@@ -27,6 +27,7 @@
 namespace App\Http\Controllers\Maps;
 
 use App\Http\Controllers\Controller;
+use App\Models\CustomMap;
 use App\Models\CustomMapNodeImage;
 use enshrined\svgSanitize\Sanitizer;
 use Illuminate\Contracts\View\View;
@@ -39,7 +40,7 @@ class CustomMapNodeImageController extends Controller
 {
     public function index(): View
     {
-        $this->authorize('update');
+        $this->authorize('custom-map.update');
 
         return view('map.custom-nodeimage-manage', [
             'images' => CustomMapNodeImage::orderBy('name')->get(),
@@ -48,11 +49,13 @@ class CustomMapNodeImageController extends Controller
 
     public function show(CustomMapNodeImage $image)
     {
+        $this->authorize('viewAny', CustomMap::class);
+
         // explicitly use file cache
         try {
             $imageContent = Cache::driver('file')
                 ->remember($this->getCacheKey($image), new \DateInterval('P30D'), fn () => $image->image);
-        } catch (\ErrorException $e) {
+        } catch (\ErrorException) {
             // if cache fails, just load from database :(
             $imageContent = $image->image;
         }
@@ -68,7 +71,8 @@ class CustomMapNodeImageController extends Controller
 
     public function store(FormRequest $request): JsonResponse
     {
-        $this->authorize('update');
+        $this->authorize('custom-map.update');
+
         $this->validate($request, [
             'image' => 'image|mimes:png,jpg,svg,gif',
             'name' => 'string',
@@ -87,14 +91,15 @@ class CustomMapNodeImageController extends Controller
         return response()->json([
             'result' => 'success',
             'id' => $image->custom_map_node_image_id,
-            'name' => $image->name,
+            'name' => htmlentities($image->name),
             'version' => $image->version,
         ]);
     }
 
     public function update(FormRequest $request, CustomMapNodeImage $image): JsonResponse
     {
-        $this->authorize('update', $image);
+        $this->authorize('custom-map.update');
+
         $this->validate($request, [
             'image' => 'image|mimes:png,jpg,svg,gif',
             'name' => 'string',
@@ -105,14 +110,15 @@ class CustomMapNodeImageController extends Controller
 
         return response()->json([
             'result' => 'success',
-            'name' => $request['name'],
+            'name' => htmlentities($image->name),
             'version' => $image->version,
         ]);
     }
 
     public function destroy(CustomMapNodeImage $image): Response
     {
-        $this->authorize('update', $image);
+        $this->authorize('custom-map.update');
+
         if ($image->nodes->count() > 0) {
             return response('Image is in use', 403)
                       ->header('Content-Type', 'text/plain');
@@ -138,7 +144,7 @@ class CustomMapNodeImageController extends Controller
             Cache::driver('file')->forget($this->getCacheKey($image)); // clear old image cache if present
 
             $image->image = $image_content;
-            $image->version = md5($image_content);
+            $image->version = md5((string) $image_content);
             $image->mime = $mimeType;
         }
         $image->name = $request->name;

@@ -329,11 +329,11 @@ the alert rule won't match. The alert rule is ignored.
 
 Some properties used for alerting (ending in `_prev`) are only updated when a
 change is detected, and not every time the poller runs. This means that if you
-make a permanant change to your network such as removing a device, performing a
+make a permanent change to your network such as removing a device, performing a
 major firmware upgrade, or downgrading a WAN connection, you may be stuck with
 some unresolvable alerts.
 
-If a port will be permantly down, it's best practice to configure it to be
+If a port will be permanently down, it's best practice to configure it to be
 administratively down on the device to prevent malicious access. You can then
 only run alerts on ports with `ifAdminStatus = up`. Otherwise, you'll need to
 reset the device port state history.
@@ -459,7 +459,7 @@ exit;
 ```
 - Enable and restart MySQL server.
 - Edit your `config.php` file to point the install to the new database server location.
-- **Very important**: On your LibreNMS server, inside your install directory is a `.env` file, in it you need to edit the `DBHOST` paramater to point to your new server location.
+- **Very important**: On your LibreNMS server, inside your install directory is a `.env` file, in it you need to edit the `DBHOST` parameter to point to your new server location.
 - After all this is done, enable all the cron entries again and start apache.
 ### <a name='optional-requirements-for-snmpv3-sha2-auth'>What are the "optional requirements message" when I add SNMPv3 devices?</a>
 When you add a device via the WebUI you may see a little message stating "Optional requirements are not met so some options are disabled". Do not panic. This simply means your system does not contain **openssl >= 1.1** and **net-snmp >= 5.8**, which are the minimum specifications needed to be able to use SHA-224|256|384|512 as auth algorithms.
@@ -490,8 +490,8 @@ COMMUNITY. Use `snmpwalk` instead of `snmpbulkwalk` for v1 devices.
 > Feel free to use another service!
 
 ```bash
-./discovery.php -h HOSTNAME -d | curl --data-binary @- https://paste.rs/
-lnms device:poll HOSTNAME -vv | curl --data-binary @- https://paste.rs/
+lnms device:discover -vv HOSTNAME | curl --data-binary @- https://paste.rs/
+lnms device:poll -vv HOSTNAME | curl --data-binary @- https://paste.rs/
 snmpbulkwalk -OUneb -v2c -c COMMUNITY HOSTNAME . | curl --data-binary @- https://paste.rs/
 ```
 

@@ -17,7 +17,7 @@ $regexp = '/
 $oids = snmp_walk($device, '.1.3.6.1.4.1.22626.1.5.2', '-OsqnU', '');
 if ($oids) {
     $out = [];
-    foreach (explode("\n", $oids) as $line) {
+    foreach (explode("\n", (string) $oids) as $line) {
         preg_match($regexp, $line, $match);
         if ($match['name']) {
             $out[$match['id']]['name'] = $match['name'];

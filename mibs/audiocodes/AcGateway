@@ -4,29 +4,30 @@ AcGateway DEFINITIONS ::= BEGIN
 
    IMPORTS
        
-              OBJECT-TYPE, 
-       MODULE-IDENTITY                             FROM SNMPv2-SMI
-       TAddress, 
-       DisplayString, 
-       DateAndTime, TEXTUAL-CONVENTION             FROM SNMPv2-TC
-		RowPointer									FROM SNMPv2-TC
-       IpAddress                                   FROM RFC1155-SMI
-        Unsigned32,
-		Integer32,
-	enterprises                                FROM SNMPv2-SMI
-        RowStatus      			 	   FROM SNMPv2-TC       
+	OBJECT-TYPE, 
+	MODULE-IDENTITY                             FROM SNMPv2-SMI
+	TAddress, 
+	DisplayString, 
+	DateAndTime, TEXTUAL-CONVENTION             FROM SNMPv2-TC
+	RowPointer                                  FROM SNMPv2-TC
+	IpAddress                                   FROM RFC1155-SMI
+	Unsigned32,
+	Integer32,
+	Gauge32,			
+	enterprises                                 FROM SNMPv2-SMI
+	RowStatus                                   FROM SNMPv2-TC       
 
-		SnmpAdminString								FROM SNMP-FRAMEWORK-MIB
+	SnmpAdminString                             FROM SNMP-FRAMEWORK-MIB
 	audioCodes,
 	acRegistrations,
 	acGeneric,
-	acProducts,acBoardMibs                     FROM AUDIOCODES-TYPES-MIB
-	InetAddress, InetAddressType			FROM INET-ADDRESS-MIB;
+	acProducts,acBoardMibs                      FROM AUDIOCODES-TYPES-MIB
+	InetAddress, InetAddressType                FROM INET-ADDRESS-MIB;
        
 	
 
 acGateway MODULE-IDENTITY
-	LAST-UPDATED "201303060109Z"          --Wednesday, March 6 2013
+	LAST-UPDATED "202012200628Z"          --Sunday, December 20 2020
 	ORGANIZATION "AudioCodes Ltd"
     	CONTACT-INFO
     	"Postal: Support
@@ -105,7 +106,7 @@ AC INI-Param: CHANNELSELECTMODE"
        MAX-ACCESS not-accessible
        STATUS current
        DESCRIPTION
-           "The table defines trunk/hunt groups and phone numbers for gateway endpoints. 
+           "The table defines trunk/hunt groups and phone numbers for gateway endpoints.
 The endpoints that aren’t defined will be disabled."
        ::= {channelsSetting 21}
 
@@ -753,6 +754,30 @@ AC INI-Param: ALTROUTINGTEL2IPKEEPALIVETIME"
 
 
 
+     manipulationAndRoutingIP2TelTaggingDestDialPlanIndex OBJECT-TYPE
+       SYNTAX Integer32 (-1..7)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "IP to Tel Tagging Destination Dial Plan Index.
+Access: Instant.
+AC INI-Param: IP2TELTAGGINGDESTDIALPLANINDEX"
+       ::= {manipulationAndRouting 13}
+
+
+
+     manipulationAndRoutingIP2TelTaggingSourceDialPlanIndex OBJECT-TYPE
+       SYNTAX Integer32 (-1..7)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "IP to Tel Tagging Source Dial Plan Index.
+Access: Instant.
+AC INI-Param: IP2TELTAGGINGSOURCEDIALPLANINDEX"
+       ::= {manipulationAndRouting 14}
+
+
+
      routing OBJECT IDENTIFIER ::= {manipulationAndRouting 20}
 
 
@@ -764,7 +789,7 @@ AC INI-Param: ALTROUTINGTEL2IPKEEPALIVETIME"
        MAX-ACCESS not-accessible
        STATUS current
        DESCRIPTION
-           "Phone prefix to IP address routing table. 
+           "Phone prefix to IP address routing table.
 The table is used for routing incoming PSTN to IP calls,
  if Gatekeeper is not used."
        ::= {routing 1}
@@ -806,7 +831,8 @@ The table is used for routing incoming PSTN to IP calls,
        tel2IPRoutingTransportType                      INTEGER,
        tel2IPRoutingSourceTrunkGroupID                 Integer32,
        tel2IPRoutingDestSRD                            Integer32,
-       tel2IPRoutingCostGroupName                      RowPointer
+       tel2IPRoutingCostGroupName                      RowPointer,
+       tel2IPRoutingRouteName                          SnmpAdminString
      }
 
 
@@ -1044,6 +1070,18 @@ AC INI-Param: PREFIX_CostGroup"
 
 
 
+     tel2IPRoutingRouteName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Route Name.
+Access: Instant.
+AC INI-Param: PREFIX_RouteName"
+       ::= {tel2IPRoutingEntry 19}
+
+
+
      -- ****************************************
      -- iP2TelRouting table declaration
      -- ****************************************
@@ -1087,7 +1125,8 @@ AC INI-Param: PREFIX_CostGroup"
        iP2TelRoutingSourceIPGroupID                    Integer32,
        iP2TelRoutingDestHostPrefix                     SnmpAdminString,
        iP2TelRoutingSourceHostPrefix                   SnmpAdminString,
-       iP2TelRoutingTrunkId                            Integer32
+       iP2TelRoutingTrunkId                            Integer32,
+       iP2TelRoutingRouteName                          SnmpAdminString
      }
 
 
@@ -1256,6 +1295,18 @@ AC INI-Param: PstnPrefix_TrunkId"
 
 
 
+     iP2TelRoutingRouteName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Route Name.
+Access: Instant.
+AC INI-Param: PstnPrefix_RouteName"
+       ::= {iP2TelRoutingEntry 14}
+
+
+
      -- ****************************************
      -- dnsInfo table declaration
      -- ****************************************
@@ -1367,7 +1418,7 @@ AC INI-Param: Dns2Ip_DomainName"
      dnsInfoFirstIPAddress OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-create
-       STATUS current
+       STATUS deprecated
        DESCRIPTION
            "IP Address.
 Access: Instant.
@@ -1379,7 +1430,7 @@ AC INI-Param: Dns2Ip_FirstIpAddress"
      dnsInfoSecondIPAddress OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-create
-       STATUS current
+       STATUS deprecated
        DESCRIPTION
            "IP Address.
 Access: Instant.
@@ -1391,7 +1442,7 @@ AC INI-Param: Dns2Ip_SecondIpAddress"
      dnsInfoThirdIPAddress OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-create
-       STATUS current
+       STATUS deprecated
        DESCRIPTION
            "IP Address.
 Access: Instant.
@@ -1403,7 +1454,7 @@ AC INI-Param: Dns2Ip_ThirdIpAddress"
      dnsInfoFourthIPAddress OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "IP Address.
 Access: Instant.
@@ -1904,7 +1955,7 @@ AC INI-Param: SOURCEIPADDRESSINPUT"
        altRouteCauseIP2TELRowStatus                    RowStatus,
        altRouteCauseIP2TELAction                       INTEGER,
        altRouteCauseIP2TELActionResult                 INTEGER,
-       altRouteCauseIP2TELReleaseCause                 Unsigned32
+       altRouteCauseIP2TELReleaseCause                 INTEGER
      }
 
 
@@ -1962,7 +2013,138 @@ AC INI-Param: N/A"
 
 
      altRouteCauseIP2TELReleaseCause OBJECT-TYPE
-       SYNTAX Unsigned32 (0..232)
+       SYNTAX INTEGER {
+                  unassignedNumber(1)
+,
+                  noRouteToTransitNet(2)
+,
+                  noRouteToDestination(3)
+,
+                  channelUnacceptable(6)
+,
+                  callAwarded(7)
+,
+                  preemption(8)
+,
+                  normalClear(16)
+,
+                  userBusy(17)
+,
+                  noUserResponding(18)
+,
+                  noAnswer(19)
+,
+                  subscriberAbsent(20)
+,
+                  callRejected(21)
+,
+                  numberChanged(22)
+,
+                  nonselectedUserClearing(26)
+,
+                  destinationOutOfOrder(27)
+,
+                  invalidNumberFormat(28)
+,
+                  facilityRejected(29)
+,
+                  responseToStatusEnquiry(30)
+,
+                  normalUnspecified(31)
+,
+                  circuitCongestion(32)
+,
+                  userCongestion(33)
+,
+                  noCircuitAvailable(34)
+,
+                  networkOutOfOrder(38)
+,
+                  permanentFrameModeConnectionOoS(39)
+,
+                  permanentFrameModeConnectionOper(40)
+,
+                  temporaryFailure(41)
+,
+                  switchingEquipmentCongestion(42)
+,
+                  accessInformationDiscarded(43)
+,
+                  requestedCircuitNA(44)
+,
+                  precedenceCallBlocked(46)
+,
+                  resourceUnavailableUnspecified(47)
+,
+                  qoSNA(49)
+,
+                  requestedFacilityNotSubscribed(50)
+,
+                  outgoingCallsBarredWithinCUG(53)
+,
+                  incomingCallsBarredWithinCUG(55)
+,
+                  bCNotAuthorized(57)
+,
+                  bCNA(58)
+,
+                  inconsistencyInOutgoingIE(62)
+,
+                  serviceOrOptionNA(63)
+,
+                  bCNotImplemented(65)
+,
+                  channelTypeNotImplemented(66)
+,
+                  requestedFacilityNotImplemented(69)
+,
+                  onlyRestrictedInfoBC(70)
+,
+                  serviceNotImplementedUnspecified(79)
+,
+                  invalidCRValue(81)
+,
+                  identifiedChannelNotExist(82)
+,
+                  suspendedCallButCallIDNotExist(83)
+,
+                  callIdentityinUse(84)
+,
+                  noCallSuspended(85)
+,
+                  callHavingCallIDCleared(86)
+,
+                  userNotMemberofCUG(87)
+,
+                  incompatibleDestination(88)
+,
+                  nonExistentCUG(90)
+,
+                  invalidTransitNetworkSelection(91)
+,
+                  invalidMessageUnspecified(95)
+,
+                  mandatoryIEisMissing(96)
+,
+                  messageTypeNotImplemented(97)
+,
+                  messageStateInconsistency(98)
+,
+                  iENotImplemented(99)
+,
+                  invalidIEContents(100)
+,
+                  messageNotCompatible(101)
+,
+                  recoveryonTimerExpiry(102)
+,
+                  protocolErrorUnspecified(111)
+,
+                  unknownError(112)
+,
+                  interworkingUnspecified(127)
+
+                  }
        MAX-ACCESS read-create
        STATUS current
        DESCRIPTION
@@ -2008,7 +2190,7 @@ AC INI-Param: AltRouteCauseIp2Tel_ReleaseCause"
        altRouteCauseTEL2IPRowStatus                    RowStatus,
        altRouteCauseTEL2IPAction                       INTEGER,
        altRouteCauseTEL2IPActionResult                 INTEGER,
-       altRouteCauseTEL2IPReleaseCause                 Unsigned32
+       altRouteCauseTEL2IPReleaseCause                 INTEGER
      }
 
 
@@ -2066,7 +2248,96 @@ AC INI-Param: N/A"
 
 
      altRouteCauseTEL2IPReleaseCause OBJECT-TYPE
-       SYNTAX Unsigned32 (0..700)
+       SYNTAX INTEGER {
+                  wildCard4xx(4)
+,
+                  wildCardFivexx(5)
+,
+                  wildCardSixxx(6)
+,
+                  badRequest(400)
+,
+                  unauthorized(401)
+,
+                  paymentRequired(402)
+,
+                  forbidden(403)
+,
+                  notFound(404)
+,
+                  methodNotAllowed(405)
+,
+                  requestNotAcceptable(406)
+,
+                  authenticationRequired(407)
+,
+                  requestTimeout(408)
+,
+                  conflict(409)
+,
+                  gone(410)
+,
+                  requestTooLarge(413)
+,
+                  requestURITooLong(414)
+,
+                  unsupportedMedia(415)
+,
+                  badExtension(420)
+,
+                  extensionRequired(421)
+,
+                  sessionIntervalTooSmall(423)
+,
+                  unavailable(480)
+,
+                  transactionDoesNotExist(481)
+,
+                  loopDetected(482)
+,
+                  tooManyHops(483)
+,
+                  addressIncomplete(484)
+,
+                  ambiguous(485)
+,
+                  busy(486)
+,
+                  requestTerminated(487)
+,
+                  notAcceptableHere(488)
+,
+                  requestPending(491)
+,
+                  undecipherable(493)
+,
+                  internalError(500)
+,
+                  notImplemented(501)
+,
+                  badGateway(502)
+,
+                  serviceUnavailable(503)
+,
+                  serverTimeout(504)
+,
+                  versionNotSupported(505)
+,
+                  messageTooLarge(513)
+,
+                  busyEverywhere(600)
+,
+                  decline(603)
+,
+                  doesNotExistAnywhere(604)
+,
+                  sDPNotAcceptable(606)
+,
+                  iPProfileCallLimit(805)
+,
+                  mediaLimitsExceeded(806)
+
+                  }
        MAX-ACCESS read-create
        STATUS current
        DESCRIPTION
@@ -2336,7 +2607,7 @@ AC INI-Param: ADDTRUNKGROUPASPREFIXTOSOURCE"
 ,
                   unknown(0)
 ,
-                  bust(1)
+                  busy(1)
 ,
                   noReply(2)
 ,
@@ -2375,7 +2646,7 @@ AC INI-Param: SetTel2IpRedirectReason"
 ,
                   unknown(0)
 ,
-                  bust(1)
+                  busy(1)
 ,
                   noReply(2)
 ,
@@ -2524,7 +2795,8 @@ AC INI-Param: ADDNPIANDTON2REDIRECTNUMBER"
        dstIP2TELSuffix2Add                             SnmpAdminString,
        dstIP2TELIsPresentationRestricted               Unsigned32,
        dstIP2TELSrcHost                                SnmpAdminString,
-       dstIP2TELDstHost                                SnmpAdminString
+       dstIP2TELDstHost                                SnmpAdminString,
+       dstIP2TELManipulationName                       SnmpAdminString
      }
 
 
@@ -2766,6 +3038,18 @@ AC INI-Param: NumberMapIp2Tel_DestHost"
 
 
 
+     dstIP2TELManipulationName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Manipulation Name.
+Access: Instant.
+AC INI-Param: NumberMapIp2Tel_ManipulationName"
+       ::= {dstIP2TELEntry 18}
+
+
+
      -- ****************************************
      -- dstTEL2IP table declaration
      -- ****************************************
@@ -2814,7 +3098,8 @@ AC INI-Param: NumberMapIp2Tel_DestHost"
        dstTEL2IPSourceIPAddress                        SnmpAdminString,
        dstTEL2IPSourceTrunkGroupID                     Integer32,
        dstTEL2IPSourceIPGroupID                        Integer32,
-       dstTEL2IPDstIpGrpId                             Integer32
+       dstTEL2IPDstIpGrpId                             Integer32,
+       dstTEL2IPManipulationName                       SnmpAdminString
      }
 
 
@@ -3070,6 +3355,18 @@ AC INI-Param: NumberMapTel2Ip_DestIPGroupID"
 
 
 
+     dstTEL2IPManipulationName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Manipulation Name.
+Access: Instant.
+AC INI-Param: NumberMapTel2Ip_ManipulationName"
+       ::= {dstTEL2IPEntry 19}
+
+
+
      -- ****************************************
      -- srcIP2TEL table declaration
      -- ****************************************
@@ -3117,7 +3414,8 @@ AC INI-Param: NumberMapTel2Ip_DestIPGroupID"
        srcIP2TELSuffix2Add                             SnmpAdminString,
        srcIP2TELSourceIPAddress                        SnmpAdminString,
        srcIP2TELSrcHost                                SnmpAdminString,
-       srcIP2TELDstHost                                SnmpAdminString
+       srcIP2TELDstHost                                SnmpAdminString,
+       srcIP2TELManipulationName                       SnmpAdminString
      }
 
 
@@ -3366,6 +3664,18 @@ AC INI-Param: SourceNumberMapIp2Tel_DestHost"
 
 
 
+     srcIP2TELManipulationName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Manipulation Name.
+Access: Instant.
+AC INI-Param: SourceNumberMapIp2Tel_ManipulationName"
+       ::= {srcIP2TELEntry 18}
+
+
+
      -- ****************************************
      -- srcTEL2IP table declaration
      -- ****************************************
@@ -3415,7 +3725,8 @@ AC INI-Param: SourceNumberMapIp2Tel_DestHost"
        srcTEL2IPSourceTrunkGroupID                     Integer32,
        srcTEL2IPSourceIPGroupID                        Integer32,
        srcTEL2IPSrcHost                                SnmpAdminString,
-       srcTEL2IPDstHost                                SnmpAdminString
+       srcTEL2IPDstHost                                SnmpAdminString,
+       srcTEL2IPManipulationName                       SnmpAdminString
      }
 
 
@@ -3688,6 +3999,18 @@ AC INI-Param: SourceNumberMapIp2Tel_DestHost"
 
 
 
+     srcTEL2IPManipulationName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Manipulation Name.
+Access: Instant.
+AC INI-Param: SourceNumberMapTel2Ip_ManipulationName"
+       ::= {srcTEL2IPEntry 20}
+
+
+
      -- ****************************************
      -- phoneContext table declaration
      -- ****************************************
@@ -3901,7 +4224,8 @@ AC INI-Param: PhoneContext_Context"
        redirectNumberMapIp2TelSrcTrunkGroupID          Integer32,
        redirectNumberMapIp2TelSrcIPGroupID             Integer32,
        redirectNumberMapIp2TelSrcHost                  SnmpAdminString,
-       redirectNumberMapIp2TelDstHost                  SnmpAdminString
+       redirectNumberMapIp2TelDstHost                  SnmpAdminString,
+       redirectNumberMapIp2TelManipulationName         SnmpAdminString
      }
 
 
@@ -4175,6 +4499,18 @@ AC INI-Param: RedirectNumberMapIp2Tel_DestHost"
 
 
 
+     redirectNumberMapIp2TelManipulationName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Manipulation Name.
+Access: Instant.
+AC INI-Param: RedirectNumberMapIp2Tel_ManipulationName"
+       ::= {redirectNumberMapIp2TelEntry 20}
+
+
+
      -- ****************************************
      -- redirectNumberMapTel2Ip table declaration
      -- ****************************************
@@ -4224,7 +4560,8 @@ AC INI-Param: RedirectNumberMapIp2Tel_DestHost"
        redirectNumberMapTel2IpSrcTrunkGroupID          Integer32,
        redirectNumberMapTel2IpSrcIPGroupID             Integer32,
        redirectNumberMapTel2IpSrcHost                  SnmpAdminString,
-       redirectNumberMapTel2IpDstHost                  SnmpAdminString
+       redirectNumberMapTel2IpDstHost                  SnmpAdminString,
+       redirectNumberMapTel2IpManipulationName         SnmpAdminString
      }
 
 
@@ -4474,6 +4811,18 @@ AC INI-Param: RedirectNumberMapTel2Ip_DestHost"
 
 
 
+     redirectNumberMapTel2IpManipulationName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Manipulation Name.
+Access: Instant.
+AC INI-Param: RedirectNumberMapTel2Ip_ManipulationName"
+       ::= {redirectNumberMapTel2IpEntry 20}
+
+
+
      connectivityQos OBJECT IDENTIFIER ::= {manipulationAndRouting 22}
 
 
@@ -4576,7 +4925,7 @@ AC INI-Param: SWAPREDIRECTNUMBER"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Select Transfer Capabilities method between H.323/Q.931 and
 ISDN/Q.931.
@@ -4902,13 +5251,13 @@ AC INI-Param: SendLocalTimeToISDNConnect"
 
 
      digitalGWUuiHeaderFormat OBJECT-TYPE
-       SYNTAX Unsigned32 (0..2)
+       SYNTAX Unsigned32 (0..3)
        MAX-ACCESS read-write
        STATUS current
        DESCRIPTION
-           "(0): X-UserToUser, (1): format: User-to-UserUser with protocol
-discriminator, (2): format: User-to-User with 'encoding=hex'
-at the end.
+           "(0): X-UserToUser, (1): format: User-to-User with protocol discriminator,
+(2): format: User-to-User with 'encoding=hex'
+at the end, (3): format: User-to-User with text presentation.
 Access: Instant.
 AC INI-Param: USERTOUSERHEADERFORMAT"
        ::= {digitalGW 42}
@@ -4934,6 +5283,25 @@ AC INI-Param: TRANSFERCAPABILITYFORDATACALLS"
 
 
 
+     digitalGWDisconnectCallWithPIIfAlt OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "If set to 1 and ISDN DISCONNECT with PI is received, 183 with
+SDP will be sent toward IP only in case no PSTN Alternative
+call is possible.
+Access: Instant.
+AC INI-Param: DISCONNECTCALLWITHPIIFALT"
+       ::= {digitalGW 44}
+
+
+
      -- ****************************************
      -- iSDNRxOverlap table declaration
      -- ****************************************
@@ -4942,7 +5310,7 @@ AC INI-Param: TRANSFERCAPABILITYFORDATACALLS"
        MAX-ACCESS not-accessible
        STATUS current
        DESCRIPTION
-           "Choose either: Disabled or Enabled (default). 
+           "Choose either: Disabled or Enabled (default).
 Any number bigger than one = Number of digits to receive.
 Note 1: If enabled, the Mediant 2000 receives ISDN called number that is sent in the 'Overlap' mode.
 Note 2: The SETUP to IP is sent only after the number (including 'Sending Complete' Info Element) was
@@ -5998,7 +6366,7 @@ AC INI-Param: OOSONREGISTRATIONFAIL"
      chargeCodesTable OBJECT-TYPE
        SYNTAX SEQUENCE OF ChargeCodesEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {fxs 21}
@@ -6011,7 +6379,7 @@ AC INI-Param: OOSONREGISTRATIONFAIL"
      chargeCodesEntry OBJECT-TYPE
        SYNTAX ChargeCodesEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {chargeCodesIndex}
@@ -6046,7 +6414,7 @@ AC INI-Param: OOSONREGISTRATIONFAIL"
      chargeCodesIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..24)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Charge code index.
 AC INI-Param: ChargeCode_Index"
@@ -6057,7 +6425,7 @@ AC INI-Param: ChargeCode_Index"
      chargeCodesRowStatus OBJECT-TYPE
        SYNTAX RowStatus
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Row-Status Textual Conventions as defined in RFC 2579: Textual
 Conventions for SMIv2.
@@ -6072,7 +6440,7 @@ AC INI-Param: N/A"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Development Impending.
 AC INI-Param: N/A"
@@ -6086,7 +6454,7 @@ AC INI-Param: N/A"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Development Impending.
 AC INI-Param: N/A"
@@ -6097,7 +6465,7 @@ AC INI-Param: N/A"
      chargeCodesPeriod1EndTime OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 Access: Instant.
@@ -6109,7 +6477,7 @@ AC INI-Param: ChargeCode_EndTime1"
      chargeCodesPeriod1PulseInterval OBJECT-TYPE
        SYNTAX Unsigned32 (0..5000)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 Access: Instant.
@@ -6121,7 +6489,7 @@ AC INI-Param: ChargeCode_PulseInterval1"
      chargeCodesPeriod1PulsesOnAnswer OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 Access: Instant.
@@ -6133,7 +6501,7 @@ AC INI-Param: ChargeCode_PulsesOnAnswer1"
      chargeCodesPeriod2EndTime OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 Access: Instant.
@@ -6145,7 +6513,7 @@ AC INI-Param: ChargeCode_EndTime2"
      chargeCodesPeriod2PulseInterval OBJECT-TYPE
        SYNTAX Unsigned32 (0..5000)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 Access: Instant.
@@ -6157,7 +6525,7 @@ AC INI-Param: ChargeCode_PulseInterval2"
      chargeCodesPeriod2PulsesOnAnswer OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 Access: Instant.
@@ -6169,7 +6537,7 @@ AC INI-Param: ChargeCode_PulsesOnAnswer2"
      chargeCodesPeriod3EndTime OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 Access: Instant.
@@ -6181,7 +6549,7 @@ AC INI-Param: ChargeCode_EndTime3"
      chargeCodesPeriod3PulseInterval OBJECT-TYPE
        SYNTAX Unsigned32 (0..5000)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 Access: Instant.
@@ -6193,7 +6561,7 @@ AC INI-Param: ChargeCode_PulseInterval3"
      chargeCodesPeriod3PulsesOnAnswer OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 Access: Instant.
@@ -6205,7 +6573,7 @@ AC INI-Param: ChargeCode_PulsesOnAnswer3"
      chargeCodesPeriod4EndTime OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 Access: Instant.
@@ -6217,7 +6585,7 @@ AC INI-Param: ChargeCode_EndTime4"
      chargeCodesPeriod4PulseInterval OBJECT-TYPE
        SYNTAX Unsigned32 (0..5000)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 Access: Instant.
@@ -6229,7 +6597,7 @@ AC INI-Param: ChargeCode_PulseInterval4"
      chargeCodesPeriod4PulsesOnAnswer OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 Access: Instant.
@@ -6380,6 +6748,155 @@ AC INI-Param: ToneIndex_PriorityIndex"
 
 
 
+     -- ****************************************
+     -- rejectAnonymousCallPerPort table declaration
+     -- ****************************************
+     rejectAnonymousCallPerPortTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF RejectAnonymousCallPerPortEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {fxs 23}
+
+
+
+     -- ****************************************
+     -- rejectAnonymousCallPerPort table entry
+     -- ****************************************
+     rejectAnonymousCallPerPortEntry OBJECT-TYPE
+       SYNTAX RejectAnonymousCallPerPortEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {rejectAnonymousCallPerPortIndex}
+       ::= {rejectAnonymousCallPerPortTable 1}
+
+
+
+     -- ****************************************
+     -- rejectAnonymousCallPerPort TABLE
+     -- ****************************************
+     RejectAnonymousCallPerPortEntry ::= SEQUENCE {
+       rejectAnonymousCallPerPortIndex                 Unsigned32,
+       rejectAnonymousCallPerPortIsUsed                INTEGER,
+       rejectAnonymousCallPerPortAction                INTEGER,
+       rejectAnonymousCallPerPortActionResult          INTEGER,
+       rejectAnonymousCallPerPortEnable                INTEGER,
+       rejectAnonymousCallPerPortModule                Unsigned32,
+       rejectAnonymousCallPerPortPort                  Unsigned32,
+       rejectAnonymousCallPerPortPortType              SnmpAdminString
+     }
+
+
+
+     rejectAnonymousCallPerPortIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..23)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Reject anonymous call per port index.
+AC INI-Param: RejectAnonymousCallPerPort_Index"
+       ::= {rejectAnonymousCallPerPortEntry 1}
+
+
+
+     rejectAnonymousCallPerPortIsUsed OBJECT-TYPE
+       SYNTAX INTEGER {
+                  no(0)
+,
+                  yes(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Is Used.
+Access: Instant.
+AC INI-Param: RejectAnonymousCallPerPort_IsUsed"
+       ::= {rejectAnonymousCallPerPortEntry 2}
+
+
+
+     rejectAnonymousCallPerPortAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  developmentImpending(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Development Impending.
+AC INI-Param: RejectAnonymousCallPerPort_Action"
+       ::= {rejectAnonymousCallPerPortEntry 3}
+
+
+
+     rejectAnonymousCallPerPortActionResult OBJECT-TYPE
+       SYNTAX INTEGER {
+                  developmentImpending(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Development Impending.
+AC INI-Param: RejectAnonymousCallPerPort_ActionRes"
+       ::= {rejectAnonymousCallPerPortEntry 4}
+
+
+
+     rejectAnonymousCallPerPortEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Reject Calls Enable.
+Access: Instant.
+AC INI-Param: RejectAnonymousCallPerPort_Enable"
+       ::= {rejectAnonymousCallPerPortEntry 5}
+
+
+
+     rejectAnonymousCallPerPortModule OBJECT-TYPE
+       SYNTAX Unsigned32 (0..255)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Module.
+AC INI-Param: RejectAnonymousCallPerPort_Module"
+       ::= {rejectAnonymousCallPerPortEntry 6}
+
+
+
+     rejectAnonymousCallPerPortPort OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Port.
+AC INI-Param: RejectAnonymousCallPerPort_Port"
+       ::= {rejectAnonymousCallPerPortEntry 7}
+
+
+
+     rejectAnonymousCallPerPortPortType OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..10))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "PortType.
+AC INI-Param: RejectAnonymousCallPerPort_PortType"
+       ::= {rejectAnonymousCallPerPortEntry 8}
+
+
+
      fxo OBJECT IDENTIFIER ::= {analogGW 11}
 
 
@@ -6510,6 +7027,19 @@ AC INI-Param: FXOAutoDialPlayBusyTone"
 
 
 
+     fxoRingTimeout OBJECT-TYPE
+       SYNTAX Unsigned32 (0..50)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the delay (in 100 msec) for generating INVITE after
+RING_START detection. The valid range is 0 to 50.
+Access: Instant.
+AC INI-Param: FXORINGTIMEOUT"
+       ::= {fxo 9}
+
+
+
      dialing OBJECT IDENTIFIER ::= {analogGW 12}
 
 
@@ -6581,7 +7111,7 @@ AC INI-Param: DIGITMAPPING"
        DESCRIPTION
            "Enable automatic digit delivery to Tel side after line is off-hooked
 or seized.
-Access: Offline.
+Access: Instant.
 AC INI-Param: ENABLEDIGITDELIVERY"
        ::= {dialing 5}
 
@@ -7401,7 +7931,11 @@ AC INI-Param: ENABLEDID"
        SYNTAX INTEGER {
                   disable(0)
 ,
-                  enable(1)
+                  single(1)
+,
+                  doubleWink(2)
+,
+                  winkAndPolarity(3)
 
                   }
        MAX-ACCESS read-write
@@ -7604,7 +8138,7 @@ AC INI-Param: CONFERENCEID"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Beep when a new participant joins a conference.
 Access: Instant.
@@ -7640,7 +8174,7 @@ AC INI-Param: EnableConferenceDTMFReporting"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "EnableConferenceDTMFClamp - if enable remove detected DTMF digits
 from the audio stream on simple conference participant.
@@ -7761,7 +8295,7 @@ AC INI-Param: 3WayConfNoneAllocateablePorts"
      announcementID OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Identification of a play voice prompt call (To be used by SIP
 INVITE).
@@ -7774,7 +8308,7 @@ AC INI-Param: ANNOUNCEMENTID"
      announcementNumOfEndPoints OBJECT-TYPE
        SYNTAX Unsigned32 (0..240)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Number of Annuncment endpoints.
 Access: Offline.
@@ -7786,7 +8320,7 @@ AC INI-Param: NUMOFANNOUNCENDPOINTS"
      announcementToneID OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Identification of a play call progress tone call (To be used
 by SIP INVITE).
@@ -7802,7 +8336,7 @@ AC INI-Param: TONEID"
      streamingID OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Identification of HTTP played voice prompt (To be used by SIP
 INVITE).
@@ -7815,7 +8349,7 @@ AC INI-Param: STREAMINGID"
      streamingNumOfEndPoints OBJECT-TYPE
        SYNTAX Unsigned32 (0..240)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Number of Streaming  endpoints.
 Access: Offline.
@@ -7839,7 +8373,7 @@ AC INI-Param: RecordScriptPath"
      streamingMediaID OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..16))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Identification of HTTP played voice prompt (To be used by SIP
 INVITE).
@@ -7852,7 +8386,7 @@ AC INI-Param: MediaStreamingID"
      streamingStopRecordingOnNoSpeachTimeout OBJECT-TYPE
        SYNTAX Integer32 (-1..10000000)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Timeout for no speech detection used to stop recording.
 Access: Instant.
@@ -7864,7 +8398,7 @@ AC INI-Param: STOPRECORDINGONNOSPEACHTIMEOUT"
      streamingPlayFromID OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Identification of voice stream play location (To be used by
 SIP INVITE).
@@ -7877,7 +8411,7 @@ AC INI-Param: PLAYFROMID"
      streamingRecordToID OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Identification of voice stream recording location (To be used
 by SIP INVITE).
@@ -7890,7 +8424,7 @@ AC INI-Param: RECORDTOID"
      streamingNetAnnAnncID OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "NetAnn Announcement ID.
 Access: Instant.
@@ -7902,7 +8436,7 @@ AC INI-Param: NETANNANNCID"
      streamingMscmlID OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Identification of HTTP played voice prompt using mscml(To be
 used by SIP INVITE).
@@ -7915,7 +8449,7 @@ AC INI-Param: MSCMLID"
      streamingMonitorID OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Identification of Calea call (To be used by SIP INVITE).
 Access: Instant.
@@ -7930,7 +8464,7 @@ AC INI-Param: MONITORID"
      vxmlID OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Identification of VoiceXML call (To be used by SIP INVITE).
 Access: Instant.
@@ -7942,7 +8476,7 @@ AC INI-Param: VXMLID"
      vxmlNumOfEndPoints OBJECT-TYPE
        SYNTAX Unsigned32 (0..240)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Number of VXML endpoints.
 Access: Offline.
@@ -8157,6 +8691,10 @@ AC INI-Param: N/A"
                   speex-NB(41)
 ,
                   speex-WB(42)
+,
+                  silk-nb(43)
+,
+                  silk-wb(44)
 ,
                   invalideCoder(99)
 
@@ -8396,6 +8934,10 @@ AC INI-Param: N/A"
 ,
                   speex-WB(42)
 ,
+                  silk-nb(43)
+,
+                  silk-wb(44)
+,
                   invalideCoder(99)
 
                   }
@@ -8631,6 +9173,10 @@ AC INI-Param: N/A"
                   speex-NB(41)
 ,
                   speex-WB(42)
+,
+                  silk-nb(43)
+,
+                  silk-wb(44)
 ,
                   invalideCoder(99)
 
@@ -8868,6 +9414,10 @@ AC INI-Param: N/A"
 ,
                   speex-WB(42)
 ,
+                  silk-nb(43)
+,
+                  silk-wb(44)
+,
                   invalideCoder(99)
 
                   }
@@ -9103,6 +9653,10 @@ AC INI-Param: N/A"
                   speex-NB(41)
 ,
                   speex-WB(42)
+,
+                  silk-nb(43)
+,
+                  silk-wb(44)
 ,
                   invalideCoder(99)
 
@@ -9340,6 +9894,10 @@ AC INI-Param: N/A"
 ,
                   speex-WB(42)
 ,
+                  silk-nb(43)
+,
+                  silk-wb(44)
+,
                   invalideCoder(99)
 
                   }
@@ -9448,7 +10006,8 @@ AC INI-Param: CodersGroup4_Sce"
        codersGroupPacketizationTime                    Unsigned32,
        codersGroupRate                                 Unsigned32,
        codersGroupPayloadType                          Integer32,
-       codersGroupSilenceSuppression                   INTEGER
+       codersGroupSilenceSuppression                   INTEGER,
+       codersGroupCoderSpecific                        SnmpAdminString
      }
 
 
@@ -9588,6 +10147,10 @@ AC INI-Param: N/A"
 ,
                   speex-WB(42)
 ,
+                  silk-nb(43)
+,
+                  silk-wb(44)
+,
                   invalideCoder(99)
 
                   }
@@ -9653,6 +10216,18 @@ AC INI-Param: CodersGroup_PayloadType"
 Access: Instant.
 AC INI-Param: CodersGroup_Sce"
        ::= {codersGroupEntry 10}
+
+
+
+     codersGroupCoderSpecific OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..30))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Coders Specific.
+Access: Instant.
+AC INI-Param: CodersGroup_CoderSpecific"
+       ::= {codersGroupEntry 11}
 
 
 
@@ -9976,6 +10551,10 @@ AC INI-Param: N/A"
 ,
                   speex-WB(42)
 ,
+                  silk-nb(43)
+,
+                  silk-wb(44)
+,
                   invalideCoder(99)
 
                   }
@@ -9986,6 +10565,193 @@ AC INI-Param: N/A"
 Access: Offline.
 AC INI-Param: AllowedCodersGroup_Name"
        ::= {allowedCodersGroupEntry 6}
+
+
+
+     -- ****************************************
+     -- allowedVideoCodersGroupFather table declaration
+     -- ****************************************
+     allowedVideoCodersGroupFatherTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AllowedVideoCodersGroupFatherEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {coders 11}
+
+
+
+     -- ****************************************
+     -- allowedVideoCodersGroupFather table entry
+     -- ****************************************
+     allowedVideoCodersGroupFatherEntry OBJECT-TYPE
+       SYNTAX AllowedVideoCodersGroupFatherEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {allowedVideoCodersGroupFatherIndex}
+       ::= {allowedVideoCodersGroupFatherTable 1}
+
+
+
+     -- ****************************************
+     -- allowedVideoCodersGroupFather TABLE
+     -- ****************************************
+     AllowedVideoCodersGroupFatherEntry ::= SEQUENCE {
+       allowedVideoCodersGroupFatherIndex              Unsigned32,
+       allowedVideoCodersGroupFatherName               SnmpAdminString,
+       allowedVideoCodersGroupFatherNumOfEntries       Unsigned32
+     }
+
+
+
+     allowedVideoCodersGroupFatherIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Index Field for line. Internal parameter.
+AC INI-Param: AllowedVideoCodersGroupFather_Index"
+       ::= {allowedVideoCodersGroupFatherEntry 1}
+
+
+
+     allowedVideoCodersGroupFatherName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..0))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Indicates the TableIdx Of AllowedVideoCodersGroup.
+AC INI-Param: AllowedVideoCodersGroupFather_Name"
+       ::= {allowedVideoCodersGroupFatherEntry 2}
+
+
+
+     allowedVideoCodersGroupFatherNumOfEntries OBJECT-TYPE
+       SYNTAX Unsigned32 (0..9)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Indicates the Index Of AllowedVideoCodersGroup.
+AC INI-Param: AllowedVideoCodersGroupFather_NumOfEntries"
+       ::= {allowedVideoCodersGroupFatherEntry 3}
+
+
+
+     -- ****************************************
+     -- allowedVideoCodersGroup table declaration
+     -- ****************************************
+     allowedVideoCodersGroupTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AllowedVideoCodersGroupEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {coders 12}
+
+
+
+     -- ****************************************
+     -- allowedVideoCodersGroup table entry
+     -- ****************************************
+     allowedVideoCodersGroupEntry OBJECT-TYPE
+       SYNTAX AllowedVideoCodersGroupEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {allowedVideoCodersGroupTableIdx,allowedVideoCodersGroupIndex}
+       ::= {allowedVideoCodersGroupTable 1}
+
+
+
+     -- ****************************************
+     -- allowedVideoCodersGroup TABLE
+     -- ****************************************
+     AllowedVideoCodersGroupEntry ::= SEQUENCE {
+       allowedVideoCodersGroupTableIdx                 Unsigned32,
+       allowedVideoCodersGroupIndex                    Unsigned32,
+       allowedVideoCodersGroupRowStatus                RowStatus,
+       allowedVideoCodersGroupAction                   INTEGER,
+       allowedVideoCodersGroupActionRes                INTEGER,
+       allowedVideoCodersGroupName                     SnmpAdminString
+     }
+
+
+
+     allowedVideoCodersGroupTableIdx OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Index field for table.
+AC INI-Param: N/A"
+       ::= {allowedVideoCodersGroupEntry 1}
+
+
+
+     allowedVideoCodersGroupIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..9)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Index Field for line.
+AC INI-Param: AllowedVideoCodersGroup_Index"
+       ::= {allowedVideoCodersGroupEntry 2}
+
+
+
+     allowedVideoCodersGroupRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ROWSTATUS field for line.
+Access: Offline.
+AC INI-Param: N/A"
+       ::= {allowedVideoCodersGroupEntry 3}
+
+
+
+     allowedVideoCodersGroupAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS.
+Access: Offline.
+AC INI-Param: N/A"
+       ::= {allowedVideoCodersGroupEntry 4}
+
+
+
+     allowedVideoCodersGroupActionRes OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succeeded(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS RESULT.
+AC INI-Param: N/A"
+       ::= {allowedVideoCodersGroupEntry 5}
+
+
+
+     allowedVideoCodersGroupName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..24))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "allowed Video Coders Group name.
+Access: Offline.
+AC INI-Param: AllowedVideoCodersGroup_Name"
+       ::= {allowedVideoCodersGroupEntry 6}
 
 
 
@@ -10017,7 +10783,7 @@ AC INI-Param: ENABLEHOLD"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Enable Name Identification service.
 Access: Instant.
@@ -10028,15 +10794,18 @@ AC INI-Param: ENABLENAMEIDENTIFICATION"
 
      supServicesHoldFormat OBJECT-TYPE
        SYNTAX INTEGER {
-                  connectionIP(0)
+                  zeroIP(0)
 ,
-                  sDPattributesSendonly(1)
+                  sendOnly(1)
+,
+                  inactive(2)
 
                   }
        MAX-ACCESS read-write
        STATUS current
        DESCRIPTION
-           "Call Hold format - Zero IP or 'sendonly' SDP attribute.
+           "Call Hold format - Zero IP, 'sendonly' SDP attribute or Original
+IP and 'inactive' attribute.
 Access: Instant.
 AC INI-Param: HOLDFORMAT"
        ::= {supServices 3}
@@ -10872,7 +11641,7 @@ AC INI-Param: N/A"
      loggerCDRSyslogServerIP OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-write
-       STATUS current
+       STATUS deprecated
        DESCRIPTION
            "Syslog server IP address for sending CDRs.
 Access: Instant.
@@ -10907,7 +11676,7 @@ AC INI-Param: MEDIACDRREPORTLEVEL"
      loggerDebugRecordingDestIP OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-write
-       STATUS current
+       STATUS deprecated
        DESCRIPTION
            "Defines the destination IP address for Debug Recording default
 target.
@@ -11600,10 +12369,10 @@ AC INI-Param: RELIABLECONNECTIONPERSISTENTMODE"
      miscWANIPAddress OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-write
-       STATUS current
+       STATUS deprecated
        DESCRIPTION
            "Sets the WAN address to be used by VOIP signalling applications.
-Range =  IPv4 address in dotted decimal notation 
+Range =  IPv4 address in dotted decimal notation
 xxx.xxx.xxx.xxx
 Default = 0.0.0.0.
 Access: Instant.
@@ -11723,7 +12492,7 @@ AC INI-Param: ENABLERFC4117TRANSCODING"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Enable/Disable using single DSP for g711 <--> LBR coder.
 Access: Offline.
@@ -12195,11 +12964,266 @@ AC INI-Param: SIPRemoteReset"
 
 
 
+     miscEnableNonInvite408Reply OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enable sending 408 responses for non-INVITE transactions. Disable
+this parameter to comply to RFC 4320.
+Access: Instant.
+AC INI-Param: EnableNonInvite408Reply"
+       ::= {misc 61}
+
+
+
+     miscUseAltRouteReasonsFor3xx OBJECT-TYPE
+       SYNTAX INTEGER {
+                  no(0)
+,
+                  noIf6xx(1)
+,
+                  yes(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Use Alt Route Reasons Table For 3xx.
+Access: Instant.
+AC INI-Param: USEALTROUTEREASONSFOR3XX "
+       ::= {misc 62}
+
+
+
+     miscLDAPDisplayNameAttrName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..49))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "MS LDAP DISPLAY Name attribute name.
+Access: Instant.
+AC INI-Param: MSLDAPDISPLAYNAMEATTRIBUTENAME"
+       ::= {misc 63}
+
+
+
+     miscNetworkNodeId OBJECT-TYPE
+       SYNTAX Unsigned32 (0..32767)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Network Node Id.
+Access: Instant.
+AC INI-Param: NETWORKNODEID"
+       ::= {misc 64}
+
+
+
+     miscForkingDelayTimeForInvite OBJECT-TYPE
+       SYNTAX Unsigned32 (0..20)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Delay time (in seconds) to wait before sending Invite of 2nd
+forking call.
+Access: Instant.
+AC INI-Param: FORKINGDELAYTIMEFORINVITE"
+       ::= {misc 65}
+
+
+
+     miscDisplayDefaultSIPPort OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "When it is enabled and the headers have been manipulated the
+default port 5060 is shown in the headers.
+Access: Instant.
+AC INI-Param: DISPLAYDEFAULTSIPPORT"
+       ::= {misc 66}
+
+
+
+     miscSendRejectOnOverload OBJECT-TYPE
+       SYNTAX Unsigned32 (0..1)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "If set to false (0), a 503 response will not be sent on overload.
+Access: Instant.
+AC INI-Param: SendRejectOnOverload"
+       ::= {misc 67}
+
+
+
+     miscE911Gateway OBJECT-TYPE
+       SYNTAX Unsigned32 (100..2000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "time between first and second Wink generation (FXS).
+Access: Instant.
+AC INI-Param: TIMEBETWEENDIDWINKS"
+       ::= {misc 68}
+
+
+
+     miscUseDifferentRTPportAfterHold OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Use different RTP port after Hold.
+Access: Instant.
+AC INI-Param: USEDIFFERENTRTPPORTAFTERHOLD"
+       ::= {misc 69}
+
+
+
+     miscSessionExpiresDisconnectTime OBJECT-TYPE
+       SYNTAX Unsigned32 (0..32)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the minimum time factor before the session expires.
+By achieving this time without session refresh, the session
+should be disconnected.
+Access: Instant.
+AC INI-Param: SESSIONEXPIRESDISCONNECTTIME"
+       ::= {misc 70}
+
+
+
+     miscCoderPriorityNegotiation OBJECT-TYPE
+       SYNTAX INTEGER {
+                  sdpRemotePriority(0)
+,
+                  sdpLocalPriority(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the coder priority in SDP negotiation. Default: according
+remote SDP.
+Access: Instant.
+AC INI-Param: CODERPRIORITYNEGOTIATION"
+       ::= {misc 71}
+
+
+
+     miscRejectCancelAfterConnect OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines whether or not reject Cancel request after connect.
+Access: Instant.
+AC INI-Param: REJECTCANCELAFTERCONNECT"
+       ::= {misc 72}
+
+
+
+     miscAmdMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  doNotDisconnect(0)
+,
+                  disconnectOnAnsweringMachineDetection(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "0 -  not affected,1 - disconnect IP2TEL call on Answering Machine
+detection.
+Access: Instant.
+AC INI-Param: AMDMODE"
+       ::= {misc 73}
+
+
+
+     miscSipNatDetection OBJECT-TYPE
+       SYNTAX Unsigned32 (0..1)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "If not set, the incoming request will be always processed as
+user NOT behind NAT.
+Access: Instant.
+AC INI-Param: SIPNATDETECTION"
+       ::= {misc 74}
+
+
+
+     miscVerifyReceivedVia OBJECT-TYPE
+       SYNTAX Unsigned32 (0..1)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines whether or not to verify Source IP with IP in Topmost
+VIA.
+Access: Instant.
+AC INI-Param: VERIFYRECIEVEDVIA"
+       ::= {misc 75}
+
+
+
+     miscResetSRTPStateUponRekey OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Reset SRTP State Upon Re-key.
+Access: Instant.
+AC INI-Param: RESETSRTPSTATEUPONREKEY"
+       ::= {misc 76}
+
+
+
+     miscTestCallDTMFString OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..15))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "DTMF string for test calls.
+Access: Instant.
+AC INI-Param: TESTCALLDTMFSTRING"
+       ::= {misc 77}
+
+
+
      resourceManagement OBJECT IDENTIFIER ::= {common 12}
 
 
      resourceManagementMaxActiveCalls OBJECT-TYPE
-       SYNTAX Unsigned32 (1..19200)
+       SYNTAX Unsigned32 (1..20000)
        MAX-ACCESS read-write
        STATUS current
        DESCRIPTION
@@ -12292,6 +13316,18 @@ utilization  2:on medium utilization.
 Access: Instant.
 AC INI-Param: OverloadSensitivityLevel"
        ::= {resourceManagement 6}
+
+
+
+     resourceManagementSignalingCpuUsageThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..100)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Signaling CPU Usage Threshold Alarm (percentage).
+Access: Instant.
+AC INI-Param: SIGNALINGCPUUSAGETHRESHOLDALARM"
+       ::= {resourceManagement 7}
 
 
 
@@ -12448,8 +13484,24 @@ AC INI-Param: RADIUSACCOUNTINGTYPE"
        iPProfileSBCRemote3xxBehavior                   INTEGER,
        iPProfileSBCRemoteDelayedOfferSupport           INTEGER,
        iPProfileSBCPrackMode                           INTEGER,
-       iPProfileSBCUserRegistrationTime                Integer32,
-       iPProfileSBCRemoteHoldFormat                    INTEGER
+       iPProfileSBCUserRegistrationTime                Unsigned32,
+       iPProfileSBCRemoteHoldFormat                    INTEGER,
+       iPProfileSBCRTPRedundancyBehavior               INTEGER,
+       iPProfileSBCSDPPtimeAnswer                      INTEGER,
+       iPProfileSBCPreferredPTime                      Unsigned32,
+       iPProfileSBCUseSilenceSupp                      INTEGER,
+       iPProfileSBC2833DTMFPayloadType                 Unsigned32,
+       iPProfileSBCRemoteReplacesBehavior              INTEGER,
+       iPProfileSBCPlayHeldTone                        INTEGER,
+       iPProfileSBCReliableHeldToneSource              INTEGER,
+       iPProfileSBCPlayRBTToTransferee                 INTEGER,
+       iPProfileSBCJitterCompensation                  INTEGER,
+       iPProfileSBCRtcpMode                            INTEGER,
+       iPProfileSBCAllowedMediaTypes                   SnmpAdminString,
+       iPProfileEarlyAnswerTimeout                     Unsigned32,
+       iPProfileAmdMode                                INTEGER,
+       iPProfileSBCRemoteRenegotiateOnFaxDetection     INTEGER,
+       iPProfileResetSRTPStateUponRekey                INTEGER
      }
 
 
@@ -13492,7 +14544,7 @@ AC INI-Param: IpProfile_SbcPrackMode"
 
 
      iPProfileSBCUserRegistrationTime OBJECT-TYPE
-       SYNTAX Integer32 (-1..2000000)
+       SYNTAX Unsigned32 (0..2000000)
        MAX-ACCESS read-create
        STATUS current
        DESCRIPTION
@@ -13525,6 +14577,270 @@ AC INI-Param: IpProfile_SBCUserRegistrationTime "
 Access: Instant.
 AC INI-Param: IpProfile_SBCRemoteHoldFormat"
        ::= {iPProfileEntry 62}
+
+
+
+     iPProfileSBCRTPRedundancyBehavior OBJECT-TYPE
+       SYNTAX INTEGER {
+                  asIs(0)
+,
+                  extend(1)
+,
+                  disallow(2)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "SBC RTP Redundancy Behavior.
+Access: Instant.
+AC INI-Param: IpProfile_SBCRTPRedundancyBehavior"
+       ::= {iPProfileEntry 63}
+
+
+
+     iPProfileSBCSDPPtimeAnswer OBJECT-TYPE
+       SYNTAX INTEGER {
+                  remoteAnswer(0)
+,
+                  originalOffer(1)
+,
+                  preferredValue(2)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "SBC SDP Ptime Answer.
+Access: Instant.
+AC INI-Param: IpProfile_SBCSDPPtimeAnswer"
+       ::= {iPProfileEntry 64}
+
+
+
+     iPProfileSBCPreferredPTime OBJECT-TYPE
+       SYNTAX Unsigned32 (0..200)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "SBC Preferred PTime.
+Access: Instant.
+AC INI-Param: IpProfile_SBCPreferredPTime"
+       ::= {iPProfileEntry 65}
+
+
+
+     iPProfileSBCUseSilenceSupp OBJECT-TYPE
+       SYNTAX INTEGER {
+                  transparent(0)
+,
+                  add(1)
+,
+                  remove(2)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "SBC Use Silence Suppression.
+Access: Instant.
+AC INI-Param: IpProfile_SBCUseSilenceSupp"
+       ::= {iPProfileEntry 66}
+
+
+
+     iPProfileSBC2833DTMFPayloadType OBJECT-TYPE
+       SYNTAX Unsigned32 (0..200)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Defines SBC RFC2833 DTMF Payload Type Value.
+Access: Instant.
+AC INI-Param: IpProfile_SBC2833DTMFPayloadType"
+       ::= {iPProfileEntry 67}
+
+
+
+     iPProfileSBCRemoteReplacesBehavior OBJECT-TYPE
+       SYNTAX INTEGER {
+                  transparent(0)
+,
+                  handle-locally(1)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Controls how SBC will handle INVITE with Replaces header.
+Access: Instant.
+AC INI-Param: IpProfile_SBCRemoteReplacesBehavior"
+       ::= {iPProfileEntry 68}
+
+
+
+     iPProfileSBCPlayHeldTone OBJECT-TYPE
+       SYNTAX INTEGER {
+                  false(0)
+,
+                  true(1)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "SBC Play Held Tone.
+Access: Instant.
+AC INI-Param: IpProfile_SBCPlayHeldTone"
+       ::= {iPProfileEntry 69}
+
+
+
+     iPProfileSBCReliableHeldToneSource OBJECT-TYPE
+       SYNTAX INTEGER {
+                  false(0)
+,
+                  true(1)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "SBC Reliable Held Tone Source.
+Access: Instant.
+AC INI-Param: IpProfile_SBCReliableHeldToneSource"
+       ::= {iPProfileEntry 70}
+
+
+
+     iPProfileSBCPlayRBTToTransferee OBJECT-TYPE
+       SYNTAX INTEGER {
+                  no(0)
+,
+                  yes(1)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Play Ring Back Tone to transferred side on call transfer.
+Access: Instant.
+AC INI-Param: IpProfile_SBCPlayRBTToTransferee"
+       ::= {iPProfileEntry 71}
+
+
+
+     iPProfileSBCJitterCompensation OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "SBC Jitter Compensation.
+Access: Instant.
+AC INI-Param: IpProfile_SBCJitterCompensation"
+       ::= {iPProfileEntry 72}
+
+
+
+     iPProfileSBCRtcpMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  transparent(0)
+,
+                  generateAlways(1)
+,
+                  generateOnlyIfRTPActive(2)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "SBC RTCP Mode.
+Access: Instant.
+AC INI-Param: IpProfile_SBCRTCPMode"
+       ::= {iPProfileEntry 73}
+
+
+
+     iPProfileSBCAllowedMediaTypes OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..64))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Defines SBC allowed media types (comma separated string).
+Access: Instant.
+AC INI-Param: IpProfile_SBCAllowedMediaTypes"
+       ::= {iPProfileEntry 74}
+
+
+
+     iPProfileEarlyAnswerTimeout OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2400)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Max time (in seconds) to wait from sending setup message to
+PSTN to receiving connect message from PSTN.
+Access: Instant.
+AC INI-Param: IpProfile_EarlyAnswerTimeout"
+       ::= {iPProfileEntry 75}
+
+
+
+     iPProfileAmdMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  doNotDisconnect(0)
+,
+                  disconnectOnAmd(1)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "0 -  not affected 1 - disconnect IP2TEL call on Answering Machine
+detection.
+Access: Instant.
+AC INI-Param: IpProfile_AmdMode"
+       ::= {iPProfileEntry 76}
+
+
+
+     iPProfileSBCRemoteRenegotiateOnFaxDetection OBJECT-TYPE
+       SYNTAX INTEGER {
+                  dontCare(0)
+,
+                  onlyInAnswerSide(1)
+,
+                  no(2)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Describes if the remote renegotiate on fax detection.
+Access: Instant.
+AC INI-Param: IpProfile_SBCRemoteRenegotiateOnFaxDetection"
+       ::= {iPProfileEntry 77}
+
+
+
+     iPProfileResetSRTPStateUponRekey OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Reset SRTP State Upon Re-key.
+Access: Instant.
+AC INI-Param: IpProfile_ResetSRTPStateUponRekey"
+       ::= {iPProfileEntry 78}
 
 
 
@@ -13595,7 +14911,8 @@ AC INI-Param: IpProfile_SBCRemoteHoldFormat"
        telProfileEnableAGC                             INTEGER,
        telProfileECNlpMode                             INTEGER,
        telProfileEnableFXODoubleAnswer                 INTEGER,
-       telProfileCallPriorityMode                      INTEGER
+       telProfileCallPriorityMode                      INTEGER,
+       telProfileFXORingTimeout                        Integer32
      }
 
 
@@ -13996,13 +15313,17 @@ AC INI-Param: TelProfile_TimeForReorderTone"
 ,
                   disable(0)
 ,
-                  enable(1)
+                  single(1)
+,
+                  doubleWink(2)
+,
+                  winkAndPolarity(3)
 
                   }
        MAX-ACCESS read-create
        STATUS current
        DESCRIPTION
-           "
+           "Enable support for DID lines using Wink.
 Access: Instant.
 AC INI-Param: TelProfile_EnableDIDWink"
        ::= {telProfileEntry 27}
@@ -14197,6 +15518,19 @@ AC INI-Param: TelProfile_CallPriorityMode"
 
 
 
+     telProfileFXORingTimeout OBJECT-TYPE
+       SYNTAX Integer32 (-1..50)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Defines the delay (in 100 msec) for generating INVITE after
+RING_START detection. The valid range is 0 to 50.
+Access: Instant.
+AC INI-Param: TelProfile_FXORingTimeout"
+       ::= {telProfileEntry 38}
+
+
+
      voiceMail OBJECT IDENTIFIER ::= {common 16}
 
 
@@ -14235,7 +15569,15 @@ AC INI-Param: LineTransferMode"
 ,
                   isdnsetup(4)
 ,
+                  qsigMatra(5)
+,
+                   qsigSiemens(6)
+,
+                  ip2ip(7)
+,
                   etsi(8)
+,
+                  ni2(9)
 
                   }
        MAX-ACCESS read-write
@@ -14246,6 +15588,275 @@ that is used instead of legacy voicemail.
 Access: Instant.
 AC INI-Param: VoiceMailInterface"
        ::= {voiceMail 2}
+
+
+
+     vmDigitPattern OBJECT IDENTIFIER ::= {voiceMail 20}
+
+
+     vmDigitPatternNoReason OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..119))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Digit pattern used to indicate Call Forward with no reason (PBX
+to VoiceMail).
+Access: Instant.
+AC INI-Param: DigitPatternForwardNoReason"
+       ::= {vmDigitPattern 1}
+
+
+
+     vmDigitPatternOnBusy OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..119))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Digit pattern used to indicate Call Forward on busy (PBX to
+VoiceMail).
+Access: Instant.
+AC INI-Param: DigitPatternForwardOnBusy"
+       ::= {vmDigitPattern 2}
+
+
+
+     vmDigitPatternOnNoAnswer OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..119))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Digit pattern used to indicate Call Forward on no answer (PBX
+to VoiceMail).
+Access: Instant.
+AC INI-Param: DigitPatternForwardOnNoAnswer"
+       ::= {vmDigitPattern 3}
+
+
+
+     vmDigitPatternOnDND OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..119))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Digit pattern used to indicate Call Forward on Do Not Disturb
+(PBX to VoiceMail).
+Access: Instant.
+AC INI-Param: DigitPatternForwardOnDND"
+       ::= {vmDigitPattern 4}
+
+
+
+     vmDigitPatternInternalCall OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..119))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Digit pattern used to indicate internal call (PBX to VoiceMail).
+Access: Instant.
+AC INI-Param: DigitPatternInternalCall"
+       ::= {vmDigitPattern 5}
+
+
+
+     vmDigitPatternExternalCall OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..119))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Digit pattern used to indicate external call (PBX to VoiceMail).
+Access: Instant.
+AC INI-Param: DigitPatternExternalCall"
+       ::= {vmDigitPattern 6}
+
+
+
+     vmDigitPatternDisconnectCode OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..24))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Disconnect call if digit string is received from the TEL side
+during session.
+Access: Instant.
+AC INI-Param: TelDisconnectCode"
+       ::= {vmDigitPattern 7}
+
+
+
+     vmDigitPatternConnectCode OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..7))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Play Code string to Tel side when connect message recieved from
+IP side.
+Access: Instant.
+AC INI-Param: TELCONNECTCODE"
+       ::= {vmDigitPattern 8}
+
+
+
+     vmDigitPatternVmDigitPatternOnBusyExternal OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..119))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Digit pattern used to indicate Call Forward on busy (PBX to
+VoiceMail).
+Access: Instant.
+AC INI-Param: DigitPatternForwardOnBusyExt"
+       ::= {vmDigitPattern 9}
+
+
+
+     vmDigitPatternVmDigitPatternOnNoAnswerExternal OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..119))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Digit pattern used to indicate Call Forward on no answer (PBX
+to VoiceMail).
+Access: Instant.
+AC INI-Param: DigitPatternForwardOnNoAnswerExt"
+       ::= {vmDigitPattern 10}
+
+
+
+     vmDigitPatternVmDigitPatternOnDNDExternal OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..119))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Digit pattern used to indicate Call Forward on Do Not Disturb
+(PBX to VoiceMail).
+Access: Instant.
+AC INI-Param: DigitPatternForwardOnDNDExt"
+       ::= {vmDigitPattern 11}
+
+
+
+     vmDigitPatternVmDigitPatternNoReasonExternal OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..119))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Digit pattern used to indicate Call Forward with no reason (PBX
+to VoiceMail).
+Access: Instant.
+AC INI-Param: DigitPatternForwardNoReasonExt"
+       ::= {vmDigitPattern 12}
+
+
+
+     vmDigitPatternDigitToIgnore OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..50))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "A digit (0-9,A-D,* or #) that if received as Src (S) or Redirect
+(R), the digit is ignored and not added to that number.
+Used in DTMF VoiceMail.
+Access: Instant.
+AC INI-Param: DigitPatternDigitToIgnore"
+       ::= {vmDigitPattern 13}
+
+
+
+     vmMWI OBJECT IDENTIFIER ::= {voiceMail 21}
+
+
+     vmMWIOnCode OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..25))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Digit pattern used to notify PBX about messages waiting for
+extension (added as prefix).
+Access: Instant.
+AC INI-Param: MWIOnCode"
+       ::= {vmMWI 1}
+
+
+
+     vmMWIOffCode OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..25))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Digit pattern used to notify PBX about no messages waiting for
+extension (added as prefix).
+Access: Instant.
+AC INI-Param: MWIOffCode"
+       ::= {vmMWI 2}
+
+
+
+     vmMWISuffixCode OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..25))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "MWI suffix code used to notify PBX about messages waiting for
+extension (added as suffix to the extention number).
+Access: Instant.
+AC INI-Param: MWISuffixCode"
+       ::= {vmMWI 3}
+
+
+
+     vmMWISourceNumber OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..50))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "The phone number sent as source number toward PSTN for MWI setup.
+Access: Instant.
+AC INI-Param: MWISOURCENUMBER"
+       ::= {vmMWI 4}
+
+
+
+     vmSMDI OBJECT IDENTIFIER ::= {voiceMail 22}
+
+
+     vmSMDIEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables the Simplified Message Desk Interface (SMDI). SMDI defines
+a method whereby telephony systems can provide voice-messaging
+systems with data required by those telephony systems
+to process incoming calls intelligently. Whenever the phone
+system routes a call, it sends an SMDI message through an
+EIA/TIA-232 connection to the voice-messaging system that
+tells it the line that it is using, the type of call that it
+is forwarding, and information about the source and destination
+of the call. 
+0 = Normal Serial
+1 = Serial SMDI.
+Access: Offline.
+AC INI-Param: SMDI"
+       ::= {vmSMDI 1}
+
+
+
+     vmSMDITimeOut OBJECT-TYPE
+       SYNTAX Unsigned32 (0..120000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Time out <mSec> for:
+1. From SMDI Info until SETUP
+2. From SETUP until SMDI event.
+Access: Instant.
+AC INI-Param: SMDITimeOut"
+       ::= {vmSMDI 2}
 
 
 
@@ -15031,11 +16642,12 @@ AC INI-Param: TLSREMOTESUBJECTNAME"
        STATUS current
        DESCRIPTION
            "Offered SRTP Cipher Suites. 
-1: all(0) 
-2: aesCm128HmacShaOne80(1) 
-3: aesCm128HmacShaOne32(2) 
-4: ariaCm128HmacShaOne80(3) 
-5: ariaCm192HmacShaOne80(4).
+not defined(0) 
+all(15) 
+aesCm128HmacShaOne80(1) 
+aesCm128HmacShaOne32(2) 
+ariaCm128HmacShaOne80(4) 
+ariaCm192HmacShaOne80(8).
 Access: Instant.
 AC INI-Param: SRTPOFFEREDSUITES"
        ::= {gwSecurity 7}
@@ -15467,17 +17079,17 @@ AC INI-Param: N/A"
 
      idsRuleReason OBJECT-TYPE
        SYNTAX INTEGER {
-                  authenticationFailure(0)
+                  any(0)
+,
+                  connectionAbuse(1)
 ,
                   malformedMessage(2)
 ,
-                  classification(3)
+                  authenticationFailure(3)
 ,
-                  routing(4)
+                  dialogEstablishFailure(4)
 ,
-                  cACPolicy(5)
-,
-                  signalingMessages(7)
+                  abnormalFlow(5)
 
                   }
        MAX-ACCESS read-write
@@ -15618,6 +17230,24 @@ AC INI-Param: RTCPXRESCTRANSPORTTYPE"
 
 
 
+     acGWRtcpXrSbcReportMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  notSent(0)
+,
+                  sentWhenCallEnded(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "0:rtcpxr is not sent over SIP at all
+1:rtcpxr is sent over sip when call ended.
+Access: Instant.
+AC INI-Param: SBCRtcpXrReportMode"
+       ::= {acGWRtcpXr 4}
+
+
+
      acTimers OBJECT IDENTIFIER ::= {common 20}
 
 
@@ -15720,275 +17350,6 @@ AC INI-Param: EmergencyNumbers"
 
 
 
-     vmDigitPattern OBJECT IDENTIFIER ::= {voiceMail 20}
-
-
-     vmDigitPatternNoReason OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..119))
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Digit pattern used to indicate Call Forward with no reason (PBX
-to VoiceMail).
-Access: Instant.
-AC INI-Param: DigitPatternForwardNoReason"
-       ::= {vmDigitPattern 1}
-
-
-
-     vmDigitPatternOnBusy OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..119))
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Digit pattern used to indicate Call Forward on busy (PBX to
-VoiceMail).
-Access: Instant.
-AC INI-Param: DigitPatternForwardOnBusy"
-       ::= {vmDigitPattern 2}
-
-
-
-     vmDigitPatternOnNoAnswer OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..119))
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Digit pattern used to indicate Call Forward on no answer (PBX
-to VoiceMail).
-Access: Instant.
-AC INI-Param: DigitPatternForwardOnNoAnswer"
-       ::= {vmDigitPattern 3}
-
-
-
-     vmDigitPatternOnDND OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..119))
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Digit pattern used to indicate Call Forward on Do Not Disturb
-(PBX to VoiceMail).
-Access: Instant.
-AC INI-Param: DigitPatternForwardOnDND"
-       ::= {vmDigitPattern 4}
-
-
-
-     vmDigitPatternInternalCall OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..119))
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Digit pattern used to indicate internal call (PBX to VoiceMail).
-Access: Instant.
-AC INI-Param: DigitPatternInternalCall"
-       ::= {vmDigitPattern 5}
-
-
-
-     vmDigitPatternExternalCall OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..119))
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Digit pattern used to indicate external call (PBX to VoiceMail).
-Access: Instant.
-AC INI-Param: DigitPatternExternalCall"
-       ::= {vmDigitPattern 6}
-
-
-
-     vmDigitPatternDisconnectCode OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..24))
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Disconnect call if digit string is received from the TEL side
-during session.
-Access: Instant.
-AC INI-Param: TelDisconnectCode"
-       ::= {vmDigitPattern 7}
-
-
-
-     vmDigitPatternConnectCode OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..7))
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Play Code string to Tel side when connect message recieved from
-IP side.
-Access: Instant.
-AC INI-Param: TELCONNECTCODE"
-       ::= {vmDigitPattern 8}
-
-
-
-     vmDigitPatternVmDigitPatternOnBusyExternal OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..119))
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Digit pattern used to indicate Call Forward on busy (PBX to
-VoiceMail).
-Access: Instant.
-AC INI-Param: DigitPatternForwardOnBusyExt"
-       ::= {vmDigitPattern 9}
-
-
-
-     vmDigitPatternVmDigitPatternOnNoAnswerExternal OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..119))
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Digit pattern used to indicate Call Forward on no answer (PBX
-to VoiceMail).
-Access: Instant.
-AC INI-Param: DigitPatternForwardOnNoAnswerExt"
-       ::= {vmDigitPattern 10}
-
-
-
-     vmDigitPatternVmDigitPatternOnDNDExternal OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..119))
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Digit pattern used to indicate Call Forward on Do Not Disturb
-(PBX to VoiceMail).
-Access: Instant.
-AC INI-Param: DigitPatternForwardOnDNDExt"
-       ::= {vmDigitPattern 11}
-
-
-
-     vmDigitPatternVmDigitPatternNoReasonExternal OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..119))
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Digit pattern used to indicate Call Forward with no reason (PBX
-to VoiceMail).
-Access: Instant.
-AC INI-Param: DigitPatternForwardNoReasonExt"
-       ::= {vmDigitPattern 12}
-
-
-
-     vmDigitPatternDigitToIgnore OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..50))
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "A digit (0-9,A-D,* or #) that if received as Src (S) or Redirect
-(R), the digit is ignored and not added to that number.
-Used in DTMF VoiceMail.
-Access: Instant.
-AC INI-Param: DigitPatternDigitToIgnore"
-       ::= {vmDigitPattern 13}
-
-
-
-     vmMWI OBJECT IDENTIFIER ::= {voiceMail 21}
-
-
-     vmMWIOnCode OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..25))
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Digit pattern used to notify PBX about messages waiting for
-extension (added as prefix).
-Access: Instant.
-AC INI-Param: MWIOnCode"
-       ::= {vmMWI 1}
-
-
-
-     vmMWIOffCode OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..25))
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Digit pattern used to notify PBX about no messages waiting for
-extension (added as prefix).
-Access: Instant.
-AC INI-Param: MWIOffCode"
-       ::= {vmMWI 2}
-
-
-
-     vmMWISuffixCode OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..25))
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "MWI suffix code used to notify PBX about messages waiting for
-extension (added as suffix to the extention number).
-Access: Instant.
-AC INI-Param: MWISuffixCode"
-       ::= {vmMWI 3}
-
-
-
-     vmMWISourceNumber OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..50))
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "The phone number sent as source number toward PSTN for MWI setup.
-Access: Instant.
-AC INI-Param: MWISOURCENUMBER"
-       ::= {vmMWI 4}
-
-
-
-     vmSMDI OBJECT IDENTIFIER ::= {voiceMail 22}
-
-
-     vmSMDIEnable OBJECT-TYPE
-       SYNTAX INTEGER {
-                  disable(0)
-,
-                  enable(1)
-
-                  }
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Enables the Simplified Message Desk Interface (SMDI). SMDI defines
-a method whereby telephony systems can provide voice-messaging
-systems with data required by those telephony systems
-to process incoming calls intelligently. Whenever the phone
-system routes a call, it sends an SMDI message through an
-EIA/TIA-232 connection to the voice-messaging system that
-tells it the line that it is using, the type of call that it
-is forwarding, and information about the source and destination
-of the call. 
-0 = Normal Serial
-1 = Serial SMDI.
-Access: Offline.
-AC INI-Param: SMDI"
-       ::= {vmSMDI 1}
-
-
-
-     vmSMDITimeOut OBJECT-TYPE
-       SYNTAX Unsigned32 (0..120000)
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Time out <mSec> for:
-1. From SMDI Info until SETUP
-2. From SETUP until SMDI event.
-Access: Instant.
-AC INI-Param: SMDITimeOut"
-       ::= {vmSMDI 2}
-
-
-
      accounts OBJECT IDENTIFIER ::= {common 22}
 
 
@@ -16040,7 +17401,7 @@ AC INI-Param: SMDITimeOut"
 
 
      accountIndex OBJECT-TYPE
-       SYNTAX Unsigned32 (0..31)
+       SYNTAX Unsigned32 (0..500)
        MAX-ACCESS read-only
        STATUS current
        DESCRIPTION
@@ -16166,7 +17527,9 @@ AC INI-Param: Account_HostName"
        SYNTAX INTEGER {
                   no(0)
 ,
-                  yes(1)
+                  regular(1)
+,
+                  gin(2)
 
                   }
        MAX-ACCESS read-create
@@ -16240,7 +17603,7 @@ AC INI-Param: Account_ContactUser"
        ipGroupAlwaysUseRouteTable                      INTEGER,
        ipGroupRoutingMode                              INTEGER,
        ipGroupProfileId                                Unsigned32,
-       ipGroupMediaRealm                               SnmpAdminString,
+       ipGroupMediaRealm                               RowPointer,
        ipGroupMaxNumOfRegUsers                         Integer32,
        ipGroupRegistrationMode                         INTEGER,
        ipGroupAuthenticationMode                       INTEGER,
@@ -16248,13 +17611,25 @@ AC INI-Param: Account_ContactUser"
        ipGroupSRD                                      Unsigned32,
        ipGroupEnableSBCClientForking                   INTEGER,
        ipGroupSrcUriInput                              INTEGER,
-       ipGroupDstUriInput                              INTEGER
+       ipGroupDstUriInput                              INTEGER,
+       ipGroupUsername                                 SnmpAdminString,
+       ipGroupPassword                                 SnmpAdminString,
+       ipGroupAlwaysUseSourceAddr                      INTEGER,
+       ipGroupQOEProfileName                           RowPointer,
+       ipGroupBWProfileName                            RowPointer,
+       ipGroupMediaEnhancementProfileName              RowPointer,
+       ipGroupName                                     SnmpAdminString,
+       ipGroupSRDName                                  RowPointer,
+       ipGroupSBCOperationMode                         INTEGER,
+       ipGroupProxySetName                             RowPointer,
+       ipGroupProfileName                              RowPointer,
+       ipGroupProxySetConnectivity                     SnmpAdminString
      }
 
 
 
      ipGroupIndex OBJECT-TYPE
-       SYNTAX Unsigned32 (1..31)
+       SYNTAX Unsigned32 (1..500)
        MAX-ACCESS read-only
        STATUS current
        DESCRIPTION
@@ -16476,11 +17851,11 @@ AC INI-Param: IPGroup_ProfileId"
 
 
      ipGroupMediaRealm OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..39))
+       SYNTAX RowPointer
        MAX-ACCESS read-create
        STATUS current
        DESCRIPTION
-           "
+           "MediaRealm Name.
 Access: Instant.
 AC INI-Param: IPGroup_MediaRealm"
        ::= {ipGroupEntry 16}
@@ -16573,16 +17948,20 @@ AC INI-Param: IPGroup_SRD"
 
      ipGroupEnableSBCClientForking OBJECT-TYPE
        SYNTAX INTEGER {
-                  no(0)
+                  sequential(0)
 ,
-                  yes(1)
+                  parallel(1)
+,
+                  sequentialAvailableOnly(2)
 
                   }
        MAX-ACCESS read-create
        STATUS current
        DESCRIPTION
-           "Is set to yes, the SBC will fork INVITE messages (if avalibale)
-and will create up to 5 separate Sip outgoing legs.
+           "0 - Sequential route to all contacts who registered with same
+AOR. 1 - Fork INVITE messages in parallel to all registered
+contacts (up to 5). 2 - Sequential route only to available
+contacts.
 Access: Instant.
 AC INI-Param: IPGroup_EnableSBCClientForking"
        ::= {ipGroupEntry 22}
@@ -16666,6 +18045,166 @@ process in SBC.
 Access: Instant.
 AC INI-Param: IPGroup_DestUriInput"
        ::= {ipGroupEntry 24}
+
+
+
+     ipGroupUsername OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..50))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Server to server username for authentication.
+Access: Instant.
+AC INI-Param: IPGroup_Username"
+       ::= {ipGroupEntry 25}
+
+
+
+     ipGroupPassword OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..50))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Server to server password for authentication.
+Access: Instant.
+AC INI-Param: IPGroup_Password"
+       ::= {ipGroupEntry 26}
+
+
+
+     ipGroupAlwaysUseSourceAddr OBJECT-TYPE
+       SYNTAX INTEGER {
+                  no(0)
+,
+                  yes(1)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Override SIP standard rules in sending responses and requests
+within dialog. When flag is on, always send to the IP that
+previous message was received from.
+Access: Instant.
+AC INI-Param: IPGroup_AlwaysUseSourceAddr"
+       ::= {ipGroupEntry 27}
+
+
+
+     ipGroupQOEProfileName OBJECT-TYPE
+       SYNTAX RowPointer
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Quality of experience (QOE) Profile.
+Access: Instant.
+AC INI-Param: IPGroup_QOEProfile"
+       ::= {ipGroupEntry 28}
+
+
+
+     ipGroupBWProfileName OBJECT-TYPE
+       SYNTAX RowPointer
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "bandwidth Profile.
+Access: Instant.
+AC INI-Param: IPGroup_BWProfile"
+       ::= {ipGroupEntry 29}
+
+
+
+     ipGroupMediaEnhancementProfileName OBJECT-TYPE
+       SYNTAX RowPointer
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Media Enhancement Profile.
+Access: Instant.
+AC INI-Param: IPGroup_MediaEnhancementProfile"
+       ::= {ipGroupEntry 30}
+
+
+
+     ipGroupName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..50))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Name.
+Access: Instant.
+AC INI-Param: IPGroup_Name"
+       ::= {ipGroupEntry 31}
+
+
+
+     ipGroupSRDName OBJECT-TYPE
+       SYNTAX RowPointer
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "SRD Name.
+Access: Instant.
+AC INI-Param: IPGroup_SRDName"
+       ::= {ipGroupEntry 32}
+
+
+
+     ipGroupSBCOperationMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  notConfigured(-1)
+,
+                  b2BUA(0)
+,
+                  callStatefulProxy(1)
+,
+                  microsoftServer(2)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Overrides the same parameter in the SRD, when configured.
+Access: Instant.
+AC INI-Param: IPGroup_SBCOperationMode"
+       ::= {ipGroupEntry 33}
+
+
+
+     ipGroupProxySetName OBJECT-TYPE
+       SYNTAX RowPointer
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ProxySetName.
+Access: Instant.
+AC INI-Param: IPGroup_ProxySetName"
+       ::= {ipGroupEntry 34}
+
+
+
+     ipGroupProfileName OBJECT-TYPE
+       SYNTAX RowPointer
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ProfileName.
+Access: Instant.
+AC INI-Param: IPGroup_ProfileName"
+       ::= {ipGroupEntry 35}
+
+
+
+     ipGroupProxySetConnectivity OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..15))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Indicates if an IPgroup is connected or not according to the
+proxy set keepalive.
+AC INI-Param: IPGroup_ProxySetStatus"
+       ::= {ipGroupEntry 36}
 
 
 
@@ -16853,12 +18392,12 @@ AC INI-Param: AUTHCHALLENGEMETHOD"
 
 
      sbcServAuthQop OBJECT-TYPE
-       SYNTAX Unsigned32 (0..2)
+       SYNTAX Unsigned32 (0..3)
        MAX-ACCESS read-write
        STATUS current
        DESCRIPTION
            "Set to 0 to offer auth, 1 to offer auth-int or 2 to offer auth,
-auth-int.
+auth-int, or 3 to not offer any QOP.
 Access: Offline.
 AC INI-Param: AUTHQOP"
        ::= {sbc 12}
@@ -16932,6 +18471,76 @@ AC INI-Param: SBCSESSIONEXPIRES"
 
 
 
+     sbcDialogInfoInterworking OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Changes the WAN call identifiers in the dialog-info body of
+NOTIFY messages to LAN call identifiers. 0 - Do not alter the
+dialog info body in a notify message. 1 - alter the dialog
+info body call tags.
+Access: Instant.
+AC INI-Param: ENABLESBCDIALOGINFOINTERNETWORKING"
+       ::= {sbc 17}
+
+
+
+     sbcUserRegistrationGraceTime OBJECT-TYPE
+       SYNTAX Unsigned32 (0..300)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "SBC User Registration Grace Time.
+Access: Instant.
+AC INI-Param: SBCUSERREGISTRATIONGRACETIME"
+       ::= {sbc 18}
+
+
+
+     sbcCrpSurvivabilityMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  standardMode(0)
+,
+                  alwaysEmergencyMode(1)
+,
+                  autoAnswerRegister(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the CRP functionality modes: (0)Normal, (1)Always  Emergency,
+(2)Auto answer to registrations.
+Access: Instant.
+AC INI-Param: CRPSURVIVABILITYMODE"
+       ::= {sbc 19}
+
+
+
+     sbcSharedLineRegMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  asConfigured(0)
+,
+                  terminateSecondaryLines(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Define the registration handling mode in case of shared line
+manipulation. 0 - as configured, 1- terminate secondary lines.
+Access: Instant.
+AC INI-Param: SBCSHAREDLINEREGMODE"
+       ::= {sbc 20}
+
+
+
      -- ****************************************
      -- sbcClassification table declaration
      -- ****************************************
@@ -16977,13 +18586,14 @@ AC INI-Param: SBCSESSIONEXPIRES"
        sbcClassificationMessageCondition               RowPointer,
        sbcClassificationActionType                     Unsigned32,
        sbcClassificationSrcPort                        Unsigned32,
-       sbcClassificationSrcTransportType               Integer32
+       sbcClassificationSrcTransportType               Integer32,
+       sbcClassificationClassificationName             SnmpAdminString
      }
 
 
 
      sbcClassificationIndex OBJECT-TYPE
-       SYNTAX Unsigned32 (0..99)
+       SYNTAX Unsigned32 (0..500)
        MAX-ACCESS read-only
        STATUS current
        DESCRIPTION
@@ -17171,6 +18781,18 @@ AC INI-Param: Classification_SrcTransportType"
 
 
 
+     sbcClassificationClassificationName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Classification Name.
+Access: Instant.
+AC INI-Param: Classification_ClassificationName"
+       ::= {sbcClassificationEntry 16}
+
+
+
      -- ****************************************
      -- sbcRouting table declaration
      -- ****************************************
@@ -17222,7 +18844,9 @@ AC INI-Param: Classification_SrcTransportType"
        sbcRoutingCostGroupName                         RowPointer,
        sbcRoutingMessageCondition                      RowPointer,
        sbcRoutingReRouteIPGroupID                      Integer32,
-       sbcRoutingTrigger                               INTEGER
+       sbcRoutingTrigger                               INTEGER,
+       sbcRoutingRouteName                             SnmpAdminString,
+       sbcRoutingGroupPolicy                           INTEGER
      }
 
 
@@ -17466,6 +19090,8 @@ AC INI-Param: IP2IPRouting_AltRouteOptions"
                   inviteAndRegister(4)
 ,
                   inviteAndSubscribe(5)
+,
+                  options(6)
 
                   }
        MAX-ACCESS read-create
@@ -17538,6 +19164,35 @@ AC INI-Param: IP2IPRouting_Trigger"
 
 
 
+     sbcRoutingRouteName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Route Name.
+Access: Instant.
+AC INI-Param: IP2IPRouting_RouteName"
+       ::= {sbcRoutingEntry 22}
+
+
+
+     sbcRoutingGroupPolicy OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+,
+                  forking(1)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Group Policy.
+Access: Instant.
+AC INI-Param: IP2IPRouting_GroupPolicy"
+       ::= {sbcRoutingEntry 23}
+
+
+
      -- ****************************************
      -- sbcIP2IPInboundManipulation table declaration
      -- ****************************************
@@ -17586,13 +19241,14 @@ AC INI-Param: IP2IPRouting_Trigger"
        sbcIP2IPInboundManipulationLeaveFromRight       Unsigned32,
        sbcIP2IPInboundManipulationPrefix2Add           SnmpAdminString,
        sbcIP2IPInboundManipulationSuffix2Add           SnmpAdminString,
-       sbcIP2IPInboundManipulationRequestType          INTEGER
+       sbcIP2IPInboundManipulationRequestType          INTEGER,
+       sbcIP2IPInboundManipulationManipulationName     SnmpAdminString
      }
 
 
 
      sbcIP2IPInboundManipulationIndex OBJECT-TYPE
-       SYNTAX Unsigned32 (0..99)
+       SYNTAX Unsigned32 (0..500)
        MAX-ACCESS read-only
        STATUS current
        DESCRIPTION
@@ -17827,6 +19483,18 @@ AC INI-Param: IPInboundManipulation_RequestType"
 
 
 
+     sbcIP2IPInboundManipulationManipulationName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Manipulation Name.
+Access: Instant.
+AC INI-Param: IPInboundManipulation_ManipulationName"
+       ::= {sbcIP2IPInboundManipulationEntry 18}
+
+
+
      -- ****************************************
      -- sbcIP2IPOutboundManipulation table declaration
      -- ****************************************
@@ -17878,13 +19546,16 @@ AC INI-Param: IPInboundManipulation_RequestType"
        sbcIP2IPOutboundManipulationSuffix2Add          SnmpAdminString,
        sbcIP2IPOutboundManipulationRequestType         INTEGER,
        sbcIP2IPOutboundManipulationReRouteIPGroupID    Integer32,
-       sbcIP2IPOutboundManipulationTrigger             INTEGER
+       sbcIP2IPOutboundManipulationTrigger             INTEGER,
+       sbcIP2IPOutboundManipulationManipulationName    SnmpAdminString,
+       sbcIP2IPOutboundManipulationMessageCondition    RowPointer,
+       sbcIP2IPOutboundManipulationCallingNamePrefix   SnmpAdminString
      }
 
 
 
      sbcIP2IPOutboundManipulationIndex OBJECT-TYPE
-       SYNTAX Unsigned32 (0..99)
+       SYNTAX Unsigned32 (0..500)
        MAX-ACCESS read-only
        STATUS current
        DESCRIPTION
@@ -17959,9 +19630,11 @@ AC INI-Param: IPOutboundManipulation_IsAdditionalManipulation"
 
      sbcIP2IPOutboundManipulationManipulatedURI OBJECT-TYPE
        SYNTAX INTEGER {
-                  source(0)
+                  sourceURI(0)
 ,
-                  destination(1)
+                  destinationURI(1)
+,
+                  callingName(2)
 
                   }
        MAX-ACCESS read-create
@@ -18167,6 +19840,42 @@ AC INI-Param: IPOutboundManipulation_Trigger"
 
 
 
+     sbcIP2IPOutboundManipulationManipulationName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Manipulation Name.
+Access: Instant.
+AC INI-Param: IPOutboundManipulation_ManipulationName"
+       ::= {sbcIP2IPOutboundManipulationEntry 21}
+
+
+
+     sbcIP2IPOutboundManipulationMessageCondition OBJECT-TYPE
+       SYNTAX RowPointer
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Message Condition.
+Access: Instant.
+AC INI-Param: IPOutboundManipulation_MessageCondition"
+       ::= {sbcIP2IPOutboundManipulationEntry 22}
+
+
+
+     sbcIP2IPOutboundManipulationCallingNamePrefix OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..36))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Calling Name Prefix.
+Access: Instant.
+AC INI-Param: IPOutboundManipulation_CallingNamePrefix"
+       ::= {sbcIP2IPOutboundManipulationEntry 23}
+
+
+
      -- ****************************************
      -- sbcAdmissionControl table declaration
      -- ****************************************
@@ -18210,13 +19919,15 @@ AC INI-Param: IPOutboundManipulation_Trigger"
        sbcAdmissionControlLimit                        Integer32,
        sbcAdmissionControlLimitPerUser                 Integer32,
        sbcAdmissionControlRate                         Unsigned32,
-       sbcAdmissionControlMaxBurst                     Unsigned32
+       sbcAdmissionControlMaxBurst                     Unsigned32,
+       sbcAdmissionControlName                         SnmpAdminString,
+       sbcAdmissionControlReservation                  Unsigned32
      }
 
 
 
      sbcAdmissionControlIndex OBJECT-TYPE
-       SYNTAX Unsigned32 (0..99)
+       SYNTAX Unsigned32 (0..500)
        MAX-ACCESS read-only
        STATUS current
        DESCRIPTION
@@ -18395,6 +20106,30 @@ AC INI-Param: SBCAdmissionControl_MaxBurst"
 
 
 
+     sbcAdmissionControlName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Admission Control Name.
+Access: Offline.
+AC INI-Param: SBCAdmissionControl_AdmissionControlName"
+       ::= {sbcAdmissionControlEntry 14}
+
+
+
+     sbcAdmissionControlReservation OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Reservation.
+Access: Instant.
+AC INI-Param: SBCAdmissionControl_Reservation"
+       ::= {sbcAdmissionControlEntry 15}
+
+
+
      -- ****************************************
      -- sbcMessageManipulations table declaration
      -- ****************************************
@@ -18436,13 +20171,14 @@ AC INI-Param: SBCAdmissionControl_MaxBurst"
        sbcMessageManipulationsActionSubject            SnmpAdminString,
        sbcMessageManipulationsActionType               INTEGER,
        sbcMessageManipulationsActionValue              SnmpAdminString,
-       sbcMessageManipulationsRowRole                  INTEGER
+       sbcMessageManipulationsRowRole                  INTEGER,
+       sbcMessageManipulationsManipulationName         SnmpAdminString
      }
 
 
 
      sbcMessageManipulationsIndex OBJECT-TYPE
-       SYNTAX Unsigned32 (0..79)
+       SYNTAX Unsigned32 (0..500)
        MAX-ACCESS read-only
        STATUS current
        DESCRIPTION
@@ -18561,6 +20297,8 @@ AC INI-Param: MessageManipulations_ActionSubject"
                   removeSuffix(5)
 ,
                   removePrefix(6)
+,
+                  normalize(7)
 
                   }
        MAX-ACCESS read-create
@@ -18602,6 +20340,18 @@ AC INI-Param: MessageManipulations_RowRole"
 
 
 
+     sbcMessageManipulationsManipulationName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Manipulation Name.
+Access: Instant.
+AC INI-Param: MessageManipulations_ManipulationName"
+       ::= {sbcMessageManipulationsEntry 12}
+
+
+
      -- ****************************************
      -- sbcAlternativeRoutingReasons table declaration
      -- ****************************************
@@ -18637,7 +20387,7 @@ AC INI-Param: MessageManipulations_RowRole"
        sbcAlternativeRoutingReasonsRowStatus           RowStatus,
        sbcAlternativeRoutingReasonsAction              INTEGER,
        sbcAlternativeRoutingReasonsActionResult        INTEGER,
-       sbcAlternativeRoutingReasonsReleaseCause        Unsigned32
+       sbcAlternativeRoutingReasonsReleaseCause        INTEGER
      }
 
 
@@ -18694,7 +20444,96 @@ AC INI-Param: N/A"
 
 
      sbcAlternativeRoutingReasonsReleaseCause OBJECT-TYPE
-       SYNTAX Unsigned32 (0..700)
+       SYNTAX INTEGER {
+                  wildCard4xx(4)
+,
+                  wildCardFivexx(5)
+,
+                  wildCardSixxx(6)
+,
+                  badRequest(400)
+,
+                  unauthorized(401)
+,
+                  paymentRequired(402)
+,
+                  forbidden(403)
+,
+                  notFound(404)
+,
+                  methodNotAllowed(405)
+,
+                  requestNotAcceptable(406)
+,
+                  authenticationRequired(407)
+,
+                  requestTimeout(408)
+,
+                  conflict(409)
+,
+                  gone(410)
+,
+                  requestTooLarge(413)
+,
+                  requestURITooLong(414)
+,
+                  unsupportedMedia(415)
+,
+                  badExtension(420)
+,
+                  extensionRequired(421)
+,
+                  sessionIntervalTooSmall(423)
+,
+                  unavailable(480)
+,
+                  transactionDoesNotExist(481)
+,
+                  loopDetected(482)
+,
+                  tooManyHops(483)
+,
+                  addressIncomplete(484)
+,
+                  ambiguous(485)
+,
+                  busy(486)
+,
+                  requestTerminated(487)
+,
+                  notAcceptableHere(488)
+,
+                  requestPending(491)
+,
+                  undecipherable(493)
+,
+                  internalError(500)
+,
+                  notImplemented(501)
+,
+                  badGateway(502)
+,
+                  serviceUnavailable(503)
+,
+                  serverTimeout(504)
+,
+                  versionNotSupported(505)
+,
+                  messageTooLarge(513)
+,
+                  busyEverywhere(600)
+,
+                  decline(603)
+,
+                  doesNotExistAnywhere(604)
+,
+                  sDPNotAcceptable(606)
+,
+                  iPProfileCallLimit(805)
+,
+                  mediaLimitsExceeded(806)
+
+                  }
        MAX-ACCESS read-create
        STATUS current
        DESCRIPTION
@@ -19068,7 +20907,7 @@ AC INI-Param: MessagePolicy_BodyList"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "0. Always offer a single (preferrable) media IP address.
 1. ANAT - Construct offer using ANAT semantics (RFC 4091 &
@@ -19083,7 +20922,7 @@ AC INI-Param: DUALIPSTACKSDPMETHOD"
      gwIPv6GwAppPrimaryMediaInterface OBJECT-TYPE
        SYNTAX Integer32 (-1..32)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Primary media interface to be used within SDP.
 Access: Instant.
@@ -19095,7 +20934,7 @@ AC INI-Param: PRIMARYMEDIAINTERFACE"
      gwIPv6GwAppSecondaryMediaInterface OBJECT-TYPE
        SYNTAX Integer32 (-1..32)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Secondary media interface to be used within SDP.
 Access: Instant.
@@ -19164,16 +21003,18 @@ AC INI-Param: MEDIAIPVERSIONPREFERENCE"
        srdAction                                       INTEGER,
        srdActionResult                                 INTEGER,
        srdName                                         SnmpAdminString,
-       srdMediaRealm                                   SnmpAdminString,
+       srdMediaRealm                                   RowPointer,
        srdIntraSRDMediaAnchoring                       INTEGER,
        srdBlockUnRegUsers                              INTEGER,
-       srdMaxNumOfRegUsers                             Integer32
+       srdMaxNumOfRegUsers                             Integer32,
+       srdSharingPolicy                                INTEGER,
+       srdSBCOperationMode                             INTEGER
      }
 
 
 
      srdIndex OBJECT-TYPE
-       SYNTAX Unsigned32 (0..31)
+       SYNTAX Unsigned32 (0..200)
        MAX-ACCESS read-only
        STATUS current
        DESCRIPTION
@@ -19236,11 +21077,11 @@ AC INI-Param: SRD_Name"
 
 
      srdMediaRealm OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..39))
+       SYNTAX RowPointer
        MAX-ACCESS read-create
        STATUS current
        DESCRIPTION
-           "GwApp Signaling Routing Domain media realm.
+           "MediaRealm Name.
 Access: Instant.
 AC INI-Param: SRD_MediaRealm"
        ::= {srdEntry 6}
@@ -19297,6 +21138,44 @@ AC INI-Param: SRD_MaxNumOfRegUsers"
 
 
 
+     srdSharingPolicy OBJECT-TYPE
+       SYNTAX INTEGER {
+                  shared(0)
+,
+                  isolated(1)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Defines the SRD Sharing Policy.
+Access: Offline.
+AC INI-Param: SRD_SharingPolicy"
+       ::= {srdEntry 10}
+
+
+
+     srdSBCOperationMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  b2BUA(0)
+,
+                  callStatefulProxy(1)
+,
+                  microsoftServer(2)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "For Call Stateful Proxy, the SBC uses the same Call-Id and From
+tag for both sides of calls and dialogs. For B2BUA it changes
+them.
+Access: Offline.
+AC INI-Param: SRD_SBCOperationMode"
+       ::= {srdEntry 11}
+
+
+
      sipInterfaceSettings OBJECT IDENTIFIER ::= {common 27}
 
 
@@ -19335,18 +21214,20 @@ AC INI-Param: SRD_MaxNumOfRegUsers"
        sipInterfaceRowStatus                           RowStatus,
        sipInterfaceAction                              INTEGER,
        sipInterfaceActionResult                        INTEGER,
-       sipInterfaceNetworkInterface                    SnmpAdminString,
+       sipInterfaceNetworkInterface                    RowPointer,
        sipInterfaceApplicationType                     INTEGER,
        sipInterfaceUDPPort                             Unsigned32,
        sipInterfaceTCPPort                             Unsigned32,
        sipInterfaceTLSPort                             Unsigned32,
-       sipInterfaceSRD                                 Unsigned32
+       sipInterfaceSRD                                 Unsigned32,
+       sipInterfaceInterfaceName                       SnmpAdminString,
+       sipInterfaceClassificationFailureResponseType   Unsigned32
      }
 
 
 
      sipInterfaceIndex OBJECT-TYPE
-       SYNTAX Unsigned32 (0..31)
+       SYNTAX Unsigned32 (0..200)
        MAX-ACCESS read-only
        STATUS current
        DESCRIPTION
@@ -19397,7 +21278,7 @@ AC INI-Param: N/A"
 
 
      sipInterfaceNetworkInterface OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..15))
+       SYNTAX RowPointer
        MAX-ACCESS read-create
        STATUS current
        DESCRIPTION
@@ -19472,6 +21353,32 @@ AC INI-Param: SIPInterface_TLSPort"
 Access: Instant.
 AC INI-Param: SIPInterface_SRD"
        ::= {sipInterfaceEntry 10}
+
+
+
+     sipInterfaceInterfaceName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Interface Name.
+Access: Instant.
+AC INI-Param: SIPInterface_InterfaceName"
+       ::= {sipInterfaceEntry 11}
+
+
+
+     sipInterfaceClassificationFailureResponseType OBJECT-TYPE
+       SYNTAX Unsigned32 (0..699)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Classification Failure Response Type - the response type that
+will be returned after classification fails. The value 0 means
+ignore - response will not be sent.
+Access: Instant.
+AC INI-Param: SIPInterface_ClassificationFailureResponseType"
+       ::= {sipInterfaceEntry 12}
 
 
 
@@ -20546,6 +22453,8 @@ AC INI-Param: Test_Call_TestDuration"
                   disable(0)
 ,
                   dTMF(1)
+,
+                  pRT(2)
 
                   }
        MAX-ACCESS read-create
@@ -20574,7 +22483,7 @@ AC INI-Param: Test_Call_ScheduleInterval"
      testCallActiveCalls OBJECT-TYPE
        SYNTAX Unsigned32 (0..4294967296)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Current active calls.
 AC INI-Param: Test_Call_ActiveCalls"
@@ -20585,7 +22494,7 @@ AC INI-Param: Test_Call_ActiveCalls"
      testCallCallAttempts OBJECT-TYPE
        SYNTAX Unsigned32 (0..4294967296)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Total call attempts.
 AC INI-Param: Test_Call_CallAttempts"
@@ -20596,7 +22505,7 @@ AC INI-Param: Test_Call_CallAttempts"
      testCallEstablishedCalls OBJECT-TYPE
        SYNTAX Unsigned32 (0..4294967296)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Total established calls.
 AC INI-Param: Test_Call_EstablishedCalls"
@@ -20607,7 +22516,7 @@ AC INI-Param: Test_Call_EstablishedCalls"
      testCallFailedAttempts OBJECT-TYPE
        SYNTAX Unsigned32 (0..4294967296)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Total failed attempts.
 AC INI-Param: Test_Call_FailedAttempts"
@@ -20618,7 +22527,7 @@ AC INI-Param: Test_Call_FailedAttempts"
      testCallRemoteDisconnects OBJECT-TYPE
        SYNTAX Unsigned32 (0..4294967296)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Remote disconnections.
 AC INI-Param: Test_Call_RemoteDisconnects"
@@ -20629,7 +22538,7 @@ AC INI-Param: Test_Call_RemoteDisconnects"
      testCallAverageCPS OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..5))
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Average calls per second.
 AC INI-Param: Test_Call_AverageCPS"
@@ -20640,7 +22549,7 @@ AC INI-Param: Test_Call_AverageCPS"
      testCallElapsedTime OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..12))
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Elapsed time since last session beginning or stats reset.
 AC INI-Param: Test_Call_ElapsedTime"
@@ -20651,7 +22560,7 @@ AC INI-Param: Test_Call_ElapsedTime"
      testCallTestSummary OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Short summary of current test status (Idle, Running...).
 AC INI-Param: Test_Call_TestSummary"
@@ -20662,7 +22571,7 @@ AC INI-Param: Test_Call_TestSummary"
      testCallTestStatus OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..39))
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Test status.
 AC INI-Param: Test_Call_TestStatus"
@@ -20687,6 +22596,659 @@ AC INI-Param: Test_Call_TestStatus"
 Access: Offline.
 AC INI-Param: ENABLECRPAPPLICATION"
        ::= {crp 1}
+
+
+
+     userInfo OBJECT IDENTIFIER ::= {common 33}
+
+
+     userInfoEnableUsage OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables the usage of the User Information, which is loaded to
+the device in the User Information auxiliary file. 0 - disable,
+1 - enable.
+Access: Instant.
+AC INI-Param: ENABLEUSERINFOUSAGE"
+       ::= {userInfo 1}
+
+
+
+     -- ****************************************
+     -- gwUserInfo table declaration
+     -- ****************************************
+     gwUserInfoTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF GwUserInfoEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {userInfo 21}
+
+
+
+     -- ****************************************
+     -- gwUserInfo table entry
+     -- ****************************************
+     gwUserInfoEntry OBJECT-TYPE
+       SYNTAX GwUserInfoEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {gwUserInfoIndex}
+       ::= {gwUserInfoTable 1}
+
+
+
+     -- ****************************************
+     -- gwUserInfo TABLE
+     -- ****************************************
+     GwUserInfoEntry ::= SEQUENCE {
+       gwUserInfoIndex                                 Unsigned32,
+       gwUserInfoRowStatus                             RowStatus,
+       gwUserInfoAction                                INTEGER,
+       gwUserInfoActionResult                          INTEGER,
+       gwUserInfoPBXExtension                          SnmpAdminString,
+       gwUserInfoGlobalPhoneNumber                     SnmpAdminString,
+       gwUserInfoDisplayName                           SnmpAdminString,
+       gwUserInfoUsername                              SnmpAdminString,
+       gwUserInfoPassword                              SnmpAdminString,
+       gwUserInfoStatus                                INTEGER
+     }
+
+
+
+     gwUserInfoIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..999)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Entry number, starting at 0.
+AC INI-Param: GWUserInfoTable_Index"
+       ::= {gwUserInfoEntry 1}
+
+
+
+     gwUserInfoRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Row-Status Textual Conventions as defined in RFC 2579: Textual
+Conventions for SMIv2.
+AC INI-Param: GWUserInfoTable_RowStatus"
+       ::= {gwUserInfoEntry 2}
+
+
+
+     gwUserInfoAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  developmentImpending(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Development Impending.
+AC INI-Param: GWUserInfoTable_Action"
+       ::= {gwUserInfoEntry 3}
+
+
+
+     gwUserInfoActionResult OBJECT-TYPE
+       SYNTAX INTEGER {
+                  developmentImpending(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Development Impending.
+AC INI-Param: GWUserInfoTable_ActionRes"
+       ::= {gwUserInfoEntry 4}
+
+
+
+     gwUserInfoPBXExtension OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "PBX Extension.
+Access: Instant.
+AC INI-Param: GWUserInfoTable_PBXExtension"
+       ::= {gwUserInfoEntry 5}
+
+
+
+     gwUserInfoGlobalPhoneNumber OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Global Phone Number.
+Access: Instant.
+AC INI-Param: GWUserInfoTable_GlobalPhoneNumber"
+       ::= {gwUserInfoEntry 6}
+
+
+
+     gwUserInfoDisplayName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..30))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Display Name.
+Access: Instant.
+AC INI-Param: GWUserInfoTable_DisplayName"
+       ::= {gwUserInfoEntry 7}
+
+
+
+     gwUserInfoUsername OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..50))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Username.
+Access: Instant.
+AC INI-Param: GWUserInfoTable_Username"
+       ::= {gwUserInfoEntry 8}
+
+
+
+     gwUserInfoPassword OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..50))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Password.
+Access: Instant.
+AC INI-Param: GWUserInfoTable_Password"
+       ::= {gwUserInfoEntry 9}
+
+
+
+     gwUserInfoStatus OBJECT-TYPE
+       SYNTAX INTEGER {
+                  notRegistered(0)
+,
+                  registered(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Status.
+AC INI-Param: GWUserInfoTable_Status"
+       ::= {gwUserInfoEntry 10}
+
+
+
+     -- ****************************************
+     -- sbcUserInfo table declaration
+     -- ****************************************
+     sbcUserInfoTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF SbcUserInfoEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {userInfo 22}
+
+
+
+     -- ****************************************
+     -- sbcUserInfo table entry
+     -- ****************************************
+     sbcUserInfoEntry OBJECT-TYPE
+       SYNTAX SbcUserInfoEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {sbcUserInfoIndex}
+       ::= {sbcUserInfoTable 1}
+
+
+
+     -- ****************************************
+     -- sbcUserInfo TABLE
+     -- ****************************************
+     SbcUserInfoEntry ::= SEQUENCE {
+       sbcUserInfoIndex                                Unsigned32,
+       sbcUserInfoRowStatus                            RowStatus,
+       sbcUserInfoAction                               INTEGER,
+       sbcUserInfoActionResult                         INTEGER,
+       sbcUserInfoLocalUser                            SnmpAdminString,
+       sbcUserInfoUsername                             SnmpAdminString,
+       sbcUserInfoPassword                             SnmpAdminString,
+       sbcUserInfoIPGroupID                            Integer32,
+       sbcUserInfoStatus                               INTEGER
+     }
+
+
+
+     sbcUserInfoIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..20000)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Entry number, starting at 0.
+AC INI-Param: SBCUserInfoTable_Index"
+       ::= {sbcUserInfoEntry 1}
+
+
+
+     sbcUserInfoRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Row-Status Textual Conventions as defined in RFC 2579: Textual
+Conventions for SMIv2.
+AC INI-Param: SBCUserInfoTable_RowStatus"
+       ::= {sbcUserInfoEntry 2}
+
+
+
+     sbcUserInfoAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  developmentImpending(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Development Impending.
+AC INI-Param: SBCUserInfoTable_Action"
+       ::= {sbcUserInfoEntry 3}
+
+
+
+     sbcUserInfoActionResult OBJECT-TYPE
+       SYNTAX INTEGER {
+                  developmentImpending(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Development Impending.
+AC INI-Param: SBCUserInfoTable_ActionRes"
+       ::= {sbcUserInfoEntry 4}
+
+
+
+     sbcUserInfoLocalUser OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..50))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Local User.
+Access: Instant.
+AC INI-Param: SBCUserInfoTable_LocalUser"
+       ::= {sbcUserInfoEntry 5}
+
+
+
+     sbcUserInfoUsername OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..50))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Username.
+Access: Instant.
+AC INI-Param: SBCUserInfoTable_Username"
+       ::= {sbcUserInfoEntry 6}
+
+
+
+     sbcUserInfoPassword OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..50))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Password.
+Access: Instant.
+AC INI-Param: SBCUserInfoTable_Password"
+       ::= {sbcUserInfoEntry 7}
+
+
+
+     sbcUserInfoIPGroupID OBJECT-TYPE
+       SYNTAX Integer32 (-1..200)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "IP Group ID.
+Access: Instant.
+AC INI-Param: SBCUserInfoTable_IPGroupID"
+       ::= {sbcUserInfoEntry 8}
+
+
+
+     sbcUserInfoStatus OBJECT-TYPE
+       SYNTAX INTEGER {
+                  notRegistered(0)
+,
+                  registered(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Status.
+AC INI-Param: SBCUserInfoTable_Status"
+       ::= {sbcUserInfoEntry 9}
+
+
+
+     sbcExt OBJECT IDENTIFIER ::= {common 34}
+
+
+     sbcExtSharedLineRegMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Disable-SBC sends INVITE according to the Request-URI. Enabled-if
+the Request-URI is of specific contact, SBC sends the
+INVITE to all contacts under the parent AOR.
+Access: Instant.
+AC INI-Param: SBCSENDINVITETOALLCONTACTS"
+       ::= {sbcExt 1}
+
+
+
+     sbcExtDiversionURIType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  transparent(0)
+,
+                  sip(1)
+,
+                  tel(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Which uri type to use for Diversion header in SBC.
+Access: Instant.
+AC INI-Param: SBCDIVERSIONURITYPE"
+       ::= {sbcExt 2}
+
+
+
+     sbcExtEnforceMediaOrder OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "enforces media order according to rfc 3264.
+Access: Instant.
+AC INI-Param: SBCENFORCEMEDIAORDER"
+       ::= {sbcExt 3}
+
+
+
+     sbcExtFaxDetectionTimeout OBJECT-TYPE
+       SYNTAX Unsigned32 (0..30)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Maximum time for Fax Detection on SBC(seconds).
+Access: Instant.
+AC INI-Param: SBCFAXDETECTIONTIMEOUT"
+       ::= {sbcExt 4}
+
+
+
+     sipRec OBJECT IDENTIFIER ::= {common 35}
+
+
+     sipRecEnableRecApplication OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables SIP rec functionality.
+Access: Offline.
+AC INI-Param: ENABLESIPREC"
+       ::= {sipRec 1}
+
+
+
+     sipRecServerDestUsername OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..51))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "SIPRec Server Destination Username.
+Access: Instant.
+AC INI-Param: SIPRECSERVERDESTUSERNAME"
+       ::= {sipRec 2}
+
+
+
+     -- ****************************************
+     -- sipRecRouting table declaration
+     -- ****************************************
+     sipRecRoutingTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF SipRecRoutingEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Gwapp SIP Rec Routing table"
+       ::= {sipRec 21}
+
+
+
+     -- ****************************************
+     -- sipRecRouting table entry
+     -- ****************************************
+     sipRecRoutingEntry OBJECT-TYPE
+       SYNTAX SipRecRoutingEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {sipRecRoutingIndex}
+       ::= {sipRecRoutingTable 1}
+
+
+
+     -- ****************************************
+     -- sipRecRouting TABLE
+     -- ****************************************
+     SipRecRoutingEntry ::= SEQUENCE {
+       sipRecRoutingIndex                              Unsigned32,
+       sipRecRoutingRowStatus                          RowStatus,
+       sipRecRoutingAction                             INTEGER,
+       sipRecRoutingActionResult                       INTEGER,
+       sipRecRoutingRecordedIPGroupID                  Integer32,
+       sipRecRoutingRecordedSourcePrefix               SnmpAdminString,
+       sipRecRoutingRecordedDestinationPrefix          SnmpAdminString,
+       sipRecRoutingPeerIPGroupID                      Integer32,
+       sipRecRoutingPeerTrunkGroupID                   Integer32,
+       sipRecRoutingCaller                             INTEGER,
+       sipRecRoutingSRSIPGroupID                       Integer32
+     }
+
+
+
+     sipRecRoutingIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..29)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The index of the table.
+AC INI-Param: SIPRecRouting_Index"
+       ::= {sipRecRoutingEntry 1}
+
+
+
+     sipRecRoutingRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Row-Status Textual Conventions as defined in RFC 2579: Textual
+Conventions for SMIv2.
+AC INI-Param: SIPRecRouting_RowStatus"
+       ::= {sipRecRoutingEntry 2}
+
+
+
+     sipRecRoutingAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+,
+                  dial(1)
+,
+                  dropCall(2)
+,
+                  restart(3)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Development Impending.
+AC INI-Param: SIPRecRouting_Action"
+       ::= {sipRecRoutingEntry 3}
+
+
+
+     sipRecRoutingActionResult OBJECT-TYPE
+       SYNTAX INTEGER {
+                  actionDone(0)
+,
+                  inProgress(1)
+,
+                  failed(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Development Impending.
+AC INI-Param: SIPRecRouting_ActionRes"
+       ::= {sipRecRoutingEntry 4}
+
+
+
+     sipRecRoutingRecordedIPGroupID OBJECT-TYPE
+       SYNTAX Integer32 (-1..200)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Recorded IP Group ID.
+Access: Instant.
+AC INI-Param: SIPRecRouting_RecordedIPGroupID"
+       ::= {sipRecRoutingEntry 5}
+
+
+
+     sipRecRoutingRecordedSourcePrefix OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..100))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Recorded Source Prefix.
+Access: Instant.
+AC INI-Param: SIPRecRouting_RecordedSourcePrefix"
+       ::= {sipRecRoutingEntry 6}
+
+
+
+     sipRecRoutingRecordedDestinationPrefix OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..100))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Recorded Destination Prefix.
+Access: Instant.
+AC INI-Param: SIPRecRouting_RecordedDestinationPrefix"
+       ::= {sipRecRoutingEntry 7}
+
+
+
+     sipRecRoutingPeerIPGroupID OBJECT-TYPE
+       SYNTAX Integer32 (-1..200)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Peer IP Group ID.
+Access: Instant.
+AC INI-Param: SIPRecRouting_PeerIPGroupID"
+       ::= {sipRecRoutingEntry 8}
+
+
+
+     sipRecRoutingPeerTrunkGroupID OBJECT-TYPE
+       SYNTAX Integer32 (-1..241)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Peer Trunk Group ID.
+Access: Instant.
+AC INI-Param: SIPRecRouting_PeerTrunkGroupID"
+       ::= {sipRecRoutingEntry 9}
+
+
+
+     sipRecRoutingCaller OBJECT-TYPE
+       SYNTAX INTEGER {
+                  both(0)
+,
+                  recordedParty(1)
+,
+                  peerParty(2)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Caller.
+Access: Instant.
+AC INI-Param: SIPRecRouting_Caller"
+       ::= {sipRecRoutingEntry 10}
+
+
+
+     sipRecRoutingSRSIPGroupID OBJECT-TYPE
+       SYNTAX Integer32 (-1..200)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Recording Server (SRS) IP Group ID.
+Access: Instant.
+AC INI-Param: SIPRecRouting_SRSIPGroupID"
+       ::= {sipRecRoutingEntry 11}
 
 
 
@@ -21041,7 +23603,7 @@ The endpoints that aren’t defined will be disabled."
 
 
      proxyIPIndex OBJECT-TYPE
-       SYNTAX Unsigned32 (0..159)
+       SYNTAX Unsigned32 (0..4999)
        MAX-ACCESS not-accessible
        STATUS current
        DESCRIPTION
@@ -21095,7 +23657,7 @@ AC INI-Param: N/A"
      proxyIPProxyIP OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..49))
        MAX-ACCESS read-create
-       STATUS current
+       STATUS deprecated
        DESCRIPTION
            "IpAddress.
 Access: Instant.
@@ -21126,7 +23688,7 @@ AC INI-Param: ProxyIp_TransportType"
 
 
      proxyIPProxySetId OBJECT-TYPE
-       SYNTAX Unsigned32 (0..31)
+       SYNTAX Unsigned32 (0..499)
        MAX-ACCESS read-create
        STATUS current
        DESCRIPTION
@@ -21178,13 +23740,16 @@ AC INI-Param: ProxyIp_ProxySetId"
        sipProxySetIsProxyHotSwap                       INTEGER,
        sipProxySetProxyRedundancyMode                  INTEGER,
        sipProxySetClassificationInput                  INTEGER,
-       sipProxySetSRD                                  Unsigned32
+       sipProxySetSRD                                  Unsigned32,
+       sipProxySetProxyName                            SnmpAdminString,
+       sipProxySetDNSResolveMethod                     INTEGER,
+       sipProxySetKeepAliveFailureResp                 SnmpAdminString
      }
 
 
 
      sipProxySetIndex OBJECT-TYPE
-       SYNTAX Unsigned32 (1..32)
+       SYNTAX Unsigned32 (0..499)
        MAX-ACCESS not-accessible
        STATUS current
        DESCRIPTION
@@ -21347,6 +23912,52 @@ AC INI-Param: ProxySet_ClassificationInput"
 Access: Online.
 AC INI-Param: ProxySet_SRD"
        ::= {sipProxySetEntry 11}
+
+
+
+     sipProxySetProxyName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Proxy Name.
+Access: Online.
+AC INI-Param: ProxySet_ProxyName"
+       ::= {sipProxySetEntry 12}
+
+
+
+     sipProxySetDNSResolveMethod OBJECT-TYPE
+       SYNTAX INTEGER {
+                  notConfigured(-1)
+,
+                  a-Record (0)
+,
+                  srv(1)
+,
+                  naptr(2)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "DNS Resolve Method.
+Access: Online.
+AC INI-Param: ProxySet_DNSResolveMethod"
+       ::= {sipProxySetEntry 13}
+
+
+
+     sipProxySetKeepAliveFailureResp OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..12))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Defines responses for keepalive meaning failure(comma separated
+string).
+Access: Online.
+AC INI-Param: ProxySet_KeepAliveFailureResp"
+       ::= {sipProxySetEntry 14}
 
 
 
@@ -23136,6 +25747,25 @@ AC INI-Param: USEEPNUMASCALLINGNUMIP2TEL"
 
 
 
+     sipMiscSBCRTCPMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  transparent(0)
+,
+                  generateAlways(1)
+,
+                  generateOnlyIfRTPActive(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "SBC RTCP Mode.
+Access: Offline.
+AC INI-Param: SBCRTCPMODE"
+       ::= {sipMisc 56}
+
+
+
      sipSubscribe OBJECT IDENTIFIER ::= {sip 8}
 
 
@@ -23312,7 +25942,7 @@ AC INI-Param: CauseMapSip2Isdn_SipResponse"
 
 
      causeMapSIP2ISDNQ850Cause OBJECT-TYPE
-       SYNTAX Integer32 (-1..127)
+       SYNTAX Integer32 (-1..805)
        MAX-ACCESS read-write
        STATUS current
        DESCRIPTION
@@ -23417,7 +26047,7 @@ AC INI-Param: N/A"
 
 
      causeMapISDN2SIPQ850Cause OBJECT-TYPE
-       SYNTAX Integer32 (-1..127)
+       SYNTAX Integer32 (-1..805)
        MAX-ACCESS read-write
        STATUS current
        DESCRIPTION
@@ -23451,7 +26081,7 @@ AC INI-Param: CauseMapIsdn2Sip_SipResponse"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Enables SAS functionality.
 Access: Offline.
@@ -23463,7 +26093,7 @@ AC INI-Param: ENABLESAS"
      sipSASLocalSIPUdpPort OBJECT-TYPE
        SYNTAX Unsigned32 (1..65534)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Local SAS SIP port used for signaling over UDP.
 Access: Instant.
@@ -23475,7 +26105,7 @@ AC INI-Param: SASLOCALSIPUDPPORT"
      sipSASDefaultGatewayIP OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..49))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "SIP SAS default IP address for incoming requests in emergency
 mode.
@@ -23488,7 +26118,7 @@ AC INI-Param: SASDEFAULTGATEWAYIP"
      sipSASLocalSIPTlsPort OBJECT-TYPE
        SYNTAX Unsigned32 (1..65534)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Local SAS SIP port used for signaling over TLS.
 Access: Instant.
@@ -23500,7 +26130,7 @@ AC INI-Param: SASLOCALSIPTLSPORT"
      sipSASRegistrationTime OBJECT-TYPE
        SYNTAX Unsigned32 (0..2000000)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "SAS will send this value in expires header while working in
 emergency mode.
@@ -23513,7 +26143,7 @@ AC INI-Param: SASREGISTRATIONTIME"
      sipSASShortNumberLength OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Upon incoming request the user info in the request is compared
 to the registered one. SAS performs comparison of the arrived
@@ -23528,7 +26158,7 @@ AC INI-Param: SASSHORTNUMBERLENGTH"
      sipSASLocalSIPTcpPort OBJECT-TYPE
        SYNTAX Unsigned32 (1..65534)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Local SAS SIP port used for signaling over TCP.
 Access: Instant.
@@ -23540,7 +26170,7 @@ AC INI-Param: SASLOCALSIPTCPPORT"
      sipSASProxySet OBJECT-TYPE
        SYNTAX Unsigned32 (0..5)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Proxy Set Id for SAS.
 Access: Instant.
@@ -23552,7 +26182,7 @@ AC INI-Param: SASPROXYSET"
      sipSASRedundantProxySet OBJECT-TYPE
        SYNTAX Integer32 (-1..5)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Proxy Set Id for Redundant SAS.
 Access: Instant.
@@ -23569,7 +26199,7 @@ AC INI-Param: REDUNDANTSASPROXYSET"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the SAS database binding mode:
 0 - URI dependant 
@@ -23594,7 +26224,7 @@ AC INI-Param: SASBINDINGMODE"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the SAS working mode:
 0 – Standard Mode (working with configured proxy set)
@@ -23617,7 +26247,7 @@ AC INI-Param: SASSURVIVABILITYMODE"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Enables SAS to perform ENUM query when receiving INVITE messages
 in emergency mode.
@@ -23635,7 +26265,7 @@ AC INI-Param: SASENABLEENUM"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Enables SAS to add record-Route header to requests.
 Access: Instant.
@@ -23652,7 +26282,7 @@ AC INI-Param: SASENABLERECORDROUTE"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Enables SAS to reject dialog-establishment requests from un-registered
 users.
@@ -23670,12 +26300,30 @@ AC INI-Param: SASBLOCKUNREGUSERS"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Re-using TCP/TLS connection in SAS application.
 Access: Offline.
 AC INI-Param: SASCONNECTIONREUSE"
        ::= {sipSAS 15}
+
+
+
+     sipSASEnteringEmergencyMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  optionsOnly(0)
+,
+                  optionsInviteRegister(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "Defines which methods cause SAS to enter EMERGENCY mode. (0)-OPTIONS
+only, (1)-OPTIONS/INVITE/REGISTER.
+Access: Instant.
+AC INI-Param: SASENTERINGEMERGENCYMODE"
+       ::= {sipSAS 16}
 
 
 
@@ -23685,7 +26333,7 @@ AC INI-Param: SASCONNECTIONREUSE"
      sasRegistrationManipulationTable OBJECT-TYPE
        SYNTAX SEQUENCE OF SasRegistrationManipulationEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "GWAPP SAS Registration Manipulation Table."
        ::= {sipSAS 21}
@@ -23698,7 +26346,7 @@ AC INI-Param: SASCONNECTIONREUSE"
      sasRegistrationManipulationEntry OBJECT-TYPE
        SYNTAX SasRegistrationManipulationEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {sasRegistrationManipulationIndex}
@@ -23723,7 +26371,7 @@ AC INI-Param: SASCONNECTIONREUSE"
      sasRegistrationManipulationIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..0)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 AC INI-Param: SASRegistrationManipulation_Index"
@@ -23734,7 +26382,7 @@ AC INI-Param: SASRegistrationManipulation_Index"
      sasRegistrationManipulationRowStatus OBJECT-TYPE
        SYNTAX RowStatus
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Row-Status Textual Conventions as defined in RFC 2579: Textual
 Conventions for SMIv2.
@@ -23749,7 +26397,7 @@ AC INI-Param: N/A"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Development Impending.
 AC INI-Param: N/A"
@@ -23763,7 +26411,7 @@ AC INI-Param: N/A"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Development Impending.
 AC INI-Param: N/A"
@@ -23774,7 +26422,7 @@ AC INI-Param: N/A"
      sasRegistrationManipulationRemoveFromRight OBJECT-TYPE
        SYNTAX Unsigned32 (0..30)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 Access: Instant.
@@ -23786,7 +26434,7 @@ AC INI-Param: SASRegistrationManipulation_RemoveFromRight"
      sasRegistrationManipulationLeaveFromRight OBJECT-TYPE
        SYNTAX Unsigned32 (0..30)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 Access: Instant.

@@ -8,10 +8,10 @@ $stateLookupTable = [
 
 $state_name = 'raidMember';
 $states = [
-    ['value' => 0, 'generic' => 1, 'graph' => 0, 'descr' => 'undefined'],
-    ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'member'],
-    ['value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'spare'],
-    ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'failed'],
+    ['value' => 0, 'generic' => 1, 'descr' => 'undefined'],
+    ['value' => 1, 'generic' => 0, 'descr' => 'member'],
+    ['value' => 2, 'generic' => 3, 'descr' => 'spare'],
+    ['value' => 3, 'generic' => 2, 'descr' => 'failed'],
 ];
 
 $walk = [
@@ -34,7 +34,7 @@ foreach ($walk as $mib => $num_oid) {
             $group = 'Non RAID member';
             $tmp = preg_replace('/hddEnclosure0(\d)(\d+)/i', 'E${1}S${2}', $mib . $entry[$mib . 'Slots']);
             foreach ($raids as $raid) {
-                if (in_array($tmp, explode(',', $raid['raidMemberDiskChannels']))) {
+                if (in_array($tmp, explode(',', (string) $raid['raidMemberDiskChannels']))) {
                     $group = $raid['raidName'];
                     break;
                 }

@@ -85,7 +85,7 @@ class Discord extends Transport
 
     private function stripHTMLTagsFromDescription(): array
     {
-        $this->discord_message['embeds'][0]['description'] = strip_tags($this->discord_message['embeds'][0]['description']);
+        $this->discord_message['embeds'][0]['description'] = strip_tags((string) $this->discord_message['embeds'][0]['description']);
 
         return $this->discord_message;
     }
@@ -95,7 +95,7 @@ class Discord extends Transport
         $hexColor = self::getColorForState($alert_data['state']);
         $sanitized = preg_replace('/[^\dA-Fa-f]/', '', $hexColor);
 
-        return hexdec($sanitized);
+        return hexdec((string) $sanitized);
     }
 
     private function getDescription(array $alert_data): string
@@ -138,7 +138,7 @@ class Discord extends Transport
             ];
 
             return '[Image ' . ($count++) . ']';
-        }, $this->discord_message['embeds'][0]['description']);
+        }, (string) $this->discord_message['embeds'][0]['description']);
 
         return $this->discord_message;
     }
@@ -166,7 +166,7 @@ class Discord extends Transport
             return $result;
         }
 
-        $fields = explode(',', $this->config['discord-embed-fields']);
+        $fields = explode(',', (string) $this->config['discord-embed-fields']);
 
         foreach ($fields as $field) {
             $field = trim($field);

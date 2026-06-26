@@ -16,10 +16,10 @@ $oids = SnmpQuery::cache()->hideMib()->walk('CISCOSB-PHY-MIB::rlPhyTestGetResult
 $multiplier = 1;
 $divisor = 1000;
 foreach ($oids as $index => $ciscosb_data) {
-    foreach ($ciscosb_data as $key => $value) {
+    foreach ($ciscosb_data as $value) {
         if (isset($value['rlPhyTestTableTxOutput']) && is_numeric($value['rlPhyTestTableTxOutput']) && ($value['rlPhyTestTableRxOpticalPower'] != 0)) {
             $oid = '.1.3.6.1.4.1.9.6.1.101.90.1.2.1.3.' . $index . '.8';
-            $port = PortCache::getByIfIndex(preg_replace('/^\d+\./', '', $index), $device['device_id']);
+            $port = PortCache::getByIfIndex(preg_replace('/^\d+\./', '', (string) $index), $device['device_id']);
             $descr = trim($port?->ifDescr . ' Transmit Power');
             $dbm = $value['rlPhyTestTableTxOutput'] / $divisor;
             app('sensor-discovery')->discover(new \App\Models\Sensor([
@@ -45,7 +45,7 @@ foreach ($oids as $index => $ciscosb_data) {
 
         if (isset($value['rlPhyTestTableRxOpticalPower']) && is_numeric($value['rlPhyTestTableRxOpticalPower']) && ($value['rlPhyTestTableTxOutput'] != 0)) {
             $oid = '.1.3.6.1.4.1.9.6.1.101.90.1.2.1.3.' . $index . '.9';
-            $port = PortCache::getByIfIndex(preg_replace('/^\d+\./', '', $index), $device['device_id']);
+            $port = PortCache::getByIfIndex(preg_replace('/^\d+\./', '', (string) $index), $device['device_id']);
             $descr = trim($port?->ifDescr . ' Receive Power');
             $dbm = $value['rlPhyTestTableRxOpticalPower'] / $divisor;
             app('sensor-discovery')->discover(new \App\Models\Sensor([

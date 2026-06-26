@@ -1,10 +1,10 @@
 -- ============================================================================
--- Copyright (C) 2021 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: This MIB object is used to describe the interfaces of sending 
 --              the host notifications (including the alarm and event),
 --              and configurations of the log, syslog and trap.  
 -- Reference:  
--- Version: V1.68
+-- Version: V1.69
 -- ============================================================================ 
     HUAWEI-SNMP-NOTIFICATION-MIB  DEFINITIONS ::= BEGIN                       
         IMPORTS                                                           
@@ -25,7 +25,7 @@
                 FROM SNMPv2-TC;                                   
                 
         hwSyntrap  MODULE-IDENTITY                                  
-            LAST-UPDATED "202110110000Z"                              
+            LAST-UPDATED "202208300000Z"                              
             ORGANIZATION "Huawei Technologies Co.,Ltd."                
             CONTACT-INFO                                                        
                          "Huawei Industrial Base                
@@ -42,6 +42,10 @@
                 and configurations of the log, syslog and trap.                
                 "    
 --  Revision history
+			REVISION    "202208300000Z"
+            DESCRIPTION "V1.69, Add the following nodes:
+                          hwSSLCertFrameId , hwSSLCertSlotId "
+			
              REVISION    "202110110000Z"
              DESCRIPTION "V1.63, hwSyslogLogType add ssa type"
                           
@@ -3347,6 +3351,26 @@
                 Certificate End Time.
                 "
             ::= { hwCertExpireVbOids 7 }
+        
+        hwSSLCertFrameId OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                Certificate Frame Id.
+                "
+            ::= { hwCertExpireVbOids 8 }
+        
+        hwSSLCertSlotId OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                Certificate Slot Id.
+                "
+            ::= { hwCertExpireVbOids 9 }
 
         hwCertExpireTraps OBJECT IDENTIFIER ::= { hwSyntrap 21 }
         
@@ -3464,5 +3488,75 @@
                 "                                                 
             DEFVAL { 365 }
             ::= { hwLogRetention 2 }
+
+        hwBoardSslCertExpireTraps OBJECT IDENTIFIER ::= { hwSyntrap 24 }
+ 
+        hwBoardSslCertExpiringFaultTrap NOTIFICATION-TYPE
+            OBJECTS
+            {
+                hwSSLCertName,
+                hwSSLCertType,
+                hwSSLCertBeginTime,
+                hwSSLCertEndTime,
+                hwSSLCertFrameId,
+                hwSSLCertSlotId
+            }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the board certificate is about to expire.
+                "
+            ::= { hwBoardSslCertExpireTraps 1 }
+ 
+        hwBoardSslCertExpiringRestoreTrap NOTIFICATION-TYPE
+            OBJECTS
+            {
+                hwSSLCertName,
+                hwSSLCertType,
+                hwSSLCertBeginTime,
+                hwSSLCertEndTime,
+                hwSSLCertFrameId,
+                hwSSLCertSlotId
+            }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the alarm indicating that the board certificate is about to expire is cleared.
+                "
+            ::= { hwBoardSslCertExpireTraps 2 }
+ 
+        hwBoardSslCertExpiredFaultTrap NOTIFICATION-TYPE
+            OBJECTS
+            {
+                hwSSLCertName,
+                hwSSLCertType,
+                hwSSLCertBeginTime,
+                hwSSLCertEndTime,
+                hwSSLCertFrameId,
+                hwSSLCertSlotId
+            }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the board certificate has expired.
+                "
+            ::= { hwBoardSslCertExpireTraps 3 }
+ 
+        hwBoardSslCertExpiredRestoreTrap NOTIFICATION-TYPE
+            OBJECTS
+            {
+                hwSSLCertName,
+                hwSSLCertType,
+                hwSSLCertBeginTime,
+                hwSSLCertEndTime,
+                hwSSLCertFrameId,
+                hwSSLCertSlotId
+            }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the board certificate expiration alarm is cleared.
+                "
+            ::= { hwBoardSslCertExpireTraps 4 }
 
     END

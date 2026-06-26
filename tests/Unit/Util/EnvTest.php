@@ -29,14 +29,14 @@ namespace LibreNMS\Tests\Unit\Util;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\EnvHelper;
 
-class EnvTest extends TestCase
+final class EnvTest extends TestCase
 {
     public function testParseArray(): void
     {
         putenv('PARSETEST=one,two');
         $this->assertSame(['one', 'two'], EnvHelper::parseArray('PARSETEST'), 'Could not parse simple array');
         $this->assertSame(['default'], EnvHelper::parseArray('PARSETESTNOTSET', 'default'), 'Did not get default value as expected');
-        $this->assertSame(null, EnvHelper::parseArray('PARSETESTNOTSET'), 'Did not get null as expected when env not set');
+        $this->assertNull(EnvHelper::parseArray('PARSETESTNOTSET'), 'Did not get null as expected when env not set');
         $this->assertSame(3, EnvHelper::parseArray('PARSETESTNOTSET', 3), 'Did not get default value (non-array) as expected');
         $this->assertSame('default', EnvHelper::parseArray('PARSETESTNOTSET', 'default', ['default']), 'Did not get default value as expected, excluding it from exploding');
 

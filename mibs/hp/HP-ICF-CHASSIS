@@ -14,7 +14,7 @@
                FROM HP-ICF-OID;
 
        hpicfChassisMib MODULE-IDENTITY
-            LAST-UPDATED "201108250847Z"  -- August 25, 2011    
+            LAST-UPDATED "202009210847Z"  -- Sep 21, 2020
             ORGANIZATION "HP Networking"
             CONTACT-INFO
                     "Hewlett Packard Company
@@ -27,15 +27,27 @@
                     superseded by the standard Entity MIB.  However,
                     the hpicfSensorTable will still be valid."
 
+            REVISION     "202009210847Z"  -- Sep 21, 2020
+            DESCRIPTION  "Added hpicfPowerSupplyStatusTrap, Object
+                          hpicfPowerSupplySlotNum, hpicfPowerSupplyStatus,
+                          Group hpicfPowerSupplyGroup, hpicfPowerSupplyNotifyGroup
+                          Compliance hpicfChasPowerSupplyCompliance"
+
+	    REVISION     "201302100847Z"  -- Feb 10, 2013
+            DESCRIPTION  "Added  object hpSystemAirAvgTemp1,Group hpicfChasTempGroup1,
+                          Compliance hpicfChasTempCompliance1.
+                          deprecated hpSystemAirAvgTemp object, group hpicfChasTempGroup
+                          and hpicfChasTempCompliance."
+
             REVISION     "201108250847Z"  -- August 25, 2011
             DESCRIPTION  "Added new scalars hpicfFanTrayType and 
                           hpicfOpacityShieldInstalled."
-       
-            REVISION     "201008250000Z"  -- August 23, 2010
-            DESCRIPTION  "Added hpSystemAirEntPhysicalIndex to the air 
-                          temperature table."     
 
-            REVISION     "200904220000Z"  -- April 22, 2009
+	    REVISION     "201008250000Z"  -- August 25, 2010
+            DESCRIPTION  "Added hpSystemAirEntPhysicalIndex to the air
+                          temperature table."
+           
+	    REVISION     "200904220000Z"  -- April 22, 2009
             DESCRIPTION  "Added new SNMP object and SNMP table for chassis 
                          temperature details"
                           
@@ -566,8 +578,8 @@
            SYNTAX     HpSystemAirTempEntry
            MAX-ACCESS not-accessible
            STATUS     current
-           DESCRIPTION   "This is the table for chassis temperature 
-                         details."
+           DESCRIPTION   "This is the table for chassis temperature
+                          details."
            INDEX      { hpSystemAirSensor }
            ::= { hpSystemAirTempTable 1 }
 
@@ -581,23 +593,24 @@
               hpSystemAirOverTemp             INTEGER,
               hpSystemAirThresholdTemp        OCTET STRING,
               hpSystemAirAvgTemp              OCTET STRING,
-              hpSystemAirEntPhysicalIndex     PhysicalIndex
+              hpSystemAirAvgTemp1             OCTET STRING,
+              hpSystemAirEntPhysicalIndex     PhysicalIndex 
            }
        
        hpSystemAirSensor OBJECT-TYPE
            SYNTAX       Integer32 (0..2147483647)
            MAX-ACCESS   not-accessible
-           STATUS       current
+           STATUS   	current
            DESCRIPTION  "This is the index for this table.This object 
                         describes chassis attached temperature sensor.
                         Based on the value of this index, temperature
                         details are obtained from the sensor and are
-                        given." 
+                        given."          
            ::= {hpSystemAirTempEntry 1}
 
        hpSystemAirName OBJECT-TYPE
            SYNTAX       OCTET STRING(SIZE(1..20))
-           MAX-ACCESS   read-only
+ 	   MAX-ACCESS   read-only
            STATUS       current
            DESCRIPTION  "This object describes name of the system
                         which is chassis attached temperature sensor
@@ -609,7 +622,7 @@
 
        hpSystemAirCurrentTemp OBJECT-TYPE
            SYNTAX       OCTET STRING(SIZE(1..6))
-           MAX-ACCESS   read-only
+ 	   MAX-ACCESS   read-only
            STATUS       current
            DESCRIPTION  "This object gives current temperature of the
                         system. This is the current temperature given
@@ -619,16 +632,16 @@
 
        hpSystemAirMaxTemp OBJECT-TYPE
            SYNTAX       OCTET STRING( SIZE(1..6))
-           MAX-ACCESS   read-only
+ 	   MAX-ACCESS   read-only
            STATUS       current
-           DESCRIPTION  "This object gives Maximum temperature of the 
+           DESCRIPTION  "This object gives Maximum temperature of the
                         chassis."
            ::= {hpSystemAirTempEntry 4}
 
 
        hpSystemAirMinTemp OBJECT-TYPE
-           SYNTAX       OCTET STRING(SIZE(1..6))
-           MAX-ACCESS   read-only
+           SYNTAX 	OCTET STRING(SIZE(1..6))
+ 	   MAX-ACCESS   read-only
            STATUS       current
            DESCRIPTION  "This object gives Minimum temperature of the
                         chassis."
@@ -639,7 +652,7 @@
                                yes(1),
                                no(2)
                                }
-           MAX-ACCESS   read-only
+ 	   MAX-ACCESS   read-only
            STATUS       current
            DESCRIPTION  "This object gives Over temperature of the
                         system. If the current temperature of the
@@ -650,7 +663,7 @@
        
        hpSystemAirThresholdTemp OBJECT-TYPE
            SYNTAX       OCTET STRING(SIZE(1..6))
-           MAX-ACCESS   read-only
+ 	   MAX-ACCESS   read-only
            STATUS       current
            DESCRIPTION  "This object gives Threshold temperature of 
                         the system. This is the utmost temperature 
@@ -661,14 +674,14 @@
 
        hpSystemAirAvgTemp OBJECT-TYPE
            SYNTAX       OCTET STRING(SIZE(1..5)) 
-           MAX-ACCESS   read-only
-           STATUS       current
+ 	   MAX-ACCESS   read-only
+           STATUS       deprecated
            DESCRIPTION  "This object gives Average temperature of the
                         system. There will be some roll up function
                         which will check current temperature at 
                         particular intervals. Based on these current 
                         temperatures over certain time, average 
-                        temperature is calculated." 
+                        temperature is calculated."       
            ::= {hpSystemAirTempEntry 8}
 
        hpSystemAirEntPhysicalIndex OBJECT-TYPE
@@ -676,8 +689,20 @@
            MAX-ACCESS   read-only
            STATUS       current
            DESCRIPTION  "This gives the entPhysicalIndex of the temperature
-                         sensor as in the entPhysicalTable (rfc2737)."          
+                    sensor as in the entPhysicalTable (rfc2737)."
            ::= {hpSystemAirTempEntry 9}
+
+       hpSystemAirAvgTemp1 OBJECT-TYPE
+           SYNTAX       OCTET STRING(SIZE(1..6)) 
+          MAX-ACCESS   read-only
+           STATUS       current
+           DESCRIPTION  "This object gives Average temperature of the
+                        system. There will be some roll up function
+                        which will check current temperature at 
+                        particular intervals. Based on these current 
+                        temperatures over certain time, average 
+                        temperature is calculated."       
+           ::= {hpSystemAirTempEntry 10}
 
        hpicfFanTrayType  OBJECT-TYPE
             SYNTAX       INTEGER {
@@ -701,11 +726,50 @@
                          8212 and 8206 Switches."
             DEFVAL { false }
             ::= { hpicfChassis 10 }
-            
 
+       hpicfPowerSupplyTable OBJECT-TYPE
+            SYNTAX      SEQUENCE OF HpicfPowerSupplyEntry
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION  "A table that contains information on the
+                          status of the internal power supply unit."
+            ::= { hpicfChassis 11 }
 
+       hpicfPowerSupplyEntry OBJECT-TYPE
+            SYNTAX      HpicfPowerSupplyEntry
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION  "Information about the internal power supply unit
+                          in the chassis."
+            INDEX      { hpicfPowerSupplySlotNum }
+            ::= { hpicfPowerSupplyTable 1 }
 
-       
+      HpicfPowerSupplyEntry ::=
+            SEQUENCE {
+               hpicfPowerSupplySlotNum  Integer32,
+               hpicfPowerSupplyStatus   INTEGER
+            }
+
+      hpicfPowerSupplySlotNum OBJECT-TYPE
+            SYNTAX      Integer32 (1..4)
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION  "Slot number of internal power supply unit."
+            ::= { hpicfPowerSupplyEntry 1 }
+
+      hpicfPowerSupplyStatus OBJECT-TYPE
+            SYNTAX      INTEGER {
+                           ok(1),
+                           inserted(2),
+                           removed(3),
+                           faulted(4)
+                           }
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION  "Provides the status of the internal power supply unit
+                          when the switch supports removable power supply units."
+            ::= { hpicfPowerSupplyEntry 2 }
+
        -- Common Traps
 
 
@@ -718,6 +782,16 @@
                    chassis.  The hpicfSensorStatus indicates the new
                    status value for the changed sensor."
            ::=  { hpicfCommonTrapsPrefix 3 }
+
+       hpicfPowerSupplyStatusTrap NOTIFICATION-TYPE
+           OBJECTS    { hpicfPowerSupplySlotNum, hpicfPowerSupplyStatus }
+           STATUS     current
+           DESCRIPTION
+                   "hpicfPowerSupplyStatusTrap indicates that there has been
+                    a change in the status of the internal power supply unit
+                    and the hpicfPowerSupplyStatus indicates the new status
+                    of the internal power supply unit."
+           ::=  { hpicfCommonTrapsPrefix 6 }
 
        -- conformance information
 
@@ -796,14 +870,15 @@
            ::= { hpicfChassisCompliances 3 }
 
        hpicfChasTempCompliance MODULE-COMPLIANCE
-           STATUS     current
+           STATUS     deprecated
            DESCRIPTION 
                    " A compliance statement for chassis's system air temperature
                      details."            
            MODULE
                MANDATORY-GROUPS {hpicfChasTempGroup}
 
-           ::= { hpicfChassisCompliances 4 } 
+           ::= { hpicfChassisCompliances 4 }
+ 
 
        hpicfOpacityShieldsCompliance MODULE-COMPLIANCE
            STATUS     current
@@ -813,6 +888,27 @@
                MANDATORY-GROUPS {hpicfOpacityShieldsGroup}
 
            ::= { hpicfChassisCompliances 5 } 
+
+       hpicfChasTempCompliance1 MODULE-COMPLIANCE
+           STATUS     current
+           DESCRIPTION
+                   " A compliance statement for chassis's system air temperature
+                     details."
+           MODULE
+               MANDATORY-GROUPS {hpicfChasTempGroup1}
+
+           ::= { hpicfChassisCompliances 6 }
+
+      hpicfChasPowerSupplyCompliance MODULE-COMPLIANCE
+           STATUS     current
+           DESCRIPTION
+                   "A compliance statement for the internal power supply
+                    unit details."
+           MODULE
+               MANDATORY-GROUPS {hpicfPowerSupplyGroup,
+                                 hpicfPowerSupplyNotifyGroup}
+
+           ::= { hpicfChassisCompliances 7 }
 
        -- units of conformance
 
@@ -883,7 +979,7 @@
                         hpSystemAirAvgTemp,
                         hpSystemAirEntPhysicalIndex
                       }
-           STATUS   current
+           STATUS   deprecated
            DESCRIPTION
                    "A collection objects to give temperature details 
                     of chassis"
@@ -896,7 +992,41 @@
                    "A collection of objects for Opacity Shields 
                     of chassis"
            ::= { hpicfChassisGroups 6 }
+       
+     hpicfChasTempGroup1 OBJECT-GROUP
+           OBJECTS    { hpSystemAirName,
+                        hpSystemAirCurrentTemp,
+                        hpSystemAirMaxTemp,
+                        hpSystemAirMinTemp,
+                        hpSystemAirThresholdTemp,
+                        hpSystemAirOverTemp,
+                        hpSystemAirAvgTemp,
+                        hpSystemAirAvgTemp1,
+                        hpSystemAirEntPhysicalIndex
+                      }
+           STATUS   current
+           DESCRIPTION
+                   "A collection objects to give temperature details
+                    of chassis"
+           ::= { hpicfChassisGroups 7 }
 
-       END
+     hpicfPowerSupplyGroup OBJECT-GROUP
+            OBJECTS   { hpicfPowerSupplySlotNum,
+                        hpicfPowerSupplyStatus
+                      }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects for monitoring the status
+                     of the internal power supply unit."
+           ::= { hpicfChassisGroups 8 }
 
+     hpicfPowerSupplyNotifyGroup NOTIFICATION-GROUP
+           NOTIFICATIONS  { hpicfPowerSupplyStatusTrap }
+           STATUS   current
+           DESCRIPTION
+                   "A collection of notifications used to indicate
+                    changes in the internal power supply unit."
+           ::= { hpicfChassisGroups 9 }
+
+END
 

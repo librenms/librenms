@@ -1,63 +1,58 @@
-
---
--- Copyright (c) 2002-2006 by EqualLogic, Inc.
--- 
--- All rights reserved.  This software may not be copied, disclosed,
--- transferred, or used except in accordance with a license granted
--- by EqualLogic, Inc.  This software embodies proprietary information
--- and trade secrets of EqualLogic, Inc.
---
-
 IPS-AUTH-MIB DEFINITIONS  ::= BEGIN
 
     IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, Unsigned32,
-    experimental
+    mib-2
     FROM SNMPv2-SMI
 
-    TEXTUAL-CONVENTION,
-    RowStatus
+    TEXTUAL-CONVENTION, RowStatus, AutonomousType, StorageType
     FROM SNMPv2-TC
 
-    MODULE-COMPLIANCE,
-    OBJECT-GROUP
+    MODULE-COMPLIANCE, OBJECT-GROUP
     FROM SNMPv2-CONF
+
+    SnmpAdminString
+    FROM SNMP-FRAMEWORK-MIB -- RFC 3411
+
+    AddressFamilyNumbers
+    FROM IANA-ADDRESS-FAMILY-NUMBERS-MIB
     ;
 
-ipsAuthModule MODULE-IDENTITY
-    LAST-UPDATED  "200206260000Z"
+ipsAuthMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200605220000Z" -- May 22, 2006
     ORGANIZATION  "IETF IPS Working Group"
     CONTACT-INFO
     "
     Mark Bakke
     Postal: Cisco Systems, Inc
-    6450 Wedgwood Road, Suite 130
-    Maple Grove, MN
-    USA 55311
+    7900 International Drive, Suite 400
+    Bloomington, MN
+    USA 55425
 
-    Tel: +1 763-398-1000
-    Fax: +1 763-398-1001
+    E-mail: mbakke@cisco.com
 
-    E-mail: mbakke@cisco.com"
+    James Muchow
+    Postal: Qlogic Corp.
+    6321 Bury Dr.
+    Eden Prairie, MN
+    USA 55346
 
+    E-Mail: james.muchow@qlogic.com"
     DESCRIPTION
-        "The IP Storage Authorization MIB module."
+        "The IP Storage Authorization MIB module.
+         Copyright (C) The Internet Society (2006).  This version of
+         this MIB module is part of RFC 4545;  see the RFC itself for
+         full legal notices."
 
-    REVISION "200206260000Z" -- June 26, 2002
+    REVISION "200605220000Z" -- May 22, 2006
     DESCRIPTION
+        "Initial version of the IP Storage Authentication MIB module,
+        published as RFC 4545"
+::= { mib-2 141 }
 
-
-
-
-        "Initial revision published as RFC xxxx."
-
---::= { mib-2 xx }
--- in case you want to COMPILE
-::= { experimental 99999 }
-
-ipsAuthObjects OBJECT IDENTIFIER ::= { ipsAuthModule 1 }
-ipsAuthNotifications OBJECT IDENTIFIER ::= { ipsAuthModule 2 }
-ipsAuthConformance OBJECT IDENTIFIER ::= { ipsAuthModule 3 }
+ipsAuthNotifications OBJECT IDENTIFIER ::= { ipsAuthMibModule 0 }
+ipsAuthObjects       OBJECT IDENTIFIER ::= { ipsAuthMibModule 1 }
+ipsAuthConformance   OBJECT IDENTIFIER ::= { ipsAuthMibModule 2 }
 
 -- Textual Conventions
 
@@ -66,53 +61,89 @@ IpsAuthAddress ::= TEXTUAL-CONVENTION
     DESCRIPTION
         "IP Storage requires the use of address information
         that uses not only the InetAddress type defined in the
-     INET-ADDRESS-MIB, but also Fibre Channel type defined
-        in the Fibre Channel Management MIB. Although these
+        INET-ADDRESS-MIB, but also Fibre Channel type defined
+        in the Fibre Channel Management MIB.  Although these
         address types are recognized in the IANA Address Family
         Numbers MIB, the addressing mechanisms have not been
-        merged into a well-known, common type. This data type,
-        the IpsAuthAddress, performs this function for this MIB."
+        merged into a well-known, common type.  This data type,
+        the IpsAuthAddress, performs the merging for this MIB
+        module.
+
+        The formats of objects of this type are determined by
+        a corresponding object with syntax AddressFamilyNumbers,
+        and thus every object defined using this TC must
+        identify the object with syntax AddressFamilyNumbers
+        that specifies its type.
+
+        The syntax and semantics of this object depend on the
+        identified AddressFamilyNumbers object as follows:
+
+        AddressFamilyNumbers   this object
+        ====================   ===========
+        ipV4(1)                restricted to the same syntax and
+                               semantics as the InetAddressIPv4 TC.
+
+        ipV6(2)                restricted to the same syntax and
+                               semantics as the InetAddressIPv6 TC.
+
+        fibreChannelWWPN (22)
+        & fibreChannelWWNN(23) restricted to the same syntax and
+                               semantics as the FcNameIdOrZero TC.
+
+        Types other than the above should not be used unless
+
+        the corresponding format of the IpsAuthAddress object is
+        further specified (e.g., in a future revision of this TC)."
     REFERENCE
         "IANA-ADDRESS-FAMILY-NUMBERS-MIB;
-         INET-ADDRESS-MIB (RFC 2851);
-         Fibre Channel Management MIB (presently defined in
-         draft-ietf-ips-fcmgmt-mib-01.txt)."
+         INET-ADDRESS-MIB (RFC 4001);
+         FC-MGMT-MIB (RFC 4044)."
     SYNTAX        OCTET STRING (SIZE(0..255))
 
-------------------------------------------------------------------------
+--******************************************************************
 
 ipsAuthDescriptors OBJECT IDENTIFIER ::= { ipsAuthObjects 1 }
 
-ipsAuthMethodTypes OBJECT IDENTIFIER ::= { ipsAuthDescriptors 1 }
+ipsAuthMethodTypes OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Registration point for Authentication Method Types."
+    REFERENCE "RFC 3720, iSCSI Protocol Specification."
+::= { ipsAuthDescriptors 1 }
 
 ipsAuthMethodNone OBJECT-IDENTITY
-    STATUS      current
+    STATUS        current
     DESCRIPTION
-     "The authoritative identifier when no authentication
-     method is used."
-    REFERENCE "iSCSI Protocol Specification."
+        "The authoritative identifier when no authentication
+        method is used."
+    REFERENCE "RFC 3720, iSCSI Protocol Specification."
 ::= { ipsAuthMethodTypes 1 }
 
 ipsAuthMethodSrp OBJECT-IDENTITY
-    STATUS      current
+    STATUS        current
     DESCRIPTION
-     "The authoritative identifier when the authentication
-
-
-
-     method is SRP."
-    REFERENCE "iSCSI Protocol Specification."
+        "The authoritative identifier when the authentication
+        method is SRP."
+    REFERENCE "RFC 3720, iSCSI Protocol Specification."
 ::= { ipsAuthMethodTypes 2 }
 
 ipsAuthMethodChap OBJECT-IDENTITY
-    STATUS      current
+    STATUS        current
     DESCRIPTION
-     "The authoritative identifier when the authentication
-     method is CHAP."
-    REFERENCE "iSCSI Protocol Specification."
+        "The authoritative identifier when the authentication
+        method is CHAP."
+    REFERENCE "RFC 3720, iSCSI Protocol Specification."
 ::= { ipsAuthMethodTypes 3 }
 
-----------------------------------------------------------------------
+ipsAuthMethodKerberos OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "The authoritative identifier when the authentication
+        method is Kerberos."
+    REFERENCE "RFC 3720, iSCSI Protocol Specification."
+::= { ipsAuthMethodTypes 4 }
+
+--******************************************************************
 
 ipsAuthInstance OBJECT IDENTIFIER ::= { ipsAuthObjects 2 }
 
@@ -123,7 +154,7 @@ ipsAuthInstanceAttributesTable OBJECT-TYPE
     MAX-ACCESS    not-accessible
     STATUS        current
     DESCRIPTION
-        "A Dynamic list of iSCSI instances present on the system."
+        "A list of Authorization instances present on the system."
 ::= { ipsAuthInstance 2 }
 
 ipsAuthInstanceAttributesEntry OBJECT-TYPE
@@ -131,14 +162,15 @@ ipsAuthInstanceAttributesEntry OBJECT-TYPE
     MAX-ACCESS    not-accessible
     STATUS        current
     DESCRIPTION
-        "An entry (row) containing managment information applicable
-        to a particular iSCSI instance."
+        "An entry (row) containing management information
+        applicable to a particular Authorization instance."
     INDEX { ipsAuthInstIndex }
 ::= { ipsAuthInstanceAttributesTable 1 }
 
 IpsAuthInstanceAttributesEntry ::= SEQUENCE {
-    ipsAuthInstIndex                 Unsigned32,
-    ipsAuthInstDescr                 OCTET STRING -- was SnmpAdminString
+    ipsAuthInstIndex               Unsigned32,
+    ipsAuthInstDescr               SnmpAdminString,
+    ipsAuthInstStorageType         StorageType
 }
 
 ipsAuthInstIndex OBJECT-TYPE
@@ -146,37 +178,67 @@ ipsAuthInstIndex OBJECT-TYPE
     MAX-ACCESS    not-accessible
     STATUS        current
     DESCRIPTION
-        "An arbitrary integer used to uniquely identify a particular
-        authentication instance."
-
-
-
+        "An arbitrary integer used to uniquely identify a
+        particular authorization instance.  This index value
+        must not be modified or reused by an agent unless
+        a reboot has occurred.  An agent should attempt to
+        keep this value persistent across reboots."
 ::= { ipsAuthInstanceAttributesEntry 1 }
 
 ipsAuthInstDescr OBJECT-TYPE
-    SYNTAX        OCTET STRING  (SIZE (0..255))  -- was SnmpAdminString
+    SYNTAX        SnmpAdminString
     MAX-ACCESS    read-write
     STATUS        current
     DESCRIPTION
-        "An octet string, determined by the implementation to describe
-     the authentication instance.  When only a single instance is present,
-     this object may be set to the zero-length string; with multiple
-     authentication instances, it may be used in an implementation-dependent
-     manner to describe the purpose of the respective instance."
+        "A character string, determined by the implementation to
+        describe the authorization instance.  When only a single
+        instance is present, this object may be set to the
+        zero-length string; with multiple authorization
+        instances, it must be set to a unique value in an
+        implementation-dependent manner to describe the purpose
+        of the respective instance.  If this is deployed in a
+        master agent with more than one subagent implementing
+        this MIB module, the master agent is responsible for
+        ensuring that this object is unique across all
+        subagents."
 ::= { ipsAuthInstanceAttributesEntry 2 }
 
+ipsAuthInstStorageType OBJECT-TYPE
+    SYNTAX        StorageType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The storage type for all read-write objects within this
+         row.  Rows in this table are always created via an
+         external process, and may have a storage type of readOnly
+         or permanent.  Conceptual rows having the value 'permanent'
+         need not allow write access to any columnar objects in
+         the row.
+
+         If this object has the value 'volatile', modifications
+         to read-write objects in this row are not persistent
+         across reboots.  If this object has the value
+         'nonVolatile', modifications to objects in this row
+         are persistent.
+
+         An implementation may choose to allow this object
+         to be set to either 'nonVolatile' or 'volatile',
+         allowing the management application to choose this
+         behavior."
+    DEFVAL        { volatile }
+::= { ipsAuthInstanceAttributesEntry 3 }
 
 ipsAuthIdentity OBJECT IDENTIFIER ::= { ipsAuthObjects 3 }
 
--- iSCSI User Identity Attributes Table
+-- User Identity Attributes Table
 
 ipsAuthIdentAttributesTable OBJECT-TYPE
     SYNTAX        SEQUENCE OF IpsAuthIdentAttributesEntry
     MAX-ACCESS    not-accessible
     STATUS        current
     DESCRIPTION
-     "A list of user identities, each belonging to a particular
-     ipsAuthInstance."
+        "A list of user identities, each belonging to a
+        particular ipsAuthInstance."
 ::= { ipsAuthIdentity 1 }
 
 ipsAuthIdentAttributesEntry OBJECT-TYPE
@@ -185,36 +247,37 @@ ipsAuthIdentAttributesEntry OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "An entry (row) containing management information
-        describing a user identity
-        within an authentication instance on this node."
+        describing a user identity within an authorization
+        instance on this node."
     INDEX { ipsAuthInstIndex, ipsAuthIdentIndex }
 ::= { ipsAuthIdentAttributesTable  1 }
 
 IpsAuthIdentAttributesEntry ::= SEQUENCE {
-    ipsAuthIdentIndex                   Unsigned32,
-    ipsAuthIdentDescription            OCTET STRING,  -- was SnmpAdminString,
-    ipsAuthIdentRowStatus               RowStatus
+    ipsAuthIdentIndex              Unsigned32,
+    ipsAuthIdentDescription        SnmpAdminString,
+    ipsAuthIdentRowStatus          RowStatus,
+    ipsAuthIdentStorageType        StorageType
 }
 
 ipsAuthIdentIndex OBJECT-TYPE
     SYNTAX        Unsigned32 (1..4294967295)
     MAX-ACCESS    not-accessible
-
-
-
     STATUS        current
     DESCRIPTION
-        "An arbitrary integer used to uniquely identify a particular
-        identity instance within an authentication instance present
-     on the node."
+        "An arbitrary integer used to uniquely identify a
+        particular identity instance within an authorization
+        instance present on the node.  This index value
+        must not be modified or reused by an agent unless
+        a reboot has occurred.  An agent should attempt to
+        keep this value persistent across reboots."
 ::= { ipsAuthIdentAttributesEntry 1 }
 
 ipsAuthIdentDescription OBJECT-TYPE
-    SYNTAX        OCTET STRING  (SIZE  (0..255))  -- was SnmpAdminString
+    SYNTAX        SnmpAdminString
     MAX-ACCESS    read-create
     STATUS        current
     DESCRIPTION
-        "An octet string describing this particular identity."
+        "A character string describing this particular identity."
 ::= { ipsAuthIdentAttributesEntry 2 }
 
 ipsAuthIdentRowStatus OBJECT-TYPE
@@ -223,13 +286,29 @@ ipsAuthIdentRowStatus OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "This field allows entries to be dynamically added and
-     removed from this table via SNMP."
+        removed from this table via SNMP.  When adding a row to
+        this table, all non-Index/RowStatus objects must be set.
+        Rows may be discarded using RowStatus.  The value of
+        ipsAuthIdentDescription may be set while
+        ipsAuthIdentRowStatus is 'active'."
 ::= { ipsAuthIdentAttributesEntry 3 }
 
+ipsAuthIdentStorageType OBJECT-TYPE
+    SYNTAX        StorageType
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The storage type for all read-create objects in this row.
+         Rows in this table that were created through an external
+         process may have a storage type of readOnly or permanent.
+         Conceptual rows having the value 'permanent' need not
+         allow write access to any columnar objects in the row."
+    DEFVAL        { nonVolatile }
+::= { ipsAuthIdentAttributesEntry 4 }
 
 ipsAuthIdentityName OBJECT IDENTIFIER ::= { ipsAuthObjects 4 }
 
--- iSCSI User Initiator Name Attributes Table
+-- User Initiator Name Attributes Table
 
 ipsAuthIdentNameAttributesTable OBJECT-TYPE
     SYNTAX        SEQUENCE OF IpsAuthIdentNameAttributesEntry
@@ -237,7 +316,7 @@ ipsAuthIdentNameAttributesTable OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "A list of unique names that can be used to positively
-     identify a particular user identity."
+        identify a particular user identity."
 ::= { ipsAuthIdentityName 1 }
 
 ipsAuthIdentNameAttributesEntry OBJECT-TYPE
@@ -246,19 +325,18 @@ ipsAuthIdentNameAttributesEntry OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "An entry (row) containing management information
-        applicable to a unique identity name which can be used
-     to uniquely identify a user identity within a particular
-     authentication instance."
-    INDEX { ipsAuthInstIndex, ipsAuthIdentIndex, ipsAuthIdentNameIndex }
-
-
-
+        applicable to a unique identity name, which can be used
+        to identify a user identity within a particular
+        authorization instance."
+    INDEX { ipsAuthInstIndex, ipsAuthIdentIndex,
+            ipsAuthIdentNameIndex }
 ::= { ipsAuthIdentNameAttributesTable  1 }
 
 IpsAuthIdentNameAttributesEntry ::= SEQUENCE {
-    ipsAuthIdentNameIndex                   Unsigned32,
-    ipsAuthIdentName                           OCTET STRING, -- was  SnmpAdminString,
-    ipsAuthIdentNameRowStatus               RowStatus
+    ipsAuthIdentNameIndex          Unsigned32,
+    ipsAuthIdentName               SnmpAdminString,
+    ipsAuthIdentNameRowStatus      RowStatus,
+    ipsAuthIdentNameStorageType    StorageType
 }
 
 ipsAuthIdentNameIndex OBJECT-TYPE
@@ -266,19 +344,23 @@ ipsAuthIdentNameIndex OBJECT-TYPE
     MAX-ACCESS    not-accessible
     STATUS        current
     DESCRIPTION
-        "An arbitrary integer used to uniquely identify a particular
-        identity name instance within an ipsAuthIdentity within an
-     authentication instance."
+        "An arbitrary integer used to uniquely identify a
+        particular identity name instance within an
+        ipsAuthIdentity within an authorization instance.
+        This index value must not be modified or reused by
+        an agent unless a reboot has occurred.  An agent
+        should attempt to keep this value persistent across
+        reboots."
 ::= { ipsAuthIdentNameAttributesEntry 1 }
 
 ipsAuthIdentName OBJECT-TYPE
-    SYNTAX        OCTET STRING  (SIZE  (0..255))  -- was SnmpAdminString
+    SYNTAX        SnmpAdminString
     MAX-ACCESS    read-create
     STATUS        current
     DESCRIPTION
-        "A character string which is the unique name of an
-     identity that may be used to identify this
-     ipsAuthIdent entry."
+        "A character string that is the unique name of an
+        identity that may be used to identify this ipsAuthIdent
+        entry."
 ::= { ipsAuthIdentNameAttributesEntry 2 }
 
 ipsAuthIdentNameRowStatus OBJECT-TYPE
@@ -287,13 +369,28 @@ ipsAuthIdentNameRowStatus OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "This field allows entries to be dynamically added and
-     removed from this table via SNMP."
+        removed from this table via SNMP.  When adding a row to
+        this table, all non-Index/RowStatus objects must be set.
+        Rows may be discarded using RowStatus.  The value of
+        ipsAuthIdentName may be set when this value is 'active'."
 ::= { ipsAuthIdentNameAttributesEntry 3 }
 
+ipsAuthIdentNameStorageType OBJECT-TYPE
+    SYNTAX        StorageType
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The storage type for all read-create objects in this row.
+         Rows in this table that were created through an external
+         process may have a storage type of readOnly or permanent.
+         Conceptual rows having the value 'permanent' need not
+         allow write access to any columnar objects in the row."
+    DEFVAL        { nonVolatile }
+::= { ipsAuthIdentNameAttributesEntry 4 }
 
 ipsAuthIdentityAddress OBJECT IDENTIFIER ::= { ipsAuthObjects 5 }
 
--- iSCSI User Initiator Address Attributes Table
+-- User Initiator Address Attributes Table
 
 ipsAuthIdentAddrAttributesTable OBJECT-TYPE
     SYNTAX        SEQUENCE OF IpsAuthIdentAddrAttributesEntry
@@ -301,14 +398,11 @@ ipsAuthIdentAddrAttributesTable OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "A list of address ranges that are allowed to serve
-
-
-
-     as the endpoint addresses of a particular identity.
-     An address range includes a starting and ending address
-     and an optional netmask, and an address type indicator,
-     which can specify whether the address is IPv4, IPv6,
-     FC-WWPN, or FC-WWNN."
+        as the endpoint addresses of a particular identity.
+        An address range includes a starting and ending address
+        and an optional netmask, and an address type indicator,
+        which can specify whether the address is IPv4, IPv6,
+        FC-WWPN, or FC-WWNN."
 ::= { ipsAuthIdentityAddress 1 }
 
 ipsAuthIdentAddrAttributesEntry OBJECT-TYPE
@@ -317,18 +411,20 @@ ipsAuthIdentAddrAttributesEntry OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "An entry (row) containing management information
-        applicable to an address range which is used as part
-     of the authentication of an identity
-        within an authentication instance on this node."
-    INDEX { ipsAuthInstIndex, ipsAuthIdentIndex, ipsAuthIdentAddrIndex }
+        applicable to an address range that is used as part
+        of the authorization of an identity
+        within an authorization instance on this node."
+    INDEX { ipsAuthInstIndex, ipsAuthIdentIndex,
+            ipsAuthIdentAddrIndex }
 ::= { ipsAuthIdentAddrAttributesTable  1 }
 
 IpsAuthIdentAddrAttributesEntry ::= SEQUENCE {
-    ipsAuthIdentAddrIndex                   Unsigned32,
-    ipsAuthIdentAddrType                    INTEGER, -- was AddressFamilyNumbers,
-    ipsAuthIdentAddrStart                   IpsAuthAddress,
-    ipsAuthIdentAddrEnd                     IpsAuthAddress,
-    ipsAuthIdentAddrRowStatus               RowStatus
+    ipsAuthIdentAddrIndex          Unsigned32,
+    ipsAuthIdentAddrType           AddressFamilyNumbers,
+    ipsAuthIdentAddrStart          IpsAuthAddress,
+    ipsAuthIdentAddrEnd            IpsAuthAddress,
+    ipsAuthIdentAddrRowStatus      RowStatus,
+    ipsAuthIdentAddrStorageType    StorageType
 }
 
 ipsAuthIdentAddrIndex OBJECT-TYPE
@@ -336,31 +432,34 @@ ipsAuthIdentAddrIndex OBJECT-TYPE
     MAX-ACCESS    not-accessible
     STATUS        current
     DESCRIPTION
-        "An arbitrary integer used to uniquely identify a particular
-        ipsAuthIdentAddress instance within an ipsAuthIdentity within an
-     authentication instance present on the node."
+        "An arbitrary integer used to uniquely identify a
+        particular ipsAuthIdentAddress instance within an
+        ipsAuthIdentity within an authorization instance
+        present on the node.
+        This index value must not be modified or reused by
+        an agent unless a reboot has occurred.  An agent
+        should attempt to keep this value persistent across
+        reboots."
 ::= { ipsAuthIdentAddrAttributesEntry 1 }
 
 ipsAuthIdentAddrType OBJECT-TYPE
-    SYNTAX       INTEGER -- was  AddressFamilyNumbers
+    SYNTAX        AddressFamilyNumbers
     MAX-ACCESS    read-create
     STATUS        current
     DESCRIPTION
-        "The type of Address in the ipsAuthIdentAddress start, end,
-     and mask fields.  This type is taken from the IANA address
-     family types; more types may be registered independently
-     of this MIB."
+        "The address types used in the ipsAuthIdentAddrStart
+        and ipsAuthAddrEnd objects.  This type is taken
+        from the IANA address family types."
 ::= { ipsAuthIdentAddrAttributesEntry 2 }
-
-
-
 
 ipsAuthIdentAddrStart OBJECT-TYPE
     SYNTAX        IpsAuthAddress
     MAX-ACCESS    read-create
     STATUS        current
     DESCRIPTION
-        "The starting address of the allowed address range."
+        "The starting address of the allowed address range.
+        The format of this object is determined by
+        ipsAuthIdentAddrType."
 ::= { ipsAuthIdentAddrAttributesEntry 3 }
 
 ipsAuthIdentAddrEnd OBJECT-TYPE
@@ -368,11 +467,12 @@ ipsAuthIdentAddrEnd OBJECT-TYPE
     MAX-ACCESS    read-create
     STATUS        current
     DESCRIPTION
-        "The ending address of the allowed address range.  If the
-         ipsAuthIdentAddrEntry specifies a single address, this shall
-         match the ipsAuthIdentAddrStart."
+        "The ending address of the allowed address range.
+        If the ipsAuthIdentAddrEntry specifies a single
+        address, this shall match the ipsAuthIdentAddrStart.
+        The format of this object is determined by
+        ipsAuthIdentAddrType."
 ::= { ipsAuthIdentAddrAttributesEntry 4 }
-
 
 ipsAuthIdentAddrRowStatus OBJECT-TYPE
     SYNTAX        RowStatus
@@ -380,13 +480,31 @@ ipsAuthIdentAddrRowStatus OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "This field allows entries to be dynamically added and
-     removed from this table via SNMP."
+        removed from this table via SNMP.  When adding a row to
+        this table, all non-Index/RowStatus objects must be set.
+        Rows may be discarded using RowStatus.  The values of
+        ipsAuthIdentAddrStart and ipsAuthIdentAddrEnd may be set
+        when this value is 'active'.  The value of
+        ipsAuthIdentAddrType may not be set when this value is
+        'active'."
 ::= { ipsAuthIdentAddrAttributesEntry 5 }
 
+ipsAuthIdentAddrStorageType OBJECT-TYPE
+    SYNTAX        StorageType
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The storage type for all read-create objects in this row.
+         Rows in this table that were created through an external
+         process may have a storage type of readOnly or permanent.
+         Conceptual rows having the value 'permanent' need not
+         allow write access to any columnar objects in the row."
+    DEFVAL        { nonVolatile }
+::= { ipsAuthIdentAddrAttributesEntry 6 }
 
 ipsAuthCredential OBJECT IDENTIFIER ::= { ipsAuthObjects 6 }
 
--- Identity Credential Attributes Table
+-- Credential Attributes Table
 
 ipsAuthCredentialAttributesTable OBJECT-TYPE
     SYNTAX        SEQUENCE OF IpsAuthCredentialAttributesEntry
@@ -394,8 +512,8 @@ ipsAuthCredentialAttributesTable OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "A list of credentials related to user identities
-     that are allowed as valid authenticators of the
-     particular identity."
+        that are allowed as valid authenticators of the
+        particular identity."
 ::= { ipsAuthCredential 1 }
 
 ipsAuthCredentialAttributesEntry OBJECT-TYPE
@@ -403,19 +521,25 @@ ipsAuthCredentialAttributesEntry OBJECT-TYPE
     MAX-ACCESS    not-accessible
     STATUS        current
     DESCRIPTION
-
-
-
         "An entry (row) containing management information
-        applicable to a credential which authenticates a user
-        identity within an authentication instance."
+        applicable to a credential that verifies a user
+        identity within an authorization instance.
+
+        To provide complete information in this MIB for a credential,
+        the management station must not only create the row in this
+        table but must also create a row in another table, where the
+        other table is determined by the value of
+        ipsAuthCredAuthMethod, e.g., if ipsAuthCredAuthMethod has the
+        value ipsAuthMethodChap, a row must be created in the
+        ipsAuthCredChapAttributesTable."
     INDEX { ipsAuthInstIndex, ipsAuthIdentIndex, ipsAuthCredIndex }
 ::= { ipsAuthCredentialAttributesTable  1 }
 
 IpsAuthCredentialAttributesEntry ::= SEQUENCE {
-    ipsAuthCredIndex                   Unsigned32,
-    ipsAuthCredAuthMethod          INTEGER, -- was    AutonomousType need to support
-    ipsAuthCredRowStatus               RowStatus
+    ipsAuthCredIndex               Unsigned32,
+    ipsAuthCredAuthMethod          AutonomousType,
+    ipsAuthCredRowStatus           RowStatus,
+    ipsAuthCredStorageType         StorageType
 }
 
 ipsAuthCredIndex OBJECT-TYPE
@@ -423,22 +547,38 @@ ipsAuthCredIndex OBJECT-TYPE
     MAX-ACCESS    not-accessible
     STATUS        current
     DESCRIPTION
-        "An arbitrary integer used to uniquely identify a particular
-        iSCSI Credential instance within an iSCSI instance present on the
-        node."
+        "An arbitrary integer used to uniquely identify a
+        particular Credential instance within an instance
+        present on the node.
+        This index value must not be modified or reused by
+        an agent unless a reboot has occurred.  An agent
+        should attempt to keep this value persistent across
+        reboots."
 ::= { ipsAuthCredentialAttributesEntry 1 }
 
 ipsAuthCredAuthMethod OBJECT-TYPE
-    SYNTAX        INTEGER  -- was AutonomousType need to support
+    SYNTAX        AutonomousType
     MAX-ACCESS    read-create
     STATUS        current
     DESCRIPTION
-     "This object contains an OBJECT IDENTIFIER
-     which identifies the authentication method
-     used with this credential.
+        "This object contains an OBJECT IDENTIFIER
+        that identifies the authentication method
+        used with this credential.
 
-     Some standardized values for this object are defined
-     within the ipsAuthMethods subtree."
+        When a row is created in this table, a corresponding
+        row must be created by the management station
+        in a corresponding table specified by this value.
+
+        When a row is deleted from this table, the corresponding
+        row must be automatically deleted by the agent in
+        the corresponding table specified by this value.
+
+        If the value of this object is ipsAuthMethodNone, no
+        corresponding rows are created or deleted from other
+        tables.
+
+        Some standardized values for this object are defined
+        within the ipsAuthMethodTypes subtree."
 ::= { ipsAuthCredentialAttributesEntry 2 }
 
 ipsAuthCredRowStatus OBJECT-TYPE
@@ -447,15 +587,29 @@ ipsAuthCredRowStatus OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "This field allows entries to be dynamically added and
-     removed from this table via SNMP."
+        removed from this table via SNMP.  When adding a row to
+        this table, all non-Index/RowStatus objects must be set.
+        Rows may be discarded using RowStatus.  The value of
+        ipsAuthCredAuthMethod must not be changed while this row
+        is 'active'."
 ::= { ipsAuthCredentialAttributesEntry 3 }
+
+ipsAuthCredStorageType OBJECT-TYPE
+    SYNTAX        StorageType
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The storage type for all read-create objects in this row.
+         Rows in this table that were created through an external
+         process may have a storage type of readOnly or permanent.
+         Conceptual rows having the value 'permanent' need not
+         allow write access to any columnar objects in the row."
+    DEFVAL        { nonVolatile }
+::= { ipsAuthCredentialAttributesEntry 4 }
 
 ipsAuthCredChap OBJECT IDENTIFIER ::= { ipsAuthObjects 7 }
 
 -- Credential Chap-Specific Attributes Table
-
-
-
 
 ipsAuthCredChapAttributesTable OBJECT-TYPE
     SYNTAX        SEQUENCE OF IpsAuthCredChapAttributesEntry
@@ -463,8 +617,13 @@ ipsAuthCredChapAttributesTable OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "A list of CHAP attributes for credentials that
-     have their ipsAuthCredAuthMethod == ipsAuthMethodChap.
-     -ReplicateOnCreate"
+        use ipsAuthMethodChap as their ipsAuthCredAuthMethod.
+
+        A row in this table can only exist when an instance of
+        the ipsAuthCredAuthMethod object exists (or is created
+
+        simultaneously) having the same instance identifiers
+        and a value of 'ipsAuthMethodChap'."
 ::= { ipsAuthCredChap 1 }
 
 ipsAuthCredChapAttributesEntry OBJECT-TYPE
@@ -473,51 +632,64 @@ ipsAuthCredChapAttributesEntry OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "An entry (row) containing management information
-        applicable to a credential which has the ipsAuthCredAuthMethod
-     set to the OID of ipsAuthMethodChap."
+        applicable to a credential that uses
+        ipsAuthMethodChap as their ipsAuthCredAuthMethod.
+
+        When a row is created in ipsAuthCredentialAttributesTable
+        with ipsAuthCredAuthMethod = ipsAuthCredChap, the
+        management station must create a corresponding row
+        in this table.
+
+        When a row is deleted from ipsAuthCredentialAttributesTable
+        with ipsAuthCredAuthMethod = ipsAuthCredChap, the
+        agent must delete the corresponding row (if any) in
+        this table."
     INDEX { ipsAuthInstIndex, ipsAuthIdentIndex, ipsAuthCredIndex }
 ::= { ipsAuthCredChapAttributesTable  1 }
 
 IpsAuthCredChapAttributesEntry ::= SEQUENCE {
-    ipsAuthCredChapUserName           OCTET STRING, -- was  SnmpAdminString,
-    ipsAuthCredChapPassword            OCTET STRING, -- was SnmpAdminString,
-    ipsAuthCredChapRowStatus           RowStatus
+    ipsAuthCredChapUserName        SnmpAdminString,
+    ipsAuthCredChapRowStatus       RowStatus,
+    ipsAuthCredChapStorageType     StorageType
 }
 
 ipsAuthCredChapUserName OBJECT-TYPE
-    SYNTAX        OCTET STRING  (SIZE (0..255)) -- was SnmpAdminString
+    SYNTAX        SnmpAdminString
     MAX-ACCESS    read-create
     STATUS        current
     DESCRIPTION
-        "EQL-SECONDARY-KEY
-         An octet string containing the CHAP user name for this
-     credential."
+        "A character string containing the CHAP user name for this
+        credential."
+    REFERENCE
+        "W. Simpson, RFC 1994: PPP Challenge Handshake
+        Authentication Protocol (CHAP), August 1996"
 ::= { ipsAuthCredChapAttributesEntry 1 }
-
-ipsAuthCredChapPassword OBJECT-TYPE
-    SYNTAX        OCTET STRING  (SIZE (0..255)) -- was SnmpAdminString
-    MAX-ACCESS    read-create
-    STATUS        current
-    DESCRIPTION
-        "An octet string containing the password for this
-     credential.  If written, it changes the password for
-     the credential.  If read, it returns a zero-length
-     string."
-     --DEFAULT       cookie "secure"
-::= { ipsAuthCredChapAttributesEntry 2 }
 
 ipsAuthCredChapRowStatus OBJECT-TYPE
     SYNTAX        RowStatus
-
-
-
     MAX-ACCESS    read-create
     STATUS        current
     DESCRIPTION
         "This field allows entries to be dynamically added and
-     removed from this table via SNMP."
-::= { ipsAuthCredChapAttributesEntry 3 }
+        removed from this table via SNMP.  When adding a row to
+        this table, all non-Index/RowStatus objects must be set.
+        Rows may be discarded using RowStatus.  The value of
+        ipsAuthCredChapUserName may be changed while this row
+        is 'active'."
+::= { ipsAuthCredChapAttributesEntry 2 }
 
+ipsAuthCredChapStorageType OBJECT-TYPE
+    SYNTAX        StorageType
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The storage type for all read-create objects in this row.
+         Rows in this table that were created through an external
+         process may have a storage type of readOnly or permanent.
+         Conceptual rows having the value 'permanent' need not
+         allow write access to any columnar objects in the row."
+    DEFVAL        { nonVolatile }
+::= { ipsAuthCredChapAttributesEntry 3 }
 
 ipsAuthCredSrp OBJECT IDENTIFIER ::= { ipsAuthObjects 8 }
 
@@ -528,8 +700,13 @@ ipsAuthCredSrpAttributesTable OBJECT-TYPE
     MAX-ACCESS    not-accessible
     STATUS        current
     DESCRIPTION
-        "A list of SRP-specific attributes for credentials that
-     have their ipsAuthCredAuthMethod == ipsAuthMethodSrp."
+        "A list of SRP attributes for credentials that
+        use ipsAuthMethodSrp as its ipsAuthCredAuthMethod.
+
+        A row in this table can only exist when an instance of
+        the ipsAuthCredAuthMethod object exists (or is created
+        simultaneously) having the same instance identifiers
+        and a value of 'ipsAuthMethodSrp'."
 ::= { ipsAuthCredSrp 1 }
 
 ipsAuthCredSrpAttributesEntry OBJECT-TYPE
@@ -538,39 +715,38 @@ ipsAuthCredSrpAttributesEntry OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "An entry (row) containing management information
-        applicable to a credential which has the ipsAuthCredAuthMethod
-     set to the OID of ipsAuthMethodSrp."
+        applicable to a credential that uses
+        ipsAuthMethodSrp as their ipsAuthCredAuthMethod.
+
+        When a row is created in ipsAuthCredentialAttributesTable
+        with ipsAuthCredAuthMethod = ipsAuthCredSrp, the
+        management station must create a corresponding row
+        in this table.
+
+        When a row is deleted from ipsAuthCredentialAttributesTable
+        with ipsAuthCredAuthMethod = ipsAuthCredSrp, the
+        agent must delete the corresponding row (if any) in
+        this table."
     INDEX { ipsAuthInstIndex, ipsAuthIdentIndex, ipsAuthCredIndex }
 ::= { ipsAuthCredSrpAttributesTable  1 }
 
 IpsAuthCredSrpAttributesEntry ::= SEQUENCE {
-    ipsAuthCredSrpUserName            OCTET STRING, -- was SnmpAdminString,
-    ipsAuthCredSrpPassword            OCTET STRING, -- was SnmpAdminString,
-    ipsAuthCredSrpRowStatus           RowStatus
+    ipsAuthCredSrpUserName         SnmpAdminString,
+    ipsAuthCredSrpRowStatus        RowStatus,
+    ipsAuthCredSrpStorageType      StorageType
 }
 
 ipsAuthCredSrpUserName OBJECT-TYPE
-    SYNTAX        OCTET STRING  (SIZE (0..255)) -- was SnmpAdminString
+    SYNTAX        SnmpAdminString
     MAX-ACCESS    read-create
     STATUS        current
     DESCRIPTION
-        "An octet string containing the CHAP user name for this
-     credential."
+        "A character string containing the SRP user name for this
+        credential."
+    REFERENCE
+       "T. Wu, RFC 2945: The SRP Authentication and Key
+       Exchange System, September 2000"
 ::= { ipsAuthCredSrpAttributesEntry 1 }
-
-ipsAuthCredSrpPassword OBJECT-TYPE
-
-
-
-    SYNTAX        OCTET STRING  (SIZE (0..255)) -- was SnmpAdminString
-    MAX-ACCESS    read-create
-    STATUS        current
-    DESCRIPTION
-        "An octet string containing the password for this
-     credential.  If written, it changes the password for
-     the credential.  If read, it returns a zero-length
-     string."
-::= { ipsAuthCredSrpAttributesEntry 2 }
 
 ipsAuthCredSrpRowStatus OBJECT-TYPE
     SYNTAX        RowStatus
@@ -578,125 +754,238 @@ ipsAuthCredSrpRowStatus OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "This field allows entries to be dynamically added and
-     removed from this table via SNMP."
+        removed from this table via SNMP.  When adding a row to
+        this table, all non-Index/RowStatus objects must be set.
+        Rows may be discarded using RowStatus.  The value of
+        ipsAuthCredSrpUserName may be changed while the status
+        of this row is 'active'."
+::= { ipsAuthCredSrpAttributesEntry 2 }
+
+ipsAuthCredSrpStorageType OBJECT-TYPE
+    SYNTAX        StorageType
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The storage type for all read-create objects in this row.
+         Rows in this table that were created through an external
+         process may have a storage type of readOnly or permanent.
+         Conceptual rows having the value 'permanent' need not
+         allow write access to any columnar objects in the row."
+    DEFVAL        { nonVolatile }
 ::= { ipsAuthCredSrpAttributesEntry 3 }
 
-------------------------------------------------------------------------
+ipsAuthCredKerberos OBJECT IDENTIFIER ::= { ipsAuthObjects 9 }
+
+-- Credential Kerberos-Specific Attributes Table
+
+ipsAuthCredKerbAttributesTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF IpsAuthCredKerbAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A list of Kerberos attributes for credentials that
+        use ipsAuthMethodKerberos as their ipsAuthCredAuthMethod.
+
+        A row in this table can only exist when an instance of
+        the ipsAuthCredAuthMethod object exists (or is created
+        simultaneously) having the same instance identifiers
+        and a value of 'ipsAuthMethodKerb'."
+::= { ipsAuthCredKerberos 1 }
+
+ipsAuthCredKerbAttributesEntry OBJECT-TYPE
+    SYNTAX        IpsAuthCredKerbAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry (row) containing management information
+        applicable to a credential that uses
+        ipsAuthMethodKerberos as its ipsAuthCredAuthMethod.
+
+        When a row is created in ipsAuthCredentialAttributesTable
+        with ipsAuthCredAuthMethod = ipsAuthCredKerberos, the
+        management station must create a corresponding row
+        in this table.
+
+        When a row is deleted from ipsAuthCredentialAttributesTable
+        with ipsAuthCredAuthMethod = ipsAuthCredKerberos, the
+        agent must delete the corresponding row (if any) in
+        this table."
+    INDEX { ipsAuthInstIndex, ipsAuthIdentIndex, ipsAuthCredIndex }
+::= { ipsAuthCredKerbAttributesTable  1 }
+
+IpsAuthCredKerbAttributesEntry ::= SEQUENCE {
+
+    ipsAuthCredKerbPrincipal       SnmpAdminString,
+    ipsAuthCredKerbRowStatus       RowStatus,
+    ipsAuthCredKerbStorageType     StorageType
+}
+
+ipsAuthCredKerbPrincipal OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "A character string containing a Kerberos principal
+        for this credential."
+    REFERENCE
+        "C. Neuman, S. Hartman, and K. Raeburn, RFC 4120:
+        The Kerberos Network Authentication Service (V5),
+        July 2005"
+::= { ipsAuthCredKerbAttributesEntry 1 }
+
+ipsAuthCredKerbRowStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "This field allows entries to be dynamically added and
+        removed from this table via SNMP.  When adding a row to
+        this table, all non-Index/RowStatus objects must be set.
+        Rows may be discarded using RowStatus.  The value of
+        ipsAuthCredKerbPrincipal may be changed while this row
+        is 'active'."
+::= { ipsAuthCredKerbAttributesEntry 2 }
+
+ipsAuthCredKerbStorageType OBJECT-TYPE
+    SYNTAX        StorageType
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The storage type for all read-create objects in this row.
+         Rows in this table that were created through an external
+         process may have a storage type of readOnly or permanent.
+         Conceptual rows having the value 'permanent' need not
+         allow write access to any columnar objects in the row."
+    DEFVAL        { nonVolatile }
+::= { ipsAuthCredKerbAttributesEntry 3 }
+
+--******************************************************************
 -- Notifications
 
--- There are no notifications necessary in this MIB.
+-- There are no notifications necessary in this MIB module.
 
-------------------------------------------------------------------------
+--******************************************************************
 
 -- Conformance Statements
 
-ipsAuthGroups OBJECT IDENTIFIER ::= { ipsAuthConformance 1 }
+ipsAuthCompliances OBJECT IDENTIFIER ::= { ipsAuthConformance 1 }
+ipsAuthGroups      OBJECT IDENTIFIER ::= { ipsAuthConformance 2 }
 
 ipsAuthInstanceAttributesGroup OBJECT-GROUP
     OBJECTS {
-        ipsAuthInstDescr
+        ipsAuthInstDescr,
+        ipsAuthInstStorageType
     }
     STATUS current
     DESCRIPTION
         "A collection of objects providing information about
-     authentication instances."
+        authorization instances."
 ::= { ipsAuthGroups 1 }
 
 ipsAuthIdentAttributesGroup OBJECT-GROUP
     OBJECTS {
         ipsAuthIdentDescription,
-    ipsAuthIdentRowStatus
+        ipsAuthIdentRowStatus,
+        ipsAuthIdentStorageType
     }
     STATUS current
     DESCRIPTION
         "A collection of objects providing information about
-
-
-
-     user identities within an authentication instance."
+        user identities within an authorization instance."
 ::= { ipsAuthGroups 2 }
 
 ipsAuthIdentNameAttributesGroup OBJECT-GROUP
     OBJECTS {
-    ipsAuthIdentName,
-    ipsAuthIdentNameRowStatus
+        ipsAuthIdentName,
+        ipsAuthIdentNameRowStatus,
+        ipsAuthIdentNameStorageType
     }
     STATUS current
     DESCRIPTION
         "A collection of objects providing information about
-     user names within user identities within an authentication
-     instance."
+        user names within user identities within an authorization
+        instance."
 ::= { ipsAuthGroups 3 }
 
 ipsAuthIdentAddrAttributesGroup OBJECT-GROUP
     OBJECTS {
-    ipsAuthIdentAddrType,
-    ipsAuthIdentAddrStart,
-    ipsAuthIdentAddrEnd,
-    ipsAuthIdentAddrRowStatus
+        ipsAuthIdentAddrType,
+        ipsAuthIdentAddrStart,
+        ipsAuthIdentAddrEnd,
+        ipsAuthIdentAddrRowStatus,
+        ipsAuthIdentAddrStorageType
     }
     STATUS current
     DESCRIPTION
         "A collection of objects providing information about
-     address ranges within user identities within an authentication
-     instance."
+        address ranges within user identities within an
+        authorization instance."
 ::= { ipsAuthGroups 4 }
 
 ipsAuthIdentCredAttributesGroup OBJECT-GROUP
     OBJECTS {
-    ipsAuthCredAuthMethod,
-    ipsAuthCredRowStatus
+        ipsAuthCredAuthMethod,
+        ipsAuthCredRowStatus,
+        ipsAuthCredStorageType
     }
     STATUS current
     DESCRIPTION
         "A collection of objects providing information about
-     credentials within user identities within an authentication
-     instance."
+        credentials within user identities within an authorization
+        instance."
 ::= { ipsAuthGroups 5 }
 
 ipsAuthIdentChapAttrGroup OBJECT-GROUP
     OBJECTS {
-    ipsAuthCredChapUserName,
-    ipsAuthCredChapPassword,
-    ipsAuthCredChapRowStatus
+        ipsAuthCredChapUserName,
+        ipsAuthCredChapRowStatus,
+        ipsAuthCredChapStorageType
     }
     STATUS current
-
-
-
     DESCRIPTION
-        "A collection of objects providing information about CHAP
-     credentials within user identities within an authentication
-     instance."
+        "A collection of objects providing information about
+        CHAP credentials within user identities within an
+        authorization instance."
 ::= { ipsAuthGroups 6 }
 
 ipsAuthIdentSrpAttrGroup OBJECT-GROUP
     OBJECTS {
-    ipsAuthCredSrpUserName,
-    ipsAuthCredSrpPassword,
-    ipsAuthCredSrpRowStatus
+        ipsAuthCredSrpUserName,
+        ipsAuthCredSrpRowStatus,
+        ipsAuthCredSrpStorageType
     }
     STATUS current
     DESCRIPTION
-        "A collection of objects providing information about SRP
-     credentials within user identities within an authentication
-     instance."
+        "A collection of objects providing information about
+        SRP credentials within user identities within an
+        authorization instance."
 ::= { ipsAuthGroups 7 }
 
-------------------------------------------------------------------------
+ipsAuthIdentKerberosAttrGroup OBJECT-GROUP
+    OBJECTS {
+        ipsAuthCredKerbPrincipal,
+        ipsAuthCredKerbRowStatus,
+        ipsAuthCredKerbStorageType
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing information about
+        Kerberos credentials within user identities within an
+        authorization instance."
+::= { ipsAuthGroups 8 }
 
-ipsAuthCompliances OBJECT IDENTIFIER ::= { ipsAuthConformance 2 }
+--******************************************************************
 
 ipsAuthComplianceV1 MODULE-COMPLIANCE
     STATUS current
     DESCRIPTION
         "Initial version of compliance statement based on
-        initial version of MIB.
+        initial version of this MIB module.
 
-     The Instance and Identity groups are mandatory;
-     at least one of the other groups (Name, Address,
-     Credential, Certificate) is also mandatory for
-     any given implementation."
+        The Instance and Identity groups are mandatory;
+        at least one of the other groups (Name, Address,
+        Credential, Certificate) is also mandatory for
+        any given implementation."
     MODULE       -- this module
     MANDATORY-GROUPS {
         ipsAuthInstanceAttributesGroup,
@@ -709,23 +998,159 @@ ipsAuthComplianceV1 MODULE-COMPLIANCE
     GROUP ipsAuthIdentNameAttributesGroup
     DESCRIPTION
         "This group is mandatory for all implementations
-     that make use of unique identity names."
+        that make use of unique identity names."
 
     GROUP ipsAuthIdentAddrAttributesGroup
-
-
-
     DESCRIPTION
         "This group is mandatory for all implementations
-     that use addresses to help authenticate identities."
+        that use addresses to help verify identities."
 
     GROUP ipsAuthIdentCredAttributesGroup
     DESCRIPTION
         "This group is mandatory for all implementations
-     that use credentials to help authenticate identities."
+        that use credentials to help verify identities."
 
+    GROUP ipsAuthIdentChapAttrGroup
+    DESCRIPTION
+        "This group is mandatory for all implementations
+        that use CHAP to help verify identities.
+
+        The ipsAuthIdentCredAttributesGroup must be
+        implemented if this group is implemented."
+
+    GROUP ipsAuthIdentSrpAttrGroup
+    DESCRIPTION
+        "This group is mandatory for all implementations
+        that use SRP to help verify identities.
+
+        The ipsAuthIdentCredAttributesGroup must be
+        implemented if this group is implemented."
+
+    GROUP ipsAuthIdentKerberosAttrGroup
+    DESCRIPTION
+        "This group is mandatory for all implementations
+        that use Kerberos to help verify identities.
+
+        The ipsAuthIdentCredAttributesGroup must be
+        implemented if this group is implemented."
+
+    OBJECT ipsAuthInstDescr
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT ipsAuthInstStorageType
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT ipsAuthIdentDescription
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT ipsAuthIdentRowStatus
+    SYNTAX INTEGER { active(1) } -- subset of RowStatus
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required, and only one of the
+        six enumerated values for the RowStatus textual
+        convention need be supported, specifically:
+        active(1)."
+
+    OBJECT ipsAuthIdentName
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT ipsAuthIdentNameRowStatus
+    SYNTAX INTEGER { active(1) } -- subset of RowStatus
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required, and only one of the
+        six enumerated values for the RowStatus textual
+        convention need be supported, specifically:
+        active(1)."
+
+    OBJECT ipsAuthIdentAddrType
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT ipsAuthIdentAddrStart
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT ipsAuthIdentAddrEnd
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT ipsAuthIdentAddrRowStatus
+    SYNTAX INTEGER { active(1) } -- subset of RowStatus
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required, and only one of the
+        six enumerated values for the RowStatus textual
+        convention need be supported, specifically:
+        active(1)."
+
+    OBJECT ipsAuthCredAuthMethod
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT ipsAuthCredRowStatus
+    SYNTAX INTEGER { active(1) } -- subset of RowStatus
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required, and only one of the
+
+        six enumerated values for the RowStatus textual
+        convention need be supported, specifically:
+        active(1)."
+
+    OBJECT ipsAuthCredChapUserName
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT ipsAuthCredChapRowStatus
+    SYNTAX INTEGER { active(1) } -- subset of RowStatus
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required, and only one of the
+        six enumerated values for the RowStatus textual
+        convention need be supported, specifically:
+        active(1)."
+
+    OBJECT ipsAuthCredSrpUserName
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT ipsAuthCredSrpRowStatus
+    SYNTAX INTEGER { active(1) } -- subset of RowStatus
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required, and only one of the
+        six enumerated values for the RowStatus textual
+        convention need be supported, specifically:
+        active(1)."
+
+    OBJECT ipsAuthCredKerbPrincipal
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT ipsAuthCredKerbRowStatus
+    SYNTAX INTEGER { active(1) } -- subset of RowStatus
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required, and only one of the six
+        enumerated values for the RowStatus textual convention need
+        be supported, specifically:  active(1)."
 ::= { ipsAuthCompliances 1 }
 
 END
-
-

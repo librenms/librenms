@@ -113,7 +113,7 @@ if (! empty($data)) {
 
     //decode and flatten the data
     $stats = [];
-    [$json_data] = explode("\n", $data, 2);
+    [$json_data] = explode("\n", (string) $data, 2);
     foreach (json_decode($json_data, true) as $stat) {
         $stats[$stat['name']] = $stat['value'];
     }
@@ -128,7 +128,7 @@ if (! empty($data)) {
         if (isset($stats[$key])) {
             $fields[$key] = $stats[$key];
         } else {
-            $fields[$key] = 'U';
+            $fields[$key] = null;
         }
     }
 

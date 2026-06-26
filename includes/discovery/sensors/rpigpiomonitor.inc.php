@@ -31,7 +31,7 @@ if (! empty($gpio_mon_data)) {
 
     foreach ($gpio_mon_data as $index => $entry) {
         if (Str::contains($entry['nsExtendOutLine'], ';')) {
-            $splitted_data_array = explode(';', $entry['nsExtendOutLine']);
+            $splitted_data_array = explode(';', (string) $entry['nsExtendOutLine']);
             $sensor_data = [];
             foreach ($splitted_data_array as $splitted_data_index => $splitted_data) {
                 $sensor_data_parts = explode(',', $splitted_data);
@@ -45,6 +45,7 @@ if (! empty($gpio_mon_data)) {
                         $sensor_data['low_warn_limit'] = $sensor_data_parts[4];
                         $sensor_data['warn_limit'] = $sensor_data_parts[5];
                         $sensor_data['high_limit'] = $sensor_data_parts[6];
+                        $sensor_data['group'] = $sensor_data_parts[7] ?? null;
                     }
                 } else {
                     if (isset($sensor_data_parts[0]) && isset($sensor_data_parts[1]) && isset($sensor_data_parts[2])) {
@@ -54,7 +55,6 @@ if (! empty($gpio_mon_data)) {
 
                         $state_data['value'] = intval($sensor_data_parts[0]);
                         $state_data['generic'] = intval($sensor_data_parts[1]);
-                        $state_data['graph'] = 1;
                         $state_data['descr'] = $sensor_data_parts[2];
                         array_push($sensor_data['state_data'], $state_data);
                     }
@@ -74,7 +74,7 @@ if (! empty($gpio_mon_data)) {
                 create_state_index($sensor_data['name'], $sensor_data['state_data']);
             }
 
-            discover_sensor(null, $sensor_data['type'], $device, $sensor_data['oid'], $sensor_id, $sensor_data['name'], $sensor_data['descr'], 1, 1, $sensor_data['low_limit'], $sensor_data['low_warn_limit'], $sensor_data['warn_limit'], $sensor_data['high_limit'], $sensor_data['value']);
+            discover_sensor(null, $sensor_data['type'], $device, $sensor_data['oid'], $sensor_id, $sensor_data['name'], $sensor_data['descr'], 1, 1, $sensor_data['low_limit'], $sensor_data['low_warn_limit'], $sensor_data['warn_limit'], $sensor_data['high_limit'], $sensor_data['value'], 'snmp', null, null, null, $sensor_data['group']);
         } else {
             echo "[rpigpiomonitor] An error occurred while reading a sensor! Please run 'rpigpiomonitor.php -validate' on the target device to verify the configuration.\n";
         }

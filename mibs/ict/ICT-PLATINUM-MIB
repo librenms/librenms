@@ -1,0 +1,267 @@
+-- ICT MIB file for ICT Platinum Series.
+--
+-- Date		Version
+-- =============================
+-- 4/06/23	v1.02
+--
+
+ICT-PLATINUM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises, IpAddress	FROM RFC1155-SMI
+	DisplayString		FROM RFC1213-MIB
+	OBJECT-TYPE		FROM RFC-1212
+	TRAP-TYPE		FROM RFC-1215;
+
+ictPower			OBJECT IDENTIFIER ::= { enterprises 39145 }
+
+platinumSeries			OBJECT IDENTIFIER ::= { ictPower 11 }
+
+deviceModel			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Model Number"
+	::= { platinumSeries 1 }
+
+deviceName			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Device Name"
+	::= { platinumSeries 2 }
+
+deviceHardware			OBJECT-TYPE
+	SYNTAX			INTEGER (0..127)
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Hardware Version"
+	::= { platinumSeries 3 }
+
+deviceFirmware			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Firmware Version"
+	::= { platinumSeries 4 }
+
+deviceMacAddress		OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"MAC Address"
+	::= { platinumSeries 5 }
+
+inputVoltage			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Input Voltage (VAC)"
+	::= { platinumSeries 6 }
+
+outputVoltage			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Output Voltage (VDC)"
+	::= { platinumSeries 7 }
+
+outputCurrent			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"System Current (Amps)"
+	::= { platinumSeries 8 }
+
+outputEnable			OBJECT-TYPE
+	SYNTAX			INTEGER { enabled(1), disabled(2) }
+	ACCESS			read-write
+	STATUS			mandatory
+	DESCRIPTION		"Output Enable Status (a value of '1' indicates Output is Enabled, and a value of '2' indicates Output is Disabled)"
+	::= { platinumSeries 9 }
+
+batteryVoltage			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Battery Voltage (VDC)"
+	::= { platinumSeries 10 }
+
+batteryCurrent			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Battery Current (Amps)"
+	::= { platinumSeries 11 }
+
+batteryTemperature		OBJECT-TYPE
+	SYNTAX			Integer32
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Battery Temperature (ºC) (a value of '1000' indicates the temperature probe is not connected)"
+	::= { platinumSeries 12 }
+
+batterySoc			OBJECT-TYPE
+	SYNTAX			INTEGER (0..100)
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Battery State of Charge (%)"
+	::= { platinumSeries 13 }
+
+batteryNetAh			OBJECT-TYPE
+	SYNTAX			Integer32
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Battery Net Ah Count (Ah)"
+	::= { platinumSeries 14 }
+
+batteryRunTime			OBJECT-TYPE
+	SYNTAX			Integer32
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Estimated Run-time Remaining (min)"
+	::= { platinumSeries 15 }
+
+inputVoltageX1			OBJECT-TYPE
+	SYNTAX			Integer32
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Input Voltage (VAC)"
+	::= { platinumSeries 16 }
+
+outputVoltageX100		OBJECT-TYPE
+	SYNTAX			Integer32
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Output Voltage (VDC X 100)"
+	::= { platinumSeries 17 }
+
+outputCurrentX100		OBJECT-TYPE
+	SYNTAX			Integer32
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"System Current (Amps X 100)"
+	::= { platinumSeries 18 }
+
+batteryVoltageX100		OBJECT-TYPE
+	SYNTAX			Integer32
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Battery Voltage (VDC X 100)"
+	::= { platinumSeries 19 }
+
+batteryCurrentX100		OBJECT-TYPE
+	SYNTAX			Integer32
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Battery Current (Amps X 100)"
+	::= { platinumSeries 20 }
+
+batteryTestResult		OBJECT-TYPE
+	SYNTAX			INTEGER { unknown(1), inProgress(2), pass(3), fail(4) }
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Result of Last Battery Discharge Test ('1' indicates result is UNKNOWN,'2' indicates Test is IN PROGRESS, '3' indicates Test PASSED, and '4' indicates Test FAILED)"
+	::= { platinumSeries 21 }
+
+
+--
+-- Trap definitions:
+--
+
+acFailAlarmTrap			TRAP-TYPE
+	ENTERPRISE		platinumSeries
+	DESCRIPTION		"Trap generated when the AC Failure Alarm is triggered"
+	::= 101
+
+dcFailAlarmTrap			TRAP-TYPE
+	ENTERPRISE		platinumSeries
+	DESCRIPTION		"Trap generated when the DC Failure Alarm is triggered"
+	::= 102
+
+sysFailAlarmTrap		TRAP-TYPE
+	ENTERPRISE		platinumSeries
+	DESCRIPTION		"Trap generated when the System Failure Alarm is triggered"
+	::= 103
+
+overtemperatureAlarmTrap	TRAP-TYPE
+	ENTERPRISE		platinumSeries
+	DESCRIPTION		"Trap generated when the Over-Temperature Alarm is triggered"
+	::= 104
+
+commFailAlarmTrap		TRAP-TYPE
+	ENTERPRISE		platinumSeries
+	DESCRIPTION		"Trap generated when communications lost with a Parallel Unit"
+	::= 105
+
+fanFailAlarmTrap		TRAP-TYPE
+	ENTERPRISE		platinumSeries
+	DESCRIPTION		"Trap generated when the Fan Failure Alarm is triggered"
+	::= 106
+
+batteryAlarmTrap		TRAP-TYPE
+	ENTERPRISE		platinumSeries
+	DESCRIPTION		"Trap generated when a Battery Alarm is triggered"
+	::= 107
+
+acFailAlarmClear		TRAP-TYPE
+	ENTERPRISE		platinumSeries
+	DESCRIPTION		"Trap generated when the AC Failure Alarm is cleared"
+	::= 111
+
+dcFailAlarmClear		TRAP-TYPE
+	ENTERPRISE		platinumSeries
+	DESCRIPTION		"Trap generated when the DC Failure Alarm is cleared"
+	::= 112
+
+sysFailAlarmClear		TRAP-TYPE
+	ENTERPRISE		platinumSeries
+	DESCRIPTION		"Trap generated when the System Failure Alarm is cleared"
+	::= 113
+
+overtemperatureAlarmClear	TRAP-TYPE
+	ENTERPRISE		platinumSeries
+	DESCRIPTION		"Trap generated when the Over-Temperature Alarm is cleared"
+	::= 114
+
+commFailAlarmClear		TRAP-TYPE
+	ENTERPRISE		platinumSeries
+	DESCRIPTION		"Trap generated when the Communications Failure Alarm is cleared"
+	::= 115
+
+fanFailAlarmClear		TRAP-TYPE
+	ENTERPRISE		platinumSeries
+	DESCRIPTION		"Trap generated when the Fan Failure Alarm is cleared"
+	::= 116
+
+batteryAlarmClear		TRAP-TYPE
+	ENTERPRISE		platinumSeries
+	DESCRIPTION		"Trap generated when the Battery Alarm is cleared"
+	::= 117
+
+batteryTestStart		TRAP-TYPE
+	ENTERPRISE		platinumSeries
+	DESCRIPTION		"Trap generated when a Battery Discharge Test is started"
+	::= 121
+
+batteryTestComplete		TRAP-TYPE
+	ENTERPRISE		platinumSeries
+	DESCRIPTION		"Trap generated when a Battery Discharge Test completes successfully"
+	::= 122
+
+batteryTestFail			TRAP-TYPE
+	ENTERPRISE		platinumSeries
+	DESCRIPTION		"Trap generated when a Battery Discharge Test fails"
+	::= 123
+
+batteryEqualizeStart		TRAP-TYPE
+	ENTERPRISE		platinumSeries
+	DESCRIPTION		"Trap generated when a Battery Equalize Charge is started"
+	::= 124
+
+batteryEqualizeComplete		TRAP-TYPE
+	ENTERPRISE		platinumSeries
+	DESCRIPTION		"Trap generated when a Battery Equalize Charge completes"
+	::= 125
+
+END

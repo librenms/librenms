@@ -30,7 +30,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Permissions;
+use Illuminate\Support\Facades\Gate;
 
 class CustomMap extends BaseModel
 {
@@ -82,42 +82,15 @@ class CustomMap extends BaseModel
         return $config;
     }
 
-    public function hasReadAccess(User $user): bool
+    public function scopeHasAccess(Builder $query, User $user): Builder
     {
-        $device_ids = $this->nodes()->whereNotNull('device_id')->pluck('device_id');
-
-        // Restricted users can only view maps that have at least one device
-        if (count($device_ids) === 0) {
-            return false;
-        }
-
-        // Deny access if we don't have permission on any device
-        foreach ($device_ids as $device_id) {
-            if (! Permissions::canAccessDevice($device_id, $user)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public function scopeHasAccess($query, User $user)
-    {
-        if ($user->hasGlobalRead()) {
+        if (Gate::allows('viewAll', CustomMap::class)) {
             return $query;
         }
 
-        // Allow only if the user has access to all devices on the map
-        return $query->withCount([
-            'nodes as device_nodes_count' => function (Builder $q) {
-                $q->whereNotNull('device_id');
-            },
-            'nodes as device_nodes_allowed_count' => function (Builder $q) use ($user) {
-                $this->hasDeviceAccess($q, $user, 'custom_map_nodes');
-            },
-        ])
-            ->havingRaw('device_nodes_count = device_nodes_allowed_count')
-            ->having('device_nodes_count', '>', 0);
+        // Only show maps where ALL device nodes are accessible by the user
+        return $query->whereHas('nodes', fn ($q) => $q->whereNotNull('device_id'))
+            ->whereDoesntHave('nodes', fn ($q) => $q->whereNotNull('device_id')->whereNotIn('device_id', \Permissions::devicesForUser($user)));
     }
 
     /**

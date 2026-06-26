@@ -4,7 +4,7 @@ $graph_type = 'availability';
 
 $deviceModel = DeviceCache::getPrimary();
 foreach ($deviceModel->availability as $index => $duration) {
-    if (is_integer($index / 2)) {
+    if (is_int($index / 2)) {
         $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
     } else {
         $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');

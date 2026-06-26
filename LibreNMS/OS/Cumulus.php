@@ -40,6 +40,6 @@ class Cumulus extends \LibreNMS\OS
 
         $device->hardware = $response->value('ENTITY-MIB::entPhysicalDescr') ?: null;
         $device->serial = $response->value('ENTITY-MIB::entPhysicalSerialNum') ?: null;
-        $device->version = preg_replace('/^Cumulus Linux /', '', $response->value('ENTITY-MIB::entPhysicalSoftwareRev')) ?: null;
+        $device->version = preg_replace('/^Cumulus Linux /', '', (string) $response->value('ENTITY-MIB::entPhysicalSoftwareRev')) ?: null;
     }
 }

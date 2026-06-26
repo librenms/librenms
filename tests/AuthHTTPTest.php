@@ -32,7 +32,7 @@ use LibreNMS\Authentication\LegacyAuth;
 use function strip_tags;
 use function strip_tags as strip_tags1;
 
-class AuthHTTPTest extends TestCase
+final class AuthHTTPTest extends TestCase
 {
     private $original_auth_mech;
     private $server;
@@ -80,9 +80,9 @@ class AuthHTTPTest extends TestCase
 
                 // Old Behaviour
                 if (isset($_SERVER['REMOTE_USER'])) {
-                    $old_username = strip_tags1($_SERVER['REMOTE_USER']);
+                    $old_username = strip_tags1((string) $_SERVER['REMOTE_USER']);
                 } elseif (isset($_SERVER['PHP_AUTH_USER']) && LibrenmsConfig::get('auth_mechanism') === 'http-auth') {
-                    $old_username = strip_tags($_SERVER['PHP_AUTH_USER']);
+                    $old_username = strip_tags((string) $_SERVER['PHP_AUTH_USER']);
                 }
 
                 // Current Behaviour

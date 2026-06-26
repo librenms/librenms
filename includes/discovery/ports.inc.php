@@ -59,7 +59,7 @@ if ($device['os'] == 'zynos') {
 
 // Get correct eth0 port status for AirFiber 5XHD devices
 if ($device['os'] == 'airos-af-ltu') {
-    require 'ports/airos-af-ltu.inc.php';
+    require base_path('includes/discovery/ports/airos-af-ltu.inc.php');
 }
 
 //Teleste Luminato ifOperStatus
@@ -87,6 +87,16 @@ if ($device['os'] == 'tachyon') {
     require base_path('includes/discovery/ports/tachyon.inc.php');
 }
 
+// Nokia 1830 PSS/PSD - ensure ifDescr is set from ifName
+if ($device['os'] == 'nokia-1830') {
+    require base_path('includes/discovery/ports/nokia-1830.inc.php');
+}
+
+// Nokia Wavence - normalize literal NULL values from ifName/ifAlias
+if ($device['os'] == 'wavence') {
+    require base_path('includes/discovery/ports/wavence.inc.php');
+}
+
 // End Building SNMP Cache Array
 d_echo($port_stats);
 
@@ -103,18 +113,7 @@ if ($device['port_association_mode']) {
 
 // Build array of ports in the database and an ifIndex/ifName -> port_id map
 $ports_mapped = get_ports_mapped($device['device_id']);
-$ports_db = $ports_mapped['ports'];
-
-//
-// Rename any old RRD files still named after the previous ifIndex based naming schema.
-foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
-    foreach (['', '-adsl', '-dot3'] as $suffix) {
-        $old_rrd_name = "port-$ifIndex$suffix.rrd";
-        $new_rrd_name = \Rrd::portName($port_id, ltrim($suffix, '-'));
-
-        \Rrd::renameFile(DeviceCache::get($device['device_id']), $old_rrd_name, $new_rrd_name);
-    }
-}
+$ports_db = $ports_mapped['ports'] ?? [];
 
 // Fill ifAlias for fibrechannel ports
 if ($device['os'] == 'fabos') {
@@ -132,6 +131,8 @@ $default_port_group = LibrenmsConfig::get('default_port_group');
 foreach ($port_stats as $ifIndex => $snmp_data) {
     $snmp_data['ifIndex'] = $ifIndex; // Store ifIndex in port entry
     $snmp_data['ifAlias'] = StringHelpers::inferEncoding($snmp_data['ifAlias'] ?? null);
+    $snmp_data['ifName'] = StringHelpers::inferEncoding($snmp_data['ifName'] ?? null);
+    $snmp_data['ifDescr'] = StringHelpers::inferEncoding($snmp_data['ifDescr'] ?? null);
 
     // Get port_id according to port_association_mode used for this device
     $port_id = get_port_id($ports_mapped, $snmp_data, $port_association_mode);
@@ -139,12 +140,12 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
     if (is_port_valid($snmp_data, $device)) {
         port_fill_missing_and_trim($snmp_data, $device);
 
-        if ($device['os'] == 'vmware-vcsa' && preg_match('/Device ([a-z0-9]+) at .*/', $snmp_data['ifDescr'], $matches)) {
+        if ($device['os'] == 'vmware-vcsa' && preg_match('/Device ([a-z0-9]+) at .*/', (string) $snmp_data['ifDescr'], $matches)) {
             $snmp_data['ifName'] = $matches[1];
         }
 
         // Port newly discovered?
-        if (! isset($ports_db[$port_id]) || ! is_array($ports_db[$port_id])) {
+        if ($port_id === null || ! isset($ports_db[$port_id]) || ! is_array($ports_db[$port_id])) {
             $snmp_data['device_id'] = $device['device_id'];
             $port_id = dbInsert($snmp_data, 'ports');
 

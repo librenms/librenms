@@ -8,15 +8,15 @@
 @include('alerts.modals.notes')
 @if (!$bare)
 <div class="row collapse @if(!$hide_dashboard_editor)in @endif" id="dashboard-editor">
-    <div class="col-md-12">
+    <div class="col-md-12 tw:pl-0!">
         <div class="btn-group btn-lg">
-            <button class="btn btn-default disabled" style="min-width:160px;"><span class="pull-left">Dashboards</span></button>
+            <button class="btn btn-default disabled" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.title') }}</span></button>
             <div class="btn-group">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;">
-                    <span class="pull-left">{{ $dashboard->user_id != Auth::id() ? ($dashboard->user->username ?? __('Deleted User')) . ':' : null}} {{ $dashboard->dashboard_name }}</span>
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false" style="min-width:160px;">
+                    <span class="pull-left">{{ $dashboard->user_id != Auth::id() ? ($dashboard->user->username ?? trans('dashboard.deleted_user')) . ':' : null}} {{ $dashboard->dashboard_name }}</span>
                 <span class="pull-right">
                 <span class="caret"></span>
-                <span class="sr-only">Toggle Dropdown</span>
+                <span class="sr-only">{{ trans('dashboard.toggle_dropdown') }}</span>
                 </span>
                 </button>
                 <ul class="dropdown-menu">
@@ -27,26 +27,26 @@
                         </li>
                         @endif
                     @empty
-                        <li><a>No other Dashboards</a></li>
+                        <li><a>{{ trans('dashboard.no_other') }}</a></li>
                     @endforelse
 
                     @isset($shared_dashboards)
                         <li role="separator" class="divider"></li>
-                        <li class="dropdown-header">Shared Dashboards</li>
+                        <li class="dropdown-header">{{ trans('dashboard.shared_title') }}</li>
                         @foreach ($shared_dashboards as $dash)
                             @if($dash->dashboard_id != $dashboard->dashboard_id)
                             <li>
                                 <a href="{{ route('dashboard.show', $dash->dashboard_id) }}">
-                                {{ ($dash->user->username ?? __('Deleted User')) . ':' . $dash->dashboard_name . ($dash->access == 1 ? ' (Read)' : '') }}</a>
+                                {{ ($dash->user->username ?? trans('dashboard.deleted_user')) . ':' . $dash->dashboard_name . ($dash->access == 1 ? ' (' . trans('dashboard.read_only') . ')' : '') }}</a>
                             </li>
                             @endif
                         @endforeach
                     @endisset
                 </ul>
             </div>
-            <button class="btn btn-default edit-dash-btn" href="#edit_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="Edit Dashboard"><i class="fa fa-pencil-square-o fa-fw"></i></button>
-            <button class="btn btn-danger" href="#del_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="Remove Dashboard"><i class="fa fa-trash fa-fw"></i></button>
-            <button class="btn btn-success" href="#add_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="New Dashboard"><i class="fa fa-plus fa-fw"></i></button>
+                        <button class="btn btn-default edit-dash-btn" href="#edit_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.edit') }}"><i class="fa fa-pencil-square-o fa-fw"></i></button>
+            <button class="btn btn-danger" href="#del_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.remove') }}"><i class="fa fa-trash fa-fw"></i></button>
+            <button class="btn btn-success" href="#add_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.new') }}"><i class="fa fa-plus fa-fw"></i></button>
         </div>
         <div class="dash-collapse" id="add_dash" style="display: none;" >
             <div class="row" style="margin-top:5px;">
@@ -56,11 +56,11 @@
                         <div class="col-sm-3 col-sx-6">
                             <div class="input-group">
                                 <span class="input-group-btn">
-                                    <a class="btn btn-default disabled" type="button" style="min-width:160px;"><span class="pull-left">New Dashboard</span></a>
+                                    <a class="btn btn-default disabled" type="button" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.fields.new_dashboard') }}</span></a>
                                 </span>
-                                <input class="form-control" type="text" placeholder="Name" name="dashboard_name" id="dashboard_name" style="min-width:160px;">
+                                <input class="form-control" type="text" placeholder="{{ trans('dashboard.fields.name') }}" name="dashboard_name" id="dashboard_name" style="min-width:160px;">
                                 <span class="input-group-btn">
-                                    <button class="btn btn-primary" type="submit">Add</button>
+                                    <button class="btn btn-primary" type="submit">{{ trans('dashboard.buttons.add') }}</button>
                                 </span>
                             </div>
                         </div>
@@ -79,34 +79,37 @@
                             <div class="form-group">
                                 <div class="input-group">
                                     <span class="input-group-btn">
-                                        <a class="btn btn-default disabled" type="button" style="min-width:160px;"><span class="pull-left">Dashboard Name</span></a>
+                                        <a class="btn btn-default disabled" type="button" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.fields.dashboard_name') }}</span></a>
                                     </span>
-                                    <input class="form-control" type="text" placeholder="Dashbord Name" name="dashboard_name" value="{{ $dashboard->dashboard_name }}" style="width:160px;">
+                                    <input class="form-control" type="text" placeholder="{{ trans('dashboard.fields.dashboard_name') }}" name="dashboard_name" value="{{ $dashboard->dashboard_name }}" style="width:160px;">
                                     <select class="form-control" name="access" style="width:160px;">
-                                    @foreach (array('Private','Shared (Read)','Shared (Admin RW)','Shared') as $k => $v)
+                                    @php($accessLabels = [0 => trans('dashboard.access.private'), 1 => trans('dashboard.access.shared_read'), 2 => trans('dashboard.access.shared_admin'), 3 => trans('dashboard.access.shared')])
+                                    @foreach ($accessLabels as $k => $v)
                                         <option value="{{ $k }}" {{ $dashboard->access == $k ? 'selected' : null }}>{{ $v }}</option>
                                     @endforeach
                                     </select>
                                     <span class="input-group-btn pull-left">
-                                        <button class="btn btn-primary" type="submit">Update</button>
+                                        <button class="btn btn-primary" type="submit">{{ trans('dashboard.buttons.update') }}</button>
                                     </span>
                                 </div>
                             </div>
                         </form>
                     </div>
-                    @if (count($user_list) and auth()->user()->isAdmin())
+                    @can('copy', \App\Models\Dashboard::class)
+                    @if (count($user_list))
                     <div class="btn-group btn-lg" style="margin-top:5px;position:absolute;right:0px;">
                         <div class="btn-group">
                         <select class="form-control" id="dashboard_copy_target" name="dashboard_copy_target" onchange="dashboard_copy_user_select()">
-                            <option value="-1" selected> Copy Dashboard to </option>
+                            <option value="-1" selected> {{ trans('dashboard.buttons.copy_to') }} </option>
                         @foreach ($user_list as $user_id => $username)
                             <option value="{{ $user_id }}">{{ $username }}</option>
                         @endforeach
                         </select>
                         </div>
-                        <button disabled id="do_copy_dashboard" class="btn btn-primary" onclick="dashboard_copy(this)" data-toggle="tooltip" data-container="body" data-placement="top" title="Copy Dashboard"><i class="fa fa-copy fa-fw"></i></button>
+                        <button disabled id="do_copy_dashboard" class="btn btn-primary" onclick="dashboard_copy(this)" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.copy') }}"><i class="fa fa-copy fa-fw"></i></button>
                     </div>
                     @endif
+                    @endcan
                 </div>
             </div>
             <!-- End Dashboard-Settings -->
@@ -115,12 +118,12 @@
                 <div class="col-md-12">
                     <div class="col-md-12">
                         <div class="btn-group" role="group">
-                            <a class="btn btn-default disabled" role="button" style="min-width:160px;"><span class="pull-left">Add Widgets</span></a>
+                            <a class="btn btn-default disabled" role="button" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.widgets.add') }}</span></a>
                             <div class="btn-group">
-                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;"><span class="pull-left">Select Widget</span>
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.widgets.select') }}</span>
                                 <span class="pull-right">
                                     <span class="caret"></span>
-                                    <span class="sr-only">Toggle Dropdown</span>
+                                    <span class="sr-only">{{ trans('dashboard.toggle_dropdown') }}</span>
                                 </span>
                                 </button>
                                 <ul class="dropdown-menu">
@@ -142,14 +145,14 @@
             <div class="row" style="margin-top:5px;">
                 <div class="col-md-6">
                     <div class="col-md-6">
-                        <button class="btn btn-danger" type="button" id="clear_widgets" name="clear_widgets" style="min-width:160px;"><span class="pull-left">Remove</span><strong class="pull-right">Widgets</strong></button>
+                        <button class="btn btn-danger" type="button" id="clear_widgets" name="clear_widgets" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.widgets.remove') }}</span><strong class="pull-right">{{ trans('dashboard.widgets.label') }}</strong></button>
                     </div>
                 </div>
             </div>
             <div class="row" style="margin-top:5px;">
                 <div class="col-md-6">
                     <div class="col-md-6">
-                        <button class="btn btn-danger" type="button" onclick="dashboard_delete(this); return false;" data-dashboard="{{ $dashboard->dashboard_id }}" style="min-width:160px;"><span class="pull-left">Delete</span><strong class="pull-right">Dashboard</strong></button>
+                        <button class="btn btn-danger" type="button" onclick="dashboard_delete(this); return false;" data-dashboard="{{ $dashboard->dashboard_id }}" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.labels.delete') }}</span><strong class="pull-right">{{ trans('dashboard.labels.dashboard') }}</strong></button>
                     </div>
                 </div>
             </div>
@@ -159,14 +162,11 @@
 </div>
 @endif
 <span class="message" id="message"></span>
-<div class="gridster grid">
-    <ul></ul>
-</div>
+<div class="grid-stack"></div>
 </div>
 @endsection
 
 @section('javascript')
-<script src="{{ asset('js/jquery.gridster.min.js?ver=05072021') }}"></script>
 <script src="{{ asset('js/raphael.min.js?ver=05072021') }}"></script>
 <script src="{{ asset('js/justgage.min.js?ver=05072021') }}"></script>
 @endsection
@@ -174,13 +174,9 @@
 @push('scripts')
 @include('map.custom-js')
 <script type="text/javascript">
-    var gridster;
-
     var serialization = @json($dash_config);
-
-    serialization = Gridster.sort_by_row_and_col_asc(serialization);
-    var gridster_state = 0;
-
+    var gridstack_state = 0;
+    var grid;
 
     @if ($dashboard->dashboard_id > 0)
         var dashboard_id = {{ $dashboard->dashboard_id }};
@@ -188,58 +184,59 @@
         var dashboard_id = 0;
     @endif
 
-    $('[data-toggle="tooltip"]').tooltip();
-    dashboard_collapse();
-    gridster = $(".gridster ul").gridster({
-        widget_base_dimensions: ['auto', 100],
-        autogenerate_stylesheet: true,
-        widget_margins: [5, 5],
-        avoid_overlapped_widgets: true,
-        min_cols: 1,
-        max_cols: 20,
-        max_rows: 200,
-        draggable: {
-            handle: 'header, span',
-            stop: function(e, ui, $widget) {
-                updatePos(gridster);
-            },
-        },
-        resize: {
-            enabled: true,
-            stop: function(e, ui, widget) {
-                updatePos(gridster);
-                widget_reload(widget.attr('id'), widget.data('type'));
-            }
-        },
-        serialize_params: function(w, wgd) {
-            return {
-                id: $(w).attr('id'),
-                col: wgd.col,
-                row: wgd.row,
-                size_x: wgd.size_x,
-                size_y: wgd.size_y
-            };
-        }
-    }).data('gridster');
-    $('.gridster  ul').css({'width': $(window).width()});
+    // Vite loads GridStack as a deferred module; ensure it's available before running dashboard code.
+    window.addEventListener('DOMContentLoaded', function () {
+        $('[data-toggle="tooltip"]').tooltip();
+        dashboard_collapse();
+        grid = GridStack.init({
+            cellHeight: 100,
+            margin: 10,
+            minRow: 1,
+            maxRow: 200,
+            column: 20,
+            float: false,
+            draggable: {handle: 'header, span'},
+            alwaysShowResizeHandle: false,
+            resizable: {handles: 'se,sw,ne,nw'},
+            disableOneColumnMode: true,
+        }, '.grid-stack');
 
-    gridster.remove_all_widgets();
-    gridster.disable();
-    gridster.disable_resize();
-    $.each(serialization, function() {
-        widget_dom(this);
+        // load existing widgets (sorted by row/col like Gridster used to)
+        serialization.sort((a, b) => (a.row - b.row) || (a.col - b.col)).forEach(widget_dom);
+
+        // default to "view mode"
+        grid.enableMove(false);
+        grid.enableResize(false);
+
+        grid.on('change', function () {
+            updatePos(grid);
+        });
+
+        grid.on('resizestop', function (event, element) {
+            var $el = $(element);
+            updatePos(grid);
+            widget_reload($el.attr('id'), $el.data('type'));
+        });
+
+        @if (empty($dashboard->dashboard_id) && $default_dash == 0)
+        $('#dashboard_name').val('Default');
+        dashboard_add($('#add_form'));
+        @endif
     });
+
+    $('#new-widget').popover();
+
     $(document).on('click','.edit-dash-btn', function() {
-        if (gridster_state == 0) {
-            gridster.enable();
-            gridster.enable_resize();
-            gridster_state = 1;
+        if (gridstack_state == 0) {
+            grid.enableMove(true);
+            grid.enableResize(true);
+            gridstack_state = 1;
             $('.fade-edit').fadeIn();
         }
         else {
-            gridster.disable();
-            gridster.disable_resize();
-            gridster_state = 0;
+            grid.enableMove(false);
+            grid.enableResize(false);
+            gridstack_state = 0;
             $('.fade-edit').fadeOut();
         }
     });
@@ -252,7 +249,7 @@
                 dataType: "json",
                 success: function (data) {
                     if (data.status == 'ok') {
-                        gridster.remove_all_widgets();
+                        grid.removeAll();
                         toastr.success(data.message);
                     }
                     else {
@@ -280,7 +277,7 @@
                 success: function (data) {
                     if (data.status === 'ok') {
                         widget_dom(data.extra);
-                        updatePos(gridster);
+                        updatePos(grid);
                         toastr.success(data.message);
                     }
                     else {
@@ -294,7 +291,7 @@
         }
     });
 
-    $(document).on( "click", ".close-widget", function() {
+    $(document).on( "click", "[data-widget-action='close']", function() {
         var widget_id = $(this).data('widget-id');
         $.ajax({
             type: 'DELETE',
@@ -302,8 +299,11 @@
             dataType: "json",
             success: function (data) {
                 if (data.status == 'ok') {
-                    gridster.remove_widget($('#'+widget_id));
-                    updatePos(gridster);
+                    var el = document.getElementById(widget_id);
+                    if (el) {
+                        grid.removeWidget(el);
+                    }
+                    updatePos(grid);
                     toastr.success(data.message);
                 }
                 else {
@@ -316,20 +316,20 @@
         });
     });
 
-    $(document).on("click",".edit-widget",function() {
-        obj = $(this).parent().parent().parent();
-        if( obj.data('settings') == 1 ) {
-            obj.data('settings','0');
+    $(document).on("click","[data-widget-action='edit']",function() {
+        const $widget = $(this).closest('.grid-stack-item');
+        if ($widget.data('settings') == 1) {
+            $widget.data('settings', '0');
         } else {
-            obj.data('settings','1');
+            $widget.data('settings', '1');
         }
-        widget_reload(obj.attr('id'), obj.data('type'), true);
+        widget_reload($widget.attr('id'), $widget.data('type'), true);
     });
 
 
 
 
-    function updatePos(gridster) {
+    function updatePos(grid) {
         @if ($dashboard->dashboard_id > 0)
             var dashboard_id = {{ $dashboard->dashboard_id }};
         @else
@@ -337,16 +337,23 @@
         @endif
 
         if (dashboard_id > 0) {
+            var serialized = grid.save(false).map(function(item) {
+                var id = item.id || (item.el ? item.el.getAttribute('id') : undefined);
+                return {
+                    id: id,
+                    col: (item.x ?? 0) + 1,
+                    row: (item.y ?? 0) + 1,
+                    size_x: item.w ?? 1,
+                    size_y: item.h ?? 1,
+                };
+            });
             $.ajax({
                 type: 'PUT',
                 url: '{{ route('dashboard.widget.update', '?') }}'.replace('?', dashboard_id),
-                data: {data: JSON.stringify(gridster.serialize())},
+                data: {data: JSON.stringify(serialized)},
                 dataType: "json",
                 success: function (data) {
-                    if (data.status == 'ok') {
-                        toastr.success(data.message);
-                    }
-                    else {
+                    if (data.status !== 'ok') {
                         toastr.error(data.message);
                     }
                 },
@@ -364,9 +371,9 @@
             });
             $(target).fadeToggle(300);
             if (target != "#edit_dash") {
-                gridster.disable();
-                gridster.disable_resize();
-                gridster_state = 0;
+                grid.enableMove(false);
+                grid.enableResize(false);
+                gridstack_state = 0;
                 $('.fade-edit').fadeOut();
             }
         } else {
@@ -462,7 +469,6 @@
         });
     }
 
-@if (auth()->user()->isAdmin())
     function dashboard_copy_user_select() {
         var button_disabled = true;
         if (document.getElementById("dashboard_copy_target").value > 0) {
@@ -503,33 +509,47 @@
             dashboard_copy_user_select();
         }
     }
-@endif
 
     function widget_dom(data) {
-        dom = '<li id="'+data.user_widget_id+'" data-type="'+data.widget+'" data-settings="0">'+
-              '<header class="widget_header"><span id="widget_title_'+data.user_widget_id+'">'+data.title+
+        dom = '<div id="'+data.user_widget_id+'" class="grid-stack-item" data-type="'+data.widget+'" data-settings="0" gs-id="'+data.user_widget_id+'">'+
+              '<div class="grid-stack-item-content tw:ring tw:ring-gray-200 tw:dark:ring-dark-gray-200 tw:left-0! tw:bottom-0!">'+
+              '<header class="tw:bg-gray-200 tw:dark:bg-dark-gray-200 tw:text-gray-800 tw:dark:text-dark-white-100 tw:p-4 tw:text-center"><span id="widget_title_'+data.user_widget_id+'" class="dashboard-widget-title">'+data.title+
               '</span><span id="widget_title_counter_'+data.user_widget_id+'"></span>'+
-              '<span class="fade-edit pull-right">'+
+              '<span class="fade-edit tw:float-right">'+
 
                 @if (
                         ($dashboard->access == 1 && Auth::id() === $dashboard->user_id) ||
                         ($dashboard->access == 0 || $dashboard->access >= 2)
                     )
-                        '<i class="fa fa-pencil-square-o edit-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Settings" data-toggle="tooltip" data-placement="top" title="Settings">&nbsp;</i>&nbsp;'+
+                        '<i class="fa fa-pencil-square-o tw:cursor-pointer tw:me-2 tw:pl-2" data-widget-action="edit" data-widget-id="'+data.user_widget_id+'" data-toggle="tooltip" data-placement="top">&nbsp;</i>&nbsp;'+
                 @endif
-              '<i class="text-danger fa fa-times close-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Close" data-toggle="tooltip" data-placement="top" title="Remove">&nbsp;</i>&nbsp;'+
+              '<i class="fa fa-lg fa-times tw:text-[#a94442] tw:dark:text-[#ee5f5b] tw:cursor-pointer tw:me-2" data-widget-action="close" data-widget-id="'+data.user_widget_id+'" data-toggle="tooltip" data-placement="top">&nbsp;</i>&nbsp;'+
               '</span>'+
               '</header>'+
-              '<div class="widget_body" id="widget_body_'+data.user_widget_id+'">'+data.widget+'</div>'+
-              '\<script\>var timeout'+data.user_widget_id+' = grab_data('+data.user_widget_id+',\''+data.widget+'\');\<\/script\>'+
-              '</li>';
+              '<div class="tw:left-1! tw:right-1! tw:p-[0.8em] tw:overflow-y-auto tw:overflow-x-hidden tw:w-full tw:h-[calc(100%-2.6em)] tw:cursor-auto" id="widget_body_'+data.user_widget_id+'">'+data.widget+'</div>'+
+              '</div></div>';
+
+        // GridStack v11+ doesn't accept HTML strings in addWidget(), so build an element.
+        // (Also, relying on injected <script> tags is brittle; we start widget refresh explicitly below.)
+        var wrap = document.createElement('div');
+        wrap.innerHTML = dom;
+        var el = wrap.firstElementChild;
 
         if (data.hasOwnProperty('col') && data.hasOwnProperty('row')) {
-            gridster.add_widget(dom, parseInt(data.size_x), parseInt(data.size_y), parseInt(data.col), parseInt(data.row));
+            el.setAttribute('gs-w', '' + parseInt(data.size_x));
+            el.setAttribute('gs-h', '' + parseInt(data.size_y));
+            el.setAttribute('gs-x', '' + (parseInt(data.col) - 1));
+            el.setAttribute('gs-y', '' + (parseInt(data.row) - 1));
         } else {
-            gridster.add_widget(dom, parseInt(data.size_x), parseInt(data.size_y));
+            el.setAttribute('gs-w', '' + parseInt(data.size_x));
+            el.setAttribute('gs-h', '' + parseInt(data.size_y));
         }
-        if (gridster_state == 0) {
+
+        // GridStack v11: prefer makeWidget() over addWidget(el)
+        grid.el.appendChild(el);
+        grid.makeWidget(el);
+        grab_data(data.user_widget_id, data.widget);
+        if (gridstack_state == 0) {
             $('.fade-edit').fadeOut(0);
         }
         $('[data-toggle="tooltip"]').tooltip();
@@ -553,11 +573,12 @@
             }
         }
 
-        $('.gridster').find('div[id^=widget_body_]').each(function() {
+        $('.grid-stack').find('div[id^=widget_body_]').each(function() {
             if(this.contains(data)) {
-                widget_id = $(this).parent().attr('id');
-                widget_type = $(this).parent().data('type');
-                $(this).parent().data('settings', '0');
+                const $widget = $(this).closest('.grid-stack-item');
+                widget_id = $widget.attr('id');
+                widget_type = $widget.data('type');
+                $widget.data('settings', '0');
             }
         });
         if(widget_id > 0 && widget_settings != {}) {
@@ -599,7 +620,7 @@
             data: {
                 id: id,
                 dimensions: {x: $widget_body.width(), y: $widget_body.height()},
-                settings: $widget_body.parent().data('settings') == 1 ? 1 : 0
+                settings: $widget_body.closest('.grid-stack-item').data('settings') == 1 ? 1 : 0
             },
             dataType: 'json',
             success: function (data) {
@@ -609,7 +630,7 @@
 
                     $('#widget_title_' + id).html(data.title);
                     $widget_body.html(data.html);
-                    $widget_body.parent().data('settings', data.show_settings).data('refresh', data.settings.refresh);
+                    $widget_body.closest('.grid-stack-item').data('settings', data.show_settings).data('refresh', data.settings.refresh);
                 } else {
                     $widget_body.html('<div class="alert alert-info">' + data.message + '</div>');
                 }
@@ -621,7 +642,7 @@
     }
 
     function grab_data(id, data_type) {
-        const refresh = $('#widget_body_' + id).parent().data('refresh');
+        const refresh = $('#widget_body_' + id).closest('.grid-stack-item').data('refresh');
         widget_reload(id, data_type);
 
         setTimeout(function () {
@@ -629,7 +650,7 @@
         }, (refresh > 0 ? refresh : 60) * 1000);
     }
 
-    // make sure gridster stays disabled when the window is resized
+    // make sure edit mode stays disabled when the window is resized
     var resizeTrigger = null;
     addEvent(window, "resize", function(event) {
         // emit resize event, but only once every 100ms
@@ -641,18 +662,11 @@
         }
 
         setTimeout(function(){
-            if(!gridster_state) {
-                gridster.disable();
-                gridster.disable_resize();
+            if(!gridstack_state) {
+                grid.enableMove(false);
+                grid.enableResize(false);
             }
         }, 100);
     });
-
-    $('#new-widget').popover();
-
-    @if (empty($dashboard->dashboard_id) && $default_dash == 0)
-        $('#dashboard_name').val('Default');
-        dashboard_add($('#add_form'));
-    @endif
 </script>
 @endpush

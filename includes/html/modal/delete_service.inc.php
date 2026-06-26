@@ -11,7 +11,6 @@
  * the source code distribution for details.
  */
 
-if (Auth::user()->hasGlobalAdmin()) {
     ?>
 
     <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
@@ -49,9 +48,9 @@ if (Auth::user()->hasGlobalAdmin()) {
             e.preventDefault();
             var service_id = $("#service_id").val();
             $.ajax({
-                type: 'POST',
-                url: 'ajax_form.php',
-                data: {type: "delete-service", service_id: service_id},
+                type: 'DELETE',
+                url: '<?php echo route("service.destroy", ["service" => ":service"]) ?>'.replace(':service', service_id),
+                dataType: "json",
                 success: function (result) {
                     if (result.status == 0) {
                         // Yay.
@@ -73,6 +72,3 @@ if (Auth::user()->hasGlobalAdmin()) {
             });
         });
     </script>
-    <?php
-}
-?>

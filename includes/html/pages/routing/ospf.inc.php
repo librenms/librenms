@@ -1,5 +1,10 @@
 <?php
 
+use App\Models\OspfArea;
+use App\Models\OspfInstance;
+use App\Models\OspfNbr;
+use App\Models\OspfPort;
+
 echo '
 <div>
   <div class="panel panel-default">
@@ -18,36 +23,29 @@ echo '
             <th>Neighbours</th>
           </tr>
         </thead>';
-foreach (dbFetchRows("SELECT * FROM `ospf_instances` WHERE `ospfAdminStat` = 'enabled'") as $instance) {
-    $device = device_by_id_cache($instance['device_id']);
-    $area_count = dbFetchCell("SELECT COUNT(*) FROM `ospf_areas` WHERE `device_id` = '" . $device['device_id'] . "'");
-    $port_count = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `device_id` = '" . $device['device_id'] . "'");
-    $port_count_enabled = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `ospfIfAdminStat` = 'enabled' AND `device_id` = '" . $device['device_id'] . "'");
-    $nbr_count = dbFetchCell("SELECT COUNT(*) FROM `ospf_nbrs` WHERE `device_id` = '" . $device['device_id'] . "'");
+$data = OspfInstance::where('ospfAdminStat', 'enabled')
+    ->with('device')->get();
 
-    $status_color = $abr_status_color = $asbr_status_color = 'default';
+/** @var OspfInstance $instance */
+foreach ($data as $instance) {
+    $area_count = OspfArea::where('device_id', $instance->device_id)->count();
+    $port_count = OspfPort::where('device_id', $instance->device_id)->count();
+    $port_count_enabled = OspfPort::where('ospfIfAdminStat', 'enabled')->where('device_id', $instance->device_id)->count();
+    $nbr_count = OspfNbr::where('device_id', $instance->device_id)->count();
 
-    if ($instance['ospfAdminStat'] == 'enabled') {
-        $status_color = 'success';
-    }
-
-    if ($instance['ospfAreaBdrRtrStatus'] == 'true') {
-        $abr_status_color = 'success';
-    }
-
-    if ($instance['ospfASBdrRtrStatus'] == 'true') {
-        $asbr_status_color = 'success';
-    }
+    $status_color = $instance->ospfAdminStat == 'enabled' ? 'success' : 'default';
+    $abr_status_color = $instance->ospfAreaBdrRtrStatus == 'true' ? 'success' : 'default';
+    $asbr_status_color = $instance->ospfASBdrRtrStatus == 'true' ? 'success' : 'default';
 
     echo '
         <tbody>
           <tr>
             <td></td>
-            <td>' . generate_device_link($device, 0, ['tab' => 'routing', 'proto' => 'ospf']) . '</td>
-            <td>' . $instance['ospfRouterId'] . '</td>
-            <td><span class="label label-' . $status_color . '">' . $instance['ospfAdminStat'] . '</span></td>
-            <td><span class="label label-' . $abr_status_color . '">' . $instance['ospfAreaBdrRtrStatus'] . '</span></td>
-            <td><span class="label label-' . $asbr_status_color . '">' . $instance['ospfASBdrRtrStatus'] . '</span></td>
+            <td>' . ($instance->device ? \LibreNMS\Util\Url::deviceLink($instance->device, null, ['tab' => 'routing', 'proto' => 'ospf']) : 'unknown') . '</td>
+            <td>' . $instance->ospfRouterId . '</td>
+            <td><span class="label label-' . $status_color . '">' . $instance->ospfAdminStat . '</span></td>
+            <td><span class="label label-' . $abr_status_color . '">' . $instance->ospfAreaBdrRtrStatus . '</span></td>
+            <td><span class="label label-' . $asbr_status_color . '">' . $instance->ospfASBdrRtrStatus . '</span></td>
             <td>' . $area_count . '</td>
             <td>' . $port_count . '(' . $port_count_enabled . ')</td>
             <td>' . $nbr_count . '</td>

@@ -1,11 +1,13 @@
 <?php
 
+use App\Models\Port;
+
 header('Content-type: application/json');
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('port.update')) {
     $response = [
         'status' => 'error',
-        'message' => 'Need to be admin',
+        'message' => 'You need permission',
     ];
     echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;
@@ -19,12 +21,12 @@ $device_id = intval($_POST['device']);
 $rows_updated = 0;
 
 foreach ($_POST as $key => $val) {
-    if (strncmp($key, 'oldign_', 7) == 0) {
+    if (str_starts_with((string) $key, 'oldign_')) {
         // Interface identifier passed as part of the field name
-        $port_id = intval(substr($key, 7));
+        $port_id = intval(substr((string) $key, 7));
 
         $oldign = intval($val) ? 1 : 0;
-        $newign = $_POST['ignore_' . $port_id] ? 1 : 0;
+        $newign = isset($_POST['ignore_' . $port_id]) ? 1 : 0;
 
         // As checkboxes are not posted when unset - we effectively need to do a diff to work
         // out a set->unset case.
@@ -32,7 +34,7 @@ foreach ($_POST as $key => $val) {
             continue;
         }
 
-        $n = dbUpdate(['ignore' => $newign], 'ports', '`device_id` = ? AND `port_id` = ?', [$device_id, $port_id]);
+        $n = Port::where('device_id', $device_id)->where('port_id', $port_id)->update(['ignore' => $newign]);
 
         if ($n < 0) {
             $rows_updated = -1;
@@ -40,12 +42,12 @@ foreach ($_POST as $key => $val) {
         }
 
         $rows_updated += $n;
-    } elseif (strncmp($key, 'olddis_', 7) == 0) {
+    } elseif (str_starts_with((string) $key, 'olddis_')) {
         // Interface identifier passed as part of the field name
-        $port_id = intval(substr($key, 7));
+        $port_id = intval(substr((string) $key, 7));
 
         $olddis = intval($val) ? 1 : 0;
-        $newdis = $_POST['disabled_' . $port_id] ? 1 : 0;
+        $newdis = isset($_POST['disabled_' . $port_id]) ? 1 : 0;
 
         // As checkboxes are not posted when unset - we effectively need to do a diff to work
         // out a set->unset case.
@@ -53,7 +55,7 @@ foreach ($_POST as $key => $val) {
             continue;
         }
 
-        $n = dbUpdate(['disabled' => $newdis], 'ports', '`device_id` = ? AND `port_id` = ?', [$device_id, $port_id]);
+        $n = Port::where('device_id', $device_id)->where('port_id', $port_id)->update(['disabled' => $newdis]);
 
         if ($n < 0) {
             $rows_updated = -1;

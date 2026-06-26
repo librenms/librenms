@@ -21,17 +21,17 @@ class LoadUserPreferences
             $preferences = ['locale', 'site_style', 'timezone'];
             $this->loadPreferences($request, $preferences);
 
-            $this->setPreference($request, 'locale', function ($locale) {
+            $this->setPreference($request, 'locale', function ($locale): void {
                 app()->setLocale($locale);
             });
 
-            $this->setPreference($request, 'site_style', function ($style, $request) {
+            $this->setPreference($request, 'site_style', function ($style, $request): void {
                 if ($style !== 'device' && $style !== $request->session()->get('applied_site_style')) {
                     $request->session()->put('applied_site_style', $style);
                 }
             });
 
-            $this->setPreference($request, 'timezone', function ($timezone, $request) {
+            $this->setPreference($request, 'timezone', function ($timezone, $request): void {
                 $request->session()->put('preferences.timezone', $timezone);
                 $request->session()->put('preferences.timezone_static', true);
             });

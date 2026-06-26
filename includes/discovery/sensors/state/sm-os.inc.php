@@ -7,18 +7,18 @@ $modulation = snmpwalk_group($device, 'linkAcmTxModulation', 'SIAE-RADIO-SYSTEM-
 
 $state_name = 'smosLinkAcmModulation';
 $states = [
-    ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'BPSK'],
-    ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => '4QAM'],
-    ['value' => 3, 'generic' => 0, 'graph' => 1, 'descr' => '8PSK'],
-    ['value' => 4, 'generic' => 0, 'graph' => 1, 'descr' => '16QAM'],
-    ['value' => 5, 'generic' => 0, 'graph' => 1, 'descr' => '32QAM'],
-    ['value' => 6, 'generic' => 0, 'graph' => 1, 'descr' => '64QAM'],
-    ['value' => 7, 'generic' => 0, 'graph' => 1, 'descr' => '128QAM'],
-    ['value' => 8, 'generic' => 0, 'graph' => 1, 'descr' => '256QAM'],
-    ['value' => 9, 'generic' => 0, 'graph' => 1, 'descr' => '512QAM'],
-    ['value' => 10, 'generic' => 0, 'graph' => 1, 'descr' => '1024QAM'],
-    ['value' => 11, 'generic' => 0, 'graph' => 1, 'descr' => '2048QAM'],
-    ['value' => 12, 'generic' => 0, 'graph' => 1, 'descr' => '4096QAM'],
+    ['value' => 1, 'generic' => 0, 'descr' => 'BPSK'],
+    ['value' => 2, 'generic' => 0, 'descr' => '4QAM'],
+    ['value' => 3, 'generic' => 0, 'descr' => '8PSK'],
+    ['value' => 4, 'generic' => 0, 'descr' => '16QAM'],
+    ['value' => 5, 'generic' => 0, 'descr' => '32QAM'],
+    ['value' => 6, 'generic' => 0, 'descr' => '64QAM'],
+    ['value' => 7, 'generic' => 0, 'descr' => '128QAM'],
+    ['value' => 8, 'generic' => 0, 'descr' => '256QAM'],
+    ['value' => 9, 'generic' => 0, 'descr' => '512QAM'],
+    ['value' => 10, 'generic' => 0, 'descr' => '1024QAM'],
+    ['value' => 11, 'generic' => 0, 'descr' => '2048QAM'],
+    ['value' => 12, 'generic' => 0, 'descr' => '4096QAM'],
 ];
 
 if (! empty($modulation)) {

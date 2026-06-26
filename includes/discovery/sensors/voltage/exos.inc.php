@@ -9,7 +9,7 @@ $oids = SnmpQuery::cache()->hideMib()->numericIndex()->walk('FCMGMT-MIB::connUni
 
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
-        if (preg_match('/Voltage.* ([: 0-9\.]+V)/', $entry['connUnitSensorMessage'], $temp_value)) {
+        if (preg_match('/Voltage.* ([: 0-9\.]+V)/', (string) $entry['connUnitSensorMessage'], $temp_value)) {
             $value = str_replace('V', '', $temp_value[1]);
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',

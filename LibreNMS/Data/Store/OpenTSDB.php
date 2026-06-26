@@ -102,7 +102,7 @@ class OpenTSDB extends BaseDatastore
         try {
             $stat = Measurement::start('put');
 
-            $line = sprintf('put net.%s %d %f %s', strtolower($measurement), $timestamp, $value, $tags);
+            $line = sprintf('put net.%s %d %f %s', strtolower((string) $measurement), $timestamp, $value, $tags);
             Log::debug("Sending to OpenTSDB: $line\n");
             $this->connection->write("$line\n"); // send $line into OpenTSDB
 

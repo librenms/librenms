@@ -1,9 +1,9 @@
 --  =================================================================
--- Copyright (C) 2014 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: VPN diagnostics MIB. 
 -- Reference:
--- Version:     V1.0
+-- Version:     V2.04
 -- History:
 --              V1.0 zhuxiao,luobin 2008.08.08,publish 
 --              
@@ -31,7 +31,7 @@
     
 --                     
         vpndiagnostics MODULE-IDENTITY 
-            LAST-UPDATED "201401181722Z"     
+            LAST-UPDATED "201711230922Z"     
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -45,6 +45,9 @@
             DESCRIPTION 
                 "HUAWEI service quality detect funcion."
   
+            REVISION "201711230922Z"
+            DESCRIPTION 
+                "Change hwVpnCfgPingResultERt to hwVpnCfgPingResultERtName, delete  hwVpnCfgPingResultIRtIndex from hwVpnCfgPingResultIRtGroup, and delete hwVpnCfgPingResultERtIndex from hwVpnCfgPingResultERtGroup at 2017-11-23."     
             REVISION "201401181722Z"
             DESCRIPTION 
                 "Modify type of hwVpnCfgPingPwId and hwVpnCfgPingResultPwId at 2014-01-18."                  
@@ -996,7 +999,7 @@
                         ::= { hwVpnCfgPingGroups 2 }
 
                 hwVpnCfgPingResultIRtGroup OBJECT-GROUP
-                        OBJECTS { hwVpnCfgPingResultIRtIndex , hwVpnCfgPingResultIRt  }
+                        OBJECTS { hwVpnCfgPingResultIRt  }
                         STATUS current
                         DESCRIPTION 
                                 "hwVpnCfgPingResultIRtGroup."
@@ -1004,7 +1007,7 @@
 
 
                 hwVpnCfgPingResultERtGroup OBJECT-GROUP
-                        OBJECTS { hwVpnCfgPingResultERtIndex , hwVpnCfgPingResultERt  }
+                        OBJECTS { hwVpnCfgPingResultERtName }
                         STATUS current
                         DESCRIPTION 
                                 "hwVpnCfgPingResultERtGroup."
@@ -1080,7 +1083,7 @@
                         SEQUENCE { 
                                 hwVpnCfgPingResultERtIndex
                                         Integer32,
-                                hwVpnCfgPingResultERt
+                                hwVpnCfgPingResultERtName
                                         OCTET STRING
                          }
 
@@ -1092,7 +1095,7 @@
                                 "This object indicates the index of an export vpn target.."
                         ::= { hwVpnCfgPingResultERtEntry 1 }
                 
-                hwVpnCfgPingResultERt OBJECT-TYPE
+                hwVpnCfgPingResultERtName OBJECT-TYPE
                         SYNTAX OCTET STRING
                         MAX-ACCESS read-only
                         STATUS current

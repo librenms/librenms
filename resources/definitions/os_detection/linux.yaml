@@ -28,3 +28,4 @@ discovery:
 ignore_mount_regexp:
     - '#^/run($|/)#'
     - '#^/dev/shm$#'
+    - '#^/var/snap/#'

@@ -41,8 +41,8 @@ class NominatimApi extends BaseApi implements Geocoder
     protected function parseLatLng(array $data): array
     {
         return [
-            'lat' => isset($data[0]['lat']) ? $data[0]['lat'] : 0,
-            'lng' => isset($data[0]['lon']) ? $data[0]['lon'] : 0,
+            'lat' => $data[0]['lat'] ?? 0,
+            'lng' => $data[0]['lon'] ?? 0,
         ];
     }
 

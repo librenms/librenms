@@ -37,19 +37,24 @@ use Storage;
 
 class CheckRrdVersion implements Validation, ValidationFixer
 {
+    const MIN_VERSION = '1.5.5';
+
     public function validate(): ValidationResult
     {
-        // Check that rrdtool config version is what we see
         $rrd_version = Version::get()->rrdtool();
         $config_version = LibrenmsConfig::get('rrdtool_version');
 
-        if (version_compare($config_version, '1.5.5', '<')
-            && version_compare($config_version, $rrd_version, '>')
-        ) {
+        if (version_compare($rrd_version, self::MIN_VERSION, '<')) {
             return ValidationResult::fail(
-                trans('validation.validations.rrd.CheckRrdVersion.fail', ['config_version' => $config_version, 'installed_version' => $rrd_version]),
+                trans('validation.validations.rrd.CheckRrdVersion.fail', ['installed_version' => $rrd_version])
+            );
+        }
+
+        if (version_compare($config_version, self::MIN_VERSION, '<')) {
+            return ValidationResult::fail(
+                trans('validation.validations.rrd.CheckRrdVersion.fail_config', ['config_version' => $config_version]),
                 trans('validation.validations.rrd.CheckRrdVersion.fix', ['version' => $config_version])
-            )->setFixer(__CLASS__, is_writable(base_path('config.php')));
+            )->setFixer(self::class, is_writable(base_path('config.php')));
         }
 
         return ValidationResult::ok(trans('validation.validations.rrd.CheckRrdVersion.ok'));
@@ -65,12 +70,10 @@ class CheckRrdVersion implements Validation, ValidationFixer
         try {
             $contents = Storage::disk('base')->get('config.php');
 
-            $lines = array_filter(explode("\n", $contents), function ($line) {
-                return ! Str::contains($line, ['$config[\'rrdtool_version\']', '$config["rrdtool_version"]']);
-            });
+            $lines = array_filter(explode("\n", (string) $contents), fn ($line) => ! Str::contains($line, ['$config[\'rrdtool_version\']', '$config["rrdtool_version"]']));
 
             return Storage::disk('base')->put('config.php', implode("\n", $lines));
-        } catch (FileNotFoundException $e) {
+        } catch (FileNotFoundException) {
             return false;
         }
     }

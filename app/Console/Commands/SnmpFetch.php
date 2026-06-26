@@ -16,7 +16,7 @@ abstract class SnmpFetch extends LnmsCommand
 {
     protected string $type;
     protected array $oids;
-    protected ?bool $numeric;
+    protected ?bool $numeric = null;
     private string $outputFormat;
     protected int $depth;
     protected string $deviceSpec;
@@ -152,6 +152,9 @@ abstract class SnmpFetch extends LnmsCommand
         }
     }
 
+    /**
+     * @return \Illuminate\Support\Collection<int, \App\Models\Device>
+     */
     protected function getDevices(): \Illuminate\Support\Collection
     {
         return Device::whereDeviceSpec($this->deviceSpec)->pluck('device_id')

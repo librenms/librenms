@@ -1,0 +1,316 @@
+--
+-- All Rights Reserved, Copyright (c) 2013, ALAXALA Networks Corp.
+--
+-- AX-STATS-MIB.my : axStats group MIB file.
+--
+
+AX-STATS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, Integer32, OBJECT-TYPE,
+        Counter32, Counter64
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,OBJECT-GROUP
+            FROM SNMPv2-CONF
+        DisplayString
+            FROM SNMPv2-TC
+        axMib
+            FROM AX-SMI-MIB
+;
+
+axStats MODULE-IDENTITY
+    LAST-UPDATED    "201310030000Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+        "The MIB module for statistics information."
+
+    REVISION        "201310030000Z"
+    DESCRIPTION
+        "Updated header comment."
+    REVISION        "201306240000Z"
+    DESCRIPTION
+        "Initial release."
+    ::= { axMib 1 }
+
+
+--------------------------------------------------
+-- Object Identifiers
+--------------------------------------------------
+
+axIfStats     OBJECT IDENTIFIER ::= {axStats 4}
+axUrpf        OBJECT IDENTIFIER ::= {axStats 13}
+
+--------------------------------------------------
+-- Object Type definitions
+--------------------------------------------------
+
+--
+--  axIfStats
+--
+
+axIfStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxIfStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing extension statistics for more than 100,000,000 bps interface."
+    ::= {axIfStats 1}
+
+axIfStatsEntry  OBJECT-TYPE
+    SYNTAX AxIfStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing extension statistics for interface."
+    INDEX { axIfStatsIndex }
+    ::= {axIfStatsTable 1}
+
+AxIfStatsEntry ::= SEQUENCE {
+    axIfStatsIndex                  Integer32,
+    axIfStatsName                   DisplayString,
+    axIfStatsInMegaOctets           Counter32,
+    axIfStatsInUcastMegaPkts        Counter32,
+    axIfStatsInMulticastMegaPkts    Counter32,
+    axIfStatsInBroadcastMegaPkts    Counter32,
+    axIfStatsOutMegaOctets          Counter32,
+    axIfStatsOutUcastMegaPkts       Counter32,
+    axIfStatsOutMulticastMegaPkts   Counter32,
+    axIfStatsOutBroadcastMegaPkts   Counter32,
+    axIfStatsHighSpeed              Counter32
+}
+
+axIfStatsIndex  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This object value is same as Ifindex which interface index of a system."
+    ::= {axIfStatsEntry 1}
+
+axIfStatsName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Interfaces name. Same as ifDescr."
+    ::= {axIfStatsEntry 2}
+
+axIfStatsInMegaOctets  OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of octets that received on the interface. This value is displayed in mega-octets(M). Value of 0 through 999,999 are rounded down."
+    ::= {axIfStatsEntry 3}
+
+axIfStatsInUcastMegaPkts  OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of subnetwork-unicast packets that received on the interface. This value is displayed in mega-packets(M).Value of 0 through 999,999 are rounded down."
+    ::= {axIfStatsEntry 4}
+
+axIfStatsInMulticastMegaPkts  OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of multicast mega-packets that received on the interface. this value is displayed in mega-packets(M).Value of 0 through 999,999 are rounded down."
+    ::= {axIfStatsEntry 5}
+
+axIfStatsInBroadcastMegaPkts  OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of non-unicast packets delivered to a higher-layer protocol. The value is displayed in mega-packets (M). Value of 0through 999,999 are rounded down."
+    ::= {axIfStatsEntry 6}
+
+axIfStatsOutMegaOctets  OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of octets transmitted out of the interface. The value is displayed in mega-octets(M). Value of 0 through 999,999 are rounded down."
+    ::= {axIfStatsEntry 7}
+
+axIfStatsOutUcastMegaPkts  OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of packets that higher-level protocols requested be transmitted to a subnetwork-unicast dress.The value is displayed in mega packets(M). Value of 0 through 999,999 are rounded down."
+    ::= {axIfStatsEntry 8}
+
+axIfStatsOutMulticastMegaPkts  OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of multicast packets that transmitted on the erface.This value is displayed in mega-packets(M). Value of 0 through 999,999 are rounded down."
+    ::= {axIfStatsEntry 9}
+
+axIfStatsOutBroadcastMegaPkts  OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of broadcast packets that transmitted on the erface.This value is displayed in mega-packets(M). Value of 0 through 999,999 are rounded down."
+    ::= {axIfStatsEntry 10}
+
+axIfStatsHighSpeed  OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A circuit speed.This value is displayed in mega-bps[Mbps].  Round off the 1,000,000bps."
+    ::= {axIfStatsEntry 11}
+
+--
+--  axUrpf
+--
+
+axUrpfIpv4DiscStrictPkts OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of IPv4 packets discarded by Strict uRPF on the entire device"
+    ::= {axUrpf 1}
+
+axUrpfIpv6DiscStrictPkts OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of IPv6 packets discarded by Strict uRPF on the entire device"
+    ::= {axUrpf 2}
+
+axUrpfIpv4DiscLoosePkts OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of IPv4 packets discarded by Loose uRPF on the entire device"
+    ::= {axUrpf 3}
+
+axUrpfIpv6DiscLoosePkts OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of IPv6 packets discarded by Loose uRPF on the entire device"
+    ::= {axUrpf 4}
+
+--
+--  axUrpfIfStats
+--
+
+axUrpfIfStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxUrpfIfStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "uRPF statistical information on each interface"
+    ::= {axUrpf 5}
+
+axUrpfIfStatsEntry OBJECT-TYPE
+    SYNTAX AxUrpfIfStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry of uRPF statistical information table on each interface"
+    INDEX { axUrpfIfStatsIndex }
+    ::= {axUrpfIfStatsTable 1}
+
+AxUrpfIfStatsEntry ::= SEQUENCE {
+    axUrpfIfStatsIndex              Integer32,
+    axUrpfIfStatsIpv4DiscPkts       Counter64,
+    axUrpfIfStatsIpv6DiscPkts       Counter64
+}
+
+axUrpfIfStatsIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "interface ID"
+    ::= {axUrpfIfStatsEntry 1}
+
+axUrpfIfStatsIpv4DiscPkts OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of IPv4 packets discarded by uRPF on each interface"
+    ::= {axUrpfIfStatsEntry 2}
+
+axUrpfIfStatsIpv6DiscPkts OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of IPv6 packets discarded by uRPF on each interface"
+    ::= {axUrpfIfStatsEntry 3}
+
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+
+
+--------------------------------------------------
+-- Conformance Statements
+--------------------------------------------------
+
+--
+-- Confoemance identifier
+--
+
+axStatsConformance          OBJECT IDENTIFIER ::= { axStats 1000 }
+axStatsCompliances          OBJECT IDENTIFIER ::= { axStatsConformance 1 }
+axStatsGroups               OBJECT IDENTIFIER ::= { axStatsConformance 2 }
+
+--
+-- Compliance
+--
+
+axStatsCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "AX Stats Object"
+    MODULE      -- this module
+        MANDATORY-GROUPS{ axStatsGroup }
+    ::= { axStatsCompliances 1 }
+
+--
+-- Object Group
+--
+
+axStatsGroup OBJECT-GROUP
+    OBJECTS    {
+                    axIfStatsName,
+                    axIfStatsInMegaOctets,
+                    axIfStatsInUcastMegaPkts,
+                    axIfStatsInMulticastMegaPkts,
+                    axIfStatsInBroadcastMegaPkts,
+                    axIfStatsOutMegaOctets,
+                    axIfStatsOutUcastMegaPkts,
+                    axIfStatsOutMulticastMegaPkts,
+                    axIfStatsOutBroadcastMegaPkts,
+                    axIfStatsHighSpeed,
+                    axUrpfIpv4DiscStrictPkts,
+                    axUrpfIpv6DiscStrictPkts,
+                    axUrpfIpv4DiscLoosePkts,
+                    axUrpfIpv6DiscLoosePkts,
+                    axUrpfIfStatsIpv4DiscPkts,
+                    axUrpfIfStatsIpv6DiscPkts
+               }
+    STATUS current
+    DESCRIPTION
+                "The collection of notifications of axStats."
+    ::= { axStatsGroups 1 }
+
+END

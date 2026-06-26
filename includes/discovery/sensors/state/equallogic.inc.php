@@ -45,14 +45,14 @@ if (! empty($oids)) {
 
     $state_name = 'eqlMemberHealthStatus';
     $states = [
-        ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
-        ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'normal'],
-        ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'],
-        ['value' => 3, 'generic' => 2, 'graph' => 1, 'descr' => 'critical'],
+        ['value' => 0, 'generic' => 3, 'descr' => 'unknown'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'normal'],
+        ['value' => 2, 'generic' => 1, 'descr' => 'warning'],
+        ['value' => 3, 'generic' => 2, 'descr' => 'critical'],
     ];
     create_state_index($state_name, $states);
 
-    foreach (explode("\n", $oids) as $data) {
+    foreach (explode("\n", (string) $oids) as $data) {
         $data = trim($data);
         if (! empty($data)) {
             [$oid,$current] = explode(' = ', $data, 2);
@@ -89,13 +89,13 @@ if (! empty($oids1)) {
     */
     $state_name = 'eqlMemberPowerSupplyCurrentState';
     $states = [
-        ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'on-and-operating'],
-        ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'no-ac-power'],
-        ['value' => 3, 'generic' => 2, 'graph' => 1, 'descr' => 'failed-or-no-data'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'on-and-operating'],
+        ['value' => 2, 'generic' => 1, 'descr' => 'no-ac-power'],
+        ['value' => 3, 'generic' => 2, 'descr' => 'failed-or-no-data'],
     ];
     create_state_index($state_name, $states);
 
-    foreach (explode("\n", $oids1) as $data) {
+    foreach (explode("\n", (string) $oids1) as $data) {
         $data = trim($data);
         if (! empty($data)) {
             [$oid,$descr] = explode(' = ', $data, 2);
@@ -130,18 +130,18 @@ $disks_base_oid = '.1.3.6.1.4.1.12740.3.1.1.1.8.1.'; // eqlDiskStatus
 if (! empty($oids_disks)) {
     $state_name = 'eqlDiskStatus';
     $states = [
-        ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'on-line'],
-        ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'spare'],
-        ['value' => 3, 'generic' => 2, 'graph' => 1, 'descr' => 'failed'],
-        ['value' => 4, 'generic' => 1, 'graph' => 1, 'descr' => 'off-line'],
-        ['value' => 5, 'generic' => 1, 'graph' => 1, 'descr' => 'alt-sig'],
-        ['value' => 6, 'generic' => 2, 'graph' => 1, 'descr' => 'too-small'],
-        ['value' => 7, 'generic' => 0, 'graph' => 1, 'descr' => 'history-of-failures'],
-        ['value' => 8, 'generic' => 1, 'graph' => 1, 'descr' => 'unsupported-version'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'on-line'],
+        ['value' => 2, 'generic' => 0, 'descr' => 'spare'],
+        ['value' => 3, 'generic' => 2, 'descr' => 'failed'],
+        ['value' => 4, 'generic' => 1, 'descr' => 'off-line'],
+        ['value' => 5, 'generic' => 1, 'descr' => 'alt-sig'],
+        ['value' => 6, 'generic' => 2, 'descr' => 'too-small'],
+        ['value' => 7, 'generic' => 0, 'descr' => 'history-of-failures'],
+        ['value' => 8, 'generic' => 1, 'descr' => 'unsupported-version'],
     ];
     create_state_index($state_name, $states);
 
-    foreach (explode("\n", $oids_disks) as $data) {
+    foreach (explode("\n", (string) $oids_disks) as $data) {
         $data = trim($data);
         if (! empty($data)) {
             [$oid,$descr] = explode(' = ', $data, 2);

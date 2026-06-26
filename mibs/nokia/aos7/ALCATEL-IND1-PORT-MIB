@@ -3,41 +3,35 @@ ALCATEL-IND1-PORT-MIB DEFINITIONS ::= BEGIN
 IMPORTS
         OBJECT-TYPE, Counter64,
         NOTIFICATION-TYPE, MODULE-IDENTITY,
-        TimeTicks, Integer32, Unsigned32  FROM SNMPv2-SMI
+        TimeTicks, Integer32, Unsigned32, Counter32  FROM SNMPv2-SMI
         MODULE-COMPLIANCE, OBJECT-GROUP,
         NOTIFICATION-GROUP                FROM SNMPv2-CONF
         DisplayString, MacAddress, DateAndTime, TEXTUAL-CONVENTION, RowStatus
                                 FROM SNMPv2-TC
         SnmpAdminString                   FROM SNMP-FRAMEWORK-MIB
-        ifIndex, ifInErrors, ifOutErrors, ifEntry,
+        ifIndex, ifInErrors, ifOutErrors, ifEntry, InterfaceIndexOrZero,
         InterfaceIndex                    FROM IF-MIB
         softentIND1Port                   FROM ALCATEL-IND1-BASE
-        alclnkaggAggIndex                 FROM ALCATEL-IND1-LAG-MIB;
+        alclnkaggAggIndex                 FROM ALCATEL-IND1-LAG-MIB
+        VirtualOperChassisId              FROM ALCATEL-IND1-VIRTUAL-CHASSIS-MIB;
 
 
 alcatelIND1PortMIB MODULE-IDENTITY
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc."
+    CONTACT-INFO
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
 
-   LAST-UPDATED  "201311220000Z"
-   ORGANIZATION  "Alcatel-Lucent"
-   CONTACT-INFO
-        "Please consult with Customer Service to ensure the most appropriate
-         version of this document is used with the products in question:
+                      ALE USA Inc. Enterprise
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
 
-                    Alcatel-Lucent, Enterprise Solutions Division
-                   (Formerly Alcatel Internetworking, Incorporated)
-                           26801 West Agoura Road
-                        Agoura Hills, CA  91301-5122
-                          United States Of America
+     Telephone:          +1 800 995 2696
 
-        Telephone:               North America  +1 800 995 2696
-                                 Latin America  +1 877 919 9526
-                                 Europe         +31 23 556 0100
-                                 Asia           +65 394 7933
-                                 All Other      +1 818 878 4507
-
-        Electronic Mail:         support@ind.alcatel.com
-        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
 
     DESCRIPTION
         "This module describes an authoritative enterprise-specific Simple
@@ -57,12 +51,21 @@ alcatelIND1PortMIB MODULE-IDENTITY
          non-exclusive license to use this specification in connection with
          management of the products for which it is intended to be used.
 
-                     Copyright (C) 1995-2013 Alcatel-Lucent
-                         ALL RIGHTS RESERVED WORLDWIDE"
+                   Copyright (C) ALE USA Inc. 2014-2022
+                   Copyright (C) 1995-2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
 
-    REVISION      "201311220000Z"
+    REVISION      "202210210000Z"
     DESCRIPTION
-        "Add support for Fiber Channel interface statistics"
+        "Updated CableState by adding new enum value as faulty"
+
+    REVISION      "201911270000Z"
+    DESCRIPTION
+        "Updated the latest contact and Copyright information for ALE USA Inc."
+
+    REVISION      "201908070000Z"
+    DESCRIPTION
+        "Add support for alaPortXConfiguration "
 
     REVISION      "201005130000Z"
     DESCRIPTION
@@ -85,7 +88,8 @@ CableState ::= TEXTUAL-CONVENTION
                                  short(3),
                                  openShort(4),
                                  crossTalk(5),
-                                 unknown(6)
+                                 unknown(6),
+                                 faulty(7)
                                 }
 
 alcatelIND1PortNotifications                OBJECT IDENTIFIER ::= { alcatelIND1PortMIB 0 }
@@ -102,8 +106,11 @@ ddmConfiguration                            OBJECT IDENTIFIER ::= { alcatelIND1P
 portViolations                              OBJECT IDENTIFIER ::= { alcatelIND1PortMIBObjects 5 }
 csmConfTrap                                 OBJECT IDENTIFIER ::= { alcatelIND1PortMIBObjects 6 }
 interfaceCounters                           OBJECT IDENTIFIER ::= { alcatelIND1PortMIBObjects 7 }
-esmStormTrap                     	    OBJECT IDENTIFIER ::= { alcatelIND1PortMIBObjects 8 }
-linkAggPort                                OBJECT IDENTIFIER ::= { alcatelIND1PortMIBObjects 9 }
+esmStormTrap                                OBJECT IDENTIFIER ::= { alcatelIND1PortMIBObjects 8 }
+linkAggPort                                 OBJECT IDENTIFIER ::= { alcatelIND1PortMIBObjects 9 }
+alaPtpConfiguration                         OBJECT IDENTIFIER ::= { alcatelIND1PortMIBObjects 10 }
+alaPortXConfiguration                       OBJECT IDENTIFIER ::= { alcatelIND1PortMIBObjects 11 }
+portResetTrap                               OBJECT IDENTIFIER ::= { alcatelIND1PortMIBObjects 12 }
 
 
 -- Ethernet Driver object related to Trap *********************
@@ -142,7 +149,7 @@ alaDyingGaspTime OBJECT-TYPE
         MAX-ACCESS      accessible-for-notify
         STATUS          current
         DESCRIPTION
-                "This object specifies the time of power failure."
+                "This object specifies the time (in UTC) of power failure."
         ::= { csmConfTrap 3 }
 
 -- Ethernet Storm Violation   
@@ -278,7 +285,31 @@ alaDyingGaspTime OBJECT-TYPE
 	    esmPortMcastStormState
 		INTEGER,
 	    esmPortUucastStormState
-		INTEGER
+		INTEGER,
+	    esmLinkStateChangeTime
+		Counter64,
+	    esmLinkStateChangeCount
+		Counter32,
+	    esmPortIfg
+                Integer32,
+        esmPortFecMode
+                INTEGER,
+        esmPortFecOperMode
+                INTEGER,
+        esmPortGbicType
+                INTEGER,
+        esmPortInterfaceType
+                INTEGER,
+        esmPortDownReason
+                INTEGER,
+        esmPortMacsecSupported
+                INTEGER,
+        esmPortMacsec256bit
+                INTEGER,
+        esmPortMacsecXpn
+                INTEGER,
+        esmPortReset
+                INTEGER
             }
 
         esmPortSlot OBJECT-TYPE
@@ -312,7 +343,13 @@ alaDyingGaspTime OBJECT-TYPE
                 speed21000(12),
                 speed2000(13),
                 speed4000(14),
-                speed8000(15)
+                speed8000(15),
+                speed2500(18),
+                speed5000(19),
+                speed25000(22),
+                speed50000(23),
+                speed100000(24),
+                speed200000(25)
             }
             MAX-ACCESS read-only
             STATUS current
@@ -343,16 +380,27 @@ alaDyingGaspTime OBJECT-TYPE
                 speed100(1),
                 speed10(2),
                 speedAuto(3),
+                speedUnknown(4),
                 speed1000(5),
                 speed10000(6),
                 speed40000(7),
                 speedMax100(8),
                 speedMax1000(9),
+                speed20000(11),
+                speed21000(12),
                 speed2000(13),
                 speed4000(14),
                 speed8000(15),
                 speedMax4000(16),
-                speedMax8000(17)
+                speedMax8000(17),
+                speed2500(18),
+                speed5000(19),
+                speedMax2500(20),
+                speedMax5000(21),
+                speed25000(22),
+                speed50000(23),
+                speed100000(24),
+	        speed200000(25)
             }
             MAX-ACCESS read-write
             STATUS current
@@ -541,7 +589,10 @@ alaDyingGaspTime OBJECT-TYPE
                 preferredCopper(1),
                 forcedCopper(2),
                 preferredFiber(3),
-                forcedFiber(4)
+                forcedFiber(4),
+                copper(5),
+                fiber(6),
+                auto(7)
             }
             MAX-ACCESS  read-write
             STATUS  current
@@ -857,7 +908,7 @@ alaDyingGaspTime OBJECT-TYPE
         DESCRIPTION
             "The state of the port for multi-cast Storm Control."
         DEFVAL { normal }
-        ::= { esmConfEntry 43 }
+        ::= { esmConfEntry 43 } 
 
       esmPortUucastStormState OBJECT-TYPE
         SYNTAX INTEGER  {
@@ -871,7 +922,257 @@ alaDyingGaspTime OBJECT-TYPE
             "The state of the port for uucast Storm Control."
         DEFVAL { normal }
         ::= { esmConfEntry 44 }
-              
+
+      esmLinkStateChangeTime OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Time when  the link status changed last."
+        ::= { esmConfEntry 45 }
+
+      esmLinkStateChangeCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Counter to represent the number of times the link status changed."
+        ::= { esmConfEntry 46 }
+        
+      esmPortIfg    OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The value of inter packet gap in bytes."
+        DEFVAL { 12 }
+        ::= { esmConfEntry 47 }
+      
+
+        esmPortFecMode   OBJECT-TYPE
+            SYNTAX INTEGER {
+                disable(1),
+                auto(2),
+                fc(3),
+                rs(4)
+            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "Allow the user to enable or disable the port fec mode.
+                  Auto mode will select the appropiate mode based on cable capabilities."
+            DEFVAL { auto }
+          ::= { esmConfEntry 48 }
+
+        esmPortFecOperMode   OBJECT-TYPE
+            SYNTAX INTEGER {
+                disable(1),
+                auto(2),
+                fc(3),
+                rs(4)
+            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "Access operational fec mode."
+            DEFVAL { disable }
+          ::= { esmConfEntry 49 }
+
+        esmPortGbicType   OBJECT-TYPE
+            SYNTAX INTEGER {
+                gbicLh(1),
+                gbicLx(2),
+                sfpPlusLr1G10G(3),
+                gbicSx(4),
+                sfpPlusSr1G10G(5),
+                sfp10GigBaseT(6),
+                sfpGigBxU(7),
+                sfpGigBxD(8),
+                sfpGigBxU20(9),
+                sfpGigBxD20(10),
+                sfpGigBxU40(11),
+                sfpGigBxD40(12),
+                isfpGigBxU(13),
+                isfpGigBxD(14),
+                gicBx(15),
+                baseT1000(16),
+                baseFx100(17),
+                baseX1001000(18),
+                baseX101001000(19),
+                sfpPlusEr(20),
+                sfpPlusZr(21),
+                sfpPlusZrDwDm(22),
+                sfpPlusZrCwDm(23),
+                sfpPlusZrTdm(24),
+                sfpPlusLr(25),
+                sfpPlusLrm(26),
+                sfpPlusSr(27),
+                sfpPlusCopper(28),
+                qsfpPlusLr4(29),
+                qsfpPlusBd(30),
+                qsfpPlusSr4(31),
+                qsfpPlusCr4(32),
+                qsfpPlusCopper(33),
+                stackingQsfpPlusCopper(34),
+                stackingQsfpPlusSr4(35),
+                stackingQsfpPlusAoc(36),
+                sfpFc248G(37),
+                qsfpPlus4X10GCopper(38),
+                unknown(39),
+                notPresent(40),
+                na(41),
+                qsfpPlus4X10GSr(42),
+                qsfpPlus4X10GLr(43),
+                qsfpPlusAoc(44),
+                sfp25GBaseSr(45),
+                sfp25GBaseLr(46),
+                sfp25GBaseCr(47),
+                sfp25GBaseCAoc(48),
+                sfb50GBaseSr2(49),
+                sfp25GBaseLr2(50),
+                sfp25GBaseCr2(51),
+                sfp100GBaseSr4(52),
+                sfp100GBaseLr4(53),
+                sfp100GBaseCr4(54),
+                sfp100GBaseCwDm4(55),
+                sfp100GBaseAoc4(56),
+                sfp4X25GBaseSr(57),
+                sfp4X25GBaseLr(58),
+                sfp4X25GBaseCr(59),
+                sfp4X25GBaseCwDm(60),
+                sfp4X25GBaseAoc(61),
+                sfp2X50GBaseSr2(62),
+                sfp2X50GBaseLr2(63),
+                sfp2X50GBaseCr2(64),
+                sfp2X50GBaseCwDm2(65),
+                sfp2X50GBaseAoc2(66),
+		qsfpPlusER4(67),
+                qsfpPlusLM4(68),
+                qsfpPlusSwdm4(69),
+                qsfpPlusPsm4(70),
+                qsfp100GBaseDwdm(71),
+                sfp200GBaseCr4(72),
+                sfp200GBaseSr4(73),
+                sfp200GBaseFr4(74),
+                sfp200GBaseDr4(75),
+                sfp200GBaseLr4(76),
+                sfp200GBaseEr4(77),
+                sfp200GBaseAoc(78),
+                sfp50GBaseCr(79),
+                sfp50GBaseSr(80),
+                sfp50GBaseFr(81),
+                sfp50GBaseLr(82),
+                sfp50GBaseEr(83)
+
+ 
+                
+            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "information about Port Speed connected with SFP"
+          ::= { esmConfEntry 50 }
+
+        esmPortInterfaceType   OBJECT-TYPE
+            SYNTAX INTEGER {
+                copper(1),
+                fiber(2),
+                comboCopper(3),
+                comboFiber(4)
+            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "Specifies the port type. Copper(1) and fiber(2) are fixed types and NOT configurable."
+          ::= { esmConfEntry 51 }
+
+        esmPortDownReason   OBJECT-TYPE
+            SYNTAX INTEGER {
+                none(1),
+                adminDown(2),
+                lpsShutdown(3),
+                lpsRestrict(4),
+                policy(5),
+                spoofed(6),
+                bpdu(7),
+                bgp(8),
+                ospf(9),
+                rip(10),
+                vrrp(11),
+                dhcpServer(12),
+                pim(13),
+                isis(14),
+                dnsReply(15),
+                udld(16),
+                rfp(17),
+                lpsDiscard(18),
+                lfpShutdown(19),
+                lmThreshold(20),
+                lbdShutdown(21),
+                dvmrp(22),
+                spbRfp(23),
+                storm(24),
+                reserved(25),
+                lldpShutdown(26),
+                lbdRemote(27),
+                anNotComplete(28),
+                noRxSignal(29),
+                localOrRemoteFault(30)
+            }
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                 "The port down or violation reason."
+          ::= { esmConfEntry 52 }
+
+        esmPortMacsecSupported OBJECT-TYPE
+            SYNTAX INTEGER  {
+                yes(1),
+                no(2)
+            }
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "The port has macsec supported (yes) or not (no)."
+            DEFVAL { no }
+          ::= { esmConfEntry 53 }
+
+        esmPortMacsec256bit OBJECT-TYPE
+            SYNTAX INTEGER  {
+                yes(1),
+                no(2)
+            }
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "The port has macsec 256 bit (yes) or not (no)."
+            DEFVAL { no }
+          ::= { esmConfEntry 54 }
+
+        esmPortMacsecXpn OBJECT-TYPE
+            SYNTAX INTEGER  {
+                yes(1),
+                no(2)
+            }
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "The port has macsec xpn (yes) or not (no)."
+            DEFVAL { no }
+          ::= { esmConfEntry 55 }
+
+        esmPortReset OBJECT-TYPE
+            SYNTAX INTEGER  {
+                default(1),
+                reset(2)
+            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "The port reset."
+            DEFVAL { default }
+          ::= { esmConfEntry 56 }
+		  
           -- The Ethernet Statistics Group
           --
           -- The ethernet statistics group contains statistics
@@ -2733,7 +3034,7 @@ ddmRxPowerThresholdViolated NOTIFICATION-TYPE
                 lldp(14)
            }
 
-           MAX-ACCESS  not-accessible
+           MAX-ACCESS  accessible-for-notify
            STATUS current
            DESCRIPTION
             "Indicates the source of the port violation.
@@ -2783,7 +3084,7 @@ ddmRxPowerThresholdViolated NOTIFICATION-TYPE
                    pvLldpShutDown(24),
                    pvRemoteLbd(25)
            }
-           MAX-ACCESS  not-accessible
+           MAX-ACCESS  accessible-for-notify
            STATUS current
            DESCRIPTION
             "The Reason for the port violation. This will be application
@@ -2960,7 +3261,7 @@ DEFVAL { 0 }
 ::= { alaLinkMonConfigEntry 5 }
 
 alaLinkMonWaitToShutdownTimer   OBJECT-TYPE
-SYNTAX Integer32(0..3000)
+SYNTAX Integer32(0..300000)
 MAX-ACCESS  read-write
 STATUS  current
 DESCRIPTION
@@ -3411,6 +3712,19 @@ alaDyingGaspTrap NOTIFICATION-TYPE
                  above the configured value."
 ::= { alcatelIND1PortNotifications 10 }
 
+-- Port Reset trap
+    esmDrvTrapPortReset       NOTIFICATION-TYPE
+     OBJECTS     {
+                     portResetStartIfIndex,
+                     portResetEndIfIndex,
+                     portResetUserName,
+                     portResetErrorWarningDescription
+                 }
+     STATUS      current
+     DESCRIPTION
+         "Port Reset trap."
+::= { alcatelIND1PortNotifications 11 }
+
 -- TDR test Result Table
 -- This table stores the result of TDR test conducted on the copper port(<slot,port>)
 -- The object esmTdrPortTest can be used by the user to initiate the TDR test
@@ -3552,14 +3866,16 @@ esmTdrPortTest          OBJECT-TYPE
 
 esmTdrPortClearStats OBJECT-TYPE
               SYNTAX INTEGER
-		{	default(1),
-	 		reset(2)
-		}
+               {	default(1),
+		            reset(2)
+               }
               MAX-ACCESS read-write
               STATUS     current
               DESCRIPTION
                   "Used to Clear TDR stats.
-		   By default, this object contains zero value."
+              This MIB object is to trigger a clear of the stats.
+              The value of the object will revert back to default after the action is completed."
+              DEFVAL { default }
               ::= { esmTdrPortEntry 13 }
 
 esmTdrPortResult	OBJECT-TYPE
@@ -3683,13 +3999,20 @@ ifOutPktsPerSec OBJECT-TYPE
             esmConfiguredMode
                 INTEGER,
             esmOperationalMode
-                INTEGER
+                INTEGER,
+            startPortModeIfIndex
+                InterfaceIndex,
+            endPortModeIfIndex
+                InterfaceIndex
             }
         esmConfiguredMode OBJECT-TYPE
             SYNTAX INTEGER {
                 mode40Gig(1),       -- 40Gig mode
                 mode4X10Gig(2),     -- 10Gig mode, 4 ports 
-                modeAuto(3)        -- 40G or 4X10G based on detection
+                modeAuto(3),        -- Based on detection
+                mode100Gig(4),      -- 100Gig mode
+                mode4X25Gig(5),     -- 25Gig Mode, 4 ports
+                mode2X50Gig(6)      -- 50Gig mode, 2 ports 
             }
             MAX-ACCESS read-write
             STATUS current
@@ -3705,13 +4028,34 @@ ifOutPktsPerSec OBJECT-TYPE
         esmOperationalMode OBJECT-TYPE
             SYNTAX INTEGER {
                 mode40Gig(1),       -- 40Gig mode
-                mode4X10Gig(2)      -- 10Gig mode, 4 ports
+                mode4X10Gig(2),      -- 10Gig mode, 4 ports
+                mode100Gig(3),      -- 100Gig mode
+                mode4X25Gig(4),     -- 25Gig Mode, 4 ports
+                mode2X50Gig(5),     -- 50Gig mode, 2 ports 
+                modeUnknown(6)      -- Mode Unknown
             }
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
             " Operational mode of the port "
         ::= { esmPortModeEntry 2 }
+
+     startPortModeIfIndex OBJECT-TYPE
+           SYNTAX      InterfaceIndex
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+           "The start IfIndex of the port that is part of same Port Mode group"
+    ::= { esmPortModeEntry 3 }
+
+     endPortModeIfIndex OBJECT-TYPE
+           SYNTAX      InterfaceIndex
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+           "The end IfIndex of the port that is part of same Port Mode group"
+    ::= { esmPortModeEntry 4 }
+
 
 
 -- This table holds the value of configured interface beacon admin-state, Becon Led Color and
@@ -3800,6 +4144,324 @@ ifOutPktsPerSec OBJECT-TYPE
         "Row status to control creation/deletion of the Beacon"
         ::= { esmPortBeaconEntry 4 }
 
+-- This table holds the value of configured portgroup speed and
+-- operaional portgroup speed. 
+
+        esmPortGroupTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF EsmPortGroupEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+            "A list of port group entries.  This table contains
+            Configured Port group speed and Operational Port group speed"
+            ::= { physicalPort 11 }
+
+            esmPortGroupEntry  OBJECT-TYPE
+            SYNTAX  EsmPortGroupEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+            "An entry containing configured and operational port group speed  
+            applicable to a particular port group and list of member port" 
+            INDEX { esmPortGroupIfIndex, ifIndex }
+            ::= { esmPortGroupTable 1 }
+
+            EsmPortGroupEntry ::= SEQUENCE {
+            esmPortGroupIfIndex
+                Unsigned32,
+            esmConfiguredPortGroupSpeed
+                INTEGER,
+            esmOperationalPortGroupSpeed
+                INTEGER
+            }
+
+    esmPortGroupIfIndex  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The port group ifIndex component of this instance."
+        ::= {esmPortGroupEntry 1 }
+
+        esmConfiguredPortGroupSpeed OBJECT-TYPE
+            SYNTAX INTEGER {
+                speedAuto(1),       -- Based on detection
+                speed10Gig(2),      -- 10Gig mode
+                speed25Gig(3)       -- 25Gig mode
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "The desired speed of the port group. When a
+            managed system initializes, all portgroup start with
+            esmConfiguredPortGroupSpeed in the Auto state" 
+            DEFVAL { speedAuto }
+        ::= { esmPortGroupEntry 2 }
+
+
+        esmOperationalPortGroupSpeed OBJECT-TYPE
+            SYNTAX INTEGER {
+                speedNone(1),
+                speed10Gig(2),       -- 10Gig mode
+                speed25Gig(3)       -- 25Gig mode
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " Operational port group speed "
+        ::= { esmPortGroupEntry 3 }
+
+
+
+        esmPortBreakOutTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF EsmPortBreakOutEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+            "A list of port group entries. This table contains port break out."
+            ::= { physicalPort 12 }
+
+            esmPortBreakOutEntry  OBJECT-TYPE
+            SYNTAX  EsmPortBreakOutEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+            "An entry containing configured and operational port break out 
+            applicable to a particular port."
+            INDEX { ifIndex }
+            ::= { esmPortBreakOutTable 1 }
+
+            EsmPortBreakOutEntry ::= SEQUENCE {
+            esmPortBreakOutEnable
+                INTEGER
+            }
+
+    esmPortBreakOutEnable  OBJECT-TYPE
+        SYNTAX INTEGER {
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Enable or disable port break out."
+        DEFVAL { disable }
+        ::= {esmPortBreakOutEntry 1 }
+
+--
+-- PTP Configuration
+--
+
+alaPtpConfigAdminStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                        enable(1),
+                                        disable(2)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "This object enables/disables PTP software feature in the system."
+        DEFVAL          { disable }
+        ::= { alaPtpConfiguration 1 }
+
+alaPtpConfigPriority OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "This object use for configure PTP priority."
+        DEFVAL          { 5 }
+        ::= { alaPtpConfiguration 2 }
+
+alaPtpConfigMode OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This object denotes the current PTP mode."
+        ::= { alaPtpConfiguration 3 }
+
+alaPtpPortTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AlaPtpPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "This table manages PTP port's admin-state."
+    ::= { alaPtpConfiguration 4 }
+
+alaPtpPortEntry  OBJECT-TYPE
+    SYNTAX  AlaPtpPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "An entry containing additional management information
+    applicable to a particular interface with respect to ptp."
+    INDEX { ifIndex }
+    ::= { alaPtpPortTable 1 }
+
+    AlaPtpPortEntry ::= SEQUENCE {
+        alaPtpPortAdminStatus           INTEGER
+    }
+
+alaPtpPortAdminStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                   enable(1),
+                                   disable(2)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "this object enables/disables PTP port's admin-state."
+        DEFVAL          { disable }
+        ::= { alaPtpPortEntry 1 }
+
+alaPtpLoopBackPort1 OBJECT-TYPE
+    SYNTAX          InterfaceIndexOrZero
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+            "This object contain PTP loopback portlist interface index."
+    DEFVAL  { 0 }
+    ::= { alaPtpConfiguration 5 }
+
+alaPtpLoopBackPort2 OBJECT-TYPE
+    SYNTAX          InterfaceIndexOrZero
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+            "This object contain PTP loopback portlist interface index."
+    DEFVAL  { 0 }
+    ::= { alaPtpConfiguration 6 }
+
+alaPtpLoopBackPort3 OBJECT-TYPE
+    SYNTAX          InterfaceIndexOrZero
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+            "This object contain PTP loopback portlist interface index."
+    DEFVAL  { 0 }
+    ::= { alaPtpConfiguration 7 }
+
+alaPtpLoopBackPort4 OBJECT-TYPE
+    SYNTAX          InterfaceIndexOrZero
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+            "This object contain PTP loopback portlist interface index."
+    DEFVAL  { 0 }
+    ::= { alaPtpConfiguration 8 }
+
+alaPtpLoopBackPort5 OBJECT-TYPE
+    SYNTAX          InterfaceIndexOrZero
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+            "This object contain PTP loopback portlist interface index."
+    DEFVAL  { 0 }
+    ::= { alaPtpConfiguration 9 }
+
+alaPtpLoopBackPort6 OBJECT-TYPE
+    SYNTAX          InterfaceIndexOrZero
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+            "This object contain PTP loopback portlist interface index."
+    DEFVAL  { 0 }
+    ::= { alaPtpConfiguration 10 }
+
+alaPtpLoopBackPort7 OBJECT-TYPE
+    SYNTAX          InterfaceIndexOrZero
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+            "This object contain PTP loopback portlist interface index."
+    DEFVAL  { 0 }
+    ::= { alaPtpConfiguration 11 }
+
+alaPtpLoopBackPort8 OBJECT-TYPE
+    SYNTAX          InterfaceIndexOrZero
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+            "This object contain PTP loopback portlist interface index."
+    DEFVAL  { 0 }
+    ::= { alaPtpConfiguration 12 }
+    
+--
+-- Port Config Extensions Configuration using alaPortXConfiguration root OID ...
+--
+    
+alaPortXTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AlaPortXEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "This table manages port's additional parameters."
+    ::= { alaPortXConfiguration 1 }
+
+alaPortXEntry        OBJECT-TYPE
+    SYNTAX      AlaPortXEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing additional management information
+        applicable to a particular interface."
+    AUGMENTS    { ifEntry }
+    ::= { alaPortXTable 1 }
+    
+
+    AlaPortXEntry ::= SEQUENCE {
+        alaPortXLoopbackStatus           INTEGER
+    }
+
+alaPortXLoopbackStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                   enable(1),
+                                   disable(2)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "this object enables/disables port's Loopback status."
+        DEFVAL          { disable }
+        ::= { alaPortXEntry 1 }
+
+--
+-- Port reset objects trap
+--
+
+portResetStartIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+      "Start interface index."
+    ::= { portResetTrap 1 }
+
+portResetEndIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+      "End interface index."
+    ::= { portResetTrap 2 }
+
+portResetUserName  OBJECT-TYPE
+    SYNTAX      SnmpAdminString(SIZE(1..63))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+      "User name."
+    ::= { portResetTrap 3 }
+
+portResetErrorWarningDescription   OBJECT-TYPE
+    SYNTAX      SnmpAdminString(SIZE(1..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+      "Port reset error or warning discription."
+    ::= { portResetTrap 4 }
+
 -- conformance information
 
 alcatelIND1PortMIBCompliances OBJECT IDENTIFIER ::= { alcatelIND1PortMIBConformance 1 }
@@ -3821,17 +4483,18 @@ esmConfPortCompliance MODULE-COMPLIANCE
                                 ddmNotificationsGroup,
                                 esmConfTrapGroup,
                                 esmHybridConfEntryGroup,
-				esmConfEntryGroup,
-		                csmConfTrapGroup,
+                                esmConfEntryGroup,
+                                csmConfTrapGroup,
                                 esmTdrPortGroup,
-				portViolationEntryGroup,
+                                portViolationEntryGroup,
                                 ddmPortInfoGroup,
-		                alaLinkMonConfigMIBGroup,				
-		                alaLFPGroupMIBGroup,
+                                alaLinkMonConfigMIBGroup,
+                                alaLFPGroupMIBGroup,
                                 alaPvrGlobalConfigGroup,
                                 alaPvrConfigGroup,
                                 interfaceStatsMIBGroup,
-                                alaPortViolationTrapGroup
+                                alaPortViolationTrapGroup,
+                                alaPtpPortGroup
                          }
     ::= { alcatelIND1PortMIBCompliances 1 }
 
@@ -3874,7 +4537,9 @@ esmConfMIBGroup OBJECT-GROUP
               esmPortIngressRateLimitEnable, esmPortIngressRateLimit, esmPortIngressRateLimitBurst,
               esmPortEPPEnable, esmPortEEEEnable,esmPortBcastThresholdAction,esmPortMcastThresholdAction,
               esmPortUucastThresholdAction,esmPortMinBcastRateLimit,esmPortMinMcastRateLimit,
-              esmPortMinUucastRateLimit,esmPortBcastStormState, esmPortMcastStormState, esmPortUucastStormState
+              esmPortMinUucastRateLimit,esmPortBcastStormState, esmPortMcastStormState, esmPortUucastStormState,
+              esmLinkStateChangeTime, esmLinkStateChangeCount, esmPortIfg, esmPortFecMode, esmPortFecOperMode, esmPortGbicType, esmPortInterfaceType, esmPortDownReason,
+              esmPortMacsecSupported, esmPortMacsec256bit, esmPortMacsecXpn, esmPortReset
             }
     STATUS  current
     DESCRIPTION
@@ -3945,7 +4610,8 @@ alcPortNotificationGroup NOTIFICATION-GROUP
         portViolationTrap,
         portViolationNotificationTrap,
         alaDyingGaspTrap,
-        esmStormThresholdViolationStatus
+        esmStormThresholdViolationStatus,
+        esmDrvTrapPortReset
         }
     STATUS current
     DESCRIPTION
@@ -4058,13 +4724,15 @@ esmConfEntryGroup   OBJECT-GROUP
         
 portViolationEntryGroup   OBJECT-GROUP
         OBJECTS {
+        			portViolationSource,
+        			portViolationReason,
         			portViolationAction,
         			portViolationTimer,
         			portViolationTimerAction,
         			portViolationClearPort,
-                    portViolationCfgRecoveryMax,
-                    portViolationCfgRetryTime,
-                    portViolationRetryRemain
+        			portViolationCfgRecoveryMax,
+        			portViolationCfgRetryTime,
+        			portViolationRetryRemain
         		}
         STATUS  current
         DESCRIPTION
@@ -4244,7 +4912,9 @@ alaPvrGlobalConfigGroup OBJECT-GROUP
 esmPortModeGroup OBJECT-GROUP
         OBJECTS   {
                   esmConfiguredMode,
-                  esmOperationalMode           
+                  esmOperationalMode,
+                  startPortModeIfIndex,
+                  endPortModeIfIndex
                   }
         STATUS  current
         DESCRIPTION
@@ -4304,5 +4974,75 @@ alcLagStatsMIBGroup OBJECT-GROUP
     DESCRIPTION
          "A collection of link aggregation objects"
     ::= { alcatelIND1PortMIBGroups 28 }
+
+alaPtpConfigurationGroup  OBJECT-GROUP
+    OBJECTS {
+                            alaPtpConfigAdminStatus,                            
+                            alaPtpConfigPriority,
+                            alaPtpConfigMode,
+                            alaPtpLoopBackPort1,
+                            alaPtpLoopBackPort2,
+                            alaPtpLoopBackPort3,
+                            alaPtpLoopBackPort4,
+                            alaPtpLoopBackPort5,
+                            alaPtpLoopBackPort6,
+                            alaPtpLoopBackPort7,
+                            alaPtpLoopBackPort8
+            }
+    STATUS  current
+    DESCRIPTION
+                    "A collection of objects to allow configuration of PTP."
+    ::=     { alcatelIND1PortMIBGroups 29 }
+
+alaPtpPortGroup  OBJECT-GROUP
+    OBJECTS {
+                            alaPtpPortAdminStatus
+            }
+    STATUS  current
+    DESCRIPTION
+                    "A collection of objects to allow configuration of PTP."
+    ::=     { alcatelIND1PortMIBGroups 30 }
+
+
+alaPortXGroup  OBJECT-GROUP
+    OBJECTS {
+                alaPortXLoopbackStatus
+            }
+    STATUS  current
+    DESCRIPTION
+                    "A collection of objects to allow configuration of additional Port Configuration attributes."
+    ::=     { alcatelIND1PortMIBGroups 31 }
+
+esmPortGroupGroup OBJECT-GROUP
+        OBJECTS   {
+                  esmConfiguredPortGroupSpeed,
+                  esmOperationalPortGroupSpeed
+                  }
+        STATUS  current
+        DESCRIPTION
+             "A collection of objects for port Group " 
+        ::= { alcatelIND1PortMIBGroups 32 }
+
+esmPortBreakOutGroup OBJECT-GROUP
+        OBJECTS   {
+                  esmPortBreakOutEnable
+                  }
+        STATUS  current
+        DESCRIPTION
+             "A collection of objects for port break out " 
+        ::= { alcatelIND1PortMIBGroups 33 }
+
+esmPortResetGroup OBJECT-GROUP
+        OBJECTS   {
+                    portResetStartIfIndex,
+                    portResetEndIfIndex,
+                    portResetUserName,
+                    portResetErrorWarningDescription
+                  }
+        STATUS  current
+        DESCRIPTION
+             "A collection of objects for port reset " 
+        ::= { alcatelIND1PortMIBGroups 34 }
+
 
 END

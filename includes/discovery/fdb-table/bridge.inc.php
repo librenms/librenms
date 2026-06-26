@@ -58,9 +58,13 @@ if (! empty($fdbPort_table)) {
     $vlan_fdb_dict = [];
 
     // Indexed first by dot1qVlanTimeMark, which we ignore
-    foreach ($vlan_cur_table as $dot1qVlanTimeMark => $a) {
+    foreach ($vlan_cur_table as $a) {
         // Then by VLAN ID mapped to a single member array with the dot1qVlanFdbId
         foreach ($a as $vid => $data) {
+            // Skip if $data is not an array (can happen with malformed SNMP responses)
+            if (! is_array($data) || ! isset($data['dot1qVlanFdbId'])) {
+                continue;
+            }
             // Flip it round into the dictionary
             $vlan_fdb_dict[$data['dot1qVlanFdbId']] = $vid;
         }
@@ -71,9 +75,27 @@ if (! empty($fdbPort_table)) {
         // Look the dot1qVlanFdbId up to a real VLAN number; if undefined assume the
         // index *is* the VLAN number. Code in fdb-table.inc.php to map to the
         // device VLANs table should catch anything invalid.
-        $vlan = isset($vlan_fdb_dict[$vlanIndex]) ? $vlan_fdb_dict[$vlanIndex] : $vlanIndex;
+        $vlan = $vlan_fdb_dict[$vlanIndex] ?? $vlanIndex;
 
-        foreach ($data[$data_oid] ?? [] as $mac => $dot1dBasePort) {
+        // Some SNMP agents (arubaos-cx, comtrol) prepend a length byte to
+        // MacAddress indexes, encoding 7 bytes instead of 6.  With -OX the
+        // last octet spills out of the bracket into a nested array level:
+        //   dot1dTpFdbPort[6:0:a:f7:ec:d1].97 = 10
+        //   → key '6:0:a:f7:ec:d1', value ['97' => '10']
+        // Strip the length prefix, append the spilled octet (decimal → hex).
+        $fdb_entries = $data[$data_oid] ?? [];
+        foreach ($fdb_entries as $mac => $dot1dBasePort) {
+            if (is_array($dot1dBasePort)) {
+                unset($fdb_entries[$mac]);
+                $octets = explode(':', (string) $mac);
+                array_shift($octets); // drop length prefix byte
+                foreach ($dot1dBasePort as $spilled_octet => $port) {
+                    $fdb_entries[implode(':', [...$octets, dechex((int) $spilled_octet)])] = $port;
+                }
+            }
+        }
+
+        foreach ($fdb_entries as $mac => $dot1dBasePort) {
             if ($dot1dBasePort == 0) {
                 Log::debug("No port known for $mac\n");
                 continue;
@@ -84,7 +106,7 @@ if (! empty($fdbPort_table)) {
                 continue;
             }
             $port_id = $portid_dict[$dot1dBasePort] ?? PortCache::getIdFromIfIndex($dot1dBasePort); // if vendor messed up, assume base port = ifIndex
-            $vlan_id = isset($vlans_dict[$vlan]) ? $vlans_dict[$vlan] : 0;
+            $vlan_id = $vlans_dict[$vlan] ?? 0;
             $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
             Log::debug("vlan $vlan mac $mac_address port ($dot1dBasePort) $port_id\n");
         }

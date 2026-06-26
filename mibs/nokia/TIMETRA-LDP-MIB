@@ -385,7 +385,9 @@ TmnxLdpFECFlags                  ::= TEXTUAL-CONVENTION
          Flag 'upperFec' : this upper FEC is stitched to lower FEC
          Flag 'lowerFec' : this lower FEC is stitched to upper FEC
          Flag 'communityMismatch' : targeted LDP community mismatch
-         Flag 'bkpUpperFec' : backup upper FEC"
+         Flag 'bkpUpperFec' : backup upper FEC
+         'adjCapMismatch': LDP binding is not resolved due to adjacency
+                           capability mismatching."
     SYNTAX      BITS {
         dummyB0                  (0),
         egress                   (1),
@@ -411,7 +413,8 @@ TmnxLdpFECFlags                  ::= TEXTUAL-CONVENTION
         upperFec                 (21),
         lowerFec                 (22),
         communityMismatch        (23),
-        bkpUpperFec              (24)
+        bkpUpperFec              (24),
+        adjCapMismatch           (25)
     }
 
 TmnxLdpGenOperDownReasonCode     ::= TEXTUAL-CONVENTION
@@ -8319,7 +8322,8 @@ VRtrLdpEgrStatisticsEntry        ::= SEQUENCE
     vRtrLdpAggregatePktsHigh32       Counter32,
     vRtrLdpAggregateOctets           Counter64,
     vRtrLdpAggregateOctetsLow32      Counter32,
-    vRtrLdpAggregateOctetsHigh32     Counter32
+    vRtrLdpAggregateOctetsHigh32     Counter32,
+    vRtrLdpEgrStatOperMode           INTEGER
 }
 
 vRtrLdpInProfilePktsFc0          OBJECT-TYPE
@@ -9239,6 +9243,24 @@ vRtrLdpAggregateOctetsHigh32     OBJECT-TYPE
         "The value of vRtrLdpAggregateOctetsHigh32 indicates the higher 32 bits
          of the value of vRtrLdpAggregateOctets."
     ::= { vRtrLdpEgrStatisticsEntry 102 }
+
+vRtrLdpEgrStatOperMode           OBJECT-TYPE
+    SYNTAX      INTEGER {
+        per-fc    (0),
+        aggregate (1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrLdpEgrStatOperMode indicates whether egress
+         statistics are per-fc or aggregate.
+
+         A value of vRtrLdpEgrStatOperMode is 'per-fc' means that collected
+         stats will be per forwarding class.
+
+         A value of vRtrLdpEgrStatOperMode is 'aggregate' means that collected
+         stats will be aggregated."
+    ::= { vRtrLdpEgrStatisticsEntry 103 }
 
 vRtrLdpAddrFecExtTable           OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrLdpAddrFecExtEntry
@@ -12776,6 +12798,17 @@ tmnxLdpV20v0Compliance           MODULE-COMPLIANCE
         }
     ::= { tmnxLdpCompliances 16 }
 
+tmnxLdpV25v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of extended LDP on Nokia SROS
+         series systems release 25.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxLdpFecStatsGroup
+        }
+    ::= { tmnxLdpCompliances 17 }
+
 tmnxLdpGroups                    OBJECT IDENTIFIER ::= { tmnxLdpConformance 2 }
 
 tmnxLdpAddrFecGroup              OBJECT-GROUP
@@ -14985,6 +15018,16 @@ tmnxLdpPeerMcastTunnelingGroup   OBJECT-GROUP
         "The group of objects in LDP supporting multicast tunneling feature on
          Nokia SROS series systems 20.0 release."
     ::= { tmnxLdpGroups 72 }
+
+tmnxLdpFecStatsGroup             OBJECT-GROUP
+    OBJECTS     {
+        vRtrLdpEgrStatOperMode
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in LDP FEC stats feature on Nokia SROS series
+         systems 25.0 release."
+    ::= { tmnxLdpGroups 73 }
 
 tmnxLdpNotifyPrefix              OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 8 }
 

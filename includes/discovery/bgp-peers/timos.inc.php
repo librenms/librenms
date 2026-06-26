@@ -30,7 +30,7 @@ use LibreNMS\Util\IP;
 if ($device['os'] == 'timos') {
     $bgpPeersCache = SnmpQuery::numericIndex()->walk('TIMETRA-BGP-MIB::tBgpPeerNgTable')->valuesByIndex();
     foreach ($bgpPeersCache as $key => $value) {
-        $oid = explode('.', $key);
+        $oid = explode('.', (string) $key);
         $vrfInstance = $oid[0];
         $address = implode('.', array_slice($oid, 3));
         if (strlen($address) > 15) {
@@ -59,6 +59,7 @@ if ($device['os'] == 'timos') {
                     'vrf_id' => $vrfId,
                     'bgpPeerIdentifier' => $address,
                     'bgpPeerRemoteAs' => $value['TIMETRA-BGP-MIB::tBgpPeerNgPeerAS4Byte'],
+                    'bgpPeerDescr' => $value['TIMETRA-BGP-MIB::tBgpPeerNgDescription'] ?? '',
                     'bgpPeerState' => 'idle',
                     'bgpPeerAdminStatus' => 'stop',
                     'bgpLocalAddr' => '0.0.0.0',

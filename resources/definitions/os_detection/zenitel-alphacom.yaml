@@ -1,0 +1,15 @@
+os: zenitel-alphacom
+text: 'AlphaCom'
+type: server
+icon: zenitel
+mib_dir: zenitel
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.8072.3.2.10
+        snmpget:
+            oid: .1.3.6.1.4.1.26122.1.1.1.0
+            op: '!='
+            value: false

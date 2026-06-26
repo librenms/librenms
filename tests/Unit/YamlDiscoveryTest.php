@@ -30,14 +30,14 @@ use LibreNMS\Discovery\Yaml\OidField;
 use LibreNMS\Discovery\Yaml\YamlDiscoveryField;
 use LibreNMS\Tests\TestCase;
 
-class YamlDiscoveryTest extends TestCase
+final class YamlDiscoveryTest extends TestCase
 {
     public function testYamlDiscoveryFieldCalculateValue(): void
     {
         $field = new YamlDiscoveryField('test');
 
         $field->calculateValue([], [], '0', 0);
-        $this->assertSame(null, $field->value);
+        $this->assertNull($field->value);
 
         $field->calculateValue(['test' => 'MIB::oid'], [], '0', 0);
         $this->assertSame('MIB::oid', $field->value);
@@ -72,9 +72,9 @@ class YamlDiscoveryTest extends TestCase
         $this->assertSame(43, $field->value);
 
         $field->calculateValue(['oidtest' => 'missing'], ['2.3' => ['MIB::oid' => '41']], '2.3', 0);
-        $this->assertSame(null, $field->value);
+        $this->assertNull($field->value);
 
         $field->calculateValue(['oidtest' => 'missing'], ['2.3' => ['MIB::oid' => 'non-numeric']], '2.3', 0);
-        $this->assertSame(null, $field->value);
+        $this->assertNull($field->value);
     }
 }

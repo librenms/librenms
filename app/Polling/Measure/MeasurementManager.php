@@ -32,13 +32,14 @@ use Log;
 
 class MeasurementManager
 {
+    const FPING_COLOR = "\e[0;35m";
     const SNMP_COLOR = "\e[0;36m";
     const DB_COLOR = "\e[1;33m";
     const DATASTORE_COLOR = "\e[0;32m";
     const NO_COLOR = "\e[0m";
 
     /**
-     * @var \Illuminate\Support\Collection<MeasurementCollection>
+     * @var \Illuminate\Support\Collection<string, MeasurementCollection>
      */
     private static $categories;
 
@@ -48,6 +49,7 @@ class MeasurementManager
             self::$categories = new Collection;
             self::$categories->put('snmp', new MeasurementCollection());
             self::$categories->put('db', new MeasurementCollection());
+            self::$categories->put('fping', new MeasurementCollection());
         }
     }
 
@@ -72,9 +74,7 @@ class MeasurementManager
      */
     public function printChangedStats(): void
     {
-        $dsStats = app('Datastore')->getStats()->map(function (MeasurementCollection $stats, $datastore) {
-            return sprintf('%s%s%s: [%d/%.2fs]', self::DATASTORE_COLOR, $datastore, self::NO_COLOR, $stats->getCountDiff(), $stats->getDurationDiff());
-        });
+        $dsStats = app('Datastore')->getStats()->map(fn (MeasurementCollection $stats, $datastore) => sprintf('%s%s%s: [%d/%.2fs]', self::DATASTORE_COLOR, $datastore, self::NO_COLOR, $stats->getCountDiff(), $stats->getDurationDiff()));
 
         Log::info(sprintf(
             '>> %sSNMP%s: [%d/%.2fs] %sMySQL%s: [%d/%.2fs] %s',
@@ -110,14 +110,23 @@ class MeasurementManager
     }
 
     /**
+     * Record a measurement for fping
+     */
+    public function recordFping(Measurement $measurement): void
+    {
+        $this->record('fping', $measurement);
+    }
+
+    /**
      * Print global stat arrays
      */
     public function printStats(): void
     {
+        $this->printSummary('FPING', $this->getCategory('fping'), self::FPING_COLOR);
         $this->printSummary('SNMP', $this->getCategory('snmp'), self::SNMP_COLOR);
         $this->printSummary('SQL', $this->getCategory('db'), self::DB_COLOR);
 
-        app('Datastore')->getStats()->each(function (MeasurementCollection $stats, string $datastore) {
+        app('Datastore')->getStats()->each(function (MeasurementCollection $stats, string $datastore): void {
             $this->printSummary($datastore, $stats, self::DATASTORE_COLOR);
         });
 
@@ -125,7 +134,7 @@ class MeasurementManager
         if (! empty($snmpquery_cache_performance)) {
             Log::info('SnmpQuery Cache Performance');
             foreach ($snmpquery_cache_performance as $key => $hits) {
-                $vars = explode('|', $key);
+                $vars = explode('|', (string) $key);
                 Log::info(" $vars[4] cache hits: $hits" . ($hits ? '' : ' %RWaste of memory!%n'), ['color' => true]);
             }
         }
@@ -142,9 +151,7 @@ class MeasurementManager
 
     public function printSummary(string $name, MeasurementCollection $collection, string $color = ''): void
     {
-        $summaries = $collection->map(function (MeasurementSummary $stat) {
-            return sprintf('%s[%d/%.2fs]', ucfirst($stat->getType()), $stat->getCount(), $stat->getDuration());
-        });
+        $summaries = $collection->map(fn (MeasurementSummary $stat) => sprintf('%s[%d/%.2fs]', ucfirst($stat->getType()), $stat->getCount(), $stat->getDuration()));
 
         Log::info(sprintf('%s%s%s [%d/%.2fs]: %s',
             $color,

@@ -1,4 +1,4 @@
--- This file was included in WWP MIB release 04-16-00-0047
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-06-00-5005
  --
  -- CIENA-CES-ICL-MIB.my
  --
@@ -11,33 +11,39 @@
     DisplayString, RowStatus, MacAddress
         FROM SNMPv2-TC 
     CienaGlobalState,CienaStatsClear,CienaMacAddress
-	    FROM CIENA-TC                                                                          
-	cienaGlobalSeverity, cienaGlobalMacAddress
+        FROM CIENA-TC                                                                          
+    cienaGlobalSeverity, cienaGlobalMacAddress
         FROM  CIENA-GLOBAL-MIB
     cienaCesConfig, cienaCesNotifications
-	    FROM CIENA-SMI;
+        FROM CIENA-SMI;
 
-	
+
  cienaCesIclMIB MODULE-IDENTITY
-	    LAST-UPDATED "201311070000Z"
-	    ORGANIZATION "Ciena, Inc"
-	    CONTACT-INFO
-		    "   Mib Meister
-		  			115 North Sullivan Road
-					Spokane Valley, WA 99037
-		        	USA		 		
-		        	Phone:  +1 509 242 9000
-					Email:  support@ciena.com"
-	    DESCRIPTION
-		    "This MIB defines the managed objects for Inter-chassis Links"
-            REVISION    "201311070000Z"	    
-	    DESCRIPTION
-		    "Initial creation."
-	    ::= { cienaCesConfig 32 }
+        LAST-UPDATED "201706070000Z"
+        ORGANIZATION "Ciena Corp."
+        CONTACT-INFO
+        "   Mib Meister
+            7035 Ridge Road
+            Hanover, Maryland 21076
+            USA
+            Phone:  +1 800 921 1144
+            Email:  support@ciena.com"
+        DESCRIPTION
+               "This MIB defines the managed objects for Inter-chassis Links"
+        REVISION    "201706070000Z"
+            DESCRIPTION 
+                  "Updated contact info."
+        REVISION    "201612090000Z"
+            DESCRIPTION
+                  "Added cienaCesIclType, cienaCesIclVlan objects to the MIB."
+        REVISION    "201608040000Z"	    
+            DESCRIPTION
+                  "Initial creation."
+        ::= { cienaCesConfig 32 }
  
  --
  -- Node definitions
- --	
+ --
  
  cienaCesIclMIBObjects OBJECT IDENTIFIER ::= { cienaCesIclMIB 1 } 
  cienaCesIcl  OBJECT IDENTIFIER ::= { cienaCesIclMIBObjects 1 }  
@@ -55,75 +61,75 @@
  cienaCesIclMIBGroups      OBJECT IDENTIFIER ::= { cienaCesIclMIBConformance 2 } 
    
  CienaCesIclEntry ::=  SEQUENCE {          
-     cienaCesIclIndex               Unsigned32,
-     cienaCesIclName                DisplayString,
-     cienaCesIclRemoteMacAddress    MacAddress,
-     cienaCesIclType                INTEGER,     
-     cienaCesIclVlan                Unsigned32,
-     cienaCesIclVsName              DisplayString,
-     cienaCesIclCfmServicePrimary   DisplayString,
-     cienaCesIclCfmServiceSecondary    DisplayString,   
-     cienaCesIclOperState           CienaGlobalState,  
-     cienaCesIclStatus              INTEGER,
-     cienaCesIclAdminState          CienaGlobalState,
-     cienaCesIclCfmFault            INTEGER,
-     cienaCesIclVplsFault           INTEGER,
-     cienaCesIclRxTimeout           INTEGER,
-     cienaCesIclIntervalMismatch    INTEGER,
-     cienaCesIclHeartbeatInterval   Unsigned32,
-     cienaCesIclUpTime              Unsigned32,
-     cienaCesIclTotalDownTime       Unsigned32,
-     cienaCesIclRxFrames            Counter32,
-     cienaCesIclTxFrames            Counter32, 
-     cienaCesIclRxUnknownFrames     Counter32,
-     cienaCesIclRxHtbtFrames        Counter32,      
-     cienaCesIclTxHtbtFrames        Counter32,
-     cienaCesIclTxFailedFrames      Counter32,
-     cienaCesIclNumberFailures      Counter32,
-     cienaCesIclRxConfigMismatch    Counter32 
-  }     
+     cienaCesIclIndex                 Unsigned32,
+     cienaCesIclName                  DisplayString,
+     cienaCesIclRemoteMacAddress      MacAddress,
+     cienaCesIclType                  INTEGER,
+     cienaCesIclVlan                  Unsigned32,
+     cienaCesIclVsName                DisplayString,
+     cienaCesIclCfmServicePrimary     DisplayString,
+     cienaCesIclCfmServiceSecondary   DisplayString,   
+     cienaCesIclOperState             CienaGlobalState,  
+     cienaCesIclStatus                INTEGER,
+     cienaCesIclAdminState            CienaGlobalState,
+     cienaCesIclCfmFault              INTEGER,
+     cienaCesIclVplsFault             INTEGER,
+     cienaCesIclRxTimeout             INTEGER,
+     cienaCesIclIntervalMismatch      INTEGER,
+     cienaCesIclHeartbeatInterval     Unsigned32,
+     cienaCesIclUpTime                Unsigned32,
+     cienaCesIclTotalDownTime         Unsigned32,
+     cienaCesIclRxFrames              Counter32,
+     cienaCesIclTxFrames              Counter32, 
+     cienaCesIclRxUnknownFrames       Counter32,
+     cienaCesIclRxHtbtFrames          Counter32,
+     cienaCesIclTxHtbtFrames          Counter32,
+     cienaCesIclTxFailedFrames        Counter32,
+     cienaCesIclNumberFailures        Counter32,
+     cienaCesIclRxConfigMismatch      Counter32, 
+     cienaCesIclRxTimeoutMultiplier   Unsigned32 
+  }
 
-     
+
  cienaCesIclTable OBJECT-TYPE
      SYNTAX     SEQUENCE OF CienaCesIclEntry
      MAX-ACCESS not-accessible
      STATUS     current
      DESCRIPTION
-            "The (conceptual) table listing all the  
-	    Inter-chassis Links (ICLs)."  
-     ::= { cienaCesIcl 1 }      
-		
+            "The table lists all the Inter-chassis Links (ICLs)."
+     ::= { cienaCesIcl 1 }
+
  cienaCesIclEntry OBJECT-TYPE
      SYNTAX      CienaCesIclEntry
      MAX-ACCESS  not-accessible
      STATUS      current
      DESCRIPTION
-           "An entry (conceptual row) in the cienaCesIclTable."
+            "An entry in the cienaCesIclTable."
      INDEX { cienaCesIclIndex }
-     ::= { cienaCesIclTable 1 }		
-   
+     ::= { cienaCesIclTable 1 }
+
   cienaCesIclIndex  OBJECT-TYPE
      SYNTAX       Unsigned32 (1..47)
      MAX-ACCESS   read-only
      STATUS       current
      DESCRIPTION
-             "ICL Index for this entry" 
-     ::= { cienaCesIclEntry 1 }   
-     
+            "ICL Index for this entry"
+     ::= { cienaCesIclEntry 1 }
+
   cienaCesIclName  OBJECT-TYPE
      SYNTAX       DisplayString
      MAX-ACCESS   read-only
      STATUS       current
      DESCRIPTION
-             "This object specifies the name of the Inter-chassis link (ICL)." 
+             "This object specifies the name of this ICL Entry."
      ::= { cienaCesIclEntry 2 }
- 
+
  cienaCesIclRemoteMacAddress  OBJECT-TYPE
      SYNTAX       MacAddress
      MAX-ACCESS   read-only
      STATUS       current
      DESCRIPTION
-             "This object specifies the Inter-chassis link remote MAC address." 
+             "This object specifies the remote MAC address of this ICL Entry."
      ::= { cienaCesIclEntry 3 }
 
  cienaCesIclType              OBJECT-TYPE
@@ -152,7 +158,7 @@
      MAX-ACCESS   read-only
      STATUS       current
      DESCRIPTION
-             "This object specifies the ICL VS. This is valid only if cienaCesIclType is vs(2)." 
+             "This object specifies the Virtual Switch assosiated to this ICL Entry."
      ::= { cienaCesIclEntry 6 }
 
  cienaCesIclCfmServicePrimary OBJECT-TYPE
@@ -160,7 +166,7 @@
      MAX-ACCESS   read-only
      STATUS       current
      DESCRIPTION
-             "This object specifies primary CFM service on the ICL." 
+             "This object specifies primary CFM service for the ICL Entry."
      ::= { cienaCesIclEntry 7 }
 
  cienaCesIclCfmServiceSecondary OBJECT-TYPE
@@ -168,29 +174,29 @@
      MAX-ACCESS   read-only
      STATUS       current
      DESCRIPTION
-             "This object specifies the name of the Inter-chassis link (ICL)." 
-     ::= { cienaCesIclEntry 8 }   
-     
+             "This object specifies secondary CFM service for the ICL Entry."
+     ::= { cienaCesIclEntry 8 }
+
  cienaCesIclOperState           OBJECT-TYPE
      SYNTAX       CienaGlobalState
      MAX-ACCESS   read-only
      STATUS       current
      DESCRIPTION
-             "This object specifies the ICL operational state." 
+             "This object specifies the operational state for the ICL Entry." 
      ::= { cienaCesIclEntry 9 } 
-     
+
  cienaCesIclStatus          OBJECT-TYPE
      SYNTAX       INTEGER {
-                 init(1),
-                 active(2),
-                 failed(3),
-                 down(4),
-                 none(5)
-                }
+                    init(1),
+                    active(2),
+                    failed(3),
+                    down(4),
+                    none(5)
+                  }
      MAX-ACCESS   read-only
      STATUS       current
      DESCRIPTION
-             "This object specifies the status of the ICL." 
+             "This object specifies the ICL StateMachine status." 
      ::= { cienaCesIclEntry 10 }
 
  cienaCesIclAdminState          OBJECT-TYPE
@@ -198,25 +204,25 @@
      MAX-ACCESS   read-only
      STATUS       current
      DESCRIPTION
-             "This object specifies the admin state of the ICL." 
+             "This object specifies the admin state of the ICL Entry." 
      ::= { cienaCesIclEntry 11 }
 
  cienaCesIclCfmFault            OBJECT-TYPE
      SYNTAX       INTEGER {
-                 no(1),
-                 yes(2)                 
-                }
+                     no(1),
+                     yes(2)
+                  }
      MAX-ACCESS   read-only
      STATUS       current
      DESCRIPTION
              "This object specifies if CFM fault is set on the ICL." 
-     ::= { cienaCesIclEntry 12 }  
-     
- cienaCesIclVplsFault            OBJECT-TYPE
+     ::= { cienaCesIclEntry 12 }
+
+ cienaCesIclVplsFault           OBJECT-TYPE
      SYNTAX       INTEGER {
-                 no(1),
-                 yes(2)                 
-                }
+                     no(1),
+                     yes(2)                 
+                  }
      MAX-ACCESS   read-only
      STATUS       current
      DESCRIPTION
@@ -225,32 +231,32 @@
 
  cienaCesIclRxTimeout            OBJECT-TYPE
      SYNTAX       INTEGER {
-                 no(1),
-                 yes(2)                 
-                }
+                     no(1),
+                     yes(2)                 
+                     }
      MAX-ACCESS   read-only
      STATUS       current
      DESCRIPTION
              "This object specifies if Rx timeout fault is set on the ICL" 
      ::= { cienaCesIclEntry 14 }
-     
+
  cienaCesIclIntervalMismatch      OBJECT-TYPE
      SYNTAX       INTEGER {
-                 no(1),
-                 yes(2)                 
-                }
+                     no(1),
+                     yes(2)                 
+                  }
      MAX-ACCESS   read-only
      STATUS       current
      DESCRIPTION
              "This object specifies if interval mismatch fault is set on the ICL" 
      ::= { cienaCesIclEntry 15 }   
-     
+
  cienaCesIclHeartbeatInterval   OBJECT-TYPE
      SYNTAX       Unsigned32
      MAX-ACCESS   read-only
      STATUS       current
      DESCRIPTION
-             "This object specifies the ICL heartbeat interval. The range is 1 to 30s and the default is 1s." 
+             "This object specifies the ICL heartbeat interval. The range is 1 to 30sec." 
      ::= { cienaCesIclEntry 16 }
 
  cienaCesIclUpTime              OBJECT-TYPE
@@ -258,7 +264,7 @@
      MAX-ACCESS   read-only
      STATUS       current
      DESCRIPTION
-             "This object specifies total time for which the ICL has been operationally down." 
+             "This object specifies total time for which the ICL has been operationally up." 
      ::= { cienaCesIclEntry 17 }
 
  cienaCesIclTotalDownTime       OBJECT-TYPE
@@ -332,27 +338,37 @@
      DESCRIPTION
              "This object specifies the number of ICL config mismatch frames received." 
      ::= { cienaCesIclEntry 26 }
+
+ cienaCesIclRxTimeoutMultiplier  OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the ICL Rx Timeout multiplier. 
+              ICL Rx Timeout interval = (ICL heartbeat interval) * (Rx Timeout multiplier)" 
+     ::= { cienaCesIclEntry 27 }
+
     
   --
   -- Notification
   --     
-  cienaCesIclStateChange NOTIFICATION-TYPE
-	OBJECTS	{  
-	            cienaGlobalSeverity, 
-	            cienaGlobalMacAddress,
-				cienaCesIclIndex,  
-				cienaCesIclName, 
-				cienaCesIclAdminState,
-				cienaCesIclOperState				
+ cienaCesIclStateChange NOTIFICATION-TYPE
+     OBJECTS{
+              cienaGlobalSeverity, 
+              cienaGlobalMacAddress,
+              cienaCesIclIndex,
+              cienaCesIclName, 
+              cienaCesIclAdminState,
+              cienaCesIclOperState
             }
-	STATUS	current
-	DESCRIPTION
-		"This notification is sent when ICL oper state changes.
-		 Var binding cienaCesIclIndex represents the ICL index." 
-	::= { cienaCesIclMIBNotifications 1 }  
-	 
-  END
- 
+     STATUS   current
+     DESCRIPTION
+             "This notification is sent when ICL oper state changes.
+              Var binding cienaCesIclIndex represents the ICL index." 
+     ::= { cienaCesIclMIBNotifications 1 }  
+
+ END
+
  --
  -- CIENA-CES-ICL-MIB
  --

@@ -26,11 +26,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PollerGroup extends Model
 {
+    use HasFactory;
     public $timestamps = false;
     protected $primaryKey = 'id';
     protected $fillable = ['group_name', 'descr'];
@@ -42,7 +44,7 @@ class PollerGroup extends Model
     {
         parent::boot();
 
-        static::deleting(function (PollerGroup $pollergroup) {
+        static::deleting(function (PollerGroup $pollergroup): void {
             // handle device poller group fallback to default poller
             $default_poller_id = \App\Facades\LibrenmsConfig::get('default_poller_group');
             $pollergroup->devices()->update(['poller_group' => $default_poller_id]);

@@ -19,6 +19,7 @@ These options rely on ```daily.sh``` running from cron as per the installation i
     lnms config:set ports_nac_purge 10
     lnms config:set rrd_purge 0
     lnms config:set ports_purge true
+    lnms config:set networks_purge true
     ```
 
 These options will ensure data within LibreNMS over X days old is
@@ -31,6 +32,10 @@ updated for the set amount of days automatically - only enable this if
 you are comfortable with that happening. (All active RRD files are
 updated every polling period.)
 
+!!! note
+    Please be aware that `rrd_purge` does not work over rrdcached. The rrd folder needs to be accessible via the local file system or remote file share.
+    This is the same for docker and Kubernetes.
+
 ## Ports Purge
 
 Over time as you add devices some interfaces will need to be purged as
@@ -41,3 +46,11 @@ setting `lnms config:set ports_purge true`.
 
 In the Web UI Under the Ports Tab in the Nav Bar, Click on "Deleted"
 then click on "Purge all deleted". This will purge all the ports.
+
+## Networks Purge
+
+If you add and remove subnets, over time you may end up with subnets in
+the database that no longer have any IP addresses attached to them. These
+unused networks can be removed from the database if you enable the 
+networks_purge option.
+

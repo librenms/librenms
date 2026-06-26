@@ -98,7 +98,7 @@ Add/update a device called "snmpsim" to your install and set to use a specific s
 lnms dev:simulate ios_2960x
 ```
 
-You can then run `./discovery.php -h snmpsim -d -v` and `lnms device:poll snmpsim -vvv`
+You can then run `lnms device:discover snmpsim -vv` and `lnms device:poll snmpsim -vv`
 to discover and poll the simulated device.
 
 ## Snmprec format
@@ -156,7 +156,7 @@ must use a variant to store your test data (-v <variant>).
 1. Add device to LibreNMS. It is generic and device_id = 42
 1. Run `./scripts/collect-snmp-data.php -h 42 -v ''`, initial snmprec will be created
 1. [Add initial detection](Initial-Detection.md) for `example-os`
-1. Run discovery to make sure it detects properly `./discovery.php -h 42`
+1. Run discovery to make sure it detects properly `lnms device:discover -vv 42`
 1. Add any additional os items like version, hardware, features, or serial.
 1. If there is additional snmp data required, run
    `./scripts/collect-snmp-data.php -h 42 -v ''`

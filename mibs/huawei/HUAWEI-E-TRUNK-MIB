@@ -1,9 +1,9 @@
 --     =================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description:  The HUAWEI-E-TRUNK-MIB.mib provides information about E-Trunk 
 -- Reference:
--- Version:     V2.06 
+-- Version:     V2.08 
 -- History: 
 --              liwei, 2015-7-30. 
 --              1. Add E-Trunk expected state trap. 
@@ -46,7 +46,7 @@
 
 
         hwETrunkMIB MODULE-IDENTITY 
-            LAST-UPDATED "201507221448Z"
+            LAST-UPDATED "202201210000Z"
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -57,6 +57,12 @@
                    Website: http://www.huawei.com
                    Email: support@huawei.com
                  "
+            DESCRIPTION
+                "Add hwETrunkSecKeyNotCfg and hwETrunkSecKeyResume."     
+            REVISION "202201210000Z"  
+            DESCRIPTION
+                "Add hwETrunkMemberStatusReason for peerBandwidthLarge and localBandwidthLarge."     
+            REVISION "201902252019Z"   
             DESCRIPTION
                 "Add hwETrunkExpectStateChange and hwETrunkExpectStateResume."     
             REVISION "201507221448Z"        
@@ -637,7 +643,9 @@
                     degradedActive(9),
                     peerLinkDown(10),
                     linkDown(11),
-                    allActive(12)	
+                    allActive(12),
+                    peerBandwidthLarge(13),
+                    localBandwidthLarge(14)	
                 }
             MAX-ACCESS read-only
             STATUS current
@@ -654,7 +662,9 @@
                  degradedActive(9):The status of the trill active-active is fail, but the status of the peerlink is up.
                  peerLinkDown(10):The status of the trill active-active is fail, and the status of the peerlink is down. 
                  linkDown(11):The status of the E-Trunk member is down.
-                 allActive(12):The E-Trunk member is bound to an EVPN instance, and the redundancy mode is all-active."
+                 allActive(12):The E-Trunk member is bound to an EVPN instance, and the redundancy mode is all-active.
+                 peerBandwidthLarge(13):The bandwidth of peer E-Trunk member is larger than that of local E-Trunk member.
+                 localBandwidthLarge(14):The bandwidth of local E-Trunk member is larger than that of peer E-Trunk member."
             ::= { hwETrunkMemberEntry 5 }
 
    
@@ -762,6 +772,15 @@
                 "Current operation status of the row. It is used to manage the creation and deletion of conceptual rows."
             ::= { hwETrunkBackupPortEntry 3}
 
+        hwETrunkTrapObjects OBJECT IDENTIFIER ::= { hwETrunkObjects 4 }
+
+        hwETrunkTrapETrunkId OBJECT-TYPE
+            SYNTAX Integer32 (1..128)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The index of the E-Trunk."
+            ::= { hwETrunkTrapObjects 1 }
 
 -- Traps.
 
@@ -798,7 +817,21 @@
             STATUS  current
             DESCRIPTION
                  "The expected state trap of E-Trunk resumed." 
-            ::= { hwETrunkTraps 4 }    
+            ::= { hwETrunkTraps 4 }   
+
+        hwETrunkSecKeyNotCfg  NOTIFICATION-TYPE
+            OBJECTS { hwETrunkTrapETrunkId }
+            STATUS  current
+            DESCRIPTION
+                 "No encryption key is configured for the E-Trunk." 
+            ::= { hwETrunkTraps 5 }    
+
+        hwETrunkSecKeyResume  NOTIFICATION-TYPE
+            OBJECTS { hwETrunkTrapETrunkId }
+            STATUS  current
+            DESCRIPTION
+                 "The encryption key is configured for the E-Trunk." 
+            ::= { hwETrunkTraps 6 }    
 
                    
         hwETrunkConformance OBJECT IDENTIFIER ::= { hwETrunkMIB 3 }
@@ -872,7 +905,9 @@
             ::= { hwETrunkGroups 2 }
 
         hwETrunkNotificationGroup NOTIFICATION-GROUP
-            NOTIFICATIONS { hwETrunkStatusChange, hwETrunkMemberStatusChange,hwETrunkExpectStateChange,hwETrunkExpectStateResume  }
+            NOTIFICATIONS {
+                hwETrunkStatusChange, hwETrunkMemberStatusChange,hwETrunkExpectStateChange,hwETrunkExpectStateResume,
+                hwETrunkSecKeyNotCfg, hwETrunkSecKeyResume }
             STATUS current
             DESCRIPTION 
                 "Description."

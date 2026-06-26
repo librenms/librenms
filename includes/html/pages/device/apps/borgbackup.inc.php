@@ -11,19 +11,19 @@ $mode = $app->data['mode'] ?? 'single';
 $errored = $app->data['errored'] ?? [];
 
 // option bar only needed if there are errors or multiple repos
-if (strcmp($data['mode'], 'multi') == 0 || isset($errored['0'])) {
+if (strcmp((string) $data['mode'], 'multi') == 0 || isset($errored['0'])) {
     print_optionbar_start();
 
     // handle total/repos bar if multi
-    if (strcmp($data['mode'], 'multi') == 0) {
+    if (strcmp((string) $data['mode'], 'multi') == 0) {
         echo generate_link('Totals', $link_array);
         echo ' | Repos: ';
         $repos = $app->data['repos'] ?? [];
         sort($pools);
         foreach ($pools as $index => $repo) {
             $label = $vars['borgbackup'] == $repo
-                ? '<span class="pagemenu-selected">' . htmlspecialchars($repo) . '</span>'
-                : htmlspecialchars($repo);
+                ? '<span class="pagemenu-selected">' . htmlspecialchars((string) $repo) . '</span>'
+                : htmlspecialchars((string) $repo);
 
             echo generate_link($label, $link_array, ['borgbackup' => $repo]);
 
@@ -34,10 +34,10 @@ if (strcmp($data['mode'], 'multi') == 0 || isset($errored['0'])) {
     }
 
     // handle errors if present
-    if (strcmp($data['mode'], 'multi') == 0 && isset($errored['0'])) {
+    if (strcmp((string) $data['mode'], 'multi') == 0 && isset($errored['0'])) {
         echo "\n<br>\nErrored Repos: " . htmlspecialchars(implode(', ', array_keys($errored)));
-    } elseif (strcmp($data['mode'], 'single') == 0 && isset($errored['0'])) {
-        echo "\n<br>\nError: " . htmlspecialchars($errored['single']);
+    } elseif (strcmp((string) $data['mode'], 'single') == 0 && isset($errored['0'])) {
+        echo "\n<br>\nError: " . htmlspecialchars((string) $errored['single']);
     }
     print_optionbar_end();
 }

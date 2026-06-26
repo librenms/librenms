@@ -42,7 +42,7 @@ class Notification extends Model
         parent::boot();
 
         // delete attribs for this notification
-        static::deleting(function (Notification $notification) {
+        static::deleting(function (Notification $notification): void {
             $notification->attribs()->delete();
         });
     }
@@ -97,7 +97,7 @@ class Notification extends Model
      */
     public function scopeIsUnread(Builder $query, User $user)
     {
-        return $query->whereNotExists(function ($query) use ($user) {
+        return $query->whereNotExists(function ($query) use ($user): void {
             $query->select(DB::raw(1))
             ->from('notifications_attribs')
             ->whereRaw('notifications.notifications_id = notifications_attribs.notifications_id')
@@ -114,24 +114,6 @@ class Notification extends Model
     {
         $query->leftJoin('notifications_attribs', 'notifications_attribs.notifications_id', 'notifications.notifications_id')
             ->where(['notifications_attribs.key' => 'sticky', 'notifications_attribs.value' => 1]);
-    }
-
-    /**
-     * @param  Builder<Notification>  $query
-     * @return Builder<Notification>
-     */
-    public function scopeLimit(Builder $query)
-    {
-        return $query->select('notifications.*', 'key', 'users.username');
-    }
-
-    /**
-     * @param  Builder<Notification>  $query
-     * @return Builder|static
-     */
-    public function scopeSource(Builder $query)
-    {
-        return $query->leftJoin('users', 'notifications.source', '=', 'users.user_id');
     }
 
     // ---- Define Relationships ----

@@ -39,7 +39,7 @@ $serverscheck_oids = [
 
 foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {
     if (Str::contains($oid_name, 'name') && Str::contains($oid_value, ['Flooding', 'Leckage'])) {
-        preg_match("/(\d+)/", $oid_name, $temp_x);
+        preg_match("/(\d+)/", (string) $oid_name, $temp_x);
         $tmp_oid = 'sensor' . $temp_x[0] . 'Value.0';
         $current = $pre_cache['serverscheck_control'][$tmp_oid];
         $state_name = 'Serverscheck_FloodSensor';
@@ -47,9 +47,9 @@ foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {
             $index = str_replace('.0', '', $oid_name);
             $descr = $oid_value;
             $states = [
-                ['value' => 1, 'generic' => 1, 'graph' => 1, 'descr' => '-'],
-                ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'DRY'],
-                ['value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'WET'],
+                ['value' => 1, 'generic' => 1, 'descr' => '-'],
+                ['value' => 2, 'generic' => 0, 'descr' => 'DRY'],
+                ['value' => 4, 'generic' => 2, 'descr' => 'WET'],
             ];
             create_state_index($state_name, $states);
 

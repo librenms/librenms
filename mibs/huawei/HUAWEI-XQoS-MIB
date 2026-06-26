@@ -1,10 +1,10 @@
 -- =================================================================
--- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2023 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: This mib file is used for management of huawei Class Based 
 --              QoS information. 
 -- Reference:
--- Version:     V3.70
+-- Version:     V3.74
 -- History:
 --              v1.0 tianli,2004.4.10,publish  
 --              v1.1
@@ -97,7 +97,7 @@
 --            V2.60
 --                  modified by wangcheng
 --            V2.61 
---                  modified by liangyun 00353956
+--                  modified by liangyun 
 --            V2.62 
 --                  modified by wanghongke
 --            V2.63 
@@ -268,6 +268,12 @@
 --                  modified by zhaohaoran
 --            V3.70
 --                  modified by qixin
+--            V3.71
+--                  modified by xiazijie
+--            V3.73
+--                  modified by zhaohaoran
+--            V3.74
+--                  modified by qixin
 -- =================================================================
 
 HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
@@ -289,7 +295,7 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
             FROM HUAWEI-CBQOS-MIB;
 
     --BaType         
-    BaType ::= TEXTUAL-CONVENTION
+    BaType ::= TEXTUAL-CONVENTION     
         STATUS  current  
         DESCRIPTION
             "The Direction Policy apply on."                 
@@ -307,7 +313,7 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
 
 
     hwXQoSMIB MODULE-IDENTITY 
-        LAST-UPDATED  "202209141422Z"
+        LAST-UPDATED  "202302012018Z"
         ORGANIZATION 
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
@@ -320,52 +326,72 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
              "  
         DESCRIPTION
          "MODULE-IDENTITY"
+     --add by qixin	 
+       REVISION "202302012018Z"
+       DESCRIPTION
+         "Add hwXQoSFwdResourceOverload, hwXQoSFwdResourceOverloadResume"
+
+     --add by zhaohaoran	 
+       REVISION "202212132201Z"
+       DESCRIPTION
+         "Delete useless comments"
+		 
+    --add by suyibo
+      REVISION "202211301655Z"
+      DESCRIPTION
+         "Add  hwXQoSCarPercent"
+
+    --add by xiazijie
+      REVISION "202211281132Z"
+      DESCRIPTION
+         "Add  hwXQoSReceivedMultiPauseFrameInterfaceDownAlarm, hwXQoSTrunkTrafficCongestionAlarm"
+
     --add by qixin
       REVISION "202209141422Z"
       DESCRIPTION
          "Add  hwXQoSBoardHQoSFailAlarm, hwXQoSInterfaceHQoSFailAlarm"
 
-    --add by zhaohaoran 00668125
+    --add by zhaohaoran 
       REVISION "202207211154Z"
       DESCRIPTION
          "Modify  datatype of hwXQoSRedirectNextHopEventLogRdrType hwXQoSInterfaceDownRedirectNextHopInvalidAlarmRdrType to string"
 
-    --add by yanghao 00480253
+    --add by yanghao 
       REVISION "202207061539Z"
       DESCRIPTION
          "Add hwXACLEPGRuleAlarm hwXACLEPGRuleResume"
 
-    --add by tanyashi 00640677
+    --add by tanyashi 
       REVISION "202205181538Z"
       DESCRIPTION
          "Modify  hwXQosCarResourceServiceType"
 
-    --add by tanyashi 00640677
+    --add by tanyashi 
       REVISION "202204262216Z"
       DESCRIPTION
          "Modify  hwXQosCarResourceServiceType"
 
-    --add by xiazijie 30001596
+    --add by xiazijie 
       REVISION "202204161537Z"
       DESCRIPTION
          "Add  hwXQoSModeChannelOverEthBnBwdAlarm,hwXQoSModeChannelOverEthBnBwdResume"
 
-    --add by zhaobolun 00622819
+    --add by zhaobolun 
       REVISION "202201291420Z"
       DESCRIPTION
          "Modify  hwXQoSCarBindwidthExceedChipLimitAlarm,hwXQoSCarBindwidthExceedChipLimitResume"
 
-    --add by qixin 00586839
+    --add by qixin 
       REVISION "202201261200Z"
       DESCRIPTION
          "Add  hwXQoSCarBindwidthExceedChipLimitAlarm,hwXQoSCarBindwidthExceedChipLimitResume"
 	 
-    --add by tanyashi 00640677
+    --add by tanyashi 
       REVISION "202201132019Z"
       DESCRIPTION
          "Add  hwXQoSModeFlexeOverPortShapAlarmObjects, hwXQoSModeFlexeOverPortShapAlarm, hwXQoSModeFlexeOverPortShapAlarmClear"
 
-    --add by huangliang 00569946
+    --add by huangliang 
       REVISION "202112030955Z"
       DESCRIPTION
          "Modify hwXQoSPacketsDropInterfaceAlarm"
@@ -374,76 +400,76 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION
          "Delete useless comments"
 
-  --add by qixin 00586839
+  --add by qixin 
       REVISION "202111012200Z"
       DESCRIPTION
          "Modify  hwXQoSUnsupportedActionAlarmObjects"
 
-  --add by qixin 00586839
+  --add by qixin 
       REVISION "202110272200Z"
       DESCRIPTION
          "Add  hwXQoSUnsupportedActionAlarmObjects,hwXQoSUnsupportedActionAlarm,hwXQoSUnsupportedActionRusume"
 
-    --add by qiaojuyang 00434574
+    --add by qiaojuyang 
 	REVISION "202107271033Z"
     DESCRIPTION
         "ADD  hwXQoSModuleAlarmPatchStub, hwXQoSModuleAlarmPatchStubResume"
 
-    --add by qiaojuyang 00434574
+    --add by qiaojuyang 
 	REVISION "202107271033Z"
     DESCRIPTION
         "ADD  hwXQoSSlotAlarmPatchStub, hwXQoSSlotAlarmPatchStubResume"
 
-    --add by qiaojuyang 00434574
+    --add by qiaojuyang 
 	REVISION "202107271033Z"
     DESCRIPTION
         "ADD  hwXQoSDevAlarmPatchStub, hwXQoSDevAlarmPatchStubResume"
 
-  --add by qixin 00586839
+  --add by qixin 
       REVISION "202107052230Z"
       DESCRIPTION
          "Add  hwXQoSUserQueueApplyPirExhaustionAlarmObjects,hwXQoSUserQueueApplyPirPreAlarmObjects,hwXQoSUserQueuePirAdjustAlarmObjects,hwXQoSUserQueueApplyPirExhaustionAlarm,hwXQoSUserQueueApplyPirPreAlarm,hwXQoSUserQueuePirAdjustAlarm"
 
-   --add by zhoujing z30003289
+   --add by zhoujing 
    REVISION "202106221444Z"
    DESCRIPTION
 	 "Modify hwXQoSCarIfApplyDirection"
  	 
-   --add by xushijie x00600153
+   --add by xushijie 
    REVISION "202106101925Z"
    DESCRIPTION
 	 "Modify hwXQoSBaName" 
 		 
-   --add by chenlong c00588009
+   --add by chenlong 
    REVISION "202106011501Z"
    DESCRIPTION
 	 "Modify hwXQoSPacketsDropInterfaceAlarmResume and hwXQoSPacketsDropInterfaceAlarmTable" 
 
-  --add by wangjian 00421122
+  --add by wangjian 
       REVISION "202105271621Z"
       DESCRIPTION
          "Modify  hwXQoSOutPfcTurnOff, hwXQoSOutPfcTurnOffResume"
 
-  --add by wangjian 00421122
+  --add by wangjian 
       REVISION "202105261534Z"
       DESCRIPTION
          "ADD  hwXQoSOutPfcTurnOff, hwXQoSOutPfcTurnOffResume"
 
-  --add by qixin 00586839
+  --add by qixin 
       REVISION "202104211150Z"
       DESCRIPTION
          "Delete  hwXQoSBgpFlowspecDestinationOriginAsOverAlarmObjects"
 
-  --add by qixin 00586839
+  --add by qixin 
       REVISION "202104091150Z"
       DESCRIPTION
          "ADD  hwXQoSInterfaceDownRedirectNextHopInvalidAlarmObjects,hwXQoSInterfaceDownRedirectNextHopInvalidAlarm,hwXQoSInterfaceDownRedirectNextHopInvalidAlarmClear,hwXQoSRedirectNextHopEventLogObjects, hwXQoSRedirectNextHopEventLog, hwXQoSBgpFlowspecDestinationOriginAsOverAlarm, hwXQoSBgpFlowspecDestinationOriginAsOverAlarmClear, hwXQoSBgpFlowspecDestinationOriginAsOverAlarmObjects"
 
-  --add by dongyanan 00587948
+  --add by dongyanan 
       REVISION "202103041030Z"
       DESCRIPTION
          "ADD  hwXQoSModeChannelOverBandwidthAlarm, hwXQoSModeChannelOverBandwidthAlarmResume"
-  --add by dongyanan 00587948
+  --add by dongyanan 
       REVISION "202101122046Z"
       DESCRIPTION
          "ADD  hwXQoSModeChannelOverBandwidthAlarm, hwXQoSModeChannelOverBandwidthAlarmResume, hwXQoSUserQueueResPoolIndex"
@@ -532,22 +558,22 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION
          "Modify  hwXQoSUserQueueResourceEntry"
 
-  --add by guohongbo 30000385
+  --add by guohongbo 
       REVISION "202003200850Z"
       DESCRIPTION
          "Modify  hwXQoSModeChannelOverPortShapAlarm describtion"
 
-  --add by guohongbo 30000385
+  --add by guohongbo 
       REVISION "202003190850Z"
       DESCRIPTION
          "Modify  hwXQoSModeChannelOverPortShapAlarm describtion"
 
-  --add by guohongbo 30000385
+  --add by guohongbo 
       REVISION "202003171915Z"
       DESCRIPTION
          "Modify  hwXQoSPortShapingBandwidthOverAlarm to hwXQoSModeChannelOverPortShapAlarm"
 		 
-  --add by guohongbo 30000385
+  --add by guohongbo 
       REVISION "202003031151Z"
       DESCRIPTION
          "ADD  hwXQoSPortShapingBandwidthOverAlarm, hwXQoSPortShapingBandwidthOverAlarmClear"
@@ -571,7 +597,7 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION
          "MOD hwXQoSAclTcamResAclType"
 		 
-  --add by xiaozhiguang 00427076
+  --add by xiaozhiguang 
       REVISION "201909212026Z"
       DESCRIPTION
          "ADD hwXQoSTrafficSuppressionTrap, hwXQoSTrafficSuppIfIndex, hwXQoSTrafficSuppIfName, hwXQoSTrafficSuppBroadDropPkts, hwXQoSTrafficSuppMultiDropPkts, hwXQoSTrafficSuppUniDropPkts, hwXQoSTrafficSuppKnownMultiDropPkts, hwXQoSTrafficSuppKnownUniDropPkts, hwXQoSTrafficSuppressionEntry and hwXQoSTrafficSuppressionTable."
@@ -581,101 +607,101 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION
          "MOD hwXQoSIfLrCfgVlanID"
 
-   --add by dingsong 00480198
+   --add by dingsong 
        REVISION "201906120953Z"
        DESCRIPTION
           "ADD hwXACLEPGGroupMemberV6Alarm, hwXACLEPGGroupMemberV6Resume"
 
-  --add by panchao 00465316
+  --add by panchao 
     REVISION "201905141049Z"
     DESCRIPTION
          "MOD hwXQoSRedirectNextHopInvalidAlarmTable"
 
-  --add by liuxu 00467285
+  --add by liuxu 
     REVISION "201904221547Z"
     DESCRIPTION
          "MOD hwXQosCarResourceTable"
 		 
-  --add by shenlin 00454026
+  --add by shenlin 
     REVISION "201902282136Z"
     DESCRIPTION
          "MOD hwEnpPerformanceAlarm, hwEnpPerformanceAlarmResume"
          
-  --add by liuxu 00467285
+  --add by liuxu 
     REVISION "201902122126Z"
     DESCRIPTION
          "MOD ResetFlag, hwXQoSUserQueueResSlotID, hwXQoSUserGroupQueueResSlotID, hwXQoSSubPortQueueResSlotID, hwXQoSChannelResSlotID"
 
-  --add by liuxu 00467285
+  --add by liuxu 
     REVISION "201901300900Z"
     DESCRIPTION
          "MOD hwXQoSCpCarSlotId, hwXQoSBindingTrafficPolicyResSlotID, hwXQoSAclTcamResSlotID, hwXQoSBindingTrafficPolicyChassisResSlotID, hwXQoSCpDefendSlotId"
 
-  --add by jiangruochen 00467275
+  --add by jiangruochen 
     REVISION "201901221500Z"
     DESCRIPTION
          "ADD hwXQoSBindingTrafficPolicyChassisResourceTable"
 
-  --add by xuehui 00471789
+  --add by xuehui 
     REVISION "201812211406Z"
     DESCRIPTION
          "MOD hwXACLResourceAlarm, hwXACLResourceResume"
 
-  --add by pengsheng 00191075
+  --add by pengsheng 
     REVISION "201812060940Z"
     DESCRIPTION
          "MOD hwXQoSPfcApplyFailAlarmResume, hwXQoSPfcTurnOffResume"
 
-   --add by lihongling 00352815
+   --add by lihongling 
       REVISION "201811231435Z" 
        DESCRIPTION 
           "add hwXQoSFlowWredResourceTable"
 
-   --add by xuehui 00471789
+   --add by xuehui 
      REVISION "201811202029Z"
      DESCRIPTION
          "MOD  hwXACLResourceAlarm , hwXACLResourceResume"
 
-   --add by xuehui 00471789
+   --add by xuehui 
      REVISION "201811141146Z"
      DESCRIPTION
          "MOD  hwXACLResourceAlarm , hwXACLResourceResume"
     
-   --add by xuehui 00471789
+   --add by xuehui 
      REVISION "201811061827Z"
      DESCRIPTION
          "ADD  hwXACLResourceAlarm , hwXACLResourceResume"
 
-   --add by shenjiulong 00216198
+   --add by shenjiulong 
      REVISION "201811052005Z"
       DESCRIPTION
          "ADD  hwXQOSFlowControlAlarm , hwXQOSFlowControlAlarmResume"
 
-  --add by zhaoqingqing 00348648
+  --add by zhaoqingqing 
     REVISION "201810271739Z"
     DESCRIPTION
          "ADD  hwXACLEPGEnableAlarm, hwXACLEPGEnableResume"
 
-  --add by xuehui 00471789
+  --add by xuehui 
     REVISION "201810220941Z"
     DESCRIPTION
          "MOD hwXACLEPGGroupMemberAlarmEntry"
 
-  --add by dongyanhong 00427154
+  --add by dongyanhong 
     REVISION "201809301739Z"
     DESCRIPTION
          "MOD hwXQoSStormControlAction, hwXQoSStormControlBcMode, hwXQoSStormControlMcMode, hwXQoSStormControlUcMode"
 
-  --add by pengsheng 00191075
+  --add by pengsheng 
     REVISION "201809251739Z"
     DESCRIPTION
          "ADD  hwXQoSPfcApplyFailAlarm, hwXQoSPfcApplyFailAlarmResume"
 
-    --add by zhaoqingqing 00348648
+    --add by zhaoqingqing 
       REVISION "201809151739Z"
       DESCRIPTION
          "ADD  hwXACLEPGCreateGroupAlarm, hwXACLEPGCreateGroupResume, hwXACLEPGGroupMemberAlarm, hwXACLEPGGroupMemberResume, hwXACLEPGPolicyAlarm, hwXACLEPGPolicyResume"
-    --add by zhaomingzhe 00415565
+    --add by zhaomingzhe 
       REVISION "201809081730Z"
       DESCRIPTION
          "ADD  hwXQoSStormControlBroadcastRate, hwXQoSStormControlMulticastRate, hwXQoSStormControlUnicastRate"
@@ -689,13 +715,13 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
       REVISION "201808221151Z"
       DESCRIPTION
          "ADD  hwXQoSHardPipeStatisticsExtTable, hwXQoSHardPipeAccessStatisticsExtTable, hwXQoSPortQueueStatisticsExtTable, hwXQoSIfQueueExtRunInfoTable"
-    --add by gaolikun 00181543
-    --add by gaolikun 00181543
+    --add by gaolikun 
+    --add by gaolikun 
       REVISION "201807311739Z"
       DESCRIPTION
          "ADD  hwXQoSTMPerformanceAlarm, hwXQoSTMPerformanceAlarmClear"
 		 
-    --add by zhouzaihua 00215230
+    --add by zhouzaihua 
       REVISION "201807301739Z"
       DESCRIPTION
          "ADD  hwXQoSInterfaceIngressDropAlarm, hwXQoSInterfaceIngressDropAlarmResume"
@@ -705,12 +731,12 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION
          "MOD hwXQoSPortShapPercent" 
 
-    --add by guanqingyu 00279173
+    --add by guanqingyu 
       REVISION "201807031459Z"
       DESCRIPTION
          "Add hwXQoSCarStatisticsExtTable And hwXQoSIfCarStatisticsExtTable" 
 
-    --add by qilongfei 00278012
+    --add by qilongfei 
       REVISION "201806011739Z"
       DESCRIPTION
          "Add hwXQoSQppbPolicyStatisticsExtTable And hwXQoSQppbGlobalStatisticsExtTable" 
@@ -720,27 +746,27 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION
          "MOD hwXQosCarResourceServiceType " 
 
-    --add by lidapeng 00428136
+    --add by lidapeng 
       REVISION "201805101739Z"
       DESCRIPTION
          "ADD hwXQoSHardPipeApplySQFailAlarm, hwXQoSHardPipeApplySQFailAlarmClear"
     
-    --add by liyuanze 00373298
+    --add by liyuanze 
       REVISION "201804261739Z"
       DESCRIPTION
          "ADD  hwXACLFEIMemoryFullAlarm, hwXACLFEIMemoryFullAlarmResume"
 
-    --add by zhouzaihua 00215230
+    --add by zhouzaihua 
       REVISION "201804251739Z"
       DESCRIPTION
          "ADD  hwXQoSQueueStatisticsMulticastObjects"
  
-    --add by zhouzaihua 00215230
+    --add by zhouzaihua 
     REVISION "201804191739Z"
     DESCRIPTION
          "ADD  hwXQoSIfCarDiscardAlarm, hwXQoSIfCarDiscardAlarmResume"
  
-    --add by wangyan 00242782
+    --add by wangyan 
     REVISION "201804161739Z"
       DESCRIPTION
          "ADD  hwXACLFEIMemoryFullAlarm, hwXACLFEIMemoryFullAlarmResume"
@@ -756,16 +782,16 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
       REVISION "201801311139Z"
       DESCRIPTION
          "MOD  hwXQoSCpApplyPolicyName,hwXQoSCpCarActionPolicyName, hwXQoSCBPairResTrafficPolicyName"
-         --add by hanhongyun 00415689
-         --add by hehaiyan 00201775
+         --add by hanhongyun 
+         --add by hehaiyan 
      REVISION "201801231739Z"
      DESCRIPTION
          "ADD  hwXQoSPfcDeadLock, hwXQoSPfcDeadLockResume"
-         --add by hehaiyan 00201775
+         --add by hehaiyan 
      REVISION "201801221739Z"
      DESCRIPTION
          "ADD  hwXQosQueueExcepAlarm, hwXQosQueueExcepAlarmResume"
-         --add by hehaiyan 00201775
+         --add by hehaiyan 
      REVISION "201801151739Z"
       DESCRIPTION
          "MOD  hwXQoSPortQueueStatisticsQueueIndex, "
@@ -785,11 +811,11 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
             "The HUAWEI-XQoS-MIB contains objects to 
             Manage configuration and Monitor running state 
             for Class Based QoS feature." 
-     --add by tianhao 00344004
+     --add by tianhao 
      REVISION "201711101739Z"
       DESCRIPTION
          "MOD  HwXQoSIfQueueRunInfoEntry, "
-     --add by zhouzaihua 00215230
+     --add by zhouzaihua 
      REVISION "201710231739Z"
       DESCRIPTION
          "ADD  hwXQoSIngressAgingDiscardAlarm, hwXQoSIngressAgingDiscardAlarmResume"
@@ -802,15 +828,15 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
      REVISION "201709021739Z"
       DESCRIPTION
          "MODIFY  hwXQoSRedirectNextHopInvalidAlarm,hwXQoSRedirectNextHopInvalidAlarmClear" 
-  --add by yejun 00401877
+  --add by yejun 
      REVISION "201707290406Z"
       DESCRIPTION
          "MODIFY  hwXQoSHardPipeAlarmTable,hwXQoSSoftPipeAlarmTable,hwXQoSHardPipeBwAlarmTable"  
-   --add by zhouzaihua 00215230
+   --add by zhouzaihua 
      REVISION "201707251739Z"
       DESCRIPTION
          "ADD  hwXQosIngressPktsDiscardAlarm, hwXQoSIngressPktsDiscardAlarmResume"
-  --add by sunqirui 00242845
+  --add by sunqirui 
      REVISION "201707041532Z"
       DESCRIPTION
          "ADD  hwXQoSStormSuppressAlarm, hwXQoSStormSuppressAlarmResume, hwXQoSStormSuppressSlotAlarm, hwXQoSStormSuppressSlotAlarmResume"  
@@ -823,7 +849,7 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
      REVISION "201707011739Z"
       DESCRIPTION
          "MODIFY  hwXQoSHardPipeStatisticsTable"  
-  --add by zhouzaihua 00215230
+  --add by zhouzaihua 
      REVISION "201707011739Z"
       DESCRIPTION
          "ADD  hwXQoUnicastPktsDiscardAlarm, hwXQoSUnicastPktsDiscardAlarmResume"
@@ -836,7 +862,7 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION
          "ADD  hwXQoSIfCarCfgInfoTable, hwXQoSIfLrCfgInfoTable, hwXQoSIfQueueCfgInfoTable, hwXQoSIfQueueRunInfoTable, hwXQoSIfCarStatisticsTable, hwXQoSUserQueueResourceTable, hwXQoSUserGroupQueueResourceTable, hwXQoSSubPortQueueResourceTable, hwXQoSChannelResourceTable, hwXQoSTemplateResourceTable, hwXQoSCBPairResourceTable, hwXQoSBindingTrafficPolicyResourceTable, hwXQoSAclTcamResourceTable, hwXQosBoardCarResourceTable, hwXQoSPortQueueAlarmExTable "   
 
-    --add by zhouzaihua 00215230
+    --add by zhouzaihua 
      REVISION "201706131739Z"
       DESCRIPTION
          "ADD  hwXQoSRcyPortPktsDropAlarm, hwXQoSRcyPortPktsDropAlarmResume"
@@ -845,11 +871,11 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
        REVISION "201705061438Z"
        DESCRIPTION
           "ADD hwXQoSIfLrRealCir"
-    --add by zhouzaihua 00215230
+    --add by zhouzaihua 
      REVISION "201705041739Z"
       DESCRIPTION
          "ADD  hwXQoSPacketsDropInterfaceAlarm, hwXQoSPacketsDropInterfaceAlarmResume"
-  --add by sunqirui 00242845
+  --add by sunqirui 
      REVISION "201702251739Z"
       DESCRIPTION
          "ADD  hwXQoSStormControlAlarm, hwXQoSStormControlAlarmResume"   
@@ -858,7 +884,7 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
        DESCRIPTION
           "MOD  hwXQoSCarStatisticsSlotNumber"
 
-      --add by zhouzaihua 00215230
+      --add by zhouzaihua 
        REVISION "201702241022Z"
        DESCRIPTION
           "ADD  hwXQoSUnicastPktsCongestionAlarm, hwXQoSUnicastPktsCongestionAlarmResume"
@@ -868,17 +894,17 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
        DESCRIPTION
           "ADD hwXQoSSubPortQueueResPoolIndex TABLE"
 
-       --add by liangyun 00353956
+       --add by liangyun 
        REVISION "201701131548Z"
        DESCRIPTION
           "ADD hwXQoSHardPipeAccessStatisticsTable TABLE"
         
-       --add by wangcheng 00215154
+       --add by wangcheng 
        REVISION "201612211251Z"
        DESCRIPTION
           "ADD hwXQoSCarObjects"
             
-       --add by lizhen 00379896
+       --add by lizhen 
        REVISION "201611291251Z"
        DESCRIPTION
           "ADD hwXQoSHardPipeBwAlarmTable NODE"
@@ -887,7 +913,7 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
        DESCRIPTION
           "ADD add hwXQOSQueueBufferAlarmDiscard "
  
-      --add by zhangmingming 00357391
+      --add by zhangmingming 
       REVISION "201609291932Z"
       DESCRIPTION
          "Modify hwXQoSCpDefendDiscardedPacketAlarm"    
@@ -895,18 +921,18 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
        REVISION "201609211021Z"
        DESCRIPTION
           "ADD hwXQoSHardPipeApplyFailAlarm at 2016-09-21."
-  --add by pengsheng 00191075
+  --add by pengsheng 
      REVISION "201609031739Z"
       DESCRIPTION
          "ADD  hwXQoSMulticastPktsDiscardAlarm, hwXQoSMulticastPktsDiscardAlarmResume, hwXQoSMulticastPktsDiscardInterfaceAlarm, hwXQoSMulticastPktsDiscardInterfaceAlarmResume"    
        REVISION "201606201428Z"
        DESCRIPTION
           "ADD hwXQoSSoftPipeAlarmTable NODE "  
-   --add by dongyanan 00229838 
+   --add by dongyanan  
       REVISION "201606011201Z" 
        DESCRIPTION 
           "modify hwXQoSIfQueueCfgInfoTable"
-    --add by magang 00349451 
+    --add by magang  
       REVISION "201605311447Z" 
        DESCRIPTION 
           "add hwXQoSQppbPolicyEventLog, hwXQoSQppbPolicyEventLogObjects"
@@ -917,22 +943,22 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
        REVISION "201604211021Z"
        DESCRIPTION
           "MODIFY hwXQoSPortShapingPbsValue"
-    --add by magang 00349451 
+    --add by magang  
       REVISION "201604051930Z" 
        DESCRIPTION 
           "add hwXQoSGlbQPPBEventLog, hwXQoSGlbQPPBEventLogObjects" 
- -- added by chenhao 00240449
+ -- added by chenhao 
     REVISION "201603221436Z"
       DESCRIPTION
          "add VB node of hwXQoSDefendPortCarPassedPacketAlarm and hwXQoSDefendPortCarPassedPacketAlarmClear"    
        REVISION "201601191628Z"
        DESCRIPTION
           "ADD hwRemoteMirrRecoverFailNotify "
-    --add by liye 00200458
+    --add by liye 
     REVISION "201512142028Z"
       DESCRIPTION
          "ADD hwXQosBoardCarResourceTable"      
-    -- added by chenhao 00240449
+    -- added by chenhao 
     REVISION "201512041150Z"
       DESCRIPTION
          "add VB node of hwXQoSCpDefendDiscardedPacketAlarm and hwXQoSCpDefendDiscardedPacketAlarmClear"    
@@ -943,7 +969,7 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
      REVISION "201512021628Z"
       DESCRIPTION
          "modify hwXQoSBufferOverrunHistoryEntry"
-     --add by magang 00349451
+     --add by magang 
      REVISION "201511261851Z"
       DESCRIPTION
          "modify hwXQoSIfQPPBDelAlarm, hwXQoSIfQPPBDelAlarmObjects"
@@ -952,23 +978,23 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
      REVISION "201511261128Z"
       DESCRIPTION
          "add hwXQoSBufferStatisticObjects"
-     --add by magang 00349451
+     --add by magang 
      REVISION "201510231050Z"
       DESCRIPTION
          "add hwXQoSIfQPPBDelAlarm, hwXQoSIfQPPBDelAlarmObjects"
-     --add by songjian 00280711
+     --add by songjian 
      REVISION "201509161050Z"
       DESCRIPTION
          "add hwXQoSQppbPolicyApplyFailAlarm, hwXQoSQppbPolicyApplyFailAlarmClear, hwXQoSQppbPolicyApplyFailAlarmObjects"   
-      --add by wangzhensheng 00163673
+      --add by wangzhensheng 
      REVISION "201509081050Z"
       DESCRIPTION
          "add hwXQoSTrunkProfileNotEffectAlarm" 
-     --add by wangjing 00280821      
+     --add by wangjing       
      REVISION "201507161050Z"
       DESCRIPTION
          "renew description of  hwXQoSRuleFailAlarm, hwXQoSRuleFailInfo and hwXQoSRuleFailAlarmCancel"  
-     --add by wangjing 00280821      
+     --add by wangjing       
      REVISION "201506061428Z"
       DESCRIPTION
          "rename hwXQoSRuleFaileAlarm and hwXQoSRuleFaileAlarmCancel to hwXQoSRuleFailAlarm and hwXQoSRuleFailAlarmCancel"
@@ -978,7 +1004,7 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
      REVISION "201504241025Z"
        DESCRIPTION
           "Modify hwXQoSStormControlTrap"
-    -- added by chenhao 00240449
+    -- added by chenhao 
     REVISION "201501281030Z"
       DESCRIPTION
          "add trap node of hwXQoSDefendPortCarPassedPacketAlarm and hwXQoSDefendPortCarPassedPacketAlarmClear"   
@@ -989,11 +1015,11 @@ REVISION "201412231428Z"
        DESCRIPTION
           "ADD hwXQoSFCoEPriorityAlarm and hwXQoSFCoEPriorityAlarmClear"
 
-      --add by wangjing 00280821    
+      --add by wangjing     
       REVISION "201412161428Z"
        DESCRIPTION
           "Modify hwXQoSVpnAclConflictAlarm, hwXQoSVpnAclConflictAlarmClear information "   
-      --add by wangjing 00280821    
+      --add by wangjing     
       REVISION "201412161428Z"
        DESCRIPTION
           "ADD hwXQoSVpnAclConflictAlarm, hwXQoSVpnAclConflictAlarmClear and hwXQoSVpnAclConflictAlarmTable"   
@@ -1258,6 +1284,17 @@ REVISION "201412231428Z"
             In-outbound(0),
             Inbound(1),
             Outbound(2)
+            }
+--
+--   FwdResourceOverloadType              
+    FwdResourceOverloadType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION 
+            "BandWidthExceed(1)
+            "
+        SYNTAX INTEGER
+            {
+            BandWidthExceed(1)
             }
 --
 -- Node definitions
@@ -11769,7 +11806,7 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
             
     
  
---add by wangjing 00280821  2014/07/22
+--add by wangjing   2014/07/22
 -- ******************************************************************
 --
 --    hwXQoSUserQueueResourceTable
@@ -12889,7 +12926,7 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
             " This object indicates the total number of acl-tcam resource. "    
             ::= { hwXQoSAclTcamResourceEntry 6 }
                                                  
--- end by wangjing 00280821
+-- end by wangjing 
 
 -- ******************************************************************
          
@@ -13852,7 +13889,7 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
             "The interface index."
         ::= { hwXQoSHardPipeCfgAlarmEntry 1 }
                
--- end by sunhongliang 00184792       
+-- end by sunhongliang        
 
 
 --1.3.6.1.4.1.2011.5.25.32.4.1.11.29   
@@ -14494,7 +14531,7 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
     "The configed bandwidth value of hardpipe is equal to the actual bandwidth value."
     ::= { hwXQoSNotifications 48 }
 --end by lizhen
---begin add by yangting 00248638
+--begin add by yangting 
     hwXQoSHardPipeAcBandWthOverAlarm NOTIFICATION-TYPE
             OBJECTS { hwXQoSHardPipeAlarmIfIndex }
      STATUS current
@@ -14508,8 +14545,8 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
      DESCRIPTION 
     "The alarm indicating that the AC-side hard pipe bandwidth exceeded the interface bandwidth and became invalid was cleared."
     ::= { hwXQoSNotifications 62 } 
---end add by yangting 00248638
---begin add by lidapeng 00428136
+--end add by yangting 
+--begin add by lidapeng 
     hwXQoSHardPipeApplySQFailAlarm NOTIFICATION-TYPE
             OBJECTS { hwXQoSHardPipeApplySQFailAlarmIfIndex }
      STATUS current
@@ -14523,7 +14560,7 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
      DESCRIPTION 
     "The alarm of SQID resource application failure was cleared."
     ::= { hwXQoSNotifications 80 } 
---end add by lidapeng 00428136
+--end add by lidapeng 
 
 --begin add by gaolikun 
     hwXQoSTMPerformanceAlarm NOTIFICATION-TYPE
@@ -15200,6 +15237,67 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
             DESCRIPTION 
             "The alarm is cleared when the unsupported HQoS service is processed."
             ::= { hwXQoSNotifications 153 }
+--end
+--begin
+        hwXQoSReceivedMultiPauseFrameInterfaceDownAlarm NOTIFICATION-TYPE
+            OBJECTS { 
+                hwXQoSReceivedMultiPauseFrameInterfaceDownAlarmInterfaceName
+                }
+            STATUS current
+            DESCRIPTION 
+            "The interface line protocol is down after received too many PAUSE frames in a short time."
+            ::= { hwXQoSNotifications 154 }
+
+        hwXQoSReceivedMultiPauseFrameInterfaceDownResume NOTIFICATION-TYPE
+            OBJECTS { 
+                hwXQoSReceivedMultiPauseFrameInterfaceDownAlarmInterfaceName
+                }
+            STATUS current
+            DESCRIPTION 
+            "The interface line protocol recovery up after received not too many PAUSE frames in a short time."
+            ::= { hwXQoSNotifications 155 }
+--end
+--begin
+        hwXQoSTrunkTrafficCongestionAlarm NOTIFICATION-TYPE
+            OBJECTS { 
+                hwXQoSTrunkTrafficCongestionAlarmTrunkName,
+                hwXQoSTrunkTrafficCongestionAlarmSlotId
+                }
+            STATUS current
+            DESCRIPTION 
+            "Traffic congestion occurs on the trunk interface, and traffic on all member interfaces may be affected."
+            ::= { hwXQoSNotifications 156 }
+
+        hwXQoSTrunkTrafficCongestionResume NOTIFICATION-TYPE
+            OBJECTS { 
+                hwXQoSTrunkTrafficCongestionAlarmTrunkName,
+                hwXQoSTrunkTrafficCongestionAlarmSlotId
+                }
+            STATUS current
+            DESCRIPTION 
+            "Traffic congestion on the trunk interface is cleared, and traffic on the member interface recovers."
+            ::= { hwXQoSNotifications 157 }
+--end
+--begin
+        hwXQoSFwdResourceOverload NOTIFICATION-TYPE
+            OBJECTS { 
+                hwXQoSFwdResourceOverloadSlotId,
+                hwXQoSFwdResourceOverloadReasonId
+                }
+            STATUS current
+            DESCRIPTION 
+            "The board forwarding engine resources were overload."
+            ::= { hwXQoSNotifications 158 }
+
+        hwXQoSFwdResourceOverloadResume NOTIFICATION-TYPE
+            OBJECTS { 
+                hwXQoSFwdResourceOverloadSlotId,
+                hwXQoSFwdResourceOverloadReasonId
+                }
+            STATUS current
+            DESCRIPTION 
+            "The alarm is cleared when the board forwarding engine resources overload is recovered."
+            ::= { hwXQoSNotifications 159 }
 --end
 
     hwXQoSGeneral OBJECT IDENTIFIER ::= { hwXQoSObjects 12 }
@@ -17493,7 +17591,7 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
 
                                                        
 -- end by wangfengli   
---add by sunhongliang 00184792 
+--add by sunhongliang  
 -- ******************************************************************
 --
 --   hwXQoSHardPipeConfigTable
@@ -17542,8 +17640,8 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
             " This object indicates the bandwidth of configed hard pipe. "    
             ::= { hwXQoSHardPipeConfigEntry 2 }   
          
--- end by sunhongliang 00184792    
---add by sunhongliang 00184792 
+-- end by sunhongliang     
+--add by sunhongliang  
 -- ******************************************************************
 --
 --   hwXQoSHardPipeAbilityTable
@@ -17598,8 +17696,8 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
             DESCRIPTION
             " This object indicates the hard pipe ability of port. "    
             ::= { hwXQoSHardPipeAbilityEntry 2 }       
---End by sunhongliang 00184792 
---add by liangyun  00353956 
+--End by sunhongliang  
+--add by liangyun   
 -- ******************************************************************
 --
 --   hwXQoSHardPipeAccessStatisticsTable
@@ -17756,7 +17854,7 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
             DESCRIPTION
             " The value of this object identifies the rate of discarded bytes."    
             ::= { hwXQoSHardPipeAccessStatisticsEntry 11 }  
---End by liangyun 00353956 
+--End by liangyun  
 
       hwXQoSQppbPolicyStatisticsExtTable OBJECT-TYPE
           SYNTAX      SEQUENCE OF HwXQoSQppbPolicyStatisticsExtEntry
@@ -19610,103 +19708,109 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
         hwXQoSIfLrDiscardAlarmResume,
         hwXQoSFCoEPriorityAlarm,
         hwXQoSFCoEPriorityAlarmClear,
-        hwXQoSVpnAclConflictAlarm, --add by wangjing 00280821 
-        hwXQoSVpnAclConflictAlarmClear,   --add by wangjing 00280821 
+        hwXQoSVpnAclConflictAlarm, --add by wangjing  
+        hwXQoSVpnAclConflictAlarmClear,   --add by wangjing  
         hwXQoSDefendPortCarPassedPacketAlarm,
         hwXQoSDefendPortCarPassedPacketAlarmClear,
-        hwXQoSMulticastPktsDiscardAlarm,  --add by pengsheng 00191075
-        hwXQoSMulticastPktsDiscardAlarmResume,  --add by pengsheng 00191075
-        hwXQoSMulticastPktsDiscardInterfaceAlarm,  --add by pengsheng 00191075
-        hwXQoSMulticastPktsDiscardInterfaceAlarmResume,  --add by pengsheng 00191075
-        hwXQoSUnicastPktsCongestionInterfaceAlarm,  --add by zhouzaihua 00215230
-        hwXQoSUnicastPktsCongestionInterfaceAlarmResume,  --add by zhouzaihua 00215230
-        hwXQoSPacketsDropInterfaceAlarm,  --add by zhouzaihua 00215230
-        hwXQoSPacketsDropInterfaceAlarmResume,  --add by zhouzaihua 00215230
-        hwXQoSRcyPortPktsDropAlarm,  --add by zhouzaihua 00215230
-        hwXQoSRcyPortPktsDropAlarmResume,  --add by zhouzaihua 00215230
-        hwXQoSUnicastPktsDiscardAlarm,  --add by zhouzaihua 00215230
-        hwXQoSUnicastPktsDiscardAlarmResume,  --add by zhouzaihua 00215230
-        hwXQoSIfCarDiscardAlarm,  --add by zhouzaihua 00215230
-        hwXQoSIfCarDiscardAlarmResume,  --add by zhouzaihua 00215230
-        hwXQoSStormSuppressAlarm,        --add by sunqirui 00242845
-        hwXQoSStormSuppressAlarmResume,  --add by sunqirui 00242845
-        hwXQoSStormSuppressSlotAlarm,        --add by chensenfa 00215131
-        hwXQoSStormSuppressSlotAlarmResume,   --add by chensenfa 00215131
-        hwXQoSIngressPktsDiscardAlarm,  --add by zhouzaihua 00215230
-        hwXQoSIngressPktsDiscardAlarmResume,  --add by zhouzaihua 00215230
-        hwXQoSIngressAgingDiscardAlarm,  --add by zhouzaihua 00215230
-        hwXQoSIngressAgingDiscardAlarmResume, --add by zhouzaihua 00215230
-        hwXQosQueueExcepAlarm,         --add by hehaiyan 00201775
-        hwXQosQueueExcepAlarmResume,  --add by hehaiyan 00201775
-        hwXQoSPfcTurnOffAlarm,         --add by hehaiyan 00201775
-        hwXQoSPfcTurnOffResume,  --add by hehaiyan 00201775
-        hwXQoSPfcDeadLockAlarm,         --add by hehaiyan 00201775
-        hwXQoSPfcDeadLockResume,  --add by hehaiyan 00201775
-        hwXACLFEIMemoryFullAlarm,   --add by wangyan 00242782
-        hwXACLFEIMemoryFullAlarmResume, --add by wangyan 00242782
-        hwXQoSInterfaceIngressDropAlarm,  --add by zhouzaihua 00215230
-        hwXQoSInterfaceIngressDropAlarmResume,  --add by zhouzaihua 00215230
-        hwXQoSTMPerformanceAlarm,  --add by gaolikun 00181543
-        hwXQoSTMPerformanceAlarmClear,  --add by gaolikun 00181543
-        hwXACLEPGCreateGroupAlarm,  --add by zhaoqingqing 00348648
-        hwXACLEPGCreateGroupResume, --add by zhaoqingqing 00348648
-        hwXACLEPGGroupMemberAlarm,  --add by zhaoqingqing 00348648
-        hwXACLEPGGroupMemberResume, --add by zhaoqingqing 00348648
-        hwXACLEPGPolicyAlarm,      --add by zhaoqingqing 00348648
-        hwXACLEPGPolicyResume,       --add by zhaoqingqing 00348648
-        hwXQoSPfcApplyFailAlarm,         --add by pengsheng 00191075
-        hwXQoSPfcApplyFailAlarmResume,   --add by pengsheng 00191075
-        hwXACLEPGEnableAlarm,    --add by zhaoqingqing 00348648
-        hwXACLEPGEnableResume,    --add by zhaoqingqing 00348648
-        hwXQOSFlowControlAlarm,     --add by shenjiulong  00216198
-        hwXQOSFlowControlAlarmResume,    --add by shenjiulong  00216198
-        hwXACLResourceAlarm,      --add by xuehui 00471789
-        hwXACLResourceAlarmResume,      --add by xuehui 00471789
-        hwEnpPerformanceAlarm,      --add by shenlin 00454026
-        hwEnpPerformanceAlarmResume,     --add by shenlin 00454026
-        hwXACLEPGGroupMemberV6Alarm,  --add by dingsong 00480198
-        hwXACLEPGGroupMemberV6Resume, --add by dingsong 00480198
-        hwXQoSModeChannelOverPortShapAlarm, --add by guohongbo 30000385
-        hwXQoSModeChannelOverPortShapAlarmClear, --add by guohongbo 30000385
-        hwXQoSPfcInnerDeadLockAlarm,   --add by maoyingxia 00357054
-        hwXQoSPfcInnerDeadLockResume,  --add by maoyingxia 00357054
-        hwXQoSVlanStormSuppressAlarm,   --add by dujianghai 00455744
-        hwXQoSVlanStormSuppressAlarmResume,  --add by dujianghai 00455744
-        hwXQoSBDStormSuppressAlarm,   --add by dujianghai 00455744
-        hwXQoSBDStormSuppressAlarmResume,  --add by dujianghai 00455744
-        hwXQoSInterfaceDownRedirectNextHopInvalidAlarm,  --add by qixin 00586839
-        hwXQoSInterfaceDownRedirectNextHopInvalidAlarmClear,  --add by qixin 00586839
-        hwXQoSRedirectNextHopEventLog,  --add by qixin 00586839
-        hwXQoSBgpFlowspecDestinationOriginAsOverAlarm,  --add by qixin 00586839
-        hwXQoSBgpFlowspecDestinationOriginAsOverAlarmClear,  --add by qixin 00586839
-        hwXQoSOutPfcTurnOffAlarm,         --add by wangjian 00421122
-        hwXQoSOutPfcTurnOffResume,  --add by wangjian 00421122
-        hwXQoSUserQueueApplyPirExhaustionAlarm,  --add by qixin 00586839
-        hwXQoSUserQueueApplyPirExhaustionResume,  --add by qixin 00586839
-        hwXQoSUserQueueApplyPirPreAlarm,  --add by qixin 00586839
-        hwXQoSUserQueueApplyPirPreResume,  --add by qixin 00586839
-        hwXQoSUserQueuePirAdjustAlarm,  --add by qixin 00586839
-        hwXQoSUserQueuePirAdjustResume,  --add by qixin 00586839
-        hwXQoSModuleAlarmPatchStub,          --add by qiaojuyang 00434574
-        hwXQoSModuleAlarmPatchStubResume,     --add by qiaojuyang 00434574
-        hwXQoSSlotAlarmPatchStub,            --add by qiaojuyang 00434574
-        hwXQoSSlotAlarmPatchStubResume,       --add by qiaojuyang 00434574
-        hwXQoSDevAlarmPatchStub,             --add by qiaojuyang 00434574
-        hwXQoSDevAlarmPatchStubResume,        --add by qiaojuyang 00434574
-        hwXQoSUnsupportedActionAlarm,  --add by qixin 00586839
-        hwXQoSUnsupportedActionResume,  --add by qixin 00586839
-        hwXQoSModeFlexeOverPortShapAlarm, --add by tanyashi 00640677
-        hwXQoSModeFlexeOverPortShapAlarmClear, --add by tanyashi 00640677
+        hwXQoSMulticastPktsDiscardAlarm,  --add by pengsheng 
+        hwXQoSMulticastPktsDiscardAlarmResume,  --add by pengsheng 
+        hwXQoSMulticastPktsDiscardInterfaceAlarm,  --add by pengsheng 
+        hwXQoSMulticastPktsDiscardInterfaceAlarmResume,  --add by pengsheng 
+        hwXQoSUnicastPktsCongestionInterfaceAlarm,  --add by zhouzaihua 
+        hwXQoSUnicastPktsCongestionInterfaceAlarmResume,  --add by zhouzaihua 
+        hwXQoSPacketsDropInterfaceAlarm,  --add by zhouzaihua 
+        hwXQoSPacketsDropInterfaceAlarmResume,  --add by zhouzaihua 
+        hwXQoSRcyPortPktsDropAlarm,  --add by zhouzaihua 
+        hwXQoSRcyPortPktsDropAlarmResume,  --add by zhouzaihua 
+        hwXQoSUnicastPktsDiscardAlarm,  --add by zhouzaihua 
+        hwXQoSUnicastPktsDiscardAlarmResume,  --add by zhouzaihua 
+        hwXQoSIfCarDiscardAlarm,  --add by zhouzaihua 
+        hwXQoSIfCarDiscardAlarmResume,  --add by zhouzaihua 
+        hwXQoSStormSuppressAlarm,        --add by sunqirui 
+        hwXQoSStormSuppressAlarmResume,  --add by sunqirui 
+        hwXQoSStormSuppressSlotAlarm,        --add by chensenfa 
+        hwXQoSStormSuppressSlotAlarmResume,   --add by chensenfa 
+        hwXQoSIngressPktsDiscardAlarm,  --add by zhouzaihua 
+        hwXQoSIngressPktsDiscardAlarmResume,  --add by zhouzaihua 
+        hwXQoSIngressAgingDiscardAlarm,  --add by zhouzaihua 
+        hwXQoSIngressAgingDiscardAlarmResume, --add by zhouzaihua 
+        hwXQosQueueExcepAlarm,         --add by hehaiyan 
+        hwXQosQueueExcepAlarmResume,  --add by hehaiyan 
+        hwXQoSPfcTurnOffAlarm,         --add by hehaiyan 
+        hwXQoSPfcTurnOffResume,  --add by hehaiyan 
+        hwXQoSPfcDeadLockAlarm,         --add by hehaiyan 
+        hwXQoSPfcDeadLockResume,  --add by hehaiyan 
+        hwXACLFEIMemoryFullAlarm,   --add by wangyan 
+        hwXACLFEIMemoryFullAlarmResume, --add by wangyan 
+        hwXQoSInterfaceIngressDropAlarm,  --add by zhouzaihua 
+        hwXQoSInterfaceIngressDropAlarmResume,  --add by zhouzaihua 
+        hwXQoSTMPerformanceAlarm,  --add by gaolikun 
+        hwXQoSTMPerformanceAlarmClear,  --add by gaolikun 
+        hwXACLEPGCreateGroupAlarm,  --add by zhaoqingqing 
+        hwXACLEPGCreateGroupResume, --add by zhaoqingqing 
+        hwXACLEPGGroupMemberAlarm,  --add by zhaoqingqing 
+        hwXACLEPGGroupMemberResume, --add by zhaoqingqing 
+        hwXACLEPGPolicyAlarm,      --add by zhaoqingqing 
+        hwXACLEPGPolicyResume,       --add by zhaoqingqing 
+        hwXQoSPfcApplyFailAlarm,         --add by pengsheng 
+        hwXQoSPfcApplyFailAlarmResume,   --add by pengsheng 
+        hwXACLEPGEnableAlarm,    --add by zhaoqingqing 
+        hwXACLEPGEnableResume,    --add by zhaoqingqing 
+        hwXQOSFlowControlAlarm,     --add by shenjiulong  
+        hwXQOSFlowControlAlarmResume,    --add by shenjiulong  
+        hwXACLResourceAlarm,      --add by xuehui 
+        hwXACLResourceAlarmResume,      --add by xuehui 
+        hwEnpPerformanceAlarm,      --add by shenlin 
+        hwEnpPerformanceAlarmResume,     --add by shenlin 
+        hwXACLEPGGroupMemberV6Alarm,  --add by dingsong 
+        hwXACLEPGGroupMemberV6Resume, --add by dingsong 
+        hwXQoSModeChannelOverPortShapAlarm, --add by guohongbo 
+        hwXQoSModeChannelOverPortShapAlarmClear, --add by guohongbo 
+        hwXQoSPfcInnerDeadLockAlarm,   --add by maoyingxia 
+        hwXQoSPfcInnerDeadLockResume,  --add by maoyingxia 
+        hwXQoSVlanStormSuppressAlarm,   --add by dujianghai 
+        hwXQoSVlanStormSuppressAlarmResume,  --add by dujianghai 
+        hwXQoSBDStormSuppressAlarm,   --add by dujianghai 
+        hwXQoSBDStormSuppressAlarmResume,  --add by dujianghai 
+        hwXQoSInterfaceDownRedirectNextHopInvalidAlarm,  --add by qixin 
+        hwXQoSInterfaceDownRedirectNextHopInvalidAlarmClear,  --add by qixin 
+        hwXQoSRedirectNextHopEventLog,  --add by qixin 
+        hwXQoSBgpFlowspecDestinationOriginAsOverAlarm,  --add by qixin 
+        hwXQoSBgpFlowspecDestinationOriginAsOverAlarmClear,  --add by qixin 
+        hwXQoSOutPfcTurnOffAlarm,         --add by wangjian 
+        hwXQoSOutPfcTurnOffResume,  --add by wangjian 
+        hwXQoSUserQueueApplyPirExhaustionAlarm,  --add by qixin 
+        hwXQoSUserQueueApplyPirExhaustionResume,  --add by qixin 
+        hwXQoSUserQueueApplyPirPreAlarm,  --add by qixin 
+        hwXQoSUserQueueApplyPirPreResume,  --add by qixin 
+        hwXQoSUserQueuePirAdjustAlarm,  --add by qixin 
+        hwXQoSUserQueuePirAdjustResume,  --add by qixin 
+        hwXQoSModuleAlarmPatchStub,          --add by qiaojuyang 
+        hwXQoSModuleAlarmPatchStubResume,     --add by qiaojuyang 
+        hwXQoSSlotAlarmPatchStub,            --add by qiaojuyang 
+        hwXQoSSlotAlarmPatchStubResume,       --add by qiaojuyang 
+        hwXQoSDevAlarmPatchStub,             --add by qiaojuyang 
+        hwXQoSDevAlarmPatchStubResume,        --add by qiaojuyang 
+        hwXQoSUnsupportedActionAlarm,  --add by qixin 
+        hwXQoSUnsupportedActionResume,  --add by qixin 
+        hwXQoSModeFlexeOverPortShapAlarm, --add by tanyashi 
+        hwXQoSModeFlexeOverPortShapAlarmClear, --add by tanyashi 
         hwXQoSCarBindwidthExceedChipLimitAlarm,
         hwXQoSCarBindwidthExceedChipLimitResume,
         hwXQoSModeChannelOverEthBnBwdAlarm,
         hwXQoSModeChannelOverEthBnBwdResume,
-        hwXACLEPGRuleAlarm,       --add by yanghao 00480253
-        hwXACLEPGRuleResume, --add by yanghao 00480253
+        hwXACLEPGRuleAlarm,       --add by yanghao 
+        hwXACLEPGRuleResume, --add by yanghao 
         hwXQoSBoardHQoSFailAlarm,
         hwXQoSBoardHQoSFailResume,
         hwXQoSInterfaceHQoSFailAlarm,
-        hwXQoSInterfaceHQoSFailResume
+        hwXQoSInterfaceHQoSFailResume,
+        hwXQoSReceivedMultiPauseFrameInterfaceDownAlarm,
+        hwXQoSReceivedMultiPauseFrameInterfaceDownResume,
+        hwXQoSTrunkTrafficCongestionAlarm,
+        hwXQoSTrunkTrafficCongestionResume,
+        hwXQoSFwdResourceOverload,
+        hwXQoSFwdResourceOverloadResume
         }
         STATUS  current
         DESCRIPTION
@@ -20953,7 +21057,9 @@ hwXQoSBufferOverrunHistoryEntry OBJECT-TYPE
               hwXQoSCarPbs
                 Unsigned32,
               hwXQoSCarCfgRowStatus
-                RowStatus
+                RowStatus,
+              hwXQoSCarPercent
+                Unsigned32
                 } 
         
     hwXQoSCarIndex OBJECT-TYPE
@@ -21010,8 +21116,16 @@ hwXQoSBufferOverrunHistoryEntry OBJECT-TYPE
         STATUS current
         DESCRIPTION
                 "RowStatus. Three actions are used: active, createAndGo, destroy."
-        ::= { hwXQoSCarCfgInfoEntry 7 }
-    
+        ::= { hwXQoSCarCfgInfoEntry 7 } 
+
+    hwXQoSCarPercent OBJECT-TYPE
+          SYNTAX Unsigned32
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+          "The value of this object identifies the Percentage of the Bandwidth Rate as the CIR(unit: percent)."
+          ::= { hwXQoSCarCfgInfoEntry 8 } 
+
     hwXQoSCarIfApplyTable OBJECT-TYPE
         SYNTAX SEQUENCE OF HwXQoSCarIfApplyEntry
         MAX-ACCESS not-accessible
@@ -24074,6 +24188,128 @@ hwXQoSBufferOverrunHistoryEntry OBJECT-TYPE
         DESCRIPTION
         "The description of the alarm cause."
         ::= { hwXQoSInterfaceHQoSFailAlarmEntry 5 }
+--END
+--BEGIN
+    hwXQoSReceivedMultiPauseFrameInterfaceDownAlarmObjects OBJECT IDENTIFIER ::= { hwXQoSObjects 133 }
+
+    hwXQoSReceivedMultiPauseFrameInterfaceDownAlarmTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwXQoSReceivedMultiPauseFrameInterfaceDownAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "hwXQoSReceivedMultiPauseFrameInterfaceDownAlarmTable"
+        ::= { hwXQoSReceivedMultiPauseFrameInterfaceDownAlarmObjects 1 }
+
+    hwXQoSReceivedMultiPauseFrameInterfaceDownAlarmEntry OBJECT-TYPE
+        SYNTAX HwXQoSReceivedMultiPauseFrameInterfaceDownAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "hwXQoSReceivedMultiPauseFrameInterfaceDownAlarmEntry"
+        INDEX { hwXQoSReceivedMultiPauseFrameInterfaceDownAlarmInterfaceName }
+        ::= { hwXQoSReceivedMultiPauseFrameInterfaceDownAlarmTable 1 }
+
+    HwXQoSReceivedMultiPauseFrameInterfaceDownAlarmEntry ::=
+        SEQUENCE { 
+        hwXQoSReceivedMultiPauseFrameInterfaceDownAlarmInterfaceName
+                OCTET STRING
+        }
+
+    hwXQoSReceivedMultiPauseFrameInterfaceDownAlarmInterfaceName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..128))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "Interface name."
+        ::= { hwXQoSReceivedMultiPauseFrameInterfaceDownAlarmEntry 1 }
+--END
+--BEGIN
+    hwXQoSTrunkTrafficCongestionAlarmObjects OBJECT IDENTIFIER ::= { hwXQoSObjects 134 }
+
+    hwXQoSTrunkTrafficCongestionAlarmTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwXQoSTrunkTrafficCongestionAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "hwXQoSTrunkTrafficCongestionAlarmTable"
+        ::= { hwXQoSTrunkTrafficCongestionAlarmObjects 1 }
+
+    hwXQoSTrunkTrafficCongestionAlarmEntry OBJECT-TYPE
+        SYNTAX HwXQoSTrunkTrafficCongestionAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "hwXQoSTrunkTrafficCongestionAlarmEntry"
+        INDEX { hwXQoSTrunkTrafficCongestionAlarmTrunkName, hwXQoSTrunkTrafficCongestionAlarmSlotId }
+        ::= { hwXQoSTrunkTrafficCongestionAlarmTable 1 }
+
+    HwXQoSTrunkTrafficCongestionAlarmEntry ::=
+        SEQUENCE { 
+        hwXQoSTrunkTrafficCongestionAlarmTrunkName
+                OCTET STRING,
+        hwXQoSTrunkTrafficCongestionAlarmSlotId
+                OCTET STRING
+        }
+
+    hwXQoSTrunkTrafficCongestionAlarmTrunkName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..128))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "Interface name."
+        ::= { hwXQoSTrunkTrafficCongestionAlarmEntry 1 }
+
+    hwXQoSTrunkTrafficCongestionAlarmSlotId OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..31))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "The ID of slot."
+        ::= { hwXQoSTrunkTrafficCongestionAlarmEntry 2 }
+--END
+--BEGIN
+    hwXQoSFwdResourceOverloadObjects OBJECT IDENTIFIER ::= { hwXQoSObjects 135 }
+
+    hwXQoSFwdResourceOverloadTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwXQoSFwdResourceOverloadEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "hwXQoSFwdResourceOverloadTable"
+        ::= { hwXQoSFwdResourceOverloadObjects 1 }
+
+    hwXQoSFwdResourceOverloadEntry OBJECT-TYPE
+        SYNTAX HwXQoSFwdResourceOverloadEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "hwXQoSFwdResourceOverloadEntry"
+        INDEX { hwXQoSFwdResourceOverloadSlotId, hwXQoSFwdResourceOverloadReasonId }
+        ::= { hwXQoSFwdResourceOverloadTable 1 }
+
+    HwXQoSFwdResourceOverloadEntry ::=
+        SEQUENCE { 
+        hwXQoSFwdResourceOverloadSlotId
+                OCTET STRING,
+        hwXQoSFwdResourceOverloadReasonId
+                FwdResourceOverloadType
+        }
+
+    hwXQoSFwdResourceOverloadSlotId OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..31))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "The ID of slot."
+        ::= { hwXQoSFwdResourceOverloadEntry 1 }
+
+    hwXQoSFwdResourceOverloadReasonId OBJECT-TYPE
+        SYNTAX FwdResourceOverloadType
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "The ID of alarm reason."
+        ::= { hwXQoSFwdResourceOverloadEntry 2 }
 --END
 
     END

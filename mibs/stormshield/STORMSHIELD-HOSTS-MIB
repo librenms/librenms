@@ -1,0 +1,164 @@
+STORMSHIELD-HOSTS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64 FROM SNMPv2-SMI
+      DisplayString                                      FROM RFC1213-MIB
+      SnmpAdminString                                    FROM SNMP-FRAMEWORK-MIB
+      stormshieldMIB                                     FROM STORMSHIELD-SMI-MIB;
+
+   snsHosts MODULE-IDENTITY
+      LAST-UPDATED  "201702200000Z"
+      ORGANIZATION  "Stormshield"
+      CONTACT-INFO
+         "Customer Support
+
+         22 rue du Gouverneur General Eboue
+         92130 Issy-les-Moulineaux
+         FRANCE
+
+         Tel: +33 (0)9 69 32 96 29
+         E-mail: support@stormshield.eu
+         http://www.stormshield.eu"
+      DESCRIPTION   "stormshield hosts MIBS"
+      REVISION      "201702200000Z"
+      DESCRIPTION   "Initial"
+      ::= { stormshieldMIB 3 }
+
+   snsHostsTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SnsHostsEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+         "List of hosts"
+      ::= { snsHosts 1 }
+
+   snsHostsEntry OBJECT-TYPE
+      SYNTAX SnsHostsEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+         "Each entry in the snsHostsTable holds a set of information."
+      INDEX { snsHostIPAddr }
+      ::= {  snsHostsTable 1 }
+
+   SnsHostsEntry ::= SEQUENCE {
+      snsHostIPAddr               DisplayString,
+      snsHostName                 SnmpAdminString,
+      snsInterface                DisplayString,
+      snsPackets                  Counter64,
+      snsBytes                    Counter64,
+      snsCurThroughput            Counter64,
+      snsMaxThroughput            Counter64,
+      snsInBytes                  Counter64,
+      snsOutBytes                 Counter64,
+      snsInCurThroughput          Counter64,
+      snsOutCurThroughput         Counter64,
+      snsInMaxCurThroughput       Counter64,
+      snsOutMaxCurThroughput      Counter64
+   }
+
+   snsHostIPAddr OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "IP Address of the host"
+      ::= { snsHostsEntry 1 }
+
+   snsHostName OBJECT-TYPE
+      SYNTAX SnmpAdminString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Hostname"
+      ::= { snsHostsEntry 2 }
+
+   snsInterface OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Interface"
+      ::= { snsHostsEntry 3 }
+
+   snsPackets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "total packet count"
+      ::= { snsHostsEntry 4 }
+
+   snsBytes OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "total byte count (incoming + outgoing)"
+      ::= { snsHostsEntry 5 }
+
+   snsCurThroughput OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "current throughput"
+      ::= { snsHostsEntry 7 }
+
+   snsMaxThroughput OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Maximum throughput"
+      ::= { snsHostsEntry 8 }
+
+   snsInBytes OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "total incoming byte count"
+      ::= { snsHostsEntry 9 }
+
+   snsOutBytes OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "total outgoing byte count"
+      ::= { snsHostsEntry 10 }
+
+   snsInCurThroughput OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "current incoming throughput"
+      ::= { snsHostsEntry 11 }
+
+   snsOutCurThroughput OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "current outgoing throughput"
+      ::= { snsHostsEntry 12 }
+
+   snsInMaxCurThroughput OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Maximum incoming throughput"
+      ::= { snsHostsEntry 13 }
+
+   snsOutMaxCurThroughput OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Maximum outgoing throughput"
+      ::= { snsHostsEntry 14 }
+
+END

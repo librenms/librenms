@@ -10,22 +10,17 @@ use LibreNMS\Alerting\QueryBuilderFilter;
 
 class DeviceGroupController extends Controller
 {
-    public function __construct()
-    {
-        $this->authorizeResource(DeviceGroup::class, 'device_group');
-    }
-
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
-        $this->authorize('manage', DeviceGroup::class);
+        $this->authorize('viewAny', DeviceGroup::class);
 
         return view('device-group.index', [
-            'device_groups' => DeviceGroup::orderBy('name')->withCount('devices')->get(),
+            'device_groups' => DeviceGroup::hasAccess($request->user())->orderBy('name')->withCount('devices')->get(),
         ]);
     }
 
@@ -36,6 +31,8 @@ class DeviceGroupController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', DeviceGroup::class);
+
         return view('device-group.create', [
             'device_group' => new DeviceGroup(),
             'filters' => json_encode(new QueryBuilderFilter('group')),
@@ -50,6 +47,8 @@ class DeviceGroupController extends Controller
      */
     public function store(Request $request, ToastInterface $toast)
     {
+        $this->authorize('create', DeviceGroup::class);
+
         $this->validate($request, [
             'name' => 'required|string|unique:device_groups',
             'type' => 'required|in:dynamic,static',
@@ -58,7 +57,7 @@ class DeviceGroupController extends Controller
             'rules' => 'json|required_if:type,dynamic',
         ]);
 
-        $deviceGroup = DeviceGroup::make($request->only(['name', 'desc', 'type']));
+        $deviceGroup = new DeviceGroup($request->only(['name', 'desc', 'type']));
         $deviceGroup->rules = json_decode($request->rules);
         $deviceGroup->save();
 
@@ -66,7 +65,7 @@ class DeviceGroupController extends Controller
             $deviceGroup->devices()->sync($request->devices);
         }
 
-        $toast->success(__('Device Group :name created', ['name' => htmlentities($deviceGroup->name)]));
+        $toast->success(__('Device Group :name created', ['name' => htmlentities((string) $deviceGroup->name)]));
 
         return redirect()->route('device-groups.index');
     }
@@ -79,7 +78,9 @@ class DeviceGroupController extends Controller
      */
     public function show(DeviceGroup $deviceGroup)
     {
-        return redirect(url('/devices/group=' . $deviceGroup->id));
+        $this->authorize('view', $deviceGroup);
+
+        return redirect(route('devices', ['filter' => ['groups.id' => ['eq' => $deviceGroup->id]]]));
     }
 
     /**
@@ -90,6 +91,8 @@ class DeviceGroupController extends Controller
      */
     public function edit(DeviceGroup $deviceGroup)
     {
+        $this->authorize('update', $deviceGroup);
+
         return view('device-group.edit', [
             'device_group' => $deviceGroup,
             'filters' => json_encode(new QueryBuilderFilter('group')),
@@ -105,11 +108,13 @@ class DeviceGroupController extends Controller
      */
     public function update(Request $request, DeviceGroup $deviceGroup, ToastInterface $toast)
     {
+        $this->authorize('update', $deviceGroup);
+
         $this->validate($request, [
             'name' => [
                 'required',
                 'string',
-                Rule::unique('device_groups')->where(function ($query) use ($deviceGroup) {
+                Rule::unique('device_groups')->where(function ($query) use ($deviceGroup): void {
                     $query->where('id', '!=', $deviceGroup->id);
                 }),
             ],
@@ -124,11 +129,9 @@ class DeviceGroupController extends Controller
         $devices_updated = false;
         if ($deviceGroup->type == 'static') {
             // sync device_ids from input
-            $updated = $deviceGroup->devices()->sync($request->get('devices', []));
+            $updated = $deviceGroup->devices()->sync($request->input('devices', []));
             // check for attached/detached/updated
-            $devices_updated = array_sum(array_map(function ($device_ids) {
-                return count($device_ids);
-            }, $updated)) > 0;
+            $devices_updated = array_sum(array_map(count(...), $updated)) > 0;
         } else {
             $deviceGroup->rules = json_decode($request->rules);
         }
@@ -162,6 +165,8 @@ class DeviceGroupController extends Controller
      */
     public function destroy(DeviceGroup $deviceGroup)
     {
+        $this->authorize('delete', $deviceGroup);
+
         if ($deviceGroup->serviceTemplates()->exists()) {
             $msg = __('Device Group :name still has Service Templates associated with it. Please remove or update the Service Template accordingly', ['name' => htmlentities($deviceGroup->name)]);
 

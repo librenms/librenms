@@ -47,7 +47,7 @@ class CustomMapBackgroundController extends Controller
         try {
             $imageContent = Cache::driver('file')
                 ->remember($this->getCacheKey($map), new \DateInterval('P30D'), fn () => $map->background->background_image);
-        } catch (\ErrorException $e) {
+        } catch (\ErrorException) {
             // if cache fails, just load from database :(
             $imageContent = $map->background->background_image;
         }
@@ -64,6 +64,7 @@ class CustomMapBackgroundController extends Controller
     public function save(FormRequest $request, CustomMap $map)
     {
         $this->authorize('update', $map);
+
         $this->validate($request, [
             'type' => 'in:image,color,map,none',
             'image' => 'required_if:type,image|mimes:png,jpg,svg,gif',
@@ -112,7 +113,7 @@ class CustomMapBackgroundController extends Controller
                 $map->background()->save($background);
                 Cache::driver('file')->forget($this->getCacheKey($map)); // clear old image cache if present
                 $map->background_data = array_merge($map->background_data ?? [], [
-                    'version' => md5($background->background_image),
+                    'version' => md5((string) $background->background_image),
                     'original_filename' => $request->image->getClientOriginalName(),
                     'mime' => $mimeType,
                 ]);

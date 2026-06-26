@@ -9,7 +9,7 @@ if (is_numeric($vars['id'])) {
         $rrd_filename = Rrd::name($device['hostname'], ['cefswitching', $cef['entPhysicalIndex'], $cef['afi'], $cef['cef_index']]);
 
         $title = generate_device_link($device);
-        $title .= ' :: CEF Switching :: ' . htmlentities($cef['cef_descr']);
+        $title .= ' :: CEF Switching :: ' . htmlentities((string) $cef['cef_descr']);
         $auth = true;
     }
 }

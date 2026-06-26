@@ -1,16 +1,19 @@
 --  ==================================================================
--- Copyright (C) 2007 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI BRAS Management MIB
 -- Reference:
--- Version:     V1.0
+-- Version:     V2.03
 -- History:
 --              V1.0 YangChangMao, 2007-06-14, publish
 -- ==================================================================
 
 HUAWEI-BRAS-MULTICAST-MIB    DEFINITIONS ::= BEGIN
-    
+	    
+
     IMPORTS
+        entPhysicalName			
+            FROM ENTITY-MIB	
         hwBRASMib            
             FROM HUAWEI-MIB
         
@@ -18,27 +21,34 @@ HUAWEI-BRAS-MULTICAST-MIB    DEFINITIONS ::= BEGIN
             FROM SNMPv2-CONF            
 
         IpAddress, Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY, 
-        NOTIFICATION-TYPE            
+        NOTIFICATION-TYPE, Integer32            
             FROM SNMPv2-SMI            
         RowStatus, DisplayString
             FROM SNMPv2-TC;
 
         hwMulticastVirtualAdjust MODULE-IDENTITY 
-            LAST-UPDATED "200705121200Z"        -- May 12, 2007 at 12:00 GMT
+            LAST-UPDATED "201801191700Z"        -- May 12, 2007 at 12:00 GMT
             ORGANIZATION 
-                "Huawei Technologies Co., Ltd."
+                "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
-                "R&D NanJing, Huawei Technologies co.,Ltd.
-                Huihong Bld.,NO.91 Baixia Rd., 
-                Bai-Xia District Nanjing P.R. China
-                Zip:210001 
-                Http://www.huawei.com                                       
-                E-mail:support@huawei.com"
+                "Huawei Industrial Base
+                 Bantian, Longgang
+                 Shenzhen 518129
+                 People's Republic of China
+                 Website: http://www.huawei.com
+                 Email: support@huawei.com"
             DESCRIPTION 
                 "The HUAWEI-BRAS-MULTICAST-MIB contains objects to
                 manage BRAS."
-            ::= { hwBRASMib 17 }
+            REVISION  "201801191700Z"
+            DESCRIPTION "modify the description of hwMulticastVirtualAdjustShowBandListIndex hwMulticastVirtualAdjustShowBandSourceIp hwMulticastVirtualAdjustShowBandGroupIp hwMulticastVirtualAdjustShowBandwidth."
 
+            REVISION  "201711221700Z"
+            DESCRIPTION "modify the description of hwMulticastTraps's child node at 2017-11-22."
+
+            REVISION  "201606061200Z"
+            DESCRIPTION "modify type add for multicastuser over limit"
+        ::= { hwBRASMib 17 }
 --
 -- Node definitions
 --
@@ -183,7 +193,7 @@ HUAWEI-BRAS-MULTICAST-MIB    DEFINITIONS ::= BEGIN
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
-            "Index of multicast list."
+            "This object indicates the index of a multicast program list."
         ::= { hwMulticastVirtualAdjustShowBandEntry 1 }
 
     
@@ -192,7 +202,7 @@ HUAWEI-BRAS-MULTICAST-MIB    DEFINITIONS ::= BEGIN
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
-            "Source address of multicast program."
+            "This object indicates the source multicast address of a multicast program."
         ::= { hwMulticastVirtualAdjustShowBandEntry 2 }
 
     
@@ -201,7 +211,7 @@ HUAWEI-BRAS-MULTICAST-MIB    DEFINITIONS ::= BEGIN
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
-            "Group address of multicast program."
+            "This object indicates the group address of a multicast program."
         ::= { hwMulticastVirtualAdjustShowBandEntry 3 }
 
     
@@ -210,8 +220,7 @@ HUAWEI-BRAS-MULTICAST-MIB    DEFINITIONS ::= BEGIN
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            "Bandwidth of multicast program.
-             units:Kbps(kbit/s)"
+            "This object indicates the bandwidth of a multicast program, in kbit/s."
         ::= { hwMulticastVirtualAdjustShowBandEntry 4 }     
         
 --
@@ -248,7 +257,63 @@ HUAWEI-BRAS-MULTICAST-MIB    DEFINITIONS ::= BEGIN
             STATUS current
             DESCRIPTION 
                 "The hwMulticast group."
-            ::= { hwMulticastMIBGroups 1 }       
+            ::= { hwMulticastMIBGroups 1 }      
+ --
+--  multicast user over limitn
+--
+--
+--  this module
+--
+hwMulticastMIBTrapDefine OBJECT IDENTIFIER ::= { hwMulticastVirtualAdjust 3 }
+
+hwMulticastTrapOid OBJECT IDENTIFIER ::= { hwMulticastMIBTrapDefine 1 }
+hwMulticastTraps OBJECT IDENTIFIER ::= { hwMulticastMIBTrapDefine 2 }
+
+      hwMulticastThreshold OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                Threshold.
+                "
+            ::= { hwMulticastTrapOid 1 }
+
+        hwMulticastUserExceedLimitGEPre NOTIFICATION-TYPE
+           OBJECTS { entPhysicalName, hwMulticastThreshold }
+           STATUS current
+            DESCRIPTION
+                "
+                Physical interface number of online multicast users reaches the maximum user number 95%.
+                "
+            ::= { hwMulticastTraps 1 }
+
+        hwMulticastUserExceedLimitGE NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName, hwMulticastThreshold }
+            STATUS current
+            DESCRIPTION
+                "
+                Physical interface specification of the number of multicast subscribers reaches the board online users.
+                "
+            ::= { hwMulticastTraps 2 }
+    
+        hwMulticastUserExceedLimitTrunkPre NOTIFICATION-TYPE
+            OBJECTS { hwMulticastThreshold }
+            STATUS current
+            DESCRIPTION
+                "
+                TRUNK port 95% online multicast users reaches the maximum number of system users.
+                "
+            ::= { hwMulticastTraps 3 }
+
+        hwMulticastUserExceedLimitTrunk NOTIFICATION-TYPE
+            OBJECTS { hwMulticastThreshold }
+            STATUS current
+            DESCRIPTION
+                "
+                TRUNK port online multicast users reaches the maximum number of system users.
+                "
+            ::= { hwMulticastTraps 4 }
 END
         
         

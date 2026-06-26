@@ -1,9 +1,9 @@
 --==================================================================
--- Copyright (C) 2006 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2020 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI Q(802.1Q) IN Q(802.1Q) MIB
 -- Reference:
--- Version: V1.0
+-- Version: V2.07
 --          V1.1
 --          V1.2
 -- History: modified by xieyuan  2006-10-11
@@ -24,19 +24,19 @@
 HUAWEI-QINQ-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     
-    RowStatus, MacAddress
+    RowStatus, MacAddress, TEXTUAL-CONVENTION
         FROM SNMPv2-TC
 
-    MODULE-IDENTITY, OBJECT-TYPE, Integer32, OBJECT-IDENTITY, IpAddress, Counter64
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, OBJECT-IDENTITY, IpAddress, Counter64, Unsigned32
         FROM SNMPv2-SMI  
     
-    OBJECT-GROUP                        
+    OBJECT-GROUP, MODULE-COMPLIANCE                         
         FROM SNMPv2-CONF    
         
     hwDatacomm
         FROM HUAWEI-MIB
         
-    VlanId
+    VlanIdOrNone, VlanId
         FROM Q-BRIDGE-MIB
            
     InterfaceIndex
@@ -50,83 +50,103 @@ IMPORTS
         FROM HUAWEI-L2IF-MIB; 
     
     hwQinQ MODULE-IDENTITY
-        LAST-UPDATED "200612141629Z"        
+        LAST-UPDATED "202012291538Z"        
          ORGANIZATION 
-          "Huawei Technologies co.,Ltd."
+          "Huawei Technologies Co.,Ltd."
          CONTACT-INFO 
-          "VRP PlatForm Team Huawei Technologies co.,Ltd.
-          Huawei Bld.,NO.3 Xinxi Rd., 
-          Shang-Di Information Industry Base,
-          Hai-Dian District Beijing P.R. China
-            http://www.huawei.com
-           Zip:100085
-                "
-                DESCRIPTION
-            "The QinQ MIB module is defined to manage the configuration under system or interface view."
+          "Huawei Industrial Base
+            Bantian, Longgang
+             Shenzhen 518129
+             People's Republic of China
+             Website: http://www.huawei.com
+             Email: support@huawei.com
+           "
+        DESCRIPTION "Modify  hwQinQAsymmetryUserMode hwQinQSwapCfgFlag hwQinQGroupStat DEFVAL ."
+
+        REVISION  "202012291538Z"
+        DESCRIPTION  "Modify the description of hwQinQSubIfTermCeVlanAny at 2020-12-29."
+		
+        REVISION  "202005261538Z"
+        DESCRIPTION  "Modify the SYNTAX of hwQinQSubIfTermCEVlanStart at 2020-05-26."
+            
+        REVISION  "202005181538Z"
+        DESCRIPTION  "Add the hwQinQSubIfTermCeVlanAny node."
+		
+        REVISION  "201909061538Z"
+        DESCRIPTION  "Modify the REVISION and DESCRIPTION format."
+	
+        REVISION  "201712201538Z"
+        DESCRIPTION  "The QinQ MIB module is defined to manage the configuration under system or interface view."
+        
+        REVISION  "201708171538Z"
+        DESCRIPTION "Modify the description of hwQinQSubIfStackingStatCEVlan at 2017-08-17"
+         
+        REVISION  "201406101538Z"
+        DESCRIPTION "Modify the description of hwQinQSystemWellKnowMac at 2014-06-10"
             ::= {  hwDatacomm  116}
     
--- -------------------------------------------------------------
+-- =======================================
 -- Textual Conventions
--- -------------------------------------------------------------
+-- =======================================
 
 BpduIndex ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "A list value for bpdu. "
-    SYNTAX           INTEGER {	stp01(1),
-				pauseFrame(2),
-				reserved02(3),
-				reserved03(4),
-				reserved04(5),
-				reserved05(6),
-				reserved06(7),
-				reserved07(8),
-				stp02(9),
-				reserved08(10),
-				hgmp(11),
-				reserved09(12),
-				reserved10(13),
-				reserved11(14),
-				reserved12(15),
-				reserved13(16),
-				reserved14(17),
-				reserved15(18),
-				reserved16(19),
-				reserved17(20),
-				isisLevel01(21),
-				isisLevel02(22),
-				reserved18(23),
-				reserved19(24),
-				reserved20(25),
-				reserved21(26),
-				reserved22(27),
-				reserved23(28),
-				reserved24(29),
-				reserved25(30),
-				reserved26(31),
-				reserved27(32),
-				gmrp(33),
-				gvrp(34),
-				reserved28(35),
-				reserved29(36),
-				reserved30(37),
-				reserved31(38),
-				reserved32(39),
-				reserved33(40),
-				reserved34(41),
-				reserved35(42),
-				reserved36(43),
-				reserved37(44),
-				reserved38(45),
-				reserved39(46),
-				reserved40(47),
-				reserved41(48),
-				lacp(49),
-				cdp(50),
-				pagp(51),
-				udld(52),
-				vtp(53),
-				}
+    SYNTAX           INTEGER {    stp01(1),
+                pauseFrame(2),
+                reserved02(3),
+                reserved03(4),
+                reserved04(5),
+                reserved05(6),
+                reserved06(7),
+                reserved07(8),
+                stp02(9),
+                reserved08(10),
+                hgmp(11),
+                reserved09(12),
+                reserved10(13),
+                reserved11(14),
+                reserved12(15),
+                reserved13(16),
+                reserved14(17),
+                reserved15(18),
+                reserved16(19),
+                reserved17(20),
+                isisLevel01(21),
+                isisLevel02(22),
+                reserved18(23),
+                reserved19(24),
+                reserved20(25),
+                reserved21(26),
+                reserved22(27),
+                reserved23(28),
+                reserved24(29),
+                reserved25(30),
+                reserved26(31),
+                reserved27(32),
+                gmrp(33),
+                gvrp(34),
+                reserved28(35),
+                reserved29(36),
+                reserved30(37),
+                reserved31(38),
+                reserved32(39),
+                reserved33(40),
+                reserved34(41),
+                reserved35(42),
+                reserved36(43),
+                reserved37(44),
+                reserved38(45),
+                reserved39(46),
+                reserved40(47),
+                reserved41(48),
+                lacp(49),
+                cdp(50),
+                pagp(51),
+                udld(52),
+                vtp(53)
+                }
  
 -- ==================================================================
 --
@@ -142,9 +162,9 @@ BpduIndex ::= TEXTUAL-CONVENTION
                       MAX-ACCESS read-write
                       STATUS current
                       DESCRIPTION
-                            "The destination  MAC address that is replaced the original destination
-                            macAddress is a wellknown multicast macAddress  to hide the inner details of the BPDU
-                            in order to that it can be transmitted with a tag through the services'network."
+                            "The destination MAC address replacing the original destination macAddress is a well-known
+                             multicast address. This well-known multicast address shields BPDUs inner details to allow
+                             these BPDUs to be transmitted with a tag through the carrier's network."
              ::= { hwQinQSystemBase 1 }
         
         
@@ -168,6 +188,15 @@ BpduIndex ::= TEXTUAL-CONVENTION
                       DESCRIPTION
                             "View statistics about the discarded BPDUs."
                      ::= { hwQinQSystemBase 3 }  
+
+               hwQinQSystemEtherType OBJECT-TYPE
+                        SYNTAX Unsigned32 ('600'h..'ffff'h)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                            "The value of tag type is encapsulated in the head of the ethernet frame
+                            to distinguish the encapsulated mode between the 802.1Q and QinQ. Default is '8100'h."
+                     ::= { hwQinQSystemBase 4 }
         
         
                hwQinQMngObjects OBJECT IDENTIFIER ::= { hwQinQ 2 }
@@ -194,7 +223,7 @@ BpduIndex ::= TEXTUAL-CONVENTION
                 HwQinQBpduTunnelEntry ::=
                      SEQUENCE { 
                             hwQinQBpduTunnelIndex
-                                     INTEGER,
+                                     Integer32,
                             hwQinQEtherEncpsType
                                      OCTET STRING,
                             hwQinQBpduTunnelEnableOneQBpduTunnel
@@ -204,7 +233,7 @@ BpduIndex ::= TEXTUAL-CONVENTION
                             hwQinQBpduTunnelEnableTwoQBpduTunnel
                                      EnabledStatus,
                             hwQinQBpduTunnelCustomerBpduTag
-                                     VlanId,
+                                     Integer32,
                             hwQinQBpduTunnelCustomerBpduTagListLow
                                      OCTET STRING,
                             hwQinQBpduTunnelCustomerBpduTagListHigh
@@ -216,7 +245,7 @@ BpduIndex ::= TEXTUAL-CONVENTION
                             }
 
                  hwQinQBpduTunnelIndex OBJECT-TYPE
-                        SYNTAX INTEGER (1..512)
+                        SYNTAX Integer32 
                         MAX-ACCESS not-accessible
                         STATUS current
                         DESCRIPTION
@@ -250,8 +279,7 @@ BpduIndex ::= TEXTUAL-CONVENTION
                         MAX-ACCESS read-only
                         STATUS current
                         DESCRIPTION
-                            "Whether to enable the setting of BPDU Tunnel tag."
-                        DEFVAL {disabled}
+                            "Whether to enable the setting of BPDU Tunnel tag. Default is disabled."
                         ::= { hwQinQBpduTunnelEntry 4 }
 
     
@@ -261,14 +289,14 @@ BpduIndex ::= TEXTUAL-CONVENTION
                         STATUS current
                         DESCRIPTION
                             "The value indicates whether the 2Q-bpdutunnel is opened,
-                            If hwQinQBpduTunnelEnableOneQBpduTunnel is enabling, then this value should be disable."
-                        DEFVAL {disabled}
+                            If hwQinQBpduTunnelEnableOneQBpduTunnel is enabling, then this value should be disable.
+                            Default is disabled."
                         ::= { hwQinQBpduTunnelEntry 5 }
         
              
     
                  hwQinQBpduTunnelCustomerBpduTag OBJECT-TYPE
-                        SYNTAX VlanId
+                        SYNTAX Integer32
                         MAX-ACCESS read-write
                         STATUS current
                         DESCRIPTION
@@ -297,12 +325,12 @@ BpduIndex ::= TEXTUAL-CONVENTION
                         
                  hwQinQRemarkOuterTpid OBJECT-TYPE
                         SYNTAX INTEGER
-                        	{
-                       		   hexffff(1),
-                       		   hex88a8(2),
-                       		   hex9100(3),
-                       		   hex8100(4) 	
-                        	}
+                            {
+                                  hexffff(1),
+                                  hex88a8(2),
+                                  hex9100(3),
+                                  hex8100(4)     
+                            }
                         MAX-ACCESS read-write
                         STATUS current
                         DESCRIPTION
@@ -472,8 +500,7 @@ BpduIndex ::= TEXTUAL-CONVENTION
                         MAX-ACCESS not-accessible
                         STATUS current
                         DESCRIPTION
-                            "Inner vlan in packets which input the QinQ sub interface,
-                            used to indicate the packets as an index."
+                            "This object indicates the CE VLAN ID of the sub-interface configured with VLAN stacking."
                         ::= { hwQinQSubIfStackingStatEntry 2 }
         
                  hwQinQSubIfStackStatGroupId OBJECT-TYPE
@@ -590,15 +617,15 @@ BpduIndex ::= TEXTUAL-CONVENTION
                             hwQinQSubIfTermPEVlan
                                 VlanId,
                             hwQinQSubIfTermCEVlanStart
-                                VlanId,
+                                VlanIdOrNone,
                             hwQinQSubIfTermCEVlanEnd
                                 VlanId,
                             hwQinQSubIfTermGroupId
                                 Integer32,
                             hwQinQSubIfTermRowStatus
-                                RowStatus,    
-                            hwQinQSubIfTermSubscriberGroupName
-                                OCTET STRING                                
+                                RowStatus,
+                            hwQinQSubIfTermCeVlanAny
+                                INTEGER								
                          }
 
                 hwQinQSubIfTermIfIndex OBJECT-TYPE
@@ -606,7 +633,7 @@ BpduIndex ::= TEXTUAL-CONVENTION
                         MAX-ACCESS not-accessible
                         STATUS current
                         DESCRIPTION
-                            "Index number of the QinQ-termination interface."
+                            "Index number of the QinQ VLAN tag termination sub-interface."
                         ::= { hwQinQSubIfTermEntry 1 }
                           
        
@@ -615,16 +642,16 @@ BpduIndex ::= TEXTUAL-CONVENTION
                         MAX-ACCESS not-accessible
                         STATUS current
                         DESCRIPTION
-                            "Outer vlan id of the packets which have two tags before being terminated."
+                            "Outer VLAN ID of the packets which have two tags before being terminated."
                         ::= { hwQinQSubIfTermEntry 2 }
         
                hwQinQSubIfTermCEVlanStart OBJECT-TYPE
-                        SYNTAX VlanId
+                        SYNTAX VlanIdOrNone
                         MAX-ACCESS not-accessible
                         STATUS current
                         DESCRIPTION
-                            "When configure ce vlan as a range, hwQinQSubIfTermCEVlanStart
-                            is the start vlan id and hwQinQSubIfTermCEVlanEnd is the end vlan id."
+                            "When configure CE VLAN as a range, hwQinQSubIfTermCEVlanStart
+                            is the start VLAN ID and hwQinQSubIfTermCEVlanEnd is the end VLAN ID."
                         ::= { hwQinQSubIfTermEntry 3 }
         
                 hwQinQSubIfTermCEVlanEnd OBJECT-TYPE
@@ -632,8 +659,8 @@ BpduIndex ::= TEXTUAL-CONVENTION
                         MAX-ACCESS read-create
                         STATUS current
                         DESCRIPTION
-                            "When configure ce vlan as a range, hwQinQSubIfTermCEVlanStart is 
-                            the start vlan id and hwQinQSubIfTermCEVlanEnd is the end vlan id."
+                            "When configure CE VLAN as a range, hwQinQSubIfTermCEVlanStart is 
+                            the start VLAN ID and hwQinQSubIfTermCEVlanEnd is the end VLAN ID."
                         ::= { hwQinQSubIfTermEntry 4 }
                              
                 hwQinQSubIfTermGroupId OBJECT-TYPE
@@ -658,14 +685,17 @@ BpduIndex ::= TEXTUAL-CONVENTION
                             in hwQinQSubIfTermTable pointing to the row, the agent must also
                             destroy the corresponding entries in hwQinQSubIfTermTable."
                         ::= { hwQinQSubIfTermEntry 6 }
-        
-        
-                hwQinQSubIfTermSubscriberGroupName OBJECT-TYPE
-                        SYNTAX OCTET STRING (SIZE (0..31))
-                        MAX-ACCESS read-create
+						
+                hwQinQSubIfTermCeVlanAny OBJECT-TYPE
+                        SYNTAX INTEGER
+                            {
+                            anyother(1)
+                            }
+                        MAX-ACCESS  read-create
                         STATUS current
                         DESCRIPTION
-                            "Name of Subscriber Group."
+                            "The QinQ VLAN tag termination sub-interface permits
+                            packets carrying any inner VLAN tag."
                         ::= { hwQinQSubIfTermEntry 7 }
         
         
@@ -862,7 +892,7 @@ BpduIndex ::= TEXTUAL-CONVENTION
                             hwQinQStaticARPCfgVlan
                                    VlanId,
                             hwQinQStaticARPCfgCEVlan
-                                   VlanId,
+                                   Integer32,
                             hwQinQStaticARPCfgRowStatus
                                    RowStatus
                          }
@@ -903,7 +933,7 @@ BpduIndex ::= TEXTUAL-CONVENTION
                         ::= { hwQinQStaticARPCfgEntry 4 }
         
                  hwQinQStaticARPCfgCEVlan OBJECT-TYPE
-                        SYNTAX VlanId
+                        SYNTAX Integer32 (0..4094)
                         MAX-ACCESS read-create
                         STATUS current
                         DESCRIPTION
@@ -952,7 +982,7 @@ BpduIndex ::= TEXTUAL-CONVENTION
                             hwQinQStaticMACCfgPEVlan
                                     VlanId,
                             hwQinQStaticMACCfgCEVlan
-                                    VlanId,
+                                    Integer32,
                             hwQinQStaticMACCfgType
                                     INTEGER,    
                             hwQinQStaticMACCfgIfIndex
@@ -999,7 +1029,7 @@ BpduIndex ::= TEXTUAL-CONVENTION
                         ::= { hwQinQStaticMACCfgEntry 4 }
         
                  hwQinQStaticMACCfgCEVlan OBJECT-TYPE
-                        SYNTAX VlanId
+                        SYNTAX Integer32 (0..4094)
                         MAX-ACCESS read-create
                         STATUS current
                         DESCRIPTION
@@ -1315,7 +1345,9 @@ BpduIndex ::= TEXTUAL-CONVENTION
                             hwQinQModeCfgMode
                                     INTEGER,
                             hwQinQEtherType
-                                   Unsigned32
+                                   Unsigned32,
+                            hwQinQCeEtherType
+                                   Unsigned32       
                              }
 
                   hwQinQModeCfgIfIndex OBJECT-TYPE
@@ -1349,7 +1381,17 @@ BpduIndex ::= TEXTUAL-CONVENTION
                             "The value of tag type is encapsulated in the head of the ethernet frame
                             to distinguish the encapsulated mode between the 802.1Q and QinQ."
                             DEFVAL{ '8100'h }
-                        ::= { hwQinQModeCfgEntry 3 }                        
+                        ::= { hwQinQModeCfgEntry 3 } 
+                        
+                  hwQinQCeEtherType OBJECT-TYPE
+                        SYNTAX Unsigned32 ('600'h..'ffff'h)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                            "The value of tag type is encapsulated in the head of the ethernet frame
+                            to distinguish the encapsulated mode between the 802.1Q and QinQ."
+                            DEFVAL{ '8100'h }
+                        ::= { hwQinQModeCfgEntry 4 }                        
                         
                         
                  hwQinQCtrlVlanCfgTable  OBJECT-TYPE
@@ -1384,7 +1426,7 @@ BpduIndex ::= TEXTUAL-CONVENTION
                             hwQinQCtrlVlanRowStatus
                                     RowStatus,
                             hwQinQFlexibleFlag
-                            	    EnabledStatus      
+                                    EnabledStatus      
                          }
 
                   hwQinQCtrlVlanCfgIfIndex OBJECT-TYPE
@@ -1450,7 +1492,7 @@ BpduIndex ::= TEXTUAL-CONVENTION
                         DESCRIPTION
                             "The service type of the sub interface, by setting hwQinQFlexibleFlag to the value (flexibleenable),
                             the flexible attribute enabled; 
-                            So if you set hwQinQSubIfType to be dot1q type, you can not specify hwQinQFlexibleFlag as flexibledisable."
+                            So if you set hwQinQSubIfType to be dot1q type, you can not specify hwQinQFlexibleFlag as flexibleenable."
                         ::= { hwQinQCtrlVlanCfgEntry 6 }         
                         
                   hwQinQGroupCfgTable  OBJECT-TYPE
@@ -1522,7 +1564,7 @@ BpduIndex ::= TEXTUAL-CONVENTION
                         STATUS current
                         DESCRIPTION
                             "Whether the statistic function is enabled."
-                        DEFVAL{ DISABLE }
+                        DEFVAL{ disabled }
                         ::= { hwQinQGroupCfgEntry 4 }
                         
                         
@@ -1558,7 +1600,7 @@ BpduIndex ::= TEXTUAL-CONVENTION
                             hwQinQSubIfAsymmetry
                                     INTEGER,
                             hwQinQAsymmetryUserMode
-                            	    EnabledStatus
+                                    EnabledStatus
                          }
 
                   hwQinQAsymmetryCfgIfIndex OBJECT-TYPE
@@ -1574,7 +1616,8 @@ BpduIndex ::= TEXTUAL-CONVENTION
                         SYNTAX INTEGER
                                {
                                    symmetry(1),
-                                   asymmetry(2)                        
+                                   asymmetry(2),
+                                   transparent(3)                     
                                }
                         MAX-ACCESS read-write
                         STATUS current
@@ -1589,7 +1632,7 @@ BpduIndex ::= TEXTUAL-CONVENTION
                         STATUS current
                         DESCRIPTION
                             "The user mode attribute of the QinQ-termination sub interface."
-                        DEFVAL{ disable }
+                        DEFVAL{ disabled }
                         ::= { hwQinQAsymmetryCfgEntry 3 }                        
                         
                   hwQinQRemarkCfgTable  OBJECT-TYPE
@@ -1651,409 +1694,409 @@ BpduIndex ::= TEXTUAL-CONVENTION
                         DEFVAL{pevid}
                         ::= { hwQinQRemarkCfgEntry 2 }
                 hwBpduTunnelIngressTable  OBJECT-TYPE
-			SYNTAX SEQUENCE OF HwBpduTunnelIngressEntry
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"The table of bpdu tunnel ingress. "
-			::= { hwQinQMngObjects 15 }
-		
-		hwBpduTunnelIngressEntry OBJECT-TYPE
-			SYNTAX HwBpduTunnelIngressEntry
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"The entry of of bpdu tunnel ingress. "
-			INDEX {hwBpduTunnelIngressPortIndex,hwBpduTunnelBpduIngressMacIndex}
-			::= { hwBpduTunnelIngressTable 1 }
-		
-		HwBpduTunnelIngressEntry ::=
-			SEQUENCE { 
-			                hwBpduTunnelIngressPortIndex
-			                        Integer32,
-					hwBpduTunnelBpduIngressMacIndex
-						BpduIndex,
-					hwBpduTunnelIngressAddress
-						MacAddress,
-					hwBpduTunnelIngressRowStatus
-				                RowStatus	
-				}
-				
-		hwBpduTunnelIngressPortIndex OBJECT-TYPE
-			SYNTAX Integer32 (1..65535) 
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"Port index in interface. "
-			::= { hwBpduTunnelIngressEntry 1 }		
-				
-		hwBpduTunnelBpduIngressMacIndex OBJECT-TYPE
-			SYNTAX BpduIndex
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				" bpdu mac address list
-				BPDU Dmac		protocol
-				01-80-C2-00-00-00	stp01
-				01-80-C2-00-00-01	pauseFrame
-				01-80-C2-00-00-02	reserved02
-				01-80-C2-00-00-03	reserved03
-				01-80-C2-00-00-04	reserved04
-				01-80-C2-00-00-05	reserved05
-				01-80-C2-00-00-06	reserved06
-				01-80-C2-00-00-07	reserved07
-				01-80-C2-00-00-08	stp02
-				01-80-C2-00-00-09	reserved08
-				01-80-C2-00-00-0a	hgmp
-				01-80-C2-00-00-0b	reserved09
-				01-80-C2-00-00-0c	reserved10
-				01-80-C2-00-00-0d	reserved11
-				01-80-C2-00-00-0e	reserved12
-				01-80-C2-00-00-0f	reserved13
-				01-80-C2-00-00-10	reserved14
-				01-80-C2-00-00-11	reserved15
-				01-80-C2-00-00-12	reserved16
-				01-80-C2-00-00-13	reserved17
-				01-80-C2-00-00-14	isisLevel01
-				01-80-C2-00-00-15	isisLevel02
-				01-80-C2-00-00-16	reserved18
-				01-80-C2-00-00-17	reserved19
-				01-80-C2-00-00-18	reserved20
-				01-80-C2-00-00-19	reserved21
-				01-80-C2-00-00-1a	reserved22
-				01-80-C2-00-00-1b	reserved23
-				01-80-C2-00-00-1c	reserved24
-				01-80-C2-00-00-1d	reserved25
-				01-80-C2-00-00-1e	reserved26
-				01-80-C2-00-00-1f	reserved27
-				01-80-C2-00-00-20	gmrp
-				01-80-C2-00-00-21	gvrp
-				01-80-C2-00-00-22	reserved28
-				01-80-C2-00-00-23	reserved29
-				01-80-C2-00-00-24	reserved30
-				01-80-C2-00-00-25	reserved31
-				01-80-C2-00-00-26	reserved32
-				01-80-C2-00-00-27	reserved33
-				01-80-C2-00-00-28	reserved34
-				01-80-C2-00-00-29	reserved35
-				01-80-C2-00-00-2a	reserved36
-				01-80-C2-00-00-2b	reserved37
-				01-80-C2-00-00-2c	reserved38
-				01-80-C2-00-00-2d	reserved39
-				01-80-C2-00-00-2e	reserved40
-				01-80-C2-00-00-2f	reserved41"
-			::= { hwBpduTunnelIngressEntry 2 }
-						
-		hwBpduTunnelIngressAddress OBJECT-TYPE
-			SYNTAX MacAddress
-			MAX-ACCESS read-create
-			STATUS current
-			DESCRIPTION
-				"Group mac address."
-			::= { hwBpduTunnelIngressEntry 3 }		
-	        hwBpduTunnelIngressRowStatus OBJECT-TYPE
-			SYNTAX RowStatus
-			MAX-ACCESS read-create
-			STATUS current
-			DESCRIPTION
-				"Bpdu tunnek ingress row status."
-			::= { hwBpduTunnelIngressEntry 4}
-					
-		hwBpduTunnelEgressTable  OBJECT-TYPE
-			SYNTAX SEQUENCE OF HwBpduTunnelEgressEntry
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"The table of bpdu tunnel egress."
-			::= { hwQinQMngObjects 16 }
-		
+            SYNTAX SEQUENCE OF HwBpduTunnelIngressEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table of bpdu tunnel ingress. "
+            ::= { hwQinQMngObjects 15 }
+        
+        hwBpduTunnelIngressEntry OBJECT-TYPE
+            SYNTAX HwBpduTunnelIngressEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of of bpdu tunnel ingress. "
+            INDEX {hwBpduTunnelIngressPortIndex,hwBpduTunnelBpduIngressMacIndex}
+            ::= { hwBpduTunnelIngressTable 1 }
+        
+        HwBpduTunnelIngressEntry ::=
+            SEQUENCE { 
+                            hwBpduTunnelIngressPortIndex
+                                    Integer32,
+                    hwBpduTunnelBpduIngressMacIndex
+                        BpduIndex,
+                    hwBpduTunnelIngressAddress
+                        MacAddress,
+                    hwBpduTunnelIngressRowStatus
+                                RowStatus    
+                }
+                
+        hwBpduTunnelIngressPortIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..65535) 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Port index in interface. "
+            ::= { hwBpduTunnelIngressEntry 1 }        
+                
+        hwBpduTunnelBpduIngressMacIndex OBJECT-TYPE
+            SYNTAX BpduIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " bpdu mac address list
+                BPDU Dmac        protocol
+                01-80-C2-00-00-00    stp01
+                01-80-C2-00-00-01    pauseFrame
+                01-80-C2-00-00-02    reserved02
+                01-80-C2-00-00-03    reserved03
+                01-80-C2-00-00-04    reserved04
+                01-80-C2-00-00-05    reserved05
+                01-80-C2-00-00-06    reserved06
+                01-80-C2-00-00-07    reserved07
+                01-80-C2-00-00-08    stp02
+                01-80-C2-00-00-09    reserved08
+                01-80-C2-00-00-0a    hgmp
+                01-80-C2-00-00-0b    reserved09
+                01-80-C2-00-00-0c    reserved10
+                01-80-C2-00-00-0d    reserved11
+                01-80-C2-00-00-0e    reserved12
+                01-80-C2-00-00-0f    reserved13
+                01-80-C2-00-00-10    reserved14
+                01-80-C2-00-00-11    reserved15
+                01-80-C2-00-00-12    reserved16
+                01-80-C2-00-00-13    reserved17
+                01-80-C2-00-00-14    isisLevel01
+                01-80-C2-00-00-15    isisLevel02
+                01-80-C2-00-00-16    reserved18
+                01-80-C2-00-00-17    reserved19
+                01-80-C2-00-00-18    reserved20
+                01-80-C2-00-00-19    reserved21
+                01-80-C2-00-00-1a    reserved22
+                01-80-C2-00-00-1b    reserved23
+                01-80-C2-00-00-1c    reserved24
+                01-80-C2-00-00-1d    reserved25
+                01-80-C2-00-00-1e    reserved26
+                01-80-C2-00-00-1f    reserved27
+                01-80-C2-00-00-20    gmrp
+                01-80-C2-00-00-21    gvrp
+                01-80-C2-00-00-22    reserved28
+                01-80-C2-00-00-23    reserved29
+                01-80-C2-00-00-24    reserved30
+                01-80-C2-00-00-25    reserved31
+                01-80-C2-00-00-26    reserved32
+                01-80-C2-00-00-27    reserved33
+                01-80-C2-00-00-28    reserved34
+                01-80-C2-00-00-29    reserved35
+                01-80-C2-00-00-2a    reserved36
+                01-80-C2-00-00-2b    reserved37
+                01-80-C2-00-00-2c    reserved38
+                01-80-C2-00-00-2d    reserved39
+                01-80-C2-00-00-2e    reserved40
+                01-80-C2-00-00-2f    reserved41"
+            ::= { hwBpduTunnelIngressEntry 2 }
+                        
+        hwBpduTunnelIngressAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Group mac address."
+            ::= { hwBpduTunnelIngressEntry 3 }        
+            hwBpduTunnelIngressRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Bpdu tunnek ingress row status."
+            ::= { hwBpduTunnelIngressEntry 4}
+                    
+        hwBpduTunnelEgressTable  OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBpduTunnelEgressEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table of bpdu tunnel egress."
+            ::= { hwQinQMngObjects 16 }
+        
 
-		hwBpduTunnelEgressEntry OBJECT-TYPE
-			SYNTAX HwBpduTunnelEgressEntry
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"The entry of bpdu tunnel egress."
-			INDEX {hwBpduTunnelEgressPortIndex,hwBpduTunnelBpduEgressMacIndex}
-			::= { hwBpduTunnelEgressTable 1 }
-		
-		HwBpduTunnelEgressEntry ::=
-			SEQUENCE { 
-			                hwBpduTunnelEgressPortIndex
-			                        Integer32,
-					hwBpduTunnelBpduEgressMacIndex
-						BpduIndex,
-					hwBpduTunnelEgressAddress
-						MacAddress,
-					hwBpduTunnelEgressRowStatus
-				                RowStatus	
-				}
-				
-		hwBpduTunnelEgressPortIndex OBJECT-TYPE
-			SYNTAX Integer32 (1..65535) 
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"Port index in interface."
-			::= { hwBpduTunnelEgressEntry 1 }		
-				
-		hwBpduTunnelBpduEgressMacIndex OBJECT-TYPE
-			SYNTAX BpduIndex
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"Bpdu MAC address list
-				BPDU DMAC		   protocol
-				01-80-C2-00-00-00	stp01
-				01-80-C2-00-00-01	pauseFrame
-				01-80-C2-00-00-02	reserved02
-				01-80-C2-00-00-03	reserved03
-				01-80-C2-00-00-04	reserved04
-				01-80-C2-00-00-05	reserved05
-				01-80-C2-00-00-06	reserved06
-				01-80-C2-00-00-07	reserved07
-				01-80-C2-00-00-08	stp02
-				01-80-C2-00-00-09	reserved08
-				01-80-C2-00-00-0a	hgmp
-				01-80-C2-00-00-0b	reserved09
-				01-80-C2-00-00-0c	reserved10
-				01-80-C2-00-00-0d	reserved11
-				01-80-C2-00-00-0e	reserved12
-				01-80-C2-00-00-0f	reserved13
-				01-80-C2-00-00-10	reserved14
-				01-80-C2-00-00-11	reserved15
-				01-80-C2-00-00-12	reserved16
-				01-80-C2-00-00-13	reserved17
-				01-80-C2-00-00-14	isisLevel01
-				01-80-C2-00-00-15	isisLevel02
-				01-80-C2-00-00-16	reserved18
-				01-80-C2-00-00-17	reserved19
-				01-80-C2-00-00-18	reserved20
-				01-80-C2-00-00-19	reserved21
-				01-80-C2-00-00-1a	reserved22
-				01-80-C2-00-00-1b	reserved23
-				01-80-C2-00-00-1c	reserved24
-				01-80-C2-00-00-1d	reserved25
-				01-80-C2-00-00-1e	reserved26
-				01-80-C2-00-00-1f	reserved27
-				01-80-C2-00-00-20	gmrp
-				01-80-C2-00-00-21	gvrp
-				01-80-C2-00-00-22	reserved28
-				01-80-C2-00-00-23	reserved29
-				01-80-C2-00-00-24	reserved30
-				01-80-C2-00-00-25	reserved31
-				01-80-C2-00-00-26	reserved32
-				01-80-C2-00-00-27	reserved33
-				01-80-C2-00-00-28	reserved34
-				01-80-C2-00-00-29	reserved35
-				01-80-C2-00-00-2a	reserved36
-				01-80-C2-00-00-2b	reserved37
-				01-80-C2-00-00-2c	reserved38
-				01-80-C2-00-00-2d	reserved39
-				01-80-C2-00-00-2e	reserved40
-				01-80-C2-00-00-2f	reserved41."
-			::= { hwBpduTunnelEgressEntry 2 }		
-		hwBpduTunnelEgressAddress OBJECT-TYPE
-			SYNTAX MacAddress
-			MAX-ACCESS read-create
-			STATUS current
-			DESCRIPTION
-				"Group mac address."
-			::= { hwBpduTunnelEgressEntry 3 }		
-	        hwBpduTunnelEgressRowStatus OBJECT-TYPE
-			SYNTAX RowStatus
-			MAX-ACCESS read-create
-			STATUS current
-			DESCRIPTION
-				"Row Status."
-			::= { hwBpduTunnelEgressEntry 4}		
-		hwBpduTunnelVlanTable  OBJECT-TYPE
-			SYNTAX SEQUENCE OF HwBpduTunnelVlanEntry
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"The table of port bpdu tunnel."
-			::= { hwQinQMngObjects 17 }
+        hwBpduTunnelEgressEntry OBJECT-TYPE
+            SYNTAX HwBpduTunnelEgressEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of bpdu tunnel egress."
+            INDEX {hwBpduTunnelEgressPortIndex,hwBpduTunnelBpduEgressMacIndex}
+            ::= { hwBpduTunnelEgressTable 1 }
+        
+        HwBpduTunnelEgressEntry ::=
+            SEQUENCE { 
+                            hwBpduTunnelEgressPortIndex
+                                    Integer32,
+                    hwBpduTunnelBpduEgressMacIndex
+                        BpduIndex,
+                    hwBpduTunnelEgressAddress
+                        MacAddress,
+                    hwBpduTunnelEgressRowStatus
+                                RowStatus    
+                }
+                
+        hwBpduTunnelEgressPortIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..65535) 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Port index in interface."
+            ::= { hwBpduTunnelEgressEntry 1 }        
+                
+        hwBpduTunnelBpduEgressMacIndex OBJECT-TYPE
+            SYNTAX BpduIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Bpdu MAC address list
+                BPDU DMAC           protocol
+                01-80-C2-00-00-00    stp01
+                01-80-C2-00-00-01    pauseFrame
+                01-80-C2-00-00-02    reserved02
+                01-80-C2-00-00-03    reserved03
+                01-80-C2-00-00-04    reserved04
+                01-80-C2-00-00-05    reserved05
+                01-80-C2-00-00-06    reserved06
+                01-80-C2-00-00-07    reserved07
+                01-80-C2-00-00-08    stp02
+                01-80-C2-00-00-09    reserved08
+                01-80-C2-00-00-0a    hgmp
+                01-80-C2-00-00-0b    reserved09
+                01-80-C2-00-00-0c    reserved10
+                01-80-C2-00-00-0d    reserved11
+                01-80-C2-00-00-0e    reserved12
+                01-80-C2-00-00-0f    reserved13
+                01-80-C2-00-00-10    reserved14
+                01-80-C2-00-00-11    reserved15
+                01-80-C2-00-00-12    reserved16
+                01-80-C2-00-00-13    reserved17
+                01-80-C2-00-00-14    isisLevel01
+                01-80-C2-00-00-15    isisLevel02
+                01-80-C2-00-00-16    reserved18
+                01-80-C2-00-00-17    reserved19
+                01-80-C2-00-00-18    reserved20
+                01-80-C2-00-00-19    reserved21
+                01-80-C2-00-00-1a    reserved22
+                01-80-C2-00-00-1b    reserved23
+                01-80-C2-00-00-1c    reserved24
+                01-80-C2-00-00-1d    reserved25
+                01-80-C2-00-00-1e    reserved26
+                01-80-C2-00-00-1f    reserved27
+                01-80-C2-00-00-20    gmrp
+                01-80-C2-00-00-21    gvrp
+                01-80-C2-00-00-22    reserved28
+                01-80-C2-00-00-23    reserved29
+                01-80-C2-00-00-24    reserved30
+                01-80-C2-00-00-25    reserved31
+                01-80-C2-00-00-26    reserved32
+                01-80-C2-00-00-27    reserved33
+                01-80-C2-00-00-28    reserved34
+                01-80-C2-00-00-29    reserved35
+                01-80-C2-00-00-2a    reserved36
+                01-80-C2-00-00-2b    reserved37
+                01-80-C2-00-00-2c    reserved38
+                01-80-C2-00-00-2d    reserved39
+                01-80-C2-00-00-2e    reserved40
+                01-80-C2-00-00-2f    reserved41."
+            ::= { hwBpduTunnelEgressEntry 2 }        
+        hwBpduTunnelEgressAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Group mac address."
+            ::= { hwBpduTunnelEgressEntry 3 }        
+            hwBpduTunnelEgressRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row Status."
+            ::= { hwBpduTunnelEgressEntry 4}        
+        hwBpduTunnelVlanTable  OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBpduTunnelVlanEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table of port bpdu tunnel."
+            ::= { hwQinQMngObjects 17 }
 
-		hwBpduTunnelVlanEntry OBJECT-TYPE
-			SYNTAX HwBpduTunnelVlanEntry
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"The entry of port bpdu tunnel vlan."
-			INDEX { hwBpduTunnelPortIndex }
-			::= { hwBpduTunnelVlanTable 1 }
+        hwBpduTunnelVlanEntry OBJECT-TYPE
+            SYNTAX HwBpduTunnelVlanEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of port bpdu tunnel vlan."
+            INDEX { hwBpduTunnelPortIndex }
+            ::= { hwBpduTunnelVlanTable 1 }
 
-		HwBpduTunnelVlanEntry ::=
-			SEQUENCE { 
-				hwBpduTunnelPortIndex  
-					Integer32,
-				hwBpduTunnelEnable
-				        INTEGER,  
-				hwBpduTunnelVlanListLow
-					VlanList,
-				hwBpduTunnelVlanListHigh 
-					VlanList
-				}
+        HwBpduTunnelVlanEntry ::=
+            SEQUENCE { 
+                hwBpduTunnelPortIndex  
+                    Integer32,
+                hwBpduTunnelEnable
+                        INTEGER,  
+                hwBpduTunnelVlanListLow
+                    VlanList,
+                hwBpduTunnelVlanListHigh 
+                    VlanList
+                }
 
-		hwBpduTunnelPortIndex OBJECT-TYPE
-			SYNTAX Integer32 (1..65535) 
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"Port index in interface."
-			::= { hwBpduTunnelVlanEntry 1 }	
-		hwBpduTunnelEnable OBJECT-TYPE
-			SYNTAX  INTEGER
-			{
-				enabled(1),
-				disabled(2)
-			} 
-			MAX-ACCESS read-write
-			STATUS current
-			DESCRIPTION
-				"Bpdu tunnel enable."
-			::= { hwBpduTunnelVlanEntry 2 }	
-		hwBpduTunnelVlanListLow OBJECT-TYPE
-			SYNTAX VlanList
-			MAX-ACCESS read-write
-			STATUS current
-			DESCRIPTION
-				"Vlan bpdu tunnel in port."
-			::= { hwBpduTunnelVlanEntry 3 }	
-		hwBpduTunnelVlanListHigh OBJECT-TYPE
-			SYNTAX VlanList
-			MAX-ACCESS read-write
-			STATUS current
-			DESCRIPTION
-				"Vlan bpdu tunnel in port."
-			::= { hwBpduTunnelVlanEntry 4 }
- 
-		hwBpduTunnelTable  OBJECT-TYPE
-			SYNTAX SEQUENCE OF HwBpduTunnelEntry
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"The table of bpdu tunnel."
-			::= { hwQinQMngObjects 18 }
-		
-		hwBpduTunnelEntry OBJECT-TYPE
-			SYNTAX HwBpduTunnelEntry
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"The entry of of bpdu tunnel."
-			INDEX {hwBpduTunnelBpduIndex}
-			::= { hwBpduTunnelTable 1 }
-		
-		HwBpduTunnelEntry ::=
-			SEQUENCE { 
-					hwBpduTunnelBpduIndex
-						BpduIndex,
-					hwBpduTunnelBpduEnable
-						INTEGER,     
-					hwBpduTunnelMultiAddress
-						MacAddress,
-                    hwBpduTunnelRowStatus
-				        RowStatus
-						
-				}
-						
-		hwBpduTunnelBpduIndex OBJECT-TYPE
-			SYNTAX BpduIndex
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"Bpdu mac address list
-				 BPDU Dmac		    protocol
-				01-80-C2-00-00-00	stp01       (1) 
-				01-80-C2-00-00-01	pauseFrame  (2)  
-				01-80-C2-00-00-02	reserved02  (3)
-				01-80-C2-00-00-03	reserved03  (4)  
-				01-80-C2-00-00-04	reserved04  (5)  
-				01-80-C2-00-00-05	reserved05  (6)  
-				01-80-C2-00-00-06	reserved06  (7)  
-				01-80-C2-00-00-07	reserved07  (8)  
-				01-80-C2-00-00-08	stp02       (9)  
-				01-80-C2-00-00-09	reserved08  (10) 
-				01-80-C2-00-00-0a	hgmp        (11) 
-				01-80-C2-00-00-0b	reserved09  (12) 
-				01-80-C2-00-00-0c	reserved10  (13) 
-				01-80-C2-00-00-0d	reserved11  (14) 
-				01-80-C2-00-00-0e	reserved12  (15) 
-				01-80-C2-00-00-0f	reserved13  (16) 
-				01-80-C2-00-00-10	reserved14  (17) 
-				01-80-C2-00-00-11	reserved15  (18) 
-				01-80-C2-00-00-12	reserved16  (19) 
-				01-80-C2-00-00-13	reserved17  (20)
-				01-80-C2-00-00-14	isisLevel01 (21)
-				01-80-C2-00-00-15	isisLevel02 (22) 
-				01-80-C2-00-00-16	reserved18  (23) 
-				01-80-C2-00-00-17	reserved19  (24) 
-				01-80-C2-00-00-18	reserved20  (25) 
-				01-80-C2-00-00-19	reserved21  (26) 
-				01-80-C2-00-00-1a	reserved22  (27) 
-				01-80-C2-00-00-1b	reserved23  (28) 
-				01-80-C2-00-00-1c	reserved24  (29) 
-				01-80-C2-00-00-1d	reserved25  (30) 
-				01-80-C2-00-00-1e	reserved26  (31) 
-				01-80-C2-00-00-1f	reserved27  (32)
-				01-80-C2-00-00-20	gmrp (33)
-				01-80-C2-00-00-21	gvrp (34)
-				01-80-C2-00-00-22	reserved28 (35)
-				01-80-C2-00-00-23	reserved29 (36)
-				01-80-C2-00-00-24	reserved30 (37)
-				01-80-C2-00-00-25	reserved31 (38)
-				01-80-C2-00-00-26	reserved32 (39)
-			    01-80-C2-00-00-27	reserved33 (40)
-				01-80-C2-00-00-28	reserved34 (41)
-				01-80-C2-00-00-29	reserved35 (42)
-				01-80-C2-00-00-2a	reserved36 (43)
-				01-80-C2-00-00-2b	reserved37 (44)
-				01-80-C2-00-00-2c	reserved38 (45)
-				01-80-C2-00-00-2d	reserved39 (46)
-				01-80-C2-00-00-2e	reserved40 (47)
-				01-80-C2-00-00-2f	reserved41 (48)
-				01-80-C2-00-00-02	lacp (49)
-				01-00-0C-CC-CC-CC   cdp  (50)
-				01-00-0C-CC-CC-CC   pagp (51)
-				01-00-0C-CC-CC-CC   udld (52)
-				01-00-0C-CC-CC-CC   vtp  (53) ."
-			::= { hwBpduTunnelEntry 1 }
-		
-		 hwBpduTunnelBpduEnable OBJECT-TYPE
+        hwBpduTunnelPortIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..65535) 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Port index in interface."
+            ::= { hwBpduTunnelVlanEntry 1 }    
+        hwBpduTunnelEnable OBJECT-TYPE
             SYNTAX  INTEGER
-			{
-				enabled(1),
-				disabled(2)
-			}
+            {
+                enabled(1),
+                disabled(2)
+            } 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Bpdu tunnel enable."
+            ::= { hwBpduTunnelVlanEntry 2 }    
+        hwBpduTunnelVlanListLow OBJECT-TYPE
+            SYNTAX VlanList
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Vlan bpdu tunnel in port."
+            ::= { hwBpduTunnelVlanEntry 3 }    
+        hwBpduTunnelVlanListHigh OBJECT-TYPE
+            SYNTAX VlanList
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Vlan bpdu tunnel in port."
+            ::= { hwBpduTunnelVlanEntry 4 }
+ 
+        hwBpduTunnelTable  OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBpduTunnelEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table of bpdu tunnel."
+            ::= { hwQinQMngObjects 18 }
+        
+        hwBpduTunnelEntry OBJECT-TYPE
+            SYNTAX HwBpduTunnelEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of of bpdu tunnel."
+            INDEX {hwBpduTunnelBpduIndex}
+            ::= { hwBpduTunnelTable 1 }
+        
+        HwBpduTunnelEntry ::=
+            SEQUENCE { 
+                    hwBpduTunnelBpduIndex
+                        BpduIndex,
+                    hwBpduTunnelBpduEnable
+                        INTEGER,     
+                    hwBpduTunnelMultiAddress
+                        MacAddress,
+                    hwBpduTunnelRowStatus
+                        RowStatus
+                        
+                }
+                        
+        hwBpduTunnelBpduIndex OBJECT-TYPE
+            SYNTAX BpduIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Bpdu mac address list
+                 BPDU Dmac            protocol
+                01-80-C2-00-00-00    stp01       (1) 
+                01-80-C2-00-00-01    pauseFrame  (2)  
+                01-80-C2-00-00-02    reserved02  (3)
+                01-80-C2-00-00-03    reserved03  (4)  
+                01-80-C2-00-00-04    reserved04  (5)  
+                01-80-C2-00-00-05    reserved05  (6)  
+                01-80-C2-00-00-06    reserved06  (7)  
+                01-80-C2-00-00-07    reserved07  (8)  
+                01-80-C2-00-00-08    stp02       (9)  
+                01-80-C2-00-00-09    reserved08  (10) 
+                01-80-C2-00-00-0a    hgmp        (11) 
+                01-80-C2-00-00-0b    reserved09  (12) 
+                01-80-C2-00-00-0c    reserved10  (13) 
+                01-80-C2-00-00-0d    reserved11  (14) 
+                01-80-C2-00-00-0e    reserved12  (15) 
+                01-80-C2-00-00-0f    reserved13  (16) 
+                01-80-C2-00-00-10    reserved14  (17) 
+                01-80-C2-00-00-11    reserved15  (18) 
+                01-80-C2-00-00-12    reserved16  (19) 
+                01-80-C2-00-00-13    reserved17  (20)
+                01-80-C2-00-00-14    isisLevel01 (21)
+                01-80-C2-00-00-15    isisLevel02 (22) 
+                01-80-C2-00-00-16    reserved18  (23) 
+                01-80-C2-00-00-17    reserved19  (24) 
+                01-80-C2-00-00-18    reserved20  (25) 
+                01-80-C2-00-00-19    reserved21  (26) 
+                01-80-C2-00-00-1a    reserved22  (27) 
+                01-80-C2-00-00-1b    reserved23  (28) 
+                01-80-C2-00-00-1c    reserved24  (29) 
+                01-80-C2-00-00-1d    reserved25  (30) 
+                01-80-C2-00-00-1e    reserved26  (31) 
+                01-80-C2-00-00-1f    reserved27  (32)
+                01-80-C2-00-00-20    gmrp (33)
+                01-80-C2-00-00-21    gvrp (34)
+                01-80-C2-00-00-22    reserved28 (35)
+                01-80-C2-00-00-23    reserved29 (36)
+                01-80-C2-00-00-24    reserved30 (37)
+                01-80-C2-00-00-25    reserved31 (38)
+                01-80-C2-00-00-26    reserved32 (39)
+                01-80-C2-00-00-27    reserved33 (40)
+                01-80-C2-00-00-28    reserved34 (41)
+                01-80-C2-00-00-29    reserved35 (42)
+                01-80-C2-00-00-2a    reserved36 (43)
+                01-80-C2-00-00-2b    reserved37 (44)
+                01-80-C2-00-00-2c    reserved38 (45)
+                01-80-C2-00-00-2d    reserved39 (46)
+                01-80-C2-00-00-2e    reserved40 (47)
+                01-80-C2-00-00-2f    reserved41 (48)
+                01-80-C2-00-00-02    lacp (49)
+                01-00-0C-CC-CC-CC   cdp  (50)
+                01-00-0C-CC-CC-CC   pagp (51)
+                01-00-0C-CC-CC-CC   udld (52)
+                01-00-0C-CC-CC-CC   vtp  (53) ."
+            ::= { hwBpduTunnelEntry 1 }
+        
+         hwBpduTunnelBpduEnable OBJECT-TYPE
+            SYNTAX  INTEGER
+            {
+                enabled(1),
+                disabled(2)
+            }
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION "Bpdu tunnel enable or disable."
             ::= { hwBpduTunnelEntry 2 }  
             
          hwBpduTunnelMultiAddress OBJECT-TYPE
-			SYNTAX MacAddress
-			MAX-ACCESS read-create
-			STATUS current
-			DESCRIPTION
-				"Group MAC address."
-			::= { hwBpduTunnelEntry 3 }    
+            SYNTAX MacAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Group MAC address."
+            ::= { hwBpduTunnelEntry 3 }    
          hwBpduTunnelRowStatus OBJECT-TYPE
-			SYNTAX RowStatus
-			MAX-ACCESS read-create
-			STATUS current
-			DESCRIPTION
-				"Row Status."
-			::= { hwBpduTunnelEntry 4}			
-			
-						
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row Status."
+            ::= { hwBpduTunnelEntry 4}            
+            
+                        
         hwQinQSwapCfgTable  OBJECT-TYPE
             SYNTAX SEQUENCE OF HwQinQSwapCfgEntry
             MAX-ACCESS not-accessible
             STATUS current
-            DESCRIPTION	"This table describes the vlan swap configurations of interfaces."
-            	::= { hwQinQMngObjects 19 }
+            DESCRIPTION    "This table describes the vlan swap configurations of interfaces."
+                ::= { hwQinQMngObjects 19 }
         
         hwQinQSwapCfgEntry OBJECT-TYPE
             SYNTAX HwQinQSwapCfgEntry
@@ -2062,11 +2105,11 @@ BpduIndex ::= TEXTUAL-CONVENTION
             DESCRIPTION "An entry is created for each active ethernet type interface in the device 
          and deleted when the interface been not exist."
             INDEX { hwQinQSwapCfgIfIndex }
-            	::= { hwQinQSwapCfgTable 1 }
+                ::= { hwQinQSwapCfgTable 1 }
         
         HwQinQSwapCfgEntry ::=
             SEQUENCE { 
-            		hwQinQSwapCfgIfIndex
+                    hwQinQSwapCfgIfIndex
                             InterfaceIndex,
                         hwQinQSwapCfgFlag
                             EnabledStatus
@@ -2077,30 +2120,286 @@ BpduIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION "Index number of the interface."
-            	::= { hwQinQSwapCfgEntry 1 }    
+                ::= { hwQinQSwapCfgEntry 1 }    
                         
         hwQinQSwapCfgFlag OBJECT-TYPE
             SYNTAX EnabledStatus
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION 
-            	"QinQ swap flag of the interface, which indicates whether to swap the two vlan tags or not when the interface receives a packet with two 802.1q tags."
-            DEFVAL{ disable }
-            ::= { hwQinQSwapCfgEntry 2 }   
+                "QinQ swap flag of the interface, which indicates whether to swap the two vlan tags or not when the interface receives a packet with two 802.1q tags."
+            DEFVAL{ disabled }
+            ::= { hwQinQSwapCfgEntry 2 }
 
+        hwQinQSubIfMapTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwQinQSubIfMapEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "The table is used to configure QinQ-mapping function in sub interface, then packets
+                transmitted from this sub interface input with one or two tags will be mapped to other tag or tags."
+            ::= { hwQinQMngObjects 20 }
+        
+        hwQinQSubIfMapEntry OBJECT-TYPE
+            SYNTAX HwQinQSubIfMapEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "The entry of an interface enabled the QinQ-Map function."
+            INDEX { hwQinQSubIfMapIfIndex,  hwQinQSubIfPEVlan, hwQinQSubIfCEVlanStart}
+            ::= { hwQinQSubIfMapTable 1 }
+        
+        HwQinQSubIfMapEntry ::=
+            SEQUENCE { 
+            hwQinQSubIfMapIfIndex
+               InterfaceIndex,                            
+            hwQinQSubIfPEVlan
+               Integer32,
+            hwQinQSubIfCEVlanStart
+                                Integer32, 
+            hwQinQSubIfCEVlanEnd
+                                Integer32,
+            hwQinQSubIfPEVlanMap
+                Integer32,  
+            hwQinQSubIfPEEtherType
+                Unsigned32,
+            hwQinQSubIfCEVlanMap
+                                Integer32, 
+            hwQinQSubIfCEEtherType
+                Unsigned32,
+            hwQinQSubIfMapGroupId
+                Integer32,
+            hwQinQSubIfMapPe8021p
+                INTEGER,
+            hwQinQSubIfMapCe8021p
+                INTEGER,
+            hwQinQSubIfMapCetoPeFlag
+                EnabledStatus,
+            hwQinQSubIfMapRowStatus
+                RowStatus                        
+         }
     
---  -------------------------------------------------------------
+        hwQinQSubIfMapIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Index number of the QinQ-Map interface."
+            ::= { hwQinQSubIfMapEntry 1 }        
+                      
+        hwQinQSubIfPEVlan OBJECT-TYPE
+            SYNTAX Integer32 (0..4094)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Outer vlan id of the packets which have two tags before being Mapped."
+            ::= { hwQinQSubIfMapEntry 2 }  
+                       
+       hwQinQSubIfCEVlanStart OBJECT-TYPE
+                        SYNTAX Integer32 (1..4094)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Inner start vlan id of the packets which have two tags before being Mapped."
+            ::= { hwQinQSubIfMapEntry 3 }    
+                                
+       hwQinQSubIfCEVlanEnd OBJECT-TYPE
+                        SYNTAX Integer32 (1..4094)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Inner end vlan id of the packets which have two tags before being Mapped."
+            ::= { hwQinQSubIfMapEntry 4 }
+           
+       hwQinQSubIfPEVlanMap OBJECT-TYPE
+            SYNTAX Integer32 (0..4094)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Outer vlan id of the packets which have two tags after being Mapped."
+            ::= { hwQinQSubIfMapEntry 5 }  
+                                                           
+       hwQinQSubIfPEEtherType OBJECT-TYPE
+            SYNTAX Unsigned32 ('600'h..'ffff'h)                        
+                        MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "EtherType of Pe Mapped."  
+            DEFVAL{ '8100'h }
+            ::= { hwQinQSubIfMapEntry 6 }
+                                                    
+       hwQinQSubIfCEVlanMap OBJECT-TYPE
+                        SYNTAX Integer32 (1..4094)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Inner vlan id of the packets which have two tags after being Mapped."
+            ::= { hwQinQSubIfMapEntry 7 }
+       
+       hwQinQSubIfCEEtherType OBJECT-TYPE
+            SYNTAX Unsigned32 ('600'h..'ffff'h)                        
+                        MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "EtherType of Ce Mapped."  
+            DEFVAL{ '8100'h }
+            ::= { hwQinQSubIfMapEntry 8 } 
+                       
+        hwQinQSubIfMapGroupId OBJECT-TYPE
+            SYNTAX Integer32 (0..16)
+            MAX-ACCESS  read-create
+            STATUS current
+            DESCRIPTION
+                "Group-management id."
+            DEFVAL { 0 }
+            ::= { hwQinQSubIfMapEntry 9 }
+                         
+        hwQinQSubIfMapPe8021p OBJECT-TYPE
+            SYNTAX INTEGER
+                   {
+                specify0(0),
+                specify1(1),
+                specify2(2),
+                specify3(3),
+                specify4(4),
+                specify5(5),
+                specify6(6),
+                specify7(7)
+                }
+                        MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The service policy map to set the 802.1P bits. By default(pevid), 
+                 copy the P bits that were in the outer PE VLAN tag to the trunk VLAN tag,
+                 by setting object to (cevid), copy the P bits that were in inner CE VALN
+                 tag to the trunk VLAN tag."
+            ::= { hwQinQSubIfMapEntry 10 }
+            
+        hwQinQSubIfMapCe8021p OBJECT-TYPE
+            SYNTAX INTEGER
+                   {
+                specify0(0),
+                specify1(1),
+                specify2(2),
+                specify3(3),
+                specify4(4),
+                specify5(5),
+                specify6(6),
+                specify7(7)
+                }
+                        MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The service policy map to set the 802.1P bits. By default(pevid), 
+                 copy the P bits that were in the outer PE VLAN tag to the trunk VLAN tag,
+                 by setting object to (cevid), copy the P bits that were in inner CE VALN
+                 tag to the trunk VLAN tag."
+            ::= { hwQinQSubIfMapEntry 11 }
+            
+        hwQinQSubIfMapCetoPeFlag OBJECT-TYPE
+            SYNTAX EnabledStatus
+                        MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The service type of the sub interface, by setting MapCetoPeFlag to the value (CetoPeenable),
+                the 8021p CetoPeenable attribute enabled."
+            ::= { hwQinQSubIfMapEntry 12 } 
+             
+        hwQinQSubIfMapRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Used for controlling the creation and deletion of this
+                row. All writeable objects in this row may be modified at any time.
+                If a Network Management Application  attempts to delete a conceptual
+                 row by setting this  object to 'destroy' and there are one or more entries
+                in hwQinQSubIfMapTable pointing to the row, the agent must also
+                destroy the corresponding entries in hwQinQSubIfMapTable."
+            ::= { hwQinQSubIfMapEntry 13 }
+          
+        hwQinQStackingVlanCfgTable  OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwQinQStackingVlanCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                "QinQ Stacking Vlan configuration table."
+            ::= { hwQinQMngObjects 21 }
+
+        hwQinQStackingVlanCfgEntry  OBJECT-TYPE  
+            SYNTAX  HwQinQStackingVlanCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                "This object indicates the configuration table for QinQ Stacking Vlan."
+            INDEX   { hwQinQStackingVlanCfgIfIndex }
+            ::= { hwQinQStackingVlanCfgTable 1}
+
+        HwQinQStackingVlanCfgEntry ::=
+            SEQUENCE 
+            {
+                hwQinQStackingVlanCfgIfIndex            
+                    InterfaceIndex,
+                hwQinQStackingVlanCfgVlanId
+                    VlanId,
+                hwQinQStackingVlanCfgRowStatus
+                    RowStatus
+            }
+
+        hwQinQStackingVlanCfgIfIndex    OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the Index number of the vlanif interface."
+            ::= { hwQinQStackingVlanCfgEntry 1 }
+    
+        hwQinQStackingVlanCfgVlanId     OBJECT-TYPE
+            SYNTAX VlanId
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the outer vlan id for QinQ Stacking Vlan."
+            ::= { hwQinQStackingVlanCfgEntry 2 }
+         
+        hwQinQStackingVlanCfgRowStatus    OBJECT-TYPE
+            SYNTAX  RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION   
+                "This object indicates the RowStatus of hwQinQStackingVlanTable."
+            ::= { hwQinQStackingVlanCfgEntry 50 }  
+
+--  =======================================
 -- HUAWEI-QINQ-MIB MIB - Conformance Information
--- -------------------------------------------------------------
+-- =======================================
         hwQinQConformance OBJECT IDENTIFIER ::= { hwQinQ 3 }
         
         hwQinQGroups OBJECT IDENTIFIER ::= { hwQinQConformance 1 }
         
---  -------------------------------------------------------------
+        hwQinQCompliances  OBJECT IDENTIFIER ::= { hwQinQConformance 2 }
+                
+        hwQinQCompliance MODULE-COMPLIANCE
+            STATUS current
+        DESCRIPTION
+                "The core compliance statement for all implementations."
+        MODULE -- this module
+        MANDATORY-GROUPS  {
+        hwQinQSystemBaseGroup,
+        hwQinQBpduTunnelGroup,
+        hwQinQSubIfVlanStackingGroup,
+        hwQinQSubIfStackingStatGroup, 
+        hwQinQSubIfTermGroup,
+        hwQinQSubIfTermStatGroup                                                        
+        }
+        ::= { hwQinQCompliances 1 } 
+                
+        
+--  =======================================
 -- units of conformance
--- -------------------------------------------------------------
+-- =======================================
                  hwQinQSystemBaseGroup OBJECT-GROUP
-                        OBJECTS { hwQinQSystemWellKnowMac, hwQinQSystemBridgeRole, hwBpduSystemDropPacketSta }
+                        OBJECTS { hwQinQSystemWellKnowMac, hwQinQSystemBridgeRole, hwBpduSystemDropPacketSta, hwQinQSystemEtherType }
                         STATUS current
                         DESCRIPTION 
                             "A collection of objects providing device level control
@@ -2135,7 +2434,7 @@ BpduIndex ::= TEXTUAL-CONVENTION
                         ::= { hwQinQGroups 4 }
         
                   hwQinQSubIfTermGroup OBJECT-GROUP
-                        OBJECTS { hwQinQSubIfTermCEVlanEnd, hwQinQSubIfTermGroupId,  hwQinQSubIfTermRowStatus,hwQinQSubIfTermSubscriberGroupName }
+                        OBJECTS { hwQinQSubIfTermCEVlanEnd, hwQinQSubIfTermGroupId,  hwQinQSubIfTermRowStatus, hwQinQSubIfTermCeVlanAny }
                         STATUS current
                         DESCRIPTION 
                             "A collection of objects providing device level control
@@ -2216,39 +2515,53 @@ BpduIndex ::= TEXTUAL-CONVENTION
                         DESCRIPTION 
                             "A collection of items of Mode config table."
                         ::= { hwQinQGroups 15 }
-		hwBpduTunnelIngressGroup OBJECT-GROUP
-			OBJECTS {hwBpduTunnelIngressAddress,hwBpduTunnelIngressRowStatus}
-			STATUS current
-			DESCRIPTION 
-				"A collection of items of Group Mac table."
-			::= { hwQinQGroups 16 }
-		hwBpduTunnelEgressGroup OBJECT-GROUP
-			OBJECTS {hwBpduTunnelEgressAddress,hwBpduTunnelEgressRowStatus}
-			STATUS current
-			DESCRIPTION 
-				"A collection of items of Group Mac table."
-			::= { hwQinQGroups 17 }
-		hwBpduTunnelVlanGroup OBJECT-GROUP
-			OBJECTS {hwBpduTunnelEnable,hwBpduTunnelVlanListLow,hwBpduTunnelVlanListHigh}
-			STATUS current
-			DESCRIPTION 
-				"A collection of items of Mode port bpdu tunnel table."
-			::= { hwQinQGroups 18 } 
-			
-		hwBpduTunnelGroup OBJECT-GROUP
-			OBJECTS {hwBpduTunnelBpduEnable,hwBpduTunnelMultiAddress,hwBpduTunnelRowStatus}
-			STATUS current
-			DESCRIPTION 
-				"A collection of items of bpdu tunnel mac table."
-			::= { hwQinQGroups 19 } 
-					
-		hwQinQSwapCfgGroup OBJECT-GROUP
-			OBJECTS {hwQinQSwapCfgFlag}
-			STATUS current
-			DESCRIPTION 
-				"A collection of items of Swap config table."
-			::= { hwQinQGroups 20 }
- 
+        hwBpduTunnelIngressGroup OBJECT-GROUP
+            OBJECTS {hwBpduTunnelIngressAddress,hwBpduTunnelIngressRowStatus}
+            STATUS current
+            DESCRIPTION 
+                "A collection of items of Group Mac table."
+            ::= { hwQinQGroups 16 }
+        hwBpduTunnelEgressGroup OBJECT-GROUP
+            OBJECTS {hwBpduTunnelEgressAddress,hwBpduTunnelEgressRowStatus}
+            STATUS current
+            DESCRIPTION 
+                "A collection of items of Group Mac table."
+            ::= { hwQinQGroups 17 }
+        hwBpduTunnelVlanGroup OBJECT-GROUP
+            OBJECTS {hwBpduTunnelEnable,hwBpduTunnelVlanListLow,hwBpduTunnelVlanListHigh}
+            STATUS current
+            DESCRIPTION 
+                "A collection of items of Mode port bpdu tunnel table."
+            ::= { hwQinQGroups 18 } 
+            
+        hwBpduTunnelGroup OBJECT-GROUP
+            OBJECTS {hwBpduTunnelBpduEnable,hwBpduTunnelMultiAddress,hwBpduTunnelRowStatus}
+            STATUS current
+            DESCRIPTION 
+                "A collection of items of bpdu tunnel mac table."
+            ::= { hwQinQGroups 19 } 
+                    
+        hwQinQSwapCfgGroup OBJECT-GROUP
+            OBJECTS {hwQinQSwapCfgFlag}
+            STATUS current
+            DESCRIPTION 
+                "A collection of items of Swap config table."
+            ::= { hwQinQGroups 20 }
+
+       hwQinQSubIfMapGroup OBJECT-GROUP
+                        OBJECTS { hwQinQSubIfCEVlanEnd,  hwQinQSubIfPEVlanMap, hwQinQSubIfPEEtherType,  hwQinQSubIfCEVlanMap, hwQinQSubIfCEEtherType, hwQinQSubIfMapGroupId,  hwQinQSubIfMapRowStatus ,hwQinQSubIfMapPe8021p ,hwQinQSubIfMapCe8021p , hwQinQSubIfMapCetoPeFlag}
+                        STATUS current
+                        DESCRIPTION 
+                            "A collection of objects providing device level control
+                            and status information for the sub interface."
+                        ::= { hwQinQGroups 21 }
+
+        hwQinQStackingVlanCfgGroup OBJECT-GROUP
+            OBJECTS {hwQinQStackingVlanCfgVlanId,hwQinQStackingVlanCfgRowStatus}
+            STATUS current
+            DESCRIPTION 
+                "A collection of items of QinQ Stacking Vlan config table."
+            ::= { hwQinQGroups 22 }
     END
 
 --

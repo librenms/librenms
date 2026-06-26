@@ -35,10 +35,8 @@ class QueryBuilderFluentParser extends QueryBuilderParser
 {
     /**
      * Convert the query builder rules to a Laravel Fluent builder
-     *
-     * @return Builder|null
      */
-    public function toQuery()
+    public function toQuery(): ?Builder
     {
         if (empty($this->builder) || ! array_key_exists('condition', $this->builder)) {
             return null;
@@ -54,14 +52,12 @@ class QueryBuilderFluentParser extends QueryBuilderParser
     }
 
     /**
-     * @param  Builder  $query
-     * @param  array  $rule
-     * @param  string  $parent_condition  AND or OR  (for root, this should be null)
-     * @return Builder
+     * @param  array{condition: string, rules: array<array{field: string, operator: string, value: mixed}>}  $rule
+     * @param  string|null  $parent_condition  AND or OR  (for root, this should be null)
      */
-    protected function parseGroupToQuery($query, $rule, $parent_condition = null)
+    protected function parseGroupToQuery(Builder $query, array $rule, ?string $parent_condition = null): Builder
     {
-        return $query->where(function ($query) use ($rule) {
+        return $query->where(function ($query) use ($rule): void {
             foreach ($rule['rules'] as $group_rule) {
                 if (array_key_exists('condition', $group_rule)) {
                     $this->parseGroupToQuery($query, $group_rule, $rule['condition']);
@@ -73,12 +69,10 @@ class QueryBuilderFluentParser extends QueryBuilderParser
     }
 
     /**
-     * @param  Builder  $query
-     * @param  array  $rule
+     * @param  array{field: string, operator: string, value: mixed}  $rule
      * @param  string  $condition  AND or OR
-     * @return Builder
      */
-    protected function parseRuleToQuery($query, $rule, $condition)
+    protected function parseRuleToQuery(Builder $query, array $rule, string $condition): Builder
     {
         [$field, $op, $value] = $this->expandRule($rule);
 
@@ -112,7 +106,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
                 return $query->whereBetween($field, $value, $condition, $op == 'not_between');
             case 'in':
             case 'not_in':
-                $values = preg_split('/[, ]/', $value);
+                $values = preg_split('/[, ]/', (string) $value);
                 if ($values !== false) {
                     return $query->whereIn($field, $values, $condition, $op == 'not_in');
                 }
@@ -128,10 +122,10 @@ class QueryBuilderFluentParser extends QueryBuilderParser
     /**
      * Extract field, operator and value from the rule and expand macros and raw values
      *
-     * @param  array  $rule
-     * @return array [field, operator, value]
+     * @param  array{field: string, operator: string, value: mixed}  $rule
+     * @return array{0: string, 1: string, 2: mixed} [field, operator, value]
      */
-    protected function expandRule($rule)
+    protected function expandRule(array $rule): array
     {
         $field = $rule['field'];
         if (Str::startsWith($field, 'macros.')) {
@@ -141,18 +135,14 @@ class QueryBuilderFluentParser extends QueryBuilderParser
         $op = $rule['operator'];
 
         $value = $rule['value'];
-        if (! is_array($value) && is_string($value) && Str::startsWith($value, '`') && Str::endsWith($value, '`')) {
+        if (is_string($value) && Str::startsWith($value, '`') && Str::endsWith($value, '`')) {
             $value = DB::raw($this->expandMacro(trim($value, '`')));
         }
 
         return [$field, $op, $value];
     }
 
-    /**
-     * @param  Builder  $query
-     * @return Builder
-     */
-    protected function joinTables($query)
+    protected function joinTables(Builder $query): Builder
     {
         if (! isset($this->builder['joins'])) {
             $this->generateJoins();
@@ -169,14 +159,12 @@ class QueryBuilderFluentParser extends QueryBuilderParser
     /**
      * Generate the joins for this rule and store them in the rule.
      * This is an expensive operation.
-     *
-     * @return $this
      */
-    public function generateJoins()
+    public function generateJoins(): static
     {
         $joins = [];
         foreach ($this->generateGlue() as $glue) {
-            [$left, $right] = explode(' = ', $glue, 2);
+            [$left, $right] = explode(' = ', (string) $glue, 2);
             if (Str::contains($right, '.')) { // last line is devices.device_id = ? for alerting... ignore it
                 [$leftTable, $leftKey] = explode('.', $left);
                 [$rightTable, $rightKey] = explode('.', $right);

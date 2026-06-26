@@ -96,17 +96,18 @@ class Prometheus extends BaseDatastore
             }
         }
 
+        $device = $this->getDevice($meta);
+        if (LibrenmsConfig::get('prometheus.attach_sysname', false)) {
+            $tags['sysName'] = $device->sysName;
+        }
+
         foreach ($tags as $t => $v) {
             if ($v !== null) {
                 $promtags .= (Str::contains($v, '/') ? "/$t@base64/" . base64_encode($v) : "/$t/$v");
             }
         }
 
-        $device = $this->getDevice($meta);
         $promurl = $device->hostname . $promtags;
-        if (LibrenmsConfig::get('prometheus.attach_sysname', false)) {
-            $promurl .= '/sysName/' . $device->sysName;
-        }
         $promurl = str_replace(' ', '-', $promurl); // Prometheus doesn't handle tags with spaces in url
 
         Log::debug("Prometheus put $promurl: ", [
@@ -124,7 +125,7 @@ class Prometheus extends BaseDatastore
             if (! $result->successful()) {
                 Log::error('Prometheus Error: ' . $result->body());
             }
-        } catch (ConnectionException $e) {
+        } catch (ConnectionException) {
             \Illuminate\Support\Facades\Log::error("%RFailed to connect to Prometheus server $this->base_uri, temporarily disabling.%n", ['color' => true]);
             $this->enabled = false;
         }

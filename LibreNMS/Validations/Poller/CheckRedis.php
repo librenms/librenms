@@ -69,7 +69,7 @@ class CheckRedis implements \LibreNMS\Interfaces\Validation
             Redis::command('ping');
 
             return true;
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return false;
         } finally {
             restore_error_handler();

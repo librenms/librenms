@@ -1,4 +1,3 @@
-mib: ENTITY-MIB
 modules:
     os:
         hardware:

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\Filterable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,15 +13,63 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\IfOperStatus;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
-use Permissions;
 
+/**
+ * @property IfOperStatus|null $ifOperStatus
+ * @property IfOperStatus|null $ifOperStatus_prev
+ * @property IfOperStatus|null $ifAdminStatus
+ * @property IfOperStatus|null $ifAdminStatus_prev
+ */
 class Port extends DeviceRelatedModel
 {
     use HasFactory;
+    use Filterable;
 
     public $timestamps = false;
     protected $primaryKey = 'port_id';
+    protected $guarded = [];
+    protected array $filterable = [
+        'device_id',
+        'ifName',
+        'ifDescr',
+        'portName',
+        'ifSpeed',
+        'ifIndex',
+        'ifOperStatus',
+        'ifAdminStatus',
+        'ifDuplex',
+        'ifMtu',
+        'ifType',
+        'ifAlias',
+        'ifPhysAddress',
+        'ifLastChange',
+        'ifVlan',
+        'ifTrunk',
+        'ifVrf',
+        'ignore',
+        'disabled',
+        'deleted',
+        'state',
+        'search',
+        'errors',
+        'groups.id',
+        'device.groups.id',
+        'device.location_id',
+        'device.hostname',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'ifOperStatus' => IfOperStatus::class,
+            'ifOperStatus_prev' => IfOperStatus::class,
+            'ifAdminStatus' => IfOperStatus::class,
+            'ifAdminStatus_prev' => IfOperStatus::class,
+        ];
+    }
 
     /**
      * Initialize this class
@@ -29,7 +78,7 @@ class Port extends DeviceRelatedModel
     {
         parent::boot();
 
-        static::deleting(function (Port $port) {
+        static::deleting(function (Port $port): void {
             // delete related data
             $port->adsl()->delete();
             $port->vdsl()->delete();
@@ -50,6 +99,7 @@ class Port extends DeviceRelatedModel
             $port->vlans()->delete();
             $port->links()->delete();
             $port->remoteLinks()->delete();
+            $port->bills()->detach();
 
             // dont have relationships yet
             DB::table('juniAtmVp')->where('port_id', $port->port_id)->delete();
@@ -86,13 +136,13 @@ class Port extends DeviceRelatedModel
         }
 
         foreach ((array) \App\Facades\LibrenmsConfig::get('rewrite_if', []) as $src => $val) {
-            if (Str::contains(strtolower($label), strtolower($src))) {
+            if (Str::contains(strtolower($label), strtolower((string) $src))) {
                 $label = $val;
             }
         }
 
         foreach ((array) \App\Facades\LibrenmsConfig::get('rewrite_if_regexp', []) as $reg => $val) {
-            $label = preg_replace($reg . 'i', $val, $label);
+            $label = preg_replace($reg . 'i', (string) $val, $label);
         }
 
         return $label;
@@ -131,22 +181,26 @@ class Port extends DeviceRelatedModel
     }
 
     /**
-     * Check if user can access this port.
+     * Get port speeds, respecting parsed interface circuit speeds as bps
      *
-     * @param  User|int  $user
-     * @return bool
+     * @return array{int, int} [egress bps, ingress bps]
      */
-    public function canAccess($user)
+    public function getSpeeds(): array
     {
-        if (! $user) {
-            return false;
+        $egress = $ingress = (int) $this->ifSpeed;
+
+        if (! empty($this->port_descr_speed)) {
+            $speed_parts = explode('/', (string) $this->port_descr_speed, 2);
+            $parsed_egress = Number::toBytes($speed_parts[0]);
+            $parsed_ingress = isset($speed_parts[1]) ? Number::toBytes($speed_parts[1]) : $parsed_egress;
+
+            if ($parsed_egress > 0 && $parsed_ingress > 0) {
+                $egress = $parsed_egress;
+                $ingress = $parsed_ingress;
+            }
         }
 
-        if ($user->hasGlobalRead()) {
-            return true;
-        }
-
-        return Permissions::canAccessDevice($this->device_id, $user) || Permissions::canAccessPort($this->port_id, $user);
+        return [$egress, $ingress];
     }
 
     // ---- Accessors/Mutators ----
@@ -154,7 +208,7 @@ class Port extends DeviceRelatedModel
     public function getIfPhysAddressAttribute($mac)
     {
         if (! empty($mac)) {
-            return preg_replace('/(..)(..)(..)(..)(..)(..)/', '\\1:\\2:\\3:\\4:\\5:\\6', $mac);
+            return preg_replace('/(..)(..)(..)(..)(..)(..)/', '\\1:\\2:\\3:\\4:\\5:\\6', (string) $mac);
         }
 
         return null;
@@ -194,7 +248,7 @@ class Port extends DeviceRelatedModel
             [$this->qualifyColumn('deleted'), '=', 0],
             [$this->qualifyColumn('ignore'), '=', 0],
             [$this->qualifyColumn('disabled'), '=', 0],
-            [$this->qualifyColumn('ifOperStatus'), '=', 'up'],
+            [$this->qualifyColumn('ifOperStatus'), '=', IfOperStatus::Up],
         ]);
     }
 
@@ -208,8 +262,8 @@ class Port extends DeviceRelatedModel
             [$this->qualifyColumn('deleted'), '=', 0],
             [$this->qualifyColumn('ignore'), '=', 0],
             [$this->qualifyColumn('disabled'), '=', 0],
-            [$this->qualifyColumn('ifOperStatus'), '!=', 'up'],
-            [$this->qualifyColumn('ifAdminStatus'), '=', 'up'],
+            [$this->qualifyColumn('ifOperStatus'), '!=', IfOperStatus::Up],
+            [$this->qualifyColumn('ifAdminStatus'), '=', IfOperStatus::Up],
         ]);
     }
 
@@ -223,7 +277,7 @@ class Port extends DeviceRelatedModel
             [$this->qualifyColumn('deleted'), '=', 0],
             [$this->qualifyColumn('ignore'), '=', 0],
             [$this->qualifyColumn('disabled'), '=', 0],
-            [$this->qualifyColumn('ifAdminStatus'), '=', 'down'],
+            [$this->qualifyColumn('ifAdminStatus'), '=', IfOperStatus::Down],
         ]);
     }
 
@@ -261,7 +315,7 @@ class Port extends DeviceRelatedModel
             [$this->qualifyColumn('deleted'), '=', 0],
             [$this->qualifyColumn('ignore'), '=', 0],
             [$this->qualifyColumn('disabled'), '=', 0],
-        ])->where(function ($query) {
+        ])->where(function ($query): void {
             /** @var Builder $query */
             $query->where($this->qualifyColumn('ifInErrors_delta'), '>', 0)
                 ->orWhere($this->qualifyColumn('ifOutErrors_delta'), '>', 0);
@@ -287,11 +341,63 @@ class Port extends DeviceRelatedModel
 
     public function scopeInPortGroup($query, $portGroup)
     {
-        return $query->whereIn($query->qualifyColumn('port_id'), function ($query) use ($portGroup) {
+        return $query->whereIn($query->qualifyColumn('port_id'), function ($query) use ($portGroup): void {
             $query->select('port_id')
                 ->from('port_group_port')
                 ->where('port_group_id', $portGroup);
         });
+    }
+
+    public function filterErrors(Builder $query, mixed $value, array $config): void
+    {
+        $query->where(function (Builder $query) use ($value): void {
+            $operator = $value ? '>' : '=';
+            $boolean = $value ? 'or' : 'and';
+
+            $query->where($this->qualifyColumn('ifInErrors_delta'), $operator, 0, $boolean)
+                ->where($this->qualifyColumn('ifOutErrors_delta'), $operator, 0, $boolean);
+        });
+    }
+
+    /**
+     * Handle the "State" filter.
+     * up: Admin Up + Oper Up
+     * down: Admin Up + Oper NOT Up
+     * shutdown: Admin NOT Up
+     */
+    public function filterState(Builder $query, mixed $value, array $config): void
+    {
+        $this->applyMappedFilter($query, $value, $config, fn (Builder $q, $state) => match ($state) {
+            'up' => $q->where('ifOperStatus', 'up'),
+            'shutdown' => $q->where('ifAdminStatus', 'down'),
+            default => $q->where('ifOperStatus', '!=', 'up')
+                ->where(fn (Builder $sub) => $sub->where('ifAdminStatus', '!=', 'down')->orWhereNull('ifAdminStatus')),
+        });
+    }
+
+    /**
+     * Handle a global text search across multiple port fields
+     */
+    public function filterSearch(Builder $query, mixed $value, array $config): void
+    {
+        $this->applyFilterSearch(['ifName', 'ifAlias', 'ifDescr'], $query, $value, $config);
+    }
+
+    /**
+     * Custom filter for ifDuplex to handle "unknown" as both 'unknown' and NULL.
+     */
+    public function filterIfDuplex(Builder $query, mixed $value, array $config): void
+    {
+        if ($value === 'unknown') {
+            $query->where(function ($q): void {
+                $q->whereIn('ports.ifDuplex', ['unknown', ''])
+                    ->orWhereNull('ports.ifDuplex');
+            });
+
+            return;
+        }
+
+        $this->applyQueryLogic($query, 'ports.ifDuplex', $value, $config);
     }
 
     // ---- Define Relationships ----
@@ -301,6 +407,14 @@ class Port extends DeviceRelatedModel
     public function adsl(): HasOne
     {
         return $this->hasOne(PortAdsl::class, 'port_id');
+    }
+
+    /**
+     * @return BelongsToMany<Bill, $this>
+     */
+    public function bills(): BelongsToMany
+    {
+        return $this->belongsToMany(Bill::class, 'bill_ports', 'port_id', 'bill_id');
     }
 
     /**
@@ -383,6 +497,9 @@ class Port extends DeviceRelatedModel
         return $this->hasMany(Link::class, 'remote_port_id');
     }
 
+    /**
+     * @return \Illuminate\Support\Collection<int, \App\Models\Link>
+     */
     public function allLinks(): \Illuminate\Support\Collection
     {
         return $this->links->merge($this->remoteLinks);
@@ -402,7 +519,7 @@ class Port extends DeviceRelatedModel
     public function macLinkedPorts(): HasManyThrough
     {
         return $this->hasManyThrough(Port::class, Ipv4Mac::class, 'port_id', 'ifPhysAddress', 'port_id', 'mac_address')
-            ->join('ipv4_addresses', function ($j) {
+            ->join('ipv4_addresses', function ($j): void {
                 $j->on('ipv4_mac.ipv4_address', 'ipv4_addresses.ipv4_address');
                 $j->on('ports.port_id', 'ipv4_addresses.port_id');
             })
@@ -568,5 +685,13 @@ class Port extends DeviceRelatedModel
     public function vrf(): HasOne
     {
         return $this->hasOne(Vrf::class, 'vrf_id', 'ifVrf');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\PortSecurity, $this>
+     */
+    public function portSecurity(): HasOne
+    {
+        return $this->hasOne(PortSecurity::class, 'port_id');
     }
 }

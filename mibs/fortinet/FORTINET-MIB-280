@@ -13,7 +13,7 @@ FORTINET-MIB-280 DEFINITIONS ::= BEGIN
 		DisplayString
 			FROM SNMPv2-TC
 		MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32, 
-		enterprises, IpAddress
+		Counter32, enterprises, IpAddress
 			FROM SNMPv2-SMI;
 
 	--

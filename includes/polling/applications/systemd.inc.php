@@ -40,9 +40,7 @@ if (! function_exists('systemd_data_update_helper')) {
         $state_type,
         $rrd_flattened_name
     ) {
-        $rrd_flattened_name = is_null($rrd_flattened_name)
-            ? $state_type
-            : $rrd_flattened_name;
+        $rrd_flattened_name ??= $state_type;
         $rrd_name = [$polling_type, $name, $app_id, $rrd_flattened_name];
 
         // This if block allows metric names to be kept consistent
@@ -94,7 +92,7 @@ foreach ($systemd_mapper as $state_type => $state_statuses) {
     $flattened_type = $state_type;
 
     // Ternary-depth systemd type check.
-    if (preg_match('/^(.+)_(.+)$/', $state_type, $regex_matches)) {
+    if (preg_match('/^(.+)_(.+)$/', (string) $state_type, $regex_matches)) {
         if (! in_array($regex_matches[1], $state_type_ternary_depth)) {
             continue;
         }

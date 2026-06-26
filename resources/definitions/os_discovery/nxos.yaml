@@ -1,5 +1,7 @@
 modules:
     os:
-        version: 'ENTITY-MIB::entPhysicalSoftwareRev.22'
+        version:
+            'ENTITY-MIB::entPhysicalSoftwareRev.22'
+            'ENTITY-MIB::entPhysicalSoftwareRev.24'
         hardware: 'ENTITY-MIB::entPhysicalName.149'
         serial: 'ENTITY-MIB::entPhysicalSerialNum.10'

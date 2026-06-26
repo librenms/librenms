@@ -4,21 +4,10 @@ namespace App\Policies;
 
 use App\Models\Dashboard;
 use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
 class DashboardPolicy
 {
-    use HandlesAuthorization;
-
-    /**
-     * Create a new policy instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        //
-    }
+    use ChecksGlobalPermissions;
 
     /**
      * Determine whether the user can view any dashboard.
@@ -59,7 +48,9 @@ class DashboardPolicy
      */
     public function update(User $user, Dashboard $dashboard): bool
     {
-        return $dashboard->user_id == $user->user_id || $dashboard->access > 2 || ($dashboard->access > 1 && $user->isAdmin());
+        return $dashboard->user_id == $user->user_id
+            || $dashboard->access > 2
+            || ($dashboard->access > 1 && $this->hasGlobalPermission($user, 'update'));
     }
 
     /**
@@ -70,7 +61,8 @@ class DashboardPolicy
      */
     public function delete(User $user, Dashboard $dashboard): bool
     {
-        return $dashboard->user_id == $user->user_id || $user->isAdmin();
+        return $dashboard->user_id == $user->user_id
+            || $this->hasGlobalPermission($user, 'delete');
     }
 
     /**
@@ -80,9 +72,9 @@ class DashboardPolicy
      * @param  Dashboard  $dashboard
      * @param  int  $target_user_id
      */
-    public function copy(User $user, Dashboard $dashboard, int $target_user_id): bool
+    public function copy(User $user, ?Dashboard $dashboard = null, int $target_user_id = 0): bool
     {
-        // user can copy to themselves if they can view, otherwise admins can
-        return $user->isAdmin() || ($user->user_id == $target_user_id && $this->view($user, $dashboard));
+        return $this->hasGlobalPermission($user, 'copy')
+            || ($dashboard && $target_user_id && $user->user_id == $target_user_id && $this->view($user, $dashboard));
     }
 }

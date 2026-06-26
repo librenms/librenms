@@ -14,7 +14,6 @@
 $stype = '';
 $device_id = (int) ($device['device_id'] ?? 0);
 
-if (Auth::user()->hasGlobalAdmin()) {
     // Build the types list.
     $dir = \App\Facades\LibrenmsConfig::get('nagios_plugins');
     if (file_exists($dir) && is_dir($dir)) {
@@ -146,31 +145,32 @@ $('#create-service').on('show.bs.modal', function (e) {
     var service_id = button.data('service_id');
     var modal = $(this)
     $('#service_id').val(service_id);
-    $.ajax({
-        type: "POST",
-        url: "ajax_form.php",
-        data: { type: "parse-service", service_id: service_id },
-        dataType: "json",
-        success: function(output) {
-            $('#stype').val(output['stype']);
-            $("#stype").prop("disabled", true);
-            $('#ip').val(output['ip']);
-            $('#desc').val(output['desc']);
-            $('#param').val(output['param']);
-            $('#ignore').val(output['ignore']);
-            $('#disabled').val(output['disabled']);
-            $('#ignore_box').val(output['ignore']);
-            $('#disabled_box').val(output['disabled']);
-            if ($('#ignore').attr('value') == 1) {
-                $('#ignore_box').prop("checked", true);
+    if (service_id) {
+        $.ajax({
+            type: "GET",
+            url: '<?php echo route("service.show", ["service" => ":service"]) ?>'.replace(':service', service_id),
+            dataType: "json",
+            success: function(output) {
+                $('#stype').val(output['stype']);
+                $("#stype").prop("disabled", true);
+                $('#ip').val(output['ip']);
+                $('#desc').val(output['desc']);
+                $('#param').val(output['param']);
+                $('#ignore').val(output['ignore']);
+                $('#disabled').val(output['disabled']);
+                $('#ignore_box').val(output['ignore']);
+                $('#disabled_box').val(output['disabled']);
+                if ($('#ignore').attr('value') == 1) {
+                    $('#ignore_box').prop("checked", true);
+                }
+                if ($('#disabled').attr('value') == 1) {
+                    $('#disabled_box').prop("checked", true);
+                }
+                $('#service_template_id').val(output['service_template_id']);
+                $('#name').val(output['name']);
             }
-            if ($('#disabled').attr('value') == 1) {
-                $('#disabled_box').prop("checked", true);
-            }
-            $('#service_template_id').val(output['service_template_id']);
-            $('#name').val(output['name']);
-        }
-    });
+        });
+    }
 
 });
 
@@ -195,12 +195,11 @@ $('#service-submit').on("click", function(e) {
                 $("#ajax_response").html('<div class="alert alert-danger">'+result.message+'</div>');
             }
         },
-        error: function(){
-            $("#ajax_response").html('<div class="alert alert-info">An error occurred creating this service.</div>');
+        error: function(result){
+            var msg = (result.responseJSON && result.responseJSON.message) ? result.responseJSON.message : 'An error occurred saving this service.';
+            $("#ajax_response").html('<div class="alert alert-danger">' + msg + '</div>');
         }
     });
 });
 
 </script>
-    <?php
-}

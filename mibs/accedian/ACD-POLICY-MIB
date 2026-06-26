@@ -1,7 +1,7 @@
 --
 -- Accedian Enterprise Specific MIB
 --
--- Copyright (c) 2005-2011, Accedian Networks, Inc.
+-- Copyright (c) 2005-2016, Accedian Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -24,16 +24,31 @@ IMPORTS
 
 acdPolicy MODULE-IDENTITY
 
-    LAST-UPDATED "201110100100Z"
+    LAST-UPDATED "201609230100Z"
     ORGANIZATION "Accedian Networks, Inc."
     CONTACT-INFO
             "Accedian Technical Assistance Center
              Accedian Networks, Inc.
-             4878 Levy, suite 202
-             Saint-Laurent, Quebec Canada H4R 2P1
+             2351 Alfred-Nobel blvd., Suite N-410
+             Saint-Laurent, Quebec Canada H4S 2A9
              E-mail: support@accedian.com"
     DESCRIPTION
             "The Policies database for this Accedian Networks device."
+
+    REVISION "201609230100Z"        -- 23 September 2016
+    DESCRIPTION
+            "Add acdPolicyHistStatsID and acdPolicyHistStatsSampleIndex
+             to acdPolicyHistStatsGroup.
+             Add acdPolicyDeprecatedCompliance MODULE-COMPLIANCE."
+
+    REVISION "201605260100Z"        -- 26 May 2016
+    DESCRIPTION
+            "Set access level to read-only for acdPolicyHistStatsID,
+             acdPolicyHistStatsSampleIndex."
+
+    REVISION "201304240100Z"        -- 24 April 2013
+    DESCRIPTION
+            "Add tvlan id and Outer vlan to acdPolicyTable. Update encaplusation actions"
 
     REVISION "201110100100Z"        -- 10 October 2011
     DESCRIPTION
@@ -135,7 +150,9 @@ AcdPolicyEntry ::= SEQUENCE {
     acdPolicyDefaultMappingGreenPrior   Unsigned32,
     acdPolicyDefaultMappingYellowCfi    Unsigned32,
     acdPolicyDefaultMappingYellowPrior  Unsigned32,
-    acdPolicyOutgoingPort               OBJECT IDENTIFIER
+    acdPolicyOutgoingPort               OBJECT IDENTIFIER,
+    acdPolicyEvcMappingVlan2Etype       INTEGER,
+    acdPolicyEvcMappingVlan2Id          Unsigned32
 }
 
 acdPolicyID  OBJECT-TYPE
@@ -280,7 +297,11 @@ acdPolicyEvcMappingEncaps OBJECT-TYPE
                     pop(3),
                     replace(4),
                     popAndReplace(5),
-                    pushAndPreserve(6)
+                    pushAndPreserve(6),
+                    preserveVlanNewCfiPcp(7),
+                    pushAndPush(8),
+                    popAndPop(9),
+                    pushAndReplace(10)
     }
     MAX-ACCESS  read-write
     STATUS      current
@@ -291,14 +312,16 @@ acdPolicyEvcMappingEncaps OBJECT-TYPE
 acdPolicyEvcMappingEtype OBJECT-TYPE
     SYNTAX      INTEGER {
                     cvlan(1),
-                    svlan(2)
+                    svlan(2),
+                    tvlan(3)
     }
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The ethertype of the VLAN to be added if the encapsulation is set to 
-         push. Possible values are customer VLAN (cvlan) and service VLAN
-         (svlan)."
+        "The ethertype of the second VLAN to be added if the 
+         encapsulation is set to push. Possible values are customer 
+         VLAN (cvlan), service VLAN(svlan) and tunneling VLAN(tvlan).
+         Note: some values are only applicable on certain platforms."
     ::= { acdPolicyEntry 15 }
 
 acdPolicyEvcMappingVlanId OBJECT-TYPE
@@ -463,6 +486,31 @@ acdPolicyOutgoingPort  OBJECT-TYPE
              name of this port."
     ::= { acdPolicyEntry 30 }
 
+acdPolicyEvcMappingVlan2Etype OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    cvlan(1),
+                    svlan(2),
+                    tvlan(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ethertype of the second VLAN to be added if the 
+         encapsulation is set to push. Possible values are customer 
+         VLAN (cvlan), service VLAN(svlan) and tunneling VLAN(tvlan).
+         Note: some values are only applicable on certain platforms."
+    ::= { acdPolicyEntry 31 }
+
+acdPolicyEvcMappingVlan2Id OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The second VLAN ID to be added if the encapsulation is set to 
+         push. Its value ranges from 0 to 4095."
+    ::= { acdPolicyEntry 32 }
+
+
 -----------------------------------------------------------------------
  -- The Policies Counters table
  -- This table contains all counters associated with each policy.
@@ -540,7 +588,6 @@ acdPolicyStatsInPkts OBJECT-TYPE
 
 acdPolicyStatsInOverflowPkts OBJECT-TYPE
     SYNTAX      Counter32
-    UNITS       "Packets"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -574,7 +621,6 @@ acdPolicyStatsInOctets OBJECT-TYPE
 
 acdPolicyStatsInOverflowOctets OBJECT-TYPE
     SYNTAX      Counter32
-    UNITS       "Octets"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -608,7 +654,6 @@ acdPolicyStatsInPktsErr OBJECT-TYPE
 
 acdPolicyStatsInOverflowPktsErr OBJECT-TYPE
     SYNTAX      Counter32
-    UNITS       "Packets"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -677,7 +722,7 @@ AcdPolicyHistStatsEntry ::= SEQUENCE {
 
 acdPolicyHistStatsID  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "Unique value for each policy counter. Its value ranges from 1 to
@@ -702,7 +747,7 @@ acdPolicyHistStatsEntryID  OBJECT-TYPE
 
 acdPolicyHistStatsSampleIndex  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "An index that uniquely identifies the particular sample this entry
@@ -752,7 +797,6 @@ acdPolicyHistStatsInPkts OBJECT-TYPE
 
 acdPolicyHistStatsInOverflowPkts OBJECT-TYPE
     SYNTAX      Counter32
-    UNITS       "Packets"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -786,7 +830,6 @@ acdPolicyHistStatsInOctets OBJECT-TYPE
 
 acdPolicyHistStatsInOverflowOctets OBJECT-TYPE
     SYNTAX      Counter32
-    UNITS       "Octets"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -820,7 +863,6 @@ acdPolicyHistStatsInPktsErr OBJECT-TYPE
 
 acdPolicyHistStatsInOverflowPktsErr OBJECT-TYPE
     SYNTAX      Counter32
-    UNITS       "Packets"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -997,7 +1039,9 @@ acdPolicyGroup OBJECT-GROUP
         acdPolicyDefaultMappingGreenPrior,
         acdPolicyDefaultMappingYellowCfi,
         acdPolicyDefaultMappingYellowPrior,
-        acdPolicyOutgoingPort
+        acdPolicyOutgoingPort,
+        acdPolicyEvcMappingVlan2Etype,
+        acdPolicyEvcMappingVlan2Id
     }
     STATUS      current
     DESCRIPTION
@@ -1025,8 +1069,10 @@ acdPolicyStatsGroup OBJECT-GROUP
 
 acdPolicyHistStatsGroup OBJECT-GROUP
     OBJECTS {
+        acdPolicyHistStatsID,
         acdPolicyHistStatsListID,
         acdPolicyHistStatsEntryID,
+        acdPolicyHistStatsSampleIndex,
         acdPolicyHistStatsStatus,
         acdPolicyHistStatsDuration,
         acdPolicyHistStatsIntervalEnd,
@@ -1098,5 +1144,15 @@ acdPolicyCompliance MODULE-COMPLIANCE
 
     ::= { acdPolicyCompliances 1 }
 
+acdPolicyDeprecatedCompliance MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+       "The compliance statement for support of the ACD-POLICY-MIB module."
+    MODULE
+        MANDATORY-GROUPS {
+            acdPolicyDeprecatedGroup
+         }
+
+    ::= { acdPolicyCompliances 2 }
 
 END

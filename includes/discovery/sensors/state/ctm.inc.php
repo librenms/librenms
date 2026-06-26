@@ -25,12 +25,12 @@
  */
 $states = [
     'power' => [
-        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Power On'],
-        ['value' => 0, 'generic' => 1, 'graph' => 0, 'descr' => 'Power Off'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'Power On'],
+        ['value' => 0, 'generic' => 1, 'descr' => 'Power Off'],
     ],
     'sync' => [
-        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Sync Enabled'],
-        ['value' => 0, 'generic' => 1, 'graph' => 0, 'descr' => 'Sync Off'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'Sync Enabled'],
+        ['value' => 0, 'generic' => 1, 'descr' => 'Sync Off'],
     ],
 ];
 $octetSetup = [
@@ -65,9 +65,9 @@ $octetSetup = [
 ];
 
 foreach ($octetSetup as $entry) {
-    $octetString = snmp_get($device, $entry['oid'], '-Ovqe', 'CTMMIBCUSTOM');
+    $octetString = SnmpQuery::get('CTMMIBCUSTOM::' . $entry['oid'])->value();
     if ($octetString) {
-        $onStates = explode(',', $octetString);
+        $onStates = explode(',', (string) $octetString);
 
         create_state_index($entry['state_name'], $entry['states']);
 

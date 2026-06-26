@@ -3,7 +3,7 @@ FOUNDRY-SN-VSRP-MIB DEFINITIONS ::= BEGIN
 IMPORTS
 
 	MODULE-IDENTITY, OBJECT-TYPE,IpAddress, Counter32,Integer32
-		FROM SNMPv2-SMI
+		FROM SNMPv2-SMI 
 	TEXTUAL-CONVENTION
 		FROM SNMPv2-TC
 	snSwitch
@@ -11,67 +11,69 @@ IMPORTS
 	;
 
 snVsrp MODULE-IDENTITY
-    LAST-UPDATED "201006020000Z"  -- 04 June 2010
-    ORGANIZATION "Brocade Communications Systems, Inc."
-    CONTACT-INFO
-             "Technical Support Center
-              130 Holger Way,
-              San Jose, CA  95134
-              Email:  ipsupport@brocade.com
-              Phone: 1-800-752-8061
-              URL:  www.brocade.com"
-    DESCRIPTION
-             "Copyright 1996-2010 Brocade Communications Systems, Inc.
-              All rights reserved.
-              This Brocade Communications Systems SNMP Management Information Base Specification
-              embodies Brocade Communications Systems' confidential and proprietary
-              intellectual property. Brocade Communications Systems retains all
-              title and ownership in the Specification, including any revisions.
-
-              This Specification is supplied AS IS, and Brocade Communications Systems makes
-              no warranty, either express or implied, as to the use,
-              operation, condition, or performance of the specification, and any unintended
-              consequence it may on the user environment."
-
-    REVISION        "201006020000Z"  -- 04 June 2010
-    DESCRIPTION
-        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
-
-    REVISION     "200909300000Z" -- September 30, 2009
-    DESCRIPTION
+	LAST-UPDATED "201708070000Z" -- Aug 7, 2017
+	ORGANIZATION "Ruckus Wireless, Inc."
+	CONTACT-INFO
+			"
+			Technical Support Center, Ruckus Wireless, Inc,
+			350 West Java Drive,
+			Sunnyvale, CA 94089, USA
+			Support URL: https://support.ruckuswireless.com
+			Phone: +1-855-782-5871
+			ROW TF Numbers: https://support.ruckuswireless.com/contact-us"
+	DESCRIPTION
+			"
+			Copyright 1996-2017 Ruckus Wireless, Inc..
+			All rights reserved.
+			This Ruckus Wireless, Inc SNMP Management Information Base Specification
+			embodies Ruckus Wireless, Inc' confidential and proprietary
+			intellectual property. Ruckus Wireless, Inc retains all
+			title and ownership in the Specification, including any
+			revisions.
+			
+			This Specification is supplied AS IS, and Ruckus Wireless, Inc makes
+			no warranty, either express or implied, as to the use,
+			operation, condition, or performance of the Specification.			
+			"            
+	REVISION     "200909300000Z" -- September 30, 2009
+	DESCRIPTION
 			"convert from SMIv1 to SMIv2"
+	REVISION     "201708070000Z" -- Aug 7, 2017
+	DESCRIPTION
+      		     "Modified contact Info, Organization and Decscription"
    ::= { snSwitch 21}
-
+		
 	MacAddress ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT "1x:"
 		STATUS	  current
 		DESCRIPTION
 			"
 			   This data type is used to model media addresses.  For many
 			   types of media, this will be in a binary representation.
 			   For example, an ethernet address would be represented as
-			   a string of 6 octets.
+			   a string of 6 octets.			
 			"
-		SYNTAX	OCTET STRING (SIZE(6))
+		SYNTAX	OCTET STRING (SIZE(6))		
 
-snVsrpGlobal 	OBJECT IDENTIFIER ::= { snVsrp 1 }
+snVsrpGlobal 	OBJECT IDENTIFIER ::= { snVsrp 1 } 
 snVsrpIfIntf 	OBJECT IDENTIFIER ::= { snVsrp 2 }
 snVsrpVirRtr 	OBJECT IDENTIFIER ::= { snVsrp 3 }
 
 --  Section 1:	VSRP Global Variables
 
-snVsrpGroupOperModeVsrp OBJECT-TYPE
-	SYNTAX  INTEGER
-		{   disabled(0),
+snVsrpGroupOperModeVsrp OBJECT-TYPE 
+	SYNTAX  INTEGER 
+		{   disabled(0),             
 			enabled(1)
-		}
+		} 
 	MAX-ACCESS  read-write
 	STATUS  current
-	DESCRIPTION "The VSRP is configured on this system either enabled or
+	DESCRIPTION "The VSRP is configured on this system either enabled or 
 		disabled and thedefault is disabled mode.
-		 disabled(0)..........disable VSRP
-		 enabled(1)...........activate VSRP"
-	::= { snVsrpGlobal 1 }
-
+		 disabled(0)..........disable VSRP   
+		 enabled(1)...........activate VSRP" 
+	::= { snVsrpGlobal 1 } 
+	
 snVsrpIfStateChangeTrap OBJECT-TYPE
 	SYNTAX	INTEGER { disabled(0), enabled(1) }
 	MAX-ACCESS	read-write
@@ -107,8 +109,8 @@ snVsrpClearVrrpStat OBJECT-TYPE
 		"Clear VSRP statistics command."
 	::= { snVsrpGlobal 5 }
 
-
---  Section 2:	VSRP  Interface Table, new table with vlan_id as an index.
+	 
+--  Section 2:	VSRP  Interface Table, new table with vlan_id as an index, 
 
 snVsrpIfTable OBJECT-TYPE
 	SYNTAX   SEQUENCE OF SnVsrpIfEntry
@@ -148,9 +150,9 @@ snVsrpIfTable OBJECT-TYPE
 		 ::= { snVsrpIfEntry 1 }
 
 	snVsrpIfAuthType OBJECT-TYPE
-		 SYNTAX   INTEGER {
-						noAuth(0),
-						simpleTextPasswd(1),
+		 SYNTAX   INTEGER { 
+						noAuth(0), 
+						simpleTextPasswd(1), 
 						ipAuthHeader(2)
 						}
 		 MAX-ACCESS   read-write
@@ -164,14 +166,11 @@ snVsrpIfTable OBJECT-TYPE
 		 MAX-ACCESS   read-write
 		 STATUS   current
 		 DESCRIPTION
-			"The simple text password is allowed if only if
-			the snVsrpIfAuthType type is simpleTextPasswd and
-			the size should be greater than zero.
-			On reading this object, if the snVsrpIfAuthType type is
-			noAuth, then zero length string will be returned"
+			"The simple text password is allowed if only if 
+			the snVsrpIfAuthType type is simpleTextPasswd."
 		 ::= { snVsrpIfEntry 3 }
 
-
+	 
 --  Section 3: VSRP Virtual Router Configuration Table
 --  The vsrp Virtual Router Table augments with vsrp specific information.
 
@@ -208,23 +207,23 @@ snVsrpVirRtrTable OBJECT-TYPE
 				 INTEGER,
 			 snVsrpVirRtrCurrPriority
 				 INTEGER,
-			 snVsrpVirRtrHelloInt
+			 snVsrpVirRtrHelloInt 
 				 INTEGER,
-			 snVsrpVirRtrDeadInt
+			 snVsrpVirRtrDeadInt 
 				 INTEGER,
-			 snVsrpVirRtrPreemptMode
+			 snVsrpVirRtrPreemptMode 
 				 INTEGER,
 			 snVsrpVirRtrState
 				 INTEGER,
 			snVsrpVirRtrIpAddrMask
 				OCTET STRING,
-			 snVsrpVirRtrActivate
+			 snVsrpVirRtrActivate 
 				 INTEGER,
 			 snVsrpVirRtrTrackPortList
 				 OCTET STRING,
-			 snVsrpVirRtrAdvertiseBackup
+			 snVsrpVirRtrAdvertiseBackup 
 				 INTEGER,
-			 snVsrpVirRtrHoldDownInt
+			 snVsrpVirRtrHoldDownInt 
 				 INTEGER,
 			 snVsrpVirRtrInitTtl
 				 INTEGER,
@@ -234,33 +233,33 @@ snVsrpVirRtrTable OBJECT-TYPE
 				 INTEGER,
 			 snVsrpVirRtrBackupInt
 				 INTEGER,
-			 snVsrpVirRtrRowStatus
+			 snVsrpVirRtrRowStatus 
 				 INTEGER,
-			 snVsrpVirRtrRxArpPktDropCnts
+			 snVsrpVirRtrRxArpPktDropCnts 
 				 Counter32,
-			 snVsrpVirRtrRxIpPktDropCnts
+			 snVsrpVirRtrRxIpPktDropCnts 
 				 Counter32,
-			 snVsrpVirRtrRxPortMismatchCnts
+			 snVsrpVirRtrRxPortMismatchCnts 
 				 Counter32,
-			 snVsrpVirRtrRxNumOfIpMismatchCnts
+			 snVsrpVirRtrRxNumOfIpMismatchCnts 
+				 Counter32,				 
+			 snVsrpVirRtrRxIpMismatchCnts 
 				 Counter32,
-			 snVsrpVirRtrRxIpMismatchCnts
+			 snVsrpVirRtrRxHelloIntMismatchCnts 
 				 Counter32,
-			 snVsrpVirRtrRxHelloIntMismatchCnts
+			 snVsrpVirRtrRxPriorityZeroFromMasterCnts 
 				 Counter32,
-			 snVsrpVirRtrRxPriorityZeroFromMasterCnts
+			 snVsrpVirRtrRxHigherPriorityCnts 
 				 Counter32,
-			 snVsrpVirRtrRxHigherPriorityCnts
+			 snVsrpVirRtrTransToMasterStateCnts 
 				 Counter32,
-			 snVsrpVirRtrTransToMasterStateCnts
+			 snVsrpVirRtrTransToBackupStateCnts 
 				 Counter32,
-			 snVsrpVirRtrTransToBackupStateCnts
-				 Counter32,
-			 snVsrpVirRtrCurrDeadInt
+			 snVsrpVirRtrCurrDeadInt 
 				 Integer32,
-			 snVsrpVirRtrCurHelloInt
+			 snVsrpVirRtrCurHelloInt 
 				 INTEGER,
-			 snVsrpVirRtrCurHoldDownInt
+			 snVsrpVirRtrCurHoldDownInt 
 				 INTEGER,
 			 snVsrpVirRtrCurInitTtl
 				 INTEGER,
@@ -269,7 +268,7 @@ snVsrpVirRtrTable OBJECT-TYPE
 			snVsrpVirRtrMasterIpAddr
 				 IpAddress
 	   }
-
+	   
 	 snVsrpVirRtrVlanId OBJECT-TYPE
 		 SYNTAX  Integer32
 		 MAX-ACCESS  read-only
@@ -277,7 +276,7 @@ snVsrpVirRtrTable OBJECT-TYPE
 		 DESCRIPTION
 			"Vlan index."
 		 ::= { snVsrpVirRtrEntry 1 }
-
+		 
 	snVsrpVirRtrId OBJECT-TYPE
 		 SYNTAX   INTEGER (1..255)
 		 MAX-ACCESS   read-only
@@ -295,9 +294,9 @@ snVsrpVirRtrTable OBJECT-TYPE
 		 MAX-ACCESS   read-write
 		 STATUS   current
 		 DESCRIPTION
-			"The ownership of this vsrp router interface
-			can be set to backup(2).
-			VirRtr SNMP-GET returns incomplete(0), it means
+			"The ownership of this vsrp router interface 
+			can be set to backup(2).  
+			VirRtr SNMP-GET returns incomplete(0), it means 
 			no IP address has assigned to this vsrp router interface."
 		 ::= { snVsrpVirRtrEntry 3 }
 
@@ -311,8 +310,7 @@ snVsrpVirRtrTable OBJECT-TYPE
 			the Active Router for the interface.  A backup Router with
 			higher priority selected to becomes the Active Router.
 			Therefore, this Object can be set if only if snVsrpVirRtrOwnership
-			is set to backup(2).
-                        For NetIron platforms, the range is between 8 to 255."
+			is set to backup(2)."
 		 DEFVAL { 100 }
 		 ::= { snVsrpVirRtrEntry 4 }
 
@@ -322,7 +320,7 @@ snVsrpVirRtrTable OBJECT-TYPE
 		 STATUS   current
 		 DESCRIPTION
 			"The higher the number the higher the priority is.
-			after this object is configured, the snVsrpVirRtrCurrPriority
+			after this object is configured, the snVsrpVirRtrCurrPriority 
 			of this interface will be adjusted dynamically with this
 			track priority when the Track Port states first
 			changes from UP to DOWN."
@@ -387,7 +385,7 @@ snVsrpVirRtrTable OBJECT-TYPE
 		 MAX-ACCESS   read-write
 		 STATUS   current
 		 DESCRIPTION
-			"The numbers of IP Addresses of this virtual router of this
+			"The numbers of IP Addresses of this virtual router of this 
 			interface, this holds good for L3 vsrp."
 		 ::= { snVsrpVirRtrEntry 11 }
 
@@ -410,12 +408,12 @@ snVsrpVirRtrTable OBJECT-TYPE
 		 STATUS   current
 		 DESCRIPTION
 			"This object specifies the identity of the physical port and virtual ports
-			whose state is to be monitored.  Each port index is
+			whose state is to be monitored.  Each port index is 
 			an ifIndex, if there are consecutive 4 or more ifIndex then
-			they will be encoded like below.
+			they will be encoded like below. 
 			Encoding and decoding scheme is range based:
-			Each range prefix with 0000 (2 octets) where 0000 is not valid
-			ifIndex. Next 2 octets indicates lower range ifIndex, followed by 2
+			Each range prefix with 0000 (2 octets) where 0000 is not valid 
+			ifIndex. Next 2 octets indicates lower range ifIndex, followed by 2 
 			octets of higher range ifIndex. Individual(non range) ones will be displayed as it is.
 			Ex:
 			port list: 0001..0005 0015 0032..0047
@@ -423,7 +421,7 @@ snVsrpVirRtrTable OBJECT-TYPE
 			If this object is configured
 			then the Preference Level of this interface will be adjusted
 			dynamically depending on the state of the Track Port.
-			The interface's Preference Level is reduced by value of
+			The interface's Preference Level is reduced by value of 
 			Preference Level parameter when the Track Port states first
 			changes from UP to DOWN.  When the Track Port next comes up
 			the interface's Preference Level is increased by the amount
@@ -438,8 +436,8 @@ snVsrpVirRtrTable OBJECT-TYPE
 		 DESCRIPTION
 			"Set Advertise this backup router to master "
 		 DEFVAL { disabled }
-		 ::= { snVsrpVirRtrEntry 14 }
-
+		 ::= { snVsrpVirRtrEntry 14 }			  
+		 
 	snVsrpVirRtrHoldDownInt OBJECT-TYPE
 		 SYNTAX   INTEGER (1..84)
 		 MAX-ACCESS   read-write
@@ -455,7 +453,7 @@ snVsrpVirRtrTable OBJECT-TYPE
 		 MAX-ACCESS   read-write
 		 STATUS   current
 		 DESCRIPTION
-			"VSRP:TTL in the hello packet to regulate the distance that a hello packet
+			"VSRP:TTL in the hello packet to regulate the distance that a hello packet 
 			can travel. It prevents the flooding of VSRP hello packets in the network"
 		 DEFVAL { 2 }
 		 ::= { snVsrpVirRtrEntry 16 }
@@ -485,7 +483,7 @@ snVsrpVirRtrTable OBJECT-TYPE
 			"Time interval between backup routers hello message advertisements (seconds)."
 		 DEFVAL { 60 }
 		 ::= { snVsrpVirRtrEntry 19 }
-
+		 
 	snVsrpVirRtrRowStatus OBJECT-TYPE
 		 SYNTAX   INTEGER {
 					invalid(1),
@@ -597,7 +595,7 @@ snVsrpVirRtrTable OBJECT-TYPE
 		 ::= { snVsrpVirRtrEntry 30 }
 
 	 snVsrpVirRtrCurrDeadInt OBJECT-TYPE
-		 SYNTAX   Integer32
+		 SYNTAX   Integer32 
 		 MAX-ACCESS   read-only
 		 STATUS   current
 		 DESCRIPTION
@@ -626,7 +624,7 @@ snVsrpVirRtrTable OBJECT-TYPE
 		 MAX-ACCESS   read-only
 		 STATUS   current
 		 DESCRIPTION
-			"VSRP:TTL in the hello packet to regulate the distance that a hello packet
+			"VSRP:TTL in the hello packet to regulate the distance that a hello packet 
 			can travel. It prevents the flooding of VSRP hello packets in the network"
 		 ::= { snVsrpVirRtrEntry 34 }
 
@@ -648,5 +646,5 @@ snVsrpVirRtrTable OBJECT-TYPE
 			 last received by this virtual router."
 		 ::= { snVsrpVirRtrEntry 36 }
 
-
-END
+		
+END		

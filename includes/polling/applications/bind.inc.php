@@ -10,7 +10,7 @@ if (! empty($agent_data['app'][$name])) {
     $bind = SnmpQuery::get('NET-SNMP-EXTEND-MIB::nsExtendOutputFull.4.98.105.110.100')->value();
 }
 
-$bind_data = explode("\n", $bind);
+$bind_data = explode("\n", (string) $bind);
 if (count($bind_data) !== 8) {
     echo " Incorrect number of datapoints returned from device, skipping\n";
 

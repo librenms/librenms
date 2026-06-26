@@ -3,6 +3,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\OS;
@@ -27,7 +28,7 @@ class Ruckuswireless extends OS implements
             $total += $count;
 
             $sensors[] = new WirelessSensor(
-                'clients',
+                WirelessSensorType::Clients,
                 $this->getDeviceId(),
                 $oid,
                 'ruckuswireless',
@@ -41,7 +42,7 @@ class Ruckuswireless extends OS implements
         if (count($total_oids) > 1) {
             // Find Total Client Count
             $oid = '.1.3.6.1.4.1.25053.1.2.1.1.1.15.2.0'; //RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta.0
-            array_push($sensors, new WirelessSensor('clients', $this->getDeviceId(), $oid, 'ruckuswireless', $index + 1, 'System Total:'));
+            array_push($sensors, new WirelessSensor(WirelessSensorType::Clients, $this->getDeviceId(), $oid, 'ruckuswireless', $index + 1, 'System Total:'));
         }
 
         return $sensors;
@@ -55,7 +56,7 @@ class Ruckuswireless extends OS implements
         $oidtotal = '.1.3.6.1.4.1.25053.1.2.1.1.1.15.15.0'; //RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumRegisteredAP.0
         $sensorindex = 0;
         $sensors[] = new WirelessSensor(
-            'ap-count',
+            WirelessSensorType::ApCount,
             $this->getDeviceId(),
             $oidconnected,
             'ruckuswireless',
@@ -63,7 +64,7 @@ class Ruckuswireless extends OS implements
             'Connected APs'
         );
 
-        array_push($sensors, new WirelessSensor('ap-count', $this->getDeviceId(), $oidtotal, 'ruckuswireless', ++$sensorindex, 'Total APs'));
+        array_push($sensors, new WirelessSensor(WirelessSensorType::ApCount, $this->getDeviceId(), $oidtotal, 'ruckuswireless', ++$sensorindex, 'Total APs'));
 
         return $sensors;
     }

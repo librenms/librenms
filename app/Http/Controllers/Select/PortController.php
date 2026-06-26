@@ -27,77 +27,81 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\Port;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
+/**
+ * @extends SelectController<Port>
+ */
 class PortController extends SelectController
 {
     /**
      * Defines validation rules (will override base validation rules for select2 responses too)
-     *
-     * @return array
      */
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'device' => 'nullable|int',
             'devices' => 'nullable|array',
+            'field' => 'nullable|in:ifAlias,ifName,ifDescr,devices.hostname,devices.sysName',
         ];
     }
 
     /**
      * Defines search fields will be searched in order
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
      */
-    protected function searchFields($request)
+    protected function searchFields(Request $request): array
     {
-        return (array) $request->get('field', ['ifAlias', 'ifName', 'ifDescr', 'devices.hostname', 'devices.sysName']);
+        return (array) $request->input('field', ['ifAlias', 'ifName', 'ifDescr', 'devices.hostname', 'devices.sysName']);
     }
 
     /**
      * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
-        /** @var \Illuminate\Database\Eloquent\Builder $query */
+        $this->authorize('viewAny', Port::class);
+
         $query = Port::hasAccess($request->user())
             ->isNotDeleted()
             ->has('device')
-            ->with(['device' => function ($query) {
-                $query->select('device_id', 'hostname', 'sysName', 'display');
+            ->with(['device' => function ($query): void {
+                $query->select(['device_id', 'hostname', 'sysName', 'display']);
             }])
-            ->select('ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr')
+            ->select(['ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr'])
             ->groupBy(['ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr']);
 
-        if ($request->get('term')) {
+        if ($request->input('term')) {
             // join with devices for searches
             $query->leftJoin('devices', 'devices.device_id', 'ports.device_id');
         }
 
-        if ($device_id = $request->get('device')) {
+        if ($device_id = $request->input('device')) {
             $query->where('ports.device_id', $device_id);
         }
 
-        if ($device_ids = $request->get('devices')) {
+        if ($device_ids = $request->input('devices')) {
             $query->whereIn('ports.device_id', $device_ids);
         }
 
         return $query;
     }
 
-    public function formatItem($port)
+    /**
+     * @param  Port  $model
+     *
+     * @returns array{id: int|string, text: string, icon?: string}
+     */
+    public function formatItem(Model $model): array
     {
-        /** @var Port $port */
-        $label = $port->getShortLabel();
-        $description = ($label == $port->ifAlias ? '' : ' - ' . $port->ifAlias);
+        $label = $model->getShortLabel();
+        $description = ($label == $model->ifAlias ? '' : ' - ' . $model->ifAlias);
 
         return [
-            'id' => $port->port_id,
-            'text' => $label . ' - ' . $port->device->shortDisplayName() . $description,
-            'device_id' => $port->device_id,
+            'id' => $model->port_id,
+            'text' => $label . ' - ' . $model->device->shortDisplayName() . $description,
+            'device_id' => $model->device_id,
         ];
     }
 }

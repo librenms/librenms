@@ -40,7 +40,7 @@ class PluginDisable extends LnmsCommand
             $this->info(trans_choice('commands.plugin:disable.disabled', $updated, ['name' => $updated]));
 
             return 0;
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $this->error(trans('commands.plugin:disable.failed'));
 
             return 1;

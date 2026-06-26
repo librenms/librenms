@@ -31,15 +31,16 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
-class CienaCesPortNotificationTrapTest extends SnmpTrapTestCase
+final class CienaCesPortNotificationTrapTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;
 
-    public function testCienaCesPortDownNotification()
+    public function testCienaCesPortDownNotification(): void
     {
         // make a device and associate a port with it
         $device = Device::factory()->create(); /** @var Device $device */
@@ -66,10 +67,10 @@ CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortDesc $port->ifDescr",
         );
 
         $port = $port->fresh(); // refresh from database
-        $this->assertEquals($port->ifOperStatus, 'down');
+        $this->assertEquals(IfOperStatus::Down, $port->ifOperStatus);
     }
 
-    public function testCienaCesPortUpNotification()
+    public function testCienaCesPortUpNotification(): void
     {
         // make a device and associate a port with it
         $device = Device::factory()->create(); /** @var Device $device */
@@ -97,6 +98,6 @@ CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortDesc $port->ifDescr",
         );
 
         $port = $port->fresh(); // refresh from database
-        $this->assertEquals($port->ifOperStatus, 'up');
+        $this->assertEquals(IfOperStatus::Up, $port->ifOperStatus);
     }
 }

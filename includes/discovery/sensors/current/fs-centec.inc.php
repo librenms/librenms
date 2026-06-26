@@ -9,7 +9,7 @@ $ifIndexToName = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
 foreach ($biasTable as $ifIndex => $current) {
     $ifName = $ifIndexToName[$ifIndex] ?? $ifIndex;
     if (! empty($current['FS-SWITCH-V2-MIB::biasCurrent']) && $current['FS-SWITCH-V2-MIB::biasCurrent'] !== '0.00') {
-        foreach (explode(',', $current['FS-SWITCH-V2-MIB::biasCurrent']) as $channel => $value) {
+        foreach (explode(',', (string) $current['FS-SWITCH-V2-MIB::biasCurrent']) as $channel => $value) {
             $divisor = 1000;
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([

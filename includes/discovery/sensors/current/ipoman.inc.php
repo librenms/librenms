@@ -26,7 +26,7 @@ $oidsCurrOut = SnmpQuery::hideMib()->walk([
 foreach ($oidsCurrIn as $index => $entry) {
     $oid = '.1.3.6.1.4.1.2468.1.4.2.1.3.1.3.1.3.' . $index;
     $divisor = 1000;
-    $descr = (trim($oidsIn[$index]['inletConfigDesc'], '"') != '' ? trim($oidsIn[$index]['inletConfigDesc'], '"') : "Inlet $index");
+    $descr = (trim((string) $oidsIn[$index]['inletConfigDesc'], '"') != '' ? trim((string) $oidsIn[$index]['inletConfigDesc'], '"') : "Inlet $index");
     $value = ($entry['inletStatusCurrent'] / $divisor);
     $high_limit = ($entry['inletConfigCurrentHigh'] / 10);
 
@@ -55,7 +55,7 @@ foreach ($oidsCurrIn as $index => $entry) {
 foreach ($oidsCurrOut as $index => $entry) {
     $oid = '.1.3.6.1.4.1.2468.1.4.2.1.3.2.3.1.3.' . $index;
     $divisor = 1000;
-    $descr = (trim($oidsOut[$index]['outletConfigDesc'], '"') != '' ? trim($oidsOut[$index]['outletConfigDesc'], '"') : "Output $index");
+    $descr = (trim((string) $oidsOut[$index]['outletConfigDesc'], '"') != '' ? trim((string) $oidsOut[$index]['outletConfigDesc'], '"') : "Output $index");
     $value = ($entry['outletStatusCurrent'] / $divisor);
     $high_limit = ($entry['outletConfigCurrentHigh'] / 10);
 

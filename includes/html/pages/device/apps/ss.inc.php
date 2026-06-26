@@ -30,7 +30,7 @@ function ss_graph_builder($gen_type, $ss_netid_mapper, $allowed_sockets, $graphs
             if (! in_array($netid, $allowed_sockets)) {
                 continue;
             }
-            $graph_descr = strtoupper($gen_type) . ' ' . strtoupper($netid) . ' Sockets\' Statuses';
+            $graph_descr = strtoupper($gen_type) . ' ' . strtoupper((string) $netid) . ' Sockets\' Statuses';
             $graphs[$graph_name]['netid_statuses'][$netid]['desc'] = $graph_descr;
         }
     }
@@ -96,7 +96,7 @@ foreach ($ss_section_list as $gen_type) {
         echo ', ';
     }
 
-    echo generate_link(strtoupper($gen_type), $link_array, ['section' => $gen_type]);
+    echo generate_link(strtoupper((string) $gen_type), $link_array, ['section' => $gen_type]);
     $i++;
 }
 

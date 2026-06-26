@@ -1,9 +1,9 @@
 --  =================================================================
--- Copyright (C) 2008 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: CE Ping MIB. 
 -- Reference:
--- Version:     V1.0
+-- Version:     V2.01
 -- History:
 --              V1.0 zhuxiao 2008.10.16,publish 
 --              
@@ -15,42 +15,45 @@
                 IMPORTS
                         hwDatacomm                        
                                 FROM HUAWEI-MIB                        
-                        OBJECT-GROUP                        
+                        OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
                                 FROM SNMPv2-CONF                        
-                        mib-2, IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY                        
+                        mib-2, IpAddress, Integer32, Unsigned32, OBJECT-TYPE, 
+                        MODULE-IDENTITY
                                 FROM SNMPv2-SMI                        
                         MacAddress, RowStatus, TEXTUAL-CONVENTION                        
                                 FROM SNMPv2-TC;
         
         
                 hwCePing MODULE-IDENTITY 
-                        LAST-UPDATED "200810161855Z"        -- October 16, 2008 at 18:55 GMT
+                        LAST-UPDATED "201708172012Z"           --Aug 17, 2017 at 20:12GMT
                         ORGANIZATION 
-                                "Huawei Technologies Co., Ltd."
+                                "Huawei Technologies Co.,Ltd."
                         CONTACT-INFO 
-                                "R&D BeiJing, Huawei Technologies co.,Ltd.
-                                 Huawei Bld.,NO.3 Xinxi Rd.,
-                                 Shang-Di Information Industry Base,
-                                 Hai-Dian District Beijing P.R. China
-                                 Zip:100085
-                                 Http://www.huawei.com
-                                 E-mail:support@huawei.com"
+                                "Huawei Industrial Base
+                                  Bantian, Longgang
+                                   Shenzhen 518129
+                                   People's Republic of China
+                                   Website: http://www.huawei.com
+                                   Email: support@huawei.com
+                                 "
                         DESCRIPTION 
                                 "HUAWEI VPLS quality detect funcion."
+
+--  Revision history
+            REVISION     "201708172012Z"        -- Aug 17, 2017 at 20:12 GMT  
+            DESCRIPTION  "V2.01, changes in this revision:
+                          Modify the description of hwCePingCount"
                         ::= { hwDatacomm 175 }
 
-                
-        
 --
 -- Node definitions
 --
-        
                 hwCePingTable OBJECT-TYPE
                         SYNTAX SEQUENCE OF HwCePingEntry
                         MAX-ACCESS not-accessible
                         STATUS current
                         DESCRIPTION
-                                "The table of Ce Ping."
+                                "This table is used to configure and initiate a CE ping test. The test starts when the table is created."
                         ::= { hwCePing 1 }
 
                 
@@ -78,8 +81,16 @@
                                         Integer32,
                                 hwCePingCount
                                         Integer32,
+                                hwCePingTtl
+                                    Unsigned32,
+                                hwCePingExp
+                                    Unsigned32,
+                                hwCePingVerbose
+                                    INTEGER,
+                                hwCePingMacAddress
+                                    MacAddress,
                                 hwCePingRowStatus
-                                        RowStatus
+                                    RowStatus
                          }
 
                 hwCePingIndex OBJECT-TYPE
@@ -132,10 +143,47 @@
                         MAX-ACCESS read-create
                         STATUS current
                         DESCRIPTION
-                                "This value represents the number of packets that need to be transmitted."
+                                "The value of this object specifies the number of packets sent for one probe. The value ranges from 1 to 255."
                         ::= { hwCePingEntry 6 }
 
-                
+        
+                hwCePingTtl OBJECT-TYPE
+                        SYNTAX Unsigned32 (1..255)
+                        UNITS "time-to-live value"
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the TTL of echo request packets. Default value is 255."
+                        ::= { hwCePingEntry 7 }
+                        
+                hwCePingExp OBJECT-TYPE
+                        SYNTAX Unsigned32 (0..7)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the EXP of echo request packets. Default value is 0."
+                        ::= { hwCePingEntry 8 }
+
+                hwCePingVerbose OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                no(0),
+                                yes(1)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies whether the detailed information about the remote PE can be displayed. The default value is 0."
+                        ::= { hwCePingEntry 9 }
+                        
+                hwCePingMacAddress OBJECT-TYPE
+                        SYNTAX MacAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                        "Special MAC address for CE-PING, ranging from E024-7FA4-D2CB to E024-7FA4-D2DA."
+                        ::= { hwCePingEntry 10 }
+                        
                 hwCePingRowStatus OBJECT-TYPE
                         SYNTAX RowStatus
                         MAX-ACCESS read-create
@@ -169,13 +217,27 @@
                                 hwCePingResultOperStatus
                                         INTEGER,
                                 hwCePingResultMac
-                                        MacAddress
+                                        MacAddress,
+                                hwCePingResultLsrId
+                                        OCTET STRING,
+                                hwCePingResultIfName
+                                        OCTET STRING,
+                                hwCePingResultAvgRTT
+                                        Integer32,
+                                hwCePingResultSendPktNum
+                                        Integer32,
+                                hwCePingResultRcvPktNum
+                                        Integer32,
+                                hwCePingResultLostPacketNum
+                                        Integer32,
+                                hwCePingResultLostPacketRate
+                                        Integer32
                          }
 
                 hwCePingResultOperStatus OBJECT-TYPE
                         SYNTAX INTEGER
                                 {
-                                sucessful(1),
+                                successful(1),
                                 inProcess(2),
                                 timeout(3)
                                 }
@@ -183,7 +245,7 @@
                         STATUS current
                         DESCRIPTION
                                 "Reflects the operational state of a hwCePingEntry:
-                                  sucessful(1)  - Test is sucessful.
+                                  successful(1)  - Test is successful.
                                   inProcess(2) - Test is in process.
                                   timeout(3) - Test is timeout."
                         ::= { hwCePingResultEntry 1 }
@@ -197,28 +259,142 @@
                                 "The Mac that is detected by the test."
                         ::= { hwCePingResultEntry 2 }
 
-                
-                hwCePingGroup OBJECT IDENTIFIER ::= { hwCePing 3 }
+                hwCePingResultLsrId OBJECT-TYPE
+                        SYNTAX OCTET STRING
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the LSR ID of the remote PE."
+                        ::= { hwCePingResultEntry 3 }
 
-                
+                hwCePingResultIfName OBJECT-TYPE
+                        SYNTAX OCTET STRING
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the name of the AC interface on the remote PE."
+                        ::= { hwCePingResultEntry 4 }
+
+                hwCePingResultAvgRTT OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the average RTT."
+                        ::= { hwCePingResultEntry 5 }
+        
+                hwCePingResultSendPktNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the number of Request packets."
+                        ::= { hwCePingResultEntry 6 }
+                              
+                hwCePingResultRcvPktNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the number of Reply packets."
+                        ::= { hwCePingResultEntry 7 }
+                              
+                hwCePingResultLostPacketNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the number of packets discarded in the test."
+                        ::= { hwCePingResultEntry 8 }
+                              
+                hwCePingResultLostPacketRate OBJECT-TYPE
+                        SYNTAX Integer32 (0..100)
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the percentage of discarded packets to the total number of sent packets in the test."
+                        ::= { hwCePingResultEntry 9 }			   
+
+		hwCePingConformance OBJECT IDENTIFIER ::= { hwCePing 3 }				
+                              
+                hwCePingGroup OBJECT IDENTIFIER ::= { hwCePingConformance 1 }
+				               
                 hwCePingCtrlGroup OBJECT-GROUP
                         OBJECTS { hwCePingTargetAddress, hwCePingSourceAddress, hwCePingVsiName, hwCePingInterval, hwCePingCount, 
-                                hwCePingRowStatus }
+                                      hwCePingVerbose, hwCePingMacAddress, hwCePingRowStatus, hwCePingTtl, hwCePingExp }
                         STATUS current
                         DESCRIPTION 
-                                "Description."
+                               "Description."
                         ::= { hwCePingGroup 1 }
 
                 
                 hwCePingResultGroup OBJECT-GROUP
-                        OBJECTS { hwCePingResultOperStatus, hwCePingResultMac }
+                        OBJECTS { hwCePingResultOperStatus, hwCePingResultMac, hwCePingResultLsrId, hwCePingResultIfName, hwCePingResultAvgRTT, 
+                                      hwCePingResultSendPktNum, hwCePingResultRcvPktNum, hwCePingResultLostPacketNum, hwCePingResultLostPacketRate }
                         STATUS current
                         DESCRIPTION 
                                 "Description."
                         ::= { hwCePingGroup 2 }
 
+                hwCePingHistoryGroup OBJECT-GROUP
+                        OBJECTS { hwCePingHistoryRTT }
+                        STATUS current
+                        DESCRIPTION 
+                                "This object indicates the description information."
+                        ::= { hwCePingGroup 3 }
+
+		hwCePingCompliances OBJECT IDENTIFIER ::= { hwCePingConformance 2 }
+				
+		hwCePingCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			MODULE -- this module
+			MANDATORY-GROUPS { hwCePingCtrlGroup, hwCePingResultGroup, hwCePingHistoryGroup}
+			::= { hwCePingCompliances 1 }
                 
+                hwCePingHistoryTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwCePingHistoryEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the historical table of the CE ping."
+                        ::= { hwCePing 4 }
         
+                hwCePingHistoryEntry OBJECT-TYPE
+                        SYNTAX HwCePingHistoryEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the entry in hwCePingHistoryTable."
+                        INDEX { hwCePingIndex, hwCePingHistoryIndex }
+                        ::= { hwCePingHistoryTable 1 }
+                              
+                HwCePingHistoryEntry ::=
+                        SEQUENCE { 
+                                  hwCePingHistoryIndex
+                                            Integer32,
+                                  hwCePingHistoryRTT
+                                            Integer32
+                        }
+                                       
+                hwCePingHistoryIndex OBJECT-TYPE
+                        SYNTAX Integer32 (1..255)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the sequence number of a Request packet."
+                        ::= { hwCePingHistoryEntry 1 }
+                              
+                hwCePingHistoryRTT OBJECT-TYPE
+                        SYNTAX Integer32
+                        UNITS "ms"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the RTT of each Request packet."
+                        ::= { hwCePingHistoryEntry 2 }
+						
         END
 
 --

@@ -32,7 +32,7 @@ use LibreNMS\Util\Http;
 
 class GraylogApi
 {
-    private \Illuminate\Http\Client\PendingRequest $client;
+    private readonly \Illuminate\Http\Client\PendingRequest $client;
     private string $api_prefix = '';
 
     public function __construct()
@@ -115,6 +115,9 @@ class GraylogApi
         return implode(' && ', $query);
     }
 
+    /**
+     * @return \Illuminate\Support\Collection<int, non-falsy-string>
+     */
     public function getAddresses(Device $device): \Illuminate\Support\Collection
     {
         $addresses = collect([
@@ -128,14 +131,10 @@ class GraylogApi
         if (LibrenmsConfig::get('graylog.match-any-address')) {
             $addresses = $addresses->merge($device->ipv4->pluck('ipv4_address')
                 ->filter(
-                    function ($address) {
-                        return $address != '127.0.0.1';
-                    }
+                    fn ($address) => $address != '127.0.0.1'
                 ))->merge($device->ipv6->pluck('ipv6_address')
                 ->filter(
-                    function ($address) {
-                        return $address != '0000:0000:0000:0000:0000:0000:0000:0001';
-                    }
+                    fn ($address) => $address != '0000:0000:0000:0000:0000:0000:0000:0001'
                 ));
         }
 

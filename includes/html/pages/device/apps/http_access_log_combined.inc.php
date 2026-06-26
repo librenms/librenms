@@ -84,7 +84,7 @@ echo ') | Sets: ';
 
 $index_int = 0;
 foreach ($app_data['logs'] as $index => $log_name) {
-    $log_name = htmlspecialchars($log_name);
+    $log_name = htmlspecialchars((string) $log_name);
     $label = (isset($vars['access_log_page']) || $vars['log'] != $log_name)
         ? $log_name
         : '<span class="pagemenu-selected">' . $log_name . '</span>';
@@ -127,7 +127,7 @@ if (isset($vars['access_log_page']) && $vars['access_log_page'] == 'bytes') {
         'POST',
         'PUT',
     ];
-    foreach ($stats as $key => $val) {
+    foreach ($stats as $val) {
         $graphs[] = [
             'type' => 'stat',
             'description' => $val,

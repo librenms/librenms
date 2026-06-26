@@ -15,7 +15,7 @@ echo ' | Slugs: ';
 $slugs = $app->data['slugs'];
 
 foreach (array_keys($slugs) as $index => $slug) {
-    $slug = htmlspecialchars($slug);
+    $slug = htmlspecialchars((string) $slug);
     $label = $vars['slug'] == $slug
         ? '<span class="pagemenu-selected">' . $slug . '</span>'
         : $slug;

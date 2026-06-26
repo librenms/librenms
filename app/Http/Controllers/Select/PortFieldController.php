@@ -27,29 +27,32 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\Port;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use LibreNMS\Util\Number;
+use LibreNMS\Util\Rewrite;
 
+/**
+ * @extends SelectController<Port>
+ */
 class PortFieldController extends SelectController
 {
     /**
      * Defines validation rules (will override base validation rules for select2 responses too)
-     *
-     * @return array
      */
-    protected function rules()
+    protected function rules(): array
     {
         return [
-            'field' => 'required|in:ifType',
+            'field' => 'required|in:ifType,ifSpeed,port_descr_type',
             'device' => 'nullable|int',
         ];
     }
 
     /**
      * Defines fields that can be used as filters
-     *
-     * @param  $request
-     * @return string[]
      */
-    protected function filterFields($request)
+    protected function filterFields(Request $request): array
     {
         return [
             'device_id' => 'device',
@@ -58,24 +61,43 @@ class PortFieldController extends SelectController
 
     /**
      * Defines search fields will be searched in order
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
      */
-    protected function searchFields($request)
+    protected function searchFields(Request $request): array
     {
-        return [$request->get('field')];
+        return [$request->string('field')];
     }
 
     /**
      * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Port::class);
+        $this->idField = $request->string('field');
+
         return Port::hasAccess($request->user())
-            ->select($request->get('field'))->distinct();
+            ->whereNotNull($this->idField)
+            ->select($this->idField)
+            ->distinct()
+            ->orderBy($this->idField);
+    }
+
+    /**
+     * @param  Port  $model
+     * @return array{id: int|string, text: string, icon?: string}
+     */
+    public function formatItem(Model $model): array
+    {
+        $field = array_key_first($model->getAttributes());
+        $value = array_first($model->getAttributes());
+
+        return [
+            'id' => $value,
+            'text' => match ($field) {
+                'ifSpeed' => Number::formatSi($value, suffix: 'bps'),
+                'ifType' => Rewrite::normalizeIfType($value),
+                default => $value,
+            },
+        ];
     }
 }

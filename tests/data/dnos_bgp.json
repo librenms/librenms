@@ -37140,427 +37140,427 @@
                     "vlan_domain": 1,
                     "vlan_name": "Vlan 1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Internet DMZ",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Nwk Common Services",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ DR Internet Mgmt",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 5,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ DMZ Backup",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 6,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Ext Services Mgmt",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 7,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ SSL Backup",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 8,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ SSL External",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 9,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ NWK Svcs Backup",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 10,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ VM Mgmt",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 11,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Utility Lan",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 12,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Utility Mgmt",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 13,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Utility Backup",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 14,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Ext MSVPN Access",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 15,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Ext MSVPN Mgmt",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 17,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Special Web Mgmt",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 18,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Special DMZ",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 19,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ HSM Mgmt",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 21,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Ext Common Services",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 25,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Nwk Mgmt Svcs",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 26,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Nwk Mgmt Svcs Backup",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 27,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ DC Workstation",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 28,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ JSM Services",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 30,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ JOOB DMZ",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 31,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ JOOB Mgmt",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 32,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Web DMZ",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 33,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Web Mgmt",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 34,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Database Mgmt",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 35,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ JSM Backup",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 36,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Database Backup",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 38,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ DMZ",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 39,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ SCIIP Jumphost",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 40,
                     "vlan_domain": 1,
                     "vlan_name": "ACMEFWBus",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 42,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Sandfly Hosts",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 43,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Prod Web User",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 44,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Jumpbox",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 45,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Prod DMZ Mgmt",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 46,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Domain",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 47,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Prod App DB",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 48,
                     "vlan_domain": 1,
                     "vlan_name": "ACME Prod XYZ",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 52,
                     "vlan_domain": 1,
                     "vlan_name": "ACME DEV SUPPORT XYZ",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 53,
                     "vlan_domain": 1,
                     "vlan_name": "ACME_XYZ_DMZ_seg",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 54,
                     "vlan_domain": 1,
                     "vlan_name": "ACME_XYZ_DMZ_Mgmt",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 55,
                     "vlan_domain": 1,
                     "vlan_name": "ACME_XYZ_DB_seg",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 56,
                     "vlan_domain": 1,
                     "vlan_name": "ACME_XYZ_dB_Backup",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 57,
                     "vlan_domain": 1,
                     "vlan_name": "ACME_XYZ_Secure_ADS",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 58,
                     "vlan_domain": 1,
                     "vlan_name": "ACME_XYZ_DR_vCare_DB",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 59,
                     "vlan_domain": 1,
                     "vlan_name": "ACME_XYZ_DR_ADS",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 60,
                     "vlan_domain": 1,
                     "vlan_name": "ACME_Registry_EXT_Mgmt_seg",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 61,
                     "vlan_domain": 1,
                     "vlan_name": "ACME_Ext_Registry_Seg",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 62,
                     "vlan_domain": 1,
                     "vlan_name": "ACME_XYZ_Container_Svr",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 67,
                     "vlan_domain": 1,
                     "vlan_name": "ACME_XYZ_SSL_seg",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 122,
                     "vlan_domain": 1,
                     "vlan_name": "ACME_Connect",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 402,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Interconnect",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 403,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ AMSL DR Interconnect",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 405,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Interconnect Inside",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 406,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ Interconnect Outside",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 415,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ SSL Mgmt",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 416,
                     "vlan_domain": 1,
                     "vlan_name": "ACME XYZ DC VOIP",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 421,
                     "vlan_domain": 1,
                     "vlan_name": "ACME_XYZ_Interconnect",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 915,
                     "vlan_domain": 1,
                     "vlan_name": "F041F042",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

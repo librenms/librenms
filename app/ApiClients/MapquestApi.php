@@ -35,7 +35,7 @@ class MapquestApi extends BaseApi implements Geocoder
 {
     use GeocodingHelper;
 
-    protected string $base_uri = 'https://open.mapquestapi.com';
+    protected string $base_uri = 'https://mapquestapi.com';
     protected string $geocoding_uri = '/geocoding/v1/address';
 
     /**
@@ -44,8 +44,8 @@ class MapquestApi extends BaseApi implements Geocoder
     protected function parseLatLng(array $data): array
     {
         return [
-            'lat' => isset($data['results'][0]['locations'][0]['latLng']['lat']) ? $data['results'][0]['locations'][0]['latLng']['lat'] : 0,
-            'lng' => isset($data['results'][0]['locations'][0]['latLng']['lng']) ? $data['results'][0]['locations'][0]['latLng']['lng'] : 0,
+            'lat' => $data['results'][0]['locations'][0]['latLng']['lat'] ?? 0,
+            'lng' => $data['results'][0]['locations'][0]['latLng']['lng'] ?? 0,
         ];
     }
 

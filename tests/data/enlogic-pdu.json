@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": null,
+                    "sysObjectID": ".1.3.6.1.4.1.38446.1",
+                    "sysDescr": "Enlogic PDU",
+                    "sysContact": null,
+                    "version": "1.0.4.3",
+                    "hardware": "",
+                    "features": null,
+                    "location": null,
+                    "os": "enlogic-pdu",
+                    "type": "power",
+                    "serial": "",
+                    "icon": "enlogic.png"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

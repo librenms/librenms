@@ -30,7 +30,7 @@ use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Tests\TestCase;
 
-class SnmpResponseTest extends TestCase
+final class SnmpResponseTest extends TestCase
 {
     public function testSimple(): void
     {
@@ -353,7 +353,7 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
         $response = new SnmpResponse("hrDeviceTable = NULL\n", '', 0);
         $this->assertTrue($response->isValid());
         $this->assertEquals('', $response->getRawWithoutBadLines());
-        $response->mapTable(function () {
+        $response->mapTable(function (): void {
             $this->fail('There should be no data in the array.');
         });
     }

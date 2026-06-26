@@ -12,7 +12,7 @@ $option_default = $vars['topN'] ?? \App\Facades\LibrenmsConfig::get('nfsen_top_d
 
 $option_int = 0;
 foreach (\App\Facades\LibrenmsConfig::get('nfsen_top_N') as $option) {
-    if (strcmp($option_default, $option) == 0) {
+    if (strcmp((string) $option_default, $option) == 0) {
         echo '<option value = "' . $option . '" selected>' . $option . '</option>';
     } else {
         echo '<option value = "' . $option . '">' . $option . '</option>';
@@ -28,7 +28,7 @@ During the last:
 $option_keys = array_keys(\App\Facades\LibrenmsConfig::get('nfsen_lasts'));
 $options = \App\Facades\LibrenmsConfig::get('nfsen_lasts');
 foreach ($option_keys as $option) {
-    if (strcmp($option_default, $option) == 0) {
+    if (strcmp((string) $option_default, (string) $option) == 0) {
         echo '<option value = "' . $option . '" selected>' . $options[$option] . '</option>';
     } else {
         echo '<option value = "' . $option . '">' . $options[$option] . '</option>';
@@ -61,7 +61,7 @@ $stat_types = [
 
 // puts together the drop down options
 foreach ($stat_types as $option => $descr) {
-    if (strcmp($option_default, $option) == 0) {
+    if (strcmp((string) $option_default, $option) == 0) {
         echo '<option value = "' . $option . '" selected>' . $descr . "</option>\n";
     } else {
         echo '<option value = "' . $option . '">' . $descr . "</option>\n";
@@ -115,7 +115,7 @@ if (isset($vars['process'])) {
          is_numeric($vars['lastN']) &&
          ($vars['lastN'] <= \App\Facades\LibrenmsConfig::get('nfsen_last_max'))
     ) {
-        $lastN = $vars['lastN'];
+        $lastN = (int) $vars['lastN'];
     }
 
     // Make sure we have a sane value for lastN
@@ -124,7 +124,7 @@ if (isset($vars['process'])) {
          is_numeric($vars['topN']) &&
          ($vars['topN'] <= \App\Facades\LibrenmsConfig::get('nfsen_top_max'))
     ) {
-        $topN = $vars['topN'];
+        $topN = (int) $vars['topN'];
     }
 
     // Handle the stat order.
@@ -142,11 +142,22 @@ if (isset($vars['process'])) {
     $current_time = lowest_time(time() - 300);
     $last_time = lowest_time($current_time - $lastN - 300);
 
-    $command = \App\Facades\LibrenmsConfig::get('nfdump') . ' -M ' . nfsen_live_dir($device['hostname']) . ' -T -R ' .
-             time_to_nfsen_subpath($last_time) . ':' . time_to_nfsen_subpath($current_time) .
-             ' -n ' . $topN . ' -s ' . $stat_type . '/' . $stat_order;
+    $command = [
+        \App\Facades\LibrenmsConfig::get('nfdump'),
+        '-M',
+        nfsen_live_dir($device['hostname']),
+        '-T',
+        '-R',
+        time_to_nfsen_subpath($last_time) . ':' . time_to_nfsen_subpath($current_time),
+        '-n',
+        $topN,
+        '-s',
+        $stat_type . '/' . $stat_order,
+    ];
 
     echo '<pre>';
-    system($command);
+    (new \Symfony\Component\Process\Process($command))->run(function ($type, $buffer): void {
+        echo htmlspecialchars((string) $buffer);
+    });
     echo '</pre>';
 }

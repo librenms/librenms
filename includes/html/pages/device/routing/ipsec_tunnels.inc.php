@@ -76,7 +76,6 @@ $tunnel = dbFetchRows('SELECT * FROM `ipsec_tunnels` WHERE `device_id` = ? ORDER
 ]);
 
 if (is_null($vars['graph'])) {
-    $tunnel_label = 'warning';
     echo '<table class="table table-condensed table-hover">
     <thead>
       <tr>
@@ -89,17 +88,15 @@ if (is_null($vars['graph'])) {
     <tbody>';
 
     foreach ($tunnel as $entry) {
-        $local_addr = preg_replace('/\b0+(?=\d)/', '', htmlentities($entry['local_addr']));
-        $remote_addr = preg_replace('/\b0+(?=\d)/', '', htmlentities($entry['peer_addr']));
+        $local_addr = preg_replace('/\b0+(?=\d)/', '', htmlentities((string) $entry['local_addr']));
+        $remote_addr = preg_replace('/\b0+(?=\d)/', '', htmlentities((string) $entry['peer_addr']));
+        $tunnel_label = $entry['tunnel_status'] == 'active' ? 'success' : 'warning';
 
-        if ($tunnel['tunnel_status'] = 'active') {
-            $tunnel_label = 'success';
-        }
         echo '<tr>
             <td>' . $local_addr . '</td>
             <td>' . $remote_addr . '</td>
-            <td>' . htmlentities($entry['tunnel_name']) . '</td>
-            <td><span class="label label-' . $tunnel_label . '">' . htmlentities($entry['tunnel_status']) . '</span></td>
+            <td>' . htmlentities((string) $entry['tunnel_name']) . '</td>
+            <td><span class="label label-' . $tunnel_label . '">' . htmlentities((string) $entry['tunnel_status']) . '</span></td>
         </tr>';
     }
 
@@ -107,8 +104,8 @@ if (is_null($vars['graph'])) {
     </table>';
 } else {
     foreach ($tunnel as $entry) {
-        $local_addr = preg_replace('/\b0+(?=\d)/', '', htmlentities($entry['local_addr']));
-        $remote_addr = preg_replace('/\b0+(?=\d)/', '', htmlentities($entry['peer_addr']));
+        $local_addr = preg_replace('/\b0+(?=\d)/', '', htmlentities((string) $entry['local_addr']));
+        $remote_addr = preg_replace('/\b0+(?=\d)/', '', htmlentities((string) $entry['peer_addr']));
 
         $graph_type = 'ipsectunnel_' . $vars['graph'];
         $graph_array['height'] = '100';

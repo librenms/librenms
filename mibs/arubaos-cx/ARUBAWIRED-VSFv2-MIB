@@ -3,7 +3,7 @@
 --**MOD+************************************************************************
 --* Module:    ARUBAWIRED-VSFv2-MIB :VSF MIB file
 --*
---* (c) Copyright 2019-2023 Hewlett Packard Enterprise Development LP
+--* (c) Copyright 2019-2025 Hewlett Packard Enterprise Development LP
 --* All Rights Reserved.
 --*
 --* The contents of this software are proprietary and confidential
@@ -32,13 +32,16 @@ IMPORTS
         FROM ARUBAWIRED-NETWORKING-OID;
 
 arubaWiredVsfv2MIB MODULE-IDENTITY
-    LAST-UPDATED "202305160000Z" -- May 16, 2023
+    LAST-UPDATED "202501160000Z" -- January 16, 2025
     ORGANIZATION "HPE/Aruba Networking Division"
     CONTACT-INFO "Hewlett Packard Company 8000 Foothills Blvd. Roseville,
                   CA 95747"
 
     DESCRIPTION   "This MIB module describes objects used to manage Virtual
                    Switching Framework (VSF) feature."
+
+    REVISION     "202501160000Z"  -- January 16, 2025
+    DESCRIPTION  "Added VSF Vlan MAD MIBs"
 
     REVISION     "202305160000Z" -- May 16, 2023
     DESCRIPTION  "Added a new object to provide physical entity for members"
@@ -65,6 +68,7 @@ arubaWiredVsfv2Notifications OBJECT IDENTIFIER ::= { arubaWiredVsfv2MIB 0 }
 arubaWiredVsfv2Objects       OBJECT IDENTIFIER ::= { arubaWiredVsfv2MIB 1 }
 arubaWiredVsfv2Config        OBJECT IDENTIFIER ::= { arubaWiredVsfv2Objects 0 }
 arubaWiredVsfv2Status        OBJECT IDENTIFIER ::= { arubaWiredVsfv2Objects 1 }
+arubaWiredVsfv2Counters      OBJECT IDENTIFIER ::= { arubaWiredVsfv2Objects 5 }
 
 --*************************************************************
 --*    Scalar Group
@@ -81,7 +85,8 @@ arubaWiredVsfv2TrapEnable   OBJECT-TYPE
 arubaWiredVsfv2SplitDetectConfigured   OBJECT-TYPE
     SYNTAX      INTEGER {
                           none (1),
-                          mgmt (2)
+                          mgmt (2),
+                          vlan (3)
                         }
     MAX-ACCESS  read-write
     STATUS      current
@@ -93,9 +98,23 @@ arubaWiredVsfv2SplitDetectConfigured   OBJECT-TYPE
              `mgmt`: The management network interface will be used to detect a
                      stack split. If multiple fragments are detected, only
                      the stack fragment containing the 'primary' member will
-                     keep its network interfaces active."
+                     keep its network interfaces active.
+             `vlan`: Any one of the data ports configured with split detection
+                     access VLAN identifier will be used to detect stack split.
+                     If multiple fragments are detected, only the stack
+                     fragment containing the 'primary' member will keep its
+                     network interfaces active."
 
     ::= { arubaWiredVsfv2Config 2 }
+
+arubaWiredVsfv2SplitDetectVlanId   OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..5))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "VLAN identifier used for split detection"
+
+    ::= { arubaWiredVsfv2Config 3 }
 
 --*************************************************************
 --*    VSF Status Scalar Group
@@ -155,6 +174,61 @@ arubaWiredVsfv2Secondary OBJECT-TYPE
                  standby member of the stack."
 
     ::= { arubaWiredVsfv2Status 5 }
+
+arubaWiredVsfv2SplitDetectOperStatus OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..5))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The status of split detection functionality
+                 can be one of:
+
+                 `up`   : Split detection functionality is operational.
+                 `down` : Split detection functionality is not operational."
+    ::= { arubaWiredVsfv2Status 6 }
+
+arubaWiredVsfv2SplitDetectStatusDownReason OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The down reason of split detection operational status
+                 can be one of:
+
+                 'Split detection is not configured'                                   : split detection method is not configured.
+                 'Mgmt interface admin state is down'                                  : split detection method is configured as Mgmt and Mgmt interface admin state is down.
+                 'Mgmt interface link state is down'                                   : split detection method is configured as Mgmt and Mgmt interface link state is down.
+                 'Split detection VLAN is not configured'                              : split detection method is configured as vlan and split detection VLAN is not configured.
+                 'VLAN <VLAN_ID> is not configured'                                    : split detection method is configured as vlan and coresponding VLAN identifier is not configured.
+                 'VLAN <VLAN_ID> admin state is down'                                  : split detection method is configured as vlan and coresponding VLAN identifier is admin down.
+                 'VLAN <VLAN_ID> does not have split detection interfaces configured'  : split detection method is configured as vlan and coresponding VLAN identifier is not associated with any interface.
+                 'Interface <ifname> admin state is down'                              : split detection method is configured as vlan and coresponding VLAN associated interface admin state is down.
+                 'Interface <ifname> operational state is down'                        : split detection method is configured as vlan and coresponding VLAN associated interface operational state is down.
+                 'VLAN <VLAN_ID> is configured only with one split detection interface': split detection method is configured as vlan and only one access port is part of split detection VLAN. Split detection VLAN should have one access port from the primary and one from the secondary."
+    ::= { arubaWiredVsfv2Status 7 }
+
+--*************************************************************
+--*    VSF Counters Scalar Group
+--*************************************************************
+
+arubaWiredVsfv2SplitDetectCountersTx OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total number of packets transmitted."
+    ::= { arubaWiredVsfv2Counters 1 }
+
+arubaWiredVsfv2SplitDetectCountersRx OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total number of packets recieved."
+    ::= { arubaWiredVsfv2Counters  2 }
+
+arubaWiredVsfv2SplitDetectCountersRxDrop OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total number of packets recived and discarded."
+    ::= { arubaWiredVsfv2Counters  3 }
 
 --*************************************************************
 --*    arubaWiredVsfv2MemberTable
@@ -527,7 +601,8 @@ arubaWiredVsfv2ConfigScalarGroup OBJECT-GROUP
                arubaWiredVsfv2TrapEnable,
                arubaWiredVsfv2StackMacAddr,
                arubaWiredVsfv2DomainId,
-               arubaWiredVsfv2Secondary
+               arubaWiredVsfv2Secondary,
+               arubaWiredVsfv2SplitDetectVlanId
               }
     STATUS      current
     DESCRIPTION "A collection of Virtual Switching Framework scalar objects."
@@ -536,7 +611,9 @@ arubaWiredVsfv2ConfigScalarGroup OBJECT-GROUP
 arubaWiredVsfv2StatusScalarGroup OBJECT-GROUP
     OBJECTS   {
                arubaWiredVsfv2OperStatus,
-               arubaWiredVsfv2SplitDetectConfigured
+               arubaWiredVsfv2SplitDetectConfigured,
+               arubaWiredVsfv2SplitDetectOperStatus,
+               arubaWiredVsfv2SplitDetectStatusDownReason
               }
     STATUS      current
     DESCRIPTION "A collection of Virtual Switching Framework notifications
@@ -601,6 +678,17 @@ arubaWiredVsfv2NotificationsGroup NOTIFICATION-GROUP
     DESCRIPTION "A collection of VSF virtual chassis notifications objects."
     ::= { arubaWiredVsfv2Groups 6 }
 
+arubaWiredVsfv2CountersScalarGroup OBJECT-GROUP
+    OBJECTS   {
+               arubaWiredVsfv2SplitDetectCountersTx,
+               arubaWiredVsfv2SplitDetectCountersRx,
+               arubaWiredVsfv2SplitDetectCountersRxDrop
+              }
+    STATUS      current
+    DESCRIPTION "A collection of Virtual Switching Framework Counters
+                 objects."
+    ::= { arubaWiredVsfv2Groups 7 }
+
 arubaWiredVsfv2MibCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION "The compliance statement for devices implementing the
@@ -612,7 +700,8 @@ arubaWiredVsfv2MibCompliance MODULE-COMPLIANCE
                       arubaWiredVsfv2MemberTableGroup,
                       arubaWiredVsfv2LinkTableGroup,
                       arubaWiredVsfv2PortTableGroup,
-                      arubaWiredVsfv2NotificationsGroup
+                      arubaWiredVsfv2NotificationsGroup,
+                      arubaWiredVsfv2CountersScalarGroup
                       }
     ::= { arubaWiredVsfv2Compliances 1 }
 END

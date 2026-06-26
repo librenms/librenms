@@ -30,7 +30,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class RuckusSzEventTest extends SnmpTrapTestCase
+final class RuckusSzEventTest extends SnmpTrapTestCase
 {
     public function testSzApConf(): void
     {

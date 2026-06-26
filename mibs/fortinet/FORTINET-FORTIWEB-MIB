@@ -24,7 +24,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 fnFortiWebMib MODULE-IDENTITY
-    LAST-UPDATED "201807130000Z"
+    LAST-UPDATED "202007020000Z"
     ORGANIZATION 
         "Fortinet Technologies, Inc."
     CONTACT-INFO 
@@ -34,7 +34,40 @@ fnFortiWebMib MODULE-IDENTITY
          http://www.fortinet.com"
     DESCRIPTION
         "MIB module for Fortinet FortiWeb devices"
-    REVISION    "201807130000Z"
+    REVISION    "202007020000Z"
+    DESCRIPTION
+	"add   fwbALI"
+    REVISION    "202007020000Z"
+    DESCRIPTION
+	"add   fwbAZRCLD"
+    REVISION    "202007020000Z"
+    DESCRIPTION
+	"add   fwbAZROND"
+    REVISION    "202007020000Z"
+    DESCRIPTION
+	"add   fwbXENAWSOND"
+    REVISION    "202007020000Z"
+    DESCRIPTION
+	"add   fwbAWSCLD"
+    REVISION    "202007020000Z"
+    DESCRIPTION
+	"add   fwb400E"
+    REVISION    "201908150000Z"
+    DESCRIPTION
+        "add   fwb600E"
+    REVISION    "201904290000Z"
+    DESCRIPTION
+    	"add L4 connection and connection rate"
+    REVISION    "201809200000Z"
+    DESCRIPTION
+    	"add  fwb100E."
+    REVISION    "201809130000Z"
+    DESCRIPTION
+	"add HA Trap for StatusChange, MemberJoin and MemberLeave."
+    REVISION    "201808060000Z"
+    DESCRIPTION
+	"add  fwbOCI."
+    REVISION    "201808060000Z"
     DESCRIPTION
 	"add  fwbDOCKER."
     REVISION    "201804040000Z"
@@ -85,7 +118,7 @@ FwOpMode ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION 
         "enumerated type for device operation modes"
-    SYNTAX      INTEGER { inline(1), offline(2), transparent(3), wccp(4)}
+    SYNTAX      INTEGER { inline(1), offline(2), transparent(3), wccp(4), inspection(5)}
 
 FwHaMode ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -106,14 +139,23 @@ fwb400B OBJECT IDENTIFIER
 fwb100D OBJECT IDENTIFIER
     ::= { fwModel 1004 }
 
+fwb100E OBJECT IDENTIFIER
+    ::= { fwModel 1005 }
+
 fwb400C OBJECT IDENTIFIER
     ::= { fwModel 4003 }
 
 fwb400D OBJECT IDENTIFIER
     ::= { fwModel 4004 }
 
+fwb400E OBJECT IDENTIFIER
+    ::= { fwModel 4005 }
+
 fwb600D OBJECT IDENTIFIER
     ::= { fwModel 6004 }
+
+fwb600E OBJECT IDENTIFIER
+    ::= { fwModel 6005 }
 
 fwb1000B OBJECT IDENTIFIER
     ::= { fwModel 10002 }
@@ -178,8 +220,19 @@ fwbVBOX OBJECT IDENTIFIER
     ::= { fwModel 50011}
 fwbDOCKER OBJECT IDENTIFIER
     ::= { fwModel 50012}
+fwbOCI OBJECT IDENTIFIER
+    ::= { fwModel 50013}
+fwbALI OBJECT IDENTIFIER
+    ::= { fwModel 50014}
+fwbAZRCLD OBJECT IDENTIFIER
+    ::= { fwModel 50015}
+fwbAZROND OBJECT IDENTIFIER
+    ::= { fwModel 50016}
+fwbXENAWSOND OBJECT IDENTIFIER
+    ::= { fwModel 50017}
+fwbAWSCLD OBJECT IDENTIFIER
+    ::= { fwModel 50018}
 
---
 -- fortinet.fnFortiWebMib.fwSystem
 --
 
@@ -232,7 +285,7 @@ CPUEntry ::=
 
 cPUIndex OBJECT-TYPE
     SYNTAX  Integer32 (1..2147483647)
-    MAX-ACCESS  read-only
+    MAX-ACCESS  not-accessible
     STATUS  current
     DESCRIPTION
             "A unique value for each CPU." 
@@ -316,7 +369,7 @@ fwSysDiskUsage OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        "Current hard disk usage rate, if disk is present"
+        "Current log disk usage rate, if log disk is present"
     ::= { fwSystemInfo 9 }
 
 fwSysDiskCapacity OBJECT-TYPE
@@ -324,7 +377,7 @@ fwSysDiskCapacity OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        "Total hard disk capacity (MB), if disk is present"
+        "Total log disk capacity (MB), if log disk is present"
     ::= { fwSystemInfo 10 }
 
 --
@@ -335,7 +388,7 @@ fwProxy OBJECT IDENTIFIER
     ::= { fnFortiWebMib 3 }
 
 fwProxyNumber OBJECT-TYPE
-    SYNTAX      Counter32
+    SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -343,7 +396,7 @@ fwProxyNumber OBJECT-TYPE
     ::= { fwProxy 1 }
 
 fwPServerNumber OBJECT-TYPE
-    SYNTAX      Counter32
+    SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -351,7 +404,7 @@ fwPServerNumber OBJECT-TYPE
     ::= { fwProxy 2 }
 
 fwVServerNumber OBJECT-TYPE
-    SYNTAX      Counter32
+    SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -359,7 +412,7 @@ fwVServerNumber OBJECT-TYPE
     ::= { fwProxy 3 }
 
 fwMonitorNumber OBJECT-TYPE
-    SYNTAX      Counter32
+    SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -367,7 +420,7 @@ fwMonitorNumber OBJECT-TYPE
     ::= { fwProxy 4 }
 
 fwServiceNumber OBJECT-TYPE
-    SYNTAX      Counter32
+    SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -375,12 +428,29 @@ fwServiceNumber OBJECT-TYPE
     ::= { fwProxy 5 }
 
 fwPortSvrNumber OBJECT-TYPE
-    SYNTAX      Counter32
+    SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
         "Protection server number"
     ::= { fwProxy 6 }
+
+fwTotalConnectNumber OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total connnect number"
+    ::= { fwProxy 7 }
+
+fwTotalConnectNumberPerSecond OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total connect number/Second"
+    ::= { fwProxy 8 }
+
 
 --
 -- fortinet.fnFortiWebMib.fwXMLProtection
@@ -394,7 +464,7 @@ fwWAFProtection OBJECT IDENTIFIER
     ::= { fnFortiWebMib 4 }
 
 fwWAFInputRuleNumber OBJECT-TYPE
-    SYNTAX      Counter32
+    SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -402,36 +472,36 @@ fwWAFInputRuleNumber OBJECT-TYPE
     ::= { fwWAFProtection 1 }
 
 fwWAFParameterNumber OBJECT-TYPE
-    SYNTAX      Counter32
+    SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
         "WAF paramater validation rules number"
     ::= { fwWAFProtection 2 }
 
-fwWAFAccessNumber OBJECT-TYPE
-    SYNTAX      Counter32
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION 
-        "WAF page access rule number"
-    ::= { fwWAFProtection 3 }
+--fwWAFAccessNumber OBJECT-TYPE
+--    SYNTAX      Counter32
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION 
+--        "WAF page access rule number"
+--    ::= { fwWAFProtection 3 }
 
 fwWAFSvrPortNumber OBJECT-TYPE
-    SYNTAX      Counter32
+    SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
         "WAF server protection number"
-    ::= { fwWAFProtection 4 }
+    ::= { fwWAFProtection 3 }
 
-fwWAFStartPageNumber OBJECT-TYPE
-    SYNTAX      Counter32
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION 
-        "WAF start page number"
-    ::= { fwWAFProtection 5 }
+--fwWAFStartPageNumber OBJECT-TYPE
+--    SYNTAX      Counter32
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION 
+--        "WAF start page number"
+--    ::= { fwWAFProtection 5 }
 
 --fwWAFBlacklistNumber OBJECT-TYPE
 --    SYNTAX      Counter32
@@ -450,12 +520,12 @@ fwWAFStartPageNumber OBJECT-TYPE
 --    ::= { fwWAFProtection 7 }
 
 fwWAFProfileNumber  OBJECT-TYPE
-    SYNTAX      Counter32
+    SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
         "WAF profile number"
-    ::= { fwWAFProtection 6 }
+    ::= { fwWAFProtection 4 }
 
 --
 -- fortinet.fnFortiWebMib.fwTraps
@@ -604,6 +674,28 @@ fwTrapPServerFailed NOTIFICATION-TYPE
     DESCRIPTION 
         "Physical server is drop-line"
     ::= { fwTrapPrefix 5 }
+
+fwTrapHAStatusChange NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "HA Device status change slave->mater"
+    ::= { fwTrapPrefix 6 }
+
+fwTrapHAMemberJoin NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "HA cluster have member join"
+    ::= { fwTrapPrefix 7 }
+
+fwTrapHAMemberLeave NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "HA cluster have member leave"
+    ::= { fwTrapPrefix 8 }
+
 
 fwTrapXMLIntrusionAttack NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName }
@@ -769,16 +861,19 @@ fwMibConformance OBJECT IDENTIFIER
 fwTrapGroup NOTIFICATION-GROUP
     NOTIFICATIONS { fwTrapHaHBFail, fwTrapModeChange,	
                     fwTrapPolicyStart, fwTrapPolicyStop,
-		    fwTrapPServerFailed, fwTrapXMLIntrusionAttack,
-		    fwTrapXMLSchemaAttack, fwTrapXMLFilterAttack,
-		    fwTrapXMLSigEncAttack, fwTrapXMLWSDLAttack,
-		    fwTrapXMLSqlAttack, fwTrapWAFAMethodAttack,
-		    fwTrapWAFXSSAttack, fwTrapWAFSqlAttack,
-		    fwTrapWAFExploitAttack, fwTrapWAFDisclosureAttack,
-		    fwTrapWAFAccessAttack, fwTrapWAFSPageAttack,	
-		    fwTrapWAFPValidAttack, fwTrapWAFBListAttack,
-		    fwTrapWAFWListAttack, fwTrapWAFBLoginAttack,
-		    fwTrapWAFRobotAttack }
+		    fwTrapPServerFailed, fwTrapHAStatusChange,
+                    fwTrapHAMemberJoin, fwTrapHAMemberLeave,
+                    fwTrapXMLIntrusionAttack, fwTrapXMLSchemaAttack, 
+                    fwTrapXMLFilterAttack,fwTrapXMLSigEncAttack, 
+                    fwTrapXMLWSDLAttack, fwTrapXMLSqlAttack, 
+                    fwTrapWAFAMethodAttack, fwTrapWAFXSSAttack, 
+                    fwTrapWAFSqlAttack, fwTrapWAFExploitAttack, 
+                    fwTrapWAFDisclosureAttack, fwTrapWAFAccessAttack, 
+                    fwTrapWAFSPageAttack, fwTrapWAFPValidAttack, 
+                    fwTrapWAFBListAttack, fwTrapWAFBLoginAttack,
+		    fwTrapWAFRobotAttack, fwTrapWAFHideFieldAttack,
+		    fwTrapWAFUrlAccessAttack, fwTrapWAFBadRobotAttack,
+		    fwTrapWAFSignatureAttack, fwTrapWAFWListAttack }
     STATUS      current
     DESCRIPTION 
         "Traps are intended for use."
@@ -789,11 +884,31 @@ fwSystemObjectGroup OBJECT-GROUP
                   fwSysHaMode, fwSysOpMode,
 		  fwSysCpuUsage, fwSysCpuFreq,
 		  fwSysMemUsage, fwSysMemCapacity,
-		  fwSysDiskUsage, fwSysDiskCapacity }
+		  fwSysDiskUsage, fwSysDiskCapacity,
+                  cPUNumber, cPUusage }
     STATUS      current
     DESCRIPTION
         "Objects pertaining to the system status of the device."
     ::= { fwMibConformance 2 }
+
+fwProxyObjectGroup OBJECT-GROUP
+    OBJECTS     { fwProxyNumber, fwPServerNumber,
+                  fwVServerNumber, fwMonitorNumber,
+		  fwServiceNumber, fwPortSvrNumber,
+		  fwTotalConnectNumber, fwTotalConnectNumberPerSecond }
+    STATUS      current
+    DESCRIPTION
+        "Objects pertaining to proxy status of the device."
+    ::= { fwMibConformance 3 }
+
+fwWAFProtectionGroup OBJECT-GROUP
+    OBJECTS     { fwWAFInputRuleNumber, fwWAFParameterNumber,
+                  fwWAFSvrPortNumber, fwWAFProfileNumber }
+    STATUS      current
+    DESCRIPTION
+        "Objects pertaining to waf protection of the device."
+    ::= { fwMibConformance 4 }
+
 
 fwMibCompliance MODULE-COMPLIANCE
     STATUS      current
@@ -808,7 +923,15 @@ fwMibCompliance MODULE-COMPLIANCE
 
         GROUP   fwSystemObjectGroup
         DESCRIPTION   
-              "Object identifiers used in notifications. Objects are required if their containing trap is implemented."
+              "Model and feature specific."
+
+        GROUP   fwProxyObjectGroup
+        DESCRIPTION   
+              "Model and feature specific."
+
+        GROUP   fwWAFProtectionGroup
+        DESCRIPTION   
+              "Model and feature specific."
 
     ::= { fwMibConformance 100 }
 

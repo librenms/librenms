@@ -9,7 +9,7 @@ foreach ($tempTable as $ifIndex => $current) {
     $ifName = $ifIndexToName[$ifIndex] ?? $ifIndex;
 
     if (! empty($current['FS-SWITCH-V2-MIB::temperCurrent']) && $current['FS-SWITCH-V2-MIB::temperCurrent'] !== '0.00') {
-        foreach (explode(',', $current['FS-SWITCH-V2-MIB::temperCurrent']) as $channel => $value) {
+        foreach (explode(',', (string) $current['FS-SWITCH-V2-MIB::temperCurrent']) as $channel => $value) {
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
                 'sensor_class' => 'temperature',

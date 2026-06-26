@@ -1,7 +1,7 @@
 --**MOD+************************************************************************
 --* Module:    ARUBAWIRED-POE-MIB :POE MIB file
 --*
---* (c) Copyright 2019-2020 Hewlett Packard Enterprise Development LP
+--* (c) Copyright 2019-2024 Hewlett Packard Enterprise Development LP
 --* All Rights Reserved.
 --*
 --* The contents of this software are proprietary and confidential
@@ -27,7 +27,7 @@ IMPORTS
         FROM POWER-ETHERNET-MIB;
 
 arubaWiredPoeMIB MODULE-IDENTITY
-    LAST-UPDATED "201906240000Z" -- June 24, 2019
+    LAST-UPDATED "202411270000Z" -- November 27, 2024
     ORGANIZATION "HPE/Aruba Networking Division"
     CONTACT-INFO "Hewlett Packard Company
                   8000 Foothills Blvd.
@@ -36,6 +36,10 @@ arubaWiredPoeMIB MODULE-IDENTITY
         "This MIB module describes management objects
          that manage Power Source Equipment (PSE).
          This is the MIB module related to HPE Aruba PoE "
+
+    REVISION     "202411270000Z" -- November 27, 2024
+    DESCRIPTION  "Added arubaWiredPoePethMainPseAveragePoePower and
+                  arubaWiredPoePethPsePortAveragePoePower to the MIB"
 
     REVISION     "201906240000Z" -- June 24, 2019
     DESCRIPTION  "Initial revision."
@@ -91,7 +95,8 @@ ArubaWiredPoePethPsePortEntry ::=
         arubaWiredPoePethPsePortPdSignature                  INTEGER,
         arubaWiredPoePethPsePortPowerClassification          INTEGER,
         arubaWiredPoePethPsePortPseAssignedClass             INTEGER,
-        arubaWiredPoePethPsePortPoECycle                     Integer32
+        arubaWiredPoePethPsePortPoECycle                     Integer32,
+        arubaWiredPoePethPsePortAveragePoePower              Integer32
     }
 
 arubaWiredPoePethPsePortPowerAllocateBy OBJECT-TYPE
@@ -211,7 +216,11 @@ arubaWiredPoePethPsePortOperStatus OBJECT-TYPE
                   }
       MAX-ACCESS  read-only
       STATUS      current
-      DESCRIPTION "This field specifies the operational status of the port."
+      DESCRIPTION "This field specifies the operational status of the port.
+                   deny: A PD is connected, but the PSE does not have sufficient power balance,
+                         to power this port.
+                   on:   A PD is connected and the PSE is delivering the power.
+                   off:  PSE interface in disabled / searching / power_down / fault state."
       DEFVAL      { 2 }
       ::= { arubaWiredPoePethPsePortEntry 10 }
 
@@ -303,6 +312,15 @@ arubaWiredPoePethPsePortPoECycle OBJECT-TYPE
                    input."
       DEFVAL      { 1 }
       ::= { arubaWiredPoePethPsePortEntry 14 }
+
+arubaWiredPoePethPsePortAveragePoePower OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "Watts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Average instantaneous PoE power used by the port, expressed in Watts"
+    ::= { arubaWiredPoePethPsePortEntry 15 }
 
 -- **********************************************************************
 -- PSE Objects extension for Four pair related parameters on poe port
@@ -592,7 +610,8 @@ ArubaWiredPoePethMainPseEntry ::=
     SEQUENCE {
         arubaWiredPoePethMainPseReservedPower       Integer32,
         arubaWiredPoePethMainPseFailoverPower       Integer32,
-        arubaWiredPoePethMainPseRedundantPower      Integer32
+        arubaWiredPoePethMainPseRedundantPower      Integer32,
+        arubaWiredPoePethMainPseAveragePoePower     Integer32
     }
 
 arubaWiredPoePethMainPseReservedPower OBJECT-TYPE
@@ -632,6 +651,14 @@ arubaWiredPoePethMainPseRedundantPower OBJECT-TYPE
 
       DEFVAL      { 0 }
       ::= { arubaWiredPoePethMainPseEntry 3 }
+
+arubaWiredPoePethMainPseAveragePoePower OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS      "Watts"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Average instantaneous PoE power expressed in Watts."
+    ::= { arubaWiredPoePethMainPseEntry 4 }
 
 -- **********************************************************************
 -- AlwaysOnPOE Information on module - applies
@@ -755,7 +782,8 @@ arubaWiredPoePethPsePortTableGroup OBJECT-GROUP
                     arubaWiredPoePethPsePortPdSignature,
                     arubaWiredPoePethPsePortPowerClassification,
                     arubaWiredPoePethPsePortPseAssignedClass,
-                    arubaWiredPoePethPsePortPoECycle
+                    arubaWiredPoePethPsePortPoECycle,
+                    arubaWiredPoePethPsePortAveragePoePower
                   }
       STATUS      current
       DESCRIPTION "A collection of objects display configuration, status,
@@ -789,7 +817,8 @@ arubaWiredPoePethMainPseTableGroup OBJECT-GROUP
       OBJECTS     {
                    arubaWiredPoePethMainPseReservedPower,
                    arubaWiredPoePethMainPseFailoverPower,
-                   arubaWiredPoePethMainPseRedundantPower
+                   arubaWiredPoePethMainPseRedundantPower,
+                   arubaWiredPoePethMainPseAveragePoePower
                   }
       STATUS      current
       DESCRIPTION "A Collection of Object(s) that provide information about

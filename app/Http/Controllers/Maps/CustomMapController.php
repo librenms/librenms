@@ -40,13 +40,10 @@ use Illuminate\Support\Facades\Storage;
 
 class CustomMapController extends Controller
 {
-    public function __construct()
-    {
-        $this->authorizeResource(CustomMap::class, 'map');
-    }
-
     public function index(): View
     {
+        $this->authorize('viewAny', CustomMap::class);
+
         return view('map.custom-manage', [
             'maps' => CustomMap::orderBy('name')->get(['custom_map_id', 'name', 'menu_group'])->groupBy('menu_group')->sortKeys(),
             'name' => 'New Map',
@@ -94,6 +91,8 @@ class CustomMapController extends Controller
 
     public function destroy(CustomMap $map): Response
     {
+        $this->authorize('delete', $map);
+
         $map->delete();
 
         return response('Success', 200)
@@ -102,6 +101,8 @@ class CustomMapController extends Controller
 
     public function show(Request $request, CustomMap $map): View
     {
+        $this->authorize('view', $map);
+
         $request->validate([
             'screenshot' => 'nullable|in:yes',
         ]);
@@ -134,6 +135,8 @@ class CustomMapController extends Controller
 
     public function edit(CustomMap $map): View
     {
+        $this->authorize('update', $map);
+
         $data = [
             'map_id' => $map->custom_map_id,
             'name' => $map->name,
@@ -168,6 +171,8 @@ class CustomMapController extends Controller
 
     public function store(CustomMapSettingsRequest $request): JsonResponse
     {
+        $this->authorize('create', CustomMap::class);
+
         // create a new map with default values
         $map = new CustomMap;
         $map->options = [
@@ -228,6 +233,8 @@ class CustomMapController extends Controller
 
     public function update(CustomMapSettingsRequest $request, CustomMap $map): JsonResponse
     {
+        $this->authorize('update', $map);
+
         $map->fill($request->validated());
         $map->options = json_decode($request->options);
         $map->save(); // save to get ID
@@ -246,6 +253,9 @@ class CustomMapController extends Controller
 
     public function clone(CustomMap $map): JsonResponse
     {
+        $this->authorize('create', CustomMap::class);
+        $this->authorize('view', $map);
+
         $newmap = $map->replicate();
         $newmap->name .= ' - Clone';
 
@@ -258,7 +268,7 @@ class CustomMapController extends Controller
         $nodes = $map->nodes()->get();
         $edges = $map->edges()->get();
 
-        DB::transaction(function () use ($newmap, $newbackground, $nodes, $edges) {
+        DB::transaction(function () use ($newmap, $newbackground, $nodes, $edges): void {
             $newmap->save();
 
             if ($newbackground) {
@@ -267,7 +277,7 @@ class CustomMapController extends Controller
             }
 
             $node_id_map = collect();
-            foreach ($nodes as $id => $node) {
+            foreach ($nodes as $node) {
                 $newnode = $node->replicate();
                 $newnode->custom_map_id = $newmap->custom_map_id;
                 $newnode->save();
@@ -275,7 +285,7 @@ class CustomMapController extends Controller
                 $node_id_map->put($node->custom_map_node_id, $newnode->custom_map_node_id);
             }
 
-            foreach ($edges as $id => $edge) {
+            foreach ($edges as $edge) {
                 $newedge = $edge->replicate();
                 $newedge->custom_map_id = $newmap->custom_map_id;
                 $newedge->custom_map_node1_id = $node_id_map->get($edge->custom_map_node1_id);
@@ -349,7 +359,7 @@ class CustomMapController extends Controller
             if (! is_numeric($key)) {
                 // Delete keys that are not numeric
                 unset($ret[$key]);
-            } elseif (! preg_match('/^#[A-Fa-f0-0]{6}$/', $ret[$key])) {
+            } elseif (! preg_match('/^#[A-Fa-f0-0]{6}$/', (string) $ret[$key])) {
                 // Delete keys that are not a valid hex HTML colour
                 unset($ret[$key]);
             }

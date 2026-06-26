@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class Stp extends DeviceRelatedModel implements Keyable
 {
+    use HasFactory;
     protected $table = 'stp';
     protected $primaryKey = 'stp_id';
     public $timestamps = false;
@@ -30,8 +32,8 @@ class Stp extends DeviceRelatedModel implements Keyable
         'bridgeForwardDelay',
     ];
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
-        return $this->vlan;
+        return (string) $this->vlan;
     }
 }

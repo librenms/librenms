@@ -26,13 +26,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use Permissions;
 
 class DeviceGroup extends BaseModel
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $fillable = ['name', 'desc', 'type'];
 
@@ -40,17 +44,17 @@ class DeviceGroup extends BaseModel
     {
         parent::boot();
 
-        static::deleting(function (DeviceGroup $deviceGroup) {
+        static::deleting(function (DeviceGroup $deviceGroup): void {
             $deviceGroup->devices()->detach();
         });
 
-        static::saving(function (DeviceGroup $deviceGroup) {
+        static::saving(function (DeviceGroup $deviceGroup): void {
             if ($deviceGroup->isDirty('rules')) {
                 $deviceGroup->rules = $deviceGroup->getParser()->generateJoins()->toArray();
             }
         });
 
-        static::saved(function (DeviceGroup $deviceGroup) {
+        static::saved(function (DeviceGroup $deviceGroup): void {
             if ($deviceGroup->isDirty('rules')) {
                 $deviceGroup->updateDevices();
             }
@@ -94,7 +98,7 @@ class DeviceGroup extends BaseModel
 
     public function scopeHasAccess($query, User $user)
     {
-        if ($user->hasGlobalRead()) {
+        if (Gate::allows('viewAll', DeviceGroup::class)) {
             return $query;
         }
 
@@ -104,7 +108,7 @@ class DeviceGroup extends BaseModel
     public function scopeInServiceTemplate($query, $serviceTemplate)
     {
         return $query->whereIn(
-            $query->qualifyColumn('id'), function ($query) use ($serviceTemplate) {
+            $query->qualifyColumn('id'), function ($query) use ($serviceTemplate): void {
                 $query->select('device_group_id')
                     ->from('service_templates_device_group')
                     ->where('service_template_id', $serviceTemplate);
@@ -115,7 +119,7 @@ class DeviceGroup extends BaseModel
     public function scopeNotInServiceTemplate($query, $serviceTemplate)
     {
         return $query->whereNotIn(
-            $query->qualifyColumn('id'), function ($query) use ($serviceTemplate) {
+            $query->qualifyColumn('id'), function ($query) use ($serviceTemplate): void {
                 $query->select('device_group_id')
                     ->from('service_templates_device_group')
                     ->where('service_template_id', $serviceTemplate);

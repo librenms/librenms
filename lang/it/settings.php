@@ -475,8 +475,8 @@ return [
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC Accounting',
+            'mac-accounting' => [
+                'description' => 'MAC Accounting',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
@@ -859,9 +859,21 @@ return [
                 'description' => 'Username',
                 'help' => 'Username to connect to InfluxDB, if required',
             ],
+            'batch_size' => [
+                'description' => 'Batch Size',
+                'help' => 'Number of metrics to send in a single batch, 0 means no batching',
+            ],
+            'measurements' => [
+                'description' => 'Measurements',
+                'help' => 'List of measurements to send to InfluxDB, leave empty to send all',
+            ],
             'verifySSL' => [
                 'description' => 'Verify SSL',
                 'help' => 'Verify the SSL certificate is valid and trusted',
+            ],
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'To enable or disable verbose output to CLI',
             ],
         ],
         'ipmitool' => [
@@ -935,9 +947,6 @@ return [
         'nfsen_suffix' => [
             'description' => 'File name suffix',
             'help' => 'This is a very important bit as device names in NfSen are limited to 21 characters. This means full domain names for devices can be very problematic to squeeze in, so therefor this chunk is usually removed.',
-        ],
-        'nmap' => [
-            'description' => 'Path to nmap',
         ],
         'opentsdb' => [
             'enable' => [
@@ -1023,10 +1032,6 @@ return [
         'ping' => [
             'description' => 'Path to ping',
         ],
-        'ping_rrd_step' => [
-            'description' => 'Ping Frequency',
-            'help' => 'How often to check. Sets the default value for all nodes. Warning! If you change this you must make additional changes.  Check the Fast Ping docs.',
-        ],
         'poller_modules' => [
             'unix-agent' => [
                 'description' => 'Unix Agent',
@@ -1100,8 +1105,8 @@ return [
             'slas' => [
                 'description' => 'Service Level Agreement Tracking',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC Accounting',
+            'mac-accounting' => [
+                'description' => 'MAC Accounting',
             ],
             'cipsec-tunnels' => [
                 'description' => 'Cipsec Tunnels',
@@ -1256,13 +1261,17 @@ return [
             'description' => 'Sets the version of rrdtool on your server',
             'help' => 'Anything over 1.5.5 supports all features LibreNMS uses, do not set higher than your installed version',
         ],
+        'service_ping_frequency' => [
+            'description' => 'Ping Frequency',
+            'help' => 'How often to run fast ping on all devices.',
+        ],
         'service_poller_workers' => [
             'description' => 'Poller Workers',
             'help' => 'Amount of poller workers to spawn. Sets the default value for all nodes.',
         ],
         'service_poller_frequency' => [
             'description' => 'Poller Frequency (Warning!)',
-            'help' => 'How often to poll devices. Sets the default value for all nodes. Warning! Changing this without fixing rrd files will break graphs. See docs for more info.',
+            'help' => 'How often to poll devices. Sets the default value for all nodes. Warning! This should normally be null to match the rrd step option, otherwise you may break graphs. See docs for more info.',
         ],
         'service_poller_down_retry' => [
             'description' => 'Device Down Retry',
@@ -1315,9 +1324,6 @@ return [
         'service_watchdog_log' => [
             'description' => 'Log File to Watch',
             'help' => 'Default is the LibreNMS log file. Sets the default value for all nodes.',
-        ],
-        'sfdp' => [
-            'description' => 'Path to sfdp',
         ],
         'shorthost_target_length' => [
             'description' => 'Shortened hostname maximum length',
@@ -1526,9 +1532,6 @@ return [
         'device_location_map_open' => [
             'description' => 'Location Map open',
             'help' => 'Location Map is shown by default',
-        ],
-        'whois' => [
-            'description' => 'Path to whois',
         ],
         'smokeping.integration' => [
             'description' => 'Enable',

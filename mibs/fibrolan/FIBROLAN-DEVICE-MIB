@@ -12,7 +12,7 @@
 FIBROLAN-DEVICE-MIB	DEFINITIONS ::= BEGIN
 
 	IMPORTS
-
+		
 		OBJECT-TYPE,
 		IpAddress,
 		MODULE-IDENTITY,
@@ -22,7 +22,7 @@ FIBROLAN-DEVICE-MIB	DEFINITIONS ::= BEGIN
 		NOTIFICATION-TYPE		FROM SNMPv2-SMI
 
 		DisplayString			FROM SNMPv2-TC
-
+		
 		FlTemperature,
 		FlUtilization,
 		FlFileServerType,
@@ -31,7 +31,7 @@ FIBROLAN-DEVICE-MIB	DEFINITIONS ::= BEGIN
 
 
 	flDevice		MODULE-IDENTITY
-		LAST-UPDATED	"201607150000Z"
+		LAST-UPDATED	"201910240000Z"
 		ORGANIZATION	"Fibrolan Ltd."
 		CONTACT-INFO	"support@fibrolan.com"
 		DESCRIPTION	"The MIB module to describe a Fibrolan device's
@@ -40,6 +40,8 @@ FIBROLAN-DEVICE-MIB	DEFINITIONS ::= BEGIN
 				 This module is part of Fibrolan's group of generic
 				 MIB modules.
 				 Copyright (C) Fibrolan Ltd. (2009)."
+		REVISION	"201910240000Z"
+		DESCRIPTION	"Added singleFeedDown status to the flDevicePsuAlarmStatus."
 		REVISION	"201607150000Z"
 		DESCRIPTION	"Re-added and modified the portMacLimit trap.
 					It now includes the ifIndex in the varbind."
@@ -299,7 +301,8 @@ FIBROLAN-DEVICE-MIB	DEFINITIONS ::= BEGIN
 							psuNotInstalled	(2),
 							psuDown		(4),
 							fanDown		(8),
-							singleFanDown	(16)
+							singleFanDown	(16),
+							singleFeedDown	(32)
 						}
 		MAX-ACCESS			read-only
 		STATUS				current

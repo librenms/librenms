@@ -20,4 +20,18 @@ return [
     'bridge_max_age' => 'Bridge max age (s)',
     'bridge_hello_time' => 'Bridge hello time (s)',
     'bridge_forward_delay' => 'Bridge forward delay (s)',
+
+    // additional strings used in views
+    'yes' => 'Yes',
+    'no' => 'No',
+
+    'port' => 'Port',
+    'state' => 'State',
+    'enable' => 'Enable',
+    'path_cost' => 'Path cost',
+    'designated_root_short' => 'Designated root',
+    'designated_cost' => 'Designated cost',
+    'designated_bridge' => 'Designated bridge',
+    'designated_port' => 'Designated port',
+    'forward_transitions' => 'Forward transitions',
 ];

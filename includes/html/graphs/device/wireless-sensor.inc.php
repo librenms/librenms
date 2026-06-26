@@ -26,7 +26,7 @@
 require 'includes/html/graphs/common.inc.php';
 
 // escape % characters
-$unit = preg_replace('/(?<!%)%(?!%)/', '%%', $unit);
+$unit = preg_replace('/(?<!%)%(?!%)/', '%%', (string) $unit);
 
 $output_def = 'sensor';
 $num = '%5.1lf'; // default: float
@@ -48,8 +48,8 @@ if (count($sensors) == 1 && $unit_long == $sensors[0]['sensor_descr']) {
     $unit_long = '';
 }
 
-$col_w = 7 + strlen($unit);
-$rrd_options .= " COMMENT:'" . str_pad($unit_long, 35) . str_pad('Cur', $col_w) . str_pad('Min', $col_w) . "Max\\n'";
+$col_w = 7 + strlen((string) $unit);
+$rrd_options[] = 'COMMENT:' . str_pad((string) $unit_long, 35) . str_pad('Cur', $col_w) . str_pad('Min', $col_w) . 'Max\\n';
 
 foreach ($sensors as $index => $sensor) {
     $sensor_id = $sensor['sensor_id'];
@@ -58,14 +58,14 @@ foreach ($sensors as $index => $sensor) {
 
     $sensor_descr_fixed = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($sensor['sensor_descr'], 28);
     $rrd_file = Rrd::name($device['hostname'], ['wireless-sensor', $sensor['sensor_class'], $sensor['sensor_type'], $sensor['sensor_index']]);
-    $rrd_options .= " DEF:sensor$sensor_id=$rrd_file:sensor:AVERAGE";
+    $rrd_options[] = "DEF:sensor$sensor_id=$rrd_file:sensor:AVERAGE";
 
     if ($unit == 'Hz') {
-        $rrd_options .= " CDEF:sensorhz$sensor_id=sensor$sensor_id,1000000,*";
+        $rrd_options[] = "CDEF:sensorhz$sensor_id=sensor$sensor_id,1000000,*";
     }
 
-    $rrd_options .= " LINE1.5:$output_def$sensor_id#$colour:'$sensor_descr_fixed'";
-    $rrd_options .= " GPRINT:$output_def$sensor_id:LAST:'$num$unit'";
-    $rrd_options .= " GPRINT:$output_def$sensor_id:MIN:'$num$unit'";
-    $rrd_options .= " GPRINT:$output_def$sensor_id:MAX:'$num$unit'\\l ";
+    $rrd_options[] = "LINE1.5:$output_def$sensor_id#$colour:$sensor_descr_fixed";
+    $rrd_options[] = "GPRINT:$output_def$sensor_id:LAST:$num$unit";
+    $rrd_options[] = "GPRINT:$output_def$sensor_id:MIN:$num$unit";
+    $rrd_options[] = "GPRINT:$output_def$sensor_id:MAX:$num$unit\\l";
 }//end foreach

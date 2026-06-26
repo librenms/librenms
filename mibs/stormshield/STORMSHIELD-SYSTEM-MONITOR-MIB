@@ -8,7 +8,7 @@ STORMSHIELD-SYSTEM-MONITOR-MIB DEFINITIONS ::= BEGIN
       stormshieldMIB                           FROM STORMSHIELD-SMI-MIB;
 
    snsSystemMonitor MODULE-IDENTITY
-      LAST-UPDATED  "201702200000Z"
+      LAST-UPDATED  "202504100000Z"
       ORGANIZATION  "Stormshield"
       CONTACT-INFO
          "Customer Support
@@ -21,8 +21,10 @@ STORMSHIELD-SYSTEM-MONITOR-MIB DEFINITIONS ::= BEGIN
          E-mail: support@stormshield.eu
          http://www.stormshield.eu"
       DESCRIPTION   "stormshield System Monitor"
-      REVISION      "201702200000Z"
-      DESCRIPTION   "Initial"
+      REVISION      "202504100000Z"
+         DESCRIPTION   "snsMemUsageEntry added"
+      REVISION      "202206090000Z"
+         DESCRIPTION   "Initial"
       ::= { stormshieldMIB 10 }
 
    snsDate OBJECT-TYPE
@@ -43,11 +45,11 @@ STORMSHIELD-SYSTEM-MONITOR-MIB DEFINITIONS ::= BEGIN
       SYNTAX DisplayString (SIZE (0..255))
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION "Stormshield Firewall memory left for in percent
-                  (host,frag,icmp,conn,dtrack,dyn)"
+      DESCRIPTION "Stormshield Firewall memory used in percent
+                  (host,frag,icmp,conn,ether_state,dtrack,dyn,nmbufsock)"
       ::= { snsSystemMonitor 3 }
 
-   snsStatTime OBJECT-TYPE
+   snsStartTime OBJECT-TYPE
       SYNTAX DisplayString (SIZE (0..255))
       MAX-ACCESS read-only
       STATUS current
@@ -139,7 +141,8 @@ STORMSHIELD-SYSTEM-MONITOR-MIB DEFINITIONS ::= BEGIN
 
    SnsPowerSupplyEntry ::= SEQUENCE {
       snsPowerSupplyIndex      Integer32,
-      snsPowerSupplyPowered    TruthValue
+      snsPowerSupplyPowered    TruthValue,
+      snsPowerSupplyStatus     DisplayString
    }
 
    snsPowerSupplyIndex OBJECT-TYPE
@@ -155,6 +158,13 @@ STORMSHIELD-SYSTEM-MONITOR-MIB DEFINITIONS ::= BEGIN
       STATUS current
       DESCRIPTION "Is power supply powered by electricity ?"
       ::= { snsPowerSupplyEntry 2 }
+
+   snsPowerSupplyStatus OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "What is the status of the power supply ?"
+      ::= { snsPowerSupplyEntry 3 }
 
    snsCpuTable OBJECT-TYPE
       SYNTAX SEQUENCE OF SnsCpuEntry
@@ -198,11 +208,11 @@ STORMSHIELD-SYSTEM-MONITOR-MIB DEFINITIONS ::= BEGIN
       ::= { snsSystemMonitor 8 }
 
    snsBypassEntry OBJECT-TYPE
-      SYNTAX SnsBypassEntry
-      MAX-ACCESS not-accessible
-      STATUS current
+      SYNTAX      SnsBypassEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
       DESCRIPTION "Bypass information"
-      INDEX { snsBypassIndex }
+      INDEX       { snsBypassIndex }
       ::= { snsBypassTable 1 }
 
    SnsBypassEntry ::= SEQUENCE {
@@ -211,7 +221,7 @@ STORMSHIELD-SYSTEM-MONITOR-MIB DEFINITIONS ::= BEGIN
       snsBypassSystemOff    TruthValue,
       snsBypassJustOn       TruthValue,
       snsBypassRunTime      TruthValue,
-      snsBypassWatchdog     TruthValue
+      snsBypassWatchdog     DisplayString
    }
 
    snsBypassIndex OBJECT-TYPE
@@ -250,10 +260,167 @@ STORMSHIELD-SYSTEM-MONITOR-MIB DEFINITIONS ::= BEGIN
       ::= { snsBypassEntry 5 }
 
    snsBypassWatchdog OBJECT-TYPE
-      SYNTAX TruthValue
+      SYNTAX DisplayString
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION "Run-Time Watchdog Timer status"
+      DESCRIPTION "Run-Time Watchdog Timer state"
       ::= { snsBypassEntry 6 }
+
+   snsFanTable OBJECT-TYPE
+      SYNTAX        SEQUENCE OF SnsFanEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION   "Fans status of Firewalls"
+      ::= { snsSystemMonitor 9 }
+
+   snsFanEntry OBJECT-TYPE
+      SYNTAX        SnsFanEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION   "Fan information"
+      INDEX         { snsFanIndex }
+      ::= { snsFanTable 1 }
+
+   SnsFanEntry ::= SEQUENCE {
+      snsFanIndex   Integer32,
+      snsFanName    DisplayString,
+      snsFanStatus  DisplayString,
+      snsFanRpm     Unsigned32
+   }
+
+   snsFanIndex OBJECT-TYPE
+      SYNTAX        Integer32 (0..255)
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION   "Each line in the table"
+      ::= { snsFanEntry 1 }
+
+   snsFanName OBJECT-TYPE
+      SYNTAX        DisplayString
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Name of the Fan"
+      ::= { snsFanEntry 2 }
+
+   snsFanStatus OBJECT-TYPE
+      SYNTAX        DisplayString
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Status of the Fan"
+      ::= { snsFanEntry 3 }
+
+   snsFanRpm OBJECT-TYPE
+      SYNTAX        Unsigned32 (0..4294967295)
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Speed of the Fan"
+      ::= { snsFanEntry 4 }
+
+   snsMemUsageTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SnsMemUsageEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Memory usage of Firewalls"
+      ::= { snsSystemMonitor 10 }
+
+   snsMemUsageEntry OBJECT-TYPE
+      SYNTAX SnsMemUsageEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Memory usage of Firewall>"
+      INDEX { snsMemUsageIndex }
+      ::= { snsMemUsageTable 1 }
+
+   SnsMemUsageEntry ::= SEQUENCE {
+      snsMemUsageIndex      Integer32,
+      snsMemHost            Integer32,
+      snsMemFrag            Integer32,
+      snsMemIcmp            Integer32,
+      snsMemConn            Integer32,
+      snsMemEther           Integer32,
+      snsMemDataTrack       Integer32,
+      snsMemSystem          Integer32,
+      snsMemUser            Integer32,
+      snsMemMbuf            Integer32,
+   }
+
+   snsMemUsageIndex OBJECT-TYPE
+      SYNTAX        Integer32 (0..255)
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION   "Each line in the table"
+      ::= { snsMemUsageEntry 1 }
+
+   snsMemHost OBJECT-TYPE
+      SYNTAX        Integer32
+      UNITS         "%"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Protected Host memory utilization percentage"
+      ::= { snsMemUsageEntry 2 }
+
+   snsMemFrag OBJECT-TYPE
+      SYNTAX        Integer32
+      UNITS         "%"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Fragment memory utilization percentage"
+      ::= { snsMemUsageEntry 3 }
+
+   snsMemIcmp OBJECT-TYPE
+      SYNTAX        Integer32
+      UNITS         "%"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "ICMP memory utilization percentage"
+      ::= { snsMemUsageEntry 4 }
+
+   snsMemConn OBJECT-TYPE
+      SYNTAX        Integer32
+      UNITS         "%"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "ASQ connections memory utilization percentage"
+      ::= { snsMemUsageEntry 5 }
+
+   snsMemEther OBJECT-TYPE
+      SYNTAX        Integer32
+      UNITS         "%"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Etherstate connections memory utilization percentage"
+      ::= { snsMemUsageEntry 6 }
+
+   snsMemDataTrack OBJECT-TYPE
+      SYNTAX        Integer32
+      UNITS         "%"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Data tracking memory utilization percentage"
+      ::= { snsMemUsageEntry 7 }
+
+   snsMemSystem OBJECT-TYPE
+      SYNTAX        Integer32
+      UNITS         "%"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Current memory utilization percentage"
+      ::= { snsMemUsageEntry 8 }
+
+   snsMemUser OBJECT-TYPE
+      SYNTAX        Integer32
+      UNITS         "%"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "User-space memory utilization percentage"
+      ::= { snsMemUsageEntry 9 }
+
+   snsMemMbuf OBJECT-TYPE
+      SYNTAX        Integer32
+      UNITS         "%"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Socket memory utilization percentage"
+      ::= { snsMemUsageEntry 10 }
 
 END

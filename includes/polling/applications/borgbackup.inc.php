@@ -20,7 +20,7 @@ $metrics = [];
 $data = $returned['data'];
 
 // a basic sanity check
-if (! isset($data['mode']) && (strcmp($data['mode'], 'single') == 0 || strcmp($data['mode'], 'multi') == 0)) {
+if (! isset($data['mode']) && (strcmp((string) $data['mode'], 'single') == 0 || strcmp((string) $data['mode'], 'multi') == 0)) {
     d_echo('.data.mode is undef or not set to single or multi');
     update_application($app, 'Error', $metrics);
 
@@ -42,7 +42,7 @@ $rrd_def = RrdDefinition::make()
 //
 //
 // single mode is just processing the totals, outside of error checking
-if (strcmp($data['mode'], 'single') == 0
+if (strcmp((string) $data['mode'], 'single') == 0
     && $data['totals']['errored'] > 0) {
     d_echo('Single mode and error set.');
     if (isset($data['repos']['single']['error'])
@@ -87,7 +87,7 @@ foreach ($total_vars as $to_total) {
 //
 //
 // only process repos for multi as total and repos are the same for single
-if (strcmp($data['mode'], 'multi') == 0) {
+if (strcmp((string) $data['mode'], 'multi') == 0) {
     d_echo('Multi mode and starting processing repos');
 
     if (isset($data['repos'][$repo]['error'])

@@ -13,8 +13,9 @@
  */
 
 include 'includes/html/graphs/common.inc.php';
-$rrd_options .= ' -l 0 -E ';
-$rrd_options .= " COMMENT:'Class-Map              Now      Avg      Max\\n'";
+$graph_params->scale_min = 0;
+
+$rrd_options[] = 'COMMENT:Class-Map              Now      Avg      Max\\n';
 $rrd_additions = '';
 
 $colours = array_merge(\App\Facades\LibrenmsConfig::get('graph_colours.mixed'), \App\Facades\LibrenmsConfig::get('graph_colours.manycolours'), \App\Facades\LibrenmsConfig::get('graph_colours.manycolours'));
@@ -37,7 +38,7 @@ foreach ($graphs as $thisQos) {
     $rrd_filename = Rrd::name($device['hostname'], $thisQos->rrd_id);
 
     if ($count != 0) {
-        $stack = ':STACK ';
+        $stack = ':STACK';
     }
 
     // Grab a colour from the array.
@@ -47,19 +48,17 @@ foreach ($graphs as $thisQos) {
         d_echo("\nError: Out of colours. Have: " . (count($colours) - 1) . ', Requesting:' . $count);
     }
 
-    $rrd_additions .= ' DEF:DS' . $count . '=' . $rrd_filename . ':' . $cbqos_parameter_name . ':AVERAGE ';
-    $rrd_additions .= ' CDEF:MOD' . $count . '=DS' . $count . ',' . $cbqos_operator_param . ',' . $cbqos_operator . ' ';
-    $rrd_additions .= ' AREA:MOD' . $count . '#' . $colour . ":'" . str_pad(substr($thisQos->title, 0, 15), 15) . "'" . $stack;
-    $rrd_additions .= ' GPRINT:MOD' . $count . ':LAST:%6.2lf%s ';
-    $rrd_additions .= ' GPRINT:MOD' . $count . ':AVERAGE:%6.2lf%s ';
-    $rrd_additions .= ' GPRINT:MOD' . $count . ":MAX:%6.2lf%s\l ";
+    $rrd_options[] = 'DEF:DS' . $count . '=' . $rrd_filename . ':' . $cbqos_parameter_name . ':AVERAGE';
+    $rrd_options[] = 'CDEF:MOD' . $count . '=DS' . $count . ',' . $cbqos_operator_param . ',' . $cbqos_operator;
+    $rrd_options[] = 'AREA:MOD' . $count . '#' . $colour . ':' . str_pad(substr((string) $thisQos->title, 0, 15), 15) . $stack;
+    $rrd_options[] = 'GPRINT:MOD' . $count . ':LAST:%6.2lf%s';
+    $rrd_options[] = 'GPRINT:MOD' . $count . ':AVERAGE:%6.2lf%s';
+    $rrd_options[] = 'GPRINT:MOD' . $count . ":MAX:%6.2lf%s\l";
 
     $count++;
 }
 
-if ($rrd_additions == '') {
+if ($count == 0) {
     // We didn't add any data sources.
     d_echo('<pre>No DS to add</pre>');
-} else {
-    $rrd_options .= $rrd_additions;
 }

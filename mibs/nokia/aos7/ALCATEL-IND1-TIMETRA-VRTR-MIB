@@ -66,17 +66,27 @@ IMPORTS
         ;
 
 timetraVRtrMIBModule MODULE-IDENTITY
-        LAST-UPDATED    "0801010000Z"
-        ORGANIZATION    "Alcatel"
-        CONTACT-INFO
-            "Alcatel 7x50 Support
-             Web: http://www.alcatel.com/comps/pages/carrier_support.jhtml"
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc."
+    CONTACT-INFO
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
+
+                      Alcatel-Lucent Enterprise
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
+
+     Telephone:          +1 800 995 2696
+
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
+
         DESCRIPTION
             "This document  is the SNMP MIB  module to manage and provision
              the  Alcatel  7x50 device transport and virtual routers, their
              interfaces, and other related features.
 
-             Copyright 2003-2008 Alcatel-Lucent. All rights reserved.
              Reproduction of  this document is authorized  on the condition
              that the foregoing copyright notice is included.
 
@@ -92,11 +102,18 @@ timetraVRtrMIBModule MODULE-IDENTITY
 
              This  Specification  is supplied `as is', and Alcatel makes no
              warranty, either express or implied, as to the use, operation,
-             condition, or performance of the Specification."
+             condition, or performance of the Specification.
+
+                       Copyright (C) ALE USA Inc. 2014-2019
+                       Copyright (C) 2003-2013 Alcatel-Lucent
+                           ALL RIGHTS RESERVED WORLDWIDE"
 
 --
 --  Revision History
 --
+        REVISION        "201911270000Z"
+        DESCRIPTION     "Updated the latest contact and Copyright information for ALE USA Inc."
+
         REVISION        "0801010000Z"
         DESCRIPTION     "Rev 6.0                01 Jan 2008 00:00
                          6.0 release of the TIMETRA-VRTR-MIB."
@@ -132,7 +149,6 @@ timetraVRtrMIBModule MODULE-IDENTITY
         REVISION        "0008140000Z"
         DESCRIPTION     "Rev 0.1                14 Aug 2000 00:00
                          Initial version of the TIMETRA-VRTR-MIB."
-
         ::= { timetraSRMIBModules 3 }
 
 tmnxVRtrObjs            OBJECT IDENTIFIER ::= { tmnxSRObjs 3 }

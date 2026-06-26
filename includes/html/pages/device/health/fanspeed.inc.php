@@ -1,5 +1,5 @@
 <?php
 
-$class = 'fanspeed';
+$class = \LibreNMS\Enum\Sensor::Fanspeed;
 
 require 'sensors.inc.php';

@@ -22,11 +22,13 @@ IMPORTS
     timetraSRMIBModules, tmnxSRConfs,
     tmnxSRNotifyPrefix, tmnxSRObjs
                                                          FROM TIMETRA-GLOBAL-MIB
+    TmnxPortEncapType
+                                                         FROM TIMETRA-PORT-MIB
     ClassIndexOrNone, Dot1PPriority,
     IPv6FlowLabel, IPv6FlowLabelMask,
     IpAddressPrefixLength, QTagFullRange,
-    QTagFullRangeOrNone, SdpBindId,
-    ServiceAccessPoint, SvcISID,
+    QTagFullRangeOrNone, QTagOrNone,
+    SdpBindId, ServiceAccessPoint, SvcISID,
     TDSCPFilterActionValue,
     TDSCPNameOrEmpty, TFCTypeOrNone,
     TFrameType, TIcmpCodeOrNone,
@@ -35,6 +37,7 @@ IMPORTS
     TLNamedItem, TLNamedItemOrEmpty,
     TMacFilterType, TNamedItem,
     TNamedItemOrEmpty, TOperator,
+    TPolicerBurstSizeBytes,
     TRegularExpression, TTcpUdpPort,
     TmnxAddressAndPrefixAddress,
     TmnxAddressAndPrefixPrefix,
@@ -42,8 +45,8 @@ IMPORTS
     TmnxAdminState,
     TmnxAdminStateTruthValue, TmnxEncapVal,
     TmnxHttpRedirectUrl,
-    TmnxNatSubscriberType,
-    TmnxNatSubscriberTypeOrNone,
+    TmnxNatLegacySubscriberType,
+    TmnxNatLegacySubscriberTypeOrNone,
     TmnxOperState, TmnxPortID, TmnxServId,
     TmnxSubBondingConnIdOrEmpty, TmnxVRtrID,
     TmnxVRtrIDOrZero, TmnxVRtrMplsLspID
@@ -319,12 +322,20 @@ TFilterScope                     ::= TEXTUAL-CONVENTION
             The scope of a filter policy can be set to/from this value only
             when the policy does not contain any entry.
 
-            "
+         cpm:
+
+            When the scope of a filter is defined as cpm, this indicates
+            that the filter can be used as cpm filter only.
+
+            Cpm filter cannot be applied directly anywhere in the system.
+            In order to activate the cpm-filter it must be configured as the active
+            cpm filter policy in tmnxCpmHwFilterObjs."
     SYNTAX      INTEGER {
         exclusive (1),
         template  (2),
         embedded  (3),
-        system    (4)
+        system    (4),
+        cpm       (5)
     }
 
 TItemMatch                       ::= TEXTUAL-CONVENTION
@@ -594,7 +605,8 @@ TIPvXFilterEntryAction           ::= TEXTUAL-CONVENTION
                                     routing lookup.
          - forwardNHInterface (17): A packet matching the entry will be
                                     forwarded using the configured local
-                                    interface.
+                                    interface. This value was obsoleted in
+                                    release 24.3.
          - forwardLsp         (18): A packet matching the entry will be
                                     forwarded using the specified LSP.
          - forwardSdp         (19): A packet matching the entry will be
@@ -652,12 +664,17 @@ TIPvXFilterEntryAction           ::= TEXTUAL-CONVENTION
          - forwardPattern              (34):A packet matching the entry and containing
                                          the specified pattern will be forwarded.
          - forwardMplsPlcyEndpt   (35): A packet matching the entry will be forwarded
-                                           using a tunnel associated with the MPLS forawarding policy endpoint.
+                                           using a tunnel associated with the MPLS forwarding policy endpoint.
          - forwardSrtePlcyEndptColor (36): A packet matching the entry will be forwarded
                                            using a tunnel associated with the SR-TE policy endpoint and color.
          - rateLimitExtractedTraffic (38): Packet rate of packets extracted to CPM and
-                                           matching the entry is limited to value specified by
-                                           tIPvXFltrEntryActRateLimit."
+                                           matching the entry is limited to a value specified by
+                                           tIPvXFltrEntryActRateLimit.
+         - forwardSrv6Plcy           (39): A packet matching the entry will be forwarded
+                                           using a tunnel associated with the SRv6 policy.
+         - rateLimitPolicer          (40): Traffic matching the entry will be limited
+                                           to the values specified in the tFltrPolicerTable entry
+                                           with tFltrPolicerName equal to tIPvXFltrEntryActRateLimitPlcr."
     SYNTAX      INTEGER {
         drop                      (1),
         forward                   (2),
@@ -694,7 +711,9 @@ TIPvXFilterEntryAction           ::= TEXTUAL-CONVENTION
         forwardMplsPlcyEndpt      (35),
         forwardSrtePlcyEndptColor (36),
         httpRedirectCpf           (37),
-        rateLimitExtractedTraffic (38)
+        rateLimitExtractedTraffic (38),
+        forwardSrv6Plcy           (39),
+        rateLimitPolicer          (40)
     }
 
 TFilterPbrTargetStatus           ::= TEXTUAL-CONVENTION
@@ -909,6 +928,23 @@ TDhcpFilterAction                ::= TEXTUAL-CONVENTION
         drop                 (3)
     }
 
+TDhcp6FilterAction               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Action to take on DHCPv6 host creation when the filter entry matches.
+
+         When set to none(1), host creation proceeds as normal.
+
+         When set to bypass-host-creation(2), host creation is bypassed.
+
+         When set to drop(3), the DHCP message is dropped."
+    SYNTAX      INTEGER {
+        none                 (1),
+        bypass-host-creation (2),
+        drop                 (3),
+        reserved4            (4)
+    }
+
 TDhcpFilterMatch                 ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -945,6 +981,26 @@ TFltrPrefixListType              ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER {
         ipv4 (1),
         ipv6 (2)
+    }
+
+TFltrPktLenListType              ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The type TFltrPktLenListType enumerates all possible packet length
+         list types."
+    SYNTAX      INTEGER {
+        ipv4 (1),
+        ipv6 (2)
+    }
+
+TFltrPolicerScope                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The type TFltrPolicerScope enumerates all possible policer scope
+         types."
+    SYNTAX      INTEGER {
+        system (1),
+        filter (2)
     }
 
 TmnxEmbeddedFltrOperState        ::= TEXTUAL-CONVENTION
@@ -987,8 +1043,9 @@ TmnxFilterApplyPathSource        ::= TEXTUAL-CONVENTION
         "The TmnxFilterApplyPathSource data type is an enumerated integer that
          describes the source of the apply-path imported prefixes"
     SYNTAX      INTEGER {
-        unknown   (0),
-        bgp-peers (1)
+        unknown    (0),
+        bgp-peers  (1),
+        interfaces (5)
     }
 
 TFltrPortSelector                ::= TEXTUAL-CONVENTION
@@ -1064,6 +1121,13 @@ TFilterIpv6MatchPacketLength     ::= TEXTUAL-CONVENTION
         "The TFilterPacketLength textual convention is used to specify the
          total length value of a packet"
     SYNTAX      Unsigned32 (0 | 40..65575)
+
+TIPvXFilterPktLen                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TIPvXFilterPktLen textual convention is used to specify the total
+         length value of a packet as specified in packet length lists"
+    SYNTAX      Unsigned32 (0..65575)
 
 TFilterTTL                       ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -1162,6 +1226,28 @@ TFilterEntryActionRateLimit      ::= TEXTUAL-CONVENTION
          entry. The value -1 means max rate."
     SYNTAX      Integer32 (-1 | 0..2000000000)
 
+TFilterEntryActionRateLimitPps   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A limiting rate in packets per second for traffic matching the filter
+         entry. The value -1 means max rate. The value -2 is a default value
+         and means that a leaf of this type is not used."
+    SYNTAX      Integer32 (-2 | -1 | 0..100000000)
+
+TFilterPolicerPIR                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A limiting rate in kilobits per second for traffic matching the filter
+         entry. The value -1 means that a leaf of this  type is not used."
+    SYNTAX      Integer32 (-1 | 0..2000000000)
+
+TFilterPolicerPPSPIR             ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A limiting rate in packets per second for traffic matching the filter
+         entry. The value -1 means that a leaf of this  type is not used."
+    SYNTAX      Integer32 (-1 | 0..100000000)
+
 TFilterEmbedOffset               ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -1248,7 +1334,8 @@ TIPFilterEntry                   ::= SEQUENCE
     tIPFilterSharedPccRuleInsrtSize  TEntryBlockSize,
     tIPFilterSharedPccRuleNbrInsrtd  Unsigned32,
     tIPFilterChainToSystemFilter     TruthValue,
-    tIPFilterType                    TIPvXFilterType
+    tIPFilterType                    TIPvXFilterType,
+    tIPFilterSharedPolicer           TruthValue
 }
 
 tIPFilterId                      OBJECT-TYPE
@@ -1596,6 +1683,25 @@ tIPFilterType                    OBJECT-TYPE
         "The value of the object tIPFilterType specifies the type of IP filter."
     DEFVAL      { normal }
     ::= { tIPFilterEntry 25 }
+
+tIPFilterSharedPolicer           OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPFilterSharedPolicer specifies whether the
+         value of tIPvXFltrEntryActRateLimit will be shared among LAG active
+         ports.
+
+         When the value is 'true' and the filter policy is applied to a single
+         LAG interface or multiple LAG interfaces then Filter Entry Rate Limit
+         Value per FP = ((tIPvXFltrEntryActRateLimit) / (Nb Active Ports in the
+         LAG)) * (Nb active ports in the LAG for this FP)
+
+         When the value is 'false' then Filter Entry Rate Limit Value per FP =
+         tIPvXFltrEntryActRateLimit."
+    DEFVAL      { false }
+    ::= { tIPFilterEntry 26 }
 
 tIPFilterParamsTable             OBJECT-TYPE
     SYNTAX      SEQUENCE OF TIPFilterParamsEntry
@@ -5476,7 +5582,8 @@ TIPv6FilterEntry                 ::= SEQUENCE
     tIPv6FilterSharedPccRuleInsrtSiz TEntryBlockSize,
     tIPv6FilterSharedPccRuleNbrInsrt Unsigned32,
     tIPv6FilterChainToSystemFilter   TruthValue,
-    tIPv6FilterType                  TIPvXFilterType
+    tIPv6FilterType                  TIPvXFilterType,
+    tIPv6FilterSharedPolicer         TruthValue
 }
 
 tIPv6FilterId                    OBJECT-TYPE
@@ -5832,6 +5939,25 @@ tIPv6FilterType                  OBJECT-TYPE
          filter."
     DEFVAL      { normal }
     ::= { tIPv6FilterEntry 25 }
+
+tIPv6FilterSharedPolicer         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6FilterSharedPolicer specifies whether the
+         value of tIPvXFltrEntryActRateLimit will be shared among LAG active
+         ports.
+
+         When the value is 'true' and the filter policy is applied to a single
+         LAG interface or multiple LAG interfaces then Filter Entry Rate Limit
+         Value per FP = ((tIPvXFltrEntryActRateLimit) / (Nb Active Ports in the
+         LAG)) * (Nb active ports in the LAG for this FP)
+
+         When the value is 'false' then Filter Entry Rate Limit Value per FP =
+         tIPvXFltrEntryActRateLimit."
+    DEFVAL      { false }
+    ::= { tIPv6FilterEntry 26 }
 
 tIPv6FilterParamsTable           OBJECT-TYPE
     SYNTAX      SEQUENCE OF TIPv6FilterParamsEntry
@@ -6806,6 +6932,9 @@ tIPv6FilterParamsFlowLabelMask   OBJECT-TYPE
          The mask is ANDed with the received flow label to match the value of
          the object tIPv6FilterParamsFlowLabel.
 
+         If the mask is set to the value 0, it will result in resetting the
+         value to default.
+
          The value is only significant if the value of the object
          tIPv6FilterParamsFlowLabel is different from -1."
     DEFVAL      { '0fffff'H }
@@ -7548,7 +7677,7 @@ tLiReservedBlockFltrTable        OBJECT-TYPE
         "The table tLiReservedBlockFltrTable contains associations between
          normal filters and LI block reservations.
 
-         Setting the value of TIMETRA_SYSTEM_MIB:tmnxSysMgmtIfWriteMode to
+         Setting the value of TIMETRA-SYSTEM-MIB:tmnxSysMgmtIfWriteMode to
          VAL_tmnxSysMgmtIfWriteOperMode_mixed won't be allowed if this table
          contains reference to non existing filter. Before enabling mixed mode
          the loose references should be removed or replaced by name references
@@ -7873,7 +8002,11 @@ TLiMacFilterParamsEntry          ::= SEQUENCE
     tLiMacFilterParamsIngrHitCount   Counter64,
     tLiMacFilterParamsEgrHitCount    Counter64,
     tLiMacFilterParamsIngrHitBytes   Counter64,
-    tLiMacFilterParamsEgrHitBytes    Counter64
+    tLiMacFilterParamsEgrHitBytes    Counter64,
+    tLiMacFilterParamsSapPortId      TmnxPortID,
+    tLiMacFilterParamsSapEncapType   TmnxPortEncapType,
+    tLiMacFilterParamsSapEncapVal    TmnxEncapVal,
+    tLiMacFilterParamsOuterTagVal    QTagOrNone
 }
 
 tLiMacFilterParamsId             OBJECT-TYPE
@@ -8016,6 +8149,59 @@ tLiMacFilterParamsEgrHitBytes    OBJECT-TYPE
         "The value of tLiMacFilterParamsEgrHitBytes indicates the number of
          bytes of all egress packets that matched this entry."
     ::= { tLiMacFilterParamsEntry 13 }
+
+tLiMacFilterParamsSapPortId      OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tLiMacFilterParamsSapPortId specifies the sap port id to
+         match for this LI MAC filter entry.
+
+         The value 0 indicates that there is no SAP match is defined."
+    DEFVAL      { 0 }
+    ::= { tLiMacFilterParamsEntry 14 }
+
+tLiMacFilterParamsSapEncapType   OBJECT-TYPE
+    SYNTAX      TmnxPortEncapType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tLiMacFilterParamsSapEncapType specifies the sap port
+         encap value to match for this LI MAC filter entry.
+
+         The supported values are 'unknown' and 'qinqEncap'."
+    DEFVAL      { unknown }
+    ::= { tLiMacFilterParamsEntry 15 }
+
+tLiMacFilterParamsSapEncapVal    OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tLiMacFilterParamsSapEncapVal specifies the sap port
+         encap value to match for this LI MAC filter entry.
+
+         The supported values are those representing 'val.*'."
+    DEFVAL      { 0 }
+    ::= { tLiMacFilterParamsEntry 16 }
+
+tLiMacFilterParamsOuterTagVal    OBJECT-TYPE
+    SYNTAX      QTagOrNone
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tLiMacFilterParamsOuterTagVal specifies the value to
+         match against the VID of the first VLAN tag in the packet that is
+         carried transparently through the service (the first vlan tag after
+         the service delimiting tags).
+
+         This object can only be set if tMacFilterType is set to 'vid(3)'.
+
+         The (default) value of '-1' indicates no outer VLAN tag matching will
+         be performed."
+    DEFVAL      { -1 }
+    ::= { tLiMacFilterParamsEntry 17 }
 
 tLiIpFilterParamsTableLastChg    OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -8473,7 +8659,7 @@ tLiRsvdBlockFltrAssocFltrName    OBJECT-TYPE
          filter associated with this LI reserved block.
 
          The scope of associated filter (tIPFilterScope, tIPv6FilterScope,
-         tMacFilterScope)  must not equal to embedded(3)."
+         tMacFilterScope) must not equal to embedded(3)."
     ::= { tLiRsvdBlockFltrAssocEntry 3 }
 
 tLiRsvdBlockFltrAssocRowStatus   OBJECT-TYPE
@@ -9085,8 +9271,9 @@ TFilterApplyPathEntry            ::= SEQUENCE
 
 tFilterApplyPathSource           OBJECT-TYPE
     SYNTAX      INTEGER {
-        unknown   (0),
-        bgp-peers (1)
+        unknown    (0),
+        bgp-peers  (1),
+        interfaces (5)
     }
     MAX-ACCESS  not-accessible
     STATUS      current
@@ -9130,7 +9317,11 @@ tFilterApplyPathMatch1           OBJECT-TYPE
          tFilterApplyPathSource.
 
          If tFilterApplyPathSource is 'bgp-peers', this object specifies a
-         match condition on the group-name of configured bgp peers."
+         match condition on the group-name of configured bgp peers.
+
+         If tFilterApplyPathSource is 'interfaces', this object specifies a
+         match condition on the interface name of Base router, VPRN, or IES
+         interface configuration."
     DEFVAL      { ''H }
     ::= { tFilterApplyPathEntry 5 }
 
@@ -9157,9 +9348,9 @@ tFilterApplyPathVRtrId           OBJECT-TYPE
          router instance. The usage of this object depends on the source
          specified by tFilterApplyPathSource.
 
-         If tFilterApplyPathSource is 'bgp-peers' then prefixes generated by
-         apply-path rule will consist of bgp-peers pertaining to virtual router
-         instance specified by this object."
+         If tFilterApplyPathSource is 'bgp-peers' or interfaces then prefixes
+         generated by apply-path rule will consist of bgp-peers or interfaces
+         pertaining to virtual router instance specified by this object."
     DEFVAL      { 1 }
     ::= { tFilterApplyPathEntry 7 }
 
@@ -9364,7 +9555,7 @@ TIPv6FilterParamsExtEntry        ::= SEQUENCE
     tIPv6FilterParamsExtLastChanged  TimeStamp,
     tIPv6FilterParamsExtAhExtHdr     TItemMatch,
     tIPv6FilterParamsExtEspExtHdr    TItemMatch,
-    tIPv6FilterParamsExtNatType      TmnxNatSubscriberType,
+    tIPv6FilterParamsExtNatType      TmnxNatLegacySubscriberType,
     tIPv6FilterParamsExtPktLenVal1   TFilterPacketLength,
     tIPv6FilterParamsExtPktLenVal2   TFilterPacketLength,
     tIPv6FilterParamsExtPktLenOper   TOperator,
@@ -9399,7 +9590,10 @@ TIPv6FilterParamsExtEntry        ::= SEQUENCE
     tIPv6FilterParamsExtCollectStats TruthValue,
     tIPv6FilterParamsExtMxHopLmtVal1 TFilterTTL,
     tIPv6FilterParamsExtMxHopLmtVal2 TFilterTTL,
-    tIPv6FilterParamsExtMxHopLmtOper TOperator
+    tIPv6FilterParamsExtMxHopLmtOper TOperator,
+    tIPv6FilterParamsExtTcpEst       TruthValue,
+    tIPv6FilterParamsExtPktLenList   TNamedItemOrEmpty,
+    tIPv6FilterParamsExtRoutingType4 TItemMatch
 }
 
 tIPv6FilterParamsExtLastChanged  OBJECT-TYPE
@@ -9432,7 +9626,7 @@ tIPv6FilterParamsExtEspExtHdr    OBJECT-TYPE
     ::= { tIPv6FilterParamsExtEntry 3 }
 
 tIPv6FilterParamsExtNatType      OBJECT-TYPE
-    SYNTAX      TmnxNatSubscriberType { dsliteLsnSub (3), nat64LsnSub (4) }
+    SYNTAX      TmnxNatLegacySubscriberType { dsliteLsnSub (3), nat64LsnSub (4) }
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -10311,6 +10505,59 @@ tIPv6FilterParamsExtMxHopLmtOper OBJECT-TYPE
     DEFVAL      { none }
     ::= { tIPv6FilterParamsExtEntry 39 }
 
+tIPv6FilterParamsExtTcpEst       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If Enabled, matches a TCP Rst or a TCP Ack as per value of the object."
+    DEFVAL      { false }
+    ::= { tIPv6FilterParamsExtEntry 40 }
+
+tIPv6FilterParamsExtPktLenList   OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of this object specifies the packet length list used as an
+         IPv6 filter match criterion.
+
+         The value specified for this object must correspond to a packet length
+         list defined in the tFltrPktLenListTable.
+
+         If the value of this object is empty then the values of the objects
+         tIPv6FilterParamsExtMxPktLenOper, tIPv6FilterParamsExtMxPktLenVal1 and
+         tIPv6FilterParamsExtMxPktLenVal2 are used as packet length match
+         criterion.
+
+         When this object is set to a non-empty value then the objects
+         tIPv6FilterParamsExtMxPktLenOper, tIPv6FilterParamsExtMxPktLenVal1 and
+         tIPv6FilterParamsExtMxPktLenVal2 are reset to their default values by
+         the system.
+
+         Vice versa, when a new (non-default) value is provided for the objects
+         tIPv6FilterParamsExtMxPktLenOper, tIPv6FilterParamsExtMxPktLenVal1 or
+         tIPv6FilterParamsExtMxPktLenVal2, then this object is reset to its
+         default (empty) value by the system.
+
+         An attempt to set tIPv6FilterParamsExtPktLenList to a non-default
+         value in combination with setting any of
+         tIPv6FilterParamsExtMxPktLenOper, tIPv6FilterParamsExtMxPktLenVal1 or
+         tIPv6FilterParamsExtMxPktLenVal2 to a non-default value is rejected by
+         the system"
+    DEFVAL      { ''H }
+    ::= { tIPv6FilterParamsExtEntry 41 }
+
+tIPv6FilterParamsExtRoutingType4 OBJECT-TYPE
+    SYNTAX      TItemMatch
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If Enabled, matches a Segment Routing Extension Header as per value of
+         the object."
+    DEFVAL      { off }
+    ::= { tIPv6FilterParamsExtEntry 42 }
+
 tFilterEmbedOpenflowTableLstChg  OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
@@ -10727,7 +10974,9 @@ TIPFilterParamsExtEntry          ::= SEQUENCE
     tIPFilterParamsExtCollectStats   TruthValue,
     tIPFilterParamsExtMxTTLVal1      TFilterTTL,
     tIPFilterParamsExtMxTTLVal2      TFilterTTL,
-    tIPFilterParamsExtMxTTLOper      TOperator
+    tIPFilterParamsExtMxTTLOper      TOperator,
+    tIPFilterParamsExtTcpEst         TruthValue,
+    tIPFilterParamsExtPktLenList     TNamedItemOrEmpty
 }
 
 tIPFilterParamsExtLastChanged    OBJECT-TYPE
@@ -11564,7 +11813,7 @@ tIPFilterParamsExtMxTTLOper      OBJECT-TYPE
          Time-To-Live field of the IP header of the packet must be greater than
          or equal to the value of the object tIPFilterParamsExtMxTTLVal1 and
          less than or equal to the value of the object
-         tIPFilterParamsExtMxTTLVal2  in order to match this entry.
+         tIPFilterParamsExtMxTTLVal2 in order to match this entry.
 
          If the value of this object is 'lt (3)' then the value of the
          Time-To-Live field of the IP header of the packet must be less than
@@ -11590,6 +11839,48 @@ tIPFilterParamsExtMxTTLOper      OBJECT-TYPE
          gt(4)                   |    0..254           |      N/A"
     DEFVAL      { none }
     ::= { tIPFilterParamsExtEntry 36 }
+
+tIPFilterParamsExtTcpEst         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If Enabled, matches a TCP Rst or a TCP Ack as per value of the object."
+    DEFVAL      { false }
+    ::= { tIPFilterParamsExtEntry 37 }
+
+tIPFilterParamsExtPktLenList     OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of this object specifies the packet length list used as an
+         IPv4 filter match criterion.
+
+         The value specified for this object must correspond to a packet length
+         list defined in the tFltrPktLenListTable.
+
+         If the value of this object is empty then the values of the objects
+         tIPFilterParamsExtMxPktLenOper, tIPFilterParamsExtMxPktLenVal1 and
+         tIPFilterParamsExtMxPktLenVal2 are used as packet length match
+         criterion.
+
+         When this object is set to a non-empty value then the objects
+         tIPFilterParamsExtMxPktLenOper, tIPFilterParamsExtMxPktLenVal1 and
+         tIPFilterParamsExtMxPktLenVal2 are reset to their default values by
+         the system.
+
+         Vice versa, when a new (non-default) value is provided for the objects
+         tIPFilterParamsExtMxPktLenOper, tIPFilterParamsExtMxPktLenVal1 or
+         tIPFilterParamsExtMxPktLenVal2, then this object is reset to its
+         default (empty) value by the system.
+
+         An attempt to set tIPFilterParamsExtPktLenList to a non-default value
+         in combination with setting any of tIPFilterParamsExtMxPktLenOper,
+         tIPFilterParamsExtMxPktLenVal1 or tIPFilterParamsExtMxPktLenVal2 to a
+         non-default value is rejected by the system"
+    DEFVAL      { ''H }
+    ::= { tIPFilterParamsExtEntry 38 }
 
 tFilterRPlcyDstTableLastChg      OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -13215,7 +13506,6 @@ tFilterSystemFilterId            OBJECT-TYPE
     DESCRIPTION
         "The value of the object tFilterSystemFilterId specifies the ID of the
          filter policy to be selected as the active system filter policy.
-
          Values outside of range 1..65535 are reserved for entries dynamically
          created by the system and cannot be used in any SNMP SET operation.
 
@@ -13297,7 +13587,7 @@ TDhcp6FilterEntry                ::= SEQUENCE
     tDhcp6FilterRowStatus            RowStatus,
     tDhcp6FilterLastChanged          TimeStamp,
     tDhcp6FilterDescription          TItemDescription,
-    tDhcp6FilterDefAction            TDhcpFilterAction,
+    tDhcp6FilterDefAction            TDhcp6FilterAction,
     tDhcp6FilterDefActionFlags       BITS
 }
 
@@ -13336,7 +13626,7 @@ tDhcp6FilterDescription          OBJECT-TYPE
     ::= { tDhcp6FilterEntry 4 }
 
 tDhcp6FilterDefAction            OBJECT-TYPE
-    SYNTAX      TDhcpFilterAction
+    SYNTAX      TDhcp6FilterAction
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -13413,7 +13703,7 @@ TDhcp6FilterParamsEntry          ::= SEQUENCE
     tDhcp6FilterParamsLastChanged    TimeStamp,
     tDhcp6FilterParamsOptionNumber   Integer32,
     tDhcp6FilterParamsOptionMatch    TDhcpFilterMatch,
-    tDhcp6FilterParamsAction         TDhcpFilterAction,
+    tDhcp6FilterParamsAction         TDhcp6FilterAction,
     tDhcp6FilterParamsOptionValue    OCTET STRING,
     tDhcp6FilterParamsActionFlags    BITS
 }
@@ -13478,7 +13768,7 @@ tDhcp6FilterParamsOptionMatch    OBJECT-TYPE
     ::= { tDhcp6FilterParamsEntry 5 }
 
 tDhcp6FilterParamsAction         OBJECT-TYPE
-    SYNTAX      TDhcpFilterAction
+    SYNTAX      TDhcp6FilterAction
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -13770,12 +14060,13 @@ tFltrEmbFlowSpecInfoEntryCntIns  OBJECT-TYPE
 tFltrEmbFlowspecEntryInfoTable   OBJECT-TYPE
     SYNTAX      SEQUENCE OF TFltrEmbFlowspecEntryInfoEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The table tFltrEmbFlowspecEntryInfoTable contains an entry for each
          entry of an auto-created embedded filter for flowspec rules inserted
          in an IP or IPv6 filter with scope other than 'embedded'. This table
-         shows only basic flowspec embeddings (no support for groups).
+         shows only basic flowspec embeddings (no support for groups, no
+         support for filters with scope system and their flowspec embeddings).
 
          Will be obsoleted in the next release. Please use
          tFilterEmbFlowspecEntryInfoTable instead."
@@ -13840,293 +14131,6 @@ tFltrEmbFlowspecEntryOperState   OBJECT-TYPE
          by tFilterEmbedFlowspecInsertFltrId."
     ::= { tFltrEmbFlowspecEntryInfoEntry 3 }
 
-tFilterEmbedVsdTableLstChg       OBJECT-TYPE
-    SYNTAX      TimeStamp
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tFilterEmbedVsdTableLstChg indicates the
-         sysUpTime at the time of the last modification of
-         tFilterEmbedVsdTable.
-
-         If no changes were made to the table since the last re-initialization
-         of the local network management subsystem, this object contains the
-         value zero."
-    ::= { tFilterObjects 78 }
-
-tFilterEmbedVsdTable             OBJECT-TYPE
-    SYNTAX      SEQUENCE OF TFilterEmbedVsdEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The table tFilterEmbedVsdTable contains an entry for each filter
-         managed by a VSD controller embedded in a filter with scope other than
-         'embedded'.
-
-         A dedicated embedded filter under the management of the VSD controller
-         contains all required dynamic steering rules. This set of rules is
-         inserted into a filter (that has scope other than 'embedded') created
-         by an administrator containing static (security) rules that is applied
-         on interfaces.
-
-         This way the administrator has full control of the position (offset)
-         at which the rules are inserted in order not to compromise security
-         while the VSD controller can dynamically alter the steering rules as
-         necessary."
-    ::= { tFilterObjects 79 }
-
-tFilterEmbedVsdEntry             OBJECT-TYPE
-    SYNTAX      TFilterEmbedVsdEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "An entry in the table tFilterEmbedVsdTable.
-
-         Entries in this table can be created and deleted via SNMP SET
-         operations to tFilterEmbedVsdRowStatus.
-
-         Moreover entries are automatically created and deleted by the system
-         when one filter managed by a VSD controller is embedded into another
-         filter managed by a VSD controller."
-    INDEX       {
-        tFilterEmbedVsdFilterType,
-        tFilterEmbedVsdInsertFltrId,
-        tFilterEmbedVsdEmbeddedFltrId,
-        tFilterEmbedVsdOffset
-    }
-    ::= { tFilterEmbedVsdTable 1 }
-
-TFilterEmbedVsdEntry             ::= SEQUENCE
-{
-    tFilterEmbedVsdFilterType        TFilterType,
-    tFilterEmbedVsdInsertFltrId      TConfigOrVsdFilterID,
-    tFilterEmbedVsdEmbeddedFltrId    TVsdFilterID,
-    tFilterEmbedVsdOffset            TFilterEmbedOffset,
-    tFilterEmbedVsdRowStatus         RowStatus,
-    tFilterEmbedVsdLastChanged       TimeStamp,
-    tFilterEmbedVsdAdminState        TmnxEmbeddedFltrAdminState,
-    tFilterEmbedVsdOperState         TmnxEmbeddedFltrOperState
-}
-
-tFilterEmbedVsdFilterType        OBJECT-TYPE
-    SYNTAX      TFilterType
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tFilterEmbedVsdFilterType specifies the type
-         of filter for the filters specified by tFilterEmbedVsdEmbeddedFltrId
-         and tFilterEmbedVsdInsertFltrId. In release 14.0 only values
-         'fltrtypeselIp (1)', 'fltrtypeselMac (2)' and 'fltrtypeselIpv6 (4)'
-         are supported."
-    ::= { tFilterEmbedVsdEntry 1 }
-
-tFilterEmbedVsdInsertFltrId      OBJECT-TYPE
-    SYNTAX      TConfigOrVsdFilterID
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tFilterEmbedVsdInsertFltrId specifies the ID
-         of the filter with scope other than 'embedded' where the filter
-         managed by a VSD controller specified by tFilterEmbedVsdEmbeddedFltrId
-         is to be inserted.
-
-         Values outside of range 1..65535 are reserved for entries dynamically
-         created by the system and cannot be used in any SNMP SET operation."
-    ::= { tFilterEmbedVsdEntry 2 }
-
-tFilterEmbedVsdEmbeddedFltrId    OBJECT-TYPE
-    SYNTAX      TVsdFilterID
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tFilterEmbedVsdEmbeddedFltrId specifies the ID
-         of the filter managed by a VSD controller to be inserted in the filter
-         with scope other than 'embedded' specified by
-         tFilterEmbedVsdInsertFltrId."
-    ::= { tFilterEmbedVsdEntry 3 }
-
-tFilterEmbedVsdOffset            OBJECT-TYPE
-    SYNTAX      TFilterEmbedOffset
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tFilterEmbedVsdOffset specifies the offset of
-         inserted entries."
-    ::= { tFilterEmbedVsdEntry 4 }
-
-tFilterEmbedVsdRowStatus         OBJECT-TYPE
-    SYNTAX      RowStatus
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tFilterEmbedVsdRowStatus specifies the status
-         of a row in tFilterEmbedVsdTable. Rows are created and destroyed by
-         SNMP SET operations on this object.
-
-         Only values 'active (1)', 'createAndGo(4)', and 'destroy (6)' are
-         supported."
-    ::= { tFilterEmbedVsdEntry 5 }
-
-tFilterEmbedVsdLastChanged       OBJECT-TYPE
-    SYNTAX      TimeStamp
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of tFilterEmbedVsdLastChanged indicates the sysUpTime at the
-         time of last change to this row in tFilterEmbedVsdTable."
-    ::= { tFilterEmbedVsdEntry 6 }
-
-tFilterEmbedVsdAdminState        OBJECT-TYPE
-    SYNTAX      TmnxEmbeddedFltrAdminState
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tFilterEmbedVsdAdminState specifies the
-         administrative state of the embed request defined by this row.
-
-         If an active embedding cannot be fulfilled due to dynamic events, this
-         object will be set to 'inactive' automatically by the system. In those
-         cases, the value of the object tFilterEmbedVsdOperState will indicate
-         the failure reason."
-    DEFVAL      { active }
-    ::= { tFilterEmbedVsdEntry 7 }
-
-tFilterEmbedVsdOperState         OBJECT-TYPE
-    SYNTAX      TmnxEmbeddedFltrOperState
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tFilterEmbedVsdOperState indicates the
-         operational state of the embed request defined by this row."
-    ::= { tFilterEmbedVsdEntry 8 }
-
-tFilterEmbedVsdInfoTable         OBJECT-TYPE
-    SYNTAX      SEQUENCE OF TFilterEmbedVsdInfoEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The table tFilterEmbedVsdInfoTable contains an entry for each embedded
-         filter managed by a VSD controller inserted in a filter with scope
-         other than 'embedded'.
-
-         This row complements the corresponding row in the tFilterEmbedVsdTable
-         with read-only operational info."
-    ::= { tFilterObjects 80 }
-
-tFilterEmbedVsdInfoEntry         OBJECT-TYPE
-    SYNTAX      TFilterEmbedVsdInfoEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "An entry in the tFilterEmbedVsdInfoTable."
-    AUGMENTS    { tFilterEmbedVsdEntry }
-    ::= { tFilterEmbedVsdInfoTable 1 }
-
-TFilterEmbedVsdInfoEntry         ::= SEQUENCE
-{
-    tFltrEmbedVsdInfoEntryCnt        Unsigned32,
-    tFltrEmbedVsdInfoEntryCntInsrtd  Unsigned32
-}
-
-tFltrEmbedVsdInfoEntryCnt        OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tFltrEmbedVsdInfoEntryCnt indicates how many
-         entries are present in the embedded filter managed by a VSD controller
-         (specified by tFilterEmbedVsdEmbeddedFltrId)."
-    ::= { tFilterEmbedVsdInfoEntry 1 }
-
-tFltrEmbedVsdInfoEntryCntInsrtd  OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tFltrEmbedVsdInfoEntryCntInsrtd indicates how
-         many entries of the embedded filter managed by a VSD controller
-         (specified by tFilterEmbedVsdEmbeddedFltrId) are actually inserted
-         into the embedding filter (specified by tFilterEmbedVsdInsertFltrId).
-
-         If the object tFilterEmbedVsdOperState is different from 'active' this
-         object will always be zero.
-
-         Otherwise the difference between the value of this object and the
-         value of tFltrEmbedVsdInfoEntryCnt indicates how many entries of the
-         embedded filter were overwritten by local entries in the embedding
-         filter."
-    ::= { tFilterEmbedVsdInfoEntry 2 }
-
-tFilterEmbedVsdEntryInfoTable    OBJECT-TYPE
-    SYNTAX      SEQUENCE OF TFilterEmbedVsdEntryInfoEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The table tFilterEmbedVsdEntryInfoTable contains an entry for each
-         entry of an embedded filter managed by a VSD controller inserted in a
-         filter with scope other than 'embedded'"
-    ::= { tFilterObjects 81 }
-
-tFilterEmbedVsdEntryInfoEntry    OBJECT-TYPE
-    SYNTAX      TFilterEmbedVsdEntryInfoEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "An entry in the tFilterEmbedVsdEntryInfoTable. Rows in the
-         tFilterEmbedVsdEntryInfoTable are created by the SYSTEM when an
-         embedded filter managed by a VSD controller is inserted into a filter
-         with scope other than 'embedded'. They are destroyed by the SYSTEM
-         when an embedded filter managed by a VSD controller is removed from a
-         filter with scope other than 'embedded'."
-    INDEX       {
-        tFilterEmbedVsdFilterType,
-        tFilterEmbedVsdInsertFltrId,
-        tFilterEmbedVsdEmbeddedFltrId,
-        tFilterEmbedVsdEntryId
-    }
-    ::= { tFilterEmbedVsdEntryInfoTable 1 }
-
-TFilterEmbedVsdEntryInfoEntry    ::= SEQUENCE
-{
-    tFilterEmbedVsdEntryId           TEntryId,
-    tFilterEmbedVsdEntryInsrtEntryId TAnyEntryId,
-    tFilterEmbedVsdEntryOperState    TmnxFltrEmbeddedEntryState
-}
-
-tFilterEmbedVsdEntryId           OBJECT-TYPE
-    SYNTAX      TEntryId
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tFilterEmbedVsdEntryId specifies the ID of the
-         entry inside of the embedded filter managed by a VSD controller
-         specified by tFilterEmbedVsdEmbeddedFltrId."
-    ::= { tFilterEmbedVsdEntryInfoEntry 1 }
-
-tFilterEmbedVsdEntryInsrtEntryId OBJECT-TYPE
-    SYNTAX      TAnyEntryId
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tFilterEmbedVsdEntryInsrtEntryId indicates
-         which entry in the filter with scope other than 'embedded' specified
-         by tFilterEmbedVsdInsertFltrId corresponds to the entry specified by
-         tFilterEmbedVsdEntryId in the filter managed by a VSD controller
-         specified by tFilterEmbedVsdEmbeddedFltrId."
-    ::= { tFilterEmbedVsdEntryInfoEntry 2 }
-
-tFilterEmbedVsdEntryOperState    OBJECT-TYPE
-    SYNTAX      TmnxFltrEmbeddedEntryState
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tFilterEmbedVsdEntryOperState indicates the
-         current operational state of the entry identified by
-         tFilterEmbedVsdEntryId of the embedded filter identified by
-         tFilterEmbedVsdEmbeddedFltrId that is embedded into the filter
-         identified by tFilterEmbedVsdInsertFltrId."
-    ::= { tFilterEmbedVsdEntryInfoEntry 3 }
-
 tMacFltrEntryActionTblLChg       OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
@@ -14147,49 +14151,10 @@ tMacFltrEntryActionTable         OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The table tMacFltrEntryActionTable contains information pertaining to
-         redundant MAC filter entry actions. Prior to introduction of
-         tMacFltrEntryActionTable MAC filter actions were configured via
-         tMacFilterParamsTable. Via tMacFilterParamsTable it is possible to
-         configure only one action per filter entry. tMacFltrEntryActionTable
-         is introduced to override the functionality of tMacFilterParamsTable
-         regarding the action configuration. tMacFltrEntryActionTable supports
-         configuration of redundant filter actions. Functionality related to
-         actions added after introduction of tMacFltrEntryActionTable is
-         supported only via tMacFltrEntryActionTable.
-
-         Filter actions available prior to introduction of
-         tMacFltrEntryActionTable can be configured via specifying action
-         parameters in tMacFilterParamsTable or via tMacFltrEntryActionTable.
-         It's recommended to use tMacFltrEntryActionTable.
-
-         Configuration via tMacFilterParamsTable:
-           - only actions available prior to introduction of
-             tMacFltrEntryActionTable are allowed:
-             When an entry is created in tMacFilterParamsTable then an entry
-             with the value of tMacFltrEntryActActionId equal to 'primary' is
-             created in tMacFltrEntryActionTable by the system. If an action is
-             configured via tMacFilterParamsTable, then this new system created
-             entry in tMacFltrEntryActionTable will contain interpretation of
-             values pertaining to configured action in tMacFilterParamsEntry.
-
-         Configuration via tMacFltrEntryActionTable:
-           - action available prior to introduction of tMacFltrEntryActionTable:
-             If an action which was available prior to introduction of
-             tMacFltrEntryActionTable is configured via tMacFltrEntryActionTable
-             and the value of tMacFltrEntryActActionId for that action is equal
-             to 'primary' then the action related objects in the table
-             tMacFilterParamsAction will be automatically set by the system to
-             the interpretation of the values in tMacFltrEntryActionTable
-             pertaining to that action.
-
-           - action not available prior to introduction of
-             tMacFltrEntryActionTable: If an action not available prior to
-             introduction of tMacFltrEntryActionTable is configured then the
-             value of tMacFilterParamsAction is set to 'unrecognized' by the
-             system. The value 'unrecognized' indicates that functionality not
-             supported by tMacFilterParamsTable was configured and therefore
-             action related objects in the tMacFilterParamsTable are not valid
-             and shouldn't be used for configuration."
+         MAC filter actions to be taken for packets that match the filter entry
+         identified by tMacFilterId and tMacFilterParamsIndex. The table
+         tMacFltrEntryActionTable supports configuration of redundant filter
+         entry actions."
     ::= { tFilterObjects 83 }
 
 tMacFltrEntryActionEntry         OBJECT-TYPE
@@ -14484,60 +14449,11 @@ tIPvXFltrEntryActionTable        OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The table tIPvXFltrEntryActionTable contains information pertaining to
-         redundant IPv4 and IPv6 filter entry actions. Prior to introduction of
-         tIPvXFltrEntryActionTable IPv4 filter actions were configured via
-         tIPFilterParamsTable and tIPFilterParamsExtTable. IPv6 filter actions
-         were configured via tIPv6FilterParamsTable and
-         tIPv6FilterParamsExtTable. Via these original tables it is possible to
-         configure only one action per filter entry. tIPvXFltrEntryActionTable
-         is introduced to override the functionality of the original tables
-         regarding the action configuration. tIPvXFltrEntryActionTable supports
-         configuration of redundant filter actions. Functionality related to
-         actions added after introduction of tIPvXFltrEntryActionTable is
-         supported only via tIPvXFltrEntryActionTable.
-
-         Filter actions available prior to introduction of
-         tIPvXFltrEntryActionTable can be configured via specifying action
-         parameters in the original tables or via tIPvXFltrEntryActionTable.
-         It's recommended to use tIPvXFltrEntryActionTable.
-
-         Configuration via the original tables:
-           - only actions available prior to introduction of
-             tIPvXFltrEntryActionTable are allowed:
-             When an entry is created in tIPFilterParamsTable then an entry with
-             the value of tIPvXFltrEntryActActionId equal to 'primary' and the
-             value of tIPvXFltrEntryActFltrType equal to 'fltrtypeselIp' is
-             created in tIPvXFltrEntryActionTable by the system.  When an entry
-             is created in tIPv6FilterParamsTable then an entry with the value
-             of tIPvXFltrEntryActActionId equal to 'primary' and the value of
-             tIPvXFltrEntryActFltrType equal to 'fltrtypeselIpv6' is created in
-             tIPvXFltrEntryActionTable by the system. This new system created
-             entry in tIPvXFltrEntryActionTable will contain interpretation of
-             values pertaining to configured action in tIPFilterParamsEntry or
-             tIPv6FilterParamsEntry and their augment tables.
-
-         Configuration via tIPvXFltrEntryActionTable:
-           - action available prior to introduction of
-             tIPvXFltrEntryActionTable:
-             If an action which was available prior to introduction of
-             tIPvXFltrEntryActionTable is configured via
-             tIPvXFltrEntryActionTable and the value of
-             tIPvXFltrEntryActActionId for that action is equal to 'primary'
-             then the action related objects in the original tables will be
-             automatically set by the system to the interpretation of the values
-             in tIPvXFltrEntryActionTable pertaining to that action.
-
-           - action not available prior to introduction of
-             tIPvXFltrEntryActionTable:
-             If an action not available prior to introduction of
-             tIPvXFltrEntryActionTable is configured via
-             tIPvXFltrEntryActionTable then the value of tIPFilterParamsAction
-             (in case of IPv4 filter) or tIPv6FilterParamsAction (in case of
-             IPv6 filter) is set to 'unrecognized' by the system. The value
-             'unrecognized' indicates that the functionality not supported by
-             the original tables was configured and therefore action related
-             objects in the original tables are not valid and shouldn't be used
-             for configuration."
+         IPv4 and IPv6 filter actions to be taken for packets that match the
+         filter entry identified by tIPvXFltrEntryActFltrType
+         tIPvXFltrEntryActFltrId and tIPvXFltrEntryActEntryId. The table
+         tIPvXFltrEntryActionTable supports configuration of redundant filter
+         entry actions."
     ::= { tFilterObjects 85 }
 
 tIPvXFltrEntryActionEntry        OBJECT-TYPE
@@ -14589,7 +14505,7 @@ TIPvXFltrEntryActionEntry        ::= SEQUENCE
     tIPvXFltrEntryActRdirAllwRadOvr  TruthValue,
     tIPvXFltrEntryActFwdRtrId        TmnxVRtrIDOrZero,
     tIPvXFltrEntryActNatPolicyName   TNamedItemOrEmpty,
-    tIPvXFltrEntryActNatType         TmnxNatSubscriberTypeOrNone,
+    tIPvXFltrEntryActNatType         TmnxNatLegacySubscriberTypeOrNone,
     tIPvXFltrEntryActFwdLsp          TmnxVRtrMplsLspID,
     tIPvXFltrEntryActFwdLspRtrId     TmnxVRtrIDOrZero,
     tIPvXFltrEntryActPktLenVal1      TFilterPacketLength,
@@ -14627,7 +14543,15 @@ TIPvXFltrEntryActionEntry        ::= SEQUENCE
     tIPvXFltrFwdSrtePlcyEndptAddrTp  InetAddressType,
     tIPvXFltrFwdSrtePlcyEndptAddr    InetAddress,
     tIPvXFltrFwdSrtePlcyColor        Unsigned32,
-    tIPvXFltrActL2AwareNatBypass     TruthValue
+    tIPvXFltrActL2AwareNatBypass     TruthValue,
+    tIPvXFltrEntryActRateLimitPps    TFilterEntryActionRateLimitPps,
+    tIPvXFltrFwdSrv6PlcyEndptAddrTp  InetAddressType,
+    tIPvXFltrFwdSrv6PlcyEndptAddr    InetAddress,
+    tIPvXFltrFwdSrv6PlcyColor        Unsigned32,
+    tIPvXFltrFwdSrv6PlcySvcSidAddrTp InetAddressType,
+    tIPvXFltrFwdSrv6PlcySvcSid       InetAddress,
+    tIPvXFltrEntryActRateLimitMbs    Integer32,
+    tIPvXFltrEntryActRateLimitPlcr   TNamedItemOrEmpty
 }
 
 tIPvXFltrEntryActFltrType        OBJECT-TYPE
@@ -14807,7 +14731,7 @@ tIPvXFltrEntryActFwdNHIndirect   OBJECT-TYPE
 tIPvXFltrEntryActFwdNHInterface  OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of the object tIPvXFltrEntryActFwdNHInterface specifies the
          interface name for the nexthop to which the packet should be forwarded
@@ -14981,7 +14905,7 @@ tIPvXFltrEntryActNatPolicyName   OBJECT-TYPE
     ::= { tIPvXFltrEntryActionEntry 19 }
 
 tIPvXFltrEntryActNatType         OBJECT-TYPE
-    SYNTAX      TmnxNatSubscriberTypeOrNone { none (0), dsliteLsnSub (3), nat64LsnSub (4) }
+    SYNTAX      TmnxNatLegacySubscriberTypeOrNone { none (0), dsliteLsnSub (3), nat64LsnSub (4) }
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15478,13 +15402,16 @@ tIPvXFltrEntryActRateLimit       OBJECT-TYPE
         "The value of the object tIPvXFltrEntryActRateLimit specifies the rate
          to which the traffic matching the filter entry will be limited.
 
-         The value of tIPvXFltrEntryActRateLimit can be set to non default
+         The value of tIPvXFltrEntryActRateLimit can be set to a non default
          value only if the value of tIPvXFltrEntryActAction is set to
-         'rateLimit'.
+         'rateLimit', 'rateLimitPktLen', 'rateLimitTtl', 'rateLimitPattern' or
+         'rateLimitExtractedTraffic'.
 
          Note that the value of tIPvXFltrEntryActRateLimit is silently cleared
          by the system if the value of tIPvXFltrEntryActAction is set to any
-         value other than 'rateLimit'."
+         value other than 'rateLimit',  'rateLimitPktLen', 'rateLimitTtl', 'rateLimitPattern' or
+         'rateLimitExtractedTraffic' or when 'tIPvXFltrEntryActRateLimitPps' is set to a non-default
+         value."
     DEFVAL      { 0 }
     ::= { tIPvXFltrEntryActionEntry 35 }
 
@@ -15827,8 +15754,8 @@ tIPvXFltrFwdMplsPlcyEndptAddrTp  OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The name of the MPLS forwarding policy endpoint to be used when the
-         value of tIPvXFltrEntryActAction is 'forwardMplsPlcyEndpt'
+        "The IP address type of the MPLS forwarding policy endpoint to be used
+         when the value of tIPvXFltrEntryActAction is 'forwardMplsPlcyEndpt'
 
          Only following values are supported:
             unknown(0)
@@ -15873,8 +15800,8 @@ tIPvXFltrFwdSrtePlcyEndptAddrTp  OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The name of the SR-TE policy endpoint to be used when the value of
-         tIPvXFltrEntryActAction is 'forwardSrtePlcyEndptColor'
+        "The IP address type of the SR-TE policy endpoint to be used when the
+         value of tIPvXFltrEntryActAction is 'forwardSrtePlcyEndptColor'
 
          Only following values are supported:
             unknown(0)
@@ -15941,6 +15868,172 @@ tIPvXFltrActL2AwareNatBypass     OBJECT-TYPE
          configured to be dropped."
     DEFVAL      { false }
     ::= { tIPvXFltrEntryActionEntry 58 }
+
+tIPvXFltrEntryActRateLimitPps    OBJECT-TYPE
+    SYNTAX      TFilterEntryActionRateLimitPps
+    UNITS       "packets per second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPvXFltrEntryActRateLimitPps specifies the
+         rate in packets per second, to which the traffic matching the filter
+         entry will be limited.
+
+         The value of tIPvXFltrEntryActRateLimitPps can be set to a non default
+         value only if the value of tIPvXFltrEntryActAction is set to
+         'rateLimit', 'rateLimitPktLen', 'rateLimitTtl', 'rateLimitPattern' or
+         'rateLimitExtractedTraffic'.
+
+         It is not allowed to set tIPvXFltrEntryActRateLimitPps and
+         tIPvXFltrEntryActRateLimit to non-default values at the same time.
+
+         Note that the value of tIPvXFltrEntryActRateLimitPps is silently cleared
+         by the system if the value of tIPvXFltrEntryActAction is set to any
+         value other than 'rateLimit',  'rateLimitPktLen', 'rateLimitTtl', 'rateLimitPattern'
+         or 'rateLimitExtractedTraffic' or tIPvXFltrEntryActRateLimit is set to a non-default
+         value."
+    DEFVAL      { -2 }
+    ::= { tIPvXFltrEntryActionEntry 59 }
+
+tIPvXFltrFwdSrv6PlcyEndptAddrTp  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP address type of the SRv6 policy endpoint to be used when the
+         value of tIPvXFltrEntryActAction is 'forwardSrv6Plcy'
+
+         Only following values are supported:
+            unknown(0)
+            ipv6(2)
+
+         The value 'unknown' indicates IP address type is not specified.
+
+         The non zero value of tIPvXFltrFwdSrv6PlcyEndptAddrTp must be set
+         together with non zero values of tIPvXFltrFwdSrv6PlcyEndptAddr, and
+         tIPvXFltrEntryActAction value 'forwardSrv6Plcy'.
+
+         Note that the value of tIPvXFltrFwdSrv6PlcyEndptAddrTp is silently
+         cleared by the system if the value of tIPvXFltrEntryActAction is set
+         to any value other than 'forwardSrv6Plcy'."
+    DEFVAL      { unknown }
+    ::= { tIPvXFltrEntryActionEntry 60 }
+
+tIPvXFltrFwdSrv6PlcyEndptAddr    OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value specifies the SRv6 policy endpoint address to be used when
+         the value of tIPvXFltrEntryActAction is 'forwardSrv6Plcy'.
+
+         The default value indicates that no IP address is specified.
+
+         The non zero value of tIPvXFltrFwdSrv6PlcyEndptAddr must be set
+         together with non zero values of tIPvXFltrFwdSrv6PlcyEndptAddrTp, and
+         tIPvXFltrEntryActAction value 'forwardSrv6Plcy'.
+
+         Note that the value of tIPvXFltrFwdSrv6PlcyEndptAddr is silently
+         cleared by the system if the value of tIPvXFltrEntryActAction is set
+         to any value other than 'forwardSrv6Plcy'."
+    DEFVAL      { ''H }
+    ::= { tIPvXFltrEntryActionEntry 61 }
+
+tIPvXFltrFwdSrv6PlcyColor        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the SRv6 policy color to be used when the value of
+         tIPvXFltrEntryActAction is 'forwardSrv6Plcy'."
+    ::= { tIPvXFltrEntryActionEntry 62 }
+
+tIPvXFltrFwdSrv6PlcySvcSidAddrTp OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP address type of the SRv6 policy SID to be used when the value
+         of tIPvXFltrEntryActAction is 'forwardSrv6Plcy'
+
+         Only following values are supported:
+            unknown(0)
+            ipv6(2)
+
+         The value 'unknown' indicates IP address type is not specified.
+
+         The non zero value of tIPvXFltrFwdSrv6PlcySvcSidAddrTp must be set
+         together with non zero values of tIPvXFltrFwdSrv6PlcySvcSid, and
+         tIPvXFltrEntryActAction value 'forwardSrv6Plcy'.
+
+         Note that the value of tIPvXFltrFwdSrv6PlcySvcSidAddrTp is silently
+         cleared by the system if the value of tIPvXFltrEntryActAction is set
+         to any value other than 'forwardSrv6Plcy'."
+    DEFVAL      { unknown }
+    ::= { tIPvXFltrEntryActionEntry 63 }
+
+tIPvXFltrFwdSrv6PlcySvcSid       OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value specifies the IPv6 address of SRv6 service-SID.
+
+         The default value indicates that no service-SID is specified.
+
+         The non zero value of tIPvXFltrFwdSrv6PlcySvcSid must be set together
+         with non zero values of tIPvXFltrFwdSrv6PlcySvcSidAddrTp, and
+         tIPvXFltrEntryActAction value 'forwardSrv6Plcy'.
+
+         Note that the value of tIPvXFltrFwdSrv6PlcySvcSid is silently cleared
+         by the system if the value of tIPvXFltrEntryActAction is set to any
+         value other than 'forwardSrv6Plcy'."
+    DEFVAL      { ''H }
+    ::= { tIPvXFltrEntryActionEntry 64 }
+
+tIPvXFltrEntryActRateLimitMbs    OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..268435456)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPvXFltrEntryActRateLimitMbs specifies the
+         maximum burst size to which the traffic matching the filter entry will
+         be limited.
+
+         This is to be used with the action rateLimit.
+
+         Note that the value of tIPvXFltrEntryActRateLimitMbs is silently
+         cleared by the system if the value of tIPvXFltrEntryActAction is set
+         to any value other than 'rateLimit'"
+    DEFVAL      { -1 }
+    ::= { tIPvXFltrEntryActionEntry 65 }
+
+tIPvXFltrEntryActRateLimitPlcr   OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPvXFltrEntryActRateLimitPlcr specifies the
+         policer object name to which the traffic matching the filter entry
+         will be limited.
+
+         If the value of tIPvXFltrEntryActRateLimitPlcr is set to a non default
+         value then the values of tIPvXFltrEntryActRateLimit,
+         tIPvXFltrEntryActRateLimitPps and tIPvXFltrEntryActRateLimitMbs are
+         set to defaults.
+
+         The value of tIPvXFltrEntryActRateLimitPlcr can be set to a non
+         default value only if the value of tIPvXFltrEntryActAction is set to
+         'rateLimitPolicer'.
+
+         Note that the value of tIPvXFltrEntryActRateLimitPlcr is silently
+         cleared by the system if the value of tIPvXFltrEntryActAction is set
+         to any value other than  'rateLimitPolicer' or when
+         tIPvXFltrEntryActRateLimit, tIPvXFltrEntryActRateLimitPps and
+         tIPvXFltrEntryActRateLimitMbs are set to a non-default value."
+    DEFVAL      { ''H }
+    ::= { tIPvXFltrEntryActionEntry 66 }
 
 tFltrEntryStatTable              OBJECT-TYPE
     SYNTAX      SEQUENCE OF TFltrEntryStatEntry
@@ -16221,7 +16314,8 @@ tFltrPrefListInfoPrefixSrc       OBJECT-TYPE
     SYNTAX      INTEGER {
         prefixConfig          (0),
         applyPathBgpPeer      (1),
-        prefixConfigGenerated (4)
+        prefixConfigGenerated (4),
+        applyPathInterface    (5)
     }
     MAX-ACCESS  not-accessible
     STATUS      current
@@ -16565,7 +16659,10 @@ TFltrGreTunTempEntry             ::= SEQUENCE
     tFltrGreTunTempDescription       TItemDescription,
     tFltrGreTunTempIpv4SrcAddr       IpAddress,
     tFltrGreTunTempIpv4GreKeyIfIndex TruthValue,
-    tFltrGreTunTempIpv4SkipTllDecr   TruthValue
+    tFltrGreTunTempIpv4SkipTllDecr   TruthValue,
+    tFltrGreTunTempIpv6SrcAddr       InetAddressIPv6,
+    tFltrGreTunTempIpv6GreKeyIfIndex TruthValue,
+    tFltrGreTunTempIpv6SkipHopDecr   TruthValue
 }
 
 tFltrGreTunTempName              OBJECT-TYPE
@@ -16613,8 +16710,8 @@ tFltrGreTunTempIpv4SrcAddr       OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The object tFltrGreTunTempIpv4SrcAddr specifies a source IP address
-         of the GRE encapsulated packet."
+        "The object tFltrGreTunTempIpv4SrcAddr specifies a source IP address of
+         the GRE encapsulated packet."
     DEFVAL      { '00000000'H }
     ::= { tFltrGreTunTempEntry 5 }
 
@@ -16623,8 +16720,8 @@ tFltrGreTunTempIpv4GreKeyIfIndex OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The object tFltrGreTunTempIpv4GreKeyIfIndex is option to include a
-         key value in the GRE header of ifIndex of the ingress interface."
+        "The object tFltrGreTunTempIpv4GreKeyIfIndex is option to include a key
+         value in the GRE header of ifIndex of the ingress interface."
     DEFVAL      { false }
     ::= { tFltrGreTunTempEntry 6 }
 
@@ -16633,10 +16730,40 @@ tFltrGreTunTempIpv4SkipTllDecr   OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The object tFltrGreTunTempIpv4SkipTllDecr is option  to not decrement
+        "The object tFltrGreTunTempIpv4SkipTllDecr is option to not decrement
          the TTL of the received packet."
     DEFVAL      { false }
     ::= { tFltrGreTunTempEntry 7 }
+
+tFltrGreTunTempIpv6SrcAddr       OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrGreTunTempIpv6SrcAddr specifies a source IP address of
+         the GRE encapsulated packet."
+    DEFVAL      { '00000000000000000000000000000000'H }
+    ::= { tFltrGreTunTempEntry 9 }
+
+tFltrGreTunTempIpv6GreKeyIfIndex OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrGreTunTempIpv6GreKeyIfIndex is option to include a key
+         value in the GRE header of ifIndex of the ingress interface."
+    DEFVAL      { false }
+    ::= { tFltrGreTunTempEntry 10 }
+
+tFltrGreTunTempIpv6SkipHopDecr   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrGreTunTempIpv6SkipHopDecr is option to not decrement
+         the hop of the received packet."
+    DEFVAL      { false }
+    ::= { tFltrGreTunTempEntry 11 }
 
 tFltrGreTunTempIpv4DstTblLstChg  OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -16644,7 +16771,7 @@ tFltrGreTunTempIpv4DstTblLstChg  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The object tFltrGreTunTempIpv4DstTblLstChg indicates the sysUpTime at
-         the time of the last modification of tFltrGreTunTempTable.
+         the time of the last modification of tFltrGreTunTempIpv4DstTable.
 
          If no changes were made to the entry since the last re-initialization
          of the local network management subsystem, then this object contains a
@@ -16656,7 +16783,7 @@ tFltrGreTunTempIpv4DstTable      OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The table tFltrGreTunTempIpv4DstTable contains destinations for  GRE
+        "The table tFltrGreTunTempIpv4DstTable contains destinations for GRE
          tunnel template"
     ::= { tFilterObjects 102 }
 
@@ -16685,7 +16812,7 @@ tFltrGreTunTempIpv4DstAddr       OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The object tFltrGreTunTempIpv4DstAddr specifies a destination IP
-         address  of the GRE encapsulated packet."
+         address of the GRE encapsulated packet."
     ::= { tFltrGreTunTempIpv4DstEntry 1 }
 
 tFltrGreTunTempIpv4DstRowStatus  OBJECT-TYPE
@@ -16702,7 +16829,7 @@ tFltrGreTunTempIpv4DstLstChg     OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The object tFltrGreTunTempLastChanged indicates the sysUpTime at the
+        "The object tFltrGreTunTempIpv4DstLstChg indicates the sysUpTime at the
          time of the last modification of this row.
 
          If no changes were made to the row since the last re-initialization of
@@ -17601,6 +17728,853 @@ tFltrProtocolListItemRowStatus   OBJECT-TYPE
          status of this row."
     ::= { tFltrProtocolListItemEntry 2 }
 
+tFltrGreTunTempIpv6DstTblLstChg  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrGreTunTempIpv6DstTblLstChg indicates the sysUpTime at
+         the time of the last modification of tFltrGreTunTempIpv6DstTable.
+
+         If no changes were made to the entry since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { tFilterObjects 113 }
+
+tFltrGreTunTempIpv6DstTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TFltrGreTunTempIpv6DstEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tFltrGreTunTempIpv6DstTable contains ipv6 destinations for
+         GRE tunnel template"
+    ::= { tFilterObjects 114 }
+
+tFltrGreTunTempIpv6DstEntry      OBJECT-TYPE
+    SYNTAX      TFltrGreTunTempIpv6DstEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tFltrGreTunTempIpv6DstTable."
+    INDEX       {
+        tFltrGreTunTempName,
+        tFltrGreTunTempIpv6DstAddr
+    }
+    ::= { tFltrGreTunTempIpv6DstTable 1 }
+
+TFltrGreTunTempIpv6DstEntry      ::= SEQUENCE
+{
+    tFltrGreTunTempIpv6DstAddr       InetAddressIPv6,
+    tFltrGreTunTempIpv6DstRowStatus  RowStatus,
+    tFltrGreTunTempIpv6DstLstChg     TimeStamp
+}
+
+tFltrGreTunTempIpv6DstAddr       OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrGreTunTempIpv6DstAddr specifies a destination IPv6
+         address of the GRE encapsulated packet."
+    ::= { tFltrGreTunTempIpv6DstEntry 1 }
+
+tFltrGreTunTempIpv6DstRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrGreTunTempIpv6DstRowStatus specifies the status of
+         this row."
+    ::= { tFltrGreTunTempIpv6DstEntry 2 }
+
+tFltrGreTunTempIpv6DstLstChg     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrGreTunTempIpv6DstLstChg indicates the sysUpTime at the
+         time of the last modification of this row.
+
+         If no changes were made to the row since the last re-initialization of
+         the local network management subsystem, then this object contains the
+         value zero."
+    ::= { tFltrGreTunTempIpv6DstEntry 3 }
+
+tFltrPktLenListTblLastChg        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrPktLenListTblLastChg indicates the sysUpTime at the
+         time of the last modification of tFltrPktLenListTable.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, this object contains the
+         value zero."
+    ::= { tFilterObjects 115 }
+
+tFltrPktLenListTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TFltrPktLenListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tFltrPktLenListTable contains an entry (AKA row) for each
+         port list defined in the filter area."
+    ::= { tFilterObjects 116 }
+
+tFltrPktLenListEntry             OBJECT-TYPE
+    SYNTAX      TFltrPktLenListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of the tFltrPktLenListTable."
+    INDEX       {
+        tFltrPktLenListType,
+        IMPLIED tFltrPktLenListName
+    }
+    ::= { tFltrPktLenListTable 1 }
+
+TFltrPktLenListEntry             ::= SEQUENCE
+{
+    tFltrPktLenListType              TFltrPktLenListType,
+    tFltrPktLenListName              TNamedItem,
+    tFltrPktLenListRowStatus         RowStatus,
+    tFltrPktLenListLastChanged       TimeStamp,
+    tFltrPktLenListDescription       TItemDescription
+}
+
+tFltrPktLenListType              OBJECT-TYPE
+    SYNTAX      TFltrPktLenListType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrPktLenListType specifies the type of this packet
+         length list."
+    ::= { tFltrPktLenListEntry 1 }
+
+tFltrPktLenListName              OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrPktLenListName specifies the name given to this packet
+         length list."
+    ::= { tFltrPktLenListEntry 2 }
+
+tFltrPktLenListRowStatus         OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrPktLenListRowStatus specifies the status of this row."
+    ::= { tFltrPktLenListEntry 3 }
+
+tFltrPktLenListLastChanged       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrPktLenListLastChanged indicates the sysUpTime at the
+         time of the last modification of this row.
+
+         If no changes were made to the row since the last re-initialization of
+         the local network management subsystem, then this object contains the
+         value zero."
+    ::= { tFltrPktLenListEntry 4 }
+
+tFltrPktLenListDescription       OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrPktLenListDescription specifies a description for this
+         packet length list."
+    DEFVAL      { ''H }
+    ::= { tFltrPktLenListEntry 5 }
+
+tFltrPktLenListItemTblLastChg    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrPktLenListItemTblLastChg indicates the sysUpTime at
+         the time of the last modification of tFltrPktLenListItemTable.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, this object contains the
+         value zero."
+    ::= { tFilterObjects 117 }
+
+tFltrPktLenListItemTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TFltrPktLenListItemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tFltrPktLenListItemTable contains an entry for each port
+         defined in any port list defined in the filter area."
+    ::= { tFilterObjects 118 }
+
+tFltrPktLenListItemEntry         OBJECT-TYPE
+    SYNTAX      TFltrPktLenListItemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Specifies an entry in the tFltrPktLenListItemTable. Intervals
+         specified by values tFltrPktLenListItemLow and tFltrPktLenListItemHigh
+         must not overlap for any two entries of the same packet length list."
+    INDEX       {
+        tFltrPktLenListType,
+        tFltrPktLenListName,
+        tFltrPktLenListItemLow,
+        tFltrPktLenListItemHigh
+    }
+    ::= { tFltrPktLenListItemTable 1 }
+
+TFltrPktLenListItemEntry         ::= SEQUENCE
+{
+    tFltrPktLenListItemLow           TIPvXFilterPktLen,
+    tFltrPktLenListItemHigh          TIPvXFilterPktLen,
+    tFltrPktLenListItemRowStatus     RowStatus
+}
+
+tFltrPktLenListItemLow           OBJECT-TYPE
+    SYNTAX      TIPvXFilterPktLen
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the lower value for the packet length range. A
+         value assigned to this object must be lower than or equal to the value
+         assigned to the corresponding object tFltrPktLenListItemHigh. When the
+         tFltrPktLenListType is set to 'ipv4', the tFltrPktLenListItemLow can
+         contain a value from 0 to 65535. When it is set to 'ipv6' the allowed
+         value range is from 40 to 65575."
+    ::= { tFltrPktLenListItemEntry 1 }
+
+tFltrPktLenListItemHigh          OBJECT-TYPE
+    SYNTAX      TIPvXFilterPktLen
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the higher value for packet length range. A
+         value assigned to this object must be greater than or equal to the
+         value assigned to the corresponding object tFltrPktLenListItemLow.
+         When the tFltrPktLenListType is set to 'ipv4', the
+         tFltrPktLenListItemHigh can contain a value from 0 to 65535. When it
+         is set to 'ipv6' the allowed value range is from 40 to 65575."
+    ::= { tFltrPktLenListItemEntry 2 }
+
+tFltrPktLenListItemRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrPktLenListItemRowStatus specifies the status of this
+         row."
+    ::= { tFltrPktLenListItemEntry 3 }
+
+tFltrPolicerTblLastChg           OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrPolicerTblLastChg indicates the sysUpTime at the time
+         of the last modification of tFltrPolicerTable.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, this object contains the
+         value zero."
+    ::= { tFilterObjects 119 }
+
+tFltrPolicerTable                OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TFltrPolicerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tFltrPolicerTable contains an entry  for each policer
+         defined in the filter area."
+    ::= { tFilterObjects 120 }
+
+tFltrPolicerEntry                OBJECT-TYPE
+    SYNTAX      TFltrPolicerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of the tFltrPolicerTable."
+    INDEX       { IMPLIED tFltrPolicerName }
+    ::= { tFltrPolicerTable 1 }
+
+TFltrPolicerEntry                ::= SEQUENCE
+{
+    tFltrPolicerName                 TNamedItem,
+    tFltrPolicerRowStatus            RowStatus,
+    tFltrPolicerLastChanged          TimeStamp,
+    tFltrPolicerDescription          TItemDescription,
+    tFltrPolicerPIR                  TFilterPolicerPIR,
+    tFltrPolicerPPSPIR               TFilterPolicerPPSPIR,
+    tFltrPolicerMBS                  TPolicerBurstSizeBytes,
+    tFltrPolicerScope                TFltrPolicerScope
+}
+
+tFltrPolicerName                 OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrPolicerName specifies the name given to this policer."
+    ::= { tFltrPolicerEntry 1 }
+
+tFltrPolicerRowStatus            OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrPolicerRowStatus specifies the status of this row."
+    ::= { tFltrPolicerEntry 2 }
+
+tFltrPolicerLastChanged          OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrPolicerLastChanged indicates the sysUpTime at the time
+         of the last modification of this row.
+
+         If no changes were made to the row since the last re-initialization of
+         the local network management subsystem, then this object contains the
+         value zero."
+    ::= { tFltrPolicerEntry 3 }
+
+tFltrPolicerDescription          OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrPolicerDescription specifies a description for this
+         policer."
+    DEFVAL      { ''H }
+    ::= { tFltrPolicerEntry 4 }
+
+tFltrPolicerPIR                  OBJECT-TYPE
+    SYNTAX      TFilterPolicerPIR
+    UNITS       "kilobps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tFltrPolicerPIR specifies the policer peak information
+         rate (PIR) specified by the user."
+    DEFVAL      { -1 }
+    ::= { tFltrPolicerEntry 5 }
+
+tFltrPolicerPPSPIR               OBJECT-TYPE
+    SYNTAX      TFilterPolicerPPSPIR
+    UNITS       "packets per second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tFltrPolicerPPSPIR specifies the policer packets per
+         second peak information rate (PPS-PIR) specified by the user."
+    DEFVAL      { -1 }
+    ::= { tFltrPolicerEntry 6 }
+
+tFltrPolicerMBS                  OBJECT-TYPE
+    SYNTAX      TPolicerBurstSizeBytes
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPolicerMBS specifies the maximum burst
+         size to which the traffic matching the filter entry will be limited."
+    DEFVAL      { -1 }
+    ::= { tFltrPolicerEntry 7 }
+
+tFltrPolicerScope                OBJECT-TYPE
+    SYNTAX      TFltrPolicerScope
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPolicerScope specifies the scope of this
+         policer specified by the user."
+    DEFVAL      { filter }
+    ::= { tFltrPolicerEntry 8 }
+
+tFltrFilterSetTableLstChng       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrFilterSetTableLstChng indicates the sysUpTime at the
+         time of the last modification of tFltrFilterSetTable.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, this object contains the
+         value zero."
+    ::= { tFilterObjects 121 }
+
+tFltrFilterSetTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TFltrFilterSetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tFltrFilterSetTable contains an entry for each filter set of
+         ipvx and/or mac filter defined in the filter area."
+    ::= { tFilterObjects 122 }
+
+tFltrFilterSetEntry              OBJECT-TYPE
+    SYNTAX      TFltrFilterSetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tFltrFilterSetTable."
+    INDEX       { IMPLIED tFltrFilterSetName }
+    ::= { tFltrFilterSetTable 1 }
+
+TFltrFilterSetEntry              ::= SEQUENCE
+{
+    tFltrFilterSetName               TNamedItem,
+    tFltrFilterSetRowStatus          RowStatus,
+    tFltrFilterSetLastChanged        TimeStamp,
+    tFltrFilterSetDescription        TItemDescription,
+    tFltrFilterSetMacFilterId        TFilterID,
+    tFltrFilterSetIpFilterId         TFilterID,
+    tFltrFilterSetIpv6FilterId       TFilterID
+}
+
+tFltrFilterSetName               OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrFilterSetName specifies the name given to this filter
+         set."
+    ::= { tFltrFilterSetEntry 1 }
+
+tFltrFilterSetRowStatus          OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrFilterSetRowStatus specifies the status of this row."
+    ::= { tFltrFilterSetEntry 2 }
+
+tFltrFilterSetLastChanged        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrFilterSetLastChanged indicates the sysUpTime at the
+         time of the last modification of this row.
+
+         If no changes were made to the row since the last re-initialization of
+         the local network management subsystem, then this object contains the
+         value zero."
+    ::= { tFltrFilterSetEntry 3 }
+
+tFltrFilterSetDescription        OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrFilterSetDescription specifies a description for this
+         row."
+    DEFVAL      { ''H }
+    ::= { tFltrFilterSetEntry 4 }
+
+tFltrFilterSetMacFilterId        OBJECT-TYPE
+    SYNTAX      TFilterID
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrFilterSetMacFilterId specifies the row
+         index in the tMacFilterTable corresponding to this mac filter, or zero
+         if no filter is specified."
+    DEFVAL      { 0 }
+    ::= { tFltrFilterSetEntry 5 }
+
+tFltrFilterSetIpFilterId         OBJECT-TYPE
+    SYNTAX      TFilterID
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrFilterSetIpFilterId specifies the row
+         index in the tIPFilterTable corresponding to this ip filter, or zero
+         if no filter is specified."
+    DEFVAL      { 0 }
+    ::= { tFltrFilterSetEntry 6 }
+
+tFltrFilterSetIpv6FilterId       OBJECT-TYPE
+    SYNTAX      TFilterID
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrFilterSetIpv6FilterId specifies the row
+         index in the tIPv6FilterTable corresponding to this ipv6 filter, or
+         zero if no filter is specified."
+    DEFVAL      { 0 }
+    ::= { tFltrFilterSetEntry 7 }
+
+tFltrPlcrStatSysScopeTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TFltrPlcrStatSysScopeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tFltrPlcrStatSysScopeTable contains statistics and counters
+         pertaining to filter policer system-scope instances."
+    ::= { tFilterObjects 123 }
+
+tFltrPlcrStatSysScopeEntry       OBJECT-TYPE
+    SYNTAX      TFltrPlcrStatSysScopeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of the tFltrPlcrStatSysScopeTable table.
+
+         Entries in this table are created by the system."
+    INDEX       { tFltrPlcrStatSysScopeName }
+    ::= { tFltrPlcrStatSysScopeTable 1 }
+
+TFltrPlcrStatSysScopeEntry       ::= SEQUENCE
+{
+    tFltrPlcrStatSysScopeName        TNamedItem,
+    tFltrPlcrStatSysScopeIngHitCnt   Counter64,
+    tFltrPlcrStatSysScopeIngHitCntB  Counter64,
+    tFltrPlcrStatSysScopeIngDrop     Counter64,
+    tFltrPlcrStatSysScopeIngDropB    Counter64,
+    tFltrPlcrStatSysScopeIngFwd      Counter64,
+    tFltrPlcrStatSysScopeIngFwdB     Counter64,
+    tFltrPlcrStatSysScopeEgrHitCnt   Counter64,
+    tFltrPlcrStatSysScopeEgrHitCntB  Counter64,
+    tFltrPlcrStatSysScopeEgrDrop     Counter64,
+    tFltrPlcrStatSysScopeEgrDropB    Counter64,
+    tFltrPlcrStatSysScopeEgrFwd      Counter64,
+    tFltrPlcrStatSysScopeEgrFwdB     Counter64
+}
+
+tFltrPlcrStatSysScopeName        OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrPlcrStatSysScopeName specifies the name of a filter
+         policer associated with this instance."
+    ::= { tFltrPlcrStatSysScopeEntry 1 }
+
+tFltrPlcrStatSysScopeIngHitCnt   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatSysScopeIngHitCnt indicates the
+         number of ingress packets which were subjected to this filter policer
+         instance."
+    ::= { tFltrPlcrStatSysScopeEntry 2 }
+
+tFltrPlcrStatSysScopeIngHitCntB  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatSysScopeIngHitCntB indicates the
+         number of bytes of all ingress packets which were subjected to this
+         filter policer instance."
+    ::= { tFltrPlcrStatSysScopeEntry 3 }
+
+tFltrPlcrStatSysScopeIngDrop     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatSysScopeIngDrop indicates the
+         number of dropped ingress packets which were subjected to this filter
+         policer instance."
+    ::= { tFltrPlcrStatSysScopeEntry 4 }
+
+tFltrPlcrStatSysScopeIngDropB    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatSysScopeIngDropB indicates the
+         number of dropped bytes of all ingress packets which were subjected to
+         this filter policer instance."
+    ::= { tFltrPlcrStatSysScopeEntry 5 }
+
+tFltrPlcrStatSysScopeIngFwd      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatSysScopeIngFwd indicates the
+         number of forwarded ingress packets which were subjected to this
+         filter policer instance."
+    ::= { tFltrPlcrStatSysScopeEntry 6 }
+
+tFltrPlcrStatSysScopeIngFwdB     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatSysScopeIngFwdB indicates the
+         number of forwarded bytes of all ingress packets which were subjected
+         to this filter policer instance."
+    ::= { tFltrPlcrStatSysScopeEntry 7 }
+
+tFltrPlcrStatSysScopeEgrHitCnt   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatSysScopeEgrHitCnt indicates the
+         number of egress packets which were subjected to this filter policer
+         instance."
+    ::= { tFltrPlcrStatSysScopeEntry 8 }
+
+tFltrPlcrStatSysScopeEgrHitCntB  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatSysScopeEgrHitCntB indicates the
+         number of bytes of all egress packets that were subjected to this
+         filter policer instance."
+    ::= { tFltrPlcrStatSysScopeEntry 9 }
+
+tFltrPlcrStatSysScopeEgrDrop     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatSysScopeEgrDrop indicates the
+         number of dropped egress packets which were subjected to this filter
+         policer instance."
+    ::= { tFltrPlcrStatSysScopeEntry 10 }
+
+tFltrPlcrStatSysScopeEgrDropB    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatSysScopeEgrDropB indicates the
+         number of dropped bytes of all egress packets which were subjected to
+         this filter policer instance."
+    ::= { tFltrPlcrStatSysScopeEntry 11 }
+
+tFltrPlcrStatSysScopeEgrFwd      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatSysScopeEgrFwd indicates the
+         number of forwarded egress packets which were subjected to this filter
+         policer instance."
+    ::= { tFltrPlcrStatSysScopeEntry 12 }
+
+tFltrPlcrStatSysScopeEgrFwdB     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatSysScopeEgrFwdB indicates the
+         number of forwarded bytes of all egress packets which were subjected
+         to this filter policer instance."
+    ::= { tFltrPlcrStatSysScopeEntry 13 }
+
+tFltrPlcrStatFltrScopeTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TFltrPlcrStatFltrScopeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tFltrPlcrStatFltrScopeTable contains statistics and counters
+         pertaining to filter policer filter-scope instances."
+    ::= { tFilterObjects 124 }
+
+tFltrPlcrStatFltrScopeEntry      OBJECT-TYPE
+    SYNTAX      TFltrPlcrStatFltrScopeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of the tFltrPlcrStatFltrScopeTable table.
+
+         Entries in this table are created by the system."
+    INDEX       {
+        tFltrPlcrStatFltrScopeName,
+        tFltrPlcrStatFltrScopeFltrType,
+        tFltrPlcrStatFltrScopeFltrId
+    }
+    ::= { tFltrPlcrStatFltrScopeTable 1 }
+
+TFltrPlcrStatFltrScopeEntry      ::= SEQUENCE
+{
+    tFltrPlcrStatFltrScopeName       TNamedItem,
+    tFltrPlcrStatFltrScopeFltrType   TFilterType,
+    tFltrPlcrStatFltrScopeFltrId     TAnyFilterID,
+    tFltrPlcrStatFltrScopeIngHitCnt  Counter64,
+    tFltrPlcrStatFltrScopeIngHitCntB Counter64,
+    tFltrPlcrStatFltrScopeIngDrop    Counter64,
+    tFltrPlcrStatFltrScopeIngDropB   Counter64,
+    tFltrPlcrStatFltrScopeIngFwd     Counter64,
+    tFltrPlcrStatFltrScopeIngFwdB    Counter64,
+    tFltrPlcrStatFltrScopeEgrHitCnt  Counter64,
+    tFltrPlcrStatFltrScopeEgrHitCntB Counter64,
+    tFltrPlcrStatFltrScopeEgrDrop    Counter64,
+    tFltrPlcrStatFltrScopeEgrDropB   Counter64,
+    tFltrPlcrStatFltrScopeEgrFwd     Counter64,
+    tFltrPlcrStatFltrScopeEgrFwdB    Counter64
+}
+
+tFltrPlcrStatFltrScopeName       OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrPlcrStatFltrScopeName specifies the name of a filter
+         policer associated with this instance."
+    ::= { tFltrPlcrStatFltrScopeEntry 1 }
+
+tFltrPlcrStatFltrScopeFltrType   OBJECT-TYPE
+    SYNTAX      TFilterType { fltrtypeselIp (1), fltrtypeselIpv6 (4) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatFltrScopeFltrType specifies the
+         type of ACL filter.
+
+         Refer to the description of the textual convention TFilterType for
+         more information."
+    ::= { tFltrPlcrStatFltrScopeEntry 2 }
+
+tFltrPlcrStatFltrScopeFltrId     OBJECT-TYPE
+    SYNTAX      TAnyFilterID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatFltrScopeFltrId specifies a
+         filter policer instance IP or IPv6 ACL filter ID. The ACL filter type
+         is given by the value of tFltrPlcrStatFltrScopeFltrType.
+
+         Refer to the description of the textual convention TAnyFilterID for
+         more information."
+    ::= { tFltrPlcrStatFltrScopeEntry 3 }
+
+tFltrPlcrStatFltrScopeIngHitCnt  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatFltrScopeIngHitCnt indicates the
+         number of ingress packets which were subjected to this filter policer
+         instance."
+    ::= { tFltrPlcrStatFltrScopeEntry 4 }
+
+tFltrPlcrStatFltrScopeIngHitCntB OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatFltrScopeIngHitCntB indicates the
+         number of bytes of all ingress packets which were subjected to this
+         filter policer instance."
+    ::= { tFltrPlcrStatFltrScopeEntry 5 }
+
+tFltrPlcrStatFltrScopeIngDrop    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatFltrScopeIngDrop indicates the
+         number of dropped ingress packets which were subjected to this filter
+         policer instance."
+    ::= { tFltrPlcrStatFltrScopeEntry 6 }
+
+tFltrPlcrStatFltrScopeIngDropB   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatFltrScopeIngDropB indicates the
+         number of dropped bytes of all ingress packets which were subjected to
+         this filter policer instance."
+    ::= { tFltrPlcrStatFltrScopeEntry 7 }
+
+tFltrPlcrStatFltrScopeIngFwd     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatFltrScopeIngFwd indicates the
+         number of forwarded ingress packets which were subjected to this
+         filter policer instance."
+    ::= { tFltrPlcrStatFltrScopeEntry 8 }
+
+tFltrPlcrStatFltrScopeIngFwdB    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatFltrScopeIngFwdB indicates the
+         number of forwarded bytes of all ingress packets which were subjected
+         to this filter policer instance."
+    ::= { tFltrPlcrStatFltrScopeEntry 9 }
+
+tFltrPlcrStatFltrScopeEgrHitCnt  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatFltrScopeEgrHitCnt indicates the
+         number of egress packets which were subjected to this filter policer
+         instance."
+    ::= { tFltrPlcrStatFltrScopeEntry 10 }
+
+tFltrPlcrStatFltrScopeEgrHitCntB OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatFltrScopeEgrHitCntB indicates the
+         number of bytes of all egress packets that were subjected to this
+         filter policer instance."
+    ::= { tFltrPlcrStatFltrScopeEntry 11 }
+
+tFltrPlcrStatFltrScopeEgrDrop    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatFltrScopeEgrDrop indicates the
+         number of dropped egress packets which were subjected to this filter
+         policer instance."
+    ::= { tFltrPlcrStatFltrScopeEntry 12 }
+
+tFltrPlcrStatFltrScopeEgrDropB   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatFltrScopeEgrDropB indicates the
+         number of dropped bytes of all egress packets which were subjected to
+         this filter policer instance."
+    ::= { tFltrPlcrStatFltrScopeEntry 13 }
+
+tFltrPlcrStatFltrScopeEgrFwd     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatFltrScopeEgrFwd indicates the
+         number of forwarded egress packets which were subjected to this filter
+         policer instance."
+    ::= { tFltrPlcrStatFltrScopeEntry 14 }
+
+tFltrPlcrStatFltrScopeEgrFwdB    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrPlcrStatFltrScopeEgrFwdB indicates the
+         number of forwarded bytes of all egress packets which were subjected
+         to this filter policer instance."
+    ::= { tFltrPlcrStatFltrScopeEntry 15 }
+
 tFilterMIBConformance            OBJECT IDENTIFIER ::= { tmnxSRConfs 21 }
 
 tFilterMIBCompliances            OBJECT IDENTIFIER ::= { tFilterMIBConformance 1 }
@@ -17934,7 +18908,6 @@ tFilterV14v0Compliance           MODULE-COMPLIANCE
             tFilterNotificationsV14v0Group,
             tFilterIPvXRedundantActionGroup,
             tFilterMacRedundantActionGroup,
-            tFilterEmbedVsdGroup,
             tFilterEntryStatGroup,
             tFilterEmbeddedRefGroup,
             tFilterRemarkDscpGroup,
@@ -17976,7 +18949,6 @@ tFilterV15v0Compliance           MODULE-COMPLIANCE
             tFilterNotificationsV14v0Group,
             tFilterIPvXRedundantActionGroup,
             tFilterMacRedundantActionGroup,
-            tFilterEmbedVsdGroup,
             tFilterEntryStatGroup,
             tFilterEmbeddedRefGroup,
             tFilterRemarkDscpGroup,
@@ -18024,7 +18996,6 @@ tFilterV16v0Compliance           MODULE-COMPLIANCE
             tFilterNotificationsV14v0Group,
             tFilterIPvXRedundantActionGroup,
             tFilterMacRedundantActionGroup,
-            tFilterEmbedVsdGroup,
             tFilterEntryStatGroup,
             tFilterEmbeddedRefGroup,
             tFilterRemarkDscpGroup,
@@ -18082,7 +19053,6 @@ tFilterV19v0Compliance           MODULE-COMPLIANCE
             tFilterNotificationsV14v0Group,
             tFilterIPvXRedundantActionGroup,
             tFilterMacRedundantActionGroup,
-            tFilterEmbedVsdGroup,
             tFilterEntryStatGroup,
             tFilterEmbeddedRefGroup,
             tFilterRemarkDscpGroup,
@@ -18148,7 +19118,6 @@ tFilterV20v0Compliance           MODULE-COMPLIANCE
             tFilterNotificationsV14v0Group,
             tFilterIPvXRedundantActionGroup,
             tFilterMacRedundantActionGroup,
-            tFilterEmbedVsdGroup,
             tFilterEntryStatGroup,
             tFilterEmbeddedRefGroup,
             tFilterRemarkDscpGroup,
@@ -18188,7 +19157,7 @@ tFilterV20v0Compliance           MODULE-COMPLIANCE
     ::= { tFilterMIBCompliances 21 }
 
 tFilterV21v0Compliance           MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for management of Filter features on Nokia
          SROS series systems release R21.0."
@@ -18215,10 +19184,8 @@ tFilterV21v0Compliance           MODULE-COMPLIANCE
             tFilterPortListV11v0Group,
             tFilterSystemFilterV13v0Group,
             tFilterEmbedFlowspecGroup,
-            tFilterNotificationsV14v0Group,
             tFilterIPvXRedundantActionGroup,
             tFilterMacRedundantActionGroup,
-            tFilterEmbedVsdGroup,
             tFilterEntryStatGroup,
             tFilterEmbeddedRefGroup,
             tFilterRemarkDscpGroup,
@@ -18263,7 +19230,7 @@ tFilterV21v0Compliance           MODULE-COMPLIANCE
     ::= { tFilterMIBCompliances 22 }
 
 tFilterV22v0Compliance           MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for management of Filter features on Nokia
          SROS series systems release R22.0."
@@ -18290,10 +19257,8 @@ tFilterV22v0Compliance           MODULE-COMPLIANCE
             tFilterPortListV11v0Group,
             tFilterSystemFilterV13v0Group,
             tFilterEmbedFlowspecGroup,
-            tFilterNotificationsV14v0Group,
             tFilterIPvXRedundantActionGroup,
             tFilterMacRedundantActionGroup,
-            tFilterEmbedVsdGroup,
             tFilterEntryStatGroup,
             tFilterEmbeddedRefGroup,
             tFilterRemarkDscpGroup,
@@ -18333,9 +19298,257 @@ tFilterV22v0Compliance           MODULE-COMPLIANCE
             tFltrEntryCollectStatsMacGroup,
             tFilterMacFltrActionGroupV21,
             tFilterMatchTTLGroup,
-            tFltrMatchSrcOrDstIpGroup
+            tFltrMatchSrcOrDstIpGroup,
+            tFltrLagSharedPolicerGroup,
+            tFltrGreTunTempIpv6Group,
+            tFltrMatchTcpEstGroup,
+            tFilterNotificationsV23v0Group
         }
     ::= { tFilterMIBCompliances 23 }
+
+tFilterV23v0Compliance           MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of Filter features on Nokia
+         SROS series systems release R23.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tFilterScalarGroup,
+            tIPFilterV21v0Group,
+            tMacFilterV21v0Group,
+            tFilterLogGroup,
+            tFilterLogV5v0Group,
+            tFilterRedirectPolicyV19v0Group,
+            tFilterNotificationsV11v0Group,
+            tFilterNotificationObjV12v0Group,
+            tIPv6FilterV21v0Group,
+            tMacFilterVidFilteringV9v0Group,
+            tDhcpFilterV10v0Group,
+            tDhcpFilterV13v0Group,
+            tFilterNameV10v0Group,
+            tLiFilterV12v0Group,
+            tFilterPrefixListV11v0Group,
+            tFilterEmbeddedInsertV11v0Group,
+            tFilterEmbeddedInsertV12v0Group,
+            tFilterEmbeddedInsertV13v0Group,
+            tFilterPortListV11v0Group,
+            tFilterSystemFilterV13v0Group,
+            tFilterEmbedFlowspecGroup,
+            tFilterIPvXRedundantActionGroup,
+            tFilterMacRedundantActionGroup,
+            tFilterEntryStatGroup,
+            tFilterEmbeddedRefGroup,
+            tFilterRemarkDscpGroup,
+            tFilterRemarkDscpExtGroup,
+            tFilterPrefListRtrBgpPeersGroup,
+            tFilterPrefListInfoGroup,
+            tFilterForwardVprnTargetGroup,
+            tFilterNotificationsV15v0Group,
+            tFilterFwdBondingConnectionGroup,
+            tFilterSelectiveFlowspecGroup,
+            tFilterMatchTcpFlagsGroup,
+            tFilterActionFc,
+            tFilterRPPingSrcAddressGroup,
+            tFilterRPActiveDstChangeNotifGrp,
+            tFilterRPActiveDstChangeGrp,
+            tFilterRPlcyBindingGroup,
+            tFltrGreTunTempGroup,
+            tFltrPrefListPrefExcludeGrp,
+            fltrMdAutoIdV16v0Group,
+            tFltrPatternMatchGroup,
+            tFltrMatchMacForIPvXGroup,
+            tFltrMatchPacketLengthGroup,
+            tFltrFilterNameInLIGroup,
+            tFltrCAMTypeGroup,
+            tLiFltrAssocFltrNameGroup,
+            tFltrIPv6ExceptionV19v0Group,
+            tFltrFwdMplsPlcyEndptGrp,
+            tFltrFwdSrtePlcyEndptColorGrp,
+            tLiFltrMatchFragmentGroup,
+            fltrMdAutoIdV20v0Group,
+            tFilterMatchProtocolListGroup,
+            tFilterMatchDestClassGroup,
+            tFilterL2AwareNatBypassGroup,
+            tFltrLiRsvdBlockRangeChgNotifGrp,
+            tFltrCflowdSampleProfileGroup,
+            tFltrEntryCollectStatsIPvXGroup,
+            tFltrEntryCollectStatsMacGroup,
+            tFilterMacFltrActionGroupV21,
+            tFilterMatchTTLGroup,
+            tFltrMatchSrcOrDstIpGroup,
+            tFltrLagSharedPolicerGroup,
+            tFltrGreTunTempIpv6Group,
+            tFltrMatchTcpEstGroup,
+            tFilterNotificationsV23v0Group,
+            tFltrFwdSrv6PlcyGrp,
+            tLiMacFilterMatchVlanIdGrp
+        }
+    ::= { tFilterMIBCompliances 24 }
+
+tFilterV24v0Compliance           MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of Filter features on Nokia
+         SROS series systems release R24.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tFilterScalarGroup,
+            tIPFilterV21v0Group,
+            tMacFilterV21v0Group,
+            tFilterLogGroup,
+            tFilterLogV5v0Group,
+            tFilterRedirectPolicyV19v0Group,
+            tFilterNotificationsV11v0Group,
+            tFilterNotificationObjV12v0Group,
+            tIPv6FilterV21v0Group,
+            tMacFilterVidFilteringV9v0Group,
+            tDhcpFilterV10v0Group,
+            tDhcpFilterV13v0Group,
+            tFilterNameV10v0Group,
+            tLiFilterV12v0Group,
+            tFilterPrefixListV11v0Group,
+            tFilterEmbeddedInsertV11v0Group,
+            tFilterEmbeddedInsertV12v0Group,
+            tFilterEmbeddedInsertV13v0Group,
+            tFilterPortListV11v0Group,
+            tFilterSystemFilterV13v0Group,
+            tFilterEmbedFlowspecGroup,
+            tFilterMacRedundantActionGroup,
+            tFilterEntryStatGroup,
+            tFilterEmbeddedRefGroup,
+            tFilterRemarkDscpGroup,
+            tFilterRemarkDscpExtGroup,
+            tFilterPrefListRtrBgpPeersGroup,
+            tFilterPrefListInfoGroup,
+            tFilterForwardVprnTargetGroup,
+            tFilterNotificationsV15v0Group,
+            tFilterFwdBondingConnectionGroup,
+            tFilterSelectiveFlowspecGroup,
+            tFilterMatchTcpFlagsGroup,
+            tFilterActionFc,
+            tFilterRPPingSrcAddressGroup,
+            tFilterRPActiveDstChangeNotifGrp,
+            tFilterRPActiveDstChangeGrp,
+            tFilterRPlcyBindingGroup,
+            tFltrGreTunTempGroup,
+            tFltrPrefListPrefExcludeGrp,
+            fltrMdAutoIdV16v0Group,
+            tFltrPatternMatchGroup,
+            tFltrMatchMacForIPvXGroup,
+            tFltrMatchPacketLengthGroup,
+            tFltrFilterNameInLIGroup,
+            tFltrCAMTypeGroup,
+            tLiFltrAssocFltrNameGroup,
+            tFltrIPv6ExceptionV19v0Group,
+            tFltrFwdMplsPlcyEndptGrp,
+            tFltrFwdSrtePlcyEndptColorGrp,
+            tLiFltrMatchFragmentGroup,
+            fltrMdAutoIdV20v0Group,
+            tFilterMatchProtocolListGroup,
+            tFilterMatchDestClassGroup,
+            tFilterL2AwareNatBypassGroup,
+            tFltrLiRsvdBlockRangeChgNotifGrp,
+            tFltrCflowdSampleProfileGroup,
+            tFltrEntryCollectStatsIPvXGroup,
+            tFltrEntryCollectStatsMacGroup,
+            tFilterMacFltrActionGroupV21,
+            tFilterMatchTTLGroup,
+            tFltrMatchSrcOrDstIpGroup,
+            tFltrLagSharedPolicerGroup,
+            tFltrGreTunTempIpv6Group,
+            tFltrMatchTcpEstGroup,
+            tFilterNotificationsV23v0Group,
+            tFltrFwdSrv6PlcyGrp,
+            tLiMacFilterMatchVlanIdGrp,
+            tFltrPktLenListGrp,
+            tFilterIPvXRedActionV24v0Group,
+            tFilterPolicerGroup,
+            tFltrFilterSetGroup
+        }
+    ::= { tFilterMIBCompliances 25 }
+
+tFilterV25v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of Filter features on Nokia
+         SROS series systems release R25.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tFilterScalarGroup,
+            tIPFilterV21v0Group,
+            tMacFilterV21v0Group,
+            tFilterLogGroup,
+            tFilterLogV5v0Group,
+            tFilterRedirectPolicyV19v0Group,
+            tFilterNotificationsV11v0Group,
+            tFilterNotificationObjV12v0Group,
+            tIPv6FilterV21v0Group,
+            tMacFilterVidFilteringV9v0Group,
+            tDhcpFilterV10v0Group,
+            tDhcpFilterV13v0Group,
+            tFilterNameV10v0Group,
+            tLiFilterV12v0Group,
+            tFilterPrefixListV11v0Group,
+            tFilterEmbeddedInsertV11v0Group,
+            tFilterEmbeddedInsertV12v0Group,
+            tFilterEmbeddedInsertV13v0Group,
+            tFilterPortListV11v0Group,
+            tFilterSystemFilterV13v0Group,
+            tFilterEmbedFlowspecGroup,
+            tFilterMacRedundantActionGroup,
+            tFilterEntryStatGroup,
+            tFilterEmbeddedRefGroup,
+            tFilterRemarkDscpGroup,
+            tFilterRemarkDscpExtGroup,
+            tFilterPrefListRtrBgpPeersGroup,
+            tFilterPrefListInfoGroup,
+            tFilterForwardVprnTargetGroup,
+            tFilterNotificationsV15v0Group,
+            tFilterFwdBondingConnectionGroup,
+            tFilterSelectiveFlowspecGroup,
+            tFilterMatchTcpFlagsGroup,
+            tFilterActionFc,
+            tFilterRPPingSrcAddressGroup,
+            tFilterRPActiveDstChangeNotifGrp,
+            tFilterRPActiveDstChangeGrp,
+            tFilterRPlcyBindingGroup,
+            tFltrGreTunTempGroup,
+            tFltrPrefListPrefExcludeGrp,
+            fltrMdAutoIdV16v0Group,
+            tFltrPatternMatchGroup,
+            tFltrMatchMacForIPvXGroup,
+            tFltrMatchPacketLengthGroup,
+            tFltrFilterNameInLIGroup,
+            tFltrCAMTypeGroup,
+            tLiFltrAssocFltrNameGroup,
+            tFltrIPv6ExceptionV19v0Group,
+            tFltrFwdMplsPlcyEndptGrp,
+            tFltrFwdSrtePlcyEndptColorGrp,
+            tLiFltrMatchFragmentGroup,
+            fltrMdAutoIdV20v0Group,
+            tFilterMatchProtocolListGroup,
+            tFilterMatchDestClassGroup,
+            tFilterL2AwareNatBypassGroup,
+            tFltrLiRsvdBlockRangeChgNotifGrp,
+            tFltrCflowdSampleProfileGroup,
+            tFltrEntryCollectStatsIPvXGroup,
+            tFltrEntryCollectStatsMacGroup,
+            tFilterMacFltrActionGroupV21,
+            tFilterMatchTTLGroup,
+            tFltrMatchSrcOrDstIpGroup,
+            tFltrLagSharedPolicerGroup,
+            tFltrGreTunTempIpv6Group,
+            tFltrMatchTcpEstGroup,
+            tFilterNotificationsV23v0Group,
+            tFltrFwdSrv6PlcyGrp,
+            tLiMacFilterMatchVlanIdGrp,
+            tFltrPktLenListGrp,
+            tFilterIPvXRedActionV24v0Group,
+            tFilterPolicerGroup,
+            tFltrFilterSetGroup,
+            tIPvXFilterParamsV25v0Group
+        }
+    ::= { tFilterMIBCompliances 26 }
 
 tFilterMIBGroups                 OBJECT IDENTIFIER ::= { tFilterMIBConformance 2 }
 
@@ -20271,7 +21484,7 @@ tFilterNotificationsV14v0Group   NOTIFICATION-GROUP
         tFilterEmbedFlowspecOperStateChg,
         tFilterEmbedVsdOperStateChg
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of notifications supporting management of filter
          notifications on Nokia SROS series systems 14.0 release."
@@ -20337,9 +21550,11 @@ tFilterIPvXRedundantActionGroup  OBJECT-GROUP
         tIPv6FilterParamsExtDownloadAct,
         tIPv6FilterParamsExtHoldRemain,
         tIPvXFltrEntryActPbrTargetStatus,
-        tIPvXFltrEntryActRateLimit
+        tIPvXFltrEntryActRateLimit,
+        tIPvXFltrEntryActRateLimitMbs,
+        tIPvXFltrEntryActRateLimitPps
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting redundant ip filter actions on Nokia
          7x50 ESS/SR series systems 14.0 release."
@@ -20369,24 +21584,6 @@ tFilterMacRedundantActionGroup   OBJECT-GROUP
         "The group of objects supporting redundant mac filter actions on Nokia
          7x50 ESS/SR series systems 14.0 release."
     ::= { tFilterMIBGroups 64 }
-
-tFilterEmbedVsdGroup             OBJECT-GROUP
-    OBJECTS     {
-        tFilterEmbedVsdTableLstChg,
-        tFilterEmbedVsdRowStatus,
-        tFilterEmbedVsdLastChanged,
-        tFilterEmbedVsdAdminState,
-        tFilterEmbedVsdOperState,
-        tFltrEmbedVsdInfoEntryCnt,
-        tFltrEmbedVsdInfoEntryCntInsrtd,
-        tFilterEmbedVsdEntryInsrtEntryId,
-        tFilterEmbedVsdEntryOperState
-    }
-    STATUS      current
-    DESCRIPTION
-        "The group of objects supporting embedding of filters managed by a VSD
-         controller on Nokia 7x50 ESS/SR series systems 14.0 release."
-    ::= { tFilterMIBGroups 65 }
 
 tFilterEmbeddedRefGroup          OBJECT-GROUP
     OBJECTS     {
@@ -20761,7 +21958,7 @@ tFilterMatchTcpFlagsGroup        OBJECT-GROUP
     }
     STATUS      current
     DESCRIPTION
-        "The group of objects supporting not present TCP flags  match criteria
+        "The group of objects supporting not present TCP flags match criteria
          till 15.0 release on Nokia 7x50 ESS/SR series systems 16.0 release."
     ::= { tFilterMIBGroups 84 }
 
@@ -21529,6 +22726,235 @@ tFltrMatchSrcOrDstIpGroup        OBJECT-GROUP
          criterion on Nokia 7x50 ESS/SR series systems 21.2 release."
     ::= { tFilterMIBGroups 121 }
 
+tFltrLagSharedPolicerGroup       OBJECT-GROUP
+    OBJECTS     {
+        tIPv6FilterSharedPolicer,
+        tIPFilterSharedPolicer
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting filter LAG shared BPS policers on
+         Nokia 7x50 ESS/SR series systems 21.2 release."
+    ::= { tFilterMIBGroups 122 }
+
+tFltrMatchTcpEstGroup            OBJECT-GROUP
+    OBJECTS     {
+        tIPFilterParamsExtTcpEst,
+        tIPv6FilterParamsExtTcpEst
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting filter TCP established match on Nokia
+         7x50 ESS/SR series systems 21.2 release."
+    ::= { tFilterMIBGroups 123 }
+
+tFilterNotificationsV23v0Group   NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tFilterEmbedFlowspecOperStateChg
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting management of filter
+         notifications on Nokia SROS series systems 23.0 release."
+    ::= { tFilterMIBGroups 124 }
+
+tFilterObsoleteNotifGroup        NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tFilterEmbedVsdOperStateChg
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of obsoleted notifications supporting management of filter
+         notifications on Nokia SROS series systems 23.0 release."
+    ::= { tFilterMIBGroups 125 }
+
+tFltrFwdSrv6PlcyGrp              OBJECT-GROUP
+    OBJECTS     {
+        tIPvXFltrFwdSrv6PlcyEndptAddrTp,
+        tIPvXFltrFwdSrv6PlcyEndptAddr,
+        tIPvXFltrFwdSrv6PlcyColor,
+        tIPvXFltrFwdSrv6PlcySvcSidAddrTp,
+        tIPvXFltrFwdSrv6PlcySvcSid
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting forwarding to a tunnel identified by
+         an SRv6 policy endpoint and color in Nokia SROS series systems in
+         release 23.7."
+    ::= { tFilterMIBGroups 127 }
+
+tLiMacFilterMatchVlanIdGrp       OBJECT-GROUP
+    OBJECTS     {
+        tLiMacFilterParamsSapPortId,
+        tLiMacFilterParamsSapEncapType,
+        tLiMacFilterParamsSapEncapVal,
+        tLiMacFilterParamsOuterTagVal
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting LI filter vlan id matching in Nokia
+         SROS series systems in release 23.10."
+    ::= { tFilterMIBGroups 128 }
+
+tFltrPktLenListGrp               OBJECT-GROUP
+    OBJECTS     {
+        tFltrPktLenListTblLastChg,
+        tFltrPktLenListRowStatus,
+        tFltrPktLenListLastChanged,
+        tFltrPktLenListDescription,
+        tFltrPktLenListItemTblLastChg,
+        tFltrPktLenListItemRowStatus,
+        tIPFilterParamsExtPktLenList,
+        tIPv6FilterParamsExtPktLenList
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of packet length lists
+         for filters on Nokia SROS series systems release 24.3."
+    ::= { tFilterMIBGroups 130 }
+
+tFilterIPvXRedActionV24v0Group   OBJECT-GROUP
+    OBJECTS     {
+        tIPvXFltrEntryActionTblLChg,
+        tIPvXFltrEntryActRowStatus,
+        tIPvXFltrEntryActLastChanged,
+        tIPvXFltrEntryActAction,
+        tIPvXFltrEntryActFwdNHIpAddrType,
+        tIPvXFltrEntryActFwdNHIpAddr,
+        tIPvXFltrEntryActFwdNHIndirect,
+        tIPvXFltrEntryActFwdRedPlcy,
+        tIPvXFltrEntryActFwdSapPortId,
+        tIPvXFltrEntryActFwdSapEncapVal,
+        tIPvXFltrEntryActFwdSdpBind,
+        tIPvXFltrEntryActRedirectURL,
+        tIPvXFltrEntryActRdirAllwRadOvr,
+        tIPvXFltrEntryActFwdRtrId,
+        tIPvXFltrEntryActNatPolicyName,
+        tIPvXFltrEntryActNatType,
+        tIPvXFltrEntryActFwdLsp,
+        tIPvXFltrEntryActFwdLspRtrId,
+        tIPvXFltrEntryActPktLenVal1,
+        tIPvXFltrEntryActPktLenVal2,
+        tIPvXFltrEntryActPktLenOper,
+        tIPvXFltrEntryActTTLVal1,
+        tIPvXFltrEntryActTTLVal2,
+        tIPvXFltrEntryActTTLOper,
+        tIPvXFltrEntryActEsi,
+        tIPvXFltrEntryActFwdEsiSvcId,
+        tIPvXFltrEntryActFwdEsiVRtrId,
+        tIPvXFltrEntryActFwdEsiSFIpType,
+        tIPvXFltrEntryActFwdEsiSFIp,
+        tIPvXFltrEntryActFwdEsiVasIf,
+        tIPFilterParamsExtStickyDst,
+        tIPFilterParamsExtDownloadAct,
+        tIPFilterParamsExtHoldRemain,
+        tIPv6FilterParamsExtStickyDst,
+        tIPv6FilterParamsExtDownloadAct,
+        tIPv6FilterParamsExtHoldRemain,
+        tIPvXFltrEntryActPbrTargetStatus,
+        tIPvXFltrEntryActRateLimit,
+        tIPvXFltrEntryActRateLimitMbs,
+        tIPvXFltrEntryActRateLimitPps
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting redundant ip filter actions on Nokia
+         7x50 ESS/SR series systems 24.0 release."
+    ::= { tFilterMIBGroups 131 }
+
+tFilterObsoleteNhItfcGroup       OBJECT-GROUP
+    OBJECTS     {
+        tIPvXFltrEntryActFwdNHInterface
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of obsoleted object in 24.3 supporting filter action forward
+         to  next-hop interface."
+    ::= { tFilterMIBGroups 132 }
+
+tFilterPolicerGroup              OBJECT-GROUP
+    OBJECTS     {
+        tFltrPolicerTblLastChg,
+        tFltrPolicerRowStatus,
+        tFltrPolicerLastChanged,
+        tFltrPolicerDescription,
+        tFltrPolicerPIR,
+        tFltrPolicerPPSPIR,
+        tFltrPolicerMBS,
+        tFltrPolicerScope,
+        tIPvXFltrEntryActRateLimitPlcr,
+        tFltrPlcrStatSysScopeIngHitCnt,
+        tFltrPlcrStatSysScopeIngDrop,
+        tFltrPlcrStatSysScopeIngFwd,
+        tFltrPlcrStatSysScopeIngHitCntB,
+        tFltrPlcrStatSysScopeIngDropB,
+        tFltrPlcrStatSysScopeIngFwdB,
+        tFltrPlcrStatSysScopeEgrHitCnt,
+        tFltrPlcrStatSysScopeEgrDrop,
+        tFltrPlcrStatSysScopeEgrFwd,
+        tFltrPlcrStatSysScopeEgrHitCntB,
+        tFltrPlcrStatSysScopeEgrDropB,
+        tFltrPlcrStatSysScopeEgrFwdB,
+        tFltrPlcrStatFltrScopeIngHitCnt,
+        tFltrPlcrStatFltrScopeIngDrop,
+        tFltrPlcrStatFltrScopeIngFwd,
+        tFltrPlcrStatFltrScopeIngHitCntB,
+        tFltrPlcrStatFltrScopeIngDropB,
+        tFltrPlcrStatFltrScopeIngFwdB,
+        tFltrPlcrStatFltrScopeEgrHitCnt,
+        tFltrPlcrStatFltrScopeEgrDrop,
+        tFltrPlcrStatFltrScopeEgrFwd,
+        tFltrPlcrStatFltrScopeEgrHitCntB,
+        tFltrPlcrStatFltrScopeEgrDropB,
+        tFltrPlcrStatFltrScopeEgrFwdB
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting policer management for filters  in
+         Nokia SROS series systems in release 25.3."
+    ::= { tFilterMIBGroups 133 }
+
+tFltrFilterSetGroup              OBJECT-GROUP
+    OBJECTS     {
+        tFltrFilterSetTableLstChng,
+        tFltrFilterSetRowStatus,
+        tFltrFilterSetLastChanged,
+        tFltrFilterSetDescription,
+        tFltrFilterSetMacFilterId,
+        tFltrFilterSetIpFilterId,
+        tFltrFilterSetIpv6FilterId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting filter set management for filters  in
+         Nokia SROS series systems in release 24.10."
+    ::= { tFilterMIBGroups 134 }
+
+tIPvXFilterParamsV25v0Group      OBJECT-GROUP
+    OBJECTS     {
+        tIPv6FilterParamsExtRoutingType4
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting filter params for filters in Nokia
+         SROS series systems in release 25.7."
+    ::= { tFilterMIBGroups 135 }
+
+tFltrGreTunTempIpv6Group         OBJECT-GROUP
+    OBJECTS     {
+        tFltrGreTunTempIpv6SrcAddr,
+        tFltrGreTunTempIpv6GreKeyIfIndex,
+        tFltrGreTunTempIpv6SkipHopDecr,
+        tFltrGreTunTempIpv6DstTblLstChg,
+        tFltrGreTunTempIpv6DstLstChg,
+        tFltrGreTunTempIpv6DstRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting ipv6 setting for GRE tunnel templates
+         on Nokia 7x50 ESS/SR series systems 22.7 release."
+    ::= { tFilterMIBConformance 123 }
+
 tFilterNotificationsPrefix       OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 21 }
 
 tFilterNotifications             OBJECT IDENTIFIER ::= { tFilterNotificationsPrefix 0 }
@@ -21827,10 +23253,9 @@ tFilterEmbedFlowspecOperStateChg NOTIFICATION-TYPE
 
 tFilterEmbedVsdOperStateChg      NOTIFICATION-TYPE
     OBJECTS     {
-        tFilterEmbedVsdOperState,
         tFltrNotifDescription
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The tFilterEmbedVsdOperStateChg notification is generated when the
          operational state of an embedding of a filter managed by a VSD

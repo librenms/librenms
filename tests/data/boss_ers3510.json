@@ -2265,84 +2265,72 @@
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "other",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "notAvail",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "removed",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "resetInProg",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "testing",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "nonFatalErr",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "fatalErr",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "notConfig",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "obsoleted",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 3
                 }
@@ -2555,84 +2543,72 @@
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "other",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "notAvail",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "removed",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "resetInProg",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "testing",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "nonFatalErr",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "fatalErr",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "notConfig",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "s5ChasComOperState",
                     "state_descr": "obsoleted",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 3
                 }
@@ -2647,74 +2623,66 @@
                     "vlan_domain": 1,
                     "vlan_name": "mgmt-grt",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 100,
                     "vlan_domain": 1,
                     "vlan_name": "mgmt",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 128,
                     "vlan_domain": 1,
                     "vlan_name": "link-to-portal",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 129,
                     "vlan_domain": 1,
                     "vlan_name": "portal-129",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 130,
                     "vlan_domain": 1,
                     "vlan_name": "portal-130",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 131,
                     "vlan_domain": 1,
                     "vlan_name": "portal-131",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 200,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN #200",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1100,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN #1100",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2100,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN #2100",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
                 {
                     "vlan": 1,
                     "baseport": 1,
@@ -2797,14 +2765,6 @@
                 },
                 {
                     "vlan": 100,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 100,
                     "baseport": 1,
                     "priority": 0,
                     "state": "unknown",
@@ -2821,14 +2781,6 @@
                 },
                 {
                     "vlan": 128,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 128,
                     "baseport": 1,
                     "priority": 0,
                     "state": "unknown",
@@ -2845,14 +2797,6 @@
                 },
                 {
                     "vlan": 129,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 129,
                     "baseport": 1,
                     "priority": 0,
                     "state": "unknown",
@@ -2869,14 +2813,6 @@
                 },
                 {
                     "vlan": 130,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 130,
                     "baseport": 1,
                     "priority": 0,
                     "state": "unknown",
@@ -2893,14 +2829,6 @@
                 },
                 {
                     "vlan": 131,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 131,
                     "baseport": 1,
                     "priority": 0,
                     "state": "unknown",
@@ -2910,14 +2838,6 @@
                 {
                     "vlan": 131,
                     "baseport": 2,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 200,
-                    "baseport": 0,
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
@@ -2949,14 +2869,6 @@
                 },
                 {
                     "vlan": 1100,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 1100,
                     "baseport": 1,
                     "priority": 0,
                     "state": "unknown",
@@ -2966,14 +2878,6 @@
                 {
                     "vlan": 1100,
                     "baseport": 2,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 2100,
-                    "baseport": 0,
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
@@ -3018,6 +2922,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3037,6 +2942,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 1
                 },
                 {
@@ -3056,6 +2962,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2
                 },
                 {
@@ -3075,6 +2982,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 3
                 },
                 {
@@ -3094,6 +3002,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 4
                 },
                 {
@@ -3113,6 +3022,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 5
                 },
                 {
@@ -3132,6 +3042,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 6
                 },
                 {
@@ -3151,6 +3062,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 7
                 },
                 {
@@ -3170,6 +3082,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 8
                 },
                 {
@@ -3189,6 +3102,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 101,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3208,6 +3122,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 102,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

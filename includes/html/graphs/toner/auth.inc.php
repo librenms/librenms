@@ -8,7 +8,7 @@ if (is_numeric($vars['id'])) {
         $rrd_filename = Rrd::name($device['hostname'], ['toner', $toner['supply_type'], $toner['supply_index']]);
 
         $title = generate_device_link($device);
-        $title .= ' :: Toner :: ' . htmlentities($toner['supply_descr']);
+        $title .= ' :: Toner :: ' . htmlentities((string) $toner['supply_descr']);
         $auth = true;
     }
 }

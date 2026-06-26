@@ -1,7 +1,5 @@
 <?php
 
-$class = 'fanspeed';
-$unit = '';
-$unit_long = 'RPM';
+$class = \LibreNMS\Enum\Sensor::Fanspeed;
 
 require 'includes/html/graphs/device/sensor.inc.php';

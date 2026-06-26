@@ -48,7 +48,7 @@ abstract class PageHook implements \LibreNMS\Interfaces\Plugins\Hooks\SinglePage
     {
         return array_merge([
             'content_view' => Str::start($this->view, "$pluginName::"),
-        ], $app->call([$this, 'data'], [
+        ], $app->call($this->data(...), [
             'settings' => $settings,
         ]));
     }

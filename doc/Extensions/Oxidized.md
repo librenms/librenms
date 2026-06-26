@@ -225,7 +225,7 @@ for any configured and enabled "routeros" device.
 Verify the return of groups by querying the API:
 
 ```
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/oxidized
 ```
 
 If you need to, you can specify credentials for groups by using the
@@ -237,6 +237,25 @@ groups:
     username: <user>
     password: <password>
 ```
+## Have Oxidized add to LibreNMS Eventlog
+
+Oxidized can be configured to add to LibreNMS's eventlog for devices. This gives better visibility when it is having issues checking for config changes, or when it observes the configuration has changed. This uses [Oxidized's Hooks](https://github.com/ytti/oxidized/blob/master/docs/Hooks.md#hook-type-exec).
+
+Example:
+```
+hooks:
+  libre_log_fail:
+    type: exec
+    events: [node_fail]
+    async: true
+    cmd: 'curl -k -s -X POST -d "{\"text\": \"Check for config change failed. Reason: ${OX_ERR_REASON//\"}. Group: ${OX_NODE_GROUP} Timetaken: ${OX_JOB_TIME}\",\"severity\":\"3\",\"type\":\"oxidized\"}" -H "X-Auth-Token: YOURAPITOKENHERE" https://foo.example/api/v0/devices/${OX_NODE_NAME}/eventlog'
+  libre_log_change:
+    type: exec
+    events: [post_store]
+    async: true
+    cmd: 'curl -k -s -X POST -d "{\"text\": \"Config change observed on check. Commit Ref: ${OX_REPO_COMMITREF} Group: ${OX_NODE_GROUP} Timetaken: ${OX_JOB_TIME}\",\"severity\":\"2\",\"type\":\"oxidized\"}" -H "X-Auth-Token: YOURAPITOKENHERE" https://foo.example/api/v0/devices/${OX_NODE_NAME}/eventlog'
+```
+Note: Ensure /bin/sh uses bash or substitutions may fail. [Ruby only executes commands with the shell defined as /bin/sh.](https://ruby-doc.org/core-2.6.5/Process.html#method-c-exec)
 
 ## Miscellaneous
 
@@ -287,16 +306,6 @@ configuration
 ```bash
 next_adds_job: true
 ```
-
-## Validate Oxidized config
-
-You can perform basic validation of the Oxidized configuration by
-going to the Overview -> Tools -> Oxidized link and in the Oxidized
-config validation page, paste your yaml file into the input box and
-click 'Validate YAML'.
-
-We check for yaml syntax errors and also actual config values to
-ensure they are used in the correct location.
 
 ## Accessing configuration of a disabled/removed device
 
