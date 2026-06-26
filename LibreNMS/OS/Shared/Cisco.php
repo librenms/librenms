@@ -153,18 +153,21 @@ class Cisco extends OS implements
             }
         }
 
+        $containedIn1000 = isset($data[1000]['entPhysicalContainedIn']) ? $data[1000]['entPhysicalContainedIn'] : null;
+        $containedIn1001 = isset($data[1001]['entPhysicalContainedIn']) ? $data[1001]['entPhysicalContainedIn'] : null;
+
         if ((empty($hardware) || preg_match('/Switch System/', (string) $hardware) || preg_match('/MIDPLANE/', (string) $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
             $hardware = $data[1000]['entPhysicalModelName'];
         } elseif ((empty($hardware) || preg_match('/Virtual Stack/', (string) $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
             $hardware = $data[1000]['entPhysicalModelName'];
         } elseif ((empty($hardware) || preg_match('/Virtual Stack/', (string) $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
             $hardware = $data[1000]['entPhysicalModelName'];
-        } elseif (empty($hardware) && ! empty($data[1000]['entPhysicalContainedIn'])) {
-            $hardware = $data[$data[1000]['entPhysicalContainedIn']]['entPhysicalName'];
+        } elseif (empty($hardware) && $containedIn1000 !== null) {
+            $hardware = isset($data[$containedIn1000]['entPhysicalName']) ? $data[$containedIn1000]['entPhysicalName'] : null;
         } elseif ((preg_match('/stack/i', $hardware ?? '') || empty($hardware)) && ! empty($data[1001]['entPhysicalModelName'])) {
             $hardware = $data[1001]['entPhysicalModelName'];
-        } elseif (empty($hardware) && ! empty($data[1001]['entPhysicalContainedIn'])) {
-            $hardware = $data[$data[1001]['entPhysicalContainedIn']]['entPhysicalName'];
+        } elseif (empty($hardware) && $containedIn1001 !== null) {
+            $hardware = isset($data[$containedIn1001]['entPhysicalName']) ? $data[$containedIn1001]['entPhysicalName'] : null;
         }
 
         $device->hardware = $hardware;
