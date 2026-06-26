@@ -27,7 +27,7 @@ class MaintenanceRefreshSslCertificates extends LnmsCommand
         $id = $this->option('id');
 
         $query = SslCertificate::query()->where('disabled', 0);
-        if ($id !== null && is_numeric($id)) {
+        if (is_numeric($id)) {
             $query->where('id', $id);
         }
         $certificates = $query->get();
@@ -47,7 +47,6 @@ class MaintenanceRefreshSslCertificates extends LnmsCommand
         $refreshed = 0;
         $failed = 0;
 
-        /** @var \App\Models\SslCertificate $cert */
         foreach ($certificates as $cert) {
             try {
                 $cert->updateFromHost($timeout);

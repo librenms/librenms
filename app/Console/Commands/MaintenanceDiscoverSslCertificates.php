@@ -56,15 +56,11 @@ class MaintenanceDiscoverSslCertificates extends LnmsCommand
                 continue;
             }
 
-            $existing = SslCertificate::where('device_id', $device->device_id)
-                ->where('host', $host)
-                ->where('port', $port)
-                ->first();
-
-            $cert = $existing ?? new SslCertificate([
+            $cert = SslCertificate::firstOrNew([
                 'device_id' => $device->device_id,
                 'host' => $host,
                 'port' => $port,
+            ], [
                 'disabled' => false,
             ]);
 
@@ -78,12 +74,12 @@ class MaintenanceDiscoverSslCertificates extends LnmsCommand
                 continue;
             }
 
-            if ($existing) {
+            if ($cert->exists) {
                 $changes = $cert->getTrackedChanges();
                 $cert->save();
                 if ($changes !== '') {
                     $updated++;
-                    Eventlog::log("SSL certificate updated: {$host}:{$port} – {$changes}", $device->device_id, 'ssl-certificate', Severity::Info, $existing->id);
+                    Eventlog::log("SSL certificate updated: {$host}:{$port} – {$changes}", $device->device_id, 'ssl-certificate', Severity::Info, $cert->id);
                 }
             } else {
                 $cert->save();
