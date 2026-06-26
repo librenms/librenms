@@ -667,8 +667,11 @@ class Url
             parse_str($parsed_url['query'] ?? '', $parsed_get_vars);
         }
 
-        // don't parse the subdirectory, if there is one in the path
-        $base_path = parse_url((string) config('app.url'), PHP_URL_PATH) ?: '';
+        // Strip subdirectory prefix before parsing path segments.
+        // APP_URL is preferred; fall back to SCRIPT_NAME via getBasePath() so
+        // subdirectory installs work without APP_URL when the web server sets
+        // SCRIPT_NAME correctly (nginx: fastcgi_params, Apache: RewriteBase).
+        $base_path = parse_url((string) config('app.url'), PHP_URL_PATH) ?: request()->getBasePath();
         if (strlen($base_path) > 1) {
             $segments = explode('/', trim(str_replace($base_path, '', $path), '/'));
         } else {
