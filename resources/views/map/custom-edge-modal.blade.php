@@ -69,6 +69,23 @@
                                 </div>
                             </div>
                             <div class="form-group row">
+                                <label for="edgearrowtype" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.arrow_type') }}</label>
+                                <div class="col-sm-9">
+                                    <select id="edgearrowtype" class="form-control input-sm">
+                                        <option value="arrow">{{ __('map.custom.edit.edge.arrow_options.arrow') }}</option>
+                                        <option value="bar">{{ __('map.custom.edit.edge.arrow_options.bar') }}</option>
+                                        <option value="circle">{{ __('map.custom.edit.edge.arrow_options.circle') }}</option>
+                                        <option value="none">{{ __('map.custom.edit.edge.arrow_options.none') }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="edgearrowscale" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.arrow_scale') }}</label>
+                                <div class="col-sm-9">
+                                    <input type=number id="edgearrowscale" class="form-control input-sm" value="0.6" step="0.1" min="0.1" max="10" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
                                 <label for="edgetextshow" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.show_usage_percent') }}</label>
                                 <div class="col-sm-9">
                                     <input class="form-check-input" type="checkbox" role="switch" id="edgetextshow">
@@ -132,6 +149,14 @@
                                     <input type=checkbox class="form-check-input" value="recenter" id="edgerecenter">
                                 </div>
                             </div>
+                            <div class="form-group row existing-edge" id="edgeWaypointRow">
+                                <label class="col-sm-3 control-label">{{ __('map.custom.edit.edge.add_waypoint') }}</label>
+                                <div class="col-sm-9">
+                                    <button type=button class="btn btn-default" data-dismiss="modal" onclick="addWaypointToEdge(current_edge_id, 'from');">{{ __('map.custom.edit.edge.from') }}</button>
+                                    <button type=button class="btn btn-default" data-dismiss="modal" onclick="addWaypointToEdge(current_edge_id, 'to');">{{ __('map.custom.edit.edge.to') }}</button>
+                                    <span class="help-block">{{ __('map.custom.edit.edge.remove_waypoint') }}</span>
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-sm-12" id="saveedge-alert">
                                 </div>
@@ -154,6 +179,7 @@
 <script>
     var port_search_device_id_1 = 0;
     var port_search_device_id_2 = 0;
+    var current_edge_id = null;
 
     function edgeCheckColourReset(itemColour, defaultColour, resetControlId) {
         if(!itemColour || itemColour.toLowerCase() == defaultColour.toLowerCase()) {
@@ -204,6 +230,7 @@
         $("#edge-saveButton").off("click");
         edgedata.edge1.smooth.type = $("#edgestyle").val();
         edgedata.edge2.smooth.type = $("#edgestyle").val();
+        edgedata.edge1.arrows = edgedata.edge2.arrows = buildArrows(Boolean(reverse_arrows), $("#edgearrowtype").val(), $("#edgearrowscale").val());
         edgedata.edge1.from = $("#edgefrom").val();
         edgedata.edge2.from = $("#edgeto").val();
         edgedata.edge1.font.face = edgedata.edge2.font.face = $("#edgetextface").val();
@@ -273,6 +300,9 @@
         $("#edgeModalLabel").text('{{ __('map.custom.edit.edge.defaults_title') }}');
 
         $("#edgestyle").val(newedgeconf.smooth.type);
+        var def_arrow = arrowProps(newedgeconf.arrows);
+        $("#edgearrowtype").val(def_arrow.type);
+        $("#edgearrowscale").val(def_arrow.scale);
         $("#edgefixedwidth").val(newedgeconf.width);
         $("#edgetextface").val(newedgeconf.font.face);
         $("#edgetextsize").val(newedgeconf.font.size);
@@ -292,6 +322,15 @@
         // Hide and show buttons based on class
         $(".existing-edge").show();
         $(".new-edge").hide();
+
+        // Track which edge is open so the waypoint buttons know what to act on
+        current_edge_id = edgedata.id;
+        // Waypoints can only be added once the edge exists in the network (after its first save)
+        if (edgedata.add) {
+            $("#edgeWaypointRow").hide();
+        } else {
+            $("#edgeWaypointRow").show();
+        }
 
         if(edgedata.add) {
             $("#edgeModalLabel").text('{{ __('map.custom.edit.edge.add') }}');
@@ -325,6 +364,9 @@
         edgeCheckColourReset(edgedata.edge1.font.color, newedgeconf.font.color, "edgecolourtextreset");
 
         $("#edgestyle").val(edgedata.edge1.smooth.type);
+        var edit_arrow = arrowProps(edgedata.edge1.arrows);
+        $("#edgearrowtype").val(edit_arrow.type);
+        $("#edgearrowscale").val(edit_arrow.scale);
         $("#edgetextface").val(edgedata.edge1.font.face);
         $("#edgetextsize").val(edgedata.edge1.font.size);
         $("#edgetextcolour").val(edgedata.edge1.font.color);
@@ -384,6 +426,7 @@
 
     function edgeDefaultsSave() {
         newedgeconf.smooth.type = $("#edgestyle").val();
+        newedgeconf.arrows = buildArrows(Boolean(reverse_arrows), $("#edgearrowtype").val(), $("#edgearrowscale").val());
         newedgeconf.font.face = $("#edgetextface").val();
         newedgeconf.font.size = $("#edgetextsize").val();
         newedgeconf.font.color = $("#edgetextcolour").val();

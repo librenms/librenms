@@ -74,6 +74,9 @@ class CustomMapDataController extends Controller
                 'text_align' => $edge->text_align,
                 'mid_x' => $edge->mid_x,
                 'mid_y' => $edge->mid_y,
+                'waypoints' => $edge->waypoints,
+                'arrow_type' => $edge->arrow_type,
+                'arrow_scale' => $edge->arrow_scale,
             ];
             if ($edge->port) {
                 $edges[$edgeid]['device_id'] = $edge->port->device_id;
@@ -206,6 +209,13 @@ class CustomMapDataController extends Controller
             'legend_hide_invalid' => 'boolean',
             'legend_hide_overspeed' => 'boolean',
             'legend_colours' => 'nullable|array',
+            'edges.*.waypoints' => 'nullable|array',
+            'edges.*.waypoints.from' => 'nullable|array|max:25',
+            'edges.*.waypoints.to' => 'nullable|array|max:25',
+            'edges.*.waypoints.*.*' => 'array|size:2',
+            'edges.*.waypoints.*.*.*' => 'integer',
+            'edges.*.arrow_type' => 'nullable|in:none,arrow,bar,circle',
+            'edges.*.arrow_scale' => 'nullable|numeric|between:0.1,10',
         ]);
 
         $map->load(['nodes', 'edges']);
@@ -291,6 +301,9 @@ class CustomMapDataController extends Controller
                 $dbedge->text_align = $edge['text_align'];
                 $dbedge->mid_x = intval($edge['mid_x']);
                 $dbedge->mid_y = intval($edge['mid_y']);
+                $dbedge->waypoints = $this->normaliseWaypoints($edge['waypoints'] ?? null);
+                $dbedge->arrow_type = $edge['arrow_type'] ?? 'arrow';
+                $dbedge->arrow_scale = $edge['arrow_scale'] ?? 0.6;
 
                 $dbedge->save();
                 $edgesProcessed[$dbedge->custom_map_edge_id] = true;
@@ -308,6 +321,35 @@ class CustomMapDataController extends Controller
         });
 
         return response()->json(['id' => $map->custom_map_id]);
+    }
+
+    /**
+     * Normalise the waypoints for an edge into integer [x, y] pairs keyed by half (from/to).
+     * Returns null when there are no waypoints so the column stays empty for simple edges.
+     *
+     * @param  mixed  $waypoints
+     * @return array{from: array<int, array{0: int, 1: int}>, to: array<int, array{0: int, 1: int}>}|null
+     */
+    private function normaliseWaypoints($waypoints): ?array
+    {
+        if (! is_array($waypoints)) {
+            return null;
+        }
+
+        $result = [];
+        foreach (['from', 'to'] as $half) {
+            if (empty($waypoints[$half]) || ! is_array($waypoints[$half])) {
+                continue;
+            }
+
+            foreach ($waypoints[$half] as $point) {
+                if (is_array($point) && array_key_exists(0, $point) && array_key_exists(1, $point)) {
+                    $result[$half][] = [intval($point[0]), intval($point[1])];
+                }
+            }
+        }
+
+        return empty($result) ? null : $result;
     }
 
     private function rateString(int $rate): string

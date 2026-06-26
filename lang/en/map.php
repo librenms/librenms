@@ -177,6 +177,14 @@ return [
                     'curvedCCW' => 'Curved Counter Clockwise',
                     'cubicBezier' => 'Cubic Bezier',
                 ],
+                'arrow_type' => 'Arrow Style',
+                'arrow_options' => [
+                    'arrow' => 'Arrow',
+                    'bar' => 'Bar',
+                    'circle' => 'Circle',
+                    'none' => 'None',
+                ],
+                'arrow_scale' => 'Arrow Size',
                 'show_usage_percent' => 'Show percent usage',
                 'show_usage_bps' => 'Show bps usage',
                 'text_align' => 'Text Alignment',
@@ -188,6 +196,8 @@ return [
                 ],
                 'label' => 'Label',
                 'recenter' => 'Recenter Line',
+                'add_waypoint' => 'Add Waypoint',
+                'remove_waypoint' => 'Remove Waypoint',
             ],
             'validate' => [
                 'width_format' => 'Width must be a number followed by px or %',

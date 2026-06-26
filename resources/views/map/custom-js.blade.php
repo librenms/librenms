@@ -151,12 +151,21 @@
             return node_cfg;
         },
 
-        getEdgeCfg: function (edgeid, edge, fromto, reverse_arrows) {
+        // Build the vis.js arrows config for an edge, honouring the per-edge arrow style (ARROWSTYLE)
+        getArrows: function (reverse_arrows, arrow_type, arrow_scale) {
+            var type = arrow_type || 'arrow';
+            var scale = parseFloat(arrow_scale) || 0.6;
+            var head = type === 'none'
+                ? {enabled: false}
+                : {enabled: true, scaleFactor: scale, type: type};
             if (Boolean(reverse_arrows)) {
-                arrows = {from: {enabled: true, scaleFactor: 0.6}, to: {enabled: false}};
-            } else {
-                arrows = {to: {enabled: true, scaleFactor: 0.6}, from: {enabled: false}};
+                return {from: head, to: {enabled: false}};
             }
+            return {to: head, from: {enabled: false}};
+        },
+
+        getEdgeCfg: function (edgeid, edge, fromto, reverse_arrows) {
+            arrows = custommap.getArrows(reverse_arrows, edge.arrow_type, edge.arrow_scale);
 
             var edge_cfg = {id: edgeid + "_" + fromto, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, background: "#FFFFFF", align: edge.text_align || "horizontal"}, smooth: {type: edge.style}, arrowStrikethrough: false};
             if (fromto == "from") {
@@ -207,6 +216,37 @@
             var mid_y =  edge.mid_y;
 
             return {id: edgeid + "_mid", shape: "dot", size: 0, x: mid_x, y: mid_y, label: screenshot ? '' : edge.label, font: {face: edge.text_face, size:  edge.text_size, color: edge.text_colour}};
+        },
+
+        // VIA waypoints: build the dot nodes and pass-through segments for one half of an edge.
+        // Reroutes baseEdge.to to the first waypoint and returns {nodes, segments, firstTo}.
+        getEdgeExtras: function (edgeid, edge, baseEdge, fromto) {
+            var hk = fromto[0];
+            var midId = edgeid + "_mid";
+            var wps = (edge.waypoints && edge.waypoints[fromto]) ? edge.waypoints[fromto] : [];
+            if (wps.length === 0) {
+                return {nodes: [], segments: [], firstTo: midId};
+            }
+
+            var nodes = [];
+            var segments = [];
+            for (var i = 0; i < wps.length; i++) {
+                nodes.push({id: edgeid + "_w" + hk + "_" + i, shape: "dot", size: 0, x: wps[i][0], y: wps[i][1]});
+                var fromId = edgeid + "_w" + hk + "_" + i;
+                var toId = (i + 1 < wps.length) ? (edgeid + "_w" + hk + "_" + (i + 1)) : midId;
+                segments.push({
+                    id: edgeid + "_" + fromto + "_seg_" + i,
+                    from: fromId,
+                    to: toId,
+                    arrows: {to: {enabled: false}, from: {enabled: false}},
+                    color: baseEdge.color,
+                    width: baseEdge.width,
+                    smooth: baseEdge.smooth,
+                    title: baseEdge.title,
+                    arrowStrikethrough: false,
+                });
+            }
+            return {nodes: nodes, segments: segments, firstTo: edgeid + "_w" + hk + "_0"};
         },
     }
 </script>

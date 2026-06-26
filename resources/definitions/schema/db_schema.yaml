@@ -559,6 +559,9 @@ custom_map_edges:
     - { Field: text_align, Type: varchar(16), 'Null': false, Extra: '', Default: horizontal }
     - { Field: mid_x, Type: int, 'Null': false, Extra: '' }
     - { Field: mid_y, Type: int, 'Null': false, Extra: '' }
+    - { Field: waypoints, Type: json, 'Null': true, Extra: '' }
+    - { Field: arrow_type, Type: varchar(16), 'Null': false, Extra: '', Default: arrow }
+    - { Field: arrow_scale, Type: 'decimal(3,1)', 'Null': false, Extra: '', Default: '0.6' }
     - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
   Indexes:
