@@ -2,15 +2,10 @@
 
 namespace App\Console\Commands;
 
-use AcmePhp\Ssl\Exception\CertificateParsingException;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use App\Models\SslCertificate;
-use Jalle19\CertificateParser\Parser;
-use Jalle19\CertificateParser\Provider\Exception\ProviderException;
-use Jalle19\CertificateParser\Provider\StreamContext;
-use Jalle19\CertificateParser\Provider\StreamSocketProvider;
 use LibreNMS\Enum\Severity;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -48,10 +43,6 @@ class MaintenanceRefreshSslCertificates extends LnmsCommand
             return 0;
         }
 
-        $parser = new Parser();
-        $context = new StreamContext();
-        $context->setVerifyPeerName(false);
-
         $timeout = 10;
         $refreshed = 0;
         $failed = 0;
@@ -59,23 +50,17 @@ class MaintenanceRefreshSslCertificates extends LnmsCommand
         /** @var \App\Models\SslCertificate $cert */
         foreach ($certificates as $cert) {
             try {
-                $provider = new StreamSocketProvider($cert->host, $cert->port, $timeout, $context);
-                $results = $parser->parse($provider);
-            } catch (ProviderException|CertificateParsingException $e) {
+                $cert->updateFromHost($timeout);
+            } catch (\Throwable $e) {
                 if ($this->getOutput()->isVerbose()) {
-                    $this->line("  {$cert->host}:{$cert->port} – " . $e->getMessage());
+                    $this->line("  $cert->host:$cert->port – " . $e->getMessage());
                 }
                 $failed++;
                 continue;
             }
 
-            $attrData = SslCertificate::attributesFromParserResults($results);
-            $newData = array_merge($attrData, [
-                'last_checked_at' => now(),
-            ]);
-            $oldAttrs = $cert->only(['subject', 'issuer', 'valid_to', 'valid_from', 'fingerprint', 'days_until_expiry']);
-            $changes = SslCertificate::formatAttributeChanges($oldAttrs, $attrData);
-            $cert->update($newData);
+            $changes = $cert->getTrackedChanges();
+            $cert->save();
             if ($changes !== '') {
                 $refreshed++;
                 Eventlog::log("SSL certificate refreshed: {$cert->host}:{$cert->port} – {$changes}", $cert->device_id, 'ssl-certificate', Severity::Info, $cert->id);

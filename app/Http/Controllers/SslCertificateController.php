@@ -52,28 +52,25 @@ class SslCertificateController extends Controller
                 ->withErrors(['device_id' => __('You may only assign certificates to devices you can access.')]);
         }
 
-        $host = $validated['host'];
-        $port = (int) ($validated['port'] ?? 443);
-        $deviceId = (int) $validated['device_id'];
+        $cert = new SslCertificate([
+            'device_id' => $request->integer('device_id'),
+            'host' => $request->string('host'),
+            'port' => $request->integer('port', 443),
+            'disabled' => false,
+        ]);
 
         try {
-            $cert = SslCertificate::fetchAndParse($host, $port);
+            $cert->updateFromHost();
         } catch (\Throwable $e) {
             return redirect()->route('ssl-certificates.create')
                 ->withInput()
                 ->withErrors(['host' => __('Failed to fetch certificate: :error', ['error' => $e->getMessage()])]);
         }
 
-        $cert['device_id'] = $deviceId;
-        $cert['host'] = $host;
-        $cert['port'] = $port;
-        $cert['last_checked_at'] = now();
-        $cert['disabled'] = false;
-
-        SslCertificate::create($cert);
+        $cert->save();
 
         return redirect()->route('ssl-certificates.index')
-            ->with('success', __('SSL certificate added for :host.', ['host' => $host . ':' . $port]));
+            ->with('success', __('SSL certificate added for :host.', ['host' => $validated['host'] . ':' . ((int)($validated['port'] ?? 443))]));
     }
 
     /**
@@ -104,7 +101,7 @@ class SslCertificateController extends Controller
         ]);
 
         if ($request->has('disabled')) {
-            $ssl_certificate->disabled = (bool) $request->input('disabled');
+            $ssl_certificate->disabled = $request->boolean('disabled');
             $ssl_certificate->save();
         }
 
