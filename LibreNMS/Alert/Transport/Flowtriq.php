@@ -31,6 +31,7 @@ use LibreNMS\Util\Http;
 
 class Flowtriq extends Transport
 {
+    /** @param  array<string, mixed>  $alert_data */
     public function deliverAlert(array $alert_data): bool
     {
         $url = $this->config['flowtriq-url'];
