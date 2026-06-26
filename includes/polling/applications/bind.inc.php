@@ -7,9 +7,7 @@ $name = 'bind';
 if (! empty($agent_data['app'][$name])) {
     $bind = $agent_data['app'][$name];
 } else {
-    $mib = 'NET-SNMP-EXTEND-MIB';
-    $oid = 'nsExtendOutputFull.4.98.105.110.100';
-    $bind = SnmpQuery::get($mib . '::' . $oid)->value();
+    $bind = SnmpQuery::get('NET-SNMP-EXTEND-MIB::nsExtendOutputFull.4.98.105.110.100')->value();
 }
 
 $bind_data = explode("\n", $bind);
