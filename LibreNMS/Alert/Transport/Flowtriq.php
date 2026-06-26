@@ -83,6 +83,7 @@ class Flowtriq extends Transport
         throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'] ?? '', $data);
     }
 
+    /** @return array<string, array<int|string, mixed>> */
     public static function configTemplate(): array
     {
         return [
