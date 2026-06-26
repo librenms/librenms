@@ -13,6 +13,38 @@ use Jalle19\CertificateParser\Provider\Exception\ProviderException;
 use Jalle19\CertificateParser\Provider\StreamContext;
 use Jalle19\CertificateParser\Provider\StreamSocketProvider;
 
+/**
+ * @property int|null $id
+ * @property int|null $device_id
+ * @property string $host
+ * @property int $port
+ * @property string|null $issuer
+ * @property string|null $issuer_country
+ * @property string|null $issuer_organization
+ * @property string|null $subject
+ * @property array|null $subject_alternative_names
+ * @property string|null $serial_number
+ * @property string|null $serial_number_hex
+ * @property bool $self_signed
+ * @property string|null $signature_algorithm
+ * @property int|null $certificate_version
+ * @property string|null $key_usage
+ * @property string|null $extended_key_usage
+ * @property string|null $basic_constraints
+ * @property string|null $subject_key_identifier
+ * @property string|null $authority_key_identifier
+ * @property Carbon|null $valid_from
+ * @property Carbon|null $valid_to
+ * @property int|null $days_until_expiry
+ * @property string|null $fingerprint
+ * @property string|null $pem
+ * @property Carbon|null $last_checked_at
+ * @property bool $disabled
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read Device|null $device
+ */
 class SslCertificate extends Model
 {
     use SoftDeletes;
