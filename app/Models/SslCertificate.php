@@ -63,7 +63,7 @@ class SslCertificate extends Model
     }
 
     /**
-     * @param Builder<SslCertificate> $query
+     * @param  Builder<SslCertificate>  $query
      * @return Builder<SslCertificate>
      */
     public function scopeEnabled(Builder $query): Builder
@@ -72,7 +72,7 @@ class SslCertificate extends Model
     }
 
     /**
-     * @param Builder<SslCertificate> $query
+     * @param  Builder<SslCertificate>  $query
      * @return Builder<SslCertificate>
      */
     public function scopeDisabled(Builder $query): Builder
@@ -83,8 +83,8 @@ class SslCertificate extends Model
     /**
      * Scope to certificates the user is allowed to see (linked to device they have access to, or no device).
      *
-     * @param Builder<SslCertificate> $query
-     * @param mixed $user
+     * @param  Builder<SslCertificate>  $query
+     * @param  mixed  $user
      * @return Builder<SslCertificate>
      */
     public function scopeHasAccess(Builder $query, $user): Builder

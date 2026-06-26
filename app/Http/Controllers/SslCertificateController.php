@@ -70,7 +70,7 @@ class SslCertificateController extends Controller
         $cert->save();
 
         return redirect()->route('ssl-certificates.index')
-            ->with('success', __('SSL certificate added for :host.', ['host' => $validated['host'] . ':' . ((int)($validated['port'] ?? 443))]));
+            ->with('success', __('SSL certificate added for :host.', ['host' => $validated['host'] . ':' . ((int) ($validated['port'] ?? 443))]));
     }
 
     /**
