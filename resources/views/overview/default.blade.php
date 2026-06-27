@@ -291,7 +291,7 @@
         }
     });
 
-    $(document).on( "click", ".close-widget", function() {
+    $(document).on( "click", "[data-widget-action='close']", function() {
         var widget_id = $(this).data('widget-id');
         $.ajax({
             type: 'DELETE',
@@ -316,7 +316,7 @@
         });
     });
 
-    $(document).on("click",".edit-widget",function() {
+    $(document).on("click","[data-widget-action='edit']",function() {
         const $widget = $(this).closest('.grid-stack-item');
         if ($widget.data('settings') == 1) {
             $widget.data('settings', '0');
@@ -521,9 +521,9 @@
                         ($dashboard->access == 1 && Auth::id() === $dashboard->user_id) ||
                         ($dashboard->access == 0 || $dashboard->access >= 2)
                     )
-                        '<i class="fa fa-pencil-square-o tw:cursor-pointer tw:me-2 tw:pl-2" data-widget-id="'+data.user_widget_id+'" data-toggle="tooltip" data-placement="top">&nbsp;</i>&nbsp;'+
+                        '<i class="fa fa-pencil-square-o tw:cursor-pointer tw:me-2 tw:pl-2" data-widget-action="edit" data-widget-id="'+data.user_widget_id+'" data-toggle="tooltip" data-placement="top">&nbsp;</i>&nbsp;'+
                 @endif
-              '<i class="fa fa-lg fa-times tw:text-[#a94442] tw:dark:text-[#ee5f5b] tw:cursor-pointer tw:me-2" data-widget-id="'+data.user_widget_id+'" data-toggle="tooltip" data-placement="top">&nbsp;</i>&nbsp;'+
+              '<i class="fa fa-lg fa-times tw:text-[#a94442] tw:dark:text-[#ee5f5b] tw:cursor-pointer tw:me-2" data-widget-action="close" data-widget-id="'+data.user_widget_id+'" data-toggle="tooltip" data-placement="top">&nbsp;</i>&nbsp;'+
               '</span>'+
               '</header>'+
               '<div class="tw:left-1! tw:right-1! tw:p-[0.8em] tw:overflow-y-auto tw:overflow-x-hidden tw:w-full tw:h-[calc(100%-2.6em)] tw:cursor-auto" id="widget_body_'+data.user_widget_id+'">'+data.widget+'</div>'+
