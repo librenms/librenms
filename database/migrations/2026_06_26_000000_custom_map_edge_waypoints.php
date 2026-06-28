@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('custom_map_edges', function (Blueprint $table) {
-            $table->json('waypoints')->nullable()->after('mid_y');
+            $table->longText('waypoints')->nullable()->after('mid_y');
         });
     }
 
