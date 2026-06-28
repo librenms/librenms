@@ -86,7 +86,7 @@ function poll_service($service)
         // Set the DS in the DB if it is blank.
         $DS = [];
 
-        /** @var object $check_ds */
+        /** @var string $check_ds */
         if (isset($check_ds)) {
             foreach (json_decode($check_ds) as $k => $v) {
                 $DS[$k] = ['uom' => $v, 'full_name' => $k];
