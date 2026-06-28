@@ -86,9 +86,8 @@ function poll_service($service)
         // Set the DS in the DB if it is blank.
         $DS = [];
 
-        /** @var string $check_ds */
         if (isset($check_ds)) {
-            foreach (json_decode($check_ds) as $k => $v) {
+            foreach (json_decode($check_ds) as $k => $v) { /** @phpstan-ignore variable.undefined (Branch only reached if $check_ds is set) */
                 $DS[$k] = ['uom' => $v, 'full_name' => $k];
             }
         } else {
