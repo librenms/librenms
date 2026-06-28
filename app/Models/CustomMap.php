@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\Filterable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -34,8 +35,16 @@ use Illuminate\Support\Facades\Gate;
 
 class CustomMap extends BaseModel
 {
+    use Filterable;
     use HasFactory;
+
     protected $primaryKey = 'custom_map_id';
+    protected array $filterable = [
+        'name',
+        'menu_group',
+        'nodes.device_id',
+        'edges.port_id',
+    ];
     protected $fillable = [
         'name',
         'menu_group',
