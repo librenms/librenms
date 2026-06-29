@@ -35,7 +35,7 @@ use LibreNMS\Enum\FpingExitCode;
 use LibreNMS\Exceptions\FpingUnparsableLine;
 use LibreNMS\RRD\RrdDefinition;
 
-class FpingResponse implements PingResultInterface, \Stringable
+class FpingResponse implements \Stringable
 {
     /**
      * @param  int  $transmitted  ICMP packets transmitted
@@ -64,12 +64,49 @@ class FpingResponse implements PingResultInterface, \Stringable
 
     public static function artificialUp(?string $host = null): static
     {
-        return new static(1, 1, 0, 0, 0, 0, 0, FpingExitCode::Success, $host, true);
+        return new static(
+            transmitted: 1,
+            received: 1,
+            loss: 0,
+            min_latency: 0.0,
+            max_latency: 0.0,
+            avg_latency: 0.0,
+            duplicates: 0,
+            exit_code: FpingExitCode::Success,
+            host: $host,
+            skipped: true,
+        );
     }
 
     public static function artificialDown(?string $host = null): static
     {
-        return new static(1, 0, 100, 0, 0, 0, 0, FpingExitCode::Success, $host, false);
+        return new static(
+            transmitted: 1,
+            received: 0,
+            loss: 100,
+            min_latency: 0.0,
+            max_latency: 0.0,
+            avg_latency: 0.0,
+            duplicates: 0,
+            exit_code: FpingExitCode::Success,
+            host: $host,
+            skipped: false,
+        );
+    }
+
+    public static function createError(FpingExitCode $exitCode, ?string $host = null): static
+    {
+        return new static(
+            transmitted: 0,
+            received: 0,
+            loss: 0,
+            min_latency: 0.0,
+            max_latency: 0.0,
+            avg_latency: 0.0,
+            duplicates: 0,
+            exit_code: $exitCode,
+            host: $host,
+        );
     }
 
     public function wasSkipped(): bool
@@ -77,33 +114,70 @@ class FpingResponse implements PingResultInterface, \Stringable
         return $this->skipped;
     }
 
-    public static function parseLine(string $output, ?int $code = null): FpingResponse
+    public static function parseAliveLine(string $output): FpingResponse
+    {
+        // Try parsing as simple "alive / unreachable" first
+        if (preg_match('/^(\S+) is (alive|unreachable)$/', $output, $parsed)) {
+            $host = $parsed[1];
+            $isAlive = $parsed[2] === 'alive';
+
+            return new static(
+                transmitted: 1,
+                received: $isAlive ? 1 : 0,
+                loss: $isAlive ? 0 : 100,
+                min_latency: 0.0,
+                max_latency: 0.0,
+                avg_latency: 0.0,
+                duplicates: 0,
+                exit_code: $isAlive ? FpingExitCode::Success : FpingExitCode::Unreachable,
+                host: $host,
+            );
+        }
+
+        // Try parsing name resolution error lines
+        if (preg_match('/^(\S+): (Name or service not known|Temporary failure in name resolution)$/', $output, $parsed)) {
+            $host = $parsed[1];
+            $error = $parsed[2];
+
+            $exitCode = $error === 'Name or service not known' ? FpingExitCode::InvalidHost : FpingExitCode::SysCallFail;
+
+            return static::createError($exitCode, $host);
+        }
+
+        throw new FpingUnparsableLine($output);
+    }
+
+    public static function parseMetricLine(string $output, ?int $code = null): FpingResponse
     {
         $matched = preg_match('#(\S+)\s*: (xmt/rcv/%loss = (\d+)/(\d+)/(?:(100)%|(\d+)%, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+))|Name or service not known|Temporary failure in name resolution)$#', $output, $parsed);
 
-        if ($code == 0 && ! $matched) {
+        if (! $matched) {
             throw new FpingUnparsableLine($output);
         }
 
         [, $host, $error, $xmt, $rcv, $loss100, $loss, $min, $avg, $max] = array_pad($parsed, 10, null);
         $loss = $loss100 ?: $loss;
 
-        if ($error == 'Name or service not known') {
-            return new FpingResponse(0, 0, 0, 0, 0, 0, 0, FpingExitCode::InvalidHost, (string) $host);
-        } elseif ($error == 'Temporary failure in name resolution') {
-            return new FpingResponse(0, 0, 0, 0, 0, 0, 0, FpingExitCode::SysCallFail, (string) $host);
+        if ($error === 'Name or service not known') {
+            return static::createError(FpingExitCode::InvalidHost, (string) $host);
         }
 
+        if ($error === 'Temporary failure in name resolution') {
+            return static::createError(FpingExitCode::SysCallFail, (string) $host);
+        }
+
+        $parsedExitCode = $code !== null ? (FpingExitCode::tryFrom($code) ?? FpingExitCode::SysCallFail) : ($loss100 ? FpingExitCode::Unreachable : FpingExitCode::Success);
+
         return new static(
-            (int) $xmt,
-            (int) $rcv,
-            (int) $loss,
-            (float) $min,
-            (float) $max,
-            (float) $avg,
-            substr_count($output, 'duplicate'),
-            $code !== null ? FpingExitCode::from($code) : ($loss100 ? FpingExitCode::Unreachable : FpingExitCode::Success),
-            (string) $host,
+            transmitted: (int) $xmt,
+            received: (int) $rcv,
+            loss: (int) $loss,
+            min_latency: (float) $min,
+            max_latency: (float) $max,
+            avg_latency: (float) $avg,
+            duplicates: substr_count($output, 'duplicate'),
+            exit_code: $parsedExitCode,
+            host: (string) $host,
         );
     }
 

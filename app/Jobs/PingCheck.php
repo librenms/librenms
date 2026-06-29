@@ -38,8 +38,8 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Data\Source\Icmp\FpingAliveResponse;
-use LibreNMS\Data\Source\Icmp\FpingAvailabilityService;
+use LibreNMS\Data\Source\Icmp\Fping;
+use LibreNMS\Data\Source\Icmp\FpingResponse;
 use LibreNMS\Enum\AvailabilitySource;
 
 class PingCheck implements ShouldQueue
@@ -82,8 +82,8 @@ class PingCheck implements ShouldQueue
 
         Log::info('Processing hosts in this order : ' . implode(', ', $ordered_hostname_list));
 
-        // bulk ping and send FpingAliveResponse to recordData as they come in
-        app()->make(FpingAvailabilityService::class)->bulkPing($ordered_hostname_list, function (FpingAliveResponse $response): void {
+        // bulk ping and send FpingResponse to recordData as they come in
+        app()->make(Fping::class)->bulkPing($ordered_hostname_list, function (FpingResponse $response): void {
             $this->handleResponse($response);
         });
 
@@ -165,7 +165,7 @@ class PingCheck implements ShouldQueue
     /**
      * Record the data and run alerts if all parents have been processed
      */
-    public function handleResponse(FpingAliveResponse $response): void
+    public function handleResponse(FpingResponse $response): void
     {
         Log::debug("Received response for $response->host");
 

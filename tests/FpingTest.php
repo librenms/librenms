@@ -27,8 +27,7 @@
 namespace LibreNMS\Tests;
 
 use App\Facades\LibrenmsConfig;
-use LibreNMS\Data\Source\Icmp\FpingAvailabilityService;
-use LibreNMS\Data\Source\Icmp\FpingMetricService;
+use LibreNMS\Data\Source\Icmp\Fping;
 use Symfony\Component\Process\Process;
 
 final class FpingTest extends TestCase
@@ -38,7 +37,7 @@ final class FpingTest extends TestCase
         $output = "192.168.1.3 : xmt/rcv/%loss = 3/3/0%, min/avg/max = 0.62/0.71/0.93\n";
         $this->mockFpingProcess($output, 0);
 
-        $actual = app()->make(FpingMetricService::class)->ping('192.168.1.3');
+        $actual = app()->make(Fping::class)->ping('192.168.1.3');
 
         $this->assertTrue($actual->isAlive());
         $this->assertEquals('192.168.1.3', $actual->host);
@@ -57,7 +56,7 @@ final class FpingTest extends TestCase
         $output = "192.168.1.7 : xmt/rcv/%loss = 5/3/40%, min/avg/max = 0.13/0.23/0.32\n";
         $this->mockFpingProcess($output, 0);
 
-        $actual = app()->make(FpingMetricService::class)->ping('192.168.1.7');
+        $actual = app()->make(Fping::class)->ping('192.168.1.7');
 
         $this->assertTrue($actual->isAlive());
         $this->assertEquals('192.168.1.7', $actual->host);
@@ -76,7 +75,7 @@ final class FpingTest extends TestCase
         $output = "192.168.53.1 : xmt/rcv/%loss = 3/0/100%\n";
         $this->mockFpingProcess($output, 1);
 
-        $actual = app()->make(FpingMetricService::class)->ping('192.168.53.1');
+        $actual = app()->make(Fping::class)->ping('192.168.53.1');
 
         $this->assertFalse($actual->isAlive());
         $this->assertEquals('192.168.53.1', $actual->host);
@@ -100,7 +99,7 @@ OUT;
 
         $this->mockFpingProcess($output, 1);
 
-        $actual = app()->make(FpingMetricService::class)->ping('192.168.1.2');
+        $actual = app()->make(Fping::class)->ping('192.168.1.2');
 
         $this->assertFalse($actual->isAlive());
         $this->assertEquals('192.168.1.2', $actual->host);
@@ -153,7 +152,7 @@ OUT;
 
         // make call
         $calls = 0;
-        app()->make(FpingAvailabilityService::class)->bulkPing($hosts, function ($response) use ($expected, &$calls): void {
+        app()->make(Fping::class)->bulkPing($hosts, function ($response) use ($expected, &$calls): void {
             $calls++;
 
             $this->assertArrayHasKey($response->host, $expected);
@@ -163,5 +162,25 @@ OUT;
         });
 
         $this->assertEquals(count($expected), $calls);
+    }
+
+    public function testMtuSuccess(): void
+    {
+        $process = $this->mockFpingProcess('', 0);
+        $process->shouldReceive('disableOutput')->once();
+        $process->shouldReceive('isSuccessful')->once()->andReturn(true);
+
+        $result = app()->make(Fping::class)->testMtu('192.168.1.3', 1500);
+        $this->assertTrue($result);
+    }
+
+    public function testMtuFailure(): void
+    {
+        $process = $this->mockFpingProcess('', 1);
+        $process->shouldReceive('disableOutput')->once();
+        $process->shouldReceive('isSuccessful')->once()->andReturn(false);
+
+        $result = app()->make(Fping::class)->testMtu('192.168.1.3', 1500);
+        $this->assertFalse($result);
     }
 }
