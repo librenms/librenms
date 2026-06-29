@@ -4,6 +4,7 @@ namespace App\Models;
 
 use AcmePhp\Ssl\Exception\CertificateParsingException;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -93,22 +94,34 @@ class SslCertificate extends Model
         return $this->belongsTo(Device::class, 'device_id', 'device_id');
     }
 
-    public function scopeEnabled($query)
+    /**
+     * @param  Builder<SslCertificate>  $query
+     * @return Builder<SslCertificate>
+     */
+    public function scopeEnabled(Builder $query): Builder
     {
         return $query->where('disabled', false);
     }
 
-    public function scopeDisabled($query)
+    /**
+     * @param  Builder<SslCertificate>  $query
+     * @return Builder<SslCertificate>
+     */
+    public function scopeDisabled(Builder $query): Builder
     {
         return $query->where('disabled', true);
     }
 
     /**
      * Scope to certificates the user is allowed to see (linked to device they have access to, or no device).
+     *
+     * @param  Builder<SslCertificate>  $query
+     * @param  mixed  $user
+     * @return Builder<SslCertificate>
      */
-    public function scopeHasAccess($query, $user)
+    public function scopeHasAccess(Builder $query, $user): Builder
     {
-        return $query->where(function ($q) use ($user): void {
+        return $query->where(function (Builder $q) use ($user): void {
             $q->whereNull('device_id')
                 ->orWhereIn('device_id', Device::hasAccess($user)->select('device_id'));
         });
@@ -129,83 +142,25 @@ class SslCertificate extends Model
     }
 
     /**
-     * Build attribute array from parser results (ParsedCertificate + raw openssl_x509_parse).
-     *
-     * @param  \Jalle19\CertificateParser\ParserResults  $results
-     * @return array<string, mixed>
+     * Get a formatted string of changes for tracked attributes.
      */
-    public static function attributesFromParserResults($results): array
+    public function getTrackedChanges(): string
     {
-        $cert = $results->getParsedCertificate();
-        $raw = $results->getRawCertificate();
-        $validFrom = method_exists($cert, 'getValidFrom') ? $cert->getValidFrom() : null;
-        $validTo = $cert->getValidTo();
-
-        $issuerCountry = $raw['issuer']['C'] ?? null;
-        $issuerOrg = $raw['issuer']['O'] ?? null;
-
-        $serialNumber = method_exists($cert, 'getSerialNumber') ? $cert->getSerialNumber() : ($raw['serialNumber'] ?? null);
-        $serialNumberHex = $raw['serialNumberHex'] ?? null;
-        $selfSigned = method_exists($cert, 'isSelfSigned') ? $cert->isSelfSigned() : (method_exists($cert, 'getSelfSigned') ? $cert->getSelfSigned() : false);
-
-        $signatureAlgorithm = $raw['signatureTypeSN'] ?? $raw['signatureTypeLN'] ?? null;
-        $version = isset($raw['version']) ? (int) $raw['version'] + 1 : null; // OpenSSL: 2 = X.509 v3
-
-        $extensions = $raw['extensions'] ?? [];
-        $keyUsage = $extensions['keyUsage'] ?? null;
-        $extendedKeyUsage = $extensions['extendedKeyUsage'] ?? null;
-        $basicConstraints = $extensions['basicConstraints'] ?? null;
-        $subjectKeyId = $extensions['subjectKeyIdentifier'] ?? null;
-        $authorityKeyId = $extensions['authorityKeyIdentifier'] ?? null;
-
-        $daysUntilExpiry = null;
-        if ($validTo !== null) {
-            $daysUntilExpiry = (int) round(\Carbon\Carbon::instance($validTo)->diffInSeconds(now(), false) / -86400);
-        }
-
-        return [
-            'issuer' => $cert->getIssuer(),
-            'issuer_country' => $issuerCountry,
-            'issuer_organization' => $issuerOrg,
-            'subject' => $cert->getSubject(),
-            'subject_alternative_names' => $cert->getSubjectAlternativeNames(),
-            'serial_number' => $serialNumber,
-            'serial_number_hex' => $serialNumberHex,
-            'self_signed' => $selfSigned,
-            'signature_algorithm' => $signatureAlgorithm,
-            'certificate_version' => $version,
-            'key_usage' => $keyUsage,
-            'extended_key_usage' => $extendedKeyUsage,
-            'basic_constraints' => $basicConstraints,
-            'subject_key_identifier' => $subjectKeyId,
-            'authority_key_identifier' => $authorityKeyId,
-            'valid_from' => $validFrom !== null ? $validFrom->format('Y-m-d H:i:s') : null,
-            'valid_to' => $validTo !== null ? $validTo->format('Y-m-d H:i:s') : null,
-            'days_until_expiry' => $daysUntilExpiry,
-            'fingerprint' => $results->getFingerprint(),
-            'pem' => $results->getPemString(),
-        ];
-    }
-
-    /**
-     * Build a string describing which certificate attribute fields changed (old -> new).
-     * Used for eventlog messages when discovering or refreshing certificates.
-     *
-     * @param  array<string, mixed>  $old  previous attribute values (e.g. from model only())
-     * @param  array<string, mixed>  $new  new attribute values
-     * @return string comma-separated "field (old → new)" for each changed field
-     */
-    public static function formatAttributeChanges(array $old, array $new): string
-    {
+        $dirty = $this->getDirty();
         $parts = [];
         $fields = ['subject', 'issuer', 'valid_to', 'valid_from', 'fingerprint', 'days_until_expiry'];
+
         foreach ($fields as $field) {
-            $o = $old[$field] ?? null;
-            $n = $new[$field] ?? null;
-            if ($o !== $n && (string) $o !== (string) $n) {
+            if (array_key_exists($field, $dirty)) {
+                $o = $this->getOriginal($field);
+                $n = $this->getAttribute($field);
+
                 $oStr = $o instanceof \DateTimeInterface ? $o->format('Y-m-d H:i:s') : (string) $o;
                 $nStr = $n instanceof \DateTimeInterface ? $n->format('Y-m-d H:i:s') : (string) $n;
-                $parts[] = "{$field} ({$oStr} → {$nStr})";
+
+                if ($oStr !== $nStr) {
+                    $parts[] = "{$field} ({$oStr} → {$nStr})";
+                }
             }
         }
 
@@ -213,23 +168,52 @@ class SslCertificate extends Model
     }
 
     /**
-     * Fetch certificate from host:port and return array of attributes for create/update.
+     * Fetch certificate details from the host and port and update this model's attributes.
      *
-     * @throws ProviderException|CertificateParsingException
+     * @throws \Exception
      */
-    public static function fetchAndParse(string $host, int $port = 443, int $timeout = 10): array
+    public function updateFromHost(int $timeout = 10): void
     {
         $context = new StreamContext;
         $context->setVerifyPeerName(false);
-        $provider = new StreamSocketProvider($host, $port, $timeout, $context);
+        $provider = new StreamSocketProvider($this->host, $this->port, $timeout, $context);
         $parser = new Parser;
 
         try {
             $results = $parser->parse($provider);
         } catch (ProviderException|CertificateParsingException $e) {
-            throw new \Exception("Failed to fetch certificate from {$host}:{$port}: {$e->getMessage()}");
+            throw new \Exception("Failed to fetch certificate from $this->host:$this->port: {$e->getMessage()}");
         }
 
-        return self::attributesFromParserResults($results);
+        $cert = $results->getParsedCertificate();
+        $raw = $results->getRawCertificate();
+        $validFrom = method_exists($cert, 'getValidFrom') ? $cert->getValidFrom() : null;
+        $validTo = $cert->getValidTo();
+
+        $this->issuer = $cert->getIssuer();
+        $this->issuer_country = $raw['issuer']['C'] ?? null;
+        $this->issuer_organization = $raw['issuer']['O'] ?? null;
+        $this->subject = $cert->getSubject();
+        $this->subject_alternative_names = $cert->getSubjectAlternativeNames();
+        $this->serial_number = method_exists($cert, 'getSerialNumber') ? $cert->getSerialNumber() : ($raw['serialNumber'] ?? null);
+        $this->serial_number_hex = $raw['serialNumberHex'] ?? null;
+        $this->self_signed = method_exists($cert, 'isSelfSigned') ? $cert->isSelfSigned() : (method_exists($cert, 'getSelfSigned') ? $cert->getSelfSigned() : false);
+        $this->signature_algorithm = $raw['signatureTypeSN'] ?? $raw['signatureTypeLN'] ?? null;
+        $this->certificate_version = isset($raw['version']) ? (int) $raw['version'] + 1 : null; // OpenSSL: 2 = X.509 v3
+
+        $extensions = $raw['extensions'] ?? [];
+        $this->key_usage = $extensions['keyUsage'] ?? null;
+        $this->extended_key_usage = $extensions['extendedKeyUsage'] ?? null;
+        $this->basic_constraints = $extensions['basicConstraints'] ?? null;
+        $this->subject_key_identifier = $extensions['subjectKeyIdentifier'] ?? null;
+        $this->authority_key_identifier = $extensions['authorityKeyIdentifier'] ?? null;
+
+        $this->valid_from = $validFrom !== null ? Carbon::instance($validFrom) : null;
+        $this->valid_to = Carbon::instance($validTo);
+        $this->days_until_expiry = (int) round($this->valid_to->diffInSeconds(now()) / -86400);
+
+        $this->fingerprint = $results->getFingerprint();
+        $this->pem = $results->getPemString();
+        $this->last_checked_at = now();
     }
 }
