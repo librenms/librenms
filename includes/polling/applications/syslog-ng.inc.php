@@ -16,7 +16,10 @@ try {
     return;
 }
 
-$metrics = [];
+$metrics = [
+    'center_queued_processed' => $data['center_queued_processed'],
+    'center_received_processed' => $data['center_received_processed'],
+];
 $app_data = [
     'global' => [],
     'sources' => [],
@@ -30,6 +33,7 @@ $center_fields = [
     'queued' => $data['center_queued_processed'],
     'received' => $data['center_received_processed'],
 ];
+
 
 $tags = [
     'name' => $name,
@@ -153,3 +157,6 @@ foreach ($data['sources'] as $source_name => $source) {
         }
     }
 }
+
+$app->data = $app_data;
+update_application($app, 'OK', $metrics);
