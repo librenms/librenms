@@ -51,7 +51,7 @@ Output:
 }
 ```
 
-### `get_port_security_by_hostname`
+### `get_port_vlan_info_by_hostname`
 
 Get all port_vlan info by inputting hostname or device_id
 
