@@ -200,15 +200,10 @@ class GraphsPageController extends Controller
     private function entityTitle(?Device $device, ?Port $port): string
     {
         if ($port !== null) {
-            $title = $device?->display . ' :: Port ' . $port->getLabel();
-            if ($port->ifAlias !== '' && $port->ifAlias !== $port->ifDescr) {
-                $title .= ', ' . $port->ifAlias;
-            }
-
-            return $title;
+            return $device?->display . ' :: Port ' . $port->getFullLabel();
         }
 
-        return $device?->displayName() ?? '';
+        return $device?->display ?? '';
     }
 
     /**
