@@ -773,12 +773,12 @@
     // Remove the waypoint nodes and pass-through segments for an edge (leaves the canonical _from/_to/_mid).
     function removeEdgeWaypointArtifacts(edgeid) {
         network_edges.getIds().forEach(function (id) {
-            if (typeof id === 'string' && (id.indexOf(edgeid + "_from_seg_") === 0 || id.indexOf(edgeid + "_to_seg_") === 0)) {
+            if (typeof id === 'string' && (id.startsWith(edgeid + "_from_seg_") || id.startsWith(edgeid + "_to_seg_"))) {
                 network_edges.remove(id);
             }
         });
         network_nodes.getIds().forEach(function (id) {
-            if (typeof id === 'string' && (id.indexOf(edgeid + "_wf_") === 0 || id.indexOf(edgeid + "_wt_") === 0)) {
+            if (typeof id === 'string' && (id.startsWith(edgeid + "_wf_") || id.startsWith(edgeid + "_wt_"))) {
                 network_nodes.remove(id);
             }
         });

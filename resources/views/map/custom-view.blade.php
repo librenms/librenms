@@ -109,21 +109,13 @@
                     if(nodeid.endsWith('_mid')) {
                         edgeid = nodeid.split("_")[0];
                         if(! (edgeid in data.edges)) {
-                            // remove the edge plus any waypoint nodes/segments
-                            network_edges.getIds().forEach(function (eid) {
-                                if(typeof eid === 'string' && eid.split("_")[0] === edgeid) {
-                                    network_edges.remove(eid);
-                                }
-                            });
-                            network_nodes.getIds().forEach(function (nid) {
-                                if(typeof nid === 'string' && /_w[ft]_\d+$/.test(nid) && nid.split("_")[0] === edgeid) {
-                                    network_nodes.remove(nid);
-                                }
-                            });
                             network_nodes.remove(edgeid + "_mid");
+                            network_edges.remove(edgeid + "_to");
+                            network_edges.remove(edgeid + "_from");
+                            // this edge's waypoint nodes/segments are dropped by the valid_ids pass below
                         }
                     } else if(typeof nodeid === 'string' && /_w[ft]_\d+$/.test(nodeid)) {
-                        // waypoint node - removed together with its edge above
+                        // waypoint node - dropped by the valid_ids pass below
                     } else {
                         if(! (nodeid in data.nodes)) {
                             network_nodes.remove(nodeid);
@@ -143,7 +135,7 @@
                     });
                 });
                 network_edges.getIds().forEach(function (eid) {
-                    if(typeof eid === 'string' && eid.indexOf("_seg_") > 0 && !(eid in valid_ids)) {
+                    if(typeof eid === 'string' && eid.includes("_seg_") && !(eid in valid_ids)) {
                         network_edges.remove(eid);
                     }
                 });
