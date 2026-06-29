@@ -299,6 +299,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::resource('location', LocationController::class)->only('update', 'destroy');
         Route::resource('pollergroup', PollerGroupController::class)->only('destroy', 'show', 'store', 'update');
         // misc ajax controllers
+        Route::get('search', Ajax\GlobalSearchController::class)->name('ajax.search.global');
         Route::get('search/bgp', Ajax\BgpSearchController::class);
         Route::get('search/device', Ajax\DeviceSearchController::class);
         Route::get('search/port', Ajax\PortSearchController::class);

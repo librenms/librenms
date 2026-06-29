@@ -639,13 +639,46 @@
             </ul>
 
 {{-- User --}}
-            <form role="search" class="navbar-form navbar-right global-search">
-                @csrf
+            <div class="navbar-form navbar-right global-search tw:relative" x-data="globalSearch()"
+                 @keydown.escape="close()" @click.outside="close()">
                 <div class="form-group">
-                    <input class="form-control typeahead" type="search" id="gsearch" name="gsearch"
-                           placeholder="{{ __('Global Search') }}" autocomplete="off">
+                    <input class="form-control" type="search" id="gsearch" name="gsearch" autocomplete="off"
+                           placeholder="{{ __('Global Search') }}"
+                           x-model="query" x-ref="input"
+                           @input.debounce.250ms="run()" @focus="open = flat.length > 0"
+                           @keydown.down.prevent="move(1)" @keydown.up.prevent="move(-1)" @keydown.enter.prevent="go()">
                 </div>
-            </form>
+                <div x-show="open" x-cloak
+                     class="tw:absolute tw:right-0 tw:mt-1 tw:w-[50rem] tw:max-w-[90vw] tw:max-h-[70vh] tw:overflow-y-auto tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200 tw:rounded-lg tw:shadow-xl tw:z-50">
+                    <div x-show="loading" class="tw:px-4 tw:py-3 tw:text-gray-500 tw:dark:text-dark-white-400">
+                        <i class="fa fa-spinner fa-spin"></i> {{ __('Searching...') }}
+                    </div>
+                    <div x-show="!loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-gray-500 tw:dark:text-dark-white-400">
+                        {{ __('No results') }}
+                    </div>
+                    <template x-for="group in groups" :key="group.type">
+                        <div>
+                            <div class="tw:px-4 tw:py-1.5 tw:bg-gray-100 tw:dark:bg-dark-gray-200 tw:text-gray-600 tw:dark:text-dark-white-300 tw:text-xs tw:font-bold tw:uppercase" x-text="group.label"></div>
+                            <template x-for="item in group.results" :key="group.type + item.url">
+                                <a :href="item.url" @mouseenter="active = flat.indexOf(item)"
+                                   class="tw:flex tw:items-center tw:gap-2.5 tw:px-4 tw:py-2 tw:no-underline tw:text-gray-800 tw:dark:text-dark-white-100 tw:hover:bg-gray-50 tw:dark:hover:bg-dark-gray-300"
+                                   :class="{ 'tw:bg-gray-100 tw:dark:bg-dark-gray-300': flat[active] === item }">
+                                    <template x-if="item.image">
+                                        <img :src="item.image" class="tw:h-7 tw:w-7 tw:shrink-0 tw:object-contain tw:dark:bg-gray-50 tw:dark:rounded tw:dark:p-0.5">
+                                    </template>
+                                    <template x-if="!item.image">
+                                        <i class="fa fa-fw fa-lg tw:shrink-0 icon-theme" :class="item.icon"></i>
+                                    </template>
+                                    <span class="tw:min-w-0 tw:flex-1">
+                                        <span class="tw:block tw:truncate" x-text="item.name"></span>
+                                        <span class="tw:block tw:truncate tw:text-xs tw:text-gray-500 tw:dark:text-dark-white-400" x-text="item.subtitle"></span>
+                                    </span>
+                                </a>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </div>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">
@@ -747,125 +780,47 @@
 </nav>
 
 <script>
-    var devices = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        remote: {
-            url: ajax_url + "/search/device?search=%QUERY",
-            filter: function (devices) {
-                return $.map(devices, function (device) {
-                    return {
-                        device_id: device.device_id,
-                        device_image: device.device_image,
-                        url: device.url,
-                        name: device.name,
-                        device_os: device.device_os,
-                        version: device.version,
-                        device_hardware: device.device_hardware,
-                        device_ports: device.device_ports,
-                        location: device.location
-                    };
-                });
+    document.addEventListener('alpine:init', () => {
+        window.Alpine.data('globalSearch', () => ({
+            query: '',
+            groups: [],
+            flat: [],
+            open: false,
+            loading: false,
+            active: -1,
+            controller: null,
+            run() {
+                if (this.query.trim() === '') { this.reset(); return; }
+                this.open = true;
+                this.loading = true;
+                if (this.controller) this.controller.abort();
+                this.controller = new AbortController();
+                fetch('{{ url('ajax/search') }}?search=' + encodeURIComponent(this.query.trim()), {
+                    signal: this.controller.signal,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        this.groups = data.groups || [];
+                        this.flat = this.groups.flatMap(g => g.results);
+                        this.active = -1;
+                        this.loading = false;
+                    })
+                    .catch(e => { if (e.name !== 'AbortError') { this.loading = false; } });
             },
-            wildcard: "%QUERY"
-        }
-    });
-    var ports = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        remote: {
-            url: ajax_url + "/search/port/?search=%QUERY",
-            filter: function (ports) {
-                return $.map(ports, function (port) {
-                    return {
-                        url: port.url,
-                        name: port.name,
-                        description: port.description,
-                        colours: port.colours,
-                        hostname: port.hostname
-                    };
-                });
+            move(dir) {
+                if (this.flat.length === 0) { return; }
+                this.open = true;
+                this.active = (this.active + dir + this.flat.length) % this.flat.length;
             },
-            wildcard: "%QUERY"
-        }
-    });
-    var bgp = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        remote: {
-            url: ajax_url + "/search/bgp/?search=%QUERY",
-            filter: function (bgp_sessions) {
-                return $.map(bgp_sessions, function (bgp) {
-                    return {
-                        url: bgp.url,
-                        name: bgp.name,
-                        description: bgp.description,
-                        localas: bgp.localas,
-                        bgp_image: bgp.bgp_image,
-                        remoteas: bgp.remoteas,
-                        colours: bgp.colours,
-                        hostname: bgp.hostname
-                    };
-                });
+            go() {
+                let item = this.flat[this.active] || this.flat[0];
+                if (item) { window.location.href = item.url; }
             },
-            wildcard: "%QUERY"
-        }
+            close() { this.open = false; },
+            reset() { this.groups = []; this.flat = []; this.open = false; this.active = -1; this.loading = false; },
+        }));
     });
-
-    if ($(window).width() < 768) {
-        var cssMenu = 'typeahead-left';
-    } else {
-        var cssMenu = '';
-    }
-
-    devices.initialize();
-    ports.initialize();
-    bgp.initialize();
-    $('#gsearch').typeahead({
-            hint: true,
-            highlight: true,
-            minLength: 1
-        },
-        {
-            source: devices.ttAdapter(),
-            limit: '{{ $typeahead_limit }}',
-            async: true,
-            display: 'name',
-            valueKey: 'name',
-            templates: {
-                header: '<h5><strong>&nbsp;Devices</strong></h5>',
-                suggestion: Handlebars.compile('<p><a href="@{{url}}"><img src="@{{device_image}}" class="tw:h-8 tw:float-left  tw:m-1 tw:dark:bg-gray-50 tw:dark:rounded-lg tw:dark:p-1 tw:mr-2"> <small><strong>@{{name}}</strong> | @{{device_os}} | @{{version}} <br /> @{{device_hardware}} with @{{device_ports}} port(s) | @{{location}}</small></a></p>')
-            }
-        },
-        {
-            source: ports.ttAdapter(),
-            limit: '{{ $typeahead_limit }}',
-            async: true,
-            display: 'name',
-            valueKey: 'name',
-            templates: {
-                header: '<h5><strong>&nbsp;Ports</strong></h5>',
-                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small><i class="fa fa-link fa-sm icon-theme" aria-hidden="true"></i> <strong>@{{name}}</strong> – @{{hostname}}<br /><i>@{{description}}</i></small></a></p>')
-            }
-        },
-        {
-            source: bgp.ttAdapter(),
-            limit: '{{ $typeahead_limit }}',
-            async: true,
-            display: 'name',
-            valueKey: 'name',
-            templates: {
-                header: '<h5><strong>&nbsp;BGP Sessions</strong></h5>',
-                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small><i class="@{{bgp_image}}" aria-hidden="true"></i> @{{name}} - @{{hostname}}<br />AS@{{localas}} -> AS@{{remoteas}}</small></a></p>')
-            }
-        }).on('typeahead:select', function (ev, suggestion) {
-            window.location.href = suggestion.url;
-        }).on('keyup', function (e) {
-            // on enter go to the first selection
-            if (e.which === 13) {
-                $('.tt-selectable').first().trigger( "click" );
-            }
-        });
 
     var hideDashboardEditor = {{ (int) $hide_dashboard_editor }};
     function toggleDashboardEditor() {
