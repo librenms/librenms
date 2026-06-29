@@ -159,12 +159,12 @@ class Cisco extends OS implements
             $hardware = $data[1000]['entPhysicalModelName'];
         } elseif ((empty($hardware) || preg_match('/Virtual Stack/', (string) $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
             $hardware = $data[1000]['entPhysicalModelName'];
-        } elseif (empty($hardware) && ! empty($data[1000]['entPhysicalContainedIn'])) {
-            $hardware = $data[$data[1000]['entPhysicalContainedIn']]['entPhysicalName'];
+        } elseif (empty($hardware) && isset($data[1000]['entPhysicalContainedIn'])) {
+            $hardware = $data[$data[1000]['entPhysicalContainedIn']]['entPhysicalName'] ?? null;
         } elseif ((preg_match('/stack/i', $hardware ?? '') || empty($hardware)) && ! empty($data[1001]['entPhysicalModelName'])) {
             $hardware = $data[1001]['entPhysicalModelName'];
-        } elseif (empty($hardware) && ! empty($data[1001]['entPhysicalContainedIn'])) {
-            $hardware = $data[$data[1001]['entPhysicalContainedIn']]['entPhysicalName'];
+        } elseif (empty($hardware) && isset($data[1001]['entPhysicalContainedIn'])) {
+            $hardware = $data[$data[1001]['entPhysicalContainedIn']]['entPhysicalName'] ?? null;
         }
 
         $device->hardware = $hardware;
