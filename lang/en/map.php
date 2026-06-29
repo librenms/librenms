@@ -176,6 +176,7 @@ return [
                     'curvedCW' => 'Curved Clockwise',
                     'curvedCCW' => 'Curved Counter Clockwise',
                     'cubicBezier' => 'Cubic Bezier',
+                    'angled' => 'Angled',
                 ],
                 'arrow_type' => 'Arrow Style',
                 'arrow_options' => [

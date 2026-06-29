@@ -65,6 +65,7 @@
                                         <option value="curvedCW">{{ __('map.custom.edit.edge.style_options.curvedCW') }}</option>
                                         <option value="curvedCCW">{{ __('map.custom.edit.edge.style_options.curvedCCW') }}</option>
                                         <option value="cubicBezier">{{ __('map.custom.edit.edge.style_options.cubicBezier') }}</option>
+                                        <option value="angled">{{ __('map.custom.edit.edge.style_options.angled') }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -229,8 +230,8 @@
         edgeNodesUpdate(edgedata.id, $("#edgefrom").val(), $("#edgeto").val(), edgedata.edge1.from, edgedata.edge2.from);
 
         $("#edge-saveButton").off("click");
-        edgedata.edge1.smooth.type = $("#edgestyle").val();
-        edgedata.edge2.smooth.type = $("#edgestyle").val();
+        edgedata.edge1.smooth = edgeSmooth($("#edgestyle").val());
+        edgedata.edge2.smooth = edgeSmooth($("#edgestyle").val());
         edgedata.edge1.arrow_type = edgedata.edge2.arrow_type = $("#edgearrowtype").val();
         edgedata.edge1.arrow_scale = edgedata.edge2.arrow_scale = parseFloat($("#edgearrowscale").val()) || 0.6;
         edgedata.edge1.arrows = edgedata.edge2.arrows = buildArrows(Boolean(reverse_arrows), edgedata.edge1.arrow_type, edgedata.edge1.arrow_scale);
@@ -370,9 +371,12 @@
         edgeCheckColourReset(edgedata.edge1.font.color, newedgeconf.font.color, "edgecolourtextreset");
 
         $("#edgestyle").val(edgedata.edge1.smooth.type);
+        // The arrow now lives on a mid-link segment, so read the stored per-edge style rather than edge1.arrows
         var edit_arrow = arrowProps(edgedata.edge1.arrows);
-        $("#edgearrowtype").val(edit_arrow.type);
-        $("#edgearrowscale").val(edit_arrow.scale);
+        var edit_atype = (edgedata.edge1.arrow_type !== undefined && edgedata.edge1.arrow_type !== null) ? edgedata.edge1.arrow_type : edit_arrow.type;
+        var edit_ascale = (edgedata.edge1.arrow_scale !== undefined && edgedata.edge1.arrow_scale !== null) ? edgedata.edge1.arrow_scale : edit_arrow.scale;
+        $("#edgearrowtype").val(edit_atype);
+        $("#edgearrowscale").val(edit_ascale);
         $("#edgetextface").val(edgedata.edge1.font.face);
         $("#edgetextsize").val(edgedata.edge1.font.size);
         $("#edgetextcolour").val(edgedata.edge1.font.color);
@@ -433,7 +437,7 @@
     }
 
     function edgeDefaultsSave() {
-        newedgeconf.smooth.type = $("#edgestyle").val();
+        newedgeconf.smooth = edgeSmooth($("#edgestyle").val());
         newedgeconf.arrows = buildArrows(Boolean(reverse_arrows), $("#edgearrowtype").val(), $("#edgearrowscale").val());
         newedgeconf.font.face = $("#edgetextface").val();
         newedgeconf.font.size = $("#edgetextsize").val();

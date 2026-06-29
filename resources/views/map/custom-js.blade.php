@@ -164,10 +164,15 @@
             return {to: head, from: {enabled: false}};
         },
 
+        // "angled" (Weathermap VIASTYLE) renders straight segments; disable smoothing but keep the type
+        smoothForStyle: function (style) {
+            return style === "angled" ? {enabled: false, type: "angled"} : {type: style};
+        },
+
         getEdgeCfg: function (edgeid, edge, fromto, reverse_arrows) {
             arrows = custommap.getArrows(reverse_arrows, edge.arrow_type, edge.arrow_scale);
 
-            var edge_cfg = {id: edgeid + "_" + fromto, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, background: "#FFFFFF", align: edge.text_align || "horizontal"}, smooth: {type: edge.style}, arrowStrikethrough: false};
+            var edge_cfg = {id: edgeid + "_" + fromto, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, background: "#FFFFFF", align: edge.text_align || "horizontal"}, smooth: custommap.smoothForStyle(edge.style), arrowStrikethrough: false};
             if (fromto == "from") {
                 edge_cfg.from = edge.custom_map_node1_id;
                 var port_pct = Boolean(reverse_arrows) ? edge.port_topct : edge.port_frompct;

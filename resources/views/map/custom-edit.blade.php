@@ -441,6 +441,12 @@
         window.location.href = "{{ route('maps.custom.index') }}";
     }
 
+    // Build a vis.js smooth config for an edge style. "angled" (Weathermap VIASTYLE) renders straight
+    // segments with sharp corners, so disable smoothing while keeping the type for save/round-trip.
+    function edgeSmooth(style) {
+        return style === "angled" ? {enabled: false, type: "angled"} : {type: style};
+    }
+
     // Build a vis.js arrows config honouring the per-edge arrow style (ARROWSTYLE)
     function buildArrows(reverse, arrow_type, arrow_scale) {
         var type = arrow_type || 'arrow';
@@ -807,6 +813,61 @@
         return lens.length - 1;
     }
 
+    function arrowEnd(ref, end, head) {
+        ref.arrows = (end === 'to') ? {to: head, from: {enabled: false}} : {from: head, to: {enabled: false}};
+    }
+
+    // Place the two opposing direction arrows (Weathermap-style) at the geometric middle of the WHOLE
+    // link: build the ordered legs node1 -> from-waypoints -> mid -> to-waypoints -> node2, find the
+    // vertex nearest the length-midpoint, and put a converging end-arrow on each of the two legs that
+    // meet there. All other arrows are cleared. The head comes from the edge's per-edge arrow style.
+    function placeMidArrows(edge1, edge2, fromSegs, toSegs, n1, n2, midPos, fromWps, toWps, headType, headScale) {
+        var off = function () { return {to: {enabled: false}, from: {enabled: false}}; };
+        edge1.arrows = off();
+        edge2.arrows = off();
+        fromSegs.forEach(function (s) { s.arrows = off(); });
+        toSegs.forEach(function (s) { s.arrows = off(); });
+
+        if (!headType || headType === 'none' || !n1 || !n2 || !midPos) {
+            return;
+        }
+        var head = {enabled: true, scaleFactor: parseFloat(headScale) || 0.6, type: headType};
+        var P = function (xy) { return {x: xy[0], y: xy[1]}; };
+
+        // Legs node1 -> mid (vis from->to matches node1->node2 direction)
+        var legs = [{ref: edge1, forward: true, a: {x: n1.x, y: n1.y}, b: fromWps.length ? P(fromWps[0]) : {x: midPos.x, y: midPos.y}}];
+        for (var i = 0; i < fromWps.length; i++) {
+            legs.push({ref: fromSegs[i], forward: true, a: P(fromWps[i]), b: (i + 1 < fromWps.length) ? P(fromWps[i + 1]) : {x: midPos.x, y: midPos.y}});
+        }
+        // Legs node2 -> mid, then reversed to walk mid -> node2 (vis from->to is opposite to travel)
+        var toLegs = [{ref: edge2, a: {x: n2.x, y: n2.y}, b: toWps.length ? P(toWps[0]) : {x: midPos.x, y: midPos.y}}];
+        for (var j = 0; j < toWps.length; j++) {
+            toLegs.push({ref: toSegs[j], a: P(toWps[j]), b: (j + 1 < toWps.length) ? P(toWps[j + 1]) : {x: midPos.x, y: midPos.y}});
+        }
+        for (var k = toLegs.length - 1; k >= 0; k--) {
+            legs.push({ref: toLegs[k].ref, forward: false, a: toLegs[k].b, b: toLegs[k].a});
+        }
+
+        var dist = function (p, q) { var dx = q.x - p.x, dy = q.y - p.y; return Math.sqrt(dx * dx + dy * dy); };
+        var total = 0;
+        legs.forEach(function (l) { total += dist(l.a, l.b); });
+        if (total === 0) {
+            return;
+        }
+
+        // Vertex (leg boundary) nearest the half-length point
+        var acc = 0, bestJ = 0, bestDiff = Infinity;
+        for (var m = 0; m < legs.length - 1; m++) {
+            acc += dist(legs[m].a, legs[m].b);
+            var diff = Math.abs(acc - total / 2);
+            if (diff < bestDiff) { bestDiff = diff; bestJ = m; }
+        }
+        var before = legs[bestJ], after = legs[bestJ + 1];
+        // End arrows point toward their endpoint node, so both converge on the shared vertex
+        arrowEnd(before.ref, before.forward ? 'to' : 'from', head);
+        arrowEnd(after.ref, after.forward ? 'from' : 'to', head);
+    }
+
     // Build the waypoint dot nodes and pass-through segments for one half of an edge.
     // Returns {nodes, segments, firstTo} where firstTo is the id the canonical _from/_to segment should point to.
     function buildHalfExtras(edgeid, edge, half, baseEdge) {
@@ -821,26 +882,19 @@
             return {nodes: [], segments: [], firstTo: midId};
         }
 
-        // The destination-side arrowhead must render where the chain reaches _mid (the last segment),
-        // not on the canonical edge which now stops at the first waypoint. The source-side head
-        // (reverse arrows) stays on the canonical edge as it still touches the real node.
-        var toHead = (baseEdge.arrows && baseEdge.arrows.to && baseEdge.arrows.to.enabled) ? baseEdge.arrows.to : null;
-        if (toHead) {
-            baseEdge.arrows = {from: (baseEdge.arrows && baseEdge.arrows.from) || {enabled: false}, to: {enabled: false}};
-        }
-
+        // Pass-through segments carry no arrows; the two direction arrows are placed at the link's
+        // geometric midpoint by placeMidArrows once both halves are known.
         var nodes = [];
         var segments = [];
         for (var i = 0; i < wps.length; i++) {
             nodes.push({id: edgeid + "_w" + hk + "_" + i, shape: "dot", size: 3, x: wps[i][0], y: wps[i][1], label: ''});
             var fromId = edgeid + "_w" + hk + "_" + i;
-            var isLast = (i + 1 >= wps.length);
-            var toId = isLast ? midId : (edgeid + "_w" + hk + "_" + (i + 1));
+            var toId = (i + 1 < wps.length) ? (edgeid + "_w" + hk + "_" + (i + 1)) : midId;
             segments.push({
                 id: edgeid + "_" + half + "_seg_" + i,
                 from: fromId,
                 to: toId,
-                arrows: (isLast && toHead) ? {to: toHead, from: {enabled: false}} : {to: {enabled: false}, from: {enabled: false}},
+                arrows: {to: {enabled: false}, from: {enabled: false}},
                 color: baseEdge.color,
                 width: baseEdge.width,
                 smooth: baseEdge.smooth,
@@ -884,9 +938,6 @@
         if (!edge1 || !edge2) {
             return;
         }
-        // Recompute full arrows from each edge's stored per-edge style so the split in buildHalfExtras is idempotent across rebuilds
-        edge1.arrows = buildArrows(Boolean(reverse_arrows), edge1.arrow_type, edge1.arrow_scale);
-        edge2.arrows = buildArrows(Boolean(reverse_arrows), edge2.arrow_type, edge2.arrow_scale);
         var wp = collectEdgeWaypoints(edgeid) || {from: [], to: []};
         removeEdgeWaypointArtifacts(edgeid);
         var synthetic = {waypoints: wp};
@@ -894,6 +945,12 @@
         var toExtras = buildHalfExtras(edgeid, synthetic, 'to', edge2);
         edge1.to = fromExtras.firstTo;
         edge2.to = toExtras.firstTo;
+
+        // VIA arrows: re-place the two opposing arrows at the geometric middle after the chain changed
+        placeMidArrows(edge1, edge2, fromExtras.segments, toExtras.segments,
+            network_nodes.get(edge1.from), network_nodes.get(edge2.from),
+            network_nodes.get(edgeid + "_mid"), wp.from, wp.to, edge1.arrow_type, edge1.arrow_scale);
+
         network_nodes.update(fromExtras.nodes.concat(toExtras.nodes));
         network_edges.update([edge1, edge2].concat(fromExtras.segments).concat(toExtras.segments));
         network_nodes.flush();
@@ -1004,10 +1061,10 @@
                     var mid = {id: edgeid + "_mid", shape: "dot", size: 0, x: mid_x, y: mid_y, label: edge.label};
                     mid.size = 3;
 
-                    var arrows = buildArrows(Boolean(reverse_arrows), edge.arrow_type, edge.arrow_scale);
+                    var noArrows = {to: {enabled: false}, from: {enabled: false}};
 
-                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: arrows, arrow_type: edge.arrow_type, arrow_scale: edge.arrow_scale, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: {type: edge.style}, arrowStrikethrough: false};
-                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: arrows, arrow_type: edge.arrow_type, arrow_scale: edge.arrow_scale, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: {type: edge.style}, arrowStrikethrough: false};
+                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: noArrows, arrow_type: edge.arrow_type, arrow_scale: edge.arrow_scale, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: edgeSmooth(edge.style), arrowStrikethrough: false};
+                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: noArrows, arrow_type: edge.arrow_type, arrow_scale: edge.arrow_scale, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: edgeSmooth(edge.style), arrowStrikethrough: false};
                     if(edge.fixed_width) {
                         edge1.width = edge2.width = parseFloat(edge.fixed_width) || null;
                     }
@@ -1035,6 +1092,12 @@
                     edge2.to = toExtras.firstTo;
                     var wpNodes = fromExtras.nodes.concat(toExtras.nodes);
                     var segs = fromExtras.segments.concat(toExtras.segments);
+
+                    // VIA arrows: place the two opposing arrows at the geometric middle of the whole link
+                    placeMidArrows(edge1, edge2, fromExtras.segments, toExtras.segments,
+                        network_nodes.get(edge.custom_map_node1_id), network_nodes.get(edge.custom_map_node2_id),
+                        {x: mid_x, y: mid_y}, (edge.waypoints && edge.waypoints.from) || [], (edge.waypoints && edge.waypoints.to) || [],
+                        edge.arrow_type, edge.arrow_scale);
 
                     network_nodes.update([mid].concat(wpNodes));
                     network_edges.update([edge1, edge2].concat(segs));
