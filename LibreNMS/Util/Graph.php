@@ -128,7 +128,7 @@ class Graph
      * Build RRD options for the given $vars
      *
      * @param  array|string  $vars
-     * @param  string|null   &$rrd_filename output parameter for the resolved rrd filename
+     * @param  string|null  &$rrd_filename  output parameter for the resolved rrd filename
      * @return array
      *
      * @throws RrdGraphException

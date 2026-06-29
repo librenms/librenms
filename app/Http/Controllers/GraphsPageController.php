@@ -254,16 +254,19 @@ class GraphsPageController extends Controller
 
             return implode(' ', array_map(escapeshellarg(...), [
                 'rrdtool',
-                ...Rrd::buildCommand('graph', '-', $rrd_options)
+                ...Rrd::buildCommand('graph', '-', $rrd_options),
             ]));
         } catch (\Throwable $e) {
             Log::error('RRDTool Command Error: ' . $e->getMessage(), ['exception' => $e]);
+
             return null;
         }
     }
 
     /**
      * Build a /graphs query-string URL, merging changes into the current request parameters.
+     *
+     * @param  array<string, mixed>  $changes
      */
     private function graphUrl(GraphsPageRequest $request, array $changes = []): string
     {

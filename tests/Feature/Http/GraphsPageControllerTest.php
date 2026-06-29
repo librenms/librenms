@@ -70,7 +70,7 @@ class GraphsPageControllerTest extends TestCase
         $response->assertSee('RRDTool Command');
         $response->assertSee('port-id' . $port->port_id . '.rrd', false);
         $this->assertNoPhpWarningOutput($response->getContent());
-     }
+    }
 
     public function testDeviceShowCommand(): void
     {
