@@ -33,7 +33,6 @@ use Illuminate\Support\Facades\Http;
 use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Tests\TestCase;
-
 use function PHPUnit\Framework\assertEquals;
 
 final class DiscordTest extends TestCase
@@ -44,7 +43,7 @@ final class DiscordTest extends TestCase
 
         $transport = new Transport\Discord(new AlertTransport([
             'transport_config' => [
-                'url' => '',
+                'url' => 'https://discord.com/api/webhooks/number/id',
                 'options' => '',
                 'discord-embed-fields' => '',
             ],
@@ -56,7 +55,7 @@ final class DiscordTest extends TestCase
         $transport->deliverAlert(AlertData::testData($mock_device));
 
         Http::assertSent(function (Request $request) {
-            assertEquals('', $request->url());
+            assertEquals('https://discord.com/api/webhooks/number/id', $request->url());
             assertEquals('POST', $request->method());
             assertEquals('application/json', $request->header('Content-Type')[0]);
             assertEquals(
