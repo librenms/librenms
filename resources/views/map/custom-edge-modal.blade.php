@@ -73,6 +73,7 @@
                                 <div class="col-sm-9">
                                     <select id="edgearrowtype" class="form-control input-sm">
                                         <option value="arrow">{{ __('map.custom.edit.edge.arrow_options.arrow') }}</option>
+                                        <option value="vee">{{ __('map.custom.edit.edge.arrow_options.vee') }}</option>
                                         <option value="bar">{{ __('map.custom.edit.edge.arrow_options.bar') }}</option>
                                         <option value="circle">{{ __('map.custom.edit.edge.arrow_options.circle') }}</option>
                                         <option value="none">{{ __('map.custom.edit.edge.arrow_options.none') }}</option>
@@ -230,7 +231,9 @@
         $("#edge-saveButton").off("click");
         edgedata.edge1.smooth.type = $("#edgestyle").val();
         edgedata.edge2.smooth.type = $("#edgestyle").val();
-        edgedata.edge1.arrows = edgedata.edge2.arrows = buildArrows(Boolean(reverse_arrows), $("#edgearrowtype").val(), $("#edgearrowscale").val());
+        edgedata.edge1.arrow_type = edgedata.edge2.arrow_type = $("#edgearrowtype").val();
+        edgedata.edge1.arrow_scale = edgedata.edge2.arrow_scale = parseFloat($("#edgearrowscale").val()) || 0.6;
+        edgedata.edge1.arrows = edgedata.edge2.arrows = buildArrows(Boolean(reverse_arrows), edgedata.edge1.arrow_type, edgedata.edge1.arrow_scale);
         edgedata.edge1.from = $("#edgefrom").val();
         edgedata.edge2.from = $("#edgeto").val();
         edgedata.edge1.font.face = edgedata.edge2.font.face = $("#edgetextface").val();
@@ -239,6 +242,7 @@
         edgedata.edge1.font.align = edgedata.edge2.font.align = $("#edgetextalign").val();
         edgedata.edge1.font.background = edgedata.edge2.font.background = '#FFFFFF';
         edgedata.edge1.label = edgedata.edge2.label = edgeLabel($("#edgetextshow").prop('checked'), $("#edgebpsshow").prop('checked'), null);
+        edgedata.edge1.via_label = edgedata.edge2.via_label = edgedata.edge1.label;
         edgedata.edge1.width = edgedata.edge2.width = parseFloat($("#edgefixedwidth").val()) || null;
         edgedata.edge1.title = edgedata.edge2.title = $("#port_id").val();
         edgedata.edge1.arrowStrikethrough = edgedata.edge2.arrowStrikethrough = false;
@@ -293,6 +297,8 @@
             }
         }
         $("#edgerecenter").prop( "checked", false );
+        // Re-split the waypoint chain so the arrowhead placement reflects the (possibly changed) arrow style
+        rebuildEdgeChain(edgedata.id);
         $("#map-saveDataButton").show();
     }
 
@@ -371,8 +377,10 @@
         $("#edgetextsize").val(edgedata.edge1.font.size);
         $("#edgetextcolour").val(edgedata.edge1.font.color);
         $("#edgetextalign").val(edgedata.edge1.font.align || "horizontal");
-        $("#edgetextshow").bootstrapSwitch('state', (edgedata.edge1.label != null && edgedata.edge1.label.includes('xx%')));
-        $("#edgebpsshow").bootstrapSwitch('state', (edgedata.edge1.label != null && edgedata.edge1.label.includes('bps')));
+        // The displayed label may have been relocated to a waypoint segment, so read the flags from the stored via_label
+        var edge_label_src = (edgedata.edge1.via_label !== undefined && edgedata.edge1.via_label !== null) ? edgedata.edge1.via_label : edgedata.edge1.label;
+        $("#edgetextshow").bootstrapSwitch('state', (edge_label_src != null && edge_label_src.includes('xx%')));
+        $("#edgebpsshow").bootstrapSwitch('state', (edge_label_src != null && edge_label_src.includes('bps')));
         $("#edgelabel").val('label' in edgedata.mid ? edgedata.mid.label : '');
         $("#edgefixedwidth").val(edgedata.edge1.width);
 

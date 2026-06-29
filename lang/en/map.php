@@ -180,6 +180,7 @@ return [
                 'arrow_type' => 'Arrow Style',
                 'arrow_options' => [
                     'arrow' => 'Arrow',
+                    'vee' => 'Small Arrow',
                     'bar' => 'Bar',
                     'circle' => 'Circle',
                     'none' => 'None',

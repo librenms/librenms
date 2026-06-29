@@ -218,9 +218,32 @@
             return {id: edgeid + "_mid", shape: "dot", size: 0, x: mid_x, y: mid_y, label: screenshot ? '' : edge.label, font: {face: edge.text_face, size:  edge.text_size, color: edge.text_colour}};
         },
 
+        // Index of the sub-edge (0 = canonical node->first hop, then each segment) that straddles the
+        // midpoint of a half-polyline by length. Used to centre the half's label like Weathermap.
+        halfMidSubedge: function (points) {
+            var lens = [];
+            var total = 0;
+            for (var i = 0; i + 1 < points.length; i++) {
+                var dx = points[i + 1].x - points[i].x;
+                var dy = points[i + 1].y - points[i].y;
+                var len = Math.sqrt(dx * dx + dy * dy);
+                lens.push(len);
+                total += len;
+            }
+            var half = total / 2;
+            var acc = 0;
+            for (var j = 0; j < lens.length; j++) {
+                acc += lens[j];
+                if (acc >= half) {
+                    return j;
+                }
+            }
+            return lens.length - 1;
+        },
+
         // VIA waypoints: build the dot nodes and pass-through segments for one half of an edge.
         // Reroutes baseEdge.to to the first waypoint and returns {nodes, segments, firstTo}.
-        getEdgeExtras: function (edgeid, edge, baseEdge, fromto) {
+        getEdgeExtras: function (edgeid, edge, baseEdge, fromto, network_nodes) {
             var hk = fromto[0];
             var midId = edgeid + "_mid";
             var wps = (edge.waypoints && edge.waypoints[fromto]) ? edge.waypoints[fromto] : [];
@@ -228,24 +251,56 @@
                 return {nodes: [], segments: [], firstTo: midId};
             }
 
+            // Move the destination-side arrowhead onto the last segment so it renders at _mid,
+            // not at the first waypoint. The source-side head (reverse arrows) stays on the canonical edge.
+            var toHead = (baseEdge.arrows && baseEdge.arrows.to && baseEdge.arrows.to.enabled) ? baseEdge.arrows.to : null;
+            if (toHead) {
+                baseEdge.arrows = {from: (baseEdge.arrows && baseEdge.arrows.from) || {enabled: false}, to: {enabled: false}};
+            }
+
             var nodes = [];
             var segments = [];
             for (var i = 0; i < wps.length; i++) {
                 nodes.push({id: edgeid + "_w" + hk + "_" + i, shape: "dot", size: 0, x: wps[i][0], y: wps[i][1]});
                 var fromId = edgeid + "_w" + hk + "_" + i;
-                var toId = (i + 1 < wps.length) ? (edgeid + "_w" + hk + "_" + (i + 1)) : midId;
+                var isLast = (i + 1 >= wps.length);
+                var toId = isLast ? midId : (edgeid + "_w" + hk + "_" + (i + 1));
                 segments.push({
                     id: edgeid + "_" + fromto + "_seg_" + i,
                     from: fromId,
                     to: toId,
-                    arrows: {to: {enabled: false}, from: {enabled: false}},
+                    arrows: (isLast && toHead) ? {to: toHead, from: {enabled: false}} : {to: {enabled: false}, from: {enabled: false}},
                     color: baseEdge.color,
                     width: baseEdge.width,
                     smooth: baseEdge.smooth,
+                    font: baseEdge.font,
                     title: baseEdge.title,
                     arrowStrikethrough: false,
                 });
             }
+
+            // VIA label: centre each half's bandwidth/percent label on the FULL half-link (Weathermap-style),
+            // not on the short canonical stub, by moving it to the sub-edge straddling the half-polyline midpoint.
+            var halfLabel = baseEdge.label;
+            if (halfLabel && network_nodes) {
+                var fromNode = network_nodes.get(baseEdge.from);
+                var midPos = (edge.mid_x !== undefined && edge.mid_x !== null) ? {x: edge.mid_x, y: edge.mid_y} : network_nodes.get(midId);
+                if (fromNode && midPos) {
+                    var pts = [{x: fromNode.x, y: fromNode.y}];
+                    for (var p = 0; p < wps.length; p++) {
+                        pts.push({x: wps[p][0], y: wps[p][1]});
+                    }
+                    pts.push({x: midPos.x, y: midPos.y});
+                    var li = custommap.halfMidSubedge(pts);
+                    if (li === 0) {
+                        baseEdge.label = halfLabel;
+                    } else {
+                        baseEdge.label = '';
+                        segments[li - 1].label = halfLabel;
+                    }
+                }
+            }
+
             return {nodes: nodes, segments: segments, firstTo: edgeid + "_w" + hk + "_0"};
         },
     }

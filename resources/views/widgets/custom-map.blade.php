@@ -60,8 +60,8 @@
                     }
 
                     // VIA waypoints: reroute the canonical segments through any waypoint nodes
-                    var fromExtras = custommap.getEdgeExtras(edgeid, edge, edge1, "from");
-                    var toExtras = custommap.getEdgeExtras(edgeid, edge, edge2, "to");
+                    var fromExtras = custommap.getEdgeExtras(edgeid, edge, edge1, "from", network_nodes);
+                    var toExtras = custommap.getEdgeExtras(edgeid, edge, edge2, "to", network_nodes);
                     edge1.to = fromExtras.firstTo;
                     edge2.to = toExtras.firstTo;
 

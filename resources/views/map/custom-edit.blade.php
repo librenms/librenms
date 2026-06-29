@@ -461,10 +461,13 @@
     }
 
     function swapArrows(reverse) {
-        network_edges.forEach((edge) => {
-            var props = arrowProps(edge.arrows);
-            edge.arrows = buildArrows(Boolean(reverse), props.type, props.scale);
-            network_edges.update(edge);
+        // Flip the map-level arrow direction, then rebuild each edge from its stored per-edge style.
+        // Going through rebuildEdgeChain keeps the waypoint chains and arrowhead placement correct.
+        reverse_arrows = reverse ? 1 : 0;
+        network_edges.getIds().forEach(function (id) {
+            if (typeof id === 'string' && id.endsWith("_from")) {
+                rebuildEdgeChain(id.slice(0, -5));
+            }
         });
         network_edges.flush();
     }
@@ -608,12 +611,20 @@
         $.each(network_nodes.get(), function (node_idx, node) {
             if(node.id.startsWith("legend_")) {
                 return;
+            } else if(typeof node.id === 'string' && /_w[ft]_\d+$/.test(node.id)) {
+                // waypoint dot node - persisted via its edge's waypoints field, not as a map node
+                return;
             } else if(node.id.endsWith("_mid")) {
                 edgeid = node.id.split("_")[0];
                 edge1 = network_edges.get(edgeid + "_from");
                 edge2 = network_edges.get(edgeid + "_to");
                 var arrow_props = arrowProps(edge1.arrows);
-                edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, text_align: edge1.font.align, from: edge1.from, to: edge2.from, showpct: (edge1.label != null && edge1.label.includes("xx%")), showbps: (edge1.label != null && edge1.label.includes("bps")), label: (node.label || ''), fixed_width: (edge1.width || null), port_id: edge1.title, style: edge1.smooth.type, arrow_type: arrow_props.type, arrow_scale: arrow_props.scale, mid_x: node.x, mid_y: node.y, waypoints: collectEdgeWaypoints(edgeid), reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
+                // Prefer the stored per-edge style; edge1.arrows may have been split for waypoint rendering
+                var arrow_type = (edge1.arrow_type !== undefined && edge1.arrow_type !== null) ? edge1.arrow_type : arrow_props.type;
+                var arrow_scale = (edge1.arrow_scale !== undefined && edge1.arrow_scale !== null) ? edge1.arrow_scale : arrow_props.scale;
+                // The displayed label may have been relocated to a waypoint segment, so read the flags from the stored via_label
+                var label_src = (edge1.via_label !== undefined && edge1.via_label !== null) ? edge1.via_label : edge1.label;
+                edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, text_align: edge1.font.align, from: edge1.from, to: edge2.from, showpct: (label_src != null && label_src.includes("xx%")), showbps: (label_src != null && label_src.includes("bps")), label: (node.label || ''), fixed_width: (edge1.width || null), port_id: edge1.title, style: edge1.smooth.type, arrow_type: arrow_type, arrow_scale: arrow_scale, mid_x: node.x, mid_y: node.y, waypoints: collectEdgeWaypoints(edgeid), reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
             } else {
                 if(node.icon.code) {
                     node.icon = node.icon.code.charCodeAt(0).toString(16);
@@ -773,6 +784,29 @@
         });
     }
 
+    // Index of the sub-edge (0 = canonical node->first hop, then each segment) that straddles the
+    // midpoint of a half-polyline by length. Used to centre the half's label like Weathermap.
+    function halfMidSubedge(points) {
+        var lens = [];
+        var total = 0;
+        for (var i = 0; i + 1 < points.length; i++) {
+            var dx = points[i + 1].x - points[i].x;
+            var dy = points[i + 1].y - points[i].y;
+            var len = Math.sqrt(dx * dx + dy * dy);
+            lens.push(len);
+            total += len;
+        }
+        var half = total / 2;
+        var acc = 0;
+        for (var j = 0; j < lens.length; j++) {
+            acc += lens[j];
+            if (acc >= half) {
+                return j;
+            }
+        }
+        return lens.length - 1;
+    }
+
     // Build the waypoint dot nodes and pass-through segments for one half of an edge.
     // Returns {nodes, segments, firstTo} where firstTo is the id the canonical _from/_to segment should point to.
     function buildHalfExtras(edgeid, edge, half, baseEdge) {
@@ -780,7 +814,19 @@
         var midId = edgeid + "_mid";
         var wps = (edge.waypoints && edge.waypoints[half]) ? edge.waypoints[half] : [];
         if (wps.length === 0) {
+            // No waypoints: the canonical edge spans the whole half, so its own label is already centred
+            if (baseEdge.via_label !== undefined && baseEdge.via_label !== null) {
+                baseEdge.label = baseEdge.via_label;
+            }
             return {nodes: [], segments: [], firstTo: midId};
+        }
+
+        // The destination-side arrowhead must render where the chain reaches _mid (the last segment),
+        // not on the canonical edge which now stops at the first waypoint. The source-side head
+        // (reverse arrows) stays on the canonical edge as it still touches the real node.
+        var toHead = (baseEdge.arrows && baseEdge.arrows.to && baseEdge.arrows.to.enabled) ? baseEdge.arrows.to : null;
+        if (toHead) {
+            baseEdge.arrows = {from: (baseEdge.arrows && baseEdge.arrows.from) || {enabled: false}, to: {enabled: false}};
         }
 
         var nodes = [];
@@ -788,12 +834,13 @@
         for (var i = 0; i < wps.length; i++) {
             nodes.push({id: edgeid + "_w" + hk + "_" + i, shape: "dot", size: 3, x: wps[i][0], y: wps[i][1], label: ''});
             var fromId = edgeid + "_w" + hk + "_" + i;
-            var toId = (i + 1 < wps.length) ? (edgeid + "_w" + hk + "_" + (i + 1)) : midId;
+            var isLast = (i + 1 >= wps.length);
+            var toId = isLast ? midId : (edgeid + "_w" + hk + "_" + (i + 1));
             segments.push({
                 id: edgeid + "_" + half + "_seg_" + i,
                 from: fromId,
                 to: toId,
-                arrows: {to: {enabled: false}, from: {enabled: false}},
+                arrows: (isLast && toHead) ? {to: toHead, from: {enabled: false}} : {to: {enabled: false}, from: {enabled: false}},
                 color: baseEdge.color,
                 width: baseEdge.width,
                 smooth: baseEdge.smooth,
@@ -802,6 +849,31 @@
                 arrowStrikethrough: false,
             });
         }
+
+        // VIA label: keep each half's bandwidth/percent label at the middle of the FULL half-link
+        // (Weathermap-style) instead of on the short canonical stub. Place it on the sub-edge that
+        // straddles the half-polyline midpoint (sub-edge 0 = canonical node->first hop).
+        var halfLabel = (baseEdge.via_label !== undefined && baseEdge.via_label !== null) ? baseEdge.via_label : baseEdge.label;
+        if (halfLabel) {
+            var fromNode = network_nodes.get(baseEdge.from);
+            var midNode = network_nodes.get(midId);
+            var midPos = (edge.mid_x !== undefined && edge.mid_x !== null) ? {x: edge.mid_x, y: edge.mid_y} : midNode;
+            if (fromNode && midPos) {
+                var pts = [{x: fromNode.x, y: fromNode.y}];
+                for (var p = 0; p < wps.length; p++) {
+                    pts.push({x: wps[p][0], y: wps[p][1]});
+                }
+                pts.push({x: midPos.x, y: midPos.y});
+                var li = halfMidSubedge(pts);
+                if (li === 0) {
+                    baseEdge.label = halfLabel;
+                } else {
+                    baseEdge.label = '';
+                    segments[li - 1].label = halfLabel;
+                }
+            }
+        }
+
         return {nodes: nodes, segments: segments, firstTo: edgeid + "_w" + hk + "_0"};
     }
 
@@ -812,6 +884,9 @@
         if (!edge1 || !edge2) {
             return;
         }
+        // Recompute full arrows from each edge's stored per-edge style so the split in buildHalfExtras is idempotent across rebuilds
+        edge1.arrows = buildArrows(Boolean(reverse_arrows), edge1.arrow_type, edge1.arrow_scale);
+        edge2.arrows = buildArrows(Boolean(reverse_arrows), edge2.arrow_type, edge2.arrow_scale);
         var wp = collectEdgeWaypoints(edgeid) || {from: [], to: []};
         removeEdgeWaypointArtifacts(edgeid);
         var synthetic = {waypoints: wp};
@@ -931,8 +1006,8 @@
 
                     var arrows = buildArrows(Boolean(reverse_arrows), edge.arrow_type, edge.arrow_scale);
 
-                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: {type: edge.style}, arrowStrikethrough: false};
-                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: {type: edge.style}, arrowStrikethrough: false};
+                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: arrows, arrow_type: edge.arrow_type, arrow_scale: edge.arrow_scale, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: {type: edge.style}, arrowStrikethrough: false};
+                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: arrows, arrow_type: edge.arrow_type, arrow_scale: edge.arrow_scale, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: {type: edge.style}, arrowStrikethrough: false};
                     if(edge.fixed_width) {
                         edge1.width = edge2.width = parseFloat(edge.fixed_width) || null;
                     }
@@ -950,6 +1025,7 @@
                         edge1.title = edge2.title = '';
                     }
                     edge1.label = edge2.label = edgeLabel(edge.showpct, edge.showbps, '');
+                    edge1.via_label = edge2.via_label = edge1.label;
 
                     // VIA waypoints: rebuild any waypoint chain from the (authoritative) server data
                     removeEdgeWaypointArtifacts(edgeid);
