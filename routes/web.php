@@ -180,6 +180,9 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('logs/syslog', Device\Tabs\SyslogController::class)->name('syslog');
         Route::get('popup', App\Http\Controllers\DevicePopupController::class)->name('popup');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
+        Route::get('config/backups', [Device\Tabs\ConfigController::class, 'backups'])->name('config.backups');
+        Route::get('config/backups/{backup}', [Device\Tabs\ConfigController::class, 'backup'])->where('backup', '[A-Za-z0-9._|-]+')->name('config.backup');
+        Route::get('config/diff', [Device\Tabs\ConfigController::class, 'diff'])->name('config.diff');
         Route::put('module/{module}', [Device\Tabs\ModuleController::class, 'update'])->name('module.update');
         Route::delete('module/{module}', [Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
     });
