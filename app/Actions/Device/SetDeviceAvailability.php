@@ -34,7 +34,9 @@ class SetDeviceAvailability
 
         if ($commit) {
             $device->save();
-            $this->updateDeviceOutage->execute($device, $available);
+            if ($changed) {
+                $this->updateDeviceOutage->execute($device, $available);
+            }
         }
 
         return $changed;
