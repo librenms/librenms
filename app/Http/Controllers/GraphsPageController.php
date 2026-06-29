@@ -203,7 +203,7 @@ class GraphsPageController extends Controller
             return $device?->display . ' :: Port ' . $port->getFullLabel();
         }
 
-        return $device?->display ?? '';
+        return $device->display ?? '';
     }
 
     /**
