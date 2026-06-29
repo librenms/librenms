@@ -4,53 +4,54 @@ namespace App\Http\Controllers;
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Facades\Rrd;
+use App\Http\Requests\GraphsPageRequest;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Util\Graph;
 use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
+use function base_path;
 
 class GraphsPageController extends Controller
 {
-    public function __invoke(Request $request): View
+    public function __invoke(GraphsPageRequest $request): View
     {
-        $vars = $request->except(['page', 'username', 'password']);
+        $fullType = $request->string('type')->toString();
+        [$type, $subtype] = explode('_', $fullType, 2);
 
-        preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', (string) ($vars['type'] ?? ''), $graphtype);
-        $type = basename($graphtype['type'] ?? '');
-        $subtype = basename($graphtype['subtype'] ?? '');
+        // Authorize before doing any other page-setup work.
+        [$device, $port] = $this->authorizeGraph($type, $request);
 
-        // Authorize before doing any other page-setup work, so unauthorized requests are
-        // rejected as early as possible. The auth include also resolves the $device/$port
-        // models used for the page heading.
-        [$device, $port] = $this->authorizeGraph($type, $vars);
-
-        if (isset($vars['widescreen'])) {
-            if ($vars['widescreen'] === 'yes') {
-                session()->put('widescreen', 1);
-            } elseif ($vars['widescreen'] === 'no') {
-                session()->forget('widescreen');
+        if ($request->has('widescreen')) {
+            if ($request->input('widescreen') === 'yes') {
+                $request->session()->put('widescreen', 1);
+            } elseif ($request->input('widescreen') === 'no') {
+                $request->session()->forget('widescreen');
             }
         }
 
-        ['width' => $graphWidth, 'height' => $graphHeight, 'thumbWidth' => $thumbWidth] = $this->graphDimensions();
+        ['width' => $graphWidth, 'height' => $graphHeight, 'thumbWidth' => $thumbWidth] = $this->graphDimensions($request);
 
-        $vars['from'] = Time::parseAt($vars['from'] ?? '') ?: LibrenmsConfig::get('time.day');
-        $vars['to'] = Time::parseAt($vars['to'] ?? '') ?: LibrenmsConfig::get('time.now');
+        $rawFrom = $request->input('from');
+        $rawTo = $request->input('to');
+        $from = Time::parseAt($rawFrom ?? '') ?: LibrenmsConfig::get('time.day');
+        $to = Time::parseAt($rawTo ?? '') ?: LibrenmsConfig::get('time.now');
 
-        $subtitle = $this->buildSubtitle($type, $subtype, $vars);
+        $subtitle = $this->buildSubtitle($type, $subtype, $request);
         $pageTitle = trim($this->entityTitle($device, $port) . $subtitle);
 
         $graphSubtypes = in_array($type, ['sensor', 'wireless'])
             ? []
             : get_graph_subtypes($type);
 
-        $showCommand = isset($vars['showcommand']) && $vars['showcommand'] === 'yes';
+        $showCommand = $request->input('showcommand') === 'yes';
 
-        // Build a /graphs query-string URL, merging $changes into the current vars (null removes a key).
+        // Build a /graphs query-string URL, merging $changes into the current request parameters (null removes a key).
         $graphUrl = fn (array $changes = []): string => url()->query(
             'graphs',
-            array_filter(array_merge($vars, $changes), fn ($v) => $v !== null)
+            array_filter(array_merge($request->except(['page', 'username', 'password']), $changes), fn ($v) => $v !== null)
         );
 
         // Subtype navigation options for <x-select>; each value is the destination URL.
@@ -66,26 +67,37 @@ class GraphsPageController extends Controller
             $subtypeSelected = $graphUrl(['type' => $type . '_' . $subtype]);
         }
 
+        $vars = $request->except(['page', 'username', 'password']);
+        $vars['from'] = $from;
+        $vars['to'] = $to;
+        if ($port) {
+            $vars['device'] = $port->device_id;
+            $vars['id'] = $port->port_id;
+        } elseif ($device) {
+            $vars['device'] = $device->device_id;
+            $vars['id'] = $device->device_id;
+        }
+
         // Thumbnail period row. A thumbnail is "active" when its duration matches the range
         // currently shown in the main graph (comparing durations stays correct even though the
         // absolute now-anchored timestamps drift between requests).
         $thumbTo = LibrenmsConfig::get('time.now');
-        $currentDuration = (int) $vars['to'] - (int) $vars['from'];
+        $currentDuration = (int) $to - (int) $from;
         $periodThumbs = [];
         foreach (LibrenmsConfig::get('graphs.row.normal') as $period => $text) {
-            $from = LibrenmsConfig::get("time.$period");
-            $periodDuration = (int) $thumbTo - (int) $from;
+            $periodFrom = LibrenmsConfig::get("time.$period");
+            $periodDuration = (int) $thumbTo - (int) $periodFrom;
             $periodThumbs[] = [
                 'text' => $text,
                 'active' => $periodDuration > 0 && abs($currentDuration - $periodDuration) <= 0.1 * $periodDuration,
-                'link' => $graphUrl(['from' => $this->relativeOffset($periodDuration), 'to' => null]),
+                'link' => $graphUrl(['from' => Time::toRelativeOffset($periodDuration), 'to' => null]),
                 'vars' => array_merge($vars, [
                     'height' => '90',
                     'width' => (int) round($thumbWidth * 1.5),
                     'legend' => 'no',
                     'absolute' => 1, // full-size-mode: PNG renders at exactly width x height, so the
                                      // thumbnail can reserve its space and load without layout shift
-                    'from' => $from,
+                    'from' => $periodFrom,
                     'to' => $thumbTo,
                 ]),
             ];
@@ -93,36 +105,63 @@ class GraphsPageController extends Controller
 
         // Legend / previous / RRD-command / port-speed-zoom controls.
         $toggles = [];
-        $toggles[] = (isset($vars['legend']) && $vars['legend'] == 'no')
+        $toggles[] = ($request->input('legend') === 'no')
             ? ['text' => 'Show Legend', 'link' => $graphUrl(['legend' => null])]
             : ['text' => 'Hide Legend', 'link' => $graphUrl(['legend' => 'no'])];
-        $toggles[] = (isset($vars['previous']) && $vars['previous'] == 'yes')
+        $toggles[] = ($request->input('previous') === 'yes')
             ? ['text' => 'Hide Previous', 'link' => $graphUrl(['previous' => null])]
             : ['text' => 'Show Previous', 'link' => $graphUrl(['previous' => 'yes'])];
         $toggles[] = $showCommand
             ? ['text' => 'Hide RRD Command', 'link' => $graphUrl(['showcommand' => null])]
             : ['text' => 'Show RRD Command', 'link' => $graphUrl(['showcommand' => 'yes'])];
-        if (($vars['type'] ?? '') === 'port_bits') {
-            $toggles[] = ($vars['port_speed_zoom'] ?? LibrenmsConfig::get('graphs.port_speed_zoom'))
+        if ($fullType === 'port_bits') {
+            $toggles[] = $request->boolean('port_speed_zoom', (bool) LibrenmsConfig::get('graphs.port_speed_zoom'))
                 ? ['text' => 'Zoom to Traffic', 'link' => $graphUrl(['port_speed_zoom' => 0])]
                 : ['text' => 'Zoom to Port Speed', 'link' => $graphUrl(['port_speed_zoom' => 1])];
         }
-        $trendHint = ($vars['type'] ?? '') === 'port_bits' || str_contains((string) ($vars['type'] ?? ''), 'sensor_');
+        $trendHint = $fullType === 'port_bits' || str_contains($fullType, 'sensor_');
 
-        // Main graph rendering (data prepared here; the view only echoes the server-built markup).
-        $mainGraphVars = array_merge($vars, ['height' => $graphHeight, 'width' => $graphWidth]);
-        $graphJsState = generate_graph_js_state($mainGraphVars);
-        $dynamicGraphHtml = LibrenmsConfig::get('webui.dynamic_graphs', false) === true
-            ? generate_dynamic_graph_js($mainGraphVars) . generate_dynamic_graph_tag($mainGraphVars)
-            : null;
-        $mainGraphTag = Url::lazyGraphTag($mainGraphVars);
+        // Main graph rendering.
+        $width = $request->integer('width');
+        if ($width < 10) {
+            $width = $graphWidth;
+        }
 
-        $fullType = (string) ($vars['type'] ?? '');
+        $height = $request->integer('height');
+        if ($height < 10) {
+            $height = $graphHeight;
+        }
+
+        $mainGraphVars = array_merge($vars, ['height' => $height, 'width' => $width]);
         $graphDescr = LibrenmsConfig::has("graph_descr.$fullType")
             ? LibrenmsConfig::get("graph_descr.$fullType")
             : null;
 
-        $viewData = [
+        $isDynamicGraph = LibrenmsConfig::get('webui.dynamic_graphs', false) === true;
+        $dynamicGraphWidth = 0;
+        $dynamicGraphSrcTemplate = null;
+        if ($isDynamicGraph) {
+            $dynamicGraphWidth = $width;
+
+            $placeholders = [
+                'width' => '{{width}}',
+                'from' => '{{start}}',
+                'to' => '{{end}}',
+            ];
+
+            $params = [];
+            foreach ($mainGraphVars as $key => $value) {
+                $params[$key] = $placeholders[$key] ?? $value;
+            }
+
+            $dynamicGraphSrcTemplate = str_replace(
+                ['%7B%7Bstart%7D%7D', '%7B%7Bend%7D%7D', '%7B%7Bwidth%7D%7D'],
+                ['{{start}}', '{{end}}', '{{width}}'],
+                route('graph', $params)
+            );
+        }
+
+        return view('graphs.show', [
             'device' => $device,
             'port' => $port,
             'subtitle' => $subtitle,
@@ -132,39 +171,36 @@ class GraphsPageController extends Controller
             'periodThumbs' => $periodThumbs,
             'toggles' => $toggles,
             'trendHint' => $trendHint,
-            'graphFrom' => $request->input('from', '-1d'),
-            'graphTo' => $request->input('to'),
-            'graphJsState' => $graphJsState,
-            'dynamicGraphHtml' => $dynamicGraphHtml,
-            'mainGraphTag' => $mainGraphTag,
+            'graphFrom' => $rawFrom ?? '-1d',
+            'graphTo' => $rawTo,
+            'mainGraphVars' => $mainGraphVars,
             'graphDescr' => $graphDescr,
             'showCommand' => $showCommand,
-            'rrdCommandHtml' => $showCommand ? $this->renderRrdCommand($mainGraphVars) : null,
+            'rrdCommand' => $showCommand ? $this->renderRrdCommand($mainGraphVars) : null,
+            'isDynamicGraph' => $isDynamicGraph,
+            'dynamicGraphWidth' => $dynamicGraphWidth,
+            'dynamicGraphSrcTemplate' => $dynamicGraphSrcTemplate,
             'refresh' => LibrenmsConfig::get('page_refresh'),
-        ];
-
-        return view('graphs.show', $viewData);
+        ]);
     }
 
     /**
      * Build the plain-text subtitle (" :: ...") describing the graph subtype.
-     *
-     * @param  array<string, mixed>  $vars
      */
-    private function buildSubtitle(string $type, string $subtype, array $vars): string
+    private function buildSubtitle(string $type, string $subtype, GraphsPageRequest $request): string
     {
         if (LibrenmsConfig::has("graph_types.$type.$subtype.descr")) {
             return ' :: ' . LibrenmsConfig::get("graph_types.$type.$subtype.descr");
         }
 
         if ($type === 'device' && $subtype === 'collectd') {
-            $subtitle = ' :: ' . StringHelpers::niceCase($subtype) . ' :: ' . ($vars['c_plugin'] ?? '');
-            if (isset($vars['c_plugin_instance'])) {
-                $subtitle .= ' - ' . $vars['c_plugin_instance'];
+            $subtitle = ' :: ' . StringHelpers::niceCase($subtype) . ' :: ' . ($request->input('c_plugin') ?? '');
+            if ($cPluginInstance = $request->input('c_plugin_instance')) {
+                $subtitle .= ' - ' . $cPluginInstance;
             }
-            $subtitle .= ' - ' . ($vars['c_type'] ?? '');
-            if (isset($vars['c_type_instance'])) {
-                $subtitle .= ' - ' . $vars['c_type_instance'];
+            $subtitle .= ' - ' . ($request->input('c_type') ?? '');
+            if ($cTypeInstance = $request->input('c_type_instance')) {
+                $subtitle .= ' - ' . $cTypeInstance;
             }
 
             return $subtitle;
@@ -196,19 +232,36 @@ class GraphsPageController extends Controller
      * The per-type auth include sets $auth and, depending on the type, the $device and/or
      * $port models used for the page heading. Aborts with 403 when access is not permitted.
      *
-     * @param  array<string, mixed>  $vars
      * @return array{0: ?object, 1: ?object} the resolved [$device, $port]
      */
-    private function authorizeGraph(string $type, array $vars): array
+    private function authorizeGraph(string $type, GraphsPageRequest $request): array
     {
-        $this->loadLegacyGraphHelpers();
+        include_once base_path('includes/dbFacile.php');
+        include_once base_path('includes/common.php');
+        include_once base_path('includes/html/functions.inc.php');
+        include_once base_path('includes/rewrites.php');
 
-        $device = isset($vars['device']) ? DeviceCache::get($vars['device']) : null;
+        $device = null;
+        if ($deviceId = $request->input('device')) {
+            $device = DeviceCache::get($deviceId);
+        } elseif (($entityId = $request->input('id')) && $type !== 'port') {
+            $device = DeviceCache::get($entityId);
+        }
         $port = null;
-        /** @var bool $auth set by the required auth.inc.php below */
         $auth = false;
-        if ($type && is_file(base_path("includes/html/graphs/$type/auth.inc.php"))) {
-            require base_path("includes/html/graphs/$type/auth.inc.php");
+
+        // Legacy auth.inc.php files expect their inputs in a $vars array in scope
+        $vars = $request->except(['page', 'username', 'password']);
+        if ($request->has('id') && ! $request->has('device') && $type !== 'port') {
+            $vars['device'] = $request->input('id');
+        }
+
+        $authPath = base_path("includes/html/graphs/{$type}/auth.inc.php");
+        if (is_file($authPath)) {
+            $runAuth = static function (string $file, array $vars, mixed &$device, mixed &$port, bool &$auth): void {
+                require $file;
+            };
+            $runAuth($authPath, $vars, $device, $port, $auth);
         }
 
         if (! $auth) {
@@ -219,29 +272,15 @@ class GraphsPageController extends Controller
     }
 
     /**
-     * Pull in the legacy graph helpers this page relies on (get_graph_subtypes(),
-     * generate_graph_js_state(), generate_dynamic_graph_*(), and the per-type auth.inc.php files).
-     * Mirrors the include block in LibreNMS\Util\Graph::get() so the legacy scope stays contained
-     * here.
-     */
-    private function loadLegacyGraphHelpers(): void
-    {
-        include_once base_path('includes/dbFacile.php');
-        include_once base_path('includes/common.php');
-        include_once base_path('includes/html/functions.inc.php');
-        include_once base_path('includes/rewrites.php');
-    }
-
-    /**
      * Resolve the main graph and thumbnail dimensions together. Width starts from the widescreen
      * preference and is overridden by the client-reported screen width; height comes from config and
      * is likewise refined by the reported screen height.
      *
      * @return array{width: int, height: int, thumbWidth: int}
      */
-    private function graphDimensions(): array
+    private function graphDimensions(GraphsPageRequest $request): array
     {
-        if (session('widescreen')) {
+        if ($request->session()->get('widescreen')) {
             $width = 1700;
             $thumbWidth = 180;
         } else {
@@ -249,14 +288,14 @@ class GraphsPageController extends Controller
             $thumbWidth = 113;
         }
 
-        if ($screenWidth = \Session::get('screen_width')) {
+        if ($screenWidth = $request->session()->get('screen_width')) {
             $width = $screenWidth > 800
                 ? (int) ($screenWidth - ($screenWidth / 10))
                 : (int) ($screenWidth - ($screenWidth / 4));
         }
 
         $height = LibrenmsConfig::get('webui.min_graph_height');
-        if ($screenHeight = \Session::get('screen_height')) {
+        if ($screenHeight = $request->session()->get('screen_height')) {
             $height = $screenHeight > 960
                 ? (int) ($screenHeight - ($screenHeight / 2))
                 : (int) max($height, $screenHeight - ($screenHeight / 1.5));
@@ -265,56 +304,22 @@ class GraphsPageController extends Controller
         return ['width' => $width, 'height' => $height, 'thumbWidth' => $thumbWidth];
     }
 
-    /**
-     * Express a duration in seconds as a relative "ago" offset (e.g. "-6h", "-1w", "-1mo") using
-     * the units understood by Time::parseAt() and the date-range picker. Using this for thumbnail
-     * links makes the picker show a friendly "X ago to now" range instead of raw timestamps, and
-     * keeps the range anchored to "now" on each load rather than freezing at click time.
-     *
-     * The duration is snapped to the largest unit that rounds to a whole count, so LibreNMS's
-     * 31-day month / 365-day year periods read as "1 month" / "1 year" rather than "31 days" /
-     * "365 days". Unit sizes match the date-range picker's own relative formatting.
-     */
-    private function relativeOffset(int $seconds): string
-    {
-        foreach (['y' => 31536000, 'mo' => 2592000, 'w' => 604800, 'd' => 86400, 'h' => 3600, 'm' => 60] as $unit => $size) {
-            $count = (int) round($seconds / $size);
-            if ($count >= 1) {
-                return '-' . $count . $unit;
-            }
-        }
-
-        return '-' . $seconds . 's';
-    }
 
     /**
      * @param  array<string, mixed>  $graphVars
      */
-    private function renderRrdCommand(array $graphVars): string
+    private function renderRrdCommand(array $graphVars): ?string
     {
-        $vars = $graphVars;
-        $auth = false;
-        $command_only = 1;
-
-        // Legacy graph templates use relative requires, so they must run from the install root
-        // (mirrors LibreNMS\Util\Graph::get()). Restore the cwd/buffer afterwards so a failing
-        // include can't leak state into the rest of the request.
-        $previousCwd = getcwd();
-        $bufferLevel = ob_get_level();
-        chdir(base_path());
-        ob_start();
-
         try {
-            require base_path('includes/html/graphs/graph.inc.php');
+            $rrd_options = Graph::getRrdOptions($graphVars);
 
-            return (string) ob_get_clean();
-        } finally {
-            while (ob_get_level() > $bufferLevel) {
-                ob_end_clean();
-            }
-            if ($previousCwd !== false) {
-                chdir($previousCwd);
-            }
+            return implode(' ', array_map(escapeshellarg(...), [
+                'rrdtool',
+                ...Rrd::buildCommand('graph', '-', $rrd_options)
+            ]));
+        } catch (\Throwable $e) {
+            Log::error('RRDTool Command Error: ' . $e->getMessage(), ['exception' => $e]);
+            return null;
         }
     }
 }

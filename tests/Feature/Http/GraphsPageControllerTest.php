@@ -35,7 +35,7 @@ class GraphsPageControllerTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Poller Time');
-        $response->assertSee('graph.php?device=' . $device->device_id, false);
+        $response->assertSee('graph?device=' . $device->device_id, false);
         $this->assertNoPhpWarningOutput($response->getContent());
     }
 
@@ -69,6 +69,18 @@ class GraphsPageControllerTest extends TestCase
         $response->assertOk();
         $response->assertSee('RRDTool Command');
         $response->assertSee('port-id' . $port->port_id . '.rrd', false);
+        $this->assertNoPhpWarningOutput($response->getContent());
+     }
+
+    public function testDeviceShowCommand(): void
+    {
+        $device = Device::factory()->create();
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs?id={$device->device_id}&type=device_poller_perf&showcommand=yes");
+
+        $response->assertOk();
+        $response->assertSee('RRDTool Command');
         $this->assertNoPhpWarningOutput($response->getContent());
     }
 
@@ -113,6 +125,51 @@ class GraphsPageControllerTest extends TestCase
 
         $this->get("/graphs?device={$device->device_id}&type=device_poller_perf")
             ->assertRedirect('/login');
+    }
+
+    public function testInvalidParameterKeyReturnsValidationError(): void
+    {
+        $device = Device::factory()->create();
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs?device={$device->device_id}&type=device_poller_perf&invalid<key>=1");
+
+        $response->assertSessionHasErrors();
+    }
+
+    public function testInvalidParameterValueReturnsValidationError(): void
+    {
+        $device = Device::factory()->create();
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs?device={$device->device_id}&type=device_poller_perf&legend=invalid;value");
+
+        $response->assertSessionHasErrors();
+    }
+
+    public function testInvalidGraphTypeReturnsValidationError(): void
+    {
+        $device = Device::factory()->create();
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs?device={$device->device_id}&type=invalid_type");
+
+        $response->assertSessionHasErrors();
+    }
+
+    public function testDynamicGraphsRendersCorrectWidth(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'graph-device.example.com']);
+        LibrenmsConfig::set('webui.dynamic_graphs', true);
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs?device={$device->device_id}&type=device_poller_perf");
+
+        $response->assertOk();
+        $response->assertSee('style="width:1075px', false);
+        $response->assertSee('from={{start}}', false);
+        $response->assertSee('to={{end}}', false);
+        $response->assertSee('width={{width}}', false);
     }
 
     private function adminUser(): User

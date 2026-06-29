@@ -98,6 +98,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::post('alert/{alert}/ack', [AlertController::class, 'ack'])->name('alert.ack');
     Route::get('devices/{view?}/{graph?}/{vars?}', [DevicesController::class, 'index'])->where('vars', '.*')->name('devices');
     Route::resource('device-groups', DeviceGroupController::class);
+    Route::get('graphs', GraphsPageController::class)->name('graphs');
     Route::any('inventory', App\Http\Controllers\InventoryController::class)->name('inventory');
     Route::get('inventory/purge', [App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
     Route::get('outages', [OutagesController::class, 'index'])->name('outages');
@@ -443,10 +444,6 @@ Route::prefix('install')->group(function (): void {
     Route::get('/ajax/steps', [Install\InstallationController::class, 'stepsCompleted'])->name('install.action.steps');
     Route::any('{path?}', [Install\InstallationController::class, 'invalid'])->where('path', '.*'); // 404
 });
-
-Route::get('graphs', GraphsPageController::class)
-    ->middleware('auth')
-    ->name('graphs');
 
 // Legacy routes
 Route::any('/dummy_legacy_auth/{path?}', [LegacyController::class, 'dummy'])->middleware('auth');
