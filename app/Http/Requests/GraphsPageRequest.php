@@ -2,17 +2,72 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
+use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
+use App\Models\Device;
+use App\Models\Port;
 use Illuminate\Foundation\Http\FormRequest;
+use LibreNMS\Util\Time;
 
 class GraphsPageRequest extends FormRequest
 {
+    public string $type = '';
+    public string $subtype = '';
+    public ?Device $device = null;
+    public ?Port $port = null;
+    public int $from = 0;
+    public int $to = 0;
+
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        $typeInput = $this->string('type', '')->toString();
+        if (! preg_match('/^[a-zA-Z0-9]+_[a-zA-Z0-9_.-]+$/', $typeInput)) {
+            return false;
+        }
+        [$this->type, $this->subtype] = explode('_', $typeInput, 2);
+
+        $this->from = (int) (Time::parseAt($this->input('from', '')) ?: LibrenmsConfig::get('time.day'));
+        $this->to = (int) (Time::parseAt($this->input('to', '')) ?: LibrenmsConfig::get('time.now'));
+
+        // Include legacy database and HTML helper functions
+        include_once base_path('includes/dbFacile.php');
+        include_once base_path('includes/common.php');
+        include_once base_path('includes/html/functions.inc.php');
+        include_once base_path('includes/rewrites.php');
+
+        $device = null;
+        if ($deviceId = $this->input('device')) {
+            $device = DeviceCache::get($deviceId);
+        } elseif (($entityId = $this->input('id')) && $this->type !== 'port') {
+            $device = DeviceCache::get($entityId);
+        }
+        $port = null;
+        $auth = false;
+
+        // Legacy auth.inc.php files expect their inputs in a $vars array in scope
+        $vars = $this->except(['page', 'username', 'password']);
+        if ($this->has('id') && ! $this->has('device') && $this->type !== 'port') {
+            $vars['device'] = $this->input('id');
+        }
+
+        $authPath = base_path("includes/html/graphs/{$this->type}/auth.inc.php");
+        if (! is_file($authPath)) {
+            // Let validation handle reporting that the graph type is invalid
+            return true;
+        }
+
+        $runAuth = static function (string $file, array $vars, mixed &$device, mixed &$port, bool &$auth): void {
+            require $file;
+        };
+        $runAuth($authPath, $vars, $device, $port, $auth);
+
+        $this->device = $device;
+        $this->port = $port;
+
+        return (bool) $auth;
     }
 
     /**
@@ -93,5 +148,28 @@ class GraphsPageRequest extends FormRequest
                 }
             }
         });
+    }
+
+    /**
+     * Build the legacy variables array for graph template execution.
+     *
+     * @param  array<string, mixed>  $overrides
+     * @return array<string, mixed>
+     */
+    public function toVars(array $overrides = []): array
+    {
+        $vars = $this->except(['page', 'username', 'password']);
+        $vars['from'] = $this->from;
+        $vars['to'] = $this->to;
+
+        if ($this->port) {
+            $vars['device'] = $this->port->device_id;
+            $vars['id'] = $this->port->port_id;
+        } elseif ($this->device) {
+            $vars['device'] = $this->device->device_id;
+            $vars['id'] = $this->device->device_id;
+        }
+
+        return array_merge($vars, $overrides);
     }
 }

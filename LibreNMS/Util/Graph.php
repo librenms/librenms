@@ -220,34 +220,38 @@ class Graph
      * Get an array of all graph subtypes for the given type
      *
      * @param  string  $type
-     * @param  Device  $device
+     * @param  ?Device  $device
      * @return array
      */
-    public static function getSubtypes($type, $device = null): array
+    public static function getSubtypes(string $type, ?Device $device = null): array
     {
+        $dir = base_path('includes/html/graphs/' . basename($type));
         $types = [];
 
-        // find the subtypes defined in files
-        foreach (glob(base_path("/includes/html/graphs/$type/*.inc.php")) as $file) {
-            $type = basename($file, '.inc.php');
-            if ($type != 'auth') {
-                $types[] = $type;
+        if (is_dir($dir)) {
+            foreach (new \DirectoryIterator($dir) as $file) {
+                if ($file->isFile() && str_ends_with($file->getFilename(), '.inc.php')) {
+                    $name = $file->getBasename('.inc.php');
+                    if ($name !== 'auth') {
+                        $types[] = $name;
+                    }
+                }
             }
         }
 
-        if ($device != null) {
-            // find the MIB subtypes
+        if ($device?->graphs) {
             $graphs = $device->graphs->pluck('graph');
 
-            foreach (LibrenmsConfig::get('graph_types') as $type => $type_data) {
+            foreach (LibrenmsConfig::get('graph_types') as $gType => $type_data) {
                 foreach (array_keys($type_data) as $subtype) {
-                    if ($graphs->contains($subtype) && self::isMibGraph($type, $subtype)) {
+                    if ($graphs->contains($subtype) && self::isMibGraph($gType, $subtype)) {
                         $types[] = $subtype;
                     }
                 }
             }
         }
 
+        $types = array_unique($types);
         sort($types);
 
         return $types;

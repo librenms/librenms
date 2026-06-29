@@ -28,22 +28,23 @@
 </x-panel>
 
 @unless ($showCommand)
-<div class="tw:flex tw:flex-wrap tw:justify-center tw:gap-1">
+    <div class="tw:hidden tw:sm:flex tw:flex-nowrap tw:justify-center tw:gap-1 tw:overflow-hidden">
 @foreach ($periodThumbs as $thumb)
     <a href="{{ $thumb['link'] }}"
        @if ($thumb['active']) aria-current="true" @endif
        style="--thumb-w: {{ $thumb['vars']['width'] }}px; --thumb-h: {{ $thumb['vars']['height'] }}px"
-       class="tw:flex tw:flex-col tw:items-center tw:gap-0.5 tw:p-1 tw:rounded-lg tw:border tw:no-underline tw:transition-colors
+       class="tw:flex tw:flex-col tw:items-center tw:gap-0.5 tw:p-1 tw:rounded-lg tw:border tw:no-underline tw:transition-colors tw:shrink tw:min-w-0 tw:basis-[var(--thumb-w)]
               @if ($thumb['active']) tw:border-blue-500 tw:bg-blue-50 tw:dark:bg-gray-700 @else tw:border-transparent tw:hover:border-gray-300 tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700 @endif">
-        <span class="tw:text-base tw:font-medium tw:whitespace-nowrap tw:text-gray-700 tw:dark:text-gray-200">{{ $thumb['text'] }}</span>
-        <img class="graph-image tw:block tw:w-[var(--thumb-w)] tw:h-[var(--thumb-h)] tw:object-cover tw:rounded"
+        <span class="tw:font-medium tw:whitespace-nowrap tw:text-gray-700 tw:dark:text-gray-200 tw:overflow-hidden tw:text-ellipsis tw:w-full tw:text-center">{{ $thumb['text'] }}</span>
+        <img class="graph-image tw:block tw:w-full tw:max-w-[var(--thumb-w)] tw:object-cover tw:rounded tw:border-0 tw:aspect-[var(--thumb-w)/var(--thumb-h)]"
              src="{{ route('graph', $thumb['vars']) }}"
-             style="border: 0;"
+             width="{{ $thumb['vars']['width'] }}"
+             height="{{ $thumb['vars']['height'] }}"
              @config('enable_lazy_load') loading="lazy" @endconfig />
     </a>
 @endforeach
 </div>
-<hr />
+<hr class="tw:hidden tw:sm:block" />
 @endunless
 
 <div class="tw:w-[48ch] tw:max-w-full tw:mx-auto tw:mb-2">
@@ -86,11 +87,10 @@
         });
         window.onload = function(){ window.dispatchEvent(new Event('resize')); }
     </script>
-    <img style="width:{{ $dynamicGraphWidth }}px;height:100%" class="graph graph-image img-responsive" data-src-template="{{ $dynamicGraphSrcTemplate }}" border="0" />
+    <img style="width:{{ $dynamicGraphWidth }}px" class="graph graph-image img-responsive tw:h-full tw:border-0" data-src-template="{{ $dynamicGraphSrcTemplate }}" />
 @else
-    <img class="graph-image img-responsive tw:mx-auto"
+    <img class="graph-image img-responsive tw:mx-auto tw:border-0"
          src="{{ route('graph', $mainGraphVars) }}"
-         style="border: 0;"
          @config('enable_lazy_load') loading="lazy" @endconfig />
 @endif
 </div>
@@ -108,7 +108,7 @@
 
 @if ($showCommand && $rrdCommand)
 <div class="infobox">
-    <p style="font-size: 16px; font-weight: bold;">{{ __('RRDTool Command') }}</p>
+    <p class="tw:text-lg tw:font-bold">{{ __('RRDTool Command') }}</p>
     <pre class="rrd-pre">{{ $rrdCommand }}</pre>
 </div>
 @endif
