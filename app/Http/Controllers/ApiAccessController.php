@@ -24,10 +24,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\ApiToken;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Laravel\Sanctum\PersonalAccessToken;
 use LibreNMS\Authentication\LegacyAuth;
 
 class ApiAccessController extends Controller
@@ -46,8 +48,15 @@ class ApiAccessController extends Controller
             ->orderBy('id')
             ->get();
 
+        $v1Tokens = PersonalAccessToken::query()
+            ->where('tokenable_type', User::class)
+            ->where('tokenable_id', $user->user_id)
+            ->orderBy('id')
+            ->get();
+
         return view('user.api-access', [
             'tokens' => $tokens,
+            'v1_tokens' => $v1Tokens,
             'legacy_auth_type' => LegacyAuth::getType(),
         ]);
     }
@@ -118,11 +127,71 @@ class ApiAccessController extends Controller
             ->with('status', __('API token has been removed.'));
     }
 
+    // ---- v1 (Sanctum) personal access tokens ----
+
+    public function storeV1(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'token_name' => 'required|string|max:255',
+            'expires_in' => 'nullable|integer|min:1',
+        ]);
+
+        $user = $request->user();
+        $expiresAt = empty($validated['expires_in'])
+            ? null
+            : now()->addDays((int) $validated['expires_in']);
+
+        $token = $user->createToken($validated['token_name'], ['*'], $expiresAt);
+
+        return response()->json([
+            'token' => $token->plainTextToken,
+            'token_id' => $token->accessToken->id,
+            'token_name' => $token->accessToken->name,
+            'created_at' => __('Just now'),
+            'expires_at' => $expiresAt ? $expiresAt->diffForHumans() : __('Never'),
+        ], 201);
+    }
+
+    public function renewV1(Request $request, int $id): JsonResponse
+    {
+        $validated = $request->validate([
+            'extend_days' => 'required|integer|min:0',
+        ]);
+
+        $token = $this->v1TokenOwnedByUser($request, $id);
+
+        // 0 days means the token never expires
+        $token->expires_at = (int) $validated['extend_days'] === 0
+            ? null
+            : now()->addDays((int) $validated['extend_days']);
+        $token->save();
+
+        return response()->json([
+            'expires_at' => $token->expires_at ? $token->expires_at->diffForHumans() : __('Never'),
+        ]);
+    }
+
+    public function destroyV1(Request $request, int $id): JsonResponse
+    {
+        $this->v1TokenOwnedByUser($request, $id)->delete();
+
+        return response()->json(['status' => 'ok']);
+    }
+
     private function tokenOwnedByUser(Request $request, int $id): ApiToken
     {
         return ApiToken::query()
             ->where('id', $id)
             ->where('user_id', $request->user()->user_id)
+            ->firstOrFail();
+    }
+
+    private function v1TokenOwnedByUser(Request $request, int $id): PersonalAccessToken
+    {
+        return PersonalAccessToken::query()
+            ->where('id', $id)
+            ->where('tokenable_type', User::class)
+            ->where('tokenable_id', $request->user()->user_id)
             ->firstOrFail();
     }
 }
