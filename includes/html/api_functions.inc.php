@@ -435,7 +435,7 @@ function add_device(Illuminate\Http\Request $request)
     try {
         $device = new Device(Arr::only($data, [
             'hostname',
-            'display',
+            'display_template',
             'overwrite_ip',
             'location_id',
             'override_sysLocation',
@@ -1034,60 +1034,45 @@ function trigger_device_discovery(Illuminate\Http\Request $request)
 
 function list_available_health_graphs(Illuminate\Http\Request $request)
 {
-    $hostname = $request->route('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = DeviceCache::get($request->route('hostname'));
 
-    return check_device_permission($device_id, function ($device_id) use ($request) {
+    return check_device_permission($device->device_id, function () use ($request, $device) {
         $input_type = $request->route('type');
-        if ($input_type) {
-            $type = preg_replace('/^device_/', '', $input_type);
-        }
+        $type = $input_type ? preg_replace('/^device_/', '', $input_type) : null;
         $sensor_id = $request->route('sensor_id');
-        $graphs = [];
 
-        if (isset($type)) {
-            if (isset($sensor_id)) {
-                $graphs = dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_id` = ?', [$sensor_id]);
-            } else {
-                foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', [$device_id, $type]) as $graph) {
-                    $graphs[] = [
-                        'sensor_id' => $graph['sensor_id'],
-                        'desc' => $graph['sensor_descr'],
-                    ];
+        if ($type === null) {
+            $graphs = $device->sensors()
+                ->where('sensor_deleted', 0)
+                ->distinct()
+                ->pluck('sensor_class')
+                ->map(fn ($sensor_class) => ['desc' => ucfirst((string) $sensor_class), 'name' => 'device_' . $sensor_class])
+                ->all();
+
+            $extraTypes = [
+                'processors' => ['desc' => 'Processors', 'name' => 'device_processor'],
+                'storage' => ['desc' => 'Storage', 'name' => 'device_storage'],
+                'mempools' => ['desc' => 'Memory Pools', 'name' => 'device_mempool'],
+            ];
+            foreach ($extraTypes as $relation => $entry) {
+                if ($device->{$relation}()->count() > 0) {
+                    $graphs[] = $entry;
                 }
             }
-        } else {
-            foreach (dbFetchRows('SELECT `sensor_class` FROM `sensors` WHERE `device_id` = ? AND `sensor_deleted` = 0 GROUP BY `sensor_class`', [$device_id]) as $graph) {
-                $graphs[] = [
-                    'desc' => ucfirst((string) $graph['sensor_class']),
-                    'name' => 'device_' . $graph['sensor_class'],
-                ];
-            }
-            $device = Device::find($device_id);
 
-            if ($device) {
-                if ($device->processors()->count() > 0) {
-                    array_push($graphs, [
-                        'desc' => 'Processors',
-                        'name' => 'device_processor',
-                    ]);
-                }
-
-                if ($device->storage()->count() > 0) {
-                    array_push($graphs, [
-                        'desc' => 'Storage',
-                        'name' => 'device_storage',
-                    ]);
-                }
-
-                if ($device->mempools()->count() > 0) {
-                    array_push($graphs, [
-                        'desc' => 'Memory Pools',
-                        'name' => 'device_mempool',
-                    ]);
-                }
-            }
+            return api_success($graphs, 'graphs');
         }
+
+        [$query, $id_field, $descr_field] = match ($type) {
+            'processor' => [$device->processors(), 'processor_id', 'processor_descr'],
+            'storage' => [$device->storage(), 'storage_id', 'storage_descr'],
+            'mempool' => [$device->mempools(), 'mempool_id', 'mempool_descr'],
+            default => [$device->sensors()->where('sensor_class', $type)->where('sensor_deleted', 0), 'sensor_id', 'sensor_descr'],
+        };
+
+        $graphs = $sensor_id
+            ? $query->where($id_field, $sensor_id)->get()->toArray()
+            : $query->get()->map(fn ($graph) => ['sensor_id' => $graph->{$id_field}, 'desc' => $graph->{$descr_field}])->all();
 
         return api_success($graphs, 'graphs');
     });
