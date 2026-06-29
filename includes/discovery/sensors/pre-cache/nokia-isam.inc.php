@@ -152,6 +152,14 @@ $portTable = [
 ];
 
 // dbm pre cache
+// Some ISAMs serve the SFP diagnostics subtree (SFP-MIB) slowly: the
+// sfpDiagAvailable walk alone takes several seconds and exceeds the default 1s
+// SNMP timeout, so it times out and no SFP dBm sensors are discovered (observed
+// on roughly half of a real ISAM fleet). Raise the timeout for the SFP queries
+// only (both the walk and the per-port gets below), then restore it.
+$nokiaIsamSfpTimeout = $device['timeout'] ?? null;
+$device['timeout'] = max((int) ($device['timeout'] ?? 0), 10);
+
 $pre_cache['nokiaIsamSfpPort'] = snmpwalk_cache_twopart_oid($device, 'sfpDiagAvailable', [], 'SFP-MIB', 'nokia');
 foreach ($pre_cache['nokiaIsamSfpPort'] as $slotId => $slot) {
     foreach ($slot as $portId => $port) {
@@ -184,4 +192,11 @@ foreach ($pre_cache['nokiaIsamSfpPort'] as $slotId => $slot) {
             unset($twopart_value);
         }
     }
+}
+
+// restore the original SNMP timeout
+if ($nokiaIsamSfpTimeout === null) {
+    unset($device['timeout']);
+} else {
+    $device['timeout'] = $nokiaIsamSfpTimeout;
 }
