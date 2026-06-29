@@ -4419,9 +4419,9 @@
         "graphs.mini.normal": {
             "default": {
                 "day": "24 Hours",
-                "week": "One Week",
-                "month": "One Month",
-                "year": "One Year"
+                "week": "1 Week",
+                "month": "1 Month",
+                "year": "1 Year"
             },
             "type": "array"
         },
@@ -4429,12 +4429,12 @@
             "default": {
                 "sixhour": "6 Hours",
                 "day": "24 Hours",
-                "week": "One Week",
-                "twoweek": "Two Weeks",
-                "month": "One Month",
-                "twomonth": "Two Months",
-                "year": "One Year",
-                "twoyear": "Two Years"
+                "week": "1 Week",
+                "twoweek": "2 Weeks",
+                "month": "1 Month",
+                "twomonth": "2 Months",
+                "year": "1 Year",
+                "twoyear": "2 Years"
             },
             "type": "array"
         },
@@ -4450,12 +4450,12 @@
                 "sixhour": "6 Hours",
                 "day": "24 Hours",
                 "twoday": "48 Hours",
-                "week": "One Week",
-                "twoweek": "Two Weeks",
-                "month": "One Month",
-                "twomonth": "Two Months",
-                "year": "One Year",
-                "twoyear": "Two Years"
+                "week": "1 Week",
+                "twoweek": "2 Weeks",
+                "month": "1 Month",
+                "twomonth": "2 Months",
+                "year": "1 Year",
+                "twoyear": "2 Years"
             },
             "type": "array"
         },
