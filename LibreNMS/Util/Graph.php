@@ -203,6 +203,7 @@ class Graph
                 throw new RrdGraphException('Graph Definition Error', 'Def Error', $width, $height);
             }
 
+            // @phpstan-ignore deadCode.unreachable ($rrd_options is populated by included graph templates, so this is reachable)
             return [...$graph_params->toRrdOptions(), ...$rrd_options];
         } finally {
             if ($previousCwd !== false) {
