@@ -218,6 +218,11 @@ class CustomMapDataController extends Controller
             'edges.*.arrow_scale' => 'nullable|numeric|between:0.1,10',
         ]);
 
+        // Once nested edges.* rules exist, validate() only returns the validated keys per edge
+        // (waypoints/arrow_type/arrow_scale) and strips the rest (from/to/style/...). Read the full
+        // edge payload from the request so those fields are preserved.
+        $data['edges'] = $request->input('edges', []);
+
         $map->load(['nodes', 'edges']);
 
         DB::transaction(function () use ($map, $data): void {
