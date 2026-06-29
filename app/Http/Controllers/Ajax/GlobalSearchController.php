@@ -7,8 +7,11 @@ use App\Http\Controllers\Controller;
 use App\Models\BgpPeer;
 use App\Models\Device;
 use App\Models\Eventlog;
+use App\Models\Mempool;
 use App\Models\Port;
+use App\Models\Processor;
 use App\Models\Sensor;
+use App\Models\Storage;
 use App\Models\WirelessSensor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -146,6 +149,66 @@ class GlobalSearchController extends Controller
             ]);
         if ($wireless->isNotEmpty()) {
             $groups[] = ['type' => 'wireless', 'label' => __('Wireless'), 'results' => $wireless];
+        }
+
+        $storage = Storage::hasAccess($user)->with('device')
+            ->where(fn (Builder $q) => $q->where('storage_descr', 'like', $like)
+                ->orWhere('storage_type', 'like', $like))
+            ->orderBy('storage_descr')->limit($limit)->get()
+            ->map(fn (Storage $s) => [
+                'name' => $s->storage_descr,
+                'subtitle' => trim($s->device?->display . ' ' . $s->storage_type),
+                'icon' => 'fa fa-hdd-o',
+                'url' => Url::generate([
+                    'page' => 'graphs',
+                    'id' => $s->storage_id,
+                    'type' => 'storage_usage',
+                    'from' => LibrenmsConfig::get('time.day'),
+                    'to' => LibrenmsConfig::get('time.now'),
+                ]),
+            ]);
+        if ($storage->isNotEmpty()) {
+            $groups[] = ['type' => 'storage', 'label' => __('Storage'), 'results' => $storage];
+        }
+
+        $mempools = Mempool::hasAccess($user)->with('device')
+            ->where(fn (Builder $q) => $q->where('mempool_descr', 'like', $like)
+                ->orWhere('mempool_type', 'like', $like))
+            ->orderBy('mempool_descr')->limit($limit)->get()
+            ->map(fn (Mempool $m) => [
+                'name' => $m->mempool_descr,
+                'subtitle' => trim($m->device?->display . ' ' . $m->mempool_type),
+                'icon' => 'fa fa-memory',
+                'url' => Url::generate([
+                    'page' => 'graphs',
+                    'id' => $m->mempool_id,
+                    'type' => 'mempool_usage',
+                    'from' => LibrenmsConfig::get('time.day'),
+                    'to' => LibrenmsConfig::get('time.now'),
+                ]),
+            ]);
+        if ($mempools->isNotEmpty()) {
+            $groups[] = ['type' => 'mempools', 'label' => __('Memory'), 'results' => $mempools];
+        }
+
+        $processors = Processor::hasAccess($user)->with('device')
+            ->where(fn (Builder $q) => $q->where('processor_descr', 'like', $like)
+                ->orWhere('processor_type', 'like', $like))
+            ->orderBy('processor_descr')->limit($limit)->get()
+            ->map(fn (Processor $p) => [
+                'name' => $p->processor_descr,
+                'subtitle' => trim($p->device?->display . ' ' . $p->processor_type),
+                'icon' => 'fa fa-microchip',
+                'url' => Url::generate([
+                    'page' => 'graphs',
+                    'id' => $p->processor_id,
+                    'type' => 'processor_usage',
+                    'from' => LibrenmsConfig::get('time.day'),
+                    'to' => LibrenmsConfig::get('time.now'),
+                ]),
+            ]);
+        if ($processors->isNotEmpty()) {
+            $groups[] = ['type' => 'processors', 'label' => __('Processors'), 'results' => $processors];
         }
 
         $eventlog = Eventlog::hasAccess($user)->with('device')
