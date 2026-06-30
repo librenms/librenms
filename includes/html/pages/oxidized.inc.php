@@ -35,6 +35,9 @@ $no_refresh = true;
                                 <th data-column-id="sysname" data-visible="false">SysName</th>
                                 <th data-column-id="last_status" data-formatter="status">Last Status</th>
                                 <th data-column-id="last_update">Last Update</th>
+                                <?php if (LibrenmsConfig::get('oxidized.features.versioning') === true) { ?>
+                                  <th data-column-id="last_change">Last Change</th>
+                                <?php } ?>
                                 <th data-column-id="model">Model</th>
                                 <th data-column-id="group">Group</th>
                                 <th data-column-id="actions" data-formatter="actions">Actions</th>

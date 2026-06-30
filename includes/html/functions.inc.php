@@ -779,6 +779,29 @@ function eventlog_severity($eventlog_severity)
     };
 } // end eventlog_severity
 
+/**
+ * Convert a UTC timestamp to local timezone.
+ *
+ * @param  string  $time  UTC time string
+ * @return string Formatted local time with timezone abbreviation, or original value on error
+ */
+function format_oxidize_timestamp($time)
+{
+    try {
+        // Convert UTC time string to local timezone set
+        $utc_time = $time;
+        $utc_date = new DateTime($utc_time, new DateTimeZone('UTC'));
+        $local_timezone = new DateTimeZone(date_default_timezone_get());
+        $local_date = $utc_date->setTimezone($local_timezone);
+
+        // Generate local time string
+        return $local_date->format('Y-m-d H:i:s T');
+    } catch (Exception) {
+        // Just display the current value
+        return $time;
+    }
+}
+
 function get_oxidized_nodes_list()
 {
     $context = stream_context_create([
@@ -795,25 +818,17 @@ function get_oxidized_nodes_list()
             //user cannot see this device, so let's skip it.
             continue;
         }
-        try {
-            // Convert UTC time string to local timezone set
-            $utc_time = $object['time'];
-            $utc_date = new DateTime($utc_time, new DateTimeZone('UTC'));
-            $local_timezone = new DateTimeZone(date_default_timezone_get());
-            $local_date = $utc_date->setTimezone($local_timezone);
-
-            // Generate local time string
-            $formatted_local_time = $local_date->format('Y-m-d H:i:s T');
-        } catch (Exception) {
-            // Just display the current value of $object['time'];
-            $formatted_local_time = $object['time'];
+        $extra_columns = '';
+        if (LibrenmsConfig::get('oxidized.features.versioning') === true) {
+            $extra_columns .= '<td>' . format_oxidize_timestamp($object['mtime']) . '</td>';
         }
         echo '<tr>
         <td>' . $device->device_id . '</td>
         <td>' . $object['name'] . '</td>
         <td>' . $device->sysName . '</td>
         <td>' . $object['status'] . '</td>
-        <td>' . $formatted_local_time . '</td>
+        <td>' . format_oxidize_timestamp($object['time']) . '</td>
+        ' . $extra_columns . '
         <td>' . $object['model'] . '</td>
         <td>' . $object['group'] . '</td>
         <td></td>
