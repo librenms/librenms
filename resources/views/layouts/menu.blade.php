@@ -649,7 +649,7 @@
                            placeholder="{{ __('Global Search') }}"
                            x-model="query" x-ref="input"
                            @input.debounce.250ms="run()" @focus="open = flat.length > 0"
-                           @keydown.down.prevent="move(1)" @keydown.up.prevent="move(-1)" @keydown.enter.prevent="go()">
+                           @keydown="onKey($event)">
                 </div>
                 <div x-show="open" x-cloak
                      class="tw:absolute tw:right-0 tw:mt-1 tw:w-[50rem] tw:max-w-[90vw] tw:max-h-[70vh] tw:overflow-y-auto tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200 tw:rounded-lg tw:shadow-xl tw:z-50">
@@ -663,9 +663,9 @@
                         <div>
                             <div class="tw:px-4 tw:py-1.5 tw:bg-gray-100 tw:dark:bg-dark-gray-200 tw:text-gray-600 tw:dark:text-dark-white-300 tw:text-xs tw:font-bold tw:uppercase" x-text="group.label"></div>
                             <template x-for="item in group.results" :key="group.type + item.url">
-                                <a :href="item.url" @mouseenter="active = flat.indexOf(item)"
+                                <a :href="item.url" @mouseenter="active = item.url"
                                    class="tw:flex tw:items-center tw:gap-2.5 tw:px-4 tw:py-2 tw:no-underline tw:text-gray-800 tw:dark:text-dark-white-100 tw:hover:bg-gray-50 tw:dark:hover:bg-dark-gray-300"
-                                   :class="[{ 'tw:bg-gray-100 tw:dark:bg-dark-gray-300': flat[active] === item }, item.status ? 'tw:border-l-5 ' + item.status : '']">
+                                   :class="(active === item.url ? 'tw:bg-gray-100 tw:dark:bg-dark-gray-300 ' : '') + (item.status ? 'tw:border-l-5 ' + item.status : '')">
                                     <template x-if="item.image">
                                         <img :src="item.image" class="tw:h-7 tw:w-7 tw:shrink-0 tw:object-contain tw:dark:bg-gray-50 tw:dark:rounded tw:dark:p-0.5">
                                     </template>
@@ -790,7 +790,7 @@
             flat: [],
             open: false,
             loading: false,
-            active: -1,
+            active: '',
             controller: null,
             run() {
                 if (this.query.trim() === '') { this.reset(); return; }
@@ -806,22 +806,29 @@
                     .then(data => {
                         this.groups = data.groups || [];
                         this.flat = this.groups.flatMap(g => g.results);
-                        this.active = -1;
+                        this.active = '';
                         this.loading = false;
                     })
                     .catch(e => { if (e.name !== 'AbortError') { this.loading = false; } });
             },
+            onKey(e) {
+                if (e.key === 'ArrowDown') { e.preventDefault(); this.move(1); }
+                else if (e.key === 'ArrowUp') { e.preventDefault(); this.move(-1); }
+                else if (e.key === 'Enter') { e.preventDefault(); this.go(); }
+            },
             move(dir) {
                 if (this.flat.length === 0) { return; }
                 this.open = true;
-                this.active = (this.active + dir + this.flat.length) % this.flat.length;
+                let i = this.flat.findIndex(it => it.url === this.active);
+                i = (i + dir + this.flat.length) % this.flat.length;
+                this.active = this.flat[i].url;
             },
             go() {
-                let item = this.flat[this.active] || this.flat[0];
-                if (item) { window.location.href = item.url; }
+                let url = this.active || (this.flat[0] && this.flat[0].url);
+                if (url) { window.location.href = url; }
             },
             close() { this.open = false; },
-            reset() { this.groups = []; this.flat = []; this.open = false; this.active = -1; this.loading = false; },
+            reset() { this.groups = []; this.flat = []; this.open = false; this.active = ''; this.loading = false; },
         }));
     });
 
