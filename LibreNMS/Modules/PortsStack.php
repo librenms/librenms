@@ -112,6 +112,22 @@ class PortsStack implements Module
                     'ifStackStatus' => 'active',
                 ]);
             });
+
+            // The LAG-MIB drops a member's row from the table the moment its link goes down,
+            // so a simple sync would delete it and lose the only signal an alert rule can match.
+            // Preserve the existing row as notInService; it flips back to active when the member returns.
+            $seen = array_flip($portStacks->filter()->pluck('low_ifIndex')->map(fn ($i) => (int) $i)->all());
+            foreach ($device->portsStack()->get() as $existing) {
+                if (! isset($seen[(int) $existing->low_ifIndex])) {
+                    $portStacks->push(new PortStack([
+                        'high_ifIndex' => $existing->high_ifIndex,
+                        'high_port_id' => PortCache::getIdFromIfIndex($existing->high_ifIndex, $device) ?? $existing->high_port_id,
+                        'low_ifIndex' => $existing->low_ifIndex,
+                        'low_port_id' => PortCache::getIdFromIfIndex($existing->low_ifIndex, $device) ?? $existing->low_port_id,
+                        'ifStackStatus' => 'notInService',
+                    ]));
+                }
+            }
         }
 
         ModuleModelObserver::observe(PortStack::class);
