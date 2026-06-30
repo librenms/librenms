@@ -22,13 +22,22 @@ REDIS_SENTINEL_SERVICE=mymaster
 REDIS_PASSWORD=your_redis_password
 
 # These values tell the web app to use Sentinel as the Redis backend - do not change
-REDIS_BROADCAST_CONNECTION=sentinel_cache
+CACHE_DRIVER=redis
+REDIS_QUEUE_CONNECTION=sentinel_default
 REDIS_CACHE_CONNECTION=sentinel_cache
-REDIS_LOCK_CACHE_CONNECTION=sentinel_cache
+REDIS_CACHE_LOCK_CONNECTION=sentinel_default
+
 SESSION_DRIVER=redis
 SESSION_CONNECTION=sentinel_session
 ```
 
+The three `sentinel_*` connections are defined in `config/database.php`:
+
+- `sentinel_default` - DB 0, used by queue and cache lock, and any caller that
+  references the `default`-equivalent Sentinel backend.
+- `sentinel_session` - DB 1, used by session storage.
+- `sentinel_cache` - DB 2, used by the application cache.
+        
 ### Redis Sentinel Authentication
 
 If your Redis Sentinel cluster is password-protected, you need to append `password=your_redis_password` to each Redis Sentinel URL in the `REDIS_SENTINEL_HOSTS` variable.
