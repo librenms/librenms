@@ -104,11 +104,12 @@ class PrinterSupplies implements Module
         $toner_snmp = [];
         $contexts = $os instanceof PrinterSuppliesContext ? $os->getPrinterSuppliesContexts() : [''];
         foreach ($contexts as $context) {
-            $query = SnmpQuery::device($os->getDevice())
+            $toner_snmp = SnmpQuery::device($os->getDevice())
                 ->numeric()
-                ->context($context);
+                ->context($context)
+                ->get($toner_data->pluck('supply_oid')->all())
+                ->values();
 
-            $toner_snmp = $query->get($toner_data->pluck('supply_oid')->toArray())->values();
             if (! empty($toner_snmp)) {
                 break;
             }
