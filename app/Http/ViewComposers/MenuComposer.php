@@ -317,7 +317,6 @@ class MenuComposer
         $vars['poller_clusters'] = \App\Models\PollerCluster::exists();
 
         // Search bar
-        $vars['typeahead_limit'] = LibrenmsConfig::get('webui.global_search_result_limit');
         $vars['global_search_ctrlf_focus'] = UserPref::getPref(Auth::user(), 'global_search_ctrlf_focus');
 
         // Plugins
