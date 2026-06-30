@@ -1,9 +1,9 @@
 <?php
 
 /**
- * airflow.inc.php
+ * AlertNotifications.php
  *
- * LibreNMS airflow overview for WebUI
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,9 +20,12 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2016 Neil Lathwood
- * @author     Neil Lathwood <neil@lathwood.co.uk>
+ * @copyright  2026 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
-$sensor_class = \LibreNMS\Enum\Sensor::Airflow;
 
-require 'includes/html/pages/device/overview/generic/sensor.inc.php';
+namespace LibreNMS\Alert;
+
+class AlertNotifications
+{
+}
