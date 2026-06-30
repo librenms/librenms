@@ -25,7 +25,7 @@ use LibreNMS\RRD\RrdDefinition;
 //NET-SNMP-EXTEND-MIB::nsExtendOutputFull."exim-stats"
 $name = 'exim-stats';
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.101.120.105.109.45.115.116.97.116.115';
-$stats = snmp_get($device, $oid, '-Oqv');
+$stats = SnmpQuery::get($oid)->value();
 
 [$frozen, $queue] = explode("\n", $stats);
 
