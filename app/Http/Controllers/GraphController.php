@@ -2,50 +2,55 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\GraphRequest;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Util\Debug;
-use LibreNMS\Util\Graph;
-use LibreNMS\Util\Url;
 
 class GraphController extends Controller
 {
     /**
      * @throws RrdGraphException
      */
-    public function __invoke(Request $request, string $path = ''): Response
+    public function __invoke(GraphRequest $request): Response
     {
-        $vars = Url::parseLegacyPathVars();
-
-        if ($request->user() !== null) {
+        if (Auth::check()) {
             // only allow debug for logged in users
-            Debug::set(! empty($vars['debug']));
+            Debug::set($request->boolean('debug'));
         }
 
         try {
-            $graph = Graph::get($vars);
+            $graph = $request->getGraph();
+
+            $image = $graph->render();
 
             if (Debug::isEnabled()) {
-                return response('<img src="' . $graph->inline() . '" alt="graph" />');
+                return response('<img src="' . $image->inline() . '" alt="graph" />');
             }
 
             $headers = [
-                'Content-type' => $graph->contentType(),
+                'Content-type' => $image->contentType(),
             ];
 
             if ($request->input('output') == 'base64') {
-                return response($graph->base64(), 200, $headers);
+                return response($image->base64(), 200, $headers);
             }
 
-            return response($graph->data, 200, $headers);
+            return response($image->data, 200, $headers);
         } catch (RrdGraphException $e) {
             if (Debug::isEnabled()) {
                 throw $e;
             }
 
-            return response($e->generateErrorImage(), 500, ['Content-type' => ImageFormat::forGraph($vars['graph_type'] ?? null)->contentType()]);
+            try {
+                $format = $request->getGraph()->getParams()->imageFormat;
+            } catch (\Throwable) {
+                $format = ImageFormat::Png;
+            }
+
+            return response($e->generateErrorImage(), 500, ['Content-type' => $format->contentType()]);
         }
     }
 }
