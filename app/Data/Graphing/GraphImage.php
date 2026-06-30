@@ -24,7 +24,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Data\Graphing;
+namespace App\Data\Graphing;
 
 use LibreNMS\Enum\ImageFormat;
 

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Data\TimeSeries\Contracts\MetricIdentifiable;
+use App\Data\TimeSeries\MetricIdentity;
 use App\Observers\ProcessorObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -19,7 +21,7 @@ use LibreNMS\Util\Number;
  * @property int|null $processor_perc_warn_custom
  */
 #[ObservedBy([ProcessorObserver::class])]
-class Processor extends DeviceRelatedModel implements Keyable
+class Processor extends DeviceRelatedModel implements Keyable, MetricIdentifiable
 {
     use HasFactory;
 
@@ -119,5 +121,14 @@ class Processor extends DeviceRelatedModel implements Keyable
     public function getCompositeKey(): string
     {
         return $this->processor_type . '_' . $this->processor_index;
+    }
+
+    public function toMetricIdentity(string $metricName): MetricIdentity
+    {
+        return new MetricIdentity($metricName, [
+            'device_id' => $this->device_id,
+            'processor_type' => $this->processor_type,
+            'processor_index' => $this->processor_index,
+        ]);
     }
 }
