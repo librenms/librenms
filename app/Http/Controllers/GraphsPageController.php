@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Data\Graphing\GraphFactory;
+use App\Data\Graphing\GraphParameters;
 use App\Facades\LibrenmsConfig;
-use App\Http\Requests\GraphsPageRequest;
+use App\Http\Requests\GraphRequest;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Contracts\View\View;
@@ -14,15 +16,19 @@ use LibreNMS\Util\Time;
 
 class GraphsPageController extends Controller
 {
-    public function __invoke(GraphsPageRequest $request): View
+    public function __invoke(GraphRequest $request): View
     {
-        $fullType = "{$request->type}_$request->subtype";
+        $params = $request->graphParams();
+        $graph = $request->graph();
+        $device = $graph->getDevice();
+        $port = $graph->getPort();
+        $fullType = "{$params->type}_$params->subtype";
         $showCommand = $request->input('showcommand') === 'yes';
         $isDynamicGraph = LibrenmsConfig::get('webui.dynamic_graphs', false) === true;
 
         $this->handleWidescreenPreference($request);
 
-        $subtitle = $this->buildSubtitle($request->type, $request->subtype, $request);
+        $subtitle = $this->buildSubtitle($params->type, $params->subtype, $graph->getSubtitle());
 
         [$subtypeOptions, $subtypeSelected] = $this->subtypeNavigationOptions($request);
 
@@ -32,13 +38,13 @@ class GraphsPageController extends Controller
         $mainGraphVars = $request->toVars(['height' => $height, 'width' => $width]);
 
         return view('graphs.show', [
-            'device' => $request->device,
-            'port' => $request->port,
+            'device' => $device,
+            'port' => $port,
             'subtitle' => $subtitle,
-            'pageTitle' => $this->entityTitle($request->device, $request->port) . $subtitle,
+            'pageTitle' => $this->entityTitle($device, $port) . $subtitle,
             'subtypeOptions' => $subtypeOptions,
             'subtypeSelected' => $subtypeSelected,
-            'periodThumbs' => $this->periodThumbnails($request, $request->from, $request->to, $thumbWidth),
+            'periodThumbs' => $this->periodThumbnails($request, $thumbWidth),
             'toggles' => $this->controlToggles($request, $fullType, $showCommand),
             'trendHint' => $fullType === 'port_bits' || str_contains($fullType, 'sensor_'),
             'graphFrom' => $request->input('from') ?? '-1d',
@@ -57,7 +63,7 @@ class GraphsPageController extends Controller
     /**
      * Store widescreen display toggle state in session.
      */
-    private function handleWidescreenPreference(GraphsPageRequest $request): void
+    private function handleWidescreenPreference(GraphRequest $request): void
     {
         if ($request->has('widescreen')) {
             $request->input('widescreen') === 'yes'
@@ -71,9 +77,10 @@ class GraphsPageController extends Controller
      *
      * @return array{0: array<int, array{value: string, text: string}>, 1: ?string}
      */
-    private function subtypeNavigationOptions(GraphsPageRequest $request): array
+    private function subtypeNavigationOptions(GraphRequest $request): array
     {
-        $graphSubtypes = in_array($request->type, ['sensor', 'wireless'], true) ? [] : Graph::getSubtypes($request->type, $request->device);
+        $type = $request->graphParams()->type;
+        $graphSubtypes = in_array($type, ['sensor', 'wireless'], true) ? [] : Graph::getSubtypes($type, $request->graph()->getDevice());
 
         if (count($graphSubtypes) <= 1) {
             return [[], null];
@@ -81,10 +88,10 @@ class GraphsPageController extends Controller
 
         return [
             array_map(fn ($availType) => [
-                'value' => $this->graphUrl($request, ['type' => "{$request->type}_{$availType}"]),
+                'value' => $this->graphUrl($request, ['type' => "{$type}_{$availType}"]),
                 'text' => StringHelpers::niceCase($availType),
             ], $graphSubtypes),
-            $this->graphUrl($request, ['type' => "{$request->type}_{$request->subtype}"]),
+            $this->graphUrl($request, ['type' => "{$type}_{$request->graphParams()->subtype}"]),
         ];
     }
 
@@ -93,10 +100,11 @@ class GraphsPageController extends Controller
      *
      * @return array<int, array<string, mixed>>
      */
-    private function periodThumbnails(GraphsPageRequest $request, int $from, int $to, int $thumbWidth): array
+    private function periodThumbnails(GraphRequest $request, int $thumbWidth): array
     {
         $now = (int) LibrenmsConfig::get('time.now');
-        $currentDuration = ($to ?: $now) - $from;
+        $params = $request->graphParams();
+        $currentDuration = $now - $params->from;
         $periodThumbs = [];
 
         foreach (LibrenmsConfig::get('graphs.row.normal') as $period => $text) {
@@ -104,7 +112,7 @@ class GraphsPageController extends Controller
             $periodDuration = $now - $periodFrom;
             $periodThumbs[] = [
                 'text' => __("settings.settings.graphs.row.normal.options.$period"),
-                'active' => ! $to && $periodDuration > 0 && abs($currentDuration - $periodDuration) <= 0.05 * $periodDuration,
+                'active' => $params->ends_now && $periodDuration > 0 && abs($currentDuration - $periodDuration) <= 0.05 * $periodDuration,
                 'link' => $this->graphUrl($request, ['from' => Time::toRelativeOffset($periodDuration), 'to' => null]),
                 'vars' => $request->toVars([
                     'height' => '90',
@@ -124,7 +132,7 @@ class GraphsPageController extends Controller
      *
      * @return array<int, array{text: string, link: string}>
      */
-    private function controlToggles(GraphsPageRequest $request, string $fullType, bool $showCommand): array
+    private function controlToggles(GraphRequest $request, string $fullType, bool $showCommand): array
     {
         $toggles = [
             $request->input('legend') === 'no'
@@ -170,10 +178,10 @@ class GraphsPageController extends Controller
     /**
      * Build the plain-text subtitle (" :: ...") describing the graph subtype.
      */
-    private function buildSubtitle(string $type, string $subtype, GraphsPageRequest $request): string
+    private function buildSubtitle(string $type, string $subtype, ?string $graphSubtitle): string
     {
-        if ($request->subtitle) {
-            return $request->subtitle;
+        if ($graphSubtitle) {
+            return $graphSubtitle;
         }
 
         if (LibrenmsConfig::has("graph_types.$type.$subtype.descr")) {
@@ -202,7 +210,7 @@ class GraphsPageController extends Controller
      *
      * @return array{width: int, height: int, thumbWidth: int}
      */
-    private function graphDimensions(GraphsPageRequest $request): array
+    private function graphDimensions(GraphRequest $request): array
     {
         if ($request->session()->get('widescreen')) {
             $width = 1700;
@@ -237,15 +245,7 @@ class GraphsPageController extends Controller
     private function renderRrdCommand(array $graphVars): ?string
     {
         try {
-            $rrd_options = Graph::getRrdOptions($graphVars);
-
-            // rrd file names are relative to the rrd directory
-            return 'cd ' . escapeshellarg((string) LibrenmsConfig::get('rrd_dir')) . ' && ' . implode(' ', array_map(escapeshellarg(...), [
-                'rrdtool',
-                'graph',
-                '-',
-                ...$rrd_options,
-            ]));
+            return app(GraphFactory::class)->graphFor(new GraphParameters($graphVars))->getDebugCommand();
         } catch (\Throwable $e) {
             Log::error('RRDTool Command Error: ' . $e->getMessage(), ['exception' => $e]);
 
@@ -258,7 +258,7 @@ class GraphsPageController extends Controller
      *
      * @param  array<string, mixed>  $changes
      */
-    private function graphUrl(GraphsPageRequest $request, array $changes = []): string
+    private function graphUrl(GraphRequest $request, array $changes = []): string
     {
         $params = array_merge(
             $request->except(['page', 'username', 'password', 'width', 'height']),

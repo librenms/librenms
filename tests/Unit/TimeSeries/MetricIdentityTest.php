@@ -9,15 +9,11 @@ class MetricIdentityTest extends TestCase
 {
     public function test_it_can_be_instantiated_with_measurement_and_tags(): void
     {
-        $identity = new MetricIdentity('host.example.com', 'mempool', ['mempool_index' => 10]);
+        $identity = new MetricIdentity(1, 'mempool', ['mempool_index' => 10], ['mempool', 'hr', 10]);
 
-        $this->assertEquals('host.example.com', $identity->owner);
+        $this->assertEquals(1, $identity->deviceId);
         $this->assertEquals('mempool', $identity->measurement);
         $this->assertEquals(['mempool_index' => 10], $identity->tags);
-    }
-
-    public function test_the_owner_is_a_series_tag(): void
-    {
-        $this->assertSame(['owner' => 'proxmox-abc', 'id' => 5], new MetricIdentity('proxmox-abc', 'vm.cpu', ['id' => 5])->seriesTags());
+        $this->assertEquals(['mempool', 'hr', 10], $identity->rrdName);
     }
 }

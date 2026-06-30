@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Observers\ProcessorObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -119,5 +120,18 @@ class Processor extends DeviceRelatedModel implements Keyable
     public function getCompositeKey(): string
     {
         return $this->processor_type . '_' . $this->processor_index;
+    }
+
+    /**
+     * Identity used when storing and reading the usage time series
+     */
+    public function metricIdentity(): MetricIdentity
+    {
+        return new MetricIdentity(
+            $this->device_id,
+            'processors',
+            ['processor_type' => $this->processor_type, 'processor_index' => $this->processor_index],
+            ['processor', $this->processor_type, $this->processor_index],
+        );
     }
 }
