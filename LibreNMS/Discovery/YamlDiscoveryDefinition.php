@@ -118,7 +118,7 @@ class YamlDiscoveryDefinition
             if (! empty($numeric_oids)) {
                 $snmpQuery = SnmpQuery::numeric();
                 if (isset($yamlItem['snmp_flags'])) {
-                    $snmpQuery->options($yamlItem['snmp_flags']);
+                    $snmpQuery = $snmpQuery->options($yamlItem['snmp_flags']);
                 }
                 $snmp_data = $snmpQuery->get($numeric_oids)->values();
                 $fetchedData = array_merge($fetchedData, $snmp_data);
@@ -127,7 +127,7 @@ class YamlDiscoveryDefinition
             if (! empty($oids)) {
                 $snmpQuery = SnmpQuery::enumStrings()->numericIndex();
                 if (isset($yamlItem['snmp_flags'])) {
-                    $snmpQuery->options($yamlItem['snmp_flags']);
+                    $snmpQuery = $snmpQuery->options($yamlItem['snmp_flags']);
                 }
                 $response = $snmpQuery->walk($oids);
                 $response->valuesByIndex($snmp_data); // load into the $snmp_data array
@@ -187,7 +187,7 @@ class YamlDiscoveryDefinition
         $query = SnmpQuery::enumStrings()->numericIndex();
 
         if (isset($data['snmp_flags'])) {
-            $query->options($data['snmp_flags']);
+            $query = $query->options($data['snmp_flags']);
         }
 
         return $query->walk($data['oids'])->valuesByIndex();
