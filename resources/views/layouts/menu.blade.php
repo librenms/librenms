@@ -240,6 +240,9 @@
                         <li><a href="{{ url('fullscreenmap') }}"><i class="fa fa-expand fa-fw fa-lg"
                                                                     aria-hidden="true"></i> {{ __('Geographical') }}
                             </a></li>
+                        <li><a href="{{ route('maps.custom.index') }}">
+                                <i class="fa fa-list fa-fw fa-lg" aria-hidden="true"></i> {{ __('Custom Maps') }}
+                            </a></li>
                         @if($device_groups->isNotEmpty())
                             <li class="dropdown-submenu"><a><i class="fa fa-th fa-fw fa-lg"
                                                                aria-hidden="true"></i> {{ __('Device Groups Maps') }}
