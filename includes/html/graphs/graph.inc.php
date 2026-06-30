@@ -37,10 +37,7 @@ try {
 
     require LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/auth.inc.php";
 
-    if ($auth && is_customoid_graph($type, $subtype)) {
-        $unit = $vars['unit'];
-        include LibrenmsConfig::get('install_dir') . '/includes/html/graphs/customoid/customoid.inc.php';
-    } elseif ($auth && is_file(LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php")) {
+    if ($auth && is_file(LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php")) {
         include LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php";
     } elseif ($auth && is_file(LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/generic.inc.php")) {
         include LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/generic.inc.php";
