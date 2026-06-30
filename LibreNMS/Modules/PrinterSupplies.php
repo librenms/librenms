@@ -70,7 +70,7 @@ class PrinterSupplies implements Module
         $contexts = $os instanceof PrinterSuppliesContext ? $os->getPrinterSuppliesContexts() : [''];
 
         ModuleModelObserver::observe(PrinterSupply::class, __('Printer Supplies'));
-        $levels = $this->discoveryLevels($contexts, $os->getName(), $device_array['hardware'] ?? '');
+        $levels = $this->discoveryLevels($device_array, $contexts);
         $this->syncModelsByGroup($device, 'printerSupplies', $levels, [['supply_type', '!=', 'input']]);
         ModuleModelObserver::done();
 
@@ -116,12 +116,7 @@ class PrinterSupplies implements Module
 
         foreach ($toner_data as $toner) {
             $raw_toner = $toner_snmp[$toner['supply_oid']] ?? null;
-            $tonerperc = self::getTonerLevel(
-                $raw_toner,
-                $toner['supply_capacity'] ?? null,
-                $device['os'] ?? '',
-                $device['hardware'] ?? ''
-            );
+            $tonerperc = self::getTonerLevel($device, $raw_toner, $toner['supply_capacity'] ?? null);
             Log::info('Checking toner ' . $toner['supply_descr'] . "... $tonerperc %");
 
             $tags = [
@@ -185,7 +180,7 @@ class PrinterSupplies implements Module
         ];
     }
 
-    private function discoveryLevels(array $contexts, string $os, string $hardware): Collection
+    private function discoveryLevels(array $device, array $contexts): Collection
     {
         $levels = new Collection();
 
@@ -242,7 +237,7 @@ class PrinterSupplies implements Module
             if (empty($raw_toner)) {
                 $supply_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.5.$last_index";
                 $raw_toner = SnmpQuery::context($context)->get($supply_oid)->value();
-                if ($raw_toner === '' && $os === 'brother') {
+                if ($raw_toner === '' && $device['os'] === 'brother') {
                     // Preserve legacy Brother handling when this vendor fallback OID is absent.
                     $raw_toner = '0';
                 }
@@ -260,7 +255,7 @@ class PrinterSupplies implements Module
             }
 
             $capacity = self::getTonerCapacity($raw_capacity);
-            $current = self::getTonerLevel($raw_toner, $capacity, $os, $hardware);
+            $current = self::getTonerLevel($device, $raw_toner, $capacity);
 
             if (is_numeric($current)) {
                 $levels->push(new PrinterSupply([
@@ -334,11 +329,12 @@ class PrinterSupplies implements Module
     }
 
     /**
+     * @param  array  $device
      * @param  int|string  $raw_value  The value returned from snmp
      * @param  int  $capacity  the normalized capacity
      * @return int|float|bool the toner level as a percentage
      */
-    private static function getTonerLevel($raw_value, $capacity, string $os, string $hardware)
+    private static function getTonerLevel(array $device, $raw_value, $capacity)
     {
         // -3 means some toner is left
         if ($raw_value == '-3') {
@@ -356,12 +352,12 @@ class PrinterSupplies implements Module
         }
 
         // Non-standard snmp values
-        if ($os == 'ricoh' || $os == 'nrg' || $os == 'lanier') {
+        if ($device['os'] == 'ricoh' || $device['os'] == 'nrg' || $device['os'] == 'lanier') {
             if ($raw_value == '-100') {
                 return 0;
             }
-        } elseif ($os == 'brother') {
-            if (! Str::contains($hardware, 'MFC-L8850')) {
+        } elseif ($device['os'] == 'brother') {
+            if (! Str::contains($device['hardware'] ?? '', 'MFC-L8850')) {
                 switch ($raw_value) {
                     case '0':
                         return 100;
