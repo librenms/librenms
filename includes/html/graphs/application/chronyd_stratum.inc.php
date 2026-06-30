@@ -10,6 +10,7 @@ $array = [
     'stratum' => ['descr' => 'Stratum'],
 ];
 
+$i = 0;
 $rrd_list = [];
 foreach ($array as $ds => $var) {
     $rrd_list[$i]['filename'] = $rrd_filename;

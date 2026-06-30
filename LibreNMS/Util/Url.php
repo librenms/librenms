@@ -343,11 +343,14 @@ class Url
         return '<img src="graph-image ' . url('graph.php') . '?type=' . $args['graph_type'] . '&amp;id=' . $args['port_id'] . '&amp;from=' . $args['from'] . '&amp;to=' . $args['to'] . '&amp;width=' . $args['width'] . '&amp;height=' . $args['height'] . '&amp;bg=' . $args['bg'] . '">';
     }
 
+    /**
+     * Generate a URL from page and key/value vars.
+     */
     public static function generate($vars, $new_vars = [])
     {
         $vars = array_merge($vars, $new_vars);
 
-        $url = url(LibrenmsConfig::get('base_url', true) . $vars['page'] . '');
+        $url = url($vars['page'] ?? '');
         unset($vars['page']);
 
         return $url . self::urlParams($vars);
@@ -370,7 +373,7 @@ class Url
             }
         }
 
-        return $url;
+        return rtrim($url, '/');
     }
 
     /**
@@ -664,10 +667,13 @@ class Url
             parse_str($parsed_url['query'] ?? '', $parsed_get_vars);
         }
 
-        // don't parse the subdirectory, if there is one in the path
-        $base_url = parse_url(LibrenmsConfig::get('base_url'))['path'] ?? '';
-        if (strlen($base_url) > 1) {
-            $segments = explode('/', trim(str_replace($base_url, '', $path), '/'));
+        // Strip subdirectory prefix before parsing path segments.
+        // APP_URL is preferred; fall back to SCRIPT_NAME via getBasePath() so
+        // subdirectory installs work without APP_URL when the web server sets
+        // SCRIPT_NAME correctly (nginx: fastcgi_params, Apache: RewriteBase).
+        $base_path = parse_url((string) config('app.url'), PHP_URL_PATH) ?: request()->getBasePath();
+        if (strlen($base_path) > 1) {
+            $segments = explode('/', trim(str_replace($base_path, '', $path), '/'));
         } else {
             $segments = explode('/', trim((string) $path, '/'));
         }

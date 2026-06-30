@@ -318,10 +318,6 @@ return [
             'description' => '验证记录项目大于',
             'help' => '由daily.sh脚本执行的清理任务',
         ],
-        'base_url' => [
-            'description' => '指定 URL',
-            'help' => '此设置仅在您需要*强制*使用特定主机名/端口时才应设置。它将阻止从任何其他主机名访问Web界面。',
-        ],
         'distributed_poller' => [
             'description' => '启用分布式轮询 (需要额外设定)',
             'help' => '启用全系统分布式轮询功能。此功能旨在实现负载分担，而非远程轮询。您必须阅读以下文档以获取启用步骤：https://docs.librenms.org/Extensions/Distributed-Poller/',

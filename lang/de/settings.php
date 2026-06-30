@@ -320,10 +320,6 @@ return [
             'description' => 'Entferne Auth log Einträge welche älter sind als',
             'help' => 'Wird durch daily.sh erledigt',
         ],
-        'base_url' => [
-            'description' => 'Spezifiziere URL',
-            'help' => 'Sollte nur gesetzt werden wenn man den Zugriff nur über einen bestimmten Hostnamen/Port erlauben möchte',
-        ],
         'distributed_poller' => [
             'description' => 'aktiviere Distributed Polling (benötigt zusätzliche Konfiguration)',
             'help' => 'Aktiviere systemweites Distributed Polling. Dies wird genutzt für Lastverteilung und nicht remote Polling. Lesen Sie hierzu folgende Dokumentation: https://docs.librenms.org/Extensions/Distributed-Poller/',
