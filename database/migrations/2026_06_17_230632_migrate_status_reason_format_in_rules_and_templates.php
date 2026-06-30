@@ -37,7 +37,7 @@ return new class extends Migration
             if (str_contains((string) $query, 'devices.status_reason')) {
                 $newQuery = preg_replace('/devices\.status_reason\s*=\s*[\'"]([^\'"]+)[\'"]/', 'devices.status_reason LIKE \'%$1%\'', (string) $query);
                 $newQuery = preg_replace('/devices\.status_reason\s*!=\s*[\'"]([^\'"]+)[\'"]/', 'devices.status_reason NOT LIKE \'%$1%\'', $newQuery);
-                
+
                 if ($newQuery !== $query) {
                     $query = $newQuery;
                     $changed = true;
@@ -54,7 +54,7 @@ return new class extends Migration
     }
 
     /**
-     * @param  array{condition?: string, field?: string, rules?: array, operator?: string}  $node
+     * @param  array{condition?: string, field?: string, rules?: array<int, mixed>, operator?: string}  $node
      */
     private function updateBuilderNode(array &$node): bool
     {
