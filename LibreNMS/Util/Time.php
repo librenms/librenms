@@ -235,4 +235,24 @@ class Time
     {
         return Carbon::now(session('preferences.timezone'));
     }
+
+    public static function toRelativeOffset(int $seconds): string
+    {
+        $timeUnits = [
+            'y' => 31536000,
+            'mo' => 2592000,
+            'w' => 604800,
+            'd' => 86400,
+            'h' => 3600,
+            'm' => 60,
+        ];
+
+        foreach ($timeUnits as $unit => $size) {
+            if ($seconds >= $size && $seconds % $size === 0) {
+                return '-' . ($seconds / $size) . $unit;
+            }
+        }
+
+        return '-' . $seconds . 's';
+    }
 }
