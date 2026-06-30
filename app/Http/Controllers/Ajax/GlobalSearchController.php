@@ -36,7 +36,7 @@ class GlobalSearchController extends Controller
         $groups = [];
 
         $deviceQuery = Device::hasAccess($user)->select('devices.*')->distinct();
-        $deviceQuery->where(function (Builder $q) use ($like, $search, $deviceQuery) {
+        $deviceQuery->where(function (Builder $q) use ($like, $search, $deviceQuery): void {
             $q->where('hostname', 'like', $like)
                 ->orWhere('sysName', 'like', $like)
                 ->orWhere('display', 'like', $like)
