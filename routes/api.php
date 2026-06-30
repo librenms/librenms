@@ -37,6 +37,8 @@ Route::prefix('v0')->group(function (): void {
         Route::get('portgroups/{group}', [App\Api\Controllers\LegacyApiController::class, 'get_graph_by_portgroup'])->name('get_graph_by_portgroup');
         Route::get('alerts/{id}', [App\Api\Controllers\LegacyApiController::class, 'list_alerts'])->name('get_alert');
         Route::get('alerts', [App\Api\Controllers\LegacyApiController::class, 'list_alerts'])->name('list_alerts');
+        Route::get('problems/{id}', [App\Api\Controllers\LegacyApiController::class, 'list_alerts'])->name('get_problem');
+        Route::get('problems', [App\Api\Controllers\LegacyApiController::class, 'list_alerts'])->name('list_problems');
         Route::get('rules/{id}', [App\Api\Controllers\LegacyApiController::class, 'list_alert_rules'])->name('get_alert_rule');
         Route::get('rules', [App\Api\Controllers\LegacyApiController::class, 'list_alert_rules'])->name('list_alert_rules');
         Route::get('routing/vrf/{id}', [App\Api\Controllers\LegacyApiController::class, 'get_vrf'])->name('get_vrf');
@@ -86,6 +88,8 @@ Route::prefix('v0')->group(function (): void {
         Route::delete('bills/{bill_id}', [App\Api\Controllers\LegacyApiController::class, 'delete_bill'])->name('delete_bill');
         Route::put('alerts/{id}', [App\Api\Controllers\LegacyApiController::class, 'ack_alert'])->name('ack_alert');
         Route::put('alerts/unmute/{id}', [App\Api\Controllers\LegacyApiController::class, 'unmute_alert'])->name('unmute_alert');
+        Route::put('problems/{id}', [App\Api\Controllers\LegacyApiController::class, 'ack_alert'])->name('ack_problem');
+        Route::put('problems/unmute/{id}', [App\Api\Controllers\LegacyApiController::class, 'unmute_alert'])->name('unmute_problem');
         Route::post('alert_templates', [App\Api\Controllers\LegacyApiController::class, 'add_edit_alert_template'])->name('add_alert_template');
         Route::put('alert_templates', [App\Api\Controllers\LegacyApiController::class, 'add_edit_alert_template'])->name('edit_alert_template');
         // Route::delete('alert_templates/{id}', [App\Api\Controllers\LegacyApiController::class, 'delete_alert_template'])->name('delete_alert_template');

@@ -35,13 +35,13 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\AlertLog;
+use App\Models\AlertProblem;
 use App\Models\AlertRule;
 use App\Models\AlertTransport;
 use App\Models\ApplicationMetric;
 use App\Models\Eventlog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertRuleOperationPhase;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\MaintenanceStatus;
@@ -192,24 +192,29 @@ class RunAlerts
                 $obj['diff'] = $extra['diff'];
             }
         } elseif ($alert['state'] == AlertState::RECOVERED) {
-            // Alert is now cleared
-            $id = dbFetchRow('SELECT alert_log.id,alert_log.time_logged,alert_log.details FROM alert_log WHERE alert_log.state != ? && alert_log.state != ? && alert_log.rule_id = ? && alert_log.device_id = ? && alert_log.id < ? ORDER BY id DESC LIMIT 1', [AlertState::ACKNOWLEDGED, AlertState::RECOVERED, $alert['rule_id'], $alert['device_id'], $alert['id']]);
-            if (empty($id['id'])) {
+            // Alert is now cleared. Scope to the same problem when notifying per entity.
+            $alert_log = AlertLog::where('state', '!=', AlertState::ACKNOWLEDGED)->where('state', '!=', AlertState::RECOVERED)->where('rule_id', $alert['rule_id'])->where('device_id', $alert['device_id'])->where('id', '<', $alert['id']);
+            if (! empty($alert['problem_id'])) {
+                $alert_log->where('problem_id', $alert['problem_id']);
+            }
+            $alert_log->orderBy('id', 'desc')->first();
+            if (empty($alert_log?->id)) {
                 return false;
             }
 
             $extra = [];
-            if (! empty($id['details'])) {
-                $extra = json_decode(gzuncompress($id['details']), true);
+            if (! empty($alert_log?->details)) {
+                $extra = json_decode(gzuncompress($alert_log?->details), true);
             }
 
             // Reset count to 0 so alerts will continue
             $extra['count'] = 0;
-            dbUpdate(['details' => gzcompress(json_encode($id['details']), 9)], 'alert_log', 'id = ?', [$alert['id']]);
+            $alert_log->details = gzcompress(json_encode($alert_log?->details), 9);
+            $alert_log->save();
 
             $obj['title'] = $template->title_rec ?: 'Device ' . $obj['display'] . ' recovered from ' . ($alert['name'] ?: $alert['rule']);
-            $obj['elapsed'] = Time::formatInterval(strtotime((string) $alert['time_logged']) - strtotime((string) $id['time_logged']), true) ?: 'none';
-            $obj['id'] = $id['id'];
+            $obj['elapsed'] = Time::formatInterval(strtotime((string) $alert['time_logged']) - strtotime((string) $alert_log?->time_logged), true) ?: 'none';
+            $obj['id'] = $alert_log?->id;
             foreach ($extra['rule'] as $incident) {
                 $i++;
                 $obj['faults'][$i] = $incident;
@@ -287,22 +292,58 @@ class RunAlerts
      */
     public function issueAlert($alert)
     {
-        if (LibrenmsConfig::get('alert.fixed-contacts') == false) {
-            if (empty($alert['query'])) {
-                $alert['query'] = QueryBuilderParser::fromJson($alert['builder'])->toSql();
+        $perEntity = (bool) AlertRule::query()->where('id', $alert['rule_id'])->value('notify_per_entity');
+
+        $recovering = (int) $alert['state'] === AlertState::RECOVERED;
+        $problems = AlertProblem::query()
+            ->where('rule_id', $alert['rule_id'])
+            ->where('device_id', $alert['device_id'])
+            ->where('open', 1)
+            ->where('state', $recovering ? '=' : '!=', AlertState::RECOVERED)
+            ->orderBy('id')
+            ->get();
+
+        // Build the set of notifications to send: one per problem (per-entity) or one aggregate (grouped).
+        $units = [];
+        if ($problems->isEmpty()) {
+            $units[] = $alert; // legacy fallback (e.g. data with no problem rows yet)
+        } elseif ($perEntity) {
+            foreach ($problems as $problem) {
+                $unit = $alert;
+                $unit['state'] = (int) $problem->state;
+                $unit['problem_id'] = $problem->id;
+                $unit['details']['rule'] = $problem->details['rule'] ?? [];
+                $unit['details']['contacts'] = $problem->details['contacts'] ?? ($alert['details']['contacts'] ?? []);
+                $latestLogId = AlertLog::query()->where('problem_id', $problem->id)->max('id');
+                if ($latestLogId) {
+                    $unit['id'] = $latestLogId;
+                }
+                $unit['time_logged'] = (string) ($problem->last_seen ?? $problem->timestamp);
+                $units[] = $unit;
             }
-            $sql = $alert['query'];
-            $qry = dbFetchRows($sql, [$alert['device_id']]);
-            $alert['details']['contacts'] = AlertUtil::getContacts($qry);
+        } else {
+            $rows = [];
+            foreach ($problems as $problem) {
+                foreach (($problem->details['rule'] ?? []) as $row) {
+                    $rows[] = $row;
+                }
+            }
+            $alert['details']['rule'] = $rows;
+            if (LibrenmsConfig::get('alert.fixed-contacts') == false) {
+                $alert['details']['contacts'] = AlertUtil::getContacts($rows);
+            }
+            $units[] = $alert;
         }
 
-        $obj = $this->describeAlert($alert);
-        if (is_array($obj)) {
-            echo 'Issuing Alert-UID #' . $alert['id'] . '/' . $alert['state'] . ':' . PHP_EOL;
-            if ($alert['state'] != AlertState::ACKNOWLEDGED || LibrenmsConfig::get('alert.acknowledged') === true) {
-                $this->extTransports($obj);
+        foreach ($units as $unit) {
+            $obj = $this->describeAlert($unit);
+            if (is_array($obj)) {
+                echo 'Issuing Alert-UID #' . $unit['id'] . '/' . $unit['state'] . ':' . PHP_EOL;
+                if ($unit['state'] != AlertState::ACKNOWLEDGED || LibrenmsConfig::get('alert.acknowledged') === true) {
+                    $this->extTransports($obj);
+                }
+                echo "\r\n";
             }
-            echo "\r\n";
         }
 
         return true;
@@ -328,150 +369,6 @@ class RunAlerts
                 dbUpdate(['open' => AlertState::CLEAR], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
             }
         }
-    }
-
-    /**
-     * Run Follow-Up alerts
-     *
-     * @return void
-     */
-    public function runFollowUp()
-    {
-        foreach ($this->loadAlerts('alerts.state > ' . AlertState::CLEAR . ' && alerts.open = 0') as $alert) {
-            if ($alert['state'] != AlertState::ACKNOWLEDGED || ($alert['info']['until_clear'] === false)) {
-                $rextra = json_decode((string) $alert['extra'], true);
-                if ($rextra['invert']) {
-                    continue;
-                }
-
-                if (empty($alert['query'])) {
-                    $alert['query'] = QueryBuilderParser::fromJson($alert['builder'])->toSql();
-                }
-                $chk = dbFetchRows($alert['query'], [$alert['device_id']]);
-                //make sure we can json_encode all the datas later
-                $current_alert_count = count($chk);
-                for ($i = 0; $i < $current_alert_count; $i++) {
-                    if (isset($chk[$i]['ip'])) {
-                        $chk[$i]['ip'] = inet6_ntop($chk[$i]['ip']);
-                    }
-                }
-                $alert['details']['rule'] ??= []; // if details.rule is missing, set it to an empty array
-                $ret = 'Alert #' . $alert['id'];
-                $state = AlertState::CLEAR;
-
-                // Get the added and resolved items
-                [$added_diff, $resolved_diff] = $this->diffBetweenFaults($alert['details']['rule'], $chk);
-                $previous_alert_count = count($alert['details']['rule']);
-
-                if (! empty($added_diff) && ! empty($resolved_diff)) {
-                    $ret .= ' Changed';
-                    $state = AlertState::CHANGED;
-                    $alert['details']['diff'] = ['added' => $added_diff, 'resolved' => $resolved_diff];
-                } elseif (! empty($added_diff)) {
-                    $ret .= ' Worse';
-                    $state = AlertState::WORSE;
-                    $alert['details']['diff'] = ['added' => $added_diff];
-                } elseif (! empty($resolved_diff)) {
-                    $ret .= ' Better';
-                    $state = AlertState::BETTER;
-                    $alert['details']['diff'] = ['resolved' => $resolved_diff];
-                    // Failsafe if the diff didn't return any results
-                } elseif ($current_alert_count > $previous_alert_count) {
-                    $ret .= ' Worse';
-                    $state = AlertState::WORSE;
-                    Eventlog::log('Alert got worse but the diff was not, ensure that a "id" or "_id" field is available for rule ' . $alert['name'], $alert['device_id'], 'alert', Severity::Warning);
-                    // Failsafe if the diff didn't return any results
-                } elseif ($current_alert_count < $previous_alert_count) {
-                    $ret .= ' Better';
-                    $state = AlertState::BETTER;
-                    Eventlog::log('Alert got better but the diff was not, ensure that a "id" or "_id" field is available for rule ' . $alert['name'], $alert['device_id'], 'alert', Severity::Warning);
-                }
-
-                if ($state > AlertState::CLEAR && $current_alert_count > 0) {
-                    $alert['details']['rule'] = $chk;
-                    if (dbInsert([
-                        'state' => $state,
-                        'device_id' => $alert['device_id'],
-                        'rule_id' => $alert['rule_id'],
-                        'details' => gzcompress(json_encode($alert['details']), 9),
-                    ], 'alert_log')) {
-                        dbUpdate(['state' => $state, 'open' => 1, 'alerted' => 1], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
-                    }
-
-                    echo $ret . ' (' . $previous_alert_count . '/' . $current_alert_count . ")\r\n";
-                }
-            }
-        }
-    }
-
-    /**
-     * Extract the fields that are used to identify the elements in the array of a "fault"
-     *
-     * @param  array  $element
-     * @return array
-     */
-    private function extractIdFieldsForFault($element)
-    {
-        return array_filter(array_keys($element), fn ($key) =>
-            // Exclude location_id as it is not relevant for the comparison
-            ($key === 'id' || strpos((string) $key, '_id')) !== false && $key !== 'location_id');
-    }
-
-    /**
-     * Generate a comparison key for an element based on the fields that identify it for a "fault"
-     *
-     * @param  array  $element
-     * @param  array  $idFields
-     * @return string
-     */
-    private function generateComparisonKeyForFault($element, $idFields)
-    {
-        $keyParts = [];
-        foreach ($idFields as $field) {
-            $keyParts[] = $element[$field] ?? '';
-        }
-
-        return implode('|', $keyParts);
-    }
-
-    /**
-     * Find new elements in the array for faults
-     * PHP array_diff is not working well for it
-     *
-     * @param  array  $array1
-     * @param  array  $array2
-     * @return array [$added, $removed]
-     */
-    private function diffBetweenFaults($array1, $array2)
-    {
-        $array1_keys = [];
-        $added_elements = [];
-        $removed_elements = [];
-
-        // Create associative array for quick lookup of $array1 elements
-        foreach ($array1 as $element1) {
-            $element1_ids = $this->extractIdFieldsForFault($element1);
-            $element1_key = $this->generateComparisonKeyForFault($element1, $element1_ids);
-            $array1_keys[$element1_key] = $element1;
-        }
-
-        // Iterate through $array2 and determine added elements
-        foreach ($array2 as $element2) {
-            $element2_ids = $this->extractIdFieldsForFault($element2);
-            $element2_key = $this->generateComparisonKeyForFault($element2, $element2_ids);
-
-            if (! isset($array1_keys[$element2_key])) {
-                $added_elements[] = $element2;
-            } else {
-                // Remove matched elements
-                unset($array1_keys[$element2_key]);
-            }
-        }
-
-        // Remaining elements in $array1_keys are the removed elements
-        $removed_elements = array_values($array1_keys);
-
-        return [$added_elements, $removed_elements];
     }
 
     public function loadAlerts($where)
@@ -645,6 +542,16 @@ class RunAlerts
             if (! $noiss) {
                 dbUpdate(['alerted' => $alert['state']], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
                 $this->issueAlert($alert);
+            }
+
+            if ((int) $alert['state'] === AlertState::RECOVERED) {
+                // Recovery has been handled (sent or muted): close the recovered problems so they are terminal.
+                AlertProblem::query()
+                    ->where('rule_id', $alert['rule_id'])
+                    ->where('device_id', $alert['device_id'])
+                    ->where('open', 1)
+                    ->where('state', AlertState::RECOVERED)
+                    ->update(['open' => 0]);
             }
         }
     }

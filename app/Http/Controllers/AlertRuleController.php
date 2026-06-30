@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AlertRuleRequest;
+use App\Models\Alert;
+use App\Models\AlertProblem;
 use App\Models\AlertRule;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
+use LibreNMS\Enum\AlertState;
 
 class AlertRuleController extends Controller
 {
@@ -65,6 +68,7 @@ class AlertRuleController extends Controller
             'severity' => $alertRule->severity,
             'adv_query' => $alertRule->query,
             'invert_map' => $alertRule->invert_map,
+            'notify_per_entity' => $alertRule->notify_per_entity,
         ]);
     }
 
@@ -105,7 +109,13 @@ class AlertRuleController extends Controller
 
         $alertRule->disabled = ! $request->boolean('state', $alertRule->disabled);
         $success = $alertRule->save();
-        url('graphs', ['id' => 42, 'type' => 'sensor_']);
+
+        if ($success && $alertRule->disabled) {
+            AlertProblem::where('rule_id', $alertRule->id)->where('open', 1)
+                ->update(['open' => 0, 'state' => AlertState::RECOVERED]);
+            Alert::where('rule_id', $alertRule->id)
+                ->update(['state' => AlertState::CLEAR, 'open' => 0, 'alerted' => 0, 'open_problem_count' => 0]);
+        }
 
         return response()->json(['status' => $success ? 200 : 422], $success ? 200 : 422);
     }
@@ -161,6 +171,7 @@ class AlertRuleController extends Controller
             'proc',
             'notes',
             'invert_map',
+            'notify_per_entity',
         ]));
         $alertRule->disabled ??= false;
         $alertRule->builder = json_decode((string) $request->validated('builder_json', '[]'), true);

@@ -116,6 +116,14 @@ class AppServiceProvider extends ServiceProvider
             'device' => \App\Models\Device::class,
             'device_group' => \App\Models\DeviceGroup::class,
             'location' => \App\Models\Location::class,
+            'bgppeer' => \App\Models\BgpPeer::class,
+            'service' => \App\Models\Service::class,
+            'mempool' => \App\Models\Mempool::class,
+            'processor' => \App\Models\Processor::class,
+            'storage' => \App\Models\Storage::class,
+            'application' => \App\Models\Application::class,
+            'accesspoint' => \App\Models\AccessPoint::class,
+            'bill' => \App\Models\Bill::class,
         ], $sensor_types));
     }
 

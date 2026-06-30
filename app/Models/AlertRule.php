@@ -45,6 +45,7 @@ use LibreNMS\Enum\AlertState;
  * @property string $query
  * @property array<string, mixed>|null $builder
  * @property bool|int $invert_map
+ * @property bool|int $notify_per_entity
  * @property int|null $alert_operation_id
  * @property AlertOperation|null $alertOperation
  */
@@ -59,6 +60,7 @@ class AlertRule extends BaseModel
         static::deleting(function (AlertRule $rule): void {
             $rule->alerts()->delete();
             $rule->logs()->delete();
+            AlertProblem::where('rule_id', $rule->id)->delete();
             $rule->templateMaps()->delete();
 
             $rule->devices()->detach();
@@ -77,6 +79,7 @@ class AlertRule extends BaseModel
         'query',
         'builder',
         'invert_map',
+        'notify_per_entity',
         'alert_operation_id',
     ];
 
@@ -84,6 +87,7 @@ class AlertRule extends BaseModel
         'builder' => 'array',
         'extra' => 'array',
         'alert_operation_id' => 'integer',
+        'notify_per_entity' => 'boolean',
     ];
 
     // ---- Query scopes ----

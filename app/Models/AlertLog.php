@@ -33,4 +33,12 @@ class AlertLog extends DeviceRelatedModel
     {
         return $this->belongsTo(AlertRule::class, 'rule_id', 'id');
     }
+
+    /**
+     * @return BelongsTo<AlertProblem, $this>
+     */
+    public function problem(): BelongsTo
+    {
+        return $this->belongsTo(AlertProblem::class, 'problem_id', 'id');
+    }
 }

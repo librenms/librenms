@@ -43,6 +43,25 @@ use PHPMailer\PHPMailer\PHPMailer;
 class AlertUtil
 {
     /**
+     * Map of alert-query id columns to registered morph aliases (see AppServiceProvider).
+     * Used to resolve the entity a problem is about (Port, Sensor, ...).
+     */
+    private const ENTITY_COLUMN_MAP = [
+        'port_id' => 'interface',
+        'sensor_id' => 'sensor',
+        'bgpPeer_id' => 'bgppeer',
+        'service_id' => 'service',
+        'mempool_id' => 'mempool',
+        'processor_id' => 'processor',
+        'storage_id' => 'storage',
+        'app_id' => 'application',
+        'accesspoint_id' => 'accesspoint',
+        'bill_id' => 'bill',
+        'device_group_id' => 'device_group',
+        'location_id' => 'location',
+    ];
+
+    /**
      * Get the rule_id for a specific alert
      *
      * @param  int  $alert_id
@@ -51,6 +70,57 @@ class AlertUtil
     private static function getRuleId($alert_id)
     {
         return Alert::find($alert_id)?->rule_id;
+    }
+
+    /**
+     * @param  array<string, mixed>  $element
+     * @return array<int, string>
+     */
+    public static function extractIdFieldsForFault(array $element): array
+    {
+        return array_filter(array_keys($element), fn ($key) =>
+            // Exclude location_id as it is not relevant for the comparison
+            ($key === 'id' || strpos((string) $key, '_id')) !== false && $key !== 'location_id');
+    }
+
+    /**
+     * @param  array<string, mixed>  $element
+     * @param  array<int, string>  $idFields
+     */
+    public static function generateComparisonKeyForFault(array $element, array $idFields): string
+    {
+        $keyParts = [];
+        foreach ($idFields as $field) {
+            $keyParts[] = $element[$field] ?? '';
+        }
+
+        return implode('|', $keyParts);
+    }
+
+    /**
+     * @param  array<string, mixed>  $row
+     * @return array{0: ?string, 1: ?int}
+     */
+    public static function entityForFault(array $row): array
+    {
+        foreach (self::ENTITY_COLUMN_MAP as $column => $alias) {
+            if (! empty($row[$column])) {
+                return [$alias, (int) $row[$column]];
+            }
+        }
+
+        foreach ($row as $key => $value) {
+            if ($key === 'device_id' || $key === 'location_id' || empty($value)) {
+                continue;
+            }
+            if ($key === 'id' || str_ends_with((string) $key, '_id')) {
+                $alias = $key === 'id' ? null : substr((string) $key, 0, -3);
+
+                return [$alias, (int) $value];
+            }
+        }
+
+        return [null, null];
     }
 
     /**
