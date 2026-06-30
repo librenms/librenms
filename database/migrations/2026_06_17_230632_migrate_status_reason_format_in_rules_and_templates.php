@@ -34,10 +34,14 @@ return new class extends Migration
                 }
             }
 
-            if (str_contains((string) $query, 'devices.status_reason = ') || str_contains((string) $query, 'devices.status_reason != ')) {
-                $query = preg_replace('/devices\.status_reason = \'([^\']+)\'/', 'devices.status_reason LIKE \'%$1%\'', $query);
-                $query = preg_replace('/devices\.status_reason != \'([^\']+)\'/', 'devices.status_reason NOT LIKE \'%$1%\'', $query);
-                $changed = true;
+            if (str_contains((string) $query, 'devices.status_reason')) {
+                $newQuery = preg_replace('/devices\.status_reason\s*=\s*[\'"]([^\'"]+)[\'"]/', 'devices.status_reason LIKE \'%$1%\'', (string) $query);
+                $newQuery = preg_replace('/devices\.status_reason\s*!=\s*[\'"]([^\'"]+)[\'"]/', 'devices.status_reason NOT LIKE \'%$1%\'', $newQuery);
+                
+                if ($newQuery !== $query) {
+                    $query = $newQuery;
+                    $changed = true;
+                }
             }
 
             if ($changed) {
@@ -49,6 +53,9 @@ return new class extends Migration
         }
     }
 
+    /**
+     * @param  array{condition?: string, field?: string, rules?: array, operator?: string}  $node
+     */
     private function updateBuilderNode(array &$node): bool
     {
         $changed = false;
@@ -80,8 +87,8 @@ return new class extends Migration
                 return $str;
             }
 
-            $newStr = preg_replace('/\$alert->status_reason\s*==\s*\'([^\']+)\'/', 'str_contains((string) $alert->status_reason, \'$1\')', (string) $str);
-            $newStr = preg_replace('/\$alert->status_reason\s*!=\s*\'([^\']+)\'/', '! str_contains((string) $alert->status_reason, \'$1\')', $newStr);
+            $newStr = preg_replace('/\$alert->status_reason\s*={2,3}\s*[\'"]([^\'"]+)[\'"]/', 'str_contains((string) $alert->status_reason, \'$1\')', (string) $str);
+            $newStr = preg_replace('/\$alert->status_reason\s*!==?\s*[\'"]([^\'"]+)[\'"]/', '! str_contains((string) $alert->status_reason, \'$1\')', $newStr);
 
             if ($newStr !== $str) {
                 $changed = true;

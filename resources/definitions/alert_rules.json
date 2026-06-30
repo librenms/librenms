@@ -9,7 +9,7 @@
     "default": true
   },
   {
-    "builder": {"condition":"AND","rules":[{"id":"macros.device_down","field":"macros.device_down","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"devices.status_reason","field":"devices.status_reason","type":"string","input":"text","operator":"equal","value":"snmp"}],"valid":true},
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_down","field":"macros.device_down","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"devices.status_reason","field":"devices.status_reason","type":"string","input":"text","operator":"contains","value":"snmp"}],"valid":true},
     "name": "Device Down (SNMP unreachable)",
     "default": true,
     "notes": "Device may responds on ICMP but not on SNMP."
