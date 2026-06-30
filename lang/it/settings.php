@@ -62,7 +62,7 @@ return [
             'kafka' => ['name' => 'Datastore: Kafka'],
             'opentsdb' => ['name' => 'Datastore: OpenTSDB'],
             'ping' => ['name' => 'Ping'],
-            'prometheus' => ['name' => 'Datastore: Prometheus'],
+            'prometheus' => ['name' => 'Datastore: Prometheus (Pushgateway)'],
             'rrdtool' => ['name' => 'Datastore: RRDTool'],
             'snmp' => ['name' => 'SNMP'],
             'poller_modules' => ['name' => 'Poller Modules'],

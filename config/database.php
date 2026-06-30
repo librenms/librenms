@@ -130,7 +130,6 @@ return [
 
         'default' => [
             'scheme' => env('REDIS_SCHEME', 'tcp'),
-
             'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'username' => env('REDIS_USERNAME'),
@@ -147,6 +146,17 @@ return [
             'password' => env('REDIS_PASSWORD'),
             'port' => env('REDIS_PORT', '6379'),
             'database' => env('REDIS_CACHE_DB', '1'),
+        ],
+
+        // Metrics snapshot storage (Prometheus, etc.)
+        'metrics' => [
+            'scheme' => env('REDIS_SCHEME', 'tcp'),
+            'url' => env('REDIS_URL'),
+            'host' => env('REDIS_HOST', '127.0.0.1'),
+            'username' => env('REDIS_USERNAME'),
+            'password' => env('REDIS_PASSWORD'),
+            'port' => env('REDIS_PORT', '6379'),
+            'database' => env('REDIS_METRICS_DB', '2'),
         ],
 
         'sentinel_session' => [
@@ -169,6 +179,18 @@ return [
                 'parameters' => [
                     'password' => env('REDIS_PASSWORD', ''),
                     'database' => env('REDIS_CACHE_DB', '1'),
+                ],
+            ],
+        ],
+
+        'sentinel_metrics' => [
+            ...explode(',', (string) env('REDIS_SENTINEL_HOSTS', '')),
+            'options' => [
+                'replication' => 'sentinel',
+                'service' => env('REDIS_SENTINEL_SERVICE', 'mymaster'),
+                'parameters' => [
+                    'password' => env('REDIS_PASSWORD', ''),
+                    'database' => env('REDIS_METRICS_DB', '2'),
                 ],
             ],
         ],

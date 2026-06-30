@@ -65,6 +65,21 @@ DEBUG);
 
             // if there is a numeric channel, assume the rest of the data is valid, I guess
             if (is_numeric($ap->channel)) {
+                // sync to DB
+                $ap_key = $ap->getCompositeKey();
+                if ($db_aps->has($ap_key)) {
+                    // ap exists in DB, update it
+                    $db_ap = $db_aps->get($ap_key);
+                    $db_ap->fill($ap->getAttributes());
+                    $db_ap->deleted = 0;
+                    $db_ap->save();
+                    $ap = $db_ap;
+                    $db_aps->forget($ap_key); // remove valid APs from collection
+                } else {
+                    // save new to DB
+                    DeviceCache::getPrimary()->accessPoints()->save($ap);
+                }
+
                 $rrd_def = RrdDefinition::make()
                     ->addDataset('channel', 'GAUGE', 0, 200)
                     ->addDataset('txpow', 'GAUGE', 0, 200)
@@ -85,6 +100,7 @@ DEBUG);
                 ]);
 
                 $tags = [
+                    'accesspoint_id' => $ap->accesspoint_id,
                     'name' => $ap->name,
                     'radionum' => $ap->radio_number,
                     'rrd_name' => ['arubaap', $ap->name . $ap->radio_number],
@@ -92,20 +108,6 @@ DEBUG);
                 ];
 
                 app('Datastore')->put($device, 'aruba', $tags, $fields);
-
-                // sync to DB
-                $ap_key = $ap->getCompositeKey();
-                if ($db_aps->has($ap_key)) {
-                    // ap exists in DB, update it
-                    $db_ap = $db_aps->get($ap_key);
-                    $db_ap->fill($ap->getAttributes());
-                    $db_ap->deleted = 0;
-                    $db_ap->save();
-                    $db_aps->forget($ap_key); // remove valid APs from collection
-                } else {
-                    // save new to DB
-                    DeviceCache::getPrimary()->accessPoints()->save($ap);
-                }
             }
         }
     }

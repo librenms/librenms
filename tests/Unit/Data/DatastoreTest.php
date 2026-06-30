@@ -44,6 +44,7 @@ final class DatastoreTest extends TestCase
             'kafka',
             'opentsdb',
             'prometheus',
+            'redis',
             'rrd',
         ]);
     }

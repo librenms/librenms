@@ -158,6 +158,7 @@ function record_sensor_data($device, $all_sensors)
         ];
 
         $tags = [
+            'sensor_id' => $sensor['sensor_id'],
             'sensor_class' => $sensor['sensor_class'],
             'sensor_type' => $sensor['sensor_type'],
             'sensor_descr' => $sensor['sensor_descr'],

@@ -97,6 +97,7 @@ class Storage implements Module
             $this->printStorage($storage);
 
             $datastore->put($os->getDeviceArray(), 'storage', [
+                'storage_id' => $storage->storage_id,
                 'type' => $storage->type,
                 'descr' => $storage->storage_descr,
                 'rrd_name' => ['storage', $storage->type, $storage->storage_descr],

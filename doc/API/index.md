@@ -68,20 +68,25 @@ Output from the API currently is via two output types:
 
 ## Endpoint Categories
 
+- [Alerts](Alerts.md)
+- [ARP](ARP.md)
+- [Bills](Bills.md)
+- [Inventory](Inventory.md)
 - [Devices](Devices.md)
 - [DeviceGroups](DeviceGroups.md)
+- [Locations](Locations.md)
+- [Logs](Logs.md)
+- [Metrics](Metrics.md)
 - [Ports](Ports.md)
 - [Port_Groups](Port_Groups.md)
 - [PortGroups](PortGroups.md)
 - [PortSecurity](PortSecurity.md)
-- [Alerts](Alerts.md)
 - [Routing](Routing.md)
-- [Switching](Switching.md)
-- [Inventory](Inventory.md)
-- [Bills](Bills.md)
-- [ARP](ARP.md)
 - [Services](Services.md)
-- [Logs](Logs.md)
+- [Switching](Switching.md)
 - [System](System.md)
+<<<<<<< master
 - [Pollers](Pollers.md)
 - [Locations](Locations.md)
+=======
+>>>>>>> Update ServicesMetrics.php, WirelessSensorsMetrics.php, Metrics.md, and 3 more files
