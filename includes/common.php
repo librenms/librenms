@@ -271,15 +271,6 @@ function generate_smokeping_file($device, $file = '')
     return $smokeping->generateFileName($file);
 }
 
-function is_customoid_graph($type, $subtype)
-{
-    if (! empty($subtype) && $type == 'customoid') {
-        return true;
-    }
-
-    return false;
-} // is_customoid_graph
-
 /**
  * Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.
  *

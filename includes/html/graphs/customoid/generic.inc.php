@@ -6,7 +6,7 @@ require 'includes/html/graphs/common.inc.php';
 
 $scale_min = 0;
 $graph_max = 1;
-$unit_text = $unit;
+$unit_text = $vars['unit'];
 
 $ds = 'oid_value';
 
