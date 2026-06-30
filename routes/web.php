@@ -303,9 +303,6 @@ Route::middleware(['auth'])->group(function (): void {
         Route::resource('pollergroup', PollerGroupController::class)->only('destroy', 'show', 'store', 'update');
         // misc ajax controllers
         Route::get('search', Ajax\GlobalSearchController::class)->name('ajax.search.global');
-        Route::get('search/bgp', Ajax\BgpSearchController::class);
-        Route::get('search/device', Ajax\DeviceSearchController::class);
-        Route::get('search/port', Ajax\PortSearchController::class);
         Route::post('set_resolution', [Ajax\SessionController::class, 'resolution']);
         Route::post('set_style', [Ajax\SessionController::class, 'style']);
         Route::post('ripe/raw', [Ajax\RipeNccApiController::class, 'raw']);

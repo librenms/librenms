@@ -665,7 +665,7 @@
                             <template x-for="item in group.results" :key="group.type + item.url">
                                 <a :href="item.url" @mouseenter="active = flat.indexOf(item)"
                                    class="tw:flex tw:items-center tw:gap-2.5 tw:px-4 tw:py-2 tw:no-underline tw:text-gray-800 tw:dark:text-dark-white-100 tw:hover:bg-gray-50 tw:dark:hover:bg-dark-gray-300"
-                                   :class="{ 'tw:bg-gray-100 tw:dark:bg-dark-gray-300': flat[active] === item }">
+                                   :class="[{ 'tw:bg-gray-100 tw:dark:bg-dark-gray-300': flat[active] === item }, item.status ? 'tw:border-l-5 ' + item.status : '']">
                                     <template x-if="item.image">
                                         <img :src="item.image" class="tw:h-7 tw:w-7 tw:shrink-0 tw:object-contain tw:dark:bg-gray-50 tw:dark:rounded tw:dark:p-0.5">
                                     </template>
@@ -798,7 +798,7 @@
                 this.loading = true;
                 if (this.controller) this.controller.abort();
                 this.controller = new AbortController();
-                fetch('{{ url('ajax/search') }}?search=' + encodeURIComponent(this.query.trim()), {
+                fetch('{{ route('ajax.search.global') }}?search=' + encodeURIComponent(this.query.trim()), {
                     signal: this.controller.signal,
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 })

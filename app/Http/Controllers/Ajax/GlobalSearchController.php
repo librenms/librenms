@@ -16,6 +16,9 @@ use App\Models\WirelessSensor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use LibreNMS\Enum\DeviceStatus;
+use LibreNMS\Enum\IfOperStatus;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Url;
 
 class GlobalSearchController extends Controller
@@ -70,6 +73,12 @@ class GlobalSearchController extends Controller
                 'name' => $d->display,
                 'subtitle' => trim(LibrenmsConfig::getOsSetting($d->os, 'text') . ' ' . $d->hardware) ?: $d->sysName,
                 'image' => $d->icon,
+                'status' => match ($d->getDeviceStatus()) {
+                    DeviceStatus::Up, DeviceStatus::IgnoredUp => $d->isUnderMaintenance() ? 'tw:border-l-blue-500!' : 'tw:border-l-green-600!',
+                    DeviceStatus::Down, DeviceStatus::IgnoredDown => $d->isUnderMaintenance() ? 'tw:border-l-blue-500!' : 'tw:border-l-red-600!',
+                    DeviceStatus::Disabled => 'tw:border-l-black!',
+                    DeviceStatus::NeverPolled => 'tw:border-l-gray-400!',
+                },
                 'url' => Url::deviceUrl($d),
             ]);
         if ($devices->isNotEmpty()) {
@@ -87,6 +96,12 @@ class GlobalSearchController extends Controller
                 'name' => $p->getLabel(),
                 'subtitle' => trim($p->device?->display . ' ' . $p->getDescription()),
                 'icon' => 'fa fa-link',
+                'status' => match (true) {
+                    (bool) $p->ignore => 'tw:border-l-black!',
+                    $p->ifAdminStatus == IfOperStatus::Down => 'tw:border-l-gray-400!',
+                    $p->ifOperStatus != IfOperStatus::Up => 'tw:border-l-red-600!',
+                    default => 'tw:border-l-green-600!',
+                },
                 'url' => Url::portUrl($p),
             ]);
         if ($ports->isNotEmpty()) {
@@ -103,6 +118,11 @@ class GlobalSearchController extends Controller
                 'name' => $b->bgpPeerIdentifier,
                 'subtitle' => trim($b->device?->display . ' AS' . $b->bgpPeerRemoteAs . ' ' . $b->astext),
                 'icon' => 'fa fa-share-alt',
+                'status' => match (true) {
+                    $b->bgpPeerAdminStatus !== 'start' => 'tw:border-l-black!',
+                    $b->bgpPeerState !== 'established' => 'tw:border-l-red-600!',
+                    default => 'tw:border-l-green-600!',
+                },
                 'url' => Url::deviceUrl($b->device, ['tab' => 'routing', 'proto' => 'bgp']),
             ]);
         if ($bgp->isNotEmpty()) {
@@ -159,6 +179,7 @@ class GlobalSearchController extends Controller
                 'name' => $s->storage_descr,
                 'subtitle' => trim($s->device?->display . ' ' . $s->storage_type),
                 'icon' => 'fa fa-hdd-o',
+                'status' => ($s->storage_perc_warn !== null && $s->storage_perc >= $s->storage_perc_warn) ? 'tw:border-l-red-600!' : 'tw:border-l-green-600!',
                 'url' => Url::generate([
                     'page' => 'graphs',
                     'id' => $s->storage_id,
@@ -179,6 +200,7 @@ class GlobalSearchController extends Controller
                 'name' => $m->mempool_descr,
                 'subtitle' => trim($m->device?->display . ' ' . $m->mempool_type),
                 'icon' => 'fa fa-memory',
+                'status' => ($m->mempool_perc_warn !== null && $m->mempool_perc >= $m->mempool_perc_warn) ? 'tw:border-l-red-600!' : 'tw:border-l-green-600!',
                 'url' => Url::generate([
                     'page' => 'graphs',
                     'id' => $m->mempool_id,
@@ -199,6 +221,7 @@ class GlobalSearchController extends Controller
                 'name' => $p->processor_descr,
                 'subtitle' => trim($p->device?->display . ' ' . $p->processor_type),
                 'icon' => 'fa fa-microchip',
+                'status' => ($p->processor_perc_warn !== null && $p->processor_usage >= $p->processor_perc_warn) ? 'tw:border-l-red-600!' : 'tw:border-l-green-600!',
                 'url' => Url::generate([
                     'page' => 'graphs',
                     'id' => $p->processor_id,
@@ -220,6 +243,13 @@ class GlobalSearchController extends Controller
                 'name' => $e->message,
                 'subtitle' => trim($e->device?->display . ' ' . $e->datetime),
                 'icon' => 'fa fa-bookmark',
+                'status' => match ($e->severity) {
+                    Severity::Ok => 'tw:border-l-green-600!',
+                    Severity::Info, Severity::Notice => 'tw:border-l-blue-500!',
+                    Severity::Warning => 'tw:border-l-amber-500!',
+                    Severity::Error => 'tw:border-l-red-600!',
+                    default => 'tw:border-l-gray-400!',
+                },
                 'url' => Url::deviceUrl($e->device_id, ['tab' => 'logs']),
             ]);
         if ($eventlog->isNotEmpty()) {
