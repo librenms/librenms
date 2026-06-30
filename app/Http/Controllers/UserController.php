@@ -86,14 +86,13 @@ class UserController extends Controller
     {
         $this->authorize('create', User::class);
 
-        $user = $request->only(['username', 'realname', 'email', 'descr', 'can_modify_passwd']);
-        $user['auth_type'] = LegacyAuth::getType();
-        $user['can_modify_passwd'] = $request->input('can_modify_passwd'); // checkboxes are missing when unchecked
-
-        $user = User::create($user);
+        $user = new User($request->only(['username', 'realname', 'email', 'descr']));
+        $user->auth_type = LegacyAuth::getType();
+        $user->can_modify_passwd = (int) $request->boolean('can_modify_passwd'); // checkboxes are missing when unchecked
+        $user->save(); // below requires user_id and prevent login of partially created by not including password
 
         $user->setPassword($request->new_password);
-        $user->syncRoles($request->input('roles', []));
+        $user->syncRoles($request->array('roles'));
         $user->auth_id = (string) LegacyAuth::get()->getUserid($user->username) ?: $user->user_id;
         $this->updateDashboard($user, $request->integer('dashboard'));
         $this->updateTimezone($user, $request->string('timezone'));
