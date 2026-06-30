@@ -1,0 +1,1943 @@
+--******************************************************************************
+-- HM-NAT-MIB: Managed objects for 
+--
+-- May 2011
+-- 
+-- Copyright (c) Hirschmann Automation & Control GmbH 2011
+--******************************************************************************
+
+HM2-NAT-MIB DEFINITIONS ::= BEGIN
+IMPORTS 
+	OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE,
+	Integer32, Unsigned32, Counter64
+		FROM SNMPv2-SMI
+	RowStatus, DisplayString, TruthValue
+		FROM SNMPv2-TC	
+	MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        InterfaceIndex, InterfaceIndexOrZero
+        	FROM IF-MIB
+        hm2ConfigurationMibs, HmActionValue, HmTimeSeconds1970		   
+        	FROM HM2-TC-MIB        
+        StorageType  FROM SNMPv2-TC
+	;
+
+hm2NatMib MODULE-IDENTITY
+	LAST-UPDATED "201111300000Z" -- Nov 30, 2011
+	ORGANIZATION "Hirschmann Automation and Control GmbH"
+	CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 - 7127 -14 -0
+         E-mail:     hac.support@belden.com"
+        DESCRIPTION
+         "This MIB defines the SNMP interface for Hirschmann DNAT/SNAT/
+	  Double NAT/1:1 NAT implementations
+
+          Copyright (C) "
+        REVISION     "201111300000Z" -- Nov 30, 2011
+        DESCRIPTION
+         	 "- Added missing protocol information
+         	  - Changed stats to 64bit values
+         	 "  
+        REVISION     "201110240000Z" -- Oct 24, 2011
+        DESCRIPTION
+         	 "Removed all address types to be in sync with the FW MIB.
+         	  The address type is now determined by the parser
+         	  automatically.
+         	 "  
+        REVISION     "201109130000Z" -- Sep 13, 2011
+        DESCRIPTION
+         	 "- Added commit and pending actions variables
+         	  - Added interface mapping tables
+         	  - Use HmActionValue instead of TruthValue
+         	 "         
+        REVISION     "201107010000Z" -- July 1, 2011
+        DESCRIPTION
+         	 "- Modifications to address representation
+         	 "
+        REVISION     "201105310000Z" -- May 31, 2011
+        DESCRIPTION
+          "Initial version."
+	::= { hm2ConfigurationMibs 80 }
+
+
+hm2NatNotifications OBJECT IDENTIFIER ::= { hm2NatMib 0 }
+
+hm2NatObjects OBJECT IDENTIFIER ::= { hm2NatMib 1 }
+
+hm2NatConformance OBJECT IDENTIFIER ::= { hm2NatMib 2}
+
+hm2NatGeneralSettings OBJECT IDENTIFIER ::= { hm2NatObjects 1 }
+
+hm2NatSNMPExtensionGroup OBJECT IDENTIFIER ::= { hm2NatMib 5 }
+--******************************************************************************
+--                         General Settings Objects
+--******************************************************************************
+
+
+hm2DnatMaxRules OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Maximum number of allowed rules for DNAT."
+        ::= { hm2NatGeneralSettings 2 }
+
+hm2OneToOneNatMaxRules OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Maximum number of allowed rules for 1:1 NAT."
+        ::= { hm2NatGeneralSettings 3 }
+	
+hm2MasqMaxRules OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Maximum number of allowed rules for Masquerading."
+        ::= { hm2NatGeneralSettings 4 }
+
+hm2DoubleNatMaxRules OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Maximum number of allowed rules for Double NAT."
+        ::= { hm2NatGeneralSettings 5 }
+
+hm2NatResetStatistics OBJECT-TYPE
+	SYNTAX HmActionValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Setting this value to action(2) will reset the statistics of 
+		 the whole NAT module. It will be set to noop(1) automatically
+		 after reset."
+		 ::= { hm2NatGeneralSettings 6 }
+
+--******************************************************************************
+--                          DNAT Rules Definition
+--******************************************************************************
+
+hm2DnatRuleAppliedTrap NOTIFICATION-TYPE
+	OBJECTS { hm2DnatRuleIndex }
+	STATUS current
+	DESCRIPTION
+		"A rule of DNAT was applied. The rule is 
+		 identified by the given rule index of the rule table."
+		 ::= { hm2NatNotifications 1 }
+
+hm2DnatRuleAppliedAndLoggedTrap NOTIFICATION-TYPE
+	OBJECTS { hm2DnatRuleIndex }
+	STATUS current
+	DESCRIPTION
+		"A rule of DNAT was applied and logged according to
+		 the current logging mechanism. The rule is identified by the 
+		 given rule index of the rule table."
+		 ::= { hm2NatNotifications 2 }
+
+hm2Dnat OBJECT IDENTIFIER ::= { hm2NatObjects 2 }
+	
+hm2DnatRules OBJECT IDENTIFIER ::= { hm2Dnat 1 }
+
+hm2DnatRulesObjects OBJECT IDENTIFIER ::= { hm2DnatRules 1 }	
+
+hm2DnatRuleCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of current DNAT rules"
+	::= { hm2DnatRulesObjects 1 }
+
+hm2DnatIfMappingRuleCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of current DNAT IF mapping entries."
+	::={ hm2DnatRulesObjects 2 }
+
+hm2DnatRulePendingActions OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"This value describes, whether the DNAT rule table was modified
+		 but not yet written to the firewall implementation (set to 
+		 true). After writing all modifications to the firewall, the 
+		 value switches automatically back to false."
+	DEFVAL { false }	 
+		 ::={ hm2DnatRulesObjects 3 }
+
+hm2DnatCommitPendingActions OBJECT-TYPE
+	SYNTAX HmActionValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Setting this value to action(2) writes not yet committed changes
+		 to the firewall (DNAT and Interface Mapping Table). After 
+		 writing all modifications, the value switches automatically 
+		 back to noop(1)."
+	DEFVAL { noop }	 
+		 ::={ hm2DnatRulesObjects 4 }
+
+hm2DnatRulesTables OBJECT IDENTIFIER ::= { hm2DnatRules 2 }
+
+hm2DnatRuleTable OBJECT-TYPE 
+	SYNTAX SEQUENCE OF Hm2DnatRuleEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The list of DNAT rules for this firewall."
+		::= { hm2DnatRulesTables 1 }	
+	
+	 hm2DnatRuleEntry OBJECT-TYPE
+		SYNTAX Hm2DnatRuleEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"DNAT rule entry."
+		INDEX { hm2DnatRuleIndex }
+		::= { hm2DnatRuleTable 1 }
+		
+Hm2DnatRuleEntry ::=
+	SEQUENCE {
+		hm2DnatRuleIndex Integer32,
+		hm2DnatSourceAddress DisplayString,
+		hm2DnatSourcePort DisplayString,
+		hm2DnatTargetAddress DisplayString,
+		hm2DnatTargetPort DisplayString,		
+		hm2DnatNewTargetAddress DisplayString,
+		hm2DnatNewTargetPort DisplayString,
+		hm2DnatProto INTEGER,
+		hm2DnatRuleParams DisplayString,
+		hm2DnatLog TruthValue,
+		hm2DnatTrap TruthValue,
+		hm2DnatRowStatus RowStatus,
+        hm2DnatDescription DisplayString
+	}
+		
+hm2DnatRuleIndex OBJECT-TYPE
+	SYNTAX Integer32 ( 1..255 )
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"Rule index of this DNAT rule."
+	::= { hm2DnatRuleEntry 1 }
+
+hm2DnatSourceAddress OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..20) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Source address of packets to be NATed. Can be:
+            - Single address (a.b.c.d), 
+            - address range in CIDR notation (a.b.c.d/n) 
+            - the name of a Netobject ($NetobjectName)
+            - 'any' for no filtering at all
+            - a prepending '!' selects the complement set"
+	DEFVAL  { "any" }     
+	::= { hm2DnatRuleEntry 3 }
+
+hm2DnatSourcePort OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..50) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The source port of the packet to reroute. Allowed formats are:
+		- keyword 'any' for no filtering or a protocol without ports
+		- single port ('10')
+		- port range with first and last port separated by hyphen 
+		  ('10-15')
+		- comma separated list of ports ('1235,25,123')
+		- combination of the points above ('10,25-30,125,1993')
+
+        The number of named ports (1 for each individual port, 2 for port
+        ranges) must not exceed 15."
+	DEFVAL { "any" }
+	::= { hm2DnatRuleEntry 4 }
+
+hm2DnatTargetAddress OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..20) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Destination address of packets to be NATed. Can be:
+            - Single address (a.b.c.d), 
+            - address range in CIDR notation (a.b.c.d/n) 
+            - the name of a Netobject ($NetobjectName)
+            - 'any' for no filtering at all
+            - a prepending '!' selects the complement set"
+	::= { hm2DnatRuleEntry 5 }
+
+hm2DnatTargetPort OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..50) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The target port of the packet to reroute. Allowed formats are:
+		- keyword 'any'
+		- single port ('10')
+		- port range with first and last port separated by hyphen 
+		  ('10-15')
+		- comma separated list of ports ('1235,25,123')
+		- combination of the points above ('10,25-30,125,1993')
+
+        The number of named ports (1 for each individual port, 2 for port
+        ranges) must not exceed 15."
+	DEFVAL { "any" }
+	::= { hm2DnatRuleEntry 6 }
+
+hm2DnatNewTargetAddress OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..20) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The IP address of the machine to reroute packets to. Must be a single 
+        IP address (a.b.c.d)."
+	::= { hm2DnatRuleEntry 7 }
+
+hm2DnatNewTargetPort OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..50) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The port to reroute packets to. Must be a single port or 'any'."
+	::= { hm2DnatRuleEntry 8 }
+
+hm2DnatProto OBJECT-TYPE
+	SYNTAX		 INTEGER { 
+		                   icmp(1), 
+		                   igmp(2),
+		                   ipip(3),
+		                   tcp(4),
+		                   udp(5),
+		                   esp(6),
+		                   ah(7),
+		                   icmpv6(8),
+		                   any(9)		                 
+			}
+	MAX-ACCESS 	 read-create
+	STATUS 		 current
+	DESCRIPTION
+		 "The IP protocol (RFC 791) for protocol-independent
+                  filtering. The following values are currently
+                  supported:
+                  o  icmp(1): Internet Control Message Protocol (RFC 792)
+                  o  igmp(2): Internet Group Management Protocol
+                  o  ipip(3): IP in IP tunneling (RFC 1853)
+                  o  tcp(4): Transmission Control Protocol (RFC 793)
+                  o  udp(5): User Datagram Protocol (RFC 768)
+                  o  esp(6): IPsec Encapsulated Security Payload (RFC 2406)
+                  o  ah(7): IPsec Authentication Header (RFC 2402)
+                  o  icmpv6(8): Internet Control Message Protocol for IPv6
+                  o  any(9): apply to all protocols"
+	 DEFVAL  { any }
+	 ::= { hm2DnatRuleEntry 9 }
+
+hm2DnatRuleParams OBJECT-TYPE
+ 	 SYNTAX DisplayString ( SIZE(0..50) )
+ 	 MAX-ACCESS read-create
+ 	 STATUS current
+ 	 DESCRIPTION
+ 	 	 "Additional parameters to this rule as string. 
+		  Currently only the value 'none' is valid.
+		  Reserved for future use."
+ 	 ::= { hm2DnatRuleEntry 10 }	 
+
+hm2DnatLog OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true if application of this rule shall be logged."
+	DEFVAL { false }
+	::={ hm2DnatRuleEntry 11 }
+
+
+hm2DnatTrap OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true if application of this rule shall send a trap."
+	DEFVAL { false }
+	::={ hm2DnatRuleEntry 12 }
+		
+
+hm2DnatRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"This is a standard row status value:
+            - active(1): The rule is active. Note that until committed, the rule
+              will not be applied.
+            - notInService(2): The rule is inactive because of user action.
+            - notReady(3):The rule is inactive because it has an incomplete
+              configuration.
+            - createAndGo(4): Create the rule with default parameters
+              activated.
+            - createAndWait(5): Create the rule inactive.
+            - destroy(6): Delete the rule. You cannot delete a rule with
+              interface mappings to it."
+		::= { hm2DnatRuleEntry 13 }
+
+hm2DnatDescription OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(0..32) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION "User defined textual description related to this rule."
+	DEFVAL  { "" }     
+	::= { hm2DnatRuleEntry 14 }
+	
+hm2DnatRuleIfMappingTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2DnatRuleIfMappingEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table for mapping DNAT rules to interfaces."
+		::={ hm2DnatRulesTables 2 }
+	
+hm2DnatRuleIfMappingEntry OBJECT-TYPE
+	SYNTAX Hm2DnatRuleIfMappingEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in rule interface mapping table."
+	INDEX { hm2DnatIfmInterface, hm2DnatIfmDirection, hm2DnatIfmRuleIndex } 
+		::={ hm2DnatRuleIfMappingTable 1 }
+
+Hm2DnatRuleIfMappingEntry ::= SEQUENCE {	
+	hm2DnatIfmRuleIndex Integer32,
+	hm2DnatIfmDirection INTEGER,
+	hm2DnatIfmPriority Unsigned32,
+	hm2DnatIfmInterface InterfaceIndex,
+	hm2DnatIfmRowStatus RowStatus
+}
+
+hm2DnatIfmRuleIndex OBJECT-TYPE
+	SYNTAX Integer32 (1..2048)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The index of the DNAT rule this mapping entry is assigned to."
+		::={ hm2DnatRuleIfMappingEntry 1 }
+
+	
+hm2DnatIfmDirection OBJECT-TYPE
+	SYNTAX INTEGER {
+			ingress(1),
+			egress(2),
+			both(3)
+	}
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "For DNAT, this can only be set to ingress, which is the interface on
+        which a packet that is to be forwarded will arrive."
+		::={ hm2DnatRuleIfMappingEntry 2 }
+	
+hm2DnatIfmPriority OBJECT-TYPE
+	SYNTAX Unsigned32 (1..6500)
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+        "The priority is the sorting key for rules in the chain to this
+        interface. They don't need to be unique per interface, but in
+        that case, no clear order can be assumed.
+        Priorities are processed in ascending order (0 highest
+        priority)."
+		::={ hm2DnatRuleIfMappingEntry 3 }
+	
+hm2DnatIfmInterface OBJECT-TYPE
+	SYNTAX InterfaceIndex
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The interface this mapping entry is assigned to. This has to be either
+        an hm2AgentSwitchIpInterfaceIfIndex or an hm2AgentSwitchIpVlanIfIndex.
+        Note that for physical interfaces this only works if the corresponding
+        hm2AgentSwitchIpInterfaceRoutingMode is set to enable."
+		::={ hm2DnatRuleIfMappingEntry 4 }
+	
+hm2DnatIfmRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The RowStatus value for this entry with the usual meanings:
+        
+            - active(1): The interface mapping is in place
+            - notInService(2): The interface mapping is not in place because the
+              user said so
+            - notReady(3): The interface mapping is not in place because the
+              agent said so
+            - createAndGo(4): Create this mapping with the default priority and
+              activate it.
+            - createAndWait(5): Create this mapping deactivated.
+            - destroy(6): Destroy this interface mapping."
+		::={ hm2DnatRuleIfMappingEntry 5 }
+
+	
+	
+
+hm2DnatStats OBJECT IDENTIFIER ::= { hm2Dnat 2 }
+
+hm2DnatGlobalStats OBJECT IDENTIFIER ::= { hm2DnatStats 1 }
+
+hm2DnatStatsTotalPck OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets processed by the DNAT firewall."
+		::= { hm2DnatGlobalStats 1 }
+	
+hm2DnatStatsTotalPckSize OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of bytes processed by the DNAT firewall."
+		::= { hm2DnatGlobalStats 2 }
+	
+hm2DnatStatsTotalPckDenDrop OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped or denied by the DNAT firewall."
+		::={ hm2DnatGlobalStats 3 }
+
+
+
+hm2DnatStatsTotalPckAccepted OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets accepted by the DNAT firewall."
+		::={ hm2DnatGlobalStats 4 }
+	
+hm2DnatRuleStats OBJECT IDENTIFIER ::= { hm2DnatStats 2 }
+	
+hm2DnatStatsRuleTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2DnatStatsRuleTableEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table of per-rule statistics of the DNAT firewall."
+		::= { hm2DnatRuleStats 1 }
+	
+hm2DnatStatsRuleTableEntry OBJECT-TYPE
+	SYNTAX Hm2DnatStatsRuleTableEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Statistics table entry for DNAT."
+	INDEX { hm2DnatRuleIndex }
+	::={ hm2DnatStatsRuleTable 1 }
+	
+Hm2DnatStatsRuleTableEntry ::= SEQUENCE {
+	hm2DnatStatsPckCount Counter64,	
+	hm2DnatStatsPckSize Counter64,	
+	hm2DnatStatsLastApplied HmTimeSeconds1970
+}
+
+hm2DnatStatsPckCount OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of packets DNATed."
+		::={ hm2DnatStatsRuleTableEntry 1 }
+
+hm2DnatStatsPckSize OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of bytes DNATed."
+		::={ hm2DnatStatsRuleTableEntry 2 }
+	
+hm2DnatStatsLastApplied OBJECT-TYPE
+	SYNTAX HmTimeSeconds1970
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Time of last application of the rule in seconds since 1.1.1970."
+		::={ hm2DnatStatsRuleTableEntry 3 }
+	
+--******************************************************************************
+--			1:1 NAT
+--******************************************************************************
+
+hm21to1RuleAppliedTrap NOTIFICATION-TYPE
+	OBJECTS { hm21to1RuleIndex }
+	STATUS current
+	DESCRIPTION
+		"A rule of 1:1 NAT was applied. The rule is 
+		 identified by the given rule index of the rule table."
+		 ::= { hm2NatNotifications 5 }
+
+hm21to1RuleAppliedAndLoggedTrap NOTIFICATION-TYPE
+	OBJECTS { hm21to1RuleIndex }
+	STATUS current
+	DESCRIPTION
+		"A rule of 1:1 NAT was applied and logged according
+		 the current logging mechanism. The rule is identified by the 
+		 given rule index of the rule table."
+		 ::= { hm2NatNotifications 6 }
+
+hm21to1 OBJECT IDENTIFIER ::= { hm2NatObjects 4 }
+
+hm21to1RuleObjects OBJECT IDENTIFIER ::= { hm21to1 1 }
+
+hm21to1RuleCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of current 1:1 NAT rules."
+	::= { hm21to1RuleObjects 1 }
+
+hm21to1IfMappingRuleCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of current 1:1 NAT IF mapping entries."
+	::={ hm21to1RuleObjects 2 }
+
+hm21to1RulePendingActions OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"This value describes, whether the 1:1 NAT rule table was 
+		 modified but not yet written to the firewall implementation 
+		 (set to true). After writing all modifications to the firewall,
+		 the value switches automatically back to false."
+	DEFVAL { false }	 
+		 ::={ hm21to1RuleObjects 3 }
+
+hm21to1CommitPendingActions OBJECT-TYPE
+	SYNTAX HmActionValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Setting this value to action(2) writes not yet committed changes
+		 to the firewall (1:1 NAT and Interface Mapping Table). After 
+		 writing all modifications, the value switches automatically 
+		 back to noop(1)."
+	DEFVAL { noop }	 
+		 ::={ hm21to1RuleObjects 4 }
+
+hm21to1Alg OBJECT-TYPE
+    SYNTAX BITS {
+           ftp(0),
+           icmp(1)
+           }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Global bitmask for application level gateway of all the 1:1 NAT rules."
+    DEFVAL    { {icmp, ftp} }
+    ::= { hm21to1RuleObjects 5 }
+
+hm21to1PublicIntf OBJECT-TYPE
+    SYNTAX InterfaceIndexOrZero
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The index of the public interface defined on the uplink port."
+    DEFVAL { 0 }
+    ::= { hm21to1RuleObjects 6 }
+
+hm21to1RuleTables OBJECT IDENTIFIER ::= { hm21to1 2 }
+
+hm21to1RuleTable OBJECT-TYPE 
+	SYNTAX SEQUENCE OF Hm21to1RuleEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The list of 1:1 NAT rules for this firewall."
+		::= { hm21to1RuleTables 1 }
+	
+ hm21to1RuleEntry OBJECT-TYPE	
+	SYNTAX Hm21to1RuleEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"1:1 NAT rule entry."
+	INDEX { hm21to1RuleIndex }
+	::= { hm21to1RuleTable 1 }
+	
+Hm21to1RuleEntry ::=
+	SEQUENCE {
+		hm21to1RuleIndex Integer32,		
+		hm21to1TargetAddress DisplayString,
+		hm21to1NewTargetAddress DisplayString,		
+		hm21to1RuleParams DisplayString,
+		hm21to1Log TruthValue,
+		hm21to1Trap TruthValue,
+		hm21to1RowStatus RowStatus,
+        hm21to1Description DisplayString,
+        hm21to1IngressIntf InterfaceIndexOrZero,
+        hm21to1EgressIntf InterfaceIndexOrZero,
+        hm21to1Priority Unsigned32,
+        hm21to1StorageType StorageType
+	}
+
+hm21to1RuleIndex OBJECT-TYPE
+	SYNTAX Integer32 ( 1..255 )
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"Rule index of this 1:1 NAT rule."
+	::= { hm21to1RuleEntry 1 }
+
+hm21to1TargetAddress OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..20) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Destination address of packets to be NATed. Can be:
+            - Single address (a.b.c.d), 
+            - address range in CIDR notation (a.b.c.d/n) 
+            - the name of a Netobject ($NetobjectName)
+            - 'any' for no filtering at all"
+	::= { hm21to1RuleEntry 2 }
+
+hm21to1NewTargetAddress OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..20) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"New Destination address of packets to be NATed. Can be:
+            - Single address (a.b.c.d), 
+            - address range in CIDR notation (a.b.c.d/n) 
+            - the name of a Netobject ($NetobjectName)
+            - 'any' for no filtering at all"
+		::= { hm21to1RuleEntry 3 }
+	
+hm21to1RuleParams OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(0..50) )
+ 	MAX-ACCESS read-create
+ 	STATUS current
+ 	DESCRIPTION
+	 	 "Additional parameters to this rule as string. 
+		  Currently only the value 'none' is valid.
+		  Reserved for future use."
+ 		 ::= { hm21to1RuleEntry 4 }	 
+
+hm21to1Log OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true if application of this rule shall be logged."
+	DEFVAL { false }
+	::={ hm21to1RuleEntry 5 }
+
+
+hm21to1Trap OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true if application of this rule shall send a trap."
+	DEFVAL { false }
+	::={ hm21to1RuleEntry 6 }
+
+hm21to1RowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"This is a standard row status value:
+            - active(1): The rule is active. Note that until committed, the rule
+              will not be applied.
+            - notInService(2): The rule is inactive because of user action.
+            - notReady(3):The rule is inactive because it has an incomplete
+              configuration.
+            - createAndGo(4): Create the rule with default parameters
+              activated.
+            - createAndWait(5): Create the rule inactive.
+            - destroy(6): Delete the rule. You cannot delete a rule with
+              interface mappings to it."
+		::= { hm21to1RuleEntry 7 }
+	
+hm21to1Description OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(0..32) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION "User defined textual description related to this rule."
+	DEFVAL  { "" }     
+	::= { hm21to1RuleEntry 8 }
+
+hm21to1IngressIntf OBJECT-TYPE
+    SYNTAX InterfaceIndexOrZero
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The index of the interface on which packets going to the target address
+        will arrive. This has to be either an hm2AgentSwitchIpInterfaceIfIndex
+        or an hm2AgentSwitchIpVlanIfIndex.  Note that for physical interfaces
+        this only works if the corresponding
+        hm2AgentSwitchIpInterfaceRoutingMode is set to enable."
+    DEFVAL { 0 }
+    ::= { hm21to1RuleEntry 9 }
+
+hm21to1EgressIntf OBJECT-TYPE
+    SYNTAX InterfaceIndexOrZero
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The index of the interface from which the new target address can be
+        reached. This has to be either an hm2AgentSwitchIpInterfaceIfIndex
+        or an hm2AgentSwitchIpVlanIfIndex.  Note that for physical interfaces
+        this only works if the corresponding
+        hm2AgentSwitchIpInterfaceRoutingMode is set to enable."
+
+    DEFVAL { 0 }
+    ::= { hm21to1RuleEntry 10 }
+
+hm21to1Priority OBJECT-TYPE
+    SYNTAX Unsigned32 (0..6500)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The priority is the sorting key for rules in the chain to this
+        interface. They don't need to be unique per interface, but in that case,
+        no clear order can be assumed.
+        Priorities are processed in ascending order (0 highest priority)."
+    DEFVAL { 0 }
+    ::= { hm21to1RuleEntry 11 }
+
+hm21to1StorageType OBJECT-TYPE
+    SYNTAX StorageType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The storage type for this row.  Rows having the value 
+        'volatile' are not saved."
+    DEFVAL { nonVolatile }
+    ::= { hm21to1RuleEntry 12 }
+
+hm21to1Stats OBJECT IDENTIFIER ::={ hm21to1 3 }
+
+hm21to1GeneralStats OBJECT IDENTIFIER ::= { hm21to1Stats 1 }
+
+hm21to1StatsTotalPck OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets processed by 1:1 NAT."
+		::= { hm21to1GeneralStats 1 }
+
+hm21to1StatsTotalPckSize OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of bytes processed by the 1:1 NAT."
+		::= { hm21to1GeneralStats 2 }
+
+hm21to1StatsTotalPckDenDrop OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped or denied by 1:1 NAT."
+		::={ hm21to1GeneralStats 3 }
+
+hm21to1StatsTotalPckAccepted OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets accepted by 1:1 NAT."
+		::={ hm21to1GeneralStats 4 }
+	
+hm21to1StatsTables OBJECT IDENTIFIER ::= { hm21to1Stats 2 }
+	
+hm21to1StatsRuleTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2OtoStatsRuleTableEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table of per-rule statistics of 1:1 NAT."
+		::= { hm21to1StatsTables 1 }
+	
+Hm2OtoStatsRuleTableEntry ::= SEQUENCE {
+	hm21to1StatsPckCount Counter64,
+	hm21to1StatsPckSize Counter64,
+	hm21to1StatsLastApplied HmTimeSeconds1970
+}
+
+hm21to1StatsRuleTableEntry OBJECT-TYPE
+	SYNTAX Hm2OtoStatsRuleTableEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Statistics table entry for 1:1 NAT."
+	INDEX { hm21to1RuleIndex }
+	::={ hm21to1StatsRuleTable 1 }
+	
+hm21to1StatsPckCount OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of packets matched by this rule."
+		::={ hm21to1StatsRuleTableEntry 1 }
+	
+hm21to1StatsPckSize OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of bytes processed by this rule."
+		::={ hm21to1StatsRuleTableEntry 2 }
+	
+hm21to1StatsLastApplied OBJECT-TYPE
+	SYNTAX HmTimeSeconds1970
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Time of last application of the rule in seconds since 1.1.1970."
+		::={ hm21to1StatsRuleTableEntry 3 }
+	
+--******************************************************************************
+--				Masquerading
+--******************************************************************************
+
+hm2MasqRuleAppliedTrap NOTIFICATION-TYPE
+	OBJECTS { hm2MasqRuleIndex }
+	STATUS current
+	DESCRIPTION
+		"A rule of masquerading was applied. The rule is 
+		 identified by the given rule index of the rule table."
+		 ::= { hm2NatNotifications 7 }
+
+hm2MasqRuleAppliedAndLoggedTrap NOTIFICATION-TYPE
+	OBJECTS { hm2MasqRuleIndex }
+	STATUS current
+	DESCRIPTION
+		"A rule of masquerading was applied and logged according
+		 the current logging mechanism. The rule is identified by the 
+		 given rule index of the rule table."
+		 ::= { hm2NatNotifications 8 }
+
+hm2Masquerading OBJECT IDENTIFIER ::= { hm2NatObjects 5 }
+
+hm2MasqRuleObjects OBJECT IDENTIFIER ::= { hm2Masquerading 1 }
+
+hm2MasqRuleCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of current masquerading rules."
+	::= { hm2MasqRuleObjects 1 }
+
+hm2MasqIfMappingRuleCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of current masquerading IF mapping entries."
+	::={ hm2MasqRuleObjects 2 }
+
+hm2MasqRulePendingActions OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"This value describes, whether the masquerading rule table was 
+		 modified but not yet written to the firewall implementation 
+		 (set to true). After writing all modifications to the firewall,
+		 the value switches automatically back to false."
+	DEFVAL { false }	 
+		 ::={ hm2MasqRuleObjects 3 }
+
+hm2MasqCommitPendingActions OBJECT-TYPE
+	SYNTAX HmActionValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Setting this value to action(2) writes not yet committed changes
+		 to the firewall (DNAT and Interface Mapping Table). After 
+		 writing all modifications, the value switches automatically 
+		 back to noop(1)."
+	DEFVAL { noop }	 
+		 ::={ hm2MasqRuleObjects 4 }
+
+hm2MasqRuleTables OBJECT IDENTIFIER ::= { hm2Masquerading 2 } 
+
+hm2MasqRuleTable OBJECT-TYPE 
+	SYNTAX SEQUENCE OF Hm2MasqRuleEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The list of masquerading rules for this firewall."
+		::= { hm2MasqRuleTables 1 }
+
+hm2MasqRuleEntry OBJECT-TYPE	
+	SYNTAX Hm2MasqRuleEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Masquerading rule entry."
+	INDEX { hm2MasqRuleIndex }
+	::= { hm2MasqRuleTable 1 }
+
+Hm2MasqRuleEntry ::=
+	SEQUENCE {
+		hm2MasqRuleIndex Integer32,		
+		hm2MasqSourceAddress DisplayString,
+		hm2MasqSourcePort DisplayString,
+		hm2MasqProto INTEGER,
+		hm2MasqRuleParams DisplayString,
+		hm2MasqLog TruthValue,
+		hm2MasqTrap TruthValue,
+		hm2MasqRowStatus RowStatus,
+		hm2MasqDescription DisplayString,
+		hm2MasqIpsecExempt TruthValue
+	}
+
+hm2MasqRuleIndex OBJECT-TYPE
+	SYNTAX Integer32 ( 1..128 )
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"Rule index of this masquerading rule."
+	::= { hm2MasqRuleEntry 1 }
+
+hm2MasqSourceAddress OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..20) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The source address of the packets to reroute. Allowed formats are:
+		- keyword 'any'
+		- IP address  ('10.0.0.1')
+        - IP address range ('10.0.0.0/8')
+        - a prepending '!' selects the complement set
+        "
+	::= { hm2MasqRuleEntry 2 }
+
+hm2MasqSourcePort OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..50) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The source port of the packet to reroute. Allowed formats are:
+		- keyword 'any'
+		- single  ('10')
+		-  range with first and last separated by hyphen 
+		  ('10-15')
+		- comma separated list of s ('1235,25,123')
+		- combination of the points above ('10,25-30,125,1993')
+
+        The number of named ports (1 for each individual port, 2 for port
+        ranges) must not exceed 15."
+	DEFVAL { "any" }
+	::= { hm2MasqRuleEntry 3 }
+
+hm2MasqProto OBJECT-TYPE
+	SYNTAX		 INTEGER { 
+		                   tcp(4),
+		                   udp(5),
+		                   any(9)		                 
+			}
+	MAX-ACCESS 	 read-create
+	STATUS 		 current
+	DESCRIPTION
+		 "The IP protocol (RFC 791) for protocol-independent
+                  filtering. The following values are currently
+                  supported:
+                  o  tcp(4): transmission control protocol (RFC 793)
+                  o  udp(5): user datagram protocol (RFC 768)
+                  o  any(9): apply to all protocols"
+	 DEFVAL  { any }
+	 ::= { hm2MasqRuleEntry 4 }
+
+
+hm2MasqRuleParams OBJECT-TYPE
+ 	 SYNTAX DisplayString ( SIZE(0..50) )
+ 	 MAX-ACCESS read-create
+ 	 STATUS current
+ 	 DESCRIPTION
+ 	 	 "Additional parameters to this rule as string. 
+		  Currently only the value 'none' is valid.
+		  Reserved for future use."
+ 	 ::= { hm2MasqRuleEntry 5 }	 
+
+hm2MasqLog OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true if application of this rule shall be logged."
+	DEFVAL { false }
+	::={ hm2MasqRuleEntry 6 }
+
+
+hm2MasqTrap OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true if application of this rule shall send a trap."
+	DEFVAL { false }
+	::={ hm2MasqRuleEntry 7 }
+
+hm2MasqRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"This is a standard row status value:
+            - active(1): The rule is active. Note that until committed, the rule
+              will not be applied.
+            - notInService(2): The rule is inactive because of user action.
+            - notReady(3):The rule is inactive because it has an incomplete
+              configuration.
+            - createAndGo(4): Create the rule with default parameters
+              activated.
+            - createAndWait(5): Create the rule inactive.
+            - destroy(6): Delete the rule. You cannot delete a rule with
+              interface mappings to it."
+	::= { hm2MasqRuleEntry 8 }
+
+hm2MasqDescription OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(0..32) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION "User defined textual description related to this rule."
+	DEFVAL  { "" }     
+	::= { hm2MasqRuleEntry 9 }
+
+hm2MasqIpsecExempt OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true if application of this rule should ignore IPsec traffic."
+	DEFVAL { false }
+	::= { hm2MasqRuleEntry 10 }
+
+hm2MasqRuleIfMappingTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2MasqRuleIfMappingEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table for mapping masquerading rules to interfaces."
+		::={ hm2MasqRuleTables 2 }
+
+
+hm2MasqRuleIfMappingEntry OBJECT-TYPE
+	SYNTAX Hm2MasqRuleIfMappingEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in rule interface mapping table."
+	INDEX { hm2MasqIfmInterface, hm2MasqIfmDirection, hm2MasqIfmRuleIndex } 
+		::={ hm2MasqRuleIfMappingTable 1 }
+
+Hm2MasqRuleIfMappingEntry ::= SEQUENCE {	
+	hm2MasqIfmRuleIndex Integer32,
+	hm2MasqIfmDirection INTEGER,
+	hm2MasqIfmPriority Unsigned32,
+	hm2MasqIfmInterface InterfaceIndex,
+	hm2MasqIfmRowStatus RowStatus
+}
+hm2MasqIfmRuleIndex OBJECT-TYPE
+	SYNTAX Integer32 (1..2048)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The index of the 1:1 NAT rule this mapping entry is assigned 
+		 to."
+		::={ hm2MasqRuleIfMappingEntry 1 }
+
+	
+hm2MasqIfmDirection OBJECT-TYPE
+	SYNTAX INTEGER {
+			ingress(1),
+			egress(2),
+			both(3)
+	}
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "For masquerading, this can only be set to egress which is the interface
+        packets will be masqueraded to."
+		::={ hm2MasqRuleIfMappingEntry 2 }
+	
+hm2MasqIfmPriority OBJECT-TYPE
+	SYNTAX Unsigned32 (1..6500)
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+        "The priority is the sorting key for rules in the chain to this
+        interface. They don't need to be unique per interface, but in that case,
+        no clear order can be assumed.
+        Priorities are processed in ascending order (0 highest priority)."
+		::={ hm2MasqRuleIfMappingEntry 3 }
+	
+hm2MasqIfmInterface OBJECT-TYPE
+	SYNTAX InterfaceIndex
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The interface this mapping entry is assigned to. This has to be either
+        an hm2AgentSwitchIpInterfaceIfIndex or an hm2AgentSwitchIpVlanIfIndex.
+        Note that for physical interfaces this only works if the corresponding
+        hm2AgentSwitchIpInterfaceRoutingMode is set to enable."
+		::={ hm2MasqRuleIfMappingEntry 4 }
+	
+hm2MasqIfmRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The RowStatus value for this entry with the usual meanings:
+        
+            - active(1): The interface mapping is in place
+            - notInService(2): The interface mapping is not in place because the
+              user said so
+            - notReady(3): The interface mapping is not in place because the
+              agent said so
+            - createAndGo(4): Create this mapping with the default priority and
+              activate it.
+            - createAndWait(5): Create this mapping deactivated.
+            - destroy(6): Destroy this interface mapping."
+		::={ hm2MasqRuleIfMappingEntry 5 }	
+
+
+hm2MasqStats OBJECT IDENTIFIER ::={ hm2Masquerading 3 }
+
+hm2MasqGeneralStats OBJECT IDENTIFIER ::= { hm2MasqStats 1 }
+
+hm2MasqStatsTotalPck OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets processed by Masquerading"
+		::= { hm2MasqGeneralStats 1 }
+
+	
+hm2MasqStatsTotalPckSize OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of bytes processed by Masquerading"
+		::= { hm2MasqGeneralStats 2 }
+
+hm2MasqStatsTotalPckDenDrop OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped or denied by Masquerading"
+		::={ hm2MasqGeneralStats 3 }
+
+hm2MasqStatsTotalPckAccepted OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets accepted by masquerading."
+		::={ hm2MasqGeneralStats 4 }
+	
+hm2MasqStatsRuleTables OBJECT IDENTIFIER ::= { hm2MasqStats 2 }
+	
+hm2MasqStatsRuleTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2MasqStatsRuleTableEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table of per-rule statistics of masquerading."
+		::= { hm2MasqStatsRuleTables 1 }
+
+hm2MasqStatsRuleTableEntry OBJECT-TYPE
+	SYNTAX Hm2MasqStatsRuleTableEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Statistics table entry for masquerading."
+	INDEX { hm2MasqRuleIndex }
+	::={ hm2MasqStatsRuleTable 1 }
+	
+Hm2MasqStatsRuleTableEntry ::= SEQUENCE {
+	hm2MasqStatsPckCount Counter64,
+	hm2MasqStatsPckSize Counter64,
+	hm2MasqStatsLastApplied HmTimeSeconds1970
+}
+hm2MasqStatsPckCount OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of packets matched by this rule."
+		::={ hm2MasqStatsRuleTableEntry 1 }
+	
+hm2MasqStatsPckSize OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of bytes processed by this rule."
+		::={ hm2MasqStatsRuleTableEntry 2 }
+	
+hm2MasqStatsLastApplied OBJECT-TYPE
+	SYNTAX HmTimeSeconds1970
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Time of last application of the rule in seconds since 1.1.1970"
+		::={ hm2MasqStatsRuleTableEntry 3 }
+	
+
+--******************************************************************************
+--                         Double NAT
+--******************************************************************************
+
+hm2DonatRuleAppliedTrap NOTIFICATION-TYPE
+	OBJECTS { hm2DonatRuleIndex }
+	STATUS current
+	DESCRIPTION
+		"A rule of double NAT was applied. The rule is 
+		 identified by the given rule index of the rule table."
+		 ::= { hm2NatNotifications 9 }
+
+hm2DonatRuleAppliedAndLoggedTrap NOTIFICATION-TYPE
+	OBJECTS { hm2DonatRuleIndex }
+	STATUS current
+	DESCRIPTION
+		"A rule of double NAT was applied and logged according
+		 the current logging mechanism. The rule is identified by the 
+		 given rule index of the rule table."
+		 ::= { hm2NatNotifications 10 }
+
+hm2DoubleNat OBJECT IDENTIFIER ::= { hm2NatObjects 6 }
+
+hm2DoubleNatRuleObjects OBJECT IDENTIFIER ::= { hm2DoubleNat 1 }
+
+
+hm2DoubleNatRuleCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only	
+	STATUS current
+	DESCRIPTION
+		"Current number of rules for double NAT."
+		::= { hm2DoubleNatRuleObjects 1 }
+
+hm2DoubleNatIfMappingRuleCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of current double NAT IF mapping entries."
+	::={ hm2DoubleNatRuleObjects 2 }	
+	
+hm2DoubleNatRulePendingActions OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"This value describes, whether the double NAT rule table was 
+		 modified but not yet written to the firewall implementation 
+		 (set to true). After writing all modifications to the firewall,
+		 the value switches automatically back to false."
+	DEFVAL { false }	 
+		 ::={ hm2DoubleNatRuleObjects 3 }
+
+hm2DoubleNatCommitPendingActions OBJECT-TYPE
+	SYNTAX HmActionValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Setting this value to action(2) writes not yet committed changes
+		 to the firewall (double NAT and interface mapping table). After 
+		 writing all modifications, the value switches automatically 
+		 back to noop(1)."
+	DEFVAL { noop }	 
+		 ::={ hm2DoubleNatRuleObjects 4 }
+	
+hm2DoubleNatRuleTables OBJECT IDENTIFIER ::= { hm2DoubleNat 2 }
+
+hm2DoubleNatRuleTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2DoubleNatRuleEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table of double NAT rules."
+		::= { hm2DoubleNatRuleTables 1 }
+	
+ hm2DoubleNatRuleEntry OBJECT-TYPE
+	SYNTAX Hm2DoubleNatRuleEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry within double NAT rule table."
+	INDEX { hm2DonatRuleIndex }	
+		::= { hm2DoubleNatRuleTable 1 }
+		
+Hm2DoubleNatRuleEntry ::= SEQUENCE {
+	hm2DonatRuleIndex Integer32,
+	hm2DonatLocalInternalIp DisplayString,
+	hm2DonatLocalExternalIp DisplayString,
+	hm2DonatRemoteInternalIp DisplayString,
+	hm2DonatRemoteExternalIp DisplayString,
+	hm2DonatRuleParams DisplayString,
+	hm2DonatLog TruthValue,
+	hm2DonatTrap TruthValue,
+	hm2DonatRowStatus RowStatus,
+    hm2DonatDescription DisplayString
+}
+
+hm2DonatRuleIndex OBJECT-TYPE
+	SYNTAX Integer32 (1..255)
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"Index of the rule within table."
+		::= { hm2DoubleNatRuleEntry 1 }
+	
+hm2DonatLocalInternalIp OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..20) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+        "The real IP address of the first net/machine you want to double NAT.
+        Allowed formats are:
+		- keyword 'any'
+		- IP address  ('10.0.0.1')
+        - IP address range ('10.0.0.0/8')"
+		::= { hm2DoubleNatRuleEntry 2 }
+	
+hm2DonatLocalExternalIp OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..20) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+        "The IP address where you want the first net/machine to be reachable
+        from the second net/machine.
+        Allowed formats are:
+		- keyword 'any'
+		- IP address  ('10.0.0.1')
+        - IP address range ('10.0.0.0/8')"
+		::= { hm2DoubleNatRuleEntry 3 }
+	
+hm2DonatRemoteInternalIp OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..20) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+        "The real IP address of the second net/machine you want to double NAT.
+        Allowed formats are:
+		- keyword 'any'
+		- IP address  ('10.0.0.1')
+        - IP address range ('10.0.0.0/8')"
+		::= { hm2DoubleNatRuleEntry 4 }
+
+hm2DonatRemoteExternalIp OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..20) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+        "The IP address where you want the second net/machine to be reachable
+        from the first net/machine.
+        Allowed formats are:
+		- keyword 'any'
+		- IP address  ('10.0.0.1')
+        - IP address range ('10.0.0.0/8')"
+		::= { hm2DoubleNatRuleEntry 5 }
+
+hm2DonatRuleParams OBJECT-TYPE
+ 	 SYNTAX DisplayString ( SIZE(0..50) )
+ 	 MAX-ACCESS read-create
+ 	 STATUS current
+ 	 DESCRIPTION
+ 	 	 "Additional parameters to this rule as string. 
+		  Currently only the value 'none' is valid.
+		  Reserved for future use."
+ 	 ::= { hm2DoubleNatRuleEntry 6 }	 
+	
+hm2DonatLog OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true if application of this rule shall be logged."
+	DEFVAL { false }
+	::={ hm2DoubleNatRuleEntry 7 }
+
+
+hm2DonatTrap OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true if application of this rule shall send a trap."
+	DEFVAL { false }
+	::={ hm2DoubleNatRuleEntry 8 }
+
+hm2DonatRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"This is a standard row status value:
+            - active(1): The rule is active. Note that until committed, the rule
+              will not be applied.
+            - notInService(2): The rule is inactive because of user action.
+            - notReady(3):The rule is inactive because it has an incomplete
+              configuration.
+            - createAndGo(4): Create the rule with default parameters
+              activated.
+            - createAndWait(5): Create the rule inactive.
+            - destroy(6): Delete the rule. You cannot delete a rule with
+              interface mappings to it."
+		::= { hm2DoubleNatRuleEntry 9 }
+
+hm2DonatDescription OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(0..32) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION "User defined textual description related to this rule."
+	DEFVAL  { "" }
+	::= { hm2DoubleNatRuleEntry 10 }
+
+hm2DonatRuleIfMappingTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2DonatRuleIfMappingEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table for mapping double NAT rules to interfaces."
+		::={ hm2DoubleNatRuleTables 2 }
+	
+hm2DonatRuleIfMappingEntry OBJECT-TYPE
+	SYNTAX Hm2DonatRuleIfMappingEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in rule interface mapping table."
+	INDEX { hm2DonatIfmInterface, hm2DonatIfmDirection, hm2DonatIfmRuleIndex } 
+		::={ hm2DonatRuleIfMappingTable 1 }
+
+Hm2DonatRuleIfMappingEntry ::= SEQUENCE {	
+	hm2DonatIfmRuleIndex Integer32,
+	hm2DonatIfmDirection INTEGER,
+	hm2DonatIfmPriority Unsigned32,
+	hm2DonatIfmInterface InterfaceIndex,
+	hm2DonatIfmRowStatus RowStatus
+}
+
+hm2DonatIfmRuleIndex OBJECT-TYPE
+	SYNTAX Integer32 (1..2048)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The index of the double NAT rule this mapping entry is assigned 
+		 to."
+		::={ hm2DonatRuleIfMappingEntry 1 }
+
+	
+hm2DonatIfmDirection OBJECT-TYPE
+	SYNTAX INTEGER {
+			ingress(1),
+			egress(2),
+			both(3)
+	}
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "Meanings:
+            - ingress(1): The first net/machine can be reached through this
+              interface
+            - egress(2): The second net/machine can be reached through this
+              interface
+            - both(3): Both machines/nets can be reached through this interface"
+		::={ hm2DonatRuleIfMappingEntry 2 }
+	
+hm2DonatIfmPriority OBJECT-TYPE
+	SYNTAX Unsigned32 (1..6500)
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+        "The priority is the sorting key for rules in the chain to this
+        interface. They don't need to be unique per interface, but in that case,
+        no clear order can be assumed.
+        Priorities are processed in ascending order (0 highest priority)."
+		::={ hm2DonatRuleIfMappingEntry 3 }
+	
+hm2DonatIfmInterface OBJECT-TYPE
+	SYNTAX InterfaceIndex
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The interface this mapping entry is assigned to. This has to be either
+        an hm2AgentSwitchIpInterfaceIfIndex or an hm2AgentSwitchIpVlanIfIndex.
+        Note that for physical interfaces this only works if the corresponding
+        hm2AgentSwitchIpInterfaceRoutingMode is set to enable."
+		::={ hm2DonatRuleIfMappingEntry 4 }
+	
+hm2DonatIfmRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The RowStatus value for this entry with the usual meanings:
+        
+            - active(1): The interface mapping is in place
+            - notInService(2): The interface mapping is not in place because the
+              user said so
+            - notReady(3): The interface mapping is not in place because the
+              agent said so
+            - createAndGo(4): Create this mapping with the default priority and
+              activate it.
+            - createAndWait(5): Create this mapping deactivated.
+            - destroy(6): Destroy this interface mapping."
+		::={ hm2DonatRuleIfMappingEntry 5 }	
+
+	
+hm2DonatStats OBJECT IDENTIFIER ::={ hm2DoubleNat 3 }
+
+hm2DonatGeneralStats OBJECT IDENTIFIER ::= { hm2DonatStats 1 }
+
+hm2DonatStatsTotalPck OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets processed by double NAT."
+		::= { hm2DonatGeneralStats 1 }
+	
+hm2DonatStatsTotalPckSize OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of bytes processed by double NAT."
+		::= { hm2DonatGeneralStats 2 }
+
+hm2DonatStatsTotalPckDenDrop OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped or denied by double NAT."
+		::={ hm2DonatGeneralStats 3 }
+	
+hm2DonatStatsTotalPckAcc OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets accepted by double NAT."
+		::={ hm2DonatGeneralStats 4 }
+	
+hm2DonatStatsRuleTables OBJECT IDENTIFIER ::= { hm2DonatStats 2 }
+	
+hm2DonatStatsRuleTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2DonatStatsRuleTableEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table of per-rule statistics of double NAT."
+		::= { hm2DonatStatsRuleTables 1 }
+	
+hm2DonatStatsRuleTableEntry OBJECT-TYPE
+	SYNTAX Hm2DonatStatsRuleTableEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Statistics table entry for double NAT."
+	INDEX { hm2DonatRuleIndex }
+	::={ hm2DonatStatsRuleTable 1 }
+	
+Hm2DonatStatsRuleTableEntry ::= SEQUENCE {
+	hm2DonatStatsPckCount Counter64,
+	hm2DonatStatsPckSize Counter64,
+	hm2DonatStatsLastApplied HmTimeSeconds1970
+}
+
+hm2DonatStatsPckCount OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of packets matched by this rule."
+		::={ hm2DonatStatsRuleTableEntry 1 }
+
+hm2DonatStatsPckSize OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of bytes processed by this rule."
+		::={ hm2DonatStatsRuleTableEntry 2 }
+
+hm2DonatStatsLastApplied OBJECT-TYPE
+	SYNTAX HmTimeSeconds1970
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Time of last application of the rule in seconds since 1.1.1970."
+		::={ hm2DonatStatsRuleTableEntry 3 }
+
+--******************************************************************************
+--			Compliance statements
+--******************************************************************************
+
+hm2NatCompliances OBJECT IDENTIFIER ::= { hm2NatConformance 1 }
+hm2NatGroups OBJECT IDENTIFIER ::= { hm2NatConformance 2 }
+
+hm2NatCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for an SNMP entity which
+         implements the Hirschmann NAT MIB."
+    MODULE     -- this module
+    MANDATORY-GROUPS { hm2NatGeneralGroup, hm2NatNotificationsGroup }
+    ::= { hm2NatCompliances 1 }
+
+hm2NatGeneralGroup OBJECT-GROUP
+    OBJECTS {
+    	hm2DnatMaxRules,
+    	hm2OneToOneNatMaxRules,
+    	hm2DoubleNatMaxRules,
+    	hm2MasqMaxRules,
+    	hm2NatResetStatistics,
+
+    	hm2DnatIfMappingRuleCount,
+	hm2DnatRulePendingActions,
+    	hm2DnatCommitPendingActions,
+	hm2DnatRuleCount,
+	hm2DnatRuleIndex,
+	hm2DnatSourceAddress,
+	hm2DnatSourcePort,
+	hm2DnatTargetAddress,
+	hm2DnatTargetPort,	
+	hm2DnatNewTargetAddress,
+	hm2DnatNewTargetPort,
+	hm2DnatProto,
+	hm2DnatRuleParams,
+	hm2DnatLog,
+	hm2DnatTrap,
+        hm2DnatDescription,
+	hm2DnatRowStatus,
+	hm2DnatIfmPriority,
+	hm2DnatIfmRowStatus,	
+        hm2DnatStatsPckCount,
+        hm2DnatStatsPckSize,
+	hm2DnatStatsLastApplied,
+	hm2DnatStatsTotalPck,
+	hm2DnatStatsTotalPckSize,
+	hm2DnatStatsTotalPckDenDrop,
+	hm2DnatStatsTotalPckAccepted,
+	
+	hm21to1IfMappingRuleCount,
+	hm21to1RulePendingActions,
+    	hm21to1CommitPendingActions,
+	hm21to1RuleCount,
+	hm21to1RuleIndex,	
+	hm21to1TargetAddress,	
+	hm21to1NewTargetAddress,
+	hm21to1RuleParams,
+	hm21to1Log,
+	hm21to1Trap,
+        hm21to1Description,
+        hm21to1IngressIntf,
+        hm21to1EgressIntf,
+        hm21to1Priority,
+
+	hm21to1RowStatus,
+        hm21to1StatsPckCount,
+        hm21to1StatsPckSize,
+	hm21to1StatsLastApplied,
+	hm21to1StatsTotalPck,
+	hm21to1StatsTotalPckSize,
+	hm21to1StatsTotalPckDenDrop,
+	hm21to1StatsTotalPckAccepted,
+	
+	hm2MasqIfMappingRuleCount,
+	hm2MasqRulePendingActions,
+    	hm2MasqCommitPendingActions,
+	hm2MasqRuleCount,
+	hm2MasqRuleIndex,	
+	hm2MasqSourceAddress,
+	hm2MasqSourcePort,
+	hm2MasqProto,
+	hm2MasqRuleParams,
+	hm2MasqLog,
+	hm2MasqTrap,
+        hm2MasqDescription,
+	hm2MasqRowStatus,
+	hm2MasqIfmPriority,
+	hm2MasqIfmRowStatus,	
+        hm2MasqStatsPckCount,
+        hm2MasqStatsPckSize,
+	hm2MasqStatsLastApplied,
+	hm2MasqStatsTotalPck,
+	hm2MasqStatsTotalPckSize,
+	hm2MasqStatsTotalPckDenDrop,
+	hm2MasqStatsTotalPckAccepted,
+	
+	hm2DoubleNatIfMappingRuleCount,
+	hm2DoubleNatRulePendingActions,
+    	hm2DoubleNatCommitPendingActions,
+	hm2DoubleNatRuleCount,
+	hm2DonatRuleIndex,	
+	hm2DonatLocalInternalIp,	
+	hm2DonatLocalExternalIp,
+	hm2DonatRemoteInternalIp,	
+	hm2DonatRemoteExternalIp,
+	hm2DonatRuleParams,
+	hm2DonatLog,
+	hm2DonatTrap,
+        hm2DonatDescription,
+	hm2DonatIfmPriority,
+	hm2DonatIfmRowStatus,	
+	hm2DonatRowStatus,
+	hm2DonatStatsPckCount,
+	hm2DonatStatsPckSize,
+	hm2DonatStatsLastApplied,
+	hm2DonatStatsTotalPck,
+	hm2DonatStatsTotalPckSize,
+	hm2DonatStatsTotalPckDenDrop,
+	hm2DonatStatsTotalPckAcc
+	
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of all Hirschmann objects provided by the Firewall
+        module."
+    ::= { hm2NatGroups 1 }
+
+hm2NatNotificationsGroup  NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		
+		hm2DnatRuleAppliedTrap,
+		hm2DnatRuleAppliedAndLoggedTrap,
+		
+		hm21to1RuleAppliedTrap,
+		hm21to1RuleAppliedAndLoggedTrap,
+		
+		hm2MasqRuleAppliedTrap,
+		hm2MasqRuleAppliedAndLoggedTrap,
+		
+		hm2DonatRuleAppliedTrap,
+		hm2DonatRuleAppliedAndLoggedTrap
+	}
+	STATUS current
+	DESCRIPTION
+		"A collection of all Hirschmann notifications provided by the
+		NAT module."
+		::= { hm2NatGroups 2 }
+
+--******************************************************************************
+--                      hm2NatSNMPExtensionGroup
+--******************************************************************************
+
+hm2NatSNMPExtensionEgressInterfaceInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the 1 to 1 NAT rule entry contains an invalid value
+                        for egress interface that cannot be processed."
+           ::= { hm2NatSNMPExtensionGroup 1 }
+
+hm2NatSNMPExtensionIngressInterfaceInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the 1 to 1 NAT rule entry contains an invalid value
+                        for ingress interface that cannot be processed."
+           ::= { hm2NatSNMPExtensionGroup 2 }
+
+hm2NatSNMPExtensionIPsecExemptInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the masquerading NAT rule entry contains an invalid value
+                        for ipsec exempt that cannot be processed."
+           ::= { hm2NatSNMPExtensionGroup 3 }
+
+hm2NatSNMPExtensionLocalExternalIPInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the double NAT rule entry contains an invalid value
+                        for local external IP address that cannot be processed."
+           ::= { hm2NatSNMPExtensionGroup 4 }
+
+hm2NatSNMPExtensionLocalInternalIPInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the double NAT rule entry contains an invalid value
+                        for local internal IP  address that cannot be processed."
+           ::= { hm2NatSNMPExtensionGroup 5 }
+
+hm2NatSNMPExtensionNewDestAddrInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the 1 to 1/destination NAT rule entry contains an invalid value
+                        for new destination address that cannot be processed."
+           ::= { hm2NatSNMPExtensionGroup 6 }
+
+hm2NatSNMPExtensionNewDestPortInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the destination NAT rule entry contains an invalid value
+                        for new destination port that cannot be processed."
+           ::= { hm2NatSNMPExtensionGroup 7 }
+
+hm2NatSNMPExtensionRemoteExternalIPInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the double NAT rule entry contains an invalid value
+                        for remote external IP address that cannot be processed."
+           ::= { hm2NatSNMPExtensionGroup 8 }
+
+hm2NatSNMPExtensionRemoteInternalIPInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the double NAT rule entry contains an invalid value
+                        for remote internal IP address that cannot be processed."
+           ::= { hm2NatSNMPExtensionGroup 9 }
+
+hm2NatSNMPExtensionBadDestAddr OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the 1 to 1 NAT rule entry contains an invalid
+                        destination IP address range and cannot be processed."
+           ::= { hm2NatSNMPExtensionGroup 10 }
+
+hm2NatSNMPExtensionBadNewDestAddr OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the 1 to 1 NAT rule entry contains an invalid
+                        new destination IP address range and cannot be processed."
+           ::= { hm2NatSNMPExtensionGroup 11 }
+
+hm2NatSNMPExtensionDestAndNewDestAddrSubnetError OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the 1 to 1 NAT rule entry contains destination IP address
+                        and new destination IP address which are not on the same subnet and cannot
+                        be processed."
+           ::= { hm2NatSNMPExtensionGroup 12 }
+
+hm2NatSNMPExtensionBadRuleParameter OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the 1 to 1 NAT rule entry contains invalid rule parameters
+                        that cannot be processed."
+           ::= { hm2NatSNMPExtensionGroup 13 }
+
+hm2NatSNMPExtensionIngressAndEgressIntfEqualError OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the 1 to 1 NAT rule entry contains the same values for ingress
+                        and egress interfaces and cannot be processed."
+           ::= { hm2NatSNMPExtensionGroup 14 }
+END
+
+

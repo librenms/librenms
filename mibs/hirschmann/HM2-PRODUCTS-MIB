@@ -1,0 +1,1427 @@
+
+HM2-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Hirschmann Products MIB
+-- *************************************************************
+--
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI -- RFC 2578
+    hm2ConfigurationMibs
+    	FROM HM2-TC-MIB;
+
+hm2ProductsMib MODULE-IDENTITY
+	LAST-UPDATED "202109230000Z" -- September 23, 2021
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann products MIB.
+         Copyright (C) 2021. All Rights Reserved."
+    REVISION     "202102250000Z" -- February 25, 2021
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 2 }
+
+--
+-- *************************************************************
+-- hm2Products group
+-- *************************************************************
+-- 
+hm2ProductFamily OBJECT-IDENTITY
+    			 STATUS  	current
+    			 DESCRIPTION "Hirschmann product family."
+    			 ::= { hm2ProductsMib 1 }
+    			 
+hm2ModuleFamily OBJECT-IDENTITY
+    			 STATUS  	current
+    			 DESCRIPTION "Hirschmann module family."
+    			 ::= { hm2ProductsMib 2 }
+
+                    
+-- Product families                    
+ees	 OBJECT-IDENTITY
+   	 STATUS  	current
+   	 DESCRIPTION "Hirschmann Embedded Ethernet Switch family."
+   	 ::= { hm2ProductFamily 1 }
+
+rsp	 OBJECT-IDENTITY
+   	 STATUS  	current
+   	 DESCRIPTION "Hirschmann Rail Switch Power family."
+   	 ::= { hm2ProductFamily 2 }
+
+eagle	 OBJECT-IDENTITY
+   	 STATUS  	current
+   	 DESCRIPTION "Hirschmann Eagle family."
+   	 ::= { hm2ProductFamily 3 }
+
+msp	 OBJECT-IDENTITY
+   	 STATUS  	current
+   	 DESCRIPTION "Hirschmann MICE Switch Power family."
+   	 ::= { hm2ProductFamily 4 }
+
+rsps OBJECT-IDENTITY
+   	 STATUS  	current
+   	 DESCRIPTION "Hirschmann Rail Switch Power Smart family."
+   	 ::= { hm2ProductFamily 5 }  
+   	 
+rspl OBJECT-IDENTITY
+   	 STATUS  	current
+   	 DESCRIPTION "Hirschmann Rail Switch Power Lite family."
+   	 ::= { hm2ProductFamily 6 } 	 
+   	
+eesx OBJECT-IDENTITY
+   	 STATUS  	current
+   	 DESCRIPTION "Hirschmann Embedded Ethernet Switch eXtend family."
+   	 ::= { hm2ProductFamily 7 } 	
+   	  
+rspe OBJECT-IDENTITY
+   	 STATUS  	current
+   	 DESCRIPTION "Hirschmann Rail Switch Power Enhanced family."
+   	 ::= { hm2ProductFamily 8 } 
+
+tofino OBJECT-IDENTITY
+   	 STATUS  	current
+   	 DESCRIPTION "Hirschmann TOFINO family."
+   	 ::= { hm2ProductFamily 9 } 
+   	    	 
+grs OBJECT-IDENTITY
+   	 STATUS  	current
+   	 DESCRIPTION "Hirschmann GREYHOUND family."
+   	 ::= { hm2ProductFamily 10 } 
+	 
+octopus OBJECT-IDENTITY
+   	 STATUS  	current
+   	 DESCRIPTION "Hirschmann Octopus family."
+   	 ::= { hm2ProductFamily 11 } 
+   	 
+red OBJECT-IDENTITY
+   	 STATUS  	current
+   	 DESCRIPTION "Hirschmann RED family."
+   	 ::= { hm2ProductFamily 12 } 
+   	 
+rdd OBJECT-IDENTITY
+   	 STATUS  	current
+   	 DESCRIPTION "Hirschmann RDD family."
+   	 ::= { hm2ProductFamily 13 } 
+   	 
+dragon OBJECT-IDENTITY
+   	 STATUS  	current
+   	 DESCRIPTION "Hirschmann DRAGON family."
+   	 ::= { hm2ProductFamily 14 }
+   	   	 
+brs OBJECT-IDENTITY
+   	 STATUS  	current
+   	 DESCRIPTION "Hirschmann BRS family."
+   	 ::= { hm2ProductFamily 15 } 
+
+brse OBJECT-IDENTITY
+     STATUS     current
+     DESCRIPTION "Reserved product family."
+     ::= { hm2ProductFamily 16 }
+
+-- Module families                  
+msm	 OBJECT-IDENTITY
+   	 STATUS  	current
+   	 DESCRIPTION "Hirschmann Mice Switch Power Module family."
+   	 ::= { hm2ModuleFamily 1 }
+
+rspm OBJECT-IDENTITY
+   	 STATUS  	current
+   	 DESCRIPTION "Hirschmann Rail Switch Power Module family."
+   	 ::= { hm2ModuleFamily 2 }
+
+grm OBJECT-IDENTITY
+   	 STATUS  	current
+   	 DESCRIPTION "Hirschmann GREYHOUND Module family."
+   	 ::= { hm2ModuleFamily 3 }
+
+gmm OBJECT-IDENTITY
+   	 STATUS  	current
+   	 DESCRIPTION "Hirschmann GREYHOUND Switch Module family."
+   	 ::= { hm2ModuleFamily 4 }
+
+mmm OBJECT-IDENTITY
+   	 STATUS  	current
+   	 DESCRIPTION "Hirschmann DRAGON Switch Module family."
+   	 ::= { hm2ModuleFamily 5 }
+   	 
+m1 OBJECT-IDENTITY
+     STATUS  	current
+     DESCRIPTION "Hirschmann GRS103/MACH102 Switch Module family."
+     ::= { hm2ModuleFamily 99 }
+   	 
+--         
+-- Device groups per family (EES)
+--         
+ees20-0600	 OBJECT-IDENTITY
+   	 	 	 STATUS  	current
+   	 	 	 DESCRIPTION "Hirschmann Embedded Ethernet Switch EES20-0600 device."
+   	 	 	 ::= { ees 1 }
+
+ees25-0600	 OBJECT-IDENTITY
+   	 	 	 STATUS  	current
+   	 	 	 DESCRIPTION "Hirschmann Embedded Ethernet Switch EES25-0600 device."
+   	 	 	 ::= { ees 2 }
+
+--         
+-- Device groups per family (RSP)
+--         
+rsp20-11003z6tt	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann Rail Switch Power RSP20-1103Z6TT device."
+   	 	 	 	 ::= { rsp 1 }
+
+rsp20-11003z6zt	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann Rail Switch Power RSP20-11003Z6ZT device."
+   	 	 	 	 ::= { rsp 2 }
+
+rsp25-11003z6tt	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann Rail Switch Power RSP25-11003Z6TT device."
+   	 	 	 	 ::= { rsp 3 }
+
+rsp25-11003z6zt	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann Rail Switch Power RSP25-11003Z6ZT device."
+   	 	 	 	 ::= { rsp 4 }
+
+rsp30-08033o6tt	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann Rail Switch Power RSP30-08033O6TT device."
+   	 	 	 	 ::= { rsp 5 }
+
+rsp30-08033o6zt	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann Rail Switch Power RSP30-08033O6ZT device."
+   	 	 	 	 ::= { rsp 6 }
+
+rsp35-08033o6tt	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann Rail Switch Power RSP35-08033O6TT device."
+   	 	 	 	 ::= { rsp 7 }
+
+rsp35-08033o6zt  OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann Rail Switch Power RSP35-08033O6ZT device."
+   	 	 	 	 ::= { rsp 8 }
+   	 	 	 	 
+--                          
+-- Device groups per family (Eagle)
+--         
+eagle20-0400999TT999  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE20 with 4 Fast Ethernet ports."
+			::= { eagle 1 }
+eagle20-0400999TTC99  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE20 with 4 Fast Ethernet ports and GPRS/UMTS modem."
+			::= { eagle 2 }
+eagle20-0400999TTCAA  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE20 with 4 Fast Ethernet ports and GPRS/UMTS modem."
+			::= { eagle 3 }
+eagle20-0400999TTCAB  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE20 with 4 Fast Ethernet ports and GPRS/UMTS modem."
+			::= { eagle 4 }
+eagle20-0400999TTCVA  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE20 with 4 Fast Ethernet ports and GPRS/UMTS modem."
+			::= { eagle 5 }
+eagle20-0400999TTCVB  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE20 with 4 Fast Ethernet ports and GPRS/UMTS modem."
+			::= { eagle 6 }
+eagle20-0400999TTCH2  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE20 with 4 Fast Ethernet ports and GPRS/UMTS modem."
+			::= { eagle 7 }
+eagle20-0400999TTCP2  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE20 with 4 Fast Ethernet ports and GPRS/UMTS modem."
+			::= { eagle 8 }
+eagle20-0400999TT9AA  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE20 with 4 Fast Ethernet ports."
+			::= { eagle 20 }
+eagle20-0400999TT9AB  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE20 with 4 Fast Ethernet ports."
+			::= { eagle 21 }
+eagle20-0400999TT9VA  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE20 with 4 Fast Ethernet ports."
+			::= { eagle 22 }
+eagle20-0400999TT9VB  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE20 with 4 Fast Ethernet ports."
+			::= { eagle 23 }
+eagle20-0400999TT9H2  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE20 with 4 Fast Ethernet ports."
+			::= { eagle 24 }
+eagle20-0400999TT9P2  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE20 with 4 Fast Ethernet ports."
+			::= { eagle 25 }
+
+eagle30-04022O6TT999  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE30 with 2 Gigabit Ethernet ports, 4 Fast Ethernet ports."
+			::= { eagle 40 }
+eagle30-04022O6TTC99  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE30 with 2 Gigabit Ethernet ports, 4 Fast Ethernet ports and GPRS/UMTS modem."
+			::= { eagle 41 }
+eagle30-04022O6TTCAA  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE30 with 2 Gigabit Ethernet ports, 4 Fast Ethernet ports and GPRS/UMTS modem."
+			::= { eagle 42 }
+eagle30-04022O6TTCAB  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE30 with 2 Gigabit Ethernet ports, 4 Fast Ethernet ports and GPRS/UMTS modem."
+			::= { eagle 43 }
+eagle30-04022O6TTCVA  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE30 with 2 Gigabit Ethernet ports, 4 Fast Ethernet ports and GPRS/UMTS modem."
+			::= { eagle 44 }
+eagle30-04022O6TTCVB  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE30 with 2 Gigabit Ethernet ports, 4 Fast Ethernet ports and GPRS/UMTS modem."
+			::= { eagle 45 }
+eagle30-04022O6TTCH2  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE30 with 2 Gigabit Ethernet ports, 4 Fast Ethernet ports and GPRS/UMTS modem."
+			::= { eagle 46 }
+eagle30-04022O6TTCP2  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE30 with 2 Gigabit Ethernet ports, 4 Fast Ethernet ports and GPRS/UMTS modem."
+			::= { eagle 47 }
+eagle30-04022O6TT9AA  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE30 with 2 Gigabit Ethernet ports, 4 Fast Ethernet ports."
+			::= { eagle 60 }
+eagle30-04022O6TT9AB  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE30 with 2 Gigabit Ethernet ports, 4 Fast Ethernet ports."
+			::= { eagle 61 }
+eagle30-04022O6TT9VA  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE30 with 2 Gigabit Ethernet ports, 4 Fast Ethernet ports."
+			::= { eagle 62 }
+eagle30-04022O6TT9VB  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE30 with 2 Gigabit Ethernet ports, 4 Fast Ethernet ports."
+			::= { eagle 63 }
+eagle30-04022O6TT9H2  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE30 with 2 Gigabit Ethernet ports, 4 Fast Ethernet ports."
+			::= { eagle 64 }
+eagle30-04022O6TT9P2  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE30 with 2 Gigabit Ethernet ports, 4 Fast Ethernet ports."
+			::= { eagle 65 }
+
+eagle40-033T1 OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE40 with 3 Gigabit Ethernet RJ45 ports."
+			::= { eagle 1000 }
+eagle40-031O6  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE40 with 2 Gigabit Ethernet RJ45 ports, 1 Gigabit Ethernet SFP port."
+			::= { eagle 1001 }
+eagle40-033T6  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE40 with 3 M12 Ethernet ports."
+			::= { eagle 1002 }
+eagle40-072O6  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE40 with 5 Gigabit Ethernet RJ45 ports, 2 Gigabit Ethernet SFP port."
+			::= { eagle 1003 }
+eagle40-075O6  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE40 with 2 Gigabit Ethernet RJ45 ports, 5 Gigabit Ethernet SFP port."
+			::= { eagle 1004 }
+eagle40-044T1  OBJECT-IDENTITY
+			STATUS  	current
+			DESCRIPTION "EAGLE40 with 4 Gigabit Ethernet RJ45 ports."
+			::= { eagle 1006 }
+
+--         
+-- Device groups per family (MSP)
+--         
+msp30-0804	OBJECT-IDENTITY
+   	 		STATUS  	current
+   	 	 	DESCRIPTION "Hirschmann MICE Switch Power MSP30-0804 device."
+   	 	 	::= { msp 1 }
+msp32-0804	OBJECT-IDENTITY
+   	 		STATUS  	current
+   	 	 	DESCRIPTION "Hirschmann MICE Switch Power MSP32-0804 device."
+   	 	 	::= { msp 2 }
+msp30-1604	OBJECT-IDENTITY
+   	 		STATUS  	current
+   	 	 	DESCRIPTION "Hirschmann MICE Switch Power MSP30-1604 device."
+   	 	 	::= { msp 3 }
+msp32-1604	OBJECT-IDENTITY
+   	 		STATUS  	current
+   	 	 	DESCRIPTION "Hirschmann MICE Switch Power MSP32-1604 device."
+   	 	 	::= { msp 4 }
+msp30-2404	OBJECT-IDENTITY
+   	 		STATUS  	current
+   	 	 	DESCRIPTION "Hirschmann MICE Switch Power MSP30-2404 device."
+   	 	 	::= { msp 5 }
+msp32-2404	OBJECT-IDENTITY
+   	 		STATUS  	current
+   	 	 	DESCRIPTION "Hirschmann MICE Switch Power MSP32-2404 device."
+   	 	 	::= { msp 6 }
+msp40-00280	OBJECT-IDENTITY
+   	 		STATUS  	current
+   	 	 	DESCRIPTION "Hirschmann MICE Switch Power MSP40-00280 device."
+   	 	 	::= { msp 1000 }
+msp42-00280	OBJECT-IDENTITY
+   	 		STATUS  	current
+   	 	 	DESCRIPTION "Hirschmann MICE Switch Power MSP42-00280 device."
+   	 	 	::= { msp 1001 }
+msp40-00200	OBJECT-IDENTITY
+   	 		STATUS  	current
+   	 	 	DESCRIPTION "Hirschmann MICE Switch Power MSP40-00200 device."
+   	 	 	::= { msp 1002 }
+msp42-00200	OBJECT-IDENTITY
+   	 		STATUS  	current
+   	 	 	DESCRIPTION "Hirschmann MICE Switch Power MSP42-00200 device."
+   	 	 	::= { msp 1003 }
+msp40-00120	OBJECT-IDENTITY
+   	 		STATUS  	current
+   	 	 	DESCRIPTION "Hirschmann MICE Switch Power MSP40-00120 device."
+   	 	 	::= { msp 1004 }
+msp42-00120	OBJECT-IDENTITY
+   	 		STATUS  	current
+   	 	 	DESCRIPTION "Hirschmann MICE Switch Power MSP42-00120 device."
+   	 	 	::= { msp 1005 }
+
+--         
+-- Device groups per family (RSPS)
+--         
+rsps20-06002z6yt	 OBJECT-IDENTITY
+   	 	 	 STATUS  	current
+   	 	 	 DESCRIPTION "Hirschmann Rail Switch Power Smart RSPS20-06002Z6YT device."
+   	 	 	 ::= { rsps 1 }
+
+rsps20-06002z6tt	 OBJECT-IDENTITY
+   	 	 	 STATUS  	current
+   	 	 	 DESCRIPTION "Hirschmann Rail Switch Power Smart RSPS20-06002Z6TT device."
+   	 	 	 ::= { rsps 2 }
+
+rsps20-06002t1tt	 OBJECT-IDENTITY
+   	 	 	 STATUS  	current
+   	 	 	 DESCRIPTION "Hirschmann Rail Switch Power Smart RSPS20-06002T1TT device."
+   	 	 	 ::= { rsps 3 }
+  
+rsps25-06002z6yt	 OBJECT-IDENTITY
+   	 	 	 STATUS  	current
+   	 	 	 DESCRIPTION "Hirschmann Rail Switch Power Smart RSPS25-06002Z6YT device."
+   	 	 	 ::= { rsps 4 }
+
+rsps25-06002z6tt	 OBJECT-IDENTITY
+   	 	 	 STATUS  	current
+   	 	 	 DESCRIPTION "Hirschmann Rail Switch Power Smart RSPS25-06002Z6TT device."
+   	 	 	 ::= { rsps 5 }
+
+rsps25-06002t1tt	 OBJECT-IDENTITY
+   	 	 	 STATUS  	current
+   	 	 	 DESCRIPTION "Hirschmann Rail Switch Power Smart RSPS25-06002T1TT device."
+   	 	 	 ::= { rsps 6 } 
+
+--         
+-- Device groups per family (RSPL)
+--     
+
+rspl20-08002z6tt  OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann Rail Switch Power Lite RSPL20-08002Z6TT device."
+   	 	 	 	 ::= { rspl 1 }
+   	 	 	 	 
+rspl20-08002z6yt  OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann Rail Switch Power Lite RSPL20-08002Z6YT device."
+   	 	 	 	 ::= { rspl 2 }
+   	 	 	 	 
+rspl30-08022o7yt  OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann Rail Switch Power Lite RSPL30-0802207YT device."
+   	 	 	 	 ::= { rspl 3 }
+   	 	 	 	 
+rspl30-08022o7zt  OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann Rail Switch Power Lite RSPL30-0802207ZT device."
+   	 	 	 	 ::= { rspl 4 }
+
+--         
+-- Device groups per family (EESX)
+--         
+eesx20-0800	 OBJECT-IDENTITY
+   	 	 	 STATUS  	current
+   	 	 	 DESCRIPTION "Hirschmann Embedded Ethernet Switch eXtend EES20-0800 device."
+   	 	 	 ::= { eesx 1 }
+
+eesx30-0802	 OBJECT-IDENTITY
+   	 	 	 STATUS  	current
+   	 	 	 DESCRIPTION "Hirschmann Embedded Ethernet Switch eXtend EES30-0802 device."
+   	 	 	 ::= { eesx 2 }
+  
+--         
+-- Device groups per family (RSPE)
+--         
+rspe30-24044O7T99	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann Rail Switch Power rspe30-24044O7T99 device."
+   	 	 	 	 ::= { rspe 1 }
+
+rspe32-24044O7T99	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann Rail Switch Power rspe30-24044O7T99 device."
+   	 	 	 	 ::= { rspe 2 }
+
+rspe35-24044O7T99	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann Rail Switch Power rspe30-24044O7T99 device."
+   	 	 	 	 ::= { rspe 3 }
+
+rspe37-24044O7T99	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann Rail Switch Power rspe30-24044O7T99 device."
+   				 ::= { rspe 4 }
+   				 
+--
+-- Device groups per family (GRS)
+--         
+grs1020-16t9	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann GREYHOUND with 16 TX Fast Ethernet ports."
+   	 	 	 	 ::= { grs 1 }
+
+grs1020-8t8z	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann GREYHOUND with 8 TX and 8 FX Fast Ethernet ports."
+   	 	 	 	 ::= { grs 2 }
+
+grs1120-16t9	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann GREYHOUND with 16 TX Fast Ethernet ports."
+   	 	 	 	 ::= { grs 3 }
+
+grs1120-8t8z	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann GREYHOUND with 8 TX and 8 FX Fast Ethernet ports."
+   	 	 	 	 ::= { grs 4 }
+
+grs1030-16t9	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann GREYHOUND with 4 TX/FX Combo Gigabit Ethernet ports and 16 TX Fast Ethernet ports."
+   	 	 	 	 ::= { grs 5 }
+
+grs1030-8t8z	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann GREYHOUND with 4 TX/FX Combo Gigabit Ethernet ports, 8 TX and 8 FX Fast Ethernet ports."
+   	 	 	 	 ::= { grs 6 }
+
+grs1130-16t9	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann GREYHOUND with 4 TX/FX Combo Gigabit Ethernet ports and 16 TX Fast Ethernet ports."
+   	 	 	 	 ::= { grs 7 }
+
+grs1130-8t8z	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann GREYHOUND with 4 TX/FX Combo Gigabit Ethernet ports, 8 TX and 8 FX Fast Ethernet ports."
+   	 	 	 	 ::= { grs 8 }
+
+grs1042-at2z 	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann GREYHOUND Switch with 2 FX Gigabit and 10 TX Ethernet ports."
+   	 	 	 	 ::= { grs 1000 }
+   	 	 	 
+grs1142-at2z  	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann GREYHOUND Switch with 2 FX Gigabit and 10 TX Ethernet ports."
+   	 	 	 	 ::= { grs 1001 }
+
+grs1042-6t6z  	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann GREYHOUND Switch with 6 FX Gigabit and 6 TX Ethernet ports."
+   	 	 	 	 ::= { grs 1002 }
+   	 	 	 
+grs1142-6t6z  	 OBJECT-IDENTITY
+   	 	 	 	 STATUS  	current
+   	 	 	 	 DESCRIPTION "Hirschmann GREYHOUND Switch with 6 FX Gigabit and 6 TX Ethernet ports."
+   	 	 	 	 ::= { grs 1003 }
+
+grs106-6f8f16t   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with 6 FX 10GE and 8 FX 2.5GE and 16 TX GE ports."
+                 ::= { grs 2000 }
+
+grs106-6f8t16t   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with 6 FX 10GE and 8 TX 2.5GE and 16 TX GE ports."
+                 ::= { grs 2001 }
+
+grs106-6f0016c   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with 6 FX 10GE and 16 Combo GE ports."
+                 ::= { grs 2002 }
+
+grs104-6f8t16t   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with 6 FX GE and 24 TX GE ports."
+                 ::= { grs 2003 }
+
+grs104-6f8f16t   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with 14 FX GE and 16 TX GE ports."
+                 ::= { grs 2004 }
+
+grs104-6f0016c   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with 6 FX GE and 16 Combo GE ports."
+                 ::= { grs 2005 }
+
+grs105-6f8f16t   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with 6 FX 2.5GE and 8 FX GE and 16 TX GE ports."
+                 ::= { grs 2006 }
+
+grs105-6f8t16t   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with 6 FX 2.5GE and 24 TX GE ports."
+                 ::= { grs 2007 }
+
+grs105-6f0016c   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with 6 FX 2.5GE and 16 Combo GE ports."
+                 ::= { grs 2008 }
+
+grs115-6f8f16t   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with MACsec functionality and 2 FX 2.5GE and 12 FX GE and 16 TX GE ports."
+                 ::= { grs 2009 }
+
+grs115-6f8t16t   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with MACsec functionality and 2 FX 2.5GE and 4 FX GE and 24 TX GE ports."
+                 ::= { grs 2010 }
+
+grs115-6f0016c   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with MACsec functionality and 2 FX 2.5GE and 4 FX GE and 16 Combo GE ports."
+                 ::= { grs 2011 }
+
+grs116-6f8f16t   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with MACsec functionality and 6 FX 10GE and 8 FX 2.5GE and 16 TX GE ports."
+                 ::= { grs 2012 }
+
+grs116-6f8t16t   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with MACsec functionality and 6 FX 10GE and 8 TX 2.5GE and 16 TX GE ports."
+                 ::= { grs 2013 }
+
+grs116-6f0016c   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with MACsec functionality and 6 FX 10GE and 16 Combo GE ports."
+                 ::= { grs 2014 }
+
+grs124-6f8f16t   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with PoE functionality and 14 FX GE and 16 TX GE ports."
+                 ::= { grs 2015 }
+
+grs124-6f8t16t   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with PoE functionality and 6 FX GE and 24 TX GE ports."
+                 ::= { grs 2016 }
+
+grs124-6f0016c   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with PoE functionality and 6 FX GE and 16 Combo GE ports."
+                 ::= { grs 2017 }
+
+grs125-6f8f16t   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with PoE functionality and 6 FX 2.5GE and 8 FX GE and 16 TX GE ports."
+                 ::= { grs 2018 }
+
+grs125-6f8t16t   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with PoE functionality and 6 FX 2.5GE and 24 TX GE ports."
+                 ::= { grs 2019 }
+
+grs125-6f0016c   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with PoE functionality and 6 FX 2.5GE and 16 Combo GE ports."
+                 ::= { grs 2020 }
+
+grs126-6f8f16t   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with PoE functionality and 6 FX 10GE and 8 FX 2.5GE and 16 TX GE ports."
+                 ::= { grs 2021 }
+
+grs126-6f8t16t   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with PoE functionality and 6 FX 10GE and 8 TX 2.5GE and 16 TX GE ports."
+                 ::= { grs 2022 }
+
+grs126-6f0016c   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with PoE functionality and 6 FX 10GE and 16 Combo GE ports."
+                 ::= { grs 2023 }
+
+grs135-6f8f16t   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with MACsec and PoE functionality and 6 FX 2.5GE and 8 FX GE and 16 TX GE ports."
+                 ::= { grs 2024 }
+
+grs135-6f8t16t   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with MACsec and PoE functionality and 6 FX 2.5GE and 24 TX GE ports."
+                 ::= { grs 2025 }
+
+grs135-6f0016c   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with MACsec and PoE functionality and 6 FX 2.5GE and 16 Combo GE ports."
+                 ::= { grs 2026 }
+
+grs136-6f8f16t   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with MACsec and PoE functionality and 6 FX 10GE and 8 FX 2.5GE and 16 TX GE ports."
+                 ::= { grs 2027 }
+
+grs136-6f8t16t   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with MACsec and PoE functionality and 6 FX 10GE and 8 TX 2.5GE and 16 TX GE ports."
+                 ::= { grs 2028 }
+
+grs136-6f0016c   OBJECT-IDENTITY
+                 STATUS  	current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with MACsec and PoE functionality and 6 FX 10GE and 16 Combo GE ports."
+                 ::= { grs 2029 }
+
+grs103-6t4c      OBJECT-IDENTITY
+                 STATUS     current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with 6 TX Fast Ethernet ports and 4 TX/FX Combo Gigabit Ethernet ports."
+                 ::= { grs 3000 }
+
+grs103-22t4c     OBJECT-IDENTITY
+                 STATUS     current
+                 DESCRIPTION "Hirschmann GREYHOUND Switch with 22 TX Fast Ethernet ports and 4 TX/FX Combo Gigabit Ethernet ports."
+                 ::= { grs 3001 }
+
+--
+-- Device groups per family (OCTOPUS)
+--         
+os20-000800  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 1 }
+os20-001200  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 2 }
+os20-002000  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 3 }
+os20-002800  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 4 }
+os24-111200  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 5 }
+os24-101200  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 6 }
+os24-081200  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 7 }
+os24-152000  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 8 }
+os24-152800  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 9 }
+os24-142000  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 10 }
+os24-142800  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 11 }
+os24-122000  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 12 }
+os24-122800  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 13 }
+os30-000802  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 14 }
+os30-001602  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 15 }
+os30-002402  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 16 }
+os34-100802  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 17 }
+os34-141602  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 18 }
+os34-142402  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 19 }
+os30-000804  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 20 }
+os30-001604  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 21 }
+os30-002404  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 22 }
+os34-110804  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 23 }
+os34-100804  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 24 }
+os34-080804  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 25 }
+os34-151604  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 26 }
+os34-152404  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 27 }
+os34-141604  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 28 }
+os34-142404  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 29 }
+os34-121604  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 30 }
+os34-122404  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann Octopus Switch device."
+           ::= { octopus 31 }
+os3-30-000000080800  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 8 GE ports and 8 FE ports."
+           ::= { octopus 100 }
+os3-30-000000081600  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 16 GE ports and 8 FE ports."
+           ::= { octopus 101 }
+os3-30-000000160800  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 8 GE ports and 16 FE ports."
+           ::= { octopus 102 }
+os3-34-080800080800  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 8 GE ports and 8 FE ports. 8 ports are capable of PoE."
+           ::= { octopus 103 }
+os3-34-160808080800  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 8 GE ports and 8 FE ports. 16 ports are capable of PoE."
+           ::= { octopus 104 }
+os3-34-080008081600  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 16 GE ports and 8 FE ports. 8 ports are capable of PoE."
+           ::= { octopus 105 }         
+os3-34-080800081600  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 16 GE ports and 8 FE ports. 8 ports are capable of PoE."
+           ::= { octopus 106 }
+os3-34-160808081600  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 16 GE ports and 8 FE ports. 16 ports are capable of PoE."
+           ::= { octopus 107 }
+os3-34-240816081600  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 16 GE ports and 8 FE ports. 24 ports are capable of PoE."
+           ::= { octopus 108 }
+os3-34-160016081600  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 16 GE ports and 8 FE ports. 16 ports are capable of PoE."
+           ::= { octopus 109 }
+os3-34-080800160800  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 8 GE ports and 16 FE ports. 8 ports are capable of PoE."
+           ::= { octopus 110 }
+os3-34-161600160800  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 8 GE ports and 16 FE ports. 16 ports are capable of PoE."
+           ::= { octopus 111 }
+os3-34-241608160800  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 8 GE ports and 16 FE ports. 24 ports are capable of PoE."
+           ::= { octopus 112 }
+os3-34-080008160800  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 8 GE ports and 16 FE ports. 8 ports are capable of PoE."
+           ::= { octopus 113 }
+os3-34-160808160800  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 8 GE ports and 16 FE ports. 16 ports are capable of PoE."
+           ::= { octopus 114 }
+os3-40-000000000800  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 8 GE ports."
+           ::= { octopus 115 }
+os3-40-000000001600  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 16 GE ports."
+           ::= { octopus 116 }
+os3-40-000000002400  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 24 GE ports."
+           ::= { octopus 117 }
+os3-44-080008000800  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 8 GE ports. 8 ports are capable of PoE."
+           ::= { octopus 118 }
+os3-44-080008001600  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 16 GE ports. 8 ports are capable of PoE."
+           ::= { octopus 119 }
+os3-44-160016001600  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 16 GE ports. 16 ports are capable of PoE."
+           ::= { octopus 120 }
+os3-44-080008002400  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 24 GE. 8 ports are capable of PoE."
+           ::= { octopus 121 }
+os3-44-160016002400  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 24 GE. 16 ports are capable of PoE."
+           ::= { octopus 122 }
+os3-44-240024002400  OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 24 GE. 24 ports are capable of PoE."
+           ::= { octopus 123 }
+octopus-8tx-eec-m    OBJECT-IDENTITY
+           STATUS   current
+           DESCRIPTION "Hirschmann OCTOPUS Switch with 8 FE M12 ports."
+           ::= { octopus 200 }
+
+--         
+-- Device groups per family (RED)
+--         
+
+red25-04002t1tt	 OBJECT-IDENTITY
+   	 	 	 STATUS  	current
+   	 	 	 DESCRIPTION "Hirschmann RED25 with 4 TX Fast Ethernet ports."
+   	 	 	 ::= { red 1 }
+
+red25-04002z6tt	 OBJECT-IDENTITY
+           STATUS  	current
+           DESCRIPTION "Hirschmann RED25 with 2 TX and 2 FX Fast Ethernet ports."
+           ::= { red 2 }	 
+
+--         
+-- Device groups per family (RDD)
+--         
+
+raildatadiodeinput	 OBJECT-IDENTITY
+   	 	 	 STATUS  	current
+   	 	 	 DESCRIPTION "Hirschmann RDD left."
+   	 	 	 ::= { rdd 1 }
+
+raildatadiodeoutput	 OBJECT-IDENTITY
+   	 	 	 STATUS  	current
+   	 	 	 DESCRIPTION "Hirschmann RDD right."
+   	 	 	 ::= { rdd 2 }	
+   
+--         
+-- Device groups per family (DRAGON)
+--         
+
+dragon-00484	 OBJECT-IDENTITY
+   	 	 	 STATUS  	current
+   	 	 	 DESCRIPTION "Hirschmann DRAGON Switch with 48G + 4XG ports."
+   	 	 	 ::= { dragon 1 }
+			 
+dragon-00808	 OBJECT-IDENTITY
+   	 	 	 STATUS  	current
+   	 	 	 DESCRIPTION "Hirschmann DRAGON Switch with 80G + 8XG ports."
+   	 	 	 ::= { dragon 2 }
+
+dragon-00520     OBJECT-IDENTITY
+             STATUS      current
+             DESCRIPTION "Hirschmann DRAGON Switch with 52G ports."
+             ::= { dragon 3 }
+
+--         
+-- Device groups per family (BRS)
+--         
+
+brs20-0400 OBJECT-IDENTITY
+            STATUS   current
+            DESCRIPTION "Hirschmann Bobcat Rail Switch with 4 TX Fast Ethernet ports."
+		    ::= { brs 1 }
+brs20-0500 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 4 TX and 1 FX Fast Ethernet ports."
+			::= { brs 2 }
+brs20-0600 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 4 TX and 2 FX Fast Ethernet ports."
+			::= { brs 3 }
+brs20-0800 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX Fast Ethernet ports."
+			::= { brs 4 }
+brs20-0900 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX and 1 FX Fast Ethernet ports."
+			::= { brs 5 }
+brs20-1000 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX and 2 FX Fast Ethernet ports."
+			::= { brs 6 }
+brs20-1100 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX and 3 FX Fast Ethernet ports."
+			::= { brs 7 }
+brs20-1200 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX and 4FX/4TX Fast Ethernet ports."
+			::= { brs 8 }
+brs20-1600 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 16 TX Fast Ethernet ports."
+			::= { brs 9 }
+brs20-1700 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 16 TX and 1 FX Fast Ethernet ports."
+			::= { brs 10 }
+brs20-1800 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 16 TX and 2 FX Fast Ethernet ports."
+			::= { brs 11 }
+brs20-1900 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 16 TX and 3 FX Fast Ethernet ports."
+			::= { brs 12 }
+brs20-2000 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 16 TX and 4FX/4TX Fast Ethernet ports."
+			::= { brs 13 }
+brs20-2400 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 20 TX and 4FX/4TX Fast Ethernet ports."
+			::= { brs 14 }
+brs30-0804 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX Fast Ethernet and 4FX/4TX Gigabit Ethernet ports."
+			::= { brs 15 }
+brs30-2004 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 20 TX Fast Ethernet and 4FX/4TX Gigabit Ethernet ports."
+			::= { brs 16 }
+brs40-0008 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX Gigabit Ethernet ports."
+			::= { brs 17 }
+brs40-0012 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX and 4FX/4TX Gigabit Ethernet ports."
+			::= { brs 18 }
+brs50-0012 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX Gigabit Ethernet and 4FX/4TX 2.5G Ethernet ports."
+			::= { brs 19 }
+brs50-0020 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 16 TX Gigabit Ethernet and 4FX/4TX 2.5G Ethernet ports."
+			::= { brs 20 }
+brs21-1200 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX and 4FX MACsec Fast Ethernet ports."
+			::= { brs 21 }
+brs21-2000 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 16 TX and 4FX MACsec Fast Ethernet ports."
+			::= { brs 22 }
+brs31-0804 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX Fast Ethernet and 4FX MACsec Gigabit Ethernet ports."
+			::= { brs 23 }
+brs31-2004 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 20 TX Fast Ethernet and 4FX MACsec Gigabit Ethernet ports."
+			::= { brs 24 }
+brs51-0012 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX Gigabit Ethernet and 4TX MACsec 2.5G Ethernet ports."
+			::= { brs 25 }
+brs51-0020 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 16 TX Gigabit Ethernet and 4TX MACsec 2.5G Ethernet ports."
+			::= { brs 26 }
+brs22-0800 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX Fast Ethernet PoE ports."
+			::= { brs 27 }
+brs32-0804 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX Fast Ethernet PoE and 4FX/4TX Gigabit Ethernet ports."
+			::= { brs 28 }
+brs42-0008 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX Gigabit Ethernet PoE ports."
+			::= { brs 29 }
+brs42-0012 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX PoE and 4FX/4TX Gigabit Ethernet ports."
+			::= { brs 30 }
+brs52-0012 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX Gigabit Ethernet PoE and 4FX/4TX 2.5G Ethernet ports."
+			::= { brs 31 }
+brs33-0804 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX Fast Ethernet PoE and 4FX MACsec Gigabit Ethernet ports."
+			::= { brs 32 }
+brs43-0012 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX PoE and 4FX MACsec Gigabit Ethernet ports."
+			::= { brs 33 }
+brs53-0012 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX Gigabit Ethernet PoE and 4FX MACsec 2.5G Ethernet ports."
+			::= { brs 34 }
+brs55-0020 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 16 TX Gigabit Ethernet and 4FX/4TX FPGA 2.5G Ethernet ports."
+			::= { brs 35 }
+brs56-0020 OBJECT-IDENTITY
+            STATUS   current
+            DESCRIPTION "Hirschmann Bobcat Rail Switch with 16 TX Gigabit Ethernet and 4FX/4TX MACsec FPGA 2.5G Ethernet ports."
+		    ::= { brs 36 }
+brs40-0020 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 16 TX and 4FX/4TX Gigabit Ethernet ports."
+			::= { brs 37 }
+brs41-0020 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 16 TX and 4FX MACsec Gigabit Ethernet ports."
+			::= { brs 38 } 
+brs41-0012 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 8 TX and 4FX MACsec Gigabit Ethernet ports."
+			::= { brs 39 }
+brs30-1604 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 16 TX Fast Ethernet and 4FX/4TX Gigabit Ethernet ports."
+			::= { brs 40 }
+brs40-0016 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 16 TX Gigabit Ethernet ports."
+			::= { brs 41 }
+brs40-0024 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 20 TX and 4FX/4TX Gigabit Ethernet ports."
+			::= { brs 42 }
+brs50-0024 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 20 TX Gigabit Ethernet and 4FX/4TX 2.5G Ethernet ports."
+			::= { brs 43 }
+brs21-2400 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 20 TX and 4FX MACsec Fast Ethernet ports."
+			::= { brs 44 }
+brs31-1604 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 16 TX Fast Ethernet and 4FX MACsec Gigabit Ethernet ports."
+			::= { brs 45 }
+brs41-0024 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 20 TX and 4FX MACsec Gigabit Ethernet ports."
+			::= { brs 46 }
+brs51-0024 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Switch with 20 TX Gigabit Ethernet and 4TX MACsec 2.5G Ethernet ports."
+			::= { brs 47 }
+bxs30-000804 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat IP30/40 Extended Switch with 8 TX Fast Ethernet and 4 TX Gigabit Ethernet ports."
+			::= { brs 1000 }
+bxs32-000804 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat IP30/40 Extended Switch with 8 TX PoE Fast Ethernet and 4 TX (3 PoE) Gigabit Ethernet ports."
+			::= { brs 1001 }
+bxs40-000012 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat IP30/40 Extended Switch with 12 TX Gigabit Ethernet ports."
+			::= { brs 1002 }
+bxs42-000012 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat IP30/40 Extended Switch with 12 TX (11 PoE) Gigabit Ethernet ports."
+			::= { brs 1003 }
+
+brp60-001608 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat Rail Performance Switch with ****** ports."
+			::= { brs 2000 }
+
+bxp62-140006 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat eXtreme Performance Switch with PoE functionality and 6 TX 10GE and 14 TX GE ports"
+			::= { brs 3000 }
+
+bxp62-220006 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat eXtreme Performance Switch with PoE functionality and 6 TX 10GE and 22 TX GE ports"
+			::= { brs 3001 }
+
+bxp60-140006 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat eXtreme Performance Switch with 6 TX 10GE and 14 TX GE ports"
+			::= { brs 3002 }
+
+bxp60-220006 OBJECT-IDENTITY
+			STATUS   current
+			DESCRIPTION "Hirschmann Bobcat eXtreme Performance Switch with 6 TX 10GE and 22 TX GE ports"
+			::= { brs 3003 }
+
+--
+-- Device groups per family (BRSE)
+--
+brse20-0400 OBJECT-IDENTITY
+            STATUS   current
+            DESCRIPTION "Hirschmann Bobcat-E Rail Switch with 4 TX Fast Ethernet ports."
+            ::= { brse 1 }
+brse20-0500 OBJECT-IDENTITY
+            STATUS   current
+            DESCRIPTION "Hirschmann Bobcat-E Rail Switch with 4 TX and 1 FX Fast Ethernet ports."
+            ::= { brse 2 }
+brse20-0600 OBJECT-IDENTITY
+            STATUS   current
+            DESCRIPTION "Hirschmann Bobcat-E Rail Switch with 4 TX and 2 FX Fast Ethernet ports."
+            ::= { brse 3 }
+brse20-0800 OBJECT-IDENTITY
+            STATUS   current
+            DESCRIPTION "Hirschmann Bobcat-E Rail Switch with 8 TX Fast Ethernet ports."
+            ::= { brse 4 }
+brse20-0900 OBJECT-IDENTITY
+            STATUS   current
+            DESCRIPTION "Hirschmann Bobcat-E Rail Switch with 8 TX and 1 FX Fast Ethernet ports."
+            ::= { brse 5 }
+brse20-1000 OBJECT-IDENTITY
+            STATUS   current
+            DESCRIPTION "Hirschmann Bobcat-E Rail Switch with 8 TX and 2 FX Fast Ethernet ports."
+            ::= { brse 6 }
+
+--
+-- Module groups per family (MSM)
+--
+msm-4tx		OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann MICE Switch Power MSM module with 4 TX ports."
+			::= { msm 1 }
+msm-3tx-1fx	OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann MICE Switch Power MSM module with 3 TX ports and 1 FX port."
+			::= { msm 2 }
+msm-2tx-2fx	OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann MICE Switch Power MSM module with 2 TX ports and 2 FX ports."
+			::= { msm 3 }
+msm-1tx-3fx	OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann MICE Switch Power MSM module with 1 TX ports and 3 FX ports."
+			::= { msm 4 }
+msm-4fx 	OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann MICE Switch Power MSM module with 4 FX ports."
+			::= { msm 5 }
+msm-4txfx	OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann MICE Switch Power MSM module with 4 TX and 4 SFP combo ports."
+			::= { msm 6 }
+msm-2fx		OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann MICE Switch Power MSM module with 2 SFP+ ports."
+			::= { msm 7 }
+msm-4io		OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann MICE Switch Power MSM module with 4 IO ports."
+			::= { msm 100 }
+
+--
+-- Module groups per family (RSPM)
+--
+rspm20-8tx OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann Rail Switch Power Enhanced module with 8 TX ports."
+			::= { rspm 1 }
+			
+rspm22-8tx OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann Rail Switch Power Enhanced module with 8 TX ports and POE."
+			::= { rspm 2 }
+			
+rspm20-4tx-4fx	OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann Rail Switch Power Enhanced module with 4 TX and 4 FX ports."
+			::= { rspm 3 }
+			
+rspm22-4tx-4fx	OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann Rail Switch Power Enhanced module with 4 TX and 4 FX ports and POE."
+			::= { rspm 4 }
+			
+rspm20-8fx OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann Rail Switch Power Enhanced module with 8 FX ports."
+			::= { rspm 5 }						
+
+--
+-- Module groups per family (GRM)
+--
+grm20-8tx OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann GREYHOUND Module with 8 TX ports."
+			::= { grm 1 }
+			
+grm20-8fx OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann GREYHOUND Module with 8 FX ports."
+			::= { grm 2 }
+			
+grm20-4tx-4fx	OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann GREYHOUND Module with 4 TX and 4 FX ports."
+			::= { grm 3 }
+			
+--
+-- Module groups per family (GMM)
+--
+gmm20-8fx OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann GREYHOUND Switch Module with 8 FX ports."
+			::= { gmm 1 }
+			
+gmm30-4tx-4fx OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann GREYHOUND Switch Module with 4 TX and 4 FX ports."
+			::= { gmm 2 }
+			
+gmm32-4tx-4fx OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann GREYHOUND Switch Module with 4 TX PoE and 4 FX ports."
+			::= { gmm 3 }
+			
+gmm40-4tx-4fx OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann GREYHOUND Switch Module with 4 TX and 4 FX ports."
+			::= { gmm 4 }
+			
+gmm40-8fx OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann GREYHOUND Switch Module with 8 FX ports."
+			::= { gmm 5 }
+			
+gmm40-8tx OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann GREYHOUND Switch Module with 8 TX ports."
+			::= { gmm 6 }
+			
+gmm42-4tx-4fx OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann GREYHOUND Switch Module with 4 TX PoE and 4 FX ports."
+			::= { gmm 7 }
+			
+gmm42-8tx OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann GREYHOUND Switch Module with 8 TX PoE ports."
+			::= { gmm 8 }
+
+--
+-- Module groups per family (MMM)
+--
+mmm40-12tx OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann DRAGON Switch Module with 12 TX ports."
+			::= { mmm 1 }
+			
+mmm40-12fx OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann DRAGON Switch Module with 12 FX ports."
+			::= { mmm 2 }
+
+mmm42-10tx OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann DRAGON Switch Module with 10 TX PoE ports."
+			::= { mmm 3 }
+
+m1-8tp-rj45 OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann GRS103/MACH102 Switch Module with 8 TX ports."
+			::= { m1 1 }
+
+m1-8tp-rj45-poe OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann GRS103/MACH102 Switch Module with 8 TX PoE ports."
+			::= { m1 2 }
+
+m1-8fx-dsc OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann GRS103/MACH102 Switch Module with 8 FX ports (SM or MM SC connector)."
+			::= { m1 3 }
+
+m1-8sfp OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION "Hirschmann GRS103/MACH102 Switch Module with 8 SFP ports."
+			::= { m1 4 }
+
+END

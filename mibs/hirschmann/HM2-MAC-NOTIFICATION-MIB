@@ -1,0 +1,148 @@
+HM2-MAC-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
+
+-- *************************************************************
+-- Hirschmann MAC Notification MIB
+-- *************************************************************
+
+IMPORTS
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE,
+    OBJECT-TYPE,
+    Integer32                   FROM SNMPv2-SMI -- RFC 2578
+    MacAddress                  FROM SNMPv2-TC
+    ifIndex                     FROM IF-MIB
+    HmEnabledStatus, 
+    hm2ConfigurationMibs        FROM HM2-TC-MIB;
+
+hm2MACNotificationMib MODULE-IDENTITY
+    LAST-UPDATED "201203310000Z" -- March 31, 2012
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann MAC Notification MIB.
+         Send a trap if a unicast MAC address is learned or 
+         removed from the forwarding data base.
+         Copyright (C) 2012. All Rights Reserved."
+    REVISION     "201203310000Z" -- March 31, 2012
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 35 }
+
+--
+-- *************************************************************
+-- hm2MACNotificationMib
+-- *************************************************************
+--
+hm2MACNotifyMibNotifications     OBJECT IDENTIFIER ::= { hm2MACNotificationMib 0 }
+hm2MACNotifyMibObjects           OBJECT IDENTIFIER ::= { hm2MACNotificationMib 1 }
+-- hm2MACNotifyMibConformance           OBJECT IDENTIFIER ::= { hm2MACNotificationMib 2 }
+
+--
+-- *************************************************************
+-- hm2MACNotifyMibObjects
+-- *************************************************************
+--
+
+--
+-- MAC Notification Global Group
+--
+hm2MACNotifyAdminState    OBJECT-TYPE
+    SYNTAX      HmEnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable or disable MAC Notification global." 
+    DEFVAL  { disable }
+    ::= { hm2MACNotifyMibObjects 1 }
+
+hm2MACNotifyInterval    OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "MAC Notification interval in seconds.
+        Range is between 0 and 2147483647." 
+    DEFVAL  { 1 }
+    ::= { hm2MACNotifyMibObjects 2 }
+
+
+--
+-- MAC Notification Interface Group
+--
+hm2MACNotifyInterfaceTable  OBJECT-TYPE 
+    SYNTAX      SEQUENCE OF Hm2MACNotifyInterfaceEntry 
+    MAX-ACCESS  not-accessible 
+    STATUS      current 
+    DESCRIPTION 
+        "A table containing current configuration information
+        for each interface." 
+    ::= { hm2MACNotifyMibObjects 10 } 
+ 
+hm2MACNotifyInterfaceEntry  OBJECT-TYPE 
+    SYNTAX      Hm2MACNotifyInterfaceEntry 
+    MAX-ACCESS  not-accessible 
+    STATUS      current 
+    DESCRIPTION 
+        "A logical row in the hm2MACNotifyInterfaceTable." 
+    INDEX { 
+        ifIndex 
+    } 
+    ::= { hm2MACNotifyInterfaceTable 1}
+ 
+Hm2MACNotifyInterfaceEntry ::= SEQUENCE { 
+    hm2MACNotifyInterfaceAdminState              HmEnabledStatus,
+    hm2MACNotifyInterfaceMACAddr                 MacAddress,
+    hm2MACNotifyInterfaceMACStatus               INTEGER
+}
+
+hm2MACNotifyInterfaceAdminState  OBJECT-TYPE 
+    SYNTAX      HmEnabledStatus
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        "Enable or disable MAC Notification on this interface." 
+    DEFVAL  { disable } 
+    ::= { hm2MACNotifyInterfaceEntry 1 }
+
+hm2MACNotifyInterfaceMACAddr  OBJECT-TYPE 
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION 
+        "Last MAC address on this interface that have been added or 
+        removed from the address table." 
+    ::= { hm2MACNotifyInterfaceEntry 2 }
+
+hm2MACNotifyInterfaceMACStatus  OBJECT-TYPE 
+    SYNTAX      INTEGER
+        {
+            other(1),
+            added(2),
+            removed(3)
+        } 
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION 
+        "Status of the last MAC address on this interface." 
+    ::= { hm2MACNotifyInterfaceEntry 3 }
+
+
+-- 
+-- ***********************************************************
+-- hm2MACNotifyMibNotifications
+-- ***********************************************************
+--
+hm2MACNotificationTrap  NOTIFICATION-TYPE
+    OBJECTS     { ifIndex, hm2MACNotifyInterfaceMACAddr, hm2MACNotifyInterfaceMACStatus }
+    STATUS      current
+    DESCRIPTION	
+        "This trap is sent when a MAC address has been added to or 
+        removed from the FDB on a specific interface."
+    ::= { hm2MACNotifyMibNotifications 1 }	
+
+END

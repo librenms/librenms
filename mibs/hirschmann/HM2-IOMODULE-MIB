@@ -1,0 +1,474 @@
+HM2-IOMODULE-MIB DEFINITIONS ::= BEGIN
+
+-- 
+-- ***********************************************************
+-- Hirschmann IO Module MIB
+-- ***********************************************************
+--
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, 
+    NOTIFICATION-TYPE, Integer32  FROM SNMPv2-SMI
+	InetPortNumber, 
+	InetAddressType, InetAddress  FROM INET-ADDRESS-MIB
+    HmEnabledStatus,
+    hm2ConfigurationMibs          FROM HM2-TC-MIB;
+
+
+hm2IOModuleMib MODULE-IDENTITY
+    LAST-UPDATED "201202100000Z" -- February 10, 2012
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann IO Module MIB.
+         Copyright (C) 2012. All Rights Reserved."
+    REVISION     "201202100000Z" -- February 10, 2012
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 100 }
+ 
+
+-- 
+-- ***********************************************************
+-- hm2IOModuleMib
+-- ***********************************************************
+--
+
+hm2IOModuleMibNotifications			OBJECT IDENTIFIER ::= { hm2IOModuleMib 0 }
+hm2IOModuleMibObjects			OBJECT IDENTIFIER ::= { hm2IOModuleMib 1 }
+-- hm2IOModuleMibConformance			OBJECT IDENTIFIER ::= { hm2IOModuleMib 2 }
+
+-- *************************************************************************
+-- Group Config
+-- *************************************************************************
+hm2IOModConfigGroup	OBJECT IDENTIFIER 
+		::= { hm2IOModuleMibObjects 1 }
+		
+-- *************************************************************************
+-- Group Common Config
+-- *************************************************************************
+hm2IOModConfigCommon OBJECT IDENTIFIER
+      ::= { hm2IOModConfigGroup 1 }
+
+hm2IOModConfigDigInputAdminState OBJECT-TYPE
+      SYNTAX                           HmEnabledStatus
+      MAX-ACCESS                       read-write
+      STATUS                           current
+      DESCRIPTION
+         "Enables polling of input values.
+         (if disable(2) input task will do nothing)"
+      DEFVAL                           { disable }
+      ::= { hm2IOModConfigCommon 1 }
+
+hm2IOModConfigDigOutputAdminState OBJECT-TYPE
+      SYNTAX                           HmEnabledStatus
+      MAX-ACCESS                       read-write
+      STATUS                           current
+      DESCRIPTION
+         "Enables mirroring of input values to output ports.
+         (if disable(2) output task will do nothing)"
+      DEFVAL                           { disable }
+      ::= { hm2IOModConfigCommon 2 }
+
+hm2IOModConfigDigInputRefreshInterval OBJECT-TYPE
+      SYNTAX                           Integer32 (1000..10000)
+      MAX-ACCESS                       read-write
+      STATUS                           current
+      DESCRIPTION
+         "The refresh interval (in ms) of the input values.
+         The accuracy of the interval value is 100ms. 
+         Minimum 1000ms (1s), Maximum 10000ms (10s)."
+      DEFVAL                           { 1000 }
+      ::= { hm2IOModConfigCommon 3 }
+
+hm2IOModConfigDigOutputRefreshInterval OBJECT-TYPE
+      SYNTAX                           Integer32 (1000..10000)
+      MAX-ACCESS                       read-write
+      STATUS                           current
+      DESCRIPTION
+         "The refresh interval (in ms) of the output values.
+         The accuracy of the interval value is 100ms.
+         Minimum 1000ms (1s), Maximum 10000ms (10s)."
+      DEFVAL                           { 1000 }
+      ::= { hm2IOModConfigCommon 4 }
+
+hm2IOModConfigDigOutputRetryCount OBJECT-TYPE
+      SYNTAX                           Integer32 (1..10)
+      MAX-ACCESS                       read-write
+      STATUS                           current
+      DESCRIPTION
+         "The retry count for the output values.
+         when after the number of configured retries no SNMP get request
+         was answered, the output value (hm2IOModValueDigOutputValue) will be
+         set to invalid (3). Minimum 1, Maximum 10."
+      DEFVAL                           { 3 }
+      ::= { hm2IOModConfigCommon 5 }
+
+-- *************************************************************************
+-- Table Digital Input Config
+-- *************************************************************************
+hm2IOModConfigDigInputTable OBJECT-TYPE
+      SYNTAX                           SEQUENCE OF Hm2IOModConfigDigInputEntry
+      MAX-ACCESS                       not-accessible
+      STATUS                           current
+      DESCRIPTION
+         "IO module config table for inputs"
+      ::= { hm2IOModConfigGroup 2 }
+
+hm2IOModConfigDigInputEntry OBJECT-TYPE
+      SYNTAX                           Hm2IOModConfigDigInputEntry
+      MAX-ACCESS                       not-accessible
+      STATUS                           current
+      DESCRIPTION
+         "IO module config entry for inputs"
+      INDEX {
+         hm2IOModConfigDigInputModID,
+         hm2IOModConfigDigInputID}
+      ::= { hm2IOModConfigDigInputTable 1 }
+
+Hm2IOModConfigDigInputEntry ::= SEQUENCE {
+      hm2IOModConfigDigInputModID       Integer32,
+      hm2IOModConfigDigInputID          Integer32,
+      hm2IOModConfigDigInputLogEvent    HmEnabledStatus,
+      hm2IOModConfigDigInputSnmpTrap    HmEnabledStatus
+      }
+
+hm2IOModConfigDigInputModID OBJECT-TYPE
+      SYNTAX                           Integer32 (0..7)
+      MAX-ACCESS                       not-accessible
+      STATUS                           current
+      DESCRIPTION
+         "The module ID of an input. 
+         Module ID 0 corresponds to the power supply module."
+      ::= { hm2IOModConfigDigInputEntry 1 }
+
+hm2IOModConfigDigInputID OBJECT-TYPE
+      SYNTAX                           Integer32 (1..4)
+      MAX-ACCESS                       not-accessible
+      STATUS                           current
+      DESCRIPTION
+         "The ID of an input."
+      ::= { hm2IOModConfigDigInputEntry 2 }
+
+hm2IOModConfigDigInputLogEvent OBJECT-TYPE
+      SYNTAX                           HmEnabledStatus
+      MAX-ACCESS                       read-write
+      STATUS                           current
+      DESCRIPTION
+         "Trigger an event log when input status changes.
+         If the value is disable (2), no event log entry will be written.
+         If the value is enable (1), an event log entry will be written when
+         the input state changes.
+         The input state will be checked according to the refresh interval 
+         entered in hm2IOModConfigDigInputRefreshInterval."
+      DEFVAL                           { disable }
+      ::= { hm2IOModConfigDigInputEntry 3 }
+
+hm2IOModConfigDigInputSnmpTrap OBJECT-TYPE
+      SYNTAX                           HmEnabledStatus
+      MAX-ACCESS                       read-write
+      STATUS                           current
+      DESCRIPTION
+         "Trigger an SNMP trap log when input status changes.
+         If the value is disable (2), no SNMP trap will be sent.
+         If the value is enable (1), a SNMP trap will be sent when
+         the input state changes.
+         The SNMP trap will be sent to all receivers configured
+         in the snmpTargetAddrTable.
+         The input state will be checked according to the refresh interval entered
+         in hm2IOModConfigDigInputRefreshInterval."
+      DEFVAL                           { disable }
+      ::= { hm2IOModConfigDigInputEntry 4 }
+
+-- *************************************************************************
+-- Table Digital Output Config
+-- *************************************************************************
+hm2IOModConfigDigOutputTable OBJECT-TYPE
+      SYNTAX                           SEQUENCE OF Hm2IOModConfigDigOutputEntry
+      MAX-ACCESS                       not-accessible
+      STATUS                           current
+      DESCRIPTION
+         "IO module config table for outputs."
+      ::= { hm2IOModConfigGroup 3 }
+
+hm2IOModConfigDigOutputEntry OBJECT-TYPE
+      SYNTAX                           Hm2IOModConfigDigOutputEntry
+      MAX-ACCESS                       not-accessible
+      STATUS                           current
+      DESCRIPTION
+         "IO module config entry for outputs"
+      INDEX {
+         hm2IOModConfigDigOutputModID,
+         hm2IOModConfigDigOutputID }
+      ::= { hm2IOModConfigDigOutputTable 1 }
+
+Hm2IOModConfigDigOutputEntry ::= SEQUENCE {
+      hm2IOModConfigDigOutputModID               Integer32,
+      hm2IOModConfigDigOutputID                  Integer32,
+      hm2IOModConfigDigOutputLogEvent            HmEnabledStatus,
+      hm2IOModConfigDigOutputSnmpTrap            HmEnabledStatus,
+      hm2IOModConfigDigOutputSourceAddressType   InetAddressType,
+	  hm2IOModConfigDigOutputSourceAddress       InetAddress,
+	  hm2IOModConfigDigOutputSourcePort			 InetPortNumber,
+      hm2IOModConfigDigOutputSourceModID         Integer32,
+      hm2IOModConfigDigOutputSourceID            Integer32
+	  }
+
+hm2IOModConfigDigOutputModID OBJECT-TYPE
+      SYNTAX                           Integer32 (0..7)
+      MAX-ACCESS                       not-accessible
+      STATUS current
+      DESCRIPTION
+         "The module ID of an output.
+         Module ID 0 corresponds to the power supply module."
+      ::= { hm2IOModConfigDigOutputEntry 1 }
+
+hm2IOModConfigDigOutputID OBJECT-TYPE
+      SYNTAX                           Integer32 (1..4)
+      MAX-ACCESS                       not-accessible
+      STATUS                           current
+      DESCRIPTION
+         "The ID of an output."
+      ::= { hm2IOModConfigDigOutputEntry 2 }
+
+hm2IOModConfigDigOutputLogEvent OBJECT-TYPE
+      SYNTAX                           HmEnabledStatus
+      MAX-ACCESS                       read-write
+      STATUS                           current
+      DESCRIPTION
+         "Trigger an event log when output status changes.
+         If the value is disable (2), no event log entry will be written.
+         If the value is enable (1), an event log entry will be written when
+         the output state changes.
+         The output state will be checked according to the refresh interval
+         entered in hm2IOModConfigDigOutputRefreshInterval."
+      DEFVAL                           { disable }
+      ::= { hm2IOModConfigDigOutputEntry 3 }
+
+hm2IOModConfigDigOutputSnmpTrap OBJECT-TYPE
+      SYNTAX                           HmEnabledStatus
+      MAX-ACCESS                       read-write
+      STATUS                           current
+      DESCRIPTION
+         "Trigger an SNMP trap log when output status changes.
+         If the value is disable (2), no SNMP trap will be sent.
+         If the value is enable (1), a SNMP trap will be sent when
+         the output state changes.
+         The SNMP trap will be sent to all receivers configured
+         in the snmpTargetAddrTable.
+         The output state will be checked according to the refresh interval
+         entered in hm2IOModConfigDigOutputRefreshInterval."
+      DEFVAL                           { disable }
+      ::= { hm2IOModConfigDigOutputEntry 4 }
+
+hm2IOModConfigDigOutputSourceAddressType OBJECT-TYPE
+      SYNTAX                           InetAddressType
+      MAX-ACCESS                       read-write
+      STATUS                           current
+      DESCRIPTION
+         "Address type of an input mirrored to the output.
+          Currently, only ipv4 is supported."
+      DEFVAL { ipv4 } 
+      ::= { hm2IOModConfigDigOutputEntry 5 }
+
+hm2IOModConfigDigOutputSourceAddress OBJECT-TYPE
+      SYNTAX                           InetAddress
+      MAX-ACCESS                       read-write
+      STATUS                           current
+      DESCRIPTION
+         "The IP address of an input mirrored to the output.
+         Use 0.0.0.0 if the output should not be set.
+         In this case hm2IOModValueDigOutputValue is not-configured(4).
+         Use 127.0.0.1 if a local input should be used."
+      DEFVAL { '00000000'H } -- 0.0.0.0
+      ::= { hm2IOModConfigDigOutputEntry 6 }		   
+		   
+hm2IOModConfigDigOutputSourcePort OBJECT-TYPE
+      SYNTAX                           InetPortNumber
+      MAX-ACCESS                       read-write
+      STATUS                           current
+      DESCRIPTION
+         "The SNMP port number being used by the input mirrored to the output.
+         This port would be the destination of the SNMP requests for 
+         polling the state of the input."
+      DEFVAL { 161 }
+      ::= { hm2IOModConfigDigOutputEntry 7 }		   
+
+hm2IOModConfigDigOutputSourceModID OBJECT-TYPE
+      SYNTAX                           Integer32 (0..7)
+      MAX-ACCESS                       read-write
+      STATUS                           current
+      DESCRIPTION
+         "The module ID of an input mirrored to the output.
+         Module ID 0 corresponds to the power supply module.
+         Ignored when hm2IOModConfigDigOutputSourceIP is 0.0.0.0."
+      DEFVAL                           { 1 }
+      ::= { hm2IOModConfigDigOutputEntry 8 }
+
+hm2IOModConfigDigOutputSourceID OBJECT-TYPE
+      SYNTAX                           Integer32 (1..4)
+      MAX-ACCESS                       read-write
+      STATUS                           current
+      DESCRIPTION
+         "The ID of an input mirrored to the output.
+         Ignored when hm2IOModConfigDigOutputSourceIP is 0.0.0.0."
+      DEFVAL                           { 1 }
+      ::= { hm2IOModConfigDigOutputEntry 9 }
+
+-- *************************************************************************
+-- Group Value
+-- *************************************************************************
+hm2IOModValueGroup OBJECT IDENTIFIER
+      ::= { hm2IOModuleMibObjects 2 }
+
+-- *************************************************************************
+-- Table Digital Input Value
+-- *************************************************************************
+hm2IOModValueDigInputTable OBJECT-TYPE
+      SYNTAX                           SEQUENCE OF Hm2IOModValueDigInputEntry
+      MAX-ACCESS                       not-accessible
+      STATUS                           current
+      DESCRIPTION
+         "IO module value table for inputs"
+      ::= { hm2IOModValueGroup 1 }
+
+hm2IOModValueDigInputEntry OBJECT-TYPE
+      SYNTAX                           Hm2IOModValueDigInputEntry
+      MAX-ACCESS                       not-accessible
+      STATUS                           current
+      DESCRIPTION
+         "IO module value entry for inputs"
+      INDEX {
+         hm2IOModValueDigInputModID,
+         hm2IOModValueDigInputID}
+      ::= { hm2IOModValueDigInputTable 1 }
+
+Hm2IOModValueDigInputEntry ::= SEQUENCE {
+      hm2IOModValueDigInputModID        Integer32,
+      hm2IOModValueDigInputID           Integer32,
+      hm2IOModValueDigInputValue        INTEGER}
+
+hm2IOModValueDigInputModID OBJECT-TYPE
+      SYNTAX                           Integer32 (0..7)
+      MAX-ACCESS                       not-accessible
+      STATUS                           current
+      DESCRIPTION
+         "The module ID of an input.
+         Module ID 0 corresponds to the power supply module."
+      ::= { hm2IOModValueDigInputEntry 1 }
+
+hm2IOModValueDigInputID OBJECT-TYPE
+      SYNTAX                           Integer32 (1..4)
+      MAX-ACCESS                       not-accessible
+      STATUS                           current
+      DESCRIPTION
+         "The ID of an input."
+      ::= { hm2IOModValueDigInputEntry 2 }
+
+hm2IOModValueDigInputValue OBJECT-TYPE
+      SYNTAX                           INTEGER {
+         not-available (0),
+         high (1),
+         low (2)}
+      MAX-ACCESS                       read-only
+      STATUS current
+      DESCRIPTION
+         "Status of the input.
+         If the value is not-available(0), then the IO module is not plugged in,
+         if the value is high(1), the input has high (+24V) value,
+         if the value is low(2), the input has low (0V) value."
+      ::= { hm2IOModValueDigInputEntry 3 }
+
+
+-- *************************************************************************
+-- Table Digital Output Value
+-- *************************************************************************
+hm2IOModValueDigOutputTable OBJECT-TYPE
+      SYNTAX                           SEQUENCE OF Hm2IOModValueDigOutputEntry
+      MAX-ACCESS                       not-accessible
+      STATUS                           current
+      DESCRIPTION
+         "IO module value table for outputs"
+      ::= { hm2IOModValueGroup 2 }
+
+hm2IOModValueDigOutputEntry OBJECT-TYPE
+      SYNTAX                           Hm2IOModValueDigOutputEntry
+      MAX-ACCESS                       not-accessible
+      STATUS                           current
+      DESCRIPTION
+         "IO module value entry for outputs"
+      INDEX {
+         hm2IOModValueDigOutputModID,
+         hm2IOModValueDigOutputID }
+      ::= { hm2IOModValueDigOutputTable 1 }
+
+Hm2IOModValueDigOutputEntry ::= SEQUENCE {
+      hm2IOModValueDigOutputModID       Integer32,
+      hm2IOModValueDigOutputID          Integer32,
+      hm2IOModValueDigOutputValue       INTEGER}
+
+hm2IOModValueDigOutputModID OBJECT-TYPE
+      SYNTAX                           Integer32 (0..7)
+      MAX-ACCESS                       not-accessible
+      STATUS                           current
+      DESCRIPTION
+         "The module ID of an Output.
+         Module ID 0 corresponds to the power supply module."
+      ::= { hm2IOModValueDigOutputEntry 1 }
+
+hm2IOModValueDigOutputID OBJECT-TYPE
+      SYNTAX                           Integer32 (1..4)
+      MAX-ACCESS                       not-accessible
+      STATUS                           current
+      DESCRIPTION
+         "The ID of an Output."
+      ::= { hm2IOModValueDigOutputEntry 2 }
+
+hm2IOModValueDigOutputValue OBJECT-TYPE
+      SYNTAX                           INTEGER {
+         not-available (0),
+         high (1),
+         low (2),
+         invalid (3),
+         not-configured (4)}
+      MAX-ACCESS                       read-only
+      STATUS                           current
+      DESCRIPTION "Status of the output.
+         If the value is not-available(0), then the IO module is not plugged in,
+         if the value is high(1), the output has high (+24V) value,
+         if the value is low(2), the output has low (0V) value.
+         If the value is invalid (3), the output has low (0V) value and 
+         the IO input source is configured but cannot be read.
+         If the value is not-configured (4), the output has low (0V) value and 
+         has no IO input source configured."
+      ::= { hm2IOModValueDigOutputEntry 3 }
+
+-- *************************************************************************
+-- TRAP's
+-- *************************************************************************
+hm2IOModDigInputChangeTrap NOTIFICATION-TYPE
+      OBJECTS {
+         hm2IOModValueDigInputValue}
+      STATUS                           current
+      DESCRIPTION
+         "This trap is sent if the state of an input changes.
+         This trap is sent only when hm2IOModConfigDigInputSnmpTrap is set 
+         to enabled (1)."
+      ::= { hm2IOModuleMibNotifications 1 }
+
+hm2IOModDigOutputChangeTrap NOTIFICATION-TYPE
+      OBJECTS {
+         hm2IOModValueDigOutputValue}
+      STATUS                           current
+      DESCRIPTION
+         "This trap is sent if the state of an input changes.
+         This trap is sent when hm2IOModConfigDigOutputSnmpTrap is set to 
+         enabled (1) or when the output value changes from or to invalid (3)."
+      ::= { hm2IOModuleMibNotifications 2 }
+
+END

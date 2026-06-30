@@ -1,0 +1,120 @@
+HM2-PLATFORM-MRP-MIB DEFINITIONS ::= BEGIN
+
+-- -------------------------------------------------------------
+-- MRP private MIB for IEEE 802.1Q Devices
+-- -------------------------------------------------------------
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32
+    	FROM SNMPv2-SMI
+    TimeInterval
+    	FROM SNMPv2-TC
+    hm2PlatformMibs
+    	FROM HM2-TC-MIB;
+
+hm2PlatformMRP MODULE-IDENTITY
+    LAST-UPDATED "201304100000Z" -- April 10, 2013
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+             "The Hirschmann Private Platform2 MIB for 802.1Q MRP Configuration.
+              Copyright (C) 2013. All Rights Reserved."
+    REVISION 
+             "201304100000Z" -- April 10, 2013
+    DESCRIPTION
+             "Initial version."
+    ::= { hm2PlatformMibs 60 }
+
+-- -------------------------------------------------------------
+-- groups in the MRP MIB
+-- -------------------------------------------------------------
+
+hm2AgentDot1qMrp                 OBJECT IDENTIFIER ::= { hm2PlatformMRP 1 }
+hm2AgentDot1qMrpMxrp             OBJECT IDENTIFIER ::= { hm2PlatformMRP 2 }
+
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+--
+-- The MRP Port Table
+--
+-- @purpose  Describes basic MRP per port functionality.
+--
+-- -------------------------------------------------------------
+
+hm2AgentDot1qPortMrpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hm2AgentDot1qPortMrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of MRP control information about every bridge
+        port.  This is indexed by hm2AgentDot1qMrpPort."
+    ::= { hm2AgentDot1qMrp 1 }
+
+hm2AgentDot1qPortMrpEntry OBJECT-TYPE
+    SYNTAX      Hm2AgentDot1qPortMrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MRP control information for a bridge port."
+    INDEX   { hm2AgentDot1qMrpPort }
+    ::= { hm2AgentDot1qPortMrpTable 1 }
+
+Hm2AgentDot1qPortMrpEntry ::=
+    SEQUENCE {
+        hm2AgentDot1qMrpPort
+            Integer32,
+        hm2AgentDot1qPortMrpJoinTime
+            TimeInterval,
+        hm2AgentDot1qPortMrpLeaveTime
+            TimeInterval,
+        hm2AgentDot1qPortMrpLeaveAllTime
+            TimeInterval
+     }
+
+hm2AgentDot1qMrpPort OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current 
+    DESCRIPTION
+    	"The MRP port number."
+    ::= { hm2AgentDot1qPortMrpEntry 1 }
+
+hm2AgentDot1qPortMrpJoinTime OBJECT-TYPE
+    SYNTAX      TimeInterval (10..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MRP Join time(10..100), in centiseconds."
+    DEFVAL      { 20 }
+    ::= { hm2AgentDot1qPortMrpEntry 2 }
+
+hm2AgentDot1qPortMrpLeaveTime OBJECT-TYPE
+    SYNTAX      TimeInterval (20..600)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MRP Leave time(20..600), in centiseconds."
+    DEFVAL      { 60 }
+    ::= { hm2AgentDot1qPortMrpEntry 3 }
+
+hm2AgentDot1qPortMrpLeaveAllTime OBJECT-TYPE
+    SYNTAX      TimeInterval (200..6000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MRP LeaveAll time(200..6000), in centiseconds."
+    DEFVAL      { 1000 }
+    ::= { hm2AgentDot1qPortMrpEntry 4 }
+    
+-- -------------------------------------------------------------
+-- End of the MRP Port Table
+-- -------------------------------------------------------------
+
+END
