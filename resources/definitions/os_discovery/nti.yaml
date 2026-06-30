@@ -308,18 +308,26 @@ modules:
                             oid: ENVIROMUX-1W-MIB::alertEnabled
                             op: '='
                             value: 0
-                # 2D / 5D / 16D digital inputs (digInputValue = closed(0)/open(1)); skip slots whose description is "Not configured"
+                # 2D / 5D / 16D digital inputs: poll digInputStatus (col 8) instead of
+                # raw digInputValue (col 7) so the device-side normal/alert evaluation
+                # (which honors the user-configured digInputNormalValue) is preserved.
                 -
                     oid: ENVIROMUX2D::digInputTable
-                    value: ENVIROMUX2D::digInputValue
-                    num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.6.1.1.7.{{ $index }}'
+                    value: ENVIROMUX2D::digInputStatus
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.6.1.1.8.{{ $index }}'
                     descr: '{{ ENVIROMUX2D::digInputDescription }}'
-                    index: 'digInputValue.{{ $index }}'
-                    state_name: DigitalInputs
+                    index: 'digInputStatus.{{ $index }}'
+                    state_name: digInputStatus
                     group: Inputs
                     states:
-                        - { descr: closed, value: 0, generic: 0 }
-                        - { descr: open, value: 1, generic: 1 }
+                        - { descr: notconnected, value: 0, generic: 3 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: prealert, value: 2, generic: 1 }
+                        - { descr: alert, value: 3, generic: 2 }
+                        - { descr: acknowledged, value: 4, generic: 1 }
+                        - { descr: dismissed, value: 5, generic: 1 }
+                        - { descr: disconnected, value: 6, generic: 3 }
+                        - { descr: reserved, value: 10, generic: 3 }
                     skip_values:
                         -
                             oid: ENVIROMUX2D::digInputDescription
@@ -327,15 +335,21 @@ modules:
                             value: '/^Not configured$/'
                 -
                     oid: ENVIROMUX5D::digInputTable
-                    value: ENVIROMUX5D::digInputValue
-                    num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.6.1.1.7.{{ $index }}'
+                    value: ENVIROMUX5D::digInputStatus
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.6.1.1.8.{{ $index }}'
                     descr: '{{ ENVIROMUX5D::digInputDescription }}'
-                    index: 'digInputValue.{{ $index }}'
-                    state_name: DigitalInputs
+                    index: 'digInputStatus.{{ $index }}'
+                    state_name: digInputStatus
                     group: Inputs
                     states:
-                        - { descr: closed, value: 0, generic: 0 }
-                        - { descr: open, value: 1, generic: 1 }
+                        - { descr: notconnected, value: 0, generic: 3 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: prealert, value: 2, generic: 1 }
+                        - { descr: alert, value: 3, generic: 2 }
+                        - { descr: acknowledged, value: 4, generic: 1 }
+                        - { descr: dismissed, value: 5, generic: 1 }
+                        - { descr: disconnected, value: 6, generic: 3 }
+                        - { descr: reserved, value: 10, generic: 3 }
                     skip_values:
                         -
                             oid: ENVIROMUX5D::digInputDescription
@@ -343,32 +357,45 @@ modules:
                             value: '/^Not configured$/'
                 -
                     oid: ENVIROMUX16D::digInputTable
-                    value: ENVIROMUX16D::digInputValue
-                    num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.6.1.1.7.{{ $index }}'
+                    value: ENVIROMUX16D::digInputStatus
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.6.1.1.8.{{ $index }}'
                     descr: '{{ ENVIROMUX16D::digInputDescription }}'
-                    index: 'digInputValue.{{ $index }}'
-                    state_name: DigitalInputs
+                    index: 'digInputStatus.{{ $index }}'
+                    state_name: digInputStatus
                     group: Inputs
                     states:
-                        - { descr: closed, value: 0, generic: 0 }
-                        - { descr: open, value: 1, generic: 1 }
+                        - { descr: notconnected, value: 0, generic: 3 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: prealert, value: 2, generic: 1 }
+                        - { descr: alert, value: 3, generic: 2 }
+                        - { descr: acknowledged, value: 4, generic: 1 }
+                        - { descr: dismissed, value: 5, generic: 1 }
+                        - { descr: disconnected, value: 6, generic: 3 }
+                        - { descr: reserved, value: 10, generic: 3 }
                     skip_values:
                         -
                             oid: ENVIROMUX16D::digInputDescription
                             op: 'regex'
                             value: '/^Not configured$/'
-                # 2D / 5D / 16D remote inputs (remoteInputValue = closed(0)/open(1)); skip "Not configured" slots
+                # 2D / 5D / 16D remote inputs: poll remoteInputStatus (col 8) instead of
+                # raw remoteInputValue (col 7) so the device-side normal/alert evaluation
+                # (which honors the user-configured remoteInputNormalValue) is preserved.
                 -
                     oid: ENVIROMUX2D::remoteInputTable
-                    value: ENVIROMUX2D::remoteInputValue
-                    num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.12.1.1.7.{{ $index }}'
+                    value: ENVIROMUX2D::remoteInputStatus
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.12.1.1.8.{{ $index }}'
                     descr: '{{ ENVIROMUX2D::remoteInputDescription }}'
-                    index: 'remoteInputValue.{{ $index }}'
-                    state_name: DigitalInputs
+                    index: 'remoteInputStatus.{{ $index }}'
+                    state_name: remoteInputStatus
                     group: 'Remote Inputs'
                     states:
-                        - { descr: closed, value: 0, generic: 0 }
-                        - { descr: open, value: 1, generic: 1 }
+                        - { descr: notconnected, value: 0, generic: 3 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: prealert, value: 2, generic: 1 }
+                        - { descr: alert, value: 3, generic: 2 }
+                        - { descr: acknowledged, value: 4, generic: 1 }
+                        - { descr: dismissed, value: 5, generic: 1 }
+                        - { descr: disconnected, value: 6, generic: 3 }
                     skip_values:
                         -
                             oid: ENVIROMUX2D::remoteInputDescription
@@ -376,15 +403,20 @@ modules:
                             value: '/^Not configured$/'
                 -
                     oid: ENVIROMUX5D::remoteInputTable
-                    value: ENVIROMUX5D::remoteInputValue
-                    num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.12.1.1.7.{{ $index }}'
+                    value: ENVIROMUX5D::remoteInputStatus
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.12.1.1.8.{{ $index }}'
                     descr: '{{ ENVIROMUX5D::remoteInputDescription }}'
-                    index: 'remoteInputValue.{{ $index }}'
-                    state_name: DigitalInputs
+                    index: 'remoteInputStatus.{{ $index }}'
+                    state_name: remoteInputStatus
                     group: 'Remote Inputs'
                     states:
-                        - { descr: closed, value: 0, generic: 0 }
-                        - { descr: open, value: 1, generic: 1 }
+                        - { descr: notconnected, value: 0, generic: 3 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: prealert, value: 2, generic: 1 }
+                        - { descr: alert, value: 3, generic: 2 }
+                        - { descr: acknowledged, value: 4, generic: 1 }
+                        - { descr: dismissed, value: 5, generic: 1 }
+                        - { descr: disconnected, value: 6, generic: 3 }
                     skip_values:
                         -
                             oid: ENVIROMUX5D::remoteInputDescription
@@ -392,21 +424,54 @@ modules:
                             value: '/^Not configured$/'
                 -
                     oid: ENVIROMUX16D::remoteInputTable
-                    value: ENVIROMUX16D::remoteInputValue
-                    num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.12.1.1.7.{{ $index }}'
+                    value: ENVIROMUX16D::remoteInputStatus
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.12.1.1.8.{{ $index }}'
                     descr: '{{ ENVIROMUX16D::remoteInputDescription }}'
-                    index: 'remoteInputValue.{{ $index }}'
-                    state_name: DigitalInputs
+                    index: 'remoteInputStatus.{{ $index }}'
+                    state_name: remoteInputStatus
                     group: 'Remote Inputs'
                     states:
-                        - { descr: closed, value: 0, generic: 0 }
-                        - { descr: open, value: 1, generic: 1 }
+                        - { descr: notconnected, value: 0, generic: 3 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: prealert, value: 2, generic: 1 }
+                        - { descr: alert, value: 3, generic: 2 }
+                        - { descr: acknowledged, value: 4, generic: 1 }
+                        - { descr: dismissed, value: 5, generic: 1 }
+                        - { descr: disconnected, value: 6, generic: 3 }
                     skip_values:
                         -
                             oid: ENVIROMUX16D::remoteInputDescription
                             op: 'regex'
                             value: '/^Not configured$/'
-                # 2D / 5D / 16D output relays (outRelayStatus = active(0)/inactive(1))
+                # 5D / 16D siren/beacon outputs (sirenBeaconsStatus = off(0)/on(1));
+                # active siren reflects an in-progress alert so map on -> generic 1.
+                # 2D MIB has no sirenBeacons subtree.
+                -
+                    oid: ENVIROMUX5D::sirenBeaconsTable
+                    value: ENVIROMUX5D::sirenBeaconsStatus
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.19.1.1.2.{{ $index }}'
+                    descr: 'Siren/Beacon {{ $index }}'
+                    index: 'sirenBeaconsStatus.{{ $index }}'
+                    state_name: sirenBeaconsStatus
+                    group: 'Siren/Beacon'
+                    states:
+                        - { descr: off, value: 0, generic: 0 }
+                        - { descr: on, value: 1, generic: 1 }
+                -
+                    oid: ENVIROMUX16D::sirenBeaconsTable
+                    value: ENVIROMUX16D::sirenBeaconsStatus
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.19.1.1.2.{{ $index }}'
+                    descr: 'Siren/Beacon {{ $index }}'
+                    index: 'sirenBeaconsStatus.{{ $index }}'
+                    state_name: sirenBeaconsStatus
+                    group: 'Siren/Beacon'
+                    states:
+                        - { descr: off, value: 0, generic: 0 }
+                        - { descr: on, value: 1, generic: 1 }
+                # 2D / 5D / 16D output relays (outRelayStatus = active(0)/inactive(1)).
+                # No outRelayNormalValue exists, so we can't know which side the operator
+                # considers "normal"; both states are mapped to generic 0 (informational)
+                # and the user can override per-sensor in LibreNMS as needed.
                 -
                     oid: ENVIROMUX2D::outRelayTable
                     value: ENVIROMUX2D::outRelayStatus
@@ -417,7 +482,7 @@ modules:
                     group: Relays
                     states:
                         - { descr: active, value: 0, generic: 0 }
-                        - { descr: inactive, value: 1, generic: 1 }
+                        - { descr: inactive, value: 1, generic: 0 }
                 -
                     oid: ENVIROMUX5D::outRelayTable
                     value: ENVIROMUX5D::outRelayStatus
@@ -428,7 +493,7 @@ modules:
                     group: Relays
                     states:
                         - { descr: active, value: 0, generic: 0 }
-                        - { descr: inactive, value: 1, generic: 1 }
+                        - { descr: inactive, value: 1, generic: 0 }
                 -
                     oid: ENVIROMUX16D::outRelayTable
                     value: ENVIROMUX16D::outRelayStatus
@@ -439,7 +504,7 @@ modules:
                     group: Relays
                     states:
                         - { descr: active, value: 0, generic: 0 }
-                        - { descr: inactive, value: 1, generic: 1 }
+                        - { descr: inactive, value: 1, generic: 0 }
                 # 2D / 5D / 16D power supplies; pwrSupplyStatus = failed(0)/ok(1)/na(2).
                 # Operators can silence a known-empty bay via the device's web UI which
                 # reports back as na(2); na is mapped to generic 0 so it does not alert.
