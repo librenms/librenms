@@ -122,12 +122,12 @@ function printEntPhysical($device, $ent, $level, $class)
         if ($sensors->count() > 1) {
             echo "<br>Sensors:<div class='interface-desc' style='margin-left: 20px;'>";
             foreach ($sensors as $sensor) {
-                $disp_name = e(str_replace([$ent['entPhysicalDescr'], $ent['entPhysicalName']], ['', ''], $sensor->sensor_descr). ' ' . $sensor->sensor_class);
+                $disp_name = e(str_replace([$ent['entPhysicalDescr'], $ent['entPhysicalName']], ['', ''], $sensor->sensor_descr) . ' ' . $sensor->sensor_class);
                 echo Url::graphPopup(
                     ['type' => 'sensor_' . $sensor->sensor_class, 'id' => $sensor->sensor_id, 'from' => '-2w', 'width' => 400, 'height' => 150, 'popup_title' => $disp_name],
                     "<span class='text-info'>" . $disp_name . '</span> ' . Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue()),
-//                    null,
-//                    ['-2d', '-2w'],
+                    null,
+                    ['-2d', '-2w'],
                 );
                 echo '<br>';
             }
