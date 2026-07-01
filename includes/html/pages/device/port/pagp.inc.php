@@ -1,32 +1,28 @@
 <?php
 
-use App\Facades\LibrenmsConfig;
+use LibreNMS\Util\Url;
 
 // FIXME functions!
 if (! $graph_type) {
     $graph_type = 'pagp_bits';
 }
 
-$daily_traffic = 'graph.php?port=' . $port['port_id'] . "&amp;type=$graph_type&amp;from=" . LibrenmsConfig::get('time.day') . '&amp;to=' . LibrenmsConfig::get('time.now') . '&amp;width=215&amp;height=100';
-$daily_url = 'graph.php?port=' . $port['port_id'] . "&amp;type=$graph_type&amp;from=" . LibrenmsConfig::get('time.day') . '&amp;to=' . LibrenmsConfig::get('time.now') . '&amp;width=500&amp;height=150';
+$daily_traffic = e(route('graph', ['port' => $port['port_id'], 'type' => $graph_type, 'from' => '-1d', 'width' => 215, 'height' => 100]));
+$daily_url = e(route('graph', ['port' => $port['port_id'], 'type' => $graph_type, 'from' => '-1d', 'width' => 500, 'height' => 150]));
 
-$weekly_traffic = 'graph.php?port=' . $port['port_id'] . "&amp;type=$graph_type&amp;from=" . LibrenmsConfig::get('time.week') . '&amp;to=' . LibrenmsConfig::get('time.now') . '&amp;width=215&amp;height=100';
-$weekly_url = 'graph.php?port=' . $port['port_id'] . "&amp;type=$graph_type&amp;from=" . LibrenmsConfig::get('time.week') . '&amp;to=' . LibrenmsConfig::get('time.now') . '&amp;width=500&amp;height=150';
+$weekly_traffic = e(route('graph', ['port' => $port['port_id'], 'type' => $graph_type, 'from' => '-1w', 'width' => 215, 'height' => 100]));
+$weekly_url = e(route('graph', ['port' => $port['port_id'], 'type' => $graph_type, 'from' => '-1w', 'width' => 500, 'height' => 150]));
 
-$monthly_traffic = 'graph.php?port=' . $port['port_id'] . "&amp;type=$graph_type&amp;from=" . LibrenmsConfig::get('time.month') . '&amp;to=' . LibrenmsConfig::get('time.now') . '&amp;width=215&amp;height=100';
-$monthly_url = 'graph.php?port=' . $port['port_id'] . "&amp;type=$graph_type&amp;from=" . LibrenmsConfig::get('time.month') . '&amp;to=' . LibrenmsConfig::get('time.now') . '&amp;width=500&amp;height=150';
+$monthly_traffic = e(route('graph', ['port' => $port['port_id'], 'type' => $graph_type, 'from' => '-1mo', 'width' => 215, 'height' => 100]));
+$monthly_url = e(route('graph', ['port' => $port['port_id'], 'type' => $graph_type, 'from' => '-1mo', 'width' => 500, 'height' => 150]));
 
-$yearly_traffic = 'graph.php?port=' . $port['port_id'] . "&amp;type=$graph_type&amp;from=" . LibrenmsConfig::get('time.year') . '&amp;to=' . LibrenmsConfig::get('time.now') . '&amp;width=215&amp;height=100';
-$yearly_url = 'graph.php?port=' . $port['port_id'] . "&amp;type=$graph_type&amp;from=" . LibrenmsConfig::get('time.year') . '&amp;to=' . LibrenmsConfig::get('time.now') . '&amp;width=500&amp;height=150';
+$yearly_traffic = e(route('graph', ['port' => $port['port_id'], 'type' => $graph_type, 'from' => '-1y', 'width' => 215, 'height' => 100]));
+$yearly_url = e(route('graph', ['port' => $port['port_id'], 'type' => $graph_type, 'from' => '-1y', 'width' => 500, 'height' => 150]));
 
-echo "<a href='#' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT" . LibrenmsConfig::get('overlib_defaults') . ");\" onmouseout=\"return nd();\">
-      <img src='$daily_traffic' border=0></a> ";
-echo "<a href='#' onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT" . LibrenmsConfig::get('overlib_defaults') . ");\" onmouseout=\"return nd();\">
-      <img src='$weekly_traffic' border=0></a> ";
-echo "<a href='#' onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT" . LibrenmsConfig::get('overlib_defaults') . ", WIDTH, 350);\" onmouseout=\"return nd();\">
-      <img src='$monthly_traffic' border=0></a> ";
-echo "<a href='#' onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT" . LibrenmsConfig::get('overlib_defaults') . ", WIDTH, 350);\" onmouseout=\"return nd();\">
-      <img src='$yearly_traffic' border=0></a>";
+echo Url::overlibLink('#', "<img src='$daily_traffic' border=0>", "<img src='$daily_url'>") . ' ';
+echo Url::overlibLink('#', "<img src='$weekly_traffic' border=0>", "<img src='$weekly_url'>") . ' ';
+echo Url::overlibLink('#', "<img src='$monthly_traffic' border=0>", "<img src='$monthly_url'>") . ' ';
+echo Url::overlibLink('#', "<img src='$yearly_traffic' border=0>", "<img src='$yearly_url'>");
 
 foreach (dbFetchRows('SELECT * FROM `ports` WHERE `pagpGroupIfIndex` = ? and `device_id` = ?', [$port['ifIndex'], $device['device_id']]) as $member) {
     $member = cleanPort($member);
