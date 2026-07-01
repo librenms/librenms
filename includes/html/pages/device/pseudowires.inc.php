@@ -107,14 +107,14 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I WHERE P.port_id
 
         if ($pw_a) {
             foreach (['bits', 'upkts', 'errors'] as $graph_type) {
-                   echo generate_port_link($pw_a, Url::graphTag([
-                       'type' => 'port_' . $graph_type,
-                       'id' => $pw_a['port_id'],
-                       'width' => 150,
-                       'height' => 30,
-                       'from' => '-1d',
-                       'bg' => $bg,
-                   ]));
+                echo generate_port_link($pw_a, Url::graphTag([
+                    'type' => 'port_' . $graph_type,
+                    'id' => $pw_a['port_id'],
+                    'width' => 150,
+                    'height' => 30,
+                    'from' => '-1d',
+                    'bg' => $bg,
+                ]));
             }
         }
 
