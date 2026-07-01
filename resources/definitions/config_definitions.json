@@ -7395,6 +7395,17 @@
                 "value": "integer|zero_or_exists:dashboards,dashboard_id"
             }
         },
+        "webui.noc_rotate_seconds": {
+            "default": 15,
+            "group": "webui",
+            "section": "dashboard",
+            "order": 1,
+            "type": "integer",
+            "units": "seconds",
+            "validate": {
+                "value": "integer|min:1"
+            }
+        },
         "webui.dynamic_graphs": {
             "default": false,
             "group": "webui",

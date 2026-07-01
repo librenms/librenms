@@ -44,6 +44,12 @@
                     @endisset
                 </ul>
             </div>
+            <div class="checkbox" style="display: inline-flex; align-items: center; margin: 0 0 0 10px;">
+                <label style="display: inline-flex; align-items: center; gap: 6px; margin: 0; font-size: 14px; font-weight: normal;">
+                    <input type="checkbox" id="dashboard_noc_enabled" @checked($noc_enabled) onchange="dashboard_noc_toggle(this)">
+                    {{ __('dashboard.noc.include') }}
+                </label>
+            </div>
                         <button class="btn btn-default edit-dash-btn" href="#edit_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.edit') }}"><i class="fa fa-pencil-square-o fa-fw"></i></button>
             <button class="btn btn-danger" href="#del_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.remove') }}"><i class="fa fa-trash fa-fw"></i></button>
             <button class="btn btn-success" href="#add_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.new') }}"><i class="fa fa-plus fa-fw"></i></button>
@@ -73,7 +79,7 @@
             <!-- Start Dashboard-Settings -->
             <div class="row" style="margin-top:5px;">
                 <div class="col-md-12">
-                    <div class="col-md-12">
+                    <div class="col-md-12" style="position: relative;">
                         <form class="form-inline" onsubmit="dashboard_edit(this); return false;">
                             @csrf
                             <div class="form-group">
@@ -442,6 +448,41 @@
                 }
             });
         }
+    }
+
+    function dashboard_noc_toggle(data) {
+        @if ($dashboard->dashboard_id > 0)
+            var dashboard_id = {{ $dashboard->dashboard_id }};
+        @else
+            var dashboard_id = 0;
+        @endif
+
+        if (dashboard_id <= 0) {
+            $(data).prop('checked', false);
+            toastr.warning('{{ __('dashboard.noc.save_first') }}');
+            return;
+        }
+
+        var enabled = $(data).is(':checked') ? 1 : 0;
+        $.ajax({
+            type: 'PUT',
+            url: '{{ route('dashboard.noc.update', '?') }}'.replace('?', dashboard_id),
+            data: {
+                enabled: enabled
+            },
+            dataType: 'json',
+            success: function (result) {
+                if (result.status === 'ok') {
+                    toastr.success(result.message);
+                } else {
+                    toastr.error(result.message || 'Error');
+                }
+            },
+            error: function () {
+                $(data).prop('checked', ! enabled);
+                toastr.error('{{ __('dashboard.noc.update_error') }}');
+            }
+        });
     }
 
     function dashboard_add(data) {

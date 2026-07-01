@@ -141,10 +141,62 @@ class DashboardController extends Controller
             'dash_config' => $data,
             'dashboard' => $dashboard,
             'hide_dashboard_editor' => UserPref::getPref($user, 'hide_dashboard_editor'),
+            'noc_enabled' => $this->getNocDashboardIds($user)->contains($dashboard->dashboard_id),
             'user_dashboards' => $user_dashboards,
             'shared_dashboards' => $shared_dashboards,
             'widgets' => $widgets,
             'user_list' => $user_list,
+        ]);
+    }
+
+    /**
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function noc(Request $request)
+    {
+        $user = $request->user();
+        $dashboards = $this->getAvailableDashboards($user);
+
+        $noc_dashboards = $this->getNocDashboardIds($user)
+            ->map(fn (int $dashboard_id) => $dashboards->get($dashboard_id))
+            ->filter()
+            ->values();
+
+        return view('overview.noc', [
+            'noc_dashboards' => $noc_dashboards,
+            'rotate_seconds' => max((int) LibrenmsConfig::get('webui.noc_rotate_seconds', 15), 1),
+        ]);
+    }
+
+    public function updateNoc(Request $request, Dashboard $dashboard): JsonResponse
+    {
+        $this->authorize('view', $dashboard);
+
+        $validated = $request->validate([
+            'enabled' => 'required|boolean',
+        ]);
+
+        $user = $request->user();
+        $dashboard_ids = $this->getNocDashboardIds($user);
+
+        if ((bool) $validated['enabled']) {
+            $dashboard_ids->push($dashboard->dashboard_id);
+        } else {
+            $dashboard_ids = $dashboard_ids->reject(fn (int $id) => $id === $dashboard->dashboard_id);
+        }
+
+        $dashboard_ids = $dashboard_ids->unique()->values();
+
+        if ($dashboard_ids->isEmpty()) {
+            UserPref::forgetPref($user, 'noc_dashboards');
+        } else {
+            UserPref::setPref($user, 'noc_dashboards', $dashboard_ids->all());
+        }
+
+        return response()->json([
+            'status' => 'ok',
+            'message' => __('dashboard.noc.updated'),
+            'count' => $dashboard_ids->count(),
         ]);
     }
 
@@ -266,5 +318,21 @@ class DashboardController extends Controller
         }
 
         return $this->dashboards;
+    }
+
+    /**
+     * @return Collection<int, int>
+     */
+    private function getNocDashboardIds(User $user): Collection
+    {
+        $selected_ids = collect(UserPref::getPref($user, 'noc_dashboards') ?? [])
+            ->map(fn ($id) => (int) $id)
+            ->filter(fn (int $id) => $id > 0);
+
+        $allowed_ids = $this->getAvailableDashboards($user)->keys();
+
+        return $selected_ids
+            ->filter(fn (int $id) => $allowed_ids->contains($id))
+            ->values();
     }
 }

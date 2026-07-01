@@ -61,6 +61,30 @@ on what you want the users access to change.
 Step 2: Then go to Settings -> WebUI settings -> Dashboard Settings
 and set the global default dashboard.
 
+## NOC Dashboard Rotation
+
+You can create a per-user NOC rotation list from dashboards.
+
+1. Open any dashboard.
+2. Open **Dashboard Editor**.
+3. Enable **Include this dashboard in my NOC rotation list**.
+4. Repeat for each dashboard you want in your rotation.
+
+To start rotating through the selected dashboards, open **Overview -> Dashboard -> NOC View**.
+
+NOC rotation always reads your current dashboard list when NOC View starts.
+Dashboard permissions are unchanged, so only dashboards you can already access are included.
+
+### Rotation Interval
+
+The rotation interval is configurable with `webui.noc_rotate_seconds`.
+
+```bash
+lnms config:set webui.noc_rotate_seconds 15
+```
+
+Default is `15` seconds.
+
 ## Setting embedded webpage
 
 Using the Notes Widget.

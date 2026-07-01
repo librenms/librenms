@@ -175,8 +175,10 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('maps/devicedependency', [DeviceDependencyController::class, 'dependencyMap']);
 
     // dashboard
+    Route::get('dashboard/noc', [DashboardController::class, 'noc'])->name('dashboard.noc');
     Route::resource('dashboard', DashboardController::class)->except(['create', 'edit']);
     Route::post('dashboard/{dashboard}/copy', [DashboardController::class, 'copy'])->name('dashboard.copy');
+    Route::put('dashboard/{dashboard}/noc', [DashboardController::class, 'updateNoc'])->name('dashboard.noc.update');
     Route::post('dashboard/{dashboard}/widgets', [DashboardWidgetController::class, 'add'])->name('dashboard.widget.add');
     Route::delete('dashboard/{dashboard}/widgets', [DashboardWidgetController::class, 'clear'])->name('dashboard.widget.clear');
     Route::put('dashboard/{dashboard}/widgets', [DashboardWidgetController::class, 'update'])->name('dashboard.widget.update');
