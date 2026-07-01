@@ -159,6 +159,9 @@ class Rrd extends BaseDatastore
         }
     }
 
+    /**
+     * @throws RrdException
+     */
     public function lastUpdate(string $filename): ?TimeSeriesPoint
     {
         $output = $this->command('lastupdate', $filename);

@@ -658,7 +658,7 @@ devices:
     - { Field: location_id, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: os, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: status, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-    - { Field: status_reason, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: status_reason, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: uptime, Type: bigint, 'Null': true, Extra: '' }

@@ -29,6 +29,7 @@ namespace LibreNMS\Interfaces;
 use App\Models\Device;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 
 interface Module
@@ -41,12 +42,12 @@ interface Module
     /**
      * Should this module be run?
      */
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool;
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool;
 
     /**
      * Should polling run for this device?
      */
-    public function shouldPoll(OS $os, ModuleStatus $status): bool;
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool;
 
     /**
      * Discover this module. Heavier processes can be run here

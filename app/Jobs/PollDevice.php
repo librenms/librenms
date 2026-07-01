@@ -54,6 +54,7 @@ class PollDevice implements ShouldQueue
     public function handle(): void
     {
         $this->initDevice();
+        $connectivity = new ConnectivityHelper($this->device);
         $this->initRrdDirectory();
         PollingDevice::dispatch($this->device);
         $this->os = OS::make($this->deviceArray);
@@ -64,7 +65,7 @@ class PollDevice implements ShouldQueue
         // check and save status
         app(CheckDeviceAvailability::class)->execute($this->device, true);
 
-        $this->pollModules();
+        $this->pollModules($connectivity);
 
         $measurement->end();
 
@@ -74,7 +75,7 @@ class PollDevice implements ShouldQueue
                 $this->recordPerformance($measurement);
             }
 
-            if (ConnectivityHelper::pingIsAllowed($this->device)) {
+            if ($connectivity->icmpIsEnabled()) {
                 $this->os->enableGraph('ping_perf');
             }
 
@@ -108,7 +109,7 @@ class PollDevice implements ShouldQueue
         DevicePolled::dispatch($this->device);
     }
 
-    private function pollModules(): void
+    private function pollModules(ConnectivityHelper $connectivity): void
     {
         // update $device array status
         $this->deviceArray['status'] = $this->device->status;
@@ -129,7 +130,7 @@ class PollDevice implements ShouldQueue
 
             try {
                 $instance = Module::fromName($module);
-                $should_poll = $instance->shouldPoll($this->os, $module_status);
+                $should_poll = $instance->shouldPoll($this->os, $module_status, $connectivity);
 
                 if ($should_poll) {
                     Log::info("#### Load poller module $module ####\n");
