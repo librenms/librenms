@@ -30,6 +30,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Port;
 use Carbon\Carbon;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL as LaravelUrl;
 use Illuminate\Support\Str;
@@ -64,10 +65,7 @@ class Url
         );
     }
 
-    /**
-     * Provisional port link generation
-     */
-    public static function modernPortLink(?Port $port, string $text = '', string $extra = ''): string
+    public static function modernPortLink(?Port $port, Htmlable|string $text = '', string $extra = ''): string
     {
         if ($port === null) {
             return e($text);

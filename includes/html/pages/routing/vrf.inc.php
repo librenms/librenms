@@ -123,7 +123,8 @@ if (Gate::denies('viewAny', Vrf::class)) {
                 echo "'>" . DeviceCache::get($device['device_id'])->displayName() . '</a> ';
 
                 if ($device['vrf_name'] != $vrf['vrf_name']) {
-                    echo "<a href='#' onmouseover=\" return overlib('Expected Name : " . $vrf['vrf_name'] . '<br />Configured : ' . $device['vrf_name'] . "', CAPTION, '<span class=list-large>VRF Inconsistency</span>' ,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\"> <i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i></a>";
+                    $overlib_content = '<div class="list-large">VRF Inconsistency</div>Expected Name : ' . e($vrf['vrf_name']) . '<br />Configured : ' . e($device['vrf_name']);
+                    echo \LibreNMS\Util\Url::overlibLink('#', " <i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", $overlib_content);
                 }
 
                 echo '</td><td>';

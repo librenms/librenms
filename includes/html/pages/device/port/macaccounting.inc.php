@@ -32,7 +32,7 @@ if ($port['ifAdminStatus'] == IfOperStatus::Up && $port['ifOperStatus'] == IfOpe
 }
 
 $i = 1;
-$inf = \LibreNMS\Util\Rewrite::normalizeIfName($ifname);
+$inf = LibreNMS\Util\Rewrite::normalizeIfName($ifname);
 
 echo "<div style='clear: both;'>";
 
@@ -131,7 +131,7 @@ if ($vars['subview'] == 'top10') {
         } else {
             $row_colour = LibrenmsConfig::get('list_colour.odd');
         }
-        $ipv4 = \App\Models\Ipv4Mac::where('mac_address', $acc['mac'])->value('ipv4_address');
+        $ipv4 = App\Models\Ipv4Mac::where('mac_address', $acc['mac'])->value('ipv4_address');
         $arp_host = dbFetchRow('SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$ipv4]);
         $arp_host = cleanPort($arp_host);
         if ($arp_host) {
@@ -165,13 +165,14 @@ if ($vars['subview'] == 'top10') {
                 $asn = 'No Session';
             }
 
+            $popup_content = '<div style="font-size: 16px; padding:5px; font-weight: bold; color: #555555;">' . e($name . ' - ' . $ipv4 . ' - ' . $asn) . '</div>' .
+                '<img src="' . route('graph', ['id' => $acc['ma_id'], 'type' => $graph_type, 'from' => LibrenmsConfig::get('time.twoday'), 'width' => 450, 'height' => 150]) . '">';
+            $link_text = "<img src='" . e(route('graph', ['id' => $acc['ma_id'], 'type' => $graph_type, 'from' => LibrenmsConfig::get('time.twoday'), 'width' => 213, 'height' => 45])) . "'>";
+            $overlib_link = Url::overlibLink('#', $link_text, $popup_content);
+
             echo "<div style='display: block; padding: 3px; margin: 3px; min-width: 221px; max-width:221px; min-height:90px; max-height:90px; text-align: center; float: left;'>
       " . $ipv4 . ' - ' . $asn . "
-          <a href='#' onmouseover=\"return overlib('\
-     <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #555555;\'>" . $name . ' - ' . $ipv4 . ' - ' . $asn . "</div>\
-     <img src=\'" . e(route('graph', ['id' => $acc['ma_id'], 'type' => $graph_type, 'from' => LibrenmsConfig::get('time.twoday'), 'width' => 450, 'height' => 150])) . "\'>\
-     ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\" >
-          <img src='" . e(route('graph', ['id' => $acc['ma_id'], 'type' => $graph_type, 'from' => LibrenmsConfig::get('time.twoday'), 'width' => 213, 'height' => 45])) . "'></a>
+          $overlib_link
 
           <span style='font-size: 10px;'>" . $name . '</span>
          </div>';
