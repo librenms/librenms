@@ -321,7 +321,7 @@ export default function filterBarComponent({
             }
 
             if (field.type === "boolean") {
-                filter.display = filter.value ? "Yes" : "No";
+                filter.display = filter.value == 1 ? "Yes" : "No";
                 return;
             }
 
