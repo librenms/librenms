@@ -10,8 +10,12 @@ trait ChecksGlobalPermissions
 {
     protected ?string $globalPrefix = null;
 
-    protected function hasGlobalPermission(User $user, string $action): bool
+    protected function hasGlobalPermission(User $user, string $action, bool $allowUserViewItemizedPermissions = false): bool
     {
+        if ($allowUserViewItemizedPermissions && $action === 'view' && $user->hasRole('user')) {
+            return true; // user role has all view permissions
+        }
+
         // Guess prefix
         $this->globalPrefix ??= Str::kebab(Str::before(class_basename($this), 'Policy'));
 

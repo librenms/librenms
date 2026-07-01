@@ -32,7 +32,9 @@ use App\Models\Device;
 use App\Models\Vminfo;
 use Closure;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\View\Component;
+use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Util\Graph;
 
 class Page extends Component
@@ -48,6 +50,7 @@ class Page extends Component
         public readonly array $dropdownLinks = [],
         public readonly string $subtitle = '',
     ) {
+        $device->loadCount(['ports', 'sensors', 'wirelessSensors']);
         DeviceCache::setPrimary($device->device_id); // set primary device in case it was not set by controller
         $this->pagetitle = $subtitle ? ($device->displayName() . ': ' . $subtitle) : $device->displayName();
         $this->alertClass = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');
@@ -70,7 +73,7 @@ class Page extends Component
         $graphs = [];
         foreach (Graph::getOverviewGraphsForDevice($this->device) as $graph) {
             $graph_array['type'] = $graph['graph'];
-            $graph_array['popup_title'] = __($graph['text']);
+            $graph_array['popup_title'] = Lang::has('sensors.' . strtolower($graph['text'] . '.long')) ? __('sensors.' . strtolower($graph['text'] . '.long')) : __($graph['text']);
             $graphs[] = $graph_array;
         }
 
@@ -94,5 +97,15 @@ class Page extends Component
                 break;
             }
         }
+    }
+
+    public function statusBorderClass(): string
+    {
+        return match ($this->device->getDeviceStatus()) {
+            DeviceStatus::Up, DeviceStatus::IgnoredUp => $this->device->isUnderMaintenance() ? 'tw:border-l-blue-500!' : 'tw:border-l-green-600!',
+            DeviceStatus::Down, DeviceStatus::IgnoredDown => $this->device->isUnderMaintenance() ? 'tw:border-l-blue-500!' : 'tw:border-l-red-600!',
+            DeviceStatus::Disabled => 'tw:border-l-black!',
+            DeviceStatus::NeverPolled => 'tw:border-l-gray-400!',
+        };
     }
 }

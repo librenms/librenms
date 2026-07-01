@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\PollerGroup;
 use App\Models\User;
 
@@ -14,6 +15,10 @@ class PollerGroupPolicy
      */
     public function viewAny(User $user): bool
     {
+        if (! LibrenmsConfig::get('distributed_poller')) {
+            return false;
+        }
+
         return $this->hasGlobalPermission($user, 'create')
             || $this->hasGlobalPermission($user, 'update')
             || $this->hasGlobalPermission($user, 'delete');
@@ -24,7 +29,7 @@ class PollerGroupPolicy
      */
     public function view(User $user, PollerGroup $pollerGroup): bool
     {
-        return false;
+        return $this->viewAny($user); // no explicit view permission?
     }
 
     /**

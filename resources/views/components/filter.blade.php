@@ -1,0 +1,253 @@
+<div
+    {{ $attributes->merge(['class' => 'tw:relative tw:inline-flex tw:items-center tw:text-[13px] tw:max-w-full' . ($hide ? ' tw:hidden' : '')]) }}
+    x-data="filterBarComponent({
+        name: @js($name),
+        fields: @js($fields),
+        reload: @js($reload),
+        initial: @js($initial),
+        hide: @js($hide)
+    })"
+    @click.outside="close()"
+    @keydown.escape.window="close()">
+
+    {{-- Main Bar --}}
+<div class="tw:group/bar tw:flex tw:flex-col tw:sm:flex-row tw:flex-nowrap" style="font-size: 16px" x-show="!hide">
+    <div class="tw:flex tw:items-stretch tw:flex-col tw:sm:flex-row tw:h-auto tw:sm:h-[2.125em] tw:rounded-lg tw:border tw:border-neutral-300 tw:dark:border-dark-gray-300 tw:bg-white tw:dark:bg-dark-gray-500 tw:font-mono tw:shadow-xs tw:max-w-full">
+
+        {{-- LEFT SECTION: Options Dropdown --}}
+        <div class="tw:relative tw:flex tw:items-stretch">
+            <button type="button"
+                    :title="filters.length ? '{{ __('Filter options') }}' : '{{ __('Open filter menu') }}'"
+                    @click.stop="toggleOptions()"
+                    class="tw:shrink-0 tw:flex tw:items-center tw:gap-2 tw:py-2 tw:sm:py-0 tw:px-4 tw:h-full tw:max-sm:w-full tw:max-sm:left-0 tw:transition-colors tw:border-b tw:sm:border-b-0 tw:sm:border-r tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:rounded-tl-lg tw:rounded-tr-lg tw:sm:rounded-tr-none tw:sm:rounded-l-lg tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400">
+                <div class="tw:relative tw:flex tw:items-center">
+                    <i class="fa-solid fa-filter tw:text-[1.12em]"></i>
+                    <span x-show="filters.length"
+                          class="tw:absolute tw:top-[-0.2em] tw:right-[-0.3em] tw:w-[0.5em] tw:h-[0.5em] tw:bg-neutral-600 tw:dark:bg-dark-white-300 tw:rounded-full tw:ring-1 tw:ring-white tw:dark:ring-dark-gray-500"></span>
+                </div>
+                <span class="tw:font-bold" x-show="!filters.length">{{ __('Filter') }}</span>
+                <span class="tw:text-[0.95em]" x-show="filters.length" x-text="filters.length"></span>
+            </button>
+
+            {{-- Options Menu --}}
+            <div x-show="showOptions" x-cloak x-transition @click.stop
+                 class="tw:absolute tw:top-full tw:left-0 tw:mt-2 tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-neutral-200 tw:dark:border-dark-gray-200 tw:rounded-lg tw:shadow-xl tw:z-50 tw:py-2">
+
+                <div class="tw:px-5 tw:py-2 tw:text-neutral-400 tw:dark:text-dark-white-400 tw:uppercase tw:tracking-wider">{{ __('Settings') }}</div>
+
+                <button type="button" @click="clearAll()"
+                        class="tw:flex tw:items-center tw:gap-3 tw:w-full tw:px-5 tw:py-3 tw:text-left tw:text-nowrap tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-300 tw:transition-colors tw:text-red-600! tw:dark:text-red-400! tw:font-bold">
+                    <i class="fa-solid fa-trash-alt"></i>
+                    <span>{{ __('Clear All') }}</span>
+                </button>
+
+                <button type="button" @click="savePreferences()"
+                        class="tw:flex tw:items-center tw:gap-3 tw:w-full tw:px-5 tw:py-3 tw:text-left tw:text-nowrap tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-300 tw:transition-colors tw:text-neutral-600! tw:dark:text-dark-white-200! tw:font-bold">
+                    <i class="fa-solid fa-save"></i>
+                    <span>{{ __('Save Preferences') }}</span>
+                </button>
+            </div>
+        </div>
+
+        {{-- MIDDLE SECTION: Chips --}}
+        <div class="tw:flex tw:flex-col tw:sm:flex-row tw:items-stretch tw:overflow-x-auto tw:scrollbar-none tw:flex-nowrap">
+            <template x-for="f in filters" :key="f.key">
+                <div class="filter-chip tw:shrink-0 tw:relative tw:group tw:flex tw:items-stretch tw:h-full tw:border-b tw:sm:border-b-0 tw:sm:border-r tw:border-neutral-200 tw:dark:border-dark-gray-300"
+                     role="listitem">
+                    <button type="button" title="{{ __('Edit filter') }}"
+                            @click="open(fields.find(field => field.key === f.key))"
+                            class="tw:flex tw:items-center tw:py-2 tw:sm:py-0 tw:px-4 tw:gap-2 tw:transition-colors tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400 tw:whitespace-nowrap tw:leading-none">
+                        <span class="tw:font-bold tw:text-neutral-900! tw:dark:text-dark-white-100!"
+                              x-text="f.label"></span>
+                        <span class="tw:text-neutral-400! tw:dark:text-dark-white-400! tw:leading-none" x-text="f.sym"></span>
+                        <span x-show="f.display" class="tw:font-bold tw:text-neutral-700! tw:dark:text-dark-white-200! tw:leading-none"
+                              x-text="Array.isArray(f.display) ? f.display.join(', ') : f.display">
+                        </span>
+                    </button>
+                    <button type="button" title="{{ __('Remove filter') }}" @click.stop="remove(f.key)"
+                            class="tw:h-full tw:w-0 tw:py-2 tw:sm:py-0 tw:group-hover:w-[2.125em] tw:flex tw:items-center tw:justify-center tw:bg-neutral-100 tw:dark:bg-dark-gray-400 tw:text-neutral-500! tw:dark:text-dark-white-400! tw:transition-all tw:duration-200 tw:ease-in-out tw:overflow-hidden tw:text-[1.2em] tw:hover:text-red-600! tw:dark:hover:text-red-400!">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </template>
+        </div>
+
+        {{-- RIGHT SECTION: Plus Button & Dropdown --}}
+        <div class="tw:shrink-0 tw:max-sm:left-0 tw:flex tw:flex-col tw:sm:flex-row tw:items-stretch">
+            {{-- Search Shortcut --}}
+            <button type="button"
+                    x-cloak
+                    x-show="defaultSearchField && !isActive(defaultSearchField.key)"
+                    @click="open(defaultSearchField)"
+                    :title="defaultSearchField.label"
+                    class="tw:w-[2.125em] tw:py-2 tw:sm:py-0 tw:h-full tw:relative tw:max-sm:w-full tw:flex tw:items-center tw:justify-center tw:text-neutral-400! tw:dark:text-dark-white-400! tw:hover:text-neutral-900! tw:dark:hover:text-dark-white-100! tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400 tw:transition-colors tw:border-b tw:sm:border-b-0 tw:sm:border-r tw:border-neutral-200 tw:dark:border-dark-gray-300">
+                <i class="fa-solid fa-search"></i>
+            </button>
+
+            <button type="button" title="{{ __('Add new filter') }}" @click.stop="toggleAdd()"
+                    @keydown.arrow-down.prevent="navDropdown('next')"
+                    @keydown.arrow-up.prevent="navDropdown('prev')"
+                    class="tw:w-[2.125em] tw:py-2 tw:sm:py-0 tw:h-full tw:relative tw:max-sm:w-full tw:flex tw:items-center tw:justify-center tw:text-neutral-400! tw:dark:text-dark-white-400! tw:hover:text-neutral-900! tw:dark:hover:text-dark-white-100! tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400 tw:transition-colors tw:rounded-bl-lg tw:rounded-br-lg tw:sm:rounded-bl-none tw:sm:rounded-r-lg">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+
+            {{-- Fields Selector --}}
+            <div x-show="showAdd" x-cloak x-transition @click.stop
+                 :class="filters.length > 0 ? 'tw:right-0' : 'tw:left-0'"
+                 class="tw:absolute tw:top-full tw:mt-2 tw:min-w-70 tw:max-w-[90vw] tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-neutral-200 tw:dark:border-dark-gray-200 tw:rounded-lg tw:shadow-xl tw:z-50 tw:py-2">
+
+                @foreach($fields as $index => $field)
+                    <button type="button" @click="open(fields[{{ $index }}])"
+                            :class="[isActive(fields[{{ $index }}].key) ? 'tw:text-blue-600! tw:dark:text-blue-400! tw:bg-blue-50/50 tw:dark:bg-blue-900/20' : 'tw:text-neutral-600! tw:dark:text-dark-white-200!', highlightedIndex === {{ $index }} ? 'tw:bg-neutral-100 tw:dark:bg-dark-gray-300' : '']"
+                            class="tw:flex tw:items-center tw:w-full tw:px-5 tw:py-2.5 tw:text-left tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-300 tw:transition-colors tw:gap-3">
+
+                        {{-- Left Side Icon and Label Section --}}
+                        <div class="tw:flex tw:items-center tw:gap-3 tw:grow">
+                            <i class="{{ $getFieldIcon($field['type'] ?? 'text') }} fa-fw tw:text-neutral-400 tw:dark:text-dark-white-400 tw:text-center"></i>
+                            <span>{{ $field['label'] }}</span>
+                        </div>
+
+                        {{-- Right Side Active Status Checkmark --}}
+                        <i x-show="isActive(fields[{{ $index }}].key)"
+                           class="fa-solid fa-check fa-fw"></i>
+                    </button>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
+    {{-- Spacer to reserve space for remove button --}}
+    <div x-show="filters.length > 0"
+         class="tw:w-[2.125em] tw:hidden tw:sm:block tw:transition-all tw:duration-200 tw:ease-in-out tw:overflow-hidden tw:group-has-[.filter-chip:hover]/bar:w-0">
+    </div>
+</div>
+
+    {{-- Dialog Modal (Teleported) --}}
+    <template x-teleport="body">
+        <div x-show="dialog" x-cloak
+             class="tw:fixed tw:inset-0 tw:z-100 tw:flex tw:items-center tw:justify-center tw:p-6 tw:bg-neutral-950/60 tw:backdrop-blur-xs"
+             style="font-size: 16px"
+             @click="close()">
+            <div x-show="dialog" x-transition @click.stop
+                 class="tw:w-full tw:max-w-[25em] tw:bg-white tw:dark:bg-dark-gray-500 tw:border tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:rounded-2xl tw:shadow-2xl tw:font-mono tw:text-[0.875em]"
+                 role="dialog" aria-modal="true">
+
+                {{-- Header --}}
+                <div class="tw:px-6 tw:py-[1.2em] tw:border-b tw:border-neutral-100 tw:dark:border-dark-gray-300 tw:bg-blue-50/20 tw:dark:bg-dark-gray-400 tw:flex tw:items-center tw:justify-between tw:rounded-t-2xl">
+                    <div class="tw:text-[1.2em] tw:font-black tw:text-neutral-900! tw:dark:text-dark-white-100!">
+                        <span x-text="current?.label"></span>
+                        <span class="tw:ml-1 tw:text-[0.65em] tw:text-blue-600! tw:dark:text-blue-500! tw:uppercase">{{ __('Filter') }}</span>
+                    </div>
+                    <button type="button" title="{{ __('Close dialog') }}" @click="close()"
+                            class="tw:text-neutral-400! tw:dark:text-dark-white-400! tw:transition-colors tw:hover:text-red-500! tw:dark:hover:text-red-500! tw:text-[1.5em]">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                {{-- Body --}}
+                <div class="tw:p-6 tw:space-y-7">
+                    <div>
+                        <span class="tw:block tw:text-[0.8em] tw:font-black tw:text-neutral-400 tw:dark:text-dark-white-400 tw:uppercase tw:tracking-widest tw:mb-4">{{ __('Condition') }}</span>
+                        <div class="tw:grid tw:grid-cols-2 tw:gap-2">
+                            <template x-for="o in ops()" :key="o.v">
+                                <button type="button" @click="op = o.v"
+                                        class="tw:flex tw:items-center tw:gap-4 tw:px-4 tw:py-3 tw:rounded-lg tw:text-[0.95em] tw:font-bold tw:transition-all tw:border"
+                                        :class="op === o.v
+                                            ? 'tw:bg-blue-600 tw:dark:bg-blue-600 tw:text-white! tw:dark:text-white! tw:border-blue-600 tw:shadow-md'
+                                            : 'tw:bg-neutral-50 tw:dark:bg-dark-gray-400 tw:text-neutral-600! tw:dark:text-dark-white-200! tw:border-neutral-100 tw:dark:border-dark-gray-300 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300'">
+                                    <span class="tw:w-[1.2em] tw:text-center tw:opacity-70" x-text="o.s"></span>
+                                    <span x-text="o.l"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div x-show="!isNullary()">
+                        <span class="tw:block tw:text-[0.8em] tw:font-black tw:text-neutral-400 tw:dark:text-dark-white-400 tw:uppercase tw:tracking-widest tw:mb-4">{{ __('Value') }}</span>
+
+                        {{-- Text/Number/Date --}}
+                        <template x-if="current && ['text','email','number','date'].includes(current?.type) && !current?.endpoint">
+                            <input x-ref="valInput" :type="current?.type" x-model="value" @input="display = value"
+                                   x-init="$nextTick(() => $el.focus())"
+                                   @keydown.enter="apply()"
+                                   class="tw:w-full tw:px-4 tw:py-[0.8em] tw:text-[0.95em] tw:bg-neutral-50 tw:dark:bg-dark-gray-400 tw:border tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:rounded-lg tw:focus:ring-2 tw:focus:ring-blue-500/50 tw:focus:border-blue-500 tw:outline-none tw:text-neutral-900! tw:dark:text-dark-white-100! tw:transition-all"/>
+                        </template>
+
+                        {{-- Remote Search --}}
+                        <template x-if="current && current?.endpoint">
+                            <div @remote-selected.stop="isMulti() ? toggleMulti($event.detail.id, $event.detail.text) : (value = $event.detail.id, display = $event.detail.text, apply())">
+                                <x-remote-dropdown :multi="null" />
+                            </div>
+                        </template>
+
+                        {{-- Static Selects --}}
+                        <template x-if="current && current.type === 'select' && !current?.endpoint">
+                            <div class="tw:flex tw:flex-col tw:gap-2">
+                                <template x-for="opt in getNormalizedOptions()" :key="opt.value">
+                                    <button type="button"
+                                            @click="selectOption(opt.value, opt.label)"
+                                            class="tw:flex tw:items-center tw:justify-between tw:w-full tw:px-[1.2em] tw:py-[0.8em] tw:rounded-lg tw:text-[0.95em] tw:font-bold tw:transition-all tw:border tw:text-left"
+                                            :class="(isMulti() ? value.includes(opt.value) : value === opt.value)
+                                              ? 'tw:bg-blue-600 tw:text-white! tw:border-blue-600 tw:shadow-md'
+                                              : 'tw:bg-neutral-50 tw:dark:bg-dark-gray-400 tw:text-neutral-600! tw:dark:text-dark-white-200! tw:border-neutral-100 tw:dark:border-dark-gray-300 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300'">
+                                        <span x-text="opt.label"></span>
+                                        <svg
+                                            x-show="isMulti() ? value.includes(opt.value) : value === opt.value"
+                                            class="tw:w-[1.1em] tw:h-[1.1em] tw:transition-transform"
+                                            viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2.5">
+                                            <path d="M1.5 5l3 3 4-5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </button>
+                                </template>
+                            </div>
+                        </template>
+
+                        {{-- Boolean Toggle --}}
+                        <template x-if="current && current.type === 'boolean'">
+                            <div class="tw:grid tw:grid-cols-2 tw:gap-[0.8em]">
+                                <button type="button" @click="setBoolean(1, 'Yes')"
+                                        class="tw:py-[1em] tw:rounded-lg tw:font-bold tw:border tw:transition-all"
+                                        :class="value == 1
+                                            ? 'tw:bg-blue-50 tw:dark:bg-blue-900/30 tw:text-blue-600! tw:dark:text-blue-400! tw:border-blue-200 tw:dark:border-blue-800'
+                                            : 'tw:bg-neutral-50 tw:dark:bg-dark-gray-400 tw:text-neutral-600! tw:dark:text-dark-white-200! tw:border-transparent tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300'">
+                                    {{ __('Yes') }}
+                                </button>
+                                <button type="button" @click="setBoolean(0, 'No')"
+                                        class="tw:py-[1em] tw:rounded-lg tw:font-bold tw:border tw:transition-all"
+                                        :class="value == 0 && value !== ''
+                                            ? 'tw:bg-blue-50 tw:dark:bg-blue-900/30 tw:text-blue-600! tw:dark:text-blue-400! tw:border-blue-200 tw:dark:border-blue-800'
+                                            : 'tw:bg-neutral-50 tw:dark:bg-dark-gray-400 tw:text-neutral-600! tw:dark:text-dark-white-200! tw:border-transparent tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300'">
+                                    {{ __('No') }}
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                {{-- Footer --}}
+                <div class="tw:flex tw:items-center tw:justify-between tw:px-6 tw:py-[1.2em] tw:bg-neutral-50/50 tw:dark:bg-dark-gray-400 tw:rounded-b-2xl tw:border-t tw:border-neutral-100 tw:dark:border-dark-gray-300">
+                    <button type="button" x-show="isActive(current?.key)" @click="remove(current.key)"
+                            class="tw:h-[2.6em] tw:px-5 tw:bg-white tw:dark:bg-dark-gray-500 tw:text-neutral-600! tw:dark:text-red-400! tw:border tw:border-neutral-200 tw:dark:border-dark-gray-200 tw:rounded-lg tw:text-[0.9em] tw:font-bold tw:transition-colors tw:hover:bg-red-50 tw:dark:hover:bg-red-900/20">
+                        {{ __('Remove') }}
+                    </button>
+                    <div x-show="!isActive(current?.key)"></div>
+                    <div class="tw:flex tw:gap-4">
+                        <button type="button" @click="close()"
+                                class="tw:h-[2.6em] tw:px-5 tw:bg-white tw:dark:bg-dark-gray-500 tw:border tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:text-[0.9em] tw:font-bold tw:text-neutral-600! tw:dark:text-dark-white-300! tw:rounded-lg tw:transition-colors tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400">
+                            {{ __('Cancel') }}
+                        </button>
+                        <button type="button" @click="apply()"
+                                :disabled="!isNullary() && (isMulti() ? !value.length : value === '' || value === null)"
+                                class="tw:h-[2.6em] tw:px-[1.8em] tw:text-[0.9em] tw:font-bold tw:bg-blue-600 tw:text-white! tw:rounded-lg tw:transition-all tw:hover:bg-blue-700 tw:dark:hover:bg-blue-500 tw:disabled:opacity-20">
+                            {{ __('Apply') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+</div>
+
+@push('scripts')
+    @routes
+@endpush

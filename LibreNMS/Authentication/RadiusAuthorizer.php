@@ -36,6 +36,7 @@ class RadiusAuthorizer extends MysqlAuthorizer
             $this->radius->setDebug(true);
         }
 
+        $this->radius->setIncludeMessageAuthenticator();
         $password = $credentials['password'] ?? null;
         if ($this->radius->accessRequest($credentials['username'], $password) === true) {
             $user = User::thisAuth()->firstOrNew(['username' => $credentials['username']], [

@@ -587,6 +587,9 @@ foreach ($ports as $port) {
             $this_port['ifName'] = $matches[1];
         }
 
+        $this_port['ifName'] = StringHelpers::inferEncoding($this_port['ifName'] ?? null);
+        $this_port['ifDescr'] = StringHelpers::inferEncoding($this_port['ifDescr'] ?? null);
+
         $polled_period = max($polled - $port['poll_time'], 1);
 
         $port['update'] = [];
@@ -743,8 +746,15 @@ foreach ($ports as $port) {
             }
         }//end foreach
 
-        // Parse description (usually ifAlias) if config option set
-        if (LibrenmsConfig::has('port_descr_parser') && is_file(LibrenmsConfig::get('install_dir') . '/' . LibrenmsConfig::get('port_descr_parser'))) {
+        // Parse description (usually ifAlias) if config option set.
+        $port_parser_file = LibrenmsConfig::has('port_descr_parser')
+            ? realpath(LibrenmsConfig::get('install_dir') . '/' . LibrenmsConfig::get('port_descr_parser'))
+            : false;
+        $port_parser_base = realpath(LibrenmsConfig::get('install_dir') . '/includes');
+
+        if ($port_parser_file && $port_parser_base
+            && str_starts_with($port_parser_file, $port_parser_base . DIRECTORY_SEPARATOR)
+            && str_ends_with($port_parser_file, '.php')) {
             $port_attribs = [
                 'type',
                 'descr',
@@ -754,7 +764,7 @@ foreach ($ports as $port) {
             ];
 
             $port_ifAlias = []; // for port descr parser mappings
-            $port_parser ??= include LibrenmsConfig::get('install_dir') . '/' . LibrenmsConfig::get('port_descr_parser');
+            $port_parser ??= include $port_parser_file;
 
             // handle functional style parsers
             if (is_callable($port_parser)) {

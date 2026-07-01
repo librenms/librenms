@@ -49,17 +49,6 @@ function delete_service($service = null)
     return Service::query()->where('service_id', $service)->delete();
 }
 
-function discover_service($device, $service)
-{
-    $created = \LibreNMS\Services::discover($device, $service);
-
-    if ($created) {
-        echo '+';
-    }
-
-    echo "$service ";
-}
-
 function poll_service($service)
 {
     $update = [];
@@ -147,8 +136,8 @@ function poll_service($service)
         );
 
         // Run alert rules due to status changed
-        $rules = new AlertRules;
-        $rules->runRules($service['device_id']);
+        $rules = new AlertRules($service['device_id']);
+        $rules->run();
     }
 
     if ($service['service_message'] != $msg) {
