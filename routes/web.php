@@ -302,7 +302,11 @@ Route::middleware(['auth'])->group(function (): void {
         Route::resource('location', LocationController::class)->only('update', 'destroy');
         Route::resource('pollergroup', PollerGroupController::class)->only('destroy', 'show', 'store', 'update');
         // misc ajax controllers
-        Route::get('search', Ajax\GlobalSearchController::class)->name('ajax.search.global');
+        Route::get('search/devices', Ajax\Search\DevicesSearchController::class)->name('ajax.search.devices');
+        Route::get('search/ports', Ajax\Search\PortsSearchController::class)->name('ajax.search.ports');
+        Route::get('search/health', Ajax\Search\HealthSearchController::class)->name('ajax.search.health');
+        Route::get('search/routing', Ajax\Search\RoutingSearchController::class)->name('ajax.search.routing');
+        Route::get('search/logs', Ajax\Search\LogsSearchController::class)->name('ajax.search.logs');
         Route::post('set_resolution', [Ajax\SessionController::class, 'resolution']);
         Route::post('set_style', [Ajax\SessionController::class, 'style']);
         Route::post('ripe/raw', [Ajax\RipeNccApiController::class, 'raw']);

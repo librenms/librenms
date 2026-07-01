@@ -653,7 +653,7 @@
                 </div>
                 <div x-show="open" x-cloak
                      class="tw:absolute tw:right-0 tw:mt-1 tw:w-[50rem] tw:max-w-[90vw] tw:max-h-[70vh] tw:overflow-y-auto tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200 tw:rounded-lg tw:shadow-xl tw:z-50">
-                    <div x-show="loading" class="tw:px-4 tw:py-3 tw:text-gray-500 tw:dark:text-dark-white-400">
+                    <div x-show="loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-gray-500 tw:dark:text-dark-white-400">
                         <i class="fa fa-spinner fa-spin"></i> {{ __('Searching...') }}
                     </div>
                     <div x-show="!loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-gray-500 tw:dark:text-dark-white-400">
@@ -791,25 +791,46 @@
             open: false,
             loading: false,
             active: '',
-            controller: null,
+            seq: 0,
+            controllers: [],
+            endpoints: @js([
+                route('ajax.search.devices'),
+                route('ajax.search.ports'),
+                route('ajax.search.health'),
+                route('ajax.search.routing'),
+                route('ajax.search.logs'),
+            ]),
+            order: ['devices', 'ports', 'sensors', 'wireless', 'storage', 'mempools', 'processors', 'bgp', 'eventlog'],
             run() {
-                if (this.query.trim() === '') { this.reset(); return; }
+                let q = this.query.trim();
+                if (q === '') { this.reset(); return; }
                 this.open = true;
                 this.loading = true;
-                if (this.controller) this.controller.abort();
-                this.controller = new AbortController();
-                fetch('{{ route('ajax.search.global') }}?search=' + encodeURIComponent(this.query.trim()), {
-                    signal: this.controller.signal,
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                })
-                    .then(r => r.json())
-                    .then(data => {
-                        this.groups = data.groups || [];
-                        this.flat = this.groups.flatMap(g => g.results);
-                        this.active = '';
-                        this.loading = false;
+                this.active = '';
+                this.groups = [];
+                this.flat = [];
+                this.controllers.forEach(c => c.abort());
+                this.controllers = [];
+                let seq = ++this.seq;
+                let collected = {};
+                let pending = this.endpoints.length;
+                this.endpoints.forEach(url => {
+                    let controller = new AbortController();
+                    this.controllers.push(controller);
+                    fetch(url + '?search=' + encodeURIComponent(q), {
+                        signal: controller.signal,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
                     })
-                    .catch(e => { if (e.name !== 'AbortError') { this.loading = false; } });
+                        .then(r => r.json())
+                        .then(data => {
+                            if (seq !== this.seq) { return; }
+                            (data.groups || []).forEach(g => { collected[g.type] = g; });
+                            this.groups = this.order.filter(t => collected[t]).map(t => collected[t]);
+                            this.flat = this.groups.flatMap(g => g.results);
+                        })
+                        .catch(() => {})
+                        .finally(() => { pending--; if (seq === this.seq && pending === 0) { this.loading = false; } });
+                });
             },
             onKey(e) {
                 if (e.key === 'ArrowDown') { e.preventDefault(); this.move(1); }
@@ -828,7 +849,7 @@
                 if (url) { window.location.href = url; }
             },
             close() { this.open = false; },
-            reset() { this.groups = []; this.flat = []; this.open = false; this.active = ''; this.loading = false; },
+            reset() { this.controllers.forEach(c => c.abort()); this.controllers = []; this.groups = []; this.flat = []; this.open = false; this.active = ''; this.loading = false; },
         }));
     });
 
