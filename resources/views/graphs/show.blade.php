@@ -28,15 +28,19 @@
 </x-panel>
 
 @unless ($showCommand)
-    <div class="tw:hidden tw:sm:flex tw:flex-nowrap tw:justify-center tw:gap-1 tw:overflow-hidden">
+{{-- Thumbnail row: always a single centered row. Each thumbnail grows up to its
+     normal rendered width (--thumb-w) and shrinks no smaller than 60% of it; once
+     even that no longer fits, the row scrolls horizontally instead of wrapping. --}}
+<div class="thumb-scroll tw:flex tw:overflow-x-auto tw:scroll-px-2">
+<div class="tw:mx-auto tw:flex tw:flex-nowrap tw:gap-1">
 @foreach ($periodThumbs as $thumb)
     <a href="{{ $thumb['link'] }}"
        @if ($thumb['active']) aria-current="true" @endif
-       style="--thumb-w: {{ $thumb['vars']['width'] }}px; --thumb-h: {{ $thumb['vars']['height'] }}px"
-       class="tw:flex tw:flex-col tw:items-center tw:gap-0.5 tw:p-1 tw:rounded-lg tw:border tw:no-underline tw:transition-colors tw:shrink tw:min-w-0 tw:basis-[var(--thumb-w)]
+       style="--thumb-w: {{ $thumb['vars']['width'] }}px; --thumb-ar: {{ $thumb['vars']['width'] }} / {{ $thumb['vars']['height'] }}"
+       class="tw:flex tw:min-w-[calc(var(--thumb-w)*0.6)] tw:max-w-[var(--thumb-w)] tw:flex-[1_1_var(--thumb-w)] tw:flex-col tw:items-center tw:gap-0.5 tw:p-1 tw:rounded-lg tw:border tw:no-underline tw:transition-colors
               @if ($thumb['active']) tw:border-blue-500 tw:bg-blue-50 tw:dark:bg-gray-700 @else tw:border-transparent tw:hover:border-gray-300 tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700 @endif">
         <span class="tw:font-medium tw:whitespace-nowrap tw:text-gray-700 tw:dark:text-gray-200 tw:overflow-hidden tw:text-ellipsis tw:w-full tw:text-center">{{ $thumb['text'] }}</span>
-        <img class="graph-image tw:block tw:w-full tw:max-w-[var(--thumb-w)] tw:object-cover tw:rounded tw:border-0 tw:aspect-[var(--thumb-w)/var(--thumb-h)]"
+        <img class="graph-image tw:block tw:w-[var(--thumb-w)] tw:max-w-full tw:aspect-[var(--thumb-ar)] tw:object-cover tw:rounded tw:border-0"
              src="{{ route('graph', $thumb['vars']) }}"
              width="{{ $thumb['vars']['width'] }}"
              height="{{ $thumb['vars']['height'] }}"
@@ -44,12 +48,12 @@
     </a>
 @endforeach
 </div>
-<hr class="tw:hidden tw:sm:block" />
+</div>
 @endunless
 
-<div class="tw:w-[48ch] tw:max-w-full tw:mx-auto tw:mb-2">
+<div class="tw:w-[48ch] tw:max-w-full tw:mx-auto tw:mt-3 tw:mb-2">
     <x-date-range-picker :start="$graphFrom" :end="$graphTo"
-                         class="tw:w-full tw:text-center tw:px-3 tw:py-2 tw:border tw:border-gray-300 tw:rounded-md"></x-date-range-picker>
+                         class="tw:w-full tw:text-center tw:px-3 tw:py-2 tw:border tw:border-gray-300 tw:rounded-md tw:bg-gray-100! tw:hover:bg-gray-200! tw:dark:bg-white! tw:dark:hover:bg-gray-200!"></x-date-range-picker>
 </div>
 <div class="tw:text-center">
 @foreach ($toggles as $toggle)
@@ -67,7 +71,7 @@
     document.graphLegend = '{{ str_replace("'", '', $mainGraphVars['legend'] ?? '') }}';
 </script>
 
-<div class="tw:text-center tw:[&_img]:mx-auto">
+<div class="tw:text-center tw:[&_img]:mx-auto tw:[&_img]:h-auto tw:[&_img]:max-w-full">
 @if ($isDynamicGraph)
     <script src="{{ asset('js/RrdGraphJS/q-5.0.2.min.js') }}"></script>
     <script src="{{ asset('js/RrdGraphJS/moment-timezone-with-data.js') }}"></script>
@@ -141,4 +145,39 @@
         }
     });
 </script>
+@endpush
+
+@push('styles')
+<style>
+    /* Horizontal scroll strip (graph period thumbnails): keep a normal-width,
+       grabbable bar with an always-visible thumb in both light and dark mode. */
+    .thumb-scroll {
+        scrollbar-width: auto;
+        scrollbar-color: rgb(107 114 128 / 0.7) transparent; /* gray-500 thumb */
+    }
+    .thumb-scroll::-webkit-scrollbar {
+        height: 20px;
+    }
+    .thumb-scroll::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .thumb-scroll::-webkit-scrollbar-thumb {
+        background-color: rgb(107 114 128 / 0.7); /* gray-500 */
+        border-radius: 9999px;
+        border: 4px solid transparent; /* visible thumb ~12px; transparent inset keeps it off the track edges */
+        background-clip: content-box;
+    }
+    .thumb-scroll::-webkit-scrollbar-thumb:hover {
+        background-color: rgb(75 85 99 / 0.9); /* gray-600 */
+    }
+    .dark .thumb-scroll {
+        scrollbar-color: rgb(172 182 191 / 0.6) transparent; /* dark-white-400 thumb */
+    }
+    .dark .thumb-scroll::-webkit-scrollbar-thumb {
+        background-color: rgb(172 182 191 / 0.6);
+    }
+    .dark .thumb-scroll::-webkit-scrollbar-thumb:hover {
+        background-color: rgb(200 200 200 / 0.85); /* dark-white-200 */
+    }
+</style>
 @endpush

@@ -165,7 +165,7 @@
                 if (startString && endString) {
                     return `${startString} to ${endString}`;
                 } else if (startString) {
-                    return `From ${startString}`;
+                    return `From ${startString} to now`;
                 } else if (endString) {
                     return `Until ${endString}`;
                 }

@@ -224,9 +224,9 @@ class GraphsPageController extends Controller
         }
 
         if ($screenWidth = $request->session()->get('screen_width')) {
-            $width = $screenWidth > 800
-                ? (int) ($screenWidth - ($screenWidth / 10))
-                : (int) ($screenWidth - ($screenWidth / 4));
+            // Render at the full screen width so the image is always at least as wide as
+            // its (narrower) container; CSS then only ever scales it down, never up (blur).
+            $width = (int) $screenWidth;
         }
 
         $height = LibrenmsConfig::get('webui.min_graph_height');

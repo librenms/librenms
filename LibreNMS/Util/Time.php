@@ -240,7 +240,7 @@ class Time
     {
         $timeUnits = [
             'y' => 31536000,
-            'mo' => 2592000,
+            'mo' => 2678400, // 31 days, matching LibreNMS's month period (see legacyTimeSpecToSecs)
             'w' => 604800,
             'd' => 86400,
             'h' => 3600,
