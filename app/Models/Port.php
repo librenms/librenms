@@ -150,12 +150,12 @@ class Port extends DeviceRelatedModel
 
     /**
      * Get the shortened label for this device.  Replaces things like GigabitEthernet with GE.
-     *
-     * @return string
      */
-    public function getShortLabel()
+    public function getShortLabel(?int $length = null): string
     {
-        return Rewrite::shortenIfName(Rewrite::normalizeIfName($this->ifName ?: $this->ifDescr));
+        $name = Rewrite::normalizeIfName($this->ifName ?: $this->ifDescr);
+
+        return substr(Rewrite::shortenIfName($name), 0, $length);
     }
 
     /**

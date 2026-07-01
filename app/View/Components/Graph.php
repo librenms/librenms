@@ -136,7 +136,7 @@ class Graph extends Component
 
     private function getSrc(): string
     {
-        return url('graph.php') . '?' . http_build_query($this->vars + [
+        return route('graph', $this->vars + [
             'type' => $this->type,
             'legend' => $this->legend,
             'absolute_size' => $this->absolute_size,

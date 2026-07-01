@@ -297,51 +297,6 @@ class Url
         return self::generate(['page' => 'device', 'device' => $sensor->device_id, 'tab' => 'health', 'metric' => $sensor->sensor_class], $vars);
     }
 
-    /**
-     * @param  Port  $port
-     * @return string
-     */
-    public static function portThumbnail($port)
-    {
-        $graph_array = [
-            'port_id' => $port->port_id,
-            'graph_type' => 'port_bits',
-            'from' => Carbon::now()->subDay()->timestamp,
-            'to' => Carbon::now()->timestamp,
-            'width' => 150,
-            'height' => 21,
-        ];
-
-        return self::portImage($graph_array);
-    }
-
-    /**
-     * @param  Port  $port
-     * @return string
-     */
-    public static function portErrorsThumbnail($port)
-    {
-        $graph_array = [
-            'port_id' => $port->port_id,
-            'graph_type' => 'port_errors',
-            'from' => Carbon::now()->subDay()->timestamp,
-            'to' => Carbon::now()->timestamp,
-            'width' => 150,
-            'height' => 21,
-        ];
-
-        return self::portImage($graph_array);
-    }
-
-    public static function portImage($args)
-    {
-        if (empty($args['bg'])) {
-            $args['bg'] = 'FFFFFF00';
-        }
-
-        return '<img src="graph-image ' . url('graph.php') . '?type=' . $args['graph_type'] . '&amp;id=' . $args['port_id'] . '&amp;from=' . $args['from'] . '&amp;to=' . $args['to'] . '&amp;width=' . $args['width'] . '&amp;height=' . $args['height'] . '&amp;bg=' . $args['bg'] . '">';
-    }
-
     public static function generate($vars, $new_vars = [])
     {
         $vars = array_merge($vars, $new_vars);
@@ -392,17 +347,12 @@ class Url
     }
 
     /**
-     * @param  array  $args
+     * @param  string[]  $args
      * @return string
      */
-    public static function graphTag($args)
+    public static function graphTag($args): string
     {
-        $urlargs = [];
-        foreach ($args as $key => $arg) {
-            $urlargs[] = $key . '=' . ($arg === null ? '' : urlencode($arg));
-        }
-
-        return '<img class="graph-image" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
+        return '<img class="graph-image" src="' . route('graph', $args) . '" style="border:0;" />';
     }
 
     public static function graphPopup($args, $content = null, $link = null, array $graph_periods = ['-1d', '-1w', '-1mo', '-1y']): string
@@ -434,13 +384,7 @@ class Url
 
     public static function lazyGraphTag($args, string $class = 'img-responsive'): string
     {
-        $urlargs = [];
-
-        foreach ($args as $key => $arg) {
-            $urlargs[] = $key . '=' . ($arg === null ? '' : urlencode($arg));
-        }
-
-        $tag = '<img class="graph-image ' . $class . '" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;"';
+        $tag = '<img class="graph-image ' . $class . '" src="' . route('graph', $args) . '" style="border:0;"';
 
         if (LibrenmsConfig::get('enable_lazy_load', true)) {
             return $tag . ' loading="lazy" />';
@@ -497,16 +441,24 @@ class Url
      * @param  string  $legend
      * @param  int  $width
      * @param  int  $height
-     * @param  string  $sep
      * @param  string  $class
      * @param  int  $absolute_size
      * @return string
      */
-    public static function minigraphImage($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100, $sep = '&amp;', $class = 'minigraph-image', $absolute_size = 0)
+    public static function minigraphImage($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100, $class = 'minigraph-image', $absolute_size = 0): string
     {
-        $vars = ['device=' . $device->device_id, "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size"];
+        $vars = [
+            'device' => $device->device_id,
+            'from' => $start,
+            'to' => $end,
+            'width' => $width,
+            'height' => $height,
+            'type' => $type,
+            'legend' => $legend,
+            'absolute' => $absolute_size,
+        ];
 
-        return '<img class="graph-image ' . $class . '" width="' . $width . '" height="' . $height . '" src="' . url('graph.php') . '?' . implode($sep, $vars) . '">';
+        return '<img class="graph-image ' . $class . '" width="' . $width . '" height="' . $height . '" src="' . route('graph', $vars) . '">';
     }
 
     /**
