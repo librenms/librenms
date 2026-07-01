@@ -5,7 +5,7 @@ $init_modules = ['alerts', 'laravel'];
 require __DIR__ . '/../includes/init.php';
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\RunAlerts;
+use LibreNMS\Alert\AlertNotifications;
 use LibreNMS\Alert\Template;
 use LibreNMS\Util\Debug;
 
@@ -13,7 +13,7 @@ $options = getopt('t:h:r:p:s:d::');
 
 if (isset($options['t']) && isset($options['h']) && isset($options['r'])) {
     Debug::set(isset($options['d']));
-    $runAlerts = new RunAlerts();
+    $runAlerts = new AlertNotifications();
 
     $template_id = $options['t'];
     $device_id = ctype_digit($options['h']) ? $options['h'] : getidbyname($options['h']);
@@ -30,7 +30,7 @@ if (isset($options['t']) && isset($options['h']) && isset($options['r'])) {
         exit(2);
     }
 
-    $obj = $runAlerts->describeAlert($alerts[0]);
+    $obj = $runAlerts->getNotificationData($alerts[0]);
     if (isset($options['p'])) {
         $obj['transport'] = $options['p'];
     }

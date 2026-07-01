@@ -49,18 +49,6 @@ Artisan::command('poller:ping
     PingCheck::dispatch($this->argument('groups'));
 })->purpose(__('Check if devices are up or down via icmp'));
 
-Artisan::command('poller:alerts', function (): void {
-    $command = [base_path('alerts.php')];
-    if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
-        $command[] = '-d';
-        if ($verbosity >= 256) {
-            $command[] = '-v';
-        }
-    }
-
-    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
-})->purpose(__('Check for any pending alerts and deliver them via defined transports'));
-
 Artisan::command('poller:billing
     {bill id? : ' . __('The bill id to poll') . '}
 ', function (): void {

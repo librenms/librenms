@@ -1628,7 +1628,7 @@ return [
                 'help' => 'განგაშების ამოცანის დაგეგმვის მეთოდი. მოძველებული გამოიყენებს cron-ს, თუ crontab-ის ჩანაწერი არსებობს დადისპეჩერის სერვისს, თუ მოძველებული კონფიგურაციის პარამეტრი service_billing_enabled ჭეშმარიტზეა დაყენებული.',
                 'options' => [
                     'legacy' => 'მოძველებული (შეუზღუდავი)',
-                    'cron' => 'Cron (alerts.php)',
+                    'cron' => 'Cron (lnms alerts:notify)',
                     'dispatcher' => 'დისპეჩერის სერვისი',
                 ],
             ],
@@ -1656,7 +1656,7 @@ return [
                 'options' => [
                     'legacy' => 'მოძველებული (შეუზღუდავი)',
                     'disabled' => 'Disabled (pings only during polling)',
-                    'cron' => 'Cron (ping.php)',
+                    'cron' => 'Cron (lnms device:ping fast)',
                     'dispatcher' => 'დისპეჩერის სერვისი',
                 ],
             ],

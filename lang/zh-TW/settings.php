@@ -2189,7 +2189,7 @@ return [
                 'help' => '警報任務排程方法。Legacy 會在 crontab 項目存在時使用 cron，並在 legacy 設定選項 service_billing_enabled 設為 true 時使用 dispatcher 服務。',
                 'options' => [
                     'legacy' => 'Legacy（不限制）',
-                    'cron' => 'Cron（alerts.php）',
+                    'cron' => 'Cron（lnms alerts:notify）',
                     'dispatcher' => 'Dispatcher Service',
                 ],
             ],
@@ -2217,7 +2217,7 @@ return [
                 'options' => [
                     'legacy' => 'Legacy（不限制）',
                     'disabled' => '停用（僅在輪詢時 ping）',
-                    'cron' => 'Cron（ping.php）',
+                    'cron' => 'Cron（lnms device:ping fast）',
                     'dispatcher' => 'Dispatcher Service',
                 ],
             ],
