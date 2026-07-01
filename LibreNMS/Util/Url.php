@@ -345,7 +345,7 @@ class Url
     }
 
     /**
-     * @param  string[]  $args
+     * @param  array<string, mixed>  $args
      * @return string
      */
     public static function graphTag($args): string

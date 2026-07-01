@@ -1,10 +1,10 @@
 <?php
 
 use App\Facades\DeviceCache;
-use App\Facades\LibrenmsConfig;
 use App\Models\Vrf;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Url;
 
 if (Gate::denies('viewAny', Vrf::class)) {
     include 'includes/html/error-no-perm.inc.php';
@@ -111,7 +111,7 @@ if (Gate::denies('viewAny', Vrf::class)) {
         foreach (dbFetchRows('SELECT `vrf_name`, `mplsVpnVrfRouteDistinguisher`, `mplsVpnVrfDescription` FROM `vrfs` GROUP BY `mplsVpnVrfRouteDistinguisher`, `mplsVpnVrfDescription`,`vrf_name`') as $vrf) {
             echo '<tr><td></td>';
             echo '<td width=240>';
-            echo '<a class=list-large href=' . \LibreNMS\Util\Url::generate($vars, ['view' => 'detail', 'vrf' => $vrf['vrf_name']]) . '>';
+            echo '<a class=list-large href=' . Url::generate($vars, ['view' => 'detail', 'vrf' => $vrf['vrf_name']]) . '>';
             echo e($vrf['vrf_name']) . '</a><br />';
             echo '<span class=box-desc>' . e($vrf['mplsVpnVrfDescription']) . '</span></td>';
             echo '<td width=100 class=box-desc>' . e($vrf['mplsVpnVrfRouteDistinguisher']) . '</td>';
@@ -119,12 +119,12 @@ if (Gate::denies('viewAny', Vrf::class)) {
             $x = 1;
             foreach ($vrf_devices[$vrf['vrf_name']][$vrf['mplsVpnVrfRouteDistinguisher']] as $device) {
                 echo "<tr><td width=200><a href='";
-                echo \LibreNMS\Util\Url::generate(['page' => 'device'], ['device' => $device['device_id'], 'tab' => 'routing', 'view' => 'basic', 'proto' => 'vrf']);
+                echo Url::generate(['page' => 'device'], ['device' => $device['device_id'], 'tab' => 'routing', 'view' => 'basic', 'proto' => 'vrf']);
                 echo "'>" . DeviceCache::get($device['device_id'])->displayName() . '</a> ';
 
                 if ($device['vrf_name'] != $vrf['vrf_name']) {
                     $overlib_content = '<div class="list-large">VRF Inconsistency</div>Expected Name : ' . e($vrf['vrf_name']) . '<br />Configured : ' . e($device['vrf_name']);
-                    echo \LibreNMS\Util\Url::overlibLink('#', " <i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", $overlib_content);
+                    echo Url::overlibLink('#', " <i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", $overlib_content);
                 }
 
                 echo '</td><td>';
@@ -139,15 +139,16 @@ if (Gate::denies('viewAny', Vrf::class)) {
                         case 'upkts':
                         case 'nupkts':
                         case 'errors':
-                            $port['width'] = '130';
-                            $port['height'] = '30';
-                            $port['from'] = LibrenmsConfig::get('time.day');
-                            $port['to'] = LibrenmsConfig::get('time.now');
-                            $port['graph_type'] = 'port_' . $vars['graph'];
                             echo "<div style='display: block; padding: 3px; margin: 3px; min-width: 135px; max-width:135px; min-height:75px; max-height:75px;
                             text-align: center; float: left;'>
                                 <div style='font-weight: bold;'>" . Rewrite::shortenIfName($port['ifDescr']) . '</div>';
-                            print_port_thumbnail($port);
+                            echo generate_port_link($port, Url::graphTag([
+                                'type' => 'port_' . $vars['graph'],
+                                'id' => $port['port_id'],
+                                'width' => 130,
+                                'height' => 30,
+                                'from' => '-1d',
+                            ]));
                             echo "<div style='font-size: 9px;'>" . substr((string) short_port_descr($port['ifAlias']), 0, 22) . '</div>
                                 </div>';
                             break;

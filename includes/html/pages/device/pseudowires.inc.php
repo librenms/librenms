@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\Url;
+
 $pagetitle[] = 'Pseudowires';
 
 if (! isset($vars['view'])) {
@@ -104,34 +106,30 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I WHERE P.port_id
         echo '<tr style="background-color: rgb(' . $bg . ')"><td></td><td colspan=2>';
 
         if ($pw_a) {
-            $pw_a['width'] = '150';
-            $pw_a['height'] = '30';
-            $pw_a['from'] = \App\Facades\LibrenmsConfig::get('time.day');
-            $pw_a['to'] = \App\Facades\LibrenmsConfig::get('time.now');
-            $pw_a['bg'] = $bg;
-            $types = [
-                'bits',
-                'upkts',
-                'errors',
-            ];
-            foreach ($types as $graph_type) {
-                $pw_a['graph_type'] = 'port_' . $graph_type;
-                print_port_thumbnail($pw_a);
+            foreach (['bits', 'upkts', 'errors'] as $graph_type) {
+                   echo generate_port_link($pw_a, Url::graphTag([
+                       'type' => 'port_' . $graph_type,
+                       'id' => $pw_a['port_id'],
+                       'width' => 150,
+                       'height' => 30,
+                       'from' => '-1d',
+                       'bg' => $bg,
+                   ]));
             }
         }
 
         echo '</td><td></td><td colspan=2>';
 
         if ($pw_b) {
-            $pw_b['width'] = '150';
-            $pw_b['height'] = '30';
-            $pw_b['from'] = \App\Facades\LibrenmsConfig::get('time.day');
-            $pw_b['to'] = \App\Facades\LibrenmsConfig::get('time.now');
-            $pw_b['bg'] = $bg;
-            $types = ['bits', 'upkts', 'errors'];
-            foreach ($types as $graph_type) {
-                $pw_b['graph_type'] = 'port_' . $graph_type;
-                print_port_thumbnail($pw_b);
+            foreach (['bits', 'upkts', 'errors'] as $graph_type) {
+                echo generate_port_link($pw_b, Url::graphTag([
+                    'type' => 'port_' . $graph_type,
+                    'id' => $pw_b['port_id'],
+                    'width' => 150,
+                    'height' => 30,
+                    'from' => '-1d',
+                    'bg' => $bg,
+                ]));
             }
         }
 

@@ -316,11 +316,6 @@ function graph_error($text, $short = null, $color = [128, 0, 0])
     echo LibreNMS\Util\Graph::error($text, $short, 300, null, $color);
 }
 
-function print_port_thumbnail($args)
-{
-    echo generate_port_link($args, Url::graphTag($args));
-}//end print_port_thumbnail()
-
 function print_optionbar_start($height = 0, $width = 0, $marginbottom = 5)
 {
     echo '
