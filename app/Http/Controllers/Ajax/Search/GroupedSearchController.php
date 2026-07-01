@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 
 abstract class GroupedSearchController extends Controller
 {
@@ -29,16 +28,9 @@ abstract class GroupedSearchController extends Controller
     }
 
     /**
-     * @return array<array{type: string, label: string, results: Collection}|null>
+     * Return a list of groups, each ['type' => ..., 'label' => ..., 'results' => Collection], or null for empty groups.
+     *
+     * @return list<mixed>
      */
     abstract protected function groups(string $search, string $like, int $limit, ?User $user): array;
-
-    /**
-     * @param  Collection<int, array<string, mixed>>  $results
-     * @return array{type: string, label: string, results: Collection}|null
-     */
-    protected function group(string $type, string $label, Collection $results): ?array
-    {
-        return $results->isEmpty() ? null : ['type' => $type, 'label' => $label, 'results' => $results];
-    }
 }

@@ -60,6 +60,6 @@ class DevicesSearchController extends GroupedSearchController
                 'url' => Url::deviceUrl($d),
             ]);
 
-        return [$this->group('devices', __('Devices'), $devices)];
+        return [$devices->isEmpty() ? null : ['type' => 'devices', 'label' => __('Devices'), 'results' => $devices]];
     }
 }

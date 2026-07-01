@@ -32,6 +32,6 @@ class PortsSearchController extends GroupedSearchController
                 'url' => Url::portUrl($p),
             ]);
 
-        return [$this->group('ports', __('Ports'), $ports)];
+        return [$ports->isEmpty() ? null : ['type' => 'ports', 'label' => __('Ports'), 'results' => $ports]];
     }
 }
