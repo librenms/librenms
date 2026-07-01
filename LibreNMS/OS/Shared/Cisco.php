@@ -1058,6 +1058,24 @@ class Cisco extends OS implements
             $vlans4k = $xmitJoined4k !== '' ? $xmitJoined4k : ($data['CISCO-VTP-MIB::vlanTrunkPortVlansEnabled4k'] ?? '');
             foreach (StringHelpers::bitsToIndices($vlans4k) as $vlan_id) {
                 $isNative[$vlan_id + 3071][$ifindex] ??= 0;
+            // Only returns tagged VLANs for each port. Some devices (e.g. Cisco Nexus/NX-OS)
+            // leave the XmitJoined extension objects empty, which drops VLANs above 1023.
+            // Fall back to the VlansEnabled extension when that happens.
+            foreach ([
+                ['', -1],
+                ['2k', 1023],
+                ['3k', 2047],
+                ['4k', 3071],
+            ] as [$suffix, $offset]) {
+                $vlans = $data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined' . $suffix] ?? '';
+
+                if ($vlans === '') {
+                    $vlans = $data['CISCO-VTP-MIB::vlanTrunkPortVlansEnabled' . $suffix] ?? '';
+                }
+
+                foreach (StringHelpers::bitsToIndices($vlans) as $vlanId) {
+                    $isNative[$vlanId + $offset][$ifindex] ??= 0;
+                }
             }
         }
 
