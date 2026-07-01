@@ -74,6 +74,7 @@ To start rotating through the selected dashboards, open **Overview -> Dashboard 
 
 NOC rotation always reads your current dashboard list when NOC View starts.
 Dashboard permissions are unchanged, so only dashboards you can already access are included.
+Some browsers block automatic fullscreen requests unless they come from a direct user action, so NOC View shows a centered fullscreen prompt on startup when the automatic request is blocked.
 
 ### Rotation Interval
 

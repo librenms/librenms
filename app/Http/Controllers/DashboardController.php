@@ -321,12 +321,12 @@ class DashboardController extends Controller
     }
 
     /**
-     * @return Collection<int, int>
+     * @return Collection<int, int<1, max>>
      */
     private function getNocDashboardIds(User $user): Collection
     {
         $selected_ids = collect(UserPref::getPref($user, 'noc_dashboards') ?? [])
-            ->map(fn ($id) => (int) $id)
+            ->map(fn (mixed $id): int => (int) $id)
             ->filter(fn (int $id) => $id > 0);
 
         $allowed_ids = $this->getAvailableDashboards($user)->keys();
