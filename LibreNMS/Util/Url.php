@@ -30,7 +30,6 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Port;
 use Carbon\Carbon;
-use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL as LaravelUrl;
 use Illuminate\Support\Str;
@@ -406,34 +405,31 @@ class Url
         return '<img class="graph-image" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
     }
 
-    public static function graphPopup($args, $content = null, $link = null)
+    public static function graphPopup($args, $content = null, $link = null, array $graph_periods = ['-1d', '-1w', '-1mo', '-1y']): string
     {
         // Take $args and print day,week,month,year graphs in overlib, hovered over graph
         $original_from = $args['from'] ?? '';
         $popup_title = $args['popup_title'] ?? 'Graph';
-        $now = CarbonImmutable::now();
 
-        $graph = $content ?: self::graphTag($args);
-        $popup = "<div class=\'list-large\'>$popup_title</div>";
-        $popup .= '<div style="width: 850px">';
         $args['width'] = 340;
         $args['height'] = 100;
         $args['legend'] = 'yes';
-        $args['from'] = $now->subDay()->timestamp;
-        $popup .= self::graphTag($args);
-        $args['from'] = $now->subWeek()->timestamp;
-        $popup .= self::graphTag($args);
-        $args['from'] = $now->subMonth()->timestamp;
-        $popup .= self::graphTag($args);
-        $args['from'] = $now->subYear()->timestamp;
-        $popup .= self::graphTag($args);
+        $columns = count($graph_periods) < 4 ? 1 : 2;
+
+        $graph = $content ?: self::graphTag($args);
+        $popup = "<div class=\'list-large\'>$popup_title</div>";
+        $popup .= "<div style=\"display:grid;grid-template-columns:repeat($columns,max-content);\">";
+        foreach ($graph_periods as $period) {
+            $args['from'] = $period;
+            $popup .= ' ' . self::graphTag($args);
+        }
         $popup .= '</div>';
 
         $args['from'] = $original_from;
 
         $args['link'] = $link ?: self::generate($args, ['page' => 'graphs', 'height' => null, 'width' => null, 'bg' => null]);
 
-        return self::overlibLink($args['link'], $graph, $popup, null);
+        return self::overlibLink($args['link'], $graph, $popup);
     }
 
     public static function lazyGraphTag($args, string $class = 'img-responsive'): string
@@ -453,7 +449,7 @@ class Url
         return $tag . ' />';
     }
 
-    public static function overlibLink($url, $text, $contents, $class = null)
+    public static function overlibLink($url, $text, $contents, $class = null): string
     {
         $contents = "<div class=\'overlib-contents\'>" . $contents . '</div>';
         $contents = str_replace('"', "\'", $contents);
