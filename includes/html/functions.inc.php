@@ -172,7 +172,7 @@ function generate_dynamic_graph_tag($args)
         $urlargs[] = $key . '=' . $value;
     }
 
-    return '<img style="width:' . $width . 'px;height:100%" class="graph graph-image img-responsive" data-src-template="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
+    return '<img style="width:' . $width . 'px;height:100%" class="graph graph-image img-responsive" data-src-template="' . route('graph') . '?' . implode('&amp;', $urlargs) . '" border="0" />';
 }//end generate_dynamic_graph_tag()
 
 function generate_dynamic_graph_js($args)
@@ -304,15 +304,6 @@ function generate_sap_url($sap, $vars = [])
     return Url::graphPopup(['device' => $sap['device_id'], 'page' => 'graphs', 'type' => 'device_sap', 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps', 'traffic_id' => $sap['svc_oid'] . '.' . $sap['sapPortId'] . '.' . $sap['sapEncapValue']], $vars);
 }//end generate_sap_url()
 
-function generate_port_image($args)
-{
-    if (! $args['bg']) {
-        $args['bg'] = 'FFFFFF00';
-    }
-
-    return "<img src='graph.php?type=" . $args['graph_type'] . '&amp;id=' . $args['port_id'] . '&amp;from=' . $args['from'] . '&amp;to=' . $args['to'] . '&amp;width=' . $args['width'] . '&amp;height=' . $args['height'] . '&amp;bg=' . $args['bg'] . "'>";
-}//end generate_port_image()
-
 /**
  * Create image to output text instead of a graph.
  *
@@ -327,7 +318,7 @@ function graph_error($text, $short = null, $color = [128, 0, 0])
 
 function print_port_thumbnail($args)
 {
-    echo generate_port_link($args, generate_port_image($args));
+    echo generate_port_link($args, Url::graphTag($args));
 }//end print_port_thumbnail()
 
 function print_optionbar_start($height = 0, $width = 0, $marginbottom = 5)

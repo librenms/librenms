@@ -15,29 +15,29 @@
                         <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                     @endif
                 @endforeach
-                
+
                 <div class="form-group" style="margin-right: 10px;">
-                    <input type="text" 
-                           class="form-control" 
-                           name="searchVlanNumber" 
-                           value="{{ $data['searchVlanNumber'] ?? '' }}" 
-                           placeholder="VLAN Number..." 
+                    <input type="text"
+                           class="form-control"
+                           name="searchVlanNumber"
+                           value="{{ $data['searchVlanNumber'] ?? '' }}"
+                           placeholder="VLAN Number..."
                            style="width: 150px;">
                 </div>
-                
+
                 <div class="form-group" style="margin-right: 10px;">
-                    <input type="text" 
-                           class="form-control" 
-                           name="searchVlanName" 
-                           value="{{ $data['searchVlanName'] ?? '' }}" 
-                           placeholder="VLAN Name..." 
+                    <input type="text"
+                           class="form-control"
+                           name="searchVlanName"
+                           value="{{ $data['searchVlanName'] ?? '' }}"
+                           placeholder="VLAN Name..."
                            style="width: 200px;">
                 </div>
-                
+
                 <button type="submit" class="btn btn-primary">
                     <i class="fa fa-search"></i> Filter
                 </button>
-                
+
                 @if($data['searchVlanNumber'] || $data['searchVlanName'])
                     <a href="{{ request()->url() }}" class="btn btn-default" style="margin-left: 5px;">
                         <i class="fa fa-times"></i> Clear
@@ -77,8 +77,8 @@
                     @else
                         <div style="display: block; padding: 2px; margin: 2px; min-width: 139px; max-width:139px; min-height:85px; max-height:85px; text-align: center; float: left; background-color: {{ \App\Facades\LibrenmsConfig::get('list_colour.odd_alt2') }}">
                             <div style="font-weight: bold;">{{ $port->port->ifDescr }}</div>
-                            <a href="{{ route('device', ['device' => $device->device_id, 'tab' => 'port', 'vars' => 'port='.$port->port->port_id]) }}" onmouseover="return overlib('<div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #e5e5e5;\'>{{ $device->hostname }}-{{ $port->port->ifDescr }}</div>{{ $port->port->ifAlias }}<img src=\'{{ url('graph.php') }}?type=port_{{ $vars }}&amp;id={{ $port->port->port_id }}&amp;from={{ \App\Facades\LibrenmsConfig::get('time.twoday') }}&amp;to={{ \App\Facades\LibrenmsConfig::get('time.now') }}&amp;width=450&amp;height=150\'>', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);" onmouseout="return nd();">
-                                <img src="{{ url('graph.php') }}?type=port_{{ $vars }}&amp;id={{ $port->port->port_id }}&amp;from={{ \App\Facades\LibrenmsConfig::get('time.twoday') }}&amp;to={{ \App\Facades\LibrenmsConfig::get('time.now') }}&amp;width=132&amp;height=40&amp;legend=no">
+                            <a href="{{ route('device', ['device' => $device->device_id, 'tab' => 'port', 'vars' => 'port='.$port->port->port_id]) }}" onmouseover="return overlib('<div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #e5e5e5;\'>{{ $device->hostname }}-{{ $port->port->ifDescr }}</div>{{ $port->port->ifAlias }}<img src=\'{{ route('graph', ['type' => 'port_' . $vars, 'id' => $port->$port->port_id, 'from' => '-2d', 'width' => 450, 'height' => 150]) }}\'>', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);" onmouseout="return nd();">
+                                <img src="{{ route('graph', ['type' => 'port_' . $vars, 'id' => $port->port->port_id, 'from' => '-2d', 'width' => 132, 'height' => 40, 'legend' => 'no']) }}">
                             </a>
                             <div style="font-size: 9px;">{{ $port->port->ifAlias }}</div>
                         </div>
@@ -101,11 +101,11 @@
         @endforelse
         </tbody>
     </table>
-    
+
     {{-- Results Count --}}
     @if(($data['searchVlanNumber'] || $data['searchVlanName']) && count($data['vlans']) > 0)
         <div class="alert alert-success">
-            <i class="fa fa-check-circle"></i> 
+            <i class="fa fa-check-circle"></i>
             Showing {{ count($data['vlans']) }} VLAN{{ count($data['vlans']) !== 1 ? 's' : '' }} matching your criteria
         </div>
     @endif
