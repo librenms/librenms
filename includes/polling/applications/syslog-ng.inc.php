@@ -39,7 +39,7 @@ $tags = [
     'name' => $name,
     'app_id' => $app->app_id,
     'rrd_name' => ['app', $name, $app->app_id, 'center'],
-    'rrd_def' => $rrd_def,
+    'rrd_def' => $center_rrd_def,
 ];
 
 app('Datastore')->put($device, 'app', $tags, $center_fields);
@@ -80,7 +80,7 @@ $counter = [
 
 $tags['rrd_def'] = $gauge_rrd_def;
 foreach ($gauge as $stat) {
-    if (is_null($data['global'][$stat]['max'])) {
+    if (! is_null($data['global'][$stat]['max'])) {
         $tags['rrd_name'] = ['app', $name, $app->app_id, 'global_-_'.$stat];
         $stats_fields = [
             'max' => $data['global'][$stat]['max'],
@@ -90,7 +90,7 @@ foreach ($gauge as $stat) {
             'mode' => $data['global'][$stat]['mode'],
             'sum' => $data['global'][$stat]['sum'],
         ];
-        app('Datastore')->put($device, 'app', $tags, $stat_fields);
+        app('Datastore')->put($device, 'app', $tags, $stats_fields);
         $app_data['global'][$stat] = true;
     } else {
         $app_data['global'][$stat] = false;
@@ -99,7 +99,7 @@ foreach ($gauge as $stat) {
 
 $tags['rrd_def'] = $counter_rrd_def;
 foreach ($counter as $stat) {
-    if (is_null($data['global'][$stat]['max'])) {
+    if (! is_null($data['global'][$stat]['max'])) {
         $tags['rrd_name'] = ['app', $name, $app->app_id, 'global_-_'.$stat];
         $stats_fields = [
             'max' => $data['global'][$stat]['max'],
@@ -109,7 +109,7 @@ foreach ($counter as $stat) {
             'mode' => $data['global'][$stat]['mode'],
             'sum' => $data['global'][$stat]['sum'],
         ];
-        app('Datastore')->put($device, 'app', $tags, $stat_fields);
+        app('Datastore')->put($device, 'app', $tags, $stats_fields);
         $app_data['global'][$stat] = true;
     } else {
         $app_data['global'][$stat] = false;
@@ -121,7 +121,7 @@ foreach ($data['sources'] as $source_name => $source) {
 
     $tags['rrd_def'] = $gauge_rrd_def;
     foreach ($gauge as $stat) {
-        if (is_null($data['global'][$stat]['max'])) {
+        if (! is_null($source[$stat]['max'])) {
             $tags['rrd_name'] = ['app', $name, $app->app_id, 'source_-_'.$stat.'_-_'.$source_name];
             $stats_fields = [
                 'max' => $source[$stat]['max'],
@@ -131,7 +131,7 @@ foreach ($data['sources'] as $source_name => $source) {
                 'mode' => $source[$stat]['mode'],
                 'sum' => $source[$stat]['sum'],
             ];
-            app('Datastore')->put($device, 'app', $tags, $stat_fields);
+            app('Datastore')->put($device, 'app', $tags, $stats_fields);
             $app_data['sources'][$source_name][$stat] = true;
         } else {
             $app_data['sources'][$source_name][$stat] = false;
@@ -140,7 +140,7 @@ foreach ($data['sources'] as $source_name => $source) {
 
     $tags['rrd_def'] = $counter_rrd_def;
     foreach ($counter as $stat) {
-        if (is_null($data['global'][$stat]['max'])) {
+        if (! is_null($source[$stat]['max'])) {
             $tags['rrd_name'] = ['app', $name, $app->app_id, 'source_-_'.$stat.'_-_'.$source_name];
             $stats_fields = [
                 'max' => $source[$stat]['max'],
@@ -150,7 +150,7 @@ foreach ($data['sources'] as $source_name => $source) {
                 'mode' => $source[$stat]['mode'],
                 'sum' => $source[$stat]['sum'],
             ];
-            app('Datastore')->put($device, 'app', $tags, $stat_fields);
+            app('Datastore')->put($device, 'app', $tags, $stats_fields);
             $app_data['sources'][$source_name][$stat] = true;
         } else {
             $app_data['sources'][$source_name][$stat] = false;
