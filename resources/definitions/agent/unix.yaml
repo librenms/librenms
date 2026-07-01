@@ -1,0 +1,9 @@
+# Application handlers for Unix/Linux OS types.
+# handler: fully-qualified class name of the LibreNMS\Agent\Application subclass to instantiate.
+# The dispatcher in LibreNMS/OS/Shared/Unix.php resolves these at runtime.
+
+mdadm:
+  handler: LibreNMS\Agent\Unix\Mdadm\Common
+  description: Linux software RAID arrays managed by mdadm
+  sensor_group_prefix:
+    - "Mdadm"

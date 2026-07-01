@@ -5,6 +5,7 @@ namespace App\Console\Commands\Traits;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\Version;
 
 trait ProcessesDevices
@@ -12,6 +13,7 @@ trait ProcessesDevices
     protected function handleDebug(): void
     {
         if ($this->getOutput()->isVerbose()) {
+            Debug::setVerbose(true);
             Log::debug(Version::get()->header());
             LibrenmsConfig::invalidateAndReload();
         }

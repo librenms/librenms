@@ -45,6 +45,7 @@ final class DocsTest extends TestCase
             '*/Extensions/Applications/*',
             '*/General/Changelogs/*',
             '*/Alerting/Transports/*',
+            '*/Developing/Application/*',
         ];
 
         // Build the exclusion part of the find command

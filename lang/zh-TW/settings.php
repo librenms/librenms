@@ -871,10 +871,6 @@ return [
             'description' => 'Customer 連接埠類型',
             'help' => '所列描述類型的連接埠會顯示在 customers ports 選單項目下。詳情請參閱「介面描述解析」文件。',
         ],
-        'base_url' => [
-            'description' => '指定 URL',
-            'help' => '此項*僅*在您想*強制*使用特定主機名稱／連接埠時才應設定。設定後將無法從其他任何主機名稱使用 Web 介面',
-        ],
         'disabled_sensors' => [
             'description' => '已停用的感測器',
             'help' => '不應輪詢或顯示於 Web 介面中的感測器。',

@@ -26,12 +26,14 @@
 
 namespace LibreNMS\OS\Shared;
 
+use App\Models\Application;
 use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\OS\Traits\ServerHardware;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 use SnmpQuery;
+use Symfony\Component\Yaml\Yaml;
 
 class Unix extends \LibreNMS\OS implements MempoolsDiscovery
 {
@@ -124,5 +126,46 @@ class Unix extends \LibreNMS\OS implements MempoolsDiscovery
             '.1.3.6.1.4.1.2021.7890.4.101.1', // legacy UCD-SNMP-MIB exec
         ])->value();
         $device->serial = $serial ?: $device->serial;
+    }
+
+    public function discoverApplication(Application $app): bool
+    {
+        $class = $this->applicationHandlers()[$app->app_type]['handler'] ?? null;
+        if ($class === null || ! class_exists($class)) {
+            return false;
+        }
+        echo '  ' . $app->app_type . ': ';
+        $instance = new $class($this, $app);
+        if ($instance->shouldDiscover()) {
+            $instance->discover();
+        }
+        $instance->printDiscoverySummary();
+
+        return true;
+    }
+
+    public function pollApplication(Application $app, array $agent_data): bool
+    {
+        $class = $this->applicationHandlers()[$app->app_type]['handler'] ?? null;
+        if ($class === null || ! class_exists($class)) {
+            return false;
+        }
+        $instance = new $class($this, $app, $agent_data);
+        if ($instance->shouldPoll()) {
+            $instance->poll();
+        }
+
+        return true;
+    }
+
+    private function applicationHandlers(): array
+    {
+        static $handlers = null;
+        if ($handlers === null) {
+            $file = base_path('resources/definitions/agent/unix.yaml');
+            $handlers = file_exists($file) ? (Yaml::parseFile($file) ?? []) : [];
+        }
+
+        return $handlers;
     }
 }

@@ -366,12 +366,13 @@ Please refer to [RRDCached](../Extensions/RRDCached.md)
 
 ## WebUI Settings
 
-!!! setting "system/server"
-    ```bash
-    lnms config:set base_url http://demo.librenms.org
-    ```
+Set `APP_URL` in your `.env` file to the full URL of your LibreNMS install, then run `lnms config:cache`.
 
-LibreNMS will attempt to detect the URL you are using, but you can override that here.
+```bash
+APP_URL=http://demo.librenms.org
+```
+
+LibreNMS will attempt to detect the URL you are using, but you can override it here.
 
 !!! setting "webui/style"
     ```bash

@@ -412,6 +412,16 @@ class OS implements
         return $this->discoverIeeeQBridgeMibVlans();
     }
 
+    public function discoverApplication(\App\Models\Application $app): bool
+    {
+        return false;
+    }
+
+    public function pollApplication(\App\Models\Application $app, array $agent_data): bool
+    {
+        return false;
+    }
+
     /**
      * @inheritDoc
      */

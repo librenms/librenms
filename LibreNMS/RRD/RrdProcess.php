@@ -86,7 +86,13 @@ class RrdProcess
                 }
 
                 if (trim($buffer) !== '') {
-                    $this->logger->warning('RRDtool stderr: ' . trim($buffer));
+                    if (stripos($buffer, 'warning:') !== false) {
+                        $this->logger->warning('RRDtool stderr: ' . trim($buffer));
+
+                        return false;
+                    }
+
+                    throw RrdException::parse($buffer);
                 }
 
                 return false;

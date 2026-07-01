@@ -4,6 +4,7 @@ use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\Sensor;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
+use Symfony\Component\Yaml\Yaml;
 
 // Sensor overview panels, rendered in this order. Each empty class is skipped below.
 $sensor_overview_order = [
@@ -40,11 +41,34 @@ $sensor_overview_order = [
     Sensor::SignalLoss,
 ];
 
+// App-specific overview panels render their own sensor data, so suppress
+// matching app-owned sensors from the generic overview blocks.
+$agentDefs = Yaml::parseFile(base_path('resources/definitions/agent/unix.yaml')) ?? [];
+$appOverviewGroupPrefixes = [];
+foreach ($agentDefs as $def) {
+    foreach ((array) ($def['sensor_group_prefix'] ?? []) as $prefix) {
+        $appOverviewGroupPrefixes[] = (string) $prefix;
+    }
+}
+
 foreach ($sensor_overview_order as $sensor_class) {
-    $sensors = DeviceCache::getPrimary()->sensors->where('sensor_class', $sensor_class->value)->where('group', '!=', 'transceiver')->sortBy([
-        ['group', 'asc'],
-        ['sensor_descr', 'asc'],
-    ]); // cache all sensors on device and exclude transceivers
+    $sensors = DeviceCache::getPrimary()->sensors
+        ->where('sensor_class', $sensor_class->value)
+        ->where('group', '!=', 'transceiver')
+        ->filter(static function ($sensor) use ($appOverviewGroupPrefixes): bool {
+            $group = (string) $sensor->group;
+            foreach ($appOverviewGroupPrefixes as $prefix) {
+                if (str_starts_with($group, $prefix)) {
+                    return false;
+                }
+            }
+
+            return true;
+        })
+        ->sortBy([
+            ['group', 'asc'],
+            ['sensor_descr', 'asc'],
+        ]); // cache all sensors on device and exclude transceivers
 
     if ($sensors->isNotEmpty()) {
         // prepare each sensor for display: normalise the description (ipmi sensors get a

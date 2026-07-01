@@ -30,6 +30,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
+use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
@@ -41,6 +42,8 @@ use LibreNMS\Exceptions\RrdStoreException;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Rewrite;
+use SimpleXMLElement;
+use Symfony\Component\Process\Process;
 
 class Rrd extends BaseDatastore
 {
@@ -138,9 +141,11 @@ class Rrd extends BaseDatastore
             }, ARRAY_FILTER_USE_KEY);
         }
 
+        $template = ! empty($meta['rrd_update_template']) ? array_keys($fields) : null;
+
         try {
             try {
-                $this->update($rrd, $fields);
+                $this->update($rrd, $fields, $template);
             } catch (RrdNotFoundException) {
                 if (isset($rrd_def)) {
                     $this->command('create', $rrd, ['--step', $step, ...$rrd_def->getArguments(), ...$this->rra]);
@@ -176,6 +181,333 @@ class Rrd extends BaseDatastore
     }
 
     /**
+     * List datasets defined in an RRD file.
+     *
+     * Usage:
+     *   $datasets = Rrd::listDatasets($rrdFilename);
+     *   // ['read', 'written', 'reads', 'writes']
+     *
+     * @return array<string>
+     */
+    public function listDatasets(string $filename): array
+    {
+        // Use a one-shot process to avoid the pipe race condition: the persistent
+        // Proc pipe uses non-blocking reads and stream_select returns as soon as any
+        // data arrives, so large info output is often truncated. A dedicated subprocess
+        // blocks until rrdtool exits and all output is available. Bypassing rrdcached
+        // here is intentional — DS structure lives in the file header, not the write
+        // buffer, so reading directly always returns the current on-disk structure.
+        $process = new Process([LibrenmsConfig::get('rrdtool', 'rrdtool'), 'info', $filename]);
+        $process->setTimeout(10);
+        $process->run();
+        $output = $process->getOutput();
+
+        if ($output === '') {
+            return [];
+        }
+
+        $datasetsByIndex = [];
+        if (preg_match_all('/^ds\[([^\]]+)\]\.index = (\d+)$/m', $output, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $datasetsByIndex[(int) $match[2]] = $match[1];
+            }
+
+            if (! empty($datasetsByIndex)) {
+                ksort($datasetsByIndex);
+
+                return array_values($datasetsByIndex);
+            }
+        }
+
+        if (preg_match_all('/^ds\[([^\]]+)\]\./m', $output, $matches)) {
+            $datasets = [];
+            foreach ($matches[1] as $dataset) {
+                $datasets[$dataset] = true;
+            }
+
+            return array_keys($datasets);
+        }
+
+        return [];
+    }
+
+    /**
+     * Add one or more datasets to an existing RRD file via rrdtool tune.
+     *
+     * Usage:
+     *   Rrd::addDatasets($rrdFilename, [
+     *       ['name' => 'la1', 'type' => 'GAUGE', 'heartbeat' => 600, 'min' => 0, 'max' => 100],
+     *       ['name' => 'busy_usec', 'type' => 'DERIVE', 'heartbeat' => 600, 'min' => 0, 'max' => 'U'],
+     *   ]);
+     *
+     * Dataset names must be 1-19 chars and match [a-zA-Z0-9_].
+     * Existing datasets are skipped.
+     *
+     * @param  array<int, array{name: string, type: string, heartbeat: int, min?: int|float|string|null, max?: int|float|string|null}>  $datasets
+     */
+    public function addDatasets(string $filename, array $datasets): bool
+    {
+        $existing = array_flip($this->listDatasets($filename));
+        $options = [];
+
+        foreach ($datasets as $dataset) {
+            $name = $dataset['name'] ?? '';
+            if (! preg_match('/^[a-zA-Z0-9_]{1,19}$/', (string) $name)) {
+                continue;
+            }
+
+            if (isset($existing[$name])) {
+                continue;
+            }
+
+            $type = strtoupper((string) ($dataset['type'] ?? ''));
+            if (! in_array($type, ['GAUGE', 'COUNTER', 'DERIVE', 'ABSOLUTE'], true)) {
+                continue;
+            }
+
+            $heartbeat = (int) ($dataset['heartbeat'] ?? 0);
+            if ($heartbeat < 1) {
+                continue;
+            }
+
+            $min = $this->normalizeDatasetLimit($dataset['min'] ?? 'U');
+            $max = $this->normalizeDatasetLimit($dataset['max'] ?? 'U');
+
+            $options[] = "DS:$name:$type:$heartbeat:$min:$max";
+        }
+
+        if (empty($options)) {
+            return true;
+        }
+
+        $output = $this->command('tune', $filename, $options);
+
+        return ! str_contains($output, 'ERROR');
+    }
+
+    /**
+     * Add datasets from a config array keyed by dataset name or listed with `name`.
+     *
+     * Usage:
+     *   Rrd::addDatasetsFromConfig($rrdFilename, [
+     *       'la1' => ['type' => 'GAUGE', 'heartbeat' => 600, 'min' => 0, 'max' => 100],
+     *       'la5' => ['type' => 'GAUGE', 'heartbeat' => 600, 'min' => 0, 'max' => 100],
+     *       'busy_usec' => ['type' => 'DERIVE', 'heartbeat' => 600, 'min' => 0, 'max' => 'U'],
+     *   ]);
+     *
+     * @param  array<int|string, array{name?: string, type: string, heartbeat: int, min?: int|float|string|null, max?: int|float|string|null}>  $config
+     */
+    public function addDatasetsFromConfig(string $filename, array $config): bool
+    {
+        $datasets = [];
+
+        foreach ($config as $name => $dataset) {
+            if (! is_array($dataset)) {
+                continue;
+            }
+
+            if (is_string($name) && ! isset($dataset['name'])) {
+                $dataset['name'] = $name;
+            }
+
+            $datasets[] = $dataset;
+        }
+
+        if (empty($datasets)) {
+            return true;
+        }
+
+        return $this->addDatasets($filename, $datasets);
+    }
+
+    private function normalizeDatasetLimit(int|float|string|null $value): string
+    {
+        if ($value === null) {
+            return 'U';
+        }
+
+        if (is_string($value) && strtoupper($value) === 'U') {
+            return 'U';
+        }
+
+        if (! is_numeric($value)) {
+            return 'U';
+        }
+
+        return (string) $value;
+    }
+
+    /**
+     * Get the latest aligned per-second rates for one or more datasets.
+     *
+     * Usage:
+     *   $point = Rrd::getLastRates($rrdFilename, ['read', 'written', 'reads', 'writes']);
+     *   $readBps = $point?->get('read');
+     *   $opsOut = $point?->get('writes');
+     *
+     * This aligns the xport query window to configured rrd.step and returns
+     * float values from the final xport row for the requested datasets.
+     *
+     * @param  string  $filename  Full path to the rrd file
+     * @param  array<string>  $datasets  Dataset names to export
+     * @param  string  $cf  Consolidation function, defaults to AVERAGE
+     */
+    public function getLastRates(string $filename, array $datasets, string $cf = 'AVERAGE'): ?TimeSeriesPoint
+    {
+        $datasets = array_values(array_filter(array_unique($datasets), fn ($dataset): bool => $dataset !== ''));
+        if (empty($datasets)) {
+            return null;
+        }
+
+        $window = $this->getLastRateWindow($filename);
+        if ($window === null) {
+            return null;
+        }
+
+        $xportOutput = $this->runXportRates(
+            $filename,
+            $datasets,
+            strtoupper($cf),
+            $window['start'],
+            $window['end'],
+            $window['step'],
+        );
+        if ($xportOutput === null) {
+            return null;
+        }
+
+        $rates = $this->parseXportRates($xportOutput, $datasets);
+        if (empty($rates)) {
+            return null;
+        }
+
+        return new TimeSeriesPoint($window['end'], $rates);
+    }
+
+    /**
+     * @return array{start: int, end: int, step: int}|null
+     */
+    private function getLastRateWindow(string $filename): ?array
+    {
+        // Align to the latest full PDP interval using configured rrd.step.
+        $output = $this->command('last', $filename);
+        if (! preg_match('/^\s*(\d+)/m', $output, $matches)) {
+            return null;
+        }
+
+        $last = (int) $matches[1];
+        $step = max((int) $this->step, 1);
+        $end = intdiv($last, $step) * $step;
+        $start = max($end - $step, 0);
+
+        return [
+            'start' => $start,
+            'end' => $end,
+            'step' => $step,
+        ];
+    }
+
+    private function runXportRates(string $filename, array $datasets, string $cf, int $start, int $end, int $step): ?string
+    {
+        // Match command() path handling when rrdcached expects relative file paths.
+        $filename = $this->shortenFilenameForReadCommand($filename);
+
+        $options = [
+            '--start',
+            (string) $start,
+            '--end',
+            (string) $end,
+            '--step',
+            (string) $step,
+        ];
+
+        foreach ($datasets as $index => $dataset) {
+            // Keep DEF variable names simple, preserve original DS names in XPORT legend.
+            $varName = 'd' . $index;
+            $options[] = "DEF:$varName=$filename:$dataset:$cf";
+            $options[] = "XPORT:$varName:$dataset";
+        }
+
+        try {
+            $output = app(RrdProcess::class, ['timeout' => 15])->run('xport ' . implode(' ', $options), '</xport>');
+        } catch (RrdException) {
+            return null;
+        }
+
+        $endTagPos = strrpos($output, '</xport>');
+        if ($endTagPos === false) {
+            return null;
+        }
+
+        return substr($output, 0, $endTagPos + 8);
+    }
+
+    private function shortenFilenameForReadCommand(string $filename): string
+    {
+        // rrdcached read operations use paths relative to rrd_dir.
+        if ($this->rrdcached) {
+            return str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
+        }
+
+        return $filename;
+    }
+
+    /**
+     * @param  array<string>  $datasets
+     * @return array<string, float>
+     */
+    private function parseXportRates(string $xportOutput, array $datasets): array
+    {
+        // Parse xport XML once and return only requested datasets from the last row.
+        $xml = simplexml_load_string($xportOutput);
+        if (! $xml instanceof SimpleXMLElement) {
+            return [];
+        }
+
+        $legend = [];
+        foreach ($xml->meta->legend->entry ?? [] as $entry) {
+            $legend[] = (string) $entry;
+        }
+
+        $rows = $xml->data->row ?? [];
+        if (count($rows) < 1 || empty($legend)) {
+            return [];
+        }
+
+        $lastRow = $rows[count($rows) - 1];
+        $allowedDatasets = array_flip($datasets);
+        $rates = [];
+        $index = 0;
+
+        foreach ($lastRow->v ?? [] as $value) {
+            if (! isset($legend[$index], $allowedDatasets[$legend[$index]])) {
+                $index++;
+
+                continue;
+            }
+
+            $rawValue = trim((string) $value);
+            if ($rawValue === '' || strcasecmp($rawValue, 'nan') === 0 || strcasecmp($rawValue, '-nan') === 0) {
+                $index++;
+
+                continue;
+            }
+
+            if (! is_numeric($rawValue)) {
+                $index++;
+
+                continue;
+            }
+
+            // Cast to native float so callers do not handle scientific-notation strings.
+            $rates[$legend[$index]] = (float) $rawValue;
+            $index++;
+        }
+
+        return $rates;
+    }
+
+    /**
      * Updates an rrd database at $filename using $options
      * Where $options is an array, each entry which is not a number is replaced with "U"
      *
@@ -186,11 +518,12 @@ class Rrd extends BaseDatastore
      *
      * @internal
      */
-    public function update(string $filename, array $data): void
+    public function update(string $filename, array $data, ?array $template = null): void
     {
-        $data = 'N:' . implode(':', array_map(fn ($v) => is_numeric($v) ? $v : 'U', $data));
+        $values = 'N:' . implode(':', array_map(fn ($v) => is_numeric($v) ? $v : 'U', $data));
+        $options = $template === null ? [$values] : ['--template', implode(':', $template), $values];
 
-        $this->command('update', $filename, [$data]);
+        $this->command('update', $filename, $options);
     }
 
     // rrdtool_update
@@ -372,6 +705,20 @@ class Rrd extends BaseDatastore
             return $output;
         }
 
+        // rrdtool writes its temp file in the target directory and will not create it,
+        // failing with "Cannot create temporary file" if the directory is missing.
+        // The per-device directory is normally made by PollDevice::initRrdDirectory(),
+        // but discovery (e.g. CheckDeviceAvailability writing icmp-perf, or an app
+        // collector creating its first rrd) can run before the device is ever polled,
+        // so ensure the directory exists here before creating a new rrd.
+        // Skipped for rrdcached, which manages file creation under its own base dir.
+        if ($command === 'create' && ! $this->rrdcached) {
+            $dir = dirname($filename);
+            if (! is_dir($dir)) {
+                mkdir($dir, 0775, true);
+            }
+        }
+
         $this->init();
         $output = $this->rrd->run($commandLine);
 
@@ -424,6 +771,7 @@ class Rrd extends BaseDatastore
         if ($this->rrdcached) {
             $output = $this->command('list', '/' . self::safeName($hostname));
             $files = explode("\n", trim($output));
+            array_pop($files); // remove rrdcached status line
         } else {
             $files = glob($this->dirFromHost($hostname) . '/*.rrd') ?: [];
         }
@@ -586,6 +934,28 @@ class Rrd extends BaseDatastore
         $result = str_replace(':', '\:', $result);          // escape colons
 
         return $result . ' ';
+    }
+
+    /**
+     * Run rrdtool and parse the version from the output.
+     *
+     * @return string
+     */
+    public static function version(): string
+    {
+        try {
+            $rrd = app(RrdProcess::class, ['timeout' => 10]);
+            $output = $rrd->run('--version');
+            $parts = explode(' ', $output, 3);
+
+            if (isset($parts[1])) {
+                return str_replace('1.7.01.7.0', '1.7.0', $parts[1]);
+            }
+        } catch (Exception) {
+            //
+        }
+
+        return '';
     }
 
     /**

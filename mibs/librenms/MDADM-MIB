@@ -1,0 +1,1552 @@
+MDADM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Unsigned32, Integer32, enterprises
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, TruthValue
+        FROM SNMPv2-TC
+    CounterBasedGauge64
+        FROM HCNUM-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;
+
+mdadmMIB MODULE-IDENTITY
+    LAST-UPDATED "202606080000Z"
+    ORGANIZATION "Unassigned"
+    CONTACT-INFO
+        "mdadm SNMP agent MIB.
+
+         Enterprise OID: 1.3.6.1.4.1.60652.101"
+    DESCRIPTION
+        "The MDADM-MIB exposes Linux software RAID (mdadm) array health,
+         configuration, synchronisation status, and member device health.
+
+         Data source is the Linux md sysfs interface.  Each
+         DESCRIPTION clause notes the canonical Linux sysfs path.
+         Member-level sysfs paths use the form
+         /sys/block/<mdX>/md/dev-<name>/<attr>.
+
+         Textual conventions, objects, notifications, and conformance
+         definitions are all in this file.
+
+         OID structure:
+           mdadmMIB  1.3.6.1.4.1.60652.101
+             mdadmObjects       .1
+               mdadmMetadata        .1.1   system-level scalars
+               array meta table:    .1.{2,3,4}
+               array health table:  .1.{5,6,7}
+               array sync table:    .1.{8,9,10}
+               device meta table:   .1.{11,12,13}
+               device health table: .1.{14,15,16}
+             mdadmNotifications .2
+             mdadmConformance   .3"
+    REVISION "202606080000Z"
+    DESCRIPTION "Change all timestamp fields from DateAndTime to DisplayString
+                 (ISO 8601) for reliable pass_persist transport; remove JSON
+                 field path annotations; rename MdadmArrayState TC to
+                 MdadmArrayStatus to avoid case-only name collision."
+    REVISION "202606070000Z"
+    DESCRIPTION "Add mdadmArrayShortName and mdadmArrayUris to mdadmArrayMetaEntry."
+    REVISION "202606060000Z"
+    DESCRIPTION "Initial version."
+    ::= { enterprises 60652 101 }
+
+-- --------------------------------------------------------------------------
+-- Textual Conventions
+-- --------------------------------------------------------------------------
+
+MdadmRaidLevel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "RAID level as reported by mdadm and /sys/block/<mdX>/md/level.
+         unknown(0) is used when the level string cannot be mapped."
+    SYNTAX      INTEGER {
+                    unknown(0),
+                    linear(1),
+                    raid0(2),
+                    raid1(3),
+                    raid4(4),
+                    raid5(5),
+                    raid6(6),
+                    raid10(10)
+                }
+
+MdadmArrayStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Array state derived from /sys/block/<mdX>/md/array_state.
+         unknown(0) is used when the state string cannot be mapped.
+
+         Defined kernel state strings (from md.rst):
+           clear         -- no devices, no size
+           inactive      -- devices but array not active
+           suspended     -- active but I/O suspended
+           readonly      -- read-only
+           read-auto     -- read-only, switches to read-write on first write
+           clean         -- consistent, no dirty data
+           active        -- normal operation, possible dirty data
+           write-pending -- active, pending transition to clean
+           active-idle   -- like active but no recent writes"
+    SYNTAX      INTEGER {
+                    unknown(0),
+                    clear(1),
+                    inactive(2),
+                    suspended(3),
+                    readonly(4),
+                    readAuto(5),
+                    clean(6),
+                    active(7),
+                    writePending(8),
+                    activeIdle(9),
+                    degraded(10),
+                    failed(11)
+                }
+
+MdadmSyncAction ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Current or most recently completed synchronisation action for an
+         array, derived from /sys/block/<mdX>/md/sync_action.
+
+         Defined kernel values: resync, recover, idle, check, repair."
+    SYNTAX      INTEGER {
+                    idle(0),
+                    resync(1),
+                    recover(2),
+                    check(3),
+                    repair(4),
+                    reshape(5)
+                }
+
+MdadmDeviceRole ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Role of a member device within its array, derived from
+         /sys/block/<mdX>/md/dev-<name>/state."
+    SYNTAX      INTEGER {
+                    unknown(0),
+                    active(1),
+                    spare(2),
+                    faulty(3),
+                    missing(4),
+                    writeMostly(5),
+                    replacement(6)
+                }
+
+MdadmConsistencyPolicy ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Array consistency policy from
+         /sys/block/<mdX>/md/consistency_policy.
+         Defined kernel values: none, resync, bitmap, journal, ppl."
+    SYNTAX      INTEGER {
+                    unknown(0),
+                    resync(1),
+                    journal(2),
+                    ppl(3),
+                    none(4),
+                    bitmap(5)
+                }
+
+MdadmBitmapType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Write-intent bitmap storage type from
+         /sys/block/<mdX>/md/bitmap_type.
+         Defined kernel values: none, bitmap (internal), llbitmap
+         (lockless internal)."
+    SYNTAX      INTEGER {
+                    none(0),
+                    internal(1),
+                    external(2),
+                    lockless(3)
+                }
+
+MdadmJournalMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "RAID-5/6 journal (cache) mode from
+         /sys/block/<mdX>/md/journal_mode.
+         Applicable only when a journal device is present.
+         Defined kernel values: write-through, write-back."
+    SYNTAX      INTEGER {
+                    writeThrough(0),
+                    writeBack(1)
+                }
+
+-- --------------------------------------------------------------------------
+-- Top-level structure
+-- --------------------------------------------------------------------------
+
+mdadmObjects       OBJECT IDENTIFIER ::= { mdadmMIB 1 }
+mdadmNotifications OBJECT IDENTIFIER ::= { mdadmMIB 2 }
+mdadmConformance   OBJECT IDENTIFIER ::= { mdadmMIB 3 }
+mdadmCompliances   OBJECT IDENTIFIER ::= { mdadmConformance 1 }
+mdadmGroups        OBJECT IDENTIFIER ::= { mdadmConformance 2 }
+
+-- --------------------------------------------------------------------------
+-- Section 1: Metadata scalars  (.1.1)
+-- --------------------------------------------------------------------------
+
+mdadmMetadata OBJECT IDENTIFIER ::= { mdadmObjects 1 }
+
+mdadmLastUpdated OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ISO 8601 timestamp of the most recent agent data collection,
+         e.g. '2026-06-10T19:45:09+00:00'."
+    ::= { mdadmMetadata 1 }
+
+mdadmVersion OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Agent output format version."
+    ::= { mdadmMetadata 2 }
+
+mdadmError OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Agent error code from the most recent collection run.  Zero
+         indicates success."
+    ::= { mdadmMetadata 3 }
+
+mdadmErrorString OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Human-readable error description from the most recent collection
+         run.  Empty when mdadmError is zero."
+    ::= { mdadmMetadata 4 }
+
+mdadmArrayCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of mdadm arrays discovered on this host.
+         Linux: count of /sys/block/md*/md/ directories"
+    ::= { mdadmMetadata 5 }
+
+mdadmDegradedArrayCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of arrays currently in a degraded state.
+         Linux: count of arrays where /sys/block/<mdX>/md/degraded > 0"
+    ::= { mdadmMetadata 6 }
+
+mdadmSyncingArrayCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of arrays currently performing a synchronisation
+         operation.
+         Linux: count of arrays where /sys/block/<mdX>/md/sync_action
+                != 'idle'"
+    ::= { mdadmMetadata 7 }
+
+mdadmTotalMemberCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of member device slots across all arrays, including
+         spares.
+         Linux: sum of /sys/block/<mdX>/md/raid_disks across arrays"
+    ::= { mdadmMetadata 8 }
+
+-- --------------------------------------------------------------------------
+-- Section 2: Array Metadata Table  (.2 RowCount, .3 LastChange, .4 Table)
+-- --------------------------------------------------------------------------
+
+mdadmArrayMetaTableRowCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current number of rows in mdadmArrayMetaTable."
+    ::= { mdadmObjects 2 }
+
+mdadmArrayMetaTableLastChange OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ISO 8601 timestamp of the most recent row addition or removal
+         in mdadmArrayMetaTable."
+    ::= { mdadmObjects 3 }
+
+mdadmArrayMetaTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MdadmArrayMetaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Array identity and static configuration.  One row per array.
+         This table changes infrequently; implementations SHOULD poll
+         it on a long interval (e.g. 8 hours)."
+    ::= { mdadmObjects 4 }
+
+mdadmArrayMetaEntry OBJECT-TYPE
+    SYNTAX      MdadmArrayMetaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Identity and configuration for one mdadm array."
+    INDEX { mdadmArrayIndex }
+    ::= { mdadmArrayMetaTable 1 }
+
+MdadmArrayMetaEntry ::= SEQUENCE {
+    mdadmArrayIndex               Unsigned32,
+    mdadmArrayUuid                DisplayString,
+    mdadmArrayName                DisplayString,
+    mdadmArrayRaidLevel           MdadmRaidLevel,
+    mdadmArrayMetadataVersion     DisplayString,
+    mdadmArrayConsistencyPolicy   MdadmConsistencyPolicy,
+    mdadmArrayLayout              Integer32,
+    mdadmArrayRaidDisks           Unsigned32,
+    mdadmArraySizeBytes           CounterBasedGauge64,
+    mdadmArraySizeBlocks          CounterBasedGauge64,
+    mdadmArrayComponentSizeBlocks CounterBasedGauge64,
+    mdadmArrayChunkSize           Unsigned32,
+    mdadmArrayBitmapType          MdadmBitmapType,
+    mdadmArrayBitmapLocation      DisplayString,
+    mdadmArrayBitmapChunksize     Unsigned32,
+    mdadmArrayBitmapMetadata      DisplayString,
+    mdadmArrayLogicalBlockSize    Unsigned32,
+    mdadmArrayResyncStart         CounterBasedGauge64,
+    mdadmArrayReshapePosition     CounterBasedGauge64,
+    mdadmArrayBitmapTimeBase      Unsigned32,
+    mdadmArrayShortName           DisplayString,
+    mdadmArrayUris                DisplayString
+}
+
+mdadmArrayIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Locally-assigned array index.  The agent derives this value
+         as a 32-bit FNV-1a hash of the array UUID, so the same array
+         tends to receive the same index across restarts when its UUID
+         is unchanged.  Hash collisions are resolved by linear probing.
+         Managers SHOULD use mdadmArrayUuid as the stable identifier."
+    ::= { mdadmArrayMetaEntry 1 }
+
+mdadmArrayUuid OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Globally unique array identifier in the mdadm UUID format.
+         Linux: /sys/block/<mdX>/md/uuid"
+    ::= { mdadmArrayMetaEntry 2 }
+
+mdadmArrayName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Kernel device name of the array, e.g. 'md0'.
+         Linux: kernel device name of /sys/block/<mdX>"
+    ::= { mdadmArrayMetaEntry 3 }
+
+mdadmArrayRaidLevel OBJECT-TYPE
+    SYNTAX      MdadmRaidLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RAID level of the array.
+         Linux: /sys/block/<mdX>/md/level"
+    ::= { mdadmArrayMetaEntry 4 }
+
+mdadmArrayMetadataVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "mdadm metadata format version string, e.g. '1.2'.  May also
+         be 'none' or 'external:<name>' for externally-managed metadata.
+         Linux: /sys/block/<mdX>/md/metadata_version"
+    ::= { mdadmArrayMetaEntry 5 }
+
+mdadmArrayConsistencyPolicy OBJECT-TYPE
+    SYNTAX      MdadmConsistencyPolicy
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Consistency policy used by the array.
+         Linux: /sys/block/<mdX>/md/consistency_policy"
+    ::= { mdadmArrayMetaEntry 6 }
+
+mdadmArrayLayout OBJECT-TYPE
+    SYNTAX      Integer32 (-1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Numeric layout code; interpretation depends on RAID level.
+         For RAID-5: 0=left-asymmetric, 1=right-asymmetric,
+         2=left-symmetric, 3=right-symmetric, 4=parity-first,
+         5=parity-last.  For RAID-10: encodes near/far/offset copies.
+         The implementation MUST return -1 for RAID levels where layout
+         is not applicable (i.e. anything other than RAID-5 or RAID-10).
+         Linux: /sys/block/<mdX>/md/layout"
+    ::= { mdadmArrayMetaEntry 7 }
+
+mdadmArrayRaidDisks OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Configured number of data and parity disks, excluding spares.
+         Linux: /sys/block/<mdX>/md/raid_disks"
+    ::= { mdadmArrayMetaEntry 8 }
+
+mdadmArraySizeBytes OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total user-addressable array capacity in bytes.
+         Linux: /sys/block/<mdX>/md/array_size (KiB) x 1024"
+    ::= { mdadmArrayMetaEntry 9 }
+
+mdadmArraySizeBlocks OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "512-byte blocks"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total array capacity in 512-byte blocks.
+         Linux: /sys/block/<mdX>/size"
+    ::= { mdadmArrayMetaEntry 10 }
+
+mdadmArrayComponentSizeBlocks OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "1-KiB blocks"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Per-member component size in 1-KiB blocks.  This is the space
+         each member device contributes to the array.
+         Linux: /sys/block/<mdX>/md/component_size"
+    ::= { mdadmArrayMetaEntry 11 }
+
+mdadmArrayChunkSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RAID stripe chunk size in bytes.  Must be a power of 2 and at
+         least 4 KiB.  Zero for RAID levels that do not use striping
+         (e.g. RAID-1).
+         Linux: /sys/block/<mdX>/md/chunk_size"
+    ::= { mdadmArrayMetaEntry 12 }
+
+mdadmArrayBitmapType OBJECT-TYPE
+    SYNTAX      MdadmBitmapType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Write-intent bitmap storage type.  lockless(3) corresponds to
+         the kernel 'llbitmap' value.
+         Linux: /sys/block/<mdX>/md/bitmap_type"
+    ::= { mdadmArrayMetaEntry 13 }
+
+mdadmArrayBitmapLocation OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bitmap storage location string.  '+N' or '-N' means N sectors
+         from the metadata start; 'file' means an external file; 'none'
+         means no bitmap is present.
+         Linux: /sys/block/<mdX>/md/bitmap/location"
+    ::= { mdadmArrayMetaEntry 14 }
+
+mdadmArrayBitmapChunksize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bitmap chunk size in bytes; each bit covers this many bytes of
+         array space.  Zero when no bitmap is present.
+         Linux: /sys/block/<mdX>/md/bitmap/chunksize"
+    ::= { mdadmArrayMetaEntry 15 }
+
+mdadmArrayBitmapMetadata OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bitmap metadata storage: 'internal' or 'external'.  Empty when
+         no bitmap is present.
+         Linux: /sys/block/<mdX>/md/bitmap/metadata"
+    ::= { mdadmArrayMetaEntry 16 }
+
+mdadmArrayLogicalBlockSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Logical block size of the array.  Only configurable for
+         metadata version 1.x arrays.
+         Linux: /sys/block/<mdX>/md/logical_block_size"
+    ::= { mdadmArrayMetaEntry 17 }
+
+mdadmArrayResyncStart OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "sectors"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sector offset from which a resync will begin if the array is
+         assembled after an unclean shutdown.  The implementation MUST
+         set this to 18446744073709551615 (0xFFFFFFFFFFFFFFFF) when the
+         sysfs value is 'none', meaning the array was cleanly shut down
+         and no resync is needed.
+         Linux: /sys/block/<mdX>/md/resync_start"
+    ::= { mdadmArrayMetaEntry 18 }
+
+mdadmArrayReshapePosition OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "sectors"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sector offset showing how far an in-progress reshape (level
+         migration or geometry change) has reached.  The implementation
+         MUST set this to 18446744073709551615 (0xFFFFFFFFFFFFFFFF)
+         when the sysfs value is 'none', meaning no reshape is in
+         progress.
+         Linux: /sys/block/<mdX>/md/reshape_position"
+    ::= { mdadmArrayMetaEntry 19 }
+
+mdadmArrayBitmapTimeBase OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Interval used by the bitmap daemon; bitmap bits are cleared
+         approximately every 2-3 times this period after the
+         corresponding regions are confirmed in-sync.
+         Linux: /sys/block/<mdX>/md/bitmap/time_base"
+    ::= { mdadmArrayMetaEntry 20 }
+
+mdadmArrayShortName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Kernel block-device short name of the array, e.g. 'md0' or
+         'md127'.  This is the basename of the sysfs entry under
+         /sys/block/ and is stable for the lifetime of the array
+         assembly.
+         Linux: basename of /sys/block/<mdX>"
+    ::= { mdadmArrayMetaEntry 21 }
+
+mdadmArrayUris OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Space-separated list of block-device URIs through which this
+         array is accessible.  The first entry is always /dev/<mdX>.
+         Subsequent entries are the /dev/disk/by-id/md-* symlinks
+         (both md-name-* and md-uuid-*) that resolve to the same
+         device, sorted lexicographically.
+         Example: '/dev/md0 /dev/disk/by-id/md-name-host:boot
+                   /dev/disk/by-id/md-uuid-003f82c4:...'
+         Linux: /dev/<mdX>, /dev/disk/by-id/md-*"
+    ::= { mdadmArrayMetaEntry 22 }
+
+-- --------------------------------------------------------------------------
+-- Section 3: Array Health Table  (.5 RowCount, .6 LastChange, .7 Table)
+-- --------------------------------------------------------------------------
+
+mdadmArrayHealthTableRowCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current number of rows in mdadmArrayHealthTable."
+    ::= { mdadmObjects 5 }
+
+mdadmArrayHealthTableLastChange OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ISO 8601 timestamp of the most recent row addition, removal,
+         or material content change in mdadmArrayHealthTable."
+    ::= { mdadmObjects 6 }
+
+mdadmArrayHealthTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MdadmArrayHealthEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Array health and operational status.  One row per array.
+         Intended for frequent polling (e.g. 5-minute interval)."
+    ::= { mdadmObjects 7 }
+
+mdadmArrayHealthEntry OBJECT-TYPE
+    SYNTAX      MdadmArrayHealthEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Health and operational status for one mdadm array."
+    INDEX { mdadmArrayIndex }
+    ::= { mdadmArrayHealthTable 1 }
+
+MdadmArrayHealthEntry ::= SEQUENCE {
+    mdadmArrayState                MdadmArrayStatus,
+    mdadmArrayDegradedCount        Unsigned32,
+    mdadmArrayActiveDevices        Unsigned32,
+    mdadmArrayWorkingDevices       Unsigned32,
+    mdadmArraySpareDevices         Unsigned32,
+    mdadmArrayFailedDevices        Unsigned32,
+    mdadmArrayMismatchCount        Unsigned32,
+    mdadmArraySafeModeMilliseconds Unsigned32,
+    mdadmArrayIsMounted            TruthValue,
+    mdadmArrayMountPoints          DisplayString,
+    mdadmArrayIsSwap               TruthValue,
+    mdadmArrayBitmapBacklog        Unsigned32,
+    mdadmArrayBitmapMaxBacklog     Unsigned32,
+    mdadmArrayBitmapCanClear       TruthValue,
+    mdadmArraySuspendLo            CounterBasedGauge64,
+    mdadmArraySuspendHi            CounterBasedGauge64,
+    mdadmArrayStripeCacheSize      Unsigned32,
+    mdadmArrayStripeCacheActive    Unsigned32,
+    mdadmArrayJournalMode          MdadmJournalMode
+}
+
+mdadmArrayState OBJECT-TYPE
+    SYNTAX      MdadmArrayStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current array state.
+         Linux: /sys/block/<mdX>/md/array_state"
+    ::= { mdadmArrayHealthEntry 1 }
+
+mdadmArrayDegradedCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of missing or failed disks causing degraded operation.
+         Linux: /sys/block/<mdX>/md/degraded"
+    ::= { mdadmArrayHealthEntry 2 }
+
+mdadmArrayActiveDevices OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of member devices currently active in the array.
+         Linux: active_dev count from /proc/mdstat"
+    ::= { mdadmArrayHealthEntry 3 }
+
+mdadmArrayWorkingDevices OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of working devices (active plus spares).
+         Linux: working_dev count from /proc/mdstat"
+    ::= { mdadmArrayHealthEntry 4 }
+
+mdadmArraySpareDevices OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of spare devices available for automatic replacement.
+         Linux: spare_dev count from /proc/mdstat"
+    ::= { mdadmArrayHealthEntry 5 }
+
+mdadmArrayFailedDevices OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of failed devices in the array.
+         Linux: failed_dev count from /proc/mdstat"
+    ::= { mdadmArrayHealthEntry 6 }
+
+mdadmArrayMismatchCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of sectors where data mismatches were detected during
+         the most recent check or repair operation.
+         Linux: /sys/block/<mdX>/md/mismatch_cnt"
+    ::= { mdadmArrayHealthEntry 7 }
+
+mdadmArraySafeModeMilliseconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Safe-mode write-quiesce delay.  After this period of write
+         inactivity the array transitions from active to clean state.
+         The kernel default is 200 ms.
+         Linux: /sys/block/<mdX>/md/safe_mode_delay (seconds, float)"
+    ::= { mdadmArrayHealthEntry 8 }
+
+mdadmArrayIsMounted OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether the array device is currently mounted as a filesystem.
+         Linux: /proc/self/mountinfo"
+    ::= { mdadmArrayHealthEntry 9 }
+
+mdadmArrayMountPoints OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Space-separated list of filesystem mount points for this array.
+         Empty when mdadmArrayIsMounted is false(2).
+         Linux: /proc/self/mountinfo"
+    ::= { mdadmArrayHealthEntry 10 }
+
+mdadmArrayIsSwap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether the array is enabled as a swap device.
+         Linux: /proc/swaps"
+    ::= { mdadmArrayHealthEntry 11 }
+
+mdadmArrayBitmapBacklog OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current write-intent bitmap dirty-backlog count (number of
+         pending background writes for write-mostly RAID-1 devices).
+         Zero when no bitmap is present.
+         Linux: /sys/block/<mdX>/md/bitmap/backlog"
+    ::= { mdadmArrayHealthEntry 12 }
+
+mdadmArrayBitmapMaxBacklog OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Peak write-intent bitmap dirty backlog observed since the
+         array was assembled."
+    ::= { mdadmArrayHealthEntry 13 }
+
+mdadmArrayBitmapCanClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether the write-intent bitmap bits can currently be cleared
+         as blocks are confirmed in-sync.  The kernel sets this to
+         false(2) when a degraded write occurs; it reverts to true(1)
+         once the array is fully resynced.
+         Linux: /sys/block/<mdX>/md/bitmap/can_clear"
+    ::= { mdadmArrayHealthEntry 14 }
+
+mdadmArraySuspendLo OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "sectors"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Start sector of the I/O-suspended range.  With mdadmArraySuspendHi
+         this defines a range of the array where all write requests are
+         blocked until the range is released.  Used by RAID-4/5/6 during
+         reshape operations.  Zero when no range is suspended.
+         Linux: /sys/block/<mdX>/md/suspend_lo"
+    ::= { mdadmArrayHealthEntry 15 }
+
+mdadmArraySuspendHi OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "sectors"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "End sector of the I/O-suspended range.  See mdadmArraySuspendLo.
+         Zero when no range is suspended.
+         Linux: /sys/block/<mdX>/md/suspend_hi"
+    ::= { mdadmArrayHealthEntry 16 }
+
+mdadmArrayStripeCacheSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "entries"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of stripe-cache slots allocated for RAID-5/6 write
+         coalescing.  The kernel default is 256; the valid range is
+         17-32768.  Zero for non-RAID-5/6 arrays.
+         Linux: /sys/block/<mdX>/md/stripe_cache_size"
+    ::= { mdadmArrayHealthEntry 17 }
+
+mdadmArrayStripeCacheActive OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "entries"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of stripe-cache slots currently in use (active).  Zero
+         for non-RAID-5/6 arrays.
+         Linux: /sys/block/<mdX>/md/strip_cache_active"
+    ::= { mdadmArrayHealthEntry 18 }
+
+mdadmArrayJournalMode OBJECT-TYPE
+    SYNTAX      MdadmJournalMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RAID-5/6 journal (cache) write mode when a journal device is
+         present.  writeThrough(0) commits data to member disks before
+         acknowledging the host write; writeBack(1) acknowledges from
+         the journal device, giving lower latency at the cost of data
+         loss if the journal device fails.  This object is only
+         meaningful when a journal device is configured.
+         Linux: /sys/block/<mdX>/md/journal_mode"
+    ::= { mdadmArrayHealthEntry 19 }
+
+-- --------------------------------------------------------------------------
+-- Section 4: Array Sync Table  (.8 RowCount, .9 LastChange, .10 Table)
+-- --------------------------------------------------------------------------
+
+mdadmArraySyncTableRowCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current number of rows in mdadmArraySyncTable."
+    ::= { mdadmObjects 8 }
+
+mdadmArraySyncTableLastChange OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ISO 8601 timestamp of the most recent row addition, removal,
+         or material content change in mdadmArraySyncTable."
+    ::= { mdadmObjects 9 }
+
+mdadmArraySyncTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MdadmArraySyncEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Array synchronisation, rebuild, and check progress.  One row
+         per array.  Rows are always present; mdadmArraySyncAction is
+         idle(0) when no operation is in progress."
+    ::= { mdadmObjects 10 }
+
+mdadmArraySyncEntry OBJECT-TYPE
+    SYNTAX      MdadmArraySyncEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Synchronisation state for one mdadm array."
+    INDEX { mdadmArrayIndex }
+    ::= { mdadmArraySyncTable 1 }
+
+MdadmArraySyncEntry ::= SEQUENCE {
+    mdadmArraySyncAction            MdadmSyncAction,
+    mdadmArraySyncLastAction        MdadmSyncAction,
+    mdadmArraySyncCompletedCentipct Unsigned32,
+    mdadmArraySyncDoneBytes         CounterBasedGauge64,
+    mdadmArraySyncTotalBytes        CounterBasedGauge64,
+    mdadmArraySyncSpeedBps          CounterBasedGauge64,
+    mdadmArraySyncSpeedMinBps       CounterBasedGauge64,
+    mdadmArraySyncSpeedMaxBps       CounterBasedGauge64,
+    mdadmArraySyncMin               CounterBasedGauge64,
+    mdadmArraySyncMax               CounterBasedGauge64
+}
+
+mdadmArraySyncAction OBJECT-TYPE
+    SYNTAX      MdadmSyncAction
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current synchronisation action.  idle(0) when no operation is
+         in progress.
+         Linux: /sys/block/<mdX>/md/sync_action"
+    ::= { mdadmArraySyncEntry 1 }
+
+mdadmArraySyncLastAction OBJECT-TYPE
+    SYNTAX      MdadmSyncAction
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Most recently completed synchronisation action."
+    ::= { mdadmArraySyncEntry 2 }
+
+mdadmArraySyncCompletedCentipct OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "0.01 percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percentage of the current synchronisation operation completed,
+         in units of 0.01 percent (divide by 100 for percent).  Zero
+         when mdadmArraySyncAction is idle(0).  Derived from
+         sync_completed as (done / total) x 10000.
+         Linux: /sys/block/<mdX>/md/sync_completed ('done/total' in
+                sectors)"
+    ::= { mdadmArraySyncEntry 3 }
+
+mdadmArraySyncDoneBytes OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bytes processed so far in the current synchronisation.  Zero
+         when mdadmArraySyncAction is idle(0).
+         Linux: /sys/block/<mdX>/md/sync_completed (done part, sectors
+                x 512)"
+    ::= { mdadmArraySyncEntry 4 }
+
+mdadmArraySyncTotalBytes OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total bytes to process in the current synchronisation.  Zero
+         when mdadmArraySyncAction is idle(0).
+         Linux: /sys/block/<mdX>/md/sync_completed (total part,
+                sectors x 512)"
+    ::= { mdadmArraySyncEntry 5 }
+
+mdadmArraySyncSpeedBps OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "bytes/second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current 30-second average synchronisation throughput.  Zero
+         when mdadmArraySyncAction is idle(0).
+         Linux: /sys/block/<mdX>/md/sync_speed (K/sec x 1024)"
+    ::= { mdadmArraySyncEntry 6 }
+
+mdadmArraySyncSpeedMinBps OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "bytes/second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Configured minimum synchronisation speed.  Zero means the
+         system global minimum applies.
+         Linux: /sys/block/<mdX>/md/sync_speed_min (KiB/s x 1024);
+                'system' defers to /sys/block/md/md/sync_speed_min"
+    ::= { mdadmArraySyncEntry 7 }
+
+mdadmArraySyncSpeedMaxBps OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "bytes/second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Configured maximum synchronisation speed.  Zero means the
+         system global maximum applies.
+         Linux: /sys/block/<mdX>/md/sync_speed_max (KiB/s x 1024);
+                'system' defers to /sys/block/md/md/sync_speed_max"
+    ::= { mdadmArraySyncEntry 8 }
+
+mdadmArraySyncMin OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "sectors"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Start sector of the region to check or repair.  Only the
+         portion of the array at or above this sector is examined
+         during a check or repair operation.  Must be a multiple of
+         chunk_size.  Zero means start from the beginning.
+         Linux: /sys/block/<mdX>/md/sync_min"
+    ::= { mdadmArraySyncEntry 9 }
+
+mdadmArraySyncMax OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "sectors"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "End sector of the region to check or repair.  Only the
+         portion of the array below this sector is examined.  The
+         implementation MUST set this to 18446744073709551615
+         (0xFFFFFFFFFFFFFFFF) when the sysfs value is 'max', meaning
+         the entire array from mdadmArraySyncMin onward is in scope.
+         Linux: /sys/block/<mdX>/md/sync_max"
+    ::= { mdadmArraySyncEntry 10 }
+
+-- --------------------------------------------------------------------------
+-- Section 5: Device Metadata Table  (.11 RowCount, .12 LastChange, .13 Table)
+-- --------------------------------------------------------------------------
+
+mdadmDeviceMetaTableRowCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current number of rows in mdadmDeviceMetaTable."
+    ::= { mdadmObjects 11 }
+
+mdadmDeviceMetaTableLastChange OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ISO 8601 timestamp of the most recent row addition or removal
+         in mdadmDeviceMetaTable."
+    ::= { mdadmObjects 12 }
+
+mdadmDeviceMetaTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MdadmDeviceMetaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Member device identity and static configuration.  One row per
+         device per array.  This table changes infrequently;
+         implementations SHOULD poll it on a long interval (e.g.
+         8 hours)."
+    ::= { mdadmObjects 13 }
+
+mdadmDeviceMetaEntry OBJECT-TYPE
+    SYNTAX      MdadmDeviceMetaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Identity and configuration for one member device."
+    INDEX { mdadmArrayIndex, mdadmMemberIndex }
+    ::= { mdadmDeviceMetaTable 1 }
+
+MdadmDeviceMetaEntry ::= SEQUENCE {
+    mdadmMemberIndex        Unsigned32,
+    mdadmMemberDeviceName   DisplayString,
+    mdadmMemberDeviceUuid   DisplayString,
+    mdadmMemberSlot         Unsigned32,
+    mdadmMemberRole         MdadmDeviceRole,
+    mdadmMemberIdModel      DisplayString,
+    mdadmMemberIdSerial     DisplayString,
+    mdadmMemberSizeBytes    CounterBasedGauge64,
+    mdadmMemberOffsetBlocks CounterBasedGauge64,
+    mdadmMemberPplSector    CounterBasedGauge64,
+    mdadmMemberPplSize      CounterBasedGauge64
+}
+
+mdadmMemberIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Locally-assigned member device index within the array.  The
+         agent derives this value as a 32-bit FNV-1a hash of the
+         concatenation serial_number|model_name; when both are
+         unavailable the device kernel name is used instead.  Hash
+         collisions are resolved by linear probing.  Managers SHOULD
+         use mdadmMemberDeviceUuid or (mdadmArrayUuid, mdadmMemberSlot)
+         as stable identifiers."
+    ::= { mdadmDeviceMetaEntry 1 }
+
+mdadmMemberDeviceName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Kernel device name of the member, e.g. 'sda' or 'nvme0n1p3'.
+         Linux: device name part of /sys/block/<mdX>/md/dev-<name>/
+                symlink target"
+    ::= { mdadmDeviceMetaEntry 2 }
+
+mdadmMemberDeviceUuid OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device UUID as recorded in the mdadm superblock on this device.
+         Linux: mdadm --examine /dev/<name> (not available via sysfs)"
+    ::= { mdadmDeviceMetaEntry 3 }
+
+mdadmMemberSlot OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Slot position of this device in the array (0-based).  The
+         sentinel value 4294967295 (0xFFFFFFFF) is used when the slot
+         is not assigned, e.g. for spare devices not yet incorporated.
+         Linux: /sys/block/<mdX>/md/dev-<name>/slot ('none' -> sentinel)"
+    ::= { mdadmDeviceMetaEntry 4 }
+
+mdadmMemberRole OBJECT-TYPE
+    SYNTAX      MdadmDeviceRole
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Role of this device within the array.
+         Linux: derived from /sys/block/<mdX>/md/dev-<name>/state"
+    ::= { mdadmDeviceMetaEntry 5 }
+
+mdadmMemberIdModel OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Drive model string, e.g. 'SAMSUNG_MZ7LH960HAJR-00005'.  Empty
+         if unavailable.
+         Linux: udevadm info /dev/<name> (ID_MODEL attribute)"
+    ::= { mdadmDeviceMetaEntry 6 }
+
+mdadmMemberIdSerial OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Drive serial number.  Empty if unavailable.
+         Linux: udevadm info /dev/<name> (ID_SERIAL_SHORT attribute)"
+    ::= { mdadmDeviceMetaEntry 7 }
+
+mdadmMemberSizeBytes OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Component size of this member in bytes.
+         Linux: /sys/block/<mdX>/md/dev-<name>/size (1-KiB blocks)
+                x 1024"
+    ::= { mdadmDeviceMetaEntry 8 }
+
+mdadmMemberOffsetBlocks OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "sectors"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sector offset on the physical device where the array component
+         begins.  Data storage starts at this offset.
+         Linux: /sys/block/<mdX>/md/dev-<name>/offset (sectors)"
+    ::= { mdadmDeviceMetaEntry 9 }
+
+mdadmMemberPplSector OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "sectors"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sector offset of the Partial Parity Log (PPL) on this device.
+         PPL is used by RAID-5 with consistency_policy=ppl to reduce
+         resync time after unclean shutdown.  Zero when PPL is not
+         present on this device.
+         Linux: /sys/block/<mdX>/md/dev-<name>/ppl_sector"
+    ::= { mdadmDeviceMetaEntry 10 }
+
+mdadmMemberPplSize OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "sectors"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Allocated size of the Partial Parity Log on this device in
+         sectors.  Zero when PPL is not present on this device.
+         Linux: /sys/block/<mdX>/md/dev-<name>/ppl_size"
+    ::= { mdadmDeviceMetaEntry 11 }
+
+-- --------------------------------------------------------------------------
+-- Section 6: Device Health Table  (.14 RowCount, .15 LastChange, .16 Table)
+-- --------------------------------------------------------------------------
+
+mdadmDeviceHealthTableRowCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current number of rows in mdadmDeviceHealthTable."
+    ::= { mdadmObjects 14 }
+
+mdadmDeviceHealthTableLastChange OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ISO 8601 timestamp of the most recent row addition, removal,
+         or material content change in mdadmDeviceHealthTable."
+    ::= { mdadmObjects 15 }
+
+mdadmDeviceHealthTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MdadmDeviceHealthEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Member device health and error counters.  One row per device
+         per array.  Intended for frequent polling (e.g. 5-minute
+         interval)."
+    ::= { mdadmObjects 16 }
+
+mdadmDeviceHealthEntry OBJECT-TYPE
+    SYNTAX      MdadmDeviceHealthEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Health and error counters for one member device."
+    INDEX { mdadmArrayIndex, mdadmMemberIndex }
+    ::= { mdadmDeviceHealthTable 1 }
+
+MdadmDeviceHealthEntry ::= SEQUENCE {
+    mdadmMemberState               DisplayString,
+    mdadmMemberIsMissing           TruthValue,
+    mdadmMemberErrors              Unsigned32,
+    mdadmMemberEvents              Unsigned32,
+    mdadmMemberRecoveryStartBlocks CounterBasedGauge64,
+    mdadmMemberBadBlockCount       Unsigned32,
+    mdadmMemberUnackBadBlockCount  Unsigned32
+}
+
+mdadmMemberState OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Raw comma-separated state flag string from the md sysfs state
+         file.  Possible flags defined by the kernel: faulty, in_sync,
+         writemostly, blocked, spare, write_error, want_replacement,
+         replacement.  Use mdadmMemberRole for a normalised enumeration.
+         Linux: /sys/block/<mdX>/md/dev-<name>/state"
+    ::= { mdadmDeviceHealthEntry 1 }
+
+mdadmMemberIsMissing OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether this member device is missing from the array; i.e. the
+         slot is occupied in the array configuration but no block device
+         is present.
+         Linux: absence of /sys/block/<mdX>/md/dev-<name>/block symlink"
+    ::= { mdadmDeviceHealthEntry 2 }
+
+mdadmMemberErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Cumulative count of uncorrected read errors as tracked by the
+         md driver.  The count is approximate; the kernel increments it
+         on each read error regardless of whether the sector was
+         eventually recovered.
+         Linux: /sys/block/<mdX>/md/dev-<name>/errors"
+    ::= { mdadmDeviceHealthEntry 3 }
+
+mdadmMemberEvents OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Event counter from the mdadm superblock on this device.  The
+         kernel increments the event counter on every array state
+         transition; devices with stale (low) event counts are treated
+         as out-of-date during assembly.
+         Linux: mdadm --examine /dev/<name> (not available via sysfs)"
+    ::= { mdadmDeviceHealthEntry 4 }
+
+mdadmMemberRecoveryStartBlocks OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "sectors"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sector offset from which a rebuild of this device should
+         resume after an interruption.  Sectors below this offset are
+         already known good.  The implementation MUST set this to
+         18446744073709551615 (0xFFFFFFFFFFFFFFFF) when the sysfs
+         value is 'none', meaning the device is fully in-sync.
+         Linux: /sys/block/<mdX>/md/dev-<name>/recovery_start"
+    ::= { mdadmDeviceHealthEntry 5 }
+
+mdadmMemberBadBlockCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bad-block ranges recorded in the bad-block log on
+         this device.  A non-zero value means the device has sectors
+         that the md driver has given up trying to correct; the array
+         will avoid writing to those sectors where possible.
+         Linux: /sys/block/<mdX>/md/dev-<name>/bad_blocks (range count)"
+    ::= { mdadmDeviceHealthEntry 6 }
+
+mdadmMemberUnackBadBlockCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bad-block ranges that have been detected but not yet
+         persistently written to disk.  These bad blocks will be lost
+         if the system is powered off before they are saved.  Non-zero
+         values require immediate attention.
+         Linux: /sys/block/<mdX>/md/dev-<name>/unacknowledged_bad_blocks
+                (range count)"
+    ::= { mdadmDeviceHealthEntry 7 }
+
+-- --------------------------------------------------------------------------
+-- Notifications
+-- --------------------------------------------------------------------------
+
+mdadmArrayDegraded NOTIFICATION-TYPE
+    OBJECTS {
+        mdadmArrayName,
+        mdadmArrayState,
+        mdadmArrayDegradedCount
+    }
+    STATUS      current
+    DESCRIPTION
+        "Generated when an array transitions to a degraded state, i.e.
+         when mdadmArrayDegradedCount increases from zero."
+    ::= { mdadmNotifications 1 }
+
+mdadmArrayFailed NOTIFICATION-TYPE
+    OBJECTS {
+        mdadmArrayName,
+        mdadmArrayState
+    }
+    STATUS      current
+    DESCRIPTION
+        "Generated when an array transitions to the failed state."
+    ::= { mdadmNotifications 2 }
+
+mdadmArrayRecoveryStarted NOTIFICATION-TYPE
+    OBJECTS {
+        mdadmArrayName,
+        mdadmArraySyncAction
+    }
+    STATUS      current
+    DESCRIPTION
+        "Generated when a synchronisation operation begins, i.e. when
+         mdadmArraySyncAction transitions away from idle(0)."
+    ::= { mdadmNotifications 3 }
+
+mdadmArrayRecoveryComplete NOTIFICATION-TYPE
+    OBJECTS {
+        mdadmArrayName,
+        mdadmArraySyncLastAction
+    }
+    STATUS      current
+    DESCRIPTION
+        "Generated when a synchronisation operation completes, i.e.
+         when mdadmArraySyncAction returns to idle(0).
+         mdadmArraySyncLastAction identifies the completed operation."
+    ::= { mdadmNotifications 4 }
+
+mdadmMemberFailed NOTIFICATION-TYPE
+    OBJECTS {
+        mdadmArrayName,
+        mdadmMemberDeviceName,
+        mdadmMemberRole
+    }
+    STATUS      current
+    DESCRIPTION
+        "Generated when a member device transitions to faulty role."
+    ::= { mdadmNotifications 5 }
+
+mdadmMemberMissing NOTIFICATION-TYPE
+    OBJECTS {
+        mdadmArrayName,
+        mdadmMemberDeviceName,
+        mdadmMemberIsMissing
+    }
+    STATUS      current
+    DESCRIPTION
+        "Generated when a member device is no longer accessible."
+    ::= { mdadmNotifications 6 }
+
+mdadmMemberBadBlocks NOTIFICATION-TYPE
+    OBJECTS {
+        mdadmArrayName,
+        mdadmMemberDeviceName,
+        mdadmMemberBadBlockCount,
+        mdadmMemberUnackBadBlockCount
+    }
+    STATUS      current
+    DESCRIPTION
+        "Generated when mdadmMemberBadBlockCount or
+         mdadmMemberUnackBadBlockCount increases."
+    ::= { mdadmNotifications 7 }
+
+-- --------------------------------------------------------------------------
+-- Conformance
+-- --------------------------------------------------------------------------
+
+mdadmCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "Compliance statement for MDADM-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            mdadmMetadataGroup,
+            mdadmArrayMetaGroup,
+            mdadmArrayHealthGroup,
+            mdadmArraySyncGroup,
+            mdadmDeviceMetaGroup,
+            mdadmDeviceHealthGroup
+        }
+        GROUP mdadmNotifGroup
+            DESCRIPTION
+                "Notification support is optional.  Implementations that
+                 generate SNMP notifications MUST implement this group."
+    ::= { mdadmCompliances 1 }
+
+mdadmMetadataGroup OBJECT-GROUP
+    OBJECTS {
+        mdadmLastUpdated,
+        mdadmVersion,
+        mdadmError,
+        mdadmErrorString,
+        mdadmArrayCount,
+        mdadmDegradedArrayCount,
+        mdadmSyncingArrayCount,
+        mdadmTotalMemberCount
+    }
+    STATUS      current
+    DESCRIPTION "System-level metadata scalars."
+    ::= { mdadmGroups 1 }
+
+mdadmArrayMetaGroup OBJECT-GROUP
+    OBJECTS {
+        mdadmArrayMetaTableRowCount,
+        mdadmArrayMetaTableLastChange,
+        mdadmArrayUuid,
+        mdadmArrayName,
+        mdadmArrayRaidLevel,
+        mdadmArrayMetadataVersion,
+        mdadmArrayConsistencyPolicy,
+        mdadmArrayLayout,
+        mdadmArrayRaidDisks,
+        mdadmArraySizeBytes,
+        mdadmArraySizeBlocks,
+        mdadmArrayComponentSizeBlocks,
+        mdadmArrayChunkSize,
+        mdadmArrayBitmapType,
+        mdadmArrayBitmapLocation,
+        mdadmArrayBitmapChunksize,
+        mdadmArrayBitmapMetadata,
+        mdadmArrayLogicalBlockSize,
+        mdadmArrayResyncStart,
+        mdadmArrayReshapePosition,
+        mdadmArrayBitmapTimeBase,
+        mdadmArrayShortName,
+        mdadmArrayUris
+    }
+    STATUS      current
+    DESCRIPTION "Array identity and configuration objects."
+    ::= { mdadmGroups 2 }
+
+mdadmArrayHealthGroup OBJECT-GROUP
+    OBJECTS {
+        mdadmArrayHealthTableRowCount,
+        mdadmArrayHealthTableLastChange,
+        mdadmArrayState,
+        mdadmArrayDegradedCount,
+        mdadmArrayActiveDevices,
+        mdadmArrayWorkingDevices,
+        mdadmArraySpareDevices,
+        mdadmArrayFailedDevices,
+        mdadmArrayMismatchCount,
+        mdadmArraySafeModeMilliseconds,
+        mdadmArrayIsMounted,
+        mdadmArrayMountPoints,
+        mdadmArrayIsSwap,
+        mdadmArrayBitmapBacklog,
+        mdadmArrayBitmapMaxBacklog,
+        mdadmArrayBitmapCanClear,
+        mdadmArraySuspendLo,
+        mdadmArraySuspendHi,
+        mdadmArrayStripeCacheSize,
+        mdadmArrayStripeCacheActive,
+        mdadmArrayJournalMode
+    }
+    STATUS      current
+    DESCRIPTION "Array health and operational status objects."
+    ::= { mdadmGroups 3 }
+
+mdadmArraySyncGroup OBJECT-GROUP
+    OBJECTS {
+        mdadmArraySyncTableRowCount,
+        mdadmArraySyncTableLastChange,
+        mdadmArraySyncAction,
+        mdadmArraySyncLastAction,
+        mdadmArraySyncCompletedCentipct,
+        mdadmArraySyncDoneBytes,
+        mdadmArraySyncTotalBytes,
+        mdadmArraySyncSpeedBps,
+        mdadmArraySyncSpeedMinBps,
+        mdadmArraySyncSpeedMaxBps,
+        mdadmArraySyncMin,
+        mdadmArraySyncMax
+    }
+    STATUS      current
+    DESCRIPTION "Array synchronisation and rebuild progress objects."
+    ::= { mdadmGroups 4 }
+
+mdadmDeviceMetaGroup OBJECT-GROUP
+    OBJECTS {
+        mdadmDeviceMetaTableRowCount,
+        mdadmDeviceMetaTableLastChange,
+        mdadmMemberDeviceName,
+        mdadmMemberDeviceUuid,
+        mdadmMemberSlot,
+        mdadmMemberRole,
+        mdadmMemberIdModel,
+        mdadmMemberIdSerial,
+        mdadmMemberSizeBytes,
+        mdadmMemberOffsetBlocks,
+        mdadmMemberPplSector,
+        mdadmMemberPplSize
+    }
+    STATUS      current
+    DESCRIPTION "Member device identity and configuration objects."
+    ::= { mdadmGroups 5 }
+
+mdadmDeviceHealthGroup OBJECT-GROUP
+    OBJECTS {
+        mdadmDeviceHealthTableRowCount,
+        mdadmDeviceHealthTableLastChange,
+        mdadmMemberState,
+        mdadmMemberIsMissing,
+        mdadmMemberErrors,
+        mdadmMemberEvents,
+        mdadmMemberRecoveryStartBlocks,
+        mdadmMemberBadBlockCount,
+        mdadmMemberUnackBadBlockCount
+    }
+    STATUS      current
+    DESCRIPTION "Member device health and error counter objects."
+    ::= { mdadmGroups 6 }
+
+mdadmNotifGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        mdadmArrayDegraded,
+        mdadmArrayFailed,
+        mdadmArrayRecoveryStarted,
+        mdadmArrayRecoveryComplete,
+        mdadmMemberFailed,
+        mdadmMemberMissing,
+        mdadmMemberBadBlocks
+    }
+    STATUS      current
+    DESCRIPTION "Array and member device event notifications."
+    ::= { mdadmGroups 7 }
+
+END
