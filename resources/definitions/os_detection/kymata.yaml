@@ -50,6 +50,7 @@ discovery_modules:
     ntp: false
     services: false
 over:
+    - { graph: device_dbm, text: 'Tx Power' }
 discovery:
     -
         sysObjectID:
