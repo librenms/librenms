@@ -6,6 +6,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Secrets\SecretData;
 
 class UpdatePollingMethodRequest extends FormRequest
 {
@@ -45,7 +46,7 @@ class UpdatePollingMethodRequest extends FormRequest
         ];
 
         if ($type->hasSecret() && $this->has('secret_data')) {
-            /** @var class-string<\App\LibreNMS\Polling\Secrets\SecretData> $secretClass */
+            /** @var class-string<SecretData> $secretClass */
             $secretClass = $type->secretClass();
             $rules = [
                 ...$rules,
