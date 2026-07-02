@@ -31,7 +31,14 @@
 {{-- Thumbnail row: always a single centered row. Each thumbnail grows up to its
      normal rendered width (--thumb-w) and shrinks no smaller than 60% of it; once
      even that no longer fits, the row scrolls horizontally instead of wrapping. --}}
-<div class="thumb-scroll tw:flex tw:overflow-x-auto tw:scroll-px-2">
+<div id="period-thumbs"
+     class="tw:flex tw:overflow-x-auto tw:scroll-px-2 tw:pb-2
+            tw:[scrollbar-width:auto] tw:[scrollbar-color:rgb(107_114_128_/_0.9)_transparent] tw:dark:[scrollbar-color:rgb(172_182_191_/_0.8)_transparent]
+            tw:[&::-webkit-scrollbar]:h-5
+            tw:[&::-webkit-scrollbar-track]:bg-transparent
+            tw:[&::-webkit-scrollbar-thumb]:rounded-full tw:[&::-webkit-scrollbar-thumb]:border-4 tw:[&::-webkit-scrollbar-thumb]:border-transparent tw:[&::-webkit-scrollbar-thumb]:bg-clip-content
+            tw:[&::-webkit-scrollbar-thumb]:bg-gray-500 tw:[&::-webkit-scrollbar-thumb:hover]:bg-gray-600
+            tw:dark:[&::-webkit-scrollbar-thumb]:bg-dark-white-400/85 tw:dark:[&::-webkit-scrollbar-thumb:hover]:bg-dark-white-200">
 <div class="tw:mx-auto tw:flex tw:flex-nowrap tw:gap-1">
 @foreach ($periodThumbs as $thumb)
     <a href="{{ $thumb['link'] }}"
@@ -49,6 +56,15 @@
 @endforeach
 </div>
 </div>
+{{-- Runs synchronously as the parser reaches it (before first paint), so the active
+     period is already in view with no visible scroll jump. Image width/height attrs
+     mean layout is correct even before the thumbnails load. --}}
+<script>
+    (function () {
+        var active = document.getElementById('period-thumbs')?.querySelector('[aria-current="true"]');
+        if (active) active.scrollIntoView({ block: 'nearest', inline: 'center' });
+    })();
+</script>
 @endunless
 
 <div class="tw:w-[48ch] tw:max-w-full tw:mx-auto tw:mt-3 tw:mb-2">
@@ -145,39 +161,4 @@
         }
     });
 </script>
-@endpush
-
-@push('styles')
-<style>
-    /* Horizontal scroll strip (graph period thumbnails): keep a normal-width,
-       grabbable bar with an always-visible thumb in both light and dark mode. */
-    .thumb-scroll {
-        scrollbar-width: auto;
-        scrollbar-color: rgb(107 114 128 / 0.7) transparent; /* gray-500 thumb */
-    }
-    .thumb-scroll::-webkit-scrollbar {
-        height: 20px;
-    }
-    .thumb-scroll::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    .thumb-scroll::-webkit-scrollbar-thumb {
-        background-color: rgb(107 114 128 / 0.7); /* gray-500 */
-        border-radius: 9999px;
-        border: 4px solid transparent; /* visible thumb ~12px; transparent inset keeps it off the track edges */
-        background-clip: content-box;
-    }
-    .thumb-scroll::-webkit-scrollbar-thumb:hover {
-        background-color: rgb(75 85 99 / 0.9); /* gray-600 */
-    }
-    .dark .thumb-scroll {
-        scrollbar-color: rgb(172 182 191 / 0.6) transparent; /* dark-white-400 thumb */
-    }
-    .dark .thumb-scroll::-webkit-scrollbar-thumb {
-        background-color: rgb(172 182 191 / 0.6);
-    }
-    .dark .thumb-scroll::-webkit-scrollbar-thumb:hover {
-        background-color: rgb(200 200 200 / 0.85); /* dark-white-200 */
-    }
-</style>
 @endpush
