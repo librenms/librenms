@@ -44,6 +44,16 @@ enum PollingMethodType: string
         return $this->secretClass() !== null;
     }
 
+    public function icon(): string
+    {
+        return match ($this) {
+            self::Snmp => 'fa-server',
+            self::Icmp => 'fa-exchange',
+            self::Ipmi => 'fa-microchip',
+            self::UnixAgent => 'fa-terminal',
+        };
+    }
+
     /**
      * @param array<string, array> $schema
      * @return array

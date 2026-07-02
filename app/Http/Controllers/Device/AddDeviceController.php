@@ -42,6 +42,7 @@ class AddDeviceController
             return [
                 'type' => $type->value,
                 'label' => __('poller.methods.' . $type->value),
+                'icon' => $type->icon(),
                 'schema_fields' => $schemaFields,
                 'schema_defaults' => collect($schema)->mapWithKeys(
                     fn (array $field, string $key): array => [
@@ -63,6 +64,7 @@ class AddDeviceController
             'default_poller_group' => LibrenmsConfig::get('default_poller_group', 0),
             'port_association_modes' => PortAssociationMode::getModes(),
             'default_port_association_mode' => LibrenmsConfig::get('default_port_association_mode', 'ifIndex'),
+            'oldActiveMethods' => old('active_methods', ['snmp', 'icmp']),
         ]);
     }
 

@@ -5,15 +5,6 @@
         <x-device.edit-tabs :device="$device" />
 
         @if($configuredMethods->isNotEmpty())
-            @php
-                $allMethods = $configuredMethods->concat($unconfiguredMethods);
-                $icons = [
-                    'snmp' => 'fa-server',
-                    'icmp' => 'fa-exchange',
-                    'ipmi' => 'fa-microchip',
-                    'unix-agent' => 'fa-terminal',
-                ];
-            @endphp
             <div
                 x-data="pollingTabs('{{ request('tab') }}', @js($configuredMethods->pluck('type')->values()), '{{ $configuredMethods->first()["type"] }}', @js($allMethods->mapWithKeys(fn($m) => [$m['type'] => ['enabled' => (bool)$m['enabled'], 'affectsAvailability' => (bool)$m['affects_availability'], 'credential_mode' => 'existing', 'formData' => $m['schema_defaults'] ?? [], 'settingsData' => $m['settings'] ?? []]])), {{ $errors->any() ? 'true' : 'false' }}, @js($unconfiguredMethods->map(fn($m) => ['type' => $m['type'], 'label' => $m['label']])->values()))"
                 class="tw:flex tw:flex-col tw:md:flex-row tw:gap-6 tw:mt-6"
@@ -29,7 +20,7 @@
                                 <button type="button" @click="activeTab = '{{ $method["type"] }}'"
                                         :class="activeTab === '{{ $method["type"] }}' ? 'tw:text-white!' : 'tw:text-gray-700 tw:dark:text-dark-white-200'"
                                         class="tw:flex-1 tw:text-left tw:px-4 tw:py-3 tw:font-medium tw:transition-colors tw:flex tw:items-center">
-                                    <i class="fa fa-fw {{ $icons[$method['type']] ?? 'fa-circle-o' }} tw:mr-2"></i>
+                                    <i class="fa fa-fw {{ $method['icon'] }} tw:mr-2"></i>
                                     {{ $method['label'] }}
                                 </button>
                                 @if($method['configured'])
