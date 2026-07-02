@@ -2,12 +2,12 @@
 
 namespace App\Console\Commands;
 
-use App\Actions\Device\DeviceIcmpIsAvailable;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
 use App\Jobs\PingCheck;
 use App\Models\Device;
 use Illuminate\Support\Arr;
+use LibreNMS\Data\Source\Icmp\Fping;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -32,7 +32,7 @@ class DevicePing extends LnmsCommand
      *
      * @return int
      */
-    public function handle(DeviceIcmpIsAvailable $deviceIsPingable): int
+    public function handle(Fping $fping): int
     {
         $spec = $this->argument('device spec');
 
@@ -65,7 +65,11 @@ class DevicePing extends LnmsCommand
 
         /** @var Device $device */
         foreach ($devices as $device) {
-            $response = $deviceIsPingable->execute($device);
+            $response = $fping->ping($device->pollerTarget(), $device->ipFamily());
+            if ($response->duplicates > 0 && $device->exists) {
+                \App\Models\Eventlog::log('Duplicate ICMP response detected! This could indicate a network issue.', $device, 'icmp', \LibreNMS\Enum\Severity::Warning);
+                $response->ignoreFailure();
+            }
 
             $this->line($device->displayName() . ' : ' . ($response->wasSkipped() ? 'skipped' : $response));
         }

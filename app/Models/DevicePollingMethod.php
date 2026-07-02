@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Interfaces\PollingMethod;
+use LibreNMS\Polling\PollingMethodFactory;
 
 class DevicePollingMethod extends Model
 {
@@ -27,6 +29,11 @@ class DevicePollingMethod extends Model
         'last_checked_at' => 'datetime',
         'last_check_successful' => 'boolean',
     ];
+
+    public function toPollingMethod(): PollingMethod
+    {
+        return app(PollingMethodFactory::class)->make($this);
+    }
 
     /** @return BelongsTo<Device, $this> */
     public function device(): BelongsTo

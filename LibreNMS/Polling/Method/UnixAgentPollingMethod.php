@@ -3,9 +3,11 @@
 namespace LibreNMS\Polling\Method;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\PollingMethod;
+use LibreNMS\Util\Rewrite;
 
 readonly class UnixAgentPollingMethod implements PollingMethod
 {
@@ -14,6 +16,29 @@ readonly class UnixAgentPollingMethod implements PollingMethod
         public bool $affectsAvailability,
         public int $port,
     ) {}
+
+    public function isAvailable(Device $device, bool $commit = false): bool
+    {
+        $agent_port = $device->getAttrib('override_Unixagent_port');
+        if (empty($agent_port)) {
+            $agent_port = LibrenmsConfig::get('unix-agent.port');
+        }
+
+        $poller_target = Rewrite::addIpv6Brackets($device->pollerTarget());
+        $timeout = LibrenmsConfig::get('unix-agent.connection-timeout', 10);
+
+        try {
+            $agent = @fsockopen($poller_target, (int) $agent_port, $errno, $errstr, $timeout);
+            if ($agent) {
+                fclose($agent);
+                return true;
+            }
+        } catch (\Throwable) {
+            // return false
+        }
+
+        return false;
+    }
 
     public static function fromModel(DevicePollingMethod $method): self
     {
