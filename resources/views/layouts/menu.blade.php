@@ -782,6 +782,21 @@
         </div>
 </nav>
 
+<style>
+    /* On mobile, put the global search at the top of the collapsed menu.
+       Scoped to the open (.in/.collapsing) state so the collapse toggle still works. */
+    @media (max-width: 767px) {
+        #navHeaderCollapse.in,
+        #navHeaderCollapse.collapsing {
+            display: flex;
+            flex-direction: column;
+        }
+        #navHeaderCollapse .global-search {
+            order: -1;
+        }
+    }
+</style>
+
 <script>
     document.addEventListener('alpine:init', () => {
         window.Alpine.data('globalSearch', () => ({
