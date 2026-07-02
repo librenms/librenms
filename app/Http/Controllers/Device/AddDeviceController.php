@@ -36,7 +36,7 @@ class AddDeviceController
         $availableMethods = collect(PollingMethodType::cases())->map(function (PollingMethodType $type): array {
             $methodClass = $type->methodClass();
             $schema = $type->hasSecret() ? $type->secretClass()::getUiSchema() : [];
-            $schemaFields = PollingMethodType::buildSchemaFields($schema);
+            $schemaFields = PollingMethodType::buildSchemaFields($schema, "methods['" . $type->value . "'].formData");
             $settingsSchema = $methodClass::getSettingsSchema();
 
             return [
@@ -48,7 +48,7 @@ class AddDeviceController
                         $key => $field['default'] ?? (isset($field['options']) ? array_key_first($field['options']) : ''),
                     ]
                 )->all(),
-                'settings_fields' => PollingMethodType::buildSchemaFields($settingsSchema, 'settingsData'),
+                'settings_fields' => PollingMethodType::buildSchemaFields($settingsSchema, "methods['" . $type->value . "'].settingsData"),
             ];
         });
 

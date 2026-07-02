@@ -1,5 +1,3 @@
-<h3 class="tw:text-xl tw:font-semibold tw:mb-6 tw:text-gray-800 tw:dark:text-dark-white-100 tw:border-b tw:pb-3 tw:dark:border-dark-gray-400">{{ __('Add Polling Type') }}</h3>
-
 @if($unconfiguredMethods->isEmpty())
     <div class="tw:bg-blue-50 tw:text-blue-800 tw:p-4 tw:rounded-lg tw:border tw:border-blue-200 tw:dark:bg-transparent tw:dark:text-blue-300 tw:dark:border-dark-gray-400">
         <i class="fa fa-info-circle tw:mr-2"></i> {{ __('All available polling types are already configured for this device.') }}
@@ -25,7 +23,7 @@
         {{-- Step 1: Pick a polling type --}}
         <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-6 tw:mb-6 tw:max-w-2xl">
             <label class="tw:block tw:font-medium tw:mb-2 tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Polling Type') }}</label>
-            <select name="method_type" x-model="methodType" class="form-control @error('method_type') tw:border-red-500 @enderror" required>
+            <select name="method_type" x-model="methodType" class="form-control tw:rounded-lg tw:border-gray-200 tw:bg-white tw:dark:border-dark-gray-400 tw:dark:bg-dark-gray-500 tw:dark:text-white @error('method_type') tw:border-red-500 @enderror" required>
                 <option value="">{{ __('Select a polling type...') }}</option>
                 @foreach($unconfiguredMethods as $method)
                     <option value="{{ $method['type'] }}">{{ $method['label'] }}</option>
@@ -202,9 +200,11 @@
         @endforeach
 
         {{-- Submit — only shown once a type is selected --}}
-        <div x-show="methodType !== ''" style="display: none;" class="tw:mt-6 tw:pt-6 tw:border-t tw:border-gray-200 tw:dark:border-dark-gray-400">
-            <button type="submit" class="btn btn-success tw:bg-[#449d44] tw:hover:bg-[#357a35] tw:border-[#449d44]">
-                <i class="fa fa-plus tw:mr-1"></i> {{ __('Add Polling Type') }}
+        <div x-show="methodType !== ''" style="display: none;" class="tw:mt-6 tw:pt-6 tw:border-t tw:border-gray-200 tw:dark:border-dark-gray-400" x-data="{ loading: false }">
+            <button type="submit" :disabled="loading" class="btn btn-success tw:bg-emerald-600 tw:hover:bg-emerald-700 tw:border-emerald-600" @click="loading = true">
+                <template x-if="loading"><i class="fa fa-spinner fa-spin tw:mr-1"></i></template>
+                <template x-if="!loading"><i class="fa fa-plus tw:mr-1"></i></template>
+                {{ __('Add Polling Type') }}
             </button>
         </div>
     </form>
