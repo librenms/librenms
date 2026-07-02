@@ -63,7 +63,7 @@ class PortsStack implements Module
      */
     public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
