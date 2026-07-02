@@ -188,12 +188,12 @@
                                                     <input type="checkbox" name="polling_methods[{{ $method['type'] }}][validate]"
                                                            value="1" class="tw:sr-only"
                                                            x-model="methods['{{ $method['type'] }}'].validate">
-                                                    <div class="tw:block tw:w-16 tw:h-9 tw:rounded-full tw:transition-colors tw:duration-200"
+                                                    <div class="tw:block tw:w-12 tw:h-7 tw:rounded-full tw:transition-colors tw:duration-200"
                                                          :class="methods['{{ $method['type'] }}'].validate ? 'tw:bg-[#337ab7]' : 'tw:bg-gray-300 tw:dark:bg-dark-gray-400'"></div>
-                                                    <div class="tw:absolute tw:left-1 tw:top-1 tw:w-7 tw:h-7 tw:rounded-full tw:transition-transform tw:duration-200 tw:bg-white tw:shadow-sm"
-                                                         :class="methods['{{ $method['type'] }}'].validate ? 'tw:translate-x-7' : 'tw:translate-x-0'"></div>
+                                                    <div class="tw:absolute tw:left-0.5 tw:top-0.5 tw:w-6 tw:h-6 tw:rounded-full tw:transition-transform tw:duration-200 tw:bg-white tw:shadow-sm"
+                                                         :class="methods['{{ $method['type'] }}'].validate ? 'tw:translate-x-5' : 'tw:translate-x-0'"></div>
                                                 </div>
-                                                <span class="tw:ml-4 tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Validate on add') }}</span>
+                                                <span class="tw:ml-3 tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Validate on add') }}</span>
                                             </label>
 
                                             {{-- Affects Availability toggle --}}
@@ -203,12 +203,12 @@
                                                     <input type="checkbox" name="polling_methods[{{ $method['type'] }}][affects_availability]"
                                                            value="1" class="tw:sr-only"
                                                            x-model="methods['{{ $method['type'] }}'].affects_availability">
-                                                    <div class="tw:block tw:w-16 tw:h-9 tw:rounded-full tw:transition-colors tw:duration-200"
+                                                    <div class="tw:block tw:w-12 tw:h-7 tw:rounded-full tw:transition-colors tw:duration-200"
                                                          :class="methods['{{ $method['type'] }}'].affects_availability ? 'tw:bg-[#337ab7]' : 'tw:bg-gray-300 tw:dark:bg-dark-gray-400'"></div>
-                                                    <div class="tw:absolute tw:left-1 tw:top-1 tw:w-7 tw:h-7 tw:rounded-full tw:transition-transform tw:duration-200 tw:bg-white tw:shadow-sm"
-                                                         :class="methods['{{ $method['type'] }}'].affects_availability ? 'tw:translate-x-7' : 'tw:translate-x-0'"></div>
+                                                    <div class="tw:absolute tw:left-0.5 tw:top-0.5 tw:w-6 tw:h-6 tw:rounded-full tw:transition-transform tw:duration-200 tw:bg-white tw:shadow-sm"
+                                                         :class="methods['{{ $method['type'] }}'].affects_availability ? 'tw:translate-x-5' : 'tw:translate-x-0'"></div>
                                                 </div>
-                                                <span class="tw:ml-4 tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('poller.affects_availability') }}</span>
+                                                <span class="tw:ml-3 tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('poller.affects_availability') }}</span>
                                             </label>
                                         </div>
                                     </div>
@@ -298,10 +298,18 @@
                                                                     @endforeach
                                                                 </select>
                                                             @elseif($field['field_type'] === 'password')
-                                                                <input type="password"
-                                                                       name="polling_methods[{{ $method['type'] }}][secret_data][{{ $field['key'] }}]"
-                                                                       class="form-control"
-                                                                       autocomplete="new-password">
+                                                                 <div class="input-group tw:w-full">
+                                                                     <input type="password"
+                                                                            id="secret_{{ $method['type'] }}_{{ $field['key'] }}"
+                                                                            name="polling_methods[{{ $method['type'] }}][secret_data][{{ $field['key'] }}]"
+                                                                            class="form-control"
+                                                                            autocomplete="new-password">
+                                                                     <span class="input-group-btn">
+                                                                         <button type="button" class="btn btn-default btn-toggle-password" onclick="togglePasswordVisibility('secret_{{ $method['type'] }}_{{ $field['key'] }}', this)" title="{{ __('Show/hide') }}">
+                                                                             <i class="fa fa-eye-slash"></i>
+                                                                         </button>
+                                                                     </span>
+                                                                 </div>
                                                             @else
                                                                 <input type="text"
                                                                        name="polling_methods[{{ $method['type'] }}][secret_data][{{ $field['key'] }}]"
@@ -391,3 +399,21 @@
         </x-panel>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        function togglePasswordVisibility(inputId, btn) {
+            var input = document.getElementById(inputId);
+            var icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        }
+    </script>
+@endpush
