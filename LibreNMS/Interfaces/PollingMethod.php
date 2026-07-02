@@ -2,8 +2,15 @@
 
 namespace LibreNMS\Interfaces;
 
+use App\Models\Device;
+
 interface PollingMethod
 {
+    /**
+     * Check if the polling method is available/reachable for the device.
+     */
+    public function isAvailable(Device $device, bool $commit = false): bool;
+
     /**
      * UI/form schema for device-specific settings.
      * @return array<string, array{type: string, options?: array<string,string>, visible_if: array}>
