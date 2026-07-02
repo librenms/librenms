@@ -1024,6 +1024,7 @@ class Cisco extends OS implements
         ])->table(1);
 
         // Hash Table indexed by vlans and ifIndexes
+        $isNative = [];
         foreach ($native_vlans_raw as $ifindex => $data) {
             // Only returns 'untagged' vlan for each port (either access ports, or native vlan of a trunk)
             // stored for use in below loop
@@ -1038,14 +1039,14 @@ class Cisco extends OS implements
             // leave the XmitJoined extension objects empty, which drops VLANs above 1023.
             // Fall back to the VlansEnabled extension when that happens.
             foreach ([
-                ['', -1],
-                ['2k', 1023],
-                ['3k', 2047],
-                ['4k', 3071],
-            ] as [$suffix, $offset]) {
+                ['', -1, false],
+                ['2k', 1023, true],
+                ['3k', 2047, true],
+                ['4k', 3071, true],
+            ] as [$suffix, $offset, $allowFallback]) {
                 $vlanBits = $data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined' . $suffix] ?? '';
 
-                if ($vlanBits === '') {
+                if ($allowFallback && $vlanBits === '') {
                     $vlanBits = $data['CISCO-VTP-MIB::vlanTrunkPortVlansEnabled' . $suffix] ?? '';
                 }
 
