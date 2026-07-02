@@ -121,17 +121,21 @@ foreach ($counter as $stat) {
     }
 }
 
-$tags['rrd_def'] = $single_counter_rrd_def;
 foreach ($counter as $stat) {
-    if (! is_null($source[$stat])) {
+    if (! is_null($data['global'][$stat]['max'])) {
         $tags['rrd_name'] = ['app', $name, $app->app_id, 'global_-_'.$stat];
         $stats_fields = [
-            'data' => $source[$stat],
+            'max' => $data['global'][$stat]['max'],
+            'mean' => $data['global'][$stat]['mean'],
+            'median' => $data['global'][$stat]['median'],
+            'min' => $data['global'][$stat]['min'],
+            'mode' => $data['global'][$stat]['mode'],
+            'sum' => $data['global'][$stat]['sum'],
         ];
         app('Datastore')->put($device, 'app', $tags, $stats_fields);
-        $app_data['sources'][$source_name][$stat] = true;
+        $app_data['global'][$stat] = true;
     } else {
-        $app_data['sources'][$source_name][$stat] = false;
+        $app_data['global'][$stat] = false;
     }
 }
 
@@ -177,7 +181,7 @@ foreach ($data['sources'] as $source_name => $source) {
     }
 
     $tags['rrd_def'] = $single_counter_rrd_def;
-    foreach ($counter as $stat) {
+    foreach ($single_counter as $stat) {
         if (! is_null($source[$stat])) {
             $tags['rrd_name'] = ['app', $name, $app->app_id, 'source_-_'.$stat.'_-_'.$source_name];
             $stats_fields = [
