@@ -2,6 +2,7 @@
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Graphing\GraphParameters;
 use LibreNMS\Enum\ImageFormat;
@@ -58,7 +59,7 @@ try {
     }
 
     // check after auth
-    if (isset($vars['device']) && $device->exists === false) {
+    if (isset($vars['device']) && $device instanceof Device && $device->exists === false) {
         throw new \LibreNMS\Exceptions\RrdGraphException('Device not found');
     }
 
