@@ -81,7 +81,7 @@ $single_counter = [
     'dropped',
     'processed',
     'queued',
-]
+];
 
 $tags['rrd_def'] = $gauge_rrd_def;
 foreach ($gauge as $stat) {
