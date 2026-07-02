@@ -48,6 +48,7 @@ use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\RealtimeDataController;
 use App\Http\Controllers\RealtimeGraphController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SecretController;
 use App\Http\Controllers\Select;
 use App\Http\Controllers\SensorController;
 use App\Http\Controllers\ServiceController;
@@ -116,8 +117,8 @@ Route::middleware(['auth'])->group(function (): void {
         Route::delete('{poller}', [PollerController::class, 'destroy'])->name('poller.destroy');
         Route::delete('cluster/{poller_cluster}', [PollerController::class, 'destroyCluster'])->name('poller-cluster.destroy');
     });
-    Route::delete('ports/purge', [\App\Http\Controllers\PortsController::class, 'purge'])->name('ports.purge');
-    Route::get('ports/{view?}/{graph?}', [\App\Http\Controllers\PortsController::class, 'index'])
+    Route::delete('ports/purge', [App\Http\Controllers\PortsController::class, 'purge'])->name('ports.purge');
+    Route::get('ports/{view?}/{graph?}', [App\Http\Controllers\PortsController::class, 'index'])
         ->middleware('saved-filter:ports')->name('ports');
     Route::prefix('services')->name('services.')->group(function (): void {
         Route::resource('templates', ServiceTemplateController::class);
@@ -148,6 +149,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::post('bill', [UserPermissionsController::class, 'attachBill'])->name('bill.attach');
         Route::delete('bill/{bill}', [UserPermissionsController::class, 'detachBill'])->name('bill.detach')->whereNumber('bill');
     });
+    Route::resource('secrets', SecretController::class)->except(['show']);
     Route::get('about', [AboutController::class, 'index'])->name('about');
     Route::delete('reporting', [AboutController::class, 'clearReportingData'])->name('reporting.clear');
     Route::get('authlog', [AuthLogController::class, 'index'])->name('auth-log');
@@ -158,6 +160,9 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('nac', [NacController::class, 'index']);
 
     // Device Tabs
+    Route::get('/device/add', [Device\AddDeviceController::class, 'index'])->name('device.add');
+    Route::post('/device/add', [Device\AddDeviceController::class, 'store'])->name('device.add.store');
+    Route::redirect('/addhost', '/device/add');
     Route::get('/device/{device}/edit', [Device\EditDeviceController::class, 'index'])->name('device.edit');
     Route::put('/device/{device}/edit', [Device\EditDeviceController::class, 'update'])->name('device.edit.update');
     Route::get('/device/{device}/edit/health', [Device\EditHealthController::class, 'index'])->name('device.edit.health');
@@ -166,6 +171,10 @@ Route::middleware(['auth'])->group(function (): void {
     Route::post('/device/{device}/edit/health/sensor/{sensor}/alert', [Device\EditHealthController::class, 'updateAlert'])->name('device.edit.health.sensor.alert')->scopeBindings();
     Route::get('/device/{device}/edit/misc', [Device\EditMiscController::class, 'index'])->name('device.edit.misc');
     Route::put('/device/{device}/edit/misc', [Device\EditMiscController::class, 'update'])->name('device.edit.misc.update');
+    Route::get('/device/{device}/edit/polling', [Device\EditPollingController::class, 'index'])->name('device.edit.polling');
+    Route::post('/device/{device}/edit/polling', [Device\EditPollingController::class, 'store'])->name('device.edit.polling.store');
+    Route::put('/device/{device}/edit/polling/{methodType}', [Device\EditPollingController::class, 'update'])->name('device.edit.polling.update');
+    Route::delete('/device/{device}/edit/polling/{methodType}', [Device\EditPollingController::class, 'destroy'])->name('device.edit.polling.destroy');
     Route::post('/device/{device}/rediscover', [DeviceController::class, 'rediscover'])->name('device.rediscover');
 
     Route::get('/device/delete', [DeviceController::class, 'deleteIndex'])->name('device.delete');
@@ -333,6 +342,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('graph-aggregate', Select\GraphAggregateController::class)->name('ajax.select.graph-aggregate');
             Route::get('graylog-streams', Select\GraylogStreamsController::class)->name('ajax.select.graylog-streams');
             Route::get('inventory', Select\InventoryController::class)->name('ajax.select.inventory');
+            Route::get('secret', Select\SecretController::class)->name('ajax.select.secret');
             Route::get('syslog', Select\SyslogController::class)->name('ajax.select.syslog');
             Route::get('location', Select\LocationController::class)->name('ajax.select.location');
             Route::get('munin', Select\MuninPluginController::class)->name('ajax.select.munin');

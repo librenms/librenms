@@ -40,7 +40,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\FpingResponse;
-use LibreNMS\Enum\AvailabilitySource;
+use LibreNMS\Enum\PollingMethodType;
 
 class PingCheck implements ShouldQueue
 {
@@ -144,6 +144,7 @@ class PingCheck implements ShouldQueue
         $query = Device::canPing()
             ->select(['devices.device_id', 'hostname', 'overwrite_ip', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken'])
             ->with([
+                'pollingMethods',
                 'parents' => function ($q): void {
                     $q->canPing()->select('devices.device_id');
                 },
@@ -184,8 +185,19 @@ class PingCheck implements ShouldQueue
             }
         }
 
+        // update ICMP polling method state
+        $icmpMethod = $device->getPollingMethod(PollingMethodType::Icmp);
+        if ($icmpMethod !== null) {
+            $icmpMethod->last_check_successful = $response->isAlive();
+            $icmpMethod->last_checked_at = now();
+            $icmpMethod->save();
+        }
+
         // mark up only if snmp is not down too
-        $changed = app(SetDeviceAvailability::class)->execute($device, $response->isAlive(), AvailabilitySource::Icmp, true);
+        $changed = app(SetDeviceAvailability::class)->execute($device, true);
+
+        // save last_ping_timetaken and rrd data
+        $response->saveStats($device);
 
         // mark as processed
         $this->processed->put($device->device_id, true);

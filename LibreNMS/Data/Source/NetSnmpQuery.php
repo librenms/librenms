@@ -317,54 +317,28 @@ class NetSnmpQuery implements SnmpQueryInterface
             return array_merge($cmd, $this->options, $oids);
         }
 
-        // authentication
-        $this->buildAuth($cmd);
+        // authentication & settings
+        $snmp = $this->device->getPollingMethods()->snmp();
+        $auth = $snmp->toNetSnmpOptions($this->context);
 
-        $cmd = array_merge($cmd, $this->options);
+        $cmd = array_merge($cmd, $auth, $this->options);
 
-        $timeout = $this->device->timeout ?? LibrenmsConfig::get('snmp.timeout');
+        $timeout = $snmp->timeout;
         if ($timeout && $timeout !== 1) {
             array_push($cmd, '-t', $timeout);
         }
 
-        $retries = $this->device->retries ?? LibrenmsConfig::get('snmp.retries');
+        $retries = $snmp->retries;
         if ($retries && $retries !== 5) {
             array_push($cmd, '-r', $retries);
         }
 
         $hostname = Rewrite::addIpv6Brackets((string) ($this->device->overwrite_ip ?: $this->device->hostname));
-        $cmd[] = ($this->device->transport ?? 'udp') . ':' . $hostname . ':' . $this->device->port;
+        $cmd[] = $snmp->transport . ':' . $hostname . ':' . $snmp->port;
 
         return array_merge($cmd, $oids);
     }
 
-    private function buildAuth(array &$cmd): void
-    {
-        if ($this->device->snmpver === 'v3') {
-            array_push($cmd, '-v3', '-l', $this->device->authlevel);
-            array_push($cmd, '-n', $this->context);
-
-            switch (strtolower((string) $this->device->authlevel)) {
-                case 'authpriv':
-                    array_push($cmd, '-x', $this->device->cryptoalgo);
-                    array_push($cmd, '-X', $this->device->cryptopass);
-                    // fallthrough
-                case 'authnopriv':
-                    array_push($cmd, '-a', $this->device->authalgo);
-                    array_push($cmd, '-A', $this->device->authpass);
-                    // fallthrough
-                case 'noauthnopriv':
-                    array_push($cmd, '-u', $this->device->authname ?: 'root');
-                    break;
-                default:
-                    Log::debug("Unsupported SNMPv3 AuthLevel: {$this->device->snmpver}");
-            }
-        } elseif ($this->device->snmpver === 'v2c' || $this->device->snmpver === 'v1') {
-            array_push($cmd, '-' . $this->device->snmpver, '-c', $this->context ? "{$this->device->community}@$this->context" : $this->device->community);
-        } else {
-            Log::debug("Unsupported SNMP Version: {$this->device->snmpver}");
-        }
-    }
 
     private function execMultiple(string $command, array $oids): SnmpResponse
     {
@@ -441,14 +415,16 @@ class NetSnmpQuery implements SnmpQueryInterface
                 $this->allowUnordered();
             }
 
+            $snmp = $this->device->getPollingMethods()->snmp();
+
             // handle bulk settings
-            if ($this->device->snmpver !== 'v1'
+            if ($snmp->version !== 'v1'
                 && LibrenmsConfig::getOsSetting($this->device->os, 'snmp_bulk', true)
                 && empty(array_intersect($oids, LibrenmsConfig::getCombined($this->device->os, 'oids.no_bulk', 'snmp.'))) // skip for oids that do not work with bulk
             ) {
                 $snmpcmd = [LibrenmsConfig::get('snmpbulkwalk', 'snmpbulkwalk')];
 
-                $max_repeaters = $this->device->getAttrib('snmp_max_repeaters') ?: LibrenmsConfig::getOsSetting($this->device->os, 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', false));
+                $max_repeaters = $snmp->maxRepeaters;
                 if ($max_repeaters > 0) {
                     $snmpcmd[] = "-Cr$max_repeaters";
                 }
@@ -525,7 +501,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     private function limitOids(array $oids): array
     {
         // get max oids per query device attrib > os setting > global setting
-        $configured_max = $this->device->getAttrib('snmp_max_oid') ?: LibrenmsConfig::getOsSetting($this->device->os, 'snmp_max_oid', LibrenmsConfig::get('snmp.max_oid', 10));
+        $configured_max = $this->device->getPollingMethods()->snmp()->maxOid;
         $max_oids = max($configured_max, 1); // 0 or less would break things.
 
         if (count($oids) > $max_oids) {
@@ -545,6 +521,6 @@ class NetSnmpQuery implements SnmpQueryInterface
         $oids = implode(',', $oids);
         $options = implode(',', $this->options);
 
-        return "$type|{$this->device->hostname}|{$this->device->community}|$this->context|$oids|$options";
+        return "$type|{$this->device->hostname}|{$this->device->getPollingMethods()->snmp()->community}|$this->context|$oids|$options";
     }
 }

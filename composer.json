@@ -64,7 +64,7 @@
         "friendsofphp/php-cs-fixer": "^3.66",
         "fruitcake/laravel-debugbar": "^4.1",
         "larastan/larastan": "^3.1",
-        "laravel/boost": "^2.0",
+        "laravel/boost": "^2.4",
         "laravel/dusk": "^8.2.2",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",

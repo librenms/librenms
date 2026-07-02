@@ -18,6 +18,7 @@
 
 use App\Facades\LibrenmsConfig;
 use App\Polling\Measure\Measurement;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Rewrite;
 
@@ -166,12 +167,13 @@ function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir 
  */
 function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdir = null)
 {
-    if (! isset($device['transport'])) {
-        $device['transport'] = 'udp';
-    }
+    $deviceModel = DeviceCache::get($device['device_id']);
 
-    $cmd = snmp_gen_auth($device, $cmd);
-    $cmd = $options ? array_merge($cmd, (array) $options) : $cmd;
+    // $device is not persisted to the db, fill in the data
+    $snmpMethod = $deviceModel->getPollingMethods()->snmp();
+
+    $cmd = array_merge($cmd, $snmpMethod->toNetSnmpOptions($device['context_name'] ?? null), Arr::wrap($options));
+
     if ($mib) {
         array_push($cmd, '-m', $mib);
     }
@@ -188,7 +190,8 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
     }
 
     $pollertarget = Rewrite::addIpv6Brackets(DeviceCache::get($device['device_id'])->pollerTarget());
-    $cmd[] = $device['transport'] . ':' . $pollertarget . ':' . $device['port'];
+    $transport = $device['transport'] ?: 'udp';
+    $cmd[] = $transport . ':' . $pollertarget . ':' . $device['port'];
     $cmd = array_merge($cmd, (array) $oids);
 
     return $cmd;
