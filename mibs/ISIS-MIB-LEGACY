@@ -50,7 +50,7 @@ ISIS-MIB-LEGACY DEFINITIONS ::= BEGIN
 
         DESCRIPTION
             "Initial version, published as RFC 0DDD."
-    ::= { experimental 37 }
+    ::= { 1 3 6 1 3 37 }
 
 -- RFC Editor - please Replace with proper IANA Value
 
