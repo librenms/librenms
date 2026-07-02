@@ -65,15 +65,13 @@
                         {{ __('General Properties') }}
                     </h3>
                     <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-3 tw:gap-6">
-                        <div class="form-group {{ $errors->has('hostname') ? 'has-error' : '' }} tw:mb-0">
+                        <div class="form-group @error('hostname') has-error @enderror tw:mb-0">
                             <label for="hostname" class="control-label">{{ __('Hostname or IP') }}</label>
                             <input type="text" id="hostname" name="hostname" class="form-control"
                                    value="{{ old('hostname') }}" placeholder="device.example.com" required autofocus>
-                            @if($errors->has('hostname'))
-                                @foreach($errors->get('hostname') as $error)
-                                    <span class="help-block">{{ $error }}</span>
-                                @endforeach
-                            @endif
+                            @error('hostname')
+                                <span class="help-block">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div class="form-group tw:mb-0">
