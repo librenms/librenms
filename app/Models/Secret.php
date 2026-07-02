@@ -51,8 +51,8 @@ class Secret extends BaseModel
             return $query;
         }
 
-        return $query->where(function (Builder $query) use ($user) {
-            $query->whereHas('devices', function (Builder $query) use ($user) {
+        return $query->where(function (Builder $query) use ($user): void {
+            $query->whereHas('devices', function (Builder $query) use ($user): void {
                 $query->whereIntegerInRaw('devices.device_id', \Permissions::devicesForUser($user));
             })->orWhere($query->qualifyColumn('default'), true);
         });

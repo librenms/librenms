@@ -103,7 +103,7 @@ class ValidateDeviceAndCreate
                     if ($method->relationLoaded('secret') && $method->secret) {
                         $secret = $method->secret;
                         if (! $secret->exists && empty($secret->description)) {
-                            $secret->description = strtoupper($method->method_type->value) . ' ' . $this->device->hostname;
+                            $secret->description = strtoupper((string) $method->method_type->value) . ' ' . $this->device->hostname;
                         }
                         $secret->save();
                         $method->secret_id = $secret->id;
@@ -160,9 +160,7 @@ class ValidateDeviceAndCreate
         // Keep track of other polling methods so we do not overwrite them when setting the relation
         $otherPollingMethods = collect();
         if ($this->device->relationLoaded('pollingMethods')) {
-            $otherPollingMethods = $this->device->pollingMethods->filter(function ($m) {
-                return $m->method_type !== PollingMethodType::Snmp;
-            });
+            $otherPollingMethods = $this->device->pollingMethods->filter(fn($m) => $m->method_type !== PollingMethodType::Snmp);
         }
 
         foreach ($snmp_versions as $snmp_version) {
