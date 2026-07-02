@@ -4417,25 +4417,11 @@
             }
         },
         "graphs.mini.normal": {
-            "default": {
-                "day": "24 Hours",
-                "week": "1 Week",
-                "month": "1 Month",
-                "year": "1 Year"
-            },
+            "default": ["day", "week", "month", "year"],
             "type": "array"
         },
         "graphs.mini.widescreen": {
-            "default": {
-                "sixhour": "6 Hours",
-                "day": "24 Hours",
-                "week": "1 Week",
-                "twoweek": "2 Weeks",
-                "month": "1 Month",
-                "twomonth": "2 Months",
-                "year": "1 Year",
-                "twoyear": "2 Years"
-            },
+            "default": ["sixhour", "day", "week", "twoweek", "month", "twomonth", "year", "twoyear"],
             "type": "array"
         },
         "graphs.port_speed_zoom": {
@@ -4446,17 +4432,7 @@
             "order": 4
         },
         "graphs.row.normal": {
-            "default": {
-                "sixhour": "6 Hours",
-                "day": "24 Hours",
-                "twoday": "48 Hours",
-                "week": "1 Week",
-                "twoweek": "2 Weeks",
-                "month": "1 Month",
-                "twomonth": "2 Months",
-                "year": "1 Year",
-                "twoyear": "2 Years"
-            },
+            "default": ["sixhour", "day", "twoday", "week", "twoweek", "month", "twomonth", "year", "twoyear"],
             "type": "array"
         },
         "graylog.base_uri": {

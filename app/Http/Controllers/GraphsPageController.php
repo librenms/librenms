@@ -100,11 +100,11 @@ class GraphsPageController extends Controller
         $currentDuration = $to - $from;
         $periodThumbs = [];
 
-        foreach (LibrenmsConfig::get('graphs.row.normal') as $period => $text) {
+        foreach (LibrenmsConfig::get('graphs.row.normal') as $period) {
             $periodFrom = LibrenmsConfig::get("time.{$period}");
             $periodDuration = (int) $thumbTo - (int) $periodFrom;
             $periodThumbs[] = [
-                'text' => $text,
+                'text' => __("settings.settings.graphs.row.normal.options.{$period}"),
                 'active' => $periodDuration > 0 && abs($currentDuration - $periodDuration) <= 0.1 * $periodDuration,
                 'link' => $this->graphUrl($request, ['from' => Time::toRelativeOffset($periodDuration), 'to' => null]),
                 'vars' => $request->toVars([
