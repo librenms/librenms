@@ -9,6 +9,12 @@ return [
         'unix-agent' => 'Unix Agent',
     ],
     'method_settings' => [
+        'ipmi' => [
+            'hostname' => 'Hostname',
+            'port' => 'Port',
+            'ciphersuite' => 'Cipher Suite',
+            'timeout' => 'Timeout',
+        ],
         'snmp' => [
             'transport' => 'SNMP transport',
             'port' => 'SNMP port number',
