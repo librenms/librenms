@@ -204,7 +204,8 @@
 
     function fixNodePos(nodeid, node) {
         var move=false;
-        if ( node_align && !nodeid.endsWith("_mid")) {
+        var is_aux = nodeid.endsWith("_mid") || (typeof nodeid === 'string' && /_w[ft]_\d+$/.test(nodeid));
+        if ( node_align && !is_aux) {
             node.x = Math.round(node.x / node_align) * node_align;
             node.y = Math.round(node.y / node_align) * node_align;
             move = true;
@@ -251,14 +252,37 @@
             }
         options['manipulation']['deleteNode'] = function (data, callback) {
                 callback(null);
-                $.each( data.edges, function( edge_idx, edgeid ) {
-                    edgeid = edgeid.split("_")[0];
-                    deleteEdge(edgeid);
-                });
+
+                // Separate waypoint dot nodes from real map nodes
+                var real_nodes = [];
+                var rebuild_edges = {};
                 $.each( data.nodes, function( node_idx, nodeid ) {
-                    network_nodes.remove(nodeid);
-                    network_nodes.flush();
+                    var m = (typeof nodeid === 'string') ? nodeid.match(/^(.+)_w[ft]_\d+$/) : null;
+                    if (m) {
+                        rebuild_edges[m[1]] = true;
+                        network_nodes.remove(nodeid);
+                    } else {
+                        real_nodes.push(nodeid);
+                    }
                 });
+
+                // Only delete whole edges when a real node is being removed (not when removing a waypoint)
+                if (real_nodes.length > 0) {
+                    $.each( data.edges, function( edge_idx, edgeid ) {
+                        edgeid = edgeid.split("_")[0];
+                        deleteEdge(edgeid);
+                    });
+                    $.each( real_nodes, function( node_idx, nodeid ) {
+                        network_nodes.remove(nodeid);
+                        network_nodes.flush();
+                    });
+                }
+
+                // Re-index and re-render any edge that lost a waypoint
+                Object.keys(rebuild_edges).forEach(function (eid) {
+                    rebuildEdgeChain(eid);
+                });
+
                 $("#map-saveDataButton").show();
             }
         options['manipulation']['addEdge'] = function (data, callback) {
@@ -417,16 +441,39 @@
         window.location.href = "{{ route('maps.custom.index') }}";
     }
 
-    function swapArrows(reverse) {
-        var arrows;
-        if (reverse) {
-            arrows = {from: {enabled: true, scaleFactor: 0.6}, to: {enabled: false}};
-        } else {
-            arrows = {to: {enabled: true, scaleFactor: 0.6}, from: {enabled: false}};
+    // Build a vis.js smooth config for an edge style. "angled" (Weathermap VIASTYLE) renders straight
+    // segments with sharp corners, so disable smoothing while keeping the type for save/round-trip.
+    function edgeSmooth(style) {
+        return style === "angled" ? {enabled: false, type: "angled"} : {type: style};
+    }
+
+    // Build a vis.js arrows config honouring the per-edge arrow style (ARROWSTYLE)
+    function buildArrows(reverse, arrow_type, arrow_scale) {
+        var type = arrow_type || 'arrow';
+        var scale = parseFloat(arrow_scale) || 0.6;
+        var head = type === 'none' ? {enabled: false} : {enabled: true, scaleFactor: scale, type: type};
+        return reverse ? {from: head, to: {enabled: false}} : {to: head, from: {enabled: false}};
+    }
+
+    // Extract the {type, scale} from a vis.js arrows object (whichever end is enabled)
+    function arrowProps(arrows) {
+        var head = (arrows && arrows.to && arrows.to.enabled) ? arrows.to
+                 : (arrows && arrows.from && arrows.from.enabled) ? arrows.from
+                 : null;
+        if (!head) {
+            return {type: 'none', scale: 0.6};
         }
-        network_edges.forEach((edge) => {
-            edge.arrows = arrows;
-            network_edges.update(edge);
+        return {type: head.type || 'arrow', scale: head.scaleFactor || 0.6};
+    }
+
+    function swapArrows(reverse) {
+        // Flip the map-level arrow direction, then rebuild each edge from its stored per-edge style.
+        // Going through rebuildEdgeChain keeps the waypoint chains and arrowhead placement correct.
+        reverse_arrows = reverse ? 1 : 0;
+        network_edges.getIds().forEach(function (id) {
+            if (typeof id === 'string' && id.endsWith("_from")) {
+                rebuildEdgeChain(id.slice(0, -5));
+            }
         });
         network_edges.flush();
     }
@@ -570,11 +617,20 @@
         $.each(network_nodes.get(), function (node_idx, node) {
             if(node.id.startsWith("legend_")) {
                 return;
+            } else if(typeof node.id === 'string' && /_w[ft]_\d+$/.test(node.id)) {
+                // waypoint dot node - persisted via its edge's waypoints field, not as a map node
+                return;
             } else if(node.id.endsWith("_mid")) {
                 edgeid = node.id.split("_")[0];
                 edge1 = network_edges.get(edgeid + "_from");
                 edge2 = network_edges.get(edgeid + "_to");
-                edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, text_align: edge1.font.align, from: edge1.from, to: edge2.from, showpct: (edge1.label != null && edge1.label.includes("xx%")), showbps: (edge1.label != null && edge1.label.includes("bps")), label: (node.label || ''), fixed_width: (edge1.width || null), port_id: edge1.title, style: edge1.smooth.type, mid_x: node.x, mid_y: node.y, reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
+                var arrow_props = arrowProps(edge1.arrows);
+                // Prefer the stored per-edge style; edge1.arrows may have been split for waypoint rendering
+                var arrow_type = (edge1.arrow_type !== undefined && edge1.arrow_type !== null) ? edge1.arrow_type : arrow_props.type;
+                var arrow_scale = (edge1.arrow_scale !== undefined && edge1.arrow_scale !== null) ? edge1.arrow_scale : arrow_props.scale;
+                // The displayed label may have been relocated to a waypoint segment, so read the flags from the stored via_label
+                var label_src = (edge1.via_label !== undefined && edge1.via_label !== null) ? edge1.via_label : edge1.label;
+                edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, text_align: edge1.font.align, from: edge1.from, to: edge2.from, showpct: (label_src != null && label_src.includes("xx%")), showbps: (label_src != null && label_src.includes("bps")), label: (node.label || ''), fixed_width: (edge1.width || null), port_id: edge1.title, style: edge1.smooth.type, arrow_type: arrow_type, arrow_scale: arrow_scale, mid_x: node.x, mid_y: node.y, waypoints: collectEdgeWaypoints(edgeid), reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
             } else {
                 if(node.icon.code) {
                     node.icon = node.icon.code.charCodeAt(0).toString(16);
@@ -697,11 +753,239 @@
         edgeEdit(edgedata);
     }
 
+    // VIA waypoints: gather the waypoint node positions for an edge, keyed by half (from/to).
+    // Scans all nodes (rather than counting up from 0) so it is robust to gaps after a removal.
+    function collectEdgeWaypoints(edgeid) {
+        var fromArr = [];
+        var toArr = [];
+        network_nodes.get().forEach(function (n) {
+            if (typeof n.id !== 'string') {
+                return;
+            }
+            var m = n.id.match(/^(.+)_w([ft])_(\d+)$/);
+            if (m && m[1] === edgeid) {
+                (m[2] === 'f' ? fromArr : toArr).push({i: parseInt(m[3]), x: Math.round(n.x), y: Math.round(n.y)});
+            }
+        });
+        fromArr.sort((a, b) => a.i - b.i);
+        toArr.sort((a, b) => a.i - b.i);
+        var wp = {
+            from: fromArr.map((p) => [p.x, p.y]),
+            to: toArr.map((p) => [p.x, p.y]),
+        };
+        return (wp.from.length === 0 && wp.to.length === 0) ? null : wp;
+    }
+
+    // Remove the waypoint nodes and pass-through segments for an edge (leaves the canonical _from/_to/_mid).
+    function removeEdgeWaypointArtifacts(edgeid) {
+        network_edges.getIds().forEach(function (id) {
+            if (typeof id === 'string' && (id.startsWith(edgeid + "_from_seg_") || id.startsWith(edgeid + "_to_seg_"))) {
+                network_edges.remove(id);
+            }
+        });
+        network_nodes.getIds().forEach(function (id) {
+            if (typeof id === 'string' && (id.startsWith(edgeid + "_wf_") || id.startsWith(edgeid + "_wt_"))) {
+                network_nodes.remove(id);
+            }
+        });
+    }
+
+    // Index of the sub-edge (0 = canonical node->first hop, then each segment) that straddles the
+    // midpoint of a half-polyline by length. Used to centre the half's label like Weathermap.
+    function halfMidSubedge(points) {
+        var lens = [];
+        var total = 0;
+        for (var i = 0; i + 1 < points.length; i++) {
+            var dx = points[i + 1].x - points[i].x;
+            var dy = points[i + 1].y - points[i].y;
+            var len = Math.sqrt(dx * dx + dy * dy);
+            lens.push(len);
+            total += len;
+        }
+        var half = total / 2;
+        var acc = 0;
+        for (var j = 0; j < lens.length; j++) {
+            acc += lens[j];
+            if (acc >= half) {
+                return j;
+            }
+        }
+        return lens.length - 1;
+    }
+
+    function arrowEnd(ref, end, head) {
+        ref.arrows = (end === 'to') ? {to: head, from: {enabled: false}} : {from: head, to: {enabled: false}};
+    }
+
+    // Place the two opposing direction arrows (Weathermap-style) at the geometric middle of the WHOLE
+    // link: build the ordered legs node1 -> from-waypoints -> mid -> to-waypoints -> node2, find the
+    // vertex nearest the length-midpoint, and put a converging end-arrow on each of the two legs that
+    // meet there. All other arrows are cleared. The head comes from the edge's per-edge arrow style.
+    function placeMidArrows(edge1, edge2, fromSegs, toSegs, n1, n2, midPos, fromWps, toWps, headType, headScale) {
+        var off = function () { return {to: {enabled: false}, from: {enabled: false}}; };
+        edge1.arrows = off();
+        edge2.arrows = off();
+        fromSegs.forEach(function (s) { s.arrows = off(); });
+        toSegs.forEach(function (s) { s.arrows = off(); });
+
+        if (!headType || headType === 'none' || !n1 || !n2 || !midPos) {
+            return;
+        }
+        var head = {enabled: true, scaleFactor: parseFloat(headScale) || 0.6, type: headType};
+        var P = function (xy) { return {x: xy[0], y: xy[1]}; };
+
+        // Legs node1 -> mid (vis from->to matches node1->node2 direction)
+        var legs = [{ref: edge1, forward: true, a: {x: n1.x, y: n1.y}, b: fromWps.length ? P(fromWps[0]) : {x: midPos.x, y: midPos.y}}];
+        for (var i = 0; i < fromWps.length; i++) {
+            legs.push({ref: fromSegs[i], forward: true, a: P(fromWps[i]), b: (i + 1 < fromWps.length) ? P(fromWps[i + 1]) : {x: midPos.x, y: midPos.y}});
+        }
+        // Legs node2 -> mid, then reversed to walk mid -> node2 (vis from->to is opposite to travel)
+        var toLegs = [{ref: edge2, a: {x: n2.x, y: n2.y}, b: toWps.length ? P(toWps[0]) : {x: midPos.x, y: midPos.y}}];
+        for (var j = 0; j < toWps.length; j++) {
+            toLegs.push({ref: toSegs[j], a: P(toWps[j]), b: (j + 1 < toWps.length) ? P(toWps[j + 1]) : {x: midPos.x, y: midPos.y}});
+        }
+        for (var k = toLegs.length - 1; k >= 0; k--) {
+            legs.push({ref: toLegs[k].ref, forward: false, a: toLegs[k].b, b: toLegs[k].a});
+        }
+
+        var dist = function (p, q) { var dx = q.x - p.x, dy = q.y - p.y; return Math.sqrt(dx * dx + dy * dy); };
+        var total = 0;
+        legs.forEach(function (l) { total += dist(l.a, l.b); });
+        if (total === 0) {
+            return;
+        }
+
+        // Vertex (leg boundary) nearest the half-length point
+        var acc = 0, bestJ = 0, bestDiff = Infinity;
+        for (var m = 0; m < legs.length - 1; m++) {
+            acc += dist(legs[m].a, legs[m].b);
+            var diff = Math.abs(acc - total / 2);
+            if (diff < bestDiff) { bestDiff = diff; bestJ = m; }
+        }
+        var before = legs[bestJ], after = legs[bestJ + 1];
+        // End arrows point toward their endpoint node, so both converge on the shared vertex
+        arrowEnd(before.ref, before.forward ? 'to' : 'from', head);
+        arrowEnd(after.ref, after.forward ? 'from' : 'to', head);
+    }
+
+    // Build the waypoint dot nodes and pass-through segments for one half of an edge.
+    // Returns {nodes, segments, firstTo} where firstTo is the id the canonical _from/_to segment should point to.
+    function buildHalfExtras(edgeid, edge, half, baseEdge) {
+        var hk = half[0];
+        var midId = edgeid + "_mid";
+        var wps = (edge.waypoints && edge.waypoints[half]) ? edge.waypoints[half] : [];
+        if (wps.length === 0) {
+            // No waypoints: the canonical edge spans the whole half, so its own label is already centred
+            if (baseEdge.via_label !== undefined && baseEdge.via_label !== null) {
+                baseEdge.label = baseEdge.via_label;
+            }
+            return {nodes: [], segments: [], firstTo: midId};
+        }
+
+        // Pass-through segments carry no arrows; the two direction arrows are placed at the link's
+        // geometric midpoint by placeMidArrows once both halves are known.
+        var nodes = [];
+        var segments = [];
+        for (var i = 0; i < wps.length; i++) {
+            nodes.push({id: edgeid + "_w" + hk + "_" + i, shape: "dot", size: 3, x: wps[i][0], y: wps[i][1], label: ''});
+            var fromId = edgeid + "_w" + hk + "_" + i;
+            var toId = (i + 1 < wps.length) ? (edgeid + "_w" + hk + "_" + (i + 1)) : midId;
+            segments.push({
+                id: edgeid + "_" + half + "_seg_" + i,
+                from: fromId,
+                to: toId,
+                arrows: {to: {enabled: false}, from: {enabled: false}},
+                color: baseEdge.color,
+                width: baseEdge.width,
+                smooth: baseEdge.smooth,
+                font: baseEdge.font,
+                title: baseEdge.title,
+                arrowStrikethrough: false,
+            });
+        }
+
+        // VIA label: keep each half's bandwidth/percent label at the middle of the FULL half-link
+        // (Weathermap-style) instead of on the short canonical stub. Place it on the sub-edge that
+        // straddles the half-polyline midpoint (sub-edge 0 = canonical node->first hop).
+        var halfLabel = (baseEdge.via_label !== undefined && baseEdge.via_label !== null) ? baseEdge.via_label : baseEdge.label;
+        if (halfLabel) {
+            var fromNode = network_nodes.get(baseEdge.from);
+            var midNode = network_nodes.get(midId);
+            var midPos = (edge.mid_x !== undefined && edge.mid_x !== null) ? {x: edge.mid_x, y: edge.mid_y} : midNode;
+            if (fromNode && midPos) {
+                var pts = [{x: fromNode.x, y: fromNode.y}];
+                for (var p = 0; p < wps.length; p++) {
+                    pts.push({x: wps[p][0], y: wps[p][1]});
+                }
+                pts.push({x: midPos.x, y: midPos.y});
+                var li = halfMidSubedge(pts);
+                if (li === 0) {
+                    baseEdge.label = halfLabel;
+                } else {
+                    baseEdge.label = '';
+                    segments[li - 1].label = halfLabel;
+                }
+            }
+        }
+
+        return {nodes: nodes, segments: segments, firstTo: edgeid + "_w" + hk + "_0"};
+    }
+
+    // Rebuild an edge's waypoint chain from the current network state (used after add/remove without a server round-trip).
+    function rebuildEdgeChain(edgeid) {
+        var edge1 = network_edges.get(edgeid + "_from");
+        var edge2 = network_edges.get(edgeid + "_to");
+        if (!edge1 || !edge2) {
+            return;
+        }
+        var wp = collectEdgeWaypoints(edgeid) || {from: [], to: []};
+        removeEdgeWaypointArtifacts(edgeid);
+        var synthetic = {waypoints: wp};
+        var fromExtras = buildHalfExtras(edgeid, synthetic, 'from', edge1);
+        var toExtras = buildHalfExtras(edgeid, synthetic, 'to', edge2);
+        edge1.to = fromExtras.firstTo;
+        edge2.to = toExtras.firstTo;
+
+        // VIA arrows: re-place the two opposing arrows at the geometric middle after the chain changed
+        placeMidArrows(edge1, edge2, fromExtras.segments, toExtras.segments,
+            network_nodes.get(edge1.from), network_nodes.get(edge2.from),
+            network_nodes.get(edgeid + "_mid"), wp.from, wp.to, edge1.arrow_type, edge1.arrow_scale);
+
+        network_nodes.update(fromExtras.nodes.concat(toExtras.nodes));
+        network_edges.update([edge1, edge2].concat(fromExtras.segments).concat(toExtras.segments));
+        network_nodes.flush();
+        network_edges.flush();
+    }
+
+    // Add a waypoint to one half of an edge, positioned halfway between the half's last point and the mid node.
+    function addWaypointToEdge(edgeid, half) {
+        var canonical = network_edges.get(edgeid + "_" + half);
+        var mid = network_nodes.get(edgeid + "_mid");
+        if (!canonical || !mid) {
+            return;
+        }
+        var wp = collectEdgeWaypoints(edgeid) || {from: [], to: []};
+        var lastPt;
+        if (wp[half].length > 0) {
+            lastPt = {x: wp[half][wp[half].length - 1][0], y: wp[half][wp[half].length - 1][1]};
+        } else {
+            lastPt = network.getPositions([canonical.from])[canonical.from];
+        }
+        var newPt = [Math.round((lastPt.x + mid.x) / 2), Math.round((lastPt.y + mid.y) / 2)];
+        var hk = half[0];
+        network_nodes.add({id: edgeid + "_w" + hk + "_" + wp[half].length, shape: "dot", size: 3, x: newPt[0], y: newPt[1], label: ''});
+        network_nodes.flush();
+        rebuildEdgeChain(edgeid);
+        $("#map-saveDataButton").show();
+        $("#map-renderButton").show();
+    }
+
     function deleteEdge(edgeid) {
         const edge1 = network_edges.get(edgeid + "_from");
         const edge2 = network_edges.get(edgeid + "_to");
         var nm_id = edge1.from < edge2.from ? edge1.from + '.' + edge2.from : edge2.from + '.' + edge1.from;
         edgeNodesRemove(nm_id, edgeid);
+        removeEdgeWaypointArtifacts(edgeid);
         network_edges.remove(edgeid + "_to");
         network_edges.remove(edgeid + "_from");
         network_edges.flush();
@@ -777,15 +1061,10 @@
                     var mid = {id: edgeid + "_mid", shape: "dot", size: 0, x: mid_x, y: mid_y, label: edge.label};
                     mid.size = 3;
 
-                    var arrows;
-                    if (Boolean(reverse_arrows)) {
-                        arrows = {from: {enabled: true, scaleFactor: 0.6}, to: {enabled: false}};
-                    } else {
-                        arrows = {to: {enabled: true, scaleFactor: 0.6}, from: {enabled: false}};
-                    }
+                    var noArrows = {to: {enabled: false}, from: {enabled: false}};
 
-                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: {type: edge.style}, arrowStrikethrough: false};
-                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: {type: edge.style}, arrowStrikethrough: false};
+                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: noArrows, arrow_type: edge.arrow_type, arrow_scale: edge.arrow_scale, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: edgeSmooth(edge.style), arrowStrikethrough: false};
+                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: noArrows, arrow_type: edge.arrow_type, arrow_scale: edge.arrow_scale, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: edgeSmooth(edge.style), arrowStrikethrough: false};
                     if(edge.fixed_width) {
                         edge1.width = edge2.width = parseFloat(edge.fixed_width) || null;
                     }
@@ -803,14 +1082,25 @@
                         edge1.title = edge2.title = '';
                     }
                     edge1.label = edge2.label = edgeLabel(edge.showpct, edge.showbps, '');
-                    if (network_nodes.get(mid.id)) {
-                        network_nodes.update(mid);
-                        network_edges.update(edge1);
-                        network_edges.update(edge2);
-                    } else {
-                        network_nodes.add([mid]);
-                        network_edges.add([edge1, edge2]);
-                    }
+                    edge1.via_label = edge2.via_label = edge1.label;
+
+                    // VIA waypoints: rebuild any waypoint chain from the (authoritative) server data
+                    removeEdgeWaypointArtifacts(edgeid);
+                    var fromExtras = buildHalfExtras(edgeid, edge, 'from', edge1);
+                    var toExtras = buildHalfExtras(edgeid, edge, 'to', edge2);
+                    edge1.to = fromExtras.firstTo;
+                    edge2.to = toExtras.firstTo;
+                    var wpNodes = fromExtras.nodes.concat(toExtras.nodes);
+                    var segs = fromExtras.segments.concat(toExtras.segments);
+
+                    // VIA arrows: place the two opposing arrows at the geometric middle of the whole link
+                    placeMidArrows(edge1, edge2, fromExtras.segments, toExtras.segments,
+                        network_nodes.get(edge.custom_map_node1_id), network_nodes.get(edge.custom_map_node2_id),
+                        {x: mid_x, y: mid_y}, (edge.waypoints && edge.waypoints.from) || [], (edge.waypoints && edge.waypoints.to) || [],
+                        edge.arrow_type, edge.arrow_scale);
+
+                    network_nodes.update([mid].concat(wpNodes));
+                    network_edges.update([edge1, edge2].concat(segs));
                 });
 
                 // Remove any nodes that are not in the database, includes edges
@@ -818,10 +1108,13 @@
                     if(nodeid.endsWith('_mid')) {
                         edgeid = nodeid.split("_")[0];
                         if(! (edgeid in data.edges)) {
+                            removeEdgeWaypointArtifacts(edgeid);
                             network_nodes.remove(edgeid + "_mid");
                             network_edges.remove(edgeid + "_to");
                             network_edges.remove(edgeid + "_from");
                         }
+                    } else if(typeof nodeid === 'string' && /_w[ft]_\d+$/.test(nodeid)) {
+                        // waypoint node - cleaned up together with its edge, leave it here
                     } else {
                         if(! (nodeid in data.nodes)) {
                             network_nodes.remove(nodeid);
