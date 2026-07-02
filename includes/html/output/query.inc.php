@@ -24,6 +24,8 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
+use App\Facades\DeviceCache;
+use App\Models\AlertRule;
 use App\Models\Device;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Alert\AlertUtil;
@@ -40,17 +42,13 @@ $type = $_REQUEST['type'];
 switch ($type) {
     case 'alerts':
         $filename = "alerts-$hostname.txt";
-        $device_id = getidbyname($hostname);
-        $device = device_by_id_cache($device_id);
-        $rules = AlertUtil::getRules($device_id);
+        $device = DeviceCache::getByHostname($hostname);
+        $rules = AlertRule::enabled()->forDevice($device)->get();
         $output = '';
         $results = [];
         foreach ($rules as $rule) {
-            if (empty($rule['query'])) {
-                $rule['query'] = QueryBuilderParser::fromJson($rule['builder'])->toSql();
-            }
-            $sql = $rule['query'];
-            $qry = dbFetchRow($sql, [$device_id]);
+            $sql = $rule->query ?: QueryBuilderParser::fromJson($rule->builder)->toSql();
+            $qry = dbFetchRow($sql, [$device->device_id]);
             if (is_array($qry)) {
                 $results[] = $qry;
                 $response = 'matches';
@@ -58,20 +56,20 @@ switch ($type) {
                 $response = 'no match';
             }
 
-            $extra = json_decode((string) $rule['extra'], true);
-            if ($extra['options']['override_query'] === 'on' || $extra['options']['override_query'] === true) {
+            $extra = $rule->extra;
+            if (($extra['options']['override_query'] ?? null) === 'on' || ($extra['options']['override_query'] ?? null) === true) {
                 $qb = $extra['options']['override_query'];
             } else {
-                $qb = QueryBuilderParser::fromJson($rule['builder'] ?? []);
+                $qb = QueryBuilderParser::fromJson($rule->builder ?? []);
             }
 
-            $output .= 'Rule name: ' . $rule['name'] . PHP_EOL;
+            $output .= 'Rule name: ' . $rule->name . PHP_EOL;
             if ($qb instanceof QueryBuilderParser) {
                 $output .= 'Alert rule: ' . $qb->toSql(false) . PHP_EOL;
             } else {
                 $output .= 'Alert rule: Custom SQL Query' . PHP_EOL;
             }
-            $output .= 'Alert query: ' . $rule['query'] . PHP_EOL;
+            $output .= 'Alert query: ' . ($rule->query ?: $sql) . PHP_EOL;
             $output .= 'Rule match: ' . $response . PHP_EOL . PHP_EOL;
         }
         if (\App\Facades\LibrenmsConfig::get('alert.transports.mail') === true) {

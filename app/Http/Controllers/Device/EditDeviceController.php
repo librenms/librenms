@@ -33,6 +33,7 @@ use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\PollerGroup;
 use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -44,8 +45,12 @@ use Throwable;
 
 class EditDeviceController
 {
+    use AuthorizesRequests;
+
     public function index(Device $device): View
     {
+        $this->authorize('update', $device);
+
         $types = collect(LibrenmsConfig::get('device_types'))->keyBy('type');
         if (! $types->has($device->type)) {
             $types->put($device->type, [
@@ -78,7 +83,7 @@ class EditDeviceController
             'static_groups' => $static_groups,
             'types' => $types,
             'default_type' => LibrenmsConfig::getOsSetting($device->os, 'type'),
-            'parents' => $device->parents()->pluck('hostname', 'device_id'),
+            'parents' => $device->parents()->select(['devices.device_id', 'hostname', 'sysName', 'ip', 'overwrite_ip', 'display'])->get()->mapWithKeys(fn ($parent) => [$parent->device_id => $parent->displayName()]),
             'poller_groups' => PollerGroup::orderBy('group_name')->pluck('group_name', 'id'),
             'default_poller_group' => LibrenmsConfig::get('distributed_poller_group'),
             'override_sysContact_bool' => $device->getAttrib('override_sysContact_bool'),

@@ -28,7 +28,7 @@ We list below what we make use of including the license compliance.
 - [Moment](http://momentjs.com/): MIT
 - [Tag Manager](http://soliantconsulting.github.io/tagmanager/): MIT
 - [TW Sack](https://code.google.com/p/tw-sack/): GPLv3
-- [Gridster](http://gridster.net/): MIT
+- [Gridstack](https://gridstackjs.com): MIT
 - [Pure PHP radius class](http://developer.sysco.ch/php/): GPLv3
 - [GeSHi - Generic Syntax Highlighter](http://qbnz.com/highlighter/): GPLv2+
 - MalaysiaMap.svg - By Exiang [CC BY 3.0](http://creativecommons.org/licenses/by/3.0), via Wikimedia Commons

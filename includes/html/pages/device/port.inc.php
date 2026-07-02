@@ -10,6 +10,7 @@ use App\Models\PortVlan;
 use App\Models\Sensor;
 use App\Plugins\Hooks\PortTabHook;
 use Illuminate\Support\Facades\Gate;
+use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 
@@ -31,15 +32,15 @@ if ($port->ifPhysAddress) {
 }
 
 $color = 'black';
-if ($port->ifAdminStatus == 'down') {
+if ($port->ifAdminStatus == IfOperStatus::Down) {
     $status = "<span class='grey'>Disabled</span>";
 }
 
-if ($port->ifAdminStatus == 'up' && $port->ifOperStatus != 'up') {
+if ($port->ifAdminStatus == IfOperStatus::Up && $port->ifOperStatus != IfOperStatus::Up) {
     $status = "<span class='red'>Enabled / Disconnected</span>";
 }
 
-if ($port->ifAdminStatus == 'up' && $port->ifOperStatus == 'up') {
+if ($port->ifAdminStatus == IfOperStatus::Up && $port->ifOperStatus == IfOperStatus::Up) {
     $status = "<span class='green'>Enabled / Connected</span>";
 }
 

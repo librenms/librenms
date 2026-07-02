@@ -2,16 +2,35 @@
 
 namespace App\Models;
 
+use App\Facades\Permissions;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Gate;
 
 class Link extends Model
 {
     use HasFactory;
 
     public $timestamps = false;
+
+    protected function scopeHasAccess(Builder $query, User $user): Builder
+    {
+        if (
+            Gate::forUser($user)->allows('viewAll', Link::class)
+            || Gate::forUser($user)->allows('viewAll', Device::class)
+            || Gate::forUser($user)->allows('viewAll', Port::class)
+        ) {
+            return $query;
+        }
+
+        return $query->where(fn ($query) => $query->whereIntegerInRaw('links.local_port_id', Permissions::portsForUser($user))
+            ->orWhereIntegerInRaw('links.local_device_id', Permissions::devicesForUser($user)))->where(fn (Builder $query) => $query->where('links.remote_device_id', 0)
+            ->orWhereIntegerInRaw('links.remote_port_id', Permissions::portsForUser($user))
+            ->orWhereIntegerInRaw('links.remote_device_id', Permissions::devicesForUser($user)));
+    }
 
     // ---- Define Relationships ----
     /**

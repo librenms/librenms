@@ -33,6 +33,8 @@ class PortController extends Controller
 {
     public function update(\Illuminate\Http\Request $request, Port $port)
     {
+        $this->authorize('update', $port);
+
         $validated = Validator::make($request->json()->all(), [
             'groups' => 'array',
             'groups.*' => 'int',

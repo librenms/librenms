@@ -1,0 +1,2207 @@
+OPTICSIM-RADIO-TRS-PDH-MIB DEFINITIONS ::= BEGIN
+       IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE,
+       Integer32, Unsigned32                             FROM SNMPv2-SMI
+       RowStatus, TruthValue, DisplayString,
+       TEXTUAL-CONVENTION                                FROM SNMPv2-TC
+       ifIndex, InterfaceIndex, InterfaceIndexOrZero     FROM IF-MIB
+       MODULE-COMPLIANCE, OBJECT-GROUP                   FROM SNMPv2-CONF
+       opticsimRadioMib, opticsimRadioMC                 FROM OPTICSIM-RADIOREG-MIB
+       OpticsIMRadioChannelNumber                        FROM OPTICSIM-COMMON-TC
+       TsdimOperationalState, OpticsIMUserLabel          FROM TSDIM-SNMP-TC;
+
+opticsIMRadioTrsPdhMib MODULE-IDENTITY
+       LAST-UPDATED "202510080000Z"
+       ORGANIZATION "Alcatel TND"
+       CONTACT-INFO "Alcatel TND"
+    DESCRIPTION
+                "Radio PDH Transmission MIB."
+
+    REVISION "202510060000Z"
+      DESCRIPTION
+        " - Added fourQamStrong value to OpticsIMModulationTypeOrZero and OpticsIMModulationTypeOrZero textual convention.
+        "
+
+    REVISION "202510080000Z"
+      DESCRIPTION
+        " - Added fourQamStrong value to supportedModulation.
+        "
+
+    REVISION "202509180000Z"
+      DESCRIPTION
+        " - Added  adaptiveEnhAllowedModulationSupportAsReference to opticsIMAdaptiveEnhAllowedModulationTable.
+        "
+
+    REVISION "202505270000Z"
+      DESCRIPTION
+        " - Added  activeReceiver new enumerationvalue to drivingMSE object.
+        "
+
+    REVISION "202502200000Z"
+      DESCRIPTION
+        " - Added new columnar objects to opticsIMRadioPDHTTPBidTable:
+          -- radioPDHTTPBidCombinerImplemented
+      -- radioPDHTTPBidCombinerFunction
+      - Changed radioPDHTTPBidMaxBandwidthForLicense from read-only to read-write.
+          - Added opticsIMAllowedCapacityLicenseTable.
+        "
+
+    REVISION "202404190000Z"
+      DESCRIPTION
+        " Added new columnar objects to opticsIMRadioPDHTTPBidTable:
+          - radioPDHTTPBidPowerSavingTxMuteTimeoutPeriod
+      - radioPDHTTPBidPowerSavingCarrierDisabledTimeoutPeriod
+        "
+
+        REVISION "202402270000Z"
+      DESCRIPTION
+        " Added new columnar objects to opticsIMRadioPDHTTPBidTable:
+    - radioPDHTTPBidPowerSavingOperStatus
+      - radioPDHTTPBidPowerSavingTxMuteCommand
+    - radioPDHTTPBidPowerSavingCarrierDisabledCommand
+        "
+
+    REVISION "202111230000Z"
+      DESCRIPTION
+        " Added new columnar object radioPDHTTPBidXpicAutomuteEnable to opticsIMRadioPDHTTPBidTable.
+        "
+
+    REVISION "201810160000Z"
+      DESCRIPTION
+        " Added 2GHz new value to  OpticsIMChannelSpacing Textual Convention.
+        "
+
+     REVISION "201703240000Z"
+      DESCRIPTION
+        "D.Spreafico:
+ Convention
+      - SNMPIDL-526, added radioPDHTTPBidCarrierMode ( notApplicable, singleCarrier, dualCarrierOneDirection, dualCarrierTwoDirections) new object to opticsIMRadioPDHTTPBidTable
+      - SNMPIDL-527, added radioPDHTTPBidMaxBandwidthForLicense new object to opticsIMRadioPDHTTPBidTable
+      - SNMPIDL-528, added new values to  OpticsIMChannelSpacing Textual Convention;
+                   added new values to  OpticsIMModulationType and OpticsIMModulationTypeOrZero Textual
+                     added new values to adaptiveModulationSupported
+        "
+
+     REVISION "201605060000Z"
+      DESCRIPTION
+        "- SNMPIDL-xxx, added 'eightyMHz (18)' value to OpticsIMChannelSpacing Textual Convention.
+        "
+     REVISION "201511130000Z"
+      DESCRIPTION
+        "- SNMPIDL-507, update LAST-UPDATED and REVISION date format adding the 2 digits missing (20) for yers after 1999.
+Added a REVISION block corresponding to the LAST-UPDATED timestamp.
+           - SNMPIDL-508, added a space between opening and closing braces and the enclosed content.
+        "
+
+     REVISION "201401060000Z"
+    DESCRIPTION
+                "D.Spreafico
+                 - added fourThousandNinetySixQam new value to adaptive modulation supported list BITS
+                "
+
+     REVISION "201307060000Z"
+    DESCRIPTION
+                "D.Spreafico
+                 - added fourThousandNinetySixQam to modulation type list
+         OPTnm21894:
+                 - added  radioPDHTTPBidSquelchCombiner and radioPDHTTPBidSquelchReused on opticsIMRadioPDHTTPBidTable
+         OPTnm21918:
+         - added radioPDHTTPBidEncryptionMode and radioPDHTTPBidEncryptionPassPhrase on opticsIMRadioPDHTTPBidTable
+                 -- added opticsIMRadioEncryptionPassPhrase scalar object
+                 OPTnm22380:
+                 -- added opticsIMRadioEthernetStatsAggregateMode scalar object
+                "
+
+        REVISION "201303140000Z"
+    DESCRIPTION
+                "D.Spreafico
+         OPTnm18128
+                 - added  twentyFiveMHZ and sixtyMHz enum values to OpticsIMChannelSpacing Textual Convention.
+                "
+
+        REVISION "201301100000Z"
+    DESCRIPTION
+                "D.Spreafico
+         OPTnm16322
+                 - added OpticsIMModulationTypeOrZero textual convention supporting '0' value and 'noModulaton value' enum value
+                   for modulation type.
+         - added to adaptiveModulationSupported oneThousandTwentyFourQam (11) and twoThousandFortyEightQam (12) new values.
+                "
+
+        REVISION "201209300000Z"
+
+    DESCRIPTION
+                "OPTnm13112: D.Spreafico
+                 - added oneThousandTwentyFourQam (11) and twoThousandFortyEightQam (12) new values to OpticsIMModulationType textual convention.
+                "
+
+        REVISION "201206080000Z"
+
+     DESCRIPTION
+                "OPTnm04645: D.Spreafico.
+                 - added radioPDHTTPBidEthCompressionMode object to opticsIMRadioPDHTTPBidTable
+                 - added opticsIMRadioEthCompressionTable table
+                "
+
+       REVISION "201107270000Z"
+
+     DESCRIPTION
+                "TSDnm96499: D.Spreafico.
+                 added radioPDHTTPBidOperativeAvailableBandwidth  object to
+                 opticsIMRadioPDHTTPBidTable "
+
+       REVISION "201008040000Z"
+
+     DESCRIPTION
+                "- changed enumerated string 'eightQam' to 'eightPsk' in OpticsIMModulationType textual Convention.
+                 - added XpicAssociatedInterface in opticsIMRadioPDHTTPBidTable
+        "
+
+       REVISION "201004010000Z"
+
+     DESCRIPTION
+                "- added clientType object to opticsIMRadioPDHTTPBidTable
+                 - added opticsIMallowedMinLicense object to opticsIMAllowedCapabilitiesTable
+                 - added adaptiveEnhAllowedMinLicense object to    opticsIMAdaptiveEnhAllowedModulationTable
+                 - added adaptiveAllowedCapacity and adaptiveAllowedMinLicense objects to  opticsIMAdaptiveAllowedCapabilitiesTable
+                 - added radioPDHTTPBidXpicImplemented and radioPDHTTPBidXpicMode objects to opticsIMRadioPDHTTPBidTable
+        "
+
+       REVISION "200912170000Z"
+     DESCRIPTION
+                "- Changed table name opticsIMMAdaptiveEnhAllowedCapabilitiesTable to opticsIMAdaptiveEnhAllowedCapabilitiesTable
+                 (double MM removed).
+                 - Added NetBandwidth on opticsIMRadioPDHTTPBidTable and opticsIMAdaptiveAvailableBandwidthTable
+                 - Added interfaceType on opticsIMRadioPDHTTPBidTable.
+            "
+
+       REVISION "200908060000Z"
+
+     DESCRIPTION
+                "- Added userlabel to opticsIMRadioPDHTTPBidTable.
+            "
+
+       REVISION "200902190000Z"
+     DESCRIPTION
+                "- Added the new scalar object opticsIMRadioOverbooking.
+            "
+
+       REVISION "200808070000Z"
+     DESCRIPTION
+                "- The MAX-ACCESS for radioPDHTTPBidModulation , radioPDHTTPBidChannelSpacing and radioPDHTTPBidOption
+                 objects on opticsIMRadioPDHTTPBidTable and adaptiveModulationReferenceModulation object
+                 on opticsIMAdaptiveModulationTable is changed to 'read-write' value.
+                 - Added the columnar object adaptiveModulationSwitchThresoldOffset to opticsIMAdaptiveModulationTable.
+                 - Added 'fiftyMHz' enum value to the OpticsIMChannelSpacing textual convention.
+                 - The 'fiftyFiveMHZ'  label on the OpticsIMChannelSpacing textual convention is changed
+                   on 'fiftySixMHZ'  label.
+            "
+
+       REVISION "200805290000Z"
+     DESCRIPTION
+                "Updated the enum value of OpticsIMChannelSpacing textual convention.
+                 Added the following object to opticsIMAllowedCapabilitiesTable:
+                 - opticsIMallowedOption
+                 Added the following object to opticsIMRadioPDHTTPBidTable:
+                 - radioPDHTTPBidOption
+                 Added the following object to opticsIMAdaptiveAvailableBandwidthTable:
+             - adaptiveCapacity
+                 Added the following objects to opticsIMAdaptiveModulationTable:
+             - adaptiveModCapabilitiesID
+             - adaptiveModulationSupported
+             - adaptiveModulationDrivingMSE
+                 Added the following new tables:
+             - opticsIMMAdaptiveEnhAllowedCapabilitiesTable
+             - opticsIMMAdaptiveEnhAllowedModulationTable.
+                 Added the following enum values to ModulationType Textual convention
+                 - eightQam, fiveHundredTwelveQam
+            "
+
+       REVISION "200711290000Z"
+       DESCRIPTION
+                "Updated the behaviour of opticsIMRadioFrameTable object
+            "
+
+       REVISION "200710110000Z"
+       DESCRIPTION
+                "Added the following object for adaptive modulation management:
+            - opticsIMAdaptiveModulationImplemented
+            - opticsIMAdaptiveModulationTable
+            - opticsIMAdaptiveModulationSwitchThresholdsTable
+            - opticsIMAdaptiveAllowedCapabilitiesTable
+                  - opticsIMAdaptiveAvailableBandwidthTable
+            "
+
+       REVISION "200707190000Z"
+       DESCRIPTION
+                "Added enum values to the radioPDHTTPBidChannelSpacing  object"
+
+       REVISION "200610190000Z"
+       DESCRIPTION
+                "Added the radioPDHTTPBidCapabilitiesId and radioPDHTTPBidAvailableBandwidth
+                 objects in the radioPDHTTPBid entry.
+                 Added new table opticsIMAllowedCapabilitiesTable"
+
+       REVISION "200510270000Z"
+       DESCRIPTION
+                "added new values to the radioPDHTTPBidModulation object in the
+                 radioPDHTTPBid entry.
+                 Added the  radioPDHTTPBidModulationId, radioPDHTTPBidCapacityId,
+                 radioPDHTTPBidCapacity, radioPDHTTPBidChannelSpacingId,
+                 radioPDHTTPBidChannelSpacing  objects in the radioPDHTTPBid entry.
+                 Added opticsIMAllowedModulationTable, opticsIMAllowedCapacityTable,
+                 opticsIMAllowedChannelSpacingTable new tables."
+
+       REVISION "200409300000Z"
+       DESCRIPTION
+                "added the equalizerStatus object in the radioPDHTTPBid entry."
+
+       REVISION "200404300000Z"
+      DESCRIPTION
+                "added new values to radioPDHTTPBidModulation."
+
+       REVISION "200205100000Z"
+       DESCRIPTION
+                " txSquelched object removed from radioPDHTTPBid entry."
+
+       REVISION "200205100000Z"
+       DESCRIPTION
+                " Added the txSquelched object in the radioPDHTTPBid entry."
+
+       REVISION "200201250000Z"
+       DESCRIPTION
+                "Initial Release of Radio PDH Transmission MIB."
+::= { opticsimRadioMib 3 }
+
+
+opticsIMRadioTrsPdhMibObject     OBJECT IDENTIFIER ::= { opticsIMRadioTrsPdhMib 1 }
+
+OpticsIMModulationType ::= TEXTUAL-CONVENTION
+     STATUS current
+     DESCRIPTION
+          "This object specifies the type of modulation."
+     SYNTAX INTEGER {
+         fourQam (1),
+         sixteenQam (2),
+         thirtyTwoTcm (3),
+         sixtyFourQam (4),
+         oneHundredTwentyEightTcm (5),
+         twoHundredFiftySixQam (6),
+         thirtyTwoQam (7),
+         oneHundredTwentyEightQam (8),
+        eightPsk (9),
+        fiveHundredTwelveQam (10),
+        oneThousandTwentyFourQam (11),
+        twoThousandFortyEightQam (12),
+        fourThousandNinetySixQam (13),
+-- begin SNMPIDL-yyyy
+         bPskOneFourth (14),
+        bPskOneHalf (15),
+        bPsk (16),
+        fourQamStrong (17)
+-- end SNMPIDL-yyyy
+         }
+
+OpticsIMModulationTypeOrZero ::= TEXTUAL-CONVENTION
+     STATUS current
+     DESCRIPTION
+          "This object specifies the type of modulation.
+           '0' value is allowed meaning 'not significant'
+           '100' value is  meaning 'no modulation value available'
+           "
+     SYNTAX INTEGER {
+     nullValue (0),
+         fourQam (1),
+         sixteenQam (2),
+         thirtyTwoTcm (3),
+         sixtyFourQam (4),
+         oneHundredTwentyEightTcm (5),
+         twoHundredFiftySixQam (6),
+         thirtyTwoQam (7),
+         oneHundredTwentyEightQam (8),
+     eightPsk (9),
+     fiveHundredTwelveQam (10),
+     oneThousandTwentyFourQam (11),
+     twoThousandFortyEightQam (12),
+     fourThousandNinetySixQam (13),
+-- begin SNMPIDL-yyyy
+         bPskOneFourth (14),
+        bPskOneHalf (15),
+        bPsk (16),
+-- end SNMPIDL-yyyy
+     fourQamStrong (17),
+     noModulationValue (100)
+         }
+
+
+OpticsIMChannelSpacing ::= TEXTUAL-CONVENTION
+     STATUS current
+     DESCRIPTION
+          "This object specifies the type of modulation."
+     SYNTAX INTEGER {
+         sevenMHZ (1),
+         fourteenMHZ (2),
+         twentyEight-MHZ (3),
+         fiftySixMHZ (4),
+         twoDotFiftyMHZ (5),
+         threeDotFiftyMHZ (6),
+         threeDotSeventyFiveMHZ (7),
+         fiveMHZ (8),
+         tenMHZ (9),
+         twentyMHZ (10),
+         twentyEightMHZ (11),
+         twentyNineDotSixtyFiveMHZ (12),
+         thirtyMHZ (13),
+         fortyMHZ (14),
+         fiftyMHz (15),
+         twentyFiveMHZ (16),
+         sixtyMHz (17),
+         eightyMHz (18),
+         sixtyTwoDotFiveMHz (19),
+         oneHundredMHZ (20),
+     oneHundredTwelveMHZ (21),
+         oneHundredTwentyFiveMHZ (22),
+         twoHundredFiftyMHZ (23),
+         fiveHundredMHZ (24),
+         sevenHundredFiftyMHZ (25),
+         oneThousandMHZ (26),
+         oneThousandTwoHundredFiftyMHZ (27),
+         oneThousandFiveHundredMHZ (28),
+         twoGHZ (29)
+         }
+
+
+opticsIMRadioPDHTTPBidTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMRadioPDHTTPBidEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+          " This table represents the process of converting the incoming radio frequency signal into an
+            internal logic level PDH signal and vice-versa. This process is composed of different
+            subfunctions: Rx and Demodulation subfunctions in sink side, Tx and Modulation subfunctions in
+            source side. "
+::= { opticsIMRadioTrsPdhMibObject 1 }
+
+opticsIMRadioPDHTTPBidEntry OBJECT-TYPE
+     SYNTAX                        OpticsIMRadioPDHTTPBidEntry
+     MAX-ACCESS               not-accessible
+     STATUS                         current
+     DESCRIPTION
+          " An entry of the radioPDHTTPBidTable table. Each entry corresponds to a Radio Plesiochronous
+            Physical Interface (RPPI). "
+     INDEX   { ifIndex }
+::= { opticsIMRadioPDHTTPBidTable 1 }
+
+OpticsIMRadioPDHTTPBidEntry ::= SEQUENCE {
+   radioPDHTTPBidRadioChannelNumber               OpticsIMRadioChannelNumber,
+   radioPDHTTPBidModulation                       OpticsIMModulationType,
+   radioPDHTTPBidODUServiceKit                    INTEGER,
+   radioPDHTTPBidOperationalState                 TsdimOperationalState,
+   radioPDHTTPBidAsapIndex                        Integer32,
+   radioPDHTTPBidEqualizerStatus                  INTEGER,
+   radioPDHTTPBidModulationId                     Integer32,
+   radioPDHTTPBidCapacityId                       Integer32,
+   radioPDHTTPBidCapacity                         DisplayString,
+   radioPDHTTPBidChannelSpacingId                 Integer32,
+   radioPDHTTPBidChannelSpacing                   OpticsIMChannelSpacing,
+   radioPDHTTPBidCapabilitiesId                   Integer32,
+   radioPDHTTPBidAvailableBandwidth               Integer32,
+   radioPDHTTPBidOption                           DisplayString,
+   radioPDHTTPBidUserLabel                        OpticsIMUserLabel,
+   radioPDHTTPBidNetBandwidth                     Integer32,
+   radioPDHTTPBidInterfaceType                    INTEGER,
+   radioPDHTTPBidClientType                          INTEGER,
+   radioPDHTTPBidXpicImplemented                  TruthValue,
+   radioPDHTTPBidXpicMode              INTEGER,
+   radioPDHTTPBidXpicAssociatedInterface      InterfaceIndexOrZero,
+   radioPDHTTPBidOperativeAvailableBandwidth      Integer32,
+   radioPDHTTPBidEthCompressionMode               INTEGER,
+   radioPDHTTPBidSquelchCombiner          INTEGER,
+   radioPDHTTPBidSquelchReused              INTEGER,
+   radioPDHTTPBidEncryptionMode              INTEGER,
+   radioPDHTTPBidEncryptionPassPhrase          DisplayString,
+   radioPDHTTPBid1588TCStatus             INTEGER,
+-- begin
+   radioPDHTTPBidCarrierMode             INTEGER,
+   radioPDHTTPBidMaxBandwidthForLicense        Integer32,
+-- end
+   radioPDHTTPBidXpicAutomuteEnable              TruthValue,
+-- begin Power Saving objects
+   radioPDHTTPBidPowerSavingOperStatus                INTEGER,
+   radioPDHTTPBidPowerSavingTxMuteCommand            INTEGER,
+   radioPDHTTPBidPowerSavingCarrierDisabledCommand        INTEGER,
+   radioPDHTTPBidPowerSavingTxMuteTimeoutPeriod            Integer32,
+   radioPDHTTPBidPowerSavingCarrierDisabledTimeoutPeriod    Integer32,
+-- end Power Saving objects
+   radioPDHTTPBidCombinerImplemented                TruthValue,
+   radioPDHTTPBidCombinerFunction                 INTEGER
+   }
+
+radioPDHTTPBidRadioChannelNumber OBJECT-TYPE
+     SYNTAX                    OpticsIMRadioChannelNumber
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+         "See Textual Conventions."
+::= { opticsIMRadioPDHTTPBidEntry 1 }
+
+radioPDHTTPBidModulation OBJECT-TYPE
+     SYNTAX OpticsIMModulationType
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+         "This object specifies the type of modulation. "
+::= { opticsIMRadioPDHTTPBidEntry 2 }
+
+radioPDHTTPBidODUServiceKit OBJECT-TYPE
+     SYNTAX INTEGER {
+         connected  (1),
+         notConnected (2)
+         }
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          "This object specifies if the ODU Service Kit is connected. When this is detected an Abnormal
+           Condition indication is generated."
+::= { opticsIMRadioPDHTTPBidEntry 4 }
+
+radioPDHTTPBidOperationalState OBJECT-TYPE
+     SYNTAX                    TsdimOperationalState
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+       " See Textual Conventions."
+::= { opticsIMRadioPDHTTPBidEntry 5 }
+
+radioPDHTTPBidAsapIndex OBJECT-TYPE
+     SYNTAX                    Integer32
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+       "This object defines the ASAP object associated to this radio physical port."
+::= { opticsIMRadioPDHTTPBidEntry 6 }
+
+radioPDHTTPBidEqualizerStatus OBJECT-TYPE
+     SYNTAX INTEGER {
+         inhibited (1),
+         activated (2)
+         }
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+         "This object specifies the status of equalizer. "
+::= { opticsIMRadioPDHTTPBidEntry 7 }
+
+radioPDHTTPBidModulationId                     OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object defines the identifier of the modulation value
+         requested by the managing system. This identifier must be included
+         in one of the entries of the opticsIMAllowedModulationTable.
+         As a side effect of setting this object, the agent must set the
+         radioPDHTTPBidModulation object with the value associated to
+         this identifier."
+::= { opticsIMRadioPDHTTPBidEntry 8 }
+
+radioPDHTTPBidCapacityId                       OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object defines the identifier of the radio capacity value
+         requested by the managing system. This identifier must be included
+         in one of the entries of the opticsIMAllowedCapacityTable.
+         As a side effect of setting this object, the agent must set the
+         radioPDHTTPBidcapacity object with the string associated to
+         this identifier."
+::= { opticsIMRadioPDHTTPBidEntry 9 }
+
+radioPDHTTPBidCapacity  OBJECT-TYPE
+     SYNTAX DisplayString
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+         "This object specifies the radio capacity. "
+::= { opticsIMRadioPDHTTPBidEntry  10 }
+
+radioPDHTTPBidChannelSpacingId                 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object defines the identifier of the channel spacing value
+         requested by the managing system. This identifier must be included
+         in one of the entries of the opticsIMAllowedChannelSpacingTable (pre-set
+         modulation setting, adaptiveModulationMode 'false') or of the
+         opticsIMAdaptiveAllowedChannelSpacingTable (adaptive modulation setting, adaptiveModulationMode 'true').
+         As a side effect of setting this object, the agent must set the
+         radioPDHTTPBidChannelSpacing object with the value associated to
+         this identifier."
+::= { opticsIMRadioPDHTTPBidEntry 11 }
+
+radioPDHTTPBidChannelSpacing  OBJECT-TYPE
+     SYNTAX OpticsIMChannelSpacing
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+         " This object specifies the channel spacing value. This value is expressed in MHZ.
+           Consistency checks are need on this object to change the adaptiveModulationMode  value.
+         "
+::= { opticsIMRadioPDHTTPBidEntry  12 }
+
+radioPDHTTPBidCapabilitiesId                 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object defines the identifier of the capacity, modulation and channel
+         spacing values requested by the managing system. This identifier must be included
+         in one of the entries of the opticsIMAllowedCapabilitiesTable.
+         As a side effect of setting this object, the agent must set the
+         radioPDHTTPBidCapacity, radioPDHTTPBidModulation and radioPDHTTPBidChannelSpacing
+         objects with the value associated to this identifier."
+::= { opticsIMRadioPDHTTPBidEntry 13 }
+
+radioPDHTTPBidAvailableBandwidth  OBJECT-TYPE
+     SYNTAX Integer32 (1..2147483647)
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+         "This value indicates the total amount of
+          bandwidth available on this interface and is
+          specified in kilobits per second (Kbps).  This value
+          is calculated as the difference between the amount
+          of bandwidth currently in use and that specified in
+          radioPDHTTPBidCapacity object (converted in Kbps).
+          When this value cannot be measured, this value
+          should contain the nominal bandwidth."
+::= { opticsIMRadioPDHTTPBidEntry  14 }
+
+radioPDHTTPBidOption            OBJECT-TYPE
+     SYNTAX DisplayString
+     MAX-ACCESS            read-write
+     STATUS                current
+     DESCRIPTION
+             "This object contains the option associated to the modem profile configured on this row.
+              It refers to the radioPDHTTPBidModulation object both in preset-mode and in adaptive mode
+              (in this case the radioPDHTTPBidModulation contains the reference modulation)."
+
+::= { opticsIMRadioPDHTTPBidEntry  15 }
+
+radioPDHTTPBidUserLabel           OBJECT-TYPE
+     SYNTAX OpticsIMUserLabel
+     MAX-ACCESS            read-write
+     STATUS                current
+     DESCRIPTION
+         "A textual string containing User Label of Radio Interface."
+
+::= { opticsIMRadioPDHTTPBidEntry  16 }
+
+radioPDHTTPBidNetBandwidth  OBJECT-TYPE
+     SYNTAX Integer32 (1..2147483647)
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+         "This value indicates the total amount of
+          maximum bandwidth available on this interface and is
+          specified in kilobits per second (Kbps)."
+
+::= { opticsIMRadioPDHTTPBidEntry  17 }
+
+radioPDHTTPBidInterfaceType  OBJECT-TYPE
+     SYNTAX INTEGER
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+         "This value indicates the radio physical interface type. The mapping between this value and
+          the associated radio equipment type will be defined in each product external specification."
+
+::= { opticsIMRadioPDHTTPBidEntry  18 }
+
+radioPDHTTPBidClientType  OBJECT-TYPE
+  SYNTAX INTEGER  {
+    ets     (1),
+    etb     (2),
+    linkagg (3)
+  }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+   "It is used to determine the transmission direction of the frames received
+    from the Radio Port.
+    - ETS (1) the frame will be sent to ETS Layer.
+    - ETB (2) the frame will be sent to Ethernet Switch Layer.
+    - LINKAGG (3) the frame will be sent to Link Aggregation Layer.
+    "
+::= { opticsIMRadioPDHTTPBidEntry  19 }
+
+radioPDHTTPBidXpicImplemented OBJECT-TYPE
+     SYNTAX                     TruthValue
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies whether the XPIC capability is present or not on this radio interface. The true value indicates that
+            the XPIC capability is present and the false value that the capability is not present. "
+::= { opticsIMRadioPDHTTPBidEntry  20 }
+
+radioPDHTTPBidXpicMode OBJECT-TYPE
+     SYNTAX                     INTEGER {
+            disabled             (1),
+            horizontal-polar     (2),
+            vertical-polar       (3)
+        }
+     MAX-ACCESS            read-write
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies whether the XPIC function is currently allowed to work or not.
+            The horizontal-polar (2) value indicates that the XPIC function is allowed to work on this interface in horizontal (H) polarization.
+            The vertical-polar (3) value indicates that the XPIC function is allowed to work on this interface in vertical (V) polarization.
+        The disabled (1) value that the function is not allowed to work.
+            This object is significant only if XPIC function is implemented.
+            In case the XPIC function is not implemented
+        (radioPDHTTPBidXpicImplemented = 'false' value) this object has
+        to contain 'disabled' value."
+::= { opticsIMRadioPDHTTPBidEntry  21 }
+
+radioPDHTTPBidXpicAssociatedInterface  OBJECT-TYPE
+     SYNTAX                InterfaceIndexOrZero
+     MAX-ACCESS            read-write
+     STATUS                current
+     DESCRIPTION
+          " This object specifies the radio interface (protected or not) associated to this entry in XPIC function.
+            It has to be provided by managing system ('0' as default value).
+        When not '0' the value provided has to refer to an ifIndex (index) of an existing entry on opticsIMRadioPDHTTPBidTable.
+            In case the XPIC function is not implemented (radioPDHTTPBidXpicImplemented = 'false' value) for this entry,
+            this object has to contain '0' value.
+          "
+::= { opticsIMRadioPDHTTPBidEntry  22 }
+
+radioPDHTTPBidOperativeAvailableBandwidth      OBJECT-TYPE
+     SYNTAX Integer32 (1..2147483647)
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+         "This value indicates the total amount of
+          maximum and real bandwidth available on this interface and is
+          specified in kilobits per second (Kbps).
+          This value is calculated taking in account the actual radio interface availability.
+          "
+::= { opticsIMRadioPDHTTPBidEntry  23 }
+
+
+radioPDHTTPBidEthCompressionMode OBJECT-TYPE
+     SYNTAX INTEGER {
+          disabled    (1),
+          enabled     (2)
+         }
+     MAX-ACCESS            read-write
+     STATUS                current
+     DESCRIPTION
+         "This value indicates if the header of the ethernet frames has to be compressed (enabled)
+          or not (disabled) in this radio interface.
+          "
+::= { opticsIMRadioPDHTTPBidEntry  24 }
+
+radioPDHTTPBidSquelchCombiner OBJECT-TYPE
+     SYNTAX INTEGER {
+         disabled (0),
+         main (1),
+        diversity (2)
+         }
+     MAX-ACCESS              read-write
+     STATUS                     current
+     DESCRIPTION
+          " This object allows to the managers to squelch the local  Main or Diversity receivers .
+             The disabled value means both Main and Diversity signals are not squelched.
+            The Main value means only the Main signal is squelched.
+              The Diversity  value means only the Diversity signal is squelched.
+                When a local transmitter is squelched an Abnormal Condition indication is generated. "
+::= { opticsIMRadioPDHTTPBidEntry  25 }
+
+radioPDHTTPBidSquelchReused  OBJECT-TYPE
+     SYNTAX INTEGER {
+         on (0),
+         off (1)
+         }
+     MAX-ACCESS              read-write
+     STATUS                     current
+     DESCRIPTION
+          " This object allows to the managers to squelch the local  XPIC receiver .
+             The off value means the XPIC signal is not squelched.
+              he on  value means the Diversity signal is squelched.
+              When a local transmitter is squelched an Abnormal Condition indication is generated. "
+::= { opticsIMRadioPDHTTPBidEntry  26 }
+
+radioPDHTTPBidEncryptionMode OBJECT-TYPE
+SYNTAX INTEGER {
+          disabled    (1),
+          enabled     (2)
+         }
+     MAX-ACCESS     read-write
+     STATUS            current
+     DESCRIPTION
+         " This object specifies if the data on this radio interface have to be sent in encrypted
+          (enabled value) or in a clear-text mode (disabled  value)."
+::= { opticsIMRadioPDHTTPBidEntry  27 }
+
+radioPDHTTPBidEncryptionPassPhrase OBJECT-TYPE
+    SYNTAX DisplayString
+     MAX-ACCESS read-write
+     STATUS            current
+     DESCRIPTION
+         " This object contains the pass Phrase to use for the encryption on this radio  interface
+           (on 'radio interface basis') when the encryption is enabled.
+           This value could be overwritten by the agent using the pass Phrase on 'NE basis' when a set on
+           the opticsIMRadioEncryptionPassPhrase is received on NE.
+         "
+::= { opticsIMRadioPDHTTPBidEntry  28 }
+
+radioPDHTTPBid1588TCStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+    notAplicable ( 0 ),
+    active ( 1 ),
+    notActive ( 2 )}
+
+     MAX-ACCESS read-only
+     STATUS            current
+     DESCRIPTION
+         " This object contains the status of the  1588 Transparent Clock management related the this radio interface entry.
+The Transparent Clock is activated on 'NE basis' but each radio interface could be in a different status.
+The 'notApplicable' value is returned when the radio interface doesn't support the management of the 1588 TC.
+The 'active' value is returned when the radio interface is supporting the 1588 TC and the feature is actualy working on.
+The 'notActive' value is returned when the radio interface is supporting the 1588 TC but the feature is not working due to some temporary conditions.
+         "
+::= { opticsIMRadioPDHTTPBidEntry  29 }
+
+radioPDHTTPBidCarrierMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        notApplicable ( 0 ),
+        singleCarrier ( 1 ),
+        dualCarrierOneDirection ( 2 ),
+        dualCarrierTwoDirection ( 3 )
+         }
+     MAX-ACCESS read-only
+     STATUS            current
+     DESCRIPTION
+         " This object contains the mode the radio carrier (or radio channel) identified by this ifIndex is aggregated with the radio carrier belonging
+           to the same radio equipment (hw element).
+           'singleCarrier' when the radio channel/carrier is the only channel/carrier on the radio equipment;
+           'dualCarrierOneDirection' when this carrier is aggregated for traffic transport with the associated carrier on the same radio equipment
+               (towards the same direction);
+           'dualCarrierTwoDirections' when this carrier is not aggregated with the associated carrier on the same radio equipment; the carrier on the
+               same radio equipment are independent;
+           'notApplicable' in all the other cases (ex. radio LAG).
+         "
+::= { opticsIMRadioPDHTTPBidEntry  30 }
+
+radioPDHTTPBidMaxBandwidthForLicense OBJECT-TYPE
+SYNTAX Integer32 (1..2147483647)
+     MAX-ACCESS            read-write
+     STATUS            current
+     DESCRIPTION
+         " This object contains the Max Capacity (bandwidth )limited by the elementary License selected for this single or aggregated carrier. It is specified in kilobits per second (Kbps).   .
+         "
+::= { opticsIMRadioPDHTTPBidEntry  31 }
+
+radioPDHTTPBidXpicAutomuteEnable OBJECT-TYPE
+    SYNTAX TruthValue
+     MAX-ACCESS            read-only
+     STATUS            current
+     DESCRIPTION
+         " This object contains the status of XPIC Automute function.
+         "
+::= { opticsIMRadioPDHTTPBidEntry  32 }
+
+radioPDHTTPBidPowerSavingOperStatus OBJECT-TYPE
+     SYNTAX INTEGER {
+         active (1),
+         inactive (2)
+         }
+     MAX-ACCESS            read-only
+     STATUS            current
+     DESCRIPTION
+         " This object reports to a managing system the status of power saving process on this interface. The active (1) value means a power saving command is working as requested.
+         "
+::= { opticsIMRadioPDHTTPBidEntry  33 }
+
+radioPDHTTPBidPowerSavingTxMuteCommand OBJECT-TYPE
+     SYNTAX INTEGER {
+         on (1),
+         off (2)
+         }
+     MAX-ACCESS        read-write
+     STATUS           current
+     DESCRIPTION
+         " This object allows a managing system to require a tx mute of this interface for power saving purpose.
+         "
+::= { opticsIMRadioPDHTTPBidEntry  34 }
+
+radioPDHTTPBidPowerSavingCarrierDisabledCommand OBJECT-TYPE
+     SYNTAX INTEGER {
+         enable (1),
+         disable (2)
+         }
+     MAX-ACCESS        read-write
+     STATUS           current
+     DESCRIPTION
+         " This object allows a managing system to require the disabling of this interface for power saving purpose.
+         "
+::= { opticsIMRadioPDHTTPBidEntry  35 }
+
+radioPDHTTPBidPowerSavingTxMuteTimeoutPeriod OBJECT-TYPE
+       SYNTAX            Integer32 (0..5760)
+       MAX-ACCESS    read-write
+       STATUS            current
+       DESCRIPTION
+           "This object indicates the max time period, measured in units of minutes, from the Power Saving Tx Mute command request
+           (radioPDHTTPBidPowerSavingTxMuteCommand to 'on' value) during which the command could be active.
+             After the timeout expiration the agent will remove the Power Saving Tx Mute command (radioPDHTTPBidPowerSavingTxMuteCommand to 'off' value)."
+::= { opticsIMRadioPDHTTPBidEntry  36 }
+
+radioPDHTTPBidPowerSavingCarrierDisabledTimeoutPeriod OBJECT-TYPE
+       SYNTAX            Integer32 (0..5760)
+       MAX-ACCESS    read-write
+       STATUS            current
+       DESCRIPTION
+           "This object indicates the max time period, measured in units of minutes, from the Power Saving Carrier Disabled command request
+           (radioPDHTTPBidPowerSavingCarrierDisabledCommand to 'enable' value) during which the command could be active.
+             After the timeout expiration the agent will remove the Power Saving Carrier Disabled command (radioPDHTTPBidPowerSavingCarrierDisabledCommand to 'disable' value)."
+::= { opticsIMRadioPDHTTPBidEntry  37 }
+
+radioPDHTTPBidCombinerImplemented    OBJECT-TYPE
+     SYNTAX                   TruthValue
+     MAX-ACCESS               read-only
+     STATUS                   current
+     DESCRIPTION
+          " This object specifies whether the Combiner capability is present or not on this radio equipment.
+            The true value indicates that  the Combiner capability is present and the false value that the
+            capability is not present. "
+::= { opticsIMRadioPDHTTPBidEntry  38 }
+
+radioPDHTTPBidCombinerFunction OBJECT-TYPE
+     SYNTAX INTEGER { disabled    (1),
+                      enabled     (2)  }
+     MAX-ACCESS     read-write
+     STATUS            current
+     DESCRIPTION
+         " This object specifies whether the Combiner function is currently allowed to work or no on this radio equipment."
+::= { opticsIMRadioPDHTTPBidEntry  39 }
+
+-- AllowedModulationTable
+
+opticsIMAllowedModulationTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMAllowedModulationEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+          "This table contains all the modulation values allowed for each radio interface type"
+::= { opticsIMRadioTrsPdhMibObject  2 }
+
+opticsIMAllowedModulationEntry OBJECT-TYPE
+     SYNTAX                        OpticsIMAllowedModulationEntry
+     MAX-ACCESS               not-accessible
+     STATUS                         current
+     DESCRIPTION
+          " An entry of the radioAllowedModulationTable table. Each entry (row) corresponds
+            to a modulation value allowed on a specific radio interface type."
+     INDEX   { allowedModulationRadioTypeId, allowedModulationId}
+::= { opticsIMAllowedModulationTable 1 }
+
+OpticsIMAllowedModulationEntry ::= SEQUENCE {
+   allowedModulationRadioTypeId   Integer32,
+   allowedModulationId            Integer32,
+   allowedModulation              OpticsIMModulationType
+   }
+
+allowedModulationRadioTypeId OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+        " This object contains the identifier associated to a radio interface type.
+          It identifies a index of the table.
+          The value for each radio interface type is product dependent and defined
+          in each product specification."
+::= { opticsIMAllowedModulationEntry 1 }
+
+allowedModulationId          OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+        " This object contains the identifier associated to a modulation value.
+          It identifies a index of the table."
+::= { opticsIMAllowedModulationEntry 2 }
+
+allowedModulation            OBJECT-TYPE
+     SYNTAX OpticsIMModulationType
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+        "This object contains an allowed modulation value for a radio interface type."
+::= { opticsIMAllowedModulationEntry 3 }
+
+
+-- AllowedCapacityTable
+
+opticsIMAllowedCapacityTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMAllowedCapacityEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+            "This table contains all the radio capacities values allowed for each radio interface type"
+::= { opticsIMRadioTrsPdhMibObject 3 }
+
+opticsIMAllowedCapacityEntry OBJECT-TYPE
+     SYNTAX                        OpticsIMAllowedCapacityEntry
+     MAX-ACCESS               not-accessible
+     STATUS                         current
+     DESCRIPTION
+           " An entry of the radioAllowedCapacityTable table. Each entry (row) corresponds
+            to a radio capacity value allowed on a specific radio interface type."
+     INDEX   { allowedCapacityRadioTypeId, allowedCapacityId }
+::= { opticsIMAllowedCapacityTable 1 }
+
+OpticsIMAllowedCapacityEntry ::= SEQUENCE {
+   allowedCapacityRadioTypeId      Integer32,
+   allowedCapacityId               Integer32,
+   allowedCapacity                 DisplayString
+   }
+
+allowedCapacityRadioTypeId OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+          " This object contains the identifier associated to a radio interface type.
+            It identifies a index of the table.
+            The value for each radio interface type is product dependent and defined
+            in each product specification."
+::= { opticsIMAllowedCapacityEntry 1 }
+
+allowedCapacityId          OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+              " This object contains the identifier associated to a capacity value.
+               It identifies a index of the table."
+::= { opticsIMAllowedCapacityEntry 2 }
+
+allowedCapacity            OBJECT-TYPE
+     SYNTAX DisplayString
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+             "This object contains an allowed capacity value for a radio interface type."
+::= { opticsIMAllowedCapacityEntry 3 }
+
+
+-- AllowedChannelSpacingTable
+
+opticsIMAllowedChannelSpacingTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMAllowedChannelSpacingEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+            "This table contains all the channel spacing values allowed for each radio interface type"
+::= { opticsIMRadioTrsPdhMibObject 4 }
+
+opticsIMAllowedChannelSpacingEntry OBJECT-TYPE
+     SYNTAX                        OpticsIMAllowedChannelSpacingEntry
+     MAX-ACCESS               not-accessible
+     STATUS                         current
+     DESCRIPTION
+          " An entry of the radioAllowedChannelSpacingTable table.
+            Each entry (row) corresponds
+            to a channel spacing value allowed on a specific radio interface type."
+
+     INDEX   { allowedChannelSpacingRadioTypeId, allowedChannelSpacingId }
+::= { opticsIMAllowedChannelSpacingTable 1 }
+
+OpticsIMAllowedChannelSpacingEntry ::= SEQUENCE {
+   allowedChannelSpacingRadioTypeId   Integer32,
+   allowedChannelSpacingId            Integer32,
+   allowedChannelSpacing              OpticsIMChannelSpacing
+   }
+
+
+allowedChannelSpacingRadioTypeId OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+          " This object contains the identifier associated to a radio interface type.
+            It identifies a index of the table.
+            The value for each radio interface type is product dependent and defined
+            in each product specification."
+::= { opticsIMAllowedChannelSpacingEntry 1 }
+
+allowedChannelSpacingId          OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+             " This object contains the identifier associated to a channel spacing value.
+               It identifies a index of the table."
+::= { opticsIMAllowedChannelSpacingEntry 2 }
+
+allowedChannelSpacing            OBJECT-TYPE
+     SYNTAX OpticsIMChannelSpacing
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+         "This object contains an allowed channel spacing value for a radio interface type."
+::= { opticsIMAllowedChannelSpacingEntry 3 }
+
+
+-- AllowedCapabilitiesTable
+
+opticsIMAllowedCapabilitiesTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMAllowedCapabilitiesEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+            "This table contains all the channel spacing values allowed for each radio interface type"
+::= { opticsIMRadioTrsPdhMibObject 6 }
+
+opticsIMAllowedCapabilitiesEntry OBJECT-TYPE
+     SYNTAX                        OpticsIMAllowedCapabilitiesEntry
+     MAX-ACCESS               not-accessible
+     STATUS                         current
+     DESCRIPTION
+          " An entry of the radioAllowedCapabilitiesTable table.
+            Each entry (row) corresponds to a capacity, modulation and channel spacing values allowed
+            on a specific radio interface type."
+
+     INDEX   { allowedCapabilitiesRadioTypeId, allowedCapabilitiesId }
+::= { opticsIMAllowedCapabilitiesTable 1 }
+
+OpticsIMAllowedCapabilitiesEntry ::= SEQUENCE {
+   allowedCapabilitiesRadioTypeId             Integer32,
+   allowedCapabilitiesId                      Integer32,
+   opticsIMallowedCapacity                    DisplayString,
+   opticsIMallowedModulation                  OpticsIMModulationType,
+   opticsIMallowedChannelSpacing              OpticsIMChannelSpacing,
+   opticsIMallowedOption                      DisplayString,
+   opticsIMallowedMinLicense                  DisplayString
+   }
+
+allowedCapabilitiesRadioTypeId OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+          " This object contains the identifier associated to a radio interface type.
+            It identifies a index of the table.
+            The value for each radio interface type is product dependent and defined
+            in each product specification."
+::= { opticsIMAllowedCapabilitiesEntry 1 }
+
+allowedCapabilitiesId          OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+             " This object contains the identifier associated to the capacity, modulation and
+               channel spacing values.
+               It identifies a index of the table."
+::= { opticsIMAllowedCapabilitiesEntry 2 }
+
+opticsIMallowedCapacity            OBJECT-TYPE
+     SYNTAX DisplayString
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+             "This object contains an allowed capacity value for a radio interface type."
+::= { opticsIMAllowedCapabilitiesEntry 3 }
+
+opticsIMallowedModulation            OBJECT-TYPE
+     SYNTAX OpticsIMModulationType
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+        "This object contains an allowed modulation value for a radio interface type."
+::= { opticsIMAllowedCapabilitiesEntry 4 }
+
+opticsIMallowedChannelSpacing            OBJECT-TYPE
+     SYNTAX OpticsIMChannelSpacing
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+         "This object contains an allowed channel spacing value for a radio interface type."
+::= { opticsIMAllowedCapabilitiesEntry 5 }
+
+opticsIMallowedOption            OBJECT-TYPE
+     SYNTAX DisplayString
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+             "This object contains the option associated to the modem profile identified
+              by this row."
+::= { opticsIMAllowedCapabilitiesEntry 6 }
+
+opticsIMallowedMinLicense            OBJECT-TYPE
+     SYNTAX DisplayString
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+             "This object contains the value of the minimum License required to be able to select the modem profile identified
+              by this row."
+::= { opticsIMAllowedCapabilitiesEntry 7 }
+
+-- RadioFrameTable
+
+opticsIMRadioFrameTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMRadioFrameEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+          "This table represents the list of all cross-connectable objects on a radio
+           frame associated to a radio direction or a radio channel. For each radio
+           direction or radio channel the number of entries is product dependent and
+           it will be defined in the external specification."
+
+::= { opticsIMRadioTrsPdhMibObject 5 }
+
+opticsIMRadioFrameEntry OBJECT-TYPE
+     SYNTAX                        OpticsIMRadioFrameEntry
+     MAX-ACCESS               not-accessible
+     STATUS                         current
+     DESCRIPTION
+          " An entry of the radioFrameTable table. Each entry
+            corresponds to a specific addressable object on a radio frame
+            associated to a radio direction or to a radio channel."
+     INDEX   { radioFramePositionsIndex }
+::= { opticsIMRadioFrameTable 1 }
+
+OpticsIMRadioFrameEntry ::= SEQUENCE {
+   radioFramePositionsIndex             Integer32,
+   radioFrameCrossConnectIdentifier     Integer32
+   }
+
+radioFramePositionsIndex  OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+        " This object contains the identifier (position) of a cross-connettable object on a radio frame.
+          It identifies the index of the table."
+::= { opticsIMRadioFrameEntry 1 }
+
+radioFrameCrossConnectIdentifier   OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+        "This object allows to identify the cross-connection in which the addressable object on radio frame
+         is involved.
+         It is automatically set by the agent when the radio port is cross-connected. Its value is the one
+         that identify the cross-connection index (opticsIMCrossConnectIndex object of the
+         opticsIMCrossConnectTable).
+         The value of the connection identifier is the same for all the objects making part of the same cross-
+         connection.
+         The value '0' indicates that the addressable object on radio frame is not involved in any cross-connection."
+::= { opticsIMRadioFrameEntry 2 }
+
+
+-- AdaptiveModulationImplemented
+
+opticsIMAdaptiveModulationImplemented OBJECT-TYPE
+     SYNTAX                     TruthValue
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies whether the Adaptive Modulatin capability is present or not. The true value indicates that
+            the Adaptive Modulatin capability is present and the false value that the capability is not present. "
+::= { opticsIMRadioTrsPdhMibObject 7 }
+
+-- AdaptiveModulationTable
+
+opticsIMAdaptiveModulationTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMAdaptiveModulationEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+          " This table contains the information related to the management of Adaptive Modulation process
+            (adaptiveModulationMode 'true') respect to the static configuration of modulation (preset-mode,
+            adaptiveModulationMode 'false') using opticsIMRadioPDHTTPBidEntry.
+        When the adaptiveModulationMode object is set to 'true' value then the system will adjust adaptively
+            the modulation and/or the channel coding format as well as a range of the other system parameters
+            (like i.e. transmission power level) based on the near-instantaneous channel quality information
+            perceived by the receiver and some user's parameter.
+        The parameters related to the transmission power level management in case of adaptiveModulationMode 'true'
+            are contained in the opticsIMAdaptiveModulationRadioTxPowerEntry.
+        "
+::= { opticsIMRadioTrsPdhMibObject 8 }
+
+opticsIMAdaptiveModulationEntry OBJECT-TYPE
+     SYNTAX                        OpticsIMAdaptiveModulationEntry
+     MAX-ACCESS               not-accessible
+     STATUS                         current
+     DESCRIPTION
+          " An entry of the radioAdaptiveModulationTable table. Each entry corresponds to a Radio
+            Physical Interface. "
+     INDEX   { ifIndex }
+::= { opticsIMAdaptiveModulationTable 1 }
+
+OpticsIMAdaptiveModulationEntry ::= SEQUENCE {
+   adaptiveModulationMode                                TruthValue,
+   adaptiveModulationSchemeRangeId                       INTEGER,
+   adaptiveModulationSchemeRange                         DisplayString,
+   adaptiveModulationReferenceModulationId               INTEGER,
+   adaptiveModulationReferenceModulation                 OpticsIMModulationType,
+   adaptiveModulationWaitToSwitchTime                    INTEGER,
+   adaptiveModulationManualOperation                 INTEGER,
+   adaptiveModulationCurrentModulationId               INTEGER,
+   adaptiveModulationCurrentModulation                   OpticsIMModulationType,
+   adaptiveModulationCurrentCapacity                     DisplayString,
+   adaptiveModulationDrivingMSE                    INTEGER,
+   adaptiveModulationCapabilitiesId                       Integer32,
+   adaptiveModulationSupported                    BITS,
+   adaptiveModulationSwitchThresholdOffset               Integer32
+   }
+
+adaptiveModulationMode                                OBJECT-TYPE
+     SYNTAX                    TruthValue
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+         "This object specifies whether the Adaptive Modulation is currently allowed to work or not.
+        The 'true' value indicates that the Adaptive Modulation process is allowed to work and the
+          'false' value that the process is not allowed to work (modulation value has a fixed value).
+          This object is significant only if Adaptive Modulation proces is implemented."
+::= { opticsIMAdaptiveModulationEntry 1 }
+
+adaptiveModulationSchemeRangeId                       OBJECT-TYPE
+     SYNTAX INTEGER
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+         "This object defines the identifier (requested by the managing system) of the list of modulation schemes
+          whithin the Adaptive Modulation process is allowed to work. This identifier must be included in one of
+          the entries of the opticsIMAdaptiveAllowedCapabilitiesTable (adaptiveAllowedSchemeRangeId).
+          As a side effect of setting this object:
+          - the agent must set the adaptiveModulationSchemeRange object with a string containing all the modulation
+            values associated to this identifier,
+          - the agent must create (or destroy) the related entries on opticsIMAdaptiveModulationSwitchThresholdsTable and
+            opticsIMAdaptiveModulationRadioTxPowerTable for each modulation value included in the range. "
+::= { opticsIMAdaptiveModulationEntry 2 }
+
+adaptiveModulationSchemeRange                         OBJECT-TYPE
+     SYNTAX DisplayString
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          "This object specifies the list of modulation values in the scheme range selected."
+::= { opticsIMAdaptiveModulationEntry 3 }
+
+adaptiveModulationReferenceModulationId               OBJECT-TYPE
+     SYNTAX                    INTEGER
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+       "  This object defines the identifier (requested by the managing system) of one of modulation scheme
+          whithin the list of modulation schemes (adaptiveModulationSchemeRange). This identifier must be
+          included in one of the entries of the opticsIMAdaptiveAllowedCapabilitiesTable
+          (adaptiveAllowedModulationId for a specific adaptiveModulationSchemeRangeId).
+          As a side effect of setting this object, the agent must set to the adaptiveModulationReferenceModulation
+          object with the value (adaptiveAllowedModulation) associated to this identifier and to
+          adaptiveModulationSchemeRangeId."
+::= { opticsIMAdaptiveModulationEntry 4 }
+
+adaptiveModulationReferenceModulation                 OBJECT-TYPE
+     SYNTAX                    OpticsIMModulationType
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+       "This object defines the reference modulation scheme.
+        It's is used as a reference value to guarantee all the system performances (transmission power level mask).
+       "
+::= { opticsIMAdaptiveModulationEntry 5 }
+
+adaptiveModulationWaitToSwitchTime                    OBJECT-TYPE
+     SYNTAX             INTEGER (0..20)
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+         "This object specifies the time to wait before to switch to an upper modulation scheme value.
+          It is an integer with associated measure unit expressed in decade of sec. (e.g. 15 means
+            1.5 sec "
+::= { opticsIMAdaptiveModulationEntry 6 }
+
+adaptiveModulationManualOperation        OBJECT-TYPE
+    SYNTAX INTEGER {
+         active (1),
+         notActive (2)
+         }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object is used to initiate (active) or terminate
+         (notActive) a manual handling of modulation when the
+         Adaptive Modulation process is active, without to return to static modulation Mode (preset-mode),
+         starting from current modulation value and including the transmission power limits, .
+       It's the same that to freeze the Adaptive modulation state without other modulation switching.
+       In this state will be possible to change the current Modulation (adaptiveModulationCurrentModulationId
+         object)
+         When a manual handling of modulation on Adaptive mode is initiated an Abnormal Condition indication is
+         generated. When it is terminated the Abnormal Condition indication is removed.
+       When the Active value is is selected, the adaptiveModulationCurrentModulationId object is updated with
+         the identifier of the current modulation.
+        "
+::= { opticsIMAdaptiveModulationEntry 7 }
+
+adaptiveModulationCurrentModulationId               OBJECT-TYPE
+     SYNTAX                    INTEGER
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+       "  A SET request on this object is allowed only when the adaptiveModulationManualOperation is set to
+          'active' value.
+          This object specifies the modulation value when a manual operation on modulation value on Adaptive mode
+          is active (adaptiveModulationManualOperation set to 'active' value).
+        It defines the identifier (requested by the managing system) of one of modulation scheme
+          whithin the list of modulation schemes (adaptiveModulationSchemeRange) used by Adaptive process.
+          This identifier must be included in one of the entries of the opticsIMAdaptiveAllowedCapabilitiesTable
+          (adaptiveAllowedModulationId for a specific adaptiveModulationSchemeRangeId).
+        The request is accepted only if the new value is a increment (+1) or a decrement (-1) of the old one.
+          As a side effect of setting this object, the agent must set to the adaptiveModulationCurrentModulation
+          object with the value (adaptiveAllowedModulation) associated to this identifier and to
+          adaptiveModulationSchemeRangeId."
+::= { opticsIMAdaptiveModulationEntry 8 }
+
+adaptiveModulationCurrentModulation                   OBJECT-TYPE
+    SYNTAX OpticsIMModulationType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object contains the modulation value currently used by the system and computed by the
+         Adaptive Modulation process.
+         It's updated on the GET_SNMP request from the managing system when no manual operation is active
+         ('notActive' value on adaptiveModulationManualOperation) or by  the SET_SNMP request on
+         adaptiveModulationCurrentModulationId when a manual operation is active
+         ('active' value on adaptiveModulationManualOperation ).
+        "
+::= { opticsIMAdaptiveModulationEntry 9 }
+
+adaptiveModulationCurrentCapacity                     OBJECT-TYPE
+     SYNTAX DisplayString
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+        "This object contains the capacity value currently computed by the
+         Adaptive Modulation process.
+         It's updated on the GET_SNMP request from the managing system.
+        "
+::= { opticsIMAdaptiveModulationEntry 10 }
+
+adaptiveModulationDrivingMSE OBJECT-TYPE
+     SYNTAX INTEGER {
+         notRelevant (0),
+         lowestMSE (1),
+         highestMSE (2),
+         activeReceiver (3)
+         }
+     MAX-ACCESS            read-write
+     STATUS                      current
+     DESCRIPTION
+          "This object is used to indicate in case of 1+1HSB radio configurations which MSE (Mean Square Error)
+           of the two remote receivers has to be used in the Adaptive algorithm.
+           In all the other configurations this parameter is not significant and has to be set to 'notRelevant' value."
+::= { opticsIMAdaptiveModulationEntry 11 }
+
+adaptiveModulationCapabilitiesId              OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+             " This object defines the identifier of the modem profile in Adaptive mode requested by managing system.
+               The modem profile is identified by channel spacing,  reference modulation and option values.
+               This identifier must be included in one of the entries of the opticsIMAdaptiveEnhAllowedCapabilitiesTable
+               (adaptiveEnhAllowedCapabilitiesId).
+               As a side effect of setting this object, the agent must set the
+               radioPDHTTPBidChannelSpacing, radioPDHTTPBidModulation and radioPDHTTPBidOption objects in RadioPDHTTPBidTable
+               with the value associated to this identifier."
+::= { opticsIMAdaptiveModulationEntry 12 }
+
+adaptiveModulationSupported              OBJECT-TYPE
+    SYNTAX      BITS {
+
+                      bPsk (0),
+                fourQam (1),                -- 4QAM
+                eightQam (2),            -- 8QAM
+           sixteenQam (3),            -- 16QAM
+           thirtyTwoQam (4),            -- 32QAM
+               thirtyTwoTcm (5),            -- 32TCM
+               sixtyFourQam (6),            -- 64QAM
+               oneHundredTwentyEightQam (7),    -- 128QAM
+               oneHundredTwentyEightTcm (8),    -- 128TCM
+               twoHundredFiftySixQam (9),        -- 256QAM
+             fiveHundredTwelveQam (10),         -- 512QAM
+                 oneThousandTwentyFourQam (11),        -- 1024QAM
+                 twoThousandFortyEightQam (12),     -- 2048QAM
+-- begin OPTnm25304
+            fourThousandNinetySixQam (13),    -- 4096QAM
+-- end OPTnm25304
+            bPskOneFourth (14),
+           bPskOneHalf (15),
+           fourQamStrong (16)
+           }
+
+
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+             " A value that uniquely identifies the set of modulation schemes selected to be used
+               in Adaptive mode with the modem profile identified by  adaptiveModulationCapabilitiesId.
+               Modulation schemes in this object that are not available in
+               adaptiveEnhAllowedModulationTable for the adaptiveModulationCapabilitiesId cannot
+               be enabled."
+::= { opticsIMAdaptiveModulationEntry 13 }
+
+adaptiveModulationSwitchThresholdOffset                    OBJECT-TYPE
+     SYNTAX Integer32 (-2..4)
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+          "This object contains a value used to change the threshold to switch from
+           a modulation value to an other modulation value.
+           The value is defined around a threshold base value (considered the best for this switch). The value '0' means that
+           the threshold base value has to be used. The value '0' is the default value for this object.
+           The threshold base value (for each possible switch) is product dependent.
+         This value is defined at Radio interface base and not at modulation value base.
+          "
+::= { opticsIMAdaptiveModulationEntry 14 }
+
+
+
+
+
+-- AdaptiveModulationSwitchThresholdsTable
+
+opticsIMAdaptiveModulationSwitchThresholdsTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMAdaptiveModulationSwitchThresholdsEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+          " This table contains the informations about the threshoulds, provided by managing systems,
+            to switch between each couple of modulation schemes allowed to switch.
+          "
+::= { opticsIMRadioTrsPdhMibObject 9 }
+
+opticsIMAdaptiveModulationSwitchThresholdsEntry OBJECT-TYPE
+     SYNTAX                        OpticsIMAdaptiveModulationSwitchThresholdsEntry
+     MAX-ACCESS               not-accessible
+     STATUS                         current
+     DESCRIPTION
+          " An entry of the opticsIMAdaptiveModulationSwitchThresholdsTable table. Each entry corresponds to
+            a couple of modulation values allowed to switch from one to the other.
+            Each entry is created
+            or as a side effect of setting of adaptiveModulationSchemeRangeId object for
+            each couple of modulation value included in the range
+            or at system start-up with default entries (all modulation value allowed).
+          "
+     INDEX   { ifIndex , adaptiveModulationFromToModulationOne, adaptiveModulationFromToModulationTwo}
+::= { opticsIMAdaptiveModulationSwitchThresholdsTable 1 }
+
+OpticsIMAdaptiveModulationSwitchThresholdsEntry ::= SEQUENCE {
+   adaptiveModulationFromToModulationOne                        OpticsIMModulationType,
+   adaptiveModulationFromToModulationTwo                        OpticsIMModulationType,
+   adaptiveModulationSwitchThresholdVariation                    Integer32
+   }
+
+adaptiveModulationFromToModulationOne OBJECT-TYPE
+     SYNTAX                    OpticsIMModulationType
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+         "The first of the two modulation values involved in the desiderated switch."
+::= { opticsIMAdaptiveModulationSwitchThresholdsEntry 1 }
+
+adaptiveModulationFromToModulationTwo OBJECT-TYPE
+     SYNTAX             OpticsIMModulationType
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+         "The second of the two modulation values involved in the desiderated switch."
+::= { opticsIMAdaptiveModulationSwitchThresholdsEntry 2 }
+
+adaptiveModulationSwitchThresholdVariation                    OBJECT-TYPE
+     SYNTAX Integer32 (-2..4)
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+          "This object contains a value used to change the threshold to switch between
+           adaptiveModulationFromToModulationOne and adaptiveModulationFromToModulationTwo around
+           a threshold base value (considered the best for this switch). The value '0' means that
+           the threshold base value has to be used. The value '0' is the default value for this object.
+           The threshold base value (for each possible switch) is product dependent.
+          "
+::= { opticsIMAdaptiveModulationSwitchThresholdsEntry 3 }
+
+
+
+-- AdaptiveAllowedChannelSpacingTable
+
+opticsIMAdaptiveAllowedChannelSpacingTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMAdaptiveAllowedChannelSpacingEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+            "This table contains all the channel spacing values allowed for each radio interface type
+             in case the Adaptive Modulation process is allowed to work (adaptiveModulationMode 'true')"
+::= { opticsIMRadioTrsPdhMibObject 10 }
+
+opticsIMAdaptiveAllowedChannelSpacingEntry OBJECT-TYPE
+     SYNTAX                        OpticsIMAdaptiveAllowedChannelSpacingEntry
+     MAX-ACCESS               not-accessible
+     STATUS                         current
+     DESCRIPTION
+          " An entry of the radioAllowedChannelSpacingTable table.
+            Each entry (row) corresponds
+            to a channel spacing value allowed on a specific radio interface type."
+
+     INDEX   { adaptiveAllowedChannelSpacingRadioTypeId, adaptiveAllowedChannelSpacingId }
+::= { opticsIMAdaptiveAllowedChannelSpacingTable 1 }
+
+OpticsIMAdaptiveAllowedChannelSpacingEntry ::= SEQUENCE {
+   adaptiveAllowedChannelSpacingRadioTypeId   Integer32,
+   adaptiveAllowedChannelSpacingId            Integer32,
+   adaptiveAllowedChannelSpacing              OpticsIMChannelSpacing
+   }
+
+
+adaptiveAllowedChannelSpacingRadioTypeId OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+          " This object contains the identifier associated to a radio interface type.
+            It identifies a index of the table.
+            The value for each radio interface type is product dependent and defined
+            in each product specification."
+::= { opticsIMAdaptiveAllowedChannelSpacingEntry 1 }
+
+adaptiveAllowedChannelSpacingId          OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+             " This object contains the identifier associated to a channel spacing value.
+               It identifies a index of the table."
+::= { opticsIMAdaptiveAllowedChannelSpacingEntry 2 }
+
+adaptiveAllowedChannelSpacing            OBJECT-TYPE
+     SYNTAX OpticsIMChannelSpacing
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+         "This object contains an allowed channel spacing value for a
+      radio interface type in case the Adaptive Modulation process
+      is allowed to work (adaptiveModuationMode 'true')."
+::= { opticsIMAdaptiveAllowedChannelSpacingEntry 3 }
+
+--
+-- AdaptiveAllowedCapabilitiesTable
+--
+
+opticsIMAdaptiveAllowedCapabilitiesTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMAdaptiveAllowedCapabilitiesEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+          " This table contains all the capabilities allowed in the system for Adaptive Modulation process.
+        These system capabilities (identified by adaptiveAllowedCapabilitiesIndex specific for, i.e.,
+            for each radio interface type) are described in term of lists of modulation values whithin
+            the Adaptive Modulation process is allowed to work.
+            Each list (SchemeRange) is identified by adaptiveAllowedSchemeRangeId index and composed by
+            adaptiveAllowedModulation values identified by the adaptiveAllowedModulationId indexes.
+          "
+::= { opticsIMRadioTrsPdhMibObject 11 }
+
+opticsIMAdaptiveAllowedCapabilitiesEntry OBJECT-TYPE
+     SYNTAX                        OpticsIMAdaptiveAllowedCapabilitiesEntry
+     MAX-ACCESS               not-accessible
+     STATUS                         current
+     DESCRIPTION
+          " An entry of the opticsIMAdaptiveAllowedCapabilitiesTable table. Each entry corresponds to a modulation
+            value belonging to a scheme range allowed on the system for each specific capability index (i.e.
+            radio interface type). "
+     INDEX   { adaptiveAllowedCapabilitiesIndex , adaptiveAllowedSchemeRangeId, adaptiveAllowedModulationId}
+::= { opticsIMAdaptiveAllowedCapabilitiesTable 1 }
+
+OpticsIMAdaptiveAllowedCapabilitiesEntry ::= SEQUENCE {
+   adaptiveAllowedCapabilitiesIndex         Integer32,
+   adaptiveAllowedSchemeRangeId         Integer32,
+   adaptiveAllowedModulationId             Integer32,
+   adaptiveAllowedModulation                    OpticsIMModulationType,
+   adaptiveAllowedCapacity                     DisplayString,
+   adaptiveAllowedMinLicense                 DisplayString
+   }
+
+adaptiveAllowedCapabilitiesIndex OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+         " This object contains the identifier associated to a capability type (i.e. radio interface type).
+           It identifies a index of the table.
+           The value for each capability type is product dependent and defined in each product specification.
+         "
+::= { opticsIMAdaptiveAllowedCapabilitiesEntry 1 }
+
+adaptiveAllowedSchemeRangeId OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+         " This object contains the identifier associated to a scheme range allowed.
+           It identifies a index of the table.
+         "
+::= { opticsIMAdaptiveAllowedCapabilitiesEntry 2 }
+
+adaptiveAllowedModulationId OBJECT-TYPE
+     SYNTAX                Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+         " This object contains the identifier associated to a modulation value belonging to the scheme range
+           identified by adaptiveAllowedSchemeRangeId.
+           It identifies a index of the table.
+         "
+::= { opticsIMAdaptiveAllowedCapabilitiesEntry 3 }
+
+adaptiveAllowedModulation                    OBJECT-TYPE
+     SYNTAX                OpticsIMModulationType
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+         " This object contains an allowed modulation value belonging to the scheme range
+           identified by adaptiveAllowedSchemeRangeId.
+         "
+::= { opticsIMAdaptiveAllowedCapabilitiesEntry 4 }
+
+adaptiveAllowedCapacity            OBJECT-TYPE
+     SYNTAX DisplayString
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+             "This object contains the allowed capacity value associated to the modulation value for this modem profile
+           (identified by adaptiveEnhAllowedCapabilitiesId)."
+::= { opticsIMAdaptiveAllowedCapabilitiesEntry 5 }
+
+adaptiveAllowedMinLicense            OBJECT-TYPE
+     SYNTAX DisplayString
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+             "This object contains the value of the minimum License required to be able to select the modem profile identified
+              by this row."
+::= { opticsIMAdaptiveAllowedCapabilitiesEntry 6 }
+
+
+----------------------------------------
+-- AllowedAdaptiveEnhCapabilitiesTable
+----------------------------------------
+
+opticsIMAdaptiveEnhAllowedCapabilitiesTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMAdaptiveEnhAllowedCapabilitiesEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+            "This table contains all the allowed modem profiles in Adaptive mode for each radio interface type"
+::= { opticsIMRadioTrsPdhMibObject 13 }
+
+opticsIMAdaptiveEnhAllowedCapabilitiesEntry OBJECT-TYPE
+     SYNTAX                        OpticsIMAdaptiveEnhAllowedCapabilitiesEntry
+     MAX-ACCESS               not-accessible
+     STATUS                         current
+     DESCRIPTION
+          " An entry of the radioAllowedCapabilitiesTable table.
+            Each entry (row) corresponds to a channel spacing, reference modulation and option values allowed
+            on a specific radio interface type in Adaptive mode."
+
+     INDEX   { adaptiveEnhAllowedCapabilitiesRadioTypeId, adaptiveEnhAllowedCapabilitiesId}
+::= { opticsIMAdaptiveEnhAllowedCapabilitiesTable 1 }
+
+OpticsIMAdaptiveEnhAllowedCapabilitiesEntry ::= SEQUENCE {
+   adaptiveEnhAllowedCapabilitiesRadioTypeId    Integer32,
+   adaptiveEnhAllowedCapabilitiesId             Integer32,
+   adaptiveEnhAllowedChannelSpacing             OpticsIMChannelSpacing,
+   adaptiveEnhAllowedReferenceModulation        OpticsIMModulationTypeOrZero,
+   adaptiveEnhAllowedOption                     DisplayString
+   }
+
+adaptiveEnhAllowedCapabilitiesRadioTypeId     OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+          " This object contains the identifier associated to a radio interface type.
+            It identifies a index of the table.
+            The value for each radio interface type is product dependent and defined
+            in each product specification."
+::= { opticsIMAdaptiveEnhAllowedCapabilitiesEntry 1 }
+
+adaptiveEnhAllowedCapabilitiesId              OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+             " This object contains the identifier associated to the capacity, modulation and
+               channel spacing values.
+               It identifies a index of the table."
+::= { opticsIMAdaptiveEnhAllowedCapabilitiesEntry 2 }
+
+adaptiveEnhAllowedChannelSpacing            OBJECT-TYPE
+     SYNTAX OpticsIMChannelSpacing
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+         "This object contains an allowed channel spacing value for a radio interface type."
+::= { opticsIMAdaptiveEnhAllowedCapabilitiesEntry 3 }
+
+adaptiveEnhAllowedReferenceModulation         OBJECT-TYPE
+     SYNTAX OpticsIMModulationTypeOrZero
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+        "This object contains an allowed reference modulation value for a radio interface type.
+         The zero value is allowed to manage any value for this object."
+::= { opticsIMAdaptiveEnhAllowedCapabilitiesEntry 4 }
+
+adaptiveEnhAllowedOption            OBJECT-TYPE
+     SYNTAX DisplayString
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+             "This object contains the option associated to the modem profile identified
+              by this row."
+::= { opticsIMAdaptiveEnhAllowedCapabilitiesEntry 5 }
+
+
+----------------------------------------
+-- AdaptiveEnhAllowedModulationTable
+----------------------------------------
+
+opticsIMAdaptiveEnhAllowedModulationTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMAdaptiveEnhAllowedModulationEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+          " This table contains all the modulation values (and the related capacity values) allowed
+            for each modem profile (identified by adaptiveEnhAllowedCapabilitiesRadioTypeId and
+            adaptiveEnhAllowedCapabilitiesId) allowed for Adaptive Modulation process.
+        These modulation values (identified by adaptiveEnhAllowedModulationId ) are the modulation values whithin
+            the Adaptive Modulation process is allowed to work.
+          "
+::= { opticsIMRadioTrsPdhMibObject 14 }
+
+opticsIMAdaptiveEnhAllowedModulationEntry OBJECT-TYPE
+     SYNTAX                        OpticsIMAdaptiveEnhAllowedModulationEntry
+     MAX-ACCESS               not-accessible
+     STATUS                         current
+     DESCRIPTION
+          " An entry of the opticsIMAdaptiveEnhAllowedModulationTable table. Each entry corresponds to a modulation
+            value allowed on the system for each modem profile (adaptiveEnhAllowedCapabilitiesId)in adaptive mode
+            and specific for radio interface (adaptiveEnhAllowedCapabilitiesRadioTypeId). "
+     INDEX   { adaptiveEnhAllowedCapabilitiesRadioTypeId, adaptiveEnhAllowedCapabilitiesId, adaptiveEnhAllowedModulationId}
+::= { opticsIMAdaptiveEnhAllowedModulationTable 1 }
+
+OpticsIMAdaptiveEnhAllowedModulationEntry ::= SEQUENCE {
+   adaptiveEnhAllowedModulationId         Integer32,
+   adaptiveEnhAllowedModulation                 OpticsIMModulationType,
+   adaptiveEnhAllowedCapacity                DisplayString,
+   adaptiveEnhAllowedMinLicense                DisplayString,
+   adaptiveEnhAllowedModulationSupportAsReference TruthValue
+   }
+
+adaptiveEnhAllowedModulationId OBJECT-TYPE
+     SYNTAX                Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+         " This object contains the identifier associated to a modulation value allowed for this modem profile
+           (identified by adaptiveEnhAllowedCapabilitiesId).
+           It identifies a index of the table.
+         "
+::= { opticsIMAdaptiveEnhAllowedModulationEntry 1 }
+
+adaptiveEnhAllowedModulation                    OBJECT-TYPE
+     SYNTAX                OpticsIMModulationType
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+         " This object contains an allowed modulation value for this modem profile
+           (identified by adaptiveEnhAllowedCapabilitiesId).
+         "
+::= { opticsIMAdaptiveEnhAllowedModulationEntry 2 }
+
+adaptiveEnhAllowedCapacity            OBJECT-TYPE
+     SYNTAX DisplayString
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+             "This object contains the allowed capacity value associated to the modulation value for this modem profile
+           (identified by adaptiveEnhAllowedCapabilitiesId)."
+::= { opticsIMAdaptiveEnhAllowedModulationEntry 3 }
+
+adaptiveEnhAllowedMinLicense            OBJECT-TYPE
+     SYNTAX DisplayString
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+             "This object contains the value of the minimum License required to be able to select the modem profile identified
+              by this row."
+::= { opticsIMAdaptiveEnhAllowedModulationEntry 4 }
+
+adaptiveEnhAllowedModulationSupportAsReference            OBJECT-TYPE
+     SYNTAX TruthValue
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+             "This object define if the adaptiveEnhAllowedModulation can be used to configure the reference modulation ('true' value) or not ('false' value)."
+::= { opticsIMAdaptiveEnhAllowedModulationEntry 5 }
+
+
+----------------------------------------
+-- adaptiveAvailableBandwidth
+----------------------------------------
+
+opticsIMAdaptiveAvailableBandwidthTable OBJECT-TYPE
+     SYNTAX          SEQUENCE OF OpticsIMAdaptiveAvailableBandwidthEntry
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+          " This table contains the bandwidth available and the capacity for each modulation scheme value
+            when the Adaptive Modulation process is allowed to work (adaptiveModulationMode set to 'true' value). "
+::= { opticsIMRadioTrsPdhMibObject 12 }
+
+opticsIMAdaptiveAvailableBandwidthEntry OBJECT-TYPE
+     SYNTAX       OpticsIMAdaptiveAvailableBandwidthEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+          " An entry of the radioAdaptiveAvailableBandwidthTable table. Each entry corresponds to a Radio
+            Plesiochronous Physical Interface (RPPI) and to a modulation scheme value supported. "
+     INDEX   { ifIndex, adaptiveModulationType }
+::= { opticsIMAdaptiveAvailableBandwidthTable 1 }
+
+OpticsIMAdaptiveAvailableBandwidthEntry ::= SEQUENCE {
+   adaptiveModulationType           OpticsIMModulationType,
+   adaptiveAvailableBandwidth       Integer32,
+   adaptiveCapacity               DisplayString,
+   adaptiveNetBandwidth                     Integer32
+   }
+
+adaptiveModulationType  OBJECT-TYPE
+     SYNTAX OpticsIMModulationType
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+         "This object specifies the type of modulation. "
+::= { opticsIMAdaptiveAvailableBandwidthEntry 1 }
+
+adaptiveAvailableBandwidth  OBJECT-TYPE
+     SYNTAX Integer32 (1..2147483647)
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+         "This value is significant only when the adaptive modulation process is working
+         (adaptiveModulationMode set to 'true' value).
+          This value indicates the total amount of bandwidth available on this interface
+          for the modulation scheme value specified in radioAdaptiveModulation.
+          It is specified in kilobits per second (Kbps).
+          This value is calculated as the difference between the amount
+          of bandwidth currently in use for a modulation value and that specified for radioAdaptiveModulation
+          once defined radioPDHTTPBidChannelSpacing object (converted in Kbps).
+          When this value cannot be measured, this value
+          should contain the nominal bandwidth."
+::= { opticsIMAdaptiveAvailableBandwidthEntry  2 }
+
+adaptiveCapacity            OBJECT-TYPE
+     SYNTAX DisplayString
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+             "This object contains the capacity value associated to the modulation value."
+::= { opticsIMAdaptiveAvailableBandwidthEntry  3 }
+
+adaptiveNetBandwidth OBJECT-TYPE
+     SYNTAX Integer32 (1..2147483647)
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+         "This value indicates the total amount of
+          maximum bandwidth available for this modulation value and is
+          specified in kilobits per second (Kbps)."
+::= { opticsIMAdaptiveAvailableBandwidthEntry  4 }
+
+----------------------------------------
+-- overBooking for adaptiveModulation
+----------------------------------------
+
+opticsIMRadioOverbooking OBJECT-TYPE
+
+    SYNTAX Unsigned32 (0..1)
+
+    MAX-ACCESS read-write
+
+    STATUS current
+
+    DESCRIPTION
+
+        "This attribute defines the overbooking (OB) for the Committed Bandwidth
+         on adaptive modulation.
+         When the value of 'opticsIMRadioOverbooking' is equal to 1 it means that
+         the 'OB for Committed BW' = 'Committed BW': the Admission control is on the Committed BW.
+     When the value of 'opticsIMRadioOverbooking' is equal to 0 it means unlimited
+         overbooking i.e. effectively CoS is set as Best Effort : the Admission control is on the Best effort BW."
+
+    DEFVAL { 0 }
+::= { opticsIMRadioTrsPdhMibObject 15 }
+
+
+----------------------------------------
+-- opticsIMRadioEthCompressionTable
+----------------------------------------
+
+opticsIMRadioEthCompressionTable OBJECT-TYPE
+     SYNTAX          SEQUENCE OF OpticsIMRadioEthCompressionEntry
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+          " This table contains the ethernet type values identifying the ethernet frames to compress (header compression).
+          "
+::= { opticsIMRadioTrsPdhMibObject 16 }
+
+opticsIMRadioEthCompressionEntry OBJECT-TYPE
+     SYNTAX       OpticsIMRadioEthCompressionEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+          " An entry of the opticsIMRadioEthCompressionTable table. Each entry corresponds to a
+            ether type value on 'NE basis'. "
+     INDEX   { opticsIMRadioEthTypeIndex }
+::= { opticsIMRadioEthCompressionTable 1 }
+
+OpticsIMRadioEthCompressionEntry ::= SEQUENCE {
+   opticsIMRadioEthTypeIndex INTEGER,
+   opticsIMRadioEthTypeValue INTEGER,
+   opticsIMRadioEthRowStatus RowStatus
+   }
+
+opticsIMRadioEthTypeIndex OBJECT-TYPE
+     SYNTAX INTEGER
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+         "This object specifies the value or the Ethernet type of the ethernet frames to compress. "
+::= { opticsIMRadioEthCompressionEntry 1 }
+
+opticsIMRadioEthTypeValue OBJECT-TYPE
+     SYNTAX INTEGER
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+         "This object reports in an object accessible by managing system by a GET-SNMP, the value or the same Ethernet type
+          in the opticsIMRadioEthTypeIndex index object."
+::= { opticsIMRadioEthCompressionEntry  2 }
+
+opticsIMRadioEthRowStatus OBJECT-TYPE
+     SYNTAX RowStatus
+     MAX-ACCESS            read-create
+     STATUS                current
+     DESCRIPTION
+             "This object is used to create a new row or to delete an existing row in the table"
+::= { opticsIMRadioEthCompressionEntry  3 }
+
+----------------------------------------
+-- opticsIMRadioEncryptionPassPhrase
+----------------------------------------
+
+opticsIMRadioEncryptionPassPhrase OBJECT-TYPE
+    SYNTAX DisplayString
+        MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the pass Phrase on 'NE bais' to use for the encryption for all the radio interfaces
+          where  the encryption is enabled.
+          When this object will be set to a not null value, the radioPDHTTPBidEncryptionPassPhrase for each radio direction
+          (on 'radio interface basis') will be update by the agent with the same value.
+      Once defined on 'NE basis', the managing system is allowed to define the pass Phrase on 'radio interface basis'
+          per specific radio directions.
+         "
+::= { opticsIMRadioTrsPdhMibObject 17 }
+
+----------------------------------------
+-- opticsIMRadioEthernetStatsAggregateMode
+----------------------------------------
+
+opticsIMRadioEthernetStatsAggregateMode OBJECT-TYPE
+   SYNTAX INTEGER {
+          tdmAndEthernet (0),
+          ethernetOnly (1)
+          }
+        MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object defines what frames are included/excluded on ethernet counters when the ethernet statistics
+         on the aggregate radio LAG L1 interface are requested from the manager.
+         The default value is 'tdmAndEthernet' "
+::= { opticsIMRadioTrsPdhMibObject 18 }
+
+----------------------------------------
+-- opticsIMAllowedCapacityLicenseTable
+----------------------------------------
+
+opticsIMAllowedCapacityLicenseTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMAllowedCapacityLicenseEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+            "This table contains all the radio capacities values allowed for each radio interface type"
+::= { opticsIMRadioTrsPdhMibObject 19 }
+
+opticsIMAllowedCapacityLicenseEntry OBJECT-TYPE
+     SYNTAX                        OpticsIMAllowedCapacityLicenseEntry
+     MAX-ACCESS               not-accessible
+     STATUS                         current
+     DESCRIPTION
+           " An entry of the radioAllowedCapacityLicenseTable table. Each entry (row) corresponds
+            to a capacity license value allowed on a specific radio interface type."
+     INDEX   { ifIndex , allowedCapacityId }
+::= { opticsIMAllowedCapacityLicenseTable 1 }
+
+OpticsIMAllowedCapacityLicenseEntry ::= SEQUENCE {
+   allowedCapacityLicenseId     Integer32,
+   allowedCapacityLicense       Integer32
+   }
+
+allowedCapacityLicenseId OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+          " This object contains the identifier associated to a radio interface type.
+            It identifies a index of the table.
+            The value for each radio interface type is product dependent and defined
+            in each product specification."
+::= { opticsIMAllowedCapacityLicenseEntry 1 }
+
+allowedCapacityLicense    OBJECT-TYPE
+     SYNTAX Integer32 (1..2147483647)
+     MAX-ACCESS            read-only
+     STATUS                current
+     DESCRIPTION
+             "This object contains an allowed capacity value for a radio interface type."
+::= { opticsIMAllowedCapacityLicenseEntry 2 }
+
+
+-- OPTICSIM-RADIO-TRS-PDH-MC DEFINITIONS ::= BEGIN
+--       IMPORTS
+--       MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY FROM SNMPv2-SMI
+--       MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP FROM SNMPv2-CONF
+--       opticsimRadioMC FROM OPTICSIM-RADIOREG-MIB;
+
+
+-- opticsIMRadioTrsPdhMCCompl MODULE-IDENTITY
+--       LAST-UPDATED "0205100000Z"
+--       ORGANIZATION "Alcatel TND"
+--       CONTACT-INFO "Alcatel TND"
+--       DESCRIPTION
+--           " Added the txSquelched object in the radioPDHTTPBid entry."
+--       DESCRIPTION
+--           " Added the txSquelched object in the radioPDHTTPBid entry."
+--       REVISION "0201250000Z"
+--       DESCRIPTION
+--           "Initial Release of Radio PDH Module Compliance."
+
+-- ::= { opticsIMRadioTrsPdhMCConf 1 }
+
+opticsIMRadioTrsPdhMCConf         OBJECT IDENTIFIER ::= { opticsimRadioMC 3 }
+opticsIMRadioTrsPdhMCCompl      OBJECT IDENTIFIER ::= { opticsIMRadioTrsPdhMCConf 1 }
+opticsIMRadioTrsPdhMCGroup      OBJECT IDENTIFIER ::= { opticsIMRadioTrsPdhMCConf 2 }
+
+opticsIMRadioTrsPdhMc MODULE-COMPLIANCE
+      STATUS current
+      DESCRIPTION
+          "This module compliance describes a set of objects required for Optics-IM Agent
+            implementation. These objects are defined inside opticsIMRadioTrsPdhMib. "
+
+       MODULE -- opticsIMRadioTrsPdhMib
+
+MANDATORY-GROUPS { opticsIMRadioPDHTTPGroup, opticsIMAdaptiveModulationGroup }
+
+GROUP opticsIMRadioPDHTTPGroup
+         DESCRIPTION
+          " This group describes the radio PDH group."
+
+GROUP opticsIMOptRadioPDHTTPGroup
+      DESCRIPTION
+          " This group describes the Radio PDH optional objects. "
+::= { opticsIMRadioTrsPdhMCCompl 1 }
+
+opticsIMRadioPDHTTPGroup OBJECT-GROUP
+      OBJECTS { radioPDHTTPBidRadioChannelNumber,
+                          radioPDHTTPBidModulation,
+                          radioPDHTTPBidODUServiceKit,
+                          radioPDHTTPBidOperationalState,
+                          radioPDHTTPBidAsapIndex,
+                          radioPDHTTPBidModulationId,
+                          radioPDHTTPBidCapacityId,
+                          radioPDHTTPBidCapacity,
+                          radioPDHTTPBidChannelSpacingId,
+                          radioPDHTTPBidChannelSpacing,
+                          radioPDHTTPBidCapabilitiesId,
+                          radioPDHTTPBidAvailableBandwidth,
+                          allowedModulation,
+                          allowedCapacity,
+                          allowedChannelSpacing,
+                          radioFrameCrossConnectIdentifier,
+                          radioPDHTTPBidOperativeAvailableBandwidth
+                          }
+      STATUS current
+      DESCRIPTION
+          " This group describes the Radio PDH mandatory objects."
+::= { opticsIMRadioTrsPdhMCGroup 1 }
+
+
+opticsIMOptRadioPDHTTPGroup OBJECT-GROUP
+      OBJECTS { radioPDHTTPBidEqualizerStatus
+                          }
+      STATUS current
+      DESCRIPTION
+          " This group describes the Radio PDH optional objects."
+::= { opticsIMRadioTrsPdhMCGroup 2 }
+
+opticsIMAdaptiveModulationGroup OBJECT-GROUP
+      OBJECTS { adaptiveModulationMode,
+               adaptiveModulationSchemeRangeId,
+              adaptiveModulationSchemeRange,
+              adaptiveModulationReferenceModulationId,
+              adaptiveModulationReferenceModulation,
+               adaptiveModulationWaitToSwitchTime,
+               adaptiveModulationManualOperation,
+            adaptiveModulationCurrentModulationId,
+               adaptiveModulationCurrentModulation,
+               adaptiveModulationCurrentCapacity,
+--            adaptiveModulationFromToModulationOne,
+--               adaptiveModulationFromToModulationTwo,
+               adaptiveModulationSwitchThresholdVariation,
+--                adaptiveAllowedCapabilitiesIndex,
+--               adaptiveAllowedSchemeRangeId,
+--               adaptiveAllowedModulationId,
+               adaptiveAllowedModulation,
+                        adaptiveAvailableBandwidth
+                      }
+      STATUS current
+      DESCRIPTION
+          " This group describes the Adaptive Modulation mandatory objects."
+::= { opticsIMRadioTrsPdhMCGroup 3 }
+
+
+END

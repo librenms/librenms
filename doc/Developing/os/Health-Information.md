@@ -102,6 +102,10 @@ the string to the equivalent OID representation.
 - `high_limit` (optional): This is the critical high threshold that
   `value` should be (used in alerting). If an OID is specified then
   divisor / multiplier are used.
+- `skip_limits_calc` (optional): This is the true/false flag which
+  allow raw values when limits are get from OID's. if set to true,
+  divisor / multiplier are skipped for `_limit` values, but
+  `user_func` is still applied to `_limit` values
 - `descr` (required): The visible label for this sensor. It can be a
   key with in the table or a static string, optionally using `{{ index }}`.
 - `group` (optional): Groups sensors together under in the webui,

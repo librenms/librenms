@@ -26,11 +26,14 @@
 
 namespace App\Models;
 
+use App\Facades\Permissions;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Gate;
 
 class PortGroup extends BaseModel
 {
+    use HasFactory;
     public $timestamps = false;
     protected $fillable = ['name', 'desc'];
 
@@ -40,8 +43,7 @@ class PortGroup extends BaseModel
             return $query;
         }
 
-        // maybe filtered in future
-        return $query->limit(0);
+        return $query->whereIntegerInRaw('id', Permissions::portGroupsForUser($user));
     }
 
     /**

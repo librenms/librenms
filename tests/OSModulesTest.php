@@ -30,8 +30,8 @@ use App\Facades\LibrenmsConfig;
 use DeviceCache;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
-use LibreNMS\Data\Source\Fping;
-use LibreNMS\Data\Source\FpingResponse;
+use LibreNMS\Data\Source\Icmp\Fping;
+use LibreNMS\Data\Source\Icmp\FpingResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\ModuleList;
@@ -153,13 +153,14 @@ final class OSModulesTest extends DBTestCase
     public static function dumpedDataProvider(): array
     {
         $modules = [];
+        $baseDir = realpath(__DIR__ . '/..');
 
         if (getenv('TEST_MODULES')) {
             $modules = explode(',', getenv('TEST_MODULES'));
         }
 
         try {
-            return ModuleTestHelper::findOsWithData($modules);
+            return ModuleTestHelper::findOsWithData($modules, base_path: $baseDir);
         } catch (InvalidModuleException $e) {
             // special case for exception
             return [[false, false, $e->getMessage()]];

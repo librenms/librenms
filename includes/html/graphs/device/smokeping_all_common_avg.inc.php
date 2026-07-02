@@ -21,12 +21,16 @@ if ($width > '500') {
     $descr_len = (12 + round(($width - 275) / 8));
 }
 
+$unit_text ??= '';
+
 // FIXME str_pad really needs a "limit to length" so we can rid of all the substrs all over the code to limit the length as below...
 if ($width > '500') {
     $rrd_options[] = 'COMMENT:' . substr(str_pad((string) $unit_text, $descr_len + 5), 0, $descr_len + 5) . " RTT      Loss    SDev   RTT\:SDev\l";
 } else {
     $rrd_options[] = 'COMMENT:' . substr(str_pad((string) $unit_text, $descr_len + 5), 0, $descr_len + 5) . " RTT      Loss    SDev   RTT\:SDev\l";
 }
+
+$dm_list = $sd_list = $ploss_list = '';
 
 foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filename) {
     if (! LibrenmsConfig::has("graph_colours.$colourset.$iter")) {
@@ -52,7 +56,7 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
         $rrd_options[] = 'CDEF:p' . $i . 'p' . $p . '=pin' . $i . 'p' . $p . ',UN,0,pin' . $i . 'p' . $p . ',IF';
     }
 
-    unset($pings_options, $m_options, $sdev_options);
+    $pings_options = $m_options = $sdev_options = '';
 
     foreach (range(2, $pings) as $p) {
         $pings_options .= ',p' . $i . 'p' . $p . ',UN,+';

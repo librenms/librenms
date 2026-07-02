@@ -7,6 +7,7 @@ use App\Facades\LibrenmsConfig;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Js;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Debug;
 
@@ -57,7 +58,6 @@ class LegacyController extends Controller
         }
 
         $html = ob_get_clean();
-        ob_end_clean();
 
         if (isset($pagetitle) && is_array($pagetitle)) {
             // if prefix is set, put it in front
@@ -72,7 +72,7 @@ class LegacyController extends Controller
 
             // create and set the title
             $title = implode(' - ', $pagetitle);
-            $html .= "<script type=\"text/javascript\">\ndocument.title = '$title';\n</script>";
+            $html .= '<script>document.title = ' . Js::from($title) . ';</script>';
         }
 
         return response()->view('layouts.legacy_page', [

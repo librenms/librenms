@@ -64,7 +64,7 @@ trait VminfoLibvirt
             if (Str::contains($method, 'ssh') && ! $ssh_ok) {
                 // Check if we are using SSH if we can log in without password - without blocking the discovery
                 // Also automatically add the host key so discovery doesn't block on the yes/no question, and run echo so we don't get stuck in a remote shell ;-)
-                exec('ssh -o "StrictHostKeyChecking no" -o "PreferredAuthentications publickey" -o "IdentitiesOnly yes" ' . $userHostname . ' echo -e', $out, $ret);
+                exec('ssh -o "StrictHostKeyChecking no" -o "PreferredAuthentications publickey" -o "IdentitiesOnly yes" ' . escapeshellarg((string) $userHostname) . ' echo -e', $out, $ret);
                 if ($ret != 255) {
                     $ssh_ok = 1;
                 }
@@ -73,7 +73,7 @@ trait VminfoLibvirt
             if ($ssh_ok || ! Str::contains($method, 'ssh')) {
                 // Fetch virtual machine list
                 unset($domlist);
-                exec(LibrenmsConfig::get('virsh') . ' -rc ' . $uri . ' list', $domlist);
+                exec(escapeshellarg(LibrenmsConfig::get('virsh')) . ' -rc ' . escapeshellarg($uri) . ' list', $domlist);
 
                 foreach ($domlist as $dom) {
                     [$dom_id] = explode(' ', trim($dom), 2);
@@ -81,7 +81,7 @@ trait VminfoLibvirt
                     if (is_numeric($dom_id)) {
                         // Fetch the Virtual Machine information.
                         unset($vm_info_array);
-                        exec(LibrenmsConfig::get('virsh') . ' -rc ' . $uri . ' dumpxml ' . $dom_id, $vm_info_array);
+                        exec(escapeshellarg(LibrenmsConfig::get('virsh')) . ' -rc ' . escapeshellarg($uri) . ' dumpxml ' . $dom_id, $vm_info_array);
 
                         // Example xml:
                         // <domain type='kvm' id='3'>
@@ -106,7 +106,7 @@ trait VminfoLibvirt
                         Log::debug($xml);
 
                         // libvirt does not supply this
-                        exec(LibrenmsConfig::get('virsh') . ' -rc ' . $uri . ' domstate ' . $dom_id, $vm_state);
+                        exec(escapeshellarg(LibrenmsConfig::get('virsh')) . ' -rc ' . escapeshellarg($uri) . ' domstate ' . escapeshellarg($dom_id), $vm_state);
                         $vmwVmState = PowerState::STATES[strtolower($vm_state[0])] ?? PowerState::UNKNOWN;
 
                         $vmwVmMemSize = $xml->memory;
@@ -147,7 +147,7 @@ trait VminfoLibvirt
 
                         // Save the discovered Virtual Machine.
                         $vms->push(new \App\Models\Vminfo([
-                            'vmtype' => 'libvirt',
+                            'vm_type' => 'libvirt',
                             'vmwVmVMID' => $dom_id,
                             'vmwVmState' => $vmwVmState,
                             'vmwVmGuestOS' => '',

@@ -37,6 +37,7 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Compare;
@@ -55,27 +56,32 @@ class Core implements Module
         return [];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
+        return $connectivity->snmpIsAvailable();
     }
 
     public function discover(OS $os): void
     {
-        $snmpdata = SnmpQuery::numeric()->get(['SNMPv2-MIB::sysObjectID.0', 'SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysName.0'])
-            ->values();
+        $snmpdata = SnmpQuery::numeric()->get([
+            'SNMPv2-MIB::sysObjectID.0',
+            'SNMPv2-MIB::sysDescr.0',
+            'SNMPv2-MIB::sysName.0',
+        ])->values();
+
+        $snmp_engine = SnmpQuery::get('SNMP-FRAMEWORK-MIB::snmpEngineID.0')->value();
 
         $device = $os->getDevice();
         $device->fill([
             'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'] ?? null,
             'sysName' => $snmpdata['.1.3.6.1.2.1.1.5.0'] ?? null,
             'sysDescr' => $snmpdata['.1.3.6.1.2.1.1.1.0'] ?? null,
+            'snmpEngineID' => $snmp_engine,
         ]);
 
-        foreach (['sysObjectID', 'sysName', 'sysDescr'] as $attribute) {
+        foreach (['sysObjectID', 'sysName', 'sysDescr', 'snmpEngineID'] as $attribute) {
             if ($device->isDirty($attribute)) {
-                $message = DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute));
-                Eventlog::log($message, $device, 'system', Severity::Notice);
+                Log::debug(DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)));
                 $os->getDeviceArray()[$attribute] = $device->$attribute; // update device array
             }
         }
@@ -94,9 +100,9 @@ class Core implements Module
         }
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
+        return $connectivity->snmpIsAvailable();
     }
 
     public function poll(OS $os, DataStorageInterface $datastore): void

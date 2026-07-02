@@ -21,6 +21,7 @@ return [
         'ip_exists' => '無法新增 :hostname，因為已有裝置 :existing 使用相同 IP :ip',
         'sysname_exists' => '因 sysName 重複（:sysname），已存在裝置 :hostname',
     ],
+    'host_name_empty' => '主機名稱為空',
     'host_unreachable' => [
         'unpingable' => '無法 Ping :hostname（:ip）',
         'unsnmpable' => '無法連線至 :hostname，請檢查 SNMP 設定與連線可達性',

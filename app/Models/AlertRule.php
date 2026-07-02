@@ -27,13 +27,31 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\AlertState;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $severity
+ * @property array<string, mixed>|null $extra
+ * @property bool|int $disabled
+ * @property string|null $proc
+ * @property string|null $notes
+ * @property string $query
+ * @property array<string, mixed>|null $builder
+ * @property bool|int $invert_map
+ * @property int|null $alert_operation_id
+ * @property AlertOperation|null $alertOperation
+ */
 class AlertRule extends BaseModel
 {
+    use HasFactory;
+
     public $timestamps = false;
 
     protected static function booted(): void
@@ -46,8 +64,6 @@ class AlertRule extends BaseModel
             $rule->devices()->detach();
             $rule->groups()->detach();
             $rule->locations()->detach();
-            $rule->transportSingles()->detach();
-            $rule->transportGroups()->detach();
         });
     }
 
@@ -61,14 +77,44 @@ class AlertRule extends BaseModel
         'query',
         'builder',
         'invert_map',
+        'alert_operation_id',
     ];
 
     protected $casts = [
         'builder' => 'array',
         'extra' => 'array',
+        'alert_operation_id' => 'integer',
     ];
 
     // ---- Query scopes ----
+
+    /**
+     * @param  Builder<AlertRule>  $query
+     * @param  Device  $device
+     * @return Builder<AlertRule>
+     */
+    public function scopeForDevice(Builder $query, Device $device): Builder
+    {
+        return $query->where(function (Builder $query) use ($device): void {
+            $query->where(function (Builder $query): void {
+                $query->whereDoesntHave('devices')
+                    ->whereDoesntHave('groups')
+                    ->whereDoesntHave('locations');
+            })->orWhere(function (Builder $query) use ($device): void {
+                $query->where('invert_map', 0)
+                    ->where(function (Builder $query) use ($device): void {
+                        $query->whereHas('devices', fn ($q) => $q->where('devices.device_id', $device->device_id))
+                            ->orWhereHas('groups.devices', fn ($q) => $q->where('devices.device_id', $device->device_id))
+                            ->orWhereHas('locations', fn ($q) => $q->where('locations.id', $device->location_id));
+                    });
+            })->orWhere(function (Builder $query) use ($device): void {
+                $query->where('invert_map', 1)
+                    ->whereDoesntHave('devices', fn ($q) => $q->where('devices.device_id', $device->device_id))
+                    ->whereDoesntHave('groups.devices', fn ($q) => $q->where('devices.device_id', $device->device_id))
+                    ->whereDoesntHave('locations', fn ($q) => $q->where('locations.id', $device->location_id));
+            });
+        });
+    }
 
     /**
      * @param  Builder<AlertRule>  $query
@@ -164,22 +210,37 @@ class AlertRule extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\AlertTransport, $this>
+     * @return BelongsTo<AlertOperation, $this>
      */
-    public function transportSingles(): BelongsToMany
+    public function alertOperation(): BelongsTo
     {
-        return $this->belongsToMany(AlertTransport::class, 'alert_transport_map', 'rule_id', 'transport_or_group_id')
-            ->withPivot('target_type')
-            ->wherePivot('target_type', 'single');
+        return $this->belongsTo(AlertOperation::class, 'alert_operation_id');
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\AlertTransportGroup, $this>
+     * Backwards-compatible shape: one array entry per segment (same as legacy multi-row operations).
+     *
+     * @return array<int, array<string, mixed>>
      */
-    public function transportGroups(): BelongsToMany
+    public function toOperationsApiArray(): array
     {
-        return $this->belongsToMany(AlertTransportGroup::class, 'alert_transport_map', 'rule_id', 'transport_or_group_id')
-            ->withPivot('target_type')
-            ->wherePivot('target_type', 'group');
+        $this->load([
+            'alertOperation.segments.transportSingles:alert_transports.transport_id,transport_type,transport_name',
+            'alertOperation.segments.transportGroups:alert_transport_groups.transport_group_id,transport_group_name',
+        ]);
+
+        if ($this->alertOperation === null) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($this->alertOperation->segments as $segment) {
+            $out[] = array_merge($segment->toApiArray(), [
+                'alert_operation_id' => $this->alertOperation->id,
+                'name' => $this->alertOperation->name,
+            ]);
+        }
+
+        return $out;
     }
 }

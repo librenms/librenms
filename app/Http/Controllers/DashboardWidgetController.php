@@ -69,7 +69,7 @@ class DashboardWidgetController extends Controller
         $this->authorize('update', $dashboard);
 
         $validated = $this->getValidationFactory()->make(
-            json_decode((string) $request->input('data', '[]'), true), [
+            json_decode($request->string('data', '[]'), true), [
                 '*' => 'array',
                 '*.id' => 'integer',
                 '*.col' => 'integer',
@@ -79,7 +79,7 @@ class DashboardWidgetController extends Controller
             ])->validate();
 
         foreach ($validated as $item) {
-            if ($widget = UserWidget::find($item['id'])) {
+            if ($widget = $dashboard->widgets()->find($item['id'])) {
                 $widget->fill($item);
                 $widget->save();
             }
