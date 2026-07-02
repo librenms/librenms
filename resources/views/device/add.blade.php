@@ -111,17 +111,26 @@
 
                         {{-- Left: tab list --}}
                         <div class="tw:w-full tw:md:w-1/4 tw:shrink-0">
+                            @php
+                                $icons = [
+                                    'snmp' => 'fa-server',
+                                    'icmp' => 'fa-exchange',
+                                    'ipmi' => 'fa-microchip',
+                                    'unix-agent' => 'fa-terminal',
+                                ];
+                            @endphp
                             <ul class="tw:flex tw:flex-col tw:space-y-2">
                                 @foreach($availableMethods as $method)
                                     <li x-show="activeMethods.includes('{{ $method['type'] }}')"
                                         :class="activeTab === '{{ $method['type'] }}'
-                                            ? 'tw:bg-[#337ab7] tw:border-[#337ab7] tw:dark:bg-[#22527b]'
+                                            ? 'tw:bg-blue-600 tw:border-blue-600 tw:dark:bg-blue-700 tw:dark:border-blue-700'
                                             : 'tw:border-gray-200 tw:hover:bg-gray-50 tw:dark:border-dark-gray-400 tw:dark:hover:bg-dark-gray-400'"
                                         class="tw:flex tw:items-center tw:border tw:rounded-lg tw:shadow-sm tw:transition-colors tw:overflow-hidden">
                                         <button type="button"
                                                 @click="activeTab = '{{ $method['type'] }}'"
                                                 :class="activeTab === '{{ $method['type'] }}' ? 'tw:text-white!' : 'tw:text-gray-700 tw:dark:text-dark-white-200'"
-                                                class="tw:flex-1 tw:text-left tw:px-4 tw:py-3 tw:font-medium tw:transition-colors">
+                                                class="tw:flex-1 tw:text-left tw:px-4 tw:py-3 tw:font-medium tw:transition-colors tw:flex tw:items-center">
+                                            <i class="fa fa-fw {{ $icons[$method['type']] ?? 'fa-circle-o' }} tw:mr-2"></i>
                                             {{ $method['label'] }}
                                         </button>
                                         <button type="button"
@@ -134,30 +143,27 @@
                                     </li>
                                 @endforeach
 
-                                {{-- Add polling type --}}
-                                <li class="tw:mt-4 tw:pt-2 tw:border-t tw:border-gray-200 tw:dark:border-dark-gray-400"
-                                    x-show="addableRemaining.length > 0">
-                                    <div class="input-group">
-                                        <select id="add-method-select" class="form-control">
-                                            <option value="">{{ __('Add polling type...') }}</option>
-                                            @foreach($availableMethods as $method)
-                                                <option value="{{ $method['type'] }}"
-                                                        x-show="!activeMethods.includes('{{ $method['type'] }}')">
-                                                    {{ $method['label'] }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        <span class="input-group-btn">
-                                            <button type="button" class="btn btn-success tw:bg-[#449d44] tw:hover:bg-[#357a35] tw:border-[#449d44]"
-                                                    @click="
-                                                        const sel = $el.closest('.input-group').querySelector('select');
-                                                        if (sel.value) { addMethod(sel.value); sel.value = ''; }
-                                                    ">
-                                                <i class="fa fa-plus"></i>
-                                            </button>
-                                        </span>
-                                    </div>
-                                </li>
+                                 {{-- Add polling type --}}
+                                 <li class="tw:mt-4 tw:pt-2 tw:border-t tw:border-gray-200 tw:dark:border-dark-gray-400"
+                                     x-show="addableRemaining.length > 0">
+                                     <div class="input-group">
+                                         <select id="add-method-select" class="form-control tw:rounded-lg tw:border-gray-200 tw:bg-white tw:dark:border-dark-gray-400 tw:dark:bg-dark-gray-500 tw:dark:text-white">
+                                             <option value="">{{ __('Add polling type...') }}</option>
+                                             <template x-for="m in addableRemaining" :key="m.type">
+                                                 <option :value="m.type" x-text="m.label"></option>
+                                             </template>
+                                         </select>
+                                         <span class="input-group-btn">
+                                             <button type="button" class="btn btn-success tw:bg-emerald-600 tw:hover:bg-emerald-700 tw:border-emerald-600"
+                                                     @click="
+                                                         const sel = $el.closest('.input-group').querySelector('select');
+                                                         if (sel.value) { addMethod(sel.value); sel.value = ''; }
+                                                     ">
+                                                 <i class="fa fa-plus"></i>
+                                             </button>
+                                         </span>
+                                     </div>
+                                 </li>
                             </ul>
                         </div>
 
@@ -189,7 +195,7 @@
                                                            value="1" class="tw:sr-only"
                                                            x-model="methods['{{ $method['type'] }}'].validate">
                                                     <div class="tw:block tw:w-12 tw:h-7 tw:rounded-full tw:transition-colors tw:duration-200"
-                                                         :class="methods['{{ $method['type'] }}'].validate ? 'tw:bg-[#337ab7]' : 'tw:bg-gray-300 tw:dark:bg-dark-gray-400'"></div>
+                                                         :class="methods['{{ $method['type'] }}'].validate ? 'tw:bg-blue-600' : 'tw:bg-gray-300 tw:dark:bg-dark-gray-400'"></div>
                                                     <div class="tw:absolute tw:left-0.5 tw:top-0.5 tw:w-6 tw:h-6 tw:rounded-full tw:transition-transform tw:duration-200 tw:bg-white tw:shadow-sm"
                                                          :class="methods['{{ $method['type'] }}'].validate ? 'tw:translate-x-5' : 'tw:translate-x-0'"></div>
                                                 </div>
@@ -204,7 +210,7 @@
                                                            value="1" class="tw:sr-only"
                                                            x-model="methods['{{ $method['type'] }}'].affects_availability">
                                                     <div class="tw:block tw:w-12 tw:h-7 tw:rounded-full tw:transition-colors tw:duration-200"
-                                                         :class="methods['{{ $method['type'] }}'].affects_availability ? 'tw:bg-[#337ab7]' : 'tw:bg-gray-300 tw:dark:bg-dark-gray-400'"></div>
+                                                         :class="methods['{{ $method['type'] }}'].affects_availability ? 'tw:bg-blue-600' : 'tw:bg-gray-300 tw:dark:bg-dark-gray-400'"></div>
                                                     <div class="tw:absolute tw:left-0.5 tw:top-0.5 tw:w-6 tw:h-6 tw:rounded-full tw:transition-transform tw:duration-200 tw:bg-white tw:shadow-sm"
                                                          :class="methods['{{ $method['type'] }}'].affects_availability ? 'tw:translate-x-5' : 'tw:translate-x-0'"></div>
                                                 </div>
@@ -359,29 +365,6 @@
                                         </div>
                                     @endif
 
-                                    {{-- SNMP-off manual overrides --}}
-                                    @if($method['type'] === 'snmp')
-                                        <div x-show="!methods['snmp'].validate"
-                                             class="tw:bg-yellow-50/50 tw:dark:bg-dark-gray-300/50 tw:border tw:border-yellow-100 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mt-6"
-                                             style="display: none;">
-                                            <h4 class="tw:font-semibold tw:text-xs tw:uppercase tw:tracking-wider tw:mb-4 tw:text-yellow-800 tw:dark:text-yellow-600">{{ __('Manual Overrides') }}</h4>
-                                            <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-3 tw:gap-4 tw:max-w-2xl">
-                                                <div class="form-group tw:mb-0">
-                                                    <label for="sysName" class="control-label">{{ __('sysName') }} <span class="text-muted">({{ __('optional') }})</span></label>
-                                                    <input type="text" id="sysName" name="sysName" class="form-control" value="{{ old('sysName') }}">
-                                                </div>
-                                                <div class="form-group tw:mb-0">
-                                                    <label for="hardware" class="control-label">{{ __('Hardware') }} <span class="text-muted">({{ __('optional') }})</span></label>
-                                                    <input type="text" id="hardware" name="hardware" class="form-control" value="{{ old('hardware') }}">
-                                                </div>
-                                                <div class="form-group tw:mb-0" x-init="setTimeout(() => init_select2('#os-select', 'os', {}, null, '{{ __('OS (optional)') }}'), 100)">
-                                                    <label for="os-select" class="control-label">{{ __('OS') }} <span class="text-muted">({{ __('optional') }})</span></label>
-                                                    <select id="os-select" name="os" class="form-control"></select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endif
-
                                 </div>{{-- end panel --}}
                             @endforeach
                         </div>{{-- end right --}}
@@ -389,12 +372,35 @@
                     </div>{{-- end flex row --}}
                 </div>
 
-                <div class="tw:mt-6 tw:pt-6 tw:border-t tw:border-gray-200 tw:dark:border-dark-gray-400">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fa fa-plus tw:mr-1"></i> {{ __('Add Device') }}
-                    </button>
+                {{-- SNMP manual overrides (only shown when SNMP polling method doesn't exist) --}}
+                <div x-show="!activeMethods.includes('snmp')"
+                     class="tw:bg-yellow-50/50 tw:dark:bg-dark-gray-300/50 tw:border tw:border-yellow-100 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mt-6"
+                     style="display: none;"
+                     x-transition>
+                    <h4 class="tw:font-semibold tw:text-xs tw:uppercase tw:tracking-wider tw:mb-4 tw:text-yellow-800 tw:dark:text-yellow-600">{{ __('Manual Overrides') }}</h4>
+                    <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-3 tw:gap-4 tw:max-w-2xl">
+                        <div class="form-group tw:mb-0">
+                            <label for="sysName" class="control-label">{{ __('sysName') }} <span class="text-muted">({{ __('optional') }})</span></label>
+                            <input type="text" id="sysName" name="sysName" class="form-control" value="{{ old('sysName') }}">
+                        </div>
+                        <div class="form-group tw:mb-0">
+                            <label for="hardware" class="control-label">{{ __('Hardware') }} <span class="text-muted">({{ __('optional') }})</span></label>
+                            <input type="text" id="hardware" name="hardware" class="form-control" value="{{ old('hardware') }}">
+                        </div>
+                        <div class="form-group tw:mb-0" x-init="setTimeout(() => init_select2('#os-select', 'os', {}, null, '{{ __('OS (optional)') }}'), 100)">
+                            <label for="os-select" class="control-label">{{ __('OS') }} <span class="text-muted">({{ __('optional') }})</span></label>
+                            <select id="os-select" name="os" class="form-control"></select>
+                        </div>
+                    </div>
                 </div>
 
+                <div class="tw:mt-6 tw:pt-6 tw:border-t tw:border-gray-200 tw:dark:border-dark-gray-400" x-data="{ loading: false }">
+                    <button type="submit" :disabled="loading" class="btn btn-primary tw:bg-blue-600 tw:border-blue-600 tw:hover:bg-blue-700" @click="loading = true">
+                        <template x-if="loading"><i class="fa fa-spinner fa-spin tw:mr-1"></i></template>
+                        <template x-if="!loading"><i class="fa fa-plus tw:mr-1"></i></template>
+                        {{ __('Add Device') }}
+                    </button>
+                </div>
             </form>
         </x-panel>
     </div>
