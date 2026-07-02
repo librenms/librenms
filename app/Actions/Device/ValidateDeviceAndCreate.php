@@ -77,7 +77,8 @@ class ValidateDeviceAndCreate
         if (! $this->force) {
             $this->exceptIfIpExists();
 
-            if (! app(DeviceIcmpIsAvailable::class)->execute($this->device)->isAlive()) {
+            $icmpMethod = $this->device->getPollingMethod(PollingMethodType::Icmp) ?? new DevicePollingMethod(['method_type' => PollingMethodType::Icmp, 'enabled' => true]);
+            if (! $icmpMethod->toPollingMethod()->isAvailable($this->device)) {
                 throw new HostUnreachablePingException($this->device->hostname);
             }
 
@@ -193,7 +194,7 @@ class ValidateDeviceAndCreate
                     // Set the relation temporarily for testing
                     $this->device->setRelation('pollingMethods', $otherPollingMethods->concat([$snmpMethod]));
 
-                    if (app(DeviceSnmpIsAvailable::class)->execute($this->device)) {
+                    if ($snmpMethod->toPollingMethod()->isAvailable($this->device)) {
                         return;
                     } else {
                         $host_unreachable_exception->addReason($snmp_version, $snmpData['authname'] . '/' . $snmpData['authlevel']);
@@ -222,7 +223,7 @@ class ValidateDeviceAndCreate
                     // Set the relation temporarily for testing
                     $this->device->setRelation('pollingMethods', $otherPollingMethods->concat([$snmpMethod]));
 
-                    if (app(DeviceSnmpIsAvailable::class)->execute($this->device)) {
+                    if ($snmpMethod->toPollingMethod()->isAvailable($this->device)) {
                         return;
                     } else {
                         $host_unreachable_exception->addReason($snmp_version, $community);
