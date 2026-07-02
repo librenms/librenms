@@ -16,6 +16,31 @@ class UpdatePollingMethodRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation by replacing masked values with original database values.
+     */
+    protected function prepareForValidation(): void
+    {
+        $type = $this->pollingType();
+        if ($type && $type->hasSecret() && $this->has('secret_data')) {
+            $device = $this->route('device');
+            if ($device) {
+                $pollingMethod = $device->pollingMethods()->where('method_type', $type->value)->first();
+                $oldData = $pollingMethod?->secret?->data ?? [];
+
+                $secretData = $this->input('secret_data');
+                if (is_array($secretData)) {
+                    foreach ($secretData as $key => $val) {
+                        if ($val === '********') {
+                            $secretData[$key] = data_get($oldData, $key, '');
+                        }
+                    }
+                    $this->merge(['secret_data' => $secretData]);
+                }
+            }
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
