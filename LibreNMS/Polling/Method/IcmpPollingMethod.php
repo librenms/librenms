@@ -44,13 +44,13 @@ readonly class IcmpPollingMethod implements PollingMethod
         return $status->isAlive();
     }
 
-    public static function fromModel(DevicePollingMethod $method): self
+    public static function fromModel(DevicePollingMethod $method): static
     {
         if ($method->method_type !== PollingMethodType::Icmp) {
             throw new \Exception('Invalid polling method type');
         }
 
-        return new self(
+        return new static(
             enabled: $method->enabled,
             affectsAvailability: $method->affects_availability,
         );

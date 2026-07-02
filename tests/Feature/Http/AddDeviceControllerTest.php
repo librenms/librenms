@@ -97,9 +97,10 @@ class AddDeviceControllerTest extends TestCase
 
         $factoryMock = Mockery::mock(\LibreNMS\Polling\PollingMethodFactory::class);
         $factoryMock->shouldReceive('make')
-            ->andReturnUsing(fn($method) => match ($method->method_type) {
+            ->andReturnUsing(fn(\App\Models\DevicePollingMethod $method) => match ($method->method_type) {
                 \LibreNMS\Enum\PollingMethodType::Icmp => $icmpMock,
                 \LibreNMS\Enum\PollingMethodType::Snmp => $snmpMock,
+                default => throw new \UnexpectedValueException("Unexpected polling method type"),
             });
         $this->instance(\LibreNMS\Polling\PollingMethodFactory::class, $factoryMock);
 

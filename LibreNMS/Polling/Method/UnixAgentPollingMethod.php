@@ -45,7 +45,7 @@ readonly class UnixAgentPollingMethod implements PollingMethod
         return false;
     }
 
-    public static function fromModel(DevicePollingMethod $method): self
+    public static function fromModel(DevicePollingMethod $method): static
     {
         if ($method->method_type !== PollingMethodType::UnixAgent) {
             throw new \Exception('Invalid polling method type');
@@ -53,7 +53,7 @@ readonly class UnixAgentPollingMethod implements PollingMethod
 
         $port = (int) ($method->settings['port'] ?? LibrenmsConfig::get('unix-agent.port', 6556));
 
-        return new self(
+        return new static(
             enabled: $method->enabled,
             affectsAvailability: $method->affects_availability,
             port: $port,
