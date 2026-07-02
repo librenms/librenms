@@ -21,7 +21,7 @@ class EncryptedArray implements CastsAttributes
         }
 
         try {
-            return json_decode(decrypt($value), true);
+            return json_decode((string) decrypt($value), true);
         } catch (DecryptException) {
             return [];
         }

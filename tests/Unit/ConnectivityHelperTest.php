@@ -15,22 +15,28 @@ final class ConnectivityHelperTest extends TestCase
     public function testDeviceStatus(): void
     {
         $icmpMock = Mockery::mock(\LibreNMS\Interfaces\PollingMethod::class);
+        $icmpMock->shouldReceive('isEnabled')
+            ->andReturnUsing(function () use (&$icmpMethod) {
+                return $icmpMethod->enabled;
+            });
         $icmpMock->shouldReceive('isAvailable')
             ->times(8)
             ->andReturn(true, false, true, false, true, false, true, false);
 
         $snmpMock = Mockery::mock(\LibreNMS\Interfaces\PollingMethod::class);
+        $snmpMock->shouldReceive('isEnabled')
+            ->andReturnUsing(function () use (&$snmpMethod) {
+                return $snmpMethod->enabled;
+            });
         $snmpMock->shouldReceive('isAvailable')
             ->times(8)
             ->andReturn(true, true, false, false, true, true, false, false);
 
         $factoryMock = Mockery::mock(\LibreNMS\Polling\PollingMethodFactory::class);
         $factoryMock->shouldReceive('make')
-            ->andReturnUsing(function ($method) use ($icmpMock, $snmpMock) {
-                return match ($method->method_type) {
-                    \LibreNMS\Enum\PollingMethodType::Icmp => $icmpMock,
-                    \LibreNMS\Enum\PollingMethodType::Snmp => $snmpMock,
-                };
+            ->andReturnUsing(fn($method) => match ($method->method_type) {
+                \LibreNMS\Enum\PollingMethodType::Icmp => $icmpMock,
+                \LibreNMS\Enum\PollingMethodType::Snmp => $snmpMock,
             });
         $this->instance(\LibreNMS\Polling\PollingMethodFactory::class, $factoryMock);
 
@@ -169,18 +175,24 @@ final class ConnectivityHelperTest extends TestCase
     public function testIpmiAndUnixAgentStatus(): void
     {
         $ipmiMock = Mockery::mock(\LibreNMS\Interfaces\PollingMethod::class);
+        $ipmiMock->shouldReceive('isEnabled')
+            ->andReturnUsing(function () use (&$ipmiMethod) {
+                return $ipmiMethod->enabled;
+            });
         $ipmiMock->shouldReceive('isAvailable')->andReturn(true, false);
 
         $unixAgentMock = Mockery::mock(\LibreNMS\Interfaces\PollingMethod::class);
+        $unixAgentMock->shouldReceive('isEnabled')
+            ->andReturnUsing(function () use (&$unixAgentMethod) {
+                return $unixAgentMethod->enabled;
+            });
         $unixAgentMock->shouldReceive('isAvailable')->andReturn(true, false);
 
         $factoryMock = Mockery::mock(\LibreNMS\Polling\PollingMethodFactory::class);
         $factoryMock->shouldReceive('make')
-            ->andReturnUsing(function ($method) use ($ipmiMock, $unixAgentMock) {
-                return match ($method->method_type) {
-                    \LibreNMS\Enum\PollingMethodType::Ipmi => $ipmiMock,
-                    \LibreNMS\Enum\PollingMethodType::UnixAgent => $unixAgentMock,
-                };
+            ->andReturnUsing(fn($method) => match ($method->method_type) {
+                \LibreNMS\Enum\PollingMethodType::Ipmi => $ipmiMock,
+                \LibreNMS\Enum\PollingMethodType::UnixAgent => $unixAgentMock,
             });
         $this->instance(\LibreNMS\Polling\PollingMethodFactory::class, $factoryMock);
 
