@@ -18,19 +18,22 @@ class CheckDeviceAvailability
 
     public function execute(Device $device, bool $commit = false): bool
     {
+        $connectivity = new ConnectivityHelper($device);
         $ping_response = $this->deviceIsPingable->execute($device);
 
+        $is_up_snmp = ! $connectivity->snmpIsEnabled() || $this->deviceIsSnmpable->execute($device);
+
         if ($ping_response->isAlive()) {
-            $is_up_snmp = ! ConnectivityHelper::snmpIsAllowed($device) || $this->deviceIsSnmpable->execute($device);
             $this->setDeviceAvailability->execute($device, $is_up_snmp, AvailabilitySource::Snmp, $commit);
 
             $device->mtu_status = $this->deviceMtuTest->execute($device);
         } else { // icmp down
-            $this->setDeviceAvailability->execute($device, false, AvailabilitySource::Icmp, $commit);
+            $reason = $is_up_snmp ? AvailabilitySource::Icmp : AvailabilitySource::Both;
+            $this->setDeviceAvailability->execute($device, false, $reason, $commit);
         }
 
         if ($commit) {
-            if (ConnectivityHelper::pingIsAllowed($device)) {
+            if ($connectivity->icmpIsEnabled()) {
                 $ping_response->saveStats($device);
             }
 
