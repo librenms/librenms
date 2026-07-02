@@ -1,0 +1,18 @@
+---
+os: fs-fmt04
+text: 'FS FMT / OAP chassis'
+type: network
+icon: fs
+group: fs
+mib_dir: fs
+discovery:
+    - sysObjectID:
+          - .1.3.6.1.4.1.8072.3.2.10
+      sysDescr:
+          - Linux
+      # Must be a single mapping (oid/op/value). A YAML sequence here breaks Core.php
+      # (Undefined array key "oid", SnmpQuery gets null).
+      snmpget:
+          oid: OAP-NMU::deviceType.0
+          op: starts
+          value: 'OAP'
