@@ -1,14 +1,14 @@
 <nav class="navbar navbar-default {{ $navbar }} navbar-sticky-top" role="navigation">
         <div class="navbar-header">
+            <a class="navbar-brand" href="{{ route('home') }}">
+                <x-logo responsive="lg" class="tw:h-full tw:max-w-[170px]" />
+            </a>
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navHeaderCollapse">
                 <span class="sr-only">{{ __('Toggle navigation') }}</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="{{ route('home') }}">
-                <x-logo responsive="lg" class="tw:h-full tw:max-w-[170px]" />
-            </a>
         </div>
 
         <div class="collapse navbar-collapse" id="navHeaderCollapse" style="max-height: calc(100vh - 50px)">
@@ -641,7 +641,6 @@
                 @includeIf('menu.custom')
             </ul>
 
-{{-- User --}}
             <div class="navbar-form navbar-right global-search tw:relative" x-data="globalSearch()"
                  @keydown.escape="close()" @click.outside="close()">
                 <div class="form-group">
@@ -652,7 +651,7 @@
                            @keydown="onKey($event)">
                 </div>
                 <div x-show="open" x-cloak
-                     class="tw:absolute tw:right-0 tw:mt-1 tw:w-[50rem] tw:max-w-[90vw] tw:max-h-[70vh] tw:overflow-y-auto tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200 tw:rounded-lg tw:shadow-xl tw:z-50">
+                     class="global-search-dropdown tw:absolute tw:right-0 tw:mt-1 tw:w-[50rem] tw:max-w-[90vw] tw:max-h-[70vh] tw:overflow-y-auto tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200 tw:rounded-lg tw:shadow-xl tw:z-50">
                     <div x-show="loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-gray-500 tw:dark:text-dark-white-400">
                         <i class="fa fa-spinner fa-spin"></i> {{ __('Searching...') }}
                     </div>
@@ -783,16 +782,65 @@
 </nav>
 
 <style>
-    /* On mobile, put the global search at the top of the collapsed menu.
-       Scoped to the open (.in/.collapsing) state so the collapse toggle still works. */
     @media (max-width: 767px) {
-        #navHeaderCollapse.in,
-        #navHeaderCollapse.collapsing {
-            display: flex;
-            flex-direction: column;
+        /* Make the header a flex container to place search between logo and toggle button */
+        .navbar-header {
+            display: flex !important;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            height: 50px;
+            padding-left: 15px;
+            padding-right: 15px;
+            float: none !important;
         }
-        #navHeaderCollapse .global-search {
-            order: -1;
+
+        .navbar-brand {
+            flex-shrink: 0 !important;
+            float: none !important;
+            height: 50px !important;
+            padding: 10px 0 !important;
+            margin: 0 !important;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-toggle {
+            flex-shrink: 0 !important;
+            float: none !important;
+            margin: 0 !important;
+            padding: 9px 10px !important;
+        }
+
+        /* Mobile Search Bar styling */
+        .navbar-header .global-search {
+            display: block !important;
+            flex: 1 1 auto;
+            margin: 0 10px !important;
+            padding: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .navbar-header .global-search .form-group {
+            margin: 0 !important;
+            width: 100%;
+        }
+
+        .navbar-header .global-search input {
+            width: 100% !important;
+            height: 34px;
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+
+        /* Center and format the search results dropdown on mobile */
+        .navbar-header .global-search .global-search-dropdown {
+            left: 50% !important;
+            right: auto !important;
+            transform: translateX(-50%) !important;
+            width: 95vw !important;
+            max-width: 95vw !important;
         }
     }
 </style>
@@ -897,7 +945,26 @@
         }
     @endif
 
+    function repositionSearch() {
+        var search = document.querySelector('.global-search');
+        if (!search) { return; }
+        if (window.innerWidth < 768) {
+            var toggle = document.querySelector('.navbar-header .navbar-toggle');
+            if (toggle && search.parentElement !== toggle.parentElement) {
+                toggle.parentElement.insertBefore(search, toggle);
+            }
+        } else {
+            var rightNav = document.querySelector('#navHeaderCollapse ul.navbar-right');
+            if (rightNav && search.parentElement !== rightNav.parentElement) {
+                rightNav.parentElement.insertBefore(search, rightNav);
+            }
+        }
+    }
+
     $(document).ready(function(){
+        repositionSearch();
+        window.addEventListener('resize', repositionSearch);
+
         // Focus Global Search when "/" is pressed (unless typing in a field)
         window.addEventListener("keydown", function (e) {
             if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) {
@@ -908,7 +975,10 @@
                 return;
             }
             e.preventDefault();
-            $('#gsearch').focus();
+            var visibleInput = Array.from(document.querySelectorAll('.global-search input')).find(el => el.offsetWidth > 0 || el.offsetHeight > 0);
+            if (visibleInput) {
+                visibleInput.focus();
+            }
         });
     })
 
