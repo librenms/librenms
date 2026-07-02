@@ -63,18 +63,21 @@ and set the global default dashboard.
 
 ## NOC Dashboard Rotation
 
-You can create a per-user NOC rotation list from dashboards.
+You can create per-user named NOC playlists from dashboards.
 
-1. Open any dashboard.
-2. Open **Dashboard Editor**.
-3. Enable **Include this dashboard in my NOC rotation list**.
-4. Repeat for each dashboard you want in your rotation.
+1. Open **Overview -> Dashboard -> NOC View**.
+2. Create a playlist name.
+3. Select one or more dashboards you can access.
+4. Save the playlist.
 
-To start rotating through the selected dashboards, open **Overview -> Dashboard -> NOC View**.
+To start rotating, open **Overview -> Dashboard -> NOC View** and choose which playlist to play.
 
-NOC rotation always reads your current dashboard list when NOC View starts.
+NOC rotation validates dashboards at play time. If a playlist contains missing or inaccessible dashboards,
+LibreNMS asks for confirmation before removing those entries from the playlist and continuing.
+
 Dashboard permissions are unchanged, so only dashboards you can already access are included.
-Some browsers block automatic fullscreen requests unless they come from a direct user action, so NOC View shows a centered fullscreen prompt on startup when the automatic request is blocked.
+
+Some browsers block automatic fullscreen requests unless they come from a direct user action, so NOC View shows a centered fullscreen prompt on startup.
 
 ### Rotation Interval
 

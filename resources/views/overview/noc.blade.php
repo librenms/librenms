@@ -242,14 +242,14 @@
         nocCountdownRunning = false;
         $('#noc-startup-overlay').hide();
         document.exitFullscreen().catch(function () {
-            window.location.href = '{{ route('overview') }}';
+            window.location.href = '{{ route('dashboard.noc.playlists') }}';
         });
     });
 
     document.addEventListener('fullscreenchange', function () {
         if (! document.fullscreenElement && nocRedirectAfterExit) {
             $('#noc-startup-overlay').hide();
-            window.location.href = '{{ route('overview') }}';
+            window.location.href = '{{ route('dashboard.noc.playlists') }}';
             return;
         }
 

@@ -33,6 +33,7 @@ use App\Models\UserPref;
 use App\Models\UserWidget;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -105,6 +106,7 @@ class DashboardController extends Controller
             'bare' => 'nullable|in:yes',
         ]);
 
+        /** @var User $user */
         $user = Auth::user();
 
         // Split dashboards into user owned or shared
@@ -141,7 +143,6 @@ class DashboardController extends Controller
             'dash_config' => $data,
             'dashboard' => $dashboard,
             'hide_dashboard_editor' => UserPref::getPref($user, 'hide_dashboard_editor'),
-            'noc_enabled' => $this->getNocDashboardIds($user)->contains($dashboard->dashboard_id),
             'user_dashboards' => $user_dashboards,
             'shared_dashboards' => $shared_dashboards,
             'widgets' => $widgets,
@@ -152,15 +153,157 @@ class DashboardController extends Controller
     /**
      * @return \Illuminate\Contracts\View\View
      */
-    public function noc(Request $request)
+    public function nocPlaylists(Request $request)
     {
         $user = $request->user();
-        $dashboards = $this->getAvailableDashboards($user);
+        $cleanup_data = $this->getNocCleanupData($user);
+        if ($cleanup_data !== null) {
+            return view('overview.noc_cleanup', $cleanup_data);
+        }
 
-        $noc_dashboards = $this->getNocDashboardIds($user)
+        $dashboard_name_map = $this->getAvailableDashboards($user)
+            ->mapWithKeys(fn (Dashboard $dashboard): array => [$dashboard->dashboard_id => $dashboard->dashboard_name]);
+
+        return view('overview.noc_playlists', [
+            'playlists' => $this->getNocPlaylists($user),
+            'dashboards' => $this->getAvailableDashboards($user)->values(),
+            'dashboard_name_map' => $dashboard_name_map,
+        ]);
+    }
+
+    public function storeNocPlaylist(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:64',
+            'dashboard_ids' => 'required|array|min:1',
+            'dashboard_ids.*' => 'integer',
+        ]);
+
+        $user = $request->user();
+        $playlists = $this->getNocPlaylists($user);
+        $dashboard_ids = $this->filterAllowedDashboardIds($user, $validated['dashboard_ids']);
+
+        if ($dashboard_ids->isEmpty()) {
+            return back()->with('error', __('dashboard.noc.playlist_invalid_dashboards'));
+        }
+
+        $next_id = ((int) $playlists->max('id')) + 1;
+        $playlists->push([
+            'id' => $next_id,
+            'name' => trim($validated['name']),
+            'dashboard_ids' => $dashboard_ids->all(),
+        ]);
+
+        $this->saveNocPlaylists($user, $playlists);
+
+        return back()->with('status', __('dashboard.noc.playlist_saved'));
+    }
+
+    public function updateNocPlaylist(Request $request, int $playlistId): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:64',
+            'dashboard_ids' => 'required|array|min:1',
+            'dashboard_ids.*' => 'integer',
+        ]);
+
+        $user = $request->user();
+        $playlists = $this->getNocPlaylists($user);
+        $dashboard_ids = $this->filterAllowedDashboardIds($user, $validated['dashboard_ids']);
+
+        if ($dashboard_ids->isEmpty()) {
+            return back()->with('error', __('dashboard.noc.playlist_invalid_dashboards'));
+        }
+
+        $index = $playlists->search(fn (array $playlist): bool => $playlist['id'] === $playlistId);
+        if ($index === false) {
+            return back()->with('error', __('dashboard.noc.playlist_not_found'));
+        }
+
+        $playlists->put((int) $index, [
+            'id' => $playlistId,
+            'name' => trim($validated['name']),
+            'dashboard_ids' => $dashboard_ids->all(),
+        ]);
+
+        $this->saveNocPlaylists($user, $playlists);
+
+        return back()->with('status', __('dashboard.noc.playlist_saved'));
+    }
+
+    public function destroyNocPlaylist(Request $request, int $playlistId): RedirectResponse
+    {
+        $user = $request->user();
+        $playlists = $this->getNocPlaylists($user)
+            ->reject(fn (array $playlist): bool => $playlist['id'] === $playlistId)
+            ->values();
+
+        $this->saveNocPlaylists($user, $playlists);
+
+        return back()->with('status', __('dashboard.noc.playlist_deleted'));
+    }
+
+    /**
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
+     */
+    public function nocPlay(Request $request)
+    {
+        return $this->renderNocPlaylist($request);
+    }
+
+    public function cleanupAllNocPlaylists(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        $allowed_ids = $this->getAvailableDashboards($user)->keys();
+
+        $playlists = $this->getNocPlaylists($user)
+            ->map(function (array $playlist) use ($allowed_ids): array {
+                $playlist['dashboard_ids'] = collect($playlist['dashboard_ids'])
+                    ->filter(fn (int $id): bool => $allowed_ids->contains($id))
+                    ->values()
+                    ->all();
+
+                return $playlist;
+            })
+            ->filter(fn (array $playlist): bool => ! empty($playlist['dashboard_ids']))
+            ->values();
+
+        $this->saveNocPlaylists($user, $playlists);
+
+        return redirect()->route('dashboard.noc.playlists')->with('status', __('dashboard.noc.cleanup_done'));
+    }
+
+    /**
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
+     */
+    private function renderNocPlaylist(Request $request)
+    {
+        $validated = $request->validate([
+            'playlist_id' => 'required|integer|min:1',
+        ]);
+
+        $user = $request->user();
+        $playlist_id = (int) $validated['playlist_id'];
+        $playlists = $this->getNocPlaylists($user);
+        $playlist = $playlists->first(fn (array $item): bool => $item['id'] === $playlist_id);
+
+        if (! is_array($playlist)) {
+            return redirect()->route('dashboard.noc.playlists')->with('error', __('dashboard.noc.playlist_not_found'));
+        }
+
+        $dashboards = $this->getAvailableDashboards($user);
+        $valid_ids = collect($playlist['dashboard_ids'])
+            ->filter(fn (int $id): bool => $dashboards->has($id))
+            ->values();
+
+        $noc_dashboards = $valid_ids
             ->map(fn (int $dashboard_id) => $dashboards->get($dashboard_id))
             ->filter()
             ->values();
+
+        if ($noc_dashboards->isEmpty()) {
+            return redirect()->route('dashboard.noc.playlists')->with('error', __('dashboard.noc.empty'));
+        }
 
         return view('overview.noc', [
             'noc_dashboards' => $noc_dashboards,
@@ -168,36 +311,41 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function updateNoc(Request $request, Dashboard $dashboard): JsonResponse
+    /**
+     * @return array{playlists_with_missing: Collection<int, array{id: int<1, max>, name: string, missing_ids: array<int, int<1, max>>}>, missing_ids: Collection<int, int<1, max>>}|null
+     */
+    private function getNocCleanupData(User $user): ?array
     {
-        $this->authorize('view', $dashboard);
+        $allowed_ids = $this->getAvailableDashboards($user)->keys();
+        $playlists_with_missing = $this->getNocPlaylists($user)
+            ->map(function (array $playlist) use ($allowed_ids): array {
+                $missing_ids = collect($playlist['dashboard_ids'])
+                    ->filter(fn (int $id): bool => ! $allowed_ids->contains($id))
+                    ->values()
+                    ->all();
 
-        $validated = $request->validate([
-            'enabled' => 'required|boolean',
-        ]);
+                return [
+                    'id' => $playlist['id'],
+                    'name' => $playlist['name'],
+                    'missing_ids' => $missing_ids,
+                ];
+            })
+            ->filter(fn (array $playlist): bool => ! empty($playlist['missing_ids']))
+            ->values();
 
-        $user = $request->user();
-        $dashboard_ids = $this->getNocDashboardIds($user);
-
-        if ((bool) $validated['enabled']) {
-            $dashboard_ids->push($dashboard->dashboard_id);
-        } else {
-            $dashboard_ids = $dashboard_ids->reject(fn (int $id) => $id === $dashboard->dashboard_id);
+        if ($playlists_with_missing->isEmpty()) {
+            return null;
         }
 
-        $dashboard_ids = $dashboard_ids->unique()->values();
+        $missing_ids = $playlists_with_missing
+            ->flatMap(fn (array $playlist): array => $playlist['missing_ids'])
+            ->unique()
+            ->values();
 
-        if ($dashboard_ids->isEmpty()) {
-            UserPref::forgetPref($user, 'noc_dashboards');
-        } else {
-            UserPref::setPref($user, 'noc_dashboards', $dashboard_ids->all());
-        }
-
-        return response()->json([
-            'status' => 'ok',
-            'message' => __('dashboard.noc.updated'),
-            'count' => $dashboard_ids->count(),
-        ]);
+        return [
+            'playlists_with_missing' => $playlists_with_missing,
+            'missing_ids' => $missing_ids,
+        ];
     }
 
     public function store(Request $request): JsonResponse
@@ -321,18 +469,88 @@ class DashboardController extends Controller
     }
 
     /**
+     * @param  array<int, mixed>  $dashboard_ids
      * @return Collection<int, int<1, max>>
      */
-    private function getNocDashboardIds(User $user): Collection
+    private function filterAllowedDashboardIds(User $user, array $dashboard_ids): Collection
     {
-        $selected_ids = collect(UserPref::getPref($user, 'noc_dashboards') ?? [])
-            ->map(fn (mixed $id): int => (int) $id)
-            ->filter(fn (int $id) => $id > 0);
-
         $allowed_ids = $this->getAvailableDashboards($user)->keys();
 
-        return $selected_ids
-            ->filter(fn (int $id) => $allowed_ids->contains($id))
+        return collect($dashboard_ids)
+            ->map(fn (mixed $id): int => (int) $id)
+            ->filter(fn (int $id): bool => $id > 0 && $allowed_ids->contains($id))
+            ->unique()
             ->values();
+    }
+
+    /**
+     * @return Collection<int, array{id: int<1, max>, name: string, dashboard_ids: array<int, int<1, max>>}>
+     */
+    private function getNocPlaylists(User $user): Collection
+    {
+        $raw_prefs = UserPref::query()
+            ->where('user_id', $user->user_id)
+            ->where('pref', 'like', 'noc_playlist_%')
+            ->get(['pref', 'value']);
+
+        $playlists = [];
+
+        foreach ($raw_prefs as $pref) {
+            $pref_key = (string) $pref->pref;
+
+            if (preg_match('/^noc_playlist_(\d+)_name$/', $pref_key, $matches) === 1) {
+                $playlist_id = (int) $matches[1];
+                $playlists[$playlist_id] ??= ['id' => $playlist_id, 'name' => '', 'dashboard_ids' => []];
+                $playlists[$playlist_id]['name'] = trim((string) $pref->value);
+                continue;
+            }
+
+            if (preg_match('/^noc_playlist_(\d+)_dash_(\d+)$/', $pref_key, $matches) === 1) {
+                $playlist_id = (int) $matches[1];
+                $dashboard_id = (int) $matches[2];
+                if ($dashboard_id <= 0) {
+                    continue;
+                }
+
+                $playlists[$playlist_id] ??= ['id' => $playlist_id, 'name' => '', 'dashboard_ids' => []];
+                $playlists[$playlist_id]['dashboard_ids'][] = $dashboard_id;
+            }
+        }
+
+        return collect($playlists)
+            ->map(function (array $playlist): array {
+                $playlist['dashboard_ids'] = collect($playlist['dashboard_ids'])
+                    ->map(fn (int $id): int => (int) $id)
+                    ->filter(fn (int $id): bool => $id > 0)
+                    ->unique()
+                    ->values()
+                    ->all();
+
+                return $playlist;
+            })
+            ->filter(fn (array $playlist): bool => $playlist['id'] > 0 && $playlist['name'] !== '' && ! empty($playlist['dashboard_ids']))
+            ->sortBy('id')
+            ->values();
+    }
+
+    /**
+     * @param  Collection<int, array{id: int<1, max>, name: string, dashboard_ids: array<int, int<1, max>>}>  $playlists
+     */
+    private function saveNocPlaylists(User $user, Collection $playlists): void
+    {
+        UserPref::query()
+            ->where('user_id', $user->user_id)
+            ->where('pref', 'like', 'noc_playlist_%')
+            ->delete();
+
+        UserPref::forgetPref($user, 'noc_playlists');
+
+        foreach ($playlists->values() as $playlist) {
+            UserPref::setPref($user, "noc_playlist_{$playlist['id']}_name", $playlist['name']);
+
+            foreach ($playlist['dashboard_ids'] as $dashboard_id) {
+                UserPref::setPref($user, "noc_playlist_{$playlist['id']}_dash_{$dashboard_id}", 1);
+            }
+        }
     }
 }
