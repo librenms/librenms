@@ -674,7 +674,7 @@
                                     </template>
                                     <span class="tw:min-w-0 tw:flex-1">
                                         <span class="tw:block tw:truncate" x-text="item.name"></span>
-                                        <span class="tw:block tw:truncate tw:text-xs tw:text-gray-500 tw:dark:text-dark-white-400" x-text="item.subtitle"></span>
+                                        <span class="tw:block tw:truncate tw:text-sm tw:text-gray-500 tw:dark:text-dark-white-400" x-text="item.subtitle"></span>
                                     </span>
                                 </a>
                             </template>
@@ -882,22 +882,19 @@
         }
     @endif
 
-    @if($global_search_ctrlf_focus)
-        $(document).ready(function(){
-            // Function to focus Global Search on Ctrl-F
-            window.addEventListener("keydown",function (e) {
-                if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)){
-                    if($('#gsearch').is(":focus")) {
-                        //allow normal Ctrl-F on a 2nd Hit
-                        return true;
-                    } else {
-                        //set Focus on Global Search and ignore Browsers defaults
-                        e.preventDefault();
-                        $('#gsearch').focus();
-                    }
-                }
-            })
-        })
-    @endif
+    $(document).ready(function(){
+        // Focus Global Search when "/" is pressed (unless typing in a field)
+        window.addEventListener("keydown", function (e) {
+            if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) {
+                return;
+            }
+            var el = document.activeElement;
+            if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.isContentEditable)) {
+                return;
+            }
+            e.preventDefault();
+            $('#gsearch').focus();
+        });
+    })
 
 </script>
