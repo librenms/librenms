@@ -31,9 +31,14 @@ use LibreNMS\Enum\PollingMethodType;
 
 readonly class ConnectivityHelper
 {
+    private PollingMethodFactory $pollingMethodFactory;
+
     public function __construct(
         private Device $device,
-    ) {}
+        ?PollingMethodFactory $pollingMethodFactory = null,
+    ) {
+        $this->pollingMethodFactory = $pollingMethodFactory ?? app(PollingMethodFactory::class);
+    }
 
     public function isAvailable(): bool
     {
@@ -46,7 +51,8 @@ readonly class ConnectivityHelper
         }
 
         foreach ($this->device->pollingMethods as $method) {
-            if ($method->enabled && $method->affects_availability && ! $method->last_check_successful) {
+            $pollingMethod = $this->pollingMethodFactory->make($method);
+            if ($pollingMethod->isEnabled() && $method->affects_availability && ! $method->last_check_successful) {
                 return false;
             }
         }
@@ -57,7 +63,8 @@ readonly class ConnectivityHelper
     public function hasAvailability(): bool
     {
         foreach ($this->device->pollingMethods as $method) {
-            if ($method->enabled && $method->affects_availability) {
+            $pollingMethod = $this->pollingMethodFactory->make($method);
+            if ($pollingMethod->isEnabled() && $method->affects_availability) {
                 return true;
             }
         }
@@ -67,14 +74,16 @@ readonly class ConnectivityHelper
 
     public function methodIsEnabled(PollingMethodType $type): bool
     {
-        return (bool) $this->device->getPollingMethod($type)?->enabled;
+        $method = $this->device->getPollingMethod($type);
+
+        return $method ? $this->pollingMethodFactory->make($method)->isEnabled() : false;
     }
 
     public function methodIsAvailable(PollingMethodType $type): bool
     {
         $method = $this->device->getPollingMethod($type);
 
-        return $method?->enabled && $method?->last_check_successful;
+        return $method && $this->pollingMethodFactory->make($method)->isEnabled() && $method->last_check_successful;
     }
 
     public function snmpIsEnabled(): bool
