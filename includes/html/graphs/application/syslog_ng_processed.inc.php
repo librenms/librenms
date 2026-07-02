@@ -17,11 +17,21 @@ if (isset($vars['syslog_ng_source'])) {
 
 $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
-    $rrd_list[] = [
-        'filename' => $rrd_filename,
-        'descr'    => 'processed',
-        'ds'       => 'data',
-    ];
+    if (!isset($vars['syslog_ng_source'])) {
+        foreach (['max', 'mean', 'median', 'min', 'mode', 'sum'] as $ds) {
+            $rrd_list[] = [
+                'filename' => $rrd_filename,
+                'descr'    => ucfirst($ds),
+                'ds'       => $ds,
+            ];
+        }
+    } else {
+        $rrd_list[] = [
+            'filename' => $rrd_filename,
+            'descr'    => 'processed',
+            'ds'       => 'data',
+        ];
+    }
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');
 }
