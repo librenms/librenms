@@ -34,7 +34,6 @@ $center_fields = [
     'received' => $data['center_received_processed'],
 ];
 
-
 $tags = [
     'name' => $name,
     'app_id' => $app->app_id,
@@ -60,6 +59,9 @@ $gauge_rrd_def = RrdDefinition::make()
     ->addDataset('mode', 'GAUGE', 0)
     ->addDataset('sum', 'GAUGE', 0);
 
+$single_counter_rrd_def = RrdDefinition::make()
+    ->addDataset('data', 'DERIVE', 0)
+
 $gauge = [
     'batch_size_avg',
     'batch_size_max',
@@ -70,13 +72,16 @@ $gauge = [
 $counter = [
     'connections',
     'discarded',
-    'dropped',
-    'processed',
-    'queued',
     'truncated_bytes',
     'truncated_count',
     'written',
 ];
+
+$single_counter = [
+    'dropped',
+    'processed',
+    'queued',
+]
 
 $tags['rrd_def'] = $gauge_rrd_def;
 foreach ($gauge as $stat) {
@@ -116,6 +121,20 @@ foreach ($counter as $stat) {
     }
 }
 
+$tags['rrd_def'] = $single_counter_rrd_def;
+foreach ($counter as $stat) {
+    if (! is_null($source[$stat])) {
+        $tags['rrd_name'] = ['app', $name, $app->app_id, 'global_-_'.$stat];
+        $stats_fields = [
+            'data' => $source[$stat],
+        ];
+        app('Datastore')->put($device, 'app', $tags, $stats_fields);
+        $app_data['sources'][$source_name][$stat] = true;
+    } else {
+        $app_data['sources'][$source_name][$stat] = false;
+    }
+}
+
 foreach ($data['sources'] as $source_name => $source) {
     $app_data['sources'][$source_name] = [];
 
@@ -149,6 +168,20 @@ foreach ($data['sources'] as $source_name => $source) {
                 'min' => $source[$stat]['min'],
                 'mode' => $source[$stat]['mode'],
                 'sum' => $source[$stat]['sum'],
+            ];
+            app('Datastore')->put($device, 'app', $tags, $stats_fields);
+            $app_data['sources'][$source_name][$stat] = true;
+        } else {
+            $app_data['sources'][$source_name][$stat] = false;
+        }
+    }
+
+    $tags['rrd_def'] = $single_counter_rrd_def;
+    foreach ($counter as $stat) {
+        if (! is_null($source[$stat])) {
+            $tags['rrd_name'] = ['app', $name, $app->app_id, 'source_-_'.$stat.'_-_'.$source_name];
+            $stats_fields = [
+                'data' => $source[$stat],
             ];
             app('Datastore')->put($device, 'app', $tags, $stats_fields);
             $app_data['sources'][$source_name][$stat] = true;
