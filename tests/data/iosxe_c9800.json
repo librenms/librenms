@@ -4706,8 +4706,7 @@
                     "ifStackStatus": "active"
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     },
     "vrf": {
         "discovery": {
