@@ -223,6 +223,12 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('maps/devicedependency', [DeviceDependencyController::class, 'dependencyMap']);
 
     // dashboard
+    Route::get('dashboard/noc/playlists', [DashboardController::class, 'nocPlaylists'])->name('dashboard.noc.playlists');
+    Route::post('dashboard/noc/playlists', [DashboardController::class, 'storeNocPlaylist'])->name('dashboard.noc.playlists.store');
+    Route::put('dashboard/noc/playlists/{playlistId}', [DashboardController::class, 'updateNocPlaylist'])->name('dashboard.noc.playlists.update');
+    Route::delete('dashboard/noc/playlists/{playlistId}', [DashboardController::class, 'destroyNocPlaylist'])->name('dashboard.noc.playlists.destroy');
+    Route::post('dashboard/noc/cleanup-all', [DashboardController::class, 'cleanupAllNocPlaylists'])->name('dashboard.noc.cleanup.all');
+    Route::get('dashboard/noc/play', [DashboardController::class, 'nocPlay'])->name('dashboard.noc.play');
     Route::resource('dashboard', DashboardController::class)->except(['create', 'edit']);
     Route::post('dashboard/{dashboard}/copy', [DashboardController::class, 'copy'])->name('dashboard.copy');
     Route::post('dashboard/{dashboard}/widgets', [DashboardWidgetController::class, 'add'])->name('dashboard.widget.add');
