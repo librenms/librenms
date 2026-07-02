@@ -169,7 +169,7 @@ packetCounter OBJECT-TYPE
     ::= { hardwareData 14 }
 
 activityAP OBJECT-TYPE
-    SYNTAX Integer { absent(0), present(2) }
+    SYNTAX Integer { off(0), beacon(1), traffic(2) }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "AP Activity"
