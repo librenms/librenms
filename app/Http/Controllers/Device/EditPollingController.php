@@ -24,7 +24,8 @@ class EditPollingController
 
     public function __construct(
         private readonly SecretService $secretService,
-    ) {}
+    ) {
+    }
 
     /**
      * @throws AuthorizationException
@@ -52,6 +53,7 @@ class EditPollingController
     private function buildMethodData(Device $device, PollingMethodType $type): array
     {
         $methodClass = $type->methodClass();
+        /** @var DevicePollingMethod|null $row */
         $row = $device->pollingMethods->firstWhere('method_type', $type);
         $secret = $row?->secret;
         $canUnmaskSecrets = Gate::allows('unmask', Secret::class);
@@ -63,11 +65,11 @@ class EditPollingController
             ->orderBy('description')
             ->get();
         $secretDescriptions = $secretsForType->mapWithKeys(fn (Secret $availableSecret): array => [
-            (string)$availableSecret->id => $availableSecret->description,
+            (string) $availableSecret->id => $availableSecret->description,
         ])->all();
         $secretFormDataById = $secretsForType->mapWithKeys(fn (Secret $availableSecret): array => [
-            (string)$availableSecret->id => collect($schemaFields)->mapWithKeys(fn (array $field): array => [
-                $field['key'] => $canUnmaskSecrets ? (string)data_get($availableSecret->data, $field['key'], '') : '',
+            (string) $availableSecret->id => collect($schemaFields)->mapWithKeys(fn (array $field): array => [
+                $field['key'] => $canUnmaskSecrets ? (string) data_get($availableSecret->data, $field['key'], '') : '',
             ])->all(),
         ])->all();
 
@@ -79,17 +81,17 @@ class EditPollingController
                 $key => $field['default'] ?? (isset($field['options']) ? array_key_first($field['options']) : ''),
             ])->all(),
             'settings_fields' => PollingMethodType::buildSchemaFields($settingsSchema, 'settingsData'),
-            'settings' => $row?->settings ?? [],
-            'affects_availability' => $row?->affects_availability ?? (bool)($methodClass::getDefaults()['affects_availability'] ?? false),
+            'settings' => $row ? $row->settings : [],
+            'affects_availability' => $row ? $row->affects_availability : (bool) ($methodClass::getDefaults()['affects_availability'] ?? false),
             'secret' => $secret,
             'secret_form_data' => collect($schema)->mapWithKeys(fn (array $field, string $key): array => [
-                $key => $canUnmaskSecrets ? (string)data_get($secret?->data, $key, '') : '',
+                $key => $canUnmaskSecrets ? (string) data_get($secret?->data, $key, '') : '',
             ])->all(),
             'secret_descriptions' => $secretDescriptions,
             'secret_form_data_by_id' => $secretFormDataById,
             'usage_count' => $secret?->devices()->count() ?? 0,
             'configured' => $row !== null,
-            'enabled' => $row?->enabled ?? false,
+            'enabled' => $row ? $row->enabled : false,
             'last_check_successful' => $row?->last_check_successful,
         ];
     }
@@ -125,7 +127,7 @@ class EditPollingController
             'device_id' => $device->device_id,
             'method_type' => $type,
             'enabled' => true,
-            'affects_availability' => (bool)($methodClass::getDefaults()['affects_availability'] ?? false),
+            'affects_availability' => (bool) ($methodClass::getDefaults()['affects_availability'] ?? false),
             'secret_id' => $secret?->id,
             'settings' => $this->buildSettings($methodClass, $request->validatedSettings()),
         ]);
@@ -174,17 +176,23 @@ class EditPollingController
     /**
      * @throws AuthorizationException|ValidationException
      */
-    public function update(UpdatePollingMethodRequest $request, Device $device, string $methodType, ToastInterface $toast, SetDeviceAvailability $setDeviceAvailability): RedirectResponse
-    {
+    public function update(
+        UpdatePollingMethodRequest $request,
+        Device $device,
+        string $methodType,
+        ToastInterface $toast,
+        SetDeviceAvailability $setDeviceAvailability
+    ): RedirectResponse {
         $this->authorize('update', $device);
 
         $type = PollingMethodType::tryFrom($methodType) ?? abort(404);
+        /** @var DevicePollingMethod $pollingMethod */
         $pollingMethod = $device->pollingMethods()->where('method_type', $type->value)->firstOrFail();
         $validated = $request->validated();
 
         if ($type->hasSecret() && array_key_exists('secret_id', $validated)) {
             $this->authorize('update', Secret::class);
-            $pollingMethod->secret_id = $this->resolveExistingSecret((int)$validated['secret_id'], $type)->id;
+            $pollingMethod->secret_id = $this->resolveExistingSecret((int) $validated['secret_id'], $type)->id;
         } elseif ($type->hasSecret() && $request->has('secret_data')) {
             $this->authorize('update', Secret::class);
             $mode = $validated['secret_update_mode'] ?? 'update';
@@ -200,8 +208,8 @@ class EditPollingController
 
         $methodClass = $type->methodClass();
 
-        $pollingMethod->enabled = (bool)($validated['enabled'] ?? true);
-        $pollingMethod->affects_availability = (bool)($validated['affects_availability'] ?? false);
+        $pollingMethod->enabled = (bool) ($validated['enabled'] ?? true);
+        $pollingMethod->affects_availability = (bool) ($validated['affects_availability'] ?? false);
         $pollingMethod->settings = $this->mergeSettings($pollingMethod->settings ?? [], $validated['settings'] ?? [], $methodClass);
 
         $pollingMethod->save();
@@ -230,8 +238,12 @@ class EditPollingController
     /**
      * @throws AuthorizationException
      */
-    public function destroy(Device $device, string $methodType, ToastInterface $toast, SetDeviceAvailability $setDeviceAvailability): RedirectResponse
-    {
+    public function destroy(
+        Device $device,
+        string $methodType,
+        ToastInterface $toast,
+        SetDeviceAvailability $setDeviceAvailability
+    ): RedirectResponse {
         $this->authorize('update', $device);
 
         $type = PollingMethodType::tryFrom($methodType) ?? abort(404);

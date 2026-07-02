@@ -4,8 +4,13 @@ namespace LibreNMS\Tests\Unit;
 
 use App\Actions\Device\CheckDeviceAvailability;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use LibreNMS\Data\Source\SnmpResponse;
+use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Interfaces\PollingMethod;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\Method\SnmpPollingMethod;
+use LibreNMS\Polling\PollingMethodFactory;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 use SnmpQuery;
@@ -14,7 +19,10 @@ final class ConnectivityHelperTest extends TestCase
 {
     public function testDeviceStatus(): void
     {
-        $icmpMock = Mockery::mock(\LibreNMS\Interfaces\PollingMethod::class);
+        $icmpMethod = new DevicePollingMethod();
+        $snmpMethod = new DevicePollingMethod();
+
+        $icmpMock = Mockery::mock(PollingMethod::class);
         $icmpMock->shouldReceive('isEnabled')
             ->andReturnUsing(function () use (&$icmpMethod) {
                 return $icmpMethod->enabled;
@@ -23,7 +31,7 @@ final class ConnectivityHelperTest extends TestCase
             ->times(8)
             ->andReturn(true, false, true, false, true, false, true, false);
 
-        $snmpMock = Mockery::mock(\LibreNMS\Interfaces\PollingMethod::class);
+        $snmpMock = Mockery::mock(PollingMethod::class);
         $snmpMock->shouldReceive('isEnabled')
             ->andReturnUsing(function () use (&$snmpMethod) {
                 return $snmpMethod->enabled;
@@ -32,22 +40,23 @@ final class ConnectivityHelperTest extends TestCase
             ->times(8)
             ->andReturn(true, true, false, false, true, true, false, false);
 
-        $factoryMock = Mockery::mock(\LibreNMS\Polling\PollingMethodFactory::class);
+        $factoryMock = Mockery::mock(PollingMethodFactory::class);
         $factoryMock->shouldReceive('make')
-            ->andReturnUsing(fn($method) => match ($method->method_type) {
-                \LibreNMS\Enum\PollingMethodType::Icmp => $icmpMock,
-                \LibreNMS\Enum\PollingMethodType::Snmp => $snmpMock,
+            ->andReturnUsing(fn(DevicePollingMethod $method) => match ($method->method_type) {
+                PollingMethodType::Icmp => $icmpMock,
+                PollingMethodType::Snmp => $snmpMock,
+                default => throw new \UnexpectedValueException("Unexpected polling method type"),
             });
-        $this->instance(\LibreNMS\Polling\PollingMethodFactory::class, $factoryMock);
+        $this->instance(PollingMethodFactory::class, $factoryMock);
 
         $device = new Device();
-        $icmpMethod = new \App\Models\DevicePollingMethod([
-            'method_type' => \LibreNMS\Enum\PollingMethodType::Icmp,
+        $icmpMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Icmp,
             'enabled' => true,
             'affects_availability' => true,
         ]);
-        $snmpMethod = new \App\Models\DevicePollingMethod([
-            'method_type' => \LibreNMS\Enum\PollingMethodType::Snmp,
+        $snmpMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Snmp,
             'enabled' => true,
             'affects_availability' => true,
         ]);
@@ -61,25 +70,25 @@ final class ConnectivityHelperTest extends TestCase
         $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
-        $this->assertTrue((new \LibreNMS\Polling\ConnectivityHelper($device))->isAvailable());
+        $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
 
         // ping down, snmp up
         $this->assertFalse(app(CheckDeviceAvailability::class)->execute($device));
         $this->assertFalse($device->status);
         $this->assertEquals('icmp', $device->status_reason);
-        $this->assertFalse((new \LibreNMS\Polling\ConnectivityHelper($device))->isAvailable());
+        $this->assertFalse((new ConnectivityHelper($device))->isAvailable());
 
         // ping up, snmp down
         $this->assertFalse(app(CheckDeviceAvailability::class)->execute($device));
         $this->assertFalse($device->status);
         $this->assertEquals('snmp', $device->status_reason);
-        $this->assertFalse((new \LibreNMS\Polling\ConnectivityHelper($device))->isAvailable());
+        $this->assertFalse((new ConnectivityHelper($device))->isAvailable());
 
         // ping down, snmp down
         $this->assertFalse(app(CheckDeviceAvailability::class)->execute($device));
         $this->assertFalse($device->status);
         $this->assertEquals('icmp,snmp', $device->status_reason);
-        $this->assertFalse((new \LibreNMS\Polling\ConnectivityHelper($device))->isAvailable());
+        $this->assertFalse((new ConnectivityHelper($device))->isAvailable());
 
         /** ping disabled and snmp enabled */
         $device->status = true;
@@ -91,25 +100,25 @@ final class ConnectivityHelperTest extends TestCase
         $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
-        $this->assertTrue((new \LibreNMS\Polling\ConnectivityHelper($device))->isAvailable());
+        $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
 
         // ping down, snmp up
         $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
-        $this->assertTrue((new \LibreNMS\Polling\ConnectivityHelper($device))->isAvailable());
+        $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
 
         // ping up, snmp down
         $this->assertFalse(app(CheckDeviceAvailability::class)->execute($device));
         $this->assertFalse($device->status);
         $this->assertEquals('snmp', $device->status_reason);
-        $this->assertFalse((new \LibreNMS\Polling\ConnectivityHelper($device))->isAvailable());
+        $this->assertFalse((new ConnectivityHelper($device))->isAvailable());
 
         // ping down, snmp down
         $this->assertFalse(app(CheckDeviceAvailability::class)->execute($device));
         $this->assertFalse($device->status);
         $this->assertEquals('snmp', $device->status_reason);
-        $this->assertFalse((new \LibreNMS\Polling\ConnectivityHelper($device))->isAvailable());
+        $this->assertFalse((new ConnectivityHelper($device))->isAvailable());
 
         /** ping enabled and snmp disabled */
         $device->status = true;
@@ -121,25 +130,25 @@ final class ConnectivityHelperTest extends TestCase
         $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
-        $this->assertTrue((new \LibreNMS\Polling\ConnectivityHelper($device))->isAvailable());
+        $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
 
         // ping down, snmp up
         $this->assertFalse(app(CheckDeviceAvailability::class)->execute($device));
         $this->assertFalse($device->status);
         $this->assertEquals('icmp', $device->status_reason);
-        $this->assertFalse((new \LibreNMS\Polling\ConnectivityHelper($device))->isAvailable());
+        $this->assertFalse((new ConnectivityHelper($device))->isAvailable());
 
         // ping up, snmp down
         $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
-        $this->assertTrue((new \LibreNMS\Polling\ConnectivityHelper($device))->isAvailable());
+        $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
 
         // ping down, snmp down
         $this->assertFalse(app(CheckDeviceAvailability::class)->execute($device));
         $this->assertFalse($device->status);
         $this->assertEquals('icmp', $device->status_reason);
-        $this->assertFalse((new \LibreNMS\Polling\ConnectivityHelper($device))->isAvailable());
+        $this->assertFalse((new ConnectivityHelper($device))->isAvailable());
 
         /** ping and snmp disabled */
         $device->status = true;
@@ -151,59 +160,63 @@ final class ConnectivityHelperTest extends TestCase
         $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
-        $this->assertTrue((new \LibreNMS\Polling\ConnectivityHelper($device))->isAvailable());
+        $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
 
         // ping down, snmp up
         $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
-        $this->assertTrue((new \LibreNMS\Polling\ConnectivityHelper($device))->isAvailable());
+        $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
 
         // ping up, snmp down
         $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
-        $this->assertTrue((new \LibreNMS\Polling\ConnectivityHelper($device))->isAvailable());
+        $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
 
         // ping down, snmp down
         $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
-        $this->assertTrue((new \LibreNMS\Polling\ConnectivityHelper($device))->isAvailable());
+        $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
     }
 
     public function testIpmiAndUnixAgentStatus(): void
     {
-        $ipmiMock = Mockery::mock(\LibreNMS\Interfaces\PollingMethod::class);
+        $ipmiMethod = new DevicePollingMethod();
+        $unixAgentMethod = new DevicePollingMethod();
+
+        $ipmiMock = Mockery::mock(PollingMethod::class);
         $ipmiMock->shouldReceive('isEnabled')
             ->andReturnUsing(function () use (&$ipmiMethod) {
                 return $ipmiMethod->enabled;
             });
         $ipmiMock->shouldReceive('isAvailable')->andReturn(true, false);
 
-        $unixAgentMock = Mockery::mock(\LibreNMS\Interfaces\PollingMethod::class);
+        $unixAgentMock = Mockery::mock(PollingMethod::class);
         $unixAgentMock->shouldReceive('isEnabled')
             ->andReturnUsing(function () use (&$unixAgentMethod) {
                 return $unixAgentMethod->enabled;
             });
         $unixAgentMock->shouldReceive('isAvailable')->andReturn(true, false);
 
-        $factoryMock = Mockery::mock(\LibreNMS\Polling\PollingMethodFactory::class);
+        $factoryMock = Mockery::mock(PollingMethodFactory::class);
         $factoryMock->shouldReceive('make')
-            ->andReturnUsing(fn($method) => match ($method->method_type) {
-                \LibreNMS\Enum\PollingMethodType::Ipmi => $ipmiMock,
-                \LibreNMS\Enum\PollingMethodType::UnixAgent => $unixAgentMock,
+            ->andReturnUsing(fn(DevicePollingMethod $method) => match ($method->method_type) {
+                PollingMethodType::Ipmi => $ipmiMock,
+                PollingMethodType::UnixAgent => $unixAgentMock,
+                default => throw new \UnexpectedValueException("Unexpected polling method type"),
             });
-        $this->instance(\LibreNMS\Polling\PollingMethodFactory::class, $factoryMock);
+        $this->instance(PollingMethodFactory::class, $factoryMock);
 
         $device = new Device();
-        $ipmiMethod = new \App\Models\DevicePollingMethod([
-            'method_type' => \LibreNMS\Enum\PollingMethodType::Ipmi,
+        $ipmiMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Ipmi,
             'enabled' => true,
             'affects_availability' => true,
         ]);
-        $unixAgentMethod = new \App\Models\DevicePollingMethod([
-            'method_type' => \LibreNMS\Enum\PollingMethodType::UnixAgent,
+        $unixAgentMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::UnixAgent,
             'enabled' => true,
             'affects_availability' => true,
         ]);
@@ -213,13 +226,13 @@ final class ConnectivityHelperTest extends TestCase
         $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
-        $this->assertTrue((new \LibreNMS\Polling\ConnectivityHelper($device))->isAvailable());
+        $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
 
         // ipmi down, unix agent down
         $this->assertFalse(app(CheckDeviceAvailability::class)->execute($device));
         $this->assertFalse($device->status);
         $this->assertEquals('ipmi,unix-agent', $device->status_reason);
-        $this->assertFalse((new \LibreNMS\Polling\ConnectivityHelper($device))->isAvailable());
+        $this->assertFalse((new ConnectivityHelper($device))->isAvailable());
     }
 
     public function testIsSNMPable(): void
