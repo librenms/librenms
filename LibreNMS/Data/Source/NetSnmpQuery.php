@@ -339,33 +339,6 @@ class NetSnmpQuery implements SnmpQueryInterface
         return array_merge($cmd, $oids);
     }
 
-    private function buildAuth(array &$cmd): void
-    {
-        if ($this->device->snmpver === 'v3') {
-            array_push($cmd, '-v3', '-l', $this->device->authlevel);
-            array_push($cmd, '-n', $this->context);
-
-            switch (strtolower((string) $this->device->authlevel)) {
-                case 'authpriv':
-                    array_push($cmd, '-x', $this->device->cryptoalgo);
-                    array_push($cmd, '-X', $this->device->cryptopass);
-                    // fallthrough
-                case 'authnopriv':
-                    array_push($cmd, '-a', $this->device->authalgo);
-                    array_push($cmd, '-A', $this->device->authpass);
-                    // fallthrough
-                case 'noauthnopriv':
-                    array_push($cmd, '-u', $this->device->authname ?: 'root');
-                    break;
-                default:
-                    Log::debug("Unsupported SNMPv3 AuthLevel: {$this->device->snmpver}");
-            }
-        } elseif ($this->device->snmpver === 'v2c' || $this->device->snmpver === 'v1') {
-            array_push($cmd, '-' . $this->device->snmpver, '-c', $this->context ? "{$this->device->community}@$this->context" : $this->device->community);
-        } else {
-            Log::debug("Unsupported SNMP Version: {$this->device->snmpver}");
-        }
-    }
 
     private function execMultiple(string $command, array $oids): SnmpResponse
     {
