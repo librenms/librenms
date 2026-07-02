@@ -23,6 +23,11 @@ readonly class IpmiPollingMethod implements PollingMethod
         public string $type,
     ) {}
 
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
     public function isAvailable(Device $device, bool $commit = false): bool
     {
         $ipmi = Ipmitool::init($device);

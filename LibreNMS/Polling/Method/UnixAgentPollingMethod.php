@@ -17,6 +17,11 @@ readonly class UnixAgentPollingMethod implements PollingMethod
         public int $port,
     ) {}
 
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
     public function isAvailable(Device $device, bool $commit = false): bool
     {
         $agent_port = $device->getAttrib('override_Unixagent_port');

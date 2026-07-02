@@ -18,6 +18,11 @@ readonly class IcmpPollingMethod implements PollingMethod
         public bool $affectsAvailability,
     ) {}
 
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
     public function isAvailable(Device $device, bool $commit = false): bool
     {
         $fping = app(Fping::class);
