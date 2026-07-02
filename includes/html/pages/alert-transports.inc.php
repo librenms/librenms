@@ -3,7 +3,7 @@
 use App\Models\AlertTransport;
 use Illuminate\Support\Facades\Gate;
 
-if (Gate::allows('create', AlertTransport::class)) {
+if (Gate::allows('viewAny', AlertTransport::class)) {
     // handle OAuth requests
     $request = request();  // grab the Request object
 

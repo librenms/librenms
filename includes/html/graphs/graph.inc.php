@@ -34,18 +34,10 @@ try {
     $nodetails = ! $graph_params->visible('details');
     $noagg = ! $graph_params->visible('aggregate');
     $rrd_options = [];
-    $env = [];
-
-    if (session('preferences.timezone')) {
-        $env['TZ'] = session('preferences.timezone');
-    }
 
     require LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/auth.inc.php";
 
-    if ($auth && is_customoid_graph($type, $subtype)) {
-        $unit = $vars['unit'];
-        include LibrenmsConfig::get('install_dir') . '/includes/html/graphs/customoid/customoid.inc.php';
-    } elseif ($auth && is_file(LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php")) {
+    if ($auth && is_file(LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php")) {
         include LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php";
     } elseif ($auth && is_file(LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/generic.inc.php")) {
         include LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/generic.inc.php";
@@ -75,7 +67,7 @@ try {
         echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Command</p>";
         echo "<pre class='rrd-pre'>$command</pre>";
         try {
-            Rrd::graph($rrd_options, $env);
+            Rrd::graph($rrd_options);
         } catch (\LibreNMS\Exceptions\RrdGraphException $e) {
             echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Output</p>";
             echo "<pre class='rrd-pre'>";
@@ -94,7 +86,7 @@ try {
     }
 
     // Generating the graph!
-    $image_data = Rrd::graph($rrd_options, $env);
+    $image_data = Rrd::graph($rrd_options);
 
     // output the graph
     if (\LibreNMS\Util\Debug::isEnabled()) {

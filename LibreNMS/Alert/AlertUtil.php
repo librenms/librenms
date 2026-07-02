@@ -30,7 +30,6 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Alert;
 use App\Models\AlertOperationSegment;
 use App\Models\AlertRule;
-use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\User;
 use DeviceCache;
@@ -39,7 +38,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Enum\AlertRuleOperationPhase;
-use LibreNMS\Enum\MaintenanceStatus;
 use PHPMailer\PHPMailer\PHPMailer;
 
 class AlertUtil
@@ -91,7 +89,7 @@ class AlertUtil
         unset($rextra['_stop_notifications']);
 
         $ruleRow = AlertRule::query()
-            ->with('alertOperation:id,default_operation_step_duration_seconds')
+            ->with('alertOperation:id,default_operation_step_duration_seconds,notifications_suppressed')
             ->whereKey($ruleId)
             ->first(['id', 'alert_operation_id']);
         if ($ruleRow === null || $ruleRow->alert_operation_id === null) {
@@ -122,6 +120,12 @@ class AlertUtil
         $op = self::selectOperationForEscalationStep($ops, $nextStep);
         if ($op === null) {
             $rextra['_stop_notifications'] = true;
+
+            return;
+        }
+
+        if ($ruleRow->alertOperation === null || (bool) $ruleRow->alertOperation->notifications_suppressed) {
+            $rextra['mute'] = true;
 
             return;
         }
@@ -246,18 +250,6 @@ class AlertUtil
     }
 
     /**
-     * Returns the default transports
-     *
-     * @return array
-     */
-    public static function getDefaultAlertTransports()
-    {
-        $query = 'SELECT transport_id, transport_type, transport_name FROM alert_transports WHERE is_default=true';
-
-        return dbFetchRows($query);
-    }
-
-    /**
      * Find contacts for alert
      *
      * @param  array  $results  Rule-Result
@@ -343,7 +335,9 @@ class AlertUtil
             $email = $device->getAttrib('override_sysContact_bool')
                 ? $device->getAttrib('override_sysContact_string')
                 : $device->sysContact;
-            $contacts[$email] = '';
+            if ($email) {
+                $contacts[$email] = '';
+            }
         }
 
         return $contacts;
@@ -364,49 +358,6 @@ class AlertUtil
                 $query->orWhereHas('bills', fn ($q) => $q->whereIn('bill_perms.bill_id', $bill_ids));
             }
         })->pluck('realname', 'email')->all();
-    }
-
-    public static function getRules($device_id)
-    {
-        $query = 'SELECT DISTINCT a.* FROM alert_rules a
-        LEFT JOIN alert_device_map d ON a.id=d.rule_id AND (a.invert_map = 0 OR a.invert_map = 1 AND d.device_id = ?)
-        LEFT JOIN alert_group_map g ON a.id=g.rule_id AND (a.invert_map = 0 OR a.invert_map = 1 AND g.group_id IN (SELECT DISTINCT device_group_id FROM device_group_device WHERE device_id = ?))
-        LEFT JOIN alert_location_map l ON a.id=l.rule_id AND (a.invert_map = 0 OR a.invert_map = 1 AND l.location_id IN (SELECT DISTINCT location_id FROM devices WHERE device_id = ?))
-        LEFT JOIN devices ld ON l.location_id=ld.location_id AND ld.device_id = ?
-        LEFT JOIN device_group_device dg ON g.group_id=dg.device_group_id AND dg.device_id = ?
-        WHERE a.disabled = 0 AND (
-            (d.device_id IS NULL AND g.group_id IS NULL AND l.location_id IS NULL)
-            OR (a.invert_map = 0 AND (d.device_id=? OR dg.device_id=? OR ld.device_id=?))
-            OR (a.invert_map = 1  AND (d.device_id != ? OR d.device_id IS NULL) AND (dg.device_id != ? OR dg.device_id IS NULL) AND (ld.device_id != ? OR ld.device_id IS NULL))
-        )';
-
-        $params = [$device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id];
-
-        return dbFetchRows($query, $params);
-    }
-
-    /**
-     * Check if device is under maintenance
-     *
-     * @param  int  $device_id  Device-ID
-     * @return MaintenanceStatus
-     */
-    public static function getMaintenanceStatus($device_id): MaintenanceStatus
-    {
-        return DeviceCache::get($device_id)->getMaintenanceStatus();
-    }
-
-    /**
-     * Check if device is set to ignore alerts
-     *
-     * @param  int  $device_id  Device-ID
-     * @return bool
-     */
-    public static function hasDisableNotify($device_id)
-    {
-        $device = Device::find($device_id);
-
-        return ! is_null($device) && $device->disable_notify;
     }
 
     /**

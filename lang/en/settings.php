@@ -71,6 +71,7 @@ return [
             'snmptrapd' => ['name' => 'SNMP Traps Integration'],
             'rancid' => ['name' => 'RANCID Integration'],
             'collectd' => ['name' => 'Collectd Integration'],
+            'unimus' => ['name' => 'Unimus Integration'],
         ],
         'poller' => [
             'availability' => ['name' => 'Device Availability'],
@@ -99,7 +100,6 @@ return [
             'reporting' => ['name' => 'Reporting'],
         ],
         'webui' => [
-            'availability-bar' => ['name' => 'Availability Bar Settings'],
             'availability-map' => ['name' => 'Availability Map Settings'],
             'custom-map' => ['name' => 'Custom Map Settings'],
             'graph' => ['name' => 'Graph Settings'],
@@ -582,6 +582,16 @@ return [
             'description' => 'Auth log entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
+        'availablity' => [
+            'threshold_ok' => [
+                'description' => 'Availability Ok Threshold',
+                'help' => 'Threshold for green color',
+            ],
+            'threshold_warning' => [
+                'description' => 'Availablilty Warning Threshold',
+                'help' => 'Threshold for orange color',
+            ],
+        ],
         'bad_entity_sensor_regex' => [
             'description' => 'Bad Entity Sensor Regex',
             'help' => 'Regex to match bad entity sensors, these will not be displayed in the web interface.',
@@ -952,10 +962,6 @@ return [
             'description' => 'Enable Clear Discovery',
             'help' => 'Enables the ability to clear discovery date and time for a device. This will force a rediscovery of the device.',
         ],
-        'enable_footer' => [
-            'description' => 'Enable Footer',
-            'help' => 'Enables the footer on all pages.',
-        ],
         'enable_inventory' => [
             'description' => 'Enable Inventory',
             'help' => 'Enables the inventory page, which shows the hardware inventory of devices.',
@@ -1137,6 +1143,10 @@ return [
                     'description' => 'Query api field',
                     'help' => 'Changes the default field to query graylog API.',
                 ],
+            ],
+            'match-any-address' => [
+                'description' => 'Match any address',
+                'help' => 'This is used to match any address of a device to the source of a graylog log message, by default, only the primary address is used',
             ],
         ],
         'html' => [
@@ -1687,9 +1697,8 @@ return [
             'description' => 'Bad Interface ifType',
             'help' => 'Network interface IF-MIB:!:ifType which should be ignored',
         ],
-        'ping_rrd_step' => [
-            'description' => 'Ping Frequency',
-            'help' => 'How often to check. Sets the default value for all nodes. Warning! If you change this you must make additional changes.  Check the Fast Ping docs.',
+        'ping' => [
+            'description' => 'Path to ping',
         ],
         'poller_modules' => [
             'unix-agent' => [
@@ -1730,6 +1739,9 @@ return [
             ],
             'ports' => [
                 'description' => 'Ports',
+            ],
+            'ports-stack' => [
+                'description' => 'Ports Stack',
             ],
             'bgp-peers' => [
                 'description' => 'BGP Peers',
@@ -2095,6 +2107,10 @@ return [
             'description' => 'Master Dispatcher Timeout',
             'help' => 'The amount of time before the master lock expires.  If master goes away, it will take this much time for another node to take over.  However if it takes longer than the timeout to dispatch the work, you will have multiple masters',
         ],
+        'service_ping_frequency' => [
+            'description' => 'Ping Frequency',
+            'help' => 'How often to run fast ping on all devices.',
+        ],
         'service_poller_workers' => [
             'description' => 'Poller Workers',
             'help' => 'Amount of poller workers to spawn. Sets the default value for all nodes.',
@@ -2379,6 +2395,23 @@ return [
             'description' => 'Two-Factor Throttle Time (seconds)',
             'help' => 'Lock-out time to wait in seconds before allowing further attempts if Two-Factor authentication is failed 3 times consecutively - will prompt user to wait this long.  Set to 0 to disable resulting in a permanent account lock-out and a message to user to contact administrator',
         ],
+        'unimus' => [
+            'api_version' => [
+                'description' => 'Unimus API version',
+            ],
+            'enabled' => [
+                'description' => 'Enable Unimus support',
+                'help' => 'Show device configuration backups from Unimus on the device Config tab',
+            ],
+            'token' => [
+                'description' => 'Unimus API token',
+                'help' => 'API token created in Unimus (Basic / read-only access is sufficient)',
+            ],
+            'url' => [
+                'description' => 'Unimus URL',
+                'help' => 'Base URL of your Unimus server, for example: http://unimus.example.com:8085',
+            ],
+        ],
         'unix-agent' => [
             'connection-timeout' => [
                 'description' => 'Unix-agent connection timeout',
@@ -2401,6 +2434,10 @@ return [
                 'release' => 'Monthly',
             ],
         ],
+        'update_on_days' => [
+            'description' => 'Only run updates on these days',
+            'help' => 'If set (non-empty), daily.sh will only run code updates when today matches one of these values: monday-sunday or mon-sun. Leave empty to allow updates every day.',
+        ],
         'uptime_warning' => [
             'description' => 'Show Device as warning if Uptime below (seconds)',
             'help' => 'Shows Device as warning if Uptime is below this value. Custom maps status will reflect this setting. 0 disables warning. Default 24h',
@@ -2416,16 +2453,6 @@ return [
             'scheduled_maintenance_default_behavior' => [
                 'description' => 'Default Behaviour',
                 'help' => 'When managing scheduled maintenances, this will be the default option for the Behavior option.',
-            ],
-            'availability_bar' => [
-                'threshold_green' => [
-                    'description' => 'Threshold Green',
-                    'help' => 'Threshold for green color',
-                ],
-                'threshold_orange' => [
-                    'description' => 'Threshold Orange',
-                    'help' => 'Threshold for orange color',
-                ],
             ],
             'alert_map_compact' => [
                 'description' => 'Alert map compact view',
@@ -2547,6 +2574,7 @@ return [
         'days' => 'days',
         'ms' => 'ms',
         'seconds' => 'seconds',
+        'percent' => '%',
     ],
     'validate' => [
         'boolean' => ':value is not a valid boolean',
@@ -2558,6 +2586,7 @@ return [
         'select' => ':value is not an allowed value',
         'text' => ':value is not allowed',
         'array' => 'Invalid format',
+        'password-array' => 'Invalid format',
         'executable' => ':value is not a valid executable',
         'directory' => ':value is not a valid directory',
     ],

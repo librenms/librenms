@@ -26,8 +26,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class OspfInstance extends DeviceRelatedModel
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $fillable = [
         'device_id',

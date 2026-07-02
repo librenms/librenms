@@ -145,18 +145,6 @@ function get_port_rrdfile_path($hostname, $port_id, $suffix = '')
     return Rrd::name($hostname, Rrd::portName($port_id, $suffix));
 }
 
-function get_port_by_id($port_id): array|false
-{
-    if (is_numeric($port_id)) {
-        $port = PortCache::get($port_id);
-        if ($port !== null) {
-            return $port->toArray();
-        }
-    }
-
-    return false;
-}
-
 function ifclass($ifOperStatus, $ifAdminStatus)
 {
     // fake a port model
@@ -174,11 +162,6 @@ function device_by_id_cache($device_id)
 function getidbyname($hostname)
 {
     return DeviceCache::getByHostname($hostname)->device_id;
-}
-
-function set_dev_attrib($device, $attrib_type, $attrib_value)
-{
-    return DeviceCache::get((int) $device['device_id'])->setAttrib($attrib_type, $attrib_value);
 }
 
 function get_dev_attrib($device, $attrib_type)
@@ -287,15 +270,6 @@ function generate_smokeping_file($device, $file = '')
 
     return $smokeping->generateFileName($file);
 }
-
-function is_customoid_graph($type, $subtype)
-{
-    if (! empty($subtype) && $type == 'customoid') {
-        return true;
-    }
-
-    return false;
-} // is_customoid_graph
 
 /**
  * Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.

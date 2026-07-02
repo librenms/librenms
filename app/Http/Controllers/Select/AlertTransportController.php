@@ -29,25 +29,34 @@ namespace App\Http\Controllers\Select;
 
 use App\Models\AlertTransport;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
+/**
+ * @extends SelectController<AlertTransport>
+ */
 class AlertTransportController extends SelectController
 {
-    protected function searchFields(Request $request)
+    protected function searchFields(Request $request): array
     {
         return ['transport_type', 'transport_name'];
     }
 
     public function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', AlertTransport::class);
+
         return AlertTransport::query()
             ->select(['transport_id', 'transport_type', 'transport_name'])
             ->orderBy('transport_type')
             ->orderBy('transport_name');
     }
 
-    /** @param  AlertTransport  $model */
-    public function formatItem($model): array
+    /**
+     * @param  AlertTransport  $model
+     * @return array{id: int|string, text: string, icon?: string}
+     */
+    public function formatItem(Model $model): array
     {
         return [
             'id' => $model->transport_id,

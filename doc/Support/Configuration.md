@@ -31,6 +31,23 @@ use some snmp configuration as an example:
 
     `$config['snmp']['v3'][0]['authalgo']`
 
+## CLI
+`lnms config:get <setting>` will fetch the current config settings (composite of database, config.php, and defaults).  
+`lnms config:set <setting> <value>` will set the config setting in the database.
+Calling `lnms config:set <setting>` on a setting with no value will prompt you to reset
+it to its default.
+
+Parameters are:
+```
+    <setting>   dot notation of config item
+                trailing .+ instructs to append <value> to existing value
+
+    <value>     JSON formatted config value
+                string, number, true and false are all valid JSON value
+```
+
+If you set up bash completion, you can use tab completion to find config settings.
+
 !!! note
     Not all documentation has been updated to reflect using `lnms config:set` to
     set configuration items, but it will work and is the preferred option over `config.php`.
@@ -40,14 +57,6 @@ use some snmp configuration as an example:
     validity, please be careful of inputting bad values when using `--ignore-checks`. 
 
     Please report missing settings.
-
-## CLI
-`lnms config:get <setting>` will fetch the current config settings (composite of database, config.php, and defaults).  
-`lnms config:set <setting> <value>` will set the config setting in the database.
-Calling `lnms config:set <setting>` on a setting with no value will prompt you to reset
-it to its default.
-
-If you set up bash completion, you can use tab completion to find config settings.
 
 ### Getting a list of all current values
 
@@ -557,13 +566,6 @@ which will force a full discovery run within the configured time window.
     lnms config:set enable_clear_discovery true
     ```
 
-Disable the footer of the WebUI by setting `enable_footer` to 0.
-
-!!! setting "webui/general"
-    ```bash
-    lnms config:set enable_footer true
-    ```
-
 Show the `X`th percentile in the graph instead of the default 95th percentile.
 
 !!! setting "webui/graph"
@@ -592,19 +594,19 @@ the timeline of the graphs quite easily.
 Graphs will be movable/scalable without reloading the page:
 ![Example dynamic graph usage](img/dynamic-graph-usage.gif)
 
-## Availability Bar
+## Availability Thresholds
 
-The availability bar on the device overview page shows per-day uptime over the last 90 days.
-You can configure the thresholds for the colour coding:
+This will determine what thresholds show ok/warning/error in various screens
+including the device 90 day availability widget
 
-- **Green**: availability >= threshold_good (default: 99%)
-- **Orange**: availability >= threshold_medium (default: 95%)
-- **Red**: availability < threshold_medium
+- **Green**: availability >= availablity.threshold_ok (default: 99.9%)
+- **Orange**: availability >= availablity.threshold_warning (default: 95%)
+- **Red**: availability < availablity.threshold_warning
 
-!!! setting "webui/availability-bar"
+!!! setting "webui/device"
     ```bash
-    lnms config:set webui.availability_bar.threshold_good 99
-    lnms config:set webui.availability_bar.threshold_medium 95
+    lnms config:set availablity.threshold_ok 99.99
+    lnms config:set availablity.threshold_warning 95
     ```
 
 ## Stacked Graphs
@@ -753,14 +755,14 @@ Please refer to [Auto-Discovery](../Extensions/Auto-Discovery.md)
 
 LibreNMS can discover and monitor SSL/TLS certificates presented by your devices (for example, HTTPS on port 443). This helps you track expiry dates and receive alerts before certificates expire.
 
-**Using the feature:** From the Web UI, open **SSL Certificates** to view discovered certificates, add entries manually (host and port), pause or enable monitoring for a certificate, and remove entries. An alert rule **Expiring SSL Certificates** is available to alert when a certificate will expire within 14 days.
+**Using the feature:** From the Web UI, open Overview -> Tools -> SSL Certificates to view discovered certificates, add entries manually (host and port), pause or enable monitoring for a certificate, and remove entries. An alert rule **Expiring SSL Certificates** is available to alert when a certificate will expire within 14 days.
 
 **Behaviour:**
 
 - **Discovery:** A scheduled maintenance job (`lnms maintenance:discover-ssl-certificates`) runs daily and connects to each active device on port 443 (HTTPS). If a certificate is presented, it is stored or updated. You can also run discovery manually for all devices or a single device.
 - **Refresh:** A separate scheduled job (`lnms maintenance:refresh-ssl-certificates`) runs daily to re-check existing certificates and update expiry and other details. You can refresh all enabled certificates or a single one by ID.
 
-**Configuration options:** These can be set in the Web UI under **Applications → SSL Certificates** or via the CLI (`lnms config:set`).
+**Configuration options:** These can be set in the Web UI or via the CLI (`lnms config:set`).
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|

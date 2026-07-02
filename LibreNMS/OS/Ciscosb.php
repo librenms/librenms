@@ -68,5 +68,44 @@ class Ciscosb extends OS implements OSDiscovery
         if ($device->version) {
             $device->version = trim($device->version, ', ');
         }
+
+        // CBS220 and similar devices do not implement CISCOSB proprietary MIBs.
+        // Fall back to ENTITY-MIB for hardware, serial and version.
+        if (empty($device->hardware) || empty($device->serial)) {
+            $entityData = \SnmpQuery::enumStrings()->walk([
+                'ENTITY-MIB::entPhysicalClass',
+                'ENTITY-MIB::entPhysicalModelName',
+                'ENTITY-MIB::entPhysicalHardwareRev',
+                'ENTITY-MIB::entPhysicalFirmwareRev',
+                'ENTITY-MIB::entPhysicalSoftwareRev',
+                'ENTITY-MIB::entPhysicalSerialNum',
+            ])->valuesByIndex();
+
+            foreach ($entityData as $entry) {
+                if (($entry['ENTITY-MIB::entPhysicalClass'] ?? '') !== 'chassis') {
+                    continue;
+                }
+                if (empty($device->hardware)) {
+                    $model = $entry['ENTITY-MIB::entPhysicalModelName'] ?? '';
+                    $hwRev = $entry['ENTITY-MIB::entPhysicalHardwareRev'] ?? '';
+                    $device->hardware = $hwRev ? trim("$model $hwRev") : $model;
+                }
+                if (empty($device->serial)) {
+                    $device->serial = $entry['ENTITY-MIB::entPhysicalSerialNum'] ?? '';
+                }
+                if (empty($device->version)) {
+                    $sw = $entry['ENTITY-MIB::entPhysicalSoftwareRev'] ?? '';
+                    $fw = $entry['ENTITY-MIB::entPhysicalFirmwareRev'] ?? '';
+                    $parts = array_filter([
+                        $sw ? "Software $sw" : null,
+                        $fw ? "Firmware $fw" : null,
+                    ]);
+                    if ($parts) {
+                        $device->version = implode(', ', $parts);
+                    }
+                }
+                break;
+            }
+        }
     }
 }
