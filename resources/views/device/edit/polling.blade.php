@@ -230,7 +230,7 @@
                                     <div x-show="enabled" class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mb-6">
                                         <h4 class="tw:font-semibold tw:text-xs tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Settings') }}</h4>
 
-                                        <div class="tw:grid tw:grid-cols-1 tw:gap-4 tw:max-w-2xl">
+                                        <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl">
                                             @foreach($method['settings_fields'] as $setting)
                                                 <div @if($setting['visible_if_expression']) x-show="{{ $setting['visible_if_expression'] }}" @endif>
                                                     <label class="tw:block tw:text-sm tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200 tw:mb-1">{{ __('poller.method_settings.' . $method['type'] . '.' . $setting['key']) }}</label>
