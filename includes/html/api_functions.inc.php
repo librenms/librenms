@@ -2615,7 +2615,7 @@ function rename_device(Illuminate\Http\Request $request)
 
     if (empty($new_hostname)) {
         return api_error(500, 'Missing new hostname');
-    } elseif ($new_device) {
+    } elseif ($new_device && $new_device != $device_id) {
         return api_error(500, 'Device failed to rename, new hostname already exists');
     } else {
         if (renamehost($device_id, $new_hostname, 'api') == '') {
