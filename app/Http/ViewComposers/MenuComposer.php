@@ -316,9 +316,6 @@ class MenuComposer
         // Poller Settings
         $vars['poller_clusters'] = \App\Models\PollerCluster::exists();
 
-        // Search bar
-        $vars['global_search_ctrlf_focus'] = UserPref::getPref(Auth::user(), 'global_search_ctrlf_focus');
-
         // Plugins
         $vars['has_v1_plugins'] = Plugins::count() != 0;
         $vars['v1_plugin_menu'] = Plugins::call('menu');
