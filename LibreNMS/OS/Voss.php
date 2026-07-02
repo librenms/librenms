@@ -100,11 +100,11 @@ class Voss extends Shared\Extreme implements IsIsDiscovery, IsIsPolling {
             return $this->fillNew($adjacencies, $this->discoverIsIs());
         }
 
-        $uptime = SnmpQuery::walk('ISIS-MIB-LEGACY::isisCircLastUpTime')->values();
+        $uptime = SnmpQuery::walk('ISIS-MIB-LEGACY::isisISAdjLastUpTime')->values();
 
         return $adjacencies->each(function ($adjacency) use ($states, $uptime): void {
             $adjacency->isisISAdjState = $states['ISIS-MIB-LEGACY::isisISAdjState' . $adjacency->index] ?? $adjacency->isisISAdjState;
-            $adjacency->isisISAdjLastUpTime = $this->parseAdjacencyTime($uptime['ISIS-MIB-LEGACY::isisCircLastUpTime' . $adjacency->index] ?? 0);
+            $adjacency->isisISAdjLastUpTime = $this->parseAdjacencyTime($uptime['ISIS-MIB-LEGACY::isisISAdjLastUpTime' . $adjacency->index] ?? 0);
         });
     }
 
