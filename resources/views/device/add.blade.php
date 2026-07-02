@@ -1,8 +1,5 @@
 @extends('layouts.librenmsv1')
 
-@php
-    $oldActiveMethods = old('active_methods', ['snmp', 'icmp']);
-@endphp
 
 @section('title', __('Add Device'))
 
@@ -111,14 +108,6 @@
 
                         {{-- Left: tab list --}}
                         <div class="tw:w-full tw:md:w-1/4 tw:shrink-0">
-                            @php
-                                $icons = [
-                                    'snmp' => 'fa-server',
-                                    'icmp' => 'fa-exchange',
-                                    'ipmi' => 'fa-microchip',
-                                    'unix-agent' => 'fa-terminal',
-                                ];
-                            @endphp
                             <ul class="tw:flex tw:flex-col tw:space-y-2">
                                 @foreach($availableMethods as $method)
                                     <li x-show="activeMethods.includes('{{ $method['type'] }}')"
@@ -130,7 +119,7 @@
                                                 @click="activeTab = '{{ $method['type'] }}'"
                                                 :class="activeTab === '{{ $method['type'] }}' ? 'tw:text-white!' : 'tw:text-gray-700 tw:dark:text-dark-white-200'"
                                                 class="tw:flex-1 tw:text-left tw:px-4 tw:py-3 tw:font-medium tw:transition-colors tw:flex tw:items-center">
-                                            <i class="fa fa-fw {{ $icons[$method['type']] ?? 'fa-circle-o' }} tw:mr-2"></i>
+                                            <i class="fa fa-fw {{ $method['icon'] }} tw:mr-2"></i>
                                             {{ $method['label'] }}
                                         </button>
                                         <button type="button"

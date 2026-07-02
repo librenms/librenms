@@ -42,6 +42,7 @@ class EditPollingController
 
         return view('device.edit.polling', [
             'device' => $device,
+            'allMethods' => $allMethods,
             'configuredMethods' => $allMethods->filter(fn (array $m): bool => $m['configured'])->values(),
             'unconfiguredMethods' => $allMethods->filter(fn (array $m): bool => ! $m['configured'])->values(),
             'availableSecrets' => Secret::query()->orderBy('description')->get()->groupBy(
@@ -76,6 +77,7 @@ class EditPollingController
         return [
             'type' => $type->value,
             'label' => __('poller.methods.' . $type->value),
+            'icon' => $type->icon(),
             'schema_fields' => $schemaFields,
             'schema_defaults' => collect($schema)->mapWithKeys(fn (array $field, string $key): array => [
                 $key => $field['default'] ?? (isset($field['options']) ? array_key_first($field['options']) : ''),
