@@ -121,7 +121,7 @@ foreach ($counter as $stat) {
     }
 }
 
-foreach ($counter as $stat) {
+foreach ($single_counter as $stat) {
     if (! is_null($data['global'][$stat]['max'])) {
         $tags['rrd_name'] = ['app', $name, $app->app_id, 'global_-_'.$stat];
         $stats_fields = [
