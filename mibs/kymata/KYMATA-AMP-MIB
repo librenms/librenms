@@ -1,1 +1,272 @@
+KYMATA-AMP-MIB DEFINITIONS ::= BEGIN
 
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY,
+    Integer32, IpAddress, enterprises
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF;
+
+kymataAmp MODULE-IDENTITY
+    LAST-UPDATED "202607020000Z"
+    ORGANIZATION "Guglielmo S.r.l."
+    CONTACT-INFO
+        "info@guglielmo.biz"
+    DESCRIPTION
+        "MIB for the Kymata AMPxx Amplifier.
+
+        Kymata does not offer a MIB for this product.
+        This MIB was created based on PDF documentation.
+      
+        MIB author:
+
+        CTNET BV
+        Rudy Broersma <r.broersma@ctnet.nl>
+        Meerweg 143
+        9752 XA Haren
+        The Netherlands"
+    REVISION "202607020000Z"
+    DESCRIPTION
+        "Initial release."
+    ::= { enterprises 60429 }
+
+family          OBJECT IDENTIFIER ::= { kymataAmp 1 }
+productInfo     OBJECT IDENTIFIER ::= { family 1 }
+snmpInfo        OBJECT IDENTIFIER ::= { family 2 }
+hardwareData    OBJECT IDENTIFIER ::= { family 3 }
+softwareInfo    OBJECT IDENTIFIER ::= { family 4 }
+networkData     OBJECT IDENTIFIER ::= { family 5 }
+
+factoryData     OBJECT IDENTIFIER ::= { networkData 1 }
+userData        OBJECT IDENTIFIER ::= { networkData 2 }
+identification  OBJECT IDENTIFIER ::= { snmpInfo 1 }
+trapConfig      OBJECT IDENTIFIER ::= { snmpInfo 2 }
+dns             OBJECT IDENTIFIER ::= { userData 5 }
+
+productName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Product name."
+    ::= { productInfo 1 }
+
+hwVersion OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Hardware version."
+    ::= { productInfo 2 }
+
+hwReleaseDate OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Hardware release date (YYYYMM). Agent returns Integer32."
+    ::= { productInfo 3 }
+
+serialNumber OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    ::= { productInfo 4 }
+
+fwVersion OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    ::= { productInfo 5 }
+
+lot OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    ::= { productInfo 6 }
+
+groupGatewayId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    ::= { identification 1 }
+
+gatewayLabel OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Documentation indicates string; firmware returns Integer32."
+    ::= { identification 2 }
+
+trapReceiverNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    ::= { trapConfig 1 }
+
+trapEnabled OBJECT-TYPE
+    SYNTAX INTEGER { disabled(0), enabled(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    ::= { trapConfig 2 }
+
+trapReceiverIPAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    ::= { trapConfig 3 }
+
+trapCommunity OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    ::= { trapConfig 4 }
+
+alarmStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        noAlarm(0),
+        apAlarm(1),
+        lowOutputPower(2),
+        pcbPowerFault(3),
+        highTemperature(4)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    ::= { hardwareData 1 }
+
+temperature OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "degrees Celsius"
+    MAX-ACCESS read-only
+    STATUS current
+    ::= { hardwareData 10 }
+
+voltage5V OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "millivolts"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Example value 3741 = 3.741V."
+    ::= { hardwareData 11 }
+
+rfOut OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "0.01 dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    ::= { hardwareData 12 }
+
+errorSeconds OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    ::= { hardwareData 13 }
+
+packetCounter OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Packets per minute"
+    ::= { hardwareData 14 }
+
+activityAP OBJECT-TYPE
+    SYNTAX Integer { absent(0), present(2) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "AP Activity"
+    ::= { hardwareData 15 }
+
+pcbPowerProblem OBJECT-TYPE
+    SYNTAX INTEGER { absent(0), present(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    ::= { hardwareData 16 }
+
+macAddress OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    ::= { factoryData 1 }
+
+defaultIPAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    ::= { factoryData 2 }
+
+defaultNetmask OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    ::= { factoryData 3 }
+
+hostName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    ::= { userData 1 }
+
+ipAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    ::= { userData 2 }
+
+netmask OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    ::= { userData 3 }
+
+gateway OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    ::= { userData 4 }
+
+dns1 OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    ::= { dns 1 }
+
+dns2 OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    ::= { dns 2 }
+
+ntpServer OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    ::= { userData 6 }
+
+snmpServer OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    ::= { userData 7 }
+
+kymataObjects OBJECT-GROUP
+    OBJECTS {
+        productName, hwVersion, hwReleaseDate, serialNumber,
+        fwVersion, lot, groupGatewayId, gatewayLabel,
+        trapReceiverNumber, trapEnabled, trapReceiverIPAddress,
+        trapCommunity, alarmStatus, temperature, voltage5V,
+        rfOut, errorSeconds, packetCounter, activityAP,
+        pcbPowerProblem, macAddress, defaultIPAddress, defaultNetmask,
+        hostName, ipAddress, netmask, gateway,
+        dns1, dns2, ntpServer, snmpServer
+    }
+    STATUS current
+    DESCRIPTION "Collection of Amp managed objects."
+    ::= { kymataAmp 2 }
+
+kymataCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance statement."
+    MODULE
+        MANDATORY-GROUPS { kymataObjects }
+    ::= { kymataAmp 3 }
+
+END
