@@ -35,6 +35,11 @@ readonly class SnmpPollingMethod implements PollingMethod
         public int $maxOid,
     ) {}
 
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
     public function isAvailable(Device $device, bool $commit = false): bool
     {
         $response = SnmpQuery::device($device)->get('SNMPv2-MIB::sysObjectID.0');

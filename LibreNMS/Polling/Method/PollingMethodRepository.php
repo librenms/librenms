@@ -7,7 +7,7 @@ use LibreNMS\Enum\PollingMethodType;
 
 class PollingMethodRepository
 {
-    private Device $device;
+    private readonly Device $device;
 
     public function __construct(
         ?Device $device = null,
