@@ -47,14 +47,15 @@ readonly class SnmpPollingMethod implements PollingMethod
         return $response->getExitCode() === 0 || $response->getExitCode() === 2 || $response->isValid();
     }
 
-    public static function fromModel(DevicePollingMethod $method): self
+    public static function fromModel(DevicePollingMethod $method): static
     {
         if ($method->method_type !== PollingMethodType::Snmp) {
             throw new \Exception('Invalid polling method type');
         }
 
         $device = $method->device;
-        $secretData = $method->secret?->data ?? [];
+        $secret = $method->secret;
+        $secretData = $secret ? $secret->data : [];
 
         $version = $secretData['version'] ?? 'v2c';
         $community = $secretData['community'] ?? null;
@@ -73,7 +74,7 @@ readonly class SnmpPollingMethod implements PollingMethod
         $maxRepeaters = (int) (($method->settings['max_repeaters'] ?? null) ?: LibrenmsConfig::getOsSetting($device?->os, 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', 0)));
         $maxOid = (int) (($method->settings['max_oid'] ?? null) ?: LibrenmsConfig::getOsSetting($device?->os, 'snmp_max_oid', LibrenmsConfig::get('snmp.max_oid', 10)));
 
-        return new self(
+        return new static(
             enabled: $method->enabled,
             affectsAvailability: $method->affects_availability,
             version: $version,

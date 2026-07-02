@@ -6,19 +6,18 @@ use App\Models\Secret;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use LibreNMS\Enum\SecretType;
 
+/** @extends Factory<Secret> */
 class SecretFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
-     * @var string
+     * @var class-string<Secret>
      */
     protected $model = Secret::class;
 
     /**
      * Define the model's default state.
-     *
-     * @return array
      */
     public function definition(): array
     {

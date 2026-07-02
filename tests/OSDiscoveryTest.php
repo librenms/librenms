@@ -203,14 +203,16 @@ final class OSDiscoveryTest extends TestCase
                 'community' => $community,
             ],
         ]);
-        $device->pollingMethods->first()->setRelation('secret', $secret);
-
-        $device->pollingMethods->first()->settings = [
-            'port' => $this->getSnmpsimPort(),
-            'timeout' => 3,
-            'retries' => 0,
-            'snmp_max_repeaters' => 10,
-        ];
+        $snmpMethod = $device->pollingMethods->first();
+        if ($snmpMethod) {
+            $snmpMethod->setRelation('secret', $secret);
+            $snmpMethod->settings = [
+                'port' => $this->getSnmpsimPort(),
+                'timeout' => 3,
+                'retries' => 0,
+                'snmp_max_repeaters' => 10,
+            ];
+        }
 
         return $device;
     }

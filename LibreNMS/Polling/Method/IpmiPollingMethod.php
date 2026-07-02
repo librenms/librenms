@@ -44,13 +44,13 @@ readonly class IpmiPollingMethod implements PollingMethod
         }
     }
 
-    public static function fromModel(DevicePollingMethod $method): self
+    public static function fromModel(DevicePollingMethod $method): static
     {
         if ($method->method_type !== PollingMethodType::Ipmi) {
             throw new \Exception('Invalid polling method type');
         }
 
-        return new self(
+        return new static(
             $method->enabled,
             $method->affects_availability,
             $method->secret?->data['username'] ?? '',
