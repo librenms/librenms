@@ -60,7 +60,7 @@ $gauge_rrd_def = RrdDefinition::make()
     ->addDataset('sum', 'GAUGE', 0);
 
 $single_counter_rrd_def = RrdDefinition::make()
-    ->addDataset('data', 'DERIVE', 0)
+    ->addDataset('data', 'DERIVE', 0);
 
 $gauge = [
     'batch_size_avg',
