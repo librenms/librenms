@@ -50,7 +50,7 @@ $kernel = $app->make(Kernel::class);
 
 // Rewrite request URI and script name to route via the modern Laravel "graph" route
 if (isset($_SERVER['REQUEST_URI'])) {
-    $_SERVER['REQUEST_URI'] = preg_replace('/\/graph\.php/', '/graph', $_SERVER['REQUEST_URI'], 1);
+    $_SERVER['REQUEST_URI'] = preg_replace('/\/graph\.php/', '/graph', (string) $_SERVER['REQUEST_URI'], 1);
 }
 if (isset($_SERVER['SCRIPT_NAME'])) {
     $_SERVER['SCRIPT_NAME'] = str_replace('/graph.php', '/index.php', $_SERVER['SCRIPT_NAME']);
