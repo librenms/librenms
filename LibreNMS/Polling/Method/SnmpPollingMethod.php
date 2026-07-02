@@ -3,9 +3,11 @@
 namespace LibreNMS\Polling\Method;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\PollingMethod;
+use SnmpQuery;
 
 readonly class SnmpPollingMethod implements PollingMethod
 {
@@ -32,6 +34,13 @@ readonly class SnmpPollingMethod implements PollingMethod
         public int $maxRepeaters,
         public int $maxOid,
     ) {}
+
+    public function isAvailable(Device $device, bool $commit = false): bool
+    {
+        $response = SnmpQuery::device($device)->get('SNMPv2-MIB::sysObjectID.0');
+
+        return $response->getExitCode() === 0 || $response->getExitCode() === 2 || $response->isValid();
+    }
 
     public static function fromModel(DevicePollingMethod $method): self
     {

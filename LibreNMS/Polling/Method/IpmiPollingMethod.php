@@ -2,7 +2,9 @@
 
 namespace LibreNMS\Polling\Method;
 
+use App\Models\Device;
 use App\Models\DevicePollingMethod;
+use LibreNMS\Data\Source\Ipmitool;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\PollingMethod;
 
@@ -20,6 +22,22 @@ readonly class IpmiPollingMethod implements PollingMethod
         public int $timeout,
         public string $type,
     ) {}
+
+    public function isAvailable(Device $device, bool $commit = false): bool
+    {
+        $ipmi = Ipmitool::init($device);
+
+        if (! $ipmi) {
+            return false;
+        }
+
+        try {
+            $ipmi->command(['power', 'status']);
+            return true;
+        } catch (\Throwable) {
+            return false;
+        }
+    }
 
     public static function fromModel(DevicePollingMethod $method): self
     {

@@ -37,17 +37,21 @@ readonly class ConnectivityHelper
 
     public function isAvailable(): bool
     {
-        if (! $this->device->exists || $this->device->pollingMethods->isEmpty()) {
+        if (! $this->device->exists && ! $this->device->relationLoaded('pollingMethods')) {
+            return true;
+        }
+
+        if ($this->device->pollingMethods->isEmpty()) {
             return true;
         }
 
         foreach ($this->device->pollingMethods as $method) {
             if ($method->enabled && $method->affects_availability && ! $method->last_check_successful) {
-                return true;
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 
     public function hasAvailability(): bool
