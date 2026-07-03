@@ -3,7 +3,8 @@
 namespace App\Actions\Device;
 
 use App\Models\Device;
-use LibreNMS\Enum\AvailabilitySource;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class SetDeviceAvailability
 {
@@ -14,29 +15,26 @@ class SetDeviceAvailability
 
     /**
      * @param  Device  $device
-     * @param  bool  $available
-     * @param  AvailabilitySource  $source
      * @param  bool  $commit  Save changes to the database
      * @return bool true if the status changed
      */
-    public function execute(Device $device, bool $available, AvailabilitySource $source = AvailabilitySource::None, bool $commit = true): bool
-    {
-        // if device was down and is now up, if reason was snmp and source is icmp, ignore
-        if ($available && ! $device->status && $device->status_reason == AvailabilitySource::Snmp->value) {
-            if ($source == AvailabilitySource::Icmp) {
-                return false;
-            }
+    public function execute(Device $device, bool $commit = true): bool {
+        if ($device->exists || $device->relationLoaded('pollingMethods')) {
+            $failedAvailabilityMethods = $device->pollingMethods
+                ->filter(fn ($method) => $method->enabled && $method->affects_availability && ! $method->last_check_successful);
+        } else {
+            $failedAvailabilityMethods = new Collection;
         }
 
-        $device->status = $available;
-        $device->status_reason = $available ? AvailabilitySource::None->value : $source->value;
+        $device->status = $failedAvailabilityMethods->isEmpty();
+        $device->status_reason = $failedAvailabilityMethods->map(fn ($m) => $m->method_type->value)->implode(',');
+
         $changed = $device->isDirty('status');
 
         if ($commit) {
             $device->save();
-            if ($changed) {
-                $this->updateDeviceOutage->execute($device, $available);
-            }
+            Log::debug('Device availability updated for ' . $device->hostname . ' to ' . ($device->status ? 'up' : 'down') . ' due to ' . $device->status_reason);
+            $this->updateDeviceOutage->execute($device, $device->status);
         }
 
         return $changed;

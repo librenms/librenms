@@ -197,7 +197,7 @@
                         <li role="presentation" class="divider"></li>
                         @endcanany
                         @can('device.create')
-                        <li><a href="{{ url('addhost') }}"><i class="fa fa-plus fa-fw fa-lg"
+                        <li><a href="{{ route('device.add') }}"><i class="fa fa-plus fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Add Device') }}</a></li>
                         @endcan
                         @can('device.delete')
@@ -691,6 +691,9 @@
                         <li><a href="{{ route('users.index') }}"><i class="fa fa-user-circle-o fa-fw fa-lg"
                                                                     aria-hidden="true"></i> {{ __('Manage Users') }}</a>
                         </li>
+                        @endcan
+                        @can('viewAny', \App\Models\Secret::class)
+                            <li><a href="{{ route('secrets.index') }}"><i class="fa fa-key fa-fw fa-lg" aria-hidden="true"></i> {{ __('Secrets') }}</a></li>
                         @endcan
                         @can('auth-log.view')
                         <li><a href="{{ route('auth-log') }}"><i class="fa fa-shield fa-fw fa-lg"

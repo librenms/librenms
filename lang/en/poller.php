@@ -1,6 +1,38 @@
 <?php
 
 return [
+    'affects_availability' => 'Affects availability',
+    'methods' => [
+        'snmp' => 'SNMP',
+        'icmp' => 'ICMP',
+        'ipmi' => 'IPMI',
+        'unix-agent' => 'Unix Agent',
+    ],
+    'method_settings' => [
+        'ipmi' => [
+            'hostname' => 'Hostname',
+            'port' => 'Port',
+            'ciphersuite' => 'Cipher Suite',
+            'timeout' => 'Timeout',
+        ],
+        'snmp' => [
+            'transport' => 'SNMP transport',
+            'port' => 'SNMP port number',
+            'retries' => 'SNMP retries',
+            'timeout' => 'SNMP timeout',
+            'max_repeaters' => 'SNMP max repeaters',
+            'max_oid' => 'SNMP max OID',
+        ],
+        'unix-agent' => [
+            'port' => 'Unix Agent Port',
+        ],
+    ],
+    'method_added' => 'Polling method added.',
+    'method_updated' => 'Polling method updated.',
+    'method_removed' => 'Polling method removed.',
+    'method_exists' => 'This polling method is already configured for this device.',
+    'select_credential' => 'Select an existing credential',
+    'credential_type_mismatch' => 'Selected credential does not match polling method type.',
     'settings' => [
         'settings' => [
             'poller_groups' => [
