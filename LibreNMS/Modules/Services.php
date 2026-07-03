@@ -84,14 +84,17 @@ class Services implements Module
         $discoveredPorts = [];
 
         // Only lookup services listening on 0.0.0.0 and ::
-        SnmpQuery::enumStrings()->hideMib()->walk('TCP-MIB::tcpListenerTable')-> mapTable(function ($tcpConnLocalState, $tcpConnLocalAddressType, $tcpConnLocalAddress, $tcpConnLocalPort) use ($known_services, &$discoveredPorts) {
-            if($tcpConnLocalState["tcpListenerProcess"] != 0){
+        SnmpQuery::enumStrings()->hideMib()->walk('TCP-MIB::tcpListenerTable')
+            -> mapTable(function ($tcpConnLocalState, $tcpConnLocalAddressType, $tcpConnLocalAddress, $tcpConnLocalPort) 
+            use ($known_services, &$discoveredPorts) {
+            if ($tcpConnLocalState["tcpListenerProcess"] != 0) {
                 return null;
             }
-            if($tcpConnLocalAddressType === "ipv4" && $tcpConnLocalAddress !== '"0.0.0.0"'){
+            if ($tcpConnLocalAddressType === "ipv4" && $tcpConnLocalAddress !== '"0.0.0.0"') {
                 return null;
             }
-            if($tcpConnLocalAddressType === "ipv6" && $tcpConnLocalAddress !== '"00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"'){
+            if ($tcpConnLocalAddressType === "ipv6" 
+                && $tcpConnLocalAddress !== '"00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"') {
                 return null;
             }
 
@@ -112,7 +115,7 @@ class Services implements Module
         });
 
 
-        foreach($discoveredPorts as $port => $enabled){
+        foreach ($discoveredPorts as $port => $enabled) {
             ServicesHelper::discover($device, $known_services[$port]);
         }
     }
@@ -143,7 +146,7 @@ class Services implements Module
             $name = $fields[0];
 
             list($port, $protocol) = explode('/', $fields[1]);
-            if($protocol == "tcp"){
+            if ($protocol == "tcp") {
                 $services[(int) $port] = $name;
             }
         }
