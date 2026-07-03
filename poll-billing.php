@@ -38,7 +38,7 @@ if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
 $poller_start = microtime(true);
 Log::info("Starting Bill Polling Session ... \n");
 
-$query = \LibreNMS\DB\Eloquent::DB()->table('bills');
+$query = LibreNMS\DB\Eloquent::DB()->table('bills');
 
 if (isset($options['b'])) {
     $query->where('bill_id', $options['b']);
@@ -120,6 +120,69 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
         $out_delta = ($out_delta + $port_data['out_delta']);
     }//end foreach
 
+    $sap_query = App\Models\MplsSap::query()
+        ->select('mpls_saps.*')
+        ->join('bill_saps', 'bill_saps.sap_id', '=', 'mpls_saps.sap_id')
+        ->join('devices', 'devices.device_id', '=', 'mpls_saps.device_id')
+        ->where('bill_saps.bill_id', $bill_id)
+        ->where('mpls_saps.sapOperStatus', 'up')
+        ->where('devices.status', 1);
+    if (LibrenmsConfig::get('distributed_poller') && LibrenmsConfig::get('distributed_billing')) {
+        $sap_query->whereIn('devices.poller_group', explode(',', (string) LibrenmsConfig::get('distributed_poller_group')));
+    }
+
+    foreach ($sap_query->get() as $sap_data) {
+        $sap_id = $sap_data->sap_id;
+
+        Log::info("  Polling SAP {$sap_data->sapDescription} ({$sap_data->ifName})");
+
+        // SAP traffic counters are collected by the mpls module and stored in the DB
+        $in_measurement = $sap_data->sapIngressOctets;
+        $out_measurement = $sap_data->sapEgressOctets;
+
+        if (! is_numeric($in_measurement) || ! is_numeric($out_measurement)) {
+            Log::error("WATCH out! - No SAP counters for sap_id $sap_id (has the mpls module polled yet?). Table 'bill_sap_counters' not updated");
+            continue;
+        }
+
+        $last_counters = Billing::getLastSapCounter($sap_id, $bill_id);
+        if ($last_counters['state'] == 'ok') {
+            // A SAP's traffic is bounded by the speed of its access port; use it to reject anomalous counter jumps
+            $ifSpeed = (int) App\Models\Port::where('device_id', $sap_data->device_id)->where('ifIndex', $sap_data->sapPortId)->value('ifSpeed');
+            $tmp_period = strtotime((string) $now) - strtotime((string) $last_counters['timestamp']);
+
+            if ($ifSpeed > 0 && (delta_to_bits($in_measurement, $tmp_period) - delta_to_bits($last_counters['in_counter'], $tmp_period)) > $ifSpeed) {
+                $sap_in_delta = $last_counters['in_delta'];
+            } elseif ($in_measurement >= $last_counters['in_counter']) {
+                $sap_in_delta = ($in_measurement - $last_counters['in_counter']);
+            } else {
+                $sap_in_delta = $last_counters['in_delta']; // counter reset/wrap, reuse previous delta
+            }
+
+            if ($ifSpeed > 0 && (delta_to_bits($out_measurement, $tmp_period) - delta_to_bits($last_counters['out_counter'], $tmp_period)) > $ifSpeed) {
+                $sap_out_delta = $last_counters['out_delta'];
+            } elseif ($out_measurement >= $last_counters['out_counter']) {
+                $sap_out_delta = ($out_measurement - $last_counters['out_counter']);
+            } else {
+                $sap_out_delta = $last_counters['out_delta']; // counter reset/wrap, reuse previous delta
+            }
+        } else {
+            $sap_in_delta = '0';
+            $sap_out_delta = '0';
+        }
+
+        Log::debug("****$now: " . $bill->bill_name . " SAP $sap_id in_delta: $sap_in_delta out_delta: $sap_out_delta");
+
+        LibreNMS\DB\Eloquent::DB()->table('bill_sap_counters')->updateOrInsert(
+            ['sap_id' => $sap_id, 'bill_id' => $bill_id],
+            ['timestamp' => $now, 'in_counter' => set_numeric($in_measurement), 'out_counter' => set_numeric($out_measurement), 'in_delta' => set_numeric($sap_in_delta), 'out_delta' => set_numeric($sap_out_delta)]
+        );
+
+        $delta = ($delta + $sap_in_delta + $sap_out_delta);
+        $in_delta = ($in_delta + $sap_in_delta);
+        $out_delta = ($out_delta + $sap_out_delta);
+    }//end foreach
+
     $last_data = Billing::getLastMeasurement($bill_id);
 
     if ($last_data['state'] == 'ok') {
@@ -145,13 +208,19 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
         Log::debug("BILLING: negative period! id:$bill_id period:$period delta:$delta in_delta:$in_delta out_delta:$out_delta");
     } else {
         // NOTE: casting to string for mysqli bug (fixed by mysqlnd)
+        $sap_count_query = App\Models\BillSap::query()
+            ->join('mpls_saps', 'mpls_saps.sap_id', '=', 'bill_saps.sap_id')
+            ->join('devices', 'devices.device_id', '=', 'mpls_saps.device_id')
+            ->where('bill_saps.bill_id', $bill_id);
         if (LibrenmsConfig::get('distributed_poller') && LibrenmsConfig::get('distributed_billing')) {
             $port_count = dbFetchCell('SELECT COUNT(*) FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND D.device_id = I.device_id AND D.poller_group IN (' . LibrenmsConfig::get('distributed_poller_group') . ')', [$bill_id]);
+            $sap_count = $sap_count_query->whereIn('devices.poller_group', explode(',', (string) LibrenmsConfig::get('distributed_poller_group')))->count();
         } else {
             $port_count = dbFetchCell('SELECT COUNT(*) FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND D.device_id = I.device_id', [$bill_id]);
+            $sap_count = $sap_count_query->count();
         }
-        if ($port_count > 0) {
-            // If no ports are part of this bill then don't insert a zero value entry
+        if ($port_count > 0 || $sap_count > 0) {
+            // If no ports or saps are part of this bill then don't insert a zero value entry
             dbInsert(['bill_id' => $bill_id, 'timestamp' => $now, 'period' => $period, 'delta' => (string) $delta, 'in_delta' => (string) $in_delta, 'out_delta' => (string) $out_delta], 'bill_data');
         }
     }

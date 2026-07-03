@@ -384,6 +384,25 @@ bill_port_counters:
     - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_id, bill_id], Unique: true, Type: BTREE }
+bill_sap_counters:
+  Columns:
+    - { Field: sap_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: timestamp, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
+    - { Field: in_counter, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: in_delta, Type: bigint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: out_counter, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: out_delta, Type: bigint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [sap_id, bill_id], Unique: true, Type: BTREE }
+bill_saps:
+  Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: sap_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: bill_sap_autoadded, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 cache:
   Columns:
     - { Field: key, Type: varchar(255), 'Null': false, Extra: '' }
@@ -1201,6 +1220,8 @@ mpls_saps:
     - { Field: sapOperStatus, Type: "enum('up','down')", 'Null': true, Extra: '' }
     - { Field: sapLastMgmtChange, Type: bigint, 'Null': true, Extra: '' }
     - { Field: sapLastStatusChange, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: sapIngressOctets, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: sapEgressOctets, Type: 'bigint unsigned', 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [sap_id], Unique: true, Type: BTREE }
     mpls_saps_device_id_index: { Name: mpls_saps_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }

@@ -10,8 +10,15 @@ $bill_id = $vars['id'] ?? 0;
 $rates = Billing::getRates($bill_id, $datefrom, $dateto, $vars['dir'] ?? null);
 
 $ports = dbFetchRows('SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D WHERE B.bill_id = ? AND P.port_id = B.port_id AND D.device_id = P.device_id', [$bill_id]);
+$saps = App\Models\MplsSap::query()
+    ->select('mpls_saps.*', 'devices.hostname')
+    ->join('bill_saps', 'bill_saps.sap_id', '=', 'mpls_saps.sap_id')
+    ->join('devices', 'devices.device_id', '=', 'mpls_saps.device_id')
+    ->where('bill_saps.bill_id', $bill_id)
+    ->get();
 
-// Generate a list of ports and then call the multi_bits grapher to generate from the list
+// Generate a list of ports and saps and then call the multi_bits grapher to generate from the list
+$rrd_list = [];
 $i = 0;
 
 foreach ($ports as $port) {
@@ -19,6 +26,21 @@ foreach ($ports as $port) {
     if (Rrd::checkRrdExists($rrd_file)) {
         $rrd_list[$i]['filename'] = $rrd_file;
         $rrd_list[$i]['descr'] = $port['ifDescr'];
+        $i++;
+    }
+}
+
+// SAP traffic is stored in bits (not octets) under different datasource names,
+// so pass the datasource names and a divisor to normalise it to octets.
+foreach ($saps as $sap) {
+    $encap = $sap['sapEncapValue'] == '*' ? '4095' : $sap['sapEncapValue'];
+    $rrd_file = Rrd::name($sap['hostname'], 'sap-' . $sap['svc_oid'] . '.' . $sap['sapPortId'] . '.' . $encap);
+    if (Rrd::checkRrdExists($rrd_file)) {
+        $rrd_list[$i]['filename'] = $rrd_file;
+        $rrd_list[$i]['descr'] = $sap['sapDescription'] ?: ($sap['svc_oid'] . ' ' . $sap['ifName']);
+        $rrd_list[$i]['ds_in'] = 'sapIngressBits';
+        $rrd_list[$i]['ds_out'] = 'sapEgressBits';
+        $rrd_list[$i]['divisor'] = 8;
         $i++;
     }
 }
