@@ -121,7 +121,7 @@ class Services implements Module
     /**
      * Gather from /etc/services the known services ports
      */
-    private function getKnownServicesFromSystem() : array 
+    private function getKnownServicesFromSystem(): array
     {
         $path = '/etc/services';
 
@@ -150,6 +150,7 @@ class Services implements Module
                 $services[(int) $port] = $name;
             }
         }
+        
         return $services;
     }
 
