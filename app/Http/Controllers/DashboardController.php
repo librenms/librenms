@@ -194,7 +194,7 @@ class DashboardController extends Controller
         $next_id = ((int) $playlists->max('id')) + 1;
         $playlists->push([
             'id' => $next_id,
-            'name' => trim($validated['name']),
+            'name' => trim((string) $validated['name']),
             'dashboard_ids' => $dashboard_ids->all(),
         ]);
 
@@ -226,7 +226,7 @@ class DashboardController extends Controller
 
         $playlists->put((int) $index, [
             'id' => $playlistId,
-            'name' => trim($validated['name']),
+            'name' => trim((string) $validated['name']),
             'dashboard_ids' => $dashboard_ids->all(),
         ]);
 
@@ -316,7 +316,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * @return array{playlists_with_missing: Collection<int, array{id: int<1, max>, name: string, missing_ids: array<int, int<1, max>>}>, missing_ids: Collection<int, int<1, max>>}|null
+     * @return array{playlists_with_missing: Collection<int, array{id: int, name: string, missing_ids: array<int, int>}>, missing_ids: Collection<int, int>}|null
      */
     private function getNocCleanupData(User $user): ?array
     {
@@ -496,7 +496,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * @return Collection<int, array{id: int<1, max>, name: string, dashboard_ids: array<int, int<1, max>>}>
+     * @return Collection<int, array{id: int, name: string, dashboard_ids: array<int, int>}>
      */
     private function getNocPlaylists(User $user): Collection
     {
@@ -546,7 +546,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * @param  Collection<int, array{id: int<1, max>, name: string, dashboard_ids: array<int, int<1, max>>}>  $playlists
+     * @param  Collection<int, array{id: int, name: string, dashboard_ids: array<int, int>}>  $playlists
      */
     private function saveNocPlaylists(User $user, Collection $playlists): void
     {
