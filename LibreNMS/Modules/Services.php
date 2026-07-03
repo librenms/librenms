@@ -79,26 +79,75 @@ class Services implements Module
             return;
         }
 
-        // FIXME: use /etc/services?
-        $known_services = [
-            22 => 'ssh',
-            25 => 'smtp',
-            53 => 'dns',
-            80 => 'http',
-            110 => 'pop',
-            143 => 'imap',
-        ];
+        $known_services = $this->getKnownServicesFromSystem();
 
-        // Only lookup services listening on 0.0.0.0
-        SnmpQuery::enumStrings()->hideMib()->walk('TCP-MIB::tcpConnState.0.0.0.0')->mapTable(function ($tcpConnState, $tcpConnLocalAddress, $tcpConnLocalPort, $tcpConnRemAddress, $tcpConnRemPort) use ($device, $known_services) {
+        $discoveredPorts = [];
+
+        // Only lookup services listening on 0.0.0.0 and ::
+        SnmpQuery::enumStrings()->hideMib()->walk('TCP-MIB::tcpListenerTable')-> mapTable(function ($tcpConnLocalState, $tcpConnLocalAddressType, $tcpConnLocalAddress, $tcpConnLocalPort) use ($device, $known_services, &$discoveredPorts) {
+            if($tcpConnLocalState["tcpListenerProcess"] != 0){
+                return null;
+            }
+            if($tcpConnLocalAddressType === "ipv4" && $tcpConnLocalAddress !== '"0.0.0.0"'){
+                return null;
+            }
+            if($tcpConnLocalAddressType === "ipv6" && $tcpConnLocalAddress !== '"00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"'){
+                return null;
+            }
+
+            if ($tcpConnLocalPort !== null && isset($known_services[$tcpConnLocalPort])) {
+                $discoveredPorts[$tcpConnLocalPort] = true;
+            }
+        });
+
+        // Fallback to old system for non-tcpListenerTable-compatible system
+        SnmpQuery::enumStrings()->hideMib()->walk('TCP-MIB::tcpConnState.0.0.0.0')->mapTable(function ($tcpConnState, $tcpConnLocalAddress, $tcpConnLocalPort, $tcpConnRemAddress, $tcpConnRemPort) use ($device, $known_services, &$discoveredPorts) {
             if (empty($tcpConnState['tcpConnState']) || $tcpConnState['tcpConnState'] != 'listen') {
                 return null;
             }
 
             if ($tcpConnLocalPort !== null && isset($known_services[$tcpConnLocalPort])) {
-                ServicesHelper::discover($device, $known_services[$tcpConnLocalPort]);
+                $discoveredPorts[$tcpConnLocalPort] = true;
             }
         });
+
+
+        foreach($discoveredPorts as $port => $enabled){
+            ServicesHelper::discover($device, $known_services[$port]);
+        }
+    }
+    /**
+     * Gather from /etc/services the known services ports
+     */
+    private function getKnownServicesFromSystem() : array {
+        $path = "/etc/services";
+
+        $lines = file($path, FILE_IGNORE_NEW_LINES);
+
+        $services = [];
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+
+            // Skip blank lines and comments
+            if ($line === '' || $line[0] === '#') {
+                continue;
+            }
+
+            // Remove inline comments
+            $line = preg_replace('/\s*#.*/', '', $line);
+
+            // Split on one or more whitespace characters
+            $fields = preg_split('/\s+/', $line);
+
+            $name = $fields[0];
+
+            list($port, $protocol) = explode('/', $fields[1]);
+            if($protocol == "tcp"){
+                $services[(int) $port] = $name;
+            }
+        }
+        return $services;
     }
 
     /**
