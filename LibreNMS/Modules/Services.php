@@ -150,7 +150,7 @@ class Services implements Module
                 $services[(int) $port] = $name;
             }
         }
-        
+
         return $services;
     }
 
