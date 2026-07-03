@@ -30,10 +30,6 @@
   color: #0052cccc;
 }
 
-.twitter-typeahead .tt-hint {
-    border-color: #000 !important;
-}
-
 .pace {
   -webkit-pointer-events: none;
   pointer-events: none;
