@@ -21,4 +21,3 @@ foreach ($vlan_port_mode_state_array as $index => $vlan_port_mode_state) {
         $port_stats[$index]['ifTrunk'] = 'dot1Q';
     }
 }
-
