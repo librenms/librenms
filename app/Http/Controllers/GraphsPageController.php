@@ -113,7 +113,6 @@ class GraphsPageController extends Controller
                     'legend' => 'no',
                     'absolute' => 1,
                     'from' => $periodFrom,
-                    'to' => $thumbTo,
                 ]),
             ];
         }
@@ -179,16 +178,14 @@ class GraphsPageController extends Controller
         }
 
         if ($type === 'device' && $subtype === 'collectd') {
-            $subtitle = ' :: ' . StringHelpers::niceCase($subtype) . ' :: ' . ($request->input('c_plugin') ?? '');
-            if ($cPluginInstance = $request->input('c_plugin_instance')) {
-                $subtitle .= ' - ' . $cPluginInstance;
-            }
-            $subtitle .= ' - ' . ($request->input('c_type') ?? '');
-            if ($cTypeInstance = $request->input('c_type_instance')) {
-                $subtitle .= ' - ' . $cTypeInstance;
-            }
+            $parts = array_filter([
+                $request->input('c_plugin'),
+                $request->input('c_plugin_instance'),
+                $request->input('c_type'),
+                $request->input('c_type_instance'),
+            ]);
 
-            return $subtitle;
+            return ' :: ' . StringHelpers::niceCase($subtype) . ' :: ' . implode(' - ', $parts);
         }
 
         return ' :: ' . StringHelpers::niceCase($subtype);
@@ -273,6 +270,6 @@ class GraphsPageController extends Controller
             $changes
         );
 
-        return url()->query('graphs', array_filter($params, fn ($v) => $v !== null));
+        return route('graphs', array_filter($params, fn ($v) => $v !== null));
     }
 }
