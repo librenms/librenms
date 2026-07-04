@@ -188,10 +188,7 @@ class Graph
                 throw new RrdGraphException('No Authorization', 'No Auth', $width, $height);
             }
 
-            if (is_customoid_graph($type, $subtype)) {
-                $unit = $vars['unit'];
-                require base_path('/includes/html/graphs/customoid/customoid.inc.php');
-            } elseif (is_file(base_path("/includes/html/graphs/$type/$subtype.inc.php"))) {
+            if (is_file(base_path("/includes/html/graphs/$type/$subtype.inc.php"))) {
                 require base_path("/includes/html/graphs/$type/$subtype.inc.php");
             } elseif (is_file(base_path("/includes/html/graphs/$type/generic.inc.php"))) {
                 require base_path("/includes/html/graphs/$type/generic.inc.php");

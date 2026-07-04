@@ -106,7 +106,6 @@
     }
 
     $(window).on('filter:apply', function (event) {
-        console.log(event);
         if (event.originalEvent.detail.name === 'ports') {
             filter = event.originalEvent.detail.filters;
             grid.bootgrid('reload');
