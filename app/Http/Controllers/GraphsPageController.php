@@ -236,10 +236,8 @@ class GraphsPageController extends Controller
                 : (int) max($height, $screenHeight - ($screenHeight / 1.5));
         }
 
-        // Keep the graph landscape: a time-series graph should never be taller than it is
-        // wide. Cap height at half the width so tall, narrow viewports (e.g. a big monitor
-        // with dev tools docked to the side) don't produce a squished vertical graph.
-        $height = min($height, (int) round($width / 2));
+        // Keep the graph landscape
+        $height = min($height, $width);
 
         return ['width' => $width, 'height' => $height, 'thumbWidth' => $thumbWidth];
     }

@@ -157,7 +157,7 @@ class GraphsPageControllerTest extends TestCase
         $response->assertSessionHasErrors();
     }
 
-    public function testDynamicGraphsRendersCorrectWidth(): void
+    public function testDynamicGraphsRendersCorrectly(): void
     {
         $device = Device::factory()->create(['hostname' => 'graph-device.example.com']);
         LibrenmsConfig::set('webui.dynamic_graphs', true);
@@ -166,7 +166,7 @@ class GraphsPageControllerTest extends TestCase
             ->get("/graphs?device={$device->device_id}&type=device_poller_perf");
 
         $response->assertOk();
-        $response->assertSee('style="width:1075px', false);
+        $response->assertSee('class="graph graph-image img-responsive tw:w-full tw:h-auto tw:border-0"', false);
         $response->assertSee('from={{start}}', false);
         $response->assertSee('to={{end}}', false);
         $response->assertSee('width={{width}}', false);
