@@ -1094,6 +1094,21 @@ return [
             ],
         ],
         'graphs' => [
+            'row' => [
+                'normal' => [
+                    'options' => [
+                        'sixhour' => '6 Hours',
+                        'day' => '24 Hours',
+                        'twoday' => '48 Hours',
+                        'week' => '1 Week',
+                        'twoweek' => '2 Weeks',
+                        'month' => '1 Month',
+                        'twomonth' => '2 Months',
+                        'year' => '1 Year',
+                        'twoyear' => '2 Years',
+                    ],
+                ],
+            ],
             'port_speed_zoom' => [
                 'description' => 'Zoom port graphs to port speed',
                 'help' => 'Zoom port graphs so the max is always the port speed, disabled port graphs zoom to traffic',

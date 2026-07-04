@@ -88,7 +88,8 @@ if (! $auth) {
 
         echo '<table width=100% class="thumbnail_graph_table"><tr>';
 
-        foreach ($thumb_array as $period => $text) {
+        foreach ($thumb_array as $period) {
+            $text = __("settings.settings.graphs.row.normal.options.$period");
             $graph_array['from'] = LibrenmsConfig::get("time.$period");
 
             $link_array = $vars;
