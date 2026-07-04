@@ -32,11 +32,11 @@
     @foreach ($periodThumbs as $thumb)
         <a href="{{ $thumb['link'] }}"
            @if ($thumb['active']) aria-current="true" @endif
-           style="--thumb-w: {{ $thumb['vars']['width'] }}px; --thumb-ar: {{ $thumb['vars']['width'] }} / {{ $thumb['vars']['height'] }}"
-           class="tw:flex tw:min-w-[calc(var(--thumb-w)*0.6)] tw:max-w-[var(--thumb-w)] tw:flex-[1_1_var(--thumb-w)] tw:flex-col tw:items-center tw:gap-0.5 tw:p-1 tw:rounded-lg tw:border tw:no-underline tw:transition-colors
+           style="flex: 1 1 {{ $thumb['vars']['width'] }}px; min-width: {{ (int) ($thumb['vars']['width'] * 0.6) }}px; max-width: {{ $thumb['vars']['width'] }}px;"
+           class="tw:flex tw:flex-col tw:items-center tw:gap-0.5 tw:p-1 tw:rounded-lg tw:border tw:no-underline tw:transition-colors
                   @if ($thumb['active']) tw:border-blue-500 tw:bg-blue-50 tw:dark:bg-gray-700 @else tw:border-transparent tw:hover:border-gray-300 tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700 @endif">
             <span class="tw:font-medium tw:whitespace-nowrap tw:text-gray-700 tw:dark:text-gray-200 tw:overflow-hidden tw:text-ellipsis tw:w-full tw:text-center">{{ $thumb['text'] }}</span>
-            <img class="graph-image tw:block tw:w-[var(--thumb-w)] tw:max-w-full tw:aspect-[var(--thumb-ar)] tw:object-cover tw:rounded tw:border-0"
+            <img class="graph-image tw:block tw:w-full tw:h-auto tw:object-cover tw:rounded tw:border-0"
                  src="{{ route('graph', $thumb['vars']) }}"
                  width="{{ $thumb['vars']['width'] }}"
                  height="{{ $thumb['vars']['height'] }}"
