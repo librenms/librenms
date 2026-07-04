@@ -1,16 +1,6 @@
 <?php
 
 return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Wireless Sensors Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines are used to translate names and units of wireless sensors
-    |
-    */
-
     'title' => '無線網路',
     'ap-count' => [
         'short' => 'APs',
@@ -61,6 +51,11 @@ return [
         'short' => 'MSE',
         'long' => '均方誤差',
         'unit' => 'dB',
+    ],
+    'mcs' => [
+        'short' => 'MCS',
+        'long' => '調變與編碼方案',
+        'unit' => 'MCS',
     ],
     'noise-floor' => [
         'short' => '底噪',

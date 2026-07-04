@@ -34,8 +34,8 @@ namespace LibreNMS\Alert;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
-use App\Models\Alert;
 use App\Models\AlertLog;
+use App\Models\AlertRule;
 use App\Models\AlertTransport;
 use App\Models\ApplicationMetric;
 use App\Models\Eventlog;
@@ -47,6 +47,7 @@ use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Time;
@@ -127,15 +128,20 @@ class RunAlerts
         $obj['proc'] = $alert['proc'];
         $obj['status'] = $device->status;
         $obj['status_reason'] = $device->status_reason;
-        if (ConnectivityHelper::pingIsAllowed($device)) {
-            $last_ping = Rrd::lastUpdate(Rrd::name($device->hostname, 'icmp-perf'));
-            if ($last_ping) {
-                $obj['ping_timestamp'] = $last_ping->timestamp;
-                $obj['ping_loss'] = Number::calculatePercent($last_ping->get('xmt') - $last_ping->get('rcv'), $last_ping->get('xmt'));
-                $obj['ping_min'] = $last_ping->get('min');
-                $obj['ping_max'] = $last_ping->get('max');
-                $obj['ping_avg'] = $last_ping->get('avg');
-                $obj['debug'] = 'unsupported';
+
+        if ((new ConnectivityHelper($device))->icmpIsEnabled()) {
+            try {
+                $last_ping = Rrd::lastUpdate(Rrd::name($device->hostname, 'icmp-perf'));
+                if ($last_ping) {
+                    $obj['ping_timestamp'] = $last_ping->timestamp;
+                    $obj['ping_loss'] = Number::calculatePercent($last_ping->get('xmt') - $last_ping->get('rcv'), $last_ping->get('xmt'));
+                    $obj['ping_min'] = $last_ping->get('min');
+                    $obj['ping_max'] = $last_ping->get('max');
+                    $obj['ping_avg'] = $last_ping->get('avg');
+                    $obj['debug'] = 'unsupported';
+                }
+            } catch (RrdException $e) {
+                Log::error("Error getting last ping for device {$device->hostname}: {$e->getMessage()}");
             }
         }
         $extra = $alert['details'];
@@ -262,8 +268,8 @@ class RunAlerts
     {
         global $rulescache;
         if (empty($rulescache[$device_id]) || ! isset($rulescache[$device_id])) {
-            foreach (AlertUtil::getRules($device_id) as $chk) {
-                $rulescache[$device_id][$chk['id']] = true;
+            foreach (AlertRule::enabled()->forDevice(DeviceCache::get($device_id))->get() as $chk) {
+                $rulescache[$device_id][$chk->id] = true;
             }
         }
 
@@ -490,6 +496,8 @@ class RunAlerts
                 $alert['note'] = $alert_status['note'];
                 if (! empty($alert['details'])) {
                     $alert['details'] = json_decode(gzuncompress($alert['details']), true);
+                } else {
+                    $alert['details'] = [];
                 }
                 $alert['info'] = json_decode((string) $alert_status['info'], true);
                 $alerts[] = $alert;
@@ -599,7 +607,7 @@ class RunAlerts
                 $noacc = false;
             }
 
-            $maintenance_status = AlertUtil::getMaintenanceStatus($alert['device_id']);
+            $maintenance_status = DeviceCache::get($alert['device_id'])->getMaintenanceStatus();
             // Do not send alert notifications for these types of scheduled maintenance
             if ($maintenance_status == MaintenanceStatus::MuteAlerts) {
                 $noiss = true;
@@ -660,7 +668,7 @@ class RunAlerts
         );
 
         $ruleId = (int) ($obj['rule_id'] ?? 0);
-        if (! $transport_maps) {
+        if (! $transport_maps || count($transport_maps) === 0) {
             $reason = 'No mapped transport for this operation';
             if ($ruleId > 0 && ! AlertUtil::ruleHasAlertOperations($ruleId)) {
                 $reason = 'No operations configured for this rule';
@@ -706,10 +714,6 @@ class RunAlerts
                 unset($instance);
                 echo PHP_EOL;
             }
-        }
-
-        if (count($transport_maps) === 0) {
-            echo 'No configured transports';
         }
     }
 
@@ -758,7 +762,7 @@ class RunAlerts
             return false;
         }
 
-        $down_parent_count = dbFetchCell("SELECT count(*) from devices as d LEFT JOIN devices_attribs as a ON d.device_id=a.device_id LEFT JOIN device_relationships as r ON d.device_id=r.parent_device_id WHERE d.status=0 AND d.ignore=0 AND d.disabled=0 AND r.child_device_id=? AND (d.status_reason='icmp' OR (a.attrib_type='override_icmp_disable' AND a.attrib_value=true))", [$device]);
+        $down_parent_count = dbFetchCell('SELECT count(*) from devices as d LEFT JOIN device_relationships as r ON d.device_id=r.parent_device_id WHERE d.status=0 AND d.ignore=0 AND d.disabled=0 AND r.child_device_id=?', [$device]);
         if ($down_parent_count == $parent_count) {
             return true;
         }

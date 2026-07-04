@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class PortAdsl extends PortRelatedModel implements Keyable
 {
+    use HasFactory;
     protected $table = 'ports_adsl';
     protected $primaryKey = 'port_id';
     public $timestamps = false;

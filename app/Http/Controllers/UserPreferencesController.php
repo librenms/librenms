@@ -78,7 +78,6 @@ class UserPreferencesController extends Controller
             'timezone' => UserPref::getPref($user, 'timezone'),
             'temp_units' => UserPref::getPref($user, 'temp_units'),
             'hide_dashboard_editor' => UserPref::getPref($user, 'hide_dashboard_editor') ?? 0,
-            'global_search_ctrlf_focus' => UserPref::getPref($user, 'global_search_ctrlf_focus'),
         ];
 
         if (LibrenmsConfig::get('twofactor')) {
@@ -121,7 +120,6 @@ class UserPreferencesController extends Controller
             ],
             'temp_units' => 'required|in:default,f',
             'hide_dashboard_editor' => 'required|integer',
-            'global_search_ctrlf_focus' => 'required|integer',
         ];
 
         $this->validate($request, [
