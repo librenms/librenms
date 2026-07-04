@@ -411,8 +411,6 @@ class Url
         $original_from = $args['from'] ?? '';
         $popup_title = $args['popup_title'] ?? 'Graph';
 
-        // Build the trigger graph from the caller's own width/height/legend
-        // before overriding them below for the day/week/month/year popup graphs.
         $graph = $content ?: self::graphTag($args);
 
         $args['width'] = 340;
