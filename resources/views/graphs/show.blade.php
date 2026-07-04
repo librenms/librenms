@@ -58,7 +58,7 @@
     @if ($trendHint) | {{ __('To show trend, set to future date') }} @endif
 </div>
 
-<div class="tw:w-full">
+<div class="tw:w-full tw:mt-4">
 @if ($isDynamicGraph)
     <img class="graph graph-image img-responsive tw:w-full tw:h-auto tw:border-0" data-src-template="{{ $dynamicGraphSrcTemplate }}" />
 @else
@@ -68,19 +68,15 @@
 @endif
 </div>
 
-@if ($graphDescr !== null)
+@isset($graphDescr)
 <x-panel class="tw:mt-4">
-    <x-slot:heading>
-        <div class="tw:flex tw:items-center tw:gap-3">
-            <i class="fa-solid fa-circle-info fa-lg icon-theme" aria-hidden="true"></i>
-            <div>{{ $graphDescr }}</div>
-        </div>
-    </x-slot:heading>
+    <i class="fa-solid fa-circle-info fa-lg icon-theme" aria-hidden="true"></i>
+    {{ $graphDescr }}
 </x-panel>
-@endif
+@endisset
 
 @if ($showCommand && $rrdCommand)
-<div class="infobox">
+<div class="infobox tw:text-gray-900 tw:dark:text-gray-900">
     <p class="tw:text-lg tw:font-bold">{{ __('RRDTool Command') }}</p>
     <pre class="rrd-pre">{{ $rrdCommand }}</pre>
 </div>
