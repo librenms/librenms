@@ -413,12 +413,13 @@ class Url
         $original_from = $args['from'] ?? '';
         $popup_title = $args['popup_title'] ?? 'Graph';
 
+        $graph = $content ?: self::graphTag($args);
+
         $args['width'] = 340;
         $args['height'] = 100;
         $args['legend'] = 'yes';
         $columns = count($graph_periods) < 4 ? 1 : 2;
 
-        $graph = $content ?: self::graphTag($args);
         $popup = "<div class=\'list-large\'>$popup_title</div>";
         $popup .= "<div style=\"display:grid;grid-template-columns:repeat($columns,max-content);\">";
         foreach ($graph_periods as $period) {
