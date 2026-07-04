@@ -18,6 +18,7 @@ use App\Models\Device;
 use App\Models\Port;
 use App\Models\Sensor;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\HtmlString;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
@@ -82,7 +83,11 @@ function generate_device_link($device, $text = null, $vars = [], $start = 0, $en
 {
     $deviceModel = DeviceCache::get((int) ($device['device_id'] ?? 0));
 
-    return Url::deviceLink($deviceModel, $text, $vars, $start, $end, $escape_text, $overlib);
+    if (! $escape_text) {
+        $text = new HtmlString($text);
+    }
+
+    return Url::deviceLink($deviceModel, $text, $vars, $start, $end, $overlib);
 }
 
 function bill_permitted($bill_id)
