@@ -96,7 +96,7 @@ if (isset($options['v'])) {
 $os_list = [];
 
 if (isset($os_name) && isset($variant)) {
-    $os_list = [$full_os_name => [$os_name, $variant, ModuleList::fromUserOverrides($modules)->overrides]];
+    $os_list = [$full_os_name => [$os_name, $variant, ModuleTestHelper::getValidModules($os_name, $variant, $modules)]];
 } elseif (isset($os_name)) {
     $os_list = ModuleTestHelper::findOsWithData($modules, $os_name);
 } else {

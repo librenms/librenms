@@ -292,6 +292,34 @@ class ModuleTestHelper
     }
 
     /**
+     * Resolve the module overrides for a specific os/variant combination.
+     * When $modules is empty, reads the existing JSON to auto-include any
+     * globally-disabled modules that already have test data.
+     *
+     * @param  array<string>  $modules  User-supplied module list (empty = auto)
+     * @return array<string, bool|array<string>>
+     */
+    public static function getValidModules(string $os, ?string $variant, array $modules): array
+    {
+        if (! empty($modules)) {
+            return ModuleList::fromUserOverrides($modules)->overrides;
+        }
+
+        $base_name = $variant ? "{$os}_{$variant}" : $os;
+        $json_file = base_path("tests/data/{$base_name}.json");
+        if (! is_file($json_file)) {
+            return [];
+        }
+
+        $decoded = json_decode(file_get_contents($json_file), true);
+        if (json_last_error() || empty($decoded)) {
+            return [];
+        }
+
+        return self::resolveModuleDependencies(array_keys($decoded));
+    }
+
+    /**
      * Given a json filename or basename, extract os and variant
      *
      * @param  string  $os_file  Either a filename or the basename
