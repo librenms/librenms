@@ -47,7 +47,7 @@
 </div>
 
 <div class="tw:w-[48ch] tw:max-w-full tw:mx-auto tw:mt-3 tw:mb-2">
-    <x-date-range-picker :start="$graphFrom" :end="$graphTo"
+    <x-date-range-picker :start="$graphFrom" :end="$graphTo" :reload="true"
                          class="tw:w-full tw:text-center tw:px-3 tw:py-2 tw:border tw:border-gray-300 tw:rounded-md tw:bg-gray-100! tw:hover:bg-gray-200! tw:dark:bg-white! tw:dark:hover:bg-gray-200!"></x-date-range-picker>
 </div>
 <div class="tw:text-center">
@@ -119,23 +119,5 @@
         window.onload = function(){ window.dispatchEvent(new Event('resize')); }
     @endif
 
-    window.addEventListener('date-range-changed', (event) => {
-        const { relativeStartSeconds, relativeEndSeconds, start, end } = event.detail;
-        const url = new URL(window.location.href);
-
-        const setOrDelete = (param, value) =>
-            value ? url.searchParams.set(param, value) : url.searchParams.delete(param);
-
-        const prevFrom = url.searchParams.get('from');
-        const prevTo = url.searchParams.get('to');
-
-        const fromOffset = relativeStartSeconds && LibreNMS.Date.toShortOffset(relativeStartSeconds);
-        setOrDelete('from', fromOffset === '-1d' ? null : fromOffset || (start && LibreNMS.Date.toUrl(start)));
-        setOrDelete('to', relativeEndSeconds ? LibreNMS.Date.toShortOffset(relativeEndSeconds) : end && LibreNMS.Date.toUrl(end));
-
-        if (url.searchParams.get('from') !== prevFrom || url.searchParams.get('to') !== prevTo) {
-            window.location.href = url.toString();
-        }
-    });
 </script>
 @endpush
