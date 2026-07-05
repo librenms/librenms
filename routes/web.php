@@ -13,6 +13,7 @@ use App\Http\Controllers\ApiAccessController;
 use App\Http\Controllers\Auth;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\AuthLogController;
+use App\Http\Controllers\CustomoidController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DashboardWidgetController;
 use App\Http\Controllers\Device;
@@ -127,7 +128,8 @@ Route::middleware(['auth'])->group(function (): void {
         Route::post('templates/apply/{template}', [ServiceTemplateController::class, 'apply'])->name('templates.apply');
         Route::post('templates/remove/{template}', [ServiceTemplateController::class, 'remove'])->name('templates.remove');
     });
-    Route::resource('service', ServiceController::class)->only(['show', 'destroy']);
+    Route::post('customoid/test/{customoid?}', [CustomoidController::class, 'test'])->name('customoid.test');
+    Route::resource('customoid', CustomoidController::class)->only(['show', 'store', 'update', 'destroy']);
     Route::get('locations', [LocationController::class, 'index']);
     Route::resource('ssl-certificates', SslCertificateController::class)->except(['edit']);
     Route::resource('preferences', UserPreferencesController::class)->only('index', 'store', 'update');

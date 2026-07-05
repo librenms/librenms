@@ -177,10 +177,13 @@ $('#create-service').on('show.bs.modal', function (e) {
 // on-submit
 $('#service-submit').on("click", function(e) {
     e.preventDefault();
+    var service_id = $('#service_id').val();
+    var url = service_id ? '<?php echo route("service.update", ["service" => ":service"]) ?>'.replace(':service', service_id) : '<?php echo route("service.store") ?>';
     $.ajax({
-        type: "POST",
-        url: "ajax_form.php",
+        type: service_id ? "PUT" : "POST",
+        url: url,
         data: $('form.service-form').serialize(),
+        dataType: "json",
         success: function(result){
             if (result.status == 0) {
                 // Yay.

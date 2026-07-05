@@ -126,29 +126,28 @@
 $('#create-oid-form').on('show.bs.modal', function(e) {
     var customoid_id = $(e.relatedTarget).data('customoid_id');
     $('#ccustomoid_id').val(customoid_id);
-    if (customoid_id >= 0) {
+    if (customoid_id) {
         $.ajax({
-            type: "POST",
-            url: "ajax_form.php",
-            data: { type: "parse-customoid", customoid_id: customoid_id },
-                dataType: "json",
-                success: function (data) {
-                    $('#name').val(data.name);
-                    $('#oid').val(data.oid);
-                    $('#datatype').val(data.datatype);
-                    $('#datatype').prop('disabled', true);
-                    $('#unit').val(data.unit);
-                    $('#divisor').val(data.divisor);
-                    $('#multiplier').val(data.multiplier);
-                    $('#user_func').val(data.user_func);
-                    $('#limit').val(data.limit);
-                    $('#limit_warn').val(data.limit_warn);
-                    $('#limit_low').val(data.limit_low);
-                    $('#limit_low_warn').val(data.limit_low_warn);
-                    $('#alerts').prop('checked', data.alerts);
-                    $('#passed').val(data.passed);
-                    $('#cpassed').prop('checked', data.passed);
-                }
+            type: "GET",
+            url: '<?php echo route("customoid.show", ["customoid" => ":customoid"]) ?>'.replace(':customoid', customoid_id),
+            dataType: "json",
+            success: function (data) {
+                $('#name').val(data.name);
+                $('#oid').val(data.oid);
+                $('#datatype').val(data.datatype);
+                $('#datatype').prop('disabled', true);
+                $('#unit').val(data.unit);
+                $('#divisor').val(data.divisor);
+                $('#multiplier').val(data.multiplier);
+                $('#user_func').val(data.user_func);
+                $('#limit').val(data.limit);
+                $('#limit_warn').val(data.limit_warn);
+                $('#limit_low').val(data.limit_low);
+                $('#limit_low_warn').val(data.limit_low_warn);
+                $('#alerts').prop('checked', data.alerts);
+                $('#passed').val(data.passed);
+                $('#cpassed').prop('checked', data.passed);
+            }
         });
     } else {
         $('#name').val('');
@@ -170,11 +169,12 @@ $('#create-oid-form').on('show.bs.modal', function(e) {
 });
 $('#save-oid-button').on('click', function (e) {
     e.preventDefault();
-    $('#action').val('save');
+    var customoid_id = $('#ccustomoid_id').val();
+    var url = customoid_id ? '<?php echo route("customoid.update", ["customoid" => ":customoid"]) ?>'.replace(':customoid', customoid_id) : '<?php echo route("customoid.store") ?>';
     $.ajax({
-        type: "POST",
-        url: "ajax_form.php",
-        data: $('form.coid_form').serializeArray(),
+        type: customoid_id ? "PUT" : "POST",
+        url: url,
+        data: $('form.coid_form').serialize(),
         dataType: "json",
         success: function (data) {
             if (data.status == 'ok') {
@@ -192,11 +192,13 @@ $('#save-oid-button').on('click', function (e) {
 });
 $('#test-oid-button').on('click', function (e) {
     e.preventDefault();
-    $('#action').val('test');
+    var customoid_id = $('#ccustomoid_id').val();
+    var url = customoid_id ? '<?php echo route("customoid.test", ["customoid" => ":customoid"]) ?>'.replace(':customoid', customoid_id) : '<?php echo route("customoid.test") ?>';
+    var data = $('form.coid_form').serializeArray();
     $.ajax({
         type: "POST",
-        url: "ajax_form.php",
-        data: $('form.coid_form').serializeArray(),
+        url: url,
+        data: data,
         dataType: "json",
         success: function (data) {
             if (data.status == 'ok') {
