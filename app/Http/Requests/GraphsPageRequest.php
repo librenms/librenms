@@ -10,6 +10,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 use LibreNMS\Util\Time;
+use LibreNMS\Util\Url;
 
 class GraphsPageRequest extends FormRequest
 {
@@ -19,6 +20,11 @@ class GraphsPageRequest extends FormRequest
     public ?Port $port = null;
     public int $from = 0;
     public int $to = 0;
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge(Url::parseLegacyPathVars($this->path()));
+    }
 
     /**
      * Determine if the user is authorized to make this request.
