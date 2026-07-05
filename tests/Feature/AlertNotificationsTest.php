@@ -30,24 +30,15 @@ use App\Models\Alert;
 use App\Models\AlertLog;
 use App\Models\AlertRule;
 use App\Models\Device;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Alert\AlertNotifications;
 use LibreNMS\Enum\AlertState;
-use LibreNMS\Tests\TestCase;
+use LibreNMS\Tests\DBTestCase;
 
-class AlertNotificationsTest extends TestCase
+class AlertNotificationsTest extends DBTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->dbSetUp();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->dbTearDown();
-        parent::tearDown();
-    }
+    use DatabaseTransactions;
 
     public function testClearStaleAlerts(): void
     {
@@ -115,8 +106,11 @@ class AlertNotificationsTest extends TestCase
 
         // We need to capture the output or check side effects
         ob_start();
-        $alerts->runAlerts();
-        $output = ob_get_clean();
+        try {
+            $alerts->runAlerts();
+        } finally {
+            $output = ob_get_clean();
+        }
 
         if (str_contains($output, 'Muted')) {
             echo "\nDEBUG OUTPUT:\n" . $output . "\n";
@@ -184,8 +178,11 @@ class AlertNotificationsTest extends TestCase
         $alerts = new AlertNotifications();
 
         ob_start();
-        $alerts->runAlerts();
-        $output = ob_get_clean();
+        try {
+            $alerts->runAlerts();
+        } finally {
+            $output = ob_get_clean();
+        }
 
         $this->assertStringContainsString('Issuing Alert-UID', $output);
         $this->assertStringContainsString('/0:', $output);
@@ -241,8 +238,11 @@ class AlertNotificationsTest extends TestCase
         $alerts = new AlertNotifications();
 
         ob_start();
-        $alerts->runAcks();
-        $output = ob_get_clean();
+        try {
+            $alerts->runAcks();
+        } finally {
+            $output = ob_get_clean();
+        }
 
         $this->assertStringContainsString('Issuing Alert-UID', $output);
         $this->assertStringContainsString('/2:', $output);
@@ -293,8 +293,11 @@ class AlertNotificationsTest extends TestCase
         $alerts = new AlertNotifications();
 
         ob_start();
-        $alerts->runFollowUp();
-        $output = ob_get_clean();
+        try {
+            $alerts->runFollowUp();
+        } finally {
+            $output = ob_get_clean();
+        }
 
         $this->assertStringContainsString('Alert #', $output);
         $this->assertStringContainsString('Worse', $output);

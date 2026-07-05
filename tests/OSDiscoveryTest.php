@@ -162,11 +162,14 @@ final class OSDiscoveryTest extends TestCase
         Debug::setVerbose();
         Debug::enableCliDebugOutput();
         ob_start();
-        Log::setDefaultDriver('stdout');
-        $os = Core::detectOS($this->genDevice($community));
-        $output = ob_get_contents();
-        Log::setDefaultDriver($log_driver);
-        ob_end_clean();
+        try {
+            Log::setDefaultDriver('stdout');
+            $os = Core::detectOS($this->genDevice($community));
+            $output = ob_get_contents();
+        } finally {
+            Log::setDefaultDriver($log_driver);
+            ob_end_clean();
+        }
         Debug::set(false);
         Debug::setVerbose(false);
         Debug::disableCliDebugOutput();
