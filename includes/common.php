@@ -19,7 +19,6 @@
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
@@ -210,32 +209,6 @@ function c_echo($string, $enabled = true)
         echo preg_replace('/%((%)|.)/', '', $string);
     }
 }
-
-/*
- * @return true if client IP address is authorized to access graphs
- */
-function is_client_authorized($clientip)
-{
-    if (LibrenmsConfig::get('allow_unauth_graphs', false)) {
-        d_echo("Unauthorized graphs allowed\n");
-
-        return true;
-    }
-
-    foreach (LibrenmsConfig::get('allow_unauth_graphs_cidr', []) as $range) {
-        try {
-            if (IP::parse($clientip)->inNetwork($range)) {
-                d_echo("Unauthorized graphs allowed from $range\n");
-
-                return true;
-            }
-        } catch (InvalidIpException) {
-            d_echo("Client IP ($clientip) is invalid.\n");
-        }
-    }
-
-    return false;
-} // is_client_authorized
 
 /*
  * @return an array of all graph subtypes for the given type
