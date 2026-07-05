@@ -2,6 +2,7 @@
     'start' => '',
     'end' => '',
     'presets' => true,
+    'reload' => false,
     'placeholder' => __('Select date range...'),
     'class' => 'tw:w-full tw:px-3 tw:py-2 tw:border tw:border-gray-300 tw:rounded-md'
 ])
@@ -11,6 +12,7 @@
      x-on:click.outside="closeDropdown"
      data-start="{{ $start }}"
      data-end="{{ $end }}"
+     data-reload="{{ $reload ? 'true' : 'false' }}"
      data-presets=" {{ is_array($presets) ? implode(',', $presets) : (string) $presets }}"
      data-placeholder="{{ $placeholder }}">
     <div
@@ -38,15 +40,15 @@
                 <template x-for="(preset, idx) in presets">
                     <button type="button"
                             class="preset-btn tw:px-3 tw:py-2 tw:text-sm tw:hover:bg-gray-200 tw:dark:hover:bg-gray-600 tw:rounded-md tw:transition-colors tw:min-w-10 tw:dark:text-gray-400"
-                            :class="isPresetSelected(preset) ? 'tw:bg-blue-500 tw:text-white tw:dark:text-white' : 'tw:bg-gray-100 tw:dark:bg-gray-700'"
-                            x-on:click="setRange(preset, 'now')"
-                            x-text="preset"
+                            :class="isPresetSelected(preset.value) ? 'tw:bg-blue-500 tw:text-white tw:dark:text-white' : 'tw:bg-gray-100 tw:dark:bg-gray-700'"
+                            x-on:click="setRange(preset.value, 'now')"
+                            x-text="preset.label"
                     ></button>
                 </template>
             </div>
         @endif
         <div class="tw:flex-1 tw:mb-3">
-            <label class="tw:block tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">{{ __('From') }} <span x-show="preset || ! start" x-text="'(' + (preset || '{{ __('All') }}') + ')'"></span></label>
+            <label class="tw:block tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">{{ __('From') }} <span x-show="preset || ! start" x-text="'(' + (preset ? preset.label : '{{ __('All') }}') + ')'"></span></label>
             <div class="tw:flex tw:flex-wrap tw:gap-1 tw:dark:text-dark-gray-400">
                 <input type="date" x-model="startDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white tw:w-full">
                 <input type="time" x-model="startTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white tw:w-full">
@@ -82,18 +84,20 @@
             startTime: '',
             endTime: '',
             placeholder: 'Select date range...',
+            reload: false,
+            isInitializing: false,
             relativeStartSeconds: null,
             relativeEndSeconds: null,
             presets: [
-                '6h',
-                '24h',
-                '48h',
-                '1w',
-                '2w',
-                '1mo',
-                '2mo',
-                '1y',
-                '2y',
+                { value: '6h',  label: '6 Hours',  relative: 'Last 6 hours' },
+                { value: '24h', label: '24 Hours', relative: 'Last 24 hours' },
+                { value: '48h', label: '48 Hours', relative: 'Last 48 hours' },
+                { value: '1w',  label: '1 Week',   relative: 'Last week' },
+                { value: '2w',  label: '2 Weeks',  relative: 'Last 2 weeks' },
+                { value: '1mo', label: '1 Month',  relative: 'Last month' },
+                { value: '2mo', label: '2 Months', relative: 'Last 2 months' },
+                { value: '1y',  label: '1 Year',   relative: 'Last year' },
+                { value: '2y',  label: '2 Years',  relative: 'Last 2 years' },
             ],
 
             get start() {
@@ -146,14 +150,16 @@
             },
 
             get preset() {
-                return this.presets.find(preset => this.isPresetSelected(preset));
+                return this.presets.find(p => this.isPresetSelected(p.value));
             },
 
             get displayText() {
                 if (this.relativeStartSeconds !== null) {
-                    const rel = this.formatRelative(this.relativeStartSeconds);
+                    // Use the matched preset's label; otherwise derive one from the raw offset.
+                    const matched = this.preset;
+                    const rel = matched ? matched.relative : this.relativeLabelFromSeconds(this.relativeStartSeconds);
                     if (rel) {
-                        return `${rel} to now`;
+                        return rel;
                     }
                 }
 
@@ -163,7 +169,7 @@
                 if (startString && endString) {
                     return `${startString} to ${endString}`;
                 } else if (startString) {
-                    return `From ${startString}`;
+                    return `From ${startString} to now`;
                 } else if (endString) {
                     return `Until ${endString}`;
                 }
@@ -172,6 +178,7 @@
             },
 
             init() {
+                this.isInitializing = true;
                 // Attach API for external JS control
                 this.$el.dateRangePicker = {
                     get: () => this.getRange(),
@@ -181,9 +188,12 @@
                     close: () => this.closeDropdown(),
                 };
 
+                this.reload = this.$el.dataset.reload === 'true';
+
                 if (this.$el.dataset.placeholder) this.placeholder = this.$el.dataset.placeholder;
 
                 this.setRange(this.$el.dataset.start, this.$el.dataset.end);
+                this.isInitializing = false;
             },
 
             closeDropdown() {
@@ -289,9 +299,10 @@
                 return sign === '+' ? -seconds : seconds; // '+' => future => negative
             },
 
-            // Select and format a human relative string using Intl.RelativeTimeFormat
-            formatRelative(seconds) {
-                if (seconds == null) return '';
+            // Fallback "Last ..." label for a past offset not covered by the preset list
+            // (e.g. a hand-edited ?from=-5d). Presets supply their own label above.
+            relativeLabelFromSeconds(seconds) {
+                if (!seconds || seconds <= 0) return '';
                 const units = [
                     { unit: 'year', sec: 31536000 },
                     { unit: 'month', sec: 2592000 },
@@ -301,12 +312,9 @@
                     { unit: 'minute', sec: 60 },
                     { unit: 'second', sec: 1 },
                 ];
-                const abs = Math.abs(seconds);
-                const u = units.find(u => abs % u.sec === 0 && abs >= u.sec) || units.find(u => abs >= u.sec) || units[units.length - 1];
-                const value = Math.max(1, Math.round(abs / u.sec));
-                const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' });
-                // rtf: negative = past, positive = future
-                return rtf.format(seconds > 0 ? -value : value, u.unit);
+                const u = units.find(u => seconds % u.sec === 0 && seconds >= u.sec) || units.find(u => seconds >= u.sec) || units[units.length - 1];
+                const value = Math.max(1, Math.round(seconds / u.sec));
+                return value === 1 ? `Last ${u.unit}` : `Last ${value} ${u.unit}s`;
             },
 
             // Check if a preset is selected based on seconds value
@@ -325,11 +333,17 @@
                 return LibreNMS.Date.display(dt, opts);
             },
 
+            triggerReload() {
+                if (this.isInitializing || !this.reload) return;
+                LibreNMS.Url.updateDateRange(this.relativeStartSeconds, this.relativeEndSeconds, this.start, this.end);
+            },
+
             emitChange() {
                 this.$el.dispatchEvent(new CustomEvent('date-range-changed', {
                     detail: this.getRange(),
                     bubbles: true
                 }));
+                this.triggerReload();
             }
         }));
     });

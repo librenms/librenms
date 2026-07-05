@@ -1375,10 +1375,6 @@ nav.navbar-sticky-top {
           box-shadow: 0 5px 10px rgba(0,0,0,.2);
 }
 
-.typeahead-left {
-    left: 0px !important;
-}
-
 .tt-selectable {
   cursor: pointer;
 }
