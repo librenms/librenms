@@ -38,7 +38,7 @@ class GraphsPageRequest extends FormRequest
         [$this->type, $this->subtype] = explode('_', $typeInput, 2);
 
         $this->from = (int) (Time::parseAt($this->input('from', '')) ?: LibrenmsConfig::get('time.day'));
-        $this->to = (int) (Time::parseAt($this->input('to', '')) ?: LibrenmsConfig::get('time.now'));
+        $this->to = Time::parseAt($this->input('to', ''));
 
         // Include legacy database and HTML helper functions
         include_once base_path('includes/dbFacile.php');
