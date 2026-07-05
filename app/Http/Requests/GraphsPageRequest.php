@@ -161,6 +161,8 @@ class GraphsPageRequest extends FormRequest
     public function toVars(array $overrides = []): array
     {
         $vars = $this->except(['page', 'username', 'password']);
+        $vars['from'] = $this->from;
+        $vars['to'] = $this->to;
 
         if ($this->port) {
             $vars['device'] = $this->port->device_id;
