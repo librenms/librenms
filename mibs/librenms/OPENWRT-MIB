@@ -9,11 +9,13 @@
 -- openwrtObjects, for example OPENWRT-WIRELESS-MIB at { openwrtObjects 10 }.
 --
 -- Enterprise Number: 60652 (LibreNMS, IANA PEN)
--- OID Base: .1.3.6.1.4.1.60652
+-- OID Base: .1.3.6.1.4.1.60652.102
 --
--- NOTE: the sub-arc { librenms 102 } is PROVISIONAL, following the LibreNMS
--- agent-MIB convention where OS/agent MIBs occupy the 100-block
--- (XCP-NG-VMINFO-MIB uses { LibreNMS 100 }; { LibreNMS 1 } is alerting).
+-- NOTE: the sub-arc { enterprises 60652 102 } is PROVISIONAL, following the
+-- LibreNMS agent-MIB convention where OS/agent MIBs occupy the 100-block
+-- (XCP-NG-VMINFO-MIB uses { enterprises 60652 100 }). openwrtMIB is rooted
+-- directly under the enterprise number, with no intermediate node, so a future
+-- enterprise-number reassignment is a single-line change.
 -- Pending final assignment by a LibreNMS maintainer.
 --
 -- Device metadata scalars (e.g. openwrtMIBversion, openwrtOSversion) are
@@ -44,15 +46,11 @@ openwrtMIB MODULE-IDENTITY
     REVISION "202607030000Z"
     DESCRIPTION
         "Initial version: base registration nodes for the OpenWrt subtree."
-    ::= { librenms 102 }
+    ::= { enterprises 60652 102 }
 
 -- **********************************************************
--- Top-level enterprise OID
+-- Structure
 -- **********************************************************
-
--- Matches the `librenms' node descriptor used by LIBRENMS-NOTIFICATIONS-MIB
--- (lower-case per SMI naming rules; XCP-NG-VMINFO-MIB spells it `LibreNMS').
-librenms OBJECT IDENTIFIER ::= { enterprises 60652 }
 
 openwrtObjects     OBJECT IDENTIFIER ::= { openwrtMIB 1 }
 openwrtConformance OBJECT IDENTIFIER ::= { openwrtMIB 2 }
