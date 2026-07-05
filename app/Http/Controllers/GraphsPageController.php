@@ -96,16 +96,16 @@ class GraphsPageController extends Controller
      */
     private function periodThumbnails(GraphsPageRequest $request, int $from, int $to, int $thumbWidth): array
     {
-        $thumbTo = LibrenmsConfig::get('time.now');
-        $currentDuration = $to - $from;
+        $now = (int) LibrenmsConfig::get('time.now');
+        $currentDuration = ($to ?: $now) - $from;
         $periodThumbs = [];
 
         foreach (LibrenmsConfig::get('graphs.row.normal') as $period) {
-            $periodFrom = LibrenmsConfig::get("time.{$period}");
-            $periodDuration = (int) $thumbTo - (int) $periodFrom;
+            $periodFrom = (int) LibrenmsConfig::get("time.$period");
+            $periodDuration = $now - $periodFrom;
             $periodThumbs[] = [
-                'text' => __("settings.settings.graphs.row.normal.options.{$period}"),
-                'active' => $periodDuration > 0 && abs($currentDuration - $periodDuration) <= 0.1 * $periodDuration,
+                'text' => __("settings.settings.graphs.row.normal.options.$period"),
+                'active' => ! $to && $periodDuration > 0 && abs($currentDuration - $periodDuration) <= 5,
                 'link' => $this->graphUrl($request, ['from' => Time::toRelativeOffset($periodDuration), 'to' => null]),
                 'vars' => $request->toVars([
                     'height' => '90',
