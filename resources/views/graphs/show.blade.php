@@ -34,7 +34,7 @@
            @if ($thumb['active']) aria-current="true" @endif
            style="width: {{ $thumb['vars']['width'] }}px; min-width: {{ (int) ($thumb['vars']['width'] * 0.6) }}px;"
            class="tw:flex tw:flex-col tw:items-center tw:gap-0.5 tw:p-1 tw:rounded-lg tw:border tw:no-underline tw:transition-colors
-                  @if ($loop->first) tw:ml-auto @endif @if ($loop->last) tw:mr-auto @endif
+                  @if ($loop->first) tw:ml-auto @elseif ($loop->last) tw:mr-auto @endif
                   @if ($thumb['active']) tw:border-blue-500 tw:bg-blue-50 tw:dark:bg-gray-700 @else tw:border-transparent tw:hover:border-gray-300 tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700 @endif">
             <span class="tw:font-medium tw:whitespace-nowrap tw:text-gray-700 tw:dark:text-gray-200 tw:overflow-hidden tw:text-ellipsis tw:w-full tw:text-center">{{ $thumb['text'] }}</span>
             <img class="graph-image tw:block tw:w-full tw:h-auto tw:object-cover tw:rounded tw:border-0"
