@@ -2,6 +2,7 @@
     'start' => '',
     'end' => '',
     'presets' => true,
+    'reload' => false,
     'placeholder' => __('Select date range...'),
     'class' => 'tw:w-full tw:px-3 tw:py-2 tw:border tw:border-gray-300 tw:rounded-md'
 ])
@@ -11,6 +12,7 @@
      x-on:click.outside="closeDropdown"
      data-start="{{ $start }}"
      data-end="{{ $end }}"
+     data-reload="{{ $reload ? 'true' : 'false' }}"
      data-presets=" {{ is_array($presets) ? implode(',', $presets) : (string) $presets }}"
      data-placeholder="{{ $placeholder }}">
     <div
@@ -82,6 +84,8 @@
             startTime: '',
             endTime: '',
             placeholder: 'Select date range...',
+            reload: false,
+            isInitializing: false,
             relativeStartSeconds: null,
             relativeEndSeconds: null,
             presets: [
@@ -174,6 +178,7 @@
             },
 
             init() {
+                this.isInitializing = true;
                 // Attach API for external JS control
                 this.$el.dateRangePicker = {
                     get: () => this.getRange(),
@@ -183,9 +188,12 @@
                     close: () => this.closeDropdown(),
                 };
 
+                this.reload = this.$el.dataset.reload === 'true';
+
                 if (this.$el.dataset.placeholder) this.placeholder = this.$el.dataset.placeholder;
 
                 this.setRange(this.$el.dataset.start, this.$el.dataset.end);
+                this.isInitializing = false;
             },
 
             closeDropdown() {
@@ -325,11 +333,17 @@
                 return LibreNMS.Date.display(dt, opts);
             },
 
+            triggerReload() {
+                if (this.isInitializing || !this.reload) return;
+                LibreNMS.Url.updateDateRange(this.relativeStartSeconds, this.relativeEndSeconds, this.start, this.end);
+            },
+
             emitChange() {
                 this.$el.dispatchEvent(new CustomEvent('date-range-changed', {
                     detail: this.getRange(),
                     bubbles: true
                 }));
+                this.triggerReload();
             }
         }));
     });
