@@ -15,7 +15,7 @@ $rules = [
     'blank_line_before_statement' => [
         'statements' => ['return'],
     ],
-    'braces' => true,
+    'braces' => false,
     'cast_spaces' => true,
     'class_attributes_separation' => [
         'elements' => [
@@ -25,11 +25,7 @@ $rules = [
             'trait_import' => 'none',
         ],
     ],
-    'class_definition' => [
-        'multi_line_extends_each_single_line' => true,
-        'single_item_single_line' => true,
-//        'single_line' => true,
-    ],
+    'class_definition' => false,
     'concat_space' => [
         'spacing' => 'one', // upstream none
     ],
@@ -38,7 +34,7 @@ $rules = [
     'elseif' => true,
     'encoding' => true,
     'full_opening_tag' => true,
-    'fully_qualified_strict_types' => true, // added by Shift
+    'fully_qualified_strict_types' => false, // added by Shift
     'function_declaration' => true,
     'function_typehint_space' => true,
     'general_phpdoc_tag_rename' => true,
@@ -61,13 +57,7 @@ $rules = [
     ],
     'native_function_casing' => true,
     'no_alias_functions' => true,
-    'no_extra_blank_lines' => [
-        'tokens' => [
-            'extra',
-            'throw',
-            'use',
-        ],
-    ],
+    'no_extra_blank_lines' => false,
     'no_blank_lines_after_class_opening' => true,
     'no_blank_lines_after_phpdoc' => true,
     'no_closing_tag' => true,
@@ -98,9 +88,9 @@ $rules = [
     'no_whitespace_before_comma_in_array' => true,
     'no_whitespace_in_blank_line' => true,
     'normalize_index_brace' => true,
-    'not_operator_with_successor_space' => true,
+    'not_operator_with_successor_space' => false,
     'object_operator_without_whitespace' => true,
-    'ordered_imports' => ['sort_algorithm' => 'alpha'],
+    'ordered_imports' => false,
     'psr_autoloading' => true,
     'phpdoc_indent' => true,
     'phpdoc_inline_tag_normalizer' => true,
@@ -136,7 +126,7 @@ $rules = [
     'ternary_operator_spaces' => true,
     'trailing_comma_in_multiline' => ['elements' => ['arrays']],
     'trim_array_spaces' => true,
-    'unary_operator_spaces' => true,
+    'unary_operator_spaces' => false,
     'visibility_required' => [
         'elements' => ['method', 'property'],
     ],
