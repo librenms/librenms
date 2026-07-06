@@ -78,7 +78,9 @@ readonly class ConnectivityHelper
 
     public function unixAgentIsEnabled(): bool
     {
-        return false;
+        $os_group = LibrenmsConfig::get("os.{$this->device->os}.group");
+
+        return $os_group == 'unix' || $this->device->os == 'windows';
     }
 
     public function unixAgentIsAvailable(): bool
