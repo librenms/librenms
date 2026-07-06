@@ -78,7 +78,7 @@ class Voss extends Shared\Extreme implements IsIsDiscovery, IsIsPolling {
                         'isisISAdjNeighSysID' => $this->formatIsIsId($adjacency_data['ISIS-MIB-LEGACY::isisISAdjNeighSysID'] ?? ''),
                         'isisISAdjNeighPriority' => $adjacency_data['ISIS-MIB-LEGACY::isisISAdjNeighPriority'] ?? '',
                         'isisISAdjLastUpTime' => $this->parseAdjacencyTime($adjacency_data['ISIS-MIB-LEGACY::isisISAdjLastUpTime'] ?? 0),
-                        'isisISAdjAreaAddress' => implode(',', array_map($this->formatIsIsId(...), $adjacency_data['ISIS-MIB-LEGACY::isisISAdjAreaAddress'] ?? [])),
+                        'isisISAdjAreaAddress' => implode(',', array_map($this->formatIsIsId(...), $adjacency_data['ISIS-MIB-LEGACY::isisAreaAddress'] ?? [])),
                         'isisISAdjIPAddrType' => implode(',', $adjacency_data['ISIS-MIB-LEGACY::isisISAdjIPAddrType'] ?? []),
                         'isisISAdjIPAddrAddress' => implode(',', array_map(fn ($ip) => (string) IP::fromHexString($ip, true), $adjacency_data['ISIS-MIB-LEGACY::isisISAdjIPAddrAddress'] ?? [])),
                     ]));
