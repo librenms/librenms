@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -46,13 +47,16 @@ class GraphsPageRequest extends FormRequest
         include_once base_path('includes/html/functions.inc.php');
         include_once base_path('includes/rewrites.php');
 
-        $device = null;
         if ($deviceId = $this->input('device')) {
-            $device = DeviceCache::get($deviceId);
-        } elseif (($entityId = $this->input('id')) && $this->type !== 'port') {
-            $device = DeviceCache::get($entityId);
+            $this->device = DeviceCache::get($deviceId);
+        } elseif ($entityId = $this->input('id')) {
+            if ($this->type == 'port') {
+                $this->port = PortCache::get($entityId);
+                $this->device = $this->port->device;
+            } elseif ($this->type == 'device') {
+                $this->device = DeviceCache::get($entityId);
+            }
         }
-        $port = null;
         $auth = false;
 
         // Legacy auth.inc.php files expect their inputs in a $vars array in scope
@@ -70,7 +74,7 @@ class GraphsPageRequest extends FormRequest
         $runAuth = static function (string $file, array $vars, ?Device $device, ?Port $port, bool &$auth): void {
             require $file;
         };
-        $runAuth($authPath, $vars, $device, $port, $auth);
+        $runAuth($authPath, $vars, $this->device, $this->port, $auth);
 
         return (bool) $auth;
     }
@@ -167,11 +171,9 @@ class GraphsPageRequest extends FormRequest
         $vars['from'] = $this->from;
         $vars['to'] = $this->to;
 
-        if ($this->port) {
-            $vars['device'] = $this->port->device_id;
+        if ($this->type == 'port') {
             $vars['id'] = $this->port->port_id;
-        } elseif ($this->device) {
-            $vars['device'] = $this->device->device_id;
+        } elseif ($this->type == 'device') {
             $vars['id'] = $this->device->device_id;
         }
 
