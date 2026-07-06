@@ -171,9 +171,9 @@ class GraphsPageRequest extends FormRequest
         $vars['from'] = $this->from;
         $vars['to'] = $this->to;
 
-        if ($this->type == 'port') {
+        if ($this->type == 'port' && $this->port) {
             $vars['id'] = $this->port->port_id;
-        } elseif ($this->type == 'device') {
+        } elseif ($this->type == 'device' && $this->device) {
             $vars['id'] = $this->device->device_id;
         }
 
