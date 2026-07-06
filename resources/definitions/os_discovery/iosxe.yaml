@@ -70,4 +70,26 @@ modules:
                         - { value:  4, generic: 1, descr: 'speak' }
                         - { value:  5, generic: 0, descr: 'standby' }
                         - { value:  6, generic: 0, descr: 'active' }
+                -
+                    # Async / TTY serial lines (e.g. NIM-16A console-server ports).
+                    # OLD-CISCO-TS-MIB is deprecated but the only per-line table IOS-XE
+                    # populates. Filtered to tsLineType terminal(3) so con/aux/vty
+                    # (2/6/5) and devices without async lines yield no sensors.
+                    # descr mirrors the terminal-server pattern (e.g. avocent.yaml):
+                    # the line's configured location string identifies the attached device.
+                    oid: OLD-CISCO-TS-MIB::ltsLineTable
+                    value: OLD-CISCO-TS-MIB::tsLineActive
+                    num_oid: '.1.3.6.1.4.1.9.2.9.2.1.1.{{ $index }}'
+                    state_name: ciscoAsyncLine
+                    descr: '{{ OLD-CISCO-TS-MIB::tsLineLoc }} Status'
+                    index: 'tsLineActive.{{ $index }}'
+                    group: 'Serial Ports'
+                    skip_values:
+                        -
+                            oid: OLD-CISCO-TS-MIB::tsLineType
+                            op: '!='
+                            value: 3
+                    states:
+                        - { value:  0, generic: 0, descr: 'Idle' }
+                        - { value:  1, generic: 0, descr: 'In Use' }
 
