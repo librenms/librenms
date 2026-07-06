@@ -102,73 +102,8 @@ class Graph
      */
     public static function get($vars): GraphImage
     {
-        if (! defined('IGNORE_ERRORS')) {
-            define('IGNORE_ERRORS', true);
-        }
-
-        chdir(base_path());
-
-        include_once base_path('includes/dbFacile.php');
-        include_once base_path('includes/common.php');
-        include_once base_path('includes/html/functions.inc.php');
-        include_once base_path('includes/rewrites.php');
-
-        // handle possible graph url input
-        if (is_string($vars)) {
-            $vars = Url::parseLegacyPathVars($vars);
-        }
-
-        if (isset($vars['device'])) {
-            $device = device_by_id_cache(is_numeric($vars['device']) ? $vars['device'] : getidbyname($vars['device']));
-            DeviceCache::setPrimary($device['device_id']);
-        }
-
-        // variables for included graphs
-        $graph_params = new GraphParameters($vars);
-        // set php variables for legacy graphs
-        $type = $graph_params->type;
-        $subtype = $graph_params->subtype;
-        $height = $graph_params->height;
-        $width = $graph_params->width;
-        $from = $graph_params->from;
-        $to = $graph_params->to;
-        $period = $graph_params->period;
-        $prev_from = $graph_params->prev_from;
-        $inverse = $graph_params->inverse;
-        $in = $graph_params->in;
-        $out = $graph_params->out;
-        $float_precision = $graph_params->float_precision;
-        $title = $graph_params->visible('title');
-        $nototal = ! $graph_params->visible('total');
-        $nodetails = ! $graph_params->visible('details');
-        $noagg = ! $graph_params->visible('aggregate');
-
-        $rrd_options = [];
-        $rrd_filename = null;
-
-        $auth = Auth::guest(); // if user not logged in, assume we authenticated via signed url, allow_unauth_graphs or allow_unauth_graphs_cidr
-        require base_path("/includes/html/graphs/$type/auth.inc.php");
-        if (! $auth) {
-            // We are unauthenticated :(
-            throw new RrdGraphException('No Authorization', 'No Auth', $width, $height);
-        }
-
-        if (is_customoid_graph($type, $subtype)) {
-            $unit = $vars['unit'];
-            require base_path('/includes/html/graphs/customoid/customoid.inc.php');
-        } elseif (is_file(base_path("/includes/html/graphs/$type/$subtype.inc.php"))) {
-            require base_path("/includes/html/graphs/$type/$subtype.inc.php");
-        } elseif (is_file(base_path("/includes/html/graphs/$type/generic.inc.php"))) {
-            require base_path("/includes/html/graphs/$type/generic.inc.php");
-        } else {
-            throw new RrdGraphException("{$type}_$subtype template missing", "{$type}_$subtype missing", $width, $height);
-        }
-
-        if (empty($rrd_options)) { // @phpstan-ignore empty.variable ($rrd_options is populated by included graph templates)
-            throw new RrdGraphException('Graph Definition Error', 'Def Error', $width, $height);
-        }
-
-        $rrd_options = [...$graph_params->toRrdOptions(), ...$rrd_options]; // @phpstan-ignore deadCode.unreachable
+        $graph_params = new GraphParameters(is_string($vars) ? Url::parseLegacyPathVars($vars) : $vars);
+        $rrd_options = self::getRrdOptions($vars, $rrd_filename);
 
         // Generating the graph!
         try {
@@ -182,10 +117,96 @@ class Graph
             }
 
             if (isset($rrd_filename) && ! Rrd::checkRrdExists($rrd_filename)) {
-                throw new RrdGraphException('No Data file' . basename($rrd_filename), 'No Data', $width, $height, $e->getCode(), $e->getImage());
+                throw new RrdGraphException('No Data file' . basename($rrd_filename), 'No Data', $graph_params->width, $graph_params->height, $e->getCode(), $e->getImage());
             }
 
-            throw new RrdGraphException('Error: ' . $e->getMessage(), 'Draw Error', $width, $height, $e->getCode(), $e->getImage());
+            throw new RrdGraphException('Error: ' . $e->getMessage(), 'Draw Error', $graph_params->width, $graph_params->height, $e->getCode(), $e->getImage());
+        }
+    }
+
+    /**
+     * Build RRD options for the given $vars
+     *
+     * @param  array|string  $vars
+     * @param  string|null  &$rrd_filename  output parameter for the resolved rrd filename
+     * @return array
+     *
+     * @throws RrdGraphException
+     */
+    public static function getRrdOptions($vars, ?string &$rrd_filename = null): array
+    {
+        if (! defined('IGNORE_ERRORS')) {
+            define('IGNORE_ERRORS', true);
+        }
+
+        $previousCwd = getcwd();
+        chdir(base_path());
+
+        try {
+            include_once base_path('includes/dbFacile.php');
+            include_once base_path('includes/common.php');
+            include_once base_path('includes/html/functions.inc.php');
+            include_once base_path('includes/rewrites.php');
+
+            // handle possible graph url input
+            if (is_string($vars)) {
+                $vars = Url::parseLegacyPathVars($vars);
+            }
+
+            // variables for included graphs
+            $graph_params = new GraphParameters($vars);
+            $type = $graph_params->type;
+            $subtype = $graph_params->subtype;
+
+            $deviceId = $vars['device'] ?? ($type === 'device' ? ($vars['id'] ?? null) : null);
+            if ($deviceId) {
+                $device = DeviceCache::get($deviceId);
+                DeviceCache::setPrimary($device->device_id);
+            }
+
+            $height = $graph_params->height;
+            $width = $graph_params->width;
+            $from = $graph_params->from;
+            $to = $graph_params->to;
+            $period = $graph_params->period;
+            $prev_from = $graph_params->prev_from;
+            $inverse = $graph_params->inverse;
+            $in = $graph_params->in;
+            $out = $graph_params->out;
+            $float_precision = $graph_params->float_precision;
+            $title = $graph_params->visible('title');
+            $nototal = ! $graph_params->visible('total');
+            $nodetails = ! $graph_params->visible('details');
+            $noagg = ! $graph_params->visible('aggregate');
+
+            $rrd_options = [];
+            $rrd_filename = null;
+
+            $auth = Auth::guest(); // if user not logged in, assume we authenticated via signed url, allow_unauth_graphs or allow_unauth_graphs_cidr
+            require base_path("/includes/html/graphs/$type/auth.inc.php");
+            if (! $auth) {
+                // We are unauthenticated :(
+                throw new RrdGraphException('No Authorization', 'No Auth', $width, $height);
+            }
+
+            if (is_file(base_path("/includes/html/graphs/$type/$subtype.inc.php"))) {
+                require base_path("/includes/html/graphs/$type/$subtype.inc.php");
+            } elseif (is_file(base_path("/includes/html/graphs/$type/generic.inc.php"))) {
+                require base_path("/includes/html/graphs/$type/generic.inc.php");
+            } else {
+                throw new RrdGraphException("{$type}_$subtype template missing", "{$type}_$subtype missing", $width, $height);
+            }
+
+            if (empty($rrd_options)) { // @phpstan-ignore empty.variable ($rrd_options is populated by included graph templates)
+                throw new RrdGraphException('Graph Definition Error', 'Def Error', $width, $height);
+            }
+
+            // @phpstan-ignore deadCode.unreachable ($rrd_options is populated by included graph templates, so this is reachable)
+            return [...$graph_params->toRrdOptions(), ...$rrd_options];
+        } finally {
+            if ($previousCwd !== false) {
+                chdir($previousCwd);
+            }
         }
     }
 
@@ -198,34 +219,38 @@ class Graph
      * Get an array of all graph subtypes for the given type
      *
      * @param  string  $type
-     * @param  Device  $device
+     * @param  ?Device  $device
      * @return array
      */
-    public static function getSubtypes($type, $device = null): array
+    public static function getSubtypes(string $type, ?Device $device = null): array
     {
+        $dir = base_path('includes/html/graphs/' . basename($type));
         $types = [];
 
-        // find the subtypes defined in files
-        foreach (glob(base_path("/includes/html/graphs/$type/*.inc.php")) as $file) {
-            $type = basename($file, '.inc.php');
-            if ($type != 'auth') {
-                $types[] = $type;
+        if (is_dir($dir)) {
+            foreach (new \DirectoryIterator($dir) as $file) {
+                if ($file->isFile() && str_ends_with($file->getFilename(), '.inc.php')) {
+                    $name = $file->getBasename('.inc.php');
+                    if ($name !== 'auth') {
+                        $types[] = $name;
+                    }
+                }
             }
         }
 
-        if ($device != null) {
-            // find the MIB subtypes
+        if ($device?->graphs) {
             $graphs = $device->graphs->pluck('graph');
 
-            foreach (LibrenmsConfig::get('graph_types') as $type => $type_data) {
+            foreach (LibrenmsConfig::get('graph_types') as $gType => $type_data) {
                 foreach (array_keys($type_data) as $subtype) {
-                    if ($graphs->contains($subtype) && self::isMibGraph($type, $subtype)) {
+                    if ($graphs->contains($subtype) && self::isMibGraph($gType, $subtype)) {
                         $types[] = $subtype;
                     }
                 }
             }
         }
 
+        $types = array_unique($types);
         sort($types);
 
         return $types;

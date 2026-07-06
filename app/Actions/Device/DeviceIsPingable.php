@@ -4,7 +4,7 @@ namespace App\Actions\Device;
 
 use App\Models\Device;
 use App\Models\Eventlog;
-use LibreNMS\Data\Source\Icmp\FpingMetricService;
+use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\FpingResponse;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Polling\ConnectivityHelper;
@@ -12,13 +12,13 @@ use LibreNMS\Polling\ConnectivityHelper;
 class DeviceIsPingable
 {
     public function __construct(
-        private readonly FpingMetricService $fping,
+        private readonly Fping $fping,
     ) {
     }
 
     public function execute(Device $device): FpingResponse
     {
-        if (! ConnectivityHelper::pingIsAllowed($device)) {
+        if (! (new ConnectivityHelper($device))->icmpIsEnabled()) {
             return FpingResponse::artificialUp($device->pollerTarget());
         }
 

@@ -2,23 +2,25 @@
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Graphing\GraphParameters;
 use LibreNMS\Enum\ImageFormat;
 
 try {
-    if (isset($vars['device'])) {
-        $device = DeviceCache::get($vars['device']);
-        if ($device->exists) {
-            DeviceCache::setPrimary($device->device_id);
-        }
-    }
-
     // variables for included graphs
     $graph_params = new GraphParameters($vars);
     // set php variables for legacy graphs
     $type = $graph_params->type;
     $subtype = $graph_params->subtype;
+
+    $deviceId = $vars['device'] ?? ($type === 'device' ? ($vars['id'] ?? null) : null);
+    if (isset($deviceId)) {
+        $device = DeviceCache::get($deviceId);
+        if ($device->exists) {
+            DeviceCache::setPrimary($device->device_id);
+        }
+    }
     $height = $graph_params->height;
     $width = $graph_params->width;
     $from = $graph_params->from;
@@ -37,10 +39,7 @@ try {
 
     require LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/auth.inc.php";
 
-    if ($auth && is_customoid_graph($type, $subtype)) {
-        $unit = $vars['unit'];
-        include LibrenmsConfig::get('install_dir') . '/includes/html/graphs/customoid/customoid.inc.php';
-    } elseif ($auth && is_file(LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php")) {
+    if ($auth && is_file(LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php")) {
         include LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php";
     } elseif ($auth && is_file(LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/generic.inc.php")) {
         include LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/generic.inc.php";
@@ -58,7 +57,7 @@ try {
     }
 
     // check after auth
-    if (isset($vars['device']) && $device->exists === false) {
+    if (isset($vars['device']) && $device instanceof Device && $device->exists === false) {
         throw new \LibreNMS\Exceptions\RrdGraphException('Device not found');
     }
 

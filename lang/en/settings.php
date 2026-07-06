@@ -71,6 +71,7 @@ return [
             'snmptrapd' => ['name' => 'SNMP Traps Integration'],
             'rancid' => ['name' => 'RANCID Integration'],
             'collectd' => ['name' => 'Collectd Integration'],
+            'unimus' => ['name' => 'Unimus Integration'],
         ],
         'poller' => [
             'availability' => ['name' => 'Device Availability'],
@@ -1093,6 +1094,21 @@ return [
             ],
         ],
         'graphs' => [
+            'row' => [
+                'normal' => [
+                    'options' => [
+                        'sixhour' => '6 Hours',
+                        'day' => '24 Hours',
+                        'twoday' => '48 Hours',
+                        'week' => '1 Week',
+                        'twoweek' => '2 Weeks',
+                        'month' => '1 Month',
+                        'twomonth' => '2 Months',
+                        'year' => '1 Year',
+                        'twoyear' => '2 Years',
+                    ],
+                ],
+            ],
             'port_speed_zoom' => [
                 'description' => 'Zoom port graphs to port speed',
                 'help' => 'Zoom port graphs so the max is always the port speed, disabled port graphs zoom to traffic',
@@ -2393,6 +2409,23 @@ return [
         'twofactor_lock' => [
             'description' => 'Two-Factor Throttle Time (seconds)',
             'help' => 'Lock-out time to wait in seconds before allowing further attempts if Two-Factor authentication is failed 3 times consecutively - will prompt user to wait this long.  Set to 0 to disable resulting in a permanent account lock-out and a message to user to contact administrator',
+        ],
+        'unimus' => [
+            'api_version' => [
+                'description' => 'Unimus API version',
+            ],
+            'enabled' => [
+                'description' => 'Enable Unimus support',
+                'help' => 'Show device configuration backups from Unimus on the device Config tab',
+            ],
+            'token' => [
+                'description' => 'Unimus API token',
+                'help' => 'API token created in Unimus (Basic / read-only access is sufficient)',
+            ],
+            'url' => [
+                'description' => 'Unimus URL',
+                'help' => 'Base URL of your Unimus server, for example: http://unimus.example.com:8085',
+            ],
         ],
         'unix-agent' => [
             'connection-timeout' => [
