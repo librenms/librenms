@@ -8,18 +8,19 @@ use LibreNMS\Data\Graphing\GraphParameters;
 use LibreNMS\Enum\ImageFormat;
 
 try {
-    if (isset($vars['device'])) {
-        $device = DeviceCache::get($vars['device']);
-        if ($device->exists) {
-            DeviceCache::setPrimary($device->device_id);
-        }
-    }
-
     // variables for included graphs
     $graph_params = new GraphParameters($vars);
     // set php variables for legacy graphs
     $type = $graph_params->type;
     $subtype = $graph_params->subtype;
+
+    $deviceId = $vars['device'] ?? ($type === 'device' ? ($vars['id'] ?? null) : null);
+    if (isset($deviceId)) {
+        $device = DeviceCache::get($deviceId);
+        if ($device->exists) {
+            DeviceCache::setPrimary($device->device_id);
+        }
+    }
     $height = $graph_params->height;
     $width = $graph_params->width;
     $from = $graph_params->from;
