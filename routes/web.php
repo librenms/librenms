@@ -20,6 +20,7 @@ use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\DeviceGroupController;
 use App\Http\Controllers\DevicesController;
 use App\Http\Controllers\GraphController;
+use App\Http\Controllers\GraphsPageController;
 use App\Http\Controllers\Install;
 use App\Http\Controllers\LegacyController;
 use App\Http\Controllers\LocationController;
@@ -97,6 +98,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::post('alert/{alert}/ack', [AlertController::class, 'ack'])->name('alert.ack');
     Route::get('devices/{view?}/{graph?}/{vars?}', [DevicesController::class, 'index'])->where('vars', '.*')->name('devices');
     Route::resource('device-groups', DeviceGroupController::class);
+    Route::get('graphs/{path?}', GraphsPageController::class)->where('path', '.*')->name('graphs');
     Route::any('inventory', App\Http\Controllers\InventoryController::class)->name('inventory');
     Route::get('inventory/purge', [App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
     Route::get('outages', [OutagesController::class, 'index'])->name('outages');
@@ -302,9 +304,11 @@ Route::middleware(['auth'])->group(function (): void {
         Route::resource('location', LocationController::class)->only('update', 'destroy');
         Route::resource('pollergroup', PollerGroupController::class)->only('destroy', 'show', 'store', 'update');
         // misc ajax controllers
-        Route::get('search/bgp', Ajax\BgpSearchController::class);
-        Route::get('search/device', Ajax\DeviceSearchController::class);
-        Route::get('search/port', Ajax\PortSearchController::class);
+        Route::get('search/devices', Ajax\Search\DevicesSearchController::class)->name('ajax.search.devices');
+        Route::get('search/ports', Ajax\Search\PortsSearchController::class)->name('ajax.search.ports');
+        Route::get('search/health', Ajax\Search\HealthSearchController::class)->name('ajax.search.health');
+        Route::get('search/routing', Ajax\Search\RoutingSearchController::class)->name('ajax.search.routing');
+        Route::get('search/logs', Ajax\Search\LogsSearchController::class)->name('ajax.search.logs');
         Route::post('set_resolution', [Ajax\SessionController::class, 'resolution']);
         Route::post('set_style', [Ajax\SessionController::class, 'style']);
         Route::post('ripe/raw', [Ajax\RipeNccApiController::class, 'raw']);
