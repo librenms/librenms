@@ -41,7 +41,7 @@ class DeviceObserver
     public function updated(Device $device): void
     {
         // log up/down status changes
-        if ($device->isDirty(['status', 'status_reason'])) {
+        if ($device->isDirty('status')) {
             $type = $device->status ? 'up' : 'down';
             $reason = $device->status ? $device->getOriginal('status_reason') : $device->status_reason;
             $polled_by = LibrenmsConfig::get('distributed_poller') ? (' by ' . \config('librenms.node_id')) : '';
