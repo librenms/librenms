@@ -71,8 +71,12 @@ class GraphsPageRequest extends FormRequest
             return true;
         }
 
-        $runAuth = static function (string $file, array $vars, ?Device $device, ?Port $port, bool &$auth): void {
+        $runAuth = function (string $file, array $vars, ?Device $device, ?Port $port, bool &$auth): void {
             require $file;
+
+            if (is_array($device) && isset($device['device_id'])) {
+                $this->device ??= DeviceCache::get($device['device_id']);
+            }
         };
         $runAuth($authPath, $vars, $this->device, $this->port, $auth);
 
@@ -170,12 +174,6 @@ class GraphsPageRequest extends FormRequest
         $vars = $this->except(['page', 'username', 'password']);
         $vars['from'] = $this->from;
         $vars['to'] = $this->to;
-
-        if ($this->type == 'port' && $this->port) {
-            $vars['id'] = $this->port->port_id;
-        } elseif ($this->type == 'device' && $this->device) {
-            $vars['id'] = $this->device->device_id;
-        }
 
         return array_merge($vars, $overrides);
     }
