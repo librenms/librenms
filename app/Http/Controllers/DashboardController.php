@@ -546,7 +546,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * @param  Collection<int, array{id: int<1, max>, name: non-empty-string, dashboard_ids: non-empty-array<int, int>}>  $playlists
+     * @param  Collection<int, array{id: int, name: non-empty-string, dashboard_ids: non-empty-array<int, int>}>  $playlists
      */
     private function saveNocPlaylists(User $user, Collection $playlists): void
     {
