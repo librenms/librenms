@@ -316,7 +316,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * @return array{playlists_with_missing: Collection<int, array{id: int, name: string, missing_ids: non-empty-array<int, int>}>, missing_ids: Collection<int, int>}|null
+     * @return array{playlists_with_missing: Collection<int, array{id: int, name: string, missing_ids: array<int, int>}>, missing_ids: Collection<int, int>}|null
      */
     private function getNocCleanupData(User $user): ?array
     {
@@ -496,7 +496,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * @return Collection<int, array{id: int<1, max>, name: non-empty-string, dashboard_ids: non-empty-array<int, int>}>
+     * @return Collection<int, array{id: int, name: string, dashboard_ids: array<int, int>}>
      */
     private function getNocPlaylists(User $user): Collection
     {
@@ -546,7 +546,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * @param  Collection<int, array{id: int, name: string, dashboard_ids: non-empty-array<int, int>}>  $playlists
+     * @param  Collection<int, array{id: int, name: string, dashboard_ids: array<int, int>}>  $playlists
      */
     private function saveNocPlaylists(User $user, Collection $playlists): void
     {
