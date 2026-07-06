@@ -48,7 +48,7 @@ class DevicesSearchController extends GroupedSearchController
 
         $devices = $query->orderBy('display')->limit($limit)->get()
             ->map(fn (Device $d) => [
-                'name' => $d->display,
+                'name' => $d->display . ' (' . $d->hostname . ')',
                 'subtitle' => trim(LibrenmsConfig::getOsSetting($d->os, 'text') . ' ' . $d->hardware) ?: $d->sysName,
                 'image' => $d->icon,
                 'status' => match ($d->getDeviceStatus()) {
