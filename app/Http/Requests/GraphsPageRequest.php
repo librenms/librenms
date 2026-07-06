@@ -71,7 +71,7 @@ class GraphsPageRequest extends FormRequest
             return true;
         }
 
-        $runAuth = function (string $file, array $vars, ?Device $device, ?Port $port, bool &$auth): void {
+        $runAuth = function (string $file, array $vars, mixed $device, mixed $port, bool &$auth): void {
             require $file;
 
             if (is_array($device) && isset($device['device_id'])) {
