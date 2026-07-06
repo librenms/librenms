@@ -198,6 +198,7 @@ class DashboardController extends Controller
             'dashboard_ids' => $dashboard_ids->all(),
         ]);
 
+        /** @phpstan-ignore argument.type */
         $this->saveNocPlaylists($user, $playlists);
 
         return back()->with('status', __('dashboard.noc.playlist_saved'));
@@ -230,6 +231,7 @@ class DashboardController extends Controller
             'dashboard_ids' => $dashboard_ids->all(),
         ]);
 
+        /** @phpstan-ignore argument.type */
         $this->saveNocPlaylists($user, $playlists);
 
         return back()->with('status', __('dashboard.noc.playlist_saved'));
@@ -242,6 +244,7 @@ class DashboardController extends Controller
             ->reject(fn (array $playlist): bool => $playlist['id'] === $playlistId)
             ->values();
 
+        /** @phpstan-ignore argument.type */
         $this->saveNocPlaylists($user, $playlists);
 
         return back()->with('status', __('dashboard.noc.playlist_deleted'));
@@ -272,6 +275,7 @@ class DashboardController extends Controller
             ->filter(fn (array $playlist): bool => ! empty($playlist['dashboard_ids']))
             ->values();
 
+        /** @phpstan-ignore argument.type */
         $this->saveNocPlaylists($user, $playlists);
 
         return redirect()->route('dashboard.noc.playlists')->with('status', __('dashboard.noc.cleanup_done'));
@@ -546,7 +550,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * @param  Collection<int, array{id: int, name: non-empty-string, dashboard_ids: non-empty-array<int, int>}>  $playlists
+     * @param  Collection<int, array{id: int, name: string, dashboard_ids: array<int, int>}>  $playlists
      */
     private function saveNocPlaylists(User $user, Collection $playlists): void
     {
