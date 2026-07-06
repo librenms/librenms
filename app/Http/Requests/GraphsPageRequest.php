@@ -67,13 +67,10 @@ class GraphsPageRequest extends FormRequest
             return true;
         }
 
-        $runAuth = static function (string $file, array $vars, mixed &$device, mixed &$port, bool &$auth): void {
+        $runAuth = static function (string $file, array $vars, ?Device $device, ?Port $port, bool &$auth): void {
             require $file;
         };
         $runAuth($authPath, $vars, $device, $port, $auth);
-
-        $this->device = $device;
-        $this->port = $port;
 
         return (bool) $auth;
     }
