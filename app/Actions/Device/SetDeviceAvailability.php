@@ -4,16 +4,13 @@ namespace App\Actions\Device;
 
 use App\Models\Device;
 use LibreNMS\Enum\AvailabilitySource;
+use LibreNMS\Polling\ConnectivityHelper;
 
 class SetDeviceAvailability
 {
-    public function __construct(
-    ) {
-    }
-
     /**
-     * Set status and status_reason fields based on availability results
-     * Does not persist to the database
+     * Set status and status_reason fields based on availability results.
+     * Does not persist to the database.
      *
      * @param  Device  $device
      * @param  array<string|\LibreNMS\Enum\AvailabilitySource, bool>  $results  e.g. ['icmp' => true, 'snmp' => false]
@@ -21,47 +18,30 @@ class SetDeviceAvailability
      */
     public function execute(Device $device, array $results): bool
     {
-        // Parse current failed sources from status_reason
-        $current_failed = collect(explode(',', (string) $device->status_reason))
-            ->map(fn($s) => trim($s))
-            ->filter()
-            ->all();
+        $connectivity = new ConnectivityHelper($device);
 
-        $failed_in_run = [];
-        $checked = [];
-        foreach ($results as $source => $status) {
-            $sourceName = $source instanceof AvailabilitySource ? $source->value : (string) $source;
-            $checked[] = $sourceName;
-            if (! $status) {
-                $failed_in_run[] = $sourceName;
-            }
-        }
+        // Determine which sources are currently enabled on this device
+        $enabled = collect(['icmp', 'snmp'])->filter(fn($source) => $connectivity->{"{$source}IsEnabled"}());
 
-        // Failed sources are:
-        // 1. Those that failed in this run
-        // 2. Those that were previously failed and were not checked in this run
-        $not_checked = array_diff($current_failed, $checked);
-        $all_failed = array_unique(array_merge($failed_in_run, $not_checked));
+        // Normalize keys: AvailabilitySource enum values or plain strings
+        $checked = collect($results)->mapWithKeys(function ($passed, $source) {
+            $name = $source instanceof AvailabilitySource ? $source->value : (string) $source;
 
-        // Filter failed sources to only those that are currently enabled
-        $connectivity = new \LibreNMS\Polling\ConnectivityHelper($device);
-        $enabled_sources = [];
-        if ($connectivity->icmpIsEnabled()) {
-            $enabled_sources[] = 'icmp';
-        }
-        if ($connectivity->snmpIsEnabled()) {
-            $enabled_sources[] = 'snmp';
-        }
-        // In the future, additional availability sources can be appended to $enabled_sources here.
-        $all_failed = array_intersect($all_failed, $enabled_sources);
+            return [$name => $passed];
+        });
 
-        // Sort failed sources for consistency in status_reason
-        sort($all_failed);
+        // Previously failing sources that weren't checked this run are still considered failing
+        $previously_failed = collect(explode(',', (string) $device->status_reason))->map(fn($s) => trim($s))->filter();
+        $unchecked_failures = $previously_failed->diff($checked->keys());
 
-        $available = empty($all_failed);
+        // A source is failing if it failed in this run, or was previously failing and wasn't re-checked
+        $failing = $checked->filter(fn($passed) => ! $passed)->keys()->merge($unchecked_failures);
 
-        $device->status = $available;
-        $device->status_reason = implode(',', $all_failed);
+        // Only report failures for sources that are currently enabled
+        $failed_sources = $failing->intersect($enabled)->sort()->values();
+
+        $device->status = $failed_sources->isEmpty();
+        $device->status_reason = $failed_sources->implode(',');
 
         return $device->isDirty('status');
     }
