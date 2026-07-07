@@ -18,6 +18,7 @@
  */
 
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Exceptions\RrdGraphException;
 
 require 'includes/html/collectd/config.php';
 require 'includes/html/collectd/functions.php';
@@ -66,7 +67,7 @@ function error($code, $code_msg, $title, $msg)
     if (collectd_uses_rrd_options_api()) {
         global $width, $height;
 
-        throw new \LibreNMS\Exceptions\RrdGraphException($msg, $code_msg, $width ?? 400, $height ?? 200);
+        throw new RrdGraphException($msg, $code_msg, $width ?? 400, $height ?? 200);
     }
 
     header(sprintf('HTTP/1.0 %d %s', $code, $code_msg));
