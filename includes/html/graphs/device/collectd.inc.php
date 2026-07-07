@@ -25,6 +25,10 @@ require 'includes/html/collectd/definitions.php';
 
 collectd_bind_graph_parameters($graph_params);
 
+if (isset($vars) && is_array($vars)) {
+    collectd_merge_request_vars($vars);
+}
+
 function makeTextBlock($text, $fontfile, $fontsize, $width)
 {
     // TODO: handle explicit line-break!
@@ -59,6 +63,12 @@ function makeTextBlock($text, $fontfile, $fontsize, $width)
  */
 function error($code, $code_msg, $title, $msg)
 {
+    if (collectd_uses_rrd_options_api()) {
+        global $width, $height;
+
+        throw new \LibreNMS\Exceptions\RrdGraphException($msg, $code_msg, $width ?? 400, $height ?? 200);
+    }
+
     header(sprintf('HTTP/1.0 %d %s', $code, $code_msg));
     header('Pragma: no-cache');
     header('Expires: Mon, 01 Jan 2008 00:00:00 CET');
@@ -232,8 +242,7 @@ if (isset($MetaGraphDefs[$type])) {
 }
 
 if (isset($rrd_cmd)) {
-    $from = (int) ($_GET['from'] ?? time() - 86400);
-    $to = (int) ($_GET['to'] ?? time());
+    [$from, $to] = collectd_graph_time_range();
 
     $rrd_cmd .= ' -s ' . $from . ' -e ' . $to;
 }
@@ -258,6 +267,15 @@ if (isset($_GET['debug'])) {
 
     return 0;
 } elseif ($rrd_cmd) {
+    if (collectd_uses_rrd_options_api()) {
+        $rrd_options = collectd_rrd_cmd_to_options($rrd_cmd);
+        if (empty($rrd_options)) {
+            return error500($graph_identifier, 'Failed to parse collectd graph command');
+        }
+
+        return;
+    }
+
     header('Content-Type: image/png');
     header('Cache-Control: max-age=60');
     $rt = 0;
