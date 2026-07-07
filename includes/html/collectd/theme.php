@@ -24,6 +24,7 @@ function collectd_bind_graph_parameters(GraphParameters $graph_params): void
 
     LibrenmsConfig::set('rrd_width', $graph_params->width);
     LibrenmsConfig::set('rrd_height', $graph_params->height);
+    LibrenmsConfig::set('collectd_rrd_color_opts', collectd_graph_color_options($graph_params));
 }
 
 function collectd_active_graph_parameters(): ?GraphParameters

@@ -224,7 +224,9 @@ if (isset($MetaGraphDefs[$type])) {
     collectd_flush(collectd_identifier($host, $plugin, $type, $pinst ?? '', $tinst ?? ''));
     if (isset($GraphDefs[$type])) {
         $rrd_cmd = collectd_draw_generic($timespan, $host, $plugin, $type, $pinst, $tinst);
-    } else {
+    }
+
+    if (empty($rrd_cmd)) {
         $rrd_cmd = collectd_draw_rrd($host, $plugin, $type, $pinst, $tinst);
     }
 }
@@ -236,7 +238,7 @@ if (isset($rrd_cmd)) {
     $rrd_cmd .= ' -s ' . $from . ' -e ' . $to;
 }
 
-if ($_GET['legend'] == 'no') {
+if (($_GET['legend'] ?? '') == 'no') {
     $rrd_cmd .= ' -g ';
 }
 
@@ -248,10 +250,6 @@ if ($width <= '300') {
     $rrd_cmd .= ' --font LEGEND:7:' . LibrenmsConfig::get('mono_font') . ' --font AXIS:6:' . LibrenmsConfig::get('mono_font') . ' ';
 } else {
     $rrd_cmd .= ' --font LEGEND:8:' . LibrenmsConfig::get('mono_font') . ' --font AXIS:7:' . LibrenmsConfig::get('mono_font') . ' ';
-}
-
-if ($rrd_cmd) {
-    $rrd_cmd = collectd_append_graph_color_options($rrd_cmd, $graph_params);
 }
 
 if (isset($_GET['debug'])) {

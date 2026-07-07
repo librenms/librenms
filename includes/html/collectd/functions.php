@@ -583,7 +583,7 @@ function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, 
         $rrd_cmd = array_merge($rrd_cmd, $small_opts);
     }
 
-    $rrd_cmd = array_merge($rrd_cmd, $opts['rrd_opts'], $graph);
+    $rrd_cmd = array_merge($rrd_cmd, LibrenmsConfig::get('collectd_rrd_color_opts', []), $opts['rrd_opts'], $graph);
 
     $cmd = RRDTOOL;
     $count_rrd_cmd = count($rrd_cmd);
@@ -651,7 +651,7 @@ function collectd_draw_generic($timespan, $host, $plugin, $type, $pinst = null, 
         $rrd_cmd = array_merge($rrd_cmd, $small_opts);
     }
 
-    $rrd_cmd = array_merge($rrd_cmd);
+    $rrd_cmd = array_merge($rrd_cmd, LibrenmsConfig::get('collectd_rrd_color_opts', []));
     $rrd_args = $GraphDefs[$type];
 
     foreach (LibrenmsConfig::get('datadirs') as $datadir) {
@@ -740,7 +740,7 @@ function collectd_draw_meta_stack(&$opts, &$sources)
         $cmd = array_merge($cmd, $small_opts);
     }
 
-    $cmd = array_merge($cmd, $opts['rrd_opts']);
+    $cmd = array_merge($cmd, LibrenmsConfig::get('collectd_rrd_color_opts', []), $opts['rrd_opts']);
     $max_inst_name = 0;
 
     foreach ($sources as &$inst_data) {
@@ -876,6 +876,8 @@ function collectd_draw_meta_line(&$opts, &$sources)
         ];
         $cmd = array_merge($cmd, $small_opts);
     }
+
+    $cmd = array_merge($cmd, LibrenmsConfig::get('collectd_rrd_color_opts', []), $opts['rrd_opts']);
 
     $max_inst_name = 0;
 
