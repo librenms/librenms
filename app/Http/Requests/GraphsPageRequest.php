@@ -9,6 +9,7 @@ use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
@@ -21,6 +22,8 @@ class GraphsPageRequest extends FormRequest
     public ?Port $port = null;
     public int $from = 0;
     public int $to = 0;
+    /** @var list<int> */
+    public array $ids = [];
 
     protected function prepareForValidation(): void
     {
@@ -47,28 +50,23 @@ class GraphsPageRequest extends FormRequest
         include_once base_path('includes/html/functions.inc.php');
         include_once base_path('includes/rewrites.php');
 
+        $this->ids = $this->string('id')->explode(',')->filter()->map(intval(...))->values()->all();
+
         if ($deviceId = $this->input('device')) {
             $this->device = DeviceCache::get($deviceId);
-        } elseif ($entityId = $this->input('id')) {
+        } elseif (count($this->ids) === 1) {
             if ($this->type == 'port') {
-                $this->port = PortCache::get($entityId);
+                $this->port = PortCache::get($this->getId());
                 $this->device = $this->port->device;
             } elseif ($this->type == 'device') {
-                $this->device = DeviceCache::get($entityId);
+                $this->device = DeviceCache::get($this->getId());
             }
         }
         $auth = false;
 
-        // Legacy auth.inc.php files expect their inputs in a $vars array in scope
-        $vars = $this->except(['page', 'username', 'password']);
-        if ($this->has('id') && ! $this->has('device') && $this->type !== 'port') {
-            $vars['device'] = $this->input('id');
-        }
-
-        $authPath = base_path("includes/html/graphs/{$this->type}/auth.inc.php");
+        $authPath = base_path("includes/html/graphs/$this->type/auth.inc.php");
         if (! is_file($authPath)) {
-            // Let validation handle reporting that the graph type is invalid
-            return true;
+            return false;
         }
 
         $runAuth = function (string $file, array $vars, mixed $device, mixed $port, bool &$auth): void {
@@ -78,7 +76,7 @@ class GraphsPageRequest extends FormRequest
                 $this->device ??= DeviceCache::get($device['device_id']);
             }
         };
-        $runAuth($authPath, $vars, $this->device, $this->port, $auth);
+        $runAuth($authPath, $this->toVars(), $this->device, $this->port, $auth);
 
         return (bool) $auth;
     }
@@ -100,7 +98,7 @@ class GraphsPageRequest extends FormRequest
             'showcommand' => ['nullable', 'string', 'in:yes,no'],
             'port_speed_zoom' => ['nullable', 'in:0,1'],
             'device' => ['nullable', 'integer'],
-            'id' => ['nullable', 'integer'],
+            'id' => ['nullable', 'regex:/^\d+(,\d+)*$/'],
             'width' => ['nullable', 'integer', 'min:10'],
             'height' => ['nullable', 'integer', 'min:10'],
 
@@ -137,7 +135,7 @@ class GraphsPageRequest extends FormRequest
                         $validateItem($key, $v);
                     }
                 } elseif (is_string($value)) {
-                    if (! preg_match('/^[-a-zA-Z0-9_.: \/+]*$/', $value)) {
+                    if (! preg_match('/^[-a-zA-Z0-9_.: \/+,]*$/', $value)) {
                         $validator->errors()->add($key, 'The parameter value contains invalid characters.');
                     }
                 }
@@ -150,17 +148,16 @@ class GraphsPageRequest extends FormRequest
                 }
                 $validateItem($key, $value);
             }
-
-            // Check if graph type auth file exists
-            $typeInput = $this->input('type');
-            if (is_string($typeInput) && str_contains($typeInput, '_')) {
-                [$typePart] = explode('_', $typeInput, 2);
-                $authPath = base_path("includes/html/graphs/{$typePart}/auth.inc.php");
-                if (! is_file($authPath)) {
-                    $validator->errors()->add('type', 'The specified graph type is invalid.');
-                }
-            }
         });
+    }
+
+    public function getId(): int
+    {
+        if (count($this->ids) !== 1) {
+            throw ValidationException::withMessages(['id' => 'Invalid id input, input must be a single integer']);
+        }
+
+        return $this->ids[0];
     }
 
     /**
