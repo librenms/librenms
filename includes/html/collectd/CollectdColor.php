@@ -96,7 +96,7 @@ class CollectdColor
 
     public function fade($bkgnd = null, $alpha = 0.25)
     {
-        if (is_null($bkgnd) || ! is_a($bkgnd, 'CollectdColor')) {
+        if (is_null($bkgnd) || ! $bkgnd instanceof self) {
             $bg_r = 1.0;
             $bg_g = 1.0;
             $bg_b = 1.0;

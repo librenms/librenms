@@ -56,7 +56,7 @@ unset($sep);
 
 print_optionbar_end();
 
-$i = 0;
+echo '<div style="clear: both;">';
 
 $pinsts = collectd_list_pinsts($device['hostname'], $vars['plugin']);
 foreach ($pinsts as &$instance) {
@@ -69,34 +69,20 @@ foreach ($pinsts as &$instance) {
         }
 
         foreach ($typeinstances as &$tinst) {
-            $i++;
-            if (! is_int($i / 2)) {
-                $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
-            } else {
-                $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
-            }
-
-            echo '<div style="background-color: ' . $row_colour . ';">';
-            echo '<div class="graphhead" style="padding:4px 0px 0px 8px;">';
             if ($tinst) {
-                echo $vars['plugin'] . " $instance - $type - $tinst";
+                $graph_title = $vars['plugin'] . " $instance - $type - $tinst";
             } else {
-                echo $vars['plugin'] . " $instance - $type";
+                $graph_title = $vars['plugin'] . " $instance - $type";
             }
-
-            echo '</div>';
 
             $graph_array['type'] = 'device_collectd';
             $graph_array['device'] = $device['device_id'];
-
             $graph_array['c_plugin'] = $vars['plugin'];
             $graph_array['c_plugin_instance'] = $instance;
             $graph_array['c_type'] = $type;
             $graph_array['c_type_instance'] = $tinst;
 
-            include 'includes/html/print-graphrow.inc.php';
-
-            echo '</div>';
+            include 'includes/html/print-device-graph.php';
         }
     }
 }

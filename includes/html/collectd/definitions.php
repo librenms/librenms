@@ -20,11 +20,14 @@
  *
  * Most RRD Graph definitions copied from collection.cgi
  */
+
+use App\Facades\LibrenmsConfig;
+
 $GraphDefs = [];
 $MetaGraphDefs = [];
 
-if (is_file('definitions.local.php')) {
-    require_once 'definitions.local.php';
+if (is_file(__DIR__ . '/definitions.local.php')) {
+    require_once __DIR__ . '/definitions.local.php';
 }
 
 function load_graph_definitions($logarithmic = false, $tinylegend = false)
@@ -1684,7 +1687,7 @@ function meta_graph_files_count($host, $plugin, $plugin_instance, $type, $type_i
     $type_instances = ['incoming', 'active', 'deferred'];
     foreach ($type_instances as $inst) {
         $file = '';
-        foreach (Config::get('datadirs') as $datadir) {
+        foreach (LibrenmsConfig::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
                 $file = $datadir . '/' . $title . '-' . $inst . '.rrd';
                 break;
@@ -1719,7 +1722,7 @@ function meta_graph_files_size($host, $plugin, $plugin_instance, $type, $type_in
     $type_instances = ['incoming', 'active', 'deferred'];
     foreach ($type_instances as $inst) {
         $file = '';
-        foreach (Config::get('datadirs') as $datadir) {
+        foreach (LibrenmsConfig::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
                 $file = $datadir . '/' . $title . '-' . $inst . '.rrd';
                 break;
@@ -1759,7 +1762,7 @@ function meta_graph_cpu($host, $plugin, $plugin_instance, $type, $type_instances
     $type_instances = ['idle', 'wait', 'nice', 'user', 'system', 'softirq', 'interrupt', 'steal'];
     foreach ($type_instances as $inst) {
         $file = '';
-        foreach (Config::get('datadirs') as $datadir) {
+        foreach (LibrenmsConfig::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
                 $file = $datadir . '/' . $title . '-' . $inst . '.rrd';
                 break;
@@ -1797,7 +1800,7 @@ function meta_graph_memory($host, $plugin, $plugin_instance, $type, $type_instan
     $type_instances = ['free', 'cached', 'buffered', 'used'];
     foreach ($type_instances as $inst) {
         $file = '';
-        foreach (Config::get('datadirs') as $datadir) {
+        foreach (LibrenmsConfig::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
                 $file = $datadir . '/' . $title . '-' . $inst . '.rrd';
                 break;
@@ -1834,7 +1837,7 @@ function meta_graph_vs_threads($host, $plugin, $plugin_instance, $type, $type_in
     $type_instances = ['total', 'running', 'onhold', 'uninterruptable'];
     foreach ($type_instances as $inst) {
         $file = '';
-        foreach (Config::get('datadirs') as $datadir) {
+        foreach (LibrenmsConfig::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
                 $file = $datadir . '/' . $title . '-' . $inst . '.rrd';
                 break;
@@ -1871,7 +1874,7 @@ function meta_graph_vs_memory($host, $plugin, $plugin_instance, $type, $type_ins
     $type_instances = ['anon', 'rss', 'vml', 'vm'];
     foreach ($type_instances as $inst) {
         $file = '';
-        foreach (Config::get('datadirs') as $datadir) {
+        foreach (LibrenmsConfig::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
                 $file = $datadir . '/' . $title . '-' . $inst . '.rrd';
                 break;
@@ -1900,7 +1903,7 @@ function meta_graph_if_rx_errors($host, $plugin, $plugin_instance, $type, $type_
 
     foreach ($type_instances as $inst) {
         $file = '';
-        foreach (Config::get('datadirs') as $datadir) {
+        foreach (LibrenmsConfig::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
                 $file = $datadir . '/' . $title . '-' . $inst . '.rrd';
                 break;
@@ -1929,7 +1932,7 @@ function meta_graph_mysql_commands($host, $plugin, $plugin_instance, $type, $typ
 
     foreach ($type_instances as $inst) {
         $file = '';
-        foreach (Config::get('datadirs') as $datadir) {
+        foreach (LibrenmsConfig::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
                 $file = $datadir . '/' . $title . '-' . $inst . '.rrd';
                 break;
@@ -1958,7 +1961,7 @@ function meta_graph_nfs_procedure($host, $plugin, $plugin_instance, $type, $type
 
     foreach ($type_instances as $inst) {
         $file = '';
-        foreach (Config::get('datadirs') as $datadir) {
+        foreach (LibrenmsConfig::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
                 $file = $datadir . '/' . $title . '-' . $inst . '.rrd';
                 break;
@@ -1996,7 +1999,7 @@ function meta_graph_ps_state($host, $plugin, $plugin_instance, $type, $type_inst
     $type_instances = ['paging', 'blocked', 'zombies', 'stopped', 'running', 'sleeping'];
     foreach ($type_instances as $inst) {
         $file = '';
-        foreach (Config::get('datadirs') as $datadir) {
+        foreach (LibrenmsConfig::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
                 $file = $datadir . '/' . $title . '-' . $inst . '.rrd';
                 break;
@@ -2032,7 +2035,7 @@ function meta_graph_swap($host, $plugin, $plugin_instance, $type, $type_instance
     $type_instances = ['free', 'cached', 'used'];
     foreach ($type_instances as $inst) {
         $file = '';
-        foreach (Config::get('datadirs') as $datadir) {
+        foreach (LibrenmsConfig::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
                 $file = $datadir . '/' . $title . '-' . $inst . '.rrd';
                 break;
@@ -2076,7 +2079,7 @@ function meta_graph_apache_scoreboard($host, $plugin, $plugin_instance, $type, $
     $type_instances = [/* 'open',*/ 'waiting', 'starting', 'reading', 'sending', 'keepalive', 'dnslookup', 'logging', 'closing', 'finishing', 'idle_cleanup'];
     foreach ($type_instances as $inst) {
         $file = '';
-        foreach (Config::get('datadirs') as $datadir) {
+        foreach (LibrenmsConfig::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
                 $file = $datadir . '/' . $title . '-' . $inst . '.rrd';
                 break;
@@ -2121,7 +2124,7 @@ function meta_graph_tcp_connections($host, $plugin, $plugin_instance, $type, $ty
     $type_instances = ['ESTABLISHED', 'SYN_SENT', 'SYN_RECV', 'FIN_WAIT1', 'FIN_WAIT2', 'TIME_WAIT', 'CLOSE', 'CLOSE_WAIT', 'LAST_ACK', 'CLOSING', 'LISTEN'];
     foreach ($type_instances as $inst) {
         $file = '';
-        foreach (Config::get('datadirs') as $datadir) {
+        foreach (LibrenmsConfig::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
                 $file = $datadir . '/' . $title . '-' . $inst . '.rrd';
                 break;

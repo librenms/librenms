@@ -23,6 +23,8 @@ require 'includes/html/collectd/config.php';
 require 'includes/html/collectd/functions.php';
 require 'includes/html/collectd/definitions.php';
 
+collectd_bind_graph_parameters($graph_params);
+
 function makeTextBlock($text, $fontfile, $fontsize, $width)
 {
     // TODO: handle explicit line-break!
@@ -246,6 +248,10 @@ if ($width <= '300') {
     $rrd_cmd .= ' --font LEGEND:7:' . LibrenmsConfig::get('mono_font') . ' --font AXIS:6:' . LibrenmsConfig::get('mono_font') . ' ';
 } else {
     $rrd_cmd .= ' --font LEGEND:8:' . LibrenmsConfig::get('mono_font') . ' --font AXIS:7:' . LibrenmsConfig::get('mono_font') . ' ';
+}
+
+if ($rrd_cmd) {
+    $rrd_cmd = collectd_append_graph_color_options($rrd_cmd, $graph_params);
 }
 
 if (isset($_GET['debug'])) {

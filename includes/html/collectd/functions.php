@@ -18,6 +18,7 @@
  */
 
 require 'includes/html/collectd/CollectdColor.php';
+require_once __DIR__ . '/theme.php';
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\CollectdColor;
@@ -409,7 +410,7 @@ function rrd_get_color($code, $line = true)
     if (! LibrenmsConfig::has("rrd_colors.$name")) {
         $c_f = new CollectdColor('random');
         $c_h = new CollectdColor($c_f);
-        $c_h->fade();
+        $c_h->fade(collectd_area_fade_background());
         LibrenmsConfig::set("rrd_colors.f_$code", $c_f->toString());
         LibrenmsConfig::set("rrd_colors.h_$code", $c_h->toString());
     }
@@ -582,7 +583,7 @@ function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, 
         $rrd_cmd = array_merge($rrd_cmd, $small_opts);
     }
 
-    $rrd_cmd = array_merge($rrd_cmd, LibrenmsConfig::get('rrd_opts_array'), $opts['rrd_opts'], $graph);
+    $rrd_cmd = array_merge($rrd_cmd, $opts['rrd_opts'], $graph);
 
     $cmd = RRDTOOL;
     $count_rrd_cmd = count($rrd_cmd);
@@ -650,7 +651,7 @@ function collectd_draw_generic($timespan, $host, $plugin, $type, $pinst = null, 
         $rrd_cmd = array_merge($rrd_cmd, $small_opts);
     }
 
-    $rrd_cmd = array_merge($rrd_cmd, LibrenmsConfig::get('rrd_opts_array'));
+    $rrd_cmd = array_merge($rrd_cmd);
     $rrd_args = $GraphDefs[$type];
 
     foreach (LibrenmsConfig::get('datadirs') as $datadir) {
@@ -739,7 +740,7 @@ function collectd_draw_meta_stack(&$opts, &$sources)
         $cmd = array_merge($cmd, $small_opts);
     }
 
-    $cmd = array_merge($cmd, LibrenmsConfig::get('rrd_opts_array'), $opts['rrd_opts']);
+    $cmd = array_merge($cmd, $opts['rrd_opts']);
     $max_inst_name = 0;
 
     foreach ($sources as &$inst_data) {
@@ -791,7 +792,7 @@ function collectd_draw_meta_stack(&$opts, &$sources)
         }
 
         $area_color = new CollectdColor($line_color);
-        $area_color->fade();
+        $area_color->fade(collectd_area_fade_background());
 
         $cmd[] = 'AREA:' . $inst_name . '_stk#' . $area_color->toString();
         $cmd[] = 'LINE1:' . $inst_name . '_stk#' . $line_color->toString() . ':' . $legend;
@@ -850,7 +851,7 @@ function collectd_draw_meta_line(&$opts, &$sources)
     }
 
     // $cmd = array(RRDTOOL, 'graph', '-', '-E', '-a', 'PNG', '-w', LibrenmsConfig::get('rrd_width'), '-h', LibrenmsConfig::get('rrd_height'), '-t', $opts['title']);
-    // $cmd = array_merge($cmd, LibrenmsConfig::get('rrd_opts_array'), $opts['rrd_opts']);
+    // $cmd = array_merge($cmd, $opts['rrd_opts']);
     $cmd = [
         RRDTOOL,
         'graph',
