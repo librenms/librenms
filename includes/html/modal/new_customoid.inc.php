@@ -171,10 +171,15 @@ $('#save-oid-button').on('click', function (e) {
     e.preventDefault();
     var customoid_id = $('#ccustomoid_id').val();
     var url = customoid_id ? '<?php echo route("customoid.update", ["customoid" => ":customoid"]) ?>'.replace(':customoid', customoid_id) : '<?php echo route("customoid.store") ?>';
+    $('#datatype').prop('disabled', false);
+    var data = $('form.coid_form').serialize();
+    if (customoid_id) {
+        $('#datatype').prop('disabled', true);
+    }
     $.ajax({
         type: customoid_id ? "PUT" : "POST",
         url: url,
-        data: $('form.coid_form').serialize(),
+        data: data,
         dataType: "json",
         success: function (data) {
             if (data.status == 'ok') {

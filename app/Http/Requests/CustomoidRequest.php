@@ -30,6 +30,7 @@ class CustomoidRequest extends FormRequest
         $rules = [
             'name' => 'required|string|max:200',
             'oid' => 'required|string|max:255',
+            'datatype' => 'required|string|in:COUNTER,GAUGE',
             'unit' => 'nullable|string|max:10',
             'divisor' => 'nullable|numeric',
             'multiplier' => 'nullable|numeric',
@@ -42,12 +43,9 @@ class CustomoidRequest extends FormRequest
             'passed' => 'nullable|in:on,off',
         ];
 
-        // device_id and datatype are required only when creating
+        // device_id is required only when creating
         if ($this->isMethod('post') && !$this->route('customoid')) {
             $rules['device_id'] = 'required|integer|exists:devices,device_id';
-            $rules['datatype'] = 'required|string|in:COUNTER,GAUGE';
-        } else {
-            $rules['datatype'] = 'nullable|string|in:COUNTER,GAUGE';
         }
 
         return $rules;

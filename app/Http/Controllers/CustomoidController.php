@@ -105,7 +105,7 @@ class CustomoidController extends Controller
         $customoid->fill([
             'customoid_descr' => $name,
             'customoid_oid' => strip_tags((string) $validated['oid']),
-            'customoid_datatype' => strip_tags((string) ($validated['datatype'] ?? $customoid->customoid_datatype)),
+            'customoid_datatype' => strip_tags((string) $validated['datatype']),
             'customoid_unit' => strip_tags((string) ($validated['unit'] ?? '')),
             'customoid_divisor' => is_numeric($validated['divisor'] ?? null) ? $validated['divisor'] : 1,
             'customoid_multiplier' => is_numeric($validated['multiplier'] ?? null) ? $validated['multiplier'] : 1,
