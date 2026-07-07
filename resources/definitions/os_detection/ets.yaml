@@ -5,8 +5,9 @@ icon: gude
 group: gude
 mib_dir: gude
 over:
-    - { graph: device_bits, text: 'Device Traffic' }
-    - { graph: device_state, text: States }
+    - { graph: device_current, text: Current }
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_load, text: Load }
 discovery:
     -
         sysObjectID:
