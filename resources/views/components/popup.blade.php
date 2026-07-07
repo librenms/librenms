@@ -1,4 +1,4 @@
-<div {{ $attributes->merge(['class' => 'tw:inline-block']) }}
+<div {{ $attributes->merge(['class' => 'tw:inline-block tw:relative']) }}
  x-data="popup('', { showDelay: {{ $attributes->get('show-delay', 100) }}, hideDelay: {{ $attributes->get('hide-delay', 300) }} })"
  x-on:click.away="hide(0)"
  x-on:librenms-popup-shown.window="() => hide(0)"
