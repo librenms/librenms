@@ -1,4 +1,4 @@
-os: ets
+os: gude-epc
 text: 'Gude Expert Power Control'
 type: power
 icon: gude
