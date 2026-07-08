@@ -74,7 +74,6 @@ modules:
                     oid: OLD-CISCO-TS-MIB::ltsLineTable
                     value: OLD-CISCO-TS-MIB::tsLineActive
                     num_oid: '.1.3.6.1.4.1.9.2.9.2.1.1.{{ $index }}'
-                    state_name: ciscoAsyncLine
                     descr: '{{ OLD-CISCO-TS-MIB::tsLineLoc }} Status'
                     index: 'tsLineActive.{{ $index }}'
                     group: 'Serial Ports'
