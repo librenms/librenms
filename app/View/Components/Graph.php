@@ -152,11 +152,11 @@ class Graph extends Component
     {
         $linkVars = Arr::except($this->vars, ['width', 'height', 'legend', 'bg', 'absolute_size']);
         return match ($this->link) {
-            true => url('graphs') . '/' . http_build_query($linkVars + [
+            true => route('graphs', $linkVars + [
                 'type' => $this->type,
                 'from' => $this->from,
                 'to' => $this->to,
-            ], '', '/'),
+            ]),
             false => '',
             default => $this->link,
         };
