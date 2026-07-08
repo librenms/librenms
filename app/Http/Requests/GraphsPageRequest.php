@@ -170,7 +170,7 @@ class GraphsPageRequest extends FormRequest
     {
         $vars = $this->except(['page', 'username', 'password']);
         $vars['from'] = $this->from;
-        $vars['to'] = $this->to;
+        $vars['to'] = $this->to ?: null;
 
         return array_merge($vars, $overrides);
     }
