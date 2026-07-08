@@ -52,7 +52,6 @@ use App\Http\Controllers\RealtimeGraphController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Select;
 use App\Http\Controllers\SensorController;
-use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServiceTemplateController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SslCertificateController;

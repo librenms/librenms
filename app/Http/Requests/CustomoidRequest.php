@@ -44,7 +44,7 @@ class CustomoidRequest extends FormRequest
         ];
 
         // device_id is required only when creating
-        if ($this->isMethod('post') && !$this->route('customoid')) {
+        if ($this->isMethod('post') && ! $this->route('customoid')) {
             $rules['device_id'] = 'required|integer|exists:devices,device_id';
         }
 
