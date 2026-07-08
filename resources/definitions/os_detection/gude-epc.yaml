@@ -1,0 +1,16 @@
+os: ets
+text: 'Gude Expert Power Control'
+type: power
+icon: gude
+group: gude
+mib_dir: gude
+over:
+    - { graph: device_current, text: Current }
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_load, text: Load }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.28507.43   # Expert Power Control 1202-1
+            - .1.3.6.1.4.1.28507.81   # Expert Power Control 8031-3
+            - .1.3.6.1.4.1.28507.68   # Expert Power Control 1104-1
