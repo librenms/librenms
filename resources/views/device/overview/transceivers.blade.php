@@ -16,11 +16,11 @@
                     @foreach($sensors as $sensor)
                         @if($sensor->entPhysicalIndex !== null && $sensor->entPhysicalIndex == $transceiver->entity_physical_index && $filterSensors($sensor))
                             <div class="tw:flex tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
-                                <div class="tw:w-36 tw:min-w-150 tw:shrink-0 tw:whitespace-nowrap">{{ $sensor->sensor_descr }}</div>
-                                <div class="tw:flex tw:min-w-0 tw:flex-1 tw:justify-center">
+                                <div class="tw:w-36 tw:shrink-0 tw:whitespace-nowrap">{{ $sensor->sensor_descr }}</div>
+                                <div class="tw:hidden tw:sm:flex tw:min-w-0 tw:flex-1 tw:justify-end tw:overflow-hidden">
                                     <x-graph :vars="['id' => $sensor->sensor_id]" :type="'sensor_' . $sensor->sensor_class" width="100" height="24" :popup-title="DeviceCache::getPrimary()->displayName() . ' - ' . $sensor->sensor_descr" loading="lazy"></x-graph>
                                 </div>
-                                <div>
+                                <div class="tw:w-28 tw:shrink-0 tw:flex tw:justify-end tw:ml-auto">
                                     <x-label :status="$sensor->currentStatus()">{{ $sensor->formatValue() }}</x-label>
                                 </div>
                             </div>
