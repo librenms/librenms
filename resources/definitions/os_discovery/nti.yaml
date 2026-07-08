@@ -316,7 +316,7 @@ modules:
                     value: ENVIROMUX2D::digInputStatus
                     num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.6.1.1.8.{{ $index }}'
                     descr: '{{ ENVIROMUX2D::digInputDescription }}'
-                    index: 'digInputStatus.{{ $index }}'
+                    index: 'digInputValue.{{ $index }}'
                     state_name: digInputStatus
                     group: Inputs
                     states:
@@ -338,7 +338,7 @@ modules:
                     value: ENVIROMUX5D::digInputStatus
                     num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.6.1.1.8.{{ $index }}'
                     descr: '{{ ENVIROMUX5D::digInputDescription }}'
-                    index: 'digInputStatus.{{ $index }}'
+                    index: 'digInputValue.{{ $index }}'
                     state_name: digInputStatus
                     group: Inputs
                     states:
@@ -360,7 +360,7 @@ modules:
                     value: ENVIROMUX16D::digInputStatus
                     num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.6.1.1.8.{{ $index }}'
                     descr: '{{ ENVIROMUX16D::digInputDescription }}'
-                    index: 'digInputStatus.{{ $index }}'
+                    index: 'digInputValue.{{ $index }}'
                     state_name: digInputStatus
                     group: Inputs
                     states:
@@ -385,7 +385,7 @@ modules:
                     value: ENVIROMUX2D::remoteInputStatus
                     num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.12.1.1.8.{{ $index }}'
                     descr: '{{ ENVIROMUX2D::remoteInputDescription }}'
-                    index: 'remoteInputStatus.{{ $index }}'
+                    index: 'remoteInputValue.{{ $index }}'
                     state_name: remoteInputStatus
                     group: 'Remote Inputs'
                     states:
@@ -406,7 +406,7 @@ modules:
                     value: ENVIROMUX5D::remoteInputStatus
                     num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.12.1.1.8.{{ $index }}'
                     descr: '{{ ENVIROMUX5D::remoteInputDescription }}'
-                    index: 'remoteInputStatus.{{ $index }}'
+                    index: 'remoteInputValue.{{ $index }}'
                     state_name: remoteInputStatus
                     group: 'Remote Inputs'
                     states:
@@ -427,7 +427,7 @@ modules:
                     value: ENVIROMUX16D::remoteInputStatus
                     num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.12.1.1.8.{{ $index }}'
                     descr: '{{ ENVIROMUX16D::remoteInputDescription }}'
-                    index: 'remoteInputStatus.{{ $index }}'
+                    index: 'remoteInputValue.{{ $index }}'
                     state_name: remoteInputStatus
                     group: 'Remote Inputs'
                     states:
