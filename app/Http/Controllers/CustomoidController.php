@@ -24,7 +24,7 @@ class CustomoidController extends Controller
         if (Customoid::where('customoid_descr', $name)->where('device_id', $deviceId)->exists()) {
             return response()->json([
                 'status' => 'error',
-                'message' => "OID named <i>" . e($name) . "</i> on this device already exists",
+                'message' => 'OID named <i>' . e($name) . '</i> on this device already exists',
             ]);
         }
 
@@ -49,13 +49,13 @@ class CustomoidController extends Controller
         if ($customoid->save()) {
             return response()->json([
                 'status' => 'ok',
-                'message' => "Added OID: <i>" . e($name) . "</i>",
+                'message' => 'Added OID: <i>' . e($name) . '</i>',
             ]);
         }
 
         return response()->json([
             'status' => 'error',
-            'message' => "Failed to add OID: <i>" . e($name) . "</i>",
+            'message' => 'Failed to add OID: <i>' . e($name) . '</i>',
         ]);
     }
 
@@ -98,7 +98,7 @@ class CustomoidController extends Controller
             ->exists()) {
             return response()->json([
                 'status' => 'error',
-                'message' => "OID named <i>" . e($name) . "</i> on this device already exists",
+                'message' => 'OID named <i>' . e($name) . '</i> on this device already exists',
             ]);
         }
 
@@ -121,13 +121,13 @@ class CustomoidController extends Controller
         if ($customoid->save()) {
             return response()->json([
                 'status' => 'ok',
-                'message' => "Edited OID: <i>" . e($name) . "</i>",
+                'message' => 'Edited OID: <i>' . e($name) . '</i>',
             ]);
         }
 
         return response()->json([
             'status' => 'error',
-            'message' => "Failed to edit OID <i>" . e($name) . "</i>",
+            'message' => 'Failed to edit OID <i>' . e($name) . '</i>',
         ]);
     }
 
@@ -180,7 +180,7 @@ class CustomoidController extends Controller
         if (! $response->isValid()) {
             return response()->json([
                 'status' => 'error',
-                'message' => "Invalid data in SNMP reply: " . e($response->getErrorMessage() ?: 'Timeout or bad response'),
+                'message' => 'Invalid data in SNMP reply: ' . e($response->getErrorMessage() ?: 'Timeout or bad response'),
             ]);
         }
 
@@ -210,13 +210,13 @@ class CustomoidController extends Controller
 
             return response()->json([
                 'status' => 'ok',
-                'message' => "Test successful for <i>" . e($name) . "</i>, value " . e($rawdata) . " received",
+                'message' => 'Test successful for <i>' . e($name) . '</i>, value ' . e($rawdata) . ' received',
             ]);
         }
 
         return response()->json([
             'status' => 'error',
-            'message' => "Invalid data in SNMP reply, value " . e($rawdata) . " received",
+            'message' => 'Invalid data in SNMP reply, value ' . e($rawdata) . ' received',
         ]);
     }
 }
