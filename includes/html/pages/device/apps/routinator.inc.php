@@ -51,12 +51,14 @@ if (! isset($vars['client'])) {
     ]);
 }
 
-$graphs = array_merge($graphs, [
-    'routinator_client_serial_lag' => 'RTR client serial lag',
-    'routinator_client_update' => 'RTR client last update (seconds)',
-    'routinator_client_bytes' => 'RTR client bytes written',
-    'routinator_client_queries' => 'RTR client serial queries',
-]);
+if (! empty($clients)) {
+    $graphs = array_merge($graphs, [
+        'routinator_client_serial_lag' => 'RTR client serial lag',
+        'routinator_client_update' => 'RTR client last update (seconds)',
+        'routinator_client_bytes' => 'RTR client bytes written',
+        'routinator_client_queries' => 'RTR client serial queries',
+    ]);
+}
 
 foreach ($graphs as $key => $text) {
     $graph_array['height'] = '100';
