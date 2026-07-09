@@ -6,6 +6,7 @@ use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Support\Arr;
 use Illuminate\View\Component;
+use LibreNMS\Util\Url;
 
 class Graph extends Component
 {
@@ -151,9 +152,9 @@ class Graph extends Component
     private function getLink(): string
     {
         $linkVars = Arr::except($this->vars, ['width', 'height', 'legend', 'bg', 'absolute_size']);
+
         return match ($this->link) {
-            true => route('graphs', $linkVars + [
-                'type' => $this->type,
+            true => Url::graphPageUrl($this->type, $linkVars + [
                 'from' => $this->from,
                 'to' => $this->to,
             ]),
