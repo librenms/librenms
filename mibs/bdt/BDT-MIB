@@ -157,7 +157,57 @@
       DESCRIPTION
         "Error Data."
       ::= { bDTGlobalData 9 }         
-      
+
+    bDTDeviceInfo OBJECT IDENTIFIER ::= { bDTagent 4 }
+
+    bDTDevSerialNumber OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "The serial number of this device."
+      ::= { bDTDeviceInfo 1 }
+
+    bDTDevVendorID OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "The vendor ID of this device."
+      ::= { bDTDeviceInfo 2 }
+
+    bDTDevProductID OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "The product ID of this device."
+      ::= { bDTDeviceInfo 3 }
+
+    bDTDevFirmwareRev OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "The firmware revision of this device."
+      ::= { bDTDeviceInfo 4 }
+
+    bDTDevRobFirmwareRev OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "The robotic firmware revision of this device."
+      ::= { bDTDeviceInfo 5 }
+
+    bDTDevBootcodeRev OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "The bootcode revision of this device."
+      ::= { bDTDeviceInfo 6 }
+       
 --
 -- Trap definitions
 --         
