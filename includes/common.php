@@ -210,33 +210,6 @@ function c_echo($string, $enabled = true)
     }
 }
 
-/*
- * @return an array of all graph subtypes for the given type
- */
-function get_graph_subtypes(string $type): array
-{
-    $dir = base_path('includes/html/graphs/' . basename($type));
-
-    if (! is_dir($dir)) {
-        return [];
-    }
-
-    $types = [];
-
-    foreach (new DirectoryIterator($dir) as $file) {
-        if ($file->isFile() && str_ends_with($file->getFilename(), '.inc.php')) {
-            $name = $file->getBasename('.inc.php');
-            if ($name !== 'auth') {
-                $types[] = $name;
-            }
-        }
-    }
-
-    sort($types);
-
-    return $types;
-}
-
 function generate_smokeping_file($device, $file = '')
 {
     $smokeping = new \LibreNMS\Util\Smokeping(DeviceCache::get((int) $device['device_id']));
