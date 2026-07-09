@@ -2,6 +2,7 @@ os: bdt-flexstor
 text: 'BDT FlexStor II'
 type: storage
 icon: bdt
+mib_dir: bdt
 discovery:
     -
         sysObjectID: .1.3.6.1.4.1.20884.10893.2.101

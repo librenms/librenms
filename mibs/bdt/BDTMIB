@@ -1,0 +1,344 @@
+--
+-- BDTMIB.mib
+--
+
+  BDTMIB DEFINITIONS ::= BEGIN
+
+    IMPORTS 
+      OBJECT-TYPE      
+        FROM RFC-1212      
+      TRAP-TYPE      
+        FROM RFC-1215      
+      enterprises      
+        FROM RFC1155-SMI      
+      DisplayString      
+        FROM RFC1213-MIB;
+  
+  
+  
+--
+-- Node definitions
+--
+      
+    --iso OBJECT IDENTIFIER ::= { 1 }
+    
+    --org OBJECT IDENTIFIER ::= { iso 3  }
+    
+    --dod OBJECT IDENTIFIER ::= { org 6 }
+    
+    --internet OBJECT IDENTIFIER ::= { dod 1 }
+    
+    --private OBJECT IDENTIFIER ::= { internet 4 }
+    
+    --enterprises OBJECT IDENTIFIER ::= { private 1 }
+    
+    bdt OBJECT IDENTIFIER ::= {  enterprises 20884 }
+    
+    storage OBJECT IDENTIFIER ::= { bdt 10893 }
+    
+    hardware OBJECT IDENTIFIER ::= { storage 2 }
+    
+    bDTagent OBJECT IDENTIFIER ::= { hardware 101 }
+    
+    bDTAgentInfo OBJECT IDENTIFIER ::= { bDTagent 1 }
+    
+    bDTDisplayName OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Name of this agent for display purposes."
+      ::= { bDTAgentInfo 1 }
+    
+    bDTDescription OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "A short description of this agent ."
+      ::= { bDTAgentInfo 2 }
+    
+    bDTAgentVendor OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "The name of the agent software manufacturer."
+      ::= { bDTAgentInfo 3 }
+    
+    bDTAgentVersion OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "The version of this SNMP agent software."
+      ::= { bDTAgentInfo 4 }
+    
+    bDTGlobalData OBJECT IDENTIFIER ::= { bDTagent 2 }
+    
+    bDTGlobalStatus OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        other(1),
+        unknown(2),
+        ok(3),
+        non-critical(4),
+        critical(5),
+        non-Recoverable(6)
+        }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Current status of the agent for this server. 
+        This is a rollup for the entire agent including any 
+        monitored devices. The status is intended to give 
+        initiative to a snmp monitor to get further data when 
+        this status is abnormal.
+        "
+      ::= { bDTGlobalData 1 }
+    
+    bDTLastGlobalStatus OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        other(1),
+        unknown(2),
+        ok(3),
+        non-critical(4),
+        critical(5),
+        non-recoverable(6)
+        }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "The status before the current status which induced an initiative 
+        to issue a global status change trap."
+      ::= { bDTGlobalData 2 }
+    
+    bDTTimeStamp OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "The last time that the agent values have been updated.
+        Universal time in sec since UTC 1/1/70."
+      ::= { bDTGlobalData 3 }
+    
+    bDTGetTimeOut OBJECT-TYPE
+      SYNTAX INTEGER (1..10000)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Suggested time out value in milleseconds for how long the SNMP getter
+        should wait while attempting to poll the SNMP agent."
+      ::= { bDTGlobalData 4 }
+
+    bDTErrorCode OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Error Code."
+      ::= { bDTGlobalData 5 }    
+   
+    bDTRefreshRate OBJECT-TYPE
+      SYNTAX INTEGER (-1..1000000000)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Rate in milliseconds at which the agent cached data is being updated. If the
+        value is 0 then the data is not cached. If the value is -1 then the value does
+        not apply."
+      ::= { bDTGlobalData 6 }
+      
+    bDTErrorData OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Error Data."
+      ::= { bDTGlobalData 9 }         
+      
+--
+-- Trap definitions
+--         
+	bDTTraps OBJECT IDENTIFIER ::= { bDTagent 3 }
+                              
+    bDTAgentStatusChange TRAP-TYPE
+      ENTERPRISE bDTTraps
+      VARIABLES { bDTDisplayName, bDTGlobalStatus, bDTLastGlobalStatus }
+      DESCRIPTION
+        "The %s status has changed to %d.  Previous status was %d."
+	--#TYPE         "Status Changed"
+	--#SUMMARY      "The %s status has changed to %d.  Previous status was %d."
+	--#ARGUMENTS    { 0, 1, 2 }
+	--#SEVERITY     INFORMATIONAL
+	--#TIMEINDEX    1
+	--#STATE        OPERATIONAL
+      ::= 1
+      
+    bDTPowerUp TRAP-TYPE
+      ENTERPRISE bDTTraps
+      VARIABLES { bDTDisplayName }
+      DESCRIPTION
+        "The %s device has powered up."
+	--#TYPE         "Power Up"
+	--#SUMMARY      "The %s device has powered up."
+	--#ARGUMENTS    { 0 }
+	--#SEVERITY     INFORMATIONAL
+	--#TIMEINDEX    1
+	--#STATE        OPERATIONAL  
+      ::= 2  
+	    
+      
+    bDTShutdown TRAP-TYPE
+      ENTERPRISE bDTTraps
+      VARIABLES { bDTDisplayName }
+      DESCRIPTION
+        "The %s device has shutdown."
+	--#TYPE         "Shut Down"
+	--#SUMMARY      "The %s device has shutdown."
+	--#ARGUMENTS    { 0 }
+	--#SEVERITY     INFORMATIONAL
+	--#TIMEINDEX    1
+	--#STATE        NONOPERATIONAL
+     ::= 3  
+  
+      
+    bDTError TRAP-TYPE
+      ENTERPRISE bDTTraps
+      VARIABLES { bDTDisplayName, bDTErrorCode, bDTErrorData }
+      DESCRIPTION
+        "The %s device had an error.  Error code is %s.  Error data is %s."
+	--#TYPE         "Error"
+	--#SUMMARY      "The %s device had an error.  Error code is %s.  Error data is %s."
+	--#ARGUMENTS    { 0, 1, 2 }
+	--#SEVERITY     MAJOR
+	--#TIMEINDEX    1
+	--#STATE        OPERATIONAL
+      ::= 4
+      
+
+    bDTInformational TRAP-TYPE
+      ENTERPRISE bDTTraps
+      VARIABLES { bDTDisplayName, bDTErrorCode, bDTErrorData }
+      DESCRIPTION
+        "The %s device has changed (%s).  %s"
+	--#TYPE         "Informational"
+	--#SUMMARY      "The %s device has changed (%s).  %s"
+	--#ARGUMENTS    { 0, 1, 2 }
+	--#SEVERITY     INFORMATIONAL
+	--#TIMEINDEX    1
+	--#STATE        OPERATIONAL
+      ::= 5
+      
+
+    bDTWarning TRAP-TYPE
+      ENTERPRISE bDTTraps
+      VARIABLES { bDTDisplayName, bDTErrorCode, bDTErrorData }
+      DESCRIPTION
+        "The %s device had a warning.  Error code is %s.  Error data is %s."
+	--#TYPE         "Warning"
+	--#SUMMARY      "The %s device had a warning.  Error code is %s.  Error data is %s."
+	--#ARGUMENTS    { 0, 1, 2 }
+	--#SEVERITY     MINOR
+	--#TIMEINDEX    1
+	--#STATE        OPERATIONAL
+      ::= 6    
+
+    bDTCritical TRAP-TYPE
+      ENTERPRISE bDTTraps
+      VARIABLES { bDTDisplayName, bDTErrorCode, bDTErrorData }
+      DESCRIPTION
+        "The %s device had an critial error.  Error code is %s.  Error data is %s."
+	--#TYPE         "Critical"
+	--#SUMMARY      "The %s device had an critial error.  Error code is %s.  Error data is %s."
+	--#ARGUMENTS    { 0, 1, 2 }
+	--#SEVERITY     CRITICAL
+	--#TIMEINDEX    1
+	--#STATE        OPERATIONAL
+      ::= 7
+      
+      
+    bDTMailslotOpen TRAP-TYPE
+      ENTERPRISE bDTTraps
+      VARIABLES { bDTDisplayName }
+      DESCRIPTION
+        "The %s device: mailslot opened."
+	--#TYPE         "Mailslot Opened"
+	--#SUMMARY      "The %s device: mailslot opened."
+	--#ARGUMENTS    { 0 }
+	--#SEVERITY     INFORMATIONAL
+	--#TIMEINDEX    1
+	--#STATE        OPERATIONAL
+      ::= 8   
+      
+      
+    bDTMailslotClosed TRAP-TYPE
+      ENTERPRISE bDTTraps
+      VARIABLES { bDTDisplayName }
+      DESCRIPTION
+        "The %s device: mailslot closed."
+	--#TYPE         "Mailslot Closed"
+	--#SUMMARY      "The %s device: mailslot closed."
+	--#ARGUMENTS    { 0 }
+	--#SEVERITY     INFORMATIONAL
+	--#TIMEINDEX    1
+	--#STATE        OPERATIONAL
+      ::= 9  
+      
+
+    bDTMagazineRemoved TRAP-TYPE
+      ENTERPRISE bDTTraps
+      VARIABLES { bDTDisplayName }
+      DESCRIPTION
+        "The %s device: magazine removed."
+	--#TYPE         "Magazine Removed"
+	--#SUMMARY      "The %s device: magazine removed."
+	--#ARGUMENTS    { 0 }
+	--#SEVERITY     INFORMATIONAL
+	--#TIMEINDEX    1
+	--#STATE        OPERATIONAL
+      ::= 10   
+      
+
+    bDTMagazineInserted TRAP-TYPE
+      ENTERPRISE bDTTraps
+      VARIABLES { bDTDisplayName }
+      DESCRIPTION
+        "The %s device: magazine inserted."
+	--#TYPE         "Magazin Inserted"
+	--#SUMMARY      "The %s device: magazine inserted."
+	--#ARGUMENTS    { 0 }
+	--#SEVERITY     INFORMATIONAL
+	--#TIMEINDEX    1
+	--#STATE        OPERATIONAL
+      ::= 11  
+      
+      
+    bDTCleanDrive TRAP-TYPE
+      ENTERPRISE bDTTraps
+      VARIABLES { bDTDriveNumber, bDTDisplayName }
+      DESCRIPTION
+        "The drive %s of device %s has requested cleaning."
+    --#TYPE         "Clean Drive"
+	--#SUMMARY      "The drive %d of device %s has requested cleaning."
+	--#ARGUMENTS    { 0, 1 }
+	--#SEVERITY     MINOR
+	--#TIMEINDEX    1
+	--#STATE        OPERATIONAL
+      ::= 12  
+
+      
+	bDTDriveNumber OBJECT-TYPE
+      SYNTAX INTEGER (0..6)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Drive Number."
+      ::= { bDTTraps 13 }      
+            
+  END
+
+--
+-- BDT_MIB.mib
+--
