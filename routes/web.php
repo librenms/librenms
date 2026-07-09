@@ -52,6 +52,7 @@ use App\Http\Controllers\RealtimeGraphController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Select;
 use App\Http\Controllers\SensorController;
+use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServiceTemplateController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SslCertificateController;
@@ -127,6 +128,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::post('templates/apply/{template}', [ServiceTemplateController::class, 'apply'])->name('templates.apply');
         Route::post('templates/remove/{template}', [ServiceTemplateController::class, 'remove'])->name('templates.remove');
     });
+    Route::resource('service', ServiceController::class)->only(['show', 'destroy']);
     Route::post('customoid/test/{customoid?}', [CustomoidController::class, 'test'])->name('customoid.test');
     Route::resource('customoid', CustomoidController::class)->only(['show', 'store', 'update', 'destroy']);
     Route::get('locations', [LocationController::class, 'index']);
