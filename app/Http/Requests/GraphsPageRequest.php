@@ -36,7 +36,7 @@ class GraphsPageRequest extends FormRequest
     public function authorize(): bool
     {
         $typeInput = $this->string('type', '')->toString();
-        if (! preg_match('/^[a-zA-Z0-9]+_[a-zA-Z0-9_.-]+$/', $typeInput)) {
+        if (! preg_match('#^[a-zA-Z0-9]+_[^/?&]+$#', $typeInput)) {
             return false;
         }
         [$this->type, $this->subtype] = explode('_', $typeInput, 2);
