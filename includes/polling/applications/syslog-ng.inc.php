@@ -43,14 +43,6 @@ $tags = [
 
 app('Datastore')->put($device, 'app', $tags, $center_fields);
 
-$counter_rrd_def = RrdDefinition::make()
-    ->addDataset('max', 'DERIVE', 0)
-    ->addDataset('mean', 'DERIVE', 0)
-    ->addDataset('median', 'DERIVE', 0)
-    ->addDataset('min', 'DERIVE', 0)
-    ->addDataset('mode', 'DERIVE', 0)
-    ->addDataset('sum', 'DERIVE', 0);
-
 $gauge_rrd_def = RrdDefinition::make()
     ->addDataset('max', 'GAUGE', 0)
     ->addDataset('mean', 'GAUGE', 0)
@@ -59,17 +51,14 @@ $gauge_rrd_def = RrdDefinition::make()
     ->addDataset('mode', 'GAUGE', 0)
     ->addDataset('sum', 'GAUGE', 0);
 
-$single_counter_rrd_def = RrdDefinition::make()
-    ->addDataset('data', 'DERIVE', 0);
+$single_gauge_rrd_def = RrdDefinition::make()
+    ->addDataset('data', 'GAUGE', 0);
 
 $gauge = [
     'batch_size_avg',
     'batch_size_max',
     'memory_usage',
     'msg_size_avg',
-];
-
-$counter = [
     'connections',
     'discarded',
     'truncated_bytes',
@@ -77,7 +66,7 @@ $counter = [
     'written',
 ];
 
-$single_counter = [
+$single_gauge = [
     'dropped',
     'processed',
     'queued',
@@ -102,26 +91,7 @@ foreach ($gauge as $stat) {
     }
 }
 
-$tags['rrd_def'] = $counter_rrd_def;
-foreach ($counter as $stat) {
-    if (! is_null($data['global'][$stat]['max'])) {
-        $tags['rrd_name'] = ['app', $name, $app->app_id, 'global_-_'.$stat];
-        $stats_fields = [
-            'max' => $data['global'][$stat]['max'],
-            'mean' => $data['global'][$stat]['mean'],
-            'median' => $data['global'][$stat]['median'],
-            'min' => $data['global'][$stat]['min'],
-            'mode' => $data['global'][$stat]['mode'],
-            'sum' => $data['global'][$stat]['sum'],
-        ];
-        app('Datastore')->put($device, 'app', $tags, $stats_fields);
-        $app_data['global'][$stat] = true;
-    } else {
-        $app_data['global'][$stat] = false;
-    }
-}
-
-foreach ($single_counter as $stat) {
+foreach ($single_gauge as $stat) {
     if (! is_null($data['global'][$stat]['max'])) {
         $tags['rrd_name'] = ['app', $name, $app->app_id, 'global_-_'.$stat];
         $stats_fields = [
@@ -161,27 +131,8 @@ foreach ($data['sources'] as $source_name => $source) {
         }
     }
 
-    $tags['rrd_def'] = $counter_rrd_def;
-    foreach ($counter as $stat) {
-        if (! is_null($source[$stat]['max'])) {
-            $tags['rrd_name'] = ['app', $name, $app->app_id, 'source_-_'.$stat.'_-_'.$source_name];
-            $stats_fields = [
-                'max' => $source[$stat]['max'],
-                'mean' => $source[$stat]['mean'],
-                'median' => $source[$stat]['median'],
-                'min' => $source[$stat]['min'],
-                'mode' => $source[$stat]['mode'],
-                'sum' => $source[$stat]['sum'],
-            ];
-            app('Datastore')->put($device, 'app', $tags, $stats_fields);
-            $app_data['sources'][$source_name][$stat] = true;
-        } else {
-            $app_data['sources'][$source_name][$stat] = false;
-        }
-    }
-
-    $tags['rrd_def'] = $single_counter_rrd_def;
-    foreach ($single_counter as $stat) {
+    $tags['rrd_def'] = $single_gauge_rrd_def;
+    foreach ($single_gauge as $stat) {
         if (! is_null($source[$stat])) {
             $tags['rrd_name'] = ['app', $name, $app->app_id, 'source_-_'.$stat.'_-_'.$source_name];
             $stats_fields = [
