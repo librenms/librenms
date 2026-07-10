@@ -71,8 +71,8 @@ class SonusSbc extends OS implements ProcessorDiscovery
                     'mempool_perc_warn' => 90,
                 ]))->fillUsage(null, $size, null, $percent_used));
             }
-
         }
+
         return $mempools;
     }
 

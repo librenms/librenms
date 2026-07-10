@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2026 Sofia El Khalifi
  * @author     Sofia El Khalifi <sofia.elkhalifi@netsf.fr>
  */
@@ -184,7 +185,6 @@ foreach ($snmp['ports_group'] as $k => $v) {
         $port_stats[$index]['ifAdminStatus'] = 'down';
         $port_stats[$index]['ifOperStatus'] = 'down';
     }
-
 }
 
 foreach ($snmp['mgmt_group'] as $k => $v) {
