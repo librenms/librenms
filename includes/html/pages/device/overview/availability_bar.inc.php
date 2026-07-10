@@ -78,7 +78,11 @@ for ($i = 0; $i < $days; $i++) {
             $time_str = Time::format($outage->going_down, 'time');
             $duration_str = CarbonInterval::seconds($duration)->cascade()->forHumans(['short' => true, 'parts' => 2]);
 
-            $outage_lines[] = "Outage at $time_str &bull; $duration_str";
+            if ($outage->going_down >= $day_start) {
+                $outage_lines[] = "Outage at $time_str &bull; $duration_str";
+            } else {
+                $outage_lines[] = "Outage &bull; $duration_str";
+            }
         }
     }
 
@@ -116,15 +120,14 @@ $total_outage = $outages->reduce(function ($carry, $outage) use ($start_ts, $now
 }, 0);
 
 echo <<<'HTML'
-<div class="row">
-    <div class="col-md-12">
-        <div class="panel panel-default panel-condensed">
-            <div class="panel-heading">
-                <i class="fa fa-check-circle fa-lg icon-theme" aria-hidden="true"></i>
-                <strong> Availability (90 days)</strong>
-            </div>
-            <div class="panel-body tw:px-4 tw:py-2.5">
-                <div class="tw:flex tw:gap-px tw:items-center">
+<div class="overview-panel tw:mb-5">
+    <div class="tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:border-b tw:border-gray-300 tw:text-neutral-700 tw:dark:bg-dark-gray-200 tw:dark:border-zinc-800 tw:dark:text-dark-white-200">
+        <i class="fa fa-check-circle fa-lg icon-theme" aria-hidden="true"></i>
+        <strong> Availability (90 days)</strong>
+    </div>
+    <div class="tw:flex tw:min-w-0 tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-zinc-800">
+        <div class="tw:px-4 tw:py-2.5">
+            <div class="tw:flex tw:gap-px tw:items-center">
 HTML;
 
 foreach ($day_data as $day) {
@@ -174,7 +177,6 @@ echo <<<HTML
                     <span><strong class="$total_color">$total_avail% uptime</strong></span>
                     <span>Today</span>
                 </div>
-            </div>
         </div>
     </div>
 </div>

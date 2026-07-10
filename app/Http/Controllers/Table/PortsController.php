@@ -58,6 +58,7 @@ class PortsController extends TableController
             'location' => 'nullable|integer',
             'port_descr_type' => 'nullable|string',
             'state' => 'nullable|in:up,down,admindown',
+            ...Port::filterValidationRules(),
         ];
     }
 
@@ -82,6 +83,7 @@ class PortsController extends TableController
             'hostname',
             'ifIndex',
             'ifDescr',
+            'errors' => DB::raw('ifInErrors_rate + ifOutErrors_rate'),
             'secondsIfLastChange',
             'ifConnectorPresent',
             'ifInErrors',
@@ -102,17 +104,20 @@ class PortsController extends TableController
 
     protected function baseQuery($request): Builder
     {
+        $this->authorize('viewAny', Port::class);
+
         $query = Port::hasAccess($request->user())
             ->with(['device', 'device.location'])
             ->leftJoin('devices', 'ports.device_id', 'devices.device_id')
-            ->where('deleted', $request->input('deleted', 0)) // always filter deleted
+            ->when($request->array('filter'), fn ($q, $filter) => $q->applyFilters($filter))
+            ->unless($request->has('filter.deleted'), fn ($q) => $q->where('ports.deleted', $request->input('deleted', 0)))
             ->when($request->input('hostname'), function (Builder $query, $hostname): void {
                 $query->where(function (Builder $query) use ($hostname): void {
                     $query->where('devices.hostname', 'like', "%$hostname%")
                         ->orWhere('devices.sysName', 'like', "%$hostname%");
                 });
             })
-            ->when($request->input('ifAlias'), fn (Builder $query, $ifAlias) => $query->where('ifAlias', 'like', "%$ifAlias%"))
+            ->when($request->input('ifAlias'), fn (Builder $query, $ifAlias) => $query->where('ports.ifAlias', 'like', "%$ifAlias%"))
             ->when($request->input('errors'), fn (Builder $query) => $query->hasErrors())
             ->when($request->input('state'), fn (Builder $query, $state) => match ($state) {
                 'down' => $query->isDown(),
@@ -140,9 +145,12 @@ class PortsController extends TableController
      */
     public function formatItem(Model $model): array
     {
-        $status = $model->ifOperStatus == IfOperStatus::Down
-            ? ($model->ifAdminStatus == IfOperStatus::Up ? 'label-danger' : 'label-warning')
-            : 'label-success';
+        $status = match ($model->ifOperStatus) {
+            IfOperStatus::Up => 'label-success',
+            IfOperStatus::Down, IfOperStatus::LowerLayerDown => $model->ifAdminStatus === IfOperStatus::Up ? 'label-danger' : 'label-default',
+            IfOperStatus::Testing => 'label-info',
+            default => 'label-default',
+        };
 
         return [
             'status' => $status,

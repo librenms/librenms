@@ -291,7 +291,7 @@ if (is_numeric($c1_tx)) {
 
 // Discover C1 RX Sensor
 if (is_numeric($c1_rx)) {
-    $descr = 'A1 Rx Power';
+    $descr = 'C1 Rx Power';
     $index = 'vSFPC1RxPower.0';
     $divisor = '100';
     $multiplier = '1';
@@ -389,7 +389,7 @@ if (is_numeric($d1_tx)) {
 
 // Discover D1 RX Sensor
 if (is_numeric($d1_rx)) {
-    $descr = 'B1 Rx Power';
+    $descr = 'D1 Rx Power';
     $index = 'vSFPD1RxPower.0';
     $divisor = '100';
     $multiplier = '1';

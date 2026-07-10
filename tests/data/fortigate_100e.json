@@ -3832,7 +3832,8 @@
                     "ifStackStatus": "notInService"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ipv4-addresses": {
         "discovery": {

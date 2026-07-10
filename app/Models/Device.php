@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Facades\LibrenmsConfig;
+use App\Models\Traits\Filterable;
 use App\View\SimpleTemplate;
 use Carbon\Carbon;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
@@ -37,7 +39,7 @@ use LibreNMS\Util\Url;
  */
 class Device extends BaseModel
 {
-    use PivotEventTrait, HasFactory;
+    use PivotEventTrait, HasFactory, Filterable;
 
     private ?MaintenanceStatus $maintenanceStatus = null;
 
@@ -56,7 +58,7 @@ class Device extends BaseModel
         'features',
         'hardware',
         'hostname',
-        'display',
+        'display_template',
         'icon',
         'ignore',
         'ignore_status',
@@ -80,11 +82,34 @@ class Device extends BaseModel
         'sysDescr',
         'sysName',
         'sysObjectID',
+        'snmpEngineID',
         'timeout',
         'transport',
         'type',
         'version',
         'uptime',
+    ];
+
+    protected array $filterable = [
+        'device_id',
+        'hostname',
+        'sysName',
+        'display',
+        'hardware',
+        'os',
+        'location_id',
+        'version',
+        'features',
+        'type',
+        'status',
+        'disabled',
+        'ignore',
+        'disable_notify',
+        'poller_group',
+        'groups.id',
+        'serviceTemplates.id',
+        'search',
+        'state',
     ];
 
     /**
@@ -200,19 +225,11 @@ class Device extends BaseModel
     }
 
     /**
-     * Get the display name of this device based on the display format string
-     * The default is {{ $hostname }} controlled by the device_display_default setting
+     * @deprecated use display field directly
      */
     public function displayName(): string
     {
-        $hostname_is_ip = IP::isValid($this->hostname);
-
-        return SimpleTemplate::parse($this->display ?: \App\Facades\LibrenmsConfig::get('device_display_default', '{{ $hostname }}'), [
-            'hostname' => $this->hostname,
-            'sysName' => $this->sysName ?: $this->hostname,
-            'sysName_fallback' => $hostname_is_ip ? $this->sysName : $this->hostname,
-            'ip' => $this->overwrite_ip ?: ($hostname_is_ip ? $this->hostname : $this->ip),
-        ]);
+        return $this->display ?: $this->hostname ?: '';
     }
 
     /**
@@ -229,6 +246,21 @@ class Device extends BaseModel
         }
 
         return '';
+    }
+
+    public function regenerateDisplayName(): void
+    {
+        $hostname_is_ip = IP::isValid($this->hostname);
+
+        $display = SimpleTemplate::parse($this->display_template ?: LibrenmsConfig::get('device_display_default',
+            '{{ $hostname }}'), [
+                'hostname' => $this->hostname,
+                'sysName' => $this->sysName ?: $this->hostname,
+                'sysName_fallback' => $hostname_is_ip ? $this->sysName : $this->hostname,
+                'ip' => $this->overwrite_ip ?: ($hostname_is_ip ? $this->hostname : $this->ip),
+            ]);
+
+        $this->display = substr($display, 0, 128);
     }
 
     public function isUnderMaintenance(): bool
@@ -531,6 +563,25 @@ class Device extends BaseModel
     }
 
     // ---- Query scopes ----
+
+    public function filterState(Builder $query, mixed $value, array $config): void
+    {
+        $this->applyMappedFilter($query, $value, $config, fn (Builder $q, $state) => match ($state) {
+            'up' => $q->where('status', 1)->where('disabled', 0)->where('disable_notify', 0),
+            'down' => $q->where('status', 0)->where('disabled', 0)->where('disable_notify', 0),
+            default => $q,
+        });
+    }
+
+    public function filterSearch(Builder $query, mixed $value, array $config): void
+    {
+        $this->applyFilterSearch(
+            ['sysName', 'hostname', 'display', 'hardware', 'os', 'location.location'],
+            $query,
+            $value,
+            $config,
+        );
+    }
 
     public function scopeIsUp($query)
     {

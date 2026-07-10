@@ -32,6 +32,10 @@ updated for the set amount of days automatically - only enable this if
 you are comfortable with that happening. (All active RRD files are
 updated every polling period.)
 
+!!! note
+    Please be aware that `rrd_purge` does not work over rrdcached. The rrd folder needs to be accessible via the local file system or remote file share.
+    This is the same for docker and Kubernetes.
+
 ## Ports Purge
 
 Over time as you add devices some interfaces will need to be purged as

@@ -19,9 +19,9 @@ foreach ($sensors as $sensor) {
     }
 
     if ($sensor['poller_type'] == 'ipmi') {
-        $sensor_descr = ipmiSensorName($device['hardware'], $sensor['sensor_descr']);
+        $sensor_descr = e(ipmiSensorName($device['hardware'], $sensor['sensor_descr']));
     } else {
-        $sensor_descr = $sensor['sensor_descr'];
+        $sensor_descr = e($sensor['sensor_descr']);
     }
 
     $sensor_current = Html::severityToLabel($sensor->currentStatus(), __('Current') . ': ' . $sensor->formatValue());
