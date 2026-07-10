@@ -35,7 +35,6 @@ if ($device['os'] == 'sonus-sbc') {
     $pkt_oids_tx = SnmpQuery::device($deviceModel)->walk($pkt_oid_tx)->values();
 
     foreach ($pkt_oids_rx as $k => $v) {
-
         $k_array = explode('.', (string) $k);
         echo 'k_array0  : ' . $k_array[0] . "\n";
 
@@ -78,7 +77,6 @@ if ($device['os'] == 'sonus-sbc') {
     unset($pkt_oids_rx, $index, $sensor_type, $descr, $divisor, $multiplier, $current, $devicetype, $group);
 
     foreach ($pkt_oids_tx as $k => $v) {
-
         $k_array = explode('.', (string) $k);
         echo 'k_array0  : ' . $k_array[0] . "\n";
 

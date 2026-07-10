@@ -42,7 +42,6 @@ create_state_index($stateName, $states);
 $server_status = SnmpQuery::device($deviceModel)->walk('.1.3.6.1.4.1.2879.2.8.5.1.12.1.8')->values();
 
 foreach ($server_status as $index => $entry) {
-
     echo $index;
     var_dump($entry);
     $k_array = explode('.', (string) $index);

@@ -73,7 +73,6 @@ class SonusSbc extends OS implements ProcessorDiscovery
             }
 
         }
-
         return $mempools;
     }
 

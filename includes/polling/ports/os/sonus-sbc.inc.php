@@ -60,8 +60,8 @@ foreach ($snmp['speed_group'] as $k => $v) {
     echo 'k_array0  : ' . $k_array[0] . "\n";
 
     if ($k_array[0] == 'enterprises') {
-         $ports_mapping['oid'] = str_replace('enterprises.2.10.4.1.1.4.', '', $k); //# centos case
-         echo "replace 'entreprises' ";
+        $ports_mapping['oid'] = str_replace('enterprises.2.10.4.1.1.4.', '', $k); //# centos case
+        echo "replace 'entreprises' ";
     }
     if ($k_array[0] == 'iso') {
         $ports_mapping['oid'] = str_replace('iso.3.6.1.4.1.2879.2.10.4.1.1.4.', '', $k); //# debian / docker case
@@ -127,8 +127,8 @@ foreach ($snmp['ports_group'] as $k => $v) {
     echo 'k_array0  : ' . $k_array[0] . "\n";
 
     if ($k_array[0] == 'enterprises') {
-         $ports_mapping['oid'] = str_replace('enterprises.2.10.4.2.1.3.', '', $k); //# centos case
-         echo "replace 'entreprises' ";
+        $ports_mapping['oid'] = str_replace('enterprises.2.10.4.2.1.3.', '', $k); //# centos case
+        echo "replace 'entreprises' ";
     }
     if ($k_array[0] == 'iso') {
         $ports_mapping['oid'] = str_replace('iso.3.6.1.4.1.2879.2.10.4.2.1.3.', '', $k); //# debian / docker case
@@ -194,8 +194,8 @@ foreach ($snmp['mgmt_group'] as $k => $v) {
     echo 'k_array0  : ' . $k_array[0] . "\n";
 
     if ($k_array[0] == 'enterprises') {
-         $ports_mapping['oid'] = str_replace('enterprises.2.10.4.3.1.5.', '', $k); //# centos case
-         echo "replace 'entreprises' ";
+        $ports_mapping['oid'] = str_replace('enterprises.2.10.4.3.1.5.', '', $k); //# centos case
+        echo "replace 'entreprises' ";
     }
     if ($k_array[0] == 'iso') {
         $ports_mapping['oid'] = str_replace('iso.3.6.1.4.1.2879.2.10.4.3.1.5.', '', $k); //# debian / docker case
@@ -261,8 +261,8 @@ foreach ($snmp['ctx_if'] as $k => $v) {
     echo 'k_array0  : ' . $k_array[0] . "\n";
 
     if ($k_array[0] == 'enterprises') {
-         $ports_mapping['oid'] = str_replace('enterprises.3.6.1.4.1.2879.2.10.2.10.1.5.', '', $k); //# centos case
-         echo "replace 'entreprises' ";
+        $ports_mapping['oid'] = str_replace('enterprises.3.6.1.4.1.2879.2.10.2.10.1.5.', '', $k); //# centos case
+        echo "replace 'entreprises' ";
     }
     if ($k_array[0] == 'iso') {
         $ports_mapping['oid'] = str_replace('iso.3.6.1.4.1.2879.2.10.2.10.1.5.', '', $k); //# debian / docker case
