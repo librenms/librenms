@@ -45,7 +45,7 @@ foreach ($server_status as $index => $entry) {
 
     print($index);
     var_dump($entry);
-    $k_array = explode(".",$index);
+    $k_array = explode(".", (string) $index);
     echo 'k_array0  : '. $k_array[0] ."\n";
 
     if ($k_array[0] == 'enterprises') {
@@ -66,9 +66,7 @@ foreach ($server_status as $index => $entry) {
     }
 
     $index = $ports_mapping['oid'];
-    print("INDEX : " . $index . "\n");
     $server_name = SnmpQuery::get('.1.3.6.1.4.1.2879.2.8.5.1.12.1.16.' . $index)->value();
-    print("Server name : " . $server_name . "\n");
     $descr = 'Redundancy role: ' . $server_name;
     $sensor_value = (int)$entry;
 

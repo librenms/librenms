@@ -32,7 +32,7 @@ if ($device['os'] == 'sonus-sbc') {
 	$bw_alarm_count = SnmpQuery::device($deviceModel)->walk($bw_alarm_oid)->values();
 
     foreach ($bw_alarm_count as $k => $v) {
-        $k_array = explode(".",$k);
+        $k_array = explode(".", (string) $k);
         echo 'k_array0  : '. $k_array[0] ."\n";
     
         if ($k_array[0] == 'enterprises') {
@@ -49,7 +49,7 @@ if ($device['os'] == 'sonus-sbc') {
         }
         
         $index = $ports_mapping['oid'];
-        $device_oid = explode('14.', $index, 2);
+        $device_oid = explode('14.', (string) $index, 2);
         $device_ascii = $device_oid[1];
         $codes_device = explode('.', $device_ascii);
         $device_text = '';
