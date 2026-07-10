@@ -1,7 +1,7 @@
 <?php
 
 $name = 'syslog-ng';
-$unit_text = 'messages/sec';
+$unit_text = 'messages/5min';
 $colours = 'psychedelic';
 $dostack = 0;
 $printtotal = 1;

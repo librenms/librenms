@@ -2,7 +2,7 @@
 
 $name = 'syslog-ng';
 $stat = 'queued';
-$unit_text = 'messages/sec';
+$unit_text = 'messages/5min';
 $colours = 'psychedelic';
 $dostack = 0;
 $printtotal = 0;

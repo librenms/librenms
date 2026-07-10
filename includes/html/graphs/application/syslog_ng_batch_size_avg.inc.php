@@ -2,7 +2,7 @@
 
 $name = 'syslog-ng';
 $stat = 'batch_size_avg';
-$unit_text = 'messages';
+$unit_text = 'messages/5min';
 $colours = 'psychedelic';
 $dostack = 0;
 $printtotal = 0;
