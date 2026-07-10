@@ -1,8 +1,8 @@
 <?php
 
 $name = 'syslog-ng';
-$unit_text = 'messages/5min';
-$colours = 'psychedelic';
+$unit_text = 'msgs/sec';
+$colours = 'rainbow';
 $dostack = 0;
 $printtotal = 1;
 $addarea = 0;

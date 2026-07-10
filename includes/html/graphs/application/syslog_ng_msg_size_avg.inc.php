@@ -3,7 +3,7 @@
 $name = 'syslog-ng';
 $stat = 'msg_size_avg';
 $unit_text = 'bytes';
-$colours = 'psychedelic';
+$colours = 'rainbow';
 $dostack = 0;
 $printtotal = 0;
 $addarea = 0;

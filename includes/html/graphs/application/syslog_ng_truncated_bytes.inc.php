@@ -2,8 +2,8 @@
 
 $name = 'syslog-ng';
 $stat = 'truncated_bytes';
-$unit_text = 'bytes/5min';
-$colours = 'psychedelic';
+$unit_text = 'bytes/sec';
+$colours = 'rainbow';
 $dostack = 0;
 $printtotal = 0;
 $addarea = 0;

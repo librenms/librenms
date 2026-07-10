@@ -2,8 +2,8 @@
 
 $name = 'syslog-ng';
 $stat = 'batch_size_max';
-$unit_text = 'messages';
-$colours = 'psychedelic';
+$unit_text = 'bytes';
+$colours = 'rainbow';
 $dostack = 0;
 $printtotal = 0;
 $addarea = 0;
