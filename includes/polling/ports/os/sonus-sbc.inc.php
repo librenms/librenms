@@ -52,7 +52,7 @@ $snmp['mgmt_group'] = SnmpQuery::device($deviceModel)->walk('.1.3.6.1.4.1.2879.2
 $snmp['speed_group'] = SnmpQuery::device($deviceModel)->walk('.1.3.6.1.4.1.2879.2.10.4.1.1.4')->values();
 $snmp['ctx_if'] = SnmpQuery::device($deviceModel)->walk('.1.3.6.1.4.1.2879.2.10.2.10.1.5')->values();
 
-foreach($snmp['speed_group'] as $k => $v) {
+foreach ($snmp['speed_group'] as $k => $v) {
     echo 'k : ' . $k . "\n";
 
     $v = explode(',', (string) $v);
@@ -61,13 +61,13 @@ foreach($snmp['speed_group'] as $k => $v) {
 
     if ($k_array[0] == 'enterprises') {
          $ports_mapping['oid'] = str_replace('enterprises.2.10.4.1.1.4.', '', $k); //# centos case
-       echo "replace 'entreprises' ";
+         echo "replace 'entreprises' ";
     }
-    if ($k_array[0] == 'iso'){
+    if ($k_array[0] == 'iso') {
         $ports_mapping['oid'] = str_replace('iso.3.6.1.4.1.2879.2.10.4.1.1.4.', '', $k); //# debian / docker case
         echo "replace 'iso' ";
     }
-    if ($k_array[0] == 'SNMPv2-SMI::enterprises'){
+    if ($k_array[0] == 'SNMPv2-SMI::enterprises') {
         $ports_mapping['oid'] = str_replace('SNMPv2-SMI::enterprises.2879.2.10.4.1.1.4.', '', $k); //# debian / docker case
         echo "replace 'SNMPv2-SMI::enterprises' ";
     }
@@ -119,7 +119,7 @@ foreach($snmp['speed_group'] as $k => $v) {
 }
 
 // For each interface...
-foreach($snmp['ports_group'] as $k => $v) {
+foreach ($snmp['ports_group'] as $k => $v) {
     echo 'k : ' . $k . "\n";
 
     $v = explode(',', (string) $v);
@@ -128,13 +128,13 @@ foreach($snmp['ports_group'] as $k => $v) {
 
     if ($k_array[0] == 'enterprises') {
          $ports_mapping['oid'] = str_replace('enterprises.2.10.4.2.1.3.', '', $k); //# centos case
-       echo "replace 'entreprises' ";
+         echo "replace 'entreprises' ";
     }
-    if ($k_array[0] == 'iso'){
+    if ($k_array[0] == 'iso') {
         $ports_mapping['oid'] = str_replace('iso.3.6.1.4.1.2879.2.10.4.2.1.3.', '', $k); //# debian / docker case
         echo "replace 'iso' ";
     }
-    if ($k_array[0] == 'SNMPv2-SMI::enterprises'){
+    if ($k_array[0] == 'SNMPv2-SMI::enterprises') {
         $ports_mapping['oid'] = str_replace('SNMPv2-SMI::enterprises.2879.2.10.4.2.1.3.', '', $k); //# debian / docker case
         echo "replace 'SNMPv2-SMI::enterprises' ";
     }
@@ -187,7 +187,7 @@ foreach($snmp['ports_group'] as $k => $v) {
 
 }
 
-foreach($snmp['mgmt_group'] as $k => $v) {
+foreach ($snmp['mgmt_group'] as $k => $v) {
     echo 'mgmt k : ' . $k . "\n";
     $v = explode(',', (string) $v);
     $k_array = explode('.', (string) $k);
@@ -195,13 +195,13 @@ foreach($snmp['mgmt_group'] as $k => $v) {
 
     if ($k_array[0] == 'enterprises') {
          $ports_mapping['oid'] = str_replace('enterprises.2.10.4.3.1.5.', '', $k); //# centos case
-       echo "replace 'entreprises' ";
+         echo "replace 'entreprises' ";
     }
-    if ($k_array[0] == 'iso'){
+    if ($k_array[0] == 'iso') {
         $ports_mapping['oid'] = str_replace('iso.3.6.1.4.1.2879.2.10.4.3.1.5.', '', $k); //# debian / docker case
         echo "replace 'iso' ";
     }
-    if ($k_array[0] == 'SNMPv2-SMI::enterprises'){
+    if ($k_array[0] == 'SNMPv2-SMI::enterprises') {
         $ports_mapping['oid'] = str_replace('SNMPv2-SMI::enterprises.2879.2.10.4.3.1.5.', '', $k); //# debian / docker case
         echo "replace 'SNMPv2-SMI::enterprises' ";
     }
@@ -253,7 +253,7 @@ foreach($snmp['mgmt_group'] as $k => $v) {
     $port_stats[$index]['ifInOctets'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.3.1.14.' . $ports_mapping['oid'])->value();
 }
 
-foreach($snmp['ctx_if'] as $k => $v) {
+foreach ($snmp['ctx_if'] as $k => $v) {
     echo 'k : ' . $k . "\n";
 
     $v = explode(',', (string) $v);
@@ -262,13 +262,13 @@ foreach($snmp['ctx_if'] as $k => $v) {
 
     if ($k_array[0] == 'enterprises') {
          $ports_mapping['oid'] = str_replace('enterprises.3.6.1.4.1.2879.2.10.2.10.1.5.', '', $k); //# centos case
-       echo "replace 'entreprises' ";
+         echo "replace 'entreprises' ";
     }
-    if ($k_array[0] == 'iso'){
+    if ($k_array[0] == 'iso') {
         $ports_mapping['oid'] = str_replace('iso.3.6.1.4.1.2879.2.10.2.10.1.5.', '', $k); //# debian / docker case
         echo "replace 'iso' ";
     }
-    if ($k_array[0] == 'SNMPv2-SMI::enterprises'){
+    if ($k_array[0] == 'SNMPv2-SMI::enterprises') {
         $ports_mapping['oid'] = str_replace('SNMPv2-SMI::enterprises.2879.2.10.2.10.1.5.', '', $k); //# debian / docker case
         echo "replace 'SNMPv2-SMI::enterprises' ";
     }

@@ -28,11 +28,11 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use App\Models\Mempool;
-use LibreNMS\OS;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Arr;
-use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use Illuminate\Support\Collection;
 use LibreNMS\Device\Processor;
+use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\OS;
 use SnmpQuery;
 
 class SonusSbc extends OS implements ProcessorDiscovery

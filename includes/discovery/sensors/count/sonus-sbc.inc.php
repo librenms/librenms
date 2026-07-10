@@ -40,11 +40,11 @@ if ($device['os'] == 'sonus-sbc') {
             $ports_mapping['oid'] = str_replace('enterprises.3.6.1.4.1.2879.2.10.4.1.1.41.', '', $k); //# centos case
             echo "replace 'entreprises' ";
         }
-        if ($k_array[0] == 'iso'){
+        if ($k_array[0] == 'iso') {
             $ports_mapping['oid'] = str_replace('iso.3.6.1.4.1.2879.2.10.4.1.1.41.', '', $k); //# debian / docker case
             echo "replace 'iso' ";
         }
-        if ($k_array[0] == 'SNMPv2-SMI::enterprises'){
+        if ($k_array[0] == 'SNMPv2-SMI::enterprises') {
             $ports_mapping['oid'] = str_replace('SNMPv2-SMI::enterprises.2879.2.10.4.1.1.41.', '', $k); //# debian / docker case
             echo "replace 'SNMPv2-SMI::enterprises' ";
         }
@@ -64,7 +64,7 @@ if ($device['os'] == 'sonus-sbc') {
         $divisor = 1;
         $multiplier = 1;
         $current = (int) $v;
-                echo "\n\ncurrent: " . $current;
+        echo "\n\ncurrent: " . $current;
 
         $devicetype = 'sonus-sbc';
         $group = 'Bandwidth Alarm Count in the upward direction';
@@ -73,5 +73,5 @@ if ($device['os'] == 'sonus-sbc') {
             discover_sensor(null, 'count', $device, $full_oid, $sensor_type, $devicetype, $descr, $divisor, $multiplier, null, null, null, null, $current, 'snmp', null, null, null, $group);
         }
     }
-        unset($bw_alarm_oid, $index, $sensor_type, $descr, $divisor, $multiplier, $current, $devicetype, $group);
+    unset($bw_alarm_oid, $index, $sensor_type, $descr, $divisor, $multiplier, $current, $devicetype, $group);
 }
