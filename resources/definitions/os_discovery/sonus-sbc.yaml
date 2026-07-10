@@ -1,6 +1,0 @@
-mib: SONUS-SMI:SONUS-TC
-modules:
-    os: 
-        version: SONUS-TC::SonusSoftwareVersion
-        hardware: SONUS-TC::SonusName
-        

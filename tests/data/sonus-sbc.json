@@ -199,5 +199,27 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 196608,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": 14
+                },
+                {
+                    "hrDeviceIndex": 786432,
+                    "hrDeviceDescr": "Guessing that there's a floating point co-processor",
+                    "hrDeviceType": "hrDeviceCoprocessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                }
+            ]
+        }
     }
 }

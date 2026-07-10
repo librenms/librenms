@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SonusSbc.php
  *
@@ -48,15 +49,15 @@ class SonusSbc extends OS implements ProcessorDiscovery
         $mempools = new Collection();
         $mempools_array = SnmpQuery::device($deviceModel)->walk('SONUS-SMI::sonusMgmt.8.5.1.19.1.2')->values();
         $size = 100;
-    
+
         foreach (Arr::wrap($mempools_array) as $index => $entry) {
             $device_ascii = explode('14.', (string) $index, 2);
             $codes_device = explode('.', $device_ascii[1]);
             $device_text = '';
-            print("Mempool oid : " . $index . " value : " . $entry . "\n");
+            echo 'Mempool oid : ' . $index . ' value : ' . $entry . "\n";
 
             foreach ($codes_device as $code) {
-                $device_text .= chr((int)$code);
+                $device_text .= chr((int) $code);
             }
             $percent_used = $entry;
 
@@ -65,13 +66,14 @@ class SonusSbc extends OS implements ProcessorDiscovery
                     'mempool_index' => $device_text,
                     'mempool_type' => 'sonus-sbc',
                     'mempool_class' => 'system',
-                    'mempool_descr' => 'Memory Utilization - '. $device_text,
+                    'mempool_descr' => 'Memory Utilization - ' . $device_text,
                     'mempool_perc_oid' => ".1.3.6.1.4.1.2879.2.8.5.1.19.1.2.$index",
                     'mempool_perc_warn' => 90,
                 ]))->fillUsage(null, $size, null, $percent_used));
             }
-            
+
         }
+
         return $mempools;
     }
 
@@ -84,29 +86,30 @@ class SonusSbc extends OS implements ProcessorDiscovery
         $processors = [];
 
         foreach ($data as $oid => $value) {
-            print("Processor oid : " . $oid . " value : " . $value . "\n");
+            echo 'Processor oid : ' . $oid . ' value : ' . $value . "\n";
             $device_oid = explode('14.', (string) $oid, 2);
             $device_ascii = $device_oid[1];
             $codes_device = explode('.', $device_ascii);
             $device_text = '';
 
             foreach (array_slice($codes_device, 0) as $code) {
-                $device_text .= chr((int)$code);
-            } 
+                $device_text .= chr((int) $code);
+            }
 
-            $processor_descr = "CPU - " . $device_text;
-            $processor_type = "sonus-fixed";
+            $processor_descr = 'CPU - ' . $device_text;
+            $processor_type = 'sonus-fixed';
 
             $processors[] = Processor::discover(
                 $processor_type,
                 $this->getDeviceId(),
                 $oid,
-                $device_text, 
+                $device_text,
                 $processor_descr,
                 1,
-                (int)$value
+                (int) $value
             );
         }
+
         return $processors;
     }
 }

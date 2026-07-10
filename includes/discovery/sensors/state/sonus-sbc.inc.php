@@ -39,36 +39,36 @@ $states = [
 
 create_state_index($stateName, $states);
 
-$server_status = SnmpQuery::device($deviceModel)->walk(".1.3.6.1.4.1.2879.2.8.5.1.12.1.8")->values();
+$server_status = SnmpQuery::device($deviceModel)->walk('.1.3.6.1.4.1.2879.2.8.5.1.12.1.8')->values();
 
 foreach ($server_status as $index => $entry) {
 
-    print($index);
+    echo $index;
     var_dump($entry);
-    $k_array = explode(".", (string) $index);
-    echo 'k_array0  : '. $k_array[0] ."\n";
+    $k_array = explode('.', (string) $index);
+    echo 'k_array0  : ' . $k_array[0] . "\n";
 
     if ($k_array[0] == 'enterprises') {
-        $ports_mapping['oid'] = str_replace("enterprises.3.6.1.4.1.2879.2.8.5.1.12.1.8.","",$index); ## centos case
+        $ports_mapping['oid'] = str_replace('enterprises.3.6.1.4.1.2879.2.8.5.1.12.1.8.', '', $index); //# centos case
         echo "replace 'entreprises' ";
     }
     if ($k_array[0] == 'iso'){
-        $ports_mapping['oid'] = str_replace("iso.3.6.1.4.1.2879.2.8.5.1.12.1.8.","",$index); ## debian / docker case
+        $ports_mapping['oid'] = str_replace('iso.3.6.1.4.1.2879.2.8.5.1.12.1.8.', '', $index); //# debian / docker case
         echo "replace 'iso' ";
     }
     if ($k_array[0] == '3'){
-        $ports_mapping['oid'] = str_replace("3.6.1.4.1.2879.2.8.5.1.12.1.8.","",$index); ## debian / docker case
+        $ports_mapping['oid'] = str_replace('3.6.1.4.1.2879.2.8.5.1.12.1.8.', '', $index); //# debian / docker case
         echo "replace '3' ";
     }
     if ($k_array[0] == 'SNMPv2-SMI::enterprises'){
-        $ports_mapping['oid'] = str_replace("SNMPv2-SMI::enterprises.2879.2.8.5.1.12.1.8.","",$index); ## debian / docker case
+        $ports_mapping['oid'] = str_replace('SNMPv2-SMI::enterprises.2879.2.8.5.1.12.1.8.', '', $index); //# debian / docker case
         echo "replace 'SNMPv2-SMI::enterprises' ";
     }
 
     $index = $ports_mapping['oid'];
     $server_name = SnmpQuery::get('.1.3.6.1.4.1.2879.2.8.5.1.12.1.16.' . $index)->value();
     $descr = 'Redundancy role: ' . $server_name;
-    $sensor_value = (int)$entry;
+    $sensor_value = (int) $entry;
 
     discover_sensor(
         null,
