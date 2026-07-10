@@ -23,9 +23,9 @@ modules:
                     index: 'bDTGlobalStatus.{{ $index }}'
                     state_name: bDTGlobalStatus
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: other }
-                        - { value: 2, generic: 3, graph: 0, descr: unknown }
-                        - { value: 3, generic: 0, graph: 0, descr: ok }
-                        - { value: 4, generic: 1, graph: 0, descr: non-critical }
-                        - { value: 5, generic: 2, graph: 0, descr: critical }
-                        - { value: 6, generic: 2, graph: 0, descr: non-recoverable }
+                        - { value: 1, generic: 3, descr: other }
+                        - { value: 2, generic: 3, descr: unknown }
+                        - { value: 3, generic: 0, descr: ok }
+                        - { value: 4, generic: 1, descr: non-critical }
+                        - { value: 5, generic: 2, descr: critical }
+                        - { value: 6, generic: 2, descr: non-recoverable }
