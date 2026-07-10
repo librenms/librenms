@@ -427,7 +427,7 @@ class Rrd extends BaseDatastore
 
         if ($this->rrdcached) {
             $output = $this->command('list', '/' . self::safeName($hostname));
-            $files = array_filter(explode("\n", trim($output)), fn($file) => str_starts_with($file, $prefix));
+            $files = array_filter(explode("\n", trim($output)), fn ($file) => str_starts_with((string) $file, $prefix));
         } else {
             $files = glob($this->dirFromHost($hostname) . '/' . $prefix . '*.rrd') ?: [];
         }
