@@ -7727,7 +7727,8 @@
                     "ifStackStatus": "active"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ipv6-addresses": {
         "discovery": {

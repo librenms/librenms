@@ -14,7 +14,7 @@
 
 use App\Models\Device;
 
-if (Gate::denies('update', Device::class)) {
+if (Gate::denies('device.update')) {
     $status = ['status' => 1, 'message' => 'You need to be admin'];
 } else {
     $parent_ids = (array) $_POST['parent_ids'];

@@ -32,11 +32,14 @@ use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
+use LibreNMS\Interfaces\PrinterSuppliesContext;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\StringHelpers;
+use SnmpQuery;
 
 class PrinterSupplies implements Module
 {
@@ -50,9 +53,9 @@ class PrinterSupplies implements Module
         return [];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
@@ -63,22 +66,24 @@ class PrinterSupplies implements Module
      */
     public function discover(OS $os): void
     {
-        $device = $os->getDeviceArray();
+        $device = $os->getDevice();
+        $device_array = $os->getDeviceArray();
+        $contexts = $os instanceof PrinterSuppliesContext ? $os->getPrinterSuppliesContexts() : [''];
 
-        ModuleModelObserver::observe(PrinterSupply::class, 'Printer Supplies');
-        $levels = $this->discoveryLevels($device);
-        $this->syncModelsByGroup($os->getDevice(), 'printerSupplies', $levels, [['supply_type', '!=', 'input']]);
+        ModuleModelObserver::observe(PrinterSupply::class, __('Printer Supplies'));
+        $levels = $this->discoveryLevels($device_array, $contexts);
+        $this->syncModelsByGroup($device, 'printerSupplies', $levels, [['supply_type', '!=', 'input']]);
         ModuleModelObserver::done();
 
-        ModuleModelObserver::observe(PrinterSupply::class, 'Tray Paper Level');
-        $papers = $this->discoveryPapers($device);
-        $this->syncModelsByGroup($os->getDevice(), 'printerSupplies', $papers, ['supply_type' => 'input']);
+        ModuleModelObserver::observe(PrinterSupply::class, __('Tray Paper Level'));
+        $papers = $this->discoveryPapers($contexts);
+        $this->syncModelsByGroup($device, 'printerSupplies', $papers, ['supply_type' => 'input']);
         ModuleModelObserver::done();
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
@@ -97,7 +102,19 @@ class PrinterSupplies implements Module
             return; // no data to poll
         }
 
-        $toner_snmp = snmp_get_multi_oid($device, $toner_data->pluck('supply_oid')->toArray());
+        $toner_snmp = [];
+        $contexts = $os instanceof PrinterSuppliesContext ? $os->getPrinterSuppliesContexts() : [''];
+        foreach ($contexts as $context) {
+            $toner_snmp = SnmpQuery::device($os->getDevice())
+                ->numeric()
+                ->context($context)
+                ->get($toner_data->pluck('supply_oid')->all())
+                ->values();
+
+            if (! empty($toner_snmp)) {
+                break;
+            }
+        }
 
         foreach ($toner_data as $toner) {
             $raw_toner = $toner_snmp[$toner['supply_oid']] ?? null;
@@ -165,21 +182,42 @@ class PrinterSupplies implements Module
         ];
     }
 
-    private function discoveryLevels($device): Collection
+    private function discoveryLevels(array $device, array $contexts): Collection
     {
         $levels = new Collection();
 
-        $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesLevel', [], 'Printer-MIB');
-        if (! empty($oids)) {
-            $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesType', $oids, 'Printer-MIB');
-            $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesMaxCapacity', $oids, 'Printer-MIB');
-            $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesDescription', $oids, 'Printer-MIB', null, '-OQUsa');
+        $oids = [];
+        $context = '';
+        foreach ($contexts as $context) {
+            $oids = SnmpQuery::hideMib()
+                ->enumStrings()
+                ->context($context)
+                ->walk([
+                    'Printer-MIB::prtMarkerSuppliesLevel',
+                    'Printer-MIB::prtMarkerSuppliesType',
+                    'Printer-MIB::prtMarkerSuppliesMaxCapacity',
+                    'Printer-MIB::prtMarkerSuppliesDescription',
+                ])->valuesByIndex();
+
+            if (! empty($oids)) {
+                break;
+            }
         }
 
         foreach ($oids as $index => $data) {
+            if (! isset($data['prtMarkerSuppliesDescription'], $data['prtMarkerSuppliesMaxCapacity'], $data['prtMarkerSuppliesLevel'])) {
+                continue;
+            }
+
             $last_index = substr((string) $index, strrpos((string) $index, '.') + 1);
 
             $descr = $data['prtMarkerSuppliesDescription'];
+
+            // Decode hex-encoded non-ASCII descriptions (e.g. UTF-8 CJK characters from Fujitsu/Ricoh/Kyocera printers)
+            // When using -OQUs without -a flag, net-snmp returns non-ASCII strings as hex (e.g. "E9 BB 91 E8 89 B2")
+            if (preg_match('/^([A-Fa-f\d]{2} )*[A-Fa-f\d]{2}\s*$/', (string) $descr)) {
+                $descr = (string) hex2bin(str_replace([' 00', ' '], '', (string) $descr));
+            }
             $raw_capacity = $data['prtMarkerSuppliesMaxCapacity'];
             $raw_toner = $data['prtMarkerSuppliesLevel'];
             $supply_oid = ".1.3.6.1.2.1.43.11.1.1.9.$index";
@@ -200,13 +238,17 @@ class PrinterSupplies implements Module
             // Ricoh - TONERCurLevel
             if (empty($raw_toner)) {
                 $supply_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.5.$last_index";
-                $raw_toner = snmp_get($device, $supply_oid, '-Oqv');
+                $raw_toner = SnmpQuery::context($context)->get($supply_oid)->value();
+                if ($raw_toner === '' && $device['os'] === 'brother') {
+                    // Preserve legacy Brother handling when this vendor fallback OID is absent.
+                    $raw_toner = '0';
+                }
             }
 
             // Ricoh - TONERNameLocal
             if (empty($descr)) {
                 $descr_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.3.$last_index";
-                $descr = snmp_get($device, $descr_oid, '-Oqva');
+                $descr = SnmpQuery::context($context)->get($descr_oid)->value();
             }
 
             // trim part & serial number from devices that include it
@@ -219,7 +261,6 @@ class PrinterSupplies implements Module
 
             if (is_numeric($current)) {
                 $levels->push(new PrinterSupply([
-                    'device_id' => $device['device_id'],
                     'supply_oid' => $supply_oid,
                     'supply_capacity_oid' => $capacity_oid,
                     'supply_index' => $last_index,
@@ -234,17 +275,31 @@ class PrinterSupplies implements Module
         return $levels;
     }
 
-    private function discoveryPapers($device): Collection
+    private function discoveryPapers(array $contexts): Collection
     {
         $papers = new Collection();
 
-        $tray_oids = snmpwalk_cache_oid($device, 'prtInputName', [], 'Printer-MIB');
-        if (! empty($tray_oids)) {
-            $tray_oids = snmpwalk_cache_oid($device, 'prtInputCurrentLevel', $tray_oids, 'Printer-MIB');
-            $tray_oids = snmpwalk_cache_oid($device, 'prtInputMaxCapacity', $tray_oids, 'Printer-MIB');
+        $tray_oids = [];
+        foreach ($contexts as $context) {
+            $tray_oids = SnmpQuery::hideMib()
+                ->enumStrings()
+                ->context($context)
+                ->walk([
+                    'Printer-MIB::prtInputName',
+                    'Printer-MIB::prtInputCurrentLevel',
+                    'Printer-MIB::prtInputMaxCapacity',
+                ])->valuesByIndex();
+
+            if (! empty($tray_oids)) {
+                break;
+            }
         }
 
         foreach ($tray_oids as $index => $data) {
+            if (! isset($data['prtInputName'], $data['prtInputCurrentLevel'], $data['prtInputMaxCapacity'])) {
+                continue;
+            }
+
             $last_index = substr((string) $index, strrpos((string) $index, '.') + 1);
 
             $capacity = $data['prtInputMaxCapacity'];
@@ -262,7 +317,6 @@ class PrinterSupplies implements Module
             }
 
             $papers->push(new PrinterSupply([
-                'device_id' => $device['device_id'],
                 'supply_oid' => ".1.3.6.1.2.1.43.8.2.1.10.$index",
                 'supply_capacity_oid' => ".1.3.6.1.2.1.43.8.2.1.9.$index",
                 'supply_index' => $last_index,
@@ -282,7 +336,7 @@ class PrinterSupplies implements Module
      * @param  int  $capacity  the normalized capacity
      * @return int|float|bool the toner level as a percentage
      */
-    private static function getTonerLevel($device, $raw_value, $capacity)
+    private static function getTonerLevel(array $device, $raw_value, $capacity)
     {
         // -3 means some toner is left
         if ($raw_value == '-3') {

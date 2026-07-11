@@ -1,4 +1,9 @@
 modules:
+    os:
+        hardware: SNMPv2-MIB::sysName.0
+        sysName: CUBO-MINI-MIB::cubominiSystemDataDeviceName.0
+        serial: CUBO-MINI-MIB::cubominiSystemDataSerialNumber.0
+        version: CUBO-MINI-MIB::cubominiSystemDataFwVersion.0
     sensors:
         fanspeed:
             data:

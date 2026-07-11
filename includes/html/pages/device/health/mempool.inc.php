@@ -35,7 +35,7 @@ foreach ($mempools as $mempool) {
         $used = Number::formatBi($mempool->mempool_used);
         $bytes = "$used/$total - ";
     }
-    echo "<h3 class='panel-title'>{$mempool->mempool_descr} <div class='pull-right'>$bytes$mempool->mempool_perc% used</div></h3>";
+    echo "<h3 class='panel-title'>" . e($mempool->mempool_descr) . " <div class='pull-right'>$bytes$mempool->mempool_perc% used</div></h3>";
     echo "</div><div class='panel-body'>";
     Html::graphRow(['id' => $mempool->mempool_id, 'type' => 'mempool_usage'], true);
     echo '</div></div>';

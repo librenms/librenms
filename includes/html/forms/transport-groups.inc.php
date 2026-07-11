@@ -24,14 +24,13 @@
  * @author     Vivia Nguyen-Tran <vivia@ualberta.ca>
  */
 
-use App\Models\AlertTransport;
 use App\Models\AlertTransportGroup;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
 
-if (Gate::denies('update', AlertTransport::class)) {
+if (Gate::denies('alert-transport.update')) {
     exit(json_encode([
         'status' => 'error',
         'message' => 'You need to be admin',

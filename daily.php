@@ -53,8 +53,18 @@ if ($options['f'] === 'update') {
         exit(0);
     }
 
+    $on_days = LibrenmsConfig::get('update_on_days', []);
+
+    if (is_array($on_days) && ! empty($on_days)) {
+        $today = strtolower(date('l')); // monday..sunday
+
+        if (! in_array($today, $on_days, true)) {
+            exit(0);
+        }
+    }
+
     if (LibrenmsConfig::get('update_channel') == 'master') {
-        exit(1);
+        exit(2);
     } elseif (LibrenmsConfig::get('update_channel') == 'release') {
         exit(3);
     }

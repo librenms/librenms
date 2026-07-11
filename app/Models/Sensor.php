@@ -3,22 +3,21 @@
 namespace App\Models;
 
 use App\Facades\LibrenmsConfig;
-use App\Models\Traits\HasThresholds;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Enum\SensorState;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 
-class Sensor extends DeviceRelatedModel implements Keyable
+class Sensor extends SensorModel implements Keyable
 {
     use HasFactory;
-    use HasThresholds;
 
     public $timestamps = false;
     protected $primaryKey = 'sensor_id';
@@ -237,6 +236,11 @@ class Sensor extends DeviceRelatedModel implements Keyable
             'type' => $this->sensor_type,
             'index' => $this->sensor_index,
         ];
+    }
+
+    public function icon(): string
+    {
+        return SensorEnum::tryFrom($this->sensor_class)->icon() ?? '';
     }
 
     public function __toString(): string

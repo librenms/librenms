@@ -94,3 +94,99 @@ foreach ($ext_label_oids as $vt_name => $label_base) {
     }
     unset($entry);
 }
+
+// RoomAlert MAX
+// Decode OID-encoded string index: <length>.<ascii1>.<ascii2>... -> string
+$ramax_oid_to_string = function (string $oid_suffix): string {
+    $parts = explode('.', $oid_suffix);
+    $len = (int) array_shift($parts);
+
+    return implode('', array_map(chr(...), array_slice($parts, 0, $len)));
+};
+
+// Walk sensor names, keyed by MAC address string e.g. "00:BE:44:EA:3E:CA"
+$sensor_names = [];
+$sensor_data = SnmpQuery::numeric()->walk('.1.3.6.1.4.1.20916.1.14.1.1.1.2')->getRawWithoutBadLines();
+if ($sensor_data) {
+    foreach (explode(PHP_EOL, (string) $sensor_data) as $line) {
+        $parts = explode(' =', $line, 2);
+        if (count($parts) < 2) {
+            continue;
+        }
+        [$oid, $value] = $parts;
+        $value = trim(trim($value), '"');
+        if (preg_match('/\.1\.3\.6\.1\.4\.1\.20916\.1\.14\.1\.1\.1\.2\.(.+)/', $oid, $m)) {
+            $mac_parts = explode('.', $m[1]);
+            $mac = implode(':', array_map(fn ($b) => strtoupper(sprintf('%02X', $b)), $mac_parts));
+            $sensor_names[$mac] = $value;
+        }
+    }
+}
+unset($sensor_data);
+
+// Walk channel group labels, keyed by decoded group key string
+$group_labels = [];
+$group_data = SnmpQuery::numeric()->walk('.1.3.6.1.4.1.20916.1.14.2.1.1.3')->getRawWithoutBadLines();
+if ($group_data) {
+    foreach (explode(PHP_EOL, (string) $group_data) as $line) {
+        $parts = explode(' =', $line, 2);
+        if (count($parts) < 2) {
+            continue;
+        }
+        [$oid, $value] = $parts;
+        $value = trim(trim($value), '"');
+        if (preg_match('/\.1\.3\.6\.1\.4\.1\.20916\.1\.14\.2\.1\.1\.3\.(.+)/', $oid, $m)) {
+            $group_labels[$ramax_oid_to_string($m[1])] = $value;
+        }
+    }
+}
+unset($group_data);
+
+// Walk channel fields: 2=groupRef, 3=type, 4=value, 5=description
+foreach ([2, 3, 4, 5] as $field) {
+    $field_data = SnmpQuery::numeric()->walk('.1.3.6.1.4.1.20916.1.14.3.1.1.' . $field)->getRawWithoutBadLines();
+    if (! $field_data) {
+        continue;
+    }
+    foreach (explode(PHP_EOL, (string) $field_data) as $line) {
+        $parts = explode(' =', $line, 2);
+        if (count($parts) < 2) {
+            continue;
+        }
+        [$oid, $value] = $parts;
+        $value = trim(trim($value), '"');
+        if (preg_match('/\.1\.3\.6\.1\.4\.1\.20916\.1\.14\.3\.1\.1\.' . $field . '\.(.+)/', $oid, $m)) {
+            $pre_cache['ramax-channels'][$m[1]][$field] = $value;
+        }
+    }
+    unset($field_data);
+}
+
+// Resolve description for each channel using sensor name + group label
+// channelGroupReference (field 2) format: baseMac_sensorMac_groupType_groupIndex
+$generic_labels = ['Temperature & Humidity', 'Wireless', 'Temperature', 'Humidity'];
+foreach (array_keys($pre_cache['ramax-channels'] ?? []) as $index) {
+    $channel = &$pre_cache['ramax-channels'][$index];
+    $group_ref = $channel[2] ?? '';
+    $ref_parts = explode('_', $group_ref);
+    $sensor_mac = $ref_parts[1] ?? '';
+    $sensor_name = $sensor_names[$sensor_mac] ?? null;
+    $group_label = $group_labels[$group_ref] ?? null;
+    $channel_type = $channel[3] ?? 'Sensor';
+
+    $suffix = ($group_label && ! in_array($group_label, $generic_labels))
+        ? $group_label
+        : $channel_type;
+
+    if ($sensor_name === 'Internal Sensor') {
+        $channel['label'] = 'Internal ' . $channel_type;
+    } elseif ($sensor_name) {
+        $channel['label'] = $sensor_name . ' ' . $suffix;
+    } elseif ($group_label && ! in_array($group_label, $generic_labels)) {
+        $channel['label'] = $group_label;
+    } else {
+        $channel['label'] = $channel_type;
+    }
+    unset($channel);
+}
+unset($group_labels, $sensor_names);

@@ -130,6 +130,7 @@ Route::prefix('v0')->group(function (): void {
         Route::get('{hostname}/nac', [App\Api\Controllers\LegacyApiController::class, 'get_nac'])->name('get_nac');
         Route::get('{hostname}/health/{type?}/{sensor_id?}', [App\Api\Controllers\LegacyApiController::class, 'list_available_health_graphs'])->name('list_available_health_graphs');
         Route::get('{hostname}/wireless/{type?}/{sensor_id?}', [App\Api\Controllers\LegacyApiController::class, 'list_available_wireless_graphs'])->name('list_available_wireless_graphs');
+        Route::get('{hostname}/wireless-sensors', [App\Api\Controllers\LegacyApiController::class, 'get_device_wireless_sensors'])->name('get_device_wireless_sensors');
         Route::get('{hostname}/ports', [App\Api\Controllers\LegacyApiController::class, 'get_device_ports'])->name('get_device_ports');
         Route::get('{hostname}/ip', [App\Api\Controllers\LegacyApiController::class, 'get_device_ip_addresses'])->name('get_ip_addresses');
         Route::get('{hostname}/port_stack', [App\Api\Controllers\LegacyApiController::class, 'get_port_stack'])->name('get_port_stack');

@@ -16,7 +16,6 @@
 
 /* FIXME: is there a central place we can put this? */
 
-use App\Models\Alert;
 use Illuminate\Support\Facades\Gate;
 
 $alert_states = [
@@ -39,7 +38,7 @@ $alert_severities = [
     'critical only' => 6,
 ];
 $admin_verbose_details = '';
-if (Gate::allows('detail', Alert::class)) {
+if (Gate::allows('alert.detail')) {
     $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
 }
 

@@ -39,6 +39,7 @@ use LibreNMS\Enum\IntegerType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
@@ -64,9 +65,9 @@ class Xdsl implements Module
         return ['ports'];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
@@ -79,9 +80,9 @@ class Xdsl implements Module
         $this->pollVdsl($os);
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
@@ -145,6 +146,12 @@ class Xdsl implements Module
         $adslPorts = new Collection;
 
         foreach ($adsl as $ifIndex => $data) {
+            if (! is_array($data)) {
+                $received = is_string($data) ? 'Data: "' . $data . '"' : 'Type: ' . gettype($data);
+                Log::warning("XDSL: Skipping port (ifIndex $ifIndex) - device returned malformed SNMP response. $received");
+                continue;
+            }
+
             // Values are 1/10
             foreach ($this->adslTenthValues as $oid) {
                 if (isset($data[$oid])) {
@@ -195,6 +202,11 @@ class Xdsl implements Module
         $vdslPorts = new Collection;
 
         foreach ($vdsl as $ifIndex => $data) {
+            if (! is_array($data)) {
+                $received = is_string($data) ? 'Data: "' . $data . '"' : 'Type: ' . gettype($data);
+                Log::warning("XDSL: Skipping port (ifIndex $ifIndex) - device returned malformed SNMP response. $received");
+                continue;
+            }
             $portVdsl = new PortVdsl([
                 'port_id' => PortCache::getIdFromIfIndex($ifIndex, $os->getDevice()),
                 'xdsl2ChStatusActDataRateXtur' => $data['xdsl2ChStatusActDataRate']['xtur'] ?? 0,

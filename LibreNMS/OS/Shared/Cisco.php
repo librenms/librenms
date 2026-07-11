@@ -163,12 +163,12 @@ class Cisco extends OS implements
             $hardware = $data[1000]['entPhysicalModelName'];
         } elseif ((empty($hardware) || preg_match('/Virtual Stack/', (string) $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
             $hardware = $data[1000]['entPhysicalModelName'];
-        } elseif (empty($hardware) && ! empty($data[1000]['entPhysicalContainedIn'])) {
-            $hardware = $data[$data[1000]['entPhysicalContainedIn']]['entPhysicalName'];
+        } elseif (empty($hardware) && isset($data[1000]['entPhysicalContainedIn'])) {
+            $hardware = $data[$data[1000]['entPhysicalContainedIn']]['entPhysicalName'] ?? null;
         } elseif ((preg_match('/stack/i', $hardware ?? '') || empty($hardware)) && ! empty($data[1001]['entPhysicalModelName'])) {
             $hardware = $data[1001]['entPhysicalModelName'];
-        } elseif (empty($hardware) && ! empty($data[1001]['entPhysicalContainedIn'])) {
-            $hardware = $data[$data[1001]['entPhysicalContainedIn']]['entPhysicalName'];
+        } elseif (empty($hardware) && isset($data[1001]['entPhysicalContainedIn'])) {
+            $hardware = $data[$data[1001]['entPhysicalContainedIn']]['entPhysicalName'] ?? null;
         }
 
         $device->hardware = $hardware;
@@ -1028,6 +1028,7 @@ class Cisco extends OS implements
         ])->table(1);
 
         // Hash Table indexed by vlans and ifIndexes
+        $isNative = [];
         foreach ($native_vlans_raw as $ifindex => $data) {
             // Only returns 'untagged' vlan for each port (either access ports, or native vlan of a trunk)
             // stored for use in below loop
@@ -1038,30 +1039,23 @@ class Cisco extends OS implements
             if (isset($data['CISCO-VTP-MIB::vlanTrunkPortDynamicState']) && $data['CISCO-VTP-MIB::vlanTrunkPortDynamicState'] == 2) {
                 continue; // This port is not a trunk, so continue to next one
             }
-            // Only returns 'tagged' vlan for each port
-            // stored for use in below loop
-            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined'])) {
-                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined']);
-                foreach ($vlanIds as $vlan_id) {
-                    $isNative[$vlan_id - 1][$ifindex] ??= 0;
+            // Only returns tagged VLANs for each port. Some devices (e.g. Cisco Nexus/NX-OS)
+            // leave the XmitJoined extension objects empty, which drops VLANs above 1023.
+            // Fall back to the VlansEnabled extension when that happens.
+            foreach ([
+                ['', -1, false],
+                ['2k', 1023, true],
+                ['3k', 2047, true],
+                ['4k', 3071, true],
+            ] as [$suffix, $offset, $allowFallback]) {
+                $vlanBits = $data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined' . $suffix] ?? '';
+
+                if ($allowFallback && $vlanBits === '') {
+                    $vlanBits = $data['CISCO-VTP-MIB::vlanTrunkPortVlansEnabled' . $suffix] ?? '';
                 }
-            }
-            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined2k'])) {
-                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined2k']);
-                foreach ($vlanIds as $vlan_id) {
-                    $isNative[$vlan_id + 1023][$ifindex] ??= 0;
-                }
-            }
-            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined3k'])) {
-                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined3k']);
-                foreach ($vlanIds as $vlan_id) {
-                    $isNative[$vlan_id + 2047][$ifindex] ??= 0;
-                }
-            }
-            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined4k'])) {
-                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined4k']);
-                foreach ($vlanIds as $vlan_id) {
-                    $isNative[$vlan_id + 3071][$ifindex] ??= 0;
+
+                foreach (StringHelpers::bitsToIndices($vlanBits) as $vlan_id) {
+                    $isNative[$vlan_id + $offset][$ifindex] ??= 0;
                 }
             }
         }
