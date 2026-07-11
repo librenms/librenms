@@ -645,7 +645,7 @@
                  @keydown.escape="close()" @click.outside="close()">
                 <div class="form-group">
                     <input class="form-control" type="search" id="gsearch" name="gsearch" autocomplete="off"
-                           placeholder="{{ __('Global Search') }}"
+                           placeholder="{{ __('Type / to search') }}"
                            x-model="query" x-ref="input"
                            @input.debounce.250ms="run()" @focus="open = flat.length > 0"
                            @keydown="onKey($event)">
