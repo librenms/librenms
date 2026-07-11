@@ -66,6 +66,7 @@ class AvailabilityMapController extends WidgetController
         $data['device_totals'] = $device_totals;
         $data['services'] = $services;
         $data['services_totals'] = $services_totals;
+        $data['base_filter'] = isset($data['device_group']) ? ['groups.id' => ['eq' => $data['device_group']]] : [];
 
         return view('widgets.availability-map', $data);
     }

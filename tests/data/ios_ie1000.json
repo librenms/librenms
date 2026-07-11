@@ -3284,6 +3284,7 @@
                     "vlan_vlan": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

@@ -27,14 +27,21 @@
 namespace App\Http\Controllers\Table;
 
 use App\Facades\DeviceCache;
+use App\Models\Port;
 use App\Models\PortStp;
 use App\Models\Stp;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Util\Mac;
 
+/**
+ * @extends TableController<PortStp>
+ */
 class PortStpController extends TableController
 {
-    public function rules()
+    public function rules(): array
     {
         return [
             'device_id' => 'int',
@@ -42,7 +49,7 @@ class PortStpController extends TableController
         ];
     }
 
-    protected function filterFields($request): array
+    protected function filterFields(Request $request): array
     {
         return [
             'device_id',
@@ -54,7 +61,7 @@ class PortStpController extends TableController
         ];
     }
 
-    protected function sortFields($request)
+    protected function sortFields(Request $request): array
     {
         return [
             'device_id',
@@ -72,38 +79,42 @@ class PortStpController extends TableController
         ];
     }
 
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
-        return PortStp::query()->with('port');
+        $this->authorize('viewAny', Port::class);
+
+        return PortStp::hasAccess($request->user())
+            ->with('port');
     }
 
     /**
-     * @param  PortStp  $stpPort
+     * @param  PortStp  $model
+     * @return array<string, scalar>
      */
-    public function formatItem($stpPort)
+    public function formatItem(Model $model): array
     {
-        $drMac = Mac::parse($stpPort->designatedRoot);
-        $dbMac = Mac::parse($stpPort->designatedBridge);
+        $drMac = Mac::parse($model->designatedRoot);
+        $dbMac = Mac::parse($model->designatedBridge);
 
-        $dr = DeviceCache::get(Stp::where('bridgeAddress', $stpPort->designatedRoot)->whereNot('bridgeAddress', '000000000000')->value('device_id'));
-        $db = DeviceCache::get(Stp::where('bridgeAddress', $stpPort->designatedBridge)->whereNot('bridgeAddress', '')->value('device_id'));
+        $dr = DeviceCache::get(Stp::where('bridgeAddress', $model->designatedRoot)->whereNot('bridgeAddress', '000000000000')->value('device_id'));
+        $db = DeviceCache::get(Stp::where('bridgeAddress', $model->designatedBridge)->whereNot('bridgeAddress', '')->value('device_id'));
 
         return [
-            'port_id' => Blade::render('<x-port-link :port="$port">{{ $port->getShortLabel() }}</x-port-link><br /> {{ $port->getDescription() }}', ['port' => $stpPort->port]),
-            'vlan' => $stpPort->vlan ?: 1,
-            'priority' => $stpPort->priority,
-            'state' => $stpPort->state,
-            'enable' => $stpPort->enable,
-            'pathCost' => $stpPort->pathCost,
+            'port_id' => Blade::render('<x-port-link :port="$port">{{ $port->getShortLabel() }}</x-port-link><br /> {{ $port->getDescription() }}', ['port' => $model->port]),
+            'vlan' => $model->vlan ?: 1,
+            'priority' => $model->priority,
+            'state' => $model->state,
+            'enable' => $model->enable,
+            'pathCost' => $model->pathCost,
             'designatedRoot' => $drMac->readable(),
             'designatedRoot_vendor' => $drMac->vendor(),
             'designatedRoot_device' => Blade::render('<x-device-link :device="$device"/>', ['device' => $dr]),
-            'designatedCost' => $stpPort->designatedCost,
+            'designatedCost' => $model->designatedCost,
             'designatedBridge' => $dbMac->readable(),
             'designatedBridge_vendor' => $dbMac->vendor(),
             'designatedBridge_device' => Blade::render('<x-device-link :device="$device"/>', ['device' => $db]),
-            'designatedPort' => $stpPort->designatedPort,
-            'forwardTransitions' => $stpPort->forwardTransitions,
+            'designatedPort' => $model->designatedPort,
+            'forwardTransitions' => $model->forwardTransitions,
         ];
     }
 }

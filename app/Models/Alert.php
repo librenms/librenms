@@ -27,6 +27,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -34,7 +35,18 @@ use LibreNMS\Enum\AlertState;
 
 class Alert extends Model
 {
+    use HasFactory;
     public $timestamps = false;
+    protected $fillable = [
+        'device_id',
+        'rule_id',
+        'state',
+        'open',
+        'alerted',
+        'info',
+        'timestamp',
+        'note',
+    ];
 
     /**
      * @return array{info: 'array'}
@@ -43,6 +55,7 @@ class Alert extends Model
     {
         return [
             'info' => 'array',
+            'timestamp' => 'datetime',
         ];
     }
 

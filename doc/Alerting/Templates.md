@@ -296,7 +296,7 @@ email or just the hostname in any other transport:
 
 ```php
 @if ($alert->status == 0)
-    @if ($alert->status_reason == 'icmp')
+    @if (str_contains((string) $alert->status_reason, 'icmp'))
         {{ $alert->debug['traceroute'] }}
     @endif
 @endif

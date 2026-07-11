@@ -10,7 +10,6 @@ use LibreNMS\Interfaces\Models\Keyable;
 class PortsFdb extends PortRelatedModel implements Keyable
 {
     use HasFactory;
-
     protected $table = 'ports_fdb';
     protected $primaryKey = 'ports_fdb_id';
     public $timestamps = true;

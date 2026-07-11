@@ -141,6 +141,7 @@ Currently supported applications as are below.
 - puppet-agent
 - pureftpd
 - redis
+- routinator
 - seafile
 - supervisord
 - ups-apcups

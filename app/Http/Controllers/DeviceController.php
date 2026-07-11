@@ -6,14 +6,19 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\View\Components\Device\PageTabs;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Url;
 
 class DeviceController
 {
+    use AuthorizesRequests;
+
     public function index(Request $request, $device, $current_tab = 'overview', $vars = '')
     {
         $device = str_replace('device=', '', $device);
@@ -23,6 +28,8 @@ class DeviceController
         if (! $device->exists) {
             abort(404);
         }
+
+        $this->authorize('view', $device);
 
         DeviceCache::setPrimary($device_id);
 
@@ -74,14 +81,14 @@ class DeviceController
 
         extract($data); // set preloaded data into variables
         include "includes/html/pages/device/$tab.inc.php";
-        $output = ob_get_clean();
-        ob_end_clean();
 
-        return $output;
+        return ob_get_clean();
     }
 
     public function rediscover(Device $device): JsonResponse
     {
+        $this->authorize('update', $device);
+
         $device->last_discovered = null;
         $saved = $device->save();
 
@@ -89,5 +96,43 @@ class DeviceController
             'message' => $saved ? 'Device scheduled for discovery' : 'Failed to schedule device for discovery',
             'status' => $saved ? 'ok' : 'error',
         ]);
+    }
+
+    public function deleteIndex(): View
+    {
+        $this->authorize('device.delete');
+
+        return view('device.delete', [
+            'data_warn' => [
+                __('Syslog'),
+                __('Eventlog'),
+                __('Alertlog'),
+            ],
+        ]);
+    }
+
+    public function deleteConfirm(Device $device): View
+    {
+        $this->authorize('delete', $device);
+
+        return view('device.delete-confirm', [
+            'device' => $device,
+            'data_warn' => [
+                __('Syslog'),
+                __('Eventlog'),
+                __('Alertlog'),
+            ],
+        ]);
+    }
+
+    public function destroy(Device $device): RedirectResponse
+    {
+        $this->authorize('delete', $device);
+
+        $hostname = $device->hostname;
+        $device->delete();
+
+        return redirect()->route('device.delete')
+            ->with('success', __('device.deleted', ['hostname' => $hostname]));
     }
 }

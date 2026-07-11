@@ -24,9 +24,8 @@ class MaintenanceRrdStep extends LnmsCommand
 
     public function handle(RrdProcess $rrdProcess): int
     {
-        $systemStep = (int) LibrenmsConfig::get('rrd.step', 300);
-        $icmpStep = (int) LibrenmsConfig::get('ping_rrd_step', $systemStep);
-        $systemHeartbeat = (int) LibrenmsConfig::get('rrd.heartbeat', $systemStep * 2);
+        $step = (int) LibrenmsConfig::get('rrd.step', 300);
+        $heartbeat = (int) LibrenmsConfig::get('rrd.heartbeat', $step * 2);
 
         $hostname = (string) $this->argument('device');
         if ($hostname !== 'all') {
@@ -47,10 +46,6 @@ class MaintenanceRrdStep extends LnmsCommand
 
         foreach ($this->listFiles($hostname, $rrdProcess) as $file) {
             $rrdFile = basename($file, '.rrd');
-
-            [$step, $heartbeat] = $rrdFile === 'icmp-perf'
-                ? [$icmpStep, $icmpStep * 2]
-                : [$systemStep, $systemHeartbeat];
 
             try {
                 $this->checkRrdFile($rrdProcess, $file, $step, $heartbeat);
