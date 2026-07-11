@@ -3030,40 +3030,6 @@
             ]
         }
     },
-    "route": {
-        "discovery": {
-            "route": [
-                {
-                    "context_name": "",
-                    "inetCidrRouteIfIndex": 100,
-                    "inetCidrRouteType": 4,
-                    "inetCidrRouteProto": 0,
-                    "inetCidrRouteNextHopAS": 0,
-                    "inetCidrRouteMetric1": 0,
-                    "inetCidrRouteDestType": "ipv4",
-                    "inetCidrRouteDest": "0.0.0.0",
-                    "inetCidrRouteNextHopType": "ipv4",
-                    "inetCidrRouteNextHop": "10.66.100.254",
-                    "inetCidrRoutePolicy": "zeroDotZero",
-                    "inetCidrRoutePfxLen": 0
-                },
-                {
-                    "context_name": "",
-                    "inetCidrRouteIfIndex": 100,
-                    "inetCidrRouteType": 4,
-                    "inetCidrRouteProto": 0,
-                    "inetCidrRouteNextHopAS": 0,
-                    "inetCidrRouteMetric1": 0,
-                    "inetCidrRouteDestType": "ipv4",
-                    "inetCidrRouteDest": "10.66.100.0",
-                    "inetCidrRouteNextHopType": "ipv4",
-                    "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "zeroDotZero",
-                    "inetCidrRoutePfxLen": 24
-                }
-            ]
-        }
-    },
     "ports-stack": {
         "discovery": {
             "ports_stack": [
@@ -3200,91 +3166,38 @@
             ]
         }
     },
-    "fdb-table": {
+    "route": {
         "discovery": {
-            "ports_fdb": [
+            "route": [
                 {
-                    "mac_address": "7c1eb3039385",
-                    "ifIndex": 1000001,
-                    "vlan_vlan": null
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 100,
+                    "inetCidrRouteType": 4,
+                    "inetCidrRouteProto": 0,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "0.0.0.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "10.66.100.254",
+                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePfxLen": 0
                 },
                 {
-                    "mac_address": "00085d63099c",
-                    "ifIndex": 1000002,
-                    "vlan_vlan": null
-                },
-                {
-                    "mac_address": "0003e19a970b",
-                    "ifIndex": 1000003,
-                    "vlan_vlan": null
-                },
-                {
-                    "mac_address": "0001053e363f",
-                    "ifIndex": 1000004,
-                    "vlan_vlan": null
-                },
-                {
-                    "mac_address": "583879153524",
-                    "ifIndex": 1000005,
-                    "vlan_vlan": null
-                },
-                {
-                    "mac_address": "0003e197f3ba",
-                    "ifIndex": 1000007,
-                    "vlan_vlan": null
-                },
-                {
-                    "mac_address": "00090f090206",
-                    "ifIndex": 1000007,
-                    "vlan_vlan": null
-                },
-                {
-                    "mac_address": "0013cb09de85",
-                    "ifIndex": 1000007,
-                    "vlan_vlan": null
-                },
-                {
-                    "mac_address": "04eb40902c9b",
-                    "ifIndex": 1000007,
-                    "vlan_vlan": null
-                },
-                {
-                    "mac_address": "10ca8101a994",
-                    "ifIndex": 1000007,
-                    "vlan_vlan": null
-                },
-                {
-                    "mac_address": "445bed1dbc40",
-                    "ifIndex": 1000007,
-                    "vlan_vlan": null
-                },
-                {
-                    "mac_address": "445bed2af800",
-                    "ifIndex": 1000007,
-                    "vlan_vlan": null
-                },
-                {
-                    "mac_address": "7c1eb303935b",
-                    "ifIndex": 1000007,
-                    "vlan_vlan": null
-                },
-                {
-                    "mac_address": "c884a1df9708",
-                    "ifIndex": 1000007,
-                    "vlan_vlan": null
-                },
-                {
-                    "mac_address": "2c1a0576d880",
-                    "ifIndex": 1000008,
-                    "vlan_vlan": null
-                },
-                {
-                    "mac_address": "2c1a0576d888",
-                    "ifIndex": 1000008,
-                    "vlan_vlan": null
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 100,
+                    "inetCidrRouteType": 4,
+                    "inetCidrRouteProto": 0,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "10.66.100.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "0.0.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePfxLen": 24
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     }
 }
