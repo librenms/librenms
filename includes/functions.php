@@ -10,12 +10,10 @@
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
-use App\Models\Eventlog;
 use App\Models\StateTranslation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Enum\Severity;
 
 function device_discovery_trigger($id)
 {

@@ -21,7 +21,7 @@ if ($argv[1] && $argv[2]) {
     $device = (ctype_digit($hostname) ? Device::find($hostname) : Device::where('hostname', $hostname)->first());
     $new_hostname = $argv[2];
 
-    if (!$device) {
+    if (! $device) {
         echo "Existing device not found\n";
         exit(1);
     } else {
