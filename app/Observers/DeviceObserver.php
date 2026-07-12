@@ -91,7 +91,7 @@ class DeviceObserver
             // Fail if another device has the same hostname
             if(Device::where('hostname', $device->hostname)->whereNot('device_id', $device->device_id)->count() > 0) {
                 $device->hostname = $old_name;
-                Eventlog::log("Renaming of $old_name failed", $device, 'system', Severity::Error);
+                Eventlog::log("Renaming of $old_name failed because there is already a device with the hostname $new_name", $device, 'system', Severity::Error);
                 throw new HostRenameException("Renaming of $old_name failed");
             }
 
@@ -108,7 +108,7 @@ class DeviceObserver
                 Eventlog::log("Hostname changed -> $new_name ($source)", $device, 'system', Severity::Notice);
             } else {
                 $device->hostname = $old_name;
-                Eventlog::log("Renaming of $old_name failed", $device, 'system', Severity::Error);
+                Eventlog::log("Renaming of $old_name failed because the RRD directory rename failed", $device, 'system', Severity::Error);
                 throw new HostRenameException("Renaming of $old_name failed");
             }
         }
