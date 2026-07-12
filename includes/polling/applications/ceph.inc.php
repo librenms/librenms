@@ -14,7 +14,7 @@ if (! empty($agent_data['app'][$name])) {
     $ceph_data = str_replace("<<<app-ceph>>>\n", '', $ceph_data);
 }
 
-if (isset($ceph_data)){
+if (isset($ceph_data)) {
 
     $metrics = [];
     foreach (explode('<', (string) $ceph_data) as $section) {
