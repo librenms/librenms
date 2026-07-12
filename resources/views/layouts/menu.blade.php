@@ -28,7 +28,7 @@
                                 @endforeach
                                 <li role="presentation" class="divider"></li>
                                 <li>
-                                    <a href="{{ route('dashboard.noc.playlists') }}">
+                                    <a href="{{ route('noc.playlists') }}">
                                         <i class="fa fa-repeat fa-fw fa-lg" aria-hidden="true"></i>
                                         {{ __('dashboard.noc.menu') }}
                                     </a>

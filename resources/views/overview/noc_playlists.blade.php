@@ -32,7 +32,7 @@
 
             <div class="panel panel-default" id="noc-create-playlist-panel" style="display: none;">
                 <div class="panel-body">
-                    <form method="POST" action="{{ route('dashboard.noc.playlists.store') }}">
+                    <form method="POST" action="{{ route('noc.playlists.store') }}">
                         @csrf
                         <div class="form-group">
                             <label for="new_playlist_name">{{ __('dashboard.noc.playlist_name') }}</label>
@@ -73,11 +73,11 @@
                         <td style="white-space: nowrap;">{{ count($playlist['dashboard_ids']) }}</td>
                         <td>{{ collect($playlist['dashboard_ids'])->map(fn ($dashboardId) => $dashboard_name_map[$dashboardId] ?? ('#' . $dashboardId))->implode(', ') }}</td>
                         <td class="text-right">
-                            <a class="btn btn-xs btn-default" href="{{ route('dashboard.noc.play', ['playlist_id' => $playlist['id']]) }}">{{ __('dashboard.noc.play') }}</a>
+                            <a class="btn btn-xs btn-default" href="{{ route('noc.play', ['playlist_id' => $playlist['id']]) }}">{{ __('dashboard.noc.play') }}</a>
                             <button type="button" class="btn btn-xs btn-primary" onclick="toggleNocModifyPlaylist({{ $playlist['id'] }})">
                                 {{ __('dashboard.noc.modify_playlist') }}
                             </button>
-                            <form method="POST" action="{{ route('dashboard.noc.playlists.destroy', ['playlistId' => $playlist['id']]) }}" style="display: inline-block;" onsubmit="return confirm('{{ __('dashboard.noc.playlist_delete_confirm') }}');">
+                            <form method="POST" action="{{ route('noc.playlists.destroy', ['playlistId' => $playlist['id']]) }}" style="display: inline-block;" onsubmit="return confirm('{{ __('dashboard.noc.playlist_delete_confirm') }}');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-xs btn-danger">{{ __('dashboard.noc.delete_playlist') }}</button>
@@ -88,7 +88,7 @@
                         <td colspan="3">
                             <div class="panel panel-default" style="margin: 0;">
                                 <div class="panel-body">
-                                    <form method="POST" action="{{ route('dashboard.noc.playlists.update', ['playlistId' => $playlist['id']]) }}">
+                                    <form method="POST" action="{{ route('noc.playlists.update', ['playlistId' => $playlist['id']]) }}">
                                         @csrf
                                         @method('PUT')
                                         <div class="form-group">

@@ -25,11 +25,11 @@
                 @endforeach
             </ul>
 
-            <form method="POST" action="{{ route('dashboard.noc.cleanup.all') }}" style="display: inline-block;">
+            <form method="POST" action="{{ route('noc.cleanup.all') }}" style="display: inline-block;">
                 @csrf
                 <button type="submit" class="btn btn-danger">{{ __('dashboard.noc.cleanup_confirm') }}</button>
             </form>
-            <a class="btn btn-default" href="{{ route('dashboard.noc.playlists') }}">{{ __('dashboard.noc.cleanup_cancel') }}</a>
+            <a class="btn btn-default" href="{{ route('noc.playlists') }}">{{ __('dashboard.noc.cleanup_cancel') }}</a>
         </div>
     </div>
 </div>
