@@ -153,7 +153,6 @@ class DashboardController extends Controller
         ]);
     }
 
-
     public function store(Request $request): JsonResponse
     {
         $this->authorize('create', Dashboard::class);
