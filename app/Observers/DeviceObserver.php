@@ -88,6 +88,13 @@ class DeviceObserver
             $new_rrd_dir = Rrd::dirFromHost($new_name);
             $old_rrd_dir = Rrd::dirFromHost($old_name);
 
+            // Fail if another device has the same hostname
+            if(Device::where('hostname', $device->hostname)->whereNot('device_id', $device->device_id)->count() > 0) {
+                $device->hostname = $old_name;
+                Eventlog::log("Renaming of $old_name failed", $device, 'system', Severity::Error);
+                throw new HostRenameException("Renaming of $old_name failed");
+            }
+
             if (is_dir($new_rrd_dir)) {
                 $device->hostname = $old_name;
                 Eventlog::log("Renaming of $old_name failed due to existing RRD folder for $new_name", $device, 'system', Severity::Error);
