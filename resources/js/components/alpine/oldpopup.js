@@ -6,13 +6,26 @@ export default function popup(url = "", options = {}) {
         ignoreNextShownEvent: false,
         showDelay: options.showDelay || 100,
         hideDelay: options.hideDelay || 300,
+        popperInstance: null,
         show(timeout) {
             clearTimeout(this.hideTimeout);
             this.showTimeout = setTimeout(() => {
                 this.popupShow = true;
-                Popper.createPopper(this.$refs.targetRef, this.$refs.popupRef, {
-                    padding: 8
-                });
+
+                if (this.popperInstance) {
+                    this.popperInstance.destroy();
+                }
+
+                if (typeof Popper !== 'undefined') {
+                    this.popperInstance = new Popper(this.$refs.targetRef, this.$refs.popupRef, {
+                        placement: options.placement || 'bottom',
+                        modifiers: {
+                            preventOverflow: {
+                                boundariesElement: 'viewport'
+                            }
+                        }
+                    });
+                }
 
                 // close other popups, except this one
                 this.ignoreNextShownEvent = true;
@@ -26,7 +39,13 @@ export default function popup(url = "", options = {}) {
             }
 
             clearTimeout(this.showTimeout);
-            this.hideTimeout = setTimeout(() => this.popupShow = false, timeout);
+            this.hideTimeout = setTimeout(() => {
+                this.popupShow = false;
+                if (this.popperInstance) {
+                    this.popperInstance.destroy();
+                    this.popperInstance = null;
+                }
+            }, timeout);
         }
     };
 }
