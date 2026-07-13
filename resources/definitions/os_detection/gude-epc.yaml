@@ -32,3 +32,5 @@ discovery:
             - .1.3.6.1.4.1.28507.100   # Expert Power Control 8001
             - .1.3.6.1.4.1.28507.106   # Expert Power Control 1141-1
             - .1.3.6.1.4.1.28507.107   # Expert Power Control 1121-1
+            - .1.3.6.1.4.1.28507.111   # Expert Power Control 8733-00
+            - .1.3.6.1.4.1.28507.112   # Expert Power Control 8712-10

@@ -19,6 +19,8 @@ modules:
             - .1.3.6.1.4.1.28507.98.1.1.2.2.0
             - .1.3.6.1.4.1.28507.97.1.1.2.2.0
             - .1.3.6.1.4.1.28507.64.1.1.2.2.0
+            - .1.3.6.1.4.1.28507.111.1.1.2.2.0
+            - .1.3.6.1.4.1.28507.112.1.1.2.2.0
         serial:
             - .1.3.6.1.4.1.28507.43.1.1.2.5.0
             - .1.3.6.1.4.1.28507.68.1.1.2.5.0
@@ -36,6 +38,8 @@ modules:
             - .1.3.6.1.4.1.28507.98.1.1.2.5.0
             - .1.3.6.1.4.1.28507.97.1.1.2.5.0
             - .1.3.6.1.4.1.28507.64.1.1.2.5.0
+            - .1.3.6.1.4.1.28507.111.1.1.2.5.0
+            - .1.3.6.1.4.1.28507.112.1.1.2.5.0
     sensors:
         current:
             data:
@@ -165,6 +169,22 @@ modules:
                     num_oid: '.1.3.6.1.4.1.28507.64.1.5.1.2.1.5.{{ $index }}'
                     descr: '{{ GUDEADS-EPC8316-MIB::epc8316LineSensorName }} Current'
                     index: 'epc8316Current.{{ $index }}'
+                    group: 'Power Channel {{ $index }}'
+                    divisor: 1000
+                -
+                    oid: GUDEADS-EPC873300-MIB::epc873300PowerTable
+                    value: GUDEADS-EPC873300-MIB::epc873300Current
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.5.1.2.1.5.{{ $index }}'
+                    descr: '{{ GUDEADS-EPC873300-MIB::epc873300LineSensorName }} Current'
+                    index: 'epc873300Current.{{ $index }}'
+                    group: 'Power Channel {{ $index }}'
+                    divisor: 1000
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210PowerTable
+                    value: GUDEADS-EPC871210-MIB::epc871210Current
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.5.1.2.1.5.{{ $index }}'
+                    descr: '{{ GUDEADS-EPC871210-MIB::epc871210LineSensorName }} Current'
+                    index: 'epc871210Current.{{ $index }}'
                     group: 'Power Channel {{ $index }}'
                     divisor: 1000
                 -
@@ -418,6 +438,20 @@ modules:
                     index: 'epc8316Voltage.{{ $index }}'
                     group: 'Power Channel {{ $index }}'
                 -
+                    oid: GUDEADS-EPC873300-MIB::epc873300PowerTable
+                    value: GUDEADS-EPC873300-MIB::epc873300Voltage
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.5.1.2.1.6.{{ $index }}'
+                    descr: '{{ GUDEADS-EPC873300-MIB::epc873300LineSensorName }} Voltage'
+                    index: 'epc873300Voltage.{{ $index }}'
+                    group: 'Power Channel {{ $index }}'
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210PowerTable
+                    value: GUDEADS-EPC871210-MIB::epc871210Voltage
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.5.1.2.1.6.{{ $index }}'
+                    descr: '{{ GUDEADS-EPC871210-MIB::epc871210LineSensorName }} Voltage'
+                    index: 'epc871210Voltage.{{ $index }}'
+                    group: 'Power Channel {{ $index }}'
+                -
                     oid: GUDEADS-EPC1121-MIB::epc1121CPUSensorVsystem
                     num_oid: '.1.3.6.1.4.1.28507.107.1.5.14.1.{{ $index }}'
                     descr: 'CPU System Voltage'
@@ -627,6 +661,48 @@ modules:
                     index: 'epc8291CPUSensorVmain.{{ $index }}'
                     group: CPU
                     divisor: 100
+                -
+                    oid: GUDEADS-EPC873300-MIB::epc873300CPUSensorVsystem
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.5.14.1.{{ $index }}'
+                    descr: 'CPU System Voltage'
+                    index: 'epc873300CPUSensorVsystem.{{ $index }}'
+                    group: CPU
+                    divisor: 100
+                -
+                    oid: GUDEADS-EPC873300-MIB::epc873300CPUSensorVaux
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.5.14.2.{{ $index }}'
+                    descr: 'CPU Auxiliary Voltage'
+                    index: 'epc873300CPUSensorVaux.{{ $index }}'
+                    group: CPU
+                    divisor: 100
+                -
+                    oid: GUDEADS-EPC873300-MIB::epc873300CPUSensorVmain
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.5.14.3.{{ $index }}'
+                    descr: 'CPU Main Voltage'
+                    index: 'epc873300CPUSensorVmain.{{ $index }}'
+                    group: CPU
+                    divisor: 100
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210CPUSensorVsystem
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.5.14.1.{{ $index }}'
+                    descr: 'CPU System Voltage'
+                    index: 'epc871210CPUSensorVsystem.{{ $index }}'
+                    group: CPU
+                    divisor: 100
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210CPUSensorVaux
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.5.14.2.{{ $index }}'
+                    descr: 'CPU Auxiliary Voltage'
+                    index: 'epc871210CPUSensorVaux.{{ $index }}'
+                    group: CPU
+                    divisor: 100
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210CPUSensorVmain
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.5.14.3.{{ $index }}'
+                    descr: 'CPU Main Voltage'
+                    index: 'epc871210CPUSensorVmain.{{ $index }}'
+                    group: CPU
+                    divisor: 100
         frequency:
             data:
                 -
@@ -757,6 +833,22 @@ modules:
                     index: 'epc8316Frequency.{{ $index }}'
                     group: 'Power Channel {{ $index }}'
                     divisor: 100
+                -
+                    oid: GUDEADS-EPC873300-MIB::epc873300PowerTable
+                    value: GUDEADS-EPC873300-MIB::epc873300Frequency
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.5.1.2.1.7.{{ $index }}'
+                    descr: '{{ GUDEADS-EPC873300-MIB::epc873300LineSensorName }} Frequency'
+                    index: 'epc873300Frequency.{{ $index }}'
+                    group: 'Power Channel {{ $index }}'
+                    divisor: 100
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210PowerTable
+                    value: GUDEADS-EPC871210-MIB::epc871210Frequency
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.5.1.2.1.7.{{ $index }}'
+                    descr: '{{ GUDEADS-EPC871210-MIB::epc871210LineSensorName }} Frequency'
+                    index: 'epc871210Frequency.{{ $index }}'
+                    group: 'Power Channel {{ $index }}'
+                    divisor: 100
         power:
             data:
                 -
@@ -872,6 +964,20 @@ modules:
                     index: 'epc8316PowerActive.{{ $index }}'
                     group: 'Power Channel {{ $index }}'
                 -
+                    oid: GUDEADS-EPC873300-MIB::epc873300PowerTable
+                    value: GUDEADS-EPC873300-MIB::epc873300PowerActive
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.5.1.2.1.4.{{ $index }}'
+                    descr: '{{ GUDEADS-EPC873300-MIB::epc873300LineSensorName }} Active Power'
+                    index: 'epc873300PowerActive.{{ $index }}'
+                    group: 'Power Channel {{ $index }}'
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210PowerTable
+                    value: GUDEADS-EPC871210-MIB::epc871210PowerActive
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.5.1.2.1.4.{{ $index }}'
+                    descr: '{{ GUDEADS-EPC871210-MIB::epc871210LineSensorName }} Active Power'
+                    index: 'epc871210PowerActive.{{ $index }}'
+                    group: 'Power Channel {{ $index }}'
+                -
                     oid: GUDEADS-EPC1202-MIB::epc1202PowerTable
                     value: GUDEADS-EPC1202-MIB::epc1202PowerApparent
                     num_oid: '.1.3.6.1.4.1.28507.43.1.5.1.2.1.10.{{ $index }}'
@@ -982,6 +1088,20 @@ modules:
                     num_oid: '.1.3.6.1.4.1.28507.64.1.5.1.2.1.10.{{ $index }}'
                     descr: '{{ GUDEADS-EPC8316-MIB::epc8316LineSensorName }} Apparent Power'
                     index: 'epc8316PowerApparent.{{ $index }}'
+                    group: 'Power Channel {{ $index }}'
+                -
+                    oid: GUDEADS-EPC873300-MIB::epc873300PowerTable
+                    value: GUDEADS-EPC873300-MIB::epc873300PowerApparent
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.5.1.2.1.10.{{ $index }}'
+                    descr: '{{ GUDEADS-EPC873300-MIB::epc873300LineSensorName }} Apparent Power'
+                    index: 'epc873300PowerApparent.{{ $index }}'
+                    group: 'Power Channel {{ $index }}'
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210PowerTable
+                    value: GUDEADS-EPC871210-MIB::epc871210PowerApparent
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.5.1.2.1.10.{{ $index }}'
+                    descr: '{{ GUDEADS-EPC871210-MIB::epc871210LineSensorName }} Apparent Power'
+                    index: 'epc871210PowerApparent.{{ $index }}'
                     group: 'Power Channel {{ $index }}'
         power_consumed:
             data:
@@ -1113,6 +1233,22 @@ modules:
                     index: 'epc8316AbsEnergyActive.{{ $index }}'
                     group: 'Power Channel {{ $index }}'
                     divisor: 1000
+                -
+                    oid: GUDEADS-EPC873300-MIB::epc873300PowerTable
+                    value: GUDEADS-EPC873300-MIB::epc873300AbsEnergyActive
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.5.1.2.1.3.{{ $index }}'
+                    descr: '{{ GUDEADS-EPC873300-MIB::epc873300LineSensorName }} Active Energy'
+                    index: 'epc873300AbsEnergyActive.{{ $index }}'
+                    group: 'Power Channel {{ $index }}'
+                    divisor: 1000
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210PowerTable
+                    value: GUDEADS-EPC871210-MIB::epc871210AbsEnergyActive
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.5.1.2.1.3.{{ $index }}'
+                    descr: '{{ GUDEADS-EPC871210-MIB::epc871210LineSensorName }} Active Energy'
+                    index: 'epc871210AbsEnergyActive.{{ $index }}'
+                    group: 'Power Channel {{ $index }}'
+                    divisor: 1000
         power_factor:
             data:
                 -
@@ -1241,6 +1377,22 @@ modules:
                     num_oid: '.1.3.6.1.4.1.28507.64.1.5.1.2.1.8.{{ $index }}'
                     descr: '{{ GUDEADS-EPC8316-MIB::epc8316LineSensorName }} Power Factor'
                     index: 'epc8316PowerFactor.{{ $index }}'
+                    group: 'Power Channel {{ $index }}'
+                    divisor: 1000
+                -
+                    oid: GUDEADS-EPC873300-MIB::epc873300PowerTable
+                    value: GUDEADS-EPC873300-MIB::epc873300PowerFactor
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.5.1.2.1.8.{{ $index }}'
+                    descr: '{{ GUDEADS-EPC873300-MIB::epc873300LineSensorName }} Power Factor'
+                    index: 'epc873300PowerFactor.{{ $index }}'
+                    group: 'Power Channel {{ $index }}'
+                    divisor: 1000
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210PowerTable
+                    value: GUDEADS-EPC871210-MIB::epc871210PowerFactor
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.5.1.2.1.8.{{ $index }}'
+                    descr: '{{ GUDEADS-EPC871210-MIB::epc871210LineSensorName }} Power Factor'
+                    index: 'epc871210PowerFactor.{{ $index }}'
                     group: 'Power Channel {{ $index }}'
                     divisor: 1000
         temperature:
@@ -1382,6 +1534,22 @@ modules:
                     group: 'Sensor {{ $index }} ({{ GUDEADS-EPC8316-MIB::epc8316ExtSensorName }})'
                     divisor: 10
                 -
+                    oid: GUDEADS-EPC873300-MIB::epc873300SensorTable
+                    value: GUDEADS-EPC873300-MIB::epc873300TempSensor
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.6.1.1.2.{{ $index }}'
+                    descr: 'Temperature'
+                    index: 'epc873300TempSensor.{{ $index }}'
+                    group: 'Sensor {{ $index }} ({{ GUDEADS-EPC873300-MIB::epc873300ExtSensorName }})'
+                    divisor: 10
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210SensorTable
+                    value: GUDEADS-EPC871210-MIB::epc871210TempSensor
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.6.1.1.2.{{ $index }}'
+                    descr: 'Temperature'
+                    index: 'epc871210TempSensor.{{ $index }}'
+                    group: 'Sensor {{ $index }} ({{ GUDEADS-EPC871210-MIB::epc871210ExtSensorName }})'
+                    divisor: 10
+                -
                     oid: GUDEADS-EPC1202-MIB::epc1202SensorTable
                     value: GUDEADS-EPC1202-MIB::epc1202DewPoint
                     num_oid: '.1.3.6.1.4.1.28507.43.1.6.1.1.6.{{ $index }}'
@@ -1516,6 +1684,22 @@ modules:
                     descr: 'Dew Point'
                     index: 'epc8316DewPoint.{{ $index }}'
                     group: 'Sensor {{ $index }} ({{ GUDEADS-EPC8316-MIB::epc8316ExtSensorName }})'
+                    divisor: 10
+                -
+                    oid: GUDEADS-EPC873300-MIB::epc873300SensorTable
+                    value: GUDEADS-EPC873300-MIB::epc873300DewPoint
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.6.1.1.6.{{ $index }}'
+                    descr: 'Dew Point'
+                    index: 'epc873300DewPoint.{{ $index }}'
+                    group: 'Sensor {{ $index }} ({{ GUDEADS-EPC873300-MIB::epc873300ExtSensorName }})'
+                    divisor: 10
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210SensorTable
+                    value: GUDEADS-EPC871210-MIB::epc871210DewPoint
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.6.1.1.6.{{ $index }}'
+                    descr: 'Dew Point'
+                    index: 'epc871210DewPoint.{{ $index }}'
+                    group: 'Sensor {{ $index }} ({{ GUDEADS-EPC871210-MIB::epc871210ExtSensorName }})'
                     divisor: 10
                 -
                     oid: GUDEADS-EPC1202-MIB::epc1202SensorTable
@@ -1654,6 +1838,22 @@ modules:
                     group: 'Sensor {{ $index }} ({{ GUDEADS-EPC8316-MIB::epc8316ExtSensorName }})'
                     divisor: 10
                 -
+                    oid: GUDEADS-EPC873300-MIB::epc873300SensorTable
+                    value: GUDEADS-EPC873300-MIB::epc873300DewPointDiff
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.6.1.1.7.{{ $index }}'
+                    descr: 'Dew Diff'
+                    index: 'epc873300DewPointDiff.{{ $index }}'
+                    group: 'Sensor {{ $index }} ({{ GUDEADS-EPC873300-MIB::epc873300ExtSensorName }})'
+                    divisor: 10
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210SensorTable
+                    value: GUDEADS-EPC871210-MIB::epc871210DewPointDiff
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.6.1.1.7.{{ $index }}'
+                    descr: 'Dew Diff'
+                    index: 'epc871210DewPointDiff.{{ $index }}'
+                    group: 'Sensor {{ $index }} ({{ GUDEADS-EPC871210-MIB::epc871210ExtSensorName }})'
+                    divisor: 10
+                -
                     oid: GUDEADS-EPC8001-MIB::epc8001CPUSensorTcpu
                     num_oid: '.1.3.6.1.4.1.28507.100.1.5.14.4.{{ $index }}'
                     descr: 'CPU Temperature'
@@ -1707,6 +1907,20 @@ modules:
                     num_oid: '.1.3.6.1.4.1.28507.98.1.5.14.4.{{ $index }}'
                     descr: 'CPU Temperature'
                     index: 'epc8291CPUSensorTcpu.{{ $index }}'
+                    group: CPU
+                    divisor: 10
+                -
+                    oid: GUDEADS-EPC873300-MIB::epc873300CPUSensorTcpu
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.5.14.4.{{ $index }}'
+                    descr: 'CPU Temperature'
+                    index: 'epc873300CPUSensorTcpu.{{ $index }}'
+                    group: CPU
+                    divisor: 10
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210CPUSensorTcpu
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.5.14.4.{{ $index }}'
+                    descr: 'CPU Temperature'
+                    index: 'epc871210CPUSensorTcpu.{{ $index }}'
                     group: CPU
                     divisor: 10
         humidity:
@@ -1847,6 +2061,22 @@ modules:
                     index: 'epc8316HygroSensor.{{ $index }}'
                     group: 'Sensor {{ $index }} ({{ GUDEADS-EPC8316-MIB::epc8316ExtSensorName }})'
                     divisor: 10
+                -
+                    oid: GUDEADS-EPC873300-MIB::epc873300SensorTable
+                    value: GUDEADS-EPC873300-MIB::epc873300HygroSensor
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.6.1.1.3.{{ $index }}'
+                    descr: 'Humidity'
+                    index: 'epc873300HygroSensor.{{ $index }}'
+                    group: 'Sensor {{ $index }} ({{ GUDEADS-EPC873300-MIB::epc873300ExtSensorName }})'
+                    divisor: 10
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210SensorTable
+                    value: GUDEADS-EPC871210-MIB::epc871210HygroSensor
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.6.1.1.3.{{ $index }}'
+                    descr: 'Humidity'
+                    index: 'epc871210HygroSensor.{{ $index }}'
+                    group: 'Sensor {{ $index }} ({{ GUDEADS-EPC871210-MIB::epc871210ExtSensorName }})'
+                    divisor: 10
         pressure:
             data:
                 -
@@ -1984,6 +2214,22 @@ modules:
                     descr: 'Pressure'
                     index: 'epc8316AirPressure.{{ $index }}'
                     group: 'Sensor {{ $index }} ({{ GUDEADS-EPC8316-MIB::epc8316ExtSensorName }})'
+                    divisor: 10
+                -
+                    oid: GUDEADS-EPC873300-MIB::epc873300SensorTable
+                    value: GUDEADS-EPC873300-MIB::epc873300AirPressure
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.6.1.1.5.{{ $index }}'
+                    descr: 'Pressure'
+                    index: 'epc873300AirPressure.{{ $index }}'
+                    group: 'Sensor {{ $index }} ({{ GUDEADS-EPC873300-MIB::epc873300ExtSensorName }})'
+                    divisor: 10
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210SensorTable
+                    value: GUDEADS-EPC871210-MIB::epc871210AirPressure
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.6.1.1.5.{{ $index }}'
+                    descr: 'Pressure'
+                    index: 'epc871210AirPressure.{{ $index }}'
+                    group: 'Sensor {{ $index }} ({{ GUDEADS-EPC871210-MIB::epc871210ExtSensorName }})'
                     divisor: 10
         state:
             data:
@@ -2160,6 +2406,28 @@ modules:
                     index: 'epc8316ChanStatus.{{ $index }}'
                     group: 'Power Channel {{ $index }}'
                     state_name: epc8316ChanStatus
+                    states:
+                        - { descr: inactive, value: 0, generic: 2 }
+                        - { descr: valid, value: 1, generic: 0 }
+                -
+                    oid: GUDEADS-EPC873300-MIB::epc873300PowerTable
+                    value: GUDEADS-EPC873300-MIB::epc873300ChanStatus
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.5.1.2.1.2.{{ $index }}'
+                    descr: '{{ GUDEADS-EPC873300-MIB::epc873300LineSensorName }} Status'
+                    index: 'epc873300ChanStatus.{{ $index }}'
+                    group: 'Power Channel {{ $index }}'
+                    state_name: epc873300ChanStatus
+                    states:
+                        - { descr: inactive, value: 0, generic: 2 }
+                        - { descr: valid, value: 1, generic: 0 }
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210PowerTable
+                    value: GUDEADS-EPC871210-MIB::epc871210ChanStatus
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.5.1.2.1.2.{{ $index }}'
+                    descr: '{{ GUDEADS-EPC871210-MIB::epc871210LineSensorName }} Status'
+                    index: 'epc871210ChanStatus.{{ $index }}'
+                    group: 'Power Channel {{ $index }}'
+                    state_name: epc871210ChanStatus
                     states:
                         - { descr: inactive, value: 0, generic: 2 }
                         - { descr: valid, value: 1, generic: 0 }
@@ -2351,6 +2619,28 @@ modules:
                         - { descr: Off, value: 0, generic: 1 }
                         - { descr: On, value: 1, generic: 0 }
                 -
+                    oid: GUDEADS-EPC873300-MIB::epc873300portTable
+                    value: GUDEADS-EPC873300-MIB::epc873300PortState
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.3.1.2.1.3.{{ $index }}'
+                    descr: 'Relay'
+                    index: 'epc873300PortState.{{ $index }}'
+                    group: 'Output {{ $index }} ({{ GUDEADS-EPC873300-MIB::epc873300PortName }})'
+                    state_name: epc873300PortState
+                    states:
+                        - { descr: Off, value: 0, generic: 1 }
+                        - { descr: On, value: 1, generic: 0 }
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210portTable
+                    value: GUDEADS-EPC871210-MIB::epc871210PortState
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.3.1.2.1.3.{{ $index }}'
+                    descr: 'Relay'
+                    index: 'epc871210PortState.{{ $index }}'
+                    group: 'Output {{ $index }} ({{ GUDEADS-EPC871210-MIB::epc871210PortName }})'
+                    state_name: epc871210PortState
+                    states:
+                        - { descr: Off, value: 0, generic: 1 }
+                        - { descr: On, value: 1, generic: 0 }
+                -
                     oid: GUDEADS-EPC1202-MIB::epc1202OVPTable
                     value: GUDEADS-EPC1202-MIB::epc1202OVPStatus
                     num_oid: '.1.3.6.1.4.1.28507.43.1.5.2.1.2.{{ $index }}'
@@ -2490,6 +2780,18 @@ modules:
                     index: 'epc8291OVPStatus.{{ $index }}'
                     group: OVP
                     state_name: epc8291OVPStatus
+                    states:
+                        - { descr: failure, value: 0, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
+                        - { descr: unknown, value: 2, generic: 3 }
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210OVPTable
+                    value: GUDEADS-EPC871210-MIB::epc871210OVPStatus
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.5.2.1.2.{{ $index }}'
+                    descr: 'Overvoltage Protection'
+                    index: 'epc871210OVPStatus.{{ $index }}'
+                    group: OVP
+                    state_name: epc871210OVPStatus
                     states:
                         - { descr: failure, value: 0, generic: 2 }
                         - { descr: ok, value: 1, generic: 0 }
@@ -2661,6 +2963,26 @@ modules:
                     index: 'epc8316NTPTimeValid.{{ $index }}'
                     group: NTP
                     state_name: epc8316NTPTimeValid
+                    states:
+                        - { descr: no time, value: 0, generic: 2 }
+                        - { descr: valid, value: 1, generic: 0 }
+                -
+                    oid: GUDEADS-EPC873300-MIB::epc873300NTPTimeValid
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.5.15.1.{{ $index }}'
+                    descr: 'NTP Time'
+                    index: 'epc873300NTPTimeValid.{{ $index }}'
+                    group: NTP
+                    state_name: epc873300NTPTimeValid
+                    states:
+                        - { descr: no time, value: 0, generic: 2 }
+                        - { descr: valid, value: 1, generic: 0 }
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210NTPTimeValid
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.5.15.1.{{ $index }}'
+                    descr: 'NTP Time'
+                    index: 'epc871210NTPTimeValid.{{ $index }}'
+                    group: NTP
+                    state_name: epc871210NTPTimeValid
                     states:
                         - { descr: no time, value: 0, generic: 2 }
                         - { descr: valid, value: 1, generic: 0 }
@@ -2918,6 +3240,28 @@ modules:
                         - { descr: Low, value: 0, generic: 1 }
                         - { descr: High, value: 1, generic: 0 }
                 -
+                    oid: GUDEADS-EPC873300-MIB::epc873300ExtInputTable
+                    value: GUDEADS-EPC873300-MIB::epc873300ExtInput
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.6.2.2.1.2.{{ $index }}'
+                    descr: 'Logical state'
+                    index: 'epc873300ExtInput.{{ $index }}'
+                    group: 'Input {{ $index }} ({{ GUDEADS-EPC873300-MIB::epc873300ExtInputName }})'
+                    state_name: epc873300ExtInput
+                    states:
+                        - { descr: Low, value: 0, generic: 1 }
+                        - { descr: High, value: 1, generic: 0 }
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210ExtInputTable
+                    value: GUDEADS-EPC871210-MIB::epc871210ExtInput
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.6.2.2.1.2.{{ $index }}'
+                    descr: 'Logical state'
+                    index: 'epc871210ExtInput.{{ $index }}'
+                    group: 'Input {{ $index }} ({{ GUDEADS-EPC871210-MIB::epc871210ExtInputName }})'
+                    state_name: epc871210ExtInput
+                    states:
+                        - { descr: Low, value: 0, generic: 1 }
+                        - { descr: High, value: 1, generic: 0 }
+                -
                     oid: GUDEADS-EPC8021-MIB::epc8021RCMBInfoTable
                     value: GUDEADS-EPC8021-MIB::epc8021RCMBOutputRMS
                     num_oid: '.1.3.6.1.4.1.28507.77.1.5.16.1.4.{{ $index }}'
@@ -3149,6 +3493,20 @@ modules:
                     index: 'epc8316PortSwitchCount.{{ $index }}'
                     group: Relay
                 -
+                    oid: GUDEADS-EPC873300-MIB::epc873300portTable
+                    value: GUDEADS-EPC873300-MIB::epc873300PortSwitchCount
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.3.1.2.1.4.{{ $index }}'
+                    descr: 'Toggle count {{ GUDEADS-EPC873300-MIB::epc873300PortName }}'
+                    index: 'epc873300PortSwitchCount.{{ $index }}'
+                    group: Relay
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210portTable
+                    value: GUDEADS-EPC871210-MIB::epc871210PortSwitchCount
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.3.1.2.1.4.{{ $index }}'
+                    descr: 'Toggle count {{ GUDEADS-EPC871210-MIB::epc871210PortName }}'
+                    index: 'epc871210PortSwitchCount.{{ $index }}'
+                    group: Relay
+                -
                     oid: GUDEADS-EPC1202-MIB::epc1202ExtInputTable
                     value: GUDEADS-EPC1202-MIB::epc1202ExtInputToggleCount
                     num_oid: '.1.3.6.1.4.1.28507.43.1.6.2.2.1.3.{{ $index }}'
@@ -3252,4 +3610,18 @@ modules:
                     num_oid: '.1.3.6.1.4.1.28507.64.1.6.2.2.1.3.{{ $index }}'
                     descr: 'Toggle count {{ GUDEADS-EPC8316-MIB::epc8316ExtInputName }}'
                     index: 'epc8316ExtInputToggleCount.{{ $index }}'
+                    group: Input
+                -
+                    oid: GUDEADS-EPC873300-MIB::epc873300ExtInputTable
+                    value: GUDEADS-EPC873300-MIB::epc873300ExtInputToggleCount
+                    num_oid: '.1.3.6.1.4.1.28507.111.1.6.2.2.1.3.{{ $index }}'
+                    descr: 'Toggle count {{ GUDEADS-EPC873300-MIB::epc873300ExtInputName }}'
+                    index: 'epc873300ExtInputToggleCount.{{ $index }}'
+                    group: Input
+                -
+                    oid: GUDEADS-EPC871210-MIB::epc871210ExtInputTable
+                    value: GUDEADS-EPC871210-MIB::epc871210ExtInputToggleCount
+                    num_oid: '.1.3.6.1.4.1.28507.112.1.6.2.2.1.3.{{ $index }}'
+                    descr: 'Toggle count {{ GUDEADS-EPC871210-MIB::epc871210ExtInputName }}'
+                    index: 'epc871210ExtInputToggleCount.{{ $index }}'
                     group: Input
