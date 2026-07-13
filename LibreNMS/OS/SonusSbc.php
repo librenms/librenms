@@ -47,7 +47,7 @@ class SonusSbc extends OS implements ProcessorDiscovery
     {
         $deviceModel = Device::find($this->getDeviceId());
         $mempools = new Collection();
-        $mempools_array = SnmpQuery::device($deviceModel)->walk('SONUS-SMI::sonusMgmt.8.5.1.19.1.2')->values();
+        $mempools_array = SnmpQuery::device($deviceModel)->walk('.1.3.6.1.4.1.2879.2.8.5.1.19.1.2')->values();
         $size = 100;
 
         foreach (Arr::wrap($mempools_array) as $index => $entry) {
