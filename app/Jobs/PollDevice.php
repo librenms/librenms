@@ -6,6 +6,7 @@ use App\Actions\Device\CheckDeviceAvailability;
 use App\Events\DevicePolled;
 use App\Events\PollingDevice;
 use App\Facades\LibrenmsConfig;
+use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
@@ -185,7 +186,7 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
 
     private function initRrdDirectory(): void
     {
-        $host_rrd = \Rrd::name($this->device->hostname, '', '');
+        $host_rrd = Rrd::dirFromHost($this->device->hostname);
         if (LibrenmsConfig::get('rrd.enable', true) && ! is_dir($host_rrd)) {
             try {
                 mkdir($host_rrd);

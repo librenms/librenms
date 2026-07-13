@@ -19,7 +19,6 @@
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
@@ -209,59 +208,6 @@ function c_echo($string, $enabled = true)
     } else {
         echo preg_replace('/%((%)|.)/', '', $string);
     }
-}
-
-/*
- * @return true if client IP address is authorized to access graphs
- */
-function is_client_authorized($clientip)
-{
-    if (LibrenmsConfig::get('allow_unauth_graphs', false)) {
-        d_echo("Unauthorized graphs allowed\n");
-
-        return true;
-    }
-
-    foreach (LibrenmsConfig::get('allow_unauth_graphs_cidr', []) as $range) {
-        try {
-            if (IP::parse($clientip)->inNetwork($range)) {
-                d_echo("Unauthorized graphs allowed from $range\n");
-
-                return true;
-            }
-        } catch (InvalidIpException) {
-            d_echo("Client IP ($clientip) is invalid.\n");
-        }
-    }
-
-    return false;
-} // is_client_authorized
-
-/*
- * @return an array of all graph subtypes for the given type
- */
-function get_graph_subtypes(string $type): array
-{
-    $dir = base_path('includes/html/graphs/' . basename($type));
-
-    if (! is_dir($dir)) {
-        return [];
-    }
-
-    $types = [];
-
-    foreach (new DirectoryIterator($dir) as $file) {
-        if ($file->isFile() && str_ends_with($file->getFilename(), '.inc.php')) {
-            $name = $file->getBasename('.inc.php');
-            if ($name !== 'auth') {
-                $types[] = $name;
-            }
-        }
-    }
-
-    sort($types);
-
-    return $types;
 }
 
 function generate_smokeping_file($device, $file = '')
