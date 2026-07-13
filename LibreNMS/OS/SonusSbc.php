@@ -101,7 +101,7 @@ class SonusSbc extends OS implements ProcessorDiscovery
             $processors[] = Processor::discover(
                 $processor_type,
                 $this->getDeviceId(),
-                $proc_oid . ".14." . $device_ascii,
+                $proc_oid . '.14.' . $device_ascii,
                 $device_text,
                 $processor_descr,
                 1,
