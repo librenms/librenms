@@ -67,7 +67,7 @@ class SonusSbc extends OS implements ProcessorDiscovery
                     'mempool_type' => 'sonus-sbc',
                     'mempool_class' => 'system',
                     'mempool_descr' => 'Memory Utilization - ' . $device_text,
-                    'mempool_perc_oid' => ".1.3.6.1.4.1.2879.2.8.5.1.19.1.2.$index",
+                    'mempool_perc_oid' => ".1.3.6.1.4.1.2879.2.8.5.1.19.1.2." . '.14.' . $device_ascii[1],
                     'mempool_perc_warn' => 90,
                 ]))->fillUsage(null, $size, null, $percent_used));
             }
