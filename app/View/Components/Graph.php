@@ -4,6 +4,7 @@ namespace App\View\Components;
 
 use App\Models\Device;
 use App\Models\Port;
+use Illuminate\Support\Arr;
 use Illuminate\View\Component;
 
 class Graph extends Component
@@ -136,7 +137,7 @@ class Graph extends Component
 
     private function getSrc(): string
     {
-        return url('graph.php') . '?' . http_build_query($this->vars + [
+        return route('graph', [
             'type' => $this->type,
             'legend' => $this->legend,
             'absolute_size' => $this->absolute_size,
@@ -144,17 +145,19 @@ class Graph extends Component
             'height' => $this->height,
             'from' => $this->from,
             'to' => $this->to,
+            ...$this->vars,
         ]);
     }
 
     private function getLink(): string
     {
         return match ($this->link) {
-            true => url('graphs') . '/' . http_build_query($this->vars + [
+            true => route('graphs', [
                 'type' => $this->type,
                 'from' => $this->from,
                 'to' => $this->to,
-            ], '', '/'),
+                ...Arr::except($this->vars, ['width', 'height']),
+            ]),
             false => '',
             default => $this->link,
         };
