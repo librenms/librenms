@@ -46,6 +46,7 @@ class SonusSbc extends OS implements ProcessorDiscovery
     public function discoverMempools()
     {
         $deviceModel = Device::find($this->getDeviceId());
+        /** @var Collection<int, Mempool> $mempools */
         $mempools = new Collection();
         $mempools_array = SnmpQuery::device($deviceModel)->walk('.1.3.6.1.4.1.2879.2.8.5.1.19.1.2')->values();
         $size = 100;
@@ -73,15 +74,18 @@ class SonusSbc extends OS implements ProcessorDiscovery
             }
         }
 
-        return collect([$mempools]);
+        return $mempools;
     }
-
+    /**
+    * @return array<int, Processor>
+    */
     public function discoverProcessors()
     {
         $deviceModel = Device::find($this->getDeviceId());
         $proc_oid = '1.3.6.1.4.1.2879.2.8.5.1.17.1.3';
 
         $data = SnmpQuery::device($deviceModel)->walk($proc_oid)->values();
+        /** @var array<int, Processor> $processors */    
         $processors = [];
 
         foreach ($data as $oid => $value) {
