@@ -43,6 +43,9 @@ class SonusSbc extends OS implements ProcessorDiscovery
         $this->discoverMempools();
     }
 
+    /**
+     * @return Collection<int, Mempool>
+     */
     public function discoverMempools()
     {
         $deviceModel = Device::find($this->getDeviceId());
