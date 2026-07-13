@@ -8,7 +8,7 @@ if (! empty($agent_data['app'][$name])) {
     $ceph_data = $agent_data['app'][$name];
 } else {
     $ceph_data = SnmpQuery::get('NET-SNMP-EXTEND-MIB::nsExtendOutputFull."' . $name . '"')->value();
-    $ceph_data = preg_replace('/^.+\n/', '', $ceph_data);
+    $ceph_data = preg_replace('/^.+\n/', '', (string) $ceph_data);
     $ceph_data = str_replace("<<<app-ceph>>>\n", '', $ceph_data);
 }
 
