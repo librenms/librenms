@@ -20,6 +20,9 @@ export default function popup(url = "", options = {}) {
                     this.popperInstance = new Popper(this.$refs.targetRef, this.$refs.popupRef, {
                         placement: options.placement || 'bottom',
                         modifiers: {
+                            offset: {
+                                offset: '0, 8'
+                            },
                             preventOverflow: {
                                 boundariesElement: 'viewport'
                             }
