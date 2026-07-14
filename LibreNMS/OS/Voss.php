@@ -75,7 +75,7 @@ class Voss extends Shared\Extreme implements IsIsDiscovery, IsIsPolling
                         continue; // Do not poll passive interfaces and bad data
                     }
                     $neigh_sys_id = $this->formatIsIsId(
-                    $adjacency_data['ISIS-MIB-LEGACY::isisISAdjNeighSysID'] ?? ''
+                        $adjacency_data['ISIS-MIB-LEGACY::isisISAdjNeighSysID'] ?? ''
                     );
                     $neigh_name = $isis_hostnames[$neigh_sys_id] ?? '';
                     dump($isis_hostnames);
