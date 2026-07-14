@@ -20,8 +20,8 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-$asn = htmlspecialchars((int) $vars['asn'] ?? '');
-$ixid = htmlspecialchars((int) $vars['ixid'] ?? '');
+$asn = htmlspecialchars((string) ((int) $vars['asn'] ?? ''));
+$ixid = htmlspecialchars((string) ((int) $vars['ixid'] ?? ''));
 $status = htmlspecialchars((string) $vars['status'] ?? '');
 
 ?>
