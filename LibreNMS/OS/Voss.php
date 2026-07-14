@@ -151,7 +151,7 @@ class Voss extends Shared\Extreme implements IsIsDiscovery, IsIsPolling {
                 continue;
             }
             preg_match_all('/\d+/', (string) $oid, $matches);
-            $numbers = array_map('intval', $matches[0]);
+            $numbers = array_map(intval(...), $matches[0]);
             if (count($numbers) < 10) {
                 continue;
             }
