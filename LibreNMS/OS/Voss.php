@@ -136,7 +136,6 @@ class Voss extends Shared\Extreme implements IsIsDiscovery, IsIsPolling
         return str_replace(' ', '.', trim($raw));
     }
 
-
     // Need to get hostnames for adjacent neighbor from isisLSPTLVValue as they aren't exposed elsewhere
     protected function parseIsisLspHostnames(array $tlvs): array
     {
