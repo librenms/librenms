@@ -40,6 +40,20 @@ class GraphsPageControllerTest extends TestCase
         $this->assertNoPhpWarningOutput($response->getContent());
     }
 
+    public function testGraphPageIgnoresWidthAndHeightFromUrlInput(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'graph-device.example.com']);
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs?device={$device->device_id}&type=device_poller_perf&width=2000&height=1000");
+
+        $response->assertOk();
+        $response->assertDontSee('width=2000');
+        $response->assertDontSee('height=1000');
+        $response->assertSee('width=1075');
+        $response->assertSee('height=300');
+    }
+
     public function testDateSelectorUsesSelectedRange(): void
     {
         $device = Device::factory()->create();
