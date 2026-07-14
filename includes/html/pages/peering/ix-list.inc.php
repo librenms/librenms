@@ -20,7 +20,7 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-$asn = $vars['bgpLocalAs'];
+$asn = htmlspecialchars((string) $vars['bgpLocalAs']);
 
 ?>
 <div class="row">
