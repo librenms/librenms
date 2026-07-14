@@ -31,11 +31,10 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Discovery\IsIsDiscovery;
 use LibreNMS\Interfaces\Polling\IsIsPolling;
-use LibreNMS\Interfaces\Polling\OSPolling;
-use LibreNMS\Util\IP;
 use SnmpQuery;
 
-class Voss extends Shared\Extreme implements IsIsDiscovery, IsIsPolling {
+class Voss extends Shared\Extreme implements IsIsDiscovery, IsIsPolling 
+{
 use SyncsModels;
     /**
      * Array of shortened ISIS codes
@@ -68,7 +67,7 @@ use SyncsModels;
             $isis_hostnames = $this->parseIsisLspHostnames($lsp_tlvs);
             foreach ($adjacencies_data as $circuit_index => $adjacency_list) {
                 foreach ($adjacency_list as $adjacency_index => $adjacency_data) {
-                if (empty($circuits[$circuit_index]['ISIS-MIB-LEGACY::isisCircIfIndex'])) {
+                    if (empty($circuits[$circuit_index]['ISIS-MIB-LEGACY::isisCircIfIndex'])) {
                         continue;
                     }
 
@@ -138,11 +137,11 @@ use SyncsModels;
     }
 
     
- // Need to get hostnames for adjacent neighbor from isisLSPTLVValue as they aren't exposed elsewhere
+     // Need to get hostnames for adjacent neighbor from isisLSPTLVValue as they aren't exposed elsewhere
     protected function parseIsisLspHostnames(array $tlvs): array
-   {
+    {
         $hostnames = [];
-            foreach ($tlvs as $oid => $value) {
+          foreach ($tlvs as $oid => $value) {
             $value = trim((string) $value, " \t\n\r\0\x0B\"");
             if ($value === '') {
                 continue;
