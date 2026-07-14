@@ -15,6 +15,14 @@
     "notes": "Device may responds on ICMP but not on SNMP."
   },
   {
+    "name": "ICMP Latency Abnormally High",
+    "builder": {"condition":"AND","rules":[{"id":"macros.ping_rtt_variance_perc","field":"macros.ping_rtt_variance_perc","type":"integer","input":"text","operator":"greater","value":"50"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "ICMP Packet Loss Abnormally High",
+    "builder": {"condition":"AND","rules":[{"id":"macros.ping_loss_variance_perc","field":"macros.ping_loss_variance_perc","type":"integer","input":"text","operator":"greater","value":"20"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
     "builder": {"condition":"AND","rules":[{"id":"devices.mtu_status","field":"devices.mtu_status","type":"integer","input":"text","operator":"equal","value":"0"}],"valid":true},
     "name": "Device MTU issues",
     "notes": "Device is online but large packets are failing."
