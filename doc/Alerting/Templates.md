@@ -19,6 +19,11 @@ Alert templates are based on Laravel Blade. We will cover some of
 the basics here, however the official Laravel docs will have more
 information [here](https://laravel.com/docs/blade).
 
+!!! warning
+    Laravel blade allows the use of @php which can be used to read/write files locally,
+    run database queries and more. If you don't trust your users then don't provide
+    access to create or edit Templates.
+
 ## Syntax
 
 Controls:
