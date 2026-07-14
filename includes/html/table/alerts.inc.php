@@ -184,7 +184,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         if (! preg_match('#^https?://#', (string) $proc)) {
             $has_proc = '';
         } else {
-            $has_proc = '<a href="' . htmlspecialchars($proc) . '" target="_blank"><button type="button" class="btn btn-info fa fa-external-link" aria-hidden="true"></button></a>';
+            $has_proc = '<a href="' . htmlspecialchars((string) $proc) . '" target="_blank"><button type="button" class="btn btn-info fa fa-external-link" aria-hidden="true"></button></a>';
         }
     }
 
