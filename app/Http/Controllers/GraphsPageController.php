@@ -28,8 +28,8 @@ class GraphsPageController extends Controller
         [$subtypeOptions, $subtypeSelected] = $this->subtypeNavigationOptions($request);
 
         ['width' => $graphWidth, 'height' => $graphHeight, 'thumbWidth' => $thumbWidth] = $this->graphDimensions($request);
-        $width = max(10, $request->integer('width') ?: $graphWidth);
-        $height = max(10, $request->integer('height') ?: $graphHeight);
+        $width = $graphWidth;
+        $height = $graphHeight;
         $mainGraphVars = $request->toVars(['height' => $height, 'width' => $width]);
 
         return view('graphs.show', [
@@ -100,12 +100,12 @@ class GraphsPageController extends Controller
         $currentDuration = ($to ?: $now) - $from;
         $periodThumbs = [];
 
-        foreach (LibrenmsConfig::get('graphs.row.normal') as $period) {
+        foreach (LibrenmsConfig::get('graphs.row.normal') as $period => $text) {
             $periodFrom = (int) LibrenmsConfig::get("time.$period");
             $periodDuration = $now - $periodFrom;
             $periodThumbs[] = [
                 'text' => __("settings.settings.graphs.row.normal.options.$period"),
-                'active' => ! $to && $periodDuration > 0 && abs($currentDuration - $periodDuration) <= 5,
+                'active' => ! $to && $periodDuration > 0 && abs($currentDuration - $periodDuration) <= 0.05 * $periodDuration,
                 'link' => $this->graphUrl($request, ['from' => Time::toRelativeOffset($periodDuration), 'to' => null]),
                 'vars' => $request->toVars([
                     'height' => '90',
@@ -266,7 +266,7 @@ class GraphsPageController extends Controller
     private function graphUrl(GraphsPageRequest $request, array $changes = []): string
     {
         $params = array_merge(
-            $request->except(['page', 'username', 'password']),
+            $request->except(['page', 'username', 'password', 'width', 'height']),
             $changes
         );
 

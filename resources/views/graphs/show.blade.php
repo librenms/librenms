@@ -41,6 +41,7 @@
                  src="{{ route('graph', $thumb['vars']) }}"
                  width="{{ $thumb['vars']['width'] }}"
                  height="{{ $thumb['vars']['height'] }}"
+                 fetchpriority="low"
                  @config('enable_lazy_load') loading="lazy" @endconfig />
         </a>
     @endforeach
@@ -61,11 +62,11 @@
 
 <div class="tw:w-full tw:mt-4">
 @if ($isDynamicGraph)
-    <img class="graph graph-image img-responsive tw:w-full tw:h-auto tw:border-0" data-src-template="{{ $dynamicGraphSrcTemplate }}" />
+    <img class="graph graph-image img-responsive tw:w-full tw:h-auto tw:border-0" data-src-template="{{ $dynamicGraphSrcTemplate }}" fetchpriority="high" />
 @else
     <img class="graph-image img-responsive tw:w-full tw:h-auto tw:border-0"
          src="{{ route('graph', $mainGraphVars) }}"
-         @config('enable_lazy_load') loading="lazy" @endconfig />
+         fetchpriority="high" />
 @endif
 </div>
 
@@ -112,7 +113,7 @@
                     q(item).rrdGraphPng({
                         canvasPadding: 120,
                         initialStart: {{ is_numeric($mainGraphVars['from']) ? $mainGraphVars['from'] : '(new Date()).getTime() / 1000 - 24*3600' }},
-                        initialRange: {{ is_numeric($mainGraphVars['to']) ? $mainGraphVars['to'] - $mainGraphVars['from'] : '24*3600' }}
+                        initialRange: {{ isset($mainGraphVars['to']) ? $mainGraphVars['to'] - $mainGraphVars['from'] : time() - $mainGraphVars['from'] }}
                     })
                 );
             });

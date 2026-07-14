@@ -74,7 +74,7 @@
             <a target="_blank" href="https://community.librenms.org/c/help">{{ __('Bug tracker') }}</a> |
             <a target="_blank" href="https://www.librenms.org/shop">{{ __('Merch Shop') }}</a> |
             <a target="_blank" href="https://community.librenms.org">{{ __('Community Forum') }}</a> |
-            <a target="_blank" href="https://twitter.com/librenms">{{ __('Twitter') }}</a> |
+            <a target="_blank" href="https://x.com/librenms">{{ __('Twitter/X') }}</a> |
             <a target="_blank" href="https://www.linkedin.com/company/librenms">{{ __('LinkedIn') }}</a> |
             <a target="_blank" href="https://www.librenms.org/changelog.html">{{ __('Changelog') }}</a> |
             <a href="#" data-toggle="modal" data-target="#git_log">{{ __('Local git log') }}</a>
@@ -163,8 +163,8 @@
                 <td class='text-right'>{{ $stat_entphys }}</td>
             </tr>
             <tr>
-                <td><i class='fa fa-fw fa-clone fa-lg icon-theme' aria-hidden='true'></i> <b>{{ __('Syslog Entries') }}</b></td>
-                <td class='text-right'>{{ $stat_syslog }}</td>
+                <td><i class='fa fa-fw fa-clone fa-lg icon-theme' aria-hidden='true'></i> <b>{{ __('Alert Log Entries') }}</b></td>
+                <td class='text-right'>{{ $stat_alertlogs }}</td>
                 <td><i class='fa fa-fw fa-bookmark fa-lg icon-theme' aria-hidden='true'></i> <b>{{ __('Eventlog Entries') }}</b></td>
                 <td class='text-right'>{{ $stat_events }}</td>
             </tr>
