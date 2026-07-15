@@ -2146,6 +2146,10 @@ return [
             'description' => 'Discovery Frequency',
             'help' => 'How often to run device discovery. Sets the default value for all nodes. Default is 4 times a day.',
         ],
+        'service_discovery_known_ports' => [
+            'description' => 'Discovery Known Ports',
+            'help' => 'List of ports and service to add as service when discovered on a device.'
+        ],
         'service_services_workers' => [
             'description' => 'Services Workers',
             'help' => 'Amount of services workers. Sets the default value for all nodes.',

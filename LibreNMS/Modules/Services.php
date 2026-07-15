@@ -79,15 +79,7 @@ class Services implements Module
             return;
         }
 
-        // FIXME: use /etc/services?
-        $known_services = [
-            22 => 'ssh',
-            25 => 'smtp',
-            53 => 'dns',
-            80 => 'http',
-            110 => 'pop',
-            143 => 'imap',
-        ];
+        $known_services = LibrenmsConfig::get('service_discovery_known_ports');
 
         // Only lookup services listening on 0.0.0.0
         SnmpQuery::enumStrings()->hideMib()->walk('TCP-MIB::tcpConnState.0.0.0.0')->mapTable(function ($tcpConnState, $tcpConnLocalAddress, $tcpConnLocalPort, $tcpConnRemAddress, $tcpConnRemPort) use ($device, $known_services) {

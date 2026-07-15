@@ -114,6 +114,24 @@
                     {
                         "properties": {
                             "type": {
+                                "const": "key-value-map"
+                            },
+                            "options": {
+                                "type": "object",
+                                "properties": {
+                                    "keyPlaceholder": {
+                                        "type": "string"
+                                    },
+                                    "valuePlaceholder": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "properties": {
+                            "type": {
                                 "type": "string",
                                 "enum": [
                                     "integer",

@@ -6781,6 +6781,28 @@
             "type": "integer",
             "units": "Seconds"
         },
+        "service_discovery_known_ports": {
+            "default": {
+                "22": "ssh",
+                "25": "smtp",
+                "53": "dns",
+                "80": "http",
+                "110": "pop",
+                "143": "imap"
+            },
+            "group": "poller",
+            "section": "dispatcherservice",
+            "order": 12,
+            "type": "key-value-map",
+            "options": {
+                "keyPlaceholder": "Port",
+                "valuePlaceholder": "Service"
+            },
+            "validate": {
+                "value": "array",
+                "value.*": "string"
+            }
+        },
         "service_services_workers": {
             "default": 8,
             "group": "poller",
