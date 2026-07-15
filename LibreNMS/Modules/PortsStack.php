@@ -35,6 +35,7 @@ use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 
 class PortsStack implements Module
@@ -52,17 +53,17 @@ class PortsStack implements Module
     /**
      * @inheritDoc
      */
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
      * @inheritDoc
      */
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return false;
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
@@ -123,7 +124,7 @@ class PortsStack implements Module
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
-        // no polling
+        $this->discover($os);
     }
 
     public function dataExists(Device $device): bool
@@ -144,10 +145,6 @@ class PortsStack implements Module
      */
     public function dump(Device $device, string $type): ?array
     {
-        if ($type == 'poller') {
-            return null;
-        }
-
         return [
             'ports_stack' => $device->portsStack()
                 ->orderBy('high_ifIndex')->orderBy('low_ifIndex')

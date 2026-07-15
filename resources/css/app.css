@@ -67,7 +67,7 @@
 }
 
 .overview-panel {
-  @apply tw:rounded-xl tw:overflow-hidden tw:border tw:border-gray-300 tw:shadow-sm tw:dark:border-dark-gray-200;
+  @apply tw:rounded-xl tw:border tw:border-gray-300 tw:shadow-sm tw:dark:border-dark-gray-200;
 }
 
 .lnms-btn {
@@ -108,4 +108,12 @@
 
 .lnms-btn-primary .lnms-btn-badge {
   @apply tw:bg-white tw:text-[#337ab7];
+}
+
+.lnms-btn-warning {
+  @apply tw:bg-[#f0ad4e] tw:hover:bg-[#ec971f] tw:text-white!;
+}
+
+.lnms-btn-warning .lnms-btn-badge {
+  @apply tw:bg-white tw:text-[#f0ad4e];
 }
