@@ -80,14 +80,13 @@ export default {
                 this.newItemValue = "";
                 this.$emit('input', this.localList)
             },
-            removeItem(index) {
-                console.log(index);
-                delete this.localList[index]
+            removeItem(key) {
+                delete this.localList[key]
                 this.$emit('input', this.localList)
             },
-            updateItemKey(oldValue, newValue) {
+            updateItemKey(oldKey, newKey) {
                 this.localList = Object.keys(this.localList).reduce((newList, current) => {
-                    let key = (current === oldValue ? newValue : current);
+                    let key = (current === oldKey ? newKey : current);
                     newList[key] = this.localList[current];
                     return newList;
                 }, {});

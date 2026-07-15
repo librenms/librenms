@@ -114,7 +114,6 @@ class Services implements Module
         }
 
         foreach (array_keys($discoveredPorts) as $port) {
-            echo $port . "\n";
             ServicesHelper::discover($device, strtolower((string) $known_services[$port]));
         }
     }
