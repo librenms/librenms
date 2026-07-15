@@ -12847,7 +12847,7 @@
                     "ifDuplex": null,
                     "ifMtu": 9600,
                     "ifType": "ethernetCsmacd",
-                    "ifAlias": "<portalias>",
+                    "ifAlias": "Extreme Networks 7520-48Y-8C-FabricEngine - 25GbNone Port 1/31",
                     "ifPhysAddress": "12345665081e",
                     "ifLastChange": 9600,
                     "ifVlan": "0",
