@@ -113,6 +113,114 @@
                     "app_type": "syslog-ng"
                 },
                 {
+                    "metric": "global_connections_max",
+                    "value": 42,
+                    "value_prev": null,
+                    "app_type": "syslog-ng"
+                },
+                {
+                    "metric": "global_connections_mean",
+                    "value": 21.3,
+                    "value_prev": null,
+                    "app_type": "syslog-ng"
+                },
+                {
+                    "metric": "global_connections_median",
+                    "value": 20,
+                    "value_prev": null,
+                    "app_type": "syslog-ng"
+                },
+                {
+                    "metric": "global_connections_min",
+                    "value": 5,
+                    "value_prev": null,
+                    "app_type": "syslog-ng"
+                },
+                {
+                    "metric": "global_connections_mode",
+                    "value": 18,
+                    "value_prev": null,
+                    "app_type": "syslog-ng"
+                },
+                {
+                    "metric": "global_connections_sum",
+                    "value": 2130,
+                    "value_prev": null,
+                    "app_type": "syslog-ng"
+                },
+                {
+                    "metric": "global_discarded_max",
+                    "value": 15,
+                    "value_prev": null,
+                    "app_type": "syslog-ng"
+                },
+                {
+                    "metric": "global_discarded_mean",
+                    "value": 3.2,
+                    "value_prev": null,
+                    "app_type": "syslog-ng"
+                },
+                {
+                    "metric": "global_discarded_median",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "syslog-ng"
+                },
+                {
+                    "metric": "global_discarded_min",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "syslog-ng"
+                },
+                {
+                    "metric": "global_discarded_mode",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "syslog-ng"
+                },
+                {
+                    "metric": "global_discarded_sum",
+                    "value": 320,
+                    "value_prev": null,
+                    "app_type": "syslog-ng"
+                },
+                {
+                    "metric": "global_dropped_max",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "syslog-ng"
+                },
+                {
+                    "metric": "global_dropped_mean",
+                    "value": 0.5,
+                    "value_prev": null,
+                    "app_type": "syslog-ng"
+                },
+                {
+                    "metric": "global_dropped_median",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "syslog-ng"
+                },
+                {
+                    "metric": "global_dropped_min",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "syslog-ng"
+                },
+                {
+                    "metric": "global_dropped_mode",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "syslog-ng"
+                },
+                {
+                    "metric": "global_dropped_sum",
+                    "value": 50,
+                    "value_prev": null,
+                    "app_type": "syslog-ng"
+                },
+                {
                     "metric": "global_memory_usage_max",
                     "value": 104857600,
                     "value_prev": null,
@@ -185,74 +293,74 @@
                     "app_type": "syslog-ng"
                 },
                 {
-                    "metric": "global_connections_max",
-                    "value": 42,
+                    "metric": "global_processed_max",
+                    "value": 1000000,
                     "value_prev": null,
                     "app_type": "syslog-ng"
                 },
                 {
-                    "metric": "global_connections_mean",
-                    "value": 21.3,
+                    "metric": "global_processed_mean",
+                    "value": 500000.7,
                     "value_prev": null,
                     "app_type": "syslog-ng"
                 },
                 {
-                    "metric": "global_connections_median",
-                    "value": 20,
+                    "metric": "global_processed_median",
+                    "value": 480000,
                     "value_prev": null,
                     "app_type": "syslog-ng"
                 },
                 {
-                    "metric": "global_connections_min",
-                    "value": 5,
+                    "metric": "global_processed_min",
+                    "value": 200000,
                     "value_prev": null,
                     "app_type": "syslog-ng"
                 },
                 {
-                    "metric": "global_connections_mode",
-                    "value": 18,
+                    "metric": "global_processed_mode",
+                    "value": 400000,
                     "value_prev": null,
                     "app_type": "syslog-ng"
                 },
                 {
-                    "metric": "global_connections_sum",
-                    "value": 2130,
+                    "metric": "global_processed_sum",
+                    "value": 50000070,
                     "value_prev": null,
                     "app_type": "syslog-ng"
                 },
                 {
-                    "metric": "global_discarded_max",
-                    "value": 15,
+                    "metric": "global_queued_max",
+                    "value": 120,
                     "value_prev": null,
                     "app_type": "syslog-ng"
                 },
                 {
-                    "metric": "global_discarded_mean",
-                    "value": 3.2,
+                    "metric": "global_queued_mean",
+                    "value": 60.4,
                     "value_prev": null,
                     "app_type": "syslog-ng"
                 },
                 {
-                    "metric": "global_discarded_median",
-                    "value": 2,
+                    "metric": "global_queued_median",
+                    "value": 55,
                     "value_prev": null,
                     "app_type": "syslog-ng"
                 },
                 {
-                    "metric": "global_discarded_min",
+                    "metric": "global_queued_min",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "syslog-ng"
                 },
                 {
-                    "metric": "global_discarded_mode",
-                    "value": 0,
+                    "metric": "global_queued_mode",
+                    "value": 40,
                     "value_prev": null,
                     "app_type": "syslog-ng"
                 },
                 {
-                    "metric": "global_discarded_sum",
-                    "value": 320,
+                    "metric": "global_queued_sum",
+                    "value": 6040,
                     "value_prev": null,
                     "app_type": "syslog-ng"
                 },
@@ -361,114 +469,6 @@
                 {
                     "metric": "global_written_sum",
                     "value": 25000050,
-                    "value_prev": null,
-                    "app_type": "syslog-ng"
-                },
-                {
-                    "metric": "global_dropped_max",
-                    "value": 3,
-                    "value_prev": null,
-                    "app_type": "syslog-ng"
-                },
-                {
-                    "metric": "global_dropped_mean",
-                    "value": 0.5,
-                    "value_prev": null,
-                    "app_type": "syslog-ng"
-                },
-                {
-                    "metric": "global_dropped_median",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "syslog-ng"
-                },
-                {
-                    "metric": "global_dropped_min",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "syslog-ng"
-                },
-                {
-                    "metric": "global_dropped_mode",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "syslog-ng"
-                },
-                {
-                    "metric": "global_dropped_sum",
-                    "value": 50,
-                    "value_prev": null,
-                    "app_type": "syslog-ng"
-                },
-                {
-                    "metric": "global_processed_max",
-                    "value": 1000000,
-                    "value_prev": null,
-                    "app_type": "syslog-ng"
-                },
-                {
-                    "metric": "global_processed_mean",
-                    "value": 500000.7,
-                    "value_prev": null,
-                    "app_type": "syslog-ng"
-                },
-                {
-                    "metric": "global_processed_median",
-                    "value": 480000,
-                    "value_prev": null,
-                    "app_type": "syslog-ng"
-                },
-                {
-                    "metric": "global_processed_min",
-                    "value": 200000,
-                    "value_prev": null,
-                    "app_type": "syslog-ng"
-                },
-                {
-                    "metric": "global_processed_mode",
-                    "value": 400000,
-                    "value_prev": null,
-                    "app_type": "syslog-ng"
-                },
-                {
-                    "metric": "global_processed_sum",
-                    "value": 50000070,
-                    "value_prev": null,
-                    "app_type": "syslog-ng"
-                },
-                {
-                    "metric": "global_queued_max",
-                    "value": 120,
-                    "value_prev": null,
-                    "app_type": "syslog-ng"
-                },
-                {
-                    "metric": "global_queued_mean",
-                    "value": 60.4,
-                    "value_prev": null,
-                    "app_type": "syslog-ng"
-                },
-                {
-                    "metric": "global_queued_median",
-                    "value": 55,
-                    "value_prev": null,
-                    "app_type": "syslog-ng"
-                },
-                {
-                    "metric": "global_queued_min",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "syslog-ng"
-                },
-                {
-                    "metric": "global_queued_mode",
-                    "value": 40,
-                    "value_prev": null,
-                    "app_type": "syslog-ng"
-                },
-                {
-                    "metric": "global_queued_sum",
-                    "value": 6040,
                     "value_prev": null,
                     "app_type": "syslog-ng"
                 }
