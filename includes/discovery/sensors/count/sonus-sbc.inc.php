@@ -45,8 +45,8 @@ if ($device['os'] == 'sonus-sbc') {
         $multiplier = 1;
         $devicetype = 'sonus-sbc';
         $group = 'Bandwidth Alarm Count';
-        if (is_numeric((int)$v)) {
-            discover_sensor(null, 'count', $device, $k, $sensor_type, $devicetype, $descr, $divisor, $multiplier, null, null, null, null, (int)$v, 'snmp', null, null, null, $group);
+        if (is_numeric((int) $v)) {
+            discover_sensor(null, 'count', $device, $k, $sensor_type, $devicetype, $descr, $divisor, $multiplier, null, null, null, null, (int) $v, 'snmp', null, null, null, $group);
         }
     }
     unset($bw_alarm_oid, $index, $sensor_type, $descr, $divisor, $multiplier, $current, $devicetype, $group);
