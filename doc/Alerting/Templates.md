@@ -22,7 +22,7 @@ information [here](https://laravel.com/docs/blade).
 !!! warning
     Laravel blade allows the use of @php which can be used to read/write files locally,
     run database queries and more. If you don't trust your users then don't provide
-    access to create or edit Templates.
+    access to create or edit templates.
 
 ## Syntax
 
