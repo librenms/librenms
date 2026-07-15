@@ -47,7 +47,7 @@ class Voss extends Shared\Extreme implements IsIsDiscovery, IsIsPolling
         'l1L2IntermediateSystem' => 'L1L2',
     ];
 
-     /**
+    /**
      * @return Collection<int, IsisAdjacency>
      */
     public function discoverIsIs(): Collection
@@ -138,10 +138,10 @@ class Voss extends Shared\Extreme implements IsIsDiscovery, IsIsPolling
         return str_replace(' ', '.', trim($raw));
     }
 
-     /**
+    /**
      * Need to get hostnames for adjacent neighbor from isisLSPTLVValue as they aren't exposed elsewhere
      *
-     * @param array<string, mixed> $tlvs
+     * @param  array<string, mixed> $tlvs
      * @return array<string, string>
      */
     protected function parseIsisLspHostnames(array $tlvs): array
