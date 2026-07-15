@@ -2148,7 +2148,7 @@ return [
         ],
         'service_discovery_known_ports' => [
             'description' => 'Discovery Known Ports',
-            'help' => 'List of ports and service to add as service when discovered on a device.'
+            'help' => 'List of ports and service to add as service when discovered on a device.',
         ],
         'service_services_workers' => [
             'description' => 'Services Workers',

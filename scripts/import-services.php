@@ -49,11 +49,11 @@ if (isset($options['f'])) {
 $overwrite = isset($options['o']) || isset($options['overwrite']);
 $force = isset($options['y']) || isset($options['yes']) || isset($options['force']);
 
-if (!file_exists($file)) {
+if (! file_exists($file)) {
     fwrite(STDERR, "Error: File '$file' does not exist.\n");
     exit(1);
 }
-if (!is_readable($file)) {
+if (! is_readable($file)) {
     fwrite(STDERR, "Error: File '$file' is not readable.\n");
     exit(1);
 }
@@ -115,20 +115,21 @@ function getServicesFromFile(string $path): array
         if ($protocol === 'tcp' && is_numeric($port)) {
             $portVal = (int) $port;
             // Keep the first defined service name for a given port if duplicates exist
-            if (!isset($services[$portVal])) {
+            if (! isset($services[$portVal])) {
                 $services[$portVal] = $name;
             }
         }
     }
+
     return $services;
 }
 
 echo "Parsing services file: $file\n";
 $new_ports = getServicesFromFile($file);
-echo "Found " . count($new_ports) . " service(s) in the file.\n";
+echo 'Found ' . count($new_ports) . " service(s) in the file.\n";
 
 $current_ports = LibrenmsConfig::get('service_discovery_known_ports', []);
-if (!is_array($current_ports)) {
+if (! is_array($current_ports)) {
     $current_ports = [];
 }
 
@@ -143,7 +144,7 @@ if ($overwrite) {
 
 $added_count = 0;
 foreach ($new_ports as $port => $name) {
-    if (!isset($current_ports[$port])) {
+    if (! isset($current_ports[$port])) {
         $added_count++;
     }
 }
@@ -151,11 +152,11 @@ foreach ($new_ports as $port => $name) {
 // Sort final array numerically by port key
 ksort($final_ports, SORT_NUMERIC);
 
-if (!$force) {
+if (! $force) {
     if ($overwrite) {
-        echo "WARNING: This will overwrite your entire service discovery ports configuration with " . count($final_ports) . " ports. Do you want to proceed? [y/N]: ";
+        echo 'WARNING: This will overwrite your entire service discovery ports configuration with ' . count($final_ports) . ' ports. Do you want to proceed? [y/N]: ';
     } else {
-        echo "This will merge " . count($new_ports) . " ports from '$file' (adding $added_count new ports) into your configuration. Do you want to proceed? [y/N]: ";
+        echo 'This will merge ' . count($new_ports) . " ports from '$file' (adding $added_count new ports) into your configuration. Do you want to proceed? [y/N]: ";
     }
     $input = trim(fgets(STDIN));
     if (strtolower($input) !== 'y') {
@@ -167,9 +168,9 @@ if (!$force) {
 if (LibrenmsConfig::persist('service_discovery_known_ports', $final_ports)) {
     echo "Successfully updated configuration in DB.\n";
     if ($overwrite) {
-        echo "Configuration set to " . count($final_ports) . " ports from '$file'.\n";
+        echo 'Configuration set to ' . count($final_ports) . " ports from '$file'.\n";
     } else {
-        echo "Merged configuration: " . count($current_ports) . " existing + $added_count new = " . count($final_ports) . " total ports.\n";
+        echo 'Merged configuration: ' . count($current_ports) . " existing + $added_count new = " . count($final_ports) . " total ports.\n";
     }
 } else {
     fwrite(STDERR, "Error: Failed to save the configuration to DB.\n");

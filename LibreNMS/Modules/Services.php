@@ -85,15 +85,15 @@ class Services implements Module
 
         // Only lookup services listening on 0.0.0.0 and ::
         $query = SnmpQuery::enumStrings()->hideMib()->walk('TCP-MIB::tcpListenerTable');
-        if($query->stderr == null) { // query is successful
+        if ($query->stderr == null) { // query is successful
             $query->mapTable(function ($tcpConnLocalState, $tcpConnLocalAddressType, $tcpConnLocalAddress, $tcpConnLocalPort) use ($known_services, &$discoveredPorts) {
-                if($tcpConnLocalState["tcpListenerProcess"] != 0) {
+                if ($tcpConnLocalState['tcpListenerProcess'] != 0) {
                     return null;
                 }
-                if($tcpConnLocalAddressType === "ipv4" && $tcpConnLocalAddress !== '"0.0.0.0"') {
+                if ($tcpConnLocalAddressType === 'ipv4' && $tcpConnLocalAddress !== '"0.0.0.0"') {
                     return null;
                 }
-                if($tcpConnLocalAddressType === "ipv6" && $tcpConnLocalAddress !== '"00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"') {
+                if ($tcpConnLocalAddressType === 'ipv6' && $tcpConnLocalAddress !== '"00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"') {
                     return null;
                 }
                 if ($tcpConnLocalPort !== null && isset($known_services[$tcpConnLocalPort])) {
