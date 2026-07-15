@@ -23,7 +23,7 @@ class DevicesSearchController extends GroupedSearchController
                 ->orWhere('serial', 'like', $like)
                 ->orWhere('notes', 'like', $like);
 
-            $mac = str_replace([':', '-'], '', $search);
+            $mac = strtolower(str_replace([':', '-'], '', $search));
 
             if (preg_match('/^[0-9.]+$/', $search) && str_contains($search, '.')) {
                 $query->leftJoin('ports', 'ports.device_id', '=', 'devices.device_id')
@@ -37,6 +37,7 @@ class DevicesSearchController extends GroupedSearchController
                 $query->leftJoin('ports', 'ports.device_id', '=', 'devices.device_id')
                     ->leftJoin('ipv6_addresses', 'ipv6_addresses.port_id', '=', 'ports.port_id');
                 $q->orWhere('ipv6_addresses.ipv6_address', 'like', $like)
+                    ->orWhere('ipv6_addresses.ipv6_compressed', 'like', $like)
                     ->orWhere('overwrite_ip', 'like', $like)
                     ->orWhere('ports.ifPhysAddress', 'like', '%' . $mac . '%');
                 if (\LibreNMS\Util\IPv6::isValid($search, false)) {
