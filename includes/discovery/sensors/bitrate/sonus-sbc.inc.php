@@ -24,8 +24,6 @@
  * @author     Sofia El Khalifi <sofia.elkhalifi@netsf.fr>
  */
 
-use App\Models\Device;
-
 $deviceModel = DeviceCache::get($device['device_id']);
 
 if ($device['os'] == 'sonus-sbc') {
