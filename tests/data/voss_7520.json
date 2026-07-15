@@ -3343,7 +3343,7 @@
                     "ifDuplex": null,
                     "ifMtu": null,
                     "ifType": "ethernetCsmacd",
-                    "ifAlias": "<portalias>",
+                    "ifAlias": "Extreme Networks 7520-48Y-8C-FabricEngine - 25GbNone Port 1/31",
                     "ifPhysAddress": null,
                     "ifLastChange": 0,
                     "ifVlan": null,
