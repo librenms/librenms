@@ -80,7 +80,7 @@ function getServicesFromFile(string $path): array
         $line = preg_replace('/\s*#.*/', '', $line);
 
         // Split on one or more whitespace characters
-        $fields = preg_split('/\s+/', $line);
+        $fields = preg_split('/\s+/', (string) $line);
         if (count($fields) < 2) {
             continue;
         }
@@ -92,11 +92,11 @@ function getServicesFromFile(string $path): array
         $name = null;
         $protocol = 'tcp'; // default to tcp if not specified
 
-        if (strpos($f0, '/') !== false) {
-            list($port, $protocol) = explode('/', $f0, 2);
+        if (str_contains($f0, '/')) {
+            [$port, $protocol] = explode('/', $f0, 2);
             $name = $f1;
-        } elseif (strpos($f1, '/') !== false) {
-            list($port, $protocol) = explode('/', $f1, 2);
+        } elseif (str_contains($f1, '/')) {
+            [$port, $protocol] = explode('/', $f1, 2);
             $name = $f0;
         } else {
             // No '/' present. Check if first field is numeric
