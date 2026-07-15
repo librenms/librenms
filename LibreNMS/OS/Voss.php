@@ -39,7 +39,7 @@ class Voss extends Shared\Extreme implements IsIsDiscovery, IsIsPolling
     /**
      * Array of shortened ISIS codes
      *
-     * @var array
+     * @var array<string, string>
      */
     protected array $isis_codes = [
         'l1IntermediateSystem' => 'L1',
