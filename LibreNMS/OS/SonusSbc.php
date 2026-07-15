@@ -58,7 +58,6 @@ class SonusSbc extends OS implements ProcessorDiscovery
             $device_ascii = explode('14.', (string) $index, 2);
             $codes_device = explode('.', $device_ascii[1]);
             $device_text = '';
-            echo 'Mempool oid : ' . $index . ' value : ' . $entry . "\n";
 
             foreach ($codes_device as $code) {
                 $device_text .= chr((int) $code);
@@ -93,7 +92,6 @@ class SonusSbc extends OS implements ProcessorDiscovery
         $processors = [];
 
         foreach ($data as $oid => $value) {
-            echo 'Processor oid : ' . $oid . ' value : ' . $value . "\n";
             $device_oid = explode('14.', (string) $oid, 2);
             $device_ascii = $device_oid[1];
             $codes_device = explode('.', $device_ascii);

@@ -54,23 +54,17 @@ $snmp['speed_group'] = SnmpQuery::device($deviceModel)->walk('.1.3.6.1.4.1.2879.
 $snmp['ctx_if'] = SnmpQuery::device($deviceModel)->walk('.1.3.6.1.4.1.2879.2.10.2.10.1.5')->values();
 
 foreach ($snmp['speed_group'] as $k => $v) {
-    echo 'k : ' . $k . "\n";
-
     $v = explode(',', (string) $v);
     $k_array = explode('.', (string) $k);
-    echo 'k_array0  : ' . $k_array[0] . "\n";
 
     if ($k_array[0] == 'enterprises') {
         $ports_mapping['oid'] = str_replace('enterprises.2.10.4.1.1.4.', '', $k); //# centos case
-        echo "replace 'entreprises' ";
     }
     if ($k_array[0] == 'iso') {
         $ports_mapping['oid'] = str_replace('iso.3.6.1.4.1.2879.2.10.4.1.1.4.', '', $k); //# debian / docker case
-        echo "replace 'iso' ";
     }
     if ($k_array[0] == 'SNMPv2-SMI::enterprises') {
         $ports_mapping['oid'] = str_replace('SNMPv2-SMI::enterprises.2879.2.10.4.1.1.4.', '', $k); //# debian / docker case
-        echo "replace 'SNMPv2-SMI::enterprises' ";
     }
 
     $port_oid = explode('14.', $ports_mapping['oid'], 2);
@@ -105,8 +99,6 @@ foreach ($snmp['speed_group'] as $k => $v) {
     $phy_status = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.5.1.10.14.' . $device_ascii . '.8.112.114.103.95.' . $port_ascii)->value();
     $redundancy_status = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.5.1.13.14.' . $device_ascii . '.8.112.114.103.95.' . $port_ascii)->value();
 
-    printf("phy_status: %s, redundancy_status: %s\n", $phy_status, $redundancy_status);
-
     if ($phy_status == 1 && $redundancy_status == 2) {
         $port_stats[$index]['ifAdminStatus'] = 'up';
         $port_stats[$index]['ifOperStatus'] = 'up';
@@ -121,23 +113,17 @@ foreach ($snmp['speed_group'] as $k => $v) {
 
 // For each interface...
 foreach ($snmp['ports_group'] as $k => $v) {
-    echo 'k : ' . $k . "\n";
-
     $v = explode(',', (string) $v);
     $k_array = explode('.', (string) $k);
-    echo 'k_array0  : ' . $k_array[0] . "\n";
 
     if ($k_array[0] == 'enterprises') {
         $ports_mapping['oid'] = str_replace('enterprises.2.10.4.2.1.3.', '', $k); //# centos case
-        echo "replace 'entreprises' ";
     }
     if ($k_array[0] == 'iso') {
         $ports_mapping['oid'] = str_replace('iso.3.6.1.4.1.2879.2.10.4.2.1.3.', '', $k); //# debian / docker case
-        echo "replace 'iso' ";
     }
     if ($k_array[0] == 'SNMPv2-SMI::enterprises') {
         $ports_mapping['oid'] = str_replace('SNMPv2-SMI::enterprises.2879.2.10.4.2.1.3.', '', $k); //# debian / docker case
-        echo "replace 'SNMPv2-SMI::enterprises' ";
     }
 
     $port_oid = explode('4.', $ports_mapping['oid'], 2);
@@ -188,22 +174,17 @@ foreach ($snmp['ports_group'] as $k => $v) {
 }
 
 foreach ($snmp['mgmt_group'] as $k => $v) {
-    echo 'mgmt k : ' . $k . "\n";
     $v = explode(',', (string) $v);
     $k_array = explode('.', (string) $k);
-    echo 'k_array0  : ' . $k_array[0] . "\n";
 
     if ($k_array[0] == 'enterprises') {
         $ports_mapping['oid'] = str_replace('enterprises.2.10.4.3.1.5.', '', $k); //# centos case
-        echo "replace 'entreprises' ";
     }
     if ($k_array[0] == 'iso') {
         $ports_mapping['oid'] = str_replace('iso.3.6.1.4.1.2879.2.10.4.3.1.5.', '', $k); //# debian / docker case
-        echo "replace 'iso' ";
     }
     if ($k_array[0] == 'SNMPv2-SMI::enterprises') {
         $ports_mapping['oid'] = str_replace('SNMPv2-SMI::enterprises.2879.2.10.4.3.1.5.', '', $k); //# debian / docker case
-        echo "replace 'SNMPv2-SMI::enterprises' ";
     }
 
     $port_oid = explode('14.', $ports_mapping['oid'], 2);
@@ -239,8 +220,6 @@ foreach ($snmp['mgmt_group'] as $k => $v) {
     $phy_status = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.5.1.10.14.' . $device_ascii . '.8.112.114.103.95.' . $port_ascii)->value();
     $redundancy_status = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.5.1.13.14.' . $device_ascii . '.8.112.114.103.95.' . $port_ascii)->value();
 
-    printf("Management phy_status: %s, redundancy_status: %s\n", $phy_status, $redundancy_status);
-
     if ($phy_status == 1 && $redundancy_status == 2) {
         $port_stats[$index]['ifAdminStatus'] = 'up';
         $port_stats[$index]['ifOperStatus'] = 'up';
@@ -254,23 +233,17 @@ foreach ($snmp['mgmt_group'] as $k => $v) {
 }
 
 foreach ($snmp['ctx_if'] as $k => $v) {
-    echo 'k : ' . $k . "\n";
-
     $v = explode(',', (string) $v);
     $k_array = explode('.', (string) $k);
-    echo 'k_array0  : ' . $k_array[0] . "\n";
 
     if ($k_array[0] == 'enterprises') {
         $ports_mapping['oid'] = str_replace('enterprises.3.6.1.4.1.2879.2.10.2.10.1.5.', '', $k); //# centos case
-        echo "replace 'entreprises' ";
     }
     if ($k_array[0] == 'iso') {
         $ports_mapping['oid'] = str_replace('iso.3.6.1.4.1.2879.2.10.2.10.1.5.', '', $k); //# debian / docker case
-        echo "replace 'iso' ";
     }
     if ($k_array[0] == 'SNMPv2-SMI::enterprises') {
         $ports_mapping['oid'] = str_replace('SNMPv2-SMI::enterprises.2879.2.10.2.10.1.5.', '', $k); //# debian / docker case
-        echo "replace 'SNMPv2-SMI::enterprises' ";
     }
 
     $port_oid = explode('.9.', $ports_mapping['oid'], 2);
