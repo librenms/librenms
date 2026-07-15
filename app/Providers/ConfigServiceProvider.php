@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\ConfigRepository;
 use App\Facades\LibrenmsConfig;
+use App\Listeners\RegenerateDeviceDisplayNames;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 
@@ -25,5 +27,13 @@ class ConfigServiceProvider extends ServiceProvider
                 LibrenmsConfig::reload();
             }
         });
+    }
+
+    /**
+     * Bootstrap services.
+     */
+    public function boot(): void
+    {
+        Event::listen('setting.changed.device_display_default', RegenerateDeviceDisplayNames::class);
     }
 }
