@@ -141,7 +141,7 @@ class Voss extends Shared\Extreme implements IsIsDiscovery, IsIsPolling
     /**
      * Need to get hostnames for adjacent neighbor from isisLSPTLVValue as they aren't exposed elsewhere
      *
-     * @param  array<string, mixed> $tlvs
+     * @param  array<string, mixed>  $tlvs
      * @return array<string, string>
      */
     protected function parseIsisLspHostnames(array $tlvs): array
