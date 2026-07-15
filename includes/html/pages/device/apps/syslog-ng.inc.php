@@ -43,18 +43,18 @@ if (! empty($sources)) {
 print_optionbar_end();
 
 $stat_labels = [
-    'batch_size_avg'  => 'Batch Size Average',
-    'batch_size_max'  => 'Batch Size Maximum',
-    'memory_usage'    => 'Memory Usage',
-    'msg_size_avg'    => 'Message Size Average',
-    'connections'     => 'Connections',
-    'discarded'       => 'Discarded',
-    'dropped'         => 'Dropped',
-    'processed'       => 'Processed',
-    'queued'          => 'Queued',
+    'batch_size_avg' => 'Batch Size Average',
+    'batch_size_max' => 'Batch Size Maximum',
+    'memory_usage' => 'Memory Usage',
+    'msg_size_avg' => 'Message Size Average',
+    'connections' => 'Connections',
+    'discarded' => 'Discarded',
+    'dropped' => 'Dropped',
+    'processed' => 'Processed',
+    'queued' => 'Queued',
     'truncated_bytes' => 'Truncated Bytes',
     'truncated_count' => 'Truncated Count',
-    'written'         => 'Written',
+    'written' => 'Written',
 ];
 
 $graphs = [];

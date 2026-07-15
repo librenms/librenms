@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\Eventlog;
-use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 

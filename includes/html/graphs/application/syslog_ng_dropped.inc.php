@@ -28,8 +28,8 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     } else {
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => 'dropped',
-            'ds'       => 'data',
+            'descr' => 'dropped',
+            'ds' => 'data',
         ];
     }
 } else {

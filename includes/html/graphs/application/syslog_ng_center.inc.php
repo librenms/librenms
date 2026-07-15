@@ -14,13 +14,13 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Queued',
-        'ds'       => 'queued',
+        'descr' => 'Queued',
+        'ds' => 'queued',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Received',
-        'ds'       => 'received',
+        'descr' => 'Received',
+        'ds' => 'received',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

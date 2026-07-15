@@ -21,15 +21,15 @@ if (Rrd::checkRrdExists($rrd_filename)) {
         foreach (['max', 'mean', 'median', 'min', 'mode', 'sum'] as $ds) {
             $rrd_list[] = [
                 'filename' => $rrd_filename,
-                'descr'    => ucfirst($ds),
-                'ds'       => $ds,
+                'descr' => ucfirst($ds),
+                'ds' => $ds,
             ];
         }
     } else {
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => 'processed',
-            'ds'       => 'data',
+            'descr' => 'processed',
+            'ds' => 'data',
         ];
     }
 } else {
