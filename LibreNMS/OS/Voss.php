@@ -41,12 +41,15 @@ class Voss extends Shared\Extreme implements IsIsDiscovery, IsIsPolling
      *
      * @var array
      */
-    protected $isis_codes = [
+    protected array $isis_codes = [
         'l1IntermediateSystem' => 'L1',
         'l2IntermediateSystem' => 'L2',
         'l1L2IntermediateSystem' => 'L1L2',
     ];
 
+    /**
+    * @return Collection<int, IsisAdjacency>
+    */
     public function discoverIsIs(): Collection
     {
         // Check if the device has any ISIS enabled interfaces
@@ -135,7 +138,12 @@ class Voss extends Shared\Extreme implements IsIsDiscovery, IsIsPolling
         return str_replace(' ', '.', trim($raw));
     }
 
-    // Need to get hostnames for adjacent neighbor from isisLSPTLVValue as they aren't exposed elsewhere
+    /**
+    * Need to get hostnames for adjacent neighbor from isisLSPTLVValue as they aren't exposed elsewhere
+    *
+    * @param array<string, mixed> $tlvs
+    * @return array<string, string>
+    */
     protected function parseIsisLspHostnames(array $tlvs): array
     {
         $hostnames = [];
