@@ -24,31 +24,15 @@
  * @author     Sofia El Khalifi <sofia.elkhalifi@netsf.fr>
  */
 
-use App\Models\Device;
-
-$deviceModel = Device::find($device['device_id']);
+$deviceModel = DeviceCache::get($device['device_id']);
 
 if ($device['os'] == 'sonus-sbc') {
     $bw_alarm_oid = '.1.3.6.1.4.1.2879.2.10.4.1.1.41';
-    $bw_alarm_count = SnmpQuery::device($deviceModel)->walk($bw_alarm_oid)->values();
+    $bw_alarm_count = SnmpQuery::device($deviceModel)->numeric()->walk($bw_alarm_oid)->values();
 
     foreach ($bw_alarm_count as $k => $v) {
-        $k_array = explode('.', (string) $k);
-
-        if ($k_array[0] == 'enterprises') {
-            $ports_mapping['oid'] = str_replace('enterprises.3.6.1.4.1.2879.2.10.4.1.1.41.', '', $k); //# centos case
-        }
-        if ($k_array[0] == 'iso') {
-            $ports_mapping['oid'] = str_replace('iso.3.6.1.4.1.2879.2.10.4.1.1.41.', '', $k); //# debian / docker case
-        }
-        if ($k_array[0] == 'SNMPv2-SMI::enterprises') {
-            $ports_mapping['oid'] = str_replace('SNMPv2-SMI::enterprises.2879.2.10.4.1.1.41.', '', $k); //# debian / docker case
-        }
-
-        $index = $ports_mapping['oid'];
-        $device_oid = explode('14.', (string) $index, 2);
-        $device_ascii = $device_oid[1];
-        $codes_device = explode('.', $device_ascii);
+        $device_oid = explode('14.', (string) $k, 2);
+        $codes_device = explode('.', $device_oid[1]);
         $device_text = '';
 
         foreach (array_slice($codes_device, 0) as $code) {
@@ -59,12 +43,10 @@ if ($device['os'] == 'sonus-sbc') {
         $descr = $device_text . ' - Bandwidth Alarm passed';
         $divisor = 1;
         $multiplier = 1;
-        $current = (int) $v;
         $devicetype = 'sonus-sbc';
-        $group = 'Bandwidth Alarm Count in the upward direction';
-        $full_oid = $bw_alarm_oid . '.' . $index;
-        if (is_numeric($current)) {
-            discover_sensor(null, 'count', $device, $full_oid, $sensor_type, $devicetype, $descr, $divisor, $multiplier, null, null, null, null, $current, 'snmp', null, null, null, $group);
+        $group = 'Bandwidth Alarm Count';
+        if (is_numeric((int)$v)) {
+            discover_sensor(null, 'count', $device, $k, $sensor_type, $devicetype, $descr, $divisor, $multiplier, null, null, null, null, (int)$v, 'snmp', null, null, null, $group);
         }
     }
     unset($bw_alarm_oid, $index, $sensor_type, $descr, $divisor, $multiplier, $current, $devicetype, $group);
