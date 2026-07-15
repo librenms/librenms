@@ -81,16 +81,42 @@ class Services implements Module
 
         $known_services = LibrenmsConfig::get('service_discovery_known_ports');
 
-        // Only lookup services listening on 0.0.0.0
-        SnmpQuery::enumStrings()->hideMib()->walk('TCP-MIB::tcpConnState.0.0.0.0')->mapTable(function ($tcpConnState, $tcpConnLocalAddress, $tcpConnLocalPort, $tcpConnRemAddress, $tcpConnRemPort) use ($device, $known_services) {
-            if (empty($tcpConnState['tcpConnState']) || $tcpConnState['tcpConnState'] != 'listen') {
-                return null;
-            }
+        $discoveredPorts = [];
 
-            if ($tcpConnLocalPort !== null && isset($known_services[$tcpConnLocalPort])) {
-                ServicesHelper::discover($device, $known_services[$tcpConnLocalPort]);
-            }
-        });
+        // Only lookup services listening on 0.0.0.0 and ::
+        $query = SnmpQuery::enumStrings()->hideMib()->walk('TCP-MIB::tcpListenerTable');
+        if($query->stderr == null) { // query is successful
+            $query-> mapTable(function ($tcpConnLocalState, $tcpConnLocalAddressType, $tcpConnLocalAddress, $tcpConnLocalPort) use ($device, $known_services, &$discoveredPorts) {
+                if($tcpConnLocalState["tcpListenerProcess"] != 0) {
+                    return null;
+                }
+                if($tcpConnLocalAddressType === "ipv4" && $tcpConnLocalAddress !== '"0.0.0.0"') {
+                    return null;
+                }
+                if($tcpConnLocalAddressType === "ipv6" && $tcpConnLocalAddress !== '"00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"') {
+                    return null;
+                }
+                if ($tcpConnLocalPort !== null && isset($known_services[$tcpConnLocalPort])) {
+                    $discoveredPorts[$tcpConnLocalPort] = true;
+                }
+            });
+        } else {
+            // Fallback to old system for non-tcpListenerTable-compatible system
+            SnmpQuery::enumStrings()->hideMib()->walk('TCP-MIB::tcpConnState.0.0.0.0')->mapTable(function ($tcpConnState, $tcpConnLocalAddress, $tcpConnLocalPort, $tcpConnRemAddress, $tcpConnRemPort) use ($device, $known_services, &$discoveredPorts) {
+                if (empty($tcpConnState['tcpConnState']) || $tcpConnState['tcpConnState'] != 'listen') {
+                    return null;
+                }
+
+                if ($tcpConnLocalPort !== null && isset($known_services[$tcpConnLocalPort])) {
+                    $discoveredPorts[$tcpConnLocalPort] = true;
+                }
+            });
+        }
+
+        foreach($discoveredPorts as $port => $enabled) {
+            echo $port . "\n";
+            ServicesHelper::discover($device, strtolower($known_services[$port]));
+        }
     }
 
     /**
