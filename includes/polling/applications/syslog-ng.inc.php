@@ -85,6 +85,9 @@ foreach ($gauge as $stat) {
             'sum' => $data['global'][$stat]['sum'],
         ];
         app('Datastore')->put($device, 'app', $tags, $stats_fields);
+        foreach ($stats_fields as $sub => $value) {
+            $metrics['global_' . $stat . '_' . $sub] = $value;
+        }
         $app_data['global'][$stat] = true;
     } else {
         $app_data['global'][$stat] = false;
@@ -103,6 +106,9 @@ foreach ($single_gauge as $stat) {
             'sum' => $data['global'][$stat]['sum'],
         ];
         app('Datastore')->put($device, 'app', $tags, $stats_fields);
+        foreach ($stats_fields as $sub => $value) {
+            $metrics['global_' . $stat . '_' . $sub] = $value;
+        }
         $app_data['global'][$stat] = true;
     } else {
         $app_data['global'][$stat] = false;
