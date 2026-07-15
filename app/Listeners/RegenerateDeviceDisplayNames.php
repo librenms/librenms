@@ -13,11 +13,11 @@ class RegenerateDeviceDisplayNames
      */
     public function handle(SettingChanged $event): void
     {
-        Device::withoutEvents(function () {
+        Device::withoutEvents(function (): void {
             Device::whereNull('display_template')
                 ->orWhere('display_template', '')
                 ->select(['device_id', 'display_template', 'hostname', 'sysName', 'ip', 'overwrite_ip'])
-                ->chunkById(500, function ($devices) {
+                ->chunkById(500, function ($devices): void {
                     foreach ($devices as $device) {
                         try {
                             $device->regenerateDisplayName();
