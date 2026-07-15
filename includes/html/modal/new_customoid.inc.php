@@ -27,7 +27,7 @@
                     <div class="form-group" title="SNMP data type">
                         <label for='datatype' class='col-sm-4 col-md-3 control-label'>Data Type </label>
                         <div class='col-sm-8 col-md-9'>
-                            <select class="form-control" id="datatype" name="datatype">
+                            <select class="form-control" id="datatype" name="datatype" required>
                                 <option value="COUNTER">COUNTER</option>
                                 <option value="GAUGE">GAUGE</option>
                             </select>
@@ -134,7 +134,7 @@ $('#create-oid-form').on('show.bs.modal', function(e) {
             success: function (data) {
                 $('#name').val(data.name);
                 $('#oid').val(data.oid);
-                $('#datatype').val(data.datatype);
+                $('#datatype').val(data.datatype || 'GAUGE');
                 $('#datatype').prop('disabled', true);
                 $('#unit').val(data.unit);
                 $('#divisor').val(data.divisor);
