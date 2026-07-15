@@ -75,7 +75,7 @@ $single_gauge = [
 $tags['rrd_def'] = $gauge_rrd_def;
 foreach ($gauge as $stat) {
     if (! is_null($data['global'][$stat]['max'])) {
-        $tags['rrd_name'] = ['app', $name, $app->app_id, 'global_-_'.$stat];
+        $tags['rrd_name'] = ['app', $name, $app->app_id, 'global_-_' . $stat];
         $stats_fields = [
             'max' => $data['global'][$stat]['max'],
             'mean' => $data['global'][$stat]['mean'],
@@ -93,7 +93,7 @@ foreach ($gauge as $stat) {
 
 foreach ($single_gauge as $stat) {
     if (! is_null($data['global'][$stat]['max'])) {
-        $tags['rrd_name'] = ['app', $name, $app->app_id, 'global_-_'.$stat];
+        $tags['rrd_name'] = ['app', $name, $app->app_id, 'global_-_' . $stat];
         $stats_fields = [
             'max' => $data['global'][$stat]['max'],
             'mean' => $data['global'][$stat]['mean'],
@@ -115,7 +115,7 @@ foreach ($data['sources'] as $source_name => $source) {
     $tags['rrd_def'] = $gauge_rrd_def;
     foreach ($gauge as $stat) {
         if (! is_null($source[$stat]['max'])) {
-            $tags['rrd_name'] = ['app', $name, $app->app_id, 'source_-_'.$stat.'_-_'.$source_name];
+            $tags['rrd_name'] = ['app', $name, $app->app_id, 'source_-_' . $stat . '_-_' . $source_name];
             $stats_fields = [
                 'max' => $source[$stat]['max'],
                 'mean' => $source[$stat]['mean'],
@@ -134,7 +134,7 @@ foreach ($data['sources'] as $source_name => $source) {
     $tags['rrd_def'] = $single_gauge_rrd_def;
     foreach ($single_gauge as $stat) {
         if (! is_null($source[$stat])) {
-            $tags['rrd_name'] = ['app', $name, $app->app_id, 'source_-_'.$stat.'_-_'.$source_name];
+            $tags['rrd_name'] = ['app', $name, $app->app_id, 'source_-_' . $stat . '_-_' . $source_name];
             $stats_fields = [
                 'data' => $source[$stat],
             ];

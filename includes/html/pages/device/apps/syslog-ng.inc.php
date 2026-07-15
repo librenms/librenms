@@ -59,7 +59,7 @@ $stat_labels = [
 
 $graphs = [];
 if (! isset($vars['syslog_ng_source'])) {
-    $graphs['syslog_ng_center']  = 'Center (Queued / Received)';
+    $graphs['syslog_ng_center'] = 'Center (Queued / Received)';
 }
 
 foreach ($stat_labels as $stat => $label) {
@@ -77,7 +77,7 @@ foreach ($stat_labels as $stat => $label) {
 foreach ($graphs as $key => $text) {
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
-    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
+    $graph_array['to'] = App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
 
