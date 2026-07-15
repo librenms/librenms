@@ -164,6 +164,8 @@ jobs:
         name: Start SNMPSIM
         run: |
           .python_venvs/snmpsim/bin/snmpsim-command-responder-lite --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --log-level=error --logging-method=file:/tmp/snmpsimd.log &
+          # Wait for the UDP port to open / snmpsim to start
+          timeout 10 bash -c 'until nc -z -u 127.1.6.2 1162; do sleep 0.1; done' || true
 
       -
         name: lnms dev:check ci

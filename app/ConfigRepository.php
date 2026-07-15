@@ -26,6 +26,7 @@
 
 namespace App;
 
+use App\Events\SettingChanged;
 use App\Models\Callback;
 use App\Models\GraphType;
 use Exception;
@@ -263,7 +264,9 @@ class ConfigRepository
             $deleted = Models\Config::withChildren($key)->delete();
 
             if ($deleted > 0) {
+                // delete statement above doens't trigger Eloquent events
                 $this->invalidateCache();
+                event("setting.changed.$key", new SettingChanged($key, $this->get($key)));
             }
 
             return true;
