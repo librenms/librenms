@@ -86,7 +86,7 @@ class Services implements Module
         // Only lookup services listening on 0.0.0.0 and ::
         $query = SnmpQuery::enumStrings()->hideMib()->walk('TCP-MIB::tcpListenerTable');
         if($query->stderr == null) { // query is successful
-            $query-> mapTable(function ($tcpConnLocalState, $tcpConnLocalAddressType, $tcpConnLocalAddress, $tcpConnLocalPort) use ($device, $known_services, &$discoveredPorts) {
+            $query->mapTable(function ($tcpConnLocalState, $tcpConnLocalAddressType, $tcpConnLocalAddress, $tcpConnLocalPort) use ($known_services, &$discoveredPorts) {
                 if($tcpConnLocalState["tcpListenerProcess"] != 0) {
                     return null;
                 }
@@ -102,7 +102,7 @@ class Services implements Module
             });
         } else {
             // Fallback to old system for non-tcpListenerTable-compatible system
-            SnmpQuery::enumStrings()->hideMib()->walk('TCP-MIB::tcpConnState.0.0.0.0')->mapTable(function ($tcpConnState, $tcpConnLocalAddress, $tcpConnLocalPort, $tcpConnRemAddress, $tcpConnRemPort) use ($device, $known_services, &$discoveredPorts) {
+            SnmpQuery::enumStrings()->hideMib()->walk('TCP-MIB::tcpConnState.0.0.0.0')->mapTable(function ($tcpConnState, $tcpConnLocalAddress, $tcpConnLocalPort, $tcpConnRemAddress, $tcpConnRemPort) use ($known_services, &$discoveredPorts) {
                 if (empty($tcpConnState['tcpConnState']) || $tcpConnState['tcpConnState'] != 'listen') {
                     return null;
                 }
@@ -113,9 +113,9 @@ class Services implements Module
             });
         }
 
-        foreach($discoveredPorts as $port => $enabled) {
+        foreach (array_keys($discoveredPorts) as $port) {
             echo $port . "\n";
-            ServicesHelper::discover($device, strtolower($known_services[$port]));
+            ServicesHelper::discover($device, strtolower((string) $known_services[$port]));
         }
     }
 
