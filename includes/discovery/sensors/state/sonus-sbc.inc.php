@@ -40,7 +40,7 @@ create_state_index($stateName, $states);
 $server_status = SnmpQuery::device($deviceModel)->numeric()->walk('.1.3.6.1.4.1.2879.2.8.5.1.12.1.8')->values();
 
 foreach ($server_status as $key => $value) {
-    $index = explode(".1.8.", $key);
+    $index = explode('.1.8.', $key);
     $server_name = SnmpQuery::get('.1.3.6.1.4.1.2879.2.8.5.1.12.1.16.' . $index[1])->value();
     $descr = 'Redundancy role: ' . $server_name;
     $sensor_value = (int) $value;

@@ -75,7 +75,7 @@ foreach ($snmp['speed_group'] as $k => $v) {
 
     $device_index = substr($device_ascii, -1);
     $port_index = substr($port_ascii, -1);
-    $index = $device_index . "." . $port_index;
+    $index = $device_index . '.' . $port_index;
 
     $port_stats[$index]['ifDescr'] = $device_text . '/' . $port_text;
     $port_stats[$index]['ifAlias'] = $device_text . '/' . $port_text;
@@ -99,7 +99,7 @@ foreach ($snmp['speed_group'] as $k => $v) {
 
 foreach ($snmp['ports_group'] as $k => $v) {
     $v = explode(',', (string) $v);
-    $oid_index = explode(".2.1.3.", $k);
+    $oid_index = explode("'.2.1.3.', $k);
     $port_oid = explode('4.', $oid_index[1], 2);
     $port_ascii = $port_oid[1];
     $codes = explode('.', $port_ascii);
@@ -168,7 +168,7 @@ foreach ($snmp['mgmt_group'] as $k => $v) {
 
     $device_index = substr($device_ascii, -1);
     $port_index = substr($port_ascii, -1);
-    $index = $device_index . "." . $port_index;
+    $index = $device_index . '.' . $port_index;
 
     $port_stats[$index]['ifDescr'] = $device_text . '/' . $port_text;
     $port_stats[$index]['ifAlias'] = $device_text . '/' . $port_text;
@@ -193,7 +193,7 @@ foreach ($snmp['mgmt_group'] as $k => $v) {
 
 foreach ($snmp['ctx_if'] as $k => $v) {
     $v = explode(',', (string) $v);
-    $oid_index = explode(".1.5.", $k);
+    $oid_index = explode('.1.5.', $k);
     $port_oid = explode('.9.', $oid_index[1], 2);
     $port_ascii = $port_oid[1];
 
