@@ -33,9 +33,6 @@ use LibreNMS\Interfaces\Discovery\IsIsDiscovery;
 use LibreNMS\Interfaces\Polling\IsIsPolling;
 use SnmpQuery;
 
-class Voss extends Shared\Extreme implements IsIsDiscovery, IsIsPolling
-{
-    use SyncsModels;
     /**
      * Array of shortened ISIS codes
      *
