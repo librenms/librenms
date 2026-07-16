@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.8",
+                    "sysDescr": "Netgate PFSENSE Plus",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "location": "<private>",
+                    "os": "pfsense",
+                    "type": "firewall",
+                    "serial": null,
+                    "icon": "pfsense.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}
