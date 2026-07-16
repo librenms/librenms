@@ -52,7 +52,7 @@ $snmp['ctx_if'] = SnmpQuery::device($deviceModel)->numeric()->walk('.1.3.6.1.4.1
 
 foreach ($snmp['speed_group'] as $k => $v) {
     $v = explode(',', (string) $v);
-    $oid_index = explode('14.', $k, 2);
+    $oid_index = explode('14.', (string) $k, 2);
     $port_oid = explode('.4.', $oid_index[1], 2);
 
     $device_ascii = $port_oid[0];
@@ -98,7 +98,7 @@ foreach ($snmp['speed_group'] as $k => $v) {
 
 foreach ($snmp['ports_group'] as $k => $v) {
     $v = explode(',', (string) $v);
-    $oid_index = explode('.2.1.3.', $k);
+    $oid_index = explode('.2.1.3.', (string) $k);
     $port_oid = explode('4.', $oid_index[1], 2);
     $port_ascii = $port_oid[1];
     $codes = explode('.', $port_ascii);
@@ -146,7 +146,7 @@ foreach ($snmp['ports_group'] as $k => $v) {
 
 foreach ($snmp['mgmt_group'] as $k => $v) {
     $v = explode(',', (string) $v);
-    $oid_index = explode('14.', $k, 2);
+    $oid_index = explode('14.', (string) $k, 2);
     $port_oid = explode('.4.', $oid_index[1], 2);
     $device_ascii = $port_oid[0];
     $port_ascii = $port_oid[1];
@@ -192,7 +192,7 @@ foreach ($snmp['mgmt_group'] as $k => $v) {
 
 foreach ($snmp['ctx_if'] as $k => $v) {
     $v = explode(',', (string) $v);
-    $oid_index = explode('.1.5.', $k);
+    $oid_index = explode('.1.5.', (string) $k);
     $port_oid = explode('.9.', $oid_index[1], 2);
     $port_ascii = $port_oid[1];
 

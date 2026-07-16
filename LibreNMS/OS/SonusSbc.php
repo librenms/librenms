@@ -48,21 +48,20 @@ class SonusSbc extends OS implements ProcessorDiscovery
      */
     public function discoverMempools()
     {
-        $deviceModel = Device::find($this->getDeviceId());
+        $deviceModel = DeviceCache::get($device['device_id']);
         /** @var Collection<int, Mempool> $mempools */
         $mempools = new Collection();
-        $mempools_array = SnmpQuery::device($deviceModel)->walk('.1.3.6.1.4.1.2879.2.8.5.1.19.1.2')->values();
+        $mempools_array = SnmpQuery::device($deviceModel)->numeric()->walk('.1.3.6.1.4.1.2879.2.8.5.1.19.1.2')->values();
         $size = 100;
 
-        foreach (Arr::wrap($mempools_array) as $index => $entry) {
-            $device_ascii = explode('14.', (string) $index, 2);
+        foreach (Arr::wrap($mempools_array) as $key => $value) {
+            $device_ascii = explode('14.', (string) $key, 2);
             $codes_device = explode('.', $device_ascii[1]);
             $device_text = '';
 
             foreach ($codes_device as $code) {
                 $device_text .= chr((int) $code);
             }
-            $percent_used = $entry;
 
             if ($percent_used != 0) {
                 $mempools->push((new Mempool([
@@ -70,9 +69,9 @@ class SonusSbc extends OS implements ProcessorDiscovery
                     'mempool_type' => 'sonus-sbc',
                     'mempool_class' => 'system',
                     'mempool_descr' => 'Memory Utilization - ' . $device_text,
-                    'mempool_perc_oid' => '.1.3.6.1.4.1.2879.2.8.5.1.19.1.2.14.' . $device_ascii[1],
+                    'mempool_perc_oid' => $key,
                     'mempool_perc_warn' => 90,
-                ]))->fillUsage(null, $size, null, $percent_used));
+                ]))->fillUsage(null, $size, null, $value));
             }
         }
 
@@ -84,15 +83,15 @@ class SonusSbc extends OS implements ProcessorDiscovery
      */
     public function discoverProcessors()
     {
-        $deviceModel = Device::find($this->getDeviceId());
+        $deviceModel = DeviceCache::get($device['device_id']);
         $proc_oid = '1.3.6.1.4.1.2879.2.8.5.1.17.1.3';
 
-        $data = SnmpQuery::device($deviceModel)->walk($proc_oid)->values();
+        $data = SnmpQuery::device($deviceModel)->numeric()->walk($proc_oid)->values();
         /** @var array<int, Processor> $processors */
         $processors = [];
 
-        foreach ($data as $oid => $value) {
-            $device_oid = explode('14.', (string) $oid, 2);
+        foreach ($data as $key => $value) {
+            $device_oid = explode('14.', (string) $key, 2);
             $device_ascii = $device_oid[1];
             $codes_device = explode('.', $device_ascii);
             $device_text = '';
@@ -107,7 +106,7 @@ class SonusSbc extends OS implements ProcessorDiscovery
             $processors[] = Processor::discover(
                 $processor_type,
                 $this->getDeviceId(),
-                $proc_oid . '.14.' . $device_ascii,
+                $key,
                 $device_text,
                 $processor_descr,
                 1,
