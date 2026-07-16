@@ -658,7 +658,7 @@ devices:
     - { Field: location_id, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: os, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: status, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-    - { Field: status_reason, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: status_reason, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: uptime, Type: bigint, 'Null': true, Extra: '' }
@@ -1196,7 +1196,7 @@ mpls_saps:
     - { Field: sapEncapValue, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: sapRowStatus, Type: "enum('active','notInService','notReady','createAndGo','createAndWait','destroy')", 'Null': true, Extra: '' }
     - { Field: sapType, Type: "enum('unknown','epipe','tls','vprn','ies','mirror','apipe','fpipe','ipipe','cpipe','intTls','evpnIsaTls')", 'Null': true, Extra: '' }
-    - { Field: sapDescription, Type: varchar(80), 'Null': true, Extra: '' }
+    - { Field: sapDescription, Type: varchar(160), 'Null': true, Extra: '' }
     - { Field: sapAdminStatus, Type: "enum('up','down')", 'Null': true, Extra: '' }
     - { Field: sapOperStatus, Type: "enum('up','down')", 'Null': true, Extra: '' }
     - { Field: sapLastMgmtChange, Type: bigint, 'Null': true, Extra: '' }

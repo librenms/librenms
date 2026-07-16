@@ -79,7 +79,7 @@ if ($mempools->isNotEmpty()) {
         };
 
         echo '<div class="tw:flex tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
-            <div class="tw:w-36 tw:min-w-0 tw:shrink-0 tw:truncate">' . \LibreNMS\Util\Url::overlibLink($link, $mempool->mempool_descr, $overlib_content) . '</div>
+            <div class="tw:w-36 tw:min-w-0 tw:shrink-0 tw:whitespace-nowrap">' . \LibreNMS\Util\Url::overlibLink($link, $mempool->mempool_descr, $overlib_content) . '</div>
             <div class="tw:flex tw:min-w-0 tw:flex-1 tw:justify-center">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</div>
             <div>' . \LibreNMS\Util\Url::overlibLink($link, $percentageBar, $overlib_content) . '</div>
             </div>';

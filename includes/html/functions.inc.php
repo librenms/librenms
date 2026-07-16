@@ -18,6 +18,7 @@ use App\Models\Device;
 use App\Models\Port;
 use App\Models\Sensor;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\HtmlString;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
@@ -82,7 +83,11 @@ function generate_device_link($device, $text = null, $vars = [], $start = 0, $en
 {
     $deviceModel = DeviceCache::get((int) ($device['device_id'] ?? 0));
 
-    return Url::deviceLink($deviceModel, $text, $vars, $start, $end, $escape_text, $overlib);
+    if (! $escape_text) {
+        $text = new HtmlString($text);
+    }
+
+    return Url::deviceLink($deviceModel, $text, $vars, $start, $end, $overlib);
 }
 
 function bill_permitted($bill_id)
@@ -148,83 +153,6 @@ function alert_layout($severity)
         'icon_color' => $color,
         'background_color' => $background, ];
 }
-
-function generate_dynamic_graph_tag($args)
-{
-    $urlargs = [];
-    $width = 0;
-    foreach ($args as $key => $arg) {
-        switch (strtolower((string) $key)) {
-            case 'width':
-                $width = $arg;
-                $value = '{{width}}';
-                break;
-            case 'from':
-                $value = '{{start}}';
-                break;
-            case 'to':
-                $value = '{{end}}';
-                break;
-            default:
-                $value = $arg;
-                break;
-        }
-        $urlargs[] = $key . '=' . $value;
-    }
-
-    return '<img style="width:' . $width . 'px;height:100%" class="graph graph-image img-responsive" data-src-template="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
-}//end generate_dynamic_graph_tag()
-
-function generate_dynamic_graph_js($args)
-{
-    $from = (is_numeric($args['from']) ? $args['from'] : '(new Date()).getTime() / 1000 - 24*3600');
-    $range = (is_numeric($args['to']) ? $args['to'] - $args['from'] : '24*3600');
-
-    $output = '<script src="js/RrdGraphJS/q-5.0.2.min.js"></script>
-        <script src="js/RrdGraphJS/moment-timezone-with-data.js"></script>
-        <script src="js/RrdGraphJS/rrdGraphPng.js"></script>
-          <script type="text/javascript">
-              q.ready(function(){
-                  var graphs = [];
-                  q(\'.graph\').forEach(function(item){
-                      graphs.push(
-                          q(item).rrdGraphPng({
-                              canvasPadding: 120,
-                                initialStart: ' . $from . ',
-                                initialRange: ' . $range . '
-                          })
-                      );
-                  });
-              });
-              // needed for dynamic height
-              window.onload = function(){ window.dispatchEvent(new Event(\'resize\')); }
-          </script>';
-
-    return $output;
-}//end generate_dynamic_graph_js()
-
-function generate_graph_js_state($args)
-{
-    // we are going to assume we know roughly what the graph url looks like here.
-    // TODO: Add sensible defaults
-    $from = (is_numeric($args['from']) ? $args['from'] : 0);
-    $to = (is_numeric($args['to']) ? $args['to'] : 0);
-    $width = (is_numeric($args['width']) ? $args['width'] : 0);
-    $height = (is_numeric($args['height']) ? $args['height'] : 0);
-    $legend = str_replace("'", '', $args['legend'] ?? '');
-
-    $state = <<<STATE
-<script type="text/javascript" language="JavaScript">
-document.graphFrom = $from;
-document.graphTo = $to;
-document.graphWidth = $width;
-document.graphHeight = $height;
-document.graphLegend = '$legend';
-</script>
-STATE;
-
-    return $state;
-}//end generate_graph_js_state()
 
 function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
 {
@@ -433,14 +361,6 @@ function generate_pagination($count, $limit, $page, $links = 2)
 
     return $return;
 }//end generate_pagination()
-
-function clean_bootgrid($string)
-{
-    $output = str_replace(["\r", "\n"], '', $string);
-    $output = addslashes($output);
-
-    return $output;
-}//end clean_bootgrid()
 
 function get_url()
 {

@@ -4,15 +4,23 @@
     "builder": {"condition":"AND","rules":[{"id":"macros.device_down","field":"macros.device_down","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
   },
   {
-    "builder": {"condition":"AND","rules":[{"id":"macros.device_down","field":"macros.device_down","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"devices.status_reason","field":"devices.status_reason","type":"string","input":"text","operator":"equal","value":"icmp"}],"valid":true},
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_down","field":"macros.device_down","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"devices.status_reason","field":"devices.status_reason","type":"string","input":"text","operator":"contains","value":"icmp"}],"valid":true},
     "name": "Device Down! Due to no ICMP response.",
     "default": true
   },
   {
-    "builder": {"condition":"AND","rules":[{"id":"macros.device_down","field":"macros.device_down","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"devices.status_reason","field":"devices.status_reason","type":"string","input":"text","operator":"equal","value":"snmp"}],"valid":true},
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_down","field":"macros.device_down","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"devices.status_reason","field":"devices.status_reason","type":"string","input":"text","operator":"contains","value":"snmp"}],"valid":true},
     "name": "Device Down (SNMP unreachable)",
     "default": true,
     "notes": "Device may responds on ICMP but not on SNMP."
+  },
+  {
+    "name": "ICMP Latency Abnormally High",
+    "builder": {"condition":"AND","rules":[{"id":"macros.ping_rtt_variance_perc","field":"macros.ping_rtt_variance_perc","type":"integer","input":"text","operator":"greater","value":"50"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "ICMP Packet Loss Abnormally High",
+    "builder": {"condition":"AND","rules":[{"id":"macros.ping_loss_variance_perc","field":"macros.ping_loss_variance_perc","type":"integer","input":"text","operator":"greater","value":"20"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
   },
   {
     "builder": {"condition":"AND","rules":[{"id":"devices.mtu_status","field":"devices.mtu_status","type":"integer","input":"text","operator":"equal","value":"0"}],"valid":true},

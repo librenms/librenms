@@ -38,6 +38,7 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use SnmpQuery;
@@ -52,7 +53,7 @@ class Ospf implements Module
         return ['ports'];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
         return false;
     }
@@ -65,9 +66,9 @@ class Ospf implements Module
         // no discovery
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
@@ -80,15 +81,15 @@ class Ospf implements Module
 
             // Pull data from device
             $ospf_instances_poll = SnmpQuery::context($context_name)
-                ->hideMib()->enumStrings()
+                ->enumStrings()
                 ->walk('OSPF-MIB::ospfGeneralGroup')->valuesByIndex();
 
             $ospf_instances = new Collection();
             foreach ($ospf_instances_poll as $ospf_instance_id => $ospf_entry) {
-                if (empty($ospf_entry['ospfRouterId'])) {
+                if (empty($ospf_entry['OSPF-MIB::ospfRouterId'])) {
                     continue; // skip invalid data
                 }
-                foreach (['ospfRxNewLsas', 'ospfOriginateNewLsas', 'ospfAreaBdrRtrStatus', 'ospfTOSSupport', 'ospfExternLsaCksumSum', 'ospfExternLsaCount', 'ospfASBdrRtrStatus', 'ospfVersionNumber', 'ospfAdminStat'] as $column) {
+                foreach (['OSPF-MIB::ospfRxNewLsas', 'OSPF-MIB::ospfOriginateNewLsas', 'OSPF-MIB::ospfAreaBdrRtrStatus', 'OSPF-MIB::ospfTOSSupport', 'OSPF-MIB::ospfExternLsaCksumSum', 'OSPF-MIB::ospfExternLsaCount', 'OSPF-MIB::ospfASBdrRtrStatus', 'OSPF-MIB::ospfVersionNumber', 'OSPF-MIB::ospfAdminStat'] as $column) {
                     if (! array_key_exists($column, $ospf_entry) || is_null($ospf_entry[$column])) {
                         continue 2; // This column must exist and not be null
                     }
@@ -98,7 +99,22 @@ class Ospf implements Module
                     'device_id' => $os->getDeviceId(),
                     'ospf_instance_id' => $ospf_instance_id,
                     'context_name' => $context_name,
-                ], $ospf_entry);
+                ], [
+                    'ospfRouterId' => $ospf_entry['OSPF-MIB::ospfRouterId'],
+                    'ospfAdminStat' => $ospf_entry['OSPF-MIB::ospfAdminStat'],
+                    'ospfVersionNumber' => $ospf_entry['OSPF-MIB::ospfVersionNumber'],
+                    'ospfAreaBdrRtrStatus' => $ospf_entry['OSPF-MIB::ospfAreaBdrRtrStatus'],
+                    'ospfASBdrRtrStatus' => $ospf_entry['OSPF-MIB::ospfASBdrRtrStatus'],
+                    'ospfExternLsaCount' => $ospf_entry['OSPF-MIB::ospfExternLsaCount'],
+                    'ospfExternLsaCksumSum' => $ospf_entry['OSPF-MIB::ospfExternLsaCksumSum'],
+                    'ospfTOSSupport' => $ospf_entry['OSPF-MIB::ospfTOSSupport'],
+                    'ospfOriginateNewLsas' => $ospf_entry['OSPF-MIB::ospfOriginateNewLsas'],
+                    'ospfRxNewLsas' => $ospf_entry['OSPF-MIB::ospfRxNewLsas'],
+                    'ospfExtLsdbLimit' => $ospf_entry['OSPF-MIB::ospfExtLsdbLimit'] ?? null,
+                    'ospfMulticastExtensions' => $ospf_entry['OSPF-MIB::ospfMulticastExtensions'] ?? null,
+                    'ospfExitOverflowInterval' => $ospf_entry['OSPF-MIB::ospfExitOverflowInterval'] ?? null,
+                    'ospfDemandExtensions' => $ospf_entry['OSPF-MIB::ospfDemandExtensions'] ?? null,
+                ]);
 
                 $ospf_instances->push($instance);
             }
