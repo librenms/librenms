@@ -99,7 +99,7 @@ foreach ($snmp['speed_group'] as $k => $v) {
 
 foreach ($snmp['ports_group'] as $k => $v) {
     $v = explode(',', (string) $v);
-    $oid_index = explode("'.2.1.3.', $k);
+    $oid_index = explode('.2.1.3.', $k);
     $port_oid = explode('4.', $oid_index[1], 2);
     $port_ascii = $port_oid[1];
     $codes = explode('.', $port_ascii);
