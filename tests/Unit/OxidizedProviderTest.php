@@ -60,6 +60,7 @@ final class OxidizedProviderTest extends TestCase
 
     /**
      * @param  array<string, mixed>  $extra
+     * @return array<string, mixed>
      */
     private function fakeNode(array $extra = []): array
     {
@@ -219,8 +220,8 @@ final class OxidizedProviderTest extends TestCase
         // orig (older) = bbbb2222, rev (newer) = aaaa1111
         $this->makeProvider()->diff($this->makeDevice(), 'bbbb2222', 'aaaa1111');
 
-        Http::assertSent(fn ($request) => str_contains($request->url(), 'oid=aaaa1111')
-            && str_contains($request->url(), 'oid2=bbbb2222'));
+        Http::assertSent(fn ($request) => str_contains((string) $request->url(), 'oid=aaaa1111')
+            && str_contains((string) $request->url(), 'oid2=bbbb2222'));
     }
 
     public function testNoVersioningFallsBackToCurrentConfig(): void
