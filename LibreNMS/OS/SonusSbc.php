@@ -26,6 +26,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\DeviceCache;
 use App\Models\Device;
 use App\Models\Mempool;
 use Illuminate\Support\Arr;
@@ -48,7 +49,7 @@ class SonusSbc extends OS implements ProcessorDiscovery
      */
     public function discoverMempools()
     {
-        $deviceModel = DeviceCache::get($device['device_id']);
+        $deviceModel = DeviceCache::get($this->getDeviceId());
         /** @var Collection<int, Mempool> $mempools */
         $mempools = new Collection();
         $mempools_array = SnmpQuery::device($deviceModel)->numeric()->walk('.1.3.6.1.4.1.2879.2.8.5.1.19.1.2')->values();
@@ -63,7 +64,7 @@ class SonusSbc extends OS implements ProcessorDiscovery
                 $device_text .= chr((int) $code);
             }
 
-            if ($percent_used != 0) {
+            if ($value != 0) {
                 $mempools->push((new Mempool([
                     'mempool_index' => $device_text,
                     'mempool_type' => 'sonus-sbc',
@@ -83,7 +84,7 @@ class SonusSbc extends OS implements ProcessorDiscovery
      */
     public function discoverProcessors()
     {
-        $deviceModel = DeviceCache::get($device['device_id']);
+        $deviceModel = DeviceCache::get($this->getDeviceId());
         $proc_oid = '1.3.6.1.4.1.2879.2.8.5.1.17.1.3';
 
         $data = SnmpQuery::device($deviceModel)->numeric()->walk($proc_oid)->values();
