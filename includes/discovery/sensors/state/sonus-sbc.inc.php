@@ -23,7 +23,6 @@
  * @copyright  2026 Network Factory Solutions
  * @author     Sofia El Khalifi <sofia.elkhalifi@netsf.fr>
  */
-
 $deviceModel = DeviceCache::get($device['device_id']);
 
 $stateName = 'sonusSystemServerStatusMgmtRedundancyRole';

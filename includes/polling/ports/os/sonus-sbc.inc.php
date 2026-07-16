@@ -23,7 +23,6 @@
  * @copyright  2026 Sofia El Khalifi
  * @author     Sofia El Khalifi <sofia.elkhalifi@netsf.fr>
  */
-
 $deviceModel = DeviceCache::get($device['device_id']);
 
 $EthPortSpeed = [
