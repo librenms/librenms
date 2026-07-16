@@ -28,12 +28,14 @@ use App\Models\IsisAdjacency;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Discovery\IsIsDiscovery;
 use LibreNMS\Interfaces\Polling\IsIsPolling;
 use SnmpQuery;
 
 class Voss extends Shared\Extreme implements IsIsDiscovery, IsIsPolling
 {
+    use SyncsModels;
     /**
      * Array of shortened ISIS codes
      *
