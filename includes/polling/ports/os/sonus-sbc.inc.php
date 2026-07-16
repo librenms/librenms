@@ -24,9 +24,7 @@
  * @author     Sofia El Khalifi <sofia.elkhalifi@netsf.fr>
  */
 
-use App\Models\Device;
-
-$deviceModel = Device::find($device['device_id']);
+$deviceModel = DeviceCache::get($device['device_id']);
 
 $EthPortSpeed = [
     '1' => '10000000',
@@ -48,27 +46,15 @@ $EthPortSpeed = [
 
 $snmp = [];
 $ports_mapping = [];
-$snmp['ports_group'] = SnmpQuery::device($deviceModel)->walk('.1.3.6.1.4.1.2879.2.10.4.2.1.3')->values();
-$snmp['mgmt_group'] = SnmpQuery::device($deviceModel)->walk('.1.3.6.1.4.1.2879.2.10.4.3.1.5')->values();
-$snmp['speed_group'] = SnmpQuery::device($deviceModel)->walk('.1.3.6.1.4.1.2879.2.10.4.1.1.4')->values();
-$snmp['ctx_if'] = SnmpQuery::device($deviceModel)->walk('.1.3.6.1.4.1.2879.2.10.2.10.1.5')->values();
+$snmp['ports_group'] = SnmpQuery::device($deviceModel)->numeric()->walk('.1.3.6.1.4.1.2879.2.10.4.2.1.3')->values();
+$snmp['mgmt_group'] = SnmpQuery::device($deviceModel)->numeric()->walk('.1.3.6.1.4.1.2879.2.10.4.3.1.5')->values();
+$snmp['speed_group'] = SnmpQuery::device($deviceModel)->numeric()->walk('.1.3.6.1.4.1.2879.2.10.4.1.1.4')->values();
+$snmp['ctx_if'] = SnmpQuery::device($deviceModel)->numeric()->walk('.1.3.6.1.4.1.2879.2.10.2.10.1.5')->values();
 
 foreach ($snmp['speed_group'] as $k => $v) {
     $v = explode(',', (string) $v);
-    $k_array = explode('.', (string) $k);
-
-    if ($k_array[0] == 'enterprises') {
-        $ports_mapping['oid'] = str_replace('enterprises.2.10.4.1.1.4.', '', $k); //# centos case
-    }
-    if ($k_array[0] == 'iso') {
-        $ports_mapping['oid'] = str_replace('iso.3.6.1.4.1.2879.2.10.4.1.1.4.', '', $k); //# debian / docker case
-    }
-    if ($k_array[0] == 'SNMPv2-SMI::enterprises') {
-        $ports_mapping['oid'] = str_replace('SNMPv2-SMI::enterprises.2879.2.10.4.1.1.4.', '', $k); //# debian / docker case
-    }
-
-    $port_oid = explode('14.', $ports_mapping['oid'], 2);
-    $port_oid = explode('.4.', $port_oid[1], 2);
+    $oid_index = explode('14.', $k, 2);
+    $port_oid = explode('.4.', $oid_index[1], 2);
 
     $device_ascii = $port_oid[0];
     $port_ascii = $port_oid[1];
@@ -89,11 +75,11 @@ foreach ($snmp['speed_group'] as $k => $v) {
 
     $device_index = substr($device_ascii, -1);
     $port_index = substr($port_ascii, -1);
-    $index = $device_index * 100 + $device_index * 10 + $port_index;
+    $index = $device_index . "." . $port_index;
 
     $port_stats[$index]['ifDescr'] = $device_text . '/' . $port_text;
     $port_stats[$index]['ifAlias'] = $device_text . '/' . $port_text;
-    $speed = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.1.1.4.' . $ports_mapping['oid'])->value();
+    $speed = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.1.1.4.14.' . $oid_index[1])->value();
     $port_stats[$index]['ifSpeed'] = $EthPortSpeed[(string) $speed];
 
     $phy_status = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.5.1.10.14.' . $device_ascii . '.8.112.114.103.95.' . $port_ascii)->value();
@@ -107,26 +93,14 @@ foreach ($snmp['speed_group'] as $k => $v) {
         $port_stats[$index]['ifOperStatus'] = 'down';
     }
 
-    $port_stats[$index]['ifOutOctets'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.1.1.34.' . $ports_mapping['oid'])->value();
-    $port_stats[$index]['ifInOctets'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.1.1.33.' . $ports_mapping['oid'])->value();
+    $port_stats[$index]['ifOutOctets'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.1.1.34.14.' . $oid_index[1])->value();
+    $port_stats[$index]['ifInOctets'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.1.1.33.14.' . $oid_index[1])->value();
 }
 
-// For each interface...
 foreach ($snmp['ports_group'] as $k => $v) {
     $v = explode(',', (string) $v);
-    $k_array = explode('.', (string) $k);
-
-    if ($k_array[0] == 'enterprises') {
-        $ports_mapping['oid'] = str_replace('enterprises.2.10.4.2.1.3.', '', $k); //# centos case
-    }
-    if ($k_array[0] == 'iso') {
-        $ports_mapping['oid'] = str_replace('iso.3.6.1.4.1.2879.2.10.4.2.1.3.', '', $k); //# debian / docker case
-    }
-    if ($k_array[0] == 'SNMPv2-SMI::enterprises') {
-        $ports_mapping['oid'] = str_replace('SNMPv2-SMI::enterprises.2879.2.10.4.2.1.3.', '', $k); //# debian / docker case
-    }
-
-    $port_oid = explode('4.', $ports_mapping['oid'], 2);
+    $oid_index = explode(".2.1.3.", $k);
+    $port_oid = explode('4.', $oid_index[1], 2);
     $port_ascii = $port_oid[1];
     $codes = explode('.', $port_ascii);
     $port_text = '';
@@ -135,29 +109,27 @@ foreach ($snmp['ports_group'] as $k => $v) {
         $port_text .= chr((int) $code);
     }
 
-    $port_index = substr($port_ascii, -1);
+    $index = substr($port_ascii, -1);
 
-    $index = $port_index;
     $port_stats[$index]['ifDescr'] = $port_text;
     $port_stats[$index]['ifAlias'] = $port_text;
 
-    $port_stats[$index]['ifOutOctets'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.2.1.3.' . $ports_mapping['oid'])->value();
-    $port_stats[$index]['ifInOctets'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.2.1.1.' . $ports_mapping['oid'])->value();
+    $port_stats[$index]['ifOutOctets'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.2.1.3.' . $oid_index[1])->value();
+    $port_stats[$index]['ifInOctets'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.2.1.1.' . $oid_index[1])->value();
 
-    $port_stats[$index]['ifOutUcastPkts'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.2.1.6.' . $ports_mapping['oid'])->value();
-    $port_stats[$index]['ifInUcastPkts'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.2.1.5.' . $ports_mapping['oid'])->value();
+    $port_stats[$index]['ifOutUcastPkts'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.2.1.6.' . $oid_index[1])->value();
+    $port_stats[$index]['ifInUcastPkts'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.2.1.5.' . $oid_index[1])->value();
 
-    $port_stats[$index]['ifOutErrors'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.2.1.7.' . $ports_mapping['oid'])->value();
-    $port_stats[$index]['ifInErrors'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.2.1.8.' . $ports_mapping['oid'])->value();
+    $port_stats[$index]['ifOutErrors'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.2.1.7.' . $oid_index[1])->value();
+    $port_stats[$index]['ifInErrors'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.2.1.8.' . $oid_index[1])->value();
 
-    $port_stats[$index]['ifOutDiscards'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.2.1.10.' . $ports_mapping['oid'])->value();
-    $port_stats[$index]['ifInDiscards'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.2.1.9.' . $ports_mapping['oid'])->value();
+    $port_stats[$index]['ifOutDiscards'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.2.1.10.' . $oid_index[1])->value();
+    $port_stats[$index]['ifInDiscards'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.2.1.9.' . $oid_index[1])->value();
 
     $status = DB::raw('SELECT `ifOperStatus` FROM `ports` WHERE `device_id` = ? AND `ifDescr` LIKE ?', [$device['device_id'], '%/' . $port_text]);
     $up = true;
 
     foreach ($status as $s) {
-        echo 'Port status : ' . $s . "\n";
         if ($s != 'up') {
             $up = false;
             break;
@@ -175,21 +147,8 @@ foreach ($snmp['ports_group'] as $k => $v) {
 
 foreach ($snmp['mgmt_group'] as $k => $v) {
     $v = explode(',', (string) $v);
-    $k_array = explode('.', (string) $k);
-
-    if ($k_array[0] == 'enterprises') {
-        $ports_mapping['oid'] = str_replace('enterprises.2.10.4.3.1.5.', '', $k); //# centos case
-    }
-    if ($k_array[0] == 'iso') {
-        $ports_mapping['oid'] = str_replace('iso.3.6.1.4.1.2879.2.10.4.3.1.5.', '', $k); //# debian / docker case
-    }
-    if ($k_array[0] == 'SNMPv2-SMI::enterprises') {
-        $ports_mapping['oid'] = str_replace('SNMPv2-SMI::enterprises.2879.2.10.4.3.1.5.', '', $k); //# debian / docker case
-    }
-
-    $port_oid = explode('14.', $ports_mapping['oid'], 2);
-    $port_oid = explode('.4.', $port_oid[1], 2);
-
+    $oid_index = explode('14.', $k, 2);
+    $port_oid = explode('.4.', $oid_index[1], 2);
     $device_ascii = $port_oid[0];
     $port_ascii = $port_oid[1];
 
@@ -209,12 +168,12 @@ foreach ($snmp['mgmt_group'] as $k => $v) {
 
     $device_index = substr($device_ascii, -1);
     $port_index = substr($port_ascii, -1);
-    $index = $device_index * 10 + $port_index;
+    $index = $device_index . "." . $port_index;
 
     $port_stats[$index]['ifDescr'] = $device_text . '/' . $port_text;
     $port_stats[$index]['ifAlias'] = $device_text . '/' . $port_text;
 
-    $speed = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.3.1.5.' . $ports_mapping['oid'])->value();
+    $speed = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.3.1.5.14.' . $oid_index[1])->value();
     $port_stats[$index]['ifSpeed'] = $EthPortSpeed[(string) $speed];
 
     $phy_status = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.5.1.10.14.' . $device_ascii . '.8.112.114.103.95.' . $port_ascii)->value();
@@ -228,25 +187,14 @@ foreach ($snmp['mgmt_group'] as $k => $v) {
         $port_stats[$index]['ifOperStatus'] = 'down';
     }
 
-    $port_stats[$index]['ifOutOctets'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.3.1.15.' . $ports_mapping['oid'])->value();
-    $port_stats[$index]['ifInOctets'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.3.1.14.' . $ports_mapping['oid'])->value();
+    $port_stats[$index]['ifOutOctets'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.3.1.15.14.' . $oid_index[1])->value();
+    $port_stats[$index]['ifInOctets'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.4.3.1.14.' . $oid_index[1])->value();
 }
 
 foreach ($snmp['ctx_if'] as $k => $v) {
     $v = explode(',', (string) $v);
-    $k_array = explode('.', (string) $k);
-
-    if ($k_array[0] == 'enterprises') {
-        $ports_mapping['oid'] = str_replace('enterprises.3.6.1.4.1.2879.2.10.2.10.1.5.', '', $k); //# centos case
-    }
-    if ($k_array[0] == 'iso') {
-        $ports_mapping['oid'] = str_replace('iso.3.6.1.4.1.2879.2.10.2.10.1.5.', '', $k); //# debian / docker case
-    }
-    if ($k_array[0] == 'SNMPv2-SMI::enterprises') {
-        $ports_mapping['oid'] = str_replace('SNMPv2-SMI::enterprises.2879.2.10.2.10.1.5.', '', $k); //# debian / docker case
-    }
-
-    $port_oid = explode('.9.', $ports_mapping['oid'], 2);
+    $oid_index = explode(".1.5.", $k);
+    $port_oid = explode('.9.', $oid_index[1], 2);
     $port_ascii = $port_oid[1];
 
     $codes_port = explode('.', $port_ascii);
@@ -261,7 +209,7 @@ foreach ($snmp['ctx_if'] as $k => $v) {
     $port_stats[$index]['ifDescr'] = $port_text;
     $port_stats[$index]['ifAlias'] = $port_text;
 
-    $oper_status = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.2.10.1.3.' . $ports_mapping['oid'])->value();
+    $oper_status = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.2.10.1.3.' . $oid_index[1])->value();
 
     if ($oper_status == 0) {
         $port_stats[$index]['ifAdminStatus'] = null;
@@ -277,6 +225,6 @@ foreach ($snmp['ctx_if'] as $k => $v) {
         $port_stats[$index]['ifOperStatus'] = 'up';
     }
 
-    $port_stats[$index]['ifInUcastPkts'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.2.10.1.5.' . $ports_mapping['oid'])->value();
-    $port_stats[$index]['ifOutUcastPkts'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.2.10.1.6.' . $ports_mapping['oid'])->value();
+    $port_stats[$index]['ifInUcastPkts'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.2.10.1.5.' . $oid_index[1])->value();
+    $port_stats[$index]['ifOutUcastPkts'] = SnmpQuery::device($deviceModel)->get('.1.3.6.1.4.1.2879.2.10.2.10.1.6.' . $oid_index[1])->value();
 }

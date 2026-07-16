@@ -24,9 +24,7 @@
  * @author     Sofia El Khalifi <sofia.elkhalifi@netsf.fr>
  */
 
-use App\Models\Device;
-
-$deviceModel = Device::find($device['device_id']);
+$deviceModel = DeviceCache::get($device['device_id']);
 
 $stateName = 'sonusSystemServerStatusMgmtRedundancyRole';
 
@@ -39,34 +37,19 @@ $states = [
 
 create_state_index($stateName, $states);
 
-$server_status = SnmpQuery::device($deviceModel)->walk('.1.3.6.1.4.1.2879.2.8.5.1.12.1.8')->values();
+$server_status = SnmpQuery::device($deviceModel)->numeric()->walk('.1.3.6.1.4.1.2879.2.8.5.1.12.1.8')->values();
 
-foreach ($server_status as $index => $entry) {
-    $k_array = explode('.', (string) $index);
-
-    if ($k_array[0] == 'enterprises') {
-        $ports_mapping['oid'] = str_replace('enterprises.3.6.1.4.1.2879.2.8.5.1.12.1.8.', '', $index); //# centos case
-    }
-    if ($k_array[0] == 'iso') {
-        $ports_mapping['oid'] = str_replace('iso.3.6.1.4.1.2879.2.8.5.1.12.1.8.', '', $index); //# debian / docker case
-    }
-    if ($k_array[0] == '3') {
-        $ports_mapping['oid'] = str_replace('3.6.1.4.1.2879.2.8.5.1.12.1.8.', '', $index); //# debian / docker case
-    }
-    if ($k_array[0] == 'SNMPv2-SMI::enterprises') {
-        $ports_mapping['oid'] = str_replace('SNMPv2-SMI::enterprises.2879.2.8.5.1.12.1.8.', '', $index); //# debian / docker case
-    }
-
-    $index = $ports_mapping['oid'];
-    $server_name = SnmpQuery::get('.1.3.6.1.4.1.2879.2.8.5.1.12.1.16.' . $index)->value();
+foreach ($server_status as $key => $value) {
+    $index = explode(".1.8.", $key);
+    $server_name = SnmpQuery::get('.1.3.6.1.4.1.2879.2.8.5.1.12.1.16.' . $index[1])->value();
     $descr = 'Redundancy role: ' . $server_name;
-    $sensor_value = (int) $entry;
+    $sensor_value = (int) $value;
 
     discover_sensor(
         null,
         'state',
         $device,
-        '.1.3.6.1.4.1.2879.2.8.5.1.12.1.8.' . $index,
+        $key,
         $server_name,
         $stateName,
         $descr,
