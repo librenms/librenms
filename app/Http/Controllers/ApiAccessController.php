@@ -52,7 +52,15 @@ class ApiAccessController extends Controller
             ->where('tokenable_type', User::class)
             ->where('tokenable_id', $user->user_id)
             ->orderBy('id')
-            ->get();
+            ->get()
+            ->map(fn (PersonalAccessToken $token) => [
+                'id' => $token->id,
+                'name' => $token->name,
+                'created' => $token->created_at?->diffForHumans() ?? '—',
+                'expires' => $token->expires_at?->diffForHumans() ?? __('Never'),
+                'last_used' => $token->last_used_at?->diffForHumans() ?? __('Never'),
+            ])
+            ->values();
 
         return view('user.api-access', [
             'tokens' => $tokens,
