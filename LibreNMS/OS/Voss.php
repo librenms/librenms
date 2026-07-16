@@ -35,7 +35,6 @@ use SnmpQuery;
 
 class Voss extends Shared\Extreme implements IsIsDiscovery, IsIsPolling
 {
-    use SyncsModels;
     /**
      * Array of shortened ISIS codes
      *
