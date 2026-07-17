@@ -62,8 +62,8 @@ class AlertsController extends TableController
     {
         return [
             'rule_id' => 'nullable|integer|min:1',
-            'alert_id' => 'nullable|integer|min:1',
-            'device_id' => 'nullable|integer|min:1',
+            'alert_id' => 'nullable|integer',
+            'device_id' => 'nullable|integer',
             'acknowledged' => 'nullable|integer|in:0,1',
             'fired' => 'nullable|integer|in:0,1',
             'unreachable' => 'nullable|integer|in:0,1',
@@ -96,9 +96,9 @@ class AlertsController extends TableController
     protected function filterFields(Request $request): array
     {
         return [
-            'alerts.rule_id' => 'rule_id',
-            'alerts.id' => 'alert_id',
-            'alerts.device_id' => 'device_id',
+            'rule_id' => fn (Builder $q, ?int $ruleId) => $ruleId > 0 ? $q->where('alerts.rule_id', $ruleId) : null,
+            'alert_id' => fn (Builder $q, ?int $alertId) => $alertId > 0 ? $q->where('alerts.id', $alertId) : null,
+            'device_id' => fn (Builder $q, ?int $deviceId) => $deviceId > 0 ? $q->where('alerts.device_id', $deviceId) : null,
 
             'acknowledged' => function (Builder $q, ?string $acknowledged): void {
                 if ($acknowledged !== null) {
@@ -237,12 +237,11 @@ class AlertsController extends TableController
         $noteClass = empty($model->note) ? 'default' : 'warning';
 
         return [
-            'rule' => '<i title="' . htmlentities((string) $model->builder) . '"><a href="' . Url::generate(['page' => 'alert-rules']) . '">' . htmlentities((string) $model->name) . '</a></i>',
+            'rule' => '<i title="' . e((string) $model->builder) . '"><a href="' . Url::generate(['page' => 'alert-rules']) . '">' . e((string) $model->name) . '</a></i>',
             'details' => '<a class="fa-solid fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . $model->id . '" data-parent="#alerts"></a>',
             'verbose_details' => $this->verboseDetailsButton($model->latest_alert_log_id),
             'hostname' => $hostname,
-            'location' => generate_link(htmlspecialchars($model->location ?? 'N/A'),
-                ['page' => 'devices', 'location' => $model->location ?? '']),
+            'location' => '<a href="' . e(Url::generate(['page' => 'devices', 'location' => $model->location ?? ''])) . '">' . e($model->location ?? 'N/A') . '</a>',
             'timestamp' => $model->timestamp ? Time::format($model->timestamp, 'compact') : 'N/A',
             'severity' => $this->severityIcon($model->severity, $state),
             'state' => $state,
