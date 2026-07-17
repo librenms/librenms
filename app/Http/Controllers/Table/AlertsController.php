@@ -27,8 +27,11 @@ namespace App\Http\Controllers\Table;
 
 use App\Http\Parsers\AlertLogDetailParser;
 use App\Models\Alert;
+use App\Models\AlertLog;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -78,10 +81,10 @@ class AlertsController extends TableController
     {
         return [
             'timestamp',
-            'severity'  => ['alert_rules.severity', 'timestamp'],
-            'rule'      => 'alert_rules.name',
-            'hostname'  => 'devices.hostname',
-            'location'  => 'locations.location',
+            'severity' => ['alert_rules.severity', 'timestamp'],
+            'rule' => 'alert_rules.name',
+            'hostname' => 'devices.hostname',
+            'location' => 'locations.location',
         ];
     }
 
@@ -89,19 +92,17 @@ class AlertsController extends TableController
     {
         return [
             'alerts.timestamp',
-            'alert_rules.builder',
-            'alert_rules.name',
-            'devices.hostname',
-            'devices.sysName',
+            'rule' => ['builder', 'name'],
+            'device' => ['hostname', 'sysName'],
         ];
     }
 
     protected function filterFields(Request $request): array
     {
         return [
-            'rule_id' => fn (Builder $q, ?int $ruleId) => $ruleId > 0 ? $q->where('alerts.rule_id', $ruleId) : null,
-            'alert_id' => fn (Builder $q, ?int $alertId) => $alertId > 0 ? $q->where('alerts.id', $alertId) : null,
-            'device_id' => fn (Builder $q, ?int $deviceId) => $deviceId > 0 ? $q->where('alerts.device_id', $deviceId) : null,
+            'rule_id' => fn (Builder $q, ?int $id) => $id > 0 ? $q->where('alerts.rule_id', $id) : null,
+            'alert_id' => fn (Builder $q, ?int $id) => $id > 0 ? $q->where('alerts.id', $id) : null,
+            'device_id' => fn (Builder $q, ?int $id) => $id > 0 ? $q->where('alerts.device_id', $id) : null,
 
             'acknowledged' => function (Builder $q, ?string $acknowledged): void {
                 if ($acknowledged !== null) {
@@ -128,12 +129,13 @@ class AlertsController extends TableController
                 // relationship and none of its parents are up.
                 $hasParent = fn (Builder $query) => $query
                     ->from('device_relationships')
-                    ->whereColumn('device_relationships.child_device_id', 'devices.device_id');
+                    ->whereColumn('device_relationships.child_device_id', 'alerts.device_id');
 
                 $hasUpParent = fn (Builder $query) => $query
                     ->from('device_relationships')
-                    ->join('devices as parent_devices', 'parent_devices.device_id', '=', 'device_relationships.parent_device_id')
-                    ->whereColumn('device_relationships.child_device_id', 'devices.device_id')
+                    ->join('devices as parent_devices', 'parent_devices.device_id', '=',
+                        'device_relationships.parent_device_id')
+                    ->whereColumn('device_relationships.child_device_id', 'alerts.device_id')
                     ->where('parent_devices.status', '!=', 0);
 
                 if ((int) $unreachable) {
@@ -163,11 +165,13 @@ class AlertsController extends TableController
                 }
 
                 // Values 1-3 mean "X or higher"; values 4-6 mean exact match ("X only")
-                if ($severityId > 3) {
-                    $q->where('alert_rules.severity', $severityId - 3);
-                } else {
-                    $q->where('alert_rules.severity', '>=', $severityId);
-                }
+                $q->whereHas('rule', function (Builder $rq) use ($severityId): void {
+                    if ($severityId > 3) {
+                        $rq->where('severity', $severityId - 3);
+                    } else {
+                        $rq->where('severity', '>=', $severityId);
+                    }
+                });
             },
 
             'group' => function (Builder $q, ?int $group): void {
@@ -182,7 +186,9 @@ class AlertsController extends TableController
     {
         $this->authorize('viewAny', Alert::class);
 
-        // Sub-select to fetch the latest alert_log id per (rule_id, device_id) without N+1
+        // Correlated sub-select: resolves the latest alert_log.id for each alert's
+        // (rule_id, device_id) pair. Runs as a single column in the main SELECT.
+        // The actual AlertLog rows are then batch-loaded in formatResponse.
         $latestLogIdSub = DB::table('alert_log')
             ->selectRaw('MAX(id)')
             ->whereColumn('alert_log.rule_id', 'alerts.rule_id')
@@ -191,23 +197,8 @@ class AlertsController extends TableController
         $query = Alert::query()
             ->select('alerts.*')
             ->selectSub($latestLogIdSub, 'latest_alert_log_id')
-            ->leftJoin('devices', 'alerts.device_id', '=', 'devices.device_id')
-            ->leftJoin('locations', 'devices.location_id', '=', 'locations.id')
-            ->rightJoin('alert_rules', 'alerts.rule_id', '=', 'alert_rules.id')
-            ->addSelect([
-                'devices.hostname',
-                'devices.sysName',
-                'devices.display',
-                'devices.os',
-                'devices.hardware',
-                'locations.location',
-                'alert_rules.name',
-                'alert_rules.severity',
-                'alert_rules.builder',
-                'alert_rules.proc',
-                'alerts.note',
-            ])
-            ->where('devices.disabled', 0)
+            ->with(['device', 'device.location', 'rule'])
+            ->whereHas('device', fn (Builder $q) => $q->where('disabled', 0))
             ->hasAccess($request->user());
 
         // By default, hide recovered alerts unless state=0 is explicitly requested
@@ -216,7 +207,51 @@ class AlertsController extends TableController
             $query->where('alerts.state', '!=', AlertState::RECOVERED);
         }
 
+        // Add joins only for the sort columns that actually need them
+        $sort = $request->input('sort', []);
+        if (isset($sort['severity']) || isset($sort['rule'])) {
+            $query->leftJoin('alert_rules', 'alerts.rule_id', '=', 'alert_rules.id');
+        }
+        if (isset($sort['hostname'])) {
+            $query->leftJoin('devices', 'alerts.device_id', '=', 'devices.device_id');
+        }
+        if (isset($sort['location'])) {
+            if (! isset($sort['hostname'])) {
+                $query->leftJoin('devices', 'alerts.device_id', '=', 'devices.device_id');
+            }
+            $query->leftJoin('locations', 'devices.location_id', '=', 'locations.id');
+        }
+
         return $query;
+    }
+
+    /**
+     * Batch-load the latest AlertLog records for this page in a single query,
+     * attach them as a pre-loaded relation, then delegate to the standard formatter.
+     *
+     * @param  LengthAwarePaginator  $paginator
+     */
+    protected function formatResponse($paginator): JsonResponse
+    {
+        $items = collect($paginator->items());
+
+        // Collect all latest_alert_log_id values from the main query result
+        // and resolve them with one additional query — no N+1.
+        $logIds = $items->pluck('latest_alert_log_id')->filter()->unique();
+        $logs = AlertLog::whereIn('id', $logIds)->get()->keyBy('id');
+
+        // Attach each resolved AlertLog as an already-loaded relation so that
+        // formatItem can access $model->latestLog without issuing further queries.
+        $items->each(function (Alert $alert) use ($logs): void {
+            $alert->setRelation('latestLog', $logs->get($alert->latest_alert_log_id));
+        });
+
+        return response()->json([
+            'current' => $paginator->currentPage(),
+            'rowCount' => $paginator->count(),
+            'rows' => $items->map($this->formatItem(...)),
+            'total' => $paginator->total(),
+        ]);
     }
 
     /**
@@ -227,7 +262,7 @@ class AlertsController extends TableController
      */
     public function formatItem(Model $model): array
     {
-        [$faultDetail, $maxRowLength] = $this->renderFaultDetail($model->latest_alert_log_id);
+        [$faultDetail, $maxRowLength] = $this->renderFaultDetail($model->latestLog);
 
         $state = (int) $model->state;
         $collapseClass = $this->incidentCollapseClass($model->getAttribute('uncollapse_key_count'), $maxRowLength);
@@ -240,39 +275,37 @@ class AlertsController extends TableController
         $noteClass = empty($model->note) ? 'default' : 'warning';
 
         return [
-            'rule' => '<i title="' . e((string) $model->builder) . '"><a href="' . Url::generate(['page' => 'alert-rules']) . '">' . e((string) $model->name) . '</a></i>',
+            'rule' => '<i title="' . e(json_encode($model->rule?->builder)) . '"><a href="' . Url::generate(['page' => 'alert-rules']) . '">' . e((string) $model->rule?->name) . '</a></i>',
             'details' => '<a class="fa-solid fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . $model->id . '" data-parent="#alerts"></a>',
-            'verbose_details' => $this->verboseDetailsButton($model->latest_alert_log_id),
+            'verbose_details' => $this->verboseDetailsButton($model->latestLog?->id),
             'hostname' => $hostname,
-            'location' => '<a href="' . e(Url::generate(['page' => 'devices', 'location' => $model->location ?? ''])) . '">' . e($model->location ?? 'N/A') . '</a>',
+            'location' => '<a href="' . e(Url::generate([
+                    'page' => 'devices', 'location' => $model->device?->location?->location ?? ''
+                ])) . '">' . e($model->device?->location?->location ?? 'N/A') . '</a>',
             'timestamp' => $model->timestamp ? Time::format($model->timestamp, 'compact') : 'N/A',
-            'severity' => $this->severityIcon($model->severity, $state),
+            'severity' => $this->severityIcon($model->rule?->severity, $state),
             'state' => $state,
             'alert_id' => $model->id,
             'ack_ico' => $this->ackButton($model, $state),
-            'proc' => $this->procButton($model->proc),
+            'proc' => $this->procButton($model->rule?->proc),
             'notes' => "<button type='button' class='btn btn-{$noteClass} fa fa-sticky-note-o command-alert-note' aria-label='Notes' id='alert-notes' data-alert_id='{$model->id}'></button>",
         ];
     }
 
     /**
-     * Render the collapsible fault detail HTML for the latest alert_log entry.
+     * Render the collapsible fault detail HTML from an eager-loaded latestLog entry.
      *
      * @return array{0: string, 1: int} [html, plain-text length]
      */
-    private function renderFaultDetail(?int $alertLogId): array
+    private function renderFaultDetail(?AlertLog $latestLog): array
     {
-        if (! $alertLogId) {
+        if (! $latestLog || empty($latestLog->details)) {
             return ['', 0];
         }
 
-        $rawLog = DB::table('alert_log')->where('id', $alertLogId)->value('details');
-        if (! $rawLog) {
-            return ['', 0];
-        }
-
-        $details = json_decode(gzuncompress($rawLog), true) ?? [];
-        $html = view('alerts.fault-detail', ['details' => $this->parser->parse($details)])->render();
+        $html = view('alerts.fault-detail', [
+            'details' => $this->parser->parse($latestLog->details),
+        ])->render();
 
         return [$html, strlen(strip_tags($html))];
     }
@@ -284,7 +317,7 @@ class AlertsController extends TableController
             : ' class="collapse"';
     }
 
-    private function severityIcon(string $severity, int $state): string
+    private function severityIcon(?string $severity, int $state): string
     {
         if ($state === AlertState::ACKNOWLEDGED) {
             return '<span class="alert-status label-primary">&nbsp;</span>';
