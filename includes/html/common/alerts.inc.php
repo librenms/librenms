@@ -261,7 +261,6 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
     post: function ()
     {
         return {
-            id: "alerts",
 ';
 
     if (is_numeric($rule_id)) {
@@ -299,7 +298,7 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
             device_id: \'' . $device['device_id'] . '\'
         }
     },
-    url: "ajax_table.php",
+    url: "' . route('table.alerts') . '",
     rowCount: [50, 100, 250, -1],
 
 }).on("loaded.rs.jquery.bootgrid", function() {

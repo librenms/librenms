@@ -28,12 +28,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use LibreNMS\Enum\AlertState;
 
-class Alert extends Model
+class Alert extends DeviceRelatedModel
 {
     use HasFactory;
     public $timestamps = false;
@@ -84,13 +83,6 @@ class Alert extends Model
     }
 
     // ---- Define Relationships ----
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Device, $this>
-     */
-    public function device(): BelongsTo
-    {
-        return $this->belongsTo(Device::class, 'device_id');
-    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\AlertRule, $this>
