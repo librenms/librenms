@@ -78,7 +78,10 @@ class AlertsController extends TableController
     {
         return [
             'timestamp',
-            'severity' => ['alert_rules.severity', 'timestamp'],
+            'severity'  => ['alert_rules.severity', 'timestamp'],
+            'rule'      => 'alert_rules.name',
+            'hostname'  => 'devices.hostname',
+            'location'  => 'locations.location',
         ];
     }
 

@@ -30,6 +30,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use LibreNMS\Enum\AlertState;
 
 class Alert extends DeviceRelatedModel
@@ -90,6 +92,27 @@ class Alert extends DeviceRelatedModel
     public function rule(): BelongsTo
     {
         return $this->belongsTo(AlertRule::class, 'rule_id', 'id');
+    }
+
+    /**
+     * All alert_log entries for this alert (matched by rule_id + device_id).
+     *
+     * @return HasMany<AlertLog, $this>
+     */
+    public function logs(): HasMany
+    {
+        return $this->hasMany(AlertLog::class, 'device_id', 'device_id')
+            ->whereColumn('alert_log.rule_id', 'alerts.rule_id');
+    }
+
+    /**
+     * The most recent alert_log entry for this alert.
+     *
+     * @return HasOne<AlertLog, $this>
+     */
+    public function latestLog(): HasOne
+    {
+        return $this->logs()->one()->latestOfMany('id');
     }
 
     /**
