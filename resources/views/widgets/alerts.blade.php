@@ -56,6 +56,7 @@
                 acknowledged: '{{ $acknowledged }}',
                 unreachable: '{{ $unreachable }}',
                 fired: '{{ $fired }}',
+                state: '{{ $state }}',
                 min_severity: severityQuickFilter !== null ? severityQuickFilter : (widgetDefaultMinSeverity ?? ''),
                 group: '{{ $device_group }}',
                 proc: '{{ $proc }}',

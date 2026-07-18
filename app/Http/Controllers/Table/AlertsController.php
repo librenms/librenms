@@ -125,11 +125,11 @@ class AlertsController extends TableController
 
                 // A device is "unreachable" when it has at least one parent
                 // relationship and none of its parents are up.
-                $hasParent = fn (Builder $query) => $query
+                $hasParent = fn ($query) => $query
                     ->from('device_relationships')
                     ->whereColumn('device_relationships.child_device_id', 'alerts.device_id');
 
-                $hasUpParent = fn (Builder $query) => $query
+                $hasUpParent = fn ($query) => $query
                     ->from('device_relationships')
                     ->join('devices as parent_devices', 'parent_devices.device_id', '=',
                         'device_relationships.parent_device_id')
@@ -139,7 +139,7 @@ class AlertsController extends TableController
                 if ((int) $unreachable) {
                     $q->whereExists($hasParent)->whereNotExists($hasUpParent);
                 } else {
-                    $q->where(fn (Builder $query) => $query->whereNotExists($hasParent)->orWhereExists($hasUpParent));
+                    $q->where(fn ($query) => $query->whereNotExists($hasParent)->orWhereExists($hasUpParent));
                 }
             },
 

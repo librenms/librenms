@@ -5829,33 +5829,6 @@ parameters:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
 			identifier: function.deprecated
-			count: 4
-			path: includes/html/table/alerts.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/table/alerts.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbGenPlaceholders\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/table/alerts.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
 			count: 1
 			path: includes/html/table/as-selection.inc.php
 
