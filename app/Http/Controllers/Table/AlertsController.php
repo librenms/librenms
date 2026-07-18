@@ -271,7 +271,7 @@ class AlertsController extends TableController
             'alert_id' => $model->id,
             'ack_ico' => $this->ackButton($model, $state),
             'proc' => $this->procButton($model->rule?->proc),
-            'notes' => "<button type='button' class='btn btn-{$noteClass} fa fa-sticky-note-o command-alert-note' aria-label='Notes' id='alert-notes' data-alert_id='{$model->id}'></button>",
+            'notes' => "<button type='button' class='btn btn-$noteClass fa fa-sticky-note-o command-alert-note' aria-label='Notes' id='alert-notes' data-alert_id='$model->id'></button>",
         ];
     }
 
@@ -323,17 +323,17 @@ class AlertsController extends TableController
         }
 
         $info = is_array($model->info) ? $model->info : [];
-        $btnBase = "type=\"button\" data-target=\"ack-alert\" data-state=\"{$state}\" data-alert_id=\"{$model->id}\" data-alert_state=\"{$state}\" name=\"ack-alert\"";
+        $btnBase = "type=\"button\" data-target=\"ack-alert\" data-state=\"$state\" data-alert_id=\"{$model->id}\" data-alert_state=\"$state\" name=\"ack-alert\"";
 
         if ($state !== AlertState::ACKNOWLEDGED) {
-            return "<button {$btnBase} class=\"btn btn-danger command-ack-alert fa fa-eye\" aria-hidden=\"true\" title=\"Mark as acknowledged\"></button>";
+            return "<button $btnBase class=\"btn btn-danger command-ack-alert fa fa-eye\" aria-hidden=\"true\" title=\"Mark as acknowledged\"></button>";
         }
 
         // Acknowledged-until-clear vs. standard ack both offer an un-ack action,
         // just with different icons for clarity.
         $icon = ($info['until_clear'] ?? true) === false ? 'fa-eye' : 'fa-eye-slash';
 
-        return "<button {$btnBase} class=\"btn btn-primary command-ack-alert fa {$icon}\" aria-hidden=\"true\" title=\"Mark as not acknowledged\"></button>";
+        return "<button $btnBase class=\"btn btn-primary command-ack-alert fa $icon\" aria-hidden=\"true\" title=\"Mark as not acknowledged\"></button>";
     }
 
     private function procButton(?string $proc): string
@@ -351,6 +351,6 @@ class AlertsController extends TableController
             return '';
         }
 
-        return "<button type='button' class='btn btn-alert-details command-alert-details' aria-label='Details' id='alert-details' data-alert_log_id='{$alertLogId}'><i class='fa-solid fa-circle-info'></i></button>";
+        return "<button type='button' class='btn btn-alert-details command-alert-details' aria-label='Details' id='alert-details' data-alert_log_id='$alertLogId'><i class='fa-solid fa-circle-info'></i></button>";
     }
 }
