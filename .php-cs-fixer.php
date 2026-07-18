@@ -15,7 +15,13 @@ $rules = [
     'blank_line_before_statement' => [
         'statements' => ['return'],
     ],
-    'braces' => false,
+    'single_space_around_construct' => false,
+    'control_structure_braces' => false,
+    'control_structure_continuation_position' => false,
+    'declare_parentheses' => false,
+    'no_multiple_statements_per_line' => false,
+    'braces_position' => false,
+    'statement_indentation' => false,
     'cast_spaces' => true,
     'class_attributes_separation' => [
         'elements' => [
@@ -36,7 +42,7 @@ $rules = [
     'full_opening_tag' => true,
     'fully_qualified_strict_types' => false, // added by Shift
     'function_declaration' => true,
-    'function_typehint_space' => true,
+    'type_declaration_spaces' => true,
     'general_phpdoc_tag_rename' => true,
     'heredoc_to_nowdoc' => true,
     'include' => true,
@@ -75,9 +81,8 @@ $rules = [
     'no_spaces_around_offset' => [
         'positions' => ['inside', 'outside'],
     ],
-    'no_spaces_inside_parenthesis' => true,
-    'no_trailing_comma_in_list_call' => true,
-    'no_trailing_comma_in_singleline_array' => true,
+    'spaces_inside_parentheses' => true,
+    'no_trailing_comma_in_singleline' => true,
     'no_trailing_whitespace' => true,
     'no_trailing_whitespace_in_comment' => true,
     'no_unneeded_control_parentheses' => [
@@ -110,7 +115,7 @@ $rules = [
     'short_scalar_cast' => true,
     'simplified_null_return' => false, // disabled as "risky"
     'single_blank_line_at_eof' => true,
-    'single_blank_line_before_namespace' => true,
+    'blank_lines_before_namespace' => true,
     'single_class_element_per_statement' => [
         'elements' => ['const', 'property'],
     ],
@@ -128,7 +133,7 @@ $rules = [
     'trailing_comma_in_multiline' => ['elements' => ['arrays']],
     'trim_array_spaces' => true,
     'unary_operator_spaces' => false,
-    'visibility_required' => [
+    'modifier_keywords' => [
         'elements' => ['method', 'property'],
     ],
     'whitespace_after_comma_in_array' => true,
