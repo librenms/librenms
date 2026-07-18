@@ -42,6 +42,7 @@ use LibreNMS\Util\Url;
  */
 class AlertsController extends TableController
 {
+    /** @var array<string, string> */
     protected array $default_sort = ['timestamp' => 'desc'];
 
     /** Maps the min_severity filter's UI values to alert_rules.severity comparisons. */
@@ -59,6 +60,9 @@ class AlertsController extends TableController
     ) {
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function rules(): array
     {
         return [
@@ -75,10 +79,13 @@ class AlertsController extends TableController
         ];
     }
 
+    /**
+     * @return array<string, string|array<int, string>>
+     */
     protected function sortFields(Request $request): array
     {
         return [
-            'timestamp',
+            'timestamp' => 'timestamp',
             'severity' => ['alert_rules.severity', 'timestamp'],
             'rule' => 'alert_rules.name',
             'hostname' => 'devices.hostname',
@@ -86,6 +93,9 @@ class AlertsController extends TableController
         ];
     }
 
+    /**
+     * @return array<int|string, string|array<int, string>>
+     */
     protected function searchFields(Request $request): array
     {
         return [
@@ -95,6 +105,9 @@ class AlertsController extends TableController
         ];
     }
 
+    /**
+     * @return array<string, string|\Closure>
+     */
     protected function filterFields(Request $request): array
     {
         return [
@@ -172,7 +185,8 @@ class AlertsController extends TableController
                 });
             },
 
-            'group' => function (Builder $q, ?int $group): void {
+            'group' => function ($q, ?int $group): void {
+                /** @var Builder<Alert> $q */
                 if ($group) {
                     $q->inDeviceGroup($group);
                 }
@@ -243,14 +257,14 @@ class AlertsController extends TableController
 
         $noteClass = empty($model->note) ? 'default' : 'warning';
 
+        $location = $model->device?->location?->location;
+
         return [
             'rule' => '<i title="' . e(json_encode($model->rule?->builder)) . '"><a href="' . Url::generate(['page' => 'alert-rules']) . '">' . e((string) $model->rule?->name) . '</a></i>',
             'details' => '<a class="fa-solid fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . $model->id . '" data-parent="#alerts"></a>',
             'verbose_details' => $this->verboseDetailsButton($model->latestLog?->id),
             'hostname' => $hostname,
-            'location' => '<a href="' . e(Url::generate([
-                    'page' => 'devices', 'location' => $model->device?->location?->location ?? ''
-                ])) . '">' . e($model->device?->location?->location ?? 'N/A') . '</a>',
+            'location' => '<a href="' . e(Url::generate(['page' => 'devices', 'location' => $location ?? ''])) . '">' . e($location ?? 'N/A') . '</a>',
             'timestamp' => $model->timestamp ? Time::format($model->timestamp, 'compact') : 'N/A',
             'severity' => $this->severityIcon($model->rule?->severity, $state),
             'state' => $state,
