@@ -109,6 +109,14 @@ class Alert extends DeviceRelatedModel
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\AlertLog, $this>
+     */
+    public function latestLog(): BelongsTo
+    {
+        return $this->belongsTo(AlertLog::class, 'latest_alert_log_id', 'id');
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\User, $this>
      */
     public function users(): BelongsToMany

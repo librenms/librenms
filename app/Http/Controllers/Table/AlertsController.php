@@ -28,10 +28,8 @@ namespace App\Http\Controllers\Table;
 use App\Http\Parsers\AlertLogDetailParser;
 use App\Models\Alert;
 use App\Models\AlertLog;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -197,7 +195,7 @@ class AlertsController extends TableController
         $query = Alert::query()
             ->select('alerts.*')
             ->selectSub($latestLogIdSub, 'latest_alert_log_id')
-            ->with(['device', 'device.location', 'rule'])
+            ->with(['device', 'device.location', 'rule', 'latestLog'])
             ->whereHas('device', fn (Builder $q) => $q->where('disabled', 0))
             ->hasAccess($request->user());
 
@@ -223,35 +221,6 @@ class AlertsController extends TableController
         }
 
         return $query;
-    }
-
-    /**
-     * Batch-load the latest AlertLog records for this page in a single query,
-     * attach them as a pre-loaded relation, then delegate to the standard formatter.
-     *
-     * @param  LengthAwarePaginator  $paginator
-     */
-    protected function formatResponse($paginator): JsonResponse
-    {
-        $items = collect($paginator->items());
-
-        // Collect all latest_alert_log_id values from the main query result
-        // and resolve them with one additional query — no N+1.
-        $logIds = $items->pluck('latest_alert_log_id')->filter()->unique();
-        $logs = AlertLog::whereIn('id', $logIds)->get()->keyBy('id');
-
-        // Attach each resolved AlertLog as an already-loaded relation so that
-        // formatItem can access $model->latestLog without issuing further queries.
-        $items->each(function (Alert $alert) use ($logs): void {
-            $alert->setRelation('latestLog', $logs->get($alert->latest_alert_log_id));
-        });
-
-        return response()->json([
-            'current' => $paginator->currentPage(),
-            'rowCount' => $paginator->count(),
-            'rows' => $items->map($this->formatItem(...)),
-            'total' => $paginator->total(),
-        ]);
     }
 
     /**
@@ -359,7 +328,7 @@ class AlertsController extends TableController
             return '';
         }
 
-        return '<a href="' . htmlspecialchars($proc) . '" target="_blank"><button type="button" class="btn btn-info fa fa-external-link" aria-hidden="true"></button></a>';
+        return '<a href="' . e($proc) . '" target="_blank"><button type="button" class="btn btn-info fa fa-external-link" aria-hidden="true"></button></a>';
     }
 
     private function verboseDetailsButton(?int $alertLogId): string

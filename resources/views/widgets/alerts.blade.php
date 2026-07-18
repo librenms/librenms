@@ -53,14 +53,12 @@
             ajax: true,
             requestHandler: request => ({
                 ...request,
-                id: "alerts",
                 acknowledged: '{{ $acknowledged }}',
                 unreachable: '{{ $unreachable }}',
                 fired: '{{ $fired }}',
                 min_severity: severityQuickFilter !== null ? severityQuickFilter : (widgetDefaultMinSeverity ?? ''),
                 group: '{{ $device_group }}',
                 proc: '{{ $proc }}',
-                sort: '{{ $sort }}',
                 uncollapse_key_count: '{{ $uncollapse_key_count }}',
                 device_id: '{{ $device }}'
             }),
@@ -69,7 +67,14 @@
 
                 return response
             },
-            url: "ajax_table.php",
+            sort: {
+                @if($sort === 'severity' || $sort == 1)
+                    severity: 'desc'
+                @else
+                    timestamp: 'desc'
+                @endif
+            },
+            url: "{{ route('table.alerts') }}",
             navigation: ! {{ $hidenavigation }},
             rowCount: [50, 100, 250, -1],
             templates: {
