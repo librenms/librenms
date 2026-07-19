@@ -759,69 +759,79 @@ class Routeros extends OS implements
         $links = new Collection;
 
         $lldp_ports = SnmpQuery::hideMib()->walk('MIKROTIK-MIB::mtxrInterfaceStatsName')->table();
-        $lldp_ports_num = SnmpQuery::hideMib()->walk('MIKROTIK-MIB::mtxrNeighborInterfaceID')->table();
-
-        if (empty($lldp_ports) || empty($lldp_ports_num)) {
-            return $links;
-        }
+        $mtxrNeighbor = SnmpQuery::hideMib()->walk('MIKROTIK-MIB::mtxrNeighbor')->table();
 
         $lldp_array = SnmpQuery::hideMib()->walk([
             'LLDP-MIB::lldpRemEntry',
             'LLDP-MIB::lldpRemManAddrEntry',
         ])->table(3);
 
-        // mikrotik broken LLDP implementation v6/v7
-        $lldpRows = [];
-        if (! empty($lldp_array)) {
-            foreach ($lldp_array as $key => $data) {
-                if (isset($data['lldpRemChassisIdSubtype'])) {
-                    $lldpRows[$key] = $data;
-                } else {
-                    foreach ($data as $key1 => $data1) {
-                        if (isset($data1['lldpRemChassisIdSubtype'])) {
-                            $lldpRows[$key1] = $data1;
-                        } else {
-                            foreach ($data1 as $key2 => $data2) {
-                                if (isset($data2['lldpRemChassisIdSubtype'])) {
-                                    $lldpRows[$key2] = $data2;
+        if (isset($mtxrNeighbor['mtxrNeighborInterfaceID']) & ! empty($mtxrNeighbor['mtxrNeighborInterfaceID'])) {
+            // mikrotik broken LLDP implementation v6/v7
+            $lldpRows = [];
+            if (! empty($lldp_array)) {
+                foreach ($lldp_array as $key => $data) {
+                    if (isset($data['lldpRemChassisIdSubtype'])) {
+                        $lldpRows[$key] = $data;
+                    } else {
+                        foreach ($data as $key1 => $data1) {
+                            if (isset($data1['lldpRemChassisIdSubtype'])) {
+                                $lldpRows[$key1] = $data1;
+                            } else {
+                                foreach ($data1 as $key2 => $data2) {
+                                    if (isset($data2['lldpRemChassisIdSubtype'])) {
+                                        $lldpRows[$key2] = $data2;
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-        }
 
-        if (! empty($lldpRows)) {
-            foreach ($lldpRows as $key => $data) {
-                $data['lldpRemSysName'] = StringHelpers::linksRemSysName($data['lldpRemSysName']);
-                $data['lldpRemPortId'] = StringHelpers::linksRemPortName($data['lldpRemSysDesc'], $data['lldpRemPortId']);
-                $local_port_ifName = $lldp_ports['mtxrInterfaceStatsName'][hexdec((string) $lldp_ports_num['mtxrNeighborInterfaceID'][$key])];
-                $local_port_id = PortCache::getIdFromIfName($local_port_ifName);
-                $interface = PortCache::get($local_port_id);
-                $remote_port_mac = '';
-
-                if ($data['lldpRemPortIdSubtype'] == 3) { // 3 = macaddress
-                    $remote_port_mac = Mac::parse($data['lldpRemPortId'] ?? '')->hex();
+            // Use private MIB for mndp/cdp discovery. Process only entries which are not covered by LLDP (needed since ROS 7.22)
+            foreach ($mtxrNeighbor['mtxrNeighborInterfaceID'] as $key => $data) {
+                if (empty($lldpRows[$key])) {
+                    $lldpRows[$key]['lldpRemSysName'] = $mtxrNeighbor['mtxrNeighborIdentity'][$key] ?? '';
+                    $lldpRows[$key]['lldpRemSysDesc'] = $mtxrNeighbor['mtxrNeighborPlatform'][$key] ?? '';
+                    $lldpRows[$key]['protocol'] = 'cdp';
+                    $lldpRows[$key]['lldpRemPortId'] = Mac::parse($mtxrNeighbor['mtxrNeighborMacAddress'][$key] ?? '')->hex();
+                    $lldpRows[$key]['lldpRemPortIdSubtype'] = 3;
                 }
+            }
 
-                $remote_device_id = find_device_id($data['lldpRemSysName'] ?? '', $data['lldpRemManAddr'] ?? '', $remote_port_mac);
-                $remote_chassis_id = Mac::parse($data['lldpRemChassisId'] ?? '')->hex();
+            if (! empty($lldpRows)) {
+                foreach ($lldpRows as $key => $data) {
+                    $data['lldpRemSysName'] = StringHelpers::linksRemSysName($data['lldpRemSysName']);
+                    $data['lldpRemPortId'] = StringHelpers::linksRemPortName($data['lldpRemSysDesc'], $data['lldpRemPortId']);
+                    $local_port_ifName = $lldp_ports['mtxrInterfaceStatsName'][hexdec((string) $mtxrNeighbor['mtxrNeighborInterfaceID'][$key])];
+                    $local_port_id = PortCache::getIdFromIfName($local_port_ifName);
+                    $interface = PortCache::get($local_port_id);
+                    $remote_port_mac = '';
 
-                if ($interface['port_id'] && $data['lldpRemSysName'] && $data['lldpRemPortId']) {
-                    $sufix = (! empty($data['lldpRemManAddr'])) ? '#' . $data['lldpRemManAddr'] : '';
-                    $remote_port_id = find_port_id($data['lldpRemPortDesc'] ?? '', $data['lldpRemPortId'], $remote_device_id, $remote_chassis_id);
-                    $links->push(new Link([
-                        'local_port_id' => $interface['port_id'],
-                        'remote_hostname' => $data['lldpRemSysName'],
-                        'remote_device_id' => $remote_device_id,
-                        'remote_port_id' => $remote_port_id,
-                        'active' => 1,
-                        'protocol' => 'lldp' . $sufix,
-                        'remote_port' => $data['lldpRemPortId'],
-                        'remote_platform' => null,
-                        'remote_version' => $data['lldpRemSysDesc'] ?? '',
-                    ]));
+                    if ($data['lldpRemPortIdSubtype'] == 3) { // 3 = macaddress
+                        $remote_port_mac = Mac::parse($data['lldpRemPortId'] ?? '')->hex();
+                    }
+
+                    $remote_device_id = find_device_id($data['lldpRemSysName'] ?? '', $data['lldpRemManAddr'] ?? '', $remote_port_mac);
+                    $remote_chassis_id = Mac::parse($data['lldpRemChassisId'] ?? '')->hex();
+
+                    if ($interface['port_id'] && $data['lldpRemSysName'] && $data['lldpRemPortId']) {
+                        $protocol = $data['protocol'] ?? 'lldp';
+                        $sufix = (! empty($data['lldpRemManAddr'])) ? '#' . $data['lldpRemManAddr'] : '';
+                        $remote_port_id = find_port_id($data['lldpRemPortDesc'] ?? '', $data['lldpRemPortId'], $remote_device_id, $remote_chassis_id);
+                        $links->push(new Link([
+                            'local_port_id' => $interface['port_id'],
+                            'remote_hostname' => $data['lldpRemSysName'],
+                            'remote_device_id' => $remote_device_id,
+                            'remote_port_id' => $remote_port_id,
+                            'active' => 1,
+                            'protocol' => $protocol . $sufix,
+                            'remote_port' => $data['lldpRemPortId'],
+                            'remote_platform' => null,
+                            'remote_version' => $data['lldpRemSysDesc'] ?? '',
+                        ]));
+                    }
                 }
             }
         }

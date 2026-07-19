@@ -4357,5 +4357,19 @@
                 }
             ]
         }
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 1,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 23
+                }
+            ]
+        }
     }
 }
