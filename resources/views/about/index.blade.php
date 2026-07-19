@@ -163,8 +163,8 @@
                 <td class='text-right'>{{ $stat_entphys }}</td>
             </tr>
             <tr>
-                <td><i class='fa fa-fw fa-clone fa-lg icon-theme' aria-hidden='true'></i> <b>{{ __('Syslog Entries') }}</b></td>
-                <td class='text-right'>{{ $stat_syslog }}</td>
+                <td><i class='fa fa-fw fa-clone fa-lg icon-theme' aria-hidden='true'></i> <b>{{ __('Alert Log Entries') }}</b></td>
+                <td class='text-right'>{{ $stat_alertlogs }}</td>
                 <td><i class='fa fa-fw fa-bookmark fa-lg icon-theme' aria-hidden='true'></i> <b>{{ __('Eventlog Entries') }}</b></td>
                 <td class='text-right'>{{ $stat_events }}</td>
             </tr>

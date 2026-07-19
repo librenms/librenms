@@ -149,6 +149,7 @@ class AppServiceProvider extends ServiceProvider
 
     private function bootObservers()
     {
+        \App\Models\Config::observe(\App\Observers\ConfigObserver::class);
         \App\Models\Device::observe(\App\Observers\DeviceObserver::class);
         \App\Models\Mempool::observe(\App\Observers\MempoolObserver::class);
         \App\Models\Package::observe(\App\Observers\PackageObserver::class);

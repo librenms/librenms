@@ -1,0 +1,1490 @@
+GUDEADS-EPC8021-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises,
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	Gauge32,
+	Integer32,
+	Unsigned32
+		FROM SNMPv2-SMI
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP
+		FROM SNMPv2-CONF;
+
+gudeads MODULE-IDENTITY
+	LAST-UPDATED "202409241542Z"	-- Sep 24, 2024, 3:42:00 PM
+	ORGANIZATION "GUDE Systems GmbH"
+	CONTACT-INFO
+		"Von-der-Wettern-Str. 23
+		51149 Cologne
+		Germany
+		https://www.gude-systems.com"
+	DESCRIPTION
+		"Expert Power Control 8021 MIB"
+	-- 1.3.6.1.4.1.28507
+	::= { enterprises 28507 }
+
+
+epc8021DeviceInfo OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.77.1.1.2
+	::= { epc8021CommonConfig 2 }
+
+epc8021ProdName OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The Product Name of the device."
+	-- 1.3.6.1.4.1.28507.77.1.1.2.1
+	::= { epc8021DeviceInfo 1 }
+
+
+epc8021FWVersion OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Firmware Version of the device."
+	-- 1.3.6.1.4.1.28507.77.1.1.2.2
+	::= { epc8021DeviceInfo 2 }
+
+
+epc8021HostName OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The configured Host Name."
+	-- 1.3.6.1.4.1.28507.77.1.1.2.3
+	::= { epc8021DeviceInfo 3 }
+
+
+epc8021PhysAddress OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The MAC address of the device."
+	-- 1.3.6.1.4.1.28507.77.1.1.2.4
+	::= { epc8021DeviceInfo 4 }
+
+
+epc8021SerialNumber OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The Serial Number of the device. Not available for all devices. Production start 2026."
+	-- 1.3.6.1.4.1.28507.77.1.1.2.5
+	::= { epc8021DeviceInfo 5 }
+
+
+epc8021ExtInputToggleCount OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of times the Input has changed its state."
+	-- 1.3.6.1.4.1.28507.77.1.6.2.2.1.3
+	::= { epc8021ExtInputEntry 3 }
+
+
+epc8021ExtInputPortNum OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of external Sensor Port when value greater zero, else device built-in Input."
+	-- 1.3.6.1.4.1.28507.77.1.6.2.2.1.33
+	::= { epc8021ExtInputEntry 33 }
+
+
+epc8021ExtInputBlockIndex OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Either index of device built-in Input, or index of Input in external sensor."
+	-- 1.3.6.1.4.1.28507.77.1.6.2.2.1.34
+	::= { epc8021ExtInputEntry 34 }
+
+
+epc8021ExtInputName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of
+		the Input"
+	-- 1.3.6.1.4.1.28507.77.1.6.2.2.1.32
+	::= { epc8021ExtInputEntry 32 }
+
+
+epc8021ExtInputs OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.77.1.6.2
+	::= { epc8021ExtSensors 2 }
+
+epc8021ExtInputEntry OBJECT-TYPE
+	SYNTAX  Epc8021ExtInputEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc8021ExtInputIndex }
+	-- 1.3.6.1.4.1.28507.77.1.6.2.2.1
+	::= { epc8021ExtInputTable 1 }
+
+
+Epc8021ExtInputEntry ::= SEQUENCE {
+
+	epc8021ExtInputIndex       Unsigned32,
+	epc8021ExtInput            INTEGER,
+	epc8021ExtInputToggleCount Unsigned32,
+	epc8021ExtInputName        OCTET STRING,
+	epc8021ExtInputPortNum     Integer32,
+	epc8021ExtInputBlockIndex  Integer32 }
+
+
+epc8021ExtInput OBJECT-TYPE
+	SYNTAX  INTEGER {
+			lo(0),
+			hi(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Input state of device"
+	-- 1.3.6.1.4.1.28507.77.1.6.2.2.1.2
+	::= { epc8021ExtInputEntry 2 }
+
+
+epc8021ExtInputTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8021ExtInputEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.77.1.6.2.2
+	::= { epc8021ExtInputs 2 }
+
+
+epc8021ExtInputIndex OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.77.1.6.2.2.1.1
+	::= { epc8021ExtInputEntry 1 }
+
+
+
+epc8021ExtInputEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8021ExtInputIndex,
+		epc8021ExtInput,
+		epc8021ExtInputToggleCount,
+		epc8021ExtInputName,
+		epc8021ExtInputPortNum,
+		epc8021ExtInputBlockIndex}
+	STATUS  current
+	DESCRIPTION
+		"Change of external sensor input."
+	-- 1.3.6.1.4.1.28507.77.3.25
+	::= { events 25 }
+
+epc8021RCMBInfoTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8021RCMBInfoEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"RCMB Module Information  Only visible on models
+		that support this feature."
+	-- 1.3.6.1.4.1.28507.77.1.5.16
+	::= { epc8021IntSensors 16 }
+
+
+epc8021RCMBInfoEntry OBJECT-TYPE
+	SYNTAX  Epc8021RCMBInfoEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc8021RCMBInfoIndex }
+	-- 1.3.6.1.4.1.28507.77.1.5.16.1
+	::= { epc8021RCMBInfoTable 1 }
+
+
+Epc8021RCMBInfoEntry ::= SEQUENCE {
+
+	epc8021RCMBInfoIndex    Integer32,
+	epc8021RCMBCurrentRMS   Unsigned32,
+	epc8021RCMBCurrentDC    Unsigned32,
+	epc8021RCMBOutputRMS    INTEGER,
+	epc8021RCMBOutputDC     INTEGER,
+	epc8021RCMBModuleStatus Unsigned32 }
+
+
+epc8021RCMBModuleStatus OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"RCMB Module Status Word"
+	-- 1.3.6.1.4.1.28507.77.1.5.16.1.6
+	::= { epc8021RCMBInfoEntry 6 }
+
+
+epc8021RCMBOutputRMS OBJECT-TYPE
+	SYNTAX  INTEGER {
+			up(1),
+			down(0) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"shows the output S1 of the RCMB module"
+	-- 1.3.6.1.4.1.28507.77.1.5.16.1.4
+	::= { epc8021RCMBInfoEntry 4 }
+
+
+epc8021RCMBOutputDC OBJECT-TYPE
+	SYNTAX  INTEGER {
+			up(1),
+			down(0) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"shows the output S2 of the RCMB module"
+	-- 1.3.6.1.4.1.28507.77.1.5.16.1.5
+	::= { epc8021RCMBInfoEntry 5 }
+
+
+epc8021CPUSensors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.77.1.5.14
+	::= { epc8021IntSensors 14 }
+
+epc8021NTPClient OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.77.1.5.15
+	::= { epc8021IntSensors 15 }
+
+epc8021NTPUnixTime OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"show received NTP time as unixtime (secs since 1 January 1970)"
+	-- 1.3.6.1.4.1.28507.77.1.5.15.2
+	::= { epc8021NTPClient 2 }
+
+
+epc8021NTPLastValidTimestamp OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"show seconds since last valid NTP timestamp received"
+	-- 1.3.6.1.4.1.28507.77.1.5.15.3
+	::= { epc8021NTPClient 3 }
+
+
+epc8021NTPTimeValid OBJECT-TYPE
+	SYNTAX  INTEGER {
+			notime(0),
+			valid(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Show if valid Time is received"
+	-- 1.3.6.1.4.1.28507.77.1.5.15.1
+	::= { epc8021NTPClient 1 }
+
+
+epc8021CPUSensorVsystem OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"System Voltage on CPU Board"
+	-- 1.3.6.1.4.1.28507.77.1.5.14.1
+	::= { epc8021CPUSensors 1 }
+
+
+epc8021CPUSensorVaux OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Auxiliary Voltage on CPU Board"
+	-- 1.3.6.1.4.1.28507.77.1.5.14.2
+	::= { epc8021CPUSensors 2 }
+
+
+epc8021CPUSensorVmain OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Main Voltage on CPU Board"
+	-- 1.3.6.1.4.1.28507.77.1.5.14.3
+	::= { epc8021CPUSensors 3 }
+
+
+epc8021CPUSensorTcpu OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Temperature on CPU Board"
+	-- 1.3.6.1.4.1.28507.77.1.5.14.4
+	::= { epc8021CPUSensors 4 }
+
+
+epc8021AirPressure OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual air pressure"
+	-- 1.3.6.1.4.1.28507.77.1.6.1.1.5
+	::= { epc8021SensorEntry 5 }
+
+
+epc8021DewPoint OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"dew point for actual temperature and humidity"
+	-- 1.3.6.1.4.1.28507.77.1.6.1.1.6
+	::= { epc8021SensorEntry 6 }
+
+
+epc8021DewPointDiff OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"difference between dew point and actual
+		temperature (Temp - DewPoint)"
+	-- 1.3.6.1.4.1.28507.77.1.6.1.1.7
+	::= { epc8021SensorEntry 7 }
+
+
+epc8021Voltage OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Voltage on Power Channel"
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.6
+	::= { epc8021PowerEntry 6 }
+
+
+epc8021Frequency OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 hz"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Frequency of Power Channel"
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.7
+	::= { epc8021PowerEntry 7 }
+
+
+epc8021AbsEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Absolute Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.12
+	::= { epc8021PowerEntry 12 }
+
+
+epc8021AbsEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Resettable Absolute Active Energy counter.
+		Writing '0' resets all resettable counter."
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.13
+	::= { epc8021PowerEntry 13 }
+
+
+epc8021AbsEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Absolute Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.14
+	::= { epc8021PowerEntry 14 }
+
+
+epc8021ResetTime OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Time in seconds since last Energy
+		Counter reset."
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.15
+	::= { epc8021PowerEntry 15 }
+
+
+epc8021ForwEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Forward Active Energy counter."
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.16
+	::= { epc8021PowerEntry 16 }
+
+
+epc8021ForwEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Forward Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.17
+	::= { epc8021PowerEntry 17 }
+
+
+epc8021ForwEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Forward Active Energy counter."
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.18
+	::= { epc8021PowerEntry 18 }
+
+
+epc8021ForwEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Forward Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.19
+	::= { epc8021PowerEntry 19 }
+
+
+epc8021RevEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reverse Active Energy counter."
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.20
+	::= { epc8021PowerEntry 20 }
+
+
+epc8021RevEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reverse Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.21
+	::= { epc8021PowerEntry 21 }
+
+
+epc8021RevEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Reverse Active Energy counter."
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.22
+	::= { epc8021PowerEntry 22 }
+
+
+epc8021RevEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Reverse Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.23
+	::= { epc8021PowerEntry 23 }
+
+
+epc8021AbsEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Absolute Active Energy counter."
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.3
+	::= { epc8021PowerEntry 3 }
+
+
+-- Notification Types
+--
+
+events OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.77.3
+	::= { gadsEPC8021 3 }
+
+-- Scalars and Tables
+--
+
+epc8021Objects OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.77.1
+	::= { gadsEPC8021 1 }
+
+epc8021CommonConfig OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.77.1.1
+	::= { epc8021Objects 1 }
+
+epc8021SNMPaccess OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.77.1.1.1
+	::= { epc8021CommonConfig 1 }
+
+epc8021TrapCtrl OBJECT-TYPE
+	SYNTAX  Integer32 (0..3)
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"0 = off
+		1 = Ver. 1
+		2 = Ver. 2c
+		3 = Ver. 3"
+	-- 1.3.6.1.4.1.28507.77.1.1.1.1
+	::= { epc8021SNMPaccess 1 }
+
+
+epc8021TrapIPTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8021TrapIPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"list of all Trap receiver"
+	-- 1.3.6.1.4.1.28507.77.1.1.1.2
+	::= { epc8021SNMPaccess 2 }
+
+
+epc8021TrapIPEntry OBJECT-TYPE
+	SYNTAX  Epc8021TrapIPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"an entry containing management
+		informations regarding the list of trap
+		receivers"
+	INDEX {
+		epc8021TrapIPIndex }
+	-- 1.3.6.1.4.1.28507.77.1.1.1.2.1
+	::= { epc8021TrapIPTable 1 }
+
+
+Epc8021TrapIPEntry ::= SEQUENCE {
+
+	epc8021TrapIPIndex Integer32,
+	epc8021TrapAddr    OCTET STRING }
+
+
+epc8021TrapIPIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..8)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A unique value, greater than zero, for each receiver slot."
+	-- 1.3.6.1.4.1.28507.77.1.1.1.2.1.1
+	::= { epc8021TrapIPEntry 1 }
+
+
+epc8021TrapAddr OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..99))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"DNS name or IP address specifying one Trap receiver slot.
+		A port can optionally be specified: 'name:port' An empty
+		string disables this slot."
+	-- 1.3.6.1.4.1.28507.77.1.1.1.2.1.2
+	::= { epc8021TrapIPEntry 2 }
+
+
+epc8021DeviceConfig OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.77.1.2
+	::= { epc8021Objects 2 }
+
+epc8021IntActors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.77.1.3
+	::= { epc8021Objects 3 }
+
+epc8021relayports OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.77.1.3.1
+	::= { epc8021IntActors 1 }
+
+-- the Interfaces table
+-- The Interfaces table contains information on the entity's
+-- interfaces.  Each sub-layer below the internetwork-layer
+-- of a network interface is considered to be an interface.
+
+epc8021portTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8021portEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"list of all EPC Relay Ports"
+	-- 1.3.6.1.4.1.28507.77.1.3.1.2
+	::= { epc8021relayports 2 }
+
+
+epc8021portEntry OBJECT-TYPE
+	SYNTAX  Epc8021portEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry containing management information applicable to a
+		particular relay port."
+	INDEX {
+		epc8021PortIndex }
+	-- 1.3.6.1.4.1.28507.77.1.3.1.2.1
+	::= { epc8021portTable 1 }
+
+
+Epc8021portEntry ::= SEQUENCE {
+
+	epc8021PortIndex         Integer32,
+	epc8021PortName          OCTET STRING,
+	epc8021PortState         INTEGER,
+	epc8021PortSwitchCount   Integer32,
+	epc8021PortStartupMode   INTEGER,
+	epc8021PortStartupDelay  Integer32,
+	epc8021PortRepowerTime   Integer32,
+	epc8021PortResetDuration Integer32 }
+
+
+epc8021PortName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..15))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a Relay Port."
+	-- 1.3.6.1.4.1.28507.77.1.3.1.2.1.2
+	::= { epc8021portEntry 2 }
+
+
+epc8021PortState OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1) }
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"current state of a Relay Port"
+	-- 1.3.6.1.4.1.28507.77.1.3.1.2.1.3
+	::= { epc8021portEntry 3 }
+
+
+epc8021PortSwitchCount OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The total number of switch actions ocurred on a Relay Port.
+		Does not count switch commands which will not switch
+		the ralay state, so just real relay switches are displayed here."
+	-- 1.3.6.1.4.1.28507.77.1.3.1.2.1.4
+	::= { epc8021portEntry 4 }
+
+
+epc8021PortStartupMode OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1),
+			laststate(2) }
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"set Mode of startup sequence (off, on , remember last state)"
+	DEFVAL { off }
+	-- 1.3.6.1.4.1.28507.77.1.3.1.2.1.5
+	::= { epc8021portEntry 5 }
+
+
+epc8021PortStartupDelay OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for startup action"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.77.1.3.1.2.1.6
+	::= { epc8021portEntry 6 }
+
+
+epc8021PortRepowerTime OBJECT-TYPE
+	SYNTAX  Integer32 (0..65535)
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for repower port after switching off"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.77.1.3.1.2.1.7
+	::= { epc8021portEntry 7 }
+
+
+epc8021Buzzer OBJECT-TYPE
+	SYNTAX  Integer32 (0..1)
+	UNITS	"0 = Off, 1 = On"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"turn Buzzer on and off"
+	-- 1.3.6.1.4.1.28507.77.1.3.10
+	::= { epc8021IntActors 10 }
+
+
+epc8021ExtActors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.77.1.4
+	::= { epc8021Objects 4 }
+
+epc8021IntSensors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.77.1.5
+	::= { epc8021Objects 5 }
+
+epc8021PowerChan OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.77.1.5.1
+	::= { epc8021IntSensors 1 }
+
+epc8021ActivePowerChan OBJECT-TYPE
+	SYNTAX  Unsigned32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of suppported Power Channels."
+	-- 1.3.6.1.4.1.28507.77.1.5.1.1
+	::= { epc8021PowerChan 1 }
+
+
+epc8021PowerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8021PowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"All available Channel Interfaces."
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2
+	::= { epc8021PowerChan 2 }
+
+
+epc8021PowerEntry OBJECT-TYPE
+	SYNTAX  Epc8021PowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry containing management information
+		applicable to a particular Power Channel."
+	INDEX {
+		epc8021PowerIndex }
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1
+	::= { epc8021PowerTable 1 }
+
+
+Epc8021PowerEntry ::= SEQUENCE {
+
+	epc8021PowerIndex                   Integer32,
+	epc8021ChanStatus                   Integer32,
+	epc8021AbsEnergyActive              Gauge32,
+	epc8021PowerActive                  Integer32,
+	epc8021Current                      Gauge32,
+	epc8021Voltage                      Gauge32,
+	epc8021Frequency                    Gauge32,
+	epc8021PowerFactor                  Integer32,
+	epc8021Pangle                       Integer32,
+	epc8021PowerApparent                Integer32,
+	epc8021PowerReactive                Integer32,
+	epc8021AbsEnergyReactive            Gauge32,
+	epc8021AbsEnergyActiveResettable    Gauge32,
+	epc8021AbsEnergyReactiveResettable  Gauge32,
+	epc8021ResetTime                    Gauge32,
+	epc8021ForwEnergyActive             Gauge32,
+	epc8021ForwEnergyReactive           Gauge32,
+	epc8021ForwEnergyActiveResettable   Gauge32,
+	epc8021ForwEnergyReactiveResettable Gauge32,
+	epc8021RevEnergyActive              Gauge32,
+	epc8021RevEnergyReactive            Gauge32,
+	epc8021RevEnergyActiveResettable    Gauge32,
+	epc8021RevEnergyReactiveResettable  Gauge32,
+	epc8021ResidualCurrent              Unsigned32,
+	epc8021LineSensorName               OCTET STRING }
+
+
+epc8021ChanStatus OBJECT-TYPE
+	SYNTAX  Integer32 (0..1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"0 = data not active, 1 = data valid"
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.2
+	::= { epc8021PowerEntry 2 }
+
+
+epc8021PowerActive OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Active Power"
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.4
+	::= { epc8021PowerEntry 4 }
+
+
+epc8021Current OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Curent on Power Channel."
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.5
+	::= { epc8021PowerEntry 5 }
+
+
+epc8021PowerFactor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.001"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Power Factor of Channel between
+		-1.0 and 1.00"
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.8
+	::= { epc8021PowerEntry 8 }
+
+
+epc8021Pangle OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 degree"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Phase Angle between Voltage
+		and L Line Current between
+		-180.0 and 180.0"
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.9
+	::= { epc8021PowerEntry 9 }
+
+
+epc8021PowerApparent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"VA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"L Line Mean Apparent Power"
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.10
+	::= { epc8021PowerEntry 10 }
+
+
+epc8021PowerReactive OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"VAR"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"L Line Mean Reactive Power"
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.11
+	::= { epc8021PowerEntry 11 }
+
+
+epc8021OVPTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8021OVPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Overvoltage Protection Table
+		This table may not be present
+		on devices without OVP feature"
+	-- 1.3.6.1.4.1.28507.77.1.5.2
+	::= { epc8021IntSensors 2 }
+
+
+epc8021OVPEntry OBJECT-TYPE
+	SYNTAX  Epc8021OVPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc8021OVPIndex }
+	-- 1.3.6.1.4.1.28507.77.1.5.2.1
+	::= { epc8021OVPTable 1 }
+
+
+Epc8021OVPEntry ::= SEQUENCE {
+
+	epc8021OVPIndex  Integer32,
+	epc8021OVPStatus INTEGER }
+
+
+epc8021ExtSensors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.77.1.6
+	::= { epc8021Objects 6 }
+
+epc8021SensorTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8021SensorEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.77.1.6.1
+	::= { epc8021ExtSensors 1 }
+
+
+epc8021SensorEntry OBJECT-TYPE
+	SYNTAX  Epc8021SensorEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc8021SensorIndex }
+	-- 1.3.6.1.4.1.28507.77.1.6.1.1
+	::= { epc8021SensorTable 1 }
+
+
+Epc8021SensorEntry ::= SEQUENCE {
+
+	epc8021SensorIndex   Integer32,
+	epc8021TempSensor    Integer32,
+	epc8021HygroSensor   Integer32,
+	epc8021AirPressure   Integer32,
+	epc8021DewPoint      Integer32,
+	epc8021DewPointDiff  Integer32,
+	epc8021ExtSensorName OCTET STRING }
+
+
+epc8021SensorIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.77.1.6.1.1.1
+	::= { epc8021SensorEntry 1 }
+
+
+epc8021TempSensor OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual temperature"
+	-- 1.3.6.1.4.1.28507.77.1.6.1.1.2
+	::= { epc8021SensorEntry 2 }
+
+
+epc8021HygroSensor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 percent humidity"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual humidity"
+	-- 1.3.6.1.4.1.28507.77.1.6.1.1.3
+	::= { epc8021SensorEntry 3 }
+
+
+-- Conformance
+--
+
+epc8021Conf OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.77.2
+	::= { gadsEPC8021 2 }
+
+-- Groups
+--
+
+epc8021Groups OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.77.2.1
+	::= { epc8021Conf 1 }
+
+-- Compliance
+--
+
+epc8021Compls OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.77.2.2
+	::= { epc8021Conf 2 }
+
+
+epc8021SwitchEvtPort NOTIFICATION-TYPE
+	OBJECTS {
+		epc8021PortIndex,
+		epc8021PortName,
+		epc8021PortState,
+		epc8021PortSwitchCount}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a port is switched"
+	-- 1.3.6.1.4.1.28507.77.3.1
+	::= { events 1 }
+
+
+epc8021TempEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8021SensorIndex,
+		epc8021TempSensor}
+	STATUS  current
+	DESCRIPTION
+		"temperature limits exceeded"
+	-- 1.3.6.1.4.1.28507.77.3.2
+	::= { events 2 }
+
+
+epc8021HygroEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8021SensorIndex,
+		epc8021HygroSensor}
+	STATUS  current
+	DESCRIPTION
+		"hygro limits exceeded"
+	-- 1.3.6.1.4.1.28507.77.3.3
+	::= { events 3 }
+
+
+epc8021AirPressureEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8021SensorIndex,
+		epc8021AirPressure}
+	STATUS  current
+	DESCRIPTION
+		"Air Pressure limits exceeded
+
+		"
+	-- 1.3.6.1.4.1.28507.77.3.4
+	::= { events 4 }
+
+
+epc8021DewPtDiffEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8021SensorIndex,
+		epc8021DewPointDiff}
+	STATUS  current
+	DESCRIPTION
+		"Dew Point Difference limits exceeded"
+	-- 1.3.6.1.4.1.28507.77.3.5
+	::= { events 5 }
+
+
+epc8021OVPEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8021OVPIndex,
+		epc8021OVPStatus}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when the OVP status changes"
+	-- 1.3.6.1.4.1.28507.77.3.6
+	::= { events 6 }
+
+epc8021BasicGroup OBJECT-GROUP
+	OBJECTS {
+		epc8021TrapCtrl,
+		epc8021TrapIPIndex,
+		epc8021TrapAddr,
+		epc8021portNumber,
+		epc8021PortIndex,
+		epc8021PortName,
+		epc8021PortState,
+		epc8021PortSwitchCount,
+		epc8021PortStartupMode,
+		epc8021PortStartupDelay,
+		epc8021PortRepowerTime,
+		epc8021Buzzer,
+		epc8021ActivePowerChan,
+		epc8021PowerIndex,
+		epc8021ChanStatus,
+		epc8021AbsEnergyActive,
+		epc8021PowerActive,
+		epc8021Current,
+		epc8021Voltage,
+		epc8021Frequency,
+		epc8021PowerFactor,
+		epc8021Pangle,
+		epc8021PowerApparent,
+		epc8021PowerReactive,
+		epc8021AbsEnergyReactive,
+		epc8021AbsEnergyActiveResettable,
+		epc8021AbsEnergyReactiveResettable,
+		epc8021ResetTime,
+		epc8021ForwEnergyActive,
+		epc8021ForwEnergyReactive,
+		epc8021ForwEnergyActiveResettable,
+		epc8021ForwEnergyReactiveResettable,
+		epc8021RevEnergyActive,
+		epc8021RevEnergyReactive,
+		epc8021RevEnergyActiveResettable,
+		epc8021RevEnergyReactiveResettable,
+		epc8021ResidualCurrent,
+		epc8021RCMBCurrentRMS,
+		epc8021RCMBCurrentDC,
+		epc8021LineSensorName,
+		epc8021OVPIndex,
+		epc8021OVPStatus,
+		epc8021SensorIndex,
+		epc8021TempSensor,
+		epc8021HygroSensor,
+		epc8021AirPressure,
+		epc8021DewPoint,
+		epc8021DewPointDiff,
+		epc8021ExtSensorName,
+		epc8021CPUSensorVsystem,
+		epc8021CPUSensorVaux,
+		epc8021CPUSensorVmain,
+		epc8021CPUSensorTcpu,
+		epc8021NTPTimeValid,
+		epc8021NTPUnixTime,
+		epc8021NTPLastValidTimestamp,
+		epc8021PortResetDuration,
+		epc8021RCMBInfoIndex,
+		epc8021RCMBOutputRMS,
+		epc8021RCMBOutputDC,
+		epc8021RCMBModuleStatus,
+		epc8021ExtActiveInputs,
+		epc8021ExtInputIndex,
+		epc8021ExtInput,
+		epc8021ExtInputName,
+		epc8021ExtInputPortNum,
+		epc8021ExtInputBlockIndex,
+		epc8021ExtInputToggleCount,
+		epc8021ProdName,
+		epc8021FWVersion,
+		epc8021HostName,
+		epc8021PhysAddress,
+		epc8021SerialNumber }
+	STATUS  current
+	DESCRIPTION
+		"Basic objects."
+	-- 1.3.6.1.4.1.28507.77.2.1.1
+	::= { epc8021Groups 1 }
+
+epc8021NotificationGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		epc8021SwitchEvtPort,
+		epc8021TempEvtSen,
+		epc8021HygroEvtSen,
+		epc8021AirPressureEvtSen,
+		epc8021DewPtDiffEvtSen,
+		epc8021OVPEvt,
+		epc8021LineAmperageEvt,
+		epc8021LineResidualCurrentEvt,
+		epc8021RCMBCurrentRMSEvt,
+		epc8021RCMBCurrentDCEvt,
+		epc8021RCMBSigEvt,
+		epc8021RCMBErrEvt,
+		epc8021ExtInputEvt,
+		epc8021LineVoltageEvt,
+		epc8021LinePowerEvt }
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.77.2.1.2
+	::= { epc8021Groups 2 }
+
+
+epc8021LineAmperageEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8021PowerIndex,
+		epc8021PowerActive,
+		epc8021Current,
+		epc8021Voltage,
+		epc8021Frequency,
+		epc8021PowerApparent,
+		epc8021PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		current is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.77.3.7
+	::= { events 7 }
+
+
+epc8021LineVoltageEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8021PowerIndex,
+		epc8021PowerActive,
+		epc8021Current,
+		epc8021Voltage,
+		epc8021Frequency,
+		epc8021PowerApparent,
+		epc8021PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		voltage is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.77.3.26
+	::= { events 26 }
+
+
+epc8021LinePowerEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8021PowerIndex,
+		epc8021PowerActive,
+		epc8021Current,
+		epc8021Voltage,
+		epc8021Frequency,
+		epc8021PowerApparent,
+		epc8021PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		power is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.77.3.27
+	::= { events 27 }
+
+epc8021OVPStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+			unknown(2),
+			ok(1),
+			failure(0) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"shows the status of the
+		built-in Overvoltage Protection"
+	-- 1.3.6.1.4.1.28507.77.1.5.2.1.2
+	::= { epc8021OVPEntry 2 }
+
+
+epc8021ExtSensorName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a
+		external Sensor"
+	-- 1.3.6.1.4.1.28507.77.1.6.1.1.32
+	::= { epc8021SensorEntry 32 }
+
+
+epc8021PowerIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Index of Power Channel entries"
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.1
+	::= { epc8021PowerEntry 1 }
+
+
+epc8021OVPIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.77.1.5.2.1.1
+	::= { epc8021OVPEntry 1 }
+
+
+epc8021LineSensorName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a
+		Line Sensor"
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.100
+	::= { epc8021PowerEntry 100 }
+
+
+
+epc8021LineResidualCurrentEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8021PowerIndex,
+		epc8021PowerActive,
+		epc8021Current,
+		epc8021ResidualCurrent,
+		epc8021Voltage,
+		epc8021Frequency,
+		epc8021PowerApparent,
+		epc8021PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured residual
+		current Type A is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.77.3.8
+	::= { events 8 }
+
+gadsEPC8021 OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.77
+	::= { gudeads 77 }
+
+epc8021PortResetDuration OBJECT-TYPE
+	SYNTAX  Integer32 (0..65535)
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for turning Port on again after Reset action"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.77.1.3.1.2.1.8
+	::= { epc8021portEntry 8 }
+
+
+
+epc8021RCMBSigEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8021RCMBInfoIndex,
+		epc8021RCMBCurrentRMS,
+		epc8021RCMBCurrentDC,
+		epc8021RCMBOutputRMS,
+		epc8021RCMBOutputDC,
+		epc8021RCMBModuleStatus}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when outputs of RCMB module changes"
+	-- 1.3.6.1.4.1.28507.77.3.23
+	::= { events 23 }
+
+epc8021RCMBInfoIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Index of RCMB Info entries"
+	-- 1.3.6.1.4.1.28507.77.1.5.16.1.1
+	::= { epc8021RCMBInfoEntry 1 }
+
+
+
+epc8021RCMBCurrentRMSEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8021RCMBInfoIndex,
+		epc8021RCMBCurrentRMS,
+		epc8021RCMBCurrentDC,
+		epc8021RCMBOutputRMS,
+		epc8021RCMBOutputDC,
+		epc8021RCMBModuleStatus}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured residual
+		current Type B RMS is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.77.3.18
+	::= { events 18 }
+
+
+epc8021RCMBCurrentDCEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8021RCMBInfoIndex,
+		epc8021RCMBCurrentRMS,
+		epc8021RCMBCurrentDC,
+		epc8021RCMBOutputRMS,
+		epc8021RCMBOutputDC,
+		epc8021RCMBModuleStatus}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured residual
+		current Type B DC is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.77.3.19
+	::= { events 19 }
+
+
+epc8021RCMBErrEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8021RCMBInfoIndex,
+		epc8021RCMBCurrentRMS,
+		epc8021RCMBCurrentDC,
+		epc8021RCMBOutputRMS,
+		epc8021RCMBOutputDC,
+		epc8021RCMBModuleStatus}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when error state of RCMB module changes"
+	-- 1.3.6.1.4.1.28507.77.3.24
+	::= { events 24 }
+
+epc8021ResidualCurrent OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"0.1 mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Residual Current on Power Channel.
+		According Type A IEC 60755. Only visible on
+		models that support this feature."
+	-- 1.3.6.1.4.1.28507.77.1.5.1.2.1.24
+	::= { epc8021PowerEntry 24 }
+
+
+epc8021RCMBCurrentRMS OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"0.1 mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Residual Current RMS on Power
+		Channel. According Type B IEC 60755.
+		Only visible on models that support this
+		feature."
+	-- 1.3.6.1.4.1.28507.77.1.5.16.1.2
+	::= { epc8021RCMBInfoEntry 2 }
+
+
+epc8021RCMBCurrentDC OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"0.1 mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Residual Current DC on Power
+		Channel. According Type B IEC 60755.
+		Only visible on models that support this
+		feature."
+	-- 1.3.6.1.4.1.28507.77.1.5.16.1.3
+	::= { epc8021RCMBInfoEntry 3 }
+
+
+epc8021ExtActiveInputs OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of suppported Input Channels."
+	-- 1.3.6.1.4.1.28507.77.1.6.2.1
+	::= { epc8021ExtInputs 1 }
+
+
+epc8021PortIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..4)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A unique value, greater than zero, for each Relay Port."
+	-- 1.3.6.1.4.1.28507.77.1.3.1.2.1.1
+	::= { epc8021portEntry 1 }
+
+
+epc8021portNumber OBJECT-TYPE
+	SYNTAX  Integer32 (1..4)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The number of Relay Ports"
+	-- 1.3.6.1.4.1.28507.77.1.3.1.1
+	::= { epc8021relayports 1 }
+
+
+END

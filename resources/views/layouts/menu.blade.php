@@ -606,8 +606,10 @@
                     <ul class="dropdown-menu">
                         <li><a href="{{ url('alerts') }}"><i class="fa fa-bell fa-fw fa-lg"
                                                              aria-hidden="true"></i> {{ __('Notifications') }}</a></li>
+                        @can('viewAny', \App\Models\AlertLog::class)
                         <li><a href="{{ url('alert-log') }}"><i class="fa fa-file-text fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Alert History') }}</a></li>
+                        @endcan
                         <li><a href="{{ url('alert-stats') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
                                                                   aria-hidden="true"></i> {{ __('Statistics') }}</a></li>
                         @if($show_alert_divider)
@@ -645,7 +647,7 @@
                  @keydown.escape="close()" @click.outside="close()">
                 <div class="form-group">
                     <input class="form-control" type="search" id="gsearch" name="gsearch" autocomplete="off"
-                           placeholder="{{ __('Global Search') }}"
+                           placeholder="{{ __('Type / to search') }}"
                            x-model="query" x-ref="input"
                            @input.debounce.250ms="run()" @focus="open = flat.length > 0"
                            @keydown="onKey($event)">
