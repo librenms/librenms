@@ -33,7 +33,7 @@ modules:
                     value: ESW-5112-MIB::swhSFPPortStateTXPower
                     num_oid: '.1.3.6.1.4.1.9304.100.51122.5.34.2.1.1.11.{{ $index }}'
                     descr: '{{ ESW-5112-MIB::swhSFPPortStatePortName }} SFP Tx Power'
-                    index: 'esw5112-ddmTx-{{ $index }}'
+                    index: 'ESW-5112-MIB::swhSFPPortStateTXPower.{{ $index }}'
                     group: '{{ ESW-5112-MIB::swhSFPPortStatePortName }}'
                     skip_values:
                         -
@@ -45,7 +45,7 @@ modules:
                     value: ESW-5112-MIB::swhSFPPortStateRXPower
                     num_oid: '.1.3.6.1.4.1.9304.100.51122.5.34.2.1.1.13.{{ $index }}'
                     descr: '{{ ESW-5112-MIB::swhSFPPortStatePortName }} SFP Rx Power'
-                    index: 'esw5112-ddmRx-{{ $index }}'
+                    index: 'ESW-5112-MIB::swhSFPPortStateRXPower.{{ $index }}'
                     group: '{{ ESW-5112-MIB::swhSFPPortStatePortName }}'
                     skip_values:
                         -
@@ -57,7 +57,7 @@ modules:
                     value: HES-5106-MIB::swhSFPPortStateTXPower
                     num_oid: '.1.3.6.1.4.1.9304.100.5106.5.34.2.1.1.11.{{ $index }}'
                     descr: '{{ HES-5106-MIB::swhSFPPortStatePortName }} SFP Tx Power'
-                    index: 'hes5106-ddmTx-{{ $index }}'
+                    index: 'HES-5106-MIB::swhSFPPortStateTXPower.{{ $index }}'
                     group: '{{ HES-5106-MIB::swhSFPPortStatePortName }}'
                     skip_values:
                         -
@@ -69,7 +69,7 @@ modules:
                     value: HES-5106-MIB::swhSFPPortStateRXPower
                     num_oid: '.1.3.6.1.4.1.9304.100.5106.5.34.2.1.1.13.{{ $index }}'
                     descr: '{{ HES-5106-MIB::swhSFPPortStatePortName }} SFP Rx Power'
-                    index: 'hes5106-ddmRx-{{ $index }}'
+                    index: 'HES-5106-MIB::swhSFPPortStateRXPower.{{ $index }}'
                     group: '{{ HES-5106-MIB::swhSFPPortStatePortName }}'
                     skip_values:
                         -
@@ -83,7 +83,7 @@ modules:
                     value: ESW-5112-MIB::swhSFPPortStateTXBias
                     num_oid: '.1.3.6.1.4.1.9304.100.51122.5.34.2.1.1.9.{{ $index }}'
                     descr: '{{ ESW-5112-MIB::swhSFPPortStatePortName }} SFP Tx Bias'
-                    index: 'esw5112-ddmBias-{{ $index }}'
+                    index: 'ESW-5112-MIB::swhSFPPortStateTXBias.{{ $index }}'
                     group: '{{ ESW-5112-MIB::swhSFPPortStatePortName }}'
                     skip_values:
                         -
@@ -96,7 +96,7 @@ modules:
                     value: HES-5106-MIB::swhSFPPortStateTXBias
                     num_oid: '.1.3.6.1.4.1.9304.100.5106.5.34.2.1.1.9.{{ $index }}'
                     descr: '{{ HES-5106-MIB::swhSFPPortStatePortName }} SFP Tx Bias'
-                    index: 'hes5106-ddmBias-{{ $index }}'
+                    index: 'HES-5106-MIB::swhSFPPortStateTXBias.{{ $index }}'
                     group: '{{ HES-5106-MIB::swhSFPPortStatePortName }}'
                     skip_values:
                         -
@@ -118,7 +118,7 @@ modules:
                     value: ESW-5112-MIB::swhSFPPortStateVoltage
                     num_oid: '.1.3.6.1.4.1.9304.100.51122.5.34.2.1.1.7.{{ $index }}'
                     descr: '{{ ESW-5112-MIB::swhSFPPortStatePortName }} SFP Voltage'
-                    index: 'esw5112-ddmVolt-{{ $index }}'
+                    index: 'ESW-5112-MIB::swhSFPPortStateVoltage.{{ $index }}'
                     group: '{{ ESW-5112-MIB::swhSFPPortStatePortName }}'
                     skip_values:
                         -
@@ -130,7 +130,7 @@ modules:
                     value: HES-5106-MIB::swhSFPPortStateVoltage
                     num_oid: '.1.3.6.1.4.1.9304.100.5106.5.34.2.1.1.7.{{ $index }}'
                     descr: '{{ HES-5106-MIB::swhSFPPortStatePortName }} SFP Voltage'
-                    index: 'hes5106-ddmVolt-{{ $index }}'
+                    index: 'HES-5106-MIB::swhSFPPortStateVoltage.{{ $index }}'
                     group: '{{ HES-5106-MIB::swhSFPPortStatePortName }}'
                     skip_values:
                         -
@@ -142,7 +142,7 @@ modules:
                     value: ESW-5112-MIB::swhSystemVoltageStatePresentVoltage
                     num_oid: '.1.3.6.1.4.1.9304.100.51122.5.55.1.1.3.{{ $index }}'
                     descr: '{{ ESW-5112-MIB::swhSystemVoltageStateComponent }}'
-                    index: 'esw5112-sysVolt-{{ $index }}'
+                    index: 'ESW-5112-MIB::swhSystemVoltageStatePresentVoltage.{{ $index }}'
                     divisor: 100
                     high_limit: ESW-5112-MIB::swhSystemVoltageStateThresholdHigh
                     low_limit: ESW-5112-MIB::swhSystemVoltageStateThresholdLow
@@ -165,7 +165,7 @@ modules:
                     value: ESW-5112-MIB::swhSFPPortStateTemperature
                     num_oid: '.1.3.6.1.4.1.9304.100.51122.5.34.2.1.1.5.{{ $index }}'
                     descr: '{{ ESW-5112-MIB::swhSFPPortStatePortName }} SFP Temperature'
-                    index: 'esw5112-ddmTemp-{{ $index }}'
+                    index: 'ESW-5112-MIB::swhSFPPortStateTemperature.{{ $index }}'
                     group: '{{ ESW-5112-MIB::swhSFPPortStatePortName }}'
                     skip_values:
                         -
@@ -176,14 +176,14 @@ modules:
                     oid: ESW-5112-MIB::swhCPUTemperature
                     num_oid: '.1.3.6.1.4.1.9304.100.51122.1.2.20.{{ $index }}'
                     descr: 'CPU Temperature'
-                    index: 'esw5112-cpuTemp-{{ $index }}'
+                    index: 'ESW-5112-MIB::swhCPUTemperature.{{ $index }}'
                     divisor: 10
                 -
                     oid: HES-5106-MIB::swhSFPPortStateTable
                     value: HES-5106-MIB::swhSFPPortStateTemperature
                     num_oid: '.1.3.6.1.4.1.9304.100.5106.5.34.2.1.1.5.{{ $index }}'
                     descr: '{{ HES-5106-MIB::swhSFPPortStatePortName }} SFP Temperature'
-                    index: 'hes5106-ddmTemp-{{ $index }}'
+                    index: 'HES-5106-MIB::swhSFPPortStateTemperature.{{ $index }}'
                     group: '{{ HES-5106-MIB::swhSFPPortStatePortName }}'
                     skip_values:
                         -
@@ -194,7 +194,7 @@ modules:
                     oid: HES-5106-MIB::swhCPUTemperature
                     num_oid: '.1.3.6.1.4.1.9304.100.5106.1.2.20.{{ $index }}'
                     descr: 'CPU Temperature'
-                    index: 'hes5106-cpuTemp-{{ $index }}'
+                    index: 'HES-5106-MIB::swhCPUTemperature.{{ $index }}'
                     divisor: 10
         state:
             data:
@@ -202,7 +202,7 @@ modules:
                     oid: ESW-5112-MIB::swhPowerSupplyAState
                     num_oid: '.1.3.6.1.4.1.9304.100.51122.1.2.26.{{ $index }}'
                     descr: 'Power Supply A'
-                    index: 'esw5112-psuA-{{ $index }}'
+                    index: 'ESW-5112-MIB::swhPowerSupplyAState.{{ $index }}'
                     state_name: eswPowerSupplyAState
                     states:
                         - { value: 0, generic: 3, descr: 'n/a' }
@@ -213,7 +213,7 @@ modules:
                     oid: ESW-5112-MIB::swhPowerSupplyBState
                     num_oid: '.1.3.6.1.4.1.9304.100.51122.1.2.30.{{ $index }}'
                     descr: 'Power Supply B'
-                    index: 'esw5112-psuB-{{ $index }}'
+                    index: 'ESW-5112-MIB::swhPowerSupplyBState.{{ $index }}'
                     state_name: eswPowerSupplyBState
                     skip_values:
                         -
@@ -228,7 +228,7 @@ modules:
                     oid: HES-5106-MIB::swhPowerSupplyAState
                     num_oid: '.1.3.6.1.4.1.9304.100.5106.1.2.26.{{ $index }}'
                     descr: 'Power Supply A'
-                    index: 'hes5106-psuA-{{ $index }}'
+                    index: 'HES-5106-MIB::swhPowerSupplyAState.{{ $index }}'
                     state_name: hesPowerSupplyAState
                     skip_values:
                         -
@@ -244,7 +244,7 @@ modules:
                     oid: HES-5106-MIB::swhPowerSupplyBState
                     num_oid: '.1.3.6.1.4.1.9304.100.5106.1.2.30.{{ $index }}'
                     descr: 'Power Supply B'
-                    index: 'hes5106-psuB-{{ $index }}'
+                    index: 'HES-5106-MIB::swhPowerSupplyBState.{{ $index }}'
                     state_name: hesPowerSupplyBState
                     skip_values:
                         -
