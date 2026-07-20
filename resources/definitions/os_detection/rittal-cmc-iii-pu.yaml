@@ -18,3 +18,4 @@ discovery:
             - '/^Rittal CMC III PU/'
             - '/^Rittal CMC III PU Compact/'
             - '/^Rittal PDU/'
+            - '/^Rittal IoT Interface/'
