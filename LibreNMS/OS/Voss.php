@@ -60,8 +60,8 @@ class Voss extends Shared\Extreme implements IsIsDiscovery, IsIsPolling
             $circuits = $circuits->table(1);
             $adjacencies_data = SnmpQuery::enumStrings()->walk('ISIS-MIB-LEGACY::isisISAdj')->table(2);
             $area_addr = SnmpQuery::walk('ISIS-MIB-LEGACY::isisAreaAddr')->values();
-            $device_area = reset($area_addr);
-            $device_area = str_replace(' ', '', reset($area_addr));
+            $device_area = array_first($area_addr);
+            $device_area = str_replace(' ', '', array_first($area_addr));
             $device_area = substr($device_area, 0, 2) . '.' . substr($device_area, 2);
             $lsp_tlvs = SnmpQuery::numeric()
                 ->numericIndex()
