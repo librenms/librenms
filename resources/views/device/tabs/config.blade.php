@@ -88,15 +88,23 @@
 
                 {{-- Config / diff pane --}}
                 <x-panel class="tw:lg:col-span-3 tw:overflow-hidden tw:self-start">
-                    <x-slot name="heading">
+                    <x-slot name="heading" class="tw:flex tw:items-center tw:justify-between">
                         <h3 class="panel-title">
                             <span x-show="diffMode">{{ __('Diff') }}<span
                                     x-show="diffSelection.length === 2"
-                                    x-text="': ' + formatDate(Math.min(diffSelection[0]?.date, diffSelection[1]?.date) ) + ' → ' + formatDate(Math.max(diffSelection[0]?.date, diffSelection[1]?.date))"></span></span>
+                                    x-text="': ' + formatDate(Math.min(diffSelection[0]?.date, diffSelection[1]?.date)) + ' → ' + formatDate(Math.max(diffSelection[0]?.date, diffSelection[1]?.date))"></span></span>
                             <span x-show="!diffMode">{{ __('Configuration') }}<span
                                     x-show="selected"
                                     x-text="' - ' + formatDate(selected?.date)"></span></span>
                         </h3>
+                        <button type="button"
+                                x-show="!diffMode && content !== null && (!selected || selected.type === 'TEXT')"
+                                x-cloak
+                                x-on:click="copyToClipboard()"
+                                class="lnms-btn lnms-btn-default tw:flex tw:items-center tw:gap-1.5 tw:transition-colors">
+                            <i class="fa" :class="copied ? 'fa-check tw:text-green-600' : 'fa-copy'" aria-hidden="true"></i>
+                            <span x-text="copied ? '{{ __('Copied!') }}' : '{{ __('Copy') }}'"></span>
+                        </button>
                     </x-slot>
 
                     {{-- error --}}
@@ -174,6 +182,7 @@
                 loading: false,
                 loadingMore: false,
                 error: null,
+                copied: false,
 
                 diffMode: false,
                 diffSelection: [],
@@ -321,6 +330,21 @@
                     });
 
                     return rows;
+                },
+
+                copyToClipboard() {
+                    if (!this.content) {
+                        return;
+                    }
+
+                    navigator.clipboard.writeText(this.content).then(() => {
+                        this.copied = true;
+                        setTimeout(() => {
+                            this.copied = false;
+                        }, 2000);
+                    }).catch((error) => {
+                        console.error('Failed to copy configuration to clipboard:', error);
+                    });
                 },
             }));
         });
