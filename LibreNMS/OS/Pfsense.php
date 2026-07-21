@@ -39,14 +39,12 @@ class Pfsense extends Unix implements OSPolling
     {
         parent::discoverOS($device);
 
-        if (empty($device->hardware)) {
-            $processor_load = SnmpQuery::numericIndex()->walk('HOST-RESOURCES-MIB::hrProcessorLoad')->pluck();
-            $processor_index = array_key_first($processor_load);
+        $processor_load = SnmpQuery::numericIndex()->walk('HOST-RESOURCES-MIB::hrProcessorLoad')->pluck();
+        $processor_index = array_key_first($processor_load);
 
-            if ($processor_index !== null) {
-                $description = SnmpQuery::get("HOST-RESOURCES-MIB::hrDeviceDescr.$processor_index")->value();
-                $device->hardware = $description ?: $device->hardware;
-            }
+        if ($processor_index !== null) {
+            $description = SnmpQuery::get("HOST-RESOURCES-MIB::hrDeviceDescr.$processor_index")->value();
+            $device->hardware = $description ?: $device->hardware;
         }
     }
 
