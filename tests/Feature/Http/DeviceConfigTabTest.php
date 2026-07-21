@@ -212,4 +212,25 @@ class DeviceConfigTabTest extends TestCase
             ->assertJsonPath('groups.0.type', 'INSERTED')
             ->assertJsonPath('groups.0.revised.0.text', 'ntp server 10.0.0.1');
     }
+
+    public function testDataMethodReturnsOnlyLatestBackupAndPreparedUrlsAndMessages(): void
+    {
+        $device = Device::factory()->create();
+
+        Http::fake([
+            'unimus:8085/api/v2/devices/findByAddress/*' => Http::response(['data' => ['id' => 7]], 200),
+            'unimus:8085/api/v2/devices/7/backups/latest' => Http::response([
+                'data' => ['id' => 99, 'validSince' => 300, 'validUntil' => null, 'type' => 'TEXT', 'bytes' => base64_encode('latest content')],
+            ], 200),
+        ]);
+
+        $data = app(ConfigController::class)->data($device, new \Illuminate\Http\Request());
+
+        $this->assertEquals('99', $data['latest']['id']);
+        $this->assertEquals('latest content', $data['latest']['content']);
+        $this->assertEmpty($data['backups']);
+        $this->assertArrayHasKey('urls', $data);
+        $this->assertArrayHasKey('messages', $data);
+        $this->assertEquals('Unimus', $data['provider']);
+    }
 }

@@ -7,23 +7,7 @@
                 {{ $data['error_message'] }}
             </x-panel>
         @else
-            <div x-data="configBackups({
-                    backups: {{ Js::from($data['backups']) }},
-                    latest: {{ Js::from($data['latest']) }},
-                    total: {{ Js::from($data['total']) }},
-                    totalPages: {{ Js::from($data['totalPages']) }},
-                    urls: {
-                        backups: @js(route('device.config.backups', $device->device_id)),
-                        backup: @js(route('device.config.backup', [$device->device_id, 'BACKUP_ID'])),
-                        diff: @js(route('device.config.diff', $device->device_id)),
-                    },
-                    messages: {
-                        unreachable: @js(__(':provider is not reachable.', ['provider' => $data['provider']])),
-                        error: @js(__(':provider returned an error.', ['provider' => $data['provider']])),
-                        backup_not_found: @js(__('This backup could not be loaded from :provider.', ['provider' => $data['provider']])),
-                        request_failed: @js(__('The request failed. Please try again.')),
-                    },
-                })"
+            <div x-data="configBackups(@js($data))"
                 class="tw:mt-4 tw:flex tw:flex-col tw:lg:flex-row tw:gap-4 tw:items-start">
 
                 {{-- Backup list --}}
@@ -49,7 +33,11 @@
                             {{ __('Select two backups to compare.') }}
                         </p>
 
-                        <ul class="tw:list-none tw:m-0 tw:p-0 tw:divide-y tw:divide-gray-200 tw:dark:divide-dark-gray-200 tw:max-h-60 tw:lg:max-h-[70vh] tw:overflow-y-auto">
+                        <div x-show="loadingBackups" x-cloak class="tw:py-6 tw:text-center tw:text-gray-500 tw:dark:text-dark-white-400">
+                            <i class="fa fa-spinner fa-spin"></i>
+                        </div>
+
+                        <ul x-show="!loadingBackups" class="tw:list-none tw:m-0 tw:p-0 tw:divide-y tw:divide-gray-200 tw:dark:divide-dark-gray-200 tw:max-h-60 tw:lg:max-h-[70vh] tw:overflow-y-auto">
                             <template x-for="backup in backups" :key="backup.id">
                                 <li>
                                     <button type="button"
@@ -165,9 +153,8 @@
 
                     {{-- binary backup notice --}}
                     <p x-show="!loading && !diffMode && selected && selected.type !== 'TEXT'" x-cloak
-                       class="tw:py-10 tw:m-0 tw:text-center tw:text-gray-500 tw:dark:text-dark-white-400">
-                        {{ __('This is a binary backup and cannot be displayed. View it in :provider instead.', ['provider' => $data['provider']]) }}
-                    </p>
+                       class="tw:py-10 tw:m-0 tw:text-center tw:text-gray-500 tw:dark:text-dark-white-400"
+                       x-text="messages.binary_not_supported"></p>
 
                     {{-- config view --}}
                     <template x-if="!loading && !diffMode && content !== null && (!selected || selected.type === 'TEXT')">
@@ -185,22 +172,46 @@
         document.addEventListener('alpine:init', () => {
             window.Alpine.data('configBackups', (config) => ({
                 backups: (config.backups || []).map((b) => ({ ...b, page: 0 })),
-                page: 0,
+                page: config.page || 0,
                 totalPages: config.totalPages || 0,
                 total: config.total || 0,
                 urls: config.urls || {},
                 messages: config.messages || {},
+                provider: config.provider || '',
 
                 selected: config.latest || null,
                 content: config.latest ? config.latest.content : null,
                 loading: false,
                 loadingMore: false,
+                loadingBackups: false,
                 error: null,
                 copied: false,
 
                 diffMode: false,
                 diffSelection: [],
                 diffGroups: null,
+
+                init() {
+                    this.loadBackups();
+                },
+
+                loadBackups() {
+                    this.loadingBackups = true;
+                    window.axios
+                        .get(this.urls.backups, { params: { page: 0 } })
+                        .then((response) => {
+                            this.backups = response.data.backups.map((b) => ({ ...b, page: 0 }));
+                            this.page = response.data.page;
+                            this.totalPages = response.data.totalPages;
+                            this.total = response.data.total;
+                        })
+                        .catch((error) => {
+                            this.error = error.response?.data?.error || 'request_failed';
+                        })
+                        .finally(() => {
+                            this.loadingBackups = false;
+                        });
+                },
 
                 get hasMore() {
                     return this.page < this.totalPages - 1;

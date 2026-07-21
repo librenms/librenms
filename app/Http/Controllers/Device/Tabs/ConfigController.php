@@ -64,49 +64,54 @@ class ConfigController extends Controller implements DeviceTab
     }
 
     /**
-     * @return array{error: ?string, error_message: ?string, provider: ?string, latest: ?array{id: string, date: ?int, until: ?int, type: string, content: ?string}, backups: list<array{id: string, date: ?int, until: ?int, type: string, content: ?string}>, total: int, totalPages: int}
+     * @return array{error: ?string, error_message: ?string, provider: ?string, latest: ?array{id: string, date: ?int, until: ?int, type: string, content: ?string}, backups: list<array{id: string, date: ?int, until: ?int, type: string, content: ?string}>, total: int, totalPages: int, urls: array{backups: string, backup: string, diff: string}, messages: array<string, string>}
      */
     public function data(Device $device, Request $request): array
     {
-        $empty = [
+        $provider = $this->manager->providerFor($device);
+        $providerName = $provider?->name();
+
+        $urls = [
+            'backups' => route('device.config.backups', $device->device_id),
+            'backup' => route('device.config.backup', [$device->device_id, 'BACKUP_ID']),
+            'diff' => route('device.config.diff', $device->device_id),
+        ];
+
+        $messages = [
+            'unreachable' => __(':provider is not reachable.', ['provider' => $providerName ?? __('the backup provider')]),
+            'error' => __(':provider returned an error.', ['provider' => $providerName ?? __('the backup provider')]),
+            'backup_not_found' => __('This backup could not be loaded from :provider.', ['provider' => $providerName ?? __('the backup provider')]),
+            'binary_not_supported' => __('This is a binary backup and cannot be displayed. View it in :provider instead.', ['provider' => $providerName ?? __('the backup provider')]),
+            'request_failed' => __('The request failed. Please try again.'),
+        ];
+
+        $base = [
             'error' => null,
             'error_message' => null,
-            'provider' => null,
+            'provider' => $providerName,
             'latest' => null,
             'backups' => [],
             'total' => 0,
             'totalPages' => 0,
+            'urls' => $urls,
+            'messages' => $messages,
         ];
 
-        $provider = $this->manager->providerFor($device);
         if ($provider === null) {
             $error = ConfigBackupProvider::ERROR_DEVICE_NOT_FOUND;
 
-            return array_merge($empty, ['error' => $error, 'error_message' => $this->errorMessage($error, null)]);
+            return array_merge($base, ['error' => $error, 'error_message' => $this->errorMessage($error, null)]);
         }
 
-        $empty['provider'] = $provider->name();
+        $latest = $provider->latest($device);
+        if ($latest === null) {
+            $error = $provider->lastError() ?? ConfigBackupProvider::ERROR_NO_BACKUPS;
 
-        $list = $provider->backups($device);
-        if ($list === null) {
-            $error = $provider->lastError() ?? ConfigBackupProvider::ERROR_UNREACHABLE;
-
-            return array_merge($empty, ['error' => $error, 'error_message' => $this->errorMessage($error, $provider->name())]);
+            return array_merge($base, ['error' => $error, 'error_message' => $this->errorMessage($error, $providerName)]);
         }
 
-        if (empty($list['backups'])) {
-            $error = ConfigBackupProvider::ERROR_NO_BACKUPS;
-
-            return array_merge($empty, ['error' => $error, 'error_message' => $this->errorMessage($error, $provider->name())]);
-        }
-
-        $latest = $provider->latest($device) ?? $list['backups'][0];
-
-        return array_merge($empty, [
+        return array_merge($base, [
             'latest' => $latest,
-            'backups' => $list['backups'],
-            'total' => $list['total'],
-            'totalPages' => $list['totalPages'],
         ]);
     }
 
@@ -127,7 +132,7 @@ class ConfigController extends Controller implements DeviceTab
         Gate::authorize('show-config', $device);
 
         $validated = $request->validate([
-            'page' => 'required|integer|min:0',
+            'page' => 'nullable|integer|min:0',
         ]);
 
         $provider = $this->manager->providerFor($device);
@@ -135,7 +140,7 @@ class ConfigController extends Controller implements DeviceTab
             return $this->errorResponse(ConfigBackupProvider::ERROR_DEVICE_NOT_FOUND);
         }
 
-        $list = $provider->backups($device, (int) $validated['page']);
+        $list = $provider->backups($device, (int) ($validated['page'] ?? 0));
         if ($list === null) {
             return $this->errorResponse($provider->lastError() ?? ConfigBackupProvider::ERROR_UNREACHABLE);
         }
