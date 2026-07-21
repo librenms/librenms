@@ -34,6 +34,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
+use LibreNMS\Util\NetSnmpTranslate;
 use SnmpQuery;
 
 class Awplus extends OS implements OSDiscovery, TransceiverDiscovery
@@ -51,7 +52,7 @@ class Awplus extends OS implements OSDiscovery, TransceiverDiscovery
         //Instead use sysObjectID.0
 
         if (Str::contains($hardware, 'SBx81')) {
-            $hardware = SnmpQuery::hideMib()->mibs(['AT-PRODUCT-MIB'])->translate($device->sysObjectID);
+            $hardware = NetSnmpTranslate::make()->hideMib()->mibs(['AT-PRODUCT-MIB'])->translate($device->sysObjectID);
             $hardware = str_replace('at', 'AT-', $hardware);
 
             // Features and Serial is set to Controller card 1.5 or 1.6
