@@ -18,6 +18,7 @@
                             <span class="tw:font-normal tw:text-xl tw:text-gray-500 tw:dark:text-dark-white-400" x-text="'(' + total + ')'"></span>
                         </h3>
                         <button type="button"
+                                x-show="total > 1" x-cloak
                                 x-on:click="toggleDiffMode()"
                                 x-text="diffMode ? '{{ __('Single') }}' : '{{ __('Diff') }}'"
                                 :class="diffMode
