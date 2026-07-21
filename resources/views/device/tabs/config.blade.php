@@ -35,7 +35,7 @@
                         </h3>
                         <button type="button"
                                 x-on:click="toggleDiffMode()"
-                                x-text="diffMode ? '{{ __('Cancel') }}' : '{{ __('Diff') }}'"
+                                x-text="diffMode ? '{{ __('Single') }}' : '{{ __('Diff') }}'"
                                 :class="diffMode
                                     ? 'lnms-btn-default'
                                     : 'lnms-btn-primary'"
