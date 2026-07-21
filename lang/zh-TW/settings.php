@@ -149,6 +149,9 @@ return [
             'collectd' => [
                 'name' => 'Collectd 整合',
             ],
+            'unimus' => [
+                'name' => 'Unimus 整合',
+            ],
         ],
         'poller' => [
             'availability' => [
@@ -405,7 +408,7 @@ return [
         ],
         'allow_unauth_graphs_cidr' => [
             'description' => '允許指定網路存取圖表',
-            'help' => '允許指定網路可以在未登入授權查看圖表 (若未啟用 允許未登入存取圖表 則忽略此設定)',
+            'help' => '允許指定網路可以在未登入授權檢視圖表 (若未啟用 允許未登入存取圖表 則忽略此設定)',
         ],
         'api' => [
             'cors' => [
@@ -569,7 +572,7 @@ return [
         ],
         'auth_ad_url' => [
             'description' => 'Active Directory 伺服器',
-            'help' => '設定伺服器，以空格分隔。前綴 ldaps:// 以使用 SSL。範例：ldaps://dc1.example.com ldaps://dc2.example.com',
+            'help' => '設定伺服器，以空格分隔。在前面加上 ldaps:// 以使用 SSL。範例：ldaps://dc1.example.com ldaps://dc2.example.com',
         ],
         'auth_ldap_attr' => [
             'uid' => [
@@ -644,7 +647,7 @@ return [
             'description' => '以下列方式尋找群組成員',
             'options' => [
                 'username' => '使用者名稱',
-                'fulldn' => '完整 DN（使用前綴與後綴）',
+                'fulldn' => '完整 DN (使用前置字串與後置字串)',
                 'puredn' => 'DN 搜尋 (使用 uid 屬性搜尋)',
             ],
         ],
@@ -666,7 +669,7 @@ return [
         ],
         'auth_ldap_server' => [
             'description' => 'LDAP 伺服器',
-            'help' => '設定伺服器，以空格分隔。前綴 ldaps:// 以使用 SSL',
+            'help' => '設定伺服器，以空格分隔。在前面加上 ldaps:// 以使用 SSL',
         ],
         'auth_ldap_starttls' => [
             'description' => '使用 STARTTLS',
@@ -1224,8 +1227,8 @@ return [
                 'help' => '用於連線 Graphite 伺服器的連接埠',
             ],
             'prefix' => [
-                'description' => '前綴（選填）',
-                'help' => '會將前綴加到所有指標的開頭。必須為以點分隔的英數字元',
+                'description' => '前置字串 (選填)',
+                'help' => '會將前置字串加到所有指標的開頭。必須為以點分隔的英數字元',
             ],
         ],
         'graphing' => [
@@ -1239,6 +1242,21 @@ return [
             ],
         ],
         'graphs' => [
+            'row' => [
+                'normal' => [
+                    'options' => [
+                        'sixhour' => '6 小時',
+                        'day' => '24 小時',
+                        'twoday' => '48 小時',
+                        'week' => '1 週',
+                        'twoweek' => '2 週',
+                        'month' => '1 個月',
+                        'twomonth' => '2 個月',
+                        'year' => '1 年',
+                        'twoyear' => '2 年',
+                    ],
+                ],
+            ],
             'port_speed_zoom' => [
                 'description' => '將連接埠圖表縮放至連接埠速度',
                 'help' => '縮放連接埠圖表，使最大值永遠為連接埠速度；停用後連接埠圖表會縮放至流量',
@@ -1842,9 +1860,8 @@ return [
             'description' => '捨棄介面',
             'help' => '應該被忽略的網路介面類型',
         ],
-        'ping_rrd_step' => [
-            'description' => 'Ping 頻率',
-            'help' => '多久檢查一次。設定所有節點的預設值。警告！若您變更此項，必須進行額外的變更。請參閱 Fast Ping 文件。',
+        'ping' => [
+            'description' => 'ping 路徑',
         ],
         'poller_modules' => [
             'unix-agent' => [
@@ -1885,6 +1902,9 @@ return [
             ],
             'ports' => [
                 'description' => '連接埠',
+            ],
+            'ports-stack' => [
+                'description' => '連接埠堆疊',
             ],
             'bgp-peers' => [
                 'description' => 'BGP 鄰居',
@@ -2038,7 +2058,7 @@ return [
                 'help' => '附加裝置的 sysName 資訊至 Prometheus Push Gateway。',
             ],
             'prefix' => [
-                'description' => '前綴',
+                'description' => '前置字串',
                 'help' => '選擇性附加到匯出指標名稱前的文字',
             ],
         ],
@@ -2249,6 +2269,10 @@ return [
         'service_master_timeout' => [
             'description' => '主 Dispatcher 逾時',
             'help' => '主鎖定到期前的時間。若主節點消失，另一個節點需要這麼長的時間才能接手。但若派發工作所花的時間超過逾時，您將會有多個主節點',
+        ],
+        'service_ping_frequency' => [
+            'description' => 'Ping 頻率',
+            'help' => '對所有裝置執行快速 Ping 的頻率。',
         ],
         'service_poller_workers' => [
             'description' => '輪詢器工作程序',
@@ -2533,6 +2557,23 @@ return [
         'twofactor_lock' => [
             'description' => '雙因素驗證碼有效時間 (秒)',
             'help' => '若雙因素驗證連續失敗 3 次，允許再次嘗試前需等待的鎖定時間（秒）—— 會提示使用者等待這段時間。設為 0 以停用，將導致帳號永久鎖定，並顯示訊息要使用者聯絡管理員',
+        ],
+        'unimus' => [
+            'api_version' => [
+                'description' => 'Unimus API 版本',
+            ],
+            'enabled' => [
+                'description' => '啟用 Unimus 支援',
+                'help' => '在裝置的組態分頁顯示來自 Unimus 的裝置組態備份',
+            ],
+            'token' => [
+                'description' => 'Unimus API 權杖',
+                'help' => '在 Unimus 中建立的 API 權杖 (Basic / 唯讀權限即足夠)',
+            ],
+            'url' => [
+                'description' => 'Unimus URL',
+                'help' => '您的 Unimus 伺服器基礎 URL，例如：http://unimus.example.com:8085',
+            ],
         ],
         'unix-agent' => [
             'connection-timeout' => [
