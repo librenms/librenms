@@ -24,10 +24,10 @@
                         request_failed: @js(__('The request failed. Please try again.')),
                     },
                 })"
-                class="tw:mt-4 tw:grid tw:grid-cols-1 tw:lg:grid-cols-4 tw:gap-4">
+                class="tw:mt-4 tw:flex tw:flex-col tw:lg:flex-row tw:gap-4 tw:items-start">
 
                 {{-- Backup list --}}
-                <x-panel class="tw:overflow-hidden tw:self-start">
+                <x-panel class="tw:w-full tw:lg:w-md tw:lg:shrink-0 tw:overflow-hidden tw:self-start tw:mb-0!">
                     <x-slot name="heading" class="tw:flex tw:items-center tw:justify-between">
                         <h3 class="panel-title">
                             {{ __('Backups') }}
@@ -49,7 +49,7 @@
                             {{ __('Select two backups to compare.') }}
                         </p>
 
-                        <ul class="tw:list-none tw:m-0 tw:p-0 tw:divide-y tw:divide-gray-200 tw:dark:divide-dark-gray-200 tw:max-h-[70vh] tw:overflow-y-auto">
+                        <ul class="tw:list-none tw:m-0 tw:p-0 tw:divide-y tw:divide-gray-200 tw:dark:divide-dark-gray-200 tw:max-h-60 tw:lg:max-h-[70vh] tw:overflow-y-auto">
                             <template x-for="backup in backups" :key="backup.id">
                                 <li>
                                     <button type="button"
@@ -67,6 +67,12 @@
                                             <span class="tw:block tw:text-base tw:text-gray-500 tw:dark:text-dark-white-400"
                                                   x-show="backup.until">{{ __('Valid until') }}<span x-show="backup.until" x-text="' ' + formatDate(backup.until)"></span></span>
                                         </span>
+                                        <span x-show="diffMode && getDiffRole(backup)" x-cloak
+                                              :class="getDiffRole(backup) === 'old'
+                                                  ? 'tw:bg-amber-100 tw:text-amber-800 tw:dark:bg-amber-900/40 tw:dark:text-amber-300'
+                                                  : 'tw:bg-green-100 tw:text-green-800 tw:dark:bg-green-900/40 tw:dark:text-green-300'"
+                                              class="tw:text-xs tw:font-medium tw:rounded tw:px-1.5 tw:py-0.5"
+                                              x-text="getDiffRole(backup) === 'old' ? '{{ __('Old') }}' : '{{ __('New') }}'"></span>
                                         <span x-show="backup.type !== 'TEXT'"
                                               class="tw:text-xs tw:font-medium tw:rounded tw:px-1.5 tw:py-0.5 tw:bg-gray-200 tw:text-gray-700 tw:dark:bg-dark-gray-200 tw:dark:text-dark-white-300"
                                               x-text="backup.type"></span>
@@ -87,7 +93,7 @@
                 </x-panel>
 
                 {{-- Config / diff pane --}}
-                <x-panel class="tw:lg:col-span-3 tw:overflow-hidden tw:self-start">
+                <x-panel class="tw:w-full tw:flex-1 tw:min-w-0 tw:overflow-hidden tw:self-start tw:mb-0!">
                     <x-slot name="heading" class="tw:flex tw:items-center tw:justify-between">
                         <h3 class="panel-title">
                             <span x-show="diffMode">{{ __('Diff') }}<span
@@ -97,14 +103,22 @@
                                     x-show="selected"
                                     x-text="' - ' + formatDate(selected?.date)"></span></span>
                         </h3>
-                        <button type="button"
-                                x-show="!diffMode && content !== null && (!selected || selected.type === 'TEXT')"
-                                x-cloak
-                                x-on:click="copyToClipboard()"
-                                class="lnms-btn lnms-btn-default tw:flex tw:items-center tw:gap-1.5 tw:transition-colors">
-                            <i class="fa" :class="copied ? 'fa-check tw:text-green-600' : 'fa-copy'" aria-hidden="true"></i>
-                            <span x-text="copied ? '{{ __('Copied!') }}' : '{{ __('Copy') }}'"></span>
-                        </button>
+                        <div x-show="!diffMode && content !== null && (!selected || selected.type === 'TEXT')"
+                             x-cloak
+                             class="tw:flex tw:items-center tw:gap-2">
+                            <button type="button"
+                                    x-on:click="downloadConfig()"
+                                    class="lnms-btn lnms-btn-default tw:flex tw:items-center tw:gap-1.5 tw:transition-colors">
+                                <i class="fa fa-download" aria-hidden="true"></i>
+                                <span>{{ __('Download') }}</span>
+                            </button>
+                            <button type="button"
+                                    x-on:click="copyToClipboard()"
+                                    class="lnms-btn lnms-btn-default tw:flex tw:items-center tw:gap-1.5 tw:transition-colors">
+                                <i class="fa" :class="copied ? 'fa-check tw:text-green-600 tw:dark:text-green-400' : 'fa-copy'" aria-hidden="true"></i>
+                                <span x-text="copied ? '{{ __('Copied!') }}' : '{{ __('Copy') }}'"></span>
+                            </button>
+                        </div>
                     </x-slot>
 
                     {{-- error --}}
@@ -119,7 +133,7 @@
 
                     {{-- diff view --}}
                     <template x-if="!loading && diffMode && diffReady">
-                        <div class="tw:rounded-lg tw:overflow-hidden tw:border tw:border-gray-200 tw:dark:border-dark-gray-200">
+                        <div class="tw:rounded-lg tw:overflow-x-auto tw:max-h-[70vh] tw:overflow-y-auto tw:border tw:border-gray-200 tw:dark:border-dark-gray-200">
                             <table class="tw:w-full tw:m-0 tw:font-mono tw:border-collapse">
                                 <tbody>
                                     <template x-for="(row, index) in diffRows" :key="index">
@@ -157,7 +171,7 @@
 
                     {{-- config view --}}
                     <template x-if="!loading && !diffMode && content !== null && (!selected || selected.type === 'TEXT')">
-                        <pre class="tw:m-0 tw:p-3 tw:font-mono tw:whitespace-pre tw:overflow-x-auto tw:max-h-[70vh] tw:overflow-y-auto tw:rounded-lg tw:bg-gray-50 tw:text-gray-800 tw:dark:bg-dark-gray-500! tw:dark:text-dark-white-200! tw:border tw:border-gray-200 tw:dark:border-dark-gray-200"
+                        <pre class="tw:m-0 tw:p-3 tw:font-mono tw:whitespace-pre tw:overflow-x-auto tw:max-h-[70vh] tw:overflow-y-auto tw:rounded-lg tw:bg-gray-50 tw:text-gray-800 tw:dark:bg-dark-gray-500 tw:dark:text-dark-white-200 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200"
                              x-text="content"></pre>
                     </template>
                 </x-panel>
@@ -330,6 +344,40 @@
                     });
 
                     return rows;
+                },
+
+                getDiffRole(backup) {
+                    if (!this.diffMode || this.diffSelection.length !== 2) {
+                        return null;
+                    }
+
+                    const [orig, rev] = [...this.diffSelection].sort((a, b) => a.date - b.date);
+                    if (backup.id === orig.id) {
+                        return 'old';
+                    }
+                    if (backup.id === rev.id) {
+                        return 'new';
+                    }
+
+                    return null;
+                },
+
+                downloadConfig() {
+                    if (!this.content) {
+                        return;
+                    }
+
+                    const dateStr = this.selected?.date ? new Date(this.selected.date * 1000).toISOString().split('T')[0] : 'latest';
+                    const filename = `config-${dateStr}.txt`;
+                    const blob = new Blob([this.content], { type: 'text/plain;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
                 },
 
                 copyToClipboard() {
