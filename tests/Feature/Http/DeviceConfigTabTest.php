@@ -228,9 +228,11 @@ class DeviceConfigTabTest extends TestCase
 
         $this->assertEquals('99', $data['latest']['id']);
         $this->assertEquals('latest content', $data['latest']['content']);
-        $this->assertEmpty($data['backups']);
+        $this->assertArrayNotHasKey('backups', $data);
+        $this->assertArrayNotHasKey('total', $data);
+        $this->assertArrayNotHasKey('totalPages', $data);
+        $this->assertArrayNotHasKey('provider', $data);
         $this->assertArrayHasKey('urls', $data);
         $this->assertArrayHasKey('messages', $data);
-        $this->assertEquals('Unimus', $data['provider']);
     }
 }

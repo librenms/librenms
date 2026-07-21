@@ -171,13 +171,12 @@
     <script>
         document.addEventListener('alpine:init', () => {
             window.Alpine.data('configBackups', (config) => ({
-                backups: (config.backups || []).map((b) => ({ ...b, page: 0 })),
-                page: config.page || 0,
-                totalPages: config.totalPages || 0,
-                total: config.total || 0,
+                backups: [],
+                page: 0,
+                totalPages: 0,
+                total: 0,
                 urls: config.urls || {},
                 messages: config.messages || {},
-                provider: config.provider || '',
 
                 selected: config.latest || null,
                 content: config.latest ? config.latest.content : null,

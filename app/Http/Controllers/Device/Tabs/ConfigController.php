@@ -64,7 +64,7 @@ class ConfigController extends Controller implements DeviceTab
     }
 
     /**
-     * @return array{error: ?string, error_message: ?string, provider: ?string, latest: ?array{id: string, date: ?int, until: ?int, type: string, content: ?string}, backups: list<array{id: string, date: ?int, until: ?int, type: string, content: ?string}>, total: int, totalPages: int, urls: array{backups: string, backup: string, diff: string}, messages: array<string, string>}
+     * @return array{error: ?string, error_message: ?string, latest: ?array{id: string, date: ?int, until: ?int, type: string, content: ?string}, urls: array{backups: string, backup: string, diff: string}, messages: array<string, string>}
      */
     public function data(Device $device, Request $request): array
     {
@@ -85,14 +85,10 @@ class ConfigController extends Controller implements DeviceTab
             'request_failed' => __('The request failed. Please try again.'),
         ];
 
-        $base = [
+        $empty = [
             'error' => null,
             'error_message' => null,
-            'provider' => $providerName,
             'latest' => null,
-            'backups' => [],
-            'total' => 0,
-            'totalPages' => 0,
             'urls' => $urls,
             'messages' => $messages,
         ];
@@ -100,17 +96,17 @@ class ConfigController extends Controller implements DeviceTab
         if ($provider === null) {
             $error = ConfigBackupProvider::ERROR_DEVICE_NOT_FOUND;
 
-            return array_merge($base, ['error' => $error, 'error_message' => $this->errorMessage($error, null)]);
+            return array_merge($empty, ['error' => $error, 'error_message' => $this->errorMessage($error, null)]);
         }
 
         $latest = $provider->latest($device);
         if ($latest === null) {
             $error = $provider->lastError() ?? ConfigBackupProvider::ERROR_NO_BACKUPS;
 
-            return array_merge($base, ['error' => $error, 'error_message' => $this->errorMessage($error, $providerName)]);
+            return array_merge($empty, ['error' => $error, 'error_message' => $this->errorMessage($error, $providerName)]);
         }
 
-        return array_merge($base, [
+        return array_merge($empty, [
             'latest' => $latest,
         ]);
     }
