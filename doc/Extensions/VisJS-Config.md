@@ -8,6 +8,13 @@ be adjusted by following the instructions below.
 [This link](https://visjs.github.io/vis-network/docs/network/) will
 show you all the options and explain what they do.
 
+!!! warning
+
+    There is currently a known issue with lnms set when setting JSON values.
+    As a workaround, the JSON must be double-encoded, and the resulting string 
+    must be properly escaped for the CLI. Until this issue is resolved, using 
+    the Web UI or config.php is generally less error-prone..
+
 The commands to run to use the defaults is as follows:
 
 ```bash
