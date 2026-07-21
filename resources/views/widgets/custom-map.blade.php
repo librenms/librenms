@@ -58,8 +58,15 @@
                     if(edge.port_id) {
                         edge_port_map[edgeid] = {device_id: edge.device_id, port_id: edge.port_id};
                     }
-                    network_nodes.add([mid]);
-                    network_edges.add([edge1, edge2]);
+
+                    // VIA waypoints: reroute the canonical segments through any waypoint nodes
+                    var fromExtras = custommap.getEdgeExtras(edgeid, edge, edge1, "from", network_nodes);
+                    var toExtras = custommap.getEdgeExtras(edgeid, edge, edge2, "to", network_nodes);
+                    edge1.to = fromExtras.firstTo;
+                    edge2.to = toExtras.firstTo;
+
+                    network_nodes.add([mid].concat(fromExtras.nodes).concat(toExtras.nodes));
+                    network_edges.add([edge1, edge2].concat(fromExtras.segments).concat(toExtras.segments));
                 });
 
                 custommap.redrawDefaultLegend(network_nodes, {{ $map->legend_steps }}, {{ $map->legend_x }}, {{ $map->legend_y }}, {{ $map->legend_font_size }}, {{ $map->legend_hide_invalid }}, {{ $map->legend_hide_overspeed }}, {{ Js::from($map->legend_colours) }});

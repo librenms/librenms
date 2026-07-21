@@ -91,14 +91,17 @@
                     } else {
                         delete edge_port_map[edgeid];
                     }
-                    if (network_nodes.get(mid.id)) {
-                        network_nodes.update(mid);
-                        network_edges.update(edge1);
-                        network_edges.update(edge2);
-                    } else {
-                        network_nodes.add([mid]);
-                        network_edges.add([edge1, edge2]);
-                    }
+
+                    // VIA waypoints: reroute the canonical segments through any waypoint nodes
+                    var fromExtras = custommap.getEdgeExtras(edgeid, edge, edge1, "from", network_nodes);
+                    var toExtras = custommap.getEdgeExtras(edgeid, edge, edge2, "to", network_nodes);
+                    edge1.to = fromExtras.firstTo;
+                    edge2.to = toExtras.firstTo;
+                    var wpNodes = fromExtras.nodes.concat(toExtras.nodes);
+                    var segs = fromExtras.segments.concat(toExtras.segments);
+
+                    network_nodes.update([mid].concat(wpNodes));
+                    network_edges.update([edge1, edge2].concat(segs));
                 });
 
                 // Remove any nodes that are not in the database, includes edges
@@ -109,11 +112,36 @@
                             network_nodes.remove(edgeid + "_mid");
                             network_edges.remove(edgeid + "_to");
                             network_edges.remove(edgeid + "_from");
+                            // this edge's waypoint nodes/segments are dropped by the valid_ids pass below
                         }
+                    } else if(typeof nodeid === 'string' && /_w[ft]_\d+$/.test(nodeid)) {
+                        // waypoint node - dropped by the valid_ids pass below
                     } else {
                         if(! (nodeid in data.nodes)) {
                             network_nodes.remove(nodeid);
                         }
+                    }
+                });
+
+                // Drop stale waypoint segments/nodes for edges whose waypoint count shrank
+                var valid_ids = {};
+                $.each( data.edges, function( edgeid, edge) {
+                    ['from', 'to'].forEach(function (half) {
+                        var wps = (edge.waypoints && edge.waypoints[half]) ? edge.waypoints[half] : [];
+                        for (var i = 0; i < wps.length; i++) {
+                            valid_ids[edgeid + "_w" + half[0] + "_" + i] = true;
+                            valid_ids[edgeid + "_" + half + "_seg_" + i] = true;
+                        }
+                    });
+                });
+                network_edges.getIds().forEach(function (eid) {
+                    if(typeof eid === 'string' && eid.includes("_seg_") && !(eid in valid_ids)) {
+                        network_edges.remove(eid);
+                    }
+                });
+                network_nodes.getIds().forEach(function (nid) {
+                    if(typeof nid === 'string' && /_w[ft]_\d+$/.test(nid) && !(nid in valid_ids)) {
+                        network_nodes.remove(nid);
                     }
                 });
 
