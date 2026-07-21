@@ -39,12 +39,10 @@ class Pfsense extends Unix implements OSPolling
     {
         parent::discoverOS($device);
 
-        if (empty($device->version)) {
-            foreach (SnmpQuery::walk('HOST-RESOURCES-MIB::hrSWInstalledName')->values() as $package) {
-                if (preg_match('/^pfSense(?:-base)?-(?<version>\d+(?:\.\d+)+(?:-\S+)?)$/i', trim((string) $package), $matches)) {
-                    $device->version = $matches['version'];
-                    break;
-                }
+        foreach (SnmpQuery::walk('HOST-RESOURCES-MIB::hrSWInstalledName')->values() as $package) {
+            if (preg_match('/^pfSense(?:-base)?-(?<version>\d+(?:\.\d+)+(?:-\S+)?)$/i', trim((string) $package), $matches)) {
+                $device->version = $matches['version'];
+                break;
             }
         }
     }
