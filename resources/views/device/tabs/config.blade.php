@@ -243,6 +243,10 @@
                         return;
                     }
 
+                    if (this.selected && this.selected.id === backup.id && this.content !== null) {
+                        return;
+                    }
+
                     this.selected = backup;
                     this.error = null;
 
