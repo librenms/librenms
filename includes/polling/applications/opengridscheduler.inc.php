@@ -22,7 +22,7 @@ $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.3.111.103.115';
 echo ' ' . $name;
 
 // get data through snmp
-$ogs_data = snmp_get($device, $oid, '-Oqv');
+$ogs_data = SnmpQuery::get($oid)->value();
 
 // define the rrd
 $rrd_def = RrdDefinition::make()
