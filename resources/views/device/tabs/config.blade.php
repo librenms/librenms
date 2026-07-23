@@ -76,7 +76,7 @@
                                     <button type="button"
                                             x-on:click="loadMore()"
                                             :disabled="loadingMore"
-                                            class="lnms-btn lnms-btn-default tw:w-full tw:rounded-none tw:border-0 tw:border-t tw:border-gray-200 tw:dark:border-dark-gray-200"
+                                            class="lnms-btn lnms-btn-default tw:w-full tw:rounded-none! tw:border-0! tw:border-t! tw:border-gray-200 tw:dark:border-dark-gray-200"
                                             x-text="loadingMore ? '{{ __('config_backups.loading') }}' : '{{ __('config_backups.load_more') }}'">
                                     </button>
                                 </li>
