@@ -1,0 +1,332 @@
+-- **********************************************************
+-- OPENWRT-WIRELESS-MIB
+--
+-- OpenWrt wireless metrics exported by the LibreNMS OpenWrt SNMP agent.
+-- The agent discovers radios/VAPs live (hostapd/iwinfo) at request time and
+-- serves this subtree from a single net-snmp pass_persist handler, so no
+-- per-interface or per-metric snmpd configuration is required.
+--
+-- Registers under OPENWRT-MIB at { openwrtObjects 10 }
+--   -> OID base .1.3.6.1.4.1.60652.102.1.10
+--
+-- Rows in openwrtWirelessInterfaceTable are indexed by IF-MIB ifIndex so the
+-- table joins directly onto the standard ifTable/ifXTable for the same VAP.
+-- **********************************************************
+
+OPENWRT-WIRELESS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex
+        FROM IF-MIB
+    openwrtObjects, openwrtConformance
+        FROM OPENWRT-MIB;
+
+openwrtWirelessMIB MODULE-IDENTITY
+    LAST-UPDATED "202607030000Z"
+    ORGANIZATION "LibreNMS"
+    CONTACT-INFO
+        "       LibreNMS Community
+                https://www.librenms.org
+                https://github.com/librenms/librenms
+        "
+    DESCRIPTION
+        "MIB module describing OpenWrt wireless metrics (aggregate scalars
+         and a per-interface table) exported by the LibreNMS OpenWrt SNMP
+         agent's pass_persist handler."
+    REVISION "202607030000Z"
+    DESCRIPTION
+        "Initial version: wireless aggregate scalars and per-interface table,
+         including per-interface channel utilisation and transmit power."
+    ::= { openwrtObjects 10 }
+
+-- **********************************************************
+-- Aggregate scalars
+-- **********************************************************
+
+openwrtWirelessInterfaceCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of active wireless interfaces exported in
+         openwrtWirelessInterfaceTable."
+    ::= { openwrtWirelessMIB 1 }
+
+openwrtWirelessClientCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Aggregate count of unique wireless clients served by this device
+         across its AP/master interfaces. MLO/MLD-related addresses are
+         de-duplicated so a single client associated over multiple links
+         counts once. Upstream associations on client/STA-mode interfaces are
+         excluded (this device's own uplink is not one of its clients)."
+    ::= { openwrtWirelessMIB 2 }
+
+-- **********************************************************
+-- Wireless interface table
+-- **********************************************************
+
+openwrtWirelessInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OpenwrtWirelessInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "OpenWrt wireless interfaces and their per-interface metrics."
+    ::= { openwrtWirelessMIB 3 }
+
+openwrtWirelessInterfaceEntry OBJECT-TYPE
+    SYNTAX      OpenwrtWirelessInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Metrics for one OpenWrt wireless interface. Rows are indexed by the
+         corresponding IF-MIB ifIndex, so that this table joins directly onto
+         the standard interface table for the same VAP."
+    INDEX { openwrtWlIfaceIfIndex }
+    ::= { openwrtWirelessInterfaceTable 1 }
+
+OpenwrtWirelessInterfaceEntry ::= SEQUENCE {
+    openwrtWlIfaceIfIndex     InterfaceIndex,
+    openwrtWlIfaceName        DisplayString,
+    openwrtWlIfaceLabel       DisplayString,
+    openwrtWlIfaceClients     Unsigned32,
+    openwrtWlIfaceFrequency   Unsigned32,
+    openwrtWlIfaceNoiseFloor  Integer32,
+    openwrtWlIfaceTxRateMin   Unsigned32,
+    openwrtWlIfaceTxRateAvg   Unsigned32,
+    openwrtWlIfaceTxRateMax   Unsigned32,
+    openwrtWlIfaceRxRateMin   Unsigned32,
+    openwrtWlIfaceRxRateAvg   Unsigned32,
+    openwrtWlIfaceRxRateMax   Unsigned32,
+    openwrtWlIfaceSnrMin      Integer32,
+    openwrtWlIfaceSnrAvg      Integer32,
+    openwrtWlIfaceSnrMax      Integer32,
+    openwrtWlIfaceChannelUtil Unsigned32,
+    openwrtWlIfaceTxPower     Integer32
+}
+
+openwrtWlIfaceIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The kernel interface index (IF-MIB ifIndex) of this wireless
+         interface, taken from /sys/class/net/<iface>/ifindex. Used as the
+         table index so rows align with the standard ifTable/ifXTable."
+    ::= { openwrtWirelessInterfaceEntry 1 }
+
+openwrtWlIfaceName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OpenWrt wireless interface name, for example wlan0 or phy0-ap0."
+    ::= { openwrtWirelessInterfaceEntry 2 }
+
+openwrtWlIfaceLabel OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Display label for the wireless interface, normally the SSID. If
+         multiple interfaces share an SSID, the agent appends a band suffix
+         such as 24, 5 or 6 to keep labels unique."
+    ::= { openwrtWirelessInterfaceEntry 3 }
+
+openwrtWlIfaceClients OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of stations associated with this wireless interface.
+         For an AP/master interface this is the count of connected clients.
+         For a client/STA-mode interface (e.g. a wireless uplink or backhaul)
+         this is the number of upstream associations, which is its peer count:
+         1 while associated to an AP, 0 when there is no peer (not associated /
+         link down) - so it doubles as a backhaul link-up indicator."
+    ::= { openwrtWirelessInterfaceEntry 4 }
+
+openwrtWlIfaceFrequency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "MHz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current channel centre frequency in MHz."
+    ::= { openwrtWirelessInterfaceEntry 5 }
+
+openwrtWlIfaceNoiseFloor OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Noise floor for this wireless interface in dBm (typically negative)."
+    ::= { openwrtWirelessInterfaceEntry 6 }
+
+openwrtWlIfaceTxRateMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Mbit/s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum transmit bitrate across associated stations, in Mbit/s.
+         Expressed in Mbit/s rather than bit/s so that Wi-Fi 6E/7 rates
+         (multi-Gbit/s) do not overflow Unsigned32."
+    ::= { openwrtWirelessInterfaceEntry 7 }
+
+openwrtWlIfaceTxRateAvg OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Mbit/s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average transmit bitrate across associated stations, in Mbit/s."
+    ::= { openwrtWirelessInterfaceEntry 8 }
+
+openwrtWlIfaceTxRateMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Mbit/s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum transmit bitrate across associated stations, in Mbit/s."
+    ::= { openwrtWirelessInterfaceEntry 9 }
+
+openwrtWlIfaceRxRateMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Mbit/s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum receive bitrate across associated stations, in Mbit/s."
+    ::= { openwrtWirelessInterfaceEntry 10 }
+
+openwrtWlIfaceRxRateAvg OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Mbit/s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average receive bitrate across associated stations, in Mbit/s."
+    ::= { openwrtWirelessInterfaceEntry 11 }
+
+openwrtWlIfaceRxRateMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Mbit/s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum receive bitrate across associated stations, in Mbit/s."
+    ::= { openwrtWirelessInterfaceEntry 12 }
+
+openwrtWlIfaceSnrMin OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum signal-to-noise ratio across associated stations, in dB."
+    ::= { openwrtWirelessInterfaceEntry 13 }
+
+openwrtWlIfaceSnrAvg OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average signal-to-noise ratio across associated stations, in dB."
+    ::= { openwrtWirelessInterfaceEntry 14 }
+
+openwrtWlIfaceSnrMax OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum signal-to-noise ratio across associated stations, in dB."
+    ::= { openwrtWirelessInterfaceEntry 15 }
+
+openwrtWlIfaceChannelUtil OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Channel airtime utilisation for this interface's radio, as a
+         percentage (0-100). This is the fraction of time the channel is
+         observed busy; 0 if the driver does not report survey data."
+    ::= { openwrtWirelessInterfaceEntry 16 }
+
+openwrtWlIfaceTxPower OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current transmit power for this wireless interface in dBm."
+    ::= { openwrtWirelessInterfaceEntry 17 }
+
+-- **********************************************************
+-- Conformance
+-- **********************************************************
+
+openwrtWirelessConformance OBJECT IDENTIFIER ::= { openwrtConformance 10 }
+openwrtWirelessCompliances  OBJECT IDENTIFIER ::= { openwrtWirelessConformance 1 }
+openwrtWirelessGroups       OBJECT IDENTIFIER ::= { openwrtWirelessConformance 2 }
+
+openwrtWirelessScalarGroup OBJECT-GROUP
+    OBJECTS {
+        openwrtWirelessInterfaceCount,
+        openwrtWirelessClientCount
+    }
+    STATUS  current
+    DESCRIPTION
+        "Aggregate wireless scalars."
+    ::= { openwrtWirelessGroups 1 }
+
+openwrtWirelessInterfaceGroup OBJECT-GROUP
+    OBJECTS {
+        openwrtWlIfaceName,
+        openwrtWlIfaceLabel,
+        openwrtWlIfaceClients,
+        openwrtWlIfaceFrequency,
+        openwrtWlIfaceNoiseFloor,
+        openwrtWlIfaceTxRateMin,
+        openwrtWlIfaceTxRateAvg,
+        openwrtWlIfaceTxRateMax,
+        openwrtWlIfaceRxRateMin,
+        openwrtWlIfaceRxRateAvg,
+        openwrtWlIfaceRxRateMax,
+        openwrtWlIfaceSnrMin,
+        openwrtWlIfaceSnrAvg,
+        openwrtWlIfaceSnrMax,
+        openwrtWlIfaceChannelUtil,
+        openwrtWlIfaceTxPower
+    }
+    STATUS  current
+    DESCRIPTION
+        "Per-interface wireless metrics."
+    ::= { openwrtWirelessGroups 2 }
+
+openwrtWirelessCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "Compliance statement for OpenWrt wireless monitoring agents."
+    MODULE  -- this module
+    MANDATORY-GROUPS {
+        openwrtWirelessScalarGroup,
+        openwrtWirelessInterfaceGroup
+    }
+    ::= { openwrtWirelessCompliances 1 }
+
+END

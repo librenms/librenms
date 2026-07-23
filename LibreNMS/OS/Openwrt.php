@@ -31,144 +31,215 @@ use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\OS;
-use LibreNMS\Util\Oid;
 
 class Openwrt extends OS implements
     OSDiscovery,
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,
     WirelessNoiseFloorDiscovery,
+    WirelessPowerDiscovery,
     WirelessRateDiscovery,
-    WirelessSnrDiscovery
+    WirelessSnrDiscovery,
+    WirelessUtilizationDiscovery
 {
+    // OPENWRT-WIRELESS-MIB openwrtWirelessInterfaceEntry columns, addressed as
+    // <WL_ENTRY>.<column>.<ifIndex>. Wireless data is served by the agent's
+    // pass_persist handler under { openwrtObjects 10 } (.60652.102.1.10).
+    private const WL_ENTRY = '.1.3.6.1.4.1.60652.102.1.10.3.1';
+
+    // openwrtWirelessClientCount scalar: device-wide de-duplicated client count.
+    private const WL_CLIENT_COUNT = '.1.3.6.1.4.1.60652.102.1.10.2.0';
+
+    // Rates are exported in Mbit/s (so Wi-Fi 6E/7 multi-Gbit/s rates do not
+    // overflow Unsigned32); LibreNMS Rate sensors are stored in bps.
+    private const RATE_MULTIPLIER = 1000000;
+
+    /** @var array<int, string>|null cache of ifIndex => label */
+    private ?array $wlInterfaces = null;
+
     /**
      * Retrieve basic information about the OS / device
      */
     public function discoverOS(Device $device): void
     {
-        [, $device->version] = explode(' ', snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."distro"', '-Osqnv'));
-        $device->hardware = snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."hardware"', '-Osqnv');
+        $distro = trim((string) \SnmpQuery::get('NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."distro"')->value());
+        $distroParts = preg_split('/\s+/', $distro, 2);
+        $device->version = $distroParts[1] ?? $distro;
+        $device->hardware = \SnmpQuery::get('NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."hardware"')->value();
     }
 
     /**
-     * Retrieve (and explode to array) list of network interfaces, and desired display name in LibreNMS.
-     * This information is returned from the wireless device (router / AP) - as SNMP extend, with the name "interfaces".
+     * Wireless interfaces keyed by IF-MIB ifIndex, mapped to their display
+     * label (SSID). Walked once from openwrtWlIfaceLabel and cached; the table
+     * is ifIndex-indexed so every metric column shares these indexes.
      *
-     * @return array Interfaces
+     * @return array<int, string>
      */
-    private function getInterfaces()
+    private function wirelessInterfaces(): array
     {
-        // Need to use PHP_EOL, found newline (\n) not near as reliable / consistent! And this is as PHP says it should be done.
-        $interfaces = explode(PHP_EOL, snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."interfaces"', '-Osqnv'));
-        $arrIfaces = [];
-        foreach ($interfaces as $interface) {
-            [$k, $v] = explode(',', $interface);
-            $arrIfaces[$k] = $v;
+        if ($this->wlInterfaces !== null) {
+            return $this->wlInterfaces;
         }
 
-        return $arrIfaces;
-    }
+        $labelOid = self::WL_ENTRY . '.3'; // openwrtWlIfaceLabel
+        $this->wlInterfaces = [];
 
-    /**
-     * Generic (common / shared) routine, to create new Wireless Sensors, of the sensor Type passed as the call argument.
-     * type - string, matching to LibreNMS documentation => https://docs.librenms.org/Developing/os/Wireless-Sensors/
-     * query - string, query to be used at client (appends to type string, e.g. -tx, -rx)
-     * system - boolean, flag to indicate that a combined ("system level") sensor (and OID) is to be added
-     * stats - boolean, flag denoting that statistics are to be retrieved (min, max, avg)
-     * NOTE: system and stats are assumed to be mutually exclusive (at least for now!)
-     *
-     * @return array Sensors
-     */
-    private function getSensorData(WirelessSensorType $type, $query = '', $system = false, $stats = false)
-    {
-        // Initialize needed variables, and get interfaces (actual network name, and LibreNMS name)
-        $sensors = [];
-        $interfaces = $this->getInterfaces();
-        $count = 1;
-
-        // Build array for stats - if desired
-        $statstr = [''];
-        if ($stats) {
-            $statstr = ['-min', '-max', '-avg'];
-        }
-
-        // Loop over interfaces, adding sensors
-        foreach ($interfaces as $index => $interface) {
-            // Loop over stats, appending to sensors as needed (only a single, blank, addition if no stats)
-            foreach ($statstr as $stat) {
-                $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.1.' . Oid::encodeString("{$type->value}$query-$index$stat");
-                $sensors[] = new WirelessSensor($type, $this->getDeviceId(), $oid, "openwrt$query", $count, "$interface$query$stat");
-                $count += 1;
+        foreach (\SnmpQuery::walk($labelOid)->values() as $oid => $label) {
+            $ifIndex = (int) substr((string) $oid, strrpos((string) $oid, '.') + 1);
+            if ($ifIndex > 0) {
+                $this->wlInterfaces[$ifIndex] = trim((string) $label);
             }
         }
-        // If system level (i.e. overall) sensor desired, add that one as well
-        if ($system and (count($interfaces) > 1)) {
-            $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.1.' . Oid::encodeString("{$type->value}$query-wlan");
-            $sensors[] = new WirelessSensor($type, $this->getDeviceId(), $oid, "openwrt$query", $count, 'wlan');
+
+        return $this->wlInterfaces;
+    }
+
+    /**
+     * One single-value sensor per wireless interface, reading a single table
+     * column.
+     *
+     * @return array<WirelessSensor>
+     */
+    private function perInterfaceSensors(WirelessSensorType $type, int $column, int $multiplier = 1): array
+    {
+        $sensors = [];
+        foreach ($this->wirelessInterfaces() as $ifIndex => $label) {
+            $sensors[] = new WirelessSensor(
+                $type,
+                $this->getDeviceId(),
+                self::WL_ENTRY . '.' . $column . '.' . $ifIndex,
+                'openwrt',
+                (string) $ifIndex,
+                $label !== '' ? $label : (string) $ifIndex,
+                null,
+                $multiplier
+            );
         }
 
-        // And, return all the sensors that have been created above (i.e. the array of sensors)
         return $sensors;
     }
 
     /**
-     * Discover wireless client counts. Type is clients.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     * min / avg / max sensors per wireless interface, read from three
+     * sequential table columns. The MIB SEQUENCE order is Min, Avg, Max, so
+     * the columns map $minColumn => min, +1 => avg, +2 => max.
      *
-     * @return array Sensors
+     * @return array<WirelessSensor>
+     */
+    private function statsSensors(WirelessSensorType $type, string $subtype, int $minColumn, int $multiplier = 1): array
+    {
+        $stats = ['min' => $minColumn, 'avg' => $minColumn + 1, 'max' => $minColumn + 2];
+
+        $sensors = [];
+        foreach ($this->wirelessInterfaces() as $ifIndex => $label) {
+            $name = $label !== '' ? $label : (string) $ifIndex;
+            foreach ($stats as $stat => $column) {
+                $sensors[] = new WirelessSensor(
+                    $type,
+                    $this->getDeviceId(),
+                    self::WL_ENTRY . '.' . $column . '.' . $ifIndex,
+                    $subtype,
+                    $subtype . '-' . $ifIndex . '-' . $stat,
+                    $name . ' ' . $stat,
+                    null,
+                    $multiplier
+                );
+            }
+        }
+
+        return $sensors;
+    }
+
+    /**
+     * Discover wireless client counts (per interface plus a device-wide total).
+     *
+     * @return array
      */
     public function discoverWirelessClients()
     {
-        return $this->getSensorData(WirelessSensorType::Clients, '', true, false);
+        $sensors = $this->perInterfaceSensors(WirelessSensorType::Clients, 4);
+
+        // Device-wide de-duplicated client count only adds information when
+        // more than one interface serves clients.
+        if (count($sensors) > 1) {
+            $sensors[] = new WirelessSensor(
+                WirelessSensorType::Clients,
+                $this->getDeviceId(),
+                self::WL_CLIENT_COUNT,
+                'openwrt',
+                'total',
+                'Total clients'
+            );
+        }
+
+        return $sensors;
     }
 
     /**
-     * Discover wireless frequency.  This is in MHz. Type is frequency.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     * Discover wireless frequency. This is in MHz.
      *
-     * @return array Sensors
+     * @return array
      */
     public function discoverWirelessFrequency()
     {
-        return $this->getSensorData(WirelessSensorType::Frequency, '', false, false);
+        return $this->perInterfaceSensors(WirelessSensorType::Frequency, 5);
     }
 
     /**
-     * Discover wireless noise floor.  This is in dBm. Type is noise-floor.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     * Discover wireless noise floor. This is in dBm.
      *
-     * @return array Sensors
+     * @return array
      */
     public function discoverWirelessNoiseFloor()
     {
-        return $this->getSensorData(WirelessSensorType::NoiseFloor, '', false, false);
+        return $this->perInterfaceSensors(WirelessSensorType::NoiseFloor, 6);
     }
 
     /**
-     * Discover wireless rate. This is in bps. Type is rate.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     * Discover wireless rate (tx and rx, min/avg/max). Stored in bps.
      *
      * @return array
      */
     public function discoverWirelessRate()
     {
-        $txrate = $this->getSensorData(WirelessSensorType::Rate, '-tx', false, true);
-        $rxrate = $this->getSensorData(WirelessSensorType::Rate, '-rx', false, true);
+        $tx = $this->statsSensors(WirelessSensorType::Rate, 'openwrt-tx', 7, self::RATE_MULTIPLIER);
+        $rx = $this->statsSensors(WirelessSensorType::Rate, 'openwrt-rx', 10, self::RATE_MULTIPLIER);
 
-        return array_merge($txrate, $rxrate);
+        return array_merge($tx, $rx);
     }
 
     /**
-     * Discover wireless snr. This is in dB. Type is snr.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     * Discover wireless SNR (min/avg/max). This is in dB.
      *
      * @return array
      */
     public function discoverWirelessSNR()
     {
-        return $this->getSensorData(WirelessSensorType::Snr, '', false, true);
+        return $this->statsSensors(WirelessSensorType::Snr, 'openwrt', 13);
+    }
+
+    /**
+     * Discover per-interface channel airtime utilisation. This is a percentage.
+     *
+     * @return array
+     */
+    public function discoverWirelessUtilization()
+    {
+        return $this->perInterfaceSensors(WirelessSensorType::Utilization, 16);
+    }
+
+    /**
+     * Discover per-interface transmit power. This is in dBm.
+     *
+     * @return array
+     */
+    public function discoverWirelessPower()
+    {
+        return $this->perInterfaceSensors(WirelessSensorType::Power, 17);
     }
 }
