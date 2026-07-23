@@ -209,7 +209,10 @@ class SSOAuthorizer extends MysqlAuthorizer
 
         $level = (int) LibrenmsConfig::get('sso.static_level', 0);
         $config_map = LibrenmsConfig::get('sso.group_level_map', []);
-
+        if (! is_array($config_map)) {
+            $config_map = [];
+        }
+        
         foreach ($groups as $group) {
             if (! array_key_exists($group, $config_map)) {
                 continue;
