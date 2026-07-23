@@ -353,15 +353,20 @@ final class AuthSSOTest extends DBTestCase
         LibrenmsConfig::set('sso.mode', 'env');
         LibrenmsConfig::set('sso.group_strategy', 'attribute');
 
+        //Integer
+        LibrenmsConfig::set('sso.level_attr', 'level');
+        $_SERVER['level'] = 5;
+        $this->assertSame(['global-read'], $a->getRoles(''));
+
         //String
         LibrenmsConfig::set('sso.level_attr', 'role');
-        $_SERVER['role'] = 'global-read';
+        $_SERVER['level'] = '5';
         $this->assertSame(['global-read'], $a->getRoles(''));
 
         // invalid level
         LibrenmsConfig::set('sso.level_attr', 'level');
         $_SERVER['level'] = 9;
-        $this->assertSame([], $a->getRoles(''));
+        $this->assertSame(['global-read'], $a->getRoles(''));
 
         //Invalid String
         LibrenmsConfig::set('sso.level_attr', 'level');
@@ -400,7 +405,7 @@ final class AuthSSOTest extends DBTestCase
         LibrenmsConfig::set('sso.group_strategy', 'map');
         LibrenmsConfig::set('sso.group_delimiter', ';');
         LibrenmsConfig::set('sso.group_attr', 'member');
-        LibrenmsConfig::set('sso.group_level_map', [ 'librenms-admins' => ['roles' => ['admin']], 'librenms-readers' => ['roles' => ['global-read']], ]);
+        LibrenmsConfig::set('sso.group_level_map', ['librenms-admins' => ['roles' => ['admin']], 'librenms-readers' => ['roles' => ['global-read']]]);
         $_SERVER['member'] = 'librenms-admins;librenms-readers;librenms-billingcontacts;unrelatedgroup;confluence-admins';
 
         // Valid options
@@ -456,7 +461,7 @@ final class AuthSSOTest extends DBTestCase
         // Test group filtering by regex
         LibrenmsConfig::set('sso.group_filter', '/confluence-(.*)/i');
         LibrenmsConfig::set('sso.group_delimiter', ';');
-        LibrenmsConfig::set('sso.group_level_map', ['librenms-admins' => ['roles' => ['admin']], 'librenms-readers' => ['roles' => ['global-read']], 'librenms-billingcontacts' => ['roles' => ['billing-contact']], 'confluence-admins' => ['roles' => ['confluence-admin']], ]);
+        LibrenmsConfig::set('sso.group_level_map', ['librenms-admins' => ['roles' => ['admin']], 'librenms-readers' => ['roles' => ['global-read']], 'librenms-billingcontacts' => ['roles' => ['billing-contact']], 'confluence-admins' => ['roles' => ['confluence-admin']]]);
         $this->assertSame(['confluence-admin'], $a->authSSOParseGroups());
 
         // Test group filtering by empty regex
