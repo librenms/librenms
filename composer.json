@@ -27,6 +27,7 @@
         "ext-xml": "*",
         "ext-zlib": "*",
         "amenadiel/jpgraph": "^4",
+        "binaryk/laravel-restify": "^9.11",
         "clue/socket-raw": "^1.4",
         "dapphp/radius": "^3.0",
         "easybook/geshi": "^1.0.8",
@@ -38,15 +39,16 @@
         "justinrainbow/json-schema": "^6.4",
         "laravel-notification-channels/webpush": "^10.0",
         "laravel/framework": "^12.10",
+        "laravel/sanctum": "^4.3.1",
         "laravel/tinker": "^3.0",
         "laravel/ui": "^4.6",
         "librenms/laravel-vue-i18n-generator": "dev-master",
         "librenms/plugin-interfaces": "^1.0",
         "mews/purifier": "^3.4",
+        "mikepultz/netdns2": "^1.5",
         "nesbot/carbon": "^3.8",
         "nunomaduro/laravel-console-summary": "^1.13",
         "pear/console_color2": "^0.1",
-        "mikepultz/netdns2": "^1.5",
         "php-amqplib/php-amqplib": "^3.1",
         "phpmailer/phpmailer": "^7.0",
         "predis/predis": "^3.0",
@@ -91,6 +93,9 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": false
+        },
+        "platform": {
+            "php": "8.2"
         }
     },
     "extra": {

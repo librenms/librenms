@@ -7,6 +7,36 @@ return [
         'no_devices' => 'No devices found matching your given device specification',
         'no_new_devices' => 'No new devices',
     ],
+    'api:token:create' => [
+        'description' => 'Create a new API token for a user',
+        'arguments' => [
+            'username' => 'User to create the token for',
+        ],
+        'options' => [
+            'name' => 'Name for the token',
+        ],
+        'created' => 'Token created successfully.',
+        'save-warning' => 'Save this token — it will not be shown again.',
+        'user-not-found' => 'User \':username\' not found.',
+    ],
+    'api:token:list' => [
+        'description' => 'List API tokens for a user',
+        'arguments' => [
+            'username' => 'User to list tokens for',
+        ],
+        'no-tokens' => 'No tokens found for user \':username\'.',
+        'user-not-found' => 'User \':username\' not found.',
+    ],
+    'api:token:revoke' => [
+        'description' => 'Revoke an API token for a user',
+        'arguments' => [
+            'username' => 'User the token belongs to',
+            'token-id' => 'ID of the token to revoke (see api:token:list)',
+        ],
+        'revoked' => 'Token \':name\' (ID: :id) revoked.',
+        'token-not-found' => 'Token ID :id not found for user \':username\'.',
+        'user-not-found' => 'User \':username\' not found.',
+    ],
     'config:clear' => [
         'description' => 'Clear config cache.  This will allow any changes that have been made since the last full config load to be reflected in the current config.',
     ],
