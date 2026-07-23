@@ -156,7 +156,7 @@ class OxidizedProvider implements ConfigBackupProvider
 
         // Oxidized takes the newer version as oid and the older as oid2, so the
         // resulting diff removes the original (older) lines and inserts the new.
-        $diff = $this->api->getDiff($node['name'], $revId, $origId);
+        $diff = $this->api->getDiff($node['name'], $revId, $origId, $node['group'] ?? null);
         if ($diff === null) {
             $this->lastError = $this->api->lastError() ?? self::ERROR_UNREACHABLE;
 
@@ -252,11 +252,13 @@ class OxidizedProvider implements ConfigBackupProvider
      */
     private function fetchContent(array $node, string $backupId): ?string
     {
+        $group = $node['group'] ?? null;
+
         if ($backupId === self::CONFIG_ID) {
-            return $this->api->getNodeConfig($node['name'], $node['group'] ?? null);
+            return $this->api->getNodeConfig($node['name'], $group);
         }
 
-        return $this->api->getVersionContent($node['name'], $backupId);
+        return $this->api->getVersionContent($node['name'], $backupId, $group);
     }
 
     /**
