@@ -1,5 +1,7 @@
 import logging
+import os
 import threading
+import time
 import traceback
 from queue import Empty
 from subprocess import CalledProcessError
@@ -12,6 +14,73 @@ logger = logging.getLogger(__name__)
 
 
 class QueueManager:
+    # cgroup mount + the v1 "unlimited" sentinel (PAGE_COUNTER_MAX rounded to page)
+    _CG_ROOT = "/sys/fs/cgroup"
+    _CG1_UNLIMITED = 9223372036854771712
+
+    @staticmethod
+    def _mem_read_int(path):
+        """Read an int from a cgroup file; None on 'max', missing or unparseable."""
+        try:
+            with open(path) as fh:
+                v = fh.read().strip()
+            return None if v == "max" else int(v)
+        except Exception:
+            return None
+
+    @staticmethod
+    def _mem_frac_cgv2(cgroup_root):
+        cur = QueueManager._mem_read_int(os.path.join(cgroup_root, "memory.current"))
+        lim = QueueManager._mem_read_int(os.path.join(cgroup_root, "memory.max"))
+        if cur is None or lim is None or lim <= 0:
+            return None
+        return cur / lim
+
+    @staticmethod
+    def _mem_frac_cgv1(cgroup_root):
+        base = os.path.join(cgroup_root, "memory")
+        cur = QueueManager._mem_read_int(os.path.join(base, "memory.usage_in_bytes"))
+        lim = QueueManager._mem_read_int(os.path.join(base, "memory.limit_in_bytes"))
+        if cur is None or lim is None or lim <= 0 or lim >= QueueManager._CG1_UNLIMITED:
+            return None
+        return cur / lim
+
+    @staticmethod
+    def _mem_frac_meminfo(proc_meminfo):
+        try:
+            total = None
+            avail = None
+            with open(proc_meminfo) as fh:
+                for line in fh:
+                    if line.startswith("MemTotal:"):
+                        total = int(line.split()[1])
+                    elif line.startswith("MemAvailable:"):
+                        avail = int(line.split()[1])
+                    if total is not None and avail is not None:
+                        break
+            if total and avail is not None and total > 0:
+                return 1.0 - (avail / total)
+        except Exception:
+            pass
+        return None
+
+    @classmethod
+    def memory_fraction(cls, cgroup_root=None, proc_meminfo="/proc/meminfo"):
+        """Fraction (0.0-1.0) of the effective memory limit in use, or None.
+
+        Order: cgroup v2 (if limited) -> cgroup v1 (if limited) -> meminfo -> None.
+        None means "cannot determine" and the caller must fail open (never gate).
+        """
+        if cgroup_root is None:
+            cgroup_root = cls._CG_ROOT
+        frac = cls._mem_frac_cgv2(cgroup_root)
+        if frac is not None:
+            return frac
+        frac = cls._mem_frac_cgv1(cgroup_root)
+        if frac is not None:
+            return frac
+        return cls._mem_frac_meminfo(proc_meminfo)
+
     def __init__(
         self, config, lock_manager, type_desc, uses_groups=False, auto_start=True
     ):
@@ -50,12 +119,58 @@ class QueueManager:
             )
         )
 
+        # Optional memory-pressure gate. Percent 1-99, or None = disabled.
+        self._mem_limit_frac = None
+        self._mem_paused = False
+        self._last_pause_log = 0.0
+        pct = getattr(self.config, "memory_pressure_percent", None)
+        if pct is not None:
+            try:
+                pct = int(pct)
+            except (TypeError, ValueError):
+                raise ValueError(
+                    "distributed_poller_memory_pressure_percent must be an integer 1-99"
+                )
+            if not 1 <= pct <= 99:
+                raise ValueError(
+                    "distributed_poller_memory_pressure_percent must be an integer 1-99"
+                )
+            self._mem_limit_frac = pct / 100.0
+
         if auto_start:
             self.start()
 
     def _service_worker(self, queue_id):
         logger.debug("Worker started {}".format(threading.current_thread().getName()))
         while not self._stop_event.is_set():
+            # Memory-pressure gate: don't dequeue new work while stressed (hysteresis).
+            if self._mem_limit_frac is not None:
+                frac = self.memory_fraction()
+                if frac is None:
+                    self._mem_paused = False  # cannot tell -> fail open, never gate
+                else:
+                    if frac >= self._mem_limit_frac:
+                        self._mem_paused = True
+                    elif frac < self._mem_limit_frac - 0.10:
+                        if self._mem_paused:
+                            logger.info(
+                                "Memory %.1f%%; resuming intake on %s",
+                                frac * 100,
+                                self.type,
+                            )
+                        self._mem_paused = False
+                    if self._mem_paused:
+                        now = time.time()
+                        if (now - self._last_pause_log) > 60:
+                            self._last_pause_log = now
+                            logger.warning(
+                                "Memory %.1f%% >= %.0f%%; pausing intake on %s",
+                                frac * 100,
+                                self._mem_limit_frac * 100,
+                                self.type,
+                            )
+                        time.sleep(5)
+                        continue
             logger.debug(
                 "Worker {} checking queue {} ({}) for work".format(
                     threading.current_thread().getName(),
