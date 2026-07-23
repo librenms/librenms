@@ -91,6 +91,7 @@ class ConfigController extends Controller implements DeviceTab
             'latest' => null,
             'urls' => $urls,
             'messages' => $messages,
+            'hostname' => $device->hostname,
         ];
 
         if ($provider === null) {

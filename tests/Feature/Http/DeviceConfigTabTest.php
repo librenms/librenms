@@ -234,5 +234,6 @@ class DeviceConfigTabTest extends TestCase
         $this->assertArrayNotHasKey('provider', $data);
         $this->assertArrayHasKey('urls', $data);
         $this->assertArrayHasKey('messages', $data);
+        $this->assertEquals($device->hostname, $data['hostname']);
     }
 }

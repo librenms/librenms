@@ -58,7 +58,7 @@
                                         </span>
                                         <span x-show="diffMode && getDiffRole(backup)" x-cloak
                                               :class="getDiffRole(backup) === 'old'
-                                                  ? 'tw:bg-amber-100 tw:text-amber-800 tw:dark:bg-amber-900/40 tw:dark:text-amber-300'
+                                                  ? 'tw:bg-red-100 tw:text-red-800 tw:dark:bg-red-900/40 tw:dark:text-red-300'
                                                   : 'tw:bg-green-100 tw:text-green-800 tw:dark:bg-green-900/40 tw:dark:text-green-300'"
                                               class="tw:text-xs tw:font-medium tw:rounded tw:px-1.5 tw:py-0.5"
                                               x-text="getDiffRole(backup) === 'old' ? '{{ __('Old') }}' : '{{ __('New') }}'"></span>
@@ -138,7 +138,7 @@
                                                     'tw:text-red-700 tw:dark:text-red-400': row.mode === 'removed',
                                                 }"
                                                 x-text="row.mode === 'added' ? '+' : (row.mode === 'removed' ? '-' : '')"></td>
-                                            <td class="tw:px-2 tw:py-0.5 tw:whitespace-pre tw:text-gray-800 tw:dark:text-dark-white-100" x-text="row.text"></td>
+                                            <td class="tw:px-2 tw:py-0.5 tw:whitespace-pre-wrap tw:text-gray-800 tw:dark:text-dark-white-100" x-text="row.text"></td>
                                         </tr>
                                     </template>
                                 </tbody>
@@ -159,7 +159,8 @@
 
                     {{-- config view --}}
                     <template x-if="!loading && !diffMode && content !== null && (!selected || selected.type === 'TEXT')">
-                        <pre class="tw:m-0 tw:p-3 tw:font-mono tw:whitespace-pre tw:overflow-x-auto tw:max-h-[70vh] tw:overflow-y-auto tw:rounded-lg tw:bg-gray-50 tw:text-gray-800 tw:dark:bg-dark-gray-500 tw:dark:text-dark-white-200 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200"
+                        <pre class="tw:m-0 tw:p-3 tw:font-mono tw:whitespace-pre-wrap tw:overflow-x-auto tw:max-h-[70vh] tw:overflow-y-auto tw:rounded-lg tw:bg-gray-50 tw:text-gray-800 tw:dark:bg-dark-gray-500 tw:dark:text-dark-white-200 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200"
+                             style="white-space: pre-wrap;"
                              x-text="content"></pre>
                     </template>
                 </x-panel>
@@ -383,7 +384,8 @@
                     }
 
                     const dateStr = this.selected?.date ? new Date(this.selected.date * 1000).toISOString().split('T')[0] : 'latest';
-                    const filename = `config-${dateStr}.txt`;
+                    const hostname = config.hostname ? `${config.hostname}-` : '';
+                    const filename = `${hostname}config-${dateStr}.txt`;
                     const blob = new Blob([this.content], { type: 'text/plain;charset=utf-8' });
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
