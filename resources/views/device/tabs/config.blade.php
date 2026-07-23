@@ -40,28 +40,34 @@
                                 <li>
                                     <button type="button"
                                             x-on:click="selectBackup(backup)"
-                                            :disabled="backup.type !== 'TEXT' && diffMode"
+                                            :disabled="isBackupDisabled(backup)"
                                             :class="isSelected(backup)
                                                 ? 'tw:bg-blue-50 tw:dark:bg-blue-900/40'
                                                 : 'tw:hover:bg-gray-50 tw:dark:hover:bg-dark-gray-300'"
                                             class="tw:w-full tw:text-left tw:px-4 tw:py-2.5 tw:flex tw:items-center tw:gap-2 tw:transition-colors tw:disabled:opacity-50 tw:disabled:cursor-not-allowed">
-                                        <span x-show="diffMode" x-cloak
-                                              :class="isSelected(backup) ? 'tw:bg-blue-600 tw:border-blue-600' : 'tw:border-gray-400 tw:dark:border-dark-gray-100'"
-                                              class="tw:inline-block tw:w-4 tw:h-4 tw:shrink-0 tw:rounded tw:border-2"></span>
+                                        <template x-if="diffMode">
+                                            <span :class="isSelected(backup) ? 'tw:bg-blue-600 tw:border-blue-600' : 'tw:border-gray-400 tw:dark:border-dark-gray-100'"
+                                                  class="tw:inline-block tw:w-4 tw:h-4 tw:shrink-0 tw:rounded tw:border-2"></span>
+                                        </template>
                                         <span class="tw:flex-1">
                                             <span class="tw:block tw:text-base tw:text-gray-800 tw:dark:text-dark-white-100" x-text="formatDate(backup.date)"></span>
-                                            <span class="tw:block tw:text-base tw:text-gray-500 tw:dark:text-dark-white-400"
-                                                  x-show="backup.until">{{ __('config_backups.valid_until') }}<span x-show="backup.until" x-text="' ' + formatDate(backup.until)"></span></span>
+                                            <template x-if="backup.until">
+                                                <span class="tw:block tw:text-base tw:text-gray-500 tw:dark:text-dark-white-400">
+                                                    {{ __('config_backups.valid_until') }} <span x-text="formatDate(backup.until)"></span>
+                                                </span>
+                                            </template>
                                         </span>
-                                        <span x-show="diffMode && getDiffRole(backup)" x-cloak
-                                              :class="getDiffRole(backup) === 'old'
-                                                  ? 'tw:bg-red-100 tw:text-red-800 tw:dark:bg-red-900/40 tw:dark:text-red-300'
-                                                  : 'tw:bg-green-100 tw:text-green-800 tw:dark:bg-green-900/40 tw:dark:text-green-300'"
-                                              class="tw:text-xs tw:font-medium tw:rounded tw:px-1.5 tw:py-0.5"
-                                              x-text="getDiffRole(backup) === 'old' ? '{{ __('config_backups.old') }}' : '{{ __('config_backups.new') }}'"></span>
-                                        <span x-show="backup.type !== 'TEXT'"
-                                              class="tw:text-xs tw:font-medium tw:rounded tw:px-1.5 tw:py-0.5 tw:bg-gray-200 tw:text-gray-700 tw:dark:bg-dark-gray-200 tw:dark:text-dark-white-300"
-                                              x-text="backup.type"></span>
+                                        <template x-if="diffMode && getDiffRole(backup)">
+                                            <span :class="getDiffRole(backup) === 'old'
+                                                      ? 'tw:bg-red-100 tw:text-red-800 tw:dark:bg-red-900/40 tw:dark:text-red-300'
+                                                      : 'tw:bg-green-100 tw:text-green-800 tw:dark:bg-green-900/40 tw:dark:text-green-300'"
+                                                  class="tw:text-xs tw:font-medium tw:rounded tw:px-1.5 tw:py-0.5"
+                                                  x-text="getDiffRole(backup) === 'old' ? '{{ __('config_backups.old') }}' : '{{ __('config_backups.new') }}'"></span>
+                                        </template>
+                                        <template x-if="backup.type !== 'TEXT'">
+                                            <span class="tw:text-xs tw:font-medium tw:rounded tw:px-1.5 tw:py-0.5 tw:bg-gray-200 tw:text-gray-700 tw:dark:bg-dark-gray-200 tw:dark:text-dark-white-300"
+                                                  x-text="backup.type"></span>
+                                        </template>
                                     </button>
                                 </li>
                             </template>
@@ -194,8 +200,8 @@
                 diffSelection: [],
                 diffGroups: null,
 
-                init() {
-                    this.loadLatest();
+                async init() {
+                    await this.loadLatest();
                     this.loadBackupPage(0);
                 },
 
@@ -465,9 +471,17 @@
 
                 // ── UI helpers ───────────────────────────────────────────
 
+                isBackupDisabled(backup) {
+                    return this.diffMode && backup.type !== 'TEXT';
+                },
+
+                get diffSelectionIdSet() {
+                    return new Set(this.diffSelection.map((b) => b.id));
+                },
+
                 isSelected(backup) {
                     if (this.diffMode) {
-                        return this.diffSelection.some((b) => b.id === backup.id);
+                        return this.diffSelectionIdSet.has(backup.id);
                     }
 
                     return this.selected?.id === backup.id;
