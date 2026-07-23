@@ -289,6 +289,10 @@ class SSOAuthorizer extends MysqlAuthorizer
         }
 
         $config_map = LibrenmsConfig::get('sso.group_level_map', []);
+        if (! is_array($config_map)) {
+            $config_map = [];
+        }
+
         $roles = [];
 
         foreach ($groups as $group) {
@@ -333,6 +337,6 @@ class SSOAuthorizer extends MysqlAuthorizer
             }
         }
 
-        return array_values(array_unique(array_filter($roles, static fn ($role) => is_string($role) && $role !== '')));
+        return array_values(array_unique(array_filter($roles)));
     }
 }
