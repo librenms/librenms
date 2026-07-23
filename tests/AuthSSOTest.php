@@ -359,14 +359,14 @@ final class AuthSSOTest extends DBTestCase
         $this->assertSame(['global-read'], $a->getRoles(''));
 
         //String
-        LibrenmsConfig::set('sso.level_attr', 'role');
+        LibrenmsConfig::set('sso.level_attr', 'level');
         $_SERVER['level'] = '5';
         $this->assertSame(['global-read'], $a->getRoles(''));
 
         // invalid level
         LibrenmsConfig::set('sso.level_attr', 'level');
         $_SERVER['level'] = 9;
-        $this->assertSame(['global-read'], $a->getRoles(''));
+        $this->assertSame([], $a->getRoles(''));
 
         //Invalid String
         LibrenmsConfig::set('sso.level_attr', 'level');
@@ -392,7 +392,6 @@ final class AuthSSOTest extends DBTestCase
         $this->expectException(\LibreNMS\Exceptions\AuthenticationException::class);
         $a->getRoles('');
     }
-
     public function testGroupParsing(): void
     {
         $this->basicConfig();
