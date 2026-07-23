@@ -8,10 +8,10 @@
             </x-panel>
         @else
             <div x-data="configBackups(@js($data))"
-                class="tw:mt-4 tw:flex tw:flex-col tw:lg:flex-row tw:gap-4">
+                class="tw:mt-4 tw:flex tw:flex-col tw:lg:flex-row tw:gap-4 tw:items-start">
 
                 {{-- Backup list --}}
-                <x-panel class="tw:w-full tw:lg:w-md tw:lg:shrink-0 tw:overflow-hidden tw:mb-0! tw:flex tw:flex-col">
+                <x-panel class="tw:w-full tw:lg:w-md tw:lg:shrink-0 tw:overflow-hidden tw:self-start tw:mb-0!">
                     <x-slot name="heading" class="tw:flex tw:items-center tw:justify-between">
                         <h3 class="panel-title">
                             {{ __('config_backups.backups') }}
@@ -35,7 +35,7 @@
                             <i class="fa fa-spinner tw:animate-spin"></i>
                         </div>
 
-                        <ul x-show="!loadingBackups" class="tw:list-none tw:m-0 tw:p-0 tw:divide-y tw:divide-gray-200 tw:dark:divide-dark-gray-200 tw:flex-1 tw:overflow-y-auto">
+                        <ul x-show="!loadingBackups" class="tw:list-none tw:m-0 tw:p-0 tw:divide-y tw:divide-gray-200 tw:dark:divide-dark-gray-200 tw:max-h-60 tw:lg:max-h-[70vh] tw:overflow-y-auto">
                             <template x-for="backup in backups" :key="backup.id">
                                 <li>
                                     <button type="button"
@@ -86,7 +86,7 @@
                 </x-panel>
 
                 {{-- Config / diff pane --}}
-                <x-panel class="tw:w-full tw:flex-1 tw:min-w-0 tw:overflow-hidden tw:mb-0!">
+                <x-panel class="tw:w-full tw:flex-1 tw:min-w-0 tw:overflow-hidden tw:self-start tw:mb-0!">
                     <x-slot name="heading" class="tw:flex tw:items-center tw:justify-between">
                         <h3 class="panel-title">
                             <span x-show="diffMode">{{ __('config_backups.diff') }}<span x-show="diffSelection.length === 2">:
