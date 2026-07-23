@@ -91,7 +91,7 @@
                                     x-show="selected"
                                     x-text="': ' + formatDate(selected?.date)"></span></span>
                         </h3>
-                        <div x-show="!diffMode && selected?.content != null && (!selected || selected.type === 'TEXT')"
+                        <div :class="showActions ? '' : 'tw:invisible'"
                              x-cloak
                              class="tw:flex tw:items-center tw:gap-2">
                             <button type="button"
@@ -120,7 +120,7 @@
                     </div>
 
                     {{-- diff view --}}
-                    <template x-if="!loading && diffMode && diffReady">
+                    <template x-if="showDiffView">
                         <div class="tw:rounded-lg tw:overflow-x-auto tw:max-h-[70vh] tw:overflow-y-auto tw:border tw:border-gray-200 tw:dark:border-dark-gray-200">
                             <table class="tw:w-full tw:m-0 tw:font-mono tw:border-collapse">
                                 <tbody>
@@ -146,18 +146,18 @@
                     </template>
 
                     {{-- waiting for diff selection --}}
-                    <p x-show="!loading && diffMode && !diffReady && !error" x-cloak
+                    <p x-show="showDiffPrompt" x-cloak
                        class="tw:py-10 tw:m-0 tw:text-center tw:text-gray-500 tw:dark:text-dark-white-400">
                         {{ __('config_backups.select_two_hint') }}
                     </p>
 
                     {{-- binary backup notice --}}
-                    <p x-show="!loading && !diffMode && selected && selected.type !== 'TEXT'" x-cloak
+                    <p x-show="showBinaryNotice" x-cloak
                        class="tw:py-10 tw:m-0 tw:text-center tw:text-gray-500 tw:dark:text-dark-white-400"
                        x-text="messages.binary_not_supported"></p>
 
                     {{-- config view --}}
-                    <template x-if="!loading && !diffMode && selected?.content != null && (!selected || selected.type === 'TEXT')">
+                    <template x-if="showConfigView">
                         <pre class="tw:m-0 tw:p-3 tw:font-mono tw:whitespace-pre-wrap tw:overflow-x-auto tw:max-h-[70vh] tw:overflow-y-auto tw:rounded-lg tw:bg-gray-50 tw:text-gray-800 tw:dark:bg-dark-gray-500 tw:dark:text-dark-white-200 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200"
                              style="white-space: pre-wrap;"
                              x-text="selected.content"></pre>
@@ -439,6 +439,28 @@
 
                 getDiffRole(backup) {
                     return this.diffRoleMap[backup.id] ?? null;
+                },
+
+                // ── View visibility ─────────────────────────────────────
+
+                get showDiffView() {
+                    return !this.showSpinner && this.diffMode && this.diffReady;
+                },
+
+                get showDiffPrompt() {
+                    return !this.showSpinner && this.diffMode && !this.diffReady && !this.error;
+                },
+
+                get showBinaryNotice() {
+                    return !this.showSpinner && !this.diffMode && this.selected && this.selected.type !== 'TEXT';
+                },
+
+                get showConfigView() {
+                    return !this.showSpinner && !this.diffMode && this.selected?.content != null && (!this.selected || this.selected.type === 'TEXT');
+                },
+
+                get showActions() {
+                    return this.showConfigView;
                 },
 
                 // ── UI helpers ───────────────────────────────────────────
