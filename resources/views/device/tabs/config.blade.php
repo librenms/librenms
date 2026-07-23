@@ -339,11 +339,11 @@
                 },
 
                 exitDiffMode() {
-                    if (this.diffSelection.length === 2) {
-                        const [, rev] = this.diffSelection;
-                        this.selectBackup(rev);
-                    } else if (this.diffSelection.length === 1) {
-                        this.selectBackup(this.diffSelection[0]);
+                    if (this.diffSelection.length >= 1) {
+                        const target = this.diffSelection.length === 2 ? this.diffSelection[1] : this.diffSelection[0];
+                        if (this.selected?.id !== target.id || this.selected?.content == null) {
+                            this.selectBackup(target);
+                        }
                     }
                     this.diffSelection = [];
                     this.diffGroups = null;
