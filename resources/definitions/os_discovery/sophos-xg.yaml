@@ -5,7 +5,7 @@ modules:
       hardware:
          - SFOS-FIREWALL-MIB::sfosDeviceType.0
       serial:
-          - SFOS-FIREWALL-MIB::sfosDeviceAppKey.0
+         - SFOS-FIREWALL-MIB::sfosDeviceAppKey.0
    sensors:
       additional_oids:
          data:
