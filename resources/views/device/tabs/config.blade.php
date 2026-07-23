@@ -32,7 +32,7 @@
                         </p>
 
                         <div x-show="loadingBackups" x-cloak class="tw:py-6 tw:text-center tw:text-gray-500 tw:dark:text-dark-white-400">
-                            <i class="fa fa-spinner fa-spin"></i>
+                            <i class="fa fa-spinner tw:animate-spin"></i>
                         </div>
 
                         <ul x-show="!loadingBackups" class="tw:list-none tw:m-0 tw:p-0 tw:divide-y tw:divide-gray-200 tw:dark:divide-dark-gray-200 tw:max-h-60 tw:lg:max-h-[70vh] tw:overflow-y-auto">
@@ -113,8 +113,8 @@
                          x-text="errorMessage()"></div>
 
                     {{-- loading --}}
-                    <div x-show="loading" x-cloak class="tw:py-10 tw:text-center tw:text-gray-500 tw:dark:text-dark-white-400">
-                        <i class="fa fa-spinner fa-spin fa-2x"></i>
+                    <div x-show="showSpinner" x-cloak class="tw:py-10 tw:text-center tw:text-gray-500 tw:dark:text-dark-white-400">
+                        <i class="fa fa-spinner tw:animate-spin fa-2x"></i>
                     </div>
 
                     {{-- diff view --}}
@@ -182,6 +182,7 @@
                 loading: false,
                 loadingMore: false,
                 loadingBackups: false,
+                showSpinner: false,
                 error: null,
                 copied: false,
 
@@ -190,29 +191,8 @@
                 diffGroups: null,
 
                 init() {
-                    this.loadLatest();
+                    this.fetchBackupContent(null);
                     this.loadBackups();
-                },
-
-                loadLatest() {
-                    this.loading = true;
-                    window.axios
-                        .get(this.urls.backup)
-                        .then((response) => {
-                            // Only set if user hasn't selected another one in the meantime
-                            if (!this.selected) {
-                                this.selected = response.data;
-                                this.content = response.data.content;
-                            }
-                        })
-                        .catch((error) => {
-                            if (!this.selected) {
-                                this.error = error.response?.data?.error || 'request_failed';
-                            }
-                        })
-                        .finally(() => {
-                            this.loading = false;
-                        });
                 },
 
                 loadBackups() {
@@ -278,19 +258,46 @@
                         return;
                     }
 
+                    this.fetchBackupContent(backup);
+                },
+
+                async fetchBackupContent(backup) {
                     this.loading = true;
-                    window.axios
-                        .get(this.urls.backup, { params: { backup: backup.id, page: backup.page } })
-                        .then((response) => {
-                            this.content = response.data.content;
-                        })
-                        .catch((error) => {
-                            this.content = null;
-                            this.error = error.response?.data?.error || 'request_failed';
-                        })
-                        .finally(() => {
-                            this.loading = false;
-                        });
+                    this.showSpinner = false;
+
+                    const timer = setTimeout(() => {
+                        if (this.loading) {
+                            this.showSpinner = true;
+                        }
+                    }, 300);
+
+                    const params = backup ? { backup: backup.id, page: backup.page } : {};
+                    const isLatest = backup === null;
+
+                    try {
+                        const { data } = await window.axios.get(this.urls.backup, { params });
+
+                        if (isLatest) {
+                            if (!this.selected) {
+                                this.selected = data;
+                                this.content = data.content;
+                            }
+                        } else if (this.selected?.id === backup.id) {
+                            this.content = data.content;
+                        }
+                    } catch (error) {
+                        if (isLatest || this.selected?.id === backup.id) {
+                            if (!isLatest) {
+                                this.content = null;
+                            }
+
+                            this.error = error.response?.data?.error ?? 'request_failed';
+                        }
+                    } finally {
+                        clearTimeout(timer);
+                        this.loading = false;
+                        this.showSpinner = false;
+                    }
                 },
 
                 loadMore() {
