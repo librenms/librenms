@@ -212,7 +212,7 @@ class SSOAuthorizer extends MysqlAuthorizer
         if (! is_array($config_map)) {
             $config_map = [];
         }
-        
+
         foreach ($groups as $group) {
             if (! array_key_exists($group, $config_map)) {
                 continue;
