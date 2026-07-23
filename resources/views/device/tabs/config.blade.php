@@ -21,10 +21,7 @@
                                 x-show="total > 1" x-cloak
                                 x-on:click="toggleDiffMode()"
                                 x-text="diffMode ? '{{ __('Single') }}' : '{{ __('Diff') }}'"
-                                :class="diffMode
-                                    ? 'lnms-btn-default'
-                                    : 'lnms-btn-primary'"
-                                class="lnms-btn tw:transition-colors">
+                                class="lnms-btn lnms-btn-primary tw:transition-colors">
                         </button>
                     </x-slot>
 
@@ -293,9 +290,39 @@
 
                 toggleDiffMode() {
                     this.diffMode = !this.diffMode;
-                    this.diffSelection = [];
-                    this.diffGroups = null;
                     this.error = null;
+
+                    if (this.diffMode) {
+                        // Filter for text backups since diff mode requires them
+                        const textBackups = this.backups.filter(b => b.type === 'TEXT');
+                        
+                        // Find the index of the currently selected backup in the text backups list
+                        const selectedIndex = this.selected ? textBackups.findIndex(b => b.id === this.selected.id) : -1;
+                        
+                        if (selectedIndex !== -1 && selectedIndex + 1 < textBackups.length) {
+                            // select the currently shown backup and the one right before it (next older in the list)
+                            this.diffSelection = [textBackups[selectedIndex], textBackups[selectedIndex + 1]];
+                            this.loadDiff();
+                        } else if (textBackups.length >= 2) {
+                            // fallback to the two latest
+                            this.diffSelection = [textBackups[0], textBackups[1]];
+                            this.loadDiff();
+                        } else {
+                            this.diffSelection = [];
+                            this.diffGroups = null;
+                        }
+                    } else {
+                        // Switch back to single mode: select the "new" (newer of the two compared) config
+                        if (this.diffSelection.length === 2) {
+                            const [orig, rev] = [...this.diffSelection].sort((a, b) => a.date - b.date);
+                            // select newer one
+                            this.selectBackup(rev);
+                        } else if (this.diffSelection.length === 1) {
+                            this.selectBackup(this.diffSelection[0]);
+                        }
+                        this.diffSelection = [];
+                        this.diffGroups = null;
+                    }
                 },
 
                 toggleDiffSelect(backup) {
