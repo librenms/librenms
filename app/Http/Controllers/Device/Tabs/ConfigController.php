@@ -60,7 +60,7 @@ class ConfigController extends Controller implements DeviceTab
 
     public function name(): string
     {
-        return __('Config');
+        return __('config_backups.title');
     }
 
     /**
@@ -70,6 +70,7 @@ class ConfigController extends Controller implements DeviceTab
     {
         $provider = $this->manager->providerFor($device);
         $providerName = $provider?->name();
+        $defaultProvider = __('config_backups.default_provider');
 
         $urls = [
             'backups' => route('device.config.backups', $device->device_id),
@@ -78,11 +79,11 @@ class ConfigController extends Controller implements DeviceTab
         ];
 
         $messages = [
-            'unreachable' => __(':provider is not reachable.', ['provider' => $providerName ?? __('the backup provider')]),
-            'error' => __(':provider returned an error.', ['provider' => $providerName ?? __('the backup provider')]),
-            'backup_not_found' => __('This backup could not be loaded from :provider.', ['provider' => $providerName ?? __('the backup provider')]),
-            'binary_not_supported' => __('This is a binary backup and cannot be displayed. View it in :provider instead.', ['provider' => $providerName ?? __('the backup provider')]),
-            'request_failed' => __('The request failed. Please try again.'),
+            'unreachable' => __('config_backups.messages.unreachable', ['provider' => $providerName ?? $defaultProvider]),
+            'error' => __('config_backups.messages.error', ['provider' => $providerName ?? $defaultProvider]),
+            'backup_not_found' => __('config_backups.messages.backup_not_found', ['provider' => $providerName ?? $defaultProvider]),
+            'binary_not_supported' => __('config_backups.messages.binary_not_supported', ['provider' => $providerName ?? $defaultProvider]),
+            'request_failed' => __('config_backups.messages.request_failed'),
         ];
 
         $empty = [
@@ -104,13 +105,13 @@ class ConfigController extends Controller implements DeviceTab
 
     private function errorMessage(string $error, ?string $provider): string
     {
-        $provider ??= __('the backup provider');
+        $provider ??= __('config_backups.default_provider');
 
         return match ($error) {
-            ConfigBackupProvider::ERROR_UNREACHABLE => __(':provider is not reachable. Check the configured URL and that :provider is running.', ['provider' => $provider]),
-            ConfigBackupProvider::ERROR_API => __(':provider returned an error. Check the configured API token.', ['provider' => $provider]),
-            ConfigBackupProvider::ERROR_NO_BACKUPS => __('No configuration backups exist for this device in :provider yet.', ['provider' => $provider]),
-            default => __('This device could not be found in :provider. It is matched by hostname or IP address.', ['provider' => $provider]),
+            ConfigBackupProvider::ERROR_UNREACHABLE => __('config_backups.messages.unreachable_details', ['provider' => $provider]),
+            ConfigBackupProvider::ERROR_API => __('config_backups.messages.error_details', ['provider' => $provider]),
+            ConfigBackupProvider::ERROR_NO_BACKUPS => __('config_backups.messages.no_backups', ['provider' => $provider]),
+            default => __('config_backups.messages.device_not_found', ['provider' => $provider]),
         };
     }
 

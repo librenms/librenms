@@ -14,13 +14,13 @@
                 <x-panel class="tw:w-full tw:lg:w-md tw:lg:shrink-0 tw:overflow-hidden tw:self-start tw:mb-0!">
                     <x-slot name="heading" class="tw:flex tw:items-center tw:justify-between">
                         <h3 class="panel-title">
-                            {{ __('Backups') }}
+                            {{ __('config_backups.backups') }}
                             <span x-show="!loadingBackups" x-cloak class="tw:font-normal tw:text-xl tw:text-gray-500 tw:dark:text-dark-white-400" x-text="'(' + total + ')'"></span>
                         </h3>
                         <button type="button"
                                 x-show="total > 1" x-cloak
                                 x-on:click="toggleDiffMode()"
-                                x-text="diffMode ? '{{ __('Single') }}' : '{{ __('Diff') }}'"
+                                x-text="diffMode ? '{{ __('config_backups.show_config') }}' : '{{ __('config_backups.show_diff') }}'"
                                 class="lnms-btn lnms-btn-primary tw:transition-colors">
                         </button>
                     </x-slot>
@@ -28,7 +28,7 @@
                     <x-slot name="table">
                         <p class="tw:px-4 tw:py-2 tw:m-0 tw:text-gray-500 tw:dark:text-dark-white-400 tw:border-b tw:border-gray-200 tw:dark:border-dark-gray-200"
                            x-show="diffMode" x-cloak>
-                            {{ __('Select two backups to compare.') }}
+                            {{ __('config_backups.select_two_to_compare') }}
                         </p>
 
                         <div x-show="loadingBackups" x-cloak class="tw:py-6 tw:text-center tw:text-gray-500 tw:dark:text-dark-white-400">
@@ -51,14 +51,14 @@
                                         <span class="tw:flex-1">
                                             <span class="tw:block tw:text-base tw:text-gray-800 tw:dark:text-dark-white-100" x-text="formatDate(backup.date)"></span>
                                             <span class="tw:block tw:text-base tw:text-gray-500 tw:dark:text-dark-white-400"
-                                                  x-show="backup.until">{{ __('Valid until') }}<span x-show="backup.until" x-text="' ' + formatDate(backup.until)"></span></span>
+                                                  x-show="backup.until">{{ __('config_backups.valid_until') }}<span x-show="backup.until" x-text="' ' + formatDate(backup.until)"></span></span>
                                         </span>
                                         <span x-show="diffMode && getDiffRole(backup)" x-cloak
                                               :class="getDiffRole(backup) === 'old'
                                                   ? 'tw:bg-red-100 tw:text-red-800 tw:dark:bg-red-900/40 tw:dark:text-red-300'
                                                   : 'tw:bg-green-100 tw:text-green-800 tw:dark:bg-green-900/40 tw:dark:text-green-300'"
                                               class="tw:text-xs tw:font-medium tw:rounded tw:px-1.5 tw:py-0.5"
-                                              x-text="getDiffRole(backup) === 'old' ? '{{ __('Old') }}' : '{{ __('New') }}'"></span>
+                                              x-text="getDiffRole(backup) === 'old' ? '{{ __('config_backups.old') }}' : '{{ __('config_backups.new') }}'"></span>
                                         <span x-show="backup.type !== 'TEXT'"
                                               class="tw:text-xs tw:font-medium tw:rounded tw:px-1.5 tw:py-0.5 tw:bg-gray-200 tw:text-gray-700 tw:dark:bg-dark-gray-200 tw:dark:text-dark-white-300"
                                               x-text="backup.type"></span>
@@ -73,7 +73,7 @@
                                 x-on:click="loadMore()"
                                 :disabled="loadingMore"
                                 class="lnms-btn lnms-btn-default tw:w-full"
-                                x-text="loadingMore ? '{{ __('Loading...') }}' : '{{ __('Load more') }}'">
+                                x-text="loadingMore ? '{{ __('config_backups.loading') }}' : '{{ __('config_backups.load_more') }}'">
                         </button>
                     </x-slot>
                 </x-panel>
@@ -82,27 +82,27 @@
                 <x-panel class="tw:w-full tw:flex-1 tw:min-w-0 tw:overflow-hidden tw:self-start tw:mb-0!">
                     <x-slot name="heading" class="tw:flex tw:items-center tw:justify-between">
                         <h3 class="panel-title">
-                            <span x-show="diffMode">{{ __('Diff') }}<span
+                            <span x-show="diffMode">{{ __('config_backups.diff') }}<span
                                     x-show="diffSelection.length === 2"
                                     x-text="': ' + formatDate(Math.min(diffSelection[0]?.date, diffSelection[1]?.date)) + ' → ' + formatDate(Math.max(diffSelection[0]?.date, diffSelection[1]?.date))"></span></span>
-                            <span x-show="!diffMode">{{ __('Configuration') }}<span
+                            <span x-show="!diffMode">{{ __('config_backups.configuration') }}<span
                                     x-show="selected"
                                     x-text="' - ' + formatDate(selected?.date)"></span></span>
                         </h3>
-                        <div x-show="!diffMode && content !== null && (!selected || selected.type === 'TEXT')"
+                        <div x-show="!diffMode && selected?.content != null && (!selected || selected.type === 'TEXT')"
                              x-cloak
                              class="tw:flex tw:items-center tw:gap-2">
                             <button type="button"
                                     x-on:click="downloadConfig()"
                                     class="lnms-btn lnms-btn-default tw:flex tw:items-center tw:gap-1.5 tw:transition-colors">
                                 <i class="fa fa-download" aria-hidden="true"></i>
-                                <span>{{ __('Download') }}</span>
+                                <span>{{ __('config_backups.download') }}</span>
                             </button>
                             <button type="button"
                                     x-on:click="copyToClipboard()"
                                     class="lnms-btn lnms-btn-default tw:flex tw:items-center tw:gap-1.5 tw:transition-colors">
                                 <i class="fa" :class="copied ? 'fa-check tw:text-green-600 tw:dark:text-green-400' : 'fa-copy'" aria-hidden="true"></i>
-                                <span x-text="copied ? '{{ __('Copied!') }}' : '{{ __('Copy') }}'"></span>
+                                <span x-text="copied ? '{{ __('config_backups.copied') }}' : '{{ __('config_backups.copy') }}'"></span>
                             </button>
                         </div>
                     </x-slot>
@@ -146,7 +146,7 @@
                     {{-- waiting for diff selection --}}
                     <p x-show="!loading && diffMode && !diffReady && !error" x-cloak
                        class="tw:py-10 tw:m-0 tw:text-center tw:text-gray-500 tw:dark:text-dark-white-400">
-                        {{ __('Select two backups from the list to view their differences.') }}
+                        {{ __('config_backups.select_two_hint') }}
                     </p>
 
                     {{-- binary backup notice --}}
@@ -155,10 +155,10 @@
                        x-text="messages.binary_not_supported"></p>
 
                     {{-- config view --}}
-                    <template x-if="!loading && !diffMode && content !== null && (!selected || selected.type === 'TEXT')">
+                    <template x-if="!loading && !diffMode && selected?.content != null && (!selected || selected.type === 'TEXT')">
                         <pre class="tw:m-0 tw:p-3 tw:font-mono tw:whitespace-pre-wrap tw:overflow-x-auto tw:max-h-[70vh] tw:overflow-y-auto tw:rounded-lg tw:bg-gray-50 tw:text-gray-800 tw:dark:bg-dark-gray-500 tw:dark:text-dark-white-200 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200"
                              style="white-space: pre-wrap;"
-                             x-text="content"></pre>
+                             x-text="selected.content"></pre>
                     </template>
                 </x-panel>
             </div>
@@ -180,7 +180,6 @@
 
                 // UI State
                 selected: null,
-                content: null,
                 loading: false,
                 loadingMore: false,
                 loadingBackups: false,
@@ -257,7 +256,6 @@
                         const { data } = await window.axios.get(this.urls.backup);
                         if (!this.selected) {
                             this.selected = data;
-                            this.content = data.content;
                         }
                     } catch (error) {
                         if (!this.selected) {
@@ -275,11 +273,11 @@
                             params: { backup: backup.id, page: backup.page },
                         });
                         if (this.selected?.id === backup.id) {
-                            this.content = data.content;
+                            this.selected.content = data.content;
                         }
                     } catch (error) {
                         if (this.selected?.id === backup.id) {
-                            this.content = null;
+                            this.selected.content = null;
                             this.error = this.requestError(error);
                         }
                     } finally {
@@ -293,7 +291,7 @@
                         return;
                     }
 
-                    if (this.selected?.id === backup.id && this.content !== null) {
+                    if (this.selected?.id === backup.id && this.selected.content != null) {
                         return;
                     }
 
@@ -301,7 +299,7 @@
                     this.error = null;
 
                     if (backup.type !== 'TEXT') {
-                        this.content = null;
+                        this.selected.content = null;
                         return;
                     }
 
@@ -464,7 +462,7 @@
                 },
 
                 downloadConfig() {
-                    if (!this.content) {
+                    if (!this.selected?.content) {
                         return;
                     }
 
@@ -473,7 +471,7 @@
                         : 'latest';
                     const hostname = config.hostname ? `${config.hostname}-` : '';
                     const filename = `${hostname}config-${dateStr}.txt`;
-                    const blob = new Blob([this.content], { type: 'text/plain;charset=utf-8' });
+                    const blob = new Blob([this.selected.content], { type: 'text/plain;charset=utf-8' });
                     const url = URL.createObjectURL(blob);
 
                     Object.assign(document.createElement('a'), { href: url, download: filename }).click();
@@ -481,11 +479,11 @@
                 },
 
                 copyToClipboard() {
-                    if (!this.content) {
+                    if (!this.selected?.content) {
                         return;
                     }
 
-                    navigator.clipboard.writeText(this.content).then(() => {
+                    navigator.clipboard.writeText(this.selected.content).then(() => {
                         this.copied = true;
                         setTimeout(() => {
                             this.copied = false;
