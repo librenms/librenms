@@ -150,9 +150,8 @@ class SSOAuthorizer extends MysqlAuthorizer
     }
 
     /**
-     * Calculate the privilege level to assign to a user based on the configuration and attributes supplied by the external authenticator.
-     * Returns an integer if the permission is found, or raises an AuthenticationException if the configuration is not valid.
-     * Converts the legacy level into a role
+     * Calculate the roles to assign to a user based on the configuration and attributes supplied by the external authenticator.
+     * Converts legacy levels into roles where required.
      *
      * @throws AuthenticationException
      */
@@ -170,7 +169,7 @@ class SSOAuthorizer extends MysqlAuthorizer
             }
         } elseif (LibrenmsConfig::get('sso.group_strategy') === 'map') {
             if (LibrenmsConfig::get('sso.group_level_map') && is_array(LibrenmsConfig::get('sso.group_level_map')) && LibrenmsConfig::get('sso.group_delimiter') && LibrenmsConfig::get('sso.group_attr')) {
-                return Arr::wrap(LegacyAuthLevel::tryFrom((int) $this->authSSOParseGroups())?->getName());
+                return $this->authSSOParseGroups();
             } else {
                 throw new AuthenticationException('group assignment by level map requested, but \'sso.group_level_map\', \'sso.group_attr\', or \'sso.group_delimiter\' are not set in your config');
             }
@@ -178,51 +177,65 @@ class SSOAuthorizer extends MysqlAuthorizer
             if (LibrenmsConfig::get('sso.static_level')) {
                 return Arr::wrap(LegacyAuthLevel::tryFrom((int) LibrenmsConfig::get('sso.static_level'))?->getName());
             } else {
-                throw new AuthenticationException('group assignment by static level was requested, but \'sso.group_level_map\' was not set in your config');
+                throw new AuthenticationException('group assignment by static level was requested, but \'sso.static_level\' was not set in your config');
             }
         }
 
-        throw new AuthenticationException('\'sso.group_strategy\' is not set to one of attribute in your config, map or static - configuration is unsafe');
+        throw new AuthenticationException('\'sso.group_strategy\' is not set to one of attribute, map, or static in your config - configuration is unsafe');
     }
 
     /**
-     * Map a user to a permission level based on a table mapping, sso.static_level (default 0) if no matching group is found.
+     * Map a user to roles based on the configured table mapping.
      *
-     * @return int
+     * Supports the current RBAC mapping format:
+     *     'NSS' => ['roles' => ['admin']]
+     *
+     * Legacy integer mappings are also supported and converted to role names.
+     * If no group matches, sso.static_level (default 0) is used as a fallback.
+     *
+     * @return array<string>
      */
-    public function authSSOParseGroups()
+    public function authSSOParseGroups(): array
     {
-        // Parse a delimited group list
-        $groups = explode(LibrenmsConfig::get('sso.group_delimiter', ';'), $this->authSSOGetAttr(LibrenmsConfig::get('sso.group_attr')) ?? '');
+        // Parse and normalize a delimited group list.
+        $groups = explode(
+            LibrenmsConfig::get('sso.group_delimiter', ';'),
+            $this->authSSOGetAttr(LibrenmsConfig::get('sso.group_attr')) ?? ''
+        );
+        $groups = array_values(array_filter(array_map(trim(...), $groups), static fn ($group) => $group !== ''));
 
-        $valid_groups = [];
-
-        // Only consider groups that match the filter expression - this is an optimisation for sites with thousands of groups
-        if (LibrenmsConfig::get('sso.group_filter')) {
-            foreach ($groups as $group) {
-                if (preg_match(LibrenmsConfig::get('sso.group_filter'), $group)) {
-                    array_push($valid_groups, $group);
-                }
-            }
-
-            $groups = $valid_groups;
+        // Only consider groups that match the filter expression - this is an optimisation for sites with thousands of groups.
+        $group_filter = LibrenmsConfig::get('sso.group_filter');
+        if ($group_filter) {
+            $groups = array_values(array_filter($groups, static fn ($group) => preg_match($group_filter, (string) $group) === 1));
         }
 
-        $level = (int) LibrenmsConfig::get('sso.static_level', 0);
+        $config_map = LibrenmsConfig::get('sso.group_level_map', []);
+        $roles = [];
 
-        $config_map = LibrenmsConfig::get('sso.group_level_map');
+        foreach ($groups as $group) {
+            if (! array_key_exists($group, $config_map)) {
+                continue;
+            }
 
-        // Find the highest level the user is entitled to
-        foreach ($groups as $value) {
-            if (isset($config_map[$value])) {
-                $map = $config_map[$value];
+            $map = $config_map[$group];
 
-                if (is_int($map) && $level < $map) {
-                    $level = $map;
-                }
+            // Current RBAC mapping format.
+            if (is_array($map) && isset($map['roles']) && is_array($map['roles'])) {
+                $roles = array_merge($roles, $map['roles']);
+
+                continue;
             }
         }
 
-        return $level;
+        // Preserve the previous static-level fallback when no configured group matches.
+        if ($roles === []) {
+            $static_role = LegacyAuthLevel::tryFrom((int) LibrenmsConfig::get('sso.static_level', 0))?->getName();
+            if ($static_role !== null) {
+                $roles[] = $static_role;
+            }
+        }
+
+        return array_values(array_unique(array_filter($roles, static fn ($role) => is_string($role) && $role !== '')));
     }
 }
