@@ -30,10 +30,8 @@ IMPORTS
 		FROM SNMPv2-CONF
 	DisplayString,
 	TEXTUAL-CONVENTION,
-	PhysAddress
-		FROM SNMPv2-TC
-        Ipv6Address
-                FROM IPV6-TC;
+	MacAddress
+                FROM SNMPv2-TC;
 
 sophosMIB	MODULE-IDENTITY
 	  LAST-UPDATED	"201812180000Z"
@@ -98,6 +96,7 @@ APStatusType ::= TEXTUAL-CONVENTION
 							connected		( 0 ),
 							disconnected		( 1 )
 						}
+
 ServiceStatsType ::= TEXTUAL-CONVENTION
         STATUS				current
         DESCRIPTION		"enumerated type for service status"
@@ -110,6 +109,21 @@ ServiceStatsType ::= TEXTUAL-CONVENTION
 							dead		 ( 5 ),
                                                         frozen           ( 6 ),
 							unregistered     ( 7 )
+						}
+PowerSupplyStatusType ::= TEXTUAL-CONVENTION
+        STATUS				current
+        DESCRIPTION		"enumerated type for power supply status"
+        SYNTAX INTEGER	{
+							up              ( 1 ),
+							down            ( 2 )
+						}
+
+PoEPowerStatusType ::= TEXTUAL-CONVENTION
+        STATUS				current
+        DESCRIPTION		"enumerated type for PoE power status"
+        SYNTAX INTEGER	{
+							enabled     ( 1 ),
+							disabled    ( 2 )
 						}
 RegistrationStatusType ::= TEXTUAL-CONVENTION
         STATUS				current
@@ -133,12 +147,28 @@ SubscriptionStatusType ::= TEXTUAL-CONVENTION
 
 IPSecVPNConnectionType ::= TEXTUAL-CONVENTION
         STATUS				current
-        DESCRIPTION		"enumerated type for IPSec VPN Conn type"
+        DESCRIPTION		"enumerated type for IPsec VPN connections"
         SYNTAX INTEGER	{
 							host-to-host		( 1 ),
-							site-to-site		( 2 )
+							site-to-site		( 2 ),
+							tunnel-interface	( 3 )
 						}
-						
+
+IPSecVPNConnectionStatus ::= TEXTUAL-CONVENTION
+        STATUS				current
+        DESCRIPTION		"enumerated type for IPsec VPN connection status"
+        SYNTAX INTEGER  {
+							inactive		( 0 ),
+							active			( 1 ),
+							partially-active	( 2 )
+						}
+IPSecVPNActivationStatus ::= TEXTUAL-CONVENTION
+        STATUS				current
+        DESCRIPTION		"enumerated type for IPsec VPN activation status"
+        SYNTAX INTEGER  {
+							inactive		( 0 ),
+							active			( 1 )
+						}
 -- End of enums
 
 -- SFOS-XG MIB
@@ -150,6 +180,7 @@ sfosXGLicenseDetails 		OBJECT IDENTIFIER ::= { sfosXGMIBObjects 5 }
 sfosXGTunnelInfo 		OBJECT IDENTIFIER ::= { sfosXGMIBObjects 6 }
 sfosXGWiFiInfo 			OBJECT IDENTIFIER ::= { sfosXGMIBObjects 7 }
 sfosXGTrap 			OBJECT IDENTIFIER ::= { sfosXGMIBObjects 8 }
+sfosXGSystemHealth              OBJECT IDENTIFIER ::= { sfosXGMIBObjects 9 }
 
 --snmpBasicCompliance MODULE-COMPLIANCE
 --    STATUS  current
@@ -563,7 +594,7 @@ sfosDeviceHAAuxAdminIP OBJECT-TYPE
 	::= { sfosDeviceHAMonitoringPort 2 }
 
 sfosDeviceHAAuxAdminIPv6 OBJECT-TYPE
-	SYNTAX			Ipv6Address
+	SYNTAX			InetAddress
 	MAX-ACCESS		read-only
 	STATUS			current
 	DESCRIPTION	"SFOS Auxiliary Admin IPv6"
@@ -745,16 +776,18 @@ SfosIPSecVpnTunnelEntry ::= SEQUENCE {
 	sfosIPSecVpnConnId			Integer32,
 	sfosIPSecVpnConnName			DisplayString,
 	sfosIPSecVpnConnDes			DisplayString,
-	sfosIPSecVpnPolicyName			DisplayString,
+	sfosIPSecVpnPolicyUsed			DisplayString,
 	sfosIPSecVpnConnMode			DisplayString,
 	sfosIPSecVpnConnType			IPSecVPNConnectionType,
 	sfosIPSecVpnLocalgwPort			DisplayString,
-	sfosIPSecVpnActiveTunnel		Integer32
+	sfosIPSecVpnActiveTunnel		Integer32,
+	sfosIPSecVpnConnStatus			IPSecVPNConnectionStatus,
+	sfosIPSecVpnActivated			IPSecVPNActivationStatus
 }
 
 sfosIPSecVpnConnId OBJECT-TYPE
     SYNTAX      Integer32 (1..65535)
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
         "An index value that uniquely identifies a VPN tunnel within the sfosIPSecVpnTunnelTable"
@@ -776,12 +809,12 @@ sfosIPSecVpnConnDes OBJECT-TYPE
         "Descriptive of the tunnel"
     ::= { sfosIPSecVpnTunnelEntry 3 }
 
-sfosIPSecVpnPolicyName OBJECT-TYPE
+sfosIPSecVpnPolicyUsed OBJECT-TYPE
     SYNTAX      DisplayString
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        "Policy Name of IPSec tunnel"
+        "Policy Name of IPsec tunnel"
     ::= { sfosIPSecVpnTunnelEntry 4 }	
 
 sfosIPSecVpnConnMode OBJECT-TYPE
@@ -789,7 +822,7 @@ sfosIPSecVpnConnMode OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        "Connection mode of IPSec tunnel"
+        "Connection mode of IPsec tunnel"
     ::= { sfosIPSecVpnTunnelEntry 5 }	
 
 sfosIPSecVpnConnType OBJECT-TYPE
@@ -797,7 +830,7 @@ sfosIPSecVpnConnType OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        "Connection Type of IPSec Tunnel"
+        "Connection Type of IPsec Tunnel"
     ::= { sfosIPSecVpnTunnelEntry 6 }
 
 sfosIPSecVpnLocalgwPort OBJECT-TYPE
@@ -805,7 +838,7 @@ sfosIPSecVpnLocalgwPort OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        "Port name which is  used as local gateway for IPSec tunnel"
+        "Port name which is  used as local gateway for IPsec tunnel"
     ::= { sfosIPSecVpnTunnelEntry 7 }
 
 sfosIPSecVpnActiveTunnel OBJECT-TYPE
@@ -813,8 +846,24 @@ sfosIPSecVpnActiveTunnel OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        "Count of active tunnel"
+        "Count of total tunnels configured"
     ::= { sfosIPSecVpnTunnelEntry 8 }
+
+sfosIPSecVpnConnStatus OBJECT-TYPE
+    SYNTAX      IPSecVPNConnectionStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Connection status of IPsec tunnel"
+    ::= { sfosIPSecVpnTunnelEntry 9 }
+
+sfosIPSecVpnActivated OBJECT-TYPE
+    SYNTAX      IPSecVPNActivationStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Activation status of IPsec tunnel"
+    ::= { sfosIPSecVpnTunnelEntry 10 }
 
 -- sfosVPNInfo.sfosIPSecVPNPolicyInfo
 
@@ -850,7 +899,7 @@ SfosIPSecVpnPolicyEntry ::= SEQUENCE {
 }
 
 sfosIPSecVpnPolicyId OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer32 (1..65535)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -957,7 +1006,7 @@ SfosDeviceAPEntry ::= SEQUENCE {
 	sfosDeviceAPName	DisplayString,
 	sfosDeviceAPModel	DisplayString,
 	sfosDeviceAPIPAddress	IpAddress,
-	sfosDeviceAPMacAddress	PhysAddress,
+	sfosDeviceAPMacAddress	MacAddress,
 	sfosDeviceAPStatus	APStatusType,
 	sfosDeviceAPClientCount	Integer32
 }
@@ -1078,13 +1127,12 @@ clientSSID OBJECT-TYPE
     DESCRIPTION		"Name of SSID to which AP client is connected"
     ::= { sfosDeviceAPClientEntry 7 }
 
-
 -- SFOS-XG MIB.sfosXGTrap
 sfosNotificationAlerts		OBJECT IDENTIFIER ::=  { sfosXGTrap 1 }
 
 -- sfosXGTrap.sfosNotificationAlerts
 sfosTrapMessage	OBJECT-TYPE
-	SYNTAX			DisplayString (SIZE(0..256))
+	SYNTAX			DisplayString (SIZE(0..255))
 	MAX-ACCESS		read-only
 	STATUS			current
 	DESCRIPTION	"Trap raw log line "
@@ -1096,6 +1144,192 @@ sfosNotification NOTIFICATION-TYPE
 	DESCRIPTION		"Trap for SFOS events for Notification"
 	::= { sfosNotificationAlerts 1 }
 
+-- SFOS-XG MIB.sfosXGSystemHealth
+
+sfosNPUTemperature OBJECT-TYPE
+        SYNTAX      Integer32 (0..2000)
+        UNITS       "tenths of degrees Celsius"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "NPU temperature in tenths of degrees Celsius
+             For example, a value of 650 represents 65.0°C"
+        ::= { sfosXGSystemHealth 1 }
+
+sfosCPUTemperature OBJECT-TYPE
+        SYNTAX      Integer32 (0..2000)
+        UNITS       "tenths of degrees Celsius"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "CPU temperature in tenths of degrees Celsius
+             For example, a value of 420 represents 42.0°C"
+        ::= { sfosXGSystemHealth 2 }
+
+sfosFanTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF SfosFanEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION "A table showing the speed of fans"
+	::= { sfosXGSystemHealth 3 }
+
+sfosFanEntry OBJECT-TYPE
+	SYNTAX	    SfosFanEntry
+	MAX-ACCESS  not-accessible
+	STATUS 	    current
+	DESCRIPTION "An entry for fan speed"
+	INDEX       { sfosFanIndex }
+	::= { sfosFanTable 1 }
+
+SfosFanEntry ::= SEQUENCE {
+	sfosFanIndex   Integer32,
+	sfosFanSpeed   Gauge32
+}
+
+sfosFanIndex OBJECT-TYPE
+	SYNTAX      Integer32 (1..100)
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "ID of the fans"
+	::= { sfosFanEntry 1 }
+
+sfosFanSpeed OBJECT-TYPE
+	SYNTAX      Gauge32
+	UNITS       "RPM"
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "Fan speed in RPM"
+	::= { sfosFanEntry 2 }
+
+sfosPowerSupplyTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF SfosPowerSupplyEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "Table showing the status of power supply units"
+	::= { sfosXGSystemHealth 4 }
+
+sfosPowerSupplyEntry OBJECT-TYPE
+	SYNTAX      SfosPowerSupplyEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "An entry for the status of a power supply unit"
+	INDEX       { sfosPowerSupplyIndex }
+	::= { sfosPowerSupplyTable 1 }
+
+SfosPowerSupplyEntry ::= SEQUENCE {
+	sfosPowerSupplyIndex   Integer32,
+	sfosPowerSupplyStatus  PowerSupplyStatusType
+}
+
+sfosPowerSupplyIndex OBJECT-TYPE
+	SYNTAX      Integer32 (1..255)
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "Power supply unit"
+	::= { sfosPowerSupplyEntry 1 }
+
+sfosPowerSupplyStatus OBJECT-TYPE
+	SYNTAX      PowerSupplyStatusType
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+           "Current status of the power supply unit.
+            Possible values:
+              - up(1): Power supply is operational and functioning normally
+              - down(2): Power supply unit isn't functioning"
+	::= { sfosPowerSupplyEntry 2 }
+
+-- PoE Measurements Table
+sfosPoEConsumptionTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SfosPoEEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table showing the PoE ports' power consumption"
+        ::= { sfosXGSystemHealth 5 }
+
+sfosPoEEntry OBJECT-TYPE
+        SYNTAX      SfosPoEEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry for a PoE port's power consumption"
+        INDEX       { sfosPoEIndex }
+        ::= { sfosPoEConsumptionTable 1 }
+
+SfosPoEEntry ::= SEQUENCE {
+	sfosPoEIndex         Integer32,
+        sfosPoEPortLabel     DisplayString,
+        sfosPoEPowerEnabled  PoEPowerStatusType,
+        sfosPoEPowerLimit    Gauge32,
+        sfosPoEPowerUsage    Gauge32,
+        sfosPoEVoltage       Gauge32,
+        sfosPoECurrent       Gauge32
+}
+
+sfosPoEIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..255)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "PoE"
+        ::= { sfosPoEEntry 1 }
+
+sfosPoEPortLabel OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "PoE (Power over Ethernet) port identifier"
+        ::= { sfosPoEEntry 2 }
+
+sfosPoEPowerEnabled OBJECT-TYPE
+        SYNTAX      PoEPowerStatusType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Power status of the PoE port
+             Possible values:
+               - disabled(2): PoE port's power is disabled
+               - enabled(1): PoE power is plugged in and active on this port"
+        ::= { sfosPoEEntry 3 }
+
+sfosPoEPowerLimit OBJECT-TYPE
+        SYNTAX      Gauge32
+        UNITS       "milliwatts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Maximum power limit configured for the PoE port, in milliwatts
+             For example, a value of 30000 represents 30 watts (30W)"
+        ::= { sfosPoEEntry 4 }
+
+sfosPoEPowerUsage OBJECT-TYPE
+        SYNTAX      Gauge32
+        UNITS       "milliwatts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Power consumption on the PoE port, in milliwatts
+             For example, a value of 5000 represents 5 watts (5W)"
+        ::= { sfosPoEEntry 5 }
+
+sfosPoEVoltage OBJECT-TYPE
+        SYNTAX      Gauge32
+        UNITS       "millivolts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Voltage on the PoE port, in millivolts
+             For example, a value of 53400 represents 53.4 volts (53.4V)"
+        ::= { sfosPoEEntry 6 }
+
+sfosPoECurrent OBJECT-TYPE
+        SYNTAX      Gauge32
+        UNITS       "milliamperes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Electrical current on the PoE port, in milliamperes
+             For example, a value of 132 represents 132 milliamperes (132mA or 0.132A)"
+        ::= { sfosPoEEntry 7 }
+
 -- conformance information
 
 sfosXGMIBConformance OBJECT IDENTIFIER ::= {sfosXGMIB 2}
@@ -1106,11 +1340,12 @@ sfosXGMIBGroups      OBJECT IDENTIFIER ::= {sfosXGMIBConformance 2}
 -- compliance statements
 sfosBasicCompliance MODULE-COMPLIANCE
        STATUS  current
-       DESCRIPTION "The compliance statement for SNMP entities which implement this MIB module."
+       DESCRIPTION "The compliance statement for SNMP entities which implement this MIB module"
        MODULE  -- this module
        MANDATORY-GROUPS { sfosDeviceStatusGroup, sfosDeviceStatsGroup, sfosServiceStatusGroup,
 			sfosLicInfoGroup, sfosHAStatusGroup, sfosIPSecInfoGroup,
-			sfosWiFiInfoGroup, sfosTrapInfoGroup }
+			sfosWiFiInfoGroup, sfosTrapInfoGroup, sfosNotificationGroup,
+			sfosSystemHealthInfoGroup }
 
        ::= { sfosXGMIBCompliances 1 }
 
@@ -1223,11 +1458,13 @@ sfosIPSecInfoGroup OBJECT-GROUP
 	sfosIPSecVpnConnId,
 	sfosIPSecVpnConnName,
 	sfosIPSecVpnConnDes,
-	sfosIPSecVpnPolicyName,
+	sfosIPSecVpnPolicyUsed,
 	sfosIPSecVpnConnMode,
 	sfosIPSecVpnConnType,
 	sfosIPSecVpnLocalgwPort,
 	sfosIPSecVpnActiveTunnel,
+	sfosIPSecVpnConnStatus,
+	sfosIPSecVpnActivated,
 	sfosIPSecVpnPolicyId,
 	sfosIPSecVpnPolicyName,
 	sfosIPSecVpnPolicyKeyLife,
@@ -1261,11 +1498,37 @@ sfosWiFiInfoGroup OBJECT-GROUP
 	DESCRIPTION "A collection of objects providing SFOS WiFi module Info"
 	::= { sfosXGMIBGroups 7 }
 
-sfosTrapInfoGroup NOTIFICATION-GROUP
-	NOTIFICATIONS {
-		sfosNotification }
+sfosTrapInfoGroup OBJECT-GROUP
+	OBJECTS {
+		sfosTrapMessage
+	}
 	STATUS current
 	DESCRIPTION "A collection of objects providing SFOS Trap Info"
 	::= { sfosXGMIBGroups 8 }
+
+sfosNotificationGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		sfosNotification
+	}
+	STATUS current
+	DESCRIPTION "A collection of objects providing SFOS Trap Info"
+	::= { sfosXGMIBGroups 9 }
+
+sfosSystemHealthInfoGroup OBJECT-GROUP
+        OBJECTS {
+		sfosNPUTemperature,
+		sfosCPUTemperature,
+		sfosFanSpeed,
+		sfosPowerSupplyStatus,
+                sfosPoEPortLabel,
+		sfosPoEPowerEnabled,
+		sfosPoEPowerLimit,
+		sfosPoEPowerUsage,
+		sfosPoEVoltage,
+		sfosPoECurrent
+        }
+        STATUS      current
+        DESCRIPTION "A collection of objects providing system health information"
+        ::= { sfosXGMIBGroups 10 }
 
 END
