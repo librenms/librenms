@@ -190,7 +190,29 @@
                 diffGroups: null,
 
                 init() {
+                    this.loadLatest();
                     this.loadBackups();
+                },
+
+                loadLatest() {
+                    this.loading = true;
+                    window.axios
+                        .get(this.urls.backup)
+                        .then((response) => {
+                            // Only set if user hasn't selected another one in the meantime
+                            if (!this.selected) {
+                                this.selected = response.data;
+                                this.content = response.data.content;
+                            }
+                        })
+                        .catch((error) => {
+                            if (!this.selected) {
+                                this.error = error.response?.data?.error || 'request_failed';
+                            }
+                        })
+                        .finally(() => {
+                            this.loading = false;
+                        });
                 },
 
                 loadBackups() {
@@ -204,7 +226,10 @@
                             this.total = response.data.total;
                         })
                         .catch((error) => {
-                            this.error = error.response?.data?.error || 'request_failed';
+                            // Only overwrite error if not already set by latest load
+                            if (!this.error) {
+                                this.error = error.response?.data?.error || 'request_failed';
+                            }
                         })
                         .finally(() => {
                             this.loadingBackups = false;
@@ -255,7 +280,7 @@
 
                     this.loading = true;
                     window.axios
-                        .get(this.urls.backup.replace('BACKUP_ID', encodeURIComponent(backup.id)), { params: { page: backup.page } })
+                        .get(this.urls.backup, { params: { backup: backup.id, page: backup.page } })
                         .then((response) => {
                             this.content = response.data.content;
                         })

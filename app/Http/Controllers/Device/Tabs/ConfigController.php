@@ -64,7 +64,7 @@ class ConfigController extends Controller implements DeviceTab
     }
 
     /**
-     * @return array{error: ?string, error_message: ?string, latest: ?array{id: string, date: ?int, until: ?int, type: string, content: ?string}, urls: array{backups: string, backup: string, diff: string}, messages: array<string, string>}
+     * @return array{error: ?string, error_message: ?string, urls: array{backups: string, backup: string, diff: string}, messages: array<string, string>, hostname: string}
      */
     public function data(Device $device, Request $request): array
     {
@@ -73,7 +73,7 @@ class ConfigController extends Controller implements DeviceTab
 
         $urls = [
             'backups' => route('device.config.backups', $device->device_id),
-            'backup' => route('device.config.backup', [$device->device_id, 'BACKUP_ID']),
+            'backup' => route('device.config.backup', $device->device_id),
             'diff' => route('device.config.diff', $device->device_id),
         ];
 
@@ -88,7 +88,6 @@ class ConfigController extends Controller implements DeviceTab
         $empty = [
             'error' => null,
             'error_message' => null,
-            'latest' => null,
             'urls' => $urls,
             'messages' => $messages,
             'hostname' => $device->hostname,
@@ -100,16 +99,7 @@ class ConfigController extends Controller implements DeviceTab
             return array_merge($empty, ['error' => $error, 'error_message' => $this->errorMessage($error, null)]);
         }
 
-        $latest = $provider->latest($device);
-        if ($latest === null) {
-            $error = $provider->lastError() ?? ConfigBackupProvider::ERROR_NO_BACKUPS;
-
-            return array_merge($empty, ['error' => $error, 'error_message' => $this->errorMessage($error, $providerName)]);
-        }
-
-        return array_merge($empty, [
-            'latest' => $latest,
-        ]);
+        return $empty;
     }
 
     private function errorMessage(string $error, ?string $provider): string
@@ -145,17 +135,29 @@ class ConfigController extends Controller implements DeviceTab
         return response()->json($list);
     }
 
-    public function backup(Device $device, string $backup, Request $request): JsonResponse
+    public function backup(Device $device, Request $request): JsonResponse
     {
         Gate::authorize('show-config', $device);
 
         $validated = $request->validate([
+            'backup' => 'nullable|string|max:191|regex:/^[A-Za-z0-9._\\|-]+$/',
             'page' => 'nullable|integer|min:0',
         ]);
 
         $provider = $this->manager->providerFor($device);
         if ($provider === null) {
             return $this->errorResponse(ConfigBackupProvider::ERROR_DEVICE_NOT_FOUND);
+        }
+
+        $backup = $validated['backup'] ?? null;
+
+        if ($backup === null) {
+            $latest = $provider->latest($device);
+            if ($latest === null) {
+                return $this->errorResponse($provider->lastError() ?? ConfigBackupProvider::ERROR_NO_BACKUPS);
+            }
+
+            return response()->json($latest);
         }
 
         $content = $provider->content($device, $backup, (int) ($validated['page'] ?? 0));
