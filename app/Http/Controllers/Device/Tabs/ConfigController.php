@@ -140,8 +140,8 @@ class ConfigController extends Controller implements DeviceTab
         Gate::authorize('show-config', $device);
 
         $validated = $request->validate([
-            'backup' => 'nullable|string|max:191|regex:/^[A-Za-z0-9._\\|-]+$/',
-            'page' => 'nullable|integer|min:0',
+            'backup' => ['nullable', 'string', 'max:191', 'regex:/^[A-Za-z0-9._\\|-]+$/'],
+            'page' => ['nullable', 'integer', 'min:0'],
         ]);
 
         $provider = $this->manager->providerFor($device);

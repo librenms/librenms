@@ -15,7 +15,7 @@
                     <x-slot name="heading" class="tw:flex tw:items-center tw:justify-between">
                         <h3 class="panel-title">
                             {{ __('Backups') }}
-                            <span class="tw:font-normal tw:text-xl tw:text-gray-500 tw:dark:text-dark-white-400" x-text="'(' + total + ')'"></span>
+                            <span x-show="!loadingBackups" x-cloak class="tw:font-normal tw:text-xl tw:text-gray-500 tw:dark:text-dark-white-400" x-text="'(' + total + ')'"></span>
                         </h3>
                         <button type="button"
                                 x-show="total > 1" x-cloak
@@ -320,10 +320,10 @@
                     if (this.diffMode) {
                         // Filter for text backups since diff mode requires them
                         const textBackups = this.backups.filter(b => b.type === 'TEXT');
-                        
+
                         // Find the index of the currently selected backup in the text backups list
                         const selectedIndex = this.selected ? textBackups.findIndex(b => b.id === this.selected.id) : -1;
-                        
+
                         if (selectedIndex !== -1 && selectedIndex + 1 < textBackups.length) {
                             // select the currently shown backup and the one right before it (next older in the list)
                             this.diffSelection = [textBackups[selectedIndex], textBackups[selectedIndex + 1]];
