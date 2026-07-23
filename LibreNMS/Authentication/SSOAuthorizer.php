@@ -169,7 +169,7 @@ class SSOAuthorizer extends MysqlAuthorizer
             }
         } elseif (LibrenmsConfig::get('sso.group_strategy') === 'map') {
             if (LibrenmsConfig::get('sso.group_level_map') && is_array(LibrenmsConfig::get('sso.group_level_map')) && LibrenmsConfig::get('sso.group_delimiter') && LibrenmsConfig::get('sso.group_attr')) {
-                return $this->authSSOParseGroups();
+                return $this->authSSOParseRoleNames();
             } else {
                 throw new AuthenticationException('group assignment by level map requested, but \'sso.group_level_map\', \'sso.group_attr\', or \'sso.group_delimiter\' are not set in your config');
             }
@@ -185,29 +185,107 @@ class SSOAuthorizer extends MysqlAuthorizer
     }
 
     /**
-     * Map a user to roles based on the configured table mapping.
+     * Map a user to the highest configured permission level based on their groups.
      *
-     * Supports the current RBAC mapping format:
-     *     'NSS' => ['roles' => ['admin']]
+     * Supports legacy integer mappings and the current RBAC mapping format such as
+     * ['roles' => ['admin']] or ['level' => 10].
      *
-     * Legacy integer mappings are also supported and converted to role names.
-     * If no group matches, sso.static_level (default 0) is used as a fallback.
-     *
-     * @return array<string>
+     * @return int
      */
-    public function authSSOParseGroups(): array
+    public function authSSOParseGroups(): int
     {
         // Parse and normalize a delimited group list.
         $groups = explode(
             LibrenmsConfig::get('sso.group_delimiter', ';'),
             $this->authSSOGetAttr(LibrenmsConfig::get('sso.group_attr')) ?? ''
         );
-        $groups = array_values(array_filter(array_map('trim', $groups), static fn ($group) => $group !== ''));
+        $groups = array_values(array_filter(array_map(trim(...), $groups), static fn ($group) => $group !== ''));
 
         // Only consider groups that match the filter expression - this is an optimisation for sites with thousands of groups.
         $group_filter = LibrenmsConfig::get('sso.group_filter');
         if ($group_filter) {
-            $groups = array_values(array_filter($groups, static fn ($group) => preg_match($group_filter, $group) === 1));
+            $groups = array_values(array_filter($groups, static fn ($group) => preg_match($group_filter, (string) $group) === 1));
+        }
+
+        $level = (int) LibrenmsConfig::get('sso.static_level', 0);
+        $config_map = LibrenmsConfig::get('sso.group_level_map', []);
+
+        foreach ($groups as $group) {
+            if (! array_key_exists($group, $config_map)) {
+                continue;
+            }
+
+            $map = $config_map[$group];
+
+            if (is_array($map)) {
+                if (isset($map['level']) && (is_int($map['level']) || (is_string($map['level']) && ctype_digit($map['level'])))) {
+                    $level = max($level, (int) $map['level']);
+
+                    continue;
+                }
+
+                if (isset($map['roles']) && is_array($map['roles'])) {
+                    foreach ($map['roles'] as $role) {
+                        $mapped_level = $this->getLevelFromMapValue($role);
+                        if ($mapped_level !== null) {
+                            $level = max($level, $mapped_level);
+                        }
+                    }
+
+                    continue;
+                }
+            }
+
+            $mapped_level = $this->getLevelFromMapValue($map);
+            if ($mapped_level !== null) {
+                $level = max($level, $mapped_level);
+            }
+        }
+
+        return $level;
+    }
+
+    private function getLevelFromMapValue(mixed $value): ?int
+    {
+        if (is_int($value)) {
+            return $value;
+        }
+
+        if (is_string($value) && ctype_digit($value)) {
+            return (int) $value;
+        }
+
+        if (! is_string($value)) {
+            return null;
+        }
+
+        return match (strtolower($value)) {
+            'admin' => 10,
+            'global-read', 'global_read' => 5,
+            'user' => 1,
+            'demo' => 11,
+            default => null,
+        };
+    }
+
+    private function getRoleFromMapValue(mixed $value): ?string
+    {
+        $level = $this->getLevelFromMapValue($value);
+
+        return $level !== null ? LegacyAuthLevel::tryFrom($level)?->getName() : null;
+    }
+
+    public function authSSOParseRoleNames(): array
+    {
+        $groups = explode(
+            LibrenmsConfig::get('sso.group_delimiter', ';'),
+            $this->authSSOGetAttr(LibrenmsConfig::get('sso.group_attr')) ?? ''
+        );
+        $groups = array_values(array_filter(array_map(trim(...), $groups), static fn ($group) => $group !== ''));
+
+        $group_filter = LibrenmsConfig::get('sso.group_filter');
+        if ($group_filter) {
+            $groups = array_values(array_filter($groups, static fn ($group) => preg_match($group_filter, (string) $group) === 1));
         }
 
         $config_map = LibrenmsConfig::get('sso.group_level_map', []);
@@ -220,25 +298,36 @@ class SSOAuthorizer extends MysqlAuthorizer
 
             $map = $config_map[$group];
 
-            // Current RBAC mapping format.
-            if (is_array($map) && isset($map['roles']) && is_array($map['roles'])) {
-                $roles = array_merge($roles, $map['roles']);
+            if (is_array($map)) {
+                if (isset($map['roles']) && is_array($map['roles'])) {
+                    foreach ($map['roles'] as $role) {
+                        $mapped_role = $this->getRoleFromMapValue($role);
+                        if ($mapped_role !== null) {
+                            $roles[] = $mapped_role;
+                        }
+                    }
 
-                continue;
+                    continue;
+                }
+
+                if (isset($map['level']) && (is_int($map['level']) || (is_string($map['level']) && ctype_digit($map['level'])))) {
+                    $mapped_role = $this->getRoleFromMapValue((int) $map['level']);
+                    if ($mapped_role !== null) {
+                        $roles[] = $mapped_role;
+                    }
+
+                    continue;
+                }
             }
 
-            // Backward compatibility for legacy numeric level mappings.
-            if (is_int($map) || (is_string($map) && ctype_digit($map))) {
-                $legacy_role = LegacyAuthLevel::tryFrom((int) $map)?->getName();
-                if ($legacy_role !== null) {
-                    $roles[] = $legacy_role;
-                }
+            $mapped_role = $this->getRoleFromMapValue($map);
+            if ($mapped_role !== null) {
+                $roles[] = $mapped_role;
             }
         }
 
-        // Preserve the previous static-level fallback when no configured group matches.
         if ($roles === []) {
-            $static_role = LegacyAuthLevel::tryFrom((int) LibrenmsConfig::get('sso.static_level', 0))?->getName();
+            $static_role = $this->getRoleFromMapValue(LibrenmsConfig::get('sso.static_level', 0));
             if ($static_role !== null) {
                 $roles[] = $static_role;
             }
