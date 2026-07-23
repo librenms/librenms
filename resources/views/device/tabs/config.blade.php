@@ -82,12 +82,14 @@
                 <x-panel class="tw:w-full tw:flex-1 tw:min-w-0 tw:overflow-hidden tw:self-start tw:mb-0!">
                     <x-slot name="heading" class="tw:flex tw:items-center tw:justify-between">
                         <h3 class="panel-title">
-                            <span x-show="diffMode">{{ __('config_backups.diff') }}<span
-                                    x-show="diffSelection.length === 2"
-                                    x-text="': ' + formatDate(Math.min(diffSelection[0]?.date, diffSelection[1]?.date)) + ' → ' + formatDate(Math.max(diffSelection[0]?.date, diffSelection[1]?.date))"></span></span>
+                            <span x-show="diffMode">{{ __('config_backups.diff') }}<span x-show="diffSelection.length === 2">:
+                                <span x-text="formatDate(Math.min(diffSelection[0]?.date, diffSelection[1]?.date))"></span>
+                                <i class="fa fa-arrow-right tw:mx-1 tw:text-xs tw:align-middle" aria-hidden="true"></i>
+                                <span x-text="formatDate(Math.max(diffSelection[0]?.date, diffSelection[1]?.date))"></span>
+                            </span></span>
                             <span x-show="!diffMode">{{ __('config_backups.configuration') }}<span
                                     x-show="selected"
-                                    x-text="' - ' + formatDate(selected?.date)"></span></span>
+                                    x-text="': ' + formatDate(selected?.date)"></span></span>
                         </h3>
                         <div x-show="!diffMode && selected?.content != null && (!selected || selected.type === 'TEXT')"
                              x-cloak
