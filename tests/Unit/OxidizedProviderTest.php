@@ -151,6 +151,26 @@ final class OxidizedProviderTest extends TestCase
         $this->assertSame('interface eth0', $content);
     }
 
+    public function testGroupIsIncludedInVersionAndDiffRequests(): void
+    {
+        Http::fake([
+            'oxidized:8888/node/show/*' => Http::response($this->fakeNode(['group' => 'core']), 200),
+            'oxidized:8888/node/version/view*' => Http::response('interface eth0', 200),
+            'oxidized:8888/node/version/diffs*' => Http::response("@@ -1 +1 @@\n-a\n+b\n", 200),
+        ]);
+
+        $provider = $this->makeProvider();
+        $device = $this->makeDevice();
+
+        $provider->content($device, 'aaaa1111');
+        Http::assertSent(fn ($request) => str_contains((string) $request->url(), '/node/version/view')
+            && str_contains((string) $request->url(), 'group=core'));
+
+        $provider->diff($device, 'bbbb2222', 'aaaa1111');
+        Http::assertSent(fn ($request) => str_contains((string) $request->url(), '/node/version/diffs')
+            && str_contains((string) $request->url(), 'group=core'));
+    }
+
     public function testContentRejectsNonHexId(): void
     {
         Http::fake(['*' => Http::response('nope', 200)]);
