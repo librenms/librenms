@@ -170,6 +170,7 @@
     <script>
         document.addEventListener('alpine:init', () => {
             window.Alpine.data('configBackups', (config) => ({
+                // Data
                 backups: [],
                 page: 0,
                 totalPages: 0,
@@ -177,8 +178,9 @@
                 urls: config.urls || {},
                 messages: config.messages || {},
 
-                selected: config.latest || null,
-                content: config.latest ? config.latest.content : null,
+                // UI State
+                selected: null,
+                content: null,
                 loading: false,
                 loadingMore: false,
                 loadingBackups: false,
@@ -186,58 +188,103 @@
                 error: null,
                 copied: false,
 
+                // Diff State
                 diffMode: false,
                 diffSelection: [],
                 diffGroups: null,
 
                 init() {
-                    this.fetchBackupContent(null);
-                    this.loadBackups();
+                    this.loadLatest();
+                    this.loadBackupPage(0);
                 },
 
-                loadBackups() {
-                    this.loadingBackups = true;
-                    window.axios
-                        .get(this.urls.backups, { params: { page: 0 } })
-                        .then((response) => {
-                            this.backups = response.data.backups.map((b) => ({ ...b, page: 0 }));
-                            this.page = response.data.page;
-                            this.totalPages = response.data.totalPages;
-                            this.total = response.data.total;
-                        })
-                        .catch((error) => {
-                            // Only overwrite error if not already set by latest load
-                            if (!this.error) {
-                                this.error = error.response?.data?.error || 'request_failed';
-                            }
-                        })
-                        .finally(() => {
-                            this.loadingBackups = false;
-                        });
+                // --- Loading Logic ---
+                beginLoading() {
+                    this.loading = true;
+                    this.showSpinner = false;
+                    return setTimeout(() => {
+                        if (this.loading) this.showSpinner = true;
+                    }, 300);
+                },
+
+                endLoading(timer) {
+                    clearTimeout(timer);
+                    this.loading = false;
+                    this.showSpinner = false;
+                },
+
+                // ── Backup list ──────────────────────────────────────────
+
+                async loadBackupPage(page, append = false) {
+                    const loadingKey = append ? 'loadingMore' : 'loadingBackups';
+                    this[loadingKey] = true;
+
+                    try {
+                        const { data } = await window.axios.get(this.urls.backups, { params: { page } });
+                        const mapped = data.backups.map((b) => ({ ...b, page }));
+
+                        if (append) {
+                            this.backups.push(...mapped);
+                        } else {
+                            this.backups = mapped;
+                        }
+
+                        this.page = data.page;
+                        this.totalPages = data.totalPages;
+                        this.total = data.total;
+                    } catch (error) {
+                        if (!this.error) {
+                            this.error = this.requestError(error);
+                        }
+                    } finally {
+                        this[loadingKey] = false;
+                    }
+                },
+
+                loadMore() {
+                    this.loadBackupPage(this.page + 1, true);
                 },
 
                 get hasMore() {
                     return this.page < this.totalPages - 1;
                 },
 
-                get diffReady() {
-                    return this.diffGroups !== null && this.diffSelection.length === 2;
-                },
+                // ── Backup content ───────────────────────────────────────
 
-                errorMessage() {
-                    return this.messages[this.error] || this.messages.request_failed || this.error;
-                },
-
-                formatDate(ts) {
-                    return ts ? window.LibreNMS.Date.display(ts) : '';
-                },
-
-                isSelected(backup) {
-                    if (this.diffMode) {
-                        return this.diffSelection.some((b) => b.id === backup.id);
+                async loadLatest() {
+                    const timer = this.beginLoading();
+                    try {
+                        const { data } = await window.axios.get(this.urls.backup);
+                        if (!this.selected) {
+                            this.selected = data;
+                            this.content = data.content;
+                        }
+                    } catch (error) {
+                        if (!this.selected) {
+                            this.error = this.requestError(error);
+                        }
+                    } finally {
+                        this.endLoading(timer);
                     }
+                },
 
-                    return this.selected && this.selected.id === backup.id;
+                async loadBackupContent(backup) {
+                    const timer = this.beginLoading();
+                    try {
+                        const { data } = await window.axios.get(this.urls.backup, {
+                            params: { backup: backup.id, page: backup.page },
+                        });
+                        if (this.selected?.id === backup.id) {
+                            this.content = data.content;
+                        }
+                    } catch (error) {
+                        if (this.selected?.id === backup.id) {
+                            this.content = null;
+                            this.error = this.requestError(error);
+                        }
+                    } finally {
+                        this.endLoading(timer);
+                    }
                 },
 
                 selectBackup(backup) {
@@ -246,7 +293,7 @@
                         return;
                     }
 
-                    if (this.selected && this.selected.id === backup.id && this.content !== null) {
+                    if (this.selected?.id === backup.id && this.content !== null) {
                         return;
                     }
 
@@ -258,103 +305,48 @@
                         return;
                     }
 
-                    this.fetchBackupContent(backup);
+                    this.loadBackupContent(backup);
                 },
 
-                async fetchBackupContent(backup) {
-                    this.loading = true;
-                    this.showSpinner = false;
-
-                    const timer = setTimeout(() => {
-                        if (this.loading) {
-                            this.showSpinner = true;
-                        }
-                    }, 300);
-
-                    const params = backup ? { backup: backup.id, page: backup.page } : {};
-                    const isLatest = backup === null;
-
-                    try {
-                        const { data } = await window.axios.get(this.urls.backup, { params });
-
-                        if (isLatest) {
-                            if (!this.selected) {
-                                this.selected = data;
-                                this.content = data.content;
-                            }
-                        } else if (this.selected?.id === backup.id) {
-                            this.content = data.content;
-                        }
-                    } catch (error) {
-                        if (isLatest || this.selected?.id === backup.id) {
-                            if (!isLatest) {
-                                this.content = null;
-                            }
-
-                            this.error = error.response?.data?.error ?? 'request_failed';
-                        }
-                    } finally {
-                        clearTimeout(timer);
-                        this.loading = false;
-                        this.showSpinner = false;
-                    }
-                },
-
-                loadMore() {
-                    this.loadingMore = true;
-                    const nextPage = this.page + 1;
-
-                    window.axios
-                        .get(this.urls.backups, { params: { page: nextPage } })
-                        .then((response) => {
-                            this.backups.push(...response.data.backups.map((b) => ({ ...b, page: nextPage })));
-                            this.page = response.data.page;
-                            this.totalPages = response.data.totalPages;
-                            this.total = response.data.total;
-                        })
-                        .catch((error) => {
-                            this.error = error.response?.data?.error || 'request_failed';
-                        })
-                        .finally(() => {
-                            this.loadingMore = false;
-                        });
-                },
+                // ── Diff ─────────────────────────────────────────────────
 
                 toggleDiffMode() {
                     this.diffMode = !this.diffMode;
                     this.error = null;
+                    this.diffMode ? this.enterDiffMode() : this.exitDiffMode();
+                },
 
-                    if (this.diffMode) {
-                        // Filter for text backups since diff mode requires them
-                        const textBackups = this.backups.filter(b => b.type === 'TEXT');
+                enterDiffMode() {
+                    const textBackups = this.backups.filter(b => b.type === 'TEXT');
+                    const selectedIndex = this.selected
+                        ? textBackups.findIndex(b => b.id === this.selected.id)
+                        : -1;
+                    const hasNext = selectedIndex !== -1 && selectedIndex + 1 < textBackups.length;
 
-                        // Find the index of the currently selected backup in the text backups list
-                        const selectedIndex = this.selected ? textBackups.findIndex(b => b.id === this.selected.id) : -1;
-
-                        if (selectedIndex !== -1 && selectedIndex + 1 < textBackups.length) {
-                            // select the currently shown backup and the one right before it (next older in the list)
-                            this.diffSelection = [textBackups[selectedIndex], textBackups[selectedIndex + 1]];
-                            this.loadDiff();
-                        } else if (textBackups.length >= 2) {
-                            // fallback to the two latest
-                            this.diffSelection = [textBackups[0], textBackups[1]];
-                            this.loadDiff();
-                        } else {
-                            this.diffSelection = [];
-                            this.diffGroups = null;
-                        }
+                    if (hasNext) {
+                        this.diffSelection = [textBackups[selectedIndex], textBackups[selectedIndex + 1]]
+                            .sort((a, b) => a.date - b.date);
+                    } else if (textBackups.length >= 2) {
+                        this.diffSelection = [textBackups[0], textBackups[1]]
+                            .sort((a, b) => a.date - b.date);
                     } else {
-                        // Switch back to single mode: select the "new" (newer of the two compared) config
-                        if (this.diffSelection.length === 2) {
-                            const [orig, rev] = [...this.diffSelection].sort((a, b) => a.date - b.date);
-                            // select newer one
-                            this.selectBackup(rev);
-                        } else if (this.diffSelection.length === 1) {
-                            this.selectBackup(this.diffSelection[0]);
-                        }
                         this.diffSelection = [];
                         this.diffGroups = null;
+                        return;
                     }
+
+                    this.loadDiff();
+                },
+
+                exitDiffMode() {
+                    if (this.diffSelection.length === 2) {
+                        const [, rev] = this.diffSelection;
+                        this.selectBackup(rev);
+                    } else if (this.diffSelection.length === 1) {
+                        this.selectBackup(this.diffSelection[0]);
+                    }
+                    this.diffSelection = [];
+                    this.diffGroups = null;
                 },
 
                 toggleDiffSelect(backup) {
@@ -363,40 +355,54 @@
                     }
 
                     const index = this.diffSelection.findIndex((b) => b.id === backup.id);
+
                     if (index >= 0) {
                         this.diffSelection.splice(index, 1);
                         this.diffGroups = null;
-                    } else {
-                        if (this.diffSelection.length >= 2) {
-                            this.diffSelection.pop();
-                        }
-                        this.diffSelection.push(backup);
+                        return;
                     }
 
+                    if (this.diffSelection.length >= 2) {
+                        this.diffSelection.pop();
+                    }
+
+                    this.diffSelection.push(backup);
+
                     if (this.diffSelection.length === 2) {
+                        this.diffSelection.sort((a, b) => a.date - b.date);
                         this.loadDiff();
                     }
                 },
 
-                loadDiff() {
-                    // oldest as the original, newest as the revision
-                    const [orig, rev] = [...this.diffSelection].sort((a, b) => a.date - b.date);
 
-                    this.loading = true;
+                get diffReady() {
+                    return this.diffGroups !== null && this.diffSelection.length === 2;
+                },
+
+                get diffRoleMap() {
+                    if (!this.diffMode || this.diffSelection.length !== 2) {
+                        return {};
+                    }
+                    const [orig, rev] = this.diffSelection;
+                    return { [orig.id]: 'old', [rev.id]: 'new' };
+                },
+
+                async loadDiff() {
+                    const [orig, rev] = this.diffSelection;
+                    const timer = this.beginLoading();
                     this.error = null;
                     this.diffGroups = null;
 
-                    window.axios
-                        .get(this.urls.diff, { params: { orig: orig.id, rev: rev.id } })
-                        .then((response) => {
-                            this.diffGroups = response.data.groups;
-                        })
-                        .catch((error) => {
-                            this.error = error.response?.data?.error || 'request_failed';
-                        })
-                        .finally(() => {
-                            this.loading = false;
+                    try {
+                        const { data } = await window.axios.get(this.urls.diff, {
+                            params: { orig: orig.id, rev: rev.id },
                         });
+                        this.diffGroups = data.groups;
+                    } catch (error) {
+                        this.error = this.requestError(error);
+                    } finally {
+                        this.endLoading(timer);
+                    }
                 },
 
                 get diffRows() {
@@ -405,16 +411,26 @@
                     }
 
                     const rows = [];
+                    const push = (mode, lines) => {
+                        lines.forEach((line) => {
+                            rows.push({
+                                mode,
+                                line: line.line,
+                                text: line.text,
+                            });
+                        });
+                    };
+
                     this.diffGroups.forEach((group) => {
                         if (group.type === 'COMMON') {
-                            group.original.forEach((line) => rows.push({ mode: 'common', line: line.line, text: line.text }));
+                            push('common', group.original);
                             return;
                         }
                         if (group.type === 'DELETED' || group.type === 'CHANGED') {
-                            group.original.forEach((line) => rows.push({ mode: 'removed', line: line.line, text: line.text }));
+                            push('removed', group.original);
                         }
                         if (group.type === 'INSERTED' || group.type === 'CHANGED') {
-                            group.revised.forEach((line) => rows.push({ mode: 'added', line: line.line, text: line.text }));
+                            push('added', group.revised);
                         }
                     });
 
@@ -422,19 +438,29 @@
                 },
 
                 getDiffRole(backup) {
-                    if (!this.diffMode || this.diffSelection.length !== 2) {
-                        return null;
+                    return this.diffRoleMap[backup.id] ?? null;
+                },
+
+                // ── UI helpers ───────────────────────────────────────────
+
+                isSelected(backup) {
+                    if (this.diffMode) {
+                        return this.diffSelection.some((b) => b.id === backup.id);
                     }
 
-                    const [orig, rev] = [...this.diffSelection].sort((a, b) => a.date - b.date);
-                    if (backup.id === orig.id) {
-                        return 'old';
-                    }
-                    if (backup.id === rev.id) {
-                        return 'new';
-                    }
+                    return this.selected?.id === backup.id;
+                },
 
-                    return null;
+                errorMessage() {
+                    return this.messages[this.error] || this.messages.request_failed || this.error;
+                },
+
+                formatDate(ts) {
+                    return ts ? window.LibreNMS.Date.display(ts) : '';
+                },
+
+                requestError(error) {
+                    return error.response?.data?.error ?? 'request_failed';
                 },
 
                 downloadConfig() {
@@ -442,17 +468,15 @@
                         return;
                     }
 
-                    const dateStr = this.selected?.date ? new Date(this.selected.date * 1000).toISOString().split('T')[0] : 'latest';
+                    const dateStr = this.selected?.date
+                        ? new Date(this.selected.date * 1000).toISOString().split('T')[0]
+                        : 'latest';
                     const hostname = config.hostname ? `${config.hostname}-` : '';
                     const filename = `${hostname}config-${dateStr}.txt`;
                     const blob = new Blob([this.content], { type: 'text/plain;charset=utf-8' });
                     const url = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = filename;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+
+                    Object.assign(document.createElement('a'), { href: url, download: filename }).click();
                     URL.revokeObjectURL(url);
                 },
 
