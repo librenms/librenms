@@ -392,6 +392,7 @@ final class AuthSSOTest extends DBTestCase
         $this->expectException(\LibreNMS\Exceptions\AuthenticationException::class);
         $a->getRoles('');
     }
+
     public function testGroupParsing(): void
     {
         $this->basicConfig();
@@ -422,10 +423,10 @@ final class AuthSSOTest extends DBTestCase
         $_SERVER['member'] = '';
         $this->assertSame([], $a->authSSOParseGroups());
 
-        // Empty with default access level
-        LibrenmsConfig::set('sso.static_level', 5);
-        $this->assertSame(5, $a->authSSOParseGroups());
-        LibrenmsConfig::forget('sso.static_level');
+        // Empty with default access role
+        LibrenmsConfig::set('sso.static_roles', ['global-read']);
+        $this->assertSame(['global-read'], $a->authSSOParseGroups());
+        LibrenmsConfig::forget('sso.static_roles');
 
         // Null
         $_SERVER['member'] = null;
