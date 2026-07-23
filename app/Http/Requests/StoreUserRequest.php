@@ -7,7 +7,6 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use LibreNMS\Authentication\LegacyAuth;
-use Spatie\Permission\Models\Role;
 
 class StoreUserRequest extends FormRequest
 {
@@ -40,7 +39,7 @@ class StoreUserRequest extends FormRequest
             'descr' => 'nullable|max:30|alpha_space',
             'roles' => [
                 'array',
-                Rule::when($this->user()->cannot('update', Role::class), 'size:0'),
+                Rule::when($this->user()->cannot('role.update'), 'size:0'),
             ],
             'roles.*' => 'exists:roles,name',
             'new_password' => ['required', 'confirmed', Password::defaults()],

@@ -48,6 +48,8 @@ class StoragesController extends TableController
 
     protected function baseQuery(Request $request): Builder|\Illuminate\Database\Query\Builder
     {
+        $this->authorize('viewAny', Storage::class);
+
         return Storage::query()
             ->hasAccess($request->user())
             ->when($request->input('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'storage.device_id'))
@@ -66,7 +68,7 @@ class StoragesController extends TableController
     public function formatItem(Model $model): array
     {
         $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $model->device]);
-        $descr = $model->storage_descr;
+        $descr = htmlentities((string) $model->storage_descr);
         $graph_array = [
             'type' => 'storage_usage',
             'popup_title' => htmlentities(strip_tags($model->device?->displayName() . ': ' . $model->storage_descr)),

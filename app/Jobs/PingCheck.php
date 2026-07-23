@@ -29,6 +29,7 @@ namespace App\Jobs;
 use App\Action;
 use App\Actions\Alerts\RunAlertRulesAction;
 use App\Actions\Device\SetDeviceAvailability;
+use App\Actions\Device\UpdateDeviceOutage;
 use App\Models\Device;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -38,9 +39,8 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Data\Source\Fping;
-use LibreNMS\Data\Source\FpingResponse;
-use LibreNMS\Enum\AvailabilitySource;
+use LibreNMS\Data\Source\Icmp\Fping;
+use LibreNMS\Data\Source\Icmp\FpingResponse;
 
 class PingCheck implements ShouldQueue
 {
@@ -82,8 +82,10 @@ class PingCheck implements ShouldQueue
 
         Log::info('Processing hosts in this order : ' . implode(', ', $ordered_hostname_list));
 
-        // bulk ping and send FpingResponse's to recordData as they come in
-        app()->make(Fping::class)->bulkPing($ordered_hostname_list, $this->handleResponse(...));
+        // bulk ping and send FpingResponse to recordData as they come in
+        app()->make(Fping::class)->bulkPing($ordered_hostname_list, function (FpingResponse $response): void {
+            $this->handleResponse($response);
+        });
 
         // check for any left over devices
         if ($this->deferred->isNotEmpty()) {
@@ -165,7 +167,7 @@ class PingCheck implements ShouldQueue
      */
     public function handleResponse(FpingResponse $response): void
     {
-        Log::debug("Attempting to record data for $response->host");
+        Log::debug("Received response for $response->host");
 
         $device = $this->devices->get($response->host);
 
@@ -183,10 +185,11 @@ class PingCheck implements ShouldQueue
         }
 
         // mark up only if snmp is not down too
-        $changed = app(SetDeviceAvailability::class)->execute($device, $response->success(), AvailabilitySource::Icmp, true);
-
-        // save last_ping_timetaken and rrd data
-        $response->saveStats($device);
+        $changed = app(SetDeviceAvailability::class)->execute($device, ['icmp' => $response->isAlive()]);
+        $device->save();
+        if ($changed) {
+            app(UpdateDeviceOutage::class)->execute($device);
+        }
 
         // mark as processed
         $this->processed->put($device->device_id, true);
@@ -246,7 +249,7 @@ class PingCheck implements ShouldQueue
                     if ($alert_child) {
                         Log::debug("Deferred device $child_id triggered by $device_id");
 
-                        Action::execute(RunAlertRulesAction::class, $this->devices->get($child_id));
+                        Action::execute(RunAlertRulesAction::class, device: $this->devices->get($child_id));
                         $this->deferred->pull($child_id);
                     }
                 }

@@ -76,6 +76,8 @@ class AlertLogController extends TableController
      */
     protected function baseQuery(Request $request): Builder|\Illuminate\Database\Query\Builder
     {
+        $this->authorize('viewAny', AlertLog::class);
+
         $query = AlertLog::query()
             ->select('alert_log.*')
             ->with(['device', 'rule'])

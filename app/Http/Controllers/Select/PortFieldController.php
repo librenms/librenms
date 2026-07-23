@@ -72,6 +72,7 @@ class PortFieldController extends SelectController
      */
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Port::class);
         $this->idField = $request->string('field');
 
         return Port::hasAccess($request->user())

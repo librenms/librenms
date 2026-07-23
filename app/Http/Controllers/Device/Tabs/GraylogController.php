@@ -29,6 +29,7 @@ namespace App\Http\Controllers\Device\Tabs;
 use App\ApiClients\GraylogApi;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
+use App\Models\Syslog;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use LibreNMS\Util\Graylog;
@@ -37,6 +38,9 @@ class GraylogController extends Controller
 {
     public function __invoke(Device $device, Request $request, GraylogApi $api): View
     {
+        $this->authorize('view', $device);
+        $this->authorize('viewAny', Syslog::class);  // Note: Graylog replaces syslog, correct permission?
+
         $request->validate([
             'stream' => 'nullable|string',
             'range' => 'nullable|int',

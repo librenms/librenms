@@ -33,6 +33,7 @@ use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\PollerGroup;
 use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -44,8 +45,12 @@ use Throwable;
 
 class EditDeviceController
 {
+    use AuthorizesRequests;
+
     public function index(Device $device): View
     {
+        $this->authorize('update', $device);
+
         $types = collect(LibrenmsConfig::get('device_types'))->keyBy('type');
         if (! $types->has($device->type)) {
             $types->put($device->type, [

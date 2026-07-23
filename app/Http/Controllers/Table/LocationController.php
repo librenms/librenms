@@ -59,6 +59,8 @@ class LocationController extends TableController
      */
     public function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Location::class);
+
         return Location::hasAccess($request->user())->withCount([
             'devices',
             'devices as down_count' => fn ($q) => (new Device)->scopeIsDown($q),

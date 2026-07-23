@@ -9,14 +9,12 @@ $drives = dbFetchRows('SELECT * FROM `storage` WHERE device_id = ? ORDER BY `sto
 
 if (count($drives)) {
     echo '
-          <div class="row">
-            <div class="col-md-12">
-              <div class="panel panel-default panel-condensed overview-panel">
-                <div class="panel-heading">';
+              <div class="overview-panel tw:mb-5">
+                <div class="tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:border-b tw:border-gray-300 tw:text-neutral-700 tw:dark:bg-dark-gray-200 tw:dark:border-zinc-800 tw:dark:text-dark-white-200">';
     echo '<a href="device/device=' . $device['device_id'] . '/tab=health/metric=storage/">';
     echo '<i class="fa fa-database fa-lg icon-theme" aria-hidden="true"></i> <strong>Storage</strong></a>';
     echo '    </div>
-            <table class="table table-hover table-condensed table-striped">';
+            <div class="tw:flex tw:min-w-0 tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-zinc-800">';
 
     foreach ($drives as $drive) {
         $skipdrive = 0;
@@ -73,22 +71,20 @@ if (count($drives)) {
         // the 00 at the end makes the area transparent.
         $minigraph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
 
-        echo '<tr>
-           <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $drive['storage_descr'], $overlib_content) . '</td>
-           <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</td>
-           <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Html::percentageBar(400, 10, $percent, "$used / $total ($percent%)", $free, null, null, [
+        echo '<div class="tw:flex tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
+           <div class="tw:w-40 tw:min-w-0 tw:shrink-0 tw:whitespace-nowrap">' . \LibreNMS\Util\Url::overlibLink($link, $drive['storage_descr'], $overlib_content) . '</div>
+           <div class="tw:flex tw:min-w-0 tw:flex-1 tw:justify-center">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</div>
+           <div>' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Html::percentageBar(400, 10, $percent, "$used / $total ($percent%)", $free, null, null, [
             'left' => $background['left'],
             'left_text' => null,
             'right' => $background['right'],
             'right_text' => null,
         ]), $overlib_content) . '
-           </a></td>
-         </tr>';
+           </div>
+         </div>';
     }//end foreach
 
-    echo '</table>
-        </div>
-        </div>
+    echo '</div>
         </div>';
 }//end if
 

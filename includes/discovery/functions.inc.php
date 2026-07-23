@@ -14,6 +14,7 @@
 
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\LibrenmsConfig;
+use App\Models\BgpPeer;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Port;
@@ -291,6 +292,12 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
                 return 1;
             }
         }
+    } elseif ($device['os'] == 'deltaups') {
+        if ($sensor_type == 'voltage'
+            && ! Str::startsWith($oid, '.1.3.6.1.2.1.33.1.2.5.')
+            && Str::startsWith($device['hardware'] ?? '', 'Delta UPS602R2RT')) {
+            return 10;
+        }
     } elseif ($device['os'] == 'huaweiups') {
         if ($sensor_type == 'frequency') {
             if (Str::startsWith($device['hardware'], 'UPS2000')) {
@@ -445,6 +452,9 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     // process the group
                     $group = trim((string) YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache)) ?: null;
 
+                    // process the skip_limits_calc flag
+                    $skipLimitsCalc = trim((string) YamlDiscovery::replaceValues('skip_limits_calc', $index, null, $data, $pre_cache)) ?: null;
+
                     // process the divisor - cannot be 0
                     if (isset($data['divisor'])) {
                         $divisor = (int) YamlDiscovery::replaceValues('divisor', $index, $count, $data, $pre_cache);
@@ -484,7 +494,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                         } else {
                             ${$limit} = trim((string) YamlDiscovery::replaceValues($limit, $index, null, $data, $pre_cache));
                             if (is_numeric(${$limit})) {
-                                ${$limit} = (${$limit} / $divisor) * $multiplier;
+                                ${$limit} = $skipLimitsCalc ? ${$limit} : (${$limit} / $divisor) * $multiplier;
                             }
                             if (is_numeric(${$limit}) && isset($user_function)) {
                                 if (is_callable($user_function)) {
@@ -667,7 +677,7 @@ function build_cbgp_peers($device, $peer, $af_data, $peer2)
 
 function add_bgp_peer($device, $peer)
 {
-    if (dbFetchCell('SELECT COUNT(*) from `bgpPeers` WHERE device_id = ? AND bgpPeerIdentifier = ?', [$device['device_id'], $peer['ip']]) < '1') {
+    if (BgpPeer::where('device_id', $device['device_id'])->where('bgpPeerIdentifier', $peer['ip'])->where('context_name', $device['context_name'])->count() < '1') {
         $bgpPeers = [
             'device_id' => $device['device_id'],
             'bgpPeerIdentifier' => $peer['ip'],

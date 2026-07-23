@@ -656,9 +656,10 @@ function init_select2(selector, type, data, selected, placeholder, config) {
 
     // allow function to be assigned to pass data
     const data_function = $.isFunction(data) ? data : function (params) {
-        data.term = params.term;
-        data.page = params.page || 1;
-        return data;
+        return Object.assign({}, data, {
+            term: params.term,
+            page: params.page || 1
+        });
     };
 
     const init = {
@@ -671,7 +672,21 @@ function init_select2(selector, type, data, selected, placeholder, config) {
         ajax: {
             url: ajax_url + '/select/' + type,
             delay: 150,
-            data: data_function
+            data: data_function,
+            error: function (jqXHR) {
+                if (jqXHR.status === 403 && jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                    $select.data('select2-last-error', jqXHR.responseJSON.message);
+                }
+            }
+        },
+        language: {
+            errorLoading: function () {
+                var message = $select.data('select2-last-error') || "The results could not be loaded.";
+
+                $select.removeData('select2-last-error');
+
+                return message;
+            }
         }
     };
 

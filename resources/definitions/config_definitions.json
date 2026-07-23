@@ -560,7 +560,7 @@
             "type": "select",
             "default": "none",
             "options" : {
-                "none" : "No Access",
+                "none" : "No Permissions",
                 "normal" : "Normal Access",
                 "global-read" : "Global Viewing Access",
                 "admin" : "Global Administrative Access"
@@ -1495,10 +1495,15 @@
             "default": 0.05,
             "group": "poller",
             "section": "ping",
-            "order": 4,
+            "order": 5,
             "type": "float",
             "validate": {
                 "value": "numeric|between:0.000001,0.9"
+            },
+            "when": {
+                "setting": "icmp_check",
+                "operator": "equals",
+                "value": true
             }
         },
         "device_traffic_descr": {
@@ -2250,13 +2255,6 @@
             "section": "device",
             "order": 8
         },
-        "enable_footer": {
-            "default": false,
-            "type": "boolean",
-            "group": "webui",
-            "section": "general",
-            "order": 0
-        },
         "enable_inventory": {
             "default": true,
             "type": "boolean",
@@ -2362,24 +2360,39 @@
             "default": 3,
             "group": "poller",
             "section": "ping",
-            "order": 1,
-            "type": "text"
+            "order": 2,
+            "type": "text",
+            "when": {
+                "setting": "icmp_check",
+                "operator": "equals",
+                "value": true
+            }
         },
         "fping_options.interval": {
             "default": 500,
             "units": "ms",
             "group": "poller",
             "section": "ping",
-            "order": 2,
-            "type": "text"
+            "order": 3,
+            "type": "text",
+            "when": {
+                "setting": "icmp_check",
+                "operator": "equals",
+                "value": true
+            }
         },
         "fping_options.timeout": {
             "default": 500,
             "units": "ms",
             "group": "poller",
             "section": "ping",
-            "order": 3,
-            "type": "text"
+            "order": 4,
+            "type": "text",
+            "when": {
+                "setting": "icmp_check",
+                "operator": "equals",
+                "value": true
+            }
         },
         "front_page": {
             "default": "default",
@@ -4567,6 +4580,13 @@
             "section": "graylog",
             "order": 10
         },
+        "graylog.match-any-address": {
+            "default": false,
+            "type": "boolean",
+            "group": "external",
+            "section": "graylog",
+            "order": 11
+        },
         "group": {
             "type": "text",
             "default": "librenms"
@@ -4658,7 +4678,7 @@
             "default": true,
             "group": "poller",
             "section": "ping",
-            "order": 5,
+            "order": 1,
             "type": "boolean"
         },
         "ignore_bsd_os_drives": {
@@ -6069,6 +6089,13 @@
             "default": true,
             "type": "boolean"
         },
+        "poller_modules.ports-stack": {
+            "order": 341,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "poller_modules.xdsl": {
             "order": 345,
             "group": "poller",
@@ -6823,7 +6850,7 @@
             "type": "integer",
             "units": "Seconds"
         },
-        "ping_rrd_step": {
+        "service_ping_frequency": {
             "default": 300,
             "group": "poller",
             "section": "dispatcherservice",
@@ -7293,6 +7320,36 @@
             "section": "general",
             "order": 2
         },
+        "unimus.enabled": {
+            "default": false,
+            "group": "external",
+            "section": "unimus",
+            "order": 0,
+            "type": "boolean"
+        },
+        "unimus.url": {
+            "group": "external",
+            "section": "unimus",
+            "order": 1,
+            "type": "text",
+            "validate": {
+                "value": "url"
+            }
+        },
+        "unimus.api_version": {
+            "default": "v2",
+            "group": "external",
+            "section": "unimus",
+            "order": 2,
+            "type": "text",
+            "hidden": true
+        },
+        "unimus.token": {
+            "group": "external",
+            "section": "unimus",
+            "order": 3,
+            "type": "password"
+        },
         "unix-agent-connection-time-out": {
             "default": 10,
             "type": "integer"
@@ -7339,6 +7396,26 @@
                 "master": "master",
                 "release": "release"
             }
+        },
+        "update_on_days": {
+            "default": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+            "type": "array",
+            "options": {
+                "monday": "Monday",
+                "tuesday": "Tuesday",
+                "wednesday": "Wednesday",
+                "thursday": "Thursday",
+                "friday": "Friday",
+                "saturday": "Saturday",
+                "sunday": "Sunday"
+            },
+            "validate": {
+                "value": "array",
+                "value.*": "distinct|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday"
+            },
+            "group": "system",
+            "section": "updates",
+            "order": 2
         },
         "uptime_warning": {
             "group": "webui",
