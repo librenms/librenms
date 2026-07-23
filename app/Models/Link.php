@@ -9,12 +9,27 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Gate;
+use LibreNMS\Interfaces\Models\Keyable;
 
-class Link extends Model
+class Link extends Model implements Keyable
 {
     use HasFactory;
 
     public $timestamps = false;
+    protected $table = 'links';
+    protected $primaryKey = 'id';
+    protected $fillable = [
+        'local_port_id',
+        'local_device_id',
+        'remote_port_id',
+        'active',
+        'protocol',
+        'remote_hostname',
+        'remote_device_id',
+        'remote_port',
+        'remote_platform',
+        'remote_version',
+    ];
 
     protected function scopeHasAccess(Builder $query, User $user): Builder
     {
@@ -63,5 +78,13 @@ class Link extends Model
     public function remotePort(): HasOne
     {
         return $this->hasOne(Port::class, 'port_id', 'remote_port_id');
+    }
+
+    public function getCompositeKey(): string
+    {
+        return
+        $this->local_port_id . '-' .
+        $this->remote_hostname . '-' .
+        $this->remote_port;
     }
 }
