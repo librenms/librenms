@@ -18,7 +18,7 @@
                             <span x-show="!loadingBackups" x-cloak class="tw:font-normal tw:text-xl tw:text-gray-500 tw:dark:text-dark-white-400" x-text="'(' + total + ')'"></span>
                         </h3>
                         <button type="button"
-                                x-show="total > 1" x-cloak
+                                :class="total > 1 ? '' : 'tw:invisible'" x-cloak
                                 x-on:click="toggleDiffMode()"
                                 x-text="diffMode ? '{{ __('config_backups.show_config') }}' : '{{ __('config_backups.show_diff') }}'"
                                 class="lnms-btn lnms-btn-primary tw:transition-colors">
