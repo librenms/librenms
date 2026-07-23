@@ -383,6 +383,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             }
 
             foreach ($lldp_instance as $lldp) {
+                unset($remote_device); // prevent stale remote_device leaking into neighbors with empty lldpRemSysName
                 // If lldpRemPortIdSubtype is 5 and lldpRemPortId is hex, convert it to ASCII.
                 if (isset($lldp['lldpRemPortId']) && $lldp['lldpRemPortIdSubtype'] == 5 && ctype_xdigit(str_replace([' ', ':', '-'], '', strtolower((string) $lldp['lldpRemPortId'])))) {
                     $lldp['lldpRemPortId'] = StringHelpers::hexToAscii($lldp['lldpRemPortId'], ':');
