@@ -1962,6 +1962,7 @@ ports_vlans:
     - { Field: state, Type: varchar(16), 'Null': false, Extra: '', Default: unknown }
     - { Field: cost, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: untagged, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: voice, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_vlan_id], Unique: true, Type: BTREE }
     ports_vlans_device_id_port_id_vlan_unique: { Name: ports_vlans_device_id_port_id_vlan_unique, Columns: [device_id, port_id, vlan], Unique: true, Type: BTREE }
