@@ -15,7 +15,7 @@ $init_modules = [];
 require __DIR__ . '/includes/init.php';
 
 use App\Facades\DeviceCache;
-use App\Models\Device;
+use LibreNMS\Exceptions\HostRenameException;
 
 // Remove a host and all related data from the system
 if ($argv[1] && $argv[2]) {
@@ -32,6 +32,9 @@ if ($argv[1] && $argv[2]) {
             $device->save();
             echo "Renamed $hostname\n";
             exit(0);
+        } catch (HostRenameException $e) {
+            echo $e->getMessage() . PHP_EOL;
+            exit(1);
         } catch (\Throwable) {
             echo "Device failed to be renamed\n";
             exit(1);
