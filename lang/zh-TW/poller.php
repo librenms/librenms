@@ -69,7 +69,7 @@ return [
             ],
             'ping_enabled' => [
                 'description' => '啟用快速 Ping',
-                'help' => '快速 Ping 只會對裝置發送 Ping 以檢查是否在線。',
+                'help' => '快速 Ping 只會對裝置發送 Ping 以檢查是否線上',
             ],
             'ping_frequency' => [
                 'description' => 'Ping 頻率',
