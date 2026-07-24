@@ -101,4 +101,10 @@ final class DeviceTest extends DBTestCase
         $this->assertNotNull($found);
         $this->assertEquals($device->device_id, $found->device_id, 'Did not find the correct device');
     }
+
+    public function testGetMaintenanceStatus(): void
+    {
+        $device = Device::factory()->create(); /** @var Device $device */
+        $this->assertEquals(\LibreNMS\Enum\MaintenanceStatus::None, $device->getMaintenanceStatus());
+    }
 }

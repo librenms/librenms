@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LibreNMS\Cache\DeviceMaintenanceCache;
 use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
@@ -274,34 +275,7 @@ class Device extends BaseModel
             return MaintenanceStatus::None;
         }
 
-        // use cached status
-        if ($this->maintenanceStatus !== null) {
-            return $this->maintenanceStatus;
-        }
-
-        $behavior = AlertSchedule::isActive()
-            ->where(function (Builder $query): void {
-                $query->whereHas('devices', function (Builder $query): void {
-                    $query->where('alert_schedulables.alert_schedulable_id', $this->device_id);
-                });
-
-                if ($this->groups->isNotEmpty()) {
-                    $query->orWhereHas('deviceGroups', function (Builder $query): void {
-                        $query->whereIntegerInRaw('alert_schedulables.alert_schedulable_id', $this->groups->pluck('id'));
-                    });
-                }
-
-                if ($this->location) {
-                    $query->orWhereHas('locations', function (Builder $query): void {
-                        $query->where('alert_schedulables.alert_schedulable_id', $this->location->id);
-                    });
-                }
-            })
-            ->value('behavior');
-
-        $this->maintenanceStatus = MaintenanceStatus::fromBehavior($behavior);
-
-        return $this->maintenanceStatus;
+        return app(DeviceMaintenanceCache::class)->statusFor($this->device_id);
     }
 
     public function getDeviceStatus(): DeviceStatus
