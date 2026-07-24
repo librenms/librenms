@@ -1,10 +1,10 @@
 import logging
 import os
+import sys
 import threading
+import time
 
 import pymysql  # pylint: disable=import-error
-import sys
-import time
 
 import LibreNMS
 from LibreNMS.config import DBConfig
