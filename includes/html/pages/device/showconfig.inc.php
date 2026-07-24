@@ -180,7 +180,6 @@ if (Gate::allows('showConfig', DeviceCache::getPrimary())) {
 
             $text = implode("\n", $lines);
         }
-    } elseif (LibrenmsConfig::get('oxidized.enabled') === true && LibrenmsConfig::has('oxidized.url')) {
         // Try with hostname as set in librenms first
         $oxidized_hostname = $device['hostname'];
         // fetch info about the node and then a list of versions for that node
