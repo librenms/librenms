@@ -584,7 +584,7 @@ class DiscoveryQueueManager(TimedQueueManager):
     def do_dispatch(self):
         try:
             devices = self._db.query(
-                "SELECT `device_id`, `poller_group` FROM `devices` WHERE `disabled`=0"
+                "SELECT `device_id`, `poller_group` FROM `devices` WHERE `disabled`=0 ORDER BY `last_discovered` IS NULL DESC"
             )
             for device in devices:
                 self.post_work(device[0], device[1])

@@ -636,7 +636,7 @@ class Service:
                     `last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL COALESCE(`last_polled_timetaken`, 0) SECOND) OR
                     `last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL COALESCE(`last_discovered_timetaken`, 0) SECOND)
                 )
-                ORDER BY `last_polled_timetaken` DESC""",
+                ORDER BY `last_discovered` IS NULL DESC, `last_polled_timetaken` DESC""",
                 (
                     poller_find_time,
                     self.service_age(),
