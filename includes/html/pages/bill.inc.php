@@ -74,6 +74,13 @@ if (Gate::allows('view', $bill)) {
         [$bill_id]
     );
 
+    $saps = App\Models\MplsSap::query()
+        ->select('mpls_saps.*', 'devices.hostname', 'devices.sysName')
+        ->join('bill_saps', 'bill_saps.sap_id', '=', 'mpls_saps.sap_id')
+        ->join('devices', 'devices.device_id', '=', 'mpls_saps.device_id')
+        ->where('bill_saps.bill_id', $bill_id)
+        ->get();
+
     $vars['view'] ??= 'quick';
 
     function print_port_list($ports)
@@ -95,7 +102,32 @@ if (Gate::allows('view', $bill)) {
         }
 
         echo '</div></div>';
-    }//end print_port_list?>
+    }//end print_port_list
+
+    function print_sap_list($saps)
+    {
+        if ($saps->isEmpty()) {
+            return;
+        }
+
+        echo '<div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Billed SAPs</h3>
+            </div>
+            <div class="list-group">';
+
+        // Collected Earlier
+        foreach ($saps as $sap) {
+            $sapdescr = (empty($sap['sapDescription']) ? '' : ' - ' . htmlentities((string) $sap['sapDescription']));
+            $saplabel = htmlentities((string) $sap['ifName']) . ($sap['sapEncapValue'] ? ':' . htmlentities((string) $sap['sapEncapValue']) : '') . $sapdescr;
+
+            echo '<div class="list-group-item">';
+            echo generate_sap_url($sap, $saplabel) . ' on ' . generate_device_link($sap);
+            echo '</div>';
+        }
+
+        echo '</div></div>';
+    }//end print_sap_list?>
 
     <h2>Bill: <?php echo htmlentities((string) $bill_data['bill_name']); ?></h2>
 
@@ -132,7 +164,7 @@ if (Gate::allows('view', $bill)) {
         $sep = ' | ';
     }
 
-    echo '<div style="font-weight: bold; float: right;"><a href="' . \LibreNMS\Util\Url::generate(['page' => 'bills']) . '/"><i class="fa fa-arrow-left fa-lg icon-theme" aria-hidden="true"></i> Back to Bills</a></div>';
+    echo '<div style="font-weight: bold; float: right;"><a href="' . Url::generate(['page' => 'bills']) . '/"><i class="fa fa-arrow-left fa-lg icon-theme" aria-hidden="true"></i> Back to Bills</a></div>';
 
     print_optionbar_end();
 
@@ -162,6 +194,7 @@ if (Gate::allows('view', $bill)) {
 <div class="row">
 <div class="col-lg-6 col-lg-push-6">
         <?php print_port_list($ports) ?>
+        <?php print_sap_list($saps) ?>
 </div>
 <div class="col-lg-6 col-lg-pull-6">
 <div class="panel panel-default">

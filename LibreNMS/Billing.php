@@ -113,6 +113,23 @@ class Billing
         return $return;
     }
 
+    public static function getLastSapCounter($sap_id, $bill_id): array
+    {
+        $row = \App\Models\BillSapCounter::where('sap_id', $sap_id)->where('bill_id', $bill_id)->first();
+        if ($row !== null) {
+            return [
+                'timestamp' => $row->timestamp,
+                'in_counter' => $row->in_counter,
+                'in_delta' => $row->in_delta,
+                'out_counter' => $row->out_counter,
+                'out_delta' => $row->out_delta,
+                'state' => 'ok',
+            ];
+        }
+
+        return ['state' => 'failed'];
+    }
+
     public static function getLastMeasurement($bill_id): array
     {
         $return = [];

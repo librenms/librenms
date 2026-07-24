@@ -222,7 +222,8 @@ class Mpls implements Module
                 ->leftJoin('mpls_services', 'mpls_saps.svc_id', 'mpls_services.svc_id')
                 ->orderBy('mpls_services.svc_oid')->orderBy('mpls_saps.sapPortId')->orderBy('mpls_saps.sapEncapValue')
                 ->select(['mpls_saps.*', 'mpls_services.svc_oid'])
-                ->get()->map->makeHidden(['sap_id', 'svc_id', 'device_id']),
+                // sapIngressOctets/sapEgressOctets are cumulative traffic counters (used for billing), not inventory
+                ->get()->map->makeHidden(['sap_id', 'svc_id', 'device_id', 'sapIngressOctets', 'sapEgressOctets']),
         ];
     }
 }

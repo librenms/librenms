@@ -58,20 +58,32 @@ if (! $noagg || ! $nodetails) {
 $iter = 0;
 $descr_out = '';
 foreach ($rrd_list as $rrd) {
-    if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours_in.$iter") || ! \App\Facades\LibrenmsConfig::get("graph_colours.$colours_out.$iter")) {
+    if (! App\Facades\LibrenmsConfig::get("graph_colours.$colours_in.$iter") || ! App\Facades\LibrenmsConfig::get("graph_colours.$colours_out.$iter")) {
         $iter = 0;
     }
 
-    $colour_in = \App\Facades\LibrenmsConfig::get("graph_colours.$colours_in.$iter");
-    $colour_out = \App\Facades\LibrenmsConfig::get("graph_colours.$colours_out.$iter");
+    $colour_in = App\Facades\LibrenmsConfig::get("graph_colours.$colours_in.$iter");
+    $colour_out = App\Facades\LibrenmsConfig::get("graph_colours.$colours_out.$iter");
 
     if (! $nodetails) {
-        $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr_in'] ?? $rrd['descr'] ?? '', $descr_len) . '  In';
-        $descr_out = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr_out'] ?? '', $descr_len) . ' Out';
+        $descr = LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr_in'] ?? $rrd['descr'] ?? '', $descr_len) . '  In';
+        $descr_out = LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr_out'] ?? '', $descr_len) . ' Out';
     }
 
-    $rrd_options[] = 'DEF:' . $in . $i . '=' . $rrd['filename'] . ':' . $ds_in . ':AVERAGE';
-    $rrd_options[] = 'DEF:' . $out . $i . '=' . $rrd['filename'] . ':' . $ds_out . ':AVERAGE';
+    // Allow per-file datasource names and an optional divisor to normalise the
+    // datasource to the common unit (e.g. a datasource stored in bits when the
+    // rest of the graph is in octets). Defaults keep the original behaviour.
+    $ds_in_i = $rrd['ds_in'] ?? $ds_in;
+    $ds_out_i = $rrd['ds_out'] ?? $ds_out;
+    if (! empty($rrd['divisor'])) {
+        $rrd_options[] = 'DEF:' . $in . 'raw' . $i . '=' . $rrd['filename'] . ':' . $ds_in_i . ':AVERAGE';
+        $rrd_options[] = 'DEF:' . $out . 'raw' . $i . '=' . $rrd['filename'] . ':' . $ds_out_i . ':AVERAGE';
+        $rrd_options[] = 'CDEF:' . $in . $i . '=' . $in . 'raw' . $i . ',' . $rrd['divisor'] . ',/';
+        $rrd_options[] = 'CDEF:' . $out . $i . '=' . $out . 'raw' . $i . ',' . $rrd['divisor'] . ',/';
+    } else {
+        $rrd_options[] = 'DEF:' . $in . $i . '=' . $rrd['filename'] . ':' . $ds_in_i . ':AVERAGE';
+        $rrd_options[] = 'DEF:' . $out . $i . '=' . $rrd['filename'] . ':' . $ds_out_i . ':AVERAGE';
+    }
     $rrd_options[] = 'CDEF:inB' . $i . '=in' . $i . ",$multiplier,*";
     $rrd_options[] = 'CDEF:outB' . $i . '=out' . $i . ",$multiplier,*";
     $rrd_options[] = 'CDEF:outB' . $i . '_neg=outB' . $i . ',' . $stacked['stacked'] . ',*';
