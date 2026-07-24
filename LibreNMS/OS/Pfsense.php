@@ -26,13 +26,28 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Shared\Unix;
 use LibreNMS\RRD\RrdDefinition;
+use SnmpQuery;
 
 class Pfsense extends Unix implements OSPolling
 {
+    public function discoverOS(Device $device): void
+    {
+        parent::discoverOS($device);
+
+        $processor_load = SnmpQuery::numericIndex()->walk('HOST-RESOURCES-MIB::hrProcessorLoad')->pluck();
+        $processor_index = array_key_first($processor_load);
+
+        if ($processor_index !== null) {
+            $description = SnmpQuery::get("HOST-RESOURCES-MIB::hrDeviceDescr.$processor_index")->value();
+            $device->hardware = $description ?: $device->hardware;
+        }
+    }
+
     public function pollOS(DataStorageInterface $datastore): void
     {
         $oids = snmp_get_multi($this->getDeviceArray(), [
