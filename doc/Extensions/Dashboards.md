@@ -61,6 +61,34 @@ on what you want the users access to change.
 Step 2: Then go to Settings -> WebUI settings -> Dashboard Settings
 and set the global default dashboard.
 
+## NOC Dashboard Rotation
+
+You can create per-user named NOC playlists from dashboards.
+
+1. Open **Overview -> Dashboard -> NOC View**.
+2. Create a playlist name.
+3. Select one or more dashboards you can access.
+4. Save the playlist.
+
+To start rotating, open **Overview -> Dashboard -> NOC View** and choose which playlist to play.
+
+NOC rotation validates dashboards at play time. If a playlist contains missing or inaccessible dashboards,
+LibreNMS asks for confirmation before removing those entries from the playlist and continuing.
+
+Dashboard permissions are unchanged, so only dashboards you can already access are included.
+
+Some browsers block automatic fullscreen requests unless they come from a direct user action, so NOC View shows a centered fullscreen prompt on startup.
+
+### Rotation Interval
+
+The rotation interval is configurable with `webui.noc_rotate_seconds`.
+
+```bash
+lnms config:set webui.noc_rotate_seconds 15
+```
+
+Default is `15` seconds.
+
 ## Setting embedded webpage
 
 Using the Notes Widget.

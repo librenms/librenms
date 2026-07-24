@@ -33,6 +33,7 @@ use App\Http\Controllers\Maps\CustomMapListController;
 use App\Http\Controllers\Maps\CustomMapNodeImageController;
 use App\Http\Controllers\Maps\DeviceDependencyController;
 use App\Http\Controllers\NacController;
+use App\Http\Controllers\NocController;
 use App\Http\Controllers\OuiLookupController;
 use App\Http\Controllers\OutagesController;
 use App\Http\Controllers\OverviewController;
@@ -231,6 +232,14 @@ Route::middleware(['auth'])->group(function (): void {
     Route::resource('dashboard', DashboardController::class)->except(['create', 'edit']);
     Route::post('dashboard/{dashboard}/copy', [DashboardController::class, 'copy'])->name('dashboard.copy');
     Route::post('dashboard/{dashboard}/widgets', [DashboardWidgetController::class, 'add'])->name('dashboard.widget.add');
+
+    // noc
+    Route::get('noc/playlists', [NocController::class, 'playlists'])->name('noc.playlists');
+    Route::post('noc/playlists', [NocController::class, 'storePlaylist'])->name('noc.playlists.store');
+    Route::put('noc/playlists/{playlistId}', [NocController::class, 'updatePlaylist'])->name('noc.playlists.update');
+    Route::delete('noc/playlists/{playlistId}', [NocController::class, 'destroyPlaylist'])->name('noc.playlists.destroy');
+    Route::post('noc/cleanup-all', [NocController::class, 'cleanupAllPlaylists'])->name('noc.cleanup.all');
+    Route::get('noc/play', [NocController::class, 'play'])->name('noc.play');
     Route::delete('dashboard/{dashboard}/widgets', [DashboardWidgetController::class, 'clear'])->name('dashboard.widget.clear');
     Route::put('dashboard/{dashboard}/widgets', [DashboardWidgetController::class, 'update'])->name('dashboard.widget.update');
     Route::delete('dashboard/widgets/{widget}', [DashboardWidgetController::class, 'remove'])->name('dashboard.widget.remove');

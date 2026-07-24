@@ -2509,6 +2509,10 @@ return [
                 'description' => 'Default dashboard',
                 'help' => 'Global default dashboard_id for all users who do not have their own default set',
             ],
+            'noc_rotate_seconds' => [
+                'description' => 'NOC rotate interval',
+                'help' => 'How many seconds to show each dashboard in NOC view before rotating to the next one',
+            ],
             'dynamic_graphs' => [
                 'description' => 'Enable dynamic graphs',
                 'help' => 'Enable dynamic graphs, enables zooming and panning on graphs',

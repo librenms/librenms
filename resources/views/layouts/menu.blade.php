@@ -28,6 +28,13 @@
                                 @endforeach
                                 <li role="presentation" class="divider"></li>
                                 <li>
+                                    <a href="{{ route('noc.playlists') }}">
+                                        <i class="fa fa-repeat fa-fw fa-lg" aria-hidden="true"></i>
+                                        {{ __('dashboard.noc.menu') }}
+                                    </a>
+                                </li>
+                                <li role="presentation" class="divider"></li>
+                                <li>
                                     <a onclick="toggleDashboardEditor()">
                                         <i class="fa fa-bar-chart fa-fw fa-lg" aria-hidden="true"></i>
                                         <span id="toggle-dashboard-editor-text">@if ($hide_dashboard_editor) {{ __('Show Dashboard Editor') }} @else {{ __('Hide Dashboard Editor') }}@endif</span>
