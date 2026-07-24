@@ -15,7 +15,7 @@
                     <x-slot name="heading" class="tw:flex tw:items-center tw:justify-between">
                         <h3 class="panel-title">
                             {{ __('config_backups.backups') }}
-                            <span x-show="!loadingBackups" x-cloak class="tw:font-normal tw:text-xl tw:text-gray-500 tw:dark:text-dark-white-400" x-text="'(' + total + ')'"></span>
+                            <span x-show="!loadingBackups" x-cloak class="tw:font-normal tw:text-gray-500 tw:dark:text-dark-white-400" x-text="'(' + total + ')'"></span>
                         </h3>
                         <button type="button"
                                 :class="total > 1 ? '' : 'tw:invisible'" x-cloak
