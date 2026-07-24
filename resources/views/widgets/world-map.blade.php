@@ -49,6 +49,7 @@
                             iconCreateFunction: function (cluster) {
                                 var markers = cluster.getAllChildMarkers();
                                 var color = "green";
+                                var errorCount = 0;
                                 var newClass = "Cluster marker-cluster marker-cluster-small leaflet-zoom-animated leaflet-clickable";
                                 for (var i = 0; i < markers.length; i++) {
                                     if (markers[i].options.icon.options.markerColor == "blue" && color != "red") {
@@ -56,10 +57,18 @@
                                     }
                                     if (markers[i].options.icon.options.markerColor == "red") {
                                         color = "red";
+                                        errorCount++;
                                     }
                                 }
+                                var hasErrorLabel = errorCount > 0;
+                                var label = hasErrorLabel
+                                    ? errorCount + '/' + cluster.getChildCount()
+                                    : cluster.getChildCount();
+                                var html = hasErrorLabel
+                                    ? '<span style="font-size:9px;">' + label + '</span>'
+                                    : label;
                                 return L.divIcon({
-                                    html: cluster.getChildCount(),
+                                    html: html,
                                     className: color + newClass,
                                     iconSize: L.point(40, 40)
                                 });
