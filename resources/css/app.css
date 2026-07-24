@@ -84,7 +84,7 @@
 }
 
 .lnms-btn-default {
-  @apply tw:bg-[#3a3f44] tw:hover:bg-[#1e2023] tw:text-white!;
+  @apply tw:bg-[#3a3f44] tw:hover:bg-[#1e2023] tw:text-white! tw:dark:bg-dark-gray-200 tw:dark:hover:bg-dark-gray-100 tw:dark:text-dark-white-100!;
 }
 
 .lnms-btn-default .lnms-btn-badge {
