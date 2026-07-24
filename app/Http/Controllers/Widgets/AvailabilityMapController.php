@@ -96,7 +96,8 @@ class AvailabilityMapController extends WidgetController
         $uptime_warn = (int) LibrenmsConfig::get('uptime_warning', 86400);
         $active_maintenance = AlertSchedule::isActive()->pluck('schedule_id');
         if ($active_maintenance->count() > 0) {
-            $active_maintenance_devices = Device::whereHas('alertSchedules', function (Builder $q) use ($active_maintenance) {
+            $active_maintenance_devices = Device::query()
+                ->whereHas('alertSchedules', function (Builder $q) use ($active_maintenance) {
                     $q->wherein('alert_schedule.schedule_id', $active_maintenance);
                 })
                 ->orWhereHas('location.alertSchedules', function (Builder $q) use ($active_maintenance) {
