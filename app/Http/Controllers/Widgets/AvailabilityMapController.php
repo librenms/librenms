@@ -31,6 +31,7 @@ use App\Models\AlertSchedule;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Service;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -93,7 +94,19 @@ class AvailabilityMapController extends WidgetController
 
         // process status
         $uptime_warn = (int) LibrenmsConfig::get('uptime_warning', 86400);
-        $check_maintenance = AlertSchedule::isActive()->exists(); // check if any maintenance schedule is active
+        $active_maintenance = AlertSchedule::isActive()->pluck('schedule_id');
+        if ($active_maintenance->count() > 0) {
+            $active_maintenance_devices = Device::whereHas('alertSchedules', function (Builder $q) use ($active_maintenance) {
+                    $q->wherein('alert_schedule.schedule_id', $active_maintenance);
+                })
+                ->orWhereHas('location.alertSchedules', function (Builder $q) use ($active_maintenance) {
+                    $q->wherein('alert_schedule.schedule_id', $active_maintenance);
+                })
+                ->orWhereHas('groups.alertSchedules', function (Builder $q) use ($active_maintenance) {
+                    $q->wherein('alert_schedule.schedule_id', $active_maintenance);
+                })
+                ->pluck('device_id');
+        }
         // TODO: take a deeper look, why key ignored still has to exist
         $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'maintenance' => 0, 'ignored' => 0, 'ignored-up' => 0, 'ignored-down' => 0, 'disabled' => 0];
         $data = [];
@@ -103,7 +116,7 @@ class AvailabilityMapController extends WidgetController
             [$state_name, $class] = $this->parseDeviceState($device, $uptime_warn);
             $totals[$state_name]++;
 
-            if ($check_maintenance && $device->isUnderMaintenance()) {
+            if (isset($active_maintenance_devices) && $active_maintenance_devices->contains($device->device_id)) {
                 $class = 'label-default';
                 $totals['maintenance']++;
             }

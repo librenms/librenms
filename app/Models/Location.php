@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Util\Dns;
 
@@ -188,6 +189,14 @@ class Location extends Model
     public function devices(): HasMany
     {
         return $this->hasMany(Device::class, 'location_id');
+    }
+
+    /**
+     * @return MorphToMany<AlertSchedule, $this>
+     */
+    public function alertSchedules(): MorphToMany
+    {
+        return $this->morphToMany(AlertSchedule::class, 'alert_schedulable', 'alert_schedulables', 'alert_schedulable_id', 'schedule_id');
     }
 
     public function __toString(): string
