@@ -12,8 +12,78 @@ modules:
             -
                oid:
                   - SFOS-FIREWALL-MIB::sfosIPSecVpnConnName
+                  - SFOS-FIREWALL-MIB::sfosPoEPortLabel
+      temperature:
+          data:
+             -
+                oid: SFOS-FIREWALL-MIB::sfosNPUTemperature
+                num_oid: '.1.3.6.1.4.1.2604.5.1.9.1.{{ $index }}'
+                index: sfosNPUTemperature.0
+                descr: 'NPU temperature'
+                divisor: 10
+             -
+                oid: SFOS-FIREWALL-MIB::sfosCPUTemperature
+                num_oid: '.1.3.6.1.4.1.2604.5.1.9.2.{{ $index }}'
+                index: sfosCPUTemperature.0
+                descr: 'CPU temperature'
+                divisor: 10
+      fanspeed:
+          data:
+             -
+                oid: SFOS-FIREWALL-MIB::sfosFanTable
+                value: SFOS-FIREWALL-MIB::sfosFanSpeed
+                num_oid: '.1.3.6.1.4.1.2604.5.1.9.3.1.2.{{ $index }}'
+                index: sfosFanSpeed.{{ $index }}
+                descr: 'Fan {{ $index }} speed'
+      power:
+          data:
+             -
+                oid: SFOS-FIREWALL-MIB::sfosPoEConsumptionTable
+                value: SFOS-FIREWALL-MIB::sfosPoEPowerUsage
+                num_oid: '.1.3.6.1.4.1.2604.5.1.9.5.1.5.{{ $index }}'
+                index: sfosPoEPowerUsage.{{ $index }}
+                descr: 'PoE {{ SFOS-FIREWALL-MIB::sfosPoEPortLabel }} power usage'
+                divisor: 1000
+      voltage:
+          data:
+             -
+                oid: SFOS-FIREWALL-MIB::sfosPoEConsumptionTable
+                value: SFOS-FIREWALL-MIB::sfosPoEVoltage
+                num_oid: '.1.3.6.1.4.1.2604.5.1.9.5.1.6.{{ $index }}'
+                index: sfosPoEVoltage.{{ $index }}
+                descr: 'PoE {{ SFOS-FIREWALL-MIB::sfosPoEPortLabel }} voltage'
+                divisor: 1000
+      current:
+          data:
+             -
+                oid: SFOS-FIREWALL-MIB::sfosPoEConsumptionTable
+                value: SFOS-FIREWALL-MIB::sfosPoECurrent
+                num_oid: '.1.3.6.1.4.1.2604.5.1.9.5.1.7.{{ $index }}'
+                index: sfosPoECurrent.{{ $index }}
+                descr: 'PoE {{ SFOS-FIREWALL-MIB::sfosPoEPortLabel }} current'
+                divisor: 1000
       state:
          data:
+            -
+               oid: SFOS-FIREWALL-MIB::sfosPowerSupplyTable
+               value: SFOS-FIREWALL-MIB::sfosPowerSupplyStatus
+               num_oid: '.1.3.6.1.4.1.2604.5.1.9.4.1.2.{{ $index }}'
+               index: sfosPowerSupplyStatus.{{ $index }}
+               descr: 'Power supply {{ $index }} status'
+               state_name: sfosPowerSupplyStatus
+               states:
+                  - { value: 1, generic: 0, descr: up }
+                  - { value: 2, generic: 2, descr: down }
+            -
+               oid: SFOS-FIREWALL-MIB::sfosPoEConsumptionTable
+               value: SFOS-FIREWALL-MIB::sfosPoEPowerEnabled
+               num_oid: '.1.3.6.1.4.1.2604.5.1.9.5.1.3.{{ $index }}'
+               index: sfosPoEPowerEnabled.{{ $index }}
+               descr: 'PoE {{ SFOS-FIREWALL-MIB::sfosPoEPortLabel }} power'
+               state_name: sfosPoEPowerEnabled
+               states:
+                  - { value: 1, generic: 0, descr: enabled }
+                  - { value: 2, generic: 1, descr: disabled }
 # HA
             -
                oid: SFOS-FIREWALL-MIB::sfosHAStatus
@@ -179,6 +249,11 @@ modules:
                   - { value: 5, generic: 0, descr: deactivated }
       count:
          data:
+            -
+               oid: SFOS-FIREWALL-MIB::sfosLiveUsersCount
+               num_oid: '.1.3.6.1.4.1.2604.5.1.2.6.{{ $index }}'
+               index: sfosLiveUsersCount.0
+               descr: 'Live Users'
             -
                oid: SFOS-FIREWALL-MIB::sfosIPSecVpnActiveTunnel
                num_oid: '.1.3.6.1.4.1.2604.5.1.6.1.1.1.1.8.{{ $index }}'
