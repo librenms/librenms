@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Url;
 
 // fixme new url format
 
@@ -15,14 +16,15 @@ foreach (dbFetchRows('SELECT * FROM ports WHERE `device_id` = ? AND `ifVrf` = ?'
     $port = cleanPort($port, $device);
     if ($vars['view'] == 'graphs') {
         $graph_type = 'port_' . $vars['graph'];
+        $popup_content = '<div style="font-size: 16px; padding:5px; font-weight: bold; color: #e5e5e5;">' . e($device['hostname'] . ' - ' . $port['ifDescr']) . '</div>' .
+            e($port['ifAlias']) .
+            Url::graphTag(['type' => $graph_type, 'id' => $port['port_id'], 'from' => '-2d', 'width' => 450, 'height' => 150]);
+        $link_text = Url::graphTag(['type' => $graph_type, 'id' => $port['port_id'], 'from' => '-2d', 'width' => 132, 'height' => 40, 'legend' => 'no']);
+        $overlib_link = Url::overlibLink('device/' . $device['device_id'] . '/port/' . $port['port_id'] . '/', $link_text, $popup_content);
+
         echo "<div style='display: block; padding: 2px; margin: 2px; min-width: 139px; max-width:139px; min-height:85px; max-height:85px; text-align: center; float: left; background-color: #e9e9e9;'>
     <div style='font-weight: bold;'>" . Rewrite::shortenIfName($port['ifDescr']) . "</div>
-    <a href='device/" . $device['device_id'] . '/port/' . $port['port_id'] . "/' onmouseover=\"return overlib('\
-    <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #e5e5e5;\'>" . $device['hostname'] . ' - ' . $port['ifDescr'] . '</div>\
-    ' . $port['ifAlias'] . " \
-    <img src=\'graph.php?type=$graph_type&amp;id=" . $port['port_id'] . '&amp;from=' . \App\Facades\LibrenmsConfig::get('time.twoday') . '&amp;to=' . \App\Facades\LibrenmsConfig::get('time.now') . "&amp;width=450&amp;height=150\'>\
-    ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >" . "<img src='graph.php?type=$graph_type&amp;id=" . $port['port_id'] . '&amp;from=' . \App\Facades\LibrenmsConfig::get('time.twoday') . '&amp;to=' . \App\Facades\LibrenmsConfig::get('time.now') . "&amp;width=132&amp;height=40&amp;legend=no'>
-    </a>
+    $overlib_link
     <div style='font-size: 9px;'>" . substr((string) short_port_descr($port['ifAlias']), 0, 22) . '</div>
    </div>';
     } else {
