@@ -42,8 +42,6 @@ class Device extends BaseModel
 {
     use PivotEventTrait, HasFactory, Filterable;
 
-    private ?MaintenanceStatus $maintenanceStatus = null;
-
     public $timestamps = false;
     protected $primaryKey = 'device_id';
     protected $fillable = [
