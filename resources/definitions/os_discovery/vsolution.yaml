@@ -71,4 +71,22 @@ modules:
                     num_oid: '.1.3.6.1.4.1.37950.1.1.5.12.2.1.8.1.7.{{ $index }}'
                     descr: "{{ V1600D::onuAuthInfoDescription2 }}"
                     group: "ONU"
+                -
+                    oid: V1600D::gponPonOpticalTable
+                    value: V1600D::gponPonTxPower
+                    num_oid: '.1.3.6.1.4.1.37950.1.1.5.10.13.7.1.5.{{ $index }}'
+                    descr: "PON {{ $index }} TX Power"
+                    index: "gponPonTxPower.{{ $index }}"
+                    group: "PON Optical"
+                    skip_values:
+                        - 0
+                -
+                    oid: V1600D::gponPonOpticalTable
+                    value: V1600D::gponPonRxPower
+                    num_oid: '.1.3.6.1.4.1.37950.1.1.5.10.13.7.1.6.{{ $index }}'
+                    descr: "PON {{ $index }} RX Power"
+                    index: "gponPonRxPower.{{ $index }}"
+                    group: "PON Optical"
+                    skip_values:
+                        - 0
 
