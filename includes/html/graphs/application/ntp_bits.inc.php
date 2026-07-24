@@ -13,6 +13,6 @@ $colour_area_out = 'FFDD88';
 $colour_area_in_max = 'CC88CC';
 $colour_area_out_max = 'FFEFAA';
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'ntp-server', $app->app_id]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'ntp', $app->app_id]);
 
 require 'includes/html/graphs/generic_duplex.inc.php';
