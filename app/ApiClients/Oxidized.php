@@ -115,11 +115,15 @@ class Oxidized extends BaseApi
     }
 
     /**
-     * Fetch the config for a single version (git oid) of a node.
+     * Fetch the config for a single version (git oid) of a node. A group must be
+     * supplied for grouped nodes, matching the version list lookup.
      */
-    public function getVersionContent(string $node, string $oid): ?string
+    public function getVersionContent(string $node, string $oid, ?string $group = null): ?string
     {
-        $response = $this->request('/node/version/view?node=' . rawurlencode($node) . '&oid=' . rawurlencode($oid) . '&format=text');
+        $response = $this->request('/node/version/view?node=' . rawurlencode($node)
+            . ($group ? '&group=' . rawurlencode($group) : '')
+            . '&oid=' . rawurlencode($oid)
+            . '&format=text');
 
         if ($response === null || ! $response->successful()) {
             return null;
@@ -145,11 +149,13 @@ class Oxidized extends BaseApi
 
     /**
      * Fetch the unified diff between two versions. Oxidized treats oid as the
-     * newer (revised) side and oid2 as the older (original) side.
+     * newer (revised) side and oid2 as the older (original) side. A group must
+     * be supplied for grouped nodes.
      */
-    public function getDiff(string $node, string $newOid, string $oldOid): ?string
+    public function getDiff(string $node, string $newOid, string $oldOid, ?string $group = null): ?string
     {
         $response = $this->request('/node/version/diffs?node=' . rawurlencode($node)
+            . ($group ? '&group=' . rawurlencode($group) : '')
             . '&oid=' . rawurlencode($newOid)
             . '&oid2=' . rawurlencode($oldOid)
             . '&format=text');
