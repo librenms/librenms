@@ -261,7 +261,6 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
     post: function ()
     {
         return {
-            id: "alerts",
 ';
 
     if (is_numeric($rule_id)) {
@@ -291,15 +290,12 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
         $common_output[] = "proc: '$proc',\n";
     }
 
-    if (isset($sort) && $sort != '') {
-        $common_output[] = "sort: '$sort',\n";
-    }
-
     $common_output[] = '
             device_id: \'' . $device['device_id'] . '\'
         }
     },
-    url: "ajax_table.php",
+    url: "' . route('table.alerts') . '",
+    sort: ' . ($sort === 'severity' || $sort == 1 ? '{ severity: "desc" }' : '{ timestamp: "desc" }') . ',
     rowCount: [50, 100, 250, -1],
 
 }).on("loaded.rs.jquery.bootgrid", function() {
