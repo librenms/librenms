@@ -324,30 +324,31 @@
                 },
 
                 enterDiffMode() {
-                    const textBackups = this.backups.filter(b => b.type === 'TEXT');
-                    const selectedIndex = this.selected
-                        ? textBackups.findIndex(b => b.id === this.selected.id)
-                        : -1;
-                    const hasNext = selectedIndex !== -1 && selectedIndex + 1 < textBackups.length;
-
-                    if (hasNext) {
-                        this.diffSelection = [textBackups[selectedIndex], textBackups[selectedIndex + 1]]
-                            .sort((a, b) => a.date - b.date);
-                    } else if (textBackups.length >= 2) {
-                        this.diffSelection = [textBackups[0], textBackups[1]]
-                            .sort((a, b) => a.date - b.date);
-                    } else {
-                        this.diffSelection = [];
-                        this.diffGroups = null;
-                        return;
+                    const textBackups = [];
+                    let selectedIdx = -1;
+                    for (const b of this.backups) {
+                        if (b.type !== 'TEXT') continue;
+                        if (selectedIdx === -1 && this.selected?.id === b.id) {
+                            selectedIdx = textBackups.length;
+                        }
+                        textBackups.push(b);
+                        // Stop once we have the selected item plus the one after it
+                        if (selectedIdx !== -1 && textBackups.length > selectedIdx + 1) break;
                     }
 
-                    this.loadDiff();
+                    if (selectedIdx !== -1) {
+                        const pair = textBackups[selectedIdx + 1] ?? textBackups[selectedIdx - 1];
+                        this.diffSelection = pair ? [textBackups[selectedIdx], pair] : [textBackups[selectedIdx]];
+                    } else {
+                        this.diffSelection = textBackups.slice(0, 2);
+                    }
+
+                    this.diffSelection.length === 2 ? this.loadDiff() : (this.diffGroups = null);
                 },
 
                 exitDiffMode() {
-                    if (this.diffSelection.length >= 1) {
-                        const target = this.diffSelection.length === 2 ? this.diffSelection[1] : this.diffSelection[0];
+                    if (this.diffSelection[0]) {
+                        const target = this.diffSelection[0];
                         if (this.selected?.id !== target.id || this.selected?.content == null) {
                             this.selectBackup(target);
                         }
@@ -357,45 +358,38 @@
                 },
 
                 toggleDiffSelect(backup) {
-                    if (backup.type !== 'TEXT') {
-                        return;
-                    }
+                    if (backup.type !== 'TEXT') return;
 
-                    const index = this.diffSelection.findIndex((b) => b.id === backup.id);
+                    const idx = this.diffSelection.findIndex(b => b.id === backup.id);
 
-                    if (index >= 0) {
-                        this.diffSelection.splice(index, 1);
+                    if (idx !== -1) {
+                        this.diffSelection.splice(idx, 1);
                         this.diffGroups = null;
-                        return;
-                    }
-
-                    if (this.diffSelection.length >= 2) {
-                        this.diffSelection.pop();
-                    }
-
-                    this.diffSelection.push(backup);
-
-                    if (this.diffSelection.length === 2) {
-                        this.diffSelection.sort((a, b) => a.date - b.date);
-                        this.loadDiff();
+                    } else {
+                        this.diffSelection[this.diffSelection.length === 0 ? 0 : 1] = backup;
+                        this.diffSelection.length === 2 ? this.loadDiff() : (this.diffGroups = null);
                     }
                 },
 
+                get sortedDiff() {
+                    if (this.diffSelection.length !== 2) return null;
+                    const [b1, b2] = this.diffSelection;
+                    return b1.date <= b2.date ? { orig: b1, rev: b2 } : { orig: b2, rev: b1 };
+                },
 
                 get diffReady() {
                     return this.diffGroups !== null && this.diffSelection.length === 2;
                 },
 
                 get diffRoleMap() {
-                    if (!this.diffMode || this.diffSelection.length !== 2) {
-                        return {};
-                    }
-                    const [orig, rev] = this.diffSelection;
+                    if (!this.diffMode || !this.sortedDiff) return {};
+                    const { orig, rev } = this.sortedDiff;
                     return { [orig.id]: 'old', [rev.id]: 'new' };
                 },
 
                 async loadDiff() {
-                    const [orig, rev] = this.diffSelection;
+                    if (!this.sortedDiff) return;
+                    const { orig, rev } = this.sortedDiff;
                     const timer = this.beginLoading();
                     this.error = null;
                     this.diffGroups = null;
