@@ -26,7 +26,7 @@ class DeviceMaintenanceCache
         $schedules = AlertSchedule::isActive()
             ->with([
                 'devices:device_id',
-                'locations:location_id',
+                'locations:id',
                 'locations.devices:device_id,location_id',
                 'deviceGroups:id',
                 'deviceGroups.devices:device_id',
