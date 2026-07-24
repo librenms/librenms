@@ -2609,18 +2609,18 @@ function update_device(Illuminate\Http\Request $request)
 function rename_device(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = DeviceCache::get($hostname);
     $new_hostname = $request->route('new_hostname');
-    $new_device = getidbyname($new_hostname);
 
     if (empty($new_hostname)) {
         return api_error(500, 'Missing new hostname');
-    } elseif ($new_device) {
-        return api_error(500, 'Device failed to rename, new hostname already exists');
+    } elseif (! $device->exists) {
+        return api_error(404, 'Existing device not found');
     } else {
-        if (renamehost($device_id, $new_hostname, 'api') == '') {
-            return api_success_noresult(200, 'Device has been renamed');
-        } else {
+        try {
+            $device->hostname = $new_hostname;
+            $device->save();
+        } catch (\Throwable) {
             return api_error(500, 'Device failed to be renamed');
         }
     }
