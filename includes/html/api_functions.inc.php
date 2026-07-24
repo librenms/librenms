@@ -2609,7 +2609,7 @@ function update_device(Illuminate\Http\Request $request)
 function rename_device(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    $device = (ctype_digit($hostname) ? Device::find($hostname) : Device::where('hostname', $hostname)->first());
+    $device = DeviceCache::get($hostname);
     $new_hostname = $request->route('new_hostname');
 
     if (empty($new_hostname)) {
