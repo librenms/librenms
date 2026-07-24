@@ -29,15 +29,17 @@
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
+use App\Models\PortsFdb;
 use App\Models\PortVlan;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\OS;
 use SnmpQuery;
 
-class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery
+class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, FdbTableDiscovery
 {
     public function discoverVlans(): Collection
     {
@@ -74,5 +76,27 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery
                     'port_id' => PortCache::getIdFromIfIndex($vpaIfIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
                 ]);
             })->filter();
+    }
+
+    public function discoverFdbTable(): Collection
+    {
+        $fdbt = new Collection;
+
+        $fdbt = SnmpQuery::mibDir('nokia/aos7')->walk('ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressGblManagement')
+            ->mapTable(function ($data, $vlan, $default, $ifIndex, $vlanIdx, $timestamp, $mac_address) {
+                $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0;
+
+                return new PortsFdb([
+                    'port_id' => $port_id,
+                    'mac_address' => $mac_address,
+                    'vlan_id' => $vlanIdx,
+                ]);
+            });
+
+        if ($fdbt->isEmpty()) {
+            $fdbt = parent::discoverFdbTable();
+        }
+
+        return $fdbt;
     }
 }
