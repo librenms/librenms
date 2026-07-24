@@ -31,7 +31,6 @@ use App\Models\Device;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
@@ -101,10 +100,9 @@ class PageLinks extends Component
         }
 
         // Web
-        $http_port = $device->attribs->firstWhere('attrib_type', 'override_device_http_port') ? ':' . $device->attribs->firstWhere('attrib_type', 'override_device_http_port')->attrib_value : '';
         $device_links['web'] = [
             'icon' => 'fa-globe',
-            'url' => 'https://' . $device->hostname . $http_port,
+            'url' => $device->webUrl(),
             'title' => __('Web'),
             'external' => true,
             'onclick' => 'http_fallback(this); return false;',
@@ -122,22 +120,17 @@ class PageLinks extends Component
         }
 
         // SSH
-        $ssh_port = $device->attribs->firstWhere('attrib_type', 'override_device_ssh_port') ? ':' . $device->attribs->firstWhere('attrib_type', 'override_device_ssh_port')->attrib_value : '';
-        $ssh_url = LibrenmsConfig::get('gateone.server')
-            ? LibrenmsConfig::get('gateone.server') . '?ssh=ssh://' . (LibrenmsConfig::get('gateone.use_librenms_user') ? Auth::user()->username . '@' : '') . $device['hostname'] . '&location=' . $device['hostname']
-            : 'ssh://' . $device->hostname . $ssh_port;
         $device_links['ssh'] = [
             'icon' => 'fa-lock',
-            'url' => $ssh_url,
+            'url' => $device->sshUrl(),
             'title' => __('SSH'),
             'external' => false,
         ];
 
         // Telnet
-        $telnet_port = $device->attribs->firstWhere('attrib_type', 'override_device_telnet_port') ? ':' . $device->attribs->firstWhere('attrib_type', 'override_device_telnet_port')->attrib_value : '';
         $device_links['telnet'] = [
             'icon' => 'fa-terminal',
-            'url' => 'telnet://' . $device->hostname . $telnet_port,
+            'url' => $device->telnetUrl(),
             'title' => __('Telnet'),
             'external' => false,
         ];
