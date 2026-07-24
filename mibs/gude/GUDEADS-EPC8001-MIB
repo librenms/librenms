@@ -1,0 +1,1533 @@
+GUDEADS-EPC8001-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises,
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	Gauge32,
+	Integer32,
+	Unsigned32
+		FROM SNMPv2-SMI
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP
+		FROM SNMPv2-CONF;
+
+gudeads MODULE-IDENTITY
+	LAST-UPDATED "202211230904Z"	-- Nov 23, 2022, 9:04:00 AM
+	ORGANIZATION "GUDE Systems GmbH"
+	CONTACT-INFO
+		"Von-der-Wettern-Str. 23
+		51149 Cologne
+		Germany
+		https://www.gude.info"
+	DESCRIPTION
+		"Expert Power Control 8001 MIB"
+	-- 1.3.6.1.4.1.28507
+	::= { enterprises 28507 }
+
+
+epc8001DeviceInfo OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.100.1.1.2
+	::= { epc8001CommonConfig 2 }
+
+epc8001ProdName OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The Product Name of the device."
+	-- 1.3.6.1.4.1.28507.100.1.1.2.1
+	::= { epc8001DeviceInfo 1 }
+
+
+epc8001FWVersion OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Firmware Version of the device."
+	-- 1.3.6.1.4.1.28507.100.1.1.2.2
+	::= { epc8001DeviceInfo 2 }
+
+
+epc8001HostName OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The configured Host Name."
+	-- 1.3.6.1.4.1.28507.100.1.1.2.3
+	::= { epc8001DeviceInfo 3 }
+
+
+epc8001PhysAddress OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The MAC address of the device."
+	-- 1.3.6.1.4.1.28507.100.1.1.2.4
+	::= { epc8001DeviceInfo 4 }
+
+
+epc8001SerialNumber OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The Serial Number of the device. Not available for all devices. Production start 2026."
+	-- 1.3.6.1.4.1.28507.100.1.1.2.5
+	::= { epc8001DeviceInfo 5 }
+
+
+epc8001ExtInputs OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.100.1.6.2
+	::= { epc8001ExtSensors 2 }
+
+epc8001ExtInputEntry OBJECT-TYPE
+	SYNTAX  Epc8001ExtInputEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc8001ExtInputIndex }
+	-- 1.3.6.1.4.1.28507.100.1.6.2.2.1
+	::= { epc8001ExtInputTable 1 }
+
+
+Epc8001ExtInputEntry ::= SEQUENCE {
+
+	epc8001ExtInputIndex      Unsigned32,
+	epc8001ExtInput           INTEGER,
+	epc8001ExtInputName       OCTET STRING,
+	epc8001ExtInputPortNum    Integer32,
+	epc8001ExtInputBlockIndex Integer32 }
+
+
+epc8001ExtInput OBJECT-TYPE
+	SYNTAX  INTEGER {
+			lo(0),
+			hi(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Input state of device"
+	-- 1.3.6.1.4.1.28507.100.1.6.2.2.1.2
+	::= { epc8001ExtInputEntry 2 }
+
+
+epc8001ExtActiveInputs OBJECT-TYPE
+	SYNTAX  Unsigned32 (1..12)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of suppported Input Channels."
+	-- 1.3.6.1.4.1.28507.100.1.6.2.1
+	::= { epc8001ExtInputs 1 }
+
+
+epc8001ExtInputTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8001ExtInputEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.100.1.6.2.2
+	::= { epc8001ExtInputs 2 }
+
+
+epc8001ExtInputIndex OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.100.1.6.2.2.1.1
+	::= { epc8001ExtInputEntry 1 }
+
+
+epc8001ExtInputName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of
+		the Input"
+	-- 1.3.6.1.4.1.28507.100.1.6.2.2.1.32
+	::= { epc8001ExtInputEntry 32 }
+
+
+epc8001ExtInputPortNum OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of external Sensor Port when value greater zero, else device built-in Input."
+	-- 1.3.6.1.4.1.28507.100.1.6.2.2.1.33
+	::= { epc8001ExtInputEntry 33 }
+
+
+epc8001ExtInputBlockIndex OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Either index of device built-in Input, or index of Input in external sensor."
+	-- 1.3.6.1.4.1.28507.100.1.6.2.2.1.34
+	::= { epc8001ExtInputEntry 34 }
+
+
+epc8001CPUSensors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.100.1.5.14
+	::= { epc8001IntSensors 14 }
+
+epc8001NTPClient OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.100.1.5.15
+	::= { epc8001IntSensors 15 }
+
+epc8001NTPUnixTime OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"show received NTP time as unixtime (secs since 1 January 1970)"
+	-- 1.3.6.1.4.1.28507.100.1.5.15.2
+	::= { epc8001NTPClient 2 }
+
+
+epc8001NTPLastValidTimestamp OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"show seconds since last valid NTP timestamp received"
+	-- 1.3.6.1.4.1.28507.100.1.5.15.3
+	::= { epc8001NTPClient 3 }
+
+
+epc8001NTPTimeValid OBJECT-TYPE
+	SYNTAX  INTEGER {
+			notime(0),
+			valid(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Show if valid Time is received"
+	-- 1.3.6.1.4.1.28507.100.1.5.15.1
+	::= { epc8001NTPClient 1 }
+
+
+epc8001CPUSensorVsystem OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"System Voltage on CPU Board"
+	-- 1.3.6.1.4.1.28507.100.1.5.14.1
+	::= { epc8001CPUSensors 1 }
+
+
+epc8001CPUSensorVaux OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Auxiliary Voltage on CPU Board"
+	-- 1.3.6.1.4.1.28507.100.1.5.14.2
+	::= { epc8001CPUSensors 2 }
+
+
+epc8001CPUSensorVmain OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Main Voltage on CPU Board"
+	-- 1.3.6.1.4.1.28507.100.1.5.14.3
+	::= { epc8001CPUSensors 3 }
+
+
+epc8001CPUSensorTcpu OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Temperature on CPU Board"
+	-- 1.3.6.1.4.1.28507.100.1.5.14.4
+	::= { epc8001CPUSensors 4 }
+
+
+
+epc8001PortAmperageEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8001spPowerIndex,
+		epc8001spPowerActive,
+		epc8001spCurrent,
+		epc8001spVoltage,
+		epc8001spFrequency,
+		epc8001spPowerApparent,
+		epc8001spPowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		current is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.100.3.11
+	::= { events 11 }
+
+epc8001AirPressure OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual air pressure"
+	-- 1.3.6.1.4.1.28507.100.1.6.1.1.5
+	::= { epc8001SensorEntry 5 }
+
+
+epc8001DewPoint OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"dew point for actual temperature and humidity"
+	-- 1.3.6.1.4.1.28507.100.1.6.1.1.6
+	::= { epc8001SensorEntry 6 }
+
+
+epc8001DewPointDiff OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"difference between dew point and actual
+		temperature (Temp - DewPoint)"
+	-- 1.3.6.1.4.1.28507.100.1.6.1.1.7
+	::= { epc8001SensorEntry 7 }
+
+
+epc8001Voltage OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Voltage on Power Channel"
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.6
+	::= { epc8001PowerEntry 6 }
+
+
+epc8001Frequency OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 hz"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Frequency of Power Channel"
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.7
+	::= { epc8001PowerEntry 7 }
+
+
+epc8001AbsEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Absolute Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.12
+	::= { epc8001PowerEntry 12 }
+
+
+epc8001AbsEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Resettable Absolute Active Energy counter.
+		Writing '0' resets all resettable counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.13
+	::= { epc8001PowerEntry 13 }
+
+
+epc8001AbsEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Absolute Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.14
+	::= { epc8001PowerEntry 14 }
+
+
+epc8001ResetTime OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Time in seconds since last Energy
+		Counter reset."
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.15
+	::= { epc8001PowerEntry 15 }
+
+
+epc8001ForwEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Forward Active Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.16
+	::= { epc8001PowerEntry 16 }
+
+
+epc8001ForwEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Forward Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.17
+	::= { epc8001PowerEntry 17 }
+
+
+epc8001ForwEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Forward Active Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.18
+	::= { epc8001PowerEntry 18 }
+
+
+epc8001ForwEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Forward Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.19
+	::= { epc8001PowerEntry 19 }
+
+
+epc8001RevEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reverse Active Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.20
+	::= { epc8001PowerEntry 20 }
+
+
+epc8001RevEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reverse Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.21
+	::= { epc8001PowerEntry 21 }
+
+
+epc8001RevEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Reverse Active Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.22
+	::= { epc8001PowerEntry 22 }
+
+
+epc8001RevEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Reverse Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.23
+	::= { epc8001PowerEntry 23 }
+
+
+epc8001spAbsEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Absolute Active Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.3
+	::= { epc8001spPowerEntry 3 }
+
+
+epc8001AbsEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Absolute Active Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.3
+	::= { epc8001PowerEntry 3 }
+
+
+epc8001spCurrent OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Curent on Power Channel."
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.5
+	::= { epc8001spPowerEntry 5 }
+
+
+epc8001spVoltage OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Voltage on Power Channel"
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.6
+	::= { epc8001spPowerEntry 6 }
+
+
+epc8001spFrequency OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 hz"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Frequency of Power Channel"
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.7
+	::= { epc8001spPowerEntry 7 }
+
+
+gadsEPC8001 OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.100
+	::= { gudeads 100 }
+
+-- Notification Types
+--
+
+events OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.100.3
+	::= { gadsEPC8001 3 }
+
+-- Scalars and Tables
+--
+
+epc8001Objects OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.100.1
+	::= { gadsEPC8001 1 }
+
+epc8001CommonConfig OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.100.1.1
+	::= { epc8001Objects 1 }
+
+epc8001SNMPaccess OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.100.1.1.1
+	::= { epc8001CommonConfig 1 }
+
+epc8001TrapCtrl OBJECT-TYPE
+	SYNTAX  Integer32 (0..3)
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"0 = off
+		1 = Ver. 1
+		2 = Ver. 2c
+		3 = Ver. 3"
+	-- 1.3.6.1.4.1.28507.100.1.1.1.1
+	::= { epc8001SNMPaccess 1 }
+
+
+epc8001TrapIPTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8001TrapIPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"list of all Trap receiver"
+	-- 1.3.6.1.4.1.28507.100.1.1.1.2
+	::= { epc8001SNMPaccess 2 }
+
+
+epc8001spAbsEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Absolute Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.12
+	::= { epc8001spPowerEntry 12 }
+
+
+epc8001TrapIPEntry OBJECT-TYPE
+	SYNTAX  Epc8001TrapIPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"an entry containing management
+		informations regarding the list of trap
+		receivers"
+	INDEX {
+		epc8001TrapIPIndex }
+	-- 1.3.6.1.4.1.28507.100.1.1.1.2.1
+	::= { epc8001TrapIPTable 1 }
+
+
+Epc8001TrapIPEntry ::= SEQUENCE {
+
+	epc8001TrapIPIndex Integer32,
+	epc8001TrapAddr    OCTET STRING }
+
+
+epc8001TrapIPIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..8)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A unique value, greater than zero, for each receiver slot."
+	-- 1.3.6.1.4.1.28507.100.1.1.1.2.1.1
+	::= { epc8001TrapIPEntry 1 }
+
+
+epc8001TrapAddr OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..99))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"DNS name or IP address specifying one Trap receiver slot.
+		A port can optionally be specified: 'name:port' An empty
+		string disables this slot."
+	-- 1.3.6.1.4.1.28507.100.1.1.1.2.1.2
+	::= { epc8001TrapIPEntry 2 }
+
+
+epc8001spAbsEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Resettable Absolute Active Energy counter.
+		Writing '0' resets all resettable counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.13
+	::= { epc8001spPowerEntry 13 }
+
+
+epc8001DeviceConfig OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.100.1.2
+	::= { epc8001Objects 2 }
+
+epc8001IntActors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.100.1.3
+	::= { epc8001Objects 3 }
+
+epc8001relayports OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.100.1.3.1
+	::= { epc8001IntActors 1 }
+
+epc8001portNumber OBJECT-TYPE
+	SYNTAX  Integer32 (1..8)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The number of Relay Ports"
+	-- 1.3.6.1.4.1.28507.100.1.3.1.1
+	::= { epc8001relayports 1 }
+
+
+epc8001spAbsEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Absolute Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.14
+	::= { epc8001spPowerEntry 14 }
+
+
+-- the Interfaces table
+-- The Interfaces table contains information on the entity's
+-- interfaces.  Each sub-layer below the internetwork-layer
+-- of a network interface is considered to be an interface.
+
+epc8001portTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8001portEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"list of all EPC Relay Ports"
+	-- 1.3.6.1.4.1.28507.100.1.3.1.2
+	::= { epc8001relayports 2 }
+
+
+epc8001portEntry OBJECT-TYPE
+	SYNTAX  Epc8001portEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry containing management information applicable to a
+		particular relay port."
+	INDEX {
+		epc8001PortIndex }
+	-- 1.3.6.1.4.1.28507.100.1.3.1.2.1
+	::= { epc8001portTable 1 }
+
+
+Epc8001portEntry ::= SEQUENCE {
+
+	epc8001PortIndex         Integer32,
+	epc8001PortName          OCTET STRING,
+	epc8001PortState         INTEGER,
+	epc8001PortSwitchCount   Integer32,
+	epc8001PortStartupMode   INTEGER,
+	epc8001PortStartupDelay  Integer32,
+	epc8001PortRepowerTime   Integer32,
+	epc8001PortResetDuration Integer32 }
+
+
+epc8001spResetTime OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Time in seconds since last Energy
+		Counter reset."
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.15
+	::= { epc8001spPowerEntry 15 }
+
+
+epc8001PortName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..15))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a Relay Port."
+	-- 1.3.6.1.4.1.28507.100.1.3.1.2.1.2
+	::= { epc8001portEntry 2 }
+
+
+epc8001PortState OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1) }
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"current state of a Relay Port"
+	-- 1.3.6.1.4.1.28507.100.1.3.1.2.1.3
+	::= { epc8001portEntry 3 }
+
+
+epc8001PortSwitchCount OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The total number of switch actions ocurred on a Relay Port.
+		Does not count switch commands which will not switch
+		the ralay state, so just real relay switches are displayed here."
+	-- 1.3.6.1.4.1.28507.100.1.3.1.2.1.4
+	::= { epc8001portEntry 4 }
+
+
+epc8001PortStartupMode OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1),
+			laststate(2) }
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"set Mode of startup sequence (off, on , remember last state)"
+	DEFVAL { off }
+	-- 1.3.6.1.4.1.28507.100.1.3.1.2.1.5
+	::= { epc8001portEntry 5 }
+
+
+epc8001spForwEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Forward Active Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.16
+	::= { epc8001spPowerEntry 16 }
+
+
+epc8001PortStartupDelay OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for startup action"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.100.1.3.1.2.1.6
+	::= { epc8001portEntry 6 }
+
+
+epc8001PortRepowerTime OBJECT-TYPE
+	SYNTAX  Integer32 (0..65535)
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for repower port after switching off"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.100.1.3.1.2.1.7
+	::= { epc8001portEntry 7 }
+
+
+epc8001Buzzer OBJECT-TYPE
+	SYNTAX  Integer32 (0..1)
+	UNITS	"0 = Off, 1 = On"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"turn Buzzer on and off"
+	-- 1.3.6.1.4.1.28507.100.1.3.10
+	::= { epc8001IntActors 10 }
+
+
+epc8001ExtActors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.100.1.4
+	::= { epc8001Objects 4 }
+
+epc8001spForwEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Forward Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.17
+	::= { epc8001spPowerEntry 17 }
+
+
+epc8001IntSensors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.100.1.5
+	::= { epc8001Objects 5 }
+
+epc8001PowerChan OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.100.1.5.1
+	::= { epc8001IntSensors 1 }
+
+epc8001ActivePowerChan OBJECT-TYPE
+	SYNTAX  Unsigned32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of suppported Power Channels."
+	-- 1.3.6.1.4.1.28507.100.1.5.1.1
+	::= { epc8001PowerChan 1 }
+
+
+epc8001PowerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8001PowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"All available Channel Interfaces."
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2
+	::= { epc8001PowerChan 2 }
+
+
+epc8001spForwEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Forward Active Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.18
+	::= { epc8001spPowerEntry 18 }
+
+
+epc8001PowerEntry OBJECT-TYPE
+	SYNTAX  Epc8001PowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry containing management information
+		applicable to a particular Power Channel."
+	INDEX {
+		epc8001PowerIndex }
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1
+	::= { epc8001PowerTable 1 }
+
+
+Epc8001PowerEntry ::= SEQUENCE {
+
+	epc8001PowerIndex                   Integer32,
+	epc8001ChanStatus                   Integer32,
+	epc8001AbsEnergyActive              Gauge32,
+	epc8001PowerActive                  Integer32,
+	epc8001Current                      Gauge32,
+	epc8001Voltage                      Gauge32,
+	epc8001Frequency                    Gauge32,
+	epc8001PowerFactor                  Integer32,
+	epc8001Pangle                       Integer32,
+	epc8001PowerApparent                Integer32,
+	epc8001PowerReactive                Integer32,
+	epc8001AbsEnergyReactive            Gauge32,
+	epc8001AbsEnergyActiveResettable    Gauge32,
+	epc8001AbsEnergyReactiveResettable  Gauge32,
+	epc8001ResetTime                    Gauge32,
+	epc8001ForwEnergyActive             Gauge32,
+	epc8001ForwEnergyReactive           Gauge32,
+	epc8001ForwEnergyActiveResettable   Gauge32,
+	epc8001ForwEnergyReactiveResettable Gauge32,
+	epc8001RevEnergyActive              Gauge32,
+	epc8001RevEnergyReactive            Gauge32,
+	epc8001RevEnergyActiveResettable    Gauge32,
+	epc8001RevEnergyReactiveResettable  Gauge32,
+	epc8001LineSensorName               OCTET STRING }
+
+
+epc8001ChanStatus OBJECT-TYPE
+	SYNTAX  Integer32 (0..1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"0 = data not active, 1 = data valid"
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.2
+	::= { epc8001PowerEntry 2 }
+
+
+epc8001spForwEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Forward Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.19
+	::= { epc8001spPowerEntry 19 }
+
+
+epc8001PowerActive OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Active Power"
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.4
+	::= { epc8001PowerEntry 4 }
+
+
+epc8001Current OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Curent on Power Channel."
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.5
+	::= { epc8001PowerEntry 5 }
+
+
+epc8001spRevEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reverse Active Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.20
+	::= { epc8001spPowerEntry 20 }
+
+
+epc8001PowerFactor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.001"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Power Factor of Channel between
+		-1.0 and 1.00"
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.8
+	::= { epc8001PowerEntry 8 }
+
+
+epc8001Pangle OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 degree"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Phase Angle between Voltage
+		and L Line Current between
+		-180.0 and 180.0"
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.9
+	::= { epc8001PowerEntry 9 }
+
+
+epc8001PowerApparent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"VA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"L Line Mean Apparent Power"
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.10
+	::= { epc8001PowerEntry 10 }
+
+
+epc8001PowerReactive OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"VAR"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"L Line Mean Reactive Power"
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.11
+	::= { epc8001PowerEntry 11 }
+
+
+epc8001spRevEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reverse Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.21
+	::= { epc8001spPowerEntry 21 }
+
+
+epc8001spRevEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Reverse Active Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.22
+	::= { epc8001spPowerEntry 22 }
+
+
+epc8001SinglePortPowerChan OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.100.1.5.5
+	::= { epc8001IntSensors 5 }
+
+epc8001spActivePowerChan OBJECT-TYPE
+	SYNTAX  Unsigned32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of Single Port Power Channels.
+		Value is zero on EPC 8220 series."
+	-- 1.3.6.1.4.1.28507.100.1.5.5.1
+	::= { epc8001SinglePortPowerChan 1 }
+
+
+epc8001spRevEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Reverse Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.23
+	::= { epc8001spPowerEntry 23 }
+
+
+epc8001spPowerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8001spPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"All available Single Port Power Channel Interfaces.
+		Indices 0-5 mean Ports A1 to A6, 6-11 are Ports B1 to B6.
+		This table may not be present on devices that have no
+		measurement on every port."
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2
+	::= { epc8001SinglePortPowerChan 2 }
+
+
+epc8001spPowerEntry OBJECT-TYPE
+	SYNTAX  Epc8001spPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry containing management information applicable
+		to a particular Single Port Power Channel."
+	INDEX {
+		epc8001spPowerIndex }
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1
+	::= { epc8001spPowerTable 1 }
+
+
+Epc8001spPowerEntry ::= SEQUENCE {
+
+	epc8001spPowerIndex                   Integer32,
+	epc8001spChanStatus                   Integer32,
+	epc8001spAbsEnergyActive              Gauge32,
+	epc8001spPowerActive                  Integer32,
+	epc8001spCurrent                      Gauge32,
+	epc8001spVoltage                      Gauge32,
+	epc8001spFrequency                    Gauge32,
+	epc8001spPowerFactor                  Integer32,
+	epc8001spPangle                       Integer32,
+	epc8001spPowerApparent                Integer32,
+	epc8001spPowerReactive                Integer32,
+	epc8001spAbsEnergyReactive            Gauge32,
+	epc8001spAbsEnergyActiveResettable    Gauge32,
+	epc8001spAbsEnergyReactiveResettable  Gauge32,
+	epc8001spResetTime                    Gauge32,
+	epc8001spForwEnergyActive             Gauge32,
+	epc8001spForwEnergyReactive           Gauge32,
+	epc8001spForwEnergyActiveResettable   Gauge32,
+	epc8001spForwEnergyReactiveResettable Gauge32,
+	epc8001spRevEnergyActive              Gauge32,
+	epc8001spRevEnergyReactive            Gauge32,
+	epc8001spRevEnergyActiveResettable    Gauge32,
+	epc8001spRevEnergyReactiveResettable  Gauge32 }
+
+
+epc8001spChanStatus OBJECT-TYPE
+	SYNTAX  Integer32 (0..1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"0 = data not active, 1 = data valid"
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.2
+	::= { epc8001spPowerEntry 2 }
+
+
+epc8001spPowerActive OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Active Power"
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.4
+	::= { epc8001spPowerEntry 4 }
+
+
+epc8001spPowerFactor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.001"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Power Factor of Channel between
+		-1.0 and 1.00"
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.8
+	::= { epc8001spPowerEntry 8 }
+
+
+epc8001spPangle OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 degree"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Phase Angle between Voltage
+		and L Line Current between
+		-180.0 and 180.0"
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.9
+	::= { epc8001spPowerEntry 9 }
+
+
+epc8001spPowerApparent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"VA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"L Line Mean Apparent Power"
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.10
+	::= { epc8001spPowerEntry 10 }
+
+
+epc8001spPowerReactive OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"VAR"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"L Line Mean Reactive Power"
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.11
+	::= { epc8001spPowerEntry 11 }
+
+
+epc8001ExtSensors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.100.1.6
+	::= { epc8001Objects 6 }
+
+epc8001SensorTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8001SensorEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.100.1.6.1
+	::= { epc8001ExtSensors 1 }
+
+
+epc8001SensorIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.100.1.6.1.1.1
+	::= { epc8001SensorEntry 1 }
+
+
+epc8001TempSensor OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual temperature"
+	-- 1.3.6.1.4.1.28507.100.1.6.1.1.2
+	::= { epc8001SensorEntry 2 }
+
+
+epc8001HygroSensor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 percent humidity"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual humidity"
+	-- 1.3.6.1.4.1.28507.100.1.6.1.1.3
+	::= { epc8001SensorEntry 3 }
+
+
+-- Conformance
+--
+
+epc8001Conf OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.100.2
+	::= { gadsEPC8001 2 }
+
+-- Groups
+--
+
+epc8001Groups OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.100.2.1
+	::= { epc8001Conf 1 }
+
+-- Compliance
+--
+
+epc8001Compls OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.100.2.2
+	::= { epc8001Conf 2 }
+
+
+epc8001SwitchEvtPort NOTIFICATION-TYPE
+	OBJECTS {
+		epc8001PortIndex,
+		epc8001PortName,
+		epc8001PortState,
+		epc8001PortSwitchCount}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a port is switched"
+	-- 1.3.6.1.4.1.28507.100.3.1
+	::= { events 1 }
+
+
+epc8001TempEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8001SensorIndex,
+		epc8001TempSensor}
+	STATUS  current
+	DESCRIPTION
+		"temperature limits exceeded"
+	-- 1.3.6.1.4.1.28507.100.3.2
+	::= { events 2 }
+
+
+epc8001HygroEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8001SensorIndex,
+		epc8001HygroSensor}
+	STATUS  current
+	DESCRIPTION
+		"hygro limits exceeded"
+	-- 1.3.6.1.4.1.28507.100.3.3
+	::= { events 3 }
+
+
+epc8001AirPressureEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8001SensorIndex,
+		epc8001AirPressure}
+	STATUS  current
+	DESCRIPTION
+		"Air Pressure limits exceeded
+
+		"
+	-- 1.3.6.1.4.1.28507.100.3.5
+	::= { events 5 }
+
+
+epc8001DewPtDiffEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8001SensorIndex,
+		epc8001DewPointDiff}
+	STATUS  current
+	DESCRIPTION
+		"Dew Point Difference limits exceeded"
+	-- 1.3.6.1.4.1.28507.100.3.6
+	::= { events 6 }
+
+epc8001BasicGroup OBJECT-GROUP
+	OBJECTS {
+		epc8001TrapCtrl,
+		epc8001TrapIPIndex,
+		epc8001TrapAddr,
+		epc8001portNumber,
+		epc8001PortIndex,
+		epc8001PortName,
+		epc8001PortState,
+		epc8001PortSwitchCount,
+		epc8001PortStartupMode,
+		epc8001PortStartupDelay,
+		epc8001PortRepowerTime,
+		epc8001PortResetDuration,
+		epc8001Buzzer,
+		epc8001ActivePowerChan,
+		epc8001PowerIndex,
+		epc8001ChanStatus,
+		epc8001AbsEnergyActive,
+		epc8001PowerActive,
+		epc8001Current,
+		epc8001Voltage,
+		epc8001Frequency,
+		epc8001PowerFactor,
+		epc8001Pangle,
+		epc8001PowerApparent,
+		epc8001PowerReactive,
+		epc8001AbsEnergyReactive,
+		epc8001AbsEnergyActiveResettable,
+		epc8001AbsEnergyReactiveResettable,
+		epc8001ResetTime,
+		epc8001ForwEnergyActive,
+		epc8001ForwEnergyReactive,
+		epc8001ForwEnergyActiveResettable,
+		epc8001ForwEnergyReactiveResettable,
+		epc8001RevEnergyActive,
+		epc8001RevEnergyReactive,
+		epc8001RevEnergyActiveResettable,
+		epc8001RevEnergyReactiveResettable,
+		epc8001LineSensorName,
+		epc8001spActivePowerChan,
+		epc8001spPowerIndex,
+		epc8001spChanStatus,
+		epc8001spAbsEnergyActive,
+		epc8001spPowerActive,
+		epc8001spCurrent,
+		epc8001spVoltage,
+		epc8001spFrequency,
+		epc8001spPowerFactor,
+		epc8001spPangle,
+		epc8001spPowerApparent,
+		epc8001spPowerReactive,
+		epc8001spAbsEnergyReactive,
+		epc8001spAbsEnergyActiveResettable,
+		epc8001spAbsEnergyReactiveResettable,
+		epc8001spResetTime,
+		epc8001spForwEnergyActive,
+		epc8001spForwEnergyReactive,
+		epc8001spForwEnergyActiveResettable,
+		epc8001spForwEnergyReactiveResettable,
+		epc8001spRevEnergyActive,
+		epc8001spRevEnergyReactive,
+		epc8001spRevEnergyActiveResettable,
+		epc8001spRevEnergyReactiveResettable,
+		epc8001CPUSensorVsystem,
+		epc8001CPUSensorVaux,
+		epc8001CPUSensorVmain,
+		epc8001CPUSensorTcpu,
+		epc8001NTPTimeValid,
+		epc8001NTPUnixTime,
+		epc8001NTPLastValidTimestamp,
+		epc8001SensorIndex,
+		epc8001TempSensor,
+		epc8001HygroSensor,
+		epc8001AirPressure,
+		epc8001DewPoint,
+		epc8001DewPointDiff,
+		epc8001ExtSensorName,
+		epc8001ExtActiveInputs,
+		epc8001ExtInputIndex,
+		epc8001ExtInput,
+		epc8001ExtInputName,
+		epc8001ExtInputPortNum,
+		epc8001ExtInputBlockIndex,
+		epc8001ProdName,
+		epc8001FWVersion,
+		epc8001HostName,
+		epc8001PhysAddress,
+		epc8001SerialNumber }
+	STATUS  current
+	DESCRIPTION
+		"Basic objects."
+	-- 1.3.6.1.4.1.28507.100.2.1.1
+	::= { epc8001Groups 1 }
+
+epc8001NotificationGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		epc8001SwitchEvtPort,
+		epc8001TempEvtSen,
+		epc8001HygroEvtSen,
+		epc8001AirPressureEvtSen,
+		epc8001DewPtDiffEvtSen,
+		epc8001LineAmperageEvt,
+		epc8001PortAmperageEvt,
+		epc8001ExtInputEvt }
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.100.2.1.2
+	::= { epc8001Groups 2 }
+
+
+epc8001LineAmperageEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8001PowerIndex,
+		epc8001PowerActive,
+		epc8001Current,
+		epc8001Voltage,
+		epc8001Frequency,
+		epc8001PowerApparent,
+		epc8001PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		current is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.100.3.9
+	::= { events 9 }
+
+epc8001ExtSensorName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a
+		external Sensor"
+	-- 1.3.6.1.4.1.28507.100.1.6.1.1.32
+	::= { epc8001SensorEntry 32 }
+
+
+epc8001PortIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..5)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A unique value, greater than zero, for each Relay Port."
+	-- 1.3.6.1.4.1.28507.100.1.3.1.2.1.1
+	::= { epc8001portEntry 1 }
+
+
+epc8001PowerIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Index of Power Channel entries"
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.1
+	::= { epc8001PowerEntry 1 }
+
+
+epc8001spPowerIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..8)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Index of Single Port Power Channel entries.
+		Indices 0-5 mean Ports A1 to A6, 6-11 are Ports B1 to B6."
+	-- 1.3.6.1.4.1.28507.100.1.5.5.2.1.1
+	::= { epc8001spPowerEntry 1 }
+
+
+epc8001LineSensorName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a
+		Line Sensor"
+	-- 1.3.6.1.4.1.28507.100.1.5.1.2.1.100
+	::= { epc8001PowerEntry 100 }
+
+
+epc8001PortResetDuration OBJECT-TYPE
+	SYNTAX  Integer32 (0..65535)
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for turning Port on again after Reset action"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.100.1.3.1.2.1.8
+	::= { epc8001portEntry 8 }
+
+
+epc8001SensorEntry OBJECT-TYPE
+	SYNTAX  Epc8001SensorEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc8001SensorIndex }
+	-- 1.3.6.1.4.1.28507.100.1.6.1.1
+	::= { epc8001SensorTable 1 }
+
+
+Epc8001SensorEntry ::= SEQUENCE {
+
+	epc8001SensorIndex   Integer32,
+	epc8001TempSensor    Integer32,
+	epc8001HygroSensor   Integer32,
+	epc8001AirPressure   Integer32,
+	epc8001DewPoint      Integer32,
+	epc8001DewPointDiff  Integer32,
+	epc8001ExtSensorName OCTET STRING }
+
+
+
+epc8001ExtInputEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8001ExtInputIndex,
+		epc8001ExtInput,
+		epc8001ExtInputName,
+		epc8001ExtInputPortNum,
+		epc8001ExtInputBlockIndex}
+	STATUS  current
+	DESCRIPTION
+		"Change of external sensor input."
+	-- 1.3.6.1.4.1.28507.100.3.12
+	-- 1.3.6.1.4.1.28507.100.3.25
+::= { events 25 }
+
+END

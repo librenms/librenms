@@ -53,7 +53,7 @@ unset($sep);
 
 print_optionbar_end();
 
-$group = $vars['group'] ?? array_key_first($graph_enable);
+$group = basename((string) ($vars['group'] ?? array_key_first($graph_enable)));
 $graph_enable = $graph_enable[$group] ?? [];
 
 if (($group != 'customoid') && is_file("includes/html/pages/device/graphs/$group.inc.php")) {

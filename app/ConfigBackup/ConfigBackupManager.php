@@ -38,7 +38,8 @@ class ConfigBackupManager
      */
     public static array $providers = [
         \App\ConfigBackup\Providers\UnimusProvider::class,
-        // future: OxidizedProvider::class, RancidProvider::class
+        \App\ConfigBackup\Providers\OxidizedProvider::class,
+        // future: RancidProvider::class
     ];
 
     public function providerFor(Device $device): ?ConfigBackupProvider

@@ -120,7 +120,7 @@ if (Gate::denies('viewAny', Vrf::class)) {
             foreach ($vrf_devices[$vrf['vrf_name']][$vrf['mplsVpnVrfRouteDistinguisher']] as $device) {
                 echo "<tr><td width=200><a href='";
                 echo Url::generate(['page' => 'device'], ['device' => $device['device_id'], 'tab' => 'routing', 'view' => 'basic', 'proto' => 'vrf']);
-                echo "'>" . DeviceCache::get($device['device_id'])->displayName() . '</a> ';
+                echo "'>" . htmlentities((string) DeviceCache::get($device['device_id'])->displayName()) . '</a> ';
 
                 if ($device['vrf_name'] != $vrf['vrf_name']) {
                     $overlib_content = '<div class="list-large">VRF Inconsistency</div>Expected Name : ' . e($vrf['vrf_name']) . '<br />Configured : ' . e($device['vrf_name']);
