@@ -1,0 +1,284 @@
+HM2-ETB-MIB DEFINITIONS ::= BEGIN
+-- 
+-- ***********************************************************
+-- Hirschmann Ethernet Train Backbone MIB
+-- ***********************************************************
+--
+IMPORTS
+ 
+    MODULE-IDENTITY,  OBJECT-TYPE, OBJECT-IDENTITY,
+    Integer32									               FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue, RowStatus			       FROM SNMPv2-TC  
+    InterfaceIndexOrZero									   FROM IF-MIB 
+    hm2ConfigurationMibs,
+    HmEnabledStatus								       		   FROM HM2-TC-MIB;
+ 
+	
+hm2EtbMib  MODULE-IDENTITY
+    LAST-UPDATED "201508130000Z" -- August 8, 2015
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        		 "Hirschmann Ethernet Train Backbone MIB.
+         	 	 Copyright (C) 2015. All Rights Reserved."        	 	  
+ 
+    REVISION     "201508130000Z" -- August 8, 2015
+    DESCRIPTION
+         	 	 "Initial version."
+    ::= { hm2ConfigurationMibs 130 }
+ 
+Hm2CstUuid ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "4x-2x-2x-2x-6x"  
+    STATUS       current
+    DESCRIPTION  "."
+    SYNTAX       OCTET STRING (SIZE(16))
+
+-- 
+-- ***********************************************************
+-- hm2EtbMib
+-- ***********************************************************
+--
+-- hm2EtbNotifications		OBJECT IDENTIFIER ::= { hm2EtbMib 0 }
+hm2EtbMibObjects			OBJECT IDENTIFIER ::= { hm2EtbMib 1 }
+-- hm2EtbMibConformance		OBJECT IDENTIFIER ::= { hm2EtbMib 2 }
+hm2EtbMibSNMPExtensionGroup	OBJECT IDENTIFIER ::= { hm2EtbMib 3 }
+ 
+-- 
+-- ***********************************************************
+-- hm2Etb Groups 
+-- ***********************************************************
+--
+hm2TtdpGroup     	OBJECT IDENTIFIER ::= { hm2EtbMibObjects 1 }
+ 
+	
+-- ****************************************************************************
+-- ETB Protocols
+-- ****************************************************************************
+ 
+-- *********************************
+-- ***  TTDP ***
+-- *********************************
+hm2TtdpAdminState OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The TTDP protocol administrative status."
+			::= { hm2TtdpGroup 1 }	
+			
+hm2TtdpOperState OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+				lagsNotCreated (1),
+				lagsCreatedNotUp (2),
+				lagsNoMemberPort (3),	
+				routingNotReady (4),
+				lagsReady (5),
+				componentDisable (6),
+				localETBNInhibit (7),
+				remoteETBNInhibit (8),
+				appInhibit (9),
+				consistUUIDMissing (10),
+				backboneIDMissing (11),
+				etbnCountMissing (12),
+				cnCountMissing (13),
+				ownETBNIdMissing(14),
+				etbnHasNoCN (15),
+				running (16),
+				singleDeviceInaugurated (17),
+				trainInaugurated (18)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Operational status of TTDP that specifies if the protocol is running or the reason why it is not running."
+			::= { hm2TtdpGroup 2 }	
+			
+hm2TtdpCstCnCnt OBJECT-TYPE
+			SYNTAX Integer32 (0..32)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Number of Consist networks (CN) that can be connected to the Ethernet Train Backbone Nodes (ETBN) located in Consist, including the CNs that are not currently connected.
+				 ETBNs  located in the same Consist MUST have the same value configured."
+			::= { hm2TtdpGroup 3 }
+ 
+hm2TtdpCstEtbnCnt OBJECT-TYPE
+			SYNTAX Integer32 (0..63)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Number of Ethernet Train Backbone Nodes (ETBN)  located in Consist, including the ETBNs that are not powered off.
+                 All the ETBNs  located in the same Consist MUST have the same value configured." 
+			::= { hm2TtdpGroup 4 }
+			
+hm2TtdpCstUuid OBJECT-TYPE
+			SYNTAX Hm2CstUuid
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Universally Unique IDentifier of Consist in the train network.
+All the Ethernet Train Backbone Nodes (ETBN) located in the same Consist MUST have the same value configured." 
+
+			::= { hm2TtdpGroup 5 }
+ 
+hm2TtdpCstCurrentEtbnNumber OBJECT-TYPE
+			SYNTAX Integer32 (1..63)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The physical position number of the Ethernet Train Backbone Node (ETBN) in Consist, taking into account also the ETBNs that are not currently powered on."
+			::= { hm2TtdpGroup 6 }
+			
+hm2TtdpBackboneId OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+				tcms(1),
+				multimedia(2),
+				notSpecialized1(3),
+				notSpecialized2(4)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The backbone ID is the ID of one of four Train Networks (backbones) in wich this ETBN  is member, that can be configured."
+			DEFVAL		 { tcms }
+			::= { hm2TtdpGroup 7 }
+			
+hm2TtdpLocalEtbnInhibit OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Inhibit the TTDP protocol. If the ETBN inhibition is set to (true) 
+then the train inauguration or re-inauguration will not start."
+			DEFVAL	{ false }
+			::= { hm2TtdpGroup 8 }
+			
+hm2TtdpETBNRole     OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			     switch(1),
+			     router(2)			     
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Role that Ethernet Train Backbone Node (ETBN) will take in backbone.
+				 If ETBN is used to connect one or multiple Consist networks then the role MUST be set to (router).
+                 If ETBN is used to directly connect several End Devices (ED) on the backbone then the role MUST be set to (switch)."
+			DEFVAL   { router }
+			::= { hm2TtdpGroup 9 } 
+--
+-- hm2TtdpCnToEtbnTable
+--
+hm2TtdpCnToEtbnTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Hm2TtdpCnToEtbnEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"List of Consist networks (CN) assigned to an ETBN in this consist."
+			::= { hm2TtdpGroup 20 }
+ 
+hm2TtdpCnToEtbnEntry OBJECT-TYPE
+			SYNTAX Hm2TtdpCnToEtbnEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Entries in this table."
+			INDEX { hm2TtdpCnToEtbnTableIdx, hm2TtdpCnToEtbnCnTableIdx }
+			::= { hm2TtdpCnToEtbnTable 1 }
+ 
+Hm2TtdpCnToEtbnEntry::=
+			SEQUENCE {
+                hm2TtdpCnToEtbnTableIdx
+                    Integer32,
+				hm2TtdpCnToEtbnCnTableIdx
+					Integer32,
+				hm2TtdpCnToEtbnIntf
+					InterfaceIndexOrZero,
+				hm2TtdpCnToEtbnUseDHCPServer
+					INTEGER,				
+				hm2TtdpCnToEtbnRowStatus 
+					RowStatus
+			 }
+
+hm2TtdpCnToEtbnTableIdx OBJECT-TYPE
+			SYNTAX Integer32 (1..63)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Index in this CN to ETBN table. ETBN id."
+			::= { hm2TtdpCnToEtbnEntry 1 }
+			
+hm2TtdpCnToEtbnCnTableIdx OBJECT-TYPE
+			SYNTAX Integer32 (1..32)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Index in this CN to ETBN table. CN id."
+			::= { hm2TtdpCnToEtbnEntry 2 }
+ 
+hm2TtdpCnToEtbnIntf OBJECT-TYPE
+			SYNTAX InterfaceIndexOrZero
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Interface that connects this ETBN with a CN."
+			DEFVAL { 0 }
+			::= { hm2TtdpCnToEtbnEntry 3 }
+			
+hm2TtdpCnToEtbnUseDHCPServer OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			     none(1),
+			     dhcp(2),
+			     nat(3)			     
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+                "Tell if local TTDP DHCP server is used to give IP to ETBN networks. If is set to false NAT rules will be added to translate from static networks
+                 to TTDP standard addressing. Also if is false interfaces that connect the networks should be statically configured else the network on that
+                 interface will be nonfunctional. The static network mask should be 18."
+			DEFVAL	{ none }
+			::= { hm2TtdpCnToEtbnEntry 4 }
+						
+hm2TtdpCnToEtbnRowStatus OBJECT-TYPE
+    		SYNTAX 	RowStatus
+   		 	MAX-ACCESS read-create
+    		STATUS current
+    		DESCRIPTION 
+    			"Describes the status of a row in the table."
+    		::= { hm2TtdpCnToEtbnEntry 5 }
+    		
+--***************************************************************************
+-- hm2EtbMibSNMPExtensionGroup
+--***************************************************************************
+
+hm2TttdpWrongEtbnIdWhenSettingPortError OBJECT-IDENTITY
+   STATUS        current
+   DESCRIPTION   "Cannot set port or use of DHCP server because ETBN ID used is different from local ETBN ID."
+   ::= { hm2EtbMibSNMPExtensionGroup 1 }
+   
+hm2TttdpChangeSettingWhileTttdpEnabledError OBJECT-IDENTITY
+   STATUS        current
+   DESCRIPTION   "Cannot change this setting while TTDP is enabled."
+   ::= { hm2EtbMibSNMPExtensionGroup 2 } 
+   
+hm2TttdpEnableTtdpButLagsNotCreatedError OBJECT-IDENTITY
+   STATUS        current
+   DESCRIPTION   "Cannot enable TTDP if not both lag/1 and lag/2 are created."
+   ::= { hm2EtbMibSNMPExtensionGroup 3 } 
+   
+hm2TttdpAddConsistNetworkToSwitchError OBJECT-IDENTITY
+   STATUS        current
+   DESCRIPTION   "Cannot add a Consist Network if the device is a switch."
+   ::= { hm2EtbMibSNMPExtensionGroup 4 }  
+
+END

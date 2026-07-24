@@ -1,0 +1,197 @@
+
+HM2-L2FORWARDING-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Hirschmann L2 Forwarding MIB
+-- *************************************************************
+--
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, Unsigned32,
+    Integer32					FROM SNMPv2-SMI
+    hm2ConfigurationMibs,
+		HmEnabledStatus        FROM HM2-TC-MIB;
+
+hm2L2ForwardingMib MODULE-IDENTITY
+	LAST-UPDATED "201103160000Z" -- March 16, 2011
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann L2 Forwarding MIB.
+         Copyright (C) 2011. All Rights Reserved."
+    REVISION     "201103160000Z" -- March 16, 2011
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 30 }
+
+--
+-- *************************************************************
+-- hm2L2ForwardingMib
+-- *************************************************************
+--
+hm2L2ForwardingMibNotifications		OBJECT IDENTIFIER ::= { hm2L2ForwardingMib 0 }
+hm2L2ForwardingMibObjects			OBJECT IDENTIFIER ::= { hm2L2ForwardingMib 1 }
+-- hm2L2ForwardingMibConformance		OBJECT IDENTIFIER ::= { hm2L2ForwardingMib 2 }
+
+
+--
+-- *************************************************************
+-- hm2L2Forwarding groups
+-- *************************************************************
+--
+hm2L2ForwGeneralGroup			OBJECT IDENTIFIER ::= { hm2L2ForwardingMibObjects 1 }
+hm2L2ForwClassOfServiceGroup	OBJECT IDENTIFIER ::= { hm2L2ForwardingMibObjects 2 }
+
+---
+--- The General Forwarding Group
+---	  
+
+hm2L2VlanUnawareModeAdminStatus	 OBJECT-TYPE
+		SYNTAX 		HmEnabledStatus
+		MAX-ACCESS	read-write
+		STATUS 		current
+		DESCRIPTION   	
+			"Enables or disables VLAN unaware mode for the switch unit."
+		DEFVAL { disable }
+		::= { hm2L2ForwGeneralGroup 1 }
+
+hm2L2VlanUnawareModeOperStatus	 OBJECT-TYPE
+		SYNTAX 	 	HmEnabledStatus	
+		MAX-ACCESS	read-only
+		STATUS 		current
+		DESCRIPTION   	
+			"Shows if VLAN unaware mode for the switch unit is enables or disables."
+		::= { hm2L2ForwGeneralGroup 2 }
+
+		
+---
+--- The Class of Service Group
+---	  
+		
+		
+		
+-- -------------------------------------------------------------
+-- Traffic Class Table (replacement for port based dot1dTrafficClassTable)
+-- -------------------------------------------------------------
+
+		hm2TrafficClassTable OBJECT-TYPE
+		    SYNTAX      SEQUENCE OF Hm2TrafficClassEntry
+		    MAX-ACCESS  not-accessible
+		    STATUS      current
+		    DESCRIPTION
+		        "A table mapping evaluated User Priority to Traffic
+		        Class, for forwarding by the bridge.  Traffic class is a
+		        number in the range (0..(dot1dPortNumTrafficClasses-1))."
+		    REFERENCE
+		        "ISO/IEC 15802-3 Table 7-2"
+		    ::= { hm2L2ForwClassOfServiceGroup 1 }
+
+		hm2TrafficClassEntry OBJECT-TYPE
+		    SYNTAX      Hm2TrafficClassEntry
+		    MAX-ACCESS  not-accessible
+		    STATUS      current
+		    DESCRIPTION
+		        "User Priority to Traffic Class mapping."
+		    INDEX   { hm2TrafficClassPriority }
+		    ::= { hm2TrafficClassTable 1 }
+
+		Hm2TrafficClassEntry ::=
+		    SEQUENCE {
+		        hm2TrafficClassPriority
+		            Integer32,
+		        hm2TrafficClass
+		            Integer32
+		    }
+
+		hm2TrafficClassPriority OBJECT-TYPE
+		    SYNTAX      Integer32 (0..7)
+		    MAX-ACCESS  not-accessible
+		    STATUS      current
+		    DESCRIPTION
+		        "The Priority value determined for the received frame.
+		        This value is equivalent to the priority indicated in
+		        the tagged frame received, or one of the evaluated
+		        priorities, determined according to the media-type.
+
+		        For untagged frames received from Ethernet media, this
+		        value is equal to the dot1dPortDefaultUserPriority value
+		        for the ingress port."
+		    ::= { hm2TrafficClassEntry 1 }
+
+		hm2TrafficClass OBJECT-TYPE
+		    SYNTAX      Integer32 (0..7)
+		    MAX-ACCESS  read-write
+		    STATUS      current
+		    DESCRIPTION
+		        "The Traffic Class the received frame is mapped to."
+		    ::= { hm2TrafficClassEntry 2 }
+
+		
+-- -------------------------------------------------------------
+-- IP DSCP mapping table (replacement for port based hm2AgentCosMapIpDscpTable)
+-- -------------------------------------------------------------
+		
+   -- IP DSCP mapping table
+		
+	    hm2CosMapIpDscpTable OBJECT-TYPE
+	         SYNTAX      SEQUENCE OF Hm2CosMapIpDscpEntry
+	         MAX-ACCESS  not-accessible
+	         STATUS      current
+	         DESCRIPTION
+	                     "A table mapping evaluated IP DSCP to Traffic Class 
+	                     for a specific physical port.  Traffic class is a 
+	                     number in the range 
+	                     (0..(dot1dPortNumTrafficClasses-1))."
+	         
+	         ::= { hm2L2ForwClassOfServiceGroup 2 }             
+	         
+	    hm2CosMapIpDscpEntry OBJECT-TYPE
+	         SYNTAX      Hm2CosMapIpDscpEntry
+	         MAX-ACCESS  not-accessible
+	         STATUS      current
+	         DESCRIPTION
+	                     "IP DSCP to Traffic Class mapping for a port."
+	         INDEX   { hm2CosMapIpDscpValue }
+	         ::= { hm2CosMapIpDscpTable 1 }
+
+	    Hm2CosMapIpDscpEntry ::=
+	         SEQUENCE {
+	            hm2CosMapIpDscpValue			Unsigned32,	
+	            hm2CosMapIpDscpTrafficClass		Unsigned32
+	         }
+
+	         hm2CosMapIpDscpValue OBJECT-TYPE
+	              SYNTAX      Unsigned32 (0..63)
+	              MAX-ACCESS  not-accessible
+	              STATUS      current
+	              DESCRIPTION
+	                          "The IP DSCP value contained in the received frame.  
+	                          This value is only indicated in IP packets, but is 
+	                          independent of both media-type and frame tagging.
+	                          
+	                          Non-IP packets are handled in accordance with the 
+	                          dot1dPortDefaultUserPriority value of the ingress 
+	                          port."
+
+	              ::= { hm2CosMapIpDscpEntry 1 }
+
+	         hm2CosMapIpDscpTrafficClass OBJECT-TYPE
+	              SYNTAX      Unsigned32 (0..7)
+	              MAX-ACCESS  read-write
+	              STATUS      current
+	              DESCRIPTION
+	                          "Traffic class priority queue the received frame is 
+	                          mapped to."
+	                         
+	              ::= { hm2CosMapIpDscpEntry 2 }
+
+		
+END
+
