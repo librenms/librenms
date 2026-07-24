@@ -1249,6 +1249,13 @@ return [
                 'description' => '基礎 URI',
                 'help' => '若您修改了 Graylog 預設值，可覆寫 base uri。',
             ],
+            'loglevel' => [
+                'description' => '裝置概觀記錄等級',
+                'help' => 'Sets the maximum log level shown on the device overview page.',
+            ],
+            'rowCount' => [
+                'description' => '裝置概觀資料筆數',
+                'help' => 'Sets the number of rows show on the device overview page.',
             'device-page' => [
                 'loglevel' => [
                     'description' => '裝置概觀記錄等級',

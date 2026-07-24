@@ -443,15 +443,13 @@ return [
                 'description' => 'Base URI',
                 'help' => '如果您已修改了Graylog的默认设置，此选项可覆盖基本URI。',
             ],
-            'device-page' => [
-                'loglevel' => [
-                    'description' => '设备概观记录等级',
-                    'help' => '设置设备概览页面上显示的最大日志级别。',
-                ],
-                'rowCount' => [
-                    'description' => '设备概观数据笔数',
-                    'help' => '设置设备概览页面上显示的行数。',
-                ],
+            'loglevel' => [
+                'description' => '设备概观记录等级',
+                'help' => '设置设备概览页面上显示的最大日志级别。',
+            ],
+            'rowCount' => [
+                'description' => '设备概观数据笔数',
+                'help' => '设置设备概览页面上显示的行数。',
             ],
             'password' => [
                 'description' => '密码',

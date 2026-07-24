@@ -119,14 +119,14 @@ devices.
 
 !!! setting "external/graylog"
     ```bash
-    lnms config:set graylog.device-page.rowCount 10
+    lnms config:set graylog.rowCount 10
     ```
 
 Sets the maximum number of rows to be displayed (default: 10)
 
 !!! setting "external/graylog"
     ```bash
-    lnms config:set graylog.device-page.loglevel 7
+    lnms config:set graylog.loglevel 7
     ```
 
 You can set which loglevels that should be displayed on the overview page. (default: 7, min:
@@ -134,17 +134,47 @@ You can set which loglevels that should be displayed on the overview page. (defa
 
 !!! setting "external/graylog"
     ```bash
-    lnms config:set graylog.device-page.loglevel 4
+    lnms config:set graylog.loglevel 4
     ```
 
 Shows only entries with a log level less than or equal to 4 (Emergency,
 Alert, Critical, Error, Warning).
 
-You can set a default Log Level Filter with
-```bash
-lnms config:set graylog.loglevel 7
-```
- (applies to  /graylog and /device/<device_id>/logs/graylog/ (min: 0, max: 7)
+## Per-table options
+
+These settings affect both `/graylog` and the per-device Graylog log tab.
+
+!!! setting "external/graylog"
+    ```bash
+    lnms config:set graylog.default-stream-id <stream-id>
+    ```
+
+Graylog stream ID the default search scopes to. Leave blank and the
+first stream the configured account can see is used, which keeps the
+page working out of the box and avoids the unscoped-search error on
+limited-access accounts. Set this explicitly to pin a particular
+stream as the default (e.g. "Switches"); switch via the dropdown when
+you need to look at another.
+
+!!! setting "external/graylog"
+    ```bash
+    lnms config:set graylog.fields '["severity","origin","level","source","message","facility"]'
+    ```
+
+Ordered list of columns to show in the log table (Timestamp is always
+shown). Built-in column names are: severity, origin, level, source,
+message, facility. Any other value is treated as a raw Graylog message
+field and rendered as-is (e.g. `msg`, `source_ip` for vendor-specific
+fields).
+
+!!! setting "external/graylog"
+    ```bash
+    lnms config:set graylog.hidden-fields '["gl2_"]'
+    ```
+
+Field-name prefixes to hide from the row-expand detail panel. Any field
+whose key starts with a listed prefix is omitted. Defaults to hiding
+Graylog internal fields (gl2_).
 
 ## Domain and hostname handling
 

@@ -20,33 +20,33 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2025 Tony Murray
+ * @copyright  2026 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Http\Controllers\Device\Tabs;
+namespace App\Http\Controllers;
 
 use App\ApiClients\GraylogApi;
-use App\Http\Controllers\Controller;
 use App\Models\Device;
-use App\Models\Syslog;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use LibreNMS\Util\Graylog;
 
 class GraylogController extends Controller
 {
-    public function __invoke(Device $device, Request $request, GraylogApi $api): View
+    public function __invoke(Request $request, GraylogApi $api): View
     {
-        $this->authorize('view', $device);
-        $this->authorize('viewAny', Syslog::class);  // Note: Graylog replaces syslog, correct permission?
-
         $request->validate([
             'stream' => 'nullable|string',
+            'device' => 'nullable|int',
             'range' => 'nullable|int',
             'loglevel' => 'nullable|int|min:0|max:7',
         ]);
 
-        return view('device.tabs.logs.graylog', Graylog::viewData($api, $device, $request));
+        $device = $request->input('device')
+            ? Device::hasAccess($request->user())->find((int) $request->input('device'))
+            : null;
+
+        return view('graylog.index', Graylog::viewData($api, $device, $request));
     }
 }

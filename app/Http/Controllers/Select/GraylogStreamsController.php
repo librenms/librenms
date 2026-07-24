@@ -52,14 +52,10 @@ class GraylogStreamsController extends Controller
 
         $streams = [];
         try {
-            $streams = collect($api->getStreams()['streams'])->filter(fn ($stream) => ! $search || Str::contains(strtolower((string) $stream['title']), $search) || Str::contains(strtolower((string) $stream['description']), $search))->map(function ($stream) {
-                $text = $stream['title'];
-                if ($stream['description']) {
-                    $text .= " ({$stream['description']})";
-                }
-
-                return ['id' => $stream['id'], 'text' => $text];
-            });
+            $streams = collect($api->getStreams()['streams'])->filter(fn ($stream) => ! $search || Str::contains(strtolower((string) $stream['title']), $search) || Str::contains(strtolower((string) $stream['description']), $search))->map(fn ($stream) => [
+                'id' => $stream['id'],
+                'text' => $api->formatStreamText($stream),
+            ]);
         } catch (\Exception $e) {
             Log::error($e->getMessage(), ['file' => $e->getFile(), 'line' => $e->getLine()]);
         }

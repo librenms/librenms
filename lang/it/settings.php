@@ -750,15 +750,13 @@ return [
                 'description' => 'Base URI',
                 'help' => 'Override the base uri in the case you have modified the Graylog default.',
             ],
-            'device-page' => [
-                'loglevel' => [
-                    'description' => 'Device Overview Log Level',
-                    'help' => 'Sets the maximum log level shown on the device overview page.',
-                ],
-                'rowCount' => [
-                    'description' => 'Device Overview Row Count',
-                    'help' => 'Sets the number of rows show on the device overview page.',
-                ],
+            'loglevel' => [
+                'description' => 'Device Overview Log Level',
+                'help' => 'Sets the maximum log level shown on the device overview page.',
+            ],
+            'rowCount' => [
+                'description' => 'Device Overview Row Count',
+                'help' => 'Sets the number of rows show on the device overview page.',
             ],
             'password' => [
                 'description' => 'Password',
