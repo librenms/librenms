@@ -97,13 +97,13 @@ class AvailabilityMapController extends WidgetController
         $active_maintenance = AlertSchedule::isActive()->pluck('schedule_id');
         if ($active_maintenance->count() > 0) {
             $active_maintenance_devices = Device::query()
-                ->whereHas('alertSchedules', function (Builder $q) use ($active_maintenance) {
+                ->whereHas('alertSchedules', function (Builder $q) use ($active_maintenance): void {
                     $q->wherein('alert_schedule.schedule_id', $active_maintenance);
                 })
-                ->orWhereHas('location.alertSchedules', function (Builder $q) use ($active_maintenance) {
+                ->orWhereHas('location.alertSchedules', function (Builder $q) use ($active_maintenance): void {
                     $q->wherein('alert_schedule.schedule_id', $active_maintenance);
                 })
-                ->orWhereHas('groups.alertSchedules', function (Builder $q) use ($active_maintenance) {
+                ->orWhereHas('groups.alertSchedules', function (Builder $q) use ($active_maintenance): void {
                     $q->wherein('alert_schedule.schedule_id', $active_maintenance);
                 })
                 ->pluck('device_id');
