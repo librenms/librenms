@@ -78,7 +78,11 @@ for ($i = 0; $i < $days; $i++) {
             $time_str = Time::format($outage->going_down, 'time');
             $duration_str = CarbonInterval::seconds($duration)->cascade()->forHumans(['short' => true, 'parts' => 2]);
 
-            $outage_lines[] = "Outage at $time_str &bull; $duration_str";
+            if ($outage->going_down >= $day_start) {
+                $outage_lines[] = "Outage at $time_str &bull; $duration_str";
+            } else {
+                $outage_lines[] = "Outage &bull; $duration_str";
+            }
         }
     }
 

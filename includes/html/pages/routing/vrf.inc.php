@@ -120,7 +120,7 @@ if (Gate::denies('viewAny', Vrf::class)) {
             foreach ($vrf_devices[$vrf['vrf_name']][$vrf['mplsVpnVrfRouteDistinguisher']] as $device) {
                 echo "<tr><td width=200><a href='";
                 echo \LibreNMS\Util\Url::generate(['page' => 'device'], ['device' => $device['device_id'], 'tab' => 'routing', 'view' => 'basic', 'proto' => 'vrf']);
-                echo "'>" . DeviceCache::get($device['device_id'])->displayName() . '</a> ';
+                echo "'>" . htmlentities((string) DeviceCache::get($device['device_id'])->displayName()) . '</a> ';
 
                 if ($device['vrf_name'] != $vrf['vrf_name']) {
                     echo "<a href='#' onmouseover=\" return overlib('Expected Name : " . $vrf['vrf_name'] . '<br />Configured : ' . $device['vrf_name'] . "', CAPTION, '<span class=list-large>VRF Inconsistency</span>' ,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\"> <i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i></a>";

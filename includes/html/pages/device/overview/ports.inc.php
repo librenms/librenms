@@ -20,10 +20,12 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     //Generate tooltip
     $graph_array['width'] = 210;
     $graph_array['height'] = 100;
-    $link_array = $graph_array;
-    $link_array['page'] = 'graphs';
-    unset($link_array['height'], $link_array['width']);
-    $link = \LibreNMS\Util\Url::generate($link_array);
+    $link = \LibreNMS\Util\Url::graphPageUrl('device_bits', [
+        'device' => $device['device_id'],
+        'from' => $graph_array['from'],
+        'to' => $graph_array['to'],
+        'legend' => $graph_array['legend'],
+    ]);
 
     $graph_array['width'] = '210';
     $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . ' - Device Traffic');

@@ -1,14 +1,14 @@
 <nav class="navbar navbar-default {{ $navbar }} navbar-sticky-top" role="navigation">
         <div class="navbar-header">
+            <a class="navbar-brand" href="{{ route('home') }}">
+                <x-logo responsive="lg" class="tw:h-full tw:max-w-[170px]" />
+            </a>
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navHeaderCollapse">
                 <span class="sr-only">{{ __('Toggle navigation') }}</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="{{ route('home') }}">
-                <x-logo responsive="lg" class="tw:h-full tw:max-w-[170px]" />
-            </a>
         </div>
 
         <div class="collapse navbar-collapse" id="navHeaderCollapse" style="max-height: calc(100vh - 50px)">
@@ -606,8 +606,10 @@
                     <ul class="dropdown-menu">
                         <li><a href="{{ url('alerts') }}"><i class="fa fa-bell fa-fw fa-lg"
                                                              aria-hidden="true"></i> {{ __('Notifications') }}</a></li>
+                        @can('viewAny', \App\Models\AlertLog::class)
                         <li><a href="{{ url('alert-log') }}"><i class="fa fa-file-text fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Alert History') }}</a></li>
+                        @endcan
                         <li><a href="{{ url('alert-stats') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
                                                                   aria-hidden="true"></i> {{ __('Statistics') }}</a></li>
                         @if($show_alert_divider)
@@ -641,14 +643,46 @@
                 @includeIf('menu.custom')
             </ul>
 
-{{-- User --}}
-            <form role="search" class="navbar-form navbar-right global-search">
-                @csrf
+            <div class="navbar-form navbar-right global-search tw:relative" x-data="globalSearch()"
+                 @keydown.escape="close()" @click.outside="close()">
                 <div class="form-group">
-                    <input class="form-control typeahead" type="search" id="gsearch" name="gsearch"
-                           placeholder="{{ __('Global Search') }}" autocomplete="off">
+                    <input class="form-control" type="search" id="gsearch" name="gsearch" autocomplete="off"
+                           placeholder="{{ __('Type / to search') }}"
+                           x-model="query" x-ref="input"
+                           @input.debounce.250ms="run()" @focus="open = flat.length > 0"
+                           @keydown="onKey($event)">
                 </div>
-            </form>
+                <div x-show="open" x-cloak
+                     class="global-search-dropdown tw:absolute tw:right-0 tw:mt-1 tw:w-[50rem] tw:max-w-[90vw] tw:max-h-[70vh] tw:overflow-y-auto tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200 tw:rounded-lg tw:shadow-xl tw:z-50">
+                    <div x-show="loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-gray-500 tw:dark:text-dark-white-400">
+                        <i class="fa fa-spinner fa-spin"></i> {{ __('Searching...') }}
+                    </div>
+                    <div x-show="!loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-gray-500 tw:dark:text-dark-white-400">
+                        {{ __('No results') }}
+                    </div>
+                    <template x-for="group in groups" :key="group.type">
+                        <div>
+                            <div class="tw:px-4 tw:py-1.5 tw:bg-gray-100 tw:dark:bg-dark-gray-200 tw:text-gray-600 tw:dark:text-dark-white-300 tw:text-xs tw:font-bold tw:uppercase" x-text="group.label"></div>
+                            <template x-for="item in group.results" :key="group.type + item.url">
+                                <a :href="item.url" @mouseenter="active = item.url"
+                                   class="tw:flex tw:items-center tw:gap-2.5 tw:px-4 tw:py-2 tw:no-underline tw:text-gray-800 tw:dark:text-dark-white-100 tw:hover:bg-gray-50 tw:dark:hover:bg-dark-gray-300"
+                                   :class="(active === item.url ? 'tw:bg-gray-100 tw:dark:bg-dark-gray-300 ' : '') + (item.status ? 'tw:border-l-5 ' + item.status : '')">
+                                    <template x-if="item.image">
+                                        <img :src="item.image" class="tw:h-7 tw:w-7 tw:shrink-0 tw:object-contain tw:dark:bg-gray-50 tw:dark:rounded tw:dark:p-0.5">
+                                    </template>
+                                    <template x-if="!item.image">
+                                        <i class="fa fa-fw fa-lg tw:shrink-0 icon-theme" :class="item.icon"></i>
+                                    </template>
+                                    <span class="tw:min-w-0 tw:flex-1">
+                                        <span class="tw:block tw:truncate" x-text="item.name"></span>
+                                        <span class="tw:block tw:truncate tw:text-sm tw:text-gray-500 tw:dark:text-dark-white-400" x-text="item.subtitle"></span>
+                                    </span>
+                                </a>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </div>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">
@@ -749,126 +783,140 @@
         </div>
 </nav>
 
-<script>
-    var devices = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        remote: {
-            url: ajax_url + "/search/device?search=%QUERY",
-            filter: function (devices) {
-                return $.map(devices, function (device) {
-                    return {
-                        device_id: device.device_id,
-                        device_image: device.device_image,
-                        url: device.url,
-                        name: device.name,
-                        device_os: device.device_os,
-                        version: device.version,
-                        device_hardware: device.device_hardware,
-                        device_ports: device.device_ports,
-                        location: device.location
-                    };
-                });
-            },
-            wildcard: "%QUERY"
+<style>
+    @media (max-width: 767px) {
+        /* Make the header a flex container to place search between logo and toggle button */
+        .navbar-header {
+            display: flex !important;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            height: 50px;
+            padding-left: 15px;
+            padding-right: 15px;
+            float: none !important;
         }
-    });
-    var ports = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        remote: {
-            url: ajax_url + "/search/port/?search=%QUERY",
-            filter: function (ports) {
-                return $.map(ports, function (port) {
-                    return {
-                        url: port.url,
-                        name: port.name,
-                        description: port.description,
-                        colours: port.colours,
-                        hostname: port.hostname
-                    };
-                });
-            },
-            wildcard: "%QUERY"
-        }
-    });
-    var bgp = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        remote: {
-            url: ajax_url + "/search/bgp/?search=%QUERY",
-            filter: function (bgp_sessions) {
-                return $.map(bgp_sessions, function (bgp) {
-                    return {
-                        url: bgp.url,
-                        name: bgp.name,
-                        description: bgp.description,
-                        localas: bgp.localas,
-                        bgp_image: bgp.bgp_image,
-                        remoteas: bgp.remoteas,
-                        colours: bgp.colours,
-                        hostname: bgp.hostname
-                    };
-                });
-            },
-            wildcard: "%QUERY"
-        }
-    });
 
-    if ($(window).width() < 768) {
-        var cssMenu = 'typeahead-left';
-    } else {
-        var cssMenu = '';
+        .navbar-brand {
+            flex-shrink: 0 !important;
+            float: none !important;
+            height: 50px !important;
+            padding: 10px 0 !important;
+            margin: 0 !important;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-toggle {
+            flex-shrink: 0 !important;
+            float: none !important;
+            margin: 0 !important;
+            padding: 9px 10px !important;
+        }
+
+        /* Mobile Search Bar styling */
+        .navbar-header .global-search {
+            display: block !important;
+            flex: 1 1 auto;
+            margin: 0 10px !important;
+            padding: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .navbar-header .global-search .form-group {
+            margin: 0 !important;
+            width: 100%;
+        }
+
+        .navbar-header .global-search input {
+            width: 100% !important;
+            height: 34px;
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+
+        /* Center and format the search results dropdown on mobile */
+        .navbar-header .global-search .global-search-dropdown {
+            left: 50% !important;
+            right: auto !important;
+            transform: translateX(-50%) !important;
+            width: 95vw !important;
+            max-width: 95vw !important;
+        }
     }
+</style>
 
-    devices.initialize();
-    ports.initialize();
-    bgp.initialize();
-    $('#gsearch').typeahead({
-            hint: true,
-            highlight: true,
-            minLength: 1
-        },
-        {
-            source: devices.ttAdapter(),
-            limit: '{{ $typeahead_limit }}',
-            async: true,
-            display: 'name',
-            valueKey: 'name',
-            templates: {
-                header: '<h5><strong>&nbsp;Devices</strong></h5>',
-                suggestion: Handlebars.compile('<p><a href="@{{url}}"><img src="@{{device_image}}" class="tw:h-8 tw:float-left  tw:m-1 tw:dark:bg-gray-50 tw:dark:rounded-lg tw:dark:p-1 tw:mr-2"> <small><strong>@{{name}}</strong> | @{{device_os}} | @{{version}} <br /> @{{device_hardware}} with @{{device_ports}} port(s) | @{{location}}</small></a></p>')
-            }
-        },
-        {
-            source: ports.ttAdapter(),
-            limit: '{{ $typeahead_limit }}',
-            async: true,
-            display: 'name',
-            valueKey: 'name',
-            templates: {
-                header: '<h5><strong>&nbsp;Ports</strong></h5>',
-                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small><i class="fa fa-link fa-sm icon-theme" aria-hidden="true"></i> <strong>@{{name}}</strong> – @{{hostname}}<br /><i>@{{description}}</i></small></a></p>')
-            }
-        },
-        {
-            source: bgp.ttAdapter(),
-            limit: '{{ $typeahead_limit }}',
-            async: true,
-            display: 'name',
-            valueKey: 'name',
-            templates: {
-                header: '<h5><strong>&nbsp;BGP Sessions</strong></h5>',
-                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small><i class="@{{bgp_image}}" aria-hidden="true"></i> @{{name}} - @{{hostname}}<br />AS@{{localas}} -> AS@{{remoteas}}</small></a></p>')
-            }
-        }).on('typeahead:select', function (ev, suggestion) {
-            window.location.href = suggestion.url;
-        }).on('keyup', function (e) {
-            // on enter go to the first selection
-            if (e.which === 13) {
-                $('.tt-selectable').first().trigger( "click" );
-            }
-        });
+<script>
+    document.addEventListener('alpine:init', () => {
+        window.Alpine.data('globalSearch', () => ({
+            query: '',
+            groups: [],
+            flat: [],
+            open: false,
+            loading: false,
+            active: '',
+            seq: 0,
+            controllers: [],
+            endpoints: @js([
+                route('ajax.search.devices'),
+                route('ajax.search.ports'),
+                route('ajax.search.health'),
+                route('ajax.search.routing'),
+                route('ajax.search.logs'),
+            ]),
+            order: ['devices', 'ports', 'sensors', 'wireless', 'storage', 'mempools', 'processors', 'bgp', 'eventlog'],
+            run() {
+                let q = this.query.trim();
+                if (q === '') { this.reset(); return; }
+                this.open = true;
+                this.loading = true;
+                this.active = '';
+                this.groups = [];
+                this.flat = [];
+                this.controllers.forEach(c => c.abort());
+                this.controllers = [];
+                let seq = ++this.seq;
+                let collected = {};
+                let pending = this.endpoints.length;
+                this.endpoints.forEach(url => {
+                    let controller = new AbortController();
+                    this.controllers.push(controller);
+                    fetch(url + '?search=' + encodeURIComponent(q), {
+                        signal: controller.signal,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (seq !== this.seq) { return; }
+                            (data.groups || []).forEach(g => { collected[g.type] = g; });
+                            this.groups = this.order.filter(t => collected[t]).map(t => collected[t]);
+                            this.flat = this.groups.flatMap(g => g.results);
+                        })
+                        .catch(() => {})
+                        .finally(() => { pending--; if (seq === this.seq && pending === 0) { this.loading = false; } });
+                });
+            },
+            onKey(e) {
+                if (e.key === 'ArrowDown') { e.preventDefault(); this.move(1); }
+                else if (e.key === 'ArrowUp') { e.preventDefault(); this.move(-1); }
+                else if (e.key === 'Enter') { e.preventDefault(); this.go(); }
+            },
+            move(dir) {
+                if (this.flat.length === 0) { return; }
+                this.open = true;
+                let i = this.flat.findIndex(it => it.url === this.active);
+                i = (i + dir + this.flat.length) % this.flat.length;
+                this.active = this.flat[i].url;
+            },
+            go() {
+                let url = this.active || (this.flat[0] && this.flat[0].url);
+                if (url) { window.location.href = url; }
+            },
+            close() { this.open = false; },
+            reset() { this.controllers.forEach(c => c.abort()); this.controllers = []; this.groups = []; this.flat = []; this.open = false; this.active = ''; this.loading = false; },
+        }));
+    });
 
     var hideDashboardEditor = {{ (int) $hide_dashboard_editor }};
     function toggleDashboardEditor() {
@@ -899,22 +947,41 @@
         }
     @endif
 
-    @if($global_search_ctrlf_focus)
-        $(document).ready(function(){
-            // Function to focus Global Search on Ctrl-F
-            window.addEventListener("keydown",function (e) {
-                if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)){
-                    if($('#gsearch').is(":focus")) {
-                        //allow normal Ctrl-F on a 2nd Hit
-                        return true;
-                    } else {
-                        //set Focus on Global Search and ignore Browsers defaults
-                        e.preventDefault();
-                        $('#gsearch').focus();
-                    }
-                }
-            })
-        })
-    @endif
+    function repositionSearch() {
+        var search = document.querySelector('.global-search');
+        if (!search) { return; }
+        if (window.innerWidth < 768) {
+            var toggle = document.querySelector('.navbar-header .navbar-toggle');
+            if (toggle && search.parentElement !== toggle.parentElement) {
+                toggle.parentElement.insertBefore(search, toggle);
+            }
+        } else {
+            var rightNav = document.querySelector('#navHeaderCollapse ul.navbar-right');
+            if (rightNav && search.parentElement !== rightNav.parentElement) {
+                rightNav.parentElement.insertBefore(search, rightNav);
+            }
+        }
+    }
+
+    $(document).ready(function(){
+        repositionSearch();
+        window.addEventListener('resize', repositionSearch);
+
+        // Focus Global Search when "/" is pressed (unless typing in a field)
+        window.addEventListener("keydown", function (e) {
+            if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) {
+                return;
+            }
+            var el = document.activeElement;
+            if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.isContentEditable)) {
+                return;
+            }
+            e.preventDefault();
+            var visibleInput = Array.from(document.querySelectorAll('.global-search input')).find(el => el.offsetWidth > 0 || el.offsetHeight > 0);
+            if (visibleInput) {
+                visibleInput.focus();
+            }
+        });
+    })
 
 </script>

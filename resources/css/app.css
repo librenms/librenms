@@ -72,7 +72,7 @@
 }
 
 .overview-panel {
-  @apply tw:rounded-xl tw:overflow-hidden tw:border tw:border-gray-300 tw:shadow-sm tw:dark:border-dark-gray-200;
+  @apply tw:rounded-xl tw:border tw:border-gray-300 tw:shadow-sm tw:dark:border-dark-gray-200;
 }
 
 .lnms-btn {

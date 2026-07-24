@@ -2,8 +2,6 @@ body {
   font-family: Verdana, Arial, Helvetica, sans-serif;
   margin: 0px;
   padding: 0px;
-  padding-bottom: 50px;
-  padding-top: 0px;
   background: rgb(255,255,255); /* Old browsers */
   color: #555;
   line-height: 20px;
@@ -1373,10 +1371,6 @@ nav.navbar-sticky-top {
   -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
      -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
           box-shadow: 0 5px 10px rgba(0,0,0,.2);
-}
-
-.typeahead-left {
-    left: 0px !important;
 }
 
 .tt-selectable {
