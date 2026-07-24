@@ -405,72 +405,72 @@ final class AuthSSOTest extends DBTestCase
         LibrenmsConfig::set('sso.group_strategy', 'map');
         LibrenmsConfig::set('sso.group_delimiter', ';');
         LibrenmsConfig::set('sso.group_attr', 'member');
-        LibrenmsConfig::set('sso.group_level_map', ['librenms-admins' => 10, 'librenms-readers' => 1, 'librenms-billingcontacts' => 5]);
+        LibrenmsConfig::set('sso.group_level_map', ['librenms-admins' => ['roles' => ['admin']], 'librenms-readers' => ['roles' => ['global-read']]]);
         $_SERVER['member'] = 'librenms-admins;librenms-readers;librenms-billingcontacts;unrelatedgroup;confluence-admins';
 
         // Valid options
-        $this->assertSame(10, $a->authSSOParseGroups());
+        $this->assertSame(['admin', 'global-read'], $a->authSSOParseGroups());
 
         // No match
         $_SERVER['member'] = 'confluence-admins';
-        $this->assertSame(0, $a->authSSOParseGroups());
+        $this->assertSame([], $a->authSSOParseGroups());
 
         // Delimiter only
         $_SERVER['member'] = ';;;;';
-        $this->assertSame(0, $a->authSSOParseGroups());
+        $this->assertSame([], $a->authSSOParseGroups());
 
         // Empty
         $_SERVER['member'] = '';
-        $this->assertSame(0, $a->authSSOParseGroups());
+        $this->assertSame([], $a->authSSOParseGroups());
 
-        // Empty with default access level
-        LibrenmsConfig::set('sso.static_level', 5);
-        $this->assertSame(5, $a->authSSOParseGroups());
-        LibrenmsConfig::forget('sso.static_level');
+        // Empty with default access role
+        LibrenmsConfig::set('sso.static_roles', ['global-read']);
+        $this->assertSame(['global-read'], $a->authSSOParseGroups());
+        LibrenmsConfig::forget('sso.static_roles');
 
         // Null
         $_SERVER['member'] = null;
-        $this->assertSame(0, $a->authSSOParseGroups());
+        $this->assertSame([], $a->authSSOParseGroups());
 
         // Unset
         unset($_SERVER['member']);
-        $this->assertSame(0, $a->authSSOParseGroups());
+        $this->assertSame([], $a->authSSOParseGroups());
 
         $_SERVER['member'] = 'librenms-admins;librenms-readers;librenms-billingcontacts;unrelatedgroup;confluence-admins';
 
         // Empty
         LibrenmsConfig::set('sso.group_level_map', []);
-        $this->assertSame(0, $a->authSSOParseGroups());
+        $this->assertSame([], $a->authSSOParseGroups());
 
         // Not associative
         LibrenmsConfig::set('sso.group_level_map', ['foo', 'bar', 'librenms-admins']);
-        $this->assertSame(0, $a->authSSOParseGroups());
+        $this->assertSame([], $a->authSSOParseGroups());
 
         // Null
         LibrenmsConfig::set('sso.group_level_map', null);
-        $this->assertSame(0, $a->authSSOParseGroups());
+        $this->assertSame([], $a->authSSOParseGroups());
 
         // Unset
         LibrenmsConfig::forget('sso.group_level_map');
-        $this->assertSame(0, $a->authSSOParseGroups());
+        $this->assertSame([], $a->authSSOParseGroups());
 
         // No delimiter
         LibrenmsConfig::forget('sso.group_delimiter');
-        $this->assertSame(0, $a->authSSOParseGroups());
+        $this->assertSame([], $a->authSSOParseGroups());
 
         // Test group filtering by regex
         LibrenmsConfig::set('sso.group_filter', '/confluence-(.*)/i');
         LibrenmsConfig::set('sso.group_delimiter', ';');
-        LibrenmsConfig::set('sso.group_level_map', ['librenms-admins' => 10, 'librenms-readers' => 1, 'librenms-billingcontacts' => 5, 'confluence-admins' => 7]);
-        $this->assertSame(7, $a->authSSOParseGroups());
+        LibrenmsConfig::set('sso.group_level_map', ['librenms-admins' => ['roles' => ['admin']], 'librenms-readers' => ['roles' => ['global-read']], 'librenms-billingcontacts' => ['roles' => ['billing-contact']], 'confluence-admins' => ['roles' => ['confluence-admin']]]);
+        $this->assertSame(['confluence-admin'], $a->authSSOParseGroups());
 
         // Test group filtering by empty regex
         LibrenmsConfig::set('sso.group_filter', '');
-        $this->assertSame(10, $a->authSSOParseGroups());
+        $this->assertSame(['admin'], $a->authSSOParseGroups());
 
         // Test group filtering by null regex
         LibrenmsConfig::set('sso.group_filter', null);
-        $this->assertSame(10, $a->authSSOParseGroups());
+        $this->assertSame(['admin'], $a->authSSOParseGroups());
     }
 
     protected function tearDown(): void
