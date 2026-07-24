@@ -19,6 +19,9 @@ class DeviceMaintenanceCache
         return $this->statuses[$deviceId] ?? MaintenanceStatus::None;
     }
 
+    /**
+     * @return array<int, MaintenanceStatus>
+     */
     private function build(): array
     {
         $statuses = [];
