@@ -34,7 +34,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\DeviceStatus;
@@ -290,28 +289,21 @@ class DeviceController extends TableController
 
         $actions[$row][] = [
             'title' => 'Telnet to ' . $device->hostname,
-            'href' => 'telnet://' . $device->hostname,
+            'href' => $device->telnetUrl(),
             'icon' => 'fa-terminal',
             'external' => false,
         ];
 
-        $ssh_href = 'ssh://' . $device->hostname;
-        if ($server = LibrenmsConfig::get('gateone.server')) {
-            $ssh_href = LibrenmsConfig::get('gateone.use_librenms_user')
-                ? $server . '?ssh=ssh://' . Auth::user()->username . '@' . $device->hostname . '&location=' . $device->hostname
-                : $server . '?ssh=ssh://' . $device->hostname . '&location=' . $device->hostname;
-        }
-
         $actions[$row][] = [
             'title' => 'SSH to ' . $device->hostname,
-            'href' => $ssh_href,
+            'href' => $device->sshUrl(),
             'icon' => 'fa-lock',
             'external' => false,
         ];
 
         $actions[$row][] = [
             'title' => 'Launch browser to ' . $device->hostname,
-            'href' => 'https://' . $device->hostname,
+            'href' => $device->webUrl(),
             'onclick' => 'http_fallback(this); return false;',
             'icon' => 'fa-globe',
         ];

@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Enum\DeviceStatus;
@@ -486,6 +487,49 @@ class Device extends BaseModel
     public function getAttribs()
     {
         return $this->attribs->pluck('attrib_value', 'attrib_type')->toArray();
+    }
+
+    /**
+     * Get the port suffix (e.g. ":2222") for an override_device_*_port attrib, or '' if unset
+     */
+    private function overridePort(string $type): string
+    {
+        $port = $this->getAttrib("override_device_{$type}_port");
+
+        return $port ? ':' . $port : '';
+    }
+
+    /**
+     * Build the telnet:// URL for this device, honouring any custom telnet port
+     */
+    public function telnetUrl(): string
+    {
+        return 'telnet://' . $this->hostname . $this->overridePort('telnet');
+    }
+
+    /**
+     * Build the https:// URL for this device, honouring any custom http port
+     */
+    public function webUrl(): string
+    {
+        return 'https://' . $this->hostname . $this->overridePort('http');
+    }
+
+    /**
+     * Build the SSH URL for this device. Uses the GateOne server if configured,
+     * otherwise a plain ssh:// URL honouring any custom ssh port.
+     */
+    public function sshUrl(): string
+    {
+        if ($server = LibrenmsConfig::get('gateone.server')) {
+            $user = LibrenmsConfig::get('gateone.use_librenms_user')
+                ? Auth::user()->username . '@'
+                : '';
+
+            return $server . '?ssh=ssh://' . $user . $this->hostname . '&location=' . $this->hostname;
+        }
+
+        return 'ssh://' . $this->hostname . $this->overridePort('ssh');
     }
 
     /**
