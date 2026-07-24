@@ -77,6 +77,31 @@ Nodes appear automatically after running for a few minutes.
     lnms config:set service_update_frequency 86400
     ```
 
+### Memory Pressure
+
+Optionally pause a dispatcher's intake when it is under memory pressure, to avoid
+OOM kills (for example during a thundering-herd startup of many workers). When
+usage reaches the configured percent the dispatcher stops taking new work, and
+resumes once it drops below (percent - 10). Unset (the default) disables it.
+
+Usage is read from the process's cgroup memory limit when available (cgroup v2 or
+v1), otherwise from host memory. If usage cannot be determined the gate does
+nothing and polling behaves as normal.
+
+!!! setting "poller/dispatcherservice"
+    ```bash
+    lnms config:set distributed_poller_memory_pressure_percent 85
+    ```
+
+This may also be set in `config.php`, or overridden per dispatcher via an
+environment variable (useful when the same config is shared across nodes with
+different memory limits). Precedence: environment variable, then LibreNMS config,
+then disabled.
+
+```bash
+export LIBRENMS_DISTRIBUTED_POLLER_MEMORY_PRESSURE_PERCENT=85
+```
+
 ### Restrict Processing to Dispatcher
 
 !!! setting "poller/dispatcherservice"

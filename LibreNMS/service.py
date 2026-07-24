@@ -79,6 +79,7 @@ class ServiceConfig(DBConfig):
     single_instance = True
     distributed = False
     group = 0
+    memory_pressure_percent = None
 
     debug = False
     log_level = 20
@@ -126,6 +127,13 @@ class ServiceConfig(DBConfig):
         self.distributed = config.get("distributed_poller", ServiceConfig.distributed)
         self.group = ServiceConfig.parse_group(
             config.get("distributed_poller_group", ServiceConfig.group)
+        )
+        self.memory_pressure_percent = os.getenv(
+            "LIBRENMS_DISTRIBUTED_POLLER_MEMORY_PRESSURE_PERCENT",
+            config.get(
+                "distributed_poller_memory_pressure_percent",
+                ServiceConfig.memory_pressure_percent,
+            ),
         )
 
         self.master_timeout = config.get(

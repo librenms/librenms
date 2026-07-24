@@ -887,6 +887,10 @@ return [
             'description' => 'Memcached port',
             'help' => 'The port for the memcached server. Default is 11211',
         ],
+        'distributed_poller_memory_pressure_percent' => [
+            'description' => 'Memory pressure percent',
+            'help' => 'If set (1-99), a distributed poller dispatcher pauses taking new work when its memory usage (cgroup limit, else host) reaches this percent, resuming below (percent - 10). Blank disables. Overridable per dispatcher via LIBRENMS_DISTRIBUTED_POLLER_MEMORY_PRESSURE_PERCENT.',
+        ],
         'enable_ports_etherlike' => [
             'description' => 'Enable etherlike graphs for ports',
         ],
