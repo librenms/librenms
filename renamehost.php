@@ -13,15 +13,17 @@
 
 $init_modules = [];
 require __DIR__ . '/includes/init.php';
+
+use App\Facades\DeviceCache;
 use App\Models\Device;
 
 // Remove a host and all related data from the system
 if ($argv[1] && $argv[2]) {
     $hostname = $argv[1];
-    $device = (ctype_digit($hostname) ? Device::find($hostname) : Device::where('hostname', $hostname)->first());
+    $device = DeviceCache::get($hostname);
     $new_hostname = $argv[2];
 
-    if (! $device) {
+    if (! $device->exists) {
         echo "Existing device not found\n";
         exit(1);
     } else {
