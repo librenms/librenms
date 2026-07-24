@@ -1,0 +1,104 @@
+modules:
+    power:
+      data:
+        - oid: PDUMIBV07::phaseStatusActivePower
+          value: PDUMIBV07::phaseStatusActivePower
+          num_oid: '.1.3.6.1.4.1.23280.6.1.4.{{ $index }}'
+          index: 'phaseActivePower.{{ $index }}'
+          group: Phase
+          descr: 'Phase {{ $index }} Active Power'
+
+        - oid: PDUMIBV07::outletStatusActivePower
+          value: PDUMIBV07::outletStatusActivePower
+          num_oid: '.1.3.6.1.4.1.23280.8.1.5.{{ $index }}'
+          index: 'outletActivePower.{{ $index }}'
+          group: Outlet
+          descr: 'Outlet {{ $index }} Active Power'
+    energy:
+      data:
+        - oid: PDUMIBV07::phaseStatusActiveEnergy
+          value: PDUMIBV07::phaseStatusActiveEnergy
+          num_oid: '.1.3.6.1.4.1.23280.6.1.8.{{ $index }}'
+          index: 'phaseEnergy.{{ $index }}'
+          group: Phase
+          descr: 'Phase {{ $index }} Energy'
+
+        - oid: PDUMIBV07::outletStatusActiveEnergy
+          value: PDUMIBV07::outletStatusActiveEnergy
+          num_oid: '.1.3.6.1.4.1.23280.8.1.7.{{ $index }}'
+          index: 'outletEnergy.{{ $index }}'
+          group: Outlet
+          descr: 'Outlet {{ $index }} Energy'
+
+    voltage:
+      data:
+        - oid: PDUMIBV07::phaseStatusVoltage
+          value: PDUMIBV07::phaseStatusVoltage
+          num_oid: '.1.3.6.1.4.1.23280.6.1.2.{{ $index }}'
+          index: 'phaseVoltage.{{ $index }}'
+          divisor: 10
+          group: Phase
+          descr: 'Phase {{ $index }} Voltage'
+
+        - oid: PDUMIBV07::outletStatusVoltage
+          value: PDUMIBV07::outletStatusVoltage
+          num_oid: '.1.3.6.1.4.1.23280.8.1.3.{{ $index }}'
+          index: 'outletVoltage.{{ $index }}'
+          divisor: 10
+          group: Outlet
+          descr: 'Outlet {{ $index }} Voltage'
+
+    current:
+      data:
+        - oid: PDUMIBV07::phaseStatusCurrent
+          value: PDUMIBV07::phaseStatusCurrent
+          num_oid: '.1.3.6.1.4.1.23280.6.1.3.{{ $index }}'
+          index: 'phaseCurrent.{{ $index }}'
+          divisor: 100
+          group: Phase
+          descr: 'Phase {{ $index }} Current'
+
+        - oid: PDUMIBV07::outletStatusCurrent
+          value: PDUMIBV07::outletStatusCurrent
+          num_oid: '.1.3.6.1.4.1.23280.8.1.4.{{ $index }}'
+          index: 'outletCurrent.{{ $index }}'
+          divisor: 100
+          group: Outlet
+          descr: 'Outlet {{ $index }} Current'
+
+    state:
+      data:
+        - oid: PDUMIBV07::outletStatusState
+          value: PDUMIBV07::outletStatusState
+          num_oid: '.1.3.6.1.4.1.23280.8.1.2.{{ $index }}'
+          index: 'outletState.{{ $index }}'
+          group: Outlet
+          descr: 'Outlet {{ $index }} State'
+          state_name: outletStatusState
+          states:
+            - { value: 1, descr: Off, generic: 0 }
+            - { value: 2, descr: On,  generic: 0 }
+
+        - oid: PDUMIBV07::phaseStatusVoltageLimitState
+          value: PDUMIBV07::phaseStatusVoltageLimitState
+          num_oid: '.1.3.6.1.4.1.23280.6.1.10.1.{{ $index }}'
+          index: 'phaseVoltageAlarm.{{ $index }}'
+          group: Phase
+          descr: 'Phase {{ $index }} Voltage Alarm'
+          state_name: phaseVoltageAlarm
+          states:
+            - { value: 1, descr: Normal, generic: 0 }
+            - { value: 2, descr: High,   generic: 2 }
+            - { value: 3, descr: Low,    generic: 2 }
+
+        - oid: PDUMIBV07::phaseStatusCurrentLimitState
+          value: PDUMIBV07::phaseStatusCurrentLimitState
+          num_oid: '.1.3.6.1.4.1.23280.6.1.11.1.{{ $index }}'
+          index: 'phaseCurrentAlarm.{{ $index }}'
+          group: Phase
+          descr: 'Phase {{ $index }} Current Alarm'
+          state_name: phaseCurrentAlarm
+          states:
+            - { value: 1, descr: Normal, generic: 0 }
+            - { value: 2, descr: High,   generic: 2 }
+            - { value: 3, descr: Low,    generic: 2 }
