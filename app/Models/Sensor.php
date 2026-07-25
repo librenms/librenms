@@ -15,6 +15,7 @@ use LibreNMS\Enum\SensorState;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Time;
 
 #[ObservedBy([SensorObserver::class])]
 class Sensor extends SensorModel implements Keyable
