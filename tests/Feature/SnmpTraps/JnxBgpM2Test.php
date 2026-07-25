@@ -30,15 +30,10 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\BgpPeer;
 use App\Models\Device;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Tests\Traits\RequiresMysql;
 
 final class JnxBgpM2Test extends SnmpTrapTestCase
 {
-    use RequiresMysql;
-    use DatabaseTransactions;
-
     public function testBgpPeerUnknown(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */

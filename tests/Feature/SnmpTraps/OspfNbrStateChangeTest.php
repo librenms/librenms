@@ -32,15 +32,10 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
 use App\Models\OspfNbr;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Tests\Traits\RequiresMysql;
 
 final class OspfNbrStateChangeTest extends SnmpTrapTestCase
 {
-    use RequiresMysql;
-    use DatabaseTransactions;
-
     //Test OSPF neighbor state down trap
     public function testOspfNbrDown(): void
     {

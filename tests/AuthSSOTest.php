@@ -28,13 +28,13 @@ namespace LibreNMS\Tests;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
 
-final class AuthSSOTest extends DBTestCase
+final class AuthSSOTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     private $original_auth_mech = null;
     private $server;

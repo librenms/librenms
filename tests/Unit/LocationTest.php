@@ -29,6 +29,7 @@ namespace LibreNMS\Tests\Unit;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Location;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use LibreNMS\Interfaces\Geocoder;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\Dns;
@@ -36,7 +37,7 @@ use Mockery\MockInterface;
 
 final class LocationTest extends TestCase
 {
-    use \LibreNMS\Tests\Traits\RequiresMysql;
+    use RefreshDatabase;
 
     public function testCanSetLocation(): void
     {

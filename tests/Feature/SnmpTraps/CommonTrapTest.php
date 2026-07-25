@@ -30,18 +30,13 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Ipv4Address;
 use App\Models\Port;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\Traits\RequiresMysql;
 use Log;
 
 final class CommonTrapTest extends SnmpTrapTestCase
 {
-    use RequiresMysql;
-    use DatabaseTransactions;
-
     public function testGarbage(): void
     {
         $trapText = "Garbage\n";

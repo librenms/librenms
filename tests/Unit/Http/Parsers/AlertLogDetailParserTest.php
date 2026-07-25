@@ -3,12 +3,12 @@
 namespace LibreNMS\Tests\Unit\Http\Parsers;
 
 use App\Http\Parsers\AlertLogDetailParser;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use LibreNMS\Tests\TestCase;
-use LibreNMS\Tests\Traits\RequiresMysql;
 
 class AlertLogDetailParserTest extends TestCase
 {
-    use RequiresMysql;
+    use RefreshDatabase;
 
     private AlertLogDetailParser $parser;
 

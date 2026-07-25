@@ -28,14 +28,14 @@ namespace LibreNMS\Tests\Unit;
 
 use App\Models\ComponentPref;
 use App\Models\ComponentStatusLog;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use LibreNMS\Component;
-use LibreNMS\Tests\DBTestCase;
+use LibreNMS\Tests\TestCase;
 
-final class ComponentTest extends DBTestCase
+final class ComponentTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function testDeleteComponent(): void
     {

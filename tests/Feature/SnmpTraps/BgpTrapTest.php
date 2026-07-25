@@ -29,16 +29,11 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Facades\LibrenmsConfig;
 use App\Models\BgpPeer;
 use App\Models\Device;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Tests\Traits\RequiresMysql;
 use LibreNMS\Util\AutonomousSystem;
 
 final class BgpTrapTest extends SnmpTrapTestCase
 {
-    use RequiresMysql;
-    use DatabaseTransactions;
-
     public function testBgpUp(): void
     {
         // Cache it to avoid DNS Lookup

@@ -30,16 +30,11 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
 use App\Models\Port;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Tests\Traits\RequiresMysql;
 
 final class CienaCesPortNotificationTrapTest extends SnmpTrapTestCase
 {
-    use RequiresMysql;
-    use DatabaseTransactions;
-
     public function testCienaCesPortDownNotification(): void
     {
         // make a device and associate a port with it

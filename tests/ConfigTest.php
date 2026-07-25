@@ -28,10 +28,12 @@ namespace LibreNMS\Tests;
 
 use App\ConfigRepository;
 use App\Facades\LibrenmsConfig;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 final class ConfigTest extends TestCase
 {
-    use \LibreNMS\Tests\Traits\RequiresMysql;
+    use RefreshDatabase;
+
     private \ReflectionProperty $config;
 
     protected function setUp(): void

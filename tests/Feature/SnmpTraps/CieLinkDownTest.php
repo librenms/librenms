@@ -26,18 +26,13 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
 use App\Models\Port;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Tests\Traits\RequiresMysql;
 use PHPUnit\Framework\Attributes\TestDox;
 
 #[TestDox('Cisco cieLinkDown Trap')]
 final class CieLinkDownTest extends SnmpTrapTestCase
 {
-    use RequiresMysql;
-    use DatabaseTransactions;
-
     #[TestDox('Cisco cieLinkDown')]
     public function testCieLinkDown(): void
     {

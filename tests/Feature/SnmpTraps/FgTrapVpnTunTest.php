@@ -28,15 +28,10 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
 use App\Models\Ipv4Address;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Tests\Traits\RequiresMysql;
 
 final class FgTrapVpnTunTest extends SnmpTrapTestCase
 {
-    use RequiresMysql;
-    use DatabaseTransactions;
-
     public function testVpnTunDown(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */

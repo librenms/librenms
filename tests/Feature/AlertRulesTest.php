@@ -6,6 +6,7 @@ use App\Models\Alert;
 use App\Models\AlertLog;
 use App\Models\AlertRule;
 use App\Models\Device;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Enum\AlertState;
@@ -14,7 +15,7 @@ use LibreNMS\Tests\TestCase;
 
 class AlertRulesTest extends TestCase
 {
-    use \LibreNMS\Tests\Traits\RequiresMysql;
+    use RefreshDatabase;
 
     public function testRunRulesSkipsUnderMaintenance(): void
     {
@@ -545,10 +546,10 @@ class AlertRulesTest extends TestCase
 
     public function testRunRulesConvertsBinaryIp(): void
     {
-        $device = Device::factory()->create(['status' => 0]);
+        $device = Device::factory()->create(['status' => 0,'ip' => '192.0.2.1']);
         // MySQL INET6_ATON converts string to binary
         $rule = AlertRule::factory()->create([
-            'query' => 'SELECT INET6_ATON("192.0.2.1") AS ip FROM devices WHERE device_id = ?',
+            'query' => 'SELECT * FROM devices WHERE device_id = ?',
         ]);
 
         $alertRules = new AlertRules($device);

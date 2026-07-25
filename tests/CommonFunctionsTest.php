@@ -29,13 +29,14 @@ namespace LibreNMS\Tests;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Tests\Traits\RequiresMysql;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Validate;
 
 final class CommonFunctionsTest extends TestCase
 {
-    use \LibreNMS\Tests\Traits\RequiresMysql;
+    use RequiresMysql;
 
     public function testStrContains(): void
     {
