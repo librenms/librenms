@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Facades\LibrenmsConfig;
+use App\Observers\SensorObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -13,8 +15,8 @@ use LibreNMS\Enum\SensorState;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
-use LibreNMS\Util\Time;
 
+#[ObservedBy([SensorObserver::class])]
 class Sensor extends SensorModel implements Keyable
 {
     use HasFactory;
