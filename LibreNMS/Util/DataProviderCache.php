@@ -27,7 +27,7 @@ class DataProviderCache
 
         $data = $callback();
 
-        if (!is_dir(dirname($cacheFile))) {
+        if (! is_dir(dirname($cacheFile))) {
             @mkdir(dirname($cacheFile), 0755, true);
         }
 
