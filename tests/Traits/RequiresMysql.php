@@ -31,7 +31,7 @@ trait RequiresMysql
     public static function setUpBeforeClass(): void
     {
         if (! getenv('DBTEST')) {
-            static::markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
+            static::markTestSkipped('MySQL Database tests not enabled.  Set DBTEST=1 to enable.');
         }
 
         parent::setUpBeforeClass();
