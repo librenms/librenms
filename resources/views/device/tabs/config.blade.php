@@ -50,9 +50,9 @@
                                                   class="tw:inline-block tw:w-4 tw:h-4 tw:shrink-0 tw:rounded tw:border-2"></span>
                                         </template>
                                         <span class="tw:flex-1">
-                                            <span class="tw:block tw:text-base tw:text-gray-800 tw:dark:text-dark-white-100" x-text="formatDate(backup.date)"></span>
+                                            <span class="tw:block tw:text-gray-800 tw:dark:text-dark-white-100" x-text="formatDate(backup.date)"></span>
                                             <template x-if="backup.until">
-                                                <span class="tw:block tw:text-base tw:text-gray-500 tw:dark:text-dark-white-400">
+                                                <span class="tw:block tw:text-gray-500 tw:dark:text-dark-white-400">
                                                     {{ __('config_backups.valid_until') }} <span x-text="formatDate(backup.until)"></span>
                                                 </span>
                                             </template>
