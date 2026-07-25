@@ -172,7 +172,7 @@ if ($total_avail >= $threshold_ok) {
 
 echo <<<HTML
                 </div>
-                <div class="tw:flex tw:justify-between tw:text-[11px] tw:text-gray-400 tw:mt-1">
+                <div class="tw:flex tw:justify-between tw:text-sm tw:text-gray-400 tw:mt-1">
                     <span>90 days ago</span>
                     <span><strong class="$total_color">$total_avail% uptime</strong></span>
                     <span>Today</span>
