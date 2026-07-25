@@ -11,6 +11,7 @@ abstract class TestCase extends BaseTestCase
     public function dbSetUp()
     {
         if (getenv('DBTEST')) {
+            config(['database.default' => 'testing']);
             \LibreNMS\DB\Eloquent::DB()->beginTransaction();
         } else {
             $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');

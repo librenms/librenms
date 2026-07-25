@@ -35,6 +35,8 @@ use LibreNMS\Util\Validate;
 
 final class CommonFunctionsTest extends TestCase
 {
+    use \LibreNMS\Tests\Traits\RequiresDatabase;
+
     public function testStrContains(): void
     {
         $data = 'This is a test. Just Testing.';

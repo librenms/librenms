@@ -36,4 +36,11 @@ trait RequiresDatabase
 
         parent::setUpBeforeClass();
     }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        config(['database.default' => 'testing']);
+        \DB::purge();
+    }
 }

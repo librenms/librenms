@@ -240,25 +240,31 @@ class SnmpQueryMock implements SnmpQueryInterface
         $data = file_get_contents(base_path("/tests/snmpsim/$file.snmprec"));
         $line = strtok($data, "\r\n");
         while ($line !== false) {
-            [$oid, $type, $data] = explode('|', $line, 3);
-            if ($type == '4') {
-                $data = trim($data);
-            } elseif ($type == '6') {
-                $data = trim($data, '.');
-            } elseif ($type == '4x') {
-                // MacAddress type is stored as hex string, but we don't understand mibs
-                if (Str::startsWith($oid, [
-                    '1.3.6.1.2.1.2.2.1.6', // IF-MIB::ifPhysAddress
-                    '1.3.6.1.2.1.17.1.1.0', // BRIDGE-MIB::dot1dBaseBridgeAddress.0
-                    '1.3.6.1.4.1.890.1.5.13.13.8.1.1.20', // IES5206-MIB::slotModuleMacAddress
-                ])) {
-                    $data = Mac::parse($data)->readable();
-                } else {
-                    $data = hex2bin($data);
+            $parts = explode('|', $line, 3);
+            if (count($parts) === 3) {
+                [$oid, $type, $val] = $parts;
+                if ($type == '4') {
+                    $val = trim($val);
+                } elseif ($type == '6') {
+                    $val = trim($val, '.');
+                } elseif ($type == '4x') {
+                    // MacAddress type is stored as hex string, but we don't understand mibs
+                    if (Str::startsWith($oid, [
+                        '1.3.6.1.2.1.2.2.1.6', // IF-MIB::ifPhysAddress
+                        '1.3.6.1.2.1.17.1.1.0', // BRIDGE-MIB::dot1dBaseBridgeAddress.0
+                        '1.3.6.1.4.1.890.1.5.13.13.8.1.1.20', // IES5206-MIB::slotModuleMacAddress
+                    ])) {
+                        $val = Mac::parse($val)->readable();
+                    } else {
+                        if (strlen($val) % 2 !== 0) {
+                            $val = '0' . $val;
+                        }
+                        $val = hex2bin($val);
+                    }
                 }
-            }
 
-            self::$cache[$file][$oid] = [$type, $data];
+                self::$cache[$file][$oid] = [$type, $val];
+            }
             $line = strtok("\r\n");
         }
     }

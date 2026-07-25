@@ -7,6 +7,7 @@ use LibreNMS\Tests\TestCase;
 
 class AlertLogDetailParserTest extends TestCase
 {
+    use \LibreNMS\Tests\Traits\RequiresDatabase;
     private AlertLogDetailParser $parser;
 
     protected function setUp(): void

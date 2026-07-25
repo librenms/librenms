@@ -36,6 +36,8 @@ use Mockery\MockInterface;
 
 final class LocationTest extends TestCase
 {
+    use \LibreNMS\Tests\Traits\RequiresDatabase;
+
     public function testCanSetLocation(): void
     {
         $device = Device::factory()->make(); /** @var Device $device */

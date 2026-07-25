@@ -27,7 +27,7 @@
     <env name="MAIL_MAILER" value="array"/>
     <env name="QUEUE_CONNECTION" value="sync"/>
     <env name="SESSION_DRIVER" value="array"/>
-    <env name="DB_CONNECTION" value="testing"/>
+    <env name="DB_CONNECTION" value="testing_memory"/>
     <env name="CONFIG_CACHE_TTL" value="300"/>
     <const name="PHPUNIT_RUNNING" value="true"/>
   </php>

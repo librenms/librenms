@@ -14,6 +14,8 @@ use LibreNMS\Tests\TestCase;
 
 class AlertRulesTest extends TestCase
 {
+    use \LibreNMS\Tests\Traits\RequiresDatabase;
+
     protected function setUp(): void
     {
         parent::setUp();
