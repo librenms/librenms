@@ -246,55 +246,54 @@ class ModuleTestHelper
      */
     public static function findOsWithData(array $modules = [], ?string $os_filter = null, ?string $base_path = null): array
     {
-        static $cache = [];
-        $base_path ??= base_path();
-        $cache_key = md5(implode(',', $modules) . '|' . ($os_filter ?? '') . '|' . $base_path);
-        if (isset($cache[$cache_key])) {
-            return $cache[$cache_key];
-        }
+        $base_path ??= (function_exists('base_path') ? base_path() : realpath(__DIR__ . '/../..'));
+        $cacheKey = 'os_modules_' . md5(implode(',', $modules) . '|' . ($os_filter ?? '') . '|' . $base_path);
+        $dataPath = $base_path . '/tests/data';
 
-        $os_list = [];
+        return DataProviderCache::remember($cacheKey, $dataPath, function () use ($modules, $os_filter, $base_path) {
+            $os_list = [];
 
-        foreach (glob($base_path . '/tests/data/*.json') as $file) {
-            $base_name = basename($file, '.json');
-            [$os, $variant] = self::extractVariant($file, $base_path);
+            foreach (glob($base_path . '/tests/data/*.json') as $file) {
+                $base_name = basename($file, '.json');
+                [$os, $variant] = self::extractVariant($file, $base_path);
 
-            if ($os_filter != '' && $os_filter != $os) {
-                continue;
+                if ($os_filter != '' && $os_filter != $os) {
+                    continue;
+                }
+
+                // calculate valid modules
+                $decoded = json_decode(file_get_contents($file), true);
+
+                if (json_last_error()) {
+                    echo "Invalid json data: $base_name\n";
+                    exit(1);
+                }
+
+                $data_modules = array_keys($decoded);
+
+                if (empty($modules)) {
+                    $valid_modules = $data_modules;
+                } else {
+                    $valid_modules = array_intersect($modules, $data_modules);
+                }
+
+                if (empty($valid_modules)) {
+                    continue;  // no test data for selected modules
+                }
+
+                try {
+                    $os_list[$base_name] = [
+                        $os,
+                        $variant,
+                        self::resolveModuleDependencies($valid_modules),
+                    ];
+                } catch (InvalidModuleException $e) {
+                    throw new InvalidModuleException('Invalid module ' . $e->getMessage() . " in $os $variant");
+                }
             }
 
-            // calculate valid modules
-            $decoded = json_decode(file_get_contents($file), true);
-
-            if (json_last_error()) {
-                echo "Invalid json data: $base_name\n";
-                exit(1);
-            }
-
-            $data_modules = array_keys($decoded);
-
-            if (empty($modules)) {
-                $valid_modules = $data_modules;
-            } else {
-                $valid_modules = array_intersect($modules, $data_modules);
-            }
-
-            if (empty($valid_modules)) {
-                continue;  // no test data for selected modules
-            }
-
-            try {
-                $os_list[$base_name] = [
-                    $os,
-                    $variant,
-                    self::resolveModuleDependencies($valid_modules),
-                ];
-            } catch (InvalidModuleException $e) {
-                throw new InvalidModuleException('Invalid module ' . $e->getMessage() . " in $os $variant");
-            }
-        }
-
-        return $cache[$cache_key] = $os_list;
+            return $os_list;
+        });
     }
 
     /**
