@@ -28,13 +28,13 @@ use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Tests\Traits\RequiresDatabase;
+use LibreNMS\Tests\Traits\RequiresMysql;
 use PHPUnit\Framework\Attributes\TestDox;
 
 #[TestDox('CiscoSB rldot1dStpPortStateForwarding Trap')]
 final class CiscoSBRlDot1dStpPortStateForwardingTest extends SnmpTrapTestCase
 {
-    use RequiresDatabase;
+    use RequiresMysql;
     use DatabaseTransactions;
 
     #[TestDox('CiscoSB rldot1dStpPortStateForwarding')]

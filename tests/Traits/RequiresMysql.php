@@ -1,7 +1,7 @@
 <?php
 
 /**
- * RequiresDatabase.php
+ * RequiresMysql.php
  *
  * -Description-
  *
@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Tests\Traits;
 
-trait RequiresDatabase
+trait RequiresMysql
 {
     public static function setUpBeforeClass(): void
     {
@@ -37,10 +37,10 @@ trait RequiresDatabase
         parent::setUpBeforeClass();
     }
 
-    protected function setUp(): void
+    public function setUpRequiresMysql(): void
     {
-        parent::setUp();
         config(['database.default' => 'testing']);
         \DB::purge();
+        \DB::reconnect('testing');
     }
 }

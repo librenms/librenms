@@ -14,7 +14,7 @@ use LibreNMS\Tests\TestCase;
 
 class AlertRulesTest extends TestCase
 {
-    use \LibreNMS\Tests\Traits\RequiresDatabase;
+    use \LibreNMS\Tests\Traits\RequiresMysql;
 
     protected function setUp(): void
     {

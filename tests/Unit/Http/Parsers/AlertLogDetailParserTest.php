@@ -4,17 +4,13 @@ namespace LibreNMS\Tests\Unit\Http\Parsers;
 
 use App\Http\Parsers\AlertLogDetailParser;
 use LibreNMS\Tests\TestCase;
+use LibreNMS\Tests\Traits\RequiresMysql;
 
 class AlertLogDetailParserTest extends TestCase
 {
-    use \LibreNMS\Tests\Traits\RequiresDatabase;
-    private AlertLogDetailParser $parser;
+    use RequiresMysql;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->parser = new AlertLogDetailParser();
-    }
+    private AlertLogDetailParser $parser;
 
     public function testFormatBasicRuleAlert(): void
     {
@@ -326,5 +322,11 @@ class AlertLogDetailParserTest extends TestCase
         $this->assertNotContains('snmpver', $labels);
         $this->assertNotContains('authname', $labels);
         $this->assertNotContains('cryptopass', $labels);
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->parser = new AlertLogDetailParser();
     }
 }

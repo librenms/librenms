@@ -36,7 +36,7 @@ use Mockery;
 
 abstract class SnmpTrapTestCase extends TestCase
 {
-    use \LibreNMS\Tests\Traits\RequiresDatabase;
+    use \LibreNMS\Tests\Traits\RequiresMysql;
 
     protected function assertTrapLogsMessage(string $rawTrap, string|array $log, string $failureMessage = '', array $args = [], ?Device $device = null): void
     {

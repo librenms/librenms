@@ -26,9 +26,9 @@
 
 namespace LibreNMS\Tests;
 
-use LibreNMS\Tests\Traits\RequiresDatabase;
+use LibreNMS\Tests\Traits\RequiresMysql;
 
 abstract class DBTestCase extends TestCase
 {
-    use RequiresDatabase;
+    use RequiresMysql;
 }

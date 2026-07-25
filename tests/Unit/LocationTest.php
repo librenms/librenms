@@ -36,7 +36,7 @@ use Mockery\MockInterface;
 
 final class LocationTest extends TestCase
 {
-    use \LibreNMS\Tests\Traits\RequiresDatabase;
+    use \LibreNMS\Tests\Traits\RequiresMysql;
 
     public function testCanSetLocation(): void
     {

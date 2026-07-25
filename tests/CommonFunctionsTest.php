@@ -35,7 +35,7 @@ use LibreNMS\Util\Validate;
 
 final class CommonFunctionsTest extends TestCase
 {
-    use \LibreNMS\Tests\Traits\RequiresDatabase;
+    use \LibreNMS\Tests\Traits\RequiresMysql;
 
     public function testStrContains(): void
     {

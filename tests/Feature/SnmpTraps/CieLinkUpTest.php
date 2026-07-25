@@ -29,13 +29,13 @@ use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Tests\Traits\RequiresDatabase;
+use LibreNMS\Tests\Traits\RequiresMysql;
 use PHPUnit\Framework\Attributes\TestDox;
 
 #[TestDox('Cisco cieLinkUp Trap')]
 final class CieLinkUpTest extends SnmpTrapTestCase
 {
-    use RequiresDatabase;
+    use RequiresMysql;
     use DatabaseTransactions;
 
     #[TestDox('Cisco cieLinkUp')]

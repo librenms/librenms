@@ -34,12 +34,12 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\Traits\RequiresDatabase;
+use LibreNMS\Tests\Traits\RequiresMysql;
 use Log;
 
 final class CommonTrapTest extends SnmpTrapTestCase
 {
-    use RequiresDatabase;
+    use RequiresMysql;
     use DatabaseTransactions;
 
     public function testGarbage(): void

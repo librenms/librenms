@@ -30,11 +30,11 @@ use App\Models\Device;
 use App\Models\Ipv4Address;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Tests\Traits\RequiresDatabase;
+use LibreNMS\Tests\Traits\RequiresMysql;
 
 final class FgTrapIpsTest extends SnmpTrapTestCase
 {
-    use RequiresDatabase;
+    use RequiresMysql;
     use DatabaseTransactions;
 
     public function testIpsAnomaly(): void

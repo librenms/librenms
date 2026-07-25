@@ -31,7 +31,7 @@ use App\Facades\LibrenmsConfig;
 
 final class ConfigTest extends TestCase
 {
-    use \LibreNMS\Tests\Traits\RequiresDatabase;
+    use \LibreNMS\Tests\Traits\RequiresMysql;
     private \ReflectionProperty $config;
 
     protected function setUp(): void

@@ -32,11 +32,11 @@ use App\Models\Device;
 use App\Models\Vminfo;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\PowerState;
-use LibreNMS\Tests\Traits\RequiresDatabase;
+use LibreNMS\Tests\Traits\RequiresMysql;
 
 final class VmwPowerStateTest extends SnmpTrapTestCase
 {
-    use RequiresDatabase;
+    use RequiresMysql;
     use DatabaseTransactions;
 
     public function testVmwVmPoweredOffTrap(): void
