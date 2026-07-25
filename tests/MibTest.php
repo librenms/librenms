@@ -132,6 +132,11 @@ final class MibTest extends TestCase
      */
     public static function mibFiles(): array
     {
+        static $cache = null;
+        if ($cache !== null) {
+            return $cache;
+        }
+
         $mib_base = self::basePath('mibs');
         $install_dir = self::basePath();
 
@@ -149,7 +154,7 @@ final class MibTest extends TestCase
             ];
         }
 
-        return $file_list;
+        return $cache = $file_list;
     }
 
     /**
@@ -159,6 +164,11 @@ final class MibTest extends TestCase
      */
     public static function mibDirs(): array
     {
+        static $cache = null;
+        if ($cache !== null) {
+            return $cache;
+        }
+
         $mib_base = self::basePath('mibs');
 
         $dirs = glob($mib_base . '/*', GLOB_ONLYDIR);
@@ -170,7 +180,7 @@ final class MibTest extends TestCase
             $final_list[$relative_dir] = [$dir];
         }
 
-        return $final_list;
+        return $cache = $final_list;
     }
 
     /**

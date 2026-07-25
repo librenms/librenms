@@ -246,8 +246,14 @@ class ModuleTestHelper
      */
     public static function findOsWithData(array $modules = [], ?string $os_filter = null, ?string $base_path = null): array
     {
-        $os_list = [];
+        static $cache = [];
         $base_path ??= base_path();
+        $cache_key = md5(implode(',', $modules) . '|' . ($os_filter ?? '') . '|' . $base_path);
+        if (isset($cache[$cache_key])) {
+            return $cache[$cache_key];
+        }
+
+        $os_list = [];
 
         foreach (glob($base_path . '/tests/data/*.json') as $file) {
             $base_name = basename($file, '.json');
@@ -288,7 +294,7 @@ class ModuleTestHelper
             }
         }
 
-        return $os_list;
+        return $cache[$cache_key] = $os_list;
     }
 
     /**
