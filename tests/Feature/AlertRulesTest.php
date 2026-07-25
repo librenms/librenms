@@ -16,18 +16,6 @@ class AlertRulesTest extends TestCase
 {
     use \LibreNMS\Tests\Traits\RequiresMysql;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->dbSetUp();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->dbTearDown();
-        parent::tearDown();
-    }
-
     public function testRunRulesSkipsUnderMaintenance(): void
     {
         $device = Device::factory()->create();

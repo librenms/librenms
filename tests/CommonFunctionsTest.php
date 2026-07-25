@@ -152,8 +152,6 @@ final class CommonFunctionsTest extends TestCase
 
     public function testResolveGlues(): void
     {
-        $this->dbSetUp();
-
         $this->assertFalse(ResolveGlues(['dbSchema'], 'device_id'));
 
         $this->assertSame(['devices.device_id'], ResolveGlues(['devices'], 'device_id'));
@@ -171,8 +169,6 @@ final class CommonFunctionsTest extends TestCase
 
         $expected = ['ipv4_addresses.port_id', 'ports.device_id'];
         $this->assertSame($expected, ResolveGlues(['ipv4_addresses'], 'device_id'));
-
-        $this->dbTearDown();
     }
 
     public function testFormatHostname(): void
