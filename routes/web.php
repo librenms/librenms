@@ -186,7 +186,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('popup', App\Http\Controllers\DevicePopupController::class)->name('popup');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
         Route::get('config/backups', [Device\Tabs\ConfigController::class, 'backups'])->name('config.backups');
-        Route::get('config/backups/{backup}', [Device\Tabs\ConfigController::class, 'backup'])->where('backup', '[A-Za-z0-9._|-]+')->name('config.backup');
+        Route::get('config/backup', [Device\Tabs\ConfigController::class, 'backup'])->name('config.backup');
         Route::get('config/diff', [Device\Tabs\ConfigController::class, 'diff'])->name('config.diff');
         Route::put('module/{module}', [Device\Tabs\ModuleController::class, 'update'])->name('module.update');
         Route::delete('module/{module}', [Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
@@ -361,6 +361,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('address-search/mac', Table\MacSearchController::class)->name('search.mac');
             Route::post('alertlog', Table\AlertLogController::class)->name('table.alertlog');
             Route::get('alertlog/export', [Table\AlertLogController::class, 'export'])->name('table.alertlog.export');
+            Route::post('alerts', Table\AlertsController::class)->name('table.alerts');
             Route::post('alert-schedule', Table\AlertScheduleController::class);
             Route::post('customers', Table\CustomersController::class);
             Route::post('diskio', Table\DiskioController::class)->name('table.diskio');
