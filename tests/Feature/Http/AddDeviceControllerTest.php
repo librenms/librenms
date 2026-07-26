@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Http;
+namespace LibreNMS\Tests\Feature\Http;
 
 use App\Models\User;
 use LibreNMS\Exceptions\HostUnreachableSnmpException;
