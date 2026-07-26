@@ -149,8 +149,8 @@ class SecretController extends Controller
     }
 
     /**
-     * @param array<string, mixed> $data
-     * @param array<string, array<string, mixed>> $schema
+     * @param  array<string, mixed>  $data
+     * @param  array<string, array<string, mixed>>  $schema
      * @return array<string, mixed>
      */
     private function maskPasswordFields(array $data, array $schema): array
@@ -165,9 +165,9 @@ class SecretController extends Controller
     }
 
     /**
-     * @param array<string, mixed> $newData
-     * @param array<string, mixed> $originalData
-     * @param array<string, array<string, mixed>> $schema
+     * @param  array<string, mixed>  $newData
+     * @param  array<string, mixed>  $originalData
+     * @param  array<string, array<string, mixed>>  $schema
      * @return array<string, mixed>
      */
     private function restoreMaskedFields(array $newData, array $originalData, array $schema): array

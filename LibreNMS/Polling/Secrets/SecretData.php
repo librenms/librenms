@@ -38,7 +38,7 @@ abstract class SecretData implements Arrayable, Jsonable, JsonSerializable
     /**
      * Create a new DTO instance from an array.
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     abstract public static function fromArray(array $data): static;
 
