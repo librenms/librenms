@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Traits\Filterable;
+use App\Observers\DeviceObserver;
 use App\View\SimpleTemplate;
 use Carbon\Carbon;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -38,6 +40,7 @@ use LibreNMS\Util\Url;
  *
  * @method static \Database\Factories\DeviceFactory factory(...$parameters)
  */
+#[ObservedBy([DeviceObserver::class])]
 class Device extends BaseModel
 {
     use PivotEventTrait, HasFactory, Filterable;
