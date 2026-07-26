@@ -90,11 +90,11 @@
                 </div>
 
                 {{-- Polling Methods Section --}}
-                <div class="tw:bg-white tw:dark:bg-dark-gray-500 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-6">
-                    <dif class="tw:text-lg tw:font-semibold tw:mb-4 tw:text-gray-800 tw:dark:text-dark-white-100 tw:flex tw:items-center tw:gap-2">
+                <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-6">
+                    <div class="tw:text-lg tw:font-semibold tw:mb-4 tw:text-gray-800 tw:dark:text-dark-white-100 tw:flex tw:items-center tw:gap-2">
                         <i class="fa fa-sliders tw:text-[#337ab7]"></i>
                         {{ __('Polling Methods') }}
-                    </dif>
+                    </div>
 
                     <div class="tw:flex tw:flex-col tw:md:flex-row tw:gap-6">
 
@@ -149,7 +149,7 @@
                         </div>
 
                         {{-- Right: tab panels --}}
-                        <div class="tw:w-full tw:md:w-3/4 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-lg tw:shadow-sm tw:p-6 tw:grow">
+                        <div class="tw:w-full tw:md:w-3/4 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-lg tw:shadow-sm tw:p-6 tw:grow tw:bg-white tw:dark:bg-dark-gray-500">
                             @foreach($availableMethods as $method)
                                 <div x-show="activeTab === '{{ $method['type'] }}' && activeMethods.includes('{{ $method['type'] }}')"
                                      style="display: none;"
@@ -309,22 +309,27 @@
 
                 {{-- SNMP manual overrides (only shown when SNMP polling method doesn't exist) --}}
                 <div x-show="!activeMethods.includes('snmp')"
-                     class="tw:bg-yellow-50/50 tw:dark:bg-dark-gray-300/50 tw:border tw:border-yellow-100 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mt-6"
+                     class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-6 tw:mt-6"
                      style="display: none;"
                      x-transition>
-                    <h4 class="tw:font-semibold tw:text-xs tw:uppercase tw:tracking-wider tw:mb-4 tw:text-yellow-800 tw:dark:text-yellow-600">{{ __('Manual Overrides') }}</h4>
-                    <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-3 tw:gap-4 tw:max-w-2xl">
-                        <div class="form-group tw:mb-0">
-                            <label for="sysName" class="control-label">{{ __('sysName') }} <span class="text-muted">({{ __('optional') }})</span></label>
-                            <input type="text" id="sysName" name="sysName" class="form-control" value="{{ old('sysName') }}">
-                        </div>
-                        <div class="form-group tw:mb-0">
-                            <label for="hardware" class="control-label">{{ __('Hardware') }} <span class="text-muted">({{ __('optional') }})</span></label>
-                            <input type="text" id="hardware" name="hardware" class="form-control" value="{{ old('hardware') }}">
-                        </div>
-                        <div class="form-group tw:mb-0" x-init="setTimeout(() => init_select2('#os-select', 'os', {}, null, '{{ __('OS (optional)') }}'), 100)">
-                            <label for="os-select" class="control-label">{{ __('OS') }} <span class="text-muted">({{ __('optional') }})</span></label>
-                            <select id="os-select" name="os" class="form-control"></select>
+                    <div class="tw:text-lg tw:font-semibold tw:mb-4 tw:text-gray-800 tw:dark:text-dark-white-100 tw:flex tw:items-center tw:gap-2">
+                        <i class="fa fa-wrench tw:text-[#337ab7]"></i>
+                        {{ __('Manual Overrides') }}
+                    </div>
+                    <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:bg-white tw:dark:bg-dark-gray-500">
+                        <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-3 tw:gap-4 tw:max-w-2xl">
+                            <div class="form-group tw:mb-0">
+                                <label for="sysName" class="control-label">{{ __('sysName') }} <span class="text-muted">({{ __('optional') }})</span></label>
+                                <input type="text" id="sysName" name="sysName" class="form-control" value="{{ old('sysName') }}">
+                            </div>
+                            <div class="form-group tw:mb-0">
+                                <label for="hardware" class="control-label">{{ __('Hardware') }} <span class="text-muted">({{ __('optional') }})</span></label>
+                                <input type="text" id="hardware" name="hardware" class="form-control" value="{{ old('hardware') }}">
+                            </div>
+                            <div class="form-group tw:mb-0" x-init="setTimeout(() => init_select2('#os-select', 'os', {}, null, '{{ __('OS (optional)') }}'), 100)">
+                                <label for="os-select" class="control-label">{{ __('OS') }} <span class="text-muted">({{ __('optional') }})</span></label>
+                                <select id="os-select" name="os" class="form-control"></select>
+                            </div>
                         </div>
                     </div>
                 </div>
