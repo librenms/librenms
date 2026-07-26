@@ -248,7 +248,7 @@ class AlertsController extends TableController
         [$faultDetail, $maxRowLength] = $this->renderFaultDetail($model->latestLog);
 
         $state = (int) $model->state;
-        $collapseClass = $this->incidentCollapseClass($model->getAttribute('uncollapse_key_count'), $maxRowLength);
+        $collapseClass = $this->incidentCollapseClass(request()->input('uncollapse_key_count'), $maxRowLength);
 
         $hostname = '<div class="incident">'
             . Url::modernDeviceLink($model->device)
