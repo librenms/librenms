@@ -12,7 +12,8 @@
     }
 }
 @layer utilities {
-    html {
+    html,
+    body {
         font-size: 16px;
     }
 }
