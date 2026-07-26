@@ -129,39 +129,13 @@
                                         {{ $method['label'] }} {{ __('Details') }}
                                     </h5>
 
-                                    @foreach($method['schema_fields'] as $field)
-                                        <div class="tw:mb-4"
-                                             @if($field['visible_if_expression']) x-show="{{ $field['visible_if_expression'] }}" @endif>
-                                            <label class="tw:block tw:font-medium tw:mb-1 tw:text-gray-700 tw:dark:text-dark-white-200">
-                                                {{ __($field['label']) }}
-                                            </label>
-
-                                            @if($field['field_type'] === 'select')
-                                                <select name="secret_data[{{ $field['key'] }}]"
-                                                        x-model="formData['{{ $field['key'] }}']"
-                                                        class="form-control">
-                                                    @foreach($field['options'] as $optVal => $optLabel)
-                                                        <option value="{{ $optVal }}">{{ __($optLabel) }}</option>
-                                                    @endforeach
-                                                </select>
-                                            @elseif($field['field_type'] === 'password')
-                                                <input type="password"
-                                                       name="secret_data[{{ $field['key'] }}]"
-                                                       class="form-control"
-                                                       autocomplete="new-password">
-                                            @else
-                                                <input type="text"
-                                                       name="secret_data[{{ $field['key'] }}]"
-                                                       x-model="formData['{{ $field['key'] }}']"
-                                                       class="form-control"
-                                                       value="{{ old('secret_data.' . $field['key'], '') }}">
-                                            @endif
-
-                                            @error('secret_data.' . $field['key'])
-                                            <p class="tw:text-red-600 tw:dark:text-red-400 tw:text-sm tw:mt-1">{{ $message }}</p>
-                                            @enderror
-                                        </div>
-                                    @endforeach
+                                    @include('device.includes.secret-fields', [
+                                        'fields' => $method['schema_fields'],
+                                        'methodType' => $method['type'],
+                                        'namePrefix' => 'secret_data',
+                                        'modelPrefix' => 'formData',
+                                        'useOld' => true,
+                                    ])
                                 </div>
                             </div>
                         </div>
@@ -174,29 +148,12 @@
                         <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Settings') }}</h4>
 
                         <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:text-sm tw:bg-white tw:dark:bg-dark-gray-500">
-                            <div class="tw:grid tw:grid-cols-1 tw:gap-4">
-                                @foreach($method['settings_fields'] as $setting)
-                                    <div @if($setting['visible_if_expression']) x-show="{{ $setting['visible_if_expression'] }}" @endif>
-                                        <label class="tw:block tw:font-medium tw:mb-1 tw:text-gray-700 tw:dark:text-dark-white-200">
-                                            {{ __('poller.method_settings.' . $method['type'] . '.' . $setting['key']) }}
-                                        </label>
-
-                                        @if(($setting['field_type'] ?? 'text') === 'select')
-                                            <select name="settings[{{ $setting['key'] }}]" x-model="settingsData['{{ $setting['key'] }}']" class="form-control">
-                                                @foreach($setting['options'] ?? [] as $optVal => $optLabel)
-                                                    <option value="{{ $optVal }}">{{ __($optLabel) }}</option>
-                                                @endforeach
-                                            </select>
-                                        @elseif(($setting['field_type'] ?? 'text') === 'number')
-                                            <input type="number" name="settings[{{ $setting['key'] }}]" x-model="settingsData['{{ $setting['key'] }}']" class="form-control"
-                                                   @if(isset($setting['min'])) min="{{ $setting['min'] }}" @endif
-                                                   @if(isset($setting['max'])) max="{{ $setting['max'] }}" @endif>
-                                        @else
-                                            <input type="text" name="settings[{{ $setting['key'] }}]" x-model="settingsData['{{ $setting['key'] }}']" class="form-control">
-                                        @endif
-                                    </div>
-                                @endforeach
-                            </div>
+                            @include('device.includes.method-settings', [
+                                'fields' => $method['settings_fields'],
+                                'methodType' => $method['type'],
+                                'namePrefix' => 'settings',
+                                'modelPrefix' => 'settingsData',
+                            ])
                         </div>
                     </div>
                 @endif
