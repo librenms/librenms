@@ -28,7 +28,7 @@ class DevicePollingMethod extends Model
         'method_type' => PollingMethodType::class,
         'enabled' => 'boolean',
         'affects_availability' => 'boolean',
-        'settings'  => 'array',
+        'settings' => 'array',
         'last_checked_at' => 'datetime',
         'last_check_successful' => 'boolean',
     ];

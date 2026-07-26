@@ -4,7 +4,8 @@ use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         DB::transaction(function () {
@@ -37,7 +38,7 @@ return new class extends Migration {
                         $data = [
                             'username' => $attribs['ipmi_username'] ?? '',
                             'password' => $attribs['ipmi_password'] ?? '',
-                            'kg_key'   => $attribs['ipmi_kg_key'] ?? null,
+                            'kg_key' => $attribs['ipmi_kg_key'] ?? null,
                         ];
 
                         try {
@@ -47,14 +48,14 @@ return new class extends Migration {
                                 $secretId = DB::table('secrets')->insertGetId([
                                     'description' => "IPMI for device {$hostnamesByDevice[$deviceId]}",
                                     'secret_type' => 'ipmi',
-                                    'default'     => false,
-                                    'data'        => encrypt(json_encode($data)),
-                                    'created_at'  => now(),
-                                    'updated_at'  => now(),
+                                    'default' => false,
+                                    'data' => encrypt(json_encode($data)),
+                                    'created_at' => now(),
+                                    'updated_at' => now(),
                                 ]);
                                 $secretMap[$hash] = $secretId;
                                 $secretMeta[$secretId] = [
-                                    'count'    => 1,
+                                    'count' => 1,
                                     'hostname' => $hostnamesByDevice[$deviceId],
                                 ];
                             } else {
@@ -63,13 +64,13 @@ return new class extends Migration {
                             }
 
                             $pollingMethods[] = [
-                                'device_id'            => $deviceId,
-                                'method_type'          => 'ipmi',
-                                'enabled'              => true,
+                                'device_id' => $deviceId,
+                                'method_type' => 'ipmi',
+                                'enabled' => true,
                                 'affects_availability' => false,
-                                'secret_id'            => $secretId,
-                                'created_at'           => now(),
-                                'updated_at'           => now(),
+                                'secret_id' => $secretId,
+                                'created_at' => now(),
+                                'updated_at' => now(),
                             ];
                         } catch (EncryptException) {
                             // ignore
@@ -87,7 +88,7 @@ return new class extends Migration {
                     $id++;
                     DB::table('secrets')->where('id', $secretId)->update([
                         'description' => "IPMI (shared #$id)",
-                        'updated_at'  => now(),
+                        'updated_at' => now(),
                     ]);
                 }
             }

@@ -16,7 +16,8 @@ readonly class IcmpPollingMethod implements PollingMethod
     public function __construct(
         public bool $enabled,
         public bool $affectsAvailability,
-    ) {}
+    ) {
+    }
 
     public function isEnabled(): bool
     {

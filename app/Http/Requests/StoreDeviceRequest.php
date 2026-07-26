@@ -24,20 +24,20 @@ class StoreDeviceRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'hostname'              => ['required', 'ip_or_hostname'],
-            'port'                  => ['nullable', 'integer', 'between:1,65535'],
-            'transport'             => ['nullable', 'string', 'in:udp,udp6,tcp,tcp6'],
-            'poller_group'          => ['nullable', 'integer', Rule::in(PollerGroup::pluck('id')->prepend(0))],
-            'port_assoc_mode'       => ['nullable', 'string', Rule::in(PortAssociationMode::getModes())],
-            'force_add'             => ['nullable', 'boolean'],
-            'ping_fallback'         => ['nullable', 'boolean'],
-            'polling_methods'       => ['required', 'array'],
-            'sysName'               => ['nullable', 'string', 'max:255'],
-            'hardware'              => ['nullable', 'string', 'max:255'],
-            'os'                    => ['nullable', 'string', 'max:255'],
-            'active_tab'            => ['nullable', 'string'],
-            'active_methods'        => ['nullable', 'array'],
-            'active_methods.*'      => ['string'],
+            'hostname' => ['required', 'ip_or_hostname'],
+            'port' => ['nullable', 'integer', 'between:1,65535'],
+            'transport' => ['nullable', 'string', 'in:udp,udp6,tcp,tcp6'],
+            'poller_group' => ['nullable', 'integer', Rule::in(PollerGroup::pluck('id')->prepend(0))],
+            'port_assoc_mode' => ['nullable', 'string', Rule::in(PortAssociationMode::getModes())],
+            'force_add' => ['nullable', 'boolean'],
+            'ping_fallback' => ['nullable', 'boolean'],
+            'polling_methods' => ['required', 'array'],
+            'sysName' => ['nullable', 'string', 'max:255'],
+            'hardware' => ['nullable', 'string', 'max:255'],
+            'os' => ['nullable', 'string', 'max:255'],
+            'active_tab' => ['nullable', 'string'],
+            'active_methods' => ['nullable', 'array'],
+            'active_methods.*' => ['string'],
         ];
 
         // Loop over the methods provided in the request
@@ -97,7 +97,7 @@ class StoreDeviceRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'force_add'     => $this->boolean('force_add'),
+            'force_add' => $this->boolean('force_add'),
             'ping_fallback' => $this->boolean('ping_fallback'),
         ]);
 
