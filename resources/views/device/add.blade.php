@@ -31,7 +31,7 @@
                                affects_availability: {{ old("polling_methods.{$method['type']}.affects_availability") !== null ? (old("polling_methods.{$method['type']}.affects_availability") ? 'true' : 'false') : (in_array($method['type'], ['snmp', 'icmp']) ? 'true' : 'false') }},
                                credential_mode: '{{ old("polling_methods.{$method['type']}.credential_mode", 'default') }}',
                                formData: @js(old("polling_methods.{$method['type']}.secret_data", $method['schema_defaults'] ?? [])),
-                               settingsData: @js(old("polling_methods.{$method['type']}.settings", []))
+                               settingsData: @js(old("polling_methods.{$method['type']}.settings", $method['settings_defaults'] ?? []))
                           },
                           @endforeach
                       },
@@ -60,47 +60,41 @@
 
                 {{-- General Properties Section --}}
                 <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-6 tw:mb-6">
-                    <h3 class="tw:text-lg tw:font-semibold tw:mb-4 tw:text-gray-800 tw:dark:text-dark-white-100 tw:flex tw:items-center tw:gap-2">
+                    <div class="tw:text-lg tw:font-semibold tw:mb-4 tw:text-gray-800 tw:dark:text-dark-white-100 tw:flex tw:items-center tw:gap-2">
                         <i class="fa fa-info-circle tw:text-[#337ab7]"></i>
                         {{ __('General Properties') }}
-                    </h3>
-                    <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-3 tw:gap-6">
-                        <div class="form-group @error('hostname') has-error @enderror tw:mb-0">
-                            <label for="hostname" class="control-label">{{ __('Hostname or IP') }}</label>
-                            <input type="text" id="hostname" name="hostname" class="form-control"
-                                   value="{{ old('hostname') }}" placeholder="device.example.com" required autofocus>
-                            @error('hostname')
-                                <span class="help-block">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <div class="form-group tw:mb-0">
-                            <label for="port_assoc_mode" class="control-label">{{ __('Port Association Mode') }}</label>
-                            <select id="port_assoc_mode" name="port_assoc_mode" class="form-control">
-                                @foreach($port_association_modes as $mode)
-                                    <option value="{{ $mode }}" {{ old('port_assoc_mode', $default_port_association_mode) === $mode ? 'selected' : '' }}>{{ $mode }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="form-group tw:mb-0">
-                            <label for="poller_group" class="control-label">{{ __('Poller Group') }}</label>
-                            <select id="poller_group" name="poller_group" class="form-control">
-                                <option value="0">{{ __('Default poller group') }}</option>
-                                @foreach($poller_groups as $id => $name)
-                                    <option value="{{ $id }}" {{ old('poller_group', $default_poller_group) == $id ? 'selected' : '' }}>{{ $name }}</option>
-                                @endforeach
-                            </select>
+                    </div>
+                    <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:bg-white tw:dark:bg-dark-gray-500">
+                        <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-6">
+                            <div class="form-group @error('hostname') has-error @enderror tw:mb-0">
+                                <label for="hostname" class="control-label">{{ __('Hostname or IP') }}</label>
+                                <input type="text" id="hostname" name="hostname" class="form-control"
+                                       value="{{ old('hostname') }}" placeholder="device.example.com" required autofocus>
+                                @error('hostname')
+                                    <span class="help-block">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            @config('distributed_poller')
+                            <div class="form-group tw:mb-0">
+                                <label for="poller_group" class="control-label">{{ __('Poller Group') }}</label>
+                                <select id="poller_group" name="poller_group" class="form-control">
+                                    <option value="0">{{ __('Default poller group') }}</option>
+                                    @foreach($poller_groups as $id => $name)
+                                        <option value="{{ $id }}" {{ old('poller_group', $default_poller_group) == $id ? 'selected' : '' }}>{{ $name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            @endconfig
                         </div>
                     </div>
                 </div>
 
                 {{-- Polling Methods Section --}}
                 <div class="tw:bg-white tw:dark:bg-dark-gray-500 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-6">
-                    <h3 class="tw:text-lg tw:font-semibold tw:mb-4 tw:text-gray-800 tw:dark:text-dark-white-100 tw:flex tw:items-center tw:gap-2">
+                    <dif class="tw:text-lg tw:font-semibold tw:mb-4 tw:text-gray-800 tw:dark:text-dark-white-100 tw:flex tw:items-center tw:gap-2">
                         <i class="fa fa-sliders tw:text-[#337ab7]"></i>
                         {{ __('Polling Methods') }}
-                    </h3>
+                    </dif>
 
                     <div class="tw:flex tw:flex-col tw:md:flex-row tw:gap-6">
 
@@ -171,11 +165,11 @@
                                     </template>
 
                                     {{-- Method Options --}}
-                                    <div class="tw:mb-6">
-                                        <h4 class="tw:font-semibold tw:text-xs tw:uppercase tw:tracking-wider tw:mb-3 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Method Options') }}</h4>
+                                    <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mb-6">
+                                        <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Method Options') }}</h4>
                                         <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl">
                                             {{-- Validate on add toggle --}}
-                                            <label class="tw:flex tw:items-center tw:cursor-pointer tw:group tw:px-4 tw:py-3 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:w-full">
+                                            <label class="tw:flex tw:items-center tw:cursor-pointer tw:group tw:px-4 tw:py-3 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:bg-white tw:dark:bg-dark-gray-500 tw:w-full">
                                                 <div class="tw:relative tw:shrink-0">
                                                     <input type="hidden" name="polling_methods[{{ $method['type'] }}][validate]" value="0">
                                                     <input type="checkbox" name="polling_methods[{{ $method['type'] }}][validate]"
@@ -190,7 +184,7 @@
                                             </label>
 
                                             {{-- Affects Availability toggle --}}
-                                            <label class="tw:flex tw:items-center tw:cursor-pointer tw:group tw:px-4 tw:py-3 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:w-full">
+                                            <label class="tw:flex tw:items-center tw:cursor-pointer tw:group tw:px-4 tw:py-3 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:bg-white tw:dark:bg-dark-gray-500 tw:w-full">
                                                 <div class="tw:relative tw:shrink-0">
                                                     <input type="hidden" name="polling_methods[{{ $method['type'] }}][affects_availability]" value="0">
                                                     <input type="checkbox" name="polling_methods[{{ $method['type'] }}][affects_availability]"
@@ -209,108 +203,110 @@
                                     {{-- Credentials --}}
                                     @if(!empty($method['schema_fields']))
                                         <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mb-6">
-                                            <h4 class="tw:font-semibold tw:text-xs tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Credentials') }}</h4>
+                                            <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Credentials') }}</h4>
 
-                                            <div class="tw:flex tw:flex-wrap tw:gap-6 tw:mb-4">
-                                                <label class="radio-inline">
-                                                    <input type="radio"
-                                                           name="polling_methods[{{ $method['type'] }}][credential_mode]"
-                                                           value="default"
-                                                           x-model="methods['{{ $method['type'] }}'].credential_mode">
-                                                    {{ __('Attempt Defaults') }}
-                                                </label>
-                                                <label class="radio-inline">
-                                                    <input type="radio"
-                                                           name="polling_methods[{{ $method['type'] }}][credential_mode]"
-                                                           value="existing"
-                                                           x-model="methods['{{ $method['type'] }}'].credential_mode">
-                                                    {{ __('Use Existing Secret') }}
-                                                </label>
-                                                <label class="radio-inline">
-                                                    <input type="radio"
-                                                           name="polling_methods[{{ $method['type'] }}][credential_mode]"
-                                                           value="new"
-                                                           x-model="methods['{{ $method['type'] }}'].credential_mode">
-                                                    {{ __('Create New Secret') }}
-                                                </label>
-                                            </div>
-
-                                            {{-- Existing secret picker --}}
-                                            <div x-show="methods['{{ $method['type'] }}'].credential_mode === 'existing'"
-                                                 style="display: none;"
-                                                 class="form-group tw:max-w-md tw:mb-0">
-                                                <label class="control-label">{{ __('Select Secret') }}</label>
-                                                <select name="polling_methods[{{ $method['type'] }}][secret_id]" class="form-control">
-                                                    <option value="">{{ __('Select an existing secret...') }}</option>
-                                                    @foreach($availableSecrets[$method['type']] ?? [] as $secret)
-                                                        <option value="{{ $secret->id }}"
-                                                            {{ old("polling_methods.{$method['type']}.secret_id") == $secret->id ? 'selected' : '' }}>
-                                                            {{ $secret->description }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-
-                                            {{-- New secret form --}}
-                                            <div x-show="methods['{{ $method['type'] }}'].credential_mode === 'new'"
-                                                 style="display: none;">
-                                                <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl tw:mb-4">
-                                                    <div class="form-group">
-                                                        <label class="control-label">{{ __('Secret Description') }}</label>
-                                                        <input type="text"
-                                                               name="polling_methods[{{ $method['type'] }}][description]"
-                                                               class="form-control"
-                                                               placeholder="{{ __('Optional') }}"
-                                                               value="{{ old("polling_methods.{$method['type']}.description") }}">
-                                                    </div>
-                                                    <div class="form-group tw:flex tw:items-end">
-                                                        <div class="checkbox tw:mb-0">
-                                                            <label>
-                                                                <input type="hidden" name="polling_methods[{{ $method['type'] }}][default]" value="0">
-                                                                <input type="checkbox"
-                                                                       name="polling_methods[{{ $method['type'] }}][default]"
-                                                                       value="1"
-                                                                    {{ old("polling_methods.{$method['type']}.default") ? 'checked' : '' }}>
-                                                                {{ __('Make Default') }}
-                                                            </label>
-                                                        </div>
-                                                    </div>
+                                            <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:bg-white tw:dark:bg-dark-gray-500">
+                                                <div class="tw:flex tw:flex-wrap tw:gap-6 tw:mb-4">
+                                                    <label class="radio-inline">
+                                                        <input type="radio"
+                                                               name="polling_methods[{{ $method['type'] }}][credential_mode]"
+                                                               value="default"
+                                                               x-model="methods['{{ $method['type'] }}'].credential_mode">
+                                                        {{ __('Attempt Defaults') }}
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio"
+                                                               name="polling_methods[{{ $method['type'] }}][credential_mode]"
+                                                               value="existing"
+                                                               x-model="methods['{{ $method['type'] }}'].credential_mode">
+                                                        {{ __('Use Existing Secret') }}
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio"
+                                                               name="polling_methods[{{ $method['type'] }}][credential_mode]"
+                                                               value="new"
+                                                               x-model="methods['{{ $method['type'] }}'].credential_mode">
+                                                        {{ __('Create New Secret') }}
+                                                    </label>
                                                 </div>
 
-                                                <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl">
-                                                    @foreach($method['schema_fields'] as $field)
-                                                        <div class="form-group"
-                                                             @if($field['visible_if_expression']) x-show="{{ $field['visible_if_expression'] }}" @endif>
-                                                            <label class="control-label">{{ __($field['label']) }}</label>
-                                                            @if($field['field_type'] === 'select')
-                                                                <select name="polling_methods[{{ $method['type'] }}][secret_data][{{ $field['key'] }}]"
-                                                                        x-model="methods['{{ $method['type'] }}'].formData['{{ $field['key'] }}']"
-                                                                        class="form-control">
-                                                                    @foreach($field['options'] as $optVal => $optLabel)
-                                                                        <option value="{{ $optVal }}">{{ __($optLabel) }}</option>
-                                                                    @endforeach
-                                                                </select>
-                                                            @elseif($field['field_type'] === 'password')
-                                                                 <div class="input-group tw:w-full">
-                                                                     <input type="password"
-                                                                            id="secret_{{ $method['type'] }}_{{ $field['key'] }}"
-                                                                            name="polling_methods[{{ $method['type'] }}][secret_data][{{ $field['key'] }}]"
-                                                                            class="form-control"
-                                                                            autocomplete="new-password">
-                                                                     <span class="input-group-btn">
-                                                                         <button type="button" class="btn btn-default btn-toggle-password" onclick="togglePasswordVisibility('secret_{{ $method['type'] }}_{{ $field['key'] }}', this)" title="{{ __('Show/hide') }}">
-                                                                             <i class="fa fa-eye-slash"></i>
-                                                                         </button>
-                                                                     </span>
-                                                                 </div>
-                                                            @else
-                                                                <input type="text"
-                                                                       name="polling_methods[{{ $method['type'] }}][secret_data][{{ $field['key'] }}]"
-                                                                       x-model="methods['{{ $method['type'] }}'].formData['{{ $field['key'] }}']"
-                                                                       class="form-control">
-                                                            @endif
+                                                {{-- Existing secret picker --}}
+                                                <div x-show="methods['{{ $method['type'] }}'].credential_mode === 'existing'"
+                                                     style="display: none;"
+                                                     class="form-group tw:max-w-md tw:mb-0">
+                                                    <label class="control-label">{{ __('Select Secret') }}</label>
+                                                    <select name="polling_methods[{{ $method['type'] }}][secret_id]" class="form-control">
+                                                        <option value="">{{ __('Select an existing secret...') }}</option>
+                                                        @foreach($availableSecrets[$method['type']] ?? [] as $secret)
+                                                            <option value="{{ $secret->id }}"
+                                                                {{ old("polling_methods.{$method['type']}.secret_id") == $secret->id ? 'selected' : '' }}>
+                                                                {{ $secret->description }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+
+                                                {{-- New secret form --}}
+                                                <div x-show="methods['{{ $method['type'] }}'].credential_mode === 'new'"
+                                                     style="display: none;">
+                                                    <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl tw:mb-4">
+                                                        <div class="form-group">
+                                                            <label class="control-label">{{ __('Secret Description') }}</label>
+                                                            <input type="text"
+                                                                   name="polling_methods[{{ $method['type'] }}][description]"
+                                                                   class="form-control"
+                                                                   placeholder="{{ __('Optional') }}"
+                                                                   value="{{ old("polling_methods.{$method['type']}.description") }}">
                                                         </div>
-                                                    @endforeach
+                                                        <div class="form-group tw:flex tw:items-end">
+                                                            <div class="checkbox tw:mb-0">
+                                                                <label>
+                                                                    <input type="hidden" name="polling_methods[{{ $method['type'] }}][default]" value="0">
+                                                                    <input type="checkbox"
+                                                                           name="polling_methods[{{ $method['type'] }}][default]"
+                                                                           value="1"
+                                                                        {{ old("polling_methods.{$method['type']}.default") ? 'checked' : '' }}>
+                                                                    {{ __('Make Default') }}
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl">
+                                                        @foreach($method['schema_fields'] as $field)
+                                                            <div class="form-group"
+                                                                 @if($field['visible_if_expression']) x-show="{{ $field['visible_if_expression'] }}" @endif>
+                                                                <label class="control-label">{{ __($field['label']) }}</label>
+                                                                @if($field['field_type'] === 'select')
+                                                                    <select name="polling_methods[{{ $method['type'] }}][secret_data][{{ $field['key'] }}]"
+                                                                            x-model="methods['{{ $method['type'] }}'].formData['{{ $field['key'] }}']"
+                                                                            class="form-control">
+                                                                        @foreach($field['options'] as $optVal => $optLabel)
+                                                                            <option value="{{ $optVal }}">{{ __($optLabel) }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                @elseif($field['field_type'] === 'password')
+                                                                     <div class="input-group tw:w-full">
+                                                                         <input type="password"
+                                                                                id="secret_{{ $method['type'] }}_{{ $field['key'] }}"
+                                                                                name="polling_methods[{{ $method['type'] }}][secret_data][{{ $field['key'] }}]"
+                                                                                class="form-control"
+                                                                                autocomplete="new-password">
+                                                                         <span class="input-group-btn">
+                                                                             <button type="button" class="btn btn-default btn-toggle-password" onclick="togglePasswordVisibility('secret_{{ $method['type'] }}_{{ $field['key'] }}', this)" title="{{ __('Show/hide') }}">
+                                                                                 <i class="fa fa-eye-slash"></i>
+                                                                             </button>
+                                                                         </span>
+                                                                     </div>
+                                                                @else
+                                                                    <input type="text"
+                                                                           name="polling_methods[{{ $method['type'] }}][secret_data][{{ $field['key'] }}]"
+                                                                           x-model="methods['{{ $method['type'] }}'].formData['{{ $field['key'] }}']"
+                                                                           class="form-control">
+                                                                @endif
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -319,35 +315,37 @@
                                     {{-- Settings fields --}}
                                     @if(!empty($method['settings_fields']))
                                         <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mb-6">
-                                            <h4 class="tw:font-semibold tw:text-xs tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Settings') }}</h4>
-                                            <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl">
-                                                @foreach($method['settings_fields'] as $setting)
-                                                    <div class="form-group tw:mb-0"
-                                                         @if($setting['visible_if_expression']) x-show="{{ $setting['visible_if_expression'] }}" @endif>
-                                                        <label class="control-label">{{ __('poller.method_settings.' . $method['type'] . '.' . $setting['key']) }}</label>
-                                                        @if(($setting['field_type'] ?? 'text') === 'select')
-                                                            <select name="polling_methods[{{ $method['type'] }}][settings][{{ $setting['key'] }}]"
-                                                                    x-model="methods['{{ $method['type'] }}'].settingsData['{{ $setting['key'] }}']"
-                                                                    class="form-control">
-                                                                @foreach($setting['options'] ?? [] as $optVal => $optLabel)
-                                                                    <option value="{{ $optVal }}">{{ __($optLabel) }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        @elseif(($setting['field_type'] ?? 'text') === 'number')
-                                                            <input type="number"
-                                                                   name="polling_methods[{{ $method['type'] }}][settings][{{ $setting['key'] }}]"
-                                                                   x-model="methods['{{ $method['type'] }}'].settingsData['{{ $setting['key'] }}']"
-                                                                   class="form-control"
-                                                                   @isset($setting['min']) min="{{ $setting['min'] }}" @endisset
-                                                                   @isset($setting['max']) max="{{ $setting['max'] }}" @endisset>
-                                                        @else
-                                                            <input type="text"
-                                                                   name="polling_methods[{{ $method['type'] }}][settings][{{ $setting['key'] }}]"
-                                                                   x-model="methods['{{ $method['type'] }}'].settingsData['{{ $setting['key'] }}']"
-                                                                   class="form-control">
-                                                        @endif
-                                                    </div>
-                                                @endforeach
+                                            <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Settings') }}</h4>
+                                            <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:bg-white tw:dark:bg-dark-gray-500">
+                                                <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl">
+                                                    @foreach($method['settings_fields'] as $setting)
+                                                        <div class="form-group tw:mb-0"
+                                                             @if($setting['visible_if_expression']) x-show="{{ $setting['visible_if_expression'] }}" @endif>
+                                                            <label class="control-label">{{ __('poller.method_settings.' . $method['type'] . '.' . $setting['key']) }}</label>
+                                                            @if(($setting['field_type'] ?? 'text') === 'select')
+                                                                <select name="polling_methods[{{ $method['type'] }}][settings][{{ $setting['key'] }}]"
+                                                                        x-model="methods['{{ $method['type'] }}'].settingsData['{{ $setting['key'] }}']"
+                                                                        class="form-control">
+                                                                    @foreach($setting['options'] ?? [] as $optVal => $optLabel)
+                                                                        <option value="{{ $optVal }}">{{ __($optLabel) }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            @elseif(($setting['field_type'] ?? 'text') === 'number')
+                                                                <input type="number"
+                                                                       name="polling_methods[{{ $method['type'] }}][settings][{{ $setting['key'] }}]"
+                                                                       x-model="methods['{{ $method['type'] }}'].settingsData['{{ $setting['key'] }}']"
+                                                                       class="form-control"
+                                                                       @isset($setting['min']) min="{{ $setting['min'] }}" @endisset
+                                                                       @isset($setting['max']) max="{{ $setting['max'] }}" @endisset>
+                                                            @else
+                                                                <input type="text"
+                                                                       name="polling_methods[{{ $method['type'] }}][settings][{{ $setting['key'] }}]"
+                                                                       x-model="methods['{{ $method['type'] }}'].settingsData['{{ $setting['key'] }}']"
+                                                                       class="form-control">
+                                                            @endif
+                                                        </div>
+                                                    @endforeach
+                                                </div>
                                             </div>
                                         </div>
                                     @endif

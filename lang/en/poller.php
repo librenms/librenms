@@ -22,6 +22,7 @@ return [
             'timeout' => 'SNMP timeout',
             'max_repeaters' => 'SNMP max repeaters',
             'max_oid' => 'SNMP max OID',
+            'port_association_mode' => 'Port Association Mode',
         ],
         'unix-agent' => [
             'port' => 'Unix Agent Port',
