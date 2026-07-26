@@ -23,7 +23,7 @@ class SecretService
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function updateOrCreate(DevicePollingMethod $row, PollingMethodType $type, array $data, string $mode): Secret
     {
@@ -40,8 +40,8 @@ class SecretService
     }
 
     /**
-     * @param array<string, mixed> $data
-     * @param array{description: string, default?: bool} $meta
+     * @param  array<string, mixed>  $data
+     * @param  array{description: string, default?: bool}  $meta
      */
     public function create(PollingMethodType $type, array $data, array $meta): Secret
     {
