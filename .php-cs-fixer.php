@@ -6,10 +6,7 @@ use PhpCsFixer\Finder;
 $rules = [
     'array_indentation' => true,
     'array_syntax' => ['syntax' => 'short'],
-    'binary_operator_spaces' => [
-        'default' => 'single_space',
-        'operators' => ['=>' => null],
-    ],
+    'binary_operator_spaces' => true,
     'blank_line_after_namespace' => true,
     'blank_line_after_opening_tag' => true,
     'blank_line_before_statement' => [
@@ -25,9 +22,7 @@ $rules = [
     'cast_spaces' => true,
     'class_attributes_separation' => [
         'elements' => [
-//            'const' => 'one',
             'method' => 'one',
-//            'property' => 'one',
             'trait_import' => 'none',
         ],
     ],
@@ -62,8 +57,9 @@ $rules = [
         'strategy' => 'no_multi_line',
     ],
     'native_function_casing' => true,
+    'nullable_type_declaration' => true,
     'no_alias_functions' => true,
-    'no_extra_blank_lines' => false,
+    'no_extra_blank_lines' => true,
     'no_blank_lines_after_class_opening' => true,
     'no_blank_lines_after_phpdoc' => true,
     'no_closing_tag' => true,
@@ -98,12 +94,20 @@ $rules = [
     'no_unused_imports' => true,
     'ordered_imports' => false,
     'psr_autoloading' => true,
+    'phpdoc_align' => [
+        'align' => 'left',
+        'spacing' => ['param' => 2],
+    ],
     'phpdoc_indent' => true,
     'phpdoc_inline_tag_normalizer' => true,
     'phpdoc_no_access' => true,
     'phpdoc_no_package' => true,
     'phpdoc_no_useless_inheritdoc' => true,
     'phpdoc_scalar' => true,
+    'phpdoc_separation' => [
+        'groups' => [['template'], ['param', 'return']],
+        'skip_unlisted_annotations' => true,
+    ],
     'phpdoc_single_line_var_spacing' => true,
     'phpdoc_summary' => false,
     'phpdoc_to_comment' => false, // override to preserve user preference
@@ -138,7 +142,6 @@ $rules = [
     ],
     'whitespace_after_comma_in_array' => true,
 ];
-
 
 $finder = Finder::create()
     ->in([
