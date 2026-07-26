@@ -19,8 +19,7 @@ interface PollingMethod
 
     /**
      * UI/form schema for device-specific settings.
-     *
-     * @return array<string, array{type: string, options?: array<string,string>, visible_if?: array}>
+     * @return array<string, array{type: string, default?: mixed, options?: array<string,string>, visible_if?: array<string, mixed>}>
      */
     public static function getSettingsSchema(): array;
 
@@ -34,7 +33,7 @@ interface PollingMethod
     /**
      * Validation rules for polling method per-device settings
      *
-     * @return array<string, array|string>
+     * @return array<string, array<mixed>|string>
      */
     public static function getRules(): array;
 

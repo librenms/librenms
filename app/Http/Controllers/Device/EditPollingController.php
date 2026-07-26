@@ -53,6 +53,9 @@ class EditPollingController
         ]);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function buildMethodData(Device $device, PollingMethodType $type): array
     {
         $methodClass = $type->methodClass();
@@ -169,18 +172,25 @@ class EditPollingController
 
     /**
      * @param  class-string  $methodClass
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
      */
     private function buildSettings(string $methodClass, array $validated): array
     {
-        $schemaDefaults = collect($methodClass::getSettingsSchema())
-            ->mapWithKeys(fn ($field, $key) => [
+        /** @var array<string, array{default?: mixed, options?: array<string, string>}> $settingsSchema */
+        $settingsSchema = $methodClass::getSettingsSchema();
+        $schemaDefaults = collect($settingsSchema)
+            ->mapWithKeys(fn (array $field, string $key): array => [
                 $key => $field['default'] ?? (isset($field['options']) ? array_key_first($field['options']) : null),
             ])
             ->filter();
 
+        /** @var array<string, mixed> $defaults */
+        $defaults = $methodClass::getDefaults();
+
         return array_merge(
             $schemaDefaults->all(),
-            collect($methodClass::getDefaults())->except('affects_availability')->all(),
+            collect($defaults)->except('affects_availability')->all(),
             $validated
         );
     }
@@ -239,11 +249,16 @@ class EditPollingController
     }
 
     /**
+     * @param  array<string, mixed>  $existing
+     * @param  array<string, mixed>  $validated
      * @param  class-string  $methodClass
+     * @return array<string, mixed>
      */
     private function mergeSettings(array $existing, array $validated, string $methodClass): array
     {
-        $allowed = collect($methodClass::getSettingsSchema())->keys();
+        /** @var array<string, array<string, mixed>> $settingsSchema */
+        $settingsSchema = $methodClass::getSettingsSchema();
+        $allowed = collect($settingsSchema)->keys();
 
         return array_merge(
             $existing,
