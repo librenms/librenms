@@ -31,7 +31,8 @@ class Secret extends BaseModel
      * If no class is specified, it is inferred from the secret type.
      *
      * @template T of SecretData
-     * @param class-string<T>|null $secretClass
+     *
+     * @param  class-string<T>|null  $secretClass
      * @return ($secretClass is null ? SecretData : T)
      */
     public function asSecretData(?string $secretClass = null): SecretData
