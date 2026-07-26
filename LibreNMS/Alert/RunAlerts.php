@@ -45,7 +45,6 @@ use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertRuleOperationPhase;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\MaintenanceStatus;
-use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Exceptions\RrdException;
