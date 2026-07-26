@@ -5,7 +5,9 @@ namespace LibreNMS\Polling\Method;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
+use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Interfaces\PollingMethod;
 use SnmpQuery;
 
@@ -208,6 +210,11 @@ readonly class SnmpPollingMethod implements PollingMethod
             'max_oid' => [
                 'type' => 'number',
             ],
+            'port_association_mode' => [
+                'type' => 'select',
+                'options' => array_combine(PortAssociationMode::getModes(), PortAssociationMode::getModes()),
+                'default' => LibrenmsConfig::get('default_port_association_mode', 'ifIndex'),
+            ],
         ];
     }
 
@@ -221,6 +228,7 @@ readonly class SnmpPollingMethod implements PollingMethod
             'retries' => 1,
             'max_repeaters' => 0,
             'max_oid' => 10,
+            'port_association_mode' => LibrenmsConfig::get('default_port_association_mode', 'ifIndex'),
         ];
     }
 
@@ -233,6 +241,7 @@ readonly class SnmpPollingMethod implements PollingMethod
             'retries' => ['nullable', 'integer', 'min:0', 'max:10'],
             'max_repeaters' => ['nullable', 'integer', 'min:0', 'max:30'],
             'max_oid' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'port_association_mode' => ['nullable', 'string', Rule::in(PortAssociationMode::getModes())],
         ];
     }
 }

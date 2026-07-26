@@ -147,4 +147,35 @@ class AddDeviceControllerTest extends TestCase
         $this->assertCount(1, $calledCredentials);
         $this->assertEquals('target-community', $calledCredentials[0]['community']);
     }
+
+    public function testStoreDeviceWithPortAssociationModeInSnmpSettings(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.create');
+
+        $mock = Mockery::mock('overload:App\Actions\Device\ValidateDeviceAndCreate');
+        $mock->shouldReceive('execute')->once()->andReturn(true);
+
+        $response = $this->actingAs($admin)->post(route('device.add.store'), [
+            'hostname' => 'test-device.example.com',
+            'poller_group' => 0,
+            'polling_methods' => [
+                'snmp' => [
+                    'active' => '1',
+                    'validate' => '0',
+                    'credential_mode' => 'default',
+                    'settings' => [
+                        'transport' => 'udp',
+                        'port_association_mode' => 'ifName',
+                    ],
+                ]
+            ]
+        ]);
+
+        $response->assertRedirect();
+        $device = \App\Models\Device::where('hostname', 'test-device.example.com')->first();
+        $this->assertNotNull($device);
+        $this->assertEquals(\LibreNMS\Enum\PortAssociationMode::getId('ifName'), $device->port_association_mode);
+    }
 }

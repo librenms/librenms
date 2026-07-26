@@ -141,10 +141,10 @@
                                 <input type="hidden" name="tab" value="{{ $method['type'] }}">
 
                                 {{-- Method Options --}}
-                                <div class="tw:mb-6">
-                                    <h4 class="tw:font-semibold tw:text-xs tw:uppercase tw:tracking-wider tw:mb-3 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Method Options') }}</h4>
+                                <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mb-6">
+                                    <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Method Options') }}</h4>
                                     <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl">
-                                        <label class="tw:flex tw:items-center tw:cursor-pointer tw:group tw:px-4 tw:py-3 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:w-full">
+                                        <label class="tw:flex tw:items-center tw:cursor-pointer tw:group tw:px-4 tw:py-3 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:bg-white tw:dark:bg-dark-gray-500 tw:w-full">
                                             <div class="tw:relative tw:shrink-0">
                                                 <input type="hidden" name="enabled" value="0">
                                                 <input type="checkbox" name="enabled" value="1" class="tw:sr-only" x-model="enabled">
@@ -154,7 +154,7 @@
                                             <span class="tw:ml-3 tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Enabled') }}</span>
                                         </label>
 
-                                        <label class="tw:flex tw:items-center tw:cursor-pointer tw:group tw:px-4 tw:py-3 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:w-full">
+                                        <label class="tw:flex tw:items-center tw:cursor-pointer tw:group tw:px-4 tw:py-3 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:bg-white tw:dark:bg-dark-gray-500 tw:w-full">
                                             <div class="tw:relative tw:shrink-0">
                                                 <input type="hidden" name="affects_availability" value="0">
                                                 <input type="checkbox" name="affects_availability" value="1" class="tw:sr-only" x-model="affectsAvailability">
@@ -170,7 +170,7 @@
                                 @if(!empty($method['schema_fields']))
                                     @if($method['configured'])
                                         <div x-show="enabled" class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mb-6">
-                                            <h4 class="tw:font-semibold tw:text-xs tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Credentials') }}</h4>
+                                            <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Credentials') }}</h4>
 
                                             <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:text-sm tw:bg-white tw:dark:bg-dark-gray-500">
                                                 <input type="hidden" name="secret_id" :value="selectedSecretId" :disabled="!secretSelectionConfirmed">
@@ -276,77 +276,80 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    @else
                                         {{-- Unconfigured credentials section --}}
                                         <input type="hidden" name="credential_mode" :value="credentialMode">
                                         <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mb-6">
-                                            <h4 class="tw:font-semibold tw:text-xs tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Credentials') }}</h4>
+                                            <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Credentials') }}</h4>
 
-                                            <div class="tw:flex tw:flex-wrap tw:gap-6 tw:mb-4">
-                                                <label class="radio-inline">
-                                                    <input type="radio" value="existing" x-model="credentialMode">
-                                                    {{ __('Use Existing Secret') }}
-                                                </label>
-                                                <label class="radio-inline">
-                                                    <input type="radio" value="new" x-model="credentialMode">
-                                                    {{ __('Create New Secret') }}
-                                                </label>
-                                            </div>
-
-                                            {{-- Existing secret picker --}}
-                                            <div x-show="credentialMode === 'existing'" style="display: none;" class="form-group tw:max-w-md tw:mb-0">
-                                                <label class="control-label">{{ __('Select Secret') }}</label>
-                                                <select name="secret_id" class="form-control">
-                                                    <option value="">{{ __('Select an existing secret...') }}</option>
-                                                    @foreach($availableSecrets[$method['type']] ?? [] as $secret)
-                                                        <option value="{{ $secret->id }}" {{ old('secret_id') == $secret->id ? 'selected' : '' }}>
-                                                            {{ $secret->description }}
-                                                        </option>
-                                                     @endforeach
-                                                </select>
-                                            </div>
-
-                                            {{-- New secret form --}}
-                                            <div x-show="credentialMode === 'new'" style="display: none;">
-                                                <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl tw:mb-4">
-                                                    <div class="form-group">
-                                                        <label class="control-label">{{ __('Secret Description') }}</label>
-                                                        <input type="text" name="description" class="form-control" placeholder="{{ __('Optional') }}" value="{{ old('description') }}">
-                                                    </div>
-                                                    <div class="tw:flex tw:items-end">
-                                                        <div class="checkbox tw:mb-0">
-                                                            <label>
-                                                                <input type="hidden" name="default" value="0">
-                                                                <input type="checkbox" name="default" value="1" {{ old('default') ? 'checked' : '' }}>
-                                                                {{ __('Make Default') }}
-                                                            </label>
-                                                        </div>
-                                                    </div>
+                                            <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:text-sm tw:bg-white tw:dark:bg-dark-gray-500">
+                                                <div class="tw:flex tw:flex-wrap tw:gap-6 tw:mb-4">
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="existing" x-model="credentialMode">
+                                                        {{ __('Use Existing Secret') }}
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="new" x-model="credentialMode">
+                                                        {{ __('Create New Secret') }}
+                                                    </label>
                                                 </div>
 
-                                                <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl">
-                                                    @foreach($method['schema_fields'] as $field)
-                                                        <div class="form-group" @if($field['visible_if_expression']) x-show="{{ $field['visible_if_expression'] }}" @endif>
-                                                            <label class="control-label">{{ __($field['label']) }}</label>
-                                                            @if($field['field_type'] === 'select')
-                                                                <select name="secret_data[{{ $field['key'] }}]" x-model="formData['{{ $field['key'] }}']" class="form-control tw:rounded-lg tw:border-gray-200 tw:bg-white tw:dark:border-dark-gray-400 tw:dark:bg-dark-gray-500 tw:dark:text-white">
-                                                                    @foreach($field['options'] as $optVal => $optLabel)
-                                                                        <option value="{{ $optVal }}">{{ __($optLabel) }}</option>
-                                                                    @endforeach
-                                                                </select>
-                                                            @elseif($field['field_type'] === 'password')
-                                                                <div class="input-group tw:w-full">
-                                                                    <input type="password" id="secret_{{ $method['type'] }}_{{ $field['key'] }}" name="secret_data[{{ $field['key'] }}]" class="form-control" autocomplete="new-password">
-                                                                    <span class="input-group-btn">
-                                                                        <button type="button" class="btn btn-default btn-toggle-password" onclick="togglePasswordVisibility('secret_{{ $method['type'] }}_{{ $field['key'] }}', this)" title="{{ __('Show/hide') }}">
-                                                                            <i class="fa fa-eye-slash"></i>
-                                                                        </button>
-                                                                    </span>
-                                                                </div>
-                                                            @else
-                                                                <input type="text" name="secret_data[{{ $field['key'] }}]" x-model="formData['{{ $field['key'] }}']" class="form-control">
-                                                            @endif
+                                                {{-- Existing secret picker --}}
+                                                <div x-show="credentialMode === 'existing'" style="display: none;" class="form-group tw:max-w-md tw:mb-0">
+                                                    <label class="control-label">{{ __('Select Secret') }}</label>
+                                                    <select name="secret_id" class="form-control">
+                                                        <option value="">{{ __('Select an existing secret...') }}</option>
+                                                        @foreach($availableSecrets[$method['type']] ?? [] as $secret)
+                                                            <option value="{{ $secret->id }}" {{ old('secret_id') == $secret->id ? 'selected' : '' }}>
+                                                                {{ $secret->description }}
+                                                            </option>
+                                                         @endforeach
+                                                    </select>
+                                                </div>
+
+                                                {{-- New secret form --}}
+                                                <div x-show="credentialMode === 'new'" style="display: none;">
+                                                    <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl tw:mb-4">
+                                                        <div class="form-group">
+                                                            <label class="control-label">{{ __('Secret Description') }}</label>
+                                                            <input type="text" name="description" class="form-control" placeholder="{{ __('Optional') }}" value="{{ old('description') }}">
                                                         </div>
-                                                    @endforeach
+                                                        <div class="tw:flex tw:items-end">
+                                                            <div class="checkbox tw:mb-0">
+                                                                <label>
+                                                                    <input type="hidden" name="default" value="0">
+                                                                    <input type="checkbox" name="default" value="1" {{ old('default') ? 'checked' : '' }}>
+                                                                    {{ __('Make Default') }}
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl">
+                                                        @foreach($method['schema_fields'] as $field)
+                                                            <div class="form-group" @if($field['visible_if_expression']) x-show="{{ $field['visible_if_expression'] }}" @endif>
+                                                                <label class="control-label">{{ __($field['label']) }}</label>
+                                                                @if($field['field_type'] === 'select')
+                                                                    <select name="secret_data[{{ $field['key'] }}]" x-model="formData['{{ $field['key'] }}']" class="form-control tw:rounded-lg tw:border-gray-200 tw:bg-white tw:dark:border-dark-gray-400 tw:dark:bg-dark-gray-500 tw:dark:text-white">
+                                                                        @foreach($field['options'] as $optVal => $optLabel)
+                                                                            <option value="{{ $optVal }}">{{ __($optLabel) }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                @elseif($field['field_type'] === 'password')
+                                                                    <div class="input-group tw:w-full">
+                                                                        <input type="password" id="secret_{{ $method['type'] }}_{{ $field['key'] }}" name="secret_data[{{ $field['key'] }}]" class="form-control" autocomplete="new-password">
+                                                                        <span class="input-group-btn">
+                                                                            <button type="button" class="btn btn-default btn-toggle-password" onclick="togglePasswordVisibility('secret_{{ $method['type'] }}_{{ $field['key'] }}', this)" title="{{ __('Show/hide') }}">
+                                                                                <i class="fa fa-eye-slash"></i>
+                                                                            </button>
+                                                                        </span>
+                                                                    </div>
+                                                                @else
+                                                                    <input type="text" name="secret_data[{{ $field['key'] }}]" x-model="formData['{{ $field['key'] }}']" class="form-control">
+                                                                @endif
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -356,32 +359,34 @@
                                 {{-- Settings Configuration --}}
                                 @if(!empty($method['settings_fields']))
                                     <div x-show="enabled" class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mb-6">
-                                        <h4 class="tw:font-semibold tw:text-xs tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Settings') }}</h4>
+                                        <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Settings') }}</h4>
 
-                                        <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl">
-                                            @foreach($method['settings_fields'] as $setting)
-                                                <div @if($setting['visible_if_expression']) x-show="{{ $setting['visible_if_expression'] }}" @endif>
-                                                    <label class="tw:block tw:text-sm tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200 tw:mb-1">{{ __('poller.method_settings.' . $method['type'] . '.' . $setting['key']) }}</label>
-                                                    @if(($setting['field_type'] ?? 'text') === 'select')
-                                                        <select name="settings[{{ $setting['key'] }}]" x-model="settingsData['{{ $setting['key'] }}']" class="form-control">
-                                                            @foreach($setting['options'] ?? [] as $optVal => $optLabel)
-                                                                <option value="{{ $optVal }}">{{ __($optLabel) }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    @elseif(($setting['field_type'] ?? 'text') === 'number')
-                                                        <input
-                                                            type="number"
-                                                            name="settings[{{ $setting['key'] }}]"
-                                                            x-model="settingsData['{{ $setting['key'] }}']"
-                                                            class="form-control"
-                                                            @isset($setting['min']) min="{{ $setting['min'] }}" @endisset
-                                                            @isset($setting['max']) max="{{ $setting['max'] }}" @endisset
-                                                        >
-                                                    @else
-                                                        <input type="text" name="settings[{{ $setting['key'] }}]" x-model="settingsData['{{ $setting['key'] }}']" class="form-control">
-                                                    @endif
-                                                </div>
-                                            @endforeach
+                                        <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:text-sm tw:bg-white tw:dark:bg-dark-gray-500">
+                                            <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl">
+                                                @foreach($method['settings_fields'] as $setting)
+                                                    <div @if($setting['visible_if_expression']) x-show="{{ $setting['visible_if_expression'] }}" @endif>
+                                                        <label class="tw:block tw:text-sm tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200 tw:mb-1">{{ __('poller.method_settings.' . $method['type'] . '.' . $setting['key']) }}</label>
+                                                        @if(($setting['field_type'] ?? 'text') === 'select')
+                                                            <select name="settings[{{ $setting['key'] }}]" x-model="settingsData['{{ $setting['key'] }}']" class="form-control">
+                                                                @foreach($setting['options'] ?? [] as $optVal => $optLabel)
+                                                                    <option value="{{ $optVal }}">{{ __($optLabel) }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        @elseif(($setting['field_type'] ?? 'text') === 'number')
+                                                            <input
+                                                                type="number"
+                                                                name="settings[{{ $setting['key'] }}]"
+                                                                x-model="settingsData['{{ $setting['key'] }}']"
+                                                                class="form-control"
+                                                                @isset($setting['min']) min="{{ $setting['min'] }}" @endisset
+                                                                @isset($setting['max']) max="{{ $setting['max'] }}" @endisset
+                                                            >
+                                                        @else
+                                                            <input type="text" name="settings[{{ $setting['key'] }}]" x-model="settingsData['{{ $setting['key'] }}']" class="form-control">
+                                                        @endif
+                                                    </div>
+                                                @endforeach
+                                            </div>
                                         </div>
                                     </div>
                                 @endif
