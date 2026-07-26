@@ -35,7 +35,8 @@ readonly class SnmpPollingMethod implements PollingMethod
         public int $retries,
         public int $maxRepeaters,
         public int $maxOid,
-    ) {}
+    ) {
+    }
 
     public function isEnabled(): bool
     {

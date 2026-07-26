@@ -32,7 +32,7 @@ class EncryptedArray implements CastsAttributes
      *
      * @param  array<string, mixed>  $attributes
      */
-    public function set(Model $model, string $key, mixed $value, array $attributes): string|null
+    public function set(Model $model, string $key, mixed $value, array $attributes): ?string
     {
         if (! is_array($value) || empty($value)) {
             return null;

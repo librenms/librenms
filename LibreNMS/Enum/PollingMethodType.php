@@ -78,8 +78,8 @@ enum PollingMethodType: string
 
             return [
                 ...$field,
-                'key'                   => $key,
-                'field_type'            => $field['type'] ?? 'text',
+                'key' => $key,
+                'field_type' => $field['type'] ?? 'text',
                 'visible_if_expression' => $visibleIfExpression,
             ];
         })->values()->all();
