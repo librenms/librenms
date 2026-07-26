@@ -82,6 +82,9 @@ readonly class IpmiPollingMethod implements PollingMethod
         );
     }
 
+    /**
+     * @return array<string, array{type: string, default?: mixed, options?: array<string,string>, visible_if?: array<string, mixed>}>
+     */
     public static function getSettingsSchema(): array
     {
         return [
@@ -111,6 +114,9 @@ readonly class IpmiPollingMethod implements PollingMethod
         ];
     }
 
+    /**
+     * @return array<string, array<mixed>|string>
+     */
     public static function getRules(): array
     {
         return [

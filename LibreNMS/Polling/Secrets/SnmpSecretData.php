@@ -41,6 +41,9 @@ class SnmpSecretData extends SecretData
     ) {
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public static function fromArray(array $data): static
     {
         return new static(
@@ -59,7 +62,7 @@ class SnmpSecretData extends SecretData
     /**
      * @deprecated
      *
-     * @param  array  $device
+     * @param  array<string, mixed>  $device
      * @return static
      */
     public static function fromDeviceArray(array $device): static
@@ -77,6 +80,9 @@ class SnmpSecretData extends SecretData
         );
     }
 
+    /**
+     * @return array<string, string|array<mixed>>
+     */
     public static function rules(): array
     {
         return [
@@ -91,6 +97,9 @@ class SnmpSecretData extends SecretData
         ];
     }
 
+    /**
+     * @return array<string, array<string, mixed>>
+     */
     public static function getUiSchema(): array
     {
         return [

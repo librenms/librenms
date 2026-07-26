@@ -30,26 +30,38 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
 
+/**
+ * @implements Arrayable<string, mixed>
+ */
 abstract class SecretData implements Arrayable, Jsonable, JsonSerializable
 {
     /**
      * Create a new DTO instance from an array.
+     *
+     * @param array<string, mixed> $data
      */
     abstract public static function fromArray(array $data): static;
 
     /**
      * Get validation rules for this credential type.
+     *
+     * @return array<string, string|array<mixed>>
      */
     abstract public static function rules(): array;
 
     /**
      * Get UI schema for this credential type.
+     *
+     * @return array<string, array<string, mixed>>
      */
     public static function getUiSchema(): array
     {
         return [];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
         return get_object_vars($this);
