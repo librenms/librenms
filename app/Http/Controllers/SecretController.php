@@ -148,6 +148,11 @@ class SecretController extends Controller
         return redirect()->route('secrets.index');
     }
 
+    /**
+     * @param array<string, mixed> $data
+     * @param array<string, array<string, mixed>> $schema
+     * @return array<string, mixed>
+     */
     private function maskPasswordFields(array $data, array $schema): array
     {
         foreach ($schema as $field => $config) {
@@ -159,6 +164,12 @@ class SecretController extends Controller
         return $data;
     }
 
+    /**
+     * @param array<string, mixed> $newData
+     * @param array<string, mixed> $originalData
+     * @param array<string, array<string, mixed>> $schema
+     * @return array<string, mixed>
+     */
     private function restoreMaskedFields(array $newData, array $originalData, array $schema): array
     {
         foreach ($schema as $field => $config) {

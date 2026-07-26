@@ -7,12 +7,16 @@ use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @implements CastsAttributes<array<string, mixed>, array<string, mixed>|string|null>
+ */
 class EncryptedArray implements CastsAttributes
 {
     /**
      * Cast the given value.
      *
      * @param  array<string, mixed>  $attributes
+     * @return array<string, mixed>
      */
     public function get(Model $model, string $key, mixed $value, array $attributes): array
     {

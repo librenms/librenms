@@ -12,6 +12,7 @@ use LibreNMS\Polling\Secrets\SecretData;
 
 class Secret extends BaseModel
 {
+    /** @use HasFactory<\Database\Factories\SecretFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -46,6 +47,7 @@ class Secret extends BaseModel
 
     /**
      * @param  Builder<Secret>  $query
+     * @return Builder<Secret>
      */
     public function scopeHasAccess(Builder $query, User $user): Builder
     {

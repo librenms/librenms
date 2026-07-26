@@ -98,6 +98,9 @@ readonly class SnmpPollingMethod implements PollingMethod
         );
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function toNetSnmpOptions(?string $context = null): array
     {
         $options = ['-' . $this->version];
@@ -184,6 +187,9 @@ readonly class SnmpPollingMethod implements PollingMethod
         );
     }
 
+    /**
+     * @return array<string, array{type: string, default?: mixed, options?: array<string,string>, visible_if?: array<string, mixed>}>
+     */
     public static function getSettingsSchema(): array
     {
         return [
@@ -233,6 +239,9 @@ readonly class SnmpPollingMethod implements PollingMethod
         ];
     }
 
+    /**
+     * @return array<string, array<mixed>|string>
+     */
     public static function getRules(): array
     {
         return [

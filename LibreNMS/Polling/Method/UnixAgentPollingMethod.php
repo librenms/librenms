@@ -71,6 +71,9 @@ readonly class UnixAgentPollingMethod implements PollingMethod
         );
     }
 
+    /**
+     * @return array<string, array{type: string, default?: int, min?: int, max?: int, options?: array<string,string>, visible_if?: array<string, mixed>}>
+     */
     public static function getSettingsSchema(): array
     {
         return [
@@ -90,6 +93,9 @@ readonly class UnixAgentPollingMethod implements PollingMethod
         ];
     }
 
+    /**
+     * @return array<string, array<mixed>|string>
+     */
     public static function getRules(): array
     {
         return [

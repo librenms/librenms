@@ -89,11 +89,17 @@ class StorePollingMethodRequest extends FormRequest
         return is_string($methodType) ? PollingMethodType::tryFrom($methodType) : null;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function validatedSettings(): array
     {
         return $this->validated('settings', []);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function validatedSecretData(): array
     {
         return $this->validated('secret_data', []);

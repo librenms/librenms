@@ -78,6 +78,8 @@ class AddDeviceController
         $this->authorize('create', Device::class);
 
         $validated = $request->validated();
+
+        /** @var array<string, array<string, mixed>> $rawMethods */
         $rawMethods = $validated['polling_methods'] ?? [];
         $snmpActive = (bool) ($rawMethods['snmp']['active'] ?? false);
 
@@ -175,6 +177,8 @@ class AddDeviceController
     /**
      * Resolve the secret for a polling method from the submitted credential_mode data.
      * Returns null for "default" mode (caller should not attach a secret relation).
+     *
+     * @param array<string, mixed> $data
      */
     private function resolveSecret(PollingMethodType $type, array $data): ?Secret
     {

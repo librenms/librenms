@@ -55,8 +55,9 @@ enum PollingMethodType: string
     }
 
     /**
-     * @param  array<string, array>  $schema
-     * @return array
+     * @param array<string, array<string, mixed>> $schema
+     * @param string $dataVar
+     * @return array<int, array<string, mixed>>
      */
     public static function buildSchemaFields(array $schema, string $dataVar = 'formData'): array
     {

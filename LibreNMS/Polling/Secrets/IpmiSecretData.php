@@ -35,6 +35,9 @@ class IpmiSecretData extends SecretData
     ) {
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public static function fromArray(array $data): static
     {
         return new static(
@@ -44,6 +47,9 @@ class IpmiSecretData extends SecretData
         );
     }
 
+    /**
+     * @return array<string, string|array<mixed>>
+     */
     public static function rules(): array
     {
         return [
@@ -53,6 +59,9 @@ class IpmiSecretData extends SecretData
         ];
     }
 
+    /**
+     * @return array<string, array<string, mixed>>
+     */
     public static function getUiSchema(): array
     {
         return [

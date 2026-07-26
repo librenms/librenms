@@ -22,6 +22,9 @@ class SecretService
         return $secret;
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public function updateOrCreate(DevicePollingMethod $row, PollingMethodType $type, array $data, string $mode): Secret
     {
         if (! $row->secret || $mode === 'create') {
@@ -36,6 +39,10 @@ class SecretService
         return $row->secret;
     }
 
+    /**
+     * @param array<string, mixed> $data
+     * @param array{description: string, default?: bool} $meta
+     */
     public function create(PollingMethodType $type, array $data, array $meta): Secret
     {
         return Secret::create([
