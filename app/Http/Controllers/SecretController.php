@@ -114,7 +114,7 @@ class SecretController extends Controller
 
         $validated = $request->validate([
             'description' => 'required|string|max:255',
-            'default'     => 'boolean',
+            'default' => 'boolean',
         ]);
 
         $secretType = $secret->secret_type;
@@ -128,8 +128,8 @@ class SecretController extends Controller
 
         $secret->update([
             'description' => $validated['description'],
-            'default'     => $request->boolean('default'),
-            'data'        => $data,
+            'default' => $request->boolean('default'),
+            'data' => $data,
         ]);
 
         $toast->success(__('Secret updated'));
