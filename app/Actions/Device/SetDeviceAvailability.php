@@ -38,7 +38,7 @@ class SetDeviceAvailability
         if ($commit) {
             $device->save();
             Log::debug('Device availability updated for ' . $device->hostname . ' to ' . ($device->status ? 'up' : 'down') . ' due to ' . $device->status_reason);
-            $this->updateDeviceOutage->execute($device, $device->status);
+            $this->updateDeviceOutage->execute($device);
         }
 
         return $changed;

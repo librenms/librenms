@@ -29,7 +29,6 @@ namespace App\Jobs;
 use App\Action;
 use App\Actions\Alerts\RunAlertRulesAction;
 use App\Actions\Device\SetDeviceAvailability;
-use App\Actions\Device\UpdateDeviceOutage;
 use App\Models\Device;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -41,10 +40,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\FpingResponse;
-<<<<<<< HEAD
-=======
 use LibreNMS\Enum\PollingMethodType;
->>>>>>> 95a09e2f1f (Polling Methods & Credentials)
 
 class PingCheck implements ShouldQueue
 {

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Enum\PollingMethodType;
@@ -10,6 +11,8 @@ use LibreNMS\Polling\PollingMethodFactory;
 
 class DevicePollingMethod extends Model
 {
+    /** @use HasFactory<\Database\Factories\DevicePollingMethodFactory> */
+    use HasFactory;
     protected $fillable = [
         'device_id',
         'method_type',

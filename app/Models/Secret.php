@@ -37,6 +37,7 @@ class Secret extends BaseModel
     public function asSecretData(?string $secretClass = null): SecretData
     {
         $class = $secretClass ?? $this->secret_type->secretClass();
+
         return $class::fromArray($this->data);
     }
 

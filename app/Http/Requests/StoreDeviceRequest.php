@@ -48,18 +48,18 @@ class StoreDeviceRequest extends FormRequest
             }
 
             // Only validate if explicitly checked/enabled in form
-            $isActive = !empty($data['active']) && $this->boolean("polling_methods.{$method}.active");
-            $isEnabled = !empty($data['enabled']) && $this->boolean("polling_methods.{$method}.enabled");
+            $isActive = ! empty($data['active']) && $this->boolean("polling_methods.{$method}.active");
+            $isEnabled = ! empty($data['enabled']) && $this->boolean("polling_methods.{$method}.enabled");
 
             if (! $isActive && ! $isEnabled) {
                 continue;
             }
 
-            $rules["polling_methods.{$method}.active"]               = ['nullable', 'boolean'];
-            $rules["polling_methods.{$method}.validate"]             = ['nullable', 'boolean'];
+            $rules["polling_methods.{$method}.active"] = ['nullable', 'boolean'];
+            $rules["polling_methods.{$method}.validate"] = ['nullable', 'boolean'];
             $rules["polling_methods.{$method}.affects_availability"] = ['nullable', 'boolean'];
-            $rules["polling_methods.{$method}.credential_mode"]      = ['nullable', 'in:default,existing,new'];
-            
+            $rules["polling_methods.{$method}.credential_mode"] = ['nullable', 'in:default,existing,new'];
+
             if ($type->hasSecret()) {
                 $rules["polling_methods.{$method}.secret_id"] = [
                     'required_if:polling_methods.' . $method . '.credential_mode,existing',
@@ -69,7 +69,7 @@ class StoreDeviceRequest extends FormRequest
                 ];
 
                 $rules["polling_methods.{$method}.description"] = ['nullable', 'string', 'max:255'];
-                $rules["polling_methods.{$method}.default"]     = ['nullable', 'boolean'];
+                $rules["polling_methods.{$method}.default"] = ['nullable', 'boolean'];
 
                 $credentialMode = $data['credential_mode'] ?? 'default';
                 if ($credentialMode === 'new') {

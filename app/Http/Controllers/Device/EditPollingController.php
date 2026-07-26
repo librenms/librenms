@@ -86,7 +86,7 @@ class EditPollingController
             ])->all(),
             'settings_fields' => PollingMethodType::buildSchemaFields($settingsSchema, 'settingsData'),
             'settings' => array_merge(
-                $row?->settings ?? [],
+                $row->settings ?? [],
                 $type === PollingMethodType::Snmp ? ['port_association_mode' => PortAssociationMode::getName($device->port_association_mode) ?? LibrenmsConfig::get('default_port_association_mode', 'ifIndex')] : []
             ),
             'affects_availability' => $row ? $row->affects_availability : (bool) ($methodClass::getDefaults()['affects_availability'] ?? false),

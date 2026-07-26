@@ -59,8 +59,8 @@ class AddDeviceControllerTest extends TestCase
                     'settings' => [
                         'transport' => 'udp',
                     ],
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $response->assertRedirect();
@@ -92,15 +92,16 @@ class AddDeviceControllerTest extends TestCase
                 if ($secret) {
                     $calledCredentials[] = $secret->data;
                 }
+
                 return false; // Force it to fail to collect all tried credentials
             });
 
         $factoryMock = Mockery::mock(\LibreNMS\Polling\PollingMethodFactory::class);
         $factoryMock->shouldReceive('make')
-            ->andReturnUsing(fn(\App\Models\DevicePollingMethod $method) => match ($method->method_type) {
+            ->andReturnUsing(fn (\App\Models\DevicePollingMethod $method) => match ($method->method_type) {
                 \LibreNMS\Enum\PollingMethodType::Icmp => $icmpMock,
                 \LibreNMS\Enum\PollingMethodType::Snmp => $snmpMock,
-                default => throw new \UnexpectedValueException("Unexpected polling method type"),
+                default => throw new \UnexpectedValueException('Unexpected polling method type'),
             });
         $this->instance(\LibreNMS\Polling\PollingMethodFactory::class, $factoryMock);
 
@@ -108,7 +109,7 @@ class AddDeviceControllerTest extends TestCase
         \App\Facades\LibrenmsConfig::set('snmp.version', ['v2c', 'v3']);
         \App\Facades\LibrenmsConfig::set('snmp.community', ['global-community']);
         \App\Facades\LibrenmsConfig::set('snmp.v3', [
-            ['authname' => 'global-v3-user', 'authlevel' => 'authNoPriv', 'authpass' => 'globalpass']
+            ['authname' => 'global-v3-user', 'authlevel' => 'authNoPriv', 'authpass' => 'globalpass'],
         ]);
 
         // Create an existing secret
@@ -135,8 +136,8 @@ class AddDeviceControllerTest extends TestCase
                     'settings' => [
                         'transport' => 'udp',
                     ],
-                ]
-            ]
+                ],
+            ],
         ]);
 
         // It should fail because SnmpIsAvailable always returned false, throwing HostUnreachableException
@@ -169,8 +170,8 @@ class AddDeviceControllerTest extends TestCase
                         'transport' => 'udp',
                         'port_association_mode' => 'ifName',
                     ],
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $response->assertRedirect();

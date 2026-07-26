@@ -187,15 +187,15 @@ final class OSDiscoveryTest extends TestCase
             'hostname' => $this->getSnmpsimIp(),
             'os' => 'generic',
         ]);
-        
+
         $device->setRelation('pollingMethods', collect([
             new \App\Models\DevicePollingMethod([
                 'method_type' => \LibreNMS\Enum\PollingMethodType::Snmp,
                 'enabled' => true,
                 'affects_availability' => true,
-            ])
+            ]),
         ]));
-        
+
         $secret = new \App\Models\Secret([
             'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
             'data' => [

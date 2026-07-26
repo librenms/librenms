@@ -25,7 +25,7 @@ class UpdatePollingMethodRequest extends FormRequest
             $device = $this->route('device');
             if ($device) {
                 $pollingMethod = $device->pollingMethods()->where('method_type', $type->value)->first();
-                $oldData = $pollingMethod?->secret?->data ?? [];
+                $oldData = $pollingMethod->secret->data ?? [];
 
                 $secretData = $this->input('secret_data');
                 if (is_array($secretData)) {
