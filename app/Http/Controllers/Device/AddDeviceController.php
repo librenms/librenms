@@ -50,6 +50,11 @@ class AddDeviceController
                     ]
                 )->all(),
                 'settings_fields' => PollingMethodType::buildSchemaFields($settingsSchema, "methods['" . $type->value . "'].settingsData"),
+                'settings_defaults' => collect($settingsSchema)->mapWithKeys(
+                    fn (array $field, string $key): array => [
+                        $key => $field['default'] ?? (isset($field['options']) ? array_key_first($field['options']) : ''),
+                    ]
+                )->all(),
             ];
         });
 
@@ -73,15 +78,18 @@ class AddDeviceController
         $this->authorize('create', Device::class);
 
         $validated = $request->validated();
+        $rawMethods = $validated['polling_methods'] ?? [];
+        $snmpActive = (bool) ($rawMethods['snmp']['active'] ?? false);
+
+        $portAssocModeStr = $rawMethods['snmp']['settings']['port_association_mode']
+            ?? $validated['port_assoc_mode']
+            ?? LibrenmsConfig::get('default_port_association_mode', 'ifIndex');
 
         $device = new Device([
             'hostname' => $validated['hostname'],
             'poller_group' => $validated['poller_group'] ?? LibrenmsConfig::get('default_poller_group', 0),
-            'port_association_mode' => PortAssociationMode::getId($validated['port_assoc_mode'] ?? 'ifIndex') ?? 1,
+            'port_association_mode' => PortAssociationMode::getId($portAssocModeStr) ?? 1,
         ]);
-
-        $rawMethods = $validated['polling_methods'] ?? [];
-        $snmpActive = (bool) ($rawMethods['snmp']['active'] ?? false);
 
         $pollingMethods = collect();
 
@@ -102,6 +110,9 @@ class AddDeviceController
             if ($type === PollingMethodType::Snmp) {
                 $device->port = (int) ($settings['port'] ?? LibrenmsConfig::get('snmp.port', 161));
                 $device->transport = $settings['transport'] ?? LibrenmsConfig::get('snmp.transports.0', 'udp');
+                if (isset($settings['port_association_mode'])) {
+                    $device->port_association_mode = PortAssociationMode::getId($settings['port_association_mode']) ?? 1;
+                }
                 unset($settings['port'], $settings['transport']);
             }
 

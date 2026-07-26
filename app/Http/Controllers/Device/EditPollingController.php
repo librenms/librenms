@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Device;
 
 use App\Actions\Device\SetDeviceAvailability;
+use App\Facades\LibrenmsConfig;
 use App\Http\Interfaces\ToastInterface;
 use App\Http\Requests\StorePollingMethodRequest;
 use App\Http\Requests\UpdatePollingMethodRequest;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Polling\Secrets\SecretService;
 
 class EditPollingController
@@ -83,7 +85,10 @@ class EditPollingController
                 $key => $field['default'] ?? (isset($field['options']) ? array_key_first($field['options']) : ''),
             ])->all(),
             'settings_fields' => PollingMethodType::buildSchemaFields($settingsSchema, 'settingsData'),
-            'settings' => $row ? $row->settings : [],
+            'settings' => array_merge(
+                $row?->settings ?? [],
+                $type === PollingMethodType::Snmp ? ['port_association_mode' => PortAssociationMode::getName($device->port_association_mode) ?? LibrenmsConfig::get('default_port_association_mode', 'ifIndex')] : []
+            ),
             'affects_availability' => $row ? $row->affects_availability : (bool) ($methodClass::getDefaults()['affects_availability'] ?? false),
             'secret' => $secret,
             'secret_form_data' => collect($schema)->mapWithKeys(fn (array $field, string $key): array => [
@@ -135,6 +140,11 @@ class EditPollingController
         ]);
 
         $device->pollingMethods()->save($row);
+
+        if ($type === PollingMethodType::Snmp && isset($row->settings['port_association_mode'])) {
+            $device->port_association_mode = PortAssociationMode::getId($row->settings['port_association_mode']) ?? 1;
+            $device->saveQuietly();
+        }
 
         $toast->success(__('poller.method_added'));
 
@@ -215,6 +225,10 @@ class EditPollingController
         $pollingMethod->settings = $this->mergeSettings($pollingMethod->settings ?? [], $validated['settings'] ?? [], $methodClass);
 
         $pollingMethod->save();
+
+        if ($type === PollingMethodType::Snmp && isset($pollingMethod->settings['port_association_mode'])) {
+            $device->port_association_mode = PortAssociationMode::getId($pollingMethod->settings['port_association_mode']) ?? 1;
+        }
 
         $setDeviceAvailability->execute($device, false);
         $device->saveQuietly();
