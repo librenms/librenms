@@ -339,7 +339,6 @@ class NetSnmpQuery implements SnmpQueryInterface
         return array_merge($cmd, $oids);
     }
 
-
     private function execMultiple(string $command, array $oids): SnmpResponse
     {
         $response = new SnmpResponse('');

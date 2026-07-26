@@ -35,12 +35,12 @@ abstract class SecretData implements Arrayable, Jsonable, JsonSerializable
     /**
      * Create a new DTO instance from an array.
      */
-    public static abstract function fromArray(array $data): static;
+    abstract public static function fromArray(array $data): static;
 
     /**
      * Get validation rules for this credential type.
      */
-    public static abstract function rules(): array;
+    abstract public static function rules(): array;
 
     /**
      * Get UI schema for this credential type.
