@@ -273,39 +273,12 @@
                                                     </div>
 
                                                     <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl">
-                                                        @foreach($method['schema_fields'] as $field)
-                                                            <div class="form-group"
-                                                                 @if($field['visible_if_expression']) x-show="{{ $field['visible_if_expression'] }}" @endif>
-                                                                <label class="control-label">{{ __($field['label']) }}</label>
-                                                                @if($field['field_type'] === 'select')
-                                                                    <select name="polling_methods[{{ $method['type'] }}][secret_data][{{ $field['key'] }}]"
-                                                                            x-model="methods['{{ $method['type'] }}'].formData['{{ $field['key'] }}']"
-                                                                            class="form-control">
-                                                                        @foreach($field['options'] as $optVal => $optLabel)
-                                                                            <option value="{{ $optVal }}">{{ __($optLabel) }}</option>
-                                                                        @endforeach
-                                                                    </select>
-                                                                @elseif($field['field_type'] === 'password')
-                                                                     <div class="input-group tw:w-full">
-                                                                         <input type="password"
-                                                                                id="secret_{{ $method['type'] }}_{{ $field['key'] }}"
-                                                                                name="polling_methods[{{ $method['type'] }}][secret_data][{{ $field['key'] }}]"
-                                                                                class="form-control"
-                                                                                autocomplete="new-password">
-                                                                         <span class="input-group-btn">
-                                                                             <button type="button" class="btn btn-default btn-toggle-password" onclick="togglePasswordVisibility('secret_{{ $method['type'] }}_{{ $field['key'] }}', this)" title="{{ __('Show/hide') }}">
-                                                                                 <i class="fa fa-eye-slash"></i>
-                                                                             </button>
-                                                                         </span>
-                                                                     </div>
-                                                                @else
-                                                                    <input type="text"
-                                                                           name="polling_methods[{{ $method['type'] }}][secret_data][{{ $field['key'] }}]"
-                                                                           x-model="methods['{{ $method['type'] }}'].formData['{{ $field['key'] }}']"
-                                                                           class="form-control">
-                                                                @endif
-                                                            </div>
-                                                        @endforeach
+                                                        @include('device.includes.secret-fields', [
+                                                            'fields' => $method['schema_fields'],
+                                                            'methodType' => $method['type'],
+                                                            'namePrefix' => "polling_methods[{$method['type']}][secret_data]",
+                                                            'modelPrefix' => "methods['{$method['type']}'].formData",
+                                                        ])
                                                     </div>
                                                 </div>
                                             </div>
@@ -317,35 +290,12 @@
                                         <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mb-6">
                                             <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Settings') }}</h4>
                                             <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:bg-white tw:dark:bg-dark-gray-500">
-                                                <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl">
-                                                    @foreach($method['settings_fields'] as $setting)
-                                                        <div class="form-group tw:mb-0"
-                                                             @if($setting['visible_if_expression']) x-show="{{ $setting['visible_if_expression'] }}" @endif>
-                                                            <label class="control-label">{{ __('poller.method_settings.' . $method['type'] . '.' . $setting['key']) }}</label>
-                                                            @if(($setting['field_type'] ?? 'text') === 'select')
-                                                                <select name="polling_methods[{{ $method['type'] }}][settings][{{ $setting['key'] }}]"
-                                                                        x-model="methods['{{ $method['type'] }}'].settingsData['{{ $setting['key'] }}']"
-                                                                        class="form-control">
-                                                                    @foreach($setting['options'] ?? [] as $optVal => $optLabel)
-                                                                        <option value="{{ $optVal }}">{{ __($optLabel) }}</option>
-                                                                    @endforeach
-                                                                </select>
-                                                            @elseif(($setting['field_type'] ?? 'text') === 'number')
-                                                                <input type="number"
-                                                                       name="polling_methods[{{ $method['type'] }}][settings][{{ $setting['key'] }}]"
-                                                                       x-model="methods['{{ $method['type'] }}'].settingsData['{{ $setting['key'] }}']"
-                                                                       class="form-control"
-                                                                       @isset($setting['min']) min="{{ $setting['min'] }}" @endisset
-                                                                       @isset($setting['max']) max="{{ $setting['max'] }}" @endisset>
-                                                            @else
-                                                                <input type="text"
-                                                                       name="polling_methods[{{ $method['type'] }}][settings][{{ $setting['key'] }}]"
-                                                                       x-model="methods['{{ $method['type'] }}'].settingsData['{{ $setting['key'] }}']"
-                                                                       class="form-control">
-                                                            @endif
-                                                        </div>
-                                                    @endforeach
-                                                </div>
+                                                @include('device.includes.method-settings', [
+                                                    'fields' => $method['settings_fields'],
+                                                    'methodType' => $method['type'],
+                                                    'namePrefix' => "polling_methods[{$method['type']}][settings]",
+                                                    'modelPrefix' => "methods['{$method['type']}'].settingsData",
+                                                ])
                                             </div>
                                         </div>
                                     @endif
