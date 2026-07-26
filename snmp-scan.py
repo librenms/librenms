@@ -33,8 +33,6 @@ from sys import stdout
 from time import time
 
 Result = namedtuple("Result", ["ip", "hostname", "outcome", "output"])
-args = {}
-
 
 class Outcome:
     UNDEFINED = 0
@@ -119,7 +117,7 @@ def check_ip_excluded(check_ip):
     return False
 
 
-def scan_host(scan_ip):
+def scan_host(scan_ip, args):
     hostname = None
 
     try:
@@ -339,7 +337,15 @@ Example: 192.168.0.1/32 will be treated as a single host address""",
 
             for ip in ips:
                 if not check_ip_excluded(ip):
-                    pool.apply_async(scan_host, (str(ip),), callback=handle_result)
+                    def error_callback(e):
+                       print("ERROR in scan_host:", e)
+
+                    pool.apply_async(
+                    scan_host,
+                    (str(ip),args),
+                    callback=handle_result,
+                    error_callback=error_callback
+                    )
 
         pool.close()
         pool.join()
