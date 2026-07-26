@@ -1,4 +1,4 @@
-# 
+# Syslog-NG
 
 Queries Syslog-NG via `syslog-ng-ctl stats` and returns stats based on that information.
 
