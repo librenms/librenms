@@ -85,4 +85,3 @@ enum PollingMethodType: string
         })->values()->all();
     }
 }
-

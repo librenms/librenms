@@ -42,7 +42,6 @@ use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\HostUnreachableSnmpException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
-use LibreNMS\Polling\Secrets\SnmpSecret;
 use LibreNMS\Polling\Secrets\SnmpSecretData;
 use SnmpQuery;
 
@@ -160,7 +159,7 @@ class ValidateDeviceAndCreate
         // Keep track of other polling methods so we do not overwrite them when setting the relation
         $otherPollingMethods = collect();
         if ($this->device->relationLoaded('pollingMethods')) {
-            $otherPollingMethods = $this->device->pollingMethods->filter(fn($m) => $m->method_type !== PollingMethodType::Snmp);
+            $otherPollingMethods = $this->device->pollingMethods->filter(fn ($m) => $m->method_type !== PollingMethodType::Snmp);
         }
 
         foreach ($snmp_versions as $snmp_version) {

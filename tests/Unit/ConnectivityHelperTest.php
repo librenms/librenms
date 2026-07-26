@@ -42,10 +42,10 @@ final class ConnectivityHelperTest extends TestCase
 
         $factoryMock = Mockery::mock(PollingMethodFactory::class);
         $factoryMock->shouldReceive('make')
-            ->andReturnUsing(fn(DevicePollingMethod $method) => match ($method->method_type) {
+            ->andReturnUsing(fn (DevicePollingMethod $method) => match ($method->method_type) {
                 PollingMethodType::Icmp => $icmpMock,
                 PollingMethodType::Snmp => $snmpMock,
-                default => throw new \UnexpectedValueException("Unexpected polling method type"),
+                default => throw new \UnexpectedValueException('Unexpected polling method type'),
             });
         $this->instance(PollingMethodFactory::class, $factoryMock);
 
@@ -202,10 +202,10 @@ final class ConnectivityHelperTest extends TestCase
 
         $factoryMock = Mockery::mock(PollingMethodFactory::class);
         $factoryMock->shouldReceive('make')
-            ->andReturnUsing(fn(DevicePollingMethod $method) => match ($method->method_type) {
+            ->andReturnUsing(fn (DevicePollingMethod $method) => match ($method->method_type) {
                 PollingMethodType::Ipmi => $ipmiMock,
                 PollingMethodType::UnixAgent => $unixAgentMock,
-                default => throw new \UnexpectedValueException("Unexpected polling method type"),
+                default => throw new \UnexpectedValueException('Unexpected polling method type'),
             });
         $this->instance(PollingMethodFactory::class, $factoryMock);
 

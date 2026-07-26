@@ -42,7 +42,7 @@ class EditPollingControllerTest extends TestCase
             'port_association_mode' => PortAssociationMode::getId('ifIndex'),
         ]);
 
-        $pollingMethod = DevicePollingMethod::factory()->create([
+        DevicePollingMethod::factory()->create([
             'device_id' => $device->device_id,
             'method_type' => PollingMethodType::Snmp,
             'enabled' => true,
