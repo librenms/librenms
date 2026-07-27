@@ -1,4 +1,4 @@
-<div class="overview-panel tw:mb-5">
+<div class="tw:mb-5 tw:rounded-lg tw:border tw:border-gray-300 tw:shadow-sm tw:dark:border-dark-gray-200">
     <div class="tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:border-b tw:border-gray-300 tw:text-neutral-700 tw:dark:bg-dark-gray-200 tw:dark:border-zinc-800 tw:dark:text-dark-white-200">
         <strong>{{ $title }}</strong> <a href="{{ $url }}">[EDIT]</a>
     </div>
