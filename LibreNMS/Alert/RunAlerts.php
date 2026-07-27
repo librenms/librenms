@@ -281,12 +281,11 @@ class RunAlerts
     }
 
     /**
-     * Issue Alert-Object
-     *
      * @param  array  $alert
+     * @param  array<int, array<string, mixed>>|null  $transportOverride  explicit transports to deliver to (per-segment scheduling); null uses the default lookup
      * @return bool
      */
-    public function issueAlert($alert)
+    public function issueAlert($alert, ?array $transportOverride = null)
     {
         if (LibrenmsConfig::get('alert.fixed-contacts') == false) {
             if (empty($alert['query'])) {
@@ -301,7 +300,7 @@ class RunAlerts
         if (is_array($obj)) {
             echo 'Issuing Alert-UID #' . $alert['id'] . '/' . $alert['state'] . ':' . PHP_EOL;
             if ($alert['state'] != AlertState::ACKNOWLEDGED || LibrenmsConfig::get('alert.acknowledged') === true) {
-                $this->extTransports($obj);
+                $this->extTransports($obj, $transportOverride);
             }
             echo "\r\n";
         }
@@ -524,17 +523,6 @@ class RunAlerts
                 $rextra['recovery'] = true;
             }
 
-            if (in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED], true)) {
-                AlertUtil::mergeProblemPhaseTimingFromOperations((int) $alert['rule_id'], $alert['details'], $rextra);
-            }
-
-            if (! empty($rextra['_stop_notifications'])) {
-                unset($rextra['_stop_notifications']);
-                echo 'Max escalation steps reached for Alert-UID #' . $alert['id'] . "\r\n";
-
-                continue;
-            }
-
             if (! isset($alert['details']['count'])) {
                 // make sure count is set for below code, in legacy code null would get type juggled to 0
                 $alert['details']['count'] = 0;
@@ -556,7 +544,26 @@ class RunAlerts
             }
 
             $tolerence_window = LibrenmsConfig::get('alert.tolerance_window');
-            if (! empty($rextra['count']) && empty($rextra['interval'])) {
+            $activeState = in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED], true);
+            $dueTransports = [];
+
+            if ($activeState && AlertUtil::ruleHasAlertOperations((int) $alert['rule_id'])) {
+                if (AlertUtil::operationNotificationsSuppressed((int) $alert['rule_id'])) {
+                    $rextra['mute'] = true;
+                } else {
+                    $dueSegments = AlertUtil::dueProblemSegments((int) $alert['rule_id'], $alert['details']);
+                    $updet = true;
+                    $noacc = true;
+                    if (! empty($dueSegments)) {
+                        $dueTransports = AlertUtil::segmentTransports($dueSegments);
+                        $noiss = empty($dueTransports);
+                    } else {
+                        $noiss = true;
+                    }
+                }
+            } elseif ($activeState) {
+                $rextra['mute'] = true;
+            } elseif (! empty($rextra['count']) && empty($rextra['interval'])) {
                 // This check below is for compat-reasons
                 if (! empty($rextra['delay']) && $alert['state'] != AlertState::RECOVERED) {
                     if ((time() - strtotime((string) $alert['time_logged']) + $tolerence_window) < $rextra['delay'] || (! empty($alert['details']['delay']) && (time() - $alert['details']['delay'] + $tolerence_window) < $rextra['delay'])) {
@@ -645,7 +652,7 @@ class RunAlerts
 
             if (! $noiss) {
                 dbUpdate(['alerted' => $alert['state']], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
-                $this->issueAlert($alert);
+                $this->issueAlert($alert, ! empty($dueTransports) ? $dueTransports : null);
             }
         }
     }
@@ -656,12 +663,12 @@ class RunAlerts
      * @param  array  $obj  Alert-Array
      * @return void
      */
-    public function extTransports($obj)
+    public function extTransports($obj, ?array $transportOverride = null)
     {
         $type = new Template;
 
-        // If alert transport mapping exists, override the default transports
-        $transport_maps = AlertUtil::getAlertTransports(
+        // Per-segment scheduling supplies an explicit transport list; otherwise use the default lookup.
+        $transport_maps = $transportOverride ?? AlertUtil::getAlertTransports(
             $obj['alert_id'],
             $obj['operation_phase'] ?? null,
             (int) ($obj['escalation_step'] ?? 1)
