@@ -128,6 +128,7 @@ class RunAlerts
         $obj['proc'] = $alert['proc'];
         $obj['status'] = $device->status;
         $obj['status_reason'] = $device->status_reason;
+
         if ((new ConnectivityHelper($device))->icmpIsEnabled()) {
             try {
                 $last_ping = Rrd::lastUpdate(Rrd::name($device->hostname, 'icmp-perf'));
