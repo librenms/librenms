@@ -130,17 +130,6 @@ class Device extends BaseModel
         return static::where('hostname', $hostname)->first();
     }
 
-    public function pollingMethod(PollingMethodType $method): ?DevicePollingMethod
-    {
-        if ($this->exists || $this->relationLoaded('pollingMethods')) {
-            $this->load(['pollingMethods', 'pollingMethods.secret']);
-
-            return $this->pollingMethods->firstWhere('method_type', $method);
-        }
-
-        return null;
-    }
-
     public function pollerTarget(): string
     {
         return ($this->overwrite_ip ?: $this->hostname) ?: '';
@@ -192,7 +181,7 @@ class Device extends BaseModel
 
     public function hasSnmpInfo(): bool
     {
-        $snmp = $this->getPollingMethodRepo()->snmp();
+        $snmp = $this->pollingMethodFor()->snmp();
 
         if ($snmp->version == 'v3') {
             if ($snmp->authlevel == 'authNoPriv') {
@@ -216,9 +205,20 @@ class Device extends BaseModel
         return false; // no known snmpver
     }
 
-    public function getPollingMethodRepo(): PollingMethodRepository
+    public function pollingMethodFor(): PollingMethodRepository
     {
         return new PollingMethodRepository($this);
+    }
+
+    public function pollingMethod(PollingMethodType $method): ?DevicePollingMethod
+    {
+        if ($this->exists || $this->relationLoaded('pollingMethods')) {
+            $this->load(['pollingMethods', 'pollingMethods.secret']);
+
+            return $this->pollingMethods->firstWhere('method_type', $method);
+        }
+
+        return null;
     }
 
     /**

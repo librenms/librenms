@@ -66,46 +66,6 @@ readonly class IpmiPollingMethod implements PollingMethodInterface
         );
     }
 
-    public static function save(
-        \App\Models\Device $device,
-        array $settings = [],
-        array $secretData = [],
-        bool $enabled = true,
-        bool $affectsAvailability = false,
-    ): DevicePollingMethod {
-        $method = DevicePollingMethod::with('secret')
-            ->firstOrNew([
-                'device_id' => $device->device_id,
-                'method_type' => PollingMethodType::Ipmi,
-            ]);
-
-        $method->enabled = $enabled;
-        $method->affects_availability = $affectsAvailability;
-
-        if (! empty($settings)) {
-            $method->settings = array_merge($method->settings ?? [], $settings);
-        }
-
-        if (! empty($secretData)) {
-            if ($method->secret) {
-                $method->secret->update(['data' => array_merge($method->secret->data, $secretData)]);
-            } else {
-                $secret = \App\Models\Secret::create([
-                    'description' => 'IPMI ' . $device->hostname,
-                    'secret_type' => \LibreNMS\Enum\SecretType::Ipmi,
-                    'default' => false,
-                    'data' => $secretData,
-                ]);
-                $method->secret_id = $secret->id;
-            }
-        }
-
-        $method->save();
-        $device->load('pollingMethods');
-
-        return $method;
-    }
-
     public static function disabled(): static
     {
         return new static(
