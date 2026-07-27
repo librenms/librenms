@@ -1,7 +1,6 @@
 @props(['device', 'ports'])
 
 @if($device->ports_total_count)
-    @php($portsUrl = route('device', ['device' => $device->device_id, 'tab' => 'ports']))
     <x-device.overview.panel :title="__('Overall Traffic')" icon="fa fa-road">
         <div class="tw:divide-y tw:divide-gray-300 tw:dark:divide-zinc-800">
             <div class="tw:p-2">

@@ -1,16 +1,16 @@
-@props(['device'])
-
 @if($device->processors->isNotEmpty())
     <x-device.overview.panel :title="__('Processors')" icon="fa fa-microchip"
         :href="route('device', ['device' => $device->device_id, 'tab' => 'health', 'vars' => 'metric=processor'])">
         <div class="tw:divide-y tw:divide-gray-300 tw:dark:divide-zinc-800">
-            @if(\App\Facades\LibrenmsConfig::get('cpu_details_overview'))
+            @if($showDetails)
                 @foreach($device->processors as $processor)
-                    <div class="tw:flex tw:items-center tw:gap-3 tw:px-3 tw:py-2">
-                        <span class="tw:w-36 tw:truncate">{{ $processor->getFormattedDescription() }}</span>
-                        <x-graph type="processor_usage" :vars="['id' => $processor->processor_id]" width="100" height="24" popup
-                                 :popup-title="$device->display . ' - ' . $processor->getFormattedDescription()" />
-                        <x-device.overview.percentage class="tw:ml-auto tw:max-w-[200px] tw:flex-1" :percent="$processor->processor_usage" :warning="$processor->processor_perc_warn"
+                    <div class="tw:flex tw:min-w-0 tw:items-center tw:gap-3 tw:px-3 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
+                        <span class="tw:w-36 tw:min-w-0 tw:shrink tw:truncate tw:sm:shrink-0">{{ $processor->getFormattedDescription() }}</span>
+                        <div class="tw:hidden tw:w-20 tw:shrink-0 tw:justify-center tw:lg:flex">
+                            <x-graph type="processor_usage" :vars="['id' => $processor->processor_id]" width="80" height="20" popup
+                                     :popup-title="$device->display . ' - ' . $processor->getFormattedDescription()" />
+                        </div>
+                        <x-device.overview.percentage class="tw:w-full tw:min-w-0 tw:max-w-50 tw:flex-1" :percent="$processor->processor_usage" :warning="$processor->processor_perc_warn"
                             :left_text="''" :right_text="$processor->processor_usage . '%'" graph_type="processor_usage"
                             :graph_vars="['id' => $processor->processor_id]" :graph_title="$device->display . ' - ' . $processor->getFormattedDescription()" />
                     </div>
@@ -20,15 +20,11 @@
                     <x-graph type="device_processor" :device="$device" aspect="wide" class="tw:w-full" img-class="tw:w-full tw:h-auto"
                              popup :popup-title="$device->display . ' - ' . __('CPU usage')" />
                 </div>
-                @foreach($device->processors->groupBy('processor_type') as $processors)
-                    @php
-                        $usage = (int) ceil($processors->avg('processor_usage'));
-                        $warning = $processors->avg('processor_perc_warn');
-                    @endphp
-                    <div class="tw:flex tw:items-center tw:gap-3 tw:px-3 tw:py-2">
-                        <span class="tw:w-36 tw:truncate">x{{ $processors->count() }} {{ $processors->first()->getFormattedDescription() }}</span>
-                        <x-device.overview.percentage class="tw:ml-auto tw:max-w-[400px] tw:flex-1" :percent="$usage" :warning="$warning"
-                            :left_text="''" :right_text="$usage . '%'" graph_type="device_processor"
+                @foreach($processorGroups as $data)
+                    <div class="tw:flex tw:min-w-0 tw:items-center tw:gap-3 tw:px-3 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
+                        <span class="tw:w-36 tw:min-w-0 tw:shrink tw:truncate tw:sm:shrink-0">x{{ $data['processors']->count() }} {{ $data['processors']->first()->getFormattedDescription() }}</span>
+                        <x-device.overview.percentage class="tw:ml-auto tw:w-full tw:min-w-0 tw:max-w-100 tw:flex-1" :percent="$data['usage']" :warning="$data['warning']"
+                            :left_text="''" :right_text="$data['usage'] . '%'" graph_type="device_processor"
                             :graph_vars="['device' => $device->device_id]" :graph_title="$device->display . ' - ' . __('CPU usage')" />
                     </div>
                 @endforeach
