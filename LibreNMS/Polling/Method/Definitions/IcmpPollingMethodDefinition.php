@@ -79,7 +79,7 @@ class IcmpPollingMethodDefinition implements PollingMethodDefinitionInterface
     /**
      * @inheritDoc
      */
-    public function secretClass(): null
+    public function secretDefinition(): null
     {
         return null;
     }

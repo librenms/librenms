@@ -26,6 +26,8 @@
 
 namespace LibreNMS\Interfaces;
 
+use LibreNMS\Polling\Secrets\SecretData;
+
 /**
  * @template-covariant T of PollingMethodInterface
  */
@@ -42,7 +44,7 @@ interface PollingMethodDefinitionInterface extends HasFieldSchema
     public function class(): string;
 
     /**
-     * @return SecretDefinitionInterface|null
+     * @return SecretDefinitionInterface<SecretData>|null
      */
     public function secretDefinition(): ?SecretDefinitionInterface;
 }

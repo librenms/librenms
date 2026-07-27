@@ -1,4 +1,5 @@
 <?php
+
 /**
  * IpmiSecretDefinition.php
  *
@@ -25,12 +26,15 @@
 
 namespace LibreNMS\Polling\Secrets\Definitions;
 
+use LibreNMS\Enum\SecretType;
 use LibreNMS\Interfaces\SecretDefinitionInterface;
 use LibreNMS\Polling\Secrets\IpmiSecretData;
 
+/**
+ * @implements SecretDefinitionInterface<IpmiSecretData>
+ */
 class IpmiSecretDefinition implements SecretDefinitionInterface
 {
-
     /**
      * @inheritDoc
      */
@@ -70,6 +74,11 @@ class IpmiSecretDefinition implements SecretDefinitionInterface
             'password' => 'nullable|string',
             'kg_key' => 'nullable|string|size:40|regex:/^[a-fA-F0-9]+$/',
         ];
+    }
+
+    public function type(): SecretType
+    {
+        return SecretType::Ipmi;
     }
 
     /**
