@@ -172,7 +172,7 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
     $deviceModel = DeviceCache::get($device['device_id']);
 
     // $device is not persisted to the db, fill in the data
-    $snmpMethod = $deviceModel->getPollingMethods()->snmp();
+    $snmpMethod = $deviceModel->getPollingMethodRepo()->snmp();
 
     $cmd = array_merge($cmd, $snmpMethod->toNetSnmpOptions($device['context_name'] ?? null), Arr::wrap($options));
 
@@ -194,9 +194,8 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
     $pollertarget = Rewrite::addIpv6Brackets(DeviceCache::get($device['device_id'])->pollerTarget());
     $transport = $device['transport'] ?: 'udp';
     $cmd[] = $transport . ':' . $pollertarget . ':' . $device['port'];
-    $cmd = array_merge($cmd, (array) $oids);
 
-    return $cmd;
+    return array_merge($cmd, (array) $oids);
 } // end gen_snmp_cmd()
 
 /**
@@ -591,47 +590,6 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array = [], $mib = 0, $mibdi
 
     return $array;
 }//end snmpwalk_cache_twopart_oid()
-
-/**
- * generate snmp auth arguments
- *
- * @param  array  $device
- * @param  array  $cmd
- * @return array
- *
- * @deprecated Please use SnmpQuery instead
- */
-function snmp_gen_auth(&$device, $cmd = [])
-{
-    if ($device['snmpver'] === 'v3') {
-        array_push($cmd, '-v3', '-l', $device['authlevel']);
-        array_push($cmd, '-n', $device['context_name'] ?? '');
-
-        $authlevel = strtolower((string) $device['authlevel']);
-        if ($authlevel === 'noauthnopriv') {
-            // We have to provide a username anyway (see Net-SNMP doc)
-            array_push($cmd, '-u', ! empty($device['authname']) ? $device['authname'] : 'root');
-        } elseif ($authlevel === 'authnopriv') {
-            array_push($cmd, '-a', $device['authalgo']);
-            array_push($cmd, '-A', $device['authpass']);
-            array_push($cmd, '-u', $device['authname']);
-        } elseif ($authlevel === 'authpriv') {
-            array_push($cmd, '-a', $device['authalgo']);
-            array_push($cmd, '-A', $device['authpass']);
-            array_push($cmd, '-u', $device['authname']);
-            array_push($cmd, '-x', $device['cryptoalgo']);
-            array_push($cmd, '-X', $device['cryptopass']);
-        } else {
-            d_echo('DEBUG: ' . $device['snmpver'] . " : Unsupported SNMPv3 AuthLevel (wtf have you done ?)\n");
-        }
-    } elseif ($device['snmpver'] === 'v2c' || $device['snmpver'] === 'v1') {
-        array_push($cmd, '-' . $device['snmpver'], '-c', $device['community']);
-    } else {
-        d_echo('DEBUG: ' . $device['snmpver'] . " : Unsupported SNMP Version (shouldn't be possible to get here)\n");
-    }
-
-    return $cmd;
-}//end snmp_gen_auth()
 
 /**
  * SNMPWalk_array_num - performs a numeric SNMPWalk and returns an array containing $count indexes

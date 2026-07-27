@@ -18,6 +18,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Polling\Method\PollingMethodDefinition;
 use LibreNMS\Polling\Secrets\SecretService;
 
 class EditPollingController
@@ -58,14 +59,14 @@ class EditPollingController
      */
     private function buildMethodData(Device $device, PollingMethodType $type): array
     {
-        $methodClass = $type->methodClass();
+        $defintion = PollingMethodDefinition::for($type);
         /** @var DevicePollingMethod|null $row */
         $row = $device->pollingMethods->firstWhere('method_type', $type);
         $secret = $row?->secret;
         $canUnmaskSecrets = Gate::allows('unmask', Secret::class);
-        $schema = $type->hasSecret() ? $type->secretClass()::getUiSchema() : [];
-        $schemaFields = PollingMethodType::buildSchemaFields($schema);
-        $settingsSchema = $methodClass::getSettingsSchema();
+        $schema = $defintion->secretClass() ? $defintion->secretClass()::getUiSchema() : [];
+        $schemaFields = PollingMethodDefinition::buildSchemaFields($schema);
+        $settingsSchema = $defintion->schema();
         $secretsForType = Secret::query()
             ->where('secret_type', $type->value)
             ->orderBy('description')
@@ -82,17 +83,17 @@ class EditPollingController
         return [
             'type' => $type->value,
             'label' => __('poller.methods.' . $type->value),
-            'icon' => $type->icon(),
+            'icon' => $defintion->icon(),
             'schema_fields' => $schemaFields,
             'schema_defaults' => collect($schema)->mapWithKeys(fn (array $field, string $key): array => [
                 $key => $field['default'] ?? (isset($field['options']) ? array_key_first($field['options']) : ''),
             ])->all(),
-            'settings_fields' => PollingMethodType::buildSchemaFields($settingsSchema, 'settingsData'),
+            'settings_fields' => PollingMethodDefinition::buildSchemaFields($settingsSchema, 'settingsData'),
             'settings' => array_merge(
                 $row->settings ?? [],
                 $type === PollingMethodType::Snmp ? ['port_association_mode' => PortAssociationMode::getName($device->port_association_mode) ?? LibrenmsConfig::get('default_port_association_mode', 'ifIndex')] : []
             ),
-            'affects_availability' => $row ? $row->affects_availability : (bool) ($methodClass::getDefaults()['affects_availability'] ?? false),
+            'affects_availability' => $row ? $row->affects_availability : (bool) ($defintion->defaults()['affects_availability'] ?? false),
             'secret' => $secret,
             'secret_form_data' => collect($schema)->mapWithKeys(fn (array $field, string $key): array => [
                 $key => $canUnmaskSecrets ? (string) data_get($secret?->data, $key, '') : '',
@@ -115,9 +116,10 @@ class EditPollingController
 
         $validated = $request->validated();
         $type = $request->pollingType() ?? PollingMethodType::from($validated['method_type']);
+        $definition = PollingMethodDefinition::for($type);
 
         $secret = null;
-        if ($type->hasSecret()) {
+        if ($definition->secretClass() !== null) {
             $this->authorize('create', Secret::class);
             $secret = ($validated['credential_mode'] ?? 'existing') === 'existing'
                 ? $this->resolveExistingSecret($validated['secret_id'] ?? null, $type)
@@ -131,15 +133,13 @@ class EditPollingController
                 );
         }
 
-        $methodClass = $type->methodClass();
-
         $row = new DevicePollingMethod([
             'device_id' => $device->device_id,
             'method_type' => $type,
             'enabled' => true,
-            'affects_availability' => (bool) ($methodClass::getDefaults()['affects_availability'] ?? false),
+            'affects_availability' => (bool) ($definition->defaults()['affects_availability'] ?? false),
             'secret_id' => $secret?->id,
-            'settings' => $this->buildSettings($methodClass, $request->validatedSettings()),
+            'settings' => $this->buildSettings($definition, $request->validatedSettings()),
         ]);
 
         $device->pollingMethods()->save($row);
@@ -171,14 +171,14 @@ class EditPollingController
     // ---- Private helpers ----
 
     /**
-     * @param  class-string  $methodClass
+     * @param  \LibreNMS\Interfaces\PollingMethodDefinitionInterface<\LibreNMS\Interfaces\PollingMethodInterface>  $definition
      * @param  array<string, mixed>  $validated
      * @return array<string, mixed>
      */
-    private function buildSettings(string $methodClass, array $validated): array
+    private function buildSettings(\LibreNMS\Interfaces\PollingMethodDefinitionInterface $definition, array $validated): array
     {
         /** @var array<string, array{default?: mixed, options?: array<string, string>}> $settingsSchema */
-        $settingsSchema = $methodClass::getSettingsSchema();
+        $settingsSchema = $definition->schema();
         $schemaDefaults = collect($settingsSchema)
             ->mapWithKeys(fn (array $field, string $key): array => [
                 $key => $field['default'] ?? (isset($field['options']) ? array_key_first($field['options']) : null),
@@ -186,7 +186,7 @@ class EditPollingController
             ->filter();
 
         /** @var array<string, mixed> $defaults */
-        $defaults = $methodClass::getDefaults();
+        $defaults = $definition->defaults();
 
         return array_merge(
             $schemaDefaults->all(),
@@ -212,10 +212,10 @@ class EditPollingController
         $pollingMethod = $device->pollingMethods()->where('method_type', $type->value)->firstOrFail();
         $validated = $request->validated();
 
-        if ($type->hasSecret() && array_key_exists('secret_id', $validated)) {
+        if (PollingMethodDefinition::hasSecret($type) && array_key_exists('secret_id', $validated)) {
             $this->authorize('update', Secret::class);
             $pollingMethod->secret_id = $this->resolveExistingSecret((int) $validated['secret_id'], $type)->id;
-        } elseif ($type->hasSecret() && $request->has('secret_data')) {
+        } elseif (PollingMethodDefinition::hasSecret($type) && $request->has('secret_data')) {
             $this->authorize('update', Secret::class);
             $mode = $validated['secret_update_mode'] ?? 'update';
             $pollingMethod->secret_id = $this->secretService->updateOrCreate(
@@ -228,11 +228,9 @@ class EditPollingController
 
         $pollingMethod->setRelation('device', $device);
 
-        $methodClass = $type->methodClass();
-
         $pollingMethod->enabled = (bool) ($validated['enabled'] ?? true);
         $pollingMethod->affects_availability = (bool) ($validated['affects_availability'] ?? false);
-        $pollingMethod->settings = $this->mergeSettings($pollingMethod->settings ?? [], $validated['settings'] ?? [], $methodClass);
+        $pollingMethod->settings = $this->mergeSettings($pollingMethod->settings ?? [], $validated['settings'] ?? [], PollingMethodDefinition::for($type));
 
         $pollingMethod->save();
 
@@ -251,13 +249,13 @@ class EditPollingController
     /**
      * @param  array<string, mixed>  $existing
      * @param  array<string, mixed>  $validated
-     * @param  class-string  $methodClass
+     * @param  \LibreNMS\Interfaces\PollingMethodDefinitionInterface<\LibreNMS\Interfaces\PollingMethodInterface>  $definition
      * @return array<string, mixed>
      */
-    private function mergeSettings(array $existing, array $validated, string $methodClass): array
+    private function mergeSettings(array $existing, array $validated, \LibreNMS\Interfaces\PollingMethodDefinitionInterface $definition): array
     {
         /** @var array<string, array<string, mixed>> $settingsSchema */
-        $settingsSchema = $methodClass::getSettingsSchema();
+        $settingsSchema = $definition->schema();
         $allowed = collect($settingsSchema)->keys();
 
         return array_merge(
@@ -280,7 +278,7 @@ class EditPollingController
         $type = PollingMethodType::tryFrom($methodType) ?? abort(404);
         $pollingMethod = $device->pollingMethods()->where('method_type', $type->value)->firstOrFail();
 
-        if ($type->hasSecret()) {
+        if (PollingMethodDefinition::hasSecret($type)) {
             $this->authorize('delete', Secret::class);
         }
 

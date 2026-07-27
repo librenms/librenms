@@ -7,7 +7,7 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\PollingMethod;
+use LibreNMS\Interfaces\PollingMethodInterface;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\Method\SnmpPollingMethod;
 use LibreNMS\Polling\PollingMethodFactory;
@@ -22,7 +22,7 @@ final class ConnectivityHelperTest extends TestCase
         $icmpMethod = new DevicePollingMethod();
         $snmpMethod = new DevicePollingMethod();
 
-        $icmpMock = Mockery::mock(PollingMethod::class);
+        $icmpMock = Mockery::mock(PollingMethodInterface::class);
         $icmpMock->shouldReceive('isEnabled')
             ->andReturnUsing(function () use (&$icmpMethod) {
                 return $icmpMethod->enabled;
@@ -31,7 +31,7 @@ final class ConnectivityHelperTest extends TestCase
             ->times(8)
             ->andReturn(true, false, true, false, true, false, true, false);
 
-        $snmpMock = Mockery::mock(PollingMethod::class);
+        $snmpMock = Mockery::mock(PollingMethodInterface::class);
         $snmpMock->shouldReceive('isEnabled')
             ->andReturnUsing(function () use (&$snmpMethod) {
                 return $snmpMethod->enabled;
@@ -186,14 +186,14 @@ final class ConnectivityHelperTest extends TestCase
         $ipmiMethod = new DevicePollingMethod();
         $unixAgentMethod = new DevicePollingMethod();
 
-        $ipmiMock = Mockery::mock(PollingMethod::class);
+        $ipmiMock = Mockery::mock(PollingMethodInterface::class);
         $ipmiMock->shouldReceive('isEnabled')
             ->andReturnUsing(function () use (&$ipmiMethod) {
                 return $ipmiMethod->enabled;
             });
         $ipmiMock->shouldReceive('isAvailable')->andReturn(true, false);
 
-        $unixAgentMock = Mockery::mock(PollingMethod::class);
+        $unixAgentMock = Mockery::mock(PollingMethodInterface::class);
         $unixAgentMock->shouldReceive('isEnabled')
             ->andReturnUsing(function () use (&$unixAgentMethod) {
                 return $unixAgentMethod->enabled;

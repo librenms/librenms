@@ -3,11 +3,16 @@
 namespace LibreNMS\Polling\Method;
 
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Interfaces\PollingMethodInterface;
 
 class PollingMethodRepository
 {
     private readonly Device $device;
+
+    /** @var array<string, PollingMethodInterface> */
+    private array $pollingMethods = [];
 
     public function __construct(
         ?Device $device = null,
@@ -15,47 +20,51 @@ class PollingMethodRepository
         $this->device = $device ?? \DeviceCache::getPrimary();
     }
 
-    public function ipmi(): IpmiPollingMethod
+    /**
+     * Create or update a polling method row (and its associated Secret, if applicable).
+     * Delegates all type-specific logic to the PollingMethod class for that type.
+     *
+     * @param  array<string, mixed>  $settings  Non-sensitive per-device settings (merged with existing).
+     * @param  array<string, mixed>  $secretData  Credential fields (ignored for methods without a secret).
+     */
+    public function save(PollingMethodType $type, array $settings = [], array $secretData = [], bool $enabled = true, bool $affectsAvailability = false): DevicePollingMethod
     {
-        $method = $this->device->pollingMethods->firstWhere('method_type', PollingMethodType::Ipmi);
+        return PollingMethodDefinition::for($type)->class()::save($this->device, $settings, $secretData, $enabled, $affectsAvailability);
+    }
 
-        if ($method) {
-            return IpmiPollingMethod::fromModel($method);
+    /**
+     * @template T of PollingMethodInterface
+     *
+     * @param  class-string<T>  $class
+     * @return T
+     */
+    private function pollingMethod(PollingMethodType $type, string $class): PollingMethodInterface
+    {
+        if (! isset($this->pollingMethods[$type->value])) {
+            $method = $this->device->pollingMethods->firstWhere('method_type', $type);
+            $this->pollingMethods[$type->value] = $method ? $class::fromModel($method) : $class::disabled();
         }
 
-        return IpmiPollingMethod::disabled();
+        return $this->pollingMethods[$type->value];
     }
 
     public function snmp(): SnmpPollingMethod
     {
-        $method = $this->device->pollingMethods->firstWhere('method_type', PollingMethodType::Snmp);
-
-        if ($method) {
-            return SnmpPollingMethod::fromModel($method);
-        }
-
-        return SnmpPollingMethod::disabled();
+        return $this->pollingMethod(PollingMethodType::Snmp, SnmpPollingMethod::class);
     }
 
     public function icmp(): IcmpPollingMethod
     {
-        $method = $this->device->pollingMethods->firstWhere('method_type', PollingMethodType::Icmp);
+        return $this->pollingMethod(PollingMethodType::Icmp, IcmpPollingMethod::class);
+    }
 
-        if ($method) {
-            return IcmpPollingMethod::fromModel($method);
-        }
-
-        return IcmpPollingMethod::disabled();
+    public function ipmi(): IpmiPollingMethod
+    {
+        return $this->pollingMethod(PollingMethodType::Ipmi, IpmiPollingMethod::class);
     }
 
     public function unixAgent(): UnixAgentPollingMethod
     {
-        $method = $this->device->pollingMethods->firstWhere('method_type', PollingMethodType::UnixAgent);
-
-        if ($method) {
-            return UnixAgentPollingMethod::fromModel($method);
-        }
-
-        return UnixAgentPollingMethod::disabled();
+        return $this->pollingMethod(PollingMethodType::UnixAgent, UnixAgentPollingMethod::class);
     }
 }
