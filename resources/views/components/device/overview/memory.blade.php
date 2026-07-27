@@ -9,12 +9,30 @@
                          popup :popup-title="$device->display . ' - ' . __('Memory Usage')" />
             </div>
             @foreach($device->mempools as $mempool)
+                @php
+                    $total = \LibreNMS\Util\Number::formatBi($mempool->mempool_total);
+                    $used = \LibreNMS\Util\Number::formatBi($mempool->mempool_used);
+                    $free = \LibreNMS\Util\Number::formatBi($mempool->mempool_free);
+                    $percent = $mempool->mempool_perc;
+                    $shadow = null;
+
+                    if ($mempool->mempool_class === 'system' && $device->mempools->count() > 1) {
+                        $buffers = $device->mempools->firstWhere('mempool_class', 'buffers')?->mempool_used ?? 0;
+                        $cached = $device->mempools->firstWhere('mempool_class', 'cached')?->mempool_used ?? 0;
+                        $shadow = \LibreNMS\Util\Number::calculatePercent($mempool->mempool_used + $buffers + $cached, $mempool->mempool_total, 0);
+                    }
+
+                    [$leftText, $rightText] = match ($mempool->mempool_class) {
+                        'system', 'virtual', 'swap' => ["$used / $total ($percent%)", $free],
+                        default => ["$used ($percent%)", ''],
+                    };
+                @endphp
                 <div class="tw:flex tw:items-center tw:gap-3 tw:px-3 tw:py-2">
                     <span class="tw:w-36 tw:truncate">{{ $mempool->mempool_descr }}</span>
                     <x-graph type="mempool_usage" :vars="['id' => $mempool->mempool_id]" width="100" height="24" popup
                              :popup-title="$device->display . ' - ' . $mempool->mempool_descr" />
-                    <x-device.overview.percentage class="tw:ml-auto" :percent="$mempool->mempool_perc" :warning="$mempool->mempool_perc_warn"
-                        :label="\LibreNMS\Util\Number::formatBi($mempool->mempool_used) . ' / ' . \LibreNMS\Util\Number::formatBi($mempool->mempool_total) . ' (' . round($mempool->mempool_perc) . '%)'" />
+                    <x-device.overview.percentage class="tw:ml-auto tw:max-w-[400px] tw:flex-1" :percent="$percent" :warning="$mempool->mempool_perc_warn ?: null"
+                        :left_text="$leftText" :right_text="$rightText" :shadow="$shadow" />
                 </div>
             @endforeach
         </div>
