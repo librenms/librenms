@@ -36,6 +36,7 @@ use LibreNMS\Enum\Sensor;
 use LibreNMS\Interfaces\Plugins\Hooks\DeviceOverviewHook;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Plugins;
+use LibreNMS\Util\Rewrite;
 
 class OverviewController implements DeviceTab
 {
@@ -77,10 +78,10 @@ class OverviewController implements DeviceTab
         ]);
 
         $device->loadCount([
-            'ports as ports_total_count' => fn ($query) => $query->where('deleted', '!=', 1),
-            'ports as ports_up_count' => fn ($query) => $query->where('deleted', '!=', 1)->where('disabled', 0)->where('ignore', 0)->where('ifOperStatus', 'up'),
-            'ports as ports_down_count' => fn ($query) => $query->where('deleted', '!=', 1)->where('disabled', 0)->where('ignore', 0)->where('ifOperStatus', 'down'),
-            'ports as ports_disabled_count' => fn ($query) => $query->where('deleted', '!=', 1)->where('disabled', 1),
+            'ports as ports_total_count' => fn ($query) => $query->isNotDeleted(),
+            'ports as ports_up_count' => fn ($query) => $query->isUp(),
+            'ports as ports_down_count' => fn ($query) => $query->isDown(),
+            'ports as ports_disabled_count' => fn ($query) => $query->isDisabled(),
         ]);
 
         $eventlogs = $device->eventlogs()->latest('datetime')->limit(10)->get();
@@ -120,22 +121,74 @@ class OverviewController implements DeviceTab
     /**
      * @return Collection<string, array{
      *     sensor: Sensor,
-     *     groups: Collection<int|string, Collection<int, \App\Models\Sensor>>
+     *     groups: Collection<int|string, Collection<int, array{sensor: \App\Models\Sensor, description: string, graphLink: string}>>
      * }>
      */
     private function sensorGroups(Device $device): Collection
     {
-        return collect(Sensor::cases())
+        $sensorOrder = [
+            Sensor::Charge,
+            Sensor::Temperature,
+            Sensor::Humidity,
+            Sensor::Fanspeed,
+            Sensor::Dbm,
+            Sensor::Voltage,
+            Sensor::Current,
+            Sensor::Runtime,
+            Sensor::Power,
+            Sensor::PowerConsumed,
+            Sensor::PowerFactor,
+            Sensor::Frequency,
+            Sensor::Load,
+            Sensor::State,
+            Sensor::Count,
+            Sensor::Percent,
+            Sensor::Signal,
+            Sensor::TvSignal,
+            Sensor::Bitrate,
+            Sensor::Airflow,
+            Sensor::Snr,
+            Sensor::Pressure,
+            Sensor::Cooling,
+            Sensor::Delay,
+            Sensor::QualityFactor,
+            Sensor::ChromaticDispersion,
+            Sensor::Ber,
+            Sensor::Eer,
+            Sensor::Waterflow,
+            Sensor::Loss,
+            Sensor::SignalLoss,
+        ];
+
+        return collect($sensorOrder)
             ->mapWithKeys(function (Sensor $sensorClass) use ($device): array {
                 $sensors = $device->sensors
                     ->where('sensor_class', $sensorClass->value)
                     ->where('group', '!=', 'transceiver')
                     ->sortBy([['group', 'asc'], ['sensor_descr', 'asc']]);
 
+                $preparedSensors = $sensors
+                    ->map(function (\App\Models\Sensor $sensor) use ($device, $sensorClass): array {
+                        $description = $sensor->poller_type === 'ipmi'
+                            ? Rewrite::ipmiSensorName($device->hardware, (string) $sensor->sensor_descr)
+                            : (string) $sensor->sensor_descr;
+                        $description = Rewrite::shortenIfName(substr($description, 0, 48));
+
+                        return [
+                            'sensor' => $sensor,
+                            'description' => $description,
+                            'graphLink' => route('graphs', [
+                                'type' => 'sensor_' . $sensorClass->value,
+                                'from' => LibrenmsConfig::get('time.day'),
+                                'id' => $sensor->sensor_id,
+                            ]),
+                        ];
+                    });
+
                 return $sensors->isEmpty() ? [] : [
                     $sensorClass->value => [
                         'sensor' => $sensorClass,
-                        'groups' => $sensors->toBase()->groupBy('group'),
+                        'groups' => $preparedSensors->toBase()->groupBy(fn (array $data) => $data['sensor']->group),
                     ],
                 ];
             });

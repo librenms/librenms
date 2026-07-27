@@ -4,6 +4,7 @@ namespace App\View\Components\Device\Overview;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use Carbon\CarbonInterface;
 use Carbon\CarbonInterval;
 use Closure;
 use Illuminate\Contracts\View\View;
@@ -45,7 +46,11 @@ class Availability extends Component
             ->where(fn ($query) => $query->whereNull('up_again')->orWhere('up_again', '>', $start->timestamp))
             ->orderBy('going_down')
             ->get(['going_down', 'up_again']);
-        $inserted = $this->device->inserted->timestamp;
+        $insertedAt = $this->device->getAttribute('inserted');
+        $inserted = ($insertedAt instanceof CarbonInterface ? $insertedAt->timestamp : null) ?? min(array_filter([
+            $now->timestamp - (int) $this->device->uptime,
+            $outages->first()?->going_down,
+        ], fn ($value): bool => $value !== null));
         $okThreshold = (float) LibrenmsConfig::get('availablity.threshold_ok', 99.9);
         $warningThreshold = (float) LibrenmsConfig::get('availablity.threshold_warning', 95);
         $currentDay = $start->copy()->startOfDay();

@@ -8,12 +8,26 @@
                 @if(filled($group))
                     <div class="tw:bg-neutral-100 tw:px-3 tw:py-2 tw:font-bold tw:dark:bg-dark-gray-300">{{ $group }}</div>
                 @endif
-                @foreach($sensors as $sensor)
-                    <div class="tw:flex tw:items-center tw:gap-3 tw:px-3 tw:py-2">
-                        <span class="tw:w-36 tw:truncate" title="{{ $sensor->sensor_descr }}">{{ $sensor->sensor_descr }}</span>
-                        <x-graph :type="'sensor_' . $sensor->sensor_class" :vars="['id' => $sensor->sensor_id]" width="100" height="24" popup
-                                 :popup-title="$device->display . ' - ' . $sensor->sensor_descr" />
-                        <x-label class="tw:ml-auto" :status="$sensor->currentStatus()">{{ $sensor->formatValue() }}</x-label>
+                @foreach($sensors as $data)
+                    <div class="tw:flex tw:items-center tw:gap-3 tw:px-3 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
+                        <div class="tw:w-36 tw:shrink-0 tw:truncate" title="{{ $data['description'] }}">
+                            <x-popup>
+                                <a href="{{ $data['graphLink'] }}">{{ $data['description'] }}</a>
+                                <x-slot name="title">{{ $device->display }} - {{ $data['description'] }}</x-slot>
+                                <x-slot name="body"><x-graph-row loading="lazy" :type="'sensor_' . $data['sensor']->sensor_class" :vars="['id' => $data['sensor']->sensor_id]" /></x-slot>
+                            </x-popup>
+                        </div>
+                        <div class="tw:hidden tw:min-w-0 tw:flex-1 tw:justify-end tw:sm:flex">
+                            <x-graph :type="'sensor_' . $data['sensor']->sensor_class" :vars="['id' => $data['sensor']->sensor_id]" width="100" height="24" popup
+                                     :popup-title="$device->display . ' - ' . $data['description']" />
+                        </div>
+                        <div class="tw:flex tw:w-28 tw:shrink-0 tw:justify-end">
+                            <x-popup>
+                                <a href="{{ $data['graphLink'] }}"><x-label :status="$data['sensor']->currentStatus()">{{ $data['sensor']->formatValue() }}</x-label></a>
+                                <x-slot name="title">{{ $device->display }} - {{ $data['description'] }}</x-slot>
+                                <x-slot name="body"><x-graph-row loading="lazy" :type="'sensor_' . $data['sensor']->sensor_class" :vars="['id' => $data['sensor']->sensor_id]" /></x-slot>
+                            </x-popup>
+                        </div>
                     </div>
                 @endforeach
             @endforeach

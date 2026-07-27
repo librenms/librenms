@@ -1,22 +1,13 @@
-@props(['device', 'eventlogs', 'ports'])
-
 <x-device.overview.panel :title="__('Recent Events')" icon="fa fa-bookmark" :href="route('device.eventlog', ['device' => $device->device_id])">
     <div class="tw:divide-y tw:divide-gray-300 tw:dark:divide-zinc-800">
-        @forelse($eventlogs as $entry)
-            @php
-                $severityClass = match($entry->severity) {
-                    \LibreNMS\Enum\Severity::Ok => 'success',
-                    \LibreNMS\Enum\Severity::Warning => 'warning',
-                    \LibreNMS\Enum\Severity::Error => 'danger',
-                    default => 'info',
-                };
-                $port = $entry->type === 'interface' ? $ports->get($entry->reference) : null;
-            @endphp
-            <div class="tw:grid tw:grid-cols-[auto_auto_150px_1fr] tw:items-center tw:gap-2.5 tw:px-2 tw:py-2">
-                <span class="alert-status {{ $severityClass }}"></span>
-                <span class="tw:whitespace-nowrap">{{ \LibreNMS\Util\Time::format($entry->datetime, 'compact') }}</span>
-                <span class="tw:min-w-0 tw:truncate">@if($port)<x-port-link :port="$port" />@endif</span>
-                <span>{{ $entry->message }}</span>
+        @forelse($rows as $row)
+            <div class="tw:flex tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
+                <span class="alert-status {{ $row['severityClass'] }}"></span>
+                <span class="tw:shrink-0 tw:whitespace-nowrap">{{ \LibreNMS\Util\Time::format($row['entry']->datetime, 'compact') }}</span>
+                <span class="tw:w-36 tw:shrink-0 tw:truncate" title="{{ $row['port']?->getLabel() }}">
+                    @if($row['port'])<strong><x-port-link :port="$row['port']" /></strong>@endif
+                </span>
+                <span class="tw:min-w-0 tw:flex-1">{{ $row['entry']->message }}</span>
             </div>
         @empty
             <div class="tw:p-3 tw:text-gray-500">{{ __('No recent events') }}</div>
