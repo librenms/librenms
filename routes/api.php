@@ -183,6 +183,14 @@ Route::prefix('v0')->group(function (): void {
         });
     });
 
+    // Logs
+    Route::prefix('logs')->group(function (): void {
+        Route::get('eventlog/{hostname?}', [App\Api\Controllers\LegacyApiController::class, 'list_logs'])->name('list_eventlog')->middleware('can:viewAny,App\Models\Eventlog');
+        Route::get('syslog/{hostname?}', [App\Api\Controllers\LegacyApiController::class, 'list_logs'])->name('list_syslog')->middleware('can:viewAny,App\Models\Syslog');
+        Route::get('alertlog/{hostname?}', [App\Api\Controllers\LegacyApiController::class, 'list_logs'])->name('list_alertlog')->middleware('can:viewAny,App\Models\AlertLog');
+        Route::get('authlog', [App\Api\Controllers\LegacyApiController::class, 'list_logs'])->name('list_authlog')->middleware('can:viewAny,App\Models\AuthLog');
+    });
+
     // Ports
     Route::prefix('ports')->group(function (): void {
         Route::middleware('can:viewAny,App\Models\Port')->group(function (): void {
