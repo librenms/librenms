@@ -20,7 +20,8 @@
                     <x-graph type="storage_usage" :vars="['id' => $drive->storage_id]" width="100" height="24" popup
                              :popup-title="$device->display . ' - ' . $drive->storage_descr" />
                     <x-device.overview.percentage class="tw:ml-auto tw:max-w-[400px] tw:flex-1" :percent="$percent" :warning="$drive->storage_perc_warn"
-                        :left_text="$used . ' / ' . $total . ' (' . $percent . '%)'" :right_text="$free" />
+                        :left_text="$used . ' / ' . $total . ' (' . $percent . '%)'" :right_text="$free" graph_type="storage_usage"
+                        :graph_vars="['id' => $drive->storage_id]" :graph_title="$device->display . ' - ' . $drive->storage_descr" />
                 </div>
             @endforeach
         </div>

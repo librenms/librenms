@@ -11,7 +11,8 @@
                         <x-graph type="processor_usage" :vars="['id' => $processor->processor_id]" width="100" height="24" popup
                                  :popup-title="$device->display . ' - ' . $processor->getFormattedDescription()" />
                         <x-device.overview.percentage class="tw:ml-auto tw:max-w-[200px] tw:flex-1" :percent="$processor->processor_usage" :warning="$processor->processor_perc_warn"
-                            :left_text="''" :right_text="$processor->processor_usage . '%'" />
+                            :left_text="''" :right_text="$processor->processor_usage . '%'" graph_type="processor_usage"
+                            :graph_vars="['id' => $processor->processor_id]" :graph_title="$device->display . ' - ' . $processor->getFormattedDescription()" />
                     </div>
                 @endforeach
             @else
@@ -27,7 +28,8 @@
                     <div class="tw:flex tw:items-center tw:gap-3 tw:px-3 tw:py-2">
                         <span class="tw:w-36 tw:truncate">x{{ $processors->count() }} {{ $processors->first()->getFormattedDescription() }}</span>
                         <x-device.overview.percentage class="tw:ml-auto tw:max-w-[400px] tw:flex-1" :percent="$usage" :warning="$warning"
-                            :left_text="''" :right_text="$usage . '%'" />
+                            :left_text="''" :right_text="$usage . '%'" graph_type="device_processor"
+                            :graph_vars="['device' => $device->device_id]" :graph_title="$device->display . ' - ' . __('CPU usage')" />
                     </div>
                 @endforeach
             @endif

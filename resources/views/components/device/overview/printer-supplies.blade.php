@@ -25,7 +25,8 @@
                     <x-graph type="toner_usage" :vars="['id' => $supply->supply_id]" width="100" height="24" popup
                              :popup-title="$device->display . ' - ' . $supply->supply_descr" />
                     <x-device.overview.percentage class="tw:ml-auto tw:max-w-[200px] tw:flex-1" :percent="$percent" :left_text="''"
-                        :right_text="$percent . '%'" :colors="$colors" />
+                        :right_text="$percent . '%'" :colors="$colors" graph_type="toner_usage"
+                        :graph_vars="['id' => $supply->supply_id]" :graph_title="$device->display . ' - ' . $supply->supply_descr" />
                 </div>
             @endforeach
         </div>
