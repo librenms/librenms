@@ -105,7 +105,7 @@ class DevSimulate extends LnmsCommand
         $device->status_reason = '';
         $device->save();
 
-        $device->getPollingMethodRepo()->save(
+        $device->pollingMethodFor()->save(
             PollingMethodType::Snmp,
             settings: ['transport' => 'udp', 'port' => $this->snmpsim->port],
             secretData: ['version' => 'v2c', 'community' => $community],

@@ -62,31 +62,6 @@ readonly class UnixAgentPollingMethod implements PollingMethodInterface
         );
     }
 
-    public static function save(
-        \App\Models\Device $device,
-        array $settings = [],
-        array $secretData = [],
-        bool $enabled = true,
-        bool $affectsAvailability = false,
-    ): DevicePollingMethod {
-        $method = DevicePollingMethod::firstOrNew([
-            'device_id' => $device->device_id,
-            'method_type' => PollingMethodType::UnixAgent,
-        ]);
-
-        $method->enabled = $enabled;
-        $method->affects_availability = $affectsAvailability;
-
-        if (! empty($settings)) {
-            $method->settings = array_merge($method->settings ?? [], $settings);
-        }
-
-        $method->save();
-        $device->load('pollingMethods');
-
-        return $method;
-    }
-
     public static function disabled(): static
     {
         return new static(

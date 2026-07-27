@@ -1,7 +1,7 @@
 <?php
 
 /**
- * IcmpPollingMethodDefinition.php
+ * UnixAgentPollingMethodDefinition.php
  *
  * -Description-
  *
@@ -27,19 +27,26 @@
 namespace LibreNMS\Polling\Method\Definitions;
 
 use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
-use LibreNMS\Polling\Method\IcmpPollingMethod;
+use LibreNMS\Polling\Method\UnixAgentPollingMethod;
 
 /**
- * @implements PollingMethodDefinitionInterface<IcmpPollingMethod>
+ * @implements PollingMethodDefinitionInterface<UnixAgentPollingMethod>
  */
-class IcmpPollingMethodDefinitionInterface implements PollingMethodDefinitionInterface
+class UnixAgentPollingMethodDefinition implements PollingMethodDefinitionInterface
 {
     /**
      * @inheritDoc
      */
     public function schema(): array
     {
-        return [];
+        return [
+            'port' => [
+                'type' => 'number',
+                'default' => 6556,
+                'min' => 1,
+                'max' => 65535,
+            ],
+        ];
     }
 
     /**
@@ -48,7 +55,7 @@ class IcmpPollingMethodDefinitionInterface implements PollingMethodDefinitionInt
     public function defaults(): array
     {
         return [
-            'affects_availability' => true,
+            'port' => 6556,
         ];
     }
 
@@ -57,7 +64,9 @@ class IcmpPollingMethodDefinitionInterface implements PollingMethodDefinitionInt
      */
     public function rules(): array
     {
-        return [];
+        return [
+            'port' => ['nullable', 'integer', 'min:1', 'max:65535'],
+        ];
     }
 
     /**
@@ -65,7 +74,7 @@ class IcmpPollingMethodDefinitionInterface implements PollingMethodDefinitionInt
      */
     public function icon(): string
     {
-        return 'fa-exchange';
+        return 'fa-terminal';
     }
 
     /**
@@ -73,7 +82,7 @@ class IcmpPollingMethodDefinitionInterface implements PollingMethodDefinitionInt
      */
     public function class(): string
     {
-        return IcmpPollingMethod::class;
+        return UnixAgentPollingMethod::class;
     }
 
     /**

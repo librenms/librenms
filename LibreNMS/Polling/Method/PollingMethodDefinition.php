@@ -29,10 +29,10 @@ namespace LibreNMS\Polling\Method;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
 use LibreNMS\Interfaces\PollingMethodInterface;
-use LibreNMS\Polling\Method\Definitions\IcmpPollingMethodDefinitionInterface;
-use LibreNMS\Polling\Method\Definitions\IpmiPollingMethodDefinitionInterface;
-use LibreNMS\Polling\Method\Definitions\SnmpPollingMethodDefinitionInterface;
-use LibreNMS\Polling\Method\Definitions\UnixAgentPollingMethodDefinitionInterface;
+use LibreNMS\Polling\Method\Definitions\IcmpPollingMethodDefinition;
+use LibreNMS\Polling\Method\Definitions\IpmiPollingMethodDefinition;
+use LibreNMS\Polling\Method\Definitions\SnmpPollingMethodDefinition;
+use LibreNMS\Polling\Method\Definitions\UnixAgentPollingMethodDefinition;
 
 class PollingMethodDefinition
 {
@@ -42,10 +42,10 @@ class PollingMethodDefinition
     public static function for(PollingMethodType $type): PollingMethodDefinitionInterface
     {
         return match($type) {
-            PollingMethodType::Snmp => new SnmpPollingMethodDefinitionInterface,
-            PollingMethodType::Icmp => new IcmpPollingMethodDefinitionInterface,
-            PollingMethodType::Ipmi => new IpmiPollingMethodDefinitionInterface,
-            PollingMethodType::UnixAgent => new UnixAgentPollingMethodDefinitionInterface,
+            PollingMethodType::Snmp => new SnmpPollingMethodDefinition,
+            PollingMethodType::Icmp => new IcmpPollingMethodDefinition,
+            PollingMethodType::Ipmi => new IpmiPollingMethodDefinition,
+            PollingMethodType::UnixAgent => new UnixAgentPollingMethodDefinition,
         };
     }
 

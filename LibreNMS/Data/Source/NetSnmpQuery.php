@@ -318,7 +318,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         }
 
         // authentication & settings
-        $snmp = $this->device->getPollingMethodRepo()->snmp();
+        $snmp = $this->device->pollingMethodFor()->snmp();
         $auth = $snmp->toNetSnmpOptions($this->context);
 
         $cmd = array_merge($cmd, $auth, $this->options);
@@ -414,7 +414,7 @@ class NetSnmpQuery implements SnmpQueryInterface
                 $this->allowUnordered();
             }
 
-            $snmp = $this->device->getPollingMethodRepo()->snmp();
+            $snmp = $this->device->pollingMethodFor()->snmp();
 
             // handle bulk settings
             if ($snmp->version !== 'v1'
@@ -500,7 +500,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     private function limitOids(array $oids): array
     {
         // get max oids per query device attrib > os setting > global setting
-        $configured_max = $this->device->getPollingMethodRepo()->snmp()->maxOid;
+        $configured_max = $this->device->pollingMethodFor()->snmp()->maxOid;
         $max_oids = max($configured_max, 1); // 0 or less would break things.
 
         if (count($oids) > $max_oids) {
@@ -520,6 +520,6 @@ class NetSnmpQuery implements SnmpQueryInterface
         $oids = implode(',', $oids);
         $options = implode(',', $this->options);
 
-        return "$type|{$this->device->hostname}|{$this->device->getPollingMethodRepo()->snmp()->community}|$this->context|$oids|$options";
+        return "$type|{$this->device->hostname}|{$this->device->pollingMethodFor()->snmp()->community}|$this->context|$oids|$options";
     }
 }

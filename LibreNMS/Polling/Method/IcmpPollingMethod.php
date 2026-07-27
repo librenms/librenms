@@ -57,26 +57,6 @@ readonly class IcmpPollingMethod implements PollingMethodInterface
         );
     }
 
-    public static function save(
-        \App\Models\Device $device,
-        array $settings = [],
-        array $secretData = [],
-        bool $enabled = true,
-        bool $affectsAvailability = true,
-    ): DevicePollingMethod {
-        $method = DevicePollingMethod::firstOrNew([
-            'device_id' => $device->device_id,
-            'method_type' => PollingMethodType::Icmp,
-        ]);
-
-        $method->enabled = $enabled;
-        $method->affects_availability = $affectsAvailability;
-        $method->save();
-        $device->load('pollingMethods');
-
-        return $method;
-    }
-
     public static function disabled(): static
     {
         return new static(
