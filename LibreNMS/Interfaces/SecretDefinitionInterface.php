@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SecretDefinitionInterface.php
  *
@@ -25,6 +26,7 @@
 
 namespace LibreNMS\Interfaces;
 
+use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Secrets\SecretData;
 
 /**
@@ -32,6 +34,8 @@ use LibreNMS\Polling\Secrets\SecretData;
  */
 interface SecretDefinitionInterface extends HasFieldSchema
 {
+    public function type(): SecretType;
+
     /**
      * @return class-string<T>
      */

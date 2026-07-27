@@ -36,7 +36,7 @@ class AddDeviceController
 
         $availableMethods = collect(PollingMethodType::cases())->map(function (PollingMethodType $type): array {
             $definition = PollingMethodDefinition::for($type);
-            $schema = $definition->secretClass() ? $definition->secretClass()::getUiSchema() : [];
+            $schema = $definition->secretDefinition()?->schema() ?? [];
             $schemaFields = PollingMethodDefinition::buildSchemaFields($schema, "methods['" . $type->value . "'].formData");
             $settingsSchema = $definition->schema();
 

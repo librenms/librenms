@@ -64,7 +64,7 @@ class EditPollingController
         $row = $device->pollingMethods->firstWhere('method_type', $type);
         $secret = $row?->secret;
         $canUnmaskSecrets = Gate::allows('unmask', Secret::class);
-        $schema = $defintion->secretClass() ? $defintion->secretClass()::getUiSchema() : [];
+        $schema = $defintion->secretDefinition()?->schema() ?? [];
         $schemaFields = PollingMethodDefinition::buildSchemaFields($schema);
         $settingsSchema = $defintion->schema();
         $secretsForType = Secret::query()
@@ -119,7 +119,7 @@ class EditPollingController
         $definition = PollingMethodDefinition::for($type);
 
         $secret = null;
-        if ($definition->secretClass() !== null) {
+        if ($definition->secretDefinition() !== null) {
             $this->authorize('create', Secret::class);
             $secret = ($validated['credential_mode'] ?? 'existing') === 'existing'
                 ? $this->resolveExistingSecret($validated['secret_id'] ?? null, $type)

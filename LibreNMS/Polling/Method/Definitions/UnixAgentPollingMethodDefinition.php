@@ -88,7 +88,7 @@ class UnixAgentPollingMethodDefinition implements PollingMethodDefinitionInterfa
     /**
      * @inheritDoc
      */
-    public function secretClass(): null
+    public function secretDefinition(): null
     {
         return null;
     }

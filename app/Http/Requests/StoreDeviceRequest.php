@@ -62,8 +62,8 @@ class StoreDeviceRequest extends FormRequest
             $rules["polling_methods.{$method}.credential_mode"] = ['nullable', 'in:default,existing,new'];
 
             $definition = PollingMethodDefinition::for($type);
-            $secretClass = $definition->secretClass();
-            if ($secretClass !== null) {
+            $secretDefinition = $definition->secretDefinition();
+            if ($secretDefinition !== null) {
                 $rules["polling_methods.{$method}.secret_id"] = [
                     'required_if:polling_methods.' . $method . '.credential_mode,existing',
                     'nullable',
@@ -76,7 +76,7 @@ class StoreDeviceRequest extends FormRequest
 
                 $credentialMode = $data['credential_mode'] ?? 'default';
                 if ($credentialMode === 'new') {
-                    foreach ($secretClass::rules() as $key => $rule) {
+                    foreach ($secretDefinition->rules() as $key => $rule) {
                         $rules["polling_methods.{$method}.secret_data.{$key}"] = $rule;
                     }
                 }

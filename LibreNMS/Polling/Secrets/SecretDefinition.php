@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SecretDefinition.php
  *
@@ -32,6 +33,9 @@ use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
 
 class SecretDefinition
 {
+    /**
+     * @return SecretDefinitionInterface<SecretData>
+     */
     public static function for(SecretType $type): SecretDefinitionInterface
     {
         return match($type) {

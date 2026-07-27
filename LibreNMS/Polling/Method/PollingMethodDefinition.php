@@ -51,7 +51,7 @@ class PollingMethodDefinition
 
     public static function hasSecret(PollingMethodType $type): bool
     {
-        return self::for($type)->secretClass() !== null;
+        return self::for($type)->secretDefinition() !== null;
     }
 
     /**
