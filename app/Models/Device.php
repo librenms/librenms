@@ -27,6 +27,7 @@ use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Polling\Method\PollingMethodRepository;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
@@ -129,9 +130,11 @@ class Device extends BaseModel
         return static::where('hostname', $hostname)->first();
     }
 
-    public function getPollingMethod(PollingMethodType $method): ?DevicePollingMethod
+    public function pollingMethod(PollingMethodType $method): ?DevicePollingMethod
     {
         if ($this->exists || $this->relationLoaded('pollingMethods')) {
+            $this->load(['pollingMethods', 'pollingMethods.secret']);
+
             return $this->pollingMethods->firstWhere('method_type', $method);
         }
 
@@ -189,7 +192,7 @@ class Device extends BaseModel
 
     public function hasSnmpInfo(): bool
     {
-        $snmp = $this->getPollingMethods()->snmp();
+        $snmp = $this->getPollingMethodRepo()->snmp();
 
         if ($snmp->version == 'v3') {
             if ($snmp->authlevel == 'authNoPriv') {
@@ -213,9 +216,9 @@ class Device extends BaseModel
         return false; // no known snmpver
     }
 
-    public function getPollingMethods(): \LibreNMS\Polling\Method\PollingMethodRepository
+    public function getPollingMethodRepo(): PollingMethodRepository
     {
-        return new \LibreNMS\Polling\Method\PollingMethodRepository($this);
+        return new PollingMethodRepository($this);
     }
 
     /**

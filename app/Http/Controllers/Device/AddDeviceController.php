@@ -18,6 +18,7 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\Polling\Method\PollingMethodDefinition;
 use LibreNMS\Polling\Secrets\SecretService;
 
 class AddDeviceController
@@ -34,22 +35,22 @@ class AddDeviceController
         $this->authorize('create', Device::class);
 
         $availableMethods = collect(PollingMethodType::cases())->map(function (PollingMethodType $type): array {
-            $methodClass = $type->methodClass();
-            $schema = $type->hasSecret() ? $type->secretClass()::getUiSchema() : [];
-            $schemaFields = PollingMethodType::buildSchemaFields($schema, "methods['" . $type->value . "'].formData");
-            $settingsSchema = $methodClass::getSettingsSchema();
+            $definition = PollingMethodDefinition::for($type);
+            $schema = $definition->secretClass() ? $definition->secretClass()::getUiSchema() : [];
+            $schemaFields = PollingMethodDefinition::buildSchemaFields($schema, "methods['" . $type->value . "'].formData");
+            $settingsSchema = $definition->schema();
 
             return [
                 'type' => $type->value,
                 'label' => __('poller.methods.' . $type->value),
-                'icon' => $type->icon(),
+                'icon' => $definition->icon(),
                 'schema_fields' => $schemaFields,
                 'schema_defaults' => collect($schema)->mapWithKeys(
                     fn (array $field, string $key): array => [
                         $key => $field['default'] ?? (isset($field['options']) ? array_key_first($field['options']) : ''),
                     ]
                 )->all(),
-                'settings_fields' => PollingMethodType::buildSchemaFields($settingsSchema, "methods['" . $type->value . "'].settingsData"),
+                'settings_fields' => PollingMethodDefinition::buildSchemaFields($settingsSchema, "methods['" . $type->value . "'].settingsData"),
                 'settings_defaults' => collect($settingsSchema)->mapWithKeys(
                     fn (array $field, string $key): array => [
                         $key => $field['default'] ?? (isset($field['options']) ? array_key_first($field['options']) : ''),
@@ -125,7 +126,7 @@ class AddDeviceController
                 'settings' => $settings,
             ]);
 
-            if ($type->hasSecret()) {
+            if (PollingMethodDefinition::hasSecret($type)) {
                 $secret = $this->resolveSecret($type, $data);
                 if ($secret !== null) {
                     $pollingMethod->setRelation('secret', $secret);

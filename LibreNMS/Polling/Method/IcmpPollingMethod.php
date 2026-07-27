@@ -9,9 +9,9 @@ use App\Models\Eventlog;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Interfaces\PollingMethod;
+use LibreNMS\Interfaces\PollingMethodInterface;
 
-readonly class IcmpPollingMethod implements PollingMethod
+readonly class IcmpPollingMethod implements PollingMethodInterface
 {
     public function __construct(
         public bool $enabled,
@@ -57,34 +57,31 @@ readonly class IcmpPollingMethod implements PollingMethod
         );
     }
 
-    public static function disabled(): self
+    public static function save(
+        \App\Models\Device $device,
+        array $settings = [],
+        array $secretData = [],
+        bool $enabled = true,
+        bool $affectsAvailability = true,
+    ): DevicePollingMethod {
+        $method = DevicePollingMethod::firstOrNew([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Icmp,
+        ]);
+
+        $method->enabled = $enabled;
+        $method->affects_availability = $affectsAvailability;
+        $method->save();
+        $device->load('pollingMethods');
+
+        return $method;
+    }
+
+    public static function disabled(): static
     {
-        return new self(
+        return new static(
             enabled: false,
             affectsAvailability: false,
         );
-    }
-
-    /**
-     * @return array<string, array{type: string, default?: mixed, options?: array<string,string>, visible_if?: array<string, mixed>}>
-     */
-    public static function getSettingsSchema(): array
-    {
-        return [];
-    }
-
-    public static function getDefaults(): array
-    {
-        return [
-            'affects_availability' => true,
-        ];
-    }
-
-    /**
-     * @return array<string, array<mixed>|string>
-     */
-    public static function getRules(): array
-    {
-        return [];
     }
 }

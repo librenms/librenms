@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Console\LnmsCommand;
 use App\Models\Device;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Util\Snmpsim;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -97,16 +98,18 @@ class DevSimulate extends LnmsCommand
     {
         $hostname = $this->option('multiple') ? $community : 'snmpsim';
         $device = Device::firstOrNew(['hostname' => $hostname]);
+        $device->overwrite_ip = $this->snmpsim->ip;
         $action = $device->exists ? 'updated' : 'added';
 
-        $device->overwrite_ip = $this->snmpsim->ip;
-        $device->port = $this->snmpsim->port;
-        $device->snmpver = 'v2c';
-        $device->transport = 'udp';
-        $device->community = $community;
         $device->last_discovered = null;
         $device->status_reason = '';
         $device->save();
+
+        $device->getPollingMethodRepo()->save(
+            PollingMethodType::Snmp,
+            settings: ['transport' => 'udp', 'port' => $this->snmpsim->port],
+            secretData: ['version' => 'v2c', 'community' => $community],
+        );
 
         $this->info(trans("commands.dev:simulate.$action", ['hostname' => $device->hostname, 'id' => $device->device_id]));
 

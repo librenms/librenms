@@ -6,6 +6,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Method\PollingMethodDefinition;
 use LibreNMS\Polling\Secrets\SecretData;
 
 class UpdatePollingMethodRequest extends FormRequest
@@ -21,7 +22,7 @@ class UpdatePollingMethodRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $type = $this->pollingType();
-        if ($type && $type->hasSecret() && $this->has('secret_data')) {
+        if ($type && PollingMethodDefinition::hasSecret($type) && $this->has('secret_data')) {
             $device = $this->route('device');
             if ($device) {
                 $pollingMethod = $device->pollingMethods()->where('method_type', $type->value)->first();
@@ -62,17 +63,17 @@ class UpdatePollingMethodRequest extends FormRequest
             return $rules;
         }
 
-        $methodClass = $type->methodClass();
+        $definition = PollingMethodDefinition::for($type);
         $rules = [
             ...$rules,
-            ...collect($methodClass::getRules())
+            ...collect($definition->rules())
                 ->mapWithKeys(fn (array|string $rule, string $key): array => ["settings.$key" => $rule])
                 ->all(),
         ];
 
-        if ($type->hasSecret() && $this->has('secret_data')) {
+        if ($definition->secretClass() !== null && $this->has('secret_data')) {
             /** @var class-string<SecretData> $secretClass */
-            $secretClass = $type->secretClass();
+            $secretClass = $definition->secretClass();
             $rules = [
                 ...$rules,
                 ...collect($secretClass::rules())
