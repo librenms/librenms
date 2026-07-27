@@ -10,7 +10,7 @@ return [
         'auth' => 'Autentisering',
         'authorization' => 'Auktorisation',
         'external' => 'Externt',
-            'global' => 'Globalt',
+        'global' => 'Globalt',
         'os' => 'OS',
         'discovery' => 'Upptäckt',
         'graphing' => 'Grafer',
