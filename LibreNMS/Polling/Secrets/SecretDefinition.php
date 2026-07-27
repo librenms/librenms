@@ -1,7 +1,6 @@
 <?php
-
 /**
- * PollingMethodDefinition.php
+ * SecretDefinition.php
  *
  * -Description-
  *
@@ -24,25 +23,20 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Interfaces;
+namespace LibreNMS\Polling\Secrets;
 
-/**
- * @template-covariant T of PollingMethodInterface
- */
-interface PollingMethodDefinitionInterface extends HasFieldSchema
+use LibreNMS\Enum\SecretType;
+use LibreNMS\Interfaces\SecretDefinitionInterface;
+use LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
+use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
+
+class SecretDefinition
 {
-    /**
-     * Get the icon name for this method type
-     */
-    public function icon(): string;
-
-    /**
-     * @return class-string<T>
-     */
-    public function class(): string;
-
-    /**
-     * @return SecretDefinitionInterface|null
-     */
-    public function secretDefinition(): ?SecretDefinitionInterface;
+    public static function for(SecretType $type): SecretDefinitionInterface
+    {
+        return match($type) {
+            SecretType::Ipmi => new IpmiSecretDefinition,
+            SecretType::Snmp => new SnmpSecretDefinition,
+        };
+    }
 }

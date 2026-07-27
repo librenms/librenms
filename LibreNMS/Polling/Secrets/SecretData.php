@@ -43,23 +43,6 @@ abstract class SecretData implements Arrayable, Jsonable, JsonSerializable
     abstract public static function fromArray(array $data): static;
 
     /**
-     * Get validation rules for this credential type.
-     *
-     * @return array<string, string|array<mixed>>
-     */
-    abstract public static function rules(): array;
-
-    /**
-     * Get UI schema for this credential type.
-     *
-     * @return array<string, array<string, mixed>>
-     */
-    public static function getUiSchema(): array
-    {
-        return [];
-    }
-
-    /**
      * @return array<string, mixed>
      */
     public function toArray(): array

@@ -31,7 +31,7 @@ use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
 use LibreNMS\Polling\Method\SnmpPollingMethod;
-use LibreNMS\Polling\Secrets\SnmpSecretData;
+use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
 
 /**
  * @implements PollingMethodDefinitionInterface<SnmpPollingMethod>
@@ -128,8 +128,8 @@ class SnmpPollingMethodDefinition implements PollingMethodDefinitionInterface
     /**
      * @inheritDoc
      */
-    public function secretClass(): string
+    public function secretDefinition(): SnmpSecretDefinition
     {
-        return SnmpSecretData::class;
+        return new SnmpSecretDefinition;
     }
 }

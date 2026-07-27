@@ -28,7 +28,7 @@ namespace LibreNMS\Polling\Method\Definitions;
 
 use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
 use LibreNMS\Polling\Method\IpmiPollingMethod;
-use LibreNMS\Polling\Secrets\IpmiSecretData;
+use LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
 
 /**
  * @implements PollingMethodDefinitionInterface<IpmiPollingMethod>
@@ -102,8 +102,8 @@ class IpmiPollingMethodDefinition implements PollingMethodDefinitionInterface
     /**
      * @inheritDoc
      */
-    public function secretClass(): string
+    public function secretDefinition(): IpmiSecretDefinition
     {
-        return IpmiSecretData::class;
+        return new IpmiSecretDefinition;
     }
 }
