@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\PollingMethod;
+use LibreNMS\Interfaces\PollingMethodInterface;
 use LibreNMS\Polling\PollingMethodFactory;
 
 class DevicePollingMethod extends Model
@@ -33,7 +33,7 @@ class DevicePollingMethod extends Model
         'last_check_successful' => 'boolean',
     ];
 
-    public function toPollingMethod(): PollingMethod
+    public function toPollingMethod(): PollingMethodInterface
     {
         return app(PollingMethodFactory::class)->make($this);
     }

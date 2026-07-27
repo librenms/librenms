@@ -8,6 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Method\PollingMethodDefinition;
 
 class StorePollingMethodRequest extends FormRequest
 {
@@ -35,17 +36,17 @@ class StorePollingMethodRequest extends FormRequest
         $type = $this->pollingType();
 
         if ($type) {
-            $methodClass = $type->methodClass();
+            $definition = PollingMethodDefinition::for($type);
             $rules = [
                 ...$rules,
-                ...collect($methodClass::getRules())
+                ...collect($definition->rules())
                     ->mapWithKeys(fn (array|string $rule, string $key): array => ["settings.$key" => $rule])
                     ->all(),
             ];
 
-            if ($type->hasSecret() && $this->input('credential_mode', 'existing') === 'new') {
+            if ($definition->secretClass() !== null && $this->input('credential_mode', 'existing') === 'new') {
                 /** @var class-string<\LibreNMS\Polling\Secrets\SecretData> $secretClass */
-                $secretClass = $type->secretClass();
+                $secretClass = $definition->secretClass();
                 $rules = [
                     ...$rules,
                     ...collect($secretClass::rules())
@@ -76,7 +77,7 @@ class StorePollingMethodRequest extends FormRequest
                 $validator->errors()->add('method_type', __('poller.method_exists'));
             }
 
-            if ($type->hasSecret() && $this->input('credential_mode', 'existing') === 'existing' && ! $this->input('secret_id')) {
+            if (PollingMethodDefinition::hasSecret($type) && $this->input('credential_mode', 'existing') === 'existing' && ! $this->input('secret_id')) {
                 $validator->errors()->add('secret_id', __('poller.select_credential'));
             }
         });

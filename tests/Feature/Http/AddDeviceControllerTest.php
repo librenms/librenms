@@ -81,10 +81,10 @@ class AddDeviceControllerTest extends TestCase
 
         // Mock PollingMethodFactory to return mocked methods
         $calledCredentials = [];
-        $icmpMock = Mockery::mock(\LibreNMS\Interfaces\PollingMethod::class);
+        $icmpMock = Mockery::mock(\LibreNMS\Interfaces\PollingMethodInterface::class);
         $icmpMock->shouldReceive('isAvailable')->andReturn(true);
 
-        $snmpMock = Mockery::mock(\LibreNMS\Interfaces\PollingMethod::class);
+        $snmpMock = Mockery::mock(\LibreNMS\Interfaces\PollingMethodInterface::class);
         $snmpMock->shouldReceive('isAvailable')
             ->andReturnUsing(function ($device) use (&$calledCredentials) {
                 $snmpMethod = $device->pollingMethods->firstWhere('method_type', \LibreNMS\Enum\PollingMethodType::Snmp);

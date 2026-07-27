@@ -5,13 +5,13 @@ namespace LibreNMS\Polling\Method;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
-use Illuminate\Validation\Rule;
+use App\Models\Secret;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Enum\PortAssociationMode;
-use LibreNMS\Interfaces\PollingMethod;
+use LibreNMS\Enum\SecretType;
+use LibreNMS\Interfaces\PollingMethodInterface;
 use SnmpQuery;
 
-readonly class SnmpPollingMethod implements PollingMethod
+readonly class SnmpPollingMethod implements PollingMethodInterface
 {
     public function __construct(
         public bool $enabled,
@@ -98,6 +98,41 @@ readonly class SnmpPollingMethod implements PollingMethod
         );
     }
 
+    public static function save(Device $device, array $settings = [], array $secretData = [], bool $enabled = true, bool $affectsAvailability = true): DevicePollingMethod
+    {
+        $method = DevicePollingMethod::with('secret')
+            ->firstOrNew([
+                'device_id' => $device->device_id,
+                'method_type' => PollingMethodType::Snmp,
+            ]);
+
+        $method->enabled = $enabled;
+        $method->affects_availability = $affectsAvailability;
+
+        if (! empty($settings)) {
+            $method->settings = array_merge($method->settings ?? [], $settings);
+        }
+
+        if (! empty($secretData)) {
+            if ($method->secret) {
+                $method->secret->update(['data' => array_merge($method->secret->data, $secretData)]);
+            } else {
+                $secret = Secret::create([
+                    'description' => 'SNMP ' . $device->hostname,
+                    'secret_type' => SecretType::Snmp,
+                    'default' => false,
+                    'data' => $secretData,
+                ]);
+                $method->secret_id = $secret->id;
+            }
+        }
+
+        $method->save();
+        $device->load('pollingMethods');
+
+        return $method;
+    }
+
     /**
      * @return array<int, string>
      */
@@ -141,9 +176,9 @@ readonly class SnmpPollingMethod implements PollingMethod
         return $options;
     }
 
-    public static function disabled(): self
+    public static function disabled(): static
     {
-        return new self(
+        return new static(
             enabled: false,
             affectsAvailability: false,
             version: 'v2c',
@@ -185,73 +220,5 @@ readonly class SnmpPollingMethod implements PollingMethod
             maxRepeaters: 0,
             maxOid: 10,
         );
-    }
-
-    /**
-     * @return array<string, array{type: string, default?: mixed, options?: array<string,string>, visible_if?: array<string, mixed>}>
-     */
-    public static function getSettingsSchema(): array
-    {
-        return [
-            'transport' => [
-                'type' => 'select',
-                'options' => [
-                    'udp' => 'UDP',
-                    'tcp' => 'TCP',
-                    'udp6' => 'UDP6',
-                    'tcp6' => 'TCP6',
-                ],
-            ],
-            'port' => [
-                'type' => 'number',
-            ],
-            'timeout' => [
-                'type' => 'number',
-            ],
-            'retries' => [
-                'type' => 'number',
-            ],
-            'max_repeaters' => [
-                'type' => 'number',
-            ],
-            'max_oid' => [
-                'type' => 'number',
-            ],
-            'port_association_mode' => [
-                'type' => 'select',
-                'options' => array_combine(PortAssociationMode::getModes(), PortAssociationMode::getModes()),
-                'default' => LibrenmsConfig::get('default_port_association_mode', 'ifIndex'),
-            ],
-        ];
-    }
-
-    public static function getDefaults(): array
-    {
-        return [
-            'affects_availability' => true,
-            'transport' => 'default',
-            'port' => 161,
-            'timeout' => 3,
-            'retries' => 1,
-            'max_repeaters' => 0,
-            'max_oid' => 10,
-            'port_association_mode' => LibrenmsConfig::get('default_port_association_mode', 'ifIndex'),
-        ];
-    }
-
-    /**
-     * @return array<string, array<mixed>|string>
-     */
-    public static function getRules(): array
-    {
-        return [
-            'transport' => ['required', 'string', 'in:udp,tcp,udp6,tcp6'],
-            'port' => ['nullable', 'integer', 'min:1', 'max:65535'],
-            'timeout' => ['nullable', 'integer', 'min:1', 'max:60'],
-            'retries' => ['nullable', 'integer', 'min:0', 'max:10'],
-            'max_repeaters' => ['nullable', 'integer', 'min:0', 'max:30'],
-            'max_oid' => ['nullable', 'integer', 'min:1', 'max:100'],
-            'port_association_mode' => ['nullable', 'string', Rule::in(PortAssociationMode::getModes())],
-        ];
     }
 }

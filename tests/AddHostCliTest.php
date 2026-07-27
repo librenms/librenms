@@ -49,14 +49,14 @@ final class AddHostCliTest extends DBTestCase
         $device = Device::findByHostname($this->hostName);
         $this->assertNotNull($device);
 
-        $snmpMethod = $device->getPollingMethod(PollingMethodType::Snmp);
+        $snmpMethod = $device->pollingMethod(PollingMethodType::Snmp);
         $this->assertNotNull($snmpMethod);
         $secret = $snmpMethod->secret;
         $this->assertNotNull($secret);
         $this->assertEquals('community', $secret->data['community']);
         $this->assertEquals('v1', $secret->data['version']);
 
-        $icmpMethod = $device->getPollingMethod(PollingMethodType::Icmp);
+        $icmpMethod = $device->pollingMethod(PollingMethodType::Icmp);
         $this->assertNotNull($icmpMethod);
         $this->assertTrue($icmpMethod->enabled);
     }
@@ -71,7 +71,7 @@ final class AddHostCliTest extends DBTestCase
         $device = Device::findByHostname($this->hostName);
         $this->assertNotNull($device);
 
-        $snmpMethod = $device->getPollingMethod(PollingMethodType::Snmp);
+        $snmpMethod = $device->pollingMethod(PollingMethodType::Snmp);
         $this->assertNotNull($snmpMethod);
         $secret = $snmpMethod->secret;
         $this->assertNotNull($secret);
@@ -89,7 +89,7 @@ final class AddHostCliTest extends DBTestCase
         $device = Device::findByHostname($this->hostName);
         $this->assertNotNull($device);
 
-        $snmpMethod = $device->getPollingMethod(PollingMethodType::Snmp);
+        $snmpMethod = $device->pollingMethod(PollingMethodType::Snmp);
         $this->assertNotNull($snmpMethod);
         $secret = $snmpMethod->secret;
         $this->assertNotNull($secret);
@@ -125,7 +125,7 @@ final class AddHostCliTest extends DBTestCase
                 ->execute();
 
             $device = Device::findByHostname($host);
-            $snmpMethod = $device->getPollingMethod(PollingMethodType::Snmp);
+            $snmpMethod = $device->pollingMethod(PollingMethodType::Snmp);
             $this->assertEquals($mode, $snmpMethod->settings['transport'], 'Wrong snmp transport (udp/tcp) ipv4/ipv6');
         }
     }
@@ -141,7 +141,7 @@ final class AddHostCliTest extends DBTestCase
                 ->execute();
 
             $device = Device::findByHostname($host);
-            $snmpMethod = $device->getPollingMethod(PollingMethodType::Snmp);
+            $snmpMethod = $device->pollingMethod(PollingMethodType::Snmp);
             $this->assertEquals(strtoupper((string) $mode), $snmpMethod->secret->data['authalgo'], 'Wrong snmp v3 password algorithm');
         }
     }
@@ -157,7 +157,7 @@ final class AddHostCliTest extends DBTestCase
                 ->execute();
 
             $device = Device::findByHostname($host);
-            $snmpMethod = $device->getPollingMethod(PollingMethodType::Snmp);
+            $snmpMethod = $device->pollingMethod(PollingMethodType::Snmp);
             $this->assertEquals(strtoupper((string) $mode), $snmpMethod->secret->data['cryptoalgo'], 'Wrong snmp v3 crypt algorithm');
         }
     }
@@ -176,8 +176,8 @@ final class AddHostCliTest extends DBTestCase
         $this->assertEquals('nameOfOS', $device->os, 'Wrong os name');
         $this->assertEquals('system', $device->sysName, 'Wrong system name');
 
-        $this->assertNull($device->getPollingMethod(PollingMethodType::Snmp));
-        $this->assertNotNull($device->getPollingMethod(PollingMethodType::Icmp));
+        $this->assertNull($device->pollingMethod(PollingMethodType::Snmp));
+        $this->assertNotNull($device->pollingMethod(PollingMethodType::Icmp));
     }
 
     public function testExistingDevice(): void

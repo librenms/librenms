@@ -8,6 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Polling\Method\PollingMethodDefinition;
 
 class StoreDeviceRequest extends FormRequest
 {
@@ -60,7 +61,9 @@ class StoreDeviceRequest extends FormRequest
             $rules["polling_methods.{$method}.affects_availability"] = ['nullable', 'boolean'];
             $rules["polling_methods.{$method}.credential_mode"] = ['nullable', 'in:default,existing,new'];
 
-            if ($type->hasSecret()) {
+            $definition = PollingMethodDefinition::for($type);
+            $secretClass = $definition->secretClass();
+            if ($secretClass !== null) {
                 $rules["polling_methods.{$method}.secret_id"] = [
                     'required_if:polling_methods.' . $method . '.credential_mode,existing',
                     'nullable',
@@ -73,7 +76,6 @@ class StoreDeviceRequest extends FormRequest
 
                 $credentialMode = $data['credential_mode'] ?? 'default';
                 if ($credentialMode === 'new') {
-                    $secretClass = $type->secretClass();
                     foreach ($secretClass::rules() as $key => $rule) {
                         $rules["polling_methods.{$method}.secret_data.{$key}"] = $rule;
                     }
@@ -81,9 +83,8 @@ class StoreDeviceRequest extends FormRequest
             }
 
             // Settings validation rules
-            $methodClass = $type->methodClass();
             $rules["polling_methods.{$method}.settings"] = ['nullable', 'array'];
-            foreach ($methodClass::getRules() as $key => $rule) {
+            foreach ($definition->rules() as $key => $rule) {
                 $rules["polling_methods.{$method}.settings.{$key}"] = $rule;
             }
         }

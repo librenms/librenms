@@ -74,14 +74,14 @@ readonly class ConnectivityHelper
 
     public function methodIsEnabled(PollingMethodType $type): bool
     {
-        $method = $this->device->getPollingMethod($type);
+        $method = $this->device->pollingMethod($type);
 
         return $method ? $this->pollingMethodFactory->make($method)->isEnabled() : false;
     }
 
     public function methodIsAvailable(PollingMethodType $type): bool
     {
-        $method = $this->device->getPollingMethod($type);
+        $method = $this->device->pollingMethod($type);
 
         return $method && $this->pollingMethodFactory->make($method)->isEnabled() && $method->last_check_successful;
     }

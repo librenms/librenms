@@ -6,10 +6,10 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\PollingMethod;
+use LibreNMS\Interfaces\PollingMethodInterface;
 use LibreNMS\Util\Rewrite;
 
-readonly class UnixAgentPollingMethod implements PollingMethod
+readonly class UnixAgentPollingMethod implements PollingMethodInterface
 {
     public function __construct(
         public bool $enabled,
@@ -62,44 +62,37 @@ readonly class UnixAgentPollingMethod implements PollingMethod
         );
     }
 
-    public static function disabled(): self
+    public static function save(
+        \App\Models\Device $device,
+        array $settings = [],
+        array $secretData = [],
+        bool $enabled = true,
+        bool $affectsAvailability = false,
+    ): DevicePollingMethod {
+        $method = DevicePollingMethod::firstOrNew([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::UnixAgent,
+        ]);
+
+        $method->enabled = $enabled;
+        $method->affects_availability = $affectsAvailability;
+
+        if (! empty($settings)) {
+            $method->settings = array_merge($method->settings ?? [], $settings);
+        }
+
+        $method->save();
+        $device->load('pollingMethods');
+
+        return $method;
+    }
+
+    public static function disabled(): static
     {
-        return new self(
+        return new static(
             enabled: false,
             affectsAvailability: false,
             port: 6556,
         );
-    }
-
-    /**
-     * @return array<string, array{type: string, default?: int, min?: int, max?: int, options?: array<string,string>, visible_if?: array<string, mixed>}>
-     */
-    public static function getSettingsSchema(): array
-    {
-        return [
-            'port' => [
-                'type' => 'number',
-                'default' => 6556,
-                'min' => 1,
-                'max' => 65535,
-            ],
-        ];
-    }
-
-    public static function getDefaults(): array
-    {
-        return [
-            'port' => 6556,
-        ];
-    }
-
-    /**
-     * @return array<string, array<mixed>|string>
-     */
-    public static function getRules(): array
-    {
-        return [
-            'port' => ['nullable', 'integer', 'min:1', 'max:65535'],
-        ];
     }
 }
