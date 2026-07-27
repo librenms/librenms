@@ -98,7 +98,7 @@
                                     x-show="selected"
                                     x-text="': ' + formatDate(selected?.date)"></span></span>
                         </h3>
-                        <div :class="showActions ? '' : 'tw:invisible'"
+                        <div :class="showActions ? '' : 'tw:invisible tw:w-0'"
                              x-cloak
                              class="tw:flex tw:items-center tw:gap-2">
                             <button type="button"
@@ -130,7 +130,7 @@
                     <template x-if="showDiffView">
                         <div class="tw:rounded-lg tw:overflow-x-auto tw:max-h-[70vh] tw:overflow-y-auto tw:border tw:border-gray-200 tw:dark:border-dark-gray-200">
                             <table class="tw:w-full tw:m-0 tw:font-mono tw:border-collapse">
-                                <tbody>
+                                <tbody class="tw:align-text-top">
                                     <template x-for="(row, index) in diffRows" :key="index">
                                         <tr :class="{
                                                 'tw:bg-green-100 tw:dark:bg-green-900/40': row.mode === 'added',
