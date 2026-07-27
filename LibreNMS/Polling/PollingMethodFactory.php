@@ -12,6 +12,9 @@ class PollingMethodFactory
     {
         $class = PollingMethodDefinition::for($method->method_type)->class();
 
-        return $class::fromModel($method);
+        /** @var PollingMethodInterface $instance */
+        $instance = $class::fromModel($method);
+
+        return $instance;
     }
 }

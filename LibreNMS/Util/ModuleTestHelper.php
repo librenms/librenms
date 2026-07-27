@@ -270,7 +270,7 @@ class ModuleTestHelper
             (new ValidateDeviceAndCreate($new_device, true))->execute();
             $device_id = $new_device->device_id;
 
-            $new_device->getPollingMethodRepo()->save(
+            $new_device->pollingMethodFor()->save(
                 PollingMethodType::Snmp,
                 settings: ['transport' => 'udp', 'port' => $snmpSimPort],
                 secretData: ['version' => 'v2c', 'community' => $this->file_name],

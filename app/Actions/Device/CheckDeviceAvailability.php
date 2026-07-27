@@ -3,13 +3,11 @@
 namespace App\Actions\Device;
 
 use App\Models\Device;
-use LibreNMS\Polling\PollingMethodFactory;
 
 readonly class CheckDeviceAvailability
 {
     public function __construct(
-        private readonly SetDeviceAvailability $setDeviceAvailability,
-        private readonly PollingMethodFactory $pollingMethodFactory,
+        private SetDeviceAvailability $setDeviceAvailability,
     ) {
     }
 
@@ -18,8 +16,7 @@ readonly class CheckDeviceAvailability
         $enabledPollingMethods = $device->pollingMethods->filter(fn ($m) => $m->enabled);
 
         foreach ($enabledPollingMethods as $method) {
-            $pollingMethod = $this->pollingMethodFactory->make($method);
-            $method->last_check_successful = $pollingMethod->isAvailable($device, $commit);
+            $method->last_check_successful = $method->toPollingMethod()->isAvailable($device, $commit);
             $method->last_checked_at = now();
         }
 

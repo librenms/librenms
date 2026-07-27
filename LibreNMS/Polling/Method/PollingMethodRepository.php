@@ -4,20 +4,16 @@ namespace LibreNMS\Polling\Method;
 
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
+use App\Models\Secret;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SecretType;
 use LibreNMS\Interfaces\PollingMethodInterface;
 
-class PollingMethodRepository
+readonly class PollingMethodRepository
 {
-    private readonly Device $device;
-
-    /** @var array<string, PollingMethodInterface> */
-    private array $pollingMethods = [];
-
     public function __construct(
-        ?Device $device = null,
+        private Device $device,
     ) {
-        $this->device = $device ?? \DeviceCache::getPrimary();
     }
 
     /**
@@ -29,7 +25,40 @@ class PollingMethodRepository
      */
     public function save(PollingMethodType $type, array $settings = [], array $secretData = [], bool $enabled = true, bool $affectsAvailability = false): DevicePollingMethod
     {
-        return PollingMethodDefinition::for($type)->class()::save($this->device, $settings, $secretData, $enabled, $affectsAvailability);
+        $definition = PollingMethodDefinition::for($type);
+
+        $method = DevicePollingMethod::with('secret')
+            ->firstOrNew([
+                'device_id' => $this->device->device_id,
+                'method_type' => $type,
+            ]);
+
+        $method->enabled = $enabled;
+        $method->affects_availability = $affectsAvailability;
+
+        if (! empty($settings)) {
+            $method->settings = array_merge($method->settings ?? [], $settings);
+        }
+
+        if (! empty($secretData) && $definition->secretClass()) {
+            if ($method->secret) {
+                $method->secret->update(['data' => array_merge($method->secret->data, $secretData)]);
+            } else {
+                $secretType = SecretType::fromClass($definition->secretClass());
+                $secret = Secret::create([
+                    'description' => $secretType->name . ' ' . $this->device->hostname,
+                    'secret_type' => $secretType,
+                    'default' => false,
+                    'data' => $secretData,
+                ]);
+                $method->secret_id = $secret->id;
+            }
+        }
+
+        $method->save();
+        $this->device->load('pollingMethods');
+
+        return $method;
     }
 
     /**
@@ -40,12 +69,7 @@ class PollingMethodRepository
      */
     private function pollingMethod(PollingMethodType $type, string $class): PollingMethodInterface
     {
-        if (! isset($this->pollingMethods[$type->value])) {
-            $method = $this->device->pollingMethods->firstWhere('method_type', $type);
-            $this->pollingMethods[$type->value] = $method ? $class::fromModel($method) : $class::disabled();
-        }
-
-        return $this->pollingMethods[$type->value];
+        return  $this->device->pollingMethods->firstWhere('method_type', $type)?->toPollingMethod() ?? $class::disabled();
     }
 
     public function snmp(): SnmpPollingMethod

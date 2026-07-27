@@ -1,7 +1,7 @@
 <?php
 
 /**
- * UnixAgentPollingMethodDefinition.php
+ * IpmiPollingMethodDefinition.php
  *
  * -Description-
  *
@@ -27,12 +27,13 @@
 namespace LibreNMS\Polling\Method\Definitions;
 
 use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
-use LibreNMS\Polling\Method\UnixAgentPollingMethod;
+use LibreNMS\Polling\Method\IpmiPollingMethod;
+use LibreNMS\Polling\Secrets\IpmiSecretData;
 
 /**
- * @implements PollingMethodDefinitionInterface<UnixAgentPollingMethod>
+ * @implements PollingMethodDefinitionInterface<IpmiPollingMethod>
  */
-class UnixAgentPollingMethodDefinitionInterface implements PollingMethodDefinitionInterface
+class IpmiPollingMethodDefinition implements PollingMethodDefinitionInterface
 {
     /**
      * @inheritDoc
@@ -40,11 +41,17 @@ class UnixAgentPollingMethodDefinitionInterface implements PollingMethodDefiniti
     public function schema(): array
     {
         return [
+            'hostname' => [
+                'type' => 'text',
+            ],
             'port' => [
                 'type' => 'number',
-                'default' => 6556,
-                'min' => 1,
-                'max' => 65535,
+            ],
+            'ciphersuite' => [
+                'type' => 'text',
+            ],
+            'timeout' => [
+                'type' => 'number',
             ],
         ];
     }
@@ -55,7 +62,11 @@ class UnixAgentPollingMethodDefinitionInterface implements PollingMethodDefiniti
     public function defaults(): array
     {
         return [
-            'port' => 6556,
+            'affects_availability' => false,
+            'hostname' => '',
+            'port' => 623,
+            'ciphersuite' => '',
+            'timeout' => 3,
         ];
     }
 
@@ -65,7 +76,10 @@ class UnixAgentPollingMethodDefinitionInterface implements PollingMethodDefiniti
     public function rules(): array
     {
         return [
-            'port' => ['nullable', 'integer', 'min:1', 'max:65535'],
+            'hostname' => ['required', 'string'],
+            'port' => ['required', 'integer', 'min:1', 'max:65535'],
+            'ciphersuite' => ['nullable', 'string'],
+            'timeout' => ['nullable', 'integer', 'min:1'],
         ];
     }
 
@@ -74,7 +88,7 @@ class UnixAgentPollingMethodDefinitionInterface implements PollingMethodDefiniti
      */
     public function icon(): string
     {
-        return 'fa-terminal';
+        return 'fa-microchip';
     }
 
     /**
@@ -82,14 +96,14 @@ class UnixAgentPollingMethodDefinitionInterface implements PollingMethodDefiniti
      */
     public function class(): string
     {
-        return UnixAgentPollingMethod::class;
+        return IpmiPollingMethod::class;
     }
 
     /**
      * @inheritDoc
      */
-    public function secretClass(): null
+    public function secretClass(): string
     {
-        return null;
+        return IpmiSecretData::class;
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * IpmiPollingMethodDefinition.php
+ * IcmpPollingMethodDefinition.php
  *
  * -Description-
  *
@@ -27,33 +27,19 @@
 namespace LibreNMS\Polling\Method\Definitions;
 
 use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
-use LibreNMS\Polling\Method\IpmiPollingMethod;
-use LibreNMS\Polling\Secrets\IpmiSecretData;
+use LibreNMS\Polling\Method\IcmpPollingMethod;
 
 /**
- * @implements PollingMethodDefinitionInterface<IpmiPollingMethod>
+ * @implements PollingMethodDefinitionInterface<IcmpPollingMethod>
  */
-class IpmiPollingMethodDefinitionInterface implements PollingMethodDefinitionInterface
+class IcmpPollingMethodDefinition implements PollingMethodDefinitionInterface
 {
     /**
      * @inheritDoc
      */
     public function schema(): array
     {
-        return [
-            'hostname' => [
-                'type' => 'text',
-            ],
-            'port' => [
-                'type' => 'number',
-            ],
-            'ciphersuite' => [
-                'type' => 'text',
-            ],
-            'timeout' => [
-                'type' => 'number',
-            ],
-        ];
+        return [];
     }
 
     /**
@@ -62,11 +48,7 @@ class IpmiPollingMethodDefinitionInterface implements PollingMethodDefinitionInt
     public function defaults(): array
     {
         return [
-            'affects_availability' => false,
-            'hostname' => '',
-            'port' => 623,
-            'ciphersuite' => '',
-            'timeout' => 3,
+            'affects_availability' => true,
         ];
     }
 
@@ -75,12 +57,7 @@ class IpmiPollingMethodDefinitionInterface implements PollingMethodDefinitionInt
      */
     public function rules(): array
     {
-        return [
-            'hostname' => ['required', 'string'],
-            'port' => ['required', 'integer', 'min:1', 'max:65535'],
-            'ciphersuite' => ['nullable', 'string'],
-            'timeout' => ['nullable', 'integer', 'min:1'],
-        ];
+        return [];
     }
 
     /**
@@ -88,7 +65,7 @@ class IpmiPollingMethodDefinitionInterface implements PollingMethodDefinitionInt
      */
     public function icon(): string
     {
-        return 'fa-microchip';
+        return 'fa-exchange';
     }
 
     /**
@@ -96,14 +73,14 @@ class IpmiPollingMethodDefinitionInterface implements PollingMethodDefinitionInt
      */
     public function class(): string
     {
-        return IpmiPollingMethod::class;
+        return IcmpPollingMethod::class;
     }
 
     /**
      * @inheritDoc
      */
-    public function secretClass(): string
+    public function secretClass(): null
     {
-        return IpmiSecretData::class;
+        return null;
     }
 }
