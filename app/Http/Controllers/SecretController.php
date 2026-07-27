@@ -33,6 +33,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\SecretType;
+use LibreNMS\Polling\Secrets\SecretDefinition;
 
 class SecretController extends Controller
 {
@@ -51,7 +52,7 @@ class SecretController extends Controller
 
         $type = $request->query('type', 'snmp');
         $secretType = SecretType::tryFrom($type) ?? SecretType::Snmp;
-        $schema = $secretType->secretClass()::getUiSchema();
+        $schema = SecretDefinition::for($secretType)->schema();
 
         return view('secrets.create', [
             'types' => SecretType::cases(),
@@ -75,8 +76,7 @@ class SecretController extends Controller
             abort(400, 'Invalid secret type.');
         }
 
-        $class = $secretType->secretClass();
-        $rules = $class::rules();
+        $rules = SecretDefinition::for($secretType)->rules();
         $data = $request->validate($rules);
 
         Secret::create([
@@ -95,8 +95,7 @@ class SecretController extends Controller
     {
         Gate::authorize('update', $secret);
 
-        $secretType = $secret->secret_type;
-        $schema = $secretType->secretClass()::getUiSchema();
+        $schema = SecretDefinition::for($secret->secret_type)->schema();
         $data = Gate::allows('unmask', $secret)
             ? $secret->data
             : $this->maskPasswordFields($secret->data, $schema);
@@ -117,13 +116,11 @@ class SecretController extends Controller
             'default' => 'boolean',
         ]);
 
-        $secretType = $secret->secret_type;
-        $class = $secretType->secretClass();
-        $data = $request->validate($class::rules());
+        $definition = SecretDefinition::for($secret->secret_type);
+        $data = $request->validate($definition->rules());
 
         if (! Gate::allows('unmask', $secret)) {
-            $schema = $class::getUiSchema();
-            $data = $this->restoreMaskedFields($data, $secret->data, $schema);
+            $data = $this->restoreMaskedFields($data, $secret->data, $definition->schema());
         }
 
         $secret->update([

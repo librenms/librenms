@@ -46,37 +46,4 @@ class IpmiSecretData extends SecretData
             kg_key: $data['kg_key'] ?? null,
         );
     }
-
-    /**
-     * @return array<string, string|array<mixed>>
-     */
-    public static function rules(): array
-    {
-        return [
-            'username' => 'nullable|string',
-            'password' => 'nullable|string',
-            'kg_key' => 'nullable|string|size:40|regex:/^[a-fA-F0-9]+$/',
-        ];
-    }
-
-    /**
-     * @return array<string, array<string, mixed>>
-     */
-    public static function getUiSchema(): array
-    {
-        return [
-            'username' => [
-                'type' => 'text',
-                'label' => 'Username',
-            ],
-            'password' => [
-                'type' => 'password',
-                'label' => 'Password',
-            ],
-            'kg_key' => [
-                'type' => 'password',
-                'label' => 'KG/BMC Key',
-            ],
-        ];
-    }
 }

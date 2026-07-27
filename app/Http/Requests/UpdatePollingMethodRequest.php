@@ -7,7 +7,6 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\PollingMethodDefinition;
-use LibreNMS\Polling\Secrets\SecretData;
 
 class UpdatePollingMethodRequest extends FormRequest
 {
@@ -71,12 +70,11 @@ class UpdatePollingMethodRequest extends FormRequest
                 ->all(),
         ];
 
-        if ($definition->secretClass() !== null && $this->has('secret_data')) {
-            /** @var class-string<SecretData> $secretClass */
-            $secretClass = $definition->secretClass();
+        $secretDefinition = $definition->secretDefinition();
+        if ($secretDefinition !== null && $this->has('secret_data')) {
             $rules = [
                 ...$rules,
-                ...collect($secretClass::rules())
+                ...collect($secretDefinition->rules())
                     ->mapWithKeys(fn (array|string $rule, string $key): array => ["secret_data.$key" => $rule])
                     ->all(),
             ];
