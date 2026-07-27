@@ -7,7 +7,7 @@
                 {{ $data['error_message'] }}
             </x-panel>
         @else
-            <div x-data="configBackups(@js($data))"
+            <div x-data="configBackups(@js($data))" data-config-backups
                 class="tw:mt-4 tw:flex tw:flex-col tw:lg:flex-row tw:gap-4 tw:items-start">
 
                 {{-- Backup list --}}
@@ -165,9 +165,10 @@
 
                     {{-- config view --}}
                     <template x-if="showConfigView">
-                        <pre class="tw:m-0 tw:p-3 tw:font-mono tw:whitespace-pre-wrap tw:overflow-x-auto tw:max-h-[70vh] tw:overflow-y-auto tw:rounded-lg tw:bg-gray-50 tw:text-gray-800 tw:dark:bg-dark-gray-500 tw:dark:text-dark-white-200 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200"
-                             style="white-space: pre-wrap;"
-                             x-text="selected.content"></pre>
+                        <pre class="config-highlight line-numbers tw:m-0 tw:p-3 tw:font-mono tw:whitespace-pre-wrap tw:overflow-x-auto tw:max-h-[70vh] tw:overflow-y-auto tw:rounded-lg tw:bg-gray-50 tw:text-gray-800 tw:dark:bg-dark-gray-500 tw:dark:text-dark-white-200 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200"><code
+                                x-config-highlight="selected.content"
+                                data-os="{{ $data['os'] }}"
+                                data-config-highlighting="{{ $data['config_highlighting'] }}"></code></pre>
                     </template>
                 </x-panel>
             </div>
@@ -178,6 +179,23 @@
 @push('scripts')
     <script>
         document.addEventListener('alpine:init', () => {
+            window.Alpine.directive('config-highlight', (element, { expression }, { effect, evaluateLater }) => {
+                const evaluateContent = evaluateLater(expression);
+                let updateId = 0;
+
+                effect(() => {
+                    evaluateContent((content) => {
+                        const currentUpdateId = ++updateId;
+
+                        window.LibreNMS.loadConfigHighlight().then(({ default: highlightConfig }) => {
+                            if (currentUpdateId === updateId) {
+                                highlightConfig(element, content);
+                            }
+                        });
+                    });
+                });
+            });
+
             window.Alpine.data('configBackups', (config) => ({
                 // Data
                 backups: [],
