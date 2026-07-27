@@ -76,7 +76,7 @@ class ValidateDeviceAndCreate
         if (! $this->force) {
             $this->exceptIfIpExists();
 
-            $icmpMethod = $this->device->getPollingMethod(PollingMethodType::Icmp) ?? new DevicePollingMethod(['method_type' => PollingMethodType::Icmp, 'enabled' => true]);
+            $icmpMethod = $this->device->pollingMethod(PollingMethodType::Icmp) ?? new DevicePollingMethod(['method_type' => PollingMethodType::Icmp, 'enabled' => true]);
             if (! $icmpMethod->toPollingMethod()->isAvailable($this->device)) {
                 throw new HostUnreachablePingException($this->device->hostname);
             }

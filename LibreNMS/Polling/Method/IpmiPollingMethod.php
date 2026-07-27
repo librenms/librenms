@@ -6,9 +6,9 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Data\Source\Ipmitool;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\PollingMethod;
+use LibreNMS\Interfaces\PollingMethodInterface;
 
-readonly class IpmiPollingMethod implements PollingMethod
+readonly class IpmiPollingMethod implements PollingMethodInterface
 {
     public function __construct(
         public bool $enabled,
@@ -66,9 +66,49 @@ readonly class IpmiPollingMethod implements PollingMethod
         );
     }
 
-    public static function disabled(): self
+    public static function save(
+        \App\Models\Device $device,
+        array $settings = [],
+        array $secretData = [],
+        bool $enabled = true,
+        bool $affectsAvailability = false,
+    ): DevicePollingMethod {
+        $method = DevicePollingMethod::with('secret')
+            ->firstOrNew([
+                'device_id' => $device->device_id,
+                'method_type' => PollingMethodType::Ipmi,
+            ]);
+
+        $method->enabled = $enabled;
+        $method->affects_availability = $affectsAvailability;
+
+        if (! empty($settings)) {
+            $method->settings = array_merge($method->settings ?? [], $settings);
+        }
+
+        if (! empty($secretData)) {
+            if ($method->secret) {
+                $method->secret->update(['data' => array_merge($method->secret->data, $secretData)]);
+            } else {
+                $secret = \App\Models\Secret::create([
+                    'description' => 'IPMI ' . $device->hostname,
+                    'secret_type' => \LibreNMS\Enum\SecretType::Ipmi,
+                    'default' => false,
+                    'data' => $secretData,
+                ]);
+                $method->secret_id = $secret->id;
+            }
+        }
+
+        $method->save();
+        $device->load('pollingMethods');
+
+        return $method;
+    }
+
+    public static function disabled(): static
     {
-        return new self(
+        return new static(
             false,
             false,
             '',
@@ -80,50 +120,5 @@ readonly class IpmiPollingMethod implements PollingMethod
             0,
             '',
         );
-    }
-
-    /**
-     * @return array<string, array{type: string, default?: mixed, options?: array<string,string>, visible_if?: array<string, mixed>}>
-     */
-    public static function getSettingsSchema(): array
-    {
-        return [
-            'hostname' => [
-                'type' => 'text',
-            ],
-            'port' => [
-                'type' => 'number',
-            ],
-            'ciphersuite' => [
-                'type' => 'text',
-            ],
-            'timeout' => [
-                'type' => 'number',
-            ],
-        ];
-    }
-
-    public static function getDefaults(): array
-    {
-        return [
-            'affects_availability' => false,
-            'hostname' => '',
-            'port' => 623,
-            'ciphersuite' => '',
-            'timeout' => 3,
-        ];
-    }
-
-    /**
-     * @return array<string, array<mixed>|string>
-     */
-    public static function getRules(): array
-    {
-        return [
-            'hostname' => ['required', 'string'],
-            'port' => ['required', 'integer', 'min:1', 'max:65535'],
-            'ciphersuite' => ['nullable', 'string'],
-            'timeout' => ['nullable', 'integer', 'min:1'],
-        ];
     }
 }

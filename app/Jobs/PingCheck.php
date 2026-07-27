@@ -186,7 +186,7 @@ class PingCheck implements ShouldQueue
         }
 
         // update ICMP polling method state
-        $icmpMethod = $device->getPollingMethod(PollingMethodType::Icmp);
+        $icmpMethod = $device->pollingMethod(PollingMethodType::Icmp);
         if ($icmpMethod !== null) {
             $icmpMethod->last_check_successful = $response->isAlive();
             $icmpMethod->last_checked_at = now();
