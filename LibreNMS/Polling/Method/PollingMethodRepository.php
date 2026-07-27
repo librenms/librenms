@@ -6,7 +6,6 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Enum\SecretType;
 use LibreNMS\Interfaces\PollingMethodInterface;
 
 readonly class PollingMethodRepository
@@ -40,11 +39,11 @@ readonly class PollingMethodRepository
             $method->settings = array_merge($method->settings ?? [], $settings);
         }
 
-        if (! empty($secretData) && $definition->secretClass()) {
+        if (! empty($secretData) && $definition->secretDefinition()) {
             if ($method->secret) {
                 $method->secret->update(['data' => array_merge($method->secret->data, $secretData)]);
             } else {
-                $secretType = SecretType::fromClass($definition->secretClass());
+                $secretType = $definition->secretDefinition()->type();
                 $secret = Secret::create([
                     'description' => $secretType->name . ' ' . $this->device->hostname,
                     'secret_type' => $secretType,

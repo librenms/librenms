@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Secrets\SecretData;
+use LibreNMS\Polling\Secrets\SecretDefinition;
 
 class Secret extends BaseModel
 {
@@ -38,7 +39,7 @@ class Secret extends BaseModel
      */
     public function asSecretData(?string $secretClass = null): SecretData
     {
-        $class = $secretClass ?? $this->secret_type->secretClass();
+        $class = SecretDefinition::for($this->secret_type)->class();
 
         return $class::fromArray($this->data);
     }

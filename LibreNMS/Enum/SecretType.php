@@ -26,33 +26,8 @@
 
 namespace LibreNMS\Enum;
 
-use LibreNMS\Polling\Secrets\IpmiSecretData;
-use LibreNMS\Polling\Secrets\SecretData;
-use LibreNMS\Polling\Secrets\SnmpSecretData;
-
 enum SecretType: string
 {
     case Snmp = 'snmp';
     case Ipmi = 'ipmi';
-
-    /** @param class-string<SecretData> $class */
-    public static function fromClass(string $class): self
-    {
-        foreach (self::cases() as $case) {
-            if ($case->secretClass() === $class) {
-                return $case;
-            }
-        }
-
-        throw new \InvalidArgumentException("Unregistered secret class: $class");
-    }
-
-    /** @return class-string<SecretData> */
-    public function secretClass(): string
-    {
-        return match ($this) {
-            self::Snmp => SnmpSecretData::class,
-            self::Ipmi => IpmiSecretData::class,
-        };
-    }
 }
