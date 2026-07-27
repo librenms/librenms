@@ -4,8 +4,8 @@
         <div class="tw:divide-y tw:divide-gray-300 tw:dark:divide-zinc-800">
             @foreach($drives as $data)
                 <div class="tw:flex tw:min-w-0 tw:items-center tw:gap-3 tw:px-3 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
-                    <span class="tw:w-40 tw:min-w-0 tw:shrink tw:truncate tw:sm:shrink-0" title="{{ $data['drive']->storage_descr }}">{{ $data['description'] }}</span>
-                    <div class="tw:hidden tw:w-20 tw:shrink-0 tw:justify-center tw:lg:flex">
+                    <span class="tw:min-w-0 tw:flex-1 tw:truncate" title="{{ $data['drive']->storage_descr }}">{{ $data['description'] }}</span>
+                    <div class="tw:hidden tw:w-20 tw:shrink-0 tw:justify-end tw:lg:flex">
                         <x-graph type="storage_usage" :vars="['id' => $data['drive']->storage_id]" width="80" height="20" popup
                                  :popup-title="$device->display . ' - ' . $data['description']" />
                     </div>
