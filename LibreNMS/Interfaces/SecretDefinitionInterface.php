@@ -1,7 +1,6 @@
 <?php
-
 /**
- * PollingMethodDefinition.php
+ * SecretDefinitionInterface.php
  *
  * -Description-
  *
@@ -26,23 +25,15 @@
 
 namespace LibreNMS\Interfaces;
 
-/**
- * @template-covariant T of PollingMethodInterface
- */
-interface PollingMethodDefinitionInterface extends HasFieldSchema
-{
-    /**
-     * Get the icon name for this method type
-     */
-    public function icon(): string;
+use LibreNMS\Polling\Secrets\SecretData;
 
+/**
+ * @template-covariant T of SecretData
+ */
+interface SecretDefinitionInterface extends HasFieldSchema
+{
     /**
      * @return class-string<T>
      */
     public function class(): string;
-
-    /**
-     * @return SecretDefinitionInterface|null
-     */
-    public function secretDefinition(): ?SecretDefinitionInterface;
 }

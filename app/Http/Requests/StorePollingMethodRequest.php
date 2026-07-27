@@ -44,12 +44,11 @@ class StorePollingMethodRequest extends FormRequest
                     ->all(),
             ];
 
-            if ($definition->secretClass() !== null && $this->input('credential_mode', 'existing') === 'new') {
-                /** @var class-string<\LibreNMS\Polling\Secrets\SecretData> $secretClass */
-                $secretClass = $definition->secretClass();
+            $secretDefinition = $definition->secretDefinition();
+            if ($secretDefinition !== null && $this->input('credential_mode', 'existing') === 'new') {
                 $rules = [
                     ...$rules,
-                    ...collect($secretClass::rules())
+                    ...collect($secretDefinition->rules())
                         ->mapWithKeys(fn (array|string $rule, string $key): array => ["secret_data.$key" => $rule])
                         ->all(),
                 ];
