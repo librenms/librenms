@@ -176,9 +176,9 @@ class TestTimer(unittest.TestCase):
 
 
 class TestMemoryFraction(unittest.TestCase):
-    """Deterministic fixtures for QueueManager.memory_fraction (no real cgroups)."""
+    """Deterministic fixtures for MemoryPressureGate.memory_fraction (no real cgroups)."""
 
-    from LibreNMS.queuemanager import QueueManager as QM
+    from LibreNMS.queuemanager import MemoryPressureGate as Gate
 
     def setUp(self):
         self.tmp = tempfile.mkdtemp()
@@ -201,43 +201,106 @@ class TestMemoryFraction(unittest.TestCase):
     def test_cgroup_v2_stressed(self):
         self._write("memory.current", "920000\n")
         self._write("memory.max", "1000000\n")
-        self.assertAlmostEqual(self.QM._mem_frac_cgv2(self._cg()), 0.92)
+        self.assertAlmostEqual(self.Gate._frac_cgv2(self._cg()), 0.92)
 
     def test_cgroup_v2_unlimited_is_none(self):
         self._write("memory.current", "500\n")
         self._write("memory.max", "max\n")
-        self.assertIsNone(self.QM._mem_frac_cgv2(self._cg()))
+        self.assertIsNone(self.Gate._frac_cgv2(self._cg()))
 
     def test_cgroup_v1_stressed(self):
         self._write("memory/memory.usage_in_bytes", "900\n")
         self._write("memory/memory.limit_in_bytes", "1000\n")
-        self.assertAlmostEqual(self.QM._mem_frac_cgv1(self._cg()), 0.9)
+        self.assertAlmostEqual(self.Gate._frac_cgv1(self._cg()), 0.9)
 
     def test_cgroup_v1_unlimited_is_none(self):
         self._write("memory/memory.usage_in_bytes", "900\n")
         self._write("memory/memory.limit_in_bytes", "9223372036854771712\n")
-        self.assertIsNone(self.QM._mem_frac_cgv1(self._cg()))
+        self.assertIsNone(self.Gate._frac_cgv1(self._cg()))
 
     def test_bare_metal_meminfo(self):
-        self.assertAlmostEqual(
-            self.QM._mem_frac_meminfo(self._meminfo(2000, 500)), 0.75
-        )
+        self.assertAlmostEqual(self.Gate._frac_meminfo(self._meminfo(2000, 500)), 0.75)
 
     def test_full_fallback_to_meminfo_when_no_cgroup(self):
         # empty cgroup dir -> v2/v1 None -> meminfo used
         self.assertAlmostEqual(
-            self.QM.memory_fraction(self._cg(), self._meminfo(1000, 250)), 0.75
+            self.Gate.memory_fraction(self._cg(), self._meminfo(1000, 250)), 0.75
         )
 
     def test_nothing_readable_returns_none(self):
         self.assertIsNone(
-            self.QM.memory_fraction(self._cg(), path.join(self.tmp, "nope"))
+            self.Gate.memory_fraction(self._cg(), path.join(self.tmp, "nope"))
         )
 
     def test_zero_limit_no_div_by_zero(self):
         self._write("memory.current", "5\n")
         self._write("memory.max", "0\n")
-        self.assertIsNone(self.QM._mem_frac_cgv2(self._cg()))
+        self.assertIsNone(self.Gate._frac_cgv2(self._cg()))
+
+
+class TestMemoryPressureGate(unittest.TestCase):
+    """Gate behaviour (config parsing + hysteresis), independent of real memory."""
+
+    from LibreNMS.queuemanager import MemoryPressureGate as Gate
+
+    class _Cfg:
+        def __init__(self, pct):
+            self.memory_pressure_percent = pct
+
+    def _gate(self, limit_frac, fracs):
+        """A gate whose memory_fraction() yields the given sequence in turn."""
+        gate = self.Gate(limit_frac)
+        seq = iter(fracs)
+        gate.memory_fraction = lambda *a, **k: next(seq)
+        return gate
+
+    def test_disabled_when_unset(self):
+        gate = self.Gate.from_config(self._Cfg(None))
+        self.assertFalse(gate.enabled)
+        self.assertFalse(gate.pause_if_pressured())
+
+    def test_from_config_enabled(self):
+        gate = self.Gate.from_config(self._Cfg(85))
+        self.assertTrue(gate.enabled)
+
+    def test_from_config_rejects_out_of_range(self):
+        for bad in (0, 100, -1):
+            with self.assertRaises(ValueError):
+                self.Gate.from_config(self._Cfg(bad))
+
+    def test_from_config_rejects_non_int(self):
+        with self.assertRaises(ValueError):
+            self.Gate.from_config(self._Cfg("high"))
+
+    def test_pause_when_at_or_above_limit(self):
+        # 90% usage against an 85% limit -> pause (stub sleep so it is instant)
+        import LibreNMS.queuemanager as qm
+
+        gate = self._gate(0.85, [0.90])
+        orig_sleep = qm.time.sleep
+        qm.time.sleep = lambda *_: None
+        try:
+            self.assertTrue(gate.pause_if_pressured())
+        finally:
+            qm.time.sleep = orig_sleep
+
+    def test_hysteresis_holds_between_bands(self):
+        # limit 85%: pause at >=85, stay paused through the 75-85 band, resume <75
+        import LibreNMS.queuemanager as qm
+
+        orig_sleep = qm.time.sleep
+        qm.time.sleep = lambda *_: None
+        try:
+            gate = self._gate(0.85, [0.90, 0.80, 0.74])
+            self.assertTrue(gate.pause_if_pressured())  # 90% -> pause
+            self.assertTrue(gate.pause_if_pressured())  # 80% -> still paused
+            self.assertFalse(gate.pause_if_pressured())  # 74% -> resume
+        finally:
+            qm.time.sleep = orig_sleep
+
+    def test_fails_open_when_undeterminable(self):
+        gate = self._gate(0.85, [None])
+        self.assertFalse(gate.pause_if_pressured())
 
 
 def _current_cgroup_v2_dir():
@@ -268,7 +331,7 @@ class TestMemoryPressureSmoke(unittest.TestCase):
     """
 
     def test_pause_and_resume_under_real_pressure(self):
-        from LibreNMS.queuemanager import QueueManager as QM
+        from LibreNMS.queuemanager import MemoryPressureGate as Gate
 
         # Make the trajectory visible under a plain `python3 -m unittest` run
         # (unittest does not configure logging). Opt-in test only; scoped to our
@@ -283,7 +346,7 @@ class TestMemoryPressureSmoke(unittest.TestCase):
         cg = _current_cgroup_v2_dir()
         self.assertIsNotNone(cg, "not running under cgroup v2")
         self.assertIsNotNone(
-            QM._mem_read_int(path.join(cg, "memory.max")),
+            Gate._read_int(path.join(cg, "memory.max")),
             "no real memory.max; run inside a memory-limited scope",
         )
 
@@ -298,7 +361,7 @@ class TestMemoryPressureSmoke(unittest.TestCase):
             for j in range(0, chunk, 4096):
                 buf[j] = 1  # touch pages so they are actually resident
             blocks.append(buf)
-            frac = QM.memory_fraction(cgroup_root=cg)
+            frac = Gate.memory_fraction(cgroup_root=cg)
             self.assertIsNotNone(frac, "probe returned None inside a limited scope")
             if frac >= pause_frac:
                 paused = True
@@ -306,17 +369,17 @@ class TestMemoryPressureSmoke(unittest.TestCase):
                     "PAUSE at %.1f%% (%d MiB allocated, limit %d MiB)",
                     frac * 100,
                     len(blocks) * (chunk // (1024 * 1024)),
-                    QM._mem_read_int(path.join(cg, "memory.max")) // (1024 * 1024),
+                    Gate._read_int(path.join(cg, "memory.max")) // (1024 * 1024),
                 )
                 break
             smoke_logger.info("allocating: %.1f%%", frac * 100)
         self.assertTrue(paused, "allocation never reached the pause threshold")
 
-        frac = QM.memory_fraction(cgroup_root=cg)
+        frac = Gate.memory_fraction(cgroup_root=cg)
         while blocks:
             del blocks[len(blocks) // 2 :]
             gc.collect()
-            frac = QM.memory_fraction(cgroup_root=cg)
+            frac = Gate.memory_fraction(cgroup_root=cg)
             smoke_logger.info("freeing: %.1f%%", frac * 100)
             if frac < resume_frac:
                 smoke_logger.info("RESUME crossed at %.1f%%", frac * 100)
