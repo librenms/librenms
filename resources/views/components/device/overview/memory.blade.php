@@ -32,7 +32,8 @@
                     <x-graph type="mempool_usage" :vars="['id' => $mempool->mempool_id]" width="100" height="24" popup
                              :popup-title="$device->display . ' - ' . $mempool->mempool_descr" />
                     <x-device.overview.percentage class="tw:ml-auto tw:max-w-[400px] tw:flex-1" :percent="$percent" :warning="$mempool->mempool_perc_warn ?: null"
-                        :left_text="$leftText" :right_text="$rightText" :shadow="$shadow" />
+                        :left_text="$leftText" :right_text="$rightText" :shadow="$shadow" graph_type="mempool_usage"
+                        :graph_vars="['id' => $mempool->mempool_id]" :graph_title="$device->display . ' - ' . $mempool->mempool_descr" />
                 </div>
             @endforeach
         </div>
