@@ -8,8 +8,8 @@
             </div>
             @foreach($mempools as $data)
                 <div class="tw:flex tw:min-w-0 tw:items-center tw:gap-3 tw:px-3 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
-                    <span class="tw:w-36 tw:min-w-0 tw:shrink tw:truncate tw:sm:shrink-0">{{ $data['mempool']->mempool_descr }}</span>
-                    <div class="tw:hidden tw:w-20 tw:shrink-0 tw:justify-center tw:lg:flex">
+                    <span class="tw:min-w-0 tw:flex-1 tw:truncate">{{ $data['mempool']->mempool_descr }}</span>
+                    <div class="tw:hidden tw:w-20 tw:shrink-0 tw:justify-end tw:lg:flex">
                         <x-graph type="mempool_usage" :vars="['id' => $data['mempool']->mempool_id]" width="80" height="20" popup
                                  :popup-title="$device->display . ' - ' . $data['mempool']->mempool_descr" />
                     </div>
