@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SnmpSecretDefinition.php
  *
@@ -25,12 +26,15 @@
 
 namespace LibreNMS\Polling\Secrets\Definitions;
 
+use LibreNMS\Enum\SecretType;
 use LibreNMS\Interfaces\SecretDefinitionInterface;
 use LibreNMS\Polling\Secrets\SnmpSecretData;
 
+/**
+ * @implements SecretDefinitionInterface<SnmpSecretData>
+ */
 class SnmpSecretDefinition implements SecretDefinitionInterface
 {
-
     /**
      * @inheritDoc
      */
@@ -155,6 +159,11 @@ class SnmpSecretDefinition implements SecretDefinitionInterface
             'cryptopass' => 'required_if:authlevel,authPriv|string|nullable',
             'cryptoalgo' => 'required_if:authlevel,authPriv|in:DES,AES,AES-192,AES-256,AES-192-C,AES-256-C',
         ];
+    }
+
+    public function type(): SecretType
+    {
+        return SecretType::Snmp;
     }
 
     /**
