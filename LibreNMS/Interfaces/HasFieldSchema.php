@@ -1,7 +1,6 @@
 <?php
-
 /**
- * PollingMethodDefinition.php
+ * HasFieldSchema.php
  *
  * -Description-
  *
@@ -26,23 +25,26 @@
 
 namespace LibreNMS\Interfaces;
 
-/**
- * @template-covariant T of PollingMethodInterface
- */
-interface PollingMethodDefinitionInterface extends HasFieldSchema
+interface HasFieldSchema
 {
     /**
-     * Get the icon name for this method type
+     * UI/form schema for device-specific settings.
+     *
+     * @return array<string, array{type: string, default?: mixed, options?: array<string,string>, visible_if?: array<string, mixed>}>
      */
-    public function icon(): string;
+    public function schema(): array;
 
     /**
-     * @return class-string<T>
+     * Defaults for polling method per-device settings
+     *
+     * @return array<string, mixed>
      */
-    public function class(): string;
+    public function defaults(): array;
 
     /**
-     * @return SecretDefinitionInterface|null
+     * Validation rules for polling method per-device settings
+     *
+     * @return array<string, array<mixed>|string>
      */
-    public function secretDefinition(): ?SecretDefinitionInterface;
+    public function rules(): array;
 }
