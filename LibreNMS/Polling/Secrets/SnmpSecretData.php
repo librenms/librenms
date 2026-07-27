@@ -60,27 +60,6 @@ class SnmpSecretData extends SecretData
     }
 
     /**
-     * @deprecated
-     *
-     * @param  array<string, mixed>  $device
-     * @return static
-     */
-    public static function fromDeviceArray(array $device): static
-    {
-        return new static(
-            version: $device['snmpver'] ?? 'v2c',
-            community: $device['community'] ?? null,
-            authname: $device['authname'] ?? null,
-            authpass: $device['authpass'] ?? null,
-            authlevel: $device['authlevel'] ?? 'noAuthNoPriv',
-            authalgo: $device['authalgo'] ?? 'SHA',
-            cryptopass: $device['cryptopass'] ?? null,
-            cryptoalgo: $device['cryptoalgo'] ?? 'AES',
-            context: $device['context'] ?? null,
-        );
-    }
-
-    /**
      * @return array<string, string|array<mixed>>
      */
     public static function rules(): array

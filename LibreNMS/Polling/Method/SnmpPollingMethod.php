@@ -5,9 +5,7 @@ namespace LibreNMS\Polling\Method;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
-use App\Models\Secret;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Enum\SecretType;
 use LibreNMS\Interfaces\PollingMethodInterface;
 use SnmpQuery;
 
@@ -96,41 +94,6 @@ readonly class SnmpPollingMethod implements PollingMethodInterface
             maxRepeaters: $maxRepeaters,
             maxOid: $maxOid,
         );
-    }
-
-    public static function save(Device $device, array $settings = [], array $secretData = [], bool $enabled = true, bool $affectsAvailability = true): DevicePollingMethod
-    {
-        $method = DevicePollingMethod::with('secret')
-            ->firstOrNew([
-                'device_id' => $device->device_id,
-                'method_type' => PollingMethodType::Snmp,
-            ]);
-
-        $method->enabled = $enabled;
-        $method->affects_availability = $affectsAvailability;
-
-        if (! empty($settings)) {
-            $method->settings = array_merge($method->settings ?? [], $settings);
-        }
-
-        if (! empty($secretData)) {
-            if ($method->secret) {
-                $method->secret->update(['data' => array_merge($method->secret->data, $secretData)]);
-            } else {
-                $secret = Secret::create([
-                    'description' => 'SNMP ' . $device->hostname,
-                    'secret_type' => SecretType::Snmp,
-                    'default' => false,
-                    'data' => $secretData,
-                ]);
-                $method->secret_id = $secret->id;
-            }
-        }
-
-        $method->save();
-        $device->load('pollingMethods');
-
-        return $method;
     }
 
     /**

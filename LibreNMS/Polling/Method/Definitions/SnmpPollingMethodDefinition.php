@@ -36,7 +36,7 @@ use LibreNMS\Polling\Secrets\SnmpSecretData;
 /**
  * @implements PollingMethodDefinitionInterface<SnmpPollingMethod>
  */
-class SnmpPollingMethodDefinitionInterface implements PollingMethodDefinitionInterface
+class SnmpPollingMethodDefinition implements PollingMethodDefinitionInterface
 {
     /**
      * @inheritDoc

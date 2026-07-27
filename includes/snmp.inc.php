@@ -172,7 +172,7 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
     $deviceModel = DeviceCache::get($device['device_id']);
 
     // $device is not persisted to the db, fill in the data
-    $snmpMethod = $deviceModel->getPollingMethodRepo()->snmp();
+    $snmpMethod = $deviceModel->pollingMethodFor()->snmp();
 
     $cmd = array_merge($cmd, $snmpMethod->toNetSnmpOptions($device['context_name'] ?? null), Arr::wrap($options));
 

@@ -28,19 +28,4 @@ interface PollingMethodInterface
      * Create an instance of this Polling Method from a DevicePollingMethod model
      */
     public static function fromModel(DevicePollingMethod $method): static;
-
-    /**
-     * Create or update the DevicePollingMethod row (and its associated Secret, if applicable)
-     * for the given device.  Settings and secretData are merged into existing values.
-     *
-     * @param  array<string, mixed>  $settings  Non-sensitive per-device settings.
-     * @param  array<string, mixed>  $secretData  Credential fields (ignored for methods with no secret).
-     */
-    public static function save(
-        Device $device,
-        array $settings = [],
-        array $secretData = [],
-        bool $enabled = true,
-        bool $affectsAvailability = false,
-    ): DevicePollingMethod;
 }
