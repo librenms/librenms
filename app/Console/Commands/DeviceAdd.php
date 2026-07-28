@@ -100,11 +100,14 @@ class DeviceAdd extends LnmsCommand
         }
 
         $input = array_merge($this->options(), ['auth' => $auth, 'priv' => $priv]);
-        $pollingMethods = (new \App\Actions\Device\BuildDefaultPollingMethods())->execute($device, $input);
-        $device->setRelation('pollingMethods', $pollingMethods);
 
         try {
-            $result = (new ValidateDeviceAndCreate($device, $this->option('force'), $this->option('ping-fallback')))->execute();
+            $result = (new ValidateDeviceAndCreate(
+                device: $device,
+                force: $this->option('force'),
+                ping_fallback: $this->option('ping-fallback'),
+                input: $input,
+            ))->execute();
 
             if (! $result) {
                 $this->error(trans('commands.device:add.messages.save_failed', ['hostname' => $device->hostname]));
