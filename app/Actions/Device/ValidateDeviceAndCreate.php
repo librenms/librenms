@@ -45,11 +45,16 @@ use SnmpQuery;
 
 class ValidateDeviceAndCreate
 {
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function __construct(
         private readonly Device $device,
         private readonly bool $force = false,
         private readonly bool $ping_fallback = false,
+        private readonly array $input = [],
         private readonly PollingMethodManager $manager = new PollingMethodManager,
+        private readonly BuildDefaultPollingMethods $builder = new BuildDefaultPollingMethods,
     ) {
     }
 
@@ -79,7 +84,7 @@ class ValidateDeviceAndCreate
             $this->exceptIfIpExists();
 
             $icmpMethod = $this->device->pollingMethod(PollingMethodType::Icmp)
-                ?? $this->manager->transient(PollingMethodType::Icmp, affectsAvailability: false, device: $this->device);
+                ?? $this->manager->transient(PollingMethodType::Icmp, device: $this->device, affectsAvailability: false);
             if (! $icmpMethod->toPollingMethod()->isAvailable($this->device)) {
                 throw new HostUnreachablePingException($this->device->hostname);
             }
@@ -238,22 +243,7 @@ class ValidateDeviceAndCreate
     private function fillDefaultRelations(): void
     {
         if (! $this->device->relationLoaded('pollingMethods')) {
-            $pollingMethods = collect();
-
-            $pollingMethods->push($this->manager->build(
-                PollingMethodType::Icmp,
-                affectsAvailability: false,
-                device: $this->device,
-            ));
-
-            if (! $this->device->snmp_disable) {
-                $pollingMethods->push($this->manager->build(
-                    PollingMethodType::Snmp,
-                    affectsAvailability: true,
-                    device: $this->device,
-                ));
-            }
-
+            $pollingMethods = $this->builder->execute($this->device, $this->input);
             $this->device->setRelation('pollingMethods', $pollingMethods);
         }
     }

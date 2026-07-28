@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Device;
 
-use App\Actions\Device\BuildDefaultPollingMethods;
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\LibrenmsConfig;
 use App\Http\Interfaces\ToastInterface;
@@ -96,9 +95,6 @@ class AddDeviceController
             }
         }
 
-        $pollingMethods = (new BuildDefaultPollingMethods())->execute($device, ['methods' => $rawMethods]);
-        $device->setRelation('pollingMethods', $pollingMethods);
-
         if (! $snmpActive) {
             $device->snmp_disable = true;
             $device->os = $validated['os'] ?: 'ping';
@@ -115,7 +111,7 @@ class AddDeviceController
             ->every(fn (array $data): bool => empty($data['validate']));
 
         try {
-            $validator = new ValidateDeviceAndCreate($device, $forceAdd);
+            $validator = new ValidateDeviceAndCreate($device, $forceAdd, input: ['methods' => $rawMethods]);
             $success = $validator->execute();
 
             if (! $success) {
