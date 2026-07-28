@@ -4,11 +4,7 @@ namespace App\Http\Controllers\Ajax\Search;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use App\Models\Location;
-use App\Models\Port;
-use App\Models\PortsFdb;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Util\Url;
 
@@ -33,9 +29,8 @@ class DevicesSearchController extends GroupedSearchController
                 ->orWhere('overwrite_ip', 'like', $like);
 
             if (\LibreNMS\Util\IPv4::isValid($search, false)) {
-                $query ->orWhere('ip', '=', inet_pton($search));
+                $query->orWhere('ip', '=', inet_pton($search));
             }
-
         } elseif (preg_match('/^[0-9a-f:]+$/i', $search) && str_contains($search, ':')) {
             $query->orWhereRelation('ports.ipv6', 'ipv6_address', 'like', $like)
                 ->orWhereRelation('ports.ipv6', 'ipv6_compressed', 'like', $like)
