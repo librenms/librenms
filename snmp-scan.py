@@ -340,13 +340,13 @@ Example: 192.168.0.1/32 will be treated as a single host address""",
                 if not check_ip_excluded(ip):
 
                     def error_callback(e):
-                       print("ERROR in scan_host:", e)
+                        print("ERROR in scan_host:", e)
 
                     pool.apply_async(
                         scan_host,
                         (str(ip), args),
                         callback=handle_result,
-                        error_callback=error_callback
+                        error_callback=error_callback,
                     )
 
         pool.close()
