@@ -105,11 +105,19 @@ class DevSimulate extends LnmsCommand
         $device->status_reason = '';
         $device->save();
 
-        $device->pollingMethodFor()->save(
+        $manager = new \LibreNMS\Polling\Method\PollingMethodManager();
+        $method = $manager->save(
+            $device,
             PollingMethodType::Snmp,
             settings: ['transport' => 'udp', 'port' => $this->snmpsim->port],
-            secretData: ['version' => 'v2c', 'community' => $community],
         );
+        $secret = \App\Models\Secret::create([
+            'description' => "SNMP for device $device->hostname",
+            'secret_type' => PollingMethodType::Snmp->value,
+            'default' => false,
+            'data' => ['version' => 'v2c', 'community' => $community],
+        ]);
+        $method->secret()->associate($secret)->save();
 
         $this->info(trans("commands.dev:simulate.$action", ['hostname' => $device->hostname, 'id' => $device->device_id]));
 

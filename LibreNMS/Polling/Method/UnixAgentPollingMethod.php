@@ -53,12 +53,10 @@ readonly class UnixAgentPollingMethod implements PollingMethodInterface
             throw new \Exception('Invalid polling method type');
         }
 
-        $port = (int) ($method->settings['port'] ?? LibrenmsConfig::get('unix-agent.port', 6556));
-
         return new static(
             enabled: $method->enabled,
             affectsAvailability: $method->affects_availability,
-            port: $port,
+            port: (int) $method->settings['port'],
         );
     }
 
