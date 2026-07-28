@@ -19,7 +19,7 @@ return new class extends Migration
 
                     $attribsByDevice = DB::table('devices_attribs')
                         ->whereIn('device_id', $deviceIds)
-                        ->whereIn('attrib_type', ['ipmi_hostname', 'ipmi_username', 'ipmi_password', 'ipmi_kg_key'])
+                        ->whereIn('attrib_type', ['ipmi_hostname', 'ipmi_port', 'ipmi_ciphersuite', 'ipmi_timeout', 'ipmi_username', 'ipmi_password', 'ipmi_kg_key'])
                         ->get()
                         ->groupBy('device_id');
 
@@ -63,12 +63,20 @@ return new class extends Migration
                                 $secretMeta[$secretId]['count']++;
                             }
 
+                            $settings = array_filter([
+                                'hostname' => $attribs['ipmi_hostname'],
+                                'port' => isset($attribs['ipmi_port']) ? (int) $attribs['ipmi_port'] : 623,
+                                'ciphersuite' => $attribs['ipmi_ciphersuite'] ?? '',
+                                'timeout' => isset($attribs['ipmi_timeout']) ? (int) $attribs['ipmi_timeout'] : 3,
+                            ], fn ($v) => $v !== null);
+
                             $pollingMethods[] = [
                                 'device_id' => $deviceId,
                                 'method_type' => 'ipmi',
                                 'enabled' => true,
                                 'affects_availability' => false,
                                 'secret_id' => $secretId,
+                                'settings' => json_encode($settings),
                                 'created_at' => now(),
                                 'updated_at' => now(),
                             ];

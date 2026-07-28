@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Device;
 
+use App\Actions\Device\BuildDefaultPollingMethods;
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\LibrenmsConfig;
 use App\Http\Interfaces\ToastInterface;
@@ -43,17 +44,9 @@ class AddDeviceController
                 'label' => __('poller.methods.' . $type->value),
                 'icon' => $definition->icon(),
                 'schema_fields' => $schemaFields,
-                'schema_defaults' => collect($schema)->mapWithKeys(
-                    fn (array $field, string $key): array => [
-                        $key => $field['default'] ?? (isset($field['options']) ? array_key_first($field['options']) : ''),
-                    ]
-                )->all(),
+                'schema_defaults' => $definition->secretDefinition()?->schemaDefaults() ?? [],
                 'settings_fields' => PollingMethodDefinition::buildSchemaFields($settingsSchema, "methods['" . $type->value . "'].settingsData"),
-                'settings_defaults' => collect($settingsSchema)->mapWithKeys(
-                    fn (array $field, string $key): array => [
-                        $key => $field['default'] ?? (isset($field['options']) ? array_key_first($field['options']) : ''),
-                    ]
-                )->all(),
+                'settings_defaults' => $definition->schemaDefaults(),
             ];
         });
 
@@ -94,45 +87,16 @@ class AddDeviceController
 
         $pollingMethods = collect();
 
-        foreach ($rawMethods as $method => $data) {
-            if (empty($data['active'])) {
-                continue;
+        if (isset($rawMethods['snmp']['settings'])) {
+            $settings = $rawMethods['snmp']['settings'];
+            $device->port = (int) ($settings['port'] ?? LibrenmsConfig::get('snmp.port', 161));
+            $device->transport = $settings['transport'] ?? LibrenmsConfig::get('snmp.transports.0', 'udp');
+            if (isset($settings['port_association_mode'])) {
+                $device->port_association_mode = PortAssociationMode::getId($settings['port_association_mode']) ?? 1;
             }
-
-            $type = PollingMethodType::tryFrom($method);
-            if (! $type) {
-                continue;
-            }
-
-            $settings = $data['settings'] ?? [];
-
-            // SNMP port/transport live in settings on the form; promote them onto
-            // the device row where the legacy schema expects them.
-            if ($type === PollingMethodType::Snmp) {
-                $device->port = (int) ($settings['port'] ?? LibrenmsConfig::get('snmp.port', 161));
-                $device->transport = $settings['transport'] ?? LibrenmsConfig::get('snmp.transports.0', 'udp');
-                if (isset($settings['port_association_mode'])) {
-                    $device->port_association_mode = PortAssociationMode::getId($settings['port_association_mode']) ?? 1;
-                }
-                unset($settings['port'], $settings['transport']);
-            }
-
-            $pollingMethod = $this->pollingMethodManager->build(
-                type: $type,
-                settings: $settings,
-                secretData: $data['secret_data'] ?? [],
-                credentialMode: $data['credential_mode'] ?? 'default',
-                secretId: isset($data['secret_id']) ? (int) $data['secret_id'] : null,
-                secretDescription: $data['description'] ?? null,
-                secretDefault: (bool) ($data['default'] ?? false),
-                enabled: true,
-                affectsAvailability: (bool) ($data['affects_availability'] ?? false),
-                device: $device,
-            );
-
-            $pollingMethods->push($pollingMethod);
         }
 
+        $pollingMethods = (new BuildDefaultPollingMethods())->execute($device, ['methods' => $rawMethods]);
         $device->setRelation('pollingMethods', $pollingMethods);
 
         if (! $snmpActive) {

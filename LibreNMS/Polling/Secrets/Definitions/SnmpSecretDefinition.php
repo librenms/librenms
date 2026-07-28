@@ -29,12 +29,15 @@ namespace LibreNMS\Polling\Secrets\Definitions;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Interfaces\SecretDefinitionInterface;
 use LibreNMS\Polling\Secrets\SnmpSecretData;
+use LibreNMS\Traits\HandlesFieldSchema;
 
 /**
  * @implements SecretDefinitionInterface<SnmpSecretData>
  */
 class SnmpSecretDefinition implements SecretDefinitionInterface
 {
+    use HandlesFieldSchema;
+
     /**
      * @inheritDoc
      */

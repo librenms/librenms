@@ -1,39 +1,18 @@
 <?php
 
-/**
- * UnixAgentPollingMethodDefinition.php
- *
- * -Description-
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- * @link       https://www.librenms.org
- *
- * @copyright  2026 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
- */
-
 namespace LibreNMS\Polling\Method\Definitions;
 
-use LibreNMS\Polling\Method\AbstractPollingMethodDefinition;
+use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
 use LibreNMS\Polling\Method\UnixAgentPollingMethod;
+use LibreNMS\Traits\HandlesFieldSchema;
 
 /**
- * @extends AbstractPollingMethodDefinition<UnixAgentPollingMethod>
+ * @implements PollingMethodDefinitionInterface<UnixAgentPollingMethod>
  */
-class UnixAgentPollingMethodDefinition extends AbstractPollingMethodDefinition
+class UnixAgentPollingMethodDefinition implements PollingMethodDefinitionInterface
 {
+    use HandlesFieldSchema;
+
     /**
      * @inheritDoc
      */
@@ -49,14 +28,9 @@ class UnixAgentPollingMethodDefinition extends AbstractPollingMethodDefinition
         ];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function defaults(): array
+    public function defaultAffectsAvailability(): bool
     {
-        return [
-            'port' => 6556,
-        ];
+        return false;
     }
 
     /**
@@ -65,7 +39,7 @@ class UnixAgentPollingMethodDefinition extends AbstractPollingMethodDefinition
     public function rules(): array
     {
         return [
-            'port' => ['nullable', 'integer', 'min:1', 'max:65535'],
+            'port' => ['required', 'integer', 'min:1', 'max:65535'],
         ];
     }
 

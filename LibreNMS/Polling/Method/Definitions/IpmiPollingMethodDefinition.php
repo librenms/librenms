@@ -1,40 +1,19 @@
 <?php
 
-/**
- * IpmiPollingMethodDefinition.php
- *
- * -Description-
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- * @link       https://www.librenms.org
- *
- * @copyright  2026 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
- */
-
 namespace LibreNMS\Polling\Method\Definitions;
 
-use LibreNMS\Polling\Method\AbstractPollingMethodDefinition;
+use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
 use LibreNMS\Polling\Method\IpmiPollingMethod;
 use LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
+use LibreNMS\Traits\HandlesFieldSchema;
 
 /**
- * @extends AbstractPollingMethodDefinition<IpmiPollingMethod>
+ * @implements PollingMethodDefinitionInterface<IpmiPollingMethod>
  */
-class IpmiPollingMethodDefinition extends AbstractPollingMethodDefinition
+class IpmiPollingMethodDefinition implements PollingMethodDefinitionInterface
 {
+    use HandlesFieldSchema;
+
     /**
      * @inheritDoc
      */
@@ -43,31 +22,26 @@ class IpmiPollingMethodDefinition extends AbstractPollingMethodDefinition
         return [
             'hostname' => [
                 'type' => 'text',
+                'default' => '',
             ],
             'port' => [
                 'type' => 'number',
+                'default' => 623,
             ],
             'ciphersuite' => [
                 'type' => 'text',
+                'default' => '',
             ],
             'timeout' => [
                 'type' => 'number',
+                'default' => 3,
             ],
         ];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function defaults(): array
+    public function defaultAffectsAvailability(): bool
     {
-        return [
-            'affects_availability' => false,
-            'hostname' => '',
-            'port' => 623,
-            'ciphersuite' => '',
-            'timeout' => 3,
-        ];
+        return false;
     }
 
     /**
@@ -79,7 +53,7 @@ class IpmiPollingMethodDefinition extends AbstractPollingMethodDefinition
             'hostname' => ['required', 'string'],
             'port' => ['required', 'integer', 'min:1', 'max:65535'],
             'ciphersuite' => ['nullable', 'string'],
-            'timeout' => ['nullable', 'integer', 'min:1'],
+            'timeout' => ['required', 'integer', 'min:1'],
         ];
     }
 

@@ -58,10 +58,10 @@ readonly class IpmiPollingMethod implements PollingMethodInterface
             $method->secret?->data['username'] ?? '',
             $method->secret?->data['password'] ?? '',
             $method->secret?->data['kg_key'] ?? '',
-            $method->settings['hostname'] ?? '',
-            (int) ($method->settings['port'] ?? 623),
-            (int) ($method->settings['ciphersuite'] ?? 0),
-            (int) ($method->settings['timeout'] ?? 3),
+            $method->settings['hostname'],
+            (int) $method->settings['port'],
+            (int) $method->settings['ciphersuite'],
+            (int) $method->settings['timeout'],
             $method->settings['type'] ?? '',
         );
     }

@@ -28,7 +28,7 @@ use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
-use LibreNMS\Polling\Method\PollingMethodRepository;
+use LibreNMS\Polling\Method\PollingMethodAccessor;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
@@ -186,9 +186,9 @@ class Device extends BaseModel
         return false; // no known snmpver
     }
 
-    public function pollingMethodFor(): PollingMethodRepository
+    public function pollingMethodFor(): PollingMethodAccessor
     {
-        return new PollingMethodRepository($this);
+        return new PollingMethodAccessor($this);
     }
 
     public function pollingMethod(PollingMethodType $method): ?DevicePollingMethod

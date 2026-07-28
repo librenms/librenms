@@ -271,12 +271,19 @@ class ModuleTestHelper
             (new ValidateDeviceAndCreate($new_device, true))->execute();
             $device_id = $new_device->device_id;
 
-            (new PollingMethodManager())->save(
+            $manager = new PollingMethodManager();
+            $method = $manager->save(
                 $new_device,
                 PollingMethodType::Snmp,
                 settings: ['transport' => 'udp', 'port' => $snmpSimPort],
-                secretData: ['version' => 'v2c', 'community' => $this->file_name],
             );
+            $secret = \App\Models\Secret::create([
+                'description' => "SNMP for device $new_device->hostname",
+                'secret_type' => PollingMethodType::Snmp->value,
+                'default' => false,
+                'data' => ['version' => 'v2c', 'community' => $this->file_name],
+            ]);
+            $method->secret()->associate($secret)->save();
 
             $this->qPrint("Added device: $device_id\n");
         } catch (\Exception $e) {

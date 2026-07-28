@@ -79,7 +79,7 @@ class ValidateDeviceAndCreate
             $this->exceptIfIpExists();
 
             $icmpMethod = $this->device->pollingMethod(PollingMethodType::Icmp)
-                ?? $this->manager->build(PollingMethodType::Icmp, affectsAvailability: false, device: $this->device);
+                ?? $this->manager->transient(PollingMethodType::Icmp, affectsAvailability: false, device: $this->device);
             if (! $icmpMethod->toPollingMethod()->isAvailable($this->device)) {
                 throw new HostUnreachablePingException($this->device->hostname);
             }
@@ -179,12 +179,11 @@ class ValidateDeviceAndCreate
                         'cryptoalgo' => $v3['cryptoalgo'] ?? 'AES',
                     ];
 
-                    $snmpMethod = $this->manager->build(
+                    $snmpMethod = $this->manager->transient(
                         PollingMethodType::Snmp,
                         secretData: $snmpData,
-                        credentialMode: 'new',
-                        affectsAvailability: true,
                         device: $this->device,
+                        affectsAvailability: true,
                     );
 
                     // Set the relation temporarily for testing
@@ -204,12 +203,11 @@ class ValidateDeviceAndCreate
                         'community' => $community,
                     ];
 
-                    $snmpMethod = $this->manager->build(
+                    $snmpMethod = $this->manager->transient(
                         PollingMethodType::Snmp,
                         secretData: $snmpData,
-                        credentialMode: 'new',
-                        affectsAvailability: true,
                         device: $this->device,
+                        affectsAvailability: true,
                     );
 
                     // Set the relation temporarily for testing

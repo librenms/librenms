@@ -29,12 +29,15 @@ namespace LibreNMS\Polling\Secrets\Definitions;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Interfaces\SecretDefinitionInterface;
 use LibreNMS\Polling\Secrets\IpmiSecretData;
+use LibreNMS\Traits\HandlesFieldSchema;
 
 /**
  * @implements SecretDefinitionInterface<IpmiSecretData>
  */
 class IpmiSecretDefinition implements SecretDefinitionInterface
 {
+    use HandlesFieldSchema;
+
     /**
      * @inheritDoc
      */
