@@ -16,56 +16,43 @@ class DevicesSearchController extends GroupedSearchController
 {
     protected function groups(string $search, string $like, int $limit, ?User $user): array
     {
-        $query = Device::hasAccess($user)->select('devices.*');
-        $query->where(function (Builder $q) use ($like, $search): void {
-            $q->where('hostname', 'like', $like)
+        $query = Device::hasAccess($user)->select('devices.*')
+                ->where('hostname', 'like', $like)
                 ->orWhere('sysName', 'like', $like)
                 ->orWhere('display', 'like', $like)
                 ->orWhere('hardware', 'like', $like)
                 ->orWhere('purpose', 'like', $like)
                 ->orWhere('serial', 'like', $like)
-                ->orWhere('notes', 'like', $like);
+                ->orWhere('notes', 'like', $like)
+                ->orWhereRelation('location', 'location', 'like', $like);
 
-            $locationquery = Location::where('location', 'like', $like);
-            $q->orWhereIn('devices.location_id', $locationquery->pluck('id'));
+        $mac = strtolower(str_replace([':', '-'], '', $search));
 
-            $mac = strtolower(str_replace([':', '-'], '', $search));
+        if (preg_match('/^[0-9.]+$/', $search) && str_contains($search, '.')) {
+            $query->orWhereRelation('ports.ipv4', 'ipv4_address', 'like', $like)
+                ->orWhere('overwrite_ip', 'like', $like);
 
-            if (preg_match('/^[0-9.]+$/', $search) && str_contains($search, '.')) {
-                $portquery = Port::query()
-                    ->leftJoin('ipv4_addresses', 'ipv4_addresses.port_id', '=', 'ports.port_id')
-                    ->where('ipv4_addresses.ipv4_address', 'like', $like);
-
-                $q->orWhereIn('devices.device_id', $portquery->pluck('ports.device_id'))
-                    ->orWhere('overwrite_ip', 'like', $like);
-
-                if (\LibreNMS\Util\IPv4::isValid($search, false)) {
-                    $q->orWhere('ip', '=', inet_pton($search));
-                }
-            } elseif (preg_match('/^[0-9a-f:]+$/i', $search) && str_contains($search, ':')) {
-                $portquery = Port::query()
-                    ->leftJoin('ipv6_addresses', 'ipv6_addresses.port_id', '=', 'ports.port_id')
-                    ->where('ipv6_addresses.ipv6_address', 'like', $like)
-                    ->orWhere('ipv6_addresses.ipv6_compressed', 'like', $like)
-                    ->orWhere('ports.ifPhysAddress', 'like', '%' . $mac . '%');
-
-                $q->orWhereIn('devices.device_id', $portquery->pluck('ports.device_id'))
-                    ->orWhere('overwrite_ip', 'like', $like);
-
-                if (\LibreNMS\Util\IPv6::isValid($search, false)) {
-                    $q->orWhere('ip', '=', inet_pton($search));
-                }
-            } elseif (ctype_xdigit($mac)) {
-                $portquery = Port::where('ifPhysAddress', 'like', '%' . $mac . '%');
-                $q->orWhereIn('devices.device_id', $portquery->pluck('ports.device_id'));
+            if (\LibreNMS\Util\IPv4::isValid($search, false)) {
+                $query ->orWhere('ip', '=', inet_pton($search));
             }
 
-            // A MAC-style search (with or without separators) can also match FDB entries
-            if (ctype_xdigit($mac)) {
-                $fdbquery = PortsFdb::where('mac_address', 'like', '%' . $mac . '%');
-                $q->orWhereIn('devices.device_id', $fdbquery->pluck('device_id'));
+        } elseif (preg_match('/^[0-9a-f:]+$/i', $search) && str_contains($search, ':')) {
+            $query->orWhereRelation('ports.ipv6', 'ipv6_address', 'like', $like)
+                ->orWhereRelation('ports.ipv6', 'ipv6_compressed', 'like', $like)
+                ->orWhereRelation('ports', 'ifPhysAddress', 'like', '%' . $mac . '%')
+                ->orWhere('overwrite_ip', 'like', $like);
+
+            if (\LibreNMS\Util\IPv6::isValid($search, false)) {
+                $query->orWhere('ip', '=', inet_pton($search));
             }
-        });
+        } elseif (ctype_xdigit($mac)) {
+            $query->orWhereRelation('ports', 'ifPhysAddress', 'like', '%' . $mac . '%');
+        }
+
+        // A MAC-style search (with or without separators) can also match FDB entries
+        if (ctype_xdigit($mac)) {
+            $query->orWhereRelation('portsFdb', 'mac_address', 'like', '%' . $mac . '%');
+        }
 
         $devices = $query->orderBy('display')->limit($limit)->get()
             ->map(fn (Device $d) => [
