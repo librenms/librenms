@@ -262,8 +262,6 @@ class ValidateDeviceAndCreate
 
     private function fillDefaults(): void
     {
-        $this->device->port = $this->device->port ?: LibrenmsConfig::get('snmp.port', 161);
-        $this->device->transport = $this->device->transport ?: LibrenmsConfig::get('snmp.transports.0', 'udp');
         $this->device->poller_group = $this->device->poller_group ?: LibrenmsConfig::get('default_poller_group', 0);
         $this->device->os = $this->device->os ?: 'generic';
         $this->device->status_reason = '';
