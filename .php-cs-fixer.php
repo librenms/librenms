@@ -12,7 +12,11 @@ $rules = [
     'blank_line_before_statement' => [
         'statements' => ['return'],
     ],
-    'single_space_around_construct' => false,
+    'single_space_around_construct' => [
+        'constructs_contain_a_single_space' => [],
+        'constructs_followed_by_a_single_space' => ['match'],
+        'constructs_preceded_by_a_single_space' => [],
+    ],
     'control_structure_braces' => false,
     'control_structure_continuation_position' => false,
     'declare_parentheses' => false,
