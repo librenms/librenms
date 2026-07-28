@@ -29,14 +29,14 @@ namespace LibreNMS\Polling\Method\Definitions;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PortAssociationMode;
-use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
+use LibreNMS\Polling\Method\AbstractPollingMethodDefinition;
 use LibreNMS\Polling\Method\SnmpPollingMethod;
 use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
 
 /**
- * @implements PollingMethodDefinitionInterface<SnmpPollingMethod>
+ * @extends AbstractPollingMethodDefinition<SnmpPollingMethod>
  */
-class SnmpPollingMethodDefinition implements PollingMethodDefinitionInterface
+class SnmpPollingMethodDefinition extends AbstractPollingMethodDefinition
 {
     /**
      * @inheritDoc

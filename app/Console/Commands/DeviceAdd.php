@@ -6,14 +6,11 @@ use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use App\Models\DevicePollingMethod;
 use App\Models\PollerGroup;
-use App\Models\Secret;
 use Exception;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
-use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostnameExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
@@ -97,14 +94,15 @@ class DeviceAdd extends LnmsCommand
             'port_association_mode' => PortAssociationMode::getId($this->option('port-association-mode')),
         ]);
 
+        $manager = new \LibreNMS\Polling\Method\PollingMethodManager;
         $pollingMethods = collect();
 
         // ICMP polling method is always added
-        $pollingMethods->push(new DevicePollingMethod([
-            'method_type' => PollingMethodType::Icmp,
-            'enabled' => true,
-            'affects_availability' => false,
-        ]));
+        $pollingMethods->push($manager->build(
+            PollingMethodType::Icmp,
+            affectsAvailability: false,
+            device: $device,
+        ));
 
         if ($this->option('ping-only')) {
             $device->os = $this->option('os');
@@ -112,20 +110,16 @@ class DeviceAdd extends LnmsCommand
             $device->sysName = $this->option('sysName');
         } else {
             // SNMP polling method is added if not ping-only
-            $snmpPollingMethod = new DevicePollingMethod([
-                'method_type' => PollingMethodType::Snmp,
-                'enabled' => true,
-                'affects_availability' => true,
-                'settings' => array_filter([
-                    'port' => $this->option('port'),
-                    'transport' => $this->option('transport'),
-                ]),
+            $settings = array_filter([
+                'port' => $this->option('port'),
+                'transport' => $this->option('transport'),
             ]);
 
             // Build SnmpSecret if custom credentials were provided
             $snmpver = $this->option('v3') ? 'v3' : ($this->option('v2c') ? 'v2c' : ($this->option('v1') ? 'v1' : ''));
             $community = $this->option('community');
 
+            $snmpData = [];
             if ($snmpver || $community || $auth || $priv) {
                 $snmpData = [
                     'version' => $snmpver ?: 'v2c',
@@ -137,17 +131,16 @@ class DeviceAdd extends LnmsCommand
                     'cryptopass' => $priv,
                     'cryptoalgo' => $this->option('privacy-protocol') ?: 'AES',
                 ];
-
-                $secret = new Secret([
-                    'secret_type' => SecretType::Snmp,
-                    'description' => 'SNMP ' . $device->hostname,
-                    'default' => false,
-                    'data' => $snmpData,
-                ]);
-                $snmpPollingMethod->setRelation('secret', $secret);
             }
 
-            $pollingMethods->push($snmpPollingMethod);
+            $pollingMethods->push($manager->build(
+                PollingMethodType::Snmp,
+                settings: $settings,
+                secretData: $snmpData,
+                credentialMode: ! empty($snmpData) ? 'new' : 'default',
+                affectsAvailability: true,
+                device: $device,
+            ));
         }
 
         $device->setRelation('pollingMethods', $pollingMethods);

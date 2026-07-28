@@ -28,12 +28,9 @@ namespace App\Actions\Device;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use App\Models\DevicePollingMethod;
-use App\Models\Secret;
 use Illuminate\Support\Arr;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
-use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\HostIpExistsException;
 use LibreNMS\Exceptions\HostNameEmptyException;
 use LibreNMS\Exceptions\HostnameExistsException;
@@ -42,13 +39,18 @@ use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\HostUnreachableSnmpException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
+use LibreNMS\Polling\Method\PollingMethodManager;
 use LibreNMS\Polling\Secrets\SnmpSecretData;
 use SnmpQuery;
 
 class ValidateDeviceAndCreate
 {
-    public function __construct(private readonly Device $device, private readonly bool $force = false, private readonly bool $ping_fallback = false)
-    {
+    public function __construct(
+        private readonly Device $device,
+        private readonly bool $force = false,
+        private readonly bool $ping_fallback = false,
+        private readonly PollingMethodManager $manager = new PollingMethodManager,
+    ) {
     }
 
     /**
@@ -76,7 +78,8 @@ class ValidateDeviceAndCreate
         if (! $this->force) {
             $this->exceptIfIpExists();
 
-            $icmpMethod = $this->device->pollingMethod(PollingMethodType::Icmp) ?? new DevicePollingMethod(['method_type' => PollingMethodType::Icmp, 'enabled' => true]);
+            $icmpMethod = $this->device->pollingMethod(PollingMethodType::Icmp)
+                ?? $this->manager->build(PollingMethodType::Icmp, affectsAvailability: false, device: $this->device);
             if (! $icmpMethod->toPollingMethod()->isAvailable($this->device)) {
                 throw new HostUnreachablePingException($this->device->hostname);
             }
@@ -176,17 +179,13 @@ class ValidateDeviceAndCreate
                         'cryptoalgo' => $v3['cryptoalgo'] ?? 'AES',
                     ];
 
-                    $secret = new Secret([
-                        'secret_type' => SecretType::Snmp,
-                        'data' => $snmpData,
-                    ]);
-
-                    $snmpMethod = new DevicePollingMethod([
-                        'method_type' => PollingMethodType::Snmp,
-                        'enabled' => true,
-                        'affects_availability' => true,
-                    ]);
-                    $snmpMethod->setRelation('secret', $secret);
+                    $snmpMethod = $this->manager->build(
+                        PollingMethodType::Snmp,
+                        secretData: $snmpData,
+                        credentialMode: 'new',
+                        affectsAvailability: true,
+                        device: $this->device,
+                    );
 
                     // Set the relation temporarily for testing
                     $this->device->setRelation('pollingMethods', $otherPollingMethods->concat([$snmpMethod]));
@@ -205,17 +204,13 @@ class ValidateDeviceAndCreate
                         'community' => $community,
                     ];
 
-                    $secret = new Secret([
-                        'secret_type' => SecretType::Snmp,
-                        'data' => $snmpData,
-                    ]);
-
-                    $snmpMethod = new DevicePollingMethod([
-                        'method_type' => PollingMethodType::Snmp,
-                        'enabled' => true,
-                        'affects_availability' => true,
-                    ]);
-                    $snmpMethod->setRelation('secret', $secret);
+                    $snmpMethod = $this->manager->build(
+                        PollingMethodType::Snmp,
+                        secretData: $snmpData,
+                        credentialMode: 'new',
+                        affectsAvailability: true,
+                        device: $this->device,
+                    );
 
                     // Set the relation temporarily for testing
                     $this->device->setRelation('pollingMethods', $otherPollingMethods->concat([$snmpMethod]));
@@ -247,20 +242,18 @@ class ValidateDeviceAndCreate
         if (! $this->device->relationLoaded('pollingMethods')) {
             $pollingMethods = collect();
 
-            $pollingMethods->push(new DevicePollingMethod([
-                'method_type' => PollingMethodType::Icmp,
-                'enabled' => true,
-                'affects_availability' => false,
-            ]));
+            $pollingMethods->push($this->manager->build(
+                PollingMethodType::Icmp,
+                affectsAvailability: false,
+                device: $this->device,
+            ));
 
             if (! $this->device->snmp_disable) {
-                $snmpMethod = new DevicePollingMethod([
-                    'method_type' => PollingMethodType::Snmp,
-                    'enabled' => true,
-                    'affects_availability' => true,
-                ]);
-
-                $pollingMethods->push($snmpMethod);
+                $pollingMethods->push($this->manager->build(
+                    PollingMethodType::Snmp,
+                    affectsAvailability: true,
+                    device: $this->device,
+                ));
             }
 
             $this->device->setRelation('pollingMethods', $pollingMethods);

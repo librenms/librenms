@@ -26,14 +26,14 @@
 
 namespace LibreNMS\Polling\Method\Definitions;
 
-use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
+use LibreNMS\Polling\Method\AbstractPollingMethodDefinition;
 use LibreNMS\Polling\Method\IpmiPollingMethod;
 use LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
 
 /**
- * @implements PollingMethodDefinitionInterface<IpmiPollingMethod>
+ * @extends AbstractPollingMethodDefinition<IpmiPollingMethod>
  */
-class IpmiPollingMethodDefinition implements PollingMethodDefinitionInterface
+class IpmiPollingMethodDefinition extends AbstractPollingMethodDefinition
 {
     /**
      * @inheritDoc
