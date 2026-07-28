@@ -46,7 +46,7 @@ readonly class PollingMethodRepository
      */
     private function pollingMethod(PollingMethodType $type, string $class): PollingMethodInterface
     {
-        return  $this->device->pollingMethods->firstWhere('method_type', $type)?->toPollingMethod() ?? $class::disabled();
+        return $this->device->pollingMethod($type)?->toPollingMethod() ?? $class::disabled();
     }
 
     public function snmp(): SnmpPollingMethod

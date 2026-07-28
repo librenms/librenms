@@ -35,6 +35,8 @@ class DevicePollingMethod extends Model
 
     public function toPollingMethod(): PollingMethodInterface
     {
+        $this->loadMissing('secret');
+
         return app(PollingMethodFactory::class)->make($this);
     }
 

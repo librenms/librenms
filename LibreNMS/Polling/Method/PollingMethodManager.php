@@ -130,7 +130,7 @@ class PollingMethodManager
         }
 
         $method->save();
-        $device->load('pollingMethods');
+        $device->load('pollingMethods.secret');
 
         return $method;
     }
