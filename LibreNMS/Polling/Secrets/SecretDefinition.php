@@ -38,7 +38,7 @@ class SecretDefinition
      */
     public static function for(SecretType $type): SecretDefinitionInterface
     {
-        return match($type) {
+        return match ($type) {
             SecretType::Ipmi => new IpmiSecretDefinition,
             SecretType::Snmp => new SnmpSecretDefinition,
         };
