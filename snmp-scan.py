@@ -34,6 +34,7 @@ from time import time
 
 Result = namedtuple("Result", ["ip", "hostname", "outcome", "output"])
 
+
 class Outcome:
     UNDEFINED = 0
     ADDED = 1
@@ -337,14 +338,15 @@ Example: 192.168.0.1/32 will be treated as a single host address""",
 
             for ip in ips:
                 if not check_ip_excluded(ip):
+
                     def error_callback(e):
                        print("ERROR in scan_host:", e)
 
                     pool.apply_async(
-                    scan_host,
-                    (str(ip),args),
-                    callback=handle_result,
-                    error_callback=error_callback
+                        scan_host,
+                        (str(ip), args),
+                        callback=handle_result,
+                        error_callback=error_callback
                     )
 
         pool.close()
