@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Ajax\Search;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use App\Models\Location;
 use App\Models\Port;
 use App\Models\PortsFdb;
-use App\Models\Location;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Enum\DeviceStatus;
