@@ -134,7 +134,10 @@ function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir 
 {
     $oids = Arr::wrap($oids);
 
-    if ($device['snmpver'] == 'v1'
+    $deviceModel = DeviceCache::get($device['device_id']);
+    $snmpMethod = $deviceModel->pollingMethodFor()->snmp();
+
+    if ($snmpMethod->version == 'v1'
         || (isset($device['os']) && (LibrenmsConfig::getOsSetting($device['os'], 'snmp_bulk', true) == false
                 || ! empty(array_intersect($oids, LibrenmsConfig::getCombined($device['os'], 'oids.no_bulk', 'snmp.'))))) // skip for oids that do not work with bulk
     ) {
@@ -171,8 +174,6 @@ function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir 
 function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdir = null)
 {
     $deviceModel = DeviceCache::get($device['device_id']);
-
-    // $device is not persisted to the db, fill in the data
     $snmpMethod = $deviceModel->pollingMethodFor()->snmp();
 
     $cmd = array_merge($cmd, $snmpMethod->toNetSnmpOptions($device['context_name'] ?? null), Arr::wrap($options));
@@ -193,8 +194,7 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
     }
 
     $pollertarget = Rewrite::addIpv6Brackets(DeviceCache::get($device['device_id'])->pollerTarget());
-    $transport = $device['transport'] ?: 'udp';
-    $cmd[] = $transport . ':' . $pollertarget . ':' . $device['port'];
+    $cmd[] = $snmpMethod->transport . ':' . $pollertarget . ':' . $snmpMethod->port;
 
     return array_merge($cmd, (array) $oids);
 } // end gen_snmp_cmd()
