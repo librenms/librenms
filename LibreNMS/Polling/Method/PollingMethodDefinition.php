@@ -41,7 +41,7 @@ class PollingMethodDefinition
      */
     public static function for(PollingMethodType $type): PollingMethodDefinitionInterface
     {
-        return match($type) {
+        return match ($type) {
             PollingMethodType::Snmp => new SnmpPollingMethodDefinition,
             PollingMethodType::Icmp => new IcmpPollingMethodDefinition,
             PollingMethodType::Ipmi => new IpmiPollingMethodDefinition,
