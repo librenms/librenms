@@ -40,6 +40,7 @@ use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
+use LibreNMS\Polling\Method\PollingMethodManager;
 
 class ModuleTestHelper
 {
@@ -575,7 +576,8 @@ class ModuleTestHelper
             (new ValidateDeviceAndCreate($new_device, true))->execute();
             $device_id = $new_device->device_id;
 
-            $new_device->pollingMethodFor()->save(
+            (new PollingMethodManager())->save(
+                $new_device,
                 PollingMethodType::Snmp,
                 settings: ['transport' => 'udp', 'port' => $snmpSimPort],
                 secretData: ['version' => 'v2c', 'community' => $this->file_name],
