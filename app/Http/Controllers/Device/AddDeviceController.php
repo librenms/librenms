@@ -7,7 +7,6 @@ use App\Facades\LibrenmsConfig;
 use App\Http\Interfaces\ToastInterface;
 use App\Http\Requests\StoreDeviceRequest;
 use App\Models\Device;
-use App\Models\DevicePollingMethod;
 use App\Models\PollerGroup;
 use App\Models\Secret;
 use Illuminate\Contracts\View\View;
@@ -16,17 +15,16 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
-use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Polling\Method\PollingMethodDefinition;
-use LibreNMS\Polling\Secrets\SecretService;
+use LibreNMS\Polling\Method\PollingMethodManager;
 
 class AddDeviceController
 {
     use AuthorizesRequests;
 
     public function __construct(
-        private readonly SecretService $secretService,
+        private readonly PollingMethodManager $pollingMethodManager = new PollingMethodManager,
     ) {
     }
 
@@ -119,19 +117,18 @@ class AddDeviceController
                 unset($settings['port'], $settings['transport']);
             }
 
-            $pollingMethod = new DevicePollingMethod([
-                'method_type' => $type,
-                'enabled' => true,
-                'affects_availability' => (bool) ($data['affects_availability'] ?? false),
-                'settings' => $settings,
-            ]);
-
-            if (PollingMethodDefinition::hasSecret($type)) {
-                $secret = $this->resolveSecret($type, $data);
-                if ($secret !== null) {
-                    $pollingMethod->setRelation('secret', $secret);
-                }
-            }
+            $pollingMethod = $this->pollingMethodManager->build(
+                type: $type,
+                settings: $settings,
+                secretData: $data['secret_data'] ?? [],
+                credentialMode: $data['credential_mode'] ?? 'default',
+                secretId: isset($data['secret_id']) ? (int) $data['secret_id'] : null,
+                secretDescription: $data['description'] ?? null,
+                secretDefault: (bool) ($data['default'] ?? false),
+                enabled: true,
+                affectsAvailability: (bool) ($data['affects_availability'] ?? false),
+                device: $device,
+            );
 
             $pollingMethods->push($pollingMethod);
         }
@@ -173,31 +170,5 @@ class AddDeviceController
         $toast->success(__('Device added successfully'));
 
         return redirect()->route('device', ['device' => $device->device_id]);
-    }
-
-    /**
-     * Resolve the secret for a polling method from the submitted credential_mode data.
-     * Returns null for "default" mode (caller should not attach a secret relation).
-     *
-     * @param  array<string, mixed>  $data
-     */
-    private function resolveSecret(PollingMethodType $type, array $data): ?Secret
-    {
-        $mode = $data['credential_mode'] ?? 'default';
-
-        if ($mode === 'existing') {
-            return $this->secretService->resolveExisting((int) ($data['secret_id'] ?? 0), $type);
-        }
-
-        if ($mode === 'new') {
-            return new Secret([
-                'secret_type' => SecretType::tryFrom($type->value),
-                'description' => $data['description'] ?? '',
-                'default' => (bool) ($data['default'] ?? false),
-                'data' => $data['secret_data'] ?? [],
-            ]);
-        }
-
-        return null;
     }
 }

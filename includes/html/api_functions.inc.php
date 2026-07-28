@@ -22,7 +22,6 @@ use App\Models\BgpPeer;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
-use App\Models\DevicePollingMethod;
 use App\Models\Eventlog;
 use App\Models\Ipv4Address;
 use App\Models\Ipv4Mac;
@@ -44,7 +43,6 @@ use App\Models\PortGroup;
 use App\Models\PortSecurity;
 use App\Models\PortsFdb;
 use App\Models\PortsNac;
-use App\Models\Secret;
 use App\Models\Sensor;
 use App\Models\ServiceTemplate;
 use App\Models\UserPref;
@@ -64,7 +62,6 @@ use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Billing;
 use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Enum\SecretType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidTableColumnException;
@@ -454,14 +451,15 @@ function add_device(Illuminate\Http\Request $request)
             $device->location_id = \App\Models\Location::firstOrCreate(['location' => $data['location']])->id;
         }
 
+        $manager = new \LibreNMS\Polling\Method\PollingMethodManager;
         $pollingMethods = collect();
 
         // ICMP polling method is always added
-        $pollingMethods->push(new DevicePollingMethod([
-            'method_type' => PollingMethodType::Icmp,
-            'enabled' => true,
-            'affects_availability' => false,
-        ]));
+        $pollingMethods->push($manager->build(
+            PollingMethodType::Icmp,
+            affectsAvailability: false,
+            device: $device,
+        ));
 
         $force_add = ! empty($data['force_add']);
 
@@ -473,13 +471,6 @@ function add_device(Illuminate\Http\Request $request)
         } else {
             $device->snmp_disable = 0;
             // SNMP polling method is added if not snmp_disable
-            $snmpPollingMethod = new DevicePollingMethod([
-                'method_type' => PollingMethodType::Snmp,
-                'enabled' => true,
-                'affects_availability' => true,
-            ]);
-
-            // Build SnmpSecret if custom credentials were provided
             $snmpver = $data['snmpver'] ?? $data['version'] ?? null;
             $community = $data['community'] ?? null;
             $authlevel = $data['authlevel'] ?? null;
@@ -489,6 +480,7 @@ function add_device(Illuminate\Http\Request $request)
             $cryptopass = $data['cryptopass'] ?? null;
             $cryptoalgo = $data['cryptoalgo'] ?? null;
 
+            $snmpData = [];
             if ($snmpver || $community || $authlevel || $authname || $authpass || $authalgo || $cryptopass || $cryptoalgo) {
                 $snmpData = [
                     'version' => $snmpver ?: 'v2c',
@@ -500,17 +492,15 @@ function add_device(Illuminate\Http\Request $request)
                     'cryptopass' => $cryptopass,
                     'cryptoalgo' => $cryptoalgo ?: 'AES',
                 ];
-
-                $secret = new Secret([
-                    'secret_type' => SecretType::Snmp,
-                    'description' => 'SNMP ' . $device->hostname,
-                    'default' => false,
-                    'data' => $snmpData,
-                ]);
-                $snmpPollingMethod->setRelation('secret', $secret);
             }
 
-            $pollingMethods->push($snmpPollingMethod);
+            $pollingMethods->push($manager->build(
+                PollingMethodType::Snmp,
+                secretData: $snmpData,
+                credentialMode: ! empty($snmpData) ? 'new' : 'default',
+                affectsAvailability: true,
+                device: $device,
+            ));
         }
 
         $device->setRelation('pollingMethods', $pollingMethods);
