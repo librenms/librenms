@@ -2,7 +2,6 @@
 
 namespace LibreNMS\Polling\Method;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
@@ -54,7 +53,6 @@ readonly class SnmpPollingMethod implements PollingMethodInterface
             throw new \Exception('Invalid polling method type');
         }
 
-        $device = $method->device;
         $secret = $method->secret;
         $secretData = $secret ? $secret->data : [];
 
@@ -70,12 +68,12 @@ readonly class SnmpPollingMethod implements PollingMethodInterface
             cryptopass: $secretData['cryptopass'] ?? null,
             cryptoalgo: $secretData['cryptoalgo'] ?? 'AES',
             context: $secretData['context'] ?? null,
-            transport: $method->settings['transport'] ?? 'udp',
-            port: (int) ($method->settings['port'] ?? 161),
-            timeout: (int) ($method->settings['timeout'] ?? LibrenmsConfig::get('snmp.timeout', 3)),
-            retries: (int) ($method->settings['retries'] ?? LibrenmsConfig::get('snmp.retries', 1)),
-            maxRepeaters: (int) (($method->settings['max_repeaters'] ?? null) ?: LibrenmsConfig::getOsSetting($device?->os, 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', 0))),
-            maxOid: (int) (($method->settings['max_oid'] ?? null) ?: LibrenmsConfig::getOsSetting($device?->os, 'snmp_max_oid', LibrenmsConfig::get('snmp.max_oid', 10))),
+            transport: $method->settings['transport'],
+            port: (int) $method->settings['port'],
+            timeout: (int) $method->settings['timeout'],
+            retries: (int) $method->settings['retries'],
+            maxRepeaters: (int) $method->settings['max_repeaters'],
+            maxOid: (int) $method->settings['max_oid'],
         );
     }
 

@@ -83,17 +83,15 @@ class EditPollingController
         return [
             'type' => $type->value,
             'label' => __('poller.methods.' . $type->value),
-            'icon' => $defintion->icon(),
+            'icon' => $definition->icon(),
             'schema_fields' => $schemaFields,
-            'schema_defaults' => collect($schema)->mapWithKeys(fn (array $field, string $key): array => [
-                $key => $field['default'] ?? (isset($field['options']) ? array_key_first($field['options']) : ''),
-            ])->all(),
+            'schema_defaults' => $definition->secretDefinition()?->schemaDefaults() ?? [],
             'settings_fields' => PollingMethodDefinition::buildSchemaFields($settingsSchema, 'settingsData'),
             'settings' => array_merge(
                 $row->settings ?? [],
                 $type === PollingMethodType::Snmp ? ['port_association_mode' => PortAssociationMode::getName($device->port_association_mode) ?? LibrenmsConfig::get('default_port_association_mode', 'ifIndex')] : []
             ),
-            'affects_availability' => $row ? $row->affects_availability : (bool) ($defintion->defaults()['affects_availability'] ?? false),
+            'affects_availability' => $row ? $row->affects_availability : $definition->defaultAffectsAvailability(),
             'secret' => $secret,
             'secret_form_data' => collect($schema)->mapWithKeys(fn (array $field, string $key): array => [
                 $key => $canUnmaskSecrets ? (string) data_get($secret?->data, $key, '') : '',
@@ -134,14 +132,25 @@ class EditPollingController
             device: $device,
             type: $type,
             settings: $request->validatedSettings(),
-            secretData: $request->validatedSecretData(),
-            credentialMode: $credentialMode,
-            secretId: $secretId,
-            secretDescription: $validated['description'] ?? null,
-            secretDefault: (bool) ($validated['default'] ?? false),
             enabled: true,
-            affectsAvailability: (bool) ($definition->defaults()['affects_availability'] ?? false),
+            affectsAvailability: $definition->defaultAffectsAvailability(),
         );
+
+        if ($definition->secretDefinition() !== null) {
+            if ($credentialMode === 'existing' && $secretId !== null) {
+                $secret = $this->pollingMethodManager->resolveExistingSecret($secretId, $type);
+                $row->secret()->associate($secret)->save();
+            } else {
+                $description = $validated['description'] ?? (strtoupper($type->value) . ' ' . $device->hostname);
+                $secret = Secret::create([
+                    'secret_type' => $type->value,
+                    'description' => $description,
+                    'default' => (bool) ($validated['default'] ?? false),
+                    'data' => $request->validatedSecretData(),
+                ]);
+                $row->secret()->associate($secret)->save();
+            }
+        }
 
         if ($type === PollingMethodType::Snmp && isset($row->settings['port_association_mode'])) {
             $device->port_association_mode = PortAssociationMode::getId($row->settings['port_association_mode']) ?? 1;
@@ -171,7 +180,6 @@ class EditPollingController
         $validated = $request->validated();
 
         $secretId = null;
-        $secretUpdateMode = null;
         if (PollingMethodDefinition::hasSecret($type) && array_key_exists('secret_id', $validated)) {
             $this->authorize('update', Secret::class);
             $secretId = (int) $validated['secret_id'];
@@ -182,20 +190,38 @@ class EditPollingController
             }
         } elseif (PollingMethodDefinition::hasSecret($type) && $request->has('secret_data')) {
             $this->authorize('update', Secret::class);
-            $secretUpdateMode = $validated['secret_update_mode'] ?? 'update';
         }
 
         $pollingMethod->setRelation('device', $device);
 
-        $pollingMethod = $this->pollingMethodManager->update(
-            method: $pollingMethod,
+        $pollingMethod = $this->pollingMethodManager->save(
+            device: $device,
+            type: $type,
             settings: $validated['settings'] ?? [],
-            secretData: $request->validatedSecretData(),
-            secretUpdateMode: $secretUpdateMode,
-            secretId: $secretId,
             enabled: (bool) ($validated['enabled'] ?? true),
             affectsAvailability: (bool) ($validated['affects_availability'] ?? false),
         );
+
+        if (PollingMethodDefinition::hasSecret($type)) {
+            if ($secretId !== null) {
+                $secret = $this->pollingMethodManager->resolveExistingSecret($secretId, $type);
+                $pollingMethod->secret()->associate($secret)->save();
+            } elseif ($request->has('secret_data')) {
+                $secretData = $request->validatedSecretData();
+                $mode = $validated['secret_update_mode'] ?? 'update';
+                if (! $pollingMethod->secret || $mode === 'create') {
+                    $secret = Secret::create([
+                        'secret_type' => $type->value,
+                        'description' => 'Custom ' . strtoupper($type->value),
+                        'default' => false,
+                        'data' => $secretData,
+                    ]);
+                    $pollingMethod->secret()->associate($secret)->save();
+                } else {
+                    $pollingMethod->secret->update(['data' => $secretData]);
+                }
+            }
+        }
 
         if ($type === PollingMethodType::Snmp && isset($pollingMethod->settings['port_association_mode'])) {
             $device->port_association_mode = PortAssociationMode::getId($pollingMethod->settings['port_association_mode']) ?? 1;

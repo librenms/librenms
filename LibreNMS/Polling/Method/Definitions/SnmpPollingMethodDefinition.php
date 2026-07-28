@@ -1,43 +1,22 @@
 <?php
 
-/**
- * SnmpPollingMethodDefinition.php
- *
- * -Description-
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- * @link       https://www.librenms.org
- *
- * @copyright  2026 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
- */
-
 namespace LibreNMS\Polling\Method\Definitions;
 
 use App\Facades\LibrenmsConfig;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PortAssociationMode;
-use LibreNMS\Polling\Method\AbstractPollingMethodDefinition;
+use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
 use LibreNMS\Polling\Method\SnmpPollingMethod;
 use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
+use LibreNMS\Traits\HandlesFieldSchema;
 
 /**
- * @extends AbstractPollingMethodDefinition<SnmpPollingMethod>
+ * @implements PollingMethodDefinitionInterface<SnmpPollingMethod>
  */
-class SnmpPollingMethodDefinition extends AbstractPollingMethodDefinition
+class SnmpPollingMethodDefinition implements PollingMethodDefinitionInterface
 {
+    use HandlesFieldSchema;
+
     /**
      * @inheritDoc
      */
@@ -52,21 +31,27 @@ class SnmpPollingMethodDefinition extends AbstractPollingMethodDefinition
                     'udp6' => 'UDP6',
                     'tcp6' => 'TCP6',
                 ],
+                'default' => 'udp',
             ],
             'port' => [
                 'type' => 'number',
+                'default' => 161,
             ],
             'timeout' => [
                 'type' => 'number',
+                'default' => 3,
             ],
             'retries' => [
                 'type' => 'number',
+                'default' => 1,
             ],
             'max_repeaters' => [
                 'type' => 'number',
+                'default' => 0,
             ],
             'max_oid' => [
                 'type' => 'number',
+                'default' => 10,
             ],
             'port_association_mode' => [
                 'type' => 'select',
@@ -76,21 +61,9 @@ class SnmpPollingMethodDefinition extends AbstractPollingMethodDefinition
         ];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function defaults(): array
+    public function defaultAffectsAvailability(): bool
     {
-        return [
-            'affects_availability' => true,
-            'transport' => 'default',
-            'port' => 161,
-            'timeout' => 3,
-            'retries' => 1,
-            'max_repeaters' => 0,
-            'max_oid' => 10,
-            'port_association_mode' => LibrenmsConfig::get('default_port_association_mode', 'ifIndex'),
-        ];
+        return true;
     }
 
     /**
@@ -100,12 +73,12 @@ class SnmpPollingMethodDefinition extends AbstractPollingMethodDefinition
     {
         return [
             'transport' => ['required', 'string', 'in:udp,tcp,udp6,tcp6'],
-            'port' => ['nullable', 'integer', 'min:1', 'max:65535'],
-            'timeout' => ['nullable', 'integer', 'min:1', 'max:60'],
-            'retries' => ['nullable', 'integer', 'min:0', 'max:10'],
-            'max_repeaters' => ['nullable', 'integer', 'min:0', 'max:30'],
-            'max_oid' => ['nullable', 'integer', 'min:1', 'max:100'],
-            'port_association_mode' => ['nullable', 'string', Rule::in(PortAssociationMode::getModes())],
+            'port' => ['required', 'integer', 'min:1', 'max:65535'],
+            'timeout' => ['required', 'integer', 'min:1', 'max:60'],
+            'retries' => ['required', 'integer', 'min:0', 'max:10'],
+            'max_repeaters' => ['required', 'integer', 'min:0', 'max:30'],
+            'max_oid' => ['required', 'integer', 'min:1', 'max:100'],
+            'port_association_mode' => ['required', 'string', Rule::in(PortAssociationMode::getModes())],
         ];
     }
 
