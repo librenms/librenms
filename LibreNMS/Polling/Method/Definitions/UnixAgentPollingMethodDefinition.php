@@ -26,13 +26,13 @@
 
 namespace LibreNMS\Polling\Method\Definitions;
 
-use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
+use LibreNMS\Polling\Method\AbstractPollingMethodDefinition;
 use LibreNMS\Polling\Method\UnixAgentPollingMethod;
 
 /**
- * @implements PollingMethodDefinitionInterface<UnixAgentPollingMethod>
+ * @extends AbstractPollingMethodDefinition<UnixAgentPollingMethod>
  */
-class UnixAgentPollingMethodDefinition implements PollingMethodDefinitionInterface
+class UnixAgentPollingMethodDefinition extends AbstractPollingMethodDefinition
 {
     /**
      * @inheritDoc

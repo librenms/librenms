@@ -44,6 +44,15 @@ interface PollingMethodDefinitionInterface extends HasFieldSchema
     public function class(): string;
 
     /**
+     * Resolve settings by combining schema/definition defaults, existing settings, and new input values, filtering allowed schema keys.
+     *
+     * @param  array<string, mixed>  $input
+     * @param  array<string, mixed>  $existing
+     * @return array<string, mixed>
+     */
+    public function resolveSettings(array $input, array $existing = []): array;
+
+    /**
      * @return SecretDefinitionInterface<SecretData>|null
      */
     public function secretDefinition(): ?SecretDefinitionInterface;

@@ -19,14 +19,14 @@ use Illuminate\View\View;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Polling\Method\PollingMethodDefinition;
-use LibreNMS\Polling\Secrets\SecretService;
+use LibreNMS\Polling\Method\PollingMethodManager;
 
 class EditPollingController
 {
     use AuthorizesRequests;
 
     public function __construct(
-        private readonly SecretService $secretService,
+        private readonly PollingMethodManager $pollingMethodManager = new PollingMethodManager,
     ) {
     }
 
@@ -118,31 +118,30 @@ class EditPollingController
         $type = $request->pollingType() ?? PollingMethodType::from($validated['method_type']);
         $definition = PollingMethodDefinition::for($type);
 
-        $secret = null;
         if ($definition->secretDefinition() !== null) {
             $this->authorize('create', Secret::class);
-            $secret = ($validated['credential_mode'] ?? 'existing') === 'existing'
-                ? $this->resolveExistingSecret($validated['secret_id'] ?? null, $type)
-                : $this->secretService->create(
-                    $type,
-                    $request->validatedSecretData(),
-                    [
-                        'description' => $validated['description'] ?: strtoupper($type->value) . ' ' . $request->user()?->user_id,
-                        'default' => (bool) ($validated['default'] ?? false),
-                    ]
-                );
         }
 
-        $row = new DevicePollingMethod([
-            'device_id' => $device->device_id,
-            'method_type' => $type,
-            'enabled' => true,
-            'affects_availability' => (bool) ($definition->defaults()['affects_availability'] ?? false),
-            'secret_id' => $secret?->id,
-            'settings' => $this->buildSettings($definition, $request->validatedSettings()),
-        ]);
+        $credentialMode = $validated['credential_mode'] ?? 'existing';
+        $secretId = isset($validated['secret_id']) ? (int) $validated['secret_id'] : null;
+        if ($definition->secretDefinition() !== null && $credentialMode === 'existing' && ! $secretId) {
+            throw ValidationException::withMessages([
+                'secret_id' => __('poller.select_credential'),
+            ]);
+        }
 
-        $device->pollingMethods()->save($row);
+        $row = $this->pollingMethodManager->save(
+            device: $device,
+            type: $type,
+            settings: $request->validatedSettings(),
+            secretData: $request->validatedSecretData(),
+            credentialMode: $credentialMode,
+            secretId: $secretId,
+            secretDescription: $validated['description'] ?? null,
+            secretDefault: (bool) ($validated['default'] ?? false),
+            enabled: true,
+            affectsAvailability: (bool) ($definition->defaults()['affects_availability'] ?? false),
+        );
 
         if ($type === PollingMethodType::Snmp && isset($row->settings['port_association_mode'])) {
             $device->port_association_mode = PortAssociationMode::getId($row->settings['port_association_mode']) ?? 1;
@@ -152,47 +151,6 @@ class EditPollingController
         $toast->success(__('poller.method_added'));
 
         return redirect()->route('device.edit.polling', ['device' => $device, 'tab' => $type->value]);
-    }
-
-    /**
-     * @throws ValidationException
-     */
-    private function resolveExistingSecret(?int $secretId, PollingMethodType $type): Secret
-    {
-        if (! $secretId) {
-            throw ValidationException::withMessages([
-                'secret_id' => __('poller.select_credential'),
-            ]);
-        }
-
-        return $this->secretService->resolveExisting($secretId, $type);
-    }
-
-    // ---- Private helpers ----
-
-    /**
-     * @param  \LibreNMS\Interfaces\PollingMethodDefinitionInterface<\LibreNMS\Interfaces\PollingMethodInterface>  $definition
-     * @param  array<string, mixed>  $validated
-     * @return array<string, mixed>
-     */
-    private function buildSettings(\LibreNMS\Interfaces\PollingMethodDefinitionInterface $definition, array $validated): array
-    {
-        /** @var array<string, array{default?: mixed, options?: array<string, string>}> $settingsSchema */
-        $settingsSchema = $definition->schema();
-        $schemaDefaults = collect($settingsSchema)
-            ->mapWithKeys(fn (array $field, string $key): array => [
-                $key => $field['default'] ?? (isset($field['options']) ? array_key_first($field['options']) : null),
-            ])
-            ->filter();
-
-        /** @var array<string, mixed> $defaults */
-        $defaults = $definition->defaults();
-
-        return array_merge(
-            $schemaDefaults->all(),
-            collect($defaults)->except('affects_availability')->all(),
-            $validated
-        );
     }
 
     /**
@@ -212,27 +170,32 @@ class EditPollingController
         $pollingMethod = $device->pollingMethods()->where('method_type', $type->value)->firstOrFail();
         $validated = $request->validated();
 
+        $secretId = null;
+        $secretUpdateMode = null;
         if (PollingMethodDefinition::hasSecret($type) && array_key_exists('secret_id', $validated)) {
             $this->authorize('update', Secret::class);
-            $pollingMethod->secret_id = $this->resolveExistingSecret((int) $validated['secret_id'], $type)->id;
+            $secretId = (int) $validated['secret_id'];
+            if (! $secretId) {
+                throw ValidationException::withMessages([
+                    'secret_id' => __('poller.select_credential'),
+                ]);
+            }
         } elseif (PollingMethodDefinition::hasSecret($type) && $request->has('secret_data')) {
             $this->authorize('update', Secret::class);
-            $mode = $validated['secret_update_mode'] ?? 'update';
-            $pollingMethod->secret_id = $this->secretService->updateOrCreate(
-                $pollingMethod,
-                $type,
-                $request->validatedSecretData(),
-                $mode
-            )->id;
+            $secretUpdateMode = $validated['secret_update_mode'] ?? 'update';
         }
 
         $pollingMethod->setRelation('device', $device);
 
-        $pollingMethod->enabled = (bool) ($validated['enabled'] ?? true);
-        $pollingMethod->affects_availability = (bool) ($validated['affects_availability'] ?? false);
-        $pollingMethod->settings = $this->mergeSettings($pollingMethod->settings ?? [], $validated['settings'] ?? [], PollingMethodDefinition::for($type));
-
-        $pollingMethod->save();
+        $pollingMethod = $this->pollingMethodManager->update(
+            method: $pollingMethod,
+            settings: $validated['settings'] ?? [],
+            secretData: $request->validatedSecretData(),
+            secretUpdateMode: $secretUpdateMode,
+            secretId: $secretId,
+            enabled: (bool) ($validated['enabled'] ?? true),
+            affectsAvailability: (bool) ($validated['affects_availability'] ?? false),
+        );
 
         if ($type === PollingMethodType::Snmp && isset($pollingMethod->settings['port_association_mode'])) {
             $device->port_association_mode = PortAssociationMode::getId($pollingMethod->settings['port_association_mode']) ?? 1;
@@ -244,24 +207,6 @@ class EditPollingController
         $toast->success(__('poller.method_updated'));
 
         return redirect()->route('device.edit.polling', ['device' => $device, 'tab' => $type->value]);
-    }
-
-    /**
-     * @param  array<string, mixed>  $existing
-     * @param  array<string, mixed>  $validated
-     * @param  \LibreNMS\Interfaces\PollingMethodDefinitionInterface<\LibreNMS\Interfaces\PollingMethodInterface>  $definition
-     * @return array<string, mixed>
-     */
-    private function mergeSettings(array $existing, array $validated, \LibreNMS\Interfaces\PollingMethodDefinitionInterface $definition): array
-    {
-        /** @var array<string, array<string, mixed>> $settingsSchema */
-        $settingsSchema = $definition->schema();
-        $allowed = collect($settingsSchema)->keys();
-
-        return array_merge(
-            $existing,
-            collect($validated)->only($allowed)->all()
-        );
     }
 
     /**

@@ -26,13 +26,13 @@
 
 namespace LibreNMS\Polling\Method\Definitions;
 
-use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
+use LibreNMS\Polling\Method\AbstractPollingMethodDefinition;
 use LibreNMS\Polling\Method\IcmpPollingMethod;
 
 /**
- * @implements PollingMethodDefinitionInterface<IcmpPollingMethod>
+ * @extends AbstractPollingMethodDefinition<IcmpPollingMethod>
  */
-class IcmpPollingMethodDefinition implements PollingMethodDefinitionInterface
+class IcmpPollingMethodDefinition extends AbstractPollingMethodDefinition
 {
     /**
      * @inheritDoc
