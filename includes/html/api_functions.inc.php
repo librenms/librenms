@@ -460,14 +460,11 @@ function add_device(Illuminate\Http\Request $request)
             $device->snmp_disable = 0;
         }
 
-        $pollingMethods = (new \App\Actions\Device\BuildDefaultPollingMethods())->execute($device, $data);
-        $device->setRelation('pollingMethods', $pollingMethods);
-
         if ($force_add && empty($data['snmp_disable']) && ! $device->hasSnmpInfo()) {
             return api_error(400, 'SNMP information is required when force adding a device');
         }
 
-        (new ValidateDeviceAndCreate($device, $force_add, ! empty($data['ping_fallback'])))->execute();
+        (new ValidateDeviceAndCreate($device, $force_add, ! empty($data['ping_fallback']), $data))->execute();
     } catch (\LibreNMS\Exceptions\HostExistsException|\LibreNMS\Exceptions\HostUnreachableException|\LibreNMS\Exceptions\SnmpVersionUnsupportedException $e) {
         return api_error(500, $e->getMessage());
     } catch (Exception $e) {
