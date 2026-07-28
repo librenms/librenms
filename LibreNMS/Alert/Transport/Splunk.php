@@ -60,7 +60,7 @@ class Splunk extends Transport
             $splunk_prefix .= $key . '="' . $val . '", ';
         }
 
-        $ignore = ['attribs', 'community', 'authlevel', 'authname', 'authpass', 'authalgo', 'cryptopass', 'cryptoalgo', 'snmpver', 'port'];
+        $ignore = ['attribs'];
         foreach ($device->except($ignore) as $key => $val) {
             $str_val = is_bool($val) ? (int) $val : (string) $val;
             $splunk_prefix .= 'device_' . $key . '="' . $str_val . '", ';
