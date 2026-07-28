@@ -50,11 +50,9 @@ Route::prefix('v0')->group(function (): void {
     });
 
     // Oxidized
-    Route::middleware(['can:showConfig,App\Models\Device'])->group(function (): void {
-        Route::get('oxidized/{hostname?}', [App\Api\Controllers\LegacyApiController::class, 'list_oxidized'])->name('list_oxidized');
-        Route::get('oxidized/config/search/{searchstring}', [App\Api\Controllers\LegacyApiController::class, 'search_oxidized'])->name('search_oxidized');
-        Route::get('oxidized/config/{device_name}', [App\Api\Controllers\LegacyApiController::class, 'get_oxidized_config'])->name('get_oxidized_config');
-    });
+    Route::get('oxidized/{hostname?}', [App\Api\Controllers\LegacyApiController::class, 'list_oxidized'])->middleware(['can:oxidized.list'])->name('list_oxidized');
+    Route::get('oxidized/config/search/{searchstring}', [App\Api\Controllers\LegacyApiController::class, 'search_oxidized'])->middleware(['can:oxidized.search'])->name('search_oxidized');
+    Route::get('oxidized/config/{device_name}', [App\Api\Controllers\LegacyApiController::class, 'get_oxidized_config'])->middleware(['can:viewAny,App\Models\Device'])->name('get_oxidized_config');
 
     // Device Groups
     Route::middleware(['can:viewAny,App\Models\DeviceGroup'])->group(function (): void {
