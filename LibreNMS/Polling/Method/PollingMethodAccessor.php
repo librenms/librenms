@@ -3,39 +3,14 @@
 namespace LibreNMS\Polling\Method;
 
 use App\Models\Device;
-use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\PollingMethodInterface;
 
-readonly class PollingMethodRepository
+readonly class PollingMethodAccessor
 {
     public function __construct(
         private Device $device,
-        private PollingMethodManager $manager = new PollingMethodManager,
     ) {
-    }
-
-    /**
-     * Create or update a polling method row (and its associated Secret, if applicable).
-     * Delegates all type-specific logic to PollingMethodManager.
-     *
-     * @param  array<string, mixed>  $settings  Non-sensitive per-device settings (merged with existing).
-     * @param  array<string, mixed>  $secretData  Credential fields (ignored for methods without a secret).
-     */
-    public function save(PollingMethodType $type, array $settings = [], array $secretData = [], bool $enabled = true, bool $affectsAvailability = false): DevicePollingMethod
-    {
-        return $this->manager->save(
-            $this->device,
-            $type,
-            $settings,
-            $secretData,
-            'default',
-            null,
-            null,
-            false,
-            $enabled,
-            $affectsAvailability
-        );
     }
 
     /**

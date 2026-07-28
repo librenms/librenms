@@ -61,7 +61,6 @@ use LibreNMS\Alert\AlertData;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Billing;
 use LibreNMS\Enum\MaintenanceBehavior;
-use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidTableColumnException;
@@ -451,16 +450,6 @@ function add_device(Illuminate\Http\Request $request)
             $device->location_id = \App\Models\Location::firstOrCreate(['location' => $data['location']])->id;
         }
 
-        $manager = new \LibreNMS\Polling\Method\PollingMethodManager;
-        $pollingMethods = collect();
-
-        // ICMP polling method is always added
-        $pollingMethods->push($manager->build(
-            PollingMethodType::Icmp,
-            affectsAvailability: false,
-            device: $device,
-        ));
-
         $force_add = ! empty($data['force_add']);
 
         if (! empty($data['snmp_disable'])) {
@@ -470,39 +459,9 @@ function add_device(Illuminate\Http\Request $request)
             $device->snmp_disable = 1;
         } else {
             $device->snmp_disable = 0;
-            // SNMP polling method is added if not snmp_disable
-            $snmpver = $data['snmpver'] ?? $data['version'] ?? null;
-            $community = $data['community'] ?? null;
-            $authlevel = $data['authlevel'] ?? null;
-            $authname = $data['authname'] ?? null;
-            $authpass = $data['authpass'] ?? null;
-            $authalgo = $data['authalgo'] ?? null;
-            $cryptopass = $data['cryptopass'] ?? null;
-            $cryptoalgo = $data['cryptoalgo'] ?? null;
-
-            $snmpData = [];
-            if ($snmpver || $community || $authlevel || $authname || $authpass || $authalgo || $cryptopass || $cryptoalgo) {
-                $snmpData = [
-                    'version' => $snmpver ?: 'v2c',
-                    'community' => $community,
-                    'authlevel' => $authlevel ?: 'noAuthNoPriv',
-                    'authname' => $authname,
-                    'authpass' => $authpass,
-                    'authalgo' => $authalgo ?: 'SHA',
-                    'cryptopass' => $cryptopass,
-                    'cryptoalgo' => $cryptoalgo ?: 'AES',
-                ];
-            }
-
-            $pollingMethods->push($manager->build(
-                PollingMethodType::Snmp,
-                secretData: $snmpData,
-                credentialMode: ! empty($snmpData) ? 'new' : 'default',
-                affectsAvailability: true,
-                device: $device,
-            ));
         }
 
+        $pollingMethods = (new \App\Actions\Device\BuildDefaultPollingMethods())->execute($device, $data);
         $device->setRelation('pollingMethods', $pollingMethods);
 
         if ($force_add && empty($data['snmp_disable']) && ! $device->hasSnmpInfo()) {
