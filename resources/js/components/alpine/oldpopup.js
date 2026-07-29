@@ -19,6 +19,7 @@ export default function popup(url = "", options = {}) {
                 if (typeof Popper !== 'undefined') {
                     this.popperInstance = new Popper(this.$refs.targetRef, this.$refs.popupRef, {
                         placement: options.placement || 'bottom',
+                        positionFixed: true,
                         modifiers: {
                             offset: {
                                 offset: '0, 8'
