@@ -125,7 +125,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      */
     public function context(string $context, ?string $v3_prefix = null): SnmpQueryInterface
     {
-        if ($context && $this->device->snmpver === 'v3') {
+        if ($context && $this->device->pollingMethodFor()->snmp()->version === 'v3') {
             $context = $v3_prefix . $context;
         }
 

@@ -49,7 +49,8 @@ class Dns implements Geocoder
 
         $addresses = app(self::class)->getAddresses($device->hostname);
 
-        if ($device->transport == 'udp6' || $device->transport == 'tcp6') {
+        $transport = $device->pollingMethodFor()->snmp()->transport;
+        if ($transport == 'udp6' || $transport == 'tcp6') {
             foreach ($addresses as $address) {
                 if (IPv6::isValid($address)) {
                     return $address;

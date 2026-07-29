@@ -21,6 +21,11 @@ interface PollingMethodDefinitionInterface extends HasFieldSchema
     public function class(): string;
 
     /**
+     * Create a fresh probe instance for this polling method.
+     */
+    public function probe(): PollingMethodProbeInterface;
+
+    /**
      * Default affects_availability flag for this method type.
      */
     public function defaultAffectsAvailability(): bool;
