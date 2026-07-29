@@ -22,7 +22,7 @@ class IpmiPollingMethodDefinition implements PollingMethodDefinitionInterface
     {
         return [
             'hostname' => FieldDefinition::make('hostname', 'text')
-                ->placeholder('Default: dcallable|nullevice\'s hostname')
+                ->placeholder('Default: device\'s hostname')
                 ->rules(['required', 'string']),
 
             'port' => FieldDefinition::make('port', 'number')
