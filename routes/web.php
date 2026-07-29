@@ -97,7 +97,9 @@ Route::get('graph/{path?}', GraphController::class)
 Route::middleware(['auth'])->group(function (): void {
     // pages
     Route::post('alert/{alert}/ack', [AlertController::class, 'ack'])->name('alert.ack');
-    Route::get('devices/{view?}/{graph?}/{vars?}', [DevicesController::class, 'index'])->where('vars', '.*')->name('devices');
+    Route::get('devices/{view?}/{graph?}/{vars?}', [DevicesController::class, 'index'])->where('vars', '.*')
+        ->middleware(['saved-filter:devices'])
+        ->name('devices');
     Route::resource('device-groups', DeviceGroupController::class);
     Route::get('graphs/{path?}', GraphsPageController::class)->where('path', '.*')->name('graphs');
     Route::any('inventory', App\Http\Controllers\InventoryController::class)->name('inventory');
@@ -193,12 +195,11 @@ Route::middleware(['auth'])->group(function (): void {
     });
 
     // fallback device routes
-    Route::match(['get', 'post'], 'device/{device}/{tab}/{vars}', [DeviceController::class, 'index'])
-        ->middleware('saved-filter:device.port-security')
-        ->where(['tab' => 'ports', 'vars' => 'portsecurity'])
-        ->name('device.port-security');
     Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', [DeviceController::class, 'index'])
-        ->middleware('saved-filter:device.ports') // FIXME more specific route
+        ->middleware([
+            'saved-filter:device.port-security,*/ports/portsecurity',
+            'saved-filter:device.ports,*/ports|*/ports/basic|*/ports/detail',
+        ])
         ->name('device')->where('vars', '.*');
 
     // Maps
