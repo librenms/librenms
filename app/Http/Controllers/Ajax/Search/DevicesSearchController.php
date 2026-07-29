@@ -36,16 +36,12 @@ class DevicesSearchController extends GroupedSearchController
                 ->orWhereRelation('ports.ipv6', 'ipv6_compressed', 'like', $like)
                 ->orWhereRelation('ports', 'ifPhysAddress', 'like', '%' . $mac . '%')
                 ->orWhere('overwrite_ip', 'like', $like);
-
-            if (\LibreNMS\Util\IPv6::isValid($search, false)) {
-                $query->orWhere('ip', '=', inet_pton($search));
-            }
         } elseif (ctype_xdigit($mac)) {
             $query->orWhereRelation('ports', 'ifPhysAddress', 'like', '%' . $mac . '%');
         }
 
         // A MAC-style search (with or without separators) can also match FDB entries
-        if (ctype_xdigit($mac)) {
+        if (LibrenmsConfig::get('webui.global_search_device_fdb') && ctype_xdigit($mac)) {
             $query->orWhereRelation('portsFdb', 'mac_address', 'like', '%' . $mac . '%');
         }
 

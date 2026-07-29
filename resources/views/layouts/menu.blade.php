@@ -863,8 +863,9 @@
                 route('ajax.search.ports'),
                 route('ajax.search.health'),
                 route('ajax.search.routing'),
+                route('ajax.search.logs'),
             ]),
-            order: ['devices', 'ports', 'sensors', 'wireless', 'storage', 'mempools', 'processors', 'bgp'],
+            order: ['devices', 'ports', 'sensors', 'wireless', 'storage', 'mempools', 'processors', 'bgp', 'eventlog'],
             run() {
                 let q = this.query.trim();
                 if (q === '') { this.reset(); return; }
