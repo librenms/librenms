@@ -17,16 +17,10 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Polling\Method\PollingMethodDefinition;
-use LibreNMS\Polling\Method\PollingMethodManager;
 
 class AddDeviceController
 {
     use AuthorizesRequests;
-
-    public function __construct(
-        private readonly PollingMethodManager $pollingMethodManager = new PollingMethodManager,
-    ) {
-    }
 
     public function index(Request $request): View
     {
@@ -88,20 +82,20 @@ class AddDeviceController
 
         if (isset($rawMethods['snmp']['settings'])) {
             $settings = $rawMethods['snmp']['settings'];
-            $device->port = (int) ($settings['port'] ?? LibrenmsConfig::get('snmp.port', 161));
-            $device->transport = $settings['transport'] ?? LibrenmsConfig::get('snmp.transports.0', 'udp');
+            $device->setAttribute('port', (int) ($settings['port'] ?? LibrenmsConfig::get('snmp.port', 161)));
+            $device->setAttribute('transport', $settings['transport'] ?? LibrenmsConfig::get('snmp.transports.0', 'udp'));
             if (isset($settings['port_association_mode'])) {
                 $device->port_association_mode = PortAssociationMode::getId($settings['port_association_mode']) ?? 1;
             }
         }
 
         if (! $snmpActive) {
-            $device->snmp_disable = true;
+            $device->setAttribute('snmp_disable', true);
             $device->os = $validated['os'] ?: 'ping';
             $device->sysName = $validated['sysName'] ?: '';
             $device->hardware = $validated['hardware'] ?: '';
         } else {
-            $device->snmp_disable = false;
+            $device->setAttribute('snmp_disable', false);
         }
 
         // Per-method validate flags: validate if *any* active method requests it.
