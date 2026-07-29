@@ -86,7 +86,7 @@ class EditPollingController
             'settings_defaults' => $settingsDefaults,
             'settings' => array_merge(
                 $settingsDefaults,
-                $row?->settings ?? [],
+                $row->settings ?? [],
                 $type === PollingMethodType::Snmp ? ['port_association_mode' => PortAssociationMode::getName($device->port_association_mode) ?? LibrenmsConfig::get('default_port_association_mode', 'ifIndex')] : []
             ),
             'affects_availability' => $row ? $row->affects_availability : $definition->defaultAffectsAvailability(),
