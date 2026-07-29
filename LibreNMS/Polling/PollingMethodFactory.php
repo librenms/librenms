@@ -3,18 +3,15 @@
 namespace LibreNMS\Polling;
 
 use App\Models\DevicePollingMethod;
-use LibreNMS\Interfaces\PollingMethodInterface;
-use LibreNMS\Polling\Method\PollingMethodDefinition;
+use LibreNMS\Interfaces\PollingMethodConfigInterface;
 
 class PollingMethodFactory
 {
-    public function make(DevicePollingMethod $method): PollingMethodInterface
+    public function make(DevicePollingMethod $method): PollingMethodConfigInterface
     {
-        $class = PollingMethodDefinition::for($method->method_type)->class();
+        /** @var class-string<PollingMethodConfigInterface> $class */
+        $class = $method->method_type->definition()->class();
 
-        /** @var PollingMethodInterface $instance */
-        $instance = $class::fromModel($method);
-
-        return $instance;
+        return $class::fromModel($method);
     }
 }

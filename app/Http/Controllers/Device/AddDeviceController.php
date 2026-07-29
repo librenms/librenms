@@ -16,7 +16,6 @@ use Illuminate\Http\Request;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostUnreachableException;
-use LibreNMS\Polling\Method\PollingMethodDefinition;
 
 class AddDeviceController
 {
@@ -27,18 +26,17 @@ class AddDeviceController
         $this->authorize('create', Device::class);
 
         $availableMethods = collect(PollingMethodType::cases())->map(function (PollingMethodType $type): array {
-            $definition = PollingMethodDefinition::for($type);
-            $schema = $definition->secretDefinition()?->schema() ?? [];
-            $schemaFields = PollingMethodDefinition::buildSchemaFields($schema, "methods['" . $type->value . "'].formData");
-            $settingsSchema = $definition->schema();
+            $definition = $type->definition();
+            $secretDefinition = $definition->secretDefinition();
+            $schemaFields = $secretDefinition ? $secretDefinition->buildSchemaFields(dataVar: "methods['" . $type->value . "'].formData") : [];
 
             return [
                 'type' => $type->value,
                 'label' => __('poller.methods.' . $type->value),
                 'icon' => $definition->icon(),
                 'schema_fields' => $schemaFields,
-                'schema_defaults' => $definition->secretDefinition()?->schemaDefaults() ?? [],
-                'settings_fields' => PollingMethodDefinition::buildSchemaFields($settingsSchema, "methods['" . $type->value . "'].settingsData"),
+                'schema_defaults' => $secretDefinition?->schemaDefaults() ?? [],
+                'settings_fields' => $definition->buildSchemaFields(dataVar: "methods['" . $type->value . "'].settingsData"),
                 'settings_defaults' => $definition->schemaDefaults(),
             ];
         });

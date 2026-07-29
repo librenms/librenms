@@ -28,7 +28,7 @@ namespace LibreNMS\Polling\Secrets\Definitions;
 
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Interfaces\SecretDefinitionInterface;
-use LibreNMS\Polling\Secrets\IpmiSecretData;
+use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
 use LibreNMS\Traits\HandlesFieldSchema;
 
 /**

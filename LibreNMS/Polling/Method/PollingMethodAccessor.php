@@ -3,8 +3,13 @@
 namespace LibreNMS\Polling\Method;
 
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\PollingMethodInterface;
+use LibreNMS\Interfaces\PollingMethodConfigInterface;
+use LibreNMS\Polling\Method\Config\IcmpConfig;
+use LibreNMS\Polling\Method\Config\IpmiConfig;
+use LibreNMS\Polling\Method\Config\SnmpConfig;
+use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 
 readonly class PollingMethodAccessor
 {
@@ -14,33 +19,36 @@ readonly class PollingMethodAccessor
     }
 
     /**
-     * @template T of PollingMethodInterface
+     * @template T of PollingMethodConfigInterface
      *
      * @param  class-string<T>  $class
      * @return T
      */
-    private function pollingMethod(PollingMethodType $type, string $class): PollingMethodInterface
+    private function get(PollingMethodType $type, string $class): PollingMethodConfigInterface
     {
-        return $this->device->pollingMethod($type)?->toPollingMethod() ?? $class::disabled();
+        $method = $this->device->pollingMethod($type)
+            ?? DevicePollingMethod::transient($type, device: $this->device, enabled: false);
+
+        return $method->toConfig();
     }
 
-    public function snmp(): SnmpPollingMethod
+    public function snmp(): SnmpConfig
     {
-        return $this->pollingMethod(PollingMethodType::Snmp, SnmpPollingMethod::class);
+        return $this->get(PollingMethodType::Snmp, SnmpConfig::class);
     }
 
-    public function icmp(): IcmpPollingMethod
+    public function icmp(): IcmpConfig
     {
-        return $this->pollingMethod(PollingMethodType::Icmp, IcmpPollingMethod::class);
+        return $this->get(PollingMethodType::Icmp, IcmpConfig::class);
     }
 
-    public function ipmi(): IpmiPollingMethod
+    public function ipmi(): IpmiConfig
     {
-        return $this->pollingMethod(PollingMethodType::Ipmi, IpmiPollingMethod::class);
+        return $this->get(PollingMethodType::Ipmi, IpmiConfig::class);
     }
 
-    public function unixAgent(): UnixAgentPollingMethod
+    public function unixAgent(): UnixAgentConfig
     {
-        return $this->pollingMethod(PollingMethodType::UnixAgent, UnixAgentPollingMethod::class);
+        return $this->get(PollingMethodType::UnixAgent, UnixAgentConfig::class);
     }
 }

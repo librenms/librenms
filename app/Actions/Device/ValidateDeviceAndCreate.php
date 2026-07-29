@@ -40,7 +40,7 @@ use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\HostUnreachableSnmpException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
-use LibreNMS\Polling\Secrets\SnmpSecretData;
+use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 use SnmpQuery;
 
 class ValidateDeviceAndCreate
@@ -84,13 +84,13 @@ class ValidateDeviceAndCreate
 
             $icmpMethod = $this->device->pollingMethod(PollingMethodType::Icmp)
                 ?? DevicePollingMethod::transient(PollingMethodType::Icmp, device: $this->device, affectsAvailability: false);
-            if (! $icmpMethod->toPollingMethod()->isAvailable($this->device)) {
+            if (! $icmpMethod->toConfig()->isAvailable($this->device)) {
                 throw new HostUnreachablePingException($this->device->hostname);
             }
 
             $this->detectCredentials();
 
-            if (! $this->device->snmp_disable) {
+            if (! $this->device->getAttribute('snmp_disable')) {
                 $this->device->sysName = SnmpQuery::device($this->device)->get('SNMPv2-MIB::sysName.0')->value();
                 $this->exceptIfSysNameExists();
 
@@ -129,7 +129,7 @@ class ValidateDeviceAndCreate
      */
     private function detectCredentials(): void
     {
-        if ($this->device->snmp_disable) {
+        if ($this->device->getAttribute('snmp_disable')) {
             return;
         }
 
@@ -193,7 +193,7 @@ class ValidateDeviceAndCreate
                     // Set the relation temporarily for testing
                     $this->device->setRelation('pollingMethods', $otherPollingMethods->concat([$snmpMethod]));
 
-                    if ($snmpMethod->toPollingMethod()->isAvailable($this->device)) {
+                    if ($snmpMethod->toConfig()->isAvailable($this->device)) {
                         return;
                     } else {
                         $host_unreachable_exception->addReason($snmp_version, $snmpData['authname'] . '/' . $snmpData['authlevel']);
@@ -217,7 +217,7 @@ class ValidateDeviceAndCreate
                     // Set the relation temporarily for testing
                     $this->device->setRelation('pollingMethods', $otherPollingMethods->concat([$snmpMethod]));
 
-                    if ($snmpMethod->toPollingMethod()->isAvailable($this->device)) {
+                    if ($snmpMethod->toConfig()->isAvailable($this->device)) {
                         return;
                     } else {
                         $host_unreachable_exception->addReason($snmp_version, $community);
@@ -229,7 +229,7 @@ class ValidateDeviceAndCreate
         }
 
         if ($this->ping_fallback) {
-            $this->device->snmp_disable = true;
+            $this->device->setAttribute('snmp_disable', true);
             $this->device->os = 'ping';
             $this->device->setRelation('pollingMethods', $otherPollingMethods);
 
