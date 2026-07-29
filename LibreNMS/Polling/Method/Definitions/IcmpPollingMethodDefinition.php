@@ -3,11 +3,11 @@
 namespace LibreNMS\Polling\Method\Definitions;
 
 use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
-use LibreNMS\Polling\Method\IcmpPollingMethod;
+use LibreNMS\Polling\Method\Config\IcmpConfig;
 use LibreNMS\Traits\HandlesFieldSchema;
 
 /**
- * @implements PollingMethodDefinitionInterface<IcmpPollingMethod>
+ * @implements PollingMethodDefinitionInterface<IcmpConfig>
  */
 class IcmpPollingMethodDefinition implements PollingMethodDefinitionInterface
 {
@@ -47,7 +47,7 @@ class IcmpPollingMethodDefinition implements PollingMethodDefinitionInterface
      */
     public function class(): string
     {
-        return IcmpPollingMethod::class;
+        return IcmpConfig::class;
     }
 
     /**

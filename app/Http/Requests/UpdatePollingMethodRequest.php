@@ -6,7 +6,6 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Polling\Method\PollingMethodDefinition;
 
 class UpdatePollingMethodRequest extends FormRequest
 {
@@ -21,7 +20,7 @@ class UpdatePollingMethodRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $type = $this->pollingType();
-        if ($type && PollingMethodDefinition::hasSecret($type) && $this->has('secret_data')) {
+        if ($type && $type->hasSecret() && $this->has('secret_data')) {
             $device = $this->route('device');
             if ($device) {
                 $pollingMethod = $device->pollingMethods()->where('method_type', $type->value)->first();
@@ -62,7 +61,7 @@ class UpdatePollingMethodRequest extends FormRequest
             return $rules;
         }
 
-        $definition = PollingMethodDefinition::for($type);
+        $definition = $type->definition();
         $rules = [
             ...$rules,
             ...collect($definition->rules())

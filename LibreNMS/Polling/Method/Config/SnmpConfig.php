@@ -1,14 +1,14 @@
 <?php
 
-namespace LibreNMS\Polling\Method;
+namespace LibreNMS\Polling\Method\Config;
 
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\PollingMethodInterface;
+use LibreNMS\Interfaces\PollingMethodConfigInterface;
 use SnmpQuery;
 
-readonly class SnmpPollingMethod implements PollingMethodInterface
+readonly class SnmpConfig implements PollingMethodConfigInterface
 {
     public function __construct(
         public bool $enabled,
@@ -118,28 +118,5 @@ readonly class SnmpPollingMethod implements PollingMethodInterface
         }
 
         return $options;
-    }
-
-    public static function disabled(): static
-    {
-        return new static(
-            enabled: false,
-            affectsAvailability: false,
-            version: 'v2c',
-            community: null,
-            authname: null,
-            authpass: null,
-            authlevel: 'noAuthNoPriv',
-            authalgo: 'SHA',
-            cryptopass: null,
-            cryptoalgo: 'AES',
-            context: null,
-            transport: 'udp',
-            port: 161,
-            timeout: 3,
-            retries: 1,
-            maxRepeaters: 0,
-            maxOid: 10,
-        );
     }
 }

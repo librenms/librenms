@@ -16,7 +16,7 @@ readonly class CheckDeviceAvailability
         $enabledPollingMethods = $device->pollingMethods->filter(fn ($m) => $m->enabled);
 
         foreach ($enabledPollingMethods as $method) {
-            $method->last_check_successful = $method->toPollingMethod()->isAvailable($device, $commit);
+            $method->last_check_successful = $method->toConfig()->isAvailable($device, $commit);
             $method->last_checked_at = now();
         }
 
