@@ -25,10 +25,10 @@ Prism.languages["network-config"] = {
         /\b(?:[a-f\d]{0,4}:){2,7}[a-f\d]{0,4}(?:\/\d{1,3})?\b/i,
         /\b(?:\d{1,3}\.){3}\d{1,3}(?:\/\d{1,2})?\b/,
         /\b(?:[a-f\d]{2}:){5}[a-f\d]{2}\b/i,
-        /\b(?:Gi|Fa|Te|Eth|Hu|Po|Vl|Lo|Tu|Se)\S*/i,
+        /\b(?:Gi|Fa|Te|Eth|Hu|Po|Vl|Lo|Tu|Se)[\w./:-]*\d[\w./:-]*\b/i,
     ],
     boolean: /\b(?:enable|disable|enabled|disabled|permit|deny|accept|reject|allow|drop|yes|no|true|false|up|down)\b/i,
-    keyword: /\b(?:interface|hostname|router|route|routing|network|address|gateway|vlan|vrf|policy|firewall|filter|access-list|prefix-list|community|neighbor|protocol|service|user|group|snmp|ntp|logging|authentication|authorization|accounting|certificate|crypto|ssh|set|delete|edit|config|commit|exit|end)\b/i,
+    keyword: /\b(?:set|delete|edit|commit|exit|end)\b/i,
     number: /\b(?:0x[\da-f]+|\d+(?:\.\d+)?)\b/i,
     operator: /(?:->|=>|==|!=|<=|>=|[=<>])/,
     punctuation: /[{}\[\](),:]/,
@@ -44,6 +44,14 @@ Prism.languages["cisco-config"] = Prism.languages.extend("network-config", {
         alias: "keyword",
     },
     keyword: /\b(?:aaa|access-class|access-group|access-list|banner|boot|class-map|clock|control-plane|crypto|default|description|enable|end|exec|hostname|interface|ip|ipv6|line|logging|mac-address-table|match|monitor|mpls|network|no|ntp|object-group|policy-map|port-channel|privilege|router|service|snmp-server|spanning-tree|switchport|username|version|vlan|vrf)\b/i,
+});
+
+Prism.languages["comware-config"] = Prism.languages.extend("network-config", {
+    important: {
+        pattern: /^(?:return|system-view)$/m,
+        alias: "keyword",
+    },
+    keyword: /\b(?:acl|bgp|description|display|interface|ip|ipv6|isis|lldp|local-user|ntp-service|ospf|port|quit|radius|rip|save|shutdown|snmp-agent|ssh|stp|undo|user-interface|vlan)\b/i,
 });
 
 Prism.languages["junos-config"] = Prism.languages.extend("network-config", {
@@ -76,10 +84,21 @@ Prism.languages["fortios-config"] = Prism.languages.extend("network-config", {
 
 Prism.languages["routeros-config"] = Prism.languages.extend("network-config", {
     function: {
-        pattern: /(^|\s)\/[a-z][\w/-]*/im,
+        pattern: /(^[ \t]*)\/[a-z][\w-]*(?:[ \t]+[a-z][\w-]*)*/im,
         lookbehind: true,
     },
-    keyword: /\b(?:add|comment|disable|edit|enable|export|find|get|move|print|remove|set|unset)\b/i,
+    keyword: [
+        {
+            pattern:
+                /(^[ \t]*)(?:add|disable|enable|export|get|move|print|remove|set|unset)\b/im,
+            lookbehind: true,
+        },
+        {
+            pattern: /(\[\s*)find\b/i,
+            lookbehind: true,
+        },
+    ],
+    property: /\b[a-z][\w-]*(?=\s*=)/i,
 });
 
 Prism.languages["set-config"] = Prism.languages.extend("network-config", {
@@ -95,6 +114,7 @@ const osLanguages = {
     arubaos: "cisco-config",
     "arubaos-cx": "cisco-config",
     asa: "cisco-config",
+    comware: "comware-config",
     dnos: "cisco-config",
     edgeos: "set-config",
     fortigate: "fortios-config",

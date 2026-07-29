@@ -20,7 +20,7 @@
     "src": "html/fonts/glyphicons-halflings-regular.woff2"
   },
   "resources/js/app.js": {
-    "file": "assets/app-CEHbeiKC.js",
+    "file": "assets/app--JnCrmox.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -39,7 +39,7 @@
     ]
   },
   "resources/js/configHighlight.js": {
-    "file": "assets/configHighlight-DS0sFUzu.js",
+    "file": "assets/configHighlight-Nw8pfPDu.js",
     "name": "configHighlight",
     "src": "resources/js/configHighlight.js",
     "isDynamicEntry": true,
