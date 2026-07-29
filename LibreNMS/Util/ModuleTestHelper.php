@@ -31,6 +31,7 @@ use App\Facades\LibrenmsConfig;
 use App\Jobs\DiscoverDevice;
 use App\Jobs\PollDevice;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -40,7 +41,6 @@ use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
-use LibreNMS\Polling\Method\PollingMethodManager;
 
 class ModuleTestHelper
 {
@@ -576,8 +576,7 @@ class ModuleTestHelper
             (new ValidateDeviceAndCreate($new_device, true))->execute();
             $device_id = $new_device->device_id;
 
-            $manager = new PollingMethodManager();
-            $method = $manager->save(
+            $method = DevicePollingMethod::saveForDevice(
                 $new_device,
                 PollingMethodType::Snmp,
                 settings: ['transport' => 'udp', 'port' => $snmpSimPort],
