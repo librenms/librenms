@@ -56,7 +56,7 @@ readonly class IpmiConfig implements PollingMethodConfigInterface
         $secretDefinition = $definition->secretDefinition();
 
         $settings = $definition->resolveValues($method->settings ?? []);
-        $secretData = $secretDefinition ? $secretDefinition->resolveValues($method->secret?->data ?? []) : [];
+        $secretData = $secretDefinition ? $secretDefinition->resolveValues($method->secret->data ?? []) : [];
 
         return new static(
             $method->enabled,
