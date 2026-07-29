@@ -96,7 +96,15 @@ if (! empty($peers)) {
                     $data['vrfId'] = $vrfId;
                     $data['peerIdType'] = $peerIdType;
                     $data['ifIndex'] = explode('.', (string) $ifFace)[4];
-                    $peer[$data['bgpPeerIdentifier']] = $data;
+                    // Unnumbered (interface-type) peers have no learned remote address
+                    // (bgpPeerRemoteAddr = "Unknown" until up), so key them by interface —
+                    // matching how discovery stores bgpPeerIdentifier for these peers.
+                    if ($peerIdType === 'interface') {
+                        $ifName = DeviceCache::getPrimary()->ports()->where('ifIndex', $data['ifIndex'])->value('ifName');
+                        $peer[$ifName ?: ('ifIndex.' . $data['ifIndex'])] = $data;
+                    } else {
+                        $peer[$data['bgpPeerRemoteAddr'] ?? $data['bgpPeerIdentifier']] = $data;
+                    }
 
                     return $peer;
                 });
