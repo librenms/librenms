@@ -188,7 +188,7 @@
                            value="{{ $isAlpineMode ? '' : $value }}"
                            class="form-control"
                            @if($modelPrefix) x-model="{{ $modelPrefix }}['{{ $key }}']" @endif
-                           @if($field['placeholder']) placeholder="{{ __($field['placeholder']) }}" @endif
+                           @if(filled($field['placeholder'])) placeholder="{{ __($field['placeholder']) }}" @endif
                            @if($field['required']) required @endif
                            data-bwignore="true"
                            data-lpignore="true"
@@ -212,7 +212,7 @@
                    value="{{ $isAlpineMode ? '' : $value }}"
                    class="form-control"
                    @if($modelPrefix) x-model="{{ $modelPrefix }}['{{ $key }}']" @endif
-                   @if($field['placeholder']) placeholder="{{ __($field['placeholder']) }}" @endif
+                   @if(filled($field['placeholder'])) placeholder="{{ __($field['placeholder']) }}" @endif
                    @if($field['required']) required @endif
                    @isset($field['min']) min="{{ $field['min'] }}" @endisset
                    @isset($field['max']) max="{{ $field['max'] }}" @endisset>
@@ -224,7 +224,7 @@
                    value="{{ $isAlpineMode ? '' : $value }}"
                    class="form-control"
                    @if($modelPrefix) x-model="{{ $modelPrefix }}['{{ $key }}']" @endif
-                   @if($field['placeholder']) placeholder="{{ __($field['placeholder']) }}" @endif
+                   @if(filled($field['placeholder'])) placeholder="{{ __($field['placeholder']) }}" @endif
                    @if($field['required']) required @endif>
         @endif
 
