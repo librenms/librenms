@@ -35,6 +35,8 @@ class OxidizedProvider implements ConfigBackupProvider
     /** Backup id used for the single current config when versioning is disabled. */
     private const CONFIG_ID = 'current';
 
+    private const PER_PAGE = 100;
+
     private ?string $lastError = null;
 
     /** @var array<int, array{node: ?array<string, mixed>, error: ?string}> */
@@ -78,14 +80,19 @@ class OxidizedProvider implements ConfigBackupProvider
         if ($versions === null) {
             return null;
         }
-
-        $backups = $this->mapVersions($versions);
+        // Oxidized has no API-level pagination; simulate it by slicing the full
+        // we do this because the ui has trouble dealing with thousands of backups
+        $allBackups = $this->mapVersions($versions);
+        $total = count($allBackups);
+        $totalPages = $total === 0 ? 1 : (int) ceil($total / self::PER_PAGE);
+        $page = max(0, min($page, $totalPages - 1));
+        $backups = array_slice($allBackups, $page * self::PER_PAGE, self::PER_PAGE);
 
         return [
             'backups' => $backups,
-            'total' => count($backups),
-            'totalPages' => 1,
-            'page' => 0,
+            'total' => $total,
+            'totalPages' => $totalPages,
+            'page' => $page,
         ];
     }
 
@@ -156,7 +163,7 @@ class OxidizedProvider implements ConfigBackupProvider
 
         // Oxidized takes the newer version as oid and the older as oid2, so the
         // resulting diff removes the original (older) lines and inserts the new.
-        $diff = $this->api->getDiff($node['name'], $revId, $origId);
+        $diff = $this->api->getDiff($node['name'], $revId, $origId, $node['group'] ?? null);
         if ($diff === null) {
             $this->lastError = $this->api->lastError() ?? self::ERROR_UNREACHABLE;
 
@@ -252,11 +259,13 @@ class OxidizedProvider implements ConfigBackupProvider
      */
     private function fetchContent(array $node, string $backupId): ?string
     {
+        $group = $node['group'] ?? null;
+
         if ($backupId === self::CONFIG_ID) {
-            return $this->api->getNodeConfig($node['name'], $node['group'] ?? null);
+            return $this->api->getNodeConfig($node['name'], $group);
         }
 
-        return $this->api->getVersionContent($node['name'], $backupId);
+        return $this->api->getVersionContent($node['name'], $backupId, $group);
     }
 
     /**
