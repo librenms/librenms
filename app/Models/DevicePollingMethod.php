@@ -33,6 +33,8 @@ class DevicePollingMethod extends Model
         'last_check_successful' => 'boolean',
     ];
 
+    private ?PollingMethodConfigInterface $configCache = null;
+
     /**
      * Save or update a DevicePollingMethod row settings for a device.
      *
@@ -59,6 +61,7 @@ class DevicePollingMethod extends Model
         $method->settings = $definition->resolveValues($settings, $method->settings ?? []);
 
         $method->save();
+        $method->invalidateConfigCache();
 
         return $method;
     }
@@ -108,9 +111,18 @@ class DevicePollingMethod extends Model
 
     public function toConfig(): PollingMethodConfigInterface
     {
+        if ($this->configCache !== null) {
+            return $this->configCache;
+        }
+
         $this->loadMissing('secret');
 
-        return app(PollingMethodFactory::class)->make($this);
+        return $this->configCache = app(PollingMethodFactory::class)->make($this);
+    }
+
+    public function invalidateConfigCache(): void
+    {
+        $this->configCache = null;
     }
 
     /** @return BelongsTo<Device, $this> */

@@ -219,6 +219,8 @@ class EditPollingController
                     $pollingMethod->secret->update(['data' => $secretData]);
                 }
             }
+
+            $pollingMethod->invalidateConfigCache();
         }
 
         if ($type === PollingMethodType::Snmp && isset($pollingMethod->settings['port_association_mode'])) {
