@@ -18,7 +18,6 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
-use LibreNMS\Polling\Method\PollingMethodDefinition;
 
 class EditPollingController
 {
@@ -53,14 +52,15 @@ class EditPollingController
      */
     private function buildMethodData(Device $device, PollingMethodType $type): array
     {
-        $definition = PollingMethodDefinition::for($type);
+        $definition = $type->definition();
         /** @var DevicePollingMethod|null $row */
         $row = $device->pollingMethods->firstWhere('method_type', $type);
         $secret = $row?->secret;
         $canUnmaskSecrets = Gate::allows('unmask', Secret::class);
-        $schema = $definition->secretDefinition()?->schema() ?? [];
-        $schemaFields = PollingMethodDefinition::buildSchemaFields($schema);
-        $settingsSchema = $definition->schema();
+        $secretDef = $definition->secretDefinition();
+        $schema = $secretDef?->schema() ?? [];
+        $schemaFields = $secretDef ? $secretDef->buildSchemaFields() : [];
+        $settingsFields = $definition->buildSchemaFields(dataVar: 'settingsData');
         $secretsForType = Secret::query()
             ->where('secret_type', $type->value)
             ->orderBy('description')
@@ -79,8 +79,8 @@ class EditPollingController
             'label' => __('poller.methods.' . $type->value),
             'icon' => $definition->icon(),
             'schema_fields' => $schemaFields,
-            'schema_defaults' => $definition->secretDefinition()?->schemaDefaults() ?? [],
-            'settings_fields' => PollingMethodDefinition::buildSchemaFields($settingsSchema, 'settingsData'),
+            'schema_defaults' => $secretDef?->schemaDefaults() ?? [],
+            'settings_fields' => $settingsFields,
             'settings' => array_merge(
                 $row->settings ?? [],
                 $type === PollingMethodType::Snmp ? ['port_association_mode' => PortAssociationMode::getName($device->port_association_mode) ?? LibrenmsConfig::get('default_port_association_mode', 'ifIndex')] : []
@@ -108,7 +108,7 @@ class EditPollingController
 
         $validated = $request->validated();
         $type = $request->pollingType() ?? PollingMethodType::from($validated['method_type']);
-        $definition = PollingMethodDefinition::for($type);
+        $definition = $type->definition();
 
         if ($definition->secretDefinition() !== null) {
             $this->authorize('create', Secret::class);
@@ -174,7 +174,7 @@ class EditPollingController
         $validated = $request->validated();
 
         $secretId = null;
-        if (PollingMethodDefinition::hasSecret($type) && array_key_exists('secret_id', $validated)) {
+        if ($type->hasSecret() && array_key_exists('secret_id', $validated)) {
             $this->authorize('update', Secret::class);
             $secretId = (int) $validated['secret_id'];
             if (! $secretId) {
@@ -182,7 +182,7 @@ class EditPollingController
                     'secret_id' => __('poller.select_credential'),
                 ]);
             }
-        } elseif (PollingMethodDefinition::hasSecret($type) && $request->has('secret_data')) {
+        } elseif ($type->hasSecret() && $request->has('secret_data')) {
             $this->authorize('update', Secret::class);
         }
 
@@ -196,7 +196,7 @@ class EditPollingController
             affectsAvailability: (bool) ($validated['affects_availability'] ?? false),
         );
 
-        if (PollingMethodDefinition::hasSecret($type)) {
+        if ($type->hasSecret()) {
             if ($secretId !== null) {
                 $secret = Secret::resolveForType($secretId, $type);
                 $pollingMethod->secret()->associate($secret)->save();
@@ -243,7 +243,7 @@ class EditPollingController
         $type = PollingMethodType::tryFrom($methodType) ?? abort(404);
         $pollingMethod = $device->pollingMethods()->where('method_type', $type->value)->firstOrFail();
 
-        if (PollingMethodDefinition::hasSecret($type)) {
+        if ($type->hasSecret()) {
             $this->authorize('delete', Secret::class);
         }
 

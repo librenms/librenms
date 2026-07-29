@@ -7,9 +7,9 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\PollingMethodInterface;
+use LibreNMS\Interfaces\PollingMethodConfigInterface;
 use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\Method\SnmpPollingMethod;
+use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\PollingMethodFactory;
 use LibreNMS\Tests\TestCase;
 use Mockery;
@@ -22,7 +22,7 @@ final class ConnectivityHelperTest extends TestCase
         $icmpMethod = new DevicePollingMethod();
         $snmpMethod = new DevicePollingMethod();
 
-        $icmpMock = Mockery::mock(PollingMethodInterface::class);
+        $icmpMock = Mockery::mock(PollingMethodConfigInterface::class);
         $icmpMock->shouldReceive('isEnabled')
             ->andReturnUsing(function () use (&$icmpMethod) {
                 return $icmpMethod->enabled;
@@ -31,7 +31,7 @@ final class ConnectivityHelperTest extends TestCase
             ->times(8)
             ->andReturn(true, false, true, false, true, false, true, false);
 
-        $snmpMock = Mockery::mock(PollingMethodInterface::class);
+        $snmpMock = Mockery::mock(PollingMethodConfigInterface::class);
         $snmpMock->shouldReceive('isEnabled')
             ->andReturnUsing(function () use (&$snmpMethod) {
                 return $snmpMethod->enabled;
@@ -186,14 +186,14 @@ final class ConnectivityHelperTest extends TestCase
         $ipmiMethod = new DevicePollingMethod();
         $unixAgentMethod = new DevicePollingMethod();
 
-        $ipmiMock = Mockery::mock(PollingMethodInterface::class);
+        $ipmiMock = Mockery::mock(PollingMethodConfigInterface::class);
         $ipmiMock->shouldReceive('isEnabled')
             ->andReturnUsing(function () use (&$ipmiMethod) {
                 return $ipmiMethod->enabled;
             });
         $ipmiMock->shouldReceive('isAvailable')->andReturn(true, false);
 
-        $unixAgentMock = Mockery::mock(PollingMethodInterface::class);
+        $unixAgentMock = Mockery::mock(PollingMethodConfigInterface::class);
         $unixAgentMock->shouldReceive('isEnabled')
             ->andReturnUsing(function () use (&$unixAgentMethod) {
                 return $unixAgentMethod->enabled;
@@ -247,7 +247,7 @@ final class ConnectivityHelperTest extends TestCase
             );
 
         $device = new Device;
-        $snmpMethod = new SnmpPollingMethod(
+        $snmpMethod = new SnmpConfig(
             enabled: true,
             affectsAvailability: true,
             version: 'v2c',

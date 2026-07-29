@@ -3,12 +3,12 @@
 namespace LibreNMS\Polling\Method\Definitions;
 
 use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
-use LibreNMS\Polling\Method\IpmiPollingMethod;
+use LibreNMS\Polling\Method\Config\IpmiConfig;
 use LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
 use LibreNMS\Traits\HandlesFieldSchema;
 
 /**
- * @implements PollingMethodDefinitionInterface<IpmiPollingMethod>
+ * @implements PollingMethodDefinitionInterface<IpmiConfig>
  */
 class IpmiPollingMethodDefinition implements PollingMethodDefinitionInterface
 {
@@ -70,7 +70,7 @@ class IpmiPollingMethodDefinition implements PollingMethodDefinitionInterface
      */
     public function class(): string
     {
-        return IpmiPollingMethod::class;
+        return IpmiConfig::class;
     }
 
     /**

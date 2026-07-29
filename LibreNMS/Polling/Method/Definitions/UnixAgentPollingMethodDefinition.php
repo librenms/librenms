@@ -3,11 +3,11 @@
 namespace LibreNMS\Polling\Method\Definitions;
 
 use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
-use LibreNMS\Polling\Method\UnixAgentPollingMethod;
+use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 use LibreNMS\Traits\HandlesFieldSchema;
 
 /**
- * @implements PollingMethodDefinitionInterface<UnixAgentPollingMethod>
+ * @implements PollingMethodDefinitionInterface<UnixAgentConfig>
  */
 class UnixAgentPollingMethodDefinition implements PollingMethodDefinitionInterface
 {
@@ -56,7 +56,7 @@ class UnixAgentPollingMethodDefinition implements PollingMethodDefinitionInterfa
      */
     public function class(): string
     {
-        return UnixAgentPollingMethod::class;
+        return UnixAgentConfig::class;
     }
 
     /**

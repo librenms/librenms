@@ -8,7 +8,6 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
-use LibreNMS\Polling\Method\PollingMethodDefinition;
 
 class StoreDeviceRequest extends FormRequest
 {
@@ -61,7 +60,7 @@ class StoreDeviceRequest extends FormRequest
             $rules["polling_methods.{$method}.affects_availability"] = ['nullable', 'boolean'];
             $rules["polling_methods.{$method}.credential_mode"] = ['nullable', 'in:default,existing,new'];
 
-            $definition = PollingMethodDefinition::for($type);
+            $definition = $type->definition();
             $secretDefinition = $definition->secretDefinition();
             if ($secretDefinition !== null) {
                 $rules["polling_methods.{$method}.secret_id"] = [
