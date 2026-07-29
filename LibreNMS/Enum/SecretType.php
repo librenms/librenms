@@ -26,8 +26,19 @@
 
 namespace LibreNMS\Enum;
 
+use LibreNMS\Interfaces\SecretDefinitionInterface;
+use LibreNMS\Polling\Secrets\SecretData;
+
 enum SecretType: string
 {
     case Snmp = 'snmp';
     case Ipmi = 'ipmi';
+
+    /**
+     * @return SecretDefinitionInterface<SecretData>
+     */
+    public function definition(): SecretDefinitionInterface
+    {
+        return app("polling.secret.$this->value");
+    }
 }

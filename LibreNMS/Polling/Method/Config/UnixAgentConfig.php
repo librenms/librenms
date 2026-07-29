@@ -1,15 +1,15 @@
 <?php
 
-namespace LibreNMS\Polling\Method;
+namespace LibreNMS\Polling\Method\Config;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\PollingMethodInterface;
+use LibreNMS\Interfaces\PollingMethodConfigInterface;
 use LibreNMS\Util\Rewrite;
 
-readonly class UnixAgentPollingMethod implements PollingMethodInterface
+readonly class UnixAgentConfig implements PollingMethodConfigInterface
 {
     public function __construct(
         public bool $enabled,
@@ -57,15 +57,6 @@ readonly class UnixAgentPollingMethod implements PollingMethodInterface
             enabled: $method->enabled,
             affectsAvailability: $method->affects_availability,
             port: (int) $method->settings['port'],
-        );
-    }
-
-    public static function disabled(): static
-    {
-        return new static(
-            enabled: false,
-            affectsAvailability: false,
-            port: 6556,
         );
     }
 }

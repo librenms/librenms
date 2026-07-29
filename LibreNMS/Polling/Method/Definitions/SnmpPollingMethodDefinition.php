@@ -6,12 +6,12 @@ use App\Facades\LibrenmsConfig;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
-use LibreNMS\Polling\Method\SnmpPollingMethod;
+use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
 use LibreNMS\Traits\HandlesFieldSchema;
 
 /**
- * @implements PollingMethodDefinitionInterface<SnmpPollingMethod>
+ * @implements PollingMethodDefinitionInterface<SnmpConfig>
  */
 class SnmpPollingMethodDefinition implements PollingMethodDefinitionInterface
 {
@@ -95,7 +95,7 @@ class SnmpPollingMethodDefinition implements PollingMethodDefinitionInterface
      */
     public function class(): string
     {
-        return SnmpPollingMethod::class;
+        return SnmpConfig::class;
     }
 
     /**

@@ -5,7 +5,7 @@ namespace LibreNMS\Interfaces;
 use LibreNMS\Polling\Secrets\SecretData;
 
 /**
- * @template-covariant T of PollingMethodInterface
+ * @template-covariant T of PollingMethodConfigInterface
  */
 interface PollingMethodDefinitionInterface extends HasFieldSchema
 {

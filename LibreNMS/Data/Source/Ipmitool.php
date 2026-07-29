@@ -33,7 +33,7 @@ use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
 use LibreNMS\Exceptions\IpmiConnectionFailed;
-use LibreNMS\Polling\Method\IpmiPollingMethod;
+use LibreNMS\Polling\Method\Config\IpmiConfig;
 
 class Ipmitool
 {
@@ -42,7 +42,7 @@ class Ipmitool
 
     public function __construct(
         private readonly Device $device,
-        private readonly IpmiPollingMethod $method,
+        private readonly IpmiConfig $method,
     ) {
         $this->binary = LibrenmsConfig::get('ipmitool', 'ipmitool');
         $this->type = $this->method->type;

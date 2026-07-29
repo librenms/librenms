@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\PollingMethodInterface;
-use LibreNMS\Polling\Method\PollingMethodDefinition;
+use LibreNMS\Interfaces\PollingMethodConfigInterface;
 use LibreNMS\Polling\PollingMethodFactory;
 
 class DevicePollingMethod extends Model
@@ -46,7 +45,7 @@ class DevicePollingMethod extends Model
         bool $enabled = true,
         ?bool $affectsAvailability = null,
     ): self {
-        $definition = PollingMethodDefinition::for($type);
+        $definition = $type->definition();
 
         /** @var self $method */
         $method = static::firstOrNew([
@@ -76,14 +75,15 @@ class DevicePollingMethod extends Model
         array $secretData = [],
         ?Device $device = null,
         ?bool $affectsAvailability = null,
+        bool $enabled = true,
     ): self {
-        $definition = PollingMethodDefinition::for($type);
+        $definition = $type->definition();
         $resolvedSettings = $definition->resolveValues($settings);
         $affectsAvail = $affectsAvailability ?? $definition->defaultAffectsAvailability();
 
         $method = new static([
             'method_type' => $type,
-            'enabled' => true,
+            'enabled' => $enabled,
             'affects_availability' => $affectsAvail,
             'settings' => $resolvedSettings,
         ]);
@@ -106,7 +106,7 @@ class DevicePollingMethod extends Model
         return $method;
     }
 
-    public function toPollingMethod(): PollingMethodInterface
+    public function toConfig(): PollingMethodConfigInterface
     {
         $this->loadMissing('secret');
 

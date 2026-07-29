@@ -9,4 +9,5 @@ return [
     App\Providers\SnmptrapProvider::class,
     App\Providers\PluginProvider::class,
     App\Providers\RestifyServiceProvider::class,
+    App\Providers\PollingServiceProvider::class,
 ];

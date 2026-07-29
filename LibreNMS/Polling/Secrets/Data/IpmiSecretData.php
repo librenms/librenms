@@ -1,7 +1,7 @@
 <?php
 
 /**
- * SecretDefinition.php
+ * IpmiSecretData.php
  *
  * -Description-
  *
@@ -24,23 +24,28 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Polling\Secrets;
+namespace LibreNMS\Polling\Secrets\Data;
 
-use LibreNMS\Enum\SecretType;
-use LibreNMS\Interfaces\SecretDefinitionInterface;
-use LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
-use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
+use LibreNMS\Polling\Secrets\SecretData;
 
-class SecretDefinition
+class IpmiSecretData extends SecretData
 {
+    public function __construct(
+        public ?string $username = null,
+        public ?string $password = null,
+        public ?string $kg_key = null,
+    ) {
+    }
+
     /**
-     * @return SecretDefinitionInterface<SecretData>
+     * @param  array<string, mixed>  $data
      */
-    public static function for(SecretType $type): SecretDefinitionInterface
+    public static function fromArray(array $data): static
     {
-        return match ($type) {
-            SecretType::Ipmi => new IpmiSecretDefinition,
-            SecretType::Snmp => new SnmpSecretDefinition,
-        };
+        return new static(
+            username: $data['username'] ?? null,
+            password: $data['password'] ?? null,
+            kg_key: $data['kg_key'] ?? null,
+        );
     }
 }

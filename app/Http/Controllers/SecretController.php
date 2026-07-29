@@ -33,7 +33,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\SecretType;
-use LibreNMS\Polling\Secrets\SecretDefinition;
 
 class SecretController extends Controller
 {
@@ -52,7 +51,7 @@ class SecretController extends Controller
 
         $type = $request->query('type', 'snmp');
         $secretType = SecretType::tryFrom($type) ?? SecretType::Snmp;
-        $schema = SecretDefinition::for($secretType)->schema();
+        $schema = $secretType->definition()->schema();
 
         return view('secrets.create', [
             'types' => SecretType::cases(),
@@ -76,7 +75,7 @@ class SecretController extends Controller
             abort(400, 'Invalid secret type.');
         }
 
-        $rules = SecretDefinition::for($secretType)->rules();
+        $rules = $secretType->definition()->rules();
         $data = $request->validate($rules);
 
         Secret::create([
@@ -95,7 +94,7 @@ class SecretController extends Controller
     {
         Gate::authorize('update', $secret);
 
-        $schema = SecretDefinition::for($secret->secret_type)->schema();
+        $schema = $secret->secret_type->definition()->schema();
         $data = Gate::allows('unmask', $secret)
             ? $secret->data
             : $this->maskPasswordFields($secret->data, $schema);
@@ -116,7 +115,7 @@ class SecretController extends Controller
             'default' => 'boolean',
         ]);
 
-        $definition = SecretDefinition::for($secret->secret_type);
+        $definition = $secret->secret_type->definition();
         $data = $request->validate($definition->rules());
 
         if (! Gate::allows('unmask', $secret)) {

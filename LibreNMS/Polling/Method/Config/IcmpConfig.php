@@ -1,6 +1,6 @@
 <?php
 
-namespace LibreNMS\Polling\Method;
+namespace LibreNMS\Polling\Method\Config;
 
 use App\Actions\Device\DeviceMtuTest;
 use App\Models\Device;
@@ -9,9 +9,9 @@ use App\Models\Eventlog;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Interfaces\PollingMethodInterface;
+use LibreNMS\Interfaces\PollingMethodConfigInterface;
 
-readonly class IcmpPollingMethod implements PollingMethodInterface
+readonly class IcmpConfig implements PollingMethodConfigInterface
 {
     public function __construct(
         public bool $enabled,
@@ -54,14 +54,6 @@ readonly class IcmpPollingMethod implements PollingMethodInterface
         return new static(
             enabled: $method->enabled,
             affectsAvailability: $method->affects_availability,
-        );
-    }
-
-    public static function disabled(): static
-    {
-        return new static(
-            enabled: false,
-            affectsAvailability: false,
         );
     }
 }

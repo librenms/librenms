@@ -1,14 +1,14 @@
 <?php
 
-namespace LibreNMS\Polling\Method;
+namespace LibreNMS\Polling\Method\Config;
 
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Data\Source\Ipmitool;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\PollingMethodInterface;
+use LibreNMS\Interfaces\PollingMethodConfigInterface;
 
-readonly class IpmiPollingMethod implements PollingMethodInterface
+readonly class IpmiConfig implements PollingMethodConfigInterface
 {
     public function __construct(
         public bool $enabled,
@@ -63,22 +63,6 @@ readonly class IpmiPollingMethod implements PollingMethodInterface
             (int) $method->settings['ciphersuite'],
             (int) $method->settings['timeout'],
             $method->settings['type'] ?? '',
-        );
-    }
-
-    public static function disabled(): static
-    {
-        return new static(
-            false,
-            false,
-            '',
-            '',
-            '',
-            '',
-            0,
-            0,
-            0,
-            '',
         );
     }
 }
