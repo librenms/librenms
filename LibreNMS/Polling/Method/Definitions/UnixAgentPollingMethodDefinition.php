@@ -27,6 +27,13 @@ class UnixAgentPollingMethodDefinition implements PollingMethodDefinitionInterfa
                 ->max(65535)
                 ->rules(['required', 'integer', 'min:1', 'max:65535'])
                 ->cast('int'),
+
+            'timeout' => FieldDefinition::make('timeout', 'number')
+                ->fallback(fn () => LibrenmsConfig::get('unix-agent.connection-timeout', 10))
+                ->min(1)
+                ->max(300)
+                ->rules(['required', 'integer', 'min:1', 'max:300'])
+                ->cast('int'),
         ];
     }
 
@@ -49,6 +56,14 @@ class UnixAgentPollingMethodDefinition implements PollingMethodDefinitionInterfa
     public function class(): string
     {
         return UnixAgentConfig::class;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function probe(): \LibreNMS\Polling\Method\Probe\UnixAgentProbe
+    {
+        return new \LibreNMS\Polling\Method\Probe\UnixAgentProbe();
     }
 
     /**

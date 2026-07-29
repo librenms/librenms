@@ -6,6 +6,7 @@ use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Database\Eloquent\Model;
+use LibreNMS\Exceptions\SecretDecryptionException;
 
 /**
  * @implements CastsAttributes<array<string, mixed>, array<string, mixed>|string|null>
@@ -25,9 +26,15 @@ class EncryptedArray implements CastsAttributes
         }
 
         try {
-            return json_decode((string) decrypt($value), true) ?? [];
+            $decrypted = decrypt($value);
+            $decoded = json_decode((string) $decrypted, true);
+            if (! is_array($decoded)) {
+                throw SecretDecryptionException::failedToDecrypt('Decrypted payload is not a valid JSON array.');
+            }
+
+            return $decoded;
         } catch (DecryptException $e) {
-            throw \LibreNMS\Exceptions\SecretDecryptionException::failedToDecrypt($e->getMessage());
+            throw SecretDecryptionException::failedToDecrypt($e->getMessage());
         }
     }
 
@@ -44,8 +51,8 @@ class EncryptedArray implements CastsAttributes
 
         try {
             return encrypt(json_encode($value));
-        } catch (EncryptException) {
-            return null;
+        } catch (EncryptException $e) {
+            throw SecretDecryptionException::failedToDecrypt($e->getMessage());
         }
     }
 }
