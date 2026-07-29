@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Interfaces;
 
+use App\View\FieldSchema\HasFieldSchema;
 use LibreNMS\Polling\Secrets\SecretData;
 
 /**

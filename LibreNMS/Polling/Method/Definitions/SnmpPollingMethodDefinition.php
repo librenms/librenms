@@ -3,12 +3,13 @@
 namespace LibreNMS\Polling\Method\Definitions;
 
 use App\Facades\LibrenmsConfig;
+use App\View\FieldSchema\FieldDefinition;
+use App\View\FieldSchema\HandlesFieldSchema;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
-use LibreNMS\Traits\HandlesFieldSchema;
 
 /**
  * @implements PollingMethodDefinitionInterface<SnmpConfig>
@@ -20,66 +21,64 @@ class SnmpPollingMethodDefinition implements PollingMethodDefinitionInterface
     /**
      * @inheritDoc
      */
-    public function schema(): array
+    public function fields(): array
     {
         return [
-            'transport' => [
-                'type' => 'select',
-                'options' => [
+            'transport' => FieldDefinition::make('transport', 'select')
+                ->options([
                     'udp' => 'UDP',
                     'tcp' => 'TCP',
                     'udp6' => 'UDP6',
                     'tcp6' => 'TCP6',
-                ],
-                'default' => 'udp',
-            ],
-            'port' => [
-                'type' => 'number',
-                'default' => 161,
-            ],
-            'timeout' => [
-                'type' => 'number',
-                'default' => 3,
-            ],
-            'retries' => [
-                'type' => 'number',
-                'default' => 1,
-            ],
-            'max_repeaters' => [
-                'type' => 'number',
-                'default' => 0,
-            ],
-            'max_oid' => [
-                'type' => 'number',
-                'default' => 10,
-            ],
-            'port_association_mode' => [
-                'type' => 'select',
-                'options' => array_combine(PortAssociationMode::getModes(), PortAssociationMode::getModes()),
-                'default' => LibrenmsConfig::get('default_port_association_mode', 'ifIndex'),
-            ],
+                ])
+                ->default('udp')
+                ->rules(['required', 'string', 'in:udp,tcp,udp6,tcp6']),
+
+            'port' => FieldDefinition::make('port', 'number')
+                ->fallback(fn () => LibrenmsConfig::get('snmp.port'))
+                ->min(1)
+                ->max(65535)
+                ->rules(['required', 'integer', 'min:1', 'max:65535'])
+                ->cast('int'),
+
+            'timeout' => FieldDefinition::make('timeout', 'number')
+                ->fallback(fn () => LibrenmsConfig::get('snmp.timeout'))
+                ->min(1)
+                ->max(60)
+                ->rules(['required', 'integer', 'min:1', 'max:60'])
+                ->cast('int'),
+
+            'retries' => FieldDefinition::make('retries', 'number')
+                ->fallback(fn () => LibrenmsConfig::get('snmp.retries'))
+                ->min(0)
+                ->max(10)
+                ->rules(['required', 'integer', 'min:0', 'max:10'])
+                ->cast('int'),
+
+            'max_repeaters' => FieldDefinition::make('max_repeaters', 'number')
+                ->fallback(fn () => LibrenmsConfig::get('snmp.max_repeaters'))
+                ->min(0)
+                ->max(30)
+                ->rules(['required', 'integer', 'min:0', 'max:30'])
+                ->cast('int'),
+
+            'max_oid' => FieldDefinition::make('max_oid', 'number')
+                ->fallback(fn () => LibrenmsConfig::get('snmp.max_oid'))
+                ->min(1)
+                ->max(100)
+                ->rules(['required', 'integer', 'min:1', 'max:100'])
+                ->cast('int'),
+
+            'port_association_mode' => FieldDefinition::make('port_association_mode', 'select')
+                ->options(array_combine(PortAssociationMode::getModes(), PortAssociationMode::getModes()))
+                ->default(fn () => LibrenmsConfig::get('default_port_association_mode', 'ifIndex'))
+                ->rules(['required', 'string', Rule::in(PortAssociationMode::getModes())]),
         ];
     }
 
     public function defaultAffectsAvailability(): bool
     {
         return true;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function rules(): array
-    {
-        return [
-            'transport' => ['required', 'string', 'in:udp,tcp,udp6,tcp6'],
-            'port' => ['required', 'integer', 'min:1', 'max:65535'],
-            'timeout' => ['required', 'integer', 'min:1', 'max:60'],
-            'retries' => ['required', 'integer', 'min:0', 'max:10'],
-            'max_repeaters' => ['required', 'integer', 'min:0', 'max:30'],
-            'max_oid' => ['required', 'integer', 'min:1', 'max:100'],
-            'port_association_mode' => ['required', 'string', Rule::in(PortAssociationMode::getModes())],
-        ];
     }
 
     /**

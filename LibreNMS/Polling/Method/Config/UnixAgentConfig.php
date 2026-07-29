@@ -53,10 +53,13 @@ readonly class UnixAgentConfig implements PollingMethodConfigInterface
             throw new \Exception('Invalid polling method type');
         }
 
+        $definition = PollingMethodType::UnixAgent->definition();
+        $settings = $definition->resolveValues($method->settings ?? []);
+
         return new static(
             enabled: $method->enabled,
             affectsAvailability: $method->affects_availability,
-            port: (int) $method->settings['port'],
+            port: $settings['port'],
         );
     }
 }

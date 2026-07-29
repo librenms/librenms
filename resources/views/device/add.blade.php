@@ -272,14 +272,16 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl">
-                                                        @include('device.includes.secret-fields', [
-                                                            'fields' => $method['schema_fields'],
-                                                            'methodType' => $method['type'],
-                                                            'namePrefix' => "polling_methods[{$method['type']}][secret_data]",
-                                                            'modelPrefix' => "methods['{$method['type']}'].formData",
-                                                        ])
-                                                    </div>
+                                                    @php
+                                                        $secretNamePrefix = 'polling_methods[' . $method['type'] . '][secret_data]';
+                                                        $secretModelPrefix = "methods['" . $method['type'] . "'].formData";
+                                                    @endphp
+                                                    <x-field-schema-fields
+                                                        :fields="$method['schema_fields']"
+                                                        :method-type="$method['type']"
+                                                        :name-prefix="$secretNamePrefix"
+                                                        :model-prefix="$secretModelPrefix"
+                                                        :grid="true" />
                                                 </div>
                                             </div>
                                         </div>
@@ -290,12 +292,16 @@
                                         <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mb-6">
                                             <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Settings') }}</h4>
                                             <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:bg-white tw:dark:bg-dark-gray-500">
-                                                @include('device.includes.method-settings', [
-                                                    'fields' => $method['settings_fields'],
-                                                    'methodType' => $method['type'],
-                                                    'namePrefix' => "polling_methods[{$method['type']}][settings]",
-                                                    'modelPrefix' => "methods['{$method['type']}'].settingsData",
-                                                ])
+                                                @php
+                                                    $settingsNamePrefix = 'polling_methods[' . $method['type'] . '][settings]';
+                                                    $settingsModelPrefix = "methods['" . $method['type'] . "'].settingsData";
+                                                @endphp
+                                                <x-field-schema-fields
+                                                    :fields="$method['settings_fields']"
+                                                    :method-type="$method['type']"
+                                                    :name-prefix="$settingsNamePrefix"
+                                                    :model-prefix="$settingsModelPrefix"
+                                                    :grid="true" />
                                             </div>
                                         </div>
                                     @endif

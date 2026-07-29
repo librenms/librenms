@@ -26,10 +26,11 @@
 
 namespace LibreNMS\Polling\Secrets\Definitions;
 
+use App\View\FieldSchema\FieldDefinition;
+use App\View\FieldSchema\HandlesFieldSchema;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Interfaces\SecretDefinitionInterface;
 use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
-use LibreNMS\Traits\HandlesFieldSchema;
 
 /**
  * @implements SecretDefinitionInterface<IpmiSecretData>
@@ -41,41 +42,20 @@ class IpmiSecretDefinition implements SecretDefinitionInterface
     /**
      * @inheritDoc
      */
-    public function schema(): array
+    public function fields(): array
     {
         return [
-            'username' => [
-                'type' => 'text',
-                'label' => 'Username',
-            ],
-            'password' => [
-                'type' => 'password',
-                'label' => 'Password',
-            ],
-            'kg_key' => [
-                'type' => 'password',
-                'label' => 'KG/BMC Key',
-            ],
-        ];
-    }
+            'username' => FieldDefinition::make('username', 'text')
+                ->label('Username')
+                ->rules(['nullable', 'string']),
 
-    /**
-     * @return array<string, mixed>
-     */
-    public function defaults(): array
-    {
-        return [];
-    }
+            'password' => FieldDefinition::make('password', 'password')
+                ->label('Password')
+                ->rules(['nullable', 'string']),
 
-    /**
-     * @inheritDoc
-     */
-    public function rules(): array
-    {
-        return [
-            'username' => 'nullable|string',
-            'password' => 'nullable|string',
-            'kg_key' => 'nullable|string|size:40|regex:/^[a-fA-F0-9]+$/',
+            'kg_key' => FieldDefinition::make('kg_key', 'password')
+                ->label('KG/BMC Key')
+                ->rules(['nullable', 'string', 'size:40', 'regex:/^[a-fA-F0-9]+$/']),
         ];
     }
 

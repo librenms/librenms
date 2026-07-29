@@ -42,10 +42,13 @@ class IpmiSecretData extends SecretData
      */
     public static function fromArray(array $data): static
     {
+        $definition = new \LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
+        $resolved = $definition->resolveValues($data);
+
         return new static(
-            username: $data['username'] ?? null,
-            password: $data['password'] ?? null,
-            kg_key: $data['kg_key'] ?? null,
+            username: $resolved['username'] ?? null,
+            password: $resolved['password'] ?? null,
+            kg_key: $resolved['kg_key'] ?? null,
         );
     }
 }
