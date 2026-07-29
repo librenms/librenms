@@ -20,12 +20,15 @@
     "src": "html/fonts/glyphicons-halflings-regular.woff2"
   },
   "resources/js/app.js": {
-    "file": "assets/app-CMPAftGi.js",
+    "file": "assets/app--JnCrmox.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
+    "dynamicImports": [
+      "resources/js/configHighlight.js"
+    ],
     "css": [
-      "assets/app-C-X9Y1e0.css"
+      "assets/app-ZKJlgQ48.css"
     ],
     "assets": [
       "assets/glyphicons-halflings-regular-BUJKDMgK.eot",
@@ -33,6 +36,18 @@
       "assets/glyphicons-halflings-regular-BKjkU69z.woff",
       "assets/glyphicons-halflings-regular-DrwTMapi.ttf",
       "assets/glyphicons-halflings-regular-CSehLiBc.svg"
+    ]
+  },
+  "resources/js/configHighlight.js": {
+    "file": "assets/configHighlight-Nw8pfPDu.js",
+    "name": "configHighlight",
+    "src": "resources/js/configHighlight.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/configHighlight-CVm6F_yB.css"
     ]
   }
 }
