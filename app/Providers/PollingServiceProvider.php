@@ -25,6 +25,6 @@ class PollingServiceProvider extends ServiceProvider
         $this->app->singleton('polling.method.ipmi', IpmiPollingMethodDefinition::class);
         $this->app->singleton('polling.secret.ipmi', IpmiSecretDefinition::class);
 
-        $this->app->singleton('polling.method.unixagent', UnixAgentPollingMethodDefinition::class);
+        $this->app->singleton('polling.method.unix-agent', UnixAgentPollingMethodDefinition::class);
     }
 }
