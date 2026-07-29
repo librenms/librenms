@@ -129,8 +129,9 @@ return [
             'type' => 'Discover devices only with specified type',
         ],
         'errors' => [
-            'none_up' => 'Device was down, unable to discover.|All devices were down, unable to discover.',
+            'none_up' => 'Device was down due to :reason.|All devices were down.',
             'none_actioned' => 'No devices were discovered.',
+            'status_reason_unkown' => 'unknown',
         ],
         'actioned' => 'Discovered :count devices in :time',
         'starting' => 'Starting discovery:',
@@ -159,8 +160,9 @@ return [
             'type' => 'Poll devices only with specified type',
         ],
         'errors' => [
-            'none_up' => 'Device was down, unable to poll.|All devices were down, unable to poll.',
+            'none_up' => 'Device was down due to :reason.|All devices were down.',
             'none_actioned' => 'No devices were polled.',
+            'status_reason_unkown' => 'unknown',
         ],
         'actioned' => 'Polled :count devices in :time',
         'starting' => 'Starting polling run:',

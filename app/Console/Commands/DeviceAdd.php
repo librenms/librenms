@@ -89,29 +89,25 @@ class DeviceAdd extends LnmsCommand
         $device = new Device([
             'hostname' => $this->argument('device spec'),
             'display_template' => $this->option('display-name'),
-            'snmpver' => $this->option('v3') ? 'v3' : ($this->option('v2c') ? 'v2c' : ($this->option('v1') ? 'v1' : '')),
-            'port' => $this->option('port'),
-            'transport' => $this->option('transport'),
             'poller_group' => $this->option('poller-group'),
             'port_association_mode' => PortAssociationMode::getId($this->option('port-association-mode')),
-            'community' => $this->option('community'),
-            'authlevel' => ($auth ? 'auth' : 'noAuth') . (($priv && $auth) ? 'Priv' : 'NoPriv'),
-            'authname' => $this->option('security-name'),
-            'authpass' => $this->option('auth-password'),
-            'authalgo' => $this->option('auth-protocol'),
-            'cryptopass' => $this->option('privacy-password'),
-            'cryptoalgo' => $this->option('privacy-protocol'),
         ]);
 
         if ($this->option('ping-only')) {
-            $device->snmp_disable = true;
             $device->os = $this->option('os');
             $device->hardware = $this->option('hardware');
             $device->sysName = $this->option('sysName');
         }
 
+        $input = array_merge($this->options(), ['auth' => $auth, 'priv' => $priv]);
+
         try {
-            $result = (new ValidateDeviceAndCreate($device, $this->option('force'), $this->option('ping-fallback')))->execute();
+            $result = (new ValidateDeviceAndCreate(
+                device: $device,
+                force: $this->option('force'),
+                ping_fallback: $this->option('ping-fallback'),
+                input: $input,
+            ))->execute();
 
             if (! $result) {
                 $this->error(trans('commands.device:add.messages.save_failed', ['hostname' => $device->hostname]));

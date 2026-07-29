@@ -18,6 +18,7 @@
 
 use App\Facades\LibrenmsConfig;
 use App\Polling\Measure\Measurement;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Rewrite;
 
@@ -130,7 +131,10 @@ function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir 
 {
     $oids = Arr::wrap($oids);
 
-    if ($device['snmpver'] == 'v1'
+    $deviceModel = DeviceCache::get($device['device_id']);
+    $snmpMethod = $deviceModel->pollingMethodFor()->snmp();
+
+    if ($snmpMethod->version == 'v1'
         || (isset($device['os']) && (LibrenmsConfig::getOsSetting($device['os'], 'snmp_bulk', true) == false
                 || ! empty(array_intersect($oids, LibrenmsConfig::getCombined($device['os'], 'oids.no_bulk', 'snmp.'))))) // skip for oids that do not work with bulk
     ) {
@@ -166,12 +170,11 @@ function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir 
  */
 function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdir = null)
 {
-    if (! isset($device['transport'])) {
-        $device['transport'] = 'udp';
-    }
+    $deviceModel = DeviceCache::get($device['device_id']);
+    $snmpMethod = $deviceModel->pollingMethodFor()->snmp();
 
-    $cmd = snmp_gen_auth($device, $cmd);
-    $cmd = $options ? array_merge($cmd, (array) $options) : $cmd;
+    $cmd = array_merge($cmd, $snmpMethod->toNetSnmpOptions($device['context_name'] ?? null), Arr::wrap($options));
+
     if ($mib) {
         array_push($cmd, '-m', $mib);
     }
@@ -188,10 +191,9 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
     }
 
     $pollertarget = Rewrite::addIpv6Brackets(DeviceCache::get($device['device_id'])->pollerTarget());
-    $cmd[] = $device['transport'] . ':' . $pollertarget . ':' . $device['port'];
-    $cmd = array_merge($cmd, (array) $oids);
+    $cmd[] = $snmpMethod->transport . ':' . $pollertarget . ':' . $snmpMethod->port;
 
-    return $cmd;
+    return array_merge($cmd, (array) $oids);
 } // end gen_snmp_cmd()
 
 /**
@@ -559,47 +561,6 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array = [], $mib = 0, $mibdi
 
     return $array;
 }//end snmpwalk_cache_twopart_oid()
-
-/**
- * generate snmp auth arguments
- *
- * @param  array  $device
- * @param  array  $cmd
- * @return array
- *
- * @deprecated Please use SnmpQuery instead
- */
-function snmp_gen_auth(&$device, $cmd = [])
-{
-    if ($device['snmpver'] === 'v3') {
-        array_push($cmd, '-v3', '-l', $device['authlevel']);
-        array_push($cmd, '-n', $device['context_name'] ?? '');
-
-        $authlevel = strtolower((string) $device['authlevel']);
-        if ($authlevel === 'noauthnopriv') {
-            // We have to provide a username anyway (see Net-SNMP doc)
-            array_push($cmd, '-u', ! empty($device['authname']) ? $device['authname'] : 'root');
-        } elseif ($authlevel === 'authnopriv') {
-            array_push($cmd, '-a', $device['authalgo']);
-            array_push($cmd, '-A', $device['authpass']);
-            array_push($cmd, '-u', $device['authname']);
-        } elseif ($authlevel === 'authpriv') {
-            array_push($cmd, '-a', $device['authalgo']);
-            array_push($cmd, '-A', $device['authpass']);
-            array_push($cmd, '-u', $device['authname']);
-            array_push($cmd, '-x', $device['cryptoalgo']);
-            array_push($cmd, '-X', $device['cryptopass']);
-        } else {
-            d_echo('DEBUG: ' . $device['snmpver'] . " : Unsupported SNMPv3 AuthLevel (wtf have you done ?)\n");
-        }
-    } elseif ($device['snmpver'] === 'v2c' || $device['snmpver'] === 'v1') {
-        array_push($cmd, '-' . $device['snmpver'], '-c', $device['community']);
-    } else {
-        d_echo('DEBUG: ' . $device['snmpver'] . " : Unsupported SNMP Version (shouldn't be possible to get here)\n");
-    }
-
-    return $cmd;
-}//end snmp_gen_auth()
 
 /**
  * SNMPWalk_array_num - performs a numeric SNMPWalk and returns an array containing $count indexes
