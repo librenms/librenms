@@ -44,6 +44,24 @@ class Secret extends BaseModel
         return $class::fromArray($this->data);
     }
 
+    /**
+     * Resolve an existing Secret by ID and verify its type matches the polling method type.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public static function resolveForType(int $id, \LibreNMS\Enum\PollingMethodType $type): self
+    {
+        $secret = static::findOrFail($id);
+
+        if ($secret->secret_type->value !== $type->value) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'secret_id' => __('poller.credential_type_mismatch'),
+            ]);
+        }
+
+        return $secret;
+    }
+
     // ---- Query Scopes ----
 
     /**

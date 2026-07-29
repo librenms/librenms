@@ -28,6 +28,7 @@ namespace App\Actions\Device;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use Illuminate\Support\Arr;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
@@ -39,7 +40,6 @@ use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\HostUnreachableSnmpException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
-use LibreNMS\Polling\Method\PollingMethodManager;
 use LibreNMS\Polling\Secrets\SnmpSecretData;
 use SnmpQuery;
 
@@ -53,7 +53,6 @@ class ValidateDeviceAndCreate
         private readonly bool $force = false,
         private readonly bool $ping_fallback = false,
         private readonly array $input = [],
-        private readonly PollingMethodManager $manager = new PollingMethodManager,
         private readonly BuildDefaultPollingMethods $builder = new BuildDefaultPollingMethods,
     ) {
     }
@@ -84,7 +83,7 @@ class ValidateDeviceAndCreate
             $this->exceptIfIpExists();
 
             $icmpMethod = $this->device->pollingMethod(PollingMethodType::Icmp)
-                ?? $this->manager->transient(PollingMethodType::Icmp, device: $this->device, affectsAvailability: false);
+                ?? DevicePollingMethod::transient(PollingMethodType::Icmp, device: $this->device, affectsAvailability: false);
             if (! $icmpMethod->toPollingMethod()->isAvailable($this->device)) {
                 throw new HostUnreachablePingException($this->device->hostname);
             }
@@ -184,7 +183,7 @@ class ValidateDeviceAndCreate
                         'cryptoalgo' => $v3['cryptoalgo'] ?? 'AES',
                     ];
 
-                    $snmpMethod = $this->manager->transient(
+                    $snmpMethod = DevicePollingMethod::transient(
                         PollingMethodType::Snmp,
                         secretData: $snmpData,
                         device: $this->device,
@@ -208,7 +207,7 @@ class ValidateDeviceAndCreate
                         'community' => $community,
                     ];
 
-                    $snmpMethod = $this->manager->transient(
+                    $snmpMethod = DevicePollingMethod::transient(
                         PollingMethodType::Snmp,
                         secretData: $snmpData,
                         device: $this->device,

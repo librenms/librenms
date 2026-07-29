@@ -19,16 +19,10 @@ use Illuminate\View\View;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Polling\Method\PollingMethodDefinition;
-use LibreNMS\Polling\Method\PollingMethodManager;
 
 class EditPollingController
 {
     use AuthorizesRequests;
-
-    public function __construct(
-        private readonly PollingMethodManager $pollingMethodManager = new PollingMethodManager,
-    ) {
-    }
 
     /**
      * @throws AuthorizationException
@@ -59,14 +53,14 @@ class EditPollingController
      */
     private function buildMethodData(Device $device, PollingMethodType $type): array
     {
-        $defintion = PollingMethodDefinition::for($type);
+        $definition = PollingMethodDefinition::for($type);
         /** @var DevicePollingMethod|null $row */
         $row = $device->pollingMethods->firstWhere('method_type', $type);
         $secret = $row?->secret;
         $canUnmaskSecrets = Gate::allows('unmask', Secret::class);
-        $schema = $defintion->secretDefinition()?->schema() ?? [];
+        $schema = $definition->secretDefinition()?->schema() ?? [];
         $schemaFields = PollingMethodDefinition::buildSchemaFields($schema);
-        $settingsSchema = $defintion->schema();
+        $settingsSchema = $definition->schema();
         $secretsForType = Secret::query()
             ->where('secret_type', $type->value)
             ->orderBy('description')
@@ -128,7 +122,7 @@ class EditPollingController
             ]);
         }
 
-        $row = $this->pollingMethodManager->save(
+        $row = DevicePollingMethod::saveForDevice(
             device: $device,
             type: $type,
             settings: $request->validatedSettings(),
@@ -138,7 +132,7 @@ class EditPollingController
 
         if ($definition->secretDefinition() !== null) {
             if ($credentialMode === 'existing' && $secretId !== null) {
-                $secret = $this->pollingMethodManager->resolveExistingSecret($secretId, $type);
+                $secret = Secret::resolveForType($secretId, $type);
                 $row->secret()->associate($secret)->save();
             } else {
                 $description = $validated['description'] ?? (strtoupper($type->value) . ' ' . $device->hostname);
@@ -194,7 +188,7 @@ class EditPollingController
 
         $pollingMethod->setRelation('device', $device);
 
-        $pollingMethod = $this->pollingMethodManager->save(
+        $pollingMethod = DevicePollingMethod::saveForDevice(
             device: $device,
             type: $type,
             settings: $validated['settings'] ?? [],
@@ -204,7 +198,7 @@ class EditPollingController
 
         if (PollingMethodDefinition::hasSecret($type)) {
             if ($secretId !== null) {
-                $secret = $this->pollingMethodManager->resolveExistingSecret($secretId, $type);
+                $secret = Secret::resolveForType($secretId, $type);
                 $pollingMethod->secret()->associate($secret)->save();
             } elseif ($request->has('secret_data')) {
                 $secretData = $request->validatedSecretData();

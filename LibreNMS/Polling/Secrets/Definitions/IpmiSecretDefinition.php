@@ -60,7 +60,7 @@ class IpmiSecretDefinition implements SecretDefinitionInterface
     }
 
     /**
-     * @inheritDoc
+     * @return array<string, mixed>
      */
     public function defaults(): array
     {
