@@ -2,9 +2,11 @@
 
 namespace LibreNMS\Polling\Method\Definitions;
 
+use App\Facades\LibrenmsConfig;
+use App\View\FieldSchema\FieldDefinition;
+use App\View\FieldSchema\HandlesFieldSchema;
 use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
-use LibreNMS\Traits\HandlesFieldSchema;
 
 /**
  * @implements PollingMethodDefinitionInterface<UnixAgentConfig>
@@ -16,31 +18,21 @@ class UnixAgentPollingMethodDefinition implements PollingMethodDefinitionInterfa
     /**
      * @inheritDoc
      */
-    public function schema(): array
+    public function fields(): array
     {
         return [
-            'port' => [
-                'type' => 'number',
-                'default' => 6556,
-                'min' => 1,
-                'max' => 65535,
-            ],
+            'port' => FieldDefinition::make('port', 'number')
+                ->fallback(fn () => LibrenmsConfig::get('unix-agent.port'))
+                ->min(1)
+                ->max(65535)
+                ->rules(['required', 'integer', 'min:1', 'max:65535'])
+                ->cast('int'),
         ];
     }
 
     public function defaultAffectsAvailability(): bool
     {
         return false;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function rules(): array
-    {
-        return [
-            'port' => ['required', 'integer', 'min:1', 'max:65535'],
-        ];
     }
 
     /**

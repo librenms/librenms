@@ -2,9 +2,9 @@
 
 namespace LibreNMS\Polling\Method\Definitions;
 
+use App\View\FieldSchema\HandlesFieldSchema;
 use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
-use LibreNMS\Traits\HandlesFieldSchema;
 
 /**
  * @implements PollingMethodDefinitionInterface<IcmpConfig>
@@ -16,7 +16,7 @@ class IcmpPollingMethodDefinition implements PollingMethodDefinitionInterface
     /**
      * @inheritDoc
      */
-    public function schema(): array
+    public function fields(): array
     {
         return [];
     }
@@ -24,14 +24,6 @@ class IcmpPollingMethodDefinition implements PollingMethodDefinitionInterface
     public function defaultAffectsAvailability(): bool
     {
         return true;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function rules(): array
-    {
-        return [];
     }
 
     /**

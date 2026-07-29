@@ -52,17 +52,23 @@ readonly class IpmiConfig implements PollingMethodConfigInterface
             throw new \Exception('Invalid polling method type');
         }
 
+        $definition = PollingMethodType::Ipmi->definition();
+        $secretDefinition = $definition->secretDefinition();
+
+        $settings = $definition->resolveValues($method->settings ?? []);
+        $secretData = $secretDefinition ? $secretDefinition->resolveValues($method->secret?->data ?? []) : [];
+
         return new static(
             $method->enabled,
             $method->affects_availability,
-            $method->secret?->data['username'] ?? '',
-            $method->secret?->data['password'] ?? '',
-            $method->secret?->data['kg_key'] ?? '',
-            $method->settings['hostname'],
-            (int) $method->settings['port'],
-            (int) $method->settings['ciphersuite'],
-            (int) $method->settings['timeout'],
-            $method->settings['type'] ?? '',
+            $secretData['username'] ?? '',
+            $secretData['password'] ?? '',
+            $secretData['kg_key'] ?? '',
+            $settings['hostname'] ?? '',
+            $settings['port'] ?? 623,
+            (int) ($settings['ciphersuite'] ?? 0),
+            $settings['timeout'] ?? 3,
+            $settings['type'] ?? '',
         );
     }
 }

@@ -37,7 +37,7 @@
         {{-- Step 2: Per-method configuration --}}
         @foreach($unconfiguredMethods as $method)
             <div x-show="methodType === '{{ $method['type'] }}'" style="display: none;" x-transition
-                 x-data="{ settingsData: @json(old('settings', $method['settings'] ?? [])) }">
+                 x-data="{ settingsData: @js(old('settings', array_merge($method['settings_defaults'] ?? [], $method['settings'] ?? []))) }">
 
                 @if(empty($method['schema_fields']))
                     {{-- No secret needed (ICMP, IPMI, unix-agent, etc.) --}}
@@ -129,13 +129,12 @@
                                         {{ $method['label'] }} {{ __('Details') }}
                                     </h5>
 
-                                    @include('device.includes.secret-fields', [
-                                        'fields' => $method['schema_fields'],
-                                        'methodType' => $method['type'],
-                                        'namePrefix' => 'secret_data',
-                                        'modelPrefix' => 'formData',
-                                        'useOld' => true,
-                                    ])
+                                    <x-field-schema-fields
+                                        :fields="$method['schema_fields']"
+                                        :method-type="$method['type']"
+                                        name-prefix="secret_data"
+                                        model-prefix="formData"
+                                        :grid="true" />
                                 </div>
                             </div>
                         </div>
@@ -148,12 +147,12 @@
                         <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Settings') }}</h4>
 
                         <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:text-sm tw:bg-white tw:dark:bg-dark-gray-500">
-                            @include('device.includes.method-settings', [
-                                'fields' => $method['settings_fields'],
-                                'methodType' => $method['type'],
-                                'namePrefix' => 'settings',
-                                'modelPrefix' => 'settingsData',
-                            ])
+                            <x-field-schema-fields
+                                :fields="$method['settings_fields']"
+                                :method-type="$method['type']"
+                                name-prefix="settings"
+                                model-prefix="settingsData"
+                                :grid="true" />
                         </div>
                     </div>
                 @endif

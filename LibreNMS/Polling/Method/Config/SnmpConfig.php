@@ -53,27 +53,30 @@ readonly class SnmpConfig implements PollingMethodConfigInterface
             throw new \Exception('Invalid polling method type');
         }
 
-        $secret = $method->secret;
-        $secretData = $secret ? $secret->data : [];
+        $definition = PollingMethodType::Snmp->definition();
+        $secretDefinition = $definition->secretDefinition();
+
+        $settings = $definition->resolveValues($method->settings ?? []);
+        $secretData = $secretDefinition->resolveValues($method->secret?->data ?? []);
 
         return new static(
             enabled: $method->enabled,
             affectsAvailability: $method->affects_availability,
-            version: $secretData['version'] ?? 'v2c',
+            version: $secretData['version'],
             community: $secretData['community'] ?? null,
             authname: $secretData['authname'] ?? null,
             authpass: $secretData['authpass'] ?? null,
-            authlevel: $secretData['authlevel'] ?? 'noAuthNoPriv',
-            authalgo: $secretData['authalgo'] ?? 'SHA',
+            authlevel: $secretData['authlevel'],
+            authalgo: $secretData['authalgo'],
             cryptopass: $secretData['cryptopass'] ?? null,
-            cryptoalgo: $secretData['cryptoalgo'] ?? 'AES',
+            cryptoalgo: $secretData['cryptoalgo'],
             context: $secretData['context'] ?? null,
-            transport: $method->settings['transport'],
-            port: (int) $method->settings['port'],
-            timeout: (int) $method->settings['timeout'],
-            retries: (int) $method->settings['retries'],
-            maxRepeaters: (int) $method->settings['max_repeaters'],
-            maxOid: (int) $method->settings['max_oid'],
+            transport: $settings['transport'],
+            port: $settings['port'],
+            timeout: $settings['timeout'],
+            retries: $settings['retries'],
+            maxRepeaters: $settings['max_repeaters'],
+            maxOid: $settings['max_oid'],
         );
     }
 
