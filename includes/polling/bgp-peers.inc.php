@@ -96,7 +96,7 @@ if (! empty($peers)) {
                     $data['vrfId'] = $vrfId;
                     $data['peerIdType'] = $peerIdType;
                     $data['ifIndex'] = explode('.', (string) $ifFace)[4];
-                    $peer[$data['bgpPeerIdentifier']] = $data;
+                    $peer[$data['bgpPeerRemoteAddr']] = $data;
 
                     return $peer;
                 });
