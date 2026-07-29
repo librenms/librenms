@@ -3,21 +3,18 @@
 namespace App\Actions\Device;
 
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
+use App\Models\Secret;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Polling\Method\PollingMethodManager;
 
 class BuildDefaultPollingMethods
 {
-    public function __construct(
-        private readonly PollingMethodManager $manager = new PollingMethodManager,
-    ) {
-    }
-
     /**
      * Build default polling methods collection for a new device.
      *
      * @param  array<string, mixed>  $input
+     * @return Collection<int, DevicePollingMethod>
      */
     public function execute(Device $device, array $input): Collection
     {
@@ -40,7 +37,7 @@ class BuildDefaultPollingMethods
                 $secretId = isset($data['secret_id']) ? (int) $data['secret_id'] : null;
                 $affectsAvailability = isset($data['affects_availability']) ? (bool) $data['affects_availability'] : null;
 
-                $pollingMethod = $this->manager->transient(
+                $pollingMethod = DevicePollingMethod::transient(
                     type: $type,
                     settings: $settings,
                     secretData: ($credentialMode === 'existing' || empty($secretData)) ? [] : $secretData,
@@ -49,7 +46,7 @@ class BuildDefaultPollingMethods
                 );
 
                 if ($credentialMode === 'existing' && $secretId !== null) {
-                    $secret = $this->manager->resolveExistingSecret($secretId, $type);
+                    $secret = Secret::resolveForType($secretId, $type);
                     $pollingMethod->setRelation('secret', $secret);
                     $pollingMethod->secret_id = $secret->id;
                 } elseif ($credentialMode === 'new' && ! empty($secretData) && ! empty($data['description'])) {
@@ -66,7 +63,7 @@ class BuildDefaultPollingMethods
         }
 
         // ICMP polling method is always added
-        $pollingMethods->push($this->manager->transient(
+        $pollingMethods->push(DevicePollingMethod::transient(
             PollingMethodType::Icmp,
             device: $device,
             affectsAvailability: false,
@@ -103,7 +100,7 @@ class BuildDefaultPollingMethods
                 ];
             }
 
-            $pollingMethods->push($this->manager->transient(
+            $pollingMethods->push(DevicePollingMethod::transient(
                 PollingMethodType::Snmp,
                 settings: $settings,
                 secretData: $snmpData,
