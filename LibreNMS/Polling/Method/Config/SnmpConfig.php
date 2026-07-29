@@ -57,7 +57,7 @@ readonly class SnmpConfig implements PollingMethodConfigInterface
         $secretDefinition = $definition->secretDefinition();
 
         $settings = $definition->resolveValues($method->settings ?? []);
-        $secretData = $secretDefinition->resolveValues($method->secret?->data ?? []);
+        $secretData = $secretDefinition->resolveValues($method->secret->data ?? []);
 
         return new static(
             enabled: $method->enabled,

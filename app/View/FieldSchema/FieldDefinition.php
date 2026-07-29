@@ -28,6 +28,11 @@ namespace App\View\FieldSchema;
 
 class FieldDefinition
 {
+    /**
+     * @param  array<string|int, mixed>|null  $options
+     * @param  array<string, mixed>|null  $visibleIf
+     * @param  array<int, string>|string|null  $rules
+     */
     public function __construct(
         public string $key,
         public string $type = 'text',
@@ -64,6 +69,9 @@ class FieldDefinition
         return $this;
     }
 
+    /**
+     * @param  array<string|int, mixed>|null  $options
+     */
     public function options(?array $options): static
     {
         $this->options = $options;
@@ -71,6 +79,9 @@ class FieldDefinition
         return $this;
     }
 
+    /**
+     * @param  array<string, mixed>|null  $visibleIf
+     */
     public function visibleIf(?array $visibleIf): static
     {
         $this->visibleIf = $visibleIf;
@@ -78,6 +89,9 @@ class FieldDefinition
         return $this;
     }
 
+    /**
+     * @param  array<int, string>|string|null  $rules
+     */
     public function rules(array|string|null $rules): static
     {
         $this->rules = $rules;
@@ -164,6 +178,9 @@ class FieldDefinition
         return $fallbackValue !== null ? (string) $fallbackValue : null;
     }
 
+    /**
+     * @return array<int, string>|string|null
+     */
     public function getRules(): array|string|null
     {
         if ($this->rules !== null) {
