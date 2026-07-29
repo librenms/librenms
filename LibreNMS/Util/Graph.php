@@ -272,7 +272,7 @@ class Graph
 
     public static function getOverviewGraphsForDevice(Device $device): array
     {
-        if ($device->snmp_disable) {
+        if (! $device->pollingMethodFor()->snmp()->enabled) {
             return Arr::wrap(LibrenmsConfig::getOsSetting('ping', 'over'));
         }
 

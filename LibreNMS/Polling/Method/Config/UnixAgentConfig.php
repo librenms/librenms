@@ -2,12 +2,9 @@
 
 namespace LibreNMS\Polling\Method\Config;
 
-use App\Facades\LibrenmsConfig;
-use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\PollingMethodConfigInterface;
-use LibreNMS\Util\Rewrite;
 
 readonly class UnixAgentConfig implements PollingMethodConfigInterface
 {
@@ -15,36 +12,13 @@ readonly class UnixAgentConfig implements PollingMethodConfigInterface
         public bool $enabled,
         public bool $affectsAvailability,
         public int $port,
+        public int $timeout,
     ) {
     }
 
     public function isEnabled(): bool
     {
         return $this->enabled;
-    }
-
-    public function isAvailable(Device $device, bool $commit = false): bool
-    {
-        $agent_port = $device->getAttrib('override_Unixagent_port');
-        if (empty($agent_port)) {
-            $agent_port = LibrenmsConfig::get('unix-agent.port');
-        }
-
-        $poller_target = Rewrite::addIpv6Brackets($device->pollerTarget());
-        $timeout = LibrenmsConfig::get('unix-agent.connection-timeout', 10);
-
-        try {
-            $agent = @fsockopen($poller_target, (int) $agent_port, $errno, $errstr, $timeout);
-            if ($agent) {
-                fclose($agent);
-
-                return true;
-            }
-        } catch (\Throwable) {
-            // return false
-        }
-
-        return false;
     }
 
     public static function fromModel(DevicePollingMethod $method): static
@@ -60,6 +34,7 @@ readonly class UnixAgentConfig implements PollingMethodConfigInterface
             enabled: $method->enabled,
             affectsAvailability: $method->affects_availability,
             port: $settings['port'],
+            timeout: $settings['timeout'],
         );
     }
 }
