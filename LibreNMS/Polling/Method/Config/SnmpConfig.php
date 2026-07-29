@@ -75,7 +75,7 @@ readonly class SnmpConfig implements PollingMethodConfigInterface
         $secretDefinition = $definition->secretDefinition();
 
         $settings = $definition->resolveValues($method->settings ?? []);
-        $secretData = $secretDefinition->resolveValues($method->secret?->data ?? []);
+        $secretData = $secretDefinition->resolveValues($method->secret->data ?? []);
 
         $timeout = (float) ($settings['timeout'] > 0 ? $settings['timeout'] : LibrenmsConfig::get('snmp.timeout', 1));
         $retries = (int) (is_numeric($settings['retries']) ? $settings['retries'] : LibrenmsConfig::get('snmp.retries', 5));
