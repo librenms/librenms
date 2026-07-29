@@ -1,4 +1,5 @@
 <?php
+
 /**
  * HandlesFieldSchema.php
  *
