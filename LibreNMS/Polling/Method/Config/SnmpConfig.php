@@ -71,29 +71,32 @@ readonly class SnmpConfig implements PollingMethodConfigInterface
             throw new SnmpException('Invalid polling method type');
         }
 
-        $secret = $method->secret;
-        $secretData = $secret ? $secret->data : [];
+        $definition = PollingMethodType::Snmp->definition();
+        $secretDefinition = $definition->secretDefinition();
 
-        $timeout = (float) ($method->settings['timeout'] > 0 ? $method->settings['timeout'] : LibrenmsConfig::get('snmp.timeout', 1));
-        $retries = (int) (is_numeric($method->settings['retries']) ? $method->settings['retries'] : LibrenmsConfig::get('snmp.retries', 5));
-        $maxRepeaters = (int) ($method->settings['max_repeaters'] ?: LibrenmsConfig::getOsSetting($device->os, 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', 0)));
-        $configuredMaxOid = (int) ($method->settings['max_oid'] ?: LibrenmsConfig::getOsSetting($device->os, 'snmp_max_oid', LibrenmsConfig::get('snmp.max_oid', 10)));
+        $settings = $definition->resolveValues($method->settings ?? []);
+        $secretData = $secretDefinition->resolveValues($method->secret?->data ?? []);
+
+        $timeout = (float) ($settings['timeout'] > 0 ? $settings['timeout'] : LibrenmsConfig::get('snmp.timeout', 1));
+        $retries = (int) (is_numeric($settings['retries']) ? $settings['retries'] : LibrenmsConfig::get('snmp.retries', 5));
+        $maxRepeaters = (int) ($settings['max_repeaters'] ?: LibrenmsConfig::getOsSetting($device->os, 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', 0)));
+        $configuredMaxOid = (int) ($settings['max_oid'] ?: LibrenmsConfig::getOsSetting($device->os, 'snmp_max_oid', LibrenmsConfig::get('snmp.max_oid', 10)));
         $rawBulk = $device->getAttrib('snmp_bulk') ?? LibrenmsConfig::getOsSetting($device->os, 'snmp_bulk', LibrenmsConfig::get('snmp_bulk', true));
 
         return new static(
             enabled: $method->enabled,
             affectsAvailability: $method->affects_availability,
-            version: $secretData['version'] ?? 'v2c',
+            version: $secretData['version'],
             community: $secretData['community'] ?? null,
             authname: $secretData['authname'] ?? null,
             authpass: $secretData['authpass'] ?? null,
-            authlevel: $secretData['authlevel'] ?? 'noAuthNoPriv',
-            authalgo: $secretData['authalgo'] ?? 'SHA',
+            authlevel: $secretData['authlevel'],
+            authalgo: $secretData['authalgo'],
             cryptopass: $secretData['cryptopass'] ?? null,
-            cryptoalgo: $secretData['cryptoalgo'] ?? 'AES',
+            cryptoalgo: $secretData['cryptoalgo'],
             context: $secretData['context'] ?? null,
-            transport: $method->settings['transport'],
-            port: (int) ($method->settings['port'] ?? 161),
+            transport: $settings['transport'],
+            port: (int) ($settings['port'] ?? 161),
             timeout: max(0.1, $timeout),
             retries: max(0, $retries),
             maxRepeaters: max(0, $maxRepeaters),

@@ -74,6 +74,8 @@ class EditPollingController
             ])->all(),
         ])->all();
 
+        $settingsDefaults = $definition->schemaDefaults();
+
         return [
             'type' => $type->value,
             'label' => __('poller.methods.' . $type->value),
@@ -81,8 +83,10 @@ class EditPollingController
             'schema_fields' => $schemaFields,
             'schema_defaults' => $secretDef?->schemaDefaults() ?? [],
             'settings_fields' => $settingsFields,
+            'settings_defaults' => $settingsDefaults,
             'settings' => array_merge(
-                $row->settings ?? [],
+                $settingsDefaults,
+                $row?->settings ?? [],
                 $type === PollingMethodType::Snmp ? ['port_association_mode' => PortAssociationMode::getName($device->port_association_mode) ?? LibrenmsConfig::get('default_port_association_mode', 'ifIndex')] : []
             ),
             'affects_availability' => $row ? $row->affects_availability : $definition->defaultAffectsAvailability(),
@@ -94,7 +98,7 @@ class EditPollingController
             'secret_form_data_by_id' => $secretFormDataById,
             'usage_count' => $secret?->devices()->count() ?? 0,
             'configured' => $row !== null,
-            'enabled' => $row ? $row->enabled : false,
+            'enabled' => $row ? $row->enabled : true,
             'last_check_successful' => $row?->last_check_successful,
         ];
     }

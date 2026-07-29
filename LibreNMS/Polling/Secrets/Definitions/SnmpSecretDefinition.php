@@ -26,10 +26,11 @@
 
 namespace LibreNMS\Polling\Secrets\Definitions;
 
+use App\View\FieldSchema\FieldDefinition;
+use App\View\FieldSchema\HandlesFieldSchema;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Interfaces\SecretDefinitionInterface;
 use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
-use LibreNMS\Traits\HandlesFieldSchema;
 
 /**
  * @implements SecretDefinitionInterface<SnmpSecretData>
@@ -41,126 +42,102 @@ class SnmpSecretDefinition implements SecretDefinitionInterface
     /**
      * @inheritDoc
      */
-    public function schema(): array
+    public function fields(): array
     {
         return [
-            'version' => [
-                'type' => 'select',
-                'label' => 'SNMP Version',
-                'options' => [
+            'version' => FieldDefinition::make('version', 'select')
+                ->label('SNMP Version')
+                ->options([
                     'v1' => 'v1',
                     'v2c' => 'v2c',
                     'v3' => 'v3',
-                ],
-            ],
-            'community' => [
-                'type' => 'password',
-                'label' => 'Community',
-                'visible_if' => [
+                ])
+                ->default('v2c')
+                ->rules(['required', 'in:v1,v2c,v3']),
+
+            'community' => FieldDefinition::make('community', 'password')
+                ->label('Community')
+                ->visibleIf([
                     'version' => ['$in' => ['v1', 'v2c']],
-                ],
-            ],
-            'authname' => [
-                'type' => 'text',
-                'label' => 'Auth Name',
-                'visible_if' => [
+                ])
+                ->rules(['required_if:version,v1,v2c', 'string', 'nullable']),
+
+            'authname' => FieldDefinition::make('authname', 'text')
+                ->label('Auth Name')
+                ->visibleIf([
                     'version' => 'v3',
-                ],
-            ],
-            'authlevel' => [
-                'type' => 'select',
-                'label' => 'Auth Level',
-                'options' => [
+                ])
+                ->rules(['required_if:version,v3', 'string', 'nullable']),
+
+            'authlevel' => FieldDefinition::make('authlevel', 'select')
+                ->label('Auth Level')
+                ->options([
                     'noAuthNoPriv' => 'No Authentication, No Privacy',
                     'authNoPriv' => 'Authentication, No Privacy',
                     'authPriv' => 'Authentication, Privacy',
-                ],
-                'visible_if' => [
+                ])
+                ->default('noAuthNoPriv')
+                ->visibleIf([
                     'version' => 'v3',
-                ],
-            ],
-            'authpass' => [
-                'type' => 'password',
-                'label' => 'Auth Password',
-                'visible_if' => [
+                ])
+                ->rules(['required_if:version,v3', 'in:noAuthNoPriv,authNoPriv,authPriv']),
+
+            'authpass' => FieldDefinition::make('authpass', 'password')
+                ->label('Auth Password')
+                ->visibleIf([
                     'version' => 'v3',
                     'authlevel' => ['$in' => ['authNoPriv', 'authPriv']],
-                ],
-            ],
-            'authalgo' => [
-                'type' => 'select',
-                'label' => 'Auth Algorithm',
-                'options' => [
+                ])
+                ->rules(['required_if:authlevel,authNoPriv,authPriv', 'string', 'nullable']),
+
+            'authalgo' => FieldDefinition::make('authalgo', 'select')
+                ->label('Auth Algorithm')
+                ->options([
                     'MD5' => 'MD5',
                     'SHA' => 'SHA',
                     'SHA-224' => 'SHA-224',
                     'SHA-256' => 'SHA-256',
                     'SHA-384' => 'SHA-384',
                     'SHA-512' => 'SHA-512',
-                ],
-                'visible_if' => [
+                ])
+                ->default('SHA')
+                ->visibleIf([
                     'version' => 'v3',
                     'authlevel' => ['$in' => ['authNoPriv', 'authPriv']],
-                ],
-            ],
-            'cryptopass' => [
-                'type' => 'password',
-                'label' => 'Crypto Password',
-                'visible_if' => [
+                ])
+                ->rules(['required_if:authlevel,authNoPriv,authPriv', 'in:MD5,SHA,SHA-224,SHA-256,SHA-384,SHA-512']),
+
+            'cryptopass' => FieldDefinition::make('cryptopass', 'password')
+                ->label('Crypto Password')
+                ->visibleIf([
                     'version' => 'v3',
                     'authlevel' => 'authPriv',
-                ],
-            ],
-            'cryptoalgo' => [
-                'type' => 'select',
-                'label' => 'Crypto Algorithm',
-                'options' => [
+                ])
+                ->rules(['required_if:authlevel,authPriv', 'string', 'nullable']),
+
+            'cryptoalgo' => FieldDefinition::make('cryptoalgo', 'select')
+                ->label('Crypto Algorithm')
+                ->options([
                     'DES' => 'DES',
                     'AES' => 'AES',
                     'AES-192' => 'AES-192',
                     'AES-256' => 'AES-256',
                     'AES-192-C' => 'AES-192-C',
                     'AES-256-C' => 'AES-256-C',
-                ],
-                'visible_if' => [
+                ])
+                ->default('AES')
+                ->visibleIf([
                     'version' => 'v3',
                     'authlevel' => 'authPriv',
-                ],
-            ],
-            'context' => [
-                'type' => 'text',
-                'label' => 'Context',
-                'visible_if' => [
+                ])
+                ->rules(['required_if:authlevel,authPriv', 'in:DES,AES,AES-192,AES-256,AES-192-C,AES-256-C']),
+
+            'context' => FieldDefinition::make('context', 'text')
+                ->label('Context')
+                ->visibleIf([
                     'version' => 'v3',
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function defaults(): array
-    {
-        return [
-            'version' => 'v2c',
-        ];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function rules(): array
-    {
-        return [
-            'version' => 'required|in:v1,v2c,v3',
-            'community' => 'required_if:version,v1,v2c|string|nullable',
-            'authname' => 'required_if:version,v3|string|nullable',
-            'authpass' => 'required_if:authlevel,authNoPriv,authPriv|string|nullable',
-            'authlevel' => 'required_if:version,v3|in:noAuthNoPriv,authNoPriv,authPriv',
-            'authalgo' => 'required_if:authlevel,authNoPriv,authPriv|in:MD5,SHA,SHA-224,SHA-256,SHA-384,SHA-512',
-            'cryptopass' => 'required_if:authlevel,authPriv|string|nullable',
-            'cryptoalgo' => 'required_if:authlevel,authPriv|in:DES,AES,AES-192,AES-256,AES-192-C,AES-256-C',
+                ])
+                ->rules(['nullable', 'string']),
         ];
     }
 

@@ -35,7 +35,7 @@
                     </div>
                 </div>
 
-                @include('secrets._form_fields', ['schema' => $schema, 'data' => $data])
+                <x-field-schema-fields :fields="$schema" :data="$data" />
 
                 <div class="tw:mt-6">
                     <button type="submit" class="btn btn-primary">

@@ -2,10 +2,11 @@
 
 namespace LibreNMS\Polling\Method\Definitions;
 
+use App\View\FieldSchema\FieldDefinition;
+use App\View\FieldSchema\HandlesFieldSchema;
 use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
 use LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
-use LibreNMS\Traits\HandlesFieldSchema;
 
 /**
  * @implements PollingMethodDefinitionInterface<IpmiConfig>
@@ -17,44 +18,34 @@ class IpmiPollingMethodDefinition implements PollingMethodDefinitionInterface
     /**
      * @inheritDoc
      */
-    public function schema(): array
+    public function fields(): array
     {
         return [
-            'hostname' => [
-                'type' => 'text',
-                'default' => '',
-            ],
-            'port' => [
-                'type' => 'number',
-                'default' => 623,
-            ],
-            'ciphersuite' => [
-                'type' => 'text',
-                'default' => '',
-            ],
-            'timeout' => [
-                'type' => 'number',
-                'default' => 3,
-            ],
+            'hostname' => FieldDefinition::make('hostname', 'text')
+                ->placeholder('Default: dcallable|nullevice\'s hostname')
+                ->rules(['required', 'string']),
+
+            'port' => FieldDefinition::make('port', 'number')
+                ->default(623)
+                ->min(1)
+                ->max(65535)
+                ->rules(['required', 'integer', 'min:1', 'max:65535'])
+                ->cast('int'),
+
+            'ciphersuite' => FieldDefinition::make('ciphersuite', 'text')
+                ->rules(['nullable', 'string']),
+
+            'timeout' => FieldDefinition::make('timeout', 'number')
+                ->default(3)
+                ->min(1)
+                ->rules(['required', 'integer', 'min:1'])
+                ->cast('int'),
         ];
     }
 
     public function defaultAffectsAvailability(): bool
     {
         return false;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function rules(): array
-    {
-        return [
-            'hostname' => ['required', 'string'],
-            'port' => ['required', 'integer', 'min:1', 'max:65535'],
-            'ciphersuite' => ['nullable', 'string'],
-            'timeout' => ['required', 'integer', 'min:1'],
-        ];
     }
 
     /**

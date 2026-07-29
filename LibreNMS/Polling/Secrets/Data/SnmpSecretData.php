@@ -48,16 +48,19 @@ class SnmpSecretData extends SecretData
      */
     public static function fromArray(array $data): static
     {
+        $definition = new \LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
+        $resolved = $definition->resolveValues($data);
+
         return new static(
-            version: $data['version'] ?? 'v2c',
-            community: $data['community'] ?? null,
-            authname: $data['authname'] ?? null,
-            authpass: $data['authpass'] ?? null,
-            authlevel: $data['authlevel'] ?? 'noAuthNoPriv',
-            authalgo: $data['authalgo'] ?? 'SHA',
-            cryptopass: $data['cryptopass'] ?? null,
-            cryptoalgo: $data['cryptoalgo'] ?? 'AES',
-            context: $data['context'] ?? null,
+            version: $resolved['version'],
+            community: $resolved['community'] ?? null,
+            authname: $resolved['authname'] ?? null,
+            authpass: $resolved['authpass'] ?? null,
+            authlevel: $resolved['authlevel'],
+            authalgo: $resolved['authalgo'],
+            cryptopass: $resolved['cryptopass'] ?? null,
+            cryptoalgo: $resolved['cryptoalgo'],
+            context: $resolved['context'] ?? null,
         );
     }
 }

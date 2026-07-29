@@ -1,9 +1,16 @@
 <?php
 
-namespace LibreNMS\Interfaces;
+namespace App\View\FieldSchema;
 
 interface HasFieldSchema
 {
+    /**
+     * Typed field definitions for this schema.
+     *
+     * @return array<string, \App\View\FieldSchema\FieldDefinition>
+     */
+    public function fields(): array;
+
     /**
      * UI/form schema for device-specific settings.
      *
