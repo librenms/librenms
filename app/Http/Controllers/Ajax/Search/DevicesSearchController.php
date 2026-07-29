@@ -36,6 +36,10 @@ class DevicesSearchController extends GroupedSearchController
                 ->orWhereRelation('ports.ipv6', 'ipv6_compressed', 'like', $like)
                 ->orWhereRelation('ports', 'ifPhysAddress', 'like', '%' . $mac . '%')
                 ->orWhere('overwrite_ip', 'like', $like);
+
+            if (\LibreNMS\Util\IPv6::isValid($search, false)) {
+                $query->orWhere('ip', '=', inet_pton($search));
+            }
         } elseif (ctype_xdigit($mac)) {
             $query->orWhereRelation('ports', 'ifPhysAddress', 'like', '%' . $mac . '%');
         }
