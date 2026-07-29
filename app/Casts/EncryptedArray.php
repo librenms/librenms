@@ -25,9 +25,9 @@ class EncryptedArray implements CastsAttributes
         }
 
         try {
-            return json_decode((string) decrypt($value), true);
-        } catch (DecryptException) {
-            return [];
+            return json_decode((string) decrypt($value), true) ?? [];
+        } catch (DecryptException $e) {
+            throw \LibreNMS\Exceptions\SecretDecryptionException::failedToDecrypt($e->getMessage());
         }
     }
 
