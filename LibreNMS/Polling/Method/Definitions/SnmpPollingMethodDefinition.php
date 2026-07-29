@@ -100,6 +100,14 @@ class SnmpPollingMethodDefinition implements PollingMethodDefinitionInterface
     /**
      * @inheritDoc
      */
+    public function probe(): \LibreNMS\Polling\Method\Probe\SnmpProbe
+    {
+        return new \LibreNMS\Polling\Method\Probe\SnmpProbe();
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function secretDefinition(): SnmpSecretDefinition
     {
         return new SnmpSecretDefinition;

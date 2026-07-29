@@ -45,6 +45,14 @@ class IcmpPollingMethodDefinition implements PollingMethodDefinitionInterface
     /**
      * @inheritDoc
      */
+    public function probe(): \LibreNMS\Polling\Method\Probe\IcmpProbe
+    {
+        return new \LibreNMS\Polling\Method\Probe\IcmpProbe();
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function secretDefinition(): null
     {
         return null;

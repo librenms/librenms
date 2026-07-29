@@ -48,9 +48,15 @@ class Secret extends BaseModel
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public static function resolveForType(int $id, \LibreNMS\Enum\PollingMethodType $type): self
+    public static function resolveForType(int $id, \LibreNMS\Enum\PollingMethodType $type, ?User $user = null): self
     {
-        $secret = static::findOrFail($id);
+        $query = static::query();
+        $user ??= auth()->user();
+        if ($user) {
+            $query->hasAccess($user);
+        }
+
+        $secret = $query->findOrFail($id);
 
         if ($secret->secret_type->value !== $type->value) {
             throw \Illuminate\Validation\ValidationException::withMessages([

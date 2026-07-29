@@ -26,14 +26,13 @@
 
 namespace LibreNMS\Polling\Method\Config;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Interfaces\PollingMethodConfigInterface;
 use SnmpQuery;
-use App\Facades\LibrenmsConfig;
-use LibreNMS\Util\Rewrite;
 
 readonly class SnmpConfig implements PollingMethodConfigInterface
 {
@@ -63,7 +62,7 @@ readonly class SnmpConfig implements PollingMethodConfigInterface
     ) {
     }
 
-    public static function fromDevice(Device $device): self
+    public static function fromDevice(Device $device): static
     {
         $method = $device->pollingMethod(PollingMethodType::Snmp);
 

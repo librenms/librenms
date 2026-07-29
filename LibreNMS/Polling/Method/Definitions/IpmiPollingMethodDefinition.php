@@ -67,6 +67,14 @@ class IpmiPollingMethodDefinition implements PollingMethodDefinitionInterface
     /**
      * @inheritDoc
      */
+    public function probe(): \LibreNMS\Polling\Method\Probe\IpmiProbe
+    {
+        return new \LibreNMS\Polling\Method\Probe\IpmiProbe();
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function secretDefinition(): IpmiSecretDefinition
     {
         return new IpmiSecretDefinition;

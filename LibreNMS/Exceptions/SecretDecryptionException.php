@@ -2,9 +2,9 @@
 
 namespace LibreNMS\Exceptions;
 
-use Exception;
+use RuntimeException;
 
-class SecretDecryptionException extends Exception
+class SecretDecryptionException extends RuntimeException
 {
     public static function failedToDecrypt(?string $reason = null): self
     {

@@ -22,6 +22,6 @@ enum PollingMethodType: string
 
     public function hasSecret(): bool
     {
-        return app()->bound("polling.secret.$this->value");
+        return $this->definition()->secretDefinition() !== null;
     }
 }

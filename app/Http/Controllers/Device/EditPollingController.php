@@ -41,9 +41,11 @@ class EditPollingController
             'allMethods' => $allMethods,
             'configuredMethods' => $allMethods->filter(fn (array $m): bool => $m['configured'])->values(),
             'unconfiguredMethods' => $allMethods->filter(fn (array $m): bool => ! $m['configured'])->values(),
-            'availableSecrets' => Secret::query()->orderBy('description')->get()->groupBy(
-                fn (Secret $s): string => $s->secret_type->value
-            ),
+            'availableSecrets' => Secret::query()
+                ->when(auth()->user(), fn ($q, $user) => $q->hasAccess($user))
+                ->orderBy('description')
+                ->get()
+                ->groupBy(fn (Secret $s): string => $s->secret_type->value),
         ]);
     }
 
@@ -62,6 +64,7 @@ class EditPollingController
         $schemaFields = $secretDef ? $secretDef->buildSchemaFields() : [];
         $settingsFields = $definition->buildSchemaFields(dataVar: 'settingsData');
         $secretsForType = Secret::query()
+            ->when(auth()->user(), fn ($q, $user) => $q->hasAccess($user))
             ->where('secret_type', $type->value)
             ->orderBy('description')
             ->get();
@@ -207,16 +210,19 @@ class EditPollingController
             } elseif ($request->has('secret_data')) {
                 $secretData = $request->validatedSecretData();
                 $mode = $validated['secret_update_mode'] ?? 'update';
-                if (! $pollingMethod->secret || $mode === 'create') {
+                $existingSecret = $pollingMethod->secret;
+                $isSharedSecret = $existingSecret && $existingSecret->devices()->count() > 1;
+
+                if (! $existingSecret || $mode === 'create' || $mode === 'copy' || $isSharedSecret) {
                     $secret = Secret::create([
                         'secret_type' => $type->value,
-                        'description' => 'Custom ' . strtoupper($type->value),
+                        'description' => 'Custom ' . strtoupper($type->value) . ' (' . $device->hostname . ')',
                         'default' => false,
                         'data' => $secretData,
                     ]);
                     $pollingMethod->secret()->associate($secret)->save();
                 } else {
-                    $pollingMethod->secret->update(['data' => $secretData]);
+                    $existingSecret->update(['data' => $secretData]);
                 }
             }
 

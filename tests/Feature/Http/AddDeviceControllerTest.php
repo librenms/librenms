@@ -79,31 +79,30 @@ class AddDeviceControllerTest extends TestCase
         $admin->assignRole('admin');
         $admin->givePermissionTo('device.create');
 
-        // Mock PollingMethodFactory to return mocked methods
         $calledCredentials = [];
-        $icmpMock = Mockery::mock(\LibreNMS\Interfaces\PollingMethodConfigInterface::class);
-        $icmpMock->shouldReceive('isAvailable')->andReturn(true);
 
-        $snmpMock = Mockery::mock(\LibreNMS\Interfaces\PollingMethodConfigInterface::class);
-        $snmpMock->shouldReceive('isAvailable')
-            ->andReturnUsing(function ($device) use (&$calledCredentials) {
-                $snmpMethod = $device->pollingMethods->firstWhere('method_type', \LibreNMS\Enum\PollingMethodType::Snmp);
+        // Mock Fping for ICMP check
+        $fpingMock = Mockery::mock(\LibreNMS\Data\Source\Icmp\Fping::class);
+        $statusMock = Mockery::mock(\LibreNMS\Data\Source\Icmp\FpingResponse::class);
+        $statusMock->shouldReceive('isAlive')->andReturn(true);
+        /** @phpstan-ignore-next-line */
+        $statusMock->duplicates = 0;
+        $fpingMock->shouldReceive('ping')->andReturn($statusMock);
+        $this->instance(\LibreNMS\Data\Source\Icmp\Fping::class, $fpingMock);
+
+        // Mock SnmpQuery to capture tried credentials
+        \SnmpQuery::partialMock()->shouldReceive('get')
+            ->andReturnUsing(function () use (&$calledCredentials) {
+                /** @var \App\Models\Device|null $device */
+                $device = \SnmpQuery::getFacadeRoot()?->getDevice();
+                $snmpMethod = $device?->pollingMethods->firstWhere('method_type', \LibreNMS\Enum\PollingMethodType::Snmp);
                 $secret = $snmpMethod?->secret;
                 if ($secret) {
                     $calledCredentials[] = $secret->data;
                 }
 
-                return false; // Force it to fail to collect all tried credentials
+                return new \LibreNMS\Data\Source\SnmpResponse('', '', 1); // Fail check to collect all tried
             });
-
-        $factoryMock = Mockery::mock(\LibreNMS\Polling\PollingMethodFactory::class);
-        $factoryMock->shouldReceive('make')
-            ->andReturnUsing(fn (\App\Models\DevicePollingMethod $method) => match ($method->method_type) {
-                \LibreNMS\Enum\PollingMethodType::Icmp => $icmpMock,
-                \LibreNMS\Enum\PollingMethodType::Snmp => $snmpMock,
-                default => throw new \UnexpectedValueException('Unexpected polling method type'),
-            });
-        $this->instance(\LibreNMS\Polling\PollingMethodFactory::class, $factoryMock);
 
         // Set global configured SNMP credentials to something we shouldn't attempt
         \App\Facades\LibrenmsConfig::set('snmp.version', ['v2c', 'v3']);
