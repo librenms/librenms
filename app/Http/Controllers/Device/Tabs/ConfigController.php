@@ -28,6 +28,7 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\ConfigBackup\ConfigBackupManager;
+use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
 use Illuminate\Http\JsonResponse;
@@ -64,7 +65,7 @@ class ConfigController extends Controller implements DeviceTab
     }
 
     /**
-     * @return array{error: ?string, error_message: ?string, urls: array{backups: string, backup: string, diff: string}, messages: array<string, string>, hostname: string}
+     * @return array{error: ?string, error_message: ?string, urls: array{backups: string, backup: string, diff: string}, messages: array<string, string>, hostname: string, os: string, config_highlighting: ?string}
      */
     public function data(Device $device, Request $request): array
     {
@@ -92,6 +93,8 @@ class ConfigController extends Controller implements DeviceTab
             'urls' => $urls,
             'messages' => $messages,
             'hostname' => $device->hostname,
+            'os' => $device->os,
+            'config_highlighting' => LibrenmsConfig::getOsSetting($device->os, 'config_highlighting'),
         ];
 
         if ($provider === null) {

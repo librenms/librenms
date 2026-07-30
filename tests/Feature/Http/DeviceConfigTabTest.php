@@ -211,7 +211,7 @@ class DeviceConfigTabTest extends TestCase
 
     public function testDataMethodReturnsPreparedUrlsAndMessages(): void
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->create(['os' => 'pfsense']);
 
         Http::fake([
             'unimus:8085/api/v2/devices/findByAddress/*' => Http::response(['data' => ['id' => 7]], 200),
@@ -227,6 +227,41 @@ class DeviceConfigTabTest extends TestCase
         $this->assertArrayHasKey('urls', $data);
         $this->assertArrayHasKey('messages', $data);
         $this->assertEquals($device->hostname, $data['hostname']);
+        $this->assertSame('pfsense', $data['os']);
+        $this->assertSame('xml', $data['config_highlighting']);
+    }
+
+    public function testDataMethodLeavesUnconfiguredHighlightingNull(): void
+    {
+        $device = Device::factory()->create(['os' => 'ios']);
+
+        Http::fake([
+            'unimus:8085/api/v2/devices/findByAddress/*' => Http::response(['data' => ['id' => 7]], 200),
+        ]);
+
+        $data = app(ConfigController::class)->data($device, new \Illuminate\Http\Request());
+
+        $this->assertSame('ios', $data['os']);
+        $this->assertNull($data['config_highlighting']);
+    }
+
+    public function testConfigTabRendersHighlightedCodeWithLineNumbers(): void
+    {
+        $device = Device::factory()->create(['os' => 'pfsense']);
+
+        Http::fake([
+            'unimus:8085/api/v2/devices/findByAddress/*' => Http::response(['data' => ['id' => 7]], 200),
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device', ['device' => $device, 'tab' => 'config']))
+            ->assertOk()
+            ->assertSee('data-config-backups', false)
+            ->assertSee('window.LibreNMS.loadConfigHighlight()', false)
+            ->assertSee('class="config-highlight line-numbers', false)
+            ->assertSee('x-config-highlight="selected.content"', false)
+            ->assertSee('data-os="pfsense"', false)
+            ->assertSee('data-config-highlighting="xml"', false);
     }
 
     public function testLatestEndpointReturnsLatestBackup(): void
