@@ -245,25 +245,15 @@ class AlertsController extends TableController
      */
     public function formatItem(Model $model): array
     {
-        [$faultDetail, $maxRowLength] = $this->renderFaultDetail($model->latestLog);
-
         $state = (int) $model->state;
-        $collapseClass = $this->incidentCollapseClass($model->getAttribute('uncollapse_key_count'), $maxRowLength);
-
-        $hostname = '<div class="incident">'
-            . Url::modernDeviceLink($model->device)
-            . '<div id="incident' . $model->id . '"' . $collapseClass . '>' . $faultDetail . '</div>'
-            . '</div>';
-
         $noteClass = empty($model->note) ? 'default' : 'warning';
-
         $location = $model->device?->location?->location;
 
         return [
             'rule' => '<i title="' . e(json_encode($model->rule?->builder)) . '"><a href="' . Url::generate(['page' => 'alert-rules']) . '">' . e((string) $model->rule?->name) . '</a></i>',
             'details' => '<a class="fa-solid fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . $model->id . '" data-parent="#alerts"></a>',
             'verbose_details' => $this->verboseDetailsButton($model->latestLog?->id),
-            'hostname' => $hostname,
+            'hostname' => $this->renderHostname($model),
             'location' => '<a href="' . e(Url::generate(['page' => 'devices', 'location' => $location ?? ''])) . '">' . e($location ?? 'N/A') . '</a>',
             'timestamp' => $model->timestamp ? Time::format($model->timestamp, 'compact') : 'N/A',
             'severity' => $this->severityIcon($model->rule?->severity, $state),
@@ -277,24 +267,38 @@ class AlertsController extends TableController
 
     /**
      * Render the collapsible fault detail HTML from an eager-loaded latestLog entry.
-     *
-     * @return array{0: string, 1: int} [html, plain-text length]
      */
-    private function renderFaultDetail(?AlertLog $latestLog): array
+    private function renderFaultDetail(?AlertLog $latestLog): string
     {
         if (! $latestLog || empty($latestLog->details)) {
-            return ['', 0];
+            return '';
         }
 
-        $html = view('alerts.fault-detail', [
+        return view('alerts.fault-detail', [
             'details' => $this->parser->parse($latestLog->details),
         ])->render();
-
-        return [$html, strlen(strip_tags($html))];
     }
 
-    private function incidentCollapseClass(mixed $uncollapseKeyCount, int $maxRowLength): string
+    private function renderHostname(Alert $alert): string
     {
+        $faultDetail = $this->renderFaultDetail($alert->latestLog);
+        $collapseClass = $this->incidentCollapseClass($faultDetail);
+
+        return '<div class="incident">'
+            . Url::modernDeviceLink($alert->device)
+            . '<div id="incident' . $alert->id . '"' . $collapseClass . '>' . $faultDetail . '</div>'
+            . '</div>';
+    }
+
+    private function incidentCollapseClass(string $detail): string
+    {
+        if (empty($detail)) {
+            return '';
+        }
+
+        $uncollapseKeyCount = request()->input('uncollapse_key_count');
+        $maxRowLength = strlen(strip_tags($detail));
+
         return (is_numeric($uncollapseKeyCount) && $maxRowLength < (int) $uncollapseKeyCount)
             ? ''
             : ' class="collapse"';
