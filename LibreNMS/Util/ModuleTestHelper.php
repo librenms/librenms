@@ -39,6 +39,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
+use SnmpQuery;
 
 class ModuleTestHelper
 {
@@ -153,11 +154,11 @@ class ModuleTestHelper
 
                 $snmp_options = ['-OUneb', '-Ih', '-m', '+' . $oid_data['mib']];
                 if ($oid_data['method'] == 'walk') {
-                    $data = \SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'] ?? null)->walk($oid_data['oid']);
+                    $data = SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'] ?? null)->walk($oid_data['oid']);
                 } elseif ($oid_data['method'] == 'get') {
-                    $data = \SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'] ?? null)->get($oid_data['oid']);
+                    $data = SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'] ?? null)->get($oid_data['oid']);
                 } elseif ($oid_data['method'] == 'getnext') {
-                    $data = \SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'] ?? null)->next($oid_data['oid']);
+                    $data = SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'] ?? null)->next($oid_data['oid']);
                 }
 
                 if (isset($data) && $data->getExitCode() === 0) {
@@ -171,11 +172,6 @@ class ModuleTestHelper
 
     private function collectOids(int $device_id): array
     {
-        global $device;
-
-        $device = device_by_id_cache($device_id);
-        DeviceCache::setPrimary($device_id);
-
         // Run discovery
         ob_start();
         $save_debug = Debug::isEnabled();
@@ -201,7 +197,7 @@ class ModuleTestHelper
 
         // extract mibs and group with oids
         $snmp_oids = [
-            null => [
+            '' => [
                 'sysDescr.0_get' => ['oid' => 'sysDescr.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'],
                 'sysObjectID.0_get' => ['oid' => 'sysObjectID.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'],
             ],
@@ -214,7 +210,7 @@ class ModuleTestHelper
             $method = $snmp_matches[1][$index];
             $oids = explode("' '", trim($snmp_matches[3][$index]));
             preg_match("/('-c' '.*@([^']+)'|'-n' '([^']+)')/", $line, $context_matches);
-            $context = $context_matches[2] ?? $context_matches[3] ?? null;
+            $context = $context_matches[2] ?? $context_matches[3] ?? '';
 
             foreach ($oids as $oid) {
                 $snmp_oids[$context]["{$oid}_$method"] = [
