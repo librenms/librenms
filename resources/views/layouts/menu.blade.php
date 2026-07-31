@@ -602,7 +602,7 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">
                         <i class="fa fa-exclamation-circle text-{{ $alert_menu_class }} fa-fw fa-lg" aria-hidden="true"></i>
-                        <span class="badge badge-navbar-user count-notif badge-{{ $alert_menu_class }}">{{ $alert_count }}</span>
+                    @if ($alert_count > 0)<span class="badge badge-navbar-user count-notif badge-{{ $alert_menu_class }}">{{ $alert_count }}</span>@endif
                     <span class="tw:md:hidden tw:2xl:inline-block">{{ __('Alerts') }}</span>
                     </a>
                     <ul class="dropdown-menu">
