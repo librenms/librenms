@@ -156,6 +156,10 @@ class DevCollectSnmprec extends LnmsCommand
                 return;
             }
 
+            foreach ($event->oids as $oid) {
+                $this->output->write(' ' . $oid);
+            }
+
             $parsed = $this->convertSnmpToSnmprec($event->response);
 
             // If the captured response could not be parsed into snmprec lines (e.g. non-numeric OID format or missing type info),
@@ -195,10 +199,6 @@ class DevCollectSnmprec extends LnmsCommand
             if (! empty($parsed)) {
                 $snmprecDataByContext[$event->context][] = $parsed;
             }
-
-            foreach ($event->oids as $oid) {
-                $this->output->write(' ' . $oid);
-            }
         };
 
         $this->output->write(__('commands.dev:collect-snmprec.capturing_data'));
@@ -207,8 +207,15 @@ class DevCollectSnmprec extends LnmsCommand
 
         Event::listen(SnmpQueryExecuted::class, $listener);
 
+        $previous_level = config('logging.channels.stdout.level');
+        if (! Debug::isEnabled()) {
+            config(['logging.channels.stdout.level' => 'emergency']);
+        }
+
         (new DiscoverDevice($device->device_id, $moduleList))->handle();
         (new PollDevice($device->device_id, $moduleList))->handle();
+
+        config(['logging.channels.stdout.level' => $previous_level]);
 
         Event::forget(SnmpQueryExecuted::class);
 
