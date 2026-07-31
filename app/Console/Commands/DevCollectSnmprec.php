@@ -11,7 +11,6 @@ use App\Jobs\PollDevice;
 use App\Models\Device;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
@@ -42,16 +41,8 @@ class DevCollectSnmprec extends LnmsCommand
 
     public function handle(): int
     {
-        $deviceSpec = $this->argument('device');
-        try {
-            $device = DeviceCache::get($deviceSpec);
-        } catch (\Exception $e) {
-            $device = null;
-        }
-
-        if (! $device || ! $device->exists) {
-            $this->error(__('commands.dev:collect-snmprec.device_not_found', ['device' => $deviceSpec]));
-
+        $device = $this->resolveDevice();
+        if (! $device) {
             return 1;
         }
 
@@ -62,32 +53,24 @@ class DevCollectSnmprec extends LnmsCommand
             return 1;
         }
 
-        if (Str::contains($variant, '_')) {
+        if (str_contains($variant, '_')) {
             $this->error(__('commands.dev:collect-snmprec.variant_underscore'));
 
             return 1;
         }
 
-        if ($device->os !== 'generic') {
-            $targetOs = $device->os;
-        } else {
-            $targetOs = $this->option('os');
-            if (! $targetOs) {
-                $this->error(__('commands.dev:collect-snmprec.os_required'));
+        $targetOs = $device->os !== 'generic' ? $device->os : $this->option('os');
+        if (! $targetOs) {
+            $this->error(__('commands.dev:collect-snmprec.os_required'));
 
-                return 1;
-            }
+            return 1;
         }
 
         Debug::set((bool) $this->option('debug'));
 
         $modulesInput = $this->option('modules');
-        if ($modulesInput !== null && $modulesInput !== '') {
-            $modules = explode(',', $modulesInput);
-        } else {
-            $modulesInput = 'all';
-            $modules = [];
-        }
+        $modules = ($modulesInput === null || $modulesInput === '') ? [] : explode(',', $modulesInput);
+        $modulesInput = $modulesInput ?: 'all';
 
         $this->line("OS: $targetOs");
         $this->line("Module(s): $modulesInput");
@@ -98,11 +81,15 @@ class DevCollectSnmprec extends LnmsCommand
 
         try {
             $moduleList = ModuleList::fromUserOverrides($modules);
-            $preferNew = (bool) $this->option('prefer-new');
-            $full = (bool) $this->option('full');
             $snmprecFile = $this->getSnmprecFilePath($targetOs, $variant);
 
-            $this->captureData($device, $moduleList, $snmprecFile, $preferNew, $full);
+            $this->captureData(
+                $device,
+                $moduleList,
+                $snmprecFile,
+                (bool) $this->option('prefer-new'),
+                (bool) $this->option('full'),
+            );
 
             $this->newLine();
             $this->info(__('commands.dev:collect-snmprec.verify_private_data'));
@@ -113,6 +100,25 @@ class DevCollectSnmprec extends LnmsCommand
         }
 
         return 0;
+    }
+
+    private function resolveDevice(): ?Device
+    {
+        $deviceSpec = $this->argument('device');
+
+        try {
+            $device = DeviceCache::get($deviceSpec);
+        } catch (\Exception $e) {
+            $device = null;
+        }
+
+        if (! $device || ! $device->exists) {
+            $this->error(__('commands.dev:collect-snmprec.device_not_found', ['device' => $deviceSpec]));
+
+            return null;
+        }
+
+        return $device;
     }
 
     private function getSnmprecFilePath(string $os, string $variant): string
@@ -133,8 +139,7 @@ class DevCollectSnmprec extends LnmsCommand
             $this->output->write(__('commands.dev:collect-snmprec.capturing_data') . ' .');
             $data = SnmpQuery::options(['-OUneb', '-Ih'])->walk('.');
             if ($data->getExitCode() === 0) {
-                $snmprecData = [$this->convertSnmpToSnmprec($data)];
-                $this->saveSnmprec($snmprecFile, $snmprecData, '', $preferNew);
+                $this->saveSnmprec($snmprecFile, [$this->convertSnmpToSnmprec($data)], '', $preferNew);
             }
 
             return;
@@ -162,35 +167,11 @@ class DevCollectSnmprec extends LnmsCommand
 
             $parsed = $this->convertSnmpToSnmprec($event->response);
 
-            // If the captured response could not be parsed into snmprec lines (e.g. non-numeric OID format or missing type info),
-            // re-query the device with optimal options (-OUneb -Ih -m +MIB)
+            // If the captured response could not be parsed into snmprec lines (e.g. non-numeric OID format or
+            // missing type info), re-query the device with optimal options (-OUneb -Ih -m +MIB)
             if (empty($parsed) && ! empty($event->oids)) {
                 $isRequerying = true;
-
-                $mibOption = ! empty($event->mibs) ? '+' . implode(':', $event->mibs) : 'ALL';
-                $snmpOptions = ['-OUneb', '-Ih', '-m', $mibOption];
-                $mibDir = $event->mibDir;
-
-                foreach ($event->oids as $oid) {
-                    $query = SnmpQuery::device($device)
-                        ->options($snmpOptions)
-                        ->context($event->context)
-                        ->mibDir($mibDir);
-
-                    $data = match ($event->method) {
-                        'snmpget' => $query->get($oid),
-                        'snmpgetnext' => $query->next($oid),
-                        default => $query->walk($oid),
-                    };
-
-                    if ($data->getExitCode() === 0) {
-                        $reParsed = $this->convertSnmpToSnmprec($data);
-                        if (! empty($reParsed)) {
-                            $snmprecDataByContext[$event->context][] = $reParsed;
-                        }
-                    }
-                }
-
+                $this->requeryOids($device, $event, $snmprecDataByContext);
                 $isRequerying = false;
 
                 return;
@@ -224,66 +205,112 @@ class DevCollectSnmprec extends LnmsCommand
         }
     }
 
+    /**
+     * Re-query OIDs one at a time with explicit MIB options when the bulk response couldn't be parsed.
+     */
+    private function requeryOids(Device $device, SnmpQueryExecuted $event, array &$snmprecDataByContext): void
+    {
+        $mibOption = ! empty($event->mibs) ? '+' . implode(':', $event->mibs) : 'ALL';
+        $snmpOptions = ['-OUneb', '-Ih', '-m', $mibOption];
+
+        foreach ($event->oids as $oid) {
+            $query = SnmpQuery::device($device)
+                ->options($snmpOptions)
+                ->context($event->context)
+                ->mibDir($event->mibDir);
+
+            $data = match ($event->method) {
+                'snmpget' => $query->get($oid),
+                'snmpgetnext' => $query->next($oid),
+                default => $query->walk($oid),
+            };
+
+            if ($data->getExitCode() === 0) {
+                $reParsed = $this->convertSnmpToSnmprec($data);
+                if (! empty($reParsed)) {
+                    $snmprecDataByContext[$event->context][] = $reParsed;
+                }
+            }
+        }
+    }
+
     private function convertSnmpToSnmprec(SnmpResponse $snmpData): array
     {
         $result = [];
+
         foreach (explode(PHP_EOL, $snmpData->getRawWithoutBadLines()) as $line) {
             if (empty($line)) {
                 continue;
             }
 
             if (preg_match('/^\.[.\d]+ =/', $line)) {
-                [$oid, $rawData] = explode(' =', $line, 2);
-                $oid = ltrim($oid, '.');
-                $rawData = trim($rawData);
-
-                if (empty($rawData) || $rawData == '""') {
-                    $result[] = "$oid|4|";
-                } else {
-                    [$rawType, $data] = array_pad(explode(':', $rawData, 2), 2, '');
-                    if (Str::startsWith($rawType, 'Wrong Type (should be ')) {
-                        [$rawType, $data] = explode(':', ltrim($data), 2);
-                    }
-
-                    $type = $this->getSnmprecType($rawType);
-
-                    if ($type === null) {
-                        Log::debug('Skipped line, bad type: ' . $line);
-                        continue;
-                    }
-
-                    $data = ltrim($data, ' ');
-                    if (Str::startsWith($data, '"') && Str::endsWith($data, '"')) {
-                        $data = stripslashes(substr($data, 1, -1));
-                    }
-
-                    if ($type == '6') {
-                        $data = ltrim($data, '.');
-                    } elseif ($type == '4x') {
-                        $data = str_replace(' ', '', $data);
-                    } elseif ($type == '67') {
-                        preg_match('/\((\d+)\)/', $data, $match);
-                        $data = $match[1] ?? $data;
-                    }
-
-                    $result[] = "$oid|$type|$data";
+                $parsed = $this->parseOidLine($line);
+                if ($parsed !== null) {
+                    $result[] = $parsed;
                 }
             } else {
-                $lastKey = array_key_last($result);
-                if ($lastKey === null) {
-                    continue;
-                }
-
-                [$oid, $type, $data] = array_pad(explode('|', $result[$lastKey], 3), 3, '');
-                if ($type == '4x') {
-                    $result[$lastKey] .= bin2hex(PHP_EOL . $line);
-                } else {
-                    $result[$lastKey] = "$oid|4x|" . bin2hex($data . PHP_EOL . $line);
-                }
+                $this->appendContinuationLine($result, $line);
             }
         }
 
         return $result;
+    }
+
+    /**
+     * Parse a single "OID = TYPE: value" snmpwalk line into an "oid|type|value" snmprec line.
+     */
+    private function parseOidLine(string $line): ?string
+    {
+        [$oid, $rawData] = explode(' =', $line, 2);
+        $oid = ltrim($oid, '.');
+        $rawData = trim($rawData);
+
+        if (empty($rawData) || $rawData == '""') {
+            return "$oid|4|";
+        }
+
+        [$rawType, $data] = array_pad(explode(':', $rawData, 2), 2, '');
+        if (str_starts_with($rawType, 'Wrong Type (should be ')) {
+            [$rawType, $data] = explode(':', ltrim($data), 2);
+        }
+
+        $type = $this->getSnmprecType($rawType);
+        if ($type === null) {
+            Log::debug('Skipped line, bad type: ' . $line);
+
+            return null;
+        }
+
+        $data = ltrim($data, ' ');
+        if (str_starts_with($data, '"') && str_ends_with($data, '"')) {
+            $data = stripslashes(substr($data, 1, -1));
+        }
+
+        $data = match ($type) {
+            '6' => ltrim($data, '.'),
+            '4x' => str_replace(' ', '', $data),
+            '67' => preg_match('/\((\d+)\)/', $data, $ticks) ? $ticks[1] : $data,
+            default => $data,
+        };
+
+        return "$oid|$type|$data";
+    }
+
+    /**
+     * Append a wrapped line (no leading OID) onto the previous result entry as hex-encoded data.
+     */
+    private function appendContinuationLine(array &$result, string $line): void
+    {
+        $lastKey = array_key_last($result);
+        if ($lastKey === null) {
+            return;
+        }
+
+        [$oid, $type, $data] = array_pad(explode('|', $result[$lastKey], 3), 3, '');
+
+        $result[$lastKey] = $type == '4x'
+            ? $result[$lastKey] . bin2hex(PHP_EOL . $line)
+            : "$oid|4x|" . bin2hex($data . PHP_EOL . $line);
     }
 
     private function getSnmprecType(string $text): ?string
@@ -323,34 +350,39 @@ class DevCollectSnmprec extends LnmsCommand
 
         $results = $preferNew ? array_merge($existingData, $newData) : array_merge($newData, $existingData);
 
-        uksort($results, function ($a, $b) {
-            $aParts = explode('.', (string) $a);
-            $bParts = explode('.', (string) $b);
-
-            foreach ($aParts as $index => $aPart) {
-                if (! isset($bParts[$index])) {
-                    return 1;
-                }
-
-                if ($aPart > $bParts[$index]) {
-                    return 1;
-                } elseif ($aPart < $bParts[$index]) {
-                    return -1;
-                }
-            }
-
-            return count($aParts) <=> count($bParts);
-        });
-
-        $output = implode(PHP_EOL, $results) . PHP_EOL;
+        uksort($results, fn ($a, $b) => $this->compareOids((string) $a, (string) $b));
 
         if (empty($results)) {
             $this->info(__('commands.dev:collect-snmprec.no_data', ['file' => $filename]));
-        } else {
-            $this->newLine();
-            $this->info(__('commands.dev:collect-snmprec.saved_snmprec', ['file' => $filename]));
-            file_put_contents($filename, $output);
+
+            return;
         }
+
+        $this->newLine();
+        $this->info(__('commands.dev:collect-snmprec.saved_snmprec', ['file' => $filename]));
+        file_put_contents($filename, implode(PHP_EOL, $results) . PHP_EOL);
+    }
+
+    /**
+     * Compare two dotted-decimal OIDs numerically, segment by segment.
+     */
+    private function compareOids(string $a, string $b): int
+    {
+        $aParts = explode('.', $a);
+        $bParts = explode('.', $b);
+
+        foreach ($aParts as $index => $part) {
+            if (! isset($bParts[$index])) {
+                return 1;
+            }
+
+            $cmp = $part <=> $bParts[$index];
+            if ($cmp !== 0) {
+                return $cmp;
+            }
+        }
+
+        return count($aParts) <=> count($bParts);
     }
 
     private function indexSnmprec(array $snmprecData): array
