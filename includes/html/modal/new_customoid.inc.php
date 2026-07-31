@@ -103,13 +103,13 @@
                     </div>
                     <div class="form-group">
                         <div class="col-sm-12 text-center">
-                            <button type="button" class="btn btn-success" id="save-oid-button" name="save-oid-button">
+                            <button type="button" class="lnms-btn lnms-btn-success" id="save-oid-button" name="save-oid-button">
                                 Save OID
                             </button>
-                            <button type="button" class="btn btn-warning" id="save-oid-skip-button" name="save-oid-skip-button">
+                            <button type="button" class="lnms-btn lnms-btn-warning" id="save-oid-skip-button" name="save-oid-skip-button">
                                 Save (Skip test)
                             </button>
-                            <button type="button" class="btn btn-primary" id="test-oid-button" name="test-oid-button">
+                            <button type="button" class="lnms-btn lnms-btn-primary" id="test-oid-button" name="test-oid-button">
                                 Test OID
                             </button>
                         </div>
