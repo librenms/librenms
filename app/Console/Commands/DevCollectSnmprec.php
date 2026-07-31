@@ -157,7 +157,7 @@ class DevCollectSnmprec extends LnmsCommand
 
         $isRequerying = false;
         $listener = function (SnmpQueryExecuted $event) use (&$snmprecDataByContext, $device, &$isRequerying): void {
-            if ($isRequerying || $event->response->getExitCode() !== 0) {
+            if ($isRequerying || $event->response->getExitCode() !== 0) { // @phpstan-ignore booleanOr.leftAlwaysFalse
                 return;
             }
 
