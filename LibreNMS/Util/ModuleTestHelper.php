@@ -35,11 +35,8 @@ use DeviceCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
-use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
-use SnmpQuery;
 
 class ModuleTestHelper
 {
@@ -130,102 +127,6 @@ class ModuleTestHelper
     public function setJsonSavePath(string $path): void
     {
         $this->json_file = $path;
-    }
-
-    public function captureFromDevice(int $device_id, bool $prefer_new = false, bool $full = false): void
-    {
-        if ($full) {
-            $snmp_oids[][] = [
-                'oid' => '.',
-                'method' => 'walk',
-                'mib' => null,
-                'mibdir' => null,
-            ];
-        } else {
-            $snmp_oids = $this->collectOids($device_id);
-        }
-
-        DeviceCache::setPrimary($device_id);
-
-        foreach ($snmp_oids as $context => $context_oids) {
-            $snmprec_data = [];
-            foreach ($context_oids as $oid_data) {
-                $this->qPrint(' ' . $oid_data['oid']);
-
-                $snmp_options = ['-OUneb', '-Ih', '-m', '+' . $oid_data['mib']];
-                if ($oid_data['method'] == 'walk') {
-                    $data = SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'] ?? null)->walk($oid_data['oid']);
-                } elseif ($oid_data['method'] == 'get') {
-                    $data = SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'] ?? null)->get($oid_data['oid']);
-                } elseif ($oid_data['method'] == 'getnext') {
-                    $data = SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'] ?? null)->next($oid_data['oid']);
-                }
-
-                if (isset($data) && $data->getExitCode() === 0) {
-                    $snmprec_data[] = $this->convertSnmpToSnmprec($data);
-                }
-            }
-
-            $this->saveSnmprec($snmprec_data, $context, true, $prefer_new);
-        }
-    }
-
-    private function collectOids(int $device_id): array
-    {
-        // Run discovery
-        ob_start();
-        $save_debug = Debug::isEnabled();
-        $save_vdebug = Debug::isVerbose();
-        Debug::set();
-        Debug::setVerbose();
-        (new DiscoverDevice($device_id, $this->modules))->handle();
-        (new PollDevice($device_id, $this->modules))->handle();
-        Debug::set($save_debug);
-        Debug::setVerbose($save_vdebug);
-        $collection_output = ob_get_contents();
-        ob_end_clean();
-
-        d_echo($collection_output);
-        d_echo(PHP_EOL);
-
-        // remove color
-        $collection_output = preg_replace('/\033\[[\d;]+m/', '', $collection_output);
-
-        // extract snmp queries
-        $snmp_query_regex = '/SNMP\[\'.*snmp(?:bulk)?(walk|get|getnext)\' .+\'(udp|tcp|tcp6|udp6):(?:\[[0-9a-f:]+\]|[^:]+):[0-9]+\' \'(.+)\'\]/m';
-        preg_match_all($snmp_query_regex, (string) $collection_output, $snmp_matches);
-
-        // extract mibs and group with oids
-        $snmp_oids = [
-            '' => [
-                'sysDescr.0_get' => ['oid' => 'sysDescr.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'],
-                'sysObjectID.0_get' => ['oid' => 'sysObjectID.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'],
-            ],
-        ];
-        foreach ($snmp_matches[0] as $index => $line) {
-            preg_match("/'-m' '\+?([a-zA-Z0-9:\-]+)'/", $line, $mib_matches);
-            $mib = $mib_matches[1] ?? null;
-            preg_match("/'-M' '\+?([a-zA-Z0-9:\-\/]+)'/", $line, $mibdir_matches);
-            $mibdir = $mibdir_matches[1];
-            $method = $snmp_matches[1][$index];
-            $oids = explode("' '", trim($snmp_matches[3][$index]));
-            preg_match("/('-c' '.*@([^']+)'|'-n' '([^']+)')/", $line, $context_matches);
-            $context = $context_matches[2] ?? $context_matches[3] ?? '';
-
-            foreach ($oids as $oid) {
-                $snmp_oids[$context]["{$oid}_$method"] = [
-                    'oid' => $oid,
-                    'mib' => $mib,
-                    'mibdir' => $mibdir,
-                    'method' => $method,
-                ];
-            }
-        }
-
-        d_echo('OIDs to capture ');
-        d_echo($snmp_oids);
-
-        return $snmp_oids;
     }
 
     /**
@@ -358,71 +259,6 @@ class ModuleTestHelper
         }
     }
 
-    private function convertSnmpToSnmprec(SnmpResponse $snmp_data): array
-    {
-        $result = [];
-        foreach (explode(PHP_EOL, $snmp_data->getRawWithoutBadLines()) as $line) {
-            if (empty($line)) {
-                continue;
-            }
-
-            if (preg_match('/^\.[.\d]+ =/', $line)) {
-                [$oid, $raw_data] = explode(' =', $line, 2);
-                $oid = ltrim($oid, '.');
-                $raw_data = trim($raw_data);
-
-                if (empty($raw_data) || $raw_data == '""') {
-                    $result[] = "$oid|4|"; // empty data, we don't know type, put string
-                } else {
-                    [$raw_type, $data] = array_pad(explode(':', $raw_data, 2), 2, '');
-                    if (Str::startsWith($raw_type, 'Wrong Type (should be ')) {
-                        // device returned the wrong type, save the wrong type to emulate the device behavior
-                        [$raw_type, $data] = explode(':', ltrim($data), 2);
-                    }
-
-                    $type = $this->getSnmprecType($raw_type);
-
-                    if ($type === null) {
-                        Log::debug('Skipped line, bad type: ' . $line);
-                        continue;
-                    }
-
-                    $data = ltrim($data, ' ');
-                    if (Str::startsWith($data, '"') && Str::endsWith($data, '"')) {
-                        // raw string surrounded by quotes, strip extra escapes
-                        $data = stripslashes(substr($data, 1, -1));
-                    }
-
-                    if ($type == '6') {
-                        // remove leading . from oid data
-                        $data = ltrim($data, '.');
-                    } elseif ($type == '4x') {
-                        // remove spaces from hex-strings
-                        $data = str_replace(' ', '', $data);
-                    } elseif ($type == '67') {
-                        // extract timeticks value (-Ot removes type info)
-                        preg_match('/\((\d+)\)/', $data, $match);
-                        $data = $match[1];
-                    }
-
-                    $result[] = "$oid|$type|$data";
-                }
-            } else {
-                // multi-line data, append to last
-                $last = end($result);
-
-                [$oid, $type, $data] = explode('|', $last, 3);
-                if ($type == '4x') {
-                    $result[key($result)] .= bin2hex(PHP_EOL . $line);
-                } else {
-                    $result[key($result)] = "$oid|4x|" . bin2hex($data . PHP_EOL . $line);
-                }
-            }
-        }
-
-        return $result;
-    }
-
     private function getSnmprecType(string $text): ?string
     {
         return match ($text) {
@@ -441,49 +277,6 @@ class ModuleTestHelper
         };
     }
 
-    private function saveSnmprec(array $data, ?string $context = null, bool $write = true, bool $prefer_new = false): void
-    {
-        $filename = $this->snmprec_file;
-
-        if ($context) {
-            $filename = str_replace('.snmprec', '', $filename) . "@$context.snmprec";
-        }
-
-        if (is_file($filename)) {
-            $existing_data = $this->indexSnmprec(explode(PHP_EOL, file_get_contents($filename)));
-        } else {
-            $existing_data = [];
-        }
-
-        $new_data = [];
-        foreach ($data as $part) {
-            $new_data = array_merge($new_data, $this->indexSnmprec($part));
-        }
-
-        $this->cleanSnmprecData($new_data);
-
-        // merge new and existing data
-        if ($prefer_new) {
-            $results = array_merge($existing_data, $new_data);
-        } else {
-            $results = array_merge($new_data, $existing_data);
-        }
-
-        // put data in the proper order for snmpsim
-        uksort($results, $this->compareOid(...));
-
-        $output = implode(PHP_EOL, $results) . PHP_EOL;
-
-        if ($write) {
-            if (empty($results)) {
-                $this->qPrint("No data for $filename\n");
-            } else {
-                $this->qPrint("\nSaved snmprec data $filename\n");
-                file_put_contents($filename, $output);
-            }
-        }
-    }
-
     private function indexSnmprec(array $snmprec_data): array
     {
         $result = [];
@@ -496,36 +289,6 @@ class ModuleTestHelper
         }
 
         return $result;
-    }
-
-    private function cleanSnmprecData(array &$data): void
-    {
-        $private_oid = [
-            '1.3.6.1.2.1.1.6.0',
-            '1.3.6.1.2.1.1.4.0',
-            '1.3.6.1.2.1.1.5.0',
-        ];
-
-        foreach ($private_oid as $oid) {
-            if (isset($data[$oid])) {
-                $parts = explode('|', $data[$oid], 3);
-                $parts[2] = $parts[1] === '4' ? '<private>' : '3C707269766174653E';
-                $data[$oid] = implode('|', $parts);
-            }
-        }
-
-        // IF-MIB::ifPhysAddress, Make sure it is in hex format
-        foreach ($data as $oid => $oid_data) {
-            if (str_starts_with((string) $oid, '1.3.6.1.2.1.2.2.1.6.')) {
-                $parts = explode('|', (string) $oid_data, 3);
-                $mac = Mac::parse($parts[2])->hex();
-                if ($mac) {
-                    $parts[2] = $mac;
-                    $parts[1] = '4x';
-                    $data[$oid] = implode('|', $parts);
-                }
-            }
-        }
     }
 
     /**
