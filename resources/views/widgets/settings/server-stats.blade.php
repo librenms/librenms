@@ -1,11 +1,9 @@
 @extends('widgets.settings.base')
-
 @section('form')
     <div class="form-group">
         <label for="title-{{ $id }}" class="control-label">{{ __('Widget title') }}</label>
         <input type="text" class="form-control" name="title" id="title-{{ $id }}" placeholder="{{ __('Default Title') }}" value="{{ $title }}">
     </div>
-
     <div class="form-group">
         <label for="device-{{ $id }}" class="control-label">{{ __('Device') }}</label>
         <select class="form-control" id="device-{{ $id }}" name="device" required>
@@ -14,7 +12,15 @@
             @endif
         </select>
     </div>
-
+    <div class="form-group">
+        <label for="unit-{{ $id }}" class="control-label">{{ __('Display Unit') }}</label>
+        <select name="unit" id="unit-{{ $id }}" class="form-control">
+            <option value="AUTO" {{ $unit == 'AUTO' ? 'selected' : '' }}>{{ __('Auto') }}</option>
+            <option value="MIB" {{ $unit == 'MIB' ? 'selected' : '' }}>MiB</option>
+            <option value="GIB" {{ $unit == 'GIB' ? 'selected' : '' }}>GiB</option>
+            <option value="TIB" {{ $unit == 'TIB' ? 'selected' : '' }}>TiB</option>
+        </select>
+    </div>
     <div class="form-group">
         <label for="columnsize-{{ $id }}" class="control-label">{{ __('Columns') }}</label>
         <select name="columnsize" id="columnsize-{{ $id }}" class="form-control">
@@ -27,7 +33,6 @@
         </select>
     </div>
 @endsection
-
 @section('javascript')
     <script type="text/javascript">
         init_select2('#device-{{ $id }}', 'device', {}, @json($device ? ['id' => $device->device_id, 'text' => $device->displayName()] : ''));
