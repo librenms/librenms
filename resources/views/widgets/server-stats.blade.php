@@ -1,58 +1,66 @@
 <div class="col-sm-{{ $columns }}">
-    <div class="gauge-title">{{ __('CPU Usage') }}</div>
-    <div
-        id="cpu-{{ $id }}"
-        class="gauge-{{ $id }} gauge-container"
-        data-value="{{ $cpu }}"
-        data-max="100"
-        data-symbol="%"
-    ></div>
+    <div id="gauge-cpu-{{ $id }}" class="gauge-container"></div>
 </div>
 
-@foreach($mempools as $key => $mem)
+@foreach($mempools as $index => $mem)
     <div class="col-sm-{{ $columns }}">
-        <div class="gauge-title">{{ $mem->mempool_descr}} {{ __('Usage') }}</div>
-        <div
-            id="mem-{{ $key }}-{{ $id }}"
-            class="gauge-{{ $id }} gauge-container"
-            data-value="{{ $mem->used}}"
-            data-max="{{ $mem->total}}"
-            data-label="Mbytes"
-        ></div>
+        <div id="gauge-mem-{{ $id }}-{{ $index }}" class="gauge-container"></div>
     </div>
 @endforeach
 
-@foreach($disks as $key => $disk)
+@foreach($disks as $index => $disk)
     <div class="col-sm-{{ $columns }}">
-        <div class="gauge-title">{{ $disk->storage_descr}} {{ __('Usage') }}</div>
-        <div
-            id="disk-{{ $key }}-{{ $id }}"
-            class="gauge-{{ $id }} gauge-container"
-            data-value="{{ $disk->used}}"
-            data-max="{{ $disk->total}}"
-            data-label="Mbytes"
-        ></div>
+        <div id="gauge-disk-{{ $id }}-{{ $index }}" class="gauge-container"></div>
     </div>
 @endforeach
 
-<script type='text/javascript'>
-    $('.gauge-{{ $id }}').each(function() {
+<script type="text/javascript">
+    $(document).ready(function() {
+
         new JustGage({
-            id: this.id,
+            id: "gauge-cpu-{{ $id }}",
+            title: "{{ __('CPU Usage') }}",
+            value: {{ (float) ($cpu ?? 0) }},
             min: 0,
-            valueFontSize: '2px'
+            max: 100,
+            symbol: '%',
+            valueFontSize: '15px',
+            titleFontColor: '#999999'
         });
+
+        @foreach($mempools as $index => $mem)
+            new JustGage({
+                id: "gauge-mem-{{ $id }}-{{ $index }}",
+                title: "{!! addslashes($mem->descr) !!}",
+                value: {{ (float) $mem->used }},
+                min: 0,
+                max: {{ (float) ($mem->total > 0 ? $mem->total : 100) }},
+                label: "{{ $unit }}",
+                valueFontSize: '15px',
+                labelMinFontSize: '10px',
+                titleFontColor: '#999999'
+            });
+        @endforeach
+
+        @foreach($disks as $index => $disk)
+            new JustGage({
+                id: "gauge-disk-{{ $id }}-{{ $index }}",
+                title: "{!! addslashes($disk->descr) !!}",
+                value: {{ (float) $disk->used }},
+                min: 0,
+                max: {{ (float) ($disk->total > 0 ? $disk->total : 100) }},
+                label: "{{ $unit }}",
+                valueFontSize: '15px',
+                labelMinFontSize: '10px',
+                titleFontColor: '#999999'
+            });
+        @endforeach
     });
 </script>
 
 <style>
-    .gauge-title {
-        text-align:center;
-        font-family: Arial, sans-serif; font-size: 0.8em; font-weight: bold;
-        color:#999999;
-    }
     .gauge-container {
-        height: 80px;
+        height: 120px;
         margin-bottom: 15px;
     }
 </style>
