@@ -106,6 +106,9 @@
                             <button type="button" class="btn btn-success" id="save-oid-button" name="save-oid-button">
                                 Save OID
                             </button>
+                            <button type="button" class="btn btn-warning" id="save-oid-skip-button" name="save-oid-skip-button">
+                                Save (Skip test)
+                            </button>
                             <button type="button" class="btn btn-primary" id="test-oid-button" name="test-oid-button">
                                 Test OID
                             </button>
@@ -167,8 +170,7 @@ $('#create-oid-form').on('show.bs.modal', function(e) {
         $('#cpassed').prop('checked', false);
     }
 });
-$('#save-oid-button').on('click', function (e) {
-    e.preventDefault();
+function saveOid() {
     var customoid_id = $('#ccustomoid_id').val();
     var url = customoid_id ? '<?php echo route("customoid.update", ["customoid" => ":customoid"]) ?>'.replace(':customoid', customoid_id) : '<?php echo route("customoid.store") ?>';
     $('#datatype').prop('disabled', false);
@@ -194,6 +196,16 @@ $('#save-oid-button').on('click', function (e) {
             toastr.error('Failed to process OID');
         }
     });
+}
+$('#save-oid-button').on('click', function (e) {
+    e.preventDefault();
+    saveOid();
+});
+$('#save-oid-skip-button').on('click', function (e) {
+    e.preventDefault();
+    $('#passed').val('on');
+    $('#cpassed').prop('checked', true);
+    saveOid();
 });
 $('#test-oid-button').on('click', function (e) {
     e.preventDefault();
