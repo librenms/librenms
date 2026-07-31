@@ -52,7 +52,7 @@ class ShowConfigController extends Controller implements DeviceTab
             return false; // a modern config backup provider takes over the Config tab
         }
 
-        if (Gate::allows('showConfig', $device)) {
+        if (Gate::allows('config-backup.showConfig')) {
             return $this->oxidizedEnabled($device) || $this->getRancidConfigFile() !== false;
         }
 

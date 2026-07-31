@@ -2100,7 +2100,7 @@ function get_oxidized_config(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('device_name');
     $device = DeviceCache::get($hostname);
-    if (Gate::denies('showConfig', $device)) {
+    if (Gate::denies('config-backup.showConfig')) {
         return api_error(403, 'Insufficient permissions');
     }
 

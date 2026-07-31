@@ -56,6 +56,10 @@ groups:
     component:
         - component.update
 
+    config-backup:
+        - config-backup.showConfig
+        - config-backup.refreshConfig
+
     custom-map:
         - custom-map.viewAll
         - custom-map.view
@@ -75,8 +79,6 @@ groups:
         - device.update
         - device.delete
         - device.debug
-        - device.showConfig
-        - device.refreshConfig
         - device.updateNotes
 
     device-group:

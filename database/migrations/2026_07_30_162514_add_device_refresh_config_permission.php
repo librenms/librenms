@@ -6,13 +6,22 @@ use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
+    /** @var array<string, string> old permission name => new permission name */
+    private array $moves = [
+        'oxidized.refresh' => 'config-backup.refreshConfig',
+        'device.showConfig' => 'config-backup.showConfig',
+    ];
+
     /**
-     * Replace the Oxidized-specific refresh permission with the generic device
-     * config refresh permission, preserving which roles hold it.
+     * Move the config backup permissions into their own "Config Backup" group,
+     * replacing the Oxidized-specific refresh permission and the device-scoped
+     * show config permission, preserving which roles hold them.
      */
     public function up(): void
     {
-        $this->movePermission('oxidized.refresh', 'device.refreshConfig');
+        foreach ($this->moves as $from => $to) {
+            $this->movePermission($from, $to);
+        }
     }
 
     /**
@@ -20,7 +29,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        $this->movePermission('device.refreshConfig', 'oxidized.refresh');
+        foreach ($this->moves as $from => $to) {
+            $this->movePermission($to, $from);
+        }
     }
 
     /**

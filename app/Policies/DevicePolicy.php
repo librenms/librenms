@@ -72,26 +72,6 @@ class DevicePolicy
     }
 
     /**
-     * Determine whether the user can view the stored configuration of the device
-     * from Oxidized or Rancid
-     */
-    public function showConfig(User $user, Device $device): bool
-    {
-        return $this->hasGlobalPermission($user, 'showConfig')
-            && $this->view($user, $device);
-    }
-
-    /**
-     * Determine whether the user can queue a fresh configuration backup of the
-     * device (e.g. Oxidized's reload node)
-     */
-    public function refreshConfig(User $user, Device $device): bool
-    {
-        return $this->hasGlobalPermission($user, 'refreshConfig')
-            && $this->view($user, $device);
-    }
-
-    /**
      * Determine whether the user can update device notes.
      */
     public function updateNotes(User $user, Device $device): bool

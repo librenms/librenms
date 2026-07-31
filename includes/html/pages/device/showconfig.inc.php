@@ -5,7 +5,7 @@ use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\Process\Process;
 
-if (Gate::allows('showConfig', DeviceCache::getPrimary())) {
+if (Gate::allows('config-backup.showConfig')) {
     if (LibrenmsConfig::get('rancid_repo_type') == 'git-bare' && is_dir($rancid_path)) {
         echo '<div style="clear: both;">';
 
