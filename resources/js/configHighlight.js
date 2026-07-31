@@ -158,5 +158,35 @@ export default function highlightConfig(element, content) {
     element.classList.add(`language-${language}`);
     element.parentElement.classList.add(`language-${language}`);
     element.textContent = content ?? "";
+
+    const pre = element.parentElement;
+    const lines = content ? (content.match(/\n(?!$)/g) || []).length + 1 : 1;
+
+    if (lines > 20000) {
+        pre.classList.remove("line-numbers");
+        element.classList.remove("line-numbers");
+        pre.style.paddingLeft = "";
+        const existingRows = pre.querySelector(".line-numbers-rows");
+        if (existingRows) {
+            existingRows.remove();
+        }
+        return;
+    }
+
+    pre.classList.add("line-numbers");
+    const startLine = parseInt(pre.getAttribute("data-start"), 10) || 1;
+    const maxLineNumber = startLine + lines - 1;
+    const digits = Math.max(3, String(maxLineNumber).length);
+    const rowsWidth = Number((digits * 0.9).toFixed(2));
+    const paddingLeft = Number((rowsWidth + 0.9).toFixed(2));
+
+    pre.style.paddingLeft = `${paddingLeft}em`;
+
     Prism.highlightElement(element);
+
+    const rows = pre.querySelector(".line-numbers-rows");
+    if (rows) {
+        rows.style.left = `-${paddingLeft}em`;
+        rows.style.width = `${rowsWidth}em`;
+    }
 }
