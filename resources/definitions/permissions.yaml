@@ -76,6 +76,7 @@ groups:
         - device.delete
         - device.debug
         - device.showConfig
+        - device.refreshConfig
         - device.updateNotes
 
     device-group:
@@ -122,7 +123,6 @@ groups:
 
     oxidized:
         - oxidized.list
-        - oxidized.refresh
         - oxidized.search
 
     peering-db:

@@ -10,6 +10,7 @@ return [
         'delete' => ['label' => 'Delete Devices', 'description' => 'Remove devices from LibreNMS'],
         'debug' => ['label' => 'Debug Devices', 'description' => 'Run snmpwalk and other debug commands on devices'],
         'showConfig' => ['label' => 'Show Device Config', 'description' => 'Show device configuration'],
+        'refreshConfig' => ['label' => 'Refresh Device Config', 'description' => 'Refresh device configuration'],
         'updateNotes' => ['label' => 'Update Device Notes', 'description' => 'Update device notes'],
     ],
 
@@ -135,7 +136,6 @@ return [
     'oxidized' => [
         'title' => 'Oxidized',
         'view' => ['label' => 'View Oxidized', 'description' => 'View device configuration backups'],
-        'refresh' => ['label' => 'Refresh Oxidized', 'description' => 'Trigger a configuration re-fetch for a device'],
         'search' => ['label' => 'Search Oxidized', 'description' => 'Search through Oxidized configuration backups'],
     ],
 
