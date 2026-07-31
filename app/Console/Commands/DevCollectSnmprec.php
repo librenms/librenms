@@ -108,7 +108,7 @@ class DevCollectSnmprec extends LnmsCommand
 
         try {
             $device = DeviceCache::get($deviceSpec);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $device = null;
         }
 
@@ -306,7 +306,7 @@ class DevCollectSnmprec extends LnmsCommand
             return;
         }
 
-        [$oid, $type, $data] = array_pad(explode('|', $result[$lastKey], 3), 3, '');
+        [$oid, $type, $data] = array_pad(explode('|', (string) $result[$lastKey], 3), 3, '');
 
         $result[$lastKey] = $type == '4x'
             ? $result[$lastKey] . bin2hex(PHP_EOL . $line)

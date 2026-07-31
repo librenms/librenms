@@ -88,40 +88,9 @@ class ModuleTestHelper
         LibrenmsConfig::set('kafka.enable', false);
     }
 
-    private static function compareOid(mixed $a, mixed $b): int
-    {
-        $a_oid = explode('.', (string) $a);
-        $b_oid = explode('.', (string) $b);
-
-        foreach ($a_oid as $index => $a_part) {
-            if (! isset($b_oid[$index])) {
-                return 1; // a is higher (b doesn't exist)
-            }
-
-            $b_part = $b_oid[$index];
-
-            if ($a_part > $b_part) {
-                return 1; // a is higher
-            } elseif ($a_part < $b_part) {
-                return -1; // b is higher
-            }
-        }
-
-        if (count($a_oid) < count($b_oid)) {
-            return -1; // same prefix, but b has more so it is higher
-        }
-
-        return 0;
-    }
-
     public function setQuiet(bool $quiet = true): void
     {
         $this->quiet = $quiet;
-    }
-
-    public function setSnmprecSavePath(string $path): void
-    {
-        $this->snmprec_file = $path;
     }
 
     public function setJsonSavePath(string $path): void
@@ -257,38 +226,6 @@ class ModuleTestHelper
         } else {
             echo $var;
         }
-    }
-
-    private function getSnmprecType(string $text): ?string
-    {
-        return match ($text) {
-            'STRING', 'OCTET STRING', 'BITS', 'Network Address' => '4',
-            'OID', 'OBJECT IDENTIFIER' => '6',
-            'Hex-STRING' => '4x',
-            'Timeticks' => '67',
-            'INTEGER', 'Integer32' => '2',
-            'NULL' => '5',
-            'IpAddress' => '64',
-            'Counter32' => '65',
-            'Gauge32' => '66',
-            'Opaque' => '68',
-            'Counter64' => '70',
-            default => null
-        };
-    }
-
-    private function indexSnmprec(array $snmprec_data): array
-    {
-        $result = [];
-
-        foreach ($snmprec_data as $line) {
-            if (! empty($line)) {
-                [$oid] = explode('|', (string) $line, 2);
-                $result[$oid] = $line;
-            }
-        }
-
-        return $result;
     }
 
     /**

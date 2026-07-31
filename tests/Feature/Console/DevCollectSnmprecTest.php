@@ -1,9 +1,10 @@
 <?php
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Feature\Console;
 
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Tests\TestCase;
 
 final class DevCollectSnmprecTest extends TestCase
 {
