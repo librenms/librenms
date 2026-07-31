@@ -152,6 +152,9 @@ function resolveLanguage(os, configuredLanguage) {
     return "network-config";
 }
 
+const HIGHLIGHT_THRESHOLD = 5000;
+const LINE_NUMBERS_THRESHOLD = 20000;
+
 export default function highlightConfig(element, content) {
     const language = resolveLanguage(element.dataset.os, element.dataset.configHighlighting);
 
@@ -162,14 +165,18 @@ export default function highlightConfig(element, content) {
     const pre = element.parentElement;
     const lines = content ? (content.match(/\n(?!$)/g) || []).length + 1 : 1;
 
-    if (lines > 20000) {
+    const existingRows = pre.querySelector(".line-numbers-rows");
+    if (existingRows) {
+        existingRows.remove();
+    }
+
+    const showLineNumbers = lines <= LINE_NUMBERS_THRESHOLD;
+    const showHighlighting = lines <= HIGHLIGHT_THRESHOLD;
+
+    if (!showLineNumbers) {
         pre.classList.remove("line-numbers");
         element.classList.remove("line-numbers");
         pre.style.paddingLeft = "";
-        const existingRows = pre.querySelector(".line-numbers-rows");
-        if (existingRows) {
-            existingRows.remove();
-        }
         return;
     }
 
@@ -182,7 +189,15 @@ export default function highlightConfig(element, content) {
 
     pre.style.paddingLeft = `${paddingLeft}em`;
 
-    Prism.highlightElement(element);
+    if (showHighlighting) {
+        Prism.highlightElement(element);
+    } else {
+        const rows = document.createElement("span");
+        rows.className = "line-numbers-rows";
+        rows.setAttribute("aria-hidden", "true");
+        rows.innerHTML = Array(lines + 1).join("<span></span>");
+        element.appendChild(rows);
+    }
 
     const rows = pre.querySelector(".line-numbers-rows");
     if (rows) {
