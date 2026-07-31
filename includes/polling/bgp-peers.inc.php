@@ -136,7 +136,8 @@ if (! empty($peers)) {
         $vrfId = $peer['vrf_id'];
 
         try {
-            $peer_ip = IP::parse($peer['bgpPeerIdentifier']);
+            // Unnumbered peers are identified by their local interface (e.g. swp25), not an IP
+            $peer_ip = IP::parse($peer['bgpPeerIdentifier'], true) ?? $peer['bgpPeerIdentifier'];
 
             d_echo("Checking BGP peer $peer_ip ");
 
@@ -368,14 +369,18 @@ if (! empty($peers)) {
                         }
                     }
                 } else {
-                    $bgp_peer_ident = $peer_ip->toSnmpIndex();
-                    $ip_ver = $peer_ip->getFamily();
-                    if ($ip_ver == 'ipv6') {
-                        $ip_type = 2;
-                        $ip_len = 16;
-                    } else {
-                        $ip_type = 1;
-                        $ip_len = 4;
+                    // interface-identified (unnumbered) peers have no IP to index by;
+                    // the branches that need these are never reached for them
+                    if ($peer_ip instanceof IP) {
+                        $bgp_peer_ident = $peer_ip->toSnmpIndex();
+                        $ip_ver = $peer_ip->getFamily();
+                        if ($ip_ver == 'ipv6') {
+                            $ip_type = 2;
+                            $ip_len = 16;
+                        } else {
+                            $ip_type = 1;
+                            $ip_len = 4;
+                        }
                     }
 
                     if ($device['os_group'] === 'arista') {
