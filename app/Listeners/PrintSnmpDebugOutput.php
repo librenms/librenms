@@ -8,6 +8,7 @@ use LibreNMS\Util\Debug;
 
 class PrintSnmpDebugOutput
 {
+    /** @var array<int, string> */
     private array $commandCleanupPatterns = [
         '/-c\' \'[\S]+\'/',
         '/-u\' \'[\S]+\'/',
@@ -19,6 +20,7 @@ class PrintSnmpDebugOutput
         '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
     ];
 
+    /** @var array<int, string> */
     private array $commandReplacementPatterns = [
         '-c\' \'COMMUNITY\'',
         '-u\' \'USER\'',

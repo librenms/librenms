@@ -12,12 +12,12 @@ class SnmpQueryExecuted
 
     /**
      * @param  string  $method  snmpget, snmpwalk, snmpgetnext, snmptranslate, etc.
-     * @param  array  $oids  List of OIDs queried
-     * @param  array  $cliCommand  The raw CLI command array
+     * @param  array<int, string>  $oids  List of OIDs queried
+     * @param  array<int, string>  $cliCommand  The raw CLI command array
      * @param  SnmpResponse  $response  The SNMP response object
      * @param  Device|null  $device  The device object, if available
      * @param  string  $context  SNMP context, if set
-     * @param  array  $mibs  List of MIBs included
+     * @param  array<int, string>  $mibs  List of MIBs included
      * @param  string|null  $mibDir  MIB directories used
      */
     public function __construct(

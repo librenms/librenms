@@ -23,7 +23,7 @@ use Symfony\Component\Console\Input\InputOption;
 class DevCollectSnmprec extends LnmsCommand
 {
     protected $name = 'dev:collect-snmprec';
-    protected $developer = true;
+    protected bool $developer = true;
 
     public function __construct()
     {
@@ -124,7 +124,7 @@ class DevCollectSnmprec extends LnmsCommand
     private function getSnmprecFilePath(string $os, string $variant): string
     {
         if ($customFile = $this->option('file')) {
-            return $customFile;
+            return (string) $customFile;
         }
 
         $variantSuffix = strtolower($variant) ? '_' . strtolower($variant) : '';
@@ -167,8 +167,8 @@ class DevCollectSnmprec extends LnmsCommand
 
             $parsed = $this->convertSnmpToSnmprec($event->response);
 
-            // If the captured response could not be parsed into snmprec lines (e.g. non-numeric OID format or
-            // missing type info), re-query the device with optimal options (-OUneb -Ih -m +MIB)
+            // If the captured response could not be parsed into snmprec lines (e.g. non-numeric OID format or missing type info),
+            // re-query the device with optimal options (-OUneb -Ih -m +MIB)
             if (empty($parsed) && ! empty($event->oids)) {
                 $isRequerying = true;
                 $this->requeryOids($device, $event, $snmprecDataByContext);
@@ -207,6 +207,8 @@ class DevCollectSnmprec extends LnmsCommand
 
     /**
      * Re-query OIDs one at a time with explicit MIB options when the bulk response couldn't be parsed.
+     *
+     * @param  array<string, array<int, array<int, string>>>  $snmprecDataByContext
      */
     private function requeryOids(Device $device, SnmpQueryExecuted $event, array &$snmprecDataByContext): void
     {
@@ -234,6 +236,9 @@ class DevCollectSnmprec extends LnmsCommand
         }
     }
 
+    /**
+     * @return array<int, string>
+     */
     private function convertSnmpToSnmprec(SnmpResponse $snmpData): array
     {
         $result = [];
@@ -298,6 +303,8 @@ class DevCollectSnmprec extends LnmsCommand
 
     /**
      * Append a wrapped line (no leading OID) onto the previous result entry as hex-encoded data.
+     *
+     * @param  array<int, string>  $result
      */
     private function appendContinuationLine(array &$result, string $line): void
     {
@@ -331,6 +338,9 @@ class DevCollectSnmprec extends LnmsCommand
         };
     }
 
+    /**
+     * @param  array<int, array<int, string>>  $data
+     */
     private function saveSnmprec(string $baseFile, array $data, ?string $context, bool $preferNew): void
     {
         $filename = $baseFile;
@@ -385,6 +395,10 @@ class DevCollectSnmprec extends LnmsCommand
         return count($aParts) <=> count($bParts);
     }
 
+    /**
+     * @param  array<int, string>  $snmprecData
+     * @return array<string, string>
+     */
     private function indexSnmprec(array $snmprecData): array
     {
         $result = [];
@@ -399,6 +413,9 @@ class DevCollectSnmprec extends LnmsCommand
         return $result;
     }
 
+    /**
+     * @param  array<string, string>  $data
+     */
     private function cleanSnmprecData(array &$data): void
     {
         $privateOids = [
@@ -428,6 +445,11 @@ class DevCollectSnmprec extends LnmsCommand
         }
     }
 
+    /**
+     * @param  string  $name
+     * @param  string  $value
+     * @return array<int, string>|false
+     */
     public function completeArgument($name, $value): array|false
     {
         if ($name === 'device') {
