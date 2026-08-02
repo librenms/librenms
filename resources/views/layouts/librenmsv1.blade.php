@@ -11,7 +11,7 @@
         <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
         <link rel="icon" type="image/png" href="{{ asset('images/favicon-32x32.png') }}" sizes="32x32">
         <link rel="icon" type="image/png" href="{{ asset('images/favicon-16x16.png') }}" sizes="16x16">
-        <link rel="mask-icon" href="{{ asset('images/safari-pinned-tab.svg') }}" color="#5bbad5">
+        <link rel="mask-icon" href="{{ asset('images/safari-pinned-tab.svg') }}" color="#0F6E7C">
         <link rel="shortcut icon" href="{{ asset('images/favicon.ico') }}">
     @else
         <link rel="shortcut icon" href="{{ LibrenmsConfig::get('favicon') }}">
@@ -20,7 +20,7 @@
     <link rel="manifest" href="{{ asset('images/manifest.json') }}" crossorigin="use-credentials">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="msapplication-config" content="{{ asset('images/browserconfig.xml') }}">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="{{ session('applied_site_style') === 'dark' ? '#1E2226' : '#F4F6F8' }}">
 
     @vite(['resources/js/app.js'])
     <link href="{{ asset('css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet">
@@ -107,7 +107,7 @@
     @endauth
     @yield('javascript')
 </head>
-<body>
+<body class="lnms-shell">
 @if(Auth::check())
     <script>
         // only update resolution if it doesn't match what is stored in the session
@@ -117,13 +117,19 @@
     </script>
 @endif
 
+@if(request()->input('bare') != 'yes')
+    <a class="lnms-skip-link" href="#lnms-content">{{ __('Skip to content') }}</a>
+@endif
+
 @if(request()->input('bare') == 'yes')
     <style>body { padding-top: 0 !important; padding-bottom: 0 !important; }</style>
 @elseif($show_menu)
     @include('layouts.menu')
 @endif
 
+<main id="lnms-content" class="lnms-content" tabindex="-1">
 @yield('content')
+</main>
 
 @yield('scripts')
 

@@ -1,9 +1,9 @@
-<nav class="navbar navbar-default {{ $navbar }} navbar-sticky-top" role="navigation">
+<nav class="navbar navbar-default {{ $navbar }} navbar-sticky-top lnms-nav" role="navigation" aria-label="{{ __('Primary') }}">
         <div class="navbar-header">
             <a class="navbar-brand" href="{{ route('home') }}">
                 <x-logo responsive="lg" class="tw:h-full tw:max-w-[170px]" />
             </a>
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navHeaderCollapse">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navHeaderCollapse" aria-controls="navHeaderCollapse" aria-expanded="false">
                 <span class="sr-only">{{ __('Toggle navigation') }}</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
@@ -644,38 +644,43 @@
             </ul>
 
             <div class="navbar-form navbar-right global-search tw:relative" x-data="globalSearch()"
+                 role="search" aria-label="{{ __('Global Search') }}"
                  @keydown.escape="close()" @click.outside="close()">
                 <div class="form-group">
+                    <label class="sr-only" for="gsearch">{{ __('Global Search') }}</label>
                     <input class="form-control" type="search" id="gsearch" name="gsearch" autocomplete="off"
                            placeholder="{{ __('Type / to search') }}"
+                           aria-autocomplete="list"
                            x-model="query" x-ref="input"
                            @input.debounce.250ms="run()" @focus="open = flat.length > 0"
                            @keydown="onKey($event)">
                 </div>
                 <div x-show="open" x-cloak
-                     class="global-search-dropdown tw:absolute tw:right-0 tw:mt-1 tw:w-[50rem] tw:max-w-[90vw] tw:max-h-[70vh] tw:overflow-y-auto tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200 tw:rounded-lg tw:shadow-xl tw:z-50">
-                    <div x-show="loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-gray-500 tw:dark:text-dark-white-400">
-                        <i class="fa fa-spinner fa-spin"></i> {{ __('Searching...') }}
+                     class="global-search-dropdown tw:absolute tw:right-0 tw:mt-1 tw:w-[50rem] tw:max-w-[90vw] tw:max-h-[70vh] tw:overflow-y-auto tw:bg-lnms-surface tw:border tw:border-lnms-border tw:rounded-lnms-md tw:shadow-lnms-sm tw:z-50"
+                     role="listbox">
+                    <div x-show="loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-lnms-text-muted">
+                        <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> {{ __('Searching...') }}
                     </div>
-                    <div x-show="!loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-gray-500 tw:dark:text-dark-white-400">
+                    <div x-show="!loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-lnms-text-muted">
                         {{ __('No results') }}
                     </div>
                     <template x-for="group in groups" :key="group.type">
                         <div>
-                            <div class="tw:px-4 tw:py-1.5 tw:bg-gray-100 tw:dark:bg-dark-gray-200 tw:text-gray-600 tw:dark:text-dark-white-300 tw:text-xs tw:font-bold tw:uppercase" x-text="group.label"></div>
+                            <div class="tw:px-4 tw:py-1.5 tw:bg-lnms-surface-muted tw:text-lnms-text-secondary tw:text-xs tw:font-semibold tw:uppercase" x-text="group.label"></div>
                             <template x-for="item in group.results" :key="group.type + item.url">
                                 <a :href="item.url" @mouseenter="active = item.url"
-                                   class="tw:flex tw:items-center tw:gap-2.5 tw:px-4 tw:py-2 tw:no-underline tw:text-gray-800 tw:dark:text-dark-white-100 tw:hover:bg-gray-50 tw:dark:hover:bg-dark-gray-300"
-                                   :class="(active === item.url ? 'tw:bg-gray-100 tw:dark:bg-dark-gray-300 ' : '') + (item.status ? 'tw:border-l-5 ' + item.status : '')">
+                                   class="tw:flex tw:items-center tw:gap-2.5 tw:px-4 tw:py-2 tw:no-underline tw:text-lnms-text tw:hover:bg-lnms-surface-muted"
+                                   :class="(active === item.url ? 'tw:bg-lnms-accent-muted ' : '') + (item.status ? 'tw:border-l-5 ' + item.status : '')"
+                                   role="option">
                                     <template x-if="item.image">
-                                        <img :src="item.image" class="tw:h-7 tw:w-7 tw:shrink-0 tw:object-contain tw:dark:bg-gray-50 tw:dark:rounded tw:dark:p-0.5">
+                                        <img :src="item.image" alt="" class="tw:h-7 tw:w-7 tw:shrink-0 tw:object-contain tw:dark:bg-gray-50 tw:dark:rounded tw:dark:p-0.5">
                                     </template>
                                     <template x-if="!item.image">
-                                        <i class="fa fa-fw fa-lg tw:shrink-0 icon-theme" :class="item.icon"></i>
+                                        <i class="fa fa-fw fa-lg tw:shrink-0 icon-theme" :class="item.icon" aria-hidden="true"></i>
                                     </template>
                                     <span class="tw:min-w-0 tw:flex-1">
                                         <span class="tw:block tw:truncate" x-text="item.name"></span>
-                                        <span class="tw:block tw:truncate tw:text-sm tw:text-gray-500 tw:dark:text-dark-white-400" x-text="item.subtitle"></span>
+                                        <span class="tw:block tw:truncate tw:text-sm tw:text-lnms-text-muted" x-text="item.subtitle"></span>
                                     </span>
                                 </a>
                             </template>
