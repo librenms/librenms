@@ -5,36 +5,36 @@
 @endsection
 
 @section('content')
-<div class="container">
-<div class="row">
-    <div class="col-md-6 col-md-offset-3">
-        <x-panel>
+<div class="lnms-login">
+<div class="lnms-login__inner">
+        <x-panel class="lnms-login-panel">
             <x-slot name="title">
                 <x-logo class="logon-logo tw:h-auto tw:w-full" />
+                <p class="lnms-login__brand-line">{{ __('Two-Factor Authentication') }}</p>
             </x-slot>
 
             <div class="container-fluid">
                 @if(session('twofactoradd'))
                 <div class="row">
                     <div id="twofactorqrcontainer" class="col-md-12">
-                        <h4>Scan with your Two Factor Authenticator.</h4>
+                        <h4>{{ __('Scan with your Two Factor Authenticator.') }}</h4>
                         <div class="col-md-12 text-center tw:mb-2">
-                            <div class="tw:inline-block tw:bg-white tw:p-4 tw:pb-2 tw:rounded-lg" id="twofactorqr"></div>
+                            <div class="tw:inline-block tw:bg-white tw:p-4 tw:pb-2 tw:rounded-lnms-md" id="twofactorqr"></div>
                         </div>
                         <div class="col-md-12 text-center">
-                            <button class="btn btn-default" onclick="$('#twofactorqrcontainer').hide(); $('#twofactorkeycontainer').show();">Manual</button>
+                            <button class="btn btn-default" type="button" onclick="$('#twofactorqrcontainer').hide(); $('#twofactorkeycontainer').show();">{{ __('Manual') }}</button>
                         </div>
                     </div>
 
                     <div id="twofactorkeycontainer" style="display: none" class="col-md-12">
                         <div class="col-sm-12">
-                            <h4 style="user-select: none;">Secret Key:</h4>
+                            <h4 style="user-select: none;">{{ __('Secret Key:') }}</h4>
                         </div>
-                        <div class="col-sm-12 text-center" style="padding: 32px 0; font-size: medium;">
+                        <div class="col-sm-12 text-center" style="padding: 32px 0; font-size: medium; font-family: var(--lnms-font-mono);">
                             {{ $key }}
                         </div>
                         <div class="col-sm-12 text-center">
-                            <button class="btn btn-default" onclick="$('#twofactorkeycontainer').hide(); $('#twofactorqrcontainer').show();">QR</button>
+                            <button class="btn btn-default" type="button" onclick="$('#twofactorkeycontainer').hide(); $('#twofactorqrcontainer').show();">{{ __('QR') }}</button>
                         </div>
                     </div>
                     <script>$("#twofactorqr").qrcode({"text": "{!! $uri !!}"});</script>
@@ -52,11 +52,13 @@
                                         @endforeach
                                     </div>
                                     @if(!$errors->has('lockout'))
+                                    <label class="sr-only" for="twofactor">{{ __('Please enter auth token') }}</label>
                                     <input type="text"
                                            name="twofactor"
                                            id="twofactor"
                                            class="form-control"
-                                           autocomplete="off"
+                                           autocomplete="one-time-code"
+                                           inputmode="numeric"
                                            aria-describedby="twoFactorErrors"
                                            placeholder="{{ __('Please enter auth token') }}"
                                            required autofocus>
@@ -67,7 +69,7 @@
                                 @if(!$errors->has('lockout'))
                                     <div class="col-md-12" style="margin:8px">
                                         <button type="submit" class="btn btn-primary btn-block" name="submit">
-                                            <i class="fa fa-btn fa-sign-in"></i> {{ __('Submit') }}
+                                            <i class="fa fa-btn fa-sign-in" aria-hidden="true"></i> {{ __('Submit') }}
                                         </button>
                                     </div>
                                 @endif

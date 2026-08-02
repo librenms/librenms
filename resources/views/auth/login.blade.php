@@ -1,11 +1,9 @@
 @extends('layouts.librenmsv1')
 
 @section('content')
-<div class="container">
-    <div class="row">
-        <div class="col-md-6 col-md-offset-3 tw:mt-20">
-            @include('auth.login-form')
-        </div>
+<div class="lnms-login">
+    <div class="lnms-login__inner">
+        @include('auth.login-form')
     </div>
     @if($errors->any())
         <script>toastr.error('{{ $errors->first() }}')</script>
