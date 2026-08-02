@@ -3,15 +3,18 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'reboot-required';
-$options = '-Oqv';
-$mib = 'NET-SNMP-EXTEND-MIB';
-$oid = 'nsExtendOutput1Line."reboot-required"';
+$oid = 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."reboot-required"';
 
-$reboot = snmp_get($device, $oid, $options, $mib);
-$reboot = trim($reboot);
+$response = \SnmpQuery::get($oid);
 
-// Sanitize to 0 or 1
-$reboot = ($reboot === '1') ? 1 : 0;
+if (! $response->isValid()) {
+    echo PHP_EOL . $name . ': ' . $response->getErrorMessage() . PHP_EOL;
+
+    return;
+}
+
+$raw = trim($response->value());
+$reboot = ($raw === '1') ? 1 : 0;
 $status = $reboot ? 'Reboot required' : 'No reboot required';
 
 $rrd_name = ['app', $name, $app->app_id];
