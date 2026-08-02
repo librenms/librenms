@@ -20,7 +20,7 @@ if (empty($birdOutput)) {
 $protocolsData = [];
 
 // Remove headers
-$birdOutput = trim(explode('Name       Proto      Table      State  Since         Info', $birdOutput, 2)[1]);
+$birdOutput = trim(explode('Name       Proto      Table      State  Since         Info', (string) $birdOutput, 2)[1]);
 $protocolSegments = explode("\n\n", $birdOutput);
 
 // Remove the first title

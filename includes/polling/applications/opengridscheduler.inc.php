@@ -32,7 +32,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('zombie_jobs', 'GAUGE', 0);
 
 // parse the data from the script
-$data = explode("\n", $ogs_data);
+$data = explode("\n", (string) $ogs_data);
 $fields = [
     'running_jobs' => $data[0],
     'pending_jobs' => $data[1],
