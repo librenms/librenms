@@ -7291,6 +7291,36 @@
             "section": "general",
             "order": 2
         },
+        "unimus.enabled": {
+            "default": false,
+            "group": "external",
+            "section": "unimus",
+            "order": 0,
+            "type": "boolean"
+        },
+        "unimus.url": {
+            "group": "external",
+            "section": "unimus",
+            "order": 1,
+            "type": "text",
+            "validate": {
+                "value": "url"
+            }
+        },
+        "unimus.api_version": {
+            "default": "v2",
+            "group": "external",
+            "section": "unimus",
+            "order": 2,
+            "type": "text",
+            "hidden": true
+        },
+        "unimus.token": {
+            "group": "external",
+            "section": "unimus",
+            "order": 3,
+            "type": "password"
+        },
         "unix-agent-connection-time-out": {
             "default": 10,
             "type": "integer"

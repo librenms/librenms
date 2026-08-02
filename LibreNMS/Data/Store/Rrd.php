@@ -159,6 +159,9 @@ class Rrd extends BaseDatastore
         }
     }
 
+    /**
+     * @throws RrdException
+     */
     public function lastUpdate(string $filename): ?TimeSeriesPoint
     {
         $output = $this->command('lastupdate', $filename);
@@ -312,14 +315,13 @@ class Rrd extends BaseDatastore
      *
      * @param  string  $host  Host name
      * @param  array|string  $extra  Components of RRD filename - will be separated with "-", or a pre-formed rrdname
-     * @param  string  $extension  File extension (default is .rrd)
      * @return string the name of the rrd file for $host's $extra component
      */
-    public function name($host, $extra, $extension = '.rrd'): string
+    public function name($host, $extra): string
     {
         $filename = self::safeName(is_array($extra) ? implode('-', $extra) : $extra);
 
-        return implode('/', [$this->dirFromHost($host), $filename . $extension]);
+        return implode('/', [$this->dirFromHost($host), $filename . '.rrd']);
     }
 
     /**
@@ -419,13 +421,15 @@ class Rrd extends BaseDatastore
      * @param  string  $hostname  hostname of the device
      * @return string[] array of rrd files for this host
      */
-    public function getRrdFiles(string $hostname): array
+    public function getRrdFiles(string $hostname, string|array $prefix = ''): array
     {
+        $prefix = self::safeName(is_array($prefix) ? implode('-', $prefix) : $prefix);
+
         if ($this->rrdcached) {
             $output = $this->command('list', '/' . self::safeName($hostname));
-            $files = explode("\n", trim($output));
+            $files = array_filter(explode("\n", trim($output)), fn ($file) => str_starts_with((string) $file, $prefix));
         } else {
-            $files = glob($this->dirFromHost($hostname) . '/*.rrd') ?: [];
+            $files = glob($this->dirFromHost($hostname) . '/' . $prefix . '*.rrd') ?: [];
         }
 
         sort($files);
@@ -507,7 +511,7 @@ class Rrd extends BaseDatastore
             return;
         }
 
-        foreach (glob($this->name($hostname, $prefix, '*.rrd')) as $rrd) {
+        foreach (glob($this->name($hostname, $prefix)) as $rrd) {
             unlink($rrd);
         }
     }

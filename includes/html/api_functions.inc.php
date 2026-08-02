@@ -2099,6 +2099,11 @@ function search_oxidized(Illuminate\Http\Request $request)
 function get_oxidized_config(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('device_name');
+    $device = DeviceCache::get($hostname);
+    if (Gate::denies('showConfig', $device)) {
+        return api_error(403, 'Insufficient permissions');
+    }
+
     $node_info = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/show/' . $hostname . '?format=json'), true);
     $result = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/fetch/' . $node_info['full_name'] . '?format=json'), true);
     if (! $result) {
@@ -2609,18 +2614,18 @@ function update_device(Illuminate\Http\Request $request)
 function rename_device(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = DeviceCache::get($hostname);
     $new_hostname = $request->route('new_hostname');
-    $new_device = getidbyname($new_hostname);
 
     if (empty($new_hostname)) {
         return api_error(500, 'Missing new hostname');
-    } elseif ($new_device) {
-        return api_error(500, 'Device failed to rename, new hostname already exists');
+    } elseif (! $device->exists) {
+        return api_error(404, 'Existing device not found');
     } else {
-        if (renamehost($device_id, $new_hostname, 'api') == '') {
-            return api_success_noresult(200, 'Device has been renamed');
-        } else {
+        try {
+            $device->hostname = $new_hostname;
+            $device->save();
+        } catch (\Throwable) {
             return api_error(500, 'Device failed to be renamed');
         }
     }
@@ -3684,7 +3689,7 @@ function add_service_for_host(Illuminate\Http\Request $request)
     $service_param = $data['param'] ?: '';
     $service_ignore = $data['ignore'] ? true : false; // Default false
     $service_disable = $data['disable'] ? true : false; // Default false
-    $service_name = $data['name'];
+    $service_name = $data['name'] ?? '';
     $service_id = \LibreNMS\Services::addService($device_id, $service_type, $service_desc, $service_ip, $service_param, (int) $service_ignore, (int) $service_disable, 0, $service_name);
     if ($service_id != false) {
         return api_success_noresult(201, "Service $service_type has been added to device $hostname (#$service_id)");

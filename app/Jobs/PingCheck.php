@@ -29,6 +29,7 @@ namespace App\Jobs;
 use App\Action;
 use App\Actions\Alerts\RunAlertRulesAction;
 use App\Actions\Device\SetDeviceAvailability;
+use App\Actions\Device\UpdateDeviceOutage;
 use App\Models\Device;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -38,9 +39,8 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Data\Source\Icmp\FpingAliveResponse;
-use LibreNMS\Data\Source\Icmp\FpingAvailabilityService;
-use LibreNMS\Enum\AvailabilitySource;
+use LibreNMS\Data\Source\Icmp\Fping;
+use LibreNMS\Data\Source\Icmp\FpingResponse;
 
 class PingCheck implements ShouldQueue
 {
@@ -82,8 +82,8 @@ class PingCheck implements ShouldQueue
 
         Log::info('Processing hosts in this order : ' . implode(', ', $ordered_hostname_list));
 
-        // bulk ping and send FpingAliveResponse to recordData as they come in
-        app()->make(FpingAvailabilityService::class)->bulkPing($ordered_hostname_list, function (FpingAliveResponse $response): void {
+        // bulk ping and send FpingResponse to recordData as they come in
+        app()->make(Fping::class)->bulkPing($ordered_hostname_list, function (FpingResponse $response): void {
             $this->handleResponse($response);
         });
 
@@ -165,7 +165,7 @@ class PingCheck implements ShouldQueue
     /**
      * Record the data and run alerts if all parents have been processed
      */
-    public function handleResponse(FpingAliveResponse $response): void
+    public function handleResponse(FpingResponse $response): void
     {
         Log::debug("Received response for $response->host");
 
@@ -185,7 +185,11 @@ class PingCheck implements ShouldQueue
         }
 
         // mark up only if snmp is not down too
-        $changed = app(SetDeviceAvailability::class)->execute($device, $response->isAlive(), AvailabilitySource::Icmp, true);
+        $changed = app(SetDeviceAvailability::class)->execute($device, ['icmp' => $response->isAlive()]);
+        $device->save();
+        if ($changed) {
+            app(UpdateDeviceOutage::class)->execute($device);
+        }
 
         // mark as processed
         $this->processed->put($device->device_id, true);

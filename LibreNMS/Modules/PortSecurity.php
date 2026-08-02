@@ -34,6 +34,7 @@ use LibreNMS\Interfaces\Discovery\PortSecurityDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 
 class PortSecurity implements Module
@@ -48,9 +49,9 @@ class PortSecurity implements Module
         return [];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice()) && $os instanceof PortSecurityDiscovery;
+        return $status->isEnabled() && $connectivity->snmpIsAvailable() && $os instanceof PortSecurityDiscovery;
     }
 
     /**
@@ -61,9 +62,9 @@ class PortSecurity implements Module
         $this->poll($os, app('Datastore'));
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice()) && $os instanceof PortSecurityPolling;
+        return $status->isEnabled() && $connectivity->snmpIsAvailable() && $os instanceof PortSecurityPolling;
     }
 
     /**

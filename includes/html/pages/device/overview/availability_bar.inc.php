@@ -78,7 +78,11 @@ for ($i = 0; $i < $days; $i++) {
             $time_str = Time::format($outage->going_down, 'time');
             $duration_str = CarbonInterval::seconds($duration)->cascade()->forHumans(['short' => true, 'parts' => 2]);
 
-            $outage_lines[] = "Outage at $time_str &bull; $duration_str";
+            if ($outage->going_down >= $day_start) {
+                $outage_lines[] = "Outage at $time_str &bull; $duration_str";
+            } else {
+                $outage_lines[] = "Outage &bull; $duration_str";
+            }
         }
     }
 
@@ -144,9 +148,9 @@ foreach ($day_data as $day) {
     echo <<<HTML
     <div x-data="{ open:false, x:0, y:0, place(){ const r=this.\$el.getBoundingClientRect(); this.x=r.left+r.width/2; this.y=r.top; this.\$nextTick(()=>{ const w=this.\$refs.tip?.offsetWidth||0; const pad=8; this.x=Math.max(pad+w/2, Math.min(window.innerWidth-pad-w/2, this.x)); }); } }"
          @mouseenter="open=true; place()" @mouseleave="open=false" @scroll.window="open && place()" @resize.window="open && place()"
-         class="tw:flex-1 tw:h-12 tw:rounded-sm tw:cursor-pointer tw:relative {$day['color']}">
+         class="tw:flex-1 tw:h-10 tw:rounded-sm tw:cursor-pointer tw:relative {$day['color']}">
         <div x-ref="tip" x-show="open" x-cloak :style="`left:\${x}px; top:\${y - 8}px; transform: translate(-50%, -100%);`"
-             class="tw:fixed tw:bg-white tw:border tw:border-gray-300 tw:rounded tw:min-w-70 tw:px-8 tw:py-5 tw:text-xl tw:font-medium tw:whitespace-nowrap tw:z-9999 tw:shadow-md tw:pointer-events-none">
+             class="tw:fixed tw:bg-white tw:border tw:border-gray-300 tw:rounded tw:min-w-70 tw:px-4 tw:py-3 tw:font-medium tw:whitespace-nowrap tw:z-9999 tw:shadow-md tw:pointer-events-none">
             $tip
         </div>
     </div>
@@ -168,7 +172,7 @@ if ($total_avail >= $threshold_ok) {
 
 echo <<<HTML
                 </div>
-                <div class="tw:flex tw:justify-between tw:text-[11px] tw:text-gray-400 tw:mt-1">
+                <div class="tw:flex tw:justify-between tw:text-sm tw:text-gray-400 tw:mt-1">
                     <span>90 days ago</span>
                     <span><strong class="$total_color">$total_avail% uptime</strong></span>
                     <span>Today</span>
