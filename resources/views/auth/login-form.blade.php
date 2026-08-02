@@ -1,6 +1,7 @@
-<x-panel class="tw:rounded-lg tw:overflow-hidden">
+<x-panel class="lnms-login-panel">
     <x-slot name="title">
         <x-logo class="logon-logo tw:h-auto tw:w-full" />
+        <p class="lnms-login__brand-line">{{ __('Network monitoring') }}</p>
     </x-slot>
 
     @config('login_message')
@@ -14,7 +15,8 @@
             {{ csrf_field() }}
             <div class="form-group{{ $errors->has('username') ? ' has-error' : '' }}">
                 <div class="col-md-12">
-                    <input type="text" name="username" id="username" value="{{ old('username') }}" class="form-control" placeholder="{{ __('Username') }}" required autofocus />
+                    <label class="sr-only" for="username">{{ __('Username') }}</label>
+                    <input type="text" name="username" id="username" value="{{ old('username') }}" class="form-control" placeholder="{{ __('Username') }}" required autofocus autocomplete="username" />
                     @if ($errors->has('email'))
                         <span class="help-block">
                                     <strong>{{ $errors->first('username') }}</strong>
@@ -24,7 +26,8 @@
             </div>
             <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
                 <div class="col-md-12">
-                    <input type="password" name="password" id="password" autocomplete="off" class="form-control" placeholder="{{ __('Password') }}" />
+                    <label class="sr-only" for="password">{{ __('Password') }}</label>
+                    <input type="password" name="password" id="password" autocomplete="current-password" class="form-control" placeholder="{{ __('Password') }}" />
                     @if ($errors->has('password'))
                         <span class="help-block">
                                     <strong>{{ $errors->first('password') }}</strong>
@@ -44,7 +47,7 @@
             <div class="form-group">
                 <div class="col-md-12">
                     <button type="submit" id="login" class="btn btn-primary btn-block" name="submit">
-                        <i class="fa fa-btn fa-sign-in"></i> {{ __('Login') }}
+                        <i class="fa fa-btn fa-sign-in" aria-hidden="true"></i> {{ __('Login') }}
                     </button>
                 </div>
             </div>
@@ -53,8 +56,8 @@
         @foreach (\App\Facades\LibrenmsConfig::get('auth.socialite.configs', []) as $provider => $config)
         <form role="form" action="{{ route('socialite.redirect', $provider) }}" method="post" class="tw:mt-5">
             {{ csrf_field() }}
-            <button type="submit" id="login" class="btn btn-success btn-block">
-                <i class="fab fa-btn fa-{{ $provider }}"></i> {{ __('Login with') }} {{ ucfirst($provider) }}
+            <button type="submit" id="login-{{ $provider }}" class="btn btn-success btn-block">
+                <i class="fab fa-btn fa-{{ $provider }}" aria-hidden="true"></i> {{ __('Login with') }} {{ ucfirst($provider) }}
             </button>
         </form>
         @endforeach
