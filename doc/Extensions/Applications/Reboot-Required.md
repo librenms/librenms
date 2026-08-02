@@ -1,19 +1,29 @@
 ## Reboot Required
 
-Monitors whether a Debian-based host requires a reboot (e.g. after a kernel
-or libc upgrade) by checking for the existence of `/var/run/reboot-required`,
-which the `update-notifier-common` package creates when a pending upgrade
-requires a restart.
+Monitors whether a host requires a reboot to apply a pending kernel or
+library update. Detects the distro family automatically via
+`/etc/os-release` and picks the appropriate check:
+
+- Debian/Ubuntu: existence of `/var/run/reboot-required`, which
+  `update-notifier-common` creates when a pending upgrade requires a
+  restart.
+- RHEL/CentOS/Rocky/Alma/Fedora/Amazon Linux: `needs-restarting -r`
+  (from `yum-utils`/`dnf-utils`).
+- SUSE/SLES/openSUSE: `zypper needs-rebooting`.
+- Arch Linux: compares the running kernel against
+  `/usr/lib/modules/$(uname -r)`, since Arch has no official tool for
+  this.
+
+On an unsupported distro, or when the expected detection tool is
+missing, the script exits non-zero with no output, which surfaces as
+a poll error rather than a silent false "no reboot needed".
 
 ### SNMP Extend
 
-1. Create the extend script on the monitored host.
+1. Fetch the script in question and make it executable.
 
 ```bash
-cat > /etc/snmp/reboot-required << 'EOF'
-#!/usr/bin/env bash
-[ -f /var/run/reboot-required ] && echo "1" || echo "0"
-EOF
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/reboot-required -O /etc/snmp/reboot-required
 chmod +x /etc/snmp/reboot-required
 ```
 
@@ -31,6 +41,8 @@ Extend` heading top of page.
 
 ### Notes
 
-- Requires the `update-notifier-common` package on the monitored host
-  (installed by default on Debian and Ubuntu).
+- On Debian/Ubuntu, requires the `update-notifier-common` package
+  (installed by default).
+- On RHEL-family hosts, requires `yum-utils`/`dnf-utils` for
+  `needs-restarting`.
 - The graphed value is `0` (no reboot needed) or `1` (reboot needed).
