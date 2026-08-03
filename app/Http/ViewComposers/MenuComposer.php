@@ -294,6 +294,7 @@ class MenuComposer
             ->where('devices.ignore', '=', '0')
             ->groupBy('severity')
             ->pluck('severity');
+        $vars['alert_count'] = $alert_status->count() ?? 0;
 
         if ($alert_status->contains('critical')) {
             $vars['alert_menu_class'] = 'danger';
