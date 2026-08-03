@@ -1,4 +1,4 @@
-<div id="alerts_container-{{ $id }}" data-reload="false">
+<div id="alerts_container-{{ $id }}" class="lnms-alerts-widget" data-reload="false">
     <div class="table-responsive">
         <table id="alerts-{{ $id }}" class="table table-hover table-condensed alerts">
             <thead>
