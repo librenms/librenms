@@ -3,7 +3,7 @@
 @section('title', __('Custom Maps'))
 
 @section('content')
-<div class="tw:px-3 tw:sm:px-6 tw:mx-auto">
+<div class="tw:px-3 tw:sm:px-6 tw:mx-auto lnms-maps lnms-maps-custom">
     <x-panel id="manage-custom-maps" class="tw:mx-auto tw:max-w-(--breakpoint-lg)">
         <x-slot:title>
             <div class="tw:flex tw:justify-between tw:items-center">

@@ -3,7 +3,9 @@
 @section('title', __('map.custom.title.create'))
 
 @section('content')
+<div class="lnms-maps lnms-maps-custom-new">
     @include('map.custom-map-modal')
+</div>
 @endsection
 
 @section('scripts')

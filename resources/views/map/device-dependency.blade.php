@@ -3,7 +3,7 @@
 @section('title', __('Device Dependency Map'))
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid lnms-maps lnms-maps-dependency">
 
 <div class="row">
 <div class="col-md-12">

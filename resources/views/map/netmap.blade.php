@@ -3,7 +3,7 @@
 @section('title', __('Network Map'))
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid lnms-maps lnms-maps-netmap">
 
 <div class="row">
 <div class="col-md-12">
