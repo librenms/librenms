@@ -40,6 +40,7 @@ class ServerStatsController extends WidgetController
         'title' => null,
         'columnsize' => 3,
         'device' => null,
+        'gauges' => [],
         'cpu' => 0,
         'mempools' => [],
         'disks' => [],
@@ -70,18 +71,23 @@ class ServerStatsController extends WidgetController
 
         $device = Device::hasAccess($request->user())->find($data['device']);
         if ($device) {
+            $hiddenGauges = (array) $data['gauges'];
+
             $data['cpu'] = round((float) $device->processors()->avg('processor_usage'), 1);
+            $data['showCpu'] = ! in_array('cpu', $hiddenGauges);
 
             $data['mempools'] = $device->mempools()
                 ->get(['mempool_descr', 'mempool_used', 'mempool_total'])
-                ->map(fn (Mempool $m) => $this->formatUsage($m->mempool_descr ?? 'Memory', (float) $m->mempool_used, (float) $m->mempool_total));
+                ->filter(fn (Mempool $m) => ! in_array("mempool:$m->mempool_descr", $hiddenGauges))
+                ->map(fn (Mempool $m) => $this->formatUsage($m->mempool_descr ?: 'Memory', (float) $m->mempool_used, (float) $m->mempool_total));
 
             $data['disks'] = $device->storage()
                 ->get(['storage_descr', 'storage_used', 'storage_size'])
-                ->map(fn (Storage $d) => $this->formatUsage($d->storage_descr ?? 'Storage', (float) $d->storage_used, (float) $d->storage_size));
+                ->filter(fn (Storage $d) => ! in_array("storage:$d->storage_descr", $hiddenGauges))
+                ->map(fn (Storage $d) => $this->formatUsage($d->storage_descr ?: 'Storage', (float) $d->storage_used, (float) $d->storage_size));
 
             $numCols = (int) ($data['columnsize'] ?? 3);
-            $totalGauges = 1 + count($data['mempools']) + count($data['disks']);
+            $totalGauges = (int) $data['showCpu'] + count($data['mempools']) + count($data['disks']);
 
             $data['gridCols'] = match ($numCols) {
                 1 => 'tw:grid-cols-1',
@@ -102,6 +108,17 @@ class ServerStatsController extends WidgetController
     {
         $settings = $this->getSettings(true);
         $settings['device'] = Device::hasAccess($request->user())->find($settings['device']) ?: null;
+        $settings['gaugeOptions'] = collect();
+
+        if ($settings['device']) {
+            $settings['gaugeOptions']->put('cpu', __('widgets.server-stats.cpu_usage'));
+            foreach ($settings['device']->mempools()->pluck('mempool_descr') as $description) {
+                $settings['gaugeOptions']->put("mempool:$description", $description ?: __('Memory'));
+            }
+            foreach ($settings['device']->storage()->pluck('storage_descr') as $description) {
+                $settings['gaugeOptions']->put("storage:$description", $description ?: __('Storage'));
+            }
+        }
 
         return view('widgets.settings.server-stats', $settings);
     }

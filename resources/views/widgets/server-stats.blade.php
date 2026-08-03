@@ -1,8 +1,10 @@
 <div class="tw:grid {{ $gridCols ?? 'tw:grid-cols-3' }} tw:gap-2 tw:h-full tw:w-full tw:items-stretch tw:overflow-y-auto" style="grid-template-rows: repeat({{ $gridRows ?? 1 }}, minmax(65px, 1fr));">
-    <div class="tw:flex tw:flex-col tw:items-center tw:justify-center tw:w-full tw:h-full tw:min-h-0">
-        <div id="gauge-cpu-{{ $id }}" class="gauge-container"></div>
-        <div class="gauge-title">{{ __('CPU Usage') }}</div>
-    </div>
+    @if($showCpu ?? true)
+        <div class="tw:flex tw:flex-col tw:items-center tw:justify-center tw:w-full tw:h-full tw:min-h-0">
+            <div id="gauge-cpu-{{ $id }}" class="gauge-container"></div>
+            <div class="gauge-title">{{ __('widgets.server-stats.cpu_usage') }}</div>
+        </div>
+    @endif
 
     @foreach($mempools as $index => $mem)
         <div class="tw:flex tw:flex-col tw:items-center tw:justify-center tw:w-full tw:h-full tw:min-h-0">
@@ -22,15 +24,17 @@
 <script type="text/javascript">
     $(document).ready(function () {
 
-        new JustGage({
-            id: "gauge-cpu-{{ $id }}",
-            value: {{ (float) ($cpu ?? 0) }},
-            min: 0,
-            max: 100,
-            symbol: '%',
-            relativeGaugeSize: true,
-            gaugeWidthScale: 0.6
-        });
+        @if($showCpu ?? true)
+            new JustGage({
+                id: "gauge-cpu-{{ $id }}",
+                value: {{ (float) ($cpu ?? 0) }},
+                min: 0,
+                max: 100,
+                symbol: '%',
+                relativeGaugeSize: true,
+                gaugeWidthScale: 0.6
+            });
+        @endif
 
         @foreach($mempools as $index => $mem)
         new JustGage({
