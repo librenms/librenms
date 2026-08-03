@@ -1,4 +1,4 @@
-<div class="dashboard-graph">
+<div class="dashboard-graph lnms-dashboard-graph">
     <a href="graphs/{{ implode('/', $params) }}/type={{ $graph_type }}/from={{ $from }}/to={{ $to }}">
         <img class="minigraph-image"
              width="{{ $dimensions['x'] }}"
