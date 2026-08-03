@@ -1879,6 +1879,286 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-surface);
 }
 
+/*
+ * Phase 5 — Device detail page shell (presentation only)
+ * Hosts: .lnms-device-page / __header / __tabs / __actions / __content
+ * Preserve: route('device'), $tab->visible(), PageLinks Gate checks,
+ * data-toggle dropdown, edit/rediscover/delete on edit tab, graph-popup, legacy slot.
+ * Status left-border uses semantic --lnms-status-* only.
+ */
+.lnms-device-page {
+    font-family: var(--lnms-font-sans);
+    color: var(--lnms-text);
+}
+
+.lnms-device-page .lnms-device-page__header.panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-left-width: 5px;
+    border-radius: var(--lnms-radius-lg);
+    box-shadow: var(--lnms-shadow-sm);
+    margin-bottom: 0;
+}
+
+.lnms-device-page .lnms-device-page__header--up {
+    border-left-color: var(--lnms-status-up) !important;
+}
+
+.lnms-device-page .lnms-device-page__header--down {
+    border-left-color: var(--lnms-status-down) !important;
+}
+
+.lnms-device-page .lnms-device-page__header--maintenance {
+    border-left-color: var(--lnms-status-maintenance) !important;
+}
+
+.lnms-device-page .lnms-device-page__header--disabled {
+    border-left-color: var(--lnms-status-unknown) !important;
+}
+
+.lnms-device-page .lnms-device-page__header--unknown {
+    border-left-color: var(--lnms-status-unknown) !important;
+}
+
+.lnms-device-page .lnms-device-page__header > .panel-body,
+.lnms-device-page .lnms-device-page__header-body {
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+    padding: var(--lnms-space-3) var(--lnms-space-4) 0 var(--lnms-space-4);
+    overflow: auto;
+}
+
+.lnms-device-page .lnms-device-page__icon {
+    margin: var(--lnms-space-2);
+    border-radius: var(--lnms-radius-sm);
+}
+
+.dark .lnms-device-page .lnms-device-page__icon {
+    background-color: var(--lnms-surface-muted);
+    padding: var(--lnms-space-2);
+    border-radius: var(--lnms-radius-md);
+}
+
+.lnms-device-page .lnms-device-page__identity {
+    margin-top: var(--lnms-space-1);
+}
+
+.lnms-device-page .lnms-device-page__title {
+    font-size: var(--lnms-text-xl);
+    font-weight: 600;
+    font-family: var(--lnms-font-display);
+    color: var(--lnms-text);
+    line-height: 1.3;
+}
+
+.lnms-device-page .lnms-device-page__maintenance {
+    color: var(--lnms-status-maintenance);
+}
+
+.lnms-device-page .lnms-device-page__vm-host {
+    color: var(--lnms-accent);
+    text-decoration: none;
+}
+
+.lnms-device-page .lnms-device-page__vm-host:hover,
+.lnms-device-page .lnms-device-page__vm-host:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-device-page .lnms-device-page__location {
+    margin-top: var(--lnms-space-4);
+    font-size: var(--lnms-text-sm);
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-device-page .lnms-device-page__location a {
+    color: var(--lnms-accent);
+    text-decoration: none;
+}
+
+.lnms-device-page .lnms-device-page__location a:hover,
+.lnms-device-page .lnms-device-page__location a:focus {
+    color: var(--lnms-accent-hover);
+    text-decoration: underline;
+}
+
+.lnms-device-page .lnms-device-page__graph-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: flex-start;
+    gap: var(--lnms-space-4);
+    margin: 0 var(--lnms-space-4);
+    padding: var(--lnms-space-3) var(--lnms-space-4) var(--lnms-space-5);
+}
+
+.lnms-device-page .lnms-device-page__graph-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.lnms-device-page .lnms-device-page__graph-label {
+    margin-top: var(--lnms-space-1);
+    font-size: var(--lnms-text-sm);
+    font-weight: 600;
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-device-page .lnms-device-page__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding-left: var(--lnms-space-4);
+    margin: var(--lnms-space-5) 0 0;
+    border-bottom: 1px solid var(--lnms-border);
+    align-items: flex-end;
+    gap: 0;
+}
+
+.lnms-device-page .lnms-device-page__tab {
+    margin-bottom: -1px;
+}
+
+.lnms-device-page .lnms-device-page__tab-link {
+    display: inline-block;
+    padding: var(--lnms-space-3);
+    border-bottom: 2px solid transparent;
+    border-radius: var(--lnms-radius-sm) var(--lnms-radius-sm) 0 0;
+    font-size: var(--lnms-text-sm);
+    font-weight: 500;
+    white-space: nowrap;
+    text-decoration: none;
+    color: var(--lnms-text-secondary);
+    transition: color var(--lnms-duration-fast) var(--lnms-ease),
+        border-color var(--lnms-duration-fast) var(--lnms-ease);
+}
+
+.lnms-device-page .lnms-device-page__tab-link:hover,
+.lnms-device-page .lnms-device-page__tab-link:focus {
+    color: var(--lnms-text);
+    border-bottom-color: var(--lnms-border-strong);
+    text-decoration: none;
+}
+
+.lnms-device-page .lnms-device-page__tab-link:focus-visible {
+    outline: 2px solid var(--lnms-focus-ring);
+    outline-offset: 2px;
+}
+
+.lnms-device-page .lnms-device-page__tab-link--active {
+    color: var(--lnms-text);
+    border-bottom-color: var(--lnms-accent);
+    font-weight: 600;
+}
+
+.lnms-device-page .lnms-device-page__tab-link .icon-theme {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-device-page .lnms-device-page__tab-link--active .icon-theme,
+.lnms-device-page .lnms-device-page__tab-link:hover .icon-theme {
+    color: var(--lnms-accent);
+}
+
+.lnms-device-page .lnms-device-page__actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--lnms-space-1);
+    padding: var(--lnms-space-2) var(--lnms-space-3) var(--lnms-space-2) 0;
+}
+
+.lnms-device-page .lnms-device-page__action-btn {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    color: var(--lnms-text-secondary);
+    padding: var(--lnms-space-2) var(--lnms-space-3);
+    transition: background-color var(--lnms-duration-fast) var(--lnms-ease),
+        border-color var(--lnms-duration-fast) var(--lnms-ease),
+        color var(--lnms-duration-fast) var(--lnms-ease);
+}
+
+.lnms-device-page .lnms-device-page__action-btn:hover,
+.lnms-device-page .lnms-device-page__action-btn:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+    color: var(--lnms-text);
+}
+
+.lnms-device-page .lnms-device-page__action-btn:focus-visible {
+    outline: 2px solid var(--lnms-focus-ring);
+    outline-offset: 2px;
+}
+
+.lnms-device-page .lnms-device-page__action-btn .icon-theme {
+    color: inherit;
+}
+
+.lnms-device-page .lnms-device-page__action-menu .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-device-page .lnms-device-page__action-menu .dropdown-menu > li > a {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-device-page .lnms-device-page__action-menu .dropdown-menu > li > a:hover,
+.lnms-device-page .lnms-device-page__action-menu .dropdown-menu > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text);
+}
+
+.lnms-device-page .lnms-device-page__action-menu .dropdown-menu > li > a .icon-theme {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-device-page .lnms-device-page__action-menu .divider {
+    background-color: var(--lnms-border);
+}
+
+.lnms-device-page .lnms-device-page__content {
+    margin-top: var(--lnms-space-4);
+}
+
+@media (max-width: 767px) {
+    .lnms-device-page .lnms-device-page__header > .panel-body,
+    .lnms-device-page .lnms-device-page__header-body {
+        padding: var(--lnms-space-2) var(--lnms-space-3) 0;
+    }
+
+    .lnms-device-page .lnms-device-page__graph-row {
+        margin: var(--lnms-space-2) 0 0;
+        padding: var(--lnms-space-2);
+        width: 100%;
+        clear: both;
+    }
+
+    .lnms-device-page .lnms-device-page__tabs {
+        padding-left: var(--lnms-space-2);
+    }
+
+    .lnms-device-page .lnms-device-page__tab-link {
+        padding: var(--lnms-space-2) var(--lnms-space-3);
+        font-size: var(--lnms-text-xs);
+    }
+
+    .lnms-device-page .lnms-device-page__actions {
+        width: 100%;
+        justify-content: flex-end;
+        padding-right: var(--lnms-space-2);
+        margin-top: var(--lnms-space-2);
+    }
+}
+
 .lnms-btn {
     @apply tw:inline-flex tw:items-center tw:gap-2 tw:rounded-[length:var(--lnms-radius-md)] tw:px-4 tw:py-2 tw:font-normal tw:no-underline;
 }
