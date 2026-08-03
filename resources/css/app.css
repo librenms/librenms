@@ -5,6 +5,92 @@
 @source "../../includes/html/pages/**/*.php";
 @source "../../includes/html/**/*.inc.php";
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* —— Design tokens (Phase 3 / docs/modern-ui/DESIGN_SYSTEM.md) —— */
+:root {
+    /* Text/surface pairs target WCAG AA (~4.5:1). Borders target UI 3:1 where practical.
+       Status hues stay semantic; pair with bold/border cues — warn/up as pure text may be AA-large only. */
+    --lnms-bg: #F4F6F8;
+    --lnms-surface: #FFFFFF;
+    --lnms-surface-muted: #EEF1F4;
+    --lnms-border: #B8C2CC;
+    --lnms-border-strong: #8E969C;
+    --lnms-text: #1B242C;
+    --lnms-text-secondary: #5A6A78;
+    --lnms-text-muted: #5E6E7C;
+    --lnms-accent: #0F6E7C;
+    --lnms-accent-hover: #0B5A66;
+    --lnms-accent-muted: #D7EEF1;
+    --lnms-focus-ring: rgba(15, 110, 124, 0.45);
+
+    --lnms-status-up: #1F8A4C;
+    --lnms-status-down: #C62828;
+    --lnms-status-warn: #C47E00;
+    --lnms-status-critical: #A31515;
+    --lnms-status-maintenance: #2F5D9F;
+    --lnms-status-unknown: #6B7785;
+    --lnms-status-on: #FFFFFF;
+
+    --lnms-font-sans: "IBM Plex Sans", "Segoe UI", "Helvetica Neue", sans-serif;
+    --lnms-font-mono: "IBM Plex Mono", "Consolas", "Liberation Mono", monospace;
+    --lnms-font-display: var(--lnms-font-sans);
+
+    --lnms-text-xs: 12px;
+    --lnms-text-sm: 13px;
+    --lnms-text-md: 14px;
+    --lnms-text-lg: 16px;
+    --lnms-text-xl: 20px;
+    --lnms-text-2xl: 24px;
+
+    --lnms-space-1: 4px;
+    --lnms-space-2: 8px;
+    --lnms-space-3: 12px;
+    --lnms-space-4: 16px;
+    --lnms-space-5: 24px;
+    --lnms-space-6: 32px;
+    --lnms-space-8: 48px;
+
+    --lnms-radius-sm: 4px;
+    --lnms-radius-md: 8px;
+    --lnms-radius-lg: 12px;
+
+    --lnms-shadow-none: none;
+    --lnms-shadow-sm: 0 1px 2px rgba(27, 36, 44, 0.06);
+    --lnms-shadow-md: 0 4px 12px rgba(27, 36, 44, 0.10);
+
+    --lnms-duration-fast: 120ms;
+    --lnms-duration-normal: 180ms;
+    --lnms-ease: cubic-bezier(0.2, 0, 0, 1);
+
+    --lnms-nav-height: 50px;
+}
+
+.dark {
+    --lnms-bg: #1E2226;
+    --lnms-surface: #272B30;
+    --lnms-surface-muted: #2E3338;
+    --lnms-border: #555C66;
+    --lnms-border-strong: #606870;
+    --lnms-text: #F9FAFB;
+    --lnms-text-secondary: #C8C8C8;
+    --lnms-text-muted: #ACB6BF;
+    --lnms-accent: #3DA8B5;
+    --lnms-accent-hover: #5CBCC7;
+    --lnms-accent-muted: #1F3A40;
+    --lnms-focus-ring: rgba(61, 168, 181, 0.55);
+
+    --lnms-status-up: #3DCF7A;
+    --lnms-status-down: #F07178;
+    --lnms-status-warn: #E6B84D;
+    --lnms-status-critical: #FF6B6B;
+    --lnms-status-maintenance: #6B9FE8;
+    --lnms-status-unknown: #8B96A3;
+    --lnms-status-on: #0E1114;
+
+    --lnms-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+    --lnms-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+
 @layer base {
     button:not(:disabled),
     [role="button"]:not(:disabled) {
@@ -35,6 +121,34 @@
   --color-dark-white-300: #bebfbf;
   --color-dark-white-400: #acb6bf;
 
+  --color-lnms-bg: var(--lnms-bg);
+  --color-lnms-surface: var(--lnms-surface);
+  --color-lnms-surface-muted: var(--lnms-surface-muted);
+  --color-lnms-border: var(--lnms-border);
+  --color-lnms-border-strong: var(--lnms-border-strong);
+  --color-lnms-text: var(--lnms-text);
+  --color-lnms-text-secondary: var(--lnms-text-secondary);
+  --color-lnms-text-muted: var(--lnms-text-muted);
+  --color-lnms-accent: var(--lnms-accent);
+  --color-lnms-accent-hover: var(--lnms-accent-hover);
+  --color-lnms-accent-muted: var(--lnms-accent-muted);
+  --color-lnms-status-up: var(--lnms-status-up);
+  --color-lnms-status-down: var(--lnms-status-down);
+  --color-lnms-status-warn: var(--lnms-status-warn);
+  --color-lnms-status-critical: var(--lnms-status-critical);
+  --color-lnms-status-maintenance: var(--lnms-status-maintenance);
+  --color-lnms-status-unknown: var(--lnms-status-unknown);
+
+  --font-lnms-sans: var(--lnms-font-sans);
+  --font-lnms-mono: var(--lnms-font-mono);
+
+  --radius-lnms-sm: var(--lnms-radius-sm);
+  --radius-lnms-md: var(--lnms-radius-md);
+  --radius-lnms-lg: var(--lnms-radius-lg);
+
+  --shadow-lnms-sm: var(--lnms-shadow-sm);
+  --shadow-lnms-md: var(--lnms-shadow-md);
+
   --border-width-0_5: 0.5px;
 
   --shadow-inner-glow: inset 0 0 11px rgba(0, 0, 0, 0.1);
@@ -58,14 +172,439 @@
   }
 }
 
+/* —— Shell canvas —— */
+body.lnms-shell {
+    background-color: var(--lnms-bg) !important;
+    background-image: none;
+    color: var(--lnms-text);
+    font-family: var(--lnms-font-sans);
+    line-height: 1.45;
+}
+
+body.lnms-shell a:focus-visible,
+body.lnms-shell button:focus-visible,
+body.lnms-shell input:focus-visible,
+body.lnms-shell select:focus-visible,
+body.lnms-shell textarea:focus-visible,
+body.lnms-shell .btn:focus-visible,
+body.lnms-shell .form-control:focus-visible,
+body.lnms-shell .dropdown-toggle:focus-visible,
+body.lnms-shell .navbar-toggle:focus-visible,
+body.lnms-shell .nav-tabs > li > a:focus-visible,
+body.lnms-shell .pagination > li > a:focus-visible,
+body.lnms-shell .pagination > li > span:focus-visible,
+body.lnms-shell .bootgrid-header .search .search-field:focus-visible,
+body.lnms-shell .bootgrid-footer .pagination > li > a:focus-visible,
+body.lnms-shell [role="option"]:focus-visible,
+body.lnms-shell [role="tab"]:focus-visible {
+    outline: 2px solid var(--lnms-focus-ring);
+    outline-offset: 2px;
+}
+
+/* Visible keyboard highlight for combobox options (global search) */
+.lnms-nav .global-search-dropdown [role="option"][aria-selected="true"] {
+    background-color: var(--lnms-accent-muted);
+    color: var(--lnms-text);
+}
+
+/* Icon-leaning navbar controls: keep ≥32px hit area without changing Bootstrap layout */
+nav.navbar.lnms-nav.navbar-default .navbar-nav.navbar-right > li > a.dropdown-toggle {
+    min-height: 32px;
+    min-width: 32px;
+}
+
+/* Contrast helpers for status text (pair with existing bold/border cues) */
+.lnms-a11y-status-up { color: var(--lnms-status-up); }
+.lnms-a11y-status-down { color: var(--lnms-status-down); }
+.lnms-a11y-status-warn { color: var(--lnms-status-warn); }
+.lnms-a11y-status-critical { color: var(--lnms-status-critical); }
+.lnms-a11y-status-unknown { color: var(--lnms-status-unknown); }
+.lnms-a11y-muted { color: var(--lnms-text-secondary); }
+
+/* Prefer secondary (not muted) for actionable chrome labels in light/dark */
+body.lnms-shell .text-muted.lnms-a11y-readable,
+body.lnms-shell .lnms-a11y-readable {
+    color: var(--lnms-text-secondary) !important;
+}
+
+.lnms-skip-link {
+    position: absolute;
+    left: var(--lnms-space-2);
+    top: -100px;
+    z-index: 1200;
+    padding: var(--lnms-space-2) var(--lnms-space-3);
+    background: var(--lnms-surface);
+    color: var(--lnms-accent);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.lnms-skip-link:focus,
+.lnms-skip-link:focus-visible {
+    top: var(--lnms-space-2);
+    outline: 2px solid var(--lnms-focus-ring);
+    outline-offset: 2px;
+}
+
+.lnms-content {
+    padding: var(--lnms-space-3);
+    min-height: 0;
+}
+
+@media (min-width: 768px) {
+    .lnms-content {
+        padding: var(--lnms-space-4);
+    }
+}
+
+/* —— Navbar chrome (Bootstrap contracts preserved) —— */
+nav.navbar.lnms-nav.navbar-default {
+    background-color: var(--lnms-surface) !important;
+    border-color: var(--lnms-border) !important;
+    border-bottom: 1px solid var(--lnms-border) !important;
+    border-top: 3px solid var(--lnms-accent) !important;
+    box-shadow: var(--lnms-shadow-sm);
+    min-height: var(--lnms-nav-height);
+    margin-bottom: var(--lnms-space-3) !important;
+    font-family: var(--lnms-font-sans);
+}
+
+nav.navbar.lnms-nav.navbar-default .navbar-brand {
+    color: var(--lnms-accent) !important;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    height: var(--lnms-nav-height);
+    display: flex;
+    align-items: center;
+}
+
+nav.navbar.lnms-nav.navbar-default .navbar-nav > li > a {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+    font-weight: 500;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    transition: color var(--lnms-duration-fast) var(--lnms-ease),
+                background-color var(--lnms-duration-fast) var(--lnms-ease);
+}
+
+nav.navbar.lnms-nav.navbar-default .navbar-nav > li > a:hover,
+nav.navbar.lnms-nav.navbar-default .navbar-nav > li > a:focus {
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface-muted);
+}
+
+nav.navbar.lnms-nav.navbar-default .navbar-nav > .active > a,
+nav.navbar.lnms-nav.navbar-default .navbar-nav > .active > a:hover,
+nav.navbar.lnms-nav.navbar-default .navbar-nav > .active > a:focus,
+nav.navbar.lnms-nav.navbar-default .navbar-nav > .open > a,
+nav.navbar.lnms-nav.navbar-default .navbar-nav > .open > a:hover,
+nav.navbar.lnms-nav.navbar-default .navbar-nav > .open > a:focus {
+    color: var(--lnms-text);
+    background-color: var(--lnms-accent-muted);
+    box-shadow: inset 0 -2px 0 var(--lnms-accent);
+    font-weight: 600;
+}
+
+nav.navbar.lnms-nav.navbar-default .navbar-toggle {
+    border-color: var(--lnms-border);
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+nav.navbar.lnms-nav.navbar-default .navbar-toggle .icon-bar {
+    background-color: var(--lnms-text-secondary);
+}
+
+nav.navbar.lnms-nav.navbar-default .navbar-toggle:hover,
+nav.navbar.lnms-nav.navbar-default .navbar-toggle:focus {
+    background-color: var(--lnms-surface-muted);
+}
+
+nav.navbar.lnms-nav .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: var(--lnms-shadow-sm);
+    padding: var(--lnms-space-1) 0;
+}
+
+nav.navbar.lnms-nav .dropdown-menu > li > a {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+    padding: 8px 16px;
+    transition: background-color var(--lnms-duration-fast) var(--lnms-ease);
+}
+
+nav.navbar.lnms-nav .dropdown-menu > li > a:hover,
+nav.navbar.lnms-nav .dropdown-menu > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text);
+}
+
+nav.navbar.lnms-nav .dropdown-menu .divider {
+    background-color: var(--lnms-border);
+    margin: var(--lnms-space-1) 0;
+}
+
+nav.navbar.lnms-nav .navbar-form.global-search .form-control {
+    background-color: var(--lnms-surface-muted);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    color: var(--lnms-text);
+    height: 34px;
+    font-size: var(--lnms-text-sm);
+    box-shadow: none;
+    transition: border-color var(--lnms-duration-fast) var(--lnms-ease),
+                box-shadow var(--lnms-duration-fast) var(--lnms-ease);
+}
+
+nav.navbar.lnms-nav .navbar-form.global-search .form-control::placeholder {
+    color: var(--lnms-text-muted);
+}
+
+nav.navbar.lnms-nav .navbar-form.global-search .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 3px var(--lnms-focus-ring);
+    background-color: var(--lnms-surface);
+}
+
+nav.navbar.lnms-nav .fa-nav-icons {
+    color: var(--lnms-text-secondary);
+}
+
+nav.navbar.lnms-nav .navbar-nav > li > a:hover .fa-nav-icons,
+nav.navbar.lnms-nav .navbar-nav > .open > a .fa-nav-icons,
+nav.navbar.lnms-nav .navbar-nav > .active > a .fa-nav-icons {
+    color: var(--lnms-accent);
+}
+
+nav.navbar.lnms-nav .badge-navbar-user.badge-danger {
+    background-color: var(--lnms-status-critical);
+}
+
+nav.navbar.lnms-nav .badge-navbar-user.badge-default {
+    background-color: var(--lnms-status-unknown);
+}
+
+.dark nav.navbar.lnms-nav.navbar-default {
+    background-color: var(--lnms-surface) !important;
+    border-color: var(--lnms-border) !important;
+    border-top: 3px solid var(--lnms-accent) !important;
+    border-bottom: 1px solid var(--lnms-border) !important;
+}
+
+.dark nav.navbar.lnms-nav.navbar-default .navbar-brand {
+    color: var(--lnms-accent) !important;
+}
+
+.dark nav.navbar.lnms-nav.navbar-default .navbar-nav > li > a {
+    color: var(--lnms-text-secondary);
+}
+
+.dark nav.navbar.lnms-nav.navbar-default .navbar-nav > li > a:hover,
+.dark nav.navbar.lnms-nav.navbar-default .navbar-nav > li > a:focus,
+.dark nav.navbar.lnms-nav.navbar-default .navbar-nav > .active > a,
+.dark nav.navbar.lnms-nav.navbar-default .navbar-nav > .open > a {
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface-muted);
+}
+
+.dark nav.navbar.lnms-nav .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+}
+
+.dark nav.navbar.lnms-nav .dropdown-menu > li > a {
+    color: var(--lnms-text);
+}
+
+.dark nav.navbar.lnms-nav .dropdown-menu > li > a:hover,
+.dark nav.navbar.lnms-nav .dropdown-menu > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text);
+}
+
+/* Global search dropdown token bridge */
+.lnms-nav .global-search-dropdown {
+    border-radius: var(--lnms-radius-md) !important;
+    box-shadow: var(--lnms-shadow-sm) !important;
+    border-color: var(--lnms-border) !important;
+    background: var(--lnms-surface) !important;
+}
+
+/* —— Login / auth chrome (first-paint must differ clearly from stock) —— */
+.lnms-login {
+    min-height: calc(100vh - 2rem);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: var(--lnms-space-8) var(--lnms-space-4) var(--lnms-space-5);
+    background:
+        linear-gradient(180deg, var(--lnms-accent-muted) 0%, transparent 42%),
+        radial-gradient(900px 420px at 50% -8%, rgba(15, 110, 124, 0.18), transparent 55%),
+        var(--lnms-bg) !important;
+}
+
+.lnms-login__inner {
+    width: 100%;
+    max-width: 420px;
+}
+
+.lnms-login .lnms-login__brand-line {
+    margin: var(--lnms-space-2) 0 0;
+    color: var(--lnms-accent) !important;
+    font-size: var(--lnms-text-sm);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.lnms-login .panel,
+.lnms-login .lnms-login-panel.panel {
+    background: var(--lnms-surface) !important;
+    border: 1px solid var(--lnms-border) !important;
+    border-top: 4px solid var(--lnms-accent) !important;
+    border-radius: var(--lnms-radius-lg) !important;
+    box-shadow: var(--lnms-shadow-md) !important;
+    overflow: hidden;
+}
+
+.lnms-login .panel-heading {
+    background: var(--lnms-surface) !important;
+    border-bottom: 1px solid var(--lnms-border) !important;
+    padding: var(--lnms-space-5) var(--lnms-space-5) var(--lnms-space-3);
+    text-align: center;
+}
+
+.lnms-login .panel-title {
+    margin: 0;
+}
+
+.lnms-login .panel-body {
+    padding: var(--lnms-space-5);
+}
+
+.lnms-login .panel-footer {
+    background: var(--lnms-surface-muted) !important;
+    border-top: 1px solid var(--lnms-border) !important;
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-login .logon-logo {
+    max-width: 220px;
+    margin: 0 auto;
+}
+
+.lnms-login .form-control {
+    height: 40px;
+    border-color: var(--lnms-border) !important;
+    border-radius: var(--lnms-radius-md) !important;
+    background: var(--lnms-surface) !important;
+    color: var(--lnms-text) !important;
+    box-shadow: none !important;
+}
+
+.lnms-login .form-control:focus {
+    border-color: var(--lnms-accent) !important;
+    box-shadow: 0 0 0 3px var(--lnms-focus-ring) !important;
+}
+
+.lnms-login .btn-primary {
+    background-color: var(--lnms-accent) !important;
+    border-color: var(--lnms-accent) !important;
+    border-radius: var(--lnms-radius-md) !important;
+    font-weight: 600;
+    min-height: 40px;
+}
+
+.lnms-login .btn-primary:hover,
+.lnms-login .btn-primary:focus {
+    background-color: var(--lnms-accent-hover) !important;
+    border-color: var(--lnms-accent-hover) !important;
+}
+
+.lnms-login .btn-success {
+    border-radius: var(--lnms-radius-md);
+}
+
+.lnms-login .btn-default,
+.lnms-login .btn-danger {
+    border-radius: var(--lnms-radius-md);
+}
+
+.lnms-login__brand-line,
+.lnms-login .lnms-login__brand-line {
+    margin: var(--lnms-space-2) 0 0;
+    color: var(--lnms-accent) !important;
+    font-size: var(--lnms-text-sm);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.lnms-login .checkbox label {
+    color: var(--lnms-text-secondary);
+    font-weight: 400;
+}
+
+/* —— Error layout tokens (standalone pages may also inline) —— */
+.lnms-error-page {
+    background: var(--lnms-bg);
+    color: var(--lnms-text);
+    font-family: var(--lnms-font-sans);
+    margin: 0;
+    padding-bottom: 45px;
+}
+
+.lnms-error-page .exception-summary {
+    background: var(--lnms-status-critical);
+    border-bottom: 1px solid var(--lnms-border-strong);
+    margin-bottom: var(--lnms-space-5);
+}
+
+.lnms-error-page a {
+    color: var(--lnms-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    nav.navbar.lnms-nav.navbar-default .navbar-nav > li > a,
+    nav.navbar.lnms-nav .dropdown-menu > li > a,
+    nav.navbar.lnms-nav .navbar-form.global-search .form-control,
+    .lnms-devices .lnms-devices-graphs__item a,
+    .lnms-device-page .lnms-device-page__tab-link,
+    .lnms-device-page .lnms-device-page__action-btn,
+    .lnms-ports .lnms-ports-graphs__item a {
+        transition: none;
+    }
+
+    /* Nonessential shell/module transitions we introduced — keep Bootstrap collapse usable */
+    body.lnms-shell [class^="lnms-"] ,
+    body.lnms-shell [class*=" lnms-"] {
+        scroll-behavior: auto;
+    }
+
+    body.lnms-shell [class^="lnms-"] ,
+    body.lnms-shell [class*=" lnms-"],
+    body.lnms-shell .lnms-nav .global-search-dropdown {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
+
 .device-link-up {
-    @apply tw:font-bold tw:text-blue-900 tw:visited:text-blue-900 tw:dark:text-dark-white-100 tw:dark:visited:text-dark-white-100
+    @apply tw:font-bold tw:text-[color:var(--lnms-status-up)] tw:visited:text-[color:var(--lnms-status-up)] tw:dark:text-[color:var(--lnms-status-up)] tw:dark:visited:text-[color:var(--lnms-status-up)]
 }
 .device-link-down {
-    @apply tw:font-bold tw:text-red-600 tw:visited:text-red-600 tw:dark:text-red-500! tw:dark:visited:text-red-500!
+    @apply tw:font-bold tw:text-[color:var(--lnms-status-down)] tw:visited:text-[color:var(--lnms-status-down)] tw:dark:text-[color:var(--lnms-status-down)]! tw:dark:visited:text-[color:var(--lnms-status-down)]!
 }
 .device-link-disabled {
-    @apply tw:font-bold tw:text-gray-400 tw:visited:text-gray-400 tw:dark:text-gray-500! tw:dark:visited:text-gray-500!
+    @apply tw:font-bold tw:text-[color:var(--lnms-status-unknown)] tw:visited:text-[color:var(--lnms-status-unknown)] tw:dark:text-[color:var(--lnms-status-unknown)]! tw:dark:visited:text-[color:var(--lnms-status-unknown)]!
 }
 
 #coordinates-text  {
@@ -73,15 +612,4861 @@
 }
 
 .overview-panel {
-  @apply tw:rounded-xl tw:border tw:border-gray-300 tw:shadow-sm tw:dark:border-dark-gray-200;
+  @apply tw:rounded-[length:var(--lnms-radius-lg)] tw:border tw:border-[color:var(--lnms-border)] tw:shadow-none tw:dark:border-[color:var(--lnms-border)];
+}
+
+/* —— Dashboard widget chrome (Phase 4) —— */
+.lnms-dashboard {
+    font-family: var(--lnms-font-sans);
+}
+
+.lnms-dashboard #dashboard-editor {
+    margin-bottom: var(--lnms-space-3);
+}
+
+.lnms-dashboard #dashboard-editor .btn {
+    border-radius: var(--lnms-radius-sm);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard #dashboard-editor .btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+}
+
+.lnms-dashboard #dashboard-editor .btn-primary:hover,
+.lnms-dashboard #dashboard-editor .btn-primary:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+}
+
+.lnms-dashboard #dashboard-editor .btn-success {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+}
+
+.lnms-dashboard #dashboard-editor .btn-success:hover,
+.lnms-dashboard #dashboard-editor .btn-success:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+}
+
+.lnms-dashboard #dashboard-editor .btn-danger {
+    background-color: var(--lnms-status-down);
+    border-color: var(--lnms-status-down);
+}
+
+.lnms-dashboard #dashboard-editor .form-control {
+    border-color: var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-dashboard #dashboard-editor .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 3px var(--lnms-focus-ring);
+}
+
+.lnms-dashboard #dashboard-editor .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-dashboard #dashboard-editor .dropdown-menu > li > a {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard #dashboard-editor .dropdown-menu > li > a:hover,
+.lnms-dashboard #dashboard-editor .dropdown-menu > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard #dashboard-editor .divider {
+    background-color: var(--lnms-border);
+}
+
+.lnms-dashboard #dashboard-editor .dropdown-header {
+    color: var(--lnms-text-muted);
+    font-size: var(--lnms-text-xs);
+}
+
+.lnms-dashboard #message {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .grid-stack {
+    margin-top: var(--lnms-space-2);
+}
+
+.lnms-dashboard .grid-stack-item-content.lnms-widget {
+    background: var(--lnms-surface);
+    color: var(--lnms-text);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-lg);
+    box-shadow: var(--lnms-shadow-sm);
+    overflow: hidden;
+}
+
+.lnms-dashboard .lnms-widget__header {
+    background: var(--lnms-surface-muted);
+    color: var(--lnms-text);
+    border-bottom: 1px solid var(--lnms-border);
+    padding: var(--lnms-space-2) var(--lnms-space-3);
+    text-align: center;
+    font-size: var(--lnms-text-sm);
+    font-weight: 600;
+    line-height: 1.4;
+    min-height: 2.6em;
+}
+
+.lnms-dashboard .lnms-widget__title {
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget__body {
+    left: 4px !important;
+    right: 4px !important;
+    padding: 0.8em;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+    height: calc(100% - 2.6em);
+    cursor: auto;
+    color: var(--lnms-text);
+    background: var(--lnms-surface);
+}
+
+.lnms-dashboard .lnms-widget .fade-edit {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard .lnms-widget .fade-edit [data-widget-action="edit"]:hover {
+    color: var(--lnms-accent);
+}
+
+.lnms-dashboard .lnms-widget .fade-edit [data-widget-action="close"] {
+    color: var(--lnms-status-down) !important;
+}
+
+.lnms-dashboard .lnms-widget .fade-edit [data-widget-action="close"]:hover {
+    color: var(--lnms-status-critical) !important;
+}
+
+/* Override legacy tw_dark hardcode when tokenized chrome is present */
+.dark .lnms-dashboard .grid-stack .grid-stack-item-content.lnms-widget {
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+}
+
+/* —— Dashboard widget content (Phase 4) —— */
+/* Device summary: keep legacy .green/.red/.blue/.grey/.black class names;
+   remap colors to status tokens inside widget scope only. */
+.lnms-dashboard .lnms-widget .lnms-device-summary.panel {
+    margin-bottom: 0;
+    background: transparent;
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: none;
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .table > thead > tr > th,
+.lnms-dashboard .lnms-widget .lnms-device-summary .table > tbody > tr > th {
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+    font-weight: 500;
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .table > tbody > tr > td {
+    border-top-color: var(--lnms-border);
+    vertical-align: middle;
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary a {
+    color: var(--lnms-accent);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary a:hover,
+.lnms-dashboard .lnms-widget .lnms-device-summary a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .green,
+.lnms-dashboard .lnms-widget .lnms-device-summary a.green,
+.lnms-dashboard .lnms-widget .lnms-device-summary a.green:visited {
+    color: var(--lnms-status-up) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .red,
+.lnms-dashboard .lnms-widget .lnms-device-summary a.red,
+.lnms-dashboard .lnms-widget .lnms-device-summary a.red:visited {
+    color: var(--lnms-status-down) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .blue,
+.lnms-dashboard .lnms-widget .lnms-device-summary a.blue,
+.lnms-dashboard .lnms-widget .lnms-device-summary a.blue:visited {
+    color: var(--lnms-status-maintenance) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .grey,
+.lnms-dashboard .lnms-widget .lnms-device-summary a.grey,
+.lnms-dashboard .lnms-widget .lnms-device-summary a.grey:visited {
+    color: var(--lnms-text-muted) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .black,
+.lnms-dashboard .lnms-widget .lnms-device-summary a.black,
+.lnms-dashboard .lnms-widget .lnms-device-summary a.black:visited {
+    color: var(--lnms-status-unknown) !important;
+}
+
+/* Alerts widget: Bootgrid chrome only — preserve IDs, data-column-id, table.alerts */
+.lnms-dashboard .lnms-widget .lnms-alerts-widget {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .table.alerts {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-header,
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-header .search .search-field,
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-footer .search .search-field {
+    border-color: var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-header .search .search-field:focus,
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-footer .search .search-field:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 3px var(--lnms-focus-ring);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-table th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-color: var(--lnms-border);
+    font-weight: 500;
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-table td {
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-table tr:hover td {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .alerts-widget-sev-btn.btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .alerts-widget-sev-btn.btn-default:hover,
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .alerts-widget-sev-btn.btn-default:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .alerts-widget-sev-btn.btn-warning {
+    background-color: var(--lnms-status-warn);
+    border-color: var(--lnms-status-warn);
+    color: var(--lnms-status-on);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .alerts-widget-sev-btn.btn-danger {
+    background-color: var(--lnms-status-critical);
+    border-color: var(--lnms-status-critical);
+    color: #FFFFFF;
+}
+
+/* Availability map: remaps Bootstrap labels + compact tiles; routes/labels unchanged */
+.lnms-dashboard .lnms-widget .lnms-availability-map {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .widget-availability-host,
+.lnms-dashboard .lnms-widget .lnms-availability-map .widget-availability-service {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .label {
+    border-radius: var(--lnms-radius-sm);
+    font-weight: 500;
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .label-success {
+    background-color: var(--lnms-status-up) !important;
+    color: #FFFFFF !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .label-warning {
+    background-color: var(--lnms-status-warn) !important;
+    color: var(--lnms-status-on) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .label-danger {
+    background-color: var(--lnms-status-down) !important;
+    color: #FFFFFF !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .label-default {
+    background-color: var(--lnms-status-maintenance) !important;
+    color: #FFFFFF !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .blackbg {
+    background-color: var(--lnms-status-unknown) !important;
+    color: #FFFFFF !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .availability-map-oldview-box-up,
+.lnms-dashboard .lnms-widget .lnms-availability-map .availability-map-oldview-box-ignored-up {
+    background-color: var(--lnms-status-up) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .availability-map-oldview-box-warn {
+    background-color: var(--lnms-status-warn) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .availability-map-oldview-box-down {
+    background-color: var(--lnms-status-down) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .availability-map-oldview-box-ignored,
+.lnms-dashboard .lnms-widget .lnms-availability-map .availability-map-oldview-box-ignored-down,
+.lnms-dashboard .lnms-widget .lnms-availability-map .availability-map-oldview-box-disabled {
+    background-color: var(--lnms-status-unknown) !important;
+}
+
+/* Eventlog widget: Bootgrid chrome — preserve IDs, data-column-id, /ajax/table/eventlog */
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-header,
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-header .search .search-field,
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-footer .search .search-field {
+    border-color: var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-header .search .search-field:focus,
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-footer .search .search-field:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 3px var(--lnms-focus-ring);
+}
+
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-table th,
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .table > thead > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-color: var(--lnms-border);
+    font-weight: 500;
+}
+
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-table td,
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .table > tbody > tr > td {
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-table tr:hover td,
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+/* Device types + top-devices / top-interfaces tables */
+.lnms-dashboard .lnms-widget .lnms-device-types.panel,
+.lnms-dashboard .lnms-widget .lnms-top-devices,
+.lnms-dashboard .lnms-widget .lnms-top-interfaces {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-types.panel {
+    margin-bottom: 0;
+    background: transparent;
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: none;
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-types .table,
+.lnms-dashboard .lnms-widget .lnms-top-devices .table,
+.lnms-dashboard .lnms-widget .lnms-top-interfaces .table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-types .table > thead > tr > th,
+.lnms-dashboard .lnms-widget .lnms-top-devices .table > thead > tr > th,
+.lnms-dashboard .lnms-widget .lnms-top-interfaces .table > thead > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+    font-weight: 500;
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-types .table > tbody > tr > td,
+.lnms-dashboard .lnms-widget .lnms-top-devices .table > tbody > tr > td,
+.lnms-dashboard .lnms-widget .lnms-top-interfaces .table > tbody > tr > td {
+    border-top-color: var(--lnms-border);
+    vertical-align: middle;
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-types .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-dashboard .lnms-widget .lnms-top-devices .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-dashboard .lnms-widget .lnms-top-interfaces .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-types .table-striped > tbody > tr:nth-of-type(even),
+.lnms-dashboard .lnms-widget .lnms-top-devices .table-striped > tbody > tr:nth-of-type(even),
+.lnms-dashboard .lnms-widget .lnms-top-interfaces .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-types .table-hover > tbody > tr:hover,
+.lnms-dashboard .lnms-widget .lnms-top-devices .table-hover > tbody > tr:hover,
+.lnms-dashboard .lnms-widget .lnms-top-interfaces .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-types a,
+.lnms-dashboard .lnms-widget .lnms-top-devices a,
+.lnms-dashboard .lnms-widget .lnms-top-interfaces a {
+    color: var(--lnms-accent);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-types a:hover,
+.lnms-dashboard .lnms-widget .lnms-device-types a:focus,
+.lnms-dashboard .lnms-widget .lnms-top-devices a:hover,
+.lnms-dashboard .lnms-widget .lnms-top-devices a:focus,
+.lnms-dashboard .lnms-widget .lnms-top-interfaces a:hover,
+.lnms-dashboard .lnms-widget .lnms-top-interfaces a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-devices h4,
+.lnms-dashboard .lnms-widget .lnms-top-interfaces h4 {
+    margin-top: 0;
+    margin-bottom: var(--lnms-space-2);
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+    font-weight: 500;
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-interfaces .minigraph-image,
+.lnms-dashboard .lnms-widget .lnms-top-devices .minigraph-image {
+    border-radius: var(--lnms-radius-sm);
+    vertical-align: middle;
+}
+
+/* World map: container chrome only — Leaflet IDs, maps.getdevices, markers preserved */
+.lnms-dashboard .lnms-widget .lnms-worldmap-widget.worldmap_widget {
+    border-radius: 0 0 var(--lnms-radius-md) var(--lnms-radius-md);
+    overflow: hidden;
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-worldmap-widget .leaflet-popup-content-wrapper {
+    background: var(--lnms-surface);
+    color: var(--lnms-text);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-worldmap-widget .leaflet-popup-tip {
+    background: var(--lnms-surface);
+}
+
+.lnms-dashboard .lnms-widget .lnms-worldmap-widget .leaflet-popup-content a {
+    color: var(--lnms-accent);
+}
+
+.lnms-dashboard .lnms-widget .lnms-worldmap-widget .leaflet-popup-content a:hover,
+.lnms-dashboard .lnms-widget .lnms-worldmap-widget .leaflet-popup-content a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-dashboard .lnms-widget .lnms-worldmap-widget .greenCluster {
+    background-color: var(--lnms-status-up);
+    color: #FFFFFF;
+}
+
+.lnms-dashboard .lnms-widget .lnms-worldmap-widget .blueCluster {
+    background-color: var(--lnms-status-maintenance);
+    color: #FFFFFF;
+}
+
+.lnms-dashboard .lnms-widget .lnms-worldmap-widget .redCluster {
+    background-color: var(--lnms-status-down);
+    color: #FFFFFF;
+}
+
+/* Graph widget chrome: real /graph images only */
+.lnms-dashboard .lnms-widget .lnms-dashboard-graph.dashboard-graph {
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    overflow: hidden;
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-dashboard-graph .minigraph-image {
+    display: block;
+    border-radius: 0;
+}
+
+/* Syslog / Graylog / Alertlog / Alertlog-stats: Bootgrid — preserve IDs, data-column-id, AJAX URLs */
+.lnms-dashboard .lnms-widget .lnms-syslog-widget,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .table,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .table,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .table,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-header,
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-footer,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-header,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-footer,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-header,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-footer,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-header,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-header .search .search-field,
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-footer .search .search-field,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-header .search .search-field,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-footer .search .search-field,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-header .search .search-field,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-footer .search .search-field,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-header .search .search-field,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-footer .search .search-field {
+    border-color: var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-header .search .search-field:focus,
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-footer .search .search-field:focus,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-header .search .search-field:focus,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-footer .search .search-field:focus,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-header .search .search-field:focus,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-footer .search .search-field:focus,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-header .search .search-field:focus,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-footer .search .search-field:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 3px var(--lnms-focus-ring);
+}
+
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-table th,
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .table > thead > tr > th,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-table th,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .table > thead > tr > th,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-table th,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .table > thead > tr > th,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-table th,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .table > thead > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-color: var(--lnms-border);
+    font-weight: 500;
+}
+
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-table td,
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .table > tbody > tr > td,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-table td,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .table > tbody > tr > td,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-table td,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .table > tbody > tr > td,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-table td,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .table > tbody > tr > td {
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-table tr:hover td,
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .table-hover > tbody > tr:hover,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-table tr:hover td,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .table-hover > tbody > tr:hover,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-table tr:hover td,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .table-hover > tbody > tr:hover,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-table tr:hover td,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .table-striped > tbody > tr:nth-of-type(even),
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+/* Alert map: label/tile remaps — preserve device alert links */
+.lnms-dashboard .lnms-widget .lnms-alert-map {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alert-map .widget-alert-totals {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alert-map .label {
+    border-radius: var(--lnms-radius-sm);
+    font-weight: 500;
+}
+
+.lnms-dashboard .lnms-widget .lnms-alert-map .label-success {
+    background-color: var(--lnms-status-up) !important;
+    color: #FFFFFF !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-alert-map .label-warning {
+    background-color: var(--lnms-status-warn) !important;
+    color: #FFFFFF !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-alert-map .label-danger {
+    background-color: var(--lnms-status-critical) !important;
+    color: #FFFFFF !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-alert-map .blackbg {
+    background-color: var(--lnms-status-unknown) !important;
+    color: #FFFFFF !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-alert-map .alert-map-compact-ok,
+.lnms-dashboard .lnms-widget .lnms-alert-map .widget-alert-map-compact-ok {
+    background-color: var(--lnms-status-up) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-alert-map .alert-map-compact-warning,
+.lnms-dashboard .lnms-widget .lnms-alert-map .widget-alert-map-compact-warning {
+    background-color: var(--lnms-status-warn) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-alert-map .alert-map-compact-critical,
+.lnms-dashboard .lnms-widget .lnms-alert-map .widget-alert-map-compact-critical {
+    background-color: var(--lnms-status-critical) !important;
+}
+
+/* Component status table */
+.lnms-dashboard .lnms-widget .lnms-component-status {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-component-status .table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-component-status .table > thead > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+    font-weight: 500;
+}
+
+.lnms-dashboard .lnms-widget .lnms-component-status .table > tbody > tr > td {
+    border-top-color: var(--lnms-border);
+    vertical-align: middle;
+}
+
+.lnms-dashboard .lnms-widget .lnms-component-status .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-dashboard .lnms-widget .lnms-component-status .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-component-status .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-component-status .text-success {
+    color: var(--lnms-status-up) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-component-status .text-danger {
+    color: var(--lnms-status-down) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-component-status .grey {
+    color: var(--lnms-status-unknown) !important;
+}
+
+/* Server stats gauges — host chrome; JustGage IDs preserved */
+.lnms-dashboard .lnms-widget .lnms-server-stats {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-server-stats .gauge-title {
+    text-align: center;
+    font-family: var(--lnms-font-sans, system-ui, sans-serif);
+    font-size: var(--lnms-text-sm);
+    font-weight: 600;
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard .lnms-widget .lnms-server-stats .gauge-container {
+    height: 80px;
+    margin-bottom: var(--lnms-space-3, 15px);
+}
+
+/* Health sensors — token surfaces around real graph/device routes */
+.lnms-dashboard .lnms-widget .lnms-health-sensors {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-health-sensors .alert-danger {
+    background-color: color-mix(in srgb, var(--lnms-status-critical) 12%, var(--lnms-surface));
+    border-color: var(--lnms-status-critical);
+    color: var(--lnms-status-critical);
+}
+
+.lnms-dashboard .lnms-widget .lnms-health-sensors .alert-info {
+    background-color: color-mix(in srgb, var(--lnms-accent) 10%, var(--lnms-surface));
+    border-color: var(--lnms-accent);
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard .lnms-widget .lnms-health-sensors a {
+    color: var(--lnms-accent);
+}
+
+.lnms-dashboard .lnms-widget .lnms-health-sensors a:hover,
+.lnms-dashboard .lnms-widget .lnms-health-sensors a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+/* Top errors — same table chrome as top-interfaces */
+.lnms-dashboard .lnms-widget .lnms-top-errors {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-errors .table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-errors .table > thead > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+    font-weight: 500;
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-errors .table > tbody > tr > td {
+    border-top-color: var(--lnms-border);
+    vertical-align: middle;
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-errors .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-errors .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-errors .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-errors a {
+    color: var(--lnms-accent);
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-errors a:hover,
+.lnms-dashboard .lnms-widget .lnms-top-errors a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-errors h4 {
+    margin-top: 0;
+    margin-bottom: var(--lnms-space-2);
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+    font-weight: 500;
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-errors .minigraph-image {
+    border-radius: var(--lnms-radius-sm);
+    vertical-align: middle;
+}
+
+/* Globe / custom-map / generic-image chrome — map IDs + routes preserved */
+.lnms-dashboard .lnms-widget .lnms-globe-widget {
+    border-radius: 0 0 var(--lnms-radius-md) var(--lnms-radius-md);
+    overflow: hidden;
+    background-color: var(--lnms-surface-muted);
+    min-height: 120px;
+}
+
+.lnms-dashboard .lnms-widget .lnms-custom-map {
+    border-radius: 0 0 var(--lnms-radius-md) var(--lnms-radius-md);
+    overflow: hidden;
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-generic-image {
+    display: inline-block;
+    border-radius: var(--lnms-radius-md);
+    overflow: hidden;
+    border: 1px solid var(--lnms-border);
+    background-color: var(--lnms-surface-muted);
+    line-height: 0;
+}
+
+.lnms-dashboard .lnms-widget .lnms-generic-image .dashboard-image {
+    display: block;
+    max-width: 100%;
+}
+
+/* Notes + placeholder leftover widgets — presentation only */
+.lnms-dashboard .lnms-widget .lnms-notes-widget {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+    line-height: 1.45;
+    padding: var(--lnms-space-1);
+}
+
+.lnms-dashboard .lnms-widget .lnms-notes-widget h1,
+.lnms-dashboard .lnms-widget .lnms-notes-widget h2,
+.lnms-dashboard .lnms-widget .lnms-notes-widget h3,
+.lnms-dashboard .lnms-widget .lnms-notes-widget h4 {
+    color: var(--lnms-text);
+    margin-top: 0;
+    font-family: var(--lnms-font-sans);
+}
+
+.lnms-dashboard .lnms-widget .lnms-notes-widget pre {
+    background-color: var(--lnms-surface-muted);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    color: var(--lnms-text);
+    padding: var(--lnms-space-2);
+    font-family: var(--lnms-font-mono);
+    font-size: var(--lnms-text-xs);
+    white-space: pre-wrap;
+}
+
+.lnms-dashboard .lnms-widget .lnms-notes-widget iframe {
+    max-width: 100%;
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-placeholder-widget {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+    padding: var(--lnms-space-3);
+}
+
+.lnms-dashboard .lnms-widget .lnms-placeholder-widget h3 {
+    margin-top: 0;
+    margin-bottom: var(--lnms-space-3);
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-lg);
+    font-weight: 600;
+    font-family: var(--lnms-font-sans);
+}
+
+.lnms-dashboard .lnms-widget .lnms-placeholder-widget__hint {
+    margin: 0;
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-md);
+    font-weight: 400;
+}
+
+.lnms-dashboard .lnms-widget .lnms-placeholder-widget__hint strong {
+    color: var(--lnms-text);
+    font-weight: 600;
+}
+
+.dark .lnms-dashboard .lnms-widget .lnms-device-summary .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-table td.loading,
+.dark .lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-table td.no-results,
+.dark .lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-table td.loading,
+.dark .lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-table td.no-results,
+.dark .lnms-dashboard .lnms-widget .lnms-eventlog-widget .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-dashboard .lnms-widget .lnms-device-types .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-dashboard .lnms-widget .lnms-top-devices .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-dashboard .lnms-widget .lnms-top-interfaces .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-table td.loading,
+.dark .lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-table td.no-results,
+.dark .lnms-dashboard .lnms-widget .lnms-syslog-widget .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-table td.loading,
+.dark .lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-table td.no-results,
+.dark .lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-table td.loading,
+.dark .lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-table td.no-results,
+.dark .lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-table td.loading,
+.dark .lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-table td.no-results,
+.dark .lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-dashboard .lnms-widget .lnms-component-status .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-dashboard .lnms-widget .lnms-top-errors .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+/* —— Phase 5 module hosts (shared base; keep per-module sections below) —— */
+.lnms-devices,
+.lnms-device-page,
+.lnms-ports,
+.lnms-graphs,
+.lnms-health,
+.lnms-wireless,
+.lnms-alerts,
+.lnms-alert-log,
+.lnms-alert-rules,
+.lnms-maps,
+.lnms-eventlog,
+.lnms-syslog,
+.lnms-authlog,
+.lnms-bills,
+.lnms-bill,
+.lnms-users,
+.lnms-users-permissions,
+.lnms-roles,
+.lnms-settings,
+.lnms-api,
+.lnms-poller,
+.lnms-plugins,
+.lnms-inventory,
+.lnms-services,
+.lnms-apps,
+.lnms-validate,
+.lnms-nac,
+.lnms-ssl-certificates,
+.lnms-oui-lookup,
+.lnms-about,
+.lnms-port-groups,
+.lnms-port-security,
+.lnms-search,
+.lnms-notifications,
+.lnms-customers,
+.lnms-peering,
+.lnms-oxidized {
+    font-family: var(--lnms-font-sans);
+    color: var(--lnms-text);
+}
+
+/* Phase 5: Device list — hosts .lnms-devices*; Bootgrid #devices / data-column-id preserved */
+.lnms-devices .lnms-devices-panel.panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-lg);
+    box-shadow: none;
+    color: var(--lnms-text);
+}
+
+.lnms-devices .lnms-devices-panel > .panel-heading {
+    background-color: var(--lnms-surface-muted);
+    border-bottom: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-lg) var(--lnms-radius-lg) 0 0;
+    color: var(--lnms-text);
+    padding: var(--lnms-space-2) var(--lnms-space-3);
+}
+
+.lnms-devices .lnms-devices-panel > .panel-body {
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+    padding: var(--lnms-space-3);
+}
+
+.lnms-devices .lnms-devices-panel > .panel-footer {
+    background-color: var(--lnms-surface-muted);
+    border-top: 1px solid var(--lnms-border);
+    border-radius: 0 0 var(--lnms-radius-lg) var(--lnms-radius-lg);
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-devices .lnms-devices-toolbar {
+    align-items: flex-start;
+}
+
+.lnms-devices .lnms-devices-nav .panel {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    margin-bottom: 0;
+}
+
+.lnms-devices .lnms-devices-nav .panel-heading {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-devices .lnms-devices-nav a {
+    color: var(--lnms-accent);
+    text-decoration: none;
+}
+
+.lnms-devices .lnms-devices-nav a:hover,
+.lnms-devices .lnms-devices-nav a:focus {
+    color: var(--lnms-accent-hover);
+    text-decoration: underline;
+}
+
+.lnms-devices .lnms-devices-nav .pagemenu-selected a {
+    color: var(--lnms-text);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 2px solid var(--lnms-accent);
+    padding-bottom: 1px;
+}
+
+.lnms-devices .lnms-devices-menu .btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text-secondary);
+    border-radius: var(--lnms-radius-sm);
+}
+
+.lnms-devices .lnms-devices-menu .btn-default:hover,
+.lnms-devices .lnms-devices-menu .btn-default:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+    color: var(--lnms-text);
+}
+
+.lnms-devices .lnms-devices-menu .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-devices .lnms-devices-menu .dropdown-menu > li > a {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-devices .lnms-devices-menu .dropdown-menu > li > a:hover,
+.lnms-devices .lnms-devices-menu .dropdown-menu > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text);
+}
+
+/* Bootgrid device table — keep #devices / data-column-id / devices-headers-table-menu */
+.lnms-devices .lnms-devices-list {
+    margin-top: var(--lnms-space-1);
+}
+
+.lnms-devices .devices-headers-table-menu {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-devices .bootgrid-header,
+.lnms-devices .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.lnms-devices .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-devices .bootgrid-footer .actionBar .btn-group > .btn,
+.lnms-devices .bootgrid-header .dropdown-toggle,
+.lnms-devices .bootgrid-footer .dropdown-toggle {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    border-radius: var(--lnms-radius-sm);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-devices .bootgrid-header .dropdown-menu,
+.lnms-devices .bootgrid-footer .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-devices .bootgrid-header .dropdown-menu > li > a,
+.lnms-devices .bootgrid-footer .dropdown-menu > li > a,
+.lnms-devices .bootgrid-header .dropdown-menu .dropdown-item,
+.lnms-devices .bootgrid-footer .dropdown-menu .dropdown-item {
+    color: var(--lnms-text);
+}
+
+.lnms-devices .bootgrid-header .dropdown-menu > li > a:hover,
+.lnms-devices .bootgrid-footer .dropdown-menu > li > a:hover {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-devices #devices.table,
+.lnms-devices .bootgrid-table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-devices #devices.table > thead > tr > th,
+.lnms-devices .bootgrid-table th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+    border-top-color: var(--lnms-border);
+    font-weight: 500;
+    font-size: var(--lnms-text-xs);
+    text-transform: none;
+    white-space: nowrap;
+}
+
+.lnms-devices #devices.table > tbody > tr > td,
+.lnms-devices .bootgrid-table td {
+    border-top-color: var(--lnms-border);
+    color: var(--lnms-text);
+    vertical-align: middle;
+}
+
+.lnms-devices #devices.table-striped > tbody > tr:nth-of-type(odd),
+.lnms-devices .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-devices #devices.table-striped > tbody > tr:nth-of-type(even),
+.lnms-devices .bootgrid-table.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-devices #devices.table-hover > tbody > tr:hover,
+.lnms-devices .bootgrid-table.table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-devices .bootgrid-table td.loading,
+.lnms-devices .bootgrid-table td.no-results {
+    color: var(--lnms-text-muted);
+    background-color: var(--lnms-surface) !important;
+}
+
+.lnms-devices .pagination > li > a,
+.lnms-devices .pagination > li > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-accent);
+}
+
+.lnms-devices .pagination > li > a:hover,
+.lnms-devices .pagination > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-devices .pagination > .active > a,
+.lnms-devices .pagination > .active > span,
+.lnms-devices .pagination > .active > a:hover,
+.lnms-devices .pagination > .active > span:hover {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #FFFFFF;
+}
+
+.lnms-devices .pagination > .disabled > a,
+.lnms-devices .pagination > .disabled > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text-muted);
+}
+
+/* Status strip remaps — Bootgrid formatters still emit label-* / blackbg */
+.lnms-devices .alert-status,
+.lnms-devices .alert-status-small {
+    border-radius: 1px;
+}
+
+.lnms-devices .alert-status.label-success,
+.lnms-devices .alert-status-small.label-success {
+    background-color: var(--lnms-status-up) !important;
+}
+
+.lnms-devices .alert-status.label-danger,
+.lnms-devices .alert-status-small.label-danger {
+    background-color: var(--lnms-status-down) !important;
+}
+
+.lnms-devices .alert-status.label-warning,
+.lnms-devices .alert-status-small.label-warning {
+    background-color: var(--lnms-status-warn) !important;
+}
+
+.lnms-devices .alert-status.label-default,
+.lnms-devices .alert-status-small.label-default {
+    background-color: var(--lnms-status-unknown) !important;
+}
+
+.lnms-devices .alert-status.blackbg,
+.lnms-devices .alert-status-small.blackbg {
+    background-color: var(--lnms-status-unknown) !important;
+}
+
+.lnms-devices .red {
+    color: var(--lnms-status-down) !important;
+}
+
+.lnms-devices .device-table-icon {
+    border-radius: var(--lnms-radius-sm);
+}
+
+.lnms-devices .device-table-header-actions {
+    text-align: center;
+}
+
+.lnms-devices .lnms-devices-list a {
+    color: var(--lnms-accent);
+}
+
+.lnms-devices .lnms-devices-list a:hover,
+.lnms-devices .lnms-devices-list a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-devices .lnms-devices-list .icon-theme {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-devices .lnms-devices-list a:hover .icon-theme {
+    color: var(--lnms-accent);
+}
+
+.lnms-devices .glyphicon-wrench {
+    color: var(--lnms-status-maintenance);
+}
+
+/* Graph view — preserve lazy graph tags + Alpine deviceLink */
+.lnms-devices .lnms-devices-graphs__rule {
+    border-color: var(--lnms-border);
+    border-top-style: solid;
+}
+
+.lnms-devices .lnms-devices-graphs__item a {
+    display: block;
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    overflow: hidden;
+    background-color: var(--lnms-surface-muted);
+    transition: border-color var(--lnms-duration-fast) var(--lnms-ease);
+}
+
+.lnms-devices .lnms-devices-graphs__item a:hover,
+.lnms-devices .lnms-devices-graphs__item a:focus {
+    border-color: var(--lnms-accent);
+}
+
+.lnms-devices .lnms-devices-graphs__item img,
+.lnms-devices .lnms-devices-graphs__item .graph-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.lnms-devices .lnms-devices-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-devices .lnms-devices-footer .form-control {
+    border-color: var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+}
+
+.lnms-devices .lnms-devices-footer .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 3px var(--lnms-focus-ring);
+}
+
+.lnms-devices .lnms-devices-footer a {
+    color: var(--lnms-accent);
+}
+
+@media (max-width: 767px) {
+    .lnms-devices .lnms-devices-panel > .panel-body {
+        padding: var(--lnms-space-2);
+    }
+
+    .lnms-devices .lnms-devices-toolbar {
+        flex-direction: column;
+    }
+
+    .lnms-devices .lnms-devices-menu {
+        align-self: flex-end;
+    }
+
+    .lnms-devices #devices.table > thead > tr > th,
+    .lnms-devices .bootgrid-table th {
+        font-size: 11px;
+    }
+}
+
+.dark .lnms-devices #devices.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-devices .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-devices .bootgrid-table td.loading,
+.dark .lnms-devices .bootgrid-table td.no-results {
+    background-color: var(--lnms-surface);
+}
+
+/* Phase 5: Device detail — hosts .lnms-device-page*; status left-border uses --lnms-status-* */
+.lnms-device-page .lnms-device-page__header.panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-left-width: 5px;
+    border-radius: var(--lnms-radius-lg);
+    box-shadow: var(--lnms-shadow-sm);
+    margin-bottom: 0;
+}
+
+.lnms-device-page .lnms-device-page__header--up {
+    border-left-color: var(--lnms-status-up) !important;
+}
+
+.lnms-device-page .lnms-device-page__header--down {
+    border-left-color: var(--lnms-status-down) !important;
+}
+
+.lnms-device-page .lnms-device-page__header--maintenance {
+    border-left-color: var(--lnms-status-maintenance) !important;
+}
+
+.lnms-device-page .lnms-device-page__header--disabled {
+    border-left-color: var(--lnms-status-unknown) !important;
+}
+
+.lnms-device-page .lnms-device-page__header--unknown {
+    border-left-color: var(--lnms-status-unknown) !important;
+}
+
+.lnms-device-page .lnms-device-page__header > .panel-body,
+.lnms-device-page .lnms-device-page__header-body {
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+    padding: var(--lnms-space-3) var(--lnms-space-4) 0 var(--lnms-space-4);
+    overflow: auto;
+}
+
+.lnms-device-page .lnms-device-page__icon {
+    margin: var(--lnms-space-2);
+    border-radius: var(--lnms-radius-sm);
+}
+
+.dark .lnms-device-page .lnms-device-page__icon {
+    background-color: var(--lnms-surface-muted);
+    padding: var(--lnms-space-2);
+    border-radius: var(--lnms-radius-md);
+}
+
+.lnms-device-page .lnms-device-page__identity {
+    margin-top: var(--lnms-space-1);
+}
+
+.lnms-device-page .lnms-device-page__title {
+    font-size: var(--lnms-text-xl);
+    font-weight: 600;
+    font-family: var(--lnms-font-display);
+    color: var(--lnms-text);
+    line-height: 1.3;
+}
+
+.lnms-device-page .lnms-device-page__maintenance {
+    color: var(--lnms-status-maintenance);
+}
+
+.lnms-device-page .lnms-device-page__vm-host {
+    color: var(--lnms-accent);
+    text-decoration: none;
+}
+
+.lnms-device-page .lnms-device-page__vm-host:hover,
+.lnms-device-page .lnms-device-page__vm-host:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-device-page .lnms-device-page__location {
+    margin-top: var(--lnms-space-4);
+    font-size: var(--lnms-text-sm);
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-device-page .lnms-device-page__location a {
+    color: var(--lnms-accent);
+    text-decoration: none;
+}
+
+.lnms-device-page .lnms-device-page__location a:hover,
+.lnms-device-page .lnms-device-page__location a:focus {
+    color: var(--lnms-accent-hover);
+    text-decoration: underline;
+}
+
+.lnms-device-page .lnms-device-page__graph-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: flex-start;
+    gap: var(--lnms-space-4);
+    margin: 0 var(--lnms-space-4);
+    padding: var(--lnms-space-3) var(--lnms-space-4) var(--lnms-space-5);
+}
+
+.lnms-device-page .lnms-device-page__graph-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.lnms-device-page .lnms-device-page__graph-label {
+    margin-top: var(--lnms-space-1);
+    font-size: var(--lnms-text-sm);
+    font-weight: 600;
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-device-page .lnms-device-page__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding-left: var(--lnms-space-4);
+    margin: var(--lnms-space-5) 0 0;
+    border-bottom: 1px solid var(--lnms-border);
+    align-items: flex-end;
+    gap: 0;
+}
+
+.lnms-device-page .lnms-device-page__tab {
+    margin-bottom: -1px;
+}
+
+.lnms-device-page .lnms-device-page__tab-link {
+    display: inline-block;
+    padding: var(--lnms-space-3);
+    border-bottom: 2px solid transparent;
+    border-radius: var(--lnms-radius-sm) var(--lnms-radius-sm) 0 0;
+    font-size: var(--lnms-text-sm);
+    font-weight: 500;
+    white-space: nowrap;
+    text-decoration: none;
+    color: var(--lnms-text-secondary);
+    transition: color var(--lnms-duration-fast) var(--lnms-ease),
+        border-color var(--lnms-duration-fast) var(--lnms-ease);
+}
+
+.lnms-device-page .lnms-device-page__tab-link:hover,
+.lnms-device-page .lnms-device-page__tab-link:focus {
+    color: var(--lnms-text);
+    border-bottom-color: var(--lnms-border-strong);
+    text-decoration: none;
+}
+
+.lnms-device-page .lnms-device-page__tab-link:focus-visible {
+    outline: 2px solid var(--lnms-focus-ring);
+    outline-offset: 2px;
+}
+
+.lnms-device-page .lnms-device-page__tab-link--active {
+    color: var(--lnms-text);
+    border-bottom-color: var(--lnms-accent);
+    font-weight: 600;
+}
+
+.lnms-device-page .lnms-device-page__tab-link .icon-theme {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-device-page .lnms-device-page__tab-link--active .icon-theme,
+.lnms-device-page .lnms-device-page__tab-link:hover .icon-theme {
+    color: var(--lnms-accent);
+}
+
+.lnms-device-page .lnms-device-page__actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--lnms-space-1);
+    padding: var(--lnms-space-2) var(--lnms-space-3) var(--lnms-space-2) 0;
+}
+
+.lnms-device-page .lnms-device-page__action-btn {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    color: var(--lnms-text-secondary);
+    padding: var(--lnms-space-2) var(--lnms-space-3);
+    transition: background-color var(--lnms-duration-fast) var(--lnms-ease),
+        border-color var(--lnms-duration-fast) var(--lnms-ease),
+        color var(--lnms-duration-fast) var(--lnms-ease);
+}
+
+.lnms-device-page .lnms-device-page__action-btn:hover,
+.lnms-device-page .lnms-device-page__action-btn:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+    color: var(--lnms-text);
+}
+
+.lnms-device-page .lnms-device-page__action-btn:focus-visible {
+    outline: 2px solid var(--lnms-focus-ring);
+    outline-offset: 2px;
+}
+
+.lnms-device-page .lnms-device-page__action-btn .icon-theme {
+    color: inherit;
+}
+
+.lnms-device-page .lnms-device-page__action-menu .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-device-page .lnms-device-page__action-menu .dropdown-menu > li > a {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-device-page .lnms-device-page__action-menu .dropdown-menu > li > a:hover,
+.lnms-device-page .lnms-device-page__action-menu .dropdown-menu > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text);
+}
+
+.lnms-device-page .lnms-device-page__action-menu .dropdown-menu > li > a .icon-theme {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-device-page .lnms-device-page__action-menu .divider {
+    background-color: var(--lnms-border);
+}
+
+.lnms-device-page .lnms-device-page__content {
+    margin-top: var(--lnms-space-4);
+}
+
+@media (max-width: 767px) {
+    .lnms-device-page .lnms-device-page__header > .panel-body,
+    .lnms-device-page .lnms-device-page__header-body {
+        padding: var(--lnms-space-2) var(--lnms-space-3) 0;
+    }
+
+    .lnms-device-page .lnms-device-page__graph-row {
+        margin: var(--lnms-space-2) 0 0;
+        padding: var(--lnms-space-2);
+        width: 100%;
+        clear: both;
+    }
+
+    .lnms-device-page .lnms-device-page__tabs {
+        padding-left: var(--lnms-space-2);
+    }
+
+    .lnms-device-page .lnms-device-page__tab-link {
+        padding: var(--lnms-space-2) var(--lnms-space-3);
+        font-size: var(--lnms-text-xs);
+    }
+
+    .lnms-device-page .lnms-device-page__actions {
+        width: 100%;
+        justify-content: flex-end;
+        padding-right: var(--lnms-space-2);
+        margin-top: var(--lnms-space-2);
+    }
+}
+
+/* Phase 5: Ports — hosts .lnms-ports*; Bootgrid #ports / data-column-id preserved */
+.lnms-ports .lnms-ports-panel.panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-lg);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-ports .lnms-ports-panel > .panel-heading {
+    background-color: var(--lnms-surface-muted);
+    border-bottom: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-lg) var(--lnms-radius-lg) 0 0;
+    color: var(--lnms-text);
+}
+
+.lnms-ports .lnms-ports-panel > .panel-body {
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+    padding: var(--lnms-space-3);
+}
+
+.lnms-ports .lnms-ports-panel > .panel-footer {
+    background-color: var(--lnms-surface-muted);
+    border-top: 1px solid var(--lnms-border);
+    border-radius: 0 0 var(--lnms-radius-lg) var(--lnms-radius-lg);
+}
+
+.lnms-ports .lnms-ports-toolbar {
+    align-items: flex-start;
+}
+
+.lnms-ports .lnms-ports-nav .panel {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    margin-bottom: 0;
+}
+
+.lnms-ports .lnms-ports-nav .panel-heading {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-ports .lnms-ports-nav a,
+.lnms-ports .lnms-ports-group-link a {
+    color: var(--lnms-accent);
+    text-decoration: none;
+}
+
+.lnms-ports .lnms-ports-nav a:hover,
+.lnms-ports .lnms-ports-nav a:focus,
+.lnms-ports .lnms-ports-group-link a:hover,
+.lnms-ports .lnms-ports-group-link a:focus {
+    color: var(--lnms-accent-hover);
+    text-decoration: underline;
+}
+
+.lnms-ports .lnms-ports-nav .pagemenu-selected a {
+    color: var(--lnms-text);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.lnms-ports .lnms-ports-group-link {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-ports .lnms-ports-menu .btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-ports .lnms-ports-menu .btn-default:hover,
+.lnms-ports .lnms-ports-menu .btn-default:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+    color: var(--lnms-text);
+}
+
+.lnms-ports .lnms-ports-menu .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-ports .lnms-ports-menu .dropdown-menu > li > a {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-ports .lnms-ports-menu .dropdown-menu > li > a:hover,
+.lnms-ports .lnms-ports-menu .dropdown-menu > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text);
+}
+
+.lnms-ports .lnms-ports-list {
+    margin-top: var(--lnms-space-1);
+}
+
+.lnms-ports .bootgrid-header,
+.lnms-ports .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.lnms-ports .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-ports .bootgrid-footer .actionBar .btn-group > .btn,
+.lnms-ports .bootgrid-header .dropdown-toggle,
+.lnms-ports .bootgrid-footer .dropdown-toggle {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-ports .bootgrid-header .dropdown-menu,
+.lnms-ports .bootgrid-footer .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+}
+
+.lnms-ports .bootgrid-header .dropdown-menu > li > a,
+.lnms-ports .bootgrid-footer .dropdown-menu > li > a,
+.lnms-ports .bootgrid-header .dropdown-menu .dropdown-item,
+.lnms-ports .bootgrid-footer .dropdown-menu .dropdown-item {
+    color: var(--lnms-text);
+}
+
+.lnms-ports .bootgrid-header .dropdown-menu > li > a:hover,
+.lnms-ports .bootgrid-footer .dropdown-menu > li > a:hover {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-ports #ports.table,
+.lnms-ports .bootgrid-table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-ports #ports.table > thead > tr > th,
+.lnms-ports .bootgrid-table th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+    font-weight: 600;
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-ports #ports.table > tbody > tr > td,
+.lnms-ports .bootgrid-table td {
+    border-top-color: var(--lnms-border);
+    color: var(--lnms-text);
+    vertical-align: middle;
+}
+
+.lnms-ports #ports.table-striped > tbody > tr:nth-of-type(odd),
+.lnms-ports .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-ports #ports.table-striped > tbody > tr:nth-of-type(even),
+.lnms-ports .bootgrid-table.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-ports #ports.table-hover > tbody > tr:hover,
+.lnms-ports .bootgrid-table.table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-ports .bootgrid-table td.loading,
+.lnms-ports .bootgrid-table td.no-results {
+    color: var(--lnms-text-muted);
+    background-color: var(--lnms-surface) !important;
+}
+
+.lnms-ports .pagination > li > a,
+.lnms-ports .pagination > li > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-accent);
+}
+
+.lnms-ports .pagination > li > a:hover,
+.lnms-ports .pagination > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-ports .pagination > .active > a,
+.lnms-ports .pagination > .active > span,
+.lnms-ports .pagination > .active > a:hover,
+.lnms-ports .pagination > .active > span:hover {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #FFFFFF;
+}
+
+.lnms-ports .pagination > .disabled > a,
+.lnms-ports .pagination > .disabled > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text-muted);
+}
+
+.lnms-ports .alert-status,
+.lnms-ports .alert-status-small {
+    border-radius: 1px;
+}
+
+.lnms-ports .alert-status.label-success,
+.lnms-ports .alert-status-small.label-success {
+    background-color: var(--lnms-status-up) !important;
+}
+
+.lnms-ports .alert-status.label-danger,
+.lnms-ports .alert-status-small.label-danger {
+    background-color: var(--lnms-status-down) !important;
+}
+
+.lnms-ports .alert-status.label-warning,
+.lnms-ports .alert-status-small.label-warning {
+    background-color: var(--lnms-status-warn) !important;
+}
+
+.lnms-ports .alert-status.label-default,
+.lnms-ports .alert-status-small.label-default {
+    background-color: var(--lnms-status-unknown) !important;
+}
+
+.lnms-ports .alert-status.blackbg,
+.lnms-ports .alert-status-small.blackbg {
+    background-color: var(--lnms-status-unknown) !important;
+}
+
+/* Bootgrid data-css-class rate/error column colors */
+.lnms-ports td.green,
+.lnms-ports .bootgrid-table td.green {
+    color: var(--lnms-status-up) !important;
+}
+
+.lnms-ports td.blue,
+.lnms-ports .bootgrid-table td.blue {
+    color: var(--lnms-accent) !important;
+}
+
+.lnms-ports td.red,
+.lnms-ports .bootgrid-table td.red,
+.lnms-ports .red {
+    color: var(--lnms-status-down) !important;
+}
+
+.lnms-ports .lnms-ports-list a,
+.lnms-ports .lnms-ports-actions a {
+    color: var(--lnms-accent);
+}
+
+.lnms-ports .lnms-ports-list a:hover,
+.lnms-ports .lnms-ports-list a:focus,
+.lnms-ports .lnms-ports-actions a:hover,
+.lnms-ports .lnms-ports-actions a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-ports .lnms-ports-list .icon-theme,
+.lnms-ports .lnms-ports-actions .icon-theme,
+.lnms-ports .lnms-ports-menu .icon-theme {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-ports .lnms-ports-list a:hover .icon-theme,
+.lnms-ports .lnms-ports-actions a:hover .icon-theme {
+    color: var(--lnms-accent);
+}
+
+.lnms-ports .lnms-ports-graphs__rule {
+    border-color: var(--lnms-border);
+    border-top-style: solid;
+}
+
+.lnms-ports .lnms-ports-graphs__item a {
+    display: block;
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    overflow: hidden;
+    transition: border-color var(--lnms-duration-fast) var(--lnms-ease);
+}
+
+.lnms-ports .lnms-ports-graphs__item a:hover,
+.lnms-ports .lnms-ports-graphs__item a:focus {
+    border-color: var(--lnms-accent);
+}
+
+.lnms-ports .lnms-ports-graphs__item img,
+.lnms-ports .lnms-ports-graphs__item .graph-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.lnms-ports .lnms-ports-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-ports .lnms-ports-footer .form-control {
+    border-color: var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+}
+
+.lnms-ports .lnms-ports-footer .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 3px var(--lnms-focus-ring);
+}
+
+.lnms-ports .lnms-ports-footer a {
+    color: var(--lnms-accent);
+}
+
+@media (max-width: 767px) {
+    .lnms-ports .lnms-ports-panel > .panel-body {
+        padding: var(--lnms-space-2);
+    }
+
+    .lnms-ports .lnms-ports-toolbar {
+        flex-direction: column;
+    }
+
+    .lnms-ports .lnms-ports-menu {
+        align-self: flex-end;
+    }
+
+    .lnms-ports #ports.table > thead > tr > th,
+    .lnms-ports .bootgrid-table th {
+        font-size: 11px;
+    }
+}
+
+.dark .lnms-ports #ports.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-ports .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-ports .bootgrid-table td.loading,
+.dark .lnms-ports .bootgrid-table td.no-results {
+    background-color: var(--lnms-surface);
+}
+
+.dark .lnms-ports #ports.table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-ports .bootgrid-table.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+/* Phase 5: Graphs — hosts .lnms-graphs*; #period-thumbs / .graph-image preserved */
+.lnms-graphs .lnms-graphs-panel.panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-graphs .lnms-graphs-panel > .panel-heading {
+    background-color: var(--lnms-surface-muted);
+    border-bottom: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-graphs .lnms-graphs-title {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-md);
+}
+
+.lnms-graphs .lnms-graphs-title a {
+    color: var(--lnms-accent);
+    text-decoration: none;
+}
+
+.lnms-graphs .lnms-graphs-title a:hover,
+.lnms-graphs .lnms-graphs-title a:focus {
+    color: var(--lnms-accent-hover);
+    text-decoration: underline;
+}
+
+.lnms-graphs .lnms-graphs-subtype select,
+.lnms-graphs .lnms-graphs-subtype .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    border-radius: var(--lnms-radius-sm);
+}
+
+.lnms-graphs .lnms-graphs-subtype select:focus,
+.lnms-graphs .lnms-graphs-subtype .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 3px var(--lnms-focus-ring);
+}
+
+.lnms-graphs .lnms-graphs-thumbs {
+    margin-top: var(--lnms-space-3);
+}
+
+.lnms-graphs .lnms-graphs-thumb {
+    border-color: transparent;
+    color: var(--lnms-text);
+    background-color: transparent;
+}
+
+.lnms-graphs .lnms-graphs-thumb:hover,
+.lnms-graphs .lnms-graphs-thumb:focus {
+    border-color: var(--lnms-border-strong);
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-graphs .lnms-graphs-thumb--active,
+.lnms-graphs .lnms-graphs-thumb[aria-current="true"] {
+    border-color: var(--lnms-accent);
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-graphs .lnms-graphs-thumb__label {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-graphs .lnms-graphs-thumb--active .lnms-graphs-thumb__label,
+.lnms-graphs .lnms-graphs-thumb[aria-current="true"] .lnms-graphs-thumb__label {
+    color: var(--lnms-text);
+}
+
+.lnms-graphs .lnms-graphs-thumb__img,
+.lnms-graphs .lnms-graphs-main .graph-image {
+    max-width: 100%;
+}
+
+.lnms-graphs .lnms-graphs-daterange__control {
+    background-color: var(--lnms-surface-muted) !important;
+    border-color: var(--lnms-border) !important;
+    color: var(--lnms-text) !important;
+    border-radius: var(--lnms-radius-md);
+}
+
+.lnms-graphs .lnms-graphs-daterange__control:hover,
+.lnms-graphs .lnms-graphs-daterange__control:focus {
+    background-color: var(--lnms-surface) !important;
+    border-color: var(--lnms-border-strong) !important;
+}
+
+.lnms-graphs .lnms-graphs-toggles {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-graphs .lnms-graphs-toggles a {
+    color: var(--lnms-accent);
+    text-decoration: none;
+}
+
+.lnms-graphs .lnms-graphs-toggles a:hover,
+.lnms-graphs .lnms-graphs-toggles a:focus {
+    color: var(--lnms-accent-hover);
+    text-decoration: underline;
+}
+
+.lnms-graphs .lnms-graphs-toggles__sep {
+    margin: 0 var(--lnms-space-1);
+    color: var(--lnms-border-strong);
+}
+
+.lnms-graphs .lnms-graphs-toggles__hint {
+    color: var(--lnms-text-muted);
+}
+
+.lnms-graphs .lnms-graphs-main {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    padding: var(--lnms-space-2);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-graphs .lnms-graphs-descr.panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-graphs .lnms-graphs-descr .icon-theme {
+    color: var(--lnms-accent);
+    margin-right: var(--lnms-space-2);
+}
+
+.lnms-graphs .lnms-graphs-rrd.infobox,
+.lnms-graphs .infobox.lnms-graphs-rrd {
+    margin-top: var(--lnms-space-4);
+    padding: var(--lnms-space-4);
+    background-color: var(--lnms-surface-muted);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    color: var(--lnms-text);
+}
+
+.lnms-graphs .lnms-graphs-rrd__title {
+    color: var(--lnms-text);
+    margin-bottom: var(--lnms-space-2);
+}
+
+.lnms-graphs .lnms-graphs-rrd__pre,
+.lnms-graphs .rrd-pre {
+    font-family: var(--lnms-font-mono);
+    font-size: var(--lnms-text-xs);
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    padding: var(--lnms-space-3);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+@media (max-width: 767px) {
+    .lnms-graphs .lnms-graphs-main {
+        padding: var(--lnms-space-1);
+    }
+
+    .lnms-graphs .lnms-graphs-thumbs {
+        margin-top: var(--lnms-space-2);
+    }
+}
+
+/* Phase 5: Health — hosts .lnms-health*; Bootgrid sensor tables preserved */
+.lnms-health .lnms-health-panel.panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-health .lnms-health-panel > .panel-heading {
+    background-color: var(--lnms-surface-muted);
+    border-bottom: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-health .lnms-health-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--lnms-space-2);
+    padding: 0 var(--lnms-space-2);
+}
+
+.lnms-health .lnms-health-toolbar__left,
+.lnms-health .lnms-health-toolbar__right {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--lnms-space-2);
+}
+
+.lnms-health .lnms-health-toolbar a {
+    color: var(--lnms-accent);
+    text-decoration: none;
+}
+
+.lnms-health .lnms-health-toolbar a:hover,
+.lnms-health .lnms-health-toolbar a:focus {
+    color: var(--lnms-accent-hover);
+    text-decoration: underline;
+}
+
+.lnms-health .lnms-health-toolbar .pagemenu-selected a {
+    color: var(--lnms-text);
+    font-weight: 600;
+}
+
+.lnms-health .lnms-health-list {
+    margin-top: 0;
+}
+
+.lnms-health .bootgrid-header,
+.lnms-health .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-health .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-health .bootgrid-footer .actionBar .btn-group > .btn,
+.lnms-health .bootgrid-header .dropdown-toggle,
+.lnms-health .bootgrid-footer .dropdown-toggle {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-health .bootgrid-header .dropdown-menu,
+.lnms-health .bootgrid-footer .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+}
+
+.lnms-health .bootgrid-header .dropdown-menu > li > a,
+.lnms-health .bootgrid-footer .dropdown-menu > li > a {
+    color: var(--lnms-text);
+}
+
+.lnms-health .bootgrid-header .dropdown-menu > li > a:hover,
+.lnms-health .bootgrid-footer .dropdown-menu > li > a:hover {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-health #sensors.table,
+.lnms-health #mempool.table,
+.lnms-health #processor.table,
+.lnms-health #storage.table,
+.lnms-health #printer.table,
+.lnms-health .bootgrid-table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-health #sensors.table > thead > tr > th,
+.lnms-health #mempool.table > thead > tr > th,
+.lnms-health #processor.table > thead > tr > th,
+.lnms-health #storage.table > thead > tr > th,
+.lnms-health #printer.table > thead > tr > th,
+.lnms-health .bootgrid-table th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-health #sensors.table > tbody > tr > td,
+.lnms-health #mempool.table > tbody > tr > td,
+.lnms-health #processor.table > tbody > tr > td,
+.lnms-health #storage.table > tbody > tr > td,
+.lnms-health #printer.table > tbody > tr > td,
+.lnms-health .bootgrid-table td {
+    border-top-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-health .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-health .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-health .table-striped > tbody > tr:nth-of-type(even),
+.lnms-health .bootgrid-table.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-health .table-hover > tbody > tr:hover,
+.lnms-health .bootgrid-table.table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-health .bootgrid-table td.loading,
+.lnms-health .bootgrid-table td.no-results {
+    color: var(--lnms-text-muted);
+    background-color: var(--lnms-surface) !important;
+}
+
+.lnms-health .pagination > li > a,
+.lnms-health .pagination > li > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-health .pagination > li > a:hover,
+.lnms-health .pagination > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+}
+
+.lnms-health .pagination > .active > a,
+.lnms-health .pagination > .active > span,
+.lnms-health .pagination > .active > a:hover,
+.lnms-health .pagination > .active > span:hover {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-health .pagination > .disabled > a,
+.lnms-health .pagination > .disabled > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text-muted);
+}
+
+.lnms-health .lnms-health-list a {
+    color: var(--lnms-accent);
+}
+
+.lnms-health .lnms-health-list a:hover,
+.lnms-health .lnms-health-list a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-health .lnms-health-list .graph-image,
+.lnms-health .lnms-health-list img.graph-image {
+    max-width: 100%;
+    height: auto;
+}
+
+.lnms-health .alert-status,
+.lnms-health .alert-status-small {
+    border-radius: 1px;
+}
+
+.lnms-health .alert-status.label-success,
+.lnms-health .alert-status-small.label-success {
+    background-color: var(--lnms-status-up) !important;
+}
+
+.lnms-health .alert-status.label-danger,
+.lnms-health .alert-status-small.label-danger {
+    background-color: var(--lnms-status-down) !important;
+}
+
+.lnms-health .alert-status.label-warning,
+.lnms-health .alert-status-small.label-warning {
+    background-color: var(--lnms-status-warn) !important;
+}
+
+.lnms-health .alert-status.label-default,
+.lnms-health .alert-status-small.label-default {
+    background-color: var(--lnms-status-unknown) !important;
+}
+
+@media (max-width: 767px) {
+    .lnms-health .lnms-health-toolbar {
+        flex-direction: column;
+        padding: 0;
+    }
+
+    .lnms-health .lnms-health-toolbar__right {
+        align-self: flex-end;
+    }
+
+    .lnms-health #sensors.table > thead > tr > th,
+    .lnms-health #mempool.table > thead > tr > th,
+    .lnms-health #processor.table > thead > tr > th,
+    .lnms-health #storage.table > thead > tr > th,
+    .lnms-health #printer.table > thead > tr > th,
+    .lnms-health .bootgrid-table th {
+        font-size: 11px;
+    }
+}
+
+.dark .lnms-health .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-health .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-health .bootgrid-table td.loading,
+.dark .lnms-health .bootgrid-table td.no-results {
+    background-color: var(--lnms-surface);
+}
+
+.dark .lnms-health .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-health .bootgrid-table.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+/* Phase 5: Wireless — hosts .lnms-wireless*; Bootgrid #sensors preserved */
+.lnms-wireless .lnms-wireless-panel.panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    overflow: hidden;
+}
+
+.lnms-wireless .lnms-wireless-panel > .panel-heading {
+    background-color: var(--lnms-surface-muted);
+    border-bottom: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-wireless .lnms-wireless-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--lnms-space-2);
+    padding: 0 10px;
+}
+
+.lnms-wireless .lnms-wireless-toolbar__left,
+.lnms-wireless .lnms-wireless-toolbar__right {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--lnms-space-2);
+}
+
+.lnms-wireless .lnms-wireless-toolbar a {
+    color: var(--lnms-accent);
+    text-decoration: none;
+}
+
+.lnms-wireless .lnms-wireless-toolbar a:hover,
+.lnms-wireless .lnms-wireless-toolbar a:focus {
+    color: var(--lnms-accent-hover);
+    text-decoration: underline;
+}
+
+.lnms-wireless .lnms-wireless-toolbar .pagemenu-selected a {
+    color: var(--lnms-text);
+    font-weight: 600;
+}
+
+.lnms-wireless .lnms-wireless-list {
+    margin-top: 0;
+}
+
+.lnms-wireless .bootgrid-header,
+.lnms-wireless .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-wireless .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-wireless .bootgrid-footer .actionBar .btn-group > .btn,
+.lnms-wireless .bootgrid-header .dropdown-toggle,
+.lnms-wireless .bootgrid-footer .dropdown-toggle {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-wireless .bootgrid-header .dropdown-menu,
+.lnms-wireless .bootgrid-footer .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+}
+
+.lnms-wireless .bootgrid-header .dropdown-menu > li > a,
+.lnms-wireless .bootgrid-footer .dropdown-menu > li > a {
+    color: var(--lnms-text);
+}
+
+.lnms-wireless .bootgrid-header .dropdown-menu > li > a:hover,
+.lnms-wireless .bootgrid-footer .dropdown-menu > li > a:hover {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-wireless #sensors.table,
+.lnms-wireless .bootgrid-table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-wireless #sensors.table > thead > tr > th,
+.lnms-wireless .bootgrid-table th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+}
+
+.lnms-wireless #sensors.table > tbody > tr > td,
+.lnms-wireless .bootgrid-table td {
+    border-top-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-wireless .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-wireless .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-wireless .table-striped > tbody > tr:nth-of-type(even),
+.lnms-wireless .bootgrid-table.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-wireless .table-hover > tbody > tr:hover,
+.lnms-wireless .bootgrid-table.table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-wireless .bootgrid-table td.loading,
+.lnms-wireless .bootgrid-table td.no-results {
+    color: var(--lnms-text-muted);
+    background-color: var(--lnms-surface) !important;
+}
+
+.lnms-wireless .pagination > li > a,
+.lnms-wireless .pagination > li > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-wireless .pagination > li > a:hover,
+.lnms-wireless .pagination > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+}
+
+.lnms-wireless .pagination > .active > a,
+.lnms-wireless .pagination > .active > span,
+.lnms-wireless .pagination > .active > a:hover,
+.lnms-wireless .pagination > .active > span:hover {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-wireless .pagination > .disabled > a,
+.lnms-wireless .pagination > .disabled > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text-muted);
+}
+
+.lnms-wireless .lnms-wireless-list a {
+    color: var(--lnms-accent);
+}
+
+.lnms-wireless .lnms-wireless-list a:hover,
+.lnms-wireless .lnms-wireless-list a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-wireless .lnms-wireless-list .graph-image,
+.lnms-wireless .lnms-wireless-list img.graph-image {
+    max-width: 100%;
+    height: auto;
+}
+
+.lnms-wireless .alert-status,
+.lnms-wireless .alert-status-small {
+    border-radius: 1px;
+}
+
+.lnms-wireless .alert-status.label-success,
+.lnms-wireless .alert-status-small.label-success {
+    background-color: var(--lnms-status-up) !important;
+}
+
+.lnms-wireless .alert-status.label-danger,
+.lnms-wireless .alert-status-small.label-danger {
+    background-color: var(--lnms-status-down) !important;
+}
+
+.lnms-wireless .alert-status.label-warning,
+.lnms-wireless .alert-status-small.label-warning {
+    background-color: var(--lnms-status-warn) !important;
+}
+
+.lnms-wireless .alert-status.label-default,
+.lnms-wireless .alert-status-small.label-default {
+    background-color: var(--lnms-status-unknown) !important;
+}
+
+@media (max-width: 767px) {
+    .lnms-wireless .lnms-wireless-toolbar {
+        flex-direction: column;
+        padding: 0;
+    }
+
+    .lnms-wireless .lnms-wireless-toolbar__right {
+        align-self: flex-end;
+    }
+
+    .lnms-wireless #sensors.table > thead > tr > th,
+    .lnms-wireless .bootgrid-table th {
+        font-size: 11px;
+    }
+}
+
+.dark .lnms-wireless .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-wireless .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-wireless .bootgrid-table td.loading,
+.dark .lnms-wireless .bootgrid-table td.no-results {
+    background-color: var(--lnms-surface);
+}
+
+.dark .lnms-wireless .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-wireless .bootgrid-table.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+/* Phase 5: Alerts — hosts .lnms-alerts / .lnms-alert-log / .lnms-alert-rules; Bootgrid IDs preserved */
+.lnms-alerts .lnms-alerts-panel.panel,
+.lnms-alert-log .lnms-alert-log-panel.panel,
+.lnms-alerts .panel.panel-default,
+.lnms-alert-log .panel.panel-default {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    overflow: hidden;
+}
+
+.lnms-alerts .panel > .panel-heading,
+.lnms-alert-log .panel > .panel-heading {
+    background-color: var(--lnms-surface-muted);
+    border-bottom: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-alerts .bootgrid-header,
+.lnms-alerts .bootgrid-footer,
+.lnms-alert-log .bootgrid-header,
+.lnms-alert-log .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-alerts .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-alerts .bootgrid-footer .actionBar .btn-group > .btn,
+.lnms-alerts .bootgrid-header .dropdown-toggle,
+.lnms-alerts .bootgrid-footer .dropdown-toggle,
+.lnms-alert-log .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-alert-log .bootgrid-footer .actionBar .btn-group > .btn,
+.lnms-alert-log .bootgrid-header .dropdown-toggle,
+.lnms-alert-log .bootgrid-footer .dropdown-toggle {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-alerts .bootgrid-header .dropdown-menu,
+.lnms-alerts .bootgrid-footer .dropdown-menu,
+.lnms-alert-log .bootgrid-header .dropdown-menu,
+.lnms-alert-log .bootgrid-footer .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+}
+
+.lnms-alerts .bootgrid-header .dropdown-menu > li > a,
+.lnms-alerts .bootgrid-footer .dropdown-menu > li > a,
+.lnms-alert-log .bootgrid-header .dropdown-menu > li > a,
+.lnms-alert-log .bootgrid-footer .dropdown-menu > li > a {
+    color: var(--lnms-text);
+}
+
+.lnms-alerts .bootgrid-header .dropdown-menu > li > a:hover,
+.lnms-alerts .bootgrid-footer .dropdown-menu > li > a:hover,
+.lnms-alert-log .bootgrid-header .dropdown-menu > li > a:hover,
+.lnms-alert-log .bootgrid-footer .dropdown-menu > li > a:hover {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-alerts table.alerts,
+.lnms-alerts .bootgrid-table,
+.lnms-alert-log #alertlog.table,
+.lnms-alert-log .bootgrid-table,
+.lnms-alert-rules #alert-rules-table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-alerts table.alerts > thead > tr > th,
+.lnms-alerts .bootgrid-table th,
+.lnms-alert-log #alertlog.table > thead > tr > th,
+.lnms-alert-log .bootgrid-table th,
+.lnms-alert-rules #alert-rules-table > thead > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+}
+
+.lnms-alerts table.alerts > tbody > tr > td,
+.lnms-alerts .bootgrid-table td,
+.lnms-alert-log #alertlog.table > tbody > tr > td,
+.lnms-alert-log .bootgrid-table td,
+.lnms-alert-rules #alert-rules-table > tbody > tr > td {
+    border-top-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-alerts .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-alerts .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.lnms-alert-log .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-alert-log .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.lnms-alert-rules .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-alerts .table-striped > tbody > tr:nth-of-type(even),
+.lnms-alerts .bootgrid-table.table-striped > tbody > tr:nth-of-type(even),
+.lnms-alert-log .table-striped > tbody > tr:nth-of-type(even),
+.lnms-alert-log .bootgrid-table.table-striped > tbody > tr:nth-of-type(even),
+.lnms-alert-rules .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-alerts .table-hover > tbody > tr:hover,
+.lnms-alerts .bootgrid-table.table-hover > tbody > tr:hover,
+.lnms-alert-log .table-hover > tbody > tr:hover,
+.lnms-alert-log .bootgrid-table.table-hover > tbody > tr:hover,
+.lnms-alert-rules .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-alerts .bootgrid-table td.loading,
+.lnms-alerts .bootgrid-table td.no-results,
+.lnms-alert-log .bootgrid-table td.loading,
+.lnms-alert-log .bootgrid-table td.no-results {
+    color: var(--lnms-text-muted);
+    background-color: var(--lnms-surface) !important;
+}
+
+.lnms-alerts .pagination > li > a,
+.lnms-alerts .pagination > li > span,
+.lnms-alert-log .pagination > li > a,
+.lnms-alert-log .pagination > li > span,
+.lnms-alert-rules .pagination > li > a,
+.lnms-alert-rules .pagination > li > span,
+.lnms-alert-rules p.pagination {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-alerts .pagination > li > a:hover,
+.lnms-alerts .pagination > li > a:focus,
+.lnms-alert-log .pagination > li > a:hover,
+.lnms-alert-log .pagination > li > a:focus,
+.lnms-alert-rules .pagination > li > a:hover,
+.lnms-alert-rules .pagination > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+}
+
+.lnms-alerts .pagination > .active > a,
+.lnms-alerts .pagination > .active > span,
+.lnms-alert-log .pagination > .active > a,
+.lnms-alert-log .pagination > .active > span,
+.lnms-alert-rules .pagination > .active > a,
+.lnms-alert-rules .pagination > .active > span {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-alerts a,
+.lnms-alert-log a,
+.lnms-alert-rules a {
+    color: var(--lnms-accent);
+}
+
+.lnms-alerts a:hover,
+.lnms-alerts a:focus,
+.lnms-alert-log a:hover,
+.lnms-alert-log a:focus,
+.lnms-alert-rules a:hover,
+.lnms-alert-rules a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-alert-rules .lnms-alert-rules-inner {
+    color: var(--lnms-text);
+}
+
+.lnms-alert-rules #result_form .btn-primary,
+.lnms-alert-rules .btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-alert-rules #result_form .btn-primary:hover,
+.lnms-alert-rules #result_form .btn-primary:focus,
+.lnms-alert-rules .btn-primary:hover,
+.lnms-alert-rules .btn-primary:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+    color: #fff;
+}
+
+.lnms-alert-rules #results.form-control,
+.lnms-alert-rules .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-alert-rules #results.form-control:focus,
+.lnms-alert-rules .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+/* Modal chrome only — keep #alert_ack_modal / #alert_notes_modal / #alert_details_modal / #create-alert IDs */
+.lnms-shell #alert_ack_modal .modal-content,
+.lnms-shell #alert_notes_modal .modal-content,
+.lnms-shell #alert_details_modal .modal-content,
+.lnms-shell #create-alert .modal-content,
+.lnms-shell #search_rule_modal .modal-content,
+.lnms-shell #confirm-delete .modal-content {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-shell #alert_ack_modal .modal-header,
+.lnms-shell #alert_notes_modal .modal-header,
+.lnms-shell #alert_details_modal .modal-header,
+.lnms-shell #create-alert .modal-header,
+.lnms-shell #search_rule_modal .modal-header,
+.lnms-shell #confirm-delete .modal-header,
+.lnms-shell #alert_ack_modal .modal-footer,
+.lnms-shell #alert_notes_modal .modal-footer,
+.lnms-shell #alert_details_modal .modal-footer,
+.lnms-shell #create-alert .modal-footer,
+.lnms-shell #search_rule_modal .modal-footer,
+.lnms-shell #confirm-delete .modal-footer {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border);
+}
+
+.dark .lnms-alerts .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-alerts .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-alerts .bootgrid-table td.loading,
+.dark .lnms-alerts .bootgrid-table td.no-results,
+.dark .lnms-alert-log .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-alert-log .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-alert-log .bootgrid-table td.loading,
+.dark .lnms-alert-log .bootgrid-table td.no-results,
+.dark .lnms-alert-rules .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.dark .lnms-alerts .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-alerts .bootgrid-table.table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-alert-log .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-alert-log .bootgrid-table.table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-alert-rules .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+/* Phase 5: Maps — hosts .lnms-maps*; Leaflet/vis/custom map JS preserved */
+.lnms-maps .page-availability-title,
+.lnms-maps .page-availability-report-host,
+.lnms-maps .pull-right {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-maps select.form-control,
+.lnms-maps select.input-sm,
+.lnms-maps .page-availability-report-select,
+.lnms-maps #show_items,
+.lnms-maps #show_group,
+.lnms-maps #highlight_node {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+    border-radius: var(--lnms-radius-sm);
+}
+
+.lnms-maps select.form-control:focus,
+.lnms-maps select.input-sm:focus,
+.lnms-maps #show_items:focus,
+.lnms-maps #show_group:focus,
+.lnms-maps #highlight_node:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+    outline: none;
+}
+
+.lnms-maps .alert {
+    border-radius: var(--lnms-radius-md);
+}
+
+.lnms-maps .alert-warning {
+    background-color: color-mix(in srgb, var(--lnms-status-warn, #c9a227) 18%, var(--lnms-surface));
+    border-color: color-mix(in srgb, var(--lnms-status-warn, #c9a227) 45%, var(--lnms-border));
+    color: var(--lnms-text);
+}
+
+.lnms-maps #visualization,
+.lnms-maps #custom-map,
+.lnms-maps #map-container,
+.lnms-maps #fullscreen-map {
+    border-radius: var(--lnms-radius-md);
+}
+
+.lnms-maps a {
+    color: var(--lnms-accent);
+}
+
+.lnms-maps a:hover,
+.lnms-maps a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-maps .panel,
+.lnms-maps .x-panel,
+.lnms-maps [id^="manage-custom"] {
+    color: var(--lnms-text);
+}
+
+.lnms-maps .btn-primary,
+.lnms-maps .lnms-btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-maps .btn-primary:hover,
+.lnms-maps .btn-primary:focus,
+.lnms-maps .lnms-btn-primary:hover,
+.lnms-maps .lnms-btn-primary:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+    color: #fff;
+}
+
+.lnms-maps .btn-default,
+.lnms-maps .lnms-btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-maps .btn-default:hover,
+.lnms-maps .btn-default:focus,
+.lnms-maps .lnms-btn-default:hover,
+.lnms-maps .lnms-btn-default:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+    color: var(--lnms-text);
+}
+
+.lnms-maps .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-maps .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+.lnms-maps .well {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-maps hr {
+    border-top-color: var(--lnms-border);
+}
+
+.lnms-maps .custom-control-label,
+.lnms-maps label {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-maps-availability .page-availability-title-left,
+.lnms-maps-availability .page-availability-title-right {
+    margin-bottom: 0.75rem;
+}
+
+.lnms-maps-availability .label-font-border {
+    /* keep semantic Bootstrap status labels; only tighten spacing */
+    margin-inline-start: 0.25rem;
+}
+
+.lnms-maps-custom .panel-title,
+.lnms-maps-custom-manage .panel-title,
+.lnms-maps-nodeimage .panel-title {
+    color: var(--lnms-text);
+}
+
+/* Map modal chrome only — preserve modal IDs and form field IDs */
+.lnms-shell #mapModal .modal-content,
+.lnms-shell #mapDeleteModal .modal-content,
+.lnms-shell #mapCloneModal .modal-content,
+.lnms-shell #mapListModal .modal-content,
+.lnms-shell #mapLegendModal .modal-content,
+.lnms-shell #nodeModal .modal-content,
+.lnms-shell #edgeModal .modal-content,
+.lnms-shell #bgModal .modal-content,
+.lnms-shell #imageModal .modal-content,
+.lnms-shell #imageDeleteModal .modal-content {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-shell #mapModal .modal-header,
+.lnms-shell #mapDeleteModal .modal-header,
+.lnms-shell #mapCloneModal .modal-header,
+.lnms-shell #mapListModal .modal-header,
+.lnms-shell #mapLegendModal .modal-header,
+.lnms-shell #nodeModal .modal-header,
+.lnms-shell #edgeModal .modal-header,
+.lnms-shell #bgModal .modal-header,
+.lnms-shell #imageModal .modal-header,
+.lnms-shell #imageDeleteModal .modal-header,
+.lnms-shell #mapModal .modal-footer,
+.lnms-shell #mapDeleteModal .modal-footer,
+.lnms-shell #mapCloneModal .modal-footer,
+.lnms-shell #mapListModal .modal-footer,
+.lnms-shell #mapLegendModal .modal-footer,
+.lnms-shell #nodeModal .modal-footer,
+.lnms-shell #edgeModal .modal-footer,
+.lnms-shell #bgModal .modal-footer,
+.lnms-shell #imageModal .modal-footer,
+.lnms-shell #imageDeleteModal .modal-footer {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border);
+}
+
+.lnms-shell #mapModal .form-control,
+.lnms-shell #nodeModal .form-control,
+.lnms-shell #edgeModal .form-control,
+.lnms-shell #bgModal .form-control,
+.lnms-shell #imageModal .form-control,
+.lnms-shell #mapCloneModal .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+/* Phase 5: Logs — hosts .lnms-eventlog / .lnms-syslog / .lnms-authlog; Bootgrid IDs preserved */
+.lnms-eventlog .lnms-eventlog-panel.panel,
+.lnms-syslog .lnms-syslog-panel.panel,
+.lnms-eventlog .panel.panel-default,
+.lnms-syslog .panel.panel-default,
+.lnms-authlog .panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    overflow: hidden;
+}
+
+.lnms-eventlog .panel > .panel-heading,
+.lnms-syslog .panel > .panel-heading,
+.lnms-authlog .panel-heading,
+.lnms-authlog .panel-title {
+    background-color: var(--lnms-surface-muted);
+    border-bottom: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-eventlog .bootgrid-header,
+.lnms-eventlog .bootgrid-footer,
+.lnms-syslog .bootgrid-header,
+.lnms-syslog .bootgrid-footer,
+.lnms-authlog .bootgrid-header,
+.lnms-authlog .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-eventlog .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-eventlog .bootgrid-footer .actionBar .btn-group > .btn,
+.lnms-syslog .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-syslog .bootgrid-footer .actionBar .btn-group > .btn,
+.lnms-authlog .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-authlog .bootgrid-footer .actionBar .btn-group > .btn {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-eventlog #eventlog.table,
+.lnms-eventlog .bootgrid-table,
+.lnms-syslog #syslog.table,
+.lnms-syslog .bootgrid-table,
+.lnms-authlog #authlog.table,
+.lnms-authlog .bootgrid-table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-eventlog #eventlog.table > thead > tr > th,
+.lnms-eventlog .bootgrid-table th,
+.lnms-syslog #syslog.table > thead > tr > th,
+.lnms-syslog .bootgrid-table th,
+.lnms-authlog #authlog.table > thead > tr > th,
+.lnms-authlog .bootgrid-table th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+}
+
+.lnms-eventlog #eventlog.table > tbody > tr > td,
+.lnms-eventlog .bootgrid-table td,
+.lnms-syslog #syslog.table > tbody > tr > td,
+.lnms-syslog .bootgrid-table td,
+.lnms-authlog #authlog.table > tbody > tr > td,
+.lnms-authlog .bootgrid-table td {
+    border-top-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-eventlog .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-eventlog .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.lnms-syslog .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-syslog .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.lnms-authlog .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-eventlog .table-striped > tbody > tr:nth-of-type(even),
+.lnms-eventlog .bootgrid-table.table-striped > tbody > tr:nth-of-type(even),
+.lnms-syslog .table-striped > tbody > tr:nth-of-type(even),
+.lnms-syslog .bootgrid-table.table-striped > tbody > tr:nth-of-type(even),
+.lnms-authlog .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-eventlog .table-hover > tbody > tr:hover,
+.lnms-eventlog .bootgrid-table.table-hover > tbody > tr:hover,
+.lnms-syslog .table-hover > tbody > tr:hover,
+.lnms-syslog .bootgrid-table.table-hover > tbody > tr:hover,
+.lnms-authlog .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-eventlog .bootgrid-table td.loading,
+.lnms-eventlog .bootgrid-table td.no-results,
+.lnms-syslog .bootgrid-table td.loading,
+.lnms-syslog .bootgrid-table td.no-results {
+    color: var(--lnms-text-muted);
+    background-color: var(--lnms-surface) !important;
+}
+
+.lnms-eventlog .pagination > li > a,
+.lnms-eventlog .pagination > li > span,
+.lnms-syslog .pagination > li > a,
+.lnms-syslog .pagination > li > span,
+.lnms-authlog .pagination > li > a,
+.lnms-authlog .pagination > li > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-eventlog .pagination > li > a:hover,
+.lnms-eventlog .pagination > li > a:focus,
+.lnms-syslog .pagination > li > a:hover,
+.lnms-syslog .pagination > li > a:focus,
+.lnms-authlog .pagination > li > a:hover,
+.lnms-authlog .pagination > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+}
+
+.lnms-eventlog .pagination > .active > a,
+.lnms-eventlog .pagination > .active > span,
+.lnms-syslog .pagination > .active > a,
+.lnms-syslog .pagination > .active > span,
+.lnms-authlog .pagination > .active > a,
+.lnms-authlog .pagination > .active > span {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-eventlog #result_form .btn-default,
+.lnms-syslog #result_form .btn-default,
+.lnms-eventlog .btn-default,
+.lnms-syslog .btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-eventlog #result_form .form-control,
+.lnms-syslog #result_form .form-control,
+.lnms-eventlog .form-control,
+.lnms-syslog .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-eventlog a,
+.lnms-syslog a,
+.lnms-authlog a {
+    color: var(--lnms-accent);
+}
+
+.lnms-eventlog a:hover,
+.lnms-eventlog a:focus,
+.lnms-syslog a:hover,
+.lnms-syslog a:focus,
+.lnms-authlog a:hover,
+.lnms-authlog a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.dark .lnms-eventlog .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-eventlog .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-eventlog .bootgrid-table td.loading,
+.dark .lnms-eventlog .bootgrid-table td.no-results,
+.dark .lnms-syslog .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-syslog .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-syslog .bootgrid-table td.loading,
+.dark .lnms-syslog .bootgrid-table td.no-results,
+.dark .lnms-authlog .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.dark .lnms-eventlog .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-eventlog .bootgrid-table.table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-syslog .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-syslog .bootgrid-table.table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-authlog .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+/* Phase 5: Billing — hosts .lnms-bills / .lnms-bill; bandwidth accounting only (no fake invoicing) */
+.lnms-bills .lnms-bills-panel.panel,
+.lnms-bills .panel.panel-default,
+.lnms-bill .panel.panel-default {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    overflow: hidden;
+}
+
+.lnms-bills .panel > .panel-heading,
+.lnms-bill .panel > .panel-heading {
+    background-color: var(--lnms-surface-muted);
+    border-bottom: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-bills .panel > .panel-heading .panel-title,
+.lnms-bill .panel > .panel-heading .panel-title {
+    color: var(--lnms-text);
+}
+
+.lnms-bills .bootgrid-header,
+.lnms-bills .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-bills .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-bills .bootgrid-footer .actionBar .btn-group > .btn,
+.lnms-bills .bootgrid-header .dropdown-toggle,
+.lnms-bills .bootgrid-footer .dropdown-toggle,
+.lnms-bills #table-filters .form-control,
+.lnms-bills #table-filters select.form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-bills #table-filters .form-control:focus,
+.lnms-bills #table-filters select.form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+.lnms-bills .bootgrid-header .dropdown-menu,
+.lnms-bills .bootgrid-footer .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+}
+
+.lnms-bills .bootgrid-header .dropdown-menu > li > a,
+.lnms-bills .bootgrid-footer .dropdown-menu > li > a {
+    color: var(--lnms-text);
+}
+
+.lnms-bills .bootgrid-header .dropdown-menu > li > a:hover,
+.lnms-bills .bootgrid-footer .dropdown-menu > li > a:hover {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-bills #bills-list.table,
+.lnms-bills .bootgrid-table,
+.lnms-bill table.table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-bills #bills-list.table > thead > tr > th,
+.lnms-bills .bootgrid-table th,
+.lnms-bill table.table > thead > tr > th,
+.lnms-bill table.table > tbody > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+}
+
+.lnms-bills #bills-list.table > tbody > tr > td,
+.lnms-bills .bootgrid-table td,
+.lnms-bill table.table > tbody > tr > td {
+    border-top-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-bills .table-hover > tbody > tr:hover,
+.lnms-bills .bootgrid-table.table-hover > tbody > tr:hover,
+.lnms-bill .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-bills .bootgrid-table td.loading,
+.lnms-bills .bootgrid-table td.no-results {
+    color: var(--lnms-text-muted);
+    background-color: var(--lnms-surface) !important;
+}
+
+.lnms-bills .pagination > li > a,
+.lnms-bills .pagination > li > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-bills .pagination > li > a:hover,
+.lnms-bills .pagination > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+}
+
+.lnms-bills .pagination > .active > a,
+.lnms-bills .pagination > .active > span {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-bills h2,
+.lnms-bill h2,
+.lnms-bill h3 {
+    color: var(--lnms-text);
+    font-family: var(--lnms-font-sans);
+}
+
+.lnms-bill .well,
+.lnms-bill .optionbar,
+.lnms-bill [class*="optionbar"] {
+    color: var(--lnms-text);
+}
+
+.lnms-bill .pagemenu-selected {
+    color: var(--lnms-accent);
+    font-weight: 600;
+}
+
+.lnms-bill .list-group-item {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-bill .list-group-item:hover {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-bills .btn-default,
+.lnms-bill .btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-bills .btn-default:hover,
+.lnms-bills .btn-default:focus,
+.lnms-bill .btn-default:hover,
+.lnms-bill .btn-default:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+    color: var(--lnms-text);
+}
+
+.lnms-bills .form-control,
+.lnms-bill .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-bills .form-control:focus,
+.lnms-bill .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+.lnms-bills a,
+.lnms-bill a {
+    color: var(--lnms-accent);
+}
+
+.lnms-bills a:hover,
+.lnms-bills a:focus,
+.lnms-bill a:hover,
+.lnms-bill a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+/* Modal chrome only — preserve #create-bill ID and create Bill gate */
+.lnms-shell #create-bill .modal-content {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-shell #create-bill .modal-header,
+.lnms-shell #create-bill .modal-footer {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border);
+}
+
+.lnms-shell #create-bill .modal-title {
+    color: var(--lnms-text);
+}
+
+.lnms-shell #create-bill .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.dark .lnms-bills .bootgrid-table td.loading,
+.dark .lnms-bills .bootgrid-table td.no-results {
+    background-color: var(--lnms-surface) !important;
+}
+
+.dark .lnms-bills .table-hover > tbody > tr:hover,
+.dark .lnms-bill .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+/* Phase 5: Users/Roles — hosts .lnms-users* / .lnms-roles; #users Bootgrid preserved */
+.lnms-users .panel,
+.lnms-users-permissions .panel,
+.lnms-roles .panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    color: var(--lnms-text);
+}
+
+.lnms-users .panel-heading,
+.lnms-users .panel-title,
+.lnms-users-permissions .panel-heading,
+.lnms-users-permissions .panel-title,
+.lnms-roles .panel-heading,
+.lnms-roles .panel-title {
+    background-color: var(--lnms-surface-muted);
+    border-bottom-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-users .bootgrid-header,
+.lnms-users .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-users .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-users .bootgrid-footer .actionBar .btn-group > .btn {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-users #users.table,
+.lnms-users .bootgrid-table,
+.lnms-users-permissions table.table,
+.lnms-roles table.table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-users #users.table > thead > tr > th,
+.lnms-users .bootgrid-table th,
+.lnms-users-permissions table.table > thead > tr > th,
+.lnms-users-permissions table.table > tbody > tr > th,
+.lnms-roles table.table > thead > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+    border-color: var(--lnms-border);
+}
+
+.lnms-users #users.table > tbody > tr > td,
+.lnms-users .bootgrid-table td,
+.lnms-users-permissions table.table > tbody > tr > td,
+.lnms-roles table.table > tbody > tr > td {
+    border-top-color: var(--lnms-border);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-users .table-hover > tbody > tr:hover,
+.lnms-users .bootgrid-table.table-hover > tbody > tr:hover,
+.lnms-users-permissions .table-hover > tbody > tr:hover,
+.lnms-roles .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-users .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-users-permissions .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-users .table-striped > tbody > tr:nth-of-type(even),
+.lnms-users-permissions .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-users .pagination > li > a,
+.lnms-users .pagination > li > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-users .pagination > li > a:hover,
+.lnms-users .pagination > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+}
+
+.lnms-users .pagination > .active > a,
+.lnms-users .pagination > .active > span {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-users legend,
+.lnms-users-permissions h4,
+.lnms-roles legend {
+    color: var(--lnms-text);
+    border-bottom-color: var(--lnms-border);
+}
+
+.lnms-users .form-control,
+.lnms-users-permissions .form-control,
+.lnms-roles .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-users .form-control:focus,
+.lnms-users-permissions .form-control:focus,
+.lnms-roles .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+.lnms-users .control-label,
+.lnms-users-permissions .control-label,
+.lnms-roles .control-label,
+.lnms-users .help-block,
+.lnms-roles .help-block {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-users .btn-primary,
+.lnms-users-permissions .btn-primary,
+.lnms-roles .btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-users .btn-primary:hover,
+.lnms-users .btn-primary:focus,
+.lnms-users-permissions .btn-primary:hover,
+.lnms-users-permissions .btn-primary:focus,
+.lnms-roles .btn-primary:hover,
+.lnms-roles .btn-primary:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+    color: #fff;
+}
+
+.lnms-users .btn-default,
+.lnms-users-permissions .btn-default,
+.lnms-roles .btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-users .btn-default:hover,
+.lnms-users .btn-default:focus,
+.lnms-users-permissions .btn-default:hover,
+.lnms-users-permissions .btn-default:focus,
+.lnms-roles .btn-default:hover,
+.lnms-roles .btn-default:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+    color: var(--lnms-text);
+}
+
+.lnms-users a,
+.lnms-users-permissions a,
+.lnms-roles a {
+    color: var(--lnms-accent);
+}
+
+.lnms-users a:hover,
+.lnms-users a:focus,
+.lnms-users-permissions a:hover,
+.lnms-users-permissions a:focus,
+.lnms-roles a:hover,
+.lnms-roles a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-users .label-info,
+.lnms-roles .label-info {
+    background-color: var(--lnms-accent-muted);
+    color: var(--lnms-accent-hover);
+}
+
+.dark .lnms-users .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-users-permissions .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.dark .lnms-users .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-users-permissions .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+/* Phase 5: Settings/API — hosts .lnms-settings / .lnms-api; Ziggy + token CRUD preserved */
+.lnms-settings .panel,
+.lnms-settings .panel.with-nav-tabs.panel-default {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    color: var(--lnms-text);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-settings .panel > .panel-heading,
+.lnms-settings .with-nav-tabs > .panel-heading {
+    background-color: var(--lnms-surface-muted);
+    border-bottom: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-settings .nav-tabs {
+    border-bottom-color: var(--lnms-border);
+}
+
+.lnms-settings .nav-tabs > li > a,
+.lnms-settings .with-nav-tabs.panel-default .nav-tabs > li > a {
+    color: var(--lnms-text-secondary);
+    border-radius: var(--lnms-radius-sm) var(--lnms-radius-sm) 0 0;
+}
+
+.lnms-settings .nav-tabs > li > a:hover,
+.lnms-settings .nav-tabs > li > a:focus,
+.lnms-settings .with-nav-tabs.panel-default .nav-tabs > li > a:hover,
+.lnms-settings .with-nav-tabs.panel-default .nav-tabs > li > a:focus {
+    color: var(--lnms-text);
+    background-color: var(--lnms-accent-muted);
+    border-color: transparent;
+}
+
+.lnms-settings .nav-tabs > li.active > a,
+.lnms-settings .nav-tabs > li.active > a:hover,
+.lnms-settings .nav-tabs > li.active > a:focus,
+.lnms-settings .with-nav-tabs.panel-default .nav-tabs > li.active > a,
+.lnms-settings .with-nav-tabs.panel-default .nav-tabs > li.active > a:hover,
+.lnms-settings .with-nav-tabs.panel-default .nav-tabs > li.active > a:focus {
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    border-bottom-color: var(--lnms-surface);
+}
+
+.lnms-settings .panel-body {
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+}
+
+.lnms-settings #settings-search,
+.lnms-settings .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    border-radius: var(--lnms-radius-sm);
+}
+
+.lnms-settings #settings-search:focus,
+.lnms-settings .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+.lnms-settings .col-form-label,
+.lnms-settings .control-label,
+.lnms-settings .help-block,
+.lnms-settings h5 {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-settings hr {
+    border-top-color: var(--lnms-border);
+}
+
+.lnms-settings .btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-settings .btn-primary:hover,
+.lnms-settings .btn-primary:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+    color: #fff;
+}
+
+.lnms-settings .btn-danger {
+    background-color: var(--lnms-status-down);
+    border-color: var(--lnms-status-down);
+    color: #fff;
+}
+
+.lnms-settings .btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-settings .panel-group .panel,
+.lnms-settings .accordion .panel {
+    border-color: var(--lnms-border);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-settings .panel-group .panel-heading,
+.lnms-settings .accordion .panel-heading {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text);
+}
+
+.lnms-settings .panel-title a,
+.lnms-settings .accordion .panel-title a {
+    color: var(--lnms-text);
+}
+
+.lnms-settings .panel-title a:hover,
+.lnms-settings .panel-title a:focus {
+    color: var(--lnms-accent);
+}
+
+.lnms-api__title {
+    margin-top: 0;
+    margin-bottom: var(--lnms-space-4);
+    font-size: var(--lnms-text-xl);
+    font-weight: 600;
+    color: var(--lnms-text);
+    border-bottom: 1px solid var(--lnms-border);
+    padding-bottom: var(--lnms-space-2);
+}
+
+.lnms-api__help {
+    color: var(--lnms-text-secondary);
+    margin-bottom: var(--lnms-space-4);
+}
+
+.lnms-api__table-wrap {
+    margin-bottom: var(--lnms-space-4);
+}
+
+.lnms-api__table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+}
+
+.lnms-api__table > thead > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-color: var(--lnms-border);
+}
+
+.lnms-api__table > tbody > tr > td {
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    vertical-align: middle;
+}
+
+.lnms-api__row--foreign-auth {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-api .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-api .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+.lnms-api .control-label {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-api .btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-api .btn-primary:hover,
+.lnms-api .btn-primary:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+    color: #fff;
+}
+
+.lnms-api .btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-api .btn-warning {
+    background-color: var(--lnms-status-warn);
+    border-color: var(--lnms-status-warn);
+    color: #fff;
+}
+
+.lnms-api .btn-danger {
+    background-color: var(--lnms-status-down);
+    border-color: var(--lnms-status-down);
+    color: #fff;
+}
+
+.lnms-api .btn-success {
+    background-color: var(--lnms-status-up);
+    border-color: var(--lnms-status-up);
+    color: #fff;
+}
+
+.lnms-api .modal-content {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    border-radius: var(--lnms-radius-md);
+}
+
+.lnms-api .modal-header,
+.lnms-api .modal-footer {
+    border-color: var(--lnms-border);
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-api .modal-title {
+    color: var(--lnms-text);
+}
+
+.lnms-api .alert-warning.lnms-api__token-once {
+    border-color: var(--lnms-status-warn);
+}
+
+.lnms-api .api-token-description-text {
+    color: var(--lnms-accent);
+}
+
+.lnms-api .api-token-description-text:focus-visible {
+    outline: 2px solid var(--lnms-focus-ring);
+    outline-offset: 2px;
+}
+
+/* Phase 5: Poller / Plugins — hosts .lnms-poller* / .lnms-plugins*; real routes + Bootgrid #poll-log preserved */
+.lnms-poller .nav-tabs {
+    border-bottom-color: var(--lnms-border);
+}
+
+.lnms-poller .nav-tabs > li > a {
+    color: var(--lnms-text-secondary);
+    border-radius: var(--lnms-radius-sm) var(--lnms-radius-sm) 0 0;
+}
+
+.lnms-poller .nav-tabs > li > a:hover,
+.lnms-poller .nav-tabs > li > a:focus {
+    color: var(--lnms-text);
+    background-color: var(--lnms-accent-muted);
+    border-color: transparent;
+}
+
+.lnms-poller .nav-tabs > li.active > a,
+.lnms-poller .nav-tabs > li.active > a:hover,
+.lnms-poller .nav-tabs > li.active > a:focus {
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    border-bottom-color: transparent;
+}
+
+.lnms-poller .panel,
+.lnms-plugins .panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    color: var(--lnms-text);
+    box-shadow: none;
+}
+
+.lnms-poller .panel-heading,
+.lnms-poller .panel-title,
+.lnms-plugins .panel-heading,
+.lnms-plugins .panel-title {
+    background-color: var(--lnms-surface-muted);
+    border-bottom-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-poller .table,
+.lnms-plugins .table {
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-poller .table > thead > tr > th,
+.lnms-poller .table > tbody > tr > th,
+.lnms-plugins .table > thead > tr > th,
+.lnms-plugins .table > tbody > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-color: var(--lnms-border);
+}
+
+.lnms-poller .table > tbody > tr > td,
+.lnms-plugins .table > tbody > tr > td {
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    vertical-align: middle;
+}
+
+.lnms-poller .bootgrid-header,
+.lnms-poller .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-poller .bootgrid-header .actionBar .btn,
+.lnms-poller .bootgrid-footer .actionBar .btn {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-poller .form-control,
+.lnms-plugins .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-poller .form-control:focus,
+.lnms-plugins .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+.lnms-poller .btn-primary,
+.lnms-plugins .btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-poller .btn-primary:hover,
+.lnms-poller .btn-primary:focus,
+.lnms-plugins .btn-primary:hover,
+.lnms-plugins .btn-primary:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+    color: #fff;
+}
+
+.lnms-poller .btn-default,
+.lnms-plugins .btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-poller .btn-danger,
+.lnms-plugins .btn-danger {
+    background-color: var(--lnms-status-down);
+    border-color: var(--lnms-status-down);
+    color: #fff;
+}
+
+.lnms-poller .btn-success,
+.lnms-plugins .btn-success {
+    background-color: var(--lnms-status-up);
+    border-color: var(--lnms-status-up);
+    color: #fff;
+}
+
+.lnms-poller .modal-content,
+.lnms-plugins .modal-content {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    border-radius: var(--lnms-radius-md);
+}
+
+.lnms-poller .modal-header,
+.lnms-poller .modal-footer,
+.lnms-plugins .modal-header,
+.lnms-plugins .modal-footer {
+    border-color: var(--lnms-border);
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-poller .modal-title,
+.lnms-plugins .modal-title {
+    color: var(--lnms-text);
+}
+
+/* Phase 5: Inventory / Services / Apps — hosts .lnms-inventory / .lnms-services / .lnms-apps; Bootgrid #inventory + modal IDs preserved */
+.lnms-inventory .panel,
+.lnms-services .panel,
+.lnms-apps .panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    color: var(--lnms-text);
+    box-shadow: none;
+}
+
+.lnms-inventory .panel-heading,
+.lnms-inventory .panel-title,
+.lnms-services .panel-heading,
+.lnms-services .panel-title,
+.lnms-apps .panel-heading,
+.lnms-apps .panel-title {
+    background-color: var(--lnms-surface-muted);
+    border-bottom-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-inventory .bootgrid-header,
+.lnms-inventory .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-inventory .bootgrid-header .actionBar .btn,
+.lnms-inventory .bootgrid-footer .actionBar .btn,
+.lnms-inventory .btn-default,
+.lnms-services .btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-inventory .table,
+.lnms-inventory .bootgrid-table,
+.lnms-services .table,
+.lnms-apps .table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-inventory .table > thead > tr > th,
+.lnms-inventory .bootgrid-table th,
+.lnms-services .table > thead > tr > th,
+.lnms-apps .table > thead > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-color: var(--lnms-border);
+}
+
+.lnms-inventory .table > tbody > tr > td,
+.lnms-inventory .bootgrid-table td,
+.lnms-services .table > tbody > tr > td,
+.lnms-apps .table > tbody > tr > td {
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    vertical-align: middle;
+}
+
+.lnms-inventory .table-hover > tbody > tr:hover,
+.lnms-inventory .bootgrid-table.table-hover > tbody > tr:hover,
+.lnms-services .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-inventory .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-services .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-inventory .table-striped > tbody > tr:nth-of-type(even),
+.lnms-services .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-inventory .form-control,
+.lnms-services .form-control,
+.lnms-apps .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-inventory .form-control:focus,
+.lnms-services .form-control:focus,
+.lnms-apps .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+.lnms-inventory .btn-primary,
+.lnms-services .btn-primary,
+.lnms-apps .btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-inventory .btn-primary:hover,
+.lnms-inventory .btn-primary:focus,
+.lnms-services .btn-primary:hover,
+.lnms-services .btn-primary:focus,
+.lnms-apps .btn-primary:hover,
+.lnms-apps .btn-primary:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+    color: #fff;
+}
+
+.lnms-services .btn-success {
+    background-color: var(--lnms-status-up);
+    border-color: var(--lnms-status-up);
+    color: #fff;
+}
+
+.lnms-services .btn-danger {
+    background-color: var(--lnms-status-down);
+    border-color: var(--lnms-status-down);
+    color: #fff;
+}
+
+.lnms-services .btn-warning {
+    background-color: var(--lnms-status-warn);
+    border-color: var(--lnms-status-warn);
+    color: #fff;
+}
+
+.lnms-inventory a,
+.lnms-services a,
+.lnms-apps a {
+    color: var(--lnms-accent);
+}
+
+.lnms-inventory a:hover,
+.lnms-inventory a:focus,
+.lnms-services a:hover,
+.lnms-services a:focus,
+.lnms-apps a:hover,
+.lnms-apps a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-services .well,
+.lnms-services legend,
+.lnms-apps .panel-body {
+    color: var(--lnms-text);
+    border-color: var(--lnms-border);
+}
+
+.lnms-services .well {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-services .modal-content,
+.lnms-apps .modal-content {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    border-radius: var(--lnms-radius-md);
+}
+
+.lnms-services .modal-header,
+.lnms-services .modal-footer {
+    border-color: var(--lnms-border);
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-services .modal-title {
+    color: var(--lnms-text);
+}
+
+.lnms-services .alert-info {
+    background-color: var(--lnms-accent-muted);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.dark .lnms-inventory .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-services .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.dark .lnms-inventory .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-services .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+/* Phase 5: Validate / NAC / SSL Certificates / OUI — hosts; routes, Bootgrid IDs, Alpine, @can preserved */
+.lnms-validate .panel,
+.lnms-nac .panel,
+.lnms-ssl-certificates .panel,
+.lnms-oui-lookup .panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    color: var(--lnms-text);
+    box-shadow: none;
+}
+
+.lnms-validate .panel-heading,
+.lnms-validate .panel-title,
+.lnms-nac .panel-heading,
+.lnms-nac .panel-title,
+.lnms-ssl-certificates .panel-heading,
+.lnms-ssl-certificates .panel-title,
+.lnms-oui-lookup .panel-heading,
+.lnms-oui-lookup .panel-title {
+    background-color: var(--lnms-surface-muted);
+    border-bottom-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-validate .panel-body,
+.lnms-nac .panel-body,
+.lnms-ssl-certificates .panel-body,
+.lnms-oui-lookup .panel-body {
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+}
+
+.lnms-validate .panel-success > .panel-heading,
+.lnms-validate .panel-success {
+    border-color: color-mix(in srgb, var(--lnms-status-up) 45%, var(--lnms-border));
+}
+
+.lnms-validate .panel-success > .panel-heading {
+    background-color: color-mix(in srgb, var(--lnms-status-up) 18%, var(--lnms-surface-muted));
+    color: var(--lnms-text);
+}
+
+.lnms-validate .panel-warning > .panel-heading,
+.lnms-validate .panel-warning {
+    border-color: color-mix(in srgb, var(--lnms-status-warn) 45%, var(--lnms-border));
+}
+
+.lnms-validate .panel-warning > .panel-heading {
+    background-color: color-mix(in srgb, var(--lnms-status-warn) 18%, var(--lnms-surface-muted));
+    color: var(--lnms-text);
+}
+
+.lnms-validate .panel-danger > .panel-heading,
+.lnms-validate .panel-danger {
+    border-color: color-mix(in srgb, var(--lnms-status-down) 45%, var(--lnms-border));
+}
+
+.lnms-validate .panel-danger > .panel-heading {
+    background-color: color-mix(in srgb, var(--lnms-status-down) 18%, var(--lnms-surface-muted));
+    color: var(--lnms-text);
+}
+
+.lnms-validate .panel-info > .panel-heading,
+.lnms-validate .panel-info {
+    border-color: color-mix(in srgb, var(--lnms-accent) 40%, var(--lnms-border));
+}
+
+.lnms-validate .panel-info > .panel-heading {
+    background-color: var(--lnms-accent-muted);
+    color: var(--lnms-text);
+}
+
+.lnms-validate .list-group-item {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-validate .list-group-item.active {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-validate pre {
+    background-color: var(--lnms-surface-muted);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    color: var(--lnms-text);
+}
+
+.lnms-nac .bootgrid-header,
+.lnms-nac .bootgrid-footer,
+.lnms-ssl-certificates .bootgrid-header,
+.lnms-ssl-certificates .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-nac .bootgrid-header .actionBar .btn,
+.lnms-nac .bootgrid-footer .actionBar .btn,
+.lnms-ssl-certificates .bootgrid-header .actionBar .btn,
+.lnms-ssl-certificates .bootgrid-footer .actionBar .btn,
+.lnms-validate .btn-default,
+.lnms-nac .btn-default,
+.lnms-ssl-certificates .btn-default,
+.lnms-oui-lookup .btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-nac .table,
+.lnms-nac .bootgrid-table,
+.lnms-ssl-certificates .table,
+.lnms-ssl-certificates .bootgrid-table,
+.lnms-oui-lookup .table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-nac .table > thead > tr > th,
+.lnms-nac .bootgrid-table th,
+.lnms-ssl-certificates .table > thead > tr > th,
+.lnms-ssl-certificates .bootgrid-table th,
+.lnms-ssl-certificates .table > tbody > tr > th,
+.lnms-oui-lookup .table > thead > tr > th,
+.lnms-oui-lookup .table > tbody > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-color: var(--lnms-border);
+}
+
+.lnms-nac .table > tbody > tr > td,
+.lnms-nac .bootgrid-table td,
+.lnms-ssl-certificates .table > tbody > tr > td,
+.lnms-ssl-certificates .bootgrid-table td,
+.lnms-oui-lookup .table > tbody > tr > td {
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    vertical-align: middle;
+}
+
+.lnms-nac .table-hover > tbody > tr:hover,
+.lnms-nac .bootgrid-table.table-hover > tbody > tr:hover,
+.lnms-ssl-certificates .table-hover > tbody > tr:hover,
+.lnms-ssl-certificates .bootgrid-table.table-hover > tbody > tr:hover,
+.lnms-oui-lookup .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-nac .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-ssl-certificates .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-nac .table-striped > tbody > tr:nth-of-type(even),
+.lnms-ssl-certificates .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-validate .form-control,
+.lnms-nac .form-control,
+.lnms-ssl-certificates .form-control,
+.lnms-oui-lookup .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-validate .form-control:focus,
+.lnms-nac .form-control:focus,
+.lnms-ssl-certificates .form-control:focus,
+.lnms-oui-lookup .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+.lnms-validate .btn-primary,
+.lnms-nac .btn-primary,
+.lnms-ssl-certificates .btn-primary,
+.lnms-oui-lookup .btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-validate .btn-primary:hover,
+.lnms-validate .btn-primary:focus,
+.lnms-ssl-certificates .btn-primary:hover,
+.lnms-ssl-certificates .btn-primary:focus,
+.lnms-oui-lookup .btn-primary:hover,
+.lnms-oui-lookup .btn-primary:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+    color: #fff;
+}
+
+.lnms-validate .btn-success,
+.lnms-ssl-certificates .btn-success {
+    background-color: var(--lnms-status-up);
+    border-color: var(--lnms-status-up);
+    color: #fff;
+}
+
+.lnms-ssl-certificates .btn-danger {
+    background-color: var(--lnms-status-down);
+    border-color: var(--lnms-status-down);
+    color: #fff;
+}
+
+.lnms-ssl-certificates .btn-warning {
+    background-color: var(--lnms-status-warn);
+    border-color: var(--lnms-status-warn);
+    color: #fff;
+}
+
+.lnms-ssl-certificates .btn-info {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-validate a,
+.lnms-nac a,
+.lnms-ssl-certificates a,
+.lnms-oui-lookup a {
+    color: var(--lnms-accent);
+}
+
+.lnms-validate a:hover,
+.lnms-validate a:focus,
+.lnms-nac a:hover,
+.lnms-nac a:focus,
+.lnms-ssl-certificates a:hover,
+.lnms-ssl-certificates a:focus,
+.lnms-oui-lookup a:hover,
+.lnms-oui-lookup a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-ssl-certificates .alert-success {
+    background-color: color-mix(in srgb, var(--lnms-status-up) 16%, var(--lnms-surface));
+    border-color: color-mix(in srgb, var(--lnms-status-up) 40%, var(--lnms-border));
+    color: var(--lnms-text);
+}
+
+.lnms-ssl-certificates .alert-danger,
+.lnms-ssl-certificates .alert-warning {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-ssl-certificates .help-block,
+.lnms-oui-lookup .panel-body {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-ssl-certificates code {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text);
+    border-radius: var(--lnms-radius-sm);
+}
+
+.lnms-nac .label,
+.lnms-ssl-certificates .label {
+    font-weight: 600;
+}
+
+.dark .lnms-nac .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-ssl-certificates .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.dark .lnms-nac .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-ssl-certificates .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+/* Phase 5: About / port-groups / port-security / search / notifications / customers / peering / oxidized */
+.lnms-about .table,
+.lnms-port-groups .table,
+.lnms-port-security .table,
+.lnms-search .table,
+.lnms-notifications .table,
+.lnms-customers .table,
+.lnms-customers .bootgrid-table,
+.lnms-peering .table,
+.lnms-oxidized .table,
+.lnms-oxidized .bootgrid-table {
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-about .table > thead > tr > th,
+.lnms-about .table > tbody > tr > th,
+.lnms-about .table > tbody > tr > td,
+.lnms-port-groups .table > thead > tr > th,
+.lnms-port-groups .table > tbody > tr > td,
+.lnms-port-security .table > thead > tr > th,
+.lnms-port-security .table > tbody > tr > td,
+.lnms-search .table > thead > tr > th,
+.lnms-search .table > tbody > tr > td,
+.lnms-notifications .table > thead > tr > th,
+.lnms-notifications .table > tbody > tr > td,
+.lnms-customers .table > thead > tr > th,
+.lnms-customers .bootgrid-table th,
+.lnms-customers .table > tbody > tr > td,
+.lnms-customers .bootgrid-table td,
+.lnms-peering .table > thead > tr > th,
+.lnms-peering .table > tbody > tr > td,
+.lnms-oxidized .table > thead > tr > th,
+.lnms-oxidized .bootgrid-table th,
+.lnms-oxidized .table > tbody > tr > td,
+.lnms-oxidized .bootgrid-table td {
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-about .table > thead > tr > th,
+.lnms-port-groups .table > thead > tr > th,
+.lnms-port-security .table > thead > tr > th,
+.lnms-search .table > thead > tr > th,
+.lnms-notifications .table > thead > tr > th,
+.lnms-customers .table > thead > tr > th,
+.lnms-customers .bootgrid-table th,
+.lnms-peering .table > thead > tr > th,
+.lnms-oxidized .table > thead > tr > th,
+.lnms-oxidized .bootgrid-table th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-about .table-hover > tbody > tr:hover,
+.lnms-port-groups .table-hover > tbody > tr:hover,
+.lnms-port-security .table-hover > tbody > tr:hover,
+.lnms-search .table-hover > tbody > tr:hover,
+.lnms-notifications .table-hover > tbody > tr:hover,
+.lnms-customers .table-hover > tbody > tr:hover,
+.lnms-customers .bootgrid-table.table-hover > tbody > tr:hover,
+.lnms-peering .table-hover > tbody > tr:hover,
+.lnms-oxidized .table-hover > tbody > tr:hover,
+.lnms-oxidized .bootgrid-table.table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-port-groups .panel,
+.lnms-notifications .panel,
+.lnms-peering .panel,
+.lnms-oxidized .panel,
+.lnms-oxidized .panel.with-nav-tabs {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    color: var(--lnms-text);
+    box-shadow: none;
+}
+
+.lnms-port-groups .panel-heading,
+.lnms-port-groups .panel-title,
+.lnms-notifications .panel-heading,
+.lnms-peering .panel-heading,
+.lnms-oxidized .panel-heading {
+    background-color: var(--lnms-surface-muted);
+    border-bottom-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-port-groups .panel-body,
+.lnms-notifications .panel-body,
+.lnms-peering .panel-body,
+.lnms-oxidized .panel-body {
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+}
+
+.lnms-about .modal-content,
+.lnms-notifications .modal-content {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    border-radius: var(--lnms-radius-md);
+}
+
+.lnms-about .modal-header,
+.lnms-about .modal-footer,
+.lnms-notifications .modal-header,
+.lnms-notifications .modal-footer {
+    border-color: var(--lnms-border);
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-about .modal-title,
+.lnms-about h3,
+.lnms-about p,
+.lnms-notifications h1,
+.lnms-notifications h4,
+.lnms-oxidized h2,
+.lnms-search .optionbar,
+.lnms-peering h3 {
+    color: var(--lnms-text);
+}
+
+.lnms-about pre,
+.lnms-about .modal-body pre {
+    background-color: var(--lnms-surface-muted);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    color: var(--lnms-text);
+}
+
+.lnms-about .form-control,
+.lnms-port-groups .form-control,
+.lnms-notifications .form-control,
+.lnms-search .form-control,
+.lnms-peering .form-control,
+.lnms-oxidized .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-about .form-control:focus,
+.lnms-port-groups .form-control:focus,
+.lnms-notifications .form-control:focus,
+.lnms-search .form-control:focus,
+.lnms-peering .form-control:focus,
+.lnms-oxidized .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+.lnms-about .btn-default,
+.lnms-port-groups .btn-default,
+.lnms-port-security .btn-default,
+.lnms-notifications .btn-default,
+.lnms-search .btn-default,
+.lnms-customers .bootgrid-header .actionBar .btn,
+.lnms-oxidized .bootgrid-header .actionBar .btn {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-about .btn-primary,
+.lnms-port-groups .btn-primary,
+.lnms-port-security .btn-primary,
+.lnms-notifications .btn-primary,
+.lnms-search .btn-primary,
+.lnms-peering .btn-primary,
+.lnms-oxidized .btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-about .btn-primary:hover,
+.lnms-about .btn-primary:focus,
+.lnms-port-groups .btn-primary:hover,
+.lnms-port-groups .btn-primary:focus,
+.lnms-port-security .btn-primary:hover,
+.lnms-port-security .btn-primary:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+    color: #fff;
+}
+
+.lnms-about .btn-danger,
+.lnms-port-groups .btn-danger,
+.lnms-notifications .btn-danger {
+    background-color: var(--lnms-status-down);
+    border-color: var(--lnms-status-down);
+    color: #fff;
+}
+
+.lnms-notifications .btn-success,
+.lnms-about .btn-success {
+    background-color: var(--lnms-status-up);
+    border-color: var(--lnms-status-up);
+    color: #fff;
+}
+
+.lnms-about a,
+.lnms-port-groups a,
+.lnms-port-security a,
+.lnms-search a,
+.lnms-notifications a,
+.lnms-customers a,
+.lnms-peering a,
+.lnms-oxidized a {
+    color: var(--lnms-accent);
+}
+
+.lnms-about a:hover,
+.lnms-about a:focus,
+.lnms-port-groups a:hover,
+.lnms-port-groups a:focus,
+.lnms-port-security a:hover,
+.lnms-port-security a:focus,
+.lnms-search a:hover,
+.lnms-search a:focus,
+.lnms-notifications a:hover,
+.lnms-notifications a:focus,
+.lnms-customers a:hover,
+.lnms-customers a:focus,
+.lnms-peering a:hover,
+.lnms-peering a:focus,
+.lnms-oxidized a:hover,
+.lnms-oxidized a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-port-groups legend,
+.lnms-port-groups .list-large,
+.lnms-search .pagemenu-selected,
+.lnms-oxidized .nav-tabs > li > a,
+.lnms-notifications .count-notif {
+    color: var(--lnms-text);
+}
+
+.lnms-oxidized .nav-tabs > li.active > a,
+.lnms-oxidized .nav-tabs > li.active > a:hover,
+.lnms-oxidized .nav-tabs > li.active > a:focus {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    border-bottom-color: transparent;
+    color: var(--lnms-text);
+}
+
+.lnms-customers .bootgrid-header,
+.lnms-customers .bootgrid-footer,
+.lnms-oxidized .bootgrid-header,
+.lnms-oxidized .bootgrid-footer,
+.lnms-search .bootgrid-header,
+.lnms-search .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-about .bg-info,
+.lnms-about label.bg-info {
+    background-color: var(--lnms-accent-muted);
+    color: var(--lnms-text);
+}
+
+.dark .lnms-about .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-port-groups .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-customers .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-oxidized .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.dark .lnms-about .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-port-groups .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-customers .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-oxidized .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
 }
 
 .lnms-btn {
-  @apply tw:inline-flex tw:items-center tw:gap-2 tw:rounded-xl tw:px-4 tw:py-2 tw:font-normal tw:no-underline;
+    @apply tw:inline-flex tw:items-center tw:gap-2 tw:rounded-[length:var(--lnms-radius-md)] tw:px-4 tw:py-2 tw:font-normal tw:no-underline;
 }
 
 .lnms-btn-badge {
-  @apply tw:inline-flex tw:min-w-9 tw:items-center tw:justify-center tw:rounded-xl tw:px-2.5 tw:py-0.5 tw:text-base tw:font-bold;
+  @apply tw:inline-flex tw:min-w-9 tw:items-center tw:justify-center tw:rounded-[length:var(--lnms-radius-sm)] tw:px-2.5 tw:py-0.5 tw:text-base tw:font-bold;
 }
 
 .lnms-btn-default {
@@ -93,33 +5478,33 @@
 }
 
 .lnms-btn-success {
-  @apply tw:bg-[#5cb85c] tw:hover:bg-[#449d44] tw:text-white!;
+  @apply tw:bg-[color:var(--lnms-status-up)] tw:hover:brightness-95 tw:text-white!;
 }
 
 .lnms-btn-success .lnms-btn-badge {
-  @apply tw:bg-white tw:text-[#5cb85c];
+  @apply tw:bg-white tw:text-[color:var(--lnms-status-up)];
 }
 
 .lnms-btn-danger {
-  @apply tw:bg-[#d9534f] tw:hover:bg-[#c9302c] tw:text-white!;
+  @apply tw:bg-[color:var(--lnms-status-down)] tw:hover:brightness-95 tw:text-white!;
 }
 
 .lnms-btn-danger .lnms-btn-badge {
-  @apply tw:bg-white tw:text-[#d9534f];
+  @apply tw:bg-white tw:text-[color:var(--lnms-status-down)];
 }
 
 .lnms-btn-primary {
-  @apply tw:bg-[#337ab7] tw:hover:bg-[#286090] tw:text-white!;
+  @apply tw:bg-[color:var(--lnms-accent)] tw:hover:bg-[color:var(--lnms-accent-hover)] tw:text-white!;
 }
 
 .lnms-btn-primary .lnms-btn-badge {
-  @apply tw:bg-white tw:text-[#337ab7];
+  @apply tw:bg-white tw:text-[color:var(--lnms-accent)];
 }
 
 .lnms-btn-warning {
-  @apply tw:bg-[#f0ad4e] tw:hover:bg-[#ec971f] tw:text-white!;
+  @apply tw:bg-[color:var(--lnms-status-warn)] tw:hover:brightness-95 tw:text-white!;
 }
 
 .lnms-btn-warning .lnms-btn-badge {
-  @apply tw:bg-white tw:text-[#f0ad4e];
+  @apply tw:bg-white tw:text-[color:var(--lnms-status-warn)];
 }
