@@ -531,6 +531,155 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
   @apply tw:rounded-[length:var(--lnms-radius-lg)] tw:border tw:border-[color:var(--lnms-border)] tw:shadow-none tw:dark:border-[color:var(--lnms-border)];
 }
 
+/* —— Dashboard widget chrome (Phase 4) —— */
+.lnms-dashboard {
+    font-family: var(--lnms-font-sans);
+}
+
+.lnms-dashboard #dashboard-editor {
+    margin-bottom: var(--lnms-space-3);
+}
+
+.lnms-dashboard #dashboard-editor .btn {
+    border-radius: var(--lnms-radius-sm);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard #dashboard-editor .btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+}
+
+.lnms-dashboard #dashboard-editor .btn-primary:hover,
+.lnms-dashboard #dashboard-editor .btn-primary:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+}
+
+.lnms-dashboard #dashboard-editor .btn-success {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+}
+
+.lnms-dashboard #dashboard-editor .btn-success:hover,
+.lnms-dashboard #dashboard-editor .btn-success:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+}
+
+.lnms-dashboard #dashboard-editor .btn-danger {
+    background-color: var(--lnms-status-down);
+    border-color: var(--lnms-status-down);
+}
+
+.lnms-dashboard #dashboard-editor .form-control {
+    border-color: var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-dashboard #dashboard-editor .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 3px var(--lnms-focus-ring);
+}
+
+.lnms-dashboard #dashboard-editor .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-dashboard #dashboard-editor .dropdown-menu > li > a {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard #dashboard-editor .dropdown-menu > li > a:hover,
+.lnms-dashboard #dashboard-editor .dropdown-menu > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard #dashboard-editor .divider {
+    background-color: var(--lnms-border);
+}
+
+.lnms-dashboard #dashboard-editor .dropdown-header {
+    color: var(--lnms-text-muted);
+    font-size: var(--lnms-text-xs);
+}
+
+.lnms-dashboard #message {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .grid-stack {
+    margin-top: var(--lnms-space-2);
+}
+
+.lnms-dashboard .grid-stack-item-content.lnms-widget {
+    background: var(--lnms-surface);
+    color: var(--lnms-text);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-lg);
+    box-shadow: var(--lnms-shadow-sm);
+    overflow: hidden;
+}
+
+.lnms-dashboard .lnms-widget__header {
+    background: var(--lnms-surface-muted);
+    color: var(--lnms-text);
+    border-bottom: 1px solid var(--lnms-border);
+    padding: var(--lnms-space-2) var(--lnms-space-3);
+    text-align: center;
+    font-size: var(--lnms-text-sm);
+    font-weight: 600;
+    line-height: 1.4;
+    min-height: 2.6em;
+}
+
+.lnms-dashboard .lnms-widget__title {
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget__body {
+    left: 4px !important;
+    right: 4px !important;
+    padding: 0.8em;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+    height: calc(100% - 2.6em);
+    cursor: auto;
+    color: var(--lnms-text);
+    background: var(--lnms-surface);
+}
+
+.lnms-dashboard .lnms-widget .fade-edit {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard .lnms-widget .fade-edit [data-widget-action="edit"]:hover {
+    color: var(--lnms-accent);
+}
+
+.lnms-dashboard .lnms-widget .fade-edit [data-widget-action="close"] {
+    color: var(--lnms-status-down) !important;
+}
+
+.lnms-dashboard .lnms-widget .fade-edit [data-widget-action="close"]:hover {
+    color: var(--lnms-status-critical) !important;
+}
+
+/* Override legacy tw_dark hardcode when tokenized chrome is present */
+.dark .lnms-dashboard .grid-stack .grid-stack-item-content.lnms-widget {
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+}
+
 .lnms-btn {
     @apply tw:inline-flex tw:items-center tw:gap-2 tw:rounded-[length:var(--lnms-radius-md)] tw:px-4 tw:py-2 tw:font-normal tw:no-underline;
 }
