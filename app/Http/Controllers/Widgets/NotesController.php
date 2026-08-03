@@ -53,6 +53,8 @@ class NotesController extends WidgetController
         ];
         $output = \LibreNMS\Util\Clean::html(nl2br($settings['notes']), $purifier_config);
 
-        return $output;
+        return view('widgets.notes', [
+            'notesHtml' => $output,
+        ]);
     }
 }
