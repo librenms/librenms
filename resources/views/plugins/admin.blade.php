@@ -3,8 +3,9 @@
 @section('title', trans('plugins.admin_page'))
 
 @section('content')
-    <div class="container">
-        <div class="panel panel-default panel-condensed col-md-6 col-md-offset-3 col-xs-12 col-sm-8 col-sm-offset-2" style="padding: 0">
+    {{-- Phase 5 host: .lnms-plugins — plugin.admin / plugin.update / plugin.settings|legacy routes + CSRF preserved --}}
+    <div class="container lnms-plugins">
+        <div class="panel panel-default panel-condensed col-md-6 col-md-offset-3 col-xs-12 col-sm-8 col-sm-offset-2 lnms-plugins-panel" style="padding: 0">
             <div class="panel-heading">
                 <strong>{{ __('plugins.admin_title') }}</strong>
             </div>

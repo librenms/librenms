@@ -1,7 +1,8 @@
 @extends('layouts.librenmsv1')
 
 @section('content')
-<div class="container-fluid">
+{{-- Phase 5 host: .lnms-poller — tabs use real poller.* routes; Bootgrid #poll-log / delete modals preserved --}}
+<div class="container-fluid lnms-poller">
   <div class="row">
     <div class="col-md-12">
       <ul class="nav nav-tabs">

@@ -1583,7 +1583,9 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 .lnms-users-permissions,
 .lnms-roles,
 .lnms-settings,
-.lnms-api {
+.lnms-api,
+.lnms-poller,
+.lnms-plugins {
     font-family: var(--lnms-font-sans);
     color: var(--lnms-text);
 }
@@ -4512,6 +4514,156 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 .lnms-api .api-token-description-text:focus-visible {
     outline: 2px solid var(--lnms-focus-ring);
     outline-offset: 2px;
+}
+
+/* Phase 5: Poller / Plugins — hosts .lnms-poller* / .lnms-plugins*; real routes + Bootgrid #poll-log preserved */
+.lnms-poller .nav-tabs {
+    border-bottom-color: var(--lnms-border);
+}
+
+.lnms-poller .nav-tabs > li > a {
+    color: var(--lnms-text-secondary);
+    border-radius: var(--lnms-radius-sm) var(--lnms-radius-sm) 0 0;
+}
+
+.lnms-poller .nav-tabs > li > a:hover,
+.lnms-poller .nav-tabs > li > a:focus {
+    color: var(--lnms-text);
+    background-color: var(--lnms-accent-muted);
+    border-color: transparent;
+}
+
+.lnms-poller .nav-tabs > li.active > a,
+.lnms-poller .nav-tabs > li.active > a:hover,
+.lnms-poller .nav-tabs > li.active > a:focus {
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    border-bottom-color: transparent;
+}
+
+.lnms-poller .panel,
+.lnms-plugins .panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    color: var(--lnms-text);
+    box-shadow: none;
+}
+
+.lnms-poller .panel-heading,
+.lnms-poller .panel-title,
+.lnms-plugins .panel-heading,
+.lnms-plugins .panel-title {
+    background-color: var(--lnms-surface-muted);
+    border-bottom-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-poller .table,
+.lnms-plugins .table {
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-poller .table > thead > tr > th,
+.lnms-poller .table > tbody > tr > th,
+.lnms-plugins .table > thead > tr > th,
+.lnms-plugins .table > tbody > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-color: var(--lnms-border);
+}
+
+.lnms-poller .table > tbody > tr > td,
+.lnms-plugins .table > tbody > tr > td {
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    vertical-align: middle;
+}
+
+.lnms-poller .bootgrid-header,
+.lnms-poller .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-poller .bootgrid-header .actionBar .btn,
+.lnms-poller .bootgrid-footer .actionBar .btn {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-poller .form-control,
+.lnms-plugins .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-poller .form-control:focus,
+.lnms-plugins .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+.lnms-poller .btn-primary,
+.lnms-plugins .btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-poller .btn-primary:hover,
+.lnms-poller .btn-primary:focus,
+.lnms-plugins .btn-primary:hover,
+.lnms-plugins .btn-primary:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+    color: #fff;
+}
+
+.lnms-poller .btn-default,
+.lnms-plugins .btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-poller .btn-danger,
+.lnms-plugins .btn-danger {
+    background-color: var(--lnms-status-down);
+    border-color: var(--lnms-status-down);
+    color: #fff;
+}
+
+.lnms-poller .btn-success,
+.lnms-plugins .btn-success {
+    background-color: var(--lnms-status-up);
+    border-color: var(--lnms-status-up);
+    color: #fff;
+}
+
+.lnms-poller .modal-content,
+.lnms-plugins .modal-content {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    border-radius: var(--lnms-radius-md);
+}
+
+.lnms-poller .modal-header,
+.lnms-poller .modal-footer,
+.lnms-plugins .modal-header,
+.lnms-plugins .modal-footer {
+    border-color: var(--lnms-border);
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-poller .modal-title,
+.lnms-plugins .modal-title {
+    color: var(--lnms-text);
 }
 
 .lnms-btn {
