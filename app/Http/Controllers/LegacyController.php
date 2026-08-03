@@ -85,6 +85,8 @@ class LegacyController extends Controller
             'syslog' => 'lnms-syslog',
             'bills' => 'lnms-bills',
             'bill' => 'lnms-bill',
+            'services' => 'lnms-services',
+            'apps' => 'lnms-apps',
         ];
         $legacy_host = $legacy_hosts[$vars['page'] ?? ''] ?? '';
 

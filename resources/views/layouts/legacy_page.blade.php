@@ -12,6 +12,8 @@
             'syslog' => 'lnms-syslog',
             'bills' => 'lnms-bills',
             'bill' => 'lnms-bill',
+            'services' => 'lnms-services',
+            'apps' => 'lnms-apps',
         ];
         $lnmsLegacyHost = $legacy_host ?? '';
         if ($lnmsLegacyHost === '') {

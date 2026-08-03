@@ -1585,7 +1585,10 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 .lnms-settings,
 .lnms-api,
 .lnms-poller,
-.lnms-plugins {
+.lnms-plugins,
+.lnms-inventory,
+.lnms-services,
+.lnms-apps {
     font-family: var(--lnms-font-sans);
     color: var(--lnms-text);
 }
@@ -4664,6 +4667,198 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 .lnms-poller .modal-title,
 .lnms-plugins .modal-title {
     color: var(--lnms-text);
+}
+
+/* Phase 5: Inventory / Services / Apps — hosts .lnms-inventory / .lnms-services / .lnms-apps; Bootgrid #inventory + modal IDs preserved */
+.lnms-inventory .panel,
+.lnms-services .panel,
+.lnms-apps .panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    color: var(--lnms-text);
+    box-shadow: none;
+}
+
+.lnms-inventory .panel-heading,
+.lnms-inventory .panel-title,
+.lnms-services .panel-heading,
+.lnms-services .panel-title,
+.lnms-apps .panel-heading,
+.lnms-apps .panel-title {
+    background-color: var(--lnms-surface-muted);
+    border-bottom-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-inventory .bootgrid-header,
+.lnms-inventory .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-inventory .bootgrid-header .actionBar .btn,
+.lnms-inventory .bootgrid-footer .actionBar .btn,
+.lnms-inventory .btn-default,
+.lnms-services .btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-inventory .table,
+.lnms-inventory .bootgrid-table,
+.lnms-services .table,
+.lnms-apps .table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-inventory .table > thead > tr > th,
+.lnms-inventory .bootgrid-table th,
+.lnms-services .table > thead > tr > th,
+.lnms-apps .table > thead > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-color: var(--lnms-border);
+}
+
+.lnms-inventory .table > tbody > tr > td,
+.lnms-inventory .bootgrid-table td,
+.lnms-services .table > tbody > tr > td,
+.lnms-apps .table > tbody > tr > td {
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    vertical-align: middle;
+}
+
+.lnms-inventory .table-hover > tbody > tr:hover,
+.lnms-inventory .bootgrid-table.table-hover > tbody > tr:hover,
+.lnms-services .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-inventory .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-services .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-inventory .table-striped > tbody > tr:nth-of-type(even),
+.lnms-services .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-inventory .form-control,
+.lnms-services .form-control,
+.lnms-apps .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-inventory .form-control:focus,
+.lnms-services .form-control:focus,
+.lnms-apps .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+.lnms-inventory .btn-primary,
+.lnms-services .btn-primary,
+.lnms-apps .btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-inventory .btn-primary:hover,
+.lnms-inventory .btn-primary:focus,
+.lnms-services .btn-primary:hover,
+.lnms-services .btn-primary:focus,
+.lnms-apps .btn-primary:hover,
+.lnms-apps .btn-primary:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+    color: #fff;
+}
+
+.lnms-services .btn-success {
+    background-color: var(--lnms-status-up);
+    border-color: var(--lnms-status-up);
+    color: #fff;
+}
+
+.lnms-services .btn-danger {
+    background-color: var(--lnms-status-down);
+    border-color: var(--lnms-status-down);
+    color: #fff;
+}
+
+.lnms-services .btn-warning {
+    background-color: var(--lnms-status-warn);
+    border-color: var(--lnms-status-warn);
+    color: #fff;
+}
+
+.lnms-inventory a,
+.lnms-services a,
+.lnms-apps a {
+    color: var(--lnms-accent);
+}
+
+.lnms-inventory a:hover,
+.lnms-inventory a:focus,
+.lnms-services a:hover,
+.lnms-services a:focus,
+.lnms-apps a:hover,
+.lnms-apps a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-services .well,
+.lnms-services legend,
+.lnms-apps .panel-body {
+    color: var(--lnms-text);
+    border-color: var(--lnms-border);
+}
+
+.lnms-services .well {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-services .modal-content,
+.lnms-apps .modal-content {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    border-radius: var(--lnms-radius-md);
+}
+
+.lnms-services .modal-header,
+.lnms-services .modal-footer {
+    border-color: var(--lnms-border);
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-services .modal-title {
+    color: var(--lnms-text);
+}
+
+.lnms-services .alert-info {
+    background-color: var(--lnms-accent-muted);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.dark .lnms-inventory .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-services .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.dark .lnms-inventory .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-services .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
 }
 
 .lnms-btn {

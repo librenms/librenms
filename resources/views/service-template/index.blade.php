@@ -3,7 +3,8 @@
 @section('title', __('Services Templates'))
 
 @section('content')
-    <div class="container-fluid">
+    {{-- Phase 5 host: .lnms-services — real services.templates.* routes; panel/table IDs preserved --}}
+    <div class="container-fluid lnms-services">
         <x-panel id="manage-services-templates-panel">
             <x-slot name="title">
                 <span class="fa-stack" aria-hidden="true">
