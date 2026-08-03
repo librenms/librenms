@@ -75,11 +75,13 @@ class LegacyController extends Controller
             $html .= '<script>document.title = ' . Js::from($title) . ';</script>';
         }
 
-        // Presentation host classes for Phase 5 legacy alert pages (CSS only; no Bootgrid/ID changes).
+        // Presentation host classes for Phase 5 legacy pages (CSS only; no Bootgrid/ID changes).
         $legacy_hosts = [
             'alerts' => 'lnms-alerts',
             'alert-log' => 'lnms-alert-log',
             'alert-rules' => 'lnms-alert-rules',
+            'eventlog' => 'lnms-eventlog',
+            'syslog' => 'lnms-syslog',
         ];
         $legacy_host = $legacy_hosts[$vars['page'] ?? ''] ?? '';
 

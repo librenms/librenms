@@ -4,7 +4,8 @@
     <x-device.page :device="$device" subtitle="{{ __('Syslog') }}">
         <x-device.log-tabs :device="$device" tab="syslog"/>
 
-        <x-panel title="{{ __('Syslog') }}">
+        <div class="lnms-syslog">
+        <x-panel title="{{ __('Syslog') }}" class="lnms-syslog-panel">
             <div class="table-responsive">
                 <table id="syslog" class="table table-hover table-condensed table-striped">
                     <thead>
@@ -25,6 +26,7 @@
                 <input type="hidden" name="device" id="device" value="{{ $device->device_id }}">
             @endif
         </x-panel>
+        </div>
     </x-device.page>
 @endsection
 
