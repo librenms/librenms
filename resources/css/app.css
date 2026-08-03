@@ -1420,6 +1420,67 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     max-width: 100%;
 }
 
+/* Notes + placeholder leftover widgets — presentation only */
+.lnms-dashboard .lnms-widget .lnms-notes-widget {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+    line-height: 1.45;
+    padding: var(--lnms-space-1);
+}
+
+.lnms-dashboard .lnms-widget .lnms-notes-widget h1,
+.lnms-dashboard .lnms-widget .lnms-notes-widget h2,
+.lnms-dashboard .lnms-widget .lnms-notes-widget h3,
+.lnms-dashboard .lnms-widget .lnms-notes-widget h4 {
+    color: var(--lnms-text);
+    margin-top: 0;
+    font-family: var(--lnms-font-sans);
+}
+
+.lnms-dashboard .lnms-widget .lnms-notes-widget pre {
+    background-color: var(--lnms-surface-muted);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    color: var(--lnms-text);
+    padding: var(--lnms-space-2);
+    font-family: var(--lnms-font-mono);
+    font-size: var(--lnms-text-xs);
+    white-space: pre-wrap;
+}
+
+.lnms-dashboard .lnms-widget .lnms-notes-widget iframe {
+    max-width: 100%;
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-placeholder-widget {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+    padding: var(--lnms-space-3);
+}
+
+.lnms-dashboard .lnms-widget .lnms-placeholder-widget h3 {
+    margin-top: 0;
+    margin-bottom: var(--lnms-space-3);
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-lg);
+    font-weight: 600;
+    font-family: var(--lnms-font-sans);
+}
+
+.lnms-dashboard .lnms-widget .lnms-placeholder-widget__hint {
+    margin: 0;
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-md);
+    font-weight: 400;
+}
+
+.lnms-dashboard .lnms-widget .lnms-placeholder-widget__hint strong {
+    color: var(--lnms-text);
+    font-weight: 600;
+}
+
 .dark .lnms-dashboard .lnms-widget .lnms-device-summary .table-striped > tbody > tr:nth-of-type(odd),
 .dark .lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-table td.loading,
 .dark .lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-table td.no-results,
@@ -1441,6 +1502,380 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 .dark .lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .table-striped > tbody > tr:nth-of-type(odd),
 .dark .lnms-dashboard .lnms-widget .lnms-component-status .table-striped > tbody > tr:nth-of-type(odd),
 .dark .lnms-dashboard .lnms-widget .lnms-top-errors .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+/* —— Phase 5: Device list (presentation only) ——
+ * Hosts: .lnms-devices / .lnms-devices-panel / .lnms-devices-list / .lnms-devices-graphs
+ * Preserve: #devices, data-column-id, route('table.device'), devices-headers-table-menu,
+ * Alpine filter bar, Bootgrid, graph lazy tags, Device::hasAccess (backend unchanged).
+ */
+.lnms-devices {
+    font-family: var(--lnms-font-sans);
+    color: var(--lnms-text);
+}
+
+.lnms-devices .lnms-devices-panel.panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-lg);
+    box-shadow: none;
+    color: var(--lnms-text);
+}
+
+.lnms-devices .lnms-devices-panel > .panel-heading {
+    background-color: var(--lnms-surface-muted);
+    border-bottom: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-lg) var(--lnms-radius-lg) 0 0;
+    color: var(--lnms-text);
+    padding: var(--lnms-space-2) var(--lnms-space-3);
+}
+
+.lnms-devices .lnms-devices-panel > .panel-body {
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+    padding: var(--lnms-space-3);
+}
+
+.lnms-devices .lnms-devices-panel > .panel-footer {
+    background-color: var(--lnms-surface-muted);
+    border-top: 1px solid var(--lnms-border);
+    border-radius: 0 0 var(--lnms-radius-lg) var(--lnms-radius-lg);
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-devices .lnms-devices-toolbar {
+    align-items: flex-start;
+}
+
+.lnms-devices .lnms-devices-nav .panel {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    margin-bottom: 0;
+}
+
+.lnms-devices .lnms-devices-nav .panel-heading {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-devices .lnms-devices-nav a {
+    color: var(--lnms-accent);
+    text-decoration: none;
+}
+
+.lnms-devices .lnms-devices-nav a:hover,
+.lnms-devices .lnms-devices-nav a:focus {
+    color: var(--lnms-accent-hover);
+    text-decoration: underline;
+}
+
+.lnms-devices .lnms-devices-nav .pagemenu-selected a {
+    color: var(--lnms-text);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 2px solid var(--lnms-accent);
+    padding-bottom: 1px;
+}
+
+.lnms-devices .lnms-devices-menu .btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text-secondary);
+    border-radius: var(--lnms-radius-sm);
+}
+
+.lnms-devices .lnms-devices-menu .btn-default:hover,
+.lnms-devices .lnms-devices-menu .btn-default:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+    color: var(--lnms-text);
+}
+
+.lnms-devices .lnms-devices-menu .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-devices .lnms-devices-menu .dropdown-menu > li > a {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-devices .lnms-devices-menu .dropdown-menu > li > a:hover,
+.lnms-devices .lnms-devices-menu .dropdown-menu > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text);
+}
+
+/* Bootgrid device table — keep #devices / data-column-id / devices-headers-table-menu */
+.lnms-devices .lnms-devices-list {
+    margin-top: var(--lnms-space-1);
+}
+
+.lnms-devices .devices-headers-table-menu {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-devices .bootgrid-header,
+.lnms-devices .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.lnms-devices .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-devices .bootgrid-footer .actionBar .btn-group > .btn,
+.lnms-devices .bootgrid-header .dropdown-toggle,
+.lnms-devices .bootgrid-footer .dropdown-toggle {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    border-radius: var(--lnms-radius-sm);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-devices .bootgrid-header .dropdown-menu,
+.lnms-devices .bootgrid-footer .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-devices .bootgrid-header .dropdown-menu > li > a,
+.lnms-devices .bootgrid-footer .dropdown-menu > li > a,
+.lnms-devices .bootgrid-header .dropdown-menu .dropdown-item,
+.lnms-devices .bootgrid-footer .dropdown-menu .dropdown-item {
+    color: var(--lnms-text);
+}
+
+.lnms-devices .bootgrid-header .dropdown-menu > li > a:hover,
+.lnms-devices .bootgrid-footer .dropdown-menu > li > a:hover {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-devices #devices.table,
+.lnms-devices .bootgrid-table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-devices #devices.table > thead > tr > th,
+.lnms-devices .bootgrid-table th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+    border-top-color: var(--lnms-border);
+    font-weight: 500;
+    font-size: var(--lnms-text-xs);
+    text-transform: none;
+    white-space: nowrap;
+}
+
+.lnms-devices #devices.table > tbody > tr > td,
+.lnms-devices .bootgrid-table td {
+    border-top-color: var(--lnms-border);
+    color: var(--lnms-text);
+    vertical-align: middle;
+}
+
+.lnms-devices #devices.table-striped > tbody > tr:nth-of-type(odd),
+.lnms-devices .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-devices #devices.table-striped > tbody > tr:nth-of-type(even),
+.lnms-devices .bootgrid-table.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-devices #devices.table-hover > tbody > tr:hover,
+.lnms-devices .bootgrid-table.table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-devices .bootgrid-table td.loading,
+.lnms-devices .bootgrid-table td.no-results {
+    color: var(--lnms-text-muted);
+    background-color: var(--lnms-surface) !important;
+}
+
+.lnms-devices .pagination > li > a,
+.lnms-devices .pagination > li > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-accent);
+}
+
+.lnms-devices .pagination > li > a:hover,
+.lnms-devices .pagination > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-devices .pagination > .active > a,
+.lnms-devices .pagination > .active > span,
+.lnms-devices .pagination > .active > a:hover,
+.lnms-devices .pagination > .active > span:hover {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #FFFFFF;
+}
+
+.lnms-devices .pagination > .disabled > a,
+.lnms-devices .pagination > .disabled > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text-muted);
+}
+
+/* Status strip remaps — Bootgrid formatters still emit label-* / blackbg */
+.lnms-devices .alert-status,
+.lnms-devices .alert-status-small {
+    border-radius: 1px;
+}
+
+.lnms-devices .alert-status.label-success,
+.lnms-devices .alert-status-small.label-success {
+    background-color: var(--lnms-status-up) !important;
+}
+
+.lnms-devices .alert-status.label-danger,
+.lnms-devices .alert-status-small.label-danger {
+    background-color: var(--lnms-status-down) !important;
+}
+
+.lnms-devices .alert-status.label-warning,
+.lnms-devices .alert-status-small.label-warning {
+    background-color: var(--lnms-status-warn) !important;
+}
+
+.lnms-devices .alert-status.label-default,
+.lnms-devices .alert-status-small.label-default {
+    background-color: var(--lnms-status-unknown) !important;
+}
+
+.lnms-devices .alert-status.blackbg,
+.lnms-devices .alert-status-small.blackbg {
+    background-color: var(--lnms-status-unknown) !important;
+}
+
+.lnms-devices .red {
+    color: var(--lnms-status-down) !important;
+}
+
+.lnms-devices .device-table-icon {
+    border-radius: var(--lnms-radius-sm);
+}
+
+.lnms-devices .device-table-header-actions {
+    text-align: center;
+}
+
+.lnms-devices .lnms-devices-list a {
+    color: var(--lnms-accent);
+}
+
+.lnms-devices .lnms-devices-list a:hover,
+.lnms-devices .lnms-devices-list a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-devices .lnms-devices-list .icon-theme {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-devices .lnms-devices-list a:hover .icon-theme {
+    color: var(--lnms-accent);
+}
+
+.lnms-devices .glyphicon-wrench {
+    color: var(--lnms-status-maintenance);
+}
+
+/* Graph view — preserve lazy graph tags + Alpine deviceLink */
+.lnms-devices .lnms-devices-graphs__rule {
+    border-color: var(--lnms-border);
+    border-top-style: solid;
+}
+
+.lnms-devices .lnms-devices-graphs__item a {
+    display: block;
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    overflow: hidden;
+    background-color: var(--lnms-surface-muted);
+    transition: border-color var(--lnms-duration-fast) var(--lnms-ease);
+}
+
+.lnms-devices .lnms-devices-graphs__item a:hover,
+.lnms-devices .lnms-devices-graphs__item a:focus {
+    border-color: var(--lnms-accent);
+}
+
+.lnms-devices .lnms-devices-graphs__item img,
+.lnms-devices .lnms-devices-graphs__item .graph-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.lnms-devices .lnms-devices-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-devices .lnms-devices-footer .form-control {
+    border-color: var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+}
+
+.lnms-devices .lnms-devices-footer .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 3px var(--lnms-focus-ring);
+}
+
+.lnms-devices .lnms-devices-footer a {
+    color: var(--lnms-accent);
+}
+
+@media (max-width: 767px) {
+    .lnms-devices .lnms-devices-panel > .panel-body {
+        padding: var(--lnms-space-2);
+    }
+
+    .lnms-devices .lnms-devices-toolbar {
+        flex-direction: column;
+    }
+
+    .lnms-devices .lnms-devices-menu {
+        align-self: flex-end;
+    }
+
+    .lnms-devices #devices.table > thead > tr > th,
+    .lnms-devices .bootgrid-table th {
+        font-size: 11px;
+    }
+}
+
+.dark .lnms-devices #devices.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-devices .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-devices .bootgrid-table td.loading,
+.dark .lnms-devices .bootgrid-table td.no-results {
     background-color: var(--lnms-surface);
 }
 
