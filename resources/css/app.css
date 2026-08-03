@@ -2159,6 +2159,379 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     }
 }
 
+/*
+ * Phase 5 — Ports / interfaces list (presentation only)
+ * Hosts: .lnms-ports / .lnms-ports-panel / .lnms-ports-list / .lnms-ports-graphs
+ * Preserve: #ports, data-column-id, route('table.ports'), Alpine filter bar,
+ * Bootgrid, portPurge @can('port.delete'), group-graph-link, graph lazy tags,
+ * portLink Alpine, Port access gates (backend unchanged).
+ */
+.lnms-ports {
+    font-family: var(--lnms-font-sans);
+    color: var(--lnms-text);
+}
+
+.lnms-ports .lnms-ports-panel.panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-lg);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-ports .lnms-ports-panel > .panel-heading {
+    background-color: var(--lnms-surface-muted);
+    border-bottom: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-lg) var(--lnms-radius-lg) 0 0;
+    color: var(--lnms-text);
+}
+
+.lnms-ports .lnms-ports-panel > .panel-body {
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+    padding: var(--lnms-space-3);
+}
+
+.lnms-ports .lnms-ports-panel > .panel-footer {
+    background-color: var(--lnms-surface-muted);
+    border-top: 1px solid var(--lnms-border);
+    border-radius: 0 0 var(--lnms-radius-lg) var(--lnms-radius-lg);
+}
+
+.lnms-ports .lnms-ports-toolbar {
+    align-items: flex-start;
+}
+
+.lnms-ports .lnms-ports-nav .panel {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    margin-bottom: 0;
+}
+
+.lnms-ports .lnms-ports-nav .panel-heading {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-ports .lnms-ports-nav a,
+.lnms-ports .lnms-ports-group-link a {
+    color: var(--lnms-accent);
+    text-decoration: none;
+}
+
+.lnms-ports .lnms-ports-nav a:hover,
+.lnms-ports .lnms-ports-nav a:focus,
+.lnms-ports .lnms-ports-group-link a:hover,
+.lnms-ports .lnms-ports-group-link a:focus {
+    color: var(--lnms-accent-hover);
+    text-decoration: underline;
+}
+
+.lnms-ports .lnms-ports-nav .pagemenu-selected a {
+    color: var(--lnms-text);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.lnms-ports .lnms-ports-group-link {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-ports .lnms-ports-menu .btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-ports .lnms-ports-menu .btn-default:hover,
+.lnms-ports .lnms-ports-menu .btn-default:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+    color: var(--lnms-text);
+}
+
+.lnms-ports .lnms-ports-menu .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-ports .lnms-ports-menu .dropdown-menu > li > a {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-ports .lnms-ports-menu .dropdown-menu > li > a:hover,
+.lnms-ports .lnms-ports-menu .dropdown-menu > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text);
+}
+
+.lnms-ports .lnms-ports-list {
+    margin-top: var(--lnms-space-1);
+}
+
+.lnms-ports .bootgrid-header,
+.lnms-ports .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.lnms-ports .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-ports .bootgrid-footer .actionBar .btn-group > .btn,
+.lnms-ports .bootgrid-header .dropdown-toggle,
+.lnms-ports .bootgrid-footer .dropdown-toggle {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-ports .bootgrid-header .dropdown-menu,
+.lnms-ports .bootgrid-footer .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+}
+
+.lnms-ports .bootgrid-header .dropdown-menu > li > a,
+.lnms-ports .bootgrid-footer .dropdown-menu > li > a,
+.lnms-ports .bootgrid-header .dropdown-menu .dropdown-item,
+.lnms-ports .bootgrid-footer .dropdown-menu .dropdown-item {
+    color: var(--lnms-text);
+}
+
+.lnms-ports .bootgrid-header .dropdown-menu > li > a:hover,
+.lnms-ports .bootgrid-footer .dropdown-menu > li > a:hover {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-ports #ports.table,
+.lnms-ports .bootgrid-table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-ports #ports.table > thead > tr > th,
+.lnms-ports .bootgrid-table th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+    font-weight: 600;
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-ports #ports.table > tbody > tr > td,
+.lnms-ports .bootgrid-table td {
+    border-top-color: var(--lnms-border);
+    color: var(--lnms-text);
+    vertical-align: middle;
+}
+
+.lnms-ports #ports.table-striped > tbody > tr:nth-of-type(odd),
+.lnms-ports .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-ports #ports.table-striped > tbody > tr:nth-of-type(even),
+.lnms-ports .bootgrid-table.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-ports #ports.table-hover > tbody > tr:hover,
+.lnms-ports .bootgrid-table.table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-ports .bootgrid-table td.loading,
+.lnms-ports .bootgrid-table td.no-results {
+    color: var(--lnms-text-muted);
+    background-color: var(--lnms-surface) !important;
+}
+
+.lnms-ports .pagination > li > a,
+.lnms-ports .pagination > li > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-accent);
+}
+
+.lnms-ports .pagination > li > a:hover,
+.lnms-ports .pagination > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-ports .pagination > .active > a,
+.lnms-ports .pagination > .active > span,
+.lnms-ports .pagination > .active > a:hover,
+.lnms-ports .pagination > .active > span:hover {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #FFFFFF;
+}
+
+.lnms-ports .pagination > .disabled > a,
+.lnms-ports .pagination > .disabled > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text-muted);
+}
+
+.lnms-ports .alert-status,
+.lnms-ports .alert-status-small {
+    border-radius: 1px;
+}
+
+.lnms-ports .alert-status.label-success,
+.lnms-ports .alert-status-small.label-success {
+    background-color: var(--lnms-status-up) !important;
+}
+
+.lnms-ports .alert-status.label-danger,
+.lnms-ports .alert-status-small.label-danger {
+    background-color: var(--lnms-status-down) !important;
+}
+
+.lnms-ports .alert-status.label-warning,
+.lnms-ports .alert-status-small.label-warning {
+    background-color: var(--lnms-status-warn) !important;
+}
+
+.lnms-ports .alert-status.label-default,
+.lnms-ports .alert-status-small.label-default {
+    background-color: var(--lnms-status-unknown) !important;
+}
+
+.lnms-ports .alert-status.blackbg,
+.lnms-ports .alert-status-small.blackbg {
+    background-color: var(--lnms-status-unknown) !important;
+}
+
+/* Bootgrid data-css-class rate/error column colors */
+.lnms-ports td.green,
+.lnms-ports .bootgrid-table td.green {
+    color: var(--lnms-status-up) !important;
+}
+
+.lnms-ports td.blue,
+.lnms-ports .bootgrid-table td.blue {
+    color: var(--lnms-accent) !important;
+}
+
+.lnms-ports td.red,
+.lnms-ports .bootgrid-table td.red,
+.lnms-ports .red {
+    color: var(--lnms-status-down) !important;
+}
+
+.lnms-ports .lnms-ports-list a,
+.lnms-ports .lnms-ports-actions a {
+    color: var(--lnms-accent);
+}
+
+.lnms-ports .lnms-ports-list a:hover,
+.lnms-ports .lnms-ports-list a:focus,
+.lnms-ports .lnms-ports-actions a:hover,
+.lnms-ports .lnms-ports-actions a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-ports .lnms-ports-list .icon-theme,
+.lnms-ports .lnms-ports-actions .icon-theme,
+.lnms-ports .lnms-ports-menu .icon-theme {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-ports .lnms-ports-list a:hover .icon-theme,
+.lnms-ports .lnms-ports-actions a:hover .icon-theme {
+    color: var(--lnms-accent);
+}
+
+.lnms-ports .lnms-ports-graphs__rule {
+    border-color: var(--lnms-border);
+    border-top-style: solid;
+}
+
+.lnms-ports .lnms-ports-graphs__item a {
+    display: block;
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    overflow: hidden;
+    transition: border-color var(--lnms-duration-fast) var(--lnms-ease);
+}
+
+.lnms-ports .lnms-ports-graphs__item a:hover,
+.lnms-ports .lnms-ports-graphs__item a:focus {
+    border-color: var(--lnms-accent);
+}
+
+.lnms-ports .lnms-ports-graphs__item img,
+.lnms-ports .lnms-ports-graphs__item .graph-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.lnms-ports .lnms-ports-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-ports .lnms-ports-footer .form-control {
+    border-color: var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+}
+
+.lnms-ports .lnms-ports-footer .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 3px var(--lnms-focus-ring);
+}
+
+.lnms-ports .lnms-ports-footer a {
+    color: var(--lnms-accent);
+}
+
+@media (max-width: 767px) {
+    .lnms-ports .lnms-ports-panel > .panel-body {
+        padding: var(--lnms-space-2);
+    }
+
+    .lnms-ports .lnms-ports-toolbar {
+        flex-direction: column;
+    }
+
+    .lnms-ports .lnms-ports-menu {
+        align-self: flex-end;
+    }
+
+    .lnms-ports #ports.table > thead > tr > th,
+    .lnms-ports .bootgrid-table th {
+        font-size: 11px;
+    }
+}
+
+.dark .lnms-ports #ports.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-ports .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-ports .bootgrid-table td.loading,
+.dark .lnms-ports .bootgrid-table td.no-results {
+    background-color: var(--lnms-surface);
+}
+
+.dark .lnms-ports #ports.table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-ports .bootgrid-table.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
 .lnms-btn {
     @apply tw:inline-flex tw:items-center tw:gap-2 tw:rounded-[length:var(--lnms-radius-md)] tw:px-4 tw:py-2 tw:font-normal tw:no-underline;
 }
