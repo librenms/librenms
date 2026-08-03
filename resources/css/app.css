@@ -8,14 +8,16 @@
 
 /* —— Design tokens (Phase 3 / docs/modern-ui/DESIGN_SYSTEM.md) —— */
 :root {
+    /* Text/surface pairs target WCAG AA (~4.5:1). Borders target UI 3:1 where practical.
+       Status hues stay semantic; pair with bold/border cues — warn/up as pure text may be AA-large only. */
     --lnms-bg: #F4F6F8;
     --lnms-surface: #FFFFFF;
     --lnms-surface-muted: #EEF1F4;
-    --lnms-border: #D5DCE3;
-    --lnms-border-strong: #B8C2CC;
+    --lnms-border: #B8C2CC;
+    --lnms-border-strong: #8E969C;
     --lnms-text: #1B242C;
     --lnms-text-secondary: #5A6A78;
-    --lnms-text-muted: #7A8B99;
+    --lnms-text-muted: #5E6E7C;
     --lnms-accent: #0F6E7C;
     --lnms-accent-hover: #0B5A66;
     --lnms-accent-muted: #D7EEF1;
@@ -67,8 +69,8 @@
     --lnms-bg: #1E2226;
     --lnms-surface: #272B30;
     --lnms-surface-muted: #2E3338;
-    --lnms-border: #3E444C;
-    --lnms-border-strong: #4F565D;
+    --lnms-border: #555C66;
+    --lnms-border-strong: #606870;
     --lnms-text: #F9FAFB;
     --lnms-text-secondary: #C8C8C8;
     --lnms-text-muted: #ACB6BF;
