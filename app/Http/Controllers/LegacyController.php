@@ -76,12 +76,15 @@ class LegacyController extends Controller
         }
 
         // Presentation host classes for Phase 5 legacy pages (CSS only; no Bootgrid/ID changes).
+        // Billing hosts are bandwidth-accounting chrome only (no invoice/payment UI).
         $legacy_hosts = [
             'alerts' => 'lnms-alerts',
             'alert-log' => 'lnms-alert-log',
             'alert-rules' => 'lnms-alert-rules',
             'eventlog' => 'lnms-eventlog',
             'syslog' => 'lnms-syslog',
+            'bills' => 'lnms-bills',
+            'bill' => 'lnms-bill',
         ];
         $legacy_host = $legacy_hosts[$vars['page'] ?? ''] ?? '';
 
