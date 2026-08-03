@@ -1,4 +1,4 @@
-<div id="alertlog-stats_container-{{ $id }}" data-reload="false">
+<div id="alertlog-stats_container-{{ $id }}" class="lnms-alertlog-stats-widget" data-reload="false">
     <div class="table-responsive">
         <table id="alertlog-stats-{{ $id }}" class="table table-hover table-condensed table-striped">
             <thead>

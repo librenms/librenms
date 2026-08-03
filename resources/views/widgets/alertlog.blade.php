@@ -1,4 +1,4 @@
-<div id="alertlog_container-{{ $id }}" data-reload="false">
+<div id="alertlog_container-{{ $id }}" class="lnms-alertlog-widget" data-reload="false">
     <div class="table-responsive">
         <table id="alertlog_{{ $id }}" class="table table-hover table-condensed alerts" data-url="{{ route('table.alertlog') }}">
             <thead>

@@ -1,4 +1,4 @@
-<div id="graylog_container-{{ $id }}" data-reload="false">
+<div id="graylog_container-{{ $id }}" class="lnms-graylog-widget" data-reload="false">
     <div class="table-responsive">
         <table id="graylog-{{ $id }}" class="table table-hover table-condensed graylog">
             <thead>

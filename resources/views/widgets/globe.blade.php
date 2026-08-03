@@ -1,4 +1,4 @@
-<div id='chart_div-{{ $id }}'></div>
+<div id='chart_div-{{ $id }}' class="lnms-globe-widget"></div>
 
 <script type='text/javascript'>
     loadjs('https://www.gstatic.com/charts/loader.js', function() {

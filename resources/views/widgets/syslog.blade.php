@@ -1,4 +1,4 @@
-<div id="syslog_container-{{ $id }}" data-reload="false">
+<div id="syslog_container-{{ $id }}" class="lnms-syslog-widget" data-reload="false">
     <div class="table-responsive">
         <table id="syslog-{{ $id }}" class="table table-hover table-condensed table-striped">
             <thead>

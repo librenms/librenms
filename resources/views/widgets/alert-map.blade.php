@@ -1,3 +1,4 @@
+<div class="lnms-alert-map">
 @if($alert_totals)
     <div class="widget-alert-totals">
         <span>{{ __('Total alerts') }}</span>
@@ -21,3 +22,4 @@
         @endif
     </a>
 @endforeach
+</div>

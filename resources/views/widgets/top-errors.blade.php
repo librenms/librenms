@@ -1,3 +1,4 @@
+<div class="lnms-top-errors">
 <h4>Top {{ $interface_count }} errored interfaces polled within {{ $time_interval }} minutes</h4>
 <div class="table-responsive">
     <table class="table table-hover table-condensed table-striped bootgrid-table">
@@ -18,4 +19,5 @@
         @endforeach
         </tbody>
     </table>
+</div>
 </div>
