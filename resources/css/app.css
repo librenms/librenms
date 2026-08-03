@@ -2532,6 +2532,441 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-surface-muted);
 }
 
+/*
+ * Phase 5 — Graphs page (/graphs)
+ * Hosts: .lnms-graphs / .lnms-graphs-panel / .lnms-graphs-thumbs / .lnms-graphs-main
+ * Preserve: #period-thumbs, .graph-image, .graph (rrdGraphPng), route('graph'),
+ * AuthenticateGraph image endpoints, RrdGraphJS, .infobox / .rrd-pre, subtype select.
+ */
+.lnms-graphs {
+    font-family: var(--lnms-font-sans);
+    color: var(--lnms-text);
+}
+
+.lnms-graphs .lnms-graphs-panel.panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-graphs .lnms-graphs-panel > .panel-heading {
+    background-color: var(--lnms-surface-muted);
+    border-bottom: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-graphs .lnms-graphs-title {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-md);
+}
+
+.lnms-graphs .lnms-graphs-title a {
+    color: var(--lnms-accent);
+    text-decoration: none;
+}
+
+.lnms-graphs .lnms-graphs-title a:hover,
+.lnms-graphs .lnms-graphs-title a:focus {
+    color: var(--lnms-accent-hover);
+    text-decoration: underline;
+}
+
+.lnms-graphs .lnms-graphs-subtype select,
+.lnms-graphs .lnms-graphs-subtype .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    border-radius: var(--lnms-radius-sm);
+}
+
+.lnms-graphs .lnms-graphs-subtype select:focus,
+.lnms-graphs .lnms-graphs-subtype .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 3px var(--lnms-focus-ring);
+}
+
+.lnms-graphs .lnms-graphs-thumbs {
+    margin-top: var(--lnms-space-3);
+}
+
+.lnms-graphs .lnms-graphs-thumb {
+    border-color: transparent;
+    color: var(--lnms-text);
+    background-color: transparent;
+}
+
+.lnms-graphs .lnms-graphs-thumb:hover,
+.lnms-graphs .lnms-graphs-thumb:focus {
+    border-color: var(--lnms-border-strong);
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-graphs .lnms-graphs-thumb--active,
+.lnms-graphs .lnms-graphs-thumb[aria-current="true"] {
+    border-color: var(--lnms-accent);
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-graphs .lnms-graphs-thumb__label {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-graphs .lnms-graphs-thumb--active .lnms-graphs-thumb__label,
+.lnms-graphs .lnms-graphs-thumb[aria-current="true"] .lnms-graphs-thumb__label {
+    color: var(--lnms-text);
+}
+
+.lnms-graphs .lnms-graphs-thumb__img,
+.lnms-graphs .lnms-graphs-main .graph-image {
+    max-width: 100%;
+}
+
+.lnms-graphs .lnms-graphs-daterange__control {
+    background-color: var(--lnms-surface-muted) !important;
+    border-color: var(--lnms-border) !important;
+    color: var(--lnms-text) !important;
+    border-radius: var(--lnms-radius-md);
+}
+
+.lnms-graphs .lnms-graphs-daterange__control:hover,
+.lnms-graphs .lnms-graphs-daterange__control:focus {
+    background-color: var(--lnms-surface) !important;
+    border-color: var(--lnms-border-strong) !important;
+}
+
+.lnms-graphs .lnms-graphs-toggles {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-graphs .lnms-graphs-toggles a {
+    color: var(--lnms-accent);
+    text-decoration: none;
+}
+
+.lnms-graphs .lnms-graphs-toggles a:hover,
+.lnms-graphs .lnms-graphs-toggles a:focus {
+    color: var(--lnms-accent-hover);
+    text-decoration: underline;
+}
+
+.lnms-graphs .lnms-graphs-toggles__sep {
+    margin: 0 var(--lnms-space-1);
+    color: var(--lnms-border-strong);
+}
+
+.lnms-graphs .lnms-graphs-toggles__hint {
+    color: var(--lnms-text-muted);
+}
+
+.lnms-graphs .lnms-graphs-main {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    padding: var(--lnms-space-2);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-graphs .lnms-graphs-descr.panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-graphs .lnms-graphs-descr .icon-theme {
+    color: var(--lnms-accent);
+    margin-right: var(--lnms-space-2);
+}
+
+.lnms-graphs .lnms-graphs-rrd.infobox,
+.lnms-graphs .infobox.lnms-graphs-rrd {
+    margin-top: var(--lnms-space-4);
+    padding: var(--lnms-space-4);
+    background-color: var(--lnms-surface-muted);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    color: var(--lnms-text);
+}
+
+.lnms-graphs .lnms-graphs-rrd__title {
+    color: var(--lnms-text);
+    margin-bottom: var(--lnms-space-2);
+}
+
+.lnms-graphs .lnms-graphs-rrd__pre,
+.lnms-graphs .rrd-pre {
+    font-family: var(--lnms-font-mono);
+    font-size: var(--lnms-text-xs);
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    padding: var(--lnms-space-3);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+@media (max-width: 767px) {
+    .lnms-graphs .lnms-graphs-main {
+        padding: var(--lnms-space-1);
+    }
+
+    .lnms-graphs .lnms-graphs-thumbs {
+        margin-top: var(--lnms-space-2);
+    }
+}
+
+/*
+ * Phase 5 — Health / sensors index pages
+ * Hosts: .lnms-health / .lnms-health-panel / .lnms-health-toolbar / .lnms-health-list
+ * Preserve: #sensors|#mempool|#processor|#storage|#printer, data-column-id,
+ * Bootgrid ajax/table/* routes, viewAny Sensor/Mempool/Processor/Storage.
+ */
+.lnms-health {
+    font-family: var(--lnms-font-sans);
+    color: var(--lnms-text);
+}
+
+.lnms-health .lnms-health-panel.panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-health .lnms-health-panel > .panel-heading {
+    background-color: var(--lnms-surface-muted);
+    border-bottom: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-health .lnms-health-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--lnms-space-2);
+    padding: 0 var(--lnms-space-2);
+}
+
+.lnms-health .lnms-health-toolbar__left,
+.lnms-health .lnms-health-toolbar__right {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--lnms-space-2);
+}
+
+.lnms-health .lnms-health-toolbar a {
+    color: var(--lnms-accent);
+    text-decoration: none;
+}
+
+.lnms-health .lnms-health-toolbar a:hover,
+.lnms-health .lnms-health-toolbar a:focus {
+    color: var(--lnms-accent-hover);
+    text-decoration: underline;
+}
+
+.lnms-health .lnms-health-toolbar .pagemenu-selected a {
+    color: var(--lnms-text);
+    font-weight: 600;
+}
+
+.lnms-health .lnms-health-list {
+    margin-top: 0;
+}
+
+.lnms-health .bootgrid-header,
+.lnms-health .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-health .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-health .bootgrid-footer .actionBar .btn-group > .btn,
+.lnms-health .bootgrid-header .dropdown-toggle,
+.lnms-health .bootgrid-footer .dropdown-toggle {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-health .bootgrid-header .dropdown-menu,
+.lnms-health .bootgrid-footer .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+}
+
+.lnms-health .bootgrid-header .dropdown-menu > li > a,
+.lnms-health .bootgrid-footer .dropdown-menu > li > a {
+    color: var(--lnms-text);
+}
+
+.lnms-health .bootgrid-header .dropdown-menu > li > a:hover,
+.lnms-health .bootgrid-footer .dropdown-menu > li > a:hover {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-health #sensors.table,
+.lnms-health #mempool.table,
+.lnms-health #processor.table,
+.lnms-health #storage.table,
+.lnms-health #printer.table,
+.lnms-health .bootgrid-table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-health #sensors.table > thead > tr > th,
+.lnms-health #mempool.table > thead > tr > th,
+.lnms-health #processor.table > thead > tr > th,
+.lnms-health #storage.table > thead > tr > th,
+.lnms-health #printer.table > thead > tr > th,
+.lnms-health .bootgrid-table th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-health #sensors.table > tbody > tr > td,
+.lnms-health #mempool.table > tbody > tr > td,
+.lnms-health #processor.table > tbody > tr > td,
+.lnms-health #storage.table > tbody > tr > td,
+.lnms-health #printer.table > tbody > tr > td,
+.lnms-health .bootgrid-table td {
+    border-top-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-health .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-health .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-health .table-striped > tbody > tr:nth-of-type(even),
+.lnms-health .bootgrid-table.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-health .table-hover > tbody > tr:hover,
+.lnms-health .bootgrid-table.table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-health .bootgrid-table td.loading,
+.lnms-health .bootgrid-table td.no-results {
+    color: var(--lnms-text-muted);
+    background-color: var(--lnms-surface) !important;
+}
+
+.lnms-health .pagination > li > a,
+.lnms-health .pagination > li > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-health .pagination > li > a:hover,
+.lnms-health .pagination > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+}
+
+.lnms-health .pagination > .active > a,
+.lnms-health .pagination > .active > span,
+.lnms-health .pagination > .active > a:hover,
+.lnms-health .pagination > .active > span:hover {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-health .pagination > .disabled > a,
+.lnms-health .pagination > .disabled > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text-muted);
+}
+
+.lnms-health .lnms-health-list a {
+    color: var(--lnms-accent);
+}
+
+.lnms-health .lnms-health-list a:hover,
+.lnms-health .lnms-health-list a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-health .lnms-health-list .graph-image,
+.lnms-health .lnms-health-list img.graph-image {
+    max-width: 100%;
+    height: auto;
+}
+
+.lnms-health .alert-status,
+.lnms-health .alert-status-small {
+    border-radius: 1px;
+}
+
+.lnms-health .alert-status.label-success,
+.lnms-health .alert-status-small.label-success {
+    background-color: var(--lnms-status-up) !important;
+}
+
+.lnms-health .alert-status.label-danger,
+.lnms-health .alert-status-small.label-danger {
+    background-color: var(--lnms-status-down) !important;
+}
+
+.lnms-health .alert-status.label-warning,
+.lnms-health .alert-status-small.label-warning {
+    background-color: var(--lnms-status-warn) !important;
+}
+
+.lnms-health .alert-status.label-default,
+.lnms-health .alert-status-small.label-default {
+    background-color: var(--lnms-status-unknown) !important;
+}
+
+@media (max-width: 767px) {
+    .lnms-health .lnms-health-toolbar {
+        flex-direction: column;
+        padding: 0;
+    }
+
+    .lnms-health .lnms-health-toolbar__right {
+        align-self: flex-end;
+    }
+
+    .lnms-health #sensors.table > thead > tr > th,
+    .lnms-health #mempool.table > thead > tr > th,
+    .lnms-health #processor.table > thead > tr > th,
+    .lnms-health #storage.table > thead > tr > th,
+    .lnms-health #printer.table > thead > tr > th,
+    .lnms-health .bootgrid-table th {
+        font-size: 11px;
+    }
+}
+
+.dark .lnms-health .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-health .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-health .bootgrid-table td.loading,
+.dark .lnms-health .bootgrid-table td.no-results {
+    background-color: var(--lnms-surface);
+}
+
+.dark .lnms-health .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-health .bootgrid-table.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
 .lnms-btn {
     @apply tw:inline-flex tw:items-center tw:gap-2 tw:rounded-[length:var(--lnms-radius-md)] tw:px-4 tw:py-2 tw:font-normal tw:no-underline;
 }
