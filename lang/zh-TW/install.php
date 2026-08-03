@@ -28,7 +28,7 @@ return [
         'config_not_written' => '無法寫入 config.php',
         'config_written' => '已寫入 config.php 檔案',
         'copied' => '已複製到剪貼簿',
-        'dashboard' => '儀表板',
+        'dashboard' => '資訊看板',
         'env_manual' => '請手動將以下內容更新至 :file',
         'env_not_written' => '無法寫入 .env 檔案',
         'env_written' => '已寫入 .env 檔案',

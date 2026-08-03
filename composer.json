@@ -145,6 +145,22 @@
         "post-root-package-install": "LibreNMS\\ComposerHelper::postRootPackageInstall",
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
+        ],
+        "lint": [
+            "rector",
+            "php-cs-fixer fix"
+        ],
+        "test:lint": [
+            "php-cs-fixer check",
+            "rector --dry-run"
+        ],
+        "test:unit": "phpunit",
+        "test:types": "phpstan",
+        "test:types-new": "run_check() { set -- $(git diff --name-only --diff-filter=A master... -- '*.php'); if [ $# -gt 0 ]; then vendor/bin/phpstan analyse -l 6 \"$@\"; return $?; else echo 'No new PHP files found to analyze.'; return 0; fi; }; run_check",
+        "test": [
+            "@test:unit",
+            "@test:lint",
+            "@test:types"
         ]
     },
     "support": {
