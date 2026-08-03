@@ -1091,6 +1091,335 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     border-radius: 0;
 }
 
+/* Syslog / Graylog / Alertlog / Alertlog-stats: Bootgrid — preserve IDs, data-column-id, AJAX URLs */
+.lnms-dashboard .lnms-widget .lnms-syslog-widget,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .table,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .table,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .table,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-header,
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-footer,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-header,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-footer,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-header,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-footer,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-header,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-header .search .search-field,
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-footer .search .search-field,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-header .search .search-field,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-footer .search .search-field,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-header .search .search-field,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-footer .search .search-field,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-header .search .search-field,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-footer .search .search-field {
+    border-color: var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-header .search .search-field:focus,
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-footer .search .search-field:focus,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-header .search .search-field:focus,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-footer .search .search-field:focus,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-header .search .search-field:focus,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-footer .search .search-field:focus,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-header .search .search-field:focus,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-footer .search .search-field:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 3px var(--lnms-focus-ring);
+}
+
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-table th,
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .table > thead > tr > th,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-table th,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .table > thead > tr > th,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-table th,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .table > thead > tr > th,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-table th,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .table > thead > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-color: var(--lnms-border);
+    font-weight: 500;
+}
+
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-table td,
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .table > tbody > tr > td,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-table td,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .table > tbody > tr > td,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-table td,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .table > tbody > tr > td,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-table td,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .table > tbody > tr > td {
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-table tr:hover td,
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .table-hover > tbody > tr:hover,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-table tr:hover td,
+.lnms-dashboard .lnms-widget .lnms-graylog-widget .table-hover > tbody > tr:hover,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-table tr:hover td,
+.lnms-dashboard .lnms-widget .lnms-alertlog-widget .table-hover > tbody > tr:hover,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-table tr:hover td,
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-dashboard .lnms-widget .lnms-syslog-widget .table-striped > tbody > tr:nth-of-type(even),
+.lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+/* Alert map: label/tile remaps — preserve device alert links */
+.lnms-dashboard .lnms-widget .lnms-alert-map {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alert-map .widget-alert-totals {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alert-map .label {
+    border-radius: var(--lnms-radius-sm);
+    font-weight: 500;
+}
+
+.lnms-dashboard .lnms-widget .lnms-alert-map .label-success {
+    background-color: var(--lnms-status-up) !important;
+    color: #FFFFFF !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-alert-map .label-warning {
+    background-color: var(--lnms-status-warn) !important;
+    color: #FFFFFF !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-alert-map .label-danger {
+    background-color: var(--lnms-status-critical) !important;
+    color: #FFFFFF !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-alert-map .blackbg {
+    background-color: var(--lnms-status-unknown) !important;
+    color: #FFFFFF !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-alert-map .alert-map-compact-ok,
+.lnms-dashboard .lnms-widget .lnms-alert-map .widget-alert-map-compact-ok {
+    background-color: var(--lnms-status-up) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-alert-map .alert-map-compact-warning,
+.lnms-dashboard .lnms-widget .lnms-alert-map .widget-alert-map-compact-warning {
+    background-color: var(--lnms-status-warn) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-alert-map .alert-map-compact-critical,
+.lnms-dashboard .lnms-widget .lnms-alert-map .widget-alert-map-compact-critical {
+    background-color: var(--lnms-status-critical) !important;
+}
+
+/* Component status table */
+.lnms-dashboard .lnms-widget .lnms-component-status {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-component-status .table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-component-status .table > thead > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+    font-weight: 500;
+}
+
+.lnms-dashboard .lnms-widget .lnms-component-status .table > tbody > tr > td {
+    border-top-color: var(--lnms-border);
+    vertical-align: middle;
+}
+
+.lnms-dashboard .lnms-widget .lnms-component-status .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-dashboard .lnms-widget .lnms-component-status .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-component-status .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-component-status .text-success {
+    color: var(--lnms-status-up) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-component-status .text-danger {
+    color: var(--lnms-status-down) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-component-status .grey {
+    color: var(--lnms-status-unknown) !important;
+}
+
+/* Server stats gauges — host chrome; JustGage IDs preserved */
+.lnms-dashboard .lnms-widget .lnms-server-stats {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-server-stats .gauge-title {
+    text-align: center;
+    font-family: var(--lnms-font-sans, system-ui, sans-serif);
+    font-size: var(--lnms-text-sm);
+    font-weight: 600;
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard .lnms-widget .lnms-server-stats .gauge-container {
+    height: 80px;
+    margin-bottom: var(--lnms-space-3, 15px);
+}
+
+/* Health sensors — token surfaces around real graph/device routes */
+.lnms-dashboard .lnms-widget .lnms-health-sensors {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-health-sensors .alert-danger {
+    background-color: color-mix(in srgb, var(--lnms-status-critical) 12%, var(--lnms-surface));
+    border-color: var(--lnms-status-critical);
+    color: var(--lnms-status-critical);
+}
+
+.lnms-dashboard .lnms-widget .lnms-health-sensors .alert-info {
+    background-color: color-mix(in srgb, var(--lnms-accent) 10%, var(--lnms-surface));
+    border-color: var(--lnms-accent);
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard .lnms-widget .lnms-health-sensors a {
+    color: var(--lnms-accent);
+}
+
+.lnms-dashboard .lnms-widget .lnms-health-sensors a:hover,
+.lnms-dashboard .lnms-widget .lnms-health-sensors a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+/* Top errors — same table chrome as top-interfaces */
+.lnms-dashboard .lnms-widget .lnms-top-errors {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-errors .table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-errors .table > thead > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+    font-weight: 500;
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-errors .table > tbody > tr > td {
+    border-top-color: var(--lnms-border);
+    vertical-align: middle;
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-errors .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-errors .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-errors .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-errors a {
+    color: var(--lnms-accent);
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-errors a:hover,
+.lnms-dashboard .lnms-widget .lnms-top-errors a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-errors h4 {
+    margin-top: 0;
+    margin-bottom: var(--lnms-space-2);
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+    font-weight: 500;
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-errors .minigraph-image {
+    border-radius: var(--lnms-radius-sm);
+    vertical-align: middle;
+}
+
+/* Globe / custom-map / generic-image chrome — map IDs + routes preserved */
+.lnms-dashboard .lnms-widget .lnms-globe-widget {
+    border-radius: 0 0 var(--lnms-radius-md) var(--lnms-radius-md);
+    overflow: hidden;
+    background-color: var(--lnms-surface-muted);
+    min-height: 120px;
+}
+
+.lnms-dashboard .lnms-widget .lnms-custom-map {
+    border-radius: 0 0 var(--lnms-radius-md) var(--lnms-radius-md);
+    overflow: hidden;
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-generic-image {
+    display: inline-block;
+    border-radius: var(--lnms-radius-md);
+    overflow: hidden;
+    border: 1px solid var(--lnms-border);
+    background-color: var(--lnms-surface-muted);
+    line-height: 0;
+}
+
+.lnms-dashboard .lnms-widget .lnms-generic-image .dashboard-image {
+    display: block;
+    max-width: 100%;
+}
+
 .dark .lnms-dashboard .lnms-widget .lnms-device-summary .table-striped > tbody > tr:nth-of-type(odd),
 .dark .lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-table td.loading,
 .dark .lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-table td.no-results,
@@ -1099,7 +1428,19 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 .dark .lnms-dashboard .lnms-widget .lnms-eventlog-widget .table-striped > tbody > tr:nth-of-type(odd),
 .dark .lnms-dashboard .lnms-widget .lnms-device-types .table-striped > tbody > tr:nth-of-type(odd),
 .dark .lnms-dashboard .lnms-widget .lnms-top-devices .table-striped > tbody > tr:nth-of-type(odd),
-.dark .lnms-dashboard .lnms-widget .lnms-top-interfaces .table-striped > tbody > tr:nth-of-type(odd) {
+.dark .lnms-dashboard .lnms-widget .lnms-top-interfaces .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-table td.loading,
+.dark .lnms-dashboard .lnms-widget .lnms-syslog-widget .bootgrid-table td.no-results,
+.dark .lnms-dashboard .lnms-widget .lnms-syslog-widget .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-table td.loading,
+.dark .lnms-dashboard .lnms-widget .lnms-graylog-widget .bootgrid-table td.no-results,
+.dark .lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-table td.loading,
+.dark .lnms-dashboard .lnms-widget .lnms-alertlog-widget .bootgrid-table td.no-results,
+.dark .lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-table td.loading,
+.dark .lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .bootgrid-table td.no-results,
+.dark .lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-dashboard .lnms-widget .lnms-component-status .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-dashboard .lnms-widget .lnms-top-errors .table-striped > tbody > tr:nth-of-type(odd) {
     background-color: var(--lnms-surface);
 }
 
