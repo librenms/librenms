@@ -650,9 +650,11 @@
                     <label class="sr-only" for="gsearch">{{ __('Global Search') }}</label>
                     <input class="form-control" type="search" id="gsearch" name="gsearch" autocomplete="off"
                            placeholder="{{ __('Type / to search') }}"
+                           role="combobox"
                            aria-autocomplete="list"
                            aria-controls="global-search-results"
                            :aria-expanded="open ? 'true' : 'false'"
+                           :aria-activedescendant="active ? optionId(active) : ''"
                            aria-haspopup="listbox"
                            x-model="query" x-ref="input"
                            @input.debounce.250ms="run()" @focus="open = flat.length > 0"
@@ -661,21 +663,23 @@
                 <div id="global-search-results" x-show="open" x-cloak
                      class="global-search-dropdown tw:absolute tw:right-0 tw:mt-1 tw:w-[50rem] tw:max-w-[90vw] tw:max-h-[70vh] tw:overflow-y-auto tw:bg-lnms-surface tw:border tw:border-lnms-border tw:rounded-lnms-md tw:shadow-lnms-sm tw:z-50"
                      role="listbox"
+                     :aria-busy="loading ? 'true' : 'false'"
                      aria-label="{{ __('Global Search') }}">
-                    <div x-show="loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-lnms-text-muted">
+                    <div x-show="loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-lnms-text-muted" role="status">
                         <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> {{ __('Searching...') }}
                     </div>
-                    <div x-show="!loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-lnms-text-muted">
+                    <div x-show="!loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-lnms-text-muted" role="status">
                         {{ __('No results') }}
                     </div>
                     <template x-for="group in groups" :key="group.type">
-                        <div>
+                        <div role="group" :aria-label="group.label">
                             <div class="tw:px-4 tw:py-1.5 tw:bg-lnms-surface-muted tw:text-lnms-text-secondary tw:text-xs tw:font-semibold tw:uppercase" x-text="group.label"></div>
                             <template x-for="item in group.results" :key="group.type + item.url">
-                                <a :href="item.url" @mouseenter="active = item.url"
+                                <a :href="item.url" :id="optionId(item.url)" @mouseenter="active = item.url"
                                    class="tw:flex tw:items-center tw:gap-2.5 tw:px-4 tw:py-2 tw:no-underline tw:text-lnms-text tw:hover:bg-lnms-surface-muted"
                                    :class="(active === item.url ? 'tw:bg-lnms-accent-muted ' : '') + (item.status ? 'tw:border-l-5 ' + item.status : '')"
-                                   role="option">
+                                   role="option"
+                                   :aria-selected="active === item.url ? 'true' : 'false'">
                                     <template x-if="item.image">
                                         <img :src="item.image" alt="" class="tw:h-7 tw:w-7 tw:shrink-0 tw:object-contain tw:dark:bg-gray-50 tw:dark:rounded tw:dark:p-0.5">
                                     </template>
@@ -694,7 +698,9 @@
             </div>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">
+                    <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false"
+                       aria-label="{{ __('User') }}">
                         <i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
                         <span class="badge badge-navbar-user count-notif {{ $notification_count ? 'badge-danger' : 'badge-default' }}">{{ $notification_count ?: '' }}</span>
                         <span class="tw:md:hidden tw:2xl:inline-block"><small>{{ Auth::user()->username }}</small></span>
@@ -720,7 +726,9 @@
                 </li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"
-                       style="margin-left:5px"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
+                       style="margin-left:5px"
+                       aria-haspopup="true" aria-expanded="false"
+                       aria-label="{{ __('settings.title') }}"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
                         <span class="visible-xs-inline-block">{{ __('settings.title') }}</span></a>
                     <ul class="dropdown-menu">
                         @canany(['settings.view', 'settings.update'])
@@ -875,6 +883,9 @@
                 route('ajax.search.logs'),
             ]),
             order: ['devices', 'ports', 'sensors', 'wireless', 'storage', 'mempools', 'processors', 'bgp', 'eventlog'],
+            optionId(url) {
+                return 'gsearch-opt-' + String(url).replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 160);
+            },
             run() {
                 let q = this.query.trim();
                 if (q === '') { this.reset(); return; }
@@ -917,12 +928,18 @@
                 let i = this.flat.findIndex(it => it.url === this.active);
                 i = (i + dir + this.flat.length) % this.flat.length;
                 this.active = this.flat[i].url;
+                this.$nextTick(() => {
+                    let el = document.getElementById(this.optionId(this.active));
+                    if (el && typeof el.scrollIntoView === 'function') {
+                        el.scrollIntoView({ block: 'nearest' });
+                    }
+                });
             },
             go() {
                 let url = this.active || (this.flat[0] && this.flat[0].url);
                 if (url) { window.location.href = url; }
             },
-            close() { this.open = false; },
+            close() { this.open = false; this.active = ''; },
             reset() { this.controllers.forEach(c => c.abort()); this.controllers = []; this.groups = []; this.flat = []; this.open = false; this.active = ''; this.loading = false; },
         }));
     });
@@ -972,9 +989,38 @@
         }
     }
 
+    function syncLnmsNavDropdownAria() {
+        document.querySelectorAll('nav.lnms-nav li.dropdown > a.dropdown-toggle').forEach(function (toggle) {
+            if (!toggle.hasAttribute('aria-haspopup')) {
+                toggle.setAttribute('aria-haspopup', 'true');
+            }
+            var open = toggle.parentElement && toggle.parentElement.classList.contains('open');
+            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+        var collapse = document.getElementById('navHeaderCollapse');
+        var collapseToggle = document.querySelector('nav.lnms-nav .navbar-toggle');
+        if (collapse && collapseToggle) {
+            collapseToggle.setAttribute('aria-expanded', collapse.classList.contains('in') ? 'true' : 'false');
+        }
+    }
+
     $(document).ready(function(){
         repositionSearch();
         window.addEventListener('resize', repositionSearch);
+        syncLnmsNavDropdownAria();
+
+        // Keep aria-expanded in sync with Bootstrap .open / collapse without
+        // replacing bootstrap-hover-dropdown behavior (observe class only).
+        var nav = document.querySelector('nav.lnms-nav');
+        if (nav && window.MutationObserver) {
+            var obs = new MutationObserver(function () { syncLnmsNavDropdownAria(); });
+            obs.observe(nav, { attributes: true, attributeFilter: ['class'], subtree: true });
+        }
+        $(document).on(
+            'show.bs.dropdown hide.bs.dropdown shown.bs.dropdown hidden.bs.dropdown show.bs.collapse hide.bs.collapse shown.bs.collapse hidden.bs.collapse',
+            'nav.lnms-nav .dropdown, #navHeaderCollapse',
+            syncLnmsNavDropdownAria
+        );
 
         // Focus Global Search when "/" is pressed (unless typing in a field)
         window.addEventListener("keydown", function (e) {
