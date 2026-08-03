@@ -35,6 +35,8 @@ class OxidizedProvider implements ConfigBackupProvider
     /** Backup id used for the single current config when versioning is disabled. */
     private const CONFIG_ID = 'current';
 
+    private const PER_PAGE = 100;
+
     private ?string $lastError = null;
 
     /** @var array<int, array{node: ?array<string, mixed>, error: ?string}> */
@@ -78,14 +80,19 @@ class OxidizedProvider implements ConfigBackupProvider
         if ($versions === null) {
             return null;
         }
-
-        $backups = $this->mapVersions($versions);
+        // Oxidized has no API-level pagination; simulate it by slicing the full
+        // we do this because the ui has trouble dealing with thousands of backups
+        $allBackups = $this->mapVersions($versions);
+        $total = count($allBackups);
+        $totalPages = $total === 0 ? 1 : (int) ceil($total / self::PER_PAGE);
+        $page = max(0, min($page, $totalPages - 1));
+        $backups = array_slice($allBackups, $page * self::PER_PAGE, self::PER_PAGE);
 
         return [
             'backups' => $backups,
-            'total' => count($backups),
-            'totalPages' => 1,
-            'page' => 0,
+            'total' => $total,
+            'totalPages' => $totalPages,
+            'page' => $page,
         ];
     }
 

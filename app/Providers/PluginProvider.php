@@ -27,11 +27,12 @@
 namespace App\Providers;
 
 use App\Exceptions\PluginDoesNotImplementHookException;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Plugins\PluginManagerInterface;
 
-class PluginProvider extends ServiceProvider
+class PluginProvider extends ServiceProvider implements DeferrableProvider
 {
     public function register(): void
     {
@@ -41,6 +42,13 @@ class PluginProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadLocalPlugins($this->app->make(PluginManagerInterface::class));
+    }
+
+    public function provides(): array
+    {
+        return [
+            PluginManagerInterface::class,
+        ];
     }
 
     /**
