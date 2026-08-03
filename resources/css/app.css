@@ -3862,6 +3862,451 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-surface-muted);
 }
 
+/*
+ * Phase 5 — Billing / bandwidth accounting (presentation only)
+ * Hosts via legacy_page: .lnms-bills (list) / .lnms-bill (detail)
+ * Real features only: quotas, CDR/95th, transfer, periods, ports, usage,
+ * overage, history. Do NOT invent invoices, payments, debt, taxes,
+ * receipts, or suspension-for-nonpayment chrome.
+ * Preserve: #bills-list Bootgrid, #create-bill modal, Bill gates,
+ * optionbar views (quick/accurate/transfer/history/edit/delete/reset),
+ * ajax_table.php id=bills contract.
+ */
+.lnms-bills,
+.lnms-bill {
+    font-family: var(--lnms-font-sans);
+    color: var(--lnms-text);
+}
+
+.lnms-bills .lnms-bills-panel.panel,
+.lnms-bills .panel.panel-default,
+.lnms-bill .panel.panel-default {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    overflow: hidden;
+}
+
+.lnms-bills .panel > .panel-heading,
+.lnms-bill .panel > .panel-heading {
+    background-color: var(--lnms-surface-muted);
+    border-bottom: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-bills .panel > .panel-heading .panel-title,
+.lnms-bill .panel > .panel-heading .panel-title {
+    color: var(--lnms-text);
+}
+
+.lnms-bills .bootgrid-header,
+.lnms-bills .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-bills .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-bills .bootgrid-footer .actionBar .btn-group > .btn,
+.lnms-bills .bootgrid-header .dropdown-toggle,
+.lnms-bills .bootgrid-footer .dropdown-toggle,
+.lnms-bills #table-filters .form-control,
+.lnms-bills #table-filters select.form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-bills #table-filters .form-control:focus,
+.lnms-bills #table-filters select.form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+.lnms-bills .bootgrid-header .dropdown-menu,
+.lnms-bills .bootgrid-footer .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+}
+
+.lnms-bills .bootgrid-header .dropdown-menu > li > a,
+.lnms-bills .bootgrid-footer .dropdown-menu > li > a {
+    color: var(--lnms-text);
+}
+
+.lnms-bills .bootgrid-header .dropdown-menu > li > a:hover,
+.lnms-bills .bootgrid-footer .dropdown-menu > li > a:hover {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-bills #bills-list.table,
+.lnms-bills .bootgrid-table,
+.lnms-bill table.table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-bills #bills-list.table > thead > tr > th,
+.lnms-bills .bootgrid-table th,
+.lnms-bill table.table > thead > tr > th,
+.lnms-bill table.table > tbody > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+}
+
+.lnms-bills #bills-list.table > tbody > tr > td,
+.lnms-bills .bootgrid-table td,
+.lnms-bill table.table > tbody > tr > td {
+    border-top-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-bills .table-hover > tbody > tr:hover,
+.lnms-bills .bootgrid-table.table-hover > tbody > tr:hover,
+.lnms-bill .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-bills .bootgrid-table td.loading,
+.lnms-bills .bootgrid-table td.no-results {
+    color: var(--lnms-text-muted);
+    background-color: var(--lnms-surface) !important;
+}
+
+.lnms-bills .pagination > li > a,
+.lnms-bills .pagination > li > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-bills .pagination > li > a:hover,
+.lnms-bills .pagination > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+}
+
+.lnms-bills .pagination > .active > a,
+.lnms-bills .pagination > .active > span {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-bills h2,
+.lnms-bill h2,
+.lnms-bill h3 {
+    color: var(--lnms-text);
+    font-family: var(--lnms-font-sans);
+}
+
+.lnms-bill .well,
+.lnms-bill .optionbar,
+.lnms-bill [class*="optionbar"] {
+    color: var(--lnms-text);
+}
+
+.lnms-bill .pagemenu-selected {
+    color: var(--lnms-accent);
+    font-weight: 600;
+}
+
+.lnms-bill .list-group-item {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-bill .list-group-item:hover {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-bills .btn-default,
+.lnms-bill .btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-bills .btn-default:hover,
+.lnms-bills .btn-default:focus,
+.lnms-bill .btn-default:hover,
+.lnms-bill .btn-default:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+    color: var(--lnms-text);
+}
+
+.lnms-bills .form-control,
+.lnms-bill .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-bills .form-control:focus,
+.lnms-bill .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+.lnms-bills a,
+.lnms-bill a {
+    color: var(--lnms-accent);
+}
+
+.lnms-bills a:hover,
+.lnms-bills a:focus,
+.lnms-bill a:hover,
+.lnms-bill a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+/* Modal chrome only — preserve #create-bill ID and create Bill gate */
+.lnms-shell #create-bill .modal-content {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-shell #create-bill .modal-header,
+.lnms-shell #create-bill .modal-footer {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border);
+}
+
+.lnms-shell #create-bill .modal-title {
+    color: var(--lnms-text);
+}
+
+.lnms-shell #create-bill .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.dark .lnms-bills .bootgrid-table td.loading,
+.dark .lnms-bills .bootgrid-table td.no-results {
+    background-color: var(--lnms-surface) !important;
+}
+
+.dark .lnms-bills .table-hover > tbody > tr:hover,
+.dark .lnms-bill .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+/*
+ * Phase 5 — Users / Roles (presentation only)
+ * Blade hosts: .lnms-users / .lnms-users-permissions / .lnms-roles
+ * Preserve: #users Bootgrid, UserController policies, Spatie roles,
+ * permissions attach/detach routes, role CRUD forms, 2FA AJAX.
+ */
+.lnms-users,
+.lnms-users-permissions,
+.lnms-roles {
+    font-family: var(--lnms-font-sans);
+    color: var(--lnms-text);
+}
+
+.lnms-users .panel,
+.lnms-users-permissions .panel,
+.lnms-roles .panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    color: var(--lnms-text);
+}
+
+.lnms-users .panel-heading,
+.lnms-users .panel-title,
+.lnms-users-permissions .panel-heading,
+.lnms-users-permissions .panel-title,
+.lnms-roles .panel-heading,
+.lnms-roles .panel-title {
+    background-color: var(--lnms-surface-muted);
+    border-bottom-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-users .bootgrid-header,
+.lnms-users .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-users .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-users .bootgrid-footer .actionBar .btn-group > .btn {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-users #users.table,
+.lnms-users .bootgrid-table,
+.lnms-users-permissions table.table,
+.lnms-roles table.table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-users #users.table > thead > tr > th,
+.lnms-users .bootgrid-table th,
+.lnms-users-permissions table.table > thead > tr > th,
+.lnms-users-permissions table.table > tbody > tr > th,
+.lnms-roles table.table > thead > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+    border-color: var(--lnms-border);
+}
+
+.lnms-users #users.table > tbody > tr > td,
+.lnms-users .bootgrid-table td,
+.lnms-users-permissions table.table > tbody > tr > td,
+.lnms-roles table.table > tbody > tr > td {
+    border-top-color: var(--lnms-border);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-users .table-hover > tbody > tr:hover,
+.lnms-users .bootgrid-table.table-hover > tbody > tr:hover,
+.lnms-users-permissions .table-hover > tbody > tr:hover,
+.lnms-roles .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-users .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-users-permissions .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-users .table-striped > tbody > tr:nth-of-type(even),
+.lnms-users-permissions .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-users .pagination > li > a,
+.lnms-users .pagination > li > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-users .pagination > li > a:hover,
+.lnms-users .pagination > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+}
+
+.lnms-users .pagination > .active > a,
+.lnms-users .pagination > .active > span {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-users legend,
+.lnms-users-permissions h4,
+.lnms-roles legend {
+    color: var(--lnms-text);
+    border-bottom-color: var(--lnms-border);
+}
+
+.lnms-users .form-control,
+.lnms-users-permissions .form-control,
+.lnms-roles .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-users .form-control:focus,
+.lnms-users-permissions .form-control:focus,
+.lnms-roles .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+.lnms-users .control-label,
+.lnms-users-permissions .control-label,
+.lnms-roles .control-label,
+.lnms-users .help-block,
+.lnms-roles .help-block {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-users .btn-primary,
+.lnms-users-permissions .btn-primary,
+.lnms-roles .btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-users .btn-primary:hover,
+.lnms-users .btn-primary:focus,
+.lnms-users-permissions .btn-primary:hover,
+.lnms-users-permissions .btn-primary:focus,
+.lnms-roles .btn-primary:hover,
+.lnms-roles .btn-primary:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+    color: #fff;
+}
+
+.lnms-users .btn-default,
+.lnms-users-permissions .btn-default,
+.lnms-roles .btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-users .btn-default:hover,
+.lnms-users .btn-default:focus,
+.lnms-users-permissions .btn-default:hover,
+.lnms-users-permissions .btn-default:focus,
+.lnms-roles .btn-default:hover,
+.lnms-roles .btn-default:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+    color: var(--lnms-text);
+}
+
+.lnms-users a,
+.lnms-users-permissions a,
+.lnms-roles a {
+    color: var(--lnms-accent);
+}
+
+.lnms-users a:hover,
+.lnms-users a:focus,
+.lnms-users-permissions a:hover,
+.lnms-users-permissions a:focus,
+.lnms-roles a:hover,
+.lnms-roles a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-users .label-info,
+.lnms-roles .label-info {
+    background-color: var(--lnms-accent-muted);
+    color: var(--lnms-accent-hover);
+}
+
+.dark .lnms-users .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-users-permissions .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.dark .lnms-users .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-users-permissions .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
 .lnms-btn {
     @apply tw:inline-flex tw:items-center tw:gap-2 tw:rounded-[length:var(--lnms-radius-md)] tw:px-4 tw:py-2 tw:font-normal tw:no-underline;
 }
