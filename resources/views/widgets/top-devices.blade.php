@@ -1,3 +1,4 @@
+<div class="lnms-top-devices">
 @if($rows->isNotEmpty())
 <div class="table-responsive">
     <table class="table table-hover table-condensed table-striped bootgrid-table">
@@ -23,3 +24,4 @@
 @else
     <h4>{{ __('No devices found within interval.') }}</h4>
 @endif
+</div>

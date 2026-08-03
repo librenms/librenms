@@ -1,4 +1,4 @@
-<x-panel class="table-responsive tw:mb-0!">
+<x-panel class="table-responsive lnms-device-summary">
     <x-slot name="table">
         <table class="table table-hover table-condensed table-striped">
             <thead>

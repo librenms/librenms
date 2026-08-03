@@ -1,3 +1,4 @@
+<div class="lnms-top-interfaces">
 <h4>Top {{ $interface_count }} interfaces polled within {{ $time_interval }} minutes</h4>
 <div class="table-responsive">
     <table class="table table-hover table-condensed table-striped bootgrid-table">
@@ -18,4 +19,5 @@
         @endforeach
         </tbody>
     </table>
+</div>
 </div>

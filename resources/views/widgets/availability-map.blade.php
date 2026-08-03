@@ -1,3 +1,4 @@
+<div class="lnms-availability-map">
 @if($show_totals)
 @if($device_totals)
 <div class="widget-availability-host">
@@ -46,3 +47,4 @@
         @endif
     </a>
 @endforeach
+</div>
