@@ -3,18 +3,18 @@
 @section('title', __('Ports'))
 
 @section('content')
-    <div class="container-fluid">
-        <x-panel>
+    <div class="container-fluid lnms-ports">
+        <x-panel class="lnms-ports-panel">
             <x-slot name="heading">
-                <div class="tw:flex tw:justify-between">
-                    <div class="tw:min-h-8">
+                <div class="lnms-ports-toolbar tw:flex tw:justify-between tw:flex-wrap tw:gap-2">
+                    <div class="lnms-ports-nav tw:min-h-8">
                         <x-option-bar :options="$nav" name="{{ __('Ports') }}" :selected="$view" linkClass="sync-filter-url" border="none" class="tw:inline-block tw:p-1"></x-option-bar>
                         <x-option-bar :options="$graphNav" name="{{ __('Graphs') }}" :selected="$graph" linkClass="sync-filter-url" border="none" class="tw:inline-block tw:p-1"></x-option-bar>
-                        <span id="group-graph-link" x-data="{ group: @js($group) }"  x-show="group" x-init="window.addEventListener('filter:apply', (e) => $data.group = e.detail.filters['groups.id']?.eq);">
+                        <span id="group-graph-link" class="lnms-ports-group-link" x-data="{ group: @js($group) }"  x-show="group" x-init="window.addEventListener('filter:apply', (e) => $data.group = e.detail.filters['groups.id']?.eq);">
                             | <a :href="'{{ route('portgroup.graph', [":group"]) }}'.replace(':group', group)" title="{{ __('port.groups.graph') }}">{{ __('port.groups.combined') }}</a>
                         </span>
                     </div>
-                    <div class="btn-group pull-right" role="group">
+                    <div class="btn-group pull-right lnms-ports-menu" role="group">
                         <div class="btn-group" role="group" x-data="portPurge()">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fa fa-ellipsis-v fa-lg fa-fw icon-theme"></i>
