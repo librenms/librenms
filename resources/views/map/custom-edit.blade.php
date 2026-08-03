@@ -3,6 +3,7 @@
 @section('title', __('map.custom.title.edit'))
 
 @section('content')
+<div class="lnms-maps lnms-maps-custom-edit">
 
 @include('map.custom-background-modal')
 @include('map.custom-node-modal')
@@ -56,6 +57,7 @@
             />
     </div>
   </div>
+</div>
 </div>
 @endsection
 

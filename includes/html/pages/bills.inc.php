@@ -92,7 +92,7 @@ echo "<meta http-equiv='refresh' content='10000'>";
 
 include 'includes/html/modal/new_bill.inc.php';
 ?>
-<div class="panel panel-default panel-condensed">
+<div class="panel panel-default panel-condensed lnms-bills-panel">
     <div class="table-responsive">
         <table class="table table-hover" id="bills-list">
         <thead>

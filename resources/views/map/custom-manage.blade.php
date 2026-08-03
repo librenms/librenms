@@ -3,7 +3,7 @@
 @section('title', __('map.custom.title.manage'))
 
 @section('content')
-<div class="tw:px-3 tw:sm:px-6 tw:mx-auto">
+<div class="tw:px-3 tw:sm:px-6 tw:mx-auto lnms-maps lnms-maps-custom lnms-maps-custom-manage">
     @include('map.custom-map-modal')
     @include('map.custom-map-delete-modal')
     @include('map.custom-map-clone-modal')

@@ -3,7 +3,7 @@
 @section('title', __('Availability Map'))
 
 @section('content')
-    <div class="container-fluid">
+    <div class="container-fluid lnms-maps lnms-maps-availability">
         <div class="row">
             <div class="col-md-12">
                 <div class="page-availability-title-left">

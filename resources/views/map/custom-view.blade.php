@@ -3,7 +3,7 @@
 @section('title', __('map.custom.title.view', ['name' => $name]))
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid lnms-maps lnms-maps-custom-view">
   <div class="row" id="alert-row">
     <div class="col-md-12">
       <div class="alert alert-warning" role="alert" id="alert">{{ __('map.custom.view.loading') }}</div>

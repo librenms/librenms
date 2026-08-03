@@ -24,7 +24,7 @@ if ($device_id = (int) Request::input('device')) {
 $pagetitle[] = 'Eventlog';
 ?>
 
-<div class="panel panel-default panel-condensed">
+<div class="panel panel-default panel-condensed lnms-eventlog-panel">
     <div class="panel-heading">
         <strong>Eventlog</strong>
     </div>

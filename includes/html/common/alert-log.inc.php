@@ -41,7 +41,7 @@ if (Gate::allows('alert.detail')) {
     $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
 }
 
-$common_output[] = '<div class="panel panel-default panel-condensed">
+$common_output[] = '<div class="panel panel-default panel-condensed lnms-alert-log-panel">
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-md-2">

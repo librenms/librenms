@@ -17,7 +17,7 @@ $no_refresh = true;
 $page_title = 'Alerts';
 ?>
 
-<div class="panel panel-default panel-condensed">
+<div class="panel panel-default panel-condensed lnms-alerts-panel">
     <div class="panel-heading">
         <strong>Alerts</strong>
     </div>

@@ -3,15 +3,15 @@
 @section('title', __('Authlog'))
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid lnms-authlog">
 
 
-<x-panel id="manage-authlog-panel">
+<x-panel id="manage-authlog-panel" class="lnms-authlog-panel">
     <x-slot name="title">
         <i class="fa fa-user-circle-o fa-fw fa-lg" aria-hidden="true"></i> {{ __('Authlog') }}
     </x-slot>
 
-    <div class="table-responsive">
+    <div class="table-responsive lnms-authlog-list">
         <table id="authlog" class="table table-hover table-condensed table-striped" style="display: none;">
             <thead>
             <tr>
@@ -34,6 +34,7 @@
         </table>
     </div>
 </x-panel>
+</div>
 @endsection
 
 @section('scripts')

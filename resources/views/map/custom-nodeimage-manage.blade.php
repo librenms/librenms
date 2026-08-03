@@ -3,7 +3,7 @@
 @section('title', __('map.custom.nodeimage.title.manage'))
 
 @section('content')
-<div class="tw:px-3 tw:sm:px-6 tw:mx-auto">
+<div class="tw:px-3 tw:sm:px-6 tw:mx-auto lnms-maps lnms-maps-nodeimage">
     @include('map.custom-nodeimage-modal')
     @include('map.custom-nodeimage-delete-modal')
     <x-panel id="manage-custom-nodeimages" class="tw:mx-auto tw:max-w-(--breakpoint-lg)">

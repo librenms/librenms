@@ -28,7 +28,7 @@ if (isset($vars['action']) && $vars['action'] == 'expunge' && Gate::allows('sysl
 
 $pagetitle[] = 'Syslog';
 ?>
-<div class="panel panel-default panel-condensed">
+<div class="panel panel-default panel-condensed lnms-syslog-panel">
     <div class="panel-heading">
         <strong>Syslog</strong>
     </div>

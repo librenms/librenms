@@ -3,6 +3,7 @@
 @section('title', __('Geographical Map'))
 
 @section('content')
+<div class="lnms-maps lnms-maps-geo">
 
 @if($map_engine != 'leaflet')
 
@@ -33,6 +34,7 @@ Only leaflet map engine is currently supported
 
 @endif
 
+</div>
 @endsection
 
 @section('css')

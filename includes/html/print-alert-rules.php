@@ -36,6 +36,7 @@ if (Gate::denies('viewAny', AlertRule::class)) {
 $no_refresh = true;
 
 ?>
+<div class="lnms-alert-rules-inner">
 <div class="row">
     <div class="col-sm-12">
         <span id="message"></span>
@@ -513,6 +514,7 @@ if ($count < 1) {
         </div>
         </div>';
 }
+echo '</div>'; // .lnms-alert-rules-inner
 ?>
 <script>
 $("[data-toggle='modal'], [data-toggle='popover']").popover({
