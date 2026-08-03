@@ -3,13 +3,13 @@
 @section('title', __('Manage Users'))
 
 @section('content')
-<div class="container-fluid">
-    <x-panel>
+<div class="container-fluid lnms-users">
+    <x-panel class="lnms-users-panel">
         <x-slot name="title">
             <i class="fa fa-user-circle-o fa-fw fa-lg" aria-hidden="true"></i> {{ __('Manage Users') }}
         </x-slot>
 
-        <div class="table-responsive">
+        <div class="table-responsive lnms-users-list">
             <table id="users" class="table table-bordered table-condensed">
                 <thead>
                 <tr>

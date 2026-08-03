@@ -3,13 +3,13 @@
 @section('title', __('permissions.rbac.title'))
 
 @section('content')
-    <div class="container">
+    <div class="container lnms-roles">
         <div class="alert alert-warning">
             <i class="fas fa-exclamation-triangle tw:mr-2"></i>
             <strong>{{ __('permissions.rbac.beta_warning_title') }}:</strong>
             {{ __('permissions.rbac.beta_warning_message') }}
         </div>
-        <x-panel>
+        <x-panel class="lnms-roles-panel">
             <x-slot name="title">
                 <i class="fas fa-shield-halved fa-fw fa-lg" aria-hidden="true"></i> {{ __('permissions.rbac.title') }}
             </x-slot>
