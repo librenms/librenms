@@ -1,3 +1,4 @@
+<div class="lnms-health-sensors">
 @if (!empty($error))
     <div class="alert alert-danger">{{ $error }}</div>
 @elseif ($sensors->isEmpty())
@@ -123,3 +124,4 @@
         </script>
     @endif
 @endif
+</div>

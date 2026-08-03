@@ -1,3 +1,4 @@
+<div class="lnms-server-stats">
 <div class="col-sm-{{ $columns }}">
     <div class="gauge-title">{{ __('CPU Usage') }}</div>
     <div
@@ -44,15 +45,4 @@
         });
     });
 </script>
-
-<style>
-    .gauge-title {
-        text-align:center;
-        font-family: Arial, sans-serif; font-size: 0.8em; font-weight: bold;
-        color:#999999;
-    }
-    .gauge-container {
-        height: 80px;
-        margin-bottom: 15px;
-    }
-</style>
+</div>

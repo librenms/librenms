@@ -16,7 +16,7 @@
     }
 </style>
 
-<div id="map-container-{{ $id }}" style="width: 100%; height: 100%">
+<div id="map-container-{{ $id }}" class="lnms-custom-map" style="width: 100%; height: 100%">
   <div id="custom-map-{{ $id }}" style="width: 99%; height: 99%"></div>
   <x-geo-map id="custom-map-bg-geo-map-{{ $id }}"
     :init="$map->background_type == 'map'"

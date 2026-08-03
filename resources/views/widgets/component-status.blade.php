@@ -1,4 +1,4 @@
-<div>
+<div class="lnms-component-status">
     <table id="component-status" class="table table-hover table-condensed table-striped">
         <thead>
         <tr>
