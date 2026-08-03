@@ -464,13 +464,12 @@ final class AuthSSOTest extends DBTestCase
         LibrenmsConfig::set('sso.group_level_map', ['librenms-admins' => ['roles' => ['admin']], 'librenms-readers' => ['roles' => ['global-read']], 'librenms-billingcontacts' => ['roles' => ['billing-contact']], 'confluence-admins' => ['roles' => ['confluence-admin']]]);
         $this->assertSame(['confluence-admin'], $a->authSSOParseGroups());
 
-        // Test group filtering by empty regex
+        // Empty or null regex should behave as no filter and process the full group list.
         LibrenmsConfig::set('sso.group_filter', '');
-        $this->assertSame(['admin'], $a->authSSOParseGroups());
+        $this->assertSame(['admin', 'global-read', 'billing-contact', 'confluence-admin'], $a->authSSOParseGroups());
 
-        // Test group filtering by null regex
         LibrenmsConfig::set('sso.group_filter', null);
-        $this->assertSame(['admin'], $a->authSSOParseGroups());
+        $this->assertSame(['admin', 'global-read', 'billing-contact', 'confluence-admin'], $a->authSSOParseGroups());
     }
 
     protected function tearDown(): void

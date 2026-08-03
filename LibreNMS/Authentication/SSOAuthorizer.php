@@ -191,7 +191,8 @@ class SSOAuthorizer extends MysqlAuthorizer
      *     'NSS' => ['roles' => ['admin']]
      *
      * Legacy integer mappings are also supported and converted to role names.
-     * If no group matches, sso.static_level (default 0) is used as a fallback.
+     * If no group matches, configured static roles are used when available;
+     * otherwise sso.static_level (default 0) is used as a fallback.
      *
      * @return array<string>
      */
@@ -204,13 +205,18 @@ class SSOAuthorizer extends MysqlAuthorizer
         );
         $groups = array_values(array_filter(array_map(trim(...), $groups), static fn ($group) => $group !== ''));
 
-        // Only consider groups that match the filter expression - this is an optimisation for sites with thousands of groups.
+        // Only consider groups that match the filter expression when one is configured.
+        // Empty or null filters should behave as "no filter", so the full group list is evaluated.
         $group_filter = LibrenmsConfig::get('sso.group_filter');
-        if ($group_filter) {
+        if (is_string($group_filter) && $group_filter !== '') {
             $groups = array_values(array_filter($groups, static fn ($group) => preg_match($group_filter, (string) $group) === 1));
         }
 
         $config_map = LibrenmsConfig::get('sso.group_level_map', []);
+        if (! is_array($config_map)) {
+            $config_map = [];
+        }
+
         $roles = [];
 
         foreach ($groups as $group) {
@@ -230,9 +236,14 @@ class SSOAuthorizer extends MysqlAuthorizer
 
         // Preserve the previous static-level fallback when no configured group matches.
         if ($roles === []) {
-            $static_role = LegacyAuthLevel::tryFrom((int) LibrenmsConfig::get('sso.static_level', 0))?->getName();
-            if ($static_role !== null) {
-                $roles[] = $static_role;
+            $static_roles = LibrenmsConfig::get('sso.static_roles');
+            if (is_array($static_roles)) {
+                $roles = array_values(array_filter($static_roles, static fn ($role) => is_string($role) && $role !== ''));
+            } else {
+                $static_role = LegacyAuthLevel::tryFrom((int) LibrenmsConfig::get('sso.static_level', 0))?->getName();
+                if ($static_role !== null) {
+                    $roles[] = $static_role;
+                }
             }
         }
 
