@@ -44,11 +44,8 @@ class ApiToken extends BaseModel
 
     /**
      * Check if the given token is valid
-     *
-     * @param  string  $token
-     * @return bool
      */
-    public static function isValid($token, $user_id = null)
+    public static function isValid(string $token, ?int $user_id = null): bool
     {
         $query = self::query()->isEnabled()->where('token_hash', $token);
 
