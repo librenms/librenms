@@ -19,14 +19,14 @@
     @foreach($mempools as $index => $mem)
         <div class="tw:text-center">
             <div id="gauge-mem-{{ $id }}-{{ $index }}" class="gauge-container"></div>
-            <div class="gauge-title">{{ $mem->descr }}</div>
+            <div class="gauge-title">{{ $mem['descr'] }}</div>
         </div>
     @endforeach
 
     @foreach($disks as $index => $disk)
         <div class="tw:text-center">
             <div id="gauge-disk-{{ $id }}-{{ $index }}" class="gauge-container"></div>
-            <div class="gauge-title">{{ $disk->descr }}</div>
+            <div class="gauge-title">{{ $disk['descr'] }}</div>
         </div>
     @endforeach
 </div>
@@ -47,11 +47,11 @@
         @foreach($mempools as $index => $mem)
         new JustGage({
             id: "gauge-mem-{{ $id }}-{{ $index }}",
-            title: "{!! addslashes($mem->descr) !!}",
-            value: {{ (float) $mem->used }},
+            title: "{!! addslashes($mem['descr']) !!}",
+            value: {{ (float) $mem['used'] }},
             min: 0,
-            max: {{ (float) ($mem->total > 0 ? $mem->total : 100) }},
-            label: "{{ $mem->unit }}",
+            max: {{ (float) ($mem['total'] > 0 ? $mem['total'] : 100) }},
+            label: "{{ $mem['unit'] }}",
             valueFontSize: '15px',
             labelMinFontSize: '10px'
         });
@@ -60,11 +60,11 @@
         @foreach($disks as $index => $disk)
         new JustGage({
             id: "gauge-disk-{{ $id }}-{{ $index }}",
-            title: "{!! addslashes($disk->descr) !!}",
-            value: {{ (float) $disk->used }},
+            title: "{!! addslashes($disk['descr']) !!}",
+            value: {{ (float) $disk['used'] }},
             min: 0,
-            max: {{ (float) ($disk->total > 0 ? $disk->total : 100) }},
-            label: "{{ $disk->unit }}",
+            max: {{ (float) ($disk['total'] > 0 ? $disk['total'] : 100) }},
+            label: "{{ $disk['unit'] }}",
             valueFontSize: '15px',
             labelMinFontSize: '10px'
         });

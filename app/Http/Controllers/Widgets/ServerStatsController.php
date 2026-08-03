@@ -27,6 +27,8 @@
 namespace App\Http\Controllers\Widgets;
 
 use App\Models\Device;
+use App\Models\Mempool;
+use App\Models\Storage;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use LibreNMS\Util\Number;
@@ -72,11 +74,11 @@ class ServerStatsController extends WidgetController
 
             $data['mempools'] = $device->mempools()
                 ->get(['mempool_descr', 'mempool_used', 'mempool_total'])
-                ->map(fn ($m) => $this->formatUsage($m->mempool_descr ?? 'Memory', (float) $m->mempool_used, (float) $m->mempool_total));
+                ->map(fn (Mempool $m) => $this->formatUsage($m->mempool_descr ?? 'Memory', (float) $m->mempool_used, (float) $m->mempool_total));
 
             $data['disks'] = $device->storage()
                 ->get(['storage_descr', 'storage_used', 'storage_size'])
-                ->map(fn ($d) => $this->formatUsage($d->storage_descr ?? 'Storage', (float) $d->storage_used, (float) $d->storage_size));
+                ->map(fn (Storage $d) => $this->formatUsage($d->storage_descr ?? 'Storage', (float) $d->storage_used, (float) $d->storage_size));
         }
 
         return view('widgets.server-stats', $data);
@@ -98,7 +100,10 @@ class ServerStatsController extends WidgetController
         return $settings;
     }
 
-    private function formatUsage(string $descr, float $used, float $total): object
+    /**
+     * @return array{descr: string, used: float, total: float, unit: string}
+     */
+    private function formatUsage(string $descr, float $used, float $total): array
     {
         $formatted = Number::formatSi(max($total, 1), 2, 0, 'B');
         $parts = explode(' ', trim($formatted));
@@ -114,11 +119,11 @@ class ServerStatsController extends WidgetController
             default => 1,
         };
 
-        return (object) [
+        return [
             'descr' => $descr,
-            'used'  => round($used / $factor, 2),
+            'used' => round($used / $factor, 2),
             'total' => round($total / $factor, 2),
-            'unit'  => $unit,
+            'unit' => $unit,
         ];
     }
 }
