@@ -25,9 +25,20 @@
             <option value="12" @if($columnsize == 12) selected @endif>12</option>
         </select>
     </div>
+
+    <div class="form-group">
+        <label for="gauges-{{ $id }}" class="control-label">{{ __('widgets.server-stats.hidden_gauges') }}</label>
+        <select class="form-control" name="gauges[]" id="gauges-{{ $id }}" multiple data-placeholder="{{ __('widgets.server-stats.select_gauges') }}">
+            @foreach($gaugeOptions as $key => $description)
+                <option value="{{ $key }}" @selected(in_array($key, (array) $gauges, true))>{{ $description }}</option>
+            @endforeach
+        </select>
+        <span class="help-block">{{ __('widgets.server-stats.hidden_gauges_help') }}</span>
+    </div>
 @endsection
 @section('javascript')
     <script type="text/javascript">
         init_select2('#device-{{ $id }}', 'device', {}, @json($device ? ['id' => $device->device_id, 'text' => $device->displayName()] : ''));
+        $('#gauges-{{ $id }}').select2({width: '100%'});
     </script>
 @endsection
