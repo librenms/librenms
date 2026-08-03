@@ -14,8 +14,8 @@ return [
 
     'config-backup' => [
         'title' => 'Config Backup',
-        'showConfig' => ['label' => 'Show Device Config', 'description' => 'View device configuration backups'],
-        'refreshConfig' => ['label' => 'Refresh Device Config', 'description' => 'Trigger an on-demand device configuration backup'],
+        'show' => ['label' => 'Show Device Config', 'description' => 'View device configuration backups'],
+        'refresh' => ['label' => 'Refresh Device Config', 'description' => 'Trigger an on-demand device configuration backup'],
     ],
 
     'alert' => [

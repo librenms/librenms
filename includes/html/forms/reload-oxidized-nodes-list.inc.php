@@ -11,7 +11,7 @@
  * the source code distribution for details.
  */
 
-if (Gate::denies('config-backup.refreshConfig')) {
+if (Gate::denies('config-backup.refresh')) {
     $status = 'error';
     $message = 'ERROR: You need permission to reload Oxidized node list';
 } else {

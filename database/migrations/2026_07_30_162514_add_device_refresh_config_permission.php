@@ -8,8 +8,8 @@ return new class extends Migration
 {
     /** @var array<string, string> old permission name => new permission name */
     private array $moves = [
-        'oxidized.refresh' => 'config-backup.refreshConfig',
-        'device.showConfig' => 'config-backup.showConfig',
+        'oxidized.refresh' => 'config-backup.refresh',
+        'device.showConfig' => 'config-backup.show',
     ];
 
     /**
