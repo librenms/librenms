@@ -3,7 +3,8 @@
 @section('title', __('Port Groups'))
 
 @section('content')
-    <div class="container-fluid">
+    {{-- Phase 5 host: .lnms-port-groups — PortGroup policy @can / destroy AJAX / #manage-port-groups-table preserved --}}
+    <div class="container-fluid lnms-port-groups">
         <x-panel id="manage-port-groups-panel">
             <x-slot name="title">
                 <i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Port Groups') }}

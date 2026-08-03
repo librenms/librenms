@@ -3,6 +3,8 @@
 @section('title', __('About'))
 
 @section('content')
+{{-- Phase 5 host: .lnms-about — AboutController routes / reporting @can / clear-reporting preserved --}}
+<div class="lnms-about">
 <div class="modal fade" id="git_log" tabindex="-1" role="dialog" aria-labelledby="git_log_label" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -202,6 +204,7 @@ along with this program.  If not, see <a target="_blank" href="https://www.gnu.o
 
         </div>
     </div>
+</div>
 </div>
 @endsection
 

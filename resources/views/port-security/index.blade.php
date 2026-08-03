@@ -3,7 +3,8 @@
 @section('title', __('Port Security'))
 
 @section('content')
-<div class="container-fluid">
+{{-- Phase 5 host: .lnms-port-security — filter / export / pagination preserved --}}
+<div class="container-fluid lnms-port-security">
     <div class="tw:flex tw:items-center tw:justify-between tw:pb-4 tw:gap-4">
         <div class="tw:flex-1">
             <x-filter name="port-security" :fields="$filterFields" :initial="$filter" :reload="true"/>

@@ -1592,7 +1592,15 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 .lnms-validate,
 .lnms-nac,
 .lnms-ssl-certificates,
-.lnms-oui-lookup {
+.lnms-oui-lookup,
+.lnms-about,
+.lnms-port-groups,
+.lnms-port-security,
+.lnms-search,
+.lnms-notifications,
+.lnms-customers,
+.lnms-peering,
+.lnms-oxidized {
     font-family: var(--lnms-font-sans);
     color: var(--lnms-text);
 }
@@ -5144,6 +5152,286 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 
 .dark .lnms-nac .table-striped > tbody > tr:nth-of-type(even),
 .dark .lnms-ssl-certificates .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+/* Phase 5: About / port-groups / port-security / search / notifications / customers / peering / oxidized */
+.lnms-about .table,
+.lnms-port-groups .table,
+.lnms-port-security .table,
+.lnms-search .table,
+.lnms-notifications .table,
+.lnms-customers .table,
+.lnms-customers .bootgrid-table,
+.lnms-peering .table,
+.lnms-oxidized .table,
+.lnms-oxidized .bootgrid-table {
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-about .table > thead > tr > th,
+.lnms-about .table > tbody > tr > th,
+.lnms-about .table > tbody > tr > td,
+.lnms-port-groups .table > thead > tr > th,
+.lnms-port-groups .table > tbody > tr > td,
+.lnms-port-security .table > thead > tr > th,
+.lnms-port-security .table > tbody > tr > td,
+.lnms-search .table > thead > tr > th,
+.lnms-search .table > tbody > tr > td,
+.lnms-notifications .table > thead > tr > th,
+.lnms-notifications .table > tbody > tr > td,
+.lnms-customers .table > thead > tr > th,
+.lnms-customers .bootgrid-table th,
+.lnms-customers .table > tbody > tr > td,
+.lnms-customers .bootgrid-table td,
+.lnms-peering .table > thead > tr > th,
+.lnms-peering .table > tbody > tr > td,
+.lnms-oxidized .table > thead > tr > th,
+.lnms-oxidized .bootgrid-table th,
+.lnms-oxidized .table > tbody > tr > td,
+.lnms-oxidized .bootgrid-table td {
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-about .table > thead > tr > th,
+.lnms-port-groups .table > thead > tr > th,
+.lnms-port-security .table > thead > tr > th,
+.lnms-search .table > thead > tr > th,
+.lnms-notifications .table > thead > tr > th,
+.lnms-customers .table > thead > tr > th,
+.lnms-customers .bootgrid-table th,
+.lnms-peering .table > thead > tr > th,
+.lnms-oxidized .table > thead > tr > th,
+.lnms-oxidized .bootgrid-table th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-about .table-hover > tbody > tr:hover,
+.lnms-port-groups .table-hover > tbody > tr:hover,
+.lnms-port-security .table-hover > tbody > tr:hover,
+.lnms-search .table-hover > tbody > tr:hover,
+.lnms-notifications .table-hover > tbody > tr:hover,
+.lnms-customers .table-hover > tbody > tr:hover,
+.lnms-customers .bootgrid-table.table-hover > tbody > tr:hover,
+.lnms-peering .table-hover > tbody > tr:hover,
+.lnms-oxidized .table-hover > tbody > tr:hover,
+.lnms-oxidized .bootgrid-table.table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-port-groups .panel,
+.lnms-notifications .panel,
+.lnms-peering .panel,
+.lnms-oxidized .panel,
+.lnms-oxidized .panel.with-nav-tabs {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    color: var(--lnms-text);
+    box-shadow: none;
+}
+
+.lnms-port-groups .panel-heading,
+.lnms-port-groups .panel-title,
+.lnms-notifications .panel-heading,
+.lnms-peering .panel-heading,
+.lnms-oxidized .panel-heading {
+    background-color: var(--lnms-surface-muted);
+    border-bottom-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-port-groups .panel-body,
+.lnms-notifications .panel-body,
+.lnms-peering .panel-body,
+.lnms-oxidized .panel-body {
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+}
+
+.lnms-about .modal-content,
+.lnms-notifications .modal-content {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    border-radius: var(--lnms-radius-md);
+}
+
+.lnms-about .modal-header,
+.lnms-about .modal-footer,
+.lnms-notifications .modal-header,
+.lnms-notifications .modal-footer {
+    border-color: var(--lnms-border);
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-about .modal-title,
+.lnms-about h3,
+.lnms-about p,
+.lnms-notifications h1,
+.lnms-notifications h4,
+.lnms-oxidized h2,
+.lnms-search .optionbar,
+.lnms-peering h3 {
+    color: var(--lnms-text);
+}
+
+.lnms-about pre,
+.lnms-about .modal-body pre {
+    background-color: var(--lnms-surface-muted);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    color: var(--lnms-text);
+}
+
+.lnms-about .form-control,
+.lnms-port-groups .form-control,
+.lnms-notifications .form-control,
+.lnms-search .form-control,
+.lnms-peering .form-control,
+.lnms-oxidized .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-about .form-control:focus,
+.lnms-port-groups .form-control:focus,
+.lnms-notifications .form-control:focus,
+.lnms-search .form-control:focus,
+.lnms-peering .form-control:focus,
+.lnms-oxidized .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+.lnms-about .btn-default,
+.lnms-port-groups .btn-default,
+.lnms-port-security .btn-default,
+.lnms-notifications .btn-default,
+.lnms-search .btn-default,
+.lnms-customers .bootgrid-header .actionBar .btn,
+.lnms-oxidized .bootgrid-header .actionBar .btn {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-about .btn-primary,
+.lnms-port-groups .btn-primary,
+.lnms-port-security .btn-primary,
+.lnms-notifications .btn-primary,
+.lnms-search .btn-primary,
+.lnms-peering .btn-primary,
+.lnms-oxidized .btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-about .btn-primary:hover,
+.lnms-about .btn-primary:focus,
+.lnms-port-groups .btn-primary:hover,
+.lnms-port-groups .btn-primary:focus,
+.lnms-port-security .btn-primary:hover,
+.lnms-port-security .btn-primary:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+    color: #fff;
+}
+
+.lnms-about .btn-danger,
+.lnms-port-groups .btn-danger,
+.lnms-notifications .btn-danger {
+    background-color: var(--lnms-status-down);
+    border-color: var(--lnms-status-down);
+    color: #fff;
+}
+
+.lnms-notifications .btn-success,
+.lnms-about .btn-success {
+    background-color: var(--lnms-status-up);
+    border-color: var(--lnms-status-up);
+    color: #fff;
+}
+
+.lnms-about a,
+.lnms-port-groups a,
+.lnms-port-security a,
+.lnms-search a,
+.lnms-notifications a,
+.lnms-customers a,
+.lnms-peering a,
+.lnms-oxidized a {
+    color: var(--lnms-accent);
+}
+
+.lnms-about a:hover,
+.lnms-about a:focus,
+.lnms-port-groups a:hover,
+.lnms-port-groups a:focus,
+.lnms-port-security a:hover,
+.lnms-port-security a:focus,
+.lnms-search a:hover,
+.lnms-search a:focus,
+.lnms-notifications a:hover,
+.lnms-notifications a:focus,
+.lnms-customers a:hover,
+.lnms-customers a:focus,
+.lnms-peering a:hover,
+.lnms-peering a:focus,
+.lnms-oxidized a:hover,
+.lnms-oxidized a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-port-groups legend,
+.lnms-port-groups .list-large,
+.lnms-search .pagemenu-selected,
+.lnms-oxidized .nav-tabs > li > a,
+.lnms-notifications .count-notif {
+    color: var(--lnms-text);
+}
+
+.lnms-oxidized .nav-tabs > li.active > a,
+.lnms-oxidized .nav-tabs > li.active > a:hover,
+.lnms-oxidized .nav-tabs > li.active > a:focus {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    border-bottom-color: transparent;
+    color: var(--lnms-text);
+}
+
+.lnms-customers .bootgrid-header,
+.lnms-customers .bootgrid-footer,
+.lnms-oxidized .bootgrid-header,
+.lnms-oxidized .bootgrid-footer,
+.lnms-search .bootgrid-header,
+.lnms-search .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-about .bg-info,
+.lnms-about label.bg-info {
+    background-color: var(--lnms-accent-muted);
+    color: var(--lnms-text);
+}
+
+.dark .lnms-about .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-port-groups .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-customers .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-oxidized .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.dark .lnms-about .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-port-groups .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-customers .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-oxidized .table-striped > tbody > tr:nth-of-type(even) {
     background-color: var(--lnms-surface-muted);
 }
 

@@ -14,6 +14,11 @@
             'bill' => 'lnms-bill',
             'services' => 'lnms-services',
             'apps' => 'lnms-apps',
+            'search' => 'lnms-search',
+            'notifications' => 'lnms-notifications',
+            'customers' => 'lnms-customers',
+            'peering' => 'lnms-peering',
+            'oxidized' => 'lnms-oxidized',
         ];
         $lnmsLegacyHost = $legacy_host ?? '';
         if ($lnmsLegacyHost === '') {

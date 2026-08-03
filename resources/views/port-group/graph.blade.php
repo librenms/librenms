@@ -3,7 +3,8 @@
 @section('title', __('Interface Group'))
 
 @section('content')
-<div class="container-fluid">
+{{-- Phase 5 host: .lnms-port-groups — portgroup.graph / x-graph-row preserved --}}
+<div class="container-fluid lnms-port-groups">
     @if($ports->count() == 0)
     <div class="row">
         <div class=col-md-12><span class=list-large>{{ __("No ports in port group") }} {{ $group->name }}</span></div>

@@ -87,6 +87,11 @@ class LegacyController extends Controller
             'bill' => 'lnms-bill',
             'services' => 'lnms-services',
             'apps' => 'lnms-apps',
+            'search' => 'lnms-search',
+            'notifications' => 'lnms-notifications',
+            'customers' => 'lnms-customers',
+            'peering' => 'lnms-peering',
+            'oxidized' => 'lnms-oxidized',
         ];
         $legacy_host = $legacy_hosts[$vars['page'] ?? ''] ?? '';
 
