@@ -3,25 +3,26 @@
 @section('title', __('API Tokens'))
 
 @section('content')
-<div class="container-fluid">
-    <legend>{{ __('API Tokens') }}</legend>
+{{-- Phase 5 host: .lnms-api — token CRUD routes/permissions unchanged; never log token values --}}
+<div class="container-fluid lnms-api">
+    <h1 class="lnms-api__title">{{ __('API Tokens') }}</h1>
 
     @if (session('status'))
-        <div class="alert alert-info">{{ session('status') }}</div>
+        <div class="alert alert-info" role="status">{{ session('status') }}</div>
     @endif
 
     @if (session('api_token_plain'))
-        <div class="alert alert-warning">
+        <div class="alert alert-warning lnms-api__token-once" role="status">
             <p><strong>{{ session('api_token_message', __('Copy this token now; it will not be shown again.')) }}</strong></p>
             <div class="form-group">
                 <label for="api-token-once" class="control-label">{{ __('Your API token') }}</label>
-                <input type="text" class="form-control" id="api-token-once" readonly value="{{ session('api_token_plain') }}">
+                <input type="text" class="form-control" id="api-token-once" readonly value="{{ session('api_token_plain') }}" autocomplete="off">
             </div>
         </div>
     @endif
 
     @if ($errors->any())
-        <div class="alert alert-danger">
+        <div class="alert alert-danger" role="alert">
             <ul class="list-unstyled">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -30,9 +31,10 @@
         </div>
     @endif
 
-        <p class="text-muted">{{ __('Tokens are shown only once when created or reset. Use the REST API with the X-Auth-Token header.') }}</p>
+        <p class="text-muted lnms-api__help">{{ __('Tokens are shown only once when created or reset. Use the REST API with the X-Auth-Token header.') }}</p>
 
-        <table class="table table-bordered table-condensed">
+        <div class="table-responsive lnms-api__table-wrap">
+        <table class="table table-bordered table-condensed lnms-api__table">
             <thead>
                 <tr>
                     <th>{{ __('Description') }}</th>
@@ -43,7 +45,7 @@
             </thead>
             <tbody>
                 @forelse ($tokens as $api)
-                    <tr id="api-token-row-{{ $api->id }}" @if($api->user && $api->user->auth_type !== $legacy_auth_type) bgcolor="lightgrey" @endif>
+                    <tr id="api-token-row-{{ $api->id }}" @class(['lnms-api__row--foreign-auth' => $api->user && $api->user->auth_type !== $legacy_auth_type])>
                         <td class="api-token-description-cell" data-token-id="{{ $api->id }}">
                             <span
                                 class="api-token-description-text"
@@ -85,13 +87,13 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
 
-        <div class="text-center">
+        <div class="text-center lnms-api__actions">
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-token">
                 {{ __('Create API access token') }}
             </button>
         </div>
-</div>
 
 <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="modal-delete-title" aria-hidden="true">
     <div class="modal-dialog modal-sm">
@@ -139,6 +141,7 @@
             </form>
         </div>
     </div>
+</div>
 </div>
 @endsection
 

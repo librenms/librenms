@@ -23,11 +23,12 @@
   -->
 
 <template>
-    <tabs @tab-selected="tabChanged" :selected="this.tab">
+    <tabs class="lnms-settings-tabs" @tab-selected="tabChanged" :selected="this.tab">
         <template v-slot:header>
-            <form class="form-inline" @submit.prevent>
+            <form class="form-inline lnms-settings-filter" role="search" @submit.prevent>
                 <div class="input-group">
-                    <input id="settings-search" type="search" class="form-control" :placeholder="$t('Filter Settings')" v-model.trim="search_phrase">
+                    <label class="sr-only" for="settings-search">{{ $t('Filter Settings') }}</label>
+                    <input id="settings-search" type="search" class="form-control" :placeholder="$t('Filter Settings')" :aria-label="$t('Filter Settings')" autocomplete="off" v-model.trim="search_phrase">
                 </div>
             </form>
         </template>
