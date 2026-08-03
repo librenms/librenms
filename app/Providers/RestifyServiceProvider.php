@@ -2,10 +2,8 @@
 
 namespace App\Providers;
 
-use App\Http\Controllers\Api\V1\HealthController;
-use App\Http\Controllers\Api\V1\PingController;
-use App\Http\Middleware\EnsureApiV1Enabled;
-use App\Restify\RoutesBoot as CustomRoutesBoot;
+use App\Api\CustomRestifyRoutesBoot;
+use App\Facades\LibrenmsConfig;
 use Binaryk\LaravelRestify\Bootstrap\RoutesBoot;
 use Binaryk\LaravelRestify\Restify;
 use Binaryk\LaravelRestify\RestifyApplicationServiceProvider;
@@ -14,6 +12,13 @@ use Illuminate\Support\Facades\Route;
 
 class RestifyServiceProvider extends RestifyApplicationServiceProvider
 {
+    /**
+     * Repository classes exposed on the v1 API.
+     */
+    protected array $repositories = [
+        // DeviceRepository::class,
+    ];
+
     protected function gate(): void
     {
         Gate::define('viewRestify', fn ($user = null) => true);
@@ -21,41 +26,26 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
 
     protected function routes(): void
     {
-        // v1 custom endpoints that are not Restify repositories.
-        // The whole v1 API is opt-in via the api.v1.enabled setting.
-        Route::prefix('api/v1')->middleware(EnsureApiV1Enabled::class)->group(function (): void {
-            // Public, unauthenticated liveness probe.
-            Route::get('ping', PingController::class)->name('v1.ping');
+        if (! LibrenmsConfig::get('api.v1.enabled', false)) {
+            return;
+        }
 
-            // Health check requires authentication (exposes subsystem status).
-            Route::get('health', HealthController::class)
-                ->middleware('auth:sanctum')
-                ->name('v1.health');
-        });
+        // v1 custom endpoints that are not Restify repositories.
+        Route::prefix('api/v1')->group(base_path('routes/api_v1.php'));
 
         parent::routes();
-
-        // Parent only registers routes in console (for route:list) and
-        // skips both web requests and unit tests. Register for both.
-        if (! app()->runningInConsole() || app()->runningUnitTests()) {
-            app(RoutesBoot::class)->boot();
-        }
     }
 
     public function boot(): void
     {
-        // Swap Restify's route booter for one that omits the built-in
-        // default routes (profile, global search, restifyjs/setup). The only
-        // v1 routes should be those we explicitly add: registered
-        // repositories and our own custom controllers (ping/health). This
-        // must be bound before parent::boot() triggers route registration,
-        // and persists for the RestifyInjector middleware at request time.
-        $this->app->bind(RoutesBoot::class, CustomRoutesBoot::class);
+        // Use our own route booter so Restify skips its built-in routes
+        // (profile, search, restifyjs/setup) — only repositories and our
+        // ping/health controllers should be exposed. Must bind before
+        // parent::boot(), since that's what triggers route registration.
+        $this->app->bind(RoutesBoot::class, CustomRestifyRoutesBoot::class);
 
         parent::boot();
 
-        // No model repositories are registered yet. Add repository classes
-        // here as v1 resources are introduced.
-        Restify::repositories([]);
+        Restify::repositories($this->repositories);
     }
 }

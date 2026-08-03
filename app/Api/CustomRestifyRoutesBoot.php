@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Restify;
+namespace App\Api;
 
 use Binaryk\LaravelRestify\Bootstrap\RoutesBoot as BaseRoutesBoot;
 use Binaryk\LaravelRestify\Bootstrap\RoutesDefinition;
@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
  * This override registers the per-repository CRUD routes but
  * skips once().
  */
-class RoutesBoot extends BaseRoutesBoot
+class CustomRestifyRoutesBoot extends BaseRoutesBoot
 {
     /**
      * @param  array<string, mixed>  $config  Route group config (prefix, middleware, name, ...).
@@ -24,9 +24,8 @@ class RoutesBoot extends BaseRoutesBoot
     public function defaultRoutes($config): self
     {
         Route::group($config, function (): void {
-            // Repository CRUD/actions/getters/etc. via the {repository}
-            // wildcard. Intentionally omit ->once() so profile, search and
-            // restifyjs/setup are not registered.
+            // Skip ->once() to drop Restify's built-in profile,
+            // search, and restifyjs/setup routes.
             app(RoutesDefinition::class)();
         });
 

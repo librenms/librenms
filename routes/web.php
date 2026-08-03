@@ -1,5 +1,6 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Ajax;
 use App\Http\Controllers\AlertController;
@@ -65,7 +66,6 @@ use App\Http\Controllers\Widgets;
 use App\Http\Controllers\WidgetSettingsController;
 use App\Http\Controllers\WirelessSensorController;
 use App\Http\Middleware\AuthenticateGraph;
-use App\Http\Middleware\EnsureApiV1Enabled;
 use Illuminate\Support\Facades\Auth as AuthFacade;
 use Illuminate\Support\Facades\Route;
 
@@ -143,11 +143,11 @@ Route::middleware(['auth'])->group(function (): void {
         Route::patch('api-access/{id}', [ApiAccessController::class, 'update'])->name('api-access.update')->whereNumber('id');
         Route::post('api-access/{id}/reset', [ApiAccessController::class, 'reset'])->name('api-access.reset')->whereNumber('id');
         Route::delete('api-access/{id}', [ApiAccessController::class, 'destroy'])->name('api-access.destroy')->whereNumber('id');
-        Route::middleware(EnsureApiV1Enabled::class)->group(function (): void {
+        if (LibrenmsConfig::get('api.v1.enabled', false)) {
             Route::post('api-access/v1', [ApiAccessController::class, 'storeV1'])->name('api-access.v1.store');
             Route::patch('api-access/v1/{id}/renew', [ApiAccessController::class, 'renewV1'])->name('api-access.v1.renew')->whereNumber('id');
             Route::delete('api-access/v1/{id}', [ApiAccessController::class, 'destroyV1'])->name('api-access.v1.destroy')->whereNumber('id');
-        });
+        }
     });
     Route::resource('users', UserController::class);
     Route::prefix('users/{user}/permissions')->name('users.permissions.')->group(function (): void {
