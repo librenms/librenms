@@ -12,15 +12,7 @@
             @endif
         </select>
     </div>
-    <div class="form-group">
-        <label for="unit-{{ $id }}" class="control-label">{{ __('Display Unit') }}</label>
-        <select name="unit" id="unit-{{ $id }}" class="form-control">
-            <option value="AUTO" {{ $unit == 'AUTO' ? 'selected' : '' }}>{{ __('Auto') }}</option>
-            <option value="MIB" {{ $unit == 'MIB' ? 'selected' : '' }}>MiB</option>
-            <option value="GIB" {{ $unit == 'GIB' ? 'selected' : '' }}>GiB</option>
-            <option value="TIB" {{ $unit == 'TIB' ? 'selected' : '' }}>TiB</option>
-        </select>
-    </div>
+
     <div class="form-group">
         <label for="columnsize-{{ $id }}" class="control-label">{{ __('Columns') }}</label>
         <select name="columnsize" id="columnsize-{{ $id }}" class="form-control">
@@ -28,6 +20,7 @@
             <option value="2" @if($columnsize == 2) selected @endif>2</option>
             <option value="3" @if($columnsize == 3) selected @endif>3</option>
             <option value="4" @if($columnsize == 4) selected @endif>4</option>
+            <option value="5" @if($columnsize == 5) selected @endif>5</option>
             <option value="6" @if($columnsize == 6) selected @endif>6</option>
             <option value="12" @if($columnsize == 12) selected @endif>12</option>
         </select>
