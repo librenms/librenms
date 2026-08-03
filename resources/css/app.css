@@ -184,9 +184,44 @@ body.lnms-shell input:focus-visible,
 body.lnms-shell select:focus-visible,
 body.lnms-shell textarea:focus-visible,
 body.lnms-shell .btn:focus-visible,
-body.lnms-shell .form-control:focus-visible {
+body.lnms-shell .form-control:focus-visible,
+body.lnms-shell .dropdown-toggle:focus-visible,
+body.lnms-shell .navbar-toggle:focus-visible,
+body.lnms-shell .nav-tabs > li > a:focus-visible,
+body.lnms-shell .pagination > li > a:focus-visible,
+body.lnms-shell .pagination > li > span:focus-visible,
+body.lnms-shell .bootgrid-header .search .search-field:focus-visible,
+body.lnms-shell .bootgrid-footer .pagination > li > a:focus-visible,
+body.lnms-shell [role="option"]:focus-visible,
+body.lnms-shell [role="tab"]:focus-visible {
     outline: 2px solid var(--lnms-focus-ring);
     outline-offset: 2px;
+}
+
+/* Visible keyboard highlight for combobox options (global search) */
+.lnms-nav .global-search-dropdown [role="option"][aria-selected="true"] {
+    background-color: var(--lnms-accent-muted);
+    color: var(--lnms-text);
+}
+
+/* Icon-leaning navbar controls: keep ≥32px hit area without changing Bootstrap layout */
+nav.navbar.lnms-nav.navbar-default .navbar-nav.navbar-right > li > a.dropdown-toggle {
+    min-height: 32px;
+    min-width: 32px;
+}
+
+/* Contrast helpers for status text (pair with existing bold/border cues) */
+.lnms-a11y-status-up { color: var(--lnms-status-up); }
+.lnms-a11y-status-down { color: var(--lnms-status-down); }
+.lnms-a11y-status-warn { color: var(--lnms-status-warn); }
+.lnms-a11y-status-critical { color: var(--lnms-status-critical); }
+.lnms-a11y-status-unknown { color: var(--lnms-status-unknown); }
+.lnms-a11y-muted { color: var(--lnms-text-secondary); }
+
+/* Prefer secondary (not muted) for actionable chrome labels in light/dark */
+body.lnms-shell .text-muted.lnms-a11y-readable,
+body.lnms-shell .lnms-a11y-readable {
+    color: var(--lnms-text-secondary) !important;
 }
 
 .lnms-skip-link {
@@ -511,8 +546,26 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 @media (prefers-reduced-motion: reduce) {
     nav.navbar.lnms-nav.navbar-default .navbar-nav > li > a,
     nav.navbar.lnms-nav .dropdown-menu > li > a,
-    nav.navbar.lnms-nav .navbar-form.global-search .form-control {
+    nav.navbar.lnms-nav .navbar-form.global-search .form-control,
+    .lnms-devices .lnms-devices-graphs__item a,
+    .lnms-device-page .lnms-device-page__tab-link,
+    .lnms-device-page .lnms-device-page__action-btn,
+    .lnms-ports .lnms-ports-graphs__item a {
         transition: none;
+    }
+
+    /* Nonessential shell/module transitions we introduced — keep Bootstrap collapse usable */
+    body.lnms-shell [class^="lnms-"] ,
+    body.lnms-shell [class*=" lnms-"] {
+        scroll-behavior: auto;
+    }
+
+    body.lnms-shell [class^="lnms-"] ,
+    body.lnms-shell [class*=" lnms-"],
+    body.lnms-shell .lnms-nav .global-search-dropdown {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
     }
 }
 
