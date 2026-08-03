@@ -8,6 +8,7 @@
 
 namespace LibreNMS\Tests\Feature\Api\V1;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Sanctum\Sanctum;
@@ -16,6 +17,21 @@ use LibreNMS\Tests\DBTestCase;
 final class HealthPingTest extends DBTestCase
 {
     use DatabaseTransactions;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        LibrenmsConfig::set('api.v1.enabled', true);
+    }
+
+    public function testV1IsDisabledByDefault(): void
+    {
+        LibrenmsConfig::set('api.v1.enabled', false);
+
+        $this->getJson('/api/v1/ping')->assertNotFound();
+        $this->getJson('/api/v1/health')->assertNotFound();
+    }
 
     public function testPingIsPublicAndReturnsOk(): void
     {

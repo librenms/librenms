@@ -92,6 +92,7 @@
             </button>
         </div>
 
+        @config('api.v1.enabled')
         <hr>
 
         <legend>{{ __('API v1 tokens') }} <span class="label label-info">{{ __('Beta') }}</span></legend>
@@ -157,6 +158,7 @@
                 {{ __('Create v1 API token') }}
             </button>
         </div>
+        @endconfig
 </div>
 
 <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="modal-delete-title" aria-hidden="true">
@@ -207,6 +209,7 @@
     </div>
 </div>
 
+@config('api.v1.enabled')
 <div class="modal fade" id="v1-create-token" tabindex="-1" role="dialog" aria-labelledby="v1-create-title" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -286,6 +289,7 @@
         </div>
     </div>
 </div>
+@endconfig
 @endsection
 
 @section('scripts')
@@ -397,6 +401,7 @@
       $('#remove_token_form').attr('action', baseUrl + '/' + token_id);
     });
 
+    @config('api.v1.enabled')
     function v1FailMessage(xhr, fallback) {
       var j = xhr.responseJSON;
       if (j && j.errors) {
@@ -500,6 +505,7 @@
         v1ToastError(v1FailMessage(xhr, @json(__('Could not delete token.'))));
       });
     });
+    @endconfig
   })();
 </script>
 @endsection

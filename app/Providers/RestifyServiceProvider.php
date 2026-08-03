@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\PingController;
+use App\Http\Middleware\EnsureApiV1Enabled;
 use App\Restify\RoutesBoot as CustomRoutesBoot;
 use Binaryk\LaravelRestify\Bootstrap\RoutesBoot;
 use Binaryk\LaravelRestify\Restify;
@@ -21,7 +22,8 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
     protected function routes(): void
     {
         // v1 custom endpoints that are not Restify repositories.
-        Route::prefix('api/v1')->group(function (): void {
+        // The whole v1 API is opt-in via the api.v1.enabled setting.
+        Route::prefix('api/v1')->middleware(EnsureApiV1Enabled::class)->group(function (): void {
             // Public, unauthenticated liveness probe.
             Route::get('ping', PingController::class)->name('v1.ping');
 

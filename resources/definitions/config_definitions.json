@@ -391,6 +391,13 @@
             "order": 3,
             "type": "array"
         },
+        "api.v1.enabled": {
+            "default": false,
+            "group": "api",
+            "section": "v1",
+            "order": 1,
+            "type": "boolean"
+        },
         "apps.powerdns-recursor.api-key": {
             "type": "text",
             "group": "apps",
