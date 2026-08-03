@@ -3460,6 +3460,408 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-surface-muted);
 }
 
+/*
+ * Phase 5 — Maps / topology (presentation only)
+ * Hosts: .lnms-maps / .lnms-maps-availability / .lnms-maps-netmap /
+ *        .lnms-maps-dependency / .lnms-maps-geo / .lnms-maps-custom*
+ * Preserve: Leaflet/vis/custom map JS, #visualization, #fullscreen-map,
+ * #custom-map, #device-list, #highlight_node, maps.getdevices AJAX,
+ * Maps\* controllers, CustomMap policies, modal IDs.
+ */
+.lnms-maps {
+    font-family: var(--lnms-font-sans);
+    color: var(--lnms-text);
+}
+
+.lnms-maps .page-availability-title,
+.lnms-maps .page-availability-report-host,
+.lnms-maps .pull-right {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-maps select.form-control,
+.lnms-maps select.input-sm,
+.lnms-maps .page-availability-report-select,
+.lnms-maps #show_items,
+.lnms-maps #show_group,
+.lnms-maps #highlight_node {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+    border-radius: var(--lnms-radius-sm);
+}
+
+.lnms-maps select.form-control:focus,
+.lnms-maps select.input-sm:focus,
+.lnms-maps #show_items:focus,
+.lnms-maps #show_group:focus,
+.lnms-maps #highlight_node:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+    outline: none;
+}
+
+.lnms-maps .alert {
+    border-radius: var(--lnms-radius-md);
+}
+
+.lnms-maps .alert-warning {
+    background-color: color-mix(in srgb, var(--lnms-status-warn, #c9a227) 18%, var(--lnms-surface));
+    border-color: color-mix(in srgb, var(--lnms-status-warn, #c9a227) 45%, var(--lnms-border));
+    color: var(--lnms-text);
+}
+
+.lnms-maps #visualization,
+.lnms-maps #custom-map,
+.lnms-maps #map-container,
+.lnms-maps #fullscreen-map {
+    border-radius: var(--lnms-radius-md);
+}
+
+.lnms-maps a {
+    color: var(--lnms-accent);
+}
+
+.lnms-maps a:hover,
+.lnms-maps a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-maps .panel,
+.lnms-maps .x-panel,
+.lnms-maps [id^="manage-custom"] {
+    color: var(--lnms-text);
+}
+
+.lnms-maps .btn-primary,
+.lnms-maps .lnms-btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-maps .btn-primary:hover,
+.lnms-maps .btn-primary:focus,
+.lnms-maps .lnms-btn-primary:hover,
+.lnms-maps .lnms-btn-primary:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+    color: #fff;
+}
+
+.lnms-maps .btn-default,
+.lnms-maps .lnms-btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-maps .btn-default:hover,
+.lnms-maps .btn-default:focus,
+.lnms-maps .lnms-btn-default:hover,
+.lnms-maps .lnms-btn-default:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+    color: var(--lnms-text);
+}
+
+.lnms-maps .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-maps .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+.lnms-maps .well {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-maps hr {
+    border-top-color: var(--lnms-border);
+}
+
+.lnms-maps .custom-control-label,
+.lnms-maps label {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-maps-availability .page-availability-title-left,
+.lnms-maps-availability .page-availability-title-right {
+    margin-bottom: 0.75rem;
+}
+
+.lnms-maps-availability .label-font-border {
+    /* keep semantic Bootstrap status labels; only tighten spacing */
+    margin-inline-start: 0.25rem;
+}
+
+.lnms-maps-custom .panel-title,
+.lnms-maps-custom-manage .panel-title,
+.lnms-maps-nodeimage .panel-title {
+    color: var(--lnms-text);
+}
+
+/* Map modal chrome only — preserve modal IDs and form field IDs */
+.lnms-shell #mapModal .modal-content,
+.lnms-shell #mapDeleteModal .modal-content,
+.lnms-shell #mapCloneModal .modal-content,
+.lnms-shell #mapListModal .modal-content,
+.lnms-shell #mapLegendModal .modal-content,
+.lnms-shell #nodeModal .modal-content,
+.lnms-shell #edgeModal .modal-content,
+.lnms-shell #bgModal .modal-content,
+.lnms-shell #imageModal .modal-content,
+.lnms-shell #imageDeleteModal .modal-content {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-shell #mapModal .modal-header,
+.lnms-shell #mapDeleteModal .modal-header,
+.lnms-shell #mapCloneModal .modal-header,
+.lnms-shell #mapListModal .modal-header,
+.lnms-shell #mapLegendModal .modal-header,
+.lnms-shell #nodeModal .modal-header,
+.lnms-shell #edgeModal .modal-header,
+.lnms-shell #bgModal .modal-header,
+.lnms-shell #imageModal .modal-header,
+.lnms-shell #imageDeleteModal .modal-header,
+.lnms-shell #mapModal .modal-footer,
+.lnms-shell #mapDeleteModal .modal-footer,
+.lnms-shell #mapCloneModal .modal-footer,
+.lnms-shell #mapListModal .modal-footer,
+.lnms-shell #mapLegendModal .modal-footer,
+.lnms-shell #nodeModal .modal-footer,
+.lnms-shell #edgeModal .modal-footer,
+.lnms-shell #bgModal .modal-footer,
+.lnms-shell #imageModal .modal-footer,
+.lnms-shell #imageDeleteModal .modal-footer {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border);
+}
+
+.lnms-shell #mapModal .form-control,
+.lnms-shell #nodeModal .form-control,
+.lnms-shell #edgeModal .form-control,
+.lnms-shell #bgModal .form-control,
+.lnms-shell #imageModal .form-control,
+.lnms-shell #mapCloneModal .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+/*
+ * Phase 5 — Eventlog / Syslog / Authlog (presentation only)
+ * Legacy hosts via legacy_page: .lnms-eventlog / .lnms-syslog
+ * Blade hosts: .lnms-authlog (+ device tab wrappers)
+ * Preserve: #eventlog, #syslog, #authlog, #result_form, Bootgrid table.* routes,
+ * select2 AJAX, datetimepickers, CSRF filter forms.
+ */
+.lnms-eventlog,
+.lnms-syslog,
+.lnms-authlog {
+    font-family: var(--lnms-font-sans);
+    color: var(--lnms-text);
+}
+
+.lnms-eventlog .lnms-eventlog-panel.panel,
+.lnms-syslog .lnms-syslog-panel.panel,
+.lnms-eventlog .panel.panel-default,
+.lnms-syslog .panel.panel-default,
+.lnms-authlog .panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    overflow: hidden;
+}
+
+.lnms-eventlog .panel > .panel-heading,
+.lnms-syslog .panel > .panel-heading,
+.lnms-authlog .panel-heading,
+.lnms-authlog .panel-title {
+    background-color: var(--lnms-surface-muted);
+    border-bottom: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-eventlog .bootgrid-header,
+.lnms-eventlog .bootgrid-footer,
+.lnms-syslog .bootgrid-header,
+.lnms-syslog .bootgrid-footer,
+.lnms-authlog .bootgrid-header,
+.lnms-authlog .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-eventlog .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-eventlog .bootgrid-footer .actionBar .btn-group > .btn,
+.lnms-syslog .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-syslog .bootgrid-footer .actionBar .btn-group > .btn,
+.lnms-authlog .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-authlog .bootgrid-footer .actionBar .btn-group > .btn {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-eventlog #eventlog.table,
+.lnms-eventlog .bootgrid-table,
+.lnms-syslog #syslog.table,
+.lnms-syslog .bootgrid-table,
+.lnms-authlog #authlog.table,
+.lnms-authlog .bootgrid-table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-eventlog #eventlog.table > thead > tr > th,
+.lnms-eventlog .bootgrid-table th,
+.lnms-syslog #syslog.table > thead > tr > th,
+.lnms-syslog .bootgrid-table th,
+.lnms-authlog #authlog.table > thead > tr > th,
+.lnms-authlog .bootgrid-table th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+}
+
+.lnms-eventlog #eventlog.table > tbody > tr > td,
+.lnms-eventlog .bootgrid-table td,
+.lnms-syslog #syslog.table > tbody > tr > td,
+.lnms-syslog .bootgrid-table td,
+.lnms-authlog #authlog.table > tbody > tr > td,
+.lnms-authlog .bootgrid-table td {
+    border-top-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-eventlog .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-eventlog .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.lnms-syslog .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-syslog .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.lnms-authlog .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-eventlog .table-striped > tbody > tr:nth-of-type(even),
+.lnms-eventlog .bootgrid-table.table-striped > tbody > tr:nth-of-type(even),
+.lnms-syslog .table-striped > tbody > tr:nth-of-type(even),
+.lnms-syslog .bootgrid-table.table-striped > tbody > tr:nth-of-type(even),
+.lnms-authlog .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-eventlog .table-hover > tbody > tr:hover,
+.lnms-eventlog .bootgrid-table.table-hover > tbody > tr:hover,
+.lnms-syslog .table-hover > tbody > tr:hover,
+.lnms-syslog .bootgrid-table.table-hover > tbody > tr:hover,
+.lnms-authlog .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-eventlog .bootgrid-table td.loading,
+.lnms-eventlog .bootgrid-table td.no-results,
+.lnms-syslog .bootgrid-table td.loading,
+.lnms-syslog .bootgrid-table td.no-results {
+    color: var(--lnms-text-muted);
+    background-color: var(--lnms-surface) !important;
+}
+
+.lnms-eventlog .pagination > li > a,
+.lnms-eventlog .pagination > li > span,
+.lnms-syslog .pagination > li > a,
+.lnms-syslog .pagination > li > span,
+.lnms-authlog .pagination > li > a,
+.lnms-authlog .pagination > li > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-eventlog .pagination > li > a:hover,
+.lnms-eventlog .pagination > li > a:focus,
+.lnms-syslog .pagination > li > a:hover,
+.lnms-syslog .pagination > li > a:focus,
+.lnms-authlog .pagination > li > a:hover,
+.lnms-authlog .pagination > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+}
+
+.lnms-eventlog .pagination > .active > a,
+.lnms-eventlog .pagination > .active > span,
+.lnms-syslog .pagination > .active > a,
+.lnms-syslog .pagination > .active > span,
+.lnms-authlog .pagination > .active > a,
+.lnms-authlog .pagination > .active > span {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-eventlog #result_form .btn-default,
+.lnms-syslog #result_form .btn-default,
+.lnms-eventlog .btn-default,
+.lnms-syslog .btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-eventlog #result_form .form-control,
+.lnms-syslog #result_form .form-control,
+.lnms-eventlog .form-control,
+.lnms-syslog .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-eventlog a,
+.lnms-syslog a,
+.lnms-authlog a {
+    color: var(--lnms-accent);
+}
+
+.lnms-eventlog a:hover,
+.lnms-eventlog a:focus,
+.lnms-syslog a:hover,
+.lnms-syslog a:focus,
+.lnms-authlog a:hover,
+.lnms-authlog a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.dark .lnms-eventlog .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-eventlog .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-eventlog .bootgrid-table td.loading,
+.dark .lnms-eventlog .bootgrid-table td.no-results,
+.dark .lnms-syslog .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-syslog .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-syslog .bootgrid-table td.loading,
+.dark .lnms-syslog .bootgrid-table td.no-results,
+.dark .lnms-authlog .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.dark .lnms-eventlog .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-eventlog .bootgrid-table.table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-syslog .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-syslog .bootgrid-table.table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-authlog .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
 .lnms-btn {
     @apply tw:inline-flex tw:items-center tw:gap-2 tw:rounded-[length:var(--lnms-radius-md)] tw:px-4 tw:py-2 tw:font-normal tw:no-underline;
 }
