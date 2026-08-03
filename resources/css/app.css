@@ -203,8 +203,11 @@ body.lnms-shell .form-control:focus-visible {
     font-weight: 600;
 }
 
-.lnms-skip-link:focus {
+.lnms-skip-link:focus,
+.lnms-skip-link:focus-visible {
     top: var(--lnms-space-2);
+    outline: 2px solid var(--lnms-focus-ring);
+    outline-offset: 2px;
 }
 
 .lnms-content {
@@ -4305,6 +4308,266 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 .dark .lnms-users .table-striped > tbody > tr:nth-of-type(even),
 .dark .lnms-users-permissions .table-striped > tbody > tr:nth-of-type(even) {
     background-color: var(--lnms-surface-muted);
+}
+
+/*
+ * Phase 5 — System settings (Vue) + API management (presentation only)
+ * Hosts: .lnms-settings (Blade) / .lnms-api (api-access)
+ * Preserve: Ziggy routes, LibrenmsSettings save/list axios, settings.view|update,
+ * api-access token CRUD + can:api.access. Do not log/expose token values.
+ */
+.lnms-settings,
+.lnms-api {
+    font-family: var(--lnms-font-sans);
+    color: var(--lnms-text);
+}
+
+.lnms-settings .panel,
+.lnms-settings .panel.with-nav-tabs.panel-default {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    color: var(--lnms-text);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-settings .panel > .panel-heading,
+.lnms-settings .with-nav-tabs > .panel-heading {
+    background-color: var(--lnms-surface-muted);
+    border-bottom: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-settings .nav-tabs {
+    border-bottom-color: var(--lnms-border);
+}
+
+.lnms-settings .nav-tabs > li > a,
+.lnms-settings .with-nav-tabs.panel-default .nav-tabs > li > a {
+    color: var(--lnms-text-secondary);
+    border-radius: var(--lnms-radius-sm) var(--lnms-radius-sm) 0 0;
+}
+
+.lnms-settings .nav-tabs > li > a:hover,
+.lnms-settings .nav-tabs > li > a:focus,
+.lnms-settings .with-nav-tabs.panel-default .nav-tabs > li > a:hover,
+.lnms-settings .with-nav-tabs.panel-default .nav-tabs > li > a:focus {
+    color: var(--lnms-text);
+    background-color: var(--lnms-accent-muted);
+    border-color: transparent;
+}
+
+.lnms-settings .nav-tabs > li.active > a,
+.lnms-settings .nav-tabs > li.active > a:hover,
+.lnms-settings .nav-tabs > li.active > a:focus,
+.lnms-settings .with-nav-tabs.panel-default .nav-tabs > li.active > a,
+.lnms-settings .with-nav-tabs.panel-default .nav-tabs > li.active > a:hover,
+.lnms-settings .with-nav-tabs.panel-default .nav-tabs > li.active > a:focus {
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    border-bottom-color: var(--lnms-surface);
+}
+
+.lnms-settings .panel-body {
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+}
+
+.lnms-settings #settings-search,
+.lnms-settings .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    border-radius: var(--lnms-radius-sm);
+}
+
+.lnms-settings #settings-search:focus,
+.lnms-settings .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+.lnms-settings .col-form-label,
+.lnms-settings .control-label,
+.lnms-settings .help-block,
+.lnms-settings h5 {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-settings hr {
+    border-top-color: var(--lnms-border);
+}
+
+.lnms-settings .btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-settings .btn-primary:hover,
+.lnms-settings .btn-primary:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+    color: #fff;
+}
+
+.lnms-settings .btn-danger {
+    background-color: var(--lnms-status-down);
+    border-color: var(--lnms-status-down);
+    color: #fff;
+}
+
+.lnms-settings .btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-settings .panel-group .panel,
+.lnms-settings .accordion .panel {
+    border-color: var(--lnms-border);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-settings .panel-group .panel-heading,
+.lnms-settings .accordion .panel-heading {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text);
+}
+
+.lnms-settings .panel-title a,
+.lnms-settings .accordion .panel-title a {
+    color: var(--lnms-text);
+}
+
+.lnms-settings .panel-title a:hover,
+.lnms-settings .panel-title a:focus {
+    color: var(--lnms-accent);
+}
+
+.lnms-api__title {
+    margin-top: 0;
+    margin-bottom: var(--lnms-space-4);
+    font-size: var(--lnms-text-xl);
+    font-weight: 600;
+    color: var(--lnms-text);
+    border-bottom: 1px solid var(--lnms-border);
+    padding-bottom: var(--lnms-space-2);
+}
+
+.lnms-api__help {
+    color: var(--lnms-text-secondary);
+    margin-bottom: var(--lnms-space-4);
+}
+
+.lnms-api__table-wrap {
+    margin-bottom: var(--lnms-space-4);
+}
+
+.lnms-api__table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+}
+
+.lnms-api__table > thead > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-color: var(--lnms-border);
+}
+
+.lnms-api__table > tbody > tr > td {
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    vertical-align: middle;
+}
+
+.lnms-api__row--foreign-auth {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-api .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-api .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+.lnms-api .control-label {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-api .btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-api .btn-primary:hover,
+.lnms-api .btn-primary:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+    color: #fff;
+}
+
+.lnms-api .btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-api .btn-warning {
+    background-color: var(--lnms-status-warn);
+    border-color: var(--lnms-status-warn);
+    color: #fff;
+}
+
+.lnms-api .btn-danger {
+    background-color: var(--lnms-status-down);
+    border-color: var(--lnms-status-down);
+    color: #fff;
+}
+
+.lnms-api .btn-success {
+    background-color: var(--lnms-status-up);
+    border-color: var(--lnms-status-up);
+    color: #fff;
+}
+
+.lnms-api .modal-content {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    border-radius: var(--lnms-radius-md);
+}
+
+.lnms-api .modal-header,
+.lnms-api .modal-footer {
+    border-color: var(--lnms-border);
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-api .modal-title {
+    color: var(--lnms-text);
+}
+
+.lnms-api .alert-warning.lnms-api__token-once {
+    border-color: var(--lnms-status-warn);
+}
+
+.lnms-api .api-token-description-text {
+    color: var(--lnms-accent);
+}
+
+.lnms-api .api-token-description-text:focus-visible {
+    outline: 2px solid var(--lnms-focus-ring);
+    outline-offset: 2px;
 }
 
 .lnms-btn {
