@@ -79,6 +79,20 @@ class ServerStatsController extends WidgetController
             $data['disks'] = $device->storage()
                 ->get(['storage_descr', 'storage_used', 'storage_size'])
                 ->map(fn (Storage $d) => $this->formatUsage($d->storage_descr ?? 'Storage', (float) $d->storage_used, (float) $d->storage_size));
+
+            $numCols = (int) ($data['columnsize'] ?? 3);
+            $totalGauges = 1 + count($data['mempools']) + count($data['disks']);
+
+            $data['gridCols'] = match ($numCols) {
+                1 => 'tw:grid-cols-1',
+                2 => 'tw:grid-cols-2',
+                4 => 'tw:grid-cols-4',
+                5 => 'tw:grid-cols-5',
+                6 => 'tw:grid-cols-6',
+                12 => 'tw:grid-cols-12',
+                default => 'tw:grid-cols-3',
+            };
+            $data['gridRows'] = max(1, (int) ceil($totalGauges / max(1, $numCols)));
         }
 
         return view('widgets.server-stats', $data);
