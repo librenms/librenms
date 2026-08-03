@@ -1,5 +1,5 @@
 @php
-    $gridCols = match((int) ($columnsize ?? $columns ?? 3)) {
+    $gridCols = match($columns) {
         1 => 'tw:grid-cols-1',
         2 => 'tw:grid-cols-2',
         4 => 'tw:grid-cols-4',
