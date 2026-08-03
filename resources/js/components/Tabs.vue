@@ -29,10 +29,16 @@
                 <ul class="nav nav-tabs" role="tablist">
                     <li v-for="tab in tabs" :key="tab.name" :class="{ 'active': tab.isActive }" role="presentation">
                         <a role="tab"
+                           :id="'tab-' + tab.name"
                            :aria-controls="tab.name"
                            :aria-selected="tab.isActive ? 'true' : 'false'"
+                           :tabindex="tab.isActive ? 0 : -1"
                            href="#"
-                           @click.prevent="activeTab = tab.name">
+                           @click.prevent="activeTab = tab.name"
+                           @keydown.left.prevent="selectRelative(-1)"
+                           @keydown.right.prevent="selectRelative(1)"
+                           @keydown.home.prevent="selectByIndex(0)"
+                           @keydown.end.prevent="selectByIndex(tabs.length - 1)">
                             <i v-if="tab.icon" :class="['fa', 'fa-fw', tab.icon]" aria-hidden="true"></i>
                             {{ tab.text || tab.name }}&nbsp;
                         </a>
@@ -72,6 +78,31 @@
             activeTab(name) {
                 this.tabs.forEach(tab => tab.isActive = (tab.name === name));
                 this.$emit('tab-selected', name)
+                this.$nextTick(() => {
+                    const el = document.getElementById('tab-' + name);
+                    if (el && typeof el.focus === 'function' && this._focusTab) {
+                        el.focus();
+                        this._focusTab = false;
+                    }
+                });
+            }
+        },
+        methods: {
+            selectByIndex(index) {
+                if (!this.tabs.length) {
+                    return;
+                }
+                const i = Math.max(0, Math.min(index, this.tabs.length - 1));
+                this._focusTab = true;
+                this.activeTab = this.tabs[i].name;
+            },
+            selectRelative(delta) {
+                if (!this.tabs.length) {
+                    return;
+                }
+                const current = this.tabs.findIndex(tab => tab.name === this.activeTab);
+                const next = (current + delta + this.tabs.length) % this.tabs.length;
+                this.selectByIndex(next);
             }
         }
     }
