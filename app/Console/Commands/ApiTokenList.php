@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class ApiTokenList extends LnmsCommand
 {
-    protected $name = 'api:token:list';
+    protected $name = 'api:token-list';
 
     public function __construct()
     {
@@ -23,7 +23,7 @@ class ApiTokenList extends LnmsCommand
         $user = User::where('username', $username)->first();
 
         if (! $user) {
-            $this->error(trans('commands.api:token:list.user-not-found', ['username' => $username]));
+            $this->error(trans('commands.api:token-list.user-not-found', ['username' => $username]));
 
             return 1;
         }
@@ -31,7 +31,7 @@ class ApiTokenList extends LnmsCommand
         $tokens = $user->tokens;
 
         if ($tokens->isEmpty()) {
-            $this->info(trans('commands.api:token:list.no-tokens', ['username' => $user->username]));
+            $this->info(trans('commands.api:token-list.no-tokens', ['username' => $user->username]));
 
             return 0;
         }

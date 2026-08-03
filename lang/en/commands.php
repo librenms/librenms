@@ -7,7 +7,7 @@ return [
         'no_devices' => 'No devices found matching your given device specification',
         'no_new_devices' => 'No new devices',
     ],
-    'api:token:create' => [
+    'api:token-create' => [
         'description' => 'Create a new API token for a user',
         'arguments' => [
             'username' => 'User to create the token for',
@@ -19,7 +19,7 @@ return [
         'save-warning' => 'Save this token — it will not be shown again.',
         'user-not-found' => 'User \':username\' not found.',
     ],
-    'api:token:list' => [
+    'api:token-list' => [
         'description' => 'List API tokens for a user',
         'arguments' => [
             'username' => 'User to list tokens for',
@@ -27,11 +27,11 @@ return [
         'no-tokens' => 'No tokens found for user \':username\'.',
         'user-not-found' => 'User \':username\' not found.',
     ],
-    'api:token:revoke' => [
+    'api:token-revoke' => [
         'description' => 'Revoke an API token for a user',
         'arguments' => [
             'username' => 'User the token belongs to',
-            'token-id' => 'ID of the token to revoke (see api:token:list)',
+            'token-id' => 'ID of the token to revoke (see api:token-list)',
         ],
         'revoked' => 'Token \':name\' (ID: :id) revoked.',
         'token-not-found' => 'Token ID :id not found for user \':username\'.',

@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class ApiTokenRevoke extends LnmsCommand
 {
-    protected $name = 'api:token:revoke';
+    protected $name = 'api:token-revoke';
 
     public function __construct()
     {
@@ -24,7 +24,7 @@ class ApiTokenRevoke extends LnmsCommand
         $user = User::where('username', $username)->first();
 
         if (! $user) {
-            $this->error(trans('commands.api:token:revoke.user-not-found', ['username' => $username]));
+            $this->error(trans('commands.api:token-revoke.user-not-found', ['username' => $username]));
 
             return 1;
         }
@@ -33,13 +33,13 @@ class ApiTokenRevoke extends LnmsCommand
         $token = $user->tokens()->where('id', $tokenId)->first();
 
         if (! $token) {
-            $this->error(trans('commands.api:token:revoke.token-not-found', ['id' => $tokenId, 'username' => $user->username]));
+            $this->error(trans('commands.api:token-revoke.token-not-found', ['id' => $tokenId, 'username' => $user->username]));
 
             return 1;
         }
 
         $token->delete();
-        $this->info(trans('commands.api:token:revoke.revoked', ['name' => $token->name, 'id' => $tokenId]));
+        $this->info(trans('commands.api:token-revoke.revoked', ['name' => $token->name, 'id' => $tokenId]));
 
         return 0;
     }
