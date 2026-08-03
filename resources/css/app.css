@@ -2967,6 +2967,499 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-surface-muted);
 }
 
+/*
+ * Phase 5 — Wireless sensors (presentation)
+ * Hosts: .lnms-wireless / .lnms-wireless-panel / .lnms-wireless-toolbar / .lnms-wireless-list
+ * Preserve: #sensors, data-column-id, Bootgrid ajax/table/wireless, viewAny WirelessSensor.
+ */
+.lnms-wireless {
+    font-family: var(--lnms-font-sans);
+    color: var(--lnms-text);
+}
+
+.lnms-wireless .lnms-wireless-panel.panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    overflow: hidden;
+}
+
+.lnms-wireless .lnms-wireless-panel > .panel-heading {
+    background-color: var(--lnms-surface-muted);
+    border-bottom: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-wireless .lnms-wireless-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--lnms-space-2);
+    padding: 0 10px;
+}
+
+.lnms-wireless .lnms-wireless-toolbar__left,
+.lnms-wireless .lnms-wireless-toolbar__right {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--lnms-space-2);
+}
+
+.lnms-wireless .lnms-wireless-toolbar a {
+    color: var(--lnms-accent);
+    text-decoration: none;
+}
+
+.lnms-wireless .lnms-wireless-toolbar a:hover,
+.lnms-wireless .lnms-wireless-toolbar a:focus {
+    color: var(--lnms-accent-hover);
+    text-decoration: underline;
+}
+
+.lnms-wireless .lnms-wireless-toolbar .pagemenu-selected a {
+    color: var(--lnms-text);
+    font-weight: 600;
+}
+
+.lnms-wireless .lnms-wireless-list {
+    margin-top: 0;
+}
+
+.lnms-wireless .bootgrid-header,
+.lnms-wireless .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-wireless .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-wireless .bootgrid-footer .actionBar .btn-group > .btn,
+.lnms-wireless .bootgrid-header .dropdown-toggle,
+.lnms-wireless .bootgrid-footer .dropdown-toggle {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-wireless .bootgrid-header .dropdown-menu,
+.lnms-wireless .bootgrid-footer .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+}
+
+.lnms-wireless .bootgrid-header .dropdown-menu > li > a,
+.lnms-wireless .bootgrid-footer .dropdown-menu > li > a {
+    color: var(--lnms-text);
+}
+
+.lnms-wireless .bootgrid-header .dropdown-menu > li > a:hover,
+.lnms-wireless .bootgrid-footer .dropdown-menu > li > a:hover {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-wireless #sensors.table,
+.lnms-wireless .bootgrid-table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-wireless #sensors.table > thead > tr > th,
+.lnms-wireless .bootgrid-table th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+}
+
+.lnms-wireless #sensors.table > tbody > tr > td,
+.lnms-wireless .bootgrid-table td {
+    border-top-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-wireless .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-wireless .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-wireless .table-striped > tbody > tr:nth-of-type(even),
+.lnms-wireless .bootgrid-table.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-wireless .table-hover > tbody > tr:hover,
+.lnms-wireless .bootgrid-table.table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-wireless .bootgrid-table td.loading,
+.lnms-wireless .bootgrid-table td.no-results {
+    color: var(--lnms-text-muted);
+    background-color: var(--lnms-surface) !important;
+}
+
+.lnms-wireless .pagination > li > a,
+.lnms-wireless .pagination > li > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-wireless .pagination > li > a:hover,
+.lnms-wireless .pagination > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+}
+
+.lnms-wireless .pagination > .active > a,
+.lnms-wireless .pagination > .active > span,
+.lnms-wireless .pagination > .active > a:hover,
+.lnms-wireless .pagination > .active > span:hover {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-wireless .pagination > .disabled > a,
+.lnms-wireless .pagination > .disabled > span {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text-muted);
+}
+
+.lnms-wireless .lnms-wireless-list a {
+    color: var(--lnms-accent);
+}
+
+.lnms-wireless .lnms-wireless-list a:hover,
+.lnms-wireless .lnms-wireless-list a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-wireless .lnms-wireless-list .graph-image,
+.lnms-wireless .lnms-wireless-list img.graph-image {
+    max-width: 100%;
+    height: auto;
+}
+
+.lnms-wireless .alert-status,
+.lnms-wireless .alert-status-small {
+    border-radius: 1px;
+}
+
+.lnms-wireless .alert-status.label-success,
+.lnms-wireless .alert-status-small.label-success {
+    background-color: var(--lnms-status-up) !important;
+}
+
+.lnms-wireless .alert-status.label-danger,
+.lnms-wireless .alert-status-small.label-danger {
+    background-color: var(--lnms-status-down) !important;
+}
+
+.lnms-wireless .alert-status.label-warning,
+.lnms-wireless .alert-status-small.label-warning {
+    background-color: var(--lnms-status-warn) !important;
+}
+
+.lnms-wireless .alert-status.label-default,
+.lnms-wireless .alert-status-small.label-default {
+    background-color: var(--lnms-status-unknown) !important;
+}
+
+@media (max-width: 767px) {
+    .lnms-wireless .lnms-wireless-toolbar {
+        flex-direction: column;
+        padding: 0;
+    }
+
+    .lnms-wireless .lnms-wireless-toolbar__right {
+        align-self: flex-end;
+    }
+
+    .lnms-wireless #sensors.table > thead > tr > th,
+    .lnms-wireless .bootgrid-table th {
+        font-size: 11px;
+    }
+}
+
+.dark .lnms-wireless .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-wireless .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-wireless .bootgrid-table td.loading,
+.dark .lnms-wireless .bootgrid-table td.no-results {
+    background-color: var(--lnms-surface);
+}
+
+.dark .lnms-wireless .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-wireless .bootgrid-table.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+/*
+ * Phase 5 — Legacy alerts pages (presentation only)
+ * Hosts via legacy_page: .lnms-alerts / .lnms-alert-log / .lnms-alert-rules
+ * Preserve: #alerts_*, #alertlog, #alert-rules-table, #result_form, #message,
+ * ack/notes/details modal IDs, query-builder markup, Bootgrid ajax contracts.
+ * Do not restyle query-builder internals beyond modal chrome.
+ */
+.lnms-alerts,
+.lnms-alert-log,
+.lnms-alert-rules {
+    font-family: var(--lnms-font-sans);
+    color: var(--lnms-text);
+}
+
+.lnms-alerts .lnms-alerts-panel.panel,
+.lnms-alert-log .lnms-alert-log-panel.panel,
+.lnms-alerts .panel.panel-default,
+.lnms-alert-log .panel.panel-default {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    overflow: hidden;
+}
+
+.lnms-alerts .panel > .panel-heading,
+.lnms-alert-log .panel > .panel-heading {
+    background-color: var(--lnms-surface-muted);
+    border-bottom: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-alerts .bootgrid-header,
+.lnms-alerts .bootgrid-footer,
+.lnms-alert-log .bootgrid-header,
+.lnms-alert-log .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-alerts .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-alerts .bootgrid-footer .actionBar .btn-group > .btn,
+.lnms-alerts .bootgrid-header .dropdown-toggle,
+.lnms-alerts .bootgrid-footer .dropdown-toggle,
+.lnms-alert-log .bootgrid-header .actionBar .btn-group > .btn,
+.lnms-alert-log .bootgrid-footer .actionBar .btn-group > .btn,
+.lnms-alert-log .bootgrid-header .dropdown-toggle,
+.lnms-alert-log .bootgrid-footer .dropdown-toggle {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-alerts .bootgrid-header .dropdown-menu,
+.lnms-alerts .bootgrid-footer .dropdown-menu,
+.lnms-alert-log .bootgrid-header .dropdown-menu,
+.lnms-alert-log .bootgrid-footer .dropdown-menu {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+}
+
+.lnms-alerts .bootgrid-header .dropdown-menu > li > a,
+.lnms-alerts .bootgrid-footer .dropdown-menu > li > a,
+.lnms-alert-log .bootgrid-header .dropdown-menu > li > a,
+.lnms-alert-log .bootgrid-footer .dropdown-menu > li > a {
+    color: var(--lnms-text);
+}
+
+.lnms-alerts .bootgrid-header .dropdown-menu > li > a:hover,
+.lnms-alerts .bootgrid-footer .dropdown-menu > li > a:hover,
+.lnms-alert-log .bootgrid-header .dropdown-menu > li > a:hover,
+.lnms-alert-log .bootgrid-footer .dropdown-menu > li > a:hover {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-alerts table.alerts,
+.lnms-alerts .bootgrid-table,
+.lnms-alert-log #alertlog.table,
+.lnms-alert-log .bootgrid-table,
+.lnms-alert-rules #alert-rules-table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-alerts table.alerts > thead > tr > th,
+.lnms-alerts .bootgrid-table th,
+.lnms-alert-log #alertlog.table > thead > tr > th,
+.lnms-alert-log .bootgrid-table th,
+.lnms-alert-rules #alert-rules-table > thead > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+}
+
+.lnms-alerts table.alerts > tbody > tr > td,
+.lnms-alerts .bootgrid-table td,
+.lnms-alert-log #alertlog.table > tbody > tr > td,
+.lnms-alert-log .bootgrid-table td,
+.lnms-alert-rules #alert-rules-table > tbody > tr > td {
+    border-top-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-alerts .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-alerts .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.lnms-alert-log .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-alert-log .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.lnms-alert-rules .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-alerts .table-striped > tbody > tr:nth-of-type(even),
+.lnms-alerts .bootgrid-table.table-striped > tbody > tr:nth-of-type(even),
+.lnms-alert-log .table-striped > tbody > tr:nth-of-type(even),
+.lnms-alert-log .bootgrid-table.table-striped > tbody > tr:nth-of-type(even),
+.lnms-alert-rules .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-alerts .table-hover > tbody > tr:hover,
+.lnms-alerts .bootgrid-table.table-hover > tbody > tr:hover,
+.lnms-alert-log .table-hover > tbody > tr:hover,
+.lnms-alert-log .bootgrid-table.table-hover > tbody > tr:hover,
+.lnms-alert-rules .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-alerts .bootgrid-table td.loading,
+.lnms-alerts .bootgrid-table td.no-results,
+.lnms-alert-log .bootgrid-table td.loading,
+.lnms-alert-log .bootgrid-table td.no-results {
+    color: var(--lnms-text-muted);
+    background-color: var(--lnms-surface) !important;
+}
+
+.lnms-alerts .pagination > li > a,
+.lnms-alerts .pagination > li > span,
+.lnms-alert-log .pagination > li > a,
+.lnms-alert-log .pagination > li > span,
+.lnms-alert-rules .pagination > li > a,
+.lnms-alert-rules .pagination > li > span,
+.lnms-alert-rules p.pagination {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-alerts .pagination > li > a:hover,
+.lnms-alerts .pagination > li > a:focus,
+.lnms-alert-log .pagination > li > a:hover,
+.lnms-alert-log .pagination > li > a:focus,
+.lnms-alert-rules .pagination > li > a:hover,
+.lnms-alert-rules .pagination > li > a:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+}
+
+.lnms-alerts .pagination > .active > a,
+.lnms-alerts .pagination > .active > span,
+.lnms-alert-log .pagination > .active > a,
+.lnms-alert-log .pagination > .active > span,
+.lnms-alert-rules .pagination > .active > a,
+.lnms-alert-rules .pagination > .active > span {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-alerts a,
+.lnms-alert-log a,
+.lnms-alert-rules a {
+    color: var(--lnms-accent);
+}
+
+.lnms-alerts a:hover,
+.lnms-alerts a:focus,
+.lnms-alert-log a:hover,
+.lnms-alert-log a:focus,
+.lnms-alert-rules a:hover,
+.lnms-alert-rules a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-alert-rules .lnms-alert-rules-inner {
+    color: var(--lnms-text);
+}
+
+.lnms-alert-rules #result_form .btn-primary,
+.lnms-alert-rules .btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-alert-rules #result_form .btn-primary:hover,
+.lnms-alert-rules #result_form .btn-primary:focus,
+.lnms-alert-rules .btn-primary:hover,
+.lnms-alert-rules .btn-primary:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+    color: #fff;
+}
+
+.lnms-alert-rules #results.form-control,
+.lnms-alert-rules .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-alert-rules #results.form-control:focus,
+.lnms-alert-rules .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+/* Modal chrome only — keep #alert_ack_modal / #alert_notes_modal / #alert_details_modal / #create-alert IDs */
+.lnms-shell #alert_ack_modal .modal-content,
+.lnms-shell #alert_notes_modal .modal-content,
+.lnms-shell #alert_details_modal .modal-content,
+.lnms-shell #create-alert .modal-content,
+.lnms-shell #search_rule_modal .modal-content,
+.lnms-shell #confirm-delete .modal-content {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-shell #alert_ack_modal .modal-header,
+.lnms-shell #alert_notes_modal .modal-header,
+.lnms-shell #alert_details_modal .modal-header,
+.lnms-shell #create-alert .modal-header,
+.lnms-shell #search_rule_modal .modal-header,
+.lnms-shell #confirm-delete .modal-header,
+.lnms-shell #alert_ack_modal .modal-footer,
+.lnms-shell #alert_notes_modal .modal-footer,
+.lnms-shell #alert_details_modal .modal-footer,
+.lnms-shell #create-alert .modal-footer,
+.lnms-shell #search_rule_modal .modal-footer,
+.lnms-shell #confirm-delete .modal-footer {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border);
+}
+
+.dark .lnms-alerts .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-alerts .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-alerts .bootgrid-table td.loading,
+.dark .lnms-alerts .bootgrid-table td.no-results,
+.dark .lnms-alert-log .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-alert-log .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-alert-log .bootgrid-table td.loading,
+.dark .lnms-alert-log .bootgrid-table td.no-results,
+.dark .lnms-alert-rules .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.dark .lnms-alerts .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-alerts .bootgrid-table.table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-alert-log .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-alert-log .bootgrid-table.table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-alert-rules .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
 .lnms-btn {
     @apply tw:inline-flex tw:items-center tw:gap-2 tw:rounded-[length:var(--lnms-radius-md)] tw:px-4 tw:py-2 tw:font-normal tw:no-underline;
 }
