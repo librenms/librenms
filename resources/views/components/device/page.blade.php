@@ -1,20 +1,20 @@
 @section('title', $pagetitle)
 
-<div class="container-fluid">
-    <x-panel class="tw:rounded-2xl! tw:border tw:border-l-5 {{ $statusBorderClass }} tw:border-gray-300 tw:bg-white tw:shadow-sm tw:dark:border-dark-gray-200 tw:dark:bg-dark-gray-40 tw:mb-0!">
-        <x-slot:slot class="tw:pl-5 tw:pr-5 tw:pt-3! tw:pb-0!">
+<div class="container-fluid lnms-device-page">
+    <x-panel class="lnms-device-page__header {{ $statusBorderClass }}">
+        <x-slot:slot class="lnms-device-page__header-body">
         <img src="{{ url($device->logo()) }}" title="{{ $device->logo() }}"
              alt="logo"
-             class="device-icon-header pull-left tw:dark:bg-gray-50 tw:dark:rounded-lg tw:dark:p-2 tw:ml-2 tw:mt-2 tw:mb-2"
+             class="device-icon-header lnms-device-page__icon pull-left"
              style="max-height: 100px">
-        <div class="pull-left" style="margin-top: 5px;">
+        <div class="pull-left lnms-device-page__identity">
             @if($parentDeviceId)
-                <a href="{{ route('device', $parentDeviceId) }}" title="{{ __('device.vm_host') }}"><i
+                <a href="{{ route('device', $parentDeviceId) }}" title="{{ __('device.vm_host') }}" class="lnms-device-page__vm-host"><i
                         class="fa fa-server fa-fw fa-lg"></i></a>
             @endif
-            <div style="font-size: 20px;">
+            <div class="lnms-device-page__title">
                 @if($device->isUnderMaintenance())
-                    <span title="{{ __('device.scheduled_maintenance') }}" class="fa fa-wrench fa-fw"></span>
+                    <span title="{{ __('device.scheduled_maintenance') }}" class="fa fa-wrench fa-fw lnms-device-page__maintenance"></span>
                 @endif
                 <x-device-link :device="$device"/>
                 @if($typeIcon)
@@ -22,18 +22,17 @@
                 @endif
             </div>
             @if($device->location)
-                <div class="tw:mt-4"><a href="{{ route('devices', ['filter' => ['location_id' => ['eq' => $device->location_id]]]) }}">{{ $device->location }}</a></div>
+                <div class="lnms-device-page__location"><a href="{{ route('devices', ['filter' => ['location_id' => ['eq' => $device->location_id]]]) }}">{{ $device->location }}</a></div>
             @endif
         </div>
-        <div class="pull-right tw:mr-2">
+        <div class="pull-right lnms-device-page__graphs">
                 @if($overviewGraphs())
-                    <div
-                        class="tw:flex tw:flex-row tw:flex-wrap tw:items-end tw:justify-start tw:gap-4 tw:mx-6 tw:px-6 tw:pt-3 tw:pb-5 tw:rounded-2xl">
+                    <div class="lnms-device-page__graph-row">
                         @foreach($overviewGraphs() as $graph)
-                            <div class="tw:flex tw:flex-col tw:items-center tw:text-center tw:shrink-0">
+                            <div class="lnms-device-page__graph-item">
                                 <x-graph-popup :vars="$graph" :type="$graph['type']" :width="$graph['width']" :height="$graph['height']"
                                     :popup-title="$graph['popup_title']" :device="$device" />
-                                <div class="tw:mt-1 tw:font-semibold tw:text-sm tw:text-gray-700 tw:dark:text-dark-white-300">
+                                <div class="lnms-device-page__graph-label">
                                     {{ $graph['popup_title'] }}
                                 </div>
                             </div>
@@ -46,7 +45,7 @@
 
     <x-device.page-tabs :device="$device" :dropdown-links="$dropdownLinks"/>
 
-    <div class="tab-content tw:mt-4">
+    <div class="tab-content lnms-device-page__content">
         <div class="tab-pane active">
 
             {{ $slot }}

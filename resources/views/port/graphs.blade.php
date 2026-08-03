@@ -1,10 +1,11 @@
-<div class="@if($hideFilter) tw:hidden @else tw:flex tw:justify-between @endif">
-    <x-filter name="ports" :fields="$filterFields" id="port-filter" :hide="$hideFilter" :initial="$filter" :reload="true"/>
-    <x-date-range-picker :start="$graphTemplate['from'] ?? null" :end="$graphTemplate['to'] ?? null" :reload="true"></x-date-range-picker>
-</div>
-<hr class="tw:my-5 @if($hideFilter) tw:hidden @endif"/>
+<div class="lnms-ports-graphs">
+    <div class="lnms-ports-graphs__filters @if($hideFilter) tw:hidden @else tw:flex tw:justify-between @endif">
+        <x-filter name="ports" :fields="$filterFields" id="port-filter" :hide="$hideFilter" :initial="$filter" :reload="true"/>
+        <x-date-range-picker :start="$graphTemplate['from'] ?? null" :end="$graphTemplate['to'] ?? null" :reload="true"></x-date-range-picker>
+    </div>
+    <hr class="lnms-ports-graphs__rule tw:my-5 @if($hideFilter) tw:hidden @endif"/>
 
-    <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:lg:grid-cols-4 tw:gap-4">
+    <div class="lnms-ports-graphs__grid tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:lg:grid-cols-4 tw:gap-4">
         @foreach($ports as $port)
             @php
                 /** @var \App\Models\Port $port */
@@ -15,16 +16,17 @@
                 $portLinkOptions = ['port_id' => $port->port_id, 'params' => ['type' => $graph_array['type']]];
             @endphp
 
-            <div>
+            <div class="lnms-ports-graphs__item">
                 <a href="{{ $link }}" class="{{ \LibreNMS\Util\Url::portLinkDisplayClass($port) }}" x-data="portLink(@js($portLinkOptions))">
                     {!! $graphTag !!}
                 </a>
             </div>
         @endforeach
     </div>
+</div>
 
 <x-slot name="footer">
-    <div class="tw:p-3 tw:flex tw:items-center tw:justify-between tw:flex-wrap tw:gap-4">
+    <div class="lnms-ports-footer tw:p-3 tw:flex tw:items-center tw:justify-between tw:flex-wrap tw:gap-4">
         <div class="tw:flex tw:items-center tw:gap-2 tw:text-sm">
             <label for="per_page" class="tw:whitespace-nowrap">{{ __("Per page") }}</label>
             <select id="per_page" class="form-control input-sm tw:w-auto" onchange="window.location.href = $(this).val()">
@@ -36,5 +38,3 @@
         <div>{{ $ports->appends(request()->all())->links() }}</div>
     </div>
 </x-slot>
-
-

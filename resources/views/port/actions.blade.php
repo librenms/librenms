@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid lnms-ports-actions">
     <div class="row">
         @if(request('deleted') === 'yes')
             @can('delete', \App\Models\Port::class)

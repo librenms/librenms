@@ -102,10 +102,10 @@ class Page extends Component
     public function statusBorderClass(): string
     {
         return match ($this->device->getDeviceStatus()) {
-            DeviceStatus::Up, DeviceStatus::IgnoredUp => $this->device->isUnderMaintenance() ? 'tw:border-l-blue-500!' : 'tw:border-l-green-600!',
-            DeviceStatus::Down, DeviceStatus::IgnoredDown => $this->device->isUnderMaintenance() ? 'tw:border-l-blue-500!' : 'tw:border-l-red-600!',
-            DeviceStatus::Disabled => 'tw:border-l-black!',
-            DeviceStatus::NeverPolled => 'tw:border-l-gray-400!',
+            DeviceStatus::Up, DeviceStatus::IgnoredUp => $this->device->isUnderMaintenance() ? 'lnms-device-page__header--maintenance' : 'lnms-device-page__header--up',
+            DeviceStatus::Down, DeviceStatus::IgnoredDown => $this->device->isUnderMaintenance() ? 'lnms-device-page__header--maintenance' : 'lnms-device-page__header--down',
+            DeviceStatus::Disabled => 'lnms-device-page__header--disabled',
+            DeviceStatus::NeverPolled => 'lnms-device-page__header--unknown',
         };
     }
 }

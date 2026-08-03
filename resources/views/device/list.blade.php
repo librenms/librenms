@@ -1,6 +1,6 @@
 <template id="device-filter-template"><x-filter name="devices" :fields="$filterFields" :initial="$filter" :hide="$hideFilter" /></template>
 
-<div class="table-responsive">
+<div class="lnms-devices-list table-responsive">
     <table id="devices" class="table table-hover table-condensed table-striped"
            data-url="{{ route('table.device') }}">
         <thead>

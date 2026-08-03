@@ -1,14 +1,14 @@
-<div class="tw:ml-auto tw:flex tw:items-center tw:gap-1" role="group">
+<div class="lnms-device-page__actions" role="group">
     <a href="{{ $primaryDeviceLink['url'] }}"
-       class="btn"
+       class="btn lnms-device-page__action-btn"
        type="button"
        @if(isset($primaryDeviceLink['onclick']))onclick="{{ $primaryDeviceLink['onclick'] }}" @endif
        @if($primaryDeviceLink['external'])target="_blank" rel="noopener" @endif
        title="{{ $primaryDeviceLink['title'] }}"
     ><i class="fa {{ $primaryDeviceLink['icon'] }} fa-lg icon-theme"></i>
     </a>
-    <div class="btn-group" role="group">
-        <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <div class="btn-group lnms-device-page__action-menu" role="group">
+        <button type="button" class="btn dropdown-toggle lnms-device-page__action-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fa fa-ellipsis-v fa-lg fa-fw icon-theme"></i>
         </button>
         <ul class="dropdown-menu dropdown-menu-right">
