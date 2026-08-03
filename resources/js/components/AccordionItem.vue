@@ -26,9 +26,12 @@
     <div class="panel panel-default">
         <div class="panel-heading" role="tab" :id="slug()">
             <h4 class="panel-title">
-                <a class="accordion-item-trigger" :class="{'collapsed': !isActive}" role="button" data-parent="#accordion" @click="isActive = !isActive" :data-href="hash()">
-                    <i class="fa fa-chevron-down accordion-item-trigger-icon"></i>
-                    <i v-if="icon" :class="['fa', 'fa-fw', icon]"></i>
+                <a class="accordion-item-trigger" :class="{'collapsed': !isActive}" role="button"
+                   :aria-expanded="isActive ? 'true' : 'false'"
+                   :aria-controls="slug() + '-content'"
+                   data-parent="#accordion" @click="isActive = !isActive" :data-href="hash()">
+                    <i class="fa fa-chevron-down accordion-item-trigger-icon" aria-hidden="true"></i>
+                    <i v-if="icon" :class="['fa', 'fa-fw', icon]" aria-hidden="true"></i>
                     {{ text || name  }}
                 </a>
             </h4>

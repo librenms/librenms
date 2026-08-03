@@ -23,7 +23,12 @@
   -->
 
 <template>
-    <div v-show="isActive" role="tabpanel" class="tab-pane" :id="name">
+    <div v-show="isActive"
+         role="tabpanel"
+         class="tab-pane"
+         :id="name"
+         :aria-labelledby="'tab-' + name"
+         :aria-hidden="isActive ? 'false' : 'true'">
         <slot></slot>
     </div>
 </template>

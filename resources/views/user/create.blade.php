@@ -3,10 +3,10 @@
 @section('title', __('Create User'))
 
 @section('content')
-<div class="container">
+<div class="container lnms-users">
     <div class="row">
         <form action="{{ route('users.store') }}" method="POST" role="form"
-              class="form-horizontal col-md-8 col-md-offset-2">
+              class="form-horizontal col-md-8 col-md-offset-2 lnms-users-form">
             <legend>{{ __('Create User') }}</legend>
             @csrf
 

@@ -3,10 +3,10 @@
 @section('title', __('Edit User'))
 
 @section('content')
-<div class="container">
+<div class="container lnms-users">
     <div class="row">
         <form action="{{ route('users.update', $user->user_id)}}" method="POST" role="form"
-              class="form-horizontal col-md-8 col-md-offset-2">
+              class="form-horizontal col-md-8 col-md-offset-2 lnms-users-form">
             <legend>{{ __('Edit User') }}: {{ $user->username }}</legend>
             {{ method_field('PUT') }}
             @csrf

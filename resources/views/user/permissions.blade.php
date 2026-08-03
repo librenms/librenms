@@ -3,8 +3,8 @@
 @section('title', __('Edit user'))
 
 @section('content')
-<div class="container" style="font-size: 16px;">
-    <x-panel>
+<div class="container lnms-users-permissions" style="font-size: 16px;">
+    <x-panel class="lnms-users-permissions-panel">
         <x-slot:heading>
             <div class="tw:flex tw:justify-between tw:items-center">
                 <div class="tw:text-4xl">

@@ -3,8 +3,8 @@
 @section('title', __('permissions.rbac.edit_role'))
 
 @section('content')
-    <div class="container" x-data="roleForm({{ json_encode($role->permissions->pluck('name')) }})">
-        <x-panel>
+    <div class="container lnms-roles" x-data="roleForm({{ json_encode($role->permissions->pluck('name')) }})">
+        <x-panel class="lnms-roles-panel">
             <x-slot name="title">
                 <div class="tw:flex tw:items-center tw:justify-between tw:w-full">
                     <div class="tw:flex tw:items-center">
