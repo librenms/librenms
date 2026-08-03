@@ -3,7 +3,8 @@
 @section('title', __('NAC'))
 
 @section('content')
-<div class="container-fluid">
+{{-- Phase 5 host: .lnms-nac — Bootgrid #nac-grid / #check_showHistorical / table.port-nac preserved --}}
+<div class="container-fluid lnms-nac">
     <div class="row">
     <div class="col-md-12">
 

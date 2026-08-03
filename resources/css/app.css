@@ -1588,7 +1588,11 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 .lnms-plugins,
 .lnms-inventory,
 .lnms-services,
-.lnms-apps {
+.lnms-apps,
+.lnms-validate,
+.lnms-nac,
+.lnms-ssl-certificates,
+.lnms-oui-lookup {
     font-family: var(--lnms-font-sans);
     color: var(--lnms-text);
 }
@@ -4858,6 +4862,288 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 
 .dark .lnms-inventory .table-striped > tbody > tr:nth-of-type(even),
 .dark .lnms-services .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+/* Phase 5: Validate / NAC / SSL Certificates / OUI — hosts; routes, Bootgrid IDs, Alpine, @can preserved */
+.lnms-validate .panel,
+.lnms-nac .panel,
+.lnms-ssl-certificates .panel,
+.lnms-oui-lookup .panel {
+    background-color: var(--lnms-surface);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    color: var(--lnms-text);
+    box-shadow: none;
+}
+
+.lnms-validate .panel-heading,
+.lnms-validate .panel-title,
+.lnms-nac .panel-heading,
+.lnms-nac .panel-title,
+.lnms-ssl-certificates .panel-heading,
+.lnms-ssl-certificates .panel-title,
+.lnms-oui-lookup .panel-heading,
+.lnms-oui-lookup .panel-title {
+    background-color: var(--lnms-surface-muted);
+    border-bottom-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-validate .panel-body,
+.lnms-nac .panel-body,
+.lnms-ssl-certificates .panel-body,
+.lnms-oui-lookup .panel-body {
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+}
+
+.lnms-validate .panel-success > .panel-heading,
+.lnms-validate .panel-success {
+    border-color: color-mix(in srgb, var(--lnms-status-up) 45%, var(--lnms-border));
+}
+
+.lnms-validate .panel-success > .panel-heading {
+    background-color: color-mix(in srgb, var(--lnms-status-up) 18%, var(--lnms-surface-muted));
+    color: var(--lnms-text);
+}
+
+.lnms-validate .panel-warning > .panel-heading,
+.lnms-validate .panel-warning {
+    border-color: color-mix(in srgb, var(--lnms-status-warn) 45%, var(--lnms-border));
+}
+
+.lnms-validate .panel-warning > .panel-heading {
+    background-color: color-mix(in srgb, var(--lnms-status-warn) 18%, var(--lnms-surface-muted));
+    color: var(--lnms-text);
+}
+
+.lnms-validate .panel-danger > .panel-heading,
+.lnms-validate .panel-danger {
+    border-color: color-mix(in srgb, var(--lnms-status-down) 45%, var(--lnms-border));
+}
+
+.lnms-validate .panel-danger > .panel-heading {
+    background-color: color-mix(in srgb, var(--lnms-status-down) 18%, var(--lnms-surface-muted));
+    color: var(--lnms-text);
+}
+
+.lnms-validate .panel-info > .panel-heading,
+.lnms-validate .panel-info {
+    border-color: color-mix(in srgb, var(--lnms-accent) 40%, var(--lnms-border));
+}
+
+.lnms-validate .panel-info > .panel-heading {
+    background-color: var(--lnms-accent-muted);
+    color: var(--lnms-text);
+}
+
+.lnms-validate .list-group-item {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-validate .list-group-item.active {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-validate pre {
+    background-color: var(--lnms-surface-muted);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    color: var(--lnms-text);
+}
+
+.lnms-nac .bootgrid-header,
+.lnms-nac .bootgrid-footer,
+.lnms-ssl-certificates .bootgrid-header,
+.lnms-ssl-certificates .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-nac .bootgrid-header .actionBar .btn,
+.lnms-nac .bootgrid-footer .actionBar .btn,
+.lnms-ssl-certificates .bootgrid-header .actionBar .btn,
+.lnms-ssl-certificates .bootgrid-footer .actionBar .btn,
+.lnms-validate .btn-default,
+.lnms-nac .btn-default,
+.lnms-ssl-certificates .btn-default,
+.lnms-oui-lookup .btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-nac .table,
+.lnms-nac .bootgrid-table,
+.lnms-ssl-certificates .table,
+.lnms-ssl-certificates .bootgrid-table,
+.lnms-oui-lookup .table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    background-color: var(--lnms-surface);
+}
+
+.lnms-nac .table > thead > tr > th,
+.lnms-nac .bootgrid-table th,
+.lnms-ssl-certificates .table > thead > tr > th,
+.lnms-ssl-certificates .bootgrid-table th,
+.lnms-ssl-certificates .table > tbody > tr > th,
+.lnms-oui-lookup .table > thead > tr > th,
+.lnms-oui-lookup .table > tbody > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-color: var(--lnms-border);
+}
+
+.lnms-nac .table > tbody > tr > td,
+.lnms-nac .bootgrid-table td,
+.lnms-ssl-certificates .table > tbody > tr > td,
+.lnms-ssl-certificates .bootgrid-table td,
+.lnms-oui-lookup .table > tbody > tr > td {
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    vertical-align: middle;
+}
+
+.lnms-nac .table-hover > tbody > tr:hover,
+.lnms-nac .bootgrid-table.table-hover > tbody > tr:hover,
+.lnms-ssl-certificates .table-hover > tbody > tr:hover,
+.lnms-ssl-certificates .bootgrid-table.table-hover > tbody > tr:hover,
+.lnms-oui-lookup .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-nac .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-ssl-certificates .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-nac .table-striped > tbody > tr:nth-of-type(even),
+.lnms-ssl-certificates .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-validate .form-control,
+.lnms-nac .form-control,
+.lnms-ssl-certificates .form-control,
+.lnms-oui-lookup .form-control {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-validate .form-control:focus,
+.lnms-nac .form-control:focus,
+.lnms-ssl-certificates .form-control:focus,
+.lnms-oui-lookup .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lnms-accent) 25%, transparent);
+}
+
+.lnms-validate .btn-primary,
+.lnms-nac .btn-primary,
+.lnms-ssl-certificates .btn-primary,
+.lnms-oui-lookup .btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-validate .btn-primary:hover,
+.lnms-validate .btn-primary:focus,
+.lnms-ssl-certificates .btn-primary:hover,
+.lnms-ssl-certificates .btn-primary:focus,
+.lnms-oui-lookup .btn-primary:hover,
+.lnms-oui-lookup .btn-primary:focus {
+    background-color: var(--lnms-accent-hover);
+    border-color: var(--lnms-accent-hover);
+    color: #fff;
+}
+
+.lnms-validate .btn-success,
+.lnms-ssl-certificates .btn-success {
+    background-color: var(--lnms-status-up);
+    border-color: var(--lnms-status-up);
+    color: #fff;
+}
+
+.lnms-ssl-certificates .btn-danger {
+    background-color: var(--lnms-status-down);
+    border-color: var(--lnms-status-down);
+    color: #fff;
+}
+
+.lnms-ssl-certificates .btn-warning {
+    background-color: var(--lnms-status-warn);
+    border-color: var(--lnms-status-warn);
+    color: #fff;
+}
+
+.lnms-ssl-certificates .btn-info {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    color: #fff;
+}
+
+.lnms-validate a,
+.lnms-nac a,
+.lnms-ssl-certificates a,
+.lnms-oui-lookup a {
+    color: var(--lnms-accent);
+}
+
+.lnms-validate a:hover,
+.lnms-validate a:focus,
+.lnms-nac a:hover,
+.lnms-nac a:focus,
+.lnms-ssl-certificates a:hover,
+.lnms-ssl-certificates a:focus,
+.lnms-oui-lookup a:hover,
+.lnms-oui-lookup a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-ssl-certificates .alert-success {
+    background-color: color-mix(in srgb, var(--lnms-status-up) 16%, var(--lnms-surface));
+    border-color: color-mix(in srgb, var(--lnms-status-up) 40%, var(--lnms-border));
+    color: var(--lnms-text);
+}
+
+.lnms-ssl-certificates .alert-danger,
+.lnms-ssl-certificates .alert-warning {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-ssl-certificates .help-block,
+.lnms-oui-lookup .panel-body {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-ssl-certificates code {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text);
+    border-radius: var(--lnms-radius-sm);
+}
+
+.lnms-nac .label,
+.lnms-ssl-certificates .label {
+    font-weight: 600;
+}
+
+.dark .lnms-nac .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-ssl-certificates .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.dark .lnms-nac .table-striped > tbody > tr:nth-of-type(even),
+.dark .lnms-ssl-certificates .table-striped > tbody > tr:nth-of-type(even) {
     background-color: var(--lnms-surface-muted);
 }
 

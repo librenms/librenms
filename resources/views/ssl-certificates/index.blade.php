@@ -3,7 +3,8 @@
 @section('title', __('SSL Certificates'))
 
 @section('content')
-<div class="container-fluid">
+{{-- Phase 5 host: .lnms-ssl-certificates — Bootgrid #ssl-certificates / @can create|update|delete preserved --}}
+<div class="container-fluid lnms-ssl-certificates">
     <div class="row">
         <div class="col-md-12">
             @if (session('success'))

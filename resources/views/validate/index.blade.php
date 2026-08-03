@@ -3,7 +3,8 @@
 @section('title', __('validation.results.validate'))
 
 @section('content')
-    <div x-data="{
+    {{-- Phase 5 host: .lnms-validate — Alpine groups / validate.results / validate.fix / settings.view|update preserved --}}
+    <div class="lnms-validate" x-data="{
             groups: @js($groups),
             listItems: 10,
             validateGroup(group) {
