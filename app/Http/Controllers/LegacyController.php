@@ -75,9 +75,18 @@ class LegacyController extends Controller
             $html .= '<script>document.title = ' . Js::from($title) . ';</script>';
         }
 
+        // Presentation host classes for Phase 5 legacy alert pages (CSS only; no Bootgrid/ID changes).
+        $legacy_hosts = [
+            'alerts' => 'lnms-alerts',
+            'alert-log' => 'lnms-alert-log',
+            'alert-rules' => 'lnms-alert-rules',
+        ];
+        $legacy_host = $legacy_hosts[$vars['page'] ?? ''] ?? '';
+
         return response()->view('layouts.legacy_page', [
             'content' => $html,
             'refresh' => $no_refresh ? 0 : LibrenmsConfig::get('page_refresh'), // @phpstan-ignore ternary.alwaysFalse ($no_refresh may be set by included pages)
+            'legacy_host' => $legacy_host,
         ]);
     }
 
