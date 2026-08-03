@@ -20,15 +20,18 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2018 Tony Murray
+ * @copyright  2018-2026 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Http\Controllers\Widgets;
 
 use App\Models\Device;
+use App\Models\Mempool;
+use App\Models\Storage;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use LibreNMS\Util\Number;
 
 class ServerStatsController extends WidgetController
 {
@@ -57,7 +60,7 @@ class ServerStatsController extends WidgetController
         return parent::getTitle();
     }
 
-    public function getView(Request $request): string|View
+    public function getView(Request $request): \Illuminate\View\View|string
     {
         $data = $this->getSettings();
 
@@ -67,9 +70,15 @@ class ServerStatsController extends WidgetController
 
         $device = Device::hasAccess($request->user())->find($data['device']);
         if ($device) {
-            $data['cpu'] = $device->processors()->avg('processor_usage');
-            $data['mempools'] = $device->mempools()->select(\DB::raw('mempool_descr, ROUND(mempool_used / (1024*1024), 0) as used, ROUND(mempool_total /(1024*1024), 0) as total'))->get();
-            $data['disks'] = $device->storage()->select(\DB::raw('storage_descr, ROUND(storage_used / (1024*1024), 0) as used, ROUND(storage_size / (1024*1024), 0) as total'))->get();
+            $data['cpu'] = round((float) $device->processors()->avg('processor_usage'), 1);
+
+            $data['mempools'] = $device->mempools()
+                ->get(['mempool_descr', 'mempool_used', 'mempool_total'])
+                ->map(fn (Mempool $m) => $this->formatUsage($m->mempool_descr ?? 'Memory', (float) $m->mempool_used, (float) $m->mempool_total));
+
+            $data['disks'] = $device->storage()
+                ->get(['storage_descr', 'storage_used', 'storage_size'])
+                ->map(fn (Storage $d) => $this->formatUsage($d->storage_descr ?? 'Storage', (float) $d->storage_used, (float) $d->storage_size));
         }
 
         return view('widgets.server-stats', $data);
@@ -86,8 +95,35 @@ class ServerStatsController extends WidgetController
     public function getSettings($settingsView = false): array
     {
         $settings = parent::getSettings($settingsView);
-        $settings['columns'] = 12 / $settings['columnsize'];
+        $settings['columns'] = (int) ($settings['columnsize'] ?? 3);
 
         return $settings;
+    }
+
+    /**
+     * @return array{descr: string, used: float, total: float, unit: string}
+     */
+    private function formatUsage(string $descr, float $used, float $total): array
+    {
+        $formatted = Number::formatSi(max($total, 1), 2, 0, 'B');
+        $parts = explode(' ', trim($formatted));
+        $unit = array_last($parts) ?: 'B';
+
+        $factor = match ($unit) {
+            'kB' => 1000,
+            'MB' => 1000 ** 2,
+            'GB' => 1000 ** 3,
+            'TB' => 1000 ** 4,
+            'PB' => 1000 ** 5,
+            'EB' => 1000 ** 6,
+            default => 1,
+        };
+
+        return [
+            'descr' => $descr,
+            'used' => round($used / $factor, 2),
+            'total' => round($total / $factor, 2),
+            'unit' => $unit,
+        ];
     }
 }
