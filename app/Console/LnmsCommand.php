@@ -34,7 +34,7 @@ use Validator;
 
 abstract class LnmsCommand extends Command
 {
-    protected $developer = false;
+    protected bool $developer = false;
 
     /** @var string[][]|callable[]|null */
     protected $optionValues;

@@ -96,6 +96,29 @@ return [
             'snmpsim' => 'Use snmpsim for unit tests',
         ],
     ],
+    'dev:collect-snmprec' => [
+        'description' => 'Collect SNMP data from a device for snmpsim test files',
+        'arguments' => [
+            'device' => 'ID, IP, or hostname of the device to collect data from',
+        ],
+        'options' => [
+            'variant' => 'The variant of the OS to use, usually the device model',
+            'modules' => 'The discovery/poller module(s) to collect data for, comma delimited',
+            'prefer-new' => 'Prefer new snmprec data over existing data',
+            'os' => 'Name of the OS to save test data for (only used if device is generic)',
+            'file' => 'Save data to file instead of the standard location',
+            'debug' => 'Enable debug output',
+            'full' => 'Walk the whole device (default: only used OIDs)',
+        ],
+        'device_not_found' => 'Device \':device\' not found.',
+        'variant_required' => 'The --variant (-v) option is required.',
+        'variant_underscore' => 'Variant name cannot contain an underscore (_).',
+        'os_required' => 'OS (-o, --os) is required because device is generic.',
+        'capturing_data' => 'Capturing Data:',
+        'saved_snmprec' => 'Saved snmprec data :file',
+        'no_data' => 'No data for :file',
+        'verify_private_data' => 'Verify these file(s) do not contain any private data before sharing!',
+    ],
     'dev:simulate' => [
         'description' => 'Simulate devices using test data',
         'arguments' => [

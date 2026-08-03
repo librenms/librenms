@@ -1,0 +1,1280 @@
+GUDEADS-EPC871210-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises,
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	Gauge32,
+	Integer32,
+	Unsigned32
+		FROM SNMPv2-SMI
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP
+		FROM SNMPv2-CONF;
+
+gudeads MODULE-IDENTITY
+	LAST-UPDATED "202409241518Z"	-- Sep 24, 2024, 3:18:00 PM
+	ORGANIZATION "GUDE Systems GmbH"
+	CONTACT-INFO
+		"Von-der-Wettern-Str. 23
+		51149 Cologne
+		Germany
+		https://www.gude-systems.com"
+	DESCRIPTION
+		"Expert Power Control 871210 MIB"
+	-- 1.3.6.1.4.1.28507
+	::= { enterprises 28507 }
+
+
+epc871210DeviceInfo OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.112.1.1.2
+	::= { epc871210CommonConfig 2 }
+
+epc871210ProdName OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The Product Name of the device."
+	-- 1.3.6.1.4.1.28507.112.1.1.2.1
+	::= { epc871210DeviceInfo 1 }
+
+
+epc871210FWVersion OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Firmware Version of the device."
+	-- 1.3.6.1.4.1.28507.112.1.1.2.2
+	::= { epc871210DeviceInfo 2 }
+
+
+epc871210HostName OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The configured Host Name."
+	-- 1.3.6.1.4.1.28507.112.1.1.2.3
+	::= { epc871210DeviceInfo 3 }
+
+
+epc871210PhysAddress OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The MAC address of the device."
+	-- 1.3.6.1.4.1.28507.112.1.1.2.4
+	::= { epc871210DeviceInfo 4 }
+
+
+epc871210SerialNumber OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The Serial Number of the device. Not available for all devices. Production start 2026."
+	-- 1.3.6.1.4.1.28507.112.1.1.2.5
+	::= { epc871210DeviceInfo 5 }
+
+
+epc871210ExtInputToggleCount OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of times the Input has changed its state."
+	-- 1.3.6.1.4.1.28507.112.1.6.2.2.1.3
+	::= { epc871210ExtInputEntry 3 }
+
+
+epc871210ExtInputPortNum OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of external Sensor Port when value greater zero, else device built-in Input."
+	-- 1.3.6.1.4.1.28507.112.1.6.2.2.1.33
+	::= { epc871210ExtInputEntry 33 }
+
+
+epc871210ExtInputBlockIndex OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Either index of device built-in Input, or index of Input in external sensor."
+	-- 1.3.6.1.4.1.28507.112.1.6.2.2.1.34
+	::= { epc871210ExtInputEntry 34 }
+
+
+epc871210ExtInputName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of
+		the Input"
+	-- 1.3.6.1.4.1.28507.112.1.6.2.2.1.32
+	::= { epc871210ExtInputEntry 32 }
+
+
+
+epc871210ExtInputEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc871210ExtInputIndex,
+		epc871210ExtInput,
+		epc871210ExtInputToggleCount,
+		epc871210ExtInputName,
+		epc871210ExtInputPortNum,
+		epc871210ExtInputBlockIndex}
+	STATUS  current
+	DESCRIPTION
+		"Change of external sensor input."
+	-- 1.3.6.1.4.1.28507.112.3.25
+	::= { events 25 }
+
+epc871210ExtInputs OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.112.1.6.2
+	::= { epc871210ExtSensors 2 }
+
+epc871210ExtInputEntry OBJECT-TYPE
+	SYNTAX  Epc871210ExtInputEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc871210ExtInputIndex }
+	-- 1.3.6.1.4.1.28507.112.1.6.2.2.1
+	::= { epc871210ExtInputTable 1 }
+
+
+Epc871210ExtInputEntry ::= SEQUENCE {
+
+	epc871210ExtInputIndex       Unsigned32,
+	epc871210ExtInput            INTEGER,
+	epc871210ExtInputToggleCount Integer32,
+	epc871210ExtInputName        OCTET STRING,
+	epc871210ExtInputPortNum     Integer32,
+	epc871210ExtInputBlockIndex  Integer32 }
+
+
+epc871210ExtInput OBJECT-TYPE
+	SYNTAX  INTEGER {
+			lo(0),
+			hi(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Input state of device"
+	-- 1.3.6.1.4.1.28507.112.1.6.2.2.1.2
+	::= { epc871210ExtInputEntry 2 }
+
+
+epc871210ExtActiveInputs OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of suppported Input Channels."
+	-- 1.3.6.1.4.1.28507.112.1.6.2.1
+	::= { epc871210ExtInputs 1 }
+
+
+epc871210ExtInputTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc871210ExtInputEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.112.1.6.2.2
+	::= { epc871210ExtInputs 2 }
+
+
+epc871210ExtInputIndex OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.112.1.6.2.2.1.1
+	::= { epc871210ExtInputEntry 1 }
+
+
+epc871210CPUSensors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.112.1.5.14
+	::= { epc871210IntSensors 14 }
+
+epc871210NTPClient OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.112.1.5.15
+	::= { epc871210IntSensors 15 }
+
+epc871210NTPUnixTime OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"show received NTP time as unixtime (secs since 1 January 1970)"
+	-- 1.3.6.1.4.1.28507.112.1.5.15.2
+	::= { epc871210NTPClient 2 }
+
+
+epc871210NTPLastValidTimestamp OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"show seconds since last valid NTP timestamp received"
+	-- 1.3.6.1.4.1.28507.112.1.5.15.3
+	::= { epc871210NTPClient 3 }
+
+
+epc871210NTPTimeValid OBJECT-TYPE
+	SYNTAX  INTEGER {
+			notime(0),
+			valid(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Show if valid Time is received"
+	-- 1.3.6.1.4.1.28507.112.1.5.15.1
+	::= { epc871210NTPClient 1 }
+
+
+epc871210CPUSensorVsystem OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"System Voltage on CPU Board"
+	-- 1.3.6.1.4.1.28507.112.1.5.14.1
+	::= { epc871210CPUSensors 1 }
+
+
+epc871210CPUSensorVaux OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Auxiliary Voltage on CPU Board"
+	-- 1.3.6.1.4.1.28507.112.1.5.14.2
+	::= { epc871210CPUSensors 2 }
+
+
+epc871210CPUSensorVmain OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Main Voltage on CPU Board"
+	-- 1.3.6.1.4.1.28507.112.1.5.14.3
+	::= { epc871210CPUSensors 3 }
+
+
+epc871210CPUSensorTcpu OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Temperature on CPU Board"
+	-- 1.3.6.1.4.1.28507.112.1.5.14.4
+	::= { epc871210CPUSensors 4 }
+
+
+-- Notification Types
+--
+
+events OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.112.3
+	::= { gadsEPC871210 3 }
+
+
+epc871210SwitchEvtPort NOTIFICATION-TYPE
+	OBJECTS {
+		epc871210PortIndex,
+		epc871210PortName,
+		epc871210PortState,
+		epc871210PortSwitchCount}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a port is switched"
+	-- 1.3.6.1.4.1.28507.112.3.1
+	::= { events 1 }
+
+
+epc871210TempEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc871210SensorIndex,
+		epc871210TempSensor}
+	STATUS  current
+	DESCRIPTION
+		"temperature limits exceeded"
+	-- 1.3.6.1.4.1.28507.112.3.2
+	::= { events 2 }
+
+
+epc871210AirPressureEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc871210SensorIndex,
+		epc871210AirPressure}
+	STATUS  current
+	DESCRIPTION
+		"Air Pressure limits exceeded
+
+		"
+	-- 1.3.6.1.4.1.28507.112.3.4
+	::= { events 4 }
+
+
+epc871210DewPtDiffEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc871210SensorIndex,
+		epc871210DewPointDiff}
+	STATUS  current
+	DESCRIPTION
+		"Dew Point Difference limits exceeded"
+	-- 1.3.6.1.4.1.28507.112.3.5
+	::= { events 5 }
+
+
+epc871210OVPEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc871210OVPIndex,
+		epc871210OVPStatus}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when the OVP status changes"
+	-- 1.3.6.1.4.1.28507.112.3.6
+	::= { events 6 }
+
+
+epc871210LineAmperageEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc871210PowerIndex,
+		epc871210PowerActive,
+		epc871210Current,
+		epc871210Voltage,
+		epc871210Frequency,
+		epc871210PowerApparent,
+		epc871210PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		current is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.112.3.7
+	::= { events 7 }
+
+
+epc871210LineVoltageEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc871210PowerIndex,
+		epc871210PowerActive,
+		epc871210Current,
+		epc871210Voltage,
+		epc871210Frequency,
+		epc871210PowerApparent,
+		epc871210PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		voltage is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.112.3.26
+	::= { events 26 }
+
+
+epc871210LinePowerEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc871210PowerIndex,
+		epc871210PowerActive,
+		epc871210Current,
+		epc871210Voltage,
+		epc871210Frequency,
+		epc871210PowerApparent,
+		epc871210PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		power is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.112.3.27
+	::= { events 27 }
+
+epc871210Voltage OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Voltage on Power Channel"
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.6
+	::= { epc871210PowerEntry 6 }
+
+
+epc871210Frequency OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 hz"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Frequency of Power Channel"
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.7
+	::= { epc871210PowerEntry 7 }
+
+
+epc871210AbsEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Absolute Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.12
+	::= { epc871210PowerEntry 12 }
+
+
+epc871210AbsEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Resettable Absolute Active Energy counter.
+		Writing '0' resets all resettable counter."
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.13
+	::= { epc871210PowerEntry 13 }
+
+
+epc871210AbsEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Absolute Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.14
+	::= { epc871210PowerEntry 14 }
+
+
+epc871210ResetTime OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Time in seconds since last Energy
+		Counter reset."
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.15
+	::= { epc871210PowerEntry 15 }
+
+
+epc871210ForwEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Forward Active Energy counter."
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.16
+	::= { epc871210PowerEntry 16 }
+
+
+epc871210ForwEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Forward Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.17
+	::= { epc871210PowerEntry 17 }
+
+
+epc871210ForwEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Forward Active Energy counter."
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.18
+	::= { epc871210PowerEntry 18 }
+
+
+epc871210ForwEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Forward Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.19
+	::= { epc871210PowerEntry 19 }
+
+
+epc871210RevEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reverse Active Energy counter."
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.20
+	::= { epc871210PowerEntry 20 }
+
+
+epc871210RevEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reverse Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.21
+	::= { epc871210PowerEntry 21 }
+
+
+epc871210RevEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Reverse Active Energy counter."
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.22
+	::= { epc871210PowerEntry 22 }
+
+
+epc871210RevEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Reverse Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.23
+	::= { epc871210PowerEntry 23 }
+
+
+epc871210AbsEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Absolute Active Energy counter."
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.3
+	::= { epc871210PowerEntry 3 }
+
+
+-- Scalars and Tables
+--
+
+epc871210Objects OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.112.1
+	::= { gadsEPC871210 1 }
+
+epc871210CommonConfig OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.112.1.1
+	::= { epc871210Objects 1 }
+
+epc871210SNMPaccess OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.112.1.1.1
+	::= { epc871210CommonConfig 1 }
+
+epc871210TrapCtrl OBJECT-TYPE
+	SYNTAX  Integer32 (0..3)
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"0 = off
+		1 = Ver. 1
+		2 = Ver. 2c
+		3 = Ver. 3"
+	-- 1.3.6.1.4.1.28507.112.1.1.1.1
+	::= { epc871210SNMPaccess 1 }
+
+
+epc871210TrapIPTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc871210TrapIPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"list of all Trap receiver"
+	-- 1.3.6.1.4.1.28507.112.1.1.1.2
+	::= { epc871210SNMPaccess 2 }
+
+
+epc871210TrapIPEntry OBJECT-TYPE
+	SYNTAX  Epc871210TrapIPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"an entry containing management
+		informations regarding the list of trap
+		receivers"
+	INDEX {
+		epc871210TrapIPIndex }
+	-- 1.3.6.1.4.1.28507.112.1.1.1.2.1
+	::= { epc871210TrapIPTable 1 }
+
+
+Epc871210TrapIPEntry ::= SEQUENCE {
+
+	epc871210TrapIPIndex Integer32,
+	epc871210TrapAddr    OCTET STRING }
+
+
+epc871210TrapIPIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..8)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A unique value, greater than zero, for each receiver slot."
+	-- 1.3.6.1.4.1.28507.112.1.1.1.2.1.1
+	::= { epc871210TrapIPEntry 1 }
+
+
+epc871210TrapAddr OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..99))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"DNS name or IP address specifying one Trap receiver slot.
+		A port can optionally be specified: 'name:port' An empty
+		string disables this slot."
+	-- 1.3.6.1.4.1.28507.112.1.1.1.2.1.2
+	::= { epc871210TrapIPEntry 2 }
+
+
+epc871210DeviceConfig OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.112.1.2
+	::= { epc871210Objects 2 }
+
+epc871210IntActors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.112.1.3
+	::= { epc871210Objects 3 }
+
+epc871210relayports OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.112.1.3.1
+	::= { epc871210IntActors 1 }
+
+-- the Interfaces table
+-- The Interfaces table contains information on the entity's
+-- interfaces.  Each sub-layer below the internetwork-layer
+-- of a network interface is considered to be an interface.
+
+epc871210portTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc871210portEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"list of all EPC Relay Ports"
+	-- 1.3.6.1.4.1.28507.112.1.3.1.2
+	::= { epc871210relayports 2 }
+
+
+epc871210portEntry OBJECT-TYPE
+	SYNTAX  Epc871210portEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry containing management information applicable to a
+		particular relay port."
+	INDEX {
+		epc871210PortIndex }
+	-- 1.3.6.1.4.1.28507.112.1.3.1.2.1
+	::= { epc871210portTable 1 }
+
+
+Epc871210portEntry ::= SEQUENCE {
+
+	epc871210PortIndex         Integer32,
+	epc871210PortName          OCTET STRING,
+	epc871210PortState         INTEGER,
+	epc871210PortSwitchCount   Integer32,
+	epc871210PortStartupMode   INTEGER,
+	epc871210PortStartupDelay  Integer32,
+	epc871210PortRepowerTime   Integer32,
+	epc871210PortResetDuration Integer32 }
+
+
+epc871210PortName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..15))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a Relay Port."
+	-- 1.3.6.1.4.1.28507.112.1.3.1.2.1.2
+	::= { epc871210portEntry 2 }
+
+
+epc871210PortState OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1) }
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"current state of a Relay Port"
+	-- 1.3.6.1.4.1.28507.112.1.3.1.2.1.3
+	::= { epc871210portEntry 3 }
+
+
+epc871210PortSwitchCount OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The total number of switch actions ocurred on a Relay Port.
+		Does not count switch commands which will not switch
+		the ralay state, so just real relay switches are displayed here."
+	-- 1.3.6.1.4.1.28507.112.1.3.1.2.1.4
+	::= { epc871210portEntry 4 }
+
+
+epc871210PortStartupMode OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1),
+			laststate(2) }
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"set Mode of startup sequence (off, on , remember last state)"
+	DEFVAL { off }
+	-- 1.3.6.1.4.1.28507.112.1.3.1.2.1.5
+	::= { epc871210portEntry 5 }
+
+
+epc871210PortStartupDelay OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for startup action"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.112.1.3.1.2.1.6
+	::= { epc871210portEntry 6 }
+
+
+epc871210PortRepowerTime OBJECT-TYPE
+	SYNTAX  Integer32 (0..65535)
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for repower port after switching off"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.112.1.3.1.2.1.7
+	::= { epc871210portEntry 7 }
+
+
+epc871210Buzzer OBJECT-TYPE
+	SYNTAX  Integer32 (0..1)
+	UNITS	"0 = Off, 1 = On"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"turn Buzzer on and off"
+	-- 1.3.6.1.4.1.28507.112.1.3.10
+	::= { epc871210IntActors 10 }
+
+
+epc871210ExtActors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.112.1.4
+	::= { epc871210Objects 4 }
+
+epc871210IntSensors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.112.1.5
+	::= { epc871210Objects 5 }
+
+epc871210PowerChan OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.112.1.5.1
+	::= { epc871210IntSensors 1 }
+
+epc871210ActivePowerChan OBJECT-TYPE
+	SYNTAX  Unsigned32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of suppported Power Channels."
+	-- 1.3.6.1.4.1.28507.112.1.5.1.1
+	::= { epc871210PowerChan 1 }
+
+
+epc871210PowerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc871210PowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"All available Channel Interfaces."
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2
+	::= { epc871210PowerChan 2 }
+
+
+epc871210PowerEntry OBJECT-TYPE
+	SYNTAX  Epc871210PowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry containing management information
+		applicable to a particular Power Channel."
+	INDEX {
+		epc871210PowerIndex }
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1
+	::= { epc871210PowerTable 1 }
+
+
+Epc871210PowerEntry ::= SEQUENCE {
+
+	epc871210PowerIndex                   Integer32,
+	epc871210ChanStatus                   Integer32,
+	epc871210AbsEnergyActive              Gauge32,
+	epc871210PowerActive                  Integer32,
+	epc871210Current                      Gauge32,
+	epc871210Voltage                      Gauge32,
+	epc871210Frequency                    Gauge32,
+	epc871210PowerFactor                  Integer32,
+	epc871210Pangle                       Integer32,
+	epc871210PowerApparent                Integer32,
+	epc871210PowerReactive                Integer32,
+	epc871210AbsEnergyReactive            Gauge32,
+	epc871210AbsEnergyActiveResettable    Gauge32,
+	epc871210AbsEnergyReactiveResettable  Gauge32,
+	epc871210ResetTime                    Gauge32,
+	epc871210ForwEnergyActive             Gauge32,
+	epc871210ForwEnergyReactive           Gauge32,
+	epc871210ForwEnergyActiveResettable   Gauge32,
+	epc871210ForwEnergyReactiveResettable Gauge32,
+	epc871210RevEnergyActive              Gauge32,
+	epc871210RevEnergyReactive            Gauge32,
+	epc871210RevEnergyActiveResettable    Gauge32,
+	epc871210RevEnergyReactiveResettable  Gauge32,
+	epc871210LineSensorName               OCTET STRING }
+
+
+epc871210ChanStatus OBJECT-TYPE
+	SYNTAX  Integer32 (0..1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"0 = data not active, 1 = data valid"
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.2
+	::= { epc871210PowerEntry 2 }
+
+
+epc871210PowerActive OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Active Power"
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.4
+	::= { epc871210PowerEntry 4 }
+
+
+epc871210Current OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Curent on Power Channel."
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.5
+	::= { epc871210PowerEntry 5 }
+
+
+epc871210PowerFactor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.001"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Power Factor of Channel between
+		-1.0 and 1.00"
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.8
+	::= { epc871210PowerEntry 8 }
+
+
+epc871210Pangle OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 degree"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Phase Angle between Voltage
+		and L Line Current between
+		-180.0 and 180.0"
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.9
+	::= { epc871210PowerEntry 9 }
+
+
+epc871210PowerApparent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"VA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"L Line Mean Apparent Power"
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.10
+	::= { epc871210PowerEntry 10 }
+
+
+epc871210PowerReactive OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"VAR"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"L Line Mean Reactive Power"
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.11
+	::= { epc871210PowerEntry 11 }
+
+
+epc871210OVPTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc871210OVPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Overvoltage Protection Table
+		This table may not be present
+		on devices without OVP feature"
+	-- 1.3.6.1.4.1.28507.112.1.5.2
+	::= { epc871210IntSensors 2 }
+
+
+epc871210OVPEntry OBJECT-TYPE
+	SYNTAX  Epc871210OVPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc871210OVPIndex }
+	-- 1.3.6.1.4.1.28507.112.1.5.2.1
+	::= { epc871210OVPTable 1 }
+
+
+Epc871210OVPEntry ::= SEQUENCE {
+
+	epc871210OVPIndex  Integer32,
+	epc871210OVPStatus INTEGER }
+
+
+epc871210ExtSensors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.112.1.6
+	::= { epc871210Objects 6 }
+
+epc871210SensorTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc871210SensorEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.112.1.6.1
+	::= { epc871210ExtSensors 1 }
+
+
+epc871210SensorEntry OBJECT-TYPE
+	SYNTAX  Epc871210SensorEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc871210SensorIndex }
+	-- 1.3.6.1.4.1.28507.112.1.6.1.1
+	::= { epc871210SensorTable 1 }
+
+
+Epc871210SensorEntry ::= SEQUENCE {
+
+	epc871210SensorIndex   Integer32,
+	epc871210TempSensor    Integer32,
+	epc871210HygroSensor   Integer32,
+	epc871210AirPressure   Integer32,
+	epc871210DewPoint      Integer32,
+	epc871210DewPointDiff  Integer32,
+	epc871210ExtSensorName OCTET STRING }
+
+
+epc871210SensorIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.112.1.6.1.1.1
+	::= { epc871210SensorEntry 1 }
+
+
+epc871210TempSensor OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual temperature"
+	-- 1.3.6.1.4.1.28507.112.1.6.1.1.2
+	::= { epc871210SensorEntry 2 }
+
+
+epc871210AirPressure OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual air pressure"
+	-- 1.3.6.1.4.1.28507.112.1.6.1.1.5
+	::= { epc871210SensorEntry 5 }
+
+
+epc871210DewPoint OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"dew point for actual temperature and humidity"
+	-- 1.3.6.1.4.1.28507.112.1.6.1.1.6
+	::= { epc871210SensorEntry 6 }
+
+
+epc871210DewPointDiff OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"difference between dew point and actual
+		temperature (Temp - DewPoint)"
+	-- 1.3.6.1.4.1.28507.112.1.6.1.1.7
+	::= { epc871210SensorEntry 7 }
+
+
+epc871210HygroSensor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 percent humidity"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual humidity"
+	-- 1.3.6.1.4.1.28507.112.1.6.1.1.3
+	::= { epc871210SensorEntry 3 }
+
+
+-- Conformance
+--
+
+epc871210Conf OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.112.2
+	::= { gadsEPC871210 2 }
+
+-- Groups
+--
+
+epc871210Groups OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.112.2.1
+	::= { epc871210Conf 1 }
+
+-- Compliance
+--
+
+epc871210Compls OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.112.2.2
+	::= { epc871210Conf 2 }
+
+epc871210BasicGroup OBJECT-GROUP
+	OBJECTS {
+		epc871210TrapCtrl,
+		epc871210TrapIPIndex,
+		epc871210TrapAddr,
+		epc871210portNumber,
+		epc871210PortIndex,
+		epc871210PortName,
+		epc871210PortState,
+		epc871210PortSwitchCount,
+		epc871210PortStartupMode,
+		epc871210PortStartupDelay,
+		epc871210PortRepowerTime,
+		epc871210Buzzer,
+		epc871210ActivePowerChan,
+		epc871210PowerIndex,
+		epc871210ChanStatus,
+		epc871210AbsEnergyActive,
+		epc871210PowerActive,
+		epc871210Current,
+		epc871210Voltage,
+		epc871210Frequency,
+		epc871210PowerFactor,
+		epc871210Pangle,
+		epc871210PowerApparent,
+		epc871210PowerReactive,
+		epc871210AbsEnergyReactive,
+		epc871210AbsEnergyActiveResettable,
+		epc871210AbsEnergyReactiveResettable,
+		epc871210ResetTime,
+		epc871210ForwEnergyActive,
+		epc871210ForwEnergyReactive,
+		epc871210ForwEnergyActiveResettable,
+		epc871210ForwEnergyReactiveResettable,
+		epc871210RevEnergyActive,
+		epc871210RevEnergyReactive,
+		epc871210RevEnergyActiveResettable,
+		epc871210RevEnergyReactiveResettable,
+		epc871210OVPIndex,
+		epc871210OVPStatus,
+		epc871210SensorIndex,
+		epc871210TempSensor,
+		epc871210HygroSensor,
+		epc871210AirPressure,
+		epc871210DewPoint,
+		epc871210DewPointDiff,
+		epc871210LineSensorName,
+		epc871210ExtSensorName,
+		epc871210CPUSensorVsystem,
+		epc871210CPUSensorVaux,
+		epc871210CPUSensorVmain,
+		epc871210CPUSensorTcpu,
+		epc871210NTPTimeValid,
+		epc871210NTPUnixTime,
+		epc871210NTPLastValidTimestamp,
+		epc871210PortResetDuration,
+		epc871210ExtActiveInputs,
+		epc871210ExtInputIndex,
+		epc871210ExtInput,
+		epc871210ExtInputName,
+		epc871210ExtInputPortNum,
+		epc871210ExtInputBlockIndex,
+		epc871210ExtInputToggleCount,
+		epc871210ProdName,
+		epc871210FWVersion,
+		epc871210HostName,
+		epc871210PhysAddress,
+		epc871210SerialNumber }
+	STATUS  current
+	DESCRIPTION
+		"Basic objects."
+	-- 1.3.6.1.4.1.28507.112.2.1.1
+	::= { epc871210Groups 1 }
+
+epc871210NotificationGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		epc871210SwitchEvtPort,
+		epc871210TempEvtSen,
+		epc871210HygroEvtSen,
+		epc871210AirPressureEvtSen,
+		epc871210DewPtDiffEvtSen,
+		epc871210OVPEvt,
+		epc871210LineAmperageEvt,
+		epc871210ExtInputEvt,
+		epc871210LineVoltageEvt,
+		epc871210LinePowerEvt }
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.112.2.1.2
+	::= { epc871210Groups 2 }
+
+
+epc871210HygroEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc871210SensorIndex,
+		epc871210HygroSensor}
+	STATUS  current
+	DESCRIPTION
+		"hygro limits exceeded"
+	-- 1.3.6.1.4.1.28507.112.3.3
+	::= { events 3 }
+
+epc871210OVPStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+			unknown(2),
+			ok(1),
+			failure(0) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"shows the status of the
+		built-in Overvoltage Protection"
+	-- 1.3.6.1.4.1.28507.112.1.5.2.1.2
+	::= { epc871210OVPEntry 2 }
+
+
+epc871210LineSensorName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a
+		Line Sensor"
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.100
+	::= { epc871210PowerEntry 100 }
+
+
+epc871210ExtSensorName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a
+		external Sensor"
+	-- 1.3.6.1.4.1.28507.112.1.6.1.1.32
+	::= { epc871210SensorEntry 32 }
+
+
+epc871210PowerIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Index of Power Channel entries"
+	-- 1.3.6.1.4.1.28507.112.1.5.1.2.1.1
+	::= { epc871210PowerEntry 1 }
+
+
+epc871210OVPIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.112.1.5.2.1.1
+	::= { epc871210OVPEntry 1 }
+
+
+gadsEPC871210 OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.112
+	::= { gudeads 112 }
+
+epc871210PortResetDuration OBJECT-TYPE
+	SYNTAX  Integer32 (0..65535)
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for turning Port on again after Reset action"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.112.1.3.1.2.1.8
+	::= { epc871210portEntry 8 }
+
+
+epc871210portNumber OBJECT-TYPE
+	SYNTAX  Integer32 (1..20)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The number of Relay Ports"
+	-- 1.3.6.1.4.1.28507.112.1.3.1.1
+	::= { epc871210relayports 1 }
+
+
+epc871210PortIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..20)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A unique value, greater than zero, for each Relay Port."
+	-- 1.3.6.1.4.1.28507.112.1.3.1.2.1.1
+	::= { epc871210portEntry 1 }
+
+
+END

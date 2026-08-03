@@ -1,0 +1,36 @@
+os: gude-epc
+text: 'Gude Expert Power Control'
+type: power
+icon: gude
+group: gude
+mib_dir: gude
+over:
+    - { graph: device_power, text: Power }
+    - { graph: device_current, text: Current }
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_power_consumed, text: Power Consumed }
+
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.28507.1     # Expert Power Control NET 2x6 / EPC8
+            - .1.3.6.1.4.1.28507.43    # Expert Power Control 1202
+            - .1.3.6.1.4.1.28507.50    # Expert Power Control 1292
+            - .1.3.6.1.4.1.28507.56    # Expert Power Control 8221
+            - .1.3.6.1.4.1.28507.58    # Expert Power Control 8226
+            - .1.3.6.1.4.1.28507.64    # Expert Power Control 8316
+            - .1.3.6.1.4.1.28507.68    # Expert Power Control 1104-1
+            - .1.3.6.1.4.1.28507.69    # Expert Power Control 1105-1
+            - .1.3.6.1.4.1.28507.77    # Expert Power Control 8021
+            - .1.3.6.1.4.1.28507.81    # Expert Power Control 8031
+            - .1.3.6.1.4.1.28507.82    # Expert Power Control 8032
+            - .1.3.6.1.4.1.28507.83    # Expert Power Control 8035
+            - .1.3.6.1.4.1.28507.85    # Expert Power Control 8041
+            - .1.3.6.1.4.1.28507.87    # Expert Power Control 8045
+            - .1.3.6.1.4.1.28507.97    # Expert Power Control 8314
+            - .1.3.6.1.4.1.28507.98    # Expert Power Control 8291-1
+            - .1.3.6.1.4.1.28507.100   # Expert Power Control 8001
+            - .1.3.6.1.4.1.28507.106   # Expert Power Control 1141-1
+            - .1.3.6.1.4.1.28507.107   # Expert Power Control 1121-1
+            - .1.3.6.1.4.1.28507.111   # Expert Power Control 8733-00
+            - .1.3.6.1.4.1.28507.112   # Expert Power Control 8712-10

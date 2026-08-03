@@ -98,7 +98,9 @@ Route::get('graph/{path?}', GraphController::class)
 Route::middleware(['auth'])->group(function (): void {
     // pages
     Route::post('alert/{alert}/ack', [AlertController::class, 'ack'])->name('alert.ack');
-    Route::get('devices/{view?}/{graph?}/{vars?}', [DevicesController::class, 'index'])->where('vars', '.*')->name('devices');
+    Route::get('devices/{view?}/{graph?}/{vars?}', [DevicesController::class, 'index'])->where('vars', '.*')
+        ->middleware(['saved-filter:devices'])
+        ->name('devices');
     Route::resource('device-groups', DeviceGroupController::class);
     Route::get('graphs/{path?}', GraphsPageController::class)->where('path', '.*')->name('graphs');
     Route::any('inventory', App\Http\Controllers\InventoryController::class)->name('inventory');
@@ -192,19 +194,18 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('popup', App\Http\Controllers\DevicePopupController::class)->name('popup');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
         Route::get('config/backups', [Device\Tabs\ConfigController::class, 'backups'])->name('config.backups');
-        Route::get('config/backups/{backup}', [Device\Tabs\ConfigController::class, 'backup'])->where('backup', '[A-Za-z0-9._|-]+')->name('config.backup');
+        Route::get('config/backup', [Device\Tabs\ConfigController::class, 'backup'])->name('config.backup');
         Route::get('config/diff', [Device\Tabs\ConfigController::class, 'diff'])->name('config.diff');
         Route::put('module/{module}', [Device\Tabs\ModuleController::class, 'update'])->name('module.update');
         Route::delete('module/{module}', [Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
     });
 
     // fallback device routes
-    Route::match(['get', 'post'], 'device/{device}/{tab}/{vars}', [DeviceController::class, 'index'])
-        ->middleware('saved-filter:device.port-security')
-        ->where(['tab' => 'ports', 'vars' => 'portsecurity'])
-        ->name('device.port-security');
     Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', [DeviceController::class, 'index'])
-        ->middleware('saved-filter:device.ports') // FIXME more specific route
+        ->middleware([
+            'saved-filter:device.port-security,*/ports/portsecurity',
+            'saved-filter:device.ports,*/ports|*/ports/basic|*/ports/detail',
+        ])
         ->name('device')->where('vars', '.*');
 
     // Maps
@@ -367,6 +368,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('address-search/mac', Table\MacSearchController::class)->name('search.mac');
             Route::post('alertlog', Table\AlertLogController::class)->name('table.alertlog');
             Route::get('alertlog/export', [Table\AlertLogController::class, 'export'])->name('table.alertlog.export');
+            Route::post('alerts', Table\AlertsController::class)->name('table.alerts');
             Route::post('alert-schedule', Table\AlertScheduleController::class);
             Route::post('customers', Table\CustomersController::class);
             Route::post('diskio', Table\DiskioController::class)->name('table.diskio');
