@@ -832,9 +832,274 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     color: #FFFFFF;
 }
 
+/* Availability map: remaps Bootstrap labels + compact tiles; routes/labels unchanged */
+.lnms-dashboard .lnms-widget .lnms-availability-map {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .widget-availability-host,
+.lnms-dashboard .lnms-widget .lnms-availability-map .widget-availability-service {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .label {
+    border-radius: var(--lnms-radius-sm);
+    font-weight: 500;
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .label-success {
+    background-color: var(--lnms-status-up) !important;
+    color: #FFFFFF !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .label-warning {
+    background-color: var(--lnms-status-warn) !important;
+    color: var(--lnms-status-on) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .label-danger {
+    background-color: var(--lnms-status-down) !important;
+    color: #FFFFFF !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .label-default {
+    background-color: var(--lnms-status-maintenance) !important;
+    color: #FFFFFF !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .blackbg {
+    background-color: var(--lnms-status-unknown) !important;
+    color: #FFFFFF !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .availability-map-oldview-box-up,
+.lnms-dashboard .lnms-widget .lnms-availability-map .availability-map-oldview-box-ignored-up {
+    background-color: var(--lnms-status-up) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .availability-map-oldview-box-warn {
+    background-color: var(--lnms-status-warn) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .availability-map-oldview-box-down {
+    background-color: var(--lnms-status-down) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-availability-map .availability-map-oldview-box-ignored,
+.lnms-dashboard .lnms-widget .lnms-availability-map .availability-map-oldview-box-ignored-down,
+.lnms-dashboard .lnms-widget .lnms-availability-map .availability-map-oldview-box-disabled {
+    background-color: var(--lnms-status-unknown) !important;
+}
+
+/* Eventlog widget: Bootgrid chrome — preserve IDs, data-column-id, /ajax/table/eventlog */
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-header,
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-header .search .search-field,
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-footer .search .search-field {
+    border-color: var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-header .search .search-field:focus,
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-footer .search .search-field:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 3px var(--lnms-focus-ring);
+}
+
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-table th,
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .table > thead > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-color: var(--lnms-border);
+    font-weight: 500;
+}
+
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-table td,
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .table > tbody > tr > td {
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-table tr:hover td,
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-dashboard .lnms-widget .lnms-eventlog-widget .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+/* Device types + top-devices / top-interfaces tables */
+.lnms-dashboard .lnms-widget .lnms-device-types.panel,
+.lnms-dashboard .lnms-widget .lnms-top-devices,
+.lnms-dashboard .lnms-widget .lnms-top-interfaces {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-types.panel {
+    margin-bottom: 0;
+    background: transparent;
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: none;
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-types .table,
+.lnms-dashboard .lnms-widget .lnms-top-devices .table,
+.lnms-dashboard .lnms-widget .lnms-top-interfaces .table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-types .table > thead > tr > th,
+.lnms-dashboard .lnms-widget .lnms-top-devices .table > thead > tr > th,
+.lnms-dashboard .lnms-widget .lnms-top-interfaces .table > thead > tr > th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+    font-weight: 500;
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-types .table > tbody > tr > td,
+.lnms-dashboard .lnms-widget .lnms-top-devices .table > tbody > tr > td,
+.lnms-dashboard .lnms-widget .lnms-top-interfaces .table > tbody > tr > td {
+    border-top-color: var(--lnms-border);
+    vertical-align: middle;
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-types .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-dashboard .lnms-widget .lnms-top-devices .table-striped > tbody > tr:nth-of-type(odd),
+.lnms-dashboard .lnms-widget .lnms-top-interfaces .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-types .table-striped > tbody > tr:nth-of-type(even),
+.lnms-dashboard .lnms-widget .lnms-top-devices .table-striped > tbody > tr:nth-of-type(even),
+.lnms-dashboard .lnms-widget .lnms-top-interfaces .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-types .table-hover > tbody > tr:hover,
+.lnms-dashboard .lnms-widget .lnms-top-devices .table-hover > tbody > tr:hover,
+.lnms-dashboard .lnms-widget .lnms-top-interfaces .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-types a,
+.lnms-dashboard .lnms-widget .lnms-top-devices a,
+.lnms-dashboard .lnms-widget .lnms-top-interfaces a {
+    color: var(--lnms-accent);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-types a:hover,
+.lnms-dashboard .lnms-widget .lnms-device-types a:focus,
+.lnms-dashboard .lnms-widget .lnms-top-devices a:hover,
+.lnms-dashboard .lnms-widget .lnms-top-devices a:focus,
+.lnms-dashboard .lnms-widget .lnms-top-interfaces a:hover,
+.lnms-dashboard .lnms-widget .lnms-top-interfaces a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-devices h4,
+.lnms-dashboard .lnms-widget .lnms-top-interfaces h4 {
+    margin-top: 0;
+    margin-bottom: var(--lnms-space-2);
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+    font-weight: 500;
+}
+
+.lnms-dashboard .lnms-widget .lnms-top-interfaces .minigraph-image,
+.lnms-dashboard .lnms-widget .lnms-top-devices .minigraph-image {
+    border-radius: var(--lnms-radius-sm);
+    vertical-align: middle;
+}
+
+/* World map: container chrome only — Leaflet IDs, maps.getdevices, markers preserved */
+.lnms-dashboard .lnms-widget .lnms-worldmap-widget.worldmap_widget {
+    border-radius: 0 0 var(--lnms-radius-md) var(--lnms-radius-md);
+    overflow: hidden;
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-worldmap-widget .leaflet-popup-content-wrapper {
+    background: var(--lnms-surface);
+    color: var(--lnms-text);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: var(--lnms-shadow-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-worldmap-widget .leaflet-popup-tip {
+    background: var(--lnms-surface);
+}
+
+.lnms-dashboard .lnms-widget .lnms-worldmap-widget .leaflet-popup-content a {
+    color: var(--lnms-accent);
+}
+
+.lnms-dashboard .lnms-widget .lnms-worldmap-widget .leaflet-popup-content a:hover,
+.lnms-dashboard .lnms-widget .lnms-worldmap-widget .leaflet-popup-content a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-dashboard .lnms-widget .lnms-worldmap-widget .greenCluster {
+    background-color: var(--lnms-status-up);
+    color: #FFFFFF;
+}
+
+.lnms-dashboard .lnms-widget .lnms-worldmap-widget .blueCluster {
+    background-color: var(--lnms-status-maintenance);
+    color: #FFFFFF;
+}
+
+.lnms-dashboard .lnms-widget .lnms-worldmap-widget .redCluster {
+    background-color: var(--lnms-status-down);
+    color: #FFFFFF;
+}
+
+/* Graph widget chrome: real /graph images only */
+.lnms-dashboard .lnms-widget .lnms-dashboard-graph.dashboard-graph {
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    overflow: hidden;
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-dashboard-graph .minigraph-image {
+    display: block;
+    border-radius: 0;
+}
+
 .dark .lnms-dashboard .lnms-widget .lnms-device-summary .table-striped > tbody > tr:nth-of-type(odd),
 .dark .lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-table td.loading,
-.dark .lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-table td.no-results {
+.dark .lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-table td.no-results,
+.dark .lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-table td.loading,
+.dark .lnms-dashboard .lnms-widget .lnms-eventlog-widget .bootgrid-table td.no-results,
+.dark .lnms-dashboard .lnms-widget .lnms-eventlog-widget .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-dashboard .lnms-widget .lnms-device-types .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-dashboard .lnms-widget .lnms-top-devices .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-dashboard .lnms-widget .lnms-top-interfaces .table-striped > tbody > tr:nth-of-type(odd) {
     background-color: var(--lnms-surface);
 }
 
