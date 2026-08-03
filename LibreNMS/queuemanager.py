@@ -54,11 +54,11 @@ class MemoryPressureGate:
             pct = int(pct)
         except (TypeError, ValueError):
             raise ValueError(
-                "distributed_poller_memory_pressure_percent must be an integer 1-99"
+                "LIBRENMS_DISTRIBUTED_POLLER_MEMORY_PRESSURE_PERCENT must be an integer 1-99"
             )
         if not 1 <= pct <= 99:
             raise ValueError(
-                "distributed_poller_memory_pressure_percent must be an integer 1-99"
+                "LIBRENMS_DISTRIBUTED_POLLER_MEMORY_PRESSURE_PERCENT must be an integer 1-99"
             )
         return cls(pct / 100.0, type_desc)
 

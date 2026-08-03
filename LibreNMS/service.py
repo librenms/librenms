@@ -130,10 +130,7 @@ class ServiceConfig(DBConfig):
         )
         self.memory_pressure_percent = os.getenv(
             "LIBRENMS_DISTRIBUTED_POLLER_MEMORY_PRESSURE_PERCENT",
-            config.get(
-                "distributed_poller_memory_pressure_percent",
-                ServiceConfig.memory_pressure_percent,
-            ),
+            ServiceConfig.memory_pressure_percent,
         )
 
         self.master_timeout = config.get(

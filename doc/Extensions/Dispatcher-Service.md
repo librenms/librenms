@@ -88,15 +88,9 @@ Usage is read from the process's cgroup memory limit when available (cgroup v2 o
 v1), otherwise from host memory. If usage cannot be determined the gate does
 nothing and polling behaves as normal.
 
-!!! setting "poller/dispatcherservice"
-    ```bash
-    lnms config:set distributed_poller_memory_pressure_percent 85
-    ```
-
-This may also be set in `config.php`, or overridden per dispatcher via an
-environment variable (useful when the same config is shared across nodes with
-different memory limits). Precedence: environment variable, then LibreNMS config,
-then disabled.
+This is set per dispatcher via an environment variable (there is no global config
+setting, as dispatchers sharing one LibreNMS install commonly have different
+memory limits):
 
 ```bash
 export LIBRENMS_DISTRIBUTED_POLLER_MEMORY_PRESSURE_PERCENT=85
