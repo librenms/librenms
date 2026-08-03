@@ -174,7 +174,8 @@
 
 /* —— Shell canvas —— */
 body.lnms-shell {
-    background: var(--lnms-bg);
+    background-color: var(--lnms-bg) !important;
+    background-image: none;
     color: var(--lnms-text);
     font-family: var(--lnms-font-sans);
     line-height: 1.45;
@@ -260,9 +261,10 @@ body.lnms-shell .lnms-a11y-readable {
 
 /* —— Navbar chrome (Bootstrap contracts preserved) —— */
 nav.navbar.lnms-nav.navbar-default {
-    background-color: var(--lnms-surface);
-    border-color: var(--lnms-border);
-    border-bottom-width: 1px;
+    background-color: var(--lnms-surface) !important;
+    border-color: var(--lnms-border) !important;
+    border-bottom: 1px solid var(--lnms-border) !important;
+    border-top: 3px solid var(--lnms-accent) !important;
     box-shadow: var(--lnms-shadow-sm);
     min-height: var(--lnms-nav-height);
     margin-bottom: var(--lnms-space-3) !important;
@@ -270,7 +272,9 @@ nav.navbar.lnms-nav.navbar-default {
 }
 
 nav.navbar.lnms-nav.navbar-default .navbar-brand {
-    color: var(--lnms-text);
+    color: var(--lnms-accent) !important;
+    font-weight: 700;
+    letter-spacing: 0.01em;
     height: var(--lnms-nav-height);
     display: flex;
     align-items: center;
@@ -386,8 +390,14 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 }
 
 .dark nav.navbar.lnms-nav.navbar-default {
-    background-color: var(--lnms-surface);
-    border-color: var(--lnms-border);
+    background-color: var(--lnms-surface) !important;
+    border-color: var(--lnms-border) !important;
+    border-top: 3px solid var(--lnms-accent) !important;
+    border-bottom: 1px solid var(--lnms-border) !important;
+}
+
+.dark nav.navbar.lnms-nav.navbar-default .navbar-brand {
+    color: var(--lnms-accent) !important;
 }
 
 .dark nav.navbar.lnms-nav.navbar-default .navbar-nav > li > a {
@@ -425,7 +435,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background: var(--lnms-surface) !important;
 }
 
-/* —— Login / auth chrome —— */
+/* —— Login / auth chrome (first-paint must differ clearly from stock) —— */
 .lnms-login {
     min-height: calc(100vh - 2rem);
     display: flex;
@@ -433,8 +443,9 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     justify-content: center;
     padding: var(--lnms-space-8) var(--lnms-space-4) var(--lnms-space-5);
     background:
-        radial-gradient(1200px 480px at 50% -10%, var(--lnms-accent-muted), transparent 60%),
-        var(--lnms-bg);
+        linear-gradient(180deg, var(--lnms-accent-muted) 0%, transparent 42%),
+        radial-gradient(900px 420px at 50% -8%, rgba(15, 110, 124, 0.18), transparent 55%),
+        var(--lnms-bg) !important;
 }
 
 .lnms-login__inner {
@@ -442,17 +453,28 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     max-width: 420px;
 }
 
-.lnms-login .panel {
-    background: var(--lnms-surface);
-    border: 1px solid var(--lnms-border);
-    border-radius: var(--lnms-radius-lg);
-    box-shadow: var(--lnms-shadow-sm);
+.lnms-login .lnms-login__brand-line {
+    margin: var(--lnms-space-2) 0 0;
+    color: var(--lnms-accent) !important;
+    font-size: var(--lnms-text-sm);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.lnms-login .panel,
+.lnms-login .lnms-login-panel.panel {
+    background: var(--lnms-surface) !important;
+    border: 1px solid var(--lnms-border) !important;
+    border-top: 4px solid var(--lnms-accent) !important;
+    border-radius: var(--lnms-radius-lg) !important;
+    box-shadow: var(--lnms-shadow-md) !important;
     overflow: hidden;
 }
 
 .lnms-login .panel-heading {
-    background: var(--lnms-surface);
-    border-bottom: 1px solid var(--lnms-border);
+    background: var(--lnms-surface) !important;
+    border-bottom: 1px solid var(--lnms-border) !important;
     padding: var(--lnms-space-5) var(--lnms-space-5) var(--lnms-space-3);
     text-align: center;
 }
@@ -466,8 +488,8 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 }
 
 .lnms-login .panel-footer {
-    background: var(--lnms-surface-muted);
-    border-top: 1px solid var(--lnms-border);
+    background: var(--lnms-surface-muted) !important;
+    border-top: 1px solid var(--lnms-border) !important;
     color: var(--lnms-text-secondary);
     font-size: var(--lnms-text-sm);
 }
@@ -478,30 +500,31 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 }
 
 .lnms-login .form-control {
-    height: 36px;
-    border-color: var(--lnms-border);
-    border-radius: var(--lnms-radius-sm);
-    background: var(--lnms-surface);
-    color: var(--lnms-text);
-    box-shadow: none;
+    height: 40px;
+    border-color: var(--lnms-border) !important;
+    border-radius: var(--lnms-radius-md) !important;
+    background: var(--lnms-surface) !important;
+    color: var(--lnms-text) !important;
+    box-shadow: none !important;
 }
 
 .lnms-login .form-control:focus {
-    border-color: var(--lnms-accent);
-    box-shadow: 0 0 0 3px var(--lnms-focus-ring);
+    border-color: var(--lnms-accent) !important;
+    box-shadow: 0 0 0 3px var(--lnms-focus-ring) !important;
 }
 
 .lnms-login .btn-primary {
-    background-color: var(--lnms-accent);
-    border-color: var(--lnms-accent);
-    border-radius: var(--lnms-radius-md);
+    background-color: var(--lnms-accent) !important;
+    border-color: var(--lnms-accent) !important;
+    border-radius: var(--lnms-radius-md) !important;
     font-weight: 600;
+    min-height: 40px;
 }
 
 .lnms-login .btn-primary:hover,
 .lnms-login .btn-primary:focus {
-    background-color: var(--lnms-accent-hover);
-    border-color: var(--lnms-accent-hover);
+    background-color: var(--lnms-accent-hover) !important;
+    border-color: var(--lnms-accent-hover) !important;
 }
 
 .lnms-login .btn-success {
@@ -513,11 +536,14 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     border-radius: var(--lnms-radius-md);
 }
 
-.lnms-login__brand-line {
+.lnms-login__brand-line,
+.lnms-login .lnms-login__brand-line {
     margin: var(--lnms-space-2) 0 0;
-    color: var(--lnms-text-secondary);
+    color: var(--lnms-accent) !important;
     font-size: var(--lnms-text-sm);
-    font-weight: 400;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     text-align: center;
 }
 

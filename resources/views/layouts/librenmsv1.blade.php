@@ -22,7 +22,6 @@
     <meta name="msapplication-config" content="{{ asset('images/browserconfig.xml') }}">
     <meta name="theme-color" content="{{ session('applied_site_style') === 'dark' ? '#1E2226' : '#F4F6F8' }}">
 
-    @vite(['resources/js/app.js'])
     <link href="{{ asset('css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/bootstrap-switch.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/toastr.min.css') }}" rel="stylesheet">
@@ -47,6 +46,8 @@
     @foreach(LibrenmsConfig::get('webui.custom_css', []) as $custom_css)
         <link href="{{ $custom_css }}" rel="stylesheet">
     @endforeach
+    {{-- Modern UI Vite CSS/JS AFTER legacy stylesheets so design tokens win the cascade --}}
+    @vite(['resources/js/app.js'])
     @yield('css')
     @stack('styles')
 
