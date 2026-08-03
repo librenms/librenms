@@ -1,4 +1,4 @@
-<div id="worldmap_widget-{{ $id }}" class="worldmap_widget" data-reload="false"></div>
+<div id="worldmap_widget-{{ $id }}" class="worldmap_widget lnms-worldmap-widget" data-reload="false"></div>
 
 <script type="application/javascript">
     (function () {

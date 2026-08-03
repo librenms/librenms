@@ -1,4 +1,4 @@
-<div id="eventlog_container-{{ $id }}" data-reload="false">
+<div id="eventlog_container-{{ $id }}" class="lnms-eventlog-widget" data-reload="false">
     <div class="table-responsive">
         <table id="eventlog-{{ $id }}" class="table table-hover table-condensed table-striped">
             <thead>
