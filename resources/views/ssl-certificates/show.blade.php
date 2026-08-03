@@ -3,7 +3,8 @@
 @section('title', __('SSL Certificate') . ' – ' . $certificate->host)
 
 @section('content')
-    <div class="container-fluid">
+    {{-- Phase 5 host: .lnms-ssl-certificates — update/destroy forms + @can gates preserved --}}
+    <div class="container-fluid lnms-ssl-certificates">
         <div class="row">
             <div class="col-md-12">
                 @if (session('success'))

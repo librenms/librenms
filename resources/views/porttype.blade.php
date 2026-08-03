@@ -3,7 +3,8 @@
 @section('title', __('Interface Types'))
 
 @section('content')
-<div class="container-fluid">
+{{-- Phase 5 host: .lnms-port-groups — PortTypeController / x-graph-row preserved --}}
+<div class="container-fluid lnms-port-groups">
     @if($ports->count() == 0)
     <div class="row">
         <div class=col-md-12><span class=list-large>{{ __("No ports found for type") }} {{ implode(' + ', $types) }}</span></div>

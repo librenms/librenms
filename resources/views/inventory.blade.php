@@ -3,7 +3,8 @@
 @section('title', __('Inventory'))
 
 @section('content')
-    <div class="container-fluid">
+    {{-- Phase 5 host: .lnms-inventory — Bootgrid #inventory / #inventory_filter / purge route preserved --}}
+    <div class="container-fluid lnms-inventory">
         <x-panel>
             <x-slot:heading class="tw:flex tw:justify-between">
                 <h3 class="panel-title">{{ __('Inventory') }}</h3>

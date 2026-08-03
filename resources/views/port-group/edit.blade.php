@@ -3,7 +3,8 @@
 @section('title', __('Edit Port Group'))
 
 @section('content')
-    <div class="container">
+    {{-- Phase 5 host: .lnms-port-groups — update route / CSRF preserved --}}
+    <div class="container lnms-port-groups">
         <div class="row">
             <form action="{{ route('port-groups.update', $port_group->id) }}" method="POST" role="form"
                   class="form-horizontal device-group-form col-md-10 col-md-offset-1 col-sm-12">

@@ -3,7 +3,7 @@
 @section('title', __('Edit Service Template'))
 
 @section('content')
-    <div class="container">
+    <div class="container lnms-services">
         <div class="row">
             <form action="{{ route('services.templates.update', $template->id) }}" method="POST" role="form"
                   class="form-horizontal service-template-form col-md-10 col-md-offset-1 col-sm-12">

@@ -3,7 +3,8 @@
 @section('title', __('Add SSL Certificate'))
 
 @section('content')
-<div class="container-fluid">
+{{-- Phase 5 host: .lnms-ssl-certificates — store route / device select / create gate preserved --}}
+<div class="container-fluid lnms-ssl-certificates">
     <div class="row">
         <div class="col-md-12">
             <x-panel title="{{ __('Add SSL Certificate') }}" id="add-ssl-certificate-panel">

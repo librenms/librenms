@@ -3,7 +3,8 @@
 @section('title', __('tools.oui.lookup'))
 
 @section('content')
-    <div class="container">
+    {{-- Phase 5 host: .lnms-oui-lookup — query form / mac_oui.enabled / tools.oui gate preserved --}}
+    <div class="container lnms-oui-lookup">
         <x-panel title="{{ __('tools.oui.title') }}" class="tw:w-fit tw:mx-auto">
             @config('mac_oui.enabled')
                 @if($db_populated)
