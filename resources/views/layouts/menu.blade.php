@@ -651,13 +651,17 @@
                     <input class="form-control" type="search" id="gsearch" name="gsearch" autocomplete="off"
                            placeholder="{{ __('Type / to search') }}"
                            aria-autocomplete="list"
+                           aria-controls="global-search-results"
+                           :aria-expanded="open ? 'true' : 'false'"
+                           aria-haspopup="listbox"
                            x-model="query" x-ref="input"
                            @input.debounce.250ms="run()" @focus="open = flat.length > 0"
                            @keydown="onKey($event)">
                 </div>
-                <div x-show="open" x-cloak
+                <div id="global-search-results" x-show="open" x-cloak
                      class="global-search-dropdown tw:absolute tw:right-0 tw:mt-1 tw:w-[50rem] tw:max-w-[90vw] tw:max-h-[70vh] tw:overflow-y-auto tw:bg-lnms-surface tw:border tw:border-lnms-border tw:rounded-lnms-md tw:shadow-lnms-sm tw:z-50"
-                     role="listbox">
+                     role="listbox"
+                     aria-label="{{ __('Global Search') }}">
                     <div x-show="loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-lnms-text-muted">
                         <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> {{ __('Searching...') }}
                     </div>
