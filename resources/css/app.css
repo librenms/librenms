@@ -1563,16 +1563,32 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-surface);
 }
 
-/* —— Phase 5: Device list (presentation only) ——
- * Hosts: .lnms-devices / .lnms-devices-panel / .lnms-devices-list / .lnms-devices-graphs
- * Preserve: #devices, data-column-id, route('table.device'), devices-headers-table-menu,
- * Alpine filter bar, Bootgrid, graph lazy tags, Device::hasAccess (backend unchanged).
- */
-.lnms-devices {
+/* —— Phase 5 module hosts (shared base; keep per-module sections below) —— */
+.lnms-devices,
+.lnms-device-page,
+.lnms-ports,
+.lnms-graphs,
+.lnms-health,
+.lnms-wireless,
+.lnms-alerts,
+.lnms-alert-log,
+.lnms-alert-rules,
+.lnms-maps,
+.lnms-eventlog,
+.lnms-syslog,
+.lnms-authlog,
+.lnms-bills,
+.lnms-bill,
+.lnms-users,
+.lnms-users-permissions,
+.lnms-roles,
+.lnms-settings,
+.lnms-api {
     font-family: var(--lnms-font-sans);
     color: var(--lnms-text);
 }
 
+/* Phase 5: Device list — hosts .lnms-devices*; Bootgrid #devices / data-column-id preserved */
 .lnms-devices .lnms-devices-panel.panel {
     background-color: var(--lnms-surface);
     border: 1px solid var(--lnms-border);
@@ -1937,18 +1953,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-surface);
 }
 
-/*
- * Phase 5 — Device detail page shell (presentation only)
- * Hosts: .lnms-device-page / __header / __tabs / __actions / __content
- * Preserve: route('device'), $tab->visible(), PageLinks Gate checks,
- * data-toggle dropdown, edit/rediscover/delete on edit tab, graph-popup, legacy slot.
- * Status left-border uses semantic --lnms-status-* only.
- */
-.lnms-device-page {
-    font-family: var(--lnms-font-sans);
-    color: var(--lnms-text);
-}
-
+/* Phase 5: Device detail — hosts .lnms-device-page*; status left-border uses --lnms-status-* */
 .lnms-device-page .lnms-device-page__header.panel {
     background-color: var(--lnms-surface);
     border: 1px solid var(--lnms-border);
@@ -2217,18 +2222,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     }
 }
 
-/*
- * Phase 5 — Ports / interfaces list (presentation only)
- * Hosts: .lnms-ports / .lnms-ports-panel / .lnms-ports-list / .lnms-ports-graphs
- * Preserve: #ports, data-column-id, route('table.ports'), Alpine filter bar,
- * Bootgrid, portPurge @can('port.delete'), group-graph-link, graph lazy tags,
- * portLink Alpine, Port access gates (backend unchanged).
- */
-.lnms-ports {
-    font-family: var(--lnms-font-sans);
-    color: var(--lnms-text);
-}
-
+/* Phase 5: Ports — hosts .lnms-ports*; Bootgrid #ports / data-column-id preserved */
 .lnms-ports .lnms-ports-panel.panel {
     background-color: var(--lnms-surface);
     border: 1px solid var(--lnms-border);
@@ -2590,17 +2584,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-surface-muted);
 }
 
-/*
- * Phase 5 — Graphs page (/graphs)
- * Hosts: .lnms-graphs / .lnms-graphs-panel / .lnms-graphs-thumbs / .lnms-graphs-main
- * Preserve: #period-thumbs, .graph-image, .graph (rrdGraphPng), route('graph'),
- * AuthenticateGraph image endpoints, RrdGraphJS, .infobox / .rrd-pre, subtype select.
- */
-.lnms-graphs {
-    font-family: var(--lnms-font-sans);
-    color: var(--lnms-text);
-}
-
+/* Phase 5: Graphs — hosts .lnms-graphs*; #period-thumbs / .graph-image preserved */
 .lnms-graphs .lnms-graphs-panel.panel {
     background-color: var(--lnms-surface);
     border: 1px solid var(--lnms-border);
@@ -2778,17 +2762,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     }
 }
 
-/*
- * Phase 5 — Health / sensors index pages
- * Hosts: .lnms-health / .lnms-health-panel / .lnms-health-toolbar / .lnms-health-list
- * Preserve: #sensors|#mempool|#processor|#storage|#printer, data-column-id,
- * Bootgrid ajax/table/* routes, viewAny Sensor/Mempool/Processor/Storage.
- */
-.lnms-health {
-    font-family: var(--lnms-font-sans);
-    color: var(--lnms-text);
-}
-
+/* Phase 5: Health — hosts .lnms-health*; Bootgrid sensor tables preserved */
 .lnms-health .lnms-health-panel.panel {
     background-color: var(--lnms-surface);
     border: 1px solid var(--lnms-border);
@@ -3025,16 +2999,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-surface-muted);
 }
 
-/*
- * Phase 5 — Wireless sensors (presentation)
- * Hosts: .lnms-wireless / .lnms-wireless-panel / .lnms-wireless-toolbar / .lnms-wireless-list
- * Preserve: #sensors, data-column-id, Bootgrid ajax/table/wireless, viewAny WirelessSensor.
- */
-.lnms-wireless {
-    font-family: var(--lnms-font-sans);
-    color: var(--lnms-text);
-}
-
+/* Phase 5: Wireless — hosts .lnms-wireless*; Bootgrid #sensors preserved */
 .lnms-wireless .lnms-wireless-panel.panel {
     background-color: var(--lnms-surface);
     border: 1px solid var(--lnms-border);
@@ -3254,20 +3219,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-surface-muted);
 }
 
-/*
- * Phase 5 — Legacy alerts pages (presentation only)
- * Hosts via legacy_page: .lnms-alerts / .lnms-alert-log / .lnms-alert-rules
- * Preserve: #alerts_*, #alertlog, #alert-rules-table, #result_form, #message,
- * ack/notes/details modal IDs, query-builder markup, Bootgrid ajax contracts.
- * Do not restyle query-builder internals beyond modal chrome.
- */
-.lnms-alerts,
-.lnms-alert-log,
-.lnms-alert-rules {
-    font-family: var(--lnms-font-sans);
-    color: var(--lnms-text);
-}
-
+/* Phase 5: Alerts — hosts .lnms-alerts / .lnms-alert-log / .lnms-alert-rules; Bootgrid IDs preserved */
 .lnms-alerts .lnms-alerts-panel.panel,
 .lnms-alert-log .lnms-alert-log-panel.panel,
 .lnms-alerts .panel.panel-default,
@@ -3518,19 +3470,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-surface-muted);
 }
 
-/*
- * Phase 5 — Maps / topology (presentation only)
- * Hosts: .lnms-maps / .lnms-maps-availability / .lnms-maps-netmap /
- *        .lnms-maps-dependency / .lnms-maps-geo / .lnms-maps-custom*
- * Preserve: Leaflet/vis/custom map JS, #visualization, #fullscreen-map,
- * #custom-map, #device-list, #highlight_node, maps.getdevices AJAX,
- * Maps\* controllers, CustomMap policies, modal IDs.
- */
-.lnms-maps {
-    font-family: var(--lnms-font-sans);
-    color: var(--lnms-text);
-}
-
+/* Phase 5: Maps — hosts .lnms-maps*; Leaflet/vis/custom map JS preserved */
 .lnms-maps .page-availability-title,
 .lnms-maps .page-availability-report-host,
 .lnms-maps .pull-right {
@@ -3716,20 +3656,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     color: var(--lnms-text);
 }
 
-/*
- * Phase 5 — Eventlog / Syslog / Authlog (presentation only)
- * Legacy hosts via legacy_page: .lnms-eventlog / .lnms-syslog
- * Blade hosts: .lnms-authlog (+ device tab wrappers)
- * Preserve: #eventlog, #syslog, #authlog, #result_form, Bootgrid table.* routes,
- * select2 AJAX, datetimepickers, CSRF filter forms.
- */
-.lnms-eventlog,
-.lnms-syslog,
-.lnms-authlog {
-    font-family: var(--lnms-font-sans);
-    color: var(--lnms-text);
-}
-
+/* Phase 5: Logs — hosts .lnms-eventlog / .lnms-syslog / .lnms-authlog; Bootgrid IDs preserved */
 .lnms-eventlog .lnms-eventlog-panel.panel,
 .lnms-syslog .lnms-syslog-panel.panel,
 .lnms-eventlog .panel.panel-default,
@@ -3920,22 +3847,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-surface-muted);
 }
 
-/*
- * Phase 5 — Billing / bandwidth accounting (presentation only)
- * Hosts via legacy_page: .lnms-bills (list) / .lnms-bill (detail)
- * Real features only: quotas, CDR/95th, transfer, periods, ports, usage,
- * overage, history. Do NOT invent invoices, payments, debt, taxes,
- * receipts, or suspension-for-nonpayment chrome.
- * Preserve: #bills-list Bootgrid, #create-bill modal, Bill gates,
- * optionbar views (quick/accurate/transfer/history/edit/delete/reset),
- * ajax_table.php id=bills contract.
- */
-.lnms-bills,
-.lnms-bill {
-    font-family: var(--lnms-font-sans);
-    color: var(--lnms-text);
-}
-
+/* Phase 5: Billing — hosts .lnms-bills / .lnms-bill; bandwidth accounting only (no fake invoicing) */
 .lnms-bills .lnms-bills-panel.panel,
 .lnms-bills .panel.panel-default,
 .lnms-bill .panel.panel-default {
@@ -4154,19 +4066,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-accent-muted);
 }
 
-/*
- * Phase 5 — Users / Roles (presentation only)
- * Blade hosts: .lnms-users / .lnms-users-permissions / .lnms-roles
- * Preserve: #users Bootgrid, UserController policies, Spatie roles,
- * permissions attach/detach routes, role CRUD forms, 2FA AJAX.
- */
-.lnms-users,
-.lnms-users-permissions,
-.lnms-roles {
-    font-family: var(--lnms-font-sans);
-    color: var(--lnms-text);
-}
-
+/* Phase 5: Users/Roles — hosts .lnms-users* / .lnms-roles; #users Bootgrid preserved */
 .lnms-users .panel,
 .lnms-users-permissions .panel,
 .lnms-roles .panel {
@@ -4365,18 +4265,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-surface-muted);
 }
 
-/*
- * Phase 5 — System settings (Vue) + API management (presentation only)
- * Hosts: .lnms-settings (Blade) / .lnms-api (api-access)
- * Preserve: Ziggy routes, LibrenmsSettings save/list axios, settings.view|update,
- * api-access token CRUD + can:api.access. Do not log/expose token values.
- */
-.lnms-settings,
-.lnms-api {
-    font-family: var(--lnms-font-sans);
-    color: var(--lnms-text);
-}
-
+/* Phase 5: Settings/API — hosts .lnms-settings / .lnms-api; Ziggy + token CRUD preserved */
 .lnms-settings .panel,
 .lnms-settings .panel.with-nav-tabs.panel-default {
     background-color: var(--lnms-surface);
