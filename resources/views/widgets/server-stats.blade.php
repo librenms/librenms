@@ -1,30 +1,20 @@
-@php
-    $gridCols = match($columns) {
-        1 => 'tw:grid-cols-1',
-        2 => 'tw:grid-cols-2',
-        4 => 'tw:grid-cols-4',
-        5 => 'tw:grid-cols-5',
-        6 => 'tw:grid-cols-6',
-        12 => 'tw:grid-cols-12',
-        default => 'tw:grid-cols-3',
-    };
-@endphp
-
-<div class="tw:grid {{ $gridCols }} tw:gap-4">
-    <div class="tw:text-center">
-        <div id="gauge-cpu-{{ $id }}" class="gauge-container"></div>
-        <div class="gauge-title">{{ __('CPU Usage') }}</div>
-    </div>
+<div class="tw:grid {{ $gridCols ?? 'tw:grid-cols-3' }} tw:gap-2 tw:h-full tw:w-full tw:items-stretch tw:overflow-y-auto" style="grid-template-rows: repeat({{ $gridRows ?? 1 }}, minmax(65px, 1fr));">
+    @if($showCpu ?? true)
+        <div class="tw:flex tw:flex-col tw:items-center tw:justify-center tw:w-full tw:h-full tw:min-h-0">
+            <div id="gauge-cpu-{{ $id }}" class="gauge-container"></div>
+            <div class="gauge-title">{{ __('widgets.server-stats.cpu_usage') }}</div>
+        </div>
+    @endif
 
     @foreach($mempools as $index => $mem)
-        <div class="tw:text-center">
+        <div class="tw:flex tw:flex-col tw:items-center tw:justify-center tw:w-full tw:h-full tw:min-h-0">
             <div id="gauge-mem-{{ $id }}-{{ $index }}" class="gauge-container"></div>
             <div class="gauge-title">{{ $mem['descr'] }}</div>
         </div>
     @endforeach
 
     @foreach($disks as $index => $disk)
-        <div class="tw:text-center">
+        <div class="tw:flex tw:flex-col tw:items-center tw:justify-center tw:w-full tw:h-full tw:min-h-0">
             <div id="gauge-disk-{{ $id }}-{{ $index }}" class="gauge-container"></div>
             <div class="gauge-title">{{ $disk['descr'] }}</div>
         </div>
@@ -34,39 +24,39 @@
 <script type="text/javascript">
     $(document).ready(function () {
 
-        new JustGage({
-            id: "gauge-cpu-{{ $id }}",
-            title: "{{ __('CPU Usage') }}",
-            value: {{ (float) ($cpu ?? 0) }},
-            min: 0,
-            max: 100,
-            symbol: '%',
-            valueFontSize: '15px'
-        });
+        @if($showCpu ?? true)
+            new JustGage({
+                id: "gauge-cpu-{{ $id }}",
+                value: {{ (float) ($cpu ?? 0) }},
+                min: 0,
+                max: 100,
+                symbol: '%',
+                relativeGaugeSize: true,
+                gaugeWidthScale: 0.6
+            });
+        @endif
 
         @foreach($mempools as $index => $mem)
         new JustGage({
             id: "gauge-mem-{{ $id }}-{{ $index }}",
-            title: "{!! addslashes($mem['descr']) !!}",
             value: {{ (float) $mem['used'] }},
             min: 0,
             max: {{ (float) ($mem['total'] > 0 ? $mem['total'] : 100) }},
             label: "{{ $mem['unit'] }}",
-            valueFontSize: '15px',
-            labelMinFontSize: '10px'
+            relativeGaugeSize: true,
+            gaugeWidthScale: 0.6
         });
         @endforeach
 
         @foreach($disks as $index => $disk)
         new JustGage({
             id: "gauge-disk-{{ $id }}-{{ $index }}",
-            title: "{!! addslashes($disk['descr']) !!}",
             value: {{ (float) $disk['used'] }},
             min: 0,
             max: {{ (float) ($disk['total'] > 0 ? $disk['total'] : 100) }},
             label: "{{ $disk['unit'] }}",
-            valueFontSize: '15px',
-            labelMinFontSize: '10px'
+            relativeGaugeSize: true,
+            gaugeWidthScale: 0.6
         });
         @endforeach
     });
@@ -74,14 +64,20 @@
 
 <style>
     .gauge-container {
-        height: 120px;
+        width: 100%;
+        flex: 1 1 auto;
+        min-height: 40px;
+        max-height: 120px;
     }
 
     .gauge-title {
         font-weight: bold;
-        font-size: 12px;
-        margin-bottom: 15px !important;
+        font-size: 11px;
+        line-height: 1.1;
+        margin-top: 2px;
+        margin-bottom: 2px !important;
         word-break: break-word;
+        flex: 0 0 auto;
     }
 
     /* Dark Mode Styling for JustGage SVG Elements */
