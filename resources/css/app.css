@@ -680,6 +680,164 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     color: var(--lnms-text);
 }
 
+/* —— Dashboard widget content (Phase 4) —— */
+/* Device summary: keep legacy .green/.red/.blue/.grey/.black class names;
+   remap colors to status tokens inside widget scope only. */
+.lnms-dashboard .lnms-widget .lnms-device-summary.panel {
+    margin-bottom: 0;
+    background: transparent;
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-md);
+    box-shadow: none;
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .table {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .table > thead > tr > th,
+.lnms-dashboard .lnms-widget .lnms-device-summary .table > tbody > tr > th {
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+    font-weight: 500;
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .table > tbody > tr > td {
+    border-top-color: var(--lnms-border);
+    vertical-align: middle;
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .table-hover > tbody > tr:hover {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary a {
+    color: var(--lnms-accent);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary a:hover,
+.lnms-dashboard .lnms-widget .lnms-device-summary a:focus {
+    color: var(--lnms-accent-hover);
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .green,
+.lnms-dashboard .lnms-widget .lnms-device-summary a.green,
+.lnms-dashboard .lnms-widget .lnms-device-summary a.green:visited {
+    color: var(--lnms-status-up) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .red,
+.lnms-dashboard .lnms-widget .lnms-device-summary a.red,
+.lnms-dashboard .lnms-widget .lnms-device-summary a.red:visited {
+    color: var(--lnms-status-down) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .blue,
+.lnms-dashboard .lnms-widget .lnms-device-summary a.blue,
+.lnms-dashboard .lnms-widget .lnms-device-summary a.blue:visited {
+    color: var(--lnms-status-maintenance) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .grey,
+.lnms-dashboard .lnms-widget .lnms-device-summary a.grey,
+.lnms-dashboard .lnms-widget .lnms-device-summary a.grey:visited {
+    color: var(--lnms-text-muted) !important;
+}
+
+.lnms-dashboard .lnms-widget .lnms-device-summary .black,
+.lnms-dashboard .lnms-widget .lnms-device-summary a.black,
+.lnms-dashboard .lnms-widget .lnms-device-summary a.black:visited {
+    color: var(--lnms-status-unknown) !important;
+}
+
+/* Alerts widget: Bootgrid chrome only — preserve IDs, data-column-id, table.alerts */
+.lnms-dashboard .lnms-widget .lnms-alerts-widget {
+    color: var(--lnms-text);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .table.alerts {
+    margin-bottom: 0;
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-header,
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-footer {
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-header .search .search-field,
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-footer .search .search-field {
+    border-color: var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    background-color: var(--lnms-surface);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-header .search .search-field:focus,
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-footer .search .search-field:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 3px var(--lnms-focus-ring);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-table th {
+    background-color: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+    border-color: var(--lnms-border);
+    font-weight: 500;
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-table td {
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-table tr:hover td {
+    background-color: var(--lnms-accent-muted);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .alerts-widget-sev-btn.btn-default {
+    background-color: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .alerts-widget-sev-btn.btn-default:hover,
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .alerts-widget-sev-btn.btn-default:focus {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border-strong);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .alerts-widget-sev-btn.btn-warning {
+    background-color: var(--lnms-status-warn);
+    border-color: var(--lnms-status-warn);
+    color: var(--lnms-status-on);
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .alerts-widget-sev-btn.btn-danger {
+    background-color: var(--lnms-status-critical);
+    border-color: var(--lnms-status-critical);
+    color: #FFFFFF;
+}
+
+.dark .lnms-dashboard .lnms-widget .lnms-device-summary .table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-table td.loading,
+.dark .lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-table td.no-results {
+    background-color: var(--lnms-surface);
+}
+
 .lnms-btn {
     @apply tw:inline-flex tw:items-center tw:gap-2 tw:rounded-[length:var(--lnms-radius-md)] tw:px-4 tw:py-2 tw:font-normal tw:no-underline;
 }
