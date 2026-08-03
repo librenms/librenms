@@ -152,11 +152,56 @@ function resolveLanguage(os, configuredLanguage) {
     return "network-config";
 }
 
+const HIGHLIGHT_THRESHOLD = 5000;
+const LINE_NUMBERS_THRESHOLD = 20000;
+
 export default function highlightConfig(element, content) {
     const language = resolveLanguage(element.dataset.os, element.dataset.configHighlighting);
 
     element.classList.add(`language-${language}`);
     element.parentElement.classList.add(`language-${language}`);
     element.textContent = content ?? "";
-    Prism.highlightElement(element);
+
+    const pre = element.parentElement;
+    const lines = content ? (content.match(/\n(?!$)/g) || []).length + 1 : 1;
+
+    const existingRows = pre.querySelector(".line-numbers-rows");
+    if (existingRows) {
+        existingRows.remove();
+    }
+
+    const showLineNumbers = lines <= LINE_NUMBERS_THRESHOLD;
+    const showHighlighting = lines <= HIGHLIGHT_THRESHOLD;
+
+    if (!showLineNumbers) {
+        pre.classList.remove("line-numbers");
+        element.classList.remove("line-numbers");
+        pre.style.paddingLeft = "";
+        return;
+    }
+
+    pre.classList.add("line-numbers");
+    const startLine = parseInt(pre.getAttribute("data-start"), 10) || 1;
+    const maxLineNumber = startLine + lines - 1;
+    const digits = Math.max(3, String(maxLineNumber).length);
+    const rowsWidth = Number((digits * 0.9).toFixed(2));
+    const paddingLeft = Number((rowsWidth + 0.9).toFixed(2));
+
+    pre.style.paddingLeft = `${paddingLeft}em`;
+
+    if (showHighlighting) {
+        Prism.highlightElement(element);
+    } else {
+        const rows = document.createElement("span");
+        rows.className = "line-numbers-rows";
+        rows.setAttribute("aria-hidden", "true");
+        rows.innerHTML = Array(lines + 1).join("<span></span>");
+        element.appendChild(rows);
+    }
+
+    const rows = pre.querySelector(".line-numbers-rows");
+    if (rows) {
+        rows.style.left = `-${paddingLeft}em`;
+        rows.style.width = `${rowsWidth}em`;
+    }
 }
