@@ -78,7 +78,7 @@ modules:
                     high_limit: ENLOGIC-PDU2-MIB::pduCircuitBreakerConfigUpperCriticalThreshold
                     descr: "Input Breaker {{ ENLOGIC-PDU2-MIB::pduCircuitBreakerLabel }} phase {{ ENLOGIC-PDU2-MIB::pduCircuitBreakerPropertiesInputLayout }}"
                     skip_values:
-                        - 
+                        -
                             oid: ENLOGIC-PDU2-MIB::pduCircuitBreakerStatusLoadState
                             op: '='
                             value: 0
