@@ -222,7 +222,7 @@ class GraphParameters implements \Stringable
             array_push($options, '--right-axis', $this->escapeParameter($this->right_axis));
         }
         if ($this->right_axis_label !== null) {
-            array_push($options, '--right-axis-label', $this->escapeParameter( $this->right_axis_label));
+            array_push($options, '--right-axis-label', $this->escapeParameter($this->right_axis_label));
         }
         if ($this->left_axis_format !== null) {
             array_push($options, '--left-axis-format', $this->escapeParameter($this->left_axis_format));
