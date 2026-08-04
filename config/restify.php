@@ -14,7 +14,6 @@ return [
     'base' => '/api/v1',
 
     'middleware' => [
-        App\Http\Middleware\EnsureApiV1Enabled::class,
         App\Http\Middleware\EnforceJsonApi::class,
         'auth:sanctum',
         DispatchRestifyStartingEvent::class,

@@ -95,7 +95,13 @@
         @config('api.v1.enabled')
         <hr>
 
-        <legend>{{ __('API v1 tokens') }} <span class="label label-info">{{ __('Beta') }}</span></legend>
+        <legend>
+            <span>{{ __('API v1 tokens') }}</span>
+            <span class="tw:ml-2 tw:inline-flex tw:align-middle tw:items-center tw:gap-1 tw:text-xs tw:font-bold tw:uppercase tw:tracking-wider tw:text-amber-600">
+        <span class="tw:size-1.5 tw:rounded-full tw:bg-amber-500"></span>
+        {{ __('Beta') }}
+    </span>
+        </legend>
 
         <div class="alert alert-warning">
             <i class="fas fa-exclamation-triangle tw:mr-2"></i>
