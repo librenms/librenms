@@ -266,17 +266,18 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('alert-rule-from-rule/{alert_rule}', [AlertRuleTemplateController::class, 'rule'])->name('alert-rule-template.rule');
     Route::get('alertlog/{alertLog}/details', Ajax\AlertDetailsController::class)->name('alertlog.details');
 
-    Route::get('plugin/settings', App\Http\Controllers\PluginAdminController::class)->name('plugin.admin');
-    Route::get('plugin/settings/{plugin:plugin_name}', PluginSettingsController::class)->name('plugin.settings');
-    Route::post('plugin/settings/{plugin:plugin_name}', [PluginSettingsController::class, 'update'])->name('plugin.update');
-
     Route::resource('port-groups', PortGroupController::class);
     Route::get('validate', [ValidateController::class, 'index'])->name('validate');
     Route::get('validate/results/{group?}', [ValidateController::class, 'runValidation'])->name('validate.results');
     Route::post('validate/fix', [ValidateController::class, 'runFixer'])->name('validate.fix');
 
+    Route::middleware(['can:plugin.admin'])->group(function () {
+        Route::get('plugin/settings', App\Http\Controllers\PluginAdminController::class)->name('plugin.admin');
+        Route::get('plugin/settings/{plugin:plugin_name}', PluginSettingsController::class)->name('plugin.settings');
+        Route::post('plugin/settings/{plugin:plugin_name}', [PluginSettingsController::class, 'update'])->name('plugin.update');
+    });
+
     Route::get('plugin', [PluginLegacyController::class, 'redirect']);
-    Route::redirect('plugin/view=admin', '/plugin/admin');
     Route::get('plugin/p={pluginName}', [PluginLegacyController::class, 'redirect']);
     Route::any('plugin/v1/{plugin:plugin_name}/{other?}', PluginLegacyController::class)->where('other', '(.*)')->name('plugin.legacy');
     Route::get('plugin/{plugin:plugin_name}', PluginPageController::class)->name('plugin.page');
