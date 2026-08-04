@@ -1,0 +1,10 @@
+os: alpha-dsm33x
+text: 'Alpha DSM33X'
+type: power
+icon: alpha
+group: alpha
+discovery:
+    - sysObjectID:
+          - .1.3.6.1.4.1.926.1.99.1.4.2
+      sysDescr:
+          - 'MODEL: DSM33X'
