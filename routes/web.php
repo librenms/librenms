@@ -271,7 +271,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('validate/results/{group?}', [ValidateController::class, 'runValidation'])->name('validate.results');
     Route::post('validate/fix', [ValidateController::class, 'runFixer'])->name('validate.fix');
 
-    Route::middleware(['can:plugin.admin'])->group(function () {
+    Route::middleware(['can:plugin.admin'])->group(function (): void {
         Route::get('plugin/settings', App\Http\Controllers\PluginAdminController::class)->name('plugin.admin');
         Route::get('plugin/settings/{plugin:plugin_name}', PluginSettingsController::class)->name('plugin.settings');
         Route::post('plugin/settings/{plugin:plugin_name}', [PluginSettingsController::class, 'update'])->name('plugin.update');
