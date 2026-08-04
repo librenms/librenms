@@ -14,6 +14,8 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
 {
     /**
      * Repository classes exposed on the v1 API.
+     *
+     * @var array<int, class-string<\Binaryk\LaravelRestify\Repositories\Repository>>
      */
     protected array $repositories = [
         // DeviceRepository::class,
