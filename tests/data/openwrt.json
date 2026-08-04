@@ -3766,6 +3766,88 @@
         },
         "poller": "matches discovery"
     },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "fanspeed",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2021.13.16.3.1.3.1",
+                    "sensor_index": "1",
+                    "sensor_type": "openwrt",
+                    "sensor_descr": "pwmfan",
+                    "group": "LM-SENSORS",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3495,
+                    "sensor_limit": 6291,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 2796,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2021.13.16.2.1.3.1",
+                    "sensor_index": "1",
+                    "sensor_type": "openwrt",
+                    "sensor_descr": "cpu_thermal",
+                    "group": "LM-SENSORS",
+                    "sensor_divisor": 1000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 52,
+                    "sensor_limit": 72,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 42,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2021.13.16.2.1.3.2",
+                    "sensor_index": "2",
+                    "sensor_type": "openwrt",
+                    "sensor_descr": "ddr_thermal",
+                    "group": "LM-SENSORS",
+                    "sensor_divisor": 1000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 47,
+                    "sensor_limit": 67,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 37,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
     "storage": {
         "discovery": {
             "storage": [

@@ -2,8 +2,9 @@ To use wireless sensors on OpenWrt, install the OpenWrt scripts from
 `librenms-agent/snmp/Openwrt` on the device. Wireless metrics are served by a
 single net-snmp `pass_persist` handler (`openwrt-snmp-pass.sh`) that exposes the
 OPENWRT-WIRELESS-MIB subtree; radios and VAPs are discovered live, so no
-per-radio snmpd configuration is required. Temperatures ride a second
-`pass_persist` handler using LM-SENSORS-MIB emulation.
+per-radio snmpd configuration is required. Temperatures (thermal zones) and
+fan speeds (hwmon tachometer inputs) ride a second `pass_persist` handler
+using LM-SENSORS-MIB emulation.
 
 # Installation
 
@@ -29,7 +30,7 @@ config pass
 	option persist '1'
 
 config pass
-	option miboid '.1.3.6.1.4.1.2021.13.16.2.1'
+	option miboid '.1.3.6.1.4.1.2021.13.16'
 	option prog '/usr/libexec/openwrt-snmp/lm-sensors-pass.sh'
 	option persist '1'
 ```
