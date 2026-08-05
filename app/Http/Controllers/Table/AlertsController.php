@@ -282,7 +282,7 @@ class AlertsController extends TableController
     private function renderHostname(Alert $alert): string
     {
         $faultDetail = $this->renderFaultDetail($alert->latestLog);
-        $collapseClass = $this->incidentCollapseClass(implode('', $alert->latestlog->details));
+        $collapseClass = $this->incidentCollapseClass($faultDetail);
 
         return '<div class="incident">'
             . Url::modernDeviceLink($alert->device)

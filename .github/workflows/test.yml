@@ -68,7 +68,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          tools: composer,php-cs-fixer
+          tools: composer
           coverage: none
       -
         name: Get composer cache directory
