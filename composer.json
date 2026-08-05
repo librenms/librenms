@@ -61,11 +61,11 @@
         "coding-socks/lost-in-translation": "^0.3.5",
         "composer/composer": "^2.8",
         "fakerphp/faker": "^1.23",
-        "friendsofphp/php-cs-fixer": "^3.66",
         "fruitcake/laravel-debugbar": "^4.1",
         "larastan/larastan": "^3.1",
         "laravel/boost": "^2.0",
         "laravel/dusk": "^8.2.2",
+        "laravel/pint": "^1.30",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
         "php-parallel-lint/php-parallel-lint": "^1.1",
@@ -145,6 +145,22 @@
         "post-root-package-install": "LibreNMS\\ComposerHelper::postRootPackageInstall",
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
+        ],
+        "lint": [
+            "rector",
+            "pint"
+        ],
+        "test:lint": [
+            "pint --test",
+            "rector --dry-run"
+        ],
+        "test:unit": "phpunit",
+        "test:types": "phpstan",
+        "test:types-new": "run_check() { set -- $(git diff --name-only --diff-filter=A master... -- '*.php'); if [ $# -gt 0 ]; then vendor/bin/phpstan analyse -l 6 \"$@\"; return $?; else echo 'No new PHP files found to analyze.'; return 0; fi; }; run_check",
+        "test": [
+            "@test:unit",
+            "@test:lint",
+            "@test:types"
         ]
     },
     "support": {
