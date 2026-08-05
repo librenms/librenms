@@ -1,0 +1,37 @@
+#
+# LibreNMS OS detection for the HOPF 8029NTSM NTP time server module
+# MIB: HOPF8029NTSM-MIB
+# Data tree (MODULE-IDENTITY): hopf8029NTSM ::= { hopf 28 } -> .1.3.6.1.4.1.12527.28
+# sysObjectID observed on a real unit: .1.3.6.1.4.1.12527.26 (separate model id)
+#
+# Install at: includes/definitions/hopf-8029ntsm.yaml   (LibreNMS 22.11.0 layout)
+#
+
+os: hopf-8029ntsm
+text: 'HOPF 8029NTSM Time Server'
+type: appliance
+icon: hopf
+group: hopf
+
+# Additional directory to search for MIBs (place the MIB file at mibs/hopf/HOPF8029NTSM-MIB)
+mib_dir: hopf
+
+# sysObjectID is the most reliable match. NOTE: a real 8029NTS/M reports
+# sysObjectID .1.3.6.1.4.1.12527.26, which differs from the MIB data root
+# (.12527.28). Both are matched below: .26 is the observed device/model id,
+# .28 is kept as a fallback (it is where the MIB registers its data objects,
+# and other models/firmware may report it). The regex + sysDescr blocks catch
+# a sysObjectID one level deeper (model/instance sub-id) as a further safety net.
+discovery:
+    -
+      sysObjectID:
+          - .1.3.6.1.4.1.12527.26
+          - .1.3.6.1.4.1.12527.28
+    -
+      sysObjectID_regex:
+          - '/^\.1\.3\.6\.1\.4\.1\.12527\.(26|28)(\.|$)/'
+      sysDescr_regex:
+          - '/8029/i'
+    -
+      sysDescr_regex:
+          - '/8029\s*NTS/i'
