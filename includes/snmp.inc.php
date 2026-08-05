@@ -16,9 +16,11 @@
  * the source code distribution for details.
  */
 
+use App\Events\SnmpQueryExecuted;
 use App\Facades\LibrenmsConfig;
 use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
+use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Util\Rewrite;
 
 /**
@@ -195,6 +197,33 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
 } // end gen_snmp_cmd()
 
 /**
+ * Execute an SNMP CLI command and dispatch SnmpQueryExecuted event.
+ *
+ * @deprecated Please use SnmpQuery instead
+ */
+function snmp_exec(array $cmd, array $oids, string $method, ?array $device = null, array|string|null $mibs = null, ?string $mibdir = null): string
+{
+    $proc = new \Symfony\Component\Process\Process($cmd);
+    $proc->setTimeout(LibrenmsConfig::get('snmp.exec_timeout', 1200));
+
+    $proc->run();
+    $output = $proc->getOutput();
+
+    event(new SnmpQueryExecuted(
+        method: $method,
+        oids: $oids,
+        cliCommand: $cmd,
+        response: new SnmpResponse($output, $proc->getErrorOutput(), $proc->getExitCode()),
+        device: DeviceCache::get($device['device_id'] ?? DeviceCache::getPrimary()->device_id),
+        context: $device['context_name'] ?? '',
+        mibs: is_array($mibs) ? $mibs : ($mibs ? explode(':', (string) $mibs) : []),
+        mibDir: $mibdir ? mibdir($mibdir, $device) : null,
+    ));
+
+    return $output;
+}
+
+/**
  * @deprecated Please use SnmpQuery instead
  */
 function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir = null, $array = [])
@@ -206,7 +235,7 @@ function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir
     }
 
     $cmd = gen_snmpget_cmd($device, $oids, $options, $mib, $mibdir);
-    $data = trim((string) external_exec($cmd));
+    $data = trim((string) snmp_exec($cmd, $oids, 'snmpget', $device, $mib, $mibdir));
 
     foreach (explode("\n", $data) as $entry) {
         if (! Str::contains($entry, ' =')) {
@@ -253,7 +282,7 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
 
     $data = [];
     foreach (array_chunk($oids, $oid_limit) as $chunk) {
-        $output = external_exec(gen_snmpget_cmd($device, $chunk, $options, $mib, $mibdir));
+        $output = snmp_exec(gen_snmpget_cmd($device, $chunk, $options, $mib, $mibdir), $chunk, 'snmpget', $device, $mib, $mibdir);
         $result = trim(str_replace('Wrong Type (should be OBJECT IDENTIFIER): ', '', $output));
         if ($result) {
             $data = array_merge($data, explode("\n", $result));
@@ -305,7 +334,7 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
         throw new Exception("snmp_get called for multiple OIDs: $oid");
     }
 
-    $output = external_exec(gen_snmpget_cmd($device, $oid, $options, $mib, $mibdir));
+    $output = snmp_exec(gen_snmpget_cmd($device, $oid, $options, $mib, $mibdir), Arr::wrap($oid), 'snmpget', $device, $mib, $mibdir);
     $output = str_replace('Wrong Type (should be OBJECT IDENTIFIER): ', '', $output);
     $data = trim($output, "\\\" \n\r");
 
@@ -342,7 +371,7 @@ function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = nul
 
     $snmpcmd = [LibrenmsConfig::get('snmpgetnext', 'snmpgetnext')];
     $cmd = gen_snmp_cmd($snmpcmd, $device, $oid, $options, $mib, $mibdir);
-    $data = trim((string) external_exec($cmd), "\" \n\r");
+    $data = trim((string) snmp_exec($cmd, Arr::wrap($oid), 'snmpgetnext', $device, $mib, $mibdir), "\" \n\r");
 
     $measure->manager()->recordSnmp($measure->end());
     if (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data)) {
@@ -362,7 +391,7 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
     $measure = Measurement::start('snmpwalk');
 
     $cmd = gen_snmpwalk_cmd($device, $oid, $options, $mib, $mibdir);
-    $data = trim((string) external_exec($cmd));
+    $data = trim((string) snmp_exec($cmd, Arr::wrap($oid), 'snmpwalk', $device, $mib, $mibdir));
 
     $data = str_replace('"', '', $data);
     $data = str_replace('End of MIB', '', $data);
@@ -488,7 +517,7 @@ function snmpwalk_cache_multi_oid($device, $oid, $array = [], $mib = null, $mibd
 function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibdir = null, $snmpFlags = '-OQUsetX')
 {
     $cmd = gen_snmpwalk_cmd($device, $oid, $snmpFlags, $mib, $mibdir);
-    $data = rtrim((string) external_exec($cmd));
+    $data = rtrim((string) snmp_exec($cmd, Arr::wrap($oid), 'snmpwalk', $device, $mib, $mibdir));
 
     if (empty($data)) {
         return $array;
@@ -531,7 +560,7 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibd
 function snmpwalk_cache_twopart_oid($device, $oid, $array = [], $mib = 0, $mibdir = null, $snmpflags = '-OQUs')
 {
     $cmd = gen_snmpwalk_cmd($device, $oid, $snmpflags, $mib, $mibdir);
-    $data = trim((string) external_exec($cmd));
+    $data = trim((string) snmp_exec($cmd, Arr::wrap($oid), 'snmpwalk', $device, $mib, $mibdir));
 
     if (empty($data)) {
         return $array;

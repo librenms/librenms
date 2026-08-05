@@ -22,7 +22,7 @@ class DevicesSearchController extends GroupedSearchController
                 ->orWhere('notes', 'like', $like)
                 ->orWhereRelation('location', 'location', 'like', $like);
 
-        $mac = strtolower(str_replace([':', '-'], '', $search));
+        $mac = strtolower(str_replace([':', '-', '.'], '', $search));
 
         if (preg_match('/^[0-9.]+$/', $search) && str_contains($search, '.')) {
             $query->orWhereRelation('ports.ipv4', 'ipv4_address', 'like', $like)
