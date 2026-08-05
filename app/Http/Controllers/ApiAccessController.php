@@ -23,7 +23,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\ApiToken;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -49,7 +48,7 @@ class ApiAccessController extends Controller
             ->orderBy('id')
             ->get();
 
-        $v1Tokens = LibrenmsConfig::get('api.v1.enabled', false)
+        $v1Tokens = config('api.v1.enabled')
             ? PersonalAccessToken::query()
                 ->where('tokenable_type', User::class)
                 ->where('tokenable_id', $user->user_id)

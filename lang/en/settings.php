@@ -27,7 +27,6 @@ return [
         ],
         'api' => [
             'cors' => ['name' => 'CORS'],
-            'v1' => ['name' => 'API v1 (Beta)'],
         ],
         'apps' => [
             'powerdns-recursor' => ['name' => 'PowerDNS Recursor'],
@@ -288,12 +287,6 @@ return [
                 'origin' => [
                     'description' => 'Allow Request Origins',
                     'help' => 'Matches the request origin. Wildcards can be used, eg. *.mydomain.com',
-                ],
-            ],
-            'v1' => [
-                'enabled' => [
-                    'description' => 'Enable the v1 API (Beta)',
-                    'help' => 'Opt in to the new v1 REST API. When disabled, all /api/v1 endpoints return 404 and v1 token management is hidden from the web UI.',
                 ],
             ],
         ],

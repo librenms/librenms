@@ -8,53 +8,52 @@
 
 namespace LibreNMS\Tests\Feature\Api\V1;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\User;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Sanctum\Sanctum;
 use LibreNMS\Tests\DBTestCase;
 
 final class HealthPingTest extends DBTestCase
 {
-    /*
-     * No DatabaseTransactions here: the api.v1.enabled setting decides route
-     * registration at application boot, so it must be committed to the DB
-     * before the application is (re)built — a transaction-wrapped write would
-     * be invisible to the fresh application, and refreshApplication() leaves
-     * the transaction behind anyway. All writes are cleaned up explicitly.
-     */
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {
-        parent::setUp();
+        // v1 route registration reads api.v1.enabled (API_V1_ENABLED env)
+        // during application boot, so the env value must be in place before
+        // parent::setUp() creates the application.
+        self::putEnv('API_V1_ENABLED', 'true');
 
-        $this->setV1Enabled(true);
+        parent::setUp();
     }
 
     protected function tearDown(): void
     {
-        LibrenmsConfig::erase('api.v1.enabled');
-
         parent::tearDown();
+
+        self::putEnv('API_V1_ENABLED', null);
     }
 
-    /**
-     * Persist the setting, then boot a fresh application so route
-     * registration (which runs at boot) sees the new value.
-     */
-    private function setV1Enabled(bool $enabled): void
+    private static function putEnv(string $name, ?string $value): void
     {
-        if ($enabled) {
-            LibrenmsConfig::persist('api.v1.enabled', true);
-        } else {
-            LibrenmsConfig::erase('api.v1.enabled');
+        if ($value === null) {
+            putenv($name);
+            unset($_ENV[$name], $_SERVER[$name]);
+
+            return;
         }
 
-        $this->refreshApplication();
+        putenv("$name=$value");
+        $_ENV[$name] = $value;
+        $_SERVER[$name] = $value;
     }
 
     public function testV1IsDisabledByDefault(): void
     {
-        $this->setV1Enabled(false);
+        // An explicit 'false' (not an unset) so a stray API_V1_ENABLED in a
+        // local .env cannot leak in when the application re-reads it.
+        self::putEnv('API_V1_ENABLED', 'false');
+        $this->refreshApplication();
 
         $this->getJson('/api/v1/ping')->assertNotFound();
         $this->getJson('/api/v1/health')->assertNotFound();
@@ -95,7 +94,5 @@ final class HealthPingTest extends DBTestCase
                     'cache' => ['ok'],
                 ],
             ]);
-
-        $user->delete();
     }
 }
