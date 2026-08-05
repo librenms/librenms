@@ -3,6 +3,7 @@
 namespace LibreNMS\Tests\Feature\Http;
 
 use App\Facades\LibrenmsConfig;
+use App\Http\Requests\GraphsPageRequest;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\User;
@@ -37,6 +38,20 @@ class GraphsPageControllerTest extends TestCase
         $response->assertSee('Poller Time');
         $response->assertSee('graph?device=' . $device->device_id, false);
         $this->assertNoPhpWarningOutput($response->getContent());
+    }
+
+    public function testGraphPageIgnoresWidthAndHeightFromUrlInput(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'graph-device.example.com']);
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs?device={$device->device_id}&type=device_poller_perf&width=2000&height=1000");
+
+        $response->assertOk();
+        $response->assertDontSee('width=2000');
+        $response->assertDontSee('height=1000');
+        $response->assertSee('width=1075');
+        $response->assertSee('height=300');
     }
 
     public function testDateSelectorUsesSelectedRange(): void
@@ -147,14 +162,35 @@ class GraphsPageControllerTest extends TestCase
         $response->assertSessionHasErrors();
     }
 
-    public function testInvalidGraphTypeReturnsValidationError(): void
+    public function testInvalidGraphTypeReturnsForbidden(): void
     {
         $device = Device::factory()->create();
 
         $response = $this->actingAs($this->adminUser())
             ->get("/graphs?device={$device->device_id}&type=invalid_type");
 
-        $response->assertSessionHasErrors();
+        $response->assertForbidden();
+    }
+
+    public function testCommaSeparatedIdIsAcceptedByValidation(): void
+    {
+        $device = Device::factory()->create();
+        $secondDevice = Device::factory()->create();
+
+        $request = GraphsPageRequest::create("/graphs?id={$device->device_id},{$secondDevice->device_id}&type=device_poller_perf");
+        $validator = validator($request->all(), (new GraphsPageRequest())->rules());
+
+        $this->assertFalse($validator->errors()->has('id'));
+    }
+
+    public function testInvalidCommaSeparatedIdFailsValidation(): void
+    {
+        $device = Device::factory()->create();
+
+        $request = GraphsPageRequest::create("/graphs?id={$device->device_id},abc&type=device_poller_perf");
+        $validator = validator($request->all(), (new GraphsPageRequest())->rules());
+
+        $this->assertTrue($validator->errors()->has('id'));
     }
 
     public function testDynamicGraphsRendersCorrectly(): void

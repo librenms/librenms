@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 /**
@@ -164,8 +165,9 @@ abstract class PaginatedAjaxController extends Controller
 
         foreach ($sort as $column => $direction) {
             if (isset($columns[$column]) || in_array($column, $columns)) {
-                $name = $columns[$column] ?? $column;
-                $query->orderBy($name, $direction == 'desc' ? 'desc' : 'asc');
+                foreach (Arr::wrap($columns[$column] ?? $column) as $name) {
+                    $query->orderBy($name, $direction == 'desc' ? 'desc' : 'asc');
+                }
             }
         }
 

@@ -28,8 +28,8 @@ class GraphsPageController extends Controller
         [$subtypeOptions, $subtypeSelected] = $this->subtypeNavigationOptions($request);
 
         ['width' => $graphWidth, 'height' => $graphHeight, 'thumbWidth' => $thumbWidth] = $this->graphDimensions($request);
-        $width = max(10, $request->integer('width') ?: $graphWidth);
-        $height = max(10, $request->integer('height') ?: $graphHeight);
+        $width = $graphWidth;
+        $height = $graphHeight;
         $mainGraphVars = $request->toVars(['height' => $height, 'width' => $width]);
 
         return view('graphs.show', [
@@ -266,7 +266,7 @@ class GraphsPageController extends Controller
     private function graphUrl(GraphsPageRequest $request, array $changes = []): string
     {
         $params = array_merge(
-            $request->except(['page', 'username', 'password']),
+            $request->except(['page', 'username', 'password', 'width', 'height']),
             $changes
         );
 

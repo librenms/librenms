@@ -600,14 +600,18 @@
                 @endif
 {{-- Alerts --}}
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i
-                            class="fa fa-exclamation-circle text-{{ $alert_menu_class }} fa-fw fa-lg"
-                            aria-hidden="true"></i> <span class="tw:md:hidden tw:2xl:inline-block">{{ __('Alerts') }}</span></a>
+                    <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">
+                        <i class="fa fa-exclamation-circle text-{{ $alert_menu_class }} fa-fw fa-lg" aria-hidden="true"></i>
+                    @if ($alert_count > 0)<span class="badge badge-navbar-user count-notif badge-{{ $alert_menu_class }}">{{ $alert_count }}</span>@endif
+                    <span class="tw:md:hidden tw:2xl:inline-block">{{ __('Alerts') }}</span>
+                    </a>
                     <ul class="dropdown-menu">
                         <li><a href="{{ url('alerts') }}"><i class="fa fa-bell fa-fw fa-lg"
                                                              aria-hidden="true"></i> {{ __('Notifications') }}</a></li>
+                        @can('viewAny', \App\Models\AlertLog::class)
                         <li><a href="{{ url('alert-log') }}"><i class="fa fa-file-text fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Alert History') }}</a></li>
+                        @endcan
                         <li><a href="{{ url('alert-stats') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
                                                                   aria-hidden="true"></i> {{ __('Statistics') }}</a></li>
                         @if($show_alert_divider)
@@ -645,7 +649,7 @@
                  @keydown.escape="close()" @click.outside="close()">
                 <div class="form-group">
                     <input class="form-control" type="search" id="gsearch" name="gsearch" autocomplete="off"
-                           placeholder="{{ __('Global Search') }}"
+                           placeholder="{{ __('Type / to search') }}"
                            x-model="query" x-ref="input"
                            @input.debounce.250ms="run()" @focus="open = flat.length > 0"
                            @keydown="onKey($event)">

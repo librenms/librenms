@@ -18,80 +18,8 @@
  */
 
 use App\Facades\LibrenmsConfig;
-use LibreNMS\Enum\Severity;
-use LibreNMS\Exceptions\InvalidIpException;
-use LibreNMS\Util\Debug;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
-use Symfony\Component\Process\Process;
-
-/**
- * Execute and snmp command, filter debug output unless -v is specified
- *
- * @param  array  $command
- * @return null|string
- */
-function external_exec($command)
-{
-    $device = DeviceCache::getPrimary();
-
-    $proc = new Process($command);
-    $proc->setTimeout(LibrenmsConfig::get('snmp.exec_timeout', 1200));
-
-    if (Debug::isEnabled() && ! Debug::isVerbose()) {
-        $patterns = [
-            '/-c\' \'[\S]+\'/',
-            '/-u\' \'[\S]+\'/',
-            '/-U\' \'[\S]+\'/',
-            '/-A\' \'[\S]+\'/',
-            '/-X\' \'[\S]+\'/',
-            '/-P\' \'[\S]+\'/',
-            '/-H\' \'[\S]+\'/',
-            '/-y\' \'[\S]+\'/',
-            '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
-        ];
-        $replacements = [
-            '-c\' \'COMMUNITY\'',
-            '-u\' \'USER\'',
-            '-U\' \'USER\'',
-            '-A\' \'PASSWORD\'',
-            '-X\' \'PASSWORD\'',
-            '-P\' \'PASSWORD\'',
-            '-H\' \'HOSTNAME\'',
-            '-y\' \'KG_KEY\'',
-            '\1:HOSTNAME:\3',
-        ];
-
-        $debug_command = preg_replace($patterns, $replacements, $proc->getCommandLine());
-        c_echo('SNMP[%c' . $debug_command . "%n]\n");
-    } elseif (Debug::isVerbose()) {
-        c_echo('SNMP[%c' . $proc->getCommandLine() . "%n]\n");
-    }
-
-    $proc->run();
-    $output = $proc->getOutput();
-
-    if ($proc->getExitCode()) {
-        if (Str::startsWith($proc->getErrorOutput(), 'Invalid authentication protocol specified')) {
-            \App\Models\Eventlog::log('Unsupported SNMP authentication algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Severity::Error);
-        } elseif (Str::startsWith($proc->getErrorOutput(), 'Invalid privacy protocol specified')) {
-            \App\Models\Eventlog::log('Unsupported SNMP privacy algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Severity::Error);
-        }
-        d_echo('Exitcode: ' . $proc->getExitCode());
-        d_echo($proc->getErrorOutput());
-    }
-
-    if (Debug::isEnabled() && ! Debug::isVerbose()) {
-        $ip_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
-        $debug_output = preg_replace($ip_regex, '*', $output);
-        d_echo($debug_output . PHP_EOL);
-    } elseif (Debug::isVerbose()) {
-        d_echo($output . PHP_EOL);
-    }
-    d_echo($proc->getErrorOutput());
-
-    return $output;
-}
 
 function shorthost($hostname, $len = 12)
 {
@@ -209,59 +137,6 @@ function c_echo($string, $enabled = true)
     } else {
         echo preg_replace('/%((%)|.)/', '', $string);
     }
-}
-
-/*
- * @return true if client IP address is authorized to access graphs
- */
-function is_client_authorized($clientip)
-{
-    if (LibrenmsConfig::get('allow_unauth_graphs', false)) {
-        d_echo("Unauthorized graphs allowed\n");
-
-        return true;
-    }
-
-    foreach (LibrenmsConfig::get('allow_unauth_graphs_cidr', []) as $range) {
-        try {
-            if (IP::parse($clientip)->inNetwork($range)) {
-                d_echo("Unauthorized graphs allowed from $range\n");
-
-                return true;
-            }
-        } catch (InvalidIpException) {
-            d_echo("Client IP ($clientip) is invalid.\n");
-        }
-    }
-
-    return false;
-} // is_client_authorized
-
-/*
- * @return an array of all graph subtypes for the given type
- */
-function get_graph_subtypes(string $type): array
-{
-    $dir = base_path('includes/html/graphs/' . basename($type));
-
-    if (! is_dir($dir)) {
-        return [];
-    }
-
-    $types = [];
-
-    foreach (new DirectoryIterator($dir) as $file) {
-        if ($file->isFile() && str_ends_with($file->getFilename(), '.inc.php')) {
-            $name = $file->getBasename('.inc.php');
-            if ($name !== 'auth') {
-                $types[] = $name;
-            }
-        }
-    }
-
-    sort($types);
-
-    return $types;
 }
 
 function generate_smokeping_file($device, $file = '')

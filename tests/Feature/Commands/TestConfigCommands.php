@@ -59,6 +59,9 @@ final class TestConfigCommands extends InMemoryDbTestCase
         // os bool
         $this->assertCliSets('os.ios.rfc1628_compat', true);
 
+        // os config highlighting
+        $this->assertCliSets('os.ios.config_highlighting', 'cisco-config');
+
         // os array
         $this->assertCliSets('os.netonix.bad_iftype', ['ethernet', 'psuedowire']);
 

@@ -34,19 +34,19 @@ $('#delete-oid-button').on('click', function(event) {
     event.preventDefault();
     var customoid_id = $("#dcustomoid_id").val();
     $.ajax({
-        type: 'POST',
-        url: 'ajax_form.php',
-        data: { type: "delete-customoid", customoid_id: customoid_id },
-        dataType: "html",
-        success: function(msg) {
-            if(msg.indexOf("ERROR:") <= -1) {
+        type: 'DELETE',
+        url: '<?php echo route("customoid.destroy", ["customoid" => ":customoid"]) ?>'.replace(':customoid', customoid_id),
+        dataType: "json",
+        success: function(data) {
+            if (data.status == 'ok') {
                 $("#row_"+customoid_id).remove();
             }
-            $("#message").html('<div class="alert alert-info">'+msg+'</div>');
+            $("#message").html('<div class="alert alert-info">'+data.message+'</div>');
             $("#delete-oid-form").modal('hide');
         },
-        error: function() {
-            $("#message").html('<div class="alert alert-info">This OID could not be deleted.</div>');
+        error: function(xhr) {
+            var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'This OID could not be deleted.';
+            $("#message").html('<div class="alert alert-info">' + msg + '</div>');
             $("#delete-oid-form").modal('hide');
         }
     });

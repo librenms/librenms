@@ -4,41 +4,45 @@ namespace App\Actions\Device;
 
 use App\Models\Device;
 use LibreNMS\Enum\AvailabilitySource;
+use LibreNMS\Polling\ConnectivityHelper;
 
 class SetDeviceAvailability
 {
-    public function __construct(
-        private readonly UpdateDeviceOutage $updateDeviceOutage,
-    ) {
-    }
-
     /**
+     * Set status and status_reason fields based on availability results.
+     * Does not persist to the database.
+     *
      * @param  Device  $device
-     * @param  bool  $available
-     * @param  AvailabilitySource  $source
-     * @param  bool  $commit  Save changes to the database
+     * @param  array<string|\LibreNMS\Enum\AvailabilitySource, bool>  $results  e.g. ['icmp' => true, 'snmp' => false]
      * @return bool true if the status changed
      */
-    public function execute(Device $device, bool $available, AvailabilitySource $source = AvailabilitySource::None, bool $commit = true): bool
+    public function execute(Device $device, array $results): bool
     {
-        // if device was down and is now up, if reason was snmp and source is icmp, ignore
-        if ($available && ! $device->status && $device->status_reason == AvailabilitySource::Snmp->value) {
-            if ($source == AvailabilitySource::Icmp) {
-                return false;
-            }
-        }
+        $connectivity = new ConnectivityHelper($device);
 
-        $device->status = $available;
-        $device->status_reason = $available ? AvailabilitySource::None->value : $source->value;
-        $changed = $device->isDirty('status');
+        // Determine which sources are currently enabled on this device
+        $enabled = collect(['icmp', 'snmp'])->filter(fn ($source) => $connectivity->{"{$source}IsEnabled"}());
 
-        if ($commit) {
-            $device->save();
-            if ($changed) {
-                $this->updateDeviceOutage->execute($device, $available);
-            }
-        }
+        // Normalize keys: AvailabilitySource enum values or plain strings
+        $checked = collect($results)->mapWithKeys(function ($passed, $source) {
+            $name = $source instanceof AvailabilitySource ? $source->value : (string) $source;
 
-        return $changed;
+            return [$name => $passed];
+        });
+
+        // Previously failing sources that weren't checked this run are still considered failing
+        $previously_failed = collect(explode(',', (string) $device->status_reason))->map(fn ($s) => trim($s))->filter();
+        $unchecked_failures = $previously_failed->diff($checked->keys());
+
+        // A source is failing if it failed in this run, or was previously failing and wasn't re-checked
+        $failing = $checked->filter(fn ($passed) => ! $passed)->keys()->merge($unchecked_failures);
+
+        // Only report failures for sources that are currently enabled
+        $failed_sources = $failing->intersect($enabled)->sort()->values();
+
+        $device->status = $failed_sources->isEmpty();
+        $device->status_reason = $failed_sources->implode(',');
+
+        return $device->isDirty('status');
     }
 }

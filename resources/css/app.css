@@ -1,14 +1,20 @@
 @import './toast.css';
-
 @import "tailwindcss" prefix(tw);
+@import "../../html/css/bootstrap.min.css" layer(components);
+
 @source "../../includes/html/pages/**/*.php";
 @source "../../includes/html/**/*.inc.php";
-@import "../../html/css/bootstrap.min.css" layer(components);
 @custom-variant dark (&:where(.dark, .dark *));
 @layer base {
     button:not(:disabled),
     [role="button"]:not(:disabled) {
         cursor: pointer;
+    }
+}
+@layer utilities {
+    html,
+    body {
+        font-size: 14px;
     }
 }
 @theme {
@@ -67,7 +73,7 @@
 }
 
 .overview-panel {
-  @apply tw:rounded-xl tw:overflow-hidden tw:border tw:border-gray-300 tw:shadow-sm tw:dark:border-dark-gray-200;
+  @apply tw:rounded-xl tw:border tw:border-gray-300 tw:shadow-sm tw:dark:border-dark-gray-200;
 }
 
 .lnms-btn {
@@ -79,7 +85,7 @@
 }
 
 .lnms-btn-default {
-  @apply tw:bg-[#3a3f44] tw:hover:bg-[#1e2023] tw:text-white!;
+  @apply tw:bg-[#3a3f44] tw:hover:bg-[#1e2023] tw:text-white! tw:dark:bg-dark-gray-200 tw:dark:hover:bg-dark-gray-100 tw:dark:text-dark-white-100!;
 }
 
 .lnms-btn-default .lnms-btn-badge {

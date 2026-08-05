@@ -123,9 +123,10 @@ Input:
 
 - type: service type
 - ip: ip of the service
-- desc: description for the service
-- param: parameters for the service
-- ignore: ignore the service for checks
+- name: (Optional) name of the service
+- desc: (Optional) description for the service
+- param: (Optional) parameters for the service
+- ignore: (Optional) ignore the service for checks
 
 Example:
 

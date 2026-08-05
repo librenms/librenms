@@ -121,6 +121,7 @@ groups:
         - outage.view
 
     oxidized:
+        - oxidized.list
         - oxidized.refresh
         - oxidized.search
 

@@ -41,7 +41,7 @@ class DeviceObserver
     public function updated(Device $device): void
     {
         // log up/down status changes
-        if ($device->isDirty(['status', 'status_reason'])) {
+        if ($device->isDirty('status')) {
             $type = $device->status ? 'up' : 'down';
             $reason = $device->status ? $device->getOriginal('status_reason') : $device->status_reason;
             $polled_by = LibrenmsConfig::get('distributed_poller') ? (' by ' . \config('librenms.node_id')) : '';
@@ -88,6 +88,13 @@ class DeviceObserver
             $new_rrd_dir = Rrd::dirFromHost($new_name);
             $old_rrd_dir = Rrd::dirFromHost($old_name);
 
+            // Fail if another device has the same hostname
+            if (Device::where('hostname', $device->hostname)->whereNot('device_id', $device->device_id)->count() > 0) {
+                $device->hostname = $old_name;
+                Eventlog::log("Renaming of $old_name failed because there is already a device with the hostname $new_name", $device, 'system', Severity::Error);
+                throw new HostRenameException("Renaming of $old_name failed because there is already a device with the hostname $new_name");
+            }
+
             if (is_dir($new_rrd_dir)) {
                 $device->hostname = $old_name;
                 Eventlog::log("Renaming of $old_name failed due to existing RRD folder for $new_name", $device, 'system', Severity::Error);
@@ -101,7 +108,7 @@ class DeviceObserver
                 Eventlog::log("Hostname changed -> $new_name ($source)", $device, 'system', Severity::Notice);
             } else {
                 $device->hostname = $old_name;
-                Eventlog::log("Renaming of $old_name failed", $device, 'system', Severity::Error);
+                Eventlog::log("Renaming of $old_name failed because the RRD directory rename failed", $device, 'system', Severity::Error);
                 throw new HostRenameException("Renaming of $old_name failed");
             }
         }

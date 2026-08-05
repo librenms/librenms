@@ -88,7 +88,7 @@ class DeviceController extends TableController
             'hostname' => 'hostname',
             'display' => 'display',
             'hardware' => 'hardware',
-            'os' => 'os',
+            'os' => ['os', 'version', 'display'],
             'uptime' => \DB::raw('IF(`status` = 1, `uptime`, `last_polled` - NOW())'),
             'location' => 'location',
             'device_id' => 'device_id',

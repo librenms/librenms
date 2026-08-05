@@ -113,7 +113,7 @@
                     q(item).rrdGraphPng({
                         canvasPadding: 120,
                         initialStart: {{ is_numeric($mainGraphVars['from']) ? $mainGraphVars['from'] : '(new Date()).getTime() / 1000 - 24*3600' }},
-                        initialRange: {{ is_numeric($mainGraphVars['to']) ? $mainGraphVars['to'] - $mainGraphVars['from'] : '24*3600' }}
+                        initialRange: {{ isset($mainGraphVars['to']) ? $mainGraphVars['to'] - $mainGraphVars['from'] : time() - $mainGraphVars['from'] }}
                     })
                 );
             });

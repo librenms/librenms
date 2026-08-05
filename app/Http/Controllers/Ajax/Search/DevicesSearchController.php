@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Ajax\Search;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Util\Url;
 
@@ -13,38 +12,42 @@ class DevicesSearchController extends GroupedSearchController
 {
     protected function groups(string $search, string $like, int $limit, ?User $user): array
     {
-        $query = Device::hasAccess($user)->select('devices.*')->distinct();
-        $query->where(function (Builder $q) use ($like, $search, $query): void {
-            $q->where('hostname', 'like', $like)
+        $query = Device::hasAccess($user)->select('devices.*')
+                ->where('hostname', 'like', $like)
                 ->orWhere('sysName', 'like', $like)
                 ->orWhere('display', 'like', $like)
                 ->orWhere('hardware', 'like', $like)
                 ->orWhere('purpose', 'like', $like)
                 ->orWhere('serial', 'like', $like)
-                ->orWhere('notes', 'like', $like);
+                ->orWhere('notes', 'like', $like)
+                ->orWhereRelation('location', 'location', 'like', $like);
 
-            if (preg_match('/^[0-9.]+$/', $search) && str_contains($search, '.')) {
-                $query->leftJoin('ports', 'ports.device_id', '=', 'devices.device_id')
-                    ->leftJoin('ipv4_addresses', 'ipv4_addresses.port_id', '=', 'ports.port_id');
-                $q->orWhere('ipv4_addresses.ipv4_address', 'like', $like)
-                    ->orWhere('overwrite_ip', 'like', $like);
-                if (\LibreNMS\Util\IPv4::isValid($search, false)) {
-                    $q->orWhere('ip', '=', inet_pton($search));
-                }
-            } elseif (preg_match('/^[0-9a-f:]+$/i', $search) && str_contains($search, ':')) {
-                $query->leftJoin('ports', 'ports.device_id', '=', 'devices.device_id')
-                    ->leftJoin('ipv6_addresses', 'ipv6_addresses.port_id', '=', 'ports.port_id');
-                $q->orWhere('ipv6_addresses.ipv6_address', 'like', $like)
-                    ->orWhere('overwrite_ip', 'like', $like)
-                    ->orWhere('ports.ifPhysAddress', 'like', '%' . str_replace(':', '', $search) . '%');
-                if (\LibreNMS\Util\IPv6::isValid($search, false)) {
-                    $q->orWhere('ip', '=', inet_pton($search));
-                }
-            } elseif (ctype_xdigit($mac = str_replace([':', '-'], '', $search))) {
-                $query->leftJoin('ports', 'ports.device_id', '=', 'devices.device_id');
-                $q->orWhere('ports.ifPhysAddress', 'like', '%' . $mac . '%');
+        $mac = strtolower(str_replace([':', '-', '.'], '', $search));
+
+        if (preg_match('/^[0-9.]+$/', $search) && str_contains($search, '.')) {
+            $query->orWhereRelation('ports.ipv4', 'ipv4_address', 'like', $like)
+                ->orWhere('overwrite_ip', 'like', $like);
+
+            if (\LibreNMS\Util\IPv4::isValid($search, false)) {
+                $query->orWhere('ip', '=', inet_pton($search));
             }
-        });
+        } elseif (preg_match('/^[0-9a-f:]+$/i', $search) && str_contains($search, ':')) {
+            $query->orWhereRelation('ports.ipv6', 'ipv6_address', 'like', $like)
+                ->orWhereRelation('ports.ipv6', 'ipv6_compressed', 'like', $like)
+                ->orWhereRelation('ports', 'ifPhysAddress', 'like', '%' . $mac . '%')
+                ->orWhere('overwrite_ip', 'like', $like);
+
+            if (\LibreNMS\Util\IPv6::isValid($search, false)) {
+                $query->orWhere('ip', '=', inet_pton($search));
+            }
+        } elseif (ctype_xdigit($mac)) {
+            $query->orWhereRelation('ports', 'ifPhysAddress', 'like', '%' . $mac . '%');
+        }
+
+        // A MAC-style search (with or without separators) can also match FDB entries
+        if (ctype_xdigit($mac)) {
+            $query->orWhereRelation('portsFdb', 'mac_address', 'like', '%' . $mac . '%');
+        }
 
         $devices = $query->orderBy('display')->limit($limit)->get()
             ->map(fn (Device $d) => [
