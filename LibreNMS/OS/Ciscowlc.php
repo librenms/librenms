@@ -44,12 +44,12 @@ class Ciscowlc extends Cisco implements
 {
     public function pollOS(DataStorageInterface $datastore): void
     {
-        if (! $this->getDevice()->wirelessSensors()->where('sensor_class', 'ap-count')->exists()) {
-            return; // if ap count doesn't exist, skip this polling TODO replace with wireless controller module
+        $apNames = SnmpQuery::enumStrings()->walk('AIRESPACE-WIRELESS-MIB::bsnAPName')->table(1);
+        if (empty($apNames)) {
+            return; // no AP data on this controller, nothing to poll
         }
 
         $device = $this->getDeviceArray();
-        $apNames = SnmpQuery::enumStrings()->walk('AIRESPACE-WIRELESS-MIB::bsnAPName')->table(1);
         $radios = SnmpQuery::enumStrings()->walk('AIRESPACE-WIRELESS-MIB::bsnAPIfTable')->table(2);
         SnmpQuery::walk('AIRESPACE-WIRELESS-MIB::bsnAPIfLoadChannelUtilization')->table(2, $radios);
         $interferences = SnmpQuery::walk('AIRESPACE-WIRELESS-MIB::bsnAPIfInterferencePower')->table(3);
