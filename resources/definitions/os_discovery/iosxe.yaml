@@ -53,6 +53,30 @@ modules:
                             oid: 'CISCO-VOICE-DIAL-CONTROL-MIB::cvSipMsgRateWMValue.3.1'
                             op: '='
                             value: 0
+                -
+                    oid: CISCO-SYSLOG-MIB::clogNotificationsSent
+                    value: CISCO-SYSLOG-MIB::clogNotificationsSent
+                    num_oid: '.1.3.6.1.4.1.9.9.41.1.1.1.{{ $index }}'
+                    descr: 'Syslog Notifications Sent'
+                    group: 'Syslog'
+                    index: 'clogNotificationsSent.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: CISCO-SYSLOG-MIB::clogMsgIgnores
+                    value: CISCO-SYSLOG-MIB::clogMsgIgnores
+                    num_oid: '.1.3.6.1.4.1.9.9.41.1.1.4.{{ $index }}'
+                    descr: 'Syslog Messages Ignored'
+                    group: 'Syslog'
+                    index: 'clogMsgIgnores.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: CISCO-SYSLOG-MIB::clogMsgDrops
+                    value: CISCO-SYSLOG-MIB::clogMsgDrops
+                    num_oid: '.1.3.6.1.4.1.9.9.41.1.1.5.{{ $index }}'
+                    descr: 'Syslog Messages Dropped'
+                    group: 'Syslog'
+                    index: 'clogMsgDrops.{{ $index }}'
+                    rrd_type: COUNTER
         state:
             data:
                 -
