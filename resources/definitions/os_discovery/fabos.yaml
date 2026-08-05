@@ -99,3 +99,54 @@ modules:
                             oid: SW-MIB::swSensorValue
                             op: '='
                             value: -2147483648
+
+        count:
+            data:
+                -
+                    oid: swFCPortTable
+                    value: swFCPortRxEncInFrs
+                    num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.6.2.1.21.{{ $index }}'
+                    descr: 'FC {{ swFCPortName }} encoding errors inside frames'
+                    index: 'swFCPortRxEncInFrs.{{ $index }}'
+                -
+                    oid: swFCPortTable
+                    value: swFCPortRxCrcs
+                    num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.6.2.1.22.{{ $index }}'
+                    descr: 'FC {{ swFCPortName }} CRC errors'
+                    index: 'swFCPortRxCrcs.{{ $index }}'
+                -
+                    oid: swFCPortTable
+                    value: swFCPortRxTruncs
+                    num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.6.2.1.23.{{ $index }}'
+                    descr: 'FC {{ swFCPortName }} truncated frames'
+                    index: 'swFCPortRxTruncs.{{ $index }}'
+                -
+                    oid: swFCPortTable
+                    value: swFCPortRxTooLongs
+                    num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.6.2.1.24.{{ $index }}'
+                    descr: 'FC {{ swFCPortName }} oversized frames'
+                    index: 'swFCPortRxTooLongs.{{ $index }}'
+                -
+                    oid: swFCPortTable
+                    value: swFCPortRxBadEofs
+                    num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.6.2.1.25.{{ $index }}'
+                    descr: 'FC {{ swFCPortName }} bad EOF errors'
+                    index: 'swFCPortRxBadEofs.{{ $index }}'
+                -
+                    oid: swFCPortTable
+                    value: swFCPortRxEncOutFrs
+                    num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.6.2.1.26.{{ $index }}'
+                    descr: 'FC {{ swFCPortName }} encoding errors outside frames'
+                    index: 'swFCPortRxEncOutFrs.{{ $index }}'
+                -
+                    oid: swFCPortTable
+                    value: swFCPortRxBadOs
+                    num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.6.2.1.27.{{ $index }}'
+                    descr: 'FC {{ swFCPortName }} bad ordered set errors'
+                    index: 'swFCPortRxBadOs.{{ $index }}'
+                -
+                    oid: swFCPortTable
+                    value: swFCPortC3Discards
+                    num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.6.2.1.28.{{ $index }}'
+                    descr: 'FC {{ swFCPortName }} class 3 discards'
+                    index: 'swFCPortC3Discards.{{ $index }}'
