@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use App\Api\CustomRestifyRoutesBoot;
-use App\Facades\LibrenmsConfig;
 use Binaryk\LaravelRestify\Bootstrap\RoutesBoot;
 use Binaryk\LaravelRestify\Restify;
 use Binaryk\LaravelRestify\RestifyApplicationServiceProvider;
@@ -28,7 +27,7 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
 
     protected function routes(): void
     {
-        if (! LibrenmsConfig::get('api.v1.enabled', false)) {
+        if (! self::apiV1Enabled()) {
             return;
         }
 
@@ -36,6 +35,29 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
         Route::prefix('api/v1')->group(base_path('routes/api_v1.php'));
 
         parent::routes();
+    }
+
+    /**
+     * Whether the v1 API is enabled, decided at route-registration time.
+     *
+     * This runs while providers are still booting, so it must not touch
+     * LibrenmsConfig: constructing ConfigRepository pre-boot skips loadDB()
+     * (Eloquent::isConnected() is false until the app has booted) and caches
+     * a config without any DB settings for CONFIG_CACHE_TTL, both disabling
+     * this gate and poisoning the shared config cache. A plain Eloquent
+     * query works fine pre-boot, so the setting is read directly. Note this
+     * intentionally ignores config.php overrides for this one setting.
+     */
+    public static function apiV1Enabled(): bool
+    {
+        try {
+            return (bool) \App\Models\Config::query()
+                ->where('config_name', 'api.v1.enabled')
+                ->value('config_value');
+        } catch (\Throwable) {
+            // no database yet (install, package:discover, pre-migration)
+            return false;
+        }
     }
 
     public function boot(): void
