@@ -65,7 +65,7 @@ return [
 不過，警報規則中可以讀取忽略標籤。
 如果設定了 `devices.ignore = 0` 或 `macros.device = 1` 且啟用了忽略警報標籤，警報規則將不會符合。',
         'ignore_device_status' => '忽略裝置狀態',
-        'ignore_device_status_title' => '將裝置標記為忽略狀態，它將始終顯示為在線。',
+        'ignore_device_status_title' => '將裝置標記為忽略狀態，它將始終顯示為線上。',
         'save' => '儲存',
         'size_on_disk' => '磁碟使用大小',
         'rrd_files' => 'RRD 檔案',
