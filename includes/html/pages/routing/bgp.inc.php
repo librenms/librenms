@@ -287,8 +287,8 @@ if (\Illuminate\Support\Facades\Gate::denies('viewAny', BgpPeer::class)) {
 
         // Peer Address
         $peer_id_ip = IP::parse($peer['bgpPeerIdentifier'], true);
-        $peer_ipv4 = Device::whereHas('ipv4', fn($q) => $q->where('ipv4_address', $peer['bgpPeerIdentifier']))->get();
-        $peer_ipv6 = $peer_ipv4->isEmpty() ? Device::whereHas('ipv6', fn($q) => $q->where('ipv6_address', $peer_id_ip?->uncompressed() ?? $peer['bgpPeerIdentifier']))->get() : collect();
+        $peer_ipv4 = Device::whereHas('ipv4', fn ($q) => $q->where('ipv4_address', $peer['bgpPeerIdentifier']))->get();
+        $peer_ipv6 = $peer_ipv4->isEmpty() ? Device::whereHas('ipv6', fn ($q) => $q->where('ipv6_address', $peer_id_ip?->uncompressed() ?? $peer['bgpPeerIdentifier']))->get() : collect();
         $peer_device = $peer_ipv4->count() === 1 ? $peer_ipv4->first() : ($peer_ipv6->count() === 1 ? $peer_ipv6->first() : null);
         $peeraddresslink = '<span class=list-large>' . Url::deviceLink($peer_device, $peer_addr, ['tab' => 'routing', 'proto' => 'bgp']) . '</span>';
 
