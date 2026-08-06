@@ -2517,6 +2517,26 @@ return [
                 'description' => 'Set the max search result limit',
                 'help' => 'Global search results limit',
             ],
+            'global_search_device_fdb' => [
+                'description' => 'Global search device FDB table',
+                'help' => 'Find devices with matching FDB table entries in the global search results',
+            ],
+            'global_search_eventlogs' => [
+                'description' => 'Global search event logs',
+                'help' => 'Find matching event logs in the global search results',
+            ],
+            'global_search_health' => [
+                'description' => 'Global search health',
+                'help' => 'Find matching health sensors in the global search results',
+            ],
+            'global_search_ports' => [
+                'description' => 'Global search ports',
+                'help' => 'Find matching ports in the global search results',
+            ],
+            'global_search_routing' => [
+                'description' => 'Global search route peers',
+                'help' => 'Find matching routing peers in the global search results',
+            ],
             'graph_stacked' => [
                 'description' => 'Use stacked graphs',
                 'help' => 'Display stacked graphs instead of inverted graphs',
