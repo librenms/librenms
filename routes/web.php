@@ -310,7 +310,8 @@ Route::middleware(['auth'])->group(function (): void {
         // misc ajax controllers
         Route::get('search/devices', Ajax\Search\DevicesSearchController::class)->name('ajax.search.devices');
         Route::get('search/ports', Ajax\Search\PortsSearchController::class)->name('ajax.search.ports');
-        Route::get('search/endpoints', Ajax\Search\EndpointsSearchController::class)->name('ajax.search.endpoints');
+        Route::get('search/fdb', Ajax\Search\FdbSearchController::class)->name('ajax.search.fdb');
+        Route::get('search/arp', Ajax\Search\ArpSearchController::class)->name('ajax.search.arp');
         Route::get('search/health', Ajax\Search\HealthSearchController::class)->name('ajax.search.health');
         Route::get('search/routing', Ajax\Search\RoutingSearchController::class)->name('ajax.search.routing');
         Route::get('search/logs', Ajax\Search\LogsSearchController::class)->name('ajax.search.logs');

@@ -22,5 +22,9 @@ return [
     'mac' => 'MAC Address',
     'arp_tables' => 'ARP Tables',
     'fdb_tables' => 'FDB Tables',
+    'ndp_tables' => 'NDP Tables',
+    'fdb_connected' => 'connected',
+    'fdb_trunk' => 'trunk',
+    'arp_summary' => 'Seen on :devices device(s) / :ports port(s)',
     'packages' => 'Packages',
 ];
