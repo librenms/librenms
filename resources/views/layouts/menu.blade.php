@@ -865,11 +865,12 @@
             endpoints: @js([
                 route('ajax.search.devices'),
                 route('ajax.search.ports'),
+                route('ajax.search.endpoints'),
                 route('ajax.search.health'),
                 route('ajax.search.routing'),
                 route('ajax.search.logs'),
             ]),
-            order: ['devices', 'ports', 'sensors', 'wireless', 'storage', 'mempools', 'processors', 'bgp', 'eventlog'],
+            order: ['devices', 'ports', 'endpoints', 'sensors', 'wireless', 'storage', 'mempools', 'processors', 'bgp', 'eventlog'],
             run() {
                 let q = this.query.trim();
                 if (q === '') { this.reset(); return; }

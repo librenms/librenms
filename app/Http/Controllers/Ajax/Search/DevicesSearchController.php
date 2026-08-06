@@ -37,10 +37,12 @@ class DevicesSearchController extends GroupedSearchController
                 } elseif (preg_match('/^[0-9a-f:]+$/i', $search) && str_contains($search, ':')) {
                     $query->orWhere(fn ($sq) => $sq->whereRelation('ports.ipv6', 'ipv6_address', 'like', $like)
                         ->orWhereRelation('ports.ipv6', 'ipv6_compressed', 'like', $like)
+                        ->orWhereRelation('ports', 'ifPhysAddress', 'like', $like)
                         ->orWhereRelation('ports', 'ifPhysAddress', 'like', '%' . $mac . '%')
                         ->orWhere('overwrite_ip', 'like', $like));
                 } elseif (ctype_xdigit($mac)) {
-                    $query->orWhereRelation('ports', 'ifPhysAddress', 'like', '%' . $mac . '%');
+                    $query->orWhereRelation('ports', 'ifPhysAddress', 'like', $like)
+                        ->orWhereRelation('ports', 'ifPhysAddress', 'like', '%' . $mac . '%');
                 }
             })
             ->orderBy('devices.display')
