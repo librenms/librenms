@@ -66,7 +66,8 @@ class CheckRedis implements \LibreNMS\Interfaces\Validation
         set_error_handler(null); // hide connection errors, we will send our own message
 
         try {
-            Redis::command('ping');
+            $connection = config('cache.stores.redis.connection', 'default');
+            Redis::connection($connection)->ping();
 
             return true;
         } catch (\Exception) {
