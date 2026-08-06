@@ -48,6 +48,6 @@ class PortsSearchController extends GroupedSearchController
                 ];
             });
 
-        return [$ports->isEmpty() ? null : ['type' => 'ports', 'label' => __('Ports'), 'results' => $ports]];
+        return [$ports->isEmpty() ? null : ['type' => 'ports', 'label' => __('search.ports'), 'results' => $ports]];
     }
 }

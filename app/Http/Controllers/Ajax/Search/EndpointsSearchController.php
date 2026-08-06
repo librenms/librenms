@@ -32,7 +32,7 @@ class EndpointsSearchController extends GroupedSearchController
             ->limit($limit)->get()
             ->map(fn (PortsFdb $f) => [
                 'name' => $f->mac_address,
-                'subtitle' => trim($f->device?->display . ' ' . $f->port?->getLabel() . ' (FDB)'),
+                'subtitle' => trim($f->device?->display . ' ' . $f->port?->getLabel() . ' (' . __('search.fdb') . ')'),
                 'icon' => 'fa fa-microchip',
                 'url' => Url::deviceUrl($f->device, ['tab' => 'ports', 'view' => 'fdb', 'search' => $f->mac_address]),
             ]);
@@ -49,7 +49,7 @@ class EndpointsSearchController extends GroupedSearchController
             ->limit($limit)->get()
             ->map(fn (Ipv4Mac $a) => [
                 'name' => $a->ipv4_address,
-                'subtitle' => trim($a->device?->display . ' ' . $a->port?->getLabel() . ' ' . $a->mac_address . ' (ARP)'),
+                'subtitle' => trim($a->device?->display . ' ' . $a->port?->getLabel() . ' ' . $a->mac_address . ' (' . __('search.arp') . ')'),
                 'icon' => 'fa fa-address-card',
                 'url' => Url::deviceUrl($a->device, ['tab' => 'ports', 'view' => 'arp', 'search' => $a->ipv4_address]),
             ]);
@@ -66,13 +66,13 @@ class EndpointsSearchController extends GroupedSearchController
             ->limit($limit)->get()
             ->map(fn (Ipv6Nd $n) => [
                 'name' => $n->ipv6_address,
-                'subtitle' => trim($n->device?->display . ' ' . $n->port?->getLabel() . ' ' . $n->mac_address . ' (NDP)'),
+                'subtitle' => trim($n->device?->display . ' ' . $n->port?->getLabel() . ' ' . $n->mac_address . ' (' . __('search.ndp') . ')'),
                 'icon' => 'fa fa-address-card',
                 'url' => Url::deviceUrl($n->device, ['tab' => 'ports', 'view' => 'nd', 'search' => $n->ipv6_address]),
             ]);
 
         $results = $fdb->concat($arp)->concat($ndp)->take($limit);
 
-        return [$results->isEmpty() ? null : ['type' => 'endpoints', 'label' => __('Endpoints'), 'results' => $results]];
+        return [$results->isEmpty() ? null : ['type' => 'endpoints', 'label' => __('search.endpoints'), 'results' => $results]];
     }
 }

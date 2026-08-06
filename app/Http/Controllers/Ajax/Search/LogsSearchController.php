@@ -36,6 +36,6 @@ class LogsSearchController extends GroupedSearchController
                 'url' => Url::deviceUrl($e->device_id, ['tab' => 'logs']),
             ]);
 
-        return [$eventlog->isEmpty() ? null : ['type' => 'eventlog', 'label' => __('Eventlog'), 'results' => $eventlog]];
+        return [$eventlog->isEmpty() ? null : ['type' => 'eventlog', 'label' => __('search.eventlog'), 'results' => $eventlog]];
     }
 }

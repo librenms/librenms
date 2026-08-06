@@ -96,11 +96,11 @@ class HealthSearchController extends GroupedSearchController
             ]);
 
         return [
-            $sensors->isEmpty() ? null : ['type' => 'sensors', 'label' => __('Health'), 'results' => $sensors],
-            $wireless->isEmpty() ? null : ['type' => 'wireless', 'label' => __('Wireless'), 'results' => $wireless],
-            $storage->isEmpty() ? null : ['type' => 'storage', 'label' => __('Storage'), 'results' => $storage],
-            $mempools->isEmpty() ? null : ['type' => 'mempools', 'label' => __('Memory'), 'results' => $mempools],
-            $processors->isEmpty() ? null : ['type' => 'processors', 'label' => __('Processors'), 'results' => $processors],
+            $sensors->isEmpty() ? null : ['type' => 'sensors', 'label' => __('search.health'), 'results' => $sensors],
+            $wireless->isEmpty() ? null : ['type' => 'wireless', 'label' => __('search.wireless'), 'results' => $wireless],
+            $storage->isEmpty() ? null : ['type' => 'storage', 'label' => __('search.storage'), 'results' => $storage],
+            $mempools->isEmpty() ? null : ['type' => 'mempools', 'label' => __('search.memory'), 'results' => $mempools],
+            $processors->isEmpty() ? null : ['type' => 'processors', 'label' => __('search.processors'), 'results' => $processors],
         ];
     }
 }

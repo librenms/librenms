@@ -35,6 +35,8 @@ class EndpointsSearchTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonPath('groups.0.type', 'endpoints')
             ->assertJsonPath('groups.0.results.0.name', $mac);
+        
+        $this->assertStringContainsString('(FDB)', $response->json('groups.0.results.0.subtitle'));
     }
 
     public function test_search_returns_arp_match()

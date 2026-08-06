@@ -106,25 +106,25 @@
                                                                 aria-hidden="true"></i> {{ __('Inventory') }}</a></li>
                         @if($package_count)
                             <li><a href="{{ url('search/search=packages') }}"><i class="fa fa-archive fa-fw fa-lg"
-                                                                                 aria-hidden="true"></i> {{ __('Packages') }}
+                                                                                 aria-hidden="true"></i> {{ __('search.packages') }}
                                 </a></li>
                         @endif
 
                         <li role="presentation" class="divider"></li>
                         <li><a href="{{ url('search/search=ipv4') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                         aria-hidden="true"></i> {{ __('IPv4 Address') }}
+                                                                         aria-hidden="true"></i> {{ __('search.ipv4') }}
                             </a></li>
                         <li><a href="{{ url('search/search=ipv6') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                         aria-hidden="true"></i> {{ __('IPv6 Address') }}
+                                                                         aria-hidden="true"></i> {{ __('search.ipv6') }}
                             </a></li>
                         <li><a href="{{ url('search/search=mac') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                        aria-hidden="true"></i> {{ __('MAC Address') }}</a>
+                                                                        aria-hidden="true"></i> {{ __('search.mac') }}</a>
                         </li>
                         <li><a href="{{ url('search/search=arp') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                        aria-hidden="true"></i> {{ __('ARP Tables') }}</a>
+                                                                        aria-hidden="true"></i> {{ __('search.arp_tables') }}</a>
                         </li>
                         <li><a href="{{ url('search/search=fdb') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                        aria-hidden="true"></i> {{ __('FDB Tables') }}</a>
+                                                                        aria-hidden="true"></i> {{ __('search.fdb_tables') }}</a>
                         </li>
                     </ul>
                 </li>
@@ -649,18 +649,18 @@
                  @keydown.escape="close()" @click.outside="close()">
                 <div class="form-group">
                     <input class="form-control" type="search" id="gsearch" name="gsearch" autocomplete="off"
-                           placeholder="{{ __('Type / to search') }}"
+                           placeholder="{{ __('search.placeholder') }}"
                            x-model="query" x-ref="input"
                            @input.debounce.250ms="run()" @focus="open = flat.length > 0"
                            @keydown="onKey($event)">
                 </div>
                 <div x-show="open" x-cloak
-                     class="global-search-dropdown tw:absolute tw:right-0 tw:mt-1 tw:w-[50rem] tw:max-w-[90vw] tw:max-h-[70vh] tw:overflow-y-auto tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200 tw:rounded-lg tw:shadow-xl tw:z-50">
+                     class="global-search-dropdown tw:absolute tw:right-0 tw:mt-1 tw:min-w-70 tw:max-w-[90vw] tw:max-h-[70vh] tw:overflow-y-auto tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200 tw:rounded-lg tw:shadow-xl tw:z-50">
                     <div x-show="loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-gray-500 tw:dark:text-dark-white-400">
-                        <i class="fa fa-spinner fa-spin"></i> {{ __('Searching...') }}
+                        <i class="fa fa-spinner fa-spin"></i> {{ __('search.searching') }}
                     </div>
                     <div x-show="!loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-gray-500 tw:dark:text-dark-white-400">
-                        {{ __('No results') }}
+                        {{ __('search.no_results') }}
                     </div>
                     <template x-for="group in groups" :key="group.type">
                         <div>

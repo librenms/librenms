@@ -34,6 +34,6 @@ class RoutingSearchController extends GroupedSearchController
                 'url' => Url::deviceUrl($b->device, ['tab' => 'routing', 'proto' => 'bgp']),
             ]);
 
-        return [$bgp->isEmpty() ? null : ['type' => 'bgp', 'label' => __('BGP Sessions'), 'results' => $bgp]];
+        return [$bgp->isEmpty() ? null : ['type' => 'bgp', 'label' => __('search.bgp_sessions'), 'results' => $bgp]];
     }
 }
