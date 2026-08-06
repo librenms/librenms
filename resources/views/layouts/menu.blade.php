@@ -857,6 +857,8 @@
             flat: [],
             open: false,
             loading: false,
+            navigateOnLoad: false,
+            lastRunQuery: '',
             active: '',
             seq: 0,
             controllers: [],
@@ -871,6 +873,9 @@
             run() {
                 let q = this.query.trim();
                 if (q === '') { this.reset(); return; }
+                if (q !== this.lastRunQuery) { this.navigateOnLoad = false; }
+                if (q === this.lastRunQuery && (this.open || this.loading)) { return; }
+                this.lastRunQuery = q;
                 this.open = true;
                 this.loading = true;
                 this.active = '';
@@ -894,6 +899,11 @@
                             (data.groups || []).forEach(g => { collected[g.type] = g; });
                             this.groups = this.order.filter(t => collected[t]).map(t => collected[t]);
                             this.flat = this.groups.flatMap(g => g.results);
+
+                            if (this.navigateOnLoad && this.flat.length > 0) {
+                                this.go();
+                                this.navigateOnLoad = false;
+                            }
                         })
                         .catch(() => {})
                         .finally(() => { pending--; if (seq === this.seq && pending === 0) { this.loading = false; } });
@@ -902,7 +912,15 @@
             onKey(e) {
                 if (e.key === 'ArrowDown') { e.preventDefault(); this.move(1); }
                 else if (e.key === 'ArrowUp') { e.preventDefault(); this.move(-1); }
-                else if (e.key === 'Enter') { e.preventDefault(); this.go(); }
+                else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (this.flat.length > 0) {
+                        this.go();
+                    } else if (this.query.trim() !== '') {
+                        this.run();
+                        this.navigateOnLoad = true;
+                    }
+                }
             },
             move(dir) {
                 if (this.flat.length === 0) { return; }
@@ -915,8 +933,8 @@
                 let url = this.active || (this.flat[0] && this.flat[0].url);
                 if (url) { window.location.href = url; }
             },
-            close() { this.open = false; },
-            reset() { this.controllers.forEach(c => c.abort()); this.controllers = []; this.groups = []; this.flat = []; this.open = false; this.active = ''; this.loading = false; },
+            close() { this.open = false; this.navigateOnLoad = false; },
+            reset() { this.controllers.forEach(c => c.abort()); this.controllers = []; this.groups = []; this.flat = []; this.open = false; this.active = ''; this.loading = false; this.navigateOnLoad = false; this.lastRunQuery = ''; },
         }));
     });
 
