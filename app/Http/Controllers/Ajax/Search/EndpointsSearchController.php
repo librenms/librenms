@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Ajax\Search;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Ipv4Mac;
 use App\Models\Ipv6Nd;
 use App\Models\PortsFdb;
@@ -13,6 +14,10 @@ class EndpointsSearchController extends GroupedSearchController
 {
     protected function groups(string $search, string $like, int $limit, ?User $user): array
     {
+        if (! LibrenmsConfig::get('webui.global_search.endpoints')) {
+            return [null];
+        }
+
         $mac = strtolower(str_replace([':', '-', '.'], '', $search));
         $isMac = ctype_xdigit($mac) && $mac !== '';
 

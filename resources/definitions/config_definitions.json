@@ -7522,7 +7522,7 @@
             "order": 0,
             "type": "integer"
         },
-        "webui.global_search.fdb": {
+        "webui.global_search.endpoints": {
             "default": true,
             "group": "webui",
             "section": "search",

@@ -2517,9 +2517,9 @@ return [
                 'description' => 'Set the max search result limit',
                 'help' => 'Global search results limit',
             ],
-            'global_search.fdb' => [
-                'description' => 'Global search device FDB table',
-                'help' => 'Find devices with matching FDB table entries in the global search results',
+            'global_search.endpoints' => [
+                'description' => 'Global search endpoints',
+                'help' => 'Find where devices are connected by searching the FDB and ARP tables',
             ],
             'global_search.eventlogs' => [
                 'description' => 'Global search event logs',
