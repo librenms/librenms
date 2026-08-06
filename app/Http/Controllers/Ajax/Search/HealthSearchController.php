@@ -16,6 +16,10 @@ class HealthSearchController extends GroupedSearchController
 {
     protected function groups(string $search, string $like, int $limit, ?User $user): array
     {
+        if (! LibrenmsConfig::get('webui.global_search_health')) {
+            return [null];
+        }
+
         $sensors = Sensor::hasAccess($user)->with('device')->where('sensor_deleted', 0)
             ->where(fn (Builder $q) => $q->where('sensor_descr', 'like', $like)
                 ->orWhere('sensor_class', 'like', $like)
