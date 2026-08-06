@@ -1102,5 +1102,10 @@
     "name": "Zebra Printer Trap: Critical",
     "severity": "critical",
     "builder": {"condition":"AND","rules":[{"id":"eventlog.type","field":"eventlog.type","type":"string","input":"text","operator":"equal","value":"trap"},{"id":"eventlog.severity","field":"eventlog.severity","type":"string","input":"text","operator":"equal","value":"5"},{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"zebra"},{"id":"eventlog.datetime","field":"eventlog.datetime","type":"datetime","input":"text","operator":"greater_or_equal","value":"`DATE_SUB(NOW(),INTERVAL 5 MINUTE)`"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "rule": "storage.storage_perc >= storage.storage_perc_warn",
+    "name": "Storage Space Warning",
+    "severity": "warning"
   }
 ]
