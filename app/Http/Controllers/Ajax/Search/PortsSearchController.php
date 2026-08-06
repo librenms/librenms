@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Ajax\Search;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Port;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -12,6 +13,10 @@ class PortsSearchController extends GroupedSearchController
 {
     protected function groups(string $search, string $like, int $limit, ?User $user): array
     {
+        if (! LibrenmsConfig::get('webui.global_search_ports')) {
+            return [null];
+        }
+
         $ports = Port::hasAccess($user)->with('device')->where('deleted', 0)
             ->where(fn (Builder $q) => $q->where('ifAlias', 'like', $like)
                 ->orWhere('ifDescr', 'like', $like)
