@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\Utf8Sanitize;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class HrDevice extends DeviceRelatedModel implements Keyable
@@ -16,6 +17,10 @@ class HrDevice extends DeviceRelatedModel implements Keyable
         'hrDeviceErrors',
         'hrDeviceStatus',
         'hrProcessorLoad',
+    ];
+
+    protected $casts = [
+        'hrDeviceDescr' => Utf8Sanitize::class,
     ];
 
     public function getCompositeKey(): int
