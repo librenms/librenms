@@ -72,10 +72,26 @@ class Bill extends BaseModel
     }
 
     /**
+     * @return HasMany<BillSapCounter, $this>
+     */
+    public function sapCounters(): HasMany
+    {
+        return $this->hasMany(BillSapCounter::class, 'bill_id', 'bill_id');
+    }
+
+    /**
      * @return BelongsToMany<Port, $this>
      */
     public function ports(): BelongsToMany
     {
         return $this->belongsToMany(Port::class, 'bill_ports', 'bill_id', 'port_id');
+    }
+
+    /**
+     * @return BelongsToMany<MplsSap, $this>
+     */
+    public function saps(): BelongsToMany
+    {
+        return $this->belongsToMany(MplsSap::class, 'bill_saps', 'bill_id', 'sap_id');
     }
 }

@@ -82,6 +82,10 @@ if (isset($_POST['addbill']) && $_POST['addbill'] == 'yes') {
         dbInsert(['bill_id' => $bill_id, 'port_id' => $_POST['port_id']], 'bill_ports');
     }
 
+    if (is_numeric($bill_id) && ! empty($_POST['sap_id']) && is_numeric($_POST['sap_id'])) {
+        \App\Models\BillSap::create(['bill_id' => $bill_id, 'sap_id' => $_POST['sap_id']]);
+    }
+
     header('Location: ' . \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $bill_id, 'view' => 'edit']));
     exit();
 }

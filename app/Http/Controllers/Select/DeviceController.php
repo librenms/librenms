@@ -45,6 +45,7 @@ class DeviceController extends SelectController
             'user' => 'nullable|int',
             'key' => 'nullable|in:device_id,hostname',
             'exclude' => 'nullable|int',
+            'has' => 'nullable|in:mplsSaps',
         ];
     }
 
@@ -74,6 +75,7 @@ class DeviceController extends SelectController
 
         return Device::hasAccess($request->user())
             ->when($request->input('exclude'), fn ($query, $exclude) => $query->where('device_id', '!=', $exclude))
+            ->when($request->input('has'), fn ($query, $has) => $query->has($has))
             ->select(['device_id', 'hostname', 'sysName', 'display', 'icon'])
             ->orderBy('hostname');
     }

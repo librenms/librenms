@@ -3,9 +3,9 @@
 // Don't refresh this page to stop adding multiple ports
 $no_refresh = true;
 
-  // This needs more verification. Is it already added? Does it exist?
-  // Calculation to extract MB/GB/TB of Kbps/Mbps/Gbps
-$base = \App\Facades\LibrenmsConfig::get('billing.base');
+// This needs more verification. Is it already added? Does it exist?
+// Calculation to extract MB/GB/TB of Kbps/Mbps/Gbps
+$base = App\Facades\LibrenmsConfig::get('billing.base');
 
 if ($bill_data['bill_type'] == 'quota') {
     $data = $bill_data['bill_quota'];
@@ -101,8 +101,8 @@ if ($bill_data['bill_type'] == 'cdr') {
                 [$bill_data['bill_id']]
             );
 
-            if (is_array($ports)) {
-                ?>
+if (is_array($ports)) {
+    ?>
             <div class="list-group">
                 <?php   foreach ($ports as $port) {
                     $port = cleanPort($port);
@@ -125,16 +125,16 @@ if ($bill_data['bill_type'] == 'cdr') {
                 </div>
                 <?php
                 }
-                if (empty($emptyCheck)) { ?>
+    if (empty($emptyCheck)) { ?>
                 <div class="alert alert-info">There are no ports assigned to this bill</alert>
                 <?php                   } ?>
 
             </div>
 
                 <?php
-            }
-            $port_device_id = -1;
-            ?>
+}
+$port_device_id = -1;
+?>
         </div>
 
         <h4>Add Port</h4>
@@ -171,5 +171,89 @@ if ($bill_data['bill_type'] == 'cdr') {
     init_select2('#port_id', 'port', makePortData, 'Select Port');
     function billDeviceChanged() {
         $('#port_id').val(null).trigger('change'); // clear port selection
+    }
+</script>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Billed SAPs</h3>
+        </div>
+        <div class="panel-body">
+        <div class="form-group">
+            <?php
+$saps = App\Models\MplsSap::query()
+    ->select('mpls_saps.*', 'devices.hostname', 'devices.sysName')
+    ->join('bill_saps', 'bill_saps.sap_id', '=', 'mpls_saps.sap_id')
+    ->join('devices', 'devices.device_id', '=', 'mpls_saps.device_id')
+    ->where('bill_saps.bill_id', $bill_data['bill_id'])
+    ->orderBy('devices.device_id')
+    ->get();
+
+if ($saps->isNotEmpty()) {
+    ?>
+            <div class="list-group">
+                <?php   foreach ($saps as $sap) {
+                    $sapdescr = (empty($sap['sapDescription']) ? '' : ' - ' . htmlentities((string) $sap['sapDescription']));
+                    $saplabel = htmlentities((string) $sap['ifName']) . ($sap['sapEncapValue'] ? ':' . htmlentities((string) $sap['sapEncapValue']) : '') . $sapdescr; ?>
+                <div class="list-group-item">
+                    <form action="" class="form-inline" method="post" name="deletesap<?php echo $sap['sap_id'] ?>" style="display: none;">
+                        <?php echo csrf_field() ?>
+                        <input type="hidden" name="action" value="delete_bill_sap" />
+                        <input type="hidden" name="sap_id" value="<?php echo $sap['sap_id'] ?>" />
+                    </form>
+
+                    <button class="btn btn-danger btn-xs pull-right" onclick="if (confirm('Are you sure you wish to remove this SAP?')) { document.forms['deletesap<?php echo $sap['sap_id'] ?>'].submit(); }">
+                        <i class="fa fa-minus"></i>
+                        Remove SAP
+                    </button>
+                    <?php echo generate_device_link($sap); ?>
+                    <i class="fa fa-random"></i>
+                    <?php echo generate_sap_url($sap, $saplabel); ?>
+                </div>
+                <?php
+                } ?>
+            </div>
+                <?php
+} else { ?>
+            <div class="alert alert-info">There are no SAPs assigned to this bill</div>
+                <?php   } ?>
+        </div>
+
+        <h4>Add SAP</h4>
+
+        <form action="" method="post" class="form-horizontal" role="form">
+            <?php echo csrf_field() ?>
+            <input type="hidden" name="action" value="add_bill_sap" />
+            <input type="hidden" name="bill_id" value="<?php echo $bill_id; ?>" />
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label" for="sap_device">Device</label>
+                <div class="col-sm-8">
+                    <select class="form-control input-sm" id="sap_device" name="sap_device" onchange="billSapDeviceChanged()"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label" for="sap_id">SAP</label>
+                <div class="col-sm-8">
+                    <select class="form-control input-sm" id="sap_id" name="sap_id"></select>
+                </div>
+            </div>
+            <div class="col-sm-2 col-sm-offset-2">
+                <button type="submit" class="btn btn-primary" name="Submit" value=" Add "><i class="fa fa-plus"></i> Add SAP</button>
+            </div>
+        </form>
+    </div>
+    </div>
+</div>
+</div>
+<script type="text/javascript">
+    const makeSapData = function (param) {
+        param.device = $('#sap_device').val();
+        return param;
+    }
+    init_select2('#sap_device', 'device', {has: 'mplsSaps'}, 'Select Device');
+    init_select2('#sap_id', 'sap', makeSapData, 'Select SAP');
+    function billSapDeviceChanged() {
+        $('#sap_id').val(null).trigger('change'); // clear sap selection
     }
 </script>
