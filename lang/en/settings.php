@@ -2517,23 +2517,23 @@ return [
                 'description' => 'Set the max search result limit',
                 'help' => 'Global search results limit',
             ],
-            'global_search_device_fdb' => [
+            'global_search.fdb' => [
                 'description' => 'Global search device FDB table',
                 'help' => 'Find devices with matching FDB table entries in the global search results',
             ],
-            'global_search_eventlogs' => [
+            'global_search.eventlogs' => [
                 'description' => 'Global search event logs',
                 'help' => 'Find matching event logs in the global search results',
             ],
-            'global_search_health' => [
+            'global_search.health' => [
                 'description' => 'Global search health',
                 'help' => 'Find matching health sensors in the global search results',
             ],
-            'global_search_ports' => [
+            'global_search.ports' => [
                 'description' => 'Global search ports',
                 'help' => 'Find matching ports in the global search results',
             ],
-            'global_search_routing' => [
+            'global_search.routing' => [
                 'description' => 'Global search route peers',
                 'help' => 'Find matching routing peers in the global search results',
             ],

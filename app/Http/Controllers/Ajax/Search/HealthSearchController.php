@@ -16,7 +16,7 @@ class HealthSearchController extends GroupedSearchController
 {
     protected function groups(string $search, string $like, int $limit, ?User $user): array
     {
-        if (! LibrenmsConfig::get('webui.global_search_health')) {
+        if (! LibrenmsConfig::get('webui.global_search.health')) {
             return [null];
         }
 
