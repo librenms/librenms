@@ -364,6 +364,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('alertlog/export', [Table\AlertLogController::class, 'export'])->name('table.alertlog.export');
             Route::post('alerts', Table\AlertsController::class)->name('table.alerts');
             Route::post('alert-schedule', Table\AlertScheduleController::class);
+            Route::post('access-points', Table\AccessPointController::class)->name('table.access-points');
             Route::post('customers', Table\CustomersController::class);
             Route::post('diskio', Table\DiskioController::class)->name('table.diskio');
             Route::post('device', Table\DeviceController::class)->name('table.device');

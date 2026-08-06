@@ -29,6 +29,7 @@ namespace App\Http\Controllers\Device\Tabs;
 use App\Models\Device;
 use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use LibreNMS\Util\Url;
 
 class AccessPointsController implements DeviceTab
 {
@@ -54,6 +55,22 @@ class AccessPointsController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        return [];
+        $accessPointId = (int) Url::parseOptions('ap', 0);
+        $accessPoint = $accessPointId > 0
+            ? $device->accessPoints()->where('deleted', false)->find($accessPointId)
+            : null;
+
+        return [
+            'accessPoint' => $accessPoint,
+            'graphs' => [
+                ['type' => 'accesspoints_numasoclients', 'title' => __('Associated Clients')],
+                ['type' => 'accesspoints_interference', 'title' => __('Interference')],
+                ['type' => 'accesspoints_channel', 'title' => __('Channel')],
+                ['type' => 'accesspoints_txpow', 'title' => __('Transmit Power')],
+                ['type' => 'accesspoints_radioutil', 'title' => __('Radio Utilization')],
+                ['type' => 'accesspoints_nummonclients', 'title' => __('Monitored Clients')],
+                ['type' => 'accesspoints_nummonbssid', 'title' => __('Number of monitored BSSIDs')],
+            ],
+        ];
     }
 }
