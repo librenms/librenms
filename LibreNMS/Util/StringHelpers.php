@@ -52,8 +52,6 @@ class StringHelpers
             'nfs-stats' => 'NFS Stats',
             'nfs-v3-stats' => 'NFS v3 Stats',
             'ntp' => 'NTP',
-            'ntp-client' => 'NTP Client',
-            'ntp-server' => 'NTP Server',
             'opengridscheduler' => 'Open Grid Scheduler',
             'opensearch' => 'Elasticsearch\Opensearch',
             'oslv_monitor' => 'OS Level Virtualization',
