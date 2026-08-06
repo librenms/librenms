@@ -39,7 +39,7 @@
                             <td>{{ $data['accessPoint']->radioutil }}%</td>
                         </tr>
                         <tr>
-                            <th scope="row">{{ __('Interference') }}</th>
+                            <th scope="row">{{ __('Interference Index') }}</th>
                             <td>{{ $data['accessPoint']->interference }}</td>
                         </tr>
                         <tr>
@@ -71,7 +71,7 @@
                             <th data-column-id="channel">{{ __('Channel') }}</th>
                             <th data-column-id="numasoclients">{{ __('Clients') }}</th>
                             <th data-column-id="radioutil" data-formatter="percentage">{{ __('Utilization') }}</th>
-                            <th data-column-id="interference">{{ __('Interference') }}</th>
+                            <th data-column-id="interference">{{ __('Interference Index') }}</th>
                             <th data-column-id="txpow">{{ __('Transmit Power') }}</th>
                             <th data-column-id="trends" data-sortable="false" data-searchable="false">{{ __('Trends') }}</th>
                         </tr>

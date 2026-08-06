@@ -64,7 +64,7 @@ class AccessPointsController implements DeviceTab
             'accessPoint' => $accessPoint,
             'graphs' => [
                 ['type' => 'accesspoints_numasoclients', 'title' => __('Associated Clients')],
-                ['type' => 'accesspoints_interference', 'title' => __('Interference')],
+                ['type' => 'accesspoints_interference', 'title' => __('Interference Index')],
                 ['type' => 'accesspoints_channel', 'title' => __('Channel')],
                 ['type' => 'accesspoints_txpow', 'title' => __('Transmit Power')],
                 ['type' => 'accesspoints_radioutil', 'title' => __('Radio Utilization')],

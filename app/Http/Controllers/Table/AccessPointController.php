@@ -99,7 +99,7 @@ class AccessPointController extends TableController
             'trends' => '<div class="tw:flex tw:flex-col tw:gap-1">'
                 . $graph('accesspoints_numasoclients', $graphTitle . ': Associated Clients')
                 . $graph('accesspoints_radioutil', $graphTitle . ': Radio Utilization')
-                . $graph('accesspoints_interference', $graphTitle . ': Interference')
+                . $graph('accesspoints_interference', $graphTitle . ': Interference Index')
                 . '</div>',
         ];
     }
