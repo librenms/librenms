@@ -1,3 +1,4 @@
+---
 modules:
     os:
         hardware: OAP-NMU::deviceType.0
