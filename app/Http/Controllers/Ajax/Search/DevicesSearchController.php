@@ -28,8 +28,8 @@ class DevicesSearchController extends GroupedSearchController
                         ->orWhere('serial', 'like', $like)
                         ->orWhere('notes', 'like', $like)
                         ->orWhere('locations.location', 'like', $like);
-                    })
-                    ->when(IP::isValid($search), fn ($q) => $q->orWhere('ip', '=', inet_pton($search)));
+                })
+                ->when(IP::isValid($search), fn ($q) => $q->orWhere('ip', '=', inet_pton($search)));
 
                 if (preg_match('/^[0-9.]+$/', $search) && str_contains($search, '.')) {
                     $query->orWhere(fn ($sq) => $sq->whereRelation('ports.ipv4', 'ipv4_address', 'like', $like)
