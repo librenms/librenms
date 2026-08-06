@@ -1,6 +1,6 @@
 <?php
 
-$sw_fc_port_table = \LibreNMS\Util\SnmpQuery::walk('SW-MIB::swFCPortTable')->valuesByIndex();
+$sw_fc_port_table = SnmpQuery::walk('SW-MIB::swFCPortTable')->valuesByIndex();
 
 foreach ($sw_fc_port_table as $index => $brocade_port) {
     $index_brocade = $index + 1073741823;
