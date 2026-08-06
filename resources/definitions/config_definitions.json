@@ -7522,6 +7522,41 @@
             "order": 0,
             "type": "integer"
         },
+        "webui.global_search_device_fdb": {
+            "default": true,
+            "group": "webui",
+            "section": "search",
+            "order": 1,
+            "type": "boolean"
+        },
+        "webui.global_search_eventlogs": {
+            "default": true,
+            "group": "webui",
+            "section": "search",
+            "order": 2,
+            "type": "boolean"
+        },
+        "webui.global_search_health": {
+            "default": true,
+            "group": "webui",
+            "section": "search",
+            "order": 3,
+            "type": "boolean"
+        },
+        "webui.global_search_ports": {
+            "default": true,
+            "group": "webui",
+            "section": "search",
+            "order": 4,
+            "type": "boolean"
+        },
+        "webui.global_search_routing": {
+            "default": true,
+            "group": "webui",
+            "section": "search",
+            "order": 5,
+            "type": "boolean"
+        },
         "webui.graph_stacked": {
             "default": false,
             "group": "webui",
