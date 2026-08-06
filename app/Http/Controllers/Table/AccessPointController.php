@@ -16,8 +16,10 @@ class AccessPointController extends TableController
 {
     protected ?string $model = AccessPoint::class;
 
+    /** @var array<string, string> */
     protected array $default_sort = ['name' => 'asc'];
 
+    /** @return array<string, string> */
     protected function rules(): array
     {
         return [
@@ -25,6 +27,7 @@ class AccessPointController extends TableController
         ];
     }
 
+    /** @return array<int|string, string|array<int, string>> */
     protected function sortFields(Request $request): array
     {
         return [
@@ -38,6 +41,7 @@ class AccessPointController extends TableController
         ];
     }
 
+    /** @return array<int, string> */
     protected function searchFields(Request $request): array
     {
         return [
