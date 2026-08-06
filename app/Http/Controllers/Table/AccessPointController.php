@@ -77,17 +77,15 @@ class AccessPointController extends TableController
         $mac = htmlspecialchars((string) $model->mac_addr, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $type = htmlspecialchars((string) $model->type, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
-        $graph = function (string $type, string $title) use ($model, $detailUrl): string {
-            return Url::graphPopup([
-                'type' => $type,
-                'id' => $model->accesspoint_id,
-                'from' => '-1d',
-                'width' => 100,
-                'height' => 20,
-                'legend' => 'no',
-                'popup_title' => htmlspecialchars($title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
-            ], null, $detailUrl);
-        };
+        $graph = (fn (string $type, string $title): string => Url::graphPopup([
+            'type' => $type,
+            'id' => $model->accesspoint_id,
+            'from' => '-1d',
+            'width' => 100,
+            'height' => 20,
+            'legend' => 'no',
+            'popup_title' => htmlspecialchars($title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
+        ], null, $detailUrl));
 
         $graphTitle = strip_tags((string) $model->name) . ' radio ' . (int) $model->radio_number;
 
