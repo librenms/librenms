@@ -1,0 +1,874 @@
+
+HM2-FILEMGMT-MIB DEFINITIONS ::= BEGIN
+
+--
+-- ************************************************************* 
+-- Hirschmann File Management MIB
+-- *************************************************************
+-- 
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    OBJECT-IDENTITY,
+    Integer32 
+        FROM SNMPv2-SMI -- RFC 2578
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+    InetAddressType, InetAddress
+      FROM INET-ADDRESS-MIB -- RFC4001  
+    hm2ConfigurationMibs,
+    HmTimeSeconds1970,
+    HmEnabledStatus
+        FROM HM2-TC-MIB
+    InterfaceIndexOrZero FROM IF-MIB
+    SnmpAdminString					FROM SNMP-FRAMEWORK-MIB;
+
+hm2FileMgmtMib MODULE-IDENTITY
+	LAST-UPDATED "201701310000Z" -- January 31, 2017
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann File Management MIB.
+         Copyright (C) 2011, 2017. All Rights Reserved."
+    REVISION     "201701310000Z" -- January 31, 2017
+    DESCRIPTION
+         "Automatic remote config push on save version."
+    ::= { hm2ConfigurationMibs 21 }
+
+--
+-- *************************************************************
+-- hm2FileMgmtMib
+-- *************************************************************
+--
+hm2FileMgmtNotifications		OBJECT IDENTIFIER ::= { hm2FileMgmtMib 0 }
+hm2FileMgmtMibObjects			OBJECT IDENTIFIER ::= { hm2FileMgmtMib 1 }
+-- hm2FileMgmtMibConformance		OBJECT IDENTIFIER ::= { hm2FileMgmtMib 2 }
+hm2FileMgmtSNMPExtensionGroup 	OBJECT IDENTIFIER ::= { hm2FileMgmtMib 3 }
+		
+--
+-- *************************************************************
+-- hm2FileMgmt groups
+-- *************************************************************
+--
+hm2FileMgmtProfileGroup 		OBJECT IDENTIFIER ::= { hm2FileMgmtMibObjects 1 }
+
+hm2FileMgmtActionGroup 			OBJECT IDENTIFIER ::= { hm2FileMgmtMibObjects 2 }
+
+hm2FileMgmtStatusGroup 		OBJECT IDENTIFIER ::= { hm2FileMgmtMibObjects 3 }
+
+hm2FileMgmtConfigGroup 		OBJECT IDENTIFIER ::= { hm2FileMgmtMibObjects 4 }
+
+-- 
+-- ***********************************************************
+-- hm2FileMgmtActionGroup
+-- ***********************************************************
+--
+
+hm2FMActionTable OBJECT-TYPE
+			 SYNTAX SEQUENCE OF Hm2FMActionEntry
+			 MAX-ACCESS not-accessible
+			 STATUS current
+			 DESCRIPTION
+				 "A list of profiles stored in NV memory."
+			 ::= { hm2FileMgmtActionGroup 1 }
+
+hm2FMActionEntry   OBJECT-TYPE
+			 SYNTAX Hm2FMActionEntry
+			 MAX-ACCESS not-accessible
+			 STATUS current
+			 DESCRIPTION "A profile entry."
+			 INDEX { hm2FMActionType, hm2FMActionItemType, hm2FMActionSourceType, hm2FMActionDestinationType }
+			 ::= { hm2FMActionTable 1 }
+ 
+Hm2FMActionEntry ::= SEQUENCE {
+			hm2FMActionType					INTEGER,
+			hm2FMActionItemType				INTEGER,
+			hm2FMActionSourceType			INTEGER,
+			hm2FMActionDestinationType	 	INTEGER,
+			hm2FMActionActivate				Integer32
+			}
+
+
+hm2FMActionType OBJECT-TYPE
+			 SYNTAX 		INTEGER {
+			 				nop (1),
+							copy (2),
+							clear (3),
+							swap (4)
+							}
+			 MAX-ACCESS 	not-accessible
+			 STATUS 		current
+			 DESCRIPTION
+				 "Type of the action to be performed."
+			 ::= { hm2FMActionEntry 1 }
+			 
+			 
+hm2FMActionItemType OBJECT-TYPE
+			 SYNTAX 		INTEGER {
+			 				none (1),
+							config (10),
+			 				filesystem(15),		
+							script (20),
+			 				firmware (30),
+							bootcode(31),
+			 				eventlog (40),
+							audittrail (41),
+							traplog(42),		 				
+			 				sysinfo (50),			 				
+			 				sfpWhiteList (51),			 		
+			 				cliBanner (52),	 
+			 				sysinfoall (53),				
+							sshkey (60),
+							httpsServerCert (65),
+							tcpdumpcap (70),
+							tcpdumpfilter (71),
+							camcert (80),
+							ldapCacert (81),
+							mailCacert (82),
+							syslogCacert (83),
+							camcertPEM (84),
+							edsFile(90),
+							gsdmlFile(100)
+							}
+			 MAX-ACCESS 	not-accessible
+			 STATUS 		current
+			 DESCRIPTION
+				 "Type of the item to be processed."
+			 ::= { hm2FMActionEntry 2 }
+			 
+			 
+hm2FMActionSourceType OBJECT-TYPE
+			 SYNTAX 		INTEGER {
+			 				none (1),
+							nvm (2),
+							envm (3),
+							buffered (6),
+							persistent (7),
+							runningConfig (10),
+							system (11),
+							server (20)
+							}
+			 MAX-ACCESS 	not-accessible
+			 STATUS 		current
+			 DESCRIPTION
+				 "Type of the source object to be processed."
+			 ::= { hm2FMActionEntry 3 }
+			 
+			 
+			 
+hm2FMActionDestinationType OBJECT-TYPE
+			 SYNTAX 		INTEGER {
+			 				none (1),
+							nvm (2),
+							envm (3),
+							runningConfig (10),
+							system (11),
+							server (20)
+							}
+			 MAX-ACCESS 	not-accessible
+			 STATUS 		current
+			 DESCRIPTION
+				 "Type of the destination object to be processed."
+			 ::= { hm2FMActionEntry 4 }
+
+hm2FMActionActivate OBJECT-TYPE
+			 SYNTAX 		Integer32
+			 MAX-ACCESS 	read-write
+			 STATUS 		current
+			 DESCRIPTION
+				 "In case of a set operation: If the value to be written
+				 matches with the result of hm2FMActionActivateKey, 
+				 the action is started.
+				 In case of a read operation, it will always reflect
+				 the key of the last successful operation."
+			 ::= { hm2FMActionEntry 5 }
+
+-- the scalar action variables
+
+hm2FMActionSourceData OBJECT-TYPE
+			 SYNTAX 		DisplayString (SIZE(0..128))
+			 MAX-ACCESS 	read-write
+			 STATUS 		current
+			 DESCRIPTION
+				 "Additional data for the source object. This could,
+				 for example, be a profile name or URL"
+			 DEFVAL  { "" }				 
+			 ::= { hm2FileMgmtActionGroup 10 }
+	
+			 
+hm2FMActionDestinationData OBJECT-TYPE
+			 SYNTAX 		DisplayString (SIZE(0..128))
+			 MAX-ACCESS 	read-write
+			 STATUS 		current
+			 DESCRIPTION
+				 "Additional data for the source object. This could
+				 be for example a profile name or URL"
+			 DEFVAL  { "" }				 
+			 ::= { hm2FileMgmtActionGroup 11 }
+
+			 
+hm2FMActionActivateResult OBJECT-TYPE
+			 SYNTAX 		INTEGER {
+			 				ok (1),
+			 				paramError (2),
+			 				busy (3)
+							}
+			 MAX-ACCESS 	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "Either returns ok(1) if the action is successfully
+				 started, param-error(2) if there is some problem
+				 with the given parameters or busy(3) if there
+				 is still an action in progress."
+			 ::= { hm2FileMgmtActionGroup 12 }
+	
+			 
+hm2FMActionActivateResultText OBJECT-TYPE
+			 SYNTAX 		DisplayString
+			 MAX-ACCESS 	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "Text describing why the start of the operation
+				 has failed."
+			 ::= { hm2FileMgmtActionGroup 13 }
+			 
+			 
+hm2FMActionStatus OBJECT-TYPE
+			 SYNTAX 		INTEGER {
+			 				idle (1),
+			 				running (2)
+							}
+			 MAX-ACCESS 	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "Returns the running status of the action."
+			 ::= { hm2FileMgmtActionGroup 14 }
+
+
+hm2FMActionPercentReady OBJECT-TYPE
+			 SYNTAX 		Integer32 (0..100)
+			 MAX-ACCESS 	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "Estimation of how many percent of the operation
+				 is done."
+			 ::= { hm2FileMgmtActionGroup 15 }
+			 
+			 
+hm2FMActionResult OBJECT-TYPE
+			 SYNTAX 		INTEGER {
+			 				ok (1),
+			 				error (2)
+							}
+			 MAX-ACCESS 	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "Error status of the last action which has been performed."
+			 ::= { hm2FileMgmtActionGroup 16 }
+	
+			 
+hm2FMActionResultText OBJECT-TYPE
+			 SYNTAX 		DisplayString
+			 MAX-ACCESS 	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "Either OK or a descriptive text giving
+				 a reason why the last operation failed"
+			 ::= { hm2FileMgmtActionGroup 17 }
+
+hm2FMActionActivateKey OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS 	read-only
+			STATUS 		current
+			DESCRIPTION 
+				"An advisory lock used to ensure that different
+				management entities can not interfere with each
+				others actions. The value read from this variable
+				must be used to start the action by applying to
+				the object hm2FMActionActivate. "
+			 ::= { hm2FileMgmtActionGroup 18 }
+
+hm2FMActionContainerPassword OBJECT-TYPE
+			SYNTAX		DisplayString (SIZE(0..100))
+			MAX-ACCESS 	read-write
+			STATUS 		current
+			DESCRIPTION 
+				"."
+			 ::= { hm2FileMgmtActionGroup 19 }
+
+hm2FMActionParameter OBJECT-TYPE 
+			 SYNTAX 	   	INTEGER { 
+			 		   		none (1), 
+					   		all (2),
+					   		keep-ip (11)
+					   		} 
+			 MAX-ACCESS 	read-write 
+			 STATUS 	   	current 
+			 DESCRIPTION 
+			 	"This variable contains additional information that specifies the
+			  	activated action more detailed. The parameter is only respected 
+			  	for dedicated actions.
+			  
+			  	all(2) gets the complete cli script including defaults
+			  	keep-ip (11) keeps the IP parameters for management on a clear configuration
+			  
+			  	After action is done the variable is set back to the default none(1)."
+			 DEFVAL 		{ none }
+			 ::= { hm2FileMgmtActionGroup 20 }
+
+hm2FMActionSourceInterface OBJECT-TYPE
+			 SYNTAX 	   	InterfaceIndexOrZero
+			 MAX-ACCESS 	read-write
+			 STATUS 	   	current
+			 DESCRIPTION
+				 "This variable defines the interface from which the source IP address
+				  will be taken for the file transfer session. The frames will not necessarily
+				  be sent on this interface, only the IP address of the interface will be used as source.
+				  By default it has value 0."
+			 DEFVAL { 0 }
+			 ::= { hm2FileMgmtActionGroup 21 }
+
+-- 
+-- ***********************************************************
+-- hm2FileMgmtProfileGroup
+-- ***********************************************************
+--
+
+--
+-- Profiles in non volative memory
+--
+hm2FMProfileTable OBJECT-TYPE
+			 SYNTAX SEQUENCE OF Hm2FMProfileEntry
+			 MAX-ACCESS not-accessible
+			 STATUS current
+			 DESCRIPTION
+				 "A list of profiles stored in NV memory."
+			 ::= { hm2FileMgmtProfileGroup 1 }
+
+
+hm2FMProfileEntry   OBJECT-TYPE
+			 SYNTAX Hm2FMProfileEntry
+			 MAX-ACCESS not-accessible
+			 STATUS current
+			 DESCRIPTION "A profile entry."
+			 INDEX { hm2FMProfileStorageType, hm2FMProfileIndex }
+			 ::= { hm2FMProfileTable 1 }
+
+ 
+Hm2FMProfileEntry ::= SEQUENCE {
+			hm2FMProfileStorageType			INTEGER,
+			hm2FMProfileIndex				Integer32,
+			hm2FMProfileName				DisplayString,
+			hm2FMProfileDateTime			HmTimeSeconds1970,
+			hm2FMProfileActive				INTEGER,
+			hm2FMProfileAction				INTEGER,
+			hm2FMProfileDeviceType			OBJECT IDENTIFIER,
+			hm2FMProfileEncryptionActive	TruthValue,
+			hm2FMProfileEncryptionVerified	TruthValue,
+			hm2FMProfileSwMajorRelNum		Integer32,
+			hm2FMProfileSwMinorRelNum		Integer32,
+			hm2FMProfileSwBugfixRelNum		Integer32,
+			hm2FMProfileFingerprint			DisplayString,
+			hm2FMProfileFingerprintVerified	TruthValue
+			}
+
+
+hm2FMProfileStorageType OBJECT-TYPE
+			 SYNTAX 		INTEGER{
+			 				nvm (1),
+			 				envm (2)
+							}
+			 MAX-ACCESS 	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "Type of storage of the profile entry."
+			 ::= { hm2FMProfileEntry 1 }
+
+
+hm2FMProfileIndex OBJECT-TYPE
+			 SYNTAX 		Integer32 (1..100)
+			 MAX-ACCESS 	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "Index of the profile entry."
+			 ::= { hm2FMProfileEntry 2 }
+
+			 
+hm2FMProfileName OBJECT-TYPE
+			 SYNTAX 		DisplayString (SIZE(0..32))
+			 MAX-ACCESS 	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "Name of the entry consisting of alphanumeric
+				 characters plus hyphen and underscore."
+			 ::= { hm2FMProfileEntry 3 }
+	
+			 
+hm2FMProfileDateTime OBJECT-TYPE
+			 SYNTAX 		HmTimeSeconds1970
+			 MAX-ACCESS 	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "Time and date of last write access using the
+				 content of the variable hm2SystemTime."
+			 ::= { hm2FMProfileEntry 4 }
+	
+			 
+hm2FMProfileActive OBJECT-TYPE
+			 SYNTAX 		INTEGER {
+			 				active (1),
+			 				inactive (2)
+							}
+			 MAX-ACCESS 	read-write
+			 STATUS 		current
+			 DESCRIPTION
+				 "Setting the variable to active(1) enables the profile
+				 so that it will be used the next time the configuration
+				 is reloaded. Setting the value to inactive(2) is not
+				 allowed since there must be always at least one profile
+				 with the state set to active(1)."
+			 ::= { hm2FMProfileEntry 5 }
+	
+			 
+hm2FMProfileAction OBJECT-TYPE
+			 SYNTAX 		INTEGER{
+			 				other (1),
+			 				delete (2)
+							}
+			 MAX-ACCESS 	read-write
+			 STATUS 		current
+			 DESCRIPTION
+				 "Action to be performed on the profile entry. Setting
+				 the value to delete(2) erases the profile. It is not 
+				 possible to delete the currently active profile."
+			 ::= { hm2FMProfileEntry 6 }
+			 
+
+hm2FMProfileDeviceType OBJECT-TYPE
+			 SYNTAX 		OBJECT IDENTIFIER
+			 MAX-ACCESS 	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "Manufacturer-defined product identifier (product family + product ID).
+				 Example: Object-ID 1.3.6.1.4.1.248.11.2.1.1 is the hm2ProductFamily EES and
+				 Object-ID 1.3.6.1.4.1.248.11.2.1.1.2 is the Product ID for ees25-0600"
+			 ::= { hm2FMProfileEntry 7 }
+
+
+hm2FMProfileEncryptionActive OBJECT-TYPE
+			 SYNTAX 		TruthValue
+			 MAX-ACCESS 	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "The profile is encrypted if this variable is set to active(true). 
+				  It is not encrypted in case of inactive(false)."
+			 ::= { hm2FMProfileEntry 8 }
+
+hm2FMProfileEncryptionVerified OBJECT-TYPE
+			 SYNTAX 		TruthValue
+			 MAX-ACCESS 	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "This variable indicates true if an encrypted profile can be successfully decrypted by the device. 
+				  In case of an encryption password mismatch, the verification fails the value is false.
+				  If the corresponding profile is not encrypted, this variable is set to true."
+			 ::= { hm2FMProfileEntry 9 }		
+
+hm2FMProfileSwMajorRelNum    	OBJECT-TYPE
+               SYNTAX      		Integer32
+               MAX-ACCESS  		read-only
+               STATUS      		current
+               DESCRIPTION
+                    "Shows the major release number of the firmware, the profile was created on."
+               ::= { hm2FMProfileEntry 10 }
+
+hm2FMProfileSwMinorRelNum       OBJECT-TYPE
+               SYNTAX         	Integer32
+               MAX-ACCESS     	read-only
+               STATUS           current
+               DESCRIPTION
+                    "Shows the minor release number of the firmware, the profile was created on."
+               ::= { hm2FMProfileEntry 11 }
+
+hm2FMProfileSwBugfixRelNum     OBJECT-TYPE
+               SYNTAX          	Integer32
+               MAX-ACCESS      	read-only
+               STATUS          	current
+               DESCRIPTION
+                    "Shows the bugfix release number of the firmware, the profile was created on."
+               ::= { hm2FMProfileEntry 12 }
+
+hm2FMProfileFingerprint OBJECT-TYPE
+			 SYNTAX 		DisplayString (SIZE(40))
+			 MAX-ACCESS 	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "HEX String representation of profile content fingerprint. 
+				  Consists of characters (0..9A..F) to represent a hexadecimal number.
+				  It will contain the string invalid, if the corresponding file does not contain
+				  a correct formatted SHA1 hash as fingerprint."
+			 ::= { hm2FMProfileEntry 13 }
+
+hm2FMProfileFingerprintVerified OBJECT-TYPE
+			 SYNTAX 		TruthValue
+			 MAX-ACCESS 	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "This variable indicates true if the configuration profiles fingerprint matches 
+				  the profile's configuration data. 
+				  In case of a fingerprint, the variable is set to false."
+			 ::= { hm2FMProfileEntry 14 }		
+
+	
+-- ***********************************************************
+-- hm2FileMgmtStatusGroup
+-- ***********************************************************
+
+hm2FMNvmState OBJECT-TYPE
+			 SYNTAX 		INTEGER{
+			 				ok (1),
+			 				outOfSync (2),
+			 				busy (3)
+							}
+			 MAX-ACCESS 	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "This variable returns ok(1) if the contents
+				 of the currently used configuration is the same
+				 as that stored in NV memory or
+				 outOfsync(2) if there are any differences.
+				 The variable returns busy(3) if the process to determine 
+				 a possible state change is currently running."
+			 ::= { hm2FileMgmtStatusGroup 1 }
+			 
+
+hm2FMEnvmState OBJECT-TYPE
+			 SYNTAX 		INTEGER{
+			 				ok (1),
+			 				outOfSync (2),
+			 				absent (3)
+							}
+			 MAX-ACCESS 	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "This variable returns ok(1) if the contents
+				 of the currently used configuration on the 
+				 active external non-volatile memory  
+				 is the same than that stored in NV memory,
+				 outOfsync(2) if there are any differences.
+				 If the value is absent(3), then the external memory
+				 device is not connected."
+			 ::= { hm2FileMgmtStatusGroup 2 }
+	 
+hm2FMBootParamState OBJECT-TYPE
+			 SYNTAX 		INTEGER{
+			 				ok (1),
+			 				outOfSync (2)
+							}
+			 MAX-ACCESS 	read-only
+			 STATUS 	current
+			 DESCRIPTION
+			 	 "Returns outOfSync(2) if the boot parameters that were
+			 	 applied during startup are not in sync with the currently
+			 	 stored boot parameters, otherwise ok(1)."
+			 ::= { hm2FileMgmtStatusGroup 3 }
+
+-- 
+-- ***********************************************************
+-- hm2FileMgmtConfigGroup
+-- ***********************************************************
+--
+
+hm2FileMgmtConfigWatchdogControl OBJECT IDENTIFIER ::= { hm2FileMgmtConfigGroup 1 }
+
+hm2ConfigWatchdogAdminStatus	OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS	read-write
+			STATUS	current
+			DESCRIPTION
+				"Administrative status of the configuration watchdog.
+				enable(1): start/trigger the watchdog timer
+				disable(2): turn off the watchdog
+	
+				This feature provides recovery from situations where the
+				device cannot be reached by the management station anymore.
+	
+				Whenever this variable is set to enable(1), the value of
+				hm2ConfigWatchdogTimeInterval is loaded into the watchdog timer.
+				This timer must be triggered before hm2ConfigWatchdogTimerValue
+				reaches 0. If the watchdog timer expires, the last saved
+				configuration of the device will be reapplied.
+				
+				The watchdog is triggered by MIB read and write accesses."
+			DEFVAL { disable }
+			::= { hm2FileMgmtConfigWatchdogControl 1 }
+	
+hm2ConfigWatchdogOperStatus	OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS	read-only
+			STATUS	current
+			DESCRIPTION
+				"Operational status of the configuration watchdog.
+				enable(1): watchdog up and running
+				disable(2): watchdog inactive"
+			::= { hm2FileMgmtConfigWatchdogControl 2 }
+	
+hm2ConfigWatchdogTimeInterval	OBJECT-TYPE
+			SYNTAX Integer32 (30..600)
+			MAX-ACCESS	read-write
+			STATUS	current
+			DESCRIPTION
+				"Period of the watchdog timer in seconds."
+			DEFVAL { 600 }
+			::= { hm2FileMgmtConfigWatchdogControl 3 }
+	
+hm2ConfigWatchdogTimerValue	OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS	read-only
+			STATUS	current
+			DESCRIPTION
+				"Current countdown value of the watchdog timer in seconds."
+			::= { hm2FileMgmtConfigWatchdogControl 4 }
+			
+hm2ConfigWatchdogIPAddressType	OBJECT-TYPE
+			SYNTAX 	InetAddressType
+			MAX-ACCESS	read-only
+			STATUS	current
+			DESCRIPTION
+			"IP address type of station that triggers the watchdog."
+			::= { hm2FileMgmtConfigWatchdogControl 5 }
+			
+hm2ConfigWatchdogIPAddress	OBJECT-TYPE
+			SYNTAX 	InetAddress
+			MAX-ACCESS	read-only
+			STATUS	current
+			DESCRIPTION
+			"IP address of station that currently triggers the watchdog."
+			::= { hm2FileMgmtConfigWatchdogControl 6 }
+
+
+
+hm2FileMgmtServerAccessGroup OBJECT IDENTIFIER ::= { hm2FileMgmtConfigGroup 2 }	
+			
+hm2FMServerUserName	OBJECT-TYPE
+						 SYNTAX 		 DisplayString (SIZE (0..32))
+						 MAX-ACCESS 	 read-write
+						 STATUS 		 current
+						 DESCRIPTION
+							 "Login name for the used file transport protocol."
+						 ::= { hm2FileMgmtServerAccessGroup 1 }
+
+hm2FMServerPassword	 OBJECT-TYPE
+						 SYNTAX 		 DisplayString (SIZE (0..32))
+						 MAX-ACCESS 	 read-write
+						 STATUS 		 current
+						 DESCRIPTION
+							 "Password for the used file transport protocol."
+						 ::= { hm2FileMgmtServerAccessGroup 2 }
+			
+			
+	
+hm2FileMgmtSecurityGroup OBJECT IDENTIFIER ::= { hm2FileMgmtConfigGroup 4 }	
+
+hm2FileMgmtConfigPasswordStatus	OBJECT-TYPE
+						 SYNTAX			TruthValue
+						 MAX-ACCESS		read-only
+						 STATUS			current
+						 DESCRIPTION
+							 "Returns 'true' if a configuration password is set, otherwise 'false'."
+						 DEFVAL { false }
+						 ::= { hm2FileMgmtSecurityGroup 1 }
+		
+hm2FileMgmtConfigPasswordChange	OBJECT-TYPE
+						 SYNTAX			DisplayString (SIZE (0..255))
+						 MAX-ACCESS		read-write
+						 STATUS			current
+						 DESCRIPTION
+							 "Password to encrypt confidential information in the configuration file.
+							  
+							  Format: '[old password]|[new password]'
+							  
+							  set password: '|[new password]'
+							  change password: '[old password]|[new password]'
+							  remove password: '[old password]|'
+							  
+							  Valid password characters are any DisplayString characters except '|'.
+							  
+							  When this object is read, the zero-length (empty) string is returned.
+							  Setting the zero-length string has no effect."
+						 DEFVAL { "" }
+						 ::= { hm2FileMgmtSecurityGroup 2 }
+					 
+hm2FileMgmtConfigRemoteSaveGroup OBJECT IDENTIFIER ::= { hm2FileMgmtConfigGroup 5 }
+
+hm2FMConfigRemoteSaveAdminStatus	OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS	read-write
+			STATUS	current
+			DESCRIPTION
+				"enable(1) or disable(2) automatic save of configuration to remote server."
+			DEFVAL { disable }
+			::= { hm2FileMgmtConfigRemoteSaveGroup 1 }
+
+hm2FMConfigRemoteSaveDestination OBJECT-TYPE
+			 SYNTAX 		SnmpAdminString (SIZE(0..128))
+			 MAX-ACCESS 	read-write
+			 STATUS 		current
+			 DESCRIPTION
+				 "Remote URL to the location where the configuration file will be saved. The URL 
+				 shall not contain the credentials, they will be provided in hm2FMConfigRemoteSaveUsername 
+				 and hm2FMConfigRemoteSavePassword. The following wildcards are allowed:
+				 - '%%' - expands to '%' ;
+				 - '%p' - expands to device name ;
+				 - '%i' - expands to device IP address ;
+				 - '%m' - expands to device MAC address, formatted as '01-23-45-67-89-AB' ;
+				 - '%d' - expands to current date, formatted as 'yyyy-mm-dd' ;
+				 - '%t' - expands to current time, formatted as 'HH_MM_SS' ;
+				 "
+			 DEFVAL  { "" }				 
+			 ::= { hm2FileMgmtConfigRemoteSaveGroup 2 }
+
+hm2FMConfigRemoteSaveUsername OBJECT-TYPE
+			 SYNTAX 		SnmpAdminString (SIZE(0..128))
+			 MAX-ACCESS 	read-write
+			 STATUS 		current
+			 DESCRIPTION
+				 " Specifies the username to be used in remote save operations.
+				 This object will always return '******' when read."
+			 DEFVAL  { "" }				 
+			 ::= { hm2FileMgmtConfigRemoteSaveGroup 3 }
+			 
+hm2FMConfigRemoteSavePassword OBJECT-TYPE
+			 SYNTAX 		SnmpAdminString (SIZE(0..128))
+			 MAX-ACCESS 	read-write
+			 STATUS 		current
+			 DESCRIPTION
+				 " Specifies the password to be used in remote save operations. 
+				 This object will always return '******' when read."
+			 DEFVAL  { "" }				 
+			 ::= { hm2FileMgmtConfigRemoteSaveGroup 4 }			 
+
+hm2FileMgmtGlobalSourceInterface	OBJECT-TYPE
+						 SYNTAX 	   	InterfaceIndexOrZero
+						 MAX-ACCESS 	read-write
+						 STATUS 	   	current
+					     DESCRIPTION
+							 "This variable defines the global source-interface used by file-transfers in case
+							 hm2FMActionSourceInterface is not configured by the user. The frames will not necessarily
+							 be sent on this interface, only the IP address of the interface will be used as source.
+							 By default it has value 0."
+						 DEFVAL { 0 }
+						 ::= { hm2FileMgmtConfigGroup 9 }
+
+hm2FileMgmtConfigCompatibilityMode	OBJECT-TYPE
+						 SYNTAX 		INTEGER {
+			 							disable(1),
+			 							hiosV1V2(2)
+			 							}
+						 MAX-ACCESS		read-write
+						 STATUS			current
+						 DESCRIPTION
+							 "Set 'hiosV1V2' only if a configuration file needs to be migrated to a device running
+							 HiOS 01.x.xx / 02.x.xx software. Otherwise for normal operation it is recommended to set 
+							 the compatibility mode to the default 'disable'."
+						 DEFVAL { disable }
+						 ::= { hm2FileMgmtConfigGroup 10 }
+
+-- 
+-- ***********************************************************
+-- hm2FileMgmtSNMPExtensionGroup
+-- ***********************************************************
+--
+
+hm2FileMgmtSESCfgActivateSuccessSetFailuresReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates a configuration profile was activated succesfully, 
+           			    but several config items failed to initialize."
+           ::= { hm2FileMgmtSNMPExtensionGroup 1 }
+
+hm2FileMgmtSESCfgActivateErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates a configuration profile could not be activated."
+           ::= { hm2FileMgmtSNMPExtensionGroup 2 }
+
+hm2FileMgmtSESCfgActivateIncomlpeteReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates an incomlete activation of a configuration profile."
+           ::= { hm2FileMgmtSNMPExtensionGroup 3 }
+
+hm2FileMgmtSESCfgMgrCopyCommandErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates a failure of a COPY command given to the Config-Manager's command engine."
+           ::= { hm2FileMgmtSNMPExtensionGroup 4 }
+           
+hm2FileMgmtSESCfgMgrClearCommandErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates a failure of a CLEAR command given to the Config-Manager's command engine."
+           ::= { hm2FileMgmtSNMPExtensionGroup 5 }
+
+hm2FileMgmtSESCfgMgrSwapCommandErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates a failure of a SWAP command given to the Config-Manager's command engine."
+           ::= { hm2FileMgmtSNMPExtensionGroup 6 }
+           
+hm2FileMgmtSESCfgErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates a CFG test error."
+           ::= { hm2FileMgmtSNMPExtensionGroup 7 }
+
+hm2FileMgmtSESCfgMgrCommandActivateErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates a failure because other Config-Manager command is running."
+           ::= { hm2FileMgmtSNMPExtensionGroup 8 }
+           
+hm2FileMgmtActionStatusErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Operation failed because another operation is already in progress."
+           ::= { hm2FileMgmtSNMPExtensionGroup 9 }
+           
+hm2FileMgmtConfigRemoteSaveDestinationErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "URL shall not contain credentials, they will be provided separately."
+           ::= { hm2FileMgmtSNMPExtensionGroup 10 }                      
+
+hm2FileMgmtConfigCannotDeleteActiveProfile OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Cannot delete the active profile."
+           ::= { hm2FileMgmtSNMPExtensionGroup 11 }                      
+			
+-- 
+-- ***********************************************************
+-- hm2FileMgmtNotifications
+-- ***********************************************************
+--
+
+hm2ConfigurationSavedTrap NOTIFICATION-TYPE
+	OBJECTS	{ hm2FMNvmState, hm2FMEnvmState }
+	STATUS  current
+	DESCRIPTION	
+			"This trap is sent after the configuration of the 
+			 agent was successfully saved."
+	::= { hm2FileMgmtNotifications 1 }
+
+hm2ConfigurationChangedTrap NOTIFICATION-TYPE
+	OBJECTS	{ hm2FMNvmState }
+	STATUS  current
+	DESCRIPTION	
+			"This trap is sent if there is a change in the synchronization status
+			 between currently running and the saved configuration
+			 so that the value of hm2FMNvmState changes."
+	::= { hm2FileMgmtNotifications 2 }
+			
+END
+
+
+
+

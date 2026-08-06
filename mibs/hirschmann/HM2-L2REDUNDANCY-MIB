@@ -1,0 +1,1594 @@
+
+HM2-L2REDUNDANCY-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Hirschmann Layer 2 Redundancy MIB
+-- *************************************************************
+--
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY,
+    NOTIFICATION-TYPE,
+	Integer32, Unsigned32,
+	Counter32					FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE,
+    NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                FROM SNMPv2-CONF
+    SnmpAdminString
+								FROM SNMP-FRAMEWORK-MIB
+    RowStatus,
+    MacAddress,
+    TEXTUAL-CONVENTION
+                                FROM SNMPv2-TC
+	InterfaceIndexOrZero
+        						FROM IF-MIB                                
+    HmEnabledStatus,
+    hm2ConfigurationMibs        FROM HM2-TC-MIB
+    InetAddressType,
+    InetAddress                 FROM INET-ADDRESS-MIB;
+
+
+hm2L2RedundancyMib MODULE-IDENTITY
+    LAST-UPDATED "201111230000Z"
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann Layer 2 Redundancy MIB.
+         Copyright (C) 2011. All Rights Reserved."
+    REVISION "201111230000Z" -- Nov 23, 2011
+    DESCRIPTION
+        "Initial version."
+    ::= { hm2ConfigurationMibs 40 }
+
+--
+-- *************************************************************
+-- hm2L2RedundancyMib
+-- *************************************************************
+--
+hm2L2RedundancyMibNotifications			OBJECT IDENTIFIER ::= { hm2L2RedundancyMib 0 }
+hm2L2RedundancyMibObjects				OBJECT IDENTIFIER ::= { hm2L2RedundancyMib 1 }
+-- hm2L2RedundancyMibConformance		OBJECT IDENTIFIER ::= { hm2L2RedundancyMib 2 }
+hm2L2RedundancyMibSNMPExtensionGroup	OBJECT IDENTIFIER ::= { hm2L2RedundancyMib 3 }
+
+
+--
+-- *************************************************************
+-- hm2L2RedundancyMib groups
+-- *************************************************************
+-- 
+hm2MrpMibGroup						OBJECT IDENTIFIER ::= { hm2L2RedundancyMibObjects 1 }
+-- hm2LreMibGroup		    		OBJECT IDENTIFIER ::= { hm2L2RedundancyMibObjects 2 }	
+-- hm2LinkBackupMibGroup    		OBJECT IDENTIFIER ::= { hm2L2RedundancyMibObjects 3 }	
+hm2SrmMibGroup						OBJECT IDENTIFIER ::= { hm2L2RedundancyMibObjects 4 }
+-- hm2DlrMibGroup					OBJECT IDENTIFIER ::= { hm2L2RedundancyMibObjects 5 }
+hm2RingRedMibGroup					OBJECT IDENTIFIER ::= { hm2L2RedundancyMibObjects 7 }			
+hm2RingCouplingMibGroup			    OBJECT IDENTIFIER ::= { hm2L2RedundancyMibObjects 8 }
+hm2RedundantCplConfigMibGroup  	    OBJECT IDENTIFIER ::= { hm2L2RedundancyMibObjects 9 }      
+--
+-- *************************************************************
+-- Textual Conventions
+-- *************************************************************
+--
+Hm2CplPortOpState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Current state of the port."
+    SYNTAX       INTEGER {
+                    not-connected(1),    -- indicates that the port is not connected
+                    active(2),           -- indicates that the port is switching
+                    standby(3),          -- indicates that the port is standby
+                    not-applicable(4)    -- indicates that the port is not compatible with the configured control mode
+                    }
+
+Hm2CplRingActiveProt ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "The current active redundancy protocol
+                  running on the port."
+    SYNTAX       INTEGER {
+                    error(1),
+                    rstp(2),
+                    drstp(3),
+                    mrp(4),
+                    dlr(5),
+                    hiper-ring(6)
+                    }
+-- *************************************************************
+-- hm2MrpMibGroup
+-- *************************************************************
+-- 
+hm2MrpTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF Hm2MrpEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+        "Every entry in this table contains information
+        about a Media Redundancy Protocol (MRP) domain,
+        defined by IEC 62439-2."
+        ::= { hm2MrpMibGroup 1 }
+
+hm2MrpEntry     OBJECT-TYPE
+		SYNTAX		Hm2MrpEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the hm2MrpTable."
+		INDEX		{ hm2MrpDomainID }
+		::= { hm2MrpTable 1 }
+
+Hm2MrpEntry ::= SEQUENCE {
+		hm2MrpDomainID			OCTET STRING,
+		hm2MrpDomainName		SnmpAdminString,
+		hm2MrpRingport1GroupID	Integer32,
+		hm2MrpRingport1IfIndex	Integer32,
+		hm2MrpRingport1OperState	INTEGER,
+		hm2MrpRingport2GroupID	Integer32,
+		hm2MrpRingport2IfIndex	Integer32,
+		hm2MrpRingport2OperState	INTEGER,
+		hm2MrpRoleAdminState	INTEGER,
+		hm2MrpRoleOperState		INTEGER,
+		hm2MrpRecoveryDelay		INTEGER,
+		hm2MrpRecoveryDelaySupported	INTEGER,
+		hm2MrpVlanID			Integer32,
+		hm2MrpMRMPriority		Integer32,
+		hm2MrpMRMReactOnLinkChange	INTEGER,
+		hm2MrpMRMRingOpenCount		Counter32,
+		hm2MrpMRMLastRingOpenChange	Unsigned32,
+		hm2MrpMRMRoundTripDelayMax	Unsigned32,
+		hm2MrpMRMRoundTripDelayMin	Unsigned32,
+		hm2MrpMRMRoundTripDelayReset	INTEGER,
+		hm2MrpMRMNonBlockingMRCSupported	INTEGER,
+		hm2MrpMRCBlockedSupported	INTEGER,
+		hm2MrpRingOperState			INTEGER,
+		hm2MrpRedundancyOperState	INTEGER,
+		hm2MrpConfigOperState		INTEGER,
+		hm2MrpRowStatus		RowStatus,
+		hm2MrpRingport2FixedBackup	HmEnabledStatus
+                }
+
+hm2MrpDomainID  OBJECT-TYPE
+                SYNTAX          OCTET STRING (SIZE (16))
+                MAX-ACCESS      accessible-for-notify
+                STATUS          current
+                DESCRIPTION
+                "Universally unique identifier belongs to the MRP
+                domain which represents a ring."
+                ::= { hm2MrpEntry 1 }
+
+hm2MrpDomainName  OBJECT-TYPE
+                SYNTAX          SnmpAdminString
+                MAX-ACCESS      read-create
+                STATUS          current
+                DESCRIPTION
+                "A logical name for the MRP domain to ease the  
+                management of MRP domains."
+                DEFVAL { "" }
+                ::= { hm2MrpEntry 2 }
+
+hm2MrpRingport1GroupID   OBJECT-TYPE
+                SYNTAX          Integer32
+                MAX-ACCESS      read-create
+                STATUS          obsolete
+                DESCRIPTION
+                "Unique index to identify the slot number of the  
+                ringport 1 in the MRP domain." 
+                ::= { hm2MrpEntry 3 }
+
+hm2MrpRingport1IfIndex   OBJECT-TYPE
+                SYNTAX          Integer32
+                MAX-ACCESS      read-create
+                STATUS          current
+                DESCRIPTION
+                "Interface index of the ringport 1 in the MRP domain."
+                ::= { hm2MrpEntry 4 }
+
+hm2MrpRingport1OperState   OBJECT-TYPE
+                SYNTAX   INTEGER {
+                			disabled(1),
+                			blocked(2),
+                			forwarding(3),
+                			notConnected(4)
+                			}
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                "Operational state of ringport 1.
+                disabled(1) indicates that all frames are dropped.
+                blocked(2) indicates that all frames are dropped except
+                    - MRP topology change frames and MRP test frames from a MRM,
+                    - MRP link change frames from a MRC,
+                    - frames from other protocols that also define to pass
+                      blocked(2) ports.
+                forwarding(3) indicates that all frames are passed through
+                according to the forwarding behavior of IEEE 802.1D.
+                notConnected(4) indicates that the port has no link."
+                ::= { hm2MrpEntry 5 }
+
+hm2MrpRingport2GroupID   OBJECT-TYPE
+                SYNTAX          Integer32
+                MAX-ACCESS      read-create
+                STATUS          obsolete
+                DESCRIPTION
+                "Unique index to identify the slot number of the
+                ringport 2 in the MRP domain." 
+                ::= { hm2MrpEntry 6 }
+
+hm2MrpRingport2IfIndex   OBJECT-TYPE
+                SYNTAX          Integer32
+                MAX-ACCESS      read-create
+                STATUS          current
+                DESCRIPTION
+                "Interface index of the ringport 2 in the MRP domain."
+                ::= { hm2MrpEntry 7 }
+
+hm2MrpRingport2OperState   OBJECT-TYPE
+                SYNTAX   INTEGER {
+                			disabled(1),
+                			blocked(2),
+                			forwarding(3),
+                			notConnected(4)
+                			}
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                "Operational state of ringport 2.
+                disabled(1) indicates that all frames are dropped.
+                blocked(2) indicates that all frames are dropped except
+                    - MRP topology change frames and MRP test frames from a MRM,
+                    - MRP link change frames from a MRC,
+                    - frames from other protocols that also define to pass
+                      blocked(2) ports.
+                forwarding(3) indicates that all frames are passed through
+                according to the forwarding behavior of IEEE 802.1D.
+                notConnected(4) indicates that the port has no link."
+                ::= { hm2MrpEntry 8 }
+
+hm2MrpRoleAdminState   OBJECT-TYPE
+                SYNTAX   INTEGER {
+                			client(1),
+                			manager(2) 
+                			}
+                MAX-ACCESS      read-create
+                STATUS          current
+                DESCRIPTION
+                "Control the role of the MRP entity in the MRP domain.
+                If the value is set to client(1) the entity will be in
+                the role of a Media Redundancy Client (MRC).
+                If the value is set to manager(2) the entity will be in
+                the role of a Media Redundancy Manager (MRM)."
+                DEFVAL { client }
+                ::= { hm2MrpEntry 9 }
+
+hm2MrpRoleOperState   OBJECT-TYPE
+                SYNTAX   INTEGER {
+                			client(1),
+                			manager(2),
+                			undefined(3)
+                			}
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                "Operational role of the MRP entity in the MRP domain.
+                client(1) indicates that the MRP entity is in a MRC role.
+                manager(2) indicates that the MRP entity is the manager MRM
+                of this MRP domain.
+             	undefined(3) indicates that the MRP entity doesn't work."
+                ::= { hm2MrpEntry 10 }
+
+hm2MrpRecoveryDelay   OBJECT-TYPE
+                SYNTAX   INTEGER {
+                			delay500(1),
+                			delay200(2),
+							delay30(3),
+							delay10(4)
+                			}
+                MAX-ACCESS      read-create
+                STATUS          current
+                DESCRIPTION
+                "The MRM defines with its parameter set the maximum recovery
+                delay of the ring recovery in the MRP domain.
+                delay500(1) specifies the parameter set for the maximum
+                recovery delay of 500ms in the MRP domain.
+                delay200(2) specifies the parameter set for the maximum
+                recovery delay of 200ms in the MRP domain.
+                delay30(3) specifies the parameter set for the maximum
+                recovery delay of 30ms in the MRP domain.
+                delay10(4) specifies the parameter set for the maximum
+                recovery delay of 10ms in the MRP domain."
+                DEFVAL { delay200 }
+                ::= { hm2MrpEntry 11 }
+
+hm2MrpRecoveryDelaySupported   OBJECT-TYPE
+                SYNTAX   INTEGER {
+                			supportedAll(1),
+                			supported200500(2)
+                			}
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                "The 10ms and 30ms recovery time put additional restrictions
+                on the cable length and on the reaction time of each client 
+                in the MRP ring, so these recovery times may not be supported
+                by a MRP entity.
+                supportedAll(1) indicates that all recovery times in 
+                hm2MrpRecoveryDelay are supported by the MRP entity.
+                supported200500(2) indicates that only the recovery times
+                500ms and 200ms are supported by the MRP entity."
+                ::= { hm2MrpEntry 12 }
+
+hm2MrpVlanID   OBJECT-TYPE
+                SYNTAX          Integer32
+                MAX-ACCESS      read-create
+                STATUS          current
+                DESCRIPTION
+                "VLAN identifier assigned to the MRP domain.
+                If value is set to 0 no VLAN is assigned."
+                DEFVAL { 0 }
+                ::= { hm2MrpEntry 13 }
+
+hm2MrpMRMPriority   OBJECT-TYPE
+                SYNTAX          Integer32 (0..65535)
+                MAX-ACCESS      read-create
+                STATUS          current
+                DESCRIPTION
+                "Priority of the MRM. A lower value indicates a higher 
+                priority."
+                DEFVAL { 32768 }
+                ::= { hm2MrpEntry 14 }
+
+hm2MrpMRMReactOnLinkChange   OBJECT-TYPE
+                SYNTAX   INTEGER {
+                			enabled(1),
+                			disabled(2)
+                			}
+                MAX-ACCESS      read-create
+                STATUS          current
+                DESCRIPTION
+                "Specifies whether the MRM reacts on all MRP link change 
+                frames or not.
+                enabled(1) indicates that the MRM reacts on all 
+                MRP link change frames.
+                disabled(2) indicates that the MRM does not react on 
+                link down MRP link change frames."
+                DEFVAL { enabled }
+                ::= { hm2MrpEntry 15 }
+
+hm2MrpMRMRingOpenCount OBJECT-TYPE
+                SYNTAX 		Counter32
+                MAX-ACCESS 	read-only
+                STATUS 		current
+                DESCRIPTION
+                "Counter will be incremented when the ring state 
+                changes to ring open."
+                ::= { hm2MrpEntry 16 }
+
+hm2MrpMRMLastRingOpenChange OBJECT-TYPE
+                SYNTAX 		Unsigned32
+                MAX-ACCESS 	read-only
+                STATUS 		current
+                DESCRIPTION 	
+                "The local time at which the ring state last changed 
+                to ring open.
+                Measured in seconds since 00:00:00, January 1, 1970."
+                ::= { hm2MrpEntry 17 }
+
+hm2MrpMRMRoundTripDelayMax OBJECT-TYPE
+                SYNTAX 		Unsigned32
+                MAX-ACCESS 	read-only
+                STATUS 		current
+                DESCRIPTION 	
+                "The max. Round-Trip-Delay (in microseconds) which was
+                measured by the MRM since startup or reset.
+                A device which supports only the recovery delays 200ms and
+                500ms doesn't support the measuring of round-trip-delay."
+                ::= { hm2MrpEntry 18 }
+
+hm2MrpMRMRoundTripDelayMin OBJECT-TYPE
+                SYNTAX 		Unsigned32
+                MAX-ACCESS 	read-only
+                STATUS 		current
+                DESCRIPTION 	
+                "The min. Round-Trip-Delay (in microseconds) which was
+                measured by the MRM since startup or reset.
+                A device which supports only the recovery delays 200ms and
+                500ms doesn't support the measuring of round-trip-delay."
+                ::= { hm2MrpEntry 19 }
+
+hm2MrpMRMRoundTripDelayReset OBJECT-TYPE
+                SYNTAX 		INTEGER {
+                			  reset(1)
+                			  }
+                MAX-ACCESS 	read-write
+                STATUS 		current
+                DESCRIPTION 	
+                "A write request with reset(1) will reset the values of
+                hm2MrpMRMRoundTripDelayMax and hm2MrpMRMRoundTripDelayMin
+                to zero at the same time."
+                ::= { hm2MrpEntry 20 }
+
+hm2MrpMRMNonBlockingMRCSupported   OBJECT-TYPE
+                SYNTAX    INTEGER {
+                			enabled(1),
+                			disabled(2)
+                			}
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                "Ability of the MRM to support MRC in the ring which have 
+                hm2MrpMRCBlockedSupported set disabled.
+                enabled(1) indicates that the MRM is able to support 
+                MRC in the ring which have hm2MrpMRCBlockedSupported 
+                set disabled.
+                disabled(2) indicates that the MRM is not able to support 
+                MRC in the ring which have hm2MrpMRCBlockedSupported 
+                set disabled."                
+                ::= { hm2MrpEntry 21 }
+
+hm2MrpMRCBlockedSupported   OBJECT-TYPE
+                SYNTAX   INTEGER {
+                			enabled(1),
+                			disabled(2)
+                			}
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                "Ability of the MRC to receive and forward MRP test frames, 
+                MRP link change frames and MRP topology change frames at a 
+                ringport whose port state is blocked.
+                enabled(1) indicates that the MRC is able to receive and forward 
+                these MRP frames at a ringport whose port state is blocked.
+                disabled(2) indicates that the MRC is not able to receive and 
+                forward these MRP frames at a ringport whose port state is 
+                blocked."
+                ::= { hm2MrpEntry 22 }
+
+hm2MrpRingOperState   OBJECT-TYPE
+                SYNTAX   INTEGER {
+                			open(1),
+                			closed(2),
+                			undefined(3)
+                			}
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                "Actual ring state of the MRP redundancy domain.  
+                The ring state can only be detected by the MRM.
+                open(1) indicates that the ring is open.
+                closed(2) indicates that the ring is closed.
+                undefined(3) indicates an undefined ring state or is 
+                read if hm2MrpRoleOperState indicates the value client."
+                ::= { hm2MrpEntry 23 }
+
+hm2MrpRedundancyOperState   OBJECT-TYPE
+                SYNTAX   INTEGER {
+                			available(1),
+                			notAvailable(2)
+                			}
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                "Operational state of ring redundancy in the MRP domain.
+                available(1) indicates that ring redundancy exists 
+                in the MRP domain.
+                notAvailable(2) indicates that ring redundancy does not 
+                exist in the MRP domain."
+                ::= { hm2MrpEntry 24 }
+
+hm2MrpConfigOperState   OBJECT-TYPE
+                SYNTAX   INTEGER {
+                			noError(1),
+                			ringportLinkError(2),
+                			multipleMRM(3),
+                			singleSideReceive(4)
+                			}
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                "Operational state of the configuration in the MRP domain.
+                noError(1) indicates that no configuration error was detected.
+                ringportLinkError(2) indicates that one of the ring lines is
+                not connected with one of the ring ports in the MRP domain.
+                multipleMRM(3) indicates multiple active MRM in the ring.
+                singleSideReceive(4) indicates that the MRM has seen it's 
+                test frames, but only on one ring port."
+                ::= { hm2MrpEntry 25 }
+
+hm2MrpRowStatus   OBJECT-TYPE
+                SYNTAX          RowStatus
+                MAX-ACCESS      read-create
+                STATUS          current
+                DESCRIPTION
+                "Supports creation, deletion and activation of rows.
+                A row must not be active(1) in order to be modified.
+                A row can be taken out of service by writing
+                the value notInService(2)."
+                ::= { hm2MrpEntry 26 }
+
+hm2MrpRingport2FixedBackup  OBJECT-TYPE
+                SYNTAX        HmEnabledStatus
+                MAX-ACCESS    read-create
+                STATUS        current
+                DESCRIPTION
+                "If value is set to enable(1) the ringport 2 at the MRM will always 
+                be the backup port. Setting is only relevant if hm2MrpRoleAdminState 
+                is set to manager(2)."
+                DEFVAL { disable }
+                ::= { hm2MrpEntry 27 }
+
+-- *************************************************************
+-- hm2MrpMibGroup conformance
+-- *************************************************************
+-- 
+hm2MrpConformance       OBJECT IDENTIFIER ::= { hm2MrpMibGroup 2 }
+hm2MrpCompliances       OBJECT IDENTIFIER ::= { hm2MrpConformance 1 }
+
+hm2MrpCompliance MODULE-COMPLIANCE
+	STATUS		current
+	DESCRIPTION
+	"Basic implementation requirements for MRP support.
+	The agent shall support the monitoring and control
+	of MRP redundancy domains."
+
+	MODULE
+	MANDATORY-GROUPS {
+			   hm2MrpDomainBasicGroup,
+			   hm2MrpDomainManagerGroup,
+			   hm2MrpNotificationsGroup
+			}
+
+	GROUP 	hm2MrpDomainDiagGroup
+	DESCRIPTION
+	"For SNMP agents it is optional to support monitoring
+	and control of the diagnostic status of MRP domains."
+	::= { hm2MrpCompliances 1 }
+
+-- *************************************************************
+-- hm2MrpMibGroup conformance groups
+-- *************************************************************
+-- 
+hm2MrpGroups OBJECT IDENTIFIER ::= { hm2MrpConformance 2 }
+
+hm2MrpDomainBasicGroup OBJECT-GROUP
+	OBJECTS {
+			hm2MrpDomainID,
+			hm2MrpDomainName,
+			hm2MrpRingport1IfIndex,
+			hm2MrpRingport1OperState,
+			hm2MrpRingport2IfIndex,
+			hm2MrpRingport2OperState,
+			hm2MrpRoleAdminState,
+			hm2MrpRoleOperState,
+			hm2MrpRecoveryDelay,
+			hm2MrpRecoveryDelaySupported,
+			hm2MrpVlanID,
+			hm2MrpMRCBlockedSupported,
+			hm2MrpRedundancyOperState,
+			hm2MrpConfigOperState,
+			hm2MrpRowStatus
+		}
+	STATUS current
+	DESCRIPTION
+	"Parameters which are necessary to monitor
+	and control the status of MRP domains."
+	::= { hm2MrpGroups 1 }
+
+hm2MrpDomainManagerGroup OBJECT-GROUP
+	OBJECTS {
+			hm2MrpMRMPriority,
+			hm2MrpMRMReactOnLinkChange,
+			hm2MrpMRMNonBlockingMRCSupported,
+			hm2MrpRingOperState
+		}
+	STATUS current
+	DESCRIPTION
+	"Additional parameters which are necessary to monitor
+	and control the status of a MRM."
+	::= { hm2MrpGroups 2 }
+
+hm2MrpDomainDiagGroup OBJECT-GROUP
+	OBJECTS {
+			hm2MrpMRMRingOpenCount,
+			hm2MrpMRMLastRingOpenChange,
+			hm2MrpMRMRoundTripDelayMax,
+			hm2MrpMRMRoundTripDelayMin,
+			hm2MrpMRMRoundTripDelayReset
+		}
+	STATUS current
+	DESCRIPTION
+	"Parameters which are optional to monitor and
+	control the diagnostic status of MRP domains."
+	::= { hm2MrpGroups 3 }
+
+hm2MrpNotificationsGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+			hm2MrpReconfig 
+    		  }
+    STATUS  current
+    DESCRIPTION
+    "Notifications indicate changes in the MRP ring."
+    ::= { hm2MrpGroups 4 }
+
+
+-- *************************************************************
+-- scalar objects
+-- *************************************************************
+-- 
+hm2MrpFastMrp   OBJECT-TYPE
+                SYNTAX   INTEGER {
+                			supported(1),
+                			notSupported(2)
+                			}
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+				"Fast MRP means that MRP supports also maximum recovery 
+				times of 30ms or 10ms as defined in IEC 62439-2.
+                supported(1) indicates that the device is able to support
+                fast recovery times for MRP like 30ms or 10ms.
+                notSupported(2) indicates that only the MRP recovery times
+                500ms and 200ms are supported by the device."
+                ::= { hm2MrpMibGroup 3 }
+
+-- 
+-- *************************************************************
+-- hm2SrmMibGroup
+-- *************************************************************
+--
+hm2SrmGlobalAdminState  OBJECT-TYPE
+                        SYNTAX           HmEnabledStatus
+                        MAX-ACCESS       read-write
+                        STATUS           current
+                        DESCRIPTION
+                                         "Enables or disables the global SRM admin mode."
+                        DEFVAL           { disable }
+                        ::= { hm2SrmMibGroup 1 }
+
+hm2SrmMaxInstances      OBJECT-TYPE
+                        SYNTAX           Integer32
+                        MAX-ACCESS       read-only
+                        STATUS           current
+                        DESCRIPTION
+                                         "Maximum number of supported SRM instances in
+                                          the hm2SrmTable."
+                        ::= { hm2SrmMibGroup 2 }
+
+-- 
+-- *************************************************************
+-- hm2SrmTable
+-- *************************************************************
+--
+hm2SrmTable             OBJECT-TYPE
+                        SYNTAX            SEQUENCE OF Hm2SrmEntry
+                        MAX-ACCESS        not-accessible
+                        STATUS            current
+                        DESCRIPTION
+                                          "Every entry in this table contains information
+                                           about a Sub-Ring Manager (SRM) domain."
+                        ::= { hm2SrmMibGroup 3 }
+
+hm2SrmEntry             OBJECT-TYPE
+                        SYNTAX             Hm2SrmEntry
+                        MAX-ACCESS         not-accessible
+                        STATUS             current
+                        DESCRIPTION
+                                           "Information about a Sub-Ring Manager (SRM)
+                                            domain."
+                        INDEX              { hm2SrmRingID  }
+                        ::= { hm2SrmTable 1 }
+
+Hm2SrmEntry             ::= SEQUENCE {
+                                       hm2SrmRingID               Integer32,
+                                       hm2SrmAdminState           INTEGER,
+                                       hm2SrmOperState            INTEGER,
+                                       hm2SrmVlanID		       Integer32,
+                                       hm2SrmMRPDomainID          OCTET STRING,
+                                       hm2SrmPartnerMAC           MacAddress,
+                                       hm2SrmSubRingProtocol      INTEGER,
+                                       hm2SrmSubRingName	       SnmpAdminString,
+                                       hm2SrmSubRingPortIfIndex   Integer32,
+                                       hm2SrmSubRingPortOperState INTEGER,
+                                       hm2SrmSubRingOperState     INTEGER,
+                                       hm2SrmRedundancyOperState  INTEGER,
+                                       hm2SrmConfigOperState      INTEGER,
+                                       hm2SrmRowStatus            RowStatus
+                                     }
+
+
+hm2SrmRingID            OBJECT-TYPE
+                        SYNTAX              Integer32
+                        MAX-ACCESS          accessible-for-notify
+                        STATUS              current
+                        DESCRIPTION
+                                            "Identifier of the sub-ring in the SRM domain."
+                        ::= { hm2SrmEntry 1 }
+
+hm2SrmAdminState        OBJECT-TYPE
+                        SYNTAX               INTEGER {
+                                                        manager(1),
+                                                        redundantManager(2),
+                                                        singleManager(3)
+                                                     }
+                        MAX-ACCESS           read-create
+                        STATUS               current
+                        DESCRIPTION
+                                             "Admin state of the entity in the SRM domain.
+                                              If the value is set to manager(1) the entity
+                                              will be in the role of a Sub-Ring Manager.
+
+                                              If the value is set to redundantManager(2) the
+                                              entity will be in the role of the Sub-Ring
+                                              Manager which will block its ringport if the
+                                              sub-ring is closed.
+                                              If the value is set to singleManager(3) the
+                                              entity will be in the role of the single-manager
+                                              which has both ends of a sub-ring connected and
+                                              will block one of these ends if the sub-ring is
+                                              closed.
+                                              Note: Two instances in the hm2SrmTable are
+                                              needed to build a single-manager where both    
+                                              instances must have singleManager(3) selected.
+
+                                              Note: The sub-ring has two managers at the same
+                                              time. The redundant manager can be designated."
+                         DEFVAL               { manager }
+                         ::= { hm2SrmEntry 2 }
+
+hm2SrmOperState          OBJECT-TYPE
+                         SYNTAX                 INTEGER {
+                                                          manager(1),
+                                                          redundantManager(2),
+                                                          singleManager(3),
+                                                          disabled(4)
+                                                        }
+                         MAX-ACCESS             read-only
+                         STATUS                 current
+                         DESCRIPTION
+                                                "Operational state of the entity in the SRM
+                                                 domain.
+                                                 manager(1) indicates that the entity is in
+                                                 the role of a Sub-Ring Manager.
+                                                 redundantManager(2) indicates that the entity
+                                                 is in the role of the Sub-Ring Manager which
+                                                 will block its ringport if the sub-ring is
+                                                 closed.
+                                                 singleManager(3) indicates that the entity is
+                                                 in the role of the single manager.
+                                                 disabled(4) indicates that the protocol does
+                                                 not work on the entity."
+                         ::= { hm2SrmEntry 3 }
+
+hm2SrmVlanID             OBJECT-TYPE
+                         SYNTAX                 Integer32 (0..4042)
+                         MAX-ACCESS             read-create
+                         STATUS                 current
+                         DESCRIPTION
+                                                "VLAN identifier of the SRM domain.
+                                                 If value is set to 0 no VLAN is assigned."
+                         DEFVAL                 { 0 }
+                         ::= { hm2SrmEntry 4 }
+
+hm2SrmMRPDomainID         OBJECT-TYPE
+                          SYNTAX                    OCTET STRING (SIZE(16))
+                          MAX-ACCESS                read-create
+                          STATUS                    current
+                          DESCRIPTION
+                                                    "Only for MRP:
+                                                     Universally unique identifier belongs to
+                                                     the MRP domain which represents a sub-
+                                                     ring."
+                          DEFVAL                    { 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'H }
+                          ::= { hm2SrmEntry 5 }
+
+hm2SrmPartnerMAC          OBJECT-TYPE
+                          SYNTAX                    MacAddress
+                          MAX-ACCESS                read-only
+                          STATUS                    current
+                          DESCRIPTION
+                                                    "The MAC address of the partner Sub-Ring
+                                                     Manager in the same sub-ring domain."
+                          ::= { hm2SrmEntry 6 }
+
+hm2SrmSubRingProtocol   OBJECT-TYPE
+                        SYNTAX              INTEGER {
+                                                      iec-62439-mrp(4)
+                                                    }
+                        MAX-ACCESS          read-create
+                        STATUS              current
+                        DESCRIPTION
+                                            "If the value is set to iec-62439-mrp(4) the
+                                             Entity will run the MRP protocol.
+                                             Note: If using iec-62439-mrp(4) all clients in
+                                                   The sub-ring segment must run MRP according
+                                                   To IEC 62439."
+                        DEFVAL               { iec-62439-mrp }
+                        ::= { hm2SrmEntry 7 }
+
+hm2SrmSubRingName       OBJECT-TYPE
+                        SYNTAX               SnmpAdminString
+                        MAX-ACCESS           read-create
+                        STATUS               current
+                        DESCRIPTION
+                                             "Name of the sub-ring in the SRM domain."
+                        ::= { hm2SrmEntry 8 }
+
+hm2SrmSubRingPortIfIndex  OBJECT-TYPE
+                        SYNTAX                Integer32
+                        MAX-ACCESS            read-create
+                        STATUS                current
+                        DESCRIPTION
+                                              "Interface index of sub-ring port in the SRM
+                                               domain."
+                        ::= { hm2SrmEntry 9 }
+
+hm2SrmSubRingPortOperState OBJECT-TYPE
+                         SYNTAX                INTEGER {
+                                                         disabled(1),
+                                                         blocked(2),
+                                                         forwarding(3),
+                                                         not-connected(4)
+                                                       }
+                         MAX-ACCESS            read-only
+                         STATUS                current
+                         DESCRIPTION
+                                               "Operational state of sub-ring port.
+                                                disabled(1) indicates that all frames are
+                                                dropped.
+                                                blocked(2) indicates that all frames are
+                                                dropped except
+                                                - frames used by the selected ring protocol
+                                                  which are defined to pass blocked(2) ports,
+                                                - frames from other protocols which are
+                                                  Defined to pass blocked(2) ports.
+                                                forwarding(3) indicates that all frames are
+                                                passed through according to the forwarding
+                                                behavior of IEEE 802.1D.
+                                                not-connected(4) indicates that the port has
+                                                no link."
+                         ::= { hm2SrmEntry 10 }
+
+hm2SrmSubRingOperState   OBJECT-TYPE
+                         SYNTAX                  INTEGER {
+                                                           undefined(1),
+                                                           open(2),
+                                                           closed(3)
+                                                         }
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                                                 "Operational state of the sub-ring in the SRM
+                                                  domain.
+                                                  undefined(1) indicates an undefined sub-ring
+                                                  state.
+                                                  open(2) indicates that the sub-ring is
+                                                  opened.
+                                                  closed(3) indicates that the sub-ring is
+                                                  closed."
+                         ::= { hm2SrmEntry 11 }
+
+hm2SrmRedundancyOperState OBJECT-TYPE
+                          SYNTAX                  INTEGER {
+                                                            redGuaranteed(1),
+                                                            redNotGuaranteed(2)
+                                                          }
+                          MAX-ACCESS              read-only
+                          STATUS                  current
+                          DESCRIPTION
+                                                  "Operational state of the ring redundancy in
+                                                   The SRM domain.
+                                                   redGuaranteed(1) indicates that ring
+                                                   redundancy is guaranteed in the SRM domain.
+                                                   redNotGuaranteed(2) indicates that ring
+                                                   redundancy is not guaranteed in the SRM
+                                                   domain."
+                          ::= { hm2SrmEntry 12 }
+
+hm2SrmConfigOperState     OBJECT-TYPE
+                          SYNTAX                   INTEGER {
+                                                              noError(1),
+                                                              ringPortLinkError(2),
+                                                              multipleSRM(3),
+                                                              noPartnerManager(4),
+                                                              concurrentVLAN(5),
+                                                              concurrentPort(6),
+                                                              concurrentRedundancy(7),
+                                                              trunkMember(8),
+                                                              sharedVLAN(9)
+                                                           }
+                          MAX-ACCESS               read-only
+                          STATUS                   current
+                          DESCRIPTION
+                                                   "Operational state of the configuration in
+                                                    the SRM domain.
+                                                    noError(1) indicates that no configuration
+                                                    error was detected.
+                                                    ringPortLinkError(2) indicates that the
+                                                    ring port has no link or one of the sub-
+                                                    ring lines is not connected with one of
+                                                    the ring ports of the entity but to
+                                                    another port of the entity.
+                                                    multipleSRM(3) indicates that the Sub-Ring
+                                                    Manager receives frames from more than one
+                                                    Sub-Ring Managers in the sub-ring.
+                                                    noPartnerManager(4) indicates that the
+                                                    Sub-Ring Manager receives his own frames.
+                                                    concurrentVLAN(5) indicates that the VLAN of the SRM domain is
+                                                    used by MRP in the basis ring.
+                                                    concurrentPort(6) indicates that the ringport of the SRM domain
+                                                    is used by another redundancy protocol.
+                                                    concurrentRedundancy(7) indicates the SRM domain is not active
+                                                    because of another active redundancy protocol.
+                                                    trunkMember(8) indicates that the ringport of the SRM domain
+                                                    is member of a trunk.
+                                                    sharedVLAN(9) indicates the SRM domain cannot be active
+                                                    because Shared VLAN is active and MRP is used in the
+                                                    basis ring too."
+                          ::= { hm2SrmEntry 13 }
+
+hm2SrmRowStatus           OBJECT-TYPE
+                          SYNTAX                    RowStatus
+                          MAX-ACCESS                read-create
+                          STATUS                    current
+                          DESCRIPTION
+                                                    "Defines the status of the SRM database
+                                                     entry."
+                          ::= { hm2SrmEntry 20 }
+
+
+
+--
+-- *************************************************************
+-- hm2RingRedGroup
+-- *************************************************************
+--
+hm2RingRedAdminState    OBJECT-TYPE
+                        SYNTAX           HmEnabledStatus
+                        MAX-ACCESS       read-write
+                        STATUS           current
+                        DESCRIPTION
+                                         "Enables or disables the global (HIPER)Ring Redundancy admin mode."
+                        DEFVAL           { disable }
+                        ::= { hm2RingRedMibGroup 1 }
+                        
+hm2RingRedMode	    	OBJECT-TYPE
+                        SYNTAX           INTEGER {
+                                                    ring-switch(1)
+                                                 }
+                        MAX-ACCESS       read-write
+                        STATUS           current
+                        DESCRIPTION
+                                         "The mode (HIPER)Ring Redundancy is configured."
+                        DEFVAL           { ring-switch }
+                        ::= { hm2RingRedMibGroup 2 }
+
+hm2RingRedPrimaryIntf  	OBJECT-TYPE
+                        SYNTAX           InterfaceIndexOrZero
+                        MAX-ACCESS       read-write
+                        STATUS           current
+                        DESCRIPTION
+                                         "Interface index of the primary interface."
+                        DEFVAL           { 0 }
+                        ::= { hm2RingRedMibGroup 3 }
+
+hm2RingRedPrimaryIntfState  	OBJECT-TYPE
+                        SYNTAX           INTEGER {
+							    not-available(1),
+							    active(2),
+							    inactive(3)
+							    }
+                        MAX-ACCESS       read-only
+                        STATUS           current
+                        DESCRIPTION
+		                              "Operational state of the primary ring port. The port states are as follows, 
+active        - port is logically up and active. 
+inactive      - port is logically down. 
+not-available - no Hiper Ring instance is running, check prerequisites."
+                        DEFVAL           { not-available }
+                        ::= { hm2RingRedMibGroup 4 }
+                        
+hm2RingRedSecondaryIntf  	OBJECT-TYPE
+                        SYNTAX           InterfaceIndexOrZero
+                        MAX-ACCESS       read-write
+                        STATUS           current
+                        DESCRIPTION
+                                         "Interface index of the secondary interface."
+                        DEFVAL           { 0 }
+                        ::= { hm2RingRedMibGroup 5 }
+
+hm2RingRedSecondaryIntfState  	OBJECT-TYPE
+                        SYNTAX           INTEGER {
+							    not-available(1),
+							    active(2),
+							    inactive(3)
+							    }
+                        MAX-ACCESS       read-only
+                        STATUS           current
+                        DESCRIPTION
+                                      "Operational state of the secondary ring port. The port states are as follows, 
+active        - port is logically up and active. 
+inactive      - port is logically down. 
+not-available - no Hiper Ring instance is running, check prerequisites."
+                        DEFVAL           { not-available }
+                        ::= { hm2RingRedMibGroup 6 }
+
+--
+-- Ring Coupling Variables  --
+--
+
+hm2RingCouplingTable OBJECT-TYPE
+                SYNTAX          SEQUENCE OF Hm2RingCouplingEntry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION
+                "This table contains variables to define
+                an entry in the ring coupling database."
+                ::= { hm2RingCouplingMibGroup 1 }
+
+hm2RingCouplingEntry     OBJECT-TYPE
+                SYNTAX          Hm2RingCouplingEntry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "The entry of the hm2RingCouplingTable."
+                INDEX           { hm2RingCplInterconnIfIndex }
+                ::= { hm2RingCouplingTable 1 }
+
+Hm2RingCouplingEntry ::= SEQUENCE {
+                hm2RingCplInterconnIfIndex       InterfaceIndexOrZero,
+                hm2RingCplInterconnIfOpState     INTEGER,
+                hm2RingCplControlIfIndex         InterfaceIndexOrZero,
+                hm2RingCplControlIfOpState       INTEGER,
+                hm2RingCplPartnerInterconnIfIndex   InterfaceIndexOrZero,
+                hm2RingCplPartnerInterconnIfOpState INTEGER,
+                hm2RingCplPartnerIpAddrType      InetAddressType,
+                hm2RingCplPartnerIpAddr          InetAddress,
+                hm2RingCplCouplingMode           INTEGER,
+                hm2RingCplControlModeOperState   INTEGER,
+                hm2RingCplModeOperState          INTEGER,
+                hm2RingCplOperState              INTEGER,
+                hm2RingCplConfigOperState        INTEGER,
+                hm2RingCplCouplingLinks          INTEGER,
+                hm2RingCplExtendedDiag           INTEGER,
+                hm2RingCplNetCoupling            INTEGER,
+				hm2RingCplRedOperState           INTEGER,
+                hm2RingCplRowStatus              RowStatus
+                }
+
+hm2RingCplInterconnIfIndex   OBJECT-TYPE
+                SYNTAX          InterfaceIndexOrZero
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                "Interface index of the coupling link.
+                Note that only those ports can be chosen
+                which do not belong to another L2 redundancy
+                mechanism like ring redundancy or dual homing
+                and that row creation is only done by
+                writing to hm2RingCplRowStatus."
+                ::= { hm2RingCouplingEntry 1 }
+
+hm2RingCplInterconnIfOpState   OBJECT-TYPE
+                SYNTAX           Hm2CplPortOpState
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                "Operational state of the coupling interface.
+                active(2) indicates that the port is switching.
+                standby(3) indicates that the port is in standby mode.
+                On the slave active(2) indicates that a ring coupling
+                failure has occured and the port is switching.
+                On the slave standby(3) indicates that the ring coupling is ok
+                and the slave is in standby mode."
+                ::= { hm2RingCouplingEntry 2 }
+
+hm2RingCplControlIfIndex   OBJECT-TYPE
+                SYNTAX          InterfaceIndexOrZero
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                "Interface index of the control link in case
+                of outband-control.
+                Note that only those ports can be chosen
+                which do not belong to another L2 redundancy
+                mechanism like ring redundancy or dual homing
+                and that row creation is only done by
+                writing to hm2RingCplRowStatus."
+                ::= { hm2RingCouplingEntry 3 }
+
+hm2RingCplControlIfOpState   OBJECT-TYPE
+                SYNTAX           Hm2CplPortOpState
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                "Operational state of the control interface in case
+                of outband-control."
+                ::= { hm2RingCouplingEntry 4 }
+
+hm2RingCplPartnerInterconnIfIndex   OBJECT-TYPE
+                SYNTAX          InterfaceIndexOrZero
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                "Interface index identifies the coupling link of the
+                partner in the ring coupling.
+		        This variable can only be set if the
+                hm2RingCplControlMode is local(4)."
+                ::= { hm2RingCouplingEntry 5 }
+
+hm2RingCplPartnerInterconnIfOpState   OBJECT-TYPE
+                SYNTAX           Hm2CplPortOpState
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                "Operational state of the coupling interface of the
+                partner in the ring coupling.
+                active(2) indicates that the partner port is switching.
+                standby(3) indicates that the partner port is in standby mode."
+                ::= { hm2RingCouplingEntry 6 }
+
+hm2RingCplPartnerIpAddrType OBJECT-TYPE
+                SYNTAX           InetAddressType
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                "Partner IP Address type."
+                DEFVAL { ipv4 }
+                ::= { hm2RingCouplingEntry 7 }
+
+hm2RingCplPartnerIpAddr OBJECT-TYPE
+                SYNTAX           InetAddress
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                "IP Address of the partner in the ring coupling."
+                DEFVAL { '00000000'H }
+                ::= { hm2RingCouplingEntry 8 }
+
+hm2RingCplCouplingMode OBJECT-TYPE
+                SYNTAX           INTEGER {
+                                 single(1),
+                                 dual-master-inband(2),
+                                 dual-master-outband(3),
+                                 dual-slave-inband(4),
+                                 dual-slave-outband(5),
+                                 unknown(6)
+                                 }
+                MAX-ACCESS       read-write
+                STATUS           current
+                DESCRIPTION
+                "Ring-coupling operating mode .
+                In single(1) mode both coupling ports are local to the switch,
+				switch performs master and slave functions.
+                In dual-master-inband(2) mode second coupling port is on a remote
+                switch, local switch is master, communication over network.
+                In dual-master-outband(3) mode second coupling port is on a remote
+				switch, local switch is master, communication over dedicated control port.
+                In dual-slave-inband(4) mode second coupling port is on a remote switch,
+				local switch is slave, communication over network.
+                In dual-slave-outband(5) mode second coupling port is on a remote switch,
+				local switch is slave, communication over dedicated control port.
+                unknown(6) cannot be set,it's returned when no mode is configured."
+                ::= { hm2RingCouplingEntry 9 }
+
+hm2RingCplControlModeOperState OBJECT-TYPE
+                SYNTAX           INTEGER {
+                                 outband(1),
+                                 inband(2),
+                                 unknown(3),
+                                 local(4)
+                                 }
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                "Control mode of the ring coupling which can only be
+                chosen by the slave, the master just reports his current
+                control mode. unknown(3) cannot be set.
+                In outband(1) mode an additional line must connect the control
+                interfaces between the two partners in the ring coupling.
+                In inband(2) mode only the coupling link port is needed.
+                In local(4) mode the coupling link port and the partner port are
+                located on the same switch."
+                ::= { hm2RingCouplingEntry 10 }
+
+hm2RingCplModeOperState   OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                slaveOff(1),
+                                slaveOn(2)
+                                }
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                "Mode of operation .
+                slaveOn(2) slave is activated.
+                slaveOff(1) slave is deactivated, the ring coupling is disabled and
+                the switch acts from now in normal rs mode."
+                ::= { hm2RingCouplingEntry 11 }
+
+hm2RingCplOperState OBJECT-TYPE
+                 SYNTAX          INTEGER {
+                                 underCreation(1),
+                                 slave(2),
+                                 master(3),
+                                 local(4)
+                                 }
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                "Operational state of an entry.
+                If a new entry is created by setting hm2RingCplRowStatus to create(1),
+                the operState returns a value of underCreation(1).
+                slave(2) indicates that switch is configured to be the slave of the
+                ring coupling, that means the switch is in standby mode.
+                master(3) indicates that a switch is configured to be
+                the master of the ring coupling.
+                local(4) indicates that the switch is configured to control a ring
+                coupling where the coupling port and the partner port are located
+                on the same switch."
+                ::= { hm2RingCouplingEntry 12 }
+
+hm2RingCplConfigOperState OBJECT-TYPE
+                 SYNTAX          INTEGER {
+                                 noError(1),
+                                 slaveCouplingLinkError(2),
+                                 slaveControlLinkError(3),
+                                 masterControlLinkError(4),
+                                 twoSlaves(5),
+                                 localPartnerLinkError(6),
+                                 localInvalidCouplingPort(7),
+                                 couplingPortNotAvailable(8),
+                                 controlPortNotAvailable(9),
+                                 partnerPortNotAvailable(10)
+                                 }
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                "Operational state of the ring coupling configuration.
+
+                slaveCouplingLinkError(2) indicates that the coupling link
+                is not connected with the coupling port of the slave but with
+                another port of the slave.
+
+                In case of outband control additional failures can be
+                detected:
+                slaveControlLinkError(3) indicates that the control
+                port of the slave has either no link or the link
+                fails.
+                masterControlLinkError(4) indicates that the control
+                link is not connected with the control port of the
+                master but with another port of the master.
+                twoSlaves(5) is returned when two slaves are connected
+                by the control line.
+
+                localPartnerLinkError(6) indicates that the partner coupling link
+                is not connected with the partner port of the slave but with
+                another port of the slave in local control mode.
+                localInvalidCouplingPort(7) indicates that in local mode the coupling
+                line is connected to another switch and not on the same switch like
+                the partner line.
+
+                couplingPortNotAvailable(8), controlPortNotAvailable(9) and
+                partnerPortNotAvailable(10) indicate that this port is not available
+                because the module related to this port is not available or the port
+                does not exist on this module."
+                ::= { hm2RingCouplingEntry 13 }
+
+hm2RingCplCouplingLinks   OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                basicRedundancy(1),
+                                extendedRedundancy(2)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                "Maximum coupling links between two coupled rings in case of a failure
+                 in one of the coupled rings.
+
+                If there is no connection starting from the switch in slave or local
+                operational state over the route of the coupled rings or nets to oneself
+                the slave or the local mode want to set the coupling port in forwarding
+                after a timeout period.
+
+		        basicRedundancy(1) prevents the slave or the local mode from setting
+                its coupling port into forwarding in case of the described failure. In this
+                case the segment which is connected to this coupling port is unreachable
+                until the failure is eliminated.
+
+		        In extendedRedundancy(2) the coupling port and the partner coupling
+                port are allowed to be in forwarding."
+                ::= { hm2RingCouplingEntry 14 }
+
+hm2RingCplExtendedDiag OBJECT-TYPE
+                 SYNTAX          INTEGER {
+                                 noError(1),
+                                 basicRedundancyInactive(2)
+                                 }
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                "Additional operational states detected by the slave or in local mode.
+                basicRedundancyInactive(2) indicates that the coupling port has been
+                prevented from setting into forwarding (please see description
+                of hm2RingCplCouplingLinks)."
+                ::= { hm2RingCouplingEntry 15 }
+
+hm2RingCplNetCoupling OBJECT-TYPE
+                 SYNTAX          INTEGER {
+                                 ringCoupling(1),
+                                 netCoupling(2)
+                                 }
+                MAX-ACCESS       read-write
+                STATUS           current
+                DESCRIPTION
+                "Specifies the kind of the coupled net segment.
+                If two HIPER Rings are coupled ringCoupling(1) must be used.
+                In netCoupling(2) the coupled segment is no HIPER Ring topology and the
+                switches in the coupled net segment may be connected with other ports than
+                their ringports.
+
+                Notice: if the ring coupling mechanism switches over, in ringCoupling(1)
+                only the address tables of the switches in the two coupled HIPER Rings will be
+                erased, in netCoupling(2) the address tables of all switches in the
+                coupled net will be erased."
+                ::= { hm2RingCouplingEntry 16 }
+
+hm2RingCplRedOperState OBJECT-TYPE
+                 SYNTAX                  INTEGER {
+                                         redGuaranteed(1),
+                                         redNotGuaranteed(2)
+                                         }
+                MAX-ACCESS               read-only
+                STATUS                   current
+                DESCRIPTION
+                "Operational state of the Ring/Net coupling redundancy.
+                redGuaranteed(1) indicates that redundancy is guaranteed in the ring coupling.
+                redNotGuaranteed(2) indicates that redundancy is not guaranteed in the ring coupling."
+                ::= { hm2RingCouplingEntry 17}
+
+hm2RingCplRowStatus   OBJECT-TYPE
+                SYNTAX          RowStatus
+                MAX-ACCESS      read-create
+                STATUS          current
+                DESCRIPTION
+                "Defines the status of a ring coupling database entry."
+                ::= { hm2RingCouplingEntry 22 }
+
+
+--
+-- Redundant Coupling Protocol
+--
+hm2RedundantCplAdminState OBJECT-TYPE
+    SYNTAX      HmEnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Enables or disables the global RCP admin state."
+    DEFVAL { disable }
+    ::= { hm2RedundantCplConfigMibGroup 1 }
+
+hm2RedundantCplInPrimaryPort OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The inner coupling port of the primary ring."
+    DEFVAL { 0 }
+    ::= { hm2RedundantCplConfigMibGroup 2 }
+
+hm2RedundantCplOutPrimaryPort OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The outer coupling port of the primary ring."
+    DEFVAL { 0 }
+    ::= { hm2RedundantCplConfigMibGroup 3 }
+    
+hm2RedundantCplInSecondaryPort OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The inner coupling port of the secondary ring"
+    DEFVAL { 0 }
+    ::= { hm2RedundantCplConfigMibGroup 4 }
+    
+hm2RedundantCplOutSecondaryPort OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The outer coupling port of the secondary ring"
+    DEFVAL { 0 }
+    ::= { hm2RedundantCplConfigMibGroup 5 }   
+    
+hm2RedundantCplRole OBJECT-TYPE
+    SYNTAX      INTEGER {
+                	master(1),
+                	slave(2),
+                	single(3),
+ 					auto(4)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Configurable role of the RCP coupler."
+    DEFVAL { auto }
+    ::= { hm2RedundantCplConfigMibGroup 6 }      
+
+hm2RedundantCplCurrentRole OBJECT-TYPE
+    SYNTAX      INTEGER {
+                	master(1),
+                	slave(2),
+                	listening(3),
+                	error(4),
+                	disabled(5),
+                	single(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Current role of the RCP coupler."
+    ::= { hm2RedundantCplConfigMibGroup 7 } 
+
+hm2RedundantCplTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32 (5..60000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "RCP coupler timeout in milliseconds."
+    DEFVAL { 250 }
+    ::= { hm2RedundantCplConfigMibGroup 8 } 
+    
+hm2RedundantCplPartner OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "MAC address of the coupling partner."
+    ::= { hm2RedundantCplConfigMibGroup 9 } 
+    
+hm2RedundantCplPartnerPrimaryPort OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Port of the coupling partner in the primary ring."
+    ::= { hm2RedundantCplConfigMibGroup 10 }
+    
+hm2RedundantCplPartnerSecondaryPort OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Port of the coupling partner in the secondary ring."
+    ::= { hm2RedundantCplConfigMibGroup 11 }
+     
+hm2RedundantCplState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                	forwarding(1),
+                	blocking(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "current forwarding state of the RCP coupler."
+    ::= { hm2RedundantCplConfigMibGroup 12 }
+    
+hm2RedundantCplRedundancyState OBJECT-TYPE
+    SYNTAX      INTEGER {
+					redAvailable(1),
+					redNotAvailable(2)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Indicates if coupling redundancy is available."
+    ::= { hm2RedundantCplConfigMibGroup 13 }
+
+hm2RedundantCplPartnerIPAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Partner IP Address type."
+    ::= { hm2RedundantCplConfigMibGroup 14 } 
+                
+hm2RedundantCplPartnerIPAddr OBJECT-TYPE
+	SYNTAX      InetAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+				"IP address of the coupling partner."
+	::= { hm2RedundantCplConfigMibGroup 15 } 
+
+hm2RedundantCplActiveProtPrimaryRing OBJECT-TYPE
+	SYNTAX      Hm2CplRingActiveProt
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Active protocol on primary redundant coupling ring ports."
+    ::= { hm2RedundantCplConfigMibGroup 16 }
+
+hm2RedundantCplActiveProtSecondaryRing OBJECT-TYPE
+	SYNTAX      Hm2CplRingActiveProt
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Active protocol on secondary redundant coupling ring ports."
+    ::= { hm2RedundantCplConfigMibGroup 17 }
+
+--
+-- *************************************************************
+-- hm2L2RedundancyMib notifications
+-- *************************************************************
+--
+hm2MrpReconfig  NOTIFICATION-TYPE
+	OBJECTS		{ hm2MrpRingOperState }
+	STATUS		current
+	DESCRIPTION 
+	 "This notification is sent if the MRP ring has switched 
+	over."
+	::= { hm2L2RedundancyMibNotifications 1 }
+
+hm2SrmReconfig  NOTIFICATION-TYPE
+	OBJECTS		{ hm2SrmRingID, hm2SrmSubRingOperState }
+	STATUS		current
+	DESCRIPTION
+	 "This notification is sent if the SRM ring has switched
+	over."
+	::= { hm2L2RedundancyMibNotifications 2 }
+
+hm2RingCplReconfig NOTIFICATION-TYPE
+    OBJECTS   { hm2RingCplInterconnIfOpState,hm2RingCplPartnerInterconnIfOpState, hm2RingCplPartnerIpAddrType, hm2RingCplPartnerIpAddr }
+    STATUS    current
+    DESCRIPTION
+     "The Ring Coupling mechanism has switched over"
+	::= { hm2L2RedundancyMibNotifications 3 }
+
+hm2RedundantCplReconfig NOTIFICATION-TYPE
+	OBJECTS   { hm2RedundantCplCurrentRole, hm2RedundantCplState }
+    STATUS    current
+    DESCRIPTION 
+     "The RCP Redundancy mechanism has switched over."
+    ::= { hm2L2RedundancyMibNotifications 4 }
+
+
+-- ***********************************************************
+-- hm2MgmtAccessMibSNMPExtensionGroup
+-- ***********************************************************
+-- hm2MrpMibSESGroup			OBJECT IDENTIFIER ::= { hm2L2RedundancyMibSNMPExtensionGroup 1 }
+-- hm2LreMibSESGroup		    OBJECT IDENTIFIER ::= { hm2L2RedundancyMibSNMPExtensionGroup 2 }	
+-- hm2LinkBackupSESMibGroup    	OBJECT IDENTIFIER ::= { hm2L2RedundancyMibSNMPExtensionGroup 3 }	
+-- hm2SrmMibSESGroup			OBJECT IDENTIFIER ::= { hm2L2RedundancyMibSNMPExtensionGroup 4 }
+-- hm2DlrMibSESGroup			OBJECT IDENTIFIER ::= { hm2L2RedundancyMibSNMPExtensionGroup 5 }
+-- hm2RingRedMibSESGroup		OBJECT IDENTIFIER ::= { hm2L2RedundancyMibSNMPExtensionGroup 7 }			
+hm2RingCouplingMibSESGroup		OBJECT IDENTIFIER ::= { hm2L2RedundancyMibSNMPExtensionGroup 8 }
+hm2RedundantCplSESGroup   		OBJECT IDENTIFIER ::= { hm2L2RedundancyMibSNMPExtensionGroup 9 }
+
+-- *************************************************************
+-- hm2RingCouplingMibSESGroup notifications
+-- *************************************************************
+
+hm2RingCouplingInvalidPortConfiguration OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION "Could not enable Ring/Net Coupling configuration. In {0} control mode the {1} should be selected, different from the coupling port and in the valid range."
+	::= { hm2RingCouplingMibSESGroup 1 }
+
+-- *************************************************************
+-- hm2RedundantCplSESGroup notifications
+-- *************************************************************
+
+hm2RedundantCplPortsMissing OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION "Could not enable RCP. The required ports are not configured."
+	::= { hm2RedundantCplSESGroup 1 }
+
+hm2RedundantCplSecondaryGroupUnitMismatched OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION "Could not enable RCP. The selected RCP inner and outer secondary interfaces are not correctly configured."
+	::= { hm2RedundantCplSESGroup 2 }
+END
+

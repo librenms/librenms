@@ -1,0 +1,476 @@
+--******************************************************************************
+-- HM2-DOS-MITIGATION-MIB: Managed objects for 
+--
+-- March 2012
+-- 
+-- Copyright (c) Hirschmann Automation & Control GmbH 2012
+--******************************************************************************
+
+HM2-DOS-MITIGATION-MIB DEFINITIONS ::= BEGIN
+IMPORTS 
+	OBJECT-TYPE, MODULE-IDENTITY,
+	Unsigned32
+		FROM SNMPv2-SMI
+	RowStatus, TEXTUAL-CONVENTION
+		FROM SNMPv2-TC	
+	MODULE-COMPLIANCE, OBJECT-GROUP
+                FROM SNMPv2-CONF
+        InterfaceIndex, ifIndex 
+        	FROM IF-MIB
+        hm2ConfigurationMibs, HmEnabledStatus		   
+        	FROM HM2-TC-MIB        
+	;
+
+hm2DosMitigationMib MODULE-IDENTITY
+	LAST-UPDATED "201209180000Z" -- September 18, 2012
+	ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+          "Hirschmann Denial of Service MIB
+           Copyright (C) 2012. All Rights Reserved."
+    REVISION     "201209180000Z" -- September 18, 2012
+    DESCRIPTION
+          "Change the range of valid values for
+           hm2DosMitigationTcpMinimalHeaderSize
+           MIB object from (0..255) to (20..255)."
+    REVISION     "201208200000Z" -- August 20, 2012
+    DESCRIPTION
+          "hm2DosMitigationTcpFrag MIB object removed."
+    REVISION     "201206060000Z" -- June 06, 2012
+    DESCRIPTION
+          "Add MIB objects for all features supported by XGS4 switch."
+    REVISION     "201203190000Z" -- Mar 19, 2012
+    DESCRIPTION
+          "Initial version."
+	::= { hm2ConfigurationMibs 82 }
+
+DosFeatureValue ::= TEXTUAL-CONVENTION
+    STATUS   current
+    DESCRIPTION 
+       "Type of feature support: 
+       		- hw(1): Supported in Hardware
+       		- sw(2): Supported in Software
+       		- noSup(3): Not implemented (no support)"
+	SYNTAX   INTEGER {
+			hw(1),
+			sw(2),
+			noSup(3)
+	}
+    
+
+
+hm2DosMitigationNotifications 	OBJECT IDENTIFIER ::= { hm2DosMitigationMib 0 }
+hm2DosMitigationObjects 		OBJECT IDENTIFIER ::= { hm2DosMitigationMib 1 }
+hm2DosMitigationConformance 	OBJECT IDENTIFIER ::= { hm2DosMitigationMib 2}
+
+--******************************************************************************
+--                         General Settings
+--******************************************************************************
+
+hm2DosMitigationGeneralSettings OBJECT IDENTIFIER ::= { hm2DosMitigationObjects 1 }
+
+hm2DosMitigationTcpHdrChecks OBJECT IDENTIFIER ::= { hm2DosMitigationGeneralSettings 1 }
+
+hm2DosMitigationTcpNullScan OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"When enabled, TCP Null scans (TCP flags and sequence number
+		set to 0) are filtered by the device."
+	DEFVAL { disable }
+	::= { hm2DosMitigationTcpHdrChecks 1 }
+
+
+hm2DosMitigationTcpXmasScan OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "When enabled TCP Xmas scans (TCP flags FIN, 
+        URG and PSH all set to 1 and a TCP sequence 
+        number = 0) are filtered by the device."
+	DEFVAL { disable }
+	::= { hm2DosMitigationTcpHdrChecks 4 }
+
+hm2DosMitigationTcpSynFinScan OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"When enabled TCP packets with SYN and FIN flags set are
+		filtered by the device."
+	DEFVAL { disable }
+	::= { hm2DosMitigationTcpHdrChecks 7 }
+
+hm2DosMitigationTcpMinimalHeader OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"When enabled all TCP frames are checked for a minimal valid 
+		header size. Packets that contain an invalid header size are
+		discarded."
+	DEFVAL { disable }
+	::= { hm2DosMitigationTcpHdrChecks 10 }
+
+hm2DosMitigationTcpMinimalHeaderSize OBJECT-TYPE
+	SYNTAX Unsigned32 (20..255)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		" Specifies the minimum size of a valid TCP frame header size."
+	DEFVAL { 20 }
+	::= { hm2DosMitigationTcpHdrChecks 11 }
+
+hm2DosMitigationLandAttack OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"When enabled all IP frames are checked for equality of
+		src and dst IP address (known as land attack). Packets that 
+		contain such a combination are silently discarded when
+		enabled."
+	DEFVAL { disable }
+	::= { hm2DosMitigationTcpHdrChecks 13 }
+
+hm2DosMitigationTcpOffsetEqu1 OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable TCP offset DoS protection. All packets
+        ingress having a TCP header offset equal to 1 are dropped."
+	DEFVAL { disable }
+	::= { hm2DosMitigationTcpHdrChecks 14 }
+
+hm2DosMitigationTcpPrivilegedSrcPort OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable TCP SYN and L4 source port smaller than 1024 
+        DoS protection. All packets ingress having the TCP SYN flag set 
+        and a L4 source port from 0 to 1023 are dropped."
+	DEFVAL { disable }
+	::= { hm2DosMitigationTcpHdrChecks 	15 }
+
+hm2DosMitigationTcpSrcDstPortEqu OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable L4 source port equals L4 destination port 
+        DoS protection. All TCP or UDP packets ingress having the
+        L4 source port equal to L4 destination port are dropped."
+	DEFVAL { disable }
+	::= { hm2DosMitigationTcpHdrChecks 16 }
+
+
+hm2DosMitigationIcmpChecks OBJECT IDENTIFIER ::= { hm2DosMitigationGeneralSettings 2 }
+
+hm2DosMitigationIcmpFrags OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"When enabled, all fragmented ICMP packets are filtered by the
+		device."
+	DEFVAL { disable }
+	::= { hm2DosMitigationIcmpChecks 1 }
+
+
+hm2DosMitigationIcmpPacketSize OBJECT-TYPE
+	SYNTAX Unsigned32 (0..1472)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Specifies the max. allowed payload size of ICMP packets. 
+		Packets having bigger payload are filtered by the device
+		if the hm2DosMitigationIcmpPacketSizeMode is enabled."
+	DEFVAL { 512 }
+	::= { hm2DosMitigationIcmpChecks 4 }
+
+hm2DosMitigationIcmpPacketSizeMode OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"When enabled all ICMP ingress packets having the
+		payload bigger than hm2DosMitigationIcmpPacketSize
+		are filtered by device. "
+	DEFVAL { disable }
+	::= { hm2DosMitigationIcmpChecks 5 }
+	
+hm2DosMitigationIcmpSmurfAttack OBJECT-TYPE
+    SYNTAX HmEnabledStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "When enabled, all ingress ICMP packets having
+         the type set to ECHO_REQ (ping) and a broadcast
+         destination IP are dropped. "
+    DEFVAL { disable }
+    ::= { hm2DosMitigationIcmpChecks 6 }
+
+hm2DosMitigationL2Checks OBJECT IDENTIFIER ::= { hm2DosMitigationGeneralSettings 3}
+
+hm2DosMitigationSMacDMac OBJECT-TYPE
+    SYNTAX HmEnabledStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/Disable source MAC address equals destination
+         MAC address DoS protection. All packets ingress having
+         SMAC equals DMAC are dropped."
+    DEFVAL { enable }
+    ::= { hm2DosMitigationL2Checks 7 }
+
+
+hm2DosMitigationIpHdrChecks OBJECT IDENTIFIER ::= { hm2DosMitigationGeneralSettings 4}
+
+hm2DosMitigationDropIpSrcRoute OBJECT-TYPE
+    SYNTAX HmEnabledStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Discard packets with the Strict/Loose Source Routing IP option set."
+    DEFVAL { enable }
+    ::= { hm2DosMitigationIpHdrChecks 1 }
+
+hm2DosMitigationCapabilities OBJECT IDENTIFIER ::= { hm2DosMitigationGeneralSettings 0 }
+
+hm2DosMitigationTcpHdrChecksSup OBJECT-TYPE
+	SYNTAX DosFeatureValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The type of support for TCP header checks."
+        ::= { hm2DosMitigationCapabilities 1 }
+	
+hm2DosMitigationIcmpChecksSup OBJECT-TYPE
+	SYNTAX DosFeatureValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of support for ICMP checks."
+		::= { hm2DosMitigationCapabilities 2 }
+
+hm2DosMitigationTcpSynLimitSup OBJECT-TYPE
+	SYNTAX DosFeatureValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of support for TCP SYN limiter."
+		::= { hm2DosMitigationCapabilities 3 }
+
+hm2DosMitigationArpLimitSup OBJECT-TYPE
+	SYNTAX DosFeatureValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of support for ARP limiter."
+		::= { hm2DosMitigationCapabilities 4 }
+	
+hm2DosMitigationTcpNullScanSup OBJECT-TYPE
+	SYNTAX DosFeatureValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of support for TCP Null Scan."
+		::= { hm2DosMitigationCapabilities 5 }
+
+hm2DosMitigationTcpXmasSup OBJECT-TYPE
+	SYNTAX DosFeatureValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of support for TCP Xmas Scan."
+		::= { hm2DosMitigationCapabilities 6 }
+	
+
+hm2DosMitigationTcpLandSup OBJECT-TYPE
+	SYNTAX DosFeatureValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of support for land attack detection."
+		::= { hm2DosMitigationCapabilities 7 }
+	
+	
+--******************************************************************************
+--                         TCP Syn/Arp Limiter
+--******************************************************************************
+
+hm2DosMitigationLimiter OBJECT IDENTIFIER ::= { hm2DosMitigationObjects 2 }
+
+hm2DosMitigationLimiterObjects OBJECT IDENTIFIER ::= { hm2DosMitigationLimiter 1 }
+
+hm2DosMitigationLimiterRules OBJECT IDENTIFIER ::= { hm2DosMitigationLimiter 2 }
+
+hm2DosMitigationLimiterRuleTable OBJECT-TYPE 
+	SYNTAX SEQUENCE OF Hm2DosMitigationLimiterRuleEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"TCP Syn Limiter Interface Table"
+	::= { hm2DosMitigationLimiterRules 1 }	
+
+hm2DosMitigationLimiterRuleEntry OBJECT-TYPE
+	SYNTAX Hm2DosMitigationLimiterRuleEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"TCP Syn Interface entry."
+	INDEX { hm2DosMitigationLimiterInterface }
+	::= { hm2DosMitigationLimiterRuleTable 1 }
+	
+Hm2DosMitigationLimiterRuleEntry ::=
+	SEQUENCE {
+		hm2DosMitigationLimiterInterface InterfaceIndex,
+		hm2DosMitigationLimiterTcpSynLimit Unsigned32,
+		hm2DosMitigationLimiterArpLimit Unsigned32,		
+		hm2DosMitigationLimiterRowStatus RowStatus
+	}
+
+hm2DosMitigationLimiterInterface OBJECT-TYPE
+	SYNTAX InterfaceIndex
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"The interface the limiter is assigned to."
+		::={ hm2DosMitigationLimiterRuleEntry 1 }
+
+hm2DosMitigationLimiterTcpSynLimit OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The number of allowed outgoing TCP syn packets per second
+		per interface. 
+		A value of 0 disables the limiter for this interface."
+		::={ hm2DosMitigationLimiterRuleEntry 2 }
+
+hm2DosMitigationLimiterArpLimit OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The number of allowed outgoing ARP packets per second per
+		interface. 
+		A value of 0 disables the limiter for this interface."
+		::={ hm2DosMitigationLimiterRuleEntry 3 }
+
+
+hm2DosMitigationLimiterRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Row status."
+		::={ hm2DosMitigationLimiterRuleEntry 4 }
+	
+--******************************************************************************
+--			Statistics
+--******************************************************************************
+
+hm2DosMitigationStatistics OBJECT IDENTIFIER ::= { hm2DosMitigationObjects 3 }
+
+hm2DosMitigationGlobalDropCounter OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of packets dropped by the different dos
+            mitigation features."
+    ::= { hm2DosMitigationStatistics 1 }
+
+hm2DosMitigationStatisticsPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hm2DosMitigationStatisticsPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of statistics counters for dos mitigation features."
+    ::= { hm2DosMitigationStatistics 2 }
+
+hm2DosMitigationStatisticsPortEntry OBJECT-TYPE
+    SYNTAX      Hm2DosMitigationStatisticsPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of statistics counters for dos mitigation features
+            for an interface."
+    INDEX   { ifIndex }
+    ::= { hm2DosMitigationStatisticsPortTable 1 }
+
+Hm2DosMitigationStatisticsPortEntry ::=
+    SEQUENCE {
+        hm2DosMitigationPortDropCounter              Counter64
+    }
+
+hm2DosMitigationPortDropCounter OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of packets dropped by the different dos
+            mitigation features."
+    ::= { hm2DosMitigationStatisticsPortEntry 1 }
+
+
+--******************************************************************************
+--			Compliance statements
+--******************************************************************************
+
+hm2DosMitigationCompliances OBJECT IDENTIFIER ::= { hm2DosMitigationConformance 1 }
+hm2DosMitigationGroups OBJECT IDENTIFIER ::= { hm2DosMitigationConformance 2 }
+
+hm2DosMitigationCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for an SNMP entity which
+         implements the Hirschmann DOS Mitigation MIB."
+    MODULE     -- this module
+    MANDATORY-GROUPS { hm2DosMitigationGeneralGroup }
+    ::= { hm2DosMitigationCompliances 1 }
+
+hm2DosMitigationGeneralGroup OBJECT-GROUP
+    OBJECTS {
+        hm2DosMitigationTcpSynFinScan,
+        hm2DosMitigationTcpNullScan,
+    	hm2DosMitigationTcpXmasScan,
+    	hm2DosMitigationTcpMinimalHeader,
+        hm2DosMitigationTcpMinimalHeaderSize,
+    	hm2DosMitigationLandAttack,
+        hm2DosMitigationTcpOffsetEqu1,
+        hm2DosMitigationTcpPrivilegedSrcPort,
+        hm2DosMitigationTcpSrcDstPortEqu,
+    	hm2DosMitigationIcmpFrags,
+    	hm2DosMitigationIcmpPacketSize,
+        hm2DosMitigationIcmpPacketSizeMode,
+        hm2DosMitigationSMacDMac,
+        hm2DosMitigationDropIpSrcRoute,
+        hm2DosMitigationTcpHdrChecksSup,
+        hm2DosMitigationIcmpChecksSup,
+        hm2DosMitigationTcpSynLimitSup,
+        hm2DosMitigationArpLimitSup,
+        hm2DosMitigationLimiterInterface,
+        hm2DosMitigationLimiterTcpSynLimit,
+        hm2DosMitigationLimiterArpLimit,		
+        hm2DosMitigationLimiterRowStatus,
+        hm2DosMitigationTcpXmasSup,
+        hm2DosMitigationTcpNullScanSup,
+        hm2DosMitigationTcpLandSup
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of all Hirschmann objects provided by the DoS Mitigation
+        module."
+    ::= { hm2DosMitigationGroups 1 }
+END

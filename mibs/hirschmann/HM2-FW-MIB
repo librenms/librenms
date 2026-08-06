@@ -1,0 +1,5658 @@
+--******************************************************************************
+-- HM-FW-MIB: Managed objects for 
+--
+-- May 2011
+-- 
+-- Copyright (c) Hirschmann Automation & Control GmbH 2011
+--******************************************************************************
+
+HM2-FW-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS 
+	OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-IDENTITY,
+	Integer32, Unsigned32, Counter64
+		FROM SNMPv2-SMI	
+	RowStatus, DisplayString, TruthValue, MacAddress
+		FROM SNMPv2-TC	
+	MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+	SnmpAdminString     
+		FROM SNMP-FRAMEWORK-MIB                
+    InterfaceIndex 
+      	FROM IF-MIB
+    hm2ConfigurationMibs, HmActionValue, HmTimeSeconds1970, HmEnabledStatus, 
+    HmLargeDisplayString, HmExtraLargeDisplayString
+        FROM HM2-TC-MIB
+    AclBurstSize
+        FROM HM2-PLATFORM-QOS-ACL-MIB
+    EtypeValue
+        FROM HM2-PLATFORM-QOS-ACL-MIB;
+
+hm2FwMib MODULE-IDENTITY
+	LAST-UPDATED "201109130000Z"
+	ORGANIZATION "Hirschmann Automation and Control GmbH"
+	CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 - 7127 -14 -0
+         E-mail:     hac.support@belden.com"
+         DESCRIPTION
+         "SNMP interface for Hirschmann Firewall modules.
+
+          Copyright (C) "
+         REVISION     "202005260000Z" -- May 26, 2020
+         DESCRIPTION
+             "- Added Table for Intrusion Detection System"
+         REVISION     "201109130000Z" -- Sep 13, 2011
+         DESCRIPTION
+         	 "- Modified Interface Mapping Table for L3 and DynFw
+         	  - Use HmActionValue instead of TruthValue
+         	 "
+         REVISION     "201107010000Z" -- July 1, 2011
+         DESCRIPTION
+         	 "- Modifications to address representation
+         	 "
+         REVISION     "201106140000Z" -- June 14, 2011
+         DESCRIPTION
+         	 "- Restructured IF mapping tables
+         	  - Added variable for pending actions"
+         REVISION     "201105310000Z" -- May 31, 2011
+         DESCRIPTION
+          "Initial version."
+	 ::= { hm2ConfigurationMibs 79 }
+
+EnipClassId ::= TEXTUAL-CONVENTION
+         DISPLAY-HINT "x"
+         STATUS   current
+         DESCRIPTION
+                 "Class ID value of an ENIP Class Object.
+                 The allowed value is 0x00 to 0xFFFFFFFF."
+         SYNTAX   Unsigned32    -- hex value 0x00 to 0xFFFFFFFF
+
+hm2FwNotifications 		OBJECT IDENTIFIER 	::= { hm2FwMib 0 }
+hm2FwObjects 			OBJECT IDENTIFIER	::= { hm2FwMib 1 }
+hm2FwConformance 		OBJECT IDENTIFIER	::= { hm2FwMib 2 }
+hm2FwSNMPExtensionGroup	OBJECT IDENTIFIER 	::= { hm2FwMib 3 }
+
+hm2FwGeneralSettings 	OBJECT IDENTIFIER 	::= { hm2FwObjects 1 }
+hm2DynFw 				OBJECT IDENTIFIER 	::= { hm2FwObjects 2 }
+hm2L3Fw 				OBJECT IDENTIFIER 	::= { hm2FwObjects 3 }
+hm2FwLearningMode 		OBJECT IDENTIFIER 	::= { hm2FwObjects 4 }
+hm2FwIdsGroup			OBJECT IDENTIFIER	::= { hm2FwObjects 5 }
+hm2L2FwGroup			OBJECT IDENTIFIER 	::= { hm2FwObjects 6 }
+hm2FwAssetMgmtGroup		OBJECT IDENTIFIER 	::= { hm2FwObjects 7 }
+
+--******************************************************************************
+--                         General Settings Objects
+--******************************************************************************
+
+hm2DynFwMaxRules OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Maximum number of allowed rules for dynamic firewalling."
+        ::= { hm2FwGeneralSettings 1 }
+
+hm2L3MaxRules OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current	
+	DESCRIPTION
+		"Maximum number of allowed rules for L3 firewalling."
+        ::= { hm2FwGeneralSettings 2 }
+
+hm2ResetStatistics OBJECT-TYPE
+	SYNTAX HmActionValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Setting this value to action(2) will reset the statistics of the
+		 whole firewall module. It will be set to noop(1) automatically
+		 after reset."
+		 ::= { hm2FwGeneralSettings 3 }
+
+hm2FlushTables OBJECT-TYPE
+	SYNTAX HmActionValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Setting this value to action(2) will flush all connection tracking states.
+		 It will be set to noop(1) automatically after table flush."
+		 ::= { hm2FwGeneralSettings 4 }
+	 
+hm2DefaultPolicy OBJECT-TYPE
+	SYNTAX INTEGER {
+			 accept(1), 
+		         drop(2),
+		         reject(3)
+			}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The default policy for forwarding packets:
+		 o accept(1): Packets matching this rule are accepted and will 
+ 	 	   be forwarded
+ 	 	 o drop(2): Packets matching this rule will be silently 
+ 	 	   discarded
+ 	 	 o reject(3): Packets matching this rule will be dropped and
+ 	 	   the originator gets informed by an ICMP message"
+ 	DEFVAL { accept }
+ 	 	   ::= { hm2FwGeneralSettings 5 }
+ 	   
+hm2ConnTrackValidateCheckSum OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"This value describes, whether the Firewall connection tracking 
+		 in the Linux kernel shall validate the protocol checksums.
+		 Disable this validation (false) improves routing throughput."
+	DEFVAL { true }	 
+		 ::={ hm2FwGeneralSettings 6 }
+
+--******************************************************************************
+--                         Dynamic Firewall
+--******************************************************************************
+
+hm2DynFwRuleAppliedTrap NOTIFICATION-TYPE
+	OBJECTS { hm2DynFwRuleIndex }
+	STATUS current
+	DESCRIPTION
+		"A rule of the dynamic firewall was applied. The rule is 
+		 identified by the given rule index of the rule table."
+		 ::= { hm2FwNotifications 1 }
+
+hm2DynFwRuleAppliedAndLoggedTrap NOTIFICATION-TYPE
+	OBJECTS { hm2DynFwRuleIndex }
+	STATUS current
+	DESCRIPTION
+		"A rule of the dynamic firewall was applied and logged according to
+		 the current logging mechanism. The rule is identified by the 
+		 given rule index of the rule table."
+		 ::= { hm2FwNotifications 2 }
+
+hm2DynFwRuleObjects OBJECT IDENTIFIER ::= { hm2DynFw 1 }
+	 
+hm2DynFwRuleCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of current dynamic firewalls rules"
+	::= { hm2DynFwRuleObjects 1 }
+
+hm2DynFwIfMappingRuleCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of current DynFw IF mapping entries."
+	::={ hm2DynFwRuleObjects 2 }
+
+hm2DynFwRulePendingActions OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"This value describes, whether the DynFW rule table was modified
+		 but not yet written to the firewall implementation (set to 
+		 true). After writing all modifications to the firewall, the 
+		 value switches automatically back to false."
+	DEFVAL { false }	 
+		 ::={ hm2DynFwRuleObjects 3 }
+
+hm2DynFwCommitPendingActions OBJECT-TYPE
+	SYNTAX HmActionValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Setting this value to action(2) writes not yet committed changes
+		 to the firewall (DynFW and Interface Mapping Table). After 
+		 writing all modifications, the value switches automatically 
+		 back to noop(1)."
+	DEFVAL { noop }	 
+		 ::={ hm2DynFwRuleObjects 4 }
+	 
+
+hm2DynFwRuleTables OBJECT IDENTIFIER ::= { hm2DynFw 2 }
+
+hm2DynFwRuleTable OBJECT-TYPE 
+	SYNTAX SEQUENCE OF Hm2DynFwRuleEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The list of rules for this dynamic firewall"
+	::= { hm2DynFwRuleTables 1 }
+	
+hm2DynFwRuleEntry OBJECT-TYPE
+	SYNTAX Hm2DynFwRuleEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Dynamic firewall rule entry."
+	INDEX { hm2DynFwRuleIndex }
+	::= { hm2DynFwRuleTable 1 }
+		 
+Hm2DynFwRuleEntry ::=
+	SEQUENCE {
+		hm2DynFwRuleIndex Integer32,
+		hm2DynFwSourceAddress DisplayString,
+		hm2DynFwSourcePort DisplayString,
+		hm2DynFwTargetAddress DisplayString,
+		hm2DynFwTargetPort DisplayString,
+		hm2DynFwProto INTEGER,
+		hm2DynFwRuleParams DisplayString,
+		hm2DynFwAction INTEGER,
+		hm2DynFwLog TruthValue,
+		hm2DynFwTrap TruthValue,
+		hm2DynFwRowStatus RowStatus,
+		hm2DynFwDescription DisplayString
+	}
+		
+hm2DynFwRuleIndex OBJECT-TYPE
+	SYNTAX Integer32 ( 1..512 )
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"Rule index of this dynamic firewall rule"
+	::= { hm2DynFwRuleEntry 1 }
+
+hm2DynFwSourceAddress OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..20) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The source address of the packet to filter. Allowed formats are:
+		- keyword 'any'
+		- single address ('10.0.0.1')
+        - CIDR address range ('10.0.0.0/8')
+        - netobject ('$name')
+		"
+	DEFVAL  { "any" }     
+	::= { hm2DynFwRuleEntry 2 }
+
+hm2DynFwSourcePort OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..50) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The source port of the packet to filter. Allowed formats are:
+		- keyword 'any'
+		- single port ('10')
+		- port range with first and last port separated by hyphen 
+		  ('10-15')
+		- comma separated list of ports ('1235,25,123')
+		- combination of the points above ('10,25-30,125,1993')
+
+        The number of named ports (1 for each individual port, 2 for port
+        ranges) must not exceed 15.
+		"
+	DEFVAL { "any" }
+	::= { hm2DynFwRuleEntry 3 }
+
+hm2DynFwTargetAddress OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..20) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The destination address of the packet to filter. Allowed formats are:
+		- keyword 'any'
+		- single address ('10.0.0.1')
+        - CIDR address range ('10.0.0.0/8')
+        - netobject ('$name')
+		"
+	DEFVAL  { "any" }     
+	::= { hm2DynFwRuleEntry 4 }
+
+hm2DynFwTargetPort OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..50) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The destination port of the packet to filter. Allowed formats are:
+		- keyword 'any'
+		- single port ('10')
+		- port range with first and last port separated by hyphen 
+		  ('10-15')
+		- comma separated list of ports ('1235,25,123')
+		- combination of the points above ('10,25-30,125,1993')
+
+        The number of named ports (1 for each individual port, 2 for port
+        ranges) must not exceed 15.
+		"
+	DEFVAL { "any" }
+	::= { hm2DynFwRuleEntry 5 }
+
+hm2DynFwProto OBJECT-TYPE
+	SYNTAX		 INTEGER { 
+		                   icmp(1), 
+		                   igmp(2),
+		                   ipip(3),
+		                   tcp(4),
+		                   udp(5),
+		                   esp(6),
+		                   ah(7),
+		                   icmpv6(8),
+		                   any(9)		                 
+			}
+	MAX-ACCESS 	 read-create
+	STATUS 		 current
+	DESCRIPTION
+		 "The IP protocol (RFC 791) for protocol-independent
+                  filtering. The following values are currently
+                  supported:
+                  o  icmp(1): internet control message protocol (RFC 792)
+                  o  igmp(2): internet group management protocol
+                  o  ipip(3): IP in IP tunnelling (RFC 1853)
+                  o  tcp(4): transmission control protocol (RFC 793)
+                  o  udp(5): user datagram protocol (RFC 768)
+                  o  esp(6): IPsec encapsulated security payload (RFC 2406)
+                  o  ah(7): IPsec authentication header (RFC 2402)
+                  o  icmpv6(8): internet control message protocol for IPv6
+                  o  any(9): apply to all protocols"
+	 DEFVAL  { any }
+	 ::= { hm2DynFwRuleEntry 6 }
+ 
+ hm2DynFwRuleParams OBJECT-TYPE
+ 	 SYNTAX DisplayString ( SIZE(0..50) )
+ 	 MAX-ACCESS read-create
+ 	 STATUS current
+ 	 DESCRIPTION
+ 	 	 "Additional parameters to this rule as string. 
+                  A parameter has the syntax: 
+                           <param>=<val>
+                  Parameters are separated by a comma.
+                  If more than one value is given for a parameter, values are
+                  separated by a |-sign
+                  Following paramters are defined based on the different 
+                  protocols:
+                  o icmp: type=<ICMP type> (specify ICMP type to filter)
+                          code=<ICMP code> (specify ICMP code to filter)
+                  o tcp:  frag=<true/false> (apply to fragments)
+                          flags=<SYN/ACK/FIN> (apply to packets with give flags
+                  o udp/tcp: state=<new/rel/est> (apply to packets according
+                             current state of connection>
+                  o general: mac=<MAC> (specify source MAC address for this
+                             rule)
+                 "
+ 	 ::= { hm2DynFwRuleEntry 7 }	 	 
+ 
+ 
+ hm2DynFwAction OBJECT-TYPE
+ 	 SYNTAX INTEGER { accept(1), drop(2), reject(3) }
+ 	 MAX-ACCESS read-create
+ 	 STATUS current
+ 	 DESCRIPTION
+ 	 	 "The action of the corresponding rule:
+ 	 	 o accept(1): Packets matching this rule are accepted and will 
+ 	 	   be forwarded
+ 	 	 o drop(2): Packets matching this rule will be silently 
+ 	 	   discarded
+ 	 	 o reject(3): Packets matching this rule will be dropped and
+ 	 	   the originator gets informed by an ICMP message"
+ 	 ::= { hm2DynFwRuleEntry 8 }
+
+hm2DynFwLog OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true if application of this rule shall be logged"
+	DEFVAL { false }
+		::={ hm2DynFwRuleEntry 9 }
+
+hm2DynFwTrap OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true if application of this rule shall send a trap."
+	DEFVAL { false }
+	::={ hm2DynFwRuleEntry 10 }
+
+hm2DynFwRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"This is a standard row status value:
+            - active(1): The rule is active. Note that until committed, the rule
+              will not be applied.
+            - notInService(2): The rule is inactive because of user action.
+            - notReady(3): The rule is inactive because of agent action.
+            - createAndGo(4): Create the rule with default parameters
+              activated.
+            - createAndWait(5): Create the rule inactive.
+            - destroy(6): Delete the rule. You cannot delete a rule with
+              interface mappings to it."
+		::= { hm2DynFwRuleEntry 11 }
+		
+hm2DynFwDescription OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(0..32) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"User defined textual description related to this rule."
+	DEFVAL  { "" }
+	::= { hm2DynFwRuleEntry 12 }
+
+hm2DynFwRuleIfMappingTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2DynFwRuleIfMappingEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table for mapping L3 rules to interfaces"
+		::={ hm2DynFwRuleTables 2 }
+	
+hm2DynFwRuleIfMappingEntry OBJECT-TYPE
+	SYNTAX Hm2DynFwRuleIfMappingEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in rule interface mapping table"
+	INDEX { hm2DynFwIfmInterface, hm2DynFwIfmDirection, 
+		hm2DynFwIfmRuleIndex } 
+		::={ hm2DynFwRuleIfMappingTable 1 }
+	
+Hm2DynFwRuleIfMappingEntry ::= SEQUENCE {	
+	hm2DynFwIfmRuleIndex Integer32,
+	hm2DynFwIfmDirection INTEGER,	
+	hm2DynFwIfmPriority Unsigned32,
+	hm2DynFwIfmInterface InterfaceIndex,
+	hm2DynFwIfmRowStatus RowStatus
+}
+
+hm2DynFwIfmRuleIndex OBJECT-TYPE
+	SYNTAX Integer32 (1..2048)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The index of the DynFw rule this mapping entry is assigned to.
+		 The DynFw rule must exist before creation of mapping entry."
+		::={ hm2DynFwRuleIfMappingEntry 1 }
+		
+	
+hm2DynFwIfmDirection OBJECT-TYPE
+	SYNTAX INTEGER {
+			ingress(1),
+			egress(2),
+			both(3)
+	}
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "Meanings:
+            - ingress(1): Apply this rule to packets arriving on this interface
+            - egress(2): Apply this rule to packets leaving from this interface
+            - both(3): Apply this rule to packets coming in and going out on this
+              interface.
+
+        If an ingress and an egress interface are given, this is taken to mean
+        that the rule shall apply to packets arriving on the ingress interface
+        AND to be leaving on the egress interface. A rule without ingress
+        interface matches on all packets going out to the egress interface
+        given, and vice versa."
+		::={ hm2DynFwRuleIfMappingEntry 2 }
+
+hm2DynFwIfmPriority OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+         "The priority is the sorting key for rules in to this interface. They
+         don't need to be unique, but no clear order can be assumed among rules
+         with the same priority.
+		 Priorities are processed in ascending order (0 highest priority)."
+		 ::={ hm2DynFwRuleIfMappingEntry 3 } 
+
+hm2DynFwIfmInterface OBJECT-TYPE
+	SYNTAX InterfaceIndex
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The interface this mapping entry is applied to. This has to be either
+        an hm2AgentSwitchIpInterfaceIfIndex or an hm2AgentSwitchIpVlanIfIndex.
+        Note that for physical interfaces this only works if the corresponding
+        hm2AgentSwitchIpInterfaceRoutingMode is set to enable."
+		::={ hm2DynFwRuleIfMappingEntry 4 }
+	 
+hm2DynFwIfmRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The RowStatus value for this entry with the usual meanings:
+        
+            - active(1): The interface mapping is in place
+            - notInService(2): The interface mapping is not in place because the
+              user said so
+            - notReady(3): The interface mapping is not in place because the
+              agent said so
+            - createAndGo(4): Create this mapping with the default priority and
+              activate it.
+            - createAndWait(5): Create this mapping deactivated.
+            - destroy(6): Destroy this interface mapping."
+		::={ hm2DynFwRuleIfMappingEntry 5 }
+	
+hm2DynFwStats OBJECT IDENTIFIER ::={ hm2DynFw 4 }
+
+hm2DynFwGeneralStats OBJECT IDENTIFIER ::={ hm2DynFwStats 1 }
+
+hm2DynFwStatsTtPck OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets processed by the dynamic firewall"
+		::= { hm2DynFwGeneralStats 1 }
+
+hm2DynFwStatsTtPckSize OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of bytes processed by the dynamic firewall"
+		::= { hm2DynFwGeneralStats 2 }
+
+hm2DynFwStatsTtPckDenDrop OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped or denied by the dynamic 
+		 firewall"
+		::={ hm2DynFwGeneralStats 3 }
+	
+hm2DynFwStatsTtPckAccepted OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets accepted by the dynamic firewall"
+		::={ hm2DynFwGeneralStats 4 }
+	
+hm2DynFwStatsTables OBJECT IDENTIFIER ::= { hm2DynFwStats 2 }
+	
+hm2DynFwStatsRuleTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2DynFwStatsRuleEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table of per-rule statistics of the dynamic firewall"
+		::= { hm2DynFwStatsTables 1 }
+	
+hm2DynFwStatsRuleEntry OBJECT-TYPE
+	SYNTAX Hm2DynFwStatsRuleEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Statistics table entry for the dynamic firewall"
+	INDEX { hm2DynFwRuleIndex }
+	::={ hm2DynFwStatsRuleTable 1 }
+	
+	Hm2DynFwStatsRuleEntry ::= SEQUENCE {
+	hm2DynFwStatsPacketCount Counter64,
+	hm2DynFwStatsPacketSize Counter64,	
+	hm2DynFwStatsLastApplied HmTimeSeconds1970
+}
+
+hm2DynFwStatsPacketCount OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of packets matched by this rule"
+		::={ hm2DynFwStatsRuleEntry 1 }
+	
+hm2DynFwStatsPacketSize OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of bytes processed by this rule"
+		::={ hm2DynFwStatsRuleEntry 2 }
+	
+hm2DynFwStatsLastApplied OBJECT-TYPE
+	SYNTAX HmTimeSeconds1970
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Local system time (hm2SystemLocalTime) when the rule was applied the last time"
+		::={ hm2DynFwStatsRuleEntry 3 }
+
+--******************************************************************************
+--			L3 Firewall
+--******************************************************************************
+
+hm2L3RuleAppliedTrap NOTIFICATION-TYPE
+	OBJECTS { hm2L3RuleIndex }
+	STATUS current
+	DESCRIPTION
+		"A rule of the L3 firewall was applied. The rule is 
+		 identified by the given rule index of the rule table."
+		 ::= { hm2FwNotifications 3 }
+
+hm2L3RuleAppliedAndLoggedTrap NOTIFICATION-TYPE
+	OBJECTS { hm2L3RuleIndex }
+	STATUS current
+	DESCRIPTION
+		"A rule of the L3 firewall was applied and logged according
+		 the current logging mechanism. The rule is identified by the 
+		 given rule index of the rule table."
+		 ::= { hm2FwNotifications 4 }
+	 
+hm2L3RuleObjects OBJECT IDENTIFIER ::= { hm2L3Fw 1 } 
+	 
+hm2L3RuleCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of current L3 rules"
+	::= { hm2L3RuleObjects 1 }
+
+hm2L3IfMappingRuleCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of current L3 IF mapping entries."
+	::={ hm2L3RuleObjects 2 }
+
+hm2L3RulePendingActions OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"This value describes, whether the L3 rule table was modified
+		 but not yet written to the firewall implementation (set to 
+		 true). After writing all modifications to the firewall, the 
+		 value switches automatically back to false."
+	DEFVAL { false }	 
+		 ::={ hm2L3RuleObjects 3 }
+
+hm2L3CommitPendingActions OBJECT-TYPE
+	SYNTAX HmActionValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Setting this value to action(2) writes not yet committed changes
+		 to the firewall (L3 and Interface Mapping Table). After writing
+		 all modifications, the value switches automatically back to 
+		 noop(1)."
+	DEFVAL { noop }	 
+		 ::={ hm2L3RuleObjects 4 }
+
+hm2L3RuleTables OBJECT IDENTIFIER ::= { hm2L3Fw 2 }
+
+hm2L3RuleTable OBJECT-TYPE 
+	SYNTAX SEQUENCE OF Hm2L3RuleEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The list of L3 rules for this firewall"
+	::= { hm2L3RuleTables 1 }
+	
+	 hm2L3RuleEntry OBJECT-TYPE
+		SYNTAX Hm2L3RuleEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"L3 rule entry."
+		INDEX { hm2L3RuleIndex }
+		::= { hm2L3RuleTable 1 }
+		 
+Hm2L3RuleEntry ::=
+	SEQUENCE {
+		hm2L3RuleIndex Integer32,
+		hm2L3SourceAddress DisplayString,
+		hm2L3SourcePort DisplayString,
+		hm2L3TargetAddress DisplayString,
+		hm2L3TargetPort DisplayString,
+		hm2L3Proto INTEGER,
+		hm2L3RuleParams DisplayString,
+		hm2L3Action INTEGER,
+		hm2L3Log TruthValue,
+		hm2L3Trap TruthValue,
+		hm2L3RowStatus RowStatus,
+		hm2L3Description DisplayString,
+		hm2DPIProfileIndex Integer32,
+		hm2L3ProtoName DisplayString,
+		hm2L3AppRuleName DisplayString
+	}
+		
+hm2L3RuleIndex OBJECT-TYPE
+	SYNTAX Integer32 ( 1..2048 )
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"Rule index of this L3 rule"
+	::= { hm2L3RuleEntry 1 }
+
+hm2L3SourceAddress OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..32) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The source address of the packet to filter. Allowed formats are:
+		- keyword 'any'
+		- single address ('10.0.0.1')
+        - CIDR address range ('10.0.0.0/8')
+        - Asset name from hm2AssetTable
+        - netobject ('$name')
+        - a prepending '!' selects the complement set
+		"
+	DEFVAL  { "any" }     
+	::= { hm2L3RuleEntry 2 }
+
+hm2L3SourcePort OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..128) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The source port of the packet to reroute. Allowed formats are:
+		- keyword 'any'
+		- single port ('10')
+		- port range with first and last port separated by hyphen 
+		  ('10-15')
+		- comma separated list of ports ('1235,25,123')
+		- combination of the points above ('10,25-30,125,1993')
+
+        The number of named ports (1 for each individual port, 2 for port
+        ranges) must not exceed 15.
+		"
+	DEFVAL { "any" }
+	::= { hm2L3RuleEntry 3 }
+
+hm2L3TargetAddress OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..32) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The destination address of the packet to filter. Allowed formats are:
+		- keyword 'any'
+		- single address ('10.0.0.1')
+        - CIDR address range ('10.0.0.0/8')
+        - Asset name from hm2AssetTable
+        - netobject ('$name')
+		"
+	DEFVAL  { "any" }     
+	::= { hm2L3RuleEntry 4 }
+
+hm2L3TargetPort OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(1..128) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The destination port of the packet to. Allowed formats are:
+		- keyword 'any'
+		- single port ('10')
+		- port range with first and last port separated by hyphen 
+		  ('10-15')
+		- comma separated list of ports ('1235,25,123')
+		- combination of the points above ('10,25-30,125,1993')
+
+        The number of named ports (1 for each individual port, 2 for port
+        ranges) must not exceed 15.
+		"
+	DEFVAL { "any" }
+	::= { hm2L3RuleEntry 5 }
+
+hm2L3Proto OBJECT-TYPE
+	SYNTAX INTEGER { 
+		                   icmp(1), 
+		                   igmp(2),
+		                   ipip(3),
+		                   tcp(4),
+		                   udp(5),
+		                   esp(6),
+		                   ah(7),
+		                   icmpv6(8),
+		                   any(9)		                 
+			}
+	MAX-ACCESS 	 read-create
+	STATUS 		 current
+	DESCRIPTION
+		 "The IP protocol (RFC 791) for protocol-independent
+                  filtering. The following values are currently
+                  supported:
+                  o  icmp(1): internet control message protocol (RFC 792)
+                  o  igmp(2): internet group management protocol
+                  o  ipip(3): IP in IP tunnelling (RFC 1853)
+                  o  tcp(4): transmission control protocol (RFC 793)
+                  o  udp(5): user datagram protocol (RFC 768)
+                  o  esp(6): IPsec encapsulated security payload (RFC 2406)
+                  o  ah(7): IPsec authentication header (RFC 2402)
+                  o  icmpv6(8): internet control message protocol for IPv6
+                  o  any(9): apply to all protocols"
+	 DEFVAL  { any }
+	 ::= { hm2L3RuleEntry 6 }
+
+ hm2L3RuleParams OBJECT-TYPE
+ 	 SYNTAX DisplayString ( SIZE(0..50) )
+ 	 MAX-ACCESS read-create
+ 	 STATUS current
+ 	 DESCRIPTION
+ 	 	 "Additional parameters to this rule as string. 
+                  A parameter has the syntax: 
+                           <param>=<val>
+                  Parameters are separated by a comma.
+                  If more than one value is given for a parameter, values are
+                  separated by a |-sign (pipe).
+                  Following parameters are defined based on the different 
+                  protocols:
+                  o icmp: type=<ICMP type> (specify ICMP type to filter)
+                          code=<ICMP code> (specify ICMP code to filter)
+                  o tcp:  flags=<SYN/ACK/FIN> (apply to packets with given flags)
+                  o general: state=<new/rel/est> (apply to packets according to
+                             current state of connection>)
+                             mac=<MAC> (specify source MAC address for this rule)
+                             frag=<true/false> (apply to fragments)
+                 "
+ 	 ::= { hm2L3RuleEntry 7 }	 	 
+
+hm2L3Action OBJECT-TYPE
+ 	 SYNTAX INTEGER {
+			accept(1),
+			drop(2),
+			reject(3),
+			enforce-modbus(4),
+			enforce-opc(5),
+			enforce-iec104(6),
+			enforce-ethernetip(7),
+			enforce-dnp3(8)
+ 	 }
+ 	 MAX-ACCESS read-create
+ 	 STATUS current
+ 	 DESCRIPTION
+ 	 	 "The action of the corresponding rule:
+ 	 	 o accept(1): Packets matching this rule are accepted and will 
+ 	 	   be forwarded
+ 	 	 o drop(2): Packets matching this rule will be silently 
+ 	 	   discarded
+ 	 	 o reject(3): Packets matching this rule will be dropped and
+ 	 	   the originator gets informed by an ICMP message
+ 	 	 o enforce-modbus(4): Packets matching this rule are enforced by
+	 	   modbus enforcer and will be forwarded or discarded.
+	 	   The selected protocol should be tcp or udp
+	 	 o enforce-opc(5): Packets matching this rule are enforced by
+	 	   opc enforcer and will be forwarded or discarded.
+	 	   The selected protocol should be tcp
+	 	 o enforce-iec104(6): Packets matching this rule are enforced by
+	 	   IEC104 enforcer and will be forwarded or discarded.
+	 	   The selected protocol should be tcp
+	 	 o enforce-ethernetip(7): Packets matching this rule are enforced by
+	 	   EtherNet/IP enforcer and will be forwarded or discarded.
+	 	   The selected protocol should be tcp
+	 	 o enforce-dnp3(8): Packets matching this rule are enforced by
+	 	   dnp3 enforcer and will be forwarded or discarded.
+		   The selected protocol should be tcp"
+ 	 ::= { hm2L3RuleEntry 8 }
+
+hm2L3Log OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true if application of this rule shall be logged"
+	DEFVAL { false }
+		::={ hm2L3RuleEntry 9 }
+
+hm2L3Trap OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true if application of this rule shall send a trap."
+	DEFVAL { false }
+	::={ hm2L3RuleEntry 10 }
+
+hm2L3RowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"This is a standard row status value:
+            - active(1): The rule is active. Note that until committed, the rule
+              will not be applied. You cannot activate the rule
+              if an enforcer mappings to an inactive profile.
+            - notInService(2): The rule is inactive because of user action.
+            - notReady(3): The rule is inactive because of agent action.
+            - createAndGo(4): Create the rule with default parameters
+              activated.
+            - createAndWait(5): Create the rule inactive.
+            - destroy(6): Delete the rule. You cannot delete a rule with
+              interface mappings to it."
+		::= { hm2L3RuleEntry 11 }
+
+hm2L3Description OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(0..32) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"User defined textual description related to this rule."
+	DEFVAL  { "" }
+	::= { hm2L3RuleEntry 12 }
+
+hm2DPIProfileIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..32)
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The index of the DPI profile this rule is assigned to
+		depending on enforcer action.
+		Value 0 no DPI profile this rule is assigned to.
+		You cannot assign the rule to an inactive profile
+		if an active enforcer will mapping to it."
+	DEFVAL { 0 }
+	::= { hm2L3RuleEntry 13 }
+
+hm2L3ProtoName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..32))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Following values are supported:
+		 - Protocol name from hm2ProtocolTable
+         - icmp: internet control message protocol (RFC 792)
+         - igmp: internet group management protocol
+         - ipip: IP in IP tunnelling (RFC 1853)
+         - tcp: transmission control protocol (RFC 793)
+         - udp: user datagram protocol (RFC 768)
+         - esp: IPsec encapsulated security payload (RFC 2406)
+         - ah: IPsec authentication header (RFC 2402)
+         - icmpv6: internet control message protocol for IPv6
+         - any: apply to all protocols
+		 "
+	DEFVAL { "any" }
+    ::= { hm2L3RuleEntry 14 }
+
+hm2L3AppRuleName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..128))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+            "Application rule name from hm2AppRuleTable"
+	DEFVAL { "manual" }
+    ::= { hm2L3RuleEntry 15 }
+
+hm2L3RuleIfMappingTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2L3RuleIfMappingEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table for mapping L3 rules to interfaces"
+		::={ hm2L3RuleTables 2 }
+	
+hm2L3RuleIfMappingEntry OBJECT-TYPE
+	SYNTAX Hm2L3RuleIfMappingEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in rule interface mapping table"
+	INDEX { hm2L3IfmInterface, hm2L3IfmDirection, hm2L3IfmRuleIndex } 
+		::={ hm2L3RuleIfMappingTable 1 }
+
+Hm2L3RuleIfMappingEntry ::= SEQUENCE {	
+	hm2L3IfmRuleIndex Integer32,
+	hm2L3IfmDirection INTEGER,
+	hm2L3IfmPriority Unsigned32,
+	hm2L3IfmInterface InterfaceIndex,
+	hm2L3IfmRowStatus RowStatus
+}
+
+hm2L3IfmRuleIndex OBJECT-TYPE
+	SYNTAX Integer32 (1..2048)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The index of the L3 rule this mapping entry is assigned to.
+		 The rule must exist before the mapping entry can be created."
+		::={ hm2L3RuleIfMappingEntry 1 }
+
+	
+hm2L3IfmDirection OBJECT-TYPE
+	SYNTAX INTEGER {
+			ingress(1),
+			egress(2),
+			both(3)
+	}
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "Meanings:
+            - ingress(1): Apply this rule to packets arriving on this interface
+            - egress(2): Apply this rule to packets leaving from this interface
+            - both(3): Apply this rule to packets coming in and going out on this
+              interface.
+
+        If an ingress and an egress interface are given, this is taken to mean
+        that the rule shall apply to packets arriving on the ingress interface
+        AND to-be leaving on the egress interface. A rule without ingress
+        interface matches on all packets going out to the egress interface
+        given, and vice versa."
+		::={ hm2L3RuleIfMappingEntry 2 }
+	
+hm2L3IfmPriority OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+         "The priority is the sorting key for rules in to this interface. They
+         don't need to be unique, but no clear order can be assumed among rules
+         with the same priority.
+		 Priorities are processed in ascending order (0 highest 
+		 priority."
+		::={ hm2L3RuleIfMappingEntry 3 }
+	
+hm2L3IfmInterface OBJECT-TYPE
+	SYNTAX InterfaceIndex
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The interface this mapping entry is assigned to. This has to be either
+        an hm2AgentSwitchIpInterfaceIfIndex or an hm2AgentSwitchIpVlanIfIndex.
+        Note that for physical interfaces this only works if the corresponding
+        hm2AgentSwitchIpInterfaceRoutingMode is set to enable."
+		::={ hm2L3RuleIfMappingEntry 4 }
+	
+hm2L3IfmRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The RowStatus value for this entry with the usual meanings:
+        
+            - active(1): The interface mapping is in place
+            - notInService(2): The interface mapping is not in place because the
+              user said so
+            - notReady(3): The interface mapping is not in place because the
+              agent said so
+            - createAndGo(4): Create this mapping with the default priority and
+              activate it.
+            - createAndWait(5): Create this mapping deactivated.
+            - destroy(6): Destroy this interface mapping."
+		::={ hm2L3RuleIfMappingEntry 5 }
+	 
+hm2L3Stats OBJECT IDENTIFIER ::={ hm2L3Fw 4 }
+
+hm2L3GeneralStats OBJECT IDENTIFIER ::= { hm2L3Stats 1 }
+
+hm2L3StatsTotalPck OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets processed by the L3 firewall"
+		::= { hm2L3GeneralStats 1 }
+
+hm2L3StatsTotalPckSize OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of bytes processed by the L3 firewall"
+		::= { hm2L3GeneralStats 2 }
+	
+hm2L3StatsTotalPckDenDrop OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped or denied by the L3 firewall"
+		::={ hm2L3GeneralStats 3 }
+	
+hm2L3StatsTotalPckAccepted OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets accepted by the L3 firewall"
+		::={ hm2L3GeneralStats 4 }
+
+hm2L3StatsTables OBJECT IDENTIFIER ::= { hm2L3Stats 2 }
+	
+hm2L3StatsRuleTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2L3StatsRuleEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table of per-rule statistics of the L3 firewall"
+		::= { hm2L3StatsTables 1 }
+	
+hm2L3StatsRuleEntry OBJECT-TYPE
+	SYNTAX Hm2L3StatsRuleEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Statistics table entry for the L3 firewall"
+	INDEX { hm2L3RuleIndex }
+	::={ hm2L3StatsRuleTable 1 }
+	
+Hm2L3StatsRuleEntry ::= SEQUENCE {
+	hm2L3StatsPacketCount Counter64,	
+	hm2L3StatsPacketSize Counter64,	
+	hm2L3StatsLastApplied HmTimeSeconds1970
+}
+
+hm2L3StatsPacketCount OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of packets matched by this rule"
+		::={ hm2L3StatsRuleEntry 1 }
+
+hm2L3StatsPacketSize OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of bytes processed by this rule"
+		::={ hm2L3StatsRuleEntry 2 }
+	
+hm2L3StatsLastApplied OBJECT-TYPE
+	SYNTAX HmTimeSeconds1970
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Time of last application of the rule in seconds since the Unix epoch."
+		::={ hm2L3StatsRuleEntry 3 }
+
+hm2DPIProfileModbusObjects OBJECT IDENTIFIER ::= { hm2L3Fw 11 } 
+
+hm2DPIProfileModbusPendingActions OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"This value describes, whether the DPI MODBUS profile table was modified
+		 but not yet written to the enforcer implementation (set to 
+		 true). After writing all modifications to the enforcer, the 
+		 value switches automatically back to false."
+	DEFVAL { false }	 
+	::= { hm2DPIProfileModbusObjects 1 }
+
+hm2DPIProfileModbusCommitPendingActions OBJECT-TYPE
+	SYNTAX HmActionValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Setting this value to action(2) writes not yet committed changes
+		 to the enforcer (DPI MODBUS Profile Table). After writing
+		 all modifications, the value switches automatically back to 
+		 noop(1)."
+	DEFVAL { noop }	 
+	::= { hm2DPIProfileModbusObjects 2 }
+
+hm2DPIProfileOpcObjects OBJECT IDENTIFIER ::= { hm2L3Fw 12 } 
+
+hm2DPIProfileOpcPendingActions OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"This value describes, whether the L3 OPC profile table was modified
+		 but not yet written to the enforcer implementation (set to 
+		 true). After writing all modifications to the enforcer, the 
+		 value switches automatically back to false."
+	DEFVAL { false }	 
+	::= { hm2DPIProfileOpcObjects 1 }
+
+hm2DPIProfileOpcCommitPendingActions OBJECT-TYPE
+	SYNTAX HmActionValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Setting this value to action(2) writes not yet committed changes
+		 to the enforcer (DPI OPC Profile Table). After writing
+		 all modifications, the value switches automatically back to 
+		 noop(1)."
+	DEFVAL { noop }	 
+	::= { hm2DPIProfileOpcObjects 2 }
+
+hm2DPIProfileIEC104Objects OBJECT IDENTIFIER ::= { hm2L3Fw 13 } 
+
+hm2DPIProfileIEC104PendingActions OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"This value describes, whether the DPI IEC104 profile table was modified
+		 but not yet written to the enforcer implementation (set to 
+		 true). After writing all modifications to the enforcer, the 
+		 value switches automatically back to false."
+	::= { hm2DPIProfileIEC104Objects 1 }
+
+hm2DPIProfileIEC104CommitPendingActions OBJECT-TYPE
+	SYNTAX HmActionValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Setting this value to action(2) writes not yet committed changes
+		 to the enforcer (DPI IEC104 Profile Table). After writing
+		 all modifications, the value switches automatically back to 
+		 noop(1)."
+	DEFVAL { noop }	 
+	::= { hm2DPIProfileIEC104Objects 2 }
+
+hm2DPIProfileEnipObjects OBJECT IDENTIFIER ::= { hm2L3Fw 14 } 
+
+hm2DPIProfileEnipPendingActions OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"This value describes, whether the DPI EtherNet/IP profile table was modified
+		 but not yet written to the enforcer implementation (set to 
+		 true). After writing all modifications to the enforcer, the 
+		 value switches automatically back to false."
+	::= { hm2DPIProfileEnipObjects 1 }
+
+hm2DPIProfileEnipCommitPendingActions OBJECT-TYPE
+	SYNTAX HmActionValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Setting this value to action(2) writes not yet committed changes
+		 to the enforcer (DPI EtherNet/IP Profile Table). After writing
+		 all modifications, the value switches automatically back to 
+		 noop(1)."
+	DEFVAL { noop }	 
+	::= { hm2DPIProfileEnipObjects 2 }
+
+hm2DPIProfileDnp3Objects OBJECT IDENTIFIER ::= { hm2L3Fw 16 } 
+
+hm2DPIProfileDnp3PendingActions OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"This value describes, whether the DPI DNP3 profile table was modified
+		but not yet written to the enforcer implementation (set to
+		true). After writing all modifications to the enforcer, the
+		value switches automatically back to false."
+	DEFVAL { false }
+	::= { hm2DPIProfileDnp3Objects 1 }
+
+hm2DPIProfileDnp3CommitPendingActions OBJECT-TYPE
+	SYNTAX HmActionValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Setting this value to action(2) writes not yet committed changes
+		to the enforcer (DPI DNP3 Profile Table). After writing
+		all modifications, the value switches automatically back to
+		noop(1)."
+	DEFVAL { noop }
+	::= { hm2DPIProfileDnp3Objects 2 }
+
+
+hm2DPIProfileTables OBJECT IDENTIFIER ::= { hm2L3Fw 21 }
+
+hm2DPIProfileModbusTable OBJECT-TYPE 
+	SYNTAX SEQUENCE OF Hm2DPIProfileModbusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The list of DPI MODBUS profiles for this enforcer"
+	::= { hm2DPIProfileTables 1 }
+
+hm2DPIProfileModbusEntry OBJECT-TYPE
+	SYNTAX Hm2DPIProfileModbusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"DPI MODBUS profile entry."
+	INDEX { hm2DPIProfileModbusIndex }
+	::= { hm2DPIProfileModbusTable 1 }
+
+Hm2DPIProfileModbusEntry ::=
+	SEQUENCE {
+		hm2DPIProfileModbusIndex Integer32,
+		hm2DPIProfileModbusDescription DisplayString,
+		hm2DPIProfileModbusFunctionType INTEGER,
+		hm2DPIProfileModbusFunctionCodeList HmExtraLargeDisplayString,
+		hm2DPIProfileModbusUnitIdentifierList HmExtraLargeDisplayString,
+		hm2DPIProfileModbusSanityCheck TruthValue,
+		hm2DPIProfileModbusException TruthValue,
+		hm2DPIProfileModbusReset TruthValue,
+		hm2DPIProfileModbusRowStatus RowStatus
+	}
+
+hm2DPIProfileModbusIndex OBJECT-TYPE
+	SYNTAX Integer32 ( 1..32 )
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"Profile index of this DPI MODBUS profile"
+	::= { hm2DPIProfileModbusEntry 1 }
+
+hm2DPIProfileModbusDescription OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(0..32) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"User defined textual description related to this profile."
+	DEFVAL { "modbus" }
+	::= { hm2DPIProfileModbusEntry 2 }
+
+hm2DPIProfileModbusFunctionType OBJECT-TYPE
+ 	 SYNTAX INTEGER {
+			readonly(1),
+			readwrite(2),
+			programming(3),
+			all(4),
+			advanced(5)
+ 	 }
+ 	 MAX-ACCESS read-create
+ 	 STATUS current
+ 	 DESCRIPTION
+ 	 	 "The function types of the corresponding function codes:
+ 	 	 o readonly(1): Selects read only function codes for the function code list.
+ 	 	 o readwrite(2): Selects read write function codes for the function code list.
+ 	 	 o programming(3): Selects programming function codes for the function code list.
+ 	 	 o all(4): Selects all possible function codes for the function code list. Any function code will be allowed.
+	 	 o advanced(5): Keeps the function code list from the previous selection and makes it editable by the user."
+	DEFVAL { readonly }
+	::= { hm2DPIProfileModbusEntry 3 }
+
+hm2DPIProfileModbusFunctionCodeList OBJECT-TYPE
+	 SYNTAX HmExtraLargeDisplayString ( SIZE(1..1400) )
+ 	 MAX-ACCESS read-create
+ 	 STATUS current
+ 	 DESCRIPTION
+		"The function codes for this enforcer as string.
+		A function code has the syntax:
+			<val>
+		Function codes are separated by a comma.
+		If more than one value is given for a function code, values are
+		separated by a | -sign (pipe).
+		Following function codes are defined:
+			<1..255>|<0-65535>|<0-65535> (apply to packets with given function codes <1..255>, address range <0-65535>, address range <0-65535>)
+			1|<0-65535> (apply to packets with given function code read coils, coil address range <0-65535>)
+			2|<0-65535> (apply to packets with given function code read discrete inputs, input address range <0-65535>)
+			3|<0-65535> (apply to packets with given function code read holding registers, register address range <0-65535>)
+			4|<0-65535> (apply to packets with given function code read input registers, register address range <0-65535>)
+			5|<0-65535> (apply to packets with given function code write single coil, coil address range <0-65535>)
+			6|<0-65535> (apply to packets with given function code write single register, register address range <0-65535>)
+			7 (apply to packets with given function code read exception status)
+			8 (apply to packets with given function code diagnostic)
+			11 (apply to packets with given function code get com event counter)
+			12 (apply to packets with given function code get comm event log)
+			13 (apply to packets with given function code program (584/984))
+			14 (apply to packets with given function code poll (584/984))
+			15|<0-65535> (apply to packets with given function code write multiple coils, coil address range <0-65535>)
+			16|<0-65535> (apply to packets with given function code write multiple registers, register address range <0-65535>)
+			17 (apply to packets with given function code report slave id)
+			20 (apply to packets with given function code read file record)
+			21 (apply to packets with given function code write file record)
+			22|<0-65535> (apply to packets with given function code mask write register, register address range <0-65535>)
+			23|<0-65535>|<0-65535> (apply to packets with given function code read/write multiple registers, read address range <0-65535>, write address range <0-65535>)
+			24|<0-65535> (apply to packets with given function code read fifo queue, pointer address range <0-65535>)
+			40 (apply to packets with given function code program (concept))
+			42 (apply to packets with given function code concept symbol table)
+			43 (apply to packets with given function code encapsulated interface transport)
+			48 (apply to packets with given function code advantech co. ltd. - management functions)
+			66 (apply to packets with given function code scan data inc. - expanded read holding registers)
+			67 (apply to packets with given function code scan data inc. - expanded write holding registers)
+			90 (apply to packets with given function code unity programming/ofs)
+			100 (apply to packets with given function code scattered register read)
+			125 (apply to packets with given function code schneider electric - firmware replacement)
+			126 (apply to packets with given function code schneider electric - program)"
+	DEFVAL  { "1,2,3,4,7,11,12,17,20,24" }
+	::= { hm2DPIProfileModbusEntry 4 }
+
+hm2DPIProfileModbusUnitIdentifierList OBJECT-TYPE
+	 SYNTAX HmExtraLargeDisplayString ( SIZE(1..1400) )
+ 	 MAX-ACCESS read-create
+ 	 STATUS current
+ 	 DESCRIPTION
+		"Unit identifiers for this enforcer as string.
+		A unit identifier has the syntax:
+			<val>
+		To specify no options, the value 'none' must be given.
+		Unit identifiers are separated by a comma.
+		Following unit identifiers are defined:
+			<0..255> (apply to packets for which a
+			unit identifier is set)"
+	DEFVAL { "none" }
+	::= { hm2DPIProfileModbusEntry 5 }
+
+hm2DPIProfileModbusSanityCheck OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true if apply to packets for which a
+		sanity check including format and specification shall be done"
+	DEFVAL { true }
+	::= { hm2DPIProfileModbusEntry 6 }
+
+hm2DPIProfileModbusException OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true if apply to packets for which a
+		device exception message shall be sent"
+	DEFVAL { false }
+	::= { hm2DPIProfileModbusEntry 7 }
+
+hm2DPIProfileModbusReset OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true if apply to packets for which a
+		reset connection message shall be sent"
+	DEFVAL { true }
+	::= { hm2DPIProfileModbusEntry 8 }
+
+hm2DPIProfileModbusRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"This is a standard row status value:
+            - active(1): The profile is active. You cannot modify it.
+            - notInService(2): The profile is inactive because of user action.
+              You cannot inactivate the profile if an active enforcer mappings to it.
+            - notReady(3): The profile is inactive because of agent action.
+            - createAndGo(4): Create the profile with default parameters
+              activated.
+            - createAndWait(5): Create the profile inactive.
+            - destroy(6): Delete the profile.
+              You cannot delete the active profile or if an enforcer mappings to it."
+	::= { hm2DPIProfileModbusEntry 9 }
+
+hm2DPIProfileOpcTable OBJECT-TYPE 
+	SYNTAX SEQUENCE OF Hm2DPIProfileOpcEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The list of DPI OPC profiles for this enforcer"
+	::= { hm2DPIProfileTables 2 }
+
+hm2DPIProfileOpcEntry OBJECT-TYPE
+	SYNTAX Hm2DPIProfileOpcEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"DPI OPC profile entry."
+	INDEX { hm2DPIProfileOpcIndex }
+	::= { hm2DPIProfileOpcTable 1 }
+
+Hm2DPIProfileOpcEntry ::=
+	SEQUENCE {
+		hm2DPIProfileOpcIndex Integer32,
+		hm2DPIProfileOpcDescription DisplayString,
+		hm2DPIProfileOpcSanityCheck TruthValue,
+		hm2DPIProfileOpcFragmentCheck TruthValue,
+		hm2DPIProfileOpcTimeoutConnect Unsigned32,
+		hm2DPIProfileOpcRowStatus RowStatus
+	}
+
+hm2DPIProfileOpcIndex OBJECT-TYPE
+	SYNTAX Integer32 ( 1..32 )
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"Profile index of this DPI OPC profile"
+	::= { hm2DPIProfileOpcEntry 1 }
+
+hm2DPIProfileOpcDescription OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(0..32) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"User defined textual description related to this profile."
+	DEFVAL { "opc" }
+	::= { hm2DPIProfileOpcEntry 2 }
+
+hm2DPIProfileOpcSanityCheck OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true if apply to packets for which a
+		sanity check including format and specification shall be done"
+	DEFVAL { true }
+	::= { hm2DPIProfileOpcEntry 3 }
+
+hm2DPIProfileOpcFragmentCheck OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true if apply to packets for which a
+		fragment check shall be done"
+	DEFVAL { true }
+	::= { hm2DPIProfileOpcEntry 4 }
+
+hm2DPIProfileOpcTimeoutConnect OBJECT-TYPE
+	SYNTAX      Unsigned32 (0..300)
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+		"Set to nonzero if apply to packets for which a
+		timeout at connect in seconds shall be done.
+		Value 0 disables this match criteria."
+	DEFVAL { 5 }
+	::= { hm2DPIProfileOpcEntry 5 }
+
+hm2DPIProfileOpcRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"This is a standard row status value:
+            - active(1): The profile is active. You cannot modify it.
+            - notInService(2): The profile is inactive because of user action.
+              You cannot inactivate the profile if an active enforcer mappings to it.
+            - notReady(3): The profile is inactive because of agent action.
+            - createAndGo(4): Create the profile with default parameters
+              activated.
+            - createAndWait(5): Create the profile inactive.
+            - destroy(6): Delete the profile.
+              You cannot delete the active profile or if an enforcer mappings to it."
+	::= { hm2DPIProfileOpcEntry 6 }
+
+hm2DPIProfileIEC104Table OBJECT-TYPE 
+	SYNTAX SEQUENCE OF Hm2DPIProfileIEC104Entry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The list of DPI IEC104 profiles for this enforcer"
+	::= { hm2DPIProfileTables 3 }
+
+hm2DPIProfileIEC104Entry OBJECT-TYPE
+	SYNTAX Hm2DPIProfileIEC104Entry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"DPI IEC104 profile entry."
+	INDEX { hm2DPIProfileIEC104Index }
+	::= { hm2DPIProfileIEC104Table 1 }
+
+Hm2DPIProfileIEC104Entry ::=
+	SEQUENCE {
+		hm2DPIProfileIEC104Index Integer32,
+		hm2DPIProfileIEC104Description SnmpAdminString,
+		hm2DPIProfileIEC104FunctionType INTEGER,
+		hm2DPIProfileIEC104TypeIDList BITS,
+		hm2DPIProfileIEC104OriginatorAddressList BITS,
+		hm2DPIProfileIEC104CommonAddressList HmLargeDisplayString,
+		hm2DPIProfileIEC104SanityCheck HmEnabledStatus,
+		hm2DPIProfileIEC104Reset HmEnabledStatus,
+		hm2DPIProfileIEC104Debug HmEnabledStatus,
+		hm2DPIProfileIEC104RowStatus RowStatus,
+		hm2DPIProfileIEC104AdvancedTypeIDList HmExtraLargeDisplayString,
+		hm2DPIProfileIEC104OriginatorAddrList HmExtraLargeDisplayString,
+		hm2DPIProfileIEC104CauseOfTransmissionSize Integer32,
+		hm2DPIProfileIEC104CommonAddressSize Integer32,
+		hm2DPIProfileIEC104IOAddressSize Integer32,
+		hm2DPIProfileIEC104AllowIEC101 HmEnabledStatus
+	}
+
+hm2DPIProfileIEC104Index OBJECT-TYPE
+	SYNTAX Integer32 ( 1..32 )
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"Profile index of this DPI IEC104 profile"
+	::= { hm2DPIProfileIEC104Entry 1 }
+
+hm2DPIProfileIEC104Description OBJECT-TYPE
+	SYNTAX SnmpAdminString ( SIZE(0..128) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"User defined textual description related to this profile."
+	DEFVAL { "iec104" }
+	::= { hm2DPIProfileIEC104Entry 2 }
+
+hm2DPIProfileIEC104FunctionType OBJECT-TYPE
+ 	 SYNTAX INTEGER {
+			readonly(1),
+			readwrite(2),
+			common(3),
+			any(4),
+			advanced(5)
+ 	 }
+ 	 MAX-ACCESS read-create
+ 	 STATUS current
+ 	 DESCRIPTION
+ 	 	 "The function types of the corresponding type IDs:
+ 	 	 o readonly(1): Selects read only type IDs for the type ID list.
+ 	 	 o readwrite(2): Selects read write type IDs for the type ID list.
+ 	 	 o common(3): Selects common type IDs for the type ID list.
+ 	 	 o any(4): Selects all possible type IDs for the type ID list. Any type ID will be allowed.
+	 	 o advanced(5): Keeps the type ID list from the previous selection and makes it editable by the user."
+	DEFVAL { any }
+	::= { hm2DPIProfileIEC104Entry 3 }
+
+hm2DPIProfileIEC104TypeIDList OBJECT-TYPE
+ 	 SYNTAX BITS {
+		invalid-0(0),
+		m-sp-na-1(1),
+		m-sp-ta-1(2),
+		m-dp-na-1(3),
+		m-dp-ta-1(4),
+		m-st-na-1(5),
+		m-st-ta-1(6),
+		m-bo-na-1(7),
+		m-bo-ta-1(8),
+		m-me-na-1(9),
+		m-me-ta-1(10),
+		m-me-nb-1(11),
+		m-me-tb-1(12),
+		m-me-nc-1(13),
+		m-me-tc-1(14),
+		m-it-na-1(15),
+		m-it-ta-1(16),
+		m-ep-ta-1(17),
+		m-ep-tb-1(18),
+		m-ep-tc-1(19),
+		m-ps-na-1(20),
+		m-me-nd-1(21),
+		reserved-22(22),
+		reserved-23(23),
+		reserved-24(24),
+		reserved-25(25),
+		reserved-26(26),
+		reserved-27(27),
+		reserved-28(28),
+		reserved-29(29),
+		m-sp-tb-1(30),
+		m-dp-tb-1(31),
+		m-st-tb-1(32),
+		m-bo-tb-1(33),
+		m-me-td-1(34),
+		m-me-te-1(35),
+		m-me-tf-1(36),
+		m-it-tb-1(37),
+		m-ep-td-1(38),
+		m-ep-te-1(39),
+		m-ep-tf-1(40),
+		reserved-41(41),
+		reserved-42(42),
+		reserved-43(43),
+		reserved-44(44),
+		c-sc-na-1(45),
+		c-dc-na-1(46),
+		c-rc-na-1(47),
+		c-se-na-1(48),
+		c-se-nb-1(49),
+		c-se-nc-1(50),
+		c-bo-na-1(51),
+		reserved-52(52),
+		reserved-53(53),
+		reserved-54(54),
+		reserved-55(55),
+		reserved-56(56),
+		reserved-57(57),
+		c-sc-ta-1(58),
+		c-dc-ta-1(59),
+		c-rc-ta-1(60),
+		c-se-ta-1(61),
+		c-se-tb-1(62),
+		c-se-tc-1(63),
+		c-bo-ta-1(64),
+		reserved-65(65),
+		reserved-66(66),
+		reserved-67(67),
+		reserved-68(68),
+		reserved-69(69),
+		m-ei-na-1(70),
+		reserved-71(71),
+		reserved-72(72),
+		reserved-73(73),
+		reserved-74(74),
+		reserved-75(75),
+		reserved-76(76),
+		reserved-77(77),
+		reserved-78(78),
+		reserved-79(79),
+		reserved-80(80),
+		reserved-81(81),
+		reserved-82(82),
+		reserved-83(83),
+		reserved-84(84),
+		reserved-85(85),
+		reserved-86(86),
+		reserved-87(87),
+		reserved-88(88),
+		reserved-89(89),
+		reserved-90(90),
+		reserved-91(91),
+		reserved-92(92),
+		reserved-93(93),
+		reserved-94(94),
+		reserved-95(95),
+		reserved-96(96),
+		reserved-97(97),
+		reserved-98(98),
+		reserved-99(99),
+		c-ic-na-1(100),
+		c-ci-na-1(101),
+		c-rd-na-1(102),
+		c-cs-na-1(103),
+		c-ts-nb-1(104),
+		c-rp-nc-1(105),
+		c-cd-na-1(106),
+		c-ts-ta-1(107),
+		reserved-108(108),
+		reserved-109(109),
+		p-me-na-1(110),
+		p-me-nb-1(111),
+		p-me-nc-1(112),
+		p-ac-na-1(113),
+		reserved-114(114),
+		reserved-115(115),
+		reserved-116(116),
+		reserved-117(117),
+		reserved-118(118),
+		reserved-119(119),
+		f-fr-na-1(120),
+		f-sr-na-1(121),
+		f-sc-na-1(122),
+		f-ls-na-1(123),
+		f-af-na-1(124),
+		f-sg-na-1(125),
+		f-dr-ta-1(126),
+		f-sc-nb-1(127),
+		custom-128(128),
+		custom-129(129),
+		custom-130(130),
+		custom-131(131),
+		custom-132(132),
+		custom-133(133),
+		custom-134(134),
+		custom-135(135),
+		custom-136(136),
+		custom-137(137),
+		custom-138(138),
+		custom-139(139),
+		custom-140(140),
+		custom-141(141),
+		custom-142(142),
+		custom-143(143),
+		custom-144(144),
+		custom-145(145),
+		custom-146(146),
+		custom-147(147),
+		custom-148(148),
+		custom-149(149),
+		custom-150(150),
+		custom-151(151),
+		custom-152(152),
+		custom-153(153),
+		custom-154(154),
+		custom-155(155),
+		custom-156(156),
+		custom-157(157),
+		custom-158(158),
+		custom-159(159),
+		custom-160(160),
+		custom-161(161),
+		custom-162(162),
+		custom-163(163),
+		custom-164(164),
+		custom-165(165),
+		custom-166(166),
+		custom-167(167),
+		custom-168(168),
+		custom-169(169),
+		custom-170(170),
+		custom-171(171),
+		custom-172(172),
+		custom-173(173),
+		custom-174(174),
+		custom-175(175),
+		custom-176(176),
+		custom-177(177),
+		custom-178(178),
+		custom-179(179),
+		custom-180(180),
+		custom-181(181),
+		custom-182(182),
+		custom-183(183),
+		custom-184(184),
+		custom-185(185),
+		custom-186(186),
+		custom-187(187),
+		custom-188(188),
+		custom-189(189),
+		custom-190(190),
+		custom-191(191),
+		custom-192(192),
+		custom-193(193),
+		custom-194(194),
+		custom-195(195),
+		custom-196(196),
+		custom-197(197),
+		custom-198(198),
+		custom-199(199),
+		custom-200(200),
+		custom-201(201),
+		custom-202(202),
+		custom-203(203),
+		custom-204(204),
+		custom-205(205),
+		custom-206(206),
+		custom-207(207),
+		custom-208(208),
+		custom-209(209),
+		custom-210(210),
+		custom-211(211),
+		custom-212(212),
+		custom-213(213),
+		custom-214(214),
+		custom-215(215),
+		custom-216(216),
+		custom-217(217),
+		custom-218(218),
+		custom-219(219),
+		custom-220(220),
+		custom-221(221),
+		custom-222(222),
+		custom-223(223),
+		custom-224(224),
+		custom-225(225),
+		custom-226(226),
+		custom-227(227),
+		custom-228(228),
+		custom-229(229),
+		custom-230(230),
+		custom-231(231),
+		custom-232(232),
+		custom-233(233),
+		custom-234(234),
+		custom-235(235),
+		custom-236(236),
+		custom-237(237),
+		custom-238(238),
+		custom-239(239),
+		custom-240(240),
+		custom-241(241),
+		custom-242(242),
+		custom-243(243),
+		custom-244(244),
+		custom-245(245),
+		custom-246(246),
+		custom-247(247),
+		custom-248(248),
+		custom-249(249),
+		custom-250(250),
+		custom-251(251),
+		custom-252(252),
+		custom-253(253),
+		custom-254(254),
+		custom-255(255)
+	}
+ 	 MAX-ACCESS read-create
+ 	 STATUS obsolete
+ 	 DESCRIPTION
+		"**NOTE: This object is obsolete in favour of hm2DPIProfileIEC104AdvancedTypeIDList.**
+		The type IDs for this enforcer as bit string.
+		Each type ID bit can either be set (allowed) or cleared (blocked).
+		Following type IDs are defined:
+			1 Single point information m-sp-na-1
+			2 Single point information with time tag m-sp-ta-1
+			3 Double point information m-dp-na-1
+			4 Double point information with time tag m-dp-ta-1
+			5 Step position information m-st-na-1
+			6 Step position information with time tag m-st-ta-1
+			7 Bit string of 32 bit m-bo-na-1
+			8 Bit string of 32 bit with time tag m-bo-ta-1
+			9 Measured value, normalized value m-me-na-1
+			10 Measured value, normalized value with time tag m-me-ta-1
+			11 Measured value, scaled value m-me-nb-1
+			12 Measured value, scaled value with time tag m-me-tb-1
+			13 Measured value, short floating point value m-me-nc-1
+			14 Measured value, short floating point value with time tag m-me-tc-1
+			15 Integrated totals m-it-na-1
+			16 Integrated totals with time tag m-it-ta-1
+			17 Event of protection equipment with time tag m-ep-ta-1
+			18 Packed start events of protection equipment with time tag m-ep-tb-1
+			19 Packed output circuit information of protection equipment with time tag m-ep-tc-1
+			20 Packed single-point information with status change detection m-ps-na-1
+			21 Measured value, normalized value without quality descriptor m-me-nd-1
+			30 Single point information with time tag cp56time2a m-sp-tb-1
+			31 Double point information with time tag cp56time2a m-dp-tb-1
+			32 Step position information with time tag cp56time2a m-st-tb-1
+			33 Bit string of 32 bit with time tag cp56time2a m-bo-tb-1
+			34 Measured value, normalized value with time tag cp56time2a m-me-td-1
+			35 Measured value, scaled value with time tag cp56time2a m-me-te-1
+			36 Measured value, short floating point value with time tag cp56time2a m-me-tf-1
+			37 Integrated totals with time tag cp56time2a m-it-tb-1
+			38 Event of protection equipment with time tag cp56time2a m-ep-td-1
+			39 Packed start events of protection equipment with time tag cp56time2a m-ep-te-1
+			40 Packed output circuit information of protection equipment with time tag cp56time2a m-ep-tf-1
+			45 Single command c-sc-na-1
+			46 Double command c-dc-na-1
+			47 Regulating step command c-rc-na-1
+			48 Setpoint command, normalized value c-se-na-1
+			49 Setpoint command, scaled value c-se-nb-1
+			50 Setpoint command, short floating point value c-se-nc-1
+			51 Bit string 32 bit c-bo-na-1
+			58 Single command with time tag cp56time2a c-sc-ta-1
+			59 Double command with time tag cp56time2a c-dc-ta-1
+			60 Regulating step command with time tag cp56time2a c-rc-ta-1
+			61 Setpoint command, normalized value with time tag cp56time2a c-se-ta-1
+			62 Setpoint command, scaled value with time tag cp56time2a c-se-tb-1
+			63 Setpoint command, short floating point value with time tag cp56time2a c-se-tc-1
+			64 Bit string 32 bit with time tag cp56time2a c-bo-ta-1
+			70 End of initialization m-ei-na-1
+			100 (General-) Interrogation command c-ic-na-1
+			101 Counter interrogation command c-ci-na-1
+			102 Read command c-rd-na-1
+			103 Clock synchronization command c-cs-na-1
+			104 ( IEC 101 ) Test command c-ts-nb-1
+			105 Reset process command c-rp-nc-1
+			106 ( IEC 101 ) Delay acquisition command c-cd-na-1
+			107 Test command with time tag cp56time2a c-ts-ta-1
+			110 Parameter of measured value, normalized value p-me-na-1
+			111 Parameter of measured value, scaled value p-me-nb-1
+			112 Parameter of measured value, short floating point value p-me-nc-1
+			113 Parameter activation p-ac-na-1
+			120 File ready f-fr-na-1
+			121 Section ready f-sr-na-1
+			122 Call directory, select file, call file, call section f-sc-na-1
+			123 Last section, last segment f-ls-na-1
+			124 Ack file, Ack section f-af-na-1
+			125 Segment f-sg-na-1
+			126 f-dr-ta-1
+			127 QueryLog - Request archive file f-sc-nb-1
+			128-255 Custom type IDs accessible via custom-<ID>
+			All undefined type IDs are accessible via reserverd-<ID>"
+	DEFVAL  { {m-sp-na-1,m-sp-ta-1,m-dp-na-1} }
+	::= { hm2DPIProfileIEC104Entry 4 }
+
+hm2DPIProfileIEC104OriginatorAddressList OBJECT-TYPE
+ 	 SYNTAX BITS {
+		oa-0(0),
+		oa-1(1),
+		oa-2(2),
+		oa-3(3),
+		oa-4(4),
+		oa-5(5),
+		oa-6(6),
+		oa-7(7),
+		oa-8(8),
+		oa-9(9),
+		oa-10(10),
+		oa-11(11),
+		oa-12(12),
+		oa-13(13),
+		oa-14(14),
+		oa-15(15),
+		oa-16(16),
+		oa-17(17),
+		oa-18(18),
+		oa-19(19),
+		oa-20(20),
+		oa-21(21),
+		oa-22(22),
+		oa-23(23),
+		oa-24(24),
+		oa-25(25),
+		oa-26(26),
+		oa-27(27),
+		oa-28(28),
+		oa-29(29),
+		oa-30(30),
+		oa-31(31),
+		oa-32(32),
+		oa-33(33),
+		oa-34(34),
+		oa-35(35),
+		oa-36(36),
+		oa-37(37),
+		oa-38(38),
+		oa-39(39),
+		oa-40(40),
+		oa-41(41),
+		oa-42(42),
+		oa-43(43),
+		oa-44(44),
+		oa-45(45),
+		oa-46(46),
+		oa-47(47),
+		oa-48(48),
+		oa-49(49),
+		oa-50(50),
+		oa-51(51),
+		oa-52(52),
+		oa-53(53),
+		oa-54(54),
+		oa-55(55),
+		oa-56(56),
+		oa-57(57),
+		oa-58(58),
+		oa-59(59),
+		oa-60(60),
+		oa-61(61),
+		oa-62(62),
+		oa-63(63),
+		oa-64(64),
+		oa-65(65),
+		oa-66(66),
+		oa-67(67),
+		oa-68(68),
+		oa-69(69),
+		oa-70(70),
+		oa-71(71),
+		oa-72(72),
+		oa-73(73),
+		oa-74(74),
+		oa-75(75),
+		oa-76(76),
+		oa-77(77),
+		oa-78(78),
+		oa-79(79),
+		oa-80(80),
+		oa-81(81),
+		oa-82(82),
+		oa-83(83),
+		oa-84(84),
+		oa-85(85),
+		oa-86(86),
+		oa-87(87),
+		oa-88(88),
+		oa-89(89),
+		oa-90(90),
+		oa-91(91),
+		oa-92(92),
+		oa-93(93),
+		oa-94(94),
+		oa-95(95),
+		oa-96(96),
+		oa-97(97),
+		oa-98(98),
+		oa-99(99),
+		oa-100(100),
+		oa-101(101),
+		oa-102(102),
+		oa-103(103),
+		oa-104(104),
+		oa-105(105),
+		oa-106(106),
+		oa-107(107),
+		oa-108(108),
+		oa-109(109),
+		oa-110(110),
+		oa-111(111),
+		oa-112(112),
+		oa-113(113),
+		oa-114(114),
+		oa-115(115),
+		oa-116(116),
+		oa-117(117),
+		oa-118(118),
+		oa-119(119),
+		oa-120(120),
+		oa-121(121),
+		oa-122(122),
+		oa-123(123),
+		oa-124(124),
+		oa-125(125),
+		oa-126(126),
+		oa-127(127),
+		oa-128(128),
+		oa-129(129),
+		oa-130(130),
+		oa-131(131),
+		oa-132(132),
+		oa-133(133),
+		oa-134(134),
+		oa-135(135),
+		oa-136(136),
+		oa-137(137),
+		oa-138(138),
+		oa-139(139),
+		oa-140(140),
+		oa-141(141),
+		oa-142(142),
+		oa-143(143),
+		oa-144(144),
+		oa-145(145),
+		oa-146(146),
+		oa-147(147),
+		oa-148(148),
+		oa-149(149),
+		oa-150(150),
+		oa-151(151),
+		oa-152(152),
+		oa-153(153),
+		oa-154(154),
+		oa-155(155),
+		oa-156(156),
+		oa-157(157),
+		oa-158(158),
+		oa-159(159),
+		oa-160(160),
+		oa-161(161),
+		oa-162(162),
+		oa-163(163),
+		oa-164(164),
+		oa-165(165),
+		oa-166(166),
+		oa-167(167),
+		oa-168(168),
+		oa-169(169),
+		oa-170(170),
+		oa-171(171),
+		oa-172(172),
+		oa-173(173),
+		oa-174(174),
+		oa-175(175),
+		oa-176(176),
+		oa-177(177),
+		oa-178(178),
+		oa-179(179),
+		oa-180(180),
+		oa-181(181),
+		oa-182(182),
+		oa-183(183),
+		oa-184(184),
+		oa-185(185),
+		oa-186(186),
+		oa-187(187),
+		oa-188(188),
+		oa-189(189),
+		oa-190(190),
+		oa-191(191),
+		oa-192(192),
+		oa-193(193),
+		oa-194(194),
+		oa-195(195),
+		oa-196(196),
+		oa-197(197),
+		oa-198(198),
+		oa-199(199),
+		oa-200(200),
+		oa-201(201),
+		oa-202(202),
+		oa-203(203),
+		oa-204(204),
+		oa-205(205),
+		oa-206(206),
+		oa-207(207),
+		oa-208(208),
+		oa-209(209),
+		oa-210(210),
+		oa-211(211),
+		oa-212(212),
+		oa-213(213),
+		oa-214(214),
+		oa-215(215),
+		oa-216(216),
+		oa-217(217),
+		oa-218(218),
+		oa-219(219),
+		oa-220(220),
+		oa-221(221),
+		oa-222(222),
+		oa-223(223),
+		oa-224(224),
+		oa-225(225),
+		oa-226(226),
+		oa-227(227),
+		oa-228(228),
+		oa-229(229),
+		oa-230(230),
+		oa-231(231),
+		oa-232(232),
+		oa-233(233),
+		oa-234(234),
+		oa-235(235),
+		oa-236(236),
+		oa-237(237),
+		oa-238(238),
+		oa-239(239),
+		oa-240(240),
+		oa-241(241),
+		oa-242(242),
+		oa-243(243),
+		oa-244(244),
+		oa-245(245),
+		oa-246(246),
+		oa-247(247),
+		oa-248(248),
+		oa-249(249),
+		oa-250(250),
+		oa-251(251),
+		oa-252(252),
+		oa-253(253),
+		oa-254(254),
+		oa-255(255)
+ 	 }
+ 	 MAX-ACCESS read-create
+ 	 STATUS obsolete
+ 	 DESCRIPTION
+		"**NOTE: This object is obsolete in favour of hm2DPIProfileIEC104OriginatorAddrList.**
+		Allowed Originator addresses for this enforcer as bit string.
+		Each bit corresponds to an orignator address which may either be
+		allowed (bit set) or blocked (bit cleared). If all bits are cleared,
+		no filtering on originator addresses is done (all addresses allowed).
+		Following Originator addresses are defined:
+			oa-<0..255> (only the selected Originator addresses will be allowed)"
+	DEFVAL { { } }
+	::= { hm2DPIProfileIEC104Entry 5 }
+
+hm2DPIProfileIEC104CommonAddressList OBJECT-TYPE
+	 SYNTAX HmLargeDisplayString ( SIZE(0..1024) )
+ 	 MAX-ACCESS read-create
+ 	 STATUS current
+ 	 DESCRIPTION
+		"Allowed Common addresses for this enforcer as string.
+		Allowed format for common address list:
+		- index range with first and last index separated by hyphen
+		('10-15')
+		- comma separated list of index ('12,25,123')
+		- combination of the points above ('10,25-30,125,300')
+
+		If no address are specified, all Common addresses will be allowed.
+		Following Common addresses are defined:
+		 <0..65535> (only the selected Common addresses will be allowed)"
+	DEFVAL  { "" }
+	::= { hm2DPIProfileIEC104Entry 6 }
+
+hm2DPIProfileIEC104SanityCheck OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to 'enable' if a sanity check including format and specification 
+		for all packets shall be done"
+	DEFVAL { enable }
+	::= { hm2DPIProfileIEC104Entry 7 }
+
+hm2DPIProfileIEC104Reset OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to 'enable' if reset connection message shall be sent in case a packet is dropped"
+	DEFVAL { enable }
+	::= { hm2DPIProfileIEC104Entry 8 }
+
+hm2DPIProfileIEC104Debug OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to 'enable' if reset connection message shall contain debug information"
+	DEFVAL { disable }
+	::= { hm2DPIProfileIEC104Entry 9 }
+
+hm2DPIProfileIEC104RowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"This is a standard row status value:
+		- active(1): The profile is active. You cannot modify it.
+		- notInService(2): The profile is inactive because of user action.
+		You cannot inactivate the profile if an active enforcer mappings to it.
+		- notReady(3): The profile is inactive because of agent action.
+		- createAndGo(4): Create the profile with default parameters
+		activated.
+		- createAndWait(5): Create the profile inactive.
+		- destroy(6): Delete the profile.
+		You cannot delete the active profile or if an enforcer mappings to it."
+	::= { hm2DPIProfileIEC104Entry 10 }
+
+hm2DPIProfileIEC104AdvancedTypeIDList OBJECT-TYPE
+	SYNTAX HmExtraLargeDisplayString ( SIZE(0..1400) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The type IDs for this enforcer as string.
+		A type ID list has the syntax:
+		<val>
+		If more than one value is given for type ID list, values are
+		separated by a , sign (comma).
+		Note: The user can define any number between 0-255. The type ID must be a 
+		number (in decimal format).
+		All undefined type IDs are reserved for further compatible definitions.
+		Following type IDs are defined:
+			0 Invalid type id invalid-0
+			1 Single point information m-sp-na-1
+			2 Single point information with time tag m-sp-ta-1
+			3 Double point information m-dp-na-1
+			4 Double point information with time tag m-dp-ta-1
+			5 Step position information m-st-na-1
+			6 Step position information with time tag m-st-ta-1
+			7 Bit string of 32 bit m-bo-na-1
+			8 Bit string of 32 bit with time tag m-bo-ta-1
+			9 Measured value, normalized value m-me-na-1
+			10 Measured value, normalized value with time tag m-me-ta-1
+			11 Measured value, scaled value m-me-nb-1
+			12 Measured value, scaled value with time tag m-me-tb-1
+			13 Measured value, short floating point value m-me-nc-1
+			14 Measured value, short floating point value with time tag m-me-tc-1
+			15 Integrated totals m-it-na-1
+			16 Integrated totals with time tag m-it-ta-1
+			17 Event of protection equipment with time tag m-ep-ta-1
+			18 Packed start events of protection equipment with time tag m-ep-tb-1
+			19 Packed output circuit information of protection equipment with time tag m-ep-tc-1
+			20 Packed single-point information with status change detection m-ps-na-1
+			21 Measured value, normalized value without quality descriptor m-me-nd-1
+			30 Single point information with time tag cp56time2a m-sp-tb-1
+			31 Double point information with time tag cp56time2a m-dp-tb-1
+			32 Step position information with time tag cp56time2a m-st-tb-1
+			33 Bit string of 32 bit with time tag cp56time2a m-bo-tb-1
+			34 Measured value, normalized value with time tag cp56time2a m-me-td-1
+			35 Measured value, scaled value with time tag cp56time2a m-me-te-1
+			36 Measured value, short floating point value with time tag cp56time2a m-me-tf-1
+			37 Integrated totals with time tag cp56time2a m-it-tb-1
+			38 Event of protection equipment with time tag cp56time2a m-ep-td-1
+			39 Packed start events of protection equipment with time tag cp56time2a m-ep-te-1
+			40 Packed output circuit information of protection equipment with time tag cp56time2a m-ep-tf-1
+			45 Single command c-sc-na-1
+			46 Double command c-dc-na-1
+			47 Regulating step command c-rc-na-1
+			48 Setpoint command, normalized value c-se-na-1
+			49 Setpoint command, scaled value c-se-nb-1
+			50 Setpoint command, short floating point value c-se-nc-1
+			51 Bit string 32 bit c-bo-na-1
+			58 Single command with time tag cp56time2a c-sc-ta-1
+			59 Double command with time tag cp56time2a c-dc-ta-1
+			60 Regulating step command with time tag cp56time2a c-rc-ta-1
+			61 Setpoint command, normalized value with time tag cp56time2a c-se-ta-1
+			62 Setpoint command, scaled value with time tag cp56time2a c-se-tb-1
+			63 Setpoint command, short floating point value with time tag cp56time2a c-se-tc-1
+			64 Bit string 32 bit with time tag cp56time2a c-bo-ta-1
+			70 End of initialization m-ei-na-1
+			100 (General-) Interrogation command c-ic-na-1
+			101 Counter interrogation command c-ci-na-1
+			102 Read command c-rd-na-1
+			103 Clock synchronization command c-cs-na-1
+			104 ( IEC 101 ) Test command c-ts-nb-1
+			105 Reset process command c-rp-nc-1
+			106 ( IEC 101 ) Delay acquisition command c-cd-na-1
+			107 Test command with time tag cp56time2a c-ts-ta-1
+			110 Parameter of measured value, normalized value p-me-na-1
+			111 Parameter of measured value, scaled value p-me-nb-1
+			112 Parameter of measured value, short floating point value p-me-nc-1
+			113 Parameter activation p-ac-na-1
+			120 File ready f-fr-na-1
+			121 Section ready f-sr-na-1
+			122 Call directory, select file, call file, call section f-sc-na-1
+			123 Last section, last segment f-ls-na-1
+			124 Ack file, Ack section f-af-na-1
+			125 Segment f-sg-na-1
+			126 f-dr-ta-1
+			127 QueryLog - Request archive file f-sc-nb-1
+			128-135 reserved for routing of messages
+			136-255 reserved for special use"
+	DEFVAL  { "" }
+	::= { hm2DPIProfileIEC104Entry 11 }
+
+hm2DPIProfileIEC104OriginatorAddrList OBJECT-TYPE
+	SYNTAX HmExtraLargeDisplayString ( SIZE(0..1400) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Allowed Originator addresses for this enforcer as string.
+		Allowed format for originator address list:
+		- index range with first and last index separated by hyphen
+		('10-15')
+		- comma separated list of index ('12,25,123')
+		- combination of the points above ('10,25-30,125,300')
+		Note: The user can define any number between 0-255. The originator 
+		address must be a number (in decimal format).
+		Following Originator addresses are defined:
+		<0..255> (only the selected Originator addresses will be allowed)"
+	DEFVAL  { "" }
+	::= { hm2DPIProfileIEC104Entry 12 }
+
+hm2DPIProfileIEC104CauseOfTransmissionSize OBJECT-TYPE
+	SYNTAX Integer32 ( 1..2 )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to default value 2 for the latest protocol, set to 1 for legacy protocol"
+	DEFVAL { 2 }
+	::= { hm2DPIProfileIEC104Entry 13 }
+
+hm2DPIProfileIEC104CommonAddressSize OBJECT-TYPE
+	SYNTAX Integer32 ( 1..2 )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to default value 2 for the latest protocol, set to 1 for legacy protocol"
+	DEFVAL { 2 }
+	::= { hm2DPIProfileIEC104Entry 14 }
+
+hm2DPIProfileIEC104IOAddressSize OBJECT-TYPE
+	SYNTAX Integer32 ( 1..3 )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	        "Set to default value 3 for the latest protocol, set to 2 or 1 for legacy protocol"
+	DEFVAL { 3 }
+	::= { hm2DPIProfileIEC104Entry 15 }
+
+hm2DPIProfileIEC104AllowIEC101 OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to 'enable' if Type IDs that are defined for the old IEC 101 standard have to be allowed"
+	DEFVAL { disable }
+	::= { hm2DPIProfileIEC104Entry 16 }
+
+--******************************************************************************
+--                         Ethernet/IP Profile Table
+--******************************************************************************
+
+hm2DPIProfileEnipTable OBJECT-TYPE 
+	SYNTAX SEQUENCE OF Hm2DPIProfileEnipEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The list of DPI EtherNet/IP profiles for this enforcer"
+	::= { hm2DPIProfileTables 4 }
+
+hm2DPIProfileEnipEntry OBJECT-TYPE
+	SYNTAX Hm2DPIProfileEnipEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"DPI EtherNet/IP profile entry."
+	INDEX { hm2DPIProfileEnipIndex }
+	::= { hm2DPIProfileEnipTable 1 }
+
+Hm2DPIProfileEnipEntry ::=
+	SEQUENCE {
+		hm2DPIProfileEnipIndex Integer32,
+		hm2DPIProfileEnipDescription SnmpAdminString,
+		hm2DPIProfileEnipFunctionType INTEGER,
+		hm2DPIProfileEnipSanityCheck HmEnabledStatus,
+		hm2DPIProfileEnipDebug HmEnabledStatus,
+		hm2DPIProfileEnipRowStatus RowStatus,
+		hm2DPIProfileEnipDefaultObjectList HmExtraLargeDisplayString,
+		hm2DPIProfileEnipWildCardServices HmLargeDisplayString,
+		hm2DPIProfileEnipAllowEmbPCCC HmEnabledStatus,
+		hm2DPIProfileEnipTcpReset HmEnabledStatus
+	}
+
+hm2DPIProfileEnipIndex OBJECT-TYPE
+	SYNTAX Integer32 ( 1..32 )
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"Profile index of this DPI EtherNet/IP profile"
+	::= { hm2DPIProfileEnipEntry 1 }
+
+hm2DPIProfileEnipDescription OBJECT-TYPE
+	SYNTAX SnmpAdminString ( SIZE(0..32) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"User defined textual description related to this profile."
+	DEFVAL { "enip" }
+	::= { hm2DPIProfileEnipEntry 2 }
+
+hm2DPIProfileEnipFunctionType OBJECT-TYPE
+ 	 SYNTAX INTEGER {
+			readonly(1),
+			readwrite(2),
+			any(3),
+			advanced(4)
+ 	 }
+ 	 MAX-ACCESS read-create
+ 	 STATUS current
+ 	 DESCRIPTION
+ 	 	 "The function types of the corresponding commands:
+ 	 	 o readonly(1): Selects read only commands for the command list.
+ 	 	 o readwrite(2): Selects read write commands for the command list.
+		 o any(3): Selects all possible commands for the command list. Any command will be allowed.
+	 	 o advanced(4): Keeps the command list from the previous selection and makes it editable by the user."
+	DEFVAL { any }
+	::= { hm2DPIProfileEnipEntry 3 }
+
+hm2DPIProfileEnipSanityCheck OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"If a sanity check including format and specification
+		for all packets shall be done, then it must be enabled."
+	DEFVAL { enable }
+	::= { hm2DPIProfileEnipEntry 4 }
+
+hm2DPIProfileEnipDebug OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Enables or disables the debug information in a reset connection message.
+		If a reset connection message shall contain debug information, then it must be enabled."
+	DEFVAL { disable }
+	::= { hm2DPIProfileEnipEntry 5 }
+
+hm2DPIProfileEnipRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"This is a standard row status value:
+            - active(1): The profile is active. You cannot modify it.
+            - notInService(2): The profile is inactive because of user action.
+              You cannot inactivate the profile if an active enforcer mappings to it.
+            - notReady(3): The profile is inactive because of agent action.
+            - createAndGo(4): Create the profile with default parameters
+              activated.
+            - createAndWait(5): Create the profile inactive.
+            - destroy(6): Delete the profile.
+              You cannot delete the active profile or if an enforcer mappings to it."
+	::= { hm2DPIProfileEnipEntry 6 }
+
+hm2DPIProfileEnipDefaultObjectList OBJECT-TYPE
+	SYNTAX  HmExtraLargeDisplayString( SIZE(1..1280) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Index of entries to be included from default object list
+		 as per ENIP standard.
+		 Allowed formats are: (Index range <1-347>)
+		- keyword 'none' for excluding and 'all' for including the default object list.
+		- any single index (e.g. 10)
+		- index range with first and last index separated by hyphen
+		  (e.g. '10-15')
+		- comma separated list of index (e.g. 12,25,123)
+		- combination of the points above (e.g. 10,25-30,125,300)
+		- Total number of decimal values can be up to 347."
+	DEFVAL { "none" }
+	::= { hm2DPIProfileEnipEntry 7 }
+
+hm2DPIProfileEnipWildCardServices OBJECT-TYPE
+	SYNTAX HmLargeDisplayString ( SIZE(0..640) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Multiple service codes can be listed separated by a comma (',')
+		- single service code (eg: 0x10)
+		- comma separated list of service codes (eg: 0x12,0x31,0x5F)
+		- Service code starts from 0x00 and cannot be greater than 0x7F
+		- Total number of hexa-decimal values can be specified upto 128."
+	DEFVAL { "" }
+	::= { hm2DPIProfileEnipEntry 8 }
+
+hm2DPIProfileEnipAllowEmbPCCC OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Enables or disables the DPI on PCCC messages.
+		If DPI is required on PCCC messages that are encapsulated within CIP objects,
+		then Allow embedded PCCC must be enabled."
+	DEFVAL { disable }
+	::= { hm2DPIProfileEnipEntry 9 }
+
+hm2DPIProfileEnipTcpReset OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Enables or disables the resetting  of TCP connection.
+		The reset connection message shall be sent in case a packet is dropped, if TCP reset is enabled."
+	DEFVAL { enable }
+	::= { hm2DPIProfileEnipEntry 10 }
+
+--******************************************************************************
+--                         Ethernet/IP Object Table
+--******************************************************************************
+
+hm2DPIObjectEnipTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2DPIObjectEnipEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The list of DPI EtherNet/IP objects and services for this enforcer"
+	::= { hm2DPIProfileTables 5 }
+
+hm2DPIObjectEnipEntry OBJECT-TYPE
+	SYNTAX Hm2DPIObjectEnipEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"DPI EtherNet/IP object entry."
+	INDEX { hm2DPIProfileEnipIndex, hm2DPIObjectEnipClassId }
+	::= { hm2DPIObjectEnipTable 1 }
+
+Hm2DPIObjectEnipEntry ::=
+	SEQUENCE {
+		hm2DPIObjectEnipClassId EnipClassId,
+		hm2DPIObjectEnipServices HmLargeDisplayString,
+		hm2DPIObjectEnipDescription DisplayString,
+		hm2DPIObjectEnipRowStatus RowStatus
+	}
+
+hm2DPIObjectEnipClassId OBJECT-TYPE
+	 SYNTAX EnipClassId
+	 MAX-ACCESS not-accessible
+	 STATUS current
+	 DESCRIPTION
+		"The object class ID values used in the class ID and service combination.
+		 Values ranging from 0x00 to 0xFFFFFFFF (0 to 4294967295) are
+		 interpreted as the Enip Class ID
+
+		 Following classes are defined:
+		         0x0000 - 0x0063 CIP Common
+		         0x0064 - 0x00C7 Vendor Specific
+		         0x00F0 - 0x02FF CIP Common
+		         0x0300 - 0x04FF Vendor Specific
+		 WARNING: The enip command, service and class codes will be combined to generate an
+		 internal configuration file. Number of CIP objects created directly increases the 
+		 size of the configuration file, which may increase forwarding time."
+	::= { hm2DPIObjectEnipEntry 1 }
+
+hm2DPIObjectEnipServices OBJECT-TYPE
+	SYNTAX HmLargeDisplayString ( SIZE(0..640) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The services codes are allowed as string.
+		A service has the syntax:
+			<0xval>
+		- Services are separated by a comma and are formated in hex (e.g. 0x00 to 0x7F).
+		- Services start from 0x00 and cannot be greater than 0x7F.
+		- Total number of hexa-decimal values can be specified upto 128.
+		A few of the defined service codes are listed below:
+			0x01 Get Attributes All
+			0x02 Set Attributes All
+			0x03 Get Attributes List
+			0x04 Set Attributes List
+			0x05 Reset
+			0x06 Start
+			0x07 Stop
+			0x08 Create
+			0x09 Delete
+			0x0A Multiple Service Packet
+			0x0D Apply Attributes
+			0x0E Get Attribute Single
+			0x10 Set Attribute Single
+			0x11 Find Next Object Instance
+			0x15 Restore
+			0x16 Save
+			0x17 Nop
+			0x18 Get Member
+			0x19 Set Member
+			0x1A Insert Member
+			0x1B Remove Member
+			0x1C Group Sync
+			0x32 - 0x4A Vendor Specific
+			0x4B - 0x63 Object Class Specific
+
+		WARNING: The command, service and class codes will be combined to generate an
+		internal configuration file. Number of CIP service codes created directly increases
+		the size of the configuration file, which may increase forwarding time."
+	DEFVAL { "" }
+	::= { hm2DPIObjectEnipEntry 2 }
+
+hm2DPIObjectEnipDescription OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(0..32) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"User defined textual description related to the ENIP object class ID and services."
+	DEFVAL { "" }
+	::= { hm2DPIObjectEnipEntry 3 }
+
+hm2DPIObjectEnipRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"This is a standard row status value:
+            - active(1): The profile is active. You cannot modify it.
+            - notInService(2): The profile is inactive because of user action.
+              You cannot inactivate the profile if an active enforcer mappings to it.
+            - notReady(3): The profile is inactive because of agent action.
+            - createAndGo(4): Create the profile with default parameters
+              activated.
+            - createAndWait(5): Create the profile inactive.
+            - destroy(6): Delete the profile.
+              You cannot delete the active profile or if an enforcer mappings to it."
+	::= { hm2DPIObjectEnipEntry 4 }
+
+hm2DPIProfileDnp3Table OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2DPIProfileDnp3Entry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The list of DPI DNP3 profiles for this enforcer"
+	::= { hm2DPIProfileTables 6 }
+
+hm2DPIProfileDnp3Entry OBJECT-TYPE
+	SYNTAX Hm2DPIProfileDnp3Entry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"DPI DNP3 profile entry."
+	INDEX { hm2DPIProfileDnp3Index }
+	::= { hm2DPIProfileDnp3Table 1 }
+
+Hm2DPIProfileDnp3Entry ::=
+	SEQUENCE {
+		hm2DPIProfileDnp3Index Integer32,
+		hm2DPIProfileDnp3Description DisplayString,
+		hm2DPIProfileDnp3FunctionCodeList HmExtraLargeDisplayString,
+		hm2DPIProfileDnp3DefaultWhiteList HmExtraLargeDisplayString,
+		hm2DPIProfileDnp3CrcCheck TruthValue,
+		hm2DPIProfileDnp3SanityCheck TruthValue,
+		hm2DPIProfileDnp3CheckOutstationTraffic TruthValue,
+		hm2DPIProfileDnp3TcpReset TruthValue,
+		hm2DPIProfileDnp3RowStatus RowStatus
+	}
+
+hm2DPIProfileDnp3Index OBJECT-TYPE
+	SYNTAX Integer32 ( 1..32 )
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"Profile index of this DPI DNP3 profile"
+	::= { hm2DPIProfileDnp3Entry 1 }
+
+hm2DPIProfileDnp3Description OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(0..32) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"User defined textual description related to this profile."
+	DEFVAL { "Dnp3" }
+	::= { hm2DPIProfileDnp3Entry 2 }
+
+hm2DPIProfileDnp3FunctionCodeList OBJECT-TYPE
+	SYNTAX HmExtraLargeDisplayString ( SIZE(1..1400) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The function codes for this enforcer as string.
+		A function code has the syntax:
+		    <val>
+		If more than one value is given for a function code, values are
+		separated by a , sign (comma).
+		Note: The user can define any number between 0-255. The code must be a number (in decimal format).
+		Following function codes are defined by the DNP3 standard IEEE 1815-2012: 
+			0	confirm 
+			1	read 
+			2	write 
+			3	select 
+			4	operate 
+			5	direct_operate 
+			6	direct_operate_nr 
+			7	immed_freeze 
+			8	immed_freeze_nr 
+			9	freeze_clear 
+			10	freeze_clear_nr 
+			11	freeze_at_time 
+			12	freeze_at_time_nr 
+			13	cold_restart 
+			14	warm_restart 
+			15	initialize_data 
+			16	initialize_appl 
+			17	start_appl 
+			18	stop_appl 
+			19	save_config 
+			20	enable_unsolicited 
+			21	disable_unsolicited 
+			22	assign_class 
+			23	delay_measure 
+			24	record_current_time 
+			25	open_file 
+			26	close_file 
+			27	delete_file 
+			28	get_file_info 
+			29	authenticate_file 
+			30	abort_file 
+			31	activate_config 
+			32	authenticate_req 
+			33	authenticate_err 
+			129	response 
+			130	unsolicited_response 
+			131	authenticate_resp"
+	DEFVAL  {   "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,
+				20,21,22,23,24,25,26,27,28,29,30,31,32,33,129,130,131" }
+	::= { hm2DPIProfileDnp3Entry 3 }
+
+hm2DPIProfileDnp3DefaultWhiteList OBJECT-TYPE
+	SYNTAX HmExtraLargeDisplayString ( SIZE(1..1400) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Index of entries to be included from Default White list
+		 of objects as per DNP3 standard IEEE 1815-2012.
+		 Allowed formats are: (Index range <1-317>) 
+		- keyword 'none' for excluding and 'all' for including default whitelist.
+		- single index ('10')
+		- index range with first and last index separated by hyphen 
+		  ('10-15')
+		- comma separated list of index ('12,25,123')
+		- combination of the points above ('10,25-30,125,300')"
+	DEFVAL { "all" }
+	::= { hm2DPIProfileDnp3Entry 4 }
+
+hm2DPIProfileDnp3CrcCheck OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"This option makes DNP3 enforcer validate the 
+		checksum contained in dnp3 link-layer frames. 
+		Frames with invalid checksums will be ignored"
+	DEFVAL { true }
+	::= { hm2DPIProfileDnp3Entry 5 }
+
+hm2DPIProfileDnp3SanityCheck OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true for which all
+		sanity checks shall be done"
+	DEFVAL { true }
+	::= { hm2DPIProfileDnp3Entry 6 }
+
+hm2DPIProfileDnp3CheckOutstationTraffic OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true to make dnp3 enforcer check packets originating at an outstation"
+	DEFVAL { false }
+	::= { hm2DPIProfileDnp3Entry 7 }
+
+hm2DPIProfileDnp3TcpReset OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Set to true if apply to packets for which a reset connection
+		message shall be sent on ingress and egress ports"
+	DEFVAL { true }
+	::= { hm2DPIProfileDnp3Entry 8 }
+
+hm2DPIProfileDnp3RowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"This is a standard row status value:
+            - active(1): The profile is active. You cannot modify it.
+            - notInService(2): The profile is inactive because of user action.
+              You cannot inactivate the profile if an active enforcer mappings to it.
+            - notReady(3): The profile is inactive because of agent action.
+            - createAndGo(4): Create the profile with default parameters
+              activated.
+            - createAndWait(5): Create the profile inactive.
+            - destroy(6): Delete the profile.
+              You cannot delete the active profile or if an enforcer mappings to it."
+	::= { hm2DPIProfileDnp3Entry 9 }
+
+
+
+hm2DPIProfileDnp3ObjectTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2DPIProfileDnp3ObjectEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The list of DPI DNP3 object codes"
+	::= { hm2DPIProfileTables 7 }
+
+hm2DPIProfileDnp3ObjectEntry OBJECT-TYPE
+	SYNTAX Hm2DPIProfileDnp3ObjectEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"DPI DNP3 object code entry."
+	INDEX { hm2DPIProfileDnp3Index, hm2DPIProfileDnp3ObjectIndex }
+	::= { hm2DPIProfileDnp3ObjectTable 1 }
+
+Hm2DPIProfileDnp3ObjectEntry ::=
+	SEQUENCE {
+		hm2DPIProfileDnp3ObjectIndex Integer32,
+		hm2DPIProfileDnp3ObjectType INTEGER,
+		hm2DPIProfileDnp3ObjectGroupno Integer32,
+		hm2DPIProfileDnp3ObjectVariation DisplayString,
+		hm2DPIProfileDnp3ObjectFunction Integer32,
+		hm2DPIProfileDnp3ObjectQualifier DisplayString,
+		hm2DPIProfileDnp3ObjectLength DisplayString,
+		hm2DPIProfileDnp3ObjectFuncName DisplayString,
+		hm2DPIProfileDnp3ObjectRowStatus RowStatus
+	}
+
+hm2DPIProfileDnp3ObjectIndex OBJECT-TYPE
+	SYNTAX Integer32 ( 1..256 )
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"An index that (together with the DPI
+		index hm2DPIProfileDnp3Index) identifies the entry
+		in the object code list table. This index can
+		be choosen freely, but must be greater than 0."
+	::= { hm2DPIProfileDnp3ObjectEntry 1 }
+
+hm2DPIProfileDnp3ObjectType	OBJECT-TYPE
+	SYNTAX		INTEGER {
+			request(1),
+			response(2)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Set the object type for DNP3 object code list."
+	::= { hm2DPIProfileDnp3ObjectEntry 2 }
+
+hm2DPIProfileDnp3ObjectGroupno OBJECT-TYPE
+	SYNTAX	Integer32 ( 0..255)
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+		"Group number for object code list."
+	::= { hm2DPIProfileDnp3ObjectEntry 3 }
+
+hm2DPIProfileDnp3ObjectVariation OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(0..32) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Variation number for object code list"
+	::= { hm2DPIProfileDnp3ObjectEntry 4 }
+
+hm2DPIProfileDnp3ObjectFunction OBJECT-TYPE
+	SYNTAX	Integer32 ( 0..255)
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+		"Function code number for object code list."
+	::= { hm2DPIProfileDnp3ObjectEntry 5 }
+
+hm2DPIProfileDnp3ObjectQualifier OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(0..255) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Qualifier codes for Object codes."
+	::= { hm2DPIProfileDnp3ObjectEntry 6 }
+
+hm2DPIProfileDnp3ObjectLength OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(0..32) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Object length defined for corresponding object codes."
+	::= { hm2DPIProfileDnp3ObjectEntry 7 }
+
+hm2DPIProfileDnp3ObjectFuncName OBJECT-TYPE
+	SYNTAX DisplayString ( SIZE(0..32) )
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Corresponding function name for function no in Object code."
+	::= { hm2DPIProfileDnp3ObjectEntry 8 }
+
+hm2DPIProfileDnp3ObjectRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"This is a standard row status value:
+            - active(1): The profile is active. You cannot modify it.
+            - notInService(2): The profile is inactive because of user action.
+              You cannot inactivate the profile if an active enforcer mappings to it.
+            - notReady(3): The profile is inactive because of agent action.
+            - createAndGo(4): Create the profile with default parameters
+              activated.
+            - createAndWait(5): Create the profile inactive.
+            - destroy(6): Delete the profile.
+              You cannot delete the active profile or if an enforcer mappings to it.
+		The row status of this table entry. Only entries with an 'active'
+		row status will be considered if the dnp3 row status is set 'active'.
+		Independent of that dependency any value in this entry can be changed only if the row
+		status is not 'active'."
+	::= { hm2DPIProfileDnp3ObjectEntry 9 }
+
+--******************************************************************************
+--                         Firewall Learning Mode
+--******************************************************************************
+
+hm2FLMObjects OBJECT IDENTIFIER ::= { hm2FwLearningMode 1 }
+
+hm2FLMAdminState	OBJECT-TYPE
+	SYNTAX		HmEnabledStatus
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Enable or disable the Firewall Learning Mode."
+	DEFVAL		{ disable }
+	::= { hm2FLMObjects 1 }
+
+hm2FLMAction		OBJECT-TYPE
+	SYNTAX		INTEGER {
+			none(1),
+			start(2),
+			stop(3),
+			continue(4),
+			clear(5)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Actions to control the Firewall Learning Mode."
+	DEFVAL  { none }
+	::= { hm2FLMObjects 2 }
+
+hm2FLMAppState	OBJECT-TYPE
+	SYNTAX		INTEGER {
+			off(1),
+			stopped-data-notpresent(2),
+			stopped-data-present(3),
+			learning(4),
+			pending(5)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"State of running FLM Application."
+	::= { hm2FLMObjects 3 }
+
+hm2FLMAppInfoEnum	OBJECT-TYPE
+	SYNTAX		INTEGER {
+			none(1),
+			normal(2),
+			low-memory(3),
+			out-of-memory(4),
+			connection-drop(5)
+			}
+	MAX-ACCESS   read-only
+	STATUS 	current
+	DESCRIPTION
+		"Memory status of FLM Application."
+	::= { hm2FLMObjects 4 }
+
+hm2FLMAppInfoString	OBJECT-TYPE
+	SYNTAX		SnmpAdminString (SIZE (0..80))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Special status message."
+	::= { hm2FLMObjects 5 }
+
+hm2FLML3Entries	OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of Layer 3 entries in the connection table."
+	::= { hm2FLMObjects 6 }
+
+hm2FLMFreeMem		OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Free memory(%) for learning data."
+	::= { hm2FLMObjects 7 }
+
+hm2FLMMaxEntries	OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of maximum interface entries that can be selected."
+	::= { hm2FLMObjects 8 }
+
+hm2FLMTables  OBJECT IDENTIFIER ::= { hm2FwLearningMode 2 }
+
+hm2FLMInterfaceTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF Hm2FLMInterfaceEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The list of interfaces selected for Firewall Learning Mode."
+	::= { hm2FLMTables 1 }
+
+hm2FLMInterfaceEntry	OBJECT-TYPE
+	SYNTAX		Hm2FLMInterfaceEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Interface selected for Firewall Learning Mode."
+	INDEX { hm2FLMInterfaceIndex }
+	::= { hm2FLMInterfaceTable 1 }
+
+Hm2FLMInterfaceEntry ::=
+	SEQUENCE {
+		hm2FLMInterfaceIndex InterfaceIndex,
+		hm2FLMInterfaceRowStatus RowStatus
+	}
+
+hm2FLMInterfaceIndex	OBJECT-TYPE
+	SYNTAX		InterfaceIndex
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Interface index of the entry."
+	::= { hm2FLMInterfaceEntry 1 }
+
+hm2FLMInterfaceRowStatus	OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This is a standard row status value:
+            - active(1): The interface is active. 
+            - notInService(2): The interface is inactive because routing was disabled.
+            - notReady(3): The interface is inactive because of agent action.
+            - createAndGo(4): Create the interface with default parameters
+              activated.
+            - createAndWait(5): Create the interface inactive.
+            - destroy(6): Delete the interface."
+	::= { hm2FLMInterfaceEntry 2 }
+
+
+--******************************************************************************
+--				Intrusion Detection System
+--******************************************************************************
+hm2IDSObjects OBJECT IDENTIFIER ::= { hm2FwIdsGroup 1 } 
+
+hm2IDSUserName OBJECT-TYPE
+	SYNTAX		SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS	read-write
+    STATUS		current
+    DESCRIPTION
+        "IDS Agent user name is an administrator privilege user from the 
+         user database ."
+    ::= { hm2IDSObjects 1 }
+
+hm2IDSIsRunning OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This value describes whether the IDS feature is running or not"
+    DEFVAL { false }
+    ::= { hm2IDSObjects 2 }
+
+hm2IDSAdminState OBJECT-TYPE
+    SYNTAX HmEnabledStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/Disable This value describes, whether the operator has enabled IDS feature
+        on the device or not"
+    DEFVAL { disable }
+    ::= { hm2IDSObjects 3 }
+
+
+--******************************************************************************
+--                         L2 General Settings Objects
+--******************************************************************************
+hm2L2FwGeneralSettings OBJECT IDENTIFIER ::= { hm2L2FwGroup 1 }
+
+hm2L2MaxRules OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Maximum number of allowed rules for L2 filtering."
+    ::= { hm2L2FwGeneralSettings 1 }
+
+hm2L2DefaultPolicy OBJECT-TYPE
+    SYNTAX INTEGER {
+            accept(1),
+            drop(2)
+            }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The default policy for forwarding packets:
+        o accept(1): Packets matching this rule are accepted and will 
+          be forwarded
+        o drop(2): Packets matching this rule will be silently
+          discarded"
+    DEFVAL { accept }
+    ::= { hm2L2FwGeneralSettings 2 }
+ 
+hm2L2ValidateFCS OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Activate/Deactivate the validation of FCS."
+    DEFVAL { true }
+    ::={ hm2L2FwGeneralSettings 3 }
+
+--**************************************************************
+--          L2 Filter Rule
+--**************************************************************
+hm2L2RuleAppliedTrap NOTIFICATION-TYPE
+    OBJECTS { hm2L2RuleIndex }
+    STATUS current
+    DESCRIPTION
+        "A rule of the L2 firewall was applied. The rule is
+         identified by the given rule index of the rule table."
+    ::= { hm2FwNotifications 5 }
+
+hm2L2RuleAppliedAndLoggedTrap NOTIFICATION-TYPE
+    OBJECTS { hm2L2RuleIndex }
+    STATUS current
+    DESCRIPTION
+        "A rule of the L2 firewall was applied and logged according
+         the current logging mechanism. The rule is identified by the
+         given rule index of the rule table."
+    ::= { hm2FwNotifications 6 }
+
+hm2L2RuleObjects OBJECT IDENTIFIER ::= { hm2L2FwGroup 2 }
+
+hm2L2RuleCount OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of current L2 rules"
+    ::= { hm2L2RuleObjects 1 }
+
+hm2L2IfMappingRuleCount OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of current L2 IF mapping entries."
+    ::={ hm2L2RuleObjects 2 }
+
+hm2L2RulePendingActions OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This value describes, whether the L2 rule table was modified
+         but not yet written to the firewall implementation (set to
+         true). After writing all modifications to the firewall, the
+         value switches automatically back to false."
+    DEFVAL { false }
+    ::={ hm2L2RuleObjects 3 }
+
+hm2L2CommitPendingActions OBJECT-TYPE
+    SYNTAX HmActionValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Setting this value to action(2) writes not yet committed changes
+         to the firewall (L2 and Interface Mapping Table). After writing
+         all modifications, the value switches automatically back to
+         noop(1)."
+    DEFVAL { noop }
+    ::={ hm2L2RuleObjects 4 }
+
+hm2L2RuleTables OBJECT IDENTIFIER ::= { hm2L2FwGroup 3 }
+
+hm2L2RuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hm2L2RuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of layer 2 Filter rule instances."
+    ::= { hm2L2RuleTables 1 }
+
+hm2L2RuleEntry OBJECT-TYPE
+    SYNTAX      Hm2L2RuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of layer 2 Filter classification rules."
+    INDEX       { hm2L2RuleIndex }
+    ::= { hm2L2RuleTable 1 }
+
+Hm2L2RuleEntry ::= SEQUENCE {
+    hm2L2RuleIndex Integer32,
+    hm2L2RuleHitCount Counter64,
+    hm2L2RuleAction INTEGER,
+    hm2L2RuleDestMacAddr DisplayString,
+    hm2L2RuleSrcMacAddr DisplayString,
+    hm2L2RuleEtypeKey INTEGER,
+    hm2L2RuleEtypeValue EtypeValue,
+    hm2L2RuleVlanId Integer32,
+    hm2L2RuleDestIpAddr DisplayString,
+    hm2L2RuleSrcIpAddr DisplayString,
+    hm2L2RuleProtocol Integer32,
+    hm2L2RuleIpTosBits Integer32,
+    hm2L2RuleDestPort DisplayString,
+    hm2L2RuleSrcPort DisplayString,
+    hm2L2RuleAssignQueueId Unsigned32,
+    hm2L2RuleRateLimitCrate Unsigned32,
+    hm2L2RuleRateLimitCburst AclBurstSize,
+    hm2L2RuleRateLimitCrateUnit INTEGER,
+    hm2L2FwTrap TruthValue,
+    hm2L2RuleDescription DisplayString,
+    hm2L2RuleLog TruthValue,
+    hm2L2RuleStatsAction INTEGER,
+    hm2L2RowStatus RowStatus,
+    hm2L2DPIProfileIndex Integer32,
+    hm2L2RuleProtoName DisplayString,
+    hm2L2AppRuleName DisplayString
+    }
+
+hm2L2RuleIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2048)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of this rule instance within an Filter."
+    ::= { hm2L2RuleEntry 1 }
+
+hm2L2RuleHitCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets that matched the L2 rule."
+    ::= { hm2L2RuleEntry 2 }
+
+hm2L2RuleAction OBJECT-TYPE
+    SYNTAX INTEGER {
+            accept(1),
+            drop(2),
+            enforce-modbus(4),
+            enforce-opc(5),
+            enforce-iec104(6),
+            enforce-ethernetip(7),
+            enforce-dnp3(8),
+            enforce-amp(9)
+    }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The action of the corresponding rule:
+         o accept(1): Packets matching this rule are accepted and will 
+           be forwarded
+         o drop(2): Packets matching this rule will be silently discarded
+         o enforce-modbus(4): Packets matching this rule are enforced by
+           modbus enforcer and will be forwarded or discarded.
+           The selected protocol should be tcp or udp
+         o enforce-opc(5): Packets matching this rule are enforced by
+           opc enforcer and will be forwarded or discarded.
+           The selected protocol should be tcp
+         o enforce-iec104(6): Packets matching this rule are enforced by
+           IEC104 enforcer and will be forwarded or discarded.
+           The selected protocol should be tcp
+         o enforce-ethernetip(7): Packets matching this rule are enforced by
+           EtherNet/IP enforcer and will be forwarded or discarded.
+           The selected protocol should be TCP.
+         o enforce-dnp3(8): Packets matching this rule are enforced by
+           dnp3 enforcer and will be forwarded or discarded.
+           The selected protocol should be tcp.
+         o enforce-amp(9): Packets matching this rule will be forwarded or
+           discarded based on AMP enforcer rules.
+           The selected protocol must be TCP."
+    ::= { hm2L2RuleEntry 3 }
+
+hm2L2RuleDestMacAddr OBJECT-TYPE
+    SYNTAX      DisplayString ( SIZE(1..32) )
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The destination MAC address used in the Filter classification
+        or Asset name from hm2AssetTable.
+		"
+    ::= { hm2L2RuleEntry 4 }
+ 
+hm2L2RuleSrcMacAddr OBJECT-TYPE
+    SYNTAX      DisplayString ( SIZE(1..32) )
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The source MAC address used in the Filter classification
+        or Asset name from hm2AssetTable.
+		"
+    ::= { hm2L2RuleEntry 5 }
+
+hm2L2RuleEtypeKey OBJECT-TYPE
+    SYNTAX  INTEGER {
+        custom(1),
+        appletalk(2),
+        arp(3),
+        ibmsna(4),
+        ipv4(5),
+        ipv6(6),
+        ipxold(7),
+        mplsmcast(8),
+        mplsucast(9),
+        netbios(10),
+        novell(11),
+        pppoedisc(12),
+        rarp(13),
+        pppoesess(14),
+        ipxnew(15),
+        profinet(16),
+        powerlink(17),
+        ethercat(18),
+        ieee8021q(19)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Ethertype keyword used in the Filter classification.
+         A keyword of custom(1) requires that the hm2L2RuleEtypeValue
+         object also be set."
+    ::= { hm2L2RuleEntry 6 }
+
+hm2L2RuleEtypeValue OBJECT-TYPE
+    SYNTAX  EtypeValue
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The Ethertype custom value used in the Filter classification.
+         This object is only valid if the hm2L2RuleEtypeKey is set to
+         custom(1).  Values ranging from 0x0600 to 0xFFFF
+         (1536 to 65535) are interpreted as the Ethertype.
+         Lower values are interpreted as frame size.
+         A value of 0 indicates that this field is not used."
+    ::= { hm2L2RuleEntry 7 }
+
+hm2L2RuleVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 1..4042)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The VLAN ID value used in the Filter classification.
+         The VLAN ID field is defined as the 12-bit VLAN identifier
+         in the 802.1Q tag header of a tagged Ethernet frame which is
+         contained in the first/outer tag of a double VLAN tagged frame.
+         -1 no VLAN or disabled"
+    ::= { hm2L2RuleEntry 8 }
+
+hm2L2RuleSrcIpAddr OBJECT-TYPE
+    SYNTAX      DisplayString ( SIZE(1..32) )
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The source IP address in cidr or Asset name from hm2AssetTable."
+    ::= { hm2L2RuleEntry 9 }
+
+hm2L2RuleDestIpAddr OBJECT-TYPE
+    SYNTAX      DisplayString ( SIZE(1..32) )
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Destination IP address in cidr or Asset name from hm2AssetTable."
+    ::= { hm2L2RuleEntry 10 }
+
+hm2L2RuleProtocol OBJECT-TYPE
+    SYNTAX   Integer32 {
+                 icmp(1),
+                 igmp(2),
+                 ipip(3),
+                 tcp(4),
+                 udp(5),
+                 esp(6),
+                 ah(7),
+                 icmpv6(8),
+                 any(9)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+             "The IP protocol (RFC 791) for protocol-independent
+             filtering. The following values are currently
+             supported:
+             o  icmp(1): internet control message protocol (RFC 792)
+             o  igmp(2): internet group management protocol
+             o  ipip(3): IP in IP tunnelling (RFC 1853)
+             o  tcp(4): transmission control protocol (RFC 793)
+             o  udp(5): user datagram protocol (RFC 768)
+             o  esp(6): IPsec encapsulated security payload (RFC 2406)
+             o  ah(7): IPsec authentication header (RFC 2402)
+             o  icmpv6(8): internet control message protocol for IPv6
+             o  any(9): apply to all protocols"
+    ::= { hm2L2RuleEntry 11 }
+
+hm2L2RuleIpTosBits OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current 
+    DESCRIPTION
+        "The type of service (TOS) bits value."
+    ::= { hm2L2RuleEntry 12 }
+
+hm2L2RuleSrcPort OBJECT-TYPE
+    SYNTAX      DisplayString ( SIZE(1..128) )
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Source port number"
+    ::= { hm2L2RuleEntry 13 }
+
+hm2L2RuleDestPort OBJECT-TYPE
+    SYNTAX      DisplayString ( SIZE(1..128) )
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Destination port number"
+    ::= { hm2L2RuleEntry 14 }
+
+hm2L2RuleAssignQueueId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7 | 4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Queue identifier to which all inbound packets matching L2 packet filter rule.
+         This object defaults to the standard queue assignment for user priority 0 
+         traffic per the IEEE 802.1D specification based on the number of assignable
+         queues in the system:
+            1-3 queues:  0
+            4-7 queues:  1
+              8 queues:  2
+         This default assignment is static and is not influenced by
+         other system configuration changes.
+         A value of 4294967295 indicates that this field is not used"
+    ::= { hm2L2RuleEntry 15 }
+
+hm2L2RuleRateLimitCrate OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Committed rate attribute statement value, specified in kbps.
+         Value 0 disables this match criteria."
+    DEFVAL  { 0 }
+    ::= { hm2L2RuleEntry 16 }
+
+hm2L2RuleRateLimitCburst OBJECT-TYPE
+    SYNTAX      AclBurstSize
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Committed burst size attribute statement value, specified in kbytes.
+         Value 0 disables this match criteria."
+    DEFVAL  { 0 }
+    ::= { hm2L2RuleEntry 17 }
+
+hm2L2RuleRateLimitCrateUnit OBJECT-TYPE
+    SYNTAX  INTEGER {
+        pps(1),
+        kbps(2)
+    }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The unit of the L2RuleRateLimitCrate.
+         Can be either packets per second (pps)
+         or kilobits per second (kbps)."
+    DEFVAL  { kbps }
+    ::= { hm2L2RuleEntry 18 }
+
+hm2L2FwTrap OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+        STATUS current
+    DESCRIPTION
+        "Set to true if application of this rule shall send a trap."
+    DEFVAL  { false }
+    ::={ hm2L2RuleEntry 19 }
+
+hm2L2RuleDescription OBJECT-TYPE
+    SYNTAX DisplayString ( SIZE(0..32) )
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "User defined textual description related to this rule."
+    DEFVAL  { "" }
+    ::= { hm2L2RuleEntry 20 }
+
+hm2L2RuleLog OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Set to true if application of this rule shall be logged"
+    DEFVAL { false }
+    ::={ hm2L2RuleEntry 21 }
+
+hm2L2RuleStatsAction OBJECT-TYPE
+    SYNTAX INTEGER {
+        other(1),
+        flushRuleHitCount(2)
+    }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Setting the object to 'flushRuleHitCount(2)' will reset hit counter statistics.
+         Reading the object always returns 'other'."
+    ::= { hm2L2RuleEntry 22 }
+
+hm2L2RowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This is a standard row status value
+        - active(1): The rule is active. Note that until committed, the rule
+          will not be applied. You cannot activate the rule if an enforcer mappings to an inactive profile.
+        - notInService(2): The rule is inactive because of user action.
+        - notReady(3): The rule is inactive because of agent action.
+        - createAndGo(4): Create the rule with default parameters activated.
+        - createAndWait(5): Create the rule inactive.
+        - destroy(6): Delete the rule. You cannot delete a rule with
+          interface mappings to it."
+    ::= { hm2L2RuleEntry 23 }
+
+hm2L2DPIProfileIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..32)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+               "The index of the DPI profile, to which this rule is assigned,
+                depending on enforcer action.
+                Value 0 : This rule is not assigned to any DPI Profile.
+                You cannot assign the rule to an inactive profile,
+                if an active enforcer is mapping to it."
+        DEFVAL { 0 }
+        ::= { hm2L2RuleEntry 24 }
+
+hm2L2RuleProtoName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..32))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Following values are supported:
+		 - Protocol name from hm2ProtocolTable
+         - icmp: internet control message protocol (RFC 792)
+         - igmp: internet group management protocol
+         - ipip: IP in IP tunnelling (RFC 1853)
+         - tcp: transmission control protocol (RFC 793)
+         - udp: user datagram protocol (RFC 768)
+         - esp: IPsec encapsulated security payload (RFC 2406)
+         - ah: IPsec authentication header (RFC 2402)
+         - icmpv6: internet control message protocol for IPv6
+         - any: apply to all protocols
+		 "
+	DEFVAL { "any" }
+    ::= { hm2L2RuleEntry 25 }
+
+hm2L2AppRuleName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..128))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+            "Application rule name from hm2AppRuleTable"
+	DEFVAL { "manual" }
+    ::= { hm2L2RuleEntry 26 }
+
+hm2L2RuleIfMappingTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hm2L2RuleIfMappingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table for mapping L2 rules to interfaces"
+    ::={ hm2L2RuleTables 2 }
+
+hm2L2RuleIfMappingEntry OBJECT-TYPE
+    SYNTAX Hm2L2RuleIfMappingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry in rule interface mapping table"
+    INDEX {hm2L2IfmType, hm2L2IfmInterface, hm2L2IfmDirection, hm2L2IfmRuleIndex }
+    ::={ hm2L2RuleIfMappingTable 1 }
+
+Hm2L2RuleIfMappingEntry ::= SEQUENCE {  
+    hm2L2IfmType INTEGER,
+    hm2L2IfmInterface Integer32,
+    hm2L2IfmDirection INTEGER,
+    hm2L2IfmRuleIndex Integer32,
+    hm2L2IfmPriority  Unsigned32,
+    hm2L2IfmRowStatus RowStatus
+}
+
+hm2L2IfmType OBJECT-TYPE
+    SYNTAX INTEGER {
+        port(1),
+        vlan(2)
+    }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Meanings:
+        - port(1): Apply this rule to packets arriving on non-routing physical
+          interface.
+        - vlan(2): Apply this rule to packets arriving on non-routing vlan interface."
+    ::={ hm2L2RuleIfMappingEntry 1 }
+
+hm2L2IfmInterface OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The interface this mapping entry is assigned to. This has to be either
+         an hm2AgentSwitchIpInterfaceIfIndex or an hm2AgentSwitchIpVlanIfIndex.
+         Note : Routing should be disabled on physical interfaces."
+    ::={ hm2L2RuleIfMappingEntry 2 }
+
+hm2L2IfmDirection OBJECT-TYPE
+    SYNTAX INTEGER {
+        ingress(1),
+        egress(2)
+    }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Meanings:
+        - ingress(1): Apply this rule to packets arriving on this interface
+        - egress(2): Apply this rule to packets leaving from this interface"
+    ::={ hm2L2RuleIfMappingEntry 3 }
+
+hm2L2IfmRuleIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2048)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The index of the L2 rule this mapping entry is assigned to.
+         The rule must exist before the mapping entry can be created."
+    ::={ hm2L2RuleIfMappingEntry 4 }
+
+hm2L2IfmPriority OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The priority is the sorting key for rules in to this interface. They
+         don't need to be unique, but no clear order can be assumed among rules
+         with the same priority.
+         Priorities are processed in ascending order (0)highest priority."
+    ::={ hm2L2RuleIfMappingEntry 5 }
+
+hm2L2IfmRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The RowStatus value for this entry with the usual meanings:
+        - active(1): The interface mapping is in place
+        - notInService(2): The interface mapping is not in place because the
+          user said so
+        - notReady(3): The interface mapping is not in place because the
+          agent said so
+        - createAndGo(4): Create this mapping with the default priority and
+          activate it.
+        - createAndWait(5): Create this mapping deactivated.
+        - destroy(6): Destroy this interface mapping."
+    ::={ hm2L2RuleIfMappingEntry 6 }
+
+hm2DPIProfileAmpGeneralSetting OBJECT IDENTIFIER ::= { hm2L3Fw 17 }
+
+hm2DPIAmpDI OBJECT-TYPE
+    SYNTAX HmEnabledStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "To activate/de-activate the DI (Digital Input), so that 'configuration,
+         program & mode protect' can be enable/disable with key-switch wired
+         to the DI of the DPI firewall device."
+    DEFVAL { enable }
+    ::={ hm2DPIProfileAmpGeneralSetting 1 }
+
+hm2DPIAmpProtectMode OBJECT-TYPE
+    SYNTAX HmEnabledStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "To enable or disable 'configuration, program & mode protect'."
+    DEFVAL { enable }
+    ::={ hm2DPIProfileAmpGeneralSetting 2 }
+
+hm2DPIProfileAmpObjects OBJECT IDENTIFIER ::= { hm2L3Fw 18 }
+
+hm2DPIProfileAmpPendingActions OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+            "This value describes, whether the DPI AMP profile table was modified
+             but not yet written to the enforcer implementation (set to
+             true). After writing all modifications to the enforcer, the
+             value switches automatically back to false."
+    ::= { hm2DPIProfileAmpObjects 1 }
+
+hm2DPIProfileAmpCommitPendingActions OBJECT-TYPE
+    SYNTAX HmActionValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+            "Setting this value to action(2) writes not yet committed changes
+             to the enforcer (DPI AMP Profile Table). After writing
+             all modifications, the value switches automatically back to
+             noop(1)."
+    DEFVAL { noop }
+    ::= { hm2DPIProfileAmpObjects 2 }
+
+hm2DPIProfileAmpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hm2DPIProfileAmpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+            "The list of DPI AMP profiles for this enforcer."
+    ::= { hm2DPIProfileTables 8 }
+
+hm2DPIProfileAmpEntry OBJECT-TYPE
+    SYNTAX Hm2DPIProfileAmpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+            "DPI AMP profile entry."
+    INDEX { hm2DPIProfileAmpIndex }
+    ::= { hm2DPIProfileAmpTable 1 }
+
+Hm2DPIProfileAmpEntry ::=
+   SEQUENCE {
+           hm2DPIProfileAmpIndex Integer32,
+           hm2DPIProfileAmpDescription DisplayString,
+           hm2DPIProfileAmpProtocol Integer32,
+           hm2DPIProfileAmpMsgType HmLargeDisplayString,
+           hm2DPIProfileAmpAddrClass HmLargeDisplayString,
+           hm2DPIProfileAmpDevClass HmLargeDisplayString,
+           hm2DPIProfileAmpAddress HmLargeDisplayString,
+           hm2DPIProfileAmpDataword HmLargeDisplayString,
+           hm2DPIProfileAmpTaskcode HmLargeDisplayString,
+           hm2DPIProfileAmpTaskcodedata HmLargeDisplayString,
+           hm2DPIProfileAmpProtectmode HmEnabledStatus,
+           hm2DPIProfileAmpEcc HmEnabledStatus,
+           hm2DPIProfileAmpBcc HmEnabledStatus,
+           hm2DPIProfileAmpDebug HmEnabledStatus,
+           hm2DPIProfileAmpTcpReset HmEnabledStatus,
+           hm2DPIProfileAmpSanityCheck HmEnabledStatus,
+           hm2DPIProfileAmpRowStatus RowStatus
+   }
+
+hm2DPIProfileAmpIndex OBJECT-TYPE
+   SYNTAX Integer32 ( 1..32 )
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+           "Profile index for the DPI AMP profile."
+   ::= { hm2DPIProfileAmpEntry 1 }
+   
+hm2DPIProfileAmpDescription OBJECT-TYPE
+   SYNTAX DisplayString ( SIZE(0..32) )
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+           "Textual description related to the DPI AMP profile."
+   DEFVAL { "amp" }
+   ::= { hm2DPIProfileAmpEntry 2 }
+
+hm2DPIProfileAmpProtocol OBJECT-TYPE
+   SYNTAX   Integer32 {
+                camp(1),
+                nitp(2),
+                any(3)
+   }
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+            "Specify the AMP protocol for the DPI AMP profile.
+             The following values are currently supported:
+             o  camp(1): Common ASCII Message Protocol.
+             o  nitp(2): Non-Intelligent Terminal Protocol.
+             o  any(3):  Apply all the AMP protocols."
+   DEFVAL { any }
+   ::= { hm2DPIProfileAmpEntry 3 }
+
+hm2DPIProfileAmpMsgType OBJECT-TYPE
+   SYNTAX HmLargeDisplayString ( SIZE(0..764) )
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+           "Specify the message type for the DPI AMP profile.
+            This field specifies the type of data contained 
+            in the message data area and also specifies if 
+            the message is a command or a response.
+            Allowed formats are:
+            - comma seperated message types (02,03,FF)."
+   DEFVAL  { "any" }
+   ::= { hm2DPIProfileAmpEntry 4 }
+
+hm2DPIProfileAmpAddrClass OBJECT-TYPE
+   SYNTAX HmLargeDisplayString ( SIZE(0..1024) )
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+           "Specify the particular type of the memory to be accessed.
+            Allowed formats are:
+            - keyword 'any'
+            - Address class range with first and last class seperated 
+              by hyphen (0004-000A).
+            - Comma seperated address classes (0000,0003,FFFF).
+            - Combination of  address class and address class
+              ranges (0000,0003,0004-000A).
+
+            Total number of hexa-decimal values can be specified
+            upto 205."
+   DEFVAL  { "any" }
+   ::= { hm2DPIProfileAmpEntry 5 }
+   
+hm2DPIProfileAmpDevClass OBJECT-TYPE
+   SYNTAX HmLargeDisplayString ( SIZE(0..1024) )
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+           "Specify the device class.
+            Allowed formats are:
+            - keyword 'any'
+            - Device class range with first and last class 
+              seperated by hyphen (0004-000A).
+            - Comma seperated device classes (0000,0003,FFFF).
+            - Combination of device class and device class
+              ranges (0000,0003,0004-000A).
+
+            Total number of hexa-decimal values can be specified
+            upto 205."
+   DEFVAL  { "any" }
+   ::= { hm2DPIProfileAmpEntry 6 }
+
+hm2DPIProfileAmpAddress OBJECT-TYPE
+   SYNTAX HmLargeDisplayString ( SIZE(0..1024) )
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+           "Specify the beginning address of the memory to be read
+            or written.
+            Allowed formats are:
+            - Keyword 'any'
+            - Memory address range with first and last address
+              seperated by hyphen (0004-000A).
+            - Comma seperated memory address (0000,0003,FFFF).
+            - Combination of memory address and memory address
+              ranges (0000,0003,0004-000A).
+
+            Total number of hexa-decimal values can be specified
+            upto 205."
+   DEFVAL  { "any" }
+   ::= { hm2DPIProfileAmpEntry 7 }
+
+hm2DPIProfileAmpDataword OBJECT-TYPE
+   SYNTAX  HmLargeDisplayString ( SIZE( 0..1024 ) )
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+           "Specify the address from which the data will be read.
+            It will only be used for the CAMP packets with the memory
+            exchange command or response.
+            Allowed formats are:
+            - Keyword 'any'
+            - Data word address range with first and last address seperated
+              by hyphen (0004-000A).
+            - Comma seperated data word address (0000,0003,FFFF).
+            - Combination of data word address and data word address
+              ranges (0000,0003,0004-000A).
+
+            Total number of hexa-decimal values can be specified
+            upto 205."
+   DEFVAL  { "any" }
+   ::= { hm2DPIProfileAmpEntry 8 }
+
+hm2DPIProfileAmpTaskcode OBJECT-TYPE
+   SYNTAX HmLargeDisplayString ( SIZE(0..764) )
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+           "Specify the task code for the DPI AMP profile.
+            Allowed formats are:
+            - Comma seperated task code (00,03,FF)."
+
+   DEFVAL  { "" }
+   ::= { hm2DPIProfileAmpEntry 9 }
+
+hm2DPIProfileAmpTaskcodedata OBJECT-TYPE
+   SYNTAX HmLargeDisplayString ( SIZE(0..1024) )
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+           "Specify the task code data for the DPI AMP profile.
+            Allowed formats are:
+            - Range with first and last task code seperated
+              by hyphen (0004-000A).
+            - Comma seprated task code data (0000,0003).
+            - Combination of task code data and task code data
+              ranges (0000,0003,0004-000A)
+
+            Total number of hexa-decimal values can be specified
+            upto 205."
+   DEFVAL  { "" }
+   ::= { hm2DPIProfileAmpEntry 10 }
+   
+hm2DPIProfileAmpProtectmode OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+           "Forcefully enable/disable the protect mode for the
+            particular task code in the DPI AMP profile."
+   DEFVAL { enable }
+   ::= { hm2DPIProfileAmpEntry 11 }
+
+hm2DPIProfileAmpEcc OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+           "Enable/disable the checking for the NITP Error Check 
+            Characters (ECC) of the packets in the DPI AMP profile."
+   DEFVAL { enable }
+   ::= { hm2DPIProfileAmpEntry 12 }
+
+hm2DPIProfileAmpBcc OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+           "Enable/disable the checking for the CAMP Block Check
+            Characters (BCC) of the AMP packets in the DPI AMP profile."
+   DEFVAL { enable }
+   ::= { hm2DPIProfileAmpEntry 13 }
+
+hm2DPIProfileAmpDebug OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+	  "Enable/disable the debugging in the DPI AMP profile.
+           If it is enabled then the reset connection message will
+           contain the debug information."
+   DEFVAL { disable }
+   ::= { hm2DPIProfileAmpEntry 14 }
+
+hm2DPIProfileAmpTcpReset OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+	  "Enable/disable the reseting of the TCP connection. 
+          If it is enabled then the TCP reset connection message will 
+          be sent in case a packet is dropped"
+   DEFVAL { enable }
+   ::= { hm2DPIProfileAmpEntry 15 }
+
+hm2DPIProfileAmpSanityCheck OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+            "Enable/disable the sanity check including format and
+             specification of all the AMP packets."
+   DEFVAL { enable }
+   ::= { hm2DPIProfileAmpEntry 16 }
+
+hm2DPIProfileAmpRowStatus   OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+           "This is a standard row status value:
+           - active(1): The profile is active. You cannot modify it.
+           - notInService(2): The profile is inactive because of user action.
+           You cannot inactivate the profile if an active enforcer mappings to it.
+           - notReady(3): The profile is inactive because of agent action.
+           - createAndGo(4): Create the profile with default parameters
+             activated.
+           - createAndWait(5): Create the profile inactive.
+           - destroy(6): Delete the profile.
+           You cannot delete the active profile or if an enforcer mappings to it."
+   ::= { hm2DPIProfileAmpEntry 17 }
+
+hm2DPIAmpTaskCodeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hm2DPIAmpTaskCodeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The list of task code table."
+    ::={  hm2DPIProfileTables 9 }
+
+hm2DPIAmpTaskCodeEntry OBJECT-TYPE
+    SYNTAX Hm2DPIAmpTaskCodeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Task code table entry."
+    INDEX { IMPLIED hm2DPIAmpTaskCode }
+    ::={ hm2DPIAmpTaskCodeTable 1 }
+
+Hm2DPIAmpTaskCodeEntry ::= SEQUENCE {
+   hm2DPIAmpTaskCode DisplayString,
+   hm2DPIAmpTaskCodeDescription DisplayString,
+   hm2DPIAmpTaskCodeType INTEGER,
+   hm2DPIAmpTaskCodeMode INTEGER,
+   hm2DPIAmpTaskCodeStatus RowStatus
+}
+
+hm2DPIAmpTaskCode OBJECT-TYPE
+    SYNTAX      DisplayString ( SIZE(1..2) )
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Task code value for the new custom task codes
+         The value can be between 00 to FF."
+    DEFVAL  { "" }
+    ::= { hm2DPIAmpTaskCodeEntry 1 }
+
+hm2DPIAmpTaskCodeDescription OBJECT-TYPE
+    SYNTAX DisplayString ( SIZE(0..64) )
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Description related to the task code."
+    DEFVAL  { "" }
+    ::= { hm2DPIAmpTaskCodeEntry 2 }
+        
+hm2DPIAmpTaskCodeType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        default(1),
+        custom(2)
+    }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Specify the type of task code in the task code table if it is 
+         default(i.e. default) or user defined(i.e. custom)."
+    ::= { hm2DPIAmpTaskCodeEntry 3 }
+    
+hm2DPIAmpTaskCodeMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        config(1),
+        non-config(2)
+    }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Specify the mode of the task code if it is config or
+         nonconfig."
+    DEFVAL { config }
+    ::= { hm2DPIAmpTaskCodeEntry 4 }
+
+hm2DPIAmpTaskCodeStatus OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+           "This is a standard row status value:
+           - active(1): The profile is active. You cannot modify it.
+           - notInService(2): The profile is inactive because of user action.
+           You cannot inactivate the profile if an active enforcer mappings to it.
+           - notReady(3): The profile is inactive because of agent action.
+           - createAndGo(4): Create the profile with default parameters
+           activated.
+           - createAndWait(5): Create the profile inactive.
+           - destroy(6): Delete the profile.
+           You cannot delete the active profile or if an enforcer mappings to it."
+   ::= { hm2DPIAmpTaskCodeEntry 5 }
+
+--******************************************************************************
+--                        hm2FwAssetMgmtGroup: Asset table
+--******************************************************************************
+
+hm2AssetTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hm2AssetEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+            "A list of the Assets representing real world devices/systems"
+    ::= { hm2FwAssetMgmtGroup 1 }
+
+hm2AssetEntry OBJECT-TYPE
+    SYNTAX Hm2AssetEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+            "Asset Entries"
+    INDEX { hm2AssetIndex }
+    ::= { hm2AssetTable 1 }
+
+Hm2AssetEntry ::=
+    SEQUENCE {
+            hm2AssetIndex                   Integer32,
+            hm2AssetName                    DisplayString,
+            hm2AssetDescription             DisplayString,
+            hm2AssetType                    INTEGER,
+            hm2AssetManufacturer            DisplayString,
+            hm2AssetModel                   DisplayString,
+            hm2AssetGeneralLocation         DisplayString,
+            hm2AssetSpecificLocation        DisplayString,
+            hm2AssetTag                     DisplayString,
+            hm2AssetIpAddress               DisplayString,
+            hm2AssetMacAddress              DisplayString,
+            hm2AssetStatus                  RowStatus
+    }
+
+hm2AssetIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..50)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+            "Index number of this Asset table"
+    ::= { hm2AssetEntry 1 }
+
+hm2AssetName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..32))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+            "Descriptive name for the Asset"
+    DEFVAL { "New Asset" }
+    ::= { hm2AssetEntry 2 }
+
+hm2AssetDescription    OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..128))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+            "Logical description of the function of Asset"
+    DEFVAL { "" }
+    ::= { hm2AssetEntry 3 }
+
+hm2AssetType OBJECT-TYPE
+    SYNTAX INTEGER {
+              computer(1),
+              controller(2),
+              device(3),
+              network(4),
+              network-equipment(5),
+              broadcast(6),
+              multicast(7)
+           }
+    MAX-ACCESS read-create
+    STATUS  current
+    DESCRIPTION
+        "Specifies type of the Asset"
+    DEFVAL  { computer }
+    ::= { hm2AssetEntry 4 }
+
+hm2AssetManufacturer    OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..128))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+            "Make or company that manufacturerd the Asset"
+    DEFVAL { "" }
+    ::= { hm2AssetEntry 5 } 
+
+hm2AssetModel    OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..128))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+            "Model version of the Asset"
+    DEFVAL { "" }
+    ::= { hm2AssetEntry 6 } 
+
+hm2AssetGeneralLocation    OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..128))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+            "General location of the Asset"
+    DEFVAL { "" }
+    ::= { hm2AssetEntry 7 }
+
+hm2AssetSpecificLocation    OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..128))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+            "Specific location of the Asset"
+    DEFVAL { "" }
+    ::= { hm2AssetEntry 8 }
+
+hm2AssetTag    OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..128))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+            "User defined field for corporate asset tags"
+    DEFVAL { "" }
+    ::= { hm2AssetEntry 9 }
+
+hm2AssetIpAddress       OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..20))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+            "The IP address associated to the Asset, allowed formats are:
+            - keyword 'any'
+            - single address ('10.0.0.1')
+            - CIDR address range ('10.0.0.0/8')
+            - a prepending '!' selects the complement set
+            "
+    DEFVAL { "any" }
+    ::= { hm2AssetEntry 10 }
+
+hm2AssetMacAddress OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..20))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+            "Physical address associated with the Asset"
+    DEFVAL { "any" }
+    ::= { hm2AssetEntry 11 }
+
+hm2AssetStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+           "active(1)               - This template is active.
+            notInService(2)         - Row has been suspended.
+            notReady(3)             - Row has incomplete values.
+            createAndGo(4)          - Accept row values and activate.
+            createAndWait(5)        - Accept row values and wait.
+            destroy(6)              - Set to this value to remove this template."
+    ::= { hm2AssetEntry 12 }
+
+--******************************************************************************
+--                         Application rules
+--******************************************************************************
+
+hm2AppRuleTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hm2AppRuleEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+            "Application rules"
+    ::= { hm2FwAssetMgmtGroup 2 }
+
+hm2AppRuleEntry OBJECT-TYPE
+    SYNTAX Hm2AppRuleEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+            "Application rule entry"
+    INDEX { hm2AppRuleIndex }
+    ::= { hm2AppRuleTable 1 }
+
+Hm2AppRuleEntry ::=
+    SEQUENCE {
+            hm2AppRuleIndex               Integer32,
+            hm2AppRuleName                DisplayString,
+            hm2AppRuleProtocol            DisplayString,
+            hm2AppRulePort                DisplayString,
+            hm2AppRuleDirection           INTEGER,
+            hm2AppRuleIsDefault           TruthValue,
+            hm2AppRuleStatus              RowStatus
+    }
+
+hm2AppRuleIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+            "Index number of the Application rule"
+    ::= { hm2AppRuleEntry 1 }
+
+hm2AppRuleName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..128))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+            "Logical description of the Application rule"
+	DEFVAL { "New Rule" }
+    ::= { hm2AppRuleEntry 2 }
+
+hm2AppRuleProtocol OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..32))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Following values are supported:
+		 - Protocol name from hm2ProtocolTable
+         - icmp: internet control message protocol (RFC 792)
+         - igmp: internet group management protocol
+         - ipip: IP in IP tunnelling (RFC 1853)
+         - tcp: transmission control protocol (RFC 793)
+         - udp: user datagram protocol (RFC 768)
+         - esp: IPsec encapsulated security payload (RFC 2406)
+         - ah: IPsec authentication header (RFC 2402)
+         - icmpv6: internet control message protocol for IPv6
+         - any: apply to all protocols
+		 "
+	DEFVAL { "any" }
+    ::= { hm2AppRuleEntry 3 }
+
+hm2AppRulePort OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..128))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The ports used by the selected protocol. Allowed formats are:
+        - keyword 'any'
+        - single port ('10')
+        - port range with first and last port separated by hyphen
+          ('10-15')
+        - comma separated list of ports ('1235,25,123')
+        - combination of the points above ('10,25-30,125,1993')
+        "
+    DEFVAL { "any" }
+    ::= { hm2AppRuleEntry 4 }
+
+hm2AppRuleDirection OBJECT-TYPE
+    SYNTAX INTEGER {
+               ingress(1),
+               egress(2),
+               both(3)
+           }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+       "- ingress(1): Apply this rule to packets arriving on this interface
+        - egress(2): Apply this rule to packets leaving from this interface
+        - both(3): Apply this rule to packets coming in and going out on this
+          interface."
+    DEFVAL  { ingress }
+    ::= { hm2AppRuleEntry 5 }
+
+hm2AppRuleIsDefault OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+       "Set to true if this is a factory initialized rule"
+    DEFVAL { false }
+    ::={ hm2AppRuleEntry 6 }
+
+hm2AppRuleStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This is a standard row status value:
+            - active(1): The rule is active. Note that until committed, the rule
+              will not be applied. You cannot activate the rule
+              if an enforcer mappings to an inactive profile.
+            - notInService(2): The rule is inactive because of user action.
+            - notReady(3): The rule is inactive because of agent action.
+            - createAndGo(4): Create the rule with default parameters
+              activated.
+            - createAndWait(5): Create the rule inactive.
+            - destroy(6): Delete the rule. You cannot delete a rule with
+              interface mappings to it."
+    ::= { hm2AppRuleEntry 7 }
+
+--******************************************************************************
+--                         Protocol table
+--******************************************************************************
+
+hm2ProtocolTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hm2ProtocolEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+            "A list of user defined Protocols for Packet Filter rules"
+    ::= { hm2FwAssetMgmtGroup 3 }
+
+hm2ProtocolEntry OBJECT-TYPE
+    SYNTAX Hm2ProtocolEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+            "Protocol table entries"
+    INDEX { hm2ProtocolIndex }
+    ::= { hm2ProtocolTable 1 }
+
+Hm2ProtocolEntry ::=
+    SEQUENCE {
+            hm2ProtocolIndex                Integer32,
+            hm2ProtocolName                 DisplayString,
+            hm2ProtocolDescription          DisplayString,
+            hm2ProtocolType                 INTEGER,
+            hm2ProtocolEtypeKey             INTEGER,
+            hm2ProtocolEtherType            EtypeValue,
+            hm2ProtocolIPProtoNumber        Integer32,
+            hm2ProtocolPort                 DisplayString,
+            hm2ProtocolStatus               RowStatus
+    }
+
+hm2ProtocolIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+            "Index number of the Protocol entry"
+    ::= { hm2ProtocolEntry 1 }
+
+hm2ProtocolName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..32))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The descriptive name for this protocol"
+    DEFVAL  { "New Protocol" }
+    ::= { hm2ProtocolEntry 2 }
+
+hm2ProtocolDescription OBJECT-TYPE
+    SYNTAX DisplayString ( SIZE(0..128) )
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "User defined textual description related to this protocol"
+    DEFVAL  { "" }
+    ::= { hm2ProtocolEntry 3 }
+
+hm2ProtocolType OBJECT-TYPE
+    SYNTAX INTEGER {
+             any(1),
+             ethernet(2),
+             ip(3),
+             tcp(4),
+             udp(5),
+             tcp-udp(6)
+            }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Specify the type used in the protocol"
+    DEFVAL  { any }
+    ::= { hm2ProtocolEntry 4 }
+
+hm2ProtocolEtypeKey OBJECT-TYPE
+    SYNTAX  INTEGER {
+        custom(1),
+        appletalk(2),
+        arp(3),
+        ibmsna(4),
+        ipv4(5),
+        ipv6(6),
+        ipxold(7),
+        mplsmcast(8),
+        mplsucast(9),
+        netbios(10),
+        novell(11),
+        pppoedisc(12),
+        rarp(13),
+        pppoesess(14),
+        ipxnew(15),
+        profinet(16),
+        powerlink(17),
+        ethercat(18),
+        ieee8021q(19)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Ethertype keyword to be used in the L2 filter.
+         A keyword of custom(1) requires that the hm2ProtocolEtherType
+         object also be set."
+    DEFVAL  { custom }
+    ::= { hm2ProtocolEntry 5 }
+
+hm2ProtocolEtherType    OBJECT-TYPE
+    SYNTAX EtypeValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The Ethertype custom value to be used in the L2 filter.
+         This object is only valid if the hm2ProtocolEtypeKey is set to
+         custom(1).  Values ranging from 0x0600 to 0xFFFF
+         (1536 to 65535) are interpreted as the Ethertype.
+         Lower values are interpreted as frame size.
+         A value of 0 indicates that this field is not used."
+    DEFVAL  { 0 }
+    ::= { hm2ProtocolEntry 6 }
+
+hm2ProtocolIPProtoNumber     OBJECT-TYPE
+    SYNTAX Integer32 (-1|0..255)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "IP Protocol number for user defined protocols
+		- (-1) represents that no ip protocol is selected"
+    DEFVAL  { -1 }
+    ::= { hm2ProtocolEntry 7 }
+
+hm2ProtocolPort         OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..128))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The ports used by this protocol. Allowed formats are:
+        - keyword 'any'
+        - single port ('10')
+        - port range with first and last port separated by hyphen
+          ('10-15')
+        - comma separated list of ports ('1235,25,123')
+        - combination of the points above ('10,25-30,125,1993')
+        "
+    DEFVAL { "any" }
+    ::= { hm2ProtocolEntry 8 }
+
+hm2ProtocolStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+           "active(1)               - This template is active.
+            notInService(2)         - Row has been suspended.
+            notReady(3)             - Row has incomplete values.
+            createAndGo(4)          - Accept row values and activate.
+            createAndWait(5)        - Accept row values and wait.
+            destroy(6)              - Set to this value to remove this template."
+    ::= { hm2ProtocolEntry 9 }
+
+--******************************************************************************
+--			Compliance statements
+--******************************************************************************
+
+hm2FwCompliances OBJECT IDENTIFIER ::= { hm2FwConformance 1 }
+hm2FwGroups OBJECT IDENTIFIER ::= { hm2FwConformance 2 }
+
+hm2FwCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for an SNMP entity which
+         implements the Hirschmann firewall MIB."
+    MODULE     -- this module
+    MANDATORY-GROUPS { hm2FwGeneralGroup, hm2FwNotificationsGroup }
+    ::= { hm2FwCompliances 1 }
+
+hm2FwGeneralGroup OBJECT-GROUP
+    OBJECTS {
+    	hm2DynFwMaxRules,
+    	hm2L3MaxRules,
+    	hm2ResetStatistics,
+    	hm2FlushTables,
+    	hm2DefaultPolicy,
+       
+    	hm2DynFwRuleCount,
+    	hm2DynFwIfMappingRuleCount,
+    	hm2DynFwRulePendingActions,
+    	hm2DynFwCommitPendingActions,
+    	hm2DynFwRuleIndex,
+	hm2DynFwSourceAddress,
+	hm2DynFwSourcePort,
+	hm2DynFwTargetAddress,
+	hm2DynFwTargetPort,
+	hm2DynFwProto,
+	hm2DynFwRuleParams,
+	hm2DynFwAction,
+	hm2DynFwLog,
+	hm2DynFwTrap,
+	hm2DynFwDescription,
+	hm2DynFwRowStatus,
+	hm2DynFwIfmPriority,
+	hm2DynFwIfmRowStatus,
+	
+	hm2DynFwStatsPacketCount,
+	hm2DynFwStatsPacketSize,
+	hm2DynFwStatsLastApplied,
+	hm2DynFwStatsTtPck,
+	hm2DynFwStatsTtPckSize,
+	hm2DynFwStatsTtPckDenDrop,
+	hm2DynFwStatsTtPckAccepted,
+		
+	hm2L3RuleCount,
+	hm2L3IfMappingRuleCount,
+	hm2L3RulePendingActions,
+	hm2L3CommitPendingActions,
+	hm2L3RuleIndex,
+	hm2L3SourceAddress,
+	hm2L3SourcePort,
+	hm2L3TargetAddress,
+	hm2L3TargetPort,
+	hm2L3Proto,	
+	hm2L3Action,
+	hm2L3RuleParams,	
+	hm2L3Log,
+	hm2L3Trap,
+	hm2L3Description,
+	hm2L3RowStatus,
+	hm2DPIProfileIndex,
+	hm2L3ProtoName,
+	hm2L3AppRuleName,
+	hm2L3IfmPriority,
+	hm2L3IfmRowStatus,
+	hm2L3StatsPacketCount,
+	hm2L3StatsPacketSize,
+	hm2L3StatsLastApplied,
+	hm2L3StatsTotalPck,
+	hm2L3StatsTotalPckSize,
+	hm2L3StatsTotalPckDenDrop,
+	hm2L3StatsTotalPckAccepted,
+	
+	hm2DPIProfileModbusPendingActions,
+	hm2DPIProfileModbusCommitPendingActions,
+	hm2DPIProfileModbusIndex,
+	hm2DPIProfileModbusDescription,
+	hm2DPIProfileModbusFunctionType,
+	hm2DPIProfileModbusFunctionCodeList,
+	hm2DPIProfileModbusUnitIdentifierList,
+	hm2DPIProfileModbusSanityCheck,
+	hm2DPIProfileModbusException,
+	hm2DPIProfileModbusReset,
+	hm2DPIProfileModbusRowStatus,
+	
+	hm2DPIProfileOpcPendingActions,
+	hm2DPIProfileOpcCommitPendingActions,
+	hm2DPIProfileOpcIndex,
+	hm2DPIProfileOpcDescription,
+	hm2DPIProfileOpcSanityCheck,
+	hm2DPIProfileOpcFragmentCheck,
+	hm2DPIProfileOpcTimeoutConnect,
+	hm2DPIProfileOpcRowStatus,
+	
+	hm2DPIProfileIEC104PendingActions,
+	hm2DPIProfileIEC104CommitPendingActions,
+	hm2DPIProfileIEC104Index,
+	hm2DPIProfileIEC104Description,
+	hm2DPIProfileIEC104FunctionType,
+	hm2DPIProfileIEC104TypeIDList,
+	hm2DPIProfileIEC104OriginatorAddressList,
+	hm2DPIProfileIEC104CommonAddressList,
+	hm2DPIProfileIEC104SanityCheck,
+	hm2DPIProfileIEC104Reset,
+	hm2DPIProfileIEC104Debug,
+	hm2DPIProfileIEC104RowStatus,
+	hm2DPIProfileIEC104AdvancedTypeIDList,
+	hm2DPIProfileIEC104OriginatorAddrList,
+	hm2DPIProfileIEC104CauseOfTransmissionSize,
+	hm2DPIProfileIEC104CommonAddressSize,
+	hm2DPIProfileIEC104IOAddressSize,
+	hm2DPIProfileIEC104AllowIEC101,
+	
+	hm2DPIProfileEnipPendingActions,
+	hm2DPIProfileEnipCommitPendingActions,
+	hm2DPIProfileEnipIndex,
+	hm2DPIProfileEnipDescription,
+	hm2DPIProfileEnipFunctionType,
+	hm2DPIProfileEnipSanityCheck,
+	hm2DPIProfileEnipDebug,
+	hm2DPIProfileEnipRowStatus,
+	hm2DPIProfileEnipDefaultObjectList,
+	hm2DPIProfileEnipWildCardServices,
+	hm2DPIProfileEnipAllowEmbPCCC,
+	hm2DPIProfileEnipTcpReset,
+	hm2DPIObjectEnipClassId,
+	hm2DPIObjectEnipServices,
+	hm2DPIObjectEnipDescription,
+	hm2DPIObjectEnipRowStatus,
+
+	hm2DPIProfileDnp3PendingActions,
+	hm2DPIProfileDnp3CommitPendingActions,
+	hm2DPIProfileDnp3Index,
+	hm2DPIProfileDnp3Description,
+	hm2DPIProfileDnp3FunctionCodeList,
+	hm2DPIProfileDnp3DefaultWhiteList,
+	hm2DPIProfileDnp3CrcCheck,
+	hm2DPIProfileDnp3SanityCheck,
+	hm2DPIProfileDnp3CheckOutstationTraffic,
+	hm2DPIProfileDnp3TcpReset,
+	hm2DPIProfileDnp3RowStatus,
+	hm2DPIProfileDnp3ObjectIndex,
+	hm2DPIProfileDnp3ObjectType,
+	hm2DPIProfileDnp3ObjectGroupno,
+	hm2DPIProfileDnp3ObjectVariation,
+	hm2DPIProfileDnp3ObjectFunction,
+	hm2DPIProfileDnp3ObjectQualifier,
+	hm2DPIProfileDnp3ObjectLength,
+	hm2DPIProfileDnp3ObjectFuncName,
+	hm2DPIProfileDnp3ObjectRowStatus,
+
+	hm2L2MaxRules,
+	hm2L2DefaultPolicy,
+	hm2L2ValidateFCS,
+	hm2L2RuleIndex,
+	hm2L2RuleHitCount,
+	hm2L2RuleAction,
+	hm2L2RuleDestMacAddr,
+	hm2L2RuleSrcMacAddr,
+	hm2L2RuleEtypeKey,
+	hm2L2RuleEtypeValue,
+	hm2L2RuleVlanId,
+	hm2L2RuleDestIpAddr,
+	hm2L2RuleSrcIpAddr,
+	hm2L2RuleProtocol,
+	hm2L2RuleIpTosBits,
+	hm2L2RuleDestPort,
+	hm2L2RuleSrcPort,
+	hm2L2RuleAssignQueueId,
+	hm2L2RuleRateLimitCrate,
+	hm2L2RuleRateLimitCburst,
+	hm2L2RuleRateLimitCrateUnit,
+	hm2L2RuleDescription,
+	hm2L2RuleLog,
+	hm2L2RuleStatsAction,
+	hm2L2RowStatus,
+	hm2L2DPIProfileIndex,
+	hm2L2RuleProtoName,
+	hm2L2AppRuleName,
+
+	hm2DPIProfileAmpIndex,
+	hm2DPIProfileAmpDescription,
+	hm2DPIProfileAmpProtocol,
+	hm2DPIProfileAmpMsgType,
+	hm2DPIProfileAmpAddrClass,
+	hm2DPIProfileAmpDevClass,
+	hm2DPIProfileAmpAddress,
+	hm2DPIProfileAmpDataword,
+	hm2DPIProfileAmpTaskcode,
+	hm2DPIProfileAmpTaskcodedata,
+	hm2DPIProfileAmpProtectmode,
+	hm2DPIProfileAmpEcc,
+	hm2DPIProfileAmpBcc,
+	hm2DPIProfileAmpDebug,
+	hm2DPIProfileAmpTcpReset,
+	hm2DPIProfileAmpSanityCheck,
+	hm2DPIProfileAmpRowStatus,
+
+	hm2AssetIndex,
+	hm2AssetName,
+	hm2AssetDescription,
+	hm2AssetType,
+	hm2AssetManufacturer,
+	hm2AssetModel,
+	hm2AssetGeneralLocation,
+	hm2AssetSpecificLocation,
+	hm2AssetTag,
+	hm2AssetIpAddress,
+	hm2AssetMacAddress,
+	hm2AssetStatus,
+
+	hm2AppRuleIndex,
+	hm2AppRuleName,
+	hm2AppRuleProtocol,
+	hm2AppRulePort,
+	hm2AppRuleDirection,
+	hm2AppRuleIsDefault,
+	hm2AppRuleAction,
+	hm2AppRuleStatus,
+
+	hm2ProtocolIndex,
+	hm2ProtocolName,
+	hm2ProtocolDescription,
+	hm2ProtocolType,
+	hm2ProtocolEtypeKey,
+	hm2ProtocolEtherType,
+	hm2ProtocolIPProtoNumber,
+	hm2ProtocolPort,
+	hm2ProtocolStatus 
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of all Hirschmann objects provided by the firewall
+        module."
+    ::= { hm2FwGroups 1 }
+
+hm2FwNotificationsGroup  NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		hm2DynFwRuleAppliedTrap,
+		hm2DynFwRuleAppliedAndLoggedTrap,
+		
+		hm2L3RuleAppliedTrap,
+		hm2L3RuleAppliedAndLoggedTrap,
+
+		hm2L2RuleAppliedTrap,
+		hm2L2RuleAppliedAndLoggedTrap
+	}
+	STATUS current
+	DESCRIPTION
+		"A collection of all Hirschmann notifications provided by the
+		firewall module."
+		::= { hm2FwGroups 2 }
+
+--
+-- *************************************************************
+-- FW SNMP Extension Group (extended error/event handling)
+-- *************************************************************
+--
+
+hm2FwSNMPExtensionDPISESGroup                     OBJECT IDENTIFIER ::= { hm2FwSNMPExtensionGroup 11 }
+hm2FwSNMPExtensionIEC104SESGroup                  OBJECT IDENTIFIER ::= { hm2FwSNMPExtensionGroup 12 }
+hm2FwSNMPExtensionDNP3Group                       OBJECT IDENTIFIER ::= { hm2FwSNMPExtensionGroup 13 }
+hm2FwSNMPExtensionOPCGroup                        OBJECT IDENTIFIER ::= { hm2FwSNMPExtensionGroup 14 }
+hm2FwSNMPExtensionModbusGroup                     OBJECT IDENTIFIER ::= { hm2FwSNMPExtensionGroup 15 }
+hm2FwSNMPExtensionAMPGroup                        OBJECT IDENTIFIER ::= { hm2FwSNMPExtensionGroup 17 }
+hm2FwSNMPExtensionENIPGroup                       OBJECT IDENTIFIER ::= { hm2FwSNMPExtensionGroup 18 }
+hm2FwSNMPExtensionIPGroup                         OBJECT IDENTIFIER ::= { hm2FwSNMPExtensionGroup 20 }
+hm2FwTemplateSNMPExtensionGroup                   OBJECT IDENTIFIER ::= { hm2FwSNMPExtensionGroup 21 }
+
+-- ***********************************************************
+-- hm2FwSNMPExtensionDPISESGroup
+-- ***********************************************************
+
+hm2FwSNMPExtensionDPIEntryInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DPI profile contains the index value which is out of range
+                        or contains invalid characters."
+           ::= { hm2FwSNMPExtensionDPISESGroup 1 }
+
+hm2FwSNMPExtensionDPIDescriptionInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DPI profile contains the description which has invalid
+                        value that cannot be processed."
+           ::= { hm2FwSNMPExtensionDPISESGroup 2 }
+
+hm2FwSNMPExtensionDPISanityCheckInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DPI profile contains an invalid value for sanity check
+                        that cannot be processed."
+           ::= { hm2FwSNMPExtensionDPISESGroup 3 }
+
+hm2FwSNMPExtensionDPITCPResetInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DPI profile contains an invalid value for TCP reset that
+                        cannot be processed."
+           ::= { hm2FwSNMPExtensionDPISESGroup 4 }
+
+hm2FwSNMPExtensionDPIProfileInUse OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DPI profile cannot be deleted or deactivated since it is
+                        currently used by atleast one L3 firewall rule."
+           ::= { hm2FwSNMPExtensionDPISESGroup 5 }
+
+hm2FwSNMPExtensionDPIProfileActive OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DPI profile cannot be deleted since it is active."
+           ::= { hm2FwSNMPExtensionDPISESGroup 6 }
+
+hm2FwSNMPExtensionDPIProfileUpdateError OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DPI profile cannot be modified since it is active."
+           ::= { hm2FwSNMPExtensionDPISESGroup 7 }
+
+hm2FwSNMPExtensionDPIFunctionCodeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DPI entry contains an invalid value for function
+                        code that cannot be processed."
+           ::= { hm2FwSNMPExtensionDPISESGroup 8 }
+
+hm2FwSNMPExtensionDPIProfileNotPresent OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DPI profile does not exist."
+           ::= { hm2FwSNMPExtensionDPISESGroup 9 }
+
+hm2FwSNMPExtensionDPIProfileNotActive OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DPI profile is not active."
+           ::= { hm2FwSNMPExtensionDPISESGroup 10 }
+
+-- ***********************************************************
+-- hm2FwSNMPExtensionIEC104SESGroup
+-- ***********************************************************
+
+hm2FwSNMPExtensionIEC104FunctionTypeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the IEC104 entry contains an invalid value for function type
+                        that cannot be processed."
+           ::= { hm2FwSNMPExtensionIEC104SESGroup 1 }
+
+hm2FwSNMPExtensionIEC104CommonAddListInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the IEC104 entry contains an invalid value for common address
+                        list that cannot be processed."
+           ::= { hm2FwSNMPExtensionIEC104SESGroup 2 }
+
+hm2FwSNMPExtensionIEC104DebugInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the IEC104 entry contains an invalid value for debug that
+                        cannot be processed."
+           ::= { hm2FwSNMPExtensionIEC104SESGroup 3 }
+
+hm2FwSNMPExtensionIEC104AdvTypeIDListInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the IEC104 entry contains an invalid value for advance type
+                       ID list that cannot be processed."
+           ::= { hm2FwSNMPExtensionIEC104SESGroup 4 }
+
+hm2FwSNMPExtensionIEC104OriginAddListInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the IEC104 entry contains an invalid value for originator
+                        address list that cannot be processed."
+           ::= { hm2FwSNMPExtensionIEC104SESGroup 5 }
+
+hm2FwSNMPExtensionIEC104TransSizeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the IEC104 entry contains an invalid value for cause of
+                        transmission size that cannot be processed."
+           ::= { hm2FwSNMPExtensionIEC104SESGroup 6 }
+
+hm2FwSNMPExtensionIEC104CommAddrSizeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the IEC104 entry contains an invalid value for common
+                        address size that cannot be processed."
+           ::= { hm2FwSNMPExtensionIEC104SESGroup 7 }
+
+hm2FwSNMPExtensionIEC104IOAddrSizeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the IEC104 entry contains an invalid value for IO address
+                        size that cannot be processed."
+           ::= { hm2FwSNMPExtensionIEC104SESGroup 8 }
+
+hm2FwSNMPExtensionIEC104AllowIEC101Invalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the IEC104 entry contains an invalid value for allow
+                        IEC_60870_5_101 that cannot be processed."
+           ::= { hm2FwSNMPExtensionIEC104SESGroup 9 }
+
+-- ***********************************************************
+-- hm2FwSNMPExtensionDNP3Group
+-- ***********************************************************
+
+hm2FwSNMPExtensionDNP3CRCInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DNP3 entry contains an invalid value for CRC check
+                        that cannot be processed."
+           ::= { hm2FwSNMPExtensionDNP3Group 1 }
+
+hm2FwSNMPExtensionDNP3DefWhiteListInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DNP3 entry contains an invalid value for default
+                        object list that cannot be processed."
+           ::= { hm2FwSNMPExtensionDNP3Group 2 }
+
+hm2FwSNMPExtensionDNP3FunctionCodeListInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DNP3 entry contains an invalid value for function
+                        code list that cannot be processed."
+           ::= { hm2FwSNMPExtensionDNP3Group 3 }
+
+hm2FwSNMPExtensionDNP3OutTrafficInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DNP3 entry contains an invalid value for outstation
+                        traffic check that cannot be processed."
+           ::= { hm2FwSNMPExtensionDNP3Group 4 }
+
+hm2FwSNMPExtensionDNP3GroupNumInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DNP3 entry contains an invalid value for group number
+                        that cannot be processed."
+           ::= { hm2FwSNMPExtensionDNP3Group 5 }
+
+hm2FwSNMPExtensionDNP3FunctionLengthInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DNP3 entry contains an invalid value for function length
+                        that cannot be processed."
+           ::= { hm2FwSNMPExtensionDNP3Group 6 }
+
+hm2FwSNMPExtensionDNP3FunctionNameInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DNP3 entry contains an invalid value for function name
+                        that cannot be processed."
+           ::= { hm2FwSNMPExtensionDNP3Group 7 }
+
+hm2FwSNMPExtensionDNP3ObjectCreateError OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DNP3 object list cannot be created."
+           ::= { hm2FwSNMPExtensionDNP3Group 8 }
+
+hm2FwSNMPExtensionDNP3ObjectIndexInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DNP3 object index contains invalid characters or is out
+                        of range."
+           ::= { hm2FwSNMPExtensionDNP3Group 9 }
+
+hm2FwSNMPExtensionDNP3ObjectProfileActive OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DNP3 object list cannot be modified since the DNP3 profile
+                        corresponding to it is active."
+           ::= { hm2FwSNMPExtensionDNP3Group 10 }
+
+hm2FwSNMPExtensionDNP3ObjectProfileNotExist OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the DNP3 object list cannot be modified since the DNP3 profile
+                        does not exist."
+           ::= { hm2FwSNMPExtensionDNP3Group 11 }
+
+hm2FwSNMPExtensionDNP3ObjectTypeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the object type contains an invalid value that cannot be
+                        be processed."
+           ::= { hm2FwSNMPExtensionDNP3Group 12 }
+
+hm2FwSNMPExtensionDNP3QualifierCodeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the qualifier code contains an invalid value that cannot be
+                        be processed."
+           ::= { hm2FwSNMPExtensionDNP3Group 13 }
+
+hm2FwSNMPExtensionDNP3VariationNumInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the variation number contains an invalid value that cannot be
+                        be processed."
+           ::= { hm2FwSNMPExtensionDNP3Group 14 }
+
+-- ***********************************************************
+-- hm2FwSNMPExtensionOPCGroup
+-- ***********************************************************
+
+hm2FwSNMPExtensionOPCFragmentCheckInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the OPC entry contains an invalid value for fragment check
+                        that cannot be processed."
+           ::= { hm2FwSNMPExtensionOPCGroup 1 }
+
+hm2FwSNMPExtensionOPCTimeoutInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the OPC entry contains an invalid value for OPC data connection
+                        timeout that cannot be processed."
+           ::= { hm2FwSNMPExtensionOPCGroup 2 }
+
+-- ***********************************************************
+-- hm2FwSNMPExtensionModbusGroup
+-- ***********************************************************
+
+hm2FwSNMPExtensionModbusExceptionInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the modbus entry contains an invalid value for exception response
+                        that cannot be processed."
+           ::= { hm2FwSNMPExtensionModbusGroup 1 }
+
+hm2FwSNMPExtensionModbusUnitIdentifierInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the modbus entry contains an invalid value for unit identifier
+                        that cannot be processed."
+           ::= { hm2FwSNMPExtensionModbusGroup 2 }
+
+hm2FwSNMPExtensionModbusStatefullCheckInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the modbus entry contains an invalid value for statefull check
+                        that cannot be processed."
+           ::= { hm2FwSNMPExtensionModbusGroup 3 }
+
+-- ***********************************************************
+-- hm2FwSNMPExtensionAmpGroup
+-- ***********************************************************
+hm2FwSNMPExtensionAMPMessageTypeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the message type contains invalid characters or has a wrong length."
+           ::= { hm2FwSNMPExtensionAMPGroup 1 }
+
+hm2FwSNMPExtensionAMPAddressClassInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the address class contains invalid characters or has a wrong length."
+           ::= { hm2FwSNMPExtensionAMPGroup 2 }
+
+hm2FwSNMPExtensionAMPDeviceClassInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the device class contains invalid characters or has a wrong length."
+           ::= { hm2FwSNMPExtensionAMPGroup 3 }
+
+hm2FwSNMPExtensionAMPMemoryAddressInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the memory address contains invalid characters or has a wrong length."
+           ::= { hm2FwSNMPExtensionAMPGroup 4 }
+
+hm2FwSNMPExtensionAMPDataWordInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the data word contains invalid characters or has a wrong length."
+           ::= { hm2FwSNMPExtensionAMPGroup 5 }
+
+hm2FwSNMPExtensionAMPTaskCodeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the task code contains invalid characters or has a wrong length."
+           ::= { hm2FwSNMPExtensionAMPGroup 6 }
+
+hm2FwSNMPExtensionAMPTaskCodeDataInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the task code data contains invalid characters or has a wrong length."
+           ::= { hm2FwSNMPExtensionAMPGroup 7 }
+
+hm2FwSNMPExtensionAMPProtocolInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the protocol contains an invalid value that cannot be processed."
+           ::= { hm2FwSNMPExtensionAMPGroup 8 }
+
+hm2FwSNMPExtensionAMPECCInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the error check characters contains an invalid value that cannot be processed."
+           ::= { hm2FwSNMPExtensionAMPGroup 9 }
+
+hm2FwSNMPExtensionAMPBCCInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the block check characters contains an invalid value that cannot be processed."
+           ::= { hm2FwSNMPExtensionAMPGroup 10 }
+
+hm2FwSNMPExtensionAMPDebugInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the debug contains an invalid value that cannot be processed."
+           ::= { hm2FwSNMPExtensionAMPGroup 11 }
+
+hm2FwSNMPExtensionAMPDigitalInputInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the digital input contains an invalid value that cannot be processed."
+           ::= { hm2FwSNMPExtensionAMPGroup 12 }
+
+hm2FwSNMPExtensionAMPProtectModeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the protect mode contains an invalid value that cannot be processed."
+           ::= { hm2FwSNMPExtensionAMPGroup 13 }
+
+hm2FwSNMPExtensionAMPTaskCodeModeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the task code mode contains an invalid value that cannot be processed."
+           ::= { hm2FwSNMPExtensionAMPGroup 14 }
+
+hm2FwSNMPExtensionAMPAddressClassRangeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the address class is exceeding the maximum permissable range i.e. 0000-FFFF."
+           ::= { hm2FwSNMPExtensionAMPGroup 15 }
+
+hm2FwSNMPExtensionAMPDeviceClassRangeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the device class is exceeding the maximum permissable range i.e. 0000-FFFF."
+           ::= { hm2FwSNMPExtensionAMPGroup 16 }
+
+hm2FwSNMPExtensionAMPMemoryAddressRangeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the memory address is exceeding the maximum permissable range i.e. 0000-FFFF."
+           ::= { hm2FwSNMPExtensionAMPGroup 17 }
+
+hm2FwSNMPExtensionAMPDataWordRangeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the data word is exceeding the maximum permissable range i.e. 0000-FFFF."
+           ::= { hm2FwSNMPExtensionAMPGroup 18 }
+
+hm2FwSNMPExtensionAMPTaskCodeRangeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the task code is exceeding the maximum permissable range i.e. 00-FF."
+           ::= { hm2FwSNMPExtensionAMPGroup 19 }
+
+hm2FwSNMPExtensionAMPTaskCodeDataRangeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the task code data is exceeding the maximum permissable length i.e. 72 bytes."
+           ::= { hm2FwSNMPExtensionAMPGroup 20 }
+
+hm2FwSNMPExtensionAMPProtocolNITPMessageTypeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the message type is not available when the protocol is NITP."
+           ::= { hm2FwSNMPExtensionAMPGroup 21 }
+
+hm2FwSNMPExtensionAMPProtocolNITPAddressClassInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the address class is not available when the protocol is NITP."
+           ::= { hm2FwSNMPExtensionAMPGroup 22 }
+
+hm2FwSNMPExtensionAMPProtocolNITPDeviceClassInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the device class is not available when the protocol is NITP."
+           ::= { hm2FwSNMPExtensionAMPGroup 23 }
+
+hm2FwSNMPExtensionAMPProtocolNITPMemoryAddressInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the memory address is not available when the protocol is NITP."
+           ::= { hm2FwSNMPExtensionAMPGroup 24 }
+
+hm2FwSNMPExtensionAMPProtocolNITPDataWordInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the data word is not available when the protocol is NITP."
+           ::= { hm2FwSNMPExtensionAMPGroup 25 }
+
+hm2FwSNMPExtensionAMPProtocolNITPBCCInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the block check characters is not available when the protocol is NITP."
+           ::= { hm2FwSNMPExtensionAMPGroup 26 }
+
+hm2FwSNMPExtensionAMPProtocolCAMPAddressClassInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the address class is not available if the protocol is CAMP and the message type includes hexadecimal values 02 and/or 03."
+           ::= { hm2FwSNMPExtensionAMPGroup 27 }
+
+hm2FwSNMPExtensionAMPProtocolCAMPDataWordInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the data word is not available if the protocol is CAMP and the message type includes hexadecimal values between 02..07."
+           ::= { hm2FwSNMPExtensionAMPGroup 28 }
+
+hm2FwSNMPExtensionAMPProtocolCAMPDeviceClassInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the device class is not available if the protocol is CAMP and the message type includes hexadecimal values between 04..09."
+           ::= { hm2FwSNMPExtensionAMPGroup 29 }
+
+hm2FwSNMPExtensionAMPProtocolCAMPMemoryAddressInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the memory address is not available if the protocol is CAMP and the message type includes hexadecimal values between 04..09."
+           ::= { hm2FwSNMPExtensionAMPGroup 30 }
+
+hm2FwSNMPExtensionAMPProtocolCAMPTaskCodeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the task code is not available if the protocol is CAMP and the message type includes hexadecimal values between 04..09."
+           ::= { hm2FwSNMPExtensionAMPGroup 31 }
+
+hm2FwSNMPExtensionAMPProtocolCAMPTaskCodeDataInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the task code data is not available if the protocol is CAMP and the message type includes hexadecimal values between 04..09."
+           ::= { hm2FwSNMPExtensionAMPGroup 32 }
+
+hm2FwSNMPExtensionAMPProtocolCAMPECCInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the error check characters is not available if the protocol is CAMP and the message type includes hexadecimal values between 04..09."
+           ::= { hm2FwSNMPExtensionAMPGroup 33 }
+
+hm2FwSNMPExtensionAMPProtectModeDigitalInputInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that protect mode is not available if the digital input is enabled."
+           ::= { hm2FwSNMPExtensionAMPGroup 34 }
+
+hm2FwSNMPExtensionAMPMessageTypeInputInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the message type contains an invalid value that cannot be processed. Allowed message types are 02,03,04,05,06,07,08,09,FF."
+           ::= { hm2FwSNMPExtensionAMPGroup 35 }
+
+hm2FwSNMPExtensionAMPMessageTypeBothTogetherInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the message type can have either the value 'Packed Task Code Message' or the value 'Memory Transfer Command'. Both together are not allowed."
+           ::= { hm2FwSNMPExtensionAMPGroup 36 }
+
+hm2FwSNMPExtensionAMPTaskCodeDataMultipleInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the task code data  is only available if a single task code is configured in the AMP profile."
+           ::= { hm2FwSNMPExtensionAMPGroup 37 }
+
+hm2FwSNMPExtensionAMPTaskCodeConfigureInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the AMP profile cannot be configured for the AMP profile. Task code is not present in the task code table."
+           ::= { hm2FwSNMPExtensionAMPGroup 38 }
+
+hm2FwSNMPExtensionAMPProfileDeleteInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the profile cannot be deleted or deactivated if the profile is associated with at least one L2 firewall rule."
+           ::= { hm2FwSNMPExtensionAMPGroup 39 }
+
+hm2FwSNMPExtensionAMPProfileEnableInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the profile cannot be activated if not all required parameters are set."
+           ::= { hm2FwSNMPExtensionAMPGroup 40 }
+
+hm2FwSNMPExtensionAMPTaskCodeTableInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the task code cannot be deleted or modified if it is associated with an AMP profile."
+           ::= { hm2FwSNMPExtensionAMPGroup 41 }
+
+hm2FwSNMPExtensionAMPDefaultTaskCode OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the default task codes connot be deleted or modified."
+           ::= { hm2FwSNMPExtensionAMPGroup 42 }
+
+hm2FwSNMPExtensionAMPMessageTypeTogetherInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the message type can have either the value 'Memory Exchange Command' or the value 'Memory Exchange Message'. Both together are not allowed."
+           ::= { hm2FwSNMPExtensionAMPGroup 43 }
+
+-- ***********************************************************
+-- hm2FwSNMPExtensionIPGroup
+-- ***********************************************************
+
+hm2FwSNMPExtensionIPQueueIDInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the packet filter rule entry contains an invalid value for assigned
+                        queue ID that cannot be processed."
+           ::= { hm2FwSNMPExtensionIPGroup 1 }
+
+hm2FwSNMPExtensionIPBurstSizeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the packet filter rule entry contains an invalid value
+                        for burst size that cannot be processed."
+           ::= { hm2FwSNMPExtensionIPGroup 2 }
+
+hm2FwSNMPExtensionIPDirectionInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the packet filter assignment entry contains an invalid value
+                        for direction that cannot be processed. It can only be ingress or egress."
+           ::= { hm2FwSNMPExtensionIPGroup 3 }
+
+hm2FwSNMPExtensionIPEthertypeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the packet filter rule entry contains an invalid value
+                        for ethertype that cannot be processed."
+           ::= { hm2FwSNMPExtensionIPGroup 4 }
+
+hm2FwSNMPExtensionIPEthertypeValueInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the packet filter rule entry contains an invalid value
+                        for ethertype custom value that cannot be processed."
+           ::= { hm2FwSNMPExtensionIPGroup 5 }
+
+hm2FwSNMPExtensionIPLogInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the packet filter rule entry contains an invalid value
+                        for log that cannot be processed."
+           ::= { hm2FwSNMPExtensionIPGroup 6 }
+
+hm2FwSNMPExtensionIPParameterInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the packet filter rule entry contains an invalid value
+                        for parameters that cannot be processed."
+           ::= { hm2FwSNMPExtensionIPGroup 7 }
+
+hm2FwSNMPExtensionIPPriorityInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the packet filter assignment entry contains an invalid value
+                        for priority that cannot be processed."
+           ::= { hm2FwSNMPExtensionIPGroup 8 }
+
+hm2FwSNMPExtensionIPProfileIndexInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the packet filter rule entry contains an invalid value
+                        for dpi profile index that cannot be processed."
+           ::= { hm2FwSNMPExtensionIPGroup 9 }
+
+hm2FwSNMPExtensionIPRateLimitInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the packet filter rule entry contains an invalid value
+                        for rate limit that cannot be processed."
+           ::= { hm2FwSNMPExtensionIPGroup 10 }
+
+hm2FwSNMPExtensionIPRuleInUse OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the rule cannot be deleted as it is associated with interface."
+           ::= { hm2FwSNMPExtensionIPGroup 11 }
+
+hm2FwSNMPExtensionIPTOSPriorityInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the packet filter rule entry contains an invalid value
+                        for TOS priority that cannot be processed."
+           ::= { hm2FwSNMPExtensionIPGroup 12 }
+
+hm2FwSNMPExtensionIPProtocolInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the assigned protocol for an entry is invalid."
+           ::= { hm2FwSNMPExtensionIPGroup 13 }
+
+hm2FwSNMPExtensionIPTrapInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the packet filter rule entry contains an invalid value
+                        for trap that cannot be processed."
+           ::= { hm2FwSNMPExtensionIPGroup 14 }
+
+hm2FwSNMPExtensionIPUnitInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the packet filter rule entry contains an invalid value
+                        for unit that cannot be processed. It can only has value 'pps' or 'kbps'."
+           ::= { hm2FwSNMPExtensionIPGroup 15 }
+
+hm2FwSNMPExtensionIPUnsupportedDPIL4Protocol OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the packet filter rule {0} specifies {1} DPI with an unsupported
+                        L4 protocol. Only {2} is allowed."
+           ::= { hm2FwSNMPExtensionIPGroup 16 }
+
+hm2FwSNMPExtensionIPActionInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the assigned action for an entry is invalid."
+           ::= { hm2FwSNMPExtensionIPGroup 17 }
+
+hm2FwSNMPExtensionIPEntryActiveErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the radius authentication server entry cannot be activated as
+                        an active entry with same IP address and same UDP port already exists."
+           ::= { hm2FwSNMPExtensionIPGroup 18 }
+
+hm2FwSNMPExtensionIPDestPortAny OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the destination port 'any' is invalid for the selected action
+                        in the packet filter rule."
+           ::= { hm2FwSNMPExtensionIPGroup 19 }
+
+hm2FwSNMPExtensionIPPortProtoInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the source port and destination port can be assigned values
+                        between 1 to 65535 only when protocol is tcp or udp."
+           ::= { hm2FwSNMPExtensionIPGroup 20 }
+
+hm2FwSNMPExtensionIPAppRuleNameInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the packet filter entry contains an invalid value
+                        for application rule name that cannot be processed."
+           ::= { hm2FwSNMPExtensionIPGroup 21 }
+
+-- ***********************************************************
+-- hm2FwSNMPExtensionENIPGroup
+-- ***********************************************************
+
+hm2FwSNMPExtensionENIPAllowPCCCInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the Allow embedded PCCC field contains a value which is out of range
+                        or contains invalid characters."
+           ::= { hm2FwSNMPExtensionENIPGroup 1 }
+
+hm2FwSNMPExtensionENIPDefObjectListInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the default object list contains a value which is out of range
+                        or contains invalid characters."
+           ::= { hm2FwSNMPExtensionENIPGroup 2 }
+
+hm2FwSNMPExtensionENIPDescriptionInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that description for object contains a value which is out of range
+                        or contains invalid characters."
+           ::= { hm2FwSNMPExtensionENIPGroup 3 }
+
+hm2FwSNMPExtensionENIPFunctionTypeError OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that function type is 'any' thus the wildcard service code list and
+                        default object list cannot be added or modified."
+           ::= { hm2FwSNMPExtensionENIPGroup 4 }
+
+hm2FwSNMPExtensionENIPObjectClassIdInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the class ID contains a value which is out of range
+                        or contains invalid characters."
+           ::= { hm2FwSNMPExtensionENIPGroup 5 }
+
+hm2FwSNMPExtensionENIPObjectCreateError OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the object cannot be created due to general error."
+           ::= { hm2FwSNMPExtensionENIPGroup 6 }
+
+hm2FwSNMPExtensionENIPObjectFunctionTypeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the object cannot be created since the function type is 'any'."
+           ::= { hm2FwSNMPExtensionENIPGroup 7 }
+
+hm2FwSNMPExtensionENIPObjectCreateProfileActiveError OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the object cannot be created when the profile is
+                        active."
+           ::= { hm2FwSNMPExtensionENIPGroup 8 }
+
+hm2FwSNMPExtensionENIPObjectCreateProfileNotExistError OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the object cannot be created when the profile does
+                        not exist."
+           ::= { hm2FwSNMPExtensionENIPGroup 9 }
+
+hm2FwSNMPExtensionENIPObjectModifyProfileActiveError OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the object cannot be modified when the profile is
+                        active."
+           ::= { hm2FwSNMPExtensionENIPGroup 10 }
+
+hm2FwSNMPExtensionENIPObjectModifyProfileNotExistError OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the object cannot be modified when the profile does
+                        not exist."
+           ::= { hm2FwSNMPExtensionENIPGroup 11 }
+
+hm2FwSNMPExtensionENIPObjectServiceCodeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the service code list contains a value which is out of
+                        range or contains invalid characters."
+           ::= { hm2FwSNMPExtensionENIPGroup 12 }
+
+hm2FwSNMPExtensionENIPProfileActive OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the default object list or wildcard service code list
+                        cannot be modified  when the profile is active."
+           ::= { hm2FwSNMPExtensionENIPGroup 13 }
+
+hm2FwSNMPExtensionENIPProfileNotExist OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the default object list or wildcard service code list
+                        cannot be modified since the profile does not exist."
+           ::= { hm2FwSNMPExtensionENIPGroup 14 }
+
+hm2FwSNMPExtensionENIPWildcardServiceListInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the Wild card service list contains a value which is 
+                        out of range or contains invalid characters."
+           ::= { hm2FwSNMPExtensionENIPGroup 15 }
+
+-- ***********************************************************
+-- hm2FwTemplateSNMPExtensionGroup
+-- ***********************************************************
+
+hm2FwTemplateSNMPExtAssetTagInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the asset entry conatins an invalid value for
+                        asset tag that cannot be processed."
+           ::= { hm2FwTemplateSNMPExtensionGroup 1 }
+
+hm2FwTemplateSNMPExtCannotDeleteDefaultRule OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the application rule cannot be deleted as it is
+                        designated as 'default'."
+           ::= { hm2FwTemplateSNMPExtensionGroup 2 }
+
+hm2FwTemplateSNMPExtGenLocInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the asset entry contains an invalid value for
+                        general location that cannot be processed."
+           ::= { hm2FwTemplateSNMPExtensionGroup 3 }
+
+hm2FwTemplateSNMPExtIPProtoNumberInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the protocol entry contains IP protocol number
+                        value which is out of range. Permissable range is -1..255."
+           ::= { hm2FwTemplateSNMPExtensionGroup 4 }
+
+hm2FwTemplateSNMPExtManufacturerInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the asset entry contains an invalid value for
+                        manufacturer that cannot be processed."
+           ::= { hm2FwTemplateSNMPExtensionGroup 5 }
+
+hm2FwTemplateSNMPExtModelInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the asset entry contains an invalid value for
+                        model that cannot be processed."
+           ::= { hm2FwTemplateSNMPExtensionGroup 6 }
+
+hm2FwTemplateSNMPExtSpecLocInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the asset entry contains an invalid value for
+                        specific location that cannot be processed."
+           ::= { hm2FwTemplateSNMPExtensionGroup 7 }
+
+hm2FwTemplateSNMPExtDeleteInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the entry cannot be deleted or modified beacuse
+                        it is associated with at least one application rule or L2/L3
+                        firewall rule."
+           ::= { hm2FwTemplateSNMPExtensionGroup 8 }
+
+-- ***********************************************************
+
+END

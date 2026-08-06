@@ -1,0 +1,406 @@
+HM2-TSN-MIB DEFINITIONS ::= BEGIN
+-- 
+-- ***********************************************************
+-- Hirschmann Time Sensitive Network MIB
+-- ***********************************************************
+--
+IMPORTS
+ 
+    MODULE-IDENTITY,  OBJECT-TYPE, 
+    Integer32                               FROM SNMPv2-SMI
+    hm2ConfigurationMibs,
+    HmEnabledStatus                         FROM HM2-TC-MIB
+    ieee8021STParametersEntry               FROM IEEE8021-ST-MIB
+    TEXTUAL-CONVENTION                      FROM SNMPv2-TC;
+
+
+hm2TsnMib  MODULE-IDENTITY
+    LAST-UPDATED "201802060000Z" -- February 6, 2018
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+                 "Hirschmann Time Sensitive Network MIB.
+                  Copyright (C) 2018. All Rights Reserved."
+ 
+    REVISION     "201802060000Z" -- February 6, 2018
+    DESCRIPTION
+                 "Initial version."
+    REVISION     "202102190000Z" -- February 19, 2021
+    DESCRIPTION
+                 "Added hm2TsnTemplateBasedGroup."
+    REVISION     "202103150000Z" -- March 15, 2021
+    DESCRIPTION
+                 "Added hm2TsnConflictMibSESGroup for 
+                  SNMP extended error handling. ."           
+    ::= { hm2ConfigurationMibs 51 }
+
+-- **************************************************************************************
+
+  Hm2TsnBaseTime ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT
+      "2d-1d-1d,1d:1d:1d.4d"
+    STATUS current
+    DESCRIPTION
+          "A date-time specification for absolute time entry in a time range.
+
+          field  octets  contents                  range 
+          -----  ------  --------                  -----
+            1     1-2    year                      0..65536
+            2      3     month                     1..12
+            3      4     day                       1..31
+            4      5     hour                      0..23
+            5      6     minutes                   0..59
+            6      7     seconds                   0..59
+            7    8-11    nanoseconds               0..4294967296
+
+          For example, Oct 9, 2009 at 1:30:45.4566 PM would be
+          displayed as:
+                  2009-10-9,13:30:45.4566"
+    SYNTAX OCTET STRING (SIZE (11))
+
+-- **************************************************************************************  
+    
+-- 
+-- ***********************************************************
+-- hm2TsnbMib
+-- ***********************************************************
+--
+hm2TsnNotifications         OBJECT IDENTIFIER ::= { hm2TsnMib 0 }
+hm2TsnMibObjects            OBJECT IDENTIFIER ::= { hm2TsnMib 1 }
+-- hm2TsnMibConformance     OBJECT IDENTIFIER ::= { hm2TsnMib 2 }
+hm2TsnMibSNMPExtensionGroup OBJECT IDENTIFIER ::= { hm2TsnMib 3 }
+ 
+-- 
+-- ***********************************************************
+-- hm2Tsn Groups 
+-- ***********************************************************
+--
+hm2TsnGroup                 OBJECT IDENTIFIER ::= { hm2TsnMibObjects 1 } 
+ 
+-- ****************************************************************************
+-- TSN Group
+-- ****************************************************************************
+ 
+hm2TsnAdminState OBJECT-TYPE
+            SYNTAX HmEnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The TSN protocol group administrative status."
+            DEFVAL { disable }
+            ::= { hm2TsnGroup 1 }
+
+
+-- ****************************************************************************
+-- Parameters Entry
+-- ****************************************************************************
+
+hm2STParametersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hm2STParametersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { hm2TsnMibObjects 2 }
+
+hm2STParametersEntry OBJECT-TYPE
+    SYNTAX      Hm2STParametersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    AUGMENTS { ieee8021STParametersEntry }
+    ::= { hm2STParametersTable 1 }
+
+Hm2STParametersEntry ::=
+    SEQUENCE {
+       hm2STAdminBaseTime               Hm2TsnBaseTime,
+       hm2STOperBaseTime                Hm2TsnBaseTime,
+       hm2STConfigChangeTime            Hm2TsnBaseTime,
+       hm2STPortStatus					INTEGER
+     }
+
+hm2STAdminBaseTime OBJECT-TYPE
+     SYNTAX      Hm2TsnBaseTime
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "The administrative value of the BaseTime parameter for the port."
+     ::= { hm2STParametersEntry 1 }
+
+hm2STOperBaseTime OBJECT-TYPE
+     SYNTAX      Hm2TsnBaseTime
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+                 "The operational value of the BaseTime parameter for the port."
+     ::= { hm2STParametersEntry 2 }
+
+hm2STConfigChangeTime OBJECT-TYPE
+     SYNTAX      Hm2TsnBaseTime
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+                 "The value of the ConfigChangeTime parameter for the port."
+     ::= { hm2STParametersEntry 3 }
+
+hm2STPortStatus OBJECT-TYPE
+     SYNTAX      INTEGER { running(1),
+                           waitForTimeSync(2),
+                           pending(3),
+                           disabled(4),
+                           error(5)
+                        }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+                 "The operational value of cycle status on the port"
+     ::= { hm2STParametersEntry 4 }
+
+
+-- ***********************************************************
+-- TSN Template Based Group 
+-- ***********************************************************
+
+hm2TsnTemplateBasedGroup         OBJECT IDENTIFIER ::= { hm2TsnMibObjects 3 } 
+
+hm2TsnTemplateBasedParametersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hm2TsnTemplateBasedParametersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { hm2TsnTemplateBasedGroup 1 }
+
+hm2TsnTemplateBasedParametersEntry OBJECT-TYPE
+    SYNTAX      Hm2TsnTemplateBasedParametersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    AUGMENTS { ieee8021STParametersEntry }
+    ::= { hm2TsnTemplateBasedParametersTable 1 }
+
+Hm2TsnTemplateBasedParametersEntry ::=
+    SEQUENCE {
+       hm2TsnAdminTemplateGcl             INTEGER,
+       hm2TsnOperTemplateGcl              INTEGER
+     }
+
+hm2TsnAdminTemplateGcl OBJECT-TYPE
+            SYNTAX  INTEGER {
+                               noop(1),
+                               tc7Tc6to0Gb(2),
+                               gbTc7Tc6to0(3),
+                               tc6to0GbTc7(4),
+                               gbTc7GbTc6Tc5to0(5),
+                               tc5to0GbTc7GbTc6(6),
+                               gbTc6GbTc7Tc5to0(7),
+                               gbTc7Tc5to0GbTc6(8),
+                               tc7GbTc6Tc5to0Gb(9)
+                            }
+            MAX-ACCESS      read-write
+            STATUS          current
+            DESCRIPTION
+            "Administrative value of presetting the TSN gate control list 
+            with a template.
+            
+            Writing noop(1) has no effect. When reading this object,
+            it returns noop(1).
+            
+            When writing tc7Tc6to0Gb(2) the number of entries (TLVs) in the
+            ieee8021STAdminControlList will be preassigned to 3, 
+            in the ieee8021STAdminControlList the first entry represents 
+            traffic class 7, 
+            the second entry represents the traffic classes 6 to 0,
+            and the third entry represents a guard band.
+            
+            When writing gbTc7Tc6to0(3) the number of entries (TLVs) in the
+            ieee8021STAdminControlList will be preassigned to 3, 
+            in the ieee8021STAdminControlList the first entry represents 
+            a guard band,
+            the second entry represents the traffic class 7,
+            and the third entry represents the traffic classes 6 to 0.
+            
+            When writing tc6to0GbTc7(4) the number of entries (TLVs) in the
+            ieee8021STAdminControlList will be preassigned to 3, 
+            in the ieee8021STAdminControlList the first entry represents 
+            the traffic classes 6 to 0,
+            the second entry represents a guard band,
+            and the third entry represents the traffic class 7.
+            
+            When writing gbTc7GbTc6Tc5to0(5) the number of entries (TLVs) in the
+            ieee8021STAdminControlList will be preassigned to 5, 
+            in the ieee8021STAdminControlList the first entry represents
+            a guard band, 
+            the second entry represents the traffic class 7,
+            the third entry represents a guard band,
+            the fourth entry represents the traffic class 6,
+            and the fifth entry represents the traffic classes 5 to 0.
+            
+            When writing tc5to0GbTc7GbTc6(6) the number of entries (TLVs) in the
+            ieee8021STAdminControlList will be preassigned to 5, 
+            in the ieee8021STAdminControlList the first entry represents
+            the traffic classes 5 to 0, 
+            the second entry represents a guard band,
+            the third entry represents the traffic class 7,
+            the fourth entry represents a guard band,
+            and the fifth entry represents the traffic class 6.
+            
+            When writing gbTc6GbTc7Tc5to0(7) the number of entries (TLVs) in the
+            ieee8021STAdminControlList will be preassigned to 5, 
+            in the ieee8021STAdminControlList the first entry represents
+            a guard band, 
+            the second entry represents the traffic class 6,
+            the third entry represents a guard band,
+            the fourth entry represents the traffic class 7,
+            and the fifth entry represents the traffic classes 5 to 0.
+            
+            When writing gbTc7Tc5to0GbTc6(8) the number of entries (TLVs) in the
+            ieee8021STAdminControlList will be preassigned to 5, 
+            in the ieee8021STAdminControlList the first entry represents
+            a guard band, 
+            the second entry represents the traffic class 7,
+            the third entry represents the traffic classes 5 to 0,
+            the fourth entry represents a guard band,
+            and the fifth entry represents the traffic class 6.
+
+            When writing tc7GbTc6Tc5to0Gb(9) the number of entries (TLVs) in the
+            ieee8021STAdminControlList will be preassigned to 5, 
+            in the ieee8021STAdminControlList the first entry represents
+            traffic class 7, 
+            the second entry represents a guard band,
+            the third entry represents the traffic class 6,
+            the fourth entry represents the traffic classes 5 to 0,
+            and the fifth entry represents a guard band.
+            "
+            DEFVAL { noop }            
+            ::= { hm2TsnTemplateBasedParametersEntry 1 }
+
+hm2TsnOperTemplateGcl OBJECT-TYPE
+            SYNTAX  INTEGER {
+                               noTemplate(1),
+                               tc7Tc6to0Gb(2),
+                               gbTc7Tc6to0(3),
+                               tc6to0GbTc7(4),
+                               gbTc7GbTc6Tc5to0(5),
+                               tc5to0GbTc7GbTc6(6),
+                               gbTc6GbTc7Tc5to0(7),
+                               gbTc7Tc5to0GbTc6(8),
+                               tc7GbTc6Tc5to0Gb(9)
+                            }
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION
+            "Operational value of presetting the TSN gate control list with a template.
+            
+            noTemplate(1) indicates that the TSN gate control list was not presetted
+            with a template.
+            
+            tc7Tc6to0Gb(2) indicates that the number of entries (TLVs) in the
+            ieee8021STAdminControlList was preassigned to 3, 
+            in the ieee8021STAdminControlList the first entry represents 
+            traffic class 7,
+            the second entry represents the traffic classes 6 to 0,
+            and the third entry represents a guard band.
+ 
+            gbTc7Tc6to0(3) indicates that the number of entries (TLVs) in the
+            ieee8021STAdminControlList was preassigned to 3, 
+            in the ieee8021STAdminControlList the first entry represents 
+            a guard band,
+            the second entry represents the traffic class 7,
+            and the third entry represents the traffic classes 6 to 0.
+            
+            tc6to0GbTc7(4) indicates that the number of entries (TLVs) in the
+            ieee8021STAdminControlList was preassigned to 3, 
+            in the ieee8021STAdminControlList the first entry represents 
+            the traffic classes 6 to 0,
+            the second entry represents a guard band,
+            and the third entry represents the traffic class 7.
+
+            gbTc7GbTc6Tc5to0(5) indicates that the number of entries (TLVs) in the
+            ieee8021STAdminControlList was preassigned to 5, 
+            in the ieee8021STAdminControlList the first entry represents
+            a guard band, 
+            the second entry represents the traffic class 7,
+            the third entry represents a guard band,
+            the fourth entry represents the traffic class 6,
+            and the fifth entry represents the traffic classes 5 to 0.
+
+            tc5to0GbTc7GbTc6(6) indicates that the number of entries (TLVs) in the
+            ieee8021STAdminControlList was preassigned to 5, 
+            in the ieee8021STAdminControlList the first entry represents
+            the traffic classes 5 to 0, 
+            the second entry represents a guard band,
+            the third entry represents the traffic class 7,
+            the fourth entry represents a guard band,
+            and the fifth entry represents the traffic class 6.
+
+            gbTc6GbTc7Tc5to0(7) indicates that the number of entries (TLVs) in the
+            ieee8021STAdminControlList was preassigned to 5, 
+            in the ieee8021STAdminControlList the first entry represents
+            a guard band, 
+            the second entry represents the traffic class 6,
+            the third entry represents a guard band,
+            the fourth entry represents the traffic class 7,
+            and the fifth entry represents the traffic classes 5 to 0.
+
+            gbTc7Tc5to0GbTc6(8) indicates that the number of entries (TLVs) in the
+            ieee8021STAdminControlList was preassigned to 5, 
+            in the ieee8021STAdminControlList the first entry represents
+            a guard band, 
+            the second entry represents the traffic class 7,
+            the third entry represents the traffic classes 5 to 0,
+            the fourth entry represents a guard band,
+            and the fifth entry represents the traffic class 6.
+
+            tc7GbTc6Tc5to0Gb(9) indicates that the number of entries (TLVs) in the
+            ieee8021STAdminControlList was preassigned to 5, 
+            in the ieee8021STAdminControlList the first entry represents
+            traffic class 7, 
+            the second entry represents a guard band,
+            the third entry represents the traffic class 6,
+            the fourth entry represents the traffic classes 5 to 0,
+            and the fifth entry represents a guard band.
+            "         
+            ::= { hm2TsnTemplateBasedParametersEntry 2 }
+
+--*****************************************************************************
+-- hm2TsnMibSNMPExtensionGroup
+--*****************************************************************************
+hm2TsnConflictMibSESGroup		OBJECT IDENTIFIER ::= { hm2TsnMibSNMPExtensionGroup 1 }
+
+-- *************************************************************
+-- hm2TsnConflictMibSESGroup notifications
+-- *************************************************************
+
+hm2TsnGranulaityConflict OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION 
+            "Indicates that either the configured cycle time or GCL interval 
+             does not conform to the granularity of cycle time range.	 
+            For cycle time till 4ms, granularity is 1000ns.
+            For cycle time between 4ms and 8ms, granularity is 2000ns.
+            For cycle time greater than 8ms, granularity is 4000ns.	 
+            "
+            ::= { hm2TsnConflictMibSESGroup 1 }
+	
+hm2TsnGCLTimeIntervalConflit OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION 
+            "Indicates that sum of the time interval of all GCL entries exceeds
+             the configured cycle time."
+            ::= { hm2TsnConflictMibSESGroup 2 }
+	
+hm2TsnGCLTemplateConflict OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION 
+            "Indicates that configured GCL entry does not match to any of the
+             available GCL templates."
+            ::= { hm2TsnConflictMibSESGroup 3 }
+END
