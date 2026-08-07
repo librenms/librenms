@@ -189,12 +189,20 @@
 body.lnms-shell {
     background-color: var(--lnms-bg) !important;
     background-image:
-        linear-gradient(180deg, rgba(15, 110, 124, 0.10) 0%, transparent 160px),
-        linear-gradient(90deg, rgba(27, 36, 44, 0.03) 0%, transparent 40%);
+        linear-gradient(180deg, color-mix(in srgb, var(--lnms-accent) 12%, transparent) 0%, transparent 160px),
+        linear-gradient(90deg, color-mix(in srgb, var(--lnms-text) 4%, transparent) 0%, transparent 40%);
     background-attachment: fixed;
     color: var(--lnms-text);
     font-family: var(--lnms-font-sans);
     line-height: 1.45;
+}
+
+.dark body.lnms-shell,
+html.dark body.lnms-shell {
+    background-color: var(--lnms-bg) !important;
+    background-image:
+        linear-gradient(180deg, color-mix(in srgb, var(--lnms-accent) 16%, transparent) 0%, transparent 180px),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.22) 0%, transparent 42%);
 }
 
 /* Fixed teal brand bar — unmistakable vs stock LibreNMS (no top accent) */
@@ -649,6 +657,13 @@ body.lnms-shell .lnms-a11y-readable {
         overflow-y: auto;
     }
 
+    nav.lnms-nav--app .lnms-sidebar.collapse.in,
+    nav.lnms-nav--app .lnms-sidebar.collapsing {
+        background: var(--lnms-surface) !important;
+        border-bottom: 1px solid var(--lnms-border);
+        box-shadow: var(--lnms-shadow-md);
+    }
+
     nav.lnms-nav--app .lnms-sidebar__menu > li > a {
         display: flex;
         align-items: center;
@@ -659,16 +674,61 @@ body.lnms-shell .lnms-a11y-readable {
     nav.lnms-nav--app .lnms-sidebar__menu > li > a .lnms-nav-label {
         display: inline !important;
     }
+
+    .dark nav.lnms-nav--app .lnms-sidebar.collapse.in,
+    .dark nav.lnms-nav--app .lnms-sidebar.collapsing,
+    .dark nav.lnms-nav--app .lnms-sidebar {
+        background: var(--lnms-surface) !important;
+        border-color: var(--lnms-border) !important;
+    }
+
+    /* Override legacy tw_dark transparent mobile open menus */
+    .dark nav.lnms-nav--app .lnms-sidebar .navbar-nav .open > .dropdown-menu,
+    .dark nav.lnms-nav--app .lnms-sidebar .dropdown-menu {
+        background-color: var(--lnms-surface) !important;
+        border: 1px solid var(--lnms-border);
+    }
 }
 
 .dark nav.lnms-nav--app > .lnms-topbar,
 .dark nav.lnms-nav--app .lnms-sidebar {
     background: var(--lnms-surface) !important;
-    border-color: var(--lnms-border);
+    border-color: var(--lnms-border) !important;
 }
 
 .dark nav.lnms-nav--app .lnms-sidebar__head {
     background: linear-gradient(90deg, var(--lnms-accent-muted) 0%, var(--lnms-surface) 100%);
+    border-bottom-color: var(--lnms-border);
+}
+
+.dark nav.lnms-nav--app .lnms-sidebar__menu > li > a {
+    color: var(--lnms-text-secondary) !important;
+}
+
+.dark nav.lnms-nav--app .lnms-sidebar__menu > li > a:hover,
+.dark nav.lnms-nav--app .lnms-sidebar__menu > li > a:focus {
+    color: var(--lnms-text) !important;
+    background: var(--lnms-surface-muted) !important;
+}
+
+.dark nav.lnms-nav--app .lnms-sidebar__menu > li.open > a,
+.dark nav.lnms-nav--app .lnms-sidebar__menu > li.active > a {
+    color: var(--lnms-text) !important;
+    background: var(--lnms-accent-muted) !important;
+    border-left-color: var(--lnms-accent) !important;
+}
+
+.dark .lnms-sidebar-toggle {
+    background: var(--lnms-surface-muted);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text-secondary);
+}
+
+.dark .lnms-sidebar-toggle:hover,
+.dark .lnms-sidebar-toggle:focus {
+    color: var(--lnms-text);
+    background: var(--lnms-accent-muted);
+    border-color: var(--lnms-border-strong);
 }
 
 /* —— Navbar chrome (Bootstrap contracts preserved; topbar inherits) —— */
@@ -823,16 +883,26 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 }
 
 .dark nav.navbar.lnms-nav.navbar-default .navbar-nav > li > a:hover,
-.dark nav.navbar.lnms-nav.navbar-default .navbar-nav > li > a:focus,
-.dark nav.navbar.lnms-nav.navbar-default .navbar-nav > .active > a,
-.dark nav.navbar.lnms-nav.navbar-default .navbar-nav > .open > a {
+.dark nav.navbar.lnms-nav.navbar-default .navbar-nav > li > a:focus {
     color: var(--lnms-text);
     background-color: var(--lnms-surface-muted);
 }
 
+.dark nav.navbar.lnms-nav.navbar-default .navbar-nav > .active > a,
+.dark nav.navbar.lnms-nav.navbar-default .navbar-nav > .active > a:hover,
+.dark nav.navbar.lnms-nav.navbar-default .navbar-nav > .active > a:focus,
+.dark nav.navbar.lnms-nav.navbar-default .navbar-nav > .open > a,
+.dark nav.navbar.lnms-nav.navbar-default .navbar-nav > .open > a:hover,
+.dark nav.navbar.lnms-nav.navbar-default .navbar-nav > .open > a:focus {
+    color: var(--lnms-text) !important;
+    background-color: var(--lnms-accent-muted) !important;
+    box-shadow: inset 0 -2px 0 var(--lnms-accent);
+    font-weight: 600;
+}
+
 .dark nav.navbar.lnms-nav .dropdown-menu {
-    background-color: var(--lnms-surface);
-    border-color: var(--lnms-border);
+    background-color: var(--lnms-surface) !important;
+    border-color: var(--lnms-border) !important;
 }
 
 .dark nav.navbar.lnms-nav .dropdown-menu > li > a {
@@ -843,6 +913,55 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 .dark nav.navbar.lnms-nav .dropdown-menu > li > a:focus {
     background-color: var(--lnms-surface-muted);
     color: var(--lnms-text);
+}
+
+.dark nav.navbar.lnms-nav .navbar-form.global-search .form-control {
+    background-color: var(--lnms-surface-muted);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.dark nav.navbar.lnms-nav .navbar-form.global-search .form-control:focus {
+    border-color: var(--lnms-accent);
+    background-color: var(--lnms-surface);
+    box-shadow: 0 0 0 3px var(--lnms-focus-ring);
+}
+
+.dark nav.navbar.lnms-nav .navbar-toggle {
+    border-color: var(--lnms-border);
+}
+
+.dark nav.navbar.lnms-nav .navbar-toggle .icon-bar {
+    background-color: var(--lnms-text-secondary);
+}
+
+.dark nav.navbar.lnms-nav .navbar-toggle:hover,
+.dark nav.navbar.lnms-nav .navbar-toggle:focus {
+    background-color: var(--lnms-surface-muted);
+}
+
+/* Theme toggle (user menu) — readable in both themes */
+.lnms-theme-toggle {
+    margin: 6px 12px;
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    background: var(--lnms-surface-muted);
+    overflow: hidden;
+}
+
+.lnms-theme-toggle button {
+    color: var(--lnms-text-muted);
+}
+
+.lnms-theme-toggle button:hover,
+.lnms-theme-toggle button:focus {
+    background: var(--lnms-surface) !important;
+    color: var(--lnms-text);
+}
+
+.dark .lnms-theme-toggle {
+    background: var(--lnms-surface-muted);
+    border-color: var(--lnms-border);
 }
 
 /* Global search dropdown token bridge */
@@ -1041,10 +1160,15 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 .lnms-dashboard {
     font-family: var(--lnms-font-sans);
     padding: var(--lnms-space-1) var(--lnms-space-2) var(--lnms-space-2);
-    background: rgba(255, 255, 255, 0.35);
+    background: color-mix(in srgb, var(--lnms-surface) 72%, transparent);
     border: 1px solid var(--lnms-border);
     border-radius: var(--lnms-radius-lg);
     box-shadow: none;
+}
+
+.dark .lnms-dashboard {
+    background: color-mix(in srgb, var(--lnms-surface) 88%, transparent);
+    border-color: var(--lnms-border);
 }
 
 /* Use more horizontal width on the dashboard host */
