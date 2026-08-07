@@ -51,10 +51,8 @@ class CustomMapController extends WidgetController
 
         $data['map'] = CustomMap::find($data['custom_map']);
         if (! $data['map']) {
-            return $this->needsConfigurationView(
-                __('map.custom.widget.not_found'),
-                __('Edit')
-            );
+            // Same Configure CTA as Graph / Image / Notes empty states (opens real settings).
+            return $this->needsConfigurationView(__('map.custom.widget.not_found'));
         }
         $data['base_url'] = LibrenmsConfig::get('base_url');
         $data['background_config'] = $data['map']->getBackgroundConfig();

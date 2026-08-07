@@ -1172,35 +1172,66 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     display: none !important;
 }
 
-/* Quiet unconfigured widget empty state (view mode) — denser, consistent chrome */
+/* Quiet unconfigured widget empty state (view mode) — denser, no Bootstrap btn chrome */
 .lnms-dashboard .lnms-widget-needs-config {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: var(--lnms-space-2, 8px);
-    min-height: 48px;
-    height: 100%;
-    padding: 4px 2px;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--lnms-space-2, 8px) var(--lnms-space-3, 12px);
+    min-height: 0;
+    height: auto;
+    max-width: 100%;
+    padding: 2px 0 4px;
     color: var(--lnms-text-secondary);
     box-sizing: border-box;
 }
 
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget__body:has(.lnms-widget-needs-config) {
+    display: flex;
+    align-items: flex-start;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+/* View mode: never show settings/form chrome inside needs-config bodies */
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget__body:has(.lnms-widget-needs-config) .dashboard-widget-settings,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget__body:has(.lnms-widget-needs-config) .form-group,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget__body:has(.lnms-widget-needs-config) .form-control,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget__body:has(.lnms-widget-needs-config) .input-group,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget__body:has(.lnms-widget-needs-config) .bootstrap-switch,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget__body:has(.lnms-widget-needs-config) .select2-container,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget__body:has(.lnms-widget-needs-config) .well {
+    display: none !important;
+}
+
 .lnms-dashboard .lnms-widget-needs-config__msg {
     margin: 0;
+    flex: 1 1 12rem;
     font-size: var(--lnms-text-sm);
-    line-height: 1.4;
-    max-width: 36em;
+    line-height: 1.35;
+    max-width: 42em;
 }
 
 .lnms-dashboard .lnms-widget-needs-config__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex: 0 0 auto;
+    margin: 0;
+    border: 1px solid var(--lnms-border);
     border-radius: var(--lnms-radius-sm);
-    border-color: var(--lnms-border);
     color: var(--lnms-text);
     background: var(--lnms-surface);
+    font-family: var(--lnms-font-sans);
     font-size: var(--lnms-text-xs);
-    padding: 3px 10px;
+    font-weight: 600;
+    line-height: 1.2;
+    padding: 4px 10px;
     box-shadow: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
 }
 
 .lnms-dashboard .lnms-widget-needs-config__btn:hover,
@@ -1208,7 +1239,14 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     border-color: var(--lnms-accent);
     color: var(--lnms-accent);
     background: var(--lnms-accent-muted);
+    outline: none;
 }
+
+.lnms-dashboard .lnms-widget-needs-config__btn:focus-visible {
+    box-shadow: 0 0 0 2px var(--lnms-focus-ring);
+}
+
+/* Edit mode: settings forms remain real Bootstrap/LibreNMS forms (scoped above) */
 
 /* View mode: flatten nested Bootstrap panels inside widgets */
 .lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .panel,

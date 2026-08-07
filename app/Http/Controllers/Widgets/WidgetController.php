@@ -96,8 +96,10 @@ abstract class WidgetController extends Controller
         return view('widgets.needs-config', [
             'id' => $settings['id'] ?? 0,
             'message' => $message,
-            'actionLabel' => $actionLabel,
+            // Prefer Configure; callers may pass Edit when copy asks to edit (e.g. Custom Map).
+            'actionLabel' => $actionLabel ?? __('Configure'),
             'canConfigure' => $canConfigure,
+            'widgetName' => $this->name,
         ]);
     }
 

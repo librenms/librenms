@@ -332,7 +332,7 @@
     "src": "node_modules/@fontsource/ibm-plex-sans/files/ibm-plex-sans-vietnamese-700-normal.woff2"
   },
   "resources/js/app.js": {
-    "file": "assets/app-DGZcZs6s.js",
+    "file": "assets/app-r_T92fHb.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -340,7 +340,7 @@
       "resources/js/configHighlight.js"
     ],
     "css": [
-      "assets/app-BRuiwE89.css"
+      "assets/app-9xKGuxAm.css"
     ],
     "assets": [
       "assets/glyphicons-halflings-regular-BUJKDMgK.eot",
@@ -429,7 +429,7 @@
     ]
   },
   "resources/js/configHighlight.js": {
-    "file": "assets/configHighlight-BDu7sV_4.js",
+    "file": "assets/configHighlight-Yz_s6dd_.js",
     "name": "configHighlight",
     "src": "resources/js/configHighlight.js",
     "isDynamicEntry": true,
