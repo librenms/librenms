@@ -60,6 +60,13 @@ class AlertMapController extends WidgetController
 
         [$devices, $alert_totals] = $this->getAlerts();
 
+        // Empty smoke / filtered-out: quiet Configure empty state (same pattern as Graph/Custom Map).
+        if ($devices === []) {
+            return $this->needsConfigurationView(
+                __('No devices match this alert map. Configure filters or add devices.')
+            );
+        }
+
         $data['devices'] = $devices;
         $data['alert_totals'] = $alert_totals;
 

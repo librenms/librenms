@@ -2055,14 +2055,47 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     margin: 0 8px 0 0;
 }
 
+/* Quieter search chrome (Syslog/Alerts/Eventlog/…): keep .search / .search-field / IDs usable */
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .search .input-group,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-footer .search .input-group {
+    width: 100%;
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .search .input-group-addon,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-footer .search .input-group-addon,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .search .icon,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-footer .search .icon {
+    display: none;
+}
+
 .lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .search .search-field,
 .lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-footer .search .search-field {
     height: 28px;
     padding: 2px 8px;
     font-size: var(--lnms-text-xs);
-    border-color: var(--lnms-border);
+    border: 1px solid transparent;
+    border-radius: var(--lnms-radius-sm);
     box-shadow: none;
     background: var(--lnms-surface-muted);
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .search .search-field:hover,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-footer .search .search-field:hover {
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .search .search-field:focus,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-footer .search .search-field:focus {
+    border-color: var(--lnms-accent);
+    background: var(--lnms-surface);
+    color: var(--lnms-text);
+    box-shadow: 0 0 0 2px var(--lnms-focus-ring);
+    outline: none;
 }
 
 .lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .actionBar .btn,
@@ -2330,7 +2363,8 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     max-width: 100%;
 }
 
-/* Alert map: label/tile remaps — preserve device alert links */
+/* Alert map: label/tile remaps — preserve device alert links.
+ * Empty (no devices) uses shared .lnms-widget-needs-config — denser Configure empty state. */
 .lnms-dashboard .lnms-widget .lnms-alert-map {
     color: var(--lnms-text);
     font-size: var(--lnms-text-sm);
@@ -2338,6 +2372,12 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 
 .lnms-dashboard .lnms-widget .lnms-alert-map .widget-alert-totals {
     color: var(--lnms-text-secondary);
+    margin-bottom: 4px;
+    font-size: var(--lnms-text-xs);
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-alert-map > br {
+    display: none;
 }
 
 .lnms-dashboard .lnms-widget .lnms-alert-map .label {
