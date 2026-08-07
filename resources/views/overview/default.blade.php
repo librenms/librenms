@@ -200,7 +200,7 @@
         dashboard_collapse();
         grid = GridStack.init({
             cellHeight: 100,
-            margin: 8,
+            margin: 4,
             minRow: 1,
             maxRow: 200,
             column: 20,

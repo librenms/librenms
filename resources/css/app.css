@@ -1040,11 +1040,26 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 /* —— Dashboard widget chrome (Phase 4) —— */
 .lnms-dashboard {
     font-family: var(--lnms-font-sans);
-    padding: var(--lnms-space-3);
+    padding: var(--lnms-space-2) var(--lnms-space-2) var(--lnms-space-3);
     background: rgba(255, 255, 255, 0.45);
     border: 1px solid var(--lnms-border);
     border-radius: var(--lnms-radius-lg);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* Use more horizontal width on the dashboard host */
+@media (min-width: 768px) {
+    main.lnms-content:has(.lnms-dashboard) {
+        padding-left: var(--lnms-space-3);
+        padding-right: var(--lnms-space-3);
+    }
+}
+
+.lnms-dashboard.container-fluid {
+    padding-left: 8px;
+    padding-right: 8px;
+    width: 100%;
+    max-width: none;
 }
 
 .lnms-dashboard #dashboard-editor {
@@ -1281,7 +1296,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 }
 
 .lnms-dashboard .grid-stack {
-    margin-top: var(--lnms-space-2);
+    margin-top: var(--lnms-space-1);
 }
 
 .lnms-dashboard .grid-stack-item-content.lnms-widget {
@@ -1299,16 +1314,16 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background: var(--lnms-surface);
     color: var(--lnms-text);
     border-bottom: 1px solid var(--lnms-border);
-    padding: 8px 12px;
+    padding: 6px 10px;
     text-align: left;
     font-size: var(--lnms-text-sm);
     font-weight: 600;
-    line-height: 1.4;
-    min-height: 2.4em;
+    line-height: 1.35;
+    min-height: 2.1em;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 6px;
 }
 
 .lnms-dashboard .lnms-widget__title {
@@ -1320,11 +1335,11 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 .lnms-dashboard .lnms-widget__body {
     left: 0 !important;
     right: 0 !important;
-    padding: 10px 12px;
+    padding: 6px 8px;
     overflow-y: auto;
     overflow-x: hidden;
     width: 100%;
-    height: calc(100% - 2.4em);
+    height: calc(100% - 2.1em);
     cursor: auto;
     color: var(--lnms-text);
     background: var(--lnms-surface);
@@ -1899,6 +1914,150 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 .lnms-dashboard .lnms-widget .lnms-syslog-widget .table-striped > tbody > tr:nth-of-type(even),
 .lnms-dashboard .lnms-widget .lnms-alertlog-stats-widget .table-striped > tbody > tr:nth-of-type(even) {
     background-color: var(--lnms-surface-muted);
+}
+
+/*
+ * View-mode: quieter Bootgrid chrome inside dashboard widgets.
+ * Keep IDs / .bootgrid-* / data-column-id / search / pagination for JS.
+ * Soften actionBar/infoBar chrome; denser margins and cells.
+ */
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-footer {
+    margin: 2px 0 4px;
+    padding: 0;
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .row,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-footer .row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .search,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-footer .search {
+    width: min(160px, 42%);
+    margin: 0 8px 0 0;
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .search .search-field,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-footer .search .search-field {
+    height: 28px;
+    padding: 2px 8px;
+    font-size: var(--lnms-text-xs);
+    border-color: var(--lnms-border);
+    box-shadow: none;
+    background: var(--lnms-surface-muted);
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .actionBar .btn,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-footer .infoBar .btn,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .actionBar .dropdown-toggle,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-footer .infoBar .dropdown-toggle {
+    padding: 2px 8px;
+    font-size: var(--lnms-text-xs);
+    line-height: 1.35;
+    background: transparent;
+    border-color: transparent;
+    color: var(--lnms-text-muted);
+    box-shadow: none;
+}
+
+/* View mode: hide Bootgrid column/row chrome; keep search + pagination + table IDs */
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .actionBar > .btn-group {
+    display: none;
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .actionBar .btn:hover,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-footer .infoBar .btn:hover,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .actionBar .dropdown-toggle:hover,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-footer .infoBar .dropdown-toggle:hover {
+    background: var(--lnms-surface-muted);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-footer .infos {
+    font-size: var(--lnms-text-xs);
+    color: var(--lnms-text-muted);
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-footer .pagination > li > a,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-footer .pagination > li > span,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .pagination > li > a,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .pagination > li > span {
+    padding: 2px 8px;
+    font-size: var(--lnms-text-xs);
+    line-height: 1.35;
+    color: var(--lnms-text-secondary);
+    background: transparent;
+    border-color: var(--lnms-border);
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-footer .pagination > .active > a,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-footer .pagination > .active > span,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .pagination > .active > a,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .pagination > .active > span {
+    background: var(--lnms-accent-muted);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-table th,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .table > thead > tr > th {
+    padding: 4px 6px;
+    font-size: var(--lnms-text-xs);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    background: transparent;
+    border-bottom: 1px solid var(--lnms-border);
+    border-top: 0;
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-table td,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .table > tbody > tr > td {
+    padding: 3px 6px;
+    font-size: var(--lnms-text-xs);
+    line-height: 1.35;
+    border-top-color: var(--lnms-border);
+    vertical-align: middle;
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .table-responsive {
+    margin: 0;
+    border: 0;
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .table {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+/* Soften Alerts severity quick-filter chrome in view mode (IDs/classes preserved) */
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-alerts-widget .alerts-widget-sev-btn.btn-default {
+    padding: 2px 8px;
+    font-size: var(--lnms-text-xs);
+    background: transparent;
+    border-color: transparent;
+    color: var(--lnms-text-muted);
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-alerts-widget .alerts-widget-sev-btn.btn-default:hover,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-alerts-widget .alerts-widget-sev-btn.btn-default:focus {
+    background: var(--lnms-surface-muted);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text-secondary);
+}
+
+/* Graph images: fill widget width when configured */
+.lnms-dashboard .lnms-widget .lnms-dashboard-graph.dashboard-graph {
+    width: 100%;
+}
+
+.lnms-dashboard .lnms-widget .lnms-dashboard-graph .minigraph-image {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
 }
 
 /* Alert map: label/tile remaps — preserve device alert links */
