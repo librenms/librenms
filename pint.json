@@ -153,6 +153,7 @@
         "app",
         "config",
         "database",
+        "lang",
         "resources",
         "routes",
         "tests",
