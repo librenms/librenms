@@ -135,9 +135,9 @@ class ArpSearchTest extends TestCase
         $this->assertStringContainsString('Seen on 2 device(s) / 2 port(s)', $results[0]['subtitle']);
     }
 
-    public function test_search_returns_empty_when_endpoints_disabled(): void
+    public function test_search_returns_empty_when_arp_disabled(): void
     {
-        config(['librenms.webui.global_search.endpoints' => false]);
+        \LibrenmsConfig::set('librenms.webui.global_search.arp', false);
 
         $user = User::factory()->admin()->create(['enabled' => true]);
 

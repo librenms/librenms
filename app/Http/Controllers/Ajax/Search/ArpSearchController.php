@@ -18,7 +18,7 @@ class ArpSearchController extends GroupedSearchController
 {
     protected function groups(string $search, string $like, int $limit, ?User $user): array
     {
-        if (! LibrenmsConfig::get('webui.global_search.endpoints')) {
+        if (! LibrenmsConfig::get('webui.global_search.arp')) {
             return [null];
         }
 

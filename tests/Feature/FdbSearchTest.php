@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Tests\Feature;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Ipv4Mac;
 use App\Models\Port;
@@ -186,9 +187,9 @@ class FdbSearchTest extends TestCase
         $this->assertStringContainsString('trunk', $response->json('groups.0.results.0.subtitle'));
     }
 
-    public function test_search_returns_empty_when_endpoints_disabled(): void
+    public function test_search_returns_empty_when_fdb_disabled(): void
     {
-        config(['librenms.webui.global_search.endpoints' => false]);
+        LibrenmsConfig::set('webui.global_search.fdb', false);
 
         $user = User::factory()->admin()->create(['enabled' => true]);
 
