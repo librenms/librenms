@@ -22,18 +22,22 @@ class RoutingSearchController extends GroupedSearchController
                 ->orWhere('bgpPeerIdentifier', 'like', $like)
                 ->orWhere('bgpPeerRemoteAs', 'like', $like))
             ->orderBy('astext')->limit($limit)->get()
-            ->map(fn (BgpPeer $b) => [
-                'name' => $b->bgpPeerIdentifier,
-                'subtitle' => trim($b->device?->display . ' AS' . $b->bgpPeerRemoteAs . ' ' . $b->astext),
+            ->map(fn (BgpPeer $bgpPeer) => [
+                'name' => $bgpPeer->bgpPeerIdentifier,
+                'subtitle' => implode(' · ', array_filter([
+                    $bgpPeer->device?->display,
+                    'AS' . $bgpPeer->bgpPeerRemoteAs,
+                    $bgpPeer->astext,
+                ])),
                 'icon' => 'fa fa-share-alt',
                 'status' => match (true) {
-                    $b->bgpPeerAdminStatus !== 'start' => 'tw:border-l-black!',
-                    $b->bgpPeerState !== 'established' => 'tw:border-l-red-600!',
+                    $bgpPeer->bgpPeerAdminStatus !== 'start' => 'tw:border-l-black!',
+                    $bgpPeer->bgpPeerState !== 'established' => 'tw:border-l-red-600!',
                     default => 'tw:border-l-green-600!',
                 },
-                'url' => Url::deviceUrl($b->device, ['tab' => 'routing', 'proto' => 'bgp']),
+                'url' => Url::deviceUrl($bgpPeer->device, ['tab' => 'routing', 'proto' => 'bgp']),
             ]);
 
-        return [$bgp->isEmpty() ? null : ['type' => 'bgp', 'label' => __('BGP Sessions'), 'results' => $bgp]];
+        return [$bgp->isEmpty() ? null : ['type' => 'bgp', 'label' => __('search.bgp_sessions'), 'results' => $bgp]];
     }
 }

@@ -18,25 +18,37 @@ class PortsSearchController extends GroupedSearchController
         }
 
         $ports = Port::hasAccess($user)->with('device')->where('deleted', 0)
-            ->where(fn (Builder $q) => $q->where('ifAlias', 'like', $like)
-                ->orWhere('ifDescr', 'like', $like)
-                ->orWhere('ifName', 'like', $like)
-                ->orWhere('portName', 'like', $like)
-                ->orWhere('port_descr_descr', 'like', $like))
+            ->select('ports.*')
+            ->where(function (Builder $q) use ($like): void {
+                $q->where('ifAlias', 'like', $like)
+                    ->orWhere('ifDescr', 'like', $like)
+                    ->orWhere('ifName', 'like', $like)
+                    ->orWhere('portName', 'like', $like)
+                    ->orWhere('port_descr_descr', 'like', $like)
+                    ->orWhere('ifPhysAddress', 'like', $like);
+
+                $mac = strtolower(str_replace([':', '-', '.'], '', (string) $like));
+                if (ctype_xdigit($mac)) {
+                    $q->orWhere('ifPhysAddress', 'like', '%' . $mac . '%');
+                }
+            })
             ->orderBy('ifDescr')->limit($limit)->get()
-            ->map(fn (Port $p) => [
-                'name' => $p->getLabel(),
-                'subtitle' => trim($p->device?->display . ' ' . $p->getDescription()),
+            ->map(fn (Port $port) => [
+                'name' => $port->getLabel(),
+                'subtitle' => implode(' · ', array_filter([
+                    $port->device?->display,
+                    $port->getDescription(),
+                ])),
                 'icon' => 'fa fa-link',
                 'status' => match (true) {
-                    (bool) $p->ignore => 'tw:border-l-black!',
-                    $p->ifAdminStatus == IfOperStatus::Down => 'tw:border-l-gray-400!',
-                    $p->ifOperStatus != IfOperStatus::Up => 'tw:border-l-red-600!',
+                    (bool) $port->ignore => 'tw:border-l-black!',
+                    $port->ifAdminStatus == IfOperStatus::Down => 'tw:border-l-gray-400!',
+                    $port->ifOperStatus != IfOperStatus::Up => 'tw:border-l-red-600!',
                     default => 'tw:border-l-green-600!',
                 },
-                'url' => Url::portUrl($p),
+                'url' => Url::portUrl($port),
             ]);
 
-        return [$ports->isEmpty() ? null : ['type' => 'ports', 'label' => __('Ports'), 'results' => $ports]];
+        return [$ports->isEmpty() ? null : ['type' => 'ports', 'label' => __('search.ports'), 'results' => $ports]];
     }
 }
