@@ -12,7 +12,7 @@ class RoutingSearchController extends GroupedSearchController
 {
     protected function groups(string $search, string $like, int $limit, ?User $user): array
     {
-        if (! LibrenmsConfig::get('webui.global_search_routing')) {
+        if (! LibrenmsConfig::get('webui.global_search.routing')) {
             return [null];
         }
 

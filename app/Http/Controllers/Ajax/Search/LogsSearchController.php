@@ -13,7 +13,7 @@ class LogsSearchController extends GroupedSearchController
 {
     protected function groups(string $search, string $like, int $limit, ?User $user): array
     {
-        if (! LibrenmsConfig::get('webui.global_search_eventlogs')) {
+        if (! LibrenmsConfig::get('webui.global_search.eventlogs')) {
             return [null];
         }
 
