@@ -84,7 +84,9 @@ class FdbSearchTest extends TestCase
             ->getJson(route('ajax.search.fdb', ['search' => $ip]));
 
         $response->assertStatus(200);
-        $names = collect($response->json('groups.0.results'))->pluck('name');
+        /** @var array<int, array{name: string, subtitle?: string, icon?: string, status?: string|null, url?: string}> $results */
+        $results = (array) $response->json('groups.0.results');
+        $names = collect($results)->pluck('name');
         $this->assertTrue($names->contains('00:11:22:33:44:55'));
     }
 
@@ -103,7 +105,9 @@ class FdbSearchTest extends TestCase
             ->getJson(route('ajax.search.fdb', ['search' => $ipv6]));
 
         $response->assertStatus(200);
-        $names = collect($response->json('groups.0.results'))->pluck('name');
+        /** @var array<int, array{name: string, subtitle?: string, icon?: string, status?: string|null, url?: string}> $v6Results */
+        $v6Results = (array) $response->json('groups.0.results');
+        $names = collect($v6Results)->pluck('name');
         $this->assertTrue($names->contains('00:11:22:33:44:55'));
     }
 
@@ -146,7 +150,8 @@ class FdbSearchTest extends TestCase
             ->getJson(route('ajax.search.fdb', ['search' => 'aabbcc']));
 
         $response->assertStatus(200);
-        $results = $response->json('groups.0.results');
+        /** @var array<int, array{name: string, subtitle?: string, icon?: string, status?: string|null, url?: string}> $results */
+        $results = (array) $response->json('groups.0.results');
 
         // The single-MAC port entry has a green status; uplink entries do not
         $singleMacResult = collect($results)->firstWhere('name', 'aa:bb:cc:00:33:33');

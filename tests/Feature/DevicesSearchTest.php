@@ -11,7 +11,7 @@ class DevicesSearchTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_search_returns_devices()
+    public function test_search_returns_devices(): void
     {
         $user = User::factory()->admin()->create(['enabled' => true]);
         $device = Device::factory()->create(['hostname' => 'test-device.example.com']);
@@ -24,7 +24,7 @@ class DevicesSearchTest extends TestCase
             ->assertJsonPath('groups.0.results.0.name', 'test-device.example.com');
     }
 
-    public function test_search_respects_permissions()
+    public function test_search_respects_permissions(): void
     {
         $user = User::factory()->create(['enabled' => true]); // Normal user, no roles
         $device = Device::factory()->create(['hostname' => 'test-device.example.com']);
@@ -38,7 +38,7 @@ class DevicesSearchTest extends TestCase
             ->assertJson(['groups' => []]);
     }
 
-    public function test_search_includes_location_match()
+    public function test_search_includes_location_match(): void
     {
         $user = User::factory()->admin()->create(['enabled' => true]);
         $device = Device::factory()->create([
@@ -54,7 +54,7 @@ class DevicesSearchTest extends TestCase
             ->assertJsonPath('groups.0.results.0.name', 'other');
     }
 
-    public function test_search_includes_serial_match()
+    public function test_search_includes_serial_match(): void
     {
         $user = User::factory()->admin()->create(['enabled' => true]);
         $device = Device::factory()->create([
@@ -70,7 +70,7 @@ class DevicesSearchTest extends TestCase
             ->assertJsonPath('groups.0.results.0.name', 'other');
     }
 
-    public function test_search_excludes_fdb_match()
+    public function test_search_excludes_fdb_match(): void
     {
         $user = User::factory()->admin()->create(['enabled' => true]);
         $device = Device::factory()->create(['hostname' => 'switch']);

@@ -21,7 +21,7 @@ class FdbSearchController extends GroupedSearchController
 
         $mac = strtolower(str_replace([':', '-', '.'], '', $search));
         $isIp = IP::isValid($search) || preg_match('/^[0-9]+\.[0-9]/', $search);
-        $isMac = ! $isIp && ctype_xdigit($mac) && $mac !== '';
+        $isMac = ! $isIp && ctype_xdigit($mac);
 
         // A port with exactly 1 MAC address in the FDB is directly connected to a single endpoint.
         $macCountSubquery = DB::table('ports_fdb')

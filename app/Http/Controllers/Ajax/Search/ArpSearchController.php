@@ -9,6 +9,7 @@ use App\Models\Ipv6Nd;
 use App\Models\Port;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Url;
@@ -24,7 +25,7 @@ class ArpSearchController extends GroupedSearchController
         $mac = strtolower(str_replace([':', '-', '.'], '', $search));
         $isIp = IP::isValid($search) || preg_match('/^[0-9]+\.[0-9]/', $search);
         // A valid IP can strip to hex chars (e.g. 10.0.0.1 → 10001), so only treat as MAC when not an IP
-        $isMac = ! $isIp && ctype_xdigit($mac) && $mac !== '';
+        $isMac = ! $isIp && ctype_xdigit($mac);
 
         $arp = Ipv4Mac::hasAccess($user)
             ->where(function (Builder $q) use ($like, $mac, $isMac): void {
@@ -50,6 +51,7 @@ class ArpSearchController extends GroupedSearchController
             ->groupBy('ipv6_nd.ipv6_address', 'ipv6_nd.mac_address')
             ->limit($limit);
 
+        /** @var  Collection<int, object{kind: string, address: string, mac_address: string, total: int, devices_count: int, ports_count: int, sample_device_id: int, sample_port_id: int}>  $groups */
         $groups = $arp->unionAll($nd)
             ->orderBy('address')
             ->limit($limit)
@@ -72,6 +74,10 @@ class ArpSearchController extends GroupedSearchController
         return [['type' => 'arp_tables', 'label' => __('search.arp_tables'), 'results' => $results]];
     }
 
+    /**
+     * @param  object{kind: string, address: string, mac_address: string, total: int, devices_count: int, ports_count: int, sample_device_id: int, sample_port_id: int}  $g
+     * @return array<string, mixed>
+     */
     private function formatResult(object $g, ?Device $device, ?Port $port): array
     {
         if ($g->total === 1) {

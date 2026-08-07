@@ -2519,7 +2519,7 @@ return [
             ],
             'global_search.arp' => [
                 'description' => 'Global search ARP',
-                'help' => 'Find where devices are connected by searching your devices ARP caches'
+                'help' => 'Find where devices are connected by searching your devices ARP caches',
             ],
             'global_search.fdb' => [
                 'description' => 'Global search FDB entries',
