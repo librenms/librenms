@@ -32,6 +32,7 @@ use App\Models\PortGroup;
 use App\Models\UserWidget;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -73,6 +74,31 @@ abstract class WidgetController extends Controller
         }
 
         return view('widgets.settings.base', $this->getSettings(true));
+    }
+
+    /**
+     * Quiet view-mode placeholder when a widget is not configured yet.
+     * Settings forms stay behind the widget gear / Configure action (settings=1).
+     */
+    protected function needsConfigurationView(string $message, ?string $actionLabel = null): View
+    {
+        $settings = $this->getSettings();
+        $canConfigure = true;
+        $widget = UserWidget::find($settings['id'] ?? null);
+        if ($widget && $widget->dashboard) {
+            $dash = $widget->dashboard;
+            $uid = Auth::id();
+            // Match overview fade-edit gear visibility (read-only shared: owner only).
+            $canConfigure = ($dash->access == 1 && $uid === $dash->user_id)
+                || ($dash->access == 0 || $dash->access >= 2);
+        }
+
+        return view('widgets.needs-config', [
+            'id' => $settings['id'] ?? 0,
+            'message' => $message,
+            'actionLabel' => $actionLabel,
+            'canConfigure' => $canConfigure,
+        ]);
     }
 
     public function __invoke(Request $request): JsonResponse

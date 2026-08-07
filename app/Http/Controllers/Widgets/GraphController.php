@@ -194,9 +194,9 @@ class GraphController extends WidgetController
     {
         $settings = $this->getSettings();
 
-        // force settings if not initialized
+        // Unconfigured: quiet empty state in view mode; settings open via gear / Configure.
         if ($this->hasInvalidSettings()) {
-            return $this->getSettingsView($request);
+            return $this->needsConfigurationView(__('Select a graph type and target to display.'));
         }
 
         $type = $this->getGraphType();

@@ -228,6 +228,17 @@
             widget_reload($el.attr('id'), $el.data('type'));
             // Leaflet / custom maps that skip HTML reload still need a resize pass
             $el.find('.lnms-widget__body').children().first().trigger('resize');
+            $el.find('.leaflet-container').each(function () {
+                var mapId = this.id;
+                if (mapId && typeof get_map === 'function') {
+                    try {
+                        var map = get_map(mapId);
+                        if (map && map.invalidateSize) {
+                            map.invalidateSize();
+                        }
+                    } catch (err) { /* map not registered yet */ }
+                }
+            });
         });
 
         @if (empty($dashboard->dashboard_id) && $default_dash == 0)
@@ -347,6 +358,22 @@
             $widget.data('settings', '1');
         }
         widget_reload($widget.attr('id'), $widget.data('type'), true);
+    });
+
+    // Quiet empty-state CTA: enter dashboard edit (if needed) and open real widget settings.
+    $(document).on('click', '[data-widget-configure]', function (e) {
+        e.preventDefault();
+        var $item = $(this).closest('.grid-stack-item');
+        if (!$item.length) {
+            var wid = $(this).data('widget-id');
+            $item = wid ? $('#' + wid) : $();
+        }
+        if (!$item.length) { return; }
+        if (typeof gridstack_state !== 'undefined' && gridstack_state == 0) {
+            $('.edit-dash-btn').first().trigger('click');
+        }
+        $item.data('settings', '1');
+        widget_reload($item.attr('id'), $item.data('type'), true);
     });
 
 

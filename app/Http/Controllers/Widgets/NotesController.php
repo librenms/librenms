@@ -42,7 +42,7 @@ class NotesController extends WidgetController
         $settings = $this->getSettings();
 
         if (is_null($settings['notes'])) {
-            return $this->getSettingsView($request);
+            return $this->needsConfigurationView(__('No notes yet. Configure this widget to add content.'));
         }
 
         $purifier_config = [

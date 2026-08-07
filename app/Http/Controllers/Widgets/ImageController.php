@@ -44,7 +44,7 @@ class ImageController extends WidgetController
         $data = $this->getSettings();
 
         if (is_null($data['image_url'])) {
-            return $this->getSettingsView($request);
+            return $this->needsConfigurationView(__('Set an image URL to display.'));
         }
 
         $dimensions = $request->input('dimensions');

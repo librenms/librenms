@@ -51,7 +51,10 @@ class CustomMapController extends WidgetController
 
         $data['map'] = CustomMap::find($data['custom_map']);
         if (! $data['map']) {
-            return __('map.custom.widget.not_found');
+            return $this->needsConfigurationView(
+                __('map.custom.widget.not_found'),
+                __('Edit')
+            );
         }
         $data['base_url'] = LibrenmsConfig::get('base_url');
         $data['background_config'] = $data['map']->getBackgroundConfig();

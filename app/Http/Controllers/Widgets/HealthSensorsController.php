@@ -58,7 +58,7 @@ class HealthSensorsController extends WidgetController
         $scope = (string) ($settings['device_scope'] ?? 'device');
 
         if ($scope === 'device' && empty($settings['device'])) {
-            return $this->getSettingsView($request);
+            return $this->needsConfigurationView(__('Select a device to display health sensors.'));
         }
 
         if ($scope === 'device_group' && empty($settings['device_group'])) {

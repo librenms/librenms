@@ -62,7 +62,7 @@ class ServerStatsController extends WidgetController
         $data = $this->getSettings();
 
         if (is_null($data['device'])) {
-            return $this->getSettingsView($request);
+            return $this->needsConfigurationView(__('Select a device to display server statistics.'));
         }
 
         $device = Device::hasAccess($request->user())->find($data['device']);

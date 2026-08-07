@@ -1,6 +1,14 @@
 @import './toast.css';
 @import "tailwindcss" prefix(tw);
 @import "../../html/css/bootstrap.min.css" layer(components);
+/* Self-hosted IBM Plex (DESIGN_SYSTEM.md — no CDN hotlink) */
+@import "@fontsource/ibm-plex-sans/400.css";
+@import "@fontsource/ibm-plex-sans/500.css";
+@import "@fontsource/ibm-plex-sans/600.css";
+@import "@fontsource/ibm-plex-sans/700.css";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+@import "@fontsource/ibm-plex-mono/600.css";
 
 @source "../../includes/html/pages/**/*.php";
 @source "../../includes/html/**/*.inc.php";
@@ -494,6 +502,16 @@ body.lnms-shell .lnms-a11y-readable {
         left: var(--lnms-sidebar-width);
         margin-top: 0;
         z-index: 1200;
+    }
+
+    /* Invisible hover bridge across the sidebar→flyout gap */
+    nav.lnms-nav--app .lnms-sidebar__menu > li.dropdown.open > .dropdown-menu::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: -14px;
+        width: 14px;
     }
 
     body.lnms-sidebar-collapsed nav.lnms-nav--app .lnms-sidebar__menu > li.dropdown > .dropdown-menu {
@@ -1094,6 +1112,96 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 
 .lnms-dashboard:not(.lnms-dash-editing) .dashboard-widget-settings {
     display: none !important;
+}
+
+/* Quiet unconfigured widget empty state (view mode) */
+.lnms-dashboard .lnms-widget-needs-config {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: var(--lnms-space-3, 12px);
+    min-height: 72px;
+    padding: var(--lnms-space-4, 16px);
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard .lnms-widget-needs-config__msg {
+    margin: 0;
+    font-size: var(--lnms-text-sm);
+    line-height: 1.45;
+    max-width: 36em;
+}
+
+.lnms-dashboard .lnms-widget-needs-config__btn {
+    border-radius: var(--lnms-radius-sm);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    background: var(--lnms-surface);
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard .lnms-widget-needs-config__btn:hover,
+.lnms-dashboard .lnms-widget-needs-config__btn:focus {
+    border-color: var(--lnms-accent);
+    color: var(--lnms-accent);
+    background: var(--lnms-accent-muted);
+}
+
+/* Quieter Bootstrap form chrome inside widget settings (edit only) */
+.lnms-dashboard .lnms-widget .dashboard-widget-settings {
+    padding: 8px 4px 4px;
+}
+
+.lnms-dashboard .lnms-widget .dashboard-widget-settings .form-group {
+    margin-bottom: 10px;
+}
+
+.lnms-dashboard .lnms-widget .dashboard-widget-settings .control-label {
+    font-size: var(--lnms-text-xs);
+    font-weight: 600;
+    color: var(--lnms-text-secondary);
+    margin-bottom: 4px;
+}
+
+.lnms-dashboard .lnms-widget .dashboard-widget-settings .form-control {
+    height: 32px;
+    padding: 4px 8px;
+    font-size: var(--lnms-text-sm);
+    border-color: var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    box-shadow: none;
+    background: var(--lnms-surface);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .dashboard-widget-settings .form-control:focus {
+    border-color: var(--lnms-accent);
+    box-shadow: 0 0 0 2px var(--lnms-focus-ring);
+}
+
+.lnms-dashboard .lnms-widget .dashboard-widget-settings .select2-container .select2-selection--single {
+    height: 32px;
+    border-color: var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+}
+
+.lnms-dashboard .lnms-widget .dashboard-widget-settings .select2-container .select2-selection--single .select2-selection__rendered {
+    line-height: 30px;
+    font-size: var(--lnms-text-sm);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard .lnms-widget .dashboard-widget-settings .select2-container .select2-selection--single .select2-selection__arrow {
+    height: 30px;
+}
+
+.lnms-dashboard .lnms-widget .dashboard-widget-settings .btn-primary {
+    background-color: var(--lnms-accent);
+    border-color: var(--lnms-accent);
+    border-radius: var(--lnms-radius-sm);
+    font-size: var(--lnms-text-sm);
+    padding: 4px 14px;
 }
 
 .lnms-dashboard #dashboard-editor .btn {

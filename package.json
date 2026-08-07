@@ -27,6 +27,8 @@
     },
     "dependencies": {
         "@alpinejs/intersect": "^3.15.12",
+        "@fontsource/ibm-plex-mono": "^5.3.0",
+        "@fontsource/ibm-plex-sans": "^5.3.0",
         "alpinejs": "^3.14.9",
         "babel-helper-vue-jsx-merge-props": "^2.0.3",
         "es6-object-assign": "^1.1.0",

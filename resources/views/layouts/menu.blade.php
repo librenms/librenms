@@ -1059,6 +1059,60 @@
             $(this).children('.dropdown-menu').first().css({ top: '', left: '', right: '', bottom: '', position: '' });
         });
 
+        // Stabilize flyout hover: keep open while pointer travels toggle → menu gap
+        (function () {
+            var closeTimer = null;
+            var HOVER_GRACE_MS = 220;
+
+            function clearCloseTimer() {
+                if (closeTimer) {
+                    clearTimeout(closeTimer);
+                    closeTimer = null;
+                }
+            }
+
+            function scheduleClose($li) {
+                clearCloseTimer();
+                closeTimer = setTimeout(function () {
+                    if (!$li.is(':hover') && !$li.children('.dropdown-menu').is(':hover')) {
+                        $li.removeClass('open');
+                        $li.children('a.dropdown-toggle').attr('aria-expanded', 'false');
+                        $li.trigger('hidden.bs.dropdown');
+                    }
+                }, HOVER_GRACE_MS);
+            }
+
+            $(document).on('mouseenter', '.lnms-sidebar__menu > li.dropdown', function () {
+                if (window.innerWidth < 768) { return; }
+                clearCloseTimer();
+                var $li = $(this);
+                $('.lnms-sidebar__menu > li.dropdown.open').not($li).each(function () {
+                    $(this).removeClass('open');
+                    $(this).children('a.dropdown-toggle').attr('aria-expanded', 'false');
+                    $(this).trigger('hidden.bs.dropdown');
+                });
+                if (!$li.hasClass('open')) {
+                    $li.addClass('open');
+                    $li.children('a.dropdown-toggle').attr('aria-expanded', 'true');
+                    $li.trigger('shown.bs.dropdown');
+                }
+            });
+
+            $(document).on('mouseleave', '.lnms-sidebar__menu > li.dropdown', function () {
+                if (window.innerWidth < 768) { return; }
+                scheduleClose($(this));
+            });
+
+            $(document).on('mouseenter', '.lnms-sidebar__menu > li.dropdown > .dropdown-menu', function () {
+                clearCloseTimer();
+            });
+
+            $(document).on('mouseleave', '.lnms-sidebar__menu > li.dropdown > .dropdown-menu', function () {
+                if (window.innerWidth < 768) { return; }
+                scheduleClose($(this).closest('li.dropdown'));
+            });
+        })();
+
         // Keep aria-expanded in sync with Bootstrap .open / collapse without
         // replacing bootstrap-hover-dropdown behavior (observe class only).
         var nav = document.querySelector('nav.lnms-nav');
