@@ -75,7 +75,7 @@ class ArpSearchController extends GroupedSearchController
     private function formatResult(object $g, ?Device $device, ?Port $port): array
     {
         if ($g->total === 1) {
-            $deviceDisplay = $device?->display ?? $device?->hostname ?? '';
+            $deviceDisplay = $device?->display;
             $subtitle = implode(' · ', array_filter([$deviceDisplay, $port?->getFullLabel()]));
         } else {
             $subtitle = trans_choice('search.arp_summary', $g->total, [
@@ -85,15 +85,18 @@ class ArpSearchController extends GroupedSearchController
             ]);
         }
 
-        $name = $g->kind === 'arp'
-            ? Mac::parse($g->mac_address)->readable() . ' (' . $g->address . ')'
-            : $g->address . ' (' . Mac::parse($g->mac_address)->readable() . ')';
+        $mac = Mac::parse($g->mac_address)->readable();
+        $ip = IP::parse($g->address, true)?->compressed();
+
+        $url = $g->kind === 'arp'
+            ? Url::generate(['page' => 'search', 'search' => 'arp', 'searchPhrase' => $g->address])
+            : Url::deviceUrl($device, ['tab' => 'ports', 'view' => 'nd']);
 
         return [
-            'name' => $name,
+            'name' => "$ip ($mac)",
             'subtitle' => $subtitle,
             'icon' => 'fa fa-map-marker',
-            'url' => Url::generate(['page' => 'search', 'search' => 'arp', 'searchPhrase' => $g->address]),
+            'url' => $url,
         ];
     }
 }

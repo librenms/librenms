@@ -36,19 +36,22 @@ class FdbSearchController extends GroupedSearchController
             ->with([
                 'device:device_id,display,hostname,os',
                 'port:port_id,device_id,ifDescr,ifName,ifAlias,ifIndex',
-                'ipv4Addresses:mac_address,ipv4_address',
             ])
             ->where(function (Builder $q) use ($like, $mac, $isMac, $isIp): void {
                 if ($isMac) {
-                    // MAC search: match directly against the FDB mac_address column
                     $q->where('ports_fdb.mac_address', 'like', '%' . $mac . '%');
                 } elseif ($isIp) {
-                    // IP search: join ipv4_mac to find which MACs belong to that IP,
-                    // then match FDB entries for those MACs so we show where the endpoint is plugged in
-                    $q->whereExists(function ($sub) use ($like): void {
-                        $sub->from('ipv4_mac')
-                            ->whereColumn('ipv4_mac.mac_address', 'ports_fdb.mac_address')
-                            ->where('ipv4_mac.ipv4_address', 'like', $like);
+                    // IP search: join ipv4_mac or ipv6_nd to find which MACs belong to that IP
+                    $q->where(function (Builder $ipQuery) use ($like): void {
+                        $ipQuery->whereExists(function ($sub) use ($like): void {
+                            $sub->from('ipv4_mac')
+                                ->whereColumn('ipv4_mac.mac_address', 'ports_fdb.mac_address')
+                                ->where('ipv4_mac.ipv4_address', 'like', $like);
+                        })->orWhereExists(function ($sub) use ($like): void {
+                            $sub->from('ipv6_nd')
+                                ->whereColumn('ipv6_nd.mac_address', 'ports_fdb.mac_address')
+                                ->where('ipv6_nd.ipv6_address', 'like', $like);
+                        });
                     });
                 } else {
                     $q->where('ports_fdb.mac_address', 'like', $like);
@@ -66,11 +69,8 @@ class FdbSearchController extends GroupedSearchController
                     ? __('search.fdb_connected')
                     : __('search.fdb_trunk');
 
-                $formattedMac = Mac::parse($f->mac_address)->readable();
-                $ipAddress = $f->ipv4Addresses->first()?->ipv4_address;
-
                 return [
-                    'name' => $ipAddress ? $formattedMac . ' (' . $ipAddress . ')' : $formattedMac,
+                    'name' => Mac::parse($f->mac_address)->readable(),
                     'subtitle' => implode(' · ', array_filter([
                         $deviceDisplay,
                         $portLabel,
@@ -82,6 +82,10 @@ class FdbSearchController extends GroupedSearchController
                 ];
             });
 
-        return [$fdb->isEmpty() ? null : ['type' => 'fdb_tables', 'label' => __('search.fdb_tables'), 'results' => $fdb]];
+        if ($fdb->isEmpty()) {
+            return [null];
+        }
+
+        return [['type' => 'fdb_tables', 'label' => __('search.fdb_tables'), 'results' => $fdb]];
     }
 }

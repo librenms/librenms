@@ -5,6 +5,7 @@ namespace LibreNMS\Tests\Feature;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Ipv4Mac;
+use App\Models\Ipv6Nd;
 use App\Models\Port;
 use App\Models\PortsFdb;
 use App\Models\User;
@@ -65,10 +66,10 @@ class FdbSearchTest extends TestCase
 
         $response->assertStatus(200);
         $name = $response->json('groups.0.results.0.name');
-        $this->assertEquals('00:11:22:33:44:55 (192.168.1.50)', $name);
+        $this->assertEquals('00:11:22:33:44:55', $name);
     }
 
-    public function test_search_fdb_by_ip_returns_fdb_entry(): void
+    public function test_search_fdb_by_ipv4_returns_fdb_entry(): void
     {
         $user = User::factory()->admin()->create(['enabled' => true]);
         $device = Device::factory()->create();
@@ -76,30 +77,37 @@ class FdbSearchTest extends TestCase
         $mac = '001122334455';
         $ip = '10.0.0.1';
 
-        // FDB entry on the switch port
-        PortsFdb::forceCreate([
-            'device_id' => $device->device_id,
-            'port_id' => $port->port_id,
-            'mac_address' => $mac,
-            'vlan_id' => 1,
-        ]);
+        PortsFdb::forceCreate(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => $mac, 'vlan_id' => 1]);
+        Ipv4Mac::forceCreate(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => $mac, 'ipv4_address' => $ip]);
 
-        // ARP binding associating that MAC with an IP
-        Ipv4Mac::forceCreate([
-            'device_id' => $device->device_id,
-            'port_id' => $port->port_id,
-            'mac_address' => $mac,
-            'ipv4_address' => $ip,
-        ]);
-
-        // Searching by IP should find the FDB entry (where the device is plugged in)
         $response = $this->actingAs($user)
             ->getJson(route('ajax.search.fdb', ['search' => $ip]));
 
         $response->assertStatus(200);
         $names = collect($response->json('groups.0.results'))->pluck('name');
-        $this->assertTrue($names->contains('00:11:22:33:44:55 (10.0.0.1)'), 'FDB entry not found when searching by IP');
+        $this->assertTrue($names->contains('00:11:22:33:44:55'));
     }
+
+    public function test_search_fdb_by_ipv6_returns_fdb_entry(): void
+    {
+        $user = User::factory()->admin()->create(['enabled' => true]);
+        $device = Device::factory()->create();
+        $port = Port::factory()->create(['device_id' => $device->device_id]);
+        $mac = '001122334455';
+        $ipv6 = 'fe80::1';
+
+        PortsFdb::forceCreate(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => $mac, 'vlan_id' => 1]);
+        Ipv6Nd::forceCreate(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => $mac, 'ipv6_address' => $ipv6]);
+
+        $response = $this->actingAs($user)
+            ->getJson(route('ajax.search.fdb', ['search' => $ipv6]));
+
+        $response->assertStatus(200);
+        $names = collect($response->json('groups.0.results'))->pluck('name');
+        $this->assertTrue($names->contains('00:11:22:33:44:55'));
+    }
+
+
 
     public function test_search_fdb_single_mac_port_gets_green_status(): void
     {

@@ -87,9 +87,8 @@ class ArpSearchTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonPath('groups.0.type', 'arp_tables');
 
-        $name = $response->json('groups.0.results.0.name');
-        $this->assertStringContainsString($ipv6, $name);
-        $this->assertStringContainsString('00:11:22:33:44:55', $name);
+        $url = $response->json('groups.0.results.0.url');
+        $this->assertStringContainsString('/device/' . $device->device_id . '/ports/view=nd', $url);
     }
 
     public function test_search_arp_subtitle_shows_device_and_port(): void
