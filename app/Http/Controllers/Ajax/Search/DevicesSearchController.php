@@ -45,7 +45,7 @@ class DevicesSearchController extends GroupedSearchController
         }
 
         // A MAC-style search (with or without separators) can also match FDB entries
-        if (ctype_xdigit($mac)) {
+        if (LibrenmsConfig::get('webui.global_search.fdb') && ctype_xdigit($mac)) {
             $query->orWhereRelation('portsFdb', 'mac_address', 'like', '%' . $mac . '%');
         }
 

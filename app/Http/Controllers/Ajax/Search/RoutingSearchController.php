@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Ajax\Search;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\BgpPeer;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -11,6 +12,10 @@ class RoutingSearchController extends GroupedSearchController
 {
     protected function groups(string $search, string $like, int $limit, ?User $user): array
     {
+        if (! LibrenmsConfig::get('webui.global_search.routing')) {
+            return [null];
+        }
+
         $bgp = BgpPeer::hasAccess($user)->with('device')
             ->where(fn (Builder $q) => $q->where('astext', 'like', $like)
                 ->orWhere('bgpPeerDescr', 'like', $like)

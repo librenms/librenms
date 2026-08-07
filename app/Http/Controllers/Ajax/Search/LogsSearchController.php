@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Ajax\Search;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -12,6 +13,10 @@ class LogsSearchController extends GroupedSearchController
 {
     protected function groups(string $search, string $like, int $limit, ?User $user): array
     {
+        if (! LibrenmsConfig::get('webui.global_search.eventlogs')) {
+            return [null];
+        }
+
         $eventlog = Eventlog::hasAccess($user)->with('device')
             ->where(fn (Builder $q) => $q->where('message', 'like', $like)
                 ->orWhere('type', 'like', $like)
