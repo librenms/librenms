@@ -51,7 +51,7 @@ class ArpSearchController extends GroupedSearchController
             ->groupBy('ipv6_nd.ipv6_address', 'ipv6_nd.mac_address')
             ->limit($limit);
 
-        /** @var  Collection<int, object{kind: string, address: string, mac_address: string, total: int, devices_count: int, ports_count: int, sample_device_id: int, sample_port_id: int}>  $groups */
+        /** @var Collection<int, object{kind: string, address: string, mac_address: string, total: int, devices_count: int, ports_count: int, sample_device_id: int, sample_port_id: int}>  $groups */
         $groups = $arp->unionAll($nd)
             ->orderBy('address')
             ->limit($limit)
