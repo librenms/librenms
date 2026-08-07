@@ -1660,7 +1660,8 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     color: #FFFFFF;
 }
 
-/* Availability map: remaps Bootstrap labels + compact tiles; routes/labels unchanged */
+/* Availability map: remaps Bootstrap labels + compact tiles; routes/labels unchanged.
+ * Empty (no devices/services) uses shared .lnms-widget-needs-config — denser Configure empty state. */
 .lnms-dashboard .lnms-widget .lnms-availability-map {
     color: var(--lnms-text);
     font-size: var(--lnms-text-sm);
@@ -2570,7 +2571,8 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     vertical-align: middle;
 }
 
-/* Globe / custom-map / generic-image chrome — map IDs + routes preserved */
+/* Globe / custom-map / generic-image chrome — map IDs + routes preserved.
+ * Empty globe (no locations) uses shared .lnms-widget-needs-config. */
 .lnms-dashboard .lnms-widget .lnms-globe-widget {
     border-radius: 0 0 var(--lnms-radius-md) var(--lnms-radius-md);
     overflow: hidden;

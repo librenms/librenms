@@ -62,6 +62,13 @@ class AvailabilityMapController extends WidgetController
         [$devices, $device_totals] = $this->getDevices();
         [$services, $services_totals] = $this->getServices();
 
+        // Empty smoke / filtered-out: quiet Configure empty state (same pattern as Alert Map / Graph / Custom Map).
+        if ($devices === [] && $services === []) {
+            return $this->needsConfigurationView(
+                __('No devices match this availability map. Configure filters or add devices.')
+            );
+        }
+
         $data['devices'] = $devices;
         $data['device_totals'] = $device_totals;
         $data['services'] = $services;
@@ -69,6 +76,11 @@ class AvailabilityMapController extends WidgetController
         $data['base_filter'] = isset($data['device_group']) ? ['groups.id' => ['eq' => $data['device_group']]] : [];
 
         return view('widgets.availability-map', $data);
+    }
+
+    public function getSettingsView(Request $request): View
+    {
+        return view('widgets.settings.availability-map', $this->getSettings(true));
     }
 
     private function getDevices(): array

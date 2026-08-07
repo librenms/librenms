@@ -101,6 +101,18 @@ class GlobeController extends WidgetController
 
         $data['locations'] = $locations->values()->all();
 
+        // Empty smoke / no geo locations: quiet Configure empty state (same pattern as Alert / Availability Map).
+        if ($data['locations'] === []) {
+            return $this->needsConfigurationView(
+                __('No locations match this globe map. Configure filters or add device locations.')
+            );
+        }
+
         return view('widgets.globe', $data);
+    }
+
+    public function getSettingsView(Request $request): View
+    {
+        return view('widgets.settings.globe', $this->getSettings(true));
     }
 }
