@@ -49,17 +49,21 @@ class DevicesSearchController extends GroupedSearchController
             ->limit($limit)
             ->get();
 
-        $results = $devices->map(fn (Device $d) => [
-            'name' => $d->display,
-            'subtitle' => trim(LibrenmsConfig::getOsSetting($d->os, 'text') . ' ' . $d->hardware) ?: $d->sysName,
-            'image' => $d->icon,
-            'status' => match ($d->getDeviceStatus()) {
-                DeviceStatus::Up, DeviceStatus::IgnoredUp => $d->isUnderMaintenance() ? 'tw:border-l-blue-500!' : 'tw:border-l-green-600!',
-                DeviceStatus::Down, DeviceStatus::IgnoredDown => $d->isUnderMaintenance() ? 'tw:border-l-blue-500!' : 'tw:border-l-red-600!',
+        $results = $devices->map(fn (Device $device) => [
+            'name' => $device->display,
+            'subtitle' => implode(' · ', array_filter([
+                LibrenmsConfig::getOsSetting($device->os, 'text'),
+                $device->hardware,
+                $device->name(),
+            ])),
+            'image' => $device->icon,
+            'status' => match ($device->getDeviceStatus()) {
+                DeviceStatus::Up, DeviceStatus::IgnoredUp => $device->isUnderMaintenance() ? 'tw:border-l-blue-500!' : 'tw:border-l-green-600!',
+                DeviceStatus::Down, DeviceStatus::IgnoredDown => $device->isUnderMaintenance() ? 'tw:border-l-blue-500!' : 'tw:border-l-red-600!',
                 DeviceStatus::Disabled => 'tw:border-l-black!',
                 DeviceStatus::NeverPolled => 'tw:border-l-gray-400!',
             },
-            'url' => Url::deviceUrl($d),
+            'url' => Url::deviceUrl($device),
         ]);
 
         if ($results->isEmpty()) {

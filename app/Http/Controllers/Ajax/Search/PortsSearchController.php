@@ -33,18 +33,21 @@ class PortsSearchController extends GroupedSearchController
                 }
             })
             ->orderBy('ifDescr')->limit($limit)->get()
-            ->map(function (Port $p) {
+            ->map(function (Port $port) {
                 return [
-                    'name' => $p->getLabel(),
-                    'subtitle' => trim($p->device?->display . ' ' . $p->getDescription()),
+                    'name' => $port->getLabel(),
+                    'subtitle' => implode(' · ', array_filter([
+                        $port->device?->display,
+                        $port->getDescription(),
+                    ])),
                     'icon' => 'fa fa-link',
                     'status' => match (true) {
-                        (bool) $p->ignore => 'tw:border-l-black!',
-                        $p->ifAdminStatus == IfOperStatus::Down => 'tw:border-l-gray-400!',
-                        $p->ifOperStatus != IfOperStatus::Up => 'tw:border-l-red-600!',
+                        (bool) $port->ignore => 'tw:border-l-black!',
+                        $port->ifAdminStatus == IfOperStatus::Down => 'tw:border-l-gray-400!',
+                        $port->ifOperStatus != IfOperStatus::Up => 'tw:border-l-red-600!',
                         default => 'tw:border-l-green-600!',
                     },
-                    'url' => Url::portUrl($p),
+                    'url' => Url::portUrl($port),
                 ];
             });
 

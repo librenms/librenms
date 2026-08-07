@@ -61,24 +61,18 @@ class FdbSearchController extends GroupedSearchController
             ->orderBy('ports_fdb.mac_address')
             ->limit($limit)
             ->get()
-            ->map(function (PortsFdb $f): array {
-                $macCount = (int) $f->mac_count;
-                $portLabel = $f->port?->getFullLabel();
-                $deviceDisplay = $f->device?->display ?? $f->device?->hostname ?? '';
-                $connectionHint = $macCount === 1
-                    ? __('search.fdb_connected')
-                    : __('search.fdb_trunk');
-
+            ->map(function (PortsFdb $portsFdb): array {
+                $isConnected = ((int) $portsFdb->mac_count) === 1;
                 return [
-                    'name' => Mac::parse($f->mac_address)->readable(),
+                    'name' => Mac::parse($portsFdb->mac_address)->readable(),
                     'subtitle' => implode(' · ', array_filter([
-                        $deviceDisplay,
-                        $portLabel,
-                        $connectionHint,
+                        $portsFdb->device?->display,
+                        $portsFdb->port?->getFullLabel(),
+                        $isConnected ? __('search.fdb_connected') : __('search.fdb_trunk'),
                     ])),
                     'icon' => 'fa fa-plug',
-                    'status' => $macCount === 1 ? 'tw:border-l-green-600!' : null,
-                    'url' => Url::generate(['page' => 'search', 'search' => 'fdb', 'searchPhrase' => $f->mac_address]),
+                    'status' => $isConnected ? 'tw:border-l-green-600!' : null,
+                    'url' => Url::generate(['page' => 'search', 'search' => 'fdb', 'searchPhrase' => $portsFdb->mac_address]),
                 ];
             });
 
