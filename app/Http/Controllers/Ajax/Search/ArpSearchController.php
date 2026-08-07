@@ -9,7 +9,6 @@ use App\Models\Ipv6Nd;
 use App\Models\Port;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Url;
@@ -27,8 +26,31 @@ class ArpSearchController extends GroupedSearchController
         // A valid IP can strip to hex chars (e.g. 10.0.0.1 → 10001), so only treat as MAC when not an IP
         $isMac = ! $isIp && ctype_xdigit($mac) && $mac !== '';
 
-        $groups = $this->groupedQuery(Ipv4Mac::hasAccess($user), 'ipv4_mac', 'ipv4_address', 'arp', $like, $mac, $isMac, $limit)
-            ->unionAll($this->groupedQuery(Ipv6Nd::hasAccess($user), 'ipv6_nd', 'ipv6_address', 'nd', $like, $mac, $isMac, $limit))
+        $arp = Ipv4Mac::hasAccess($user)
+            ->where(function (Builder $q) use ($like, $mac, $isMac): void {
+                $q->where('ipv4_mac.ipv4_address', 'like', $like);
+                if ($isMac) {
+                    $q->orWhere('ipv4_mac.mac_address', 'like', '%' . $mac . '%');
+                }
+            })
+            ->select(['ipv4_mac.ipv4_address as address', 'ipv4_mac.mac_address as mac_address'])
+            ->selectRaw("'arp' as kind, COUNT(*) as total, COUNT(DISTINCT device_id) as devices_count, COUNT(DISTINCT port_id) as ports_count, MIN(port_id) as sample_port_id, MIN(device_id) as sample_device_id")
+            ->groupBy('ipv4_mac.ipv4_address', 'ipv4_mac.mac_address')
+            ->limit($limit);
+
+        $nd = Ipv6Nd::hasAccess($user)
+            ->where(function (Builder $q) use ($like, $mac, $isMac): void {
+                $q->where('ipv6_nd.ipv6_address', 'like', $like);
+                if ($isMac) {
+                    $q->orWhere('ipv6_nd.mac_address', 'like', '%' . $mac . '%');
+                }
+            })
+            ->select(['ipv6_nd.ipv6_address as address', 'ipv6_nd.mac_address as mac_address'])
+            ->selectRaw("'nd' as kind, COUNT(*) as total, COUNT(DISTINCT device_id) as devices_count, COUNT(DISTINCT port_id) as ports_count, MIN(port_id) as sample_port_id, MIN(device_id) as sample_device_id")
+            ->groupBy('ipv6_nd.ipv6_address', 'ipv6_nd.mac_address')
+            ->limit($limit);
+
+        $groups = $arp->unionAll($nd)
             ->orderBy('address')
             ->limit($limit)
             ->get();
@@ -48,33 +70,6 @@ class ArpSearchController extends GroupedSearchController
         $results = $groups->map(fn ($g) => $this->formatResult($g, $devices->get($g->sample_device_id), $ports->get($g->sample_port_id)));
 
         return [['type' => 'arp_tables', 'label' => __('search.arp_tables'), 'results' => $results]];
-    }
-
-    /**
-     * Grouped, aliased query so ipv4_mac and ipv6_nd rows come back in an identical shape
-     * (address, mac_address, kind, total, devices_count, ports_count, sample_device_id, sample_port_id).
-     */
-    private function groupedQuery(Builder $query, string $table, string $addressColumn, string $kind, string $like, string $mac, bool $isMac, int $limit): Builder
-    {
-        return $query
-            ->where(function (Builder $q) use ($table, $addressColumn, $like, $mac, $isMac): void {
-                $q->where("$table.$addressColumn", 'like', $like);
-                if ($isMac) {
-                    $q->orWhere("$table.mac_address", 'like', '%' . $mac . '%');
-                }
-            })
-            ->select([
-                "$table.$addressColumn as address",
-                "$table.mac_address as mac_address",
-                DB::raw("'$kind' as kind"),
-                DB::raw('COUNT(*) as total'),
-                DB::raw('COUNT(DISTINCT device_id) as devices_count'),
-                DB::raw('COUNT(DISTINCT port_id) as ports_count'),
-                DB::raw('MIN(port_id) as sample_port_id'),
-                DB::raw('MIN(device_id) as sample_device_id'),
-            ])
-            ->groupBy("$table.$addressColumn", "$table.mac_address")
-            ->limit($limit);
     }
 
     private function formatResult(object $g, ?Device $device, ?Port $port): array
