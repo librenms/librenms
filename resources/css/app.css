@@ -2040,8 +2040,13 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     box-shadow: none;
 }
 
-/* View mode: hide Bootgrid column/row chrome; keep search + pagination + table IDs */
-.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .actionBar > .btn-group {
+/*
+ * View mode: hide Bootgrid column/row chrome (.actions), keep search + pagination +
+ * Alerts severity quick-filter (.alerts-widget-sev-btn in actionBar > .btn-group[role=group]).
+ * Selectors/IDs for Bootgrid JS remain intact.
+ */
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .actionBar .actions,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-header .actionBar .actions .btn-group {
     display: none;
 }
 
@@ -2111,20 +2116,125 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     margin-bottom: 0;
 }
 
-/* Soften Alerts severity quick-filter chrome in view mode (IDs/classes preserved) */
+/*
+ * Soften Alerts severity quick-filter in view mode.
+ * Keep .alerts-widget-sev-btn + data-target-sev + Bootgrid reload behavior.
+ */
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-alerts-widget .bootgrid-header .actionBar > .btn-group[role="group"] {
+    display: inline-flex;
+    margin: 0 4px 0 0;
+    vertical-align: middle;
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    overflow: hidden;
+    background: var(--lnms-surface-muted);
+}
+
 .lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-alerts-widget .alerts-widget-sev-btn.btn-default {
-    padding: 2px 8px;
+    padding: 2px 10px;
     font-size: var(--lnms-text-xs);
+    line-height: 1.35;
     background: transparent;
     border-color: transparent;
+    border-radius: 0;
+    box-shadow: none;
     color: var(--lnms-text-muted);
 }
 
 .lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-alerts-widget .alerts-widget-sev-btn.btn-default:hover,
 .lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-alerts-widget .alerts-widget-sev-btn.btn-default:focus {
-    background: var(--lnms-surface-muted);
-    border-color: var(--lnms-border);
+    background: var(--lnms-surface);
+    border-color: transparent;
     color: var(--lnms-text-secondary);
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-alerts-widget .alerts-widget-sev-btn.btn-warning {
+    padding: 2px 10px;
+    font-size: var(--lnms-text-xs);
+    line-height: 1.35;
+    border-radius: 0;
+    box-shadow: none;
+    background: color-mix(in srgb, var(--lnms-status-warn) 22%, var(--lnms-surface));
+    border-color: transparent;
+    color: var(--lnms-status-on);
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-alerts-widget .alerts-widget-sev-btn.btn-danger {
+    padding: 2px 10px;
+    font-size: var(--lnms-text-xs);
+    line-height: 1.35;
+    border-radius: 0;
+    box-shadow: none;
+    background: color-mix(in srgb, var(--lnms-status-critical) 18%, var(--lnms-surface));
+    border-color: transparent;
+    color: var(--lnms-status-critical);
+}
+
+/* World map Leaflet chrome (view mode) — preserve map IDs, controls, markers */
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-worldmap-widget.worldmap_widget {
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    background-color: var(--lnms-surface-muted);
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-worldmap-widget .leaflet-bar {
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    box-shadow: none;
+    overflow: hidden;
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-worldmap-widget .leaflet-bar a,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-worldmap-widget .leaflet-bar a:hover,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-worldmap-widget .leaflet-bar a:focus {
+    background: var(--lnms-surface);
+    color: var(--lnms-text-secondary);
+    border-bottom-color: var(--lnms-border);
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    font-size: 14px;
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-worldmap-widget .leaflet-bar a:hover,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-worldmap-widget .leaflet-bar a:focus {
+    background: var(--lnms-surface-muted);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-worldmap-widget .leaflet-control-layers {
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-sm);
+    box-shadow: none;
+    background: var(--lnms-surface);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-worldmap-widget .leaflet-control-attribution {
+    background: color-mix(in srgb, var(--lnms-surface) 85%, transparent);
+    color: var(--lnms-text-muted);
+    font-size: 10px;
+    margin: 0;
+    border-radius: var(--lnms-radius-sm) 0 0 0;
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-worldmap-widget .leaflet-control-attribution a {
+    color: var(--lnms-text-secondary);
+}
+
+/* Quiet leftover form-looking chrome inside view-mode widget bodies (not settings) */
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget__body .form-control:not(.search-field),
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget__body .input-group-addon,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget__body .well {
+    box-shadow: none;
+    border-color: var(--lnms-border);
+    background: var(--lnms-surface-muted);
+    border-radius: var(--lnms-radius-sm);
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget__body .well {
+    padding: var(--lnms-space-2);
+    margin-bottom: 0;
 }
 
 /* Graph images: fill widget width when configured (keep with graph chrome above) */
