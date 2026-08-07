@@ -98,7 +98,7 @@ class ArpSearchController extends GroupedSearchController
             'name' => $name,
             'subtitle' => $subtitle,
             'icon' => 'fa fa-map-marker',
-            'url' => Url::deviceUrl($device, ['tab' => 'ports', 'view' => $g->kind === 'arp' ? 'arp' : 'nd', 'search' => $g->address]),
+            'url' => Url::generate(['page' => 'search', 'search' => 'arp', 'searchPhrase' => $g->address]),
         ];
     }
 }

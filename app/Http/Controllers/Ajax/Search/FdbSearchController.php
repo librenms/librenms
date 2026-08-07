@@ -78,7 +78,7 @@ class FdbSearchController extends GroupedSearchController
                     ])),
                     'icon' => 'fa fa-plug',
                     'status' => $macCount === 1 ? 'tw:border-l-green-600!' : null,
-                    'url' => Url::deviceUrl($f->device, ['tab' => 'ports', 'view' => 'fdb', 'search' => $f->mac_address]),
+                    'url' => Url::generate(['page' => 'search', 'search' => 'fdb', 'searchPhrase' => $f->mac_address]),
                 ];
             });
 
