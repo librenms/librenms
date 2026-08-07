@@ -13,6 +13,9 @@
             </div>
         </x-slot:title>
         <x-slot:slot class="tw:pb-0!">
+        @if($maps->isEmpty())
+            <p class="lnms-maps-empty" role="status">{{ __('No custom maps defined.') }}</p>
+        @else
         <x-accordion accordionId="CustomMapGroups">
             @foreach($maps as $group_name => $group)
                 <x-accordion.item title="{{$group_name ?: 'Ungrouped'}}" id="{{uniqid()}}" open="{{($open_group == $group_name) || (count($maps) == 1)}}">
@@ -29,6 +32,7 @@
                 </x-accordion.item>
             @endforeach
         </x-accordion>
+        @endif
         </x-slot:slot>
     </x-panel>
 </div>
@@ -37,7 +41,11 @@
 @section('scripts')
 <script type="text/javascript">
     $(document).ready(async function () {
-        scrollTo = document.getElementById("accordionCustomMapGroups").querySelector("div.accordion-header span.fa-minus");
+        var accordion = document.getElementById("accordionCustomMapGroups");
+        if (!accordion) {
+            return;
+        }
+        scrollTo = accordion.querySelector("div.accordion-header span.fa-minus");
         if(scrollTo != null) {
             scrollTo.scrollIntoView({block: "center"})
         };

@@ -2775,6 +2775,38 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     color: var(--lnms-text);
 }
 
+/*
+ * Module Bootgrid empty/loading — denser quiet empty (match dashboard widget density).
+ * Preserve Bootgrid table IDs / .no-results / .loading; no fake rows.
+ */
+.lnms-devices .bootgrid-table td.loading,
+.lnms-devices .bootgrid-table td.no-results,
+.lnms-ports .bootgrid-table td.loading,
+.lnms-ports .bootgrid-table td.no-results,
+.lnms-alerts .bootgrid-table td.loading,
+.lnms-alerts .bootgrid-table td.no-results,
+.lnms-alert-log .bootgrid-table td.loading,
+.lnms-alert-log .bootgrid-table td.no-results,
+.lnms-health .bootgrid-table td.loading,
+.lnms-health .bootgrid-table td.no-results,
+.lnms-wireless .bootgrid-table td.loading,
+.lnms-wireless .bootgrid-table td.no-results,
+.lnms-eventlog .bootgrid-table td.loading,
+.lnms-eventlog .bootgrid-table td.no-results,
+.lnms-syslog .bootgrid-table td.loading,
+.lnms-syslog .bootgrid-table td.no-results,
+.lnms-bills .bootgrid-table td.loading,
+.lnms-bills .bootgrid-table td.no-results {
+    text-align: left;
+    padding: 8px 10px;
+    font-size: var(--lnms-text-sm);
+    font-weight: 400;
+    line-height: 1.35;
+    color: var(--lnms-text-muted);
+    background-color: transparent !important;
+    white-space: normal;
+}
+
 /* Phase 5: Device list — hosts .lnms-devices*; Bootgrid #devices / data-column-id preserved */
 .lnms-devices .lnms-devices-panel.panel {
     background-color: var(--lnms-surface);
@@ -2966,11 +2998,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-accent-muted);
 }
 
-.lnms-devices .bootgrid-table td.loading,
-.lnms-devices .bootgrid-table td.no-results {
-    color: var(--lnms-text-muted);
-    background-color: var(--lnms-surface) !important;
-}
+/* devices Bootgrid empty: shared denser quiet rules above */
 
 .lnms-devices .pagination > li > a,
 .lnms-devices .pagination > li > span {
@@ -3134,10 +3162,13 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 }
 
 .dark .lnms-devices #devices.table-striped > tbody > tr:nth-of-type(odd),
-.dark .lnms-devices .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-devices .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
 .dark .lnms-devices .bootgrid-table td.loading,
 .dark .lnms-devices .bootgrid-table td.no-results {
-    background-color: var(--lnms-surface);
+    background-color: transparent !important;
 }
 
 /* Phase 5: Device detail — hosts .lnms-device-page*; status left-border uses --lnms-status-* */
@@ -3588,11 +3619,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-accent-muted);
 }
 
-.lnms-ports .bootgrid-table td.loading,
-.lnms-ports .bootgrid-table td.no-results {
-    color: var(--lnms-text-muted);
-    background-color: var(--lnms-surface) !important;
-}
+/* ports Bootgrid empty: shared denser quiet rules above */
 
 .lnms-ports .pagination > li > a,
 .lnms-ports .pagination > li > span {
@@ -3760,10 +3787,13 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 }
 
 .dark .lnms-ports #ports.table-striped > tbody > tr:nth-of-type(odd),
-.dark .lnms-ports .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-ports .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
 .dark .lnms-ports .bootgrid-table td.loading,
 .dark .lnms-ports .bootgrid-table td.no-results {
-    background-color: var(--lnms-surface);
+    background-color: transparent !important;
 }
 
 .dark .lnms-ports #ports.table-striped > tbody > tr:nth-of-type(even),
@@ -4079,11 +4109,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-accent-muted);
 }
 
-.lnms-health .bootgrid-table td.loading,
-.lnms-health .bootgrid-table td.no-results {
-    color: var(--lnms-text-muted);
-    background-color: var(--lnms-surface) !important;
-}
+/* health Bootgrid empty: shared denser quiet rules above */
 
 .lnms-health .pagination > li > a,
 .lnms-health .pagination > li > span {
@@ -4175,10 +4201,13 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 }
 
 .dark .lnms-health .table-striped > tbody > tr:nth-of-type(odd),
-.dark .lnms-health .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-health .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
 .dark .lnms-health .bootgrid-table td.loading,
 .dark .lnms-health .bootgrid-table td.no-results {
-    background-color: var(--lnms-surface);
+    background-color: transparent !important;
 }
 
 .dark .lnms-health .table-striped > tbody > tr:nth-of-type(even),
@@ -4303,11 +4332,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-accent-muted);
 }
 
-.lnms-wireless .bootgrid-table td.loading,
-.lnms-wireless .bootgrid-table td.no-results {
-    color: var(--lnms-text-muted);
-    background-color: var(--lnms-surface) !important;
-}
+/* wireless Bootgrid empty: shared denser quiet rules above */
 
 .lnms-wireless .pagination > li > a,
 .lnms-wireless .pagination > li > span {
@@ -4395,10 +4420,13 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 }
 
 .dark .lnms-wireless .table-striped > tbody > tr:nth-of-type(odd),
-.dark .lnms-wireless .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
+.dark .lnms-wireless .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--lnms-surface);
+}
+
 .dark .lnms-wireless .bootgrid-table td.loading,
 .dark .lnms-wireless .bootgrid-table td.no-results {
-    background-color: var(--lnms-surface);
+    background-color: transparent !important;
 }
 
 .dark .lnms-wireless .table-striped > tbody > tr:nth-of-type(even),
@@ -4520,13 +4548,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-accent-muted);
 }
 
-.lnms-alerts .bootgrid-table td.loading,
-.lnms-alerts .bootgrid-table td.no-results,
-.lnms-alert-log .bootgrid-table td.loading,
-.lnms-alert-log .bootgrid-table td.no-results {
-    color: var(--lnms-text-muted);
-    background-color: var(--lnms-surface) !important;
-}
+/* alerts / alert-log Bootgrid empty: shared denser quiet rules above */
 
 .lnms-alerts .pagination > li > a,
 .lnms-alerts .pagination > li > span,
@@ -4639,14 +4661,17 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 
 .dark .lnms-alerts .table-striped > tbody > tr:nth-of-type(odd),
 .dark .lnms-alerts .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
-.dark .lnms-alerts .bootgrid-table td.loading,
-.dark .lnms-alerts .bootgrid-table td.no-results,
 .dark .lnms-alert-log .table-striped > tbody > tr:nth-of-type(odd),
 .dark .lnms-alert-log .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
-.dark .lnms-alert-log .bootgrid-table td.loading,
-.dark .lnms-alert-log .bootgrid-table td.no-results,
 .dark .lnms-alert-rules .table-striped > tbody > tr:nth-of-type(odd) {
     background-color: var(--lnms-surface);
+}
+
+.dark .lnms-alerts .bootgrid-table td.loading,
+.dark .lnms-alerts .bootgrid-table td.no-results,
+.dark .lnms-alert-log .bootgrid-table td.loading,
+.dark .lnms-alert-log .bootgrid-table td.no-results {
+    background-color: transparent !important;
 }
 
 .dark .lnms-alerts .table-striped > tbody > tr:nth-of-type(even),
@@ -4686,14 +4711,66 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     outline: none;
 }
 
+/*
+ * Maps status/empty alerts — denser quiet chrome (keep #alert / .alert-warning for JS).
+ * Covers Loading data / No devices found on netmap, dependency, custom-view.
+ */
+.lnms-maps #alert-row .alert,
+.lnms-maps .alert.alert-warning[role="alert"] {
+    margin: 0 0 var(--lnms-space-2, 8px);
+    padding: 6px 10px;
+    font-size: var(--lnms-text-sm);
+    font-weight: 400;
+    line-height: 1.35;
+    border-radius: var(--lnms-radius-sm);
+    box-shadow: none;
+    background-color: color-mix(in srgb, var(--lnms-status-warn, #c9a227) 12%, var(--lnms-surface));
+    border: 1px solid color-mix(in srgb, var(--lnms-status-warn, #c9a227) 35%, var(--lnms-border));
+    color: var(--lnms-text-secondary);
+}
+
 .lnms-maps .alert {
-    border-radius: var(--lnms-radius-md);
+    border-radius: var(--lnms-radius-sm);
 }
 
 .lnms-maps .alert-warning {
-    background-color: color-mix(in srgb, var(--lnms-status-warn, #c9a227) 18%, var(--lnms-surface));
-    border-color: color-mix(in srgb, var(--lnms-status-warn, #c9a227) 45%, var(--lnms-border));
+    background-color: color-mix(in srgb, var(--lnms-status-warn, #c9a227) 12%, var(--lnms-surface));
+    border-color: color-mix(in srgb, var(--lnms-status-warn, #c9a227) 35%, var(--lnms-border));
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-maps .alert-danger {
+    margin: 0 0 var(--lnms-space-2, 8px);
+    padding: 6px 10px;
+    font-size: var(--lnms-text-sm);
+    line-height: 1.35;
+    border-radius: var(--lnms-radius-sm);
+    box-shadow: none;
+    background-color: color-mix(in srgb, var(--lnms-status-down, #c0392b) 12%, var(--lnms-surface));
+    border-color: color-mix(in srgb, var(--lnms-status-down, #c0392b) 40%, var(--lnms-border));
     color: var(--lnms-text);
+}
+
+.lnms-maps .alert-info {
+    margin: 0 0 var(--lnms-space-2, 8px);
+    padding: 6px 10px;
+    font-size: var(--lnms-text-sm);
+    line-height: 1.35;
+    border-radius: var(--lnms-radius-sm);
+    box-shadow: none;
+    background-color: var(--lnms-accent-muted);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text-secondary);
+}
+
+/* Custom maps list: real empty (no maps) — not a fake map card */
+.lnms-maps .lnms-maps-empty {
+    margin: 0;
+    padding: 8px 2px 12px;
+    font-size: var(--lnms-text-sm);
+    font-weight: 400;
+    line-height: 1.35;
+    color: var(--lnms-text-muted);
 }
 
 .lnms-maps #visualization,
@@ -4941,13 +5018,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-accent-muted);
 }
 
-.lnms-eventlog .bootgrid-table td.loading,
-.lnms-eventlog .bootgrid-table td.no-results,
-.lnms-syslog .bootgrid-table td.loading,
-.lnms-syslog .bootgrid-table td.no-results {
-    color: var(--lnms-text-muted);
-    background-color: var(--lnms-surface) !important;
-}
+/* eventlog / syslog Bootgrid empty: shared denser quiet rules above */
 
 .lnms-eventlog .pagination > li > a,
 .lnms-eventlog .pagination > li > span,
@@ -5016,14 +5087,17 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 
 .dark .lnms-eventlog .table-striped > tbody > tr:nth-of-type(odd),
 .dark .lnms-eventlog .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
-.dark .lnms-eventlog .bootgrid-table td.loading,
-.dark .lnms-eventlog .bootgrid-table td.no-results,
 .dark .lnms-syslog .table-striped > tbody > tr:nth-of-type(odd),
 .dark .lnms-syslog .bootgrid-table.table-striped > tbody > tr:nth-of-type(odd),
-.dark .lnms-syslog .bootgrid-table td.loading,
-.dark .lnms-syslog .bootgrid-table td.no-results,
 .dark .lnms-authlog .table-striped > tbody > tr:nth-of-type(odd) {
     background-color: var(--lnms-surface);
+}
+
+.dark .lnms-eventlog .bootgrid-table td.loading,
+.dark .lnms-eventlog .bootgrid-table td.no-results,
+.dark .lnms-syslog .bootgrid-table td.loading,
+.dark .lnms-syslog .bootgrid-table td.no-results {
+    background-color: transparent !important;
 }
 
 .dark .lnms-eventlog .table-striped > tbody > tr:nth-of-type(even),
@@ -5125,11 +5199,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-accent-muted);
 }
 
-.lnms-bills .bootgrid-table td.loading,
-.lnms-bills .bootgrid-table td.no-results {
-    color: var(--lnms-text-muted);
-    background-color: var(--lnms-surface) !important;
-}
+/* bills Bootgrid empty: shared denser quiet rules above */
 
 .lnms-bills .pagination > li > a,
 .lnms-bills .pagination > li > span {
@@ -5245,7 +5315,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 
 .dark .lnms-bills .bootgrid-table td.loading,
 .dark .lnms-bills .bootgrid-table td.no-results {
-    background-color: var(--lnms-surface) !important;
+    background-color: transparent !important;
 }
 
 .dark .lnms-bills .table-hover > tbody > tr:hover,
@@ -6028,9 +6098,16 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 }
 
 .lnms-services .alert-info {
+    margin: 0 0 var(--lnms-space-2, 8px);
+    padding: 6px 10px;
+    font-size: var(--lnms-text-sm);
+    font-weight: 400;
+    line-height: 1.35;
+    border-radius: var(--lnms-radius-sm);
+    box-shadow: none;
     background-color: var(--lnms-accent-muted);
     border-color: var(--lnms-border);
-    color: var(--lnms-text);
+    color: var(--lnms-text-secondary);
 }
 
 .dark .lnms-inventory .table-striped > tbody > tr:nth-of-type(odd),
