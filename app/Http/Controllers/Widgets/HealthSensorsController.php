@@ -130,6 +130,12 @@ class HealthSensorsController extends WidgetController
             ]);
         }
 
+        if ($sensors->isEmpty()) {
+            return $this->needsConfigurationView(
+                __('No health sensors matched the current filters.')
+            );
+        }
+
         return view('widgets.health-sensors', [
             'id' => $settings['id'],
             'error' => null,

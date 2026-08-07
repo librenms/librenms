@@ -1519,6 +1519,12 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     box-shadow: none;
 }
 
+/* View mode: flatten device-summary nested panel (routes/counts unchanged) */
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-device-summary.panel {
+    border: none;
+    border-radius: 0;
+}
+
 .lnms-dashboard .lnms-widget .lnms-device-summary .table {
     margin-bottom: 0;
     color: var(--lnms-text);
@@ -1792,6 +1798,11 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     border: 1px solid var(--lnms-border);
     border-radius: var(--lnms-radius-md);
     box-shadow: none;
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-device-types.panel {
+    border: none;
+    border-radius: 0;
 }
 
 .lnms-dashboard .lnms-widget .lnms-device-types .table,
@@ -2191,6 +2202,28 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 }
 
 /*
+ * View-mode Bootgrid empty/loading cells — quiet denser empty (keep .no-results / .loading classes).
+ * Aligns Alerts/Syslog/Eventlog/Graylog/Alertlog with needs-config density; no fake rows.
+ */
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-table td.no-results,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .bootgrid-table td.loading {
+    text-align: left;
+    padding: 6px 8px;
+    font-size: var(--lnms-text-sm);
+    font-weight: 400;
+    line-height: 1.35;
+    color: var(--lnms-text-muted);
+    background-color: transparent !important;
+    white-space: normal;
+}
+
+.lnms-dashboard .lnms-widget .bootgrid-table td.no-results,
+.lnms-dashboard .lnms-widget .bootgrid-table td.loading {
+    color: var(--lnms-text-muted);
+    background-color: var(--lnms-surface) !important;
+}
+
+/*
  * Soften Alerts severity quick-filter in view mode.
  * Keep .alerts-widget-sev-btn + data-target-sev + Bootgrid reload behavior.
  * Explicitly un-hide: sibling of .actions (not inside it) — must stay usable.
@@ -2423,7 +2456,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-status-critical) !important;
 }
 
-/* Component status table */
+/* Component status table — denser cells; keep #component-status id */
 .lnms-dashboard .lnms-widget .lnms-component-status {
     color: var(--lnms-text);
     font-size: var(--lnms-text-sm);
@@ -2444,6 +2477,13 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 .lnms-dashboard .lnms-widget .lnms-component-status .table > tbody > tr > td {
     border-top-color: var(--lnms-border);
     vertical-align: middle;
+}
+
+.lnms-dashboard .lnms-widget .lnms-component-status .table p {
+    margin: 0;
+    padding: 0;
+    font-size: inherit;
+    line-height: 1.35;
 }
 
 .lnms-dashboard .lnms-widget .lnms-component-status .table-striped > tbody > tr:nth-of-type(odd) {
@@ -2496,17 +2536,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     font-size: var(--lnms-text-sm);
 }
 
-.lnms-dashboard .lnms-widget .lnms-health-sensors .alert-danger {
-    background-color: color-mix(in srgb, var(--lnms-status-critical) 12%, var(--lnms-surface));
-    border-color: var(--lnms-status-critical);
-    color: var(--lnms-status-critical);
-}
-
-.lnms-dashboard .lnms-widget .lnms-health-sensors .alert-info {
-    background-color: color-mix(in srgb, var(--lnms-accent) 10%, var(--lnms-surface));
-    border-color: var(--lnms-accent);
-    color: var(--lnms-text-secondary);
-}
+/* Empty / filter-error health-sensors use shared .lnms-widget-needs-config (no Bootstrap alert). */
 
 .lnms-dashboard .lnms-widget .lnms-health-sensors a {
     color: var(--lnms-accent);
@@ -2638,31 +2668,45 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     border-radius: var(--lnms-radius-sm);
 }
 
+/* Placeholder: denser quiet empty (same density as needs-config; no Configure CTA) */
 .lnms-dashboard .lnms-widget .lnms-placeholder-widget {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+    gap: 4px;
     color: var(--lnms-text-secondary);
     font-size: var(--lnms-text-sm);
-    padding: var(--lnms-space-3);
+    padding: 2px 0 4px;
+    min-height: 0;
 }
 
-.lnms-dashboard .lnms-widget .lnms-placeholder-widget h3 {
-    margin-top: 0;
-    margin-bottom: var(--lnms-space-3);
-    color: var(--lnms-text);
-    font-size: var(--lnms-text-lg);
-    font-weight: 600;
-    font-family: var(--lnms-font-sans);
+.lnms-dashboard .lnms-widget .lnms-placeholder-widget__msg {
+    margin: 0;
+    color: var(--lnms-text-secondary);
+    font-size: var(--lnms-text-sm);
+    line-height: 1.35;
+    max-width: 42em;
 }
 
 .lnms-dashboard .lnms-widget .lnms-placeholder-widget__hint {
     margin: 0;
-    color: var(--lnms-text-secondary);
-    font-size: var(--lnms-text-md);
+    color: var(--lnms-text-muted);
+    font-size: var(--lnms-text-xs);
     font-weight: 400;
+    line-height: 1.35;
+    max-width: 42em;
 }
 
 .lnms-dashboard .lnms-widget .lnms-placeholder-widget__hint strong {
-    color: var(--lnms-text);
+    color: var(--lnms-text-secondary);
     font-weight: 600;
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget__body:has(.lnms-placeholder-widget) {
+    display: flex;
+    align-items: flex-start;
+    padding-top: 4px;
+    padding-bottom: 4px;
 }
 
 .dark .lnms-dashboard .lnms-widget .lnms-device-summary .table-striped > tbody > tr:nth-of-type(odd),

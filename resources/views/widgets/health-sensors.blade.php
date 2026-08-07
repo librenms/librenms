@@ -1,8 +1,8 @@
 <div class="lnms-health-sensors">
 @if (!empty($error))
-    <div class="alert alert-danger">{{ $error }}</div>
-@elseif ($sensors->isEmpty())
-    <div class="alert alert-info">{{ __('No health sensors matched the current filters.') }}</div>
+    <div class="lnms-widget-needs-config" data-widget-type="health-sensors">
+        <p class="lnms-widget-needs-config__msg">{{ $error }}</p>
+    </div>
 @else
     @php($colWidth = max(1, min(12, intdiv(12, max(1, (int) ($cols ?? 3))))))
 
