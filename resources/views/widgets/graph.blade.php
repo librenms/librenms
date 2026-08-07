@@ -1,8 +1,11 @@
+{{-- Configured graph: real LibreNMS /graph route; CSS fills widget width --}}
 <div class="dashboard-graph lnms-dashboard-graph">
     <a href="graphs/{{ implode('/', $params) }}/type={{ $graph_type }}/from={{ $from }}/to={{ $to }}">
         <img class="minigraph-image"
              width="{{ $dimensions['x'] }}"
              height="{{ $dimensions['y'] }}"
+             alt="{{ $graph_type }}"
+             loading="lazy"
              src="{{ route('graph', [...$params, 'from' => $from, 'to' => $to, 'width' => $dimensions['x'], 'height' => $dimensions['y'], 'type' => $graph_type, 'legend' => $graph_legend, 'absolute' => 1]) }}"
         />
     </a>

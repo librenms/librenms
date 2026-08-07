@@ -1040,11 +1040,11 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 /* —— Dashboard widget chrome (Phase 4) —— */
 .lnms-dashboard {
     font-family: var(--lnms-font-sans);
-    padding: var(--lnms-space-2) var(--lnms-space-2) var(--lnms-space-3);
-    background: rgba(255, 255, 255, 0.45);
+    padding: var(--lnms-space-1) var(--lnms-space-2) var(--lnms-space-2);
+    background: rgba(255, 255, 255, 0.35);
     border: 1px solid var(--lnms-border);
     border-radius: var(--lnms-radius-lg);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    box-shadow: none;
 }
 
 /* Use more horizontal width on the dashboard host */
@@ -1105,6 +1105,49 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     color: var(--lnms-text);
 }
 
+/* View mode: quieter dashboard selector / Edit chrome (less Bootstrap default) */
+.lnms-dashboard:not(.lnms-dash-editing) #dashboard-editor {
+    margin-bottom: var(--lnms-space-2);
+    padding: var(--lnms-space-2) var(--lnms-space-3);
+    box-shadow: none;
+    background: transparent;
+    border-color: transparent;
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-dash-viewbar__select .btn.btn-default {
+    background: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    box-shadow: none;
+    border-radius: var(--lnms-radius-sm);
+    padding: 4px 10px;
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-dash-viewbar__select .btn.btn-default:hover,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-dash-viewbar__select .btn.btn-default:focus {
+    background: var(--lnms-surface-muted);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .edit-dash-btn.btn-primary {
+    background: var(--lnms-surface);
+    border-color: var(--lnms-border);
+    color: var(--lnms-text);
+    box-shadow: none;
+    border-radius: var(--lnms-radius-sm);
+    padding: 4px 12px;
+    font-size: var(--lnms-text-sm);
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .edit-dash-btn.btn-primary:hover,
+.lnms-dashboard:not(.lnms-dash-editing) .edit-dash-btn.btn-primary:focus {
+    background: var(--lnms-accent-muted);
+    border-color: var(--lnms-accent);
+    color: var(--lnms-accent);
+}
+
 /* View mode: hide destructive/create chrome until Edit */
 .lnms-dashboard:not(.lnms-dash-editing) .lnms-dash-manage,
 .lnms-dashboard:not(.lnms-dash-editing) .lnms-dash-manage-btn {
@@ -1129,22 +1172,24 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     display: none !important;
 }
 
-/* Quiet unconfigured widget empty state (view mode) */
+/* Quiet unconfigured widget empty state (view mode) — denser, consistent chrome */
 .lnms-dashboard .lnms-widget-needs-config {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
-    gap: var(--lnms-space-3, 12px);
-    min-height: 72px;
-    padding: var(--lnms-space-4, 16px);
+    gap: var(--lnms-space-2, 8px);
+    min-height: 48px;
+    height: 100%;
+    padding: 4px 2px;
     color: var(--lnms-text-secondary);
+    box-sizing: border-box;
 }
 
 .lnms-dashboard .lnms-widget-needs-config__msg {
     margin: 0;
     font-size: var(--lnms-text-sm);
-    line-height: 1.45;
+    line-height: 1.4;
     max-width: 36em;
 }
 
@@ -1153,7 +1198,9 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     border-color: var(--lnms-border);
     color: var(--lnms-text);
     background: var(--lnms-surface);
-    font-size: var(--lnms-text-sm);
+    font-size: var(--lnms-text-xs);
+    padding: 3px 10px;
+    box-shadow: none;
 }
 
 .lnms-dashboard .lnms-widget-needs-config__btn:hover,
@@ -1161,6 +1208,25 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     border-color: var(--lnms-accent);
     color: var(--lnms-accent);
     background: var(--lnms-accent-muted);
+}
+
+/* View mode: flatten nested Bootstrap panels inside widgets */
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .panel,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .panel-default,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .panel-body {
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .panel,
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .panel-default {
+    border: none;
+    background: transparent;
+    margin-bottom: 0;
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .panel-body {
+    padding: 0;
 }
 
 /* Quieter Bootstrap form chrome inside widget settings (edit only) */
@@ -1802,17 +1868,29 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     color: #FFFFFF;
 }
 
-/* Graph widget chrome: real /graph images only */
+/* Graph widget chrome: real /graph images only — fill width, quiet frame */
 .lnms-dashboard .lnms-widget .lnms-dashboard-graph.dashboard-graph {
-    border: 1px solid var(--lnms-border);
-    border-radius: var(--lnms-radius-md);
+    border: none;
+    border-radius: var(--lnms-radius-sm);
     overflow: hidden;
     background-color: var(--lnms-surface-muted);
+    width: 100%;
+    line-height: 0;
+}
+
+.lnms-dashboard .lnms-widget .lnms-dashboard-graph.dashboard-graph > a {
+    display: block;
+    width: 100%;
 }
 
 .lnms-dashboard .lnms-widget .lnms-dashboard-graph .minigraph-image {
     display: block;
     border-radius: 0;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    object-fit: contain;
+    vertical-align: top;
 }
 
 /* Syslog / Graylog / Alertlog / Alertlog-stats: Bootgrid — preserve IDs, data-column-id, AJAX URLs */
@@ -2049,7 +2127,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     color: var(--lnms-text-secondary);
 }
 
-/* Graph images: fill widget width when configured */
+/* Graph images: fill widget width when configured (keep with graph chrome above) */
 .lnms-dashboard .lnms-widget .lnms-dashboard-graph.dashboard-graph {
     width: 100%;
 }

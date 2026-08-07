@@ -45,6 +45,7 @@
                 </div>
             </div>
             <div class="lnms-dash-viewbar__actions">
+                @can('update', $dashboard)
                 <button type="button" class="btn btn-primary edit-dash-btn" href="#edit_dash"
                         data-toggle="tooltip" data-container="body" data-placement="top"
                         title="{{ trans('dashboard.buttons.edit') }}"
@@ -54,6 +55,7 @@
                 </button>
                 <button type="button" class="btn btn-default lnms-dash-manage-btn" href="#add_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.new') }}"><i class="fa fa-plus fa-fw" aria-hidden="true"></i></button>
                 <button type="button" class="btn btn-danger lnms-dash-manage-btn" href="#del_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.remove') }}"><i class="fa fa-trash fa-fw" aria-hidden="true"></i></button>
+                @endcan
             </div>
         </div>
         <div class="lnms-dash-manage">
