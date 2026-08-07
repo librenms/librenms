@@ -42,7 +42,7 @@ class PortsFdb extends PortRelatedModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ipv4Mac, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ipv6Nd, $this>
      */
     public function ipv6Addresses(): HasMany
     {

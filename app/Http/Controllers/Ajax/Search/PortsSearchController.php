@@ -28,7 +28,7 @@ class PortsSearchController extends GroupedSearchController
                     ->orWhere('ifPhysAddress', 'like', $like);
 
                 $mac = strtolower(str_replace([':', '-', '.'], '', (string) $like));
-                if (ctype_xdigit($mac) && $mac !== '') {
+                if (ctype_xdigit($mac)) {
                     $q->orWhere('ifPhysAddress', 'like', '%' . $mac . '%');
                 }
             })
