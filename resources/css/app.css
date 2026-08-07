@@ -2119,15 +2119,59 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 /*
  * Soften Alerts severity quick-filter in view mode.
  * Keep .alerts-widget-sev-btn + data-target-sev + Bootgrid reload behavior.
+ * Explicitly un-hide: sibling of .actions (not inside it) — must stay usable.
+ * Flex the Bootgrid header row so search actionBar cannot cover severity toggles.
  */
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-header .row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-header .row > [class*="col-"].actionBar {
+    float: none;
+    width: auto;
+    max-width: none;
+    position: relative;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-header .row > .col-sm-4.actionBar {
+    flex: 0 0 auto;
+    z-index: 2;
+    text-align: left;
+}
+
+.lnms-dashboard .lnms-widget .lnms-alerts-widget .bootgrid-header .row > .col-sm-8.actionBar {
+    flex: 1 1 auto;
+    min-width: 0;
+    z-index: 1;
+    text-align: right;
+}
+
 .lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-alerts-widget .bootgrid-header .actionBar > .btn-group[role="group"] {
     display: inline-flex;
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    position: relative;
+    z-index: 3;
     margin: 0 4px 0 0;
     vertical-align: middle;
     border: 1px solid var(--lnms-border);
     border-radius: var(--lnms-radius-sm);
     overflow: hidden;
     background: var(--lnms-surface-muted);
+}
+
+.lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-alerts-widget .bootgrid-header .actionBar > .btn-group[role="group"] .alerts-widget-sev-btn {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    position: relative;
+    z-index: 3;
 }
 
 .lnms-dashboard:not(.lnms-dash-editing) .lnms-widget .lnms-alerts-widget .alerts-widget-sev-btn.btn-default {
