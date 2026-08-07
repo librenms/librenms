@@ -70,6 +70,13 @@ class TopErrorsController extends WidgetController
 
         $data['ports'] = $query->get();
 
+        // Empty smoke / filtered-out: quiet Configure empty state (same pattern as Top Devices).
+        if ($data['ports']->isEmpty()) {
+            return $this->needsConfigurationView(
+                __('No errored interfaces in this interval. Configure filters or add devices.')
+            );
+        }
+
         return view('widgets.top-errors', $data);
     }
 }

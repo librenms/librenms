@@ -62,25 +62,15 @@ class HealthSensorsController extends WidgetController
         }
 
         if ($scope === 'device_group' && empty($settings['device_group'])) {
-            return view('widgets.health-sensors', [
-                'id' => $settings['id'],
-                'error' => __('Please select a device group.'),
-                'sensors' => collect(),
-                'display_mode' => $settings['display_mode'],
-                'cols' => (int) $settings['cols'],
-            ]);
+            return $this->needsConfigurationView(__('Select a device group to display health sensors.'));
         }
 
         if ($scope === 'device_regex') {
             $deviceRegex = trim((string) ($settings['device_regex'] ?? '.*'));
             if ($deviceRegex === '') {
-                return view('widgets.health-sensors', [
-                    'id' => $settings['id'],
-                    'error' => __('Please enter a device match regex (hostname or sysName).'),
-                    'sensors' => collect(),
-                    'display_mode' => $settings['display_mode'],
-                    'cols' => (int) $settings['cols'],
-                ]);
+                return $this->needsConfigurationView(
+                    __('Enter a device match regex to display health sensors.')
+                );
             }
         }
 

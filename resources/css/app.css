@@ -1859,6 +1859,8 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     font-weight: 500;
 }
 
+/* Empty Top Devices / Top Interfaces / Top Errors use shared .lnms-widget-needs-config */
+
 .lnms-dashboard .lnms-widget .lnms-top-interfaces .minigraph-image,
 .lnms-dashboard .lnms-widget .lnms-top-devices .minigraph-image {
     border-radius: var(--lnms-radius-sm);
@@ -2468,7 +2470,8 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     color: var(--lnms-status-unknown) !important;
 }
 
-/* Server stats gauges — host chrome; JustGage IDs preserved */
+/* Server stats gauges — host chrome; JustGage IDs preserved.
+ * Empty unconfigured server-stats / health-sensors use shared .lnms-widget-needs-config. */
 .lnms-dashboard .lnms-widget .lnms-server-stats {
     color: var(--lnms-text);
     font-size: var(--lnms-text-sm);
@@ -2600,7 +2603,8 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     max-width: 100%;
 }
 
-/* Notes + placeholder leftover widgets — presentation only */
+/* Notes + placeholder leftover widgets — presentation only.
+ * Empty notes uses shared .lnms-widget-needs-config (Configure → real settings). */
 .lnms-dashboard .lnms-widget .lnms-notes-widget {
     color: var(--lnms-text);
     font-size: var(--lnms-text-sm);

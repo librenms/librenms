@@ -41,7 +41,8 @@ class NotesController extends WidgetController
     {
         $settings = $this->getSettings();
 
-        if (is_null($settings['notes'])) {
+        // Empty / whitespace: quiet Configure empty state (settings stay behind gear / Configure).
+        if ($settings['notes'] === null || trim((string) $settings['notes']) === '') {
             return $this->needsConfigurationView(__('No notes yet. Configure this widget to add content.'));
         }
 

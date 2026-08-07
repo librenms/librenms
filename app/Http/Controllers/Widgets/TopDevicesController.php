@@ -79,8 +79,16 @@ class TopDevicesController extends WidgetController
             'ram' => $this->getMemoryData($sort),
             'poller' => $this->getPollerData($sort),
             'storage' => $this->getStorageData($sort),
-            default => [],
+            default => ['headers' => [], 'rows' => collect()],
         };
+
+        // Empty smoke / filtered-out: quiet Configure empty state (same pattern as Notes / maps).
+        $rows = $data['rows'] ?? collect();
+        if ($rows instanceof Collection ? $rows->isEmpty() : empty($rows)) {
+            return $this->needsConfigurationView(
+                __('No devices found within interval. Configure filters or add devices.')
+            );
+        }
 
         return view('widgets.top-devices', $data);
     }
