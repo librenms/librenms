@@ -48,7 +48,7 @@ class ApiAccessController extends Controller
             ->orderBy('id')
             ->get();
 
-        $v1Tokens = config('api.v1.enabled')
+        $v1Tokens = config('librenms.api.v1.enabled')
             ? PersonalAccessToken::query()
                 ->where('tokenable_type', User::class)
                 ->where('tokenable_id', $user->user_id)

@@ -32,7 +32,7 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
         // LibrenmsConfig pre-boot caches a config built without any DB
         // settings (Eloquent::isConnected() is false until the app has
         // booted), poisoning the shared config cache for CONFIG_CACHE_TTL.
-        if (! config('api.v1.enabled')) {
+        if (! config('librenms.api.v1.enabled')) {
             return;
         }
 

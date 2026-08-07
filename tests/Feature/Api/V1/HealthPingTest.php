@@ -19,7 +19,7 @@ final class HealthPingTest extends DBTestCase
 
     protected function setUp(): void
     {
-        // v1 route registration reads api.v1.enabled (API_V1_ENABLED env)
+        // v1 route registration reads librenms.api.v1.enabled (API_V1_ENABLED env)
         // during application boot, so the env value must be in place before
         // parent::setUp() creates the application.
         self::putEnv('API_V1_ENABLED', 'true');

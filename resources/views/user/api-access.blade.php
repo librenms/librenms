@@ -92,7 +92,7 @@
             </button>
         </div>
 
-        @if(config('api.v1.enabled'))
+        @if(config('librenms.api.v1.enabled'))
         <hr>
 
         <legend>
@@ -215,7 +215,7 @@
     </div>
 </div>
 
-@if(config('api.v1.enabled'))
+@if(config('librenms.api.v1.enabled'))
 <div class="modal fade" id="v1-create-token" tabindex="-1" role="dialog" aria-labelledby="v1-create-title" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -407,7 +407,7 @@
       $('#remove_token_form').attr('action', baseUrl + '/' + token_id);
     });
 
-    @if(config('api.v1.enabled'))
+    @if(config('librenms.api.v1.enabled'))
     function v1FailMessage(xhr, fallback) {
       var j = xhr.responseJSON;
       if (j && j.errors) {

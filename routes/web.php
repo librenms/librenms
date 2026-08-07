@@ -146,7 +146,7 @@ Route::middleware(['auth'])->group(function (): void {
         // must not be read through LibrenmsConfig here (a pre-boot
         // ConfigRepository build caches a config without any DB settings).
         // Laravel config (API_V1_ENABLED env) is safe at any point.
-        if (config('api.v1.enabled')) {
+        if (config('librenms.api.v1.enabled')) {
             Route::post('api-access/v1', [ApiAccessController::class, 'storeV1'])->name('api-access.v1.store');
             Route::patch('api-access/v1/{id}/renew', [ApiAccessController::class, 'renewV1'])->name('api-access.v1.renew')->whereNumber('id');
             Route::delete('api-access/v1/{id}', [ApiAccessController::class, 'destroyV1'])->name('api-access.v1.destroy')->whereNumber('id');
