@@ -107,8 +107,6 @@ class FdbSearchTest extends TestCase
         $this->assertTrue($names->contains('00:11:22:33:44:55'));
     }
 
-
-
     public function test_search_fdb_single_mac_port_gets_green_status(): void
     {
         $user = User::factory()->admin()->create(['enabled' => true]);

@@ -19,7 +19,7 @@ class PortsSearchTest extends TestCase
         $port = Port::factory()->create([
             'device_id' => $device->device_id,
             'ifDescr' => 'GigabitEthernet1/1',
-            'ifAlias' => 'Test Port'
+            'ifAlias' => 'Test Port',
         ]);
 
         $response = $this->actingAs($user)
@@ -36,7 +36,7 @@ class PortsSearchTest extends TestCase
         $device = Device::factory()->create();
         $port = Port::factory()->create([
             'device_id' => $device->device_id,
-            'ifPhysAddress' => '00:11:22:33:44:55'
+            'ifPhysAddress' => '00:11:22:33:44:55',
         ]);
 
         $response = $this->actingAs($user)

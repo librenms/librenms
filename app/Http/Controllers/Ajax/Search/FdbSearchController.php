@@ -63,6 +63,7 @@ class FdbSearchController extends GroupedSearchController
             ->get()
             ->map(function (PortsFdb $portsFdb): array {
                 $isConnected = ((int) $portsFdb->mac_count) === 1;
+
                 return [
                     'name' => Mac::parse($portsFdb->mac_address)->readable(),
                     'subtitle' => implode(' · ', array_filter([
