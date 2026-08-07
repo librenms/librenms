@@ -5290,6 +5290,38 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     color: var(--lnms-accent-hover);
 }
 
+/*
+ * Bill edit empty ports — denser quiet alert-info
+ * ("There are no ports assigned to this bill"). Real empty; no fake ports.
+ */
+.lnms-bill .alert-info,
+.lnms-bills .alert-info {
+    margin: 0 0 var(--lnms-space-2, 8px);
+    padding: 6px 10px;
+    font-size: var(--lnms-text-sm);
+    font-weight: 400;
+    line-height: 1.35;
+    border-radius: var(--lnms-radius-sm);
+    box-shadow: none;
+    background-color: var(--lnms-accent-muted);
+    border: 1px solid var(--lnms-border);
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-bill .alert-warning,
+.lnms-bills .alert-warning {
+    margin: 0 0 var(--lnms-space-2, 8px);
+    padding: 6px 10px;
+    font-size: var(--lnms-text-sm);
+    font-weight: 400;
+    line-height: 1.35;
+    border-radius: var(--lnms-radius-sm);
+    box-shadow: none;
+    background-color: color-mix(in srgb, var(--lnms-status-warn, #c9a227) 12%, var(--lnms-surface));
+    border: 1px solid color-mix(in srgb, var(--lnms-status-warn, #c9a227) 35%, var(--lnms-border));
+    color: var(--lnms-text-secondary);
+}
+
 /* Modal chrome only — preserve #create-bill ID and create Bill gate */
 .lnms-shell #create-bill .modal-content {
     background-color: var(--lnms-surface);
@@ -5504,6 +5536,29 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 .lnms-roles a:hover,
 .lnms-roles a:focus {
     color: var(--lnms-accent-hover);
+}
+
+/*
+ * Roles RBAC beta warning — denser quiet alert-warning (real permissions copy).
+ */
+.lnms-roles > .alert-warning,
+.lnms-roles .alert.alert-warning {
+    margin: 0 0 var(--lnms-space-3, 12px);
+    padding: 6px 10px;
+    font-size: var(--lnms-text-sm);
+    font-weight: 400;
+    line-height: 1.35;
+    border-radius: var(--lnms-radius-sm);
+    box-shadow: none;
+    background-color: color-mix(in srgb, var(--lnms-status-warn, #c9a227) 12%, var(--lnms-surface));
+    border: 1px solid color-mix(in srgb, var(--lnms-status-warn, #c9a227) 35%, var(--lnms-border));
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-roles > .alert-warning strong,
+.lnms-roles .alert.alert-warning strong {
+    font-weight: 600;
+    color: var(--lnms-text);
 }
 
 .lnms-users .label-info,
@@ -5758,8 +5813,29 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     color: var(--lnms-text);
 }
 
+/* API access status / one-time token — denser quiet alerts (real messages) */
+.lnms-api .alert-info,
+.lnms-api .alert-warning {
+    margin: 0 0 var(--lnms-space-2, 8px);
+    padding: 6px 10px;
+    font-size: var(--lnms-text-sm);
+    font-weight: 400;
+    line-height: 1.35;
+    border-radius: var(--lnms-radius-sm);
+    box-shadow: none;
+}
+
+.lnms-api .alert-info {
+    background-color: var(--lnms-accent-muted);
+    border: 1px solid var(--lnms-border);
+    color: var(--lnms-text-secondary);
+}
+
+.lnms-api .alert-warning,
 .lnms-api .alert-warning.lnms-api__token-once {
-    border-color: var(--lnms-status-warn);
+    background-color: color-mix(in srgb, var(--lnms-status-warn, #c9a227) 12%, var(--lnms-surface));
+    border: 1px solid color-mix(in srgb, var(--lnms-status-warn, #c9a227) 35%, var(--lnms-border));
+    color: var(--lnms-text-secondary);
 }
 
 .lnms-api .api-token-description-text {
@@ -6364,16 +6440,41 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 }
 
 .lnms-ssl-certificates .alert-success {
+    margin: 0 0 var(--lnms-space-2, 8px);
+    padding: 6px 10px;
+    font-size: var(--lnms-text-sm);
+    line-height: 1.35;
+    border-radius: var(--lnms-radius-sm);
+    box-shadow: none;
     background-color: color-mix(in srgb, var(--lnms-status-up) 16%, var(--lnms-surface));
     border-color: color-mix(in srgb, var(--lnms-status-up) 40%, var(--lnms-border));
     color: var(--lnms-text);
 }
 
+/*
+ * SSL create no-devices warning — denser quiet chrome (honest empty; submit stays disabled).
+ */
 .lnms-ssl-certificates .alert-danger,
 .lnms-ssl-certificates .alert-warning {
-    background-color: var(--lnms-surface-muted);
-    border-color: var(--lnms-border);
+    margin: 0 0 var(--lnms-space-2, 8px);
+    padding: 6px 10px;
+    font-size: var(--lnms-text-sm);
+    font-weight: 400;
+    line-height: 1.35;
+    border-radius: var(--lnms-radius-sm);
+    box-shadow: none;
+}
+
+.lnms-ssl-certificates .alert-danger {
+    background-color: color-mix(in srgb, var(--lnms-status-down, #c0392b) 12%, var(--lnms-surface));
+    border: 1px solid color-mix(in srgb, var(--lnms-status-down, #c0392b) 40%, var(--lnms-border));
     color: var(--lnms-text);
+}
+
+.lnms-ssl-certificates .alert-warning {
+    background-color: color-mix(in srgb, var(--lnms-status-warn, #c9a227) 12%, var(--lnms-surface));
+    border: 1px solid color-mix(in srgb, var(--lnms-status-warn, #c9a227) 35%, var(--lnms-border));
+    color: var(--lnms-text-secondary);
 }
 
 .lnms-ssl-certificates .help-block,
