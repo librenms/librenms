@@ -1,24 +1,191 @@
-<nav class="navbar navbar-default {{ $navbar }} navbar-sticky-top lnms-nav" role="navigation" aria-label="{{ __('Primary') }}">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="{{ route('home') }}">
-                <x-logo responsive="lg" class="tw:h-full tw:max-w-[170px]" />
-            </a>
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navHeaderCollapse" aria-controls="navHeaderCollapse" aria-expanded="false">
+<nav class="navbar navbar-default {{ $navbar }} navbar-sticky-top lnms-nav lnms-nav--app" role="navigation" aria-label="{{ __('Primary') }}">
+    <div class="lnms-topbar">
+        <div class="lnms-topbar__start">
+            <button type="button" class="lnms-sidebar-toggle" id="lnms-sidebar-toggle"
+                    aria-controls="navHeaderCollapse" aria-expanded="true"
+                    title="{{ __('Toggle navigation') }}">
+                <i class="fa fa-bars" aria-hidden="true"></i>
                 <span class="sr-only">{{ __('Toggle navigation') }}</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
             </button>
+            <div class="navbar-header">
+                <a class="navbar-brand" href="{{ route('home') }}">
+                    <x-logo responsive="lg" class="tw:h-full tw:max-w-[140px]" />
+                </a>
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navHeaderCollapse" aria-controls="navHeaderCollapse" aria-expanded="false">
+                    <span class="sr-only">{{ __('Toggle navigation') }}</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
         </div>
+        <div class="lnms-topbar__end">
+            <div class="navbar-form navbar-right global-search tw:relative" x-data="globalSearch()"
+                 role="search" aria-label="{{ __('Global Search') }}"
+                 @keydown.escape="close()" @click.outside="close()">
+                <div class="form-group">
+                    <label class="sr-only" for="gsearch">{{ __('Global Search') }}</label>
+                    <input class="form-control" type="search" id="gsearch" name="gsearch" autocomplete="off"
+                           placeholder="{{ __('Type / to search') }}"
+                           role="combobox"
+                           aria-autocomplete="list"
+                           aria-controls="global-search-results"
+                           :aria-expanded="open ? 'true' : 'false'"
+                           :aria-activedescendant="active ? optionId(active) : ''"
+                           aria-haspopup="listbox"
+                           x-model="query" x-ref="input"
+                           @input.debounce.250ms="run()" @focus="open = flat.length > 0"
+                           @keydown="onKey($event)">
+                </div>
+                <div id="global-search-results" x-show="open" x-cloak
+                     class="global-search-dropdown tw:absolute tw:right-0 tw:mt-1 tw:w-[50rem] tw:max-w-[90vw] tw:max-h-[70vh] tw:overflow-y-auto tw:bg-lnms-surface tw:border tw:border-lnms-border tw:rounded-lnms-md tw:shadow-lnms-sm tw:z-50"
+                     role="listbox"
+                     :aria-busy="loading ? 'true' : 'false'"
+                     aria-label="{{ __('Global Search') }}">
+                    <div x-show="loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-lnms-text-muted" role="status">
+                        <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> {{ __('Searching...') }}
+                    </div>
+                    <div x-show="!loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-lnms-text-muted" role="status">
+                        {{ __('No results') }}
+                    </div>
+                    <template x-for="group in groups" :key="group.type">
+                        <div role="group" :aria-label="group.label">
+                            <div class="tw:px-4 tw:py-1.5 tw:bg-lnms-surface-muted tw:text-lnms-text-secondary tw:text-xs tw:font-semibold tw:uppercase" x-text="group.label"></div>
+                            <template x-for="item in group.results" :key="group.type + item.url">
+                                <a :href="item.url" :id="optionId(item.url)" @mouseenter="active = item.url"
+                                   class="tw:flex tw:items-center tw:gap-2.5 tw:px-4 tw:py-2 tw:no-underline tw:text-lnms-text tw:hover:bg-lnms-surface-muted"
+                                   :class="(active === item.url ? 'tw:bg-lnms-accent-muted ' : '') + (item.status ? 'tw:border-l-5 ' + item.status : '')"
+                                   role="option"
+                                   :aria-selected="active === item.url ? 'true' : 'false'">
+                                    <template x-if="item.image">
+                                        <img :src="item.image" alt="" class="tw:h-7 tw:w-7 tw:shrink-0 tw:object-contain tw:dark:bg-gray-50 tw:dark:rounded tw:dark:p-0.5">
+                                    </template>
+                                    <template x-if="!item.image">
+                                        <i class="fa fa-fw fa-lg tw:shrink-0 icon-theme" :class="item.icon" aria-hidden="true"></i>
+                                    </template>
+                                    <span class="tw:min-w-0 tw:flex-1">
+                                        <span class="tw:block tw:truncate" x-text="item.name"></span>
+                                        <span class="tw:block tw:truncate tw:text-sm tw:text-lnms-text-muted" x-text="item.subtitle"></span>
+                                    </span>
+                                </a>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </div>
+            <ul class="nav navbar-nav navbar-right lnms-topbar__actions">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false"
+                       aria-label="{{ __('User') }}">
+                        <i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
+                        <span class="badge badge-navbar-user count-notif {{ $notification_count ? 'badge-danger' : 'badge-default' }}">{{ $notification_count ?: '' }}</span>
+                        <span class="lnms-topbar__user-label"><small>{{ Auth::user()->username }}</small></span>
+                        <span class="visible-xs-inline-block">{{ __('User') }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li><a href="{{ url('notifications') }}"><span
+                                    class="badge count-notif">{{ $notification_count }}</span> {{ __('Notifications') }}
+                            </a></li>
+                        <li><a href="{{ route('preferences.index') }}"><i class="fa fa-cog fa-fw fa-lg"
+                                                                  aria-hidden="true"></i> {{ __('My Settings') }}</a></li>
+                        <li><x-theme-toggle /></li>
+                        <li>
+                            <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                <i class="fa fa-sign-out fa-fw fa-lg" aria-hidden="true"></i> {{ __('Logout') }}
+                            </a>
 
-        <div class="collapse navbar-collapse" id="navHeaderCollapse" style="max-height: calc(100vh - 50px)">
-            <ul class="nav navbar-nav">
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                {{ csrf_field() }}
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false"
+                       aria-label="{{ __('settings.title') }}"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
+                        <span class="visible-xs-inline-block">{{ __('settings.title') }}</span></a>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        @canany(['settings.view', 'settings.update'])
+                        <li><a href="{{ url('settings') }}"><i class="fa fa-cogs fa-fw fa-lg"
+                                                               aria-hidden="true"></i> {{ __('Global Settings') }}</a></li>
+                        <li><a href="{{ url('validate') }}"><i class="fa fa-check-circle fa-fw fa-lg"
+                                                               aria-hidden="true"></i> {{ __('Validate Config') }}</a></li>
+                        @endcanany
+                        @can('viewAny', \App\Models\User::class)
+                        <li role="presentation" class="divider"></li>
+                        <li><a href="{{ route('users.index') }}"><i class="fa fa-user-circle-o fa-fw fa-lg"
+                                                                    aria-hidden="true"></i> {{ __('Manage Users') }}</a>
+                        </li>
+                        @endcan
+                        @can('auth-log.view')
+                        <li><a href="{{ route('auth-log') }}"><i class="fa fa-shield fa-fw fa-lg"
+                                                              aria-hidden="true"></i> {{ __('Auth History') }}</a></li>
+                        @endcan
+                        @if(Gate::allows('viewAny', \App\Models\PollerCluster::class) || Gate::allows('viewAny', \App\Models\PollerGroup::class))
+                        <li role="presentation" class="divider"></li>
+                        <li class="dropdown-submenu dropdown-submenu-left">
+                            <a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> {{ __('Poller') }}</a>
+                            <ul class="dropdown-menu">
+                                @can('viewAny', \App\Models\PollerCluster::class)
+                                <li><a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> {{ __('Poller') }}</a></li>
+                                @endcan
+                                @can('viewAny', \App\Models\PollerGroup::class)
+                                <li><a href="{{ route('poller.groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Groups') }}</a></li>
+                                @endcan
+                                @can('poller.update')
+                                <li><a href="{{ route('poller.settings') }}"><i class="fa fa-gears fa-fw fa-lg" aria-hidden="true"></i> {{ __('Settings') }}</a></li>
+                                @endcan
+                                @can('viewAny', \App\Models\PollerCluster::class)
+                                <li><a href="{{ route('poller.performance') }}"><i class="fa fa-line-chart fa-fw fa-lg" aria-hidden="true"></i> {{ __('Performance') }}</a></li>
+                                <li><a href="{{ route('poller.log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> {{ __('Log') }}</a></li>
+                                @endcan
+                            </ul>
+                        </li>
+                        @endif
+                        @can('api.access')
+                        <li role="presentation" class="divider"></li>
+                        <li class="dropdown-submenu dropdown-submenu-left">
+                            <a href="#"><i class="fa fa-code fa-fw fa-lg" aria-hidden="true"></i> {{ __('API') }}</a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{{ route('api-access.index') }}"><i class="fa fa-cog fa-fw fa-lg"
+                                                                         aria-hidden="true"></i> {{ __('API Tokens') }}
+                                    </a></li>
+                                <li><a href="https://docs.librenms.org/API/" target="_blank" rel="noopener"><i
+                                            class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> {{ __('API Docs') }}</a>
+                                </li>
+                            </ul>
+                        </li>
+                        @endcan
+                        <li role="presentation" class="divider"></li>
+                        <li class="dropdown-submenu dropdown-submenu-left" id="countdown_timer_menu" style="display: none">
+                            <a href="#"><i class="fa fa-clock-o fa-fw fa-lg"></i> <span id="countdown_timer"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" id="countdown_timer_pause"><i class="fa fa-pause fa-fw fa-lg"></i> {{ __('Pause') }}</a></li>
+                                <li><a href="#" id="countdown_timer_refresh"><i class="fa fa-arrows-rotate fa-fw fa-lg"></i> {{ __('Refresh') }}</a></li>
+                            </ul>
+                        </li>
+                        <li role="presentation" class="divider" id="countdown_timer_divider" style="display: none"></li>
+                        <li><a href="{{ url('about') }}"><i class="fa-solid fa-circle-info fa-fw fa-lg"
+                                                            aria-hidden="true"></i> {{ __('About :project_name', ['project_name' => $project_name]) }}
+                            </a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="collapse navbar-collapse lnms-sidebar" id="navHeaderCollapse" style="max-height: calc(100vh - 50px)">
+            <div class="lnms-sidebar__head">
+                <span class="lnms-sidebar__head-label">{{ __('Navigation') }}</span>
+            </div>
+            <ul class="nav navbar-nav lnms-sidebar__menu">
 {{-- Overview --}}
                 <li class="dropdown">
                     <a href="{{ url('overview') }}" class="dropdown-toggle" data-hover="dropdown"
                        data-toggle="dropdown"><i class="fa fa-home fa-fw fa-lg fa-nav-icons"
-                                                 aria-hidden="true"></i> <span
-                            class="tw:md:hidden tw:2xl:inline-block">{{ __('Overview') }}</span></a>
+                                                 aria-hidden="true"></i> <span class="lnms-nav-label">{{ __('Overview') }}</span></a>
                     <ul class="dropdown-menu multi-level" role="menu">
                         <li class="dropdown-submenu">
                             <a href="{{ route('overview') }}"><i class="fa fa-tv fa-fw fa-lg" aria-hidden="true"></i> {{ __('Dashboard') }}</a>
@@ -133,7 +300,7 @@
                 <li class="dropdown">
                     <a href="{{ route('devices') }}" class="dropdown-toggle" data-hover="dropdown"
                        data-toggle="dropdown"><i class="fa fa-server fa-fw fa-lg fa-nav-icons"
-                                                 aria-hidden="true"></i> <span>{{ __('Devices') }}</span></a>
+                                                 aria-hidden="true"></i> <span class="lnms-nav-label">{{ __('Devices') }}</span></a>
                     <ul class="dropdown-menu">
                     @if($no_devices_added)
                     <li><a href="#"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ __('No Devices') }}</a>
@@ -212,7 +379,7 @@
                     <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown"
                        data-toggle="dropdown"><i class="fa fa-map fa-fw fa-lg fa-nav-icons"
                                                  aria-hidden="true"></i> <span
-                            class="tw:md:hidden tw:lg:inline-block">{{ __('Maps') }}</span></a>
+                            class="lnms-nav-label">{{ __('Maps') }}</span></a>
                     <ul class="dropdown-menu">
                         <li><a href="{{ url('availability-map') }}"><i class="fa fa-arrow-circle-up fa-fw fa-lg"
                                                                        aria-hidden="true"></i> {{ __('Availability') }}
@@ -311,7 +478,7 @@
                 <li class="dropdown">
                     <a href="{{ route('ports') }}" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i
                             class="fa fa-link fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span
-                            class="tw:md:hidden tw:lg:inline-block">{{ __('Ports') }}</span></a>
+                            class="lnms-nav-label">{{ __('Ports') }}</span></a>
                     <ul class="dropdown-menu">
                         @can('viewAny', \App\Models\Port::class)
                         <li><a href="{{ route('ports') }}"><i class="fa fa-link fa-fw fa-lg"
@@ -441,7 +608,7 @@
                 <li class="dropdown">
                     <a href="{{ url('health') }}" class="dropdown-toggle" data-hover="dropdown"
                        data-toggle="dropdown"><i class="fa fa-heartbeat fa-fw fa-lg fa-nav-icons"
-                                                 aria-hidden="true"></i> <span class="tw:md:hidden tw:lg:inline-block">{{ __('Health') }}</span></a>
+                                                 aria-hidden="true"></i> <span class="lnms-nav-label">{{ __('Health') }}</span></a>
                     <ul class="dropdown-menu">
                         @can('viewAny', \App\Models\Sensor::class)
                         <li><a href="{{ url('health/metric=all?status=alert') }}"><i class="fas fa-bell fa-fw fa-lg"
@@ -485,7 +652,7 @@
                         <a href="{{ url('wireless') }}" class="dropdown-toggle" data-hover="dropdown"
                            data-toggle="dropdown"><i class="fa fa-wifi fa-fw fa-lg fa-nav-icons"
                                                      aria-hidden="true"></i> <span
-                                class="tw:md:hidden tw:2xl:inline-block">{{ __('wireless.title') }}</span></a>
+                                class="lnms-nav-label">{{ __('wireless.title') }}</span></a>
                         <ul class="dropdown-menu">
                         @foreach($wireless_menu as $wireless_menu_entry)
                                 <li><a href="{{ url('wireless/metric=' . $wireless_menu_entry->sensor_class->value) }}"><i class="fa fa-{{ $wireless_menu_entry->icon() }} fa-fw fa-lg" aria-hidden="true"></i> {{ $wireless_menu_entry->classDescr() }}</a></li>
@@ -501,7 +668,7 @@
                 <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown"
                    data-toggle="dropdown"><i class="fa fa-cogs fa-fw fa-lg fa-nav-icons"
                                              aria-hidden="true"></i> <span
-                        class="tw:md:hidden tw:2xl:inline-block">{{ __('Services') }}</span></a>
+                        class="lnms-nav-label">{{ __('Services') }}</span></a>
                 <ul class="dropdown-menu">
                     <li><a href="{{ url('services') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Services') }}</a>
                     </li>
@@ -542,7 +709,7 @@
                         <a href="{{ url('apps') }}" class="dropdown-toggle" data-hover="dropdown"
                            data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons"
                                                      aria-hidden="true"></i> <span
-                                class="tw:md:hidden tw:2xl:inline-block">{{ __('Apps') }}</span></a>
+                                class="lnms-nav-label">{{ __('Apps') }}</span></a>
                         <ul class="dropdown-menu">
                             <li><a href="{{ url('apps') }}"><i class="fa fa-object-group fa-fw fa-lg"
                                                                aria-hidden="true"></i> {{ __('Overview') }}</a></li>
@@ -569,7 +736,7 @@
                         <a href="{{ url('routing') }}" class="dropdown-toggle" data-hover="dropdown"
                            data-toggle="dropdown"><i class="fa fa-random fa-fw fa-lg fa-nav-icons"
                                                      aria-hidden="true"></i> <span
-                                class="tw:md:hidden tw:2xl:inline-block">{{ __('Routing') }}</span></a>
+                                class="lnms-nav-label">{{ __('Routing') }}</span></a>
                         <ul class="dropdown-menu">
                         @foreach($routing_menu as $routing_menu_group)
                             @if(!$loop->first)
@@ -602,7 +769,7 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i
                             class="fa fa-exclamation-circle text-{{ $alert_menu_class }} fa-fw fa-lg"
-                            aria-hidden="true"></i> <span class="tw:md:hidden tw:2xl:inline-block">{{ __('Alerts') }}</span></a>
+                            aria-hidden="true"></i> <span class="lnms-nav-label">{{ __('Alerts') }}</span></a>
                     <ul class="dropdown-menu">
                         <li><a href="{{ url('alerts') }}"><i class="fa fa-bell fa-fw fa-lg"
                                                              aria-hidden="true"></i> {{ __('Notifications') }}</a></li>
@@ -642,162 +809,7 @@
                 </li>
                 @includeIf('menu.custom')
             </ul>
-
-            <div class="navbar-form navbar-right global-search tw:relative" x-data="globalSearch()"
-                 role="search" aria-label="{{ __('Global Search') }}"
-                 @keydown.escape="close()" @click.outside="close()">
-                <div class="form-group">
-                    <label class="sr-only" for="gsearch">{{ __('Global Search') }}</label>
-                    <input class="form-control" type="search" id="gsearch" name="gsearch" autocomplete="off"
-                           placeholder="{{ __('Type / to search') }}"
-                           role="combobox"
-                           aria-autocomplete="list"
-                           aria-controls="global-search-results"
-                           :aria-expanded="open ? 'true' : 'false'"
-                           :aria-activedescendant="active ? optionId(active) : ''"
-                           aria-haspopup="listbox"
-                           x-model="query" x-ref="input"
-                           @input.debounce.250ms="run()" @focus="open = flat.length > 0"
-                           @keydown="onKey($event)">
-                </div>
-                <div id="global-search-results" x-show="open" x-cloak
-                     class="global-search-dropdown tw:absolute tw:right-0 tw:mt-1 tw:w-[50rem] tw:max-w-[90vw] tw:max-h-[70vh] tw:overflow-y-auto tw:bg-lnms-surface tw:border tw:border-lnms-border tw:rounded-lnms-md tw:shadow-lnms-sm tw:z-50"
-                     role="listbox"
-                     :aria-busy="loading ? 'true' : 'false'"
-                     aria-label="{{ __('Global Search') }}">
-                    <div x-show="loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-lnms-text-muted" role="status">
-                        <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> {{ __('Searching...') }}
-                    </div>
-                    <div x-show="!loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-lnms-text-muted" role="status">
-                        {{ __('No results') }}
-                    </div>
-                    <template x-for="group in groups" :key="group.type">
-                        <div role="group" :aria-label="group.label">
-                            <div class="tw:px-4 tw:py-1.5 tw:bg-lnms-surface-muted tw:text-lnms-text-secondary tw:text-xs tw:font-semibold tw:uppercase" x-text="group.label"></div>
-                            <template x-for="item in group.results" :key="group.type + item.url">
-                                <a :href="item.url" :id="optionId(item.url)" @mouseenter="active = item.url"
-                                   class="tw:flex tw:items-center tw:gap-2.5 tw:px-4 tw:py-2 tw:no-underline tw:text-lnms-text tw:hover:bg-lnms-surface-muted"
-                                   :class="(active === item.url ? 'tw:bg-lnms-accent-muted ' : '') + (item.status ? 'tw:border-l-5 ' + item.status : '')"
-                                   role="option"
-                                   :aria-selected="active === item.url ? 'true' : 'false'">
-                                    <template x-if="item.image">
-                                        <img :src="item.image" alt="" class="tw:h-7 tw:w-7 tw:shrink-0 tw:object-contain tw:dark:bg-gray-50 tw:dark:rounded tw:dark:p-0.5">
-                                    </template>
-                                    <template x-if="!item.image">
-                                        <i class="fa fa-fw fa-lg tw:shrink-0 icon-theme" :class="item.icon" aria-hidden="true"></i>
-                                    </template>
-                                    <span class="tw:min-w-0 tw:flex-1">
-                                        <span class="tw:block tw:truncate" x-text="item.name"></span>
-                                        <span class="tw:block tw:truncate tw:text-sm tw:text-lnms-text-muted" x-text="item.subtitle"></span>
-                                    </span>
-                                </a>
-                            </template>
-                        </div>
-                    </template>
-                </div>
-            </div>
-            <ul class="nav navbar-nav navbar-right">
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"
-                       aria-haspopup="true" aria-expanded="false"
-                       aria-label="{{ __('User') }}">
-                        <i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
-                        <span class="badge badge-navbar-user count-notif {{ $notification_count ? 'badge-danger' : 'badge-default' }}">{{ $notification_count ?: '' }}</span>
-                        <span class="tw:md:hidden tw:2xl:inline-block"><small>{{ Auth::user()->username }}</small></span>
-                        <span class="visible-xs-inline-block">{{ __('User') }}</span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="{{ url('notifications') }}"><span
-                                    class="badge count-notif">{{ $notification_count }}</span> {{ __('Notifications') }}
-                            </a></li>
-                        <li><a href="{{ route('preferences.index') }}"><i class="fa fa-cog fa-fw fa-lg"
-                                                                  aria-hidden="true"></i> {{ __('My Settings') }}</a></li>
-                        <li><x-theme-toggle /></li>
-                        <li>
-                            <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="fa fa-sign-out fa-fw fa-lg" aria-hidden="true"></i> {{ __('Logout') }}
-                            </a>
-
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                {{ csrf_field() }}
-                            </form>
-                        </li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"
-                       style="margin-left:5px"
-                       aria-haspopup="true" aria-expanded="false"
-                       aria-label="{{ __('settings.title') }}"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
-                        <span class="visible-xs-inline-block">{{ __('settings.title') }}</span></a>
-                    <ul class="dropdown-menu">
-                        @canany(['settings.view', 'settings.update'])
-                        <li><a href="{{ url('settings') }}"><i class="fa fa-cogs fa-fw fa-lg"
-                                                               aria-hidden="true"></i> {{ __('Global Settings') }}</a></li>
-                        <li><a href="{{ url('validate') }}"><i class="fa fa-check-circle fa-fw fa-lg"
-                                                               aria-hidden="true"></i> {{ __('Validate Config') }}</a></li>
-                        @endcanany
-                        @can('viewAny', \App\Models\User::class)
-                        <li role="presentation" class="divider"></li>
-                        <li><a href="{{ route('users.index') }}"><i class="fa fa-user-circle-o fa-fw fa-lg"
-                                                                    aria-hidden="true"></i> {{ __('Manage Users') }}</a>
-                        </li>
-                        @endcan
-                        @can('auth-log.view')
-                        <li><a href="{{ route('auth-log') }}"><i class="fa fa-shield fa-fw fa-lg"
-                                                              aria-hidden="true"></i> {{ __('Auth History') }}</a></li>
-                        @endcan
-                        @if(Gate::allows('viewAny', \App\Models\PollerCluster::class) || Gate::allows('viewAny', \App\Models\PollerGroup::class))
-                        <li role="presentation" class="divider"></li>
-                        <li class="dropdown-submenu">
-                            <a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> {{ __('Poller') }}</a>
-                            <ul class="dropdown-menu">
-                                @can('viewAny', \App\Models\PollerCluster::class)
-                                <li><a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> {{ __('Poller') }}</a></li>
-                                @endcan
-                                @can('viewAny', \App\Models\PollerGroup::class)
-                                <li><a href="{{ route('poller.groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Groups') }}</a></li>
-                                @endcan
-                                @can('poller.update')
-                                <li><a href="{{ route('poller.settings') }}"><i class="fa fa-gears fa-fw fa-lg" aria-hidden="true"></i> {{ __('Settings') }}</a></li>
-                                @endcan
-                                @can('viewAny', \App\Models\PollerCluster::class)
-                                <li><a href="{{ route('poller.performance') }}"><i class="fa fa-line-chart fa-fw fa-lg" aria-hidden="true"></i> {{ __('Performance') }}</a></li>
-                                <li><a href="{{ route('poller.log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> {{ __('Log') }}</a></li>
-                                @endcan
-                            </ul>
-                        </li>
-                        @endif
-                        @can('api.access')
-                        <li role="presentation" class="divider"></li>
-                        <li class="dropdown-submenu">
-                            <a href="#"><i class="fa fa-code fa-fw fa-lg" aria-hidden="true"></i> {{ __('API') }}</a>
-                            <ul class="dropdown-menu">
-                                <li><a href="{{ route('api-access.index') }}"><i class="fa fa-cog fa-fw fa-lg"
-                                                                         aria-hidden="true"></i> {{ __('API Tokens') }}
-                                    </a></li>
-                                <li><a href="https://docs.librenms.org/API/" target="_blank" rel="noopener"><i
-                                            class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> {{ __('API Docs') }}</a>
-                                </li>
-                            </ul>
-                        </li>
-                        @endcan
-                        <li role="presentation" class="divider"></li>
-                        <li class="dropdown-submenu" id="countdown_timer_menu" style="display: none">
-                            <a href="#"><i class="fa fa-clock-o fa-fw fa-lg"></i> <span id="countdown_timer"></span></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="#" id="countdown_timer_pause"><i class="fa fa-pause fa-fw fa-lg"></i> {{ __('Pause') }}</a></li>
-                                <li><a href="#" id="countdown_timer_refresh"><i class="fa fa-arrows-rotate fa-fw fa-lg"></i> {{ __('Refresh') }}</a></li>
-                            </ul>
-                        </li>
-                        <li role="presentation" class="divider" id="countdown_timer_divider" style="display: none"></li>
-                        <li><a href="{{ url('about') }}"><i class="fa-solid fa-circle-info fa-fw fa-lg"
-                                                            aria-hidden="true"></i> {{ __('About :project_name', ['project_name' => $project_name]) }}
-                            </a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
+    </div>
 </nav>
 
 <style>
@@ -974,19 +986,16 @@
     @endif
 
     function repositionSearch() {
-        var search = document.querySelector('.global-search');
-        if (!search) { return; }
-        if (window.innerWidth < 768) {
-            var toggle = document.querySelector('.navbar-header .navbar-toggle');
-            if (toggle && search.parentElement !== toggle.parentElement) {
-                toggle.parentElement.insertBefore(search, toggle);
-            }
-        } else {
-            var rightNav = document.querySelector('#navHeaderCollapse ul.navbar-right');
-            if (rightNav && search.parentElement !== rightNav.parentElement) {
-                rightNav.parentElement.insertBefore(search, rightNav);
-            }
-        }
+        // Search lives in .lnms-topbar__end; keep it there on all viewports.
+        return;
+    }
+
+    function syncLnmsSidebarToggle() {
+        var body = document.body;
+        var toggle = document.getElementById('lnms-sidebar-toggle');
+        if (!toggle || !body) { return; }
+        var collapsed = body.classList.contains('lnms-sidebar-collapsed');
+        toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
     }
 
     function syncLnmsNavDropdownAria() {
@@ -1002,12 +1011,53 @@
         if (collapse && collapseToggle) {
             collapseToggle.setAttribute('aria-expanded', collapse.classList.contains('in') ? 'true' : 'false');
         }
+        syncLnmsSidebarToggle();
     }
 
     $(document).ready(function(){
         repositionSearch();
         window.addEventListener('resize', repositionSearch);
         syncLnmsNavDropdownAria();
+
+        try {
+            if (localStorage.getItem('lnms-sidebar-collapsed') === '1') {
+                document.body.classList.add('lnms-sidebar-collapsed');
+            }
+        } catch (e) {}
+        syncLnmsSidebarToggle();
+
+        $('#lnms-sidebar-toggle').on('click', function () {
+            document.body.classList.toggle('lnms-sidebar-collapsed');
+            var collapsed = document.body.classList.contains('lnms-sidebar-collapsed');
+            try {
+                localStorage.setItem('lnms-sidebar-collapsed', collapsed ? '1' : '0');
+            } catch (e) {}
+            syncLnmsSidebarToggle();
+            $(window).trigger('resize');
+        });
+
+        // Position sidebar flyouts with fixed coordinates so overflow scroll does not clip them
+        $(document).on('shown.bs.dropdown', '.lnms-sidebar__menu > li.dropdown', function () {
+            if (window.innerWidth < 768) { return; }
+            var $li = $(this);
+            var $toggle = $li.children('a.dropdown-toggle');
+            var $menu = $li.children('.dropdown-menu').first();
+            if (!$toggle.length || !$menu.length) { return; }
+            var rect = $toggle[0].getBoundingClientRect();
+            var left = document.body.classList.contains('lnms-sidebar-collapsed')
+                ? (getComputedStyle(document.documentElement).getPropertyValue('--lnms-sidebar-collapsed-width') || '64px')
+                : (getComputedStyle(document.documentElement).getPropertyValue('--lnms-sidebar-width') || '232px');
+            $menu.css({
+                position: 'fixed',
+                top: Math.max(8, rect.top) + 'px',
+                left: left.trim(),
+                right: 'auto',
+                bottom: 'auto'
+            });
+        });
+        $(document).on('hidden.bs.dropdown', '.lnms-sidebar__menu > li.dropdown', function () {
+            $(this).children('.dropdown-menu').first().css({ top: '', left: '', right: '', bottom: '', position: '' });
+        });
 
         // Keep aria-expanded in sync with Bootstrap .open / collapse without
         // replacing bootstrap-hover-dropdown behavior (observe class only).

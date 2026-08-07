@@ -7,47 +7,56 @@
 @include('alerts.modals.ack')
 @include('alerts.modals.notes')
 @if (!$bare)
-<div class="row collapse @if(!$hide_dashboard_editor)in @endif" id="dashboard-editor">
+<div class="row collapse @if(!$hide_dashboard_editor)in @endif lnms-dash-shell" id="dashboard-editor">
     <div class="col-md-12 tw:pl-0!">
-        <div class="btn-group btn-lg" role="group" aria-label="{{ trans('dashboard.title') }}">
-            <button class="btn btn-default disabled" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.title') }}</span></button>
-            <div class="btn-group">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false" style="min-width:160px;">
-                    <span class="pull-left">{{ $dashboard->user_id != Auth::id() ? ($dashboard->user->username ?? trans('dashboard.deleted_user')) . ':' : null}} {{ $dashboard->dashboard_name }}</span>
-                <span class="pull-right">
-                <span class="caret"></span>
-                <span class="sr-only">{{ trans('dashboard.toggle_dropdown') }}</span>
-                </span>
-                </button>
-                <ul class="dropdown-menu">
-                    @forelse ($user_dashboards as $dash)
-                        @if($dash->dashboard_id != $dashboard->dashboard_id)
-                        <li>
-                            <a href="{{ route('dashboard.show', $dash->dashboard_id) }}">{{ $dash->dashboard_name }}</a>
-                        </li>
-                        @endif
-                    @empty
-                        <li><a>{{ trans('dashboard.no_other') }}</a></li>
-                    @endforelse
-
-                    @isset($shared_dashboards)
-                        <li role="separator" class="divider"></li>
-                        <li class="dropdown-header">{{ trans('dashboard.shared_title') }}</li>
-                        @foreach ($shared_dashboards as $dash)
+        <div class="lnms-dash-viewbar" role="group" aria-label="{{ trans('dashboard.title') }}">
+            <div class="lnms-dash-viewbar__select btn-group">
+                <span class="lnms-dash-viewbar__label">{{ trans('dashboard.title') }}</span>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false">
+                        <span class="lnms-dash-current">{{ $dashboard->user_id != Auth::id() ? ($dashboard->user->username ?? trans('dashboard.deleted_user')) . ':' : null}} {{ $dashboard->dashboard_name }}</span>
+                        <span class="caret"></span>
+                        <span class="sr-only">{{ trans('dashboard.toggle_dropdown') }}</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        @forelse ($user_dashboards as $dash)
                             @if($dash->dashboard_id != $dashboard->dashboard_id)
                             <li>
-                                <a href="{{ route('dashboard.show', $dash->dashboard_id) }}">
-                                {{ ($dash->user->username ?? trans('dashboard.deleted_user')) . ':' . $dash->dashboard_name . ($dash->access == 1 ? ' (' . trans('dashboard.read_only') . ')' : '') }}</a>
+                                <a href="{{ route('dashboard.show', $dash->dashboard_id) }}">{{ $dash->dashboard_name }}</a>
                             </li>
                             @endif
-                        @endforeach
-                    @endisset
-                </ul>
+                        @empty
+                            <li><a>{{ trans('dashboard.no_other') }}</a></li>
+                        @endforelse
+
+                        @isset($shared_dashboards)
+                            <li role="separator" class="divider"></li>
+                            <li class="dropdown-header">{{ trans('dashboard.shared_title') }}</li>
+                            @foreach ($shared_dashboards as $dash)
+                                @if($dash->dashboard_id != $dashboard->dashboard_id)
+                                <li>
+                                    <a href="{{ route('dashboard.show', $dash->dashboard_id) }}">
+                                    {{ ($dash->user->username ?? trans('dashboard.deleted_user')) . ':' . $dash->dashboard_name . ($dash->access == 1 ? ' (' . trans('dashboard.read_only') . ')' : '') }}</a>
+                                </li>
+                                @endif
+                            @endforeach
+                        @endisset
+                    </ul>
+                </div>
             </div>
-                        <button class="btn btn-default edit-dash-btn" href="#edit_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.edit') }}"><i class="fa fa-pencil-square-o fa-fw"></i></button>
-            <button class="btn btn-danger" href="#del_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.remove') }}"><i class="fa fa-trash fa-fw"></i></button>
-            <button class="btn btn-success" href="#add_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.new') }}"><i class="fa fa-plus fa-fw"></i></button>
+            <div class="lnms-dash-viewbar__actions">
+                <button type="button" class="btn btn-primary edit-dash-btn" href="#edit_dash"
+                        data-toggle="tooltip" data-container="body" data-placement="top"
+                        title="{{ trans('dashboard.buttons.edit') }}"
+                        aria-pressed="false">
+                    <i class="fa fa-pencil-square-o fa-fw" aria-hidden="true"></i>
+                    <span class="lnms-dash-edit-label">{{ trans('dashboard.buttons.edit') }}</span>
+                </button>
+                <button type="button" class="btn btn-default lnms-dash-manage-btn" href="#add_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.new') }}"><i class="fa fa-plus fa-fw" aria-hidden="true"></i></button>
+                <button type="button" class="btn btn-danger lnms-dash-manage-btn" href="#del_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.remove') }}"><i class="fa fa-trash fa-fw" aria-hidden="true"></i></button>
+            </div>
         </div>
+        <div class="lnms-dash-manage">
         <div class="dash-collapse" id="add_dash" style="display: none;" >
             <div class="row" style="margin-top:5px;">
                 <div class="col-md-6">
@@ -158,6 +167,7 @@
             </div>
             <hr>
         </div>
+        </div>{{-- /.lnms-dash-manage --}}
     </div>
 </div>
 @endif
@@ -190,7 +200,7 @@
         dashboard_collapse();
         grid = GridStack.init({
             cellHeight: 100,
-            margin: 10,
+            margin: 8,
             minRow: 1,
             maxRow: 200,
             column: 20,
@@ -216,6 +226,8 @@
             var $el = $(element);
             updatePos(grid);
             widget_reload($el.attr('id'), $el.data('type'));
+            // Leaflet / custom maps that skip HTML reload still need a resize pass
+            $el.find('.lnms-widget__body').children().first().trigger('resize');
         });
 
         @if (empty($dashboard->dashboard_id) && $default_dash == 0)
@@ -226,18 +238,29 @@
 
     $('#new-widget').popover();
 
-    $(document).on('click','.edit-dash-btn', function() {
+    $(document).on('click','.edit-dash-btn', function(e) {
+        e.preventDefault();
+        var $btn = $(this);
+        var $dash = $('.lnms-dashboard');
         if (gridstack_state == 0) {
             grid.enableMove(true);
             grid.enableResize(true);
             gridstack_state = 1;
             $('.fade-edit').fadeIn();
+            $dash.addClass('lnms-dash-editing');
+            $btn.attr('aria-pressed', 'true');
+            $btn.find('.lnms-dash-edit-label').text(@json(__('Done')));
+            dashboard_collapse('#edit_dash');
         }
         else {
             grid.enableMove(false);
             grid.enableResize(false);
             gridstack_state = 0;
             $('.fade-edit').fadeOut();
+            $dash.removeClass('lnms-dash-editing');
+            $btn.attr('aria-pressed', 'false');
+            $btn.find('.lnms-dash-edit-label').text(@json(trans('dashboard.buttons.edit')));
+            $('.dash-collapse').hide();
         }
     });
 
@@ -636,10 +659,25 @@
                 }
             },
             error: function (data) {
-                $widget_body.html('<div class="alert alert-info">' + (data.responseJSON.error || '{{ __('Problem with backend') }}') + '</div>');
+                var msg = (data.responseJSON && data.responseJSON.error) ? data.responseJSON.error : @json(__('Problem with backend'));
+                $widget_body.html(
+                    '<div class="lnms-widget-error" role="alert">' +
+                    '<div class="lnms-widget-error__msg"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> ' + $('<div>').text(msg).html() + '</div>' +
+                    '<button type="button" class="btn btn-sm btn-default lnms-widget-error__retry" data-widget-retry="' + id + '" data-widget-type="' + data_type + '">' +
+                    'Retry' +
+                    '</button></div>'
+                );
             }
         });
     }
+
+    $(document).on('click', '.lnms-widget-error__retry', function () {
+        var id = $(this).data('widget-retry');
+        var type = $(this).data('widget-type');
+        if (id && type) {
+            widget_reload(id, type, true);
+        }
+    });
 
     function grab_data(id, data_type) {
         const refresh = $('#widget_body_' + id).closest('.grid-stack-item').data('refresh');
