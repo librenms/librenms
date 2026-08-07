@@ -10,18 +10,20 @@
 :root {
     /* Text/surface pairs target WCAG AA (~4.5:1). Borders target UI 3:1 where practical.
        Status hues stay semantic; pair with bold/border cues — warn/up as pure text may be AA-large only. */
-    --lnms-bg: #F4F6F8;
+    /* Canvas deliberately cooler/steel vs Bootstrap #f5f5f5 / #f8f8f8 so first paint differs */
+    --lnms-bg: #E4EBF1;
     --lnms-surface: #FFFFFF;
-    --lnms-surface-muted: #EEF1F4;
-    --lnms-border: #B8C2CC;
-    --lnms-border-strong: #8E969C;
+    --lnms-surface-muted: #D9E2EA;
+    --lnms-border: #A8B4C0;
+    --lnms-border-strong: #7E8A96;
     --lnms-text: #1B242C;
     --lnms-text-secondary: #5A6A78;
     --lnms-text-muted: #5E6E7C;
     --lnms-accent: #0F6E7C;
     --lnms-accent-hover: #0B5A66;
-    --lnms-accent-muted: #D7EEF1;
+    --lnms-accent-muted: #C5E6EB;
     --lnms-focus-ring: rgba(15, 110, 124, 0.45);
+    --lnms-shell-accent-bar: 12px;
 
     --lnms-status-up: #1F8A4C;
     --lnms-status-down: #C62828;
@@ -62,7 +64,7 @@
     --lnms-duration-normal: 180ms;
     --lnms-ease: cubic-bezier(0.2, 0, 0, 1);
 
-    --lnms-nav-height: 50px;
+    --lnms-nav-height: 56px;
 }
 
 .dark {
@@ -172,13 +174,47 @@
   }
 }
 
-/* —— Shell canvas —— */
+/* —— Shell canvas (must read as Modern UI on first paint, not stock Bootstrap) —— */
 body.lnms-shell {
     background-color: var(--lnms-bg) !important;
-    background-image: none;
+    background-image:
+        linear-gradient(180deg, rgba(15, 110, 124, 0.10) 0%, transparent 160px),
+        linear-gradient(90deg, rgba(27, 36, 44, 0.03) 0%, transparent 40%);
+    background-attachment: fixed;
     color: var(--lnms-text);
     font-family: var(--lnms-font-sans);
     line-height: 1.45;
+}
+
+/* Fixed teal brand bar — unmistakable vs stock LibreNMS (no top accent) */
+.lnms-shell-accent {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--lnms-shell-accent-bar);
+    background: var(--lnms-accent);
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+    z-index: 2000;
+    pointer-events: none;
+}
+
+/* Fallback if Blade accent node missing */
+body.lnms-shell:not(:has(> .lnms-shell-accent))::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--lnms-shell-accent-bar);
+    background: var(--lnms-accent);
+    z-index: 2000;
+    pointer-events: none;
+}
+
+.dark .lnms-shell-accent,
+.dark.lnms-shell .lnms-shell-accent {
+    background: var(--lnms-accent);
 }
 
 body.lnms-shell a:focus-visible,
@@ -255,29 +291,33 @@ body.lnms-shell .lnms-a11y-readable {
 
 @media (min-width: 768px) {
     .lnms-content {
-        padding: var(--lnms-space-4);
+        padding: var(--lnms-space-4) var(--lnms-space-5);
     }
 }
 
 /* —— Navbar chrome (Bootstrap contracts preserved) —— */
 nav.navbar.lnms-nav.navbar-default {
+    top: var(--lnms-shell-accent-bar) !important;
     background-color: var(--lnms-surface) !important;
     border-color: var(--lnms-border) !important;
-    border-bottom: 1px solid var(--lnms-border) !important;
-    border-top: 3px solid var(--lnms-accent) !important;
-    box-shadow: var(--lnms-shadow-sm);
+    border-bottom: 2px solid var(--lnms-border-strong) !important;
+    border-top: none !important;
+    box-shadow: 0 2px 0 rgba(15, 110, 124, 0.18), var(--lnms-shadow-md);
     min-height: var(--lnms-nav-height);
-    margin-bottom: var(--lnms-space-3) !important;
+    margin-bottom: var(--lnms-space-4) !important;
     font-family: var(--lnms-font-sans);
 }
 
 nav.navbar.lnms-nav.navbar-default .navbar-brand {
     color: var(--lnms-accent) !important;
     font-weight: 700;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.02em;
     height: var(--lnms-nav-height);
     display: flex;
     align-items: center;
+    border-left: 4px solid var(--lnms-accent);
+    padding-left: 14px !important;
+    margin-left: 0 !important;
 }
 
 nav.navbar.lnms-nav.navbar-default .navbar-nav > li > a {
@@ -390,10 +430,12 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 }
 
 .dark nav.navbar.lnms-nav.navbar-default {
+    top: var(--lnms-shell-accent-bar) !important;
     background-color: var(--lnms-surface) !important;
     border-color: var(--lnms-border) !important;
-    border-top: 3px solid var(--lnms-accent) !important;
-    border-bottom: 1px solid var(--lnms-border) !important;
+    border-top: none !important;
+    border-bottom: 2px solid var(--lnms-border-strong) !important;
+    box-shadow: 0 2px 0 rgba(61, 168, 181, 0.28), var(--lnms-shadow-md);
 }
 
 .dark nav.navbar.lnms-nav.navbar-default .navbar-brand {
@@ -443,22 +485,22 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     justify-content: center;
     padding: var(--lnms-space-8) var(--lnms-space-4) var(--lnms-space-5);
     background:
-        linear-gradient(180deg, var(--lnms-accent-muted) 0%, transparent 42%),
-        radial-gradient(900px 420px at 50% -8%, rgba(15, 110, 124, 0.18), transparent 55%),
-        var(--lnms-bg) !important;
+        linear-gradient(180deg, rgba(15, 110, 124, 0.22) 0%, transparent 38%),
+        radial-gradient(1000px 480px at 50% -10%, rgba(15, 110, 124, 0.28), transparent 58%),
+        linear-gradient(135deg, #D5E2EA 0%, var(--lnms-bg) 55%, #CDD8E2 100%) !important;
 }
 
 .lnms-login__inner {
     width: 100%;
-    max-width: 420px;
+    max-width: 440px;
 }
 
 .lnms-login .lnms-login__brand-line {
     margin: var(--lnms-space-2) 0 0;
     color: var(--lnms-accent) !important;
     font-size: var(--lnms-text-sm);
-    font-weight: 600;
-    letter-spacing: 0.04em;
+    font-weight: 700;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
 }
 
@@ -466,14 +508,14 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 .lnms-login .lnms-login-panel.panel {
     background: var(--lnms-surface) !important;
     border: 1px solid var(--lnms-border) !important;
-    border-top: 4px solid var(--lnms-accent) !important;
+    border-top: 8px solid var(--lnms-accent) !important;
     border-radius: var(--lnms-radius-lg) !important;
     box-shadow: var(--lnms-shadow-md) !important;
     overflow: hidden;
 }
 
 .lnms-login .panel-heading {
-    background: var(--lnms-surface) !important;
+    background: linear-gradient(180deg, var(--lnms-accent-muted) 0%, var(--lnms-surface) 100%) !important;
     border-bottom: 1px solid var(--lnms-border) !important;
     padding: var(--lnms-space-5) var(--lnms-space-5) var(--lnms-space-3);
     text-align: center;
@@ -495,17 +537,18 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 }
 
 .lnms-login .logon-logo {
-    max-width: 220px;
+    max-width: 240px;
     margin: 0 auto;
 }
 
 .lnms-login .form-control {
-    height: 40px;
+    height: 44px;
     border-color: var(--lnms-border) !important;
     border-radius: var(--lnms-radius-md) !important;
     background: var(--lnms-surface) !important;
     color: var(--lnms-text) !important;
     box-shadow: none !important;
+    font-size: var(--lnms-text-md);
 }
 
 .lnms-login .form-control:focus {
@@ -517,8 +560,11 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background-color: var(--lnms-accent) !important;
     border-color: var(--lnms-accent) !important;
     border-radius: var(--lnms-radius-md) !important;
-    font-weight: 600;
-    min-height: 40px;
+    font-weight: 700;
+    min-height: 44px;
+    font-size: var(--lnms-text-md);
+    letter-spacing: 0.02em;
+    box-shadow: 0 2px 0 var(--lnms-accent-hover);
 }
 
 .lnms-login .btn-primary:hover,
@@ -618,10 +664,17 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 /* —— Dashboard widget chrome (Phase 4) —— */
 .lnms-dashboard {
     font-family: var(--lnms-font-sans);
+    padding: var(--lnms-space-3);
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid var(--lnms-border);
+    border-radius: var(--lnms-radius-lg);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .lnms-dashboard #dashboard-editor {
     margin-bottom: var(--lnms-space-3);
+    padding-bottom: var(--lnms-space-3);
+    border-bottom: 2px solid var(--lnms-accent-muted);
 }
 
 .lnms-dashboard #dashboard-editor .btn {
@@ -708,6 +761,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
     background: var(--lnms-surface);
     color: var(--lnms-text);
     border: 1px solid var(--lnms-border);
+    border-top: 4px solid var(--lnms-accent);
     border-radius: var(--lnms-radius-lg);
     box-shadow: var(--lnms-shadow-sm);
     overflow: hidden;
@@ -762,6 +816,7 @@ nav.navbar.lnms-nav .badge-navbar-user.badge-default {
 .dark .lnms-dashboard .grid-stack .grid-stack-item-content.lnms-widget {
     background-color: var(--lnms-surface);
     color: var(--lnms-text);
+    border-top-color: var(--lnms-accent);
 }
 
 /* —— Dashboard widget content (Phase 4) —— */

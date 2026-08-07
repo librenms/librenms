@@ -109,6 +109,9 @@
     @yield('javascript')
 </head>
 <body class="lnms-shell">
+@if(request()->input('bare') != 'yes')
+    <div class="lnms-shell-accent" aria-hidden="true"></div>
+@endif
 @if(Auth::check())
     <script>
         // only update resolution if it doesn't match what is stored in the session
