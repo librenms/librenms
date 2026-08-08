@@ -49,15 +49,15 @@ class Ciscosb extends OS implements OSDiscovery, TransceiverDiscovery
             }
             foreach ($entries as $id => $entry) {
                 $inventory->push(new EntPhysical([
-                    'entPhysicalIndex'     => (int) $id + 1000000000, // offset to avoid already discovered ENTITY-MIB devices
-                    'entPhysicalDescr'     => trim($entry['rlInventoryEntDescription'] ?? ''),
-                    'entPhysicalName'      => trim($entry['rlInventoryEntName'] ?? ''),
+                    'entPhysicalIndex' => (int) $id + 1000000000, // offset to avoid already discovered ENTITY-MIB devices
+                    'entPhysicalDescr' => trim($entry['rlInventoryEntDescription'] ?? ''),
+                    'entPhysicalName' => trim($entry['rlInventoryEntName'] ?? ''),
                     'entPhysicalSerialNum' => trim($entry['rlInventoryEntSerialNumber'] ?? ''),
                     'entPhysicalModelName' => trim($entry['rlInventoryEntPID'] ?? ''),
-                    'entPhysicalMfgName'   => trim($entry['rlInventoryEntVendorID'] ?? ''),
-                    'entPhysicalClass'     => 'transceiver',
-                    'entPhysicalIsFRU'     => 'true',
-                    'ifIndex'              => (int) $id,
+                    'entPhysicalMfgName' => trim($entry['rlInventoryEntVendorID'] ?? ''),
+                    'entPhysicalClass' => 'transceiver',
+                    'entPhysicalIsFRU' => 'true',
+                    'ifIndex' => (int) $id,
                 ]));
             }
         }
@@ -75,13 +75,13 @@ class Ciscosb extends OS implements OSDiscovery, TransceiverDiscovery
             }
             foreach ($entries as $id => $entry) {
                 $transceivers->push(new Transceiver([
-                    'port_id'               => PortCache::getIdFromIfIndex($id, $this->getDevice()),
-                    'index'                 => (int) $id,
+                    'port_id' => PortCache::getIdFromIfIndex($id, $this->getDevice()),
+                    'index' => (int) $id,
                     'entity_physical_index' => (int) $id + 1000000000,
-                    'type'                  => trim($entry['rlInventoryEntDescription'] ?? ''),
-                    'vendor'                => trim($entry['rlInventoryEntVendorID'] ?? ''),
-                    'model'                 => trim($entry['rlInventoryEntPID'] ?? ''),
-                    'serial'                => trim($entry['rlInventoryEntSerialNumber'] ?? ''),
+                    'type' => trim($entry['rlInventoryEntDescription'] ?? ''),
+                    'vendor' => trim($entry['rlInventoryEntVendorID'] ?? ''),
+                    'model' => trim($entry['rlInventoryEntPID'] ?? ''),
+                    'serial' => trim($entry['rlInventoryEntSerialNumber'] ?? ''),
                 ]));
             }
         }
