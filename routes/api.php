@@ -15,6 +15,10 @@ Route::prefix('v0')->group(function (): void {
     Route::get('ping', fn () => response()->json(['message' => 'pong']))->name('ping');
     Route::get('system', [App\Api\Controllers\LegacyApiController::class, 'server_info'])->name('server_info');
     Route::get('', [App\Api\Controllers\LegacyApiController::class, 'show_endpoints']);
+    Route::get('maintenance', [\App\Api\Controllers\ScheduledMaintenanceController::class, 'index']);
+    Route::post('maintenance', [\App\Api\Controllers\ScheduledMaintenanceController::class, 'store']);
+    Route::delete('maintenance/purge', [\App\Api\Controllers\ScheduledMaintenanceController::class, 'purgePast']);
+    Route::delete('maintenance/{id}', [\App\Api\Controllers\ScheduledMaintenanceController::class, 'destroy']);
 
     // Alert Templates
     Route::middleware(['can:viewAny,App\Models\AlertTemplate'])->group(function (): void {
