@@ -11073,7 +11073,7 @@
                     "ifOutUcastPkts_prev": 0,
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
-                    "ifInErrors": 0,
+                    "ifInErrors": 4,
                     "ifInErrors_prev": 0,
                     "ifInErrors_delta": null,
                     "ifInErrors_rate": null,
