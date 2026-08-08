@@ -26,13 +26,68 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Device;
+use App\Models\EntPhysical;
+use App\Models\Transceiver;
+use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
 
-class Ciscosb extends OS implements OSDiscovery
+class Ciscosb extends OS implements OSDiscovery, TransceiverDiscovery
 {
     protected ?string $entityVendorTypeMib = 'CISCO-ENTITY-VENDORTYPE-OID-MIB';
+
+    public function discoverEntityPhysical(): Collection
+    {
+        $inventory = parent::discoverEntityPhysical();
+
+        foreach (\SnmpQuery::hideMib()->cache()->walk('CISCOSB-RLINVENTORYENT-MIB::rlInventoryEntTable')->table(2) as $type => $entries) {
+            if ($type !== 'ifindex') {
+                continue;
+            }
+            foreach ($entries as $id => $entry) {
+                $inventory->push(new EntPhysical([
+                    'entPhysicalIndex'     => (int) $id + 1000000000, // offset to avoid already discovered ENTITY-MIB devices
+                    'entPhysicalDescr'     => trim($entry['rlInventoryEntDescription'] ?? ''),
+                    'entPhysicalName'      => trim($entry['rlInventoryEntName'] ?? ''),
+                    'entPhysicalSerialNum' => trim($entry['rlInventoryEntSerialNumber'] ?? ''),
+                    'entPhysicalModelName' => trim($entry['rlInventoryEntPID'] ?? ''),
+                    'entPhysicalMfgName'   => trim($entry['rlInventoryEntVendorID'] ?? ''),
+                    'entPhysicalClass'     => 'transceiver',
+                    'entPhysicalIsFRU'     => 'true',
+                    'ifIndex'              => (int) $id,
+                ]));
+            }
+        }
+
+        return $inventory;
+    }
+
+    public function discoverTransceivers(): Collection
+    {
+        $transceivers = new Collection;
+
+        foreach (\SnmpQuery::hideMib()->cache()->walk('CISCOSB-RLINVENTORYENT-MIB::rlInventoryEntTable')->table(2) as $type => $entries) {
+            if ($type !== 'ifindex') {
+                continue;
+            }
+            foreach ($entries as $id => $entry) {
+                $transceivers->push(new Transceiver([
+                    'port_id'               => PortCache::getIdFromIfIndex($id, $this->getDevice()),
+                    'index'                 => (int) $id,
+                    'entity_physical_index' => (int) $id + 1000000000,
+                    'type'                  => trim($entry['rlInventoryEntDescription'] ?? ''),
+                    'vendor'                => trim($entry['rlInventoryEntVendorID'] ?? ''),
+                    'model'                 => trim($entry['rlInventoryEntPID'] ?? ''),
+                    'serial'                => trim($entry['rlInventoryEntSerialNumber'] ?? ''),
+                ]));
+            }
+        }
+
+        return $transceivers;
+    }
 
     public function discoverOS(Device $device): void
     {
