@@ -73,7 +73,7 @@
             <!-- Start Dashboard-Settings -->
             <div class="row" style="margin-top:5px;">
                 <div class="col-md-12">
-                    <div class="col-md-12">
+                    <div class="col-md-12" style="position: relative;">
                         <form class="form-inline" onsubmit="dashboard_edit(this); return false;">
                             @csrf
                             <div class="form-group">

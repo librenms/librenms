@@ -109,6 +109,7 @@ class DashboardController extends Controller
             'bare' => 'nullable|in:yes',
         ]);
 
+        /** @var User $user */
         $user = Auth::user();
 
         // Split dashboards into user owned or shared
