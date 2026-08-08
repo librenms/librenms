@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Interfaces\Plugins\Hooks\DeviceOverviewHook;
+use LibreNMS\Util\Smokeping;
 
 $overview = 1;
 
@@ -20,11 +21,17 @@ foreach (PluginManager::call(DeviceOverviewHook::class, ['device' => DeviceCache
 
 require 'overview/ports.inc.php';
 require 'overview/availability_bar.inc.php';
-require 'overview/transceivers.inc.php';
 
-if ($device['os'] == 'ping') {
+$smokeping = LibrenmsConfig::get('smokeping.integration') === true
+    ? Smokeping::make(DeviceCache::getPrimary())
+    : null;
+if ($smokeping && $smokeping->hasGraphs()) {
+    require 'overview/smokeping.inc.php';
+} else {
     require 'overview/ping.inc.php';
 }
+
+require 'overview/transceivers.inc.php';
 
 echo '
     </div>
