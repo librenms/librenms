@@ -66,6 +66,54 @@ class GraylogApi
     }
 
     /**
+     * The stream id every search defaults to: the configured `graylog.default-stream-id`,
+     * or the first stream the account can see if that's empty. Avoids unscoped searches
+     * (which 403 on limited-access accounts) and keeps the page deterministic.
+     */
+    public function defaultStreamId(): string
+    {
+        return LibrenmsConfig::get('graylog.default-stream-id')
+            ?: ($this->getStreams()['streams'][0]['id'] ?? '');
+    }
+
+    /**
+     * Look up a stream by id and return a select2-ready `{id, text}` entry, or null
+     * if not found / API unreachable. Shared between the page controllers and the
+     * select2 ajax source so the lookup lives in one place.
+     */
+    public function findStream(string $id): ?array
+    {
+        if ($id === '') {
+            return null;
+        }
+
+        try {
+            foreach ($this->getStreams()['streams'] ?? [] as $stream) {
+                if (($stream['id'] ?? null) === $id) {
+                    return [
+                        'id' => $stream['id'],
+                        'text' => $this->formatStreamText($stream),
+                    ];
+                }
+            }
+        } catch (\Exception) {
+            // Fall through to null on API failure
+        }
+
+        return null;
+    }
+
+    public function formatStreamText(array $stream): string
+    {
+        $text = (string) ($stream['title'] ?? '');
+        if (! empty($stream['description'])) {
+            $text .= " ({$stream['description']})";
+        }
+
+        return $text;
+    }
+
+    /**
      * Query the Graylog server
      */
     public function query(string $query = '*', int $range = 0, int $limit = 0, int $offset = 0, ?string $sort = null, ?string $filter = null): array
@@ -94,14 +142,16 @@ class GraylogApi
     }
 
     /**
-     * Build a simple query string that searches the messages field and/or filters by device
+     * Build a simple query string. The search term is passed through as a raw
+     * Graylog/Lucene query so users can use field qualifiers, wildcards, and
+     * boolean operators. A bare term still searches Graylog's default field.
      */
     public function buildSimpleQuery(?string $search = null, ?Device $device = null): string
     {
         $field = LibrenmsConfig::get('graylog.query.field');
         $query = [];
         if ($search) {
-            $query[] = 'message:"' . $search . '"';
+            $query[] = '(' . $search . ')';
         }
 
         if ($device) {
