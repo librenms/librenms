@@ -29,6 +29,7 @@
     <env name="SESSION_DRIVER" value="array"/>
     <env name="DB_CONNECTION" value="testing"/>
     <env name="CONFIG_CACHE_TTL" value="300"/>
+    <env name="API_V1_ENABLED" value="false"/>
     <const name="PHPUNIT_RUNNING" value="true"/>
   </php>
   <source>

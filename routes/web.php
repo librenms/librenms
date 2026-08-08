@@ -142,6 +142,15 @@ Route::middleware(['auth'])->group(function (): void {
         Route::patch('api-access/{id}', [ApiAccessController::class, 'update'])->name('api-access.update')->whereNumber('id');
         Route::post('api-access/{id}/reset', [ApiAccessController::class, 'reset'])->name('api-access.reset')->whereNumber('id');
         Route::delete('api-access/{id}', [ApiAccessController::class, 'destroy'])->name('api-access.destroy')->whereNumber('id');
+        // Route files load while providers are still booting, so the v1 gate
+        // must not be read through LibrenmsConfig here (a pre-boot
+        // ConfigRepository build caches a config without any DB settings).
+        // Laravel config (API_V1_ENABLED env) is safe at any point.
+        if (config('librenms.api.v1.enabled')) {
+            Route::post('api-access/v1', [ApiAccessController::class, 'storeV1'])->name('api-access.v1.store');
+            Route::patch('api-access/v1/{id}/renew', [ApiAccessController::class, 'renewV1'])->name('api-access.v1.renew')->whereNumber('id');
+            Route::delete('api-access/v1/{id}', [ApiAccessController::class, 'destroyV1'])->name('api-access.v1.destroy')->whereNumber('id');
+        }
     });
     Route::resource('users', UserController::class);
     Route::prefix('users/{user}/permissions')->name('users.permissions.')->group(function (): void {
@@ -460,6 +469,8 @@ Route::prefix('install')->group(function (): void {
 // Legacy routes
 Route::any('/dummy_legacy_auth/{path?}', [LegacyController::class, 'dummy'])->middleware('auth');
 Route::any('/dummy_legacy_unauth/{path?}', [LegacyController::class, 'dummy']);
+// api/v1 is excluded so those URLs 404 when the v1 API is disabled instead
+// of falling through to the legacy page handler.
 Route::any('/{path?}', [LegacyController::class, 'index'])
-    ->where('path', '^((?!_debugbar).)*')
+    ->where('path', '^(?!api/v1($|/))((?!_debugbar).)*')
     ->middleware('auth');
