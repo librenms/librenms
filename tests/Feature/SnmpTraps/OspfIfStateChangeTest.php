@@ -33,15 +33,10 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use App\Models\OspfPort;
 use App\Models\Port;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Tests\Traits\RequiresDatabase;
 
 final class OspfIfStateChangeTest extends SnmpTrapTestCase
 {
-    use RequiresDatabase;
-    use DatabaseTransactions;
-
     //Test OSPF interface state down
     public function testOspfIfDown(): void
     {

@@ -30,15 +30,10 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
 use App\Models\Port;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Tests\Traits\RequiresDatabase;
 
 final class JnxLdpSesTest extends SnmpTrapTestCase
 {
-    use RequiresDatabase;
-    use DatabaseTransactions;
-
     public function testJnxLdpSesDownTrap(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
