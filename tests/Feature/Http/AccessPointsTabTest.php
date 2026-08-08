@@ -160,11 +160,17 @@ class AccessPointsTabTest extends TestCase
         $this->assertStringNotContainsString('<script>', $listResponse->json('rows.0.name'));
         $this->assertSame('&lt;em&gt;ax&lt;/em&gt; (0)', $listResponse->json('rows.0.radio'));
 
-        $this->get(route('device', [
+        $detailUrl = route('device.accesspoints.show', [
             'device' => $device,
-            'tab' => 'accesspoints',
-            'vars' => 'ap=' . $accessPoint->accesspoint_id,
-        ]))
+            'accessPoint' => $accessPoint,
+        ]);
+
+        $this->assertStringContainsString($detailUrl, $listResponse->json('rows.0.name'));
+        $this->assertStringContainsString($detailUrl, $listResponse->json('rows.0.trends'));
+        $this->assertStringNotContainsString('ap=', $listResponse->json('rows.0.name'));
+        $this->assertStringNotContainsString('ap=', $listResponse->json('rows.0.trends'));
+
+        $this->get($detailUrl)
             ->assertOk()
             ->assertSee('&lt;script&gt;alert(&quot;ap&quot;)&lt;/script&gt;', false)
             ->assertDontSee('<script>alert("ap")</script>', false)
@@ -172,15 +178,18 @@ class AccessPointsTabTest extends TestCase
             ->assertSee('&lt;em&gt;ax&lt;/em&gt;', false);
     }
 
-    public function testQueryParameterCanSelectAnAccessPointDetail(): void
+    public function testModernRouteRendersAccessPointDetail(): void
     {
         $device = Device::factory()->create();
-        $accessPoint = AccessPoint::factory()->for($device)->create(['name' => 'Query Selected AP']);
+        $accessPoint = AccessPoint::factory()->for($device)->create(['name' => 'Selected AP']);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'accesspoints']) . '?ap=' . $accessPoint->accesspoint_id)
+            ->get(route('device.accesspoints.show', [
+                'device' => $device,
+                'accessPoint' => $accessPoint,
+            ]))
             ->assertOk()
-            ->assertSee('Query Selected AP')
+            ->assertSee('Selected AP')
             ->assertSee('All access points')
             ->assertDontSee('id="access-points"', false);
     }
@@ -193,14 +202,24 @@ class AccessPointsTabTest extends TestCase
         $foreignAccessPoint = AccessPoint::factory()->for($otherDevice)->create(['name' => 'Foreign Secret AP']);
 
         $this->actingAs($this->admin())
-            ->get(route('device', [
+            ->get(route('device.accesspoints.show', [
                 'device' => $device,
-                'tab' => 'accesspoints',
-                'vars' => 'ap=' . $foreignAccessPoint->accesspoint_id,
+                'accessPoint' => $foreignAccessPoint,
             ]))
-            ->assertOk()
-            ->assertSee('id="access-points"', false)
-            ->assertDontSee('Foreign Secret AP');
+            ->assertNotFound();
+    }
+
+    public function testDeletedAccessPointDetailIsNotFound(): void
+    {
+        $device = Device::factory()->create();
+        $accessPoint = AccessPoint::factory()->for($device)->create(['deleted' => true]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.accesspoints.show', [
+                'device' => $device,
+                'accessPoint' => $accessPoint,
+            ]))
+            ->assertNotFound();
     }
 
     private function admin(): User

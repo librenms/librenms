@@ -67,27 +67,39 @@ class AccessPointController extends TableController
      */
     public function formatItem(Model $model): array
     {
-        $detailUrl = route('device', [
+        $detailUrl = route('device.accesspoints.show', [
             'device' => $model->device_id,
-            'tab' => 'accesspoints',
-            'vars' => 'ap=' . $model->accesspoint_id,
+            'accessPoint' => $model->accesspoint_id,
         ]);
         $escapedUrl = htmlspecialchars($detailUrl, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $name = htmlspecialchars((string) $model->name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $mac = htmlspecialchars((string) $model->mac_addr, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $type = htmlspecialchars((string) $model->type, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
-        $graph = (fn (string $type, string $title): string => Url::graphPopup([
-            'type' => $type,
+        $baseGraph = [
             'id' => $model->accesspoint_id,
             'from' => '-1d',
             'width' => 100,
             'height' => 20,
             'legend' => 'no',
-            'popup_title' => htmlspecialchars($title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
-        ], null, $detailUrl));
+        ];
 
         $graphTitle = strip_tags((string) $model->name) . ' radio ' . (int) $model->radio_number;
+        $clientsGraph = Url::graphPopup([
+            ...$baseGraph,
+            'type' => 'accesspoints_numasoclients',
+            'popup_title' => htmlspecialchars($graphTitle . ': Associated Clients', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
+        ], link: $detailUrl);
+        $utilizationGraph = Url::graphPopup([
+            ...$baseGraph,
+            'type' => 'accesspoints_radioutil',
+            'popup_title' => htmlspecialchars($graphTitle . ': Radio Utilization', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
+        ], link: $detailUrl);
+        $interferenceGraph = Url::graphPopup([
+            ...$baseGraph,
+            'type' => 'accesspoints_interference',
+            'popup_title' => htmlspecialchars($graphTitle . ': Interference Index', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
+        ], link: $detailUrl);
 
         return [
             'accesspoint_id' => (int) $model->accesspoint_id,
@@ -99,9 +111,9 @@ class AccessPointController extends TableController
             'interference' => (int) $model->interference,
             'txpow' => (int) $model->txpow,
             'trends' => '<div class="tw:flex tw:flex-col tw:gap-1">'
-                . $graph('accesspoints_numasoclients', $graphTitle . ': Associated Clients')
-                . $graph('accesspoints_radioutil', $graphTitle . ': Radio Utilization')
-                . $graph('accesspoints_interference', $graphTitle . ': Interference Index')
+                . $clientsGraph
+                . $utilizationGraph
+                . $interferenceGraph
                 . '</div>',
         ];
     }
