@@ -35,6 +35,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\ConfigBackupProvider;
+use LibreNMS\Interfaces\RefreshableConfigBackupProvider;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class ConfigController extends Controller implements DeviceTab
@@ -46,7 +47,7 @@ class ConfigController extends Controller implements DeviceTab
 
     public function visible(Device $device): bool
     {
-        return Gate::allows('show-config', $device) && $this->manager->handles($device);
+        return Gate::allows('showConfig', $device) && $this->manager->handles($device);
     }
 
     public function slug(): string
@@ -65,7 +66,7 @@ class ConfigController extends Controller implements DeviceTab
     }
 
     /**
-     * @return array{error: ?string, error_message: ?string, urls: array{backups: string, backup: string, diff: string}, messages: array<string, string>, hostname: string, os: string, config_highlighting: ?string}
+     * @return array{error: ?string, error_message: ?string, urls: array{backups: string, backup: string, diff: string, refresh: string}, messages: array<string, string>, hostname: string, os: string, config_highlighting: ?string, can_refresh: bool}
      */
     public function data(Device $device, Request $request): array
     {
@@ -77,6 +78,7 @@ class ConfigController extends Controller implements DeviceTab
             'backups' => route('device.config.backups', $device->device_id),
             'backup' => route('device.config.backup', $device->device_id),
             'diff' => route('device.config.diff', $device->device_id),
+            'refresh' => route('device.config.refresh', $device->device_id),
         ];
 
         $messages = [
@@ -95,6 +97,7 @@ class ConfigController extends Controller implements DeviceTab
             'hostname' => $device->hostname,
             'os' => $device->os,
             'config_highlighting' => LibrenmsConfig::getOsSetting($device->os, 'config_highlighting'),
+            'can_refresh' => $provider instanceof RefreshableConfigBackupProvider && Gate::allows('refreshConfig', $device),
         ];
 
         if ($provider === null) {
@@ -120,7 +123,7 @@ class ConfigController extends Controller implements DeviceTab
 
     public function backups(Device $device, Request $request): JsonResponse
     {
-        Gate::authorize('show-config', $device);
+        Gate::authorize('showConfig', $device);
 
         $validated = $request->validate([
             'page' => 'nullable|integer|min:0',
@@ -141,7 +144,7 @@ class ConfigController extends Controller implements DeviceTab
 
     public function backup(Device $device, Request $request): JsonResponse
     {
-        Gate::authorize('show-config', $device);
+        Gate::authorize('showConfig', $device);
 
         $validated = $request->validate([
             'backup' => ['nullable', 'string', 'max:191', 'regex:/^[A-Za-z0-9._\\|-]+$/'],
@@ -177,7 +180,7 @@ class ConfigController extends Controller implements DeviceTab
 
     public function diff(Device $device, Request $request): JsonResponse
     {
-        Gate::authorize('show-config', $device);
+        Gate::authorize('showConfig', $device);
 
         $validated = $request->validate([
             'orig' => 'required|string|max:191',
@@ -195,6 +198,25 @@ class ConfigController extends Controller implements DeviceTab
         }
 
         return response()->json(['groups' => $groups]);
+    }
+
+    public function refresh(Device $device, Request $request): JsonResponse
+    {
+        Gate::authorize('refreshConfig', $device);
+
+        $provider = $this->manager->providerFor($device);
+        if (! $provider instanceof RefreshableConfigBackupProvider) {
+            return response()->json(['status' => 'error', 'message' => __('config_backups.refresh_unavailable')], 422);
+        }
+
+        $queued = $provider->refresh($device, $request->user()->username ?? 'LibreNMS GUI');
+
+        return response()->json([
+            'status' => $queued ? 'ok' : 'error',
+            'message' => $queued
+                ? __('config_backups.messages.refresh_queued', ['provider' => $provider->name()])
+                : __('config_backups.messages.refresh_failed', ['provider' => $provider->name()]),
+        ], $queued ? 200 : 502);
     }
 
     private function errorResponse(string $error): JsonResponse

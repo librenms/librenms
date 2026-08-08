@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Facades\LibrenmsConfig;
 use App\Guards\ApiTokenGuard;
+use App\Models\Device;
 use App\Models\Sensor;
 use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
@@ -234,6 +235,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('admin', fn (User $user) => $user->hasRole('admin'));
         Gate::define('global-read', fn (User $user) => $user->hasAnyRole('admin', 'global-read'));
         Gate::define('demo', fn (User $user) => $user->hasRole('demo'));
+
+        Gate::define('showConfig', fn (User $user, ?Device $device = null) => $user->hasRole('global-read')
+            || ($user->can('config-backup.show') && ($device === null || $user->can('view', $device))));
+        Gate::define('refreshConfig', fn (User $user, ?Device $device = null) => $user->can('config-backup.refresh')
+            && ($device === null || $user->can('view', $device)));
 
         // define super admin and global read
         Gate::before(function (User $user, string $ability) {

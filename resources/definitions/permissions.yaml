@@ -56,6 +56,10 @@ groups:
     component:
         - component.update
 
+    config-backup:
+        - config-backup.show
+        - config-backup.refresh
+
     custom-map:
         - custom-map.viewAll
         - custom-map.view
@@ -75,7 +79,6 @@ groups:
         - device.update
         - device.delete
         - device.debug
-        - device.showConfig
         - device.updateNotes
 
     device-group:
@@ -122,7 +125,6 @@ groups:
 
     oxidized:
         - oxidized.list
-        - oxidized.refresh
         - oxidized.search
 
     peering-db:
