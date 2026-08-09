@@ -3,7 +3,6 @@
 use App\Models\BgpPeer;
 use App\Models\Device;
 use LibreNMS\Exceptions\InvalidIpException;
-use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Time;
