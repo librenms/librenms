@@ -713,7 +713,7 @@ class Cisco extends OS implements
     public function discoverTransceivers(): Collection
     {
         // use data collected by entPhysical module if available
-        $arrayOfContainers = ['cevContainerSFP', 'cevContainerGbic', 'cevContainer10GigBasePort', 'cevContainerTransceiver', 'cevContainerXFP', 'cevContainer40GigBasePort', 'cevContainerCFP', 'cevContainerCXP', 'cevContainerCPAK', 'cevContainerNCS4KSFP', 'cevContainerQSFP', 'cevContainerQSFP28SR', 'cevContainerQSFP28LR', 'cevContainerQSFP28CR', 'cevContainerQSFP28AOC', 'cevContainerQSFP28CWDM', 'cevContainerNonCiscoQSFP28SR', 'cevContainerNonCiscoQSFP28LR', 'cevContainerNonCiscoQSFP28CR', 'cevContainerNonCiscoQSFP28AOC', 'cevContainerNonCiscoQSFP28CWDM', 'cevContainerQSFPDD', 'cevPortGigEthernet', 'cevPortSseBreakout100GePort'];
+        $arrayOfContainers = ['cevContainerSFP', 'cevContainerGbic', 'cevContainer10GigBasePort', 'cevContainerTransceiver', 'cevContainerXFP', 'cevContainer40GigBasePort', 'cevContainerCFP', 'cevContainerCXP', 'cevContainerCPAK', 'cevContainerNCS4KSFP', 'cevContainerQSFP', 'cevContainerQSFP28SR', 'cevContainerQSFP28LR', 'cevContainerQSFP28CR', 'cevContainerQSFP28AOC', 'cevContainerQSFP28CWDM', 'cevContainerNonCiscoQSFP28SR', 'cevContainerNonCiscoQSFP28LR', 'cevContainerNonCiscoQSFP28CR', 'cevContainerNonCiscoQSFP28AOC', 'cevContainerNonCiscoQSFP28CWDM', 'cevContainerQSFPDD', 'cevPortGigEthernet', 'cevPort10GigSFPPlus', 'cevPort40GigQSFPPlus', 'cevPortSseBreakout100GePort'];
 
         $dbSfpCages = $this->getDevice()->entityPhysical()->whereIn('entPhysicalVendorType', $arrayOfContainers)->pluck('ifIndex', 'entPhysicalIndex');
         if ($dbSfpCages->isNotEmpty()) {
