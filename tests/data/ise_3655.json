@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.9.1.2785",
                     "sysDescr": "Cisco Identity Services Engine",
                     "sysContact": "Unknown",
-                    "version": "Cisco ADE-OS 3.4",
-                    "hardware": "SNS-3655-K9 rev A0",
+                    "version": null,
+                    "hardware": null,
                     "features": null,
                     "location": "Unknown",
-                    "os": "ise",
+                    "os": "generic",
                     "type": "server",
-                    "serial": "AAA9999Z999",
-                    "icon": "cisco.svg"
+                    "serial": null,
+                    "icon": "generic.svg"
                 }
             ]
         },
@@ -2596,40 +2596,8 @@
                     "hrProcessorLoad": null
                 },
                 {
-                    "hrDeviceIndex": 262195,
-                    "hrDeviceDescr": "network interface veth0",
-                    "hrDeviceType": "",
-                    "hrDeviceErrors": 0,
-                    "hrDeviceStatus": "unknown",
-                    "hrProcessorLoad": null
-                },
-                {
                     "hrDeviceIndex": 262196,
                     "hrDeviceDescr": "network interface podman2",
-                    "hrDeviceType": "",
-                    "hrDeviceErrors": 0,
-                    "hrDeviceStatus": "unknown",
-                    "hrProcessorLoad": null
-                },
-                {
-                    "hrDeviceIndex": 262197,
-                    "hrDeviceDescr": "network interface veth1",
-                    "hrDeviceType": "",
-                    "hrDeviceErrors": 0,
-                    "hrDeviceStatus": "unknown",
-                    "hrProcessorLoad": null
-                },
-                {
-                    "hrDeviceIndex": 262202,
-                    "hrDeviceDescr": "network interface veth2",
-                    "hrDeviceType": "",
-                    "hrDeviceErrors": 0,
-                    "hrDeviceStatus": "unknown",
-                    "hrProcessorLoad": null
-                },
-                {
-                    "hrDeviceIndex": 262203,
-                    "hrDeviceDescr": "network interface veth3",
                     "hrDeviceType": "",
                     "hrDeviceErrors": 0,
                     "hrDeviceStatus": "unknown",
