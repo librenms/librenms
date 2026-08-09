@@ -293,7 +293,7 @@ class AlertsController extends TableController
     private function clearNonPrintableChars(string $string): string
     {
         $string = trim(strip_tags($string));
-        $string = preg_replace('/[[:^print:]]\s/u', "", $string);
+        $string = preg_replace('/[[:^print:]]\s/u', '', $string);
         $string = preg_replace('/ +/', ' ', $string);
 
         return $string;
