@@ -287,14 +287,19 @@ if (\Illuminate\Support\Facades\Gate::denies('viewAny', BgpPeer::class)) {
 
         // Peer Address
         $peer_address = $peer['bgpPeerIdentifier'];
-        $peer_ip = IP::parse($peer_address, true);
+        $peer_device = Device::whereHas('bgppeers', fn ($q) => $q->where('bgpLocalAddr', $peer_address))->first();
 
-        $matching_devices = Device::whereHas('ipv4', fn ($q) => $q->where('ipv4_address', $peer_address))->get();
-        if ($matching_devices->isEmpty()) {
-            $matching_devices = Device::whereHas('ipv6', fn ($q) => $q->where('ipv6_address', $peer_ip?->uncompressed() ?? $peer_address))->get();
+        if (! $peer_device) {
+            $peer_ip = IP::parse($peer_address, true);
+            $matching_devices = Device::whereHas('ipv4', fn ($q) => $q->where('ipv4_address', $peer_address))->get();
+
+            if ($matching_devices->isEmpty()) {
+                $matching_devices = Device::whereHas('ipv6', fn ($q) => $q->where('ipv6_address', $peer_ip?->uncompressed() ?? $peer_address))->get();
+            }
+
+            $peer_device = $matching_devices->count() === 1 ? $matching_devices->first() : null;
         }
 
-        $peer_device = $matching_devices->count() === 1 ? $matching_devices->first() : null;
         $peeraddresslink = '<span class=list-large>' . Url::deviceLink($peer_device, $peer_addr, ['tab' => 'routing', 'proto' => 'bgp']) . '</span>';
 
         // Local Address
