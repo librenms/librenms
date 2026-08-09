@@ -161,7 +161,9 @@ class Graph
             $deviceId = $vars['device'] ?? ($type === 'device' ? ($vars['id'] ?? null) : null);
             if ($deviceId) {
                 $device = DeviceCache::get($deviceId);
-                DeviceCache::setPrimary($device->device_id);
+                if ($device->exists) {
+                    DeviceCache::setPrimary($device->device_id);
+                }
             }
 
             $height = $graph_params->height;
