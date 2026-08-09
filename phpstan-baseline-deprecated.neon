@@ -5001,15 +5001,6 @@ parameters:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
 			identifier: function.deprecated
-			count: 2
-			path: includes/html/pages/device/accesspoints.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
 			count: 1
 			path: includes/html/pages/device/edit/apps.inc.php
 
