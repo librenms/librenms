@@ -61,7 +61,7 @@ class Schema
 
     public function getPrimaryKey(string $table): string
     {
-        return reset($this->getSchema()[$table]['Indexes']['PRIMARY']['Columns']);
+        return array_first($this->getSchema()[$table]['Indexes']['PRIMARY']['Columns']);
     }
 
     public function getSchema(): array
