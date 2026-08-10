@@ -26,7 +26,6 @@
 
 namespace LibreNMS\DB;
 
-use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Version;
@@ -35,209 +34,98 @@ use Symfony\Component\Yaml\Yaml;
 
 class Schema
 {
-    private static $relationship_blacklist = [
-        'devices_perms',
-        'bill_perms',
-        'ports_perms',
-    ];
+    private static array $relationship_blacklist = ['devices_perms', 'bill_perms', 'ports_perms'];
+    private array $relationships;
+    private array $schema;
 
-    private $relationships;
-    private $schema;
-
-    /**
-     * Check the database to see if the migrations have all been run
-     *
-     * @return bool
-     */
-    public static function isCurrent()
+    public static function isCurrent(): bool
     {
-        if (LaravelSchema::hasTable('migrations')) {
-            return self::getMigrationFiles()->diff(self::getAppliedMigrations())->isEmpty();
-        }
-
-        return false;
+        return LaravelSchema::hasTable('migrations') && self::getMigrationFiles()->diff(self::getAppliedMigrations())->isEmpty();
     }
 
-    /**
-     * Check for extra migrations and return them
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public static function getUnexpectedMigrations()
+    public static function getUnexpectedMigrations(): \Illuminate\Support\Collection
     {
         return self::getAppliedMigrations()->diff(self::getMigrationFiles());
     }
 
-    /**
-     * @return \Illuminate\Support\Collection
-     */
-    private static function getMigrationFiles()
+    private static function getMigrationFiles(): \Illuminate\Support\Collection
     {
-        $migrations = collect(glob(base_path('database/migrations/') . '*.php'))
-            ->map(fn ($migration_file) => basename($migration_file, '.php'));
-
-        return $migrations;
+        return collect(glob(base_path('database/migrations/*.php')))->map(fn ($f) => basename($f, '.php'));
     }
 
-    /**
-     * @return \Illuminate\Support\Collection
-     */
-    private static function getAppliedMigrations()
+    private static function getAppliedMigrations(): \Illuminate\Support\Collection
     {
         return Eloquent::DB()->table('migrations')->pluck('migration');
     }
 
-    /**
-     * Get the primary key column(s) for a table
-     *
-     * @param  string  $table
-     * @return string if a single column just the name is returned, otherwise the first column listed will be returned
-     */
-    public function getPrimaryKey($table)
+    public function getPrimaryKey(string $table): string
     {
-        $schema = $this->getSchema();
-        $columns = $schema[$table]['Indexes']['PRIMARY']['Columns'];
-
-        return reset($columns);
+        return reset($this->getSchema()[$table]['Indexes']['PRIMARY']['Columns']);
     }
 
-    public function getSchema()
+    public function getSchema(): array
     {
-        if (! isset($this->schema)) {
-            $file = resource_path('definitions/schema/db_schema.yaml');
-            $this->schema = Yaml::parse(file_get_contents($file));
-        }
-
-        return $this->schema;
+        return $this->schema ??= Yaml::parse(file_get_contents(resource_path('definitions/schema/db_schema.yaml')));
     }
 
-    /**
-     * Get a list of all tables.
-     *
-     * @return array
-     */
-    public function getTables()
+    public function getTables(): array
     {
         return array_keys($this->getSchema());
     }
 
-    /**
-     * Return all columns for the given table
-     *
-     * @param  string  $table
-     * @return array
-     */
-    public function getColumns($table)
+    public function getColumns(string $table): array
     {
-        $schema = $this->getSchema();
-
-        return array_column($schema[$table]['Columns'], 'Field');
+        return array_column($this->getSchema()[$table]['Columns'], 'Field');
     }
 
-    /**
-     * Get all relationship paths.
-     * Caches the data after the first call as long as the schema hasn't changed
-     *
-     * @param  string  $base
-     * @return mixed
-     */
-    public function getAllRelationshipPaths($base = 'devices')
+    public function getAllRelationshipPaths(string $base = 'devices'): array
     {
-        $update_cache = true;
-        $cache = [];
-        $cache_file = LibrenmsConfig::get('install_dir') . "/cache/{$base}_relationships.cache";
+        $cache_file = base_path("cache/{$base}_relationships.cache");
         $db_version = Version::get()->databaseMigrationCount();
 
         if (is_file($cache_file)) {
             $cache = unserialize(file_get_contents($cache_file));
-            if ($cache['version'] == $db_version) {
-                $update_cache = false;  // cache is valid skip update
+            if (($cache['version'] ?? null) == $db_version) {
+                return $cache[$base];
             }
         }
 
-        if ($update_cache) {
-            $paths = [];
-            foreach ($this->getTables() as $table) {
-                $path = $this->findPathRecursive([$table], $base);
-                if ($path) {
-                    $paths[$table] = $path;
-                }
-            }
-
-            $cache = [
-                'version' => $db_version,
-                $base => $paths,
-            ];
-
-            if (is_writable($cache_file)) {
-                file_put_contents($cache_file, serialize($cache));
-            } else {
-                d_echo("Could not write cache file ($cache_file)!\n");
+        $paths = [];
+        foreach ($this->getTables() as $table) {
+            if ($path = $this->findPathRecursive([$table], $base)) {
+                $paths[$table] = $path;
             }
         }
 
-        return $cache[$base];
+        if (is_writable(dirname($cache_file))) {
+            file_put_contents($cache_file, serialize(['version' => $db_version, $base => $paths]));
+        }
+
+        return $paths;
     }
 
-    /**
-     * Find the relationship path from $start to $target
-     *
-     * @param  string  $target
-     * @param  string  $start  Default: devices
-     * @return array|false list of tables in path order, or false if no path is found
-     */
-    public function findRelationshipPath($target, $start = 'devices')
+    public function findRelationshipPath(string $target, string $start = 'devices'): array|bool
     {
-        d_echo("Searching for target: $start, starting with $target\n");
-
-        if ($target == $start) {
-            // um, yeah, we found it...
-            return [$start];
-        }
-
-        $all = $this->getAllRelationshipPaths($start);
-
-        return $all[$target] ?? false;
+        return ($target === $start) ? [$start] : ($this->getAllRelationshipPaths($start)[$target] ?? false);
     }
 
-    private function findPathRecursive(array $tables, $target, $history = [])
+    private function findPathRecursive(array $tables, string $target, array $history = []): array|bool
     {
         $relationships = $this->getTableRelationships();
-
-        d_echo('Starting Tables: ' . json_encode($tables) . PHP_EOL);
-        if (! empty($history)) {
-            $tables = array_diff($tables, $history);
-            d_echo('Filtered Tables: ' . json_encode($tables) . PHP_EOL);
-        }
+        $tables = array_diff($tables, $history);
 
         foreach ($tables as $table) {
-            // check for direct relationships
-            if (in_array($table, $relationships[$target])) {
-                d_echo("Direct relationship found $target -> $table\n");
-
+            if (in_array($table, $relationships[$target] ?? [])) {
                 return [$table, $target];
             }
 
-            $table_relations = $relationships[$table] ?? [];
-            d_echo("Searching $table: " . json_encode($table_relations) . PHP_EOL);
-
-            if (! empty($table_relations)) {
-                if (in_array($target, $relationships[$table])) {
-                    d_echo("Found in $table\n");
-
-                    return [$target, $table]; // found it
-                } else {
-                    $recurse = $this->findPathRecursive($relationships[$table], $target, array_merge($history, $tables));
-                    if ($recurse) {
-                        return array_merge($recurse, [$table]);
-                    }
+            if (! empty($table_relations = $relationships[$table] ?? [])) {
+                if ($recurse = $this->findPathRecursive($table_relations, $target, array_merge($history, $tables))) {
+                    return array_merge($recurse, [$table]);
                 }
             } else {
                 $relations = array_keys(array_filter($relationships, fn ($related) => in_array($table, $related)));
-
-                d_echo("Dead end at $table, searching for relationships " . json_encode($relations) . PHP_EOL);
-                $recurse = $this->findPathRecursive($relations, $target, array_merge($history, $tables));
-                if ($recurse) {
+                if ($recurse = $this->findPathRecursive($relations, $target, array_merge($history, $tables))) {
                     return array_merge($recurse, [$table]);
                 }
             }
@@ -246,144 +134,136 @@ class Schema
         return false;
     }
 
-    public function getTableRelationships()
+    public function getTableRelationships(): array
     {
         if (! isset($this->relationships)) {
             $schema = $this->getSchema();
-
-            $relations = array_column(array_map(function ($table, $data) {
-                $columns = array_column($data['Columns'], 'Field');
-
+            $relations = [];
+            foreach ($schema as $table => $data) {
                 $related = array_filter(array_map(function ($column) use ($table) {
                     $guess = $this->getTableFromKey($column);
-                    if ($guess != $table) {
-                        return $guess;
-                    }
 
-                    return null;
-                }, $columns));
-
-                // renumber $related array
-                $related = array_values($related);
-
-                return [$table, $related];
-            }, array_keys($schema), $schema), 1, 0);
-
-            // filter out blacklisted tables
+                    return ($guess && $guess !== $table) ? $guess : null;
+                }, array_column($data['Columns'], 'Field')));
+                $relations[$table] = array_values($related);
+            }
             $this->relationships = array_diff_key($relations, array_flip(self::$relationship_blacklist));
         }
 
         return $this->relationships;
     }
 
-    public function getTableFromKey($key)
+    public function getTableFromKey(string $key): ?string
     {
-        if (Str::endsWith($key, '_id')) {
-            // hardcoded
-            if ($key == 'app_id') {
-                return 'applications';
-            }
+        if ($key === 'app_id') return 'applications';
+        if (! Str::endsWith($key, '_id')) return null;
 
-            // try to guess assuming key_id = keys table
-            $guessed_table = substr((string) $key, 0, -3);
+        $guessed = substr($key, 0, -3);
+        $guessed .= Str::endsWith($guessed, 'x') ? 'es' : (Str::endsWith($guessed, 's') ? '' : 's');
 
-            if (! Str::endsWith($guessed_table, 's')) {
-                if (Str::endsWith($guessed_table, 'x')) {
-                    $guessed_table .= 'es';
-                } else {
-                    $guessed_table .= 's';
-                }
-            }
-
-            if (array_key_exists($guessed_table, $this->getSchema())) {
-                return $guessed_table;
-            }
-        }
-
-        return null;
+        return array_key_exists($guessed, $this->getSchema()) ? $guessed : null;
     }
 
-    public function columnExists($table, $column)
+    public function columnExists(string $table, string $column): bool
     {
         return in_array($column, $this->getColumns($table));
     }
 
-    /**
-     * Dump the database schema to an array.
-     * The top level will be a list of tables
-     * Each table contains the keys Columns and Indexes.
-     *
-     * Each entry in the Columns array contains these keys: Field, Type, Null, Default, Extra
-     * Each entry in the Indexes array contains these keys: Name, Columns(array), Unique
-     *
-     * @param  string  $connection  use a specific connection
-     * @return array
-     */
-    public static function dump($connection = null)
+    public static function dump($connection = null, array $tables_to_dump = []): array
     {
+        $db = DB::connection($connection);
+        if ($db->getDriverName() === 'mysql') $db->statement("SET TIME_ZONE='+00:00'");
+
+        $builder = $db->getSchemaBuilder();
+        $tables = empty($tables_to_dump) ?
+            collect($builder->getTables())->where('schema', $db->getDatabaseName())->toArray() :
+            array_map(fn ($t) => ['name' => $t], $tables_to_dump);
+
+        $extras = self::fetchMysqlExtras($db, $tables);
         $output = [];
-        $db_name = DB::connection($connection)->getDatabaseName();
 
-        DB::statement("SET TIME_ZONE='+00:00'"); // set timezone to UTC to avoid timezone issues
-
-        foreach (DB::connection($connection)->select(DB::raw("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$db_name' AND TABLE_TYPE = 'BASE TABLE' ORDER BY TABLE_NAME;")->getValue(DB::connection($connection)->getQueryGrammar())) as $table) {
-            $table = $table->TABLE_NAME;
-            foreach (DB::connection($connection)->select(DB::raw("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$db_name' AND TABLE_NAME='$table' ORDER BY ORDINAL_POSITION")->getValue(DB::connection($connection)->getQueryGrammar())) as $data) {
-                $def = [
-                    'Field' => $data->COLUMN_NAME,
-                    'Type' => preg_replace('/int\([0-9]+\)/', 'int', (string) $data->COLUMN_TYPE),
-                    'Null' => $data->IS_NULLABLE === 'YES',
-                    'Extra' => str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $data->EXTRA),
+        foreach ($tables as $table) {
+            $name = $table['name'];
+            try {
+                $output[$name] = [
+                    'Columns' => array_map(fn ($c) => self::mapColumn($c, $extras[$name] ?? []), $builder->getColumns($name)),
+                    'Indexes' => self::mapIndexes($builder->getIndexes($name)),
+                    'Constraints' => self::mapConstraints($builder->getForeignKeys($name)),
                 ];
-
-                if (isset($data->COLUMN_DEFAULT) && $data->COLUMN_DEFAULT != 'NULL') {
-                    $default = trim($data->COLUMN_DEFAULT, "'");
-                    $def['Default'] = str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $default);
-                }
-                // MySQL 8 fix, remove DEFAULT_GENERATED from timestamp extra columns
-                if ($def['Type'] == 'timestamp') {
-                    $def['Extra'] = preg_replace('/DEFAULT_GENERATED[ ]*/', '', $def['Extra']);
-                }
-
-                $output[$table]['Columns'][] = $def;
-            }
-
-            $keys = DB::connection($connection)->select(DB::raw("SHOW INDEX FROM `$table`")->getValue(DB::connection($connection)->getQueryGrammar()));
-            usort($keys, fn ($a, $b) => $a->Key_name <=> $b->Key_name);
-            foreach ($keys as $key) {
-                $key_name = $key->Key_name;
-                if (isset($output[$table]['Indexes'][$key_name])) {
-                    $output[$table]['Indexes'][$key_name]['Columns'][] = $key->Column_name;
-                } else {
-                    $output[$table]['Indexes'][$key_name] = [
-                        'Name' => $key->Key_name,
-                        'Columns' => [$key->Column_name],
-                        'Unique' => ! $key->Non_unique,
-                        'Type' => $key->Index_type,
-                    ];
-                }
-            }
-
-            $create = DB::connection($connection)->select(DB::raw("SHOW CREATE TABLE `$table`")->getValue(DB::connection($connection)->getQueryGrammar()))[0];
-
-            if (isset($create->{'Create Table'})) {
-                $constraint_regex = '/CONSTRAINT `(?<name>[A-Za-z_0-9]+)` FOREIGN KEY \(`(?<foreign_key>[A-Za-z_0-9]+)`\) REFERENCES `(?<table>[A-Za-z_0-9]+)` \(`(?<key>[A-Za-z_0-9]+)`\) ?(?<extra>[ A-Z]+)?/';
-                $constraint_count = preg_match_all($constraint_regex, $create->{'Create Table'}, $constraints);
-                for ($i = 0; $i < $constraint_count; $i++) {
-                    $constraint_name = $constraints['name'][$i];
-                    $output[$table]['Constraints'][$constraint_name] = [
-                        'name' => $constraint_name,
-                        'foreign_key' => $constraints['foreign_key'][$i],
-                        'table' => $constraints['table'][$i],
-                        'key' => $constraints['key'][$i],
-                        'extra' => $constraints['extra'][$i],
-                    ];
-                }
+            } catch (\Exception) {
+                continue;
             }
         }
 
-        DB::statement('SET TIME_ZONE=@@global.time_zone'); // restore session timezone
-
         return $output;
+    }
+
+    private static function fetchMysqlExtras($db, array $tables): array
+    {
+        if ($db->getDriverName() !== 'mysql' || empty($tables)) return [];
+
+        $names = array_column($tables, 'name');
+        $placeholders = implode(',', array_fill(0, count($names), '?'));
+        $rows = $db->select("SELECT TABLE_NAME, COLUMN_NAME, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME IN ($placeholders)", array_merge([$db->getDatabaseName()], $names));
+
+        $extras = [];
+        foreach ($rows as $r) $extras[$r->TABLE_NAME][$r->COLUMN_NAME] = $r->EXTRA;
+
+        return $extras;
+    }
+
+    private static function mapColumn(array $col, array $tableExtras): array
+    {
+        $extra = str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', (string) ($tableExtras[$col['name']] ?? ''));
+        $type = preg_replace('/int\([0-9]+\)/', 'int', (string) $col['type']);
+
+        $def = [
+            'Field' => $col['name'],
+            'Type' => $type,
+            'Null' => (bool) $col['nullable'],
+            'Extra' => preg_replace('/DEFAULT_GENERATED[ ]*/', '', $extra),
+        ];
+
+        if (isset($col['default']) && strtoupper((string) $col['default']) !== 'NULL') {
+            $default = (string) $col['default'];
+            if (str_starts_with($default, "'") && str_ends_with($default, "'")) $default = substr($default, 1, -1);
+            $def['Default'] = str_contains(strtolower($default), 'current_timestamp') ? 'CURRENT_TIMESTAMP' : $default;
+        }
+
+        return $def;
+    }
+
+    private static function mapIndexes(array $indexes): array
+    {
+        usort($indexes, fn ($a, $b) => $a['name'] <=> $b['name']);
+        $mapped = [];
+        foreach ($indexes as $i) {
+            $name = $i['primary'] ? 'PRIMARY' : $i['name'];
+            $mapped[$name] = ['Name' => $name, 'Columns' => $i['columns'], 'Unique' => (bool) $i['unique'], 'Type' => strtoupper((string) $i['type'])];
+        }
+
+        return $mapped;
+    }
+
+    private static function mapConstraints(array $fks): array
+    {
+        $mapped = [];
+        foreach ($fks as $fk) {
+            $extra = [];
+            foreach (['on_delete', 'on_update'] as $action) {
+                if ($fk[$action] && strtoupper((string) $fk[$action]) !== 'RESTRICT') {
+                    $extra[] = strtoupper(str_replace('_', ' ', $action)) . ' ' . strtoupper((string) $fk[$action]);
+                }
+            }
+            $mapped[$fk['name']] = [
+                'name' => $fk['name'],
+                'foreign_key' => $fk['columns'][0],
+                'table' => $fk['foreign_table'],
+                'key' => $fk['foreign_columns'][0],
+                'extra' => implode(' ', $extra),
+            ];
+        }
+
+        return $mapped;
     }
 }

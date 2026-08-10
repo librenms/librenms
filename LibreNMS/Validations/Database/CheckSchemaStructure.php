@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * CheckSchemaStructure.php
  *
  * -Description-
@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2022 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -26,8 +25,9 @@
 
 namespace LibreNMS\Validations\Database;
 
-use Illuminate\Database\QueryException;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema as LaravelSchema;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\DB\Schema;
 use LibreNMS\Interfaces\Validation;
@@ -37,21 +37,15 @@ use Symfony\Component\Yaml\Yaml;
 
 class CheckSchemaStructure implements Validation, ValidationFixer
 {
-    /** @var array */
-    private $descriptions = [];
-    /** @var array */
-    private $schema_update = [];
-    /** @var string */
-    private $schema_file;
+    private array $descriptions = [];
+    private array $schema_update = [];
+    private readonly string $schema_file;
 
-    public function __construct()
+    public function __construct(?string $schema_file = null)
     {
-        $this->schema_file = resource_path('definitions/schema/db_schema.yaml');
+        $this->schema_file = $schema_file ?? resource_path('definitions/schema/db_schema.yaml');
     }
 
-    /**
-     * @inheritDoc
-     */
     public function validate(): ValidationResult
     {
         if (! is_file($this->schema_file)) {
@@ -59,7 +53,6 @@ class CheckSchemaStructure implements Validation, ValidationFixer
         }
 
         $this->checkSchema();
-
         if (empty($this->schema_update)) {
             return ValidationResult::ok('Database schema correct');
         }
@@ -74,7 +67,6 @@ class CheckSchemaStructure implements Validation, ValidationFixer
     {
         try {
             $this->checkSchema();
-
             foreach ($this->schema_update as $query) {
                 DB::statement($query);
             }
@@ -85,9 +77,6 @@ class CheckSchemaStructure implements Validation, ValidationFixer
         return true;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function enabled(): bool
     {
         return Eloquent::isConnected() && CheckDatabaseSchemaVersion::isCurrent();
@@ -95,233 +84,249 @@ class CheckSchemaStructure implements Validation, ValidationFixer
 
     private function checkSchema(): void
     {
-        $master_schema = Yaml::parse(file_get_contents($this->schema_file));
-        $current_schema = Schema::dump();
+        $this->descriptions = [];
+        $this->schema_update = [];
 
-        foreach ((array) $master_schema as $table => $data) {
-            if (empty($current_schema[$table])) {
-                $this->descriptions[] = "Database: missing table ($table)";
-                $this->schema_update[] = $this->addTableSql($table, $data);
-            } else {
-                $current_columns = array_reduce($current_schema[$table]['Columns'], function ($array, $item) {
-                    $array[$item['Field']] = $item;
+        $master = (array) Yaml::parse(file_get_contents($this->schema_file));
+        $dbTables = collect(LaravelSchema::getTables())
+            ->where('schema', DB::connection()->getDatabaseName())
+            ->pluck('name')
+            ->toArray();
+        $current = Schema::dump(null, array_intersect(array_keys($master), $dbTables));
 
-                    return $array;
-                }, []);
-
-                foreach ($data['Columns'] as $index => $cdata) {
-                    $column = $cdata['Field'];
-
-                    // MySQL 8 fix, remove DEFAULT_GENERATED from timestamp extra columns
-                    if ($cdata['Type'] == 'timestamp') {
-                        $current_columns[$column]['Extra'] = preg_replace('/DEFAULT_GENERATED */', '', (string) $current_columns[$column]['Extra']);
-                    }
-
-                    if (empty($current_columns[$column])) {
-                        $this->descriptions[] = "Database: missing column ($table/$column)";
-                        $primary = false;
-                        if ($data['Indexes']['PRIMARY']['Columns'] == [$column]) {
-                            // include the primary index with the add statement
-                            unset($data['Indexes']['PRIMARY']);
-                            $primary = true;
-                        }
-                        $this->schema_update[] = $this->addColumnSql($table, $cdata, isset($data['Columns'][$index - 1]) ? $data['Columns'][$index - 1]['Field'] : null, $primary);
-                    } elseif ($cdata !== $current_columns[$column]) {
-                        $this->descriptions[] = "Database: incorrect column ($table/$column)";
-                        $this->schema_update[] = $this->updateTableSql($table, $column, $cdata);
-                    }
-
-                    unset($current_columns[$column]); // remove checked columns
-                }
-
-                foreach ($current_columns as $column => $_unused) {
-                    $this->descriptions[] = "Database: extra column ($table/$column)";
-                    $this->schema_update[] = $this->dropColumnSql($table, $column);
-                }
-
-                $index_changes = [];
-                if (isset($data['Indexes'])) {
-                    foreach ($data['Indexes'] as $name => $index) {
-                        if (empty($current_schema[$table]['Indexes'][$name])) {
-                            $this->descriptions[] = "Database: missing index ($table/$name)";
-                            $index_changes[] = $this->addIndexSql($table, $index);
-                        } elseif ($index != $current_schema[$table]['Indexes'][$name]) {
-                            $this->descriptions[] = "Database: incorrect index ($table/$name)";
-                            $index_changes[] = $this->updateIndexSql($table, $name, $index);
-                        }
-
-                        unset($current_schema[$table]['Indexes'][$name]);
-                    }
-                }
-
-                if (isset($current_schema[$table]['Indexes'])) {
-                    foreach ($current_schema[$table]['Indexes'] as $name => $_unused) {
-                        $this->descriptions[] = "Database: extra index ($table/$name)";
-                        $this->schema_update[] = $this->dropIndexSql($table, $name);
-                    }
-                }
-                $this->schema_update = array_merge($this->schema_update, $index_changes); // drop before create/update
-
-                $constraint_changes = [];
-                if (isset($data['Constraints'])) {
-                    foreach ($data['Constraints'] as $name => $constraint) {
-                        if (empty($current_schema[$table]['Constraints'][$name])) {
-                            $this->descriptions[] = "Database: missing constraint ($table/$name)";
-                            $constraint_changes[] = $this->addConstraintSql($table, $constraint);
-                        } elseif ($constraint != $current_schema[$table]['Constraints'][$name]) {
-                            $this->descriptions[] = "Database: incorrect constraint ($table/$name)";
-                            $constraint_changes[] = $this->dropConstraintSql($table, $name);
-                            $constraint_changes[] = $this->addConstraintSql($table, $constraint);
-                        }
-
-                        unset($current_schema[$table]['Constraints'][$name]);
-                    }
-                }
-
-                if (isset($current_schema[$table]['Constraints'])) {
-                    foreach ($current_schema[$table]['Constraints'] as $name => $_unused) {
-                        $this->descriptions[] = "Database: extra constraint ($table/$name)";
-                        $this->schema_update[] = $this->dropConstraintSql($table, $name);
-                    }
-                }
-                $this->schema_update = array_merge($this->schema_update, $constraint_changes); // drop before create/update
+        foreach ($master as $table => $data) {
+            if (empty($current[$table])) {
+                $this->addChange("Database: missing table ($table)", $this->addTableSql($table, $data));
+                continue;
             }
 
-            unset($current_schema[$table]); // remove checked tables
+            $this->syncColumns($table, $data['Columns'], $current[$table]['Columns']);
+            $this->syncIndexes($table, $data['Indexes'] ?? [], $current[$table]['Indexes'] ?? []);
+            $this->syncConstraints($table, $data['Constraints'] ?? [], $current[$table]['Constraints'] ?? []);
         }
 
-        foreach ($current_schema as $table => $data) {
-            $this->descriptions[] = "Database: extra table ($table)";
-            $this->schema_update[] = $this->dropTableSql($table);
+        foreach (array_diff($dbTables, array_keys($master)) as $table) {
+            $this->addChange("Database: extra table ($table)", $this->dropTableSql($table));
         }
 
-        // set utc timezone if timestamp issues
         if (preg_grep('/\d{4}-\d\d-\d\d \d\d:\d\d:\d\d/', $this->schema_update)) {
             array_unshift($this->schema_update, "SET TIME_ZONE='+00:00';");
         }
     }
 
-    private function addTableSql(string $table, array $table_schema): string
+    private function addChange(string $desc, string|array $sql): void
     {
-        $columns = array_map($this->columnToSql(...), $table_schema['Columns']);
-        $indexes = array_map($this->indexToSql(...), $table_schema['Indexes'] ?? []);
-
-        $def = implode(', ', array_merge(array_values($columns), array_values($indexes)));
-
-        return "CREATE TABLE `$table` ($def);";
+        $this->descriptions[] = $desc;
+        is_array($sql) ? $this->schema_update = [...$this->schema_update, ...$sql] : $this->schema_update[] = $sql;
     }
 
-    private function addColumnSql(string $table, array $schema, ?string $previous_column, bool $primary = false): string
+    private function syncColumns(string $table, array $master, array $current): void
     {
-        $sql = "ALTER TABLE `$table` ADD " . $this->columnToSql($schema);
-        if ($primary) {
-            $sql .= ' PRIMARY KEY';
+        $currentCols = array_change_key_case(array_column($current, null, 'Field'), CASE_LOWER);
+        foreach ($master as $i => $cdata) {
+            $field = $cdata['Field'];
+            $lower = strtolower($field);
+            if (! isset($currentCols[$lower])) {
+                $this->addChange("Database: missing column ($table/$field)", $this->addColumnSql($table, $cdata, $master[$i - 1]['Field'] ?? null));
+            } elseif (! $this->columnsMatch($cdata, $currentCols[$lower])) {
+                $this->addChange("Database: incorrect column ($table/$field)", $this->updateTableSql($table, $field, $cdata));
+            }
+            unset($currentCols[$lower]);
         }
-        if (empty($previous_column)) {
-            $sql .= ' FIRST';
-        } else {
-            $sql .= " AFTER `$previous_column`";
+        foreach ($currentCols as $c) {
+            $this->addChange("Database: extra column ($table/{$c['Field']})", $this->dropColumnSql($table, $c['Field']));
         }
-
-        return $sql . ';';
     }
 
-    private function updateTableSql(string $table, string $column, array $column_schema): string
+    private function columnsMatch(array $master, array $current): bool
     {
-        return "ALTER TABLE `$table` CHANGE `$column` " . $this->columnToSql($column_schema) . ';';
+        $typeMatch = ($master['Type'] === $current['Type']) || ($master['Type'] === 'json' && in_array($current['Type'], ['json', 'longtext', 'text']));
+
+        return $typeMatch && $master['Null'] == $current['Null'] && ($master['Default'] ?? null) == ($current['Default'] ?? null) && $master['Extra'] == $current['Extra'];
+    }
+
+    private function syncIndexes(string $table, array $master, array $current): void
+    {
+        $currentIdx = array_change_key_case($current, CASE_LOWER);
+        foreach ($master as $name => $data) {
+            $lower = strtolower($name);
+            if (! isset($currentIdx[$lower])) {
+                $this->addChange("Database: missing index ($table/$name)", $this->addIndexSql($table, $data));
+            } else {
+                $c = $currentIdx[$lower];
+                $colsMatch = array_map(strtolower(...), $data['Columns']) === array_map(strtolower(...), $c['Columns']);
+                if (! $colsMatch || $data['Unique'] != $c['Unique']) {
+                    $this->addChange("Database: incorrect index ($table/$name)", $this->updateIndexSql($table, $name, $data));
+                }
+            }
+            unset($currentIdx[$lower]);
+        }
+        foreach ($currentIdx as $name => $_) {
+            $this->addChange("Database: extra index ($table/$name)", $this->dropIndexSql($table, $name));
+        }
+    }
+
+    private function syncConstraints(string $table, array $master, array $current): void
+    {
+        $currentFk = array_change_key_case($current, CASE_LOWER);
+        foreach ($master as $name => $data) {
+            $lower = strtolower($name);
+            if (! isset($currentFk[$lower])) {
+                $this->addChange("Database: missing constraint ($table/$name)", $this->addConstraintSql($table, $data));
+            } elseif ($data != $currentFk[$lower]) {
+                $this->addChange("Database: incorrect constraint ($table/$name)", [$this->dropConstraintSql($table, $name), $this->addConstraintSql($table, $data)]);
+            }
+            unset($currentFk[$lower]);
+        }
+        foreach ($currentFk as $name => $_) {
+            $this->addChange("Database: extra constraint ($table/$name)", $this->dropConstraintSql($table, $name));
+        }
+    }
+
+    private function addTableSql(string $table, array $data): string
+    {
+        $queries = DB::pretend(fn () => LaravelSchema::create($table, function (Blueprint $b) use ($data): void {
+            foreach ($data['Columns'] as $c) {
+                $this->applyColumnToBlueprint($b, $c);
+            }
+            foreach ($data['Indexes'] ?? [] as $i) {
+                $this->applyIndexToBlueprint($b, $i);
+            }
+        }));
+
+        return implode("\n", array_column($queries, 'query')) . ';';
+    }
+
+    private function addColumnSql(string $table, array $cdata, ?string $prev): array
+    {
+        $queries = DB::pretend(fn () => LaravelSchema::table($table, function (Blueprint $b) use ($cdata, $prev): void {
+            $col = $this->applyColumnToBlueprint($b, $cdata);
+            empty($prev) ? $col->first() : $col->after($prev);
+        }));
+
+        return array_map(fn ($q) => $q['query'] . ';', $queries);
+    }
+
+    private function updateTableSql(string $table, string $column, array $cdata): array
+    {
+        $queries = DB::pretend(fn () => LaravelSchema::table($table, fn (Blueprint $b) => $this->applyColumnToBlueprint($b, $cdata, $column)->change()));
+
+        return array_map(fn ($q) => $q['query'] . ';', $queries);
     }
 
     private function dropColumnSql(string $table, string $column): string
     {
-        return "ALTER TABLE `$table` DROP `$column`;";
+        $queries = DB::pretend(fn () => LaravelSchema::table($table, fn (Blueprint $b) => $b->dropColumn($column)));
+
+        return $queries[0]['query'] . ';';
     }
 
-    private function addIndexSql(string $table, array $index_schema): string
+    private function addIndexSql(string $table, array $idata): string
     {
-        return "ALTER TABLE `$table` ADD " . $this->indexToSql($index_schema) . ';';
+        $queries = DB::pretend(fn () => LaravelSchema::table($table, fn (Blueprint $b) => $this->applyIndexToBlueprint($b, $idata)));
+
+        return $queries[0]['query'] . ';';
     }
 
-    private function updateIndexSql(string $table, string $name, array $index_schema): string
+    private function updateIndexSql(string $table, string $name, array $idata): array
     {
-        return "ALTER TABLE `$table` DROP INDEX `$name`, " . $this->indexToSql($index_schema) . ';';
+        $queries = DB::pretend(fn () => LaravelSchema::table($table, function (Blueprint $b) use ($name, $idata): void {
+            $b->dropIndex($name);
+            $this->applyIndexToBlueprint($b, $idata);
+        }));
+
+        return array_map(fn ($q) => $q['query'] . ';', $queries);
     }
 
     private function dropIndexSql(string $table, string $name): string
     {
-        return "ALTER TABLE `$table` DROP INDEX `$name`;";
+        $queries = DB::pretend(fn () => LaravelSchema::table($table, fn (Blueprint $b) => $b->dropIndex($name)));
+
+        return $queries[0]['query'] . ';';
     }
 
     private function dropTableSql(string $table): string
     {
-        return "DROP TABLE `$table`;";
+        $queries = DB::pretend(fn () => LaravelSchema::drop($table));
+
+        return $queries[0]['query'] . ';';
     }
 
-    /**
-     * Generate an SQL segment to create the column based on data from Schema::dump()
-     *
-     * @param  array  $column_data  The array of data for the column
-     * @return string sql fragment, for example: "`ix_id` int(10) unsigned NOT NULL"
-     */
-    private function columnToSql(array $column_data): string
+    private function applyColumnToBlueprint(Blueprint $b, array $cdata, ?string $old = null): ?\Illuminate\Database\Schema\ColumnDefinition
     {
-        $segments = ["`{$column_data['Field']}`", $column_data['Type']];
+        $type = (string) $cdata['Type'];
+        $field = $old ?? $cdata['Field'];
+        $unsigned = str_contains($type, 'unsigned');
+        $clean = str_replace(' unsigned', '', $type);
+        $params = [];
+        if (preg_match('/^(\w+)\((.*)\)$/', $clean, $m)) {
+            $clean = $m[1];
+            $params = str_getcsv($m[2], ',', "'", '\\');
+        }
 
-        $segments[] = $column_data['Null'] ? 'NULL' : 'NOT NULL';
+        $method = match ($clean) {
+            'int' => 'integer', 'tinyint' => 'tinyInteger', 'smallint' => 'smallInteger', 'mediumint' => 'mediumInteger', 'bigint' => 'bigInteger',
+            'varchar' => 'string', 'blob' => 'binary', 'mediumblob' => 'mediumBinary', 'longblob' => 'longBinary', 'datetime' => 'dateTime', default => $clean,
+        };
 
-        if (isset($column_data['Default'])) {
-            if ($column_data['Default'] === 'CURRENT_TIMESTAMP') {
-                $segments[] = 'DEFAULT CURRENT_TIMESTAMP';
-            } elseif ($column_data['Default'] == 'NULL') {
-                $segments[] = 'DEFAULT NULL';
-            } else {
-                $segments[] = "DEFAULT '{$column_data['Default']}'";
+        if (! method_exists($b, $method)) {
+            return null;
+        }
+        $col = $b->{$method}($field, ...$params);
+        if ($unsigned) {
+            $col->unsigned();
+        }
+        $col->nullable((bool) $cdata['Null']);
+        if (isset($cdata['Default'])) {
+            $cdata['Default'] === 'CURRENT_TIMESTAMP' ? $col->useCurrent() : $col->default($cdata['Default']);
+        }
+        if ($cdata['Extra'] === 'auto_increment') {
+            $col->autoIncrement();
+        }
+        if ($cdata['Extra'] === 'on update CURRENT_TIMESTAMP') {
+            $col->useCurrentOnUpdate();
+        }
+        if ($old && $old !== $cdata['Field']) {
+            $b->renameColumn($old, $cdata['Field']);
+        }
+
+        return $col;
+    }
+
+    private function applyIndexToBlueprint(Blueprint $b, array $idata): void
+    {
+        $cols = $idata['Columns'];
+        $name = $idata['Name'];
+        if ($name === 'PRIMARY') {
+            $b->primary($cols);
+        } elseif ($idata['Unique']) {
+            $b->unique($cols, $name);
+        } else {
+            $b->index($cols, $name);
+        }
+    }
+
+    private function addConstraintSql(string $table, array $c): string
+    {
+        $queries = DB::pretend(fn () => LaravelSchema::table($table, function (Blueprint $b) use ($c): void {
+            $fk = $b->foreign($c['foreign_key'], $c['name'])->references($c['key'])->on($c['table']);
+            if (str_contains(strtoupper((string) ($c['extra'] ?? '')), 'ON DELETE CASCADE')) {
+                $fk->onDelete('cascade');
+            } elseif (str_contains(strtoupper((string) ($c['extra'] ?? '')), 'ON DELETE SET NULL')) {
+                $fk->onDelete('set null');
             }
-        }
+            if (str_contains(strtoupper((string) ($c['extra'] ?? '')), 'ON UPDATE CASCADE')) {
+                $fk->onUpdate('cascade');
+            }
+        }));
 
-        if ($column_data['Extra'] == 'on update current_timestamp()') {
-            $segments[] = 'on update CURRENT_TIMESTAMP';
-        } else {
-            $segments[] = $column_data['Extra'];
-        }
-
-        return implode(' ', $segments);
-    }
-
-    /**
-     * Generate an SQL segment to create the index based on data from Schema::dump()
-     *
-     * @param  array  $index_data  The array of data for the index
-     * @return string sql fragment, for example: "PRIMARY KEY (`device_id`)"
-     */
-    private function indexToSql(array $index_data): string
-    {
-        if ($index_data['Name'] == 'PRIMARY') {
-            $index = 'PRIMARY KEY (%s)';
-        } elseif ($index_data['Unique']) {
-            $index = "UNIQUE `{$index_data['Name']}` (%s)";
-        } else {
-            $index = "INDEX `{$index_data['Name']}` (%s)";
-        }
-
-        $columns = implode(',', array_map(fn ($col) => "`$col`", $index_data['Columns']));
-
-        return sprintf($index, $columns);
-    }
-
-    private function addConstraintSql(string $table, array $constraint): string
-    {
-        $sql = "ALTER TABLE `$table` ADD CONSTRAINT `{$constraint['name']}` FOREIGN KEY (`{$constraint['foreign_key']}`) ";
-        $sql .= " REFERENCES `{$constraint['table']}` (`{$constraint['key']}`)";
-        if (! empty($constraint['extra'])) {
-            $sql .= ' ' . $constraint['extra'];
-        }
-        $sql .= ';';
-
-        return $sql;
+        return $queries[0]['query'] . ';';
     }
 
     private function dropConstraintSql(string $table, string $name): string
     {
-        return "ALTER TABLE `$table` DROP FOREIGN KEY `$name`;";
+        $queries = DB::pretend(fn () => LaravelSchema::table($table, fn (Blueprint $b) => $b->dropForeign($name)));
+
+        return $queries[0]['query'] . ';';
     }
 }
