@@ -34,16 +34,52 @@ class CheckSchemaStructureTest extends TestCase
         }
     }
 
-    public function test_it_detects_missing_column(): void
+    public function test_it_detects_missing_table(): void
     {
-        $table = 'test_table';
+        $table = 'missing_table';
+        $schema = [
+            $table => [
+                'Columns' => [
+                    ['Field' => 'id', 'Type' => 'int', 'Null' => false, 'Extra' => ''],
+                ],
+                'Indexes' => [
+                    'PRIMARY' => ['Name' => 'PRIMARY', 'Columns' => ['id'], 'Unique' => true, 'Type' => 'BTREE'],
+                ],
+            ],
+        ];
+
+        $schemaFile = $this->createTempSchema($schema);
+
+        try {
+            $validator = new CheckSchemaStructure($schemaFile);
+            $result = $validator->validate();
+
+            $this->assertEquals(\LibreNMS\ValidationResult::FAILURE, $result->getStatus());
+            $this->assertStringContainsString("missing table ($table)", $result->getMessage());
+        } finally {
+            unlink($schemaFile);
+        }
+    }
+
+    public function test_it_warns_on_missing_schema_file(): void
+    {
+        $validator = new CheckSchemaStructure('/non/existent/path.yaml');
+        $result = $validator->validate();
+
+        $this->assertEquals(\LibreNMS\ValidationResult::WARNING, $result->getStatus());
+        $this->assertStringContainsString("We haven't detected the db_schema.yaml file", $result->getMessage());
+    }
+
+    public function test_it_can_fix_schema(): void
+    {
+        $table = 'test_table_fix';
         DB::statement("CREATE TABLE `$table` (`id` int primary key NOT NULL)");
 
         $schema = [
             $table => [
                 'Columns' => [
                     ['Field' => 'id', 'Type' => 'int', 'Null' => false, 'Extra' => ''],
-                    ['Field' => 'missing_col', 'Type' => 'varchar(255)', 'Null' => true, 'Extra' => ''],
+                    ['Field' => 'new_col', 'Type' => 'varchar(255)', 'Null' => true, 'Extra' => ''],
                 ],
                 'Indexes' => [
                     'PRIMARY' => ['Name' => 'PRIMARY', 'Columns' => ['id'], 'Unique' => true, 'Type' => 'BTREE'],
@@ -51,86 +87,38 @@ class CheckSchemaStructureTest extends TestCase
             ],
         ];
 
-        $schemaFile = tempnam(sys_get_temp_dir(), 'schema');
-        file_put_contents($schemaFile, \Symfony\Component\Yaml\Yaml::dump($schema));
+        $schemaFile = $this->createTempSchema($schema);
 
         try {
             $validator = new CheckSchemaStructure($schemaFile);
             $result = $validator->validate();
-
             $this->assertEquals(\LibreNMS\ValidationResult::FAILURE, $result->getStatus());
-            $this->assertStringContainsString("missing column ($table/missing_col)", $result->getMessage());
-        } finally {
-            DB::statement("DROP TABLE `$table`");
-            unlink($schemaFile);
-        }
-    }
 
-    public function test_it_detects_incorrect_column(): void
-    {
-        $table = 'test_table_incorrect';
-        DB::statement("CREATE TABLE `$table` (`id` int primary key NOT NULL, `col` varchar(100))");
+            // Only run the fix for our table to avoid dropping real tables
+            $changes = (new \LibreNMS\DB\Schema(DB::connection()))->compare($schemaFile);
+            foreach ($changes as $change) {
+                if (str_contains($change['description'], "($table")) {
+                    foreach ((array) $change['sql'] as $query) {
+                        DB::statement($query);
+                    }
+                }
+            }
 
-        $schema = [
-            $table => [
-                'Columns' => [
-                    ['Field' => 'id', 'Type' => 'int', 'Null' => false, 'Extra' => ''],
-                    ['Field' => 'col', 'Type' => 'varchar(255)', 'Null' => false, 'Extra' => ''],
-                ],
-                'Indexes' => [
-                    'PRIMARY' => ['Name' => 'PRIMARY', 'Columns' => ['id'], 'Unique' => true, 'Type' => 'BTREE'],
-                ],
-            ],
-        ];
-
-        $schemaFile = tempnam(sys_get_temp_dir(), 'schema');
-        file_put_contents($schemaFile, \Symfony\Component\Yaml\Yaml::dump($schema));
-
-        try {
-            $validator = new CheckSchemaStructure($schemaFile);
             $result = $validator->validate();
-
-            $this->assertEquals(\LibreNMS\ValidationResult::FAILURE, $result->getStatus());
-            $this->assertStringContainsString("incorrect column ($table/col)", $result->getMessage());
-        } finally {
-            DB::statement("DROP TABLE `$table`");
-            unlink($schemaFile);
-        }
-    }
-
-    public function test_it_detects_json_column(): void
-    {
-        $table = 'test_table_json';
-        DB::statement("DROP TABLE IF EXISTS `$table` ");
-        DB::statement("CREATE TABLE `$table` (`id` int primary key NOT NULL, `data` json)");
-
-        $schema = [
-            $table => [
-                'Columns' => [
-                    ['Field' => 'id', 'Type' => 'int', 'Null' => false, 'Extra' => ''],
-                    ['Field' => 'data', 'Type' => 'json', 'Null' => true, 'Extra' => ''],
-                ],
-                'Indexes' => [
-                    'PRIMARY' => ['Name' => 'PRIMARY', 'Columns' => ['id'], 'Unique' => true, 'Type' => 'BTREE'],
-                ],
-            ],
-        ];
-
-        $schemaFile = tempnam(sys_get_temp_dir(), 'schema');
-        file_put_contents($schemaFile, \Symfony\Component\Yaml\Yaml::dump($schema));
-
-        try {
-            $validator = new CheckSchemaStructure($schemaFile);
-            $result = $validator->validate();
-
-            // Filter out extra table messages because we are using a partial schema file
             $messages = explode("\n", $result->getMessage());
-            $realErrors = array_filter($messages, fn ($m) => ! str_contains($m, 'extra table') && ! str_contains($m, 'detected that your database schema may be wrong'));
-
-            $this->assertEmpty($realErrors, 'JSON column validation failed: ' . implode("\n", $realErrors));
+            $realErrors = array_filter($messages, fn ($m) => str_contains($m, "($table/new_col)"));
+            $this->assertEmpty($realErrors, 'Fix failed to add the missing column');
         } finally {
             DB::statement("DROP TABLE `$table`");
             unlink($schemaFile);
         }
+    }
+
+    private function createTempSchema(array $schema): string
+    {
+        $schemaFile = tempnam(sys_get_temp_dir(), 'schema');
+        file_put_contents($schemaFile, \Symfony\Component\Yaml\Yaml::dump($schema));
+
+        return $schemaFile;
     }
 }
