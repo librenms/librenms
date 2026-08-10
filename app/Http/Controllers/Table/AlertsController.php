@@ -290,13 +290,13 @@ class AlertsController extends TableController
             . '</div>';
     }
 
-    private function clearNonPrintableChars(string $string): string
+    private function countPrintableCharacters(string $string): int
     {
         $string = trim(strip_tags($string));
         $string = preg_replace('/[[:^print:]]\s/u', '', $string);
         $string = preg_replace('/ +/', ' ', $string);
 
-        return $string;
+        return strlen($string);
     }
 
     private function incidentCollapseClass(string $detail): string
@@ -306,7 +306,7 @@ class AlertsController extends TableController
         }
 
         $uncollapseKeyCount = request()->input('uncollapse_key_count');
-        $maxRowLength = strlen($this->clearNonPrintableChars($detail));
+        $maxRowLength = $this->countPrintableCharacters($detail);
 
         return (is_numeric($uncollapseKeyCount) && $maxRowLength < (int) $uncollapseKeyCount)
             ? ''
