@@ -53,6 +53,14 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton('sensor-discovery', fn (Application $app) => new \App\Discovery\Sensor($app->make('device-cache')->getPrimary()));
+
+        $this->app->singleton('polling.method.snmp', \LibreNMS\Polling\Method\Definitions\SnmpPollingMethodDefinition::class);
+        $this->app->singleton('polling.method.icmp', \LibreNMS\Polling\Method\Definitions\IcmpPollingMethodDefinition::class);
+        $this->app->singleton('polling.method.ipmi', \LibreNMS\Polling\Method\Definitions\IpmiPollingMethodDefinition::class);
+        $this->app->singleton('polling.method.unix-agent', \LibreNMS\Polling\Method\Definitions\UnixAgentPollingMethodDefinition::class);
+
+        $this->app->singleton('secret.snmp', \LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition::class);
+        $this->app->singleton('secret.ipmi', \LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition::class);
     }
 
     /**
