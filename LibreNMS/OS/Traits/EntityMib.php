@@ -70,6 +70,20 @@ trait EntityMib
             }
         }
 
+        if (empty($map) && $this->useEntLogicalIndexAsIfIndex()) {
+            $mapping = \SnmpQuery::cache()->walk('ENTITY-MIB::entLPPhysicalIndex')->table();
+            foreach ($mapping['ENTITY-MIB::entLPPhysicalIndex'] ?? [] as $logicalIndex => $physicalEntries) {
+                foreach (array_keys($physicalEntries) as $entityPhysicalIndex) {
+                    $map[(int) $entityPhysicalIndex] = (int) $logicalIndex;
+                }
+            }
+        }
+
         return $map;
+    }
+
+    protected function useEntLogicalIndexAsIfIndex(): bool
+    {
+        return false;
     }
 }

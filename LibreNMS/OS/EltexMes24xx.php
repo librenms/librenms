@@ -20,27 +20,11 @@ class EltexMes24xx extends OS implements Ipv6AddressDiscovery, TransceiverDiscov
 {
     use EntityMib {
         EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
-        EntityMib::getIfIndexEntPhysicalMap as getBaseIfIndexEntPhysicalMap;
     }
 
-    /**
-     * @return array<int, int>
-     */
-    public function getIfIndexEntPhysicalMap(): array
+    protected function useEntLogicalIndexAsIfIndex(): bool
     {
-        $map = $this->getBaseIfIndexEntPhysicalMap();
-
-        if (empty($map)) {
-            $mapping = SnmpQuery::cache()->walk('ENTITY-MIB::entLPPhysicalIndex')->table();
-            foreach ($mapping['ENTITY-MIB::entLPPhysicalIndex'] ?? [] as $logicalIndex => $physicalEntries) {
-                foreach (array_keys($physicalEntries) as $entityPhysicalIndex) {
-                    // MES24xx uses entLogicalIndex as ifIndex in this table.
-                    $map[(int) $entityPhysicalIndex] = (int) $logicalIndex;
-                }
-            }
-        }
-
-        return $map;
+        return true;
     }
 
     public function discoverEntityPhysical(): Collection
