@@ -3852,7 +3852,7 @@
             "transceivers": [
                 {
                     "index": "1",
-                    "entity_physical_index": 1,
+                    "entity_physical_index": 10,
                     "type": null,
                     "vendor": "Cambium Networks",
                     "oui": null,
@@ -3871,7 +3871,7 @@
                 },
                 {
                     "index": "2",
-                    "entity_physical_index": 2,
+                    "entity_physical_index": 11,
                     "type": null,
                     "vendor": "",
                     "oui": null,
