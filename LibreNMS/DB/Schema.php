@@ -170,6 +170,8 @@ class Schema
             collect($builder->getTables())->where('schema', $db->getDatabaseName())->toArray() :
             array_map(fn ($t) => ['name' => $t], $tables_to_dump);
 
+        usort($tables, fn ($a, $b) => strnatcasecmp($a['name'], $b['name']));
+
         $extras = self::fetchMysqlExtras($db, $tables);
         $output = [];
 
@@ -226,11 +228,26 @@ class Schema
 
     private static function mapIndexes(array $indexes): array
     {
-        usort($indexes, fn ($a, $b) => $a['name'] <=> $b['name']);
+        usort($indexes, function ($a, $b) {
+            if ($a['primary']) {
+                return -1;
+            }
+            if ($b['primary']) {
+                return 1;
+            }
+
+            return strnatcasecmp($a['name'], $b['name']);
+        });
+
         $mapped = [];
         foreach ($indexes as $i) {
             $name = $i['primary'] ? 'PRIMARY' : $i['name'];
-            $mapped[$name] = ['Name' => $name, 'Columns' => $i['columns'], 'Unique' => (bool) $i['unique'], 'Type' => strtoupper((string) $i['type'])];
+            $mapped[$name] = [
+                'Name' => $name,
+                'Columns' => $i['columns'],
+                'Unique' => (bool) $i['unique'],
+                'Type' => strtoupper((string) ($i['type'] ?? 'BTREE')),
+            ];
         }
 
         return $mapped;
@@ -238,6 +255,8 @@ class Schema
 
     private static function mapConstraints(array $fks): array
     {
+        usort($fks, fn ($a, $b) => strnatcasecmp($a['name'], $b['name']));
+
         $mapped = [];
         foreach ($fks as $fk) {
             $extra = [];
