@@ -215,6 +215,7 @@ return [
         'new_key' => 'New APP_KEY: :key',
         'old_key' => 'Old APP_KEY: :key',
         'save_key' => 'Save new key to .env?',
+        'ha_notice' => 'If running distributed pollers or a high-availability setup, update APP_KEY in .env on all remote poller/web nodes to match.',
         'success' => 'Successfully rotated keys!',
         'validation-errors' => [
             'not_in' => ':attribute must not match current APP_KEY',
