@@ -70,16 +70,6 @@ trait EntityMib
             }
         }
 
-        if (empty($map)) {
-            $tmp = \SnmpQuery::cache()->walk('ENTITY-MIB::entLPMappingTable')->table();
-            if (isset($tmp['ENTITY-MIB::entLPPhysicalIndex']) && is_array($tmp['ENTITY-MIB::entLPPhysicalIndex'])) {
-                $tmp = $tmp['ENTITY-MIB::entLPPhysicalIndex'];
-                foreach ($tmp as $phyInd => $data) {
-                    $map[array_key_first($data)] = $phyInd;
-                }
-            }
-        }
-
         return $map;
     }
 }

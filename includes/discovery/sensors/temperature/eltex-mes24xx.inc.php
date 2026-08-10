@@ -23,14 +23,15 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
+use App\Models\Sensor;
 use LibreNMS\OS;
-use LibreNMS\Util\Oid;
+use LibreNMS\OS\EltexMes24xx;
 
 if (empty($os)) {
     $os = OS::make($device);
 }
 
-if ($os instanceof \LibreNMS\OS\EltexMes24xx) {
+if ($os instanceof EltexMes24xx) {
     $map = array_flip($os->getIfIndexEntPhysicalMap()); // map ifindex -> entphy index
     $snmpData = SnmpQuery::cache()->hideMib()->walk('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticTable')->table(3);
     if (! empty($snmpData)) {
@@ -53,9 +54,9 @@ if ($os instanceof \LibreNMS\OS\EltexMes24xx) {
             $low_limit = $data['eltexPhyTransceiverDiagnosticLowAlarmThreshold'];
             $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
             $descr = $port?->ifName;
-            $oid = Oid::of('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.1.1')->toNumeric();
+            $oid = '.1.3.6.1.4.1.35265.52.1.1.3.2.1.8.' . $ifIndex . '.1.1';
 
-            app('sensor-discovery')->discover(new \App\Models\Sensor([
+            app('sensor-discovery')->discover(new Sensor([
                 'poller_type' => 'snmp',
                 'sensor_class' => 'temperature',
                 'sensor_oid' => $oid,
@@ -69,7 +70,7 @@ if ($os instanceof \LibreNMS\OS\EltexMes24xx) {
                 'sensor_limit_warn' => $high_warn_limit,
                 'sensor_limit' => $high_limit,
                 'sensor_current' => $value,
-                'entPhysicalIndex' => $map[$ifIndex], //map ifindex -> entphy index
+                'entPhysicalIndex' => $map[$ifIndex] ?? null,
                 'entPhysicalIndex_measured' => 'port',
                 'user_func' => null,
                 'group' => 'transceiver',
