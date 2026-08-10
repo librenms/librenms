@@ -39,6 +39,6 @@ enum SecretType: string
      */
     public function definition(): SecretDefinitionInterface
     {
-        return app("polling.secret.$this->value");
+        return app("secret.$this->value");
     }
 }
