@@ -54,6 +54,18 @@ abstract class BaseAdapter implements SchemaAdapter
             $master['Extra'] == $current['Extra'];
     }
 
+    public function indexesMatch(array $master, array $current): bool
+    {
+        return $master['Name'] === $current['Name'] &&
+            array_map(strtolower(...), $master['Columns']) === array_map(strtolower(...), $current['Columns']) &&
+            $master['Unique'] == $current['Unique'];
+    }
+
+    public function constraintsMatch(array $master, array $current): bool
+    {
+        return $master === $current;
+    }
+
     public function addConstraintSql(string $table, array $c): string
     {
         return "-- addConstraintSql not implemented for this driver";

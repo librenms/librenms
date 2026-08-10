@@ -38,6 +38,16 @@ interface SchemaAdapter
     public function columnsMatch(array $master, array $current): bool;
 
     /**
+     * Compare a master index definition with the current one.
+     */
+    public function indexesMatch(array $master, array $current): bool;
+
+    /**
+     * Compare a master constraint definition with the current one.
+     */
+    public function constraintsMatch(array $master, array $current): bool;
+
+    /**
      * Generate platform-specific SQL to add a foreign key constraint.
      */
     public function addConstraintSql(string $table, array $c): string;

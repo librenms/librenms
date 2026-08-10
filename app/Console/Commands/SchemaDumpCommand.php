@@ -55,6 +55,15 @@ class SchemaDumpCommand extends DumpCommand
             $parameters['--database'] = $database;
         }
 
+        $connection = $connections->connection($database);
+        if ($connection->getDriverName() !== 'mysql') {
+            $this->warn('You are dumping the schema from a ' . $connection->getDriverName() . ' database.');
+            $this->warn('The canonical db_schema.yaml should be generated from MySQL or MariaDB.');
+            if (! $this->confirm('Are you sure you want to overwrite the canonical schema file?', false)) {
+                return 1;
+            }
+        }
+
         \Artisan::call('migrate', $parameters, $stdout);
 
         $file = $this->option('path') ?: resource_path('definitions/schema/db_schema.yaml');

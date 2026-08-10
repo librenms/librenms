@@ -332,14 +332,23 @@ class Schema
         $currentIdx = array_change_key_case($current, CASE_LOWER);
         foreach ($master as $name => $data) {
             $lower = strtolower($name);
-            if (! isset($currentIdx[$lower])) {
-                $this->addChange("Database: missing index ($table/$name)", $this->addIndexSql($table, $data), $changes);
-            } else {
-                $c = $currentIdx[$lower];
-                $colsMatch = array_map(strtolower(...), $data['Columns']) === array_map(strtolower(...), $c['Columns']);
-                if (! $colsMatch || $data['Unique'] != $c['Unique']) {
-                    $this->addChange("Database: incorrect index ($table/$name)", $this->updateIndexSql($table, $name, $data), $changes);
+            $match = $currentIdx[$lower] ?? null;
+
+            if (! $match) {
+                // Try finding by content if name doesn't match
+                foreach ($currentIdx as $iName => $iData) {
+                    if ($this->adapter->indexesMatch($data, $iData)) {
+                        $match = $iData;
+                        $lower = $iName;
+                        break;
+                    }
                 }
+            }
+
+            if (! $match) {
+                $this->addChange("Database: missing index ($table/$name)", $this->addIndexSql($table, $data), $changes);
+            } elseif (! $this->adapter->indexesMatch($data, $match)) {
+                $this->addChange("Database: incorrect index ($table/$name)", $this->updateIndexSql($table, $name, $data), $changes);
             }
             unset($currentIdx[$lower]);
         }
@@ -353,9 +362,22 @@ class Schema
         $currentFk = array_change_key_case($current, CASE_LOWER);
         foreach ($master as $name => $data) {
             $lower = strtolower($name);
-            if (! isset($currentFk[$lower])) {
+            $match = $currentFk[$lower] ?? null;
+
+            if (! $match) {
+                // Try finding by content if name doesn't match
+                foreach ($currentFk as $cName => $cData) {
+                    if ($this->adapter->constraintsMatch($data, $cData)) {
+                        $match = $cData;
+                        $lower = $cName;
+                        break;
+                    }
+                }
+            }
+
+            if (! $match) {
                 $this->addChange("Database: missing constraint ($table/$name)", $this->addConstraintSql($table, $data), $changes);
-            } elseif ($data != $currentFk[$lower]) {
+            } elseif (! $this->adapter->constraintsMatch($data, $match)) {
                 $this->addChange("Database: incorrect constraint ($table/$name)", [$this->dropConstraintSql($table, $name), $this->addConstraintSql($table, $data)], $changes);
             }
             unset($currentFk[$lower]);

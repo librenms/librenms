@@ -21,7 +21,7 @@ class CheckSchemaStructureTest extends TestCase
 
     public function test_it_detects_extra_table()
     {
-        DB::statement('CREATE TABLE `extra_table` (`id` int primary key)');
+        DB::statement('CREATE TABLE `extra_table` (`id` int primary key NOT NULL)');
 
         try {
             $validator = new CheckSchemaStructure();
@@ -37,7 +37,7 @@ class CheckSchemaStructureTest extends TestCase
     public function test_it_detects_missing_column()
     {
         $table = 'test_table';
-        DB::statement("CREATE TABLE `$table` (`id` int primary key)");
+        DB::statement("CREATE TABLE `$table` (`id` int primary key NOT NULL)");
 
         $schema = [
             $table => [
@@ -69,7 +69,7 @@ class CheckSchemaStructureTest extends TestCase
     public function test_it_detects_incorrect_column()
     {
         $table = 'test_table_incorrect';
-        DB::statement("CREATE TABLE `$table` (`id` int primary key, `col` varchar(100))");
+        DB::statement("CREATE TABLE `$table` (`id` int primary key NOT NULL, `col` varchar(100))");
 
         $schema = [
             $table => [
@@ -102,7 +102,7 @@ class CheckSchemaStructureTest extends TestCase
     {
         $table = 'test_table_json';
         DB::statement("DROP TABLE IF EXISTS `$table` ");
-        DB::statement("CREATE TABLE `$table` (`id` int primary key, `data` json)");
+        DB::statement("CREATE TABLE `$table` (`id` int primary key NOT NULL, `data` json)");
 
         $schema = [
             $table => [
