@@ -1,0 +1,205 @@
+modules:
+    os:
+        hardware: ALBENTIA-AS-MIB::albModel.0
+        serial: ALBENTIA-AS-MIB::albHWAddr.0
+        version: ALBENTIA-AS-MIB::albFWVersion.0
+
+    sensors:
+        count:
+            data:
+                -
+                    oid: ALBENTIA-AS-MIB::albUsers
+                    value: ALBENTIA-AS-MIB::albUsers
+                    num_oid: '.1.3.6.1.4.1.28087.12.10.2.1.{{ $index }}'
+                    descr: 'Registered users'
+                    index: 'albUsers.{{ $index }}'
+                    group: 'Users (total)'
+                -
+                    oid: ALBENTIA-AS-MIB::sectorStatsTable
+                    value: ALBENTIA-AS-MIB::sectorStNumUsers
+                    num_oid: '.1.3.6.1.4.1.28087.12.10.10.6.1.2.{{ $index }}'
+                    descr: 'Sector {{ ALBENTIA-AS-MIB::sectorStSectorColor }} users'
+                    index: 'sectorStNumUsers.{{ $index }}'
+                    group: 'Users per sector'
+                -
+                    oid: ALBENTIA-AS-MIB::sectorStatsTable
+                    value: ALBENTIA-AS-MIB::sectorStDiscPckt
+                    num_oid: '.1.3.6.1.4.1.28087.12.10.10.6.1.13.{{ $index }}'
+                    descr: 'Sector {{ ALBENTIA-AS-MIB::sectorStSectorColor }} RX discarded'
+                    index: 'sectorStDiscPckt.{{ $index }}'
+                    group: 'RX discarded packets'
+                -
+                    oid: ALBENTIA-AS-MIB::sectorStatsTable
+                    value: ALBENTIA-AS-MIB::sectorStDropPckt
+                    num_oid: '.1.3.6.1.4.1.28087.12.10.10.6.1.14.{{ $index }}'
+                    descr: 'Sector {{ ALBENTIA-AS-MIB::sectorStSectorColor }} RX dropped'
+                    index: 'sectorStDropPckt.{{ $index }}'
+                    group: 'RX dropped packets'
+                -
+                    oid: ALBENTIA-AS-MIB::sectorStatsTable
+                    value: ALBENTIA-AS-MIB::sectorStDLQoSNumConflicts
+                    num_oid: '.1.3.6.1.4.1.28087.12.10.10.6.1.4.{{ $index }}'
+                    descr: 'Sector {{ ALBENTIA-AS-MIB::sectorStSectorColor }} DL QoS exceeded count'
+                    index: 'sectorStDLQoSNumConflicts.{{ $index }}'
+                    group: 'DL QoS exceeded events'
+                -
+                    oid: ALBENTIA-AS-MIB::sectorStatsTable
+                    value: ALBENTIA-AS-MIB::sectorStULQoSNumConflicts
+                    num_oid: '.1.3.6.1.4.1.28087.12.10.10.6.1.6.{{ $index }}'
+                    descr: 'Sector {{ ALBENTIA-AS-MIB::sectorStSectorColor }} UL QoS exceeded count'
+                    index: 'sectorStULQoSNumConflicts.{{ $index }}'
+                    group: 'UL QoS exceeded events'
+
+        temperature:
+            data:
+                -
+                    oid: ALBENTIA-AS-MIB::sectorsTable
+                    value: ALBENTIA-AS-MIB::sectorTemp
+                    num_oid: '.1.3.6.1.4.1.28087.12.10.10.1.1.5.{{ $index }}'
+                    descr: 'Sector {{ ALBENTIA-AS-MIB::sectorColor }}'
+                    index: 'sectorTemp.{{ $index }}'
+                    divisor: 100
+                    group: 'Sector temperature'
+
+        percent:
+            data:
+                -
+                    oid: ALBENTIA-AS-MIB::zoneStatsTable
+                    value: ALBENTIA-AS-MIB::zoneStFramDivPerc
+                    num_oid: '.1.3.6.1.4.1.28087.12.10.10.7.1.15.{{ $index }}'
+                    descr: 'Zone {{ ALBENTIA-AS-MIB::zoneStId }} DL frame share'
+                    index: 'zoneStFramDivPerc.{{ $index }}'
+                    divisor: 12800
+                    user_func: round
+                    group: 'TDD DL/UL split'
+
+        state:
+            data:
+                -
+                    oid: ALBENTIA-AS-MIB::albMode
+                    value: ALBENTIA-AS-MIB::albMode
+                    num_oid: '.1.3.6.1.4.1.28087.12.10.1.1.{{ $index }}'
+                    descr: 'Station mode'
+                    index: 'albMode.{{ $index }}'
+                    state_name: albMode
+                    states:
+                        - { value: 0, descr: nm, generic: 3 }
+                        - { value: 1, descr: bs, generic: 0 }
+                        - { value: 2, descr: ss, generic: 0 }
+                -
+                    oid: ALBENTIA-AS-MIB::albEthStatus
+                    value: ALBENTIA-AS-MIB::albEthStatus
+                    num_oid: '.1.3.6.1.4.1.28087.12.10.1.8.{{ $index }}'
+                    descr: 'Ethernet status'
+                    index: 'albEthStatus.{{ $index }}'
+                    state_name: albEthStatus
+                    states:
+                        - { value: 0, descr: down, generic: 2 }
+                        - { value: 1, descr: up, generic: 0 }
+                -
+                    oid: ALBENTIA-AS-MIB::albMacStatus
+                    value: ALBENTIA-AS-MIB::albMacStatus
+                    num_oid: '.1.3.6.1.4.1.28087.12.10.1.9.{{ $index }}'
+                    descr: 'MAC status'
+                    index: 'albMacStatus.{{ $index }}'
+                    state_name: albMacStatus
+                    states:
+                        - { value: 0, descr: stopped,    generic: 2 }
+                        - { value: 1, descr: stopping,   generic: 1 }
+                        - { value: 2, descr: dfsrunning, generic: 1 }
+                        - { value: 3, descr: sarunning,  generic: 1 }
+                        - { value: 4, descr: starting,   generic: 1 }
+                        - { value: 5, descr: started,    generic: 0 }
+                -
+                    oid: ALBENTIA-AS-MIB::albLinkStatus
+                    value: ALBENTIA-AS-MIB::albLinkStatus
+                    num_oid: '.1.3.6.1.4.1.28087.12.10.3.1.{{ $index }}'
+                    descr: 'CPE link status'
+                    index: 'albLinkStatus.{{ $index }}'
+                    state_name: albLinkStatus
+                    states:
+                        - { value: 0, descr: reset,          generic: 2 }
+                        - { value: 1, descr: initialranging, generic: 1 }
+                        - { value: 2, descr: capabilities,   generic: 1 }
+                        - { value: 3, descr: authentication, generic: 1 }
+                        - { value: 4, descr: registration,   generic: 1 }
+                        - { value: 5, descr: secondary,      generic: 1 }
+                        - { value: 6, descr: active,         generic: 0 }
+                        - { value: 7, descr: disconnecting,  generic: 1 }
+                        - { value: 8, descr: unlinked,       generic: 2 }
+                -
+                    oid: ALBENTIA-AS-MIB::sectorStatsTable
+                    value: ALBENTIA-AS-MIB::sectorStDLQoSConflict
+                    num_oid: '.1.3.6.1.4.1.28087.12.10.10.6.1.3.{{ $index }}'
+                    descr: 'Sector {{ ALBENTIA-AS-MIB::sectorStSectorColor }} DL QoS'
+                    index: 'sectorStDLQoSConflict.{{ $index }}'
+                    state_name: albQoSConflict
+                    states:
+                        - { value: 1, descr: conflict, generic: 2 }
+                        - { value: 2, descr: ok,       generic: 0 }
+                -
+                    oid: ALBENTIA-AS-MIB::sectorStatsTable
+                    value: ALBENTIA-AS-MIB::sectorStULQoSConflict
+                    num_oid: '.1.3.6.1.4.1.28087.12.10.10.6.1.5.{{ $index }}'
+                    descr: 'Sector {{ ALBENTIA-AS-MIB::sectorStSectorColor }} UL QoS'
+                    index: 'sectorStULQoSConflict.{{ $index }}'
+                    state_name: albQoSConflict
+                    states:
+                        - { value: 1, descr: conflict, generic: 2 }
+                        - { value: 2, descr: ok,       generic: 0 }
+                -
+                    oid: ALBENTIA-AS-MIB::sectorsTable
+                    value: ALBENTIA-AS-MIB::sectorStatus
+                    num_oid: '.1.3.6.1.4.1.28087.12.10.10.1.1.2.{{ $index }}'
+                    descr: 'Sector {{ ALBENTIA-AS-MIB::sectorColor }} status'
+                    index: 'sectorStatus.{{ $index }}'
+                    state_name: albSectorStatus
+                    states:
+                        - { value: 0, descr: off, generic: 2 }
+                        - { value: 1, descr: on,  generic: 0 }
+                -
+                    oid: ALBENTIA-AS-MIB::zonesTable
+                    value: ALBENTIA-AS-MIB::zoneStatus
+                    num_oid: '.1.3.6.1.4.1.28087.12.10.10.2.1.3.{{ $index }}'
+                    descr: 'Zone {{ ALBENTIA-AS-MIB::zoneId }} status'
+                    index: 'zoneStatus.{{ $index }}'
+                    state_name: albZoneStatus
+                    states:
+                        - { value: 0, descr: stopped, generic: 2 }
+                        - { value: 1, descr: started, generic: 0 }
+                -
+                    oid: ALBENTIA-COMMON-MIB::gpsTable
+                    value: ALBENTIA-COMMON-MIB::gpsParamValue
+                    num_oid: '.1.3.6.1.4.1.28087.12.3.1.1.2.{{ $index }}'
+                    descr: 'GPS Antenna'
+                    index: 'gpsAntenna.{{ $index }}'
+                    skip_values:
+                        - { oid: ALBENTIA-COMMON-MIB::gpsParamName, op: '!=', value: 0 }
+                    state_name: albGpsAntenna
+                    states:
+                        - { value: 1, descr: Present,       generic: 0 }
+                        - { value: 2, descr: 'Not present', generic: 1 }
+                -
+                    oid: ALBENTIA-COMMON-MIB::gpsTable
+                    value: ALBENTIA-COMMON-MIB::gpsParamValue
+                    num_oid: '.1.3.6.1.4.1.28087.12.3.1.1.2.{{ $index }}'
+                    descr: 'GPS Antenna mode'
+                    index: 'gpsAntennaMode.{{ $index }}'
+                    skip_values:
+                        - { oid: ALBENTIA-COMMON-MIB::gpsParamName, op: '!=', value: 5 }
+                    state_name: albGpsAntennaMode
+                    states:
+                        - { value: 1, descr: Outdoor, generic: 0 }
+                        - { value: 2, descr: Indoor,  generic: 1 }
+                -
+                    oid: ALBENTIA-COMMON-MIB::gpsTable
+                    value: ALBENTIA-COMMON-MIB::gpsParamValue
+                    num_oid: '.1.3.6.1.4.1.28087.12.3.1.1.2.{{ $index }}'
+                    descr: 'GPS Anti-jamming'
+                    index: 'gpsAntiJamming.{{ $index }}'
+                    skip_values:
+                        - { oid: ALBENTIA-COMMON-MIB::gpsParamName, op: '!=', value: 6 }
+                    state_name: albGpsAntiJamming
+                    states:
+                        - { value: 1, descr: Enabled,  generic: 0 }
+                        - { value: 2, descr: Disabled, generic: 2 }

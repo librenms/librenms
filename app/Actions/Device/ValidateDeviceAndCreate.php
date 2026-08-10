@@ -31,6 +31,7 @@ use App\Models\Device;
 use Illuminate\Support\Arr;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostIpExistsException;
+use LibreNMS\Exceptions\HostNameEmptyException;
 use LibreNMS\Exceptions\HostnameExistsException;
 use LibreNMS\Exceptions\HostSysnameExistsException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
@@ -55,6 +56,10 @@ class ValidateDeviceAndCreate
      */
     public function execute(): bool
     {
+        if (empty($this->device->hostname)) {
+            throw new HostNameEmptyException();
+        }
+
         if ($this->device->exists) {
             return false;
         }
@@ -65,7 +70,7 @@ class ValidateDeviceAndCreate
         if (! $this->force) {
             $this->exceptIfIpExists();
 
-            if (! app(DeviceIsPingable::class)->execute($this->device)->success()) {
+            if (! app(DeviceIsPingable::class)->execute($this->device)->isAlive()) {
                 throw new HostUnreachablePingException($this->device->hostname);
             }
 

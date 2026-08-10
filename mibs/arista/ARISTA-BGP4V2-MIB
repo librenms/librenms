@@ -21,11 +21,12 @@ ARISTA-BGP4V2-MIB DEFINITIONS ::= BEGIN
             FROM SNMP-FRAMEWORK-MIB
         aristaExperiment FROM ARISTA-SMI-MIB
         AristaBgp4V2IdentifierTC, AristaBgp4V2AddressFamilyIdentifierTC,
-        AristaBgp4V2SubsequentAddressFamilyIdentifierTC
+        AristaBgp4V2SubsequentAddressFamilyIdentifierTC,
+        AristaBgp4V2EvpnNlriTC
             FROM ARISTA-BGP4V2-TC-MIB;
 
         aristaBgp4V2 MODULE-IDENTITY
-            LAST-UPDATED "201408150000Z"
+            LAST-UPDATED "202102100000Z"
             ORGANIZATION "Arista Networks, Inc."
             CONTACT-INFO
                 "Arista Networks, Inc.
@@ -41,14 +42,20 @@ ARISTA-BGP4V2-MIB DEFINITIONS ::= BEGIN
                      This version was published in
                      draft-ietf-idr-bgp4-mibv2-13, and
                      modified to be homed inside the Arista
-                     enterprise.  There were no other
-                     modifications.
+                     enterprise.
 
                      Copyright (C) The IETF Trust (2012).  This
                      version of this MIB module is part of
                      draft-ietf-idr-bgp4-mibv2-13.txt;
                      see the draft itself for full legal notices."
 
+            REVISION "202102100000Z"
+            DESCRIPTION
+               "Updated aristaBgp4V2PeerTable to include
+                aristaBgp4V2PeerPrevState."
+            REVISION "202012290000Z"
+            DESCRIPTION
+                   "Added aristaBgp4V2PrefixEvpnNlriGaugesTable."
             REVISION "201408150000Z"
             DESCRIPTION
                    "Updated postal and e-mail addresses."
@@ -177,7 +184,9 @@ ARISTA-BGP4V2-MIB DEFINITIONS ::= BEGIN
         aristaBgp4V2PeerState
             INTEGER,
         aristaBgp4V2PeerDescription
-            SnmpAdminString
+            SnmpAdminString,
+         aristaBgp4V2PeerPrevState
+            INTEGER
     }
 
     aristaBgp4V2PeerInstance OBJECT-TYPE
@@ -359,7 +368,6 @@ ARISTA-BGP4V2-MIB DEFINITIONS ::= BEGIN
             "RFC 4271, Section 8.2.2."
         ::= { aristaBgp4V2PeerEntry 13 }
 
-
     aristaBgp4V2PeerDescription OBJECT-TYPE
         SYNTAX     SnmpAdminString
         MAX-ACCESS read-only
@@ -371,6 +379,20 @@ ARISTA-BGP4V2-MIB DEFINITIONS ::= BEGIN
              instance for this peer."
         ::= { aristaBgp4V2PeerEntry 14 }
 
+   aristaBgp4V2PeerPrevState OBJECT-TYPE
+      SYNTAX     INTEGER {
+         idle(1),
+         connect(2),
+         active(3),
+         opensent(4),
+         openconfirm(5),
+         established(6)
+      }
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         "The BGP peer previous connection state."
+      ::= { aristaBgp4V2PeerEntry 15 }
 
     --
     -- Per-peer error management information.
@@ -934,7 +956,7 @@ ARISTA-BGP4V2-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS not-accessible
         STATUS     current
         DESCRIPTION
-            "Entry containing information about a bgp-peers prefix
+            "Entry containing information about a BGP peer's prefix
              counters."
         INDEX {
             aristaBgp4V2PeerInstance,
@@ -963,7 +985,7 @@ ARISTA-BGP4V2-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS not-accessible
         STATUS     current
         DESCRIPTION
-            "The AFI index of the per-peer, per prefix counters"
+            "The AFI index of the per-peer, per-prefix counters"
         ::= { aristaBgp4V2PrefixGaugesEntry 1 }
 
     aristaBgp4V2PrefixGaugesSafi OBJECT-TYPE
@@ -971,7 +993,7 @@ ARISTA-BGP4V2-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS not-accessible
         STATUS     current
         DESCRIPTION
-            "The SAFI index of the per-peer, per prefix counters"
+            "The SAFI index of the per-peer, per-prefix counters"
         ::= { aristaBgp4V2PrefixGaugesEntry 2 }
 
     aristaBgp4V2PrefixInPrefixes OBJECT-TYPE
@@ -1582,6 +1604,77 @@ ARISTA-BGP4V2-MIB DEFINITIONS ::= BEGIN
         ::= { aristaBgp4V2AdjRibsOutEntry 2 }
 
     --
+    -- Per-Peer prefix EVPN-NLRI Gauges
+    --
+
+    aristaBgp4V2PrefixEvpnNlriGaugesTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF AristaBgp4V2PrefixEvpnNlriGaugesEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Additional per-peer, per-EVPN-NLRI counters for
+             prefixes"
+        ::= { aristaBgp4V2Objects 11 }
+
+    aristaBgp4V2PrefixEvpnNlriGaugesEntry OBJECT-TYPE
+        SYNTAX     AristaBgp4V2PrefixEvpnNlriGaugesEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Entry containing information about a BGP peer's per-EVPN-NLRI
+             prefix counters."
+        INDEX {
+            aristaBgp4V2PeerInstance,
+            aristaBgp4V2PeerRemoteAddrType,
+            aristaBgp4V2PeerRemoteAddr,
+            aristaBgp4V2PrefixGaugesNlri
+        }
+        ::= { aristaBgp4V2PrefixEvpnNlriGaugesTable 1 }
+
+    AristaBgp4V2PrefixEvpnNlriGaugesEntry ::= SEQUENCE {
+        aristaBgp4V2PrefixGaugesNlri
+            AristaBgp4V2EvpnNlriTC,
+        aristaBgp4V2PrefixNlriInPrefixes
+            Gauge32,
+        aristaBgp4V2PrefixNlriInPrefixesAccepted
+            Gauge32
+    }
+
+    aristaBgp4V2PrefixGaugesNlri OBJECT-TYPE
+        SYNTAX     AristaBgp4V2EvpnNlriTC
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The EVPN-NLRI type index of the per-peer, per-prefix counters"
+        ::= { aristaBgp4V2PrefixEvpnNlriGaugesEntry 1 }
+
+    aristaBgp4V2PrefixNlriInPrefixes OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The number of prefixes received from a peer and that are
+             stored in the Adj-Ribs-In for that peer.
+
+             Note that this number does not reflect prefixes that
+             have been discarded due to policy."
+        REFERENCE
+            "RFC 4271, Sections 3.2 and 9."
+        ::= { aristaBgp4V2PrefixEvpnNlriGaugesEntry 2 }
+
+    aristaBgp4V2PrefixNlriInPrefixesAccepted OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The number of prefixes for a peer that are installed
+             in the Adj-Ribs-In and are eligible to become active
+             in the Loc-Rib."
+        REFERENCE
+            "RFC 4271, Sections 3.2 and 9."
+        ::= { aristaBgp4V2PrefixEvpnNlriGaugesEntry 3 }
+
+    --
     -- Notifications
     --
 
@@ -1698,7 +1791,9 @@ ARISTA-BGP4V2-MIB DEFINITIONS ::= BEGIN
             aristaBgp4V2PeerFsmEstablishedTransitions,
             aristaBgp4V2PrefixInPrefixes,
             aristaBgp4V2PrefixInPrefixesAccepted,
-            aristaBgp4V2PrefixOutPrefixes
+            aristaBgp4V2PrefixOutPrefixes,
+            aristaBgp4V2PrefixNlriInPrefixes,
+            aristaBgp4V2PrefixNlriInPrefixesAccepted
         }
         STATUS current
         DESCRIPTION
@@ -1736,7 +1831,8 @@ ARISTA-BGP4V2-MIB DEFINITIONS ::= BEGIN
             aristaBgp4V2PeerRemoteAs,
             aristaBgp4V2PeerLocalIdentifier,
             aristaBgp4V2PeerRemoteIdentifier,
-            aristaBgp4V2PeerDescription
+            aristaBgp4V2PeerDescription,
+            aristaBgp4V2PeerPrevState
         }
         STATUS current
         DESCRIPTION

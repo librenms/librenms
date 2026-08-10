@@ -23,9 +23,9 @@
  * @copyright  2020 Jozef Rebjak
  * @author     Jozef Rebjak <jozefrebjak@icloud.com>
  */
-$power1 = snmp_get($device, 'power1State.0', '-Ovqe', 'OAP-NMU');
-$power2 = snmp_get($device, 'power2State.0', '-Ovqe', 'OAP-NMU');
-$fan = snmp_get($device, 'fanState.0', '-Ovqe', 'OAP-NMU');
+$power1 = SnmpQuery::get('OAP-NMU::power1State.0')->value();
+$power2 = SnmpQuery::get('OAP-NMU::power2State.0')->value();
+$fan = SnmpQuery::get('OAP-NMU::fanState.0')->value();
 $oid_power1 = '.1.3.6.1.4.1.40989.10.16.20.11.0';
 $oid_power2 = '.1.3.6.1.4.1.40989.10.16.20.12.0';
 $oid_fan = '.1.3.6.1.4.1.40989.10.16.20.10.0';
@@ -35,8 +35,8 @@ $index = '0';
 if (is_numeric($power1)) {
     $state_name = 'power1State';
     $states = [
-        ['value' => 0, 'generic' => 2, 'graph' => 0, 'descr' => 'off'],
-        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'on'],
+        ['value' => 0, 'generic' => 2, 'descr' => 'off'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'on'],
     ];
     create_state_index($state_name, $states);
 
@@ -48,8 +48,8 @@ if (is_numeric($power1)) {
 if (is_numeric($power2)) {
     $state_name = 'power2State';
     $states = [
-        ['value' => 0, 'generic' => 2, 'graph' => 0, 'descr' => 'off'],
-        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'on'],
+        ['value' => 0, 'generic' => 2, 'descr' => 'off'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'on'],
     ];
     create_state_index($state_name, $states);
 
@@ -61,8 +61,8 @@ if (is_numeric($power2)) {
 if (is_numeric($fan)) {
     $state_name = 'fanState';
     $states = [
-        ['value' => 0, 'generic' => 2, 'graph' => 0, 'descr' => 'off'],
-        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'on'],
+        ['value' => 0, 'generic' => 2, 'descr' => 'off'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'on'],
     ];
     create_state_index($state_name, $states);
 

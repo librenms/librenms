@@ -27,12 +27,17 @@
 namespace App\Http\Controllers\Ajax;
 
 use App\Models\AlertLog;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 
 class AlertDetailsController
 {
+    use AuthorizesRequests;
+
     public function __invoke(AlertLog $alertLog): JsonResponse
     {
+        $this->authorize('view', $alertLog);
+
         return response()->json([
             'details' => $alertLog->details['rule'] ?? 'No Details found',
         ]);

@@ -27,6 +27,7 @@
 namespace App\Http\Controllers\Maps;
 
 use App\Http\Controllers\Controller;
+use App\Models\CustomMap;
 use App\Models\CustomMapNodeImage;
 use enshrined\svgSanitize\Sanitizer;
 use Illuminate\Contracts\View\View;
@@ -39,7 +40,7 @@ class CustomMapNodeImageController extends Controller
 {
     public function index(): View
     {
-        $this->authorize('update');
+        $this->authorize('custom-map.update');
 
         return view('map.custom-nodeimage-manage', [
             'images' => CustomMapNodeImage::orderBy('name')->get(),
@@ -48,6 +49,8 @@ class CustomMapNodeImageController extends Controller
 
     public function show(CustomMapNodeImage $image)
     {
+        $this->authorize('viewAny', CustomMap::class);
+
         // explicitly use file cache
         try {
             $imageContent = Cache::driver('file')
@@ -68,7 +71,8 @@ class CustomMapNodeImageController extends Controller
 
     public function store(FormRequest $request): JsonResponse
     {
-        $this->authorize('update');
+        $this->authorize('custom-map.update');
+
         $this->validate($request, [
             'image' => 'image|mimes:png,jpg,svg,gif',
             'name' => 'string',
@@ -94,7 +98,8 @@ class CustomMapNodeImageController extends Controller
 
     public function update(FormRequest $request, CustomMapNodeImage $image): JsonResponse
     {
-        $this->authorize('update', $image);
+        $this->authorize('custom-map.update');
+
         $this->validate($request, [
             'image' => 'image|mimes:png,jpg,svg,gif',
             'name' => 'string',
@@ -112,7 +117,8 @@ class CustomMapNodeImageController extends Controller
 
     public function destroy(CustomMapNodeImage $image): Response
     {
-        $this->authorize('update', $image);
+        $this->authorize('custom-map.update');
+
         if ($image->nodes->count() > 0) {
             return response('Image is in use', 403)
                       ->header('Content-Type', 'text/plain');

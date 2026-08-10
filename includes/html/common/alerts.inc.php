@@ -16,6 +16,8 @@
 
 /* FIXME: is there a central place we can put this? */
 
+use Illuminate\Support\Facades\Gate;
+
 $alert_states = [
     // divined from librenms/alerts.php
     'recovered' => 0,
@@ -35,7 +37,8 @@ $alert_severities = [
     'warning only' => 5,
     'critical only' => 6,
 ];
-if (Auth::user()->hasGlobalAdmin()) {
+$admin_verbose_details = '';
+if (Gate::allows('alert.detail')) {
     $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
 }
 
@@ -258,7 +261,6 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
     post: function ()
     {
         return {
-            id: "alerts",
 ';
 
     if (is_numeric($rule_id)) {
@@ -288,15 +290,12 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
         $common_output[] = "proc: '$proc',\n";
     }
 
-    if (isset($sort) && $sort != '') {
-        $common_output[] = "sort: '$sort',\n";
-    }
-
     $common_output[] = '
             device_id: \'' . $device['device_id'] . '\'
         }
     },
-    url: "ajax_table.php",
+    url: "' . route('table.alerts') . '",
+    sort: ' . ($sort === 'severity' || $sort == 1 ? '{ severity: "desc" }' : '{ timestamp: "desc" }') . ',
     rowCount: [50, 100, 250, -1],
 
 }).on("loaded.rs.jquery.bootgrid", function() {

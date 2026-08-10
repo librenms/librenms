@@ -325,6 +325,61 @@ STORMSHIELD-ASQ-STATS-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION ""
       ::= { snsASQStatsStateful 42 }
 
+   snsASQStatsStatefulSctpAssoc OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "SCTP associations"
+      ::= { snsASQStatsStateful 43 }
+
+   snsASQStatsStatefulSctpPackets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "SCTP packets"
+      ::= { snsASQStatsStateful 44 }
+
+   snsASQStatsStatefulSctpInBytes OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Incoming SCTP traffic"
+      ::= { snsASQStatsStateful 45 }
+
+   snsASQStatsStatefulSctpOutBytes OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Outgoing SCTP traffic"
+      ::= { snsASQStatsStateful 46 }
+
+   snsASQStatsStatefulEtherstateConn OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 47 }
+
+   snsASQStatsStatefulEtherstatePackets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 48 }
+
+   snsASQStatsStatefulEtherstateInBytes OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 49 }
+
+   snsASQStatsStatefulEtherstateOutBytes OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 50 }
    -----------------------------------
    -- ASQ Statistics Global Group --
    -----------------------------------

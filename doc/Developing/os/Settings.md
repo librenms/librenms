@@ -133,6 +133,13 @@ oids:
 ```yaml
 snmp_max_oid: 8
 ```
+#### Define SNMP repeater value by OS
+
+Example ios:
+
+```
+lnms config:set ios.snmp.max_repeaters: 30
+```
 
 ### Storage Settings
 

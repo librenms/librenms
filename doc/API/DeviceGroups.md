@@ -49,7 +49,7 @@ Input (JSON):
 - `desc`: *optional* - Description of the device group
 - `rules`: *required if type == dynamic* - A set of rules to determine which
   devices should be included in this device group
-- `devices`: *required if type == static* - A list of devices that should be
+- `devices`: *present if type == static* - A list of devices that should be
   included in this group. This is a static list of devices
 
 Examples:
@@ -122,7 +122,7 @@ Input (JSON):
 Examples:
 
 ```curl
-curl -X PATCH -d '{"name": "NewLinuxServers"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/LinuxServers
+curl -X PATCH -d '{"name": "NewLinuxServers"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devicegroups/LinuxServers
 ```
 
 Output:
@@ -152,7 +152,7 @@ Input:
 Examples:
 
 ```curl
-curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/LinuxServers
+curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devicegroups/LinuxServers
 ```
 
 Output:
@@ -293,7 +293,7 @@ Example:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
-  -X POST https://foo.example/api/v0/devicegroups/devices \
+  -X POST https://foo.example/api/v0/devicegroups/LinuxServers/devices \
   --data-raw '{"devices":[261,271]}'
 ```
 
@@ -325,7 +325,7 @@ Example:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
-  -X DELETE https://foo.example/api/v0/devicegroups/devices \
+  -X DELETE https://foo.example/api/v0/devicegroups/LinuxServers/devices \
   --data-raw '{"devices":[261,271]}'
 ```
 

@@ -1,28 +1,30 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
+use App\Models\Sensor;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Html;
 
 $row = 0;
-$unit ??= \LibreNMS\Enum\Sensor::from($class)->unit();
-$graph_type ??= 'sensor_' . $class;
+$unit ??= $class->unit();
+$graph_type ??= 'sensor_' . $class->value;
 
-$sensors = \App\Models\Sensor::where('sensor_class', $class)->where('device_id', $device['device_id'])->orderBy('sensor_descr')->get();
+$sensors = Sensor::where('sensor_class', $class)->where('device_id', $device['device_id'])->orderBy('sensor_descr')->get();
 
 foreach ($sensors as $sensor) {
     if (! is_int($row++ / 2)) {
-        $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
+        $row_colour = LibrenmsConfig::get('list_colour.even');
     } else {
-        $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
+        $row_colour = LibrenmsConfig::get('list_colour.odd');
     }
 
     if ($sensor['poller_type'] == 'ipmi') {
-        $sensor_descr = ipmiSensorName($device['hardware'], $sensor['sensor_descr']);
+        $sensor_descr = e(ipmiSensorName($device['hardware'], $sensor['sensor_descr']));
     } else {
-        $sensor_descr = $sensor['sensor_descr'];
+        $sensor_descr = e($sensor['sensor_descr']);
     }
 
-    $sensor_current = Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue());
+    $sensor_current = Html::severityToLabel($sensor->currentStatus(), __('Current') . ': ' . $sensor->formatValue());
 
     echo "<div class='panel panel-default'>
         <div class='panel-heading'>
@@ -30,16 +32,16 @@ foreach ($sensors as $sensor) {
 
     //Display low and high limit if they are not null (format_si() is changing null to '0')
     if (! is_null($sensor->sensor_limit_low)) {
-        echo ' ' . Html::severityToLabel(Severity::Unknown, 'low: ' . $sensor->formatValue('sensor_limit_low'));
+        echo ' ' . Html::severityToLabel(Severity::Unknown, __('Low Limit') . ': ' . $sensor->formatValue('sensor_limit_low'));
     }
     if (! is_null($sensor->sensor_limit_low_warn)) {
-        echo ' ' . Html::severityToLabel(Severity::Unknown, 'low_warn: ' . $sensor->formatValue('sensor_limit_low_warn'));
+        echo ' ' . Html::severityToLabel(Severity::Unknown, __('Low Warning') . ': ' . $sensor->formatValue('sensor_limit_low_warn'));
     }
     if (! is_null($sensor->sensor_limit_warn)) {
-        echo ' ' . Html::severityToLabel(Severity::Unknown, 'high_warn: ' . $sensor->formatValue('sensor_limit_warn'));
+        echo ' ' . Html::severityToLabel(Severity::Unknown, __('High Warning') . ': ' . $sensor->formatValue('sensor_limit_warn'));
     }
     if (! is_null($sensor->sensor_limit)) {
-        echo ' ' . Html::severityToLabel(Severity::Unknown, 'high: ' . $sensor->formatValue('sensor_limit'));
+        echo ' ' . Html::severityToLabel(Severity::Unknown, __('High Limit') . ': ' . $sensor->formatValue('sensor_limit'));
     }
 
     echo '</div></h3>

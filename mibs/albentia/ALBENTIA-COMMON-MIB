@@ -1,0 +1,91 @@
+--***************************************************************************
+--  Copyright 2015 Albentia Systems, S.A.
+--    File  : ALBENTIA-COMMON-MIB.my
+--    Author: Abraham Diaz Nunez
+--***************************************************************************
+ALBENTIA-COMMON-MIB    DEFINITIONS ::= BEGIN
+    IMPORTS
+        TEXTUAL-CONVENTION, DisplayString, TruthValue
+            FROM SNMPv2-TC
+        OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        Integer32, TimeTicks, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        albProducts, albGeneric, albModules
+            FROM ALBENTIA-MIB;
+
+    albCommon-Mib-Module    MODULE-IDENTITY
+        LAST-UPDATED    "201507061800Z"
+        ORGANIZATION    "Albentia Systems, S.A."
+        CONTACT-INFO    "ipichel@albentia.com"
+        DESCRIPTION        "SNMP interface module for common subsystems"
+        REVISION        "201507061800Z"
+        DESCRIPTION        ""
+        ::=  {  albModules  2  }
+
+    AlbFloatValue  ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT    "d-2"
+        STATUS            current
+        DESCRIPTION        "Float value. 2 implied decimal point when rendering the value. For example 1234 be rendered as 12.34"
+        SYNTAX            Integer32
+
+    AlbAntenna ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION
+            "Antenna: Present or not present"
+        SYNTAX            INTEGER  { present (0) , notpresent (1) }
+
+    AlbAntennaMode ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION
+            "Antenna mode: Outdoor or indoor"
+        SYNTAX            INTEGER  { outdoor (0) , indoor (1) }
+
+    AlbAntiJamming ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION
+            "Anti-jamming: Enabled or disabled"
+        SYNTAX            INTEGER  { enabled (0) , disabled (1) }
+
+    AlbGpsParameters ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION        "GPS parameters"
+        SYNTAX            INTEGER  { antenna (0), gpsreceiver (1), tdop (2), coordinates (3), altitude (4), antennamode (5), antijamming (6) }
+
+    albGps OBJECT IDENTIFIER
+        ::=  {  albProducts  3  }
+
+    gpsTable        OBJECT-TYPE
+        SYNTAX            SEQUENCE  OF  GpsEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION        "GPS subsystem status"
+        ::=  { albGps 1 }
+
+    gpsEntry        OBJECT-TYPE
+        SYNTAX            GpsEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION        "GPS entry for gpsTable"
+        INDEX            { gpsParamName }
+        ::=  { gpsTable 1 }
+
+    GpsEntry  ::=  SEQUENCE {
+        gpsParamName    AlbGpsParameters,
+        gpsParamValue    DisplayString
+        }
+
+    gpsParamName    OBJECT-TYPE
+        SYNTAX            AlbGpsParameters
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "GPS parameter name. Index"
+        ::=  {  gpsEntry  1  }
+
+    gpsParamValue            OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "GPS parameter value"
+        ::=  {  gpsEntry  2  }
+END

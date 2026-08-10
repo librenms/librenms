@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -56,7 +57,7 @@ class AviatWtm extends OS implements
         $frequency = snmpwalk_cache_oid($this->getDeviceArray(), 'aviatRfFreqTx', [], 'AVIAT-RF-MIB:');
         foreach ($frequency as $index => $data) {
             $sensors[] = new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 ".1.3.6.1.4.1.2509.9.5.2.1.1.1.$index",
                 'aviat-wtm-carrier-tx-freq',
@@ -85,7 +86,7 @@ class AviatWtm extends OS implements
         $tx = snmpwalk_cache_oid($this->getDeviceArray(), 'aviatModemCurCapacityTx', [], 'AVIAT-MODEM-MIB');
         foreach ($tx as $index => $data) {
             $sensors[] = new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 ".1.3.6.1.4.1.2509.9.3.2.1.1.11.$index",
                 'aviat-wtm-carrier-tx-rate',
@@ -99,7 +100,7 @@ class AviatWtm extends OS implements
         $rx = snmpwalk_cache_oid($this->getDeviceArray(), 'aviatModemCurCapacityRx', [], 'AVIAT-MODEM-MIB');
         foreach ($rx as $index => $data) {
             $sensors[] = new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 ".1.3.6.1.4.1.2509.9.3.2.1.1.12.$index",
                 'aviat-wtm-carrier-rx-rate',
@@ -127,7 +128,7 @@ class AviatWtm extends OS implements
 
         foreach ($rsl as $index => $data) {
             $sensors[] = new WirelessSensor(
-                'rssi',
+                WirelessSensorType::Rssi,
                 $this->getDeviceId(),
                 ".1.3.6.1.4.1.2509.9.15.2.2.1.4.$index",
                 'aviat-wtm-carrier-rsl',
@@ -156,7 +157,7 @@ class AviatWtm extends OS implements
 
         foreach ($snr as $index => $data) {
             $sensors[] = new WirelessSensor(
-                'snr',
+                WirelessSensorType::Snr,
                 $this->getDeviceId(),
                 ".1.3.6.1.4.1.2509.9.33.2.2.1.3.$index",
                 'aviat-wtm-carrier-snr',
@@ -185,7 +186,7 @@ class AviatWtm extends OS implements
 
         foreach ($power as $index => $data) {
             $sensors[] = new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 ".1.3.6.1.4.1.2509.9.33.2.2.1.7.$index",
                 'aviat-wtm-carrier-txpower',

@@ -28,7 +28,7 @@ class Osticket extends Transport
         $token = $this->config['os-token'];
         $email = '';
 
-        foreach (\LibreNMS\Util\Mail::parseEmails(LibrenmsConfig::get('email_from')) as $from => $from_name) {
+        foreach (\LibreNMS\Util\Mail::parseEmails((string) LibrenmsConfig::get('email_from')) as $from => $from_name) {
             $email = $from_name . ' <' . $from . '>';
             break;
         }

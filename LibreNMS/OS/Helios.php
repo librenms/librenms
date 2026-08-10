@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
@@ -42,7 +43,7 @@ class Helios extends OS implements WirelessFrequencyDiscovery, WirelessPowerDisc
      */
     public function discoverWirelessFrequency()
     {
-        return $this->discoverOid('frequency', 'mlRadioInfoFrequency', '.1.3.6.1.4.1.47307.1.4.2.1.4.');
+        return $this->discoverOid(WirelessSensorType::Frequency, 'mlRadioInfoFrequency', '.1.3.6.1.4.1.47307.1.4.2.1.4.');
     }
 
     /**
@@ -53,7 +54,7 @@ class Helios extends OS implements WirelessFrequencyDiscovery, WirelessPowerDisc
      */
     public function discoverWirelessPower()
     {
-        return $this->discoverOid('power', 'mlRadioInfoTxPower', '.1.3.6.1.4.1.47307.1.4.2.1.7.');
+        return $this->discoverOid(WirelessSensorType::Power, 'mlRadioInfoTxPower', '.1.3.6.1.4.1.47307.1.4.2.1.7.');
     }
 
     /**
@@ -64,10 +65,10 @@ class Helios extends OS implements WirelessFrequencyDiscovery, WirelessPowerDisc
      */
     public function discoverWirelessRssi()
     {
-        return $this->discoverOid('rssi', 'mlRadioInfoRSSILocal', '.1.3.6.1.4.1.47307.1.4.2.1.10.');
+        return $this->discoverOid(WirelessSensorType::Rssi, 'mlRadioInfoRSSILocal', '.1.3.6.1.4.1.47307.1.4.2.1.10.');
     }
 
-    private function discoverOid($type, $oid, $oid_prefix)
+    private function discoverOid(WirelessSensorType $type, $oid, $oid_prefix)
     {
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), $oid, [], 'IGNITENET-MIB');
 

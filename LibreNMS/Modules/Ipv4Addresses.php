@@ -39,6 +39,7 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Ipv4AddressDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\IPv4;
 use SnmpQuery;
@@ -58,15 +59,15 @@ class Ipv4Addresses implements Module
     /**
      * @inheritDoc
      */
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
      * @inheritDoc
      */
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
         return false;
     }
@@ -192,12 +193,16 @@ class Ipv4Addresses implements Module
     {
         $ips = new Collection;
         foreach ($device->getVrfContexts() as $context_name) {
-            $ips = $ips->merge(SnmpQuery::context($context_name)->hideMib()->enumStrings()->walk(
+            $ips = $ips->merge(SnmpQuery::context($context_name)->allowUnordered()->hideMib()->enumStrings()->walk(
                 ['IP-MIB::ipAdEntAddr', 'IP-MIB::ipAdEntIfIndex', 'IP-MIB::ipAdEntNetMask'])
             ->mapTable(function ($data, $ipAddr = '') use ($context_name, $device) {
                 //on some devices, ipAddr is broken, so use ipAdEntAddr as primary
                 $entAddr = $data['ipAdEntAddr'] ?? '';
                 $addr = (preg_match('/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/', (string) $entAddr, $tmp)) ? $entAddr : $ipAddr;
+
+                if (! IPv4::isValid($addr)) {
+                    return null;
+                }
 
                 return new Ipv4Address([
                     'port_id' => PortCache::getIdFromIfIndex($data['ipAdEntIfIndex'] ?? 0, $device),

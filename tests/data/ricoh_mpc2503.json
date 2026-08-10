@@ -1,0 +1,116 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": null,
+                    "sysObjectID": ".1.3.6.1.4.1.367.1.1",
+                    "sysDescr": "RICOH MP C2503 1.35 / RICOH Network Printer C model / RICOH Network Scanner C model / RICOH Network Facsimile C model",
+                    "sysContact": "<private>",
+                    "version": "1.35",
+                    "hardware": "MP C2503",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "ricoh",
+                    "type": "printer",
+                    "serial": "E216R220016",
+                    "icon": "ricoh.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 1,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                }
+            ]
+        }
+    },
+    "printer-supplies": {
+        "discovery": {
+            "printer_supplies": [
+                {
+                    "supply_index": 1,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
+                    "supply_descr": "黑色碳粉",
+                    "supply_capacity": 100,
+                    "supply_current": 80,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
+                },
+                {
+                    "supply_index": 2,
+                    "supply_type": "wasteToner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
+                    "supply_descr": "廢棄碳粉",
+                    "supply_capacity": 100,
+                    "supply_current": 100,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
+                },
+                {
+                    "supply_index": 3,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
+                    "supply_descr": "青色碳粉",
+                    "supply_capacity": 100,
+                    "supply_current": 30,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
+                },
+                {
+                    "supply_index": 4,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
+                    "supply_descr": "洋紅色碳粉",
+                    "supply_capacity": 100,
+                    "supply_current": 30,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
+                },
+                {
+                    "supply_index": 5,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.5",
+                    "supply_descr": "黃色碳粉",
+                    "supply_capacity": 100,
+                    "supply_current": 20,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.5"
+                },
+                {
+                    "supply_index": 1,
+                    "supply_type": "input",
+                    "supply_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.1",
+                    "supply_descr": "Paper Tray 1",
+                    "supply_capacity": 550,
+                    "supply_current": 70,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.1"
+                },
+                {
+                    "supply_index": 2,
+                    "supply_type": "input",
+                    "supply_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.2",
+                    "supply_descr": "Paper Tray 2",
+                    "supply_capacity": 550,
+                    "supply_current": 30,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.2"
+                },
+                {
+                    "supply_index": 3,
+                    "supply_type": "input",
+                    "supply_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.3",
+                    "supply_descr": "Bypass Tray",
+                    "supply_capacity": 100,
+                    "supply_current": 50,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.3"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

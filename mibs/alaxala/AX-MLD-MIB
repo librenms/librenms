@@ -1,0 +1,182 @@
+--
+-- All Rights Reserved, Copyright (c) 2015, ALAXALA Networks Corp.
+--
+-- AX-MLD-MIB.my : axMld group MIB file.
+--
+
+AX-MLD-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Unsigned32
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        axMib
+            FROM AX-SMI-MIB
+;
+
+axMld MODULE-IDENTITY
+    LAST-UPDATED    "201411170000Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+        "The MIB module for MLD information."
+    REVISION        "201411170000Z"
+    DESCRIPTION
+        "Initial release."
+    ::= { axMib 202 }
+
+
+--------------------------------------------------
+-- Object Identifiers
+--------------------------------------------------
+
+axMldObjects OBJECT IDENTIFIER ::= {axMld 1}
+axMldBandPhys OBJECT IDENTIFIER ::= {axMldObjects 1}
+
+--------------------------------------------------
+-- Object Type definitions
+--------------------------------------------------
+
+--
+--  axMldBandPhys
+--
+
+axMldBandPhysTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxMldBandPhysEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "MLD addmission control table of each physical port or 
+        link aggregation group."
+    ::= { axMldBandPhys 1}
+
+axMldBandPhysEntry OBJECT-TYPE
+    SYNTAX AxMldBandPhysEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "MLD addmission control entry of each physical port or 
+        link aggregation group."
+    INDEX { axMldBandPhysIfIndex }
+    ::= { axMldBandPhysTable 1}
+
+AxMldBandPhysEntry ::= SEQUENCE {
+    axMldBandPhysIfIndex        Integer32,
+    axMldBandPhysMaxRate        Unsigned32,
+    axMldBandPhysCurrentRate    Unsigned32,
+    axMldBandPhysAlarmRaise     Integer32,
+    axMldBandPhysAlarmClear     Integer32,
+    axMldBandPhysAlarmStatus    Integer32
+}
+
+axMldBandPhysIfIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The value of ifIndex which is assigned to this physical port or link aggregation group."
+    ::= { axMldBandPhysEntry 1}
+
+axMldBandPhysMaxRate OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of maximum rate which is configured to this physical port or link aggregation group.
+         Unit of measure : kbit/s
+         If the request which exceeds this value is received, it is discarded."
+        
+    ::= { axMldBandPhysEntry 2}
+
+axMldBandPhysCurrentRate OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of current rate which is used in this physical port or link aggregation group. 
+         Unit of measure : kbit/s"
+    ::= { axMldBandPhysEntry 3}
+
+axMldBandPhysAlarmRaise OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of alarm-raise which is configured to this physical port or link aggregation group. 
+         Unit of measure : %
+         The value is -1 when this is not configured."
+    ::= { axMldBandPhysEntry 4}
+
+axMldBandPhysAlarmClear OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of alarm-clear which is configured to this physical port or link aggregation group. 
+         Unit of measure : %
+         The value is -1 when this is not configured."
+    ::= { axMldBandPhysEntry 5}
+
+axMldBandPhysAlarmStatus OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current alarm state of this physical port or link aggregation group.
+         The initial state is 0.
+         The state changes to 1 when the current rate exceeds alarm-raise percentage of the maximum rate. 
+         Afterwards, it returns to 0 when the current rate is below alarm-clear percentage of the maximum rate.
+         The state is also 0 when alarm-raise and alarm-clear are not configured."
+    ::= { axMldBandPhysEntry 6}
+
+
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+
+
+--------------------------------------------------
+-- Conformance Statements
+--------------------------------------------------
+
+--
+-- Confoemance identifier
+--
+
+axMldConformance            OBJECT IDENTIFIER ::= { axMld 1000 }
+axMldCompliances            OBJECT IDENTIFIER ::= { axMldConformance 1 }
+axMldGroups                 OBJECT IDENTIFIER ::= { axMldConformance 2 }
+
+--
+-- Compliance
+--
+
+axMldCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "AX Mld"
+    MODULE      -- this module
+        MANDATORY-GROUPS{ axMldGroup }
+    ::= { axMldCompliances 1 }
+
+--
+-- Object Group
+--
+
+axMldGroup OBJECT-GROUP
+    OBJECTS    {
+                    axMldBandPhysMaxRate,
+                    axMldBandPhysCurrentRate,
+                    axMldBandPhysAlarmRaise,
+                    axMldBandPhysAlarmClear,
+                    axMldBandPhysAlarmStatus
+               }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects which are used to provide
+         axMld group."
+    ::= { axMldGroups 1 }
+
+END

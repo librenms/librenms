@@ -7,7 +7,7 @@ use LibreNMS\Enum\PortAssociationMode;
 $device = DeviceCache::getPrimary();
 
 if (isset($_POST['editing'])) {
-    if (Auth::user()->hasGlobalAdmin()) {
+    if (Gate::allows('update', $device)) {
         $force_save = isset($_POST['force_save']) && $_POST['force_save'] == 'on';
         $device->poller_group = $_POST['poller_group'] ?? 0;
         $snmp_enabled = ($_POST['snmp'] == 'on');
@@ -63,7 +63,6 @@ if (isset($_POST['editing'])) {
             // update devices_attribs table
 
             // note:
-            // set_dev_attrib and del_dev_attrib *only* return (bool)
             // setAttrib() returns true if it was set and false if it was not (e.g. it didn't change)
             // forgetAttrib() returns true if it was deleted and false if it was not (e.g. it didn't exist)
             // Symfony throws FatalThrowableError on error
@@ -386,6 +385,19 @@ if (LibrenmsConfig::get('distributed_poller') === true) {
         </div>
         ';
 }//end if
+
+if ($device->snmpEngineID) {
+
+?>
+<div class="form-group">
+    <label for="snmpEngineID" class="col-sm-2 control-label">SNMP Engine ID</label>
+    <div class="col-sm-6 tw:mt-2">
+        <?php echo htmlspecialchars((string) $device->snmpEngineID); ?>
+    </div>
+</div>
+
+<?php
+}
 ?>
 
 <div class="form-group">

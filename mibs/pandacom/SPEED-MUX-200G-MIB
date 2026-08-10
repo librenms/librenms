@@ -1,0 +1,2818 @@
+SPEED-MUX-200G-MIB DEFINITIONS ::= BEGIN
+
+
+--*****************************************************************************************
+
+IMPORTS
+	DisplayString FROM SNMPv2-TC
+	Integer32, Counter64, IpAddress, TimeTicks, OBJECT-TYPE, MODULE-IDENTITY FROM SNMPv2-SMI
+	multiplexer	FROM SPEEDCARRIER-MIB
+; -- END of IMPORTS
+
+--*******************************************************************
+
+    speedMux200g MODULE-IDENTITY
+        LAST-UPDATED "202010070000Z"
+        ORGANIZATION "Pan Dacom Direkt GmbH"
+        CONTACT-INFO
+            "Pan Dacom Direkt GmbH
+            Dreieich Plaza 1B
+            63303 Dreieich
+            Germany
+            Tel. : +49 6103/932-333
+            Fax. : +49 6103/932-444
+            email: kontakt@pandacomdirekt.de
+            web  : www.pandacomdirekt.de"
+        DESCRIPTION "MIB of Speed-Mux 200g"
+
+        REVISION "202010070000Z"
+        DESCRIPTION "Rev. 7.5.3
+        - profile 5x40G"
+        
+        REVISION "202004070000Z"
+        DESCRIPTION "Rev. 7.5.0
+        - advanced profile editing"
+        
+        REVISION "201906240000Z"
+        DESCRIPTION "Rev. 7.4.0
+        - Line protection"
+
+        REVISION "201904250000Z"
+        DESCRIPTION "Rev. 7.2.3
+        - integer syntax correction"
+                
+        REVISION "201904100000Z"
+        DESCRIPTION "Release 7.2.2: 
+        - LLCF writeable for client ports"
+        
+        REVISION "201901170000Z"
+        DESCRIPTION "Release 7.2: 
+        - new protocols
+        - added SPEED-MUX 200G CFP2
+        - added OTN Statistics"
+        
+        REVISION "201806060000Z"
+        DESCRIPTION "Release 7.1.1: 
+        - port protocol fix"
+        
+        REVISION "201802140000Z"
+        DESCRIPTION "Release 7.1: 
+        - added profile table
+        - added line encryption"
+
+        REVISION "201707280000Z"
+        DESCRIPTION "Init with Release 7.0"
+
+        ::= { multiplexer 1 }
+
+
+
+--******************************************************************* 
+
+    speedMux200gMOverviewTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SpeedMux200gMOverviewEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Speed-MUX 200G Module Overview table"
+        ::= { speedMux200g 1 }
+
+    speedMux200gMOverviewEntry OBJECT-TYPE
+        SYNTAX SpeedMux200gMOverviewEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Module Overview entries"
+        INDEX { speedMux200gMOverviewIndex }
+        ::= { speedMux200gMOverviewTable 1 }
+
+    SpeedMux200gMOverviewEntry ::=
+        SEQUENCE
+        {
+            speedMux200gMOverviewIndex Integer32,
+            speedMux200gMSlot Integer32,
+            speedMux200gMDevice INTEGER,
+            speedMux200gMState INTEGER,
+            speedMux200gMSysName DisplayString,
+            speedMux200gMSysUpTime TimeTicks,
+            speedMux200gMTemperature Integer32,
+            speedMux200gMAlarmState INTEGER,
+            speedMux200gMKernelImage DisplayString,
+            speedMux200gMAppImage DisplayString,
+            speedMux200gMHwVersion DisplayString,
+            speedMux200gMDevSerialNumber DisplayString,
+            speedMux200gMTemperatureAlarm INTEGER,
+            speedMux200gMOTNAlarm INTEGER,
+            speedMux200gMBoardHWAlarm INTEGER
+        }
+
+    speedMux200gMOverviewIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..100)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Overview Table Index"
+        ::= { speedMux200gMOverviewEntry 1 }
+
+    speedMux200gMSlot OBJECT-TYPE
+        SYNTAX Integer32 (1..19)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Slot number"
+        ::= { speedMux200gMOverviewEntry 2 }
+
+    speedMux200gMDevice OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            speedMuxSX200e6QSFP2cfp(16),
+            speedMuxSX200s6QSFP2cfp(17),
+            speedMuxSX200e5QSFPcfp2(19),
+            speedMuxSX200s5QSFPcfp2(20),
+            unknown(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "device type"
+        ::= { speedMux200gMOverviewEntry 3 }
+
+    speedMux200gMState OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            running(1),
+            resetSoftware(2),
+            resetConfig(3),
+            resetRegistration(4),
+            resetHardware(5),
+--            resetStats(6),
+            unknown(255)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Device oper state. If setting resetConfig, you also have to reset the hardware."
+        ::= { speedMux200gMOverviewEntry 4 }
+
+    speedMux200gMSysName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Modules name or description"
+        ::= { speedMux200gMOverviewEntry 5 }
+
+    speedMux200gMSysUpTime OBJECT-TYPE
+        SYNTAX TimeTicks
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "System Up Time in Seconds"
+        ::= { speedMux200gMOverviewEntry 6 }
+
+    speedMux200gMTemperature OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Board temperature [C]"
+        ::= { speedMux200gMOverviewEntry 7 }
+
+    speedMux200gMAlarmState OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeWarning(2),
+            activeAlarm(3),
+            lowWarning(4),
+            lowAlarm(5),
+            highWarning(6),
+            highAlarm(7),
+            noAlarms(128),
+            activeWarnings(129),
+            activeAlarms(130),
+            lowWarnings(131),
+            lowAlarms(132),
+            highWarnings(133),
+            highAlarms(134)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "global device alarm state"
+        ::= { speedMux200gMOverviewEntry 8 }
+
+    speedMux200gMKernelImage OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "kernel version"
+        ::= { speedMux200gMOverviewEntry 9 }
+
+    speedMux200gMAppImage OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "software version"
+        ::= { speedMux200gMOverviewEntry 10 }
+
+    speedMux200gMHwVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "board hardware version"
+        ::= { speedMux200gMOverviewEntry 11 }
+
+    speedMux200gMDevSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..17))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "board serial number"
+        ::= { speedMux200gMOverviewEntry 12 }
+              
+    speedMux200gMTemperatureAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            noAlarm(0),
+            activeWarning(1),
+            activeAlarm(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Board Temperature Alarm"
+        ::= { speedMux200gMOverviewEntry 13 }       
+        
+    speedMux200gMOTNAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeWarning(2),
+            activeAlarm(3),
+            lowWarning(4),
+            lowAlarm(5),
+            highWarning(6),
+            highAlarm(7),
+            noAlarms(128),
+            activeWarnings(129),
+            activeAlarms(130),
+            lowWarnings(131),
+            lowAlarms(132),
+            highWarnings(133),
+            highAlarms(134),
+            unknown(255)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Board OTN Alarm"
+        ::= { speedMux200gMOverviewEntry 14 }        
+        
+    speedMux200gMBoardHWAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeWarning(2),
+            activeAlarm(3),
+            lowWarning(4),
+            lowAlarm(5),
+            highWarning(6),
+            highAlarm(7),
+            noAlarms(128),
+            activeWarnings(129),
+            activeAlarms(130),
+            lowWarnings(131),
+            lowAlarms(132),
+            highWarnings(133),
+            highAlarms(134),
+            unknown(255)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Board other Hardware Alarm"
+        ::= { speedMux200gMOverviewEntry 15 }    
+        
+        
+-- *********************************
+
+	speedMux200gMConfigTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedMux200gMConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Speed-Mux 200G module config table"
+		::= { speedMux200g 2 }
+
+	speedMux200gMConfigEntry OBJECT-TYPE
+		SYNTAX SpeedMux200gMConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Module config entries"
+		INDEX { speedMux200gMConfigIndex }
+		::= { speedMux200gMConfigTable 1 }
+
+    	SpeedMux200gMConfigEntry ::=
+		SEQUENCE
+		{
+			speedMux200gMConfigIndex Integer32,
+			speedMux200gMNetIpAddress IpAddress,
+			speedMux200gMNetNetmask IpAddress,
+			speedMux200gMNetGateway IpAddress,
+			speedMux200gMSNMPTrapsink1 IpAddress,
+			speedMux200gMSNMPTrapsink2 IpAddress,
+			speedMux200gMSNMPTrapsink3 IpAddress,
+			speedMux200gMSNMPTrapsink4 IpAddress,
+			speedMux200gMSNMPTrapsink5 IpAddress,
+			speedMux200gMSNMPReadCommunity DisplayString,
+			speedMux200gMTempWarningLevel Integer32,
+			speedMux200gMTempAlarmLevel Integer32,
+			speedMux200gMSNMPSysContact DisplayString,
+			speedMux200gMSNMPSysLocation DisplayString,
+			speedMux200gMCLIUserTimeout Integer32,
+			speedMux200gMNetAccess INTEGER,
+			speedMux200gMApplicationConfig Integer32
+		}
+
+	speedMux200gMConfigIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+        		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Config Table Index"
+		::= { speedMux200gMConfigEntry 1 }
+
+	speedMux200gMNetIpAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"device IP-address"
+		DEFVAL { 'c0a80068'H }	-- 192.168.0.104
+		::= { speedMux200gMConfigEntry 2 }
+
+	speedMux200gMNetNetmask OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"device IP-mask"
+		DEFVAL { 'ffffff00'H }	-- 255.255.255.0
+		::= { speedMux200gMConfigEntry 3 }
+
+	speedMux200gMNetGateway OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"device default gateway"
+		::= { speedMux200gMConfigEntry 4 }
+
+	speedMux200gMSNMPTrapsink1 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"snmp trapsink 1"
+		::= { speedMux200gMConfigEntry 5 }
+
+	speedMux200gMSNMPTrapsink2 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"snmp trapsink 2"
+		::= { speedMux200gMConfigEntry 6 }
+
+	speedMux200gMSNMPTrapsink3 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"snmp trapsink 3"
+		::= { speedMux200gMConfigEntry 7 }
+
+	speedMux200gMSNMPTrapsink4 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"snmp trapsink 4"
+		::= { speedMux200gMConfigEntry 8 }
+
+	speedMux200gMSNMPTrapsink5 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"snmp trapsink 5"
+		::= { speedMux200gMConfigEntry 9 }
+
+	speedMux200gMSNMPReadCommunity OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"snmp read community"
+		::= { speedMux200gMConfigEntry 10 }
+
+	speedMux200gMTempWarningLevel OBJECT-TYPE
+		SYNTAX Integer32 (5..60)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"high temperature warning level"
+		::= { speedMux200gMConfigEntry 11 }
+
+	speedMux200gMTempAlarmLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"high temperature alarm level"
+		::= { speedMux200gMConfigEntry 12 }
+
+	speedMux200gMSNMPSysContact OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"snmp syscontact"
+		::= { speedMux200gMConfigEntry 13 }
+
+	speedMux200gMSNMPSysLocation OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"snmp syslocation"
+		::= { speedMux200gMConfigEntry 14 }
+
+	speedMux200gMCLIUserTimeout OBJECT-TYPE
+		SYNTAX Integer32 (120..3600)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"CLI user timeout. Valid from 120 to 3600 seconds."
+		::= { speedMux200gMConfigEntry 15 }
+
+	speedMux200gMNetAccess OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notavailable(0),
+			off(1),
+			telnet(2),
+			ssh(3),
+			notPossible(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"access method to this system"
+		::= { speedMux200gMConfigEntry 16 }
+
+	speedMux200gMApplicationConfig OBJECT-TYPE
+		SYNTAX Integer32 (1..6)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Current active profile. Valid from 1 to 6."
+		::= { speedMux200gMConfigEntry 17 }
+
+--********************************************
+
+	speedMux200gEthPortTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedMux200gEthPortEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"SPEED-MUX 200G Module Ethernet ports table"
+		::= { speedMux200g 3 }
+
+	speedMux200gEthPortEntry OBJECT-TYPE
+		SYNTAX SpeedMux200gEthPortEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"Module Ethernet ports config Entries"
+		INDEX { speedMux200gEthPortIndex }
+		::= { speedMux200gEthPortTable 1 }
+
+	SpeedMux200gEthPortEntry ::=
+		SEQUENCE
+		{
+			speedMux200gEthPortIndex Integer32,
+			speedMux200gEthSlot Integer32,
+			speedMux200gEthPort Integer32,
+			speedMux200gEthPortDescription DisplayString,
+			speedMux200gEthPortMode INTEGER,
+			speedMux200gEthPortOperState INTEGER
+		}
+
+	speedMux200gEthPortIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+        		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Port Index"
+		::= { speedMux200gEthPortEntry 1 }
+
+	speedMux200gEthSlot OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Slot number"
+		::= { speedMux200gEthPortEntry 2 }
+
+	speedMux200gEthPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"port number"
+		::= { speedMux200gEthPortEntry 3 }
+
+	speedMux200gEthPortDescription OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Ethernet port description. Only ports 1, 3, 4 are configurable."
+		::= { speedMux200gEthPortEntry 4 }
+
+	speedMux200gEthPortMode OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			autoneg(1),
+			hdx10(2),
+			fdx10(3),
+			hdx100(4),
+			fdx100(5),
+			fdx1000(6),
+			off(7),
+			unknown(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Ethernet Port Configuration. Only port 1 is configurable."
+		::= { speedMux200gEthPortEntry 5 }
+
+
+	speedMux200gEthPortOperState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notavailable(0),
+			linkDown(1),
+			hdx10(2),
+			fdx10(3),
+			hdx100(4),
+			fdx100(5),
+			fdx1000(6),
+			off(7),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Ethernet Port State"
+		::= { speedMux200gEthPortEntry 6 }
+
+--********************************************
+		
+	speedMux200gClientPortLaneTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedMux200gClientPortLaneEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"QSFP Client ports table"
+        		::= { speedMux200g 4 }
+        
+	speedMux200gClientPortLaneEntry OBJECT-TYPE
+		SYNTAX SpeedMux200gClientPortLaneEntry
+		MAX-ACCESS not-accessible	
+		STATUS current
+		DESCRIPTION
+			"Client ports config Entries"
+		INDEX { speedMux200gClientPortLaneIndex }
+		::= { speedMux200gClientPortLaneTable 1 }
+        
+	SpeedMux200gClientPortLaneEntry ::=
+	SEQUENCE
+	{
+		speedMux200gClientPortLaneIndex Integer32,
+		speedMux200gClientSlot Integer32,
+		speedMux200gClientPortLane Integer32,
+		speedMux200gClientPortLaneDescription DisplayString,
+		speedMux200gClientPortLaneAdminConfig INTEGER,
+		speedMux200gClientPortLaneOperState INTEGER,
+		speedMux200gClientPortLaneLoopConfig INTEGER,
+		speedMux200gClientPortLaneAlarmDeactivation INTEGER,
+		speedMux200gClientPortLaneAlarmSchedule Integer32,
+		speedMux200gClientPortLaneProtocol INTEGER,
+		speedMux200gClientPortLaneConnectionToLinePort INTEGER,
+		speedMux200gClientPortLaneLLCFconfig INTEGER 
+	}
+        
+	speedMux200gClientPortLaneIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS not-accessible
+		STATUS current	
+		DESCRIPTION
+			"Port Index"
+	::= { speedMux200gClientPortLaneEntry 1 }
+        
+	speedMux200gClientSlot OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Slot number"
+		::= { speedMux200gClientPortLaneEntry 2 }
+        
+        speedMux200gClientPortLane OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "port number"
+        ::= { speedMux200gClientPortLaneEntry 3 }
+        
+        speedMux200gClientPortLaneDescription OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Module Client port description."
+        ::= { speedMux200gClientPortLaneEntry 4 }
+        
+        speedMux200gClientPortLaneAdminConfig OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            adminDown(1),
+            adminUp(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Module Client Port Configuration. "
+        ::= { speedMux200gClientPortLaneEntry 5 }
+        
+        speedMux200gClientPortLaneOperState OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            down(1),
+            up(2),
+            loop(3),
+            downLLCF(4),
+            downTxFault(5),
+            downRxLevel(6),
+            downTxLevel(7),
+            bertRunning(8),
+            unknown(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Module Client Port Operation State"
+        ::= { speedMux200gClientPortLaneEntry 6 }
+        
+        speedMux200gClientPortLaneLoopConfig OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            off(1),
+            internal(3),
+            external(4)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Client Port loop config"
+        ::= { speedMux200gClientPortLaneEntry 7 }
+        
+        speedMux200gClientPortLaneAlarmDeactivation OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            activateAlarms(1),
+            deactivateBySchedule(2),
+            deactivatePermanently(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Client Port Alarm Deactivation Configuration"
+        ::= { speedMux200gClientPortLaneEntry 8 }
+        
+        speedMux200gClientPortLaneAlarmSchedule OBJECT-TYPE
+        SYNTAX Integer32 (1..1200)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Client Port alarm deactivation schedule. Value in hours. After this time has elapsed, the alarms are active again. Valid range: 1..1200."
+        ::= { speedMux200gClientPortLaneEntry 9 }
+
+        speedMux200gClientPortLaneProtocol OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notavailable(0), 
+            bundled(1),
+            eth40G(2), 
+            fc32G(3), 
+            fc16G(4), 
+            fc8G(5), 
+            fc10G(6), 
+            eth10G(7), 
+            cpri7(8), 
+            cpri6(9), 
+            cpri5(10), 
+            ibqdr(11), 
+            ibddr(12),
+            otu2(13),
+            otu3(14),
+            otu4(15),
+            eth100G(16),
+            eth100GMAC(17),
+            eth1G(18),
+            eth25G(19),
+            fc4G(20),
+            eth40Gsplit(29)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Client Port Protocol, set by profile"
+        ::= { speedMux200gClientPortLaneEntry 10 }
+        
+        speedMux200gClientPortLaneConnectionToLinePort OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notavailable(0), 
+            line1(1), 
+            line2(2),
+            none(255) 
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Client Port Line Mapping, set by profile"
+        ::= { speedMux200gClientPortLaneEntry 11 }
+        
+        speedMux200gClientPortLaneLLCFconfig OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            off(1),
+            on(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Client Port link loss cary forward config"
+        ::= { speedMux200gClientPortLaneEntry 12 }
+        
+        
+ 
+ --********************************************
+ 
+ speedMux200gLinePortTable OBJECT-TYPE
+ SYNTAX SEQUENCE OF SpeedMux200gLinePortEntry
+ MAX-ACCESS not-accessible
+ STATUS current
+ DESCRIPTION
+ "CFP Line ports table"
+ ::= { speedMux200g 5 }
+ 
+ speedMux200gLinePortEntry OBJECT-TYPE
+ SYNTAX SpeedMux200gLinePortEntry
+ MAX-ACCESS not-accessible
+ STATUS current
+ DESCRIPTION
+ "Line ports config Entries"
+ INDEX { speedMux200gLinePortIndex }
+ ::= { speedMux200gLinePortTable 1 }
+ 
+ SpeedMux200gLinePortEntry ::=
+ SEQUENCE
+ {
+     speedMux200gLinePortIndex Integer32,
+     speedMux200gLineSlot Integer32,
+     speedMux200gLinePort Integer32,
+     speedMux200gLinePortDescription DisplayString,
+     speedMux200gLinePortAdminConfig INTEGER,
+     speedMux200gLinePortOperState INTEGER,
+     speedMux200gLinePortLoopConfig INTEGER,
+     speedMux200gLinePortAlarmDeactivation INTEGER,
+     speedMux200gLinePortAlarmSchedule Integer32,
+     speedMux200gLinePortSpeed INTEGER,
+     speedMux200gLineGroup Integer32,
+     speedMux200gLinePortLLCFconfig INTEGER,
+     speedMux200gLinePortXCVtunableConfigSelection INTEGER,
+     speedMux200gLinePortXCVtunChannelConfig DisplayString,
+     speedMux200gLinePortXCVtunWavelengthConfig Integer32,
+     speedMux200gLinePortXCVTxPower Integer32,
+     speedMux200gLinePortXCVConfigDispersion Integer32,
+     speedMux200gLinePortEncryption INTEGER,
+     speedMux200gLinePortModulationConfig INTEGER
+ }
+ 
+ speedMux200gLinePortIndex OBJECT-TYPE
+ SYNTAX Integer32 (1..100)
+ MAX-ACCESS not-accessible
+ STATUS current
+ DESCRIPTION
+ "Port Index"
+ ::= { speedMux200gLinePortEntry 1 }
+ 
+ speedMux200gLineSlot OBJECT-TYPE
+ SYNTAX Integer32
+ MAX-ACCESS read-only
+ STATUS current
+ DESCRIPTION
+ "Slot number"
+ ::= { speedMux200gLinePortEntry 2 }
+ 
+ speedMux200gLinePort OBJECT-TYPE
+ SYNTAX Integer32
+ MAX-ACCESS read-only
+ STATUS current
+ DESCRIPTION
+ "port number"
+ ::= { speedMux200gLinePortEntry 3 }
+ 
+ speedMux200gLinePortDescription OBJECT-TYPE
+ SYNTAX DisplayString (SIZE (0..32))
+ MAX-ACCESS read-write
+ STATUS current
+ DESCRIPTION
+ "Module Line port description."
+ ::= { speedMux200gLinePortEntry 4 }
+ 
+ speedMux200gLinePortAdminConfig OBJECT-TYPE
+ SYNTAX INTEGER
+ {
+     notAvailable(0),
+     adminDown(1),
+     adminUp(2)
+ }
+ MAX-ACCESS read-write
+ STATUS current
+ DESCRIPTION
+ "Module Line Port Configuration. "
+ ::= { speedMux200gLinePortEntry 5 }
+ 
+ speedMux200gLinePortOperState OBJECT-TYPE
+ SYNTAX INTEGER
+ {
+     notAvailable(0),
+     down(1),
+     up(2),
+     loop(3),
+     downLLCF(4),
+     downTxFault(5),
+     downRxLevel(6),
+     downTxLevel(7),
+     bertRunning(8),
+     unknown(255)
+ }
+ MAX-ACCESS read-only
+ STATUS current
+ DESCRIPTION
+ "Module Line Port Operation State"
+ ::= { speedMux200gLinePortEntry 6 }
+ 
+ speedMux200gLinePortLoopConfig OBJECT-TYPE
+ SYNTAX INTEGER
+ {
+     notAvailable(0),
+     off(1),
+     internal(3),
+     external(4)
+ }
+ MAX-ACCESS read-write
+ STATUS current
+ DESCRIPTION
+ "Line Port loop config"
+ ::= { speedMux200gLinePortEntry 7 }
+ 
+ speedMux200gLinePortAlarmDeactivation OBJECT-TYPE
+ SYNTAX INTEGER
+ {
+     notAvailable(0),
+     activateAlarms(1),
+     deactivateBySchedule(2),
+     deactivatePermanently(3)
+ }
+ MAX-ACCESS read-write
+ STATUS current
+ DESCRIPTION
+ "Line Port Alarm Deactivation Configuration"
+ ::= { speedMux200gLinePortEntry 8 }
+ 
+ speedMux200gLinePortAlarmSchedule OBJECT-TYPE
+ SYNTAX Integer32 (1..1200)
+ MAX-ACCESS read-write
+ STATUS current
+ DESCRIPTION
+ "Line Port alarm deactivation schedule. Value in hours. After this time has elapsed, the alarms are active again. Valid range: 1..1200."
+ ::= { speedMux200gLinePortEntry 9 }
+ 
+ speedMux200gLinePortSpeed OBJECT-TYPE
+ SYNTAX INTEGER
+ {
+     notavailable(0), 
+     eth100G(1), 
+     otu4(2),
+     eth2x40G(3)
+ }
+ MAX-ACCESS read-only
+ STATUS current
+ DESCRIPTION
+ "Line Port Protocol, set by profile"
+ ::= { speedMux200gLinePortEntry 10 }
+ 
+ speedMux200gLineGroup OBJECT-TYPE
+ SYNTAX Integer32
+ MAX-ACCESS read-only
+ STATUS current
+ DESCRIPTION
+ "Line Port Group"
+ ::= { speedMux200gLinePortEntry 11 }
+ 
+ 
+ speedMux200gLinePortLLCFconfig OBJECT-TYPE
+ SYNTAX INTEGER
+ {
+     notAvailable(0),
+     off(1),
+     on(2)
+ }
+ MAX-ACCESS read-write
+ STATUS current
+ DESCRIPTION
+ "Line Port link loss cary forward config"
+ ::= { speedMux200gLinePortEntry 12 }
+ 
+
+ 
+ speedMux200gLinePortXCVtunableConfigSelection OBJECT-TYPE
+ SYNTAX INTEGER
+ {
+     notAvailable(0),
+     xcvInternal(1),
+     configFile(2),
+     unknown(255)
+ }
+ MAX-ACCESS read-write
+ STATUS current
+ DESCRIPTION
+ "Port XCV tunable Config Selection either from XCV or Module Config File"
+ ::= { speedMux200gLinePortEntry 13 }
+ 
+ speedMux200gLinePortXCVtunChannelConfig OBJECT-TYPE
+ SYNTAX DisplayString (SIZE (0..4))
+ MAX-ACCESS read-write
+ STATUS current
+ DESCRIPTION
+ "Port XCV tunable Channel Configuration"
+ ::= { speedMux200gLinePortEntry 14 }
+ 
+ speedMux200gLinePortXCVtunWavelengthConfig OBJECT-TYPE
+ SYNTAX Integer32 (1528350..1577100)
+ MAX-ACCESS read-write
+ STATUS current
+ DESCRIPTION
+ "Port XCV tunable Wavelength Configuration [pm]"
+ ::= { speedMux200gLinePortEntry 15 }
+ 
+ speedMux200gLinePortXCVTxPower OBJECT-TYPE
+ SYNTAX Integer32 (-1500..100)
+ MAX-ACCESS read-write
+ STATUS current
+ DESCRIPTION
+ "Port XCV TX output Power Level Config in (value * 100)"
+ ::= { speedMux200gLinePortEntry 16 }
+ 
+ speedMux200gLinePortXCVConfigDispersion OBJECT-TYPE
+ SYNTAX Integer32
+ MAX-ACCESS read-only
+ STATUS current
+ DESCRIPTION
+ "XCV Dispersion Config in (ps)"
+ ::= { speedMux200gLinePortEntry 17}   
+ 
+ speedMux200gLinePortEncryption OBJECT-TYPE
+ SYNTAX INTEGER
+ {
+     notAvailable(0),
+     noLicense(1),                
+     off(2),          
+     running(3),       
+     syncronisation(4),
+     failure(5),  
+     weak(6),
+     bypass(7),
+     unknown(255)
+ }
+ MAX-ACCESS read-only
+ STATUS current
+ DESCRIPTION
+ "State of the line encryption"
+ ::= { speedMux200gLinePortEntry 18 }
+ 
+ speedMux200gLinePortModulationConfig OBJECT-TYPE
+ SYNTAX INTEGER
+ {
+     notAvailable(0),
+     mod8QAM(1),
+     mod16QAM(2),
+     modDPQPSK(3)
+ }
+ MAX-ACCESS read-write
+ STATUS current
+ DESCRIPTION
+ "Line Port Modulation Config"
+ ::= { speedMux200gLinePortEntry 19 }
+ 
+ 
+--******************************************************************* 
+
+		
+ speedMux200gClientPortXCVInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SpeedMux200gClientPortXCVInfoEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"QSFP Client ports XCV Info table"
+        		::= { speedMux200g 6 }
+        
+    speedMux200gClientPortXCVInfoEntry OBJECT-TYPE
+        SYNTAX SpeedMux200gClientPortXCVInfoEntry
+		MAX-ACCESS not-accessible	
+		STATUS current
+		DESCRIPTION
+        "QSFP Client ports XCV Info Entries"
+        INDEX { speedMux200gClientPortXCVInfoIndex }
+        ::= { speedMux200gClientPortXCVInfoTable 1 }
+        
+    SpeedMux200gClientPortXCVInfoEntry ::=
+	SEQUENCE
+	{
+        speedMux200gClientPortXCVInfoIndex Integer32,
+        speedMux200gClientXCVInfoSlot Integer32,
+        speedMux200gClientXCVInfoPort Integer32,
+        speedMux200gClientPortXCVState INTEGER,
+        speedMux200gClientPortXCVVendorName DisplayString,
+        speedMux200gClientPortXCVVendorPartNumber DisplayString,
+        speedMux200gClientPortXCVVendorSerialNumber DisplayString,
+        speedMux200gClientPortXCVType INTEGER,
+        speedMux200gClientPortXCVConnector INTEGER,
+        speedMux200gClientPortXCVLaneCount Integer32,
+        speedMux200gClientPortXCVWavelengthLane1 Integer32,
+        speedMux200gClientPortXCVWavelengthLane2 Integer32,
+        speedMux200gClientPortXCVWavelengthLane3 Integer32,
+        speedMux200gClientPortXCVWavelengthLane4 Integer32,
+        speedMux200gClientPortXCVDMIState INTEGER, 
+        speedMux200gClientPortXCVDMITemp Integer32
+    }
+        
+    speedMux200gClientPortXCVInfoIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..1900)
+		MAX-ACCESS not-accessible
+		STATUS current	
+		DESCRIPTION
+			"Port Index"
+	::= { speedMux200gClientPortXCVInfoEntry 1 }
+        
+    speedMux200gClientXCVInfoSlot OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Slot number"
+		::= { speedMux200gClientPortXCVInfoEntry 2 }
+        
+    speedMux200gClientXCVInfoPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "port number"
+        ::= { speedMux200gClientPortXCVInfoEntry 3 }
+        
+        
+    speedMux200gClientPortXCVState OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            removed(1),
+            installed(2),
+            downTxFault(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "QSFP Transceiver State"
+        ::= { speedMux200gClientPortXCVInfoEntry 4 }
+        
+    speedMux200gClientPortXCVVendorName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..16))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transceiver vendor name"
+        ::= { speedMux200gClientPortXCVInfoEntry 5 }
+        
+    speedMux200gClientPortXCVVendorPartNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..16))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transceiver part number"
+        ::= { speedMux200gClientPortXCVInfoEntry 6 }
+        
+    speedMux200gClientPortXCVVendorSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..16))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transceiver serial number"
+        ::= { speedMux200gClientPortXCVInfoEntry 7 }
+        
+    speedMux200gClientPortXCVType OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            sfp(1),
+            xfp(2),
+            dwdmSfp(3),
+            qsfp(4),
+            qsfpPlus(5),
+            cfp(6),
+            cxp(7),
+            cfp2(8),
+            cfp4(9),
+            qsfp28(10)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transceiver Type"
+        ::= { speedMux200gClientPortXCVInfoEntry 8 }
+        
+    speedMux200gClientPortXCVConnector OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            lc(1),
+            sc(2),
+            mpo(3),
+            rj45(4),
+            fc(5),
+            bnc(6),
+            fj(7),
+            mtRj(8),
+            mu(9),
+            sg(10),
+            op(11),
+            hssdc(12),
+            cp(13),
+            mxc(14)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Connector Type"
+        ::= { speedMux200gClientPortXCVInfoEntry 9 }
+        
+    speedMux200gClientPortXCVLaneCount OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Lane Count"
+        ::= { speedMux200gClientPortXCVInfoEntry 10 }
+        
+    speedMux200gClientPortXCVWavelengthLane1 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Wave Length QSFP Line 1 (nm)"
+        ::= { speedMux200gClientPortXCVInfoEntry 11 }
+        
+    speedMux200gClientPortXCVWavelengthLane2 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Wave Length QSFP Line 2 (nm)"
+        ::= { speedMux200gClientPortXCVInfoEntry 12 }
+                
+    speedMux200gClientPortXCVWavelengthLane3 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Wave Length QSFP Line 3 (nm)"
+        ::= { speedMux200gClientPortXCVInfoEntry 13 }
+                
+    speedMux200gClientPortXCVWavelengthLane4 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Wave Length QSFP Line 4 (nm)"
+        ::= { speedMux200gClientPortXCVInfoEntry 14 }
+        
+    speedMux200gClientPortXCVDMIState OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        notSupported(0),
+        implemented(1)
+    }
+    MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "QSFP DMI support"
+        ::= { speedMux200gClientPortXCVInfoEntry 15 }
+        
+    speedMux200gClientPortXCVDMITemp OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "QSFP DMI Temperature (C)"
+        ::= { speedMux200gClientPortXCVInfoEntry 16 }
+    
+ 
+    
+--******************************************************************* 
+        
+        
+    speedMux200gLinePortXCVInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SpeedMux200gLinePortXCVInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "CFP Client ports XCV Info table"
+        ::= { speedMux200g 7 }
+        
+    speedMux200gLinePortXCVInfoEntry OBJECT-TYPE
+        SYNTAX SpeedMux200gLinePortXCVInfoEntry
+        MAX-ACCESS not-accessible   
+        STATUS current
+        DESCRIPTION
+        "CFP Client ports XCV Info Entries"
+        INDEX { speedMux200gLinePortXCVInfoIndex }
+        ::= { speedMux200gLinePortXCVInfoTable 1 }
+        
+    SpeedMux200gLinePortXCVInfoEntry ::=
+        SEQUENCE
+        {
+            speedMux200gLinePortXCVInfoIndex Integer32,
+            speedMux200gLineXCVInfoSlot Integer32,
+            speedMux200gLineXCVInfoPort Integer32,
+            speedMux200gLinePortXCVState INTEGER,
+            speedMux200gLinePortXCVVendorName DisplayString,
+            speedMux200gLinePortXCVVendorPartNumber DisplayString,
+            speedMux200gLinePortXCVVendorSerialNumber DisplayString,
+            speedMux200gLinePortXCVType INTEGER,
+            speedMux200gLinePortXCVLaneCount Integer32,
+            speedMux200gLinePortXCVDMIState INTEGER,
+            speedMux200gLinePortXCVDWDMChannel DisplayString,
+            speedMux200gLinePortXCVtunFunctionality INTEGER,
+            speedMux200gLinePortXCVtunChannelSpacing Integer32,
+            speedMux200gLinePortXCVtunNumberofChannels Integer32,
+            speedMux200gLinePortXCVtunFirstChannel DisplayString,
+            speedMux200gLinePortXCVtunLastChannel DisplayString,
+            speedMux200gLinePortXCVtunFirstWavelength Integer32,
+            speedMux200gLinePortXCVtunLastWavelength Integer32,
+            speedMux200gLinePortXCVDMITemp Integer32
+        }
+        
+    speedMux200gLinePortXCVInfoIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..1900)
+        MAX-ACCESS not-accessible
+        STATUS current  
+        DESCRIPTION
+        "Port Index"
+        ::= { speedMux200gLinePortXCVInfoEntry 1 }
+        
+    speedMux200gLineXCVInfoSlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Slot number"
+        ::= { speedMux200gLinePortXCVInfoEntry 2 }
+        
+    speedMux200gLineXCVInfoPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "port number"
+        ::= { speedMux200gLinePortXCVInfoEntry 3 }
+        
+        
+    speedMux200gLinePortXCVState OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            removed(1),
+            installed(2),
+            downTxFault(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "CFP Transceiver State"
+        ::= { speedMux200gLinePortXCVInfoEntry 4 }
+        
+    speedMux200gLinePortXCVVendorName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..16))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transceiver vendor name"
+        ::= { speedMux200gLinePortXCVInfoEntry 5 }
+        
+    speedMux200gLinePortXCVVendorPartNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..16))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transceiver part number"
+        ::= { speedMux200gLinePortXCVInfoEntry 6 }
+        
+    speedMux200gLinePortXCVVendorSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..16))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transceiver serial number"
+        ::= { speedMux200gLinePortXCVInfoEntry 7 }
+        
+    speedMux200gLinePortXCVType OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            sfp(1),
+            xfp(2),
+            dwdmSfp(3),
+            qsfp(4),
+            qsfpPlus(5),
+            cfp(6),
+            cxp(7),
+            cfp2(8),
+            cfp4(9),
+            qsfp28(10)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transceiver Type"
+        ::= { speedMux200gLinePortXCVInfoEntry 8 }
+                
+    speedMux200gLinePortXCVLaneCount OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Lane Count"
+        ::= { speedMux200gLinePortXCVInfoEntry 9 }
+        
+    speedMux200gLinePortXCVDMIState OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notSupported(0),
+            implemented(1)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transceiver DMI support"
+        ::= { speedMux200gLinePortXCVInfoEntry 10 }
+        
+    speedMux200gLinePortXCVDWDMChannel OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..4))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "DWDM Channel (Cxx or Hxx) xx in range of <01 .. 61> but Transceiver dependent"
+        ::= { speedMux200gLinePortXCVInfoEntry 11 }
+        
+    speedMux200gLinePortXCVtunFunctionality OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notSupported(0),
+            implemented(1)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transceiver tunable functionality"
+        ::= { speedMux200gLinePortXCVInfoEntry 12 }
+        
+    speedMux200gLinePortXCVtunChannelSpacing OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transceiver channel spacing (GHz)"
+        ::= { speedMux200gLinePortXCVInfoEntry 13 }
+        
+    speedMux200gLinePortXCVtunNumberofChannels OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transceiver supported number channels"
+        ::= { speedMux200gLinePortXCVInfoEntry 14 }
+        
+    speedMux200gLinePortXCVtunFirstChannel OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..4))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Tunable first channel"
+        ::= { speedMux200gLinePortXCVInfoEntry 15 }
+        
+    speedMux200gLinePortXCVtunLastChannel OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..4))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Tunable last channel"
+        ::= { speedMux200gLinePortXCVInfoEntry 16 }
+        
+    speedMux200gLinePortXCVtunFirstWavelength OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Tunable first wavelength"
+        ::= { speedMux200gLinePortXCVInfoEntry 17 }
+        
+    speedMux200gLinePortXCVtunLastWavelength OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Tunable last wavelength"
+        ::= { speedMux200gLinePortXCVInfoEntry 18 }
+        
+    speedMux200gLinePortXCVDMITemp OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "CFP DMI Temperature Alarm"
+        ::= { speedMux200gLinePortXCVInfoEntry 19 }
+        
+        
+-- *********************************
+        
+    speedMux200gClientPortXCVThresholdTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SpeedMux200gClientPortXCVThresholdEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Speed-Mux 200g Transceiver DMI threshold table"
+        ::= { speedMux200g 8 }
+        
+    speedMux200gClientPortXCVThresholdEntry OBJECT-TYPE
+        SYNTAX SpeedMux200gClientPortXCVThresholdEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Transceiver DMI threshold entries"
+        INDEX { speedMux200gClientPortXCVDMIIndex }
+        ::= { speedMux200gClientPortXCVThresholdTable 1 }
+        
+    SpeedMux200gClientPortXCVThresholdEntry ::=
+        SEQUENCE
+        {
+            speedMux200gClientPortXCVDMIIndex Integer32,
+            speedMux200gClientPortXCVDMISlot Integer32,
+            speedMux200gClientPortXCVDMIPort Integer32,
+            speedMux200gClientPortXCVDMIRxLowWarningThreshold Integer32,
+            speedMux200gClientPortXCVDMIRxLowAlarmThreshold Integer32,
+            speedMux200gClientPortXCVDMIRxHighWarningThreshold Integer32,
+            speedMux200gClientPortXCVDMIRxHighAlarmThreshold Integer32,
+            speedMux200gClientPortXCVDMITxLowWarningThreshold Integer32,
+            speedMux200gClientPortXCVDMITxLowAlarmThreshold Integer32,
+            speedMux200gClientPortXCVDMIBiasLowAlarmThreshold Integer32,
+            speedMux200gClientPortXCVDMIBiasHighAlarmThreshold Integer32,
+            speedMux200gClientPortXCVDMITempWarningThreshold Integer32,
+            speedMux200gClientPortXCVDMITempAlarmThreshold Integer32
+        }
+        
+    speedMux200gClientPortXCVDMIIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..1900)
+        MAX-ACCESS not-accessible
+        STATUS current  
+        DESCRIPTION
+        "Port Index"
+        ::= { speedMux200gClientPortXCVThresholdEntry 1 }
+        
+    speedMux200gClientPortXCVDMISlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Slot number"
+        ::= { speedMux200gClientPortXCVThresholdEntry 2 }
+        
+    speedMux200gClientPortXCVDMIPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "port number"
+        ::= { speedMux200gClientPortXCVThresholdEntry 3 }
+        
+    speedMux200gClientPortXCVDMIRxLowWarningThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical DMI Rx Low Warning Threshold"
+        ::= { speedMux200gClientPortXCVThresholdEntry 4 }
+        
+    speedMux200gClientPortXCVDMIRxLowAlarmThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical DMI Rx Low Alarm Threshold"
+        ::= { speedMux200gClientPortXCVThresholdEntry 5 }
+        
+    speedMux200gClientPortXCVDMIRxHighWarningThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical DMI Rx High Warning Threshold"
+        ::= { speedMux200gClientPortXCVThresholdEntry 6 }
+        
+    speedMux200gClientPortXCVDMIRxHighAlarmThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical DMI Rx High Alarm Threshold"
+        ::= { speedMux200gClientPortXCVThresholdEntry 7 }
+        
+    speedMux200gClientPortXCVDMITxLowWarningThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical DMI Tx Low Warning Threshold"
+        ::= { speedMux200gClientPortXCVThresholdEntry 8 }
+        
+    speedMux200gClientPortXCVDMITxLowAlarmThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical DMI Tx Low Alarm Threshold"
+        ::= { speedMux200gClientPortXCVThresholdEntry 9 }
+        
+    speedMux200gClientPortXCVDMIBiasLowAlarmThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Tx DMI Bias Low Alarm Threshold [100 * mA]"
+        ::= { speedMux200gClientPortXCVThresholdEntry 10 }
+        
+    speedMux200gClientPortXCVDMIBiasHighAlarmThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Tx DMI Bias High Alarm Threshold [100 * mA]"
+        ::= { speedMux200gClientPortXCVThresholdEntry 11 }
+        
+    speedMux200gClientPortXCVDMITempWarningThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transceiver DMI Temp Warning Threshold"
+        ::= { speedMux200gClientPortXCVThresholdEntry 12 }
+        
+    speedMux200gClientPortXCVDMITempAlarmThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transcevier DMI Temp Alarm Threshold"
+        ::= { speedMux200gClientPortXCVThresholdEntry 13 }
+        
+        
+-- *********************************
+        
+    speedMux200gLinePortXCVThresholdTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SpeedMux200gLinePortXCVThresholdEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Speed-Mux 200g Transceiver DMI threshold table"
+        ::= { speedMux200g 9 }
+        
+    speedMux200gLinePortXCVThresholdEntry OBJECT-TYPE
+        SYNTAX SpeedMux200gLinePortXCVThresholdEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Transceiver DMI threshold entries"
+        INDEX { speedMux200gLinePortXCVDMIIndex }
+        ::= { speedMux200gLinePortXCVThresholdTable 1 }
+        
+    SpeedMux200gLinePortXCVThresholdEntry ::=
+        SEQUENCE
+        {
+            speedMux200gLinePortXCVDMIIndex Integer32,
+            speedMux200gLinePortXCVDMISlot Integer32,
+            speedMux200gLinePortXCVDMIPort Integer32,
+            speedMux200gLinePortXCVDMIRxLowWarningThreshold Integer32,
+            speedMux200gLinePortXCVDMIRxLowAlarmThreshold Integer32,
+            speedMux200gLinePortXCVDMIRxHighWarningThreshold Integer32,
+            speedMux200gLinePortXCVDMIRxHighAlarmThreshold Integer32,
+            speedMux200gLinePortXCVDMITxLowWarningThreshold Integer32,
+            speedMux200gLinePortXCVDMITxLowAlarmThreshold Integer32,
+            speedMux200gLinePortXCVDMIBiasLowAlarmThreshold Integer32,
+            speedMux200gLinePortXCVDMIBiasHighAlarmThreshold Integer32,
+            speedMux200gLinePortXCVDMITempWarningThreshold Integer32,
+            speedMux200gLinePortXCVDMITempAlarmThreshold Integer32
+        }
+        
+    speedMux200gLinePortXCVDMIIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..1900)
+        MAX-ACCESS not-accessible
+        STATUS current  
+        DESCRIPTION
+        "Port Index"
+        ::= { speedMux200gLinePortXCVThresholdEntry 1 }
+        
+    speedMux200gLinePortXCVDMISlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Slot number"
+        ::= { speedMux200gLinePortXCVThresholdEntry 2 }
+        
+    speedMux200gLinePortXCVDMIPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "port number"
+        ::= { speedMux200gLinePortXCVThresholdEntry 3 }
+        
+        
+    speedMux200gLinePortXCVDMIRxLowWarningThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical DMI Rx Low Warning Threshold"
+        ::= { speedMux200gLinePortXCVThresholdEntry 4 }
+        
+    speedMux200gLinePortXCVDMIRxLowAlarmThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical DMI Rx Low Alarm Threshold"
+        ::= { speedMux200gLinePortXCVThresholdEntry 5 }
+        
+    speedMux200gLinePortXCVDMIRxHighWarningThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical DMI Rx High Warning Threshold"
+        ::= { speedMux200gLinePortXCVThresholdEntry 6 }
+        
+    speedMux200gLinePortXCVDMIRxHighAlarmThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical DMI Rx High Alarm Threshold"
+        ::= { speedMux200gLinePortXCVThresholdEntry 7 }
+        
+    speedMux200gLinePortXCVDMITxLowWarningThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical DMI Tx Low Warning Threshold"
+        ::= { speedMux200gLinePortXCVThresholdEntry 8 }
+        
+    speedMux200gLinePortXCVDMITxLowAlarmThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical DMI Tx Low Alarm Threshold"
+        ::= { speedMux200gLinePortXCVThresholdEntry 9 }
+        
+    speedMux200gLinePortXCVDMIBiasLowAlarmThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Tx DMI Bias Low Alarm Threshold"
+        ::= { speedMux200gLinePortXCVThresholdEntry 10 }
+        
+    speedMux200gLinePortXCVDMIBiasHighAlarmThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Tx DMI Bias High Alarm Threshold"
+        ::= { speedMux200gLinePortXCVThresholdEntry 11 }
+        
+    speedMux200gLinePortXCVDMITempWarningThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transceiver DMI Temp Warning Threshold"
+        ::= { speedMux200gLinePortXCVThresholdEntry 12 }
+        
+    speedMux200gLinePortXCVDMITempAlarmThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transcevier DMI Temp Alarm Threshold"
+        ::= { speedMux200gLinePortXCVThresholdEntry 13 }
+        
+-- *********************************
+        
+    speedMux200gClientPortXCVValueTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SpeedMux200gClientPortXCVValueEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Speed-Mux 200g transceiver DMI meassurement table"
+        ::= { speedMux200g 10 }
+        
+    speedMux200gClientPortXCVValueEntry OBJECT-TYPE
+        SYNTAX SpeedMux200gClientPortXCVValueEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Module transceiver DMI meassurement entries"
+        INDEX { speedMux200gClientPortXCVDMIMIndex }
+        ::= { speedMux200gClientPortXCVValueTable 1 }
+        
+    SpeedMux200gClientPortXCVValueEntry ::=
+        SEQUENCE
+        {
+            speedMux200gClientPortXCVDMIMIndex Integer32,
+            speedMux200gClientPortXCVDMIMSlot Integer32,
+            speedMux200gClientPortXCVDMIMPort Integer32,
+            speedMux200gClientPortXCVDMIRxLevelLane1 Integer32,
+            speedMux200gClientPortXCVDMIRxLevelLane2 Integer32,
+            speedMux200gClientPortXCVDMIRxLevelLane3 Integer32,
+            speedMux200gClientPortXCVDMIRxLevelLane4 Integer32,
+            speedMux200gClientPortXCVDMITxLevelLane1 Integer32,
+            speedMux200gClientPortXCVDMITxLevelLane2 Integer32,
+            speedMux200gClientPortXCVDMITxLevelLane3 Integer32,
+            speedMux200gClientPortXCVDMITxLevelLane4 Integer32,
+            speedMux200gClientPortXCVDMITxBiasLane1 Integer32,
+            speedMux200gClientPortXCVDMITxBiasLane2 Integer32,
+            speedMux200gClientPortXCVDMITxBiasLane3 Integer32,
+            speedMux200gClientPortXCVDMITxBiasLane4 Integer32
+            
+        }
+        
+    speedMux200gClientPortXCVDMIMIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..1900)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Port Index"
+        ::= { speedMux200gClientPortXCVValueEntry 1 }
+        
+    speedMux200gClientPortXCVDMIMSlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Slot number"
+        ::= { speedMux200gClientPortXCVValueEntry 2 }
+        
+    speedMux200gClientPortXCVDMIMPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Port number"
+        ::= { speedMux200gClientPortXCVValueEntry 3 }
+
+        
+    speedMux200gClientPortXCVDMIRxLevelLane1 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical receive level Lane 1 (dBm value * 100)"
+        ::= { speedMux200gClientPortXCVValueEntry 4 }
+        
+    speedMux200gClientPortXCVDMIRxLevelLane2 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical receive level Lane 2 (dBm value * 100)"
+        ::= { speedMux200gClientPortXCVValueEntry 5 }
+        
+    speedMux200gClientPortXCVDMIRxLevelLane3 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical receive level Lane 3 (dBm value * 100)"
+        ::= { speedMux200gClientPortXCVValueEntry 6 }
+        
+    speedMux200gClientPortXCVDMIRxLevelLane4 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical receive level Lane 4 (dBm value * 100)"
+        ::= { speedMux200gClientPortXCVValueEntry 7 }
+        
+    speedMux200gClientPortXCVDMITxLevelLane1 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical transmit level Lane 1 (dBm value * 100)"
+        ::= { speedMux200gClientPortXCVValueEntry 8 }
+        
+    speedMux200gClientPortXCVDMITxLevelLane2 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical transmit level Lane 2 (dBm value * 100)"
+        ::= { speedMux200gClientPortXCVValueEntry 9 }
+        
+    speedMux200gClientPortXCVDMITxLevelLane3 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical transmit level Lane 3 (dBm value * 100)"
+        ::= { speedMux200gClientPortXCVValueEntry 10 }
+        
+    speedMux200gClientPortXCVDMITxLevelLane4 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical transmit level Lane 4 (dBm value * 100)"
+        ::= { speedMux200gClientPortXCVValueEntry 11 }
+        
+    speedMux200gClientPortXCVDMITxBiasLane1 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transmitter TX bias current Lane 1 (mA * 100)"
+        ::= { speedMux200gClientPortXCVValueEntry 12 }
+        
+    speedMux200gClientPortXCVDMITxBiasLane2 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transmitter TX bias current Lane 2 (mA * 100)"
+        ::= { speedMux200gClientPortXCVValueEntry 13 }
+        
+    speedMux200gClientPortXCVDMITxBiasLane3 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transmitter TX bias current Lane 3 (mA * 100)"
+        ::= { speedMux200gClientPortXCVValueEntry 14 }
+        
+    speedMux200gClientPortXCVDMITxBiasLane4 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transmitter TX bias current Lane 4 (mA * 100)"
+        ::= { speedMux200gClientPortXCVValueEntry 15 }
+        
+-- *********************************
+        
+    speedMux200gLinePortXCVValueTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SpeedMux200gLinePortXCVValueEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Speed-Mux 200g transceiver DMI meassurement table"
+        ::= { speedMux200g 11 }
+        
+    speedMux200gLinePortXCVValueEntry OBJECT-TYPE
+        SYNTAX SpeedMux200gLinePortXCVValueEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Module transceiver DMI meassurement entries"
+        INDEX { speedMux200gLinePortXCVDMIMIndex }
+        ::= { speedMux200gLinePortXCVValueTable 1 }
+        
+    SpeedMux200gLinePortXCVValueEntry ::=
+        SEQUENCE
+        {
+            speedMux200gLinePortXCVDMIMIndex Integer32,
+            speedMux200gLinePortXCVDMIMSlot Integer32,
+            speedMux200gLinePortXCVDMIMPort Integer32,
+            speedMux200gLinePortXCVDMITempLevel Integer32,
+            speedMux200gLinePortXCVDMIRxLevel Integer32,
+            speedMux200gLinePortXCVDMITxLevel Integer32,
+            speedMux200gLinePortXCVDMITxBias Integer32,
+            speedMux200gLinePortXCVDMIDispersion Integer32,
+            speedMux200gLinePortOTNFECcorrectedBits Counter64,
+            speedMux200gLinePortOTNFECuncorrectedBlocks Counter64
+        }
+        
+    speedMux200gLinePortXCVDMIMIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..1900)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Port Index"
+        ::= { speedMux200gLinePortXCVValueEntry 1 }
+        
+    speedMux200gLinePortXCVDMIMSlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Slot number"
+        ::= { speedMux200gLinePortXCVValueEntry 2 }
+        
+    speedMux200gLinePortXCVDMIMPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Port number"
+        ::= { speedMux200gLinePortXCVValueEntry 3 }
+
+        
+    speedMux200gLinePortXCVDMITempLevel OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transceiver Temperature [C]"
+        ::= { speedMux200gLinePortXCVValueEntry 4 }
+        
+    speedMux200gLinePortXCVDMIRxLevel OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "dBm"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical receive level (dBm value * 100)"
+        ::= { speedMux200gLinePortXCVValueEntry 5 }
+        
+        
+    speedMux200gLinePortXCVDMITxLevel OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical transmit level (dBm value * 100)"
+        ::= { speedMux200gLinePortXCVValueEntry 6 }
+        
+    speedMux200gLinePortXCVDMITxBias OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transmitter TX bias current (mA * 100)"
+        ::= { speedMux200gLinePortXCVValueEntry 7 }
+        
+        
+    speedMux200gLinePortXCVDMIDispersion OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "XCV Dispersion Value (ps)"
+        ::= { speedMux200gLinePortXCVValueEntry 8 }     
+
+    speedMux200gLinePortOTNFECcorrectedBits OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "OTN Statistic FEC Corrected Bits"
+        ::= { speedMux200gLinePortXCVValueEntry 9 }     
+
+    speedMux200gLinePortOTNFECuncorrectedBlocks OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "OTN Statistic FEC Uncorrected Blocks"
+        ::= { speedMux200gLinePortXCVValueEntry 10 }     
+
+
+-- *********************************
+        
+    speedMux200gClientPortXCVAlarmTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SpeedMux200gClientPortXCVAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Speed-Mux 200g transceiver DMI Alarm table"
+        ::= { speedMux200g 12 }
+        
+    speedMux200gClientPortXCVAlarmEntry OBJECT-TYPE
+        SYNTAX SpeedMux200gClientPortXCVAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Module transceiver DMI alarm entries"
+        INDEX { speedMux200gClientPortXCVDAlarmIndex }
+        ::= { speedMux200gClientPortXCVAlarmTable 1 }
+        
+    SpeedMux200gClientPortXCVAlarmEntry ::=
+        SEQUENCE
+        {
+            speedMux200gClientPortXCVDAlarmIndex Integer32,
+            speedMux200gClientPortXCVAlarmSlot Integer32,
+            speedMux200gClientPortXCVAlarmPort Integer32,
+            speedMux200gClientPortXCVRxAlarmLane1 INTEGER,
+            speedMux200gClientPortXCVRxAlarmLane2 INTEGER,
+            speedMux200gClientPortXCVRxAlarmLane3 INTEGER,
+            speedMux200gClientPortXCVRxAlarmLane4 INTEGER,
+            speedMux200gClientPortXCVTxAlarmLane1 INTEGER,
+            speedMux200gClientPortXCVTxAlarmLane2 INTEGER,
+            speedMux200gClientPortXCVTxAlarmLane3 INTEGER,
+            speedMux200gClientPortXCVTxAlarmLane4 INTEGER,
+            speedMux200gClientPortXCVTxBiasAlarmLane1 INTEGER,
+            speedMux200gClientPortXCVTxBiasAlarmLane2 INTEGER,
+            speedMux200gClientPortXCVTxBiasAlarmLane3 INTEGER,
+            speedMux200gClientPortXCVTxBiasAlarmLane4 INTEGER,
+            speedMux200gClientPortXCVCDRAlarmLane1 INTEGER,
+            speedMux200gClientPortXCVCDRAlarmLane2 INTEGER,
+            speedMux200gClientPortXCVCDRAlarmLane3 INTEGER,
+            speedMux200gClientPortXCVCDRAlarmLane4 INTEGER,
+            speedMux200gClientPortXCVVCCAlarm INTEGER,
+            speedMux200gClientPortXCVTempAlarm INTEGER
+            
+        }
+        
+    speedMux200gClientPortXCVDAlarmIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..1900)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Port Index"
+        ::= { speedMux200gClientPortXCVAlarmEntry 1 }
+        
+    speedMux200gClientPortXCVAlarmSlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Slot number"
+        ::= { speedMux200gClientPortXCVAlarmEntry 2 }
+        
+    speedMux200gClientPortXCVAlarmPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Port number"
+        ::= { speedMux200gClientPortXCVAlarmEntry 3 }
+
+        
+    speedMux200gClientPortXCVRxAlarmLane1 OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            lowWarning(4),
+            lowAlarm(5),
+            highWarning(6),
+            highAlarm(7),
+            unknownAlarm(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical receive alarm lane 1"
+        ::= { speedMux200gClientPortXCVAlarmEntry 4 }
+        
+    speedMux200gClientPortXCVRxAlarmLane2 OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            lowWarning(4),
+            lowAlarm(5),
+            highWarning(6),
+            highAlarm(7),
+            unknownAlarm(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical receive alarm lane 2"
+        ::= { speedMux200gClientPortXCVAlarmEntry 5 }
+        
+    speedMux200gClientPortXCVRxAlarmLane3 OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            lowWarning(4),
+            lowAlarm(5),
+            highWarning(6),
+            highAlarm(7),
+            unknownAlarm(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical receive alarm lane 3"
+        ::= { speedMux200gClientPortXCVAlarmEntry 6 }
+        
+    speedMux200gClientPortXCVRxAlarmLane4 OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            lowWarning(4),
+            lowAlarm(5),
+            highWarning(6),
+            highAlarm(7),
+            unknownAlarm(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical receive alarm lane 4"
+        ::= { speedMux200gClientPortXCVAlarmEntry 7 }
+        
+    speedMux200gClientPortXCVTxAlarmLane1 OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeAlarm(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical transmit alarm lane 1  "
+        ::= { speedMux200gClientPortXCVAlarmEntry 8 }
+        
+    speedMux200gClientPortXCVTxAlarmLane2 OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeAlarm(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical transmit alarm lane 2  "
+        ::= { speedMux200gClientPortXCVAlarmEntry 9 }
+        
+    speedMux200gClientPortXCVTxAlarmLane3 OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeAlarm(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical transmit alarm lane 3  "
+        ::= { speedMux200gClientPortXCVAlarmEntry 10 }
+        
+    speedMux200gClientPortXCVTxAlarmLane4 OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeAlarm(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical transmit alarm lane 4  "
+        ::= { speedMux200gClientPortXCVAlarmEntry 11 }
+        
+    speedMux200gClientPortXCVTxBiasAlarmLane1 OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeAlarm(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transmitter TX bias alarm lane 1"
+        ::= { speedMux200gClientPortXCVAlarmEntry 12 }
+        
+    speedMux200gClientPortXCVTxBiasAlarmLane2 OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeAlarm(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transmitter TX bias alarm lane 2"
+        ::= { speedMux200gClientPortXCVAlarmEntry 13 }
+        
+    speedMux200gClientPortXCVTxBiasAlarmLane3 OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeAlarm(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transmitter TX bias alarm lane 3"
+        ::= { speedMux200gClientPortXCVAlarmEntry 14 }
+        
+    speedMux200gClientPortXCVTxBiasAlarmLane4 OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeAlarm(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transmitter TX bias alarm lane 4"
+        ::= { speedMux200gClientPortXCVAlarmEntry 15 }
+        
+        
+    speedMux200gClientPortXCVCDRAlarmLane1 OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeAlarm(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "clock data recovery alarm lane 1"
+        ::= { speedMux200gClientPortXCVAlarmEntry 16 }
+        
+    speedMux200gClientPortXCVCDRAlarmLane2 OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeAlarm(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "clock data recovery alarm lane 2"
+        ::= { speedMux200gClientPortXCVAlarmEntry 17 }
+        
+    speedMux200gClientPortXCVCDRAlarmLane3 OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeAlarm(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "clock data recovery alarm lane 3"
+        ::= { speedMux200gClientPortXCVAlarmEntry 18 }
+        
+    speedMux200gClientPortXCVCDRAlarmLane4 OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeAlarm(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "clock data recovery alarm lane 4"
+        ::= { speedMux200gClientPortXCVAlarmEntry 19 }
+        
+    speedMux200gClientPortXCVVCCAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeWarning(2),
+            activeAlarm(3),
+            unknownAlarm(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transmitter voltage common collector alarm"
+        ::= { speedMux200gClientPortXCVAlarmEntry 20 }
+        
+    speedMux200gClientPortXCVTempAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            highWarning(6),
+            highAlarm(7),
+            unknownAlarm(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Transmitter temperature alarm"
+        ::= { speedMux200gClientPortXCVAlarmEntry 21 }
+        
+
+        
+-- *********************************
+        
+    speedMux200gLinePortAlarmTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SpeedMux200gLinePortAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Speed-Mux 200g CFP DMI alarm table"
+        ::= { speedMux200g 13 }
+        
+        speedMux200gLinePortAlarmEntry OBJECT-TYPE
+        SYNTAX SpeedMux200gLinePortAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Module CFP DMI alarm entries"
+        INDEX { speedMux200gLinePortAlarmIndex }
+        ::= { speedMux200gLinePortAlarmTable 1 }
+        
+    SpeedMux200gLinePortAlarmEntry ::=
+        SEQUENCE
+        {
+            speedMux200gLinePortAlarmIndex Integer32,
+            speedMux200gLinePortAlarmSlot Integer32,
+            speedMux200gLinePortAlarmPort Integer32,
+            speedMux200gLinePortXCVRxAlarm INTEGER,
+            speedMux200gLinePortXCVTxAlarm INTEGER,
+            speedMux200gLinePortXCVTxBiasAlarm INTEGER,
+            speedMux200gLinePortXCVTempAlarm INTEGER,
+            speedMux200gLinePortEncryptionAlarm INTEGER
+        }
+        
+    speedMux200gLinePortAlarmIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..1900)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Port Index"
+        ::= { speedMux200gLinePortAlarmEntry 1 }
+        
+    speedMux200gLinePortAlarmSlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Slot number"
+        ::= { speedMux200gLinePortAlarmEntry 2 }
+        
+    speedMux200gLinePortAlarmPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Port number"
+        ::= { speedMux200gLinePortAlarmEntry 3 }
+        
+        
+    speedMux200gLinePortXCVRxAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            lowWarning(4),
+            lowAlarm(5),
+            highWarning(6),
+            highAlarm(7),
+            unknownAlarm(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical receive alarm"
+        ::= { speedMux200gLinePortAlarmEntry 4 }
+        
+        
+    speedMux200gLinePortXCVTxAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeAlarm(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "optical transmit alarm"
+        ::= { speedMux200gLinePortAlarmEntry 5 }
+        
+    speedMux200gLinePortXCVTxBiasAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeAlarm(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "CFP TX bias alarm"
+        ::= { speedMux200gLinePortAlarmEntry 6 }
+        
+    speedMux200gLinePortXCVTempAlarm OBJECT-TYPE
+         SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            highWarning(6),
+            highAlarm(7),
+            unknownAlarm(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "CFP Temperature alarm"
+        ::= { speedMux200gLinePortAlarmEntry 7 }
+        
+    speedMux200gLinePortEncryptionAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeWarning(2),
+            activeAlarm(3),
+            unknownAlarm(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Line encryption alarm"
+        ::= { speedMux200gLinePortAlarmEntry 8 }   
+        
+-- *********************************
+        
+    speedMux200gProfileTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SpeedMux200gProfileEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Speed-Mux 200g Profile table"
+        ::= { speedMux200g 14 }
+        
+        speedMux200gProfileEntry OBJECT-TYPE
+        SYNTAX SpeedMux200gProfileEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Speed-Mux 200g Profile entries"
+        INDEX { speedMux200gProfileIndex }
+        ::= { speedMux200gProfileTable 1 }
+        
+    SpeedMux200gProfileEntry ::=
+        SEQUENCE
+        {
+            speedMux200gProfileIndex Integer32,
+            speedMux200gProfileSlot Integer32,
+            speedMux200gProfileNumber Integer32,
+            speedMux200gProfileIsEditable INTEGER,
+            speedMux200gProfileDescription DisplayString,
+            speedMux200gProfilePort INTEGER,
+            speedMux200gProfilePortMapToLine INTEGER,
+            speedMux200gProfilePortProtocol INTEGER,
+            speedMux200gProfileProtecionConfig INTEGER
+       }
+        
+    speedMux200gProfileIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..1962024)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Profile Index"
+        ::= { speedMux200gProfileEntry 1 }
+        
+    speedMux200gProfileSlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Slot number"
+        ::= { speedMux200gProfileEntry 2 }
+        
+    speedMux200gProfileNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Profile number"
+        ::= { speedMux200gProfileEntry 3 }
+        
+        
+    speedMux200gProfileIsEditable OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            true(1),
+            false(2),
+            unknown(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "editable or read only profile"
+        ::= { speedMux200gProfileEntry 4 }
+        
+    speedMux200gProfileDescription OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Profile Description"
+        ::= { speedMux200gProfileEntry 5 }
+        
+        
+    speedMux200gProfilePort OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            none(0),
+            line1(1),
+            line2(2),
+            qsfp11(21),
+            qsfp12(22),
+            qsfp13(23),
+            qsfp14(24),
+            qsfp21(25),
+            qsfp22(26),
+            qsfp23(27),
+            qsfp24(28),
+            qsfp31(29),
+            qsfp32(30),
+            qsfp33(31),
+            qsfp34(32),
+            qsfp41(33),
+            qsfp42(34),
+            qsfp43(35),
+            qsfp44(36),
+            qsfp51(37),
+            qsfp52(38),
+            qsfp53(39),
+            qsfp54(40),
+            qsfp61(41),
+            qsfp62(42),
+            qsfp63(43),
+            qsfp64(44)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Line or Client Port"
+        ::= { speedMux200gProfileEntry 7 }
+        
+    speedMux200gProfilePortMapToLine OBJECT-TYPE
+         SYNTAX INTEGER
+        {
+            nonapplicable(0),
+            toLine1(1),
+            toLine2(2),
+            none(254),
+            unknown(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Map QSFP Port to Line number"
+        ::= { speedMux200gProfileEntry 8 }
+        
+    speedMux200gProfilePortProtocol OBJECT-TYPE
+         SYNTAX INTEGER
+        {
+            nonapplicable(0), 
+            bundled(1),
+            eth40G(2), 
+            fc32G(3), 
+            fc16G(4), 
+            fc8G(5), 
+            fc10G(6), 
+            eth10G(7), 
+            cpri7(8), 
+            cpri6(9), 
+            cpri5(10), 
+            ibqdr(11), 
+            ibddr(12),
+            otu2(13),
+            otu3(14),
+            otu4(15),
+            eth100GCBR(16),
+            eth100GMAC(17),
+            eth1G(18)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "QSFP Port Protocol"
+        ::= { speedMux200gProfileEntry 9 }         
+
+    speedMux200gProfileProtecionConfig OBJECT-TYPE
+         SYNTAX INTEGER
+        {
+            nonapplicable(0), 
+            disabled(1),
+            enabled(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Line Protection"
+        ::= { speedMux200gProfileEntry 10 }      
+        
+        
+        
+        
+        
+-- *********************************
+
+    speedMux200gMLineProtectionTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SpeedMux200gMLineProtectionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Speed-Mux 200G module line protection table"
+        ::= { speedMux200g 15 }
+
+    speedMux200gMLineProtectionEntry OBJECT-TYPE
+        SYNTAX SpeedMux200gMLineProtectionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Module protection entries"
+        INDEX { speedMux200gMProtectionIndex }
+        ::= { speedMux200gMLineProtectionTable 1 }
+
+        SpeedMux200gMLineProtectionEntry ::=
+        SEQUENCE
+        {
+            speedMux200gMProtectionIndex Integer32,
+            speedMux200gMProtectionSlot Integer32,
+            speedMux200gMProtectionMode INTEGER,
+            speedMux200gMProtectionFallbackConfig Integer32,
+            speedMux200gMProtectionStatus INTEGER,
+            speedMux200gMProtectionMainPath INTEGER,
+            speedMux200gMProtectionBackupPath INTEGER,
+            speedMux200gMProtectionFallbackTime Integer32
+        }
+
+    speedMux200gMProtectionIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..100)
+                MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Protection Table Index"
+        ::= { speedMux200gMLineProtectionEntry 1 }
+        
+    speedMux200gMProtectionSlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Slot number"
+        ::= { speedMux200gMLineProtectionEntry 2 }
+        
+    speedMux200gMProtectionMode OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notavailable(0),
+            fallbackLine1(1),
+            fallbackLine2(2),
+            staticLine1(3),
+            staticLine2(4)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Line protection mode"
+        ::= { speedMux200gMLineProtectionEntry 3 }
+
+    speedMux200gMProtectionFallbackConfig OBJECT-TYPE
+        SYNTAX Integer32 (5..3600)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Fallback time, valid from 5 to 3600 seconds."
+        ::= { speedMux200gMLineProtectionEntry 4 }
+
+    speedMux200gMProtectionStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notavailable(0),
+            init(1),
+            synchronizing(2),
+            line1Active(3),
+            line2Active(4),
+            off(5)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Line protection status"
+        ::= { speedMux200gMLineProtectionEntry 5 }
+
+    speedMux200gMProtectionMainPath OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notavailable(0),
+            line1(1),
+            line2(2),
+            init(3),
+            fallback(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Line protection main path"
+        ::= { speedMux200gMLineProtectionEntry 6 }
+
+    speedMux200gMProtectionBackupPath OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notavailable(0),
+            line1(1),
+            line2(2),
+            init(3),
+            fallback(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Line protection Backup path"
+        ::= { speedMux200gMLineProtectionEntry 7 }
+        
+    speedMux200gMProtectionFallbackTime OBJECT-TYPE
+        SYNTAX Integer32 (0..3600)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "current fallback time in seconds, value 3600 means off"
+        ::= { speedMux200gMLineProtectionEntry 8 }
+--********************************************
+
+END

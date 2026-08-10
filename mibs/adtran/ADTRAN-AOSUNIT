@@ -1,7 +1,7 @@
        ADTRAN-AOSUNIT DEFINITIONS ::= BEGIN
 
        IMPORTS
-           Integer32, Gauge32, OBJECT-TYPE, MODULE-IDENTITY
+           Integer32, Gauge32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
                FROM SNMPv2-SMI
            DisplayString, RowStatus, TDomain, TAddress, TEXTUAL-CONVENTION
                FROM SNMPv2-TC
@@ -13,7 +13,7 @@
                FROM ADTRAN-AOS;
 
        adGenAOSUnitMib MODULE-IDENTITY
-        LAST-UPDATED "200409240000Z"  -- September 24, 2004
+        LAST-UPDATED "201710240000Z"  -- October 24, 2017
 	ORGANIZATION "ADTRAN, Inc."
         CONTACT-INFO
                "Technical Support Dept.
@@ -29,6 +29,9 @@
                     	"This MIB contains device information, contact information, and
 			overall system health information."
 
+            REVISION    "201710240000Z"  -- October 24, 2017
+            DESCRIPTION
+                    "Added OID's for user login/logout traps. "
             REVISION    "200409280000Z"  -- September 28, 2004
             DESCRIPTION
                     "Initial version of this MIB module."
@@ -68,8 +71,8 @@
          SYNTAX  OCTET STRING (SIZE (0..255))
 
 -- ========================================================================
-
-	adAOSBootRevision  OBJECT-TYPE
+	
+        adAOSBootRevision  OBJECT-TYPE
            SYNTAX      DisplayString (SIZE(3..255))
 	   MAX-ACCESS  read-only
 	   STATUS      current
@@ -359,6 +362,32 @@
 	    ::= { adAOSUnitCompliances 1 }
 
        -- compliance statements
+
+         -- Unit Traps Menu
+
+        adAOSUnitTraps
+           OBJECT IDENTIFIER ::= { adGenAOSUnit  0 }
+        
+        adAOSUnitUserLogin NOTIFICATION-TYPE
+           STATUS      current
+           DESCRIPTION
+               "A trap to indicate that a user has successfully logged in over console or SSH."
+           ::= { adAOSUnitTraps 1 }
+
+        adAOSUnitUserLogout NOTIFICATION-TYPE
+           STATUS      current
+           DESCRIPTION
+               "A trap to indicate that a user has logged out over console or SSH."
+           ::= { adAOSUnitTraps 2 }
+
+        adAOSUnitNTPFailure NOTIFICATION-TYPE
+           STATUS      current
+           DESCRIPTION
+               "A trap to indicate that time synchronisation over NTP failed."
+           ::= { adAOSUnitTraps 3 }
+
+        --End of Unit Traps  
+
 
 
        -- units of conformance

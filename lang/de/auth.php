@@ -15,5 +15,5 @@ return [
 
     'failed' => 'Login fehlgeschlagen.',
     'throttle' => 'Zu viele Loginversuche. Versuchen Sie es in :seconds Sekunden noch einmal.',
-
+    'disabled' => 'Dein Konto ist deaktivert, bitte kontaktierte Sie den Administrator.',
 ];

@@ -29,6 +29,9 @@ namespace App\Models;
 use App\Facades\DeviceCache;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $device_id
+ */
 class DeviceRelatedModel extends BaseModel
 {
     // ---- Query Scopes ----

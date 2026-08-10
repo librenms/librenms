@@ -3,11 +3,16 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Port;
+use App\Models\Vlan;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\Url;
 
+/**
+ * @extends TableController<Port>
+ */
 class VlanPortsController extends TableController
 {
     protected function searchFields(Request $request): array
@@ -19,7 +24,7 @@ class VlanPortsController extends TableController
         ];
     }
 
-    protected function sortFields($request): array
+    protected function sortFields(Request $request): array
     {
         return [
             'device' => 'device_id',
@@ -34,8 +39,10 @@ class VlanPortsController extends TableController
 
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Vlan::class);
+
         $this->validate($request, ['vlan' => 'integer']);
-        $this->vlanId = $request->get('vlan', 1);
+        $this->vlanId = $request->input('vlan', 1);
 
         return Port::with(['device', 'device.location'])
             ->hasAccess($request->user())
@@ -61,10 +68,21 @@ class VlanPortsController extends TableController
             ]);
     }
 
+    protected function search(?string $search, Builder $query, array $fields): Builder
+    {
+        if ($search) {
+            $query->leftJoin('devices', 'ports.device_id', 'devices.device_id');
+            $fields = array_merge($fields, ['devices.hostname', 'devices.display', 'devices.sysName']);
+        }
+
+        return parent::search($search, $query, $fields);
+    }
+
     /**
      * @param  Port  $model
+     * @return array<string, scalar>
      */
-    public function formatItem($model): array
+    public function formatItem(Model $model): array
     {
         return [
             'device' => Url::deviceLink($model->device),

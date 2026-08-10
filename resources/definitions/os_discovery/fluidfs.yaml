@@ -1,0 +1,218 @@
+modules:
+  os:
+    version: FLUIDFS-MIB::versionVersion
+    hardware: FLUIDFS-MIB::versionProductName
+    serial: FLUIDFS-MIB::nASApplianceApplianceServiceTag
+    features: FLUIDFS-MIB::nASApplianceModelEnumType
+
+  sensors:
+    state:
+      data:
+        -
+          oid: FLUIDFS-MIB::nASAppliance
+          value: FLUIDFS-MIB::nASApplianceStatusEnumType
+          num_oid: '.1.3.6.1.4.1.674.11000.2000.200.1.16.1.8{{ $noindex }}'
+          descr: 'System Status'
+          index: 'nASApplianceStatus.0'
+          group: 'System Availability'
+          state_name: fluidfsApplianceStatus
+          states:
+            - { value: 0, generic: 0, descr: Optimal }
+            - { value: 1, generic: 1, descr: NotOptimal }
+            - { value: 2, generic: 2, descr: Critical }
+            - { value: 3, generic: 3, descr: NotAvailable }
+            - { value: 4, generic: 3, descr: Irrelevant }
+        -
+          oid: FLUIDFS-MIB::storageSubsystem
+          value: FLUIDFS-MIB::storageSubsystemLunsAccessibilityEnumType
+          num_oid: '.1.3.6.1.4.1.674.11000.2000.200.1.32.1.3.{{ $index }}'
+          descr: 'Subsystem Access'
+          index: 'storageSubsystemAccess.{{ $index }}'
+          group: 'System Availability'
+          state_name: fluidfsSubsystemAccess
+          states:
+            - { value: 0, generic: 2, descr: Fault }
+            - { value: 1, generic: 1, descr: NotOptimal }
+            - { value: 2, generic: 0, descr: Optimal }
+        -
+          oid: FLUIDFS-MIB::systemServiceMode
+          value: FLUIDFS-MIB::systemServiceModeStateEnumType
+          num_oid: '.1.3.6.1.4.1.674.11000.2000.200.1.36.2{{ $noindex }}'
+          descr: 'Service Mode'
+          index: 'systemServiceMode.0'
+          group: 'System Availability'
+          state_name: fluidfsServiceMode
+          states:
+            - { value: 0, generic: 0, descr: Normal }
+            - { value: 1, generic: 0, descr: WriteThrough }
+            - { value: 2, generic: 1, descr: NoService }
+        -
+          oid: FLUIDFS-MIB::nASAppliance
+          value: FLUIDFS-MIB::nASApplianceWriteThroughModeEnumType
+          num_oid: '.1.3.6.1.4.1.674.11000.2000.200.1.16.1.11.{{ $index }}'
+          descr: 'Write Mode'
+          index: 'applianceWriteMode.{{ $index }}'
+          group: 'System Availability'
+          state_name: fluidfsWriteMode
+          states:
+            - { value: 0, generic: 0, descr: Mirroring }
+            - { value: 1, generic: 0, descr: Journaling }
+            - { value: 2, generic: 1, descr: InTransition }
+        -
+          oid: FLUIDFS-MIB::activeDirectoryStatus
+          value: FLUIDFS-MIB::activeDirectoryStatusConfiguredEnumType
+          num_oid: '.1.3.6.1.4.1.674.11000.2000.200.1.1.1.4.{{ $index }}'
+          descr: 'Configured'
+          index: 'activeDirectoryConfigured.{{ $index }}'
+          group: 'Active Directory Status'
+          state_name: fluidfsDomainConfigured
+          states:
+            - { value: 0, generic: 0, descr: 'False' }
+            - { value: 1, generic: 0, descr: 'True' }
+        -
+          oid: FLUIDFS-MIB::activeDirectoryStatus
+          value: FLUIDFS-MIB::activeDirectoryStatusStatusEnumType
+          num_oid: '.1.3.6.1.4.1.674.11000.2000.200.1.1.1.5.{{ $index }}'
+          descr: 'Join State'
+          index: 'activeDirectoryStatusType.{{ $index }}'
+          group: 'Active Directory Status'
+          state_name: fluidfsDomainStatus
+          states:
+            - { value: 0, generic: 0, descr: NotJoined }
+            - { value: 1, generic: 3, descr: Unknown }
+            - { value: 2, generic: 1, descr: Offline }
+            - { value: 3, generic: 2, descr: Problematic }
+            - { value: 4, generic: 0, descr: Optimal }
+        -
+          oid: FLUIDFS-MIB::nASVolume
+          value: FLUIDFS-MIB::nASVolumeReplicationStatusEnumType
+          num_oid: '.1.3.6.1.4.1.674.11000.2000.200.1.41.1.10.{{ $index }}'
+          descr: FLUIDFS-MIB::nASVolumeVolumeName
+          index: 'nASVolumeReplication.{{ $index }}'
+          group: 'NAS Volume Replication State'
+          state_name: fluidfsVolumeReplication
+          states:
+            - { value: 0, generic: 0, descr: Standalone }
+            - { value: 1, generic: 0, descr: Source }
+            - { value: 2, generic: 0, descr: Destination }
+            - { value: 3, generic: 0, descr: SourceAndDestination }
+            - { value: 4, generic: 0, descr: Promoted }
+            - { value: 5, generic: 3, descr: NotAvailable }
+        -
+          oid: FLUIDFS-MIB::nASVolume
+          value: FLUIDFS-MIB::nASVolumeSecurityStyleEnumType
+          num_oid: '.1.3.6.1.4.1.674.11000.2000.200.1.41.1.5.{{ $index }}'
+          descr: FLUIDFS-MIB::nASVolumeVolumeName
+          index: 'volumeSecurityStyle.{{ $index }}'
+          group: 'NAS Volume Security Style'
+          state_name: fluidfsSecurityStyle
+          states:
+            - { value: 0, generic: 0, descr: Mixed }
+            - { value: 1, generic: 0, descr: Unix }
+            - { value: 2, generic: 0, descr: NTFS }
+        -
+          oid: FLUIDFS-MIB::externalServerState
+          value: FLUIDFS-MIB::externalServerStateTypeEnumType
+          num_oid: '.1.3.6.1.4.1.674.11000.2000.200.1.12.1.5.{{ $index }}'
+          descr: FLUIDFS-MIB::externalServerStateHost
+          index: 'externalServerStateType.{{ $index }}'
+          group: 'External Servers'
+          state_name: fluidfsServerStateType
+          states:
+            - { value: 0, generic: 0, descr: 'Gateway' }
+            - { value: 1, generic: 0, descr: 'Static Route' }
+            - { value: 2, generic: 0, descr: 'DNS' }
+            - { value: 3, generic: 0, descr: 'AntiVirus' }
+            - { value: 4, generic: 0, descr: 'NIS' }
+            - { value: 5, generic: 0, descr: 'LDAP' }
+            - { value: 6, generic: 0, descr: 'NTP' }
+            - { value: 7, generic: 0, descr: 'iSCSI Portal' }
+            - { value: 8, generic: 0, descr: 'VM' }
+            - { value: 9, generic: 0, descr: 'Auditing Server' }
+        -
+          oid: FLUIDFS-MIB::externalServerState
+          value: FLUIDFS-MIB::externalServerStateStateEnumType
+          num_oid: '.1.3.6.1.4.1.674.11000.2000.200.1.12.1.6.{{ $index }}'
+          descr: FLUIDFS-MIB::externalServerStateHost
+          index: 'externalServerStatus.{{ $index }}'
+          group: 'External Servers Status'
+          state_name: fluidfsServerStatus
+          states:
+            - { value: 0, generic: 0, descr: 'Available' }
+            - { value: 1, generic: 2, descr: 'Unavailable' }
+            - { value: 2, generic: 3, descr: 'Unknown' }
+
+    count:
+      data:
+        -
+          oid: FLUIDFS-MIB::nASVolume
+          value: FLUIDFS-MIB::nASVolumeNumberOfSnapshots
+          num_oid: '.1.3.6.1.4.1.674.11000.2000.200.1.41.1.9.{{ $index }}'
+          descr: FLUIDFS-MIB::nASVolumeVolumeName
+          index: 'numberOfVolSnapshots.{{ $index }}'
+          group: 'Volume Snapshots'
+        -
+          oid: FLUIDFS-MIB::nASPool
+          value: FLUIDFS-MIB::nASPoolNumberOfVirtualVolumes
+          num_oid: '.1.3.6.1.4.1.674.11000.2000.200.1.38.9{{ $noindex }}'
+          descr: 'Virtual Volumes'
+          index: 'numberOfVirtualVolumes.0'
+          group: 'NAS Pool'
+        -
+          oid: FLUIDFS-MIB::nASPool
+          value: FLUIDFS-MIB::nASPoolNumberOfClonedVolumes
+          num_oid: '.1.3.6.1.4.1.674.11000.2000.200.1.38.16{{ $noindex }}'
+          descr: 'Cloned Volumes'
+          index: 'numberOfClonedVolumes.0'
+          group: 'NAS Pool'
+        -
+          oid: FLUIDFS-MIB::nASPool
+          value: FLUIDFS-MIB::nASPoolNumberOfSnapshots
+          num_oid: '.1.3.6.1.4.1.674.11000.2000.200.1.38.15{{ $noindex }}'
+          descr: 'Snapshots'
+          index: 'numberOfPoolSnapshots.0'
+          group: 'NAS Pool'
+        -
+          oid: FLUIDFS-MIB::nASPool
+          value: FLUIDFS-MIB::nASPoolNumberOfVirtualVolumesWithSnapshots
+          num_oid: '.1.3.6.1.4.1.674.11000.2000.200.1.38.10{{ $noindex }}'
+          descr: 'Virtual Volumes With Snapshots'
+          index: 'numberOfVirtVolSnapshots.0'
+          group: 'NAS Pool'
+        -
+          oid: FLUIDFS-MIB::nASPool
+          value: FLUIDFS-MIB::nASPoolNumberOfVirtualVolumesWithReplication
+          num_oid: '.1.3.6.1.4.1.674.11000.2000.200.1.38.11{{ $noindex }}'
+          descr: 'Virtual Volumes With Replication'
+          index: 'numberOfVirtVolRepl.0'
+          group: 'NAS Pool'
+        -
+          oid: FLUIDFS-MIB::nASPool
+          value: FLUIDFS-MIB::nASPoolNumberOfVirtualVolumesWithDataReduction
+          num_oid: '.1.3.6.1.4.1.674.11000.2000.200.1.38.12{{ $noindex }}'
+          descr: 'Virtual Volumes With Data Reduction'
+          index: 'numberOfVirtVolDataRedu.0'
+          group: 'NAS Pool'
+        -
+          oid: FLUIDFS-MIB::nASPool
+          value: FLUIDFS-MIB::nASPoolNumberOfCifsShares
+          num_oid: '.1.3.6.1.4.1.674.11000.2000.200.1.38.14{{ $noindex }}'
+          descr: 'CIFS Shares'
+          index: 'numberOfCifsShares.0'
+          group: 'NAS Pool'
+        -
+          oid: FLUIDFS-MIB::nASPool
+          value: FLUIDFS-MIB::nASPoolNumberOfNfsExports
+          num_oid: '.1.3.6.1.4.1.674.11000.2000.200.1.38.13{{ $noindex }}'
+          descr: 'NFS Exports'
+          index: 'numberOfNfsExports.0'
+          group: 'NAS Pool'
+
+  storage:
+      data:
+        -
+          oid: FLUIDFS-MIB::nASVolumeEntry
+          descr: FLUIDFS-MIB::nASVolumeVolumeName
+          size: FLUIDFS-MIB::nASVolumeSizeMB
+          used: FLUIDFS-MIB::nASVolumeUsedSpaceMB
+          units: 1048576

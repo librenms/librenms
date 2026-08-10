@@ -46,7 +46,7 @@ if (! empty($agent_data['app'][$name])) {
 } else {
     // nsExtendOutputFull."powerdns-recursor"
     $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.17.112.111.119.101.114.100.110.115.45.114.101.99.117.114.115.111.114';
-    $data = stripslashes(snmp_get($device, $oid, '-Oqv'));
+    $data = stripslashes((string) SnmpQuery::get($oid)->value());
 }
 
 if (! empty($data)) {
@@ -128,7 +128,7 @@ if (! empty($data)) {
         if (isset($stats[$key])) {
             $fields[$key] = $stats[$key];
         } else {
-            $fields[$key] = 'U';
+            $fields[$key] = null;
         }
     }
 

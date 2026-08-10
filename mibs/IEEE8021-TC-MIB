@@ -1,4 +1,3 @@
-
 IEEE8021-TC-MIB DEFINITIONS ::= BEGIN
 
 -- =============================================================
@@ -12,60 +11,68 @@ IMPORTS
         FROM SNMPv2-TC; -- RFC 2579
 
 ieee8021TcMib MODULE-IDENTITY
-    LAST-UPDATED "201202150000Z" -- February 15, 2012
+    LAST-UPDATED "201806210000Z" -- June 21, 2018
     ORGANIZATION "IEEE 802.1 Working Group"
     CONTACT-INFO
-        "  WG-URL: http://grouper.ieee.org/groups/802/1/index.html
-         WG-EMail: stds-802-1@ieee.org
+        "  WG-URL: http://www.ieee802.org/1
+         WG-EMail: stds-802-1-L@ieee.org
 
-          Contact: David Levi
+          Contact: IEEE 802.1 Working Group Chair
            Postal: C/O IEEE 802.1 Working Group
                    IEEE Standards Association
                    445 Hoes Lane
-                   P.O. Box 1331
                    Piscataway
-                   NJ 08855-1331
+                   NJ 08855
                    USA
-           E-mail: STDS-802-1-L@LISTSERV.IEEE.ORG
-
-          Contact: Kevin Nolish
-           Postal: C/O IEEE 802.1 Working Group
-                   IEEE Standards Association
-                   445 Hoes Lane
-                   P.O. Box 1331
-                   Piscataway
-                   NJ 08855-1331
-                   USA
-           E-mail: STDS-802-1-L@LISTSERV.IEEE.ORG"
+           E-mail: STDS-802-1-L@IEEE.ORG"
     DESCRIPTION
         "Textual conventions used throughout the various IEEE 802.1 MIB
          modules.
 
          Unless otherwise indicated, the references in this MIB
-         module are to IEEE 802.1Q-2011.
+         module are to IEEE Std 802.1Q.
 
-         Copyright (C) IEEE.
-         This version of this MIB module is part of IEEE802.1Q;
+         Copyright (C) IEEE (2014).
+         This version of this MIB module is part of IEEE Std 802.1Q;
          see the draft itself for full legal notices."
 
+    REVISION "201806210000Z" -- June 21, 2018
+
+    
+    DESCRIPTION
+            "Published as part of IEEE Std 802.1Q 2017 revision.
+            Cross references updated and corrected."
+
+    REVISION "201412150000Z" -- December 15, 2014
+    
+    DESCRIPTION
+            "Published as part of IEEE Std 802.1Q 2014 revision.
+            Cross references updated and corrected.
+            Updating of definition of IEEE8021PbbIngressEgress
+            New identifier types for new SPBM MA types"
+            
     REVISION     "201202150000Z" -- February 15, 2012
     DESCRIPTION
          "Modified IEEE8021BridgePortType textual convention to
           include stationFacingBridgePort, 
           uplinkAccessPort, and uplinkRelayPort types."
+
     REVISION     "201108230000Z" -- August 23, 2011
     DESCRIPTION
          "Modified textual conventions  to support the IEEE 802.1
           MIBs for PBB-TE Infrastructure Protection Switching."
+
     REVISION     "201104060000Z" -- April 6, 2011
     DESCRIPTION
          "Modified textual conventions  to support Remote Customer
           Service Interfaces."
+
     REVISION     "201102270000Z" -- February 27, 2011
     DESCRIPTION
          "Minor edits to contact information etc. as part of 
           2011 revision of IEEE Std 802.1Q."
           
+
     REVISION     "200811180000Z" -- November 18, 2008
     DESCRIPTION
          "Added textual conventions needed to support the IEEE 802.1
@@ -91,8 +98,8 @@ IEEE8021PbbComponentIdentifier ::= TEXTUAL-CONVENTION
     STATUS       current
     DESCRIPTION
         "The component identifier is used to distinguish between the
-        multiple virtual bridge instances within a PB or PBB.  Each
-        virtual bridge instance is called a component.  In simple
+        multiple virtual Bridge instances within a PB or PBB.  Each
+        virtual Bridge instance is called a component.  In simple
         situations where there is only a single component the default
         value is 1.  The component is identified by a component
         identifier unique within the BEB and by a MAC address unique
@@ -106,7 +113,7 @@ IEEE8021PbbComponentIdentifierOrZero ::= TEXTUAL-CONVENTION
     STATUS       current
     DESCRIPTION
         "The component identifier is used to distinguish between the
-        multiple virtual bridge instances within a PB or PBB.  In simple
+        multiple virtual Bridge instances within a PB or PBB.  In simple
         situations where there is only a single component the default
         value is 1.  The component is identified by a component
         identifier unique within the BEB and by a MAC address unique
@@ -156,7 +163,7 @@ IEEE8021PbbIngressEgress ::= TEXTUAL-CONVENTION
         ingress to the PBBN but not egress the PBBN, egress to the
         PBBN but not ingress the PBBN, or both ingress and egress
         the PBBN."
-    REFERENCE "12.16.3, 12.16.5, 12.16.6"
+    REFERENCE "12.16.3, 12.16.5"
     SYNTAX       BITS {
                      ingress(0),
                      egress(1)
@@ -185,10 +192,10 @@ IEEE8021BridgePortNumber ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d"
     STATUS       current
     DESCRIPTION
-        "An integer that uniquely identifies a bridge port, as
-        specified in 17.3.2.2 of IEEE 802.1ap.
+        "An integer that uniquely identifies a Bridge Port, as
+        specified in 17.3.2.2.
         This value is used within the spanning tree
-        protocol to identify this port to neighbor bridges."
+        protocol to identify this port to neighbor Bridges."
     REFERENCE "17.3.2.2"
     SYNTAX       Unsigned32 (1..65535)
 
@@ -196,9 +203,8 @@ IEEE8021BridgePortNumberOrZero ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d"
     STATUS       current
     DESCRIPTION
-        "An integer that uniquely identifies a bridge port, as
-        specified in 17.3.2.2 of IEEE 802.1ap.  The value 0
-        means no port number, and this must be clarified in the
+        "An integer that uniquely identifies a Bridge Port. The value
+        0 means no port number, and this must be clarified in the
         DESCRIPTION clause of any object defined using this
         TEXTUAL-CONVENTION."
     REFERENCE "17.3.2.2"
@@ -209,42 +215,42 @@ IEEE8021BridgePortType ::= TEXTUAL-CONVENTION
     DESCRIPTION
         "A port type.  The possible port types are:
 
-             customerVlanPort(2) - Indicates a port is a C-tag
-                 aware port of an enterprise VLAN aware bridge.
+             customerVlanPort(2) - Indicates a port is a 
+                 C-tag-aware port of an enterprise VLAN-aware Bridge.
 
-             providerNetworkPort(3) - Indicates a port is an S-tag
+             providerNetworkPort(3) - Indicates a port is an S-tag-
                  aware port of a Provider Bridge or Backbone Edge
                  Bridge used for connections within a PBN or PBBN.
 
-             customerNetworkPort(4) - Indicates a port is an S-tag
+             customerNetworkPort(4) - Indicates a port is an S-tag-
                  aware port of a Provider Bridge or Backbone Edge
                  Bridge used for connections to the exterior of a
                  PBN or PBBN.
 
-             customerEdgePort(5) - Indicates a port is a C-tag
+             customerEdgePort(5) - Indicates a port is a C-tag-
                  aware port of a Provider Bridge used for connections
                  to the exterior of a PBN or PBBN.
 
-             customerBackbonePort(6) - Indicates a port is a I-tag
+             customerBackbonePort(6) - Indicates a port is a I-tag-
                  aware port of a Backbone Edge Bridge's B-component.
 
              virtualInstancePort(7) - Indicates a port is a virtual
-                 S-tag aware port within a Backbone Edge Bridge's
+                 S-tag-aware port within a Backbone Edge Bridge's
                  I-component which is responsible for handling
                  S-tagged traffic for a specific backbone service
                  instance.
 
              dBridgePort(8) - Indicates a port is a VLAN-unaware
-                 member of an 802.1D bridge.
+                 member of an IEEE 802.1D Bridge.
 
              remoteCustomerAccessPort (9) - Indicates a port is an
-                 S-tag aware port of a Provider Bridge used for
+                 S-tag-aware port of a Provider Bridge used for
                  connections to remote customer interface LANs
                  through another PBN.
                  
              stationFacingBridgePort (10) - Indicates a port of a
                  Bridge that supports the EVB status parameters
-                 (6.6.5) with an EVBMode parameter value of
+                 (40.4) with an EVBMode parameter value of
                  EVB Bridge.
                  
              uplinkAccessPort (11) - Indicates a port on a
@@ -252,10 +258,10 @@ IEEE8021BridgePortType ::= TEXTUAL-CONVENTION
                  Bridge with an EVB station.             
                  
              uplinkRelayPort (12) - Indicates a port of an edge relay
-                 that supports the EVB status parameters (6.6.5)
+                 that supports the EVB status parameters (40.4)
                  with an EVBMode parameter value of EVB station."
-    REFERENCE   "12.16.1.1.3 h4), 12.16.2.1/2,
-                 12.13.1.1, 12.13.1.2, 12.15.2.1, 12.15.2.2"
+    REFERENCE   "40.4, 12.13.1.1, 12.13.1.2, 12.16, 12.16.1.1.3
+                 12.16.2.1, 12.26"
     SYNTAX       INTEGER {
                      none(1),
                      customerVlanPort(2),
@@ -328,32 +334,43 @@ IEEE8021ServiceSelectorType ::= TEXTUAL-CONVENTION
         ieeeReserved(0)   Reserved for definition by IEEE 802.1
                           recommend to not use zero unless
                           absolutely needed.
-        vlanId(1)         12-Bit identifier as described in IEEE802.1Q.
-        isid(2)           24-Bit identifier as described in IEEE802.1ah.
+        vlanId(1)         12-Bit identifier as described in IEEE Std 802.1Q.
+        isid(2)           24-Bit identifier as described in IEEE Std 802.1ah.
         tesid(3)          32 Bit identifier as described below.
         segid(4)          32 Bit identifier as described below.
-        ieeeReserved(xx)  Reserved for definition by IEEE 802.1
-                          xx values can be [5..7].
+        path-tesid(5)     32 Bit identifier as described below.
+        group-isid(6)     24 Bit identifier as described below.
+        ieeeReserved(7)  Reserved for definition by IEEE Std 802.1
 
         To support future extensions, the IEEE8021ServiceSelectorType
-        textual convention SHOULD NOT be sub-typed in object type
-        definitions.  It MAY be sub-typed in compliance statements in
+        textual convention SHOULD NOT be subtyped in object type
+        definitions.  It MAY be subtyped in compliance statements in
         order to require only a subset of these address types for a
         compliant implementation.
 
         The tesid is used as a service selector for MAs that are present
-        in bridges that implement PBB-TE functionality.  A selector of
+        in Bridges that implement PBB-TE functionality.  A selector of
         this type is interpreted as a 32 bit unsigned value of type
         IEEE8021PbbTeTSidId.  This type is used to index the
-        Ieee8021PbbTeTeSidTable to find the ESPs which comprise the TE
+        ieee8021PbbTeTeSiEspTable to find the ESPs which comprise the TE
         Service Instance named by this TE-SID value.
         
         The segid is used as a service selector for MAs that are present
-        in bridges that implement IPS functionality.  A selector of
+        in Bridges that implement IPS functionality.  A selector of
         this type is interpreted as a 32 bit unsigned value of type
         IEEE8021TeipsSegid.  This type is used to index the
         Ieee8021TeipsSegTable to find the SMPs which comprise the
         Infrastructure Segment named by this segid value.
+
+        The path-tesid is used as a service selector for SPBM path MAs.
+        A selector of this type is interpreted as a 32 bit unsigned value
+        corresponding to the MA index dot1agCfmMaIndex. This type is used
+        to index the dot1agCfmMepSpbmEspTable to find the ESPs which
+        comprise the SPBM path associated with an SPBM path MA.
+
+        The group-isid is used as a service selector for SPBM group MAs.
+        A selector of this type is interpreted as a 24 bit unsigned value
+        corresponding to the I-SID associated with an SPBM group MA.
 
         Implementations MUST ensure that IEEE8021ServiceSelectorType
         objects and any dependent objects (e.g.,
@@ -365,16 +382,19 @@ IEEE8021ServiceSelectorType ::= TEXTUAL-CONVENTION
                     vlanId(1),
                     isid(2),
                     tesid(3),
-                    segid(4)
+                    segid(4),
+                    path-tesid(5),
+                    group-isid(6),
+                    ieeeReserved(7)
                 }
 
 IEEE8021ServiceSelectorValueOrNone ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d"
     STATUS       current
     DESCRIPTION
-        "An integer that uniquely identifies a generic MAC service,
+        "An integer that uniquely identifies a generic MAC Service,
          or none.  Examples of service selectors are a VLAN-ID
-         (IEEE 802.1Q) and an I-SID (IEEE 802.1ah).
+         (IEEE 802.1Q) and an I-SID (IEEE Std 802.1ah).
 
          An IEEE8021ServiceSelectorValueOrNone value is always
          interpreted within the context of an
@@ -410,9 +430,9 @@ IEEE8021ServiceSelectorValue ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d"
     STATUS       current
     DESCRIPTION
-        "An integer that uniquely identifies a generic MAC service.
+        "An integer that uniquely identifies a generic MAC Service.
          Examples of service selectors are a VLAN-ID (IEEE 802.1Q)
-         and an I-SID (IEEE 802.1ah).
+         and an I-SID (IEEE Std 802.1ah).
 
          An IEEE8021ServiceSelectorValue value is always interpreted
          within the context of an IEEE8021ServiceSelectorType value.
@@ -451,7 +471,7 @@ IEEE8021PriorityValue ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d"
     STATUS      current
     DESCRIPTION
-        "An 802.1Q user priority value."
+        "An IEEE 802.1Q user priority value."
    REFERENCE   "12.13.3.3"
     SYNTAX      Unsigned32 (0..7)
 
@@ -462,20 +482,20 @@ IEEE8021PbbTeProtectionGroupId ::= TEXTUAL-CONVENTION
         "The PbbTeProtectionGroupId identifier is used to distinguish 
          protection group instances present in the B Component of
          an IB-BEB."
-    REFERENCE "12.19.2"
+    REFERENCE "12.18.2"
     SYNTAX       Unsigned32 (1..429467295)
 
 IEEE8021PbbTeEsp ::= TEXTUAL-CONVENTION
     STATUS current
     DESCRIPTION
        "This textual convention is used to represent the logical
-        components that comprise the 3-tuple that identifies an
+        components that constitute the 3-tuple that identifies an
         Ethernet Switched Path.  The 3-tuple consists of a
         destination MAC address, a source MAC address and a VID.
         Bytes (1..6) of this textual convention contain the
         ESP-MAC-DA, bytes (7..12) contain the ESP-MAC-SA, and bytes
         (13..14) contain the ESP-VID."
-    REFERENCE "802.1Qay 3.2"
+    REFERENCE "3.83"
     SYNTAX OCTET STRING ( SIZE(14))
 
 IEEE8021PbbTeTSidId ::= TEXTUAL-CONVENTION
@@ -487,7 +507,7 @@ IEEE8021PbbTeTSidId ::= TEXTUAL-CONVENTION
         a TE-SID is implementation dependent.  This textual convention
         defines the external representation of TE-SID values."
     REFERENCE
-        "802.1Qay 3.11"
+        "3.270"
     SYNTAX  Unsigned32 (1..42947295)
 
 IEEE8021PbbTeProtectionGroupConfigAdmin ::= TEXTUAL-CONVENTION
@@ -500,7 +520,7 @@ IEEE8021PbbTeProtectionGroupConfigAdmin ::= TEXTUAL-CONVENTION
     REFERENCE "26.10.3.3.5
                26.10.3.3.6
                26.10.3.3.7
-               12.19.2.3.2"
+               12.18.2.3.2"
     SYNTAX    INTEGER {
                  clear(1),
                  lockOutProtection(2),
@@ -515,7 +535,7 @@ IEEE8021PbbTeProtectionGroupActiveRequests ::= TEXTUAL-CONVENTION
        "This textual convention is used to represent the status of
         active requests within a protection group."
     REFERENCE
-       "12.19.2.1.3 d)"
+       "12.18.2.1.3 d)"
    SYNTAX   INTEGER {
                 noRequest(1),
                 loP(2),
@@ -552,7 +572,7 @@ IEEE8021TeipsSmpid ::= TEXTUAL-CONVENTION
     STATUS current
     DESCRIPTION
        "This textual convention is used to represent the logical
-        components that comprise the 3-tuple that identifies a
+        components that constitute the 3-tuple that identifies a
         Segment Monitoring Path (SMP).  The 3-tuple consists of a
         destination MAC address, a source MAC address and a VID.
         Bytes (1..6) of this textual convention contain the

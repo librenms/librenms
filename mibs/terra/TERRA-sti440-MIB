@@ -1,0 +1,4295 @@
+--File Name : sti440-TERRA-MIB
+--Date      : February 06 2019
+--****************************************************
+--sti440-TERRA-MIB:     sti440 Platform Specific MIB
+--
+--February 2019, Virginijus Bieliauskas
+--
+--Copyright (c) 2019 by TERRA Electronics.
+--All rights reserved.
+--
+--****************************************************
+
+TERRA-sti440-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    DefStatus
+        FROM TERRA-DEFINITIONS-MIB
+    terraProducts
+        FROM TERRA-PRODUCTS-MIB;
+
+    terra-sti440 MODULE-IDENTITY
+        LAST-UPDATED        "201902060000Z"
+        ORGANIZATION        "TERRA Electronics"
+        CONTACT-INFO        "TERRA Electronics
+                            
+                            Draugystes 22
+                            Kaunas
+                            Lithuania
+                            LT-51256
+                            E-mail: design@terraelectronics.com"
+        DESCRIPTION         "This MIB provides Terra four channel DVB-T/T2/C to IP streamer sti440 information."
+
+        REVISION            "201902061600Z"
+        DESCRIPTION         "Production version"
+        ::= { terraProducts 18 }
+
+
+    sti440status OBJECT IDENTIFIER ::= { terra-sti440 1 }
+
+    rFinStatus1 OBJECT IDENTIFIER ::= { sti440status 1 }
+
+    inLock1 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Tuner lock"
+        ::= { rFinStatus1 1 }
+
+    instd1 OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Modulation std."
+        ::= { rFinStatus1 2 }
+
+    inlevel1 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "dbuV"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal level in dbuV"
+        ::= { rFinStatus1 3 }
+
+    inmod1 OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Modulation"
+        ::= { rFinStatus1 4 }
+
+    insnr1 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "db"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal SNR in db"
+        ::= { rFinStatus1 5 }
+
+    inber1 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal Viterbi bit error ratio x 1E9"
+        ::= { rFinStatus1 6 }
+
+    inper1 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal packet error ratio x 1E9"
+        ::= { rFinStatus1 7 }
+
+    inuncorr1 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal uncorrected packet count"
+        ::= { rFinStatus1 8 }
+
+    inbr1 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "Kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal bitrate in Kbps"
+        ::= { rFinStatus1 9 }
+
+    inccerr1 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal CC errors"
+        ::= { rFinStatus1 10 }
+
+    intotpack1 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal packet count"
+        ::= { rFinStatus1 11 }
+
+    rFinStatus2 OBJECT IDENTIFIER ::= { sti440status 2 }
+
+    inLock2 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Tuner lock"
+        ::= { rFinStatus2 1 }
+
+    instd2 OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Modulation std."
+        ::= { rFinStatus2 2 }
+
+    inlevel2 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "dbuV"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal level in dbuV"
+        ::= { rFinStatus2 3 }
+
+    inmod2 OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Modulation"
+        ::= { rFinStatus2 4 }
+
+    insnr2 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "db"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal SNR in db"
+        ::= { rFinStatus2 5 }
+
+    inber2 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal Viterbi bit error ratio x 1E9"
+        ::= { rFinStatus2 6 }
+
+    inper2 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal packet error ratio x 1E9"
+        ::= { rFinStatus2 7 }
+
+    inuncorr2 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal uncorrected packet count"
+        ::= { rFinStatus2 8 }
+
+    inbr2 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "Kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal bitrate in Kbps"
+        ::= { rFinStatus2 9 }
+
+    inccerr2 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal CC errors"
+        ::= { rFinStatus2 10 }
+
+    intotpack2 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal packet count"
+        ::= { rFinStatus2 11 }
+
+    rFinStatus3 OBJECT IDENTIFIER ::= { sti440status 3 }
+
+    inLock3 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Tuner lock"
+        ::= { rFinStatus3 1 }
+
+    instd3 OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Modulation std."
+        ::= { rFinStatus3 2 }
+
+    inlevel3 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "dbuV"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal level in dbuV"
+        ::= { rFinStatus3 3 }
+
+    inmod3 OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Modulation"
+        ::= { rFinStatus3 4 }
+
+    insnr3 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "db"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal SNR in db"
+        ::= { rFinStatus3 5 }
+
+    inber3 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal Viterbi bit error ratio x 1E9"
+        ::= { rFinStatus3 6 }
+
+    inper3 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal packet error ratio x 1E9"
+        ::= { rFinStatus3 7 }
+
+    inuncorr3 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal uncorrected packet count"
+        ::= { rFinStatus3 8 }
+
+    inbr3 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "Kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal bitrate in Kbps"
+        ::= { rFinStatus3 9 }
+
+    inccerr3 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal CC errors"
+        ::= { rFinStatus3 10 }
+
+    intotpack3 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal packet count"
+        ::= { rFinStatus3 11 }
+
+    rFinStatus4 OBJECT IDENTIFIER ::= { sti440status 4 }
+
+    inLock4 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Tuner lock"
+        ::= { rFinStatus4 1 }
+
+    instd4 OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Modulation std."
+        ::= { rFinStatus4 2 }
+
+    inlevel4 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "dbuV"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal level in dbuV"
+        ::= { rFinStatus4 3 }
+
+    inmod4 OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Modulation"
+        ::= { rFinStatus4 4 }
+
+    insnr4 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "db"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal SNR in db"
+        ::= { rFinStatus4 5 }
+
+    inber4 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal Viterbi bit error ratio x 1E9"
+        ::= { rFinStatus4 6 }
+
+    inper4 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal packet error ratio x 1E9"
+        ::= { rFinStatus4 7 }
+
+    inuncorr4 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal uncorrected packet count"
+        ::= { rFinStatus4 8 }
+
+    inbr4 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "Kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal bitrate in Kbps"
+        ::= { rFinStatus4 9 }
+
+    inccerr4 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal CC errors"
+        ::= { rFinStatus4 10 }
+
+    intotpack4 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal packet count"
+        ::= { rFinStatus4 11 }
+
+    usbStatus OBJECT IDENTIFIER ::= { sti440status 5 }
+
+    usbinBR OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "USB input bitrate in tenth of Mbps"
+        ::= { usbStatus 1 }
+
+    outStream1 OBJECT IDENTIFIER ::= { sti440status 6 }
+
+    outBr1 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream1 1 }
+
+    outStream2 OBJECT IDENTIFIER ::= { sti440status 7 }
+
+    outBr2 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream2 1 }
+
+    outStream3 OBJECT IDENTIFIER ::= { sti440status 8 }
+
+    outBr3 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream3 1 }
+
+    outStream4 OBJECT IDENTIFIER ::= { sti440status 9 }
+
+    outBr4 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream4 1 }
+
+    outStream5 OBJECT IDENTIFIER ::= { sti440status 10 }
+
+    outBr5 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream5 1 }
+
+    outStream6 OBJECT IDENTIFIER ::= { sti440status 11 }
+
+    outBr6 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream6 1 }
+
+    outStream7 OBJECT IDENTIFIER ::= { sti440status 12 }
+
+    outBr7 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream7 1 }
+
+    outStream8 OBJECT IDENTIFIER ::= { sti440status 13 }
+
+    outBr8 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream8 1 }
+
+    outStream9 OBJECT IDENTIFIER ::= { sti440status 14 }
+
+    outBr9 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream9 1 }
+
+    outStream10 OBJECT IDENTIFIER ::= { sti440status 15 }
+
+    outBr10 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream10 1 }
+
+    outStream11 OBJECT IDENTIFIER ::= { sti440status 16 }
+
+    outBr11 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream11 1 }
+
+    outStream12 OBJECT IDENTIFIER ::= { sti440status 17 }
+
+    outBr12 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream12 1 }
+
+    outStream13 OBJECT IDENTIFIER ::= { sti440status 18 }
+
+    outBr13 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream13 1 }
+
+    outStream14 OBJECT IDENTIFIER ::= { sti440status 19 }
+
+    outBr14 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream14 1 }
+
+    outStream15 OBJECT IDENTIFIER ::= { sti440status 20 }
+
+    outBr15 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream15 1 }
+
+    outStream16 OBJECT IDENTIFIER ::= { sti440status 21 }
+
+    outBr16 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream16 1 }
+
+    outStream17 OBJECT IDENTIFIER ::= { sti440status 22 }
+
+    outBr17 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream17 1 }
+
+    outStream18 OBJECT IDENTIFIER ::= { sti440status 23 }
+
+    outBr18 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream18 1 }
+
+    outStream19 OBJECT IDENTIFIER ::= { sti440status 24 }
+
+    outBr19 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream19 1 }
+
+    outStream20 OBJECT IDENTIFIER ::= { sti440status 25 }
+
+    outBr20 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream20 1 }
+
+    outStream21 OBJECT IDENTIFIER ::= { sti440status 26 }
+
+    outBr21 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream21 1 }
+
+    outStream22 OBJECT IDENTIFIER ::= { sti440status 27 }
+
+    outBr22 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream22 1 }
+
+    outStream23 OBJECT IDENTIFIER ::= { sti440status 28 }
+
+    outBr23 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream23 1 }
+
+    outStream24 OBJECT IDENTIFIER ::= { sti440status 29 }
+
+    outBr24 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream24 1 }
+
+    outStream25 OBJECT IDENTIFIER ::= { sti440status 30 }
+
+    outBr25 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream25 1 }
+
+    outStream26 OBJECT IDENTIFIER ::= { sti440status 31 }
+
+    outBr26 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream26 1 }
+
+    outStream27 OBJECT IDENTIFIER ::= { sti440status 32 }
+
+    outBr27 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream27 1 }
+
+    outStream28 OBJECT IDENTIFIER ::= { sti440status 33 }
+
+    outBr28 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream28 1 }
+
+    outStream29 OBJECT IDENTIFIER ::= { sti440status 34 }
+
+    outBr29 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream29 1 }
+
+    outStream30 OBJECT IDENTIFIER ::= { sti440status 35 }
+
+    outBr30 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream30 1 }
+
+    outStream31 OBJECT IDENTIFIER ::= { sti440status 36 }
+
+    outBr31 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream31 1 }
+
+    outStream32 OBJECT IDENTIFIER ::= { sti440status 37 }
+
+    outBr32 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream32 1 }
+
+    outStream33 OBJECT IDENTIFIER ::= { sti440status 38 }
+
+    outBr33 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream33 1 }
+
+    outStream34 OBJECT IDENTIFIER ::= { sti440status 39 }
+
+    outBr34 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream34 1 }
+
+    outStream35 OBJECT IDENTIFIER ::= { sti440status 40 }
+
+    outBr35 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream35 1 }
+
+    outStream36 OBJECT IDENTIFIER ::= { sti440status 41 }
+
+    outBr36 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream36 1 }
+
+    outStream37 OBJECT IDENTIFIER ::= { sti440status 42 }
+
+    outBr37 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream37 1 }
+
+    outStream38 OBJECT IDENTIFIER ::= { sti440status 43 }
+
+    outBr38 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream38 1 }
+
+    outStream39 OBJECT IDENTIFIER ::= { sti440status 44 }
+
+    outBr39 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream39 1 }
+
+    outStream40 OBJECT IDENTIFIER ::= { sti440status 45 }
+
+    outBr40 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream40 1 }
+
+    outStream41 OBJECT IDENTIFIER ::= { sti440status 46 }
+
+    outBr41 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream41 1 }
+
+    outStream42 OBJECT IDENTIFIER ::= { sti440status 47 }
+
+    outBr42 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream42 1 }
+
+    outStream43 OBJECT IDENTIFIER ::= { sti440status 48 }
+
+    outBr43 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream43 1 }
+
+    outStream44 OBJECT IDENTIFIER ::= { sti440status 49 }
+
+    outBr44 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream44 1 }
+
+    outStream45 OBJECT IDENTIFIER ::= { sti440status 50 }
+
+    outBr45 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream45 1 }
+
+    outStream46 OBJECT IDENTIFIER ::= { sti440status 51 }
+
+    outBr46 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream46 1 }
+
+    outStream47 OBJECT IDENTIFIER ::= { sti440status 52 }
+
+    outBr47 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream47 1 }
+
+    outStream48 OBJECT IDENTIFIER ::= { sti440status 53 }
+
+    outBr48 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream48 1 }
+
+    outStream49 OBJECT IDENTIFIER ::= { sti440status 54 }
+
+    outBr49 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream49 1 }
+
+    outStream50 OBJECT IDENTIFIER ::= { sti440status 55 }
+
+    outBr50 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream50 1 }
+
+    outStream51 OBJECT IDENTIFIER ::= { sti440status 56 }
+
+    outBr51 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream51 1 }
+
+    outStream52 OBJECT IDENTIFIER ::= { sti440status 57 }
+
+    outBr52 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream52 1 }
+
+    outStream53 OBJECT IDENTIFIER ::= { sti440status 58 }
+
+    outBr53 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream53 1 }
+
+    outStream54 OBJECT IDENTIFIER ::= { sti440status 59 }
+
+    outBr54 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream54 1 }
+
+    outStream55 OBJECT IDENTIFIER ::= { sti440status 60 }
+
+    outBr55 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream55 1 }
+
+    outStream56 OBJECT IDENTIFIER ::= { sti440status 61 }
+
+    outBr56 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream56 1 }
+
+    outStream57 OBJECT IDENTIFIER ::= { sti440status 62 }
+
+    outBr57 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream57 1 }
+
+    outStream58 OBJECT IDENTIFIER ::= { sti440status 63 }
+
+    outBr58 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream58 1 }
+
+    outStream59 OBJECT IDENTIFIER ::= { sti440status 64 }
+
+    outBr59 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream59 1 }
+
+    outStream60 OBJECT IDENTIFIER ::= { sti440status 65 }
+
+    outBr60 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream60 1 }
+
+    outStream61 OBJECT IDENTIFIER ::= { sti440status 66 }
+
+    outBr61 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream61 1 }
+
+    outStream62 OBJECT IDENTIFIER ::= { sti440status 67 }
+
+    outBr62 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream62 1 }
+
+    outStream63 OBJECT IDENTIFIER ::= { sti440status 68 }
+
+    outBr63 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream63 1 }
+
+    outStream64 OBJECT IDENTIFIER ::= { sti440status 69 }
+
+    outBr64 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream64 1 }
+
+    outStream65 OBJECT IDENTIFIER ::= { sti440status 70 }
+
+    outBr65 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream65 1 }
+
+    outStream66 OBJECT IDENTIFIER ::= { sti440status 71 }
+
+    outBr66 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream66 1 }
+
+    outStream67 OBJECT IDENTIFIER ::= { sti440status 72 }
+
+    outBr67 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream67 1 }
+
+    outStream68 OBJECT IDENTIFIER ::= { sti440status 73 }
+
+    outBr68 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream68 1 }
+
+    outStream69 OBJECT IDENTIFIER ::= { sti440status 74 }
+
+    outBr69 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream69 1 }
+
+    outStream70 OBJECT IDENTIFIER ::= { sti440status 75 }
+
+    outBr70 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream70 1 }
+
+    outStream71 OBJECT IDENTIFIER ::= { sti440status 76 }
+
+    outBr71 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream71 1 }
+
+    outStream72 OBJECT IDENTIFIER ::= { sti440status 77 }
+
+    outBr72 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream72 1 }
+
+    outStream73 OBJECT IDENTIFIER ::= { sti440status 78 }
+
+    outBr73 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream73 1 }
+
+    outStream74 OBJECT IDENTIFIER ::= { sti440status 79 }
+
+    outBr74 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream74 1 }
+
+    outStream75 OBJECT IDENTIFIER ::= { sti440status 80 }
+
+    outBr75 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream75 1 }
+
+    outStream76 OBJECT IDENTIFIER ::= { sti440status 81 }
+
+    outBr76 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream76 1 }
+
+    outStream77 OBJECT IDENTIFIER ::= { sti440status 82 }
+
+    outBr77 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream77 1 }
+
+    outStream78 OBJECT IDENTIFIER ::= { sti440status 83 }
+
+    outBr78 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream78 1 }
+
+    outStream79 OBJECT IDENTIFIER ::= { sti440status 84 }
+
+    outBr79 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream79 1 }
+
+    outStream80 OBJECT IDENTIFIER ::= { sti440status 85 }
+
+    outBr80 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream80 1 }
+
+    outStream81 OBJECT IDENTIFIER ::= { sti440status 86 }
+
+    outBr81 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream81 1 }
+
+    outStream82 OBJECT IDENTIFIER ::= { sti440status 87 }
+
+    outBr82 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream82 1 }
+
+    outStream83 OBJECT IDENTIFIER ::= { sti440status 88 }
+
+    outBr83 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream83 1 }
+
+    outStream84 OBJECT IDENTIFIER ::= { sti440status 89 }
+
+    outBr84 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream84 1 }
+
+    outStream85 OBJECT IDENTIFIER ::= { sti440status 90 }
+
+    outBr85 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream85 1 }
+
+    outStream86 OBJECT IDENTIFIER ::= { sti440status 91 }
+
+    outBr86 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream86 1 }
+
+    outStream87 OBJECT IDENTIFIER ::= { sti440status 92 }
+
+    outBr87 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream87 1 }
+
+    outStream88 OBJECT IDENTIFIER ::= { sti440status 93 }
+
+    outBr88 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream88 1 }
+
+    outStream89 OBJECT IDENTIFIER ::= { sti440status 94 }
+
+    outBr89 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream89 1 }
+
+    outStream90 OBJECT IDENTIFIER ::= { sti440status 95 }
+
+    outBr90 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream90 1 }
+
+    outStream91 OBJECT IDENTIFIER ::= { sti440status 96 }
+
+    outBr91 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream91 1 }
+
+    outStream92 OBJECT IDENTIFIER ::= { sti440status 97 }
+
+    outBr92 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream92 1 }
+
+    outStream93 OBJECT IDENTIFIER ::= { sti440status 98 }
+
+    outBr93 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream93 1 }
+
+    outStream94 OBJECT IDENTIFIER ::= { sti440status 99 }
+
+    outBr94 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream94 1 }
+
+    outStream95 OBJECT IDENTIFIER ::= { sti440status 100 }
+
+    outBr95 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream95 1 }
+
+    outStream96 OBJECT IDENTIFIER ::= { sti440status 101 }
+
+    outBr96 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream96 1 }
+
+    outStream97 OBJECT IDENTIFIER ::= { sti440status 102 }
+
+    outBr97 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream97 1 }
+
+    outStream98 OBJECT IDENTIFIER ::= { sti440status 103 }
+
+    outBr98 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream98 1 }
+
+    outStream99 OBJECT IDENTIFIER ::= { sti440status 104 }
+
+    outBr99 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream99 1 }
+
+    outStream100 OBJECT IDENTIFIER ::= { sti440status 105 }
+
+    outBr100 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream100 1 }
+
+    outStream101 OBJECT IDENTIFIER ::= { sti440status 106 }
+
+    outBr101 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream101 1 }
+
+    outStream102 OBJECT IDENTIFIER ::= { sti440status 107 }
+
+    outBr102 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream102 1 }
+
+    outStream103 OBJECT IDENTIFIER ::= { sti440status 108 }
+
+    outBr103 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream103 1 }
+
+    outStream104 OBJECT IDENTIFIER ::= { sti440status 109 }
+
+    outBr104 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream104 1 }
+
+    outStream105 OBJECT IDENTIFIER ::= { sti440status 110 }
+
+    outBr105 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream105 1 }
+
+    outStream106 OBJECT IDENTIFIER ::= { sti440status 111 }
+
+    outBr106 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream106 1 }
+
+    outStream107 OBJECT IDENTIFIER ::= { sti440status 112 }
+
+    outBr107 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream107 1 }
+
+    outStream108 OBJECT IDENTIFIER ::= { sti440status 113 }
+
+    outBr108 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream108 1 }
+
+    outStream109 OBJECT IDENTIFIER ::= { sti440status 114 }
+
+    outBr109 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream109 1 }
+
+    outStream110 OBJECT IDENTIFIER ::= { sti440status 115 }
+
+    outBr110 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream110 1 }
+
+    outStream111 OBJECT IDENTIFIER ::= { sti440status 116 }
+
+    outBr111 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream111 1 }
+
+    outStream112 OBJECT IDENTIFIER ::= { sti440status 117 }
+
+    outBr112 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream112 1 }
+
+    outStream113 OBJECT IDENTIFIER ::= { sti440status 118 }
+
+    outBr113 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream113 1 }
+
+    outStream114 OBJECT IDENTIFIER ::= { sti440status 119 }
+
+    outBr114 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream114 1 }
+
+    outStream115 OBJECT IDENTIFIER ::= { sti440status 120 }
+
+    outBr115 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream115 1 }
+
+    outStream116 OBJECT IDENTIFIER ::= { sti440status 121 }
+
+    outBr116 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream116 1 }
+
+    outStream117 OBJECT IDENTIFIER ::= { sti440status 122 }
+
+    outBr117 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream117 1 }
+
+    outStream118 OBJECT IDENTIFIER ::= { sti440status 123 }
+
+    outBr118 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream118 1 }
+
+    outStream119 OBJECT IDENTIFIER ::= { sti440status 124 }
+
+    outBr119 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream119 1 }
+
+    outStream120 OBJECT IDENTIFIER ::= { sti440status 125 }
+
+    outBr120 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream120 1 }
+
+    outStream121 OBJECT IDENTIFIER ::= { sti440status 126 }
+
+    outBr121 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream121 1 }
+
+    outStream122 OBJECT IDENTIFIER ::= { sti440status 127 }
+
+    outBr122 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream122 1 }
+
+    outStream123 OBJECT IDENTIFIER ::= { sti440status 128 }
+
+    outBr123 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream123 1 }
+
+    outStream124 OBJECT IDENTIFIER ::= { sti440status 129 }
+
+    outBr124 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream124 1 }
+
+    outStream125 OBJECT IDENTIFIER ::= { sti440status 130 }
+
+    outBr125 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream125 1 }
+
+    outStream126 OBJECT IDENTIFIER ::= { sti440status 131 }
+
+    outBr126 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream126 1 }
+
+    outStream127 OBJECT IDENTIFIER ::= { sti440status 132 }
+
+    outBr127 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream127 1 }
+
+    outStream128 OBJECT IDENTIFIER ::= { sti440status 133 }
+
+    outBr128 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream128 1 }
+
+    outStream129 OBJECT IDENTIFIER ::= { sti440status 134 }
+
+    outBr129 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream129 1 }
+
+    outStream130 OBJECT IDENTIFIER ::= { sti440status 135 }
+
+    outBr130 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream130 1 }
+
+    outStream131 OBJECT IDENTIFIER ::= { sti440status 136 }
+
+    outBr131 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream131 1 }
+
+    outStream132 OBJECT IDENTIFIER ::= { sti440status 137 }
+
+    outBr132 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream132 1 }
+
+    outStream133 OBJECT IDENTIFIER ::= { sti440status 138 }
+
+    outBr133 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream133 1 }
+
+    outStream134 OBJECT IDENTIFIER ::= { sti440status 139 }
+
+    outBr134 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream134 1 }
+
+    outStream135 OBJECT IDENTIFIER ::= { sti440status 140 }
+
+    outBr135 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream135 1 }
+
+    outStream136 OBJECT IDENTIFIER ::= { sti440status 141 }
+
+    outBr136 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream136 1 }
+
+    outStream137 OBJECT IDENTIFIER ::= { sti440status 142 }
+
+    outBr137 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream137 1 }
+
+    outStream138 OBJECT IDENTIFIER ::= { sti440status 143 }
+
+    outBr138 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream138 1 }
+
+    outStream139 OBJECT IDENTIFIER ::= { sti440status 144 }
+
+    outBr139 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream139 1 }
+
+    outStream140 OBJECT IDENTIFIER ::= { sti440status 145 }
+
+    outBr140 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream140 1 }
+
+    outStream141 OBJECT IDENTIFIER ::= { sti440status 146 }
+
+    outBr141 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream141 1 }
+
+    outStream142 OBJECT IDENTIFIER ::= { sti440status 147 }
+
+    outBr142 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream142 1 }
+
+    outStream143 OBJECT IDENTIFIER ::= { sti440status 148 }
+
+    outBr143 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream143 1 }
+
+    outStream144 OBJECT IDENTIFIER ::= { sti440status 149 }
+
+    outBr144 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream144 1 }
+
+    outStream145 OBJECT IDENTIFIER ::= { sti440status 150 }
+
+    outBr145 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream145 1 }
+
+    outStream146 OBJECT IDENTIFIER ::= { sti440status 151 }
+
+    outBr146 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream146 1 }
+
+    outStream147 OBJECT IDENTIFIER ::= { sti440status 152 }
+
+    outBr147 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream147 1 }
+
+    outStream148 OBJECT IDENTIFIER ::= { sti440status 153 }
+
+    outBr148 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream148 1 }
+
+    outStream149 OBJECT IDENTIFIER ::= { sti440status 154 }
+
+    outBr149 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream149 1 }
+
+    outStream150 OBJECT IDENTIFIER ::= { sti440status 155 }
+
+    outBr150 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream150 1 }
+
+    outStream151 OBJECT IDENTIFIER ::= { sti440status 156 }
+
+    outBr151 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream151 1 }
+
+    outStream152 OBJECT IDENTIFIER ::= { sti440status 157 }
+
+    outBr152 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream152 1 }
+
+    outStream153 OBJECT IDENTIFIER ::= { sti440status 158 }
+
+    outBr153 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream153 1 }
+
+    outStream154 OBJECT IDENTIFIER ::= { sti440status 159 }
+
+    outBr154 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream154 1 }
+
+    outStream155 OBJECT IDENTIFIER ::= { sti440status 160 }
+
+    outBr155 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream155 1 }
+
+    outStream156 OBJECT IDENTIFIER ::= { sti440status 161 }
+
+    outBr156 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream156 1 }
+
+    outStream157 OBJECT IDENTIFIER ::= { sti440status 162 }
+
+    outBr157 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream157 1 }
+
+    outStream158 OBJECT IDENTIFIER ::= { sti440status 163 }
+
+    outBr158 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream158 1 }
+
+    outStream159 OBJECT IDENTIFIER ::= { sti440status 164 }
+
+    outBr159 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream159 1 }
+
+    outStream160 OBJECT IDENTIFIER ::= { sti440status 165 }
+
+    outBr160 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream160 1 }
+
+    outStream161 OBJECT IDENTIFIER ::= { sti440status 166 }
+
+    outBr161 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream161 1 }
+
+    outStream162 OBJECT IDENTIFIER ::= { sti440status 167 }
+
+    outBr162 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream162 1 }
+
+    outStream163 OBJECT IDENTIFIER ::= { sti440status 168 }
+
+    outBr163 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream163 1 }
+
+    outStream164 OBJECT IDENTIFIER ::= { sti440status 169 }
+
+    outBr164 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream164 1 }
+
+    outStream165 OBJECT IDENTIFIER ::= { sti440status 170 }
+
+    outBr165 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream165 1 }
+
+    outStream166 OBJECT IDENTIFIER ::= { sti440status 171 }
+
+    outBr166 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream166 1 }
+
+    outStream167 OBJECT IDENTIFIER ::= { sti440status 172 }
+
+    outBr167 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream167 1 }
+
+    outStream168 OBJECT IDENTIFIER ::= { sti440status 173 }
+
+    outBr168 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream168 1 }
+
+    outStream169 OBJECT IDENTIFIER ::= { sti440status 174 }
+
+    outBr169 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream169 1 }
+
+    outStream170 OBJECT IDENTIFIER ::= { sti440status 175 }
+
+    outBr170 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream170 1 }
+
+    outStream171 OBJECT IDENTIFIER ::= { sti440status 176 }
+
+    outBr171 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream171 1 }
+
+    outStream172 OBJECT IDENTIFIER ::= { sti440status 177 }
+
+    outBr172 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream172 1 }
+
+    outStream173 OBJECT IDENTIFIER ::= { sti440status 178 }
+
+    outBr173 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream173 1 }
+
+    outStream174 OBJECT IDENTIFIER ::= { sti440status 179 }
+
+    outBr174 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream174 1 }
+
+    outStream175 OBJECT IDENTIFIER ::= { sti440status 180 }
+
+    outBr175 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream175 1 }
+
+    outStream176 OBJECT IDENTIFIER ::= { sti440status 181 }
+
+    outBr176 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream176 1 }
+
+    outStream177 OBJECT IDENTIFIER ::= { sti440status 182 }
+
+    outBr177 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream177 1 }
+
+    outStream178 OBJECT IDENTIFIER ::= { sti440status 183 }
+
+    outBr178 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream178 1 }
+
+    outStream179 OBJECT IDENTIFIER ::= { sti440status 184 }
+
+    outBr179 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream179 1 }
+
+    outStream180 OBJECT IDENTIFIER ::= { sti440status 185 }
+
+    outBr180 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream180 1 }
+
+    outStream181 OBJECT IDENTIFIER ::= { sti440status 186 }
+
+    outBr181 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream181 1 }
+
+    outStream182 OBJECT IDENTIFIER ::= { sti440status 187 }
+
+    outBr182 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream182 1 }
+
+    outStream183 OBJECT IDENTIFIER ::= { sti440status 188 }
+
+    outBr183 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream183 1 }
+
+    outStream184 OBJECT IDENTIFIER ::= { sti440status 189 }
+
+    outBr184 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream184 1 }
+
+    outStream185 OBJECT IDENTIFIER ::= { sti440status 190 }
+
+    outBr185 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream185 1 }
+
+    outStream186 OBJECT IDENTIFIER ::= { sti440status 191 }
+
+    outBr186 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream186 1 }
+
+    outStream187 OBJECT IDENTIFIER ::= { sti440status 192 }
+
+    outBr187 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream187 1 }
+
+    outStream188 OBJECT IDENTIFIER ::= { sti440status 193 }
+
+    outBr188 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream188 1 }
+
+    outStream189 OBJECT IDENTIFIER ::= { sti440status 194 }
+
+    outBr189 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream189 1 }
+
+    outStream190 OBJECT IDENTIFIER ::= { sti440status 195 }
+
+    outBr190 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream190 1 }
+
+    outStream191 OBJECT IDENTIFIER ::= { sti440status 196 }
+
+    outBr191 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream191 1 }
+
+    outStream192 OBJECT IDENTIFIER ::= { sti440status 197 }
+
+    outBr192 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream192 1 }
+
+    outStream193 OBJECT IDENTIFIER ::= { sti440status 198 }
+
+    outBr193 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream193 1 }
+
+    outStream194 OBJECT IDENTIFIER ::= { sti440status 199 }
+
+    outBr194 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream194 1 }
+
+    outStream195 OBJECT IDENTIFIER ::= { sti440status 200 }
+
+    outBr195 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream195 1 }
+
+    outStream196 OBJECT IDENTIFIER ::= { sti440status 201 }
+
+    outBr196 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream196 1 }
+
+    outStream197 OBJECT IDENTIFIER ::= { sti440status 202 }
+
+    outBr197 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream197 1 }
+
+    outStream198 OBJECT IDENTIFIER ::= { sti440status 203 }
+
+    outBr198 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream198 1 }
+
+    outStream199 OBJECT IDENTIFIER ::= { sti440status 204 }
+
+    outBr199 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream199 1 }
+
+    outStream200 OBJECT IDENTIFIER ::= { sti440status 205 }
+
+    outBr200 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream200 1 }
+
+    outStream201 OBJECT IDENTIFIER ::= { sti440status 206 }
+
+    outBr201 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream201 1 }
+
+    outStream202 OBJECT IDENTIFIER ::= { sti440status 207 }
+
+    outBr202 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream202 1 }
+
+    outStream203 OBJECT IDENTIFIER ::= { sti440status 208 }
+
+    outBr203 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream203 1 }
+
+    outStream204 OBJECT IDENTIFIER ::= { sti440status 209 }
+
+    outBr204 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream204 1 }
+
+    outStream205 OBJECT IDENTIFIER ::= { sti440status 210 }
+
+    outBr205 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream205 1 }
+
+    outStream206 OBJECT IDENTIFIER ::= { sti440status 211 }
+
+    outBr206 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream206 1 }
+
+    outStream207 OBJECT IDENTIFIER ::= { sti440status 212 }
+
+    outBr207 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream207 1 }
+
+    outStream208 OBJECT IDENTIFIER ::= { sti440status 213 }
+
+    outBr208 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream208 1 }
+
+    outStream209 OBJECT IDENTIFIER ::= { sti440status 214 }
+
+    outBr209 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream209 1 }
+
+    outStream210 OBJECT IDENTIFIER ::= { sti440status 215 }
+
+    outBr210 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream210 1 }
+
+    outStream211 OBJECT IDENTIFIER ::= { sti440status 216 }
+
+    outBr211 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream211 1 }
+
+    outStream212 OBJECT IDENTIFIER ::= { sti440status 217 }
+
+    outBr212 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream212 1 }
+
+    outStream213 OBJECT IDENTIFIER ::= { sti440status 218 }
+
+    outBr213 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream213 1 }
+
+    outStream214 OBJECT IDENTIFIER ::= { sti440status 219 }
+
+    outBr214 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream214 1 }
+
+    outStream215 OBJECT IDENTIFIER ::= { sti440status 220 }
+
+    outBr215 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream215 1 }
+
+    outStream216 OBJECT IDENTIFIER ::= { sti440status 221 }
+
+    outBr216 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream216 1 }
+
+    outStream217 OBJECT IDENTIFIER ::= { sti440status 222 }
+
+    outBr217 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream217 1 }
+
+    outStream218 OBJECT IDENTIFIER ::= { sti440status 223 }
+
+    outBr218 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream218 1 }
+
+    outStream219 OBJECT IDENTIFIER ::= { sti440status 224 }
+
+    outBr219 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream219 1 }
+
+    outStream220 OBJECT IDENTIFIER ::= { sti440status 225 }
+
+    outBr220 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream220 1 }
+
+    outStream221 OBJECT IDENTIFIER ::= { sti440status 226 }
+
+    outBr221 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream221 1 }
+
+    outStream222 OBJECT IDENTIFIER ::= { sti440status 227 }
+
+    outBr222 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream222 1 }
+
+    outStream223 OBJECT IDENTIFIER ::= { sti440status 228 }
+
+    outBr223 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream223 1 }
+
+    outStream224 OBJECT IDENTIFIER ::= { sti440status 229 }
+
+    outBr224 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream224 1 }
+
+    outStream225 OBJECT IDENTIFIER ::= { sti440status 230 }
+
+    outBr225 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream225 1 }
+
+    outStream226 OBJECT IDENTIFIER ::= { sti440status 231 }
+
+    outBr226 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream226 1 }
+
+    outStream227 OBJECT IDENTIFIER ::= { sti440status 232 }
+
+    outBr227 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream227 1 }
+
+    outStream228 OBJECT IDENTIFIER ::= { sti440status 233 }
+
+    outBr228 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream228 1 }
+
+    outStream229 OBJECT IDENTIFIER ::= { sti440status 234 }
+
+    outBr229 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream229 1 }
+
+    outStream230 OBJECT IDENTIFIER ::= { sti440status 235 }
+
+    outBr230 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream230 1 }
+
+    outStream231 OBJECT IDENTIFIER ::= { sti440status 236 }
+
+    outBr231 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream231 1 }
+
+    outStream232 OBJECT IDENTIFIER ::= { sti440status 237 }
+
+    outBr232 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream232 1 }
+
+    outStream233 OBJECT IDENTIFIER ::= { sti440status 238 }
+
+    outBr233 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream233 1 }
+
+    outStream234 OBJECT IDENTIFIER ::= { sti440status 239 }
+
+    outBr234 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream234 1 }
+
+    outStream235 OBJECT IDENTIFIER ::= { sti440status 240 }
+
+    outBr235 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream235 1 }
+
+    outStream236 OBJECT IDENTIFIER ::= { sti440status 241 }
+
+    outBr236 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream236 1 }
+
+    outStream237 OBJECT IDENTIFIER ::= { sti440status 242 }
+
+    outBr237 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream237 1 }
+
+    outStream238 OBJECT IDENTIFIER ::= { sti440status 243 }
+
+    outBr238 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream238 1 }
+
+    outStream239 OBJECT IDENTIFIER ::= { sti440status 244 }
+
+    outBr239 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream239 1 }
+
+    outStream240 OBJECT IDENTIFIER ::= { sti440status 245 }
+
+    outBr240 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream240 1 }
+
+    outStream241 OBJECT IDENTIFIER ::= { sti440status 246 }
+
+    outBr241 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream241 1 }
+
+    outStream242 OBJECT IDENTIFIER ::= { sti440status 247 }
+
+    outBr242 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream242 1 }
+
+    outStream243 OBJECT IDENTIFIER ::= { sti440status 248 }
+
+    outBr243 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream243 1 }
+
+    outStream244 OBJECT IDENTIFIER ::= { sti440status 249 }
+
+    outBr244 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream244 1 }
+
+    outStream245 OBJECT IDENTIFIER ::= { sti440status 250 }
+
+    outBr245 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream245 1 }
+
+    outStream246 OBJECT IDENTIFIER ::= { sti440status 251 }
+
+    outBr246 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream246 1 }
+
+    outStream247 OBJECT IDENTIFIER ::= { sti440status 252 }
+
+    outBr247 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream247 1 }
+
+    outStream248 OBJECT IDENTIFIER ::= { sti440status 253 }
+
+    outBr248 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream248 1 }
+
+    outStream249 OBJECT IDENTIFIER ::= { sti440status 254 }
+
+    outBr249 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream249 1 }
+
+    outStream250 OBJECT IDENTIFIER ::= { sti440status 255 }
+
+    outBr250 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream250 1 }
+
+    outStream251 OBJECT IDENTIFIER ::= { sti440status 256 }
+
+    outBr251 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream251 1 }
+
+    outStream252 OBJECT IDENTIFIER ::= { sti440status 257 }
+
+    outBr252 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream252 1 }
+
+    outStream253 OBJECT IDENTIFIER ::= { sti440status 258 }
+
+    outBr253 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream253 1 }
+
+    outStream254 OBJECT IDENTIFIER ::= { sti440status 259 }
+
+    outBr254 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream254 1 }
+
+    outStream255 OBJECT IDENTIFIER ::= { sti440status 260 }
+
+    outBr255 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream255 1 }
+
+    outStream256 OBJECT IDENTIFIER ::= { sti440status 261 }
+
+    outBr256 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream256 1 }
+
+    outStream257 OBJECT IDENTIFIER ::= { sti440status 262 }
+
+    outBr257 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream257 1 }
+
+    outStream258 OBJECT IDENTIFIER ::= { sti440status 263 }
+
+    outBr258 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream258 1 }
+
+    outStream259 OBJECT IDENTIFIER ::= { sti440status 264 }
+
+    outBr259 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream259 1 }
+
+    outStream260 OBJECT IDENTIFIER ::= { sti440status 265 }
+
+    outBr260 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream260 1 }
+
+    outStream261 OBJECT IDENTIFIER ::= { sti440status 266 }
+
+    outBr261 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream261 1 }
+
+    outStream262 OBJECT IDENTIFIER ::= { sti440status 267 }
+
+    outBr262 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream262 1 }
+
+    outStream263 OBJECT IDENTIFIER ::= { sti440status 268 }
+
+    outBr263 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream263 1 }
+
+    outStream264 OBJECT IDENTIFIER ::= { sti440status 269 }
+
+    outBr264 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream264 1 }
+
+    outStream265 OBJECT IDENTIFIER ::= { sti440status 270 }
+
+    outBr265 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream265 1 }
+
+    outStream266 OBJECT IDENTIFIER ::= { sti440status 271 }
+
+    outBr266 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream266 1 }
+
+    outStream267 OBJECT IDENTIFIER ::= { sti440status 272 }
+
+    outBr267 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream267 1 }
+
+    outStream268 OBJECT IDENTIFIER ::= { sti440status 273 }
+
+    outBr268 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream268 1 }
+
+    outStream269 OBJECT IDENTIFIER ::= { sti440status 274 }
+
+    outBr269 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream269 1 }
+
+    outStream270 OBJECT IDENTIFIER ::= { sti440status 275 }
+
+    outBr270 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream270 1 }
+
+    outStream271 OBJECT IDENTIFIER ::= { sti440status 276 }
+
+    outBr271 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream271 1 }
+
+    outStream272 OBJECT IDENTIFIER ::= { sti440status 277 }
+
+    outBr272 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream272 1 }
+
+    outStream273 OBJECT IDENTIFIER ::= { sti440status 278 }
+
+    outBr273 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream273 1 }
+
+    outStream274 OBJECT IDENTIFIER ::= { sti440status 279 }
+
+    outBr274 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream274 1 }
+
+    outStream275 OBJECT IDENTIFIER ::= { sti440status 280 }
+
+    outBr275 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream275 1 }
+
+    outStream276 OBJECT IDENTIFIER ::= { sti440status 281 }
+
+    outBr276 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream276 1 }
+
+    outStream277 OBJECT IDENTIFIER ::= { sti440status 282 }
+
+    outBr277 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream277 1 }
+
+    outStream278 OBJECT IDENTIFIER ::= { sti440status 283 }
+
+    outBr278 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream278 1 }
+
+    outStream279 OBJECT IDENTIFIER ::= { sti440status 284 }
+
+    outBr279 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream279 1 }
+
+    outStream280 OBJECT IDENTIFIER ::= { sti440status 285 }
+
+    outBr280 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream280 1 }
+
+    outStream281 OBJECT IDENTIFIER ::= { sti440status 286 }
+
+    outBr281 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream281 1 }
+
+    outStream282 OBJECT IDENTIFIER ::= { sti440status 287 }
+
+    outBr282 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream282 1 }
+
+    outStream283 OBJECT IDENTIFIER ::= { sti440status 288 }
+
+    outBr283 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream283 1 }
+
+    outStream284 OBJECT IDENTIFIER ::= { sti440status 289 }
+
+    outBr284 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream284 1 }
+
+    outStream285 OBJECT IDENTIFIER ::= { sti440status 290 }
+
+    outBr285 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream285 1 }
+
+    outStream286 OBJECT IDENTIFIER ::= { sti440status 291 }
+
+    outBr286 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream286 1 }
+
+    outStream287 OBJECT IDENTIFIER ::= { sti440status 292 }
+
+    outBr287 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream287 1 }
+
+    outStream288 OBJECT IDENTIFIER ::= { sti440status 293 }
+
+    outBr288 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream288 1 }
+
+    outStream289 OBJECT IDENTIFIER ::= { sti440status 294 }
+
+    outBr289 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream289 1 }
+
+    outStream290 OBJECT IDENTIFIER ::= { sti440status 295 }
+
+    outBr290 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream290 1 }
+
+    outStream291 OBJECT IDENTIFIER ::= { sti440status 296 }
+
+    outBr291 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream291 1 }
+
+    outStream292 OBJECT IDENTIFIER ::= { sti440status 297 }
+
+    outBr292 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream292 1 }
+
+    outStream293 OBJECT IDENTIFIER ::= { sti440status 298 }
+
+    outBr293 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream293 1 }
+
+    outStream294 OBJECT IDENTIFIER ::= { sti440status 299 }
+
+    outBr294 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream294 1 }
+
+    outStream295 OBJECT IDENTIFIER ::= { sti440status 300 }
+
+    outBr295 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream295 1 }
+
+    outStream296 OBJECT IDENTIFIER ::= { sti440status 301 }
+
+    outBr296 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream296 1 }
+
+    outStream297 OBJECT IDENTIFIER ::= { sti440status 302 }
+
+    outBr297 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream297 1 }
+
+    outStream298 OBJECT IDENTIFIER ::= { sti440status 303 }
+
+    outBr298 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream298 1 }
+
+    outStream299 OBJECT IDENTIFIER ::= { sti440status 304 }
+
+    outBr299 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream299 1 }
+
+    outStream300 OBJECT IDENTIFIER ::= { sti440status 305 }
+
+    outBr300 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream300 1 }
+
+    outStream301 OBJECT IDENTIFIER ::= { sti440status 306 }
+
+    outBr301 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream301 1 }
+
+    outStream302 OBJECT IDENTIFIER ::= { sti440status 307 }
+
+    outBr302 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream302 1 }
+
+    outStream303 OBJECT IDENTIFIER ::= { sti440status 308 }
+
+    outBr303 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream303 1 }
+
+    outStream304 OBJECT IDENTIFIER ::= { sti440status 309 }
+
+    outBr304 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream304 1 }
+
+    outStream305 OBJECT IDENTIFIER ::= { sti440status 310 }
+
+    outBr305 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream305 1 }
+
+    outStream306 OBJECT IDENTIFIER ::= { sti440status 311 }
+
+    outBr306 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream306 1 }
+
+    outStream307 OBJECT IDENTIFIER ::= { sti440status 312 }
+
+    outBr307 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream307 1 }
+
+    outStream308 OBJECT IDENTIFIER ::= { sti440status 313 }
+
+    outBr308 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream308 1 }
+
+    outStream309 OBJECT IDENTIFIER ::= { sti440status 314 }
+
+    outBr309 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream309 1 }
+
+    outStream310 OBJECT IDENTIFIER ::= { sti440status 315 }
+
+    outBr310 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream310 1 }
+
+    outStream311 OBJECT IDENTIFIER ::= { sti440status 316 }
+
+    outBr311 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream311 1 }
+
+    outStream312 OBJECT IDENTIFIER ::= { sti440status 317 }
+
+    outBr312 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream312 1 }
+
+    outStream313 OBJECT IDENTIFIER ::= { sti440status 318 }
+
+    outBr313 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream313 1 }
+
+    outStream314 OBJECT IDENTIFIER ::= { sti440status 319 }
+
+    outBr314 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream314 1 }
+
+    outStream315 OBJECT IDENTIFIER ::= { sti440status 320 }
+
+    outBr315 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream315 1 }
+
+    outStream316 OBJECT IDENTIFIER ::= { sti440status 321 }
+
+    outBr316 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream316 1 }
+
+    outStream317 OBJECT IDENTIFIER ::= { sti440status 322 }
+
+    outBr317 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream317 1 }
+
+    outStream318 OBJECT IDENTIFIER ::= { sti440status 323 }
+
+    outBr318 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream318 1 }
+
+    outStream319 OBJECT IDENTIFIER ::= { sti440status 324 }
+
+    outBr319 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream319 1 }
+
+    outStream320 OBJECT IDENTIFIER ::= { sti440status 325 }
+
+    outBr320 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in tenth of Mbps"
+        ::= { outStream320 1 }
+
+    commStatus OBJECT IDENTIFIER ::= { sti440status 326 }
+
+    inTotbr OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Total input bitrate in tenth of Mbps"
+        ::= { commStatus 1 }
+
+    outTotbr OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of Mbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Total output bitrate in tenth of Mbps"
+        ::= { commStatus 2 }
+
+    cpuLoad OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "%"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "CPU load in %"
+        ::= { commStatus 3 }
+
+    intTemp OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "deg C"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Internal temperature in deg C"
+        ::= { commStatus 4 }
+
+    volt OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenth of volt"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Supply voltage in tenth of volt"
+        ::= { commStatus 5 }
+
+    sti440alarms OBJECT IDENTIFIER ::= { terra-sti440 2 }
+
+    alarmStlink OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Streaming ETH interface link down"
+        ::= { sti440alarms 1 }
+
+    alarmCtrlink OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Control ETH interface link down"
+        ::= { sti440alarms 2 }
+
+    alarmBrovf OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate overflow"
+        ::= { sti440alarms 3 }
+
+    alarmUnlock1 OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Demodulator 1 unlocked"
+        ::= { sti440alarms 4 }
+
+    alarmUnlock2 OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Demodulator 2 unlocked"
+        ::= { sti440alarms 5 }
+
+    alarmUnlock3 OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Demodulator 3 unlocked"
+        ::= { sti440alarms 6 }
+
+    alarmUnlock4 OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Demodulator 4 unlocked"
+        ::= { sti440alarms 7 }
+
+    alarmUnlock5 OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Demodulator 5 unlocked"
+        ::= { sti440alarms 8 }
+
+    alarmUnlock6 OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Demodulator 6 unlocked"
+        ::= { sti440alarms 9 }
+
+    alarmUnlock7 OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Demodulator 7 unlocked"
+        ::= { sti440alarms 10 }
+
+    alarmUnlock8 OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Demodulator 8 unlocked"
+        ::= { sti440alarms 11 }
+
+    alarmUnlock9 OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Demodulator 9 unlocked"
+        ::= { sti440alarms 12 }
+
+    alarmPowerr OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Power voltage is out of limits"
+        ::= { sti440alarms 13 }
+
+    alarmTemperr OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Module is overheated"
+        ::= { sti440alarms 14 }
+
+    alarmIbrer OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input bitrate overflow"
+        ::= { sti440alarms 15 }
+
+    sti440notifications OBJECT IDENTIFIER ::= { terra-sti440 3 }
+
+    notifyStlink NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmStlink
+                }
+        STATUS              current
+        DESCRIPTION         "Streaming ETH interface link down"
+        ::= { sti440notifications 1 }
+
+    notifyCtrlink NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmCtrlink
+                }
+        STATUS              current
+        DESCRIPTION         "Control ETH interface link down"
+        ::= { sti440notifications 2 }
+
+    notifyBrovf NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmBrovf
+                }
+        STATUS              current
+        DESCRIPTION         "Output bitrate overflow"
+        ::= { sti440notifications 3 }
+
+    notifyUnlock1 NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmUnlock1
+                }
+        STATUS              current
+        DESCRIPTION         "Demodulator 1 unlocked"
+        ::= { sti440notifications 4 }
+
+    notifyUnlock2 NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmUnlock2
+                }
+        STATUS              current
+        DESCRIPTION         "Demodulator 2 unlocked"
+        ::= { sti440notifications 5 }
+
+    notifyUnlock3 NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmUnlock3
+                }
+        STATUS              current
+        DESCRIPTION         "Demodulator 3 unlocked"
+        ::= { sti440notifications 6 }
+
+    notifyUnlock4 NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmUnlock4
+                }
+        STATUS              current
+        DESCRIPTION         "Demodulator 4 unlocked"
+        ::= { sti440notifications 7 }
+
+    notifyUnlock5 NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmUnlock5
+                }
+        STATUS              current
+        DESCRIPTION         "Demodulator 5 unlocked"
+        ::= { sti440notifications 8 }
+
+    notifyUnlock6 NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmUnlock6
+                }
+        STATUS              current
+        DESCRIPTION         "Demodulator 6 unlocked"
+        ::= { sti440notifications 9 }
+
+    notifyUnlock7 NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmUnlock7
+                }
+        STATUS              current
+        DESCRIPTION         "Demodulator 7 unlocked"
+        ::= { sti440notifications 10 }
+
+    notifyUnlock8 NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmUnlock8
+                }
+        STATUS              current
+        DESCRIPTION         "Demodulator 8 unlocked"
+        ::= { sti440notifications 11 }
+
+    notifyUnlock9 NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmUnlock9
+                }
+        STATUS              current
+        DESCRIPTION         "Demodulator 9 unlocked"
+        ::= { sti440notifications 12 }
+
+    notifyPowerr NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmPowerr
+                }
+        STATUS              current
+        DESCRIPTION         "Power voltage is out of limits"
+        ::= { sti440notifications 13 }
+
+    notifyTemperr NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmTemperr
+                }
+        STATUS              current
+        DESCRIPTION         "Module is overheated"
+        ::= { sti440notifications 14 }
+
+    notifyIbrer NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmIbrer
+                }
+        STATUS              current
+        DESCRIPTION         "Input bitrate overflow"
+        ::= { sti440notifications 15 }
+
+    sti440Info OBJECT IDENTIFIER ::= { terra-sti440 4 }
+
+    infVersion OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Represents device firmware version number"
+        ::= { sti440Info 1 }
+
+    infSerNum OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Represents device Serial Number"
+        ::= { sti440Info 2 }
+
+    terrasti440MIBConformance OBJECT IDENTIFIER ::= { terra-sti440 5 }
+
+    terrasti440MIBGroups OBJECT IDENTIFIER ::= { terrasti440MIBConformance 1 }
+
+    sti440TerraMibAllObjects OBJECT-GROUP
+        OBJECTS {           
+                        inLock1,
+                        instd1,
+                        inlevel1,
+                        inmod1,
+                        insnr1,
+                        inber1,
+                        inper1,
+                        inuncorr1,
+                        inbr1,
+                        inccerr1,
+                        intotpack1,
+                        inLock2,
+                        instd2,
+                        inlevel2,
+                        inmod2,
+                        insnr2,
+                        inber2,
+                        inper2,
+                        inuncorr2,
+                        inbr2,
+                        inccerr2,
+                        intotpack2,
+                        inLock3,
+                        instd3,
+                        inlevel3,
+                        inmod3,
+                        insnr3,
+                        inber3,
+                        inper3,
+                        inuncorr3,
+                        inbr3,
+                        inccerr3,
+                        intotpack3,
+                        inLock4,
+                        instd4,
+                        inlevel4,
+                        inmod4,
+                        insnr4,
+                        inber4,
+                        inper4,
+                        inuncorr4,
+                        inbr4,
+                        inccerr4,
+                        intotpack4,
+                        usbinBR,
+                        outBr1,
+                        outBr2,
+                        outBr3,
+                        outBr4,
+                        outBr5,
+                        outBr6,
+                        outBr7,
+                        outBr8,
+                        outBr9,
+                        outBr10,
+                        outBr11,
+                        outBr12,
+                        outBr13,
+                        outBr14,
+                        outBr15,
+                        outBr16,
+                        outBr17,
+                        outBr18,
+                        outBr19,
+                        outBr20,
+                        outBr21,
+                        outBr22,
+                        outBr23,
+                        outBr24,
+                        outBr25,
+                        outBr26,
+                        outBr27,
+                        outBr28,
+                        outBr29,
+                        outBr30,
+                        outBr31,
+                        outBr32,
+                        outBr33,
+                        outBr34,
+                        outBr35,
+                        outBr36,
+                        outBr37,
+                        outBr38,
+                        outBr39,
+                        outBr40,
+                        outBr41,
+                        outBr42,
+                        outBr43,
+                        outBr44,
+                        outBr45,
+                        outBr46,
+                        outBr47,
+                        outBr48,
+                        outBr49,
+                        outBr50,
+                        outBr51,
+                        outBr52,
+                        outBr53,
+                        outBr54,
+                        outBr55,
+                        outBr56,
+                        outBr57,
+                        outBr58,
+                        outBr59,
+                        outBr60,
+                        outBr61,
+                        outBr62,
+                        outBr63,
+                        outBr64,
+                        outBr65,
+                        outBr66,
+                        outBr67,
+                        outBr68,
+                        outBr69,
+                        outBr70,
+                        outBr71,
+                        outBr72,
+                        outBr73,
+                        outBr74,
+                        outBr75,
+                        outBr76,
+                        outBr77,
+                        outBr78,
+                        outBr79,
+                        outBr80,
+                        outBr81,
+                        outBr82,
+                        outBr83,
+                        outBr84,
+                        outBr85,
+                        outBr86,
+                        outBr87,
+                        outBr88,
+                        outBr89,
+                        outBr90,
+                        outBr91,
+                        outBr92,
+                        outBr93,
+                        outBr94,
+                        outBr95,
+                        outBr96,
+                        outBr97,
+                        outBr98,
+                        outBr99,
+                        outBr100,
+                        outBr101,
+                        outBr102,
+                        outBr103,
+                        outBr104,
+                        outBr105,
+                        outBr106,
+                        outBr107,
+                        outBr108,
+                        outBr109,
+                        outBr110,
+                        outBr111,
+                        outBr112,
+                        outBr113,
+                        outBr114,
+                        outBr115,
+                        outBr116,
+                        outBr117,
+                        outBr118,
+                        outBr119,
+                        outBr120,
+                        outBr121,
+                        outBr122,
+                        outBr123,
+                        outBr124,
+                        outBr125,
+                        outBr126,
+                        outBr127,
+                        outBr128,
+                        outBr129,
+                        outBr130,
+                        outBr131,
+                        outBr132,
+                        outBr133,
+                        outBr134,
+                        outBr135,
+                        outBr136,
+                        outBr137,
+                        outBr138,
+                        outBr139,
+                        outBr140,
+                        outBr141,
+                        outBr142,
+                        outBr143,
+                        outBr144,
+                        outBr145,
+                        outBr146,
+                        outBr147,
+                        outBr148,
+                        outBr149,
+                        outBr150,
+                        outBr151,
+                        outBr152,
+                        outBr153,
+                        outBr154,
+                        outBr155,
+                        outBr156,
+                        outBr157,
+                        outBr158,
+                        outBr159,
+                        outBr160,
+                        outBr161,
+                        outBr162,
+                        outBr163,
+                        outBr164,
+                        outBr165,
+                        outBr166,
+                        outBr167,
+                        outBr168,
+                        outBr169,
+                        outBr170,
+                        outBr171,
+                        outBr172,
+                        outBr173,
+                        outBr174,
+                        outBr175,
+                        outBr176,
+                        outBr177,
+                        outBr178,
+                        outBr179,
+                        outBr180,
+                        outBr181,
+                        outBr182,
+                        outBr183,
+                        outBr184,
+                        outBr185,
+                        outBr186,
+                        outBr187,
+                        outBr188,
+                        outBr189,
+                        outBr190,
+                        outBr191,
+                        outBr192,
+                        outBr193,
+                        outBr194,
+                        outBr195,
+                        outBr196,
+                        outBr197,
+                        outBr198,
+                        outBr199,
+                        outBr200,
+                        outBr201,
+                        outBr202,
+                        outBr203,
+                        outBr204,
+                        outBr205,
+                        outBr206,
+                        outBr207,
+                        outBr208,
+                        outBr209,
+                        outBr210,
+                        outBr211,
+                        outBr212,
+                        outBr213,
+                        outBr214,
+                        outBr215,
+                        outBr216,
+                        outBr217,
+                        outBr218,
+                        outBr219,
+                        outBr220,
+                        outBr221,
+                        outBr222,
+                        outBr223,
+                        outBr224,
+                        outBr225,
+                        outBr226,
+                        outBr227,
+                        outBr228,
+                        outBr229,
+                        outBr230,
+                        outBr231,
+                        outBr232,
+                        outBr233,
+                        outBr234,
+                        outBr235,
+                        outBr236,
+                        outBr237,
+                        outBr238,
+                        outBr239,
+                        outBr240,
+                        outBr241,
+                        outBr242,
+                        outBr243,
+                        outBr244,
+                        outBr245,
+                        outBr246,
+                        outBr247,
+                        outBr248,
+                        outBr249,
+                        outBr250,
+                        outBr251,
+                        outBr252,
+                        outBr253,
+                        outBr254,
+                        outBr255,
+                        outBr256,
+                        outBr257,
+                        outBr258,
+                        outBr259,
+                        outBr260,
+                        outBr261,
+                        outBr262,
+                        outBr263,
+                        outBr264,
+                        outBr265,
+                        outBr266,
+                        outBr267,
+                        outBr268,
+                        outBr269,
+                        outBr270,
+                        outBr271,
+                        outBr272,
+                        outBr273,
+                        outBr274,
+                        outBr275,
+                        outBr276,
+                        outBr277,
+                        outBr278,
+                        outBr279,
+                        outBr280,
+                        outBr281,
+                        outBr282,
+                        outBr283,
+                        outBr284,
+                        outBr285,
+                        outBr286,
+                        outBr287,
+                        outBr288,
+                        outBr289,
+                        outBr290,
+                        outBr291,
+                        outBr292,
+                        outBr293,
+                        outBr294,
+                        outBr295,
+                        outBr296,
+                        outBr297,
+                        outBr298,
+                        outBr299,
+                        outBr300,
+                        outBr301,
+                        outBr302,
+                        outBr303,
+                        outBr304,
+                        outBr305,
+                        outBr306,
+                        outBr307,
+                        outBr308,
+                        outBr309,
+                        outBr310,
+                        outBr311,
+                        outBr312,
+                        outBr313,
+                        outBr314,
+                        outBr315,
+                        outBr316,
+                        outBr317,
+                        outBr318,
+                        outBr319,
+                        outBr320,
+                        inTotbr,
+                        outTotbr,
+                        cpuLoad,
+                        intTemp,
+                        volt,
+                        alarmStlink,
+                        alarmCtrlink,
+                        alarmBrovf,
+                        alarmUnlock1,
+                        alarmUnlock2,
+                        alarmUnlock3,
+                        alarmUnlock4,
+                        alarmUnlock5,
+                        alarmUnlock6,
+                        alarmUnlock7,
+                        alarmUnlock8,
+                        alarmUnlock9,
+                        alarmPowerr,
+                        alarmTemperr,
+                        alarmIbrer,
+                        infVersion,
+                        infSerNum
+                }
+        STATUS              current
+        DESCRIPTION         "This automatically created object group contains
+                            all those objects that do not belong to any other
+                            OBJECT-GROUP"
+        ::= { terrasti440MIBGroups 1 }
+
+    sti440TerraMibAllNotifications NOTIFICATION-GROUP
+        NOTIFICATIONS       {
+                                notifyStlink,
+                                notifyCtrlink,
+                                notifyBrovf,
+                                notifyUnlock1,
+                                notifyUnlock2,
+                                notifyUnlock3,
+                                notifyUnlock4,
+                                notifyUnlock5,
+                                notifyUnlock6,
+                                notifyUnlock7,
+                                notifyUnlock8,
+                                notifyUnlock9,
+                                notifyPowerr,
+                                notifyTemperr,
+                                notifyIbrer
+                            }
+        STATUS              current
+        DESCRIPTION         "This automatically created notification group
+                            contains all notifications that do not belong
+                            to any other NOTIFICATION-GROUP"
+        ::= { terrasti440MIBGroups 2 }
+
+END

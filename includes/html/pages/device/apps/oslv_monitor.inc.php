@@ -8,6 +8,22 @@ $name = 'oslv_monitor';
 
 $device_obj = DeviceCache::get($device['device_id']);
 
+// FreeBSD epair interfaces are created in pairs, epairNa and epairNb. The end
+// reported here is the guest side, while the host device LibreNMS polls has the
+// opposite end, so on FreeBSD whenever the name is an epairNa/epairNb, flip the
+// a/b suffix and look up that counterpart instead.
+$oslvm_find_port = function ($device_id, $if_name) use ($device) {
+    if ($device['os'] === 'freebsd' && preg_match('/^epair.*[ab]$/', (string) $if_name)) {
+        $if_name = preg_replace_callback(
+            '/[ab]$/',
+            fn ($matches) => $matches[0] === 'a' ? 'b' : 'a',
+            (string) $if_name
+        );
+    }
+
+    return Port::with('device')->firstWhere(['device_id' => $device_id, 'ifName' => $if_name]);
+};
+
 $link_array = [
     'page' => 'device',
     'device' => $device['device_id'],
@@ -434,12 +450,12 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                     }
                     if (isset($ip_data['gw']) && ! is_null($ip_data['gw'])) {
                         $gw_ip = $ip_data['gw'];
-                        $gw_ip = htmlspecialchars($gw_ip);
+                        $gw_ip = htmlspecialchars((string) $gw_ip);
                     }
                     if (isset($ip_data['if']) && ! is_null($ip_data['if'])) {
                         $interface = $ip_data['if'];
-                        $interface = htmlspecialchars($interface);
-                        $port = Port::with('device')->firstWhere(['device_id' => $app->device_id, 'ifName' => $interface]);
+                        $interface = htmlspecialchars((string) $interface);
+                        $port = $oslvm_find_port($app->device_id, $interface);
                         if (isset($port)) {
                             $interface_raw = true;
                             $interface = generate_port_link([
@@ -459,8 +475,8 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                     }
                     if (isset($ip_data['gw_if']) && ! is_null($ip_data['gw_if'])) {
                         $gw_interface = $ip_data['gw_if'];
-                        $gw_interface = htmlspecialchars($gw_interface);
-                        $port = Port::with('device')->firstWhere(['device_id' => $app->device_id, 'ifName' => $gw_interface]);
+                        $gw_interface = htmlspecialchars((string) $gw_interface);
+                        $port = $oslvm_find_port($app->device_id, $gw_interface);
                         if (isset($port)) {
                             $gw_interface_raw = true;
                             $gw_interface = generate_port_link([

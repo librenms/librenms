@@ -27,6 +27,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class AlertTransportGroup extends Model
 {
@@ -37,4 +38,12 @@ class AlertTransportGroup extends Model
     protected $fillable = [
         'transport_group_name',
     ];
+
+    /**
+     * @return BelongsToMany<AlertTransport, $this>
+     */
+    public function transports(): BelongsToMany
+    {
+        return $this->belongsToMany(AlertTransport::class, 'transport_group_transport', 'transport_group_id', 'transport_id');
+    }
 }

@@ -30,28 +30,31 @@ use App\Facades\DeviceCache;
 use App\Models\Component;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class RoutingController implements DeviceTab
 {
-    private $tabs;
+    private array $tabs = [];
 
     public function __construct()
     {
-        $device = DeviceCache::getPrimary();
-        $this->tabs = [
-            'ospf' => $device->ospfInstances()->count(),
-            'ospfv3' => $device->ospfv3Instances()->count(),
-            'isis' => $device->isisAdjacencies()->count(),
-            'bgp' => $device->bgppeers()->count(),
-            'vrf' => $device->vrfs()->count(),
-            'cef' => $device->cefSwitching()->count(),
-            'mpls' => $device->mplsServices()->count(),
-            'cisco-otv' => Component::query()->where('device_id', $device->device_id)->where('type', 'Cisco-OTV')->count(),
-            'loadbalancer_rservers' => $device->rServers()->count(),
-            'ipsec_tunnels' => $device->ipsecTunnels()->count(),
-            'routes' => $device->routes()->count(),
-        ];
+        if (Gate::any('routing.view', 'routing.viewAll')) {
+            $device = DeviceCache::getPrimary();
+            $this->tabs = [
+                'ospf' => $device->ospfInstances()->count(),
+                'ospfv3' => $device->ospfv3Instances()->count(),
+                'isis' => $device->isisAdjacencies()->count(),
+                'bgp' => $device->bgppeers()->count(),
+                'vrf' => $device->vrfs()->count(),
+                'cef' => $device->cefSwitching()->count(),
+                'mpls' => $device->mplsServices()->count(),
+                'cisco-otv' => Component::query()->where('device_id', $device->device_id)->where('type', 'Cisco-OTV')->count(),
+                'loadbalancer_rservers' => $device->rServers()->count(),
+                'ipsec_tunnels' => $device->ipsecTunnels()->count(),
+                'routes' => $device->routes()->count(),
+            ];
+        }
     }
 
     public function visible(Device $device): bool

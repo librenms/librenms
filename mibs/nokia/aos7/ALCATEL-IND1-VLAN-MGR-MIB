@@ -10,33 +10,27 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 
 
     alcatelIND1VLANMgrMIB MODULE-IDENTITY
-        LAST-UPDATED "200704030000Z"
-        ORGANIZATION "Alcatel-Lucent"
+        LAST-UPDATED "201911270000Z"
+        ORGANIZATION "ALE USA Inc."
         CONTACT-INFO
-            "Please consult with Customer Service to ensure the most appropriate
-             version of this document is used with the products in question:
+         "Please consult with Customer Service to ensure the most appropriate
+          version of this document is used with the products in question:
 
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
-                               26801 West Agoura Road
-                            Agoura Hills, CA  91301-5122
-                              United States Of America
+                          Alcatel-Lucent Enterprise
+                            26801 West Agoura Road
+                         Agoura Hills, CA  91301-5122
+                           United States Of America
 
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
+         Telephone:          +1 800 995 2696
 
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+         Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+         World Wide Web:     https://www.al-enterprise.com"
 
         DESCRIPTION
             "This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                 For the Birds Of Prey Product Line
+                 For the OmniSwitch Product Line
                  Vlan Manager for the distribution of vlan configuration information,
                  including the association between vlans and ports.
 
@@ -51,8 +45,13 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2007 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+                       Copyright (C) ALE USA Inc. 2014-2019
+                       Copyright (C) 1995-2013 Alcatel-Lucent
+                           ALL RIGHTS RESERVED WORLDWIDE"
+
+        REVISION      "201911270000Z"
+        DESCRIPTION
+            "Updated the latest contact and Copyright information for ALE USA Inc."
 
         REVISION      "200704030000Z"
         DESCRIPTION
@@ -133,7 +132,9 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
             vlanMtu
                 Integer32,
             vlanAfdCfg
-                Integer32
+                Integer32,
+            vlanMacTunneling
+                INTEGER
     }
 
     vlanNumber  OBJECT-TYPE
@@ -240,8 +241,10 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
             primaryVlan(19),
             isolatedVlan(20),
             communityVlan(21),
-            allVlan(22),
-            invalidVlan(23)
+            guestVlan(22),
+            l2greVlan(23),
+            mcastRcvVlan(24),
+            profinetVlan(25)
 	
         }
         MAX-ACCESS  read-create
@@ -252,14 +255,12 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
         ::= { vlanEntry 8 }
 
     vlanMtu  OBJECT-TYPE
-        SYNTAX  Integer32 (512..10222)
+        SYNTAX  Integer32 (1280..9198)
         MAX-ACCESS  read-create
         STATUS  current
         DESCRIPTION
             "Maximum transmission unit i.e. the maximum size of packet that this
-             vlan can handle. It ranges from 512 to 1500 (for OS6XXX) and 10222
-             (for OS7XXX and OS8XXX) with e2 encapsulation.With snap encapsulation
-             it ranges from 512 to 1492"
+             vlan can handle." 
         DEFVAL { 1500 }
         ::= { vlanEntry 9 }
 
@@ -273,6 +274,18 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
         DEFVAL { 1 }
         ::= { vlanEntry 10 }
 
+    vlanMacTunneling OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+                enable (1),
+                disable (2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "The MAC-Tunneling status of the VLAN."
+        DEFVAL { disable }
+        ::= { vlanEntry 11 }
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -425,6 +438,24 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 	::= { vlanMgrVlanSet 4 }
 
 
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    vlanGlobalConfig  OBJECT IDENTIFIER ::= { alcatelIND1VLANMgrMIBObjects 4 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    vlanGlobalPromptForDeletion  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Enable or disable the VLAN prompt on deletion feature."
+	DEFVAL { disabled }
+        ::= { vlanGlobalConfig 1 }
+
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -- COMPLIANCE
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -460,7 +491,8 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
             vlanSrcLearningStatus,
             vlanType,
             vlanMtu,
-            vlanAfdCfg
+            vlanAfdCfg,
+            vlanMacTunneling
         }
         STATUS  current
         DESCRIPTION
@@ -492,6 +524,16 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "Collection of objects for Vlan Manager global properties."
         ::= { alcatelIND1VLANMgrMIBGroups 3 }
+
+    vlanGlobalGroup OBJECT-GROUP
+        OBJECTS
+        {
+           vlanGlobalPromptForDeletion
+        }
+        STATUS current
+        DESCRIPTION
+            "Collection of objects for Vlan global properties."
+        ::= { alcatelIND1VLANMgrMIBGroups 4 }
 
 END
 

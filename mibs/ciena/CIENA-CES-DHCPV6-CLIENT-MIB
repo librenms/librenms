@@ -1,44 +1,49 @@
--- This file was included in WWP MIB release 04-16-00-0047
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-06-00-5005
+--
  --
  -- CIENA-CES-DHCPV6-CLIENT-MIB.my
  --
-
+           
  CIENA-CES-DHCPV6-CLIENT-MIB DEFINITIONS ::= BEGIN
 
- IMPORTS
+ IMPORTS 		
    Integer32, Counter32, Gauge32,  OBJECT-TYPE, MODULE-IDENTITY, Unsigned32
-        FROM SNMPv2-SMI
+	FROM SNMPv2-SMI			
    DisplayString, RowStatus
-        FROM SNMPv2-TC
+	FROM SNMPv2-TC						
    InetAddressType, InetAddress
-        FROM INET-ADDRESS-MIB
+	FROM INET-ADDRESS-MIB  
    CienaGlobalState, CienaStatsClear
-        FROM CIENA-TC
+	FROM CIENA-TC   
    cienaCesConfig, cienaCesNotifications
-        FROM CIENA-SMI;
-
-
+	FROM CIENA-SMI;
+	
+	
  cienaCesDhcpv6ClientMIB MODULE-IDENTITY
-        LAST-UPDATED "201606210000Z"
-        ORGANIZATION "Ciena, Inc"
-        CONTACT-INFO
+	LAST-UPDATED "201709120000Z"
+	ORGANIZATION "Ciena, Inc"
+	CONTACT-INFO
             "   Mib Meister
-                115 North Sullivan Road
-                Spokane Valley, WA 99037
+                7035 Ridge Road
+                Hanover, Maryland 21076
                 USA
-                Phone:  +1 509 242 9000
+                Phone:  +1 800 921 1144
                 Email:  support@ciena.com"
         DESCRIPTION
                 "The MIB module to manage DHCPv6 client on Ciena CES products."
 
+        REVISION "201709120000Z"
+        DESCRIPTION
+                "Updated contact info."
+
         REVISION "201606210000Z"
         DESCRIPTION
-                "LDRA - updated cienaCesDhcpv6LdraMplsVcName to 
+                "LDRA - updated cienaCesDhcpv6LdraMplsVcName to
                 allow the VC name length up to 31 characters."
-        
+
         REVISION "201601190000Z"
         DESCRIPTION
-                "LDRA - updated Dhcpv6LdraVsName and Dhcpv6LdraMplsName 
+                "LDRA - updated Dhcpv6LdraVsName and Dhcpv6LdraMplsName
                 to allow the VS name length up to 31 characters."
 
         REVISION "201511020000Z"
@@ -62,6 +67,7 @@
                 "Added support for Lightweight DHCPv6 Relay Agent (LDRA). The
                 functionality is similar to that for the L2 relay agent."
 
+
         REVISION "201302111900Z"
         DESCRIPTION
                 "The ReconfigureState was included by mistake.  It should not
@@ -78,90 +84,90 @@
                 neither implemented nor released, was removed."
 
         REVISION "201211150000Z"
-        DESCRIPTION
-            "Initial creation."
+	DESCRIPTION
+	    "Initial creation."
 
-        ::= { cienaCesConfig 30 }
+	::= { cienaCesConfig 30 }
 
- --
+ --						
  --
  -- Node definitions
  --
-
+	
  cienaCesDhcpv6ClientMIBObjects OBJECT IDENTIFIER ::= { cienaCesDhcpv6ClientMIB 1 }
-
+ 
  cienaCesDhcpv6Client     OBJECT IDENTIFIER ::= { cienaCesDhcpv6ClientMIBObjects 1 }
 
  cienaCesDhcpv6RelayAgent OBJECT IDENTIFIER ::= { cienaCesDhcpv6ClientMIBObjects 2 }
 
  cienaCesDhcpv6RelayAgentGlobalAttrs OBJECT IDENTIFIER ::= { cienaCesDhcpv6RelayAgent 1 }
 
- -- Notifications
-
- cienaCesDhcpv6ClientMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 30}
+ -- Notifications 
+  
+ cienaCesDhcpv6ClientMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 30} 
  cienaCesDhcpv6ClientMIBNotifications       OBJECT IDENTIFIER ::= { cienaCesDhcpv6ClientMIBNotificationPrefix 0 }
 
- -- Conformance information
-
- cienaCesDhcpv6ClientMIBConformance OBJECT IDENTIFIER ::= { cienaCesDhcpv6ClientMIB 2 }
- cienaCesDhcpv6ClientMIBCompliances OBJECT IDENTIFIER ::= { cienaCesDhcpv6ClientMIBConformance 1 }
+ -- Conformance information 
+ 
+ cienaCesDhcpv6ClientMIBConformance OBJECT IDENTIFIER ::= { cienaCesDhcpv6ClientMIB 2 } 
+ cienaCesDhcpv6ClientMIBCompliances OBJECT IDENTIFIER ::= { cienaCesDhcpv6ClientMIBConformance 1 } 		
  cienaCesDhcpv6ClientMIBGroups      OBJECT IDENTIFIER ::= { cienaCesDhcpv6ClientMIBConformance 2 }
 
  -- The DHCPv6 client table - global settings
-
+ 
  cienaCesDhcpv6AdminState     OBJECT-TYPE
-     SYNTAX         CienaGlobalState
+     SYNTAX		       CienaGlobalState
      MAX-ACCESS     read-only
      STATUS         current
      DESCRIPTION
-        "This object indicates if the DHCPv6 client is administratively enabled."
-     ::= { cienaCesDhcpv6Client 1 }
+    	"This object indicates if the DHCPv6 client is administratively enabled."        
+     ::= { cienaCesDhcpv6Client 1 } 
 
  cienaCesDhcpv6IfName  OBJECT-TYPE
      SYNTAX         DisplayString(SIZE (0..32))
      MAX-ACCESS     read-only
-     STATUS         current
+     STATUS         current     
      DESCRIPTION
-        "The interface associated with the DHCPV6 client."
+     	"The interface associated with the DHCPV6 client."
      ::= { cienaCesDhcpv6Client 2 }
 
- cienaCesDhcpv6RapidCommitState         OBJECT-TYPE
-     SYNTAX                             CienaGlobalState
-     MAX-ACCESS                         read-only
-     STATUS                             current
+ cienaCesDhcpv6RapidCommitState     	OBJECT-TYPE
+     SYNTAX			     	CienaGlobalState
+     MAX-ACCESS     	      		read-only
+     STATUS         			current
      DESCRIPTION
-        "This object indicates if rapid commit option is enabled on the DHCPv6 client."
-     ::= { cienaCesDhcpv6Client 3 }
-
--- cienaCesDhcpv6ReconfigureState       OBJECT-TYPE
---     SYNTAX                           CienaGlobalState
---     MAX-ACCESS                       read-only
---     STATUS                           current
+    	"This object indicates if rapid commit option is enabled on the DHCPv6 client."        
+     ::= { cienaCesDhcpv6Client 3 } 
+     
+-- cienaCesDhcpv6ReconfigureState     	OBJECT-TYPE
+--     SYNTAX				CienaGlobalState
+--     MAX-ACCESS     			read-only
+--     STATUS         			current
 --     DESCRIPTION
---      "This object indicates if reconfigure option is enabled on the DHCPv6 client."
---     ::= { cienaCesDhcpv6Client 4 }
-
+--    	"This object indicates if reconfigure option is enabled on the DHCPv6 client."        
+--     ::= { cienaCesDhcpv6Client 4 } 
+     
  cienaCesDhcpv6PrefLifetimeReq  OBJECT-TYPE
      SYNTAX         Integer32(0..2147483647)
      UNITS          "seconds"
      MAX-ACCESS     read-only
-     STATUS         current
+     STATUS         current     
      DESCRIPTION
-        "The requested preferred lifetime for the IPv6 address expressed in seconds."
-     DEFVAL         { 0 }
+     	"The requested preferred lifetime for the IPv6 address expressed in seconds."
+     DEFVAL  		{ 0 }
      ::= { cienaCesDhcpv6Client 5 }
-
+     
  cienaCesDhcpv6ValidLifetimeReq  OBJECT-TYPE
      SYNTAX         Integer32(0..2147483647)
      UNITS          "seconds"
      MAX-ACCESS     read-only
-     STATUS         current
+     STATUS         current     
      DESCRIPTION
-        "The requested valid lifetime for the IPv6 address expressed in seconds."
-     DEFVAL         { 0 }
+     	"The requested valid lifetime for the IPv6 address expressed in seconds."
+     DEFVAL  		{ 0 }
      ::= { cienaCesDhcpv6Client 6 }
-
-
+          
+     
  --
  -- DHCPOption List
  --
@@ -186,208 +192,211 @@
 
  CienaCesDhcpv6ClientOptionEntry ::=
     SEQUENCE {
-        cienaCesDhcpv6OptionCodeIndex                   Integer32,
-        cienaCesDhcpv6OptionDesc                        DisplayString,
-        cienaCesDhcpv6OptionCode                        Integer32,
-        cienaCesDhcpv6OptionState                       CienaGlobalState
+	cienaCesDhcpv6OptionCodeIndex			Integer32,
+        cienaCesDhcpv6OptionDesc			DisplayString,
+	cienaCesDhcpv6OptionCode			Integer32,
+        cienaCesDhcpv6OptionState			CienaGlobalState
     }
 
  cienaCesDhcpv6OptionCodeIndex OBJECT-TYPE
-     SYNTAX                     Integer32 (1..65535)
-     MAX-ACCESS                 not-accessible
-     STATUS                     current
+     SYNTAX			Integer32 (1..65535)
+     MAX-ACCESS			not-accessible
+     STATUS			current
      DESCRIPTION
              "Specifies the index used for this entry."
-        ::= { cienaCesDhcpv6ClientOptionEntry 1 }
+ 	::= { cienaCesDhcpv6ClientOptionEntry 1 }
 
  cienaCesDhcpv6OptionDesc OBJECT-TYPE
-     SYNTAX                     DisplayString
-     MAX-ACCESS                 read-only
-     STATUS                     current
+     SYNTAX			DisplayString
+     MAX-ACCESS			read-only
+     STATUS			current
      DESCRIPTION
              "Specifies the description for the given DHCPv6 option code."
-        ::= { cienaCesDhcpv6ClientOptionEntry 2 }
+ 	::= { cienaCesDhcpv6ClientOptionEntry 2 }
 
  cienaCesDhcpv6OptionCode OBJECT-TYPE
-     SYNTAX                     Integer32 (0..2147483647)
-     MAX-ACCESS                 read-only
-     STATUS                     current
+     SYNTAX			Integer32 (0..2147483647)
+     MAX-ACCESS			read-only
+     STATUS			current
      DESCRIPTION
              "Specifies the option code specified by RFC specification."
-        ::= { cienaCesDhcpv6ClientOptionEntry 3 }
+ 	::= { cienaCesDhcpv6ClientOptionEntry 3 }
 
- cienaCesDhcpv6OptionState      OBJECT-TYPE
-     SYNTAX                     CienaGlobalState
-     MAX-ACCESS                 read-only
-     STATUS                     current
+ cienaCesDhcpv6OptionState 	OBJECT-TYPE
+     SYNTAX			CienaGlobalState
+     MAX-ACCESS			read-only
+     STATUS			current
      DESCRIPTION
              "Specifies if the given option is enabled/disabled."
-        ::= { cienaCesDhcpv6ClientOptionEntry 4 }
-
+ 	::= { cienaCesDhcpv6ClientOptionEntry 4 }
+ 
  --
  -- Per Session Status
  --
  -- DHCPv6 client Session Table
 
-cienaCesDhcpv6ClientSessTable   OBJECT-TYPE
-        SYNTAX                  SEQUENCE OF CienaCesDhcpv6ClientSessEntry
-        MAX-ACCESS              not-accessible
-        STATUS                  current
-        DESCRIPTION      "List of active DHCPv6 client sessions."
-        ::= { cienaCesDhcpv6Client 8 }
 
-cienaCesDhcpv6ClientSessEntry   OBJECT-TYPE
-        SYNTAX                  CienaCesDhcpv6ClientSessEntry
-        MAX-ACCESS              not-accessible
-        STATUS                  current
-        DESCRIPTION      "An entry in the cienaCesDhcpv6ClientSessTable."
-        INDEX                      { cienaCesDhcpv6ClientSessMgmtIntfIndex }
-        ::= { cienaCesDhcpv6ClientSessTable 1 }
+cienaCesDhcpv6ClientSessTable	OBJECT-TYPE
+	SYNTAX			SEQUENCE OF CienaCesDhcpv6ClientSessEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION      "List of active DHCPv6 client sessions."
+	::= { cienaCesDhcpv6Client 8 }
+
+cienaCesDhcpv6ClientSessEntry	OBJECT-TYPE
+	SYNTAX			CienaCesDhcpv6ClientSessEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION      "An entry in the cienaCesDhcpv6ClientSessTable."
+	INDEX			   { cienaCesDhcpv6ClientSessMgmtIntfIndex }
+	::= { cienaCesDhcpv6ClientSessTable 1 }
+
 
 CienaCesDhcpv6ClientSessEntry ::= SEQUENCE {
-   cienaCesDhcpv6ClientSessMgmtIntfIndex        Integer32,
-   cienaCesDhcpv6ClientSessState                INTEGER,
+   cienaCesDhcpv6ClientSessMgmtIntfIndex        Integer32, 
+   cienaCesDhcpv6ClientSessState          	INTEGER,
    cienaCesDhcpv6ClientSessAutoConfigState      INTEGER,
-   cienaCesDhcpv6ClientSessUpTime               Integer32,
-   cienaCesDhcpv6ClientSessPrefLifetime         Integer32,
-   cienaCesDhcpv6ClientSessValidLifetime        Integer32,
-   cienaCesDhcpv6ClientSessLeaseExpire          Integer32,
-   cienaCesDhcpv6ClientSessClientId             DisplayString,
-   cienaCesDhcpv6ClientSessServerIpAddrType     InetAddressType,
-   cienaCesDhcpv6ClientSessServerIpAddr         InetAddress,
-   cienaCesDhcpv6ClientSessServerId             DisplayString,
-   cienaCesDhcpv6ClientSessT1Time               Integer32,
-   cienaCesDhcpv6ClientSessT2Time               Integer32
+   cienaCesDhcpv6ClientSessUpTime         	Integer32,
+   cienaCesDhcpv6ClientSessPrefLifetime		Integer32,
+   cienaCesDhcpv6ClientSessValidLifetime	Integer32,
+   cienaCesDhcpv6ClientSessLeaseExpire    	Integer32,
+   cienaCesDhcpv6ClientSessClientId       	DisplayString,
+   cienaCesDhcpv6ClientSessServerIpAddrType  	InetAddressType,
+   cienaCesDhcpv6ClientSessServerIpAddr   	InetAddress,
+   cienaCesDhcpv6ClientSessServerId   		DisplayString,
+   cienaCesDhcpv6ClientSessT1Time		Integer32,
+   cienaCesDhcpv6ClientSessT2Time	        Integer32
 }
 
-cienaCesDhcpv6ClientSessMgmtIntfIndex           OBJECT-TYPE
-        SYNTAX                  Integer32 (1..65535)
-        MAX-ACCESS              not-accessible
-        STATUS                  current
-        DESCRIPTION             "The mgmt interface index."
-        ::= { cienaCesDhcpv6ClientSessEntry 1 }
+cienaCesDhcpv6ClientSessMgmtIntfIndex		OBJECT-TYPE
+	SYNTAX			Integer32 (1..65535)
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION		"The mgmt interface index."
+	::= { cienaCesDhcpv6ClientSessEntry 1 }
 
-cienaCesDhcpv6ClientSessState           OBJECT-TYPE
-        SYNTAX      INTEGER
+cienaCesDhcpv6ClientSessState		OBJECT-TYPE
+	SYNTAX      INTEGER
                 {
-                        disabled(1),
-                        init(2),
-                        bound(3),
-                        renewing(4),
-                        rebinding(5),
-                        solicit(6),
-                        request(7),
-                        reconfigure(8),
-                        unknown(99)
+			disabled(1),
+			init(2),
+			bound(3),
+			renewing(4),
+			rebinding(5),
+			solicit(6),         
+			request(7),       
+			reconfigure(8),      
+			unknown(99)
                 }
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The DHCPv6 client state of this session."
-        ::= { cienaCesDhcpv6ClientSessEntry 2 }
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The DHCPv6 client state of this session."
+	::= { cienaCesDhcpv6ClientSessEntry 2 }
 
-cienaCesDhcpv6ClientSessAutoConfigState         OBJECT-TYPE
-        SYNTAX      INTEGER
+cienaCesDhcpv6ClientSessAutoConfigState		OBJECT-TYPE
+	SYNTAX      INTEGER
                 {
-                        none(1),
-                        stateless(2),
-                        stateful(3),
-                        unknown(99)
+			none(1),
+			stateless(2),
+			stateful(3),
+			unknown(99)
                 }
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The DHCPv6 autoconfiguration state of this session
-                          set by the router advertisement."
-        ::= { cienaCesDhcpv6ClientSessEntry 3 }
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The DHCPv6 autoconfiguration state of this session 
+	                  set by the router advertisement."
+	::= { cienaCesDhcpv6ClientSessEntry 3 }
 
-cienaCesDhcpv6ClientSessUpTime          OBJECT-TYPE
-        SYNTAX                  Integer32
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION             "The total length of time that this session has had active
-                 lease(s)."
-        ::= { cienaCesDhcpv6ClientSessEntry 4 }
+cienaCesDhcpv6ClientSessUpTime		OBJECT-TYPE
+	SYNTAX			Integer32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The total length of time that this session has had active 
+		 lease(s)."
+	::= { cienaCesDhcpv6ClientSessEntry 4 }
 
-cienaCesDhcpv6ClientSessPrefLifetime    OBJECT-TYPE
-        SYNTAX                  Integer32
+cienaCesDhcpv6ClientSessPrefLifetime	OBJECT-TYPE
+	SYNTAX			Integer32
         UNITS                   "seconds"
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The preferred lifetime in seconds of the current lease."
-        ::= { cienaCesDhcpv6ClientSessEntry 5 }
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The preferred lifetime in seconds of the current lease."
+	::= { cienaCesDhcpv6ClientSessEntry 5 }
 
-cienaCesDhcpv6ClientSessValidLifetime   OBJECT-TYPE
-        SYNTAX                  Integer32
+cienaCesDhcpv6ClientSessValidLifetime	OBJECT-TYPE
+	SYNTAX			Integer32
         UNITS                   "seconds"
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The valid lifetime in seconds of the current lease."
-        ::= { cienaCesDhcpv6ClientSessEntry 6 }
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The valid lifetime in seconds of the current lease."
+	::= { cienaCesDhcpv6ClientSessEntry 6 }
 
-cienaCesDhcpv6ClientSessLeaseExpire     OBJECT-TYPE
-        SYNTAX                  Integer32
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The remaining seconds until the current lease expires."
-        ::= { cienaCesDhcpv6ClientSessEntry 7 }
+cienaCesDhcpv6ClientSessLeaseExpire	OBJECT-TYPE
+	SYNTAX			Integer32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The remaining seconds until the current lease expires."
+	::= { cienaCesDhcpv6ClientSessEntry 7 }
 
-cienaCesDhcpv6ClientSessClientId                OBJECT-TYPE
-        SYNTAX                  DisplayString
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The full 'client ID' value associated with this lease."
-        ::= { cienaCesDhcpv6ClientSessEntry 8 }
+cienaCesDhcpv6ClientSessClientId		OBJECT-TYPE
+	SYNTAX			DisplayString
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The full 'client ID' value associated with this lease."
+	::= { cienaCesDhcpv6ClientSessEntry 8 }
 
-cienaCesDhcpv6ClientSessServerIpAddrType        OBJECT-TYPE
-        SYNTAX                  InetAddressType
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION             "The IP address type (IPv6) of the server from which this lease was obtained."
-        ::= { cienaCesDhcpv6ClientSessEntry 9 }
+cienaCesDhcpv6ClientSessServerIpAddrType	OBJECT-TYPE
+	SYNTAX			InetAddressType
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The IP address type (IPv6) of the server from which this lease was obtained."
+	::= { cienaCesDhcpv6ClientSessEntry 9 }
 
-cienaCesDhcpv6ClientSessServerIpAddr    OBJECT-TYPE
-        SYNTAX                  InetAddress
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION             "The IP address of the server from which this lease was obtained."
-        ::= { cienaCesDhcpv6ClientSessEntry 10 }
+cienaCesDhcpv6ClientSessServerIpAddr	OBJECT-TYPE
+	SYNTAX			InetAddress
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The IP address of the server from which this lease was obtained."
+	::= { cienaCesDhcpv6ClientSessEntry 10 }
+ 
+cienaCesDhcpv6ClientSessServerId		OBJECT-TYPE
+	SYNTAX			DisplayString
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The full 'server ID' value associated with this lease."
+	::= { cienaCesDhcpv6ClientSessEntry 11 }
 
-cienaCesDhcpv6ClientSessServerId                OBJECT-TYPE
-        SYNTAX                  DisplayString
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The full 'server ID' value associated with this lease."
-        ::= { cienaCesDhcpv6ClientSessEntry 11 }
-
-cienaCesDhcpv6ClientSessT1Time  OBJECT-TYPE
-        SYNTAX                  Integer32
-        UNITS                   "seconds"
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION             "The  lease renewal (T1) time in seconds."
-        ::= { cienaCesDhcpv6ClientSessEntry 12 }
-
-cienaCesDhcpv6ClientSessT2Time  OBJECT-TYPE
-        SYNTAX                  Integer32
-        UNITS                   "seconds"
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION             "The  lease rebind (T2) time in seconds."
-        ::= { cienaCesDhcpv6ClientSessEntry 13 }
-
+cienaCesDhcpv6ClientSessT1Time	OBJECT-TYPE
+	SYNTAX			Integer32
+	UNITS                   "seconds"
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The  lease renewal (T1) time in seconds."
+	::= { cienaCesDhcpv6ClientSessEntry 12 }
+ 
+cienaCesDhcpv6ClientSessT2Time	OBJECT-TYPE
+	SYNTAX			Integer32
+	UNITS                   "seconds"
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"The  lease rebind (T2) time in seconds."
+	::= { cienaCesDhcpv6ClientSessEntry 13 }
+ 
  --
  -- DHCPv6 Client Session Statistics
  --
- --
-
+ -- 
+      
 cienaCesDhcpv6ClientSessStatsTable OBJECT-TYPE
      SYNTAX  SEQUENCE OF CienaCesDhcpv6ClientSessStatsEntry
      MAX-ACCESS not-accessible
      STATUS     current
      DESCRIPTION
-            "The (conceptual) table listing the statistics for DHCPv6 per
-            interface"
+            "The (conceptual) table listing the statistics 
+            for DHCPv6 per interface"  
      ::= { cienaCesDhcpv6Client 9 }
 
+ 
 cienaCesDhcpv6ClientSessStatsEntry OBJECT-TYPE
      SYNTAX      CienaCesDhcpv6ClientSessStatsEntry
      MAX-ACCESS  not-accessible
@@ -397,145 +406,147 @@ cienaCesDhcpv6ClientSessStatsEntry OBJECT-TYPE
      INDEX {cienaCesDhcpv6ClientSessStatsMgmtIntfIndex}
      ::= { cienaCesDhcpv6ClientSessStatsTable 1 }
 
-CienaCesDhcpv6ClientSessStatsEntry ::=  SEQUENCE {
-        cienaCesDhcpv6ClientSessStatsMgmtIntfIndex      Integer32,
-        cienaCesDhcpv6ClientSessStatsClear              CienaStatsClear,
-        cienaCesDhcpv6ClientSessStatsPktsRx             Gauge32,
-        cienaCesDhcpv6ClientSessStatsReply              Gauge32,
-        cienaCesDhcpv6ClientSessStatsAdvert             Gauge32,
-        cienaCesDhcpv6ClientSessStatsRecfg              Gauge32,
-        cienaCesDhcpv6ClientSessStatsInvalid            Gauge32,
-        cienaCesDhcpv6ClientSessStatsPktsTx             Gauge32,
-        cienaCesDhcpv6ClientSessStatsSolicit            Gauge32,
-        cienaCesDhcpv6ClientSessStatsRequest            Gauge32,
-        cienaCesDhcpv6ClientSessStatsConfirm            Gauge32,
-        cienaCesDhcpv6ClientSessStatsRenew              Gauge32,
-        cienaCesDhcpv6ClientSessStatsRebind             Gauge32,
-        cienaCesDhcpv6ClientSessStatsInfoReq            Gauge32,
-        cienaCesDhcpv6ClientSessStatsRelease            Gauge32,
-        cienaCesDhcpv6ClientSessStatsDecline            Gauge32,
-        cienaCesDhcpv6ClientSessStatsTxFail             Gauge32
-        }
+CienaCesDhcpv6ClientSessStatsEntry ::=  SEQUENCE { 
+	cienaCesDhcpv6ClientSessStatsMgmtIntfIndex 	Integer32,
+	cienaCesDhcpv6ClientSessStatsClear      	CienaStatsClear,
+	cienaCesDhcpv6ClientSessStatsPktsRx  		Gauge32,
+	cienaCesDhcpv6ClientSessStatsReply  		Gauge32,	
+	cienaCesDhcpv6ClientSessStatsAdvert  		Gauge32,
+	cienaCesDhcpv6ClientSessStatsRecfg  		Gauge32,
+	cienaCesDhcpv6ClientSessStatsInvalid  		Gauge32,
+	cienaCesDhcpv6ClientSessStatsPktsTx  		Gauge32,
+	cienaCesDhcpv6ClientSessStatsSolicit  		Gauge32,
+	cienaCesDhcpv6ClientSessStatsRequest  		Gauge32,
+	cienaCesDhcpv6ClientSessStatsConfirm  		Gauge32,
+	cienaCesDhcpv6ClientSessStatsRenew  		Gauge32,
+	cienaCesDhcpv6ClientSessStatsRebind  		Gauge32,
+	cienaCesDhcpv6ClientSessStatsInfoReq  		Gauge32,
+	cienaCesDhcpv6ClientSessStatsRelease  		Gauge32,
+	cienaCesDhcpv6ClientSessStatsDecline  		Gauge32,
+	cienaCesDhcpv6ClientSessStatsTxFail  		Gauge32
+	}
+      
+ 
+cienaCesDhcpv6ClientSessStatsMgmtIntfIndex		OBJECT-TYPE
+	SYNTAX			Integer32 (1..65535)
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION		"The mgmt interface index."
+	::= { cienaCesDhcpv6ClientSessStatsEntry 1 }
 
-cienaCesDhcpv6ClientSessStatsMgmtIntfIndex              OBJECT-TYPE
-        SYNTAX                  Integer32 (1..65535)
-        MAX-ACCESS              not-accessible
-        STATUS                  current
-        DESCRIPTION             "The mgmt interface index."
-        ::= { cienaCesDhcpv6ClientSessStatsEntry 1 }
-
-cienaCesDhcpv6ClientSessStatsClear      OBJECT-TYPE
-        SYNTAX                          CienaStatsClear
-        MAX-ACCESS                      read-write
-        STATUS                          current
-        DESCRIPTION
+cienaCesDhcpv6ClientSessStatsClear 	OBJECT-TYPE
+	SYNTAX            		CienaStatsClear
+	MAX-ACCESS        		read-write
+	STATUS            		current
+	DESCRIPTION
             "This object clears the DHCPv6 session statistics."
-        DEFVAL { 0 }
-        ::= { cienaCesDhcpv6ClientSessStatsEntry 2}
+	DEFVAL { 0 }
+	::= { cienaCesDhcpv6ClientSessStatsEntry 2}
 
-cienaCesDhcpv6ClientSessStatsPktsRx     OBJECT-TYPE
-        SYNTAX                  Gauge32
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The number of DHCPv6 packets received by the client."
+      
+cienaCesDhcpv6ClientSessStatsPktsRx	OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The number of DHCPv6 packets received by the client."
           ::= { cienaCesDhcpv6ClientSessStatsEntry 3 }
 
-cienaCesDhcpv6ClientSessStatsReply      OBJECT-TYPE
-        SYNTAX                  Gauge32
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The number of DHCPv6 reply messages received by the client."
+cienaCesDhcpv6ClientSessStatsReply	OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The number of DHCPv6 reply messages received by the client."
           ::= { cienaCesDhcpv6ClientSessStatsEntry 4 }
 
-cienaCesDhcpv6ClientSessStatsAdvert     OBJECT-TYPE
-        SYNTAX                  Gauge32
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The number of DHCPv6 advertise messages received by the client."
+cienaCesDhcpv6ClientSessStatsAdvert	OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The number of DHCPv6 advertise messages received by the client."
           ::= { cienaCesDhcpv6ClientSessStatsEntry 5 }
 
-cienaCesDhcpv6ClientSessStatsRecfg      OBJECT-TYPE
-        SYNTAX                  Gauge32
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The number of DHCPv6 reconfigure messages received by the client."
+cienaCesDhcpv6ClientSessStatsRecfg	OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The number of DHCPv6 reconfigure messages received by the client."
           ::= { cienaCesDhcpv6ClientSessStatsEntry 6 }
 
-cienaCesDhcpv6ClientSessStatsInvalid    OBJECT-TYPE
-        SYNTAX                  Gauge32
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The number of DHCPv6 invalid messages received by the client."
+cienaCesDhcpv6ClientSessStatsInvalid	OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The number of DHCPv6 invalid messages received by the client."
           ::= { cienaCesDhcpv6ClientSessStatsEntry 7 }
 
-cienaCesDhcpv6ClientSessStatsPktsTx     OBJECT-TYPE
-        SYNTAX                  Gauge32
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The number of DHCPv6 messages sent by the client."
+cienaCesDhcpv6ClientSessStatsPktsTx	OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The number of DHCPv6 messages sent by the client."
           ::= { cienaCesDhcpv6ClientSessStatsEntry 8 }
 
-cienaCesDhcpv6ClientSessStatsSolicit    OBJECT-TYPE
-        SYNTAX                  Gauge32
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The number of DHCPv6 solicit messages sent by the client."
+cienaCesDhcpv6ClientSessStatsSolicit	OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The number of DHCPv6 solicit messages sent by the client."
           ::= { cienaCesDhcpv6ClientSessStatsEntry 9 }
 
-cienaCesDhcpv6ClientSessStatsRequest    OBJECT-TYPE
-        SYNTAX                  Gauge32
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The number of DHCPv6 request messages sent by the client."
+cienaCesDhcpv6ClientSessStatsRequest	OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The number of DHCPv6 request messages sent by the client."
           ::= { cienaCesDhcpv6ClientSessStatsEntry 10 }
 
-cienaCesDhcpv6ClientSessStatsConfirm    OBJECT-TYPE
-        SYNTAX                  Gauge32
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The number of DHCPv6 confirm messages sent by the client."
+cienaCesDhcpv6ClientSessStatsConfirm	OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The number of DHCPv6 confirm messages sent by the client."
           ::= { cienaCesDhcpv6ClientSessStatsEntry 11 }
 
-cienaCesDhcpv6ClientSessStatsRenew      OBJECT-TYPE
-        SYNTAX                  Gauge32
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The number of DHCPv6 renew messages sent by the client."
+cienaCesDhcpv6ClientSessStatsRenew	OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The number of DHCPv6 renew messages sent by the client."
           ::= { cienaCesDhcpv6ClientSessStatsEntry 12 }
 
-cienaCesDhcpv6ClientSessStatsRebind     OBJECT-TYPE
-        SYNTAX                  Gauge32
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The number of DHCPv6 rebind messages sent by the client."
+cienaCesDhcpv6ClientSessStatsRebind	OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The number of DHCPv6 rebind messages sent by the client."
           ::= { cienaCesDhcpv6ClientSessStatsEntry 13 }
 
-cienaCesDhcpv6ClientSessStatsInfoReq    OBJECT-TYPE
-        SYNTAX                  Gauge32
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The number of DHCPv6 information request messages sent by the client."
+cienaCesDhcpv6ClientSessStatsInfoReq	OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The number of DHCPv6 information request messages sent by the client."
           ::= { cienaCesDhcpv6ClientSessStatsEntry 14 }
 
-cienaCesDhcpv6ClientSessStatsRelease    OBJECT-TYPE
-        SYNTAX                  Gauge32
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The number of DHCPv6 release messages sent by the client."
+cienaCesDhcpv6ClientSessStatsRelease	OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The number of DHCPv6 release messages sent by the client."
           ::= { cienaCesDhcpv6ClientSessStatsEntry 15 }
 
-cienaCesDhcpv6ClientSessStatsDecline    OBJECT-TYPE
-        SYNTAX                  Gauge32
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The number of DHCPv6 decline messages sent by the client."
+cienaCesDhcpv6ClientSessStatsDecline	OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The number of DHCPv6 decline messages sent by the client."
           ::= { cienaCesDhcpv6ClientSessStatsEntry 16 }
 
-cienaCesDhcpv6ClientSessStatsTxFail     OBJECT-TYPE
-        SYNTAX                  Gauge32
-        MAX-ACCESS              read-only
-        STATUS                  current
-        DESCRIPTION      "The number of DHCPv6 messages the client was unable to send."
+cienaCesDhcpv6ClientSessStatsTxFail	OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION      "The number of DHCPv6 messages the client was unable to send."
           ::= { cienaCesDhcpv6ClientSessStatsEntry 17 }
 
 
@@ -711,6 +722,7 @@ cienaCesDhcpv6ClientSessStatsTxFail     OBJECT-TYPE
      ::= { cienaCesDhcpv6LdraStateEntry 4 }
 
 
+
  --
  -- DHCPv6 LDRA Port Trust Table
  --
@@ -721,7 +733,7 @@ cienaCesDhcpv6ClientSessStatsTxFail     OBJECT-TYPE
      DESCRIPTION
              "This table is used to specify the slot / ports and VLANs
               that the DHCPv6 LDRA can trust.
-              
+
               This table has been deprecated in favor of the
               cienaCesDhcpv6LdraExtTrustTable which adds a column for port
               status."
@@ -1915,7 +1927,7 @@ cienaCesDhcpv6ClientSessStatsTxFail     OBJECT-TYPE
               To delete a row in this table set this object
               to 'destroy'."
      ::= { cienaCesDhcpv6LdraMplsRidStringEntry 2 }
-
+  
  --
  -- Notifications
  --
@@ -1927,3 +1939,9 @@ cienaCesDhcpv6ClientSessStatsTxFail     OBJECT-TYPE
  --
  -- CIENA-CES-DHCPV6-CLIENT-MIB.my
  --
+
+
+
+
+
+

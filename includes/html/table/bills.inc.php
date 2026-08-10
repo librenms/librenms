@@ -49,7 +49,7 @@ if ($prev) {
 }
 
 // Permissions check
-if (! Auth::user()->hasGlobalRead()) {
+if (Gate::denies('viewAll', \App\Models\Bill::class)) {
     $query .= ' INNER JOIN `bill_perms` AS `BP` ON `bills`.`bill_id` = `BP`.`bill_id` ';
     $wheres[] = '`BP`.`user_id`=?';
     $param[] = Auth::id();
@@ -145,10 +145,15 @@ foreach (dbFetchRows($sql, $param) as $bill) {
 
     $bill_name = "<a href='$url'><span class='tw:font-bold tw:text-blue-900 tw:visited:textc-blue-900 tw:dark:text-dark-white-100 tw:dark:visited:text-dark-white-100'>" . htmlentities((string) $bill['bill_name']) . '</span></a><br />' .
                     date('Y-m-d', strtotime((string) $datefrom)) . ' to ' . date('Y-m-d', strtotime((string) $dateto));
-    $bar = print_percentage_bar(250, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']);
+    $bar = \LibreNMS\Util\Html::percentageBar(250, 10, $percent, null, $percent . '%', null, null, [
+        'left' => $background['left'],
+        'left_text' => null,
+        'right' => $background['right'],
+        'right_text' => null,
+    ]);
     $actions = '';
 
-    if (! $prev && Auth::user()->hasGlobalAdmin()) {
+    if (! $prev && Gate::allows('bill.update')) {
         $actions .= "<a href='" . \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $bill['bill_id'], 'view' => 'edit']) .
             "'><i class='fa fa-pencil fa-lg icon-theme' title='Edit' aria-hidden='true'></i> Edit</a> ";
     }

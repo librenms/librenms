@@ -15,6 +15,7 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
@@ -36,15 +37,15 @@ class Ipv6Addresses implements Module
     /**
      * @inheritDoc
      */
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
      * @inheritDoc
      */
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
         return false;
     }
@@ -246,12 +247,20 @@ class Ipv6Addresses implements Module
 
         // try IP-MIB::ipAddressPrefixTable to get the prefix length
         if (isset($snmpRowData['IP-MIB::ipAddressIfIndex'])) {
-            $origins = SnmpQuery::cache()->walk('IP-MIB::ipAddressPrefixOrigin')->table(4);
+            $origins = SnmpQuery::cache()->walk('IP-MIB::ipAddressPrefixOrigin')->table(4); // walk this and parse from index
             foreach ($origins[$snmpRowData['IP-MIB::ipAddressIfIndex']][$ipAddressAddrType] ?? [] as $prefix => $prefixData) {
                 foreach (array_keys($prefixData) as $prefixLen) {
                     try {
+                        // broken output, parse from raw index
+                        if ($prefixLen === 'IP-MIB::ipAddressPrefixOrigin') {
+                            if (preg_match('/^\.(?<ip>.+)\.(?<prefix_len>\d{1,3})$/', (string) $prefix, $prefix_match)) {
+                                $prefix = $prefix_match['ip'];
+                                $prefixLen = (int) $prefix_match['prefix_len'];
+                            }
+                        }
+
                         if ($ip->inNetwork($this->parseIp($prefix)->getNetwork($prefixLen))) {
-                            return $prefixLen;
+                            return (int) $prefixLen;
                         }
                     } catch (InvalidIpException) {
                         // ignore failures and return 0 if no matches found

@@ -13,8 +13,7 @@
 
 use LibreNMS\Alert\Transport;
 
-if (Auth::user()->hasGlobalAdmin()) {
-    ?>
+?>
 <!--Modal for adding or updating an alert transport -->
     <div class="modal fade" id="edit-alert-transport" tabindex="-1" role="dialog"
          aria-labelledby="Edit-transport" aria-hidden="true">
@@ -275,9 +274,8 @@ if (Auth::user()->hasGlobalAdmin()) {
             event.preventDefault();
             var transport_id = $("#delete_transport_id").val();
             $.ajax({
-                type: "POST",
-                url: "ajax_form.php",
-                data: { type: "delete-alert-transport", transport_id: transport_id },
+                type: "DELETE",
+                url: '<?php echo route("alert.transports.destroy", ["transport" => ":transport"]) ?>'.replace(':transport', transport_id),
                 dataType: "json",
                 success: function(data) {
                     if (data.status == 'ok') {
@@ -295,6 +293,3 @@ if (Auth::user()->hasGlobalAdmin()) {
         });
 
     </script>
-
-    <?php
-}

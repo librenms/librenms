@@ -35,9 +35,9 @@ class InternalHttpRequest
     use InteractsWithAuthentication;
 
     /**
-     * @var \Illuminate\Contracts\Foundation\Application|mixed
+     * @var \Illuminate\Contracts\Foundation\Application
      */
-    private $app;
+    protected $app;
 
     public function __construct()
     {

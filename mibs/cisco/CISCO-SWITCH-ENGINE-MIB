@@ -9,7 +9,7 @@
 -- August 2003, Edward Pham
 -- %DNP% March 2005, Jayakumar Kadirvelu
 --   
--- Copyright (c) 2000-2020 by cisco Systems Inc.
+-- Copyright (c) 2000-2024 by cisco Systems Inc.
 -- by cisco Systems, Inc.
 -- All rights reserved.
 -- *****************************************************************
@@ -60,7 +60,7 @@ IMPORTS
 
 
 ciscoSwitchEngineMIB MODULE-IDENTITY
-    LAST-UPDATED    "202005260000Z"
+    LAST-UPDATED    "202401090000Z"
     ORGANIZATION    "Cisco Systems Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -97,6 +97,12 @@ ciscoSwitchEngineMIB MODULE-IDENTITY
         Layer 2 forwarding. However, they can also learn 'flows' through
         other physically-separate (external) Cisco routers that are
         connected to the switch-engine through the network."
+    REVISION        "202401090000Z"
+    DESCRIPTION
+        "Add enumerated value 310 - 313 to cseTcamResourceType."
+    REVISION        "202108010000Z"
+    DESCRIPTION
+        "Add enumerated value 309 to cseTcamResourceType."
     REVISION        "202005260000Z"
     DESCRIPTION
         "Add enumerated value 304 - 308 to cseTcamResourceType."    
@@ -4698,7 +4704,17 @@ cseTcamResourceType OBJECT-TYPE
                         ingressNatInside(305),
                         ingressL2L3QosAll(306),
                         natRewriteTable(307),
-                        tcpAwareNat(308)
+                        tcpAwareNat(308),
+                        ingressNetflowSvi(309),
+                        ingressIpv6Span(310),
+                        ingressFlowPathTracerIpv4(311),
+                        ingressFlowPathTracerIpv6(312),
+                        analyticsFilterTcam(313),
+                        egressNetflow(314),
+                        egressNetflowL2(315),
+                        egressNetflowSvi(316),
+                        labelLblAHv1(317),
+                        labelLblAIv1(318)
                     }
     MAX-ACCESS      not-accessible
     STATUS          current
@@ -5622,7 +5638,31 @@ cseTcamResourceType OBJECT-TYPE
         Rewrite Table.
 
         tcpAwareNat(308) indicates that TCAM space is allocated for TCP
-        Aware NAT."
+        Aware NAT.
+
+        ingressNetflowSvi(309) indicates that TCAM space is allocated for
+        Ingress Netflow SVI.
+
+        ingressIpv6Span(310) indicates that TCAM space is allocated for
+        Ingress IPV6 SPAN.
+
+        ingressFlowPathTracerIpv4(311) indicates that TCAM space is allocated for
+        Ingress Flow Path Tracer IPV4.
+
+        ingressFlowPathTracerIpv6(312) indicates that TCAM space is allocated for
+        Ingress Flow Path Tracer IPV6.
+
+        analyticsFilterTcam(313) indicates that TCAM space is allocated for
+        Analytics Filter TCAM.
+
+        egressNetflow(314) indicates that TCAM space is allocated for
+        Egress Netflow.
+
+        egressNetflowL2(315) indicates that TCAM space is allocated for
+        Egress Netflow L2.
+
+        egressNetflowSvi(316) indicates that TCAM space is allocated for
+        Egress Netflow SVI."
         
     ::= { cseTcamUsageEntry 1 }
 
@@ -7033,5 +7073,4 @@ cseStatisticsFlowGroup1 OBJECT-GROUP
     ::= { cseMIBGroups 40 }
 
 END
-
 

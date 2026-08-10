@@ -17,14 +17,16 @@ header('Content-type: application/json');
 
 // FUA
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('wireless-sensor.update')) {
     exit(json_encode([
         'status' => 'error',
-        'message' => 'You need to be admin',
+        'message' => 'You need permission',
     ]));
 }
 
-if (! is_numeric($_POST['device_id']) || ! is_numeric($_POST['sensor_id']) || ! isset($_POST['data'])) {
+$allowed_value_types = ['sensor_limit', 'sensor_limit_warn', 'sensor_limit_low', 'sensor_limit_low_warn'];
+
+if (! is_numeric($_POST['device_id']) || ! is_numeric($_POST['sensor_id']) || ! isset($_POST['data']) || ! in_array($_POST['value_type'] ?? '', $allowed_value_types, true)) {
     exit(json_encode([
         'status' => 'error',
         'message' => 'Invalid values given',

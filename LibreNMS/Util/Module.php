@@ -26,10 +26,12 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
-use App\Models\Device;
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\ProcessType;
 use LibreNMS\Modules\LegacyModule;
-use LibreNMS\Polling\ModuleStatus;
+use LibreNMS\RRD\RrdDefinition;
 
 class Module
 {
@@ -37,6 +39,10 @@ class Module
     {
         if (class_exists(StringHelpers::toClass($module_name, '\\LibreNMS\\Modules\\'))) {
             return true;
+        }
+
+        if (! Laravel::isBooted()) {
+            return true; // if we don't have the config loaded, just allow all modules
         }
 
         return LibrenmsConfig::has('discovery_modules.' . $module_name) || LibrenmsConfig::has('poller_modules.' . $module_name);
@@ -59,30 +65,23 @@ class Module
         return is_file(base_path("includes/polling/$module_name.inc.php"));
     }
 
-    public static function pollingStatus(string $module_name, Device $device, ?bool $manual = null): ModuleStatus
+    public static function savePerformance(string $module, ProcessType $type, float $start_time, int $start_memory): void
     {
-        return new ModuleStatus(
-            LibrenmsConfig::get("poller_modules.$module_name"),
-            LibrenmsConfig::get("os.{$device->os}.poller_modules.$module_name"),
-            $device->getAttrib("poll_$module_name"),
-            $manual,
-        );
-    }
+        $module_time = microtime(true) - $start_time;
+        $module_mem = (memory_get_usage() - $start_memory);
 
-    public static function parseUserOverrides(array $overrides): array
-    {
-        $modules = [];
+        Log::info(sprintf(">> Runtime for %s module '%s': %.4f seconds with %s bytes", $type->name, $module, $module_time, $module_mem));
 
-        foreach ($overrides as $module) {
-            // parse submodules (only supported by some modules)
-            if (str_contains((string) $module, '/')) {
-                [$module, $submodule] = explode('/', (string) $module, 2);
-                $modules[$module][] = $submodule;
-            } elseif (self::exists($module)) {
-                $modules[$module] = true;
-            }
+        if ($type == ProcessType::Discovery) {
+            return; // do not record for now as there is currently no rrd during discovery
         }
 
-        return $modules;
+        app('Datastore')->put(DeviceCache::getPrimary()->toArray(), 'poller-perf', [
+            'module' => $module,
+            'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
+            'rrd_name' => ['poller-perf', $module],
+        ], [
+            'poller' => $module_time,
+        ]);
     }
 }

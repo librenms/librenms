@@ -7,12 +7,12 @@ if (empty($os)) {
 }
 
 if ($os instanceof \LibreNMS\OS\Ocnos) {
-    $metric_data = \SnmpQuery::cache()->enumStrings()->walk(['IPI-CMM-CHASSIS-MIB::cmmTransDDMTable', 'IPI-CMM-CHASSIS-MIB::cmmTransType'])->table(3);
+    $metric_data = \SnmpQuery::cache()->enumStrings()->walk(['IPI-CMM-CHASSIS-MIB::cmmTransDDMTable', 'IPI-CMM-CHASSIS-MIB::cmmTransType', 'IPI-CMM-CHASSIS-MIB::cmmTransEEPROMEntry.60'])->table(3);
     $divisor = 1000;
 
     foreach ($metric_data as $cmmStackUnitIndex => $chassis_data) {
         foreach ($chassis_data as $cmmTransIndex => $module_data) {
-            $ifName = $os->guessIfName($cmmTransIndex, $module_data['IPI-CMM-CHASSIS-MIB::cmmTransType'] ?? 'unknown');
+            $ifName = $os->guessIfName($cmmTransIndex, $module_data['IPI-CMM-CHASSIS-MIB::cmmTransType'] ?? 'unknown', $module_data['IPI-CMM-CHASSIS-MIB::cmmTransEEPROMEntry.60'] ?? '');
 
             foreach ($module_data as $cmmTransChannelIndex => $channel_data) {
                 if (isset($channel_data['IPI-CMM-CHASSIS-MIB::cmmTransLaserBiasCurrent']) && $channel_data['IPI-CMM-CHASSIS-MIB::cmmTransLaserBiasCurrent'] != '-100001') {
@@ -27,10 +27,10 @@ if ($os instanceof \LibreNMS\OS\Ocnos) {
                         'sensor_descr' => "$ifName$channelDescr xcvr bias",
                         'sensor_divisor' => $divisor,
                         'sensor_multiplier' => 1,
-                        'sensor_limit' => isset($channel_data['IPI-CMM-CHASSIS-MIB::cmmTransLaserBiasCurrCriticalThresholdMax']) ? $channel_data['IPI-CMM-CHASSIS-MIB::cmmTransLaserBiasCurrCriticalThresholdMax'] / $divisor : null,
-                        'sensor_limit_warn' => isset($channel_data['IPI-CMM-CHASSIS-MIB::cmmTransLaserBiasCurrAlertThresholdMax']) ? $channel_data['IPI-CMM-CHASSIS-MIB::cmmTransLaserBiasCurrAlertThresholdMax'] / $divisor : null,
-                        'sensor_limit_low' => isset($channel_data['IPI-CMM-CHASSIS-MIB::cmmTransLaserBiasCurrCriticalThresholdMin']) ? $channel_data['IPI-CMM-CHASSIS-MIB::cmmTransLaserBiasCurrCriticalThresholdMin'] / $divisor : null,
-                        'sensor_limit_low_warn' => isset($channel_data['IPI-CMM-CHASSIS-MIB::cmmTransLaserBiasCurrAlertThresholdMin']) ? $channel_data['IPI-CMM-CHASSIS-MIB::cmmTransLaserBiasCurrAlertThresholdMin'] / $divisor : null,
+                        'sensor_limit' => isset($channel_data['IPI-CMM-CHASSIS-MIB::cmmTransLaserBiasCurrAlertThresholdMax']) ? $channel_data['IPI-CMM-CHASSIS-MIB::cmmTransLaserBiasCurrAlertThresholdMax'] / $divisor : null,
+                        'sensor_limit_warn' => isset($channel_data['IPI-CMM-CHASSIS-MIB::cmmTransLaserBiasCurrCriticalThresholdMax']) ? $channel_data['IPI-CMM-CHASSIS-MIB::cmmTransLaserBiasCurrCriticalThresholdMax'] / $divisor : null,
+                        'sensor_limit_low' => isset($channel_data['IPI-CMM-CHASSIS-MIB::cmmTransLaserBiasCurrAlertThresholdMin']) ? $channel_data['IPI-CMM-CHASSIS-MIB::cmmTransLaserBiasCurrAlertThresholdMin'] / $divisor : null,
+                        'sensor_limit_low_warn' => isset($channel_data['IPI-CMM-CHASSIS-MIB::cmmTransLaserBiasCurrCriticalThresholdMin']) ? $channel_data['IPI-CMM-CHASSIS-MIB::cmmTransLaserBiasCurrCriticalThresholdMin'] / $divisor : null,
                         'sensor_current' => $channel_data['IPI-CMM-CHASSIS-MIB::cmmTransLaserBiasCurrent'] / $divisor,
                         'entPhysicalIndex' => $cmmStackUnitIndex * 10000 + $cmmTransIndex,
                         'entPhysicalIndex_measured' => 'port',

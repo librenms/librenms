@@ -1,0 +1,11 @@
+os: tailyn
+text: 'Tailyn'
+type: network
+icon: tailyn
+mib_dir: tailyn
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.5833.2017

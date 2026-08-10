@@ -45,17 +45,17 @@ foreach ($modules as $module_index => $module) {
     foreach ($hostnames as $index => $hostname) {
         $rrd_filename = Rrd::name($hostname, ['poller-perf', $module]);
         if (Rrd::checkRrdExists($rrd_filename)) {
-            $rrd_options .= " DEF:{$module}Raw$index=$rrd_filename:poller:AVERAGE";
+            $rrd_options[] = "DEF:{$module}Raw$index=$rrd_filename:poller:AVERAGE";
             // change undefined to 0
-            $rrd_options .= " CDEF:$module$index={$module}Raw$index,UN,0,{$module}Raw$index,IF";
+            $rrd_options[] = "CDEF:$module$index={$module}Raw$index,UN,0,{$module}Raw$index,IF";
 
             $cdef[] = $module . $index . $suffix;
             $suffix = ',+';
             if ($graph_params->visible('previous')) {
-                $rrd_options .= " DEF:{$module}RawX$index=$rrd_filename:poller:AVERAGE:start=$prev_from:end=$from";
+                $rrd_options[] = "DEF:{$module}RawX$index=$rrd_filename:poller:AVERAGE:start=$prev_from:end=$from";
                 // change undefined to 0
-                $rrd_options .= " CDEF:{$module}X$index={$module}RawX$index,UN,0,{$module}RawX$index,IF";
-                $rrd_options .= " SHIFT:{$module}X$index:$period";
+                $rrd_options[] = "CDEF:{$module}X$index={$module}RawX$index,UN,0,{$module}RawX$index,IF";
+                $rrd_options[] = "SHIFT:{$module}X$index:$period";
                 $cdefX[] = $module . 'X' . $index . $suffixX;
                 $suffixX = ',+';
             }
@@ -67,33 +67,35 @@ foreach ($modules as $module_index => $module) {
         unset($modules[$module_index]);
     } else {
         // have data for this module, display it
-        $rrd_options .= " CDEF:$module=" . implode(',', $cdef);
+        $rrd_options[] = "CDEF:$module=" . implode(',', $cdef);
         if ($graph_params->visible('previous')) {
-            $rrd_options .= " CDEF:{$module}X=" . implode(',', $cdefX);
+            $rrd_options[] = "CDEF:{$module}X=" . implode(',', $cdefX);
         }
     }
 }
 
-$rrd_options .= " 'COMMENT:Seconds                 Cur     Min     Max      Avg'";
+$rrd_options[] = 'COMMENT:Seconds                 Cur     Min     Max      Avg';
 
 if ($graph_params->visible('previous')) {
-    $rrd_options .= " COMMENT:' \t    P Min   P Max   P Avg'";
+    $rrd_options[] = "COMMENT:\t    P Min   P Max   P Avg";
 }
 
-$rrd_options .= " COMMENT:'\\n'";
+$rrd_options[] = 'COMMENT:\\n';
 
 foreach ($modules as $index => $module) {
     $color = $colors[$index % count($colors)];
-    $rrd_options .= " AREA:$module#$color:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($module, 16) . "':STACK";
-    $rrd_options .= " GPRINT:$module:LAST:%6.2lf  GPRINT:$module:MIN:%6.2lf";
-    $rrd_options .= " GPRINT:$module:MAX:%6.2lf  'GPRINT:$module:AVERAGE:%6.2lf'";
+    $rrd_options[] = "AREA:$module#$color:" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($module, 16) . ':STACK';
+    $rrd_options[] = "GPRINT:$module:LAST:%6.2lf";
+    $rrd_options[] = "GPRINT:$module:MIN:%6.2lf";
+    $rrd_options[] = "GPRINT:$module:MAX:%6.2lf";
+    $rrd_options[] = "GPRINT:$module:AVERAGE:%6.2lf";
     if ($graph_params->visible('previous')) {
-        $rrd_options .= ' AREA:' . $module . 'X#99999999' . $stacked['transparency'] . ':';
-        $rrd_options .= ' LINE1.25:' . $module . 'X#666666:';
-        $rrd_options .= " COMMENT:'\t'";
-        $rrd_options .= " GPRINT:{$module}X:MIN:%6.2lf";
-        $rrd_options .= " GPRINT:{$module}X:MAX:%6.2lf";
-        $rrd_options .= " GPRINT:{$module}X:AVERAGE:%6.2lf";
+        $rrd_options[] = 'AREA:' . $module . 'X#99999999' . $stacked['transparency'] . ':';
+        $rrd_options[] = 'LINE1.25:' . $module . 'X#666666:';
+        $rrd_options[] = "COMMENT:\t";
+        $rrd_options[] = "GPRINT:{$module}X:MIN:%6.2lf";
+        $rrd_options[] = "GPRINT:{$module}X:MAX:%6.2lf";
+        $rrd_options[] = "GPRINT:{$module}X:AVERAGE:%6.2lf";
     }
-    $rrd_options .= " COMMENT:'\\n'";
+    $rrd_options[] = 'COMMENT:\\n';
 }

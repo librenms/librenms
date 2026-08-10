@@ -19,32 +19,28 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
                         FROM ALCATEL-IND1-VIRTUAL-CHASSIS-MIB;
 
 alcatelIND1SystemMIB MODULE-IDENTITY
-                LAST-UPDATED "200709040000Z"
-                ORGANIZATION "Alcatel-Lucent"
-                CONTACT-INFO
-                     "Please consult with Customer Service to ensure the most appropriate
-             version of this document is used with the products in question:
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc."
+    CONTACT-INFO
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
 
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
-                               26801 West Agoura Road
+                      ALE USA Inc. Enterprise
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
 
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
+     Telephone:          +1 800 995 2696
 
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
 
 
                 DESCRIPTION
             "This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                 For the Birds Of Prey Product Line
+                 For the OmniSwitch Product Line
                  Proprietary System Subsystem.
 
 
@@ -56,13 +52,21 @@ alcatelIND1SystemMIB MODULE-IDENTITY
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2007 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+                           Copyright (C) ALE USA Inc. 2014-2019
+                           Copyright (C) 1995-2013 Alcatel-Lucent
+                               ALL RIGHTS RESERVED WORLDWIDE"
+
+        REVISION      "201911270000Z"
+        DESCRIPTION
+            "Updated the latest contact and Copyright information for ALE USA Inc."
+
+        REVISION      "201612210000Z"
+        DESCRIPTION
+            "Added systemServicesTcpHalfOpenTimeout to support half-open tcp timeout values."
 
         REVISION      "201101230000Z"
         DESCRIPTION
             "The latest version of this MIB Module."
-
             ::= {hardentIND1System 1 }
 
     alcatelIND1SystemMIBObjects OBJECT-IDENTITY
@@ -175,10 +179,11 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                                         severityLevelError(2), -- functionality is reduced
                                         severityLevelAlert(3), -- a violation has occurred
                                         severityLevelWarn (4), -- unexpected, non critical event
-                                        severityLevelInfo (5), -- any other msg that is not a dbg msg
-                                        severityLevelDbg1 (6), -- normal event debug message
-                                        severityLevelDbg2 (7), -- debug specific message
-                                        severityLevelDbg3 (8)  -- maximum verbosity dbg specific msg
+                                        severityLevelEvent (5), -- a clear readable customer event
+                                        severityLevelInfo (6), -- any other msg that is not a dbg msg
+                                        severityLevelDbg1 (7), -- normal event debug message
+                                        severityLevelDbg2 (8), -- debug specific message
+                                        severityLevelDbg3 (9)  -- maximum verbosity dbg specific msg
                                 }
 
         SysLogFacilityId ::= TEXTUAL-CONVENTION
@@ -243,6 +248,14 @@ alcatelIND1SystemMIB MODULE-IDENTITY
         systemBlueToothServices OBJECT IDENTIFIER       ::= {alcatelIND1SystemMIBObjects 8 }
         systemFips              OBJECT IDENTIFIER       ::= {alcatelIND1SystemMIBObjects 9 }
         systemVcHardware        OBJECT IDENTIFIER       ::= {alcatelIND1SystemMIBObjects 10 }
+        ovCloudAgent             OBJECT IDENTIFIER       ::= {alcatelIND1SystemMIBObjects 11 }
+        systemStorage                OBJECT IDENTIFIER       ::= {alcatelIND1SystemMIBObjects 12 }
+        systemStorageLockSftpServer  OBJECT IDENTIFIER       ::= {alcatelIND1SystemMIBObjects 13 }
+        systemStorageLockOutputFile  OBJECT IDENTIFIER       ::= {alcatelIND1SystemMIBObjects 14 }
+        systemSslCipher              OBJECT IDENTIFIER       ::= {alcatelIND1SystemMIBObjects 15 }
+        systemMgmtAgent              OBJECT IDENTIFIER       ::= {alcatelIND1SystemMIBObjects 16 }
+        systemSslPki                 OBJECT IDENTIFIER       ::= {alcatelIND1SystemMIBObjects 17 }
+        systemPythonPip              OBJECT IDENTIFIER       ::= {alcatelIND1SystemMIBObjects 18 }
 
         -- systemMicrocode group.  This group contains the CMM specific
         -- microcode information.
@@ -465,7 +478,7 @@ alcatelIND1SystemMIB MODULE-IDENTITY
         -- regarding this CMM.
 
     systemHardwareFlashMfg      OBJECT-TYPE
-                SYNTAX          INTEGER {other(1), amd(2), intel(3), atmel(4), micron(5), kingston(6), toshiba(7), sandisk(8), sst(9), spansion(10), wintec(13)}
+                SYNTAX          INTEGER {other(1), amd(2), intel(3), atmel(4), micron(5), kingston(6), toshiba(7), sandisk(8), sst(9), spansion(10), wintec(13), atp(14), ata(15), macronix(16), innodisk(17), memphis(18), smart(19), phison(20)}
                 MAX-ACCESS      read-only
                 STATUS          current
                 DESCRIPTION
@@ -486,7 +499,7 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                 ::= { systemHardware 2}
 
    systemHardwareMemoryMfg      OBJECT-TYPE
-                SYNTAX          INTEGER {other(1), amd(2), intel(3), atmel(4), micron(5), kingston(6), toshiba(7), agilent(8), dataram(10), interward(11), notreadable(12)}
+                SYNTAX          INTEGER {other(1), amd(2), intel(3), atmel(4), micron(5), kingston(6), toshiba(7), agilent(8), dataram(10), interward(11), notreadable(12), wintec(13), atp(14)}
                 MAX-ACCESS      read-only
                 STATUS          current
                 DESCRIPTION
@@ -514,7 +527,7 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                 ::= { systemHardware 5}
 
         systemHardwareBootCpuType       OBJECT-TYPE
-                SYNTAX          INTEGER {other(1), sparc380(2), sparcV9(3), ppc(4), ppc8540(5), ppc8572(6), arm(7)}
+                SYNTAX          INTEGER {other(1), sparc380(2), sparcV9(3), ppc(4), ppc8540(5), ppc8572(6), arm(7), intel(8)}
                 MAX-ACCESS      read-only
                 STATUS          current
                 DESCRIPTION
@@ -581,7 +594,8 @@ alcatelIND1SystemMIB MODULE-IDENTITY
 
         SystemHardwareFpgaVersionEntry ::= SEQUENCE     {
                         systemHardwareFpgaVersionIndex  Integer32,
-                        systemHardwareFpgaVersion               Unsigned32
+                        systemHardwareFpgaVersion       Unsigned32,
+                        systemHardwareFpgaManufacturer  INTEGER
                 }
 
         systemHardwareFpgaVersionIndex  OBJECT-TYPE
@@ -600,6 +614,14 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                         "This is the major version of one of the FPGA devices on this CMM.
                          refer to the systemHardwareMinorFpgaVersion for the minor number."
                 ::={systemHardwareFpgaVersionEntry 2}
+
+        systemHardwareFpgaManufacturer OBJECT-TYPE
+                SYNTAX          INTEGER {lattice(1), gowin(2)}
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "This object identifies the manufacturer of the FPGA devices on this CMM."
+                ::={systemHardwareFpgaVersionEntry 3}
 
         systemHardwareBootRomVersion    OBJECT-TYPE
                 SYNTAX          SnmpAdminString (SIZE (0..255))
@@ -957,7 +979,11 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                                         restore(46),
                                         tftp(47),
                                         fscollect(48),
-                                        fpgani(49)
+                                        fpgani(49),
+                                        fsCollectForce(50),
+                                        usb(51),
+                                        usbAutoCopy(52),
+                                        usbImgBackup(53)
                                 }
             MAX-ACCESS  read-write
                 STATUS          current
@@ -1156,7 +1182,7 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                 }
 
         systemUpdateIndex       OBJECT-TYPE
-                SYNTAX  Integer32(1..72)
+                SYNTAX  Integer32(1..5972)
                 MAX-ACCESS      not-accessible
                 STATUS          current
                 DESCRIPTION
@@ -1351,6 +1377,69 @@ alcatelIND1SystemMIB MODULE-IDENTITY
 			"determinse if usb is mounted"
 		::= { systemServices 40}
 
+	systemServicesTcpHalfOpenTimeout  OBJECT-TYPE
+		SYNTAX  Integer32(3..63)
+		MAX-ACCESS      read-write
+		STATUS      current
+		DESCRIPTION
+			"The timeout value in seconds for tcp half-open connections.
+			Current suppored values are 3, 7, 15, 31 and 63(default)"
+		DEFVAL { 63 }
+		::= { systemServices 41}  
+
+	systemServicesUsbBackupAdminState OBJECT-TYPE
+		SYNTAX          Enable
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+			"This object enables and disables usb backup admin-state ."
+		DEFVAL          { disabled }
+		::= { systemServices 42 } 
+ 
+	systemServicesUsbCopyConfig OBJECT-TYPE
+		SYNTAX          Enable
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+			"This object enables and disables usb copy-config ."
+		DEFVAL          { disabled }
+		::= { systemServices 43 }     
+
+	systemServicesUsbBackupKey OBJECT-TYPE
+		SYNTAX  SnmpAdminString (SIZE (0..32))
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+			"The key entered by the user which will be used for encrypting files that will be backed up to USB."
+		DEFVAL { "" }
+		::= { systemServices 44 }
+        
+	systemServicesUsbBackupHashkey OBJECT-TYPE
+		SYNTAX  SnmpAdminString (SIZE (0..32))
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+			"The encrypted key entered by the user which will be used for encrypted files that will be backed up to USB."
+		DEFVAL { "" }
+		::= { systemServices 45 }
+
+	systemServicesTCPTimeStampResponse OBJECT-TYPE
+		SYNTAX      Enable
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+			"Enable/disable TCP time-stamp-response."
+		::= { systemServices 46 }
+
+	systemServicesUsbBackupBootable OBJECT-TYPE
+		SYNTAX      Enable
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+			"Enable/Disable enhanced USB backup for bootable USB drive"
+		::= { systemServices 47 }
+
+ 
 --systemFileSystem group.  This group contains the parameters for
 --the multiple File Systems on the platform.
 
@@ -1622,7 +1711,7 @@ alcatelIND1SystemMIB MODULE-IDENTITY
         		::={ systemSwitchLoggingLevelEntry 2 }
 
 	systemSwitchLoggingApplicationSubAppVrfLevelIndex  OBJECT-TYPE
-                SYNTAX  		Integer32 (0..8)
+                SYNTAX  		Integer32 (0..9)
         		MAX-ACCESS      read-only
         		STATUS          current
         		DESCRIPTION
@@ -1707,7 +1796,8 @@ alcatelIND1SystemMIB MODULE-IDENTITY
             systemSwitchLoggingHostPort             Integer32,
             systemSwitchLoggingHostStatus           RowStatus,
             systemSwitchLoggingHostUserCommandHost  Enable,
-            systemSwitchLoggingHostVrfName          SnmpAdminString
+            systemSwitchLoggingHostVrfName          SnmpAdminString,
+            systemSwitchLoggingHostTls              INTEGER
             }
 
         systemSwitchLoggingHostIpAddr   OBJECT-TYPE
@@ -1748,7 +1838,7 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                 ::={ systemSwitchLoggingHostEntry 4 }
 
         systemSwitchLoggingHostVrfName  OBJECT-TYPE
-                SYNTAX          SnmpAdminString   (SIZE (0..20))
+                SYNTAX          SnmpAdminString   (SIZE (0..32))
                 MAX-ACCESS      read-create
                 STATUS          current
                 DESCRIPTION
@@ -1756,6 +1846,18 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                         switch logging records to."
                 DEFVAL  { "" }
                 ::={ systemSwitchLoggingHostEntry 5 }
+                
+        systemSwitchLoggingHostTls          OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enabled (1),
+                        disabled (2)
+                }
+                MAX-ACCESS read-create
+                STATUS          current
+                DESCRIPTION
+                        "This object is used to enable syslog over TLS."
+                DEFVAL  { disabled }
+                ::={ systemSwitchLoggingHostEntry 6 }
 
         systemSwitchLoggingHostv6Table  OBJECT-TYPE
                 SYNTAX          SEQUENCE OF SystemSwitchLoggingHostv6Entry
@@ -1779,7 +1881,8 @@ alcatelIND1SystemMIB MODULE-IDENTITY
             systemSwitchLoggingHostv6Port               Integer32,
             systemSwitchLoggingHostv6Status             RowStatus,
             systemSwitchLoggingHostv6UserCommandHost    Enable,
-            systemSwitchLoggingHostv6VrfName            SnmpAdminString
+            systemSwitchLoggingHostv6VrfName            SnmpAdminString,
+            systemSwitchLoggingHostv6Tls                INTEGER
             }
 
         systemSwitchLoggingHostv6IpAddr OBJECT-TYPE
@@ -1820,7 +1923,7 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                 ::={ systemSwitchLoggingHostv6Entry 4 }
 
         systemSwitchLoggingHostv6VrfName  OBJECT-TYPE
-                SYNTAX          SnmpAdminString   (SIZE (0..20))
+                SYNTAX          SnmpAdminString   (SIZE (0..32))
                 MAX-ACCESS      read-create
                 STATUS          current
                 DESCRIPTION
@@ -1828,6 +1931,19 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                         switch logging records to."
                 DEFVAL  { "" }
                 ::={ systemSwitchLoggingHostv6Entry 5 }
+
+        systemSwitchLoggingHostv6Tls          OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enabled (1),
+                        disabled (2)
+                }
+                MAX-ACCESS read-create
+                STATUS          current
+                DESCRIPTION
+                        "This object is used to enable syslog over TLS."
+                DEFVAL  { disabled }
+                ::={ systemSwitchLoggingHostv6Entry  6 }
+
 
         systemSwitchLoggingHostCount    OBJECT-TYPE
                 SYNTAX          Integer32 (0..4)
@@ -2051,8 +2167,203 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                         be used to send Dying Gasp switch logging records to."
                 ::={ systemSwitchLoggingDgHostEntry 3 }
 
+        systemSwitchLoggingGmtTime  OBJECT-TYPE
+                SYNTAX          Enable
+                MAX-ACCESS      read-write
+                STATUS          deprecated
+                DESCRIPTION
+                        "Enable/disable switch logging in GMT time
+                         when logging to syslog server"
+                DEFVAL { disabled }
+                ::={ systemSwitchLogging 28 }
 
+        systemSwitchLoggingSyslogProtocol  OBJECT-TYPE
+                SYNTAX          Enable
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "Enable/disable switch logging in syslog-protocol
+                         RFC5424 format when logging to file or syslog server."
+                DEFVAL { disabled }
+                ::={ systemSwitchLogging 29 }
 
+        systemSwitchLoggingSizeTrapThreshold  OBJECT-TYPE
+                SYNTAX          Integer32 (50..90)
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "when the swlog file size reaches this threshold, the trap 'systemSwlogSizeTrap' will be generated."
+                DEFVAL { 90 }
+                ::={ systemSwitchLogging 30 }
+
+        systemSwitchLoggingHostDnTable    OBJECT-TYPE
+                SYNTAX          SEQUENCE OF SystemSwitchLoggingHostDnEntry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION
+                "The table of switch logging remote hosts."
+                ::={ systemSwitchLogging 31 }
+
+        systemSwitchLoggingHostDnEntry  OBJECT-TYPE
+                SYNTAX  SystemSwitchLoggingHostDnEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                    "A remote switch logging server domain name entry.
+                    The MAX size available for systemSwitchLoggingHostDnName is 127
+                    because the table index cannot exceed MAX 128 dotted values."
+                INDEX { systemSwitchLoggingHostDnName }
+                ::={ systemSwitchLoggingHostDnTable 1 }
+
+        SystemSwitchLoggingHostDnEntry  ::= SEQUENCE {
+                systemSwitchLoggingHostDnName               SnmpAdminString,
+                systemSwitchLoggingHostDnPort               Integer32,
+                systemSwitchLoggingHostDnUserCommandHost    Enable,
+                systemSwitchLoggingHostDnVrfName            SnmpAdminString,
+                systemSwitchLoggingHostDnStatus             RowStatus,
+                systemSwitchLoggingHostDnTls                INTEGER
+        }
+
+        systemSwitchLoggingHostDnName   OBJECT-TYPE
+                SYNTAX          SnmpAdminString (SIZE (1 .. 128))
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION
+                    "The domain name of a remote host that can
+                     be used to send switch logging records to."
+                ::={ systemSwitchLoggingHostDnEntry 1 }
+
+        systemSwitchLoggingHostDnPort     OBJECT-TYPE
+                SYNTAX          Integer32 (1..65535)
+                MAX-ACCESS      read-create
+                STATUS          current
+                DESCRIPTION
+                    "The port number of a remote host that can
+                     be used to send switch logging records to."
+                DEFVAL  { 514 }
+                ::={ systemSwitchLoggingHostDnEntry 2 }
+
+        systemSwitchLoggingHostDnUserCommandHost  OBJECT-TYPE
+                SYNTAX          Enable
+                MAX-ACCESS      read-create
+                STATUS          current
+                DESCRIPTION
+                    "Indicates whether this host may receive user
+                     command data."
+                DEFVAL  { disabled }
+                ::={ systemSwitchLoggingHostDnEntry 3 }
+
+        systemSwitchLoggingHostDnVrfName  OBJECT-TYPE
+                SYNTAX          SnmpAdminString   (SIZE (0..32))
+                MAX-ACCESS      read-create
+                STATUS          current
+                DESCRIPTION
+                        "The name or number of the VRF to be used to send
+                        switch logging records to."
+                DEFVAL  { "" }
+                ::={ systemSwitchLoggingHostDnEntry 4 }
+
+        systemSwitchLoggingHostDnStatus   OBJECT-TYPE
+                SYNTAX          RowStatus
+                MAX-ACCESS      read-create
+                STATUS          current
+                DESCRIPTION
+                        "Provides the ability to add or remove a remote host entry."
+                ::={ systemSwitchLoggingHostDnEntry 5 }
+         
+        systemSwitchLoggingHostDnTls          OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enabled (1),
+                        disabled (2)
+                }
+                MAX-ACCESS read-create
+                STATUS          current
+                DESCRIPTION
+                        "This object is used to enable syslog over TLS."
+                DEFVAL  { disabled }
+                ::={ systemSwitchLoggingHostDnEntry 6 }
+
+        systemSwitchLoggingHostOutputSocket    OBJECT-TYPE
+                SYNTAX          Enable
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                    "Enable/disable host logging to external syslog server."
+                DEFVAL { disabled }
+                ::={ systemSwitchLogging 32 }
+
+        systemSwitchLoggingNiOutputSocketTable    OBJECT-TYPE
+                SYNTAX          SEQUENCE OF SystemSwitchLoggingNiOutputSocketEntry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION
+                    "The table of NI output socket"
+                ::={ systemSwitchLogging 33 }
+
+        systemSwitchLoggingNiOutputSocketEntry  OBJECT-TYPE
+                SYNTAX  SystemSwitchLoggingNiOutputSocketEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                    "A row in the NI output socket table."
+                INDEX { systemSwitchLoggingNiOutputSocketChassisId, systemSwitchLoggingNiOutputSocketSlot}
+                ::={ systemSwitchLoggingNiOutputSocketTable 1 }
+
+        SystemSwitchLoggingNiOutputSocketEntry  ::= SEQUENCE {
+                systemSwitchLoggingNiOutputSocketChassisId        Unsigned32,
+                systemSwitchLoggingNiOutputSocketSlot           Unsigned32,
+                systemSwitchLoggingNiOutputSocket         Enable
+        }
+
+        systemSwitchLoggingNiOutputSocketChassisId   OBJECT-TYPE
+                SYNTAX          Unsigned32
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION
+                    "The chassis ID for NI output socket."
+                ::={ systemSwitchLoggingNiOutputSocketEntry 1 }
+
+        systemSwitchLoggingNiOutputSocketSlot   OBJECT-TYPE
+                SYNTAX          Unsigned32
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION
+                    "The slot ID for NI output socket."
+                ::={ systemSwitchLoggingNiOutputSocketEntry 2 }
+
+        systemSwitchLoggingNiOutputSocket  OBJECT-TYPE
+                SYNTAX          Enable
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                    "Enable/disable NI logging to external syslog server."
+                DEFVAL  { disabled }
+                ::={ systemSwitchLoggingNiOutputSocketEntry 3 }
+
+        systemSwitchLoggingOutputSocketConsole    OBJECT-TYPE
+                SYNTAX          Enable
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                    "Enable/disable send console log to remote Syslog server."
+                DEFVAL { disabled }
+                ::={ systemSwitchLogging 34 }
+
+        systemSwitchLoggingDefaultLevel    OBJECT-TYPE
+                SYNTAX          SeverityLevel {
+                                    severityLevelAlarm(1),
+                                    severityLevelError(2),
+                                    severityLevelAlert(3),
+                                    severityLevelWarn(4),
+                                    severityLevelEvent(5),
+                                    severityLevelInfo(6)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                    "Switch logging default level."
+                DEFVAL { severityLevelInfo }
+                ::={ systemSwitchLogging 35 }
 
         --systemDNS group.  This group contains the Domain Name Service
         --configuration information.
@@ -2267,7 +2578,7 @@ alcatelIND1SystemMIB MODULE-IDENTITY
              ::={ systemVcHardwareEntry 2 }
  
      systemVcHardwareFlashMfg      OBJECT-TYPE
-                 SYNTAX          INTEGER {other(1), amd(2), intel(3), atmel(4), micron(5), kingston(6), toshiba(7), sandisk(8), sst(9), spansion(10), wintec(13)}
+                 SYNTAX          INTEGER {other(1), amd(2), intel(3), atmel(4), micron(5), kingston(6), toshiba(7), sandisk(8), sst(9), spansion(10), wintec(13), atp(14),ata(15), macronix(16), innodisk(17), memphis(18), smart(19)}
                  MAX-ACCESS      read-only
                  STATUS          current
                  DESCRIPTION
@@ -2418,6 +2729,529 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                  DEFVAL { {} }
                  ::= { systemVcHardwareEntry 13 }
 
+         ovCloudAgentAdminState  OBJECT-TYPE
+                 SYNTAX  INTEGER {
+                     enabled (1),
+                     disabled (2),
+                     forceDisabled (3),
+                     restart (4)
+                 }
+                 MAX-ACCESS    read-write
+                 STATUS        current
+                 DESCRIPTION
+                     "Enable or disable the cloud agent on AOS switches."
+                 DEFVAL  { disabled }
+                 ::= { ovCloudAgent 1 }
+
+         ovCloudAgentDiscoveryInterval  OBJECT-TYPE
+                 SYNTAX        Unsigned32 (2 .. 43200)
+                 MAX-ACCESS    read-write
+                 STATUS        current
+                 DESCRIPTION
+                     "Time interval in minutes the switch does call-home in case of the previous call-home failed."
+                 DEFVAL  { 30 }
+                 ::= { ovCloudAgent 2 }
+
+         ovCloudAgentDeviceState  OBJECT-TYPE
+                 SYNTAX        INTEGER {
+                    initial (1),
+                    callhomeSent (2),
+                    upgradeInProgress (3),
+                    upgradeInProgressRetry (4),
+                    vpnConnectInProgress (5),
+                    deviceNotManaged (6),
+                    preProvisionInProgress (7),
+                    preProvisionFailed (8),
+                    deviceManaged (9),
+                    error (10),
+                    pkiUpdate (11),
+                    troubleshooting (12)
+                 }
+                 MAX-ACCESS    read-only
+                 STATUS        current
+                 DESCRIPTION
+                     "The AOS switch OV cloud agent state."
+                 ::= { ovCloudAgent 3 }
+
+         ovCloudAgentVpnStatus  OBJECT-TYPE
+                 SYNTAX        INTEGER {
+                    connected (1),
+                    disconnected (2)
+                 }
+                 MAX-ACCESS    read-only
+                 STATUS        current
+                 DESCRIPTION
+                     "The AOS switch OV cloud agent VPN connection status."
+                 ::= { ovCloudAgent 4 }
+
+         ovCloudAgentTimeToNextCallhome  OBJECT-TYPE
+                 SYNTAX        Unsigned32
+                 MAX-ACCESS    read-only
+                 STATUS        current
+                 DESCRIPTION
+                     "Time in second to the next callhome in case the previous callhome is failed.
+                      Zero (0) value means it is not applicable."
+                 ::= { ovCloudAgent 5 }
+
+         ovCloudAgentRemoveInconsistentCertificate  OBJECT-TYPE
+                 SYNTAX        Unsigned32
+                 MAX-ACCESS    read-write
+                 STATUS        current
+                 DESCRIPTION
+                     "Remove the certificates from all chassis if the certificate status is inconsistent."
+                 ::= { ovCloudAgent 6 }
+
+         systemMgmtAgentAdminState  OBJECT-TYPE
+                 SYNTAX  INTEGER {
+                     enable (1),
+                     disable (2)
+                 }
+                 MAX-ACCESS    read-write
+                 STATUS        current
+                 DESCRIPTION
+                     "Enable or disable the MGMT agent on AOS switches."
+                 DEFVAL  { disable }
+                 ::= { systemMgmtAgent 1 }
+
+         systemMgmtAgentBrokerConfHostType  OBJECT-TYPE
+                 SYNTAX  InetAddressType {
+                             ipv4(1),
+                             ipv6(2),
+                             dns (16)
+                 }
+                 MAX-ACCESS    read-write
+                 STATUS        current
+                 DESCRIPTION
+                     "Type of broker. It should be DNS, IPv4 and IPv6."
+                 DEFVAL  { dns }
+                 ::= { systemMgmtAgent 2 }
+
+         systemMgmtAgentBrokerConfHost  OBJECT-TYPE
+                 SYNTAX        InetAddress
+                 MAX-ACCESS    read-write
+                 STATUS        current
+                 DESCRIPTION
+                     "Specify the broker host to connect to."
+                 DEFVAL  { "hswitch.han-networks.com" }
+                 ::= { systemMgmtAgent 3 }
+
+         systemMgmtAgentBrokerConfPort  OBJECT-TYPE
+                 SYNTAX        Integer32 (1..65535)
+                 MAX-ACCESS    read-write
+                 STATUS        current
+                 DESCRIPTION
+                     "Connect to the port specified. If not given, the default of 1883
+                      for plain MQTT or 8883 for MQTT over TLS will be used."
+                 DEFVAL  { 8883 }
+                 ::= { systemMgmtAgent 4 }
+
+         systemMgmtAgentBrokerConfUserName  OBJECT-TYPE
+                 SYNTAX        SnmpAdminString (SIZE (0..255))
+                 MAX-ACCESS    read-write
+                 STATUS        current
+                 DESCRIPTION
+                     "Provide a username to be used for authenticating with the broker."
+                 ::= { systemMgmtAgent 5 }
+
+         systemMgmtAgentBrokerConfPassword  OBJECT-TYPE
+                 SYNTAX        SnmpAdminString (SIZE (0..255))
+                 MAX-ACCESS    read-write
+                 STATUS        current
+                 DESCRIPTION
+                     "Provide a password to be used for authenticating with the broker."
+                 ::= { systemMgmtAgent 6 }
+
+         systemMgmtAgentBrokerConfQoS  OBJECT-TYPE
+                 SYNTAX        INTEGER {
+                                    qos0 (1),
+                                    qos1 (2),
+                                    qos2 (3)
+                               }
+                 MAX-ACCESS    read-write
+                 STATUS        current
+                 DESCRIPTION
+                     "Specify the quality of service to use for the message, from 0, 1 and 2."
+                 DEFVAL  { qos0 }
+                 ::= { systemMgmtAgent 7 }
+
+         systemMgmtAgentBrokerConfKeepAlive  OBJECT-TYPE
+                 SYNTAX        Integer32
+                 MAX-ACCESS    read-write
+                 STATUS        current
+                 DESCRIPTION
+                     "The number of seconds between sending PING commands to the broker for the purposes
+                      of informing it we are still connected and functioning."
+                 DEFVAL  { 15 }
+                 ::= { systemMgmtAgent 8 }
+
+         systemMgmtAgentBrokerConfCleanSession  OBJECT-TYPE
+                 SYNTAX  TruthValue
+                 MAX-ACCESS    read-write
+                 STATUS        current
+                 DESCRIPTION
+                     "Enable or disable the clean session flag."
+                 DEFVAL  { false }
+                 ::= { systemMgmtAgent 9 }
+
+         systemMgmtAgentBrokerConfProxy  OBJECT-TYPE
+                 SYNTAX        SnmpAdminString
+                 MAX-ACCESS    read-write
+                 STATUS        current
+                 DESCRIPTION
+                     "Specify a SOCKS5 proxy to connect through."
+                 ::= { systemMgmtAgent 10 }
+
+         systemMgmtAgentBrokerConfInsecure  OBJECT-TYPE
+                 SYNTAX        TruthValue
+                 MAX-ACCESS    read-write
+                 STATUS        current
+                 DESCRIPTION
+                     "When using certificate based encryption, this option disables verification
+                      of the server hostname in the server certificate."
+                 DEFVAL  { true }
+                 ::= { systemMgmtAgent 11 }
+
+         systemMgmtAgentBrokerOperHostType  OBJECT-TYPE
+                 SYNTAX  InetAddressType {
+                             ipv4(1),
+                             ipv6(2),
+                             dns (16)
+                 }
+                 MAX-ACCESS    read-only
+                 STATUS        current
+                 DESCRIPTION
+                     "Type of broker. It should be DNS, IPv4 and IPv6."
+                 DEFVAL  { dns }
+                 ::= { systemMgmtAgent 12 }
+
+         systemMgmtAgentBrokerOperHost  OBJECT-TYPE
+                 SYNTAX        InetAddress
+                 MAX-ACCESS    read-only
+                 STATUS        current
+                 DESCRIPTION
+                     "Specify the broker host to connect to."
+                 DEFVAL  { "hswitch.han-networks.com" }
+                 ::= { systemMgmtAgent 13 }
+
+         systemMgmtAgentBrokerOperPort  OBJECT-TYPE
+                 SYNTAX        Integer32 (1..65535)
+                 MAX-ACCESS    read-only
+                 STATUS        current
+                 DESCRIPTION
+                     "Connect to the port specified. If not given, the default of 1883
+                      for plain MQTT or 8883 for MQTT over TLS will be used."
+                 DEFVAL  { 8883 }
+                 ::= { systemMgmtAgent 14 }
+
+         systemMgmtAgentBrokerOperUserName  OBJECT-TYPE
+                 SYNTAX        SnmpAdminString (SIZE (0..255))
+                 MAX-ACCESS    read-only
+                 STATUS        current
+                 DESCRIPTION
+                     "Provide a username to be used for authenticating with the broker."
+                 ::= { systemMgmtAgent 15 }
+
+         systemMgmtAgentBrokerOperPassword  OBJECT-TYPE
+                 SYNTAX        SnmpAdminString (SIZE (0..255))
+                 MAX-ACCESS    read-only
+                 STATUS        current
+                 DESCRIPTION
+                     "Provide a password to be used for authenticating with the broker."
+                 ::= { systemMgmtAgent 16 }
+
+         systemMgmtAgentBrokerOperQoS  OBJECT-TYPE
+                 SYNTAX        INTEGER {
+                                    qos0 (1),
+                                    qos1 (2),
+                                    qos2 (3)
+                               }
+                 MAX-ACCESS    read-only
+                 STATUS        current
+                 DESCRIPTION
+                     "Specify the quality of service to use for the message, from 0, 1 and 2."
+                 DEFVAL  { qos0 }
+                 ::= { systemMgmtAgent 17 }
+
+         systemMgmtAgentBrokerOperKeepAlive  OBJECT-TYPE
+                 SYNTAX        Integer32
+                 MAX-ACCESS    read-only
+                 STATUS        current
+                 DESCRIPTION
+                     "The number of seconds between sending PING commands to the broker for the purposes
+                      of informing it we are still connected and functioning."
+                 DEFVAL  { 15 }
+                 ::= { systemMgmtAgent 18 }
+
+         systemMgmtAgentBrokerOperCleanSession  OBJECT-TYPE
+                 SYNTAX  TruthValue
+                 MAX-ACCESS    read-only
+                 STATUS        current
+                 DESCRIPTION
+                     "Enable or disable the clean session flag."
+                 DEFVAL  { false }
+                 ::= { systemMgmtAgent 19 }
+
+         systemMgmtAgentBrokerOperProxy  OBJECT-TYPE
+                 SYNTAX        SnmpAdminString
+                 MAX-ACCESS    read-only
+                 STATUS        current
+                 DESCRIPTION
+                     "Specify a SOCKS5 proxy to connect through."
+                 ::= { systemMgmtAgent 20 }
+
+         systemMgmtAgentBrokerOperInsecure  OBJECT-TYPE
+                 SYNTAX        TruthValue
+                 MAX-ACCESS    read-only
+                 STATUS        current
+                 DESCRIPTION
+                     "When using certificate based encryption, this option disables verification
+                      of the server hostname in the server certificate."
+                 DEFVAL  { true }
+                 ::= { systemMgmtAgent 21 }
+
+--
+-- System storage
+--
+
+         systemStorageLock OBJECT-TYPE
+                 SYNTAX        INTEGER {
+                    lock (1),
+                    unlock (2)
+                 }
+                 MAX-ACCESS    read-write
+                 STATUS        current
+                 DESCRIPTION
+                     "The storage system status. By default, the storage system is un-locked."
+                 DEFVAL {unlock}
+                 ::= { systemStorage 1 }
+
+         systemStorageExtractOperStatus OBJECT-TYPE
+                 SYNTAX        INTEGER {
+                    inProgress (1),
+                    failed (2),
+                    success(3)
+                 }
+                 MAX-ACCESS    read-only
+                 STATUS        current
+                 DESCRIPTION
+                     "This object denotes the status of the last extraction operation."
+                 DEFVAL {success}
+                 ::= { systemStorage 2 }
+--
+-- Storage lock sftp server
+--
+
+          systemStorageLockSftpServerInetAddrType  OBJECT-TYPE
+                 SYNTAX      InetAddressType {
+                      ipv4(1),
+                      ipv6(2)
+                  }
+                 MAX-ACCESS  read-write
+                 STATUS      current
+                 DESCRIPTION
+                         "The value of systemStorageLockSftpServerInetAddrType indicates the inet
+                          address type for systemStorageLockSftpServerInetAddr."
+                 DEFVAL { ipv4 }
+                 ::= { systemStorageLockSftpServer 1 }
+
+          systemStorageLockSftpServerInetAddr  OBJECT-TYPE
+                 SYNTAX      InetAddress (SIZE (1..128))
+                 MAX-ACCESS  read-write
+                 STATUS      current
+                 DESCRIPTION
+                         "IP address of the sftp server."
+                 ::= { systemStorageLockSftpServer 2 }
+
+          systemStorageLockSftpServerUser  OBJECT-TYPE
+                 SYNTAX      SnmpAdminString ( SIZE( 0 .. 63 ) )
+                 MAX-ACCESS  read-write
+                 STATUS      current
+                 DESCRIPTION
+                         "Name of the user."
+                 ::= { systemStorageLockSftpServer 3 }
+
+          systemStorageLockSftpServerPass  OBJECT-TYPE
+                 SYNTAX      SnmpAdminString ( SIZE( 0 .. 47 ) )
+                 MAX-ACCESS  read-write
+                 STATUS      current
+                 DESCRIPTION
+                         "Password of the user."
+                 ::= { systemStorageLockSftpServer 4 }
+
+          systemStorageLockSftpServerPassHash  OBJECT-TYPE
+                 SYNTAX      SnmpAdminString ( SIZE( 0 .. 96 ) )
+                 MAX-ACCESS  read-write
+                 STATUS      current
+                 DESCRIPTION
+                         "Password hash of the user."
+                 ::= { systemStorageLockSftpServer 5 }
+
+          systemStorageLockSftpServerPort  OBJECT-TYPE
+                 SYNTAX      Integer32 (0 .. 65535)
+                 MAX-ACCESS  read-write
+                 STATUS      current
+                 DESCRIPTION
+                         "Port of the sftp server."
+                 ::= { systemStorageLockSftpServer 6 }
+
+--
+-- Storage lock output file table
+--
+
+          systemStorageLockOutputFileName  OBJECT-TYPE
+                 SYNTAX      SnmpAdminString (SIZE (1..128))
+                 MAX-ACCESS  read-write
+                 STATUS      current
+                 DESCRIPTION
+                         "Name of the output file."
+                 ::= { systemStorageLockOutputFile 1 }
+
+          systemStorageLockOutputFileChassisId  OBJECT-TYPE
+                 SYNTAX      Integer32 (1..8)
+                 MAX-ACCESS  read-write
+                 STATUS      current
+                 DESCRIPTION
+                         "The storage lock chassis id."
+                 ::= { systemStorageLockOutputFile 2 }
+
+          systemStorageLockOutputFileType  OBJECT-TYPE
+                 SYNTAX      INTEGER {
+                       flash (1),
+                       bootFlash (2),
+                       eeprom (3),
+                       all (4)
+                 }
+                 MAX-ACCESS  read-write
+                 STATUS      current
+                 DESCRIPTION
+                         "The storage lock type."
+                 ::= { systemStorageLockOutputFile 3 }
+
+          systemStorageLockOutputFileAdminPass  OBJECT-TYPE
+                 SYNTAX      SnmpAdminString ( SIZE( 0 .. 47 ) )
+                 MAX-ACCESS  read-write
+                 STATUS      current
+                 DESCRIPTION
+                         "Password of the admin user."
+                 ::= { systemStorageLockOutputFile 4 }
+
+--
+-- SSL Cipher Suite Table
+--
+    systemSslCipherLevel   OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        all(1),
+                        low(2),
+                        medium(3),
+                        high(4),
+                        custom(5),
+                        customFile(6)
+                    }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+            "The strength of the cipher and indicates the minimum level of ciphers that are supported.
+             all-Includes all ciphers, including NULL-SHA.
+             low-Includes all ciphers except NULL-SHA.
+             medium-Includes all ciphers except NULL-SHA, DES-CBC-SHA, and RC4-MD5.
+             high (applies only to TLSv1.2)-Includes only AES-256 with SHA-2 ciphers.
+             custom-The cipher suite using OpenSSL cipher definition strings.
+             customFile-The cipher suite using OpenSSL cipher definition strings
+             that are stored in the specified file."
+        ::= { systemSslCipher 1 }
+
+    systemSslCipherSuite  OBJECT-TYPE
+        SYNTAX      SnmpAdminString ( SIZE( 0 .. 1024 ) ) 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Full control of the cipher suite using OpenSSL cipher definition strings."
+        ::= { systemSslCipher 2 }
+
+
+--
+-- SSL PKI Table
+--
+    systemSslPkiClientCertificateValidation   OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used for enabling/disabling the SSL certificate validation for
+            AOS TLS clients ( LDAP, RADIUS, SYSLOG, SNMP )."
+        DEFVAL { disable }
+        ::= { systemSslPki 1}
+
+    systemSslPkiClientMutualAuthentication  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used for enabling/disabling the SSL mutual authentication for
+            AOS TLS clients ( LDAP, RADIUS, SYSLOG, SNMP )."
+        DEFVAL { disable }
+        ::= { systemSslPki 2 }
+
+    systemSslPkiServerMutualAuthentication  OBJECT-TYPE
+        SYNTAX      INTEGER {    
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used for enabling/disabling the SSL mutual authentication for
+            AOS TLS servers ( Captive-Portal, SNMP )."
+        DEFVAL { disable }
+        ::= { systemSslPki 3 }
+
+    systemSslPkiTlsVersion  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        versionOneDotZero(1),
+                        versionOneDotOne (2),
+                        versionOneDotTwo(3)
+                    }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used for selecting the TLS version for AOS TLS."
+        DEFVAL { versionOneDotZero }
+        ::= { systemSslPki 4 }
+
+    systemSslPkiCheckRevocation  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        disable(1),
+                        crl(2),
+                        ocsp(3)
+                    }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used to set the TLS certificate revocation check method."
+        ::= { systemSslPki 5 }
+
+--
+-- Python Pip Table
+--
+    systemPythonPipInstall   OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        install(1),
+                        uninstall(2)
+                    }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A set with value 1 on this object will install python pip module to the switch. 
+            A set with value 2 on this object will uninstall python pip module but a reboot is required."
+        DEFVAL { uninstall }
+        ::= { systemPythonPip 1}
+
 --
 -- Trap Objects 
 --
@@ -2429,6 +3263,47 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                 "SWLOG file name that might get overwritten since swlog file reached (90%) it size"
                 DEFVAL { "" }
                 ::= { alcatelIND1SystemMIBTrapObjects 1 }
+
+        systemSwlogFailure OBJECT-TYPE
+                SYNTAX  SnmpAdminString (SIZE (0..255))
+                MAX-ACCESS  read-only
+                STATUS  current
+                DESCRIPTION
+                        "SWLOG to /flash/swlog_chasis* file may fail due to the switch runs out of file descriptor or hard disk space.
+                        This trap will also be raised during failure sending the swlog to external syslog server."
+                ::= { alcatelIND1SystemMIBTrapObjects 2 }
+
+        systemRebootReason OBJECT-TYPE
+                SYNTAX  INTEGER {
+                    remoteLoggingFailure(1),
+                    loggingServiceNotRunning(2)
+                }
+                MAX-ACCESS  read-only
+                STATUS  current
+                DESCRIPTION
+                        "This object indicates the system reboot reason.
+                         If this object value is swlogFailure(1) that means system reboot due to remote logging failure.
+                         If this object value is loggingServiceNotRunning(2) that means system reboot because syslogd/swlogd is not running."
+                ::= { alcatelIND1SystemMIBTrapObjects 3 }
+           
+        systemStorageLockStatus OBJECT-TYPE
+                SYNTAX  INTEGER {
+                    locked(1),
+                    unlocked(2)
+                }
+                MAX-ACCESS  read-only
+                STATUS  current
+                DESCRIPTION
+                        "This object indicates the system storage lock status."
+                ::= { alcatelIND1SystemMIBTrapObjects 4 }
+
+        swlogdRestart OBJECT-TYPE
+                SYNTAX SnmpAdminString (SIZE (1..255))
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "This trap is sent when swlogd/syslogd is restarted"
+                ::= { alcatelIND1SystemMIBTrapObjects 5 }
 
 --
 -- NOTIFICATIONS 
@@ -2442,6 +3317,46 @@ alcatelIND1SystemMIB MODULE-IDENTITY
            "The file specified file may get lost if not backed up , since swlog file reached 90% 
             of its size , please back up swlog before getting overwritten."
         ::= { alcatelIND1SystemMIBTraps 0 1 }
+
+        systemSwlogFailureTraps  NOTIFICATION-TYPE
+        OBJECTS  {
+                systemSwlogFailure
+        }
+        STATUS   current
+        DESCRIPTION
+           "when swlog fails to store log message to /flash/swlog_chassis* file, then this trap is
+            sent to the Management Entity, with the message which was failed to persist.
+            This trap will also be raised during failure sending the swlog to external syslog server."
+        ::= { alcatelIND1SystemMIBTraps 0 2 }
+
+        systemRebootSwlogFailureTrap  NOTIFICATION-TYPE
+        OBJECTS  {
+                systemRebootReason
+        }
+        STATUS   current
+        DESCRIPTION
+           "When swlog fails to send log message to remote server or log service is not running,
+            the system need to be rebooted. This trap is sent to the management entity to indicate the reboot reason."
+        ::= { alcatelIND1SystemMIBTraps 0 3 }
+        
+        systemStorageLockTrap  NOTIFICATION-TYPE
+        OBJECTS  {
+                systemStorageLockStatus
+        }
+        STATUS   current
+        DESCRIPTION
+           "When system storage is locked or unlocked,
+            this trap is sent to management entity to indicate the storage lock status."
+        ::= { alcatelIND1SystemMIBTraps 0 4 }
+
+        swlogdRestartTrap NOTIFICATION-TYPE
+        OBJECTS {
+		swlogdRestart
+	}
+        STATUS   current
+        DESCRIPTION
+            "When swlogd/syslogd is restarted, this trap is sent as an indication."
+        ::= { alcatelIND1SystemMIBTraps 0 5 }
 
 --
 -- Compliance Statements
@@ -2466,7 +3381,14 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                                 systemBlueToothServicesGroup,
                                 systemFipsGroup,
                                 systemVcHardwareGroup,
-                                systemNotificationGroup
+                                systemNotificationGroup,
+                                ovCloudAgentGroup,
+                                systemStorageGroup,
+                                systemStorageLockSftpServerGroup,
+                                systemStorageLockOutputFileGroup,
+                                systemStorageLockingGroup,
+                                systemSslCipherGroup,
+                                systemMgmtAgentGroup
             }
 
         ::= { alcatelIND1SystemMIBCompliances 1 }
@@ -2517,6 +3439,7 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                         systemHardwareJumperSpare,
                         systemHardwareFpgaVersionIndex,
                         systemHardwareFpgaVersion,
+                        systemHardwareFpgaManufacturer,
                         systemHardwareBootRomVersion,
                         systemHardwareDefaultMiniBootVersion,
                         systemHardwareBackupMiniBootVersion,
@@ -2581,7 +3504,15 @@ alcatelIND1SystemMIB MODULE-IDENTITY
 				systemServicesUsbAutoCopyEnable,
 				systemServicesUsbMounted,
 				systemServicesArchiveIndex,
-				systemServicesCurrentArchivePathName
+				systemServicesCurrentArchivePathName,
+				systemServicesTcpHalfOpenTimeout,
+				systemServicesUsbBackupAdminState,
+				systemServicesUsbCopyConfig,
+				systemServicesUsbBackupKey,
+				systemServicesUsbBackupHashkey,
+				systemServicesTCPTimeStampResponse,
+				systemServicesUsbBackupBootable
+                
                         }
         STATUS  current
         DESCRIPTION
@@ -2609,49 +3540,63 @@ alcatelIND1SystemMIB MODULE-IDENTITY
 
         systemSwitchLoggingGroup OBJECT-GROUP
                 OBJECTS{
-                                systemSwitchLoggingIndex,
-                                systemSwitchLoggingEnable,
-                                systemSwitchLoggingFlash,
-                                systemSwitchLoggingSocket,
-                                systemSwitchLoggingSocketIpAddr,
-                                systemSwitchLoggingConsole,
-                                systemSwitchLoggingClear,
-                                systemSwitchLoggingFileSize,
-                                systemSwitchLoggingLevel,
-                                systemSwitchLoggingApplicationAppId,
-                                systemSwitchLoggingApplicationAppName,
-       				systemSwitchLoggingApplicationSubAppId,
-       				systemSwitchLoggingApplicationSubAppName,
-       				systemSwitchLoggingApplicationSubAppLevel,
-       				systemSwitchLoggingApplicationSubAppVrfLevelIndex,
-       				systemSwitchLoggingApplicationSubAppVrfLevelString,
-                                systemSwitchLoggingAppName,
-                                systemSwitchLoggingDuplicateDetect,
-                                systemSwitchLoggingPreamble,
-                                systemSwitchLoggingDebug,
-                                systemSwitchLoggingVrf,
-                                systemSwitchLoggingHashAgeLimit,
-                                systemSwitchLoggingTty,
-                                systemSwitchLoggingSubAppNbr,
-        						systemSwitchLoggingLibraryName,
-        						systemSwitchLoggingLoopback0,
-                                systemSwitchLoggingConsoleLevel,
-                                systemSwitchLoggingHostCount,
-                                systemSwitchLoggingUserCommandStatus,
-                                systemSwitchLoggingSysLogFacilityId,
-                                systemSwitchLoggingHostIpAddr,
-                                systemSwitchLoggingHostPort,
-                                systemSwitchLoggingHostStatus,
-                                systemSwitchLoggingHostUserCommandHost,
-                                systemSwitchLoggingHostVrfName,
-                                systemSwitchLoggingHostv6IpAddr,
-                                systemSwitchLoggingHostv6Port,
-                                systemSwitchLoggingHostv6Status,
-                                systemSwitchLoggingHostv6UserCommandHost,
-                                systemSwitchLoggingHostv6VrfName,
-			        systemSwitchLoggingDgHostIpType,
-			        systemSwitchLoggingDgHostIpAddr          
-                        }
+                        systemSwitchLoggingIndex,
+                        systemSwitchLoggingEnable,
+                        systemSwitchLoggingFlash,
+                        systemSwitchLoggingSocket,
+                        systemSwitchLoggingSocketIpAddr,
+                        systemSwitchLoggingConsole,
+                        systemSwitchLoggingClear,
+                        systemSwitchLoggingFileSize,
+                        systemSwitchLoggingLevel,
+                        systemSwitchLoggingApplicationAppId,
+                        systemSwitchLoggingApplicationAppName,
+                        systemSwitchLoggingApplicationSubAppId,
+                        systemSwitchLoggingApplicationSubAppName,
+                        systemSwitchLoggingApplicationSubAppLevel,
+                        systemSwitchLoggingApplicationSubAppVrfLevelIndex,
+                        systemSwitchLoggingApplicationSubAppVrfLevelString,
+                        systemSwitchLoggingAppName,
+                        systemSwitchLoggingDuplicateDetect,
+                        systemSwitchLoggingPreamble,
+                        systemSwitchLoggingDebug,
+                        systemSwitchLoggingVrf,
+                        systemSwitchLoggingHashAgeLimit,
+                        systemSwitchLoggingTty,
+                        systemSwitchLoggingSubAppNbr,
+                        systemSwitchLoggingLibraryName,
+                        systemSwitchLoggingLoopback0,
+                        systemSwitchLoggingConsoleLevel,
+                        systemSwitchLoggingHostCount,
+                        systemSwitchLoggingUserCommandStatus,
+                        systemSwitchLoggingSysLogFacilityId,
+                        systemSwitchLoggingHostIpAddr,
+                        systemSwitchLoggingHostPort,
+                        systemSwitchLoggingHostStatus,
+                        systemSwitchLoggingHostUserCommandHost,
+                        systemSwitchLoggingHostVrfName,
+                        systemSwitchLoggingHostv6IpAddr,
+                        systemSwitchLoggingHostv6Port,
+                        systemSwitchLoggingHostv6Status,
+                        systemSwitchLoggingHostv6UserCommandHost,
+                        systemSwitchLoggingHostv6VrfName,
+                        systemSwitchLoggingDgHostIpType,
+                        systemSwitchLoggingDgHostIpAddr,
+                        systemSwitchLoggingGmtTime,
+                        systemSwitchLoggingSyslogProtocol,
+                        systemSwitchLoggingSizeTrapThreshold,
+                        systemSwitchLoggingHostDnPort,
+                        systemSwitchLoggingHostDnUserCommandHost,
+                        systemSwitchLoggingHostDnVrfName,
+                        systemSwitchLoggingHostDnStatus,
+                        systemSwitchLoggingHostv6Tls,
+                        systemSwitchLoggingHostTls,
+                        systemSwitchLoggingHostDnTls,
+                        systemSwitchLoggingHostOutputSocket,
+                        systemSwitchLoggingNiOutputSocket,
+                        systemSwitchLoggingOutputSocketConsole,
+                        systemSwitchLoggingDefaultLevel
+                }
                 STATUS      current
                 DESCRIPTION
                 "Group all the switch logging parameters together"
@@ -2717,7 +3662,10 @@ alcatelIND1SystemMIB MODULE-IDENTITY
 
          systemSwlogGroup OBJECT-GROUP
                  OBJECTS     {
-                         systemSwlogName
+                         systemSwlogName,
+                         systemSwlogFailure,
+                         systemRebootReason,
+			 swlogdRestart
                  }
          STATUS      current
          DESCRIPTION
@@ -2727,12 +3675,137 @@ alcatelIND1SystemMIB MODULE-IDENTITY
         systemNotificationGroup  NOTIFICATION-GROUP
                 NOTIFICATIONS
                 {
-                                systemSwlogSizeTrap  
+                                systemSwlogSizeTrap,
+                                systemSwlogFailureTraps,
+                                systemRebootSwlogFailureTrap,
+                                systemStorageLockTrap,
+				swlogdRestartTrap
                 }
                 STATUS  current
                 DESCRIPTION
                 "A collection of notifications for System Services events."
                 ::= { alcatelIND1SystemMIBGroups 12 }
 
+        ovCloudAgentGroup OBJECT-GROUP
+                OBJECTS{
+                                ovCloudAgentAdminState,
+                                ovCloudAgentDiscoveryInterval,
+                                ovCloudAgentDeviceState,
+                                ovCloudAgentVpnStatus,
+                                ovCloudAgentTimeToNextCallhome,
+                                ovCloudAgentRemoveInconsistentCertificate
+                }
+                STATUS      current
+                DESCRIPTION
+                "Group all the ovCloudAgent parameters together."
+                ::= { alcatelIND1SystemMIBGroups 13 }
+
+        systemStorageGroup OBJECT-GROUP
+                OBJECTS{
+                            systemStorageLock,
+                            systemStorageExtractOperStatus
+                }
+                STATUS      current
+                DESCRIPTION
+                "Group all the systemStorage parameters together."
+                ::= { alcatelIND1SystemMIBGroups 14 }
+
+        systemStorageLockSftpServerGroup OBJECT-GROUP
+                OBJECTS{
+                            systemStorageLockSftpServerInetAddrType  ,
+                            systemStorageLockSftpServerInetAddr,
+                            systemStorageLockSftpServerUser,
+                            systemStorageLockSftpServerPass,
+                            systemStorageLockSftpServerPassHash,
+                            systemStorageLockSftpServerPort
+                }
+                STATUS      current
+                DESCRIPTION
+                "Group all the systemStorageLockSftpServer parameters together."
+                ::= { alcatelIND1SystemMIBGroups 15 }
+
+        systemStorageLockOutputFileGroup OBJECT-GROUP
+                OBJECTS{
+                            systemStorageLockOutputFileName,
+                            systemStorageLockOutputFileChassisId,
+                            systemStorageLockOutputFileType,
+                            systemStorageLockOutputFileAdminPass
+                }
+                STATUS      current
+                DESCRIPTION
+                "Group all the systemStorageLockOutputFile parameters together."
+                ::= { alcatelIND1SystemMIBGroups 16 }
+
+        systemStorageLockingGroup OBJECT-GROUP 
+                OBJECTS{
+                            systemStorageLockStatus
+                }
+                STATUS      current
+                DESCRIPTION
+                "Group all the systemStorage parameters together."
+                ::= { alcatelIND1SystemMIBGroups 17 }
+
+        systemSslCipherGroup  OBJECT-GROUP
+                OBJECTS{
+                            systemSslCipherLevel,
+                            systemSslCipherSuite
+                }
+                STATUS  current
+                DESCRIPTION
+                "Collection of objects for SSL ciphers."
+                ::= { alcatelIND1SystemMIBGroups 18 }
+
+        systemMgmtAgentGroup OBJECT-GROUP
+                OBJECTS{
+                    systemMgmtAgentAdminState,
+                    systemMgmtAgentBrokerConfHostType,
+                    systemMgmtAgentBrokerConfHost,
+                    systemMgmtAgentBrokerConfPort,
+                    systemMgmtAgentBrokerConfUserName,
+                    systemMgmtAgentBrokerConfPassword,
+                    systemMgmtAgentBrokerConfQoS,
+                    systemMgmtAgentBrokerConfKeepAlive,
+                    systemMgmtAgentBrokerConfCleanSession,
+                    systemMgmtAgentBrokerConfProxy,
+                    systemMgmtAgentBrokerConfInsecure,
+                    systemMgmtAgentBrokerOperHostType,
+                    systemMgmtAgentBrokerOperHost,
+                    systemMgmtAgentBrokerOperPort,
+                    systemMgmtAgentBrokerOperUserName,
+                    systemMgmtAgentBrokerOperPassword,
+                    systemMgmtAgentBrokerOperQoS,
+                    systemMgmtAgentBrokerOperKeepAlive,
+                    systemMgmtAgentBrokerOperCleanSession,
+                    systemMgmtAgentBrokerOperProxy,
+                    systemMgmtAgentBrokerOperInsecure
+                }
+                STATUS      current
+                DESCRIPTION
+                "Group all the MGMT agent parameters together."
+                ::= { alcatelIND1SystemMIBGroups 19 }
+
+        systemSslPkiGroup  OBJECT-GROUP
+                OBJECTS{
+                            systemSslPkiClientCertificateValidation,
+                            systemSslPkiClientMutualAuthentication,
+                            systemSslPkiServerMutualAuthentication,
+                            systemSslPkiTlsVersion,
+                            systemSslPkiCheckRevocation
+                }
+                STATUS  current
+                DESCRIPTION
+                "Collection of objects for SSL PKI."
+                ::= { alcatelIND1SystemMIBGroups 20 }
+
+        systemPythonPipGroup  OBJECT-GROUP
+                OBJECTS{
+
+                            systemPythonPipInstall
+                }
+                STATUS  current
+                DESCRIPTION
+                "Collection of objects for python pip."
+                ::= { alcatelIND1SystemMIBGroups 21 }
 END
+
 

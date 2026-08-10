@@ -5,40 +5,39 @@ IMPORTS
         OBJECT-TYPE,
         OBJECT-IDENTITY,
         MODULE-IDENTITY,
+        NOTIFICATION-TYPE, 
         IpAddress               FROM SNMPv2-SMI
-        TEXTUAL-CONVENTION      FROM SNMPv2-TC
+        TEXTUAL-CONVENTION, RowStatus      FROM SNMPv2-TC
+        SnmpEngineID, SnmpAdminString       FROM SNMP-FRAMEWORK-MIB
         OBJECT-GROUP,
-        MODULE-COMPLIANCE       FROM SNMPv2-CONF
-        softentIND1SnmpAgt      FROM ALCATEL-IND1-BASE;
+        MODULE-COMPLIANCE,
+        NOTIFICATION-GROUP       FROM SNMPv2-CONF
+        softentIND1SnmpAgt      FROM ALCATEL-IND1-BASE
+        InetAddressType, InetAddress        FROM INET-ADDRESS-MIB
+        snmp                                FROM SNMPv2-MIB;
 
-
+        
 alcatelIND1SNMPAgentMIB  MODULE-IDENTITY
-        LAST-UPDATED  "201407150000Z"
-        ORGANIZATION "Alcatel-Lucent"
-        CONTACT-INFO
-            "Please consult with Customer Service to ensure the most appropriate
-             version of this document is used with the products in question:
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc."
+    CONTACT-INFO
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
 
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
-                               26801 West Agoura Road
-                            Agoura Hills, CA  91301-5122
-                              United States Of America
+                      ALE USA Inc. Enterprise
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
 
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
+     Telephone:          +1 800 995 2696
 
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
         DESCRIPTION
             "This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                 For the Birds Of Prey Product Line
+                 For the OmniSwitch Product Line
                  SNMP Agent Subsystem.
 
              The right to make changes in specification and other information
@@ -52,13 +51,24 @@ alcatelIND1SNMPAgentMIB  MODULE-IDENTITY
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2007 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+                       Copyright (C) ALE USA Inc. 2014-2019
+                       Copyright (C) 1995-2013 Alcatel-Lucent
+                           ALL RIGHTS RESERVED WORLDWIDE"
+
+        REVISION      "201911270000Z"
+        DESCRIPTION
+            "Updated the latest contact and Copyright information for ALE USA Inc."
 
         REVISION      "201407150000Z"
         DESCRIPTION
             "Addressing discrepancies with Alcatel Standard."
         ::= { softentIND1SnmpAgt 1 }
+
+    alcatelIND1SNMPAgentMIBNotifications OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For SNMP Agent Subsystem Notifications."
+        ::= { alcatelIND1SNMPAgentMIB 0 }
 
     alcatelIND1SNMPAgentMIBObjects OBJECT-IDENTITY
         STATUS current
@@ -124,7 +134,7 @@ snmpAgtSecurityLevel OBJECT-TYPE
                 required for SET.
          privAll: encryption required for SET and GET.
          trapOnly: no SNMP GET or SET are accepted."
-        DEFVAL     { noSec }
+        DEFVAL     { privAll }
         ::= { snmpAgtConfig 1}
 
 snmpAgtCommunityMode OBJECT-TYPE
@@ -137,9 +147,32 @@ snmpAgtCommunityMode OBJECT-TYPE
                 "If the community mode is enabled,
                  the SNMPv1/v2 packets must use
                  the community names."
-        DEFVAL { enabled }
+        DEFVAL { disabled }
         ::= { snmpAgtConfig 2 }
 
+snmpAgtTsmAdminState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enable(1),
+                disable(2) }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "Tsm status (enable/disable)."
+        DEFVAL { disable }
+        ::= { snmpAgtConfig 3 }
+
+snmpAgtTlsAdminState OBJECT-TYPE
+        SYNTAX INTEGER
+                {
+                  enable(1),
+                  disable(2)
+                }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The global SNMP TLS admin state."
+        DEFVAL { enable }
+    ::= { snmpAgtConfig 4  }
 
 --
 -- SNMP Agent Epilogue Control Files anchoring
@@ -187,6 +220,98 @@ snmpAgtCommunityMode OBJECT-TYPE
         ::= {  alcatelIND1SNMPAgentMIBObjects 5 }
 
 --
+-- SNMP Agent (switch wide) EngineId Configuration
+--
+      snmpAgtEngineIdType  OBJECT-TYPE
+        SYNTAX INTEGER {
+                         reserved(0),
+                         ipv4(1),
+                         ipv6(2),
+                         mac(3),
+                         text(4),
+                         octets(5)
+        }
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+              "The SNMP Agent (switch) Engine ID Type Configuration."
+
+        ::= {  alcatelIND1SNMPAgentMIBObjects 6 }
+
+      snmpAgtEngineId  OBJECT-TYPE
+        SYNTAX  SnmpEngineID
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+              "The SNMP Agent (switch) Engine ID Configuration."
+        ::= {  alcatelIND1SNMPAgentMIBObjects 7 }
+
+--
+-- SNMP TSM Map User Table
+--
+
+      alaSnmpTsmUserTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF AlaSnmpTsmUserEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+              "The table of user remote identity configured in the SNMP."
+        ::= { alcatelIND1SNMPAgentMIBObjects 8 }
+
+      alaSnmpTsmUserEntry OBJECT-TYPE
+        SYNTAX       AlaSnmpTsmUserEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+              "Information about a particular user remote identity."
+        INDEX       { alaSnmpTsmUserRemoteIdentity }
+        ::= { alaSnmpTsmUserTable 1 }
+
+      AlaSnmpTsmUserEntry ::= SEQUENCE {
+        alaSnmpTsmUserRemoteIdentity      SnmpAdminString,
+        alaSnmpTsmUserName                SnmpAdminString,
+        alaSnmpTsmUserStatus              RowStatus
+        }
+
+      alaSnmpTsmUserRemoteIdentity OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(1..128))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+              "Remote identifier is file name of the X.509 certificate."
+        ::= { alaSnmpTsmUserEntry 1 }
+
+      alaSnmpTsmUserName OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(1..32 ))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+              "Name of the user."
+        ::= { alaSnmpTsmUserEntry 2 }
+
+      alaSnmpTsmUserStatus OBJECT-TYPE
+        SYNTAX       RowStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+              "The status of this conceptual row in the alaSnmpTsmUserTable."
+        ::= { alaSnmpTsmUserEntry 3 }
+
+snmpAuthTrapMode OBJECT-TYPE
+        SYNTAX INTEGER
+                {
+                  standard(1),
+                  private(2),
+                  both(3)
+                }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The global SNMP authentication trap mode."
+        DEFVAL { standard }
+    ::= { snmp 33 }
+
+--
 -- Compliance Statements
 --
 
@@ -198,12 +323,51 @@ snmpAgtCommunityMode OBJECT-TYPE
 
             MANDATORY-GROUPS
             {
-                snmpAgtConfigGroup
+                snmpAgtConfigGroup,
+                alaSnmpTsmUserGroup,
+                alaSnmpGroup
             }
 
         ::= { alcatelIND1SNMPAgentMIBCompliances 1 }
 
+-- Notification Objects
+    alaAuthenticationFailureNotificationObj   OBJECT IDENTIFIER ::= { alcatelIND1SNMPAgentMIBObjects 9 }
 
+    alaClientIPAddrType OBJECT-TYPE
+        SYNTAX       InetAddressType
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION
+            "Client IP type causing AuthenticationFailure"
+        ::= { alaAuthenticationFailureNotificationObj 1 }
+
+    alaClientIPAddr OBJECT-TYPE
+        SYNTAX       InetAddress 
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION
+            "Client IP causing AuthenticationFailure"
+        ::= { alaAuthenticationFailureNotificationObj 2 }
+
+-- ******************************************************************
+-- NOTIFICATIONS (TRAPS)
+-- ******************************************************************
+   alaAuthenticationFailure NOTIFICATION-TYPE
+        OBJECTS  {
+                alaClientIPAddrType,
+				alaClientIPAddr
+           }
+       STATUS  current
+       DESCRIPTION
+               "Instead of standard authentificationFailure Notification, 
+                alaAuthenticationFailure is to provide IP Address information
+                of source. An alaAuthenticationFailure trap signifies that the SNMP
+                entity has received a protocol message that is not
+                properly authenticated.  While all implementations
+                of SNMP entities MAY be capable of generating this
+                trap, the snmpEnableAuthenTraps object indicates
+                whether this trap will be generated."
+       ::= { alcatelIND1SNMPAgentMIBNotifications 1 }
 --
 -- Units Of Conformance
 --
@@ -214,12 +378,54 @@ snmpAgtCommunityMode OBJECT-TYPE
             snmpAgtSecurityLevel,
             snmpAgtCommunityMode,
             snmpAgtSourceIp,
-            snmpAgtSourceIpConfig
+            snmpAgtSourceIpConfig,
+            snmpAgtEngineIdType,
+            snmpAgtEngineId,
+            snmpAgtTsmAdminState,
+            snmpAgtTlsAdminState
         }
         STATUS  current
         DESCRIPTION
             "Collection of objects for SNMP Agent configuration."
         ::= { alcatelIND1SNMPAgentMIBGroups 1 }
 
+     alaSnmpTsmUserGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaSnmpTsmUserName,
+            alaSnmpTsmUserStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for SNMP map user configuration."
+        ::= { alcatelIND1SNMPAgentMIBGroups 2 }
+
+     alaSnmpBasicNotificationsGroup NOTIFICATION-GROUP
+       NOTIFICATIONS { alaAuthenticationFailure }
+       STATUS        current
+       DESCRIPTION
+          "The basic notifications implemented by an SNMP entity
+           supporting command responder applications."
+       ::= { alcatelIND1SNMPAgentMIBGroups 3 }
+
+     alaSnmpGroup OBJECT-GROUP
+        OBJECTS
+        {
+            snmpAuthTrapMode
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for SNMP user configuration."
+        ::= { alcatelIND1SNMPAgentMIBGroups 4 }
+     alaAuthFailureGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaClientIPAddrType,
+            alaClientIPAddr
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for Alcatel Proprietary alaAuthenticationFailure notification."
+        ::= { alcatelIND1SNMPAgentMIBGroups 5 }
 
 END

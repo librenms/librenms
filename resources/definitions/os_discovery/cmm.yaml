@@ -8,5 +8,5 @@ modules:
                     index: powerStatus.{{ $index }}
                     descr: Power Status {{ $index }}
                     states:
-                        - { value: 0, generic: 2, graph: 1, descr: Power Off }
-                        - { value: 1, generic: 0, graph: 1, descr: Power On }
+                        - { value: 0, generic: 2, descr: Power Off }
+                        - { value: 1, generic: 0, descr: Power On }

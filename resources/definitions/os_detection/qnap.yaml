@@ -14,7 +14,6 @@ discovery:
     -
         sysDescr: Linux TS-
         snmpget:
-            oid: entPhysicalMfgName.1
-            mib: ENTITY-MIB
+            oid: ENTITY-MIB::entPhysicalMfgName.1
             op: starts
             value: 'QNAP Systems'

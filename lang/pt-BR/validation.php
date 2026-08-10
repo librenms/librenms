@@ -202,13 +202,14 @@ return [
     'validations' => [
         'rrd' => [
             'CheckRrdVersion' => [
-                'fail' => 'A versão do rrdtool especificada é mais recente do que a instalada. Config: :config_version Instalado: :installed_version',
+                'fail' => 'A versão do rrdtool :installed_version é muito antiga, o LibreNMS requer uma versão mínima de 1.5.5',
+                'fail_config' => 'A rrdtool_version :config_version que você especificou é muito antiga, o LibreNMS requer uma versão mínima de 1.5.5',
                 'fix' => 'Comente ou exclua $config[\'rrdtool_version\'] = \':version\'; do seu arquivo config.php',
                 'ok' => 'Versão do rrdtool ok',
             ],
             'CheckRrdcachedConnectivity' => [
                 'fail_socket' => ':socket não parece existir, teste de conectividade do rrdcached falhou',
-                'fail_port' => 'Não é possível conectar ao servidor rrdcached na porta :port',
+                'fail_port' => 'Não é possível conectar ao servidor rrdcached :server na porta :port',
                 'ok' => 'Conectado ao rrdcached',
             ],
             'CheckRrdDirPermissions' => [

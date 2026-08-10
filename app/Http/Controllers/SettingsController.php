@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use LibreNMS\Util\DynamicConfig;
 
-class SettingsController extends Controller
+class SettingsController
 {
+    use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      *
@@ -18,6 +21,8 @@ class SettingsController extends Controller
      */
     public function index(DynamicConfig $dynamicConfig, $tab = 'alerting', $section = '')
     {
+        $this->authorize('settings.view');
+
         $data = [
             'active_tab' => $tab,
             'active_section' => $section,
@@ -37,7 +42,9 @@ class SettingsController extends Controller
      */
     public function update(DynamicConfig $config, Request $request, $id)
     {
-        $value = $request->get('value');
+        $this->authorize('settings.update');
+
+        $value = $request->input('value');
 
         if (! $config->isValidSetting($id)) {
             return $this->jsonResponse($id, ':id is not a valid setting', null, 400);
@@ -66,6 +73,8 @@ class SettingsController extends Controller
      */
     public function destroy(DynamicConfig $config, $id)
     {
+        $this->authorize('settings.update');
+
         if (! $config->isValidSetting($id)) {
             return $this->jsonResponse($id, ':id is not a valid setting', null, 400);
         }
@@ -88,6 +97,8 @@ class SettingsController extends Controller
      */
     public function listAll(DynamicConfig $config)
     {
+        $this->authorize('settings.view');
+
         return response()->json($config->all()->filter->isValid());
     }
 

@@ -1,8 +1,9 @@
 <?php
 
 use App\Models\IsisAdjacency;
+use Illuminate\Support\Facades\Gate;
 
-if (! Auth::user()->hasGlobalRead()) {
+if (Gate::denies('viewAny', IsisAdjacency::class)) {
     include 'includes/html/error-no-perm.inc.php';
 } else {
     $link_array = [

@@ -26,12 +26,17 @@
 
 namespace App\Http\Controllers\Ajax;
 
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 
 class SnmpCapabilities
 {
+    use AuthorizesRequests;
+
     public function __invoke(): JsonResponse
     {
+        $this->authorize('settings.view');
+
         return new JsonResponse([
             'auth' => \LibreNMS\SNMPCapabilities::supportedAuthAlgorithms(),
             'crypto' => \LibreNMS\SNMPCapabilities::supportedCryptoAlgorithms(),

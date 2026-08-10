@@ -17,7 +17,7 @@ foreach ($port_stats as $index => $port) {
     //only convert swp ports
     if (isset($port['ifName']) && str_starts_with($port['ifName'], 'swp')) {
         $portNum = preg_replace('/[a-z]+/', '', $port['ifName']);
-        if ($portNum < 50) {
+        if ($portNum <= 63) {
             $portNum++;
             //Leading 0 for single digits
             $ifName = '1/' . Str::padLeft($portNum, 2, '0');

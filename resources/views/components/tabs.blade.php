@@ -1,5 +1,4 @@
 @props(['active' => ''])
-
 <div x-data="{
         activeTab: '{{ $active }}',
         tabs: [],
@@ -18,9 +17,9 @@
      }"
      {{ $attributes }}
 >
-    <ul role="tablist" class="tw:flex tw:flex-wrap tw:-mb-px tw:list-none tw:text-center tw:text-gray-500 tw:dark:text-gray-400">
+    <ul role="tablist" class="tw:flex tw:flex-wrap tw:list-none tw:text-center tw:text-gray-500 tw:dark:text-gray-400 tw:border-b tw:border-gray-400 tw:dark:border-gray-700">
         <template x-for="(tab, index) in tabs" :key="index">
-            <li class="tw:me-2"
+            <li class="tw:-mb-px"
                 @click="changeTab(tab.value)"
                 :id="`tab-${index + 1}`"
                 role="tab"
@@ -28,9 +27,11 @@
                 :aria-controls="`tab-panel-${index + 1}`"
             >
                 <div
-                   x-text="tab.name"
-                   class="tw:inline-block tw:p-3 tw:border-b-2 tw:rounded-t-lg tw:cursor-pointer"
-                   :class="tab.value === activeTab ? 'tw:text-blue-600 tw:border-blue-600 active tw:dark:text-blue-500 tw:dark:border-blue-500' : 'tw:border-transparent tw:hover:text-gray-600 tw:hover:border-gray-300 tw:dark:hover:text-gray-300'"
+                    x-text="tab.name"
+                    class="tw:inline-block tw:p-3 tw:border-b-2 tw:rounded-t-lg tw:font-medium tw:whitespace-nowrap tw:select-none tw:transition-colors tw:duration-75"
+                    :class="tab.value === activeTab
+                       ? 'tw:text-blue-600 tw:border-blue-600 active tw:dark:text-blue-500 tw:dark:border-blue-500 tw:bg-gray-100 tw:dark:bg-dark-gray-200 tw:cursor-default'
+                       : 'tw:border-transparent tw:cursor-pointer tw:hover:border-gray-500 tw:hover:bg-gray-100 tw:dark:hover:bg-dark-gray-300'"
                 ></div>
             </li>
         </template>

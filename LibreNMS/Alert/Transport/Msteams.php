@@ -7,7 +7,7 @@
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
- * option) any later version.  Please see LICENSE.txt at the top level of
+ * option) any later version. Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
 
@@ -23,31 +23,76 @@ class Msteams extends Transport
 
     public function deliverAlert(array $alert_data): bool
     {
-        $data = [
-            'title' => $alert_data['title'],
-            'themeColor' => self::getColorForState($alert_data['state']),
-            'text' => strip_tags((string) $alert_data['msg'], '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>'),
-            'summary' => $alert_data['title'],
-        ];
+        $url = $this->config['msteam-url'];
+        $useJson = $this->config['use-json'] === 'on';
 
         $client = Http::client();
 
-        // template will contain raw json
-        if ($this->config['use-json'] === 'on') {
+        if ($useJson) {
+            // JSON mode: template must supply the full payload.
+            // For Workflow webhooks the template must include the
+            // {"type":"message","attachments":[...]} envelope.
+            // For legacy O365 connectors a bare MessageCard JSON is fine.
             $msg = $alert_data['uid'] === '000'
                 ? $this->testJsonMessage() // use pre-made JSON for tests
                 : $alert_data['msg'];
 
             $client->withBody($msg, 'application/json');
-        }
+            $res = $client->post($url, []);
+        } else {
+            // Markdown/MessageCard mode.
+            // Build the MessageCard payload from alert data.
+            $messageCard = [
+                '@type' => 'MessageCard',
+                '@context' => 'http://schema.org/extensions',
+                'title' => $alert_data['title'],
+                'themeColor' => self::getColorForState($alert_data['state']),
+                'text' => strip_tags(
+                    (string) $alert_data['msg'],
+                    '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>'
+                ),
+                'summary' => $alert_data['title'],
+            ];
 
-        $res = $client->post($this->config['msteam-url'], $data);
+            if (! $this->isLegacyConnectorWebhook($url)) {
+                // New Workflow (Power Automate) webhook:
+                // MessageCard must be wrapped in the "message"/"attachments" envelope.
+                // Supported as of February 2026 per Microsoft dev blog update.
+                $payload = [
+                    'type' => 'message',
+                    'attachments' => [
+                        [
+                            'contentType' => 'application/vnd.microsoft.teams.card.o365connector',
+                            'content' => $messageCard,
+                        ],
+                    ],
+                ];
+                $client->withBody(json_encode($payload), 'application/json');
+                $res = $client->post($url, []);
+            } else {
+                // Legacy O365 Connector webhook: send bare MessageCard directly.
+                $res = $client->post($url, $messageCard);
+            }
+        }
 
         if ($res->successful()) {
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $data['text'], $data);
+        throw new AlertTransportDeliveryException(
+            $alert_data,
+            $res->status(),
+            $res->body(),
+            $messageCard['text'] ?? $alert_data['msg'],
+            $messageCard ?? []
+        );
+    }
+
+    private function isLegacyConnectorWebhook(string $url): bool
+    {
+        return str_contains($url, 'outlook.office.com')
+            || str_contains($url, 'outlook.office365.com')
+            || str_contains($url, '.webhook.office.com');
     }
 
     public static function configTemplate(): array
@@ -57,7 +102,7 @@ class Msteams extends Transport
                 [
                     'title' => 'Webhook URL',
                     'name' => 'msteam-url',
-                    'descr' => 'Microsoft Teams Webhook URL',
+                    'descr' => 'Microsoft Teams Webhook URL (legacy O365 connector or new Workflow webhook)',
                     'type' => 'text',
                 ],
                 [

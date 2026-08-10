@@ -35,6 +35,7 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\Url;
 
@@ -48,9 +49,9 @@ class Os implements Module
         return [];
     }
 
-    public function shouldDiscover(\LibreNMS\OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(\LibreNMS\OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     public function discover(\LibreNMS\OS $os): void
@@ -59,7 +60,8 @@ class Os implements Module
         $this->sysContact($os);
 
         // null out values in case they aren't filled.
-        $os->getDevice()->fill([
+        $device = $os->getDevice();
+        $device->fill([
             'hardware' => null,
             'version' => null,
             'features' => null,
@@ -67,13 +69,19 @@ class Os implements Module
             'icon' => null,
         ]);
 
-        $os->discoverOS($os->getDevice());
+        $os->discoverOS($device);
+
+        // reset type if user overrode it
+        if ($device->getAttrib('override_device_type') && $device->isDirty('type')) {
+            $device->type = $device->getOriginal('type');
+        }
+
         $this->handleChanges($os);
     }
 
-    public function shouldPoll(\LibreNMS\OS $os, ModuleStatus $status): bool
+    public function shouldPoll(\LibreNMS\OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     public function poll(\LibreNMS\OS $os, DataStorageInterface $datastore): void
@@ -96,12 +104,12 @@ class Os implements Module
             }
 
             // handle legacy variables, sometimes they are false
-            $deviceModel->version = ($version ?? $deviceModel->version) ?: null;
-            $deviceModel->hardware = ($hardware ?? $deviceModel->hardware) ?: null;
-            $deviceModel->features = ($features ?? $deviceModel->features) ?: null;
-            $deviceModel->serial = ($serial ?? $deviceModel->serial) ?: null;
+            $deviceModel->version = ($version ?? $deviceModel->version) ?: null; // @phpstan-ignore nullCoalesce.variable (set by include)
+            $deviceModel->hardware = ($hardware ?? $deviceModel->hardware) ?: null; // @phpstan-ignore nullCoalesce.variable (set by include)
+            $deviceModel->features = ($features ?? $deviceModel->features) ?: null; // @phpstan-ignore nullCoalesce.variable (set by include)
+            $deviceModel->serial = ($serial ?? $deviceModel->serial) ?: null; // @phpstan-ignore nullCoalesce.variable (set by include)
 
-            if (! empty($location)) { // legacy support, remove when no longer needed
+            if (! empty($location)) { // legacy support, remove when no longer needed // @phpstan-ignore empty.variable (set by include)
                 $deviceModel->setLocation($location);
                 $deviceModel->location?->save();
             }
@@ -146,9 +154,11 @@ class Os implements Module
         Log::info(trans('device.attributes.location') . ': ' . $device->location?->display());
         foreach (['hardware', 'version', 'features', 'serial'] as $attribute) {
             if (isset($device->$attribute)) {
-                $device->$attribute = trim($device->$attribute);
+                $device->$attribute = trim(preg_replace('/^[\x00-\x1F\x7F-\xFF]+/', '', $device->$attribute));
             }
-            Log::info(DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)));
+            if ($device->isDirty($attribute)) {
+                Log::info(DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)));
+            }
         }
 
         $device->save();

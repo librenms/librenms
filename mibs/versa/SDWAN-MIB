@@ -1,0 +1,317 @@
+SDWAN-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    orgServices
+        FROM VERSA-MIB
+;
+
+sdwan MODULE-IDENTITY
+    LAST-UPDATED "201510310000Z"
+    ORGANIZATION "Versa Networks"
+    CONTACT-INFO "
+        2953 Bunker Hill Lane, Suite 210
+        Santa Clara, CA - 95035 (USA)
+        Email: support@versa-networks.com"
+    DESCRIPTION "Enterprise MIB for Versa Networks'
+SD-WAN solution"
+    REVISION "201510310000Z"
+    DESCRIPTION "Initial revision"
+    ::= { orgServices 10 }
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+sdwanPolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdwanPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display statistics of the sdwan rules"
+    ::= { sdwan 1 }
+
+sdwanPolicyEntry OBJECT-TYPE
+    SYNTAX      SdwanPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { sdwanPolicyOrgId, sdwanPolicyId, sdwanPolicyRuleOrder, sdwanPolicyRuleId }
+        ::= { sdwanPolicyTable 1 }
+
+SdwanPolicyEntry ::=
+    SEQUENCE {
+        sdwanPolicyOrgId Unsigned32,
+        sdwanPolicyId Unsigned32,
+        sdwanPolicyRuleOrder Unsigned32,
+        sdwanPolicyRuleId Unsigned32,
+        sdwanPolicyOrgName String,
+        sdwanPolicyName String,
+        sdwanPolicyRuleName String,
+        sdwanPolicyHitCount ConfdString,
+        sdwanPolicyForwardPktCount ConfdString,
+        sdwanPolicyForwardByteCount ConfdString,
+        sdwanPolicyReversePktCount ConfdString,
+        sdwanPolicyReverseByteCount ConfdString,
+        sdwanPolicyTxPktsTunnel ConfdString,
+        sdwanPolicyTxBytesTunnel ConfdString,
+        sdwanPolicyRxPktsTunnel ConfdString,
+        sdwanPolicyRxBytesTunnel ConfdString,
+        sdwanPolicySkipCount ConfdString,
+        sdwanPolicyNexthopStatus String,
+        sdwanPolicyNexthopLastFlapped String,
+        sdwanPolicyKeepAliveSent ConfdString,
+        sdwanPolicyKeepAliveRcvd ConfdString
+    }
+
+sdwanPolicyOrgId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Organization Id"
+    ::= { sdwanPolicyEntry 1 }
+
+sdwanPolicyId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Policy Id"
+    ::= { sdwanPolicyEntry 2 }
+
+sdwanPolicyRuleOrder OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "rule order"
+    ::= { sdwanPolicyEntry 3 }
+
+sdwanPolicyRuleId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "rule order"
+    ::= { sdwanPolicyEntry 4 }
+
+sdwanPolicyOrgName OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of the Organization"
+    ::= { sdwanPolicyEntry 5 }
+
+sdwanPolicyName OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of the policy"
+    ::= { sdwanPolicyEntry 6 }
+
+sdwanPolicyRuleName OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "rule name"
+    ::= { sdwanPolicyEntry 7 }
+
+sdwanPolicyHitCount OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total hits on access-policy"
+    ::= { sdwanPolicyEntry 8 }
+
+sdwanPolicyForwardPktCount OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Total packets sent in forward direction"
+    ::= { sdwanPolicyEntry 9 }
+
+sdwanPolicyForwardByteCount OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Total bytes sent in forward direction"
+    ::= { sdwanPolicyEntry 10 }
+
+sdwanPolicyReversePktCount OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Total packets sent in reverse direction"
+    ::= { sdwanPolicyEntry 11 }
+
+sdwanPolicyReverseByteCount OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Total bytes sent in reverse direction"
+    ::= { sdwanPolicyEntry 12 }
+
+sdwanPolicyTxPktsTunnel OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total packets sent over sdwan tunnel"
+    ::= { sdwanPolicyEntry 13 }
+
+sdwanPolicyTxBytesTunnel OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total bytes sent over sdwan tunnel"
+    ::= { sdwanPolicyEntry 14 }
+
+sdwanPolicyRxPktsTunnel OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total packets received over sdwan tunnel"
+    ::= { sdwanPolicyEntry 15 }
+
+sdwanPolicyRxBytesTunnel OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total bytes received over sdwan tunnel"
+    ::= { sdwanPolicyEntry 16 }
+
+sdwanPolicySkipCount OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total skips of pbf rule due to nexthop down"
+    ::= { sdwanPolicyEntry 17 }
+
+sdwanPolicyNexthopStatus OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Nexthop status up/down"
+    ::= { sdwanPolicyEntry 18 }
+
+sdwanPolicyNexthopLastFlapped OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Time since nexthop monitor entered current state"
+    ::= { sdwanPolicyEntry 19 }
+
+sdwanPolicyKeepAliveSent OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of keepalive messages sent to configured monitor address"
+    ::= { sdwanPolicyEntry 20 }
+
+sdwanPolicyKeepAliveRcvd OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of keepalive messages received from configured monitor address"
+    ::= { sdwanPolicyEntry 21 }
+
+sdwanForwardingProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdwanForwardingProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display statistics of the sdwan forwarding-profiles"
+    ::= { sdwan 2 }
+
+sdwanForwardingProfileEntry OBJECT-TYPE
+    SYNTAX      SdwanForwardingProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { sdwanForwardingProfileOrgId, sdwanForwardingProfileId }
+        ::= { sdwanForwardingProfileTable 1 }
+
+SdwanForwardingProfileEntry ::=
+    SEQUENCE {
+        sdwanForwardingProfileOrgId Unsigned32,
+        sdwanForwardingProfileId Unsigned32,
+        sdwanForwardingProfileOrgName String,
+        sdwanForwardingProfileName String,
+        sdwanFpHitCount ConfdString,
+        sdwanFpNoValidLinkDropCount ConfdString,
+        sdwanFpSlaFailDropCount ConfdString,
+        sdwanFpSlaFailFwdCount ConfdString,
+        sdwanFpTurnRedirectCount ConfdString
+    }
+
+sdwanForwardingProfileOrgId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Organization Id"
+    ::= { sdwanForwardingProfileEntry 1 }
+
+sdwanForwardingProfileId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "profile id"
+    ::= { sdwanForwardingProfileEntry 2 }
+
+sdwanForwardingProfileOrgName OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of the Organization"
+    ::= { sdwanForwardingProfileEntry 3 }
+
+sdwanForwardingProfileName OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "fp name"
+    ::= { sdwanForwardingProfileEntry 4 }
+
+sdwanFpHitCount OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total hits on forwarding-profile"
+    ::= { sdwanForwardingProfileEntry 5 }
+
+sdwanFpNoValidLinkDropCount OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total drop count due to no valid link"
+    ::= { sdwanForwardingProfileEntry 6 }
+
+sdwanFpSlaFailDropCount OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total SLA fail drop count"
+    ::= { sdwanForwardingProfileEntry 7 }
+
+sdwanFpSlaFailFwdCount OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total SLA fail forward count"
+    ::= { sdwanForwardingProfileEntry 8 }
+
+sdwanFpTurnRedirectCount OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Packets redirected to TURN relay"
+    ::= { sdwanForwardingProfileEntry 9 }
+
+END

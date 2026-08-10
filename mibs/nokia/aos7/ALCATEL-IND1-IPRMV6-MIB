@@ -20,28 +20,21 @@ IMPORTS
         FROM ALCATEL-IND1-IPRM-MIB;
 
 alcatelIND1IPRMV6MIB MODULE-IDENTITY
-
-    LAST-UPDATED  "201309230000Z"
-    ORGANIZATION  "Alcatel-Lucent"
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc."
     CONTACT-INFO
-        "Please consult with Customer Service to ensure the most appropriate
-         version of this document is used with the products in question:
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
 
-                    Alcatel-Lucent, Enterprise Solutions Division
-                   (Formerly Alcatel Internetworking, Incorporated)
-                           26801 West Agoura Road
-                        Agoura Hills, CA  91301-5122
-                          United States Of America
+                      ALE USA Inc. Enterprise
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
 
-        Telephone:               North America  +1 800 995 2696
-                                 Latin America  +1 877 919 9526
-                                 Europe         +31 23 556 0100
-                                 Asia           +65 394 7933
-                                 All Other      +1 818 878 4507
+     Telephone:          +1 800 995 2696
 
-        Electronic Mail:         support@ind.alcatel.com
-        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
 
     DESCRIPTION
         "This module describes an authoritative enterprise-specific Simple
@@ -61,13 +54,21 @@ alcatelIND1IPRMV6MIB MODULE-IDENTITY
          non-exclusive license to use this specification in connection with
          management of the products for which it is intended to be used.
 
-                     Copyright (C) 1995-2010 Alcatel-Lucent
-                         ALL RIGHTS RESERVED WORLDWIDE"
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "202004080000Z"
+    DESCRIPTION
+        "SPB-MGMT routes added to route-preference types"
+
+    REVISION      "201911270000Z"
+    DESCRIPTION
+        "Updated the latest contact and Copyright information for ALE USA Inc."
 
     REVISION      "201002220000Z"
     DESCRIPTION
         "The latest version of this MIB Module."
-
     ::= { routingIND1Iprm 2 }
 
 alcatelIND1IPRMV6MIBObjects  OBJECT IDENTIFIER ::= { alcatelIND1IPRMV6MIB 1 }
@@ -90,7 +91,8 @@ AlaIprmV6RtPrefType ::= TEXTUAL-CONVENTION
                      bgpInternal(6),
                      isisl1(7),
                      isisl2(8),
-                     import(9) 
+                     import(9),
+                     spbMgmt(10) 
                     }
 
 
@@ -434,7 +436,7 @@ AlaIprmV6ImportVrfEntry ::= SEQUENCE {
    }
 
 alaIprmV6ImportVrfName OBJECT-TYPE
-    SYNTAX      SnmpAdminString (SIZE (0..20))
+    SYNTAX      SnmpAdminString (SIZE (0..32))
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -474,6 +476,61 @@ alaIprmV6StaticAllBfd   OBJECT-TYPE
     ::= { alaIprmV6Config 7 }
 
 
+-- Route Leaking Import Isid Table
+
+alaIprmV6ImportIsidTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaIprmV6ImportIsidEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table specifies ISIS L3VPN ISIDs to import IPv6 routes from." 
+    ::= { alaIprmV6Config 8 }
+
+alaIprmV6ImportIsidEntry OBJECT-TYPE
+    SYNTAX      AlaIprmV6ImportIsidEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table is created for each ISID
+         to import IPv6 routes from."
+    INDEX {
+        alaIprmV6ImportIsid
+       }
+    ::= { alaIprmV6ImportIsidTable 1 }
+
+AlaIprmV6ImportIsidEntry ::= SEQUENCE {
+    alaIprmV6ImportIsid              Unsigned32,
+    alaIprmV6ImportIsidRouteMap      Integer32,
+    alaIprmV6ImportIsidRowStatus     RowStatus
+   }
+
+alaIprmV6ImportIsid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ISIS SPB L3VPN ISID that IPv6 routes should be imported from."
+    ::= { alaIprmV6ImportIsidEntry 1 }
+
+alaIprmV6ImportIsidRouteMap OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "A route-map index representing the route-map used to filter
+         imported IPv6 routes."
+    ::= { alaIprmV6ImportIsidEntry 2 }
+
+alaIprmV6ImportIsidRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "This variable is used to create, modify, and/or
+         delete a row in this table."
+    ::= { alaIprmV6ImportIsidEntry 3 }
+
+
 -- conformance information
 
 alcatelIND1IPRMV6MIBConformance OBJECT IDENTIFIER ::= { alcatelIND1IPRMV6MIB 2 }
@@ -503,7 +560,8 @@ alaIprmV6ConfigMIBGroup OBJECT-GROUP
                 alaIprmV6StaticRouteBfdStatus, alaIprmV6StaticRouteType,
                 alaIprmV6RtPrefEntryValue,  alaIprmV6ExportRouteMap, 
                 alaIprmV6ExportToAllVrfsRouteMap, alaIprmV6ImportVrfRouteMap,
-                alaIprmV6ImportVrfRowStatus, alaIprmV6StaticAllBfd
+                alaIprmV6ImportVrfRowStatus, alaIprmV6StaticAllBfd,
+                alaIprmV6ImportIsidRouteMap, alaIprmV6ImportIsidRowStatus
             }
     STATUS  current
     DESCRIPTION

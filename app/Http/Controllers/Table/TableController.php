@@ -27,16 +27,27 @@
 namespace App\Http\Controllers\Table;
 
 use App\Http\Controllers\PaginatedAjaxController;
+use Countable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
+/**
+ * @template TModel of Model
+ *
+ * @extends PaginatedAjaxController<TModel>
+ */
 abstract class TableController extends PaginatedAjaxController
 {
-    protected $model;
+    /** @var class-string|null The model class to use */
+    protected ?string $model = null;
 
-    protected function sortFields($request)
+    protected function sortFields(Request $request): array
     {
         if (isset($this->model)) {
             $fields = \Schema::getColumnListing((new $this->model)->getTable());
@@ -47,16 +58,12 @@ abstract class TableController extends PaginatedAjaxController
         return [];
     }
 
-    final protected function baseRules()
+    final protected function baseRules(): array
     {
         return SimpleTableController::$base_rules;
     }
 
-    /**
-     * @param  Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): JsonResponse
     {
         $this->validate($request, $this->rules());
 
@@ -64,11 +71,11 @@ abstract class TableController extends PaginatedAjaxController
         $query = $this->baseQuery($request);
 
         $this->filter($request, $query, $this->filterFields($request));
-        $this->search($request->get('searchPhrase'), $query, $this->searchFields($request));
+        $this->search($request->input('searchPhrase'), $query, $this->searchFields($request));
         $this->sort($request, $query);
 
-        $limit = $request->get('rowCount', 25);
-        $page = $request->get('current', 1);
+        $limit = $request->input('rowCount', 25);
+        $page = $request->input('current', 1);
         if ($limit < 0) {
             $limit = $query->count();
             $page = null;
@@ -79,10 +86,9 @@ abstract class TableController extends PaginatedAjaxController
     }
 
     /**
-     * @param  LengthAwarePaginator|\Countable  $paginator
-     * @return \Illuminate\Http\JsonResponse
+     * @param  LengthAwarePaginator|Countable  $paginator
      */
-    protected function formatResponse($paginator)
+    protected function formatResponse($paginator): JsonResponse
     {
         return response()->json([
             'current' => $paginator->currentPage(),
@@ -94,11 +100,8 @@ abstract class TableController extends PaginatedAjaxController
 
     /**
      * Export data as CSV
-     *
-     * @param  Request  $request
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function export(Request $request)
+    public function export(Request $request): StreamedResponse
     {
         $query = $this->prepareExportQuery($request);
 
@@ -125,23 +128,20 @@ abstract class TableController extends PaginatedAjaxController
 
     /**
      * Prepare the query for export with all filters applied
-     *
-     * @param  Request  $request
-     * @return Builder
      */
-    protected function prepareExportQuery(Request $request)
+    protected function prepareExportQuery(Request $request): Builder
     {
         $query = $this->baseQuery($request);
 
         $this->filter($request, $query, $this->filterFields($request));
 
-        if ($request->has('searchPhrase') && ! empty($request->get('searchPhrase'))) {
-            $this->search($request->get('searchPhrase'), $query, $this->searchFields($request));
+        if ($request->has('searchPhrase') && ! empty($request->input('searchPhrase'))) {
+            $this->search($request->input('searchPhrase'), $query, $this->searchFields($request));
         }
 
         if ($request->has('current') && $request->has('rowCount')) {
-            $limit = $request->get('rowCount');
-            $page = $request->get('current');
+            $limit = $request->input('rowCount');
+            $page = $request->input('current');
 
             if ($limit > 0) {
                 $offset = ($page - 1) * $limit;
@@ -154,20 +154,16 @@ abstract class TableController extends PaginatedAjaxController
 
     /**
      * Get headers for CSV export
-     *
-     * @return array
      */
-    protected function getExportHeaders()
+    protected function getExportHeaders(): array
     {
         return $this->visibleColumns();
     }
 
     /**
      * Get the visible columns for this table
-     *
-     * @return array
      */
-    protected function visibleColumns()
+    protected function visibleColumns(): array
     {
         if (isset($this->model)) {
             $fields = \Schema::getColumnListing((new $this->model)->getTable());
@@ -182,10 +178,10 @@ abstract class TableController extends PaginatedAjaxController
     /**
      * Format a row for CSV export
      *
-     * @param  mixed  $item
-     * @return array
+     * @param  TModel  $item
+     * @return array<scalar>
      */
-    protected function formatExportRow($item)
+    protected function formatExportRow(Model $item): array
     {
         // First try using formatItem if it exists
         $formatted = $this->formatItem($item);
@@ -195,22 +191,15 @@ abstract class TableController extends PaginatedAjaxController
             return array_map(fn ($value) => is_string($value) ? trim(strip_tags($value)) : $value, $formatted);
         }
 
-        if (method_exists($item, 'toArray')) {
-            return $item->toArray();
-        }
-
-        return (array) $item;
+        return $item->toArray();
     }
 
     /**
      * Generate CSV response from data
      *
-     * @param  \Illuminate\Support\Collection  $data
-     * @param  array  $headers
-     * @param  string  $filename
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     * @param  Collection<TModel>  $data
      */
-    protected function generateCsvResponse($data, $headers, $filename)
+    protected function generateCsvResponse(Collection $data, array $headers, string $filename): StreamedResponse
     {
         return response()->stream(
             function () use ($data, $headers): void {

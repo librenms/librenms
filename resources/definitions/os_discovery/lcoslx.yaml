@@ -1,4 +1,3 @@
-mib: LCOS-LX-MIB
 modules:
     mempools:
         data:

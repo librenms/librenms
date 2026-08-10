@@ -114,7 +114,7 @@ $temperatures = [
 ];
 
 foreach ($temperatures as $temperature) {
-    $current = (snmp_get($device, $temperature['mib'], '-OqvU') / $temperature['precision']);
+    $current = (SnmpQuery::get($temperature['mib'])->value() / $temperature['precision']);
 
     $high_limit = null;
     $low_limit = null;

@@ -26,19 +26,26 @@
 
 namespace App\Http\Controllers\Select;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
+/**
+ * @extends SelectController<Role>
+ */
 class RoleController extends SelectController
 {
+    protected ?string $idField = 'name';
+
     protected function searchFields(Request $request): array
     {
         return ['name'];
     }
 
-    protected function baseQuery(Request $request): \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
+    protected function baseQuery(Request $request): Builder|\Illuminate\Database\Query\Builder
     {
         $this->authorize('viewAny', Role::class);
 
@@ -51,14 +58,14 @@ class RoleController extends SelectController
     }
 
     /**
-     * @param  Role  $role
-     * @return array
+     * @param  Role  $model
+     * @return array{id: int|string, text: string, icon?: string}
      */
-    public function formatItem($role): array
+    public function formatItem(Model $model): array
     {
         return [
-            'id' => $role->name,
-            'text' => Str::title(str_replace('-', ' ', $role->name)),
+            'id' => $model->name,
+            'text' => Str::title(str_replace('-', ' ', $model->name)),
         ];
     }
 }

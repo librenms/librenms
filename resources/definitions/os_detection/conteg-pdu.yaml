@@ -1,0 +1,14 @@
+os: conteg-pdu
+text: 'Conteg PDU'
+type: power
+icon: conteg
+group: conteg
+mib_dir: conteg
+over:
+    - { graph: device_power, text: 'Power' }
+    - { graph: device_current, text: 'Current' }
+    - { graph: device_voltage, text: 'Voltage' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.28402.11.1

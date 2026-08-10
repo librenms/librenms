@@ -27,12 +27,13 @@
 namespace App\Http\Controllers\Table;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
 abstract class SimpleTableController extends Controller
 {
-    public static $base_rules = [
+    public static array $base_rules = [
         'current' => 'int',
         'rowCount' => 'int',
         'searchPhrase' => 'nullable|string',
@@ -41,28 +42,18 @@ abstract class SimpleTableController extends Controller
 
     /**
      * Validate the given request with the given rules.
-     *
-     * @param  Request  $request
-     * @param  array  $rules
-     * @param  array  $messages
-     * @param  array  $customAttributes
-     * @return array
      */
-    public function validate(Request $request, array $rules = [], array $messages = [], array $customAttributes = [])
+    public function validate(Request $request, array $rules = [], array $messages = [], array $attributes = []): array
     {
         $full_rules = array_replace(self::$base_rules, $rules);
 
-        return parent::validate($request, $full_rules, $messages, $customAttributes);
+        return parent::validate($request, $full_rules, $messages, $attributes);
     }
 
     /**
-     * @param  array|Collection  $rows
-     * @param  int  $page
-     * @param  int  $currentCount
-     * @param  int  $total
-     * @return \Illuminate\Http\JsonResponse
+     * @param  array|Collection<int, mixed>  $rows
      */
-    protected function formatResponse($rows, $page, $currentCount, $total)
+    protected function formatResponse(array|Collection $rows, int $page, int $currentCount, int $total): JsonResponse
     {
         return response()->json([
             'current' => $page,

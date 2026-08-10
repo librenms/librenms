@@ -11,7 +11,9 @@ return [
         'location' => 'Location',
         'os' => 'Device OS',
         'serial' => 'Serial',
+        'sysDescr' => 'sysDescr',
         'sysName' => 'sysName',
+        'sysObjectID' => 'sysObjectID',
         'version' => 'OS Version',
         'type' => 'Device type',
     ],
@@ -19,6 +21,22 @@ return [
     'never_polled' => 'Never polled',
     'vm_host' => 'VM Host',
     'scheduled_maintenance' => 'Scheduled Maintenance',
+    'delete_device' => 'Delete Device',
+    'delete' => 'Delete :name',
+    'confirm_delete' => 'Are you sure you want to delete device :name?',
+    'deleted' => 'Device :hostname has been deleted.',
+    'please_select' => 'Please select',
+    'warning_monitored' => 'Warning, this will remove the device from being monitored!',
+    'warning_data' => 'It will also remove historical data about this device such as:',
+    'device_group' => 'Device Group',
+    'show_filter' => 'Show Filter',
+    'show_header' => 'Show Header',
+    'os' => 'OS',
+    'status' => 'Status',
+    'status_up' => 'Up',
+    'status_down' => 'Down',
+    'device_type' => 'Device Type',
+    'alerts_disabled' => 'Alerts Disabled',
 
     'edit' => [
         'delete_device' => 'Delete Device',
@@ -68,5 +86,9 @@ return [
         'last_discovered' => 'Last discovered',
 
         'rediscover_error' => 'An error occurred setting this device to be rediscovered',
+    ],
+
+    'oxidized' => [
+        'connection_error' => "We couldn't retrieve the device information from Oxidized",
     ],
 ];

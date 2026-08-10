@@ -1,0 +1,12 @@
+os: microsens-g6
+text: 'G6'
+type: network
+icon: microsens
+group: microsens
+mib_dir: microsens
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.3181.10.6

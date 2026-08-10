@@ -116,24 +116,6 @@ class Notification extends Model
             ->where(['notifications_attribs.key' => 'sticky', 'notifications_attribs.value' => 1]);
     }
 
-    /**
-     * @param  Builder<Notification>  $query
-     * @return Builder<Notification>
-     */
-    public function scopeLimit(Builder $query)
-    {
-        return $query->select('notifications.*', 'key', 'users.username');
-    }
-
-    /**
-     * @param  Builder<Notification>  $query
-     * @return Builder|static
-     */
-    public function scopeSource(Builder $query)
-    {
-        return $query->leftJoin('users', 'notifications.source', '=', 'users.user_id');
-    }
-
     // ---- Define Relationships ----
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\NotificationAttrib, $this>

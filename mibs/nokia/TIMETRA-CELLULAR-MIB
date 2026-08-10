@@ -145,7 +145,7 @@ TmnxCellularChannelNumber        ::= TEXTUAL-CONVENTION
          Network; Evolved Universal Terrestrial Radio Access (E-UTRA);
          User Equipment (UE) radio transmission and reception (Release 14),
          3GPP, September 2016, Table 5.7.3-1, 'E-UTRA channel numbers"
-    SYNTAX      Unsigned32 (0..262143)
+    SYNTAX      Unsigned32
 
 TmnxCellularBearerRate           ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -153,6 +153,534 @@ TmnxCellularBearerRate           ::= TEXTUAL-CONVENTION
         "TmnxCellularBearerRate identifies a bit rate of a bearer on a cellular
          interface, in kbit/s."
     SYNTAX      Unsigned32 (0..100000)
+
+TmnxCellularBands                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxCellularBands is a bitmask to enable/disable the LTE cellular
+         band number."
+    SYNTAX      BITS {
+        b1   (0),
+        b2   (1),
+        b3   (2),
+        b4   (3),
+        b5   (4),
+        b6   (5),
+        b7   (6),
+        b8   (7),
+        b9   (8),
+        b10  (9),
+        b11  (10),
+        b12  (11),
+        b13  (12),
+        b14  (13),
+        b15  (14),
+        b16  (15),
+        b17  (16),
+        b18  (17),
+        b19  (18),
+        b20  (19),
+        b21  (20),
+        b22  (21),
+        b23  (22),
+        b24  (23),
+        b25  (24),
+        b26  (25),
+        b27  (26),
+        b28  (27),
+        b29  (28),
+        b30  (29),
+        b31  (30),
+        b32  (31),
+        b33  (32),
+        b34  (33),
+        b35  (34),
+        b36  (35),
+        b37  (36),
+        b38  (37),
+        b39  (38),
+        b40  (39),
+        b41  (40),
+        b42  (41),
+        b43  (42),
+        b44  (43),
+        b45  (44),
+        b46  (45),
+        b47  (46),
+        b48  (47),
+        b49  (48),
+        b50  (49),
+        b51  (50),
+        b52  (51),
+        b53  (52),
+        b54  (53),
+        b55  (54),
+        b56  (55),
+        b57  (56),
+        b58  (57),
+        b59  (58),
+        b60  (59),
+        b61  (60),
+        b62  (61),
+        b63  (62),
+        b64  (63),
+        b65  (64),
+        b66  (65),
+        b67  (66),
+        b68  (67),
+        b69  (68),
+        b70  (69),
+        b71  (70),
+        b72  (71),
+        b73  (72),
+        b74  (73),
+        b75  (74),
+        b76  (75),
+        b77  (76),
+        b78  (77),
+        b79  (78),
+        b80  (79),
+        b81  (80),
+        b82  (81),
+        b83  (82),
+        b84  (83),
+        b85  (84),
+        b86  (85),
+        b87  (86),
+        b88  (87),
+        b89  (88),
+        b90  (89),
+        b91  (90),
+        b92  (91),
+        b93  (92),
+        b94  (93),
+        b95  (94),
+        b96  (95),
+        b97  (96),
+        b98  (97),
+        b99  (98),
+        b100 (99),
+        b101 (100),
+        b102 (101),
+        b103 (102),
+        b104 (103),
+        b105 (104),
+        b106 (105),
+        b107 (106),
+        b108 (107),
+        b109 (108),
+        b110 (109),
+        b111 (110),
+        b112 (111),
+        b113 (112),
+        b114 (113),
+        b115 (114),
+        b116 (115),
+        b117 (116),
+        b118 (117),
+        b119 (118),
+        b120 (119),
+        b121 (120),
+        b122 (121),
+        b123 (122),
+        b124 (123),
+        b125 (124),
+        b126 (125),
+        b127 (126),
+        b128 (127),
+        b129 (128),
+        b130 (129),
+        b131 (130),
+        b132 (131),
+        b133 (132),
+        b134 (133),
+        b135 (134),
+        b136 (135),
+        b137 (136),
+        b138 (137),
+        b139 (138),
+        b140 (139),
+        b141 (140),
+        b142 (141),
+        b143 (142),
+        b144 (143),
+        b145 (144),
+        b146 (145),
+        b147 (146),
+        b148 (147),
+        b149 (148),
+        b150 (149),
+        b151 (150),
+        b152 (151),
+        b153 (152),
+        b154 (153),
+        b155 (154),
+        b156 (155),
+        b157 (156),
+        b158 (157),
+        b159 (158),
+        b160 (159),
+        b161 (160),
+        b162 (161),
+        b163 (162),
+        b164 (163),
+        b165 (164),
+        b166 (165),
+        b167 (166),
+        b168 (167),
+        b169 (168),
+        b170 (169),
+        b171 (170),
+        b172 (171),
+        b173 (172),
+        b174 (173),
+        b175 (174),
+        b176 (175),
+        b177 (176),
+        b178 (177),
+        b179 (178),
+        b180 (179),
+        b181 (180),
+        b182 (181),
+        b183 (182),
+        b184 (183),
+        b185 (184),
+        b186 (185),
+        b187 (186),
+        b188 (187),
+        b189 (188),
+        b190 (189),
+        b191 (190),
+        b192 (191),
+        b193 (192),
+        b194 (193),
+        b195 (194),
+        b196 (195),
+        b197 (196),
+        b198 (197),
+        b199 (198),
+        b200 (199),
+        b201 (200),
+        b202 (201),
+        b203 (202),
+        b204 (203),
+        b205 (204),
+        b206 (205),
+        b207 (206),
+        b208 (207),
+        b209 (208),
+        b210 (209),
+        b211 (210),
+        b212 (211),
+        b213 (212),
+        b214 (213),
+        b215 (214),
+        b216 (215),
+        b217 (216),
+        b218 (217),
+        b219 (218),
+        b220 (219),
+        b221 (220),
+        b222 (221),
+        b223 (222),
+        b224 (223),
+        b225 (224),
+        b226 (225),
+        b227 (226),
+        b228 (227),
+        b229 (228),
+        b230 (229),
+        b231 (230),
+        b232 (231),
+        b233 (232),
+        b234 (233),
+        b235 (234),
+        b236 (235),
+        b237 (236),
+        b238 (237),
+        b239 (238),
+        b240 (239),
+        b241 (240),
+        b242 (241),
+        b243 (242),
+        b244 (243),
+        b245 (244),
+        b246 (245),
+        b247 (246),
+        b248 (247),
+        b249 (248),
+        b250 (249),
+        b251 (250),
+        b252 (251),
+        b253 (252),
+        b254 (253),
+        b255 (254),
+        b256 (255)
+    }
+
+TmnxCellularBands5g              ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxCellularBands is a bitmask to enable/disable the 5G cellular
+         band number."
+    SYNTAX      BITS {
+        n1   (0),
+        n2   (1),
+        n3   (2),
+        n4   (3),
+        n5   (4),
+        n6   (5),
+        n7   (6),
+        n8   (7),
+        n9   (8),
+        n10  (9),
+        n11  (10),
+        n12  (11),
+        n13  (12),
+        n14  (13),
+        n15  (14),
+        n16  (15),
+        n17  (16),
+        n18  (17),
+        n19  (18),
+        n20  (19),
+        n21  (20),
+        n22  (21),
+        n23  (22),
+        n24  (23),
+        n25  (24),
+        n26  (25),
+        n27  (26),
+        n28  (27),
+        n29  (28),
+        n30  (29),
+        n31  (30),
+        n32  (31),
+        n33  (32),
+        n34  (33),
+        n35  (34),
+        n36  (35),
+        n37  (36),
+        n38  (37),
+        n39  (38),
+        n40  (39),
+        n41  (40),
+        n42  (41),
+        n43  (42),
+        n44  (43),
+        n45  (44),
+        n46  (45),
+        n47  (46),
+        n48  (47),
+        n49  (48),
+        n50  (49),
+        n51  (50),
+        n52  (51),
+        n53  (52),
+        n54  (53),
+        n55  (54),
+        n56  (55),
+        n57  (56),
+        n58  (57),
+        n59  (58),
+        n60  (59),
+        n61  (60),
+        n62  (61),
+        n63  (62),
+        n64  (63),
+        n65  (64),
+        n66  (65),
+        n67  (66),
+        n68  (67),
+        n69  (68),
+        n70  (69),
+        n71  (70),
+        n72  (71),
+        n73  (72),
+        n74  (73),
+        n75  (74),
+        n76  (75),
+        n77  (76),
+        n78  (77),
+        n79  (78),
+        n80  (79),
+        n81  (80),
+        n82  (81),
+        n83  (82),
+        n84  (83),
+        n85  (84),
+        n86  (85),
+        n87  (86),
+        n88  (87),
+        n89  (88),
+        n90  (89),
+        n91  (90),
+        n92  (91),
+        n93  (92),
+        n94  (93),
+        n95  (94),
+        n96  (95),
+        n97  (96),
+        n98  (97),
+        n99  (98),
+        n100 (99),
+        n101 (100),
+        n102 (101),
+        n103 (102),
+        n104 (103),
+        n105 (104),
+        n106 (105),
+        n107 (106),
+        n108 (107),
+        n109 (108),
+        n110 (109),
+        n111 (110),
+        n112 (111),
+        n113 (112),
+        n114 (113),
+        n115 (114),
+        n116 (115),
+        n117 (116),
+        n118 (117),
+        n119 (118),
+        n120 (119),
+        n121 (120),
+        n122 (121),
+        n123 (122),
+        n124 (123),
+        n125 (124),
+        n126 (125),
+        n127 (126),
+        n128 (127),
+        n129 (128),
+        n130 (129),
+        n131 (130),
+        n132 (131),
+        n133 (132),
+        n134 (133),
+        n135 (134),
+        n136 (135),
+        n137 (136),
+        n138 (137),
+        n139 (138),
+        n140 (139),
+        n141 (140),
+        n142 (141),
+        n143 (142),
+        n144 (143),
+        n145 (144),
+        n146 (145),
+        n147 (146),
+        n148 (147),
+        n149 (148),
+        n150 (149),
+        n151 (150),
+        n152 (151),
+        n153 (152),
+        n154 (153),
+        n155 (154),
+        n156 (155),
+        n157 (156),
+        n158 (157),
+        n159 (158),
+        n160 (159),
+        n161 (160),
+        n162 (161),
+        n163 (162),
+        n164 (163),
+        n165 (164),
+        n166 (165),
+        n167 (166),
+        n168 (167),
+        n169 (168),
+        n170 (169),
+        n171 (170),
+        n172 (171),
+        n173 (172),
+        n174 (173),
+        n175 (174),
+        n176 (175),
+        n177 (176),
+        n178 (177),
+        n179 (178),
+        n180 (179),
+        n181 (180),
+        n182 (181),
+        n183 (182),
+        n184 (183),
+        n185 (184),
+        n186 (185),
+        n187 (186),
+        n188 (187),
+        n189 (188),
+        n190 (189),
+        n191 (190),
+        n192 (191),
+        n193 (192),
+        n194 (193),
+        n195 (194),
+        n196 (195),
+        n197 (196),
+        n198 (197),
+        n199 (198),
+        n200 (199),
+        n201 (200),
+        n202 (201),
+        n203 (202),
+        n204 (203),
+        n205 (204),
+        n206 (205),
+        n207 (206),
+        n208 (207),
+        n209 (208),
+        n210 (209),
+        n211 (210),
+        n212 (211),
+        n213 (212),
+        n214 (213),
+        n215 (214),
+        n216 (215),
+        n217 (216),
+        n218 (217),
+        n219 (218),
+        n220 (219),
+        n221 (220),
+        n222 (221),
+        n223 (222),
+        n224 (223),
+        n225 (224),
+        n226 (225),
+        n227 (226),
+        n228 (227),
+        n229 (228),
+        n230 (229),
+        n231 (230),
+        n232 (231),
+        n233 (232),
+        n234 (233),
+        n235 (234),
+        n236 (235),
+        n237 (236),
+        n238 (237),
+        n239 (238),
+        n240 (239),
+        n241 (240),
+        n242 (241),
+        n243 (242),
+        n244 (243),
+        n245 (244),
+        n246 (245),
+        n247 (246),
+        n248 (247),
+        n249 (248),
+        n250 (249),
+        n251 (250),
+        n252 (251),
+        n253 (252),
+        n254 (253),
+        n255 (254),
+        n256 (255)
+    }
 
 tmnxCellularObjs                 OBJECT IDENTIFIER ::= { tmnxSRObjs 109 }
 
@@ -414,7 +942,12 @@ TmnxCellularSimCardEntry         ::= SEQUENCE
     tmnxCellSimCardPin               OCTET STRING,
     tmnxCellSimCardFailureDuration   Unsigned32,
     tmnxCellSimCardPortStateSwitch   TruthValue,
-    tmnxCellSimCardBgpStateSwitch    TruthValue
+    tmnxCellSimCardBgpStateSwitch    TruthValue,
+    tmnxCellSimCardBandsConfig       TmnxCellularBands,
+    tmnxCellSimCardBandsUse3g        TruthValue,
+    tmnxCellSimCardRssiThresh        Integer32,
+    tmnxCellSimCardRssiAlarmTime     Unsigned32,
+    tmnxCellSimCardRssiThreshSwitch  TruthValue
 }
 
 tmnxCellSimCardId                OBJECT-TYPE
@@ -510,6 +1043,92 @@ tmnxCellSimCardBgpStateSwitch    OBJECT-TYPE
          or tmnxCellSimCardBgpStateSwitch must be enabled for a given SIM card."
     DEFVAL      { false }
     ::= { tmnxCellularSimCardEntry 7 }
+
+tmnxCellSimCardBandsConfig       OBJECT-TYPE
+    SYNTAX      TmnxCellularBands
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardBandsConfig specifies a set of cellular
+         bands to enable on the SIM.
+
+         Up to a maximum of 3 bits may be set to enable up to 3 LTE bands
+         simultaneously.
+
+         Attempts to set tmnxCellSimCardBandsConfig to enable a band that is
+         not part of tmnxCellMdaBandsSupported will fail with an
+         inconsistentValue error.
+
+         tmnxCellSimCardBandsConfig $feature
+         (TIMOS_FEATURE_CELLULAR_BAND_SELECTION_5G) {,
+         tmnxCellSimCardBandsConfig5g} and tmnxCellSimCardBandsUse3g must be
+         set together in the same SNMP request PDU or else the set request will
+         fail with an inconsistentValue error."
+    DEFVAL      { {} }
+    ::= { tmnxCellularSimCardEntry 8 }
+
+tmnxCellSimCardBandsUse3g        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardBandsUse3g specifies whether 3G is
+         enabled/disabled on the SIM.
+
+         tmnxCellSimCardBandsConfig $feature
+         (TIMOS_FEATURE_CELLULAR_BAND_SELECTION_5G) {,
+         tmnxCellSimCardBandsConfig5g} and tmnxCellSimCardBandsUse3g must be
+         set together in the same SNMP request PDU or else the set request will
+         fail with an inconsistentValue error."
+    DEFVAL      { false }
+    ::= { tmnxCellularSimCardEntry 9 }
+
+tmnxCellSimCardRssiThresh        OBJECT-TYPE
+    SYNTAX      Integer32 (-113..-51 | 0)
+    UNITS       "decibel-milliwatts"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardRssiThresh specifies the threshold of the
+         RSSI (Received Signal Strength Indicator) level.
+
+         The system can take actions based on the detected RSSI level compared
+         to this threshold tmnxCellSimCardRssiThresh, such as raise alarms or
+         perform a SIM switch.
+
+         A value of 0 indicates the threshold is not set, there will be no
+         actions taken based on detected RSSI level."
+    DEFVAL      { 0 }
+    ::= { tmnxCellularSimCardEntry 10 }
+
+tmnxCellSimCardRssiAlarmTime     OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..300)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardRssiAlarmTime specifies the number of
+         seconds for the RSSI (Received Signal Strength Indicator) level to
+         continuously meet the alarm conditions before raising alarm
+         tmnxCellularRssiAlarm or tmnxCellularRssiAlarmClear."
+    DEFVAL      { 60 }
+    ::= { tmnxCellularSimCardEntry 11 }
+
+tmnxCellSimCardRssiThreshSwitch  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardRssiThreshSwitch specifies whether or not
+         the system will automatically switch to the other SIM card if the RSSI
+         (Received Signal Strength Indicator) level remains below the
+         configured value tmnxCellSimCardRssiThresh for the duration specified
+         by tmnxCellSimCardFailureDuration.
+
+         The system will only automatically switch SIM cards if
+         tmnxCellMdaAdminActiveSim is set to 'automatic'."
+    DEFVAL      { false }
+    ::= { tmnxCellularSimCardEntry 12 }
 
 tmnxCellularPdnTable             OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxCellularPdnEntry
@@ -690,7 +1309,10 @@ TmnxCellularMdaEntry             ::= SEQUENCE
     tmnxCellMdaSimCardLastSwitchTime TimeStamp,
     tmnxCellMdaSimLastSwitchReason   INTEGER,
     tmnxCellMdaSpecFirmwareVersion   DisplayString,
-    tmnxCellMdaMaxTxPower            Integer32
+    tmnxCellMdaMaxTxPower            Integer32,
+    tmnxCellMdaBandsSupported        DisplayString,
+    tmnxCellMdaBandsFirmwareEnabled  DisplayString,
+    tmnxCellMdaBandsInUse            DisplayString
 }
 
 tmnxCellMdaLastChanged           OBJECT-TYPE
@@ -863,7 +1485,8 @@ tmnxCellMdaSimLastSwitchReason   OBJECT-TYPE
         manual-configuration (1),
         forced-switch        (2),
         cellular-port-down   (3),
-        no-bgp-neighbor      (4)
+        no-bgp-neighbor      (4),
+        rssi-threshold       (5)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -904,6 +1527,65 @@ tmnxCellMdaMaxTxPower            OBJECT-TYPE
          tmnxCellMdaMaxTxPower has no effect."
     DEFVAL      { 23 }
     ::= { tmnxCellularMdaEntry 14 }
+
+tmnxCellMdaBandsSupported        OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellMdaBandsSupported indicates, in string format, a
+         list of bands supported on the MDA."
+    ::= { tmnxCellularMdaEntry 15 }
+
+tmnxCellMdaBandsFirmwareEnabled  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellMdaBandsFirmwareEnabled indicates, in string
+         format, a list of bands enabled on the firmware on the cellular modem
+         of the active SIM card."
+    ::= { tmnxCellularMdaEntry 16 }
+
+tmnxCellMdaBandsInUse            OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..200))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellMdaBandsInUse indicates, in string format, the
+         list of bands being used.
+
+         For a band to be part of tmnxCellMdaBandsInUse, it must meet one of
+         the following conditions:
+
+         1)  'b1' to 'b256' LTE bands that are both enabled by tmnxCellSimCardBandsConfig
+             and part of tmnxCellMdaBandsFirmwareEnabled.
+
+         2)  When tmnxCellSimCardBandsUse3g is 'true' and tmnxCellMdaBandsFirmwareEnabled
+             contains '3g', then tmnxCellMdaBandsInUse also contains '3g'.
+
+         When there isn't any band meeting the conditions above then
+         tmnxCellMdaBandsInUse is 'all' to indicate all bands in string
+         tmnxCellMdaBandsFirmwareEnabled are in use.
+
+         For all examples below, assume tmnxCellMdaBandsFirmwareEnabled being
+         string 'b2 b3 b4 3g':
+
+         -  If tmnxCellSimCardBandsConfig has b1 and b2 enabled,
+            tmnxCellSimCardBandsUse3g is 'false', then tmnxCellMdaBandsInUse is 'b2'.
+
+         -  If tmnxCellSimCardBandsConfig has b1 and b2 enabled,
+            tmnxCellSimCardBandsUse3g is 'true', then tmnxCellMdaBandsInUse is 'b2 3g'.
+
+         -  If tmnxCellSimCardBandsConfig has b1 enabled,
+            tmnxCellSimCardBandsUse3g is 'true', then tmnxCellMdaBandsInUse is '3g'.
+
+         -  If tmnxCellSimCardBandsConfig has b1 enabled,
+            tmnxCellSimCardBandsUse3g is 'false', then tmnxCellMdaBandsInUse is 'all'.
+
+         -  If tmnxCellSimCardBandsConfig does not have any bands enabled,
+            tmnxCellSimCardBandsUse3g is 'false', then tmnxCellMdaBandsInUse is 'all'."
+    ::= { tmnxCellularMdaEntry 17 }
 
 tmnxCellPortCbsdAuthCfgTable     OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxCellPortCbsdAuthCfgEntry
@@ -968,7 +1650,7 @@ tmnxCellPortCbsdAuthUserId       OBJECT-TYPE
     ::= { tmnxCellPortCbsdAuthCfgEntry 3 }
 
 tmnxCellPortCbsdAuthAntennaGain  OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..14)
+    SYNTAX      Unsigned32 (0..24)
     UNITS       "decibel-milliwatts"
     MAX-ACCESS  read-write
     STATUS      current
@@ -1061,7 +1743,9 @@ TmnxCellularPortStatusEntry      ::= SEQUENCE
     tmnxCellPortRsrp                 Integer32,
     tmnxCellPortRscp                 Integer32,
     tmnxCellPortRsrq                 Integer32,
-    tmnxCellPortSinr                 Integer32
+    tmnxCellPortSinr                 Integer32,
+    tmnxCellPortSyncSysDateAndTime   DateAndTime,
+    tmnxCellPortPhysCellIdentity     DisplayString
 }
 
 tmnxCellPortImei                 OBJECT-TYPE
@@ -1104,7 +1788,8 @@ tmnxCellPortWirelessTechnology   OBJECT-TYPE
         none  (0),
         lte   (1),
         wcdma (2),
-        gsm   (3)
+        gsm   (3),
+        nrSa  (4)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -1264,10 +1949,31 @@ tmnxCellPortSinr                 OBJECT-TYPE
         "The value of tmnxCellPortSinr indicates the signal to interface and
          noise ratio, in tenths of decibel.
 
-         A value of -200 indicates that the signal to noise and  interface
-         ratio is -20 dB or less, while a value of 400 indicates that the
-         signal to noise and interface ratio is 40 dB or greater."
+         A value of -200 indicates that the signal to noise and interface ratio
+         is -20 dB or less, while a value of 400 indicates that the signal to
+         noise and interface ratio is 40 dB or greater."
     ::= { tmnxCellularPortStatusEntry 12 }
+
+tmnxCellPortSyncSysDateAndTime   OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortSyncSysDateAndTime indicates the synchronized
+         system UTC date and time of the cellular port.
+
+         When the cellular port does not have the time synchronized, the value
+         of tmnxCellPortSyncSysDateAndTime will be '0000000000000000000000'H."
+    ::= { tmnxCellularPortStatusEntry 13 }
+
+tmnxCellPortPhysCellIdentity     OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortPhysCellIdentity indicates the physical cell
+         identity of the connection currently in use."
+    ::= { tmnxCellularPortStatusEntry 14 }
 
 tmnxCellularSimCardStatusTable   OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxCellularSimCardStatusEntry
@@ -1787,7 +2493,8 @@ TmnxCellPortCbsdAuthStatsEntry   ::= SEQUENCE
     tmnxCellPortCbsdAuthGrantRspFail Unsigned32,
     tmnxCellPortCbsdAuthHrtbtRequest Unsigned32,
     tmnxCellPortCbsdAuthHrtbtRspSuc  Unsigned32,
-    tmnxCellPortCbsdAuthHrtbtRspFail Unsigned32
+    tmnxCellPortCbsdAuthHrtbtRspFail Unsigned32,
+    tmnxCellPortCbsdAuthMaxEirp      Integer32
 }
 
 tmnxCellPortCbsdAuthOperState    OBJECT-TYPE
@@ -2003,6 +2710,17 @@ tmnxCellPortCbsdAuthHrtbtRspFail OBJECT-TYPE
          failed CBSD authorization heartbeat responses."
     ::= { tmnxCellPortCbsdAuthStatsEntry 22 }
 
+tmnxCellPortCbsdAuthMaxEirp      OBJECT-TYPE
+    SYNTAX      Integer32 (-137..37)
+    UNITS       "decibel-milliwatts per megahertz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthMaxEirp indicates the value of
+         parameter maxEIRP (Maximum Effective Isotropic Radiated Power) in the
+         CBSD authorization grant requests."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 23 }
+
 tmnxCellularNotifyObjects        OBJECT IDENTIFIER ::= { tmnxCellularObjs 4 }
 
 tmnxCellularNotifyPdnId          OBJECT-TYPE
@@ -2136,6 +2854,42 @@ tmnxCellularComplianceV21        MODULE-COMPLIANCE
             tmnxCellularConfigGroupV21
         }
     ::= { tmnxCellularCompliances 5 }
+
+tmnxCellularComplianceV22        MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the management of the cellular
+         feature-set for Release 22 on Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCellularConfigGroupV22,
+            tmnxCellularStateGroupV22,
+            tmnxCellNotificationGroupV22
+        }
+    ::= { tmnxCellularCompliances 6 }
+
+tmnxCellularComplianceV23        MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the management of the cellular
+         feature-set for Release 23 on Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCellPortCbsdAuthGroupV23,
+            tmnxCellularStatusGroupV23
+        }
+    ::= { tmnxCellularCompliances 7 }
+
+tmnxCellularComplianceV25        MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the management of the cellular
+         feature-set for Release 25 on Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCellPortPhysCellIdenGroupV25
+        }
+    ::= { tmnxCellularCompliances 8 }
 
 tmnxCellularGroups               OBJECT IDENTIFIER ::= { tmnxCellularConformance 2 }
 
@@ -2392,6 +3146,80 @@ tmnxCellularConfigGroupV21       OBJECT-GROUP
          SROS series systems, introduced in release 21."
     ::= { tmnxCellularV21Groups 5 }
 
+tmnxCellularV22Groups            OBJECT IDENTIFIER ::= { tmnxCellularGroups 6 }
+
+tmnxCellularConfigGroupV22       OBJECT-GROUP
+    OBJECTS     {
+        tmnxCellSimCardBandsConfig,
+        tmnxCellSimCardBandsUse3g,
+        tmnxCellSimCardRssiThresh,
+        tmnxCellSimCardRssiAlarmTime,
+        tmnxCellSimCardRssiThreshSwitch
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining cellular port configuration on Nokia
+         SROS series systems, introduced in Release 22."
+    ::= { tmnxCellularV22Groups 1 }
+
+tmnxCellularStateGroupV22        OBJECT-GROUP
+    OBJECTS     {
+        tmnxCellMdaBandsSupported,
+        tmnxCellMdaBandsFirmwareEnabled,
+        tmnxCellMdaBandsInUse
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining cellular states on Nokia SROS series
+         systems, introduced in Release 22."
+    ::= { tmnxCellularV22Groups 2 }
+
+tmnxCellNotificationGroupV22     NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxCellularRssiAlarm,
+        tmnxCellularRssiAlarmClear
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications for cellular ports on Nokia SROS series
+         systems, introduced in release 22."
+    ::= { tmnxCellularV22Groups 3 }
+
+tmnxCellularV23Groups            OBJECT IDENTIFIER ::= { tmnxCellularGroups 7 }
+
+tmnxCellPortCbsdAuthGroupV23     OBJECT-GROUP
+    OBJECTS     {
+        tmnxCellPortCbsdAuthMaxEirp
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects maintaining cellular port CBSD
+         authorization capabilities on Nokia SROS series systems, introduced in
+         release 23."
+    ::= { tmnxCellularV23Groups 1 }
+
+tmnxCellularStatusGroupV23       OBJECT-GROUP
+    OBJECTS     {
+        tmnxCellPortSyncSysDateAndTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects maintaining cellular port status on
+         Nokia SROS series systems, introduced in Release 23."
+    ::= { tmnxCellularV23Groups 2 }
+
+tmnxCellularV25Groups            OBJECT IDENTIFIER ::= { tmnxCellularGroups 8 }
+
+tmnxCellPortPhysCellIdenGroupV25 OBJECT-GROUP
+    OBJECTS     {
+        tmnxCellPortPhysCellIdentity
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects maintaining cellular port physical
+         cell identity on Nokia SROS series systems, introduced in release 25."
+    ::= { tmnxCellularV25Groups 2 }
+
 tmnxCellularNotifyPrefix         OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 109 }
 
 tmnxCellularNotifications        OBJECT IDENTIFIER ::= { tmnxCellularNotifyPrefix 0 }
@@ -2540,5 +3368,44 @@ tmnxCellPortCbsdTransDown        NOTIFICATION-TYPE
 
          [RECOVERY] Not applicable."
     ::= { tmnxCellularNotifications 10 }
+
+tmnxCellularRssiAlarm            NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPortNotifyPortId,
+        tmnxCellSimCardRssiThresh,
+        tmnxCellSimCardRssiAlarmTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxCellularRssiAlarm notification is generated when the
+         cellular port has detected the RSSI (Received Signal Strength
+         Indicator) level fell below the configured minimum threshold
+         tmnxCellSimCardRssiThresh for a duration of time configured by
+         tmnxCellSimCardRssiAlarmTime.
+
+         [EFFECT] N/A.
+
+         [RECOVERY] N/A."
+    ::= { tmnxCellularNotifications 11 }
+
+tmnxCellularRssiAlarmClear       NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPortNotifyPortId,
+        tmnxCellSimCardRssiThresh,
+        tmnxCellSimCardRssiAlarmTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "After the tmnxCellularRssiAlarm is generated, the
+         tmnxCellularRssiAlarmClear notification is generated when the cellular
+         port has detected the RSSI (Received Signal Strength Indicator) level
+         rose to equal or above the configured minimum threshold
+         tmnxCellSimCardRssiThresh for the duration of time configured by
+         tmnxCellSimCardRssiAlarmTime.
+
+         [EFFECT] N/A.
+
+         [RECOVERY] N/A."
+    ::= { tmnxCellularNotifications 12 }
 
 END

@@ -178,10 +178,12 @@ return [
         'long' => 'Temperature',
         'unit' => '°C',
         'unit_long' => '° Celsius',
+        'unit_f' => '°F',
+        'unit_long_f' => '° Fahrenheit',
     ],
     'voltage' => [
         'short' => 'Voltage',
-        'long' => 'voltage',
+        'long' => 'Voltage',
         'unit' => 'V',
         'unit_long' => 'Volts',
     ],

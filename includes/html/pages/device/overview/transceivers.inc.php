@@ -36,7 +36,7 @@ if (DeviceCache::getPrimary()->transceivers->isNotEmpty()) {
             }
 
             if ($sensor->sensor_class == 'dbm') {
-                $haystack = strtolower($sensor->sensor_descr);
+                $haystack = strtolower((string) $sensor->sensor_descr);
 
                 return str_contains($haystack, 'rx') || str_contains($haystack, 'receive');
             }

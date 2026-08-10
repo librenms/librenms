@@ -6,6 +6,7 @@ use App\Facades\PortCache;
 use App\Models\EntPhysical;
 use App\Models\Transceiver;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
@@ -86,6 +87,8 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
 
         foreach ($transceivers as $cmmStackUnitIndex => $chassisTransceivers) {
             foreach ($chassisTransceivers as $cmmTransIndex => $transceiver) {
+                $ifName = $this->guessIfName($cmmTransIndex, $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransType'] ?? 'missing', $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransEEPROMEntry.60'] ?? '');
+
                 $inventory->push(new EntPhysical([
                     'entPhysicalIndex' => $cmmStackUnitIndex * 10000 + $cmmTransIndex,
                     'entPhysicalDescr' => $this->describeTransceiver($transceiver),
@@ -98,7 +101,7 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
                     'entPhysicalParentRelPos' => $cmmTransIndex,
                     'entPhysicalHardwareRev' => $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransVendorRevision'] ?? null,
                     'entPhysicalIsFRU' => 'true',
-                    'ifIndex' => $ifNameToIndex[$this->guessIfName($cmmTransIndex, $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransType'] ?? 'missing')] ?? null,
+                    'ifIndex' => $ifNameToIndex[$ifName] ?? null,
                 ]));
             }
         }
@@ -161,7 +164,7 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
         return $description;
     }
 
-    public function guessIfName($cmmTransIndex, $cmmTransType): ?string
+    public function guessIfName($cmmTransIndex, $cmmTransType, $cmmTransInterfaceIdentifier = ''): ?string
     {
         // IP Infusion has no reliable way of mapping a transceiver to a port it varies by hardware
 
@@ -171,13 +174,18 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
             default => 'ge',
         };
 
+        if (! empty($cmmTransInterfaceIdentifier)) {
+            return Str::startsWith($cmmTransInterfaceIdentifier, 'cd') ? $cmmTransInterfaceIdentifier . '/1' : $cmmTransInterfaceIdentifier;
+        }
+
         return match ($this->getDevice()->hardware) {
-            'Ufi Space S9600-32X-B' => $prefix . $cmmTransIndex,
+            'Ufi Space S9600-32X-B' => $prefix . ($this->portBreakoutEnabled() ? ($cmmTransType == 'qsfp' ? $cmmTransIndex - 5 : $cmmTransIndex - 2) : $cmmTransIndex - 1),
             'Ufi Space S9600-32X-R' => $prefix . ($this->portBreakoutEnabled() ? ($cmmTransType == 'qsfp' ? $cmmTransIndex - 5 : $cmmTransIndex - 2) : $cmmTransIndex - 1),
             'Ufi Space S9510-28DC-B' => $prefix . ($cmmTransIndex - 1),
-            'Ufi Space S9610-36D-R' => 'cd' . $cmmTransIndex . '/1',
+            'Ufi Space S9610-36D-R' => 'cd' . ($this->portBreakoutEnabled() ? ($cmmTransType == 'qsfp' ? $cmmTransIndex - 3 : $cmmTransIndex - 1) : $cmmTransIndex - 1) . '/1',
+            'Ufi Space S9502-12SM-8' => $prefix . ($cmmTransIndex - 1),
             'Ufi Space S9500-30XS-P' => $prefix . ($cmmTransType == 'qsfp' ? $cmmTransIndex - 29 : $cmmTransIndex - 1),
-            'Ufi Space S9600-72XC-R' => $prefix . $cmmTransIndex,
+            'Ufi Space S9600-72XC-R' => $prefix . ($this->portBreakoutEnabled() ? ($cmmTransType == 'qsfp' ? $cmmTransIndex - 3 : $cmmTransIndex - 1) : $cmmTransIndex - 1),
             'Edgecore 7316-26XB-O-48V-F' => $prefix . ($cmmTransType == 'qsfp' ? $cmmTransIndex - 1 : $cmmTransIndex - 3),
             'Edgecore 5912-54X-O-AC-F' => $prefix . $cmmTransIndex,
             'Edgecore 7712-32X-O-AC-F' => $prefix . $cmmTransIndex . '/1',
@@ -223,19 +231,11 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
                 default => 'unknown',
             };
 
-            $date = $data['IPI-CMM-CHASSIS-MIB::cmmTransDateCode'] ?? '0000-00-00';
-            if (preg_match('/^(\d{2,4})(\d{2})(\d{2})$/', $date, $date_matches)) {
-                $year = $date_matches[1];
-                if (strlen($year) == 2) {
-                    $year = '20' . $year;
-                }
-                $date = $year . '-' . $date_matches[2] . '-' . $date_matches[3];
-            }
-
             $cmmTransType = $data['IPI-CMM-CHASSIS-MIB::cmmTransType'] ?? 'missing';
+            $cmmTransInterfaceIdentifier = $data['IPI-CMM-CHASSIS-MIB::cmmTransEEPROMEntry.60'] ?? '';
 
             return new Transceiver([
-                'port_id' => (int) PortCache::getIdFromIfName($this->guessIfName($cmmTransIndex, $cmmTransType), $this->getDevice()),
+                'port_id' => (int) PortCache::getIdFromIfName($this->guessIfName($cmmTransIndex, $cmmTransType, $cmmTransInterfaceIdentifier), $this->getDevice()),
                 'index' => "$cmmStackUnitIndex.$cmmTransIndex",
                 'type' => $cmmTransType,
                 'vendor' => $data['IPI-CMM-CHASSIS-MIB::cmmTransVendorName'] ?? 'missing',
@@ -243,7 +243,7 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
                 'model' => $data['IPI-CMM-CHASSIS-MIB::cmmTransVendorPartNumber'] ?? 'missing',
                 'revision' => $data['IPI-CMM-CHASSIS-MIB::cmmTransVendorRevision'] ?? 'missing',
                 'serial' => $data['IPI-CMM-CHASSIS-MIB::cmmTransVendorSerialNumber'] ?? 'missing',
-                'date' => $date,
+                'date' => $data['IPI-CMM-CHASSIS-MIB::cmmTransDateCode'] ?? null,
                 'ddm' => isset($data['IPI-CMM-CHASSIS-MIB::cmmTransDDMSupport']) && $data['IPI-CMM-CHASSIS-MIB::cmmTransDDMSupport'] == 'yes',
                 'encoding' => $data['IPI-CMM-CHASSIS-MIB::cmmTransEncoding'] ?? 'missing',
                 'distance' => $distance,

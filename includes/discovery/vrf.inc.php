@@ -110,7 +110,7 @@ if (LibrenmsConfig::get('enable_vrfs')) {
                     // regexp result => 5.116.101.115.116.49 -- 36 35 33 30 31 3A 31 -- 00
                     d_echo("  [DEBUG] VRP: RD HexString handling: $matches[2]");
                     $hex_vrf_rd = str_replace(' ', '', $matches[2]);
-                    $vrf_rd = hex2str($hex_vrf_rd);
+                    $vrf_rd = hex2bin($hex_vrf_rd);
                     d_echo("\n  [DEBUG] VRP: RD : $hex_vrf_rd -> $vrf_rd");
                 }
 
@@ -133,9 +133,9 @@ if (LibrenmsConfig::get('enable_vrfs')) {
                 echo "\n  [VRF $vrf_name] DESC  - " . ($descr_table[$vrf_oid] ?? null);
 
                 if (dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid])) {
-                    dbUpdate(['vrf_name' => $vrf_name, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid] ?? null, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
+                    dbUpdate(['vrf_name' => $vrf_name, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid] ?? '', 'mplsVpnVrfRouteDistinguisher' => $vrf_rd], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
                 } else {
-                    dbInsert(['vrf_oid' => $vrf_oid, 'vrf_name' => $vrf_name, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid] ?? null, 'device_id' => $device['device_id']], 'vrfs');
+                    dbInsert(['vrf_oid' => $vrf_oid, 'vrf_name' => $vrf_name, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid] ?? '', 'device_id' => $device['device_id']], 'vrfs');
                 }
 
                 $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid]);
@@ -245,7 +245,7 @@ if (LibrenmsConfig::get('enable_vrfs')) {
             ];
 
             if (dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid])) {
-                dbUpdate(['vrf_name' => $vrf_name, 'bgpLocalAs' => $vrf_as, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => null], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
+                dbUpdate(['vrf_name' => $vrf_name, 'bgpLocalAs' => $vrf_as, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => ''], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
             } else {
                 dbInsert($vrfs, 'vrfs');
             }
@@ -288,6 +288,35 @@ if (LibrenmsConfig::get('enable_vrfs')) {
             $valid_vrf[$vrf_id] = 1;
             $valid_vrf_if[$vrf_id][$vrf_data['bgpVrfId']] = 0;
         } //end foreach
+    } elseif ($device['os'] == 'vos') {
+        // Versa VOS: build routing-instances from VERSA-IF-MIB (no standard VRF MIB)
+        $versaIf = \SnmpQuery::hideMib()->walk('VERSA-IF-MIB::versaIfTable')->table(1);
+
+        foreach ($versaIf as $ifIndex => $entry) {
+            $vrf_name = $entry['versaIfVIfVrfName'] ?? '';
+            if ($vrf_name === '') {
+                continue;
+            }
+
+            // no route-distinguisher/OID per VRF, use the name as the unique key
+            $vrf = \App\Models\Vrf::firstOrNew([
+                'device_id' => $device['device_id'],
+                'vrf_oid' => $vrf_name,
+            ]);
+            $vrf->device_id = $device['device_id'];
+            $vrf->vrf_name = $vrf_name;
+            $vrf->mplsVpnVrfDescription = '';
+            $vrf->save();
+            $valid_vrf[$vrf->vrf_id] = 1;
+
+            $port = \App\Models\Port::where('device_id', $device['device_id'])->where('ifIndex', $ifIndex)->first();
+            if ($port) {
+                echo "\n  [VRF $vrf_name] PORT - " . Rewrite::shortenIfName($port->ifDescr);
+                $port->ifVrf = $vrf->vrf_id;
+                $port->save();
+                $valid_vrf_if[$vrf->vrf_id][$port->port_id] = 1;
+            }
+        }
     } //end if
 
     unset(
@@ -313,9 +342,9 @@ if (LibrenmsConfig::get('enable_vrfs')) {
     $sql = "SELECT * FROM vrfs WHERE device_id = '" . $device['device_id'] . "'";
     foreach (dbFetchRows($sql) as $row) {
         $vrf_id = $row['vrf_id'];
-        if (! $valid_vrf[$vrf_id]) {
+        if (empty($valid_vrf[$vrf_id])) {
             echo '-';
-            dbDelete('vrfs', '`vrf_id` = ?', [$vrf_id]);
+            \App\Models\Vrf::where('vrf_id', $vrf_id)->delete();
         } else {
             echo '.';
         }

@@ -16,15 +16,15 @@ foreach (explode("\n", $fans) as $fan) {
             $current_id = $split_oid[count($split_oid) - 1];
             $current_oid = $fan_state_oid . $current_id;
             $descr = $fan_state_descr . $current_id;
-            $state = snmp_get($device, $current_oid, '-Oqv');
+            $state = SnmpQuery::get($current_oid)->value();
             if (! empty($state)) {
                 $states = [
-                    ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'other'],
-                    ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'ok'],
-                    ['value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'degraded'],
-                    ['value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'failed'],
+                    ['value' => 1, 'generic' => 3, 'descr' => 'other'],
+                    ['value' => 2, 'generic' => 0, 'descr' => 'ok'],
+                    ['value' => 3, 'generic' => 1, 'descr' => 'degraded'],
+                    ['value' => 4, 'generic' => 2, 'descr' => 'failed'],
                 ];
-                create_state_index($state_name, $states);
+                create_state_index($fan_state_name, $states);
             }
             discover_sensor(null, 'state', $device, $current_oid, $current_id, $fan_state_name, $descr, 1, 1, null, null, null, null, $state, 'snmp', $current_id);
         }
@@ -47,15 +47,15 @@ foreach (explode("\n", $psus) as $psu) {
             $current_id = $split_oid[count($split_oid) - 1];
             $current_oid = $psu_state_oid . $current_id;
             $descr = $psu_state_descr . $current_id;
-            $state = snmp_get($device, $current_oid, '-Oqv');
+            $state = SnmpQuery::get($current_oid)->value();
             if (! empty($state)) {
                 $states = [
-                    ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'other'],
-                    ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'ok'],
-                    ['value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'degraded'],
-                    ['value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'failed'],
+                    ['value' => 1, 'generic' => 3, 'descr' => 'other'],
+                    ['value' => 2, 'generic' => 0, 'descr' => 'ok'],
+                    ['value' => 3, 'generic' => 1, 'descr' => 'degraded'],
+                    ['value' => 4, 'generic' => 2, 'descr' => 'failed'],
                 ];
-                create_state_index($state_name, $states);
+                create_state_index($psu_state_name, $states);
             }
             discover_sensor(null, 'state', $device, $current_oid, $current_id, $psu_state_name, $descr, 1, 1, null, null, null, null, $state, 'snmp', $current_id);
         }

@@ -57,7 +57,7 @@ REDIS_SENTINEL_USERNAME=SentinelUsernameGoesHere
 REDIS_PASSWORD=your_redis_password
 ```
 
-For additional information on distributed polling configuration, see [Distributed-Poller.md](Distributed-Poller.md#using-redis).
+For additional information on distributed polling configuration, see [Distributed-Poller.md](Distributed-Poller.md#redis).
 
 ## Testing Your Configuration
 

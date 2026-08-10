@@ -20,11 +20,11 @@ return new class extends Migration
             }, Schema::getForeignKeys('port_group_port'));
 
             if (! in_array('port_group_port_port_group_id_foreign', $constraint_names)) {
-                $table->foreign('port_group_id')->references('id')->on('port_groups')->onDelete('CASCADE');
+                $table->foreign('port_group_id')->references('id')->on('port_groups')->onDelete('cascade');
             }
 
             if (! in_array('port_group_port_port_id_foreign', $constraint_names)) {
-                $table->foreign('port_id')->references('port_id')->on('ports')->onDelete('CASCADE');
+                $table->foreign('port_id')->references('port_id')->on('ports')->onDelete('cascade');
             }
         });
     }

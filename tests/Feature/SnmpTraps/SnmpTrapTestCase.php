@@ -39,7 +39,7 @@ abstract class SnmpTrapTestCase extends TestCase
     protected function assertTrapLogsMessage(string $rawTrap, string|array $log, string $failureMessage = '', array $args = [], ?Device $device = null): void
     {
         if ($device === null) {
-            $device = Device::factory()->make(['display' => '{{ hostname }}']);
+            $device = Device::factory()->make(['display_template' => '{{ hostname }}']);
             $device->setRelation('location', Location::factory()->make());
         }
 

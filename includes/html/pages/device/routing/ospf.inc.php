@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\OspfArea;
+use App\Models\OspfNbr;
+use App\Models\OspfPort;
+
 $i = 0;
 
 echo '
@@ -21,10 +25,10 @@ echo '
         </thead>';
 foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', [$device['device_id']]) as $instance) {
     $i++;
-    $area_count = dbFetchCell('SELECT COUNT(*) FROM `ospf_areas` WHERE `device_id` = ?', [$device['device_id']]);
-    $port_count = dbFetchCell('SELECT COUNT(*) FROM `ospf_ports` WHERE `device_id` = ?', [$device['device_id']]);
-    $port_count_enabled = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `ospfIfAdminStat` = 'enabled' AND `device_id` = ?", [$device['device_id']]);
-    $nbr_count = dbFetchCell('SELECT COUNT(*) FROM `ospf_nbrs` WHERE `device_id` = ?', [$device['device_id']]);
+    $area_count = OspfArea::where('device_id', $device['device_id'])->count();
+    $port_count = OspfPort::where('device_id', $device['device_id'])->count();
+    $port_count_enabled = OspfPort::where('ospfIfAdminStat', 'enabled')->where('device_id', $device['device_id'])->count();
+    $nbr_count = OspfNbr::where('device_id', $device['device_id'])->count();
 
     $status_color = $abr_status_color = $asbr_status_color = 'default';
 
@@ -73,8 +77,8 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', [$d
                         </tr>
                       </thead>';
     foreach (dbFetchRows('SELECT * FROM `ospf_areas` WHERE `device_id` = ?', [$device['device_id']]) as $area) {
-        $area_port_count = dbFetchCell('SELECT COUNT(*) FROM `ospf_ports` WHERE `device_id` = ? AND `ospfIfAreaId` = ?', [$device['device_id'], $area['ospfAreaId']]);
-        $area_port_count_enabled = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `ospfIfAdminStat` = 'enabled' AND `device_id` = ? AND `ospfIfAreaId` = ?", [$device['device_id'], $area['ospfAreaId']]);
+        $area_port_count = OspfPort::where('device_id', $device['device_id'])->where('ospfIfAreaId', $area['ospfAreaId'])->count();
+        $area_port_count_enabled = OspfPort::where('ospfIfAdminStat', 'enabled')->where('device_id', $device['device_id'])->where('ospfIfAreaId', $area['ospfAreaId'])->count();
 
         echo '
                       <tbody>

@@ -9,6 +9,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessMseDiscovery;
@@ -30,7 +31,7 @@ class ApexLynx extends OS implements
         $sensors = [];
 
         $sensors[] = new WirelessSensor(
-            'rssi',
+            WirelessSensorType::Rssi,
             $this->getDeviceId(),
             $oid,
             'apex-lynx',
@@ -49,7 +50,7 @@ class ApexLynx extends OS implements
 
         return [
             new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 $txoid,
                 'apex-lynx',
@@ -57,7 +58,7 @@ class ApexLynx extends OS implements
                 'Tx Frequency'
             ),
             new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 $rxoid,
                 'apex-lynx',
@@ -74,7 +75,7 @@ class ApexLynx extends OS implements
         $sensors = [];
 
         $sensors[] = new WirelessSensor(
-            'mse',
+            WirelessSensorType::Mse,
             $this->getDeviceId(),
             $oid,
             'apex-lynx',
@@ -92,7 +93,7 @@ class ApexLynx extends OS implements
         $sensors = [];
 
         $sensors[] = new WirelessSensor(
-            'rate',
+            WirelessSensorType::Rate,
             $this->getDeviceId(),
             $oid,
             'apex-lynx',
@@ -110,7 +111,7 @@ class ApexLynx extends OS implements
         $sensors = [];
 
         $sensors[] = new WirelessSensor(
-            'error-rate',
+            WirelessSensorType::ErrorRate,
             $this->getDeviceId(),
             $oid,
             'apex-lynx',

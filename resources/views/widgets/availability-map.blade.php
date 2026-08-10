@@ -1,13 +1,14 @@
+@if($show_totals)
 @if($device_totals)
 <div class="widget-availability-host">
     <span>{{ __('Total hosts') }}</span>
     @if($show_disabled_and_ignored)
-        <a href="{{ url('devices/disable_notify=1') }}"><span class="label label-default label-font-border label-border">{{ __('alert-disabled') }}: {{ $device_totals['ignored'] }}</span></a>
-        <a href="{{ url('devices/disabled=1') }}"><span class="label blackbg label-font-border label-border">{{ __('disabled') }}: {{ $device_totals['disabled'] }}</span></a>
+        <a href="{{ route('devices', ['filter' => $base_filter + ['disable_notify' => ['eq' => 1]]]) }}"><span class="label label-default label-font-border label-border">{{ __('alert-disabled') }}: {{ $device_totals['ignored'] }}</span></a>
+        <a href="{{ route('devices', ['filter' => $base_filter + ['disabled' => ['eq' => 1]]]) }}"><span class="label blackbg label-font-border label-border">{{ __('disabled') }}: {{ $device_totals['disabled'] }}</span></a>
     @endif
-    <a href="{{ url('devices/state=up') }}@if($device_group){{ '/group='.$device_group }}@endif"><span class="label label-success label-font-border label-border">{{ __('up') }}: {{ $device_totals['up'] }}</span></a>
+    <a href="{{ route('devices', ['filter' => $base_filter + ['state' => ['eq' => 'up']]]) }}"><span class="label label-success label-font-border label-border">{{ __('up') }}: {{ $device_totals['up'] }}</span></a>
     <span class="label label-warning label-font-border label-border">{{ __('warn') }}: {{ $device_totals['warn'] }}</span>
-    <a href="{{ url('devices/state=down') }}@if($device_group){{ '/group='.$device_group }}@endif"><span class="label label-danger label-font-border label-border">{{ __('down') }}: {{ $device_totals['down'] }}</span></a>
+    <a href="{{ route('devices', ['filter' => $base_filter + ['state' => ['eq' => 'down']]]) }}"><span class="label label-danger label-font-border label-border">{{ __('down') }}: {{ $device_totals['down'] }}</span></a>
     @if($device_totals['maintenance'])
     <span class="label label-default label-font-border label-border">{{ __('alerting.maintenance.maintenance') }}: {{ $device_totals['maintenance'] }}</span>
     @endif
@@ -24,6 +25,7 @@
 @endif
 
 <br style="clear:both;">
+@endif
 
 @foreach($devices as $row)
     <a href="{{ $row['link'] }}" title="{{$row['tooltip'] }}">

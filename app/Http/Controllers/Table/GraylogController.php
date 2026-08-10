@@ -29,16 +29,18 @@ namespace App\Http\Controllers\Table;
 use App\ApiClients\GraylogApi;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use App\Models\Syslog;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 
 class GraylogController extends SimpleTableController
 {
-    private $timezone;
-    private $deviceLinkCache = [];
+    private readonly ?DateTimeZone $timezone;
+    private array $deviceLinkCache = [];
 
     public function __construct()
     {
@@ -46,8 +48,10 @@ class GraylogController extends SimpleTableController
         $this->timezone = $timezone ? new DateTimeZone($timezone) : null;
     }
 
-    public function __invoke(Request $request, GraylogApi $api)
+    public function __invoke(Request $request, GraylogApi $api): JsonResponse
     {
+        $this->authorize('viewAny', Syslog::class); // Graylog replaces syslog
+
         if (! $api->isConfigured()) {
             return response()->json([
                 'error' => 'Graylog is not configured',
@@ -61,24 +65,24 @@ class GraylogController extends SimpleTableController
             'loglevel' => 'nullable|int|min:0|max:7',
         ]);
 
-        $search = $request->get('searchPhrase');
-        $device_id = (int) $request->get('device');
+        $search = $request->input('searchPhrase');
+        $device_id = (int) $request->input('device');
         $device = $device_id ? Device::find($device_id) : null;
-        $range = (int) $request->get('range', 0);
-        $limit = (int) $request->get('rowCount', 10);
-        $page = (int) $request->get('current', 1);
+        $range = (int) $request->input('range', 0);
+        $limit = (int) $request->input('rowCount', 10);
+        $page = (int) $request->input('current', 1);
         $offset = (int) (($page - 1) * $limit);
-        $loglevel = $request->get('loglevel') ?? LibrenmsConfig::get('graylog.loglevel');
+        $loglevel = $request->input('loglevel') ?? LibrenmsConfig::get('graylog.loglevel');
 
         $query = $api->buildSimpleQuery($search, $device) .
             ($loglevel !== null ? ' AND level: <=' . $loglevel : '');
 
         $sort = null;
-        foreach ($request->get('sort', []) as $field => $direction) {
+        foreach ($request->input('sort', []) as $field => $direction) {
             $sort = "$field:$direction";
         }
 
-        $stream = $request->get('stream');
+        $stream = $request->input('stream');
         $filter = $stream ? "streams:$stream" : null;
 
         try {
@@ -86,7 +90,7 @@ class GraylogController extends SimpleTableController
             $messages = $data['messages'] ?? [];
 
             return $this->formatResponse(
-                array_map([$this, 'formatMessage'], $messages),
+                array_map($this->formatMessage(...), $messages),
                 $page,
                 count($messages),
                 $data['total_results'] ?? 0,
@@ -100,7 +104,7 @@ class GraylogController extends SimpleTableController
         ], 500);
     }
 
-    private function formatMessage($message)
+    private function formatMessage(array $message): array
     {
         if ($this->timezone) {
             $graylogTime = new DateTime($message['message']['timestamp']);
@@ -127,7 +131,7 @@ class GraylogController extends SimpleTableController
         ];
     }
 
-    private function severityLabel($severity)
+    private function severityLabel(string $severity): string
     {
         $map = [
             '0' => 'label-danger',
@@ -147,18 +151,19 @@ class GraylogController extends SimpleTableController
 
     /**
      * Cache device lookups so we don't lookup for every entry
-     *
-     * @param  mixed  $source
-     * @return string
      */
-    private function deviceLinkFromSource($source): string
+    private function deviceLinkFromSource(?string $source): string
     {
+        if (! $source) {
+            return '';
+        }
+
         if (! isset($this->deviceLinkCache[$source])) {
             $device = Device::findByIp($source) ?: Device::findByHostname($source);
 
             $this->deviceLinkCache[$source] = $device
                 ? Blade::render('<x-device-link :device="$device"/>', ['device' => $device])
-                : htmlspecialchars((string) $source);
+                : htmlspecialchars($source);
         }
 
         return $this->deviceLinkCache[$source];

@@ -133,6 +133,24 @@ Implies: macros.device
 
 Source: `(devices.status = 0 AND macros.device)`
 
+### ICMP
+
+#### ICMP Latency Variance (Decimal)
+
+Entity: `macros.ping_rtt_variance_perc`
+
+Description: The percentage difference between the last ICMP latency and the rolling average.
+
+Source: `((device_stats.ping_rtt_last - device_stats.ping_rtt_avg) \/ device_stats.ping_rtt_avg) * 100`
+
+#### ICMP Packet Loss Variance (Decimal)
+
+Entity: `macros.ping_loss_variance_perc`
+
+Description: The percentage difference between the last ICMP packet loss and the rolling average.
+
+Source: `((device_stats.ping_loss_last - device_stats.ping_loss_avg) \/ device_stats.ping_loss_avg) * 100`
+
 ### Time
 
 #### Now (Datetime)

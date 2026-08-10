@@ -62,6 +62,11 @@ return [
         'long' => 'Mean Square Error',
         'unit' => 'dB',
     ],
+    'mcs' => [
+        'short' => 'MCS',
+        'long' => 'Modulation and Coding Scheme',
+        'unit' => 'MCS',
+    ],
     'noise-floor' => [
         'short' => 'Noise Floor',
         'long' => 'Noise Floor',

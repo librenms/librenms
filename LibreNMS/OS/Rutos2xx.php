@@ -27,12 +27,14 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use SnmpQuery;
 
 class Rutos2xx extends OS implements
     OSPolling,
@@ -41,16 +43,19 @@ class Rutos2xx extends OS implements
 {
     public function pollOS(DataStorageInterface $datastore): void
     {
-        // Mobile Data Usage
-        $usage = snmp_get_multi_oid($this->getDeviceArray(), [
+        $usage = SnmpQuery::numeric()->get([
             '.1.3.6.1.4.1.48690.2.11.0',
             '.1.3.6.1.4.1.48690.2.10.0',
-        ]);
+            '.1.3.6.1.4.1.48690.2.2.1.25.1',
+            '.1.3.6.1.4.1.48690.2.2.1.26.1',
+        ])->values();
 
-        $usage_sent = $usage['.1.3.6.1.4.1.48690.2.11.0'];
-        $usage_received = $usage['.1.3.6.1.4.1.48690.2.10.0'];
+        $usage_sent = $usage['.1.3.6.1.4.1.48690.2.11.0'] ?? $usage['.1.3.6.1.4.1.48690.2.2.1.25.1'] ?? null;
+        $usage_received = $usage['.1.3.6.1.4.1.48690.2.10.0'] ?? $usage['.1.3.6.1.4.1.48690.2.2.1.26.1'] ?? null;
 
-        if ($usage_sent >= 0 && $usage_received >= 0) {
+        if (is_numeric($usage_sent) && is_numeric($usage_received)
+            && $usage_sent >= 0 && $usage_received >= 0
+        ) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('usage_sent', 'GAUGE', 0)
                 ->addDataset('usage_received', 'GAUGE', 0);
@@ -68,19 +73,41 @@ class Rutos2xx extends OS implements
 
     public function discoverWirelessSnr()
     {
-        $oid = '.1.3.6.1.4.1.48690.2.22.0'; // TELTONIKA-MIB::SINR.0
+        $values = SnmpQuery::numeric()->get([
+            '.1.3.6.1.4.1.48690.2.22.0',
+            '.1.3.6.1.4.1.48690.2.2.1.19.1',
+        ])->values();
 
-        return [
-            new WirelessSensor('snr', $this->getDeviceId(), $oid, 'rutos-2xx', 1, 'SINR', null, -1, 1),
-        ];
+        $oid = ! empty($values['.1.3.6.1.4.1.48690.2.22.0'])
+            ? '.1.3.6.1.4.1.48690.2.22.0'
+            : (! empty($values['.1.3.6.1.4.1.48690.2.2.1.19.1'])
+                ? '.1.3.6.1.4.1.48690.2.2.1.19.1'
+                : null);
+
+        if ($oid !== null) {
+            return [new WirelessSensor(WirelessSensorType::Snr, $this->getDeviceId(), $oid, 'rutos-2xx', 1, 'SINR', null, -1, 1)];
+        }
+
+        return [];
     }
 
     public function discoverWirelessRssi()
     {
-        $oid = '.1.3.6.1.4.1.48690.2.23.0'; // TELTONIKA-MIB::RSRP.0
+        $values = SnmpQuery::numeric()->get([
+            '.1.3.6.1.4.1.48690.2.23.0',
+            '.1.3.6.1.4.1.48690.2.2.1.20.1',
+        ])->values();
 
-        return [
-            new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'rutos-2xx', 1, 'RSRP', null, 1, 1),
-        ];
+        $oid = ! empty($values['.1.3.6.1.4.1.48690.2.23.0'])
+            ? '.1.3.6.1.4.1.48690.2.23.0'
+            : (! empty($values['.1.3.6.1.4.1.48690.2.2.1.20.1'])
+                ? '.1.3.6.1.4.1.48690.2.2.1.20.1'
+                : null);
+
+        if ($oid !== null) {
+            return [new WirelessSensor(WirelessSensorType::Rssi, $this->getDeviceId(), $oid, 'rutos-2xx', 1, 'RSRP', null, 1, 1)];
+        }
+
+        return [];
     }
 }

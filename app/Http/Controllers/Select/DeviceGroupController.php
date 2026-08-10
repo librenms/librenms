@@ -27,36 +27,44 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\DeviceGroup;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @extends SelectController<DeviceGroup>
+ */
 class DeviceGroupController extends SelectController
 {
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'type' => 'nullable|in:static,dynamic',
         ];
     }
 
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return ['name'];
     }
 
-    protected function baseQuery($request)
+    protected function baseQuery($request): Builder|\Illuminate\Database\Query\Builder
     {
+        $this->authorize('viewAny', DeviceGroup::class);
+
         return DeviceGroup::hasAccess($request->user())
-            ->when($request->get('type'), fn ($query, $type) => $query->where('type', $type))
+            ->when($request->input('type'), fn ($query, $type) => $query->where('type', $type))
             ->select(['id', 'name']);
     }
 
     /**
-     * @param  DeviceGroup  $device_group
+     * @param  DeviceGroup  $model
+     * @return array{id: int|string, text: string, icon?: string}
      */
-    public function formatItem($device_group)
+    public function formatItem(Model $model): array
     {
         return [
-            'id' => $device_group->id,
-            'text' => $device_group->name,
+            'id' => $model->id,
+            'text' => $model->name,
         ];
     }
 }

@@ -1,10 +1,11 @@
 -- ===================================================================
--- Copyright (C) 2013 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2018 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: This MIB provides management of MPLS basic configurations.
 --              It is an extension of MPLS-LSR-STD-MIB.
 -- Reference:
--- Version: V2.01
+-- Version: V2.03
 -- History:
+-- V2.03 ChenLu, 2018-10-10, revision
 -- V2.01 ZhangAiFen, 2013-09-24, revision
 -- ===================================================================
 -- ==================================================================
@@ -33,7 +34,7 @@
                 FROM SNMPv2-SMI;
     
          hwMplsLsrExtMIB MODULE-IDENTITY 
-            LAST-UPDATED "201309241655Z"        -- Sep 24, 2013 at 16:55 GMT
+            LAST-UPDATED "201810101810Z"        -- Oct 10, 2018 at 21:00 GMT
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -49,6 +50,9 @@
                 It is an extension of MPLS-LSR-STD-MIB."                
 
 -- Revision history
+         REVISION    "201810101810Z"  
+         DESCRIPTION "V2.03, modified the description."
+		 
          REVISION    "201309241655Z"  
          DESCRIPTION "V2.01, added six nodes about MPLS BGP BFD configuration management."
 
@@ -318,9 +322,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "This table is used to configure or delete MPLS FEC Node.
-                 The indexes of this table are hwMplsFecNodeIpAddress, hwMplsFecNodeInterface, and hwMplsFecNodeNextHop.
-                "
+                "This table is used to configure or delete MPLS FEC Node."
             ::= { hwMplsLsrExtObject 50 }
 
         hwMplsFecListEntry OBJECT-TYPE
@@ -388,9 +390,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "This table is used to configure or delete the MPLS capability on the interface.
-                 The index of this table is hwMplsInterfaceIndex.
-                "
+                "This table is used to configure or delete the MPLS capability on the interface."
             ::= { hwMplsLsrExtObject 51 }
 
         hwMplsInterfaceEntry OBJECT-TYPE
@@ -452,9 +452,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "This table is used to configure or delete static LDP FRR entries on the interface.
-                 The indexes of this table are hwMplsInterfaceIndex and hwLdpStaticFrrPriority.
-                "
+                "This table is used to configure or delete static LDP FRR entries on the interface."
             ::= { hwMplsLsrExtObject 52 }
 
         hwLdpStaticFrrInterfaceEntry OBJECT-TYPE
@@ -527,9 +525,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "This table specifies LDP virtual tunnel information.
-                 The index of this table is hwLdpVirtualTunnelIndex.
-                "
+                "This table specifies LDP virtual tunnel information."
             ::= { hwMplsLsrExtObject 53 }
 
         hwLdpVirtualTunnelEntry OBJECT-TYPE
@@ -617,9 +613,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "This table is used to create or delete static LSP configurations.
-                 The index of this table is hwMplsStaticLspName.
-                "
+                "This table is used to create or delete static LSP configurations."
             ::= { hwMplsLsrExtObject 55 }
 
         hwMplsStaticLspEntry OBJECT-TYPE

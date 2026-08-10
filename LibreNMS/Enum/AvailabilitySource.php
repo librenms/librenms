@@ -4,7 +4,8 @@ namespace LibreNMS\Enum;
 
 enum AvailabilitySource: string
 {
-    case NONE = '';
-    case SNMP = 'snmp';
-    case ICMP = 'icmp';
+    case None = '';
+    case Snmp = 'snmp';
+    case Icmp = 'icmp';
+    case Both = 'icmp,snmp';
 }

@@ -11,7 +11,7 @@ Example contents:
     <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-star fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i>
         <span class="hidden-sm">Custom Menu</span></a>
     <ul class="dropdown-menu">
-        @admin
+        @can('weathermap.manage')
             <li><a href="plugins/Weathermap/output/history/index.html"><i class="fa fa-film fa-fw fa-lg" aria-hidden="true"></i> Weathermap Animation</a></li>
             <li role="presentation" class="divider"></li>
             <li><a href="#"><i class="fa fa-database fa-fw fa-lg" aria-hidden="true"></i> Item 1</a></li>
@@ -22,7 +22,7 @@ Example contents:
             <li><a href="#"><i class="fa fa-truck fa-fw fa-lg" aria-hidden="true"></i> Item 63</a></li>
         @else
             <li><a href="#">You need admin rights to see this</a></li>
-        @endadmin
+        @endcan
     </ul>
 </li>
 ```

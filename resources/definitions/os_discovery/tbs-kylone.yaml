@@ -1,0 +1,7 @@
+modules:
+    os:
+        hardware: SKYLONE-MIB::productName
+        version:
+            - SKYLONE-MIB::productVersion
+            - SKYLONE-MIB::productBuild
+        version_template: '{{ SKYLONE-MIB::productVersion }} - {{ SKYLONE-MIB::productBuild }}'

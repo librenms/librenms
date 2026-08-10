@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Observers\QosObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Interfaces\Models\Keyable;
 
+#[ObservedBy([QosObserver::class])]
 class Qos extends Model implements Keyable
 {
     use HasFactory;
@@ -33,7 +36,7 @@ class Qos extends Model implements Keyable
      *
      * @return string
      */
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return $this->device_id . '-' . $this->type . '-' . $this->rrd_id;
     }

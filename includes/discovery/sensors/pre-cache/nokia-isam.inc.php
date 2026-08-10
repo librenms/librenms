@@ -135,7 +135,7 @@ if ($asamPortNumberingMethod == 2) {
 $pre_cache['nokiaIsamSlot'] = snmpwalk_cache_multi_oid($device, 'eqptBoardContainerOffset', [], 'ASAM-EQUIP-MIB', 'nokia');
 $pre_cache['nokiaIsamSlot'] = snmpwalk_cache_multi_oid($device, 'eqptBoardIfSlotId', $pre_cache['nokiaIsamSlot'], 'ASAM-EQUIP-MIB', 'nokia');
 foreach ($pre_cache['nokiaIsamSlot'] as $slotId => $slot) {
-    $pre_cache['nokiaIsamSlot'][$slotId]['numBasedSlot'] = $slotTable[$slotId];
+    $pre_cache['nokiaIsamSlot'][$slotId] = $slotTable[$slotId] ?? $slotId;
     $pre_cache['nokiaProductName'] = $eqptHolderTable[$eqptHolderActualType];
     if ($pre_cache['nokiaProductName'] == null) {
         $pre_cache['nokiaProductName'] = 'Shelf:';

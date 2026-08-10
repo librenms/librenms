@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Interfaces\ToastInterface;
+use App\Models\Port;
 use App\Models\PortGroup;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -14,10 +16,13 @@ class PortGroupController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
+        $this->authorize('viewAny', PortGroup::class);
+
         return view('port-group.index', [
-            'port_groups' => PortGroup::orderBy('name')->withCount('ports')->get(),
+            'port_groups' => PortGroup::hasAccess($request->user())
+                ->orderBy('name')->withCount('ports')->get(),
         ]);
     }
 
@@ -28,6 +33,8 @@ class PortGroupController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', PortGroup::class);
+
         return view('port-group.create', [
             'port_group' => new PortGroup(),
         ]);
@@ -41,11 +48,13 @@ class PortGroupController extends Controller
      */
     public function store(Request $request, ToastInterface $toast)
     {
+        $this->authorize('create', PortGroup::class);
+
         $this->validate($request, [
             'name' => 'required|string|unique:port_groups',
         ]);
 
-        $portGroup = PortGroup::make($request->only(['name', 'desc']));
+        $portGroup = new PortGroup($request->only(['name', 'desc']));
         $portGroup->save();
 
         $toast->success(__('Port Group :name created', ['name' => $portGroup->name]));
@@ -61,6 +70,8 @@ class PortGroupController extends Controller
      */
     public function edit(PortGroup $portGroup)
     {
+        $this->authorize('update', $portGroup);
+
         return view('port-group.edit', [
             'port_group' => $portGroup,
         ]);
@@ -75,6 +86,8 @@ class PortGroupController extends Controller
      */
     public function update(Request $request, PortGroup $portGroup, ToastInterface $toast)
     {
+        $this->authorize('update', $portGroup);
+
         $this->validate($request, [
             'name' => [
                 'required',
@@ -108,10 +121,25 @@ class PortGroupController extends Controller
      */
     public function destroy(PortGroup $portGroup)
     {
+        $this->authorize('delete', $portGroup);
+
         $portGroup->delete();
 
         $msg = __('Port Group :name deleted', ['name' => htmlentities($portGroup->name)]);
 
         return response($msg, 200);
+    }
+
+    /**
+     * Show graph of all ports in a group
+     */
+    public function graph(Request $request, PortGroup $group): View
+    {
+        $this->authorize('view', $group);
+
+        return view('port-group.graph', [
+            'group' => $group,
+            'ports' => Port::hasAccess($request->user())->inPortGroup($group->id)->with('device')->withCount('macAccounting')->get(),
+        ]);
     }
 }

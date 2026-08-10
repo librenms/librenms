@@ -26,25 +26,25 @@
 echo 'FS NMU Signals';
 
 // SLOT A
-$a1_tx = snmp_get($device, 'vSFPA1TxPower.0', '-Ovqe', 'OAP-C1-OEO');
-$a1_rx = snmp_get($device, 'vSFPA1RxPower.0', '-Ovqe', 'OAP-C1-OEO');
-$a2_tx = snmp_get($device, 'vSFPA2TxPower.0', '-Ovqe', 'OAP-C1-OEO');
-$a2_rx = snmp_get($device, 'vSFPA2RxPower.0', '-Ovqe', 'OAP-C1-OEO');
+$a1_tx = SnmpQuery::get('OAP-C1-OEO::vSFPA1TxPower.0')->value();
+$a1_rx = SnmpQuery::get('OAP-C1-OEO::vSFPA1RxPower.0')->value();
+$a2_tx = SnmpQuery::get('OAP-C1-OEO::vSFPA2TxPower.0')->value();
+$a2_rx = SnmpQuery::get('OAP-C1-OEO::vSFPA2RxPower.0')->value();
 // SLOT B
-$b1_tx = snmp_get($device, 'vSFPB1TxPower.0', '-Ovqe', 'OAP-C1-OEO');
-$b1_rx = snmp_get($device, 'vSFPB1RxPower.0', '-Ovqe', 'OAP-C1-OEO');
-$b2_tx = snmp_get($device, 'vSFPB2TxPower.0', '-Ovqe', 'OAP-C1-OEO');
-$b2_rx = snmp_get($device, 'vSFPB2RxPower.0', '-Ovqe', 'OAP-C1-OEO');
+$b1_tx = SnmpQuery::get('OAP-C1-OEO::vSFPB1TxPower.0')->value();
+$b1_rx = SnmpQuery::get('OAP-C1-OEO::vSFPB1RxPower.0')->value();
+$b2_tx = SnmpQuery::get('OAP-C1-OEO::vSFPB2TxPower.0')->value();
+$b2_rx = SnmpQuery::get('OAP-C1-OEO::vSFPB2RxPower.0')->value();
 // SLOT C
-$c1_tx = snmp_get($device, 'vSFPC1TxPower.0', '-Ovqe', 'OAP-C1-OEO');
-$c1_rx = snmp_get($device, 'vSFPC1RxPower.0', '-Ovqe', 'OAP-C1-OEO');
-$c2_tx = snmp_get($device, 'vSFPC2TxPower.0', '-Ovqe', 'OAP-C1-OEO');
-$c2_rx = snmp_get($device, 'vSFPC2RxPower.0', '-Ovqe', 'OAP-C1-OEO');
+$c1_tx = SnmpQuery::get('OAP-C1-OEO::vSFPC1TxPower.0')->value();
+$c1_rx = SnmpQuery::get('OAP-C1-OEO::vSFPC1RxPower.0')->value();
+$c2_tx = SnmpQuery::get('OAP-C1-OEO::vSFPC2TxPower.0')->value();
+$c2_rx = SnmpQuery::get('OAP-C1-OEO::vSFPC2RxPower.0')->value();
 // SLOT D
-$d1_tx = snmp_get($device, 'vSFPD1TxPower.0', '-Ovqe', 'OAP-C1-OEO');
-$d1_rx = snmp_get($device, 'vSFPD1RxPower.0', '-Ovqe', 'OAP-C1-OEO');
-$d2_tx = snmp_get($device, 'vSFPD2TxPower.0', '-Ovqe', 'OAP-C1-OEO');
-$d2_rx = snmp_get($device, 'vSFPD2RxPower.0', '-Ovqe', 'OAP-C1-OEO');
+$d1_tx = SnmpQuery::get('OAP-C1-OEO::vSFPD1TxPower.0')->value();
+$d1_rx = SnmpQuery::get('OAP-C1-OEO::vSFPD1RxPower.0')->value();
+$d2_tx = SnmpQuery::get('OAP-C1-OEO::vSFPD2TxPower.0')->value();
+$d2_rx = SnmpQuery::get('OAP-C1-OEO::vSFPD2RxPower.0')->value();
 // SLOT A
 $oid_a1_tx = '.1.3.6.1.4.1.40989.10.16.1.2.11.4.0';
 $oid_a1_rx = '.1.3.6.1.4.1.40989.10.16.1.2.11.5.0';
@@ -291,7 +291,7 @@ if (is_numeric($c1_tx)) {
 
 // Discover C1 RX Sensor
 if (is_numeric($c1_rx)) {
-    $descr = 'A1 Rx Power';
+    $descr = 'C1 Rx Power';
     $index = 'vSFPC1RxPower.0';
     $divisor = '100';
     $multiplier = '1';
@@ -389,7 +389,7 @@ if (is_numeric($d1_tx)) {
 
 // Discover D1 RX Sensor
 if (is_numeric($d1_rx)) {
-    $descr = 'B1 Rx Power';
+    $descr = 'D1 Rx Power';
     $index = 'vSFPD1RxPower.0';
     $divisor = '100';
     $multiplier = '1';

@@ -36,8 +36,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Url;
 use LibreNMS\Util\Validate;
@@ -85,7 +87,7 @@ class TopDevicesController extends WidgetController
 
     /**
      * @param  array|string  $headers
-     * @param  Collection  $rows
+     * @param  Collection<int, mixed>  $rows
      * @return array
      */
     private function formatData($headers, $rows)
@@ -137,7 +139,7 @@ class TopDevicesController extends WidgetController
     {
         return [
             Url::deviceLink($device, $device->shortDisplayName()),
-            Url::deviceLink($device, Url::minigraphImage(
+            Url::deviceLink($device, new HtmlString(Url::minigraphImage(
                 $device,
                 Carbon::now()->subDays(1)->timestamp,
                 Carbon::now()->timestamp,
@@ -145,7 +147,7 @@ class TopDevicesController extends WidgetController
                 'no',
                 150,
                 21
-            ), $graph_params, 0, 0, 0),
+            )), $graph_params, 0, 0),
         ];
     }
 
@@ -160,7 +162,7 @@ class TopDevicesController extends WidgetController
             ->groupBy('device_id')
             ->where('poll_time', '>', Carbon::now()->subMinutes($settings['time_interval'])->timestamp)
             ->when($settings['device_group'], fn ($query) => $query->inDeviceGroup($settings['device_group']), fn ($query) => $query->has('device'))
-            ->where('ifOperStatus', 'up')
+            ->where('ifOperStatus', IfOperStatus::Up)
             ->orderByRaw('SUM(ifInOctets_rate + ifOutOctets_rate) ' . $sort)
             ->limit($settings['device_count']);
 
@@ -278,10 +280,10 @@ class TopDevicesController extends WidgetController
 
             return [
                 Url::deviceLink($device, $device->shortDisplayName()),
-                Str::limit($storage->storage_descr, 50),
+                Str::limit(htmlentities((string) $storage->storage_descr), 50),
                 Url::overlibLink(
                     $link,
-                    Html::percentageBar(150, 20, $storage->storage_perc, '', $storage->storage_perc . '%', $storage->storage_perc_warn),
+                    Html::percentageBar(150, 10, $storage->storage_perc, '', $storage->storage_perc . '%', $storage->storage_perc_warn),
                     $overlib_content
                 ),
             ];

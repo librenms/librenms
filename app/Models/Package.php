@@ -26,8 +26,11 @@
 
 namespace App\Models;
 
+use App\Observers\PackageObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use LibreNMS\Interfaces\Models\Keyable;
 
+#[ObservedBy([PackageObserver::class])]
 class Package extends DeviceRelatedModel implements Keyable
 {
     public $timestamps = false;
@@ -42,7 +45,7 @@ class Package extends DeviceRelatedModel implements Keyable
         'size',
     ];
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return "$this->manager-$this->name-$this->arch";
     }

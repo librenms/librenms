@@ -13,8 +13,10 @@ class OuiLookupController extends Controller
      */
     public function __invoke(Request $request): \Illuminate\Contracts\View\View
     {
+        $this->authorize('tools.oui');
+
         $results = [];
-        $query = $request->get('query');
+        $query = $request->input('query');
 
         if ($query) {
             $lines = preg_split('/\r\n|\n|\r/', (string) $query, flags: PREG_SPLIT_NO_EMPTY);

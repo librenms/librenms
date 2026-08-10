@@ -4,6 +4,7 @@ namespace LibreNMS\OS;
 
 use App\Models\Sensor;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessClientsPolling;
 use LibreNMS\OS;
@@ -29,10 +30,10 @@ class Stellar extends OS implements
             }
 
             $ssid_count = $ssid_counts[$ssid_name] ?? 0;
-            $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), [], 'stellar', $ssid_name, 'SSID ' . $ssid_name . ' Clients', $ssid_count);
+            $sensors[] = new WirelessSensor(WirelessSensorType::Clients, $this->getDeviceId(), [], 'stellar', $ssid_name, 'SSID ' . $ssid_name . ' Clients', $ssid_count);
         }
 
-        $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), [], 'stellar', 'total-clients', 'Total Clients', $total_clients);
+        $sensors[] = new WirelessSensor(WirelessSensorType::Clients, $this->getDeviceId(), [], 'stellar', 'total-clients', 'Total Clients', $total_clients);
 
         return $sensors;
     }

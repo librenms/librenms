@@ -18,7 +18,7 @@ Currently supported OSes are as below.
 === "CentOS/RedHat"
 
     ```bash
-    yum install perl-JSON perl-File-Slurp perl-MIME-Base64
+    yum install perl-IO-Compress perl-JSON perl-File-Slurp perl-MIME-Base64
     ```
 
 === "FreeBSD"
@@ -62,11 +62,10 @@ If using SELinux, the following is needed.
 
 1. `setsebool -P nis_enabled 1`
 
-2. Make a file (`snmp_nfs.te`) with the following contents and install
-   the policy with the command `semodule -i snmp_nfs.te`.
+2. Make a file (`snmp_nfs.te`) with the following contents
 
 ```bash
-module local_snmp 1.0;
+module snmp_nfs 1.0;
 
 require {
     type snmpd_t;
@@ -98,4 +97,10 @@ allow snmpd_t device_t:chr_file { open ioctl read write };
 # this policy allows :
 # zfs extension (fixes root needs to run this)
 # nfs extension (fixes file not found error)
+```
+3.  Compile and install the policy with the commands
+```bash
+checkmodule -M -m -o snmp_nfs.mod snmp_nfs.te
+semodule_package -m snmp_nfs.mod -o snmp_nfs.pp
+semodule -i snmp_nfs.pp
 ```

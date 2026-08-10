@@ -41,7 +41,7 @@ logsize is a small shell script that reports the size of log files.
 3. Configure the config at `/usr/local/etc/logsize.conf`. You can find the documentation for the config file in the extend. Below is a small example.
 
     ```conf
-    # monitor log sizes of logs directly udner /var/log
+    # monitor log sizes of logs directly under /var/log
     [sets.var_log]
     dir="/var/log/"
 
@@ -122,7 +122,7 @@ script and make it executable.
 3. Configure the config at `/usr/local/etc/logsize.conf`. You can find the documentation for the config file in the extend. Below is a small example.
 
     ```conf
-    # monitor log sizes of logs directly udner /var/log
+    # monitor log sizes of logs directly under /var/log
     [sets.var_log]
     dir="/var/log/"
 

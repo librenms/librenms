@@ -17,7 +17,7 @@
      	 	FROM SNMPv2-CONF;   			
 
 	alpha MODULE-IDENTITY
-		LAST-UPDATED "201904120000Z"
+		LAST-UPDATED "202304030000Z"
 		ORGANIZATION "Alpha Technologies Ltd."
 		CONTACT-INFO
 		  	"Alpha Technologies Ltd.
@@ -30,6 +30,20 @@
 		DESCRIPTION
 		  	"This MIB defines the information block(s) available in system controllers."         
 		
+		REVISION	"202304030000Z"  -- April 3, 2023
+		DESCRIPTION
+			"Updated the type of some index columns to be a string, matching the value type
+			that has been exposed for a long time.
+			"
+		
+		
+		REVISION	"201911150000Z"  -- November 15, 2019
+		DESCRIPTION
+			"Added the configurationChoiceList table to support the other configuration tables,
+			allowing the ability to see what possible choices there are for choice values.
+			"
+			
+			
 		REVISION	"201904120000Z"  -- April 12, 2019
 		DESCRIPTION
 			"Added alert table and conformance group.
@@ -406,14 +420,14 @@
 		
 	
 	DataListEntry ::= SEQUENCE {
-	   dataListReference		Unsigned32,
+	   dataListReference		OCTET STRING,
 	   dataListName       		OCTET STRING,
 	   dataListType				Unsigned32,
 	   dataListUnit				OCTET STRING
 	   }  
 	   
 	dataListReference OBJECT-TYPE
-		SYNTAX Unsigned32 (1..4294967295) 
+		SYNTAX OCTET STRING (SIZE(0..32))
 		MAX-ACCESS not-accessible
 		STATUS current
 		DESCRIPTION	
@@ -492,13 +506,13 @@
 		
 	
 	DataEntry ::= SEQUENCE {        
-	   	dataReference		    Unsigned32,
+	   	dataReference		    OCTET STRING,
 	   	dataNumberValue     	ScaledNumber,
 	   	dataStringValue			OCTET STRING
 	   	}  
 	                       
 	dataReference OBJECT-TYPE
-		SYNTAX Unsigned32 (1..4294967295) 
+		SYNTAX OCTET STRING (SIZE(0..32))
 		MAX-ACCESS not-accessible
 		STATUS current
 		DESCRIPTION	
@@ -565,14 +579,14 @@
 		
 	
 	ConfigurationListEntry ::= SEQUENCE {
-	   configurationListReference       Unsigned32,
+	   configurationListReference       OCTET STRING,
 	   configurationListName       		OCTET STRING,
 	   configurationListType   			Integer32, 
 	   configurationListUnit 			OCTET STRING
 	   }  
 	   
 	configurationListReference OBJECT-TYPE
-		SYNTAX Unsigned32 (1..4294967295) 
+		SYNTAX OCTET STRING (SIZE(0..32))
 		MAX-ACCESS not-accessible
 		STATUS current
 		DESCRIPTION	
@@ -656,13 +670,13 @@
 		
 	
 	ConfigurationEntry ::= SEQUENCE {   
-		configurationReference				Unsigned32,
+		configurationReference				OCTET STRING,
 	   	configurationNumberValue 		   	ScaledNumber,
 	   	configurationStringValue			OCTET STRING
 	   	}  
 	                                        
 	configurationReference OBJECT-TYPE
-		SYNTAX Unsigned32 (1..4294967295) 
+		SYNTAX OCTET STRING (SIZE(0..32))
 		MAX-ACCESS not-accessible
 		STATUS current
 		DESCRIPTION	
@@ -728,12 +742,12 @@
 		
 	
 	CommandListEntry ::= SEQUENCE {
-	   commandListReference     Unsigned32,
+	   commandListReference     OCTET STRING,
 	   commandListName       	OCTET STRING
 	   }  
 	   
 	commandListReference OBJECT-TYPE
-		SYNTAX Unsigned32 (1..4294967295)
+		SYNTAX OCTET STRING (SIZE(0..32))
 		MAX-ACCESS not-accessible
 		STATUS current
 		DESCRIPTION	
@@ -786,12 +800,12 @@
 		
 	
 	CommandEntry ::= SEQUENCE {  
-		commandReference			    Unsigned32,
+		commandReference			    OCTET STRING,
 	   	commandTrigger      			Integer32	   
 	   	}  
 	                                        
 	commandReference OBJECT-TYPE
-		SYNTAX Unsigned32 (1..4294967295) 
+		SYNTAX OCTET STRING (SIZE(0..32))
 		MAX-ACCESS not-accessible
 		STATUS current
 		DESCRIPTION	
@@ -957,8 +971,7 @@
 		
 	
 	AlertEntry ::= SEQUENCE {  
-		alertTypeName       OCTET STRING,
-		alertState		    Unsigned32
+		alertTypeName       OCTET STRING
    	}  
 	        
 
@@ -970,8 +983,82 @@
 		"
 		the name of the alert
 		"
-	::= { alertEntry 1 }           
-	              
+	::= { alertEntry 1 }  
+	         
+  	-- Configuration Choices
+	-----------  
+
+	configurationChoiceList				OBJECT IDENTIFIER	::=		{ resource 11 }                        
+                            
+    configurationChoiceListCount OBJECT-TYPE
+		SYNTAX Integer32 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	
+		"The number of defined configuration choices available for query."
+	::= { configurationChoiceList 1 }               
+                  
+    configurationChoiceListTable 	OBJECT-TYPE
+   		SYNTAX      SEQUENCE OF ConfigurationChoiceListEntry
+   		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Table of configuration choices. To be used in conjuction with the configurationList and configuration tables.
+		For Choice type fields, this table will tell you what the possible values each Choice field can be set to.
+       	"
+   		::= { configurationChoiceList 2 }
+                                        
+	configurationChoiceListEntry	OBJECT-TYPE
+		SYNTAX      ConfigurationChoiceListEntry               
+ 		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Configuration choice entries available for GET.
+       	"
+   		INDEX       { componentListType, configurationChoiceListReference }
+   		::= { configurationChoiceListTable 1 }
+		
+	
+	ConfigurationChoiceListEntry ::= SEQUENCE {
+	   configurationChoiceListReference         OCTET STRING,
+	   configurationChoiceListIndex       		Unsigned32,
+	   configurationChoiceListName   			OCTET STRING 
+	   }  
+	   
+	configurationChoiceListReference OBJECT-TYPE 
+		SYNTAX OCTET STRING (SIZE(0..32))
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	
+		"
+		A numerical ID value permanently assigned to the configuration field this Choice is a possible value for.
+		"
+	::= { configurationChoiceListEntry 1 }  
+	
+	configurationChoiceListIndex OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	
+		"
+		The numerical representation of this Choice. To configure a configuration field to this Choice, set the
+		numericalValue to this index.
+		"
+	::= { configurationChoiceListEntry 2 }  
+	
+	configurationChoiceListName OBJECT-TYPE
+	    SYNTAX OCTET STRING (SIZE(0..32))
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	    "
+	    A non-configurable string name of this Choice.
+	    "
+	::= { configurationChoiceListEntry 3 } 
+	 
+     
 	-- Conformance
 	
 	resourceConformance OBJECT IDENTIFIER ::= { resource 100 }
@@ -1016,6 +1103,11 @@
 	      	"
 	      	GROUP alphaAlertGroup
 	      	DESCRIPTION
+	      	"
+	      	This group is optional. (in development)
+	      	"
+			GROUP alphaConfigurationChoicesGroup
+			DESCRIPTION
 	      	"
 	      	This group is optional. (in development)
 	      	"
@@ -1142,5 +1234,14 @@
 		     "Alert type list group."
 		::= { resourceGroups 10}
 
-
+  	alphaConfigurationChoicesGroup OBJECT-GROUP
+		OBJECTS {  
+		    configurationChoiceListCount,
+			configurationChoiceListIndex,
+			configurationChoiceListName
+		}		          
+		STATUS   current
+		DESCRIPTION
+		     "Data type list group."
+		::= { resourceGroups 11}
 END

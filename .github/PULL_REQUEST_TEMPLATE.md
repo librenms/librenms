@@ -4,7 +4,9 @@ DO NOT DELETE THE UNDERLYING TEXT
 
 #### Please note
 
-> Please read this information carefully. You can run `./lnms dev:check` to check your code before submitting.
+> Please read this information carefully. Pull requests may be closed without explanation 
+> due to influx of low quality LLM generated pull requests.
+> You can run `./lnms dev:check` to check your code before submitting.
 
 - [ ] Have you followed our [code guidelines?](https://docs.librenms.org/Developing/Code-Guidelines/)
 - [ ] If my Pull Request does some changes/fixes/enhancements in the WebUI, I have inserted a screenshot of it.

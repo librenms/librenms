@@ -35,7 +35,7 @@ class MapquestApi extends BaseApi implements Geocoder
 {
     use GeocodingHelper;
 
-    protected string $base_uri = 'https://open.mapquestapi.com';
+    protected string $base_uri = 'https://mapquestapi.com';
     protected string $geocoding_uri = '/geocoding/v1/address';
 
     /**

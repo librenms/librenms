@@ -16,10 +16,16 @@
  * @author     LibreNMS Contributors
 */
 
+use App\Models\Service;
+use Illuminate\Support\Facades\Gate;
+
 $pagetitle[] = 'Services';
 
+Gate::authorize('view', DeviceCache::getPrimary());
+Gate::authorize('service.view');
+
 require_once 'includes/services.inc.php';
-$services = service_get($device['device_id']);
+$services = Service::where('device_id', $device['device_id'])->hasAccess(request()->user())->get();
 
 require_once 'includes/html/modal/new_service.inc.php';
 require_once 'includes/html/modal/delete_service.inc.php';
@@ -54,7 +60,7 @@ foreach ($menu_options as $option => $text) {
 }
 unset($sep);
 
-if (Auth::user()->hasGlobalAdmin()) {
+if (Gate::allows('create', Service::class)) {
     echo '<div class="pull-right"><a data-toggle="modal" href="#create-service"><i class="fa fa-cog" style="color:green" aria-hidden="true"></i> Add Service</a></div>';
 }
 
@@ -92,14 +98,16 @@ if (count($services) > '0') {
         echo '<td class="col-sm-1 text-muted">' . nl2br(htmlentities((string) $service['service_ip'])) . '</td>';
         echo '<td class="col-sm-4">' . nl2br(htmlentities(trim((string) $service['service_message']))) . '</td>';
         echo '<td class="col-sm-2 text-muted">' . htmlentities((string) $service['service_desc']) . '</td>';
-        echo '<td class="col-sm-1 text-muted">' . \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) . '</td>';
+        echo '<td class="col-sm-1 text-muted">' . ($service['service_changed'] ? \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) : 'Waiting for first service check') . '</td>';
         echo '<td class="col-sm-1">';
-        if (Auth::user()->hasGlobalAdmin()) {
-            echo '<div class="pull-right">';
+        echo '<div class="pull-right">';
+        if (Gate::allows('service.update')) {
             echo "<button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service['service_id']}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>";
-            echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service['service_id']}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button";
-            echo '</div>';
         }
+        if (Gate::allows('service.delete')) {
+            echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service['service_id']}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button";
+        }
+        echo '</div>';
         echo '</td>';
         echo '</tr>';
 
@@ -118,15 +126,19 @@ if (count($services) > '0') {
 
             $graphs = json_decode($service['service_ds'], true);
             foreach ($graphs as $k => $v) {
+                $graph_title = $k;
+                if (isset($v['full_name'])) {
+                    $graph_title = htmlentities((string) $v['full_name']);
+                }
                 $graph_array['device'] = $device['device_id'];
                 $graph_array['type'] = 'service_graph';
                 $graph_array['id'] = $service['service_id'];
                 $graph_array['ds'] = $k;
 
                 echo '<tr>';
-                echo '<td colspan="7">';
+                echo '<td colspan="7" style="padding: 0">';
 
-                include 'includes/html/print-graphrow.inc.php';
+                include 'includes/html/print-device-graph.php';
 
                 echo '</td>';
                 echo '</tr>';

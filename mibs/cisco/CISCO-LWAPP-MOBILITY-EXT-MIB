@@ -1,8 +1,8 @@
 -- *******************************************************************
 -- CISCO-LWAPP-MOBILITY-EXT-MIB.my
 -- January 2011, Srinath Candadai
---   
--- Copyright (c) 2011-2017 by Cisco Systems Inc.
+--
+-- Copyright (c) 2011-2020 by Cisco Systems, Inc.
 -- All rights reserved.
 -- *******************************************************************
 
@@ -34,10 +34,13 @@ IMPORTS
         FROM SNMP-FRAMEWORK-MIB
     VlanIndex
         FROM Q-BRIDGE-MIB
-    cLWlanIndex
+    cLWlanIndex,
+    cLWlanProfileName
         FROM CISCO-LWAPP-WLAN-MIB
     Dscp
         FROM CISCO-QOS-PIB-MIB
+    cLWlanWlanPolicyName
+        FROM CISCO-LWAPP-WLAN-POLICY-MIB
     ciscoMgmt
         FROM CISCO-SMI;
 
@@ -47,7 +50,7 @@ IMPORTS
 -- ********************************************************************
 
 ciscoLwappMobilityExtMIB MODULE-IDENTITY
-    LAST-UPDATED    "201705020000Z"
+    LAST-UPDATED    "202008130000Z"
     ORGANIZATION    "Cisco Systems Inc."
     CONTACT-INFO
             "Cisco Systems,
@@ -319,6 +322,13 @@ ciscoLwappMobilityExtMIB MODULE-IDENTITY
 
            [2] Draft-obara-capwap-lwapp-00.txt, IETF Light 
            Weight Access Point Protocol."
+    REVISION        "202008130000Z"
+    DESCRIPTION
+        " Added cLGuestWlanAllAnchorsDown
+                cLGuestWlanOneAnchorOnGuestLanUp notification"
+    REVISION        "201906200000Z"
+    DESCRIPTION
+        " Added C9800-specific attributes."
     REVISION        "201705020000Z"
     DESCRIPTION
         "Initial version of this MIB module."
@@ -580,6 +590,38 @@ cLMobilityExtMCNumberOfReportedAPsInSubDomain OBJECT-TYPE
         by this MC and its MAs." 
     ::= { ciscoLwappMobilityExtMCGlobalObjects 18 }
 
+cLMobilityExtMCOwnGroupMulticastAddressv6Type OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object represents the multicast IP address type of its own
+        mobility group." 
+    ::= { ciscoLwappMobilityExtMCGlobalObjects 19 }
+
+cLMobilityExtMCOwnGroupMulticastAddressv6 OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object represents the multicast IPv6 address of its own
+        mobility group." 
+    ::= { ciscoLwappMobilityExtMCGlobalObjects 20 }
+
+cLMobilityExtMCMulticastModev6 OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object allows the user to enable or disable
+        IPv6 multicast  mode.
+        A value of 'true' indicates IPv6 multicast mode
+        is enabled.
+        A value of 'false' indicates IPv6 multicast mode
+        is disabled."
+    DEFVAL          { false }
+    ::= { ciscoLwappMobilityExtMCGlobalObjects 21 }
+
 -- *******************************************************************
 -- Mobility Manager global parameters (applicable to both MC and MA)
 -- *******************************************************************
@@ -698,8 +740,8 @@ cLMobilityExtSecureCipher OBJECT-TYPE
                      to use default ciphers for mobility  tunnel.
         aes256sha1(2) - Implies that controllers will use
                         AES256_SHA cipher for mobility tunnel.
-        aes256sha2(3) - Implies that controllers will use 
-                        AES256_SHA256 cipher for mobility tunnel." 
+        aes256sha2(3) - Implies that controllers will use
+                        AES256_SHA256 cipher for mobility tunnel."
     ::= { ciscoLwappMobilityExtMCMAGlobalObjects 11 }
 
 cLMobilityExtEncryptionStatus OBJECT-TYPE
@@ -712,6 +754,24 @@ cLMobilityExtEncryptionStatus OBJECT-TYPE
         A value of 'true' indicates encryption is enabled.
         A value of 'false' indicates encryption is disabled." 
     ::= { ciscoLwappMobilityExtMCMAGlobalObjects 12 }
+
+cLMobilityExtSecureCipherv2 OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        disable(1),
+                        aes128sha2(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies to configure secure ciphers, AES128+SHA
+        or AES128+SHA2 for mobility tunnel.
+        disable(1)    - Implies that controllers will continue 
+                        to use default cipher AES128_SHA for mobility 
+                        tunnel.
+        aes128sha2(2) - Implies that controllers will use
+                        AES128_SHA256 cipher for mobility tunnel."
+    ::= { ciscoLwappMobilityExtMCMAGlobalObjects 13 }
+
 -- *******************************************************************
 -- Switch Peer Group Table (applicable to MC only)
 -- *******************************************************************
@@ -2057,10 +2117,14 @@ cLMobilityExtGroupEntry OBJECT-TYPE
     ::= { cLMobilityExtGroupTable 1 }
 
 CLMobilityExtGroupEntry ::= SEQUENCE {
-        cLMobilityExtGroupName                 SnmpAdminString,
-        cLMobilityExtGroupMulticastAddressType InetAddressType,
-        cLMobilityExtGroupMulticastAddress     InetAddress,
-        cLMobilityExtGroupRowStatus            RowStatus
+        cLMobilityExtGroupName                       SnmpAdminString,
+        cLMobilityExtGroupMulticastAddressType       InetAddressType,
+        cLMobilityExtGroupMulticastAddress           InetAddress,
+        cLMobilityExtGroupRowStatus                  RowStatus,
+        cLMobilityExtGroupMulticastMode              TruthValue,
+        cLMobilityExtGroupMulticastModev6            TruthValue,
+        cLMobilityExtGroupMulticastAddressv6Type     InetAddressType,
+        cLMobilityExtGroupMulticastAddressv6         InetAddress
 }
 
 cLMobilityExtGroupName OBJECT-TYPE
@@ -2099,7 +2163,42 @@ cLMobilityExtGroupRowStatus OBJECT-TYPE
         to create and delete specific instances of rows             
         in this table." 
     ::= { cLMobilityExtGroupEntry 4 }
- 
+
+cLMobilityExtGroupMulticastMode OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object represents the IPv4 multicast mode for the
+        mobility group."
+    ::= { cLMobilityExtGroupEntry 5 }
+
+cLMobilityExtGroupMulticastModev6 OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object represents the IPv6 multicast mode for the
+        mobility group."
+    ::= { cLMobilityExtGroupEntry 6 }
+
+cLMobilityExtGroupMulticastAddressv6Type OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object represents the multicast IPv6 address type
+        for the mobility group."
+    ::= { cLMobilityExtGroupEntry 7 }
+
+cLMobilityExtGroupMulticastAddressv6 OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object represents the multicast IPv6 address for the
+        mobility group."
+    ::= { cLMobilityExtGroupEntry 8 }
 
 -- *******************************************************************
 -- Mobility Agent (MA) peer member table
@@ -2402,6 +2501,85 @@ cLMobilityExtMCAPCount OBJECT-TYPE
         this device: this MC, or its peer MC or its MA." 
     ::= { cLMobilityExtMCAPCountEntry 3 }
  
+cLMobilityAnchorPolicyEntryTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CLMobilityAnchorPolicyEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "This table provides information about
+        one 802.11 LWAPP Mobility Anchor configured with a policy name
+        on this controller"
+    ::= { ciscoLwappMobilityExtTableObjects 15 }
+
+cLMobilityAnchorWlanPolicyEntry OBJECT-TYPE
+    SYNTAX          CLMobilityAnchorPolicyEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry in this table provides information about
+        one 802.11 LWAPP Mobility Anchor configured with a policy name
+        on this controller.
+        Each row represent an Ip anchor associated with a policy.
+        A row is added when a new anchor is added"
+    INDEX           {
+                        cLWlanWlanPolicyName,
+                        cLMobilityAnchorPolicyMCAddressType, 
+                        cLMobilityAnchorPolicyMCAddress
+                    } 
+    ::= { cLMobilityAnchorPolicyEntryTable 1 }
+
+CLMobilityAnchorPolicyEntry ::= SEQUENCE {
+        cLMobilityAnchorPolicyMCAddressType InetAddressType,
+        cLMobilityAnchorPolicyMCAddress     InetAddress,
+        cLMobilityAnchorPolicyRowStatus     RowStatus,
+        cLMobilityAnchorPolicyMCPriority    INTEGER
+}
+
+cLMobilityAnchorPolicyMCAddressType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object represents the anchor's IP address type."
+    ::= { cLMobilityAnchorWlanPolicyEntry 1 }
+
+
+cLMobilityAnchorPolicyMCAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object represents the anchor's IP address" 
+    ::= { cLMobilityAnchorWlanPolicyEntry 2 }
+
+cLMobilityAnchorPolicyRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This is the status column for this row and used
+        to create and delete specific instances of rows
+        in this table." 
+    ::= { cLMobilityAnchorWlanPolicyEntry 3 }
+
+cLMobilityAnchorPolicyMCPriority OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        local (1),
+                        primary(2),
+                        secondary(3),
+                        tertiary(4)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies priority of the mobility anchor (for the foreign
+        controller)
+        A value of '1' indicates local anchor priority (this is not permitted
+        to be configured)
+        A value of '2' indicates primary anchor priority.
+        A value of '3' indicated secondary anchor priority.
+        A value of '4' indicated tertiary anchor priority."
+    ::= { cLMobilityAnchorWlanPolicyEntry 4 }
 
 
 -- *******************************************************************
@@ -2756,6 +2934,15 @@ cLMobilityExtNotifyObjectDestinationType OBJECT-TYPE
                             Oracle." 
     ::= { ciscoLwappMobilityExtNotifObjects 4 }
 
+cLMobilityExtWlanPolicyName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (1..64))
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "This object specifies one instance of a WLAN policy on the
+         controller"
+    ::= { ciscoLwappMobilityExtNotifObjects 5 }
+
 -- *******************************************************************
 -- Mobility Agent (MA) statistics
 -- *******************************************************************
@@ -2987,6 +3174,33 @@ ciscoLwappMobilityDataPathUp NOTIFICATION-TYPE
         "This notification is sent by the agent when
         a mobility data path goes up."
    ::= { ciscoLwappMobilityExtMIBNotifs 4 }
+
+cLGuestWlanAllAnchorsDown NOTIFICATION-TYPE
+    OBJECTS    {
+        cLWlanProfileName,
+        cLMobilityExtWlanPolicyName
+    }
+    STATUS          current
+    DESCRIPTION
+        "This  notification will be emitted by the SNMP agent
+        when successive CAPWAP/Mobility ping attempts to all the anchors on
+        Guest Wlan, denoted by cLWlanProfileName, fail and
+        all the anchors are conclusively down."
+   ::= { ciscoLwappMobilityExtMIBNotifs 5 }
+
+cLGuestWlanOneAnchorOnGuestLanUp NOTIFICATION-TYPE
+    OBJECTS    {
+        cLWlanProfileName,
+        cLMobilityExtWlanPolicyName
+    }
+    STATUS          current
+    DESCRIPTION
+        "This  notification will be emitted by the SNMP agent
+        when successive CAPWAP/Mobility and UDP ping to at least one anchor
+        on the Guest Wlan, denoted by cLWlanProfileName, is
+        restored and anchor is conclusively up."
+   ::= { ciscoLwappMobilityExtMIBNotifs 6 }
+
 -- *******************************************************************
 -- *    Compliance statements
 -- *******************************************************************
@@ -3039,7 +3253,7 @@ ciscoLwappMobilityExtMIBComplianceRev2 MODULE-COMPLIANCE
     ::= { ciscoLwappMobilityExtMIBCompliances 3 }
 
 ciscoLwappMobilityExtMIBComplianceRev3 MODULE-COMPLIANCE
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The compliance statement for the SNMP entities that
         implement the ciscoLwappMobilityExtMIB module."
@@ -3054,6 +3268,22 @@ ciscoLwappMobilityExtMIBComplianceRev3 MODULE-COMPLIANCE
                     }
     ::= { ciscoLwappMobilityExtMIBCompliances 4 }
 
+ciscoLwappMobilityExtMIBComplianceRev4 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for the SNMP entities that
+        implement the ciscoLwappMobilityExtMIB module."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cLMobilityExtConfigGroupRev1,
+                        cLMobilityExtMAStatsConfigGroup,
+                        ciscoLwappMobilityExtNotifyObjectsGroup,
+                        ciscoLwappMobilityExtNotifsGroupRev1,
+                        ciscoLwappMobilityExtMCMAStatsGroup,
+                        cLMobilityExtAnchorConfigGroup
+                    }
+    ::= { ciscoLwappMobilityExtMIBCompliances 5 }
+
 -- *******************************************************************
 -- *    Units of conformance
 -- *******************************************************************
@@ -3065,6 +3295,7 @@ cLMobilityExtConfigGroup OBJECT-GROUP
                         cLMobilityExtMCEnableStatus,
                         cLMobilityExtMCAdminEnableStatus,
                         cLMobilityExtMCMulticastMode,
+                        cLMobilityExtMCMulticastModev6,
                         cLMobilityExtMCKeepAliveCount,
                         cLMobilityExtMCKeepAliveInterval,
                         cLMobilityExtMCDscpValue,
@@ -3073,6 +3304,8 @@ cLMobilityExtConfigGroup OBJECT-GROUP
                         cLMobilityExtMCApCountLicensesInUse,
                         cLMobilityExtMCOwnGroupMulticastAddressType,
                         cLMobilityExtMCOwnGroupMulticastAddress,
+                        cLMobilityExtMCOwnGroupMulticastAddressv6Type,
+                        cLMobilityExtMCOwnGroupMulticastAddressv6,
                         cLMobilityExtMCMobilityGroupName,
                         cLMobilityExtMCMONumberOfClients,
                         cLMobilityExtMCNumberOfMCs,
@@ -3152,6 +3385,10 @@ cLMobilityExtConfigGroup OBJECT-GROUP
                         cLMobilityExtForeignWlcMapRowStatus,
                         cLMobilityExtGroupMulticastAddressType,
                         cLMobilityExtGroupMulticastAddress,
+                        cLMobilityExtGroupMulticastMode,
+                        cLMobilityExtGroupMulticastModev6,
+                        cLMobilityExtGroupMulticastAddressv6Type,
+                        cLMobilityExtGroupMulticastAddressv6,
                         cLMobilityExtGroupRowStatus,
                         cLMobilityExtMAPeerPublicAddressType,
                         cLMobilityExtMAPeerPublicAddress,
@@ -3219,7 +3456,7 @@ ciscoLwappMobilityExtNotifsGroup NOTIFICATION-GROUP
                         ciscoLwappMobilityDataPathDown,
                         ciscoLwappMobilityDataPathUp
                     }
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "This collection of objects provides the information
         about the notifications sent by the agent related
@@ -3233,6 +3470,7 @@ cLMobilityExtConfigGroupRev1 OBJECT-GROUP
                         cLMobilityExtMCEnableStatus,
                         cLMobilityExtMCAdminEnableStatus,
                         cLMobilityExtMCMulticastMode,
+                        cLMobilityExtMCMulticastModev6,
                         cLMobilityExtMCKeepAliveCount,
                         cLMobilityExtMCKeepAliveInterval,
                         cLMobilityExtMCDscpValue,
@@ -3241,6 +3479,8 @@ cLMobilityExtConfigGroupRev1 OBJECT-GROUP
                         cLMobilityExtMCApCountLicensesInUse,
                         cLMobilityExtMCOwnGroupMulticastAddressType,
                         cLMobilityExtMCOwnGroupMulticastAddress,
+                        cLMobilityExtMCOwnGroupMulticastAddressv6Type,
+                        cLMobilityExtMCOwnGroupMulticastAddressv6,
                         cLMobilityExtMCMobilityGroupName,
                         cLMobilityExtMCMONumberOfClients,
                         cLMobilityExtMCNumberOfMCs,
@@ -3254,6 +3494,7 @@ cLMobilityExtConfigGroupRev1 OBJECT-GROUP
                         cLMobilityExtMgrVlanId,
                         cLMobilityExtMgrName,
                         cLMobilityExtMgrInterfaceType,
+                        cLMobilityExtSecureCipherv2,
                         cLMobilityExtNewArchitectureEnableStatus,
                         cLMobilityExtNewArchitectureAdminEnableStatus,
                         cLMobilityExtMCClientAnchorMCPrivateAddressType,
@@ -3318,6 +3559,10 @@ cLMobilityExtConfigGroupRev1 OBJECT-GROUP
                         cLMobilityExtForeignWlcMapRowStatus,
                         cLMobilityExtGroupMulticastAddressType,
                         cLMobilityExtGroupMulticastAddress,
+                        cLMobilityExtGroupMulticastMode,
+                        cLMobilityExtGroupMulticastModev6,
+                        cLMobilityExtGroupMulticastAddressv6Type,
+                        cLMobilityExtGroupMulticastAddressv6,
                         cLMobilityExtGroupRowStatus,
                         cLMobilityExtMAPeerPublicAddressType,
                         cLMobilityExtMAPeerPublicAddress,
@@ -3400,15 +3645,32 @@ ciscoLwappMobilityExtMCMAStatsGroup OBJECT-GROUP
     ::= { ciscoLwappMobilityExtMIBGroups 6 }
 
 cLMobilityExtAnchorConfigGroup OBJECT-GROUP
-    OBJECTS         { cLMobilityExtAnchorPriority }
+    OBJECTS         {
+                       cLMobilityExtAnchorPriority,
+                       cLMobilityExtAnchorStatus,
+                       cLMobilityExtAnchorRowStatus
+                     }
     STATUS          current
     DESCRIPTION
         "This object specifies the priority configured for
         an Anchor WLC mapped on a WLAN."
     ::= { ciscoLwappMobilityExtMIBGroups 7 }
 
+ciscoLwappMobilityExtNotifsGroupRev1 NOTIFICATION-GROUP
+   NOTIFICATIONS    {
+                        ciscoLwappMobilityControlPathDown,
+                        ciscoLwappMobilityControlPathUp,
+                        ciscoLwappMobilityDataPathDown,
+                        ciscoLwappMobilityDataPathUp,
+                        cLGuestWlanAllAnchorsDown,
+                        cLGuestWlanOneAnchorOnGuestLanUp
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects provides the information
+        about the notifications sent by the agent related
+        to mobility and guest anchor."
+    ::= { ciscoLwappMobilityExtMIBGroups 8 }
+
 END
-
-
-
 

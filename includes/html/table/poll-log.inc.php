@@ -1,18 +1,21 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
+use Illuminate\Support\Facades\Gate;
+use LibreNMS\Util\Time;
 
 $param = [];
 $sql = ' FROM `devices` AS D ';
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('viewAll', Device::class)) {
     $sql .= ', devices_perms AS P ';
 }
 
 $sql .= ' LEFT JOIN `locations` as L ON `D`.`location_id`=`L`.`id`';
 $sql .= ' LEFT JOIN `poller_groups` ON `D`.`poller_group`=`poller_groups`.`id`';
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('viewAll', Device::class)) {
     $sql .= " WHERE D.device_id = P.device_id AND P.user_id = '" . Auth::id() . "' AND D.ignore = '0'";
 } else {
     $sql .= ' WHERE 1';
@@ -56,8 +59,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT D.device_id, L.location as `location`, D.hostname AS `hostname`, D.sysName, IFNULL(CONVERT_TZ(D.last_polled, @@global.time_zone, ?),D.last_polled) AS `last_polled`, `group_name`, D.last_polled_timetaken AS `last_polled_timetaken` $sql";
-array_unshift($param, session('preferences.timezone'));
+$sql = "SELECT D.device_id, L.location as `location`, D.hostname AS `hostname`, D.sysName, D.last_polled AS `last_polled`, `group_name`, D.last_polled_timetaken AS `last_polled_timetaken` $sql";
 
 foreach (dbFetchRows($sql, $param) as $device) {
     if (empty($device['group_name'])) {
@@ -65,7 +67,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
     }
     $response[] = [
         'hostname' => generate_device_link($device, null, ['tab' => 'graphs', 'group' => 'poller']),
-        'last_polled' => $device['last_polled'],
+        'last_polled' => Time::format($device['last_polled'], 'compact'),
         'poller_group' => $device['group_name'],
         'location' => $device['location'],
         'last_polled_timetaken' => round($device['last_polled_timetaken'], 2),

@@ -1,4 +1,3 @@
-mib: SOCOMECUPS-MIB
 modules:
     os:
         hardware:

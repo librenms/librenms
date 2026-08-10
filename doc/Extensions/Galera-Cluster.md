@@ -61,7 +61,7 @@ Change the following values for your environment.
 ### Edit LibreNMS .env
 
 LibreNMS supports up to 9 galera nodes, you define these nodes in the .env file. For each node we have the ability to define if this librenms installation/poller is able to write, read or both to that node.
-The galera nodes you define here can be the same or differnt for each librenms poller. If you have a poller you only want to write/read to one galera node, you would simply add one DB_HOST, and omit all the rest. This allows you to precisely control what galera nodes a librenms poller is reading and or writing too.
+The galera nodes you define here can be the same or different for each librenms poller. If you have a poller you only want to write/read to one galera node, you would simply add one DB_HOST, and omit all the rest. This allows you to precisely control what galera nodes a librenms poller is reading and or writing too.
 
 * DB_HOST is always set to read/write.
 * DB_HOST must be set, however, it does not have to be the same on each poller, it can be different as long as it's part of the same galera cluster.

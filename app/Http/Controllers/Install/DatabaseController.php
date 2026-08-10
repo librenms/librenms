@@ -59,12 +59,12 @@ class DatabaseController extends InstallationController implements InstallerStep
     {
         Eloquent::setConnection(
             'setup',
-            $request->get('host', 'localhost'),
-            $request->get('username', 'librenms'),
-            $request->get('password', ''),
-            $request->get('database', 'librenms'),
-            $request->get('port', 3306),
-            $request->get('unix_socket')
+            $request->input('host', 'localhost'),
+            $request->input('username', 'librenms'),
+            $request->input('password', ''),
+            $request->input('database', 'librenms'),
+            $request->input('port', 3306),
+            $request->input('unix_socket')
         );
 
         session()->put('db', Arr::only(config('database.connections.setup', []), self::KEYS));

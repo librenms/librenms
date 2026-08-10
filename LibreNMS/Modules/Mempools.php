@@ -36,6 +36,7 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\MempoolsPolling;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
@@ -52,9 +53,9 @@ class Mempools implements Module
         return [];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     public function discover(OS $os): void
@@ -85,9 +86,9 @@ class Mempools implements Module
         $mempools->each($this->printMempool(...));
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     public function poll(OS $os, DataStorageInterface $datastore): void
@@ -147,10 +148,10 @@ class Mempools implements Module
 
         $mempools->each(function (Mempool $mempool) use ($data): void {
             $mempool->fillUsage(
-                $data[$mempool->mempool_used_oid] ?? null,
-                $data[$mempool->mempool_total_oid] ?? null,
-                $data[$mempool->mempool_free_oid] ?? null,
-                $data[$mempool->mempool_perc_oid] ?? null
+                $data[(string) $mempool->mempool_used_oid] ?? null,
+                $data[(string) $mempool->mempool_total_oid] ?? null,
+                $data[(string) $mempool->mempool_free_oid] ?? null,
+                $data[(string) $mempool->mempool_perc_oid] ?? null
             );
         });
 

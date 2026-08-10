@@ -1,18 +1,25 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Bill;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Billing;
+use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\Url;
 
-$bill_id = $vars['bill_id'];
+$bill_id = (int) ($vars['bill_id'] ?? 0);
+$bill = Bill::find($bill_id);
 
-if (Auth::user()->hasGlobalAdmin()) {
+if ($bill === null) {
+    abort(404);
+}
+
+if (Gate::any(['update', 'delete', 'create'], $bill)) {
     include 'includes/html/pages/bill/actions.inc.php';
 }
 
-if (!Bill::where('bill_id', $bill_id)->exists()) {
-    abort(404);
-} elseif (bill_permitted($bill_id)) {
+if (Gate::allows('view', $bill)) {
     $bill_data = dbFetchRow('SELECT * FROM bills WHERE bill_id = ?', [$bill_id]);
 
     $bill_name = $bill_data['bill_name'];
@@ -52,8 +59,8 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
         $bill_color = '#0000cc';
     }
 
-    $fromtext = dbFetchCell("SELECT DATE_FORMAT($datefrom, '" . \App\Facades\LibrenmsConfig::get('dateformat.mysql.date') . "')");
-    $totext = dbFetchCell("SELECT DATE_FORMAT($dateto, '" . \App\Facades\LibrenmsConfig::get('dateformat.mysql.date') . "')");
+    $fromtext = dbFetchCell("SELECT DATE_FORMAT($datefrom, '" . LibrenmsConfig::get('dateformat.mysql.date') . "')");
+    $totext = dbFetchCell("SELECT DATE_FORMAT($dateto, '" . LibrenmsConfig::get('dateformat.mysql.date') . "')");
     $unixfrom = dbFetchCell("SELECT UNIX_TIMESTAMP('$datefrom')");
     $unixto = dbFetchCell("SELECT UNIX_TIMESTAMP('$dateto')");
 
@@ -67,9 +74,7 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
         [$bill_id]
     );
 
-    if (! $vars['view']) {
-        $vars['view'] = 'quick';
-    }
+    $vars['view'] ??= 'quick';
 
     function print_port_list($ports)
     {
@@ -103,9 +108,13 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
         'transfer' => 'Transfer Graphs',
         'history' => 'Historical Graphs',
     ];
-    if (Auth::user()->hasGlobalAdmin()) {
+    if (Gate::allows('update', $bill)) {
         $menu_options['edit'] = 'Edit';
+    }
+    if (Gate::allows('delete', $bill)) {
         $menu_options['delete'] = 'Delete';
+    }
+    if (Gate::allows('update', $bill)) {
         $menu_options['reset'] = 'Reset';
     }
     $sep = '';
@@ -127,11 +136,11 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
 
     print_optionbar_end();
 
-    if ($vars['view'] == 'edit' && Auth::user()->hasGlobalAdmin()) {
+    if ($vars['view'] == 'edit' && Gate::allows('update', $bill)) {
         include 'includes/html/pages/bill/edit.inc.php';
-    } elseif ($vars['view'] == 'delete' && Auth::user()->hasGlobalAdmin()) {
+    } elseif ($vars['view'] == 'delete' && Gate::allows('delete', $bill)) {
         include 'includes/html/pages/bill/delete.inc.php';
-    } elseif ($vars['view'] == 'reset' && Auth::user()->hasGlobalAdmin()) {
+    } elseif ($vars['view'] == 'reset' && Gate::allows('update', $bill)) {
         include 'includes/html/pages/bill/reset.inc.php';
     } elseif ($vars['view'] == 'history') {
         include 'includes/html/pages/bill/history.inc.php';
@@ -168,13 +177,12 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
             $percent = Number::calculatePercent($total_data, $bill_data['bill_quota']);
             $unit = 'MB';
             $total_data = round($total_data, 2);
-            $background = \LibreNMS\Util\Color::percentage($percent, null);
-            $type = '&amp;ave=yes'; ?>
+            $graph_type = ['ave' => 'yes']; ?>
         <td>
             <?php echo Billing::formatBytes($total_data) ?> of <?php echo Billing::formatBytes($bill_data['bill_quota']) . ' (' . $percent . '%)' ?>
             - Average rate <?php echo Number::formatSi($rate_average, 2, 0, 'bps') ?>
         </td>
-        <td style="width: 210px;"><?php echo print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']) ?></td>
+        <td style="width: 210px;"><?php echo Html::percentageBar(200, 10, $percent, right_text: $percent . '%'); ?></td>
         </tr>
         <tr>
             <td colspan="2">
@@ -188,13 +196,12 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
             $cdr = $bill_data['bill_cdr'];
             $rate_95th = round($rate_95th, 2);
             $percent = Number::calculatePercent($rate_95th, $cdr);
-            $background = \LibreNMS\Util\Color::percentage($percent, null);
-            $type = '&amp;95th=yes'; ?>
+            $graph_type = ['95th' => 'yes']; ?>
         <td>
             <?php echo Number::formatSi($rate_95th, 2, 0, '') . 'bps' ?> of <?php echo Number::formatSi($cdr, 2, 0, '') . 'bps (' . $percent . '%)' ?> (95th%ile)
         </td>
         <td style="width: 210px;">
-            <?php echo print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']) ?>
+            <?php echo Html::percentageBar(200, 10, $percent, right_text: $percent . '%'); ?>
         </td>
         </tr>
         <tr>
@@ -217,64 +224,51 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
         $yesterday = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))');
         $rightnow = date('U');
 
+        $graph_args = [
+            'id' => $bill_id,
+            'width' => 1190,
+            'height' => 250,
+        ];
+        if (isset($graph_type)) {
+            $graph_args = array_merge($graph_args, $graph_type);
+        }
+
         if ($vars['view'] == 'accurate') {
-            $bi = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . htmlspecialchars((string) $_GET['bill_code']);
-            $bi .= '&amp;from=' . $unixfrom . '&amp;to=' . $unixto;
-            $bi .= '&amp;x=1190&amp;y=250';
-            $bi .= "$type'>";
-
-            $li = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . $_GET['bill_code'];
-            $li .= '&amp;from=' . $unix_prev_from . '&amp;to=' . $unix_prev_to;
-            $li .= '&amp;x=1190&amp;y=250';
-            $li .= "$type'>";
-
-            $di = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . htmlspecialchars((string) $_GET['bill_code']);
-            $di .= '&amp;from=' . \App\Facades\LibrenmsConfig::get('time.day') . '&amp;to=' . \App\Facades\LibrenmsConfig::get('time.now');
-            $di .= '&amp;x=1190&amp;y=250';
-            $di .= "$type'>";
-
-            $mi = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . htmlspecialchars((string) $_GET['bill_code']);
-            $mi .= '&amp;from=' . $lastmonth . '&amp;to=' . $rightnow;
-            $mi .= '&amp;x=1190&amp;y=250';
-            $mi .= "$type'>";
+            $graph_args['type'] = 'bill_historicbits';
+            $graph_args['bill_code'] = (string) ($_GET['bill_code'] ?? '');
         } else {
-            $bi = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
-            $bi .= '&amp;from=' . $unixfrom . '&amp;to=' . $unixto;
-            $bi .= '&amp;width=1000&amp;height=200&amp;total=1&amp;dir=' . $dir_95th . "'>";
+            $graph_args['type'] = 'bill_bits';
+            $graph_args['width'] = 1000;
+            $graph_args['height'] = 200;
+            $graph_args['total'] = 1;
+            $graph_args['dir'] = $dir_95th;
+        }
 
-            $li = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
-            $li .= '&amp;from=' . $unix_prev_from . '&amp;to=' . $unix_prev_to;
-            $li .= '&amp;width=1000&amp;height=200&amp;total=1&amp;dir=' . $dir_95th . "'>";
-
-            $di = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
-            $di .= '&amp;from=' . \App\Facades\LibrenmsConfig::get('time.day') . '&amp;to=' . \App\Facades\LibrenmsConfig::get('time.now');
-            $di .= '&amp;width=1000&amp;height=200&amp;total=1&amp;dir=' . $dir_95th . "'>";
-
-            $mi = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
-            $mi .= '&amp;from=' . $lastmonth . '&amp;to=' . $rightnow;
-            $mi .= '&amp;width=1000&amp;height=200&amp;total=1&amp;dir=' . $dir_95th . "'>";
-        }//end if
+        $bi = array_merge($graph_args, ['from' => $unixfrom, 'to' => $unixto]);
+        $li = array_merge($graph_args, ['from' => $unix_prev_from, 'to' => $unix_prev_to]);
+        $di = array_merge($graph_args, ['from' => LibrenmsConfig::get('time.day'), 'to' => LibrenmsConfig::get('time.now')]);
+        $mi = array_merge($graph_args, ['from' => $lastmonth, 'to' => $rightnow]);
 
         ?>
 <div class="panel panel-default">
 <div class="panel-heading">
     <h3 class="panel-title">Billing View</h3>
 </div>
-        <?php echo $bi ?>
+        <?php echo Url::graphTag($bi) ?>
 </div>
 
 <div class="panel panel-default">
 <div class="panel-heading">
     <h3 class="panel-title">24 Hour View</h3>
 </div>
-        <?php echo $di ?>
+        <?php echo Url::graphTag($di) ?>
 </div>
 
 <div class="panel panel-default">
 <div class="panel-heading">
     <h3 class="panel-title">Monthly View</h3>
 </div>
-        <?php echo $mi ?>
+        <?php echo Url::graphTag($mi) ?>
 </div>
         <?php
     } //end if

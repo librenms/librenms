@@ -11,10 +11,6 @@
  * the source code distribution for details.
  */
 
-if (! Auth::user()->hasGlobalAdmin()) {
-    exit('ERROR: You need to be admin');
-}
-
 ?>
 
 <div class="modal fade" id="manage-dependencies" role="dialog" aria-labelledby="mandeps" aria-hidden="true">

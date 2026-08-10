@@ -29,7 +29,7 @@ use LibreNMS\Util\Mac;
  */
 if (empty($fdbPort_table)) { // no empty if come from aos7 script
     // try nokia/ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressDisposition
-    $dot1d = snmpwalk_group($device, 'slMacAddressDisposition', 'ALCATEL-IND1-MAC-ADDRESS-MIB', 0, [], 'nokia');
+    $dot1d = snmpwalk_group($device, 'slMacAddressDisposition', 'ALCATEL-IND1-MAC-ADDRESS-MIB', 0, [], 'nokia/aos6');
     if (! empty($dot1d)) {
         echo 'AOS6 MAC-ADDRESS-MIB: ';
         $fdbPort_table = [];
@@ -49,8 +49,8 @@ if (! empty($fdbPort_table)) {
     // Build dot1dBasePort to port_id dictionary
     $portid_dict = [];
     $dot1dBasePortIfIndex = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
-    foreach ($dot1dBasePortIfIndex as $data) {
-        $portid_dict[$port['ifIndex']] = PortCache::getIdFromIfIndex($data['dot1dBasePortIfIndex'], $device['device_id']);
+    foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
+        $portid_dict[$portLocal] = PortCache::getIdFromIfIndex($data['dot1dBasePortIfIndex'], $device['device_id']);
     }
     // Collect data and populate $insert
     foreach ($fdbPort_table as $vlan => $data) {

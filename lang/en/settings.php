@@ -6,6 +6,7 @@ return [
     'groups' => [
         'alerting' => 'Alerting',
         'api' => 'API',
+        'apps' => 'Applications',
         'auth' => 'Authentication',
         'authorization' => 'Authorization',
         'external' => 'External',
@@ -27,6 +28,12 @@ return [
         'api' => [
             'cors' => ['name' => 'CORS'],
         ],
+        'apps' => [
+            'powerdns-recursor' => ['name' => 'PowerDNS Recursor'],
+            'oslv_monitor' => ['name' => 'OSLV Monitor'],
+            'sneck' => ['name' => 'Sneck'],
+            'ssl-certificates' => ['name' => 'SSL Certificates'],
+        ],
         'auth' => [
             'general' => ['name' => 'General Authentication Settings'],
             'ad' => ['name' => 'Active Directory Settings'],
@@ -34,6 +41,7 @@ return [
             'radius' => ['name' => 'Radius Settings'],
             'socialite' => ['name' => 'Socialite Settings'],
             'http' => ['name' => 'HTTP Auth Settings'],
+            'sso' => ['name' => 'Single Sign-on'],
         ],
         'authorization' => [
             'device-group' => ['name' => 'Device Group Settings'],
@@ -63,6 +71,7 @@ return [
             'snmptrapd' => ['name' => 'SNMP Traps Integration'],
             'rancid' => ['name' => 'RANCID Integration'],
             'collectd' => ['name' => 'Collectd Integration'],
+            'unimus' => ['name' => 'Unimus Integration'],
         ],
         'poller' => [
             'availability' => ['name' => 'Device Availability'],
@@ -71,6 +80,7 @@ return [
             'influxdb' => ['name' => 'Datastore: InfluxDB'],
             'influxdbv2' => ['name' => 'Datastore: InfluxDBv2'],
             'kafka' => ['name' => 'Datastore: Kafka'],
+            'mtu' => ['name' => 'MTU Check'],
             'opentsdb' => ['name' => 'Datastore: OpenTSDB'],
             'ping' => ['name' => 'Ping'],
             'prometheus' => ['name' => 'Datastore: Prometheus'],
@@ -103,6 +113,7 @@ return [
             'front-page' => ['name' => 'Front Page Settings'],
             'menu' => ['name' => 'Menu Settings'],
             'scheduled-maintenance' => ['name' => 'Scheduled Maintenance'],
+            'alert-map' => ['name' => 'Alert Map Settings'],
         ],
     ],
     'settings' => [
@@ -125,21 +136,21 @@ return [
                 'description' => 'Severity',
                 'help' => 'Severity for an Alert',
             ],
-            'max_alerts' => [
-                'description' => 'Max Alerts',
-                'help' => 'Count of Alerts to be sent',
+            'default_operation_steps_to' => [
+                'description' => 'Default operation: Steps to',
+                'help' => 'Default escalation end step for created operation rows (-1 means no limit)',
             ],
-            'delay' => [
-                'description' => 'Delay',
-                'help' => 'Delay before an Alert will be sent',
+            'default_operation_start_in' => [
+                'description' => 'Default operation: Start in',
+                'help' => 'Default delay before an operation notification is sent',
             ],
-            'interval' => [
-                'description' => 'Interval',
-                'help' => 'Interval to be checked for this Alert',
+            'default_operation_step_duration' => [
+                'description' => 'Default operation: Step duration',
+                'help' => 'Default operation step duration (minutes)',
             ],
-            'mute_alerts' => [
-                'description' => 'Mute Alerts',
-                'help' => 'Should Alert only be seen in WebUI',
+            'default_operation_notifications_suppressed' => [
+                'description' => 'Default operation: Suppress notifications',
+                'help' => 'Suppress notifications by default for created operation rows',
             ],
             'invert_rule_match' => [
                 'description' => 'Invert Rule Match',
@@ -292,6 +303,42 @@ return [
                 'port' => [
                     'description' => 'PowerDNS Recursor port',
                     'help' => 'TCP port to use for the PowerDNS Recursor app when connecting directly',
+                ],
+            ],
+            'oslv_monitor' => [
+                'seen_age' => [
+                    'description' => 'Seen age threshold',
+                    'help' => 'Age in seconds after which items are considered stale',
+                ],
+                'linux_pg_memory_stats' => [
+                    'description' => 'Linux page memory stats',
+                    'help' => 'Enable Linux page memory statistics collection',
+                ],
+                'misc_linux_memory_stats' => [
+                    'description' => 'Misc Linux memory stats',
+                    'help' => 'Enable miscellaneous Linux memory statistics collection',
+                ],
+                'zswap_size' => [
+                    'description' => 'ZSwap size stats',
+                    'help' => 'Enable ZSwap size statistics collection',
+                ],
+                'zswap_activity' => [
+                    'description' => 'ZSwap activity stats',
+                    'help' => 'Enable ZSwap activity statistics collection',
+                ],
+                'workingset_stats' => [
+                    'description' => 'Working set stats',
+                    'help' => 'Enable working set statistics collection',
+                ],
+                'thp_activity' => [
+                    'description' => 'THP activity stats',
+                    'help' => 'Enable Transparent Huge Pages activity statistics collection',
+                ],
+            ],
+            'sneck' => [
+                'polling_time_diff' => [
+                    'description' => 'Polling time difference',
+                    'help' => 'Enable polling time difference tracking for Sneck',
                 ],
             ],
         ],
@@ -535,6 +582,16 @@ return [
             'description' => 'Auth log entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
+        'availablity' => [
+            'threshold_ok' => [
+                'description' => 'Availability Ok Threshold',
+                'help' => 'Threshold for green color',
+            ],
+            'threshold_warning' => [
+                'description' => 'Availablilty Warning Threshold',
+                'help' => 'Threshold for orange color',
+            ],
+        ],
         'bad_entity_sensor_regex' => [
             'description' => 'Bad Entity Sensor Regex',
             'help' => 'Regex to match bad entity sensors, these will not be displayed in the web interface.',
@@ -690,8 +747,8 @@ return [
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC Accounting',
+            'mac-accounting' => [
+                'description' => 'MAC Accounting',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
@@ -905,10 +962,6 @@ return [
             'description' => 'Enable Clear Discovery',
             'help' => 'Enables the ability to clear discovery date and time for a device. This will force a rediscovery of the device.',
         ],
-        'enable_footer' => [
-            'description' => 'Enable Footer',
-            'help' => 'Enables the footer on all pages.',
-        ],
         'enable_inventory' => [
             'description' => 'Enable Inventory',
             'help' => 'Enables the inventory page, which shows the hardware inventory of devices.',
@@ -1041,6 +1094,21 @@ return [
             ],
         ],
         'graphs' => [
+            'row' => [
+                'normal' => [
+                    'options' => [
+                        'sixhour' => '6 Hours',
+                        'day' => '24 Hours',
+                        'twoday' => '48 Hours',
+                        'week' => '1 Week',
+                        'twoweek' => '2 Weeks',
+                        'month' => '1 Month',
+                        'twomonth' => '2 Months',
+                        'year' => '1 Year',
+                        'twoyear' => '2 Years',
+                    ],
+                ],
+            ],
             'port_speed_zoom' => [
                 'description' => 'Zoom port graphs to port speed',
                 'help' => 'Zoom port graphs so the max is always the port speed, disabled port graphs zoom to traffic',
@@ -1090,6 +1158,10 @@ return [
                     'description' => 'Query api field',
                     'help' => 'Changes the default field to query graylog API.',
                 ],
+            ],
+            'match-any-address' => [
+                'description' => 'Match any address',
+                'help' => 'This is used to match any address of a device to the source of a graylog log message, by default, only the primary address is used',
             ],
         ],
         'html' => [
@@ -1448,6 +1520,12 @@ return [
         'mtr' => [
             'description' => 'Path to mtr',
         ],
+        'mtu_options' => [
+            'bytes' => [
+                'description' => 'MTU test packet size',
+                'help' => 'Size of packets for MTU test in bytes (blank to disable MTU tests)',
+            ],
+        ],
         'mydomain' => [
             'description' => 'Primary Domain',
             'help' => 'This domain is used for network auto-discovery and other processes. LibreNMS will attempt to append it to unqualified hostnames.',
@@ -1512,9 +1590,6 @@ return [
         'nfsen_suffix' => [
             'description' => 'File name suffix',
             'help' => 'This is a very important bit as device names in NfSen are limited to 21 characters. This means full domain names for devices can be very problematic to squeeze in, so therefor this chunk is usually removed.',
-        ],
-        'nmap' => [
-            'description' => 'Path to nmap',
         ],
         'no_proxy' => [
             'description' => 'Proxy Exceptions',
@@ -1640,10 +1715,6 @@ return [
         'ping' => [
             'description' => 'Path to ping',
         ],
-        'ping_rrd_step' => [
-            'description' => 'Ping Frequency',
-            'help' => 'How often to check. Sets the default value for all nodes. Warning! If you change this you must make additional changes.  Check the Fast Ping docs.',
-        ],
         'poller_modules' => [
             'unix-agent' => [
                 'description' => 'Unix Agent',
@@ -1684,6 +1755,9 @@ return [
             'ports' => [
                 'description' => 'Ports',
             ],
+            'ports-stack' => [
+                'description' => 'Ports Stack',
+            ],
             'bgp-peers' => [
                 'description' => 'BGP Peers',
             ],
@@ -1720,7 +1794,7 @@ return [
             'slas' => [
                 'description' => 'Service Level Agreement Tracking',
             ],
-            'cisco-mac-accounting' => [
+            'mac-accounting' => [
                 'description' => 'Cisco MAC Accounting',
             ],
             'cipsec-tunnels' => [
@@ -1797,6 +1871,10 @@ return [
         'ports_fdb_purge' => [
             'description' => 'Port FDB entries older than',
             'help' => 'Cleanup done by daily.sh',
+        ],
+        'ports_ipv4_neighbours' => [
+            'description' => 'Port IPv4 neighbour lookup method',
+            'help' => 'Method to use for looking up IPv4 neighours when viewing port details.  ARP will use the ARP table to find devices with matching IP and MAC addresses.  Subnet will just look for devices with IP addresses in the same subnet.',
         ],
         'ports_nac_purge' => [
             'description' => 'Port NAC entries older than',
@@ -1908,6 +1986,10 @@ return [
             'description' => 'RANCID Repository Type',
             'help' => 'Type of repository used by RANCID, used to display config diffs on device pages',
         ],
+        'rancid_repo_url' => [
+            'description' => 'RANCID Repository URL',
+            'help' => 'RANCID repository URL, used to point at GitWeb that visualizes a bare Git repository',
+        ],
         'rancid_ignorecomments' => [
             'description' => 'RANCID Ignore Comments',
             'help' => 'Ignore comments when comparing RANCID configs, used to display config diffs on device pages',
@@ -1997,7 +2079,7 @@ return [
                 'help' => 'Discovery task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_discovery_enabled is set to true.',
                 'options' => [
                     'legacy' => 'Legacy (Unrestricted)',
-                    'cron' => 'Cron (discovery.php)',
+                    'cron' => 'Cron (lnms device:discover)',
                     'dispatcher' => 'Dispatcher Service',
                 ],
             ],
@@ -2039,6 +2121,10 @@ return [
         'service_master_timeout' => [
             'description' => 'Master Dispatcher Timeout',
             'help' => 'The amount of time before the master lock expires.  If master goes away, it will take this much time for another node to take over.  However if it takes longer than the timeout to dispatch the work, you will have multiple masters',
+        ],
+        'service_ping_frequency' => [
+            'description' => 'Ping Frequency',
+            'help' => 'How often to run fast ping on all devices.',
         ],
         'service_poller_workers' => [
             'description' => 'Poller Workers',
@@ -2103,9 +2189,6 @@ return [
         'service_health_file' => [
             'description' => 'Service Health File',
             'help' => 'Path to health file to ensure the dispatcher service is running',
-        ],
-        'sfdp' => [
-            'description' => 'Path to sfdp',
         ],
         'shorthost_target_length' => [
             'description' => 'Shortened hostname maximum length',
@@ -2221,6 +2304,86 @@ return [
         'snmpwalk' => [
             'description' => 'Path to snmpwalk',
         ],
+        'ssl_certificates' => [
+            'auto_discover' => [
+                'description' => 'Auto Discover SSL Certificates',
+                'help' => 'Auto discover SSL certificates',
+            ],
+            'skip_hosts' => [
+                'description' => 'Skip Hosts',
+                'help' => 'Skip hosts from SSL certificate discovery',
+            ],
+            'days_until_expiry_warning' => [
+                'description' => 'Warning (days)',
+                'help' => 'Number of days until certificate expiry to trigger a warning',
+            ],
+            'days_until_expiry_danger' => [
+                'description' => 'Danger (days)',
+                'help' => 'Number of days until certificate expiry to trigger a danger alert',
+            ],
+        ],
+        'sso' => [
+            'create_users' => [
+                'description' => 'Create Users',
+                'help' => 'If new users should be created upon login.',
+            ],
+            'descr_attr' => [
+                'description' => 'User Description Attribute',
+                'help' => 'The attribute containing a description of the user.',
+            ],
+            'email_attr' => [
+                'description' => 'Email Attribute',
+                'help' => 'The attribute containing the email address of the user.',
+            ],
+            'group_attr' => [
+                'description' => 'Group Attribute',
+                'help' => 'The attribute containing the groups information if using mapping.',
+            ],
+            'group_delimiter' => [
+                'description' => 'Group Delimiter',
+                'help' => 'The delimiter to use for group information if using the mapping group strategy.',
+            ],
+            'group_filter' => [
+                'description' => 'Group Filter Regexp',
+                'help' => 'Used for filtering group information if using mapping group strategy.',
+            ],
+            'group_level_map' => [
+                'description' => 'Group Level Map',
+                'help' => 'Group to role mapping.',
+            ],
+            'group_strategy' => [
+                'description' => 'Group Strategy',
+                'help' => 'How the group mapping should be done.',
+            ],
+            'level_attr' => [
+                'description' => 'Level Attribute',
+                'help' => 'The attribute to use if using the attribute group strategy.',
+            ],
+            'mode' => [
+                'description' => 'Mode',
+                'help' => 'If it should use the evironment variables or HTTP header.',
+            ],
+            'realname_attr' => [
+                'description' => 'Realname Attribute',
+                'help' => 'The attribute containing the realname of the user.',
+            ],
+            'static_level' => [
+                'description' => 'Static Level',
+                'help' => 'If static is in use, the role level value to use for every one with access.',
+            ],
+            'trusted_proxies' => [
+                'description' => 'Trusted Proxies',
+                'help' => 'A listed of trusted proxies.',
+            ],
+            'update_users' => [
+                'description' => 'Update Users',
+                'help' => 'If users should be updated upon login.',
+            ],
+            'user_attr' => [
+                'description' => 'User Attribute',
+                'help' => 'The attribute containing the username.',
+            ],
+        ],
         'storage_perc_warn' => [
             'description' => 'Default Storage Percentage Warning',
             'help' => 'Default Percentage of storage used before a warning is raised. 0 disables warning.',
@@ -2247,6 +2410,23 @@ return [
             'description' => 'Two-Factor Throttle Time (seconds)',
             'help' => 'Lock-out time to wait in seconds before allowing further attempts if Two-Factor authentication is failed 3 times consecutively - will prompt user to wait this long.  Set to 0 to disable resulting in a permanent account lock-out and a message to user to contact administrator',
         ],
+        'unimus' => [
+            'api_version' => [
+                'description' => 'Unimus API version',
+            ],
+            'enabled' => [
+                'description' => 'Enable Unimus support',
+                'help' => 'Show device configuration backups from Unimus on the device Config tab',
+            ],
+            'token' => [
+                'description' => 'Unimus API token',
+                'help' => 'API token created in Unimus (Basic / read-only access is sufficient)',
+            ],
+            'url' => [
+                'description' => 'Unimus URL',
+                'help' => 'Base URL of your Unimus server, for example: http://unimus.example.com:8085',
+            ],
+        ],
         'unix-agent' => [
             'connection-timeout' => [
                 'description' => 'Unix-agent connection timeout',
@@ -2269,6 +2449,10 @@ return [
                 'release' => 'Monthly',
             ],
         ],
+        'update_on_days' => [
+            'description' => 'Only run updates on these days',
+            'help' => 'If set (non-empty), daily.sh will only run code updates when today matches one of these values: monday-sunday or mon-sun. Leave empty to allow updates every day.',
+        ],
         'uptime_warning' => [
             'description' => 'Show Device as warning if Uptime below (seconds)',
             'help' => 'Shows Device as warning if Uptime is below this value. Custom maps status will reflect this setting. 0 disables warning. Default 24h',
@@ -2284,6 +2468,22 @@ return [
             'scheduled_maintenance_default_behavior' => [
                 'description' => 'Default Behaviour',
                 'help' => 'When managing scheduled maintenances, this will be the default option for the Behavior option.',
+            ],
+            'alert_map_compact' => [
+                'description' => 'Alert map compact view',
+                'help' => 'Alert map view with small indicators',
+            ],
+            'alert_map_sort_status' => [
+                'description' => 'Sort by status',
+                'help' => 'Sort alerts by status',
+            ],
+            'alert_map_use_device_groups' => [
+                'description' => 'Use device groups filter',
+                'help' => 'Enable usage of device groups filter',
+            ],
+            'alert_map_box_size' => [
+                'description' => 'Alert box width',
+                'help' => 'Input desired tile width in pixels for box size in full view',
             ],
             'availability_map_box_size' => [
                 'description' => 'Availability box width',
@@ -2316,6 +2516,30 @@ return [
             'global_search_result_limit' => [
                 'description' => 'Set the max search result limit',
                 'help' => 'Global search results limit',
+            ],
+            'global_search.arp' => [
+                'description' => 'Global search ARP',
+                'help' => 'Find where devices are connected by searching your devices ARP caches',
+            ],
+            'global_search.fdb' => [
+                'description' => 'Global search FDB entries',
+                'help' => 'Find where devices are connected by searching your devices bridge forwarding tables',
+            ],
+            'global_search.eventlogs' => [
+                'description' => 'Global search event logs',
+                'help' => 'Find matching event logs in the global search results',
+            ],
+            'global_search.health' => [
+                'description' => 'Global search health',
+                'help' => 'Find matching health sensors in the global search results',
+            ],
+            'global_search.ports' => [
+                'description' => 'Global search ports',
+                'help' => 'Find matching ports in the global search results',
+            ],
+            'global_search.routing' => [
+                'description' => 'Global search route peers',
+                'help' => 'Find matching routing peers in the global search results',
             ],
             'graph_stacked' => [
                 'description' => 'Use stacked graphs',
@@ -2360,8 +2584,9 @@ return [
             'description' => 'Show devices dependecies on location map',
             'help' => 'Show links between devices on the location map based on parent dependencies',
         ],
-        'whois' => [
-            'description' => 'Path to whois',
+        'device_stats_avg_factor' => [
+            'description' => 'Averaging factor',
+            'help' => 'We calculate a moving average using an exponential weighted moving average function.  This is the factor used by the function to control how much the current value affects the average.  Values closer to 1 will make the average change quicker.',
         ],
         'smokeping.integration' => [
             'description' => 'Enable',
@@ -2388,6 +2613,7 @@ return [
         'days' => 'days',
         'ms' => 'ms',
         'seconds' => 'seconds',
+        'percent' => '%',
     ],
     'validate' => [
         'boolean' => ':value is not a valid boolean',
@@ -2399,6 +2625,7 @@ return [
         'select' => ':value is not an allowed value',
         'text' => ':value is not allowed',
         'array' => 'Invalid format',
+        'password-array' => 'Invalid format',
         'executable' => ':value is not a valid executable',
         'directory' => ':value is not a valid directory',
     ],

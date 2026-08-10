@@ -1,0 +1,3903 @@
+-- ****************************************************************************
+-- * APC cPDU SNMP MIB DEFINITIONS
+-- * $Date: 8 MAY 2025 06:00:00 $
+-- * $Revision: 1.9 $
+--   Revised 
+--   -> Line to Line OID addition
+-- ****************************************************************************
+-- * APC cPDU SNMP MIB DEFINITIONS
+-- * $Date: 27 AUGUST 2024 09:00:00 $
+-- * $Revision: 1.8 $
+--   Revised 
+--   Confidential - Need To Know
+-- ****************************************************************************
+--
+--      APC cPDU SNMP 
+--      Management Information Base for SNMP Network Management for PDU
+--
+--      Copyright (c) 2021 APC
+--
+--      The APC Enterprise number is 318.
+--      The ASN.1 prefix to, and including the APC is:
+--           1.3.6.1.4.1.318
+--
+--      MIB Version 1.7
+--
+--    *********************************************************************
+--    Release History
+--		
+-- 		Added following OIDs to mib table.(27 AUGUST 2024)
+--		-> pduUnitConfigUsb - Displays/Configures USB status enbaled or disabled.
+--		-> pduUnitConfigDaisyChainState - Displays/Configures Daisychain state as QNA or RNA.
+--		-> pduUnitConfigTelnet - Displays/Configure status of Telnet feature as ON or OFF.
+--		-> pduUnitPsSupportUpstreamStatus - Deprecated.
+--		-> pduUnitPsSupportDownstreamStatus - Deprecated.
+--		-> pduUnitPsFunc - Displays/Configures Power Share Functionality as Enable or Disable.
+--		-> pduUnitPsBackupProtection - Displays Power Share support status from adjacent PDUs.
+--		-> pduUnitPsOutput - Displays Power Share support status to adjacent PDU.
+--		-> pduExternalSensorConfigAlarmResetThreshold - Displays/Configures sensors reset threshold value.
+--		-> pduExternalSensorConfigAlarmStateChangeDelay - Displays/Configures sensors state change delay value.
+--		-> pduExternalSensorSTATUSAisle - Displays Aisle status as hot or cold.
+--
+-- 		Added following OIDs to mib table.
+--		-> pduNamePlateIPV6Address - Displays both Local and Global address of IPV6.
+--		-> pduNamePlateHWVersion - Displays Hardware version of the PDU.
+--      -> pduUnitStatusPowerFactor - Displays Power Factor value of total PDU.
+--		-> pduCircuitBreakerStatusPowerFactor - Displays Power Factor value of circuit breaker.
+--		-> pduInputPhaseStatusPowerFactor - Displays Power Factor value of each Phases.
+--    *********************************************************************
+-- ===================================================================================
+-- sysDescr (1.3.6.1.2.1.1.1) which is defined in RFC1213.MIB.
+-- sysObjectID (1.3.6.1.2.1.1.2) which is defined in RFC1213.MIB.
+-- sysContact (1.3.6.1.2.1.1.4) which is defined in RFC1213.MIB.
+-- sysName (1.3.6.1.2.1.1.5) is which is defined in RFC1213.MIB.
+-- sysLocation (1.3.6.1.2.1.1.6) which is defined in RFC1213.MIB.
+-- 
+-- sysDescr OBJECT-TYPE
+--     SYNTAX  DisplayString (SIZE (0..255))
+--     ACCESS  read-only
+--     STATUS  mandatory
+--     DESCRIPTION
+--             "A textual description of the entity.  This value
+--             should include the full name, hardware version and
+--             firmware version of management module's.
+--             It is mandatory that this only contain
+--             printable ASCII characters."
+--     ::= { system 1 }
+--
+-- sysObjectID OBJECT-TYPE
+--     SYNTAX  DisplayString (SIZE (0..255))
+--     ACCESS  read-write
+--     STATUS  mandatory
+--     DESCRIPTION
+--             "Return the OID of the management module for PDU defined in the APC.MIB
+--             i.e. .1.3.6.1.4.1.318.1.1.32 is for OIDs."
+--     ::= { system 2 }
+--
+-- sysContact OBJECT-TYPE
+--     SYNTAX  DisplayString (SIZE (0..255))
+--     ACCESS  read-write
+--     STATUS  mandatory
+--     DESCRIPTION
+--             "The textual identification of the contact person
+--             for this managed node, together with information
+--             on how to contact this person."
+--     ::= { system 4 }
+--
+-- sysName OBJECT-TYPE
+--     SYNTAX  DisplayString (SIZE (0..255))
+--     ACCESS  read-write
+--     STATUS  mandatory
+--     DESCRIPTION
+--             "An administratively-assigned name for this
+--             managed node.  By convention, this is the node's
+--             fully-qualified domain name."
+--     ::= { system 5 }
+--
+-- sysLocation OBJECT-TYPE
+--     SYNTAX  DisplayString (SIZE (0..255))
+--     ACCESS  read-write
+--     STATUS  mandatory
+--     DESCRIPTION
+--             "The physical location of this node (e.g.,
+--             `telephone closet, 3rd floor')."
+--     ::= { system 6 }
+--
+-- ====================================================================================
+--
+-- ====================================================================================
+PowerNet-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   enterprises, IpAddress, Gauge, TimeTicks             FROM RFC1155-SMI
+   DisplayString, sysDescr                              FROM RFC1213-MIB
+   SnmpAdminString                                      FROM SNMP-FRAMEWORK-MIB
+   OBJECT-TYPE                                          FROM RFC-1212
+   TRAP-TYPE                                            FROM RFC-1215
+   InetAddressType                                      FROM INET-ADDRESS-MIB
+   InetAddress                                          FROM INET-ADDRESS-MIB
+   MacAddress                                           FROM SNMPv2-TC;
+-- IMPORTS End
+
+apc						OBJECT IDENTIFIER 		::= { enterprises 318 }
+
+products				OBJECT IDENTIFIER 		::=  { apc 1 }
+
+hardware				OBJECT IDENTIFIER 		::=  { products 1 }
+
+cPDU					OBJECT IDENTIFIER 		::=  { hardware 32 }
+-- ++++ Start of cPDU ++++
+
+pduNamePlate			OBJECT IDENTIFIER       ::= { cPDU 1 }
+pduUnit					OBJECT IDENTIFIER       ::= { cPDU 2 }
+pduInputPhase			OBJECT IDENTIFIER       ::= { cPDU 3 }
+pduCircuitBreaker		OBJECT IDENTIFIER       ::= { cPDU 4 }
+pduOutlet				OBJECT IDENTIFIER       ::= { cPDU 5 }
+pduExternalSensor  	  	OBJECT IDENTIFIER       ::= { cPDU 6 }
+pduSmartCabinet  	  	OBJECT IDENTIFIER       ::= { cPDU 7 }
+pduTraps		  		OBJECT IDENTIFIER       ::= { cPDU 8 }
+pduEhandle				OBJECT IDENTIFIER 		::= { cPDU 9 }
+
+-- Start pduNamePlate
+
+pduNamePlateTableSize  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The total number of PDUs"
+	::= { pduNamePlate 1 }
+
+-- pduNamePlateTable
+pduNamePlateTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduNamePlateEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of PDU nameplate data"
+	::= { pduNamePlate 2 }
+	
+pduNamePlateEntry  OBJECT-TYPE
+	SYNTAX 	PduNamePlateEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"Nameplate data from the PDU being queried. The numbers of entries equals the value of pduNamePlateTableSize."
+	INDEX { pduNamePlateIndex }
+	::= { pduNamePlateTable 1 }
+
+PduNamePlateEntry ::= SEQUENCE {
+	pduNamePlateIndex
+		Integer32,
+	pduNamePlateName
+		DisplayString,
+	pduNamePlateLocation
+		DisplayString,
+	pduNamePlateInetAddressType
+		INTEGER,
+	pduNamePlateIPAddress
+		InetAddress,
+	pduNamePlateInetNetMask
+		InetAddress,
+	pduNamePlateInetGateway
+		InetAddress,
+	pduNamePlateMACAddress
+		MacAddress,
+	pduNamePlateUTCTimeOffset
+		DisplayString,
+	pduNamePlateModelNumber
+		DisplayString,
+	pduNamePlatePartNumber
+		DisplayString,
+	pduNamePlateSerialNumber
+		DisplayString,
+	pduNamePlateDateofManufacture
+		DisplayString,
+	pduNamePlateFirmwareVersion
+		DisplayString,
+	pduNamePlateFirmwareVersionTimeStamp
+		DisplayString,
+	pduNamePlateType
+		INTEGER,
+	pduNamePlateIPV6Address
+		DisplayString,
+	pduNamePlateHWVersion
+		DisplayString
+	}
+
+pduNamePlateIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU nameplate table entry"
+	::= { pduNamePlateEntry 1 }
+	
+pduNamePlateName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"A user-defined string identifying the PDU"
+	::= { pduNamePlateEntry 2 }
+	
+pduNamePlateLocation  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"A user-defined string identifying the location of PDU"
+	::= { pduNamePlateEntry 3 }
+
+pduNamePlateInetAddressType  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The type of address format"
+	::= { pduNamePlateEntry 4 }
+	
+pduNamePlateIPAddress  OBJECT-TYPE
+	SYNTAX 	InetAddress
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The current IP address. A value of 0.0.0.0 indicates an error or an unset option"
+	::= { pduNamePlateEntry 5 }
+	
+pduNamePlateInetNetMask  OBJECT-TYPE
+	SYNTAX 	InetAddress
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The current netmask. A value of 0.0.0.0 indiates an error or an unset option"
+	::= { pduNamePlateEntry 6 }
+	
+pduNamePlateInetGateway  OBJECT-TYPE
+	SYNTAX 	InetAddress
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The current gateway. A value of 0.0.0.0 indicates an error or an unset option"
+	::= { pduNamePlateEntry 7 }
+	
+pduNamePlateMACAddress  OBJECT-TYPE
+	SYNTAX 	MacAddress
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The assigned MAC address for the PDU"
+	::= { pduNamePlateEntry 8 }
+	
+pduNamePlateUTCTimeOffset  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The difference in hours and minutes from Coordinated Universal 
+		Time(UTC) for the time used in a particular time zone"
+	::= { pduNamePlateEntry 9 }
+	
+pduNamePlateModelNumber  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The PDU model number"
+	::= { pduNamePlateEntry 10 }
+pduNamePlatePartNumber  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The PDU part number"
+	::= { pduNamePlateEntry 11 }
+	
+pduNamePlateSerialNumber  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The PDU serial number"
+	::= { pduNamePlateEntry 12 }
+	
+pduNamePlateDateofManufacture  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The date the PDU was manufactured in mm/dd/yyyy format"
+	::= { pduNamePlateEntry 13 }
+
+pduNamePlateFirmwareVersion  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The PDU firmware version"
+	::= { pduNamePlateEntry 14 }
+	
+pduNamePlateFirmwareVersionTimeStamp  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Timestamp of when the PDU firmware was last updated"
+	::= { pduNamePlateEntry 15 }
+	
+pduNamePlateType  OBJECT-TYPE
+	SYNTAX 	INTEGER {singlePhase (1),delta (2),wye (3)}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The type of input"
+	::= { pduNamePlateEntry 16 }
+	
+pduNamePlateIPV6Address  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The current IPV6 address. A value of 0.0.0.0 indicates an error or an unset option"
+::= { pduNamePlateEntry 17 }
+
+pduNamePlateHWVersion OBJECT-TYPE 
+    SYNTAX DisplayString 
+    MAX-ACCESS read-only 
+    STATUS current 
+    DESCRIPTION 
+        "Displays Hardware version of the PDU." 
+    ::= { pduNamePlateEntry 18 }
+	
+-- Start pduUnit
+
+pduUnitTableSize  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The number of units."
+	::= { pduUnit 1 }
+	
+pduUnitConfigTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduUnitConfigEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of PDU configuration data"
+	::= { pduUnit 2 }
+	
+pduUnitConfigEntry  OBJECT-TYPE
+	SYNTAX 	PduUnitConfigEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"Configuration data from the PDU being queried. The number of entries equals the value of pduUnitTableSize"
+	INDEX { pduUnitConfigIndex }
+	::= { pduUnitConfigTable 1 }
+
+PduUnitConfigEntry ::= SEQUENCE {
+	pduUnitConfigIndex
+		Integer32,
+	pduUnitConfigName
+		DisplayString,
+	pduUnitConfigLocation
+		DisplayString,
+	pduUnitConfigDisplayOrientation
+		INTEGER,
+	pduUnitConfigOledDisplayControl
+		INTEGER,
+	pduUnitConfigColdstartDelay
+		Unsigned32,
+	pduUnitConfigGlobalOutletStateOnStartup
+		INTEGER,
+	pduUnitConfigLowerCriticalThreshold
+		Unsigned32,
+	pduUnitConfigLowerWarningThreshold
+		Unsigned32,
+	pduUnitConfigUpperCriticalThreshold
+		Unsigned32,
+	pduUnitConfigUpperWarningThreshold
+		Unsigned32,
+	pduUnitConfigAlarmResetThreshold
+		Unsigned32,
+	pduUnitConfigAlarmStateChangeDelay
+		Unsigned32,
+	pduUnitConfigEnabledThresholds
+		BITS,
+	pduUnitConfigPeakPowerReset
+		INTEGER,
+	pduUnitConfigEnergyReset
+		INTEGER,
+	pduUnitConfigOutletPeakPowerReset
+		INTEGER,
+	pduUnitConfigOutletEnergyReset
+		INTEGER,
+	pduUnitConfigSsh
+		INTEGER,
+	pduUnitConfigResetNetworkManagementCard
+		INTEGER,
+	pduUnitConfigUsb
+		INTEGER,
+	pduUnitConfigDaisyChainState
+		INTEGER,
+	pduUnitConfigTelnet
+		INTEGER	
+	}
+
+pduUnitConfigIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU Unit Config Entry"
+	::= { pduUnitConfigEntry 1 }
+	
+pduUnitConfigName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"A user-defined string identifying the PDU"
+	::= { pduUnitConfigEntry 2 }
+	
+pduUnitConfigLocation  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"A user-defined string identifying the location of the PDU"
+	::= { pduUnitConfigEntry 3 }
+	
+pduUnitConfigDisplayOrientation  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		displayNormal (1),
+		displayReverse (2)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Indicates the intended physical orientation of the oLED display
+		displayNormal (1) indicates normal orientation. 
+		displayReverse (2) indicates upside down orientation
+		NOTE:
+		This OID is compatible only with the two display NMC module.  It does not work with the single display NMC module."
+	::= { pduUnitConfigEntry 4 }
+
+pduUnitConfigOledDisplayControl  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		displayOff (1),
+		displayOn (2)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Used to turn oled display On or Off
+		displayOff (1) to turn dispaly OFF. 
+		displayOn (2) to turn dispaly ON"
+	::= { pduUnitConfigEntry 5 }
+	
+pduUnitConfigColdstartDelay  OBJECT-TYPE
+	SYNTAX 	Unsigned32 (0..3600)
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The amount of time, specified in seconds, between when power 
+		is provided to the PDU and when the PDU start providing basic master
+		power to the outlets"
+	::= { pduUnitConfigEntry 6 }
+	
+pduUnitConfigGlobalOutletStateOnStartup  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		off (0),
+		on (1),
+		lastKnownState (2)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The outlet state on device startup; applies to all outlets 
+		unless overridden at the outlet level"
+	::= { pduUnitConfigEntry 7 }
+	
+pduUnitConfigLowerCriticalThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined lower critical unit active power alarm threshold measured in Watts"
+	::= { pduUnitConfigEntry 8 }
+	
+pduUnitConfigLowerWarningThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined lower non-critical (warning) unit active power alarm threshold measured in Watts"
+	::= { pduUnitConfigEntry 9 }
+	
+pduUnitConfigUpperCriticalThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined upper critical unit active power alarm threshold measured in Watts"
+	::= { pduUnitConfigEntry 10 }
+	
+pduUnitConfigUpperWarningThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined upper non-critical (warning) unit active power alarm threshold measured in Watts"
+	::= { pduUnitConfigEntry 11 }
+	
+pduUnitConfigAlarmResetThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The hysteresis used for deassertions in Watts"
+	::= { pduUnitConfigEntry 12 }
+	
+pduUnitConfigAlarmStateChangeDelay  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The delay measured in samples before a state is asserted. If the value is zero, then the state is asserted as soon as it is detected; if it is non-zero, say n, then the assertion condition must exist for n+1 consecutive samples before the corresponding assertion event is reported."
+	::= { pduUnitConfigEntry 13 }
+	
+pduUnitConfigEnabledThresholds  OBJECT-TYPE
+	SYNTAX 	BITS {
+		lowerCritical (0),
+		lowerWarning (1),
+		upperWarning  (2),
+		upperCritical (3)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"A bit string indicating which alarm thresholds are enabled"
+	::= { pduUnitConfigEntry 14 }
+	
+pduUnitConfigPeakPowerReset  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		noOperation (1),
+		reset (2)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Setting this OID to reset (2) will cause the existing peak power value 
+		to be replaced by the current load power value. Getting this OID will 
+		do nothing and return the noOperation(1) value. "
+	::= { pduUnitConfigEntry 15 }
+	
+pduUnitConfigEnergyReset  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		noOperation (1),
+		reset (2),
+		notSupported (3)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Setting this OID to reset (2) will cause the device energy meter value 
+		to be reset to zero. Getting this OID in models that support this 
+		feature will do nothing and return the noOperation(1) value. Models 
+		that do not support this feature will respond to this OID with a 
+		value of notSupported (3). Attempts to set this OID in these models will fail. "
+	::= { pduUnitConfigEntry 16 }
+
+pduUnitConfigOutletPeakPowerReset  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		noOperation (1),
+		reset (2),
+		notSupported (3)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Setting this OID to reset (2) will cause the outlet peak power meter value 
+		to be reset to zero. Getting this OID in models that support this 
+		feature will do nothing and return the noOperation(1) value. Models 
+		that do not support this feature will respond to this OID with a 
+		value of notSupported (3). Attempts to set this OID in these models will fail. "
+	::= { pduUnitConfigEntry 17 }
+
+pduUnitConfigOutletEnergyReset  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		noOperation (1),
+		reset (2),
+		notSupported (3)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Setting this OID to reset (2) will cause the outlet energy meter value 
+		to be reset to zero. Getting this OID in models that support this 
+		feature will do nothing and return the noOperation(1) value. Models 
+		that do not support this feature will respond to this OID with a 
+		value of notSupported (3). Attempts to set this OID in these models will fail. "
+	::= { pduUnitConfigEntry 18 }
+
+pduUnitConfigSsh  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		off (0),
+		on (1)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Setting this OID to off(0) will disable the SSH connection.  Setting this OID to on(1) will enable the SSH connection."
+	::= { pduUnitConfigEntry 19 }
+	
+pduUnitConfigResetNetworkManagementCard  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		noOperation (0),
+		reset (1)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Getting this OID will return noOperation(0). Setting this OID to reset(1) will reset NMC."
+	::= { pduUnitConfigEntry 20 }
+	
+pduUnitConfigUsb  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		off (0),
+		on (1)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Setting this OID to off(0) will disable the USB port.  Setting this OID to on(1) will enable the USB port."
+	::= { pduUnitConfigEntry 21 }
+	
+pduUnitConfigDaisyChainState	OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		daisychainqna (0),
+		daisychainrna (1)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Setting this OID to 0 will enable daisychain qna mode.
+		 Setting this OID to 1 will enable daisychain rna mode. Should be applied on last pdu in DaisyChain"
+	::= { pduUnitConfigEntry 22 }
+	 
+pduUnitConfigTelnet  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		off (0),
+		on (1)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Setting this OID to off(0) will disable the Telnet connection.  Setting this OID to on(1) will enable the Telnet connection.
+		 Changes made will take effect only after reboot."
+	::= { pduUnitConfigEntry 23 }
+	
+pduUnitPropertiesTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduUnitPropertiesEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of PDU properties"
+	::= { pduUnit 3 }
+	
+pduUnitPropertiesEntry  OBJECT-TYPE
+	SYNTAX 	PduUnitPropertiesEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A unit properties entry containing objects for a particular unit."
+	INDEX { pduUnitPropertiesIndex }
+	::= { pduUnitPropertiesTable 1 }
+
+PduUnitPropertiesEntry ::= SEQUENCE {
+	pduUnitPropertiesIndex
+		Integer32,
+	pduUnitPropertiesName
+		DisplayString,
+	pduUnitPropertiesOutletCount
+		Integer32,
+	pduUnitPropertiesSwitchedOutletCount
+		Integer32,
+	pduUnitPropertiesMeteredOutletCount
+		Integer32,
+	pduUnitPropertiesInputPhaseCount
+		Integer32,
+	pduUnitPropertiesCircuitBreakerCount
+		Integer32,
+	pduUnitPropertiesMaxExternalSensorCount
+		Integer32,
+	pduUnitPropertiesConnExternalSensorCount
+		Integer32,
+	pduUnitPropertiesRatedVoltage
+		DisplayString,
+	pduUnitPropertiesRatedMaxCurrent
+		DisplayString,
+	pduUnitPropertiesRatedFrequency
+		DisplayString,
+	pduUnitPropertiesRatedPower
+		DisplayString,
+	pduUnitPropertiesOrientation
+		INTEGER,
+	pduUnitPropertiesOutletLayout
+		INTEGER,
+	pduUnitPropertiesCascadeMemberType
+		INTEGER
+	}
+
+pduUnitPropertiesIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU properties table entry"
+	::= { pduUnitPropertiesEntry 1 }
+	
+pduUnitPropertiesName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"A user-defined string identifying the PDU"
+	::= { pduUnitPropertiesEntry 2 }
+	
+pduUnitPropertiesOutletCount  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The total number of outlets on the PDU"
+	::= { pduUnitPropertiesEntry 3 }
+	
+pduUnitPropertiesSwitchedOutletCount  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The total number of switched outlets on the PDU"
+	::= { pduUnitPropertiesEntry 4 }
+	
+pduUnitPropertiesMeteredOutletCount  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The total number of metered outlets on the PDU"
+	::= { pduUnitPropertiesEntry 5 }
+	
+pduUnitPropertiesInputPhaseCount  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The total number of phases on the PDU"
+	::= { pduUnitPropertiesEntry 6 }
+
+pduUnitPropertiesCircuitBreakerCount  OBJECT-TYPE
+	SYNTAX 	Integer32 (0..255)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The total number of circuit breaker on the PDU"
+	::= { pduUnitPropertiesEntry 7 }
+	
+pduUnitPropertiesMaxExternalSensorCount  OBJECT-TYPE
+	SYNTAX 	Integer32 (0..255)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The maximum number of external sensors that can be connected to the PDU"
+	::= { pduUnitPropertiesEntry 8 }
+	
+pduUnitPropertiesConnExternalSensorCount  OBJECT-TYPE
+	SYNTAX 	Integer32 (0..255)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The current number of external sensors connected to the PDU"
+	::= { pduUnitPropertiesEntry 9 }
+	
+pduUnitPropertiesRatedVoltage  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The PDU voltage rating in Volts"
+	::= { pduUnitPropertiesEntry 10 }
+	
+pduUnitPropertiesRatedMaxCurrent  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The PDU current rating in Amps"
+	::= { pduUnitPropertiesEntry 11 }
+	
+pduUnitPropertiesRatedFrequency  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The PDU frequency rating in Hz"
+	::= { pduUnitPropertiesEntry 12 }
+	
+pduUnitPropertiesRatedPower  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The PDU VA (VoltAmps) rating."
+	::= { pduUnitPropertiesEntry 13 }
+	
+pduUnitPropertiesOrientation  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		horizontal (1),
+		vertical (2)
+	}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The PDU orientation "
+	::= { pduUnitPropertiesEntry 14 }
+	
+pduUnitPropertiesOutletLayout  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		seqPhaseToNuetral (1),
+		seqPhaseToPhase (2),
+		seqPhToNeu21PhToPh (3),
+		seqPhToPhGrouped (4),
+		seqPhToNGrouped (5),
+		seqPToN1516PToPGrouped (6),
+		seqPhToPh2xGrouped (7),
+		seqPhToN2xGrouped (8),
+		seqNotApplicable (9)
+	}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The outlet layout for the PDU. Getting this OID will return outlet layout for the device.
+		seqPhaseToNeutral(1) indicates outlet layout as follows:
+		1:1-N,2:2-N,3:3-N,4:1-N,5:2-N,...
+		seqPhaseToPhase(2) indicates outlet layout as follows:
+		1:1-2,2:2-3,3:3-1,4:1-2,5:2-3,...
+		seqPhToNeu21PhToPh(3) indicates outlet layout as follows:
+		1:1-N,2:2-N...21:3-N,22:1-2,23:2-3,24:3-1,...
+		seqPhToPhGrouped(4) indicates outlet layout as follows:
+		This unit has 3 outlet groups.  Group 1:1-2, Group 2:2-3, Group 3:3-1.
+		seqPhToNGrouped(5) indicates outlet layout as follows:
+		This unit has 3 outlet groups.  Group 1:1-N, Group 2:2-N, Group 3:3-N.
+		seqPToN1516PToPGrouped(6) indicates outlet layout as follows:
+		This unit has 4 outlet groups. Group 1 (Outlets 1-14):1-2,
+		Group 2 (Outlets 15-16):1-N, Group 3:2-3, Group 4:3-1.
+		seqPhToPh2xGrouped(7) indicates outlet layout as follows:
+		This unit has 6 outlet groups.  Group 1:1-2, Group 2:1-2, Group 3:2-3,
+		Group 4:2-3, Group 5:3-1, Group 6:3-1.
+		seqPhToN2xGrouped(8) indicates outlet layout as follows:
+		This unit has 6 outlet groups.  Group 1:1-N, Group 2:1-N, Group 3:2-N,
+		Group 4:2-N, Group 5:3-N, Group 6:3-N.
+		seqNotApplicable(9):"
+	::= { pduUnitPropertiesEntry 15 }
+	
+pduUnitPropertiesCascadeMemberType  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		standalone (1),
+		parent (2),
+		child (3)
+	}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The cascading member type"
+	::= { pduUnitPropertiesEntry 16 }
+		
+pduUnitStatusTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduUnitStatusEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of PDU status information"
+	::= { pduUnit 4 }
+	
+pduUnitStatusEntry  OBJECT-TYPE
+	SYNTAX 	PduUnitStatusEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"Status information from the PDU being queried"
+	INDEX { pduUnitStatusIndex }
+	::= { pduUnitStatusTable 1 }
+
+PduUnitStatusEntry ::= SEQUENCE {
+	pduUnitStatusIndex
+		Integer32,
+	pduUnitStatusName
+		DisplayString,
+	pduUnitStatusLoadState
+		INTEGER,
+	pduUnitStatusActivePower
+		Integer32,
+	pduUnitStatusApparentPower
+		Integer32,
+	pduUnitStatusPeakPower
+		Integer32,
+	pduUnitStatusPeakPowerTimestamp
+		DisplayString,
+	pduUnitStatusPeakPowerStartTime
+		DisplayString,
+	pduUnitStatusEnergy
+		Integer32,
+	pduUnitStatusResettableEnergy
+		Integer32,
+	pduUnitStatusEnergyStartTime
+		DisplayString,
+	pduUnitStatusOutletsEnergyStartTime
+		DisplayString,
+	pduUnitStatusPowerFactor
+		Integer32
+	}
+
+pduUnitStatusIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU status table entry"
+	::= { pduUnitStatusEntry 1 }
+	
+pduUnitStatusName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"A user-defined string identifying the PDU"
+	::= { pduUnitStatusEntry 2 }
+	
+pduUnitStatusLoadState  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		upperCritical (1),
+		upperWarning (2),
+		lowerWarning (3),
+		lowerCritical (4),
+		normal (5)
+	}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Returns the present load status of the PDU based on Active Power."
+	::= { pduUnitStatusEntry 3 }
+	
+pduUnitStatusActivePower  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Returns power consumption, in Watts(W), 
+		of the PDU being queried."
+	::= { pduUnitStatusEntry 4 }
+
+pduUnitStatusApparentPower  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Returns power consumption, in Volt-Amps(VA) 
+		of the PDU load being queried."
+	::= { pduUnitStatusEntry 5 }
+	
+pduUnitStatusPeakPower  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Returns peak power consumption, in Watts(W), 
+		of the PDU being queried."
+	::= { pduUnitStatusEntry 6 }
+	
+pduUnitStatusPeakPowerTimestamp  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Indicates the date and time that peak power consumption occurred"
+	::= { pduUnitStatusEntry 7 }
+	
+pduUnitStatusPeakPowerStartTime  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Indicates the date and time of the last device peak power reset"
+	::= { pduUnitStatusEntry 8 }
+	
+pduUnitStatusEnergy  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Returns total energy consumed, in tenths of Kilowatt-Hours(kWh), of the PDU over its lifetime."		
+	::= { pduUnitStatusEntry 9 }
+
+pduUnitStatusResettableEnergy  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"A user resettable energy meter measuring PDU energy consumption 
+		in tenths of kilowatt-hours(kWh)."
+	::= { pduUnitStatusEntry 10 }
+	
+pduUnitStatusEnergyStartTime  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Indicates the date and time of the last device energy meter reset"
+	::= { pduUnitStatusEntry 11 }
+	
+pduUnitStatusOutletsEnergyStartTime  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Indicates the date and time of the last outlets energy meter reset"
+	::= { pduUnitStatusEntry 12 }
+
+pduUnitStatusPowerFactor  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Returns the ratio of active to apparent power of the PDU, in the hundreths of PowerFactor."
+	::= { pduUnitStatusEntry 13 }
+
+-- Power share table
+
+
+pduUnitPsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduUnitPsEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"Aggregate Object with number of entries equal to number of PDUs and Power share "
+	::= { pduUnit 5}
+	
+pduUnitPsEntry  OBJECT-TYPE
+	SYNTAX 	PduUnitPsEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The Power share entry containing the avaliable, input, output etc."
+	INDEX { pduUnitPsIndex }
+	::= { pduUnitPsTable 1 }
+
+
+PduUnitPsEntry ::= SEQUENCE {
+		pduUnitPsIndex
+			INTEGER,
+		pduUnitPsSupportUpstreamStatus
+			INTEGER,
+		pduUnitPsSupportDownstreamStatus		
+			INTEGER,	
+		pduUnitPsOptMode
+			INTEGER
+		pduUnitPsFunc
+			INTEGER,
+		pduUnitPsBackupProtection
+			INTEGER,
+		pduUnitPsOutput
+			INTEGER
+	 }
+
+pduUnitPsIndex OBJECT-TYPE
+	SYNTAX INTEGER (1..4)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION
+		"The index of the PDU Power share table entry"
+	::= { pduUnitPsEntry 1 }
+
+
+pduUnitPsSupportUpstreamStatus OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+		notAvailable(0),
+		available(1)
+		}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION
+		"Deprecated because of newly added OID"
+	::= { pduUnitPsEntry 2}		
+	
+pduUnitPsSupportDownstreamStatus OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+		notAvailable(0),
+		available(1)
+		}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION
+		"Deprecated because of newly added OID"
+	::= { pduUnitPsEntry 3 }	
+
+pduUnitPsOptMode OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+		backupPower(0),
+		mainPower(1)
+		}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION
+		"Operating power status. "
+	::= { pduUnitPsEntry 4 }
+	
+pduUnitPsFunc OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+		off(0),
+		on(1)
+		}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"Setting this OID to off(0) will disable the Powershare function.
+		 Setting this OID to on(1) will enable the Powershare function."
+	::= {pduUnitPsEntry 5 }
+	
+pduUnitPsBackupProtection OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+		notAvailable(0),
+		available(1)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Power share support from either of the adjacent PDUs "
+		::= { pduUnitPsEntry 6}		
+			
+pduUnitPsOutput OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+		notAvailable(0),
+		available(1)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Power share support to either of the adjacent PDUs "
+		::= { pduUnitPsEntry 7}
+
+-- Start pduInputPhase
+pduInputPhaseTableSize  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The number of PDU Input Phases "
+	::= { pduInputPhase 1 }
+	
+pduInputPhaseConfigTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduInputPhaseConfigEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of PDU Input Phase configuration data"
+	::= { pduInputPhase 2 }
+	
+pduInputPhaseConfigEntry  OBJECT-TYPE
+	SYNTAX 	PduInputPhaseConfigEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"An input phase entry containing objects for a particular input phase."
+	INDEX { pduUnitConfigIndex, pduInputPhaseConfigIndex }
+	::= { pduInputPhaseConfigTable 1 }
+
+PduInputPhaseConfigEntry ::= SEQUENCE {
+	pduInputPhaseConfigIndex
+		Integer32,
+	pduInputPhaseConfigCount
+		Integer32,
+	pduInputPhaseConfigOverloadRestriction
+		INTEGER,
+	pduInputPhaseConfigCurrentLowerCriticalThreshold
+		Unsigned32,
+	pduInputPhaseConfigCurrentLowerWarningThreshold
+		Unsigned32,
+	pduInputPhaseConfigCurrentUpperCriticalThreshold
+		Unsigned32,
+	pduInputPhaseConfigCurrentUpperWarningThreshold
+		Unsigned32,
+	pduInputPhaseConfigVoltageLowerCriticalThreshold
+		Unsigned32,
+	pduInputPhaseConfigVoltageLowerWarningThreshold
+		Unsigned32,
+	pduInputPhaseConfigVoltageUpperCriticalThreshold
+		Unsigned32,
+	pduInputPhaseConfigVoltageUpperWarningThreshold
+		Unsigned32,
+	pduInputPhaseConfigCurrentAlarmResetThreshold
+		Unsigned32,
+	pduInputPhaseConfigCurrentAlarmStateChangeDelay
+		Integer32,
+	pduInputPhaseConfigCurrentEnabledThresholds
+		BITS,
+	pduInputPhaseConfigVoltageAlarmResetThreshold
+		Unsigned32,
+	pduInputPhaseConfigVoltageAlarmStateChangeDelay
+		Integer32,
+	pduInputPhaseConfigVoltageEnabledThresholds
+		BITS,
+	pduInputPhaseConfigLineVoltageLowerCriticalThreshold
+		Unsigned32,
+	pduInputPhaseConfigLineVoltageLowerWarningThreshold
+		Unsigned32,
+	pduInputPhaseConfigLineVoltageUpperCriticalThreshold
+		Unsigned32,
+	pduInputPhaseConfigLineVoltageUpperWarningThreshold
+		Unsigned32,
+	pduInputPhaseConfigLineVoltageAlarmResetThreshold
+		Unsigned32,
+	pduInputPhaseConfigLineVoltageAlarmStateChangeDelay
+		Integer32,
+	pduInputPhaseConfigLineVoltageEnabledThresholds
+		BITS
+	}
+
+pduInputPhaseConfigIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU Input Phase configuration table entry"
+	::= { pduInputPhaseConfigEntry 1 }
+	
+pduInputPhaseConfigCount  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The total number of Input Phases"
+	::= { pduInputPhaseConfigEntry 2 }
+	
+pduInputPhaseConfigOverloadRestriction  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		alwaysAllowTurnOn (1),
+		restrictOnUpperWarning (2),
+		restrictOnUpperCritical (3),
+		notSupported (4)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"This OID controls the behavior of a Switched PDU Input Phase when an 
+		overload condition is possible and additional outlets are requested 
+		to be turned on. Setting this OID to alwaysAllowTurnON (1) will always 
+		allow the outlets on the corresponding Input Phase to turn on. Setting 
+		this OID to restrictOnUpperWarning (2) will not allow outlets on the 
+		corresponding Input Phase to turn on if the 
+		pduInputPhaseConfigUpperWarningThreshold OID is exceeded. Setting 
+		this OID to restrictOnUpperCritical (3) will not allow outlets on 
+		the corresponding Input Phase to turn on if the 
+		pduInputPhaseConfigUpperCriticalThreshold OID is exceeded. Models 
+		that do not support this feature will respond to this OID with a 
+		value of notSupported (4). Attempts to set this OID in these 
+		models will fail. "
+	::= { pduInputPhaseConfigEntry 3 }
+	
+pduInputPhaseConfigCurrentLowerCriticalThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined lower critical input phase current alarm threshold in hundredths of Amps(A)."
+	::= { pduInputPhaseConfigEntry 4 }
+	
+pduInputPhaseConfigCurrentLowerWarningThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined lower non-critical (warning) input phase current alarm threshold in hundredths of Amps(A)."
+	::= { pduInputPhaseConfigEntry 5 }
+	
+pduInputPhaseConfigCurrentUpperCriticalThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined upper critical input phase current alarm threshold in hundredths of Amps(A)."
+	::= { pduInputPhaseConfigEntry 6 }
+	
+pduInputPhaseConfigCurrentUpperWarningThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined upper non-critical (warning) input phase current alarm threshold in hundredths of Amps(A)."
+	::= { pduInputPhaseConfigEntry 7 }
+
+pduInputPhaseConfigVoltageLowerCriticalThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined lower critical input phase voltage alarm threshold in Volts(V)."
+	::= { pduInputPhaseConfigEntry 8 }
+	
+pduInputPhaseConfigVoltageLowerWarningThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined lower non-critical (warning) input phase voltage alarm threshold in Volts(V)."
+	::= { pduInputPhaseConfigEntry 9 }
+	
+pduInputPhaseConfigVoltageUpperCriticalThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined upper critical input phase voltage alarm threshold in Volts(V)."
+	::= { pduInputPhaseConfigEntry 10 }
+	
+pduInputPhaseConfigVoltageUpperWarningThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined upper non-critical (warning) input phase voltage alarm threshold in Volts(V)."
+	::= { pduInputPhaseConfigEntry 11 }
+	
+pduInputPhaseConfigCurrentAlarmResetThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The hysteresis used for current alarm deassertions in hundredths of Amps(A)."
+	::= { pduInputPhaseConfigEntry 12 }
+	
+pduInputPhaseConfigCurrentAlarmStateChangeDelay  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The delay measured in samples before a current state is asserted. If the 
+		value is zero, then the state is asserted as soon as it is 
+		detected; if it is non-zero, say n, then the assertion condition 
+		must exist for n+1 consecutive samples before the corresponding 
+		assertion event is reported. "
+	::= { pduInputPhaseConfigEntry 13 }
+	
+pduInputPhaseConfigCurrentEnabledThresholds  OBJECT-TYPE
+	SYNTAX 	BITS {
+		lowerCritical (0),
+		lowerWarning (1),
+		upperWarning (2),
+		upperCritical (3)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"A bit string indicating which current alarm thresholds are enabled."
+	::= { pduInputPhaseConfigEntry 14 }
+	
+pduInputPhaseConfigVoltageAlarmResetThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The hysteresis used for voltage alarm deassertions in Volts(V)."
+	::= { pduInputPhaseConfigEntry 15 }
+	
+pduInputPhaseConfigVoltageAlarmStateChangeDelay  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The delay measured in samples before a voltage state is asserted. If the 
+		value is zero, then the state is asserted as soon as it is 
+		detected; if it is non-zero, say n, then the assertion condition 
+		must exist for n+1 consecutive samples before the corresponding 
+		assertion event is reported. "
+	::= { pduInputPhaseConfigEntry 16 }
+	
+pduInputPhaseConfigVoltageEnabledThresholds  OBJECT-TYPE
+	SYNTAX 	BITS {
+		lowerCritical (0),
+		lowerWarning (1),
+		upperWarning (2),
+		upperCritical (3)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"A bit string indicating which voltage alarm thresholds are enabled."
+	::= { pduInputPhaseConfigEntry 17 }
+	
+pduInputPhaseConfigLineVoltageLowerCriticalThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined lower critical line voltage alarm threshold in Volts(V). Supported only on PDU Phase in case of Y connection."
+	::= { pduInputPhaseConfigEntry 18 }
+	
+pduInputPhaseConfigLineVoltageLowerWarningThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined lower non-critical (warning) line voltage alarm threshold in Volts(V). Supported only on PDU Phase in case of Y connection."
+	::= { pduInputPhaseConfigEntry 19 }
+	
+pduInputPhaseConfigLineVoltageUpperCriticalThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined upper critical line voltage alarm threshold in Volts(V). Supported only on PDU Phase in case of Y connection."
+	::= { pduInputPhaseConfigEntry 20 }
+	
+pduInputPhaseConfigLineVoltageUpperWarningThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined upper non-critical (warning) line voltage alarm threshold in Volts(V). Supported only on PDU Phase in case of Y connection."
+	::= { pduInputPhaseConfigEntry 21 }
+	
+pduInputPhaseConfigLineVoltageAlarmResetThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The hysteresis used for line voltage alarm deassertions in Volts(V). Supported only on PDU Phase in case of Y connection."
+	::= { pduInputPhaseConfigEntry 22 }
+	
+pduInputPhaseConfigLineVoltageAlarmStateChangeDelay  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The delay measured in samples before a line voltage state is asserted. If the 
+		value is zero, then the state is asserted as soon as it is 
+		detected; if it is non-zero, say n, then the assertion condition 
+		must exist for n+1 consecutive samples before the corresponding 
+		assertion event is reported. Supported only on PDU Phase in case of Y connection."
+	::= { pduInputPhaseConfigEntry 23 }
+	
+pduInputPhaseConfigLineVoltageEnabledThresholds  OBJECT-TYPE
+	SYNTAX 	BITS {
+		lowerCritical (0),
+		lowerWarning (1),
+		upperWarning (2),
+		upperCritical (3),
+		disableall(4)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"A bit string indicating which line voltage alarm thresholds are enabled. Supported only on PDU Phase in case of Y connection."
+	::= { pduInputPhaseConfigEntry 24 }
+	
+pduInputPhasePropertiesTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduInputPhasePropertiesEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of PDU Input Phase properties"
+	::= { pduInputPhase 3 }
+	
+pduInputPhasePropertiesEntry  OBJECT-TYPE
+	SYNTAX 	PduInputPhasePropertiesEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"An input phase properties entry containing objects for a particular input phase."
+	INDEX { pduUnitPropertiesIndex, pduInputPhasePropertiesIndex }
+	::= { pduInputPhasePropertiesTable 1 }
+
+PduInputPhasePropertiesEntry ::= SEQUENCE {
+	pduInputPhasePropertiesIndex
+		Integer32,
+	pduInputPhasePropertiesCount
+		Integer32
+	}
+
+pduInputPhasePropertiesIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU Input Phase status entry"
+	::= { pduInputPhasePropertiesEntry 1 }
+	
+pduInputPhasePropertiesCount  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The numeric Input Phase ID"
+	::= { pduInputPhasePropertiesEntry 2 }
+	
+pduInputPhaseStatusTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduInputPhaseStatusEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of PDU Input Phase status data"
+	::= { pduInputPhase 4 }
+	
+pduInputPhaseStatusEntry  OBJECT-TYPE
+	SYNTAX 	PduInputPhaseStatusEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"An input phase status entry containing objects for a particular input phase."
+	INDEX { pduUnitStatusIndex, pduInputPhaseStatusIndex }
+	::= { pduInputPhaseStatusTable 1 }
+
+PduInputPhaseStatusEntry ::= SEQUENCE {
+	pduInputPhaseStatusIndex
+		Integer32,
+	pduInputPhaseStatusCount
+		Integer32,
+	pduInputPhaseStatusCurrentState
+		INTEGER,
+	pduInputPhaseStatusVoltageState
+		INTEGER,
+	pduInputPhaseStatusCurrent
+		Integer32,
+	pduInputPhaseStatusVoltage
+		Integer32,
+	pduInputPhaseStatusActivePower
+		Integer32,
+	pduInputPhaseStatusApparentPower
+		Integer32,
+	pduInputPhaseStatusPowerFactor
+		Integer32,
+	pduInputPhaseStatusLineVoltageState
+		INTEGER,
+	pduInputPhaseStatusLineVoltage
+		Integer32
+	}
+
+pduInputPhaseStatusIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU Input Phase status entry"
+	::= { pduInputPhaseStatusEntry 1 }
+	
+pduInputPhaseStatusCount  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The numeric Input Phase ID"
+	::= { pduInputPhaseStatusEntry 2 }
+	
+pduInputPhaseStatusCurrentState  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		upperCritical (1),
+		upperWarning (2),
+		lowerWarning (3),
+		lowerCritical (4),
+		normal (5)
+	}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Indicates the present current status of the PDU Phase in case of Y connection or PDU Line in case of Delta conneciton."
+	::= { pduInputPhaseStatusEntry 3 }
+	
+pduInputPhaseStatusVoltageState  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		upperCritical (1),
+		upperWarning (2),
+		lowerWarning (3),
+		lowerCritical (4),
+		normal (5)
+	}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Indicates the present voltage status of the PDU Input Phase being queried"
+	::= { pduInputPhaseStatusEntry 4 }
+	
+pduInputPhaseStatusCurrent  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Returns the current draw, in hundredths of Amps(A)"
+	::= { pduInputPhaseStatusEntry 5 }
+	
+pduInputPhaseStatusVoltage  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Returns the voltage, in Volts(V)"
+	::= { pduInputPhaseStatusEntry 6 }
+	
+pduInputPhaseStatusActivePower  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Returns power consumption, in Watts(W)"
+	::= { pduInputPhaseStatusEntry 7 }
+	
+pduInputPhaseStatusApparentPower  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Returns power consumption, in Volt-Amps(VA)"
+	::= { pduInputPhaseStatusEntry 8 }
+	
+pduInputPhaseStatusPowerFactor  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Returns the ratio of active to apparent power of the PDU, in the hundreths of PowerFactor."
+	::= { pduInputPhaseStatusEntry 9 }
+	
+pduInputPhaseStatusLineVoltageState  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		upperCritical (1),
+		upperWarning (2),
+		lowerWarning (3),
+		lowerCritical (4),
+		normal (5)
+	}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Indicates the present line voltage STATUS of the PDU Input Phase being queried. Supported only on PDU Phase in case of Y connection."
+	::= { pduInputPhaseStatusEntry 10 }
+
+pduInputPhaseStatusLineVoltage  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Returns the line voltage, in Volts(V). Supported only on PDU Phase in case of Y connection."
+	::= { pduInputPhaseStatusEntry 11 }
+
+-- Start pduCircuitBreaker
+pduCircuitBreakerTableSize  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The number of PDU Circuit Breakers"
+	::= { pduCircuitBreaker 1 }
+	
+pduCircuitBreakerConfigTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduCircuitBreakerConfigEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of PDU Circuit Breaker configuration data"
+	::= { pduCircuitBreaker 2 }
+	
+pduCircuitBreakerConfigEntry  OBJECT-TYPE
+	SYNTAX 	PduCircuitBreakerConfigEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A circuit breaker configuration entry containing objects for a particular circuit breaker."
+	INDEX { pduUnitConfigIndex, pduCircuitBreakerConfigIndex }
+	::= { pduCircuitBreakerConfigTable 1 }
+
+PduCircuitBreakerConfigEntry ::= SEQUENCE {
+	pduCircuitBreakerConfigIndex
+		Integer32,
+	pduCircuitBreakerConfigCount
+		Integer32,
+	pduCircuitBreakerName
+		DisplayString,
+	pduCircuitBreakerConfigOverloadRestriction
+		INTEGER,
+	pduCircuitBreakerConfigLowerCriticalThreshold
+		Unsigned32,
+	pduCircuitBreakerConfigLowerWarningThreshold
+		Unsigned32,
+	pduCircuitBreakerConfigUpperCriticalThreshold
+		Unsigned32,
+	pduCircuitBreakerConfigUpperWarningThreshold
+		Unsigned32,
+	pduCircuitBreakerConfigAlarmResetThreshold
+		Unsigned32,
+	pduCircuitBreakerConfigAlarmStateChangeDelay
+		Unsigned32,
+	pduCircuitBreakerConfigEnabledThresholds
+		BITS
+	}
+
+pduCircuitBreakerConfigIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU Circuit Breaker configuration table entry"
+	::= { pduCircuitBreakerConfigEntry 1 }
+	
+pduCircuitBreakerConfigCount  OBJECT-TYPE
+	SYNTAX 	Integer32 (0..255)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The number of circuit breakers on the PDU"
+	::= { pduCircuitBreakerConfigEntry 2 }
+	
+pduCircuitBreakerName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The label of the circuit breaker"
+	::= { pduCircuitBreakerConfigEntry 3 }
+	
+pduCircuitBreakerConfigOverloadRestriction  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		alwaysAllowTurnOn (1),
+		restrictOnUpperWarning (2),
+		restrictOnUpperCritical (3),
+		notSupported (4)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"This OID controls the behavior of a Switched PDU Circuit 
+		Breaker when an overload condition is possible and additional 
+		outlets are requested to be turned on. Setting this OID to 
+		alwaysAllowTurnON (1) will always allow the outlets on the 
+		corresponding Circuit Breaker to turn on. Setting this OID 
+		to restrictOnUpperWarning (2) will not allow outlets on the 
+		corresponding Circuit Breaker to turn on if the 
+		pduCircuitBreakerConfigUpperWarningThreshold OID is exceeded. 
+		Setting this OID to restrictOnUpperCritical (3) will not 
+		allow outlets on the corresponding Circuit Breaker to turn 
+		on if the pduCircuitBreakerConfigUpperCriticalThreshold OID 
+		is exceeded. Models that do not support this feature will 
+		respond to this OID with a value of notSupported (4). 
+		Attempts to set this OID in these models will fail. "
+	::= { pduCircuitBreakerConfigEntry 4 }
+
+pduCircuitBreakerConfigLowerCriticalThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined lower critical circuit breaker current alarm threshold in hundredths of Amps(A)."
+	::= { pduCircuitBreakerConfigEntry 5 }
+	
+pduCircuitBreakerConfigLowerWarningThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined lower non-critical (warning) circuit breaker current alarm threshold in hundredths of Amps(A)."
+	::= { pduCircuitBreakerConfigEntry 6 }
+	
+pduCircuitBreakerConfigUpperCriticalThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined upper critical circuit breaker current alarm threshold in hundredths of Amps(A)."
+	::= { pduCircuitBreakerConfigEntry 7 }
+	
+pduCircuitBreakerConfigUpperWarningThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined upper non-critical (warning) circuit breaker current alarm threshold in hundredths of Amps(A)."
+	::= { pduCircuitBreakerConfigEntry 8 }
+	
+pduCircuitBreakerConfigAlarmResetThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The hysteresis used for deassertions in hundredths of Amps(A)."
+	::= { pduCircuitBreakerConfigEntry 9 }
+	
+pduCircuitBreakerConfigAlarmStateChangeDelay  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The delay measured in samples before a state is asserted. 
+		If the value is zero, then the state is asserted as soon 
+		as it is detected; if it is non-zero, say n, then the 
+		assertion condition must exist for n+1 consecutive samples 
+		before the corresponding assertion event is reported."
+	::= { pduCircuitBreakerConfigEntry 10 }
+	
+pduCircuitBreakerConfigEnabledThresholds  OBJECT-TYPE
+	SYNTAX 	BITS {
+		lowerCritical (0),
+		lowerWarning (1),
+		upperWarning (2),
+		upperCritical (3)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"A bit string indicating which alarm thresholds are enabled."
+	::= { pduCircuitBreakerConfigEntry 11 }
+
+pduCircuitBreakerPropertiesTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduCircuitBreakerPropertiesEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of PDU circuit breaker properties"
+	::= { pduCircuitBreaker 3 }
+
+pduCircuitBreakerPropertiesEntry  OBJECT-TYPE
+	SYNTAX 	PduCircuitBreakerPropertiesEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A circuit breaker properties entry containing objects for a particular circuit breaker."
+	INDEX { pduUnitPropertiesIndex, pduCircuitBreakerPropertiesIndex }
+	::= { pduCircuitBreakerPropertiesTable 1 }
+
+PduCircuitBreakerPropertiesEntry ::= SEQUENCE {
+	pduCircuitBreakerPropertiesIndex
+		Integer32,
+	pduCircuitBreakerPropertiesCount
+		Integer32,
+	pduCircuitBreakerPropertiesInputLayout
+		INTEGER,
+	pduCircuitBreakerPropertiesCurrentRating
+		Integer32
+	}
+
+pduCircuitBreakerPropertiesIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU Circuit Breaker properties table entry"
+	::= { pduCircuitBreakerPropertiesEntry 1 }
+	
+pduCircuitBreakerPropertiesCount  OBJECT-TYPE
+	SYNTAX 	Integer32 (0..255)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The number of Circuit Breakers"
+	::= { pduCircuitBreakerPropertiesEntry 2 }
+	
+pduCircuitBreakerPropertiesInputLayout  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		seqPhase1ToNeutral (1),
+		seqPhase2ToNeutral (2),
+		seqPhase3ToNeutral (3),
+		seqPhase1ToPhase2 (4),
+		seqPhase2ToPhase3 (5),
+		seqPhase3ToPhase1 (6)
+	}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"This OID describes the outlet phase connections on 
+		the referenced bank as follows: 
+		seqPhase1ToNeutral(1) indicates that outlets attached 
+		to circuit breaker are connected from Phase 1 to Neutral. 
+		seqPhase2ToNeutral(2) indicates that outlets attached 
+		to circuit breaker are connected from Phase 2 to Neutral. 
+		seqPhase3ToNeutral(3) indicates that outlets attached 
+		to circuit breaker are connected from Phase 3 to Neutral. 
+		seqPhase1ToPhase2(4) indicates that outlets attached 
+		to circuit breaker are connected from Phase 1 to Phase2. 
+		seqPhase2ToPhase3(5) indicates that outlets attached 
+		to circuit breaker are connected from Phase 2 to Phase3.  
+		seqPhase3ToPhase1(6) indicates that outlets attached 
+		to circuit breaker are connected from Phase 3 to Phase1. "
+	::= { pduCircuitBreakerPropertiesEntry 3 }
+
+pduCircuitBreakerPropertiesCurrentRating  OBJECT-TYPE
+	SYNTAX 	Integer32 (0..255)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The number of Circuit Breakers"
+	::= { pduCircuitBreakerPropertiesEntry 4 }
+
+pduCircuitBreakerStatusTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduCircuitBreakerStatusEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of PDU circuit breaker status data"
+	::= { pduCircuitBreaker 4 }
+	
+pduCircuitBreakerStatusEntry  OBJECT-TYPE
+	SYNTAX 	PduCircuitBreakerStatusEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A circuit breaker status entry containing objects for a particular circuit breaker."
+	INDEX { pduUnitStatusIndex, pduCircuitBreakerStatusIndex }
+	::= { pduCircuitBreakerStatusTable 1 }
+
+PduCircuitBreakerStatusEntry ::= SEQUENCE {
+	pduCircuitBreakerStatusIndex
+		Integer32,
+	pduCircuitBreakerStatusCount
+		Integer32,
+	pduCircuitBreakerLabel
+		DisplayString,
+	pduCircuitBreakerStatusLoadState
+		INTEGER,
+	pduCircuitBreakerStatusCurrent
+		Integer32,
+	pduCircuitBreakerStatusPowerFactor
+		Integer32
+	}
+
+pduCircuitBreakerStatusIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU Circuit Breaker status table entry"
+	::= { pduCircuitBreakerStatusEntry 1 }
+	
+pduCircuitBreakerStatusCount  OBJECT-TYPE
+	SYNTAX 	Integer32 (0..255)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The number of Circuit Breakers"
+	::= { pduCircuitBreakerStatusEntry 2 }
+	
+pduCircuitBreakerLabel  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The label on the PDU identifying the circuit breaker"
+	::= { pduCircuitBreakerStatusEntry 3 }
+	
+pduCircuitBreakerStatusLoadState  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		upperCritical (1),
+		upperWarning (2),
+		lowerWarning (3),
+		lowerCritical (4),
+		normal (5),
+		off (6)
+	}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Indicates the present load status of the PDU Circuit 
+		Breaker being queried"
+	::= { pduCircuitBreakerStatusEntry 4 }
+	
+pduCircuitBreakerStatusCurrent  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Returns the current draw, in hundredths of Amps(A), of the load on 
+		the PDU Circuit Breaker being queried."
+	::= { pduCircuitBreakerStatusEntry 5 }
+	
+pduCircuitBreakerStatusPowerFactor  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Returns the ratio of active to apparent power of the Circuit Breaker, in the hundreths of PowerFactor."
+	::= { pduCircuitBreakerStatusEntry 6 }
+
+-- Start pduOutlet
+pduOutletSwitchedTableSize  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The number of PDU Outlets"
+	::= { pduOutlet 1 }
+
+pduOutletSwitchedConfigTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduOutletSwitchedConfigEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of PDU Switched Outlet configuration data"
+	::= { pduOutlet 2 }
+	
+pduOutletSwitchedConfigEntry  OBJECT-TYPE
+	SYNTAX 	PduOutletSwitchedConfigEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"An outlet configuration entry containing objects for a particular outlet."
+	INDEX { pduUnitConfigIndex, pduOutletSwitchedConfigIndex }
+	::= { pduOutletSwitchedConfigTable 1 }
+
+PduOutletSwitchedConfigEntry ::= SEQUENCE {
+	pduOutletSwitchedConfigIndex
+		Integer32,
+	pduOutletSwitchedName
+		DisplayString,
+	pduOutletSwitchedStateOnStartup
+		INTEGER,
+	pduOutletSwitchedConfigPowerOnTime
+		Integer32,
+	pduOutletSwitchedConfigPowerOffTime
+		Integer32,
+	pduOutletSwitchedConfigRebootDuration
+		Integer32
+	}
+
+pduOutletSwitchedConfigIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU Switched Outlet configuration table entry"
+	::= { pduOutletSwitchedConfigEntry 1 }
+
+pduOutletSwitchedName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The user-defined name for the Switched Outlet"
+	::= { pduOutletSwitchedConfigEntry 2 }
+
+pduOutletSwitchedStateOnStartup  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		off (0),
+		on (1),
+		lastKnownState (2)
+		}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The outlet state on device startup; overrides 
+		the global value pduUnitConfigGlobalOutletStateOnStartup."
+	::= { pduOutletSwitchedConfigEntry 3 }
+
+pduOutletSwitchedConfigPowerOnTime  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The amount of delay, in seconds, between when power is 
+		provided to outlets the outlet and when this outlet 
+		starts providing power"
+	::= { pduOutletSwitchedConfigEntry 4 }
+
+pduOutletSwitchedConfigPowerOffTime  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The amount of time, in seconds, this outlet will delay 
+		powering off"
+	::= { pduOutletSwitchedConfigEntry 5 }
+
+pduOutletSwitchedConfigRebootDuration  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The amount of time, in seconds, this outlet will remain 
+		in powered off state before returning to power on state 
+		during a reboot action."
+	::= { pduOutletSwitchedConfigEntry 6 }
+	
+pduOutletSwitchedPropertiesTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduOutletSwitchedPropertiesEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of PDU Switched Outlet properties"
+	::= { pduOutlet 3 }
+	
+pduOutletSwitchedPropertiesEntry  OBJECT-TYPE
+	SYNTAX 	PduOutletSwitchedPropertiesEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"An outlet properties entry containing objects for a particular outlet."
+	INDEX { pduUnitPropertiesIndex, pduOutletSwitchedPropertiesIndex }
+	::= { pduOutletSwitchedPropertiesTable 1 }
+
+PduOutletSwitchedPropertiesEntry ::= SEQUENCE {
+	pduOutletSwitchedPropertiesIndex
+		Integer32,
+	pduOutletSwitchedPropertiesNumber
+		Integer32,
+	pduOutletSwitchedPropertiesName
+		DisplayString,
+	pduOutletSwitchedPropertiesInputPhaseLayout
+		INTEGER,
+	pduOutletSwitchedPropertiesCircuitBreaker
+		Integer32,
+	pduOutletSwitchedPropertiesCurrentRating
+		Integer32
+	}
+
+pduOutletSwitchedPropertiesIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU Switched Outlet properties table entry"
+	::= { pduOutletSwitchedPropertiesEntry 1 }
+
+pduOutletSwitchedPropertiesNumber  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The numeric Switched Outlet ID"
+	::= { pduOutletSwitchedPropertiesEntry 2 }
+
+pduOutletSwitchedPropertiesName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The user-defined switched outlet ID string"
+	::= { pduOutletSwitchedPropertiesEntry 3 }
+	
+pduOutletSwitchedPropertiesInputPhaseLayout  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		seqPhase1ToNeutral (1),
+		seqPhase2ToNeutral (2),
+		seqPhase3ToNeutral (3),
+		seqPhase1ToPhase2 (4),
+		seqPhase2ToPhase3 (5),
+		seqPhase3ToPhase1 (6)
+	}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"This OID describes the outlet phase connections 
+		on the referenced bank as follows: 
+		seqPhase1ToNeutral(1) indicates that outlets 
+		attached to Switched Outlet are connected from Phase 1 to Neutral. 
+		seqPhase2ToNeutral(2) indicates that outlets 
+		attached to Switched Outlet are connected from Phase 2 to Neutral. 
+		seqPhase3ToNeutral(3) indicates that outlets 
+		attached to Switched Outlet are connected from Phase 3 to Neutral. 
+		seqPhase1ToPhase2(4) indicates that outlets 
+		attached to Switched Outlet are connected from Phase 1 to Phase2. 
+		seqPhase2ToPhase3(5) indicates that outlets 
+		attached to Switched Outlet are connected from Phase 2 to Phase3.  
+		seqPhase3ToPhase1(6) indicates that outlets 
+		attached to Switched Outlet are connected from Phase 3 to Phase1. "
+	::= { pduOutletSwitchedPropertiesEntry 4 }
+
+pduOutletSwitchedPropertiesCircuitBreaker  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The numeric Circuit Breaker ID"
+	::= { pduOutletSwitchedPropertiesEntry 5 }
+	
+pduOutletSwitchedPropertiesCurrentRating  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The current rating of outlet in hundreths of ampere"
+	::= { pduOutletSwitchedPropertiesEntry 6 }
+
+pduOutletSwitchedStatusTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduOutletSwitchedStatusEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of PDU Switched Outlet status data"
+	::= { pduOutlet 4 }
+
+pduOutletSwitchedStatusEntry  OBJECT-TYPE
+	SYNTAX 	PduOutletSwitchedStatusEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"Status data from the PDU Switched Outlet being queried"
+	INDEX { pduUnitStatusIndex, pduOutletSwitchedStatusIndex }
+	::= { pduOutletSwitchedStatusTable 1 }
+
+PduOutletSwitchedStatusEntry ::= SEQUENCE {
+	pduOutletSwitchedStatusIndex
+		Integer32,
+	pduOutletSwitchedStatusNumber
+		Integer32,
+	pduOutletSwitchedStatusName
+		DisplayString,
+	pduOutletSwitchedStatusState
+		INTEGER
+	}
+
+pduOutletSwitchedStatusIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU Switched Outlet status table entry"
+	::= { pduOutletSwitchedStatusEntry 1 }
+
+pduOutletSwitchedStatusNumber  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The numeric Switched Outlet ID"
+	::= { pduOutletSwitchedStatusEntry 2 }
+
+pduOutletSwitchedStatusName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The user-defined switched outlet ID string"
+	::= { pduOutletSwitchedStatusEntry 3 }
+
+pduOutletSwitchedStatusState  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		off (0),
+		on (1)
+	}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Indicates the present switch state of the 
+		PDU switched outlet being queried"
+	::= { pduOutletSwitchedStatusEntry 4 }
+	
+pduOutletSwitchedControlTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduOutletSwitchedControlEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of PDU Switched Outlet status data"
+	::= { pduOutlet 5 }
+	
+pduOutletSwitchedControlEntry  OBJECT-TYPE
+	SYNTAX 	PduOutletSwitchedControlEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"Status data from the PDU Switched Outlet 
+		being queried"
+	INDEX { pduUnitConfigIndex, pduOutletSwitchedControlIndex }
+	::= { pduOutletSwitchedControlTable 1 }
+
+PduOutletSwitchedControlEntry ::= SEQUENCE {
+	pduOutletSwitchedControlIndex
+		Integer32,
+	pduOutletSwitchedControlNumber
+		Integer32,
+	pduOutletSwitchedControlName
+		DisplayString,
+	pduOutletSwitchedControlCommand
+		INTEGER
+	}
+
+pduOutletSwitchedControlIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index to the PDU switched outlet 
+		control data table entry"
+	::= { pduOutletSwitchedControlEntry 1 }
+	
+pduOutletSwitchedControlNumber  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The numeric Switched Outlet ID"
+	::= { pduOutletSwitchedControlEntry 2 }
+	
+pduOutletSwitchedControlName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The user-defined switched outlet ID string"
+	::= { pduOutletSwitchedControlEntry 3 }
+
+pduOutletSwitchedControlCommand  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		immediateOff (1),
+		immediateOn (2),
+		delayedOff (3),
+		delayedOn (4),
+		immediateReboot (5),
+		delayedReboot (6),
+		outletUnknown (7)
+		}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Getting this variable will return the outlet state.
+		If the outlet is on, the immediateOn (2) 
+		value will be returned. If the outlet is off, 
+		the immediateOff (1) value will be returned. 
+		If the state of the outlet cannot be determined, the 
+		outletUnknown (7) value will be returned. If the 
+		outletUnknown condition should occur, all devices 
+		powered by the PDU should be shut down. The PDU's 
+		power should then be cycled to clear this condition. 
+		Setting this variable to immediateOn (2) will immediately 
+		turn the outlet on. Setting this variable to 
+		immediateOff (1) will immediately turn the outlet off. 
+		Setting this variable to immediateReboot (5) 
+		will cause the Switched PDU to perform an immediateOff 
+		command, wait the pduOutletSwitchedConfigRebootDuration 
+		OID time, and then perform an immediateOn command.
+		Setting this variable to delayedOn (4) will turn the 
+		outlet on after the pduOutletSwitchedConfigPowerOnTime 
+		OID time has elapsed. Setting this variable to 
+		delayedOff (3) will turn the outlet off after the 
+		pduOutletSwitchedConfigPowerOffTime OID time has elapsed. 
+		Setting this variable to delayedReboot  (6) will cause 
+		the Switched PDU to perform a delayedOff command, wait 
+		the pduOutletSwitchedConfigRebootDuration OID time, and 
+		then perform a delayedOn command."
+	::= { pduOutletSwitchedControlEntry 4 }
+
+pduOutletMeteredTableSize  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The number of PDU Outlets"
+	::= { pduOutlet 6 }
+
+pduOutletMeteredConfigTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduOutletMeteredConfigEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of PDU Metered Outlet configuration data"
+	::= { pduOutlet 7 }
+
+pduOutletMeteredConfigEntry  OBJECT-TYPE
+	SYNTAX 	PduOutletMeteredConfigEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"An outlet configuration entry containing objects for a particular outlet."
+	INDEX { pduUnitConfigIndex, pduOutletMeteredConfigIndex }
+	::= { pduOutletMeteredConfigTable 1 }
+
+PduOutletMeteredConfigEntry ::= SEQUENCE {
+	pduOutletMeteredConfigIndex
+		Integer32,
+	pduOutletMeteredName
+		DisplayString,
+	pduOutletMeteredConfigLowerCriticalThreshold
+		Unsigned32,
+	pduOutletMeteredConfigLowerWarningThreshold
+		Unsigned32,
+	pduOutletMeteredConfigUpperCriticalThreshold
+		Unsigned32,
+	pduOutletMeteredConfigUpperWarningThreshold
+		Unsigned32,
+	pduOutletMeteredConfigAlarmResetThreshold
+		Unsigned32,
+	pduOutletMeteredConfigAlarmStateChangeDelay
+		Unsigned32,
+	pduOutletMeteredConfigEnabledThresholds
+		BITS
+	}
+
+pduOutletMeteredConfigIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU Metered Outlet 
+		configuration table entry"
+	::= { pduOutletMeteredConfigEntry 1 }
+
+pduOutletMeteredName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The user-defined name for the Metered Outlet"
+	::= { pduOutletMeteredConfigEntry 2 }
+
+pduOutletMeteredConfigLowerCriticalThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined lower critical outlet active power alarm threshold in Watts(W)."
+	::= { pduOutletMeteredConfigEntry 3 }
+
+pduOutletMeteredConfigLowerWarningThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined lower non-critical (warning) outlet active power alarm threshold in Watts(W)."
+	::= { pduOutletMeteredConfigEntry 4 }
+
+pduOutletMeteredConfigUpperCriticalThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined upper critical outlet active power alarm threshold in Watts(W)."
+	::= { pduOutletMeteredConfigEntry 5 }
+
+pduOutletMeteredConfigUpperWarningThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined upper non-critical (warning) outlet active power alarm threshold in Watts(W)."
+	::= { pduOutletMeteredConfigEntry 6 }
+
+pduOutletMeteredConfigAlarmResetThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The hysteresis used for deassertions in Watts(W)."
+	::= { pduOutletMeteredConfigEntry 7 }
+
+pduOutletMeteredConfigAlarmStateChangeDelay  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The delay measured in samples before a state 
+		is asserted. If the value is zero, then the state 
+		is asserted as soon as it is detected; if it is 
+		non-zero, say n, then the assertion condition must 
+		exist for n+1 consecutive samples before the 
+		corresponding assertion event is reported."
+	::= { pduOutletMeteredConfigEntry 8 }
+
+pduOutletMeteredConfigEnabledThresholds  OBJECT-TYPE
+	SYNTAX 	BITS {
+		lowerCritical (0),
+		lowerWarning (1),
+		upperWarning (2),
+		upperCritical (3)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"A bit string indicating which alarm 
+		thresholds are enabled."
+	::= { pduOutletMeteredConfigEntry 9 }
+
+pduOutletMeteredPropertiesTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduOutletMeteredPropertiesEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of PDU Metered Outlet properties"
+	::= { pduOutlet 8 }
+
+pduOutletMeteredPropertiesEntry  OBJECT-TYPE
+	SYNTAX 	PduOutletMeteredPropertiesEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"Configuration data from the PDU Metered 
+		Outlet being queried"
+	INDEX { pduUnitPropertiesIndex, pduOutletMeteredPropertiesIndex }
+	::= { pduOutletMeteredPropertiesTable 1 }
+
+PduOutletMeteredPropertiesEntry ::= SEQUENCE {
+	pduOutletMeteredPropertiesIndex
+		Integer32,
+	pduOutletMeteredPropertiesNumber
+		Integer32,
+	pduOutletMeteredPropertiesName
+		DisplayString,
+	pduOutletMeteredPropertiesInputPhaseLayout
+		INTEGER,
+	pduOutletMeteredPropertiesCircuitBreaker
+		Integer32,
+	pduOutletMeteredPropertiesPowerRating
+		Integer32,
+	pduOutletMeteredPropertiesCurrentRating
+		Integer32
+	}
+
+pduOutletMeteredPropertiesIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU Metered Outlet 
+		properties table entry"
+	::= { pduOutletMeteredPropertiesEntry 1 }
+
+pduOutletMeteredPropertiesNumber  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The numeric Metered Outlet ID"
+	::= { pduOutletMeteredPropertiesEntry 2 }
+
+pduOutletMeteredPropertiesName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The user-defined Metered outlet ID string"
+	::= { pduOutletMeteredPropertiesEntry 3 }
+
+pduOutletMeteredPropertiesInputPhaseLayout  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		seqPhase1ToNeutral (1),
+		seqPhase2ToNeutral (2),
+		seqPhase3ToNeutral (3),
+		seqPhase1ToPhase2 (4),
+		seqPhase2ToPhase3 (5),
+		seqPhase3ToPhase1 (6)
+	}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"This OID describes the outlet phase connections 
+		on the referenced bank as follows: 
+		seqPhase1ToNeutral(1) indicates that outlets attached 
+		to Metered Outlet are connected from Phase 1 to Neutral. 
+		seqPhase2ToNeutral(2) indicates that outlets attached 
+		to Metered Outlet are connected from Phase 2 to Neutral. 
+		seqPhase3ToNeutral(3) indicates that outlets attached 
+		to Metered Outlet are connected from Phase 3 to Neutral. 
+		seqPhase1ToPhase2(4) indicates that outlets attached 
+		to Metered Outlet are connected from Phase 1 to Phase2. 
+		seqPhase2ToPhase3(5) indicates that outlets attached 
+		to Metered Outlet are connected from Phase 2 to Phase3.  
+		seqPhase3ToPhase1(6) indicates that outlets attached 
+		to Metered Outlet are connected from Phase 3 to Phase1. "
+	::= { pduOutletMeteredPropertiesEntry 4 }
+
+pduOutletMeteredPropertiesCircuitBreaker  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The numeric Circuit Breaker ID"
+	::= { pduOutletMeteredPropertiesEntry 5 }
+
+pduOutletMeteredPropertiesPowerRating  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Maximum power rating of the PDU metered outlet"
+	::= { pduOutletMeteredPropertiesEntry 6 }
+
+pduOutletMeteredPropertiesCurrentRating  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Metered outlet current rating in hundreths of ampere"
+	::= { pduOutletMeteredPropertiesEntry 7 }
+	
+pduOutletMeteredStatusTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduOutletMeteredStatusEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of PDU Metered Outlet status data"
+	::= { pduOutlet 9 }
+	
+pduOutletMeteredStatusEntry  OBJECT-TYPE
+	SYNTAX 	PduOutletMeteredStatusEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"Status data from the PDU Metered Outlet being queried"
+	INDEX { pduUnitStatusIndex, pduOutletMeteredStatusIndex }
+	::= { pduOutletMeteredStatusTable 1 }
+
+PduOutletMeteredStatusEntry ::= SEQUENCE {
+	pduOutletMeteredStatusIndex
+		Integer32,
+	pduOutletMeteredStatusNumber
+		Integer32,
+	pduOutletMeteredStatusName
+		DisplayString,
+	pduOutletMeteredStatusLoadState
+		INTEGER,
+	pduOutletMeteredStatusCurrent
+		Integer32,
+	pduOutletMeteredStatusActivePower
+		Integer32,
+	pduOutletMeteredStatusPowerFactor
+		Integer32,
+	pduOutletMeteredStatusPeakPower
+		Integer32,
+	pduOutletMeteredStatusPeakPowerTimeStamp
+		DisplayString,
+	pduOutletMeteredStatusPeakPowerStartTime
+		DisplayString,
+	pduOutletMeteredStatusResettableEnergy
+		Integer32
+	}
+
+pduOutletMeteredStatusIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU Metered Outlet status table entry"
+	::= { pduOutletMeteredStatusEntry 1 }
+
+pduOutletMeteredStatusNumber  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The numeric Metered Outlet ID"
+	::= { pduOutletMeteredStatusEntry 2 }
+
+pduOutletMeteredStatusName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The user-defined Metered outlet ID string"
+	::= { pduOutletMeteredStatusEntry 3 }
+	
+pduOutletMeteredStatusLoadState  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		upperCritical (1),
+		upperWarning (2),
+		lowerWarning (3),
+		lowerCritical (4),
+		normal (5)
+	}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Returns the present load status of the PDU metered outlet being queried."
+	::= { pduOutletMeteredStatusEntry 4 }
+
+pduOutletMeteredStatusCurrent  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Returns the current draw, in hundredths of Amps(A), of the load on the PDU 
+		outlet being queried."
+	::= { pduOutletMeteredStatusEntry 5 }
+
+pduOutletMeteredStatusActivePower  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Returns the power draw, in Watts(W), of the load 
+		on the PDU outlet being queried."
+	::= { pduOutletMeteredStatusEntry 6 }
+	
+pduOutletMeteredStatusPowerFactor  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Returns the ratio of active to apparent power 
+		of the PDU Outlet being queried, in the hundreths of PowerFactor."
+	::= { pduOutletMeteredStatusEntry 7 }
+
+pduOutletMeteredStatusPeakPower  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Returns peak power consumption, in Watts(W), 
+		of the Rack PDU outlet being queried."
+	::= { pduOutletMeteredStatusEntry 8 }
+
+pduOutletMeteredStatusPeakPowerTimeStamp  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Indicates the date and time that this metered 
+		outlet's peak power consumption occurred"
+	::= { pduOutletMeteredStatusEntry 9 }
+
+pduOutletMeteredStatusPeakPowerStartTime  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Indicates the start date and time that this metered 
+		outlet began recording peak power observations"
+	::= { pduOutletMeteredStatusEntry 10 }
+
+pduOutletMeteredStatusResettableEnergy  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"A user resettable energy meter measuring outlet load energy 
+		consumption in tenths of Kilowatt-Hours(kWh)."
+	::= { pduOutletMeteredStatusEntry 11 }
+
+-- Start pduExternalSensor
+pduExternalSensorTableSize  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The total number of External Sensors"
+	::= { pduExternalSensor 1 }
+
+pduExternalSensorNamePlateTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduExternalSensorNamePlateEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of PDU ExternalSensorNamePlate data"
+	::= { pduExternalSensor 2 }
+
+pduExternalSensorNamePlateEntry  OBJECT-TYPE
+	SYNTAX 	PduExternalSensorNamePlateEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"External Sensor Name Plate data from the external 
+		sensor being queried. The number of entries equals 
+		the value of pduExternalSensorNamePlateTableSize."
+	INDEX { pduNamePlateIndex, pduExternalSensorNamePlateIndex }
+	::= { pduExternalSensorNamePlateTable 1 }
+
+PduExternalSensorNamePlateEntry ::= SEQUENCE {
+	pduExternalSensorNamePlateIndex
+		Integer32,
+	pduExternalSensorNamePlateName
+		DisplayString,
+	pduExternalSensorNamePlateDescription
+		DisplayString,
+	pduExternalSensorNamePlateLocation
+		DisplayString,
+	pduExternalSensorNamePlateSerialNumber
+		DisplayString,
+	pduExternalSensorNamePlateType
+		INTEGER,
+	pduExternalSensorNamePlateUnits
+		INTEGER,
+	pduExternalSensorNamePlateIdentifier
+		Integer32,
+	pduExternalSensorNamePlateProductCode
+		DisplayString
+	}
+
+pduExternalSensorNamePlateIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (0..255)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU External Sensor status table entry"
+	::= { pduExternalSensorNamePlateEntry 1 }
+
+pduExternalSensorNamePlateName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"A user-defined string identifying the external sensor"
+	::= { pduExternalSensorNamePlateEntry 2 }
+
+pduExternalSensorNamePlateDescription  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"A user-defined description of the external sensor"
+	::= { pduExternalSensorNamePlateEntry 3 }
+
+pduExternalSensorNamePlateLocation  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"A user-defined string identifying the location of the PDU"
+	::= { pduExternalSensorNamePlateEntry 4 }
+
+pduExternalSensorNamePlateSerialNumber  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS deprecated
+	DESCRIPTION 
+		"The serial code of the external sensor being queried. 
+		 This OID is used to show the product code of the sensor. Additionally, similar information is shown in the OID 'pduExternalSensorNamePlateProductCode'"
+	::= { pduExternalSensorNamePlateEntry 5 }
+
+pduExternalSensorNamePlateType  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		temperature (1),
+		humidity (2),
+		doorSwitch (3),
+		dryContact (4),
+		spotFluid (5),
+		ropeFluid (6),
+		smoke (7),
+		beacon (8),
+		airVelocity (9),
+		modbusAdapter (17),
+		hidAdapter (18)
+	}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The type of external sensor."
+	::= { pduExternalSensorNamePlateEntry 6 }
+
+pduExternalSensorNamePlateUnits  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		logic (0),
+		degreeC (1),
+		degreeF (2),
+		percent (3),
+		mps (4)
+	}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The base units the external sensor is measured in. 
+		This parameter does not apply to onOff, trip, vibration,
+		 waterDetection, smokeDetection sensors. "
+	::= { pduExternalSensorNamePlateEntry 7 }
+
+pduExternalSensorNamePlateIdentifier  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Unique identifier of the external sensor."
+	::= { pduExternalSensorNamePlateEntry 8 }
+	
+pduExternalSensorNamePlateProductCode  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The product code of the external sensor being queried"
+	::= { pduExternalSensorNamePlateEntry 9 }
+
+pduExternalSensorConfigTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduExternalSensorConfigEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of PDU External Sensor configuration data"
+	::= { pduExternalSensor 3 }
+
+pduExternalSensorConfigEntry  OBJECT-TYPE
+	SYNTAX 	PduExternalSensorConfigEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"Configuration data from the PDU External 
+		Sensor being queried"
+	INDEX { pduUnitConfigIndex, pduExternalSensorConfigIndex }
+	::= { pduExternalSensorConfigTable 1 }
+
+PduExternalSensorConfigEntry ::= SEQUENCE {
+	pduExternalSensorConfigIndex
+		Integer32,
+	pduExternalSensorConfigLowerCriticalThreshold
+		Unsigned32,
+	pduExternalSensorConfigLowerWarningThreshold
+		Unsigned32,
+	pduExternalSensorConfigUpperCriticalThreshold
+		Unsigned32,
+	pduExternalSensorConfigUpperWarningThreshold
+		Unsigned32,
+	pduExternalSensorConfigEnabledThresholds
+		BITS,
+	pduExternalSensorConfigAlarmState
+		INTEGER,
+	pduExternalSensorConfigAlarmResetThreshold
+		Unsigned32,
+	pduExternalSensorConfigAlarmStateChangeDelay
+		Unsigned32,
+	}
+
+pduExternalSensorConfigIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (0..255)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU External Sensor 
+		configuration table entry"
+	::= { pduExternalSensorConfigEntry 1 }
+
+pduExternalSensorConfigLowerCriticalThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined lower critical alarm threshold in pduExternalSensorNamePlateUnits."
+	::= { pduExternalSensorConfigEntry 2 }
+
+pduExternalSensorConfigLowerWarningThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined lower non-critical (warning) alarm threshold in pduExternalSensorNamePlateUnits."
+	::= { pduExternalSensorConfigEntry 3 }
+
+pduExternalSensorConfigUpperCriticalThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined upper critical alarm threshold in pduExternalSensorNamePlateUnits."
+	::= { pduExternalSensorConfigEntry 4 }
+
+pduExternalSensorConfigUpperWarningThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User-defined upper non-critical (warning) alarm threshold in pduExternalSensorNamePlateUnits."
+	::= { pduExternalSensorConfigEntry 5 }
+
+pduExternalSensorConfigEnabledThresholds  OBJECT-TYPE
+	SYNTAX 	BITS {
+		lowerCritical (0),
+		lowerWarning (1),
+		upperWarning (2),
+		upperCritical (3),
+		binarySensorAlarm (4)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"A bit string indicating which alarm 
+		thresholds are enabled."
+	::= { pduExternalSensorConfigEntry 6 }
+
+pduExternalSensorConfigAlarmState OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		on (1),
+		off (0)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User defined alarm state of external sensor"
+	::= { pduExternalSensorConfigEntry 7 }
+	
+pduExternalSensorConfigAlarmResetThreshold  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The hysteresis used for deassertions."
+	::= { pduExternalSensorConfigEntry 8 }
+
+pduExternalSensorConfigAlarmStateChangeDelay  OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"The delay measured in samples before a state is 
+		asserted. If the value is zero, then the state is 
+		asserted as soon as it is detected; if it is non-zero, 
+		say n, then the assertion condition must exist for n+1 
+		consecutive samples before the corresponding assertion 
+		event is reported."
+	::= { pduExternalSensorConfigEntry 9 }
+
+	
+pduExternalSensorStatusTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduExternalSensorStatusEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of PDU External Sensor status data"
+	::= { pduExternalSensor 4 }
+	
+pduExternalSensorStatusEntry  OBJECT-TYPE
+	SYNTAX 	PduExternalSensorStatusEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"Status data from the PDU External Sensor 
+		being queried"
+	INDEX { pduUnitStatusIndex, pduExternalSensorStatusIndex }
+	::= { pduExternalSensorStatusTable 1 }
+
+PduExternalSensorStatusEntry ::= SEQUENCE {
+	pduExternalSensorStatusIndex
+		Integer32,
+	pduExternalSensorStatusName
+		DisplayString,
+	pduExternalSensorStatusCommStatus
+		INTEGER,
+	pduExternalSensorStatusState
+		INTEGER,
+	pduExternalSensorStatusValue
+		Integer32,
+	pduExternalSensorStatusTimeStamp
+		DisplayString,
+	pduExternalSensorStatusHighPrecisionValue
+		Integer32,
+	pduExternalSensorSTATUSAisle
+		INTEGER
+	}
+
+pduExternalSensorStatusIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (0..255)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU External Sensor status table entry"
+	::= { pduExternalSensorStatusEntry 1 }
+
+pduExternalSensorStatusName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The user-defined name for the External Sensor"
+	::= { pduExternalSensorStatusEntry 2 }
+
+pduExternalSensorStatusCommStatus  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		notInstalled (1),
+		commsOk (2),
+		commsLost (3)
+	}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The communications status of the sensor"
+	::= { pduExternalSensorStatusEntry 3 }
+
+pduExternalSensorStatusState  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		notPresent (0), alarmed (1), normal (2), belowLowerCritical (3), belowLowerWarning (4), aboveUpperWarning (5), aboveUpperCritical (6)
+	}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"This OID reports the current state of the sensor. 
+			A notPresent (0) response indicates that no sensor is attached.
+			An alarmed (1) response indicates that the sensor is present 
+			and its measured reading indicates alarmed.
+			A normal (2) response indicates that the sensor is present 
+			and its measured reading lies within all thresholds.
+			A belowLowerCritical (3) response indicates that the sensor 
+			is present and its measured reading lies below the lower critical threshold.
+			A belowLowerWarning (4) response indicates that the sensor 
+			is present and its measured reading lies below the lower warning threshold.
+			An aboveUpperWarning (5) response indicates that the sensor 
+			is present and its measured reading lies above the upper warning threshold.
+			An aboveUpperCritical (6) response indicates that the sensor 
+			is present and its measured reading lies above the upper critical threshold."
+	::= { pduExternalSensorStatusEntry 4 }
+
+pduExternalSensorStatusValue  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Sensor reading in pduExternalSensorConfigUnits value."
+	::= { pduExternalSensorStatusEntry 5 }
+
+pduExternalSensorStatusTimeStamp  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The sensor reading timestamp."
+	::= { pduExternalSensorStatusEntry 6 }
+
+pduExternalSensorStatusHighPrecisionValue  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Temperature sensor reading in tenths of pduExternalSensorConfigUnits value.
+		This OID is applied to temperature sensor only"
+	::= { pduExternalSensorStatusEntry 7 }
+	
+pduExternalSensorSTATUSAisle  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		hotAisle (1),
+		coldAisle (2)
+	}
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Indicates whether the external sensor is 
+		in a hot or cold aisle"
+	::= { pduExternalSensorStatusEntry 8 }
+
+--  Smart Cabinet
+
+pduUnitSmartCabinetTableSize  OBJECT-TYPE
+	SYNTAX 	Integer32 (0..255)
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The total number of Smart Cabinet Configuration "
+	::= { pduSmartCabinet 1 }
+
+pduUnitSmartCabinetTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduUnitSmartCabinetEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of Smart Cabinet information"
+	::= { pduSmartCabinet 2 }
+
+
+pduUnitSmartCabinetEntry  OBJECT-TYPE
+	SYNTAX 	PduUnitSmartCabinetEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"Information of Smart Cabinet"
+	INDEX { pduUnitSmartCabinetIndex }
+	::= { pduUnitSmartCabinetTable 1 }
+
+PduUnitSmartCabinetEntry ::= SEQUENCE {
+	pduUnitSmartCabinetIndex
+		Integer32,
+	pduUnitSmartCabinetCardUserName
+		DisplayString,
+	pduUnitSmartCabinetCardID
+		Integer32,
+	pduUnitSmartCabinetTimestamp
+		DisplayString,
+	pduUnitSmartCabinetDoor
+		INTEGER
+	}
+
+pduUnitSmartCabinetIndex   OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU Smart Cabinet table entry"
+	::= { pduUnitSmartCabinetEntry 1 }
+
+pduUnitSmartCabinetCardUserName     OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"User name of ID card"
+	::= { pduUnitSmartCabinetEntry 2 }
+
+pduUnitSmartCabinetCardID		OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Card ID."
+	::= { pduUnitSmartCabinetEntry 3 }
+
+pduUnitSmartCabinetTimestamp	OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Indicates the date and time of information update"
+	::= { pduUnitSmartCabinetEntry 4 }
+
+pduUnitSmartCabinetDoor	OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		hotAisle (1),
+		coldAisle (2) }
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Aisle of Smart Cabinet. "
+	::= { pduUnitSmartCabinetEntry 5 }
+		
+pduUnitSmartCabinetControl  	OBJECT IDENTIFIER ::= { pduSmartCabinet 3 }
+
+pduUnitSmartCabinetControlUserName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"User name of ID card"
+	::= { pduUnitSmartCabinetControl 1 }
+
+pduUnitSmartCabinetControlCardID		OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Card ID."
+	::= { pduUnitSmartCabinetControl 2 }
+
+pduUnitSmartCabinetControlTimestamp	OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Indicates the date and time of information update"
+	::= { pduUnitSmartCabinetControl 3 }
+	
+pduUnitSmartCabinetControlDoor	OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		hotAisle (1),
+		coldAisle (2)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Aisle of Smart Cabinet. "
+	::= { pduUnitSmartCabinetControl 4 }
+	
+pduUnitSmartCabinetCardIDEdit	OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		grant (0), remove (1)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Smart Cabinet edit CardID "
+	::= { pduUnitSmartCabinetControl 5 }
+	
+pduUnitSmartCabinetColdAisleLockStatus	OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		unlock (0), lock (1), notPresent (2)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Smart Cabinet ColdAisle lock state "
+	::= { pduUnitSmartCabinetControl 6 }
+
+pduUnitSmartCabinetHotAisleLockStatus	OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		unlock (0), lock (1), notPresent (2)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Smart Cabinet HotAisle lock state "
+	::= { pduUnitSmartCabinetControl 7 }	
+
+pduUnitSmartCabinetLockStateTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduUnitSmartCabinetLockStateEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"A table of Smart Cabinet aisle state control"
+	::= { pduSmartCabinet 4 }
+
+pduUnitSmartCabinetLockStateEntry  OBJECT-TYPE
+	SYNTAX 	PduUnitSmartCabinetLockStateEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"Information of Smart Cabinet Lock State"
+	INDEX { pduUnitSmartCabinetLockStateIndex }
+	::= { pduUnitSmartCabinetLockStateTable 1 }
+
+PduUnitSmartCabinetLockStateEntry ::= SEQUENCE {
+  pduUnitSmartCabinetLockStateIndex
+  	Integer32,
+	pduUnitSmartCabinetColdAisleLockState
+		INTEGER,
+	pduUnitSmartCabinetHotAisleLockState
+		INTEGER,
+	pduUnitSmartCabinetColdAisleLockLabel
+		DisplayString,
+	pduUnitSmartCabinetHotAisleLockLabel
+		DisplayString
+	}
+	
+pduUnitSmartCabinetLockStateIndex   OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the PDU Smart Cabinet table entry"
+	::= { pduUnitSmartCabinetLockStateEntry 1 }	
+
+pduUnitSmartCabinetColdAisleLockState	OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		unlock (0), lock (1), notPresent (2)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Smart Cabinet ColdAisle lock state "
+	::= { pduUnitSmartCabinetLockStateEntry 2 }
+
+pduUnitSmartCabinetHotAisleLockState	OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		unlock (0), lock (1), notPresent (2)
+	}
+	MAX-ACCESS  	read-write
+	STATUS 	current
+	DESCRIPTION 
+		"Smart Cabinet HotAisle lock state "
+	::= { pduUnitSmartCabinetLockStateEntry 3 }		
+
+pduUnitSmartCabinetColdAisleLockLabel  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Label of cold aisle smartcabinet"
+	::= { pduUnitSmartCabinetLockStateEntry 4 }
+				
+pduUnitSmartCabinetHotAisleLockLabel  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Label of hot aisle smartcabinet"
+	::= { pduUnitSmartCabinetLockStateEntry 5 }				
+				
+-- Traps Information
+trapsInfo  OBJECT IDENTIFIER ::= { pduTraps 1 }
+
+trapsInfoTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF TrapsInfoEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+       "A list of Trap Information entries. The number of
+            entries are given by the value of pduUnitTableSize."	
+	::= { trapsInfo 1 }
+	
+trapsInfoEntry  OBJECT-TYPE
+	SYNTAX 	TrapsInfoEntry
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"An entry containing objects used in traps"
+	INDEX { trapsInfoIndex }
+	::= { trapsInfoTable 1 }
+
+TrapsInfoEntry ::= SEQUENCE {
+	trapsInfoIndex
+		Integer32,
+	userName
+		DisplayString,
+	userUpdated
+		DisplayString,
+	firmwareVersion
+		DisplayString,
+	roleUpdated
+		DisplayString,
+	smtpRecipients
+		DisplayString,
+	smtpServer
+		DisplayString
+	}
+
+trapsInfoIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..256)
+	MAX-ACCESS  	not-accessible
+	STATUS 	current
+	DESCRIPTION 
+		"The index of the traps table entry"
+	::= { trapsInfoEntry 1 }
+
+
+userName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The user currently logged in."
+	::= { trapsInfoEntry 2 }
+	
+userUpdated  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The user added, deleted, or modified."
+	::= { trapsInfoEntry 3 }
+
+firmwareVersion  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The version of Firmware."
+	::= { trapsInfoEntry 4 }
+
+roleUpdated  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The role added, deleted, or modified."
+	::= { trapsInfoEntry 5 }
+
+smtpRecipients  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"Comma separated list of SMTP  recipients"
+	::= { trapsInfoEntry 6 }
+
+smtpServer  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	read-only
+	STATUS 	current
+	DESCRIPTION 
+		"The IP address/host name of the SMTP server"
+	::= { trapsInfoEntry 7 }
+
+pduIndex  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	accessible-for-notify
+	STATUS 	current
+	DESCRIPTION 
+		"A unique value for PDU. Its value ranges between 1 
+		and the value of PDU count"
+	::= { trapsInfo 2 }
+
+externalSensorIndex  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  	accessible-for-notify
+	STATUS 	current
+	DESCRIPTION 
+		"A unique value for each sensor. Its value ranges between 1 
+		and the value of external sensor count."
+	::= { trapsInfo 3 }
+
+serverPing  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		pingEnable (1),
+		pingDisable (2),
+		serverReachable (3),
+		serverNotReachable (4)
+	}
+	MAX-ACCESS  	accessible-for-notify
+	STATUS 	current
+	DESCRIPTION 
+		"Whether server ping has been enabled or disabled and 
+		whether the server is reachable or not reachable"
+	::= { trapsInfo 4 }
+
+usbDevice  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		connected (1),
+		disconnected (2)
+	}
+	MAX-ACCESS  	accessible-for-notify
+	STATUS 	current
+	DESCRIPTION 
+		"Whether a USB device has been connected or disconnected"
+	::= { trapsInfo 5 }
+
+errorDescription  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  	accessible-for-notify
+	STATUS 	current
+	DESCRIPTION 
+		"Description of the Error"
+	::= { trapsInfo 6 }
+
+cascading  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		connected (1),
+		disconnected (2)
+	}
+	MAX-ACCESS  	accessible-for-notify
+	STATUS 	current
+	DESCRIPTION 
+		"Whether a cascading member has been connected or disconnected"
+	::= { trapsInfo 7 }
+
+systemCommunication  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		ok (1),
+		lost (2)
+	}
+	MAX-ACCESS  	accessible-for-notify
+	STATUS 	current
+	DESCRIPTION 
+		"Whether the Network management card has lost contact with cascading member."
+	::= { trapsInfo 8 }
+
+trapCode OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"A number identifying the event for the trap that was sent.
+		 Mapped unique trap code per unique event to be used by ISEE's
+		 decoder ring."
+	::= { trapsInfo 9 }
+
+trapDescription OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"A string identifying the event for that last trap that was sent."
+	::= { trapsInfo 10 }
+
+
+trapCritical 			NOTIFICATION-TYPE
+				OBJECTS  {
+						 trapCode, 
+						 trapDescription, 
+						 sysDescr, 
+						 pduNamePlateIPAddress}
+        		STATUS      current
+				DESCRIPTION
+        			"A critical alarm has occurred."
+        		::= {pduTraps  1}
+
+trapWarning 			NOTIFICATION-TYPE
+				OBJECTS  { 
+					     trapCode, 
+					     trapDescription, 
+					     sysDescr, 
+					     pduNamePlateIPAddress}
+				STATUS      current
+				DESCRIPTION
+				"A warning alarm has occurred."
+				::= {pduTraps  2}
+
+trapInformation 		NOTIFICATION-TYPE
+				OBJECTS  {
+					     trapCode, 
+					     trapDescription, 
+					     sysDescr, 
+					     pduNamePlateIPAddress }
+				STATUS      current
+				DESCRIPTION
+				"An informational alarm has occurred."
+				::= {pduTraps  3}
+
+trapCleared 			NOTIFICATION-TYPE
+				OBJECTS  {
+					     trapCode, 
+					     trapDescription, 
+					     sysDescr, 
+					     pduNamePlateIPAddress}
+				STATUS      current
+				DESCRIPTION
+				"An alarm has cleared."
+				::= {pduTraps  4}
+
+trapTest 			NOTIFICATION-TYPE
+				OBJECTS  {
+					     trapCode,
+				             trapDescription,
+					     sysDescr, 
+					     pduNamePlateIPAddress} 
+				STATUS      current
+				DESCRIPTION
+				"Test trap sent to a trap receiver to check proper reception of traps" 
+				::= {pduTraps  5}
+
+--     ======Ehandle Sensor Status==========
+pduEhandleTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PduEhandleEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A list of contact sensors.  The number of entries are
+         given by number of pdu and pduEhandleCount."
+    ::= { pduEhandle 1 }
+
+pduEhandleEntry OBJECT-TYPE
+    SYNTAX PduEhandleEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "An entry for a contact sensor"
+    INDEX { pduEhandleIndex }
+    ::= { pduEhandleTable 1 }
+
+PduEhandleEntry ::= SEQUENCE
+    {
+        pduEhandleIndex              INTEGER,
+        pduEhandleAisle              INTEGER,
+        pduEhandleHandleOperation    INTEGER,
+        pduEhandleFwVer                  DisplayString,
+        pduEhandleMechanicalLock        INTEGER,
+        pduEhandleSerial               DisplayString,
+        pduEhandleHwVer                DisplayString,
+        pduEhandleAutoLockTime       INTEGER,
+        pduEhandleDoorOpenTime       INTEGER,
+        pduEhandleMaxDoorOpenTime    INTEGER,
+        pduEhandleUserPinLength      INTEGER,
+        pduEhandleUserPinMode        INTEGER,
+        pduEhandleAisleControl       INTEGER
+     }
+
+pduEhandleIndex OBJECT-TYPE
+    SYNTAX INTEGER (1..2)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The index of the PDU HID table entry"
+    ::= { pduEhandleEntry 1 }
+
+pduEhandleAisle OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            hot(1),
+            cold(2)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Aisle of HID handle. "
+    ::= { pduEhandleEntry 2 }
+
+pduEhandleHandleOperation OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            unlock(1),
+            lock(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "HID handle control opterations "
+    ::= { pduEhandleEntry 3 }
+
+pduEhandleFwVer OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The firmware revision level of the HID"
+    ::= { pduEhandleEntry 4 }
+
+pduEhandleMechanicalLock OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            unlock(1),
+            lock(2)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "HID Mechanical opterations "
+    ::= { pduEhandleEntry 5 }
+
+pduEhandleSerial OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The Serial Number of the HID"
+    ::= { pduEhandleEntry 6 }
+
+pduEhandleHwVer OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The hardware revision level of the HID"
+    ::= { pduEhandleEntry 7 }
+
+pduEhandleAutoLockTime OBJECT-TYPE
+SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "HID Electronic Latch Autolock Time in seconds, Value ranges (0-999) "
+::= { pduEhandleEntry 8 }
+
+pduEhandleDoorOpenTime OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "HID Door Open Time in seconds, Value ranges (0-999)"
+        ::= { pduEhandleEntry 9 }
+
+pduEhandleMaxDoorOpenTime OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "HID Max Door Open Time in seconds, Value ranges (0-32400),
+         critical alarm will be raised if door is left open past this time"
+    ::= { pduEhandleEntry 10 }
+
+pduEhandleUserPinLength OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Rack Access User minimum PIN Length, value ranges(1-15)"
+    ::= { pduEhandleEntry 11 }
+
+pduEhandleUserPinMode OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            visible(1),
+            hidden (2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Rack Access User PIN mode setting"
+    ::= { pduEhandleEntry 12 }
+
+pduEhandleAisleControl OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            combined (1),
+            standalone(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Rack Access Aisle Control setting,
+         when set to standalone each aisle will controlled seprately,
+         when set to combined opposite aisle can be controlled with authenticated control action on either aisle"
+    ::= { pduEhandleEntry 13 }
+
+
+--     ======EHANDLE control table==========
+pduEhandleControlTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PduEhandleControlEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A list of smartcard.  The number of entries are
+         given by number of pdu and pduEhandleCount."
+    ::= { pduEhandle 2 }
+
+pduEhandleControlEntry OBJECT-TYPE
+    SYNTAX PduEhandleControlEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The smart card table entry containing the usrname, cardid, cardaisle etc."
+    INDEX { pduEhandleControlIndex }
+    ::= { pduEhandleControlTable 1 }
+
+PduEhandleControlEntry ::= SEQUENCE
+    {
+        pduEhandleControlIndex                    INTEGER,
+        pduEhandleControlUserName                 DisplayString,
+        pduEhandleControlCardIdStr                DisplayString,
+        pduEhandleControlTimestamp                DisplayString,
+        pduEhandleControlCardAisle                INTEGER,
+        pduEhandleControlStartTime                DisplayString,
+        pduEhandleControlExpireTime               DisplayString,
+        pduEhandleControlTempUser                 INTEGER,
+        pduEhandleControlPin                      DisplayString
+    }
+
+pduEhandleControlIndex OBJECT-TYPE
+    SYNTAX INTEGER (1..200)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The index of the PDU smartcard table entry"
+    ::= { pduEhandleControlEntry 1 }
+
+pduEhandleControlUserName OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "User name of smartcard"
+    ::= { pduEhandleControlEntry 2 }
+
+pduEhandleControlCardIdStr	OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "smartcard ID."
+    ::= { pduEhandleControlEntry 3 }
+
+pduEhandleControlTimestamp OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Indicates the date and time of accessing"
+    ::= { pduEhandleControlEntry 4 }
+
+pduEhandleControlCardAisle OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            hot(1),
+            cold(2),
+            both (3)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Aisle of authorized card"
+    ::= { pduEhandleControlEntry 5 }
+
+pduEhandleControlStartTime OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Indicates the start date and time Rack access user is given access"
+    ::= { pduEhandleControlEntry 6 }
+
+pduEhandleControlExpireTime OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Indicates the date and time when the access of user card will expire, To set expire time first set user as temporary user"
+    ::= { pduEhandleControlEntry 7 }
+
+pduEhandleControlTempUser OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            no(1),
+            yes(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Indicates if the card user has temporary access"
+    ::= { pduEhandleControlEntry 8 }
+
+pduEhandleControlPin OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Rack acess control entry keypad PIN"
+    ::= { pduEhandleControlEntry 9 }
+
+-- ++++ End of cPDU ++++
+
+
+END
+
+
+
+

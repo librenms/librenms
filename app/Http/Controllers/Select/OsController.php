@@ -3,13 +3,19 @@
 namespace App\Http\Controllers\Select;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class OsController
 {
+    use AuthorizesRequests;
+
     public function __invoke(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', Device::class);
+
         $request->validate([
             'limit' => 'int',
             'page' => 'int',

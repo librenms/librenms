@@ -27,8 +27,7 @@
 namespace LibreNMS\Tests;
 
 use App\Facades\LibrenmsConfig;
-use LibreNMS\Data\Source\Fping;
-use LibreNMS\Data\Source\FpingResponse;
+use LibreNMS\Data\Source\Icmp\Fping;
 use Symfony\Component\Process\Process;
 
 final class FpingTest extends TestCase
@@ -40,7 +39,7 @@ final class FpingTest extends TestCase
 
         $actual = app()->make(Fping::class)->ping('192.168.1.3');
 
-        $this->assertTrue($actual->success());
+        $this->assertTrue($actual->isAlive());
         $this->assertEquals('192.168.1.3', $actual->host);
         $this->assertEquals(3, $actual->transmitted);
         $this->assertEquals(3, $actual->received);
@@ -49,7 +48,7 @@ final class FpingTest extends TestCase
         $this->assertEquals(0.93, $actual->max_latency);
         $this->assertEquals(0.71, $actual->avg_latency);
         $this->assertEquals(0, $actual->duplicates);
-        $this->assertEquals(0, $actual->exit_code);
+        $this->assertEquals(0, $actual->getExitCode()->value);
     }
 
     public function testPartialDownPing(): void
@@ -59,7 +58,7 @@ final class FpingTest extends TestCase
 
         $actual = app()->make(Fping::class)->ping('192.168.1.7');
 
-        $this->assertTrue($actual->success());
+        $this->assertTrue($actual->isAlive());
         $this->assertEquals('192.168.1.7', $actual->host);
         $this->assertEquals(5, $actual->transmitted);
         $this->assertEquals(3, $actual->received);
@@ -68,7 +67,7 @@ final class FpingTest extends TestCase
         $this->assertEquals(0.32, $actual->max_latency);
         $this->assertEquals(0.23, $actual->avg_latency);
         $this->assertEquals(0, $actual->duplicates);
-        $this->assertEquals(0, $actual->exit_code);
+        $this->assertEquals(0, $actual->getExitCode()->value);
     }
 
     public function testDownPing(): void
@@ -78,7 +77,7 @@ final class FpingTest extends TestCase
 
         $actual = app()->make(Fping::class)->ping('192.168.53.1');
 
-        $this->assertFalse($actual->success());
+        $this->assertFalse($actual->isAlive());
         $this->assertEquals('192.168.53.1', $actual->host);
         $this->assertEquals(3, $actual->transmitted);
         $this->assertEquals(0, $actual->received);
@@ -87,7 +86,7 @@ final class FpingTest extends TestCase
         $this->assertEquals(0.0, $actual->max_latency);
         $this->assertEquals(0.0, $actual->avg_latency);
         $this->assertEquals(0, $actual->duplicates);
-        $this->assertEquals(1, $actual->exit_code);
+        $this->assertEquals(1, $actual->getExitCode()->value);
     }
 
     public function testDuplicatePing(): void
@@ -102,7 +101,7 @@ OUT;
 
         $actual = app()->make(Fping::class)->ping('192.168.1.2');
 
-        $this->assertFalse($actual->success());
+        $this->assertFalse($actual->isAlive());
         $this->assertEquals('192.168.1.2', $actual->host);
         $this->assertEquals(3, $actual->transmitted);
         $this->assertEquals(3, $actual->received);
@@ -111,7 +110,7 @@ OUT;
         $this->assertEquals(0.91, $actual->max_latency);
         $this->assertEquals(0.79, $actual->avg_latency);
         $this->assertEquals(2, $actual->duplicates);
-        $this->assertEquals(1, $actual->exit_code);
+        $this->assertEquals(1, $actual->getExitCode()->value);
     }
 
     private function mockFpingProcess($output, $exitCode)
@@ -129,10 +128,10 @@ OUT;
     public function testBulkPing(): void
     {
         $expected = [
-            '192.168.1.4' => [3, 3, 0, 0.62, 0.93, 0.71, 0, 0],
-            'hostname' => [3, 0, 100, 0.0, 0.0, 0.0, 0, 1],
-            'invalid:characters!' => [0, 0, 0, 0.0, 0.0, 0.0, 0, 2],
-            '1.1.1.1' => [3, 2, 33, 0.024, 0.054, 0.037, 0, 0],
+            '192.168.1.4' => [0],
+            'hostname' => [1],
+            'invalid:characters!' => [2],
+            '1.1.1.1' => [0],
         ];
         $hosts = array_keys($expected);
 
@@ -143,9 +142,8 @@ OUT;
         $process->shouldReceive('run')->withArgs(function ($callback) {
             // simulate incremental output (not always one full line per callback)
             call_user_func($callback, Process::ERR, "ICMP unreachable\n"); // this line should be ignored
-            call_user_func($callback, Process::ERR, "192.168.1.4 : xmt/rcv/%loss = 3/3/0%, min/avg/max = 0.62/0.71/0.93\nhostname    : xmt/rcv/%loss = 3/0/100%");
-            call_user_func($callback, Process::ERR, "invalid:characters!: Name or service not known\n\n1.1.1.1 : xmt/rcv/%loss = 3/2/33%");
-            call_user_func($callback, Process::ERR, ", min/avg/max = 0.024/0.037/0.054\n");
+            call_user_func($callback, Process::ERR, "192.168.1.4 is alive\nhostname is unreachable\n");
+            call_user_func($callback, Process::ERR, "invalid:characters!: Name or service not known\n\n1.1.1.1 is alive\n");
 
             return true;
         });
@@ -154,23 +152,35 @@ OUT;
 
         // make call
         $calls = 0;
-        app()->make(Fping::class)->bulkPing($hosts, function (FpingResponse $response) use ($expected, &$calls): void {
+        app()->make(Fping::class)->bulkPing($hosts, function ($response) use ($expected, &$calls): void {
             $calls++;
 
             $this->assertArrayHasKey($response->host, $expected);
             $current = $expected[$response->host];
 
-            $this->assertSame($current[0], $response->transmitted);
-            $this->assertSame($current[1], $response->received);
-            $this->assertSame($current[2], $response->loss);
-            $this->assertSame($current[3], $response->min_latency);
-            $this->assertSame($current[4], $response->max_latency);
-            $this->assertSame($current[5], $response->avg_latency);
-            $this->assertSame($current[6], $response->duplicates);
-            $this->assertSame($current[7], $response->exit_code);
-            $this->assertFalse($response->wasSkipped());
+            $this->assertSame($current[0], $response->getExitCode()->value);
         });
 
         $this->assertEquals(count($expected), $calls);
+    }
+
+    public function testMtuSuccess(): void
+    {
+        $process = $this->mockFpingProcess('', 0);
+        $process->shouldReceive('disableOutput')->once();
+        $process->shouldReceive('isSuccessful')->once()->andReturn(true);
+
+        $result = app()->make(Fping::class)->testMtu('192.168.1.3', 1500);
+        $this->assertTrue($result);
+    }
+
+    public function testMtuFailure(): void
+    {
+        $process = $this->mockFpingProcess('', 1);
+        $process->shouldReceive('disableOutput')->once();
+        $process->shouldReceive('isSuccessful')->once()->andReturn(false);
+
+        $result = app()->make(Fping::class)->testMtu('192.168.1.3', 1500);
+        $this->assertFalse($result);
     }
 }

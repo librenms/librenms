@@ -74,7 +74,6 @@ if (isset($ss[0])) {
         'ssRawContexts',
         'ssRawSwapIn',
         'ssRawSwapOut',
-        'ssCpuRawWait',
         'ssCpuRawSteal',
     ];
 

@@ -86,19 +86,29 @@ return [
         ],
         'rrd' => [
             'CheckRrdVersion' => [
-                'fail' => 'The rrdtool version you have specified is newer than what is installed. Config: :config_version Installed :installed_version',
+                'fail' => 'rrdtool version :installed_version is too old, LibreNMS requires a minimum version of 1.5.5',
+                'fail_config' => 'The rrdtool_version :config_version you have specified is too old, LibreNMS requires a minimum version of 1.5.5',
                 'fix' => 'Either comment out or delete $config[\'rrdtool_version\'] = \':version\'; from your config.php file',
                 'ok' => 'rrdtool version ok',
             ],
             'CheckRrdcachedConnectivity' => [
                 'fail_socket' => ':socket does not appear to exist, rrdcached connectivity test failed',
-                'fail_port' => 'Cannot connect to rrdcached server on port :port',
+                'fail_port' => 'Cannot connect to rrdcached server :server on port :port',
                 'ok' => 'Connected to rrdcached',
             ],
             'CheckRrdDirPermissions' => [
                 'fail_root' => 'Your RRD directory is owned by root, please consider changing over to user a non-root user',
                 'fail_mode' => 'Your RRD directory is not set to 0775',
                 'ok' => 'rrd_dir is writable',
+            ],
+            'CheckRrdStep' => [
+                'fail' => 'Some RRD files have the incorrect step. :bad/:total',
+                'fail_bad_files' => 'Errors reading RRD files. :bad/:total',
+                'list_bad_step_title' => 'RRD files with incorrect step',
+                'list_bad_files_title' => 'Error running rrdinfo on files',
+                'list_bad_step_item' => ':file: step is :step, should be :target',
+                'ok' => 'All :total RRD files have the correct step.',
+                'timeout' => 'Checking RRD files took too long, check skipped. You can run :command to check and fix all rrd files.',
             ],
         ],
         'database' => [

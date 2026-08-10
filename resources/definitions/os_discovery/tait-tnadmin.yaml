@@ -1,4 +1,3 @@
-mib: TAIT-TNADMIN-MIB:TAIT-TN9300-MIB
 modules:
     os:
         sysDescr_regex: '/Tait Communications, Core Network, (?<hardware>[^,]+),/'
@@ -33,11 +32,11 @@ modules:
                     group: TnAdmin
                     state_name: tnAdminTaitServiceState
                     states:
-                        - { descr: Running, graph: 1, value: 0, generic: 0 }
-                        - { descr: Watchdog Stopped, graph: 1, value: 1, generic: 1 }
-                        - { descr: Application Stopped, graph: 1, value: 2, generic: 3 }
-                        - { descr: Stopped, graph: 1, value: 3, generic: 1 }
-                        - { descr: Not Installed, graph: 1, value: 4, generic: 3 }
+                        - { descr: Running, value: 0, generic: 0 }
+                        - { descr: Watchdog Stopped, value: 1, generic: 1 }
+                        - { descr: Application Stopped, value: 2, generic: 3 }
+                        - { descr: Stopped, value: 3, generic: 1 }
+                        - { descr: Not Installed, value: 4, generic: 3 }
                 -
                     oid: TAIT-TN9300-MIB::tn9300RemoteNodeTable
                     num_oid: '.1.3.6.1.4.1.3570.3.6.2.7.1.1.6.{{ $index }}'
@@ -47,13 +46,13 @@ modules:
                     group: Tn9300RemoteNode
                     state_name: tn9300RemoteNodeState
                     states:
-                        - { descr: Unknown, graph: 1, value: 0, generic: 3 }
-                        - { descr: Offline, graph: 1, value: 1, generic: 3 }
-                        - { descr: Program, graph: 1, value: 2, generic: 3 }
-                        - { descr: Switching, graph: 1, value: 3, generic: 0 }
-                        - { descr: Control, graph: 1, value: 4, generic: 0 }
-                        - { descr: Failed, graph: 1, value: 5, generic: 1 }
-                        - { descr: Graceful Shutdown, graph: 1, value: 6, generic: 3 }
+                        - { descr: Unknown, value: 0, generic: 3 }
+                        - { descr: Offline, value: 1, generic: 3 }
+                        - { descr: Program, value: 2, generic: 3 }
+                        - { descr: Switching, value: 3, generic: 0 }
+                        - { descr: Control, value: 4, generic: 0 }
+                        - { descr: Failed, value: 5, generic: 1 }
+                        - { descr: Graceful Shutdown, value: 6, generic: 3 }
                 -
                     oid: TAIT-TN9300-MIB::tn9300RemoteNodeTable
                     num_oid: '.1.3.6.1.4.1.3570.3.6.2.7.1.1.9.{{ $index }}'
@@ -63,10 +62,10 @@ modules:
                     group: Tn9300RemoteNode
                     state_name: tn9300RemoteNodeSynced
                     states:
-                        - { descr: OK, graph: 1, value: 0, generic: 0 }
-                        - { descr: Failed, graph: 1, value: 1, generic: 1 }
-                        - { descr: Unknown, graph: 1, value: 2, generic: 3 }
-                        - { descr: None, graph: 1, value: 3, generic: 3 }
+                        - { descr: OK, value: 0, generic: 0 }
+                        - { descr: Failed, value: 1, generic: 1 }
+                        - { descr: Unknown, value: 2, generic: 3 }
+                        - { descr: None, value: 3, generic: 3 }
                 -
                     oid: TAIT-TN9300-MIB::tn9300NodeObjs
                     num_oid: '.1.3.6.1.4.1.3570.3.6.2.1.17.{{ $index }}'
@@ -76,8 +75,8 @@ modules:
                     group: Alarms Local Node
                     state_name: tn9300DiskSpaceOk
                     states:
-                        - { descr: OK, graph: 1, value: 1, generic: 0 }
-                        - { descr: NOK, graph: 1, value: 2, generic: 1 }
+                        - { descr: OK, value: 1, generic: 0 }
+                        - { descr: NOK, value: 2, generic: 1 }
                 -
                     oid: TAIT-TN9300-MIB::tn9300NodeObjs
                     num_oid: '.1.3.6.1.4.1.3570.3.6.2.1.18.{{ $index }}'
@@ -87,17 +86,17 @@ modules:
                     group: Alarms Local Node
                     state_name: tn9300LicenseValidity
                     states:
-                        - { descr: Valid, graph: 1, value: 0, generic: 0 }
-                        - { descr: File Not Found, graph: 1, value: 1, generic: 1 }
-                        - { descr: Invalid host ID, graph: 1, value: 2, generic: 1 }
-                        - { descr: Invalid product code, graph: 1, value: 3, generic: 1 }
-                        - { descr: Invalid version, graph: 1, value: 4, generic: 1 }
-                        - { descr: Invalid expiry date, graph: 1, value: 5, generic: 1 }
-                        - { descr: Expired, graph: 1, value: 6, generic: 1 }
-                        - { descr: Corrupt signature, graph: 1, value: 7, generic: 1 }
-                        - { descr: Conflicting features, graph: 1, value: 8, generic: 1 }
-                        - { descr: Invalid tier mode, graph: 1, value: 9, generic: 1 }
-                        - { descr: Invalid license format, graph: 1, value: 10, generic: 1 }
+                        - { descr: Valid, value: 0, generic: 0 }
+                        - { descr: File Not Found, value: 1, generic: 1 }
+                        - { descr: Invalid host ID, value: 2, generic: 1 }
+                        - { descr: Invalid product code, value: 3, generic: 1 }
+                        - { descr: Invalid version, value: 4, generic: 1 }
+                        - { descr: Invalid expiry date, value: 5, generic: 1 }
+                        - { descr: Expired, value: 6, generic: 1 }
+                        - { descr: Corrupt signature, value: 7, generic: 1 }
+                        - { descr: Conflicting features, value: 8, generic: 1 }
+                        - { descr: Invalid tier mode, value: 9, generic: 1 }
+                        - { descr: Invalid license format, value: 10, generic: 1 }
                 -
                     oid: TAIT-TN9300-MIB::tn9300DipLineEntry
                     num_oid: '.1.3.6.1.4.1.3570.3.6.2.4.1.1.8.{{ $index }}'
@@ -107,11 +106,11 @@ modules:
                     group: 'TN9300 DipConnections {{ TAIT-TN9300-MIB::tn9300DipLineName }}'
                     state_name: tn9300DipLineState
                     states:
-                        - { descr: Unknown, graph: 1, value: 0, generic: 3 }
-                        - { descr: Unconfigured, graph: 1, value: 1, generic: 3 }
-                        - { descr: Idle, graph: 1, value: 2, generic: 3 }
-                        - { descr: Active, graph: 1, value: 3, generic: 0 }
-                        - { descr: Failed, graph: 1, value: 4, generic: 1 }
+                        - { descr: Unknown, value: 0, generic: 3 }
+                        - { descr: Unconfigured, value: 1, generic: 3 }
+                        - { descr: Idle, value: 2, generic: 3 }
+                        - { descr: Active, value: 3, generic: 0 }
+                        - { descr: Failed, value: 4, generic: 1 }
                 -
                     oid: TAIT-TN9300-MIB::tn9300DipLineEntry
                     num_oid: '.1.3.6.1.4.1.3570.3.6.2.4.1.1.9.{{ $index }}'
@@ -121,9 +120,9 @@ modules:
                     group: 'TN9300 DipConnections {{ TAIT-TN9300-MIB::tn9300DipLineName }}'
                     state_name: tn9300DipLineNgwLinkState
                     states:
-                        - { descr: Unknown, graph: 1, value: 0, generic: 3 }
-                        - { descr: OK, graph: 1, value: 1, generic: 0 }
-                        - { descr: Failed, graph: 1, value: 2, generic: 1 }
+                        - { descr: Unknown, value: 0, generic: 3 }
+                        - { descr: OK, value: 1, generic: 0 }
+                        - { descr: Failed, value: 2, generic: 1 }
                 -
                     oid: TAIT-TN9300-MIB::tn9300SiteTable
                     num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.4.{{ $index }}'
@@ -133,8 +132,8 @@ modules:
                     group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
                     state_name: tn9300SiteEnabled
                     states:
-                        - { descr: Disabled, graph: 1, value: 0, generic: 1 }
-                        - { descr: Enabled, graph: 1, value: 1, generic: 0 }
+                        - { descr: Disabled, value: 0, generic: 1 }
+                        - { descr: Enabled, value: 1, generic: 0 }
                 -
                     oid: TAIT-TN9300-MIB::tn9300SiteTable
                     num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.5.{{ $index }}'
@@ -144,8 +143,8 @@ modules:
                     group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
                     state_name: tn9300SiteOk
                     states:
-                        - { descr: Not OK, graph: 1, value: 0, generic: 1 }
-                        - { descr: OK, graph: 1, value: 1, generic: 0 }
+                        - { descr: Not OK, value: 0, generic: 1 }
+                        - { descr: OK, value: 1, generic: 0 }
                 -
                     oid: TAIT-TN9300-MIB::tn9300SiteTable
                     num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.42.{{ $index }}'
@@ -155,8 +154,8 @@ modules:
                     group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
                     state_name: tn9300SiteControlChCountOk
                     states:
-                        - { descr: Not OK, graph: 1, value: 0, generic: 1 }
-                        - { descr: OK, graph: 1, value: 1, generic: 0 }
+                        - { descr: Not OK, value: 0, generic: 1 }
+                        - { descr: OK, value: 1, generic: 0 }
         count:
             data:
                 -

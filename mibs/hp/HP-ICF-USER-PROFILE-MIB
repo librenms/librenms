@@ -1,28 +1,26 @@
 HP-ICF-USER-PROFILE-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    TimeTicks, IpAddress, Integer32, Unsigned32,
+    TimeTicks, Integer32, Unsigned32,
     OBJECT-TYPE, MODULE-IDENTITY, Counter64
         FROM SNMPv2-SMI
-    OBJECT-IDENTITY
-        FROM SNMPv2-SMI
-    PhysAddress, DisplayString, TEXTUAL-CONVENTION,
     RowStatus, TruthValue, MacAddress
         FROM SNMPv2-TC
     MODULE-COMPLIANCE, OBJECT-GROUP
         FROM SNMPv2-CONF
     InterfaceIndex
         FROM IF-MIB
-    hpSwitch, hpicfCommonSecurity, hpicfCommon
+    hpicfCommonSecurity
         FROM HP-ICF-OID
     VlanIndex
         FROM Q-BRIDGE-MIB
+    HpicfUsrProfilePortSpeed
+        FROM CONFIG-MIB
     ;
 
 hpicfUsrProfileMIB MODULE-IDENTITY
-    LAST-UPDATED "200704170230Z"  -- April 16, 2007
-    ORGANIZATION "Hewlett Packard Company,
-                  ProCurve Networking Business"
+    LAST-UPDATED "201306121539Z"  -- June 12, 2013
+    ORGANIZATION "HP Networking"
     CONTACT-INFO "Hewlett Packard Company,
                   8000 Foothills Blvd.
                   Roseville, CA 95747."
@@ -32,6 +30,25 @@ hpicfUsrProfileMIB MODULE-IDENTITY
     --
     -- Revision History
     --
+   REVISION "201306122248Z" -- June 12, 2013
+   DESCRIPTION
+            "Version 1.7
+             Added textual convetion HpicfUsrProfilePortSpeed and 
+             objects hpicfUsrProfilePortSpeedOverRidden,
+             hpicfUsrProfileStatsPortSpeedVSA. Deprecated group
+             hpicfUsrProfileStatsGroup and added hpicfUsrProfileStatsGroup1.
+             Deprecated  hpicfUsrProfileCompliance and added
+             hpicfUsrProfileCompliance3."
+   
+    REVISION "200803171539Z" -- March 17, 2008
+    DESCRIPTION
+             "Version 1.6
+              Created hpicfUsrProfileConfigNasRulesIpv6 to enable
+              or disable IPv6 ACEs.  When enabled, destinations of
+              'any' will be treated as both IPv4 and IPv6.  When
+              disabled all destinations will be treated as IPv4
+              only."
+
     REVISION "200707162110Z"   -- July 16, 2007
     DESCRIPTION
              "Version 1.5
@@ -110,7 +127,7 @@ hpicfUsrProfileCapabilityByPortMap OBJECT-TYPE
                 
                 When a bit is set to one, it indicates that device supports
                 the selected access profile primitive only on a per port
-                ('hpicfUsrProfileUserPortNumber') basis.  The concequence is 
+                ('hpicfUsrProfileUserPortNumber') basis.  The consequence is 
                 that the device can only enforce the same access primitive
                 setting for all users ('hpicfUsrProfileUserMacAddr') on a given 
                 port." 
@@ -170,7 +187,9 @@ HpicfUsrProfileConfigFilterListEntry ::= SEQUENCE {
         hpicfUsrProfileFilterListIndex
             Integer32,
         hpicfUsrProfileConfigFilterListRowStatus
-            RowStatus
+            RowStatus,
+        hpicfUsrProfileConfigNasRulesIpv6
+            INTEGER
 }
 
 hpicfUsrProfileFilterListIndex OBJECT-TYPE
@@ -199,6 +218,20 @@ hpicfUsrProfileConfigFilterListRowStatus OBJECT-TYPE
                  list index must have an active  
                  hpicfUsrProfileConfigFilterRuleRowStatus."
     ::= { hpicfUsrProfileConfigFilterListEntry 2 }
+
+hpicfUsrProfileConfigNasRulesIpv6 OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   enabled(1),
+                   disabled(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Setting this attribute to enabled(1) enables the usage
+                 of IPv6 destinations in ACEs.  When set to disabled(2)
+                 any implicit IP destinations will be translated as
+                 IPv4 only."
+    DEFVAL      { disabled }
+    ::= { hpicfUsrProfileConfigFilterListEntry  3 }
 
 hpicfUsrProfileConfigFilterRuleTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF HpicfUsrProfileConfigFilterRuleEntry
@@ -333,7 +366,7 @@ HpicfUsrProfileConfigEntry ::=
         hpicfUsrProfileConfigFilterListEnable
             TruthValue,
         hpicfUsrProfileConfigEntryRowStatus
-            TruthValue
+            RowStatus
     }    
 
 hpicfUsrProfileConfigIndex OBJECT-TYPE
@@ -564,7 +597,7 @@ hpicfUsrProfileConfigBindEntry OBJECT-TYPE
                   hpicfUsrProfileUserMacAddr }
 ::= { hpicfUsrProfileConfigBindTable 1 }
 
-HpicfUsrProfileConfigBindEntry::=
+HpicfUsrProfileConfigBindEntry ::=
     SEQUENCE {
         hpicfUsrProfileUserPortNumber
             InterfaceIndex,
@@ -581,7 +614,7 @@ hpicfUsrProfileUserPortNumber OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "The interface index associated with this user.
-                 On wired ProCurve products, the interface index
+                 On wired HP products, the interface index
                  is the physical port. On wireless products it is 
                  the instance (whether real or virtual) of an AP."
     ::= { hpicfUsrProfileConfigBindEntry 1}
@@ -835,7 +868,11 @@ HpicfUsrProfileStatsEntry ::=
         hpicfUsrProfileStatsFilterListIndex
             Integer32,
         hpicfUsrProfileStatsAccessMode
-            Integer32
+            INTEGER,
+        hpicfUsrProfilePortSpeedOverRidden
+            TruthValue,
+        hpicfUsrProfileStatsPortSpeedVSA
+            HpicfUsrProfilePortSpeed
     }
 
 hpicfUsrProfileStatsPvid OBJECT-TYPE
@@ -976,6 +1013,27 @@ hpicfUsrProfileStatsAccessMode OBJECT-TYPE
                 the variable value will still be SNMP."
     ::= { hpicfUsrProfileStatsEntry 11}
 
+hpicfUsrProfilePortSpeedOverRidden OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "When this attribute is TRUE it signifies
+                 the 'hpicfUsrProfileStatsPortSpeedVSA'
+                 is a RADIUS over-ridden. A FALSE value
+                 signifies it is not RADIUS over-ridden value."
+
+    ::= { hpicfUsrProfileStatsEntry 12}
+
+
+hpicfUsrProfileStatsPortSpeedVSA OBJECT-TYPE
+    SYNTAX      HpicfUsrProfilePortSpeed
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute signifies at what speed
+                 the port is operating at."
+
+    ::= { hpicfUsrProfileStatsEntry 13}
+
 -- ########################################################## --
 -- Conformance Information
 -- ########################################################## --
@@ -1000,13 +1058,9 @@ hpicfUsrProfileCapabilityGroup OBJECT-GROUP
 
 hpicfUsrProfileConfigGroup OBJECT-GROUP
     OBJECTS {
-        hpicfUsrProfileFilterListIndex,
         hpicfUsrProfileConfigFilterListRowStatus,
-        hpicfUsrProfileFilterRuleListIndex,
-        hpicfUsrProfileFilterRuleIndex,
         hpicfUsrProfileConfigFilterRule,
         hpicfUsrProfileConfigFilterRuleRowStatus,
-        hpicfUsrProfileConfigIndex,
         hpicfUsrProfileConfigPvid,
         hpicfUsrProfileConfigPvidEnable,
         hpicfUsrProfileConfigTaggedEgressVlanMap1k,
@@ -1026,7 +1080,8 @@ hpicfUsrProfileConfigGroup OBJECT-GROUP
         hpicfUsrProfileConfigEntryRowStatus,
         hpicfUsrProfileConfigConflictResolveQoS,
         hpicfUsrProfileConfigConflictResolveMaxIngressBandwidth,
-        hpicfUsrProfileConfigConflictResolveMaxEgressBandwidth                        
+        hpicfUsrProfileConfigConflictResolveMaxEgressBandwidth,
+        hpicfUsrProfileConfigNasRulesIpv6
     }
     STATUS      current
     DESCRIPTION "A collection of objects providing configuration
@@ -1049,19 +1104,54 @@ hpicfUsrProfileStatsGroup OBJECT-GROUP
         hpicfUsrProfileStatsPriorityRegenTable,
         hpicfUsrProfileStatsMaxIngressBandwidth,
         hpicfUsrProfileStatsMaxEgressBandwidth,
+        hpicfUsrProfileStatsFilterListIndex
+    }
+    STATUS      deprecated
+    DESCRIPTION "A collection of objects providing statistics
+                 of user access profiles."
+    ::= { hpicfUsrProfileGroup 3 }
+
+hpicfUsrProfileConfigGroup2 OBJECT-GROUP
+    OBJECTS {
+        hpicfUsrProfileSelector,
+        hpicfUsrProfileConfigBindEntryRowStatus
+    }
+    STATUS      current
+    DESCRIPTION "A collection of objects providing configuration
+                 of user access profiles."
+    ::= { hpicfUsrProfileGroup 4 }
+
+hpicfUsrProfileStatsGroup1 OBJECT-GROUP
+    OBJECTS {
+        hpicfUsrProfileLastUpdate,
+        hpicfUsrProfileStatsFilterRule,
+        hpicfUsrProfileStatsFilterRuleHitCount,
+        hpicfUsrProfileStatsFilterRuleHitCountEnabled,
+        hpicfUsrProfileStatsPvid,
+        hpicfUsrProfileStatsTaggedEgressVlanMap1k,
+        hpicfUsrProfileStatsTaggedEgressVlanMap2k,
+        hpicfUsrProfileStatsTaggedEgressVlanMap3k,
+        hpicfUsrProfileStatsTaggedEgressVlanMap4k,
+        hpicfUsrProfileStatsIngressVlanFilterEnable,
+        hpicfUsrProfileStatsPriorityRegenTable,
+        hpicfUsrProfileStatsMaxIngressBandwidth,
+        hpicfUsrProfileStatsMaxEgressBandwidth,
         hpicfUsrProfileStatsFilterListIndex,
-        hpicfUsrProfileStatsAccessMode
+        hpicfUsrProfileStatsAccessMode,
+        hpicfUsrProfileStatsPortSpeedVSA,
+        hpicfUsrProfilePortSpeedOverRidden
     }
     STATUS      current
     DESCRIPTION "A collection of objects providing statistics
                  of user access profiles."
-    ::= { hpicfUsrProfileGroup 3 }
+    ::= { hpicfUsrProfileGroup 5 }
+
 
 -- ---------------------------------------------------------- --
 -- Compliance statements
 -- ---------------------------------------------------------- --
 hpicfUsrProfileCompliance MODULE-COMPLIANCE
-     STATUS  current
+     STATUS  deprecated
      DESCRIPTION
          "The compliance statement for devices support of
           HP-USER-PROFILE-MIB."
@@ -1073,5 +1163,43 @@ hpicfUsrProfileCompliance MODULE-COMPLIANCE
         }
      ::= { hpicfUsrProfileCompliances 1 }
 
+hpicfUsrProfileCompliance2 MODULE-COMPLIANCE
+     STATUS  deprecated
+     DESCRIPTION
+         "The compliance statement for devices support of
+          HP-USER-PROFILE-MIB."
+     MODULE -- This Module
+        MANDATORY-GROUPS {
+            hpicfUsrProfileCapabilityGroup,
+            hpicfUsrProfileConfigGroup,
+            hpicfUsrProfileStatsGroup,
+            hpicfUsrProfileConfigGroup2
+        }
+
+     ::= { hpicfUsrProfileCompliances 2 }
+
+hpicfUsrProfileCompliance3 MODULE-COMPLIANCE
+     STATUS  current
+     DESCRIPTION
+         "The compliance statement for devices support of
+          HP-USER-PROFILE-MIB."
+     MODULE -- This Module
+        MANDATORY-GROUPS {
+            hpicfUsrProfileCapabilityGroup,
+            hpicfUsrProfileConfigGroup,
+            hpicfUsrProfileStatsGroup1
+        }
+     ::= { hpicfUsrProfileCompliances 3 }
+
+hpicfUsrProfileCompliance4 MODULE-COMPLIANCE
+     STATUS  current
+     DESCRIPTION
+         "The compliance statement for devices support of
+          HP-USER-PROFILE-MIB."
+     MODULE -- This Module
+        MANDATORY-GROUPS {
+            hpicfUsrProfileConfigGroup2
+        }
+     ::= { hpicfUsrProfileCompliances 4 }
 
 END

@@ -1,6 +1,8 @@
 os: junos
 text: 'Juniper JunOS'
 type: network
+mib_dir: juniper/junos
+group: juniper
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

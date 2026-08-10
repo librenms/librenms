@@ -29,16 +29,18 @@ namespace App\Http\Controllers\Table;
 use App\Models\Device;
 use App\Models\Route;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Url;
 
+/**
+ * @extends TableController<Route>
+ */
 class RoutesTablesController extends TableController
 {
-    protected $ipCache = [];
-
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'device_id' => 'nullable|integer',
@@ -46,7 +48,7 @@ class RoutesTablesController extends TableController
         ];
     }
 
-    protected function filterFields($request)
+    protected function filterFields(Request $request): array
     {
         return [
             'route.context_name' => 'context_name',
@@ -54,7 +56,7 @@ class RoutesTablesController extends TableController
         ];
     }
 
-    protected function sortFields($request)
+    protected function sortFields(Request $request): array
     {
         return [
             'context_name',
@@ -73,17 +75,16 @@ class RoutesTablesController extends TableController
 
     /**
      * Defines the base query for this resource
-     *
-     * @param  Request  $request
-     * @return Builder|\Illuminate\Database\Query\Builder
      */
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Route::class);
+
         $join = function ($query): void {
             $query->on('ports.port_id', 'route.port_id');
         };
-        $showAllRoutes = trim(\Request::get('showAllRoutes'));
-        $showProtocols = trim(\Request::get('showProtocols'));
+        $showAllRoutes = trim(\Request::input('showAllRoutes'));
+        $showProtocols = trim(\Request::input('showProtocols'));
         if ($showProtocols == 'all') {
             $protocols = ['ipv4', 'ipv6'];
         } else {
@@ -114,15 +115,9 @@ class RoutesTablesController extends TableController
             ->leftJoin('ports', $join);
     }
 
-    /**
-     * @param  string  $search
-     * @param  Builder  $query
-     * @param  array  $fields
-     * @return Builder|\Illuminate\Database\Query\Builder
-     */
-    protected function search($search, $query, $fields = [])
+    protected function search(?string $search, Builder $query, array $fields): Builder
     {
-        if ($search = trim(\Request::get('searchPhrase'))) {
+        if ($search = trim(\Request::input('searchPhrase'))) {
             $searchLike = '%' . $search . '%';
 
             return $query->where(fn ($query) => $query->where('route.inetCidrRouteNextHop', 'like', $searchLike)
@@ -132,14 +127,9 @@ class RoutesTablesController extends TableController
         return $query;
     }
 
-    /**
-     * @param  Request  $request
-     * @param  Builder  $query
-     * @return Builder
-     */
-    public function sort($request, $query)
+    public function sort(Request $request, Builder $query): Builder
     {
-        $sort = $request->get('sort');
+        $sort = $request->input('sort');
         if (isset($sort['inetCidrRouteIfIndex'])) {
             $query->orderBy('ifDescr', $sort['inetCidrRouteIfIndex'])
                 ->orderBy('inetCidrRouteIfIndex', $sort['inetCidrRouteIfIndex']);
@@ -166,59 +156,60 @@ class RoutesTablesController extends TableController
     }
 
     /**
-     * @param  Route  $route_entry
+     * @param  Route  $model
+     * @return array<string, scalar>
      */
-    public function formatItem($route_entry)
+    public function formatItem(Model $model): array
     {
         $item = [
-            'updated_at' => $route_entry->updated_at ? $route_entry->updated_at->diffForHumans() : $route_entry->updated_at,
-            'created_at' => $route_entry->created_at ? $route_entry->created_at->toDateTimeString() : $route_entry->created_at,
-            'inetCidrRouteIfIndex' => $route_entry->inetCidrRouteIfIndex == 0 ? 'Undefined' : $route_entry->inetCidrRouteIfIndex,
-            'inetCidrRouteMetric1' => $route_entry->inetCidrRouteMetric1,
-            'inetCidrRoutePfxLen' => $route_entry->inetCidrRoutePfxLen,
-            'inetCidrRouteDestType' => $route_entry->inetCidrRouteDestType,
+            'updated_at' => $model->updated_at ? $model->updated_at->diffForHumans() : $model->updated_at,
+            'created_at' => $model->created_at ? $model->created_at->toDateTimeString() : $model->created_at,
+            'inetCidrRouteIfIndex' => $model->inetCidrRouteIfIndex == 0 ? 'Undefined' : $model->inetCidrRouteIfIndex,
+            'inetCidrRouteMetric1' => $model->inetCidrRouteMetric1,
+            'inetCidrRoutePfxLen' => $model->inetCidrRoutePfxLen,
+            'inetCidrRouteDestType' => $model->inetCidrRouteDestType,
         ];
 
         try {
-            $obj_inetCidrRouteDest = IP::parse($route_entry->inetCidrRouteDest);
+            $obj_inetCidrRouteDest = IP::parse($model->inetCidrRouteDest);
             $item['inetCidrRouteDest'] = $obj_inetCidrRouteDest->compressed();
         } catch (\Exception) {
-            $item['inetCidrRouteDest'] = $route_entry->inetCidrRouteDest;
+            $item['inetCidrRouteDest'] = $model->inetCidrRouteDest;
         }
 
-        $item['inetCidrRouteIfIndex'] = $route_entry->inetCidrRouteIfIndex == 0 ? 'Undefined' : 'IfIndex ' . $route_entry->inetCidrRouteIfIndex;
-        if ($port = $route_entry->port()->first()) {
+        $item['inetCidrRouteIfIndex'] = $model->inetCidrRouteIfIndex == 0 ? 'Undefined' : 'IfIndex ' . $model->inetCidrRouteIfIndex;
+        if ($port = $model->port()->first()) {
             $item['inetCidrRouteIfIndex'] = Blade::render('<x-port-link :port="$port">{{ $port->getShortLabel() }}</x-port-link>', ['port' => $port]);
         }
 
         try {
-            $obj_inetCidrRouteNextHop = IP::parse($route_entry->inetCidrRouteNextHop);
+            $obj_inetCidrRouteNextHop = IP::parse($model->inetCidrRouteNextHop);
             $item['inetCidrRouteNextHop'] = $obj_inetCidrRouteNextHop->compressed();
         } catch (\Exception) {
-            $item['inetCidrRouteNextHop'] = $route_entry->inetCidrRouteNextHop;
+            $item['inetCidrRouteNextHop'] = $model->inetCidrRouteNextHop;
         }
-        $device = Device::findByIp($route_entry->inetCidrRouteNextHop);
+        $device = Device::findByIp($model->inetCidrRouteNextHop);
         if ($device) {
-            if ($device->device_id == $route_entry->device_id || in_array($route_entry->inetCidrRouteNextHop, ['127.0.0.1', '::1'])) {
+            if ($device->device_id == $model->device_id || in_array($model->inetCidrRouteNextHop, ['127.0.0.1', '::1'])) {
                 $item['inetCidrRouteNextHop'] = Blade::render('<x-device-link :device="$device">localhost</x-device-link>', ['device' => $device]);
             } else {
                 $item['inetCidrRouteNextHop'] = $item['inetCidrRouteNextHop'] . '<br>(' . rtrim(Blade::render('<x-device-link :device="$device"/>', ['device' => $device])) . ')';
             }
         }
 
-        $item['inetCidrRouteProto'] = $route_entry->inetCidrRouteProto;
-        if ($route_entry->inetCidrRouteProto && $route_entry::$translateProto[$route_entry->inetCidrRouteProto]) {
-            $item['inetCidrRouteProto'] = $route_entry::$translateProto[$route_entry->inetCidrRouteProto];
+        $item['inetCidrRouteProto'] = $model->inetCidrRouteProto;
+        if ($model->inetCidrRouteProto && $model::$translateProto[$model->inetCidrRouteProto]) {
+            $item['inetCidrRouteProto'] = $model::$translateProto[$model->inetCidrRouteProto];
         }
 
-        $item['inetCidrRouteType'] = $route_entry->inetCidrRouteType;
-        if ($route_entry->inetCidrRouteType && $route_entry::$translateType[$route_entry->inetCidrRouteType]) {
-            $item['inetCidrRouteType'] = $route_entry::$translateType[$route_entry->inetCidrRouteType];
+        $item['inetCidrRouteType'] = $model->inetCidrRouteType;
+        if ($model->inetCidrRouteType && $model::$translateType[$model->inetCidrRouteType]) {
+            $item['inetCidrRouteType'] = $model::$translateType[$model->inetCidrRouteType];
         }
 
         $item['context_name'] = '[global]';
-        if ($route_entry->context_name != '') {
-            $item['context_name'] = '<a href="' . Url::generate(['page' => 'routing', 'protocol' => 'vrf', 'vrf' => $route_entry->context_name]) . '">' . htmlspecialchars((string) $route_entry->context_name) . '</a>';
+        if ($model->context_name != '') {
+            $item['context_name'] = '<a href="' . Url::generate(['page' => 'routing', 'protocol' => 'vrf', 'vrf' => $model->context_name]) . '">' . htmlspecialchars((string) $model->context_name) . '</a>';
         }
 
         return $item;

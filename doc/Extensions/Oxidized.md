@@ -307,16 +307,6 @@ configuration
 next_adds_job: true
 ```
 
-## Validate Oxidized config
-
-You can perform basic validation of the Oxidized configuration by
-going to the Overview -> Tools -> Oxidized link and in the Oxidized
-config validation page, paste your yaml file into the input box and
-click 'Validate YAML'.
-
-We check for yaml syntax errors and also actual config values to
-ensure they are used in the correct location.
-
 ## Accessing configuration of a disabled/removed device
 
 When you're disabling or removing a device from LibreNMS, the

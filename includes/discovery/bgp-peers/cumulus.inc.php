@@ -1,5 +1,7 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
+
 $bgpPeers = \SnmpQuery::enumStrings()->hideMib()->walk('CUMULUS-BGPVRF-MIB::bgpPeerTable')->mapTable(
     function ($data, $vrfId, $peerIdType, $ifFace) {
         $data['vrfId'] = $vrfId;
@@ -48,7 +50,7 @@ foreach ($bgpPeers as $bgpPeer) {
 
         DeviceCache::getPrimary()->bgppeers()->create($peers);
 
-        if (Config::get('autodiscovery.bgp')) {
+        if (LibrenmsConfig::get('autodiscovery.bgp')) {
             $name = gethostbyaddr($bgpPeer['bgpPeerRemoteAddr']);
             discover_new_device($name, $device, 'BGP');
         }

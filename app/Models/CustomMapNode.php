@@ -44,11 +44,6 @@ class CustomMapNode extends BaseModel
 
     public function scopeHasAccess($query, User $user)
     {
-        if ($user->hasGlobalRead()) {
-            return $query;
-        }
-
-        // Allow only if the user has access to the node
         return $this->hasDeviceAccess($query, $user);
     }
 

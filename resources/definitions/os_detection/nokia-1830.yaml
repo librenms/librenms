@@ -5,6 +5,7 @@ mib_dir: nokia/1830
 type: network
 ifXmcbc: true
 ifname: true
+empty_ifdescr: true
 over:
     - { graph: device_state, text: States }
     - { graph: device_dbm, text: 'Optical Power' }

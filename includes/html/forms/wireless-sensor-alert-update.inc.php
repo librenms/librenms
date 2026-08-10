@@ -17,10 +17,10 @@ header('Content-type: application/json');
 
 // FUA
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('wireless-sensor.update')) {
     exit(json_encode([
         'status' => 'error',
-        'message' => 'You need to be admin',
+        'message' => 'You need permission',
     ]));
 }
 

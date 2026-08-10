@@ -891,28 +891,24 @@
                 {
                     "state_name": "sensorexample1_000000008143f11e",
                     "state_descr": "Closed",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "sensorexample1_000000008143f11e",
                     "state_descr": "Open",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "sensorexample2_000000008143f11e",
                     "state_descr": "Switched off",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "sensorexample2_000000008143f11e",
                     "state_descr": "Switched on",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 }

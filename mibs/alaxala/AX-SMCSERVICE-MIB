@@ -1,0 +1,376 @@
+--
+-- All Rights Reserved, Copyright (c) 2015, ALAXALA Networks Corp.
+--
+-- AX-SMCSERVICE-MIB.my axSmcServiceInforamtion group MIB file.
+--
+
+AX-SMCSERVICE-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        Integer32
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        DisplayString
+            FROM SNMPv2-TC
+        axMib
+            FROM AX-SMI-MIB
+;
+
+axSmcServiceInformation MODULE-IDENTITY
+    LAST-UPDATED    "201411140000Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+        "The MIB module for SMC Service information."
+
+    REVISION        "201411140000Z"
+    DESCRIPTION
+        "Initial release."
+    ::= { axMib 1003 }
+
+-------------------------------------------------------------------------------
+-- Object Type definitions
+-------------------------------------------------------------------------------
+
+--
+--  axSmcServiceTable
+--
+axSmcServiceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxSmcServiceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing information of service with SMC service information."
+    ::= {axSmcServiceInformation 1}
+
+axSmcServiceEntry OBJECT-TYPE
+    SYNTAX AxSmcServiceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing information of service with SMC service information."
+    INDEX { axSmcServiceId }
+    ::= {axSmcServiceTable 1}
+
+AxSmcServiceEntry ::= SEQUENCE {
+    axSmcServiceId                  Integer32,
+    axSmcServiceName                DisplayString,
+    axSmcServiceNifNo               Integer32,
+    axSmcServiceType                DisplayString,
+    axSmcServiceAttachedGroupId     Integer32,
+    axSmcServiceAttachedGroupName   DisplayString,
+    axSmcServiceStatus              INTEGER,
+    axSmcServiceUpTime              DisplayString
+}
+
+axSmcServiceId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index value which identifies SMC service."
+    ::= {axSmcServiceEntry 1}
+
+axSmcServiceName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Name of SMC service."
+    ::= {axSmcServiceEntry 2}
+
+axSmcServiceNifNo OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Position information of NIF loading slot. The value is from 1 to axNifBoardNumber."
+    ::= {axSmcServiceEntry 3}
+
+axSmcServiceType OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Type of SMC service."
+    ::= {axSmcServiceEntry 4}
+
+axSmcServiceAttachedGroupId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index value which identifies service group of SMC service."
+    ::= {axSmcServiceEntry 5}
+
+axSmcServiceAttachedGroupName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Name of SMC service group of SMC service."
+    ::= {axSmcServiceEntry 6}
+
+axSmcServiceStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      active(1),
+                      standby(2),
+                      outOfService(3),
+                      unknown(99)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of SMC service."
+    ::= {axSmcServiceEntry 7}
+
+axSmcServiceUpTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Up time of SMC service.
+    Format : YYYY/MM/DD hh:mm:ss zone
+It is set to DisplayString of length zero when SMC service is downed."
+    ::= {axSmcServiceEntry 8}
+
+--
+--  axSmcServiceGroupTable
+--
+axSmcServiceGroupTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxSmcServiceGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing information of service group with SMC service information."
+    ::= {axSmcServiceInformation 2}
+
+axSmcServiceGroupEntry OBJECT-TYPE
+    SYNTAX AxSmcServiceGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing information of service group with SMC service information."
+    INDEX { axSmcServiceGroupId }
+    ::= {axSmcServiceGroupTable 1}
+
+AxSmcServiceGroupEntry ::= SEQUENCE {
+    axSmcServiceGroupId                        Integer32,
+    axSmcServiceGroupName                      DisplayString,
+    axSmcServiceGroupRedundancyType            INTEGER,
+    axSmcServiceGroupAttachedApplicationId     Integer32,
+    axSmcServiceGroupAttachedApplicationName   DisplayString,
+    axSmcServiceGroupRedundancyStatus          INTEGER
+}
+
+axSmcServiceGroupId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index value which identifies SMC service group."
+    ::= {axSmcServiceGroupEntry 1}
+
+axSmcServiceGroupName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Name of SMC service group."
+    ::= {axSmcServiceGroupEntry 2}
+
+axSmcServiceGroupRedundancyType OBJECT-TYPE
+    SYNTAX INTEGER {
+                      allActive(1),
+                      activeStandby(2),
+                      unknown(99)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value which redundancy type of service group."
+    ::= {axSmcServiceGroupEntry 3}
+
+axSmcServiceGroupAttachedApplicationId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index value which identifies application of SMC service group."
+    ::= {axSmcServiceGroupEntry 4}
+
+axSmcServiceGroupAttachedApplicationName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Name of SMC application of SMC Service Group."
+    ::= {axSmcServiceGroupEntry 5}
+
+axSmcServiceGroupRedundancyStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      invalid(1),
+                      duplex(2),
+                      simplex(3),
+                      unknown(99)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value which redundancy status of SMC Service Group."
+    ::= {axSmcServiceGroupEntry 6}
+
+--
+--  axSmcApplicationTable
+--
+axSmcApplicationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxSmcApplicationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing information of application with SMC service information."
+    ::= {axSmcServiceInformation 3}
+
+axSmcApplicationEntry OBJECT-TYPE
+    SYNTAX AxSmcApplicationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing information of application with SMC service information."
+    INDEX { axSmcApplicationId }
+    ::= {axSmcApplicationTable 1}
+
+AxSmcApplicationEntry ::= SEQUENCE {
+    axSmcApplicationId       Integer32,
+    axSmcApplicationName     DisplayString
+}
+
+axSmcApplicationId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index value which identifies SMC application."
+    ::= {axSmcApplicationEntry 1}
+
+axSmcApplicationName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Name of SMC application."
+    ::= {axSmcApplicationEntry 2}
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+axSmcServiceTraps             OBJECT IDENTIFIER ::= { axSmcServiceInformation 4 }
+axSmcServiceTrapsPrefix       OBJECT IDENTIFIER ::= { axSmcServiceTraps 0 }
+
+axSmcServiceStateChange NOTIFICATION-TYPE
+    OBJECTS     {
+                    axSmcServiceId,
+                    axSmcServiceName,
+                    axSmcServiceStatus
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap signifies that the state of an SMC service has been changed."
+    ::= { axSmcServiceTrapsPrefix 1 }
+
+axSmcServiceGroupDuplexToSimplexTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axSmcServiceGroupId,
+                    axSmcServiceGroupName
+                }
+    STATUS      current
+    DESCRIPTION
+        "SMC service group redundancy status changed from simplex to duplex."
+    ::= { axSmcServiceTrapsPrefix 2 }
+
+axSmcServiceGroupSimplexToDuplexTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axSmcServiceGroupId,
+                    axSmcServiceGroupName
+                }
+    STATUS      current
+    DESCRIPTION
+        "SMC service group redundancy status changed from duplex to simplex."
+    ::= { axSmcServiceTrapsPrefix 3 }
+
+axSmcServiceGroupSwitchOver NOTIFICATION-TYPE
+    OBJECTS     {
+                    axSmcServiceGroupId,
+                    axSmcServiceGroupName
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates that SMC service was switched over in the SMC service group."
+    ::= { axSmcServiceTrapsPrefix 4 }
+
+
+--------------------------------------------------
+-- Conformance Statements
+--------------------------------------------------
+--
+-- Conformance identifier
+--
+axSmcConformance          OBJECT IDENTIFIER ::= { axSmcServiceInformation 1000 }
+axSmcCompliances          OBJECT IDENTIFIER ::= { axSmcConformance 1 }
+axSmcGroups               OBJECT IDENTIFIER ::= { axSmcConformance 2 }
+--
+-- Compliance
+--
+axSmcCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "axSmcServiceInformation"
+    MODULE      -- this module
+        MANDATORY-GROUPS{ axSmcGroup,
+                          axSmcTrapGroup }
+    ::= { axSmcCompliances 1 }
+
+--
+-- Object Group
+--
+axSmcGroup OBJECT-GROUP
+    OBJECTS     {
+                     axSmcServiceId,
+                     axSmcServiceName,
+                     axSmcServiceNifNo,
+                     axSmcServiceType,
+                     axSmcServiceAttachedGroupId,
+                     axSmcServiceAttachedGroupName,
+                     axSmcServiceStatus,
+                     axSmcServiceUpTime,
+                     axSmcServiceGroupId,
+                     axSmcServiceGroupName,
+                     axSmcServiceGroupRedundancyType,
+                     axSmcServiceGroupAttachedApplicationId,
+                     axSmcServiceGroupAttachedApplicationName,
+                     axSmcServiceGroupRedundancyStatus,
+                     axSmcApplicationId,
+                     axSmcApplicationName
+                }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects SMC Service information."
+    ::= { axSmcGroups 1 }
+
+--
+-- Notification Group
+--
+axSmcTrapGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                       axSmcServiceStateChange,
+                       axSmcServiceGroupDuplexToSimplexTrap,
+                       axSmcServiceGroupSimplexToDuplexTrap,
+                       axSmcServiceGroupSwitchOver
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The collection of notifications of SMC Service information."
+    ::= { axSmcGroups 10 }
+
+END

@@ -13,15 +13,6 @@ over:
 poller_modules:
     arp-table: false
     bgp-peers: false
-    cisco-ace-loadbalancer: false
-    cisco-ace-serverfarms: false
-    cisco-cef: false
-    cisco-ipsec-flow-monitor: false
-    cisco-mac-accounting: false
-    cisco-otv: false
-    cisco-qfp: false
-    cisco-remote-access-monitor: false
-    cipsec-tunnels: false
     entity-physical: true
     entity-state: false
     fdb-table: false
@@ -48,12 +39,6 @@ discovery_modules:
     arp-table: false
     bgp-peers: false
     charge: false
-    cisco-cef: false
-    cisco-mac-accounting: false
-    cisco-otv: false
-    cisco-pw: false
-    cisco-qfp: false
-    cisco-vrf-lite: false
     discovery-protocols: false
     diskio: false
     entity-physical: true

@@ -80,8 +80,8 @@ modules:
                     descr: '{{ CPI-UNITY-MIB::cpiPduOutletName }}'
                     state_name: cpiPduOutletControl
                     states:
-                        - { descr: Off, graph: 1, value: 0, generic: 0 }
-                        - { descr: On, graph: 1, value: 1, generic: 0 }
+                        - { descr: Off, value: 0, generic: 0 }
+                        - { descr: On, value: 1, generic: 0 }
                 -
                     oid: CPI-UNITY-MIB::cpiPduBranchStatus
                     value: CPI-UNITY-MIB::cpiPduBranchStatus
@@ -89,6 +89,6 @@ modules:
                     descr: 'CB{{ CPI-UNITY-MIB::cpiPduBranchId }} Status'
                     state_name: cpiPduBranchStatus
                     states:
-                        - { descr: NoAlarm, graph: 1, value: 0, generic: 0 }
-                        - { descr: Warning, graph: 1, value: 1, generic: 1 }
-                        - { descr: Alarm, graph: 1, value: 2, generic: 2 }
+                        - { descr: NoAlarm, value: 0, generic: 0 }
+                        - { descr: Warning, value: 1, generic: 1 }
+                        - { descr: Alarm, value: 2, generic: 2 }

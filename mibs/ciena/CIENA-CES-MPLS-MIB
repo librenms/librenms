@@ -1,4 +1,4 @@
--- This file was included in WWP MIB release 04-16-00-0047
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-06-00-5005
 --
  -- CIENA-CES-MPLS-MIB.my
  --
@@ -24,31 +24,72 @@
         FROM MPLS-TC-STD-MIB;
 	
  cienaCesMplsMIB MODULE-IDENTITY
-            LAST-UPDATED "201611220000Z"
-            ORGANIZATION "Ciena, Inc"
+            LAST-UPDATED "201801180000Z"
+            ORGANIZATION "Ciena Corp."
             CONTACT-INFO
-                    "   Mib Meister
-		              115 North Sullivan Road
-	                   Spokane Valley, WA 99037
-		              USA		 		
-				    Phone:  +1 509 242 9000
-				    Email:  support@ciena.com"
+            "   Mib Meister
+                7035 Ridge Road
+                Hanover, Maryland 21076
+                USA
+                Phone:  +1 800 921 1144
+                Email:  support@ciena.com"
             DESCRIPTION
                     "This MIB module defines the mgmt objects for the MPLS 
                      feature for LEOS based Ciena products."
 
-	   REVISION
-           "201611220000Z"
+       REVISION
+           "201801180000Z"
+           DESCRIPTION          
+           "Added two new traps cienaCesMplsGatewayVsConfigured and cienaCesMplsGatewayVsDeconfigured, A new Parameter is added
+            cienaCesMplsPwGatewayVsState in CienaCesMplsPwNotifEntry table for above mentioned Traps."
+
+       REVISION
+           "201709150000Z"
+           DESCRIPTION          
+           "Added three new traps cienaCesGmplsEncapCoroutedServiceDegradeChgTrap, cienaCesGmplsDecapCoroutedServiceDegradeChgTrap and
+            cienaCesGmplsTransitCoroutedServiceDegradeChgTrap. Added three new OID's cienaCesGmplsNotifEncapTunnelServiceDegradeState,
+            cienaCesGmplsNotifDecapTunnelServiceDegradeState and cienaCesGmplsNotifTransitTunnelServiceDegradeState in tables cienaCesGmplsNotifEncapTunnelTable,
+            cienaCesGmplsNotifDecapTunnelTable and cienaCesGmplsNotifTransitTunnelTable respectively. Added a textual-convention ServiceDegradeState for service
+            degrade state."
+
+       REVISION
+           "201708310000Z"
            DESCRIPTION
-           "Added new OID cienaCesGmplsDynamicIngressCoroutedLspId in cienaCesGmplsDynamicIngressCoroutedTunnelTable"
+           "Added objects cienaCesGmplsDynamicIngressUniDirArHopIndex, cienaCesGmplsDynamicIngressCoroutedArHopIndex in
+            table cienaCesGmplsDynamicIngressUniDirTunnelTable and cienaCesGmplsDynamicIngressCoroutedExtTunnelTable respectively"
 
+       REVISION
+           "201706070000Z"
+           DESCRIPTION
+           "Updated contact info."
 
+	   REVISION
+           "201705110000Z"
+           DESCRIPTION
+           "Added TunnelAisFaultReason TEXTUAL-CONVENTION.
+            Added objects cienaCesGmplsNotifEncapTunnelAisFaultReason,cienaCesGmplsNotifDecapTunnelAisFaultReason, 
+            cienaCesGmplsNotifAssociatedTunnelAisFaultReason.
+            Updated cienaCesGmplsEncapCoroutedTunnelAisFaultStateChgTrap, cienaCesGmplsDecapCoroutedTunnelAisFaultStateChgTrap,
+            cienaCesGmplsAssociatedTunnelAisFaultStateChgTrap.
+            Marked TunnelAisFault, cienaCesGmplsNotifEncapTunnelAisFaulted, cienaCesGmplsNotifDecapTunnelAisFaulted
+            cienaCesGmplsNotifAssociatedTunnelAisFaulted, cienaCesGmplsEncapCoroutedTunnelAisFaultStateChgTrap, 
+            cienaCesGmplsDecapCoroutedTunnelAisFaultStateChgTrap and cienaCesGmplsAssociatedTunnelAisFaultStateChgTrap  
+            'deprecated' instead of 'obsolete' for backward compatibility"
+
+	   REVISION
+           "201705030000Z"
+           DESCRIPTION
+           "Added new cienaCesGmplsDynamicIngressCoroutedExtTunnelTable and cienaCesGmplsDynamicEgressCoroutedExtTunnelTable 
+            for Dynamic CoRouted Tunnels.
+            cienaCesGmplsDynamicIngressCoroutedTunnelTable and cienaCesGmplsDynamicEgressCoroutedTunnelTable have been marked 
+            `obsolete` in order to avoid single index mechanism for Dynamic CoRouted Tunnels"
+            
 	   REVISION
            "201611170000Z"
            DESCRIPTION
            "Added new OID cienaCesGmplsDynamicIngressCoroutedTunnelAutoSizeMode in cienaCesGmplsDynamicIngressCoroutedTunnelTable"
  
-	   REVISION
+           REVISION
            "201610210000Z"
            DESCRIPTION
            "Added new OID cienaCesTeLinkSrlgCount in cienaCesTeLinkTable"
@@ -63,17 +104,22 @@
             in cienaCesGmplsDynamicTransitCoroutedTunnelTable"
        
 	   REVISION
+           "201609230000Z"
+           DESCRIPTION
+           "Added new OID cienaCesTeLinkSrlgCount in cienaCesTeLinkTable"
+
+           REVISION
            "201609210000Z"
            DESCRIPTION
-           "Added new OID cienaCesTeResourceColorUseCount,cienaCesTeResourceColorGroupUseCount in cienaCesTeResourceColorsTable
+           "Added new OID cienaCesTeResourceColorUseCount,cienaCesTeResourceColorGroupUseCount in cienaCesTeResourceColorsTable 
             and cienaCesTeResourceColorsTable respectively"
 
-	   REVISION
+           REVISION
            "201608290000Z"
            DESCRIPTION
-           "Added new OIDs cienaCesMplsPwConfigBandwidth, cienaCesMplsPwOperBandwidth and cienaCesMplsPwBandwidthState in cienaCesMplsPwTable" 
+           "Added new OIDs cienaCesMplsPwConfigBandwidth, cienaCesMplsPwOperBandwidth and cienaCesMplsPwBandwidthState in cienaCesMplsPwTable"
 
-	   REVISION
+           REVISION
            "201608220000Z"
            DESCRIPTION
            "Modified enums AutoSizeFailHdlr, AutoSizeState, PathDisjointType, PathDisjointMode and added new enums TEMode, MplsGlobalState.
@@ -85,47 +131,48 @@
             cienaCesGmplsDynamicIngressCoroutedTunnelResourceExcludeAny in cienaCesGmplsDynamicIngressCoroutedTunnelTable. Added new OIDs 
             cienaCesTeResourceColorBitMask, cienaCesTeLinkMode and per priority unreserved bandwidth in cienaCesTeLinkTable and updated maximum bandwidth range"
 
-	   REVISION
+           REVISION
            "201607180000Z"
            DESCRIPTION
-           "Updated the description of some of the attributes in following tables cienaCesMplsStaticTransitTunnelTable, 
+           "Added new OIDs for the Traffic Statistics in the following tables cienaCesMplsStaticTransitTunnelTable, 
             cienaCesMplsDynamicTransitTunnelTable, cienaCesGmplsStaticTransitUniDirTunnelTable,
             cienaCesGmplsStaticTransitCoroutedTunnelTable, cienaCesGmplsDynamicTransitUniDirTunnelTable, cienaCesGmplsDynamicTransitCoroutedTunnelTable"
 
-	   REVISION
+           REVISION
            "201607120000Z"
            DESCRIPTION
            "Added tables: cienaCesTeLinkTable, cienaCesTeResourceGrpTable, cienaCesTeResourceColorsTable, cienaCesTeLinkSrlgTable"
 
-	   REVISION
+           REVISION
            "201607110000Z"
            DESCRIPTION
            "Added attributes cienaCesGmplsDynamicIngressCoroutedTunnelLspReoptimization, cienaCesGmplsDynamicIngressCoroutedTunnelLspReOptTimeInterval,
             cienaCesGmplsDynamicIngressCoroutedTunnelPathDisjointType,  cienaCesGmplsDynamicIngressCoroutedTunnelPathDisjointMode,
             cienaCesGmplsDynamicIngressCoroutedTunnelAutoSizeEnable, cienaCesGmplsDynamicIngressCoroutedTunnelAutoSizeInterval,
             cienaCesGmplsDynamicIngressCoroutedTunnelAutoSizeFailureHdlr, cienaCesGmplsDynamicIngressCoroutedTunnelAutoSizeState,
-            cienaCesGmplsDynamicIngressCoroutedTunnelMinBandwidth, cienaCesGmplsDynamicIngressCoroutedTunnelMaxBandwidth, cienaCesGmplsDynamicIngressCoroutedTunnelIncBandwidth,
-            cienaCesGmplsDynamicIngressCoroutedTunnelCurBandwidth, cienaCesGmplsDynamicIngressCoroutedTunnelReqBandwidth,
-            cienaCesGmplsDynamicIngressCoroutedTunnelUsedBandwidth, cienaCesGmplsDynamicIngressCoroutedTunnelClassType,
-            cienaCesGmplsDynamicIngressCoroutedTunnelResourceIncludeAll, cienaCesGmplsDynamicIngressCoroutedTunnelResourceIncludeAny,
-            cienaCesGmplsDynamicIngressCoroutedTunnelResourceExcludeAny in cienaCesGmplsDynamicIngressCoroutedTunnelTable"
+            cienaCesGmplsDynamicIngressCoroutedTunnelMinBandwidth, cienaCesGmplsDynamicIngressCoroutedTunnelMaxBandwidth, 
+            cienaCesGmplsDynamicIngressCoroutedTunnelIncBandwidth,cienaCesGmplsDynamicIngressCoroutedTunnelCurBandwidth, 
+            cienaCesGmplsDynamicIngressCoroutedTunnelReqBandwidth,cienaCesGmplsDynamicIngressCoroutedTunnelUsedBandwidth, 
+            cienaCesGmplsDynamicIngressCoroutedTunnelClassType,cienaCesGmplsDynamicIngressCoroutedTunnelResourceIncludeAll, 
+            cienaCesGmplsDynamicIngressCoroutedTunnelResourceIncludeAny,cienaCesGmplsDynamicIngressCoroutedTunnelResourceExcludeAny 
+            in cienaCesGmplsDynamicIngressCoroutedTunnelTable"
 
-	   REVISION
+           REVISION
            "201607040000Z"
            DESCRIPTION
            "Added support for MPLS-CAC (Diffserv-TE) feature"
 
-	   REVISION
+           REVISION
            "201606100000Z"
            DESCRIPTION
            "Added cienaCesGmplsEncapTunnelResizeResultTrap, cienaCesGmplsEncapTunnelMbbResultTrap, cienaCesMplsCacInterfaceThresholdTrap"
 
 	   REVISION
-	   "201603110000Z"
-	   DESCRIPTION
+           "201603110000Z"
+           DESCRIPTION
            "Added new OID for auto-backup tunnel in the cienaCesGmplsDynamicIngressCoroutedTunnelTable"
 
-	   REVISION
+           REVISION
            "201602150000Z"
            DESCRIPTION
            "Modified attributes related to if-num, LSP-id, src-tunnel-id and dest-tunnel-id in cienaCesGmplsStaticTransitCoroutedTunnelTable
@@ -135,11 +182,10 @@
            "201601040000Z"
            DESCRIPTION
            "Added new attributes if-num, LSP-id, src-tunel-id and dest-tunnel-id in static tp
-           corouted tunnel tables" 
-
+           corouted tunnel tables"
+           
            REVISION
            "201508180000Z"
-
            DESCRIPTION
            "Added new OIDs for the Traffic Statistics in the following tables cienaCesMplsStaticTransitTunnelTable, 
             cienaCesMplsDynamicTransitTunnelTable, cienaCesGmplsStaticTransitUniDirTunnelTable,
@@ -161,11 +207,12 @@
            DESCRIPTION
            "Added new OIDs cienaCesMplsPwReversion, cienaCesMplsPwRevertTime and modifed status of 
            cienaCesServiceDelimiterVID, cienaCesServiceDelimiterTPID to Deprecated in cienaCesMplsPwEntry table"            
+
            REVISION
-	   "201406110000Z"  
-	   DESCRIPTION
-	   "Modified tables: cienaCesGmplsStaticEgressCoroutedTunnelTable, cienaCesGmplsDynamicEgressCoroutedTunnelTable, 
-	   cienaCesMplsTunnelCosProfileTable."  
+           "201406110000Z"  
+           DESCRIPTION
+           "Modified tables: cienaCesGmplsStaticEgressCoroutedTunnelTable, cienaCesGmplsDynamicEgressCoroutedTunnelTable, 
+           cienaCesMplsTunnelCosProfileTable."  
 
 	       REVISION
 		   "201404080000Z"
@@ -338,12 +385,22 @@
                    } 
 
  TunnelAisFault ::= TEXTUAL-CONVENTION
-     STATUS       obsolete
+     STATUS       deprecated
      DESCRIPTION  "This is replaced by TunnelOamFault."
      SYNTAX       INTEGER {
                     fault(1),
                     nofault(2)
                    }
+
+ TunnelAisFaultReason ::= TEXTUAL-CONVENTION
+     STATUS          current
+     DESCRIPTION      "Fault Reason"
+     SYNTAX           INTEGER {
+                         none(1),
+                         serviceFault(2),
+                         serviceDegrade(3),
+                         serviceFaultAndDegrade(4)
+                      }
 
  TunnelOamFault ::= TEXTUAL-CONVENTION
      STATUS       current
@@ -387,15 +444,15 @@
                     notApplicable(4)
                    }
 
- CacPolicy ::= TEXTUAL-CONVENTION
+ CacPolicy  ::= TEXTUAL-CONVENTION
      STATUS       current
      DESCRIPTION  "MPLS Class Profile Cac Policy"
      SYNTAX       INTEGER {
-                    invalid(1),
-                    mam(2),
-                    rdm(3)
+                     invalid(1),
+                     mam(2),
+                     rdm(3)
                    }
- 
+
  PathDisjointType ::= TEXTUAL-CONVENTION
      STATUS       current
      DESCRIPTION  "Tunnel Path Disjoint Type"
@@ -426,7 +483,7 @@
      SYNTAX       INTEGER {
                     active(1),
                     inActive(2)
-                   } 
+                   }
 
  TEMode ::= TEXTUAL-CONVENTION
      STATUS       current
@@ -445,7 +502,14 @@
                     disabled(2),
                     notApplicable(3)
                    }
- 
+
+ ServiceDegradeState  ::=  TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Service Degrade State"
+     SYNTAX       INTEGER {
+                    set(1),
+                    clear(2)
+                   } 
 
  --
  -- Node definitions
@@ -1442,23 +1506,23 @@
      cienaCesMplsStaticTransitTunnelAdminState		CienaGlobalState,
      cienaCesMplsStaticTransitTunnelOperState		CienaGlobalState,
      cienaCesMplsStaticTransitTunnelNextHopIpAddr	IpAddress,
-     cienaCesMplsStaticTransitTunnelInLabel		INTEGER,
+     cienaCesMplsStaticTransitTunnelInLabel		    INTEGER,
      cienaCesMplsStaticTransitTunnelOutLabel		INTEGER,
      cienaCesMplsStaticTransitTunnelFcosPolicy		FCosPolicy,
-     cienaCesMplsStaticTransitTunnelFixedTc		Unsigned32,
+     cienaCesMplsStaticTransitTunnelFixedTc		    Unsigned32,
      cienaCesMplsStaticTransitTunnelFrmCosMapId		INTEGER,
      cienaCesMplsStaticTransitTunnelTTLPolicy		TTLPolicy,
      cienaCesMplsStaticTransitTunnelFixedTTL 		Unsigned32,
      cienaCesMplsStaticTransitTunnelRcosPolicy		FCosPolicy,
      cienaCesMplsStaticTransitTunnelRCosMapId		INTEGER,
-     cienaCesMplsStaticTransitTunnelCosProfileIndex		INTEGER,
-     cienaCesMplsStaticTransitTunnelCosProfileName      DisplayString,
+     cienaCesMplsStaticTransitTunnelCosProfileIndex	INTEGER,
+     cienaCesMplsStaticTransitTunnelCosProfileName  DisplayString,
      cienaCesMplsStaticTransitTunnelSourceIpAddr	IpAddress, 
-     cienaCesMplsStaticTransitTunnelDestIpAddr	IpAddress,
+     cienaCesMplsStaticTransitTunnelDestIpAddr	    IpAddress,
      cienaCesMplsStaticTransitTunnelIncomingPackets Unsigned32,
      cienaCesMplsStaticTransitTunnelOutgoingPackets Unsigned32,
-     cienaCesMplsStaticTransitTunnelIncomingBytes Unsigned32,
-     cienaCesMplsStaticTransitTunnelOutgoingBytes Unsigned32
+     cienaCesMplsStaticTransitTunnelIncomingBytes   Unsigned32,
+     cienaCesMplsStaticTransitTunnelOutgoingBytes   Unsigned32
    }
 
  cienaCesMplsStaticTransitTunnelIndex OBJECT-TYPE
@@ -1616,7 +1680,7 @@
  	 DESCRIPTION
  	 	"Destination IP address of the static transit tunnel."
  	 ::= { cienaCesMplsStaticTransitTunnelEntry 18 }
- 	 
+ 	  
  cienaCesMplsStaticTransitTunnelIncomingPackets		OBJECT-TYPE
      SYNTAX      Unsigned32
      MAX-ACCESS  read-only
@@ -1625,34 +1689,34 @@
            "The number of incoming packets for the given transit tunnel.
             This object is supported only on specific platforms."
      ::= { cienaCesMplsStaticTransitTunnelEntry 19 }  
-   
+
  cienaCesMplsStaticTransitTunnelOutgoingPackets	OBJECT-TYPE
  	 SYNTAX		Unsigned32  
  	 MAX-ACCESS  read-only
  	 STATUS		 current
  	 DESCRIPTION
-           "The number of outgoing packets for the given transit tunnel.
-            This object is supported only on specific platforms."
+ 	 	"The number of outgoing packets for the given transit tunnel.
+ 	 	 This object is supported only on specific platforms."
  	 ::= { cienaCesMplsStaticTransitTunnelEntry 20 }
-   
+
  cienaCesMplsStaticTransitTunnelIncomingBytes    OBJECT-TYPE
  	 SYNTAX		Unsigned32   
  	 MAX-ACCESS	read-only
  	 STATUS		current
  	 DESCRIPTION
-           "The number of incoming bytes for the given transit tunnel.
-            This object is supported only on specific platforms."
+ 	 	"The number of incoming bytes for the given transit tunnel.
+ 	 	 This object is supported only on specific platforms."
  	 ::= {cienaCesMplsStaticTransitTunnelEntry 21 }  
- 	
+ 
  cienaCesMplsStaticTransitTunnelOutgoingBytes		OBJECT-TYPE
      SYNTAX      Unsigned32
      MAX-ACCESS  read-only
      STATUS      current
      DESCRIPTION
-           "The number of outgoing bytes for the given transit tunnel.
-            This object is supported only on specific platforms."
+        "The number of outgoing bytes for the given transit tunnel.
+         This object is supported only on specific platforms."
      ::= { cienaCesMplsStaticTransitTunnelEntry 22 } 
- 	  
+
  --
  -- MPLS Dynamic transit tunnel table
  --                       
@@ -1676,19 +1740,19 @@
      ::= { cienaCesMplsDynamicTransitTunnelTable 1 }
      
  CienaCesMplsDynamicTransitTunnelEntry ::=  SEQUENCE { 
-     cienaCesMplsDynamicTransitTunnelIndex         Unsigned32,
-     cienaCesMplsDynamicTransitTunnelName          DisplayString,
-     cienaCesMplsDynamicTransitTunnelAdminState		CienaGlobalState,
-     cienaCesMplsDynamicTransitTunnelOperState		CienaGlobalState,
+     cienaCesMplsDynamicTransitTunnelIndex              Unsigned32,
+     cienaCesMplsDynamicTransitTunnelName               DisplayString,
+     cienaCesMplsDynamicTransitTunnelAdminState			CienaGlobalState,
+     cienaCesMplsDynamicTransitTunnelOperState			CienaGlobalState,
      cienaCesMplsDynamicTransitTunnelInLabel			INTEGER,
-     cienaCesMplsDynamicTransitTunnelOutLabel		INTEGER,
-     cienaCesMplsDynamicTransitTunnelNextHopIpAddr	IpAddress,
-     cienaCesMplsDynamicTransitTunnelSourceIpAddr   IpAddress,
-     cienaCesMplsDynamicTransitTunnelDestIpAddr   IpAddress,
-     cienaCesMplsDynamicTransitTunnelIncomingPackets Unsigned32,
-     cienaCesMplsDynamicTransitTunnelOutgoingPackets Unsigned32,
-     cienaCesMplsDynamicTransitTunnelIncomingBytes Unsigned32,
-     cienaCesMplsDynamicTransitTunnelOutgoingBytes Unsigned32
+     cienaCesMplsDynamicTransitTunnelOutLabel		    INTEGER,
+     cienaCesMplsDynamicTransitTunnelNextHopIpAddr	    IpAddress,
+     cienaCesMplsDynamicTransitTunnelSourceIpAddr       IpAddress,
+     cienaCesMplsDynamicTransitTunnelDestIpAddr         IpAddress,
+     cienaCesMplsDynamicTransitTunnelIncomingPackets    Unsigned32,
+     cienaCesMplsDynamicTransitTunnelOutgoingPackets    Unsigned32,
+     cienaCesMplsDynamicTransitTunnelIncomingBytes      Unsigned32,
+     cienaCesMplsDynamicTransitTunnelOutgoingBytes      Unsigned32
    }
 
  cienaCesMplsDynamicTransitTunnelIndex OBJECT-TYPE
@@ -1764,7 +1828,7 @@
  	 DESCRIPTION
  	 	"Destination IP address of the static transit tunnel."
  	 ::= { cienaCesMplsDynamicTransitTunnelEntry 9 }
- 	 
+
  cienaCesMplsDynamicTransitTunnelIncomingPackets		OBJECT-TYPE
      SYNTAX      Unsigned32
      MAX-ACCESS  read-only
@@ -1773,16 +1837,16 @@
         "The number of incoming packets for the given transit tunnel.
          This object is supported only on specific platforms."
      ::= { cienaCesMplsDynamicTransitTunnelEntry 10 }  
-   
+
  cienaCesMplsDynamicTransitTunnelOutgoingPackets	OBJECT-TYPE
-     SYNTAX		Unsigned32  
-     MAX-ACCESS  read-only
-     STATUS		 current
-     DESCRIPTION
-        "The number of outgoing packets for the given transit tunnel.
-         This object is supported only on specific platforms."
+ 	 SYNTAX		Unsigned32  
+ 	 MAX-ACCESS  read-only
+ 	 STATUS		 current
+ 	 DESCRIPTION
+ 	 	"The number of outgoing packets for the given transit tunnel.
+ 	 	 This object is supported only on specific platforms."
  	 ::= { cienaCesMplsDynamicTransitTunnelEntry 11 }
-   
+ 	 
  cienaCesMplsDynamicTransitTunnelIncomingBytes    OBJECT-TYPE
  	 SYNTAX		Unsigned32   
  	 MAX-ACCESS	read-only
@@ -1791,7 +1855,7 @@
  	 	"The number of incoming bytes for the given transit tunnel.
  	 	 This object is supported only on specific platforms."
  	 ::= {cienaCesMplsDynamicTransitTunnelEntry 12 }  
- 	
+
  cienaCesMplsDynamicTransitTunnelOutgoingBytes		OBJECT-TYPE
      SYNTAX      Unsigned32
      MAX-ACCESS  read-only
@@ -2675,7 +2739,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
     cienaCesMplsNotifCacInterfaceIndex      Unsigned32,
     cienaCesMplsNotifCacInterfaceClassType  Unsigned32,
     cienaCesMplsNotifCacInterfaceName       DisplayString,
-    cienaCesMplsNotifCacInterfaceThreshold  Unsigned32 
+    cienaCesMplsNotifCacInterfaceThreshold  Unsigned32
  }
 
   cienaCesMplsNotifCacInterfaceIndex    OBJECT-TYPE
@@ -2692,28 +2756,27 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
      MAX-ACCESS accessible-for-notify
      STATUS     current
      DESCRIPTION
-         "CAC class type value of the associated interface associated with the                                     
+         "CAC class type value of the associated interface associated with the
          notification."
-     ::= { cienaCesMplsNotifCacInterfaceEntry 2 }  
+     ::= { cienaCesMplsNotifCacInterfaceEntry 2 }
 
  cienaCesMplsNotifCacInterfaceName    OBJECT-TYPE
-     SYNTAX      DisplayString 
+     SYNTAX      DisplayString
      MAX-ACCESS  accessible-for-notify
      STATUS      current
      DESCRIPTION
-         "This represents the associated interface name." 
-     ::= { cienaCesMplsNotifCacInterfaceEntry 3 } 
+         "This represents the associated interface name."
+     ::= { cienaCesMplsNotifCacInterfaceEntry 3 }
 
  cienaCesMplsNotifCacInterfaceThreshold    OBJECT-TYPE
      SYNTAX     Unsigned32 (1..65535)
      MAX-ACCESS accessible-for-notify
      STATUS     current
      DESCRIPTION
-         "Alarm threshold value of the associated interface associated with the 
+         "Alarm threshold value of the associated interface associated with the
          notification."
-     ::= { cienaCesMplsNotifCacInterfaceEntry 4 } 
+     ::= { cienaCesMplsNotifCacInterfaceEntry 4 }
 
-      
  cienaCesMplsClassProfileTable    OBJECT-TYPE
       SYNTAX     SEQUENCE OF CienaCesMplsClassProfileEntry
       MAX-ACCESS not-accessible
@@ -2782,7 +2845,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  CienaCesMplsTEClassTypeEntry ::=  SEQUENCE {
       cienaCesMplsClassType                    Unsigned32,
       cienaCesMplsClassTypeQueueGroupIndex     Unsigned32,
-      cienaCesMplsClassTypeQueueGroupInstance  Unsigned32,
+      cienaCesMplsClassTypeQueueGroupInstance  Unsigned32, 
       cienaCesMplsClassTypeLom                 Unsigned32,
       cienaCesMplsClassTypeAlarmThreshold      Unsigned32
  }
@@ -2830,9 +2893,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
           "Indicates the Alarm Threshold percentage (%) for MPLS Class Type."
       DEFVAL { 100 }
      ::= { cienaCesMplsTEClassTypeEntry 5 }
-
-
-
+ 
  --
  -- TE Tunnel Traps
  -- 
@@ -2846,7 +2907,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
 	              cienaCesMplsNotifEncapTunnelAdminState,
 	              cienaCesMplsNotifEncapTunnelOperState,
 	              cienaCesMplsNotifEncapTunnelOamFaulted,
-	              cienaCesMplsNotifEncapTunnelFaultedNodeId
+	              cienaCesMplsNotifEncapTunnelFaultedNodeId 
 	           }
 	              
 	STATUS	   current
@@ -2888,7 +2949,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
 	              cienaCesMplsNotifTransitTunnelName,
 	              cienaCesMplsNotifTransitTunnelAdminState,
 	              cienaCesMplsNotifTransitTunnelOperState,
-	              cienaCesMplsNotifTransitTunnelOamFaulted 
+	              cienaCesMplsNotifTransitTunnelOamFaulted  
 	           }
 	              
 	STATUS	   current
@@ -2911,9 +2972,9 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
          cienaCesMplsNotifAssociatedTunnelType,
          cienaCesMplsNotifAssociatedTunnelName,
          cienaCesMplsNotifAssociatedTunnelAdminState,
-         cienaCesMplsNotifAssociatedTunnelOperState, 
+         cienaCesMplsNotifAssociatedTunnelOperState,
          cienaCesMplsNotifAssociatedTunnelOamFaulted,
-         cienaCesMplsNotifAssociatedTunnelFaultedNodeId 
+         cienaCesMplsNotifAssociatedTunnelFaultedNodeId  
      }
                               
      STATUS                   current
@@ -2925,7 +2986,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
          cienaCesMplsNotifAssociatedTunnelAdminState, 
          cienaCesMplsNotifAssociatedTunnelOperState,
          cienaCesMplsNotifAssociatedTunnelOamFaulted,
-         cienaCesMplsNotifAssociatedTunnelFaultedNodeId."
+         cienaCesMplsNotifAssociatedTunnelFaultedNodeId."  
      ::= { cienaCesMplsMIBNotifications 6 }
 
  cienaCesMplsCacInterfaceThresholdTrap  NOTIFICATION-TYPE
@@ -2946,7 +3007,6 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
          cienaCesMplsNotifCacInterfaceClassType, cienaCesMplsNotifCacInterfaceName,
          cienaCesMplsNotifCacInterfaceThreshold."
      ::= { cienaCesMplsMIBNotifications 7 }
-
 
  --
  -- GMPLS-TP Static Encap uni directional tunnel table
@@ -3224,11 +3284,11 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
      cienaCesGmplsStaticIngressCoroutedTunnelAisProfileName		DisplayString,
      cienaCesGmplsStaticIngressCoroutedTunnelBfdSessionFaulted 	INTEGER,
      cienaCesGmplsStaticIngressCoroutedTunnelBfdProfileIndex		Unsigned32,
-     cienaCesGmplsStaticIngressCoroutedTunnelRecoveryDisjoint    INTEGER,
+     cienaCesGmplsStaticIngressCoroutedTunnelRecoveryDisjoint    INTEGER,  
      cienaCesGmplsStaticIngressCoroutedTunnelNextHopIfNum        Unsigned32,
      cienaCesGmplsStaticIngressCoroutedTunnelLspId               Unsigned32,
      cienaCesGmplsStaticIngressCoroutedTunnelSrcTunnelId         Unsigned32,
-     cienaCesGmplsStaticIngressCoroutedTunnelDestTunnelId        Unsigned32
+     cienaCesGmplsStaticIngressCoroutedTunnelDestTunnelId        Unsigned32                                                                          
    }
  
  cienaCesGmplsStaticIngressCoroutedTunnelIndex OBJECT-TYPE
@@ -3476,8 +3536,8 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
      STATUS      current
      DESCRIPTION
         "Specifies the type of Recovery Disjoint"
-     ::= { cienaCesGmplsStaticIngressCoroutedTunnelEntry 27 } 
-
+     ::= { cienaCesGmplsStaticIngressCoroutedTunnelEntry 27 }     
+     
  cienaCesGmplsStaticIngressCoroutedTunnelNextHopIfNum   OBJECT-TYPE
      SYNTAX      Unsigned32  
      MAX-ACCESS  read-only
@@ -3515,7 +3575,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
      DESCRIPTION
         "This represents destination tunnel ID for this gmpls 
         static ingress corouted tunnel"
-     ::= { cienaCesGmplsStaticIngressCoroutedTunnelEntry 31 }   
+     ::= { cienaCesGmplsStaticIngressCoroutedTunnelEntry 31 }       
     
  --
  -- GMPLS-TP Dynamic Encap uni directional tunnel table
@@ -3566,7 +3626,8 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
      cienaCesGmplsDynamicIngressUniDirTunnelPathIndex			Unsigned32,
      cienaCesGmplsDynamicIngressUniDirTunnelPathName			DisplayString,
      cienaCesGmplsDynamicIngressUniDirTunnelBandwidthProfile   	DisplayString,   
-     cienaCesGmplsDynamicIngressUniDirTunnelResourcePointer     RowPointer
+     cienaCesGmplsDynamicIngressUniDirTunnelResourcePointer     RowPointer,
+     cienaCesGmplsDynamicIngressUniDirArHopIndex                Unsigned32  
    }
  
  cienaCesGmplsDynamicIngressUniDirTunnelIndex OBJECT-TYPE
@@ -3820,7 +3881,14 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
      DESCRIPTION
         "The OID must be one of the entries in mplsTunnelResourceTable."
      ::= { cienaCesGmplsDynamicIngressUniDirTunnelEntry 27 }
-  
+ 
+ cienaCesGmplsDynamicIngressUniDirArHopIndex OBJECT-TYPE 
+     SYNTAX      Unsigned32  
+     MAX-ACCESS  read-only 
+     STATUS      current 
+     DESCRIPTION 
+         "This object represents the ArHop index of this tunnel." 
+     ::= { cienaCesGmplsDynamicIngressUniDirTunnelEntry 28 }  
 
  --
  -- GMPLS-TP Dynamic Encap corouted tunnel table
@@ -3829,16 +3897,19 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelTable OBJECT-TYPE
      SYNTAX     SEQUENCE OF CienaCesGmplsDynamicIngressCoroutedTunnelEntry
      MAX-ACCESS not-accessible
-     STATUS     current
+     STATUS     obsolete
      DESCRIPTION
-            "The (conceptual) table listing the MPLS Dynamic encap co-routed tunnels."
+            "The (conceptual) table listing the MPLS Dynamic encap co-routed tunnels.
+             This table and all of it's objects are obsolete, instead of this
+             cienaCesGmplsDynamicIngressCoroutedExtTunnelTable will be in use for 
+             Dynamic Ingress CoRouted Tunnels."
 
      ::= { cienaCesGmpls 4 }
      
  cienaCesGmplsDynamicIngressCoroutedTunnelEntry  OBJECT-TYPE
      SYNTAX       CienaCesGmplsDynamicIngressCoroutedTunnelEntry
      MAX-ACCESS   not-accessible
-     STATUS       current
+     STATUS       obsolete
      DESCRIPTION
              "This represents an entry of the MPLS Dynamic encap co-routed tunnel table."
      INDEX {cienaCesGmplsDynamicIngressCoroutedTunnelIndex}
@@ -3903,7 +3974,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelIndex OBJECT-TYPE
      SYNTAX      Unsigned32   (1..65535)
      MAX-ACCESS  not-accessible
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Unique index in the table."
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 1 }
@@ -3911,7 +3982,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelName OBJECT-TYPE
      SYNTAX      DisplayString (SIZE (1..31))  	
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "This represents the encap tunnel name. Tunnel names are common across Dynamic and dynamic."
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 2 }
@@ -3919,7 +3990,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelNextHopIp		OBJECT-TYPE
  	 SYNTAX		IpAddress
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"Specifies the next hop IP address for the Dynamic encap tunnel."
  	 ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 3 }
@@ -3927,7 +3998,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelSrcIpAddr	OBJECT-TYPE
  	 SYNTAX		IpAddress
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"Source IP address of the Dynamic encap tunnel. If not specified, the Dynamic encap tunnel 
  	 	inherits the IP address of the tunnel-group. This object cannot be modified once the Dynamic encap tunnel
@@ -3937,7 +4008,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelDestIpAddr	OBJECT-TYPE
  	 SYNTAX		IpAddress
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"Destination IP address of the Dynamic encap tunnel. If not specified, the Dynamic encap tunnel 
  	 	inherits the IP address of the tunnel-group. This object cannot be modified once the Dynamic encap tunnel
@@ -3947,7 +4018,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelAdminState	OBJECT-TYPE
  	 SYNTAX		CienaGlobalState
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"Specifies the administrative status of the Dynamic encap tunnel."
  	 ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 6 }
@@ -3955,7 +4026,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelOperState	    OBJECT-TYPE
  	 SYNTAX		CienaGlobalState
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"Specifies the operational status of the Dynamic encap tunnel."
  	 ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 7 }
@@ -3963,7 +4034,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelForwardOutLabel		OBJECT-TYPE
  	 SYNTAX		Unsigned32   ( 0..1048575 )
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"The label for the Dynamic encap tunnel."
  	 ::= {cienaCesGmplsDynamicIngressCoroutedTunnelEntry 8 }
@@ -3971,7 +4042,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelReverseInLabel		OBJECT-TYPE
  	 SYNTAX		Unsigned32   ( 0..1048575 )
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"The label for the Dynamic encap tunnel."
  	 ::= {cienaCesGmplsDynamicIngressCoroutedTunnelEntry 9 }
@@ -3983,7 +4054,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  	                      backup(2)
  	 }   
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"The label for the Dynamic encap tunnel."
  	 ::= {cienaCesGmplsDynamicIngressCoroutedTunnelEntry 10 }
@@ -3991,7 +4062,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelProtectionPartnerName	OBJECT-TYPE
  	 SYNTAX		DisplayString   
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"Protection partner name of the Dynamic encap tunnel."
  	 ::= {cienaCesGmplsDynamicIngressCoroutedTunnelEntry 11 }
@@ -4002,7 +4073,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  	 						active(1)	 						
  	 			}	
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"Specifies the Protection status of the Dynamic encap tunnel."
  	 ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 12 }	
@@ -4010,7 +4081,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelTTLPolicy	 OBJECT-TYPE
      SYNTAX		TTLPolicy
      MAX-ACCESS	 read-only
-     STATUS		 current
+     STATUS		 obsolete
      DESCRIPTION
      	"Specifies whether TTL is fixed or inherited from the frame."
      DEFVAL { fixed }
@@ -4019,7 +4090,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelFixedTTL	OBJECT-TYPE
      SYNTAX		Unsigned32  (1..255)
      MAX-ACCESS	read-only
-     STATUS		current
+     STATUS		obsolete
      DESCRIPTION
      	"If the TTL policy for the Dynamic encap tunnel is fixed, then this object is 
      	the TTL value."
@@ -4029,7 +4100,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelGrpIndex			OBJECT-TYPE
      SYNTAX		Unsigned32
      MAX-ACCESS	read-only
-     STATUS		current
+     STATUS		obsolete
      DESCRIPTION
      	"The group ID of the tunnel group of which the Dynamic encap tunnel is a member."
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 15 }
@@ -4040,7 +4111,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
      					off(2)
      			}
      MAX-ACCESS	read-only
-     STATUS		current
+     STATUS		obsolete
      DESCRIPTION
      	"Indicates whether tunnel reversion is turned on/off for this encap tunnel."
      DEFVAL {  off }
@@ -4049,7 +4120,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelReversionTimeout   OBJECT-TYPE
  	 SYNTAX		Unsigned32  (1..65535)
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"This object represents the tunnel reversion hold time in seconds before
 		the primary encap tunnel switches back as active tunnel in its tunnel group."
@@ -4058,7 +4129,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
   cienaCesGmplsDynamicIngressCoroutedTunnelCosProfileIndex      OBJECT-TYPE
  	 SYNTAX		Unsigned32  (1..65535)	
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"This object represents Cos profile index" 
  	 --DEFVAL { 0 }
@@ -4067,7 +4138,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
   cienaCesGmplsDynamicIngressCoroutedTunnelCosProfileName 		OBJECT-TYPE
   	 SYNTAX		DisplayString   
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"Specifies the name of Cos profile"
  	 ::= {cienaCesGmplsDynamicIngressCoroutedTunnelEntry 19 } 
@@ -4078,7 +4149,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
      					off(2)
      			}
      MAX-ACCESS	read-only
-     STATUS		current
+     STATUS		obsolete
      DESCRIPTION
      	"Indicates whether or not an FRR (fast re-route) tunnel needs to be created for this dynamic encap tunnel."
      DEFVAL {  off }
@@ -4091,7 +4162,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  	 						node-protect(3)
  	 			}
  	 MAX-ACCESS  read-only
- 	 STATUS		 current
+ 	 STATUS		 obsolete
  	 DESCRIPTION
  	 	"Indicates the fast route method for the dynamic encap tunnel. This object cannot be modified once the
  	 	 dynamic encap tunnel entry is created." 
@@ -4101,7 +4172,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelSetupPriority OBJECT-TYPE
      SYNTAX		Unsigned32	(0..7)
      MAX-ACCESS	read-only
-     STATUS		current
+     STATUS		obsolete
      DESCRIPTION
      	"Indicates the set up priority of the dynamic encap tunnel."
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 22 }
@@ -4109,7 +4180,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelHoldPriority OBJECT-TYPE
      SYNTAX	    Unsigned32   (0..7)
      MAX-ACCESS read-only
-     STATUS     current
+     STATUS     obsolete
      DESCRIPTION
      	"Indicates the holding priority of the dynamic encap tunnel."
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 23 }
@@ -4117,7 +4188,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelPathIndex	OBJECT-TYPE
  	 SYNTAX		Unsigned32
  	 MAX-ACCESS read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"Index into the cienaCesmplsTunnelPathTable entry that
  		specifies the explicit route hops for this dynamic encap tunnel."
@@ -4126,7 +4197,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelPathName	OBJECT-TYPE
  	 SYNTAX		DisplayString
  	 MAX-ACCESS read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"The path name corresponding to the pathIndex object."
  	 ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry	25 }
@@ -4134,7 +4205,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelBandwidthProfile	OBJECT-TYPE
  	 SYNTAX		DisplayString
  	 MAX-ACCESS read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"This object represents the bandwidth profile attached to this tunnel."
  	 ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry	26 }
@@ -4142,7 +4213,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelResourcePointer OBJECT-TYPE
      SYNTAX      RowPointer
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "The OID must be one of the entries in mplsTunnelResourceTable."
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 27 } 
@@ -4150,7 +4221,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
   cienaCesGmplsDynamicIngressCoroutedTunnelBfdMonitoring        OBJECT-TYPE
      SYNTAX      CienaGlobalState
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Specifies status of BFD monitoring."
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 28 }     
@@ -4158,7 +4229,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
   cienaCesGmplsDynamicIngressCoroutedTunnelBfdProfileName 	 OBJECT-TYPE
      SYNTAX      DisplayString
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "This object represent BFD profile name."
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 29 }   
@@ -4166,7 +4237,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
   cienaCesGmplsDynamicIngressCoroutedTunnelBfdSessionName			OBJECT-TYPE
      SYNTAX      DisplayString
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Specifies BFD session name."
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 30 }     
@@ -4174,7 +4245,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
   cienaCesGmplsDynamicIngressCoroutedTunnelBfdSessionFaulted  OBJECT-TYPE
      SYNTAX      INTEGER
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Indicates if BFD is faulted."
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 31 }
@@ -4182,33 +4253,33 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelBfdProfileIndex   OBJECT-TYPE
      SYNTAX      Unsigned32  (1..65535)
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "This represents the BFD profile index in the BFD profile table
 	configured for this gmpls dynamic ingress corouted tunnel"
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 32 }     
-
-  cienaCesGmplsDynamicIngressCoroutedTunnelAutoBackupEnable  OBJECT-TYPE
+           
+ cienaCesGmplsDynamicIngressCoroutedTunnelAutoBackupEnable   OBJECT-TYPE
      SYNTAX      INTEGER
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Indicates if auto-backup is enabled for this tunnel and 
          always remains 0 in case of backup tunnel."
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 33 }
 
-  cienaCesGmplsDynamicIngressCoroutedTunnelLspReoptimization OBJECT-TYPE
+ cienaCesGmplsDynamicIngressCoroutedTunnelLspReoptimization OBJECT-TYPE
      SYNTAX      MplsGlobalState
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Indicates if Lsp-Reoptimization is enabled or disabled for this tunnel."
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 34 }
 
-  cienaCesGmplsDynamicIngressCoroutedTunnelLspReOptTimeInterval OBJECT-TYPE
+ cienaCesGmplsDynamicIngressCoroutedTunnelLspReOptTimeInterval OBJECT-TYPE
      SYNTAX     Unsigned32   (5..60)
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Indicates Lsp-Reoptimization Time interval(in minutes) for this tunnel and 
         always remains 0 in case of backup tunnel."
@@ -4218,7 +4289,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelPathDisjointType OBJECT-TYPE
      SYNTAX      PathDisjointType
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Indicates path diversification criteria used for this tunnel.
          It can either be node based or srlg based or link based or combination."
@@ -4228,106 +4299,106 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelPathDisjointMode OBJECT-TYPE
      SYNTAX      PathDisjointMode
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Indicates mode used for path diversification for this tunnel ."
      DEFVAL { strict }
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 37 }
 
-  cienaCesGmplsDynamicIngressCoroutedTunnelAutoSizeEnable  OBJECT-TYPE
+ cienaCesGmplsDynamicIngressCoroutedTunnelAutoSizeEnable  OBJECT-TYPE
      SYNTAX      MplsGlobalState
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Indicates if auto-size is enabled for this tunnel."
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 38 }
 
-  cienaCesGmplsDynamicIngressCoroutedTunnelAutoSizeInterval  OBJECT-TYPE
+ cienaCesGmplsDynamicIngressCoroutedTunnelAutoSizeInterval  OBJECT-TYPE
      SYNTAX      Unsigned32 (5..60)
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Indicates auto-sizing interval(in minutes) for this tunnel and 
         always remains 0 in case of backup tunnel."
      DEFVAL { 5 }
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 39 }
 
-  cienaCesGmplsDynamicIngressCoroutedTunnelAutoSizeFailureHdlr  OBJECT-TYPE
+ cienaCesGmplsDynamicIngressCoroutedTunnelAutoSizeFailureHdlr  OBJECT-TYPE
      SYNTAX      AutoSizeFailHdlr
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Indicates auto-sizing failure handler for this tunnel."
      DEFVAL { alarm }
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 40 }
            
-  cienaCesGmplsDynamicIngressCoroutedTunnelAutoSizeState  OBJECT-TYPE
+ cienaCesGmplsDynamicIngressCoroutedTunnelAutoSizeState  OBJECT-TYPE
      SYNTAX      AutoSizeState
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Indicates dynamic auto-sizing states for this tunnel."
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 41 }
-
-  cienaCesGmplsDynamicIngressCoroutedTunnelAutoSizeMode  OBJECT-TYPE
+           
+ cienaCesGmplsDynamicIngressCoroutedTunnelAutoSizeMode  OBJECT-TYPE
      SYNTAX      AutoSizeMode
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Indicates auto-sizing mode for this tunnel."
      DEFVAL { cac }
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 42 }
-
-  cienaCesGmplsDynamicIngressCoroutedTunnelMinBandwidth  OBJECT-TYPE
+           
+ cienaCesGmplsDynamicIngressCoroutedTunnelMinBandwidth  OBJECT-TYPE
      SYNTAX      MplsBitRate
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
-        "Indicates auto-size minimum bandwidth(in kbps) for this tunnel and 
+        "Indicates auto-size minimum bandwidth(in kbps) for this tunnel and
         always remains 0 in case of backup tunnel."
      DEFVAL { 0 }
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 43 }
            
-  cienaCesGmplsDynamicIngressCoroutedTunnelMaxBandwidth  OBJECT-TYPE
+ cienaCesGmplsDynamicIngressCoroutedTunnelMaxBandwidth  OBJECT-TYPE
      SYNTAX      MplsBitRate
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
-        "Indicates auto-size maximum bandwidth(in kbps) for this tunnel and 
+        "Indicates auto-size maximum bandwidth(in kbps) for this tunnel and
         always remains 0 in case of backup tunnel."
      DEFVAL { 1000000000 }
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 44 }
            
-  cienaCesGmplsDynamicIngressCoroutedTunnelIncBandwidth  OBJECT-TYPE
+ cienaCesGmplsDynamicIngressCoroutedTunnelIncBandwidth  OBJECT-TYPE
      SYNTAX      MplsBitRate
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Indicates auto-size increment bandwidth(in kbps) for this tunnel and
         always remains 0 in case of backup tunnel."
      DEFVAL { 0 }
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 45 }
            
-  cienaCesGmplsDynamicIngressCoroutedTunnelCurBandwidth  OBJECT-TYPE
+ cienaCesGmplsDynamicIngressCoroutedTunnelCurBandwidth  OBJECT-TYPE
      SYNTAX      MplsBitRate
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Indicates auto-size current bandwidth(in kbps) for this tunnel."
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 46 }
            
-  cienaCesGmplsDynamicIngressCoroutedTunnelReqBandwidth  OBJECT-TYPE
+ cienaCesGmplsDynamicIngressCoroutedTunnelReqBandwidth  OBJECT-TYPE
      SYNTAX      MplsBitRate
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Indicates auto-size requested bandwidth(in kbps) for this tunnel."
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 47 }
            
-  cienaCesGmplsDynamicIngressCoroutedTunnelUsedBandwidth  OBJECT-TYPE
+ cienaCesGmplsDynamicIngressCoroutedTunnelUsedBandwidth  OBJECT-TYPE
      SYNTAX      MplsBitRate
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Indicates auto-size used bandwidth(in kbps) for this tunnel."
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 48 }
@@ -4335,7 +4406,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelClassType  OBJECT-TYPE
      SYNTAX      Unsigned32 (0..7)
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Indicates the DSTE class type (CT0-CT7) mapped to this Tunnel."
      DEFVAL { 0 }
@@ -4344,7 +4415,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelResourceIncludeAll  OBJECT-TYPE
      SYNTAX      Unsigned32
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Resource affinity Admin Color-Group which is applied in 
          include-all colors mode to constrain path selection and
@@ -4354,7 +4425,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelResourceIncludeAny  OBJECT-TYPE
      SYNTAX      Unsigned32
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Resource affinity Admin Color-Group which is applied in 
          include-any colors mode to constrain path selection and
@@ -4364,13 +4435,13 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicIngressCoroutedTunnelResourceExcludeAny  OBJECT-TYPE
      SYNTAX      Unsigned32
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Resource affinity Admin Color-Group which is applied in 
          exclude-any colors mode to constrain path selection and
          always remains 0 in case of backup tunnel."
      ::= { cienaCesGmplsDynamicIngressCoroutedTunnelEntry 52 }
-
+ 
  cienaCesGmplsDynamicIngressCoroutedLspId   OBJECT-TYPE
      SYNTAX         Unsigned32
      MAX-ACCESS     read-only
@@ -4535,7 +4606,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
      cienaCesGmplsStaticEgressCoroutedTunnelPrevHopIfNum            Unsigned32,
      cienaCesGmplsStaticEgressCoroutedTunnelLspId                   Unsigned32,
      cienaCesGmplsStaticEgressCoroutedTunnelSrcTunnelId             Unsigned32,
-     cienaCesGmplsStaticEgressCoroutedTunnelDestTunnelId            Unsigned32                                                               
+     cienaCesGmplsStaticEgressCoroutedTunnelDestTunnelId            Unsigned32                                                             
    }
 
  cienaCesGmplsStaticEgressCoroutedTunnelIndex OBJECT-TYPE
@@ -4783,7 +4854,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
      	the TTL value."
      DEFVAL { 255 }
      ::= { cienaCesGmplsStaticEgressCoroutedTunnelEntry 27 }		
-                                                      
+                                                        
  cienaCesGmplsStaticEgressCoroutedTunnelPrevHopIfNum	OBJECT-TYPE
      SYNTAX		Unsigned32  
      MAX-ACCESS	read-only
@@ -4818,7 +4889,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
      DESCRIPTION
      	"This represents source tunnel ID 
      	 for this gmpls static egress corouted tunnel."
-     ::= { cienaCesGmplsStaticEgressCoroutedTunnelEntry 31 }		  
+     ::= { cienaCesGmplsStaticEgressCoroutedTunnelEntry 31 }		
 
  --
  -- GMPLS Dynamic Decap uni dir tunnel table
@@ -4934,16 +5005,18 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicEgressCoroutedTunnelTable OBJECT-TYPE
      SYNTAX     SEQUENCE OF CienaCesGmplsDynamicEgressCoroutedTunnelEntry
      MAX-ACCESS not-accessible
-     STATUS     current
+     STATUS     obsolete
      DESCRIPTION
             "The (conceptual) table listing the MPLS dynamic decap tunnels.
-            "
+             This table and all of it's objects are obsolete, instead of this
+             cienaCesGmplsDynamicEgressCoroutedExtTunnelTable will be in use 
+             for Dynamic Egress CoRouted Tunnels."
      ::= { cienaCesGmpls 8 }
      
  cienaCesGmplsDynamicEgressCoroutedTunnelEntry  OBJECT-TYPE
      SYNTAX       CienaCesGmplsDynamicEgressCoroutedTunnelEntry
      MAX-ACCESS   not-accessible
-     STATUS       current
+     STATUS       obsolete
      DESCRIPTION
              "An entry in the dynamic decap tunnel table."
      INDEX {cienaCesGmplsDynamicEgressCoroutedTunnelIndex}
@@ -4980,7 +5053,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicEgressCoroutedTunnelIndex OBJECT-TYPE
      SYNTAX      Unsigned32
      MAX-ACCESS  not-accessible
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "This represents the unique index in the table."
      ::= { cienaCesGmplsDynamicEgressCoroutedTunnelEntry 1 }
@@ -4988,7 +5061,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicEgressCoroutedTunnelName OBJECT-TYPE
      SYNTAX      DisplayString (SIZE (1..32))
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "This represents the dynamic decap tunnel name."
      ::= { cienaCesGmplsDynamicEgressCoroutedTunnelEntry 2 }
@@ -4996,7 +5069,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicEgressCoroutedTunnelAdminState OBJECT-TYPE
  	 SYNTAX		CienaGlobalState
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"Indicates the administrative status of the dynamic decap tunnel."
  	 DEFVAL {enabled}
@@ -5005,7 +5078,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicEgressCoroutedTunnelOperState OBJECT-TYPE
  	 SYNTAX		CienaGlobalState
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"Indicates the operational status of the dynamic decap tunnel."
  	 ::= { cienaCesGmplsDynamicEgressCoroutedTunnelEntry 4 }
@@ -5013,7 +5086,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicEgressCoroutedLspId   OBJECT-TYPE
  	 SYNTAX		Unsigned32 
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"Indicates the LSP ID."
  	 ::= { cienaCesGmplsDynamicEgressCoroutedTunnelEntry 5 }
@@ -5021,7 +5094,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicEgressCoroutedTunnelPrevHopIpAddr  OBJECT-TYPE
  	 SYNTAX		IpAddress
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"Prev hop IP address of the dynamic decap tunnel."
  	 ::= { cienaCesGmplsDynamicEgressCoroutedTunnelEntry 6 }
@@ -5029,7 +5102,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicEgressCoroutedTunnelSourceIpAddr  OBJECT-TYPE
  	 SYNTAX		IpAddress
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"Source IP address of the dynamic decap tunnel."
  	 ::= { cienaCesGmplsDynamicEgressCoroutedTunnelEntry 7 }
@@ -5037,7 +5110,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicEgressCoroutedTunnelDestIpAddr  OBJECT-TYPE
  	 SYNTAX		IpAddress
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"Destination IP address of the dynamic decap tunnel."
  	 ::= { cienaCesGmplsDynamicEgressCoroutedTunnelEntry 8 }
@@ -5046,7 +5119,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicEgressCoroutedTunnelForwardInLabel		OBJECT-TYPE
  	 SYNTAX		Unsigned32 
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"Idicates the label of the dynamic decap tunnel."
  	 ::= { cienaCesGmplsDynamicEgressCoroutedTunnelEntry 9 }  
@@ -5055,7 +5128,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicEgressCoroutedTunnelReverseOutLabel		OBJECT-TYPE
  	 SYNTAX		Unsigned32  (0.. 1048575 )		
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"Indicates the out label of the dynamic decap tunnel."
  	 ::= { cienaCesGmplsDynamicEgressCoroutedTunnelEntry 10 } 
@@ -5067,7 +5140,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  	                      backup(2)
  	 }   
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"specifies role of this dynamic tunnel"
  	 ::= {cienaCesGmplsDynamicEgressCoroutedTunnelEntry 11 }
@@ -5075,7 +5148,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicEgressCoroutedTunnelProtectionPartnerName	OBJECT-TYPE
  	 SYNTAX		DisplayString   
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"Protection partner name of the dynamic encap tunnel."
  	 ::= {cienaCesGmplsDynamicEgressCoroutedTunnelEntry 12 }
@@ -5086,7 +5159,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  	 						active(1)	 						
  	 			}	
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"Specifies the Protection status of the static encap tunnel."
  	 ::= { cienaCesGmplsDynamicEgressCoroutedTunnelEntry 13 }
@@ -5094,7 +5167,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicEgressCoroutedTunnelGrpIndex			OBJECT-TYPE
      SYNTAX		Unsigned32
      MAX-ACCESS	read-only
-     STATUS		current
+     STATUS		obsolete
      DESCRIPTION
      	"The group ID of the tunnel group of which the Dynamic encap tunnel is a member."
      ::= { cienaCesGmplsDynamicEgressCoroutedTunnelEntry 14 }
@@ -5105,7 +5178,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
      					off(2)                         
      			}
      MAX-ACCESS	read-only
-     STATUS		current
+     STATUS		obsolete
      DESCRIPTION
      	"Indicates whether tunnel reversion is turned on/off for this encap tunnel."
      DEFVAL {  off }
@@ -5114,7 +5187,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicEgressCoroutedTunnelReversionTimeout   OBJECT-TYPE
  	 SYNTAX		Unsigned32  (1..65535)
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"This object represents the tunnel reversion hold time in seconds before
 		the primary encap tunnel switches back as active tunnel in its tunnel group."
@@ -5123,7 +5196,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
   cienaCesGmplsDynamicEgressCoroutedTunnelCosProfileIndex      OBJECT-TYPE
  	 SYNTAX		Unsigned32  (1..65535)	
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"This object represents Cos profile index" 
  	 ::= { cienaCesGmplsDynamicEgressCoroutedTunnelEntry 17 }
@@ -5131,7 +5204,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
   cienaCesGmplsDynamicEgressCoroutedTunnelCosProfileName 		OBJECT-TYPE
   	 SYNTAX		DisplayString   
  	 MAX-ACCESS	read-only
- 	 STATUS		current
+ 	 STATUS		obsolete
  	 DESCRIPTION
  	 	"Specifies the name of Cos profile"
  	 ::= {cienaCesGmplsDynamicEgressCoroutedTunnelEntry 18 }    
@@ -5140,7 +5213,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
   cienaCesGmplsDynamicEgressCoroutedTunnelBfdMonitoring        OBJECT-TYPE
      SYNTAX      CienaGlobalState
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "This parameter indicates if BFD monitoring is enabled or disableb on tunnel"
      ::= { cienaCesGmplsDynamicEgressCoroutedTunnelEntry 19 }     
@@ -5148,7 +5221,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
   cienaCesGmplsDynamicEgressCoroutedTunnelBfdProfileName 	 OBJECT-TYPE
      SYNTAX      DisplayString
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "It Indicates assigned BFD profile names to tunnel"
      ::= { cienaCesGmplsDynamicEgressCoroutedTunnelEntry 20 }   
@@ -5156,7 +5229,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
   cienaCesGmplsDynamicEgressCoroutedTunnelBfdSessionName			OBJECT-TYPE
      SYNTAX      DisplayString
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "It Indicates BFD session names."
      ::= { cienaCesGmplsDynamicEgressCoroutedTunnelEntry 21 }     
@@ -5164,7 +5237,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
   cienaCesGmplsDynamicEgressCoroutedTunnelBfdSessionFaulted  OBJECT-TYPE
      SYNTAX      INTEGER
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
         "Specifies if BFD faulted"
      ::= { cienaCesGmplsDynamicEgressCoroutedTunnelEntry 22 }
@@ -5172,7 +5245,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicEgressCoroutedTunnelBfdProfileIndex OBJECT-TYPE
      SYNTAX		Unsigned32  (1..65535)	
      MAX-ACCESS	read-only
-     STATUS		current
+     STATUS		obsolete
      DESCRIPTION
  	 "This represents the BFD profile index in the BFD profile table
 	configured for this gmpls dynamic egress corouted tunnel" 
@@ -5181,7 +5254,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
   cienaCesGmplsDynamicEgressCoroutedTunnelTTLPolicy	 OBJECT-TYPE
      SYNTAX		TTLPolicy
      MAX-ACCESS	 read-only
-     STATUS		 current
+     STATUS		 obsolete
      DESCRIPTION
      	"Specifies whether TTL is fixed or inherited from the frame."
      DEFVAL { fixed }
@@ -5190,7 +5263,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsDynamicEgressCoroutedTunnelFixedTTL	OBJECT-TYPE
      SYNTAX		Unsigned32  (1..255)
      MAX-ACCESS	read-only
-     STATUS		current
+     STATUS		obsolete
      DESCRIPTION
      	"If the TTL policy for the Dynamic encap tunnel is fixed, then this object is 
      	the TTL value."
@@ -5235,12 +5308,12 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
      cienaCesGmplsStaticTransitUniDirTunnelFixedTTL 		Unsigned32,
      cienaCesGmplsStaticTransitUniDirTunnelCosProfileIndex	Unsigned32,
      cienaCesGmplsStaticTransitUniDirTunnelCosProfileName	DisplayString, 
-     cienaCesGmplsStaticTransitUniDirTunnelAisMonitoring			CienaGlobalState,
-     cienaCesGmplsStaticTransitUniDirTunnelAisProfileName			DisplayString,
+     cienaCesGmplsStaticTransitUniDirTunnelAisMonitoring	CienaGlobalState,
+     cienaCesGmplsStaticTransitUniDirTunnelAisProfileName	DisplayString,
      cienaCesGmplsStaticTransitUniDirTunnelIncomingPackets  Unsigned32,
      cienaCesGmplsStaticTransitUniDirTunnelOutgoingPackets  Unsigned32,
-     cienaCesGmplsStaticTransitUniDirTunnelIncomingBytes  Unsigned32,
-     cienaCesGmplsStaticTransitUniDirTunnelOutgoingBytes  Unsigned32
+     cienaCesGmplsStaticTransitUniDirTunnelIncomingBytes    Unsigned32,
+     cienaCesGmplsStaticTransitUniDirTunnelOutgoingBytes    Unsigned32
    }
 
  cienaCesGmplsStaticTransitUniDirTunnelIndex OBJECT-TYPE
@@ -5376,8 +5449,8 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
      STATUS      current
      DESCRIPTION
         "This object contais AIS profile name."
-     ::= { cienaCesGmplsStaticTransitUniDirTunnelEntry 16 } 
-     
+     ::= { cienaCesGmplsStaticTransitUniDirTunnelEntry 16 }  
+
   cienaCesGmplsStaticTransitUniDirTunnelIncomingPackets		OBJECT-TYPE
      SYNTAX      Unsigned32
      MAX-ACCESS  read-only
@@ -5385,8 +5458,8 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
      DESCRIPTION
         "The number of incoming packets for the given transit tunnel.
          This object is supported only on specific platforms."
-     ::= { cienaCesGmplsStaticTransitUniDirTunnelEntry 17 }  
-   
+     ::= { cienaCesGmplsStaticTransitUniDirTunnelEntry 17 }
+     
   cienaCesGmplsStaticTransitUniDirTunnelOutgoingPackets	OBJECT-TYPE
  	 SYNTAX		Unsigned32  
  	 MAX-ACCESS  read-only
@@ -5395,7 +5468,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  	 	"The number of outgoing packets for the given transit tunnel.
  	 	 This object is supported only on specific platforms."
  	 ::= { cienaCesGmplsStaticTransitUniDirTunnelEntry 18 }
-   
+ 	 
   cienaCesGmplsStaticTransitUniDirTunnelIncomingBytes    OBJECT-TYPE
  	 SYNTAX		Unsigned32   
  	 MAX-ACCESS	read-only
@@ -5403,8 +5476,8 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  	 DESCRIPTION
  	 	"The number of incoming bytes for the given transit tunnel.
  	 	 This object is supported only on specific platforms."
- 	 ::= {cienaCesGmplsStaticTransitUniDirTunnelEntry 19 }  
- 	
+ 	 ::= {cienaCesGmplsStaticTransitUniDirTunnelEntry 19 }
+ 	 
   cienaCesGmplsStaticTransitUniDirTunnelOutgoingBytes		OBJECT-TYPE
      SYNTAX      Unsigned32
      MAX-ACCESS  read-only
@@ -5455,19 +5528,19 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
      cienaCesGmplsStaticTransitCoroutedTunnelCosProfileName		DisplayString,
      cienaCesGmplsStaticTransitCoroutedTunnelAisMonitoring			CienaGlobalState,
      cienaCesGmplsStaticTransitCoroutedTunnelAisProfileName			DisplayString,
-     cienaCesGmplsStaticTransitCoroutedTunnelPrevHopIfNum            Unsigned32,
+     cienaCesGmplsStaticTransitCoroutedTunnelPrevHopIfNum            Unsigned32, 
      cienaCesGmplsStaticTransitCoroutedTunnelNextHopIfNum            Unsigned32,
      cienaCesGmplsStaticTransitCoroutedTunnelLspId                   Unsigned32,
      cienaCesGmplsStaticTransitCoroutedTunnelSrcTunnelId             Unsigned32,
      cienaCesGmplsStaticTransitCoroutedTunnelDestTunnelId            Unsigned32,
-     cienaCesGmplsStaticTransitCoroutedTunnelIncomingPackets  Unsigned32,
-     cienaCesGmplsStaticTransitCoroutedTunnelOutgoingPackets  Unsigned32,
-     cienaCesGmplsStaticTransitCoroutedTunnelIncomingBytes  Unsigned32,
-     cienaCesGmplsStaticTransitCoroutedTunnelOutgoingBytes  Unsigned32,
-     cienaCesGmplsStaticTransitCoroutedTunnelReverseIncomingPackets Unsigned32,
-     cienaCesGmplsStaticTransitCoroutedTunnelReverseOutgoingPackets Unsigned32,
-     cienaCesGmplsStaticTransitCoroutedTunnelReverseIncomingBytes Unsigned32,
-     cienaCesGmplsStaticTransitCoroutedTunnelReverseOutgoingBytes Unsigned32
+     cienaCesGmplsStaticTransitCoroutedTunnelIncomingPackets         Unsigned32,
+     cienaCesGmplsStaticTransitCoroutedTunnelOutgoingPackets         Unsigned32,
+     cienaCesGmplsStaticTransitCoroutedTunnelIncomingBytes           Unsigned32,
+     cienaCesGmplsStaticTransitCoroutedTunnelOutgoingBytes           Unsigned32,
+     cienaCesGmplsStaticTransitCoroutedTunnelReverseIncomingPackets  Unsigned32,
+     cienaCesGmplsStaticTransitCoroutedTunnelReverseOutgoingPackets  Unsigned32,
+     cienaCesGmplsStaticTransitCoroutedTunnelReverseIncomingBytes    Unsigned32,
+     cienaCesGmplsStaticTransitCoroutedTunnelReverseOutgoingBytes    Unsigned32
    }
 
  cienaCesGmplsStaticTransitCoroutedTunnelIndex OBJECT-TYPE
@@ -5621,57 +5694,57 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
      STATUS      current
      DESCRIPTION
         "This object contains AIS profile name "
-     ::= { cienaCesGmplsStaticTransitCoroutedTunnelEntry 18 }
-
+     ::= { cienaCesGmplsStaticTransitCoroutedTunnelEntry 18 }      
+     
   cienaCesGmplsStaticTransitCoroutedTunnelPrevHopIfNum      OBJECT-TYPE
-     SYNTAX         Unsigned32
-     MAX-ACCESS     read-only
-     STATUS         current
-     DESCRIPTION
-        "This represents previous hop interface number 
-         for this gmpls transit corouted tunnel."
-         --DEFVAL { 0 }
-     ::= { cienaCesGmplsStaticTransitCoroutedTunnelEntry 19 }
-
+ 	 SYNTAX		Unsigned32 	
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"This represents previous hop interface number 
+     	 for this gmpls transit corouted tunnel." 
+ 	 --DEFVAL { 0 }
+ 	 ::= { cienaCesGmplsStaticTransitCoroutedTunnelEntry 19 }
+    
 
   cienaCesGmplsStaticTransitCoroutedTunnelNextHopIfNum      OBJECT-TYPE
-     SYNTAX         Unsigned32
-     MAX-ACCESS     read-only
-     STATUS         current
-     DESCRIPTION
-        "This represents next hop interface number 
-         for this gmpls transit corouted tunnel."
-         --DEFVAL { 0 }
-     ::= { cienaCesGmplsStaticTransitCoroutedTunnelEntry 20 }
+ 	 SYNTAX		Unsigned32 	
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"This represents next hop interface number 
+     	 for this gmpls transit corouted tunnel." 
+ 	 --DEFVAL { 0 }
+ 	 ::= { cienaCesGmplsStaticTransitCoroutedTunnelEntry 20 }
 
   cienaCesGmplsStaticTransitCoroutedTunnelLspId      OBJECT-TYPE
-     SYNTAX         Unsigned32
-     MAX-ACCESS     read-only
-     STATUS         current
-     DESCRIPTION
-        "This represents LSP ID for this gmpls transit corouted tunnel."
-         --DEFVAL { 0 }
-     ::= { cienaCesGmplsStaticTransitCoroutedTunnelEntry 21 }
+ 	 SYNTAX		Unsigned32 	
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"This represents LSP ID for this gmpls transit corouted tunnel." 
+ 	 --DEFVAL { 0 }
+ 	 ::= { cienaCesGmplsStaticTransitCoroutedTunnelEntry 21 }
 
   cienaCesGmplsStaticTransitCoroutedTunnelSrcTunnelId      OBJECT-TYPE
-     SYNTAX         Unsigned32
-     MAX-ACCESS     read-only
-     STATUS         current
-     DESCRIPTION
-        "This represents source tunnel ID 
-         for this gmpls transit corouted tunnel."
-         --DEFVAL { 0 }
-     ::= { cienaCesGmplsStaticTransitCoroutedTunnelEntry 22 }
+ 	 SYNTAX		Unsigned32 	
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"This represents source tunnel ID 
+     	 for this gmpls transit corouted tunnel." 
+ 	 --DEFVAL { 0 }
+ 	 ::= { cienaCesGmplsStaticTransitCoroutedTunnelEntry 22 }
 
   cienaCesGmplsStaticTransitCoroutedTunnelDestTunnelId      OBJECT-TYPE
-     SYNTAX         Unsigned32
-     MAX-ACCESS     read-only
-     STATUS         current
-     DESCRIPTION
-        "This represents destination tunnel ID 
-         for this gmpls transit corouted tunnel."
-         --DEFVAL { 0 }
-     ::= { cienaCesGmplsStaticTransitCoroutedTunnelEntry 23 }
+ 	 SYNTAX		Unsigned32 	
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"This represents destination tunnel ID 
+     	 for this gmpls transit corouted tunnel." 
+ 	 --DEFVAL { 0 }
+ 	 ::= { cienaCesGmplsStaticTransitCoroutedTunnelEntry 23 }
      
   cienaCesGmplsStaticTransitCoroutedTunnelIncomingPackets		OBJECT-TYPE
      SYNTAX      Unsigned32
@@ -5681,7 +5754,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
         "The number of incoming packets for the given transit tunnel.
          This object is supported only on specific platforms."
      ::= { cienaCesGmplsStaticTransitCoroutedTunnelEntry 24 }  
-   
+     
   cienaCesGmplsStaticTransitCoroutedTunnelOutgoingPackets	OBJECT-TYPE
      SYNTAX		Unsigned32  
      MAX-ACCESS         read-only
@@ -5690,7 +5763,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
         "The number of outgoing packets for the given transit tunnel.
          This object is supported only on specific platforms."
      ::= { cienaCesGmplsStaticTransitCoroutedTunnelEntry 25 }
-   
+
   cienaCesGmplsStaticTransitCoroutedTunnelIncomingBytes    OBJECT-TYPE
      SYNTAX		Unsigned32   
      MAX-ACCESS	        read-only
@@ -5699,7 +5772,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
         "The number of incoming bytes for the given transit tunnel. 
          This object is supported only on specific platforms."
      ::= {cienaCesGmplsStaticTransitCoroutedTunnelEntry 26 }  
- 
+
   cienaCesGmplsStaticTransitCoroutedTunnelOutgoingBytes		OBJECT-TYPE
      SYNTAX      Unsigned32
      MAX-ACCESS  read-only
@@ -5777,12 +5850,12 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
      cienaCesGmplsDynamicTransitUniDirTunnelNextHopIpAddr	IpAddress,
      cienaCesGmplsDynamicTransitUniDirTunnelForwardInLabel		Unsigned32,
      cienaCesGmplsDynamicTransitUniDirTunnelForwardOutLabel		Unsigned32,  
-     cienaCesGmplsDynamicTransitUniDirTunnelTTLPolicy		TTLPolicy,
-     cienaCesGmplsDynamicTransitUniDirTunnelFixedTTL 		Unsigned32,
-     cienaCesGmplsDynamicTransitUniDirTunnelIncomingPackets  Unsigned32,
-     cienaCesGmplsDynamicTransitUniDirTunnelOutgoingPackets  Unsigned32,
-     cienaCesGmplsDynamicTransitUniDirTunnelIncomingBytes  Unsigned32,
-     cienaCesGmplsDynamicTransitUniDirTunnelOutgoingBytes  Unsigned32 
+     cienaCesGmplsDynamicTransitUniDirTunnelTTLPolicy		    TTLPolicy,
+     cienaCesGmplsDynamicTransitUniDirTunnelFixedTTL 		    Unsigned32,
+     cienaCesGmplsDynamicTransitUniDirTunnelIncomingPackets     Unsigned32,
+     cienaCesGmplsDynamicTransitUniDirTunnelOutgoingPackets     Unsigned32,
+     cienaCesGmplsDynamicTransitUniDirTunnelIncomingBytes       Unsigned32,
+     cienaCesGmplsDynamicTransitUniDirTunnelOutgoingBytes       Unsigned32 
    }
 
  cienaCesGmplsDynamicTransitUniDirTunnelIndex OBJECT-TYPE
@@ -5877,7 +5950,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
       the TTL value."
       DEFVAL { 255 }
       ::= { cienaCesGmplsDynamicTransitUniDirTunnelEntry 11 }    
-      
+
   cienaCesGmplsDynamicTransitUniDirTunnelIncomingPackets		OBJECT-TYPE
      SYNTAX      Unsigned32
      MAX-ACCESS  read-only
@@ -5886,7 +5959,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
         "The number of incoming packets for the given transit tunnel.
          This object is supported only on specific platforms."
      ::= { cienaCesGmplsDynamicTransitUniDirTunnelEntry 12 }  
-   
+
   cienaCesGmplsDynamicTransitUniDirTunnelOutgoingPackets	OBJECT-TYPE
  	 SYNTAX		Unsigned32  
  	 MAX-ACCESS  read-only
@@ -5895,7 +5968,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  	 	"The number of outgoing packets for the given transit tunnel.
  	 	 This object is supported only on specific platforms."
  	 ::= { cienaCesGmplsDynamicTransitUniDirTunnelEntry 13 }
-   
+
   cienaCesGmplsDynamicTransitUniDirTunnelIncomingBytes    OBJECT-TYPE
  	 SYNTAX		Unsigned32   
  	 MAX-ACCESS	read-only
@@ -5904,7 +5977,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  	 	"The number of incoming bytes for the given transit tunnel.
  	 	 This object is supported only on specific platforms."
  	 ::= {cienaCesGmplsDynamicTransitUniDirTunnelEntry 14 }  
- 	
+
   cienaCesGmplsDynamicTransitUniDirTunnelOutgoingBytes		OBJECT-TYPE
      SYNTAX      Unsigned32
      MAX-ACCESS  read-only
@@ -5913,8 +5986,8 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
         "The number of outgoing bytes for the given transit tunnel.
          This object is supported only on specific platforms."
      ::= { cienaCesGmplsDynamicTransitUniDirTunnelEntry 15 } 
+
            
-     
  --
  -- GMPLS Dynamic transit corouted tunnel table
  --                       
@@ -5937,23 +6010,23 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
      ::= { cienaCesGmplsDynamicTransitCoroutedTunnelTable 1 }
      
  CienaCesGmplsDynamicTransitCoroutedTunnelEntry ::=  SEQUENCE { 
-     cienaCesGmplsDynamicTransitCoroutedTunnelIndex          	        Unsigned32,
-     cienaCesGmplsDynamicTransitCoroutedTunnelName           	        DisplayString,
+     cienaCesGmplsDynamicTransitCoroutedTunnelIndex          	Unsigned32,
+     cienaCesGmplsDynamicTransitCoroutedTunnelName           	DisplayString,
      cienaCesGmplsDynamicTransitCoroutedTunnelAdminState		CienaGlobalState,
-     cienaCesGmplsDynamicTransitCoroutedTunnelOperState                 CienaGlobalState,  
-     cienaCesGmplsDynamicTransitCoroutedTunnelSourceIpAddr              IpAddress,
-     cienaCesGmplsDynamicTransitCoroutedTunnelDestIpAddr		IpAddress,     
-     cienaCesGmplsDynamicTransitCoroutedTunnelNextHopIpAddr	        IpAddress,
+     cienaCesGmplsDynamicTransitCoroutedTunnelOperState		CienaGlobalState,  
+     cienaCesGmplsDynamicTransitCoroutedTunnelSourceIpAddr			IpAddress,
+     cienaCesGmplsDynamicTransitCoroutedTunnelDestIpAddr			IpAddress,     
+     cienaCesGmplsDynamicTransitCoroutedTunnelNextHopIpAddr	IpAddress,
      cienaCesGmplsDynamicTransitCoroutedTunnelPrevHopIpAddr	       	IpAddress,
      cienaCesGmplsDynamicTransitCoroutedTunnelForwardInLabel		Unsigned32,
      cienaCesGmplsDynamicTransitCoroutedTunnelForwardOutLabel		Unsigned32, 
-     cienaCesGmplsDynamicTransitCoroutedTunnelReverseInLabel		Unsigned32,
-     cienaCesGmplsDynamicTransitCoroutedTunnelReverseOutLabel		Unsigned32,            
-     cienaCesGmplsDynamicTransitCoroutedTunnelTTLPolicy		        TTLPolicy,
-     cienaCesGmplsDynamicTransitCoroutedTunnelFixedTTL 		        Unsigned32,
-     cienaCesGmplsDynamicTransitCoroutedTunnelIncomingPackets           Unsigned32,
-     cienaCesGmplsDynamicTransitCoroutedTunnelOutgoingPackets           Unsigned32,
-     cienaCesGmplsDynamicTransitCoroutedTunnelIncomingBytes             Unsigned32,
+     cienaCesGmplsDynamicTransitCoroutedTunnelReverseInLabel   Unsigned32,
+     cienaCesGmplsDynamicTransitCoroutedTunnelReverseOutLabel  Unsigned32,            
+     cienaCesGmplsDynamicTransitCoroutedTunnelTTLPolicy		   TTLPolicy,
+     cienaCesGmplsDynamicTransitCoroutedTunnelFixedTTL 		   Unsigned32,
+     cienaCesGmplsDynamicTransitCoroutedTunnelIncomingPackets  Unsigned32,
+     cienaCesGmplsDynamicTransitCoroutedTunnelOutgoingPackets  Unsigned32,
+     cienaCesGmplsDynamicTransitCoroutedTunnelIncomingBytes    Unsigned32,
      cienaCesGmplsDynamicTransitCoroutedTunnelOutgoingBytes             Unsigned32,  
      cienaCesGmplsDynamicTransitCoroutedTunnelReverseIncomingPackets    Unsigned32,
      cienaCesGmplsDynamicTransitCoroutedTunnelReverseOutgoingPackets    Unsigned32,
@@ -6079,7 +6152,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
       the TTL value."
       DEFVAL { 255 }
       ::= { cienaCesGmplsDynamicTransitCoroutedTunnelEntry 14 }    
-      
+
   cienaCesGmplsDynamicTransitCoroutedTunnelIncomingPackets		OBJECT-TYPE
      SYNTAX      Unsigned32
      MAX-ACCESS  read-only
@@ -6088,7 +6161,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
         "The number of incoming packets for the given transit tunnel.
          This object is supported only on specific platforms."
      ::= { cienaCesGmplsDynamicTransitCoroutedTunnelEntry 15 }  
-   
+
   cienaCesGmplsDynamicTransitCoroutedTunnelOutgoingPackets	OBJECT-TYPE
  	 SYNTAX		Unsigned32  
  	 MAX-ACCESS  read-only
@@ -6097,7 +6170,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  	 	"The number of outgoing packets for the given transit tunnel.
  	 	 This object is supported only on specific platforms."
  	 ::= { cienaCesGmplsDynamicTransitCoroutedTunnelEntry 16 }
-   
+
   cienaCesGmplsDynamicTransitCoroutedTunnelIncomingBytes    OBJECT-TYPE
  	 SYNTAX		Unsigned32   
  	 MAX-ACCESS	read-only
@@ -6106,7 +6179,7 @@ cienaMplsTunnelARHopLspId OBJECT-TYPE
  	 	"The number of incoming bytes for the given transit tunnel.
  	 	 This object is supported only on specific platforms."
  	 ::= {cienaCesGmplsDynamicTransitCoroutedTunnelEntry 17 }  
- 	
+
   cienaCesGmplsDynamicTransitCoroutedTunnelOutgoingBytes		OBJECT-TYPE
      SYNTAX      Unsigned32
      MAX-ACCESS  read-only
@@ -6546,20 +6619,22 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
     ::= { cienaCesGmplsNotifEncapTunnelTable 1 }  
 
  CienaCesGmplsNotifEncapTunnelEntry ::= SEQUENCE {
-    cienaCesGmplsNotifEncapTunnelIndex Unsigned32,
-    cienaCesGmplsNotifEncapTunnelType	INTEGER,
-    cienaCesGmplsNotifEncapTunnelName   DisplayString,
-    cienaCesGmplsNotifEncapTunnelAdminState CienaGlobalState,
-    cienaCesGmplsNotifEncapTunnelOperState     CienaGlobalState,
-    cienaCesGmplsNotifEncapTunnelAisFaulted    TunnelAisFault,
-    cienaCesGmplsNotifEncapTunnelFaultedNodeId IpAddress,
-    cienaCesGmplsNotifEncapTunnelFarEndLerId IpAddress,
-    cienaCesGmplsNotifEncapTunnelResult INTEGER,
-    cienaCesGmplsNotifEncapTunnelProtectionRole INTEGER,
-    cienaCesGmplsNotifEncapTunnelRequestedBw Unsigned32,
-    cienaCesGmplsNotifEncapTunnelOperationalBw Unsigned32,
-    cienaCesGmplsNotifEncapTunnelMbbParentApp INTEGER,
-    cienaCesGmplsNotifEncapTunnelOamFaulted   TunnelOamFault
+    cienaCesGmplsNotifEncapTunnelIndex                 Unsigned32,
+    cienaCesGmplsNotifEncapTunnelType	               INTEGER,
+    cienaCesGmplsNotifEncapTunnelName                  DisplayString,
+    cienaCesGmplsNotifEncapTunnelAdminState            CienaGlobalState,
+    cienaCesGmplsNotifEncapTunnelOperState             CienaGlobalState,
+    cienaCesGmplsNotifEncapTunnelAisFaulted            TunnelAisFault,
+    cienaCesGmplsNotifEncapTunnelFaultedNodeId         IpAddress,
+    cienaCesGmplsNotifEncapTunnelFarEndLerId           IpAddress,
+    cienaCesGmplsNotifEncapTunnelResult                INTEGER,
+    cienaCesGmplsNotifEncapTunnelProtectionRole        INTEGER,
+    cienaCesGmplsNotifEncapTunnelRequestedBw           Unsigned32,
+    cienaCesGmplsNotifEncapTunnelOperationalBw         Unsigned32,
+    cienaCesGmplsNotifEncapTunnelMbbParentApp          INTEGER,
+    cienaCesGmplsNotifEncapTunnelOamFaulted            TunnelOamFault,
+    cienaCesGmplsNotifEncapTunnelAisFaultReason        TunnelAisFaultReason,
+    cienaCesGmplsNotifEncapTunnelServiceDegradeState   ServiceDegradeState
  }
  
 
@@ -6613,7 +6688,7 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsNotifEncapTunnelAisFaulted OBJECT-TYPE
      SYNTAX      TunnelAisFault
      MAX-ACCESS accessible-for-notify
-     STATUS     obsolete
+     STATUS     deprecated
      DESCRIPTION
             "This is replaced by cienaCesGmplsNotifOamTunnelAisFaulted."
      ::= { cienaCesGmplsNotifEncapTunnelEntry 6 } 
@@ -6695,7 +6770,23 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
      DESCRIPTION
             "Indication if the tunnel has Oam fault."
      ::= { cienaCesGmplsNotifEncapTunnelEntry 14 } 
- 
+
+cienaCesGmplsNotifEncapTunnelAisFaultReason OBJECT-TYPE
+     SYNTAX      TunnelAisFaultReason
+     MAX-ACCESS accessible-for-notify
+     STATUS     current
+     DESCRIPTION
+            "Reason for the AIS fault."
+     ::= { cienaCesGmplsNotifEncapTunnelEntry 15 } 
+
+ cienaCesGmplsNotifEncapTunnelServiceDegradeState OBJECT-TYPE
+     SYNTAX      ServiceDegradeState
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+            "Specifies the service degrade state of static corouted encap tunnel."
+     ::= { cienaCesGmplsNotifEncapTunnelEntry 16 }
+
  cienaCesGmplsDecapTunnelNotif OBJECT IDENTIFIER ::= { cienaCesGmpls 16 }
  
  cienaCesGmplsNotifDecapTunnelTable   OBJECT-TYPE
@@ -6717,15 +6808,17 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
      ::= { cienaCesGmplsNotifDecapTunnelTable 1 }  
 
  CienaCesGmplsNotifDecapTunnelEntry ::= SEQUENCE {
-     cienaCesGmplsNotifDecapTunnelIndex         Unsigned32,
-     cienaCesGmplsNotifDecapTunnelType          INTEGER,
-     cienaCesGmplsNotifDecapTunnelName          DisplayString,
-     cienaCesGmplsNotifDecapTunnelAdminState    CienaGlobalState,
-     cienaCesGmplsNotifDecapTunnelOperState     CienaGlobalState,
-     cienaCesGmplsNotifDecapTunnelAisFaulted    TunnelAisFault,
-     cienaCesGmplsNotifDecapTunnelFaultedNodeId IpAddress,
-     cienaCesGmplsNotifDecapTunnelFarEndLerId   IpAddress,
-     cienaCesGmplsNotifDecapTunnelOamFaulted    TunnelOamFault
+     cienaCesGmplsNotifDecapTunnelIndex                 Unsigned32,
+     cienaCesGmplsNotifDecapTunnelType                  INTEGER,
+     cienaCesGmplsNotifDecapTunnelName                  DisplayString,
+     cienaCesGmplsNotifDecapTunnelAdminState            CienaGlobalState,
+     cienaCesGmplsNotifDecapTunnelOperState             CienaGlobalState,
+     cienaCesGmplsNotifDecapTunnelAisFaulted            TunnelAisFault,
+     cienaCesGmplsNotifDecapTunnelFaultedNodeId         IpAddress,
+     cienaCesGmplsNotifDecapTunnelFarEndLerId           IpAddress,
+     cienaCesGmplsNotifDecapTunnelOamFaulted            TunnelOamFault,
+     cienaCesGmplsNotifDecapTunnelAisFaultReason        TunnelAisFaultReason,
+     cienaCesGmplsNotifDecapTunnelServiceDegradeState   ServiceDegradeState
  }
  
 
@@ -6779,7 +6872,7 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsNotifDecapTunnelAisFaulted OBJECT-TYPE
      SYNTAX      TunnelAisFault
      MAX-ACCESS accessible-for-notify
-     STATUS     obsolete
+     STATUS     deprecated
      DESCRIPTION
          "This is replaced by cienaCesGmplsNotifDecapTunnelOamFaulted."
      ::= { cienaCesGmplsNotifDecapTunnelEntry 6 } 
@@ -6799,6 +6892,7 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
      DESCRIPTION
             "IP address of the far end LER for the tunne with the AIS fault."
      ::= { cienaCesGmplsNotifDecapTunnelEntry 8 } 
+
  cienaCesGmplsNotifDecapTunnelOamFaulted OBJECT-TYPE
      SYNTAX      TunnelOamFault
      MAX-ACCESS accessible-for-notify
@@ -6806,6 +6900,22 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
      DESCRIPTION
          "Indication if the tunnel has Oam fault."
      ::= { cienaCesGmplsNotifDecapTunnelEntry 9 } 
+
+ cienaCesGmplsNotifDecapTunnelAisFaultReason OBJECT-TYPE
+     SYNTAX      TunnelAisFaultReason
+     MAX-ACCESS accessible-for-notify
+     STATUS     current
+     DESCRIPTION
+         "Reason for the AIS fault."
+     ::= { cienaCesGmplsNotifDecapTunnelEntry 10 } 
+
+ cienaCesGmplsNotifDecapTunnelServiceDegradeState OBJECT-TYPE
+     SYNTAX      ServiceDegradeState
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+         "Specifies the service degrade state of static corouted decap tunnel."
+     ::= { cienaCesGmplsNotifDecapTunnelEntry 11 }
 
  cienaCesGmplsTransitTunnelNotif OBJECT IDENTIFIER ::= { cienaCesGmpls 17 }
  
@@ -6831,12 +6941,13 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
     ::= { cienaCesGmplsNotifTransitTunnelTable 1 }
 
  CienaCesGmplsNotifTransitTunnelEntry ::= SEQUENCE {
-    cienaCesGmplsNotifTransitTunnelIndex Unsigned32,
-    cienaCesGmplsNotifTransitTunnelType	INTEGER,
-    cienaCesGmplsNotifTransitTunnelName   DisplayString,
-    cienaCesGmplsNotifTransitTunnelAdminState CienaGlobalState,
-    cienaCesGmplsNotifTransitTunnelOperState	CienaGlobalState,
-    cienaCesGmplsNotifTransitTunnelOamFaulted   TunnelOamFault
+    cienaCesGmplsNotifTransitTunnelIndex                 Unsigned32,
+    cienaCesGmplsNotifTransitTunnelType	                 INTEGER,
+    cienaCesGmplsNotifTransitTunnelName                  DisplayString,
+    cienaCesGmplsNotifTransitTunnelAdminState            CienaGlobalState,
+    cienaCesGmplsNotifTransitTunnelOperState	         CienaGlobalState,
+    cienaCesGmplsNotifTransitTunnelOamFaulted            TunnelOamFault,
+    cienaCesGmplsNotifTransitTunnelServiceDegradeState   ServiceDegradeState
  } 
 
  cienaCesGmplsNotifTransitTunnelIndex	OBJECT-TYPE
@@ -6892,7 +7003,15 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
       STATUS     current
       DESCRIPTION
              "Indication if the tunnel has Oam fault."
-      ::= { cienaCesGmplsNotifTransitTunnelEntry 6 } 
+      ::= { cienaCesGmplsNotifTransitTunnelEntry 6 }
+
+ cienaCesGmplsNotifTransitTunnelServiceDegradeState OBJECT-TYPE
+     SYNTAX      ServiceDegradeState
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+             "Specifies the service degrade state of static corouted transit tunnel."
+     ::= { cienaCesGmplsNotifTransitTunnelEntry 7 } 
 
  cienaCesGmplsAssociatedTunnelNotif OBJECT IDENTIFIER ::= { cienaCesGmpls 18 }
 
@@ -6919,15 +7038,16 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
      ::= { cienaCesGmplsNotifAssociatedTunnelTable 1 }
 
  CienaCesGmplsNotifAssociatedTunnelEntry ::= SEQUENCE {
-     cienaCesGmplsNotifAssociatedTunnelIndex         Unsigned32,
-     cienaCesGmplsNotifAssociatedTunnelType          INTEGER,
-     cienaCesGmplsNotifAssociatedTunnelName          DisplayString,
-     cienaCesGmplsNotifAssociatedTunnelAdminState    CienaGlobalState,
-     cienaCesGmplsNotifAssociatedTunnelOperState     CienaGlobalState,
-     cienaCesGmplsNotifAssociatedTunnelAisFaulted    TunnelAisFault,
-     cienaCesGmplsNotifAssociatedTunnelFaultedNodeId IpAddress,
-     cienaCesGmplsNotifAssociatedTunnelFarEndLerId   IpAddress,
-     cienaCesGmplsNotifAssociatedTunnelOamFaulted    TunnelOamFault
+     cienaCesGmplsNotifAssociatedTunnelIndex             Unsigned32,
+     cienaCesGmplsNotifAssociatedTunnelType              INTEGER,
+     cienaCesGmplsNotifAssociatedTunnelName              DisplayString,
+     cienaCesGmplsNotifAssociatedTunnelAdminState        CienaGlobalState,
+     cienaCesGmplsNotifAssociatedTunnelOperState         CienaGlobalState,
+     cienaCesGmplsNotifAssociatedTunnelAisFaulted        TunnelAisFault,
+     cienaCesGmplsNotifAssociatedTunnelFaultedNodeId     IpAddress,
+     cienaCesGmplsNotifAssociatedTunnelFarEndLerId       IpAddress,
+     cienaCesGmplsNotifAssociatedTunnelOamFaulted        TunnelOamFault,
+     cienaCesGmplsNotifAssociatedTunnelAisFaultReason    TunnelAisFaultReason
  }
 
  cienaCesGmplsNotifAssociatedTunnelIndex	OBJECT-TYPE
@@ -6980,7 +7100,7 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
  cienaCesGmplsNotifAssociatedTunnelAisFaulted OBJECT-TYPE
      SYNTAX      TunnelAisFault
      MAX-ACCESS accessible-for-notify
-     STATUS     obsolete
+     STATUS     deprecated
      DESCRIPTION
          "Replaced by cienaCesGmplsNotifAssociatedTunnelOamFaulted"
      ::= { cienaCesGmplsNotifAssociatedTunnelEntry 6 }
@@ -7009,6 +7129,13 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
          "Indication if the tunnel has Oam fault."
      ::= { cienaCesGmplsNotifAssociatedTunnelEntry 9 }
 
+ cienaCesGmplsNotifAssociatedTunnelAisFaultReason OBJECT-TYPE
+     SYNTAX      TunnelAisFaultReason
+     MAX-ACCESS accessible-for-notify
+     STATUS     current
+     DESCRIPTION
+         "Reason for the AIS fault."
+     ::= { cienaCesGmplsNotifAssociatedTunnelEntry 10 }
 
  cienaCesGmplsEncapTunnelGrpNotif OBJECT IDENTIFIER ::= { cienaCesGmpls 19 }
 
@@ -7217,7 +7344,859 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
         label associated with the notification" 
      ::= { cienaCesGmplsNotifTunnelAisFaultErrorEntry 2 }
 
+ --
+ -- GMPLS-TP Dynamic Encap New corouted tunnel table
+ --
+cienaCesGmplsDynamicIngressCoroutedExtTunnelTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesGmplsDynamicIngressCoroutedExtTunnelEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the MPLS Dynamic encap co-routed tunnels."
 
+     ::= { cienaCesGmpls 22 }
+     
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry  OBJECT-TYPE
+     SYNTAX       CienaCesGmplsDynamicIngressCoroutedExtTunnelEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This represents an entry of the MPLS Dynamic encap co-routed tunnel table."
+     INDEX {cienaCesGmplsDynamicIngressCoroutedExtTunnelLspId,cienaCesGmplsDynamicIngressCoroutedExtTunnelIndex}
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelTable 1 }
+     
+ CienaCesGmplsDynamicIngressCoroutedExtTunnelEntry ::=  SEQUENCE {                                
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelLspId                     Unsigned32,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelIndex                 	Unsigned32,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelName                  	DisplayString,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelNextHopIp	       	IpAddress,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelSrcIpAddr          IpAddress,                                
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelDestIpAddr	       	IpAddress,  
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelAdminState	       	CienaGlobalState,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelOperState	       	CienaGlobalState, 
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelForwardOutLabel	Unsigned32,    
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelReverseInLabel     Unsigned32,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelProtectionRole  	INTEGER,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelProtectionPartName	DisplayString, 
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelProtectionState		INTEGER,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelTTLPolicy		TTLPolicy,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelFixedTTL		Unsigned32,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelGrpIndex		Unsigned32,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelReversion       	INTEGER,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelReversionTimeout    Unsigned32,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelCosProfileIndex	Unsigned32,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelCosProfileName		DisplayString,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelRecordRoute		INTEGER,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelFastRoute			INTEGER,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelSetupPriority		Unsigned32,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelHoldPriority		Unsigned32,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelPathIndex			Unsigned32,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelPathName			DisplayString,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelBandwidthProfile   DisplayString,   
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelResourcePointer    RowPointer,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelBfdMonitoring      CienaGlobalState,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelBfdProfileName		DisplayString,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelBfdSessionName		DisplayString,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelBfdSessionFaulted 	Unsigned32,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelBfdProfileIndex		Unsigned32,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelAutoBackupEnable          Unsigned32,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelLspReoptimization         MplsGlobalState,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelLspReOptTimeInterval      Unsigned32,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelPathDisjointType          PathDisjointType,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelPathDisjointMode          PathDisjointMode,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelAutoSizeEnable            MplsGlobalState, 
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelAutoSizeInterval          Unsigned32,  
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelAutoSizeFailureHdlr       AutoSizeFailHdlr,  
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelAutoSizeState             AutoSizeState,  
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelAutoSizeMode              AutoSizeMode,  
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelMinBandwidth              MplsBitRate,  
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelMaxBandwidth              MplsBitRate,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelIncBandwidth              MplsBitRate,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelCurBandwidth              MplsBitRate,  
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelReqBandwidth              MplsBitRate,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelUsedBandwidth             MplsBitRate,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelClassType                 Unsigned32,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelResourceIncludeAll        Unsigned32,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelResourceIncludeAny        Unsigned32,
+     cienaCesGmplsDynamicIngressCoroutedExtTunnelResourceExcludeAny        Unsigned32,
+     cienaCesGmplsDynamicIngressCoroutedArHopIndex                         Unsigned32 
+   }
+ 
+ 
+ 
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelLspId    OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+      "A unique LspId within a tunnel."
+    ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 1 }
+
+cienaCesGmplsDynamicIngressCoroutedExtTunnelIndex OBJECT-TYPE
+     SYNTAX      Unsigned32   (1..65535)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "Unique index in the table."
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 2 }
+  
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..31))  	
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the encap tunnel name. Tunnel names are common across Dynamic and dynamic."
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 3 }
+
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelNextHopIp		OBJECT-TYPE
+ 	 SYNTAX		IpAddress
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"Specifies the next hop IP address for the Dynamic encap tunnel."
+ 	 ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 4 }
+ 
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelSrcIpAddr	OBJECT-TYPE
+ 	 SYNTAX		IpAddress
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"Source IP address of the Dynamic encap tunnel. If not specified, the Dynamic encap tunnel 
+ 	 	inherits the IP address of the tunnel-group. This object cannot be modified once the Dynamic encap tunnel
+ 	 	entry is created."
+ 	 ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 5 }
+
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelDestIpAddr	OBJECT-TYPE
+ 	 SYNTAX		IpAddress
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"Destination IP address of the Dynamic encap tunnel. If not specified, the Dynamic encap tunnel 
+ 	 	inherits the IP address of the tunnel-group. This object cannot be modified once the Dynamic encap tunnel
+ 	 	entry is created."
+ 	 ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 6 }
+
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelAdminState	OBJECT-TYPE
+ 	 SYNTAX		CienaGlobalState
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"Specifies the administrative status of the Dynamic encap tunnel."
+ 	 ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 7 }
+ 
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelOperState	    OBJECT-TYPE
+ 	 SYNTAX		CienaGlobalState
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"Specifies the operational status of the Dynamic encap tunnel."
+ 	 ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 8 }
+
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelForwardOutLabel		OBJECT-TYPE
+ 	 SYNTAX		Unsigned32   ( 0..1048575 )
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"The label for the Dynamic encap tunnel."
+ 	 ::= {cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 9 }
+
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelReverseInLabel		OBJECT-TYPE
+ 	 SYNTAX		Unsigned32   ( 0..1048575 )
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"The label for the Dynamic encap tunnel."
+ 	 ::= {cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 10 }
+                          
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelProtectionRole		OBJECT-TYPE
+ 	 SYNTAX		INTEGER {
+ 	                      none(0),
+ 	                      primary(1),
+ 	                      backup(2)
+ 	 }   
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"The label for the Dynamic encap tunnel."
+ 	 ::= {cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 11 }
+  	 
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelProtectionPartName	OBJECT-TYPE
+ 	 SYNTAX		DisplayString   
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"Protection partner name of the Dynamic encap tunnel."
+ 	 ::= {cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 12 }
+ 
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelProtectionState		OBJECT-TYPE
+ 	 SYNTAX		INTEGER	 {
+ 	 						standby(0),
+ 	 						active(1)	 						
+ 	 			}	
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"Specifies the Protection status of the Dynamic encap tunnel."
+ 	 ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 13 }	
+ 	                                                   
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelTTLPolicy	 OBJECT-TYPE
+     SYNTAX		   TTLPolicy
+     MAX-ACCESS	read-only
+     STATUS		   current
+     DESCRIPTION
+     	"Specifies whether TTL is fixed or inherited from the frame."
+     DEFVAL { fixed }
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 14 }
+ 
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelFixedTTL	OBJECT-TYPE
+     SYNTAX		   Unsigned32  (1..255)
+     MAX-ACCESS	read-only
+     STATUS		   current
+     DESCRIPTION
+     	"If the TTL policy for the Dynamic encap tunnel is fixed, then this object is 
+     	the TTL value."
+     DEFVAL { 255 }
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 15 }		
+ 
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelGrpIndex			OBJECT-TYPE
+     SYNTAX		   Unsigned32
+     MAX-ACCESS	read-only
+     STATUS		   current
+     DESCRIPTION
+     	"The group ID of the tunnel group of which the Dynamic encap tunnel is a member."
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 16 }
+
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelReversion 	OBJECT-TYPE
+     SYNTAX		   INTEGER {
+     					    on(1),
+     					    off(2)
+     			}
+     MAX-ACCESS	read-only
+     STATUS		   current
+     DESCRIPTION
+     	"Indicates whether tunnel reversion is turned on/off for this encap tunnel."
+     DEFVAL {  off }
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 17 }
+
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelReversionTimeout   OBJECT-TYPE
+ 	 SYNTAX		Unsigned32  (1..65535)
+    UNITS      "seconds"
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"This object represents the tunnel reversion hold time in seconds before
+		the primary encap tunnel switches back as active tunnel in its tunnel group."
+ 	 ::= {cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 18 }
+
+  cienaCesGmplsDynamicIngressCoroutedExtTunnelCosProfileIndex      OBJECT-TYPE
+ 	 SYNTAX		Unsigned32  (1..65535)	
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"This object represents Cos profile index" 
+ 	 ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 19 }
+                                                        
+  cienaCesGmplsDynamicIngressCoroutedExtTunnelCosProfileName 		OBJECT-TYPE
+  	 SYNTAX		DisplayString   
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"Specifies the name of Cos profile"
+ 	 ::= {cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 20 } 
+ 	 
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelRecordRoute OBJECT-TYPE
+     SYNTAX		   INTEGER {
+     					    on(1),
+     					    off(2)
+     			}
+     MAX-ACCESS	read-only
+     STATUS		   current
+     DESCRIPTION
+     	"Indicates whether or not an FRR (fast re-route) tunnel needs to be created for this dynamic encap tunnel."
+     DEFVAL {  off }
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 21 } 
+     
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelFastRoute  OBJECT-TYPE
+ 	 SYNTAX		INTEGER	 {
+ 	 						none(1),
+ 	 						link-protect(2),
+ 	 						node-protect(3)
+ 	 			}
+ 	 MAX-ACCESS  read-only
+ 	 STATUS		 current
+ 	 DESCRIPTION
+ 	 	"Indicates the fast route method for the dynamic encap tunnel. This object cannot be modified once the
+ 	 	 dynamic encap tunnel entry is created." 
+ 	 DEFVAL	{ link-protect }
+ 	 ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 22 }
+     
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelSetupPriority OBJECT-TYPE
+     SYNTAX		   Unsigned32	(0..7)
+     MAX-ACCESS	read-only
+     STATUS		   current
+     DESCRIPTION
+     	"Indicates the set up priority of the dynamic encap tunnel."
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 23 }
+ 
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelHoldPriority OBJECT-TYPE
+     SYNTAX	    Unsigned32   (0..7)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+     	"Indicates the holding priority of the dynamic encap tunnel."
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 24 }
+                 
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelPathIndex	OBJECT-TYPE
+ 	 SYNTAX		Unsigned32
+ 	 MAX-ACCESS read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"Index into the cienaCesmplsTunnelPathTable entry that
+ 		specifies the explicit route hops for this dynamic encap tunnel."
+ 	 ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 25 }
+ 
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelPathName	OBJECT-TYPE
+ 	 SYNTAX		DisplayString
+ 	 MAX-ACCESS read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"The path name corresponding to the pathIndex object."
+ 	 ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry	26 }
+ 	 
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelBandwidthProfile	OBJECT-TYPE
+ 	 SYNTAX		DisplayString
+ 	 MAX-ACCESS read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"This object represents the bandwidth profile attached to this tunnel."
+ 	 ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry	27 }
+  
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelResourcePointer OBJECT-TYPE
+     SYNTAX      RowPointer
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The OID must be one of the entries in mplsTunnelResourceTable."
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 28 } 
+ 
+  cienaCesGmplsDynamicIngressCoroutedExtTunnelBfdMonitoring        OBJECT-TYPE
+     SYNTAX      CienaGlobalState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Specifies status of BFD monitoring."
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 29 }     
+     
+  cienaCesGmplsDynamicIngressCoroutedExtTunnelBfdProfileName 	 OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This object represent BFD profile name."
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 30 }   
+     
+  cienaCesGmplsDynamicIngressCoroutedExtTunnelBfdSessionName			OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Specifies BFD session name."
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 31 }     
+  
+  cienaCesGmplsDynamicIngressCoroutedExtTunnelBfdSessionFaulted  OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..1)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Indicates if BFD is faulted,where 1 indicates fault."
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 32 }
+     
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelBfdProfileIndex   OBJECT-TYPE
+     SYNTAX      Unsigned32  (1..65535)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the BFD profile index in the BFD profile table
+	configured for this gmpls dynamic ingress corouted tunnel"
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 33 }     
+           
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelAutoBackupEnable   OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..1) 
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Indicates if auto-backup is enabled for this tunnel and 
+         always remains 0 in case of backup tunnel."
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 34 }
+
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelLspReoptimization OBJECT-TYPE
+     SYNTAX      MplsGlobalState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Indicates if Lsp-Reoptimization is enabled or disabled for this tunnel."
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 35 }
+
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelLspReOptTimeInterval OBJECT-TYPE
+     SYNTAX      Unsigned32   (5..60)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Indicates Lsp-Reoptimization Time interval(in minutes) for this tunnel and 
+        always remains 0 in case of backup tunnel."
+     DEFVAL {30}
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 36 }
+
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelPathDisjointType OBJECT-TYPE
+     SYNTAX      PathDisjointType
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Indicates path diversification criteria used for this tunnel.
+         It can either be node based or srlg based or link based or combination."
+     DEFVAL { srlg }
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 37 }
+
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelPathDisjointMode OBJECT-TYPE
+     SYNTAX      PathDisjointMode
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Indicates mode used for path diversification for this tunnel ."
+     DEFVAL { strict }
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 38 }
+
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelAutoSizeEnable  OBJECT-TYPE
+     SYNTAX      MplsGlobalState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Indicates if auto-size is enabled for this tunnel."
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 39 }
+
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelAutoSizeInterval  OBJECT-TYPE
+     SYNTAX      Unsigned32 (5..60)
+     UNITS       "minutes"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Indicates auto-sizing interval(in minutes) for this tunnel and 
+        always remains 0 in case of backup tunnel."
+     DEFVAL { 5 }
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 40 }
+
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelAutoSizeFailureHdlr  OBJECT-TYPE
+     SYNTAX      AutoSizeFailHdlr
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Indicates auto-sizing failure handler for this tunnel."
+     DEFVAL { alarm }
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 41 }
+           
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelAutoSizeState  OBJECT-TYPE
+     SYNTAX      AutoSizeState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Indicates dynamic auto-sizing states for this tunnel."
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 42 }
+           
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelAutoSizeMode  OBJECT-TYPE
+     SYNTAX      AutoSizeMode
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Indicates auto-sizing mode for this tunnel."
+     DEFVAL { cac }
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 43 }
+           
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelMinBandwidth  OBJECT-TYPE
+     SYNTAX      MplsBitRate
+     UNITS       "kbps"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Indicates auto-size minimum bandwidth(in kbps) for this tunnel and
+        always remains 0 in case of backup tunnel."
+     DEFVAL { 0 }
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 44 }
+           
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelMaxBandwidth  OBJECT-TYPE
+     SYNTAX      MplsBitRate
+     UNITS       "kbps"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Indicates auto-size maximum bandwidth(in kbps) for this tunnel and
+        always remains 0 in case of backup tunnel."
+     DEFVAL { 1000000000 }
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 45 }
+           
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelIncBandwidth  OBJECT-TYPE
+     SYNTAX      MplsBitRate
+     UNITS       "kbps"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Indicates auto-size increment bandwidth(in kbps) for this tunnel and
+        always remains 0 in case of backup tunnel."
+     DEFVAL { 0 }
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 46 }
+           
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelCurBandwidth  OBJECT-TYPE
+     SYNTAX      MplsBitRate
+     UNITS       "kbps"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Indicates auto-size current bandwidth(in kbps) for this tunnel."
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 47 }
+           
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelReqBandwidth  OBJECT-TYPE
+     SYNTAX      MplsBitRate
+     UNITS       "kbps"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Indicates auto-size requested bandwidth(in kbps) for this tunnel."
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 48 }
+           
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelUsedBandwidth  OBJECT-TYPE
+     SYNTAX      MplsBitRate
+     UNITS       "kbps"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Indicates auto-size used bandwidth(in kbps) for this tunnel."
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 49 }
+
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelClassType  OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..7)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Indicates the DSTE class type (CT0-CT7) mapped to this Tunnel."
+     DEFVAL { 0 }
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 50 }
+
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelResourceIncludeAll  OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Resource affinity Admin Color-Group which is applied in 
+         include-all colors mode to constrain path selection and
+         always remains 0 in case of backup tunnel."
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 51 }
+
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelResourceIncludeAny  OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Resource affinity Admin Color-Group which is applied in 
+         include-any colors mode to constrain path selection and
+         always remains 0 in case of backup tunnel."
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 52 }
+
+
+ cienaCesGmplsDynamicIngressCoroutedExtTunnelResourceExcludeAny  OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Resource affinity Admin Color-Group which is applied in 
+         exclude-any colors mode to constrain path selection and
+         always remains 0 in case of backup tunnel."
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 53 }
+
+ cienaCesGmplsDynamicIngressCoroutedArHopIndex OBJECT-TYPE 
+     SYNTAX         Unsigned32 
+     MAX-ACCESS     read-only 
+     STATUS         current 
+     DESCRIPTION 
+        "This object represents the ArHop index of this tunnel." 
+     ::= { cienaCesGmplsDynamicIngressCoroutedExtTunnelEntry 54 } 
+
+ --
+ -- GMPLS Dynamic Decap co routed tunnel table
+ --         
+cienaCesGmplsDynamicEgressCoroutedExtTunnelTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesGmplsDynamicEgressCoroutedExtTunnelEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the MPLS dynamic decap tunnels."
+     ::= { cienaCesGmpls 23 }
+     
+ cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry  OBJECT-TYPE
+     SYNTAX       CienaCesGmplsDynamicEgressCoroutedExtTunnelEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "An entry in the dynamic decap tunnel table."
+     INDEX {cienaCesGmplsDynamicEgressCoroutedExtTunnelLspId,cienaCesGmplsDynamicEgressCoroutedExtTunnelIndex}
+     ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelTable 1 }
+ 
+ CienaCesGmplsDynamicEgressCoroutedExtTunnelEntry ::=  SEQUENCE { 
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelLspId               Unsigned32,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelIndex          	Unsigned32,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelName           		DisplayString,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelAdminState			CienaGlobalState,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelOperState			CienaGlobalState,
+     cienaCesGmplsDynamicEgressCoroutedExtLspId      		Unsigned32,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelPrevHopIpAddr	       	IpAddress,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelSourceIpAddr			IpAddress,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelDestIpAddr			IpAddress,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelForwardInLabel		Unsigned32,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelReverseOutLabel			Unsigned32,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelProtectionRole  				INTEGER,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelProtectionPartName	DisplayString, 
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelProtectionState			INTEGER,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelGrpIndex					Unsigned32,  
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelReversion       			INTEGER,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelReversionTimeout    		Unsigned32,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelCosProfileIndex			Unsigned32,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelCosProfileName			DisplayString,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelBfdMonitoring      		CienaGlobalState,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelBfdProfileName			DisplayString,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelBfdSessionName			DisplayString,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelBfdSessionFaulted 		Unsigned32,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelBfdProfileIndex		Unsigned32,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelTTLPolicy              TTLPolicy,
+     cienaCesGmplsDynamicEgressCoroutedExtTunnelFixedTTL               Unsigned32
+   }
+
+ cienaCesGmplsDynamicEgressCoroutedExtTunnelLspId    OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+      "A unique LspId within a tunnel."
+    ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 1 }
+  
+ cienaCesGmplsDynamicEgressCoroutedExtTunnelIndex OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This represents the unique index in the table."
+     ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 2 }
+
+ cienaCesGmplsDynamicEgressCoroutedExtTunnelName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..32))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the dynamic decap tunnel name."
+     ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 3 }
+  
+ cienaCesGmplsDynamicEgressCoroutedExtTunnelAdminState OBJECT-TYPE
+ 	 SYNTAX		CienaGlobalState
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"Indicates the administrative status of the dynamic decap tunnel."
+ 	 DEFVAL {enabled}
+ 	 ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 4 }	
+ 
+ cienaCesGmplsDynamicEgressCoroutedExtTunnelOperState OBJECT-TYPE
+ 	 SYNTAX		CienaGlobalState
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"Indicates the operational status of the dynamic decap tunnel."
+ 	 ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 5 }
+ 
+ cienaCesGmplsDynamicEgressCoroutedExtLspId   OBJECT-TYPE
+ 	 SYNTAX		Unsigned32 
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"Indicates the LSP ID."
+ 	 ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 6 }
+
+ cienaCesGmplsDynamicEgressCoroutedExtTunnelPrevHopIpAddr  OBJECT-TYPE
+ 	 SYNTAX		IpAddress
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"Prev hop IP address of the dynamic decap tunnel."
+ 	 ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 7 }
+ 
+ cienaCesGmplsDynamicEgressCoroutedExtTunnelSourceIpAddr  OBJECT-TYPE
+ 	 SYNTAX		IpAddress
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"Source IP address of the dynamic decap tunnel."
+ 	 ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 8 }
+
+ cienaCesGmplsDynamicEgressCoroutedExtTunnelDestIpAddr  OBJECT-TYPE
+ 	 SYNTAX		IpAddress
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"Destination IP address of the dynamic decap tunnel."
+ 	 ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 9 }
+ 
+
+ cienaCesGmplsDynamicEgressCoroutedExtTunnelForwardInLabel		OBJECT-TYPE
+ 	 SYNTAX		Unsigned32 
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"Idicates the label of the dynamic decap tunnel."
+ 	 ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 10 }  
+ 	     
+
+ cienaCesGmplsDynamicEgressCoroutedExtTunnelReverseOutLabel		OBJECT-TYPE
+ 	 SYNTAX		Unsigned32  (0.. 1048575 )		
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"Indicates the out label of the dynamic decap tunnel."
+ 	 ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 11 } 
+
+ cienaCesGmplsDynamicEgressCoroutedExtTunnelProtectionRole		OBJECT-TYPE
+ 	 SYNTAX		INTEGER {
+ 	                      none(0),
+ 	                      primary(1),
+ 	                      backup(2)
+ 	 }   
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"specifies role of this dynamic tunnel"
+ 	 ::= {cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 12 }
+  	 
+ cienaCesGmplsDynamicEgressCoroutedExtTunnelProtectionPartName	OBJECT-TYPE
+ 	 SYNTAX		DisplayString   
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"Protection partner name of the dynamic encap tunnel."
+ 	 ::= {cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 13 }
+ 
+ cienaCesGmplsDynamicEgressCoroutedExtTunnelProtectionState		OBJECT-TYPE
+ 	 SYNTAX		INTEGER	 {
+ 	 						standby(0),
+ 	 						active(1)	 						
+ 	 			}	
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"Specifies the Protection status of the static encap tunnel."
+ 	 ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 14 }
+                
+ cienaCesGmplsDynamicEgressCoroutedExtTunnelGrpIndex			OBJECT-TYPE
+     SYNTAX		   Unsigned32
+     MAX-ACCESS	read-only
+     STATUS		   current
+     DESCRIPTION
+     	"The group ID of the tunnel group of which the Dynamic encap tunnel is a member."
+     ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 15 }
+
+ cienaCesGmplsDynamicEgressCoroutedExtTunnelReversion 	OBJECT-TYPE
+     SYNTAX		   INTEGER {
+     					    on(1),
+     					    off(2)                         
+     			  }
+     MAX-ACCESS	read-only
+     STATUS		   current
+     DESCRIPTION
+     	"Indicates whether tunnel reversion is turned on/off for this encap tunnel."
+     DEFVAL {  off }
+     ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 16 }
+
+ cienaCesGmplsDynamicEgressCoroutedExtTunnelReversionTimeout   OBJECT-TYPE
+ 	 SYNTAX		Unsigned32  (1..65535)
+    UNITS      "seconds"
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"This object represents the tunnel reversion hold time in seconds before
+		the primary encap tunnel switches back as active tunnel in its tunnel group."
+ 	 ::= {cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 17 }
+
+  cienaCesGmplsDynamicEgressCoroutedExtTunnelCosProfileIndex      OBJECT-TYPE
+ 	 SYNTAX		Unsigned32  (1..65535)	
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"This object represents Cos profile index" 
+ 	 ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 18 }
+                                                        
+  cienaCesGmplsDynamicEgressCoroutedExtTunnelCosProfileName 		OBJECT-TYPE
+  	 SYNTAX		DisplayString   
+ 	 MAX-ACCESS	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	"Specifies the name of Cos profile"
+ 	 ::= {cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 19 }    
+ 	 
+ 
+  cienaCesGmplsDynamicEgressCoroutedExtTunnelBfdMonitoring        OBJECT-TYPE
+     SYNTAX      CienaGlobalState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This parameter indicates if BFD monitoring is enabled or disableb on tunnel"
+     ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 20 }     
+     
+  cienaCesGmplsDynamicEgressCoroutedExtTunnelBfdProfileName 	 OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "It Indicates assigned BFD profile names to tunnel"
+     ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 21 }   
+     
+  cienaCesGmplsDynamicEgressCoroutedExtTunnelBfdSessionName			OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "It Indicates BFD session names."
+     ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 22 }     
+  
+  cienaCesGmplsDynamicEgressCoroutedExtTunnelBfdSessionFaulted  OBJECT-TYPE
+     SYNTAX      Unsigned32  (0..1)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Specifies if BFD faulted, where 1 indicates Fault."
+     ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 23 }
+
+ cienaCesGmplsDynamicEgressCoroutedExtTunnelBfdProfileIndex OBJECT-TYPE
+     SYNTAX		   Unsigned32  (1..65535)	
+     MAX-ACCESS	read-only
+     STATUS		   current
+     DESCRIPTION
+ 	 "This represents the BFD profile index in the BFD profile table
+	configured for this gmpls dynamic egress corouted tunnel" 
+     ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 24 }
+     
+  cienaCesGmplsDynamicEgressCoroutedExtTunnelTTLPolicy	 OBJECT-TYPE
+     SYNTAX		    TTLPolicy
+     MAX-ACCESS	 read-only
+     STATUS		    current
+     DESCRIPTION
+     	"Specifies whether TTL is fixed or inherited from the frame."
+     DEFVAL { fixed }
+     ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 25 }
+ 
+ cienaCesGmplsDynamicEgressCoroutedExtTunnelFixedTTL	OBJECT-TYPE
+     SYNTAX		   Unsigned32  (1..255)
+     MAX-ACCESS	read-only
+     STATUS		   current
+     DESCRIPTION
+     	"If the TTL policy for the Dynamic encap tunnel is fixed, then this object is 
+     	the TTL value."
+     DEFVAL { 255 }
+     ::= { cienaCesGmplsDynamicEgressCoroutedExtTunnelEntry 26 }		
+ 
   --       
  -- TP Tunnel Traps
   --      
@@ -7229,7 +8208,7 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
 	              cienaCesGmplsNotifEncapTunnelType,
 	              cienaCesGmplsNotifEncapTunnelName,
 	              cienaCesGmplsNotifEncapTunnelAdminState,
-	              cienaCesGmplsNotifEncapTunnelOperState,
+	              cienaCesGmplsNotifEncapTunnelOperState, 
 	              cienaCesGmplsNotifEncapTunnelOamFaulted,
 	              cienaCesGmplsNotifEncapTunnelFaultedNodeId
 	           }
@@ -7239,11 +8218,11 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
 	       "This notification is sent when the operational state of an encap
          uni-direction tunnel changes. Variable bindings include: cienaGlobalSeverity, 
 	       cienaGlobalMacAddress, cienaCesGmplsNotifEncapTunnelIndex, 
-	       cienaCesGmplsNotifEncapTunnelType, cienaCesGmplsNotifEncapTunnelName, 
+	       cienaCesGmplsNotifEncapTunnelType, cienaCesGmplsNotifEncapTunnelName,
 	       cienaCesGmplsNotifEncapTunnelAdminState,
 	       cienaCesGmplsNotifEncapTunnelOperState,
 	       cienaCesGmplsNotifEncapTunnelOamFaulted,
-	       cienaCesGmplsNotifEncapTunnelFaultedNodeId."   
+	       cienaCesGmplsNotifEncapTunnelFaultedNodeId."       
 	::= { cienaCesGmplsMIBNotifications 1 }
 
 
@@ -7332,7 +8311,7 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
 	              cienaCesGmplsNotifTransitTunnelName,
 	              cienaCesGmplsNotifTransitTunnelAdminState,
 	              cienaCesGmplsNotifTransitTunnelOperState,
-	              cienaCesGmplsNotifTransitTunnelOamFaulted
+	              cienaCesGmplsNotifTransitTunnelOamFaulted 
 	           }
 	              
 	STATUS	   current
@@ -7435,13 +8414,14 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
          cienaCesGmplsNotifEncapTunnelName,
          cienaCesGmplsNotifEncapTunnelAisFaulted,
          cienaCesGmplsNotifEncapTunnelFaultedNodeId,
-         cienaCesGmplsNotifEncapTunnelFarEndLerId
+         cienaCesGmplsNotifEncapTunnelFarEndLerId,
+         cienaCesGmplsNotifEncapTunnelAisFaultReason
      }
 
-     STATUS    obsolete
+     STATUS    deprecated
      DESCRIPTION  
-         "This notification is obsoleted, its functionality is absorbed in the OperState Change
-          notification."  
+         "This notification is deprecated, its functionality is absorbed in the OperState Change
+          notification."   
      ::= { cienaCesGmplsMIBNotifications 10 }
 
 
@@ -7454,12 +8434,13 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
          cienaCesGmplsNotifDecapTunnelName,
          cienaCesGmplsNotifDecapTunnelAisFaulted,
          cienaCesGmplsNotifDecapTunnelFaultedNodeId,
-         cienaCesGmplsNotifDecapTunnelFarEndLerId
+         cienaCesGmplsNotifDecapTunnelFarEndLerId,
+         cienaCesGmplsNotifDecapTunnelAisFaultReason
      }
 
-     STATUS    obsolete
+     STATUS    deprecated
      DESCRIPTION  
-         "This notification is obsoleted, its functionality is absorbed in the OperState Change
+         "This notification is deprecated, its functionality is absorbed in the OperState Change
           notification."  
      ::= { cienaCesGmplsMIBNotifications 11 }
 
@@ -7472,12 +8453,13 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
          cienaCesGmplsNotifAssociatedTunnelName,
          cienaCesGmplsNotifAssociatedTunnelAisFaulted,
          cienaCesGmplsNotifAssociatedTunnelFaultedNodeId,
-         cienaCesGmplsNotifAssociatedTunnelFarEndLerId
+         cienaCesGmplsNotifAssociatedTunnelFarEndLerId,
+         cienaCesGmplsNotifAssociatedTunnelAisFaultReason
      }
 
-     STATUS    obsolete
+     STATUS    deprecated
      DESCRIPTION  
-         "This notification is obsoleted, its functionality is absorbed in the OperState Change
+         "This notification is deprecated, its functionality is absorbed in the OperState Change
           notification."  
      ::= { cienaCesGmplsMIBNotifications 12 }
 
@@ -7499,31 +8481,30 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
          and cienaCesGmplsNotifTunnelErrorMsg"  
      ::= { cienaCesGmplsMIBNotifications 13 }
 
-  cienaCesGmplsEncapTunnelResizeResultTrap  NOTIFICATION-TYPE
-	OBJECTS	   {  
-	     	      cienaGlobalSeverity,  
-     		      cienaGlobalMacAddress,
-	              cienaCesGmplsNotifEncapTunnelIndex,
-	              cienaCesGmplsNotifEncapTunnelType,
-	              cienaCesGmplsNotifEncapTunnelName,
-	              cienaCesGmplsNotifEncapTunnelResult,
-	              cienaCesGmplsNotifEncapTunnelProtectionRole,
-	              cienaCesGmplsNotifEncapTunnelRequestedBw,
-	              cienaCesGmplsNotifEncapTunnelOperationalBw
-	           }
-	              
-	STATUS	   current
-	DESCRIPTION  
-	       "This notification is sent when the encap tunnel auto size is done
-               Variable bindings include: cienaGlobalSeverity, 
-	       cienaGlobalMacAddress, cienaCesGmplsNotifEncapTunnelIndex, 
-	       cienaCesGmplsNotifEncapTunnelType, cienaCesGmplsNotifEncapTunnelName, 
-	       cienaCesGmplsNotifEncapTunnelResult,
-               cienaCesGmplsNotifEncapTunnelProtectionRole, 
-	       cienaCesGmplsNotifEncapTunnelRequestdBw and
-               cienaCesGmplsNotifEncapTunnelOperationalBw."   
-	::= { cienaCesGmplsMIBNotifications 14 }      
-              
+ cienaCesGmplsEncapTunnelResizeResultTrap  NOTIFICATION-TYPE
+     OBJECTS    {
+         cienaGlobalSeverity,
+         cienaGlobalMacAddress,
+         cienaCesGmplsNotifEncapTunnelIndex,
+         cienaCesGmplsNotifEncapTunnelType,
+         cienaCesGmplsNotifEncapTunnelName,
+         cienaCesGmplsNotifEncapTunnelResult,
+         cienaCesGmplsNotifEncapTunnelProtectionRole,
+         cienaCesGmplsNotifEncapTunnelRequestedBw,
+         cienaCesGmplsNotifEncapTunnelOperationalBw
+     }
+
+     STATUS     current
+     DESCRIPTION
+     "This notification is sent when the encap tunnel auto size is done
+     Variable bindings include: cienaGlobalSeverity,
+     cienaGlobalMacAddress, cienaCesGmplsNotifEncapTunnelIndex,
+     cienaCesGmplsNotifEncapTunnelType, cienaCesGmplsNotifEncapTunnelName,
+     cienaCesGmplsNotifEncapTunnelResult, cienaCesGmplsNotifEncapTunnelProtectionRole, 
+     cienaCesGmplsNotifEncapTunnelRequestedBw and
+     cienaCesGmplsNotifEncapTunnelOperationalBw."
+     ::= { cienaCesGmplsMIBNotifications 14 }
+
  cienaCesGmplsEncapTunnelMbbResultTrap  NOTIFICATION-TYPE
      OBJECTS    {
          cienaGlobalSeverity,
@@ -7540,16 +8521,95 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
 
      STATUS     current
      DESCRIPTION
-               "This notification is sent when the encap tunnel MBB done
-               Variable bindings include: cienaGlobalSeverity,
-               cienaGlobalMacAddress, cienaCesGmplsNotifEncapTunnelIndex,
-               cienaCesGmplsNotifEncapTunnelType, cienaCesGmplsNotifEncapTunnelName,
-               cienaCesGmplsNotifEncapTunnelResult,
-               cienaCesGmplsNotifEncapTunnelProtectionRole,
-               cienaCesGmplsNotifEncapTunnelRequestdBw and
-               cienaCesGmplsNotifEncapTunnelOperationalBw,
-               cienaCesGmplsNotifEncapTunnelMbbParentApp."
+     "This notification is sent when the encap tunnel MBB done
+     Variable bindings include: cienaGlobalSeverity,
+     cienaGlobalMacAddress, cienaCesGmplsNotifEncapTunnelIndex,
+     cienaCesGmplsNotifEncapTunnelType, cienaCesGmplsNotifEncapTunnelName,
+     cienaCesGmplsNotifEncapTunnelProtectionRole, 
+     cienaCesGmplsNotifEncapTunnelRequestedBw,
+     cienaCesGmplsNotifEncapTunnelOperationalBw and
+     cienaCesGmplsNotifEncapTunnelParentApp."
      ::= { cienaCesGmplsMIBNotifications 15 }
+
+ cienaCesGmplsEncapCoroutedServiceDegradeChgTrap  NOTIFICATION-TYPE
+     OBJECTS    {
+         cienaGlobalSeverity,
+         cienaGlobalMacAddress,
+         cienaCesGmplsNotifEncapTunnelIndex,
+         cienaCesGmplsNotifEncapTunnelType,
+         cienaCesGmplsNotifEncapTunnelName,
+         cienaCesGmplsNotifEncapTunnelAdminState,
+         cienaCesGmplsNotifEncapTunnelOperState,
+         cienaCesGmplsNotifEncapTunnelOamFaulted,
+         cienaCesGmplsNotifEncapTunnelFaultedNodeId,
+         cienaCesGmplsNotifEncapTunnelServiceDegradeState
+     }
+
+     STATUS     current
+     DESCRIPTION
+     "This notification is sent when the service degrade state of a static corouted 
+     encap tunnel changes. Variable bindings include: cienaGlobalSeverity,
+     cienaGlobalMacAddress, cienaCesGmplsNotifEncapTunnelIndex,
+     cienaCesGmplsNotifEncapTunnelType, cienaCesGmplsNotifEncapTunnelName,
+     cienaCesGmplsNotifEncapTunnelAdminState,
+     cienaCesGmplsNotifEncapTunnelOperState,
+     cienaCesGmplsNotifEncapTunnelOamFaulted,
+     cienaCesGmplsNotifEncapTunnelFaultedNodeId,
+     cienaCesGmplsNotifEncapTunnelServiceDegradeState."
+     ::= { cienaCesGmplsMIBNotifications 16 }
+
+ cienaCesGmplsDecapCoroutedServiceDegradeChgTrap  NOTIFICATION-TYPE
+     OBJECTS    {
+         cienaGlobalSeverity,
+         cienaGlobalMacAddress,
+         cienaCesGmplsNotifDecapTunnelIndex,
+         cienaCesGmplsNotifDecapTunnelType,
+         cienaCesGmplsNotifDecapTunnelName,
+         cienaCesGmplsNotifDecapTunnelAdminState,
+         cienaCesGmplsNotifDecapTunnelOperState,
+         cienaCesGmplsNotifDecapTunnelOamFaulted,
+         cienaCesGmplsNotifdecapTunnelFaultedNodeId,
+         cienaCesGmplsNotifDecapTunnelServiceDegradeState
+     }
+
+     STATUS     current
+     DESCRIPTION
+     "This notification is sent when the service degrade state of a static corouted 
+     decap tunnel changes. Variable bindings include: cienaGlobalSeverity,
+     cienaGlobalMacAddress, cienaCesGmplsNotifDecapTunnelIndex,
+     cienaCesGmplsNotifDecapTunnelType, cienaCesGmplsNotifDecapTunnelName,
+     cienaCesGmplsNotifdecapTunnelAdminState,
+     cienaCesGmplsNotifDecapTunnelOperState,
+     cienaCesGmplsNotifDecapTunnelOamFaulted,
+     cienaCesGmplsNotifDecapTunnelFaultedNodeId,
+     cienaCesGmplsNotifDecapTunnelServiceDegradeState."
+     ::= { cienaCesGmplsMIBNotifications 17 } 
+ 
+ cienaCesGmplsTransitCoroutedServiceDegradeChgTrap  NOTIFICATION-TYPE
+     OBJECTS    {
+         cienaGlobalSeverity,
+         cienaGlobalMacAddress,
+         cienaCesGmplsNotifTransitTunnelIndex,
+         cienaCesGmplsNotifTransitTunnelType,
+         cienaCesGmplsNotifTransitTunnelName,
+         cienaCesGmplsNotifTransitTunnelAdminState,
+         cienaCesGmplsNotifTransitTunnelOperState,
+         cienaCesGmplsNotifTransitTunnelOamFaulted,
+         cienaCesGmplsNotifTransitTunnelServiceDegradeState
+     }
+
+     STATUS     current
+     DESCRIPTION
+     "This notification is sent when the service degrade state of a static corouted 
+     transit tunnel changes. Variable bindings include: cienaGlobalSeverity,
+     cienaGlobalMacAddress, cienaCesGmplsNotifTransitTunnelIndex,
+     cienaCesGmplsNotifTransitTunnelType, cienaCesGmplsNotifTransitTunnelName,
+     cienaCesGmplsNotifTransitTunnelAdminState,
+     cienaCesGmplsNotifTransitTunnelOperState,
+     cienaCesGmplsNotifTransitTunnelOamFaulted,
+     cienaCesGmplsNotifTransitTunnelServiceDegradeState."
+     ::= { cienaCesGmplsMIBNotifications 18 }
+                   
  --
  -- Mpls Global 
  --                                                           
@@ -8023,9 +9083,9 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
      STATUS      current
      DESCRIPTION
         "Mpls Free static Tunnel Label."
-     ::= { cienaCesMplsGlobalFreeStaticTunnelLabelEntry 2 }  
+     ::= { cienaCesMplsGlobalFreeStaticTunnelLabelEntry 2 } 
 
---
+ --
  -- Mpls TE Link Table
  --     
 
@@ -8116,7 +9176,7 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
      DESCRIPTION
                    "Resource Color Group Index this TE-link is associated to."
      ::= { cienaCesTeLinkEntry 4 }
-              
+
  cienaCesTeResourceColorBitMask OBJECT-TYPE
      SYNTAX      OCTET STRING (SIZE(4))
      MAX-ACCESS  read-only
@@ -8124,8 +9184,8 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
      DESCRIPTION
         "This represents individual bit for Resource Color which will be 
          set in Resource Color Group."
-
      ::= { cienaCesTeLinkEntry 5 }
+             
  cienaCesMplsClassProfIndex  OBJECT-TYPE
      SYNTAX         Unsigned32    (1..500)
      MAX-ACCESS     read-only
@@ -8135,7 +9195,7 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
      ::= { cienaCesTeLinkEntry 6 }
 
  cienaCesTeLinkMode  OBJECT-TYPE
-     SYNTAX         TEMode 
+     SYNTAX         TEMode
      MAX-ACCESS     read-only
      STATUS         current
      DESCRIPTION
@@ -8359,10 +9419,9 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
      STATUS         current
      DESCRIPTION
                    "UnReserved Priority 7 Bandwidth(in kbps) in this TE-link."
-     ::= { cienaCesTeLinkEntry 34 }
-            
+     ::= { cienaCesTeLinkEntry 34 } 
 
---
+ --
  -- Mpls Resource Color group Table
  --     
 
@@ -8484,7 +9543,7 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
          set in Resource Color Group's cienaCesTeResourceColorGroupBitMask."
      ::= { cienaCesTeResColorEntry 3 }
 
-  cienaCesTeResourceColorUseCount OBJECT-TYPE
+ cienaCesTeResourceColorUseCount OBJECT-TYPE
      SYNTAX      Counter32
      MAX-ACCESS  read-only
      STATUS      current
@@ -8492,6 +9551,7 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
         "Indicates the number of MPLS Resource Groups using this Resource 
          Color."
      ::= { cienaCesTeResColorEntry 4 }
+
 
 
  -- End of Mpls Resource Color Table
@@ -8633,6 +9693,7 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
       cienaCesMplsPwConfigBandwidth        MplsBitRate,
       cienaCesMplsPwOperBandwidth          MplsBitRate,
       cienaCesMplsPwBandwidthState         INTEGER
+
    }
  
  cienaCesMplsPwIndex OBJECT-TYPE
@@ -8786,7 +9847,8 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
      SYNTAX      INTEGER {
 			   mesh(1),
  	                   spoke(2),
- 	                   switching(3)
+ 	                   switching(3),
+ 	                   gateway(4)
  	 }
      MAX-ACCESS		read-only
      STATUS		current
@@ -9161,8 +10223,8 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
      STATUS		current
      DESCRIPTION
 	"Remote Ip address in the SP-PE TLV sent to the next hop"
-     ::= { cienaCesMplsPwEntry 54 }   
- 
+     ::= { cienaCesMplsPwEntry 54 }    
+
  cienaCesMplsPwConfigBandwidth  OBJECT-TYPE
      SYNTAX         MplsBitRate    (0..10000000)
      MAX-ACCESS     read-only
@@ -9418,7 +10480,8 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
 	VCCV control channel (CC Type-4) operation"
      DEFVAL { on }
      ::= { cienaCesMplsPwVccvProfileEntry 4 } 
-  
+ 
+ 
  --
  -- MPLS PW Notifications table
  --
@@ -9455,7 +10518,8 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
      cienaCesMplsPwNotifActPwIndex      Unsigned32,
      cienaCesMplsPwNotifActPwId         Unsigned32,
      cienaCesMplsPwNotifActPwName       DisplayString,
-     cienaCesMplsPwNotifActPwPeerIpAddr IpAddress
+     cienaCesMplsPwNotifActPwPeerIpAddr IpAddress,
+     cienaCesMplsPwGatewayVsState       DisplayString
  }
 
  cienaCesMplsPwNotifPwIndex    OBJECT-TYPE
@@ -9549,6 +10613,14 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
         active PW."
      ::= { cienaCesMplsPwNotifEntry 11 }
 
+ cienaCesMplsPwGatewayVsState OBJECT-TYPE
+     SYNTAX     DisplayString
+     MAX-ACCESS accessible-for-notify
+     STATUS     current
+     DESCRIPTION
+         "This represents the Gateway state of VS, whether Gateway VC's on VS is attached or
+          detached."
+     ::= { cienaCesMplsPwNotifEntry 12 }
 
  --
  -- PW Traps
@@ -9606,28 +10678,57 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
 
     ::= { cienaCesMplsPwMIBNotifications  3 }
 
+ cienaCesMplsGatewayVsConfigured NOTIFICATION-TYPE
+    OBJECTS {
+        cienaGlobalSeverity,  
+        cienaGlobalMacAddress,
+        cienaCesMplsPwVsIndex,
+        cienaCesMplsPwVsName,
+        cienaCesMplsPwGatewayVsState
+    }
+    STATUS  current
+    DESCRIPTION
+         "This notification is sent when two VC's of mode gateway is attached to
+          VS."
+    ::= { cienaCesMplsPwMIBNotifications  4 }
+
+ cienaCesMplsGatewayVsDeconfigured NOTIFICATION-TYPE
+    OBJECTS {
+        cienaGlobalSeverity,  
+        cienaGlobalMacAddress,
+        cienaCesMplsPwVsIndex,
+        cienaCesMplsPwVsName,
+        cienaCesMplsPwGatewayVsState
+    }
+    STATUS  current
+    DESCRIPTION
+         "This notification is sent when a pseudowire of mode gateway is detached to
+          VS."
+    ::= { cienaCesMplsPwMIBNotifications  5 }
+
 --
- -- Mpls PW Traffic Statistics Table
- --     
-     
+-- Mpls PW Traffic Statistics Table
+--     
+
  cienaCesMplsPWTrafficStatsTable OBJECT-TYPE
      SYNTAX     SEQUENCE OF CienaCesMplsPWTrafficStatsEntry
      MAX-ACCESS not-accessible
      STATUS     current
      DESCRIPTION
-           "Mpls PW Traffic Statistics table.
-            The attributes in this table are supported only on specific platforms."
+            "Mpls PW Traffic Statistics table.
+             The attributes in this table are supported only on specific platforms."
      ::= { cienaCesMplsPw 5 }
-     
+
  cienaCesMplsPWTrafficStatsEntry  OBJECT-TYPE
      SYNTAX       CienaCesMplsPWTrafficStatsEntry
      MAX-ACCESS   not-accessible
      STATUS       current
      DESCRIPTION
-             "Mpls PW Traffic Statistics table entry."
+            "Mpls PW Traffic Statistics table entry."
      INDEX {cienaCesMplsPWTrafficStatsPWIndex}
      ::= { cienaCesMplsPWTrafficStatsTable 1 }
-     
+
+
  CienaCesMplsPWTrafficStatsEntry ::=  SEQUENCE { 
      cienaCesMplsPWTrafficStatsPWIndex             Unsigned32,
      cienaCesMplsPWTrafficStatsIncomingPackets     Unsigned32,
@@ -9635,7 +10736,7 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
      cienaCesMplsPWTrafficStatsIncomingBytes       Unsigned32,
      cienaCesMplsPWTrafficStatsOutgoingBytes       Unsigned32
  }
-      
+ 
  cienaCesMplsPWTrafficStatsPWIndex		OBJECT-TYPE  
   	 SYNTAX      Unsigned32
      MAX-ACCESS  not-accessible
@@ -9643,7 +10744,7 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
      DESCRIPTION
         "Unique index for Mpls PW Traffic Statistics table."
      ::= { cienaCesMplsPWTrafficStatsEntry 1 }
-  
+
  cienaCesMplsPWTrafficStatsIncomingPackets		OBJECT-TYPE
      SYNTAX      Unsigned32
      MAX-ACCESS  read-only
@@ -9651,7 +10752,7 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
      DESCRIPTION
         "The number of incoming packets for the given PW."
      ::= { cienaCesMplsPWTrafficStatsEntry 2 }  
-   
+
  cienaCesMplsPWTrafficStatsOutgoingPackets	OBJECT-TYPE
  	 SYNTAX		Unsigned32  
  	 MAX-ACCESS  read-only
@@ -9659,7 +10760,7 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
  	 DESCRIPTION
  	 	"The number of outgoing packets for the given PW."
  	 ::= { cienaCesMplsPWTrafficStatsEntry 3 }
-   
+
  cienaCesMplsPWTrafficStatsIncomingBytes    OBJECT-TYPE
  	 SYNTAX		Unsigned32   
  	 MAX-ACCESS	read-only
@@ -9667,7 +10768,7 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
  	 DESCRIPTION
  	 	"The number of incoming bytes for the given PW."
  	 ::= {cienaCesMplsPWTrafficStatsEntry 4 }  
- 	
+
  cienaCesMplsPWTrafficStatsOutgoingBytes		OBJECT-TYPE
      SYNTAX      Unsigned32
      MAX-ACCESS  read-only
@@ -9677,9 +10778,5 @@ cienaGmplsTunnelARHopLspId OBJECT-TYPE
      ::= { cienaCesMplsPWTrafficStatsEntry 5 }	 
 
  END
-
-
-
-
 
 

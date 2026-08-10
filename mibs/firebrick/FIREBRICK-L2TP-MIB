@@ -4,8 +4,6 @@
 -- * April 2020, C Malton
 -- *
 -- * Copyright (c) 2020 by Andrews & Arnold
--- * 
--- * See the Firebrick Manuals for more information
 -- *------------------------------------------------
 
 FIREBRICK-L2TP-MIB DEFINITIONS ::= BEGIN
@@ -28,7 +26,7 @@ IMPORTS
         ;
 
 fbL2tpMib MODULE-IDENTITY
-    LAST-UPDATED "202004060000Z"
+    LAST-UPDATED "202207150000Z"
     ORGANIZATION "Andrews & Arnold Limited"
     CONTACT-INFO
         "Andrews & Arnold
@@ -38,9 +36,9 @@ fbL2tpMib MODULE-IDENTITY
 
         Tel: +44 3333 400 999
         Email: support@aa.net.uk"
-    DESCRIPTION
-        "This is a MIB Module for monitoring the Firebrick-specific structures
-        for L2tp."
+    DESCRIPTION "Firebrick-specific structures for L2TP"
+    REVISION "202207150000Z"
+    DESCRIPTION "Additional validation"
     REVISION "202004060000Z"
     DESCRIPTION "Initial version of this MIB module"
     ::= { firebrickNewStyle 1701 }
@@ -211,7 +209,7 @@ fbL2tpPeerEntry OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "An entry in the IPv4 BGP Peer Names Table"
+        "An entry in L2TP peers table"
     INDEX { fbL2tpPeerAddressType, fbL2tpPeerAddress }
     ::= { fbL2tpPeerTable 1 }
 
@@ -224,21 +222,20 @@ FbL2tpPeerEntry ::= SEQUENCE {
     fbL2tpPeerOutTunnels    Integer32,
     fbL2tpPeerOldestUptime  Integer32,
     fbL2tpPeerLiveTunnels   Integer32,
-    fbL2tpPeerSessions      Integer32
+    fbL2tpPeerSessions      Integer32,
+    fbL2tpPeerGraphName     DisplayString
 }
 
 fbL2tpPeerAddressType OBJECT-TYPE
     SYNTAX InetAddressType
-    MAX-ACCESS not-accessible
+    MAX-ACCESS read-only
     STATUS current
-    DESCRIPTION
-        "The internet address for the peer.  The type of the address is 
-         determined by the value of the fbL2tpAddressType object."
+    DESCRIPTION "The internet address type for the peer."
     ::= { fbL2tpPeerEntry 1 }
 
 fbL2tpPeerAddress OBJECT-TYPE
     SYNTAX InetAddress (SIZE (4..20))
-    MAX-ACCESS not-accessible
+    MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
         "The internet address for the peer.  The type of the address is 
@@ -247,7 +244,7 @@ fbL2tpPeerAddress OBJECT-TYPE
 
 fbL2tpPeerLoginName OBJECT-TYPE
     SYNTAX  DisplayString
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS read-only
     STATUS  current
     DESCRIPTION
         "The login name of the L2TP Peer"
@@ -255,7 +252,7 @@ fbL2tpPeerLoginName OBJECT-TYPE
 
 fbL2tpPeerHostName OBJECT-TYPE
     SYNTAX  DisplayString
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS read-only
     STATUS  current
     DESCRIPTION
         "The host name of the L2TP Peer"
@@ -263,7 +260,7 @@ fbL2tpPeerHostName OBJECT-TYPE
 
 fbL2tpPeerInTunnels OBJECT-TYPE
     SYNTAX  Integer32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS read-only
     STATUS  current
     DESCRIPTION
         "The number of inbound tunnels from the L2TP peer"
@@ -271,7 +268,7 @@ fbL2tpPeerInTunnels OBJECT-TYPE
 
 fbL2tpPeerOutTunnels OBJECT-TYPE
     SYNTAX  Integer32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS read-only
     STATUS  current
     DESCRIPTION
         "The number of outbound tunnels from the L2TP peer"
@@ -279,30 +276,35 @@ fbL2tpPeerOutTunnels OBJECT-TYPE
 
 fbL2tpPeerOldestUptime OBJECT-TYPE
     SYNTAX  Integer32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS read-only
     STATUS  current
     DESCRIPTION
         "The uptime of the oldest tunnel from the L2TP peer"
     ::= { fbL2tpPeerEntry 7 }
 
-
 fbL2tpPeerLiveTunnels OBJECT-TYPE
     SYNTAX  Integer32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS read-only
     STATUS  current
     DESCRIPTION
         "The number of live tunnels from the L2TP peer"
     ::= { fbL2tpPeerEntry 8 }
 
-
 fbL2tpPeerSessions OBJECT-TYPE
     SYNTAX  Integer32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS read-only
     STATUS  current
     DESCRIPTION
         "The number of sessions from the L2TP peer"
     ::= { fbL2tpPeerEntry 9 }
 
+fbL2tpPeerGraphName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "The graph name of the L2TP peer"
+    ::= { fbL2tpPeerEntry 10 }
 
 
 END

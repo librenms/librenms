@@ -18,31 +18,27 @@ IMPORTS
         ipv6IfIndex, ipv6RouteEntry
                 FROM IPV6-MIB
 	alaVirtualRouterName
-		FROM ALCATEL-IND1-VIRTUALROUTER-MIB;
+		FROM ALCATEL-IND1-VIRTUALROUTER-MIB
+        InterfaceIndexOrZero
+                FROM IF-MIB;
 
 
 alcatelIND1IPv6MIB MODULE-IDENTITY
-    LAST-UPDATED "201503240000Z"
-    ORGANIZATION "Alcatel-Lucent"
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc."
     CONTACT-INFO
-        "Please consult with Customer Service to ensure the most appropriate
-         version of this document is used with the products in question:
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
 
-                    Alcatel-Lucent, Enterprise Solutions Division
-                   (Formerly Alcatel Internetworking, Incorporated)
-                           26801 West Agoura Road
-                        Agoura Hills, CA  91301-5122
-                          United States Of America
+                      ALE USA Inc. Enterprise
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
 
-        Telephone:               North America  +1 800 995 2696
-                                 Latin America  +1 877 919 9526
-                                 Europe         +31 23 556 0100
-                                 Asia           +65 394 7933
-                                 All Other      +1 818 878 4507
+     Telephone:          +1 800 995 2696
 
-        Electronic Mail:         support@ind.alcatel.com
-        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
 
     DESCRIPTION
         "This module describes an authoritative enterprise-specific Simple
@@ -61,13 +57,55 @@ alcatelIND1IPv6MIB MODULE-IDENTITY
          non-exclusive license to use this specification in connection with
          management of the products for which it is intended to be used.
 
-                     Copyright (C) 1995-2015 Alcatel-Lucent
-                         ALL RIGHTS RESERVED WORLDWIDE"
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "202407150000Z"
+    DESCRIPTION
+        "Add alaIPv6DNSSLGroupConfigTable, alaIPv6DNSSLDomainTable, alaIPv6DNSSLGroupTable
+             alaIPv6RDNSSGroupConfigTable, alaIPv6RDNSSAddressTable, alaIPv6RDNSSGroupTable"
+
+    REVISION      "202406110000Z"
+    DESCRIPTION
+        "Add alaIPv6EmpAddressTable"
+
+    REVISION      "202405270000Z"
+    DESCRIPTION
+        "Add alaIPv6InterfaceAdvNat64Prefix, alaIPv6InterfaceAdvNat64PrefixLength"
+
+    REVISION      "201911280000Z"
+    DESCRIPTION
+        "Add alaIPv6InterfaceAdvSendRDNSS, alaIPv6InterfaceAdvSendDNSSL"
+
+    REVISION      "201911270000Z"
+    DESCRIPTION
+        "Updated the latest contact and Copyright information for ALE USA Inc."
+
+    REVISION      "201904290000Z"
+    DESCRIPTION
+        "Add alaIPv6InterfaceRoutedPortIfIndex, alaIPv6InterfaceRoutedPortTag"
+
+    REVISION      "201801290000Z"
+    DESCRIPTION
+        "Updated alaIPv6InterfaceTable description for service interface support.  
+        Add service type to alaIPv6InterfaceType.  Add alaIPv6NeighborPortType
+        and alaIPv6NeighborPortSubId."
+
+    REVISION      "201609260000Z"
+    DESCRIPTION
+        "Updated alaIPv6InterfaceTable description for EMP support.  
+        Add emp type to alaIPv6InterfaceType."
+
+    REVISION      "201609220000Z"
+    DESCRIPTION
+        "Add alaIPv6IgnoreAnycastEchos, alaIPv6IgnoreMcastEchos, 
+        alaIPv6IcmpRateLimitInterval and alaIPv6IcmpRateLimitBurst"
 
     REVISION      "201604120000Z"
     DESCRIPTION
         "Correct specification of objects included in 
-	 alaIPv6InterfaceNeighborLimitExceeded trap."
+     alaIPv6InterfaceNeighborLimitExceeded trap."
 
     REVISION      "201503240000Z"
     DESCRIPTION
@@ -84,9 +122,9 @@ alcatelIND1IPv6MIB MODULE-IDENTITY
     REVISION      "201408120000Z"
     DESCRIPTION
         "Added alaIPv6NeighborPortIfIndex.  Deprecated alaIPv6NeighborChassis, 
-	 alaIPv6NeighborSlot, alaIPv6NeighborPort and alaIPv6RAFilterTrustedTable.
+     alaIPv6NeighborSlot, alaIPv6NeighborPort and alaIPv6RAFilterTrustedTable.
 
-	 Added alaIPv6RAFilterTrustedPortTable.  Obsoleted alaIPv6RAFilterTrustedTable."
+     Added alaIPv6RAFilterTrustedPortTable.  Obsoleted alaIPv6RAFilterTrustedTable."
 
     REVISION      "201405200000Z"
     DESCRIPTION
@@ -125,7 +163,6 @@ alcatelIND1IPv6MIB MODULE-IDENTITY
     REVISION      "201001060000Z"
     DESCRIPTION
         "The latest version of this MIB Module."
-
     ::= { softentIND1Ipv6 1 }
 
 alcatelIND1IPv6MIBNotifications OBJECT-IDENTITY
@@ -177,6 +214,16 @@ AlaIPv6RAFilterTrustedSourceIfIndex ::= TEXTUAL-CONVENTION
 	"The ifIndex value identifying a trusted source port or 
 	 link aggregation.  The ifIndex value is in network byte order."
     SYNTAX	 OCTET STRING (SIZE(4)) 
+
+AlaIPv6RARouterPreference ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Router preference levels for Router Advertisement preference fields."
+    SYNTAX     INTEGER {
+                  medium(0),
+                  high(1),
+                  low(3)
+            }
 
 
 --
@@ -284,6 +331,74 @@ alaIPv6NeighborVRFLimit  OBJECT-TYPE
     DEFVAL      { 0 }
     ::= { alaIPv6Config 9 }
 
+alaIPv6IgnoreAnycastEchos OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If set to enable(1) no reply will be sent to an echo
+	 request sent to an anycast address."
+    DEFVAL      { disable }
+    ::= { alaIPv6Config 10 }
+
+alaIPv6IgnoreMcastEchos OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If set to enable(1) no reply will be sent to an echo
+	 request sent to a multicast address."
+    DEFVAL      { disable }
+    ::= { alaIPv6Config 11 }
+
+alaIPv6IcmpRateLimitInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The minimum interval between ICMPv6 error messages,
+        subject to the setting of alaIPv6IcmpRateLimitBurst.
+
+        A value of 0 indicates no ICMPv6 rate limiting."
+    ::= { alaIPv6Config 12 }
+
+alaIPv6IcmpRateLimitBurst OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..50)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of ICMPv6 error messages that
+        may be sent in a single burst."
+    ::= { alaIPv6Config 13 }
+
+alaIPv6DefaultDNSSLGroup OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..8)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ID of the DNS Search List group of domains to be 
+        included in a Router Advertisement DNSSL options.  
+        A value of 0 indicates the system domain should be used."
+    DEFVAL  { 0 }
+    ::= { alaIPv6Config 14 }
+
+alaIPv6DefaultRDNSSGroup OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..8)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ID of the RDNSS Search List group of domain servers to be 
+        included in a Router Advertisement RDNSS options.  
+        A value of 0 indicates the system DNS server address list should be used."
+    DEFVAL  { 0 }
+    ::= { alaIPv6Config 15 }
 
 --
 -- Alcatel IPv6 Interface Table
@@ -305,6 +420,8 @@ alaIPv6InterfaceTable OBJECT-TYPE
           0x0100tttt - The interface for tunnel tttt
           0x02000001 - The IPv6 loopback interface
           0x0300nnnn - A loopback0 interface with ID nnnn
+          0x04000001 - The IPv6 EMP interface
+          0x0600ssss - A service interface with ID ssss
 
         The IPv6 loopback interface's configuration cannot be
 	modified.
@@ -353,7 +470,15 @@ AlaIPv6InterfaceEntry ::= SEQUENCE {
     alaIPv6InterfaceNeighborLimit               Unsigned32,
     alaIPv6InterfaceRetransBackoff              Unsigned32,
     alaIPv6InterfaceRetransMax                  Unsigned32,
-    alaIPv6InterfaceRouterPreference            INTEGER
+    alaIPv6InterfaceRouterPreference            AlaIPv6RARouterPreference,
+    alaIPv6InterfaceRoutedPortIfIndex           InterfaceIndexOrZero,
+    alaIPv6InterfaceRoutedPortTag               INTEGER,
+    alaIPv6InterfaceAdvSendRDNSS                TruthValue,
+    alaIPv6InterfaceAdvSendDNSSL                TruthValue,
+    alaIPv6InterfaceAdvNat64Prefix              Ipv6Address,
+    alaIPv6InterfaceAdvNat64PrefixLength        Unsigned32,
+    alaIPv6InterfaceAdvDNSSLGroup               Unsigned32,
+    alaIPv6InterfaceAdvRDNSSGroup               Unsigned32
 }
 
 alaIPv6InterfaceRowStatus OBJECT-TYPE
@@ -386,7 +511,9 @@ alaIPv6InterfaceType OBJECT-TYPE
                     other(1),
                     vlan(2),
                     tunnel(3),
-                    loopback(4)
+                    loopback(4),
+                    emp(5),
+                    service(6)
                 }
     MAX-ACCESS  read-only
     STATUS      current
@@ -668,11 +795,7 @@ alaIPv6InterfaceRetransMax OBJECT-TYPE
     ::= { alaIPv6InterfaceEntry 26 }
 
 alaIPv6InterfaceRouterPreference OBJECT-TYPE
-    SYNTAX      INTEGER {
-                    medium(0),
-                    high(1),
-                    low(3)
-                }
+    SYNTAX      AlaIPv6RARouterPreference
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -680,6 +803,92 @@ alaIPv6InterfaceRouterPreference OBJECT-TYPE
 	as a default router."
     ::= { alaIPv6InterfaceEntry 27 }
 
+alaIPv6InterfaceRoutedPortIfIndex OBJECT-TYPE
+    SYNTAX       InterfaceIndexOrZero
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+    "The ifIndex of the physical port or linkagg bound to a routed 
+    port interface.  For non-routed port interfaces this object 
+    will have the value 0."
+    DEFVAL { 0 }
+    ::= { alaIPv6InterfaceEntry 28 }
+
+alaIPv6InterfaceRoutedPortTag OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notApplicable(1),
+                    untagged(2),
+                    tagged(3)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "For routed port interfaces, indicates if the traffic on the
+	port is tagged or untagged.  For non-routed port interfaces
+	this object will have the value notApplicable."
+    DEFVAL { notApplicable }
+    ::= { alaIPv6InterfaceEntry 29 }
+
+alaIPv6InterfaceAdvSendRDNSS OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The TRUE/FALSE value that determines whether the Recursive
+        DNS Servers option is sent in Router Advertisements."
+    DEFVAL  { false }
+    ::= { alaIPv6InterfaceEntry 30 }
+
+alaIPv6InterfaceAdvSendDNSSL OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The TRUE/FALSE value that determines whether the DNS
+        Search List option is sent in Router Advertisements."
+    DEFVAL  { false }
+    ::= { alaIPv6InterfaceEntry 31 }
+
+alaIPv6InterfaceAdvNat64Prefix OBJECT-TYPE
+    SYNTAX     Ipv6Address
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Ipv6 address of RA nat64 prefix."
+    DEFVAL { '00000000000000000000000000000000'H }
+    ::= { alaIPv6InterfaceEntry 32 }
+
+alaIPv6InterfaceAdvNat64PrefixLength OBJECT-TYPE
+    SYNTAX     Unsigned32 (0|32|40|48|56|64|96)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Ipv6 address of RA nat64 prefix length.
+         The value 0 means no nat64 prefix."
+    DEFVAL { 0 }
+    ::= { alaIPv6InterfaceEntry 33 }
+
+alaIPv6InterfaceAdvDNSSLGroup OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..8)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The ID of the DNS Search List group of domains to be 
+        included in the DNSSL option.
+        A value of 0 indicates the default domain list should be used."
+    DEFVAL  { 0 }
+    ::= { alaIPv6InterfaceEntry 34 }
+
+alaIPv6InterfaceAdvRDNSSGroup OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..8)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The ID of the RDNSS Search List group of domain servers to be 
+        included in the RDNSS option.
+        A value of 0 indicates the default domain list should be used."
+    DEFVAL  { 0 }
+    ::= { alaIPv6InterfaceEntry 35 }
 
 --
 -- Alcatel IPv6 Tunnel Configuration
@@ -928,7 +1137,9 @@ AlaIPv6NeighborEntry ::= SEQUENCE {
     alaIPv6NeighborLifetime     Unsigned32,
     alaIPv6NeighborReachability INTEGER,
     alaIPv6NeighborChassis      Unsigned32,
-    alaIPv6NeighborPortIfIndex	Unsigned32
+    alaIPv6NeighborPortIfIndex	Unsigned32,
+    alaIPv6NeighborPortType     INTEGER,
+    alaIPv6NeighborPortSubId    Unsigned32
 }
 
 alaIPv6NeighborNetAddress OBJECT-TYPE
@@ -950,7 +1161,7 @@ alaIPv6NeighborPhysAddress OBJECT-TYPE
 alaIPv6NeighborSlot OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-create
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "The slot used to reach the neighbor.  When creating a static neighbor
          the slot must be specified.  On read, a value of zero indicates
@@ -962,7 +1173,7 @@ alaIPv6NeighborSlot OBJECT-TYPE
 alaIPv6NeighborPort OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-create
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "The port used to reach the neighbor.  When creating a static neighbor
          the port must be specified.  On read, a value of zero indicates the
@@ -976,7 +1187,8 @@ alaIPv6NeighborType OBJECT-TYPE
                     other(1),    -- none of the following
                     dynamic(2),  -- dynamically resolved
                     static(3),   -- statically configured
-                    local(4)     -- local interface
+                    local(4),     -- local interface
+                    managed(5)   -- managed neighbor
                 }
     MAX-ACCESS  read-only
     STATUS      current
@@ -1008,7 +1220,7 @@ alaIPv6NeighborState OBJECT-TYPE
                                   -- for some reason.
                 }
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "The Neighbor Unreachability Detection state
         for the interface when the address mapping in
@@ -1063,7 +1275,7 @@ alaIPv6NeighborReachability OBJECT-TYPE
 alaIPv6NeighborChassis OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-create
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "On a multi-chasis system, the chassis used to reach the neighbor.
 	On a single-chassis system this value is always 0.  On read, a
@@ -1079,11 +1291,46 @@ alaIPv6NeighborPortIfIndex OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The ifIndex of the physical port or link aggregation used to reach 
-	the neighbor.  When creating a static neighbor the port ifIndex must 
-	be specified.  On read, a value of zero indicates the port ifIndex 
-	is not known/not applicable."
+        "The ifIndex of the port used to reach the neighbor.  When creating 
+	a static neighbor the port ifIndex must be specified.  On read, 
+	a value of zero indicates the port ifIndex is not known/not applicable.
+
+    	This object's value depends on the value of alaIPv6NeighborPortType.  
+	  unknown - 0
+	  physical - the ifIndex of the physical port
+	  linkagg - the ifIndex of the link aggregation
+	  sap - the ifIndex of the SAP
+	  sdp - the SDP ID"
     ::= { alaIPv6NeighborEntry 12 }
+
+alaIPv6NeighborPortType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown(0),
+                    physical(1),
+                    linkagg(2),
+                    sap(3),
+                    sdp(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of port used to reach the neighbor."
+    ::= { alaIPv6NeighborEntry 13 }
+
+alaIPv6NeighborPortSubId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..32767)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The port sub-identifier for neighbors reached via virtual
+        ports (alaIPv6NeighborPortType is sap or sdp).
+
+        For SAP ports, this object holds a VLAN ID (1..4096)
+        For SDP ports, this object holds the service ID (1..32767)
+	For all other types this object's value will be 0 and 
+        should be ignored."
+    ::= { alaIPv6NeighborEntry 14 }
+
 
 --
 -- Alcatel IPv6 Static Routes Table
@@ -1856,6 +2103,448 @@ alaIPv6RAFilterTrustedSourceRowStatus OBJECT-TYPE
         "Used to control the addition and removal of a trusted source entry."
     ::= { alaIPv6RAFilterTrustedSourceEntry 3 }
 
+--
+-- Alcatel IPv6 Emp Address Table
+--
+
+alaIPv6EmpAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaIPv6EmpAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Table allowing the creation and removal of IPv6
+        addresses assigned to the EMP interface."
+    ::= { alcatelIND1IPv6MIBObjects 18 }
+
+alaIPv6EmpAddressEntry OBJECT-TYPE
+    SYNTAX      AlaIPv6EmpAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "An IPv6 EMP address entry."
+    INDEX       { alaIPv6EmpAddressChassis }
+    ::= { alaIPv6EmpAddressTable 1 }
+
+AlaIPv6EmpAddressEntry ::= SEQUENCE {
+    alaIPv6EmpAddressChassis        Unsigned32,
+    alaIPv6EmpAddress               Ipv6Address,
+    alaIPv6EmpAddressPrefixLength   Unsigned32,
+    alaIPv6EmpAddressRowStatus      RowStatus
+}
+
+alaIPv6EmpAddressChassis OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..8)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The chassis on which to assign the EMP address.
+        A value of 0 indicates the address is the VC master 
+        EMP address."
+    ::= { alaIPv6EmpAddressEntry 1 }
+
+alaIPv6EmpAddress OBJECT-TYPE
+    SYNTAX     Ipv6Address
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The EMP IPv6 address. Each IPv6 address in this
+        table must be unique."
+    ::= { alaIPv6EmpAddressEntry 2 }
+
+alaIPv6EmpAddressPrefixLength OBJECT-TYPE
+    SYNTAX      Unsigned32 (3..128)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The EMP IPv6 address prefix length."
+    ::= { alaIPv6EmpAddressEntry 3 }
+
+alaIPv6EmpAddressRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Used to control the addition and removal of IPv6
+        EMP addresses."
+    ::= { alaIPv6EmpAddressEntry 4 }
+
+--
+-- IPv6 RA DNSSL group config table
+--
+
+alaIPv6DNSSLGroupConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaIPv6DNSSLGroupConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Table defining the mapping of DNS Search List
+        group config names to IDs."
+    ::= { alcatelIND1IPv6MIBObjects 19 }
+
+alaIPv6DNSSLGroupConfigEntry OBJECT-TYPE
+    SYNTAX      AlaIPv6DNSSLGroupConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "An DNS Search List group config entry."
+    INDEX       { alaIPv6DNSSLGroupConfigName } 
+    ::= { alaIPv6DNSSLGroupConfigTable 1 }
+
+AlaIPv6DNSSLGroupConfigEntry ::= SEQUENCE {
+    alaIPv6DNSSLGroupConfigName           SnmpAdminString,
+    alaIPv6DNSSLGroupConfigId             Unsigned32,
+    alaIPv6DNSSLGroupConfigRowStatus      RowStatus,
+    alaIPv6DNSSLGroupConfigLifeTime       Unsigned32
+}
+
+alaIPv6DNSSLGroupConfigName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The DNS Search List group config name."
+    ::= { alaIPv6DNSSLGroupConfigEntry 1 }
+
+alaIPv6DNSSLGroupConfigId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The DNS Search List group's config ID."
+    ::= { alaIPv6DNSSLGroupConfigEntry 2 }
+
+alaIPv6DNSSLGroupConfigRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Used to control the addition and removal of IPv6
+        DNS Search List groups config."
+    ::= { alaIPv6DNSSLGroupConfigEntry 3 }
+
+alaIPv6DNSSLGroupConfigLifeTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The DNS Search List group's config life time."
+    ::= { alaIPv6DNSSLGroupConfigEntry 4 }
+
+--
+-- IPv6 RA DNSSL group table
+--
+
+alaIPv6DNSSLGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaIPv6DNSSLGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Table defining the mapping of DNS Search List
+        group names to IDs."
+    ::= { alcatelIND1IPv6MIBObjects 20 }
+
+alaIPv6DNSSLGroupEntry OBJECT-TYPE
+    SYNTAX      AlaIPv6DNSSLGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "An DNS Search List group entry."
+    INDEX       { alaIPv6DNSSLGroupId } 
+    ::= { alaIPv6DNSSLGroupTable 1 }
+
+AlaIPv6DNSSLGroupEntry ::= SEQUENCE {
+    alaIPv6DNSSLGroupId             Unsigned32,
+    alaIPv6DNSSLGroupName           SnmpAdminString
+}
+
+alaIPv6DNSSLGroupId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The DNS Search List group's ID."
+    ::= { alaIPv6DNSSLGroupEntry 1 }
+
+alaIPv6DNSSLGroupName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (1..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The DNS Search List group name."
+    ::= { alaIPv6DNSSLGroupEntry 2 }
+
+--
+-- IPv6 RA DNSSL domain table
+--
+
+alaIPv6DNSSLDomainTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaIPv6DNSSLDomainEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Table listing domains in a DNS Search List group."
+    ::= { alcatelIND1IPv6MIBObjects 21 }
+
+alaIPv6DNSSLDomainEntry OBJECT-TYPE
+    SYNTAX      AlaIPv6DNSSLDomainEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "An DNSSL domain list."
+    INDEX       { alaIPv6DNSSLGroupId, alaIPv6DNSSLDomainName } 
+    ::= { alaIPv6DNSSLDomainTable 1 }
+
+AlaIPv6DNSSLDomainEntry ::= SEQUENCE {
+    alaIPv6DNSSLDomainName          SnmpAdminString,
+    alaIPv6DNSSLDomainRowStatus     RowStatus
+}
+
+alaIPv6DNSSLDomainName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..255))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A domain in the DNS Search List."
+    ::= { alaIPv6DNSSLDomainEntry 1 }
+
+alaIPv6DNSSLDomainRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Used to control the addition and removal of 
+         DNS Search List domains."
+    ::= { alaIPv6DNSSLDomainEntry 2 }
+
+--
+-- IPv6 RA RDNSS group config table
+--
+
+alaIPv6RDNSSGroupConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaIPv6RDNSSGroupConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Table defining the mapping of RDNSS Search List
+        group config names to IDs."
+    ::= { alcatelIND1IPv6MIBObjects 22 }
+
+alaIPv6RDNSSGroupConfigEntry OBJECT-TYPE
+    SYNTAX      AlaIPv6RDNSSGroupConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "An RDNSS Search List group config entry."
+    INDEX       { alaIPv6RDNSSGroupConfigName }
+    ::= { alaIPv6RDNSSGroupConfigTable 1 }
+
+AlaIPv6RDNSSGroupConfigEntry ::= SEQUENCE {
+    alaIPv6RDNSSGroupConfigName               SnmpAdminString,
+    alaIPv6RDNSSGroupConfigId                 Unsigned32,
+    alaIPv6RDNSSGroupConfigRowStatus          RowStatus,
+    alaIPv6RDNSSGroupConfigLifeTime           Unsigned32
+}
+
+alaIPv6RDNSSGroupConfigName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The RDNSS Search List group config name."
+    ::= { alaIPv6RDNSSGroupConfigEntry 1 }
+
+alaIPv6RDNSSGroupConfigId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The RDNSS Search List group's config ID."
+    ::= { alaIPv6RDNSSGroupConfigEntry 2 }
+
+alaIPv6RDNSSGroupConfigRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Used to control the addition and removal of IPv6
+        RDNSS Search List groups config."
+    ::= { alaIPv6RDNSSGroupConfigEntry 3 }
+
+alaIPv6RDNSSGroupConfigLifeTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The RDNSS Search List group's config life time."
+    ::= { alaIPv6RDNSSGroupConfigEntry 4 }
+
+--
+-- IPv6 RA RDNSS group table
+--
+
+alaIPv6RDNSSGroupTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaIPv6RDNSSGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Table defining the mapping of RDNSS Search List
+        group names to IDs."
+    ::= { alcatelIND1IPv6MIBObjects 23 }
+
+alaIPv6RDNSSGroupEntry OBJECT-TYPE
+    SYNTAX      AlaIPv6RDNSSGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "An RDNSS Search List group entry."
+    INDEX       { alaIPv6RDNSSGroupId }
+    ::= { alaIPv6RDNSSGroupTable 1 }
+
+AlaIPv6RDNSSGroupEntry ::= SEQUENCE {
+    alaIPv6RDNSSGroupId                 Unsigned32,
+    alaIPv6RDNSSGroupName               SnmpAdminString
+}
+
+alaIPv6RDNSSGroupId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The RDNSS Search List group's ID."
+    ::= { alaIPv6RDNSSGroupEntry 1 }
+
+alaIPv6RDNSSGroupName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (1..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The RDNSS Search List group config name."
+    ::= { alaIPv6RDNSSGroupEntry 2 }
+
+--
+-- IPv6 RA RDNSS address table
+--
+
+alaIPv6RDNSSAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaIPv6RDNSSAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Table listing domain servers in a RDNSS Search List group."
+    ::= { alcatelIND1IPv6MIBObjects 24 }
+
+alaIPv6RDNSSAddressEntry OBJECT-TYPE
+    SYNTAX      AlaIPv6RDNSSAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "An DNS server list."
+    INDEX       { alaIPv6RDNSSGroupId,alaIPv6RDNSSAddress }
+    ::= { alaIPv6RDNSSAddressTable 1 }
+
+AlaIPv6RDNSSAddressEntry ::= SEQUENCE {
+    alaIPv6RDNSSAddress             Ipv6Address,
+    alaIPv6RDNSSAddressRowStatus    RowStatus
+}
+
+alaIPv6RDNSSAddress OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A Address in the RDNSS Search List."
+    ::= { alaIPv6RDNSSAddressEntry 1 }
+
+alaIPv6RDNSSAddressRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Used to control the addition and removal of 
+         RDNSS Search List Address."
+    ::= { alaIPv6RDNSSAddressEntry 2 }
+
+--
+-- Alcatel IPv6 Interface Route Table for Router Advertisements
+--
+
+alaIPv6InterfaceRARouteInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaIPv6InterfaceRARouteInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table allowing the creation and removal of the IPv6
+        route prefixes to be placed in Route Information
+        options in Router Advertisement messages sent
+        from the interface."
+    ::= { alcatelIND1IPv6MIBObjects 25 }
+
+alaIPv6InterfaceRARouteInfoEntry OBJECT-TYPE
+    SYNTAX      AlaIPv6InterfaceRARouteInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An IPv6 Route Information Option prefix entry."
+    INDEX { ipv6IfIndex, alaIPv6InterfaceRARouteInfoPrefix,
+        alaIPv6InterfaceRARouteInfoPrefixLength }
+    ::= { alaIPv6InterfaceRARouteInfoTable 1 }
+
+AlaIPv6InterfaceRARouteInfoEntry ::= SEQUENCE {
+    alaIPv6InterfaceRARouteInfoRowStatus               RowStatus,
+    alaIPv6InterfaceRARouteInfoPrefix                  Ipv6Address,
+    alaIPv6InterfaceRARouteInfoPrefixLength            Unsigned32,
+    alaIPv6InterfaceRARouteInfoLifetime                Unsigned32,
+    alaIPv6InterfaceRARouteInfoPreference              AlaIPv6RARouterPreference
+}
+
+alaIPv6InterfaceRARouteInfoRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Used to control the addition and removal
+         of the IPv6 route prefixes to be included
+         in RA Route Information Option."
+    ::= { alaIPv6InterfaceRARouteInfoEntry 1 }
+
+alaIPv6InterfaceRARouteInfoPrefix OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " The IPv6 route prefix."
+    ::= { alaIPv6InterfaceRARouteInfoEntry 2 }
+
+
+alaIPv6InterfaceRARouteInfoPrefixLength OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IPv6 route prefix length ."
+    ::= { alaIPv6InterfaceRARouteInfoEntry 3 }
+
+alaIPv6InterfaceRARouteInfoLifetime OBJECT-TYPE
+    SYNTAX       Unsigned32
+    UNITS        "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "The length of time in seconds
+          that the prefix is valid for route
+          determination.  A value of all one
+          bits (0xffffffff) represents infinity."
+    ::= { alaIPv6InterfaceRARouteInfoEntry 4 }
+
+alaIPv6InterfaceRARouteInfoPreference OBJECT-TYPE
+    SYNTAX      AlaIPv6RARouterPreference
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "The preference that should be given to
+          using this router to reach the prefix."
+    DEFVAL { medium }
+    ::= { alaIPv6InterfaceRARouteInfoEntry 5 }
 
 --
 -- IPv6 Traps
@@ -1924,7 +2613,15 @@ alaIPv6Compliance MODULE-COMPLIANCE
                        alaIPv6PMTUGroup,
                        alaIPv6RouteFlagsGroup,
                        alaIPv6LocalUnicastGroup,
-		       alaIPv6RAFilterGroup
+                       alaIPv6RAFilterGroup,
+                       alaIPv6EmpAddressGroup,
+                       alaIPv6DNSSLGroupConfigGroup,
+                       alaIPv6DNSSLGroupGroup,
+                       alaIPv6DNSSLDomainGroup,
+                       alaIPv6RDNSSGroupConfigGroup,
+                       alaIPv6RDNSSGroupGroup,
+                       alaIPv6RDNSSAddressGroup,
+                       alaIPv6InterfaceRARouteInfoGroup
                     }
     ::= { alcatelIND1IPv6MIBCompliances 1 }
 
@@ -1954,7 +2651,13 @@ alaIPv6ConfigGroup OBJECT-GROUP
                   alaIPv6GlobalID,
 	          alaIPv6VirtualSourceMAC,
 	          alaIPv6NeighborLimit,
-		  alaIPv6NeighborVRFLimit
+		  alaIPv6NeighborVRFLimit,
+		  alaIPv6IcmpRateLimitBurst,
+		  alaIPv6IcmpRateLimitInterval,
+		  alaIPv6IgnoreAnycastEchos,
+		  alaIPv6IgnoreMcastEchos,
+		  alaIPv6DefaultDNSSLGroup,
+		  alaIPv6DefaultRDNSSGroup
                 }
     STATUS     current
     DESCRIPTION
@@ -1975,7 +2678,9 @@ alaIPv6NeighborGroup OBJECT-GROUP
                   alaIPv6NeighborLifetime,
                   alaIPv6NeighborReachability,
 		  -- alaIPv6NeighborChassis,
-		  alaIPv6NeighborPortIfIndex
+		  alaIPv6NeighborPortIfIndex,
+		  alaIPv6NeighborPortType,
+		  alaIPv6NeighborPortSubId
                 }
     STATUS     current
     DESCRIPTION
@@ -2025,7 +2730,15 @@ alaIPv6InterfaceGroup OBJECT-GROUP
 		  alaIPv6InterfaceNeighborLimit,
                   alaIPv6InterfaceRetransBackoff,
                   alaIPv6InterfaceRetransMax,
-                  alaIPv6InterfaceRouterPreference
+                  alaIPv6InterfaceRouterPreference,
+		  alaIPv6InterfaceRoutedPortIfIndex,
+		  alaIPv6InterfaceRoutedPortTag,
+                  alaIPv6InterfaceAdvSendRDNSS,
+                  alaIPv6InterfaceAdvSendDNSSL,
+                  alaIPv6InterfaceAdvNat64Prefix,
+                  alaIPv6InterfaceAdvNat64PrefixLength,
+                  alaIPv6InterfaceAdvDNSSLGroup,
+                  alaIPv6InterfaceAdvRDNSSGroup
                 }
     STATUS     current
     DESCRIPTION
@@ -2184,5 +2897,93 @@ alaIPv6RAFilterGroup OBJECT-GROUP
         "A collection of objects to support management of
         RA filtering."
     ::= { alcatelIND1IPv6MIBGroups 16 }
+
+alaIPv6EmpAddressGroup OBJECT-GROUP
+    OBJECTS     {
+                  alaIPv6EmpAddress,
+                  alaIPv6EmpAddressPrefixLength,
+                  alaIPv6EmpAddressRowStatus
+                }
+    STATUS     current
+    DESCRIPTION
+        "A collection of objects to support management of
+        Emp Address."
+    ::= { alcatelIND1IPv6MIBGroups 17 }
+
+alaIPv6DNSSLGroupConfigGroup OBJECT-GROUP
+    OBJECTS     {
+                  alaIPv6DNSSLGroupConfigId,
+                  alaIPv6DNSSLGroupConfigRowStatus,
+                  alaIPv6DNSSLGroupConfigLifeTime
+                }
+    STATUS     current
+    DESCRIPTION
+        "A collection of objects to support management of
+        RA DNSSL group config."
+    ::= { alcatelIND1IPv6MIBGroups 18 }
+
+alaIPv6DNSSLGroupGroup OBJECT-GROUP
+    OBJECTS     {
+                  alaIPv6DNSSLGroupName
+                }
+    STATUS     current
+    DESCRIPTION
+        "A collection of objects to support management of
+        RA DNSSL group."
+    ::= { alcatelIND1IPv6MIBGroups 19 }
+
+alaIPv6DNSSLDomainGroup OBJECT-GROUP
+    OBJECTS     {
+                  alaIPv6DNSSLDomainRowStatus
+                }
+    STATUS     current
+    DESCRIPTION
+        "A collection of objects to support management of
+        RA DNSSL domain group."
+    ::= { alcatelIND1IPv6MIBGroups 20 }
+
+alaIPv6RDNSSGroupConfigGroup OBJECT-GROUP
+    OBJECTS     {
+                  alaIPv6RDNSSGroupConfigId,
+                  alaIPv6RDNSSGroupConfigRowStatus,
+                  alaIPv6RDNSSGroupConfigLifeTime
+                }
+    STATUS     current
+    DESCRIPTION
+        "A collection of objects to support management of
+        RA RDNSS group config."
+    ::= { alcatelIND1IPv6MIBGroups 21 }
+
+alaIPv6RDNSSGroupGroup OBJECT-GROUP
+    OBJECTS     {
+                  alaIPv6RDNSSGroupName
+                }
+    STATUS     current
+    DESCRIPTION
+        "A collection of objects to support management of
+        RA RDNSS group."
+    ::= { alcatelIND1IPv6MIBGroups 22 }
+
+alaIPv6RDNSSAddressGroup OBJECT-GROUP
+    OBJECTS     {
+                  alaIPv6RDNSSAddressRowStatus
+                }
+    STATUS     current
+    DESCRIPTION
+        "A collection of objects to support management of
+        RA RDNSS address group."
+    ::= { alcatelIND1IPv6MIBGroups 23 }
+
+alaIPv6InterfaceRARouteInfoGroup OBJECT-GROUP
+    OBJECTS     {
+                  alaIPv6InterfaceRARouteInfoRowStatus,
+                  alaIPv6InterfaceRARouteInfoLifetime,
+                  alaIPv6InterfaceRARouteInfoPreference
+                }
+    STATUS     current
+    DESCRIPTION
+        "A collection of objects to support management of
+        RA Route information group."
+    ::= { alcatelIND1IPv6MIBGroups 24 }
 
 END

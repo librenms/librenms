@@ -3,7 +3,7 @@
 --
 -- DESCRIPTION:  HUAWEI-AAA-MIB
 -- Reference:  
--- Version: V6.00
+-- Version: V6.04
 -- History:
 -- =================================================================
 
@@ -23,7 +23,7 @@
                 FROM IPV6-TC;
 
         hwAaa MODULE-IDENTITY 
-            LAST-UPDATED "202208291414Z"
+            LAST-UPDATED "202212202022Z"
             ORGANIZATION "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
                 "Huawei Industrial Base
@@ -32,7 +32,23 @@
                  People's Republic of China
                  Website: http://www.huawei.com
                  Email: support@huawei.com"
+
+             DESCRIPTION
+             "Add hwUmDatabaseFileChangedAlarm"
+             REVISION    "202212202022Z"
+              
+             DESCRIPTION
+             "Add hwDynmicUclGroupIpNum, hwDynmicUclGroupIpNumSpec, hwDynmicUclGroupIpNumThreshold, hwDynmicUclGroupIpNumAlarm, hwDynmicUclGroupIpNumResume."
+             REVISION    "202212131414Z"
+
+             DESCRIPTION
+             "Add hwAuthorDynAclRuleExceed, hwAuthorAclRuleExceed, hwUserAuthorMacAddress, hwUserAuthorAclType, hwUserAuthorAclRuleNum, hwUserAuthorAclId, hwMaxUserAuthorAclNum."
+             REVISION    "202211192012Z"
  
+             DESCRIPTION
+             "Add mib table hwAccessUserSummaryTable"
+             REVISION    "202211042012Z"
+
              DESCRIPTION
              "Add hwCUOnlineUserNumAlarm, hwCUOnlineUserNumResume."
              REVISION    "202208291414Z"
@@ -6590,6 +6606,75 @@
             "The threshold of the number of users."
         ::= { hwAAATrapOid 98 }
 
+        -- 1.3.6.1.4.1.2011.5.2.2.1.99
+        hwUserAuthorAclRuleNum OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The number of user authorization acl rule."
+        ::= { hwAAATrapOid 99 }
+
+        -- 1.3.6.1.4.1.2011.5.2.2.1.100
+        hwUserAuthorAclId OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "User authorization acl id."
+        ::= { hwAAATrapOid 100 }
+
+        -- 1.3.6.1.4.1.2011.5.2.2.1.101
+        hwUserAuthorAclType OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "User authorization acl type."
+        ::= { hwAAATrapOid 101 }
+
+        -- 1.3.6.1.4.1.2011.5.2.2.1.102
+        hwUserAuthorMacAddress OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "User authorization mac address."
+        ::= { hwAAATrapOid 102 }
+
+        -- 1.3.6.1.4.1.2011.5.2.2.1.103
+        hwMaxUserAuthorAclNum OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Max number of user authorization acl rule."
+        ::= { hwAAATrapOid 103 }
+        
+        hwDynmicUclGroupIpNum OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The number of dynamic ucl group."
+        ::= { hwAAATrapOid 104 }
+
+        hwDynmicUclGroupIpNumSpec OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Max number of dynamic ucl group."
+        ::= { hwAAATrapOid 105 }
+
+        hwDynmicUclGroupIpNumThreshold OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The threshold value of dynamic ucl group."
+        ::= { hwAAATrapOid 106 }
+
             hwAAATrapsDefine OBJECT IDENTIFIER ::= { hwAAAMibTrap 2 }
 
         hwAAATraps OBJECT IDENTIFIER ::= { hwAAATrapsDefine 0 }
@@ -7762,6 +7847,41 @@ This object indicates the clear alarm when the number of users on the board fall
         DESCRIPTION
             "The number of users in a UPMNG instance fell below the alarm threshold."
         ::= { hwAAATraps 133}
+
+        hwAuthorDynAclRuleExceed NOTIFICATION-TYPE
+        OBJECTS { hwUserAuthorMacAddress, hwUserAuthorAclRuleNum, hwMaxUserAuthorAclNum}
+        STATUS current
+        DESCRIPTION
+            "The number of dynamic ACL rules authorized to NAC users exceeds the upper limit."
+        ::= { hwAAATraps 134}
+
+        hwAuthorAclRuleExceed NOTIFICATION-TYPE
+        OBJECTS { hwUserAuthorAclType, hwUserAuthorAclId, hwUserAuthorAclRuleNum, hwMaxUserAuthorAclNum}
+        STATUS current
+        DESCRIPTION
+            "The number of ACL rules authorized to NAC users exceeds the upper limit."
+        ::= { hwAAATraps 135}
+        
+        hwDynmicUclGroupIpNumAlarm NOTIFICATION-TYPE
+        OBJECTS { hwDynmicUclGroupIpNum, hwDynmicUclGroupIpNumSpec, hwDynmicUclGroupIpNumThreshold}
+        STATUS current
+        DESCRIPTION
+            "Enable the alarm when the quantity of dynamic ucl group exceed the trap threshold."
+        ::= { hwAAATraps 136}
+
+        hwDynmicUclGroupIpNumResume NOTIFICATION-TYPE
+        OBJECTS { hwDynmicUclGroupIpNum, hwDynmicUclGroupIpNumSpec, hwDynmicUclGroupIpNumThreshold}
+        STATUS current
+        DESCRIPTION
+            "Enable the alarm when the quantity of dynamic ucl group restore to the trap threshold."
+        ::= { hwAAATraps 137}
+
+        hwUmDatabaseFileChangedAlarm NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+            "The user management database file is changed."
+        ::= { hwAAATraps 138}
+
 
         hwLAMTrapsDefine OBJECT IDENTIFIER ::= { hwAAAMibTrap 3 }
 
@@ -15660,6 +15780,35 @@ This object indicates the clear alarm when the number of users on the board fall
             DESCRIPTION
                 "Specifies the number of total BRAS users with pevlan specified."
             ::= { hwPevlanStatEntry 9 }
+
+        hwAccessUserSummaryTable OBJECT IDENTIFIER ::= { hwAAAMibObjects 85 }
+
+        hwAccessUserSummaryEntry OBJECT IDENTIFIER ::= { hwAccessUserSummaryTable 1 }
+
+        hwNormalRegistrationUserNum OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Specifies the number of normal users."
+            ::= { hwAccessUserSummaryEntry 1 }
+
+        hwLocalRegistrationUserNum OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Specifies the number of local registration BRAS users."
+            ::= { hwAccessUserSummaryEntry 2 }
+
+        hwRemoteRegistrationUserNum OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Specifies the number of remote registration BRAS users."
+            ::= { hwAccessUserSummaryEntry 3 }
+
  --======                          
            
             --  ============== conformance information ==============

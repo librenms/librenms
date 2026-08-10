@@ -28,6 +28,7 @@ namespace App\Http\Controllers\Maps;
 
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
+use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -38,6 +39,8 @@ class FullscreenMapController extends Controller
 {
     protected function fullscreenMap(Request $request): View|RedirectResponse
     {
+        $this->authorize('viewAny', Device::class);
+
         $validator = Validator::make($request->all(), [
             'group' => 'int',
             'lat' => 'numeric',
@@ -49,25 +52,22 @@ class FullscreenMapController extends Controller
             return redirect('fullscreenmap');
         }
 
-        $group_name = null;
-        if ($request->get('group')) {
-            $group_name = DeviceGroup::where('id', '=', $request->get('group'))->first('name');
-            if (! empty($group_name)) {
-                $group_name = $group_name->name;
-            }
-        }
+        $group_id = $request->integer('group');
+        $deviceGroup = $group_id ? DeviceGroup::hasAccess($request->user())
+            ->select(['id', 'name'])
+            ->firstWhere('id', $group_id) : null;
 
-        $init_lat = $request->get('lat');
+        $init_lat = $request->input('lat');
         if (! $init_lat) {
             $init_lat = LibrenmsConfig::get('leaflet.default_lat', 51.48);
         }
 
-        $init_lng = $request->get('lng');
+        $init_lng = $request->input('lng');
         if (! $init_lng) {
             $init_lng = LibrenmsConfig::get('leaflet.default_lng', 0);
         }
 
-        $init_zoom = $request->get('zoom');
+        $init_zoom = $request->input('zoom');
         if (! $init_zoom) {
             $init_zoom = LibrenmsConfig::get('leaflet.default_zoom', 5);
         }
@@ -85,8 +85,8 @@ class FullscreenMapController extends Controller
             'init_zoom' => $init_zoom,
             'group_radius' => LibrenmsConfig::get('leaflet.group_radius', 80),
             'tile_url' => LibrenmsConfig::get('leaflet.tile_url', '{s}.tile.openstreetmap.org'),
-            'group_id' => $request->get('group'),
-            'group_name' => $group_name,
+            'group_id' => $deviceGroup?->id,
+            'group_name' => $deviceGroup?->name,
         ];
 
         return view('map.fullscreen', $data);

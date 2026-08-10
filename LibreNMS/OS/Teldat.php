@@ -28,6 +28,7 @@ namespace LibreNMS\OS;
 
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
@@ -75,7 +76,7 @@ class Teldat extends OS implements
             foreach ($data as $index => $entry) {
                 if (Str::startsWith($ifNames[$index], 'wlan') && $ifOperStatuses[$index] == 'up') {
                     $sensors[] = new WirelessSensor(
-                        'clients',
+                        WirelessSensorType::Clients,
                         $this->getDeviceId(),
                         ".1.3.6.1.4.1.2007.4.1.2.2.2.24.2.1.23.$index",
                         'teldat',
@@ -121,7 +122,7 @@ class Teldat extends OS implements
             foreach ($data as $index => $entry) {
                 if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
                     $sensors[] = new WirelessSensor(
-                        'rssi',
+                        WirelessSensorType::Rssi,
                         $this->getDeviceId(),
                         '.1.3.6.1.4.1.2007.4.1.2.2.2.18.3.2.1.10.' . $index,
                         'teldat',
@@ -157,7 +158,7 @@ class Teldat extends OS implements
             foreach ($data as $index => $entry) {
                 if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
                     $sensors[] = new WirelessSensor(
-                        'sinr',
+                        WirelessSensorType::Sinr,
                         $this->getDeviceId(),
                         '.1.3.6.1.4.1.2007.4.1.2.2.2.18.3.2.1.24.' . $index,
                         'teldat',
@@ -193,7 +194,7 @@ class Teldat extends OS implements
             foreach ($data as $index => $entry) {
                 if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
                     $sensors[] = new WirelessSensor(
-                        'rsrq',
+                        WirelessSensorType::Rsrq,
                         $this->getDeviceId(),
                         '.1.3.6.1.4.1.2007.4.1.2.2.2.18.3.2.1.23.' . $index,
                         'teldat',
@@ -229,7 +230,7 @@ class Teldat extends OS implements
             foreach ($data as $index => $entry) {
                 if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
                     $sensors[] = new WirelessSensor(
-                        'rsrp',
+                        WirelessSensorType::Rsrp,
                         $this->getDeviceId(),
                         '.1.3.6.1.4.1.2007.4.1.2.2.2.18.3.2.1.22.' . $index,
                         'teldat',
@@ -268,7 +269,7 @@ class Teldat extends OS implements
             foreach ($data as $index => $entry) {
                 if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
                     $sensors[] = new WirelessSensor(
-                        'cell',
+                        WirelessSensorType::Cell,
                         $this->getDeviceId(),
                         '.1.3.6.1.4.1.2007.4.1.2.2.2.18.3.2.1.5.' . $index,
                         'teldat',
@@ -293,7 +294,7 @@ class Teldat extends OS implements
             foreach ($data as $index => $entry) {
                 if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
                     $sensors[] = new WirelessSensor(
-                        'cell',
+                        WirelessSensorType::Cell,
                         $this->getDeviceId(),
                         '.1.3.6.1.4.1.2007.4.1.2.2.2.18.3.2.1.25.' . $index,
                         'teldat',

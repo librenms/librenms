@@ -91,10 +91,10 @@ modules:
           index: 'upsBatteryStatus.{{ $index }}'
           state_name: upsBatteryStatus
           states:
-            - { value: 1, generic: 3, graph: 1, descr: unknown }
-            - { value: 2, generic: 0, graph: 1, descr: batteryNormal }
-            - { value: 3, generic: 1, graph: 1, descr: batteryLow }
-            - { value: 4, generic: 2, graph: 1, descr: batteryDepleted }
+            - { value: 1, generic: 3, descr: unknown }
+            - { value: 2, generic: 0, descr: batteryNormal }
+            - { value: 3, generic: 1, descr: batteryLow }
+            - { value: 4, generic: 2, descr: batteryDepleted }
     voltage:
         data:
             -

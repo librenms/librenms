@@ -35,7 +35,7 @@ abstract class SearchController
 {
     public function __invoke(Request $request): JsonResponse
     {
-        $search = $request->get('search');
+        $search = $request->input('search');
         if (empty($search)) {
             return new JsonResponse;
         }

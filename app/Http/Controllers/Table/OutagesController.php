@@ -26,18 +26,21 @@
 
 namespace App\Http\Controllers\Table;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\DeviceOutage;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
 
+/**
+ * @extends TableController<DeviceOutage>
+ */
 class OutagesController extends TableController
 {
-    protected $model = DeviceOutage::class;
+    protected ?string $model = DeviceOutage::class;
 
     public function rules(): array
     {
@@ -49,14 +52,14 @@ class OutagesController extends TableController
         ];
     }
 
-    protected function filterFields($request): array
+    protected function filterFields(Request $request): array
     {
         return [
             'device_id' => 'device',
         ];
     }
 
-    protected function sortFields($request): array
+    protected function sortFields(Request $request): array
     {
         return ['going_down', 'up_again', 'device_id'];
     }
@@ -66,6 +69,8 @@ class OutagesController extends TableController
      */
     public function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', DeviceOutage::class);
+
         $from_ts = Time::parseInput($request->from);
         $to_ts = Time::parseInput($request->to);
 
@@ -74,30 +79,30 @@ class OutagesController extends TableController
             ->whereHas('device', function ($query): void {
                 $query->where('disabled', 0);
             })
-            ->when($from_ts || $to_ts, function ($query) use ($from_ts, $to_ts): void {
-                $query->where(function ($q) use ($from_ts, $to_ts): void {
+            ->when($from_ts || $to_ts, function ($query) use ($request, $from_ts, $to_ts): void {
+                if ($request->status === 'current') {
+                    // Current outages: only filter by start date within range
+                    $this->applyDateRangeCondition($query, 'going_down', $from_ts, $to_ts);
+                } elseif ($request->status === 'previous') {
+                    // Previous outages: both start AND end must be within range
+                    $query->where(function ($q) use ($from_ts, $to_ts): void {
+                        $this->applyDateRangeCondition($q, 'going_down', $from_ts, $to_ts);
+                        $this->applyDateRangeCondition($q, 'up_again', $from_ts, $to_ts);
+                    });
+                } else {
+                    // All outages: use original logic (any overlap with range)
                     // Outage starts within range
-                    $this->applyDateRangeCondition($q, 'going_down', $from_ts, $to_ts);
+                    $this->applyDateRangeCondition($query, 'going_down', $from_ts, $to_ts);
 
-                    // OR outage ends within range (if it has ended)
-                    $q->orWhere(function ($subQuery) use ($from_ts, $to_ts): void {
-                        $subQuery->whereNotNull('up_again');
-                        $this->applyDateRangeCondition($subQuery, 'up_again', $from_ts, $to_ts);
+                    // Outage either has not ended, or end is within date range
+                    $query->where(function ($q) use ($from_ts, $to_ts): void {
+                        // OR outage ends within range (if it has ended)
+                        $q->where(function ($subQuery) use ($from_ts, $to_ts): void {
+                            $this->applyDateRangeCondition($subQuery, 'up_again', $from_ts, $to_ts);
+                            $subQuery->orWhereNull('up_again');
+                        });
                     });
-
-                    // OR outage spans the entire range (started before, still ongoing or ended after)
-                    $q->orWhere(function ($subQuery) use ($from_ts, $to_ts): void {
-                        if ($from_ts) {
-                            $subQuery->where('going_down', '<', $from_ts);
-                        }
-                        if ($to_ts) {
-                            $subQuery->where(function ($q) use ($to_ts): void {
-                                $q->whereNotNull('up_again') // Still ongoing
-                                ->orWhere('up_again', '>', $to_ts); // Ended after range
-                            });
-                        }
-                    });
-                });
+                }
             })
             ->when($request->status === 'current', function ($query): void {
                 $query->whereNull('up_again');
@@ -108,19 +113,20 @@ class OutagesController extends TableController
     }
 
     /**
-     * @param  DeviceOutage  $outage
+     * @param  DeviceOutage  $model
+     * @return array<string, scalar>
      */
-    public function formatItem($outage): array
+    public function formatItem(Model $model): array
     {
-        $start = $this->formatDatetime($outage->going_down);
-        $end = $outage->up_again ? $this->formatDatetime($outage->up_again) : '-';
+        $start = $this->formatDatetime($model->going_down);
+        $end = $model->up_again ? $this->formatDatetime($model->up_again) : '-';
 
         return [
-            'status' => $this->statusLabel($outage),
+            'status' => $this->statusLabel($model),
             'going_down' => $start,
             'up_again' => $end,
-            'device_id' => Url::modernDeviceLink($outage->device),
-            'duration' => $this->asDuration($outage)->forHumans(['parts' => 2]),
+            'device_id' => Url::modernDeviceLink($model->device),
+            'duration' => $this->asDuration($model)->forHumans(['parts' => 2]),
         ];
     }
 
@@ -139,8 +145,7 @@ class OutagesController extends TableController
         }
 
         // Convert epoch to local time
-        return Carbon::createFromTimestamp($timestamp, session('preferences.timezone'))
-            ->format(LibrenmsConfig::get('dateformat.compact'));
+        return Time::format($timestamp, 'compact');
     }
 
     private function statusLabel(DeviceOutage $outage): string
@@ -158,8 +163,6 @@ class OutagesController extends TableController
 
     /**
      * Get headers for CSV export
-     *
-     * @return array
      */
     protected function getExportHeaders(): array
     {
@@ -175,14 +178,14 @@ class OutagesController extends TableController
      * Format a row for CSV export
      *
      * @param  DeviceOutage  $outage
-     * @return array
+     * @return array<scalar>
      */
-    protected function formatExportRow($outage): array
+    protected function formatExportRow(Model $outage): array
     {
         return [
             $outage->device ? $outage->device->displayName() : '',
-            Carbon::createFromTimestamp($outage->going_down)->toISOString(),
-            $outage->up_again ? Carbon::createFromTimestamp($outage->up_again)->toISOString() : '-',
+            Carbon::createFromTimestamp($outage->going_down)->toIso8601ZuluString(),
+            $outage->up_again ? Carbon::createFromTimestamp($outage->up_again)->toIso8601ZuluString() : '-',
             $this->asDuration($outage)->format('%H:%I:%S'),
         ];
     }

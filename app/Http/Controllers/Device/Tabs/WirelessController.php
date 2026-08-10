@@ -27,14 +27,16 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use App\Models\WirelessSensor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class WirelessController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        return $device->wirelessSensors()->exists();
+        return Gate::allows('viewAny', WirelessSensor::class) && $device->wirelessSensors()->exists();
     }
 
     public function slug(): string

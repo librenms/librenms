@@ -1,8 +1,8 @@
 -- *****************************************************************
 -- SENSATRONICS-ITTM.TXT:  MIB corresponding to ITTM firmware v3.0
 -- 
--- February 2004  Andrew F. Thompson--
--- Copyright (c) 2004 by Sensatronics LLC
+-- February 2005  Andrew F. Thompson--
+-- Copyright (c) 2005 by Sensatronics LLC
 -- All rights reserved.-- 
 -- *****************************************************************
 SENSATRONICS-ITTM DEFINITIONS ::= BEGIN
@@ -19,7 +19,7 @@ IMPORTS
         FROM SENSATRONICS-SMI;
 
 productITTM MODULE-IDENTITY
-        LAST-UPDATED "200402230900Z"
+        LAST-UPDATED "200502230900Z"
         ORGANIZATION "Sensatronics LLC"
         CONTACT-INFO
          "Sensatronics LLC
@@ -30,9 +30,9 @@ productITTM MODULE-IDENTITY
           E-mail: dthompson@sensatronics.com"
         DESCRIPTION
                 "Description of ITTM code."
-        REVISION	"200402230900Z"
+        REVISION	"200502230900Z"
         DESCRIPTION
-                "Initial version of this MIB module."        
+                "Updated version of this MIB module."        
 ::= { envMonitors 1 }
 
 unitInfo OBJECT IDENTIFIER ::= { productITTM 1 } -- Unit info for the IT Temperature Monitor being accessed.
@@ -199,11 +199,27 @@ sensor1DataStr OBJECT-TYPE
 
 sensor1DataInt OBJECT-TYPE
         SYNTAX     INTEGER (-100..255)
-        MAX-ACCESS read-write
+        MAX-ACCESS read-only
         STATUS     current
         DESCRIPTION
                 "Data from sensor 1, integer format, no decimal places"        
 ::= { sensor1 3 }
+
+sensor1SwitchInt OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel.  0=OPEN, 1=CLOSED"        
+::= { sensor1 4 }
+
+sensor1SwitchStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (6))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel. OPEN or CLOSED"        
+::= { sensor1 5 }
 
 sensor2Name OBJECT-TYPE
         SYNTAX     DisplayString (SIZE (16))
@@ -229,6 +245,22 @@ sensor2DataInt OBJECT-TYPE
                 "Data from sensor 2, integer format, no decimal places"        
 ::= { sensor2 3 }
 
+sensor2SwitchInt OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel.  0=OPEN, 1=CLOSED"        
+::= { sensor2 4 }
+
+sensor2SwitchStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (6))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel. OPEN or CLOSED"        
+::= { sensor2 5 }
+
 sensor3Name OBJECT-TYPE
         SYNTAX     DisplayString (SIZE (16))
         MAX-ACCESS read-write
@@ -252,6 +284,22 @@ sensor3DataInt OBJECT-TYPE
         DESCRIPTION
                 "Data from sensor 3, integer format, no decimal places"        
 ::= { sensor3 3 }
+
+sensor3SwitchInt OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel.  0=OPEN, 1=CLOSED"        
+::= { sensor3 4 }
+
+sensor3SwitchStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (6))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel. OPEN or CLOSED"        
+::= { sensor3 5 }
 
 sensor4Name OBJECT-TYPE
         SYNTAX     DisplayString (SIZE (16))
@@ -277,6 +325,22 @@ sensor4DataInt OBJECT-TYPE
                 "Data from sensor 4, integer format, no decimal places"        
 ::= { sensor4 3 }
 
+sensor4SwitchInt OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel.  0=OPEN, 1=CLOSED"        
+::= { sensor4 4 }
+
+sensor4SwitchStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (6))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel. OPEN or CLOSED"        
+::= { sensor4 5 }
+
 sensor5Name OBJECT-TYPE
         SYNTAX     DisplayString (SIZE (16))
         MAX-ACCESS read-write
@@ -300,6 +364,22 @@ sensor5DataInt OBJECT-TYPE
         DESCRIPTION
                 "Data from sensor 5, integer format, no decimal places"        
 ::= { sensor5 3 }
+
+sensor5SwitchInt OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel.  0=OPEN, 1=CLOSED"        
+::= { sensor5 4 }
+
+sensor5SwitchStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (6))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel. OPEN or CLOSED"        
+::= { sensor5 5 }
 
 sensor6Name OBJECT-TYPE
         SYNTAX     DisplayString (SIZE (16))
@@ -325,6 +405,22 @@ sensor6DataInt OBJECT-TYPE
                 "Data from sensor 6, integer format, no decimal places"        
 ::= { sensor6 3 }
 
+sensor6SwitchInt OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel.  0=OPEN, 1=CLOSED"        
+::= { sensor6 4 }
+
+sensor6SwitchStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (6))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel. OPEN or CLOSED"        
+::= { sensor6 5 }
+
 sensor7Name OBJECT-TYPE
         SYNTAX     DisplayString (SIZE (16))
         MAX-ACCESS read-write
@@ -348,6 +444,22 @@ sensor7DataInt OBJECT-TYPE
         DESCRIPTION
                 "Data from sensor 7, integer format, no decimal places"        
 ::= { sensor7 3 }
+
+sensor7SwitchInt OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel.  0=OPEN, 1=CLOSED"        
+::= { sensor7 4 }
+
+sensor7SwitchStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (6))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel. OPEN or CLOSED"        
+::= { sensor7 5 }
 
 sensor8Name OBJECT-TYPE
         SYNTAX     DisplayString (SIZE (16))
@@ -373,6 +485,22 @@ sensor8DataInt OBJECT-TYPE
                 "Data from sensor 8, integer format, no decimal places"        
 ::= { sensor8 3 }
 
+sensor8SwitchInt OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel.  0=OPEN, 1=CLOSED"        
+::= { sensor8 4 }
+
+sensor8SwitchStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (6))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel. OPEN or CLOSED"        
+::= { sensor8 5 }
+
 sensor9Name OBJECT-TYPE
         SYNTAX     DisplayString (SIZE (16))
         MAX-ACCESS read-write
@@ -396,6 +524,22 @@ sensor9DataInt OBJECT-TYPE
         DESCRIPTION
                 "Data from sensor 9, integer format, no decimal places"        
 ::= { sensor9 3 }
+
+sensor9SwitchInt OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel.  0=OPEN, 1=CLOSED"        
+::= { sensor9 4 }
+
+sensor9SwitchStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (6))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel. OPEN or CLOSED"        
+::= { sensor9 5 }
 
 sensor10Name OBJECT-TYPE
         SYNTAX     DisplayString (SIZE (16))
@@ -421,6 +565,22 @@ sensor10DataInt OBJECT-TYPE
                 "Data from sensor 10, integer format, no decimal places"        
 ::= { sensor10 3 }
 
+sensor10SwitchInt OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel.  0=OPEN, 1=CLOSED"        
+::= { sensor10 4 }
+
+sensor10SwitchStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (6))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel. OPEN or CLOSED"        
+::= { sensor10 5 }
+
 sensor11Name OBJECT-TYPE
         SYNTAX     DisplayString (SIZE (16))
         MAX-ACCESS read-write
@@ -444,6 +604,22 @@ sensor11DataInt OBJECT-TYPE
         DESCRIPTION
                 "Data from sensor 11, integer format, no decimal places"        
 ::= { sensor11 3 }
+
+sensor11SwitchInt OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel.  0=OPEN, 1=CLOSED"        
+::= { sensor11 4 }
+
+sensor11SwitchStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (6))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel. OPEN or CLOSED"        
+::= { sensor11 5 }
 
 sensor12Name OBJECT-TYPE
         SYNTAX     DisplayString (SIZE (16))
@@ -469,6 +645,22 @@ sensor12DataInt OBJECT-TYPE
                 "Data from sensor 12, integer format, no decimal places"        
 ::= { sensor12 3 }
 
+sensor12SwitchInt OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel.  0=OPEN, 1=CLOSED"        
+::= { sensor12 4 }
+
+sensor12SwitchStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (6))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel. OPEN or CLOSED"        
+::= { sensor12 5 }
+
 sensor13Name OBJECT-TYPE
         SYNTAX     DisplayString (SIZE (16))
         MAX-ACCESS read-write
@@ -492,6 +684,22 @@ sensor13DataInt OBJECT-TYPE
         DESCRIPTION
                 "Data from sensor 13, integer format, no decimal places"        
 ::= { sensor13 3 }
+
+sensor13SwitchInt OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel.  0=OPEN, 1=CLOSED"        
+::= { sensor13 4 }
+
+sensor13SwitchStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (6))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel. OPEN or CLOSED"        
+::= { sensor13 5 }
 
 sensor14Name OBJECT-TYPE
         SYNTAX     DisplayString (SIZE (16))
@@ -517,6 +725,22 @@ sensor14DataInt OBJECT-TYPE
                 "Data from sensor 14, integer format, no decimal places"        
 ::= { sensor14 3 }
 
+sensor14SwitchInt OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel.  0=OPEN, 1=CLOSED"        
+::= { sensor14 4 }
+
+sensor14SwitchStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (6))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel. OPEN or CLOSED"        
+::= { sensor14 5 }
+
 sensor15Name OBJECT-TYPE
         SYNTAX     DisplayString (SIZE (16))
         MAX-ACCESS read-write
@@ -541,6 +765,22 @@ sensor15DataInt OBJECT-TYPE
                 "Data from sensor 15, integer format, no decimal places"        
 ::= { sensor15 3 }
 
+sensor15SwitchInt OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel.  0=OPEN, 1=CLOSED"        
+::= { sensor15 4 }
+
+sensor15SwitchStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (6))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel. OPEN or CLOSED"        
+::= { sensor15 5 }
+
 sensor16Name OBJECT-TYPE
         SYNTAX     DisplayString (SIZE (16))
         MAX-ACCESS read-write
@@ -564,5 +804,21 @@ sensor16DataInt OBJECT-TYPE
         DESCRIPTION
                 "Data from sensor 16, integer format, no decimal places"        
 ::= { sensor16 3 }
+
+sensor16SwitchInt OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel.  0=OPEN, 1=CLOSED"        
+::= { sensor16 4 }
+
+sensor16SwitchStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (6))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Switch contact closure status for channel. OPEN or CLOSED"        
+::= { sensor16 5 }
 
 END

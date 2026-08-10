@@ -1,3 +1,12 @@
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+-- ARRIS-CMTS-FFT-MIB
+-- ARRIS CMTS Proprietary FFT mibs
+--
+-- Copyright 2004, Arris International. All rights reserved.
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+
 ARRIS-CMTS-FFT-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -13,7 +22,7 @@ IMPORTS
         FROM ARRIS-MIB;
 
     cmtsFftMIB  MODULE-IDENTITY
-        LAST-UPDATED "200402270000Z" -- 27th February 2004
+        LAST-UPDATED "201408120000Z" -- August 2014
         ORGANIZATION "Arris International"
         CONTACT-INFO
             "   Network Management
@@ -26,6 +35,10 @@ IMPORTS
 
         DESCRIPTION
             "This MIB manages the FFT software on the Arris CMTS"
+        REVISION "201408120000Z" -- August 2014
+	DESCRIPTION "Allow dcxFftSize to take value 4096"
+	REVISION "200601230000Z"
+	DESCRIPTION "Added enumeration values."
         ::= { cmtsCommon 1 }
 
     dcxFftObjects OBJECT IDENTIFIER ::= { cmtsFftMIB 1 }
@@ -72,12 +85,12 @@ IMPORTS
 
          
             dcxFftSize   OBJECT-TYPE
-                SYNTAX      Unsigned32
+                SYNTAX      Unsigned32 (256|512|1024|2048|4096)
                 MAX-ACCESS  read-write
                 STATUS      current
                 DESCRIPTION
                     "Number of samples to be collected for FFT. Valid
-                    values are 256, 512, 1024, 2048. The FFT payload size
+                    values are 256, 512, 1024, 2048, 4096. The FFT payload size
                     will be the number of samples multiplied by the number
                     of bytes per sample as determined by dcxFftOutputFormat.
                     The duration of the FFT sample will be the number of samples
@@ -86,7 +99,7 @@ IMPORTS
                 ::= { dcxFftUpstreamChannelEntry 1 }
 
             dcxFftSampleRate   OBJECT-TYPE
-                SYNTAX      INTEGER { adcRate(1), halfAdcRate(2), quarterAdcRate(3), quadrupleSymbolRate(4) }
+                SYNTAX      INTEGER { adcRate(1), halfAdcRate(2), quarterAdcRate(3), quadrupleSymbolRate(4), reserved5(5), reserved6(6), reserved7(7), reserved8(8) }
                 MAX-ACCESS  read-write
                 STATUS      current
                 DESCRIPTION
@@ -98,7 +111,7 @@ IMPORTS
                 ::= { dcxFftUpstreamChannelEntry 2 }
 
             dcxFftCentreFrequency   OBJECT-TYPE
-                SYNTAX      Integer32
+                SYNTAX      Integer32 (-81920000..81920000)
                 UNITS       "hertz"
                 MAX-ACCESS  read-write
                 STATUS      current
@@ -208,7 +221,7 @@ IMPORTS
                     "Number of times to trigger FFT when dcxFftEnable and
                     dcxFftApplyConfig are set to true. Set this object to
                     zero to trigger FFT continuously."
-                DEFVAL { 0 }
+                DEFVAL { 1 }
                 ::= { dcxFftUpstreamChannelEntry 12 }
             
             dcxFftEnable   OBJECT-TYPE

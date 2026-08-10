@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCapacityDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
@@ -68,7 +69,7 @@ class Lcos extends OS implements
                 continue;
             }
             $sensors[$radio] = new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.2356.11.1.3.57.1.3.' . Oid::encodeString($index),
                 'lcos',
@@ -111,7 +112,7 @@ class Lcos extends OS implements
                 continue;
             }
             $sensors[$radio] = new WirelessSensor(
-                'capacity',
+                WirelessSensorType::Capacity,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.2356.11.1.3.57.1.6.' . Oid::encodeString($index),
                 'lcos',
@@ -142,7 +143,7 @@ class Lcos extends OS implements
                 continue;
             }
             $sensors[$radio] = new WirelessSensor(
-                'noise-floor',
+                WirelessSensorType::NoiseFloor,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.2356.11.1.3.57.1.5.' . Oid::encodeString($index),
                 'lcos',
@@ -174,7 +175,7 @@ class Lcos extends OS implements
                 continue;
             }
             $sensors[$radio] = new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.2356.11.1.3.57.1.7.' . Oid::encodeString($index),
                 'lcos-tx',
@@ -207,7 +208,7 @@ class Lcos extends OS implements
             }
 
             $sensors[$bssid] = new WirelessSensor(
-                'ccq',
+                WirelessSensorType::Ccq,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.2356.11.1.3.44.1.10.' . Mac::parse($bssid)->oid() . '.0',
                 'lcos',
@@ -240,7 +241,7 @@ class Lcos extends OS implements
             }
 
             $sensors[$bssid] = new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.2356.11.1.3.44.1.35.' . Mac::parse($bssid)->oid() . '.0',
                 'lcos-tx',
@@ -275,7 +276,7 @@ class Lcos extends OS implements
             }
 
             $sensors[$bssid] = new WirelessSensor(
-                'rssi',
+                WirelessSensorType::Rssi,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.2356.11.1.3.44.1.26.' . Mac::parse($bssid)->oid() . '.0',
                 'lcos',

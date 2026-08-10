@@ -26,21 +26,24 @@
 
 namespace App\Models;
 
+use App\Facades\Permissions;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Gate;
 
 class PortGroup extends BaseModel
 {
+    use HasFactory;
     public $timestamps = false;
     protected $fillable = ['name', 'desc'];
 
     public function scopeHasAccess($query, User $user)
     {
-        if ($user->hasGlobalRead()) {
+        if (Gate::allows('viewAll', PortGroup::class)) {
             return $query;
         }
 
-        // maybe filtered in future
-        return $query;
+        return $query->whereIntegerInRaw('id', Permissions::portGroupsForUser($user));
     }
 
     /**

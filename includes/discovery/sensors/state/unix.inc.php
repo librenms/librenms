@@ -54,8 +54,8 @@ if (! empty($snmpData)) {
             $state_name = $sensor['state_name'];
             $descr = $sensor['descr'];
             $states = [
-                ['value' => 0, 'generic' => $sensor['genericF'], 'graph' => 1, 'descr' => 'False'],
-                ['value' => 1, 'generic' => $sensor['genericT'], 'graph' => 1, 'descr' => 'True'],
+                ['value' => 0, 'generic' => $sensor['genericF'], 'descr' => 'False'],
+                ['value' => 1, 'generic' => $sensor['genericT'], 'descr' => 'True'],
             ];
 
             create_state_index($state_name, $states);

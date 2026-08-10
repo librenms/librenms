@@ -1,4 +1,3 @@
-mib: BARCO-CLICKSHARE-MIB
 modules:
     os:
         serial: BARCO-CLICKSHARE-MIB::diSerialNumber.0
@@ -8,23 +7,23 @@ modules:
         fanspeed:
             data:
                 -
-                    oid: sensors
-                    value: sensorCaseFanSpeed
+                    oid: BARCO-CLICKSHARE-MIB::sensors
+                    value: BARCO-CLICKSHARE-MIB::sensorCaseFanSpeed
                     num_oid: '.1.3.6.1.4.1.7312.2468.1.2.1.{{ $index }}'
                     index: sensorCaseFanSpeed
                     descr: 'Case'
                 -
-                    oid: sensors
-                    value: sensorCpuFanSpeed
+                    oid: BARCO-CLICKSHARE-MIB::sensors
+                    value: BARCO-CLICKSHARE-MIB::sensorCpuFanSpeed
                     num_oid: '.1.3.6.1.4.1.7312.2468.1.2.2.{{ $index }}'
                     index: sensorCpuFanSpeed
                     descr: 'CPU'
         temperature:
             data:
                 -
-                    oid: sensors
-                    value: sensorCpuTemperature
-                    high_limit: sensorCpuTemperatureThreshold
+                    oid: BARCO-CLICKSHARE-MIB::sensors
+                    value: BARCO-CLICKSHARE-MIB::sensorCpuTemperature
+                    high_limit: BARCO-CLICKSHARE-MIB::sensorCpuTemperatureThreshold
                     num_oid: '.1.3.6.1.4.1.7312.2468.1.2.3.{{ $index }}'
                     descr: 'Case'
 

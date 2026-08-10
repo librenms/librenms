@@ -2,13 +2,19 @@
 
 namespace App\Models;
 
+use App\Observers\StorageObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\InsufficientDataException;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
+#[ObservedBy([StorageObserver::class])]
 class Storage extends DeviceRelatedModel implements Keyable
 {
+    use HasFactory;
+
     protected $table = 'storage';
     protected $primaryKey = 'storage_id';
     public $timestamps = false;
@@ -29,7 +35,7 @@ class Storage extends DeviceRelatedModel implements Keyable
         'storage_perc_warn',
     ];
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return "$this->type-$this->storage_index";
     }

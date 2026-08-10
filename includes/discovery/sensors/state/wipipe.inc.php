@@ -21,16 +21,16 @@ foreach ($pre_cache['wipipe_oids'] as $index => $entry) {
         //Create State Index
         $state_name = 'mdmStatus';
         $states = [
-            ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'established'],
-            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'establishing'],
-            ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'ready'],
-            ['value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'error'],
-            ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'disconnected'],
-            ['value' => 6, 'generic' => 1, 'graph' => 0, 'descr' => 'disconnecting'],
-            ['value' => 7, 'generic' => 2, 'graph' => 0, 'descr' => 'suspended'],
-            ['value' => 8, 'generic' => 3, 'graph' => 0, 'descr' => 'empty'],
-            ['value' => 9, 'generic' => 3, 'graph' => 0, 'descr' => 'notconfigured'],
-            ['value' => 10, 'generic' => 1, 'graph' => 0, 'descr' => 'userstopped'],
+            ['value' => 1, 'generic' => 0, 'descr' => 'established'],
+            ['value' => 2, 'generic' => 0, 'descr' => 'establishing'],
+            ['value' => 3, 'generic' => 0, 'descr' => 'ready'],
+            ['value' => 4, 'generic' => 2, 'descr' => 'error'],
+            ['value' => 5, 'generic' => 2, 'descr' => 'disconnected'],
+            ['value' => 6, 'generic' => 1, 'descr' => 'disconnecting'],
+            ['value' => 7, 'generic' => 2, 'descr' => 'suspended'],
+            ['value' => 8, 'generic' => 3, 'descr' => 'empty'],
+            ['value' => 9, 'generic' => 3, 'descr' => 'notconfigured'],
+            ['value' => 10, 'generic' => 1, 'descr' => 'userstopped'],
         ];
         create_state_index($state_name, $states);
 
@@ -49,11 +49,11 @@ foreach ($upgradestatus as $index => $entry) {
     //Create State Index
     $state_name = 'devFWUpgradeStatus';
     $states = [
-        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'idle'],
-        ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'upgrading'],
-        ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'uptodate'],
-        ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'updateAvail'],
-        ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'failure'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'idle'],
+        ['value' => 2, 'generic' => 0, 'descr' => 'upgrading'],
+        ['value' => 3, 'generic' => 0, 'descr' => 'uptodate'],
+        ['value' => 4, 'generic' => 1, 'descr' => 'updateAvail'],
+        ['value' => 5, 'generic' => 2, 'descr' => 'failure'],
     ];
     create_state_index($state_name, $states);
 

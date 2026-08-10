@@ -1,0 +1,329 @@
+--
+-- GENIE-GE-ROOT-MIB.my
+-- LAST-UPDATED "202207300000Z"
+--
+	GENIE-GE-ROOT-MIB DEFINITIONS ::= BEGIN
+
+		IMPORTS
+			enterprises
+				FROM RFC1155-SMI;
+
+--
+-- Node definitions
+--
+		-- 1.3.6.1.4.1.9926
+		genie OBJECT IDENTIFIER::= { enterprises 9926 }
+
+		-- 1.3.6.1.4.1.9926.1
+		products OBJECT IDENTIFIER::= { genie 1 }
+
+-- The product lines and registration for sysObjectID
+--
+		-- 1.3.6.1.4.1.9926.1.1
+		registration OBJECT IDENTIFIER::= { products 1 }
+
+--   Products' registration
+--
+		-- 1.3.6.1.4.1.9926.1.1.1
+		geGMSS OBJECT IDENTIFIER::= { registration 1 }
+
+		-- 1.3.6.1.4.1.9926.1.1.2
+		geGMAN OBJECT IDENTIFIER::= { registration 2 }
+
+		-- 1.3.6.1.4.1.9926.1.1.3
+		geNTG OBJECT IDENTIFIER::= { registration 3 }
+
+		-- 1.3.6.1.4.1.9926.1.1.4
+		geACS OBJECT IDENTIFIER::= { registration 4 }
+
+-- sysObjectID definition for GenieATD
+--
+		-- 1.3.6.1.4.1.9926.1.1.10
+		geATD OBJECT IDENTIFIER::= { registration 10 }
+
+		-- 1.3.6.1.4.1.9926.1.1.10.1
+		geAtd2623 OBJECT IDENTIFIER::= { geATD 1 }
+
+		-- 1.3.6.1.4.1.9926.1.1.10.2
+		geAtd2625 OBJECT IDENTIFIER::= { geATD 2 }
+
+-- sysObjectID definition for GenieATP
+--
+		-- 1.3.6.1.4.1.9926.1.1.15
+		geATP OBJECT IDENTIFIER::= { registration 15 }
+
+-- sysObjectID definition for GenieNPC
+--
+		-- 1.3.6.1.4.1.9926.1.1.20
+		geNPC OBJECT IDENTIFIER::= { registration 20 }
+
+-- sysObjectID definition for GenieATM
+--
+		-- 1.3.6.1.4.1.9926.1.1.21
+		geATM OBJECT IDENTIFIER::= { registration 21 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.1111
+		geAtm1111  OBJECT IDENTIFIER::= { geATM 1111 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.2325
+		geAtm2325E OBJECT IDENTIFIER::= { geATM 2325 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.2625
+		geAtm2625E OBJECT IDENTIFIER::= { geATM 2625 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.5312
+		geAtm5312 OBJECT IDENTIFIER::= { geATM 5312 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.5333
+		geAtm5333 OBJECT IDENTIFIER::= { geATM 5333 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6101
+		geAtm6101 OBJECT IDENTIFIER::= { geATM 6101 }
+
+                -- 1.3.6.1.4.1.9926.1.1.21.6102
+                geAtm6102 OBJECT IDENTIFIER::= { geATM 6102 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6103
+		geAtm6103 OBJECT IDENTIFIER::= { geATM 6103 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6105
+		geAtm6105 OBJECT IDENTIFIER::= { geATM 6105 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6110
+		geAtm6110 OBJECT IDENTIFIER::= { geATM 6110 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6111
+		geAtm6111 OBJECT IDENTIFIER::= { geATM 6111 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6113
+		geAtm6113 OBJECT IDENTIFIER::= { geATM 6113 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6115
+		geAtm6115 OBJECT IDENTIFIER::= { geATM 6115 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6117
+		geAtm6117 OBJECT IDENTIFIER::= { geATM 6117 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6118
+		geAtm6118 OBJECT IDENTIFIER::= { geATM 6118 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6123
+		geAtm6123 OBJECT IDENTIFIER::= { geATM 6123 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6125
+		geAtm6125 OBJECT IDENTIFIER::= { geATM 6125 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6130
+		geAtm6130 OBJECT IDENTIFIER::= { geATM 6130 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6133
+		geAtm6133 OBJECT IDENTIFIER::= { geATM 6133 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6135
+		geAtm6135 OBJECT IDENTIFIER::= { geATM 6135 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6160
+		geAtm6160 OBJECT IDENTIFIER::= { geATM 6160 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6170
+		geAtm6170 OBJECT IDENTIFIER::= { geATM 6170 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6180
+		geAtm6180 OBJECT IDENTIFIER::= { geATM 6180 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6190
+		geAtm6190 OBJECT IDENTIFIER::= { geATM 6190 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6165
+		geAtm6165 OBJECT IDENTIFIER::= { geATM 6165 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6167
+		geAtm6167 OBJECT IDENTIFIER::= { geATM 6167 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6169
+		geAtm6169 OBJECT IDENTIFIER::= { geATM 6169 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6171
+		geAtm6171 OBJECT IDENTIFIER::= { geATM 6171 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6173
+		geAtm6173 OBJECT IDENTIFIER::= { geATM 6173 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6212
+		geAtm6212 OBJECT IDENTIFIER::= { geATM 6212 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6232
+		geAtm6232 OBJECT IDENTIFIER::= { geATM 6232 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6233
+		geAtm6233 OBJECT IDENTIFIER::= { geATM 6233 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6265
+		geAtm6265 OBJECT IDENTIFIER::= { geATM 6265 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6203
+		geAtm6203 OBJECT IDENTIFIER::= { geATM 6203 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6213
+		geAtm6213 OBJECT IDENTIFIER::= { geATM 6213 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6260
+		geAtm6260 OBJECT IDENTIFIER::= { geATM 6260 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6270
+		geAtm6270 OBJECT IDENTIFIER::= { geATM 6270 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6280
+		geAtm6280 OBJECT IDENTIFIER::= { geATM 6280 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6305
+		geAtm6305 OBJECT IDENTIFIER::= { geATM 6305 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6311
+		geAtm6311 OBJECT IDENTIFIER::= { geATM 6311 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6312
+		geAtm6312 OBJECT IDENTIFIER::= { geATM 6312 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6313
+		geAtm6313 OBJECT IDENTIFIER::= { geATM 6313 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6315
+		geAtm6315 OBJECT IDENTIFIER::= { geATM 6315 }
+
+        -- 1.3.6.1.4.1.9926.1.1.21.6323
+		geAtm6323 OBJECT IDENTIFIER::= { geATM 6323 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6325
+		geAtm6325 OBJECT IDENTIFIER::= { geATM 6325 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6333
+		geAtm6333 OBJECT IDENTIFIER::= { geATM 6333 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6335
+		geAtm6335 OBJECT IDENTIFIER::= { geATM 6335 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6365
+		geAtm6365 OBJECT IDENTIFIER::= { geATM 6365 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6367
+		geAtm6367 OBJECT IDENTIFIER::= { geATM 6367 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6369
+		geAtm6369 OBJECT IDENTIFIER::= { geATM 6369 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6371
+		geAtm6371 OBJECT IDENTIFIER::= { geATM 6371 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6373
+		geAtm6373 OBJECT IDENTIFIER::= { geATM 6373 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6331
+		geAtm6331 OBJECT IDENTIFIER::= { geATM 6331 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6363
+		geAtm6363 OBJECT IDENTIFIER::= { geATM 6363 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6370
+		geAtm6370 OBJECT IDENTIFIER::= { geATM 6370 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6402
+		geAtm6402 OBJECT IDENTIFIER::= { geATM 6402 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6410
+		geAtm6410 OBJECT IDENTIFIER::= { geATM 6410 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6411
+		geAtm6411 OBJECT IDENTIFIER::= { geATM 6411 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6503
+		geAtm6503 OBJECT IDENTIFIER::= { geATM 6503 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6505
+		geAtm6505 OBJECT IDENTIFIER::= { geATM 6505 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6507
+		geAtm6507 OBJECT IDENTIFIER::= { geATM 6507 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6509
+		geAtm6509 OBJECT IDENTIFIER::= { geATM 6509 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6511
+		geAtm6511 OBJECT IDENTIFIER::= { geATM 6511 }
+
+                -- 1.3.6.1.4.1.9926.1.1.21.6611
+		geAtm6611 OBJECT IDENTIFIER::= { geATM 6611 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6703
+		geAtm6703 OBJECT IDENTIFIER::= { geATM 6703 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6705
+		geAtm6705 OBJECT IDENTIFIER::= { geATM 6705 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6707
+		geAtm6707 OBJECT IDENTIFIER::= { geATM 6707 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6709
+		geAtm6709 OBJECT IDENTIFIER::= { geATM 6709 }
+
+		-- 1.3.6.1.4.1.9926.1.1.21.6711
+		geAtm6711 OBJECT IDENTIFIER::= { geATM 6711 }
+
+-- sysObjectID definition for GenieGA
+--
+		-- 1.3.6.1.4.1.9926.1.1.30
+		gaMgmtMib OBJECT IDENTIFIER::= { registration 30 }
+
+-- sysObjectID definition for GenieGA
+--
+		-- 1.3.6.1.4.1.9926.1.1.31
+		gaNodeMib OBJECT IDENTIFIER::= { registration 31 }
+
+-- System MIB for GMSS product line
+--
+		-- 1.3.6.1.4.1.9926.1.2
+		gmss OBJECT IDENTIFIER::= { products 2 }
+
+-- System MIB for GMAN line
+--
+		-- 1.3.6.1.4.1.9926.1.3
+		gman OBJECT IDENTIFIER::= { products 3 }
+
+-- System MIB for Genie NTG (ATM) product line
+--
+		-- 1.3.6.1.4.1.9926.1.4
+		ntg OBJECT IDENTIFIER::= { products 4 }
+
+-- System MIB for Genie ACS product line
+--
+		-- 1.3.6.1.4.1.9926.1.5
+		acs OBJECT IDENTIFIER::= { products 5 }
+
+-- System MIB for Genie ATD product line
+--
+		-- 1.3.6.1.4.1.9926.1.10
+		atd OBJECT IDENTIFIER::= { products 10 }
+
+-- System MIB for Genie ATP product line
+--
+		-- 1.3.6.1.4.1.9926.1.15
+		atp OBJECT IDENTIFIER::= { products 15 }
+
+-- System MIB for Genie NPC product line
+--
+		-- 1.3.6.1.4.1.9926.1.20
+		npc OBJECT IDENTIFIER::= { products 20 }
+
+-- System MIB for Genie ATM product line
+		-- 1.3.6.1.4.1.9926.1.21
+		atm OBJECT IDENTIFIER::= { products 21 }
+
+-- System MIB for Genie Analytics product line
+		-- 1.3.6.1.4.1.9926.1.30
+		ga OBJECT IDENTIFIER::= { products 30 }
+
+	END
+
+--
+-- GENIE-GE-ROOT-MIB.my
+--

@@ -1,15 +1,15 @@
-<div class="btn-group pull-right" role="group">
+<div class="tw:ml-auto tw:flex tw:items-center tw:gap-1" role="group">
     <a href="{{ $primaryDeviceLink['url'] }}"
-       class="btn btn-default"
+       class="btn"
        type="button"
        @if(isset($primaryDeviceLink['onclick']))onclick="{{ $primaryDeviceLink['onclick'] }}" @endif
        @if($primaryDeviceLink['external'])target="_blank" rel="noopener" @endif
        title="{{ $primaryDeviceLink['title'] }}"
-    >&nbsp;<i class="fa {{ $primaryDeviceLink['icon'] }} fa-lg icon-theme"></i>
+    ><i class="fa {{ $primaryDeviceLink['icon'] }} fa-lg icon-theme"></i>
     </a>
     <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            &nbsp;<i class="fa fa-ellipsis-v fa-lg icon-theme"></i>&nbsp;
+        <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-ellipsis-v fa-lg fa-fw icon-theme"></i>
         </button>
         <ul class="dropdown-menu dropdown-menu-right">
             @foreach($deviceLinks as $link)

@@ -35,6 +35,8 @@ if (Rrd::checkRrdExists($rrd_filename)) {
         'descr' => 'Media_Wearout_Indicator',
         'ds' => 'id233',
     ];
+}
+if (Rrd::checkRrdExists($rrd_filename_232)) {
     $rrd_list[] = [
         'filename' => $rrd_filename_232,
         'descr' => 'Available_Reservd_Space',

@@ -64,10 +64,10 @@ if (is_array($components) && count($components) > 0) {
         // the last 16 bits.
 
         $hexoffset = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][23][$array['UID']];
-        $rrd['offset'] = Number::constrainInteger(hexdec(substr((string) $hexoffset, 0, 5)), IntegerType::int16) + hexdec(substr((string) $hexoffset, -5)) / 65536;
+        $rrd['offset'] = Number::constrainInteger(hexdec(substr((string) $hexoffset, 0, 5)), IntegerType::Int16) + hexdec(substr((string) $hexoffset, -5)) / 65536;
 
         $hexdelay = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][24][$array['UID']];
-        $rrd['delay'] = Number::constrainInteger(hexdec(substr((string) $hexdelay, 0, 5)), IntegerType::int16) + hexdec(substr((string) $hexdelay, -5)) / 65536;
+        $rrd['delay'] = Number::constrainInteger(hexdec(substr((string) $hexdelay, 0, 5)), IntegerType::Int16) + hexdec(substr((string) $hexdelay, -5)) / 65536;
 
         // Cisco NTPUnsignedTimeValue - 16 bits of unsignedint, and 16 bits of unsignedint for fractional
         $hexdisp = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][25][$array['UID']];

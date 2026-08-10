@@ -1888,511 +1888,438 @@
                 {
                     "state_name": "pt3080Gps1PPSStatus",
                     "state_descr": "locked",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080Gps1PPSStatus",
                     "state_descr": "unlocked",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "pt3080GpsBias",
                     "state_descr": "off",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "pt3080GpsBias",
                     "state_descr": "on",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080GpsbiasVoltage",
                     "state_descr": "gpsant-5v",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080GpsbiasVoltage",
                     "state_descr": "gpsant-33v",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080GpsSatelliteSystemCOMPASS",
                     "state_descr": "disable",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "pt3080GpsSatelliteSystemCOMPASS",
                     "state_descr": "enable",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080GpsSatelliteSystemGALILEO",
                     "state_descr": "disable",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "pt3080GpsSatelliteSystemGALILEO",
                     "state_descr": "enable",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080GpsSatelliteSystemGLONASS",
                     "state_descr": "disable",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "pt3080GpsSatelliteSystemGLONASS",
                     "state_descr": "enable",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080GpsSatelliteSystemGPS",
                     "state_descr": "disable",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "pt3080GpsSatelliteSystemGPS",
                     "state_descr": "enable",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080InputTSHp",
                     "state_descr": "asi-in-1",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080InputTSHp",
                     "state_descr": "asi-in-2",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080InputTSHp",
                     "state_descr": "demodulator-1",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080InputTSHp",
                     "state_descr": "demodulator-2",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080InputTSHp",
                     "state_descr": "tsoip-rx1",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080InputTSHp",
                     "state_descr": "tsoip-rx2",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080InputTSHp",
                     "state_descr": "satRecv",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080InputTSLp",
                     "state_descr": "asi-in-1",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080InputTSLp",
                     "state_descr": "asi-in-2",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080InputTSLp",
                     "state_descr": "demodulator-1",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080InputTSLp",
                     "state_descr": "demodulator-2",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080InputTSLp",
                     "state_descr": "tsoip-rx1",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080InputTSLp",
                     "state_descr": "tsoip-rx2",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080InputTSLp",
                     "state_descr": "satRecv",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080InputTSPrimaryStatus",
                     "state_descr": "Available",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080InputTSPrimaryStatus",
                     "state_descr": "Unavailable",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "pt3080InputTSPrimaryStatus",
                     "state_descr": "No sync",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "pt3080InputTSSecondaryStatus",
                     "state_descr": "Available",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080InputTSSecondaryStatus",
                     "state_descr": "Unavailable",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "pt3080InputTSSecondaryStatus",
                     "state_descr": "No sync",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "pt3080ModeCodeRateHighPrio",
                     "state_descr": "code-rate-1/2",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080ModeCodeRateHighPrio",
                     "state_descr": "code-rate-2/3",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080ModeCodeRateHighPrio",
                     "state_descr": "code-rate-3/4",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080ModeCodeRateHighPrio",
                     "state_descr": "code-rate-5/6",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080ModeCodeRateHighPrio",
                     "state_descr": "code-rate-7/8",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080ModeCodeRateLowPrio",
                     "state_descr": "code-rate-1/2",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080ModeCodeRateLowPrio",
                     "state_descr": "code-rate-2/3",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080ModeCodeRateLowPrio",
                     "state_descr": "code-rate-3/4",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080ModeCodeRateLowPrio",
                     "state_descr": "code-rate-5/6",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080ModeCodeRateLowPrio",
                     "state_descr": "code-rate-7/8",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080ModeConstellation",
                     "state_descr": "qpsk",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080ModeConstellation",
                     "state_descr": "qam16",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080ModeConstellation",
                     "state_descr": "qam64",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080ModeGuardInterval",
                     "state_descr": "guard-1/32",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080ModeGuardInterval",
                     "state_descr": "guard-1/16",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080ModeGuardInterval",
                     "state_descr": "guard-1/8",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080ModeGuardInterval",
                     "state_descr": "guard-1/4",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080Modeifft",
                     "state_descr": "mode-2k",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080Modeifft",
                     "state_descr": "mode-4k",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "pt3080Modeifft",
                     "state_descr": "mode-8k",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080OutputMode",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080OutputMode",
                     "state_descr": "standby",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "pt3080OutputSynchronized",
                     "state_descr": "not-synchronized",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "pt3080OutputSynchronized",
                     "state_descr": "synchronized",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080SystemDateTimeSyncActual",
                     "state_descr": "manual",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "pt3080SystemDateTimeSyncActual",
                     "state_descr": "auto",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "pt3080SystemDateTimeSyncActual",
                     "state_descr": "gps",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080SystemDateTimeSyncActual",
                     "state_descr": "ntp",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "pt3080SystemModulationStandard",
                     "state_descr": "dvbt",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080SystemModulationStandard",
                     "state_descr": "dvbt2",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080SystemModulationStandard",
                     "state_descr": "atsc",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080SystemModulationStandard",
                     "state_descr": "isdbt",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080SystemModulationStandard",
                     "state_descr": "iboc",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080TSoIPRx1Status",
                     "state_descr": "locked",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080TSoIPRx1Status",
                     "state_descr": "unlocked",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "pt3080TSoIPRx1Status",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "pt3080TSoIPRx2Status",
                     "state_descr": "locked",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "pt3080TSoIPRx2Status",
                     "state_descr": "unlocked",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "pt3080TSoIPRx2Status",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 }

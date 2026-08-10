@@ -5,7 +5,7 @@ use App\Models\Ipv6Address;
 use App\Models\Port;
 use App\Models\Storage;
 
-include 'includes/nfs-shared.inc.php';
+require base_path('includes/nfs-shared.inc.php');
 
 if (! isset($vars['flat_mount_options'])) {
     $vars['flat_mount_options'] = 1;

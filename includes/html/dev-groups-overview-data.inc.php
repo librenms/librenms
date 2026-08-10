@@ -4,28 +4,22 @@ $device_groups = dbFetchRows('SELECT dg.id, dg.name FROM device_group_device AS 
 
 if (count($device_groups)) {
     ?>
-    <div class='row'>
-        <div class='col-md-12'>
-            <div class='panel panel-default panel-condensed device-overview'>
-                <div class='panel-heading'>
+    <div class='overview-panel tw:mb-5'>
+                <div class='tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:border-b tw:border-gray-300 tw:text-neutral-700 tw:dark:bg-dark-gray-200 tw:dark:border-zinc-800 tw:dark:text-dark-white-200'>
                     <a href="<?=url('device-groups')?>">
                         <i class="fa fa-th fa-lg icon-theme" aria-hidden="true"></i>
                         <strong>Device Group Membership</strong>
                     </a>
                 </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-sm-12">
+                <div class="tw:flex tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-zinc-800">
+                    <div class="tw:flex tw:flex-wrap tw:gap-2 tw:p-2">
                         <?php foreach ($device_groups as $group) { ?>
-                            <span style="margin: 8px;">
-                                <a href="<?=url('devices/group=' . $group['id'])?>" target="_blank"><?=htmlspecialchars((string) $group['name'])?></a>
+                            <span>
+                                <a href="<?=route('devices', ['filter' => ['groups.id' => ['eq' => $group['id']]]])?>" target="_blank"><?=htmlspecialchars((string) $group['name'])?></a>
                             </span>
                         <?php } ?>
-                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
     <?php
 }

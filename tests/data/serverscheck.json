@@ -103,21 +103,18 @@
                 {
                     "state_name": "Serverscheck_FloodSensor",
                     "state_descr": "-",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "Serverscheck_FloodSensor",
                     "state_descr": "DRY",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Serverscheck_FloodSensor",
                     "state_descr": "WET",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 2
                 }
@@ -205,21 +202,18 @@
                 {
                     "state_name": "Serverscheck_FloodSensor",
                     "state_descr": "-",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "Serverscheck_FloodSensor",
                     "state_descr": "DRY",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Serverscheck_FloodSensor",
                     "state_descr": "WET",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 2
                 }

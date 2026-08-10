@@ -1,0 +1,24 @@
+-- "CONFIDENTIAL. All rights reserved. Alcatel. This computer program is protected under Copyright.
+-- Recipient is to retain the program in confidence, and is not permitted to copy, use, distribute, modify or
+-- translate the program without authorization. Passing on and copying,use and communication of its
+-- contents is not permitted without written authorization."
+
+OPTICSIM-ETHREG-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+    MODULE-IDENTITY FROM SNMPv2-SMI
+    tsdim, tsdimBasicMib FROM TSDIM-BASICREG-MIB;
+
+opticsimEthReg MODULE-IDENTITY
+    LAST-UPDATED "0209300000Z"
+    ORGANIZATION "Alcatel TND"
+    CONTACT-INFO "Alcatel TND"
+    DESCRIPTION
+        "Initial Release OPTICS-IM Ethernet REGISTRATION MODULE"
+::= { tsdimBasicMib 200 }
+
+-- Registration Tree
+
+opticsimEthMib           OBJECT IDENTIFIER ::= { tsdim 25 }
+opticsimEthMC            OBJECT IDENTIFIER ::= { opticsimEthMib 99 }
+
+END

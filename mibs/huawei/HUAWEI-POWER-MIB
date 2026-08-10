@@ -1,9 +1,9 @@
 --  ============================================================================
--- Copyright (C)2013  by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2019 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:  This MIB is used for defining Power Monitor management 
 --               MIB objects.     
 -- Reference:  
--- Version: V3.35
+-- Version: V3.62
 -- ============================================================================
 	HUAWEI-POWER-MIB DEFINITIONS ::= BEGIN
  
@@ -20,7 +20,7 @@
 			        FROM HUAWEI-DEVICE-MIB;
 		
 		hwPower MODULE-IDENTITY
-			LAST-UPDATED "201312280000Z"
+			LAST-UPDATED "201903270000Z"
 			ORGANIZATION "Huawei Technologies Co.,Ltd."
 			CONTACT-INFO                                    
 			             "Huawei Industrial Base            
@@ -34,8 +34,170 @@
 				"
 				This MIB is used for defining Power Monitor management MIB objects.
 				"
-      
       -- Revision history
+                        REVISION    "201903270000Z"
+                        DESCRIPTION "V3.62, added enumerate etp4860(131) in hwPowerType leaf for smu EMU." 
+
+                        REVISION    "201903061000Z"
+                        DESCRIPTION "V3.61, added description of enumerate etp48200(130) and modified the description of enumerate unknown in hwPowerType leaf for smu EMU." 
+
+                        REVISION    "201903060000Z"
+                        DESCRIPTION "V3.60, added enumerate etp48200(130) in hwPowerType leaf for smu EMU." 
+
+                        REVISION    "201812210000Z"
+
+                        DESCRIPTION "V3.59,
+                                    add enumerate supplyRecoverAutotestTerminated(7) in hwBatteryLogTestFinish leaf.
+                                    modified the Description of hwBatteryLogTestFinish."
+				
+	                REVISION    "201809120000Z"
+
+                        DESCRIPTION "V3.58, 
+						            add the leaf of hwEmmPowerBatteryBoardFaultTrap and hwEmmPowerBatteryBoardRecoverTrap.
+									modified the Description of hwPowerCellChargeHighTemperatureProtectionFaultTrap."
+
+                        REVISION    "201806190000Z"                                             			
+                        DESCRIPTION "V3.57, modify description the leaf of hwPowerBluetoothSwitch."   
+						
+                        REVISION    "201805290000Z"                                             			
+                        DESCRIPTION "V3.56,
+                                    add the node of hwPowerWiringCheckSwitch for setting and getting the wiring check switch of SMU.
+                                    add the node of hwPowerLatitude and hwPowerLongitude for getting the location of battery.
+                                    add the leaf of hwPowerBatteryContactorFaultTrap and hwPowerBatteryContactorRestoreTrap.
+                                    add the leaf of hwPowerLowTemperatureProtectionFaultTrap and hwPowerLowTemperatureProtectionRestoreTrap.									
+                                    add the leaf of hwPowerCellChargeHighTemperatureProtectionFaultTrap and hwPowerCellChargeHighTemperatureProtectionRestoreTrap.									
+                                    add the leaf of hwPowerOvervoltageProtectionFaultTrap and hwPowerOvervoltageProtectionRestoreTrap.									
+                                    add the leaf of hwPowerOvercurrentProtectionFaultTrap and hwPowerOvercurrentProtectionRestoreTrap.									
+                                    add the leaf of hwPowerBattCellPackFaultTrap and hwPowerBattCellPackRestoreTrap.
+                                    add the leaf of hwPowerBattManualDisconnectionFaultTrap and hwPowerBattManualDisconnectionRestoreTrap.									
+                                    add the node of hwPowerBluetoothSwitch for getting the power bluetooth switch state of SMU" 
+                          
+                        REVISION    "201801160000Z"                                             			
+                        DESCRIPTION "V3.55, added enumerate etp4850(129) in hwPowerType leaf for smu EMU."   
+  
+                        REVISION    "201711270000Z"                                             			
+                        DESCRIPTION "V3.54,
+                                    add the node hwBatteryHeaterState for getting the heater state of battery.
+                                    add the node hwBatteryHealthState for getting the health state of battery.
+                                    add the leaf of hwPowerBatteryHeaterFaultTrap and hwPowerBatteryHeaterFaultRestoreTrap.
+                                    add the leaf of hwPowerBatteryPortReverseConnectTrap and hwPowerBatteryPortReverseConnectRestoreTrap.
+                                    add the table hwBatteryCellTable fot getting the temperature and voltage of battery cell."
+                        
+                       REVISION    "201709250000Z"                                             			
+                       DESCRIPTION "V3.53,
+                                    add invalid value(-1) in hwBatteryAntiTheftSwitch.
+                                    add invalid value(-1) in hwBatteryAntiTheftTimeout.
+                                    add invalid value(-1) in hwLiBatteryGroupChargeLimit."
+
+                       REVISION    "201709120000Z"                                             			
+                       DESCRIPTION "V3.52,
+                                    add the node hwBatteryAntiTheftSwitch for setting and getting the anti-theft switch of battery.
+                                    add the node hwBatteryAntiTheftTimeout for setting and getting the anti-theft timeout time of battery.  
+                                    add the node hwLiBatteryGroupChargeLimit for setting and getting the LiBattery charge limit quotiety.
+		                            add the node hwBatterySequence and hwBatteryAddress for getting the LiBattery sequence and address.
+				                    add the leaf of hwPowerBatteryEleCoreFaultTrap and hwPowerBatteryEleCoreRestoreTrap."
+				    
+                       REVISION    "201709060000Z"                                             			
+                       DESCRIPTION "V3.51, add the node hwBatteryGroupType for getting 
+                                    the type of the lead-acid battery."  
+                                    
+                       REVISION    "201704070000Z"                                             			
+                       DESCRIPTION "V3.50, add the node hwRemoteUnitSlotDCOutputVol and hwRemoteUnitSlotDCOutputCur for getting 
+                                    the Remote Power module DC output info."  
+
+                       REVISION    "201703310000Z"  
+                       DESCRIPTION "V3.49,
+                                    modified the Description of hwACCurrentA.
+                                    modified the Description of hwACVoltB.
+                                    modified the Description of hwACCurrentB.
+                                    modified the Description of hwACVoltC.
+                                    modified the Description of hwACCurrentC.
+                                    modified the Description of hwACVoltageHigh.
+                                    modified the Description of hwACVoltageLow.
+                                    add enumerate invalid(-1) in hwACVoltageAState leaf.
+                                    modified the Description of hwACVoltageAState.
+                                    add enumerate invalid(-1) in hwACVoltageBState leaf.
+                                    modified the Description of hwACVoltageBState.
+                                    add enumerate invalid(-1) in hwACVoltageCState leaf.
+                                    modified the Description of hwACVoltageCState."
+					   
+		       REVISION    "201702170000Z"  
+                       DESCRIPTION "V3.48, add the leaf of hwRemoteUnitRestoreTrap and hwRemoteUnitFaultTrap, 
+                                   hwRemoteUnitCircuitRestoreTrap and hwRemoteUnitCircuitFailTrap."
+
+                       REVISION    "201606220000Z"  
+                       DESCRIPTION "V3.47, add the leaf of hwBatteryLowTemperature."
+                       
+                       REVISION    "201605260000Z"  
+                       DESCRIPTION "V3.46, modified the Description of hwBatteryLogTestBatteryTemperature."
+
+                       REVISION    "201511240000Z"  
+                       DESCRIPTION "V3.45, modified the objects of hwEmmDigMainsupplyFaultTrap and hwEmmDigMainsupplyRecoverTrap."
+       
+                       REVISION    "201511040000Z"  
+                       DESCRIPTION "V3.44, modified the Description of hwBatteryTemperature."
+
+                       REVISION    "201509070000Z"  
+                       DESCRIPTION "V3.43,
+                                    modified the Description of hwPowerName.
+                                    modified the Description of hwRectifierVoltage.
+                                    modified the Description of hwRectifierCurrent.
+                                    modified the default value of hwRectifierCurrentLimit.
+                                    modified the Description of hwBatteryGroupBomCode.
+                                    modified the Description of hwBatteryCapacity.
+                                    modified the Description of hwRemoteUnitDCOutputVol.
+                                    modified the Description of hwRemoteUnitDCOutputCur.
+                                    modified the Description of hwRemoteUnitSlotCircuitNum.
+                                    modified the Description of hwRemoteUnitSlotHardVersion.
+                                    modified the Description of hwRemoteUnitSlotSoftVersion.
+                                    modified the Description of hwRemoteUnitSlotNum.
+                                    modified the Description of hwRemoteUnitCircuitInputVol. 
+                                    modified the Description of hwRemoteUnitCircuitInputCur.
+                                   "
+
+                       REVISION    "201508131200Z"  
+                       DESCRIPTION "V3.42,
+				   modified the Description of hwACVoltA.
+				   modified the Description of hwDCVoltageOut
+				   modified the Description of hwDCOutLoadCurrent.
+				   modified the Description of hwBatteryVoltage.
+				   modified the Description of hwBatteryCurrent.
+				   modified the Description of hwLoadVoltageHigh. 
+				   modified the Description of hwBatteryRemainCapacity.
+      				"
+				
+                       REVISION    "201504170000Z"                                             			
+                       DESCRIPTION "V3.41, add the leaf of hwPowerBatteryTempLowTrap and hwPowerBatteryTempLowRestoreTrap, 
+                       hwPowerBatteryTempHighTrap and hwPowerBatteryTempHighRestoreTrap,hwPowerBatteryChargeOverVolTrap and 
+                       hwPowerBatteryChargeOverVolRestoreTrap,hwPowerBatteryDischargeLackVolTrap and hwPowerBatteryDischargeLackVolRestoreTrap,
+                       hwPowerBatteryChargeOverCurTrap and hwPowerBatteryChargeOverCurRestoreTrap,hwPowerBatteryDischargeOverCurTrap and 
+                       hwPowerBatteryDischargeOverCurRestoreTrap for LiBattery alarm." 
+      
+                       REVISION    "201412160000Z"                                             			
+                       DESCRIPTION "V3.39, Correct the node hwPowerRowStatus,hwACRowStatus, hwDCOutRowStatus,
+		                    hwLoadInfoRowStatus, hwRectifierRowStatus, hwBatteryGroupRowStatus, hwChargeControlRowStatus, 
+				                hwBatteryRowStatus, hwACInfoRowStatus from read-write to read-create."
+                       
+                       REVISION    "201410250000Z"                                             			
+                       DESCRIPTION "V3.38, Modify the node name from hwBatteryState to hwBatteryOperStatus"  
+		       
+                       REVISION    "201406230000Z"                                             			
+                       DESCRIPTION "V3.37, Modify the following not normative nodes to satisfy for the new OMSYS tool.
+                       hwPowerType
+                       hwACVoltageAState 
+                       hwACVoltageBState  
+                       hwACVoltageCState 
+                       hwBatteryTestDuration 
+                       hwACInfoMCBTrigger" 
+                       
+                             
+                       REVISION    "201402270000Z"                                             			
+                       DESCRIPTION "V3.36, correct the description of hwPowerType's value list."   
+
+                       REVISION    "201401090000Z"                                             			
+                       DESCRIPTION "V3.40, add OBJECT IDENTIFIER hwRemotePowerMonObjs and table hwRemoteUnitSysInfoTable, 
+                       hwRemoteUnitSlotTable, hwRemoteUnitCircuitTable for Remote Power System RemoteUnit."  
+
                        REVISION    "201312280000Z"                                             			
                        DESCRIPTION "V3.35, modify the leaf of hwRectifierOperState."       
                       
@@ -118,7 +280,8 @@
                                          
                        REVISION    "200610250900Z"
                        DESCRIPTION "V3.08,Added hwBatteryVoltageState."
-
+                       
+                       
             ::= { huaweiUtility 2 }
 		
 	
@@ -181,8 +344,16 @@
 			hwPowerVersion
 				DisplayString,
 			hwPowerSupplyState
-			  INTEGER
-		 }
+			  	INTEGER,
+			hwPowerWiringCheckSwitch
+				INTEGER,
+			hwPowerLatitude
+				DisplayString,
+			hwPowerLongitude
+				DisplayString,
+			hwPowerBluetoothSwitch
+				INTEGER
+	 }
 
 		hwPowerIndex OBJECT-TYPE
 		SYNTAX Integer32 (0..255)
@@ -211,7 +382,7 @@
 			onps(17),
 			power4875l(18),
 			psma(100),
-			perm-al175nt(101),
+			permAl175nt(101),
 			mcs1800(102),
 			mcs1800A(103),
 			mcs3000(104),
@@ -229,6 +400,9 @@
 			etp4890(126), 
 			h801pmu(127),
 			etp48150(128),
+			etp4850(129),
+			etp48200(130),
+			etp4860(131),
 			other(255)
 			}
 		MAX-ACCESS read-write
@@ -245,12 +419,12 @@
 			 7.power48300(7)             -  Type of the Power emu device is power48300                                            
 			 8.power48240SinglePhase(8)  -  Type of the Power emu device is power48240SinglePhase                              
 			 9.universalPower(9)         -  Type of the Power emu device is universalPower                                      
-			 10.power4845(10)            -  Type of the Power emu device is power4845                                         
+			 10.power4845(10)            -  Pwr4845                                         
 			 11.rpower(11)               -  Type of the Power emu device is rpower                                           
 			 12.power4805(15)            -  Type of the Power emu device is power4805                                        
 			 13.power4820(16)            -  Type of the Power emu device is power4820                                        
 			 14.onps(17)                 -  Type of the Power emu device is onps                                        
-			 15.power4875l(18)           -  Type of the Power emu device is power4875l                                        
+			 15.power4875l(18)           -  Pwr4875L                                        
 			 16.psma(100)                -  Type of the Power emu device is psma                                        
 			 17.perm-al175nt(101)        -  Type of the Power emu device is perm-al175nt                                     
 			 18.mcs1800(102)             -  Type of the Power emu device is mcs1800                                     
@@ -261,16 +435,19 @@
 			 23.eltek(107)               -  Type of the Power emu device is eltek                                             
 			 24.dk04(108)                -  Type of the Power emu device is dk04                                             
 			 25.dk04C(109)               -  Type of the Power emu device is dk04C                                             
-			 26.dpc(110)                 -  Type of the Power emu device is dpc                                             
-			 27.power4830(120)           -  Type of the Power emu device is power4830                                        
+			 26.dpc(110)                 -  Type of the Power emu device is dpc
+			 27.power4830(120)           -  Pwr4830L
 			 28.h831pmua(121)            -  Type of the Power emu device is h831pmua                                        
-			 29.power3000(122)           -  Type of the Power emu device is power3000
-			 30.liFeBattery(123)         -  Type of the Power emu device is LiFeBattery    
-			 31.etp4830(125),            -  Type of SMU Power emu device is etp4830  
-		   32.etp4890(126),            -  Type of SMU Power emu device is etp4890     
-		   33.h801pmu(127),            -  Type of the Power emu device is h801pmua     
-		   34.etp48150(128),           -  Type of SMU Power emu device is etp48150                         
-			 35.other(255)               -  other Power Type         
+			 29.power3000(122)           -  Pwr3000
+			 30.liFeBattery(123)         -  Type of the Power emu device is LiFeBattery
+			 31.etp4830(125),            -  ETP4830
+			 32.etp4890(126),            -  ETP4890
+			 33.h801pmu(127),            -  H801PMU
+			 34.etp48150(128),           -  ETP48150
+			 35.etp4850(129),            -  ETP4850
+			 36.etp48200(130),           -  ETP48200
+			 37.etp4860(131),            -  ETP4860
+			 38.other(255)               -  Unkown   
 			"
 		::= { hwPowerSysInfoEntry 2 }
 		
@@ -281,6 +458,7 @@
 		DESCRIPTION
 			"
 			Power name.
+			Invalid: null string.
 			"
 		::= { hwPowerSysInfoEntry 3 }
 		
@@ -310,7 +488,7 @@
 		
 		hwPowerRowStatus OBJECT-TYPE
 		SYNTAX RowStatus
-		MAX-ACCESS read-write
+		MAX-ACCESS read-create
 		STATUS current
 		DESCRIPTION
 			"RowStatus standard operation. The values 1 and 2 are supported currently. 
@@ -333,7 +511,7 @@
 			 2.autoControl(2)   - auto control mode, the default is auto control mode
 			 3.invalid(-1)      - indicates that the device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal
 			"
-		DEFVAL { 1 }
+		DEFVAL { manualControl }
 		::= { hwPowerSysInfoEntry 6 }
 			
 		hwPowerRemoteFrameID OBJECT-TYPE
@@ -385,6 +563,64 @@
 			2.battery(2) - indicates power supply by the batteries    
 		  "
 		::= { hwPowerSysInfoEntry 10 }
+		
+		hwPowerWiringCheckSwitch OBJECT-TYPE
+		SYNTAX INTEGER	
+			{
+			disable(1),       
+			enable(2),
+			invalid(-1)
+			}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Power wiring check switch of SMU.
+			 Options:
+			 1. disable(1)    - indicates that the power wiring check state of SMU is disabled
+			 2. enable(2)     - indicates that the power wiring check state is enabled   
+			 3. invalid(-1)   - indicates that the device can not get the value, e.g. the EMU does not support this operation
+			"
+		DEFVAL { disable }
+		::= { hwPowerSysInfoEntry 11 }
+		
+		hwPowerLatitude OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The power latitude value.
+			 Invalid: -.
+			"
+		::= { hwPowerSysInfoEntry 12 }
+		
+		hwPowerLongitude OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The power longitude value.
+			 Invalid: -.
+			"
+		::= { hwPowerSysInfoEntry 13 }
+		
+		hwPowerBluetoothSwitch OBJECT-TYPE
+		SYNTAX INTEGER	
+			{
+			enable(0),       
+			disable(1),
+			invalid(-1)
+			}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Power bluetooth state of SMU.
+			 Options:
+			 1. enable(0)    - indicates that the power bluetooth state of SMU is enabled.
+			 2. disable(1)   - indicates that the power bluetooth state of SMU is disabled.
+			 3. invalid(-1)  - indicates that the device can not get the value, e.g. the EMU does not support this operation
+			"
+		DEFVAL { disable }
+		::= { hwPowerSysInfoEntry 14 }
 		
 		hwACInputTable OBJECT-TYPE
 		SYNTAX SEQUENCE OF HwACInputEntry
@@ -490,7 +726,9 @@
 		STATUS current
 		DESCRIPTION
 			"AC Inuput voltage A.
-			Unit: mV"
+			Unit: mV
+			invalid: -1          - indicates that the device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal
+			"
 		::= { hwACInputEntry 3 }
 		
 		hwACCurrentA OBJECT-TYPE
@@ -500,7 +738,9 @@
 		STATUS current
 		DESCRIPTION
 			"AC input Current A.
-			Unit: mA"
+			Unit: mA
+			invalid: -1          - indicates that the device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal
+			"
 		::= { hwACInputEntry 4 }
 		
 		hwACVoltB OBJECT-TYPE
@@ -510,7 +750,9 @@
 		STATUS current
 		DESCRIPTION
 			"AC input voltage B.
-			Unit: mv"
+			Unit: mv
+			invalid: -1          - indicates that the device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal
+			"
 		::= { hwACInputEntry 5 }
 		
 		hwACCurrentB OBJECT-TYPE
@@ -520,7 +762,9 @@
 		STATUS current
 		DESCRIPTION
 			"AC input current B.
-			Unit: mA"
+			Unit: mA
+			invalid: -1          - indicates that the device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal
+			"
 		::= { hwACInputEntry 6 }
 		
 		hwACVoltC OBJECT-TYPE
@@ -530,7 +774,9 @@
 		STATUS current
 		DESCRIPTION
 			"AC input voltage C. 
-			Unit: mV"
+			Unit: mV
+			invalid: -1          - indicates that the device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal
+			"
 		::= { hwACInputEntry 7 }
 		
 		hwACCurrentC OBJECT-TYPE
@@ -540,7 +786,9 @@
 		STATUS current
 		DESCRIPTION
 			"AC input current C.
-			Unit: mA"
+			Unit: mA
+			invalid: -1          - indicates that the device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal
+			"
 		::= { hwACInputEntry 8 }
 		
 		hwACVoltageHigh OBJECT-TYPE
@@ -550,7 +798,9 @@
 		STATUS current
 		DESCRIPTION
 			"AC input over-voltage alarm threshold.
-			Unit: mV"
+			Unit: mV
+			invalid: -1          - indicates that the device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal
+			"
 		DEFVAL { 280000 }
 		::= { hwACInputEntry 9 }
 		
@@ -561,13 +811,15 @@
 		STATUS current
 		DESCRIPTION
 			"AC input under-voltage alarm threshold.
-			Unit: mV"
+			Unit: mV
+			invalid: -1          - indicates that the device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal
+			"
 		DEFVAL { 180000 }
 		::= { hwACInputEntry 10 }
 		
 		hwACRowStatus OBJECT-TYPE
 		SYNTAX RowStatus
-		MAX-ACCESS read-write
+		MAX-ACCESS read-create
 		STATUS current
 		DESCRIPTION
 			"Only the add operation, delete operation, and status query operation are supported."
@@ -579,7 +831,8 @@
 			 normal(0),
 			 belowVoltage(1) , 
 			 exceedVoltage(2),		     
-			 missing-phase(3)	     			    
+			 missingPhase(3),
+			 invalid(-1)
 			}
 		MAX-ACCESS read-only
 		STATUS current
@@ -589,7 +842,8 @@
 			 1. normal(0)            - indicates that the Phase AB/A of AC input state is normal
 			 2. belowVoltage(1)      - indicates that the Phase AB/A of AC input state is belowVoltage          
 			 3. exceedVoltage(2)     - indicates that the Phase AB/A of AC input state is exceedVoltage          
-			 4. missing-phase(3)     - indicates that the Phase AB/A of AC input state is missing-phase          	
+			 4. missingPhase(3)      - indicates that the Phase AB/A of AC input state is missing-phase
+			 5. invalid(-1)          - indicates that the device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal			 
 			"
 		::= { hwACInputEntry 12 }
 
@@ -599,7 +853,8 @@
 			normal(0),
 			belowVoltage(1) , 
 			exceedVoltage(2),		     
-			missing-phase(3)     			    
+			missingPhase(3),  
+			invalid(-1)			
 			}
 		MAX-ACCESS read-only
 		STATUS current
@@ -609,7 +864,8 @@
 			 1. normal(0)            - indicates that the Phase BC/B of AC input state is normal
 			 2. belowVoltage(1)      - indicates that the Phase BC/B of AC input state is belowVoltage          
 			 3. exceedVoltage(2)     - indicates that the Phase BC/B of AC input state is exceedVoltage          
-			 4. missing-phase(3)     - indicates that the Phase BC/B of AC input state is missing-phase        			
+			 4. missingPhase(3)      - indicates that the Phase BC/B of AC input state is missing-phase
+			 5. invalid(-1)          - indicates that the device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal        			
 			"
 		::= { hwACInputEntry 13 }
                
@@ -619,7 +875,8 @@
 			normal(0),
 			belowVoltage(1) , 
 			exceedVoltage(2),
-			missing-phase(3)	     			    
+			missingPhase(3),
+			invalid(-1)			
 			}
 		MAX-ACCESS read-only
 		STATUS current
@@ -629,7 +886,8 @@
 			 1. normal(0)            - indicates that the Phase CA/C of AC input state is normal
 			 2. belowVoltage(1)      - indicates that the Phase CA/C of AC input state is belowVoltage          
 			 3. exceedVoltage(2)     - indicates that the Phase CA/C of AC input state is exceedVoltage          
-			 4. missing-phase(3)     - indicates that the Phase CA/C of AC input state is missing-phase    			
+			 4. missingPhase(3)      - indicates that the Phase CA/C of AC input state is missing-phase
+			 5. invalid(-1)          - indicates that the device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal    			
 			"
 		::= { hwACInputEntry 14 }                            	
 		
@@ -703,7 +961,8 @@
 		STATUS current
 		DESCRIPTION
 			"DC voltage output.
-			Unit: mV"
+			Unit: mV.
+			invalid: -1"
 		::= { hwDCOutEntry 1 }
 		
 		hwDCCurrentOut OBJECT-TYPE
@@ -801,7 +1060,7 @@
 		
 		hwDCOutRowStatus OBJECT-TYPE
 		SYNTAX RowStatus
-		MAX-ACCESS read-write
+		MAX-ACCESS read-create
 		STATUS current
 		DESCRIPTION
 			"RowStatus standard operation"
@@ -814,7 +1073,8 @@
 		STATUS current
 		DESCRIPTION
 			"Total load current of DC output .
-			Unit: mA"
+			Unit: mA.
+			invalid: -1"
 		::= { hwDCOutEntry 10 }
 		
 		hwDCOutLoadTmpHigh OBJECT-TYPE
@@ -947,7 +1207,7 @@
 			 2. off(2)      - indicates that the Load is disabled
 			 3. invalid(-1) - indicates that the device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal
 			"
-		DEFVAL { 1 }
+		DEFVAL { on }
 		::= { hwLoadinfoEntry 2 }
 		
 		hwLoadInfoOperStatus OBJECT-TYPE
@@ -998,10 +1258,8 @@
 		DESCRIPTION
 			"Off voltage (Stop external voltage), in unit of mV,
 			 When DC output voltage exceeds the value, the load will be automatically cut off.
-			 Default: 43500
 			 Unit: mV
 			"
-		DEFVAL { 43500 }
 		::= { hwLoadinfoEntry 6 }
 		
 		hwLoadLoadName OBJECT-TYPE
@@ -1014,7 +1272,7 @@
 		
 		hwLoadInfoRowStatus OBJECT-TYPE
 		SYNTAX RowStatus
-		MAX-ACCESS read-write
+		MAX-ACCESS read-create
 		STATUS current
 		DESCRIPTION
 			"RowStatus standard operation"
@@ -1130,7 +1388,7 @@
 			 2.off(2)       - indicates that the Rectifier module is disabled
 			 3.invalid(-1)  - indicates that the device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal
 			"
-		DEFVAL { 1 }
+		DEFVAL { on }
 		::= { hwRectifierEntry 2 }
 		
 		hwRectifierOperState OBJECT-TYPE
@@ -1170,7 +1428,9 @@
 		STATUS current
 		DESCRIPTION
 			"Output voltage .
-			Unit: mV"
+			 Unit: mV
+			 Invalid(-1) indicates that device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal.
+			"
 		::= { hwRectifierEntry 4 }
 		
 		hwRectifierCurrent OBJECT-TYPE
@@ -1180,12 +1440,14 @@
 		STATUS current
 		DESCRIPTION
 			"Output current .
-			Unit: mA"
+			 Unit: mA
+			 Invalid(-1) indicates that device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal.
+			"
 		::= { hwRectifierEntry 5 }
 		
 		hwRectifierRowStatus OBJECT-TYPE
 		SYNTAX RowStatus
-		MAX-ACCESS read-write
+		MAX-ACCESS read-create
 		STATUS current
 		DESCRIPTION
 			"RowStatus standard operation"
@@ -1197,7 +1459,7 @@
 		STATUS current
 		DESCRIPTION
 			"current limit switch"
-		DEFVAL { 1 }
+		DEFVAL { 2 }
 		::= { hwRectifierEntry 7 }
 		
 		hwRectifierRunState OBJECT-TYPE
@@ -1291,7 +1553,11 @@
 			hwBatteryInstallTime
 				DisplayString,
 			hwBatteryGroupBomCode
-				DisplayString
+				DisplayString,
+	        hwBatteryGroupType
+	            INTEGER,
+	        hwLiBatteryGroupChargeLimit
+	            Integer32      
 		}
 
 		hwBatteryGroupCapacity OBJECT-TYPE
@@ -1352,7 +1618,7 @@
 		
 		hwBatteryGroupRowStatus OBJECT-TYPE
 		SYNTAX RowStatus
-		MAX-ACCESS read-write
+		MAX-ACCESS read-create
 		STATUS current
 		DESCRIPTION
 			"RowStatus standard operation"
@@ -1448,9 +1714,43 @@
 		DESCRIPTION
 			"
 			The BOM code of battery.
+			Invalid: null string.
 			"
 		::= { hwBatteryGroupEntry 13 }
-					
+		
+		hwBatteryGroupType OBJECT-TYPE
+		SYNTAX INTEGER
+			{
+			general(1),
+			tcbc(2),
+			tcbb(3)
+			}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"
+			The type of lead-acid battery.
+			1: general.
+			2: tcbc.
+			3: tcbb.
+			"
+		DEFVAL { general }
+		::= { hwBatteryGroupEntry 14 }
+		
+		hwLiBatteryGroupChargeLimit OBJECT-TYPE
+		SYNTAX Integer32 (-1 | 50..1050)
+	  	MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"The charge limit quotiety of the LiBattery. 
+		SNMP uses it which has been enlarged 1000 by host.
+		user uses it which has been lessened 1000 by SNMP.
+		Default: 1050.
+		The invalid value -1 indicates that the device can not get the value, e.g. the EMU does not support this operation. 
+	    "  
+		DEFVAL { 1050 }
+		::= { hwBatteryGroupEntry 15 }	
+				
 		hwChargeTable OBJECT-TYPE
 		SYNTAX SEQUENCE OF HwChargeEntry
 		MAX-ACCESS not-accessible
@@ -1513,7 +1813,7 @@
 			 3. auto(3)        - indicates that the charge management mode is auto-control charge
 			 4. invalid(-1)    - indicates that the device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal
 			"
-		DEFVAL { 2 }
+		DEFVAL { float }
 		::= { hwChargeEntry 1 }
 		
 		hwChargeOperStatus OBJECT-TYPE
@@ -1570,7 +1870,7 @@
 		
 		hwChargeControlRowStatus OBJECT-TYPE
 		SYNTAX RowStatus
-		MAX-ACCESS read-write
+		MAX-ACCESS read-create
 		STATUS current
 		DESCRIPTION
 			"RowStatus standard operation"
@@ -1644,7 +1944,7 @@
 				INTEGER,
 			hwBatteryVoltage
 				MeasuresRange,
-			hwBatteryState
+			hwBatteryOperStatus
 				INTEGER,
 			hwBatteryCurrent
 				MeasuresRange,
@@ -1661,11 +1961,25 @@
 			hwBatteryRemainCapacity
 				Integer32,
 			hwBatteryProtectState
-			  INTEGER,   
+				INTEGER,   
 			hwBatteryVoltageState
-			  INTEGER,    
+				INTEGER,    
 			hwBatteryHardwareState
-			  INTEGER   
+				INTEGER,  
+			hwBatteryLowTemperature
+				Integer32,
+			hwBatteryAntiTheftSwitch
+				INTEGER,
+			hwBatteryAntiTheftTimeout
+				Integer32, 
+			hwBatterySequence
+				Integer32,  
+			hwBatteryAddress
+				Integer32,
+			hwBatteryHeaterState
+				INTEGER,
+			hwBatteryHealthState
+				Integer32
 		 }
 
 		hwBatteryIndex OBJECT-TYPE
@@ -1682,7 +1996,9 @@
 		STATUS current
 		DESCRIPTION
 			"The permitted max battery capacity of the battery group loop charge.
-			Unit: Ah"
+			Unit: Ah
+			Invalid(-1) indicates that device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal.
+			"
 		DEFVAL { 100 }
 		::= { hwBatteryEntry 2 }
 		
@@ -1711,10 +2027,11 @@
 		STATUS current
 		DESCRIPTION
 			"The loop voltage of the battery group.
-			Unit: mV"
+			Unit: mV
+			invalid: -1"
 		::= { hwBatteryEntry 4 }
 		
-		hwBatteryState OBJECT-TYPE
+		hwBatteryOperStatus OBJECT-TYPE
 		SYNTAX INTEGER
 			{
 			charge(1),
@@ -1739,7 +2056,8 @@
 		STATUS current
 		DESCRIPTION
 			"Present current .
-			Unit: mA"
+			Unit: mA
+			invalid: -1"
 		::= { hwBatteryEntry 6 }
 		
 		hwBatteryTemperature OBJECT-TYPE
@@ -1749,12 +2067,14 @@
 		STATUS current
 		DESCRIPTION
 			"The loop temperature of the battery group.
-			Unit: degree"
+			Unit: degree
+			Invaild:2147483647(0X7FFFFFFF)
+			"
 		::= { hwBatteryEntry 7 }
 		
 		hwBatteryRowStatus OBJECT-TYPE
 		SYNTAX RowStatus
-		MAX-ACCESS read-write
+		MAX-ACCESS read-create
 		STATUS current
 		DESCRIPTION
 			"RowStatus standard operation"
@@ -1810,7 +2130,8 @@
 		MAX-ACCESS read-only
 		STATUS current
 		DESCRIPTION
-			"Remain capacity of the battery 
+			"Remain capacity of the battery,
+			 invalid(-1)
 			"		
 		::= { hwBatteryEntry 12 }
 
@@ -1865,6 +2186,88 @@
 			 2. fault(2)     - indicates that the hardware state of Battery is fault
 			"
 		::= { hwBatteryEntry 15 }
+		
+		hwBatteryLowTemperature OBJECT-TYPE
+		SYNTAX Integer32
+		UNITS "degree"
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The lowest loop temperature of the battery group.
+			Unit: degree
+			Invaild:2147483647(0X7FFFFFFF)
+			"
+		::= { hwBatteryEntry 16 }
+		
+		hwBatteryAntiTheftSwitch OBJECT-TYPE
+		SYNTAX INTEGER
+			{
+			disable(1),
+			enable(2),
+			invalid(-1)
+			}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Anti-theft switch of Battery.
+			 Options:
+			 1. disable(1)    - indicates that the anti-theft state of Battery is disabled
+			 2. enable(2)     - indicates that the anti-theft state of Battery is enabled   
+			 3. invalid(-1)   - indicates that the device can not get the value, e.g. the EMU does not support this operation"
+		DEFVAL { disable }
+		::= { hwBatteryEntry 17 }
+		
+		hwBatteryAntiTheftTimeout OBJECT-TYPE
+		SYNTAX Integer32 (-1 | 8..720)
+		UNITS "hour"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The anti-theft timeout time of battery.
+			The invalid value -1 indicates that the device can not get the value, e.g. the EMU does not support this operation."
+		DEFVAL { 72 }
+		::= { hwBatteryEntry 18 }  
+		
+        hwBatterySequence OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The sequence of LiBattery."
+	        ::= { hwBatteryEntry 19 }
+
+                hwBatteryAddress OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The address of LiBattery which corresponds to the subnode of LiBattery."
+	        ::= { hwBatteryEntry 20 }
+		
+		hwBatteryHeaterState OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			on(1),
+			off(2),
+			noconfig(3),
+			invalid(-1)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The state of battery heater."
+			::= { hwBatteryEntry 21 }
+			
+		hwBatteryHealthState OBJECT-TYPE
+			SYNTAX Integer32 (-1..100)
+			UNITS "%"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The health state of battery.
+				Unit:%
+				invalid:-1"
+			::= { hwBatteryEntry 22 }
 		
 		hwBatteryTestTable OBJECT-TYPE
 		SYNTAX SEQUENCE OF HwBatteryTestEntry
@@ -1997,10 +2400,10 @@
 		MAX-ACCESS read-write
 		STATUS current
 		DESCRIPTION
-			"Battery discharge test duration .
-			 Effective range is 1�C100 hours.
-			 Default :value is 10 hours
-			 Unit: hour
+			"Battery discharge test duration.
+			Effective range is 1-100 hours.
+			Default :value is 10 hours
+			Unit: hour
 			"
 		::= { hwBatteryTestEntry 5 }
 		
@@ -2010,11 +2413,11 @@
 		MAX-ACCESS read-write
 		STATUS current
 		DESCRIPTION
-			"Battery discharge test end voltage.
-			Effective range (DC lack alarm voltage+0.5V�Cvoltage of floating charge).
-			Default: 45600 
-			Unit: mV
-			"
+		  "Battery discharge test end voltage.
+		  Effective range (DC lack alarm voltage+0.5V-voltage of floating charge).
+		  Default: 45600
+		  Unit: mV
+		  "
 		::= { hwBatteryTestEntry 6 }
 		
 		hwBatteryTestTotalDischargeAH OBJECT-TYPE
@@ -2224,7 +2627,8 @@
 			alarmTerminated (3),
 			hostTerminated(4),
 			overtimeTerminated(5),
-			notTest(6)
+			notTest(6),
+			supplyRecoverAutotestTerminated(7)
 			}
 		MAX-ACCESS read-only
 		STATUS current
@@ -2237,6 +2641,7 @@
 			 4. hostTerminated(4)     - indicates that the test is stopped by the host
 			 5. overtimeTerminated(5) - indicates that the test is stopped because of over 100 hours
 			 6. notTest(6)           - indicates that the test is not started
+			 7. supplyRecoverAutotestTerminated(7)     - indicates that the test is stopped because of supply recover
 			"
 		::= { hwBatteryLogTestEntry 7 }
 	
@@ -2259,6 +2664,7 @@
 		DESCRIPTION
 			"Battery discharge test end Temperature.
 			 Unit: 0.01 Degree
+			 Invaild: 0X7FFFFFFF
 			"
 		::= { hwBatteryLogTestEntry 9 }
 		
@@ -2272,6 +2678,73 @@
 			 Unit: mA
 			"
 		::= { hwBatteryLogTestEntry 10 }	
+		
+		hwBatteryCellTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF HwBatteryCellEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The state of battery cell.
+			 The indexes of this entry are hwEnvEmuIndex, hwPowerIndex, and hwBatteryCellIndex.
+			 hwEnvEmuIndex is the index of the monitored unit. 
+			 hwPowerIndex is the index of the power supply monitored by the monitoring unit. 
+			 hwBatteryCellIndex is the index of the battery cell.
+			"
+		::= { hwBatteryGroup 6 }
+		
+		hwBatteryCellEntry OBJECT-TYPE
+		SYNTAX HwBatteryCellEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The state of battery cell.
+			 The indexes of this entry are hwEnvEmuIndex, hwPowerIndex, and hwBatteryCellIndex.
+			 hwEnvEmuIndex is the index of the monitored unit. 
+			 hwPowerIndex is the index of the power supply monitored by the monitoring unit. 
+			 hwBatteryCellIndex is the index of battery cell.
+			"
+		INDEX { hwEnvEmuIndex, hwPowerIndex, hwBatteryCellIndex }
+		::= { hwBatteryCellTable 1 }
+		
+		HwBatteryCellEntry ::=
+		SEQUENCE { 
+			hwBatteryCellIndex
+				Integer32,
+			hwBatteryCellTemperature
+				Integer32,
+			hwBatteryCellVoltage
+				Integer32			
+		 }
+
+		hwBatteryCellIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..15)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The index of battery cell."
+		::= { hwBatteryCellEntry 1 }
+		
+		hwBatteryCellTemperature OBJECT-TYPE
+		SYNTAX Integer32
+		UNITS "C"
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The temperature of battery cell.
+			Unit: C
+			Non-value: 0x7FFFFFFF"
+		::= { hwBatteryCellEntry 2 }
+		
+		hwBatteryCellVoltage OBJECT-TYPE
+		SYNTAX Integer32
+		UNITS "mV"
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The voltage of battery cell.
+			Unit: mV
+			Non-value: -1"
+		::= { hwBatteryCellEntry 3 }
 	
 		hwRemoteProvidePowerInfoTable OBJECT-TYPE
 		SYNTAX SEQUENCE OF HwRemoteProvidePowerInfoEntry
@@ -3080,7 +3553,7 @@
 		SYNTAX INTEGER     
 			{
 			normal(0),
-			break-down(1)
+			breakDown(1)
 			}
 		MAX-ACCESS read-only
 		STATUS current
@@ -3089,7 +3562,7 @@
 			The leaf is not supported.	
 			Options:
 			1. normal(0)    - indicates the AC input MCB trigger state is normal
-			2. break-down(1)- indicates the AC input MCB trigger state is break-down
+			2. breakDown(1)- indicates the AC input MCB trigger state is break-down
 			"
 		::= { hwACInfomationEntry 4 }         
 			
@@ -3107,7 +3580,7 @@
 
 		hwACInfoRowStatus OBJECT-TYPE
 		SYNTAX RowStatus
-		MAX-ACCESS read-write
+		MAX-ACCESS read-create
 		STATUS current
 		DESCRIPTION
 			"RowStatus standard operation
@@ -3325,7 +3798,7 @@
 			{
 			hwFrameIndex,
 			hwEnvEmuIndex,
-			hwDigChannelIndex,
+			hwPowerIndex,
 			hwEnvEmuType,		        
 		        hwPowerType
 			}
@@ -3341,7 +3814,7 @@
 			{
 			hwFrameIndex,
 			hwEnvEmuIndex,
-			hwDigChannelIndex,
+			hwPowerIndex,
 			hwEnvEmuType,		        
 		        hwPowerType
 			}
@@ -3576,4 +4049,856 @@
 			 "The agent generates this trap when the power module recovers.
 			 "
 			::= { hwEnvironPowerAlarmTrapsPrefix 28 }
+
+    hwPowerBatteryTempLowTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwPowerIndex,
+			hwEnvEmuType,		        
+		  hwPowerType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			  battery temperature is low.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 29 }
+
+    hwPowerBatteryTempLowRestoreTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwPowerIndex,
+			hwEnvEmuType,		        
+		  hwPowerType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			 battery recovers from low temperature.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 30 }
+			
+    hwPowerBatteryTempHighTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwPowerIndex,
+			hwEnvEmuType,		        
+		  hwPowerType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			 battery temperature is High.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 31 }
+			
+			
+    hwPowerBatteryTempHighRestoreTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwPowerIndex,
+			hwEnvEmuType,		        
+		  hwPowerType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			 battery recovers from High temperature.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 32 }
+
+    hwPowerBatteryChargeOverVolTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwPowerIndex,
+			hwEnvEmuType,		        
+		  hwPowerType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			 battery is charged over voltage.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 33 }
+					
+    hwPowerBatteryChargeOverVolRestoreTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwPowerIndex,
+			hwEnvEmuType,		        
+		        hwPowerType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			  battery recovers from charged over voltage.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 34 }
+			
+    hwPowerBatteryDischargeLackVolTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwPowerIndex,
+			hwEnvEmuType,		        
+		  hwPowerType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			  discharging battery is lack voltage.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 35 }
+					
+    hwPowerBatteryDischargeLackVolRestoreTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwPowerIndex,
+			hwEnvEmuType,		        
+		  hwPowerType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			  battery recovers from discharging lack voltage.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 36 }	
+			
+			
+	    hwPowerBatteryChargeOverCurTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwPowerIndex,
+			hwEnvEmuType,		        
+		  hwPowerType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			  battery is charged over current.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 37 }
+			
+     hwPowerBatteryChargeOverCurRestoreTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwPowerIndex,
+			hwEnvEmuType,		        
+		  hwPowerType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			  battery recovers from charged over current.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 38 }			
+			
+	    hwPowerBatteryDischargeOverCurTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwPowerIndex,
+			hwEnvEmuType,		        
+		  hwPowerType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			  discharging battery is over current.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 39 }
+			
+     hwPowerBatteryDischargeOverCurRestoreTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwPowerIndex,
+			hwEnvEmuType,		        
+		  hwPowerType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			  battery recovers from discharging over current.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 40 }	
+			
+     hwRemoteUnitCircuitFailTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwRemoteUnitSlotIndex,
+			hwRemoteUnitCircuitIndex,		        
+		  hwEnvEmuType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			  circuit of the power module is fault.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 41 }	
+			
+     hwRemoteUnitCircuitRestoreTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwRemoteUnitSlotIndex,
+			hwRemoteUnitCircuitIndex,		        
+		  hwEnvEmuType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			  circuit of the power module is recovers from fault.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 42 }
+				
+	 hwRemoteUnitFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwRemoteUnitSlotIndex,
+		  hwEnvEmuType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			  power module is fault.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 43 }      
+			
+	 hwRemoteUnitRestoreTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwRemoteUnitSlotIndex,
+		  hwEnvEmuType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			  power module is recovers from fault.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 44 } 
+			
+	        hwPowerBatteryEleCoreFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwEnvEmuType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			  LiBattery cell is fault.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 45 }
+   
+            hwPowerBatteryEleCoreRestoreTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwEnvEmuType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			  LiBattery cell is recovers from fault.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 46 }
+    hwPowerBatteryHeaterFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex			
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the 
+			battery heater fault occurs.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 47 }			
+			
+	hwPowerBatteryHeaterFaultRestoreTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the 
+			battery heater fault recovers.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 48 }	
+				
+	hwPowerBatteryPortReverseConnectTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the 
+			battery port is connected reversely.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 49 }			
+			
+	hwPowerBatteryPortReverseConnectRestoreTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the 
+			battery port is connected correctly .
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 50 }
+          
+	hwPowerBatteryContactorFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the 
+			battery contactor is fault.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 51 }
+            
+	hwPowerBatteryContactorRestoreTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the 
+			battery contactor fault recovers.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 52 }           
+            
+	hwPowerLowTemperatureProtectionFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the battery cell temperature is lower
+			than the protection point.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 53 }
+            
+	hwPowerLowTemperatureProtectionRestoreTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the 
+			battery cell low temperature protection fault recovers.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 54 }
+
+	hwPowerCellChargeHighTemperatureProtectionFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the battery cell temperature is higher
+			than the protection point when the battery is charging or discharging.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 55 }
+            
+	hwPowerCellChargeHighTemperatureProtectionRestoreTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the 
+			battery cell high temperature protection fault recovers.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 56 }
+
+	hwPowerOvervoltageProtectionFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the battery charging voltage is higher 
+			 than the protection point.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 57 }
+            
+	hwPowerOvervoltageProtectionRestoreTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the 
+			battery over voltage protection fault recovers.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 58 }
+
+	hwPowerOvercurrentProtectionFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the battery charging electric current is bigger 
+			 than the protection point.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 59 }
+            
+	hwPowerOvercurrentProtectionRestoreTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the 
+			battery over electric current protection fault recovers.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 60 }
+			
+	hwPowerBattCellPackFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the battery cell pack fault.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 61 }
+            
+	hwPowerBattCellPackRestoreTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the battery cell pack fault recovers.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 62 }
+			
+	hwPowerBattManualDisconnectionFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the battery  is disconnected manually.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 63 }
+            
+	hwPowerBattManualDisconnectionRestoreTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the battery manual disconnection fault recovers.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 64 }
+
+    hwEmmPowerBatteryBoardFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwPowerIndex,
+			hwEnvEmuType,
+	        hwPowerType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			 one or more batteries are not detected.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 65 }
+
+    hwEmmPowerBatteryBoardRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwPowerIndex,
+			hwEnvEmuType,
+		    hwPowerType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			 batteries recover.
+			 "
+			::= { hwEnvironPowerAlarmTrapsPrefix 66 }
+			
+			hwRemotePowerMonObjs OBJECT IDENTIFIER ::= { hwPower 5 }
+			hwRemoteUnitSysInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwRemoteUnitSysInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Remote power system, remote unit basic information table. The indexes of 
+				 this entry is hwEnvEmuIndex.
+				"
+			::= { hwRemotePowerMonObjs 1 }
+			
+			hwRemoteUnitSysInfoEntry OBJECT-TYPE
+			SYNTAX HwRemoteUnitSysInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Remote power system, remote unit basic information table. The indexes of 
+				 this entry is hwEnvEmuIndex.
+				"
+			INDEX { hwEnvEmuIndex }
+			::= { hwRemoteUnitSysInfoTable 1 }
+			
+			HwRemoteUnitSysInfoEntry ::=
+			SEQUENCE { 
+				hwRemoteUnitPowerSystype
+					INTEGER,
+				hwRemoteUnitDCOutputVol
+					Integer32,
+				hwRemoteUnitDCOutputCur
+					Integer32,
+				hwRemoteUnitSlotNum
+					Integer32
+			 }
+			
+			hwRemoteUnitPowerSystype OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				rftv(1),
+				rftc(2),
+				invalid(255)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Type of the remote unit power system.
+				 Options:
+				 1.rftv(1)              -  Type of the remote unit power system is RFT-V  
+				 2.rftc(2)              -  Type of the remote unit power system is RFT-C                                                                                
+				 3.invalid(255)         -  Unknown   
+				"
+			::= { hwRemoteUnitSysInfoEntry 1 }
+			
+			hwRemoteUnitDCOutputVol OBJECT-TYPE
+			SYNTAX Integer32
+			UNITS "mV"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The remote unit DC output voltage.
+				 Invalid(0x7FFFFFFF) indicates that device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal.
+				"
+			::= { hwRemoteUnitSysInfoEntry 2 }
+
+			hwRemoteUnitDCOutputCur OBJECT-TYPE
+			SYNTAX Integer32
+			UNITS "mA"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The remote unit DC output current.
+			 	 Invalid(0x7FFFFFFF) indicates that device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal.
+				"
+			::= { hwRemoteUnitSysInfoEntry 3 }
+			
+			hwRemoteUnitSlotNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The remote unit slot number.
+				 Invalid(-1) indicates that device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal.
+				"
+			::= { hwRemoteUnitSysInfoEntry 4 }		
+			
+			
+			hwRemoteUnitSlotTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwRemoteUnitSlotEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Remote power system, remote unit slot information table. The indexes of 
+				 this entry are hwEnvEmuIndex, hwRemoteUnitSlotIndex.
+				"
+			::= { hwRemotePowerMonObjs 2 }
+			
+			hwRemoteUnitSlotEntry OBJECT-TYPE
+			SYNTAX HwRemoteUnitSlotEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Remote power system, remote unit slot information table. The indexes of 
+				 this entry are hwEnvEmuIndex, hwRemoteUnitSlotIndex.
+				"
+			INDEX { hwEnvEmuIndex, hwRemoteUnitSlotIndex }
+			::= { hwRemoteUnitSlotTable 1 }
+			
+			HwRemoteUnitSlotEntry ::=
+			SEQUENCE { 
+				hwRemoteUnitSlotIndex
+					Integer32,
+				hwRemoteUnitSlotCircuitNum
+					Integer32,
+				hwRemoteUnitSlotHardVersion
+					OCTET STRING,
+				hwRemoteUnitSlotSoftVersion
+					OCTET STRING,
+				hwRemoteUnitSlotStatus
+					INTEGER,
+				hwRemoteUnitSlotAdminStatus
+					INTEGER,
+				hwRemoteUnitSlotDCOutputVol
+					Integer32,
+				hwRemoteUnitSlotDCOutputCur
+					Integer32
+			 }
+	
+			hwRemoteUnitSlotIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The remote unit slot index."
+			::= { hwRemoteUnitSlotEntry 1 }
+			
+			hwRemoteUnitSlotCircuitNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The remote unit slot circuit number.
+				 Invalid:-1.
+				"
+			::= { hwRemoteUnitSlotEntry 2 }
+			
+			hwRemoteUnitSlotHardVersion OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE(1..128))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The remote unit slot hard version.
+				 Invalid: null string.
+				"
+			::= { hwRemoteUnitSlotEntry 3 }
+			
+			hwRemoteUnitSlotSoftVersion OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE(1..128))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The remote unit slot soft version.
+				 Invalid: null string.
+				"
+			::= { hwRemoteUnitSlotEntry 4 }
+			
+			hwRemoteUnitSlotStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				normal(1),
+				fault(2),
+				null(3),
+				invalid(255)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The state of the remote unit slot.
+				 Options:
+				 1.normal(1)             -  The state of the remote unit slot is normal
+				 2.fault(2)              -  The state of the remote unit slot is fault
+				 3.null(3)               -  The state of the remote unit slot is null
+				 4.invalid(255)          -  Unknown
+				"
+			::= { hwRemoteUnitSlotEntry 5 }
+			
+			hwRemoteUnitSlotAdminStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				delete(1),
+				invalid(255)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Delete the remote unit slot.
+				 Options:
+				 1.delete(1)            -  Delete the remote unit slot  
+				 2.invalid(255)         -  Unknown   
+				"
+			::= { hwRemoteUnitSlotEntry 6 }
+			
+			hwRemoteUnitSlotDCOutputVol OBJECT-TYPE
+			SYNTAX Integer32
+			UNITS "mV"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The remote unit slot DC output voltage.
+				 Invalid:-1.
+				"
+			::= { hwRemoteUnitSlotEntry 7 }
+
+			hwRemoteUnitSlotDCOutputCur OBJECT-TYPE
+			SYNTAX Integer32
+			UNITS "mA"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The remote unit slot DC output current.
+				 Invalid:-1.
+				"
+			::= { hwRemoteUnitSlotEntry 8 }
+
+
+			hwRemoteUnitCircuitTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwRemoteUnitCircuitEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Remote power system, remote unit circuit information table. The indexes of 
+				 this entry are hwEnvEmuIndex, hwRemoteUnitSlotIndex, hwRemoteUnitCircuitIndex.
+				"
+			::= { hwRemotePowerMonObjs 3 }
+			
+			hwRemoteUnitCircuitEntry OBJECT-TYPE
+			SYNTAX HwRemoteUnitCircuitEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Remote power system, remote unit circuit information table. The indexes of 
+				 this entry are hwEnvEmuIndex, hwRemoteUnitSlotIndex, hwRemoteUnitCircuitIndex.
+				"
+			INDEX { hwEnvEmuIndex, hwRemoteUnitSlotIndex, hwRemoteUnitCircuitIndex }
+			::= { hwRemoteUnitCircuitTable 1 }
+			
+			HwRemoteUnitCircuitEntry ::=
+			SEQUENCE { 
+				hwRemoteUnitCircuitIndex
+					Integer32,
+				hwRemoteUnitCircuitInputVol
+					Integer32,
+				hwRemoteUnitCircuitInputCur
+					Integer32,
+				hwRemoteUnitCircuitState
+					INTEGER
+			 }
+	
+			hwRemoteUnitCircuitIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The remote unit circuit index."
+			::= { hwRemoteUnitCircuitEntry 1 }
+			
+			hwRemoteUnitCircuitInputVol OBJECT-TYPE		
+			SYNTAX Integer32
+			UNITS "mV"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The remote unit circuit input voltage.
+ 				 Invalid(0x7FFFFFFF) indicates that device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal.
+				"
+			::= { hwRemoteUnitCircuitEntry 2 }
+			
+			hwRemoteUnitCircuitInputCur OBJECT-TYPE
+			SYNTAX Integer32
+			UNITS "mA"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The remote unit circuit input current.
+				 Invalid(0x7FFFFFFF) indicates that device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal.
+				"
+			::= { hwRemoteUnitCircuitEntry 3 }
+			
+			hwRemoteUnitCircuitState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				normal(1),
+				fault(2),
+				null(3),
+				invalid(255)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The state of the remote unit circuit.
+				 Options:
+				 1.normal(1)             -  The state of the remote unit circuit is normal
+				 2.fault(2)              -  The state of the remote unit circuit is fault
+				 3.null(3)               -  The state of the remote unit circuit is null
+				 4.invalid(255)          -  Unknown
+				"
+			::= { hwRemoteUnitCircuitEntry 4 }
+			
 END

@@ -9,38 +9,19 @@ IMPORTS
       FROM SNMPv2-TC;
 
 snMetroRing MODULE-IDENTITY
-    LAST-UPDATED "201006020000Z"  -- 04 June 2010
-    ORGANIZATION "Brocade Communications Systems, Inc."
+    LAST-UPDATED "201708070000Z" -- Aug7, 2017
+    ORGANIZATION "Ruckus Wireless, Inc."
     CONTACT-INFO
-             "Technical Support Center
-              130 Holger Way,
-              San Jose, CA  95134
-              Email:  ipsupport@brocade.com
-              Phone: 1-800-752-8061
-              URL:  www.brocade.com"
+            ""
     DESCRIPTION
-             "Management Information Base module for metro ring
-              configuration and statistics.
-
-              Copyright 1996-2010 Brocade Communications Systems, Inc.
-              All rights reserved.
-              This Brocade Communications Systems SNMP Management Information Base Specification
-              embodies Brocade Communications Systems' confidential and proprietary
-              intellectual property. Brocade Communications Systems retains all
-              title and ownership in the Specification, including any revisions.
-
-              This Specification is supplied AS IS, and Brocade Communications Systems makes
-              no warranty, either express or implied, as to the use,
-              operation, condition, or performance of the specification, and any unintended
-              consequence it may on the user environment."
-
-    REVISION        "201006020000Z"  -- 04 June 2010
-    DESCRIPTION
-        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
-
-    REVISION     "200705160000Z" -- May 16, 2007
+            "Management Information Base module for metro ring
+            configuration and statistics."
+    REVISION     "201708070000Z" -- Aug 7, 2017
     DESCRIPTION
             ""
+    REVISION     "201708070000Z" -- Aug 7, 2017
+    DESCRIPTION
+             "Modified Organization"
    ::= { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) foundry(1991) products(1) switch(1) snSwitch(3) 29 }
 
 snMetroRingGlobalObjects OBJECT IDENTIFIER ::= { snMetroRing 1 }
@@ -344,4 +325,4 @@ snMetroRingSecPortActivePort OBJECT-TYPE
             "The ifIndex value of active secondary port."
     ::= { snMetroRingEntry 24 }
 
-END
+END		

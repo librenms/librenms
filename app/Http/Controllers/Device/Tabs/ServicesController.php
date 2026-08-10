@@ -27,14 +27,16 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use App\Models\Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class ServicesController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        return (bool) \App\Facades\LibrenmsConfig::get('show_services') && $device->services()->exists();
+        return Gate::allows('viewAny', Service::class) && $device->services()->exists();
     }
 
     public function slug(): string

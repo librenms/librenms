@@ -1,7 +1,7 @@
 
 # SDFS info
 
-A small shell script that exportfs SDFS volume info.
+A small shell script that exports SDFS volume info.
 
 ## SNMP Extend
 

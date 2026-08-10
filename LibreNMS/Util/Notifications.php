@@ -96,7 +96,18 @@ class Notifications
         foreach (LibrenmsConfig::get('notifications') as $name => $url) {
             echo '[ ' . date('r') . " ] $name $url ";
 
-            $feed = json_decode(json_encode(simplexml_load_string(file_get_contents($url))), true);
+            // fix relative path urls
+            if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+                $url = str_starts_with($url, '/') ? $url : base_path($url);
+            }
+
+            if (is_file($url)) {
+                $data = file_get_contents($url);
+            } else {
+                $data = Http::client()->get($url)->body();
+            }
+
+            $feed = json_decode(json_encode(simplexml_load_string($data)), true);
             $feed = isset($feed['channel']) ? self::parseRss($feed) : self::parseAtom($feed);
 
             array_walk($feed, function (&$items, $key, $url): void {

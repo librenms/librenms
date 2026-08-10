@@ -130,7 +130,7 @@ class PageLinks extends Component
             'icon' => 'fa-lock',
             'url' => $ssh_url,
             'title' => __('SSH'),
-            'external' => true,
+            'external' => false,
         ];
 
         // Telnet
@@ -139,10 +139,10 @@ class PageLinks extends Component
             'icon' => 'fa-terminal',
             'url' => 'telnet://' . $device->hostname . $telnet_port,
             'title' => __('Telnet'),
-            'external' => true,
+            'external' => false,
         ];
 
-        if (Gate::allows('admin')) {
+        if (Gate::allows('debug', \App\Models\Device::class)) {
             $device_links['capture'] = [
                 'icon' => 'fa-bug',
                 'url' => route('device', [$device->device_id, 'capture']),

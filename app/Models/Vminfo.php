@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-use Config;
+use App\Facades\LibrenmsConfig;
+use App\Observers\VminfoObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -12,6 +14,7 @@ use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
+#[ObservedBy([VminfoObserver::class])]
 class Vminfo extends DeviceRelatedModel implements Keyable
 {
     use HasFactory;
@@ -55,8 +58,8 @@ class Vminfo extends DeviceRelatedModel implements Keyable
     {
         $where = [$device->hostname];
 
-        if (Config::get('mydomain')) {
-            $where[] = $device->hostname . '.' . Config::get('mydomain');
+        if (LibrenmsConfig::get('mydomain')) {
+            $where[] = $device->hostname . '.' . LibrenmsConfig::get('mydomain');
         }
 
         return $query->whereIn('vmwVmDisplayName', $where);
@@ -70,8 +73,8 @@ class Vminfo extends DeviceRelatedModel implements Keyable
         return $this->hasOne(Device::class, 'hostname', 'vmwVmDisplayName');
     }
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
-        return $this->vm_type . $this->vmwVmVMID;
+        return "$this->vm_type-$this->vmwVmVMID";
     }
 }

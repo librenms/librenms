@@ -4,11 +4,11 @@ $action = $_POST['action'] ?? 'none';
 $confirm = $_POST['confirm'] ?? 'none';
 
 if ($action == 'delete_bill' && $confirm == 'confirm') {
-    dbDelete('bill_history', '`bill_id` = ?', [$bill_id]);
-    dbDelete('bill_ports', '`bill_id` = ?', [$bill_id]);
-    dbDelete('bill_data', '`bill_id` = ?', [$bill_id]);
-    dbDelete('bill_perms', '`bill_id` = ?', [$bill_id]);
-    dbDelete('bills', '`bill_id` = ?', [$bill_id]);
+    \App\Models\BillHistory::where('bill_id', $bill_id)->delete();
+    \App\Models\BillPort::where('bill_id', $bill_id)->delete();
+    \App\Models\BillData::where('bill_id', $bill_id)->delete();
+    \App\Models\BillPerm::where('bill_id', $bill_id)->delete();
+    \App\Models\Bill::where('bill_id', $bill_id)->delete();
 
     echo '<div class=infobox>Bill Deleted. Redirecting to Bills list.</div>';
 
@@ -17,8 +17,8 @@ if ($action == 'delete_bill' && $confirm == 'confirm') {
 
 if ($action == 'reset_bill' && ($confirm == 'rrd' || $confirm == 'mysql')) {
     if ($confirm == 'mysql') {
-        dbDelete('bill_history', '`bill_id` = ?', [$bill_id]);
-        dbDelete('bill_data', '`bill_id` = ?', [$bill_id]);
+        \App\Models\BillHistory::where('bill_id', $bill_id)->delete();
+        \App\Models\BillData::where('bill_id', $bill_id)->delete();
     }
 
     if ($confirm == 'rrd') {
@@ -35,7 +35,7 @@ if ($action == 'add_bill_port') {
 }
 
 if ($action == 'delete_bill_port') {
-    dbDelete('bill_ports', '`bill_id` =  ? AND `port_id` = ?', [$bill_id, $_POST['port_id']]);
+    \App\Models\BillPort::where('bill_id', $bill_id)->where('port_id', $_POST['port_id'])->delete();
 }
 
 if ($action == 'update_bill') {

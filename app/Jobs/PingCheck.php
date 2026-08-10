@@ -26,7 +26,10 @@
 
 namespace App\Jobs;
 
+use App\Action;
+use App\Actions\Alerts\RunAlertRulesAction;
 use App\Actions\Device\SetDeviceAvailability;
+use App\Actions\Device\UpdateDeviceOutage;
 use App\Models\Device;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -34,11 +37,10 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Alert\AlertRules;
-use LibreNMS\Data\Source\Fping;
-use LibreNMS\Data\Source\FpingResponse;
-use LibreNMS\Enum\AvailabilitySource;
+use LibreNMS\Data\Source\Icmp\Fping;
+use LibreNMS\Data\Source\Icmp\FpingResponse;
 
 class PingCheck implements ShouldQueue
 {
@@ -48,7 +50,7 @@ class PingCheck implements ShouldQueue
     private Collection $devices;
 
     // working data for loop
-    /** @var Collection */
+    /** @var Collection<int, \Illuminate\Database\Eloquent\Collection<int, Device>> */
     private Collection $deferred;
     /** @var Collection<int, Collection<int, bool>> device id, parent devices */
     private Collection $waiting_on;
@@ -80,8 +82,10 @@ class PingCheck implements ShouldQueue
 
         Log::info('Processing hosts in this order : ' . implode(', ', $ordered_hostname_list));
 
-        // bulk ping and send FpingResponse's to recordData as they come in
-        app()->make(Fping::class)->bulkPing($ordered_hostname_list, $this->handleResponse(...));
+        // bulk ping and send FpingResponse to recordData as they come in
+        app()->make(Fping::class)->bulkPing($ordered_hostname_list, function (FpingResponse $response): void {
+            $this->handleResponse($response);
+        });
 
         // check for any left over devices
         if ($this->deferred->isNotEmpty()) {
@@ -92,13 +96,15 @@ class PingCheck implements ShouldQueue
             Log::debug("Leftover waiting on devices, this shouldn't happen: " . $this->waiting_on->keys()->implode(', '));
         }
 
-        if (\App::runningInConsole()) {
+        if (App::runningInConsole()) {
             printf("Pinged %s devices in %.2fs\n", $this->devices->count(), microtime(true) - $ping_start);
         }
     }
 
     /**
      * Get an ordered list of hostnames that we need to ping starting from devices with no parents
+     *
+     * @param  Collection<string, Device>  $devices
      */
     private function orderHostnames(Collection $devices): array
     {
@@ -126,6 +132,8 @@ class PingCheck implements ShouldQueue
 
     /**
      * Fetch and cache all devices that we need to process
+     *
+     * @return Collection<string, Device>
      */
     private function fetchDevices(): Collection
     {
@@ -159,7 +167,7 @@ class PingCheck implements ShouldQueue
      */
     public function handleResponse(FpingResponse $response): void
     {
-        Log::debug("Attempting to record data for $response->host");
+        Log::debug("Received response for $response->host");
 
         $device = $this->devices->get($response->host);
 
@@ -177,10 +185,11 @@ class PingCheck implements ShouldQueue
         }
 
         // mark up only if snmp is not down too
-        $changed = app(SetDeviceAvailability::class)->execute($device, $response->success(), AvailabilitySource::ICMP, true);
-
-        // save last_ping_timetaken and rrd data
-        $response->saveStats($device);
+        $changed = app(SetDeviceAvailability::class)->execute($device, ['icmp' => $response->isAlive()]);
+        $device->save();
+        if ($changed) {
+            app(UpdateDeviceOutage::class)->execute($device);
+        }
 
         // mark as processed
         $this->processed->put($device->device_id, true);
@@ -191,7 +200,7 @@ class PingCheck implements ShouldQueue
             Log::debug("Device $device->hostname changed status to $type, running alerts");
 
             if (count($waiting_on) === 0) {
-                $this->runAlerts($device->device_id);
+                Action::execute(RunAlertRulesAction::class, device: $device);
             } else {
                 Log::debug('Alerts Deferred');
 
@@ -240,7 +249,7 @@ class PingCheck implements ShouldQueue
                     if ($alert_child) {
                         Log::debug("Deferred device $child_id triggered by $device_id");
 
-                        $this->runAlerts($child_id);
+                        Action::execute(RunAlertRulesAction::class, device: $this->devices->get($child_id));
                         $this->deferred->pull($child_id);
                     }
                 }
@@ -248,14 +257,5 @@ class PingCheck implements ShouldQueue
         }
 
         $this->waiting_on->pull($device_id);
-    }
-
-    /**
-     * run alerts for a device
-     */
-    private function runAlerts(int $device_id): void
-    {
-        $rules = new AlertRules;
-        $rules->runRules($device_id);
     }
 }

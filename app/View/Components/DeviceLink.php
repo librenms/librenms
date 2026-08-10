@@ -4,6 +4,7 @@ namespace App\View\Components;
 
 use App\Facades\DeviceCache;
 use App\Models\Device;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\Component;
 use LibreNMS\Util\Graph;
 
@@ -53,7 +54,7 @@ class DeviceLink extends Component
             return view('components.device-link-missing');
         }
 
-        if (! $this->device->canAccess(auth()->user())) {
+        if (Gate::denies('view', $this->device)) {
             return view('components.device-link-no-access');
         }
 

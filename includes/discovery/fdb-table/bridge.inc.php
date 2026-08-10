@@ -61,6 +61,10 @@ if (! empty($fdbPort_table)) {
     foreach ($vlan_cur_table as $a) {
         // Then by VLAN ID mapped to a single member array with the dot1qVlanFdbId
         foreach ($a as $vid => $data) {
+            // Skip if $data is not an array (can happen with malformed SNMP responses)
+            if (! is_array($data) || ! isset($data['dot1qVlanFdbId'])) {
+                continue;
+            }
             // Flip it round into the dictionary
             $vlan_fdb_dict[$data['dot1qVlanFdbId']] = $vid;
         }
@@ -73,7 +77,25 @@ if (! empty($fdbPort_table)) {
         // device VLANs table should catch anything invalid.
         $vlan = $vlan_fdb_dict[$vlanIndex] ?? $vlanIndex;
 
-        foreach ($data[$data_oid] ?? [] as $mac => $dot1dBasePort) {
+        // Some SNMP agents (arubaos-cx, comtrol) prepend a length byte to
+        // MacAddress indexes, encoding 7 bytes instead of 6.  With -OX the
+        // last octet spills out of the bracket into a nested array level:
+        //   dot1dTpFdbPort[6:0:a:f7:ec:d1].97 = 10
+        //   → key '6:0:a:f7:ec:d1', value ['97' => '10']
+        // Strip the length prefix, append the spilled octet (decimal → hex).
+        $fdb_entries = $data[$data_oid] ?? [];
+        foreach ($fdb_entries as $mac => $dot1dBasePort) {
+            if (is_array($dot1dBasePort)) {
+                unset($fdb_entries[$mac]);
+                $octets = explode(':', (string) $mac);
+                array_shift($octets); // drop length prefix byte
+                foreach ($dot1dBasePort as $spilled_octet => $port) {
+                    $fdb_entries[implode(':', [...$octets, dechex((int) $spilled_octet)])] = $port;
+                }
+            }
+        }
+
+        foreach ($fdb_entries as $mac => $dot1dBasePort) {
             if ($dot1dBasePort == 0) {
                 Log::debug("No port known for $mac\n");
                 continue;

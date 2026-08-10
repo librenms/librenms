@@ -1,10 +1,11 @@
 -- =====================================================================
--- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2023 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description: Huawei Configuration management MIB
 -- Reference:   HUAWEI Enterprise MIB
--- Version:     V2.54
+-- Version:     V2.55
 -- History:
+--  2023-01-18  v2.55  zhanglele add hwOnboardFirmwareDamaged for pkgm
 --  2022-10-26  v2.54  heyaner add hwHATraps for HA
 --  2022-04-02  v2.53  liujunjie modify description of node hwSmartUpgradeUserDataRetentionPeriodHasExpired, hwSmartUpgradeUserDataRetentionPeriodHasExpiredResume, hwTpmChipFault and hwTpmChipFaultClear.
 --  2021-11-08  v2.52  luowenbin add node hwPreviousPackage
@@ -88,7 +89,7 @@ HUAWEI-SYS-MAN-MIB DEFINITIONS ::= BEGIN
             FROM SNMP-FRAMEWORK-MIB;
 
     huaweiSystemManMIB MODULE-IDENTITY 
-        LAST-UPDATED "202210261425Z"        -- Oct. 26, 2022  GMT
+        LAST-UPDATED "202301181446Z"        -- Jan. 18, 2023  GMT
         ORGANIZATION 
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
@@ -106,6 +107,10 @@ HUAWEI-SYS-MAN-MIB DEFINITIONS ::= BEGIN
             reload actions, and notifications. By querying the system time,
             configuration files and system image files, NMS can reboot the device
             in the specified time and the specified configuration and system image."
+       REVISION
+            "202301181446Z"
+       DESCRIPTION 
+           "add node hwOnboardFirmwareDamaged."
        REVISION
             "202210261425Z"
        DESCRIPTION 
@@ -4364,7 +4369,14 @@ HUAWEI-SYS-MAN-MIB DEFINITIONS ::= BEGIN
 	DESCRIPTION 
 		"This alarm is cleared when the data of the active and standby components is successfully backed up."
 	::= { hwHANotifications 2 }
-	   
+	
+    hwOnboardFirmwareDamaged NOTIFICATION-TYPE
+    OBJECTS { entPhysicalIndex, entPhysicalName }
+    STATUS current
+    DESCRIPTION
+        "The onboard firmware is damaged."
+    ::= { huaweiSystemManMIBNotifications 45 }
+
     huaweiSystemManMIBConformance OBJECT IDENTIFIER ::= { huaweiSystemManMIB 3 }
 
     huaweiSystemManMIBCompliances OBJECT IDENTIFIER ::= { huaweiSystemManMIBConformance 1 }
@@ -4428,7 +4440,7 @@ HUAWEI-SYS-MAN-MIB DEFINITIONS ::= BEGIN
             NOTIFICATIONS { hwSysClockChangedNotification, hwSysReloadNotification, hwSysSlaveSwitchSuccessNotification,
             hwSysSlaveSwitchFailNotification, hwSysIssuNotification, hwPatchInstallFail, hwPatchInstallFailClear, hwSumUpgradeSuccess, hwSysCfgFileErrorNotification, hwSysImageErrorNotification, hwSysPafChangeNotification, 
             hwSysLicenseChangeNotification, hwSystemBoardExclude, hwSystemBoardExcludeClear, hwEvmVmAbnormalRunNotification, hwEvmVmNotRunningNotification, hwEvmVmAbnormalRestartNotification, hwEvmDownloadFailedNotification, hwEvmInstallFailedNotification,
-            hwSysImageDamagedNotification, hwComponentBackupFail, hwComponentBackupFailResume }
+            hwSysImageDamagedNotification, hwComponentBackupFail, hwComponentBackupFailResume, hwOnboardFirmwareDamaged }
         STATUS current
         DESCRIPTION 
             "A collection of notification."

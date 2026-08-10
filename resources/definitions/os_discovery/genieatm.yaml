@@ -1,0 +1,7 @@
+---
+modules:
+  os:
+    hardware_mib: GENIE-GE-ROOT-MIB
+    hardware_replace:
+      - ['/^geAtm/', 'GenieATM ']
+    sysDescr_regex: '/version: (?<version>.*) built:/'

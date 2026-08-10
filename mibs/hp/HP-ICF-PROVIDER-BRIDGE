@@ -1,12 +1,10 @@
 HP-ICF-PROVIDER-BRIDGE DEFINITIONS ::= BEGIN
 
     IMPORTS
-        hpSwitch            
-            FROM HP-ICF-OID            
-        OBJECT-TYPE, MODULE-IDENTITY
+        hpSwitch
+	    FROM HP-ICF-OID
+        OBJECT-TYPE, MODULE-IDENTITY, Integer32
             FROM SNMPv2-SMI
-        TruthValue
-            FROM SNMPv2-TC
         MODULE-COMPLIANCE, OBJECT-GROUP
             FROM SNMPv2-CONF
         dot1qVlanStaticEntry 
@@ -14,17 +12,18 @@ HP-ICF-PROVIDER-BRIDGE DEFINITIONS ::= BEGIN
         ifIndex 
             FROM IF-MIB;
 
-
     hpicfProviderBridge MODULE-IDENTITY
-        LAST-UPDATED "200608150000Z"  -- August 15, 2006
-        ORGANIZATION "Hewlett-Packard Company
-                      Procurve Networking Business"
+        LAST-UPDATED "200810010000Z"  -- Oct 01, 2008
+        ORGANIZATION "HP Networking"
         CONTACT-INFO "Hewlett-Packard Company
                       8000 Foothills Blvd.
                       Roseville, CA 95747"
         DESCRIPTION  "This MIB module contains the HP 'version'
                       of the standard Provider Bridge MIB and 
                       the proprietary extensions to it."
+        
+        REVISION     "200810010000Z"  -- Oct 01, 2008
+        DESCRIPTION  "Added hpSwitch to imports section."
         
         REVISION     "200608150000Z"  -- August 15, 2006
         DESCRIPTION  "Initial revision."
@@ -76,14 +75,15 @@ HP-ICF-PROVIDER-BRIDGE DEFINITIONS ::= BEGIN
 -- a vlanSvlanBridge..
 
     hpicfProviderBridgeEtherType OBJECT-TYPE
-        SYNTAX      INTEGER (1536..65535)
+        SYNTAX      Integer32 (1536..65535)
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION "Defines the 2-byte ethertype for provider tagged frames.
 	             The default is 0x88a8. 
                      Changing from one tag-type to another with a given 
-                     hpicfProviderBridgeType configuration will reboot the
-                     device and the new tag-type will take effect subsequently."
+                     hpicfProviderBridgeType configuration will save current
+                     configurations and reboot the device, the new tag-type
+                     will take effect subsequently."
         DEFVAL     { 34984 }
         ::= { hpicfProviderBridgeBase 2 }
 
@@ -204,7 +204,7 @@ HP-ICF-PROVIDER-BRIDGE DEFINITIONS ::= BEGIN
         OBJECTS     { hpicfProviderBridgeType,
                       hpicfProviderBridgeEtherType, 
                       hpicfProviderBridgePortType,
-                      hpicfProviderBridgeVlanTypeTable
+                      hpicfProviderBridgeVlanType
                      }
         STATUS      current
         DESCRIPTION "Basic Provider Bridge configuration information."

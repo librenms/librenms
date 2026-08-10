@@ -250,6 +250,11 @@ Route: `/api/v0/devices/:hostname/health(/:type)(/:sensor_id)`
 - type (optional) is health type / sensor class
 - sensor_id (optional) is the sensor id to retrieve specific information.
 
+`type` may be a sensor class (e.g. `device_voltage`) or one of the special
+classes `device_processor`, `device_storage` and `device_mempool`, which are
+stored in their own tables rather than the `sensors` table. The `device_`
+prefix is optional, so `processor` and `device_processor` are equivalent.
+
 Input:
 
   -
@@ -262,7 +267,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "message": "",
@@ -288,7 +293,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "message": "",
@@ -314,7 +319,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "message": "",
@@ -348,6 +353,28 @@ Output:
 }
 ```
 
+Example (processor list):
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/health/processor
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "",
+    "count": 1,
+    "graphs": [
+        {
+            "sensor_id": "1",
+            "desc": "Processor"
+        }
+    ]
+}
+```
+
 ### `list_available_wireless_graphs`
 
 This function allows to do three things:
@@ -374,7 +401,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "graphs": [
@@ -399,7 +426,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "graphs": [
@@ -419,12 +446,12 @@ Output:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/health/device_wireless_ccq/1
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/wireless/device_wireless_ccq/1
 ```
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "graphs": [
@@ -452,6 +479,84 @@ Output:
             "lastupdate": "2017-12-06 21:26:29",
             "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.3.0\"]",
             "access_point_id": null
+        }
+    ],
+    "count": 1
+}
+```
+
+### `get_device_wireless_sensors`
+
+Get the wireless sensors recorded for a device. Returns rows from the
+`wireless_sensors` table, optionally filtered by sensor class and projected
+to a chosen subset of columns.
+
+Route: `/api/v0/devices/:hostname/wireless-sensors`
+
+- hostname can be either the device hostname or id
+
+Input:
+
+- class (optional): filter rows by `sensor_class`. Must be one of the
+  wireless sensor types (`clients`, `rssi`, `snr`, `mcs`, `frequency`,
+  `capacity`, `distance`, `quality`, etc.).
+- columns (optional): comma-separated list of `wireless_sensors` columns to
+  return. Defaults to all columns.
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/wireless-sensors
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "wireless_sensors": [
+        {
+            "sensor_id": 5132,
+            "sensor_deleted": 0,
+            "sensor_class": "rssi",
+            "device_id": 42,
+            "sensor_index": "1",
+            "sensor_type": "epmp-ap-ul",
+            "sensor_descr": "Subscriber-1 (10.0.0.11) [aa:bb:cc:dd:ee:f1] UL RSSI",
+            "sensor_divisor": 1,
+            "sensor_multiplier": 1,
+            "sensor_current": -54,
+            "sensor_prev": -54,
+            "sensor_limit": null,
+            "sensor_limit_warn": null,
+            "sensor_limit_low": null,
+            "sensor_limit_low_warn": null,
+            "sensor_alert": 1,
+            "sensor_custom": "No",
+            "sensor_oids": "[\".1.3.6.1.4.1.17713.21.1.2.30.1.4.1\"]"
+        }
+    ],
+    "count": 1
+}
+```
+
+Example filtered by class and selecting a subset of columns:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/wireless-sensors?class=rssi&columns=sensor_id,sensor_index,sensor_descr,sensor_current
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "wireless_sensors": [
+        {
+            "sensor_id": 5132,
+            "sensor_index": "1",
+            "sensor_descr": "Subscriber-1 (10.0.0.11) [aa:bb:cc:dd:ee:f1] UL RSSI",
+            "sensor_current": -54
         }
     ],
     "count": 1
@@ -588,7 +693,7 @@ Input:
   Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services/localhost/35/graphs/loss
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/services/35/graphs/loss
 ```
 
 Output:
@@ -607,6 +712,7 @@ Route: `/api/v0/devices/:hostname/ports`
 Input:
 
 - columns: Comma separated list of columns you want returned.
+- `with=vlans`. Returns VLAN associations (tagged and untagged) for each port.
 
 Example:
 
@@ -634,6 +740,54 @@ Output:
     ]
 }
 ```
+
+Example with VLANs:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/ports?with=vlans
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "ports": [
+        {
+            "port_id": 12345,
+            "ifName": "Gi1/0/1",
+            "vlans": [
+                {
+                    "port_vlan_id": 2,
+                    "device_id": 3,
+                    "port_id": 12345,
+                    "vlan": 1,
+                    "baseport": 2,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "port_vlan_id": 54,
+                    "device_id": 3,
+                    "port_id": 12345,
+                    "vlan": 250,
+                    "baseport": 2,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                }
+            ]
+        }
+    ]
+}
+```
+
+> **Note:** Using `with=vlans` on devices with many ports may increase response
+> size and memory usage. Consider using the `columns` parameter to limit
+> returned fields when fetching VLAN data for large devices.
 
 ### `get_device_fdb`
 
@@ -769,23 +923,23 @@ Output:
 
 ```json
 {
-  "status": "ok",
-  "message": "",
-  "count": 2,
-  "mappings": [
-    {
-      "device_id": "3742",
-      "port_id_high": "1001000",
-      "port_id_low": "51001",
-      "ifStackStatus": "active"
-    },
-    {
-      "device_id": "3742",
-      "port_id_high": "1001000",
-      "port_id_low": "52001",
-      "ifStackStatus": "active"
-    }
-  ]
+    "status": "ok",
+    "message": "",
+    "count": 2,
+    "mappings": [
+        {
+            "device_id": "3742",
+            "port_id_high": "1001000",
+            "port_id_low": "51001",
+            "ifStackStatus": "active"
+        },
+        {
+            "device_id": "3742",
+            "port_id_high": "1001000",
+            "port_id_low": "52001",
+            "ifStackStatus": "active"
+        }
+    ]
 }
 ```
 
@@ -1035,14 +1189,14 @@ Output:
 
 ```json
 {
- "status": "ok",
- "port": {
-  "port_id": "2",
-  "device_id": "1",
-  ...
-  "poll_prev": "1418412902",
-  "poll_period": "300"
- }
+    "status": "ok",
+    "port": {
+        "port_id": "2",
+        "device_id": "1",
+        ...
+        "poll_prev": "1418412902",
+        "poll_period": "300"
+    }
 }
 ```
 
@@ -1055,11 +1209,11 @@ Route: `/api/v0/devices/:hostname/ports/:ifname/:type`
 - hostname can be either the device hostname or id
 - ifname can be any of the interface names for the device which can be
   obtained using
-  [`get_port_graphs`](#get_port_graphs). Please ensure that
+  [`get_device_ports`](#get_device_ports). Please ensure that
   the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need
   to be urlencoded.
 - type is the port type you want the graph for, you can request a list
-  of ports for a device with [`get_port_graphs`](#get_port_graphs).
+  of ports for a device with [`get_device_ports`](#get_device_ports).
 
 Input:
 
@@ -1074,6 +1228,7 @@ Input:
 - ifDescr: If this is set to true then we will use ifDescr to lookup
   the port instead of ifName. Pass the ifDescr value you want to
   search as you would ifName.
+- graph_type: This can be png or svg to force the output as required.
 
 Example:
 
@@ -1183,17 +1338,17 @@ Output:
 
 ```json
 {
- "status": "ok",
- "count": 1,
- "devices": [
-  {
-   "device_id": "1",
-   "hostname": "localhost",
-   ...
-   "serial": null,
-   "icon": null
-  }
- ]
+    "status": "ok",
+    "count": 1,
+    "devices": [
+        {
+            "device_id": "1",
+            "hostname": "localhost",
+            ...
+            "serial": null,
+            "icon": null
+        }
+    ]
 }
 ```
 
@@ -1207,17 +1362,17 @@ Output:
 
 ```json
 {
- "status": "ok",
- "count": 1,
- "devices": [
-  {
-   "device_id": "1",
-   "hostname": "localhost",
-   ...
-   "serial": null,
-   "icon": null
-  }
- ]
+    "status": "ok",
+    "count": 1,
+    "devices": [
+        {
+            "device_id": "1",
+            "hostname": "localhost",
+            ...
+            "serial": null,
+            "icon": null
+        }
+    ]
 }
 ```
 
@@ -1273,10 +1428,10 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
   -X POST https://foo.example/api/v0/devices/localhost/maintenance/ \
   --data-raw '
 {
- "title":"Device Maintenance",
-  "notes":"A 2 hour Maintenance triggered via API with start time",
-  "start":"2022-08-01 08:00:00",
-  "duration":"2:00"
+    "title":"Device Maintenance",
+    "notes":"A 2 hour Maintenance triggered via API with start time",
+    "start":"2022-08-01 08:00:00",
+    "duration":"2:00"
 }
 '
 ```
@@ -1296,9 +1451,10 @@ Example with no start time:
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
   -X POST https://foo.example/api/v0/devices/localhost/maintenance/ \
   --data-raw '
- "title":"Device Maintenance",
-  "notes":"A 2 hour Maintenance triggered via API with no start time",
-  "duration":"2:00"
+{
+    "title":"Device Maintenance",
+    "notes":"A 2 hour Maintenance triggered via API with no start time",
+    "duration":"2:00"
 }
 '
 ```
@@ -1328,10 +1484,10 @@ Input (JSON):
 Fields:
 
 - hostname (required): device hostname or IP
-- display: A string to display as the name of this device, defaults to 
+- display_template: A string to display as the name of this device, defaults to 
   hostname (or device_display_default setting). May be a simple
   template using replacements: {{ $hostname }}, {{ $sysName }},
-  {{ $sysName_fallback }}, {{ $ip }}
+  {{ $sysName_fallback }}, {{ $ip }}. This will then generate the display field.
 - snmpver: SNMP version to use, v1, v2c or v3. During checks detection order is v2c,v3,v1
 - port: SNMP port (defaults to port defined in config).
 - transport: SNMP protocol (udp,tcp,udp6,tcp6) Defaults to transport defined in config.

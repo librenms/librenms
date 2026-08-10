@@ -1,0 +1,1443 @@
+ BFD-STD-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS
+     MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+         mib-2, Integer32, Unsigned32, Counter32, Counter64
+         FROM SNMPv2-SMI                       -- RFC 2578
+
+     TruthValue, RowStatus, StorageType, TimeStamp
+         FROM SNMPv2-TC                        -- RFC 2579
+
+     MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+         FROM SNMPv2-CONF                      -- RFC 2580
+
+     InterfaceIndexOrZero
+         FROM IF-MIB                           -- RFC 2863
+
+     InetAddress, InetAddressType, InetPortNumber
+         FROM INET-ADDRESS-MIB
+
+     IndexIntegerNextFree
+         FROM DIFFSERV-MIB                     -- RFC 3289
+
+     BfdSessIndexTC, BfdIntervalTC, BfdMultiplierTC,
+     BfdCtrlDestPortNumberTC, BfdCtrlSourcePortNumberTC
+         FROM BFD-TC-STD-MIB
+
+     IANAbfdDiagTC, IANAbfdSessTypeTC, IANAbfdSessOperModeTC,
+     IANAbfdSessStateTC, IANAbfdSessAuthenticationTypeTC,
+     IANAbfdSessAuthenticationKeyTC
+         FROM IANA-BFD-TC-STD-MIB;
+
+ bfdMIB MODULE-IDENTITY
+     LAST-UPDATED "201408120000Z" -- 12 August 2014 00:00:00 GMT
+     ORGANIZATION "IETF Bidirectional Forwarding Detection
+                   Working Group"
+     CONTACT-INFO
+         "Thomas D. Nadeau
+          Brocade
+          Email:  tnadeau@lucidvision.com
+
+          Zafar Ali
+          Cisco Systems, Inc.
+          Email:  zali@cisco.com
+
+          Nobo Akiya
+          Cisco Systems, Inc.
+          Email:  nobo@cisco.com
+
+          Comments about this document should be emailed
+          directly to the BFD Working Group mailing list
+          at rtg-bfd@ietf.org"
+     DESCRIPTION
+         "Bidirectional Forwarding Management Information Base.
+
+          Copyright (c) 2014 IETF Trust and the persons identified
+          as authors of the code.  All rights reserved.
+
+          Redistribution and use in source and binary forms, with
+          or without modification, is permitted pursuant to, and
+          subject to the license terms contained in, the Simplified
+          BSD License set forth in Section 4.c of the IETF Trust's
+          Legal Provisions Relating to IETF Documents
+          (http://trustee.ietf.org/license-info)."
+     REVISION "201408120000Z" -- 12 August 2014 00:00:00 GMT
+     DESCRIPTION
+         "Initial version.  Published as RFC 7331."
+     ::= { mib-2 222 }
+
+-- Top-level components of this MIB module.
+
+ bfdNotifications OBJECT IDENTIFIER ::= { bfdMIB 0 }
+
+ bfdObjects       OBJECT IDENTIFIER ::= { bfdMIB 1 }
+
+ bfdConformance   OBJECT IDENTIFIER ::= { bfdMIB 2 }
+
+ bfdScalarObjects OBJECT IDENTIFIER ::= { bfdObjects 1 }
+
+-- BFD General Variables
+-- These parameters apply globally to the system's
+-- BFD process.
+
+ bfdAdminStatus OBJECT-TYPE
+     SYNTAX     INTEGER {
+         enabled(1),
+         disabled(2),
+         adminDown(3),
+         down(4)
+     }
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+         "The desired global administrative status of the
+          BFD system in this device."
+     ::= { bfdScalarObjects 1 }
+
+ bfdOperStatus OBJECT-TYPE
+     SYNTAX     INTEGER {
+         up(1),
+         down(2),
+         adminDown(3)
+     }
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Indicates the actual operational status of the
+          BFD system in this device.  When this value is
+          down(2), all entries in the bfdSessTable MUST have
+          their bfdSessOperStatus as down(2) as well.  When
+          this value is adminDown(3), all entries in the
+          bfdSessTable MUST have their bfdSessOperStatus
+          as adminDown(3) as well."
+     ::= { bfdScalarObjects 2 }
+
+ bfdNotificationsEnable OBJECT-TYPE
+     SYNTAX     TruthValue
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+         "If this object is set to true(1), then it enables
+          the emission of bfdSessUp and bfdSessDown
+          notifications; otherwise, these notifications are not
+          emitted."
+     REFERENCE
+         "See also RFC 3413, Simple Network Management Protocol (SNMP)
+          Applications, for explanation that
+          notifications are under the ultimate control of the
+          MIB modules in this document."
+     DEFVAL { false }
+     ::= { bfdScalarObjects 3 }
+
+ bfdSessIndexNext OBJECT-TYPE
+     SYNTAX        IndexIntegerNextFree (0..4294967295)
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "This object contains an unused value for
+          bfdSessIndex that can be used when creating
+          entries in the table.  A zero indicates that
+          no entries are available, but it MUST NOT be used
+          as a valid index. "
+     ::= { bfdScalarObjects 4 }
+
+-- BFD Session Table
+-- The BFD Session Table specifies BFD session-specific
+-- information.
+
+ bfdSessTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF BfdSessEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "The BFD Session Table describes the BFD sessions."
+     REFERENCE
+         "RFC 5880, Bidirectional Forwarding Detection (BFD)."
+     ::= { bfdObjects 2 }
+
+ bfdSessEntry OBJECT-TYPE
+     SYNTAX     BfdSessEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "The BFD Session Entry describes the BFD session."
+     INDEX { bfdSessIndex }
+     ::= { bfdSessTable 1 }
+
+ BfdSessEntry ::= SEQUENCE {
+     bfdSessIndex                    BfdSessIndexTC,
+     bfdSessVersionNumber            Unsigned32,
+     bfdSessType                     IANAbfdSessTypeTC,
+     bfdSessDiscriminator            Unsigned32,
+     bfdSessRemoteDiscr              Unsigned32,
+     bfdSessDestinationUdpPort       BfdCtrlDestPortNumberTC,
+     bfdSessSourceUdpPort            BfdCtrlSourcePortNumberTC,
+     bfdSessEchoSourceUdpPort        InetPortNumber,
+     bfdSessAdminStatus              INTEGER,
+     bfdSessOperStatus               INTEGER,
+     bfdSessState                    IANAbfdSessStateTC,
+     bfdSessRemoteHeardFlag          TruthValue,
+     bfdSessDiag                     IANAbfdDiagTC,
+     bfdSessOperMode                 IANAbfdSessOperModeTC,
+     bfdSessDemandModeDesiredFlag    TruthValue,
+     bfdSessControlPlaneIndepFlag    TruthValue,
+     bfdSessMultipointFlag           TruthValue,
+     bfdSessInterface                InterfaceIndexOrZero,
+     bfdSessSrcAddrType              InetAddressType,
+     bfdSessSrcAddr                  InetAddress,
+     bfdSessDstAddrType              InetAddressType,
+     bfdSessDstAddr                  InetAddress,
+     bfdSessGTSM                     TruthValue,
+     bfdSessGTSMTTL                  Unsigned32,
+     bfdSessDesiredMinTxInterval     BfdIntervalTC,
+     bfdSessReqMinRxInterval         BfdIntervalTC,
+     bfdSessReqMinEchoRxInterval     BfdIntervalTC,
+     bfdSessDetectMult               BfdMultiplierTC,
+     bfdSessNegotiatedInterval       BfdIntervalTC,
+     bfdSessNegotiatedEchoInterval   BfdIntervalTC,
+     bfdSessNegotiatedDetectMult     BfdMultiplierTC,
+     bfdSessAuthPresFlag             TruthValue,
+     bfdSessAuthenticationType       IANAbfdSessAuthenticationTypeTC,
+     bfdSessAuthenticationKeyID      Integer32,
+     bfdSessAuthenticationKey        IANAbfdSessAuthenticationKeyTC,
+     bfdSessStorageType              StorageType,
+     bfdSessRowStatus                RowStatus
+ }
+
+ bfdSessIndex OBJECT-TYPE
+     SYNTAX     BfdSessIndexTC
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "This object contains an index used to represent a
+          unique BFD session on this device.  Managers
+          should obtain new values for row creation in this
+          table by reading bfdSessIndexNext."
+     ::= { bfdSessEntry 1 }
+
+ bfdSessVersionNumber OBJECT-TYPE
+     SYNTAX     Unsigned32 (0..7)
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "The version number of the BFD protocol that this session
+          is running in.  Write access is available for this object
+          to provide the ability to set the desired version for this
+          BFD session."
+     REFERENCE
+         "RFC 5880, Bidirectional Forwarding Detection (BFD)."
+     DEFVAL { 1 }
+     ::= { bfdSessEntry 2 }
+
+ bfdSessType OBJECT-TYPE
+     SYNTAX     IANAbfdSessTypeTC
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the type of this BFD session."
+     ::= { bfdSessEntry 3 }
+
+ bfdSessDiscriminator OBJECT-TYPE
+     SYNTAX     Unsigned32 (1..4294967295)
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the local discriminator for this BFD
+          session, which is used to uniquely identify it."
+     ::= { bfdSessEntry 4 }
+
+ bfdSessRemoteDiscr OBJECT-TYPE
+     SYNTAX     Unsigned32 (0 | 1..4294967295)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the session discriminator chosen
+          by the remote system for this BFD session.  The value may
+          be zero(0) if the remote discriminator is not yet known
+          or if the session is in the down or adminDown(1) state."
+     REFERENCE
+         "Section 6.8.6 of RFC 5880, Bidirectional
+          Forwarding Detection (BFD)."
+     ::= { bfdSessEntry 5 }
+
+ bfdSessDestinationUdpPort OBJECT-TYPE
+     SYNTAX     BfdCtrlDestPortNumberTC
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the destination UDP port number
+          used for this BFD session's Control packets.  The value
+          may be zero(0) if the session is in adminDown(1) state."
+     DEFVAL { 0 }
+     ::= { bfdSessEntry 6 }
+
+ bfdSessSourceUdpPort OBJECT-TYPE
+     SYNTAX     BfdCtrlSourcePortNumberTC
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the source UDP port number used
+          for this BFD session's Control packets.  The value may be
+          zero(0) if the session is in adminDown(1) state.  Upon
+          creation of a new BFD session via this MIB, the value of
+          zero(0) specified would permit the implementation to
+          choose its own source port number."
+     DEFVAL { 0 }
+     ::= { bfdSessEntry 7 }
+
+ bfdSessEchoSourceUdpPort OBJECT-TYPE
+     SYNTAX     InetPortNumber
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the source UDP port number used for
+          this BFD session's Echo packets.  The value may be zero(0)
+          if the session is not running in the Echo mode, or the
+          session is in adminDown(1) state.  Upon creation of a new
+          BFD session via this MIB, the value of zero(0) would
+          permit the implementation to choose its own source port
+          number."
+     DEFVAL { 0 }
+     ::= { bfdSessEntry 8 }
+
+ bfdSessAdminStatus OBJECT-TYPE
+     SYNTAX     INTEGER {
+                         enabled(1),
+                         disabled(2),
+                         adminDown(3),
+                         down(4)
+                }
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "Denotes the desired operational status of the BFD session.
+
+          A transition to enabled(1) will start the BFD state machine
+          for the session.  The state machine will have an initial
+          state of down(2).
+
+          A transition to disabled(2) will stop the BFD state machine
+          for the session.  The state machine may first transition to
+          adminDown(1) prior to stopping.
+
+          A transition to adminDown(3) will cause the BFD state
+          machine to transition to adminDown(1) and will cause the
+          session to remain in this state.
+
+          A transition to down(4) will cause the BFD state machine
+          to transition to down(2) and will cause the session to
+          remain in this state.
+
+          Care should be used in providing write access to this
+          object without adequate authentication."
+     ::= { bfdSessEntry 9 }
+
+ bfdSessOperStatus OBJECT-TYPE
+     SYNTAX     INTEGER {
+                         up(1),
+                         down(2),
+                         adminDown(3)
+                }
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Denotes the actual operational status of the BFD session.
+          If the value of bfdOperStatus is down(2), this value MUST
+          eventually be down(2) as well.  If the value of
+          bfdOperStatus is adminDown(3), this value MUST eventually
+          be adminDown(3) as well."
+     ::= { bfdSessEntry 10 }
+
+ bfdSessState OBJECT-TYPE
+     SYNTAX     IANAbfdSessStateTC
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Configured BFD session state."
+     ::= { bfdSessEntry 11 }
+
+ bfdSessRemoteHeardFlag OBJECT-TYPE
+     SYNTAX     TruthValue
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the status of BFD packet reception from
+          the remote system.  Specifically, it is set to true(1) if
+          the local system is actively receiving BFD packets from the
+          remote system and is set to false(2) if the local system
+          has not received BFD packets recently (within the detection
+          time) or if the local system is attempting to tear down
+          the BFD session."
+     REFERENCE
+         "RFC 5880, Bidirectional Forwarding Detection (BFD)."
+     ::= { bfdSessEntry 12 }
+
+ bfdSessDiag OBJECT-TYPE
+     SYNTAX     IANAbfdDiagTC
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "A diagnostic code specifying the local system's reason
+          for the last transition of the session from up(4)
+          to some other state."
+     ::= { bfdSessEntry 13 }
+
+ bfdSessOperMode OBJECT-TYPE
+     SYNTAX     IANAbfdSessOperModeTC
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the operational mode of this
+          BFD session."
+     ::= { bfdSessEntry 14 }
+
+ bfdSessDemandModeDesiredFlag OBJECT-TYPE
+     SYNTAX     TruthValue
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object indicates the local system's
+          desire to use Demand mode.  Specifically, it is set
+          to true(1) if the local system wishes to use
+          Demand mode or false(2) if not."
+     DEFVAL { false }
+     ::= { bfdSessEntry 15 }
+
+ bfdSessControlPlaneIndepFlag OBJECT-TYPE
+     SYNTAX     TruthValue
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object indicates the local system's
+          ability to continue to function through a disruption of
+          the control plane.  Specifically, it is set
+          to true(1) if the local system BFD implementation is
+          independent of the control plane.  Otherwise, the
+          value is set to false(2)."
+     DEFVAL { false }
+     ::= { bfdSessEntry 16 }
+
+ bfdSessMultipointFlag OBJECT-TYPE
+     SYNTAX     TruthValue
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object indicates the Multipoint (M) bit for this
+          session.  It is set to true(1) if the Multipoint (M) bit is
+          set to 1.  Otherwise, the value is set to false(2)."
+     DEFVAL { false }
+     ::= { bfdSessEntry 17 }
+
+ bfdSessInterface OBJECT-TYPE
+     SYNTAX     InterfaceIndexOrZero
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object contains an interface index used to indicate
+          the interface that this BFD session is running on.  This
+          value can be zero if there is no interface associated
+          with this BFD session."
+     ::= { bfdSessEntry 18 }
+
+ bfdSessSrcAddrType OBJECT-TYPE
+     SYNTAX     InetAddressType
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the IP address type of the source IP
+          address of this BFD session.  The value of unknown(0) is
+          allowed only when the session is singleHop(1) and the
+          source IP address of this BFD session is derived from
+          the outgoing interface, or when the BFD session is not
+          associated with a specific interface.  If any other
+          unsupported values are attempted in a set operation, the
+
+          agent MUST return an inconsistentValue error."
+   ::= { bfdSessEntry 19 }
+
+ bfdSessSrcAddr OBJECT-TYPE
+     SYNTAX     InetAddress
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the source IP address of this BFD
+          session.  The format of this object is controlled by the
+          bfdSessSrcAddrType object."
+     ::= { bfdSessEntry 20 }
+
+ bfdSessDstAddrType OBJECT-TYPE
+     SYNTAX     InetAddressType
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the IP address type of the neighboring
+          IP address that is being monitored with this BFD session.
+          The value of unknown(0) is allowed only when the session is
+          singleHop(1) and the outgoing interface is of type
+          point to point, or when the BFD session is not associated
+          with a specific interface.  If any other unsupported values
+          are attempted in a set operation, the agent MUST return an
+          inconsistentValue error."
+   ::= { bfdSessEntry 21 }
+
+ bfdSessDstAddr OBJECT-TYPE
+     SYNTAX     InetAddress
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the neighboring IP address that is
+          being monitored with this BFD session.  The format of this
+          object is controlled by the bfdSessDstAddrType object."
+     ::= { bfdSessEntry 22 }
+
+ bfdSessGTSM OBJECT-TYPE
+     SYNTAX  TruthValue
+     MAX-ACCESS read-create
+     STATUS current
+     DESCRIPTION
+         "Setting the value of this object to false(2) will disable
+          GTSM protection of the BFD session.  GTSM MUST be enabled
+          on a singleHop(1) session if no authentication is in use."
+     REFERENCE
+        "RFC 5082, The Generalized TTL Security Mechanism (GTSM).
+         Section 5 of RFC 5881, Bidirectional Forwarding Detection
+         (BFD) for IPv4 and IPv6 (Single Hop)."
+     DEFVAL { true }
+     ::= { bfdSessEntry 23 }
+
+ bfdSessGTSMTTL OBJECT-TYPE
+     SYNTAX Unsigned32 (0..255)
+     MAX-ACCESS read-create
+     STATUS current
+     DESCRIPTION
+         "This object is valid only when bfdSessGTSM protection is
+          enabled on the system.  This object indicates the minimum
+          allowed Time to Live (TTL) for received BFD Control packets.
+          For a singleHop(1) session, if GTSM protection is enabled,
+          this object SHOULD be set to the maximum TTL value allowed
+          for a single hop.
+
+          By default, GTSM is enabled and the TTL value is 255.  For a
+          multihop session, updating of the maximum TTL value allowed
+          is likely required."
+     REFERENCE
+        "RFC 5082, The Generalized TTL Security Mechanism (GTSM).
+         Section 5 of RFC 5881, Bidirectional Forwarding Detection
+         (BFD) for IPv4 and IPv6 (Single Hop)."
+     DEFVAL { 255 }
+     ::= { bfdSessEntry 24 }
+
+ bfdSessDesiredMinTxInterval OBJECT-TYPE
+     SYNTAX     BfdIntervalTC
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the minimum interval, in
+          microseconds, that the local system would like to use
+          when transmitting BFD Control packets.  The value of
+          zero(0) is reserved in this case and should not be
+          used."
+     REFERENCE
+         "Section 4.1 of RFC 5880, Bidirectional Forwarding
+          Detection (BFD)."
+     ::= { bfdSessEntry 25 }
+
+ bfdSessReqMinRxInterval OBJECT-TYPE
+     SYNTAX     BfdIntervalTC
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the minimum interval, in
+          microseconds, between received BFD Control packets the
+          local system is capable of supporting.  The value of
+          zero(0) can be specified when the transmitting system
+          does not want the remote system to send any periodic BFD
+          Control packets."
+     REFERENCE
+         "Section 4.1 of RFC 5880, Bidirectional Forwarding
+          Detection (BFD)."
+     ::= { bfdSessEntry 26 }
+
+ bfdSessReqMinEchoRxInterval OBJECT-TYPE
+     SYNTAX     BfdIntervalTC
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the minimum interval, in
+          microseconds, between received BFD Echo packets that this
+          system is capable of supporting.  The value must be zero(0) if
+          this is a multihop BFD session."
+     ::= { bfdSessEntry 27 }
+
+ bfdSessDetectMult OBJECT-TYPE
+     SYNTAX     BfdMultiplierTC
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the Detect time multiplier."
+     ::= { bfdSessEntry 28 }
+
+ bfdSessNegotiatedInterval OBJECT-TYPE
+     SYNTAX     BfdIntervalTC
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the negotiated interval, in
+          microseconds, that the local system is transmitting
+          BFD Control packets."
+     ::= { bfdSessEntry 29 }
+
+ bfdSessNegotiatedEchoInterval OBJECT-TYPE
+     SYNTAX     BfdIntervalTC
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the negotiated interval, in
+          microseconds, that the local system is transmitting
+
+          BFD Echo packets.  The value is expected to be zero if
+          the sessions are not running in Echo mode."
+     ::= { bfdSessEntry 30 }
+
+ bfdSessNegotiatedDetectMult OBJECT-TYPE
+     SYNTAX     BfdMultiplierTC
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the Detect time multiplier."
+     ::= { bfdSessEntry 31 }
+
+ bfdSessAuthPresFlag OBJECT-TYPE
+     SYNTAX     TruthValue
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object indicates the local system's
+          desire to use authentication.  Specifically, it is set
+          to true(1) if the local system wishes the session
+          to be authenticated or false(2) if not."
+     REFERENCE
+         "Sections 4.2 - 4.4 of RFC 5880, Bidirectional Forwarding
+          Detection (BFD)."
+     DEFVAL { false }
+     ::= { bfdSessEntry 32 }
+
+ bfdSessAuthenticationType OBJECT-TYPE
+     SYNTAX     IANAbfdSessAuthenticationTypeTC
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "The authentication type used for this BFD session.
+          This field is valid only when the Authentication
+          Present bit is set.  MAX-ACCESS to this object as well as
+          other authentication-related objects are set to
+          read-create in order to support management of a single
+          key ID at a time; key rotation is not handled.  Key update
+          in practice must be done by atomic update using a set
+          containing all affected objects in the same varBindList
+          or otherwise risk the session dropping."
+     REFERENCE
+         "Sections 4.2 - 4.4 of RFC 5880, Bidirectional Forwarding
+          Detection (BFD)."
+     DEFVAL { noAuthentication }
+     ::= { bfdSessEntry 33 }
+
+ bfdSessAuthenticationKeyID OBJECT-TYPE
+     SYNTAX     Integer32 (-1 | 0..255)
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "The authentication key ID in use for this session.  This
+          object permits multiple keys to be active simultaneously.
+          The value -1 indicates that no authentication key ID will
+          be present in the optional BFD Authentication Section."
+     REFERENCE
+         "Sections 4.2 - 4.4 of RFC 5880, Bidirectional Forwarding
+          Detection (BFD)."
+     DEFVAL { -1 }
+     ::= { bfdSessEntry 34 }
+
+ bfdSessAuthenticationKey OBJECT-TYPE
+     SYNTAX     IANAbfdSessAuthenticationKeyTC
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "The authentication key.  When the
+          bfdSessAuthenticationType is simplePassword(1), the value
+          of this object is the password present in the BFD packets.
+
+          When the bfdSessAuthenticationType is one of the keyed
+          authentication types, this value is used in the
+          computation of the key present in the BFD authentication
+          packet."
+     REFERENCE
+         "Sections 4.2 - 4.4 of RFC 5880, Bidirectional Forwarding
+          Detection (BFD)."
+     ::= { bfdSessEntry 35 }
+
+ bfdSessStorageType OBJECT-TYPE
+     SYNTAX     StorageType
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This variable indicates the storage type for this
+          object.  Conceptual rows having the value
+          'permanent' need not allow write-access to any
+          columnar objects in the row."
+     ::= { bfdSessEntry 36 }
+
+ bfdSessRowStatus OBJECT-TYPE
+     SYNTAX     RowStatus
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This variable is used to create, modify, and/or
+          delete a row in this table.  When a row in this
+          table has a row in the active(1) state, no
+          objects in this row can be modified except the
+          bfdSessRowStatus and bfdSessStorageType."
+     ::= { bfdSessEntry 37 }
+
+-- BFD Session Performance Table
+
+ bfdSessPerfTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF BfdSessPerfEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "This table specifies BFD session performance counters."
+     ::= { bfdObjects 3 }
+
+ bfdSessPerfEntry OBJECT-TYPE
+     SYNTAX     BfdSessPerfEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "An entry in this table is created by a BFD-enabled node
+          for every BFD session. bfdSessPerfDiscTime is used to
+          indicate potential discontinuity for all counter objects
+          in this table."
+     AUGMENTS    { bfdSessEntry }
+     ::= { bfdSessPerfTable 1 }
+
+ BfdSessPerfEntry ::= SEQUENCE {
+    bfdSessPerfCtrlPktIn           Counter32,
+    bfdSessPerfCtrlPktOut          Counter32,
+    bfdSessPerfCtrlPktDrop         Counter32,
+    bfdSessPerfCtrlPktDropLastTime TimeStamp,
+    bfdSessPerfEchoPktIn           Counter32,
+    bfdSessPerfEchoPktOut          Counter32,
+    bfdSessPerfEchoPktDrop         Counter32,
+    bfdSessPerfEchoPktDropLastTime TimeStamp,
+    bfdSessUpTime                  TimeStamp,
+    bfdSessPerfLastSessDownTime    TimeStamp,
+    bfdSessPerfLastCommLostDiag    IANAbfdDiagTC,
+    bfdSessPerfSessUpCount         Counter32,
+    bfdSessPerfDiscTime            TimeStamp,
+    -- High Capacity Counters
+    bfdSessPerfCtrlPktInHC         Counter64,
+    bfdSessPerfCtrlPktOutHC        Counter64,
+    bfdSessPerfCtrlPktDropHC       Counter64,
+    bfdSessPerfEchoPktInHC         Counter64,
+    bfdSessPerfEchoPktOutHC        Counter64,
+    bfdSessPerfEchoPktDropHC       Counter64
+ }
+
+ bfdSessPerfCtrlPktIn OBJECT-TYPE
+     SYNTAX     Counter32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of BFD control messages received for this
+          BFD session.
+
+          It MUST be equal to the least significant 32 bits of
+          bfdSessPerfCtrlPktInHC if supported, and MUST do so
+          with the rules spelled out in RFC 2863."
+     ::= { bfdSessPerfEntry 1 }
+
+ bfdSessPerfCtrlPktOut OBJECT-TYPE
+     SYNTAX     Counter32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of BFD control messages sent for this BFD
+          session.
+
+          It MUST be equal to the least significant 32 bits of
+          bfdSessPerfCtrlPktOutHC if supported, and MUST do so
+          with the rules spelled out in RFC 2863."
+     ::= { bfdSessPerfEntry 2 }
+
+ bfdSessPerfCtrlPktDrop OBJECT-TYPE
+     SYNTAX     Counter32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of BFD control messages received for this
+          session yet dropped for being invalid.
+
+          It MUST be equal to the least significant 32 bits of
+          bfdSessPerfCtrlPktDropHC if supported, and MUST do so
+          with the rules spelled out in RFC 2863."
+     ::= { bfdSessPerfEntry 3 }
+
+ bfdSessPerfCtrlPktDropLastTime OBJECT-TYPE
+     SYNTAX     TimeStamp
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The value of sysUpTime on the most recent occasion at
+          which received the BFD control message for this session was
+          dropped.  If no such up event exists, this object contains
+          a zero value."
+     ::= { bfdSessPerfEntry 4 }
+
+ bfdSessPerfEchoPktIn OBJECT-TYPE
+     SYNTAX     Counter32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of BFD Echo messages received for this
+          BFD session.
+
+          It MUST be equal to the least significant 32 bits of
+          bfdSessPerfEchoPktInHC if supported, and MUST do so
+          with the rules spelled out in RFC 2863."
+     ::= { bfdSessPerfEntry 5 }
+
+ bfdSessPerfEchoPktOut OBJECT-TYPE
+     SYNTAX     Counter32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of BFD Echo messages sent for this BFD
+          session.
+
+          It MUST be equal to the least significant 32 bits of
+          bfdSessPerfEchoPktOutHC if supported, and MUST do so
+          with the rules spelled out in RFC 2863."
+     ::= { bfdSessPerfEntry 6 }
+
+ bfdSessPerfEchoPktDrop OBJECT-TYPE
+     SYNTAX     Counter32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of BFD Echo messages received for this
+          session yet dropped for being invalid.
+
+          It MUST be equal to the least significant 32 bits of
+          bfdSessPerfEchoPktDropHC if supported, and MUST do so
+          with the rules spelled out in RFC 2863."
+     ::= { bfdSessPerfEntry 7 }
+
+ bfdSessPerfEchoPktDropLastTime OBJECT-TYPE
+     SYNTAX     TimeStamp
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The value of sysUpTime on the most recent occasion at
+          which received the BFD Echo message for this session was
+          dropped.  If no such up event has been issued, this
+          object contains a zero value."
+     ::= { bfdSessPerfEntry 8 }
+
+ bfdSessUpTime OBJECT-TYPE
+     SYNTAX     TimeStamp
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The value of sysUpTime on the most recent occasion at which
+          the session came up.  If no such event has been issued,
+          this object contains a zero value."
+     ::= { bfdSessPerfEntry 9 }
+
+ bfdSessPerfLastSessDownTime OBJECT-TYPE
+     SYNTAX     TimeStamp
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The value of sysUpTime on the most recent occasion at
+          which the last time communication was lost with the
+          neighbor.  If no down event has been issued, this object
+          contains a zero value."
+     ::= { bfdSessPerfEntry 10 }
+
+ bfdSessPerfLastCommLostDiag OBJECT-TYPE
+     SYNTAX     IANAbfdDiagTC
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The BFD diag code for the last time communication was lost
+          with the neighbor.  If such an event has not been issued,
+          this object contains a zero value."
+     ::= { bfdSessPerfEntry 11 }
+
+ bfdSessPerfSessUpCount OBJECT-TYPE
+     SYNTAX     Counter32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of times this session has gone into the Up
+          state since the system last rebooted."
+     ::= { bfdSessPerfEntry 12 }
+
+ bfdSessPerfDiscTime OBJECT-TYPE
+     SYNTAX     TimeStamp
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The value of sysUpTime on the most recent occasion at
+          which any one or more of the session counters suffered
+          a discontinuity.
+
+          The relevant counters are the specific instances associated
+          with this BFD session of any Counter32 object contained in
+          the BfdSessPerfTable.  If no such discontinuities have
+          occurred since the last reinitialization of the local
+          management subsystem, then this object contains a zero
+          value."
+     ::= { bfdSessPerfEntry 13 }
+
+ bfdSessPerfCtrlPktInHC OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This value represents the total number of BFD control
+          messages received for this BFD session.
+
+          The least significant 32 bits MUST be equal to
+          bfdSessPerfCtrlPktIn, and MUST do so with
+          the rules spelled out in RFC 2863."
+     ::= { bfdSessPerfEntry 14 }
+
+ bfdSessPerfCtrlPktOutHC OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This value represents the total number of BFD control
+          messages transmitted for this BFD session.
+
+          The least significant 32 bits MUST be equal to
+          bfdSessPerfCtrlPktOut, and MUST do so with
+          the rules spelled out in RFC 2863."
+     ::= { bfdSessPerfEntry 15 }
+
+ bfdSessPerfCtrlPktDropHC OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This value represents the total number of BFD control
+          messages received for this BFD session yet dropped for
+          being invalid.
+
+          The least significant 32 bits MUST be equal to
+          bfdSessPerfCtrlPktDrop, and MUST do so with
+          the rules spelled out in RFC 2863."
+     ::= { bfdSessPerfEntry 16 }
+
+ bfdSessPerfEchoPktInHC OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This value represents the total number of BFD Echo
+          messages received for this BFD session.
+
+          The least significant 32 bits MUST be equal to
+          bfdSessPerfEchoPktIn, and MUST do so with
+          the rules spelled out in RFC 2863."
+     ::= { bfdSessPerfEntry 17 }
+
+ bfdSessPerfEchoPktOutHC OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This value represents the total number of BFD Echo
+          messages transmitted for this BFD session.
+
+          The least significant 32 bits MUST be equal to
+          bfdSessPerfEchoPktOut, and MUST do so with
+          the rules spelled out in RFC 2863."
+     ::= { bfdSessPerfEntry 18 }
+
+ bfdSessPerfEchoPktDropHC OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This value represents the total number of BFD Echo
+          messages received for this BFD session yet dropped
+          for being invalid.
+
+          The least significant 32 bits MUST be equal to
+          bfdSessPerfEchoPktDrop, and MUST do so with
+          the rules spelled out in RFC 2863."
+     ::= { bfdSessPerfEntry 19 }
+
+-- BFD Session Discriminator Mapping Table
+
+ bfdSessDiscMapTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF BfdSessDiscMapEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "The BFD Session Discriminator Mapping Table maps a
+          local discriminator value to the associated BFD session's
+          bfdSessIndex found in the bfdSessionTable."
+     ::= { bfdObjects 4 }
+
+ bfdSessDiscMapEntry OBJECT-TYPE
+     SYNTAX     BfdSessDiscMapEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "The BFD Session Discriminator Mapping Entry
+          specifies a mapping between a local discriminator
+          and a BFD session."
+     INDEX { bfdSessDiscriminator }
+     ::= { bfdSessDiscMapTable 1 }
+
+ BfdSessDiscMapEntry ::= SEQUENCE {
+     bfdSessDiscMapIndex            BfdSessIndexTC
+ }
+
+ bfdSessDiscMapIndex OBJECT-TYPE
+     SYNTAX     BfdSessIndexTC
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object specifies a mapping between a
+          local discriminator and a BFD session in
+          the BfdSessTable."
+     ::= { bfdSessDiscMapEntry 1 }
+
+-- BFD Session IP Mapping Table
+
+ bfdSessIpMapTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF BfdSessIpMapEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "The BFD Session IP Mapping Table maps given
+          bfdSessInterface, bfdSessSrcAddrType, bfdSessSrcAddr,
+          bfdSessDstAddrType, and bfdSessDstAddr
+          to an associated BFD session found in the
+          bfdSessionTable."
+     ::= { bfdObjects 5 }
+
+ bfdSessIpMapEntry OBJECT-TYPE
+     SYNTAX     BfdSessIpMapEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "The BFD Session IP Map Entry contains a mapping
+          from the IP information for a session to the session
+          in the bfdSessionTable."
+     INDEX {
+         bfdSessInterface,
+         bfdSessSrcAddrType,
+         bfdSessSrcAddr,
+         bfdSessDstAddrType,
+         bfdSessDstAddr
+     }
+     ::= { bfdSessIpMapTable 1 }
+
+ BfdSessIpMapEntry ::= SEQUENCE {
+     bfdSessIpMapIndex            BfdSessIndexTC
+ }
+
+ bfdSessIpMapIndex OBJECT-TYPE
+     SYNTAX     BfdSessIndexTC
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the BfdSessIndexTC referred
+          to by the indexes of this row.  In essence, a mapping is
+          provided between these indexes and the BfdSessTable."
+     ::= { bfdSessIpMapEntry 1 }
+
+-- Notification Configuration
+
+ bfdSessUp NOTIFICATION-TYPE
+     OBJECTS {
+         bfdSessDiag, -- low range value
+         bfdSessDiag  -- high range value
+     }
+     STATUS     current
+     DESCRIPTION
+         "This notification is generated when the
+          bfdSessState object for one or more contiguous
+          entries in bfdSessTable are about to enter the up(4)
+          state from some other state.  The included values of
+          bfdSessDiag MUST both be set equal to this
+          new state (i.e., up(4)).  The two instances of
+          bfdSessDiag in this notification indicate the range
+          of indexes that are affected.  Note that all the indexes
+          of the two ends of the range can be derived from the
+          instance identifiers of these two objects.  For the
+          cases where a contiguous range of sessions
+          have transitioned into the up(4) state at roughly
+          the same time, the device SHOULD issue a single
+          notification for each range of contiguous indexes in
+          an effort to minimize the emission of a large number
+          of notifications.  If a notification has to be
+          issued for just a single bfdSessEntry, then
+          the instance identifier (and values) of the two
+          bfdSessDiag objects MUST be identical."
+     ::= { bfdNotifications 1 }
+
+ bfdSessDown NOTIFICATION-TYPE
+     OBJECTS {
+         bfdSessDiag, -- low range value
+         bfdSessDiag  -- high range value
+     }
+     STATUS     current
+     DESCRIPTION
+         "This notification is generated when the
+          bfdSessState object for one or more contiguous
+          entries in bfdSessTable are about to enter the down(2)
+          or adminDown(1) states from some other state.  The included
+          values of bfdSessDiag MUST both be set equal to this new
+          state (i.e., down(2) or adminDown(1)).  The two instances
+          of bfdSessDiag in this notification indicate the range
+          of indexes that are affected.  Note that all the indexes
+          of the two ends of the range can be derived from the
+          instance identifiers of these two objects.  For
+          cases where a contiguous range of sessions
+          have transitioned into the down(2) or adminDown(1) states
+          at roughly the same time, the device SHOULD issue a single
+          notification for each range of contiguous indexes in
+          an effort to minimize the emission of a large number
+          of notifications.  If a notification has to be
+          issued for just a single bfdSessEntry, then
+          the instance identifier (and values) of the two
+          bfdSessDiag objects MUST be identical."
+     ::= { bfdNotifications 2 }
+
+-- Module compliance.
+
+ bfdGroups
+     OBJECT IDENTIFIER ::= { bfdConformance 1 }
+
+ bfdCompliances
+     OBJECT IDENTIFIER ::= { bfdConformance 2 }
+
+-- Compliance requirement for fully compliant implementations.
+
+ bfdModuleFullCompliance MODULE-COMPLIANCE
+     STATUS current
+     DESCRIPTION
+         "Compliance statement for agents that provide full
+          support for the BFD-MIB module.  Such devices can
+          then be monitored and also be configured using
+          this MIB module."
+
+     MODULE -- This module.
+
+     MANDATORY-GROUPS {
+         bfdSessionGroup,
+         bfdSessionReadOnlyGroup,
+         bfdSessionPerfGroup,
+         bfdNotificationGroup
+     }
+
+     GROUP        bfdSessionPerfHCGroup
+     DESCRIPTION  "This group is mandatory for all systems that
+                   are able to support the Counter64 date type."
+
+     OBJECT       bfdSessSrcAddrType
+     SYNTAX       InetAddressType { unknown(0), ipv4(1),
+                                    ipv6(2), ipv6z(4) }
+     DESCRIPTION  "Only unknown(0), ipv4(1), ipv6(2), and ipv6z(4)
+                   support are required. ipv4z(3) is not required,
+                   and dns(16) is not allowed."
+
+     OBJECT       bfdSessSrcAddr
+     SYNTAX       InetAddress (SIZE (0|4|16|20))
+     DESCRIPTION  "An implementation is only required to support
+                   unknown(0), ipv4(1), ipv6(2), and ipv6z(4) sizes."
+
+     OBJECT       bfdSessDstAddrType
+     SYNTAX       InetAddressType { unknown(0), ipv4(1),
+                                    ipv6(2), ipv6z(4) }
+     DESCRIPTION  "Only unknown(0), ipv4(1), ipv6(2), and ipv6z(4)
+                   support are required. ipv4z(3) is not required,
+                   and dns(16) is not allowed."
+
+     OBJECT       bfdSessDstAddr
+     SYNTAX       InetAddress (SIZE (0|4|16|20))
+     DESCRIPTION  "An implementation is only required to support
+                   unknown(0), ipv4(1), ipv6(2), and ipv6z(4) sizes."
+
+     OBJECT       bfdSessRowStatus
+     SYNTAX       RowStatus { active(1), notInService(2) }
+     WRITE-SYNTAX RowStatus { active(1), notInService(2),
+                              createAndGo(4), destroy(6) }
+     DESCRIPTION  "Support for createAndWait and notReady is not
+                   required."
+     ::= { bfdCompliances 1 }
+
+ bfdModuleReadOnlyCompliance MODULE-COMPLIANCE
+     STATUS current
+     DESCRIPTION
+         "Compliance requirement for implementations that only
+          provide read-only support for BFD-MIB.  Such devices
+          can then be monitored but cannot be configured using
+          this MIB module."
+
+     MODULE -- This module.
+
+     MANDATORY-GROUPS {
+         bfdSessionGroup,
+         bfdSessionReadOnlyGroup,
+         bfdSessionPerfGroup,
+         bfdNotificationGroup
+     }
+
+     GROUP        bfdSessionPerfHCGroup
+     DESCRIPTION  "This group is mandatory for all systems that
+                   are able to support the Counter64 date type."
+
+     OBJECT       bfdSessVersionNumber
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessType
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessDiscriminator
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessDestinationUdpPort
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessSourceUdpPort
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessEchoSourceUdpPort
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessAdminStatus
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessOperMode
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessDemandModeDesiredFlag
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessControlPlaneIndepFlag
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessMultipointFlag
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessInterface
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessSrcAddrType
+     SYNTAX       InetAddressType { unknown(0), ipv4(1),
+                                    ipv6(2), ipv6z(4) }
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Only unknown(0), ipv4(1), ipv6(2), and ipv6z(4)
+                   support are required. ipv4z(3) is not required,
+                   and dns(16) is not allowed."
+
+     OBJECT       bfdSessSrcAddr
+     SYNTAX       InetAddress (SIZE (0|4|16|20))
+     MIN-ACCESS   read-only
+     DESCRIPTION  "An implementation is only required to support
+                   unknown(0), ipv4(1), ipv6(2), and ipv6z(4) sizes."
+
+     OBJECT       bfdSessDstAddrType
+     SYNTAX       InetAddressType { unknown(0), ipv4(1),
+                                    ipv6(2), ipv6z(4) }
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Only unknown(0), ipv4(1), ipv6(2), and ipv6z(4)
+                   support are required. ipv4z(3) is not required,
+                   and dns(16) is not allowed."
+
+     OBJECT       bfdSessDstAddr
+     SYNTAX       InetAddress (SIZE (0|4|16|20))
+     MIN-ACCESS   read-only
+     DESCRIPTION  "An implementation is only required to support
+                   unknown(0), ipv4(1), ipv6(2), and ipv6z(4) sizes."
+
+     OBJECT       bfdSessGTSM
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessGTSMTTL
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessDesiredMinTxInterval
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessReqMinRxInterval
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessReqMinEchoRxInterval
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessDetectMult
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessAuthPresFlag
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessAuthenticationType
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessAuthenticationKeyID
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessAuthenticationKey
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessStorageType
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+
+     OBJECT       bfdSessRowStatus
+     SYNTAX       RowStatus { active(1) }
+     MIN-ACCESS   read-only
+     DESCRIPTION  "Write access is not required."
+     ::= { bfdCompliances 2 }
+
+-- Units of conformance.
+
+ bfdSessionGroup OBJECT-GROUP
+     OBJECTS {
+         bfdAdminStatus,
+         bfdOperStatus,
+         bfdNotificationsEnable,
+         bfdSessVersionNumber,
+         bfdSessType,
+         bfdSessIndexNext,
+         bfdSessDiscriminator,
+         bfdSessDestinationUdpPort,
+         bfdSessSourceUdpPort,
+         bfdSessEchoSourceUdpPort,
+         bfdSessAdminStatus,
+         bfdSessOperStatus,
+         bfdSessOperMode,
+         bfdSessDemandModeDesiredFlag,
+         bfdSessControlPlaneIndepFlag,
+         bfdSessMultipointFlag,
+         bfdSessInterface,
+         bfdSessSrcAddrType,
+         bfdSessSrcAddr,
+         bfdSessDstAddrType,
+         bfdSessDstAddr,
+         bfdSessGTSM,
+         bfdSessGTSMTTL,
+         bfdSessDesiredMinTxInterval,
+         bfdSessReqMinRxInterval,
+         bfdSessReqMinEchoRxInterval,
+         bfdSessDetectMult,
+         bfdSessAuthPresFlag,
+         bfdSessAuthenticationType,
+         bfdSessAuthenticationKeyID,
+         bfdSessAuthenticationKey,
+         bfdSessStorageType,
+         bfdSessRowStatus
+     }
+     STATUS     current
+     DESCRIPTION
+         "Collection of objects needed for BFD sessions."
+     ::= { bfdGroups 1 }
+
+ bfdSessionReadOnlyGroup OBJECT-GROUP
+     OBJECTS {
+         bfdSessRemoteDiscr,
+         bfdSessState,
+         bfdSessRemoteHeardFlag,
+         bfdSessDiag,
+         bfdSessNegotiatedInterval,
+         bfdSessNegotiatedEchoInterval,
+         bfdSessNegotiatedDetectMult,
+         bfdSessDiscMapIndex,
+         bfdSessIpMapIndex
+     }
+     STATUS     current
+     DESCRIPTION
+         "Collection of read-only objects needed for BFD sessions."
+     ::= { bfdGroups 2 }
+
+ bfdSessionPerfGroup OBJECT-GROUP
+     OBJECTS {
+         bfdSessPerfCtrlPktIn,
+         bfdSessPerfCtrlPktOut,
+         bfdSessPerfCtrlPktDrop,
+         bfdSessPerfCtrlPktDropLastTime,
+         bfdSessPerfEchoPktIn,
+         bfdSessPerfEchoPktOut,
+         bfdSessPerfEchoPktDrop,
+         bfdSessPerfEchoPktDropLastTime,
+         bfdSessUpTime,
+         bfdSessPerfLastSessDownTime,
+         bfdSessPerfLastCommLostDiag,
+         bfdSessPerfSessUpCount,
+         bfdSessPerfDiscTime
+     }
+     STATUS     current
+     DESCRIPTION
+         "Collection of objects needed to monitor the
+          performance of BFD sessions."
+     ::= { bfdGroups 3 }
+
+ bfdSessionPerfHCGroup OBJECT-GROUP
+     OBJECTS {
+         bfdSessPerfCtrlPktInHC,
+         bfdSessPerfCtrlPktOutHC,
+         bfdSessPerfCtrlPktDropHC,
+         bfdSessPerfEchoPktInHC,
+         bfdSessPerfEchoPktOutHC,
+         bfdSessPerfEchoPktDropHC
+     }
+     STATUS     current
+     DESCRIPTION
+         "Collection of objects needed to monitor the
+          performance of BFD sessions for which the
+          values of bfdSessPerfPktIn and bfdSessPerfPktOut
+          wrap around too quickly."
+     ::= { bfdGroups 4 }
+
+ bfdNotificationGroup NOTIFICATION-GROUP
+     NOTIFICATIONS {
+         bfdSessUp,
+         bfdSessDown
+     }
+     STATUS     current
+     DESCRIPTION
+         "Set of notifications implemented in this
+          module."
+     ::= { bfdGroups 5 }
+
+ END

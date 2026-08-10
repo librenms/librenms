@@ -3,34 +3,46 @@
 namespace App\View\Components;
 
 use Illuminate\View\Component;
+use Illuminate\View\ComponentSlot;
 
 class Panel extends Component
 {
     /**
      * Create a new component instance.
-     *
-     * @param  string  $title
-     * @param  string  $body_class
-     * @return void
      */
     public function __construct(
-        /**
-         * The Panel title.
-         */
-        public $title = null,
-        /**
-         * The Panel body class.
-         */
-        public $body_class = null
+        public ?string $type = 'default',
+        public mixed $title = null,
     ) {
     }
 
     /**
-     * Get the view / contents that represent the component.
-     *
-     * @return \Illuminate\View\View|string
+     * Determine if the title is a slot with attributes or just a string.
      */
-    public function render()
+    public function titleIsSlot(): bool
+    {
+        return $this->title instanceof ComponentSlot;
+    }
+
+    /**
+     * Resolve the panel's base CSS classes.
+     */
+    public function panelClass(): string
+    {
+        return match ($this->type) {
+            'primary' => 'panel panel-primary',
+            'success' => 'panel panel-success',
+            'info' => 'panel panel-info',
+            'warning' => 'panel panel-warning',
+            'danger' => 'panel panel-danger',
+            default => 'panel panel-default',
+        };
+    }
+
+    /**
+     * Get the view / contents that represent the component.
+     */
+    public function render(): \Illuminate\View\View|string
     {
         return view('components.panel');
     }

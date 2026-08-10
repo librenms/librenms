@@ -86,9 +86,9 @@ foreach ($oids as $index => $entry) {
         }
 
         $states = [
-            ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'serviceUp'],
-            ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'serviceNotUpdatedWithinLast5Min'],
-            ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'serviceDown'],
+            ['value' => 1, 'generic' => 0, 'descr' => 'serviceUp'],
+            ['value' => 2, 'generic' => 2, 'descr' => 'serviceNotUpdatedWithinLast5Min'],
+            ['value' => 3, 'generic' => 2, 'descr' => 'serviceDown'],
         ];
     }
 

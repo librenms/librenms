@@ -10,6 +10,9 @@ return [
     'alertlog-stats' => [
         'title' => 'Alert History Stats',
     ],
+    'alert-map' => [
+        'title' => 'Alert Map',
+    ],
     'availability-map' => [
         'title' => 'Availability Map',
     ],
@@ -43,6 +46,9 @@ return [
     'graylog' => [
         'title' => 'Graylog',
     ],
+    'health-sensors' => [
+        'title' => 'Health Sensors',
+    ],
     'notes' => [
         'title' => 'Notes',
     ],
@@ -51,6 +57,10 @@ return [
     ],
     'server-stats' => [
         'title' => 'Server Stats',
+        'cpu_usage' => 'CPU Usage',
+        'hidden_gauges' => 'Hidden gauges',
+        'select_gauges' => 'Select one or more gauges',
+        'hidden_gauges_help' => 'Selected gauges will be hidden. Leave empty to show all gauges.',
     ],
     'syslog' => [
         'title' => 'Syslog',

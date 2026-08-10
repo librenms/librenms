@@ -44,15 +44,15 @@ class ModuleModelObserver
     /**
      * Install observers to output +, -, U for models being created, deleted, and updated
      *
-     * @param  string|Eloquent  $model  The model name including namespace
+     * @param  class-string<Eloquent>  $model  The model name including namespace
      */
-    public static function observe($model, string $name = ''): void
+    public static function observe(string $model, string $name = ''): void
     {
         static $observed_models = []; // keep track of observed models so we don't duplicate output
         $class = ltrim($model, '\\');
 
         if ($name) {
-            Log::channel('stdout')->info(ucwords($name) . ': ', ['nlb' => true]);
+            Log::info(ucwords($name) . ': ', ['nlb' => true]);
         }
 
         if (! in_array($class, $observed_models)) {
@@ -63,7 +63,7 @@ class ModuleModelObserver
 
     public static function done(): void
     {
-        Log::channel('stdout')->info(PHP_EOL, ['nlb' => true]);
+        Log::info(PHP_EOL, ['nlb' => true]);
     }
 
     /**

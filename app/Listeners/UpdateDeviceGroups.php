@@ -31,7 +31,7 @@ class UpdateDeviceGroups
         $dg_start = microtime(true);
 
         // update device groups
-        $group_changes = Action::execute(UpdateDeviceGroupsAction::class, $event->device);
+        $group_changes = Action::execute(UpdateDeviceGroupsAction::class, device: $event->device);
 
         $added = implode(',', $group_changes['attached']);
         $removed = implode(',', $group_changes['detached']);

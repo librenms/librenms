@@ -35,6 +35,7 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\StoragePolling;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
@@ -48,9 +49,9 @@ class Storage implements Module
         return [];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
@@ -67,9 +68,9 @@ class Storage implements Module
         $saved->each($this->printStorage(...));
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
@@ -126,10 +127,10 @@ class Storage implements Module
 
         return $storages->each(function (\App\Models\Storage $storage) use ($data): void {
             $storage->fillUsage(
-                $data[$storage->storage_used_oid] ?? null,
+                $data[(string) $storage->storage_used_oid] ?? null,
                 $storage->storage_units ? $storage->storage_size / $storage->storage_units : null,
-                $data[$storage->storage_free_oid] ?? null,
-                $data[$storage->storage_perc_oid] ?? null,
+                $data[(string) $storage->storage_free_oid] ?? null,
+                $data[(string) $storage->storage_perc_oid] ?? null,
             );
         });
     }

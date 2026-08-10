@@ -18,7 +18,9 @@
                 <div class="row">
                     <div id="twofactorqrcontainer" class="col-md-12">
                         <h4>Scan with your Two Factor Authenticator.</h4>
-                        <div class="col-md-12 text-center" id="twofactorqr"></div>
+                        <div class="col-md-12 text-center tw:mb-2">
+                            <div class="tw:inline-block tw:bg-white tw:p-4 tw:pb-2 tw:rounded-lg" id="twofactorqr"></div>
+                        </div>
                         <div class="col-md-12 text-center">
                             <button class="btn btn-default" onclick="$('#twofactorqrcontainer').hide(); $('#twofactorkeycontainer').show();">Manual</button>
                         </div>

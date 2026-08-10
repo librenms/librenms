@@ -5,7 +5,7 @@ PHION-MIB DEFINITIONS ::= BEGIN
 		TEXTUAL-CONVENTION, DisplayString, DateAndTime FROM SNMPv2-TC;
 
 	phion MODULE-IDENTITY
-    	LAST-UPDATED "201401080000Z"
+		LAST-UPDATED "202007230000Z"
 	    ORGANIZATION
     	    "Barracuda Networks"
 	    CONTACT-INFO
@@ -14,11 +14,19 @@ PHION-MIB DEFINITIONS ::= BEGIN
     	    "."
 
 	    -- Revision log
+		REVISION    "202007230000Z"
+		DESCRIPTION
+			"Added licenses, protectedIP and certificates"
+
+    	REVISION    "201805290000Z"
+	    DESCRIPTION
+    	    "Added firewallSessions64, packetThroughput64 and dataThroughput64 to fwStats group"
+
     	REVISION    "201401080000Z"
 	    DESCRIPTION
-    	    "insert OBJECT-GROUPS"
+    	    "Inserted OBJECT-GROUPS"
 
-		REVISION    "201401070000Z"
+	REVISION    "201401070000Z"
 	    DESCRIPTION
     	    "Removed syntax errors"
 
@@ -126,6 +134,16 @@ PHION-MIB DEFINITIONS ::= BEGIN
 			down(-1),
 			down-disabled(0),
 			active(1)
+		}
+
+	LicenseState ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+			"The state of a license."
+		SYNTAX INTEGER {
+			ok(1),
+			grace(2),
+			expired(3)
 		}
 
 -- boxServices
@@ -989,6 +1007,102 @@ PHION-MIB DEFINITIONS ::= BEGIN
 		STATUS current
 		DESCRIPTION " "
 		::= { hwGroups 5 }
+
+-- licenses
+	licenses OBJECT-TYPE
+		SYNTAX		SEQUENCE OF LicenseEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		::= { firewall 14 }
+
+	licenseEntry OBJECT-TYPE
+		SYNTAX		LicenseEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		INDEX { licenseName }
+		::= { licenses 1 }
+
+	LicenseEntry ::= SEQUENCE {
+		licenseName DisplayString,
+		licenseState LicenseState,
+		licenseExpiration DateAndTime
+	}
+
+	licenseName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..63))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Name of the license"
+		::= { licenseEntry 1 }
+
+	licenseState OBJECT-TYPE
+		SYNTAX LicenseState
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"State of the license"
+		::= { licenseEntry 2 }
+
+	licenseExpiration OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Days until license expiration"
+		::= { licenseEntry 3 }
+
+-- protectedIP
+	protectedIP OBJECT-TYPE
+		SYNTAX		Counter64
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			" "
+		::= { firewall 15 }
+
+-- certificates
+	certificates OBJECT-TYPE
+		SYNTAX		SEQUENCE OF CertificateEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		::= { firewall 16 }
+
+	certificateEntry OBJECT-TYPE
+		SYNTAX		CertificateEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		INDEX { certificateName }
+		::= { certificates 1 }
+
+	CertificateEntry ::= SEQUENCE {
+		certificateName DisplayString,
+		certificateExpiration DateAndTime
+	}
+
+	certificateName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..63))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Name of the certificate"
+		::= { certificateEntry 1 }
+
+	certificateExpiration OBJECT-TYPE
+		SYNTAX DateAndTime
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Certificate expiration date"
+		::= { certificateEntry 2 }
 
 -- Vars
 	eventID			OBJECT-TYPE

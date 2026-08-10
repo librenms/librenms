@@ -38,7 +38,7 @@ Output:
                 "service_changed": "1470962470",
                 "service_message": "NTP OK: Offset -0.000717 secs",
                 "service_disabled": "0",
-                "service_ds": "{\"offset\":\"s\"}"
+                "service_ds": "{\"offset\":{ \"uom\":\"s\", \"full_name\": \"offset\" } }"
             }
         ],
         [
@@ -123,9 +123,10 @@ Input:
 
 - type: service type
 - ip: ip of the service
-- desc: description for the service
-- param: parameters for the service
-- ignore: ignore the service for checks
+- name: (Optional) name of the service
+- desc: (Optional) description for the service
+- param: (Optional) parameters for the service
+- ignore: (Optional) ignore the service for checks
 
 Example:
 

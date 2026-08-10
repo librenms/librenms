@@ -1,11 +1,3 @@
-<?php
-
-if (! (Auth::user()->hasGlobalAdmin())) {
-    exit('ERROR: You need to be admin');
-}
-
-?>
-
 <div class="modal fade" id="create-oid-form" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -35,7 +27,7 @@ if (! (Auth::user()->hasGlobalAdmin())) {
                     <div class="form-group" title="SNMP data type">
                         <label for='datatype' class='col-sm-4 col-md-3 control-label'>Data Type </label>
                         <div class='col-sm-8 col-md-9'>
-                            <select class="form-control" id="datatype" name="datatype">
+                            <select class="form-control" id="datatype" name="datatype" required>
                                 <option value="COUNTER">COUNTER</option>
                                 <option value="GAUGE">GAUGE</option>
                             </select>
@@ -111,10 +103,13 @@ if (! (Auth::user()->hasGlobalAdmin())) {
                     </div>
                     <div class="form-group">
                         <div class="col-sm-12 text-center">
-                            <button type="button" class="btn btn-success" id="save-oid-button" name="save-oid-button">
+                            <button type="button" class="lnms-btn lnms-btn-success" id="save-oid-button" name="save-oid-button">
                                 Save OID
                             </button>
-                            <button type="button" class="btn btn-primary" id="test-oid-button" name="test-oid-button">
+                            <button type="button" class="lnms-btn lnms-btn-warning" id="save-oid-skip-button" name="save-oid-skip-button">
+                                Save (Skip test)
+                            </button>
+                            <button type="button" class="lnms-btn lnms-btn-primary" id="test-oid-button" name="test-oid-button">
                                 Test OID
                             </button>
                         </div>
@@ -134,29 +129,28 @@ if (! (Auth::user()->hasGlobalAdmin())) {
 $('#create-oid-form').on('show.bs.modal', function(e) {
     var customoid_id = $(e.relatedTarget).data('customoid_id');
     $('#ccustomoid_id').val(customoid_id);
-    if (customoid_id >= 0) {
+    if (customoid_id) {
         $.ajax({
-            type: "POST",
-            url: "ajax_form.php",
-            data: { type: "parse-customoid", customoid_id: customoid_id },
-                dataType: "json",
-                success: function (data) {
-                    $('#name').val(data.name);
-                    $('#oid').val(data.oid);
-                    $('#datatype').val(data.datatype);
-                    $('#datatype').prop('disabled', true);
-                    $('#unit').val(data.unit);
-                    $('#divisor').val(data.divisor);
-                    $('#multiplier').val(data.multiplier);
-                    $('#user_func').val(data.user_func);
-                    $('#limit').val(data.limit);
-                    $('#limit_warn').val(data.limit_warn);
-                    $('#limit_low').val(data.limit_low);
-                    $('#limit_low_warn').val(data.limit_low_warn);
-                    $('#alerts').prop('checked', data.alerts);
-                    $('#passed').val(data.passed);
-                    $('#cpassed').prop('checked', data.passed);
-                }
+            type: "GET",
+            url: '<?php echo route("customoid.show", ["customoid" => ":customoid"]) ?>'.replace(':customoid', customoid_id),
+            dataType: "json",
+            success: function (data) {
+                $('#name').val(data.name);
+                $('#oid').val(data.oid);
+                $('#datatype').val(data.datatype || 'GAUGE');
+                $('#datatype').prop('disabled', true);
+                $('#unit').val(data.unit);
+                $('#divisor').val(data.divisor);
+                $('#multiplier').val(data.multiplier);
+                $('#user_func').val(data.user_func);
+                $('#limit').val(data.limit);
+                $('#limit_warn').val(data.limit_warn);
+                $('#limit_low').val(data.limit_low);
+                $('#limit_low_warn').val(data.limit_low_warn);
+                $('#alerts').prop('checked', data.alerts);
+                $('#passed').val(data.passed);
+                $('#cpassed').prop('checked', data.passed);
+            }
         });
     } else {
         $('#name').val('');
@@ -176,13 +170,18 @@ $('#create-oid-form').on('show.bs.modal', function(e) {
         $('#cpassed').prop('checked', false);
     }
 });
-$('#save-oid-button').on('click', function (e) {
-    e.preventDefault();
-    $('#action').val('save');
+function saveOid() {
+    var customoid_id = $('#ccustomoid_id').val();
+    var url = customoid_id ? '<?php echo route("customoid.update", ["customoid" => ":customoid"]) ?>'.replace(':customoid', customoid_id) : '<?php echo route("customoid.store") ?>';
+    $('#datatype').prop('disabled', false);
+    var data = $('form.coid_form').serialize();
+    if (customoid_id) {
+        $('#datatype').prop('disabled', true);
+    }
     $.ajax({
-        type: "POST",
-        url: "ajax_form.php",
-        data: $('form.coid_form').serializeArray(),
+        type: customoid_id ? "PUT" : "POST",
+        url: url,
+        data: data,
         dataType: "json",
         success: function (data) {
             if (data.status == 'ok') {
@@ -197,14 +196,26 @@ $('#save-oid-button').on('click', function (e) {
             toastr.error('Failed to process OID');
         }
     });
+}
+$('#save-oid-button').on('click', function (e) {
+    e.preventDefault();
+    saveOid();
+});
+$('#save-oid-skip-button').on('click', function (e) {
+    e.preventDefault();
+    $('#passed').val('on');
+    $('#cpassed').prop('checked', true);
+    saveOid();
 });
 $('#test-oid-button').on('click', function (e) {
     e.preventDefault();
-    $('#action').val('test');
+    var customoid_id = $('#ccustomoid_id').val();
+    var url = customoid_id ? '<?php echo route("customoid.test", ["customoid" => ":customoid"]) ?>'.replace(':customoid', customoid_id) : '<?php echo route("customoid.test") ?>';
+    var data = $('form.coid_form').serializeArray();
     $.ajax({
         type: "POST",
-        url: "ajax_form.php",
-        data: $('form.coid_form').serializeArray(),
+        url: url,
+        data: data,
         dataType: "json",
         success: function (data) {
             if (data.status == 'ok') {

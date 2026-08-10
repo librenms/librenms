@@ -12,7 +12,7 @@ IMPORTS
         FROM ADTRAN-AOS;
 
 adGenAOSFanMib MODULE-IDENTITY
-    LAST-UPDATED "201310220000Z"
+    LAST-UPDATED "201712270000Z"
     ORGANIZATION "ADTRAN, Inc."
     CONTACT-INFO
            "        Technical Support Dept.
@@ -25,6 +25,9 @@ adGenAOSFanMib MODULE-IDENTITY
             E-mail: support@adtran.com"
     DESCRIPTION
             "The MIB module defines fan configuration information and traps for AdtranOS products."
+    REVISION "201712270000Z"  -- December 27, 2017 / YYYYMMDDHHMMZ
+    DESCRIPTION
+            "Fan Failure resume traps added."
     REVISION "201310220000Z"  -- October 22, 2013 / YYYYMMDDHHMMZ
     DESCRIPTION
             "Created the adGenAosFan MIB. Revision R10.11"
@@ -62,7 +65,15 @@ adGenAOSFanFailure NOTIFICATION-TYPE
     DESCRIPTION
             "A fan failure trap signifies that one of the fans inside the chassis has failed."
     ::= { adGenAOSFanTrap 1 }
-    
+   
+adGenAOSFanFailureResume NOTIFICATION-TYPE
+	OBJECTS { adGenAOSFanNumber }
+    STATUS  current
+    DESCRIPTION
+            "A fan failure Resume trap signifies that one of the fans inside the chassis
+			has recoverd the failure."
+    ::= { adGenAOSFanTrap 2 }
+ 
     ------------------------------------------------------------
 -- Conformance information
 --
@@ -124,7 +135,8 @@ adGenAOSFanCompliances OBJECT IDENTIFIER
          ::= { adGenAOSFanGroups 2 }
 
      adGenAOSFanNotificationGroup NOTIFICATION-GROUP
-         NOTIFICATIONS { adGenAOSFanFailure }
+         NOTIFICATIONS { adGenAOSFanFailure,
+                         adGenAOSFanFailureResume}
          STATUS  current
          DESCRIPTION
             "Traps which may be used to enhance event driven

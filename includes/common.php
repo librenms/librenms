@@ -18,80 +18,8 @@
  */
 
 use App\Facades\LibrenmsConfig;
-use LibreNMS\Enum\Severity;
-use LibreNMS\Exceptions\InvalidIpException;
-use LibreNMS\Util\Debug;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
-use Symfony\Component\Process\Process;
-
-/**
- * Execute and snmp command, filter debug output unless -v is specified
- *
- * @param  array  $command
- * @return null|string
- */
-function external_exec($command)
-{
-    $device = DeviceCache::getPrimary();
-
-    $proc = new Process($command);
-    $proc->setTimeout(LibrenmsConfig::get('snmp.exec_timeout', 1200));
-
-    if (Debug::isEnabled() && ! Debug::isVerbose()) {
-        $patterns = [
-            '/-c\' \'[\S]+\'/',
-            '/-u\' \'[\S]+\'/',
-            '/-U\' \'[\S]+\'/',
-            '/-A\' \'[\S]+\'/',
-            '/-X\' \'[\S]+\'/',
-            '/-P\' \'[\S]+\'/',
-            '/-H\' \'[\S]+\'/',
-            '/-y\' \'[\S]+\'/',
-            '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
-        ];
-        $replacements = [
-            '-c\' \'COMMUNITY\'',
-            '-u\' \'USER\'',
-            '-U\' \'USER\'',
-            '-A\' \'PASSWORD\'',
-            '-X\' \'PASSWORD\'',
-            '-P\' \'PASSWORD\'',
-            '-H\' \'HOSTNAME\'',
-            '-y\' \'KG_KEY\'',
-            '\1:HOSTNAME:\3',
-        ];
-
-        $debug_command = preg_replace($patterns, $replacements, $proc->getCommandLine());
-        c_echo('SNMP[%c' . $debug_command . "%n]\n");
-    } elseif (Debug::isVerbose()) {
-        c_echo('SNMP[%c' . $proc->getCommandLine() . "%n]\n");
-    }
-
-    $proc->run();
-    $output = $proc->getOutput();
-
-    if ($proc->getExitCode()) {
-        if (Str::startsWith($proc->getErrorOutput(), 'Invalid authentication protocol specified')) {
-            \App\Models\Eventlog::log('Unsupported SNMP authentication algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Severity::Error);
-        } elseif (Str::startsWith($proc->getErrorOutput(), 'Invalid privacy protocol specified')) {
-            \App\Models\Eventlog::log('Unsupported SNMP privacy algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Severity::Error);
-        }
-        d_echo('Exitcode: ' . $proc->getExitCode());
-        d_echo($proc->getErrorOutput());
-    }
-
-    if (Debug::isEnabled() && ! Debug::isVerbose()) {
-        $ip_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
-        $debug_output = preg_replace($ip_regex, '*', $output);
-        d_echo($debug_output . PHP_EOL);
-    } elseif (Debug::isVerbose()) {
-        d_echo($output . PHP_EOL);
-    }
-    d_echo($proc->getErrorOutput());
-
-    return $output;
-}
 
 function shorthost($hostname, $len = 12)
 {
@@ -130,11 +58,6 @@ function print_message($text)
     }
 }
 
-function get_sensor_rrd($device, $sensor)
-{
-    return Rrd::name($device['hostname'], get_sensor_rrd_name($device, $sensor));
-}
-
 function get_sensor_rrd_name($device, $sensor)
 {
     // For IPMI, sensors tend to change order, and there is no index, so we prefer to use the description as key here.
@@ -150,54 +73,18 @@ function get_port_rrdfile_path($hostname, $port_id, $suffix = '')
     return Rrd::name($hostname, Rrd::portName($port_id, $suffix));
 }
 
-function get_port_by_ifIndex($device_id, $ifIndex)
-{
-    return dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device_id, $ifIndex]);
-}
-
-function get_port_by_id($port_id)
-{
-    if (is_numeric($port_id)) {
-        $port = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$port_id]);
-        if (is_array($port)) {
-            return $port;
-        } else {
-            return false;
-        }
-    }
-}
-
 function ifclass($ifOperStatus, $ifAdminStatus)
 {
     // fake a port model
-    return \LibreNMS\Util\Url::portLinkDisplayClass((object) ['ifOperStatus' => $ifOperStatus, 'ifAdminStatus' => $ifAdminStatus]);
+    return \LibreNMS\Util\Url::portLinkDisplayClass((object) [
+        'ifOperStatus' => $ifOperStatus instanceof \LibreNMS\Enum\IfOperStatus ? $ifOperStatus : \LibreNMS\Enum\IfOperStatus::tryFrom($ifOperStatus),
+        'ifAdminStatus' => $ifAdminStatus instanceof \LibreNMS\Enum\IfOperStatus ? $ifAdminStatus : \LibreNMS\Enum\IfOperStatus::tryFrom($ifAdminStatus),
+    ]);
 }
 
-function device_by_name($name)
+function device_by_id_cache($device_id)
 {
-    return device_by_id_cache(getidbyname($name));
-}
-
-function device_by_id_cache($device_id, $refresh = false)
-{
-    $model = $refresh ? DeviceCache::refresh((int) $device_id) : DeviceCache::get((int) $device_id);
-
-    $device = $model->toArray();
-    $device['location'] = $model->location->location ?? null;
-    $device['lat'] = $model->location->lat ?? null;
-    $device['lng'] = $model->location->lng ?? null;
-
-    return $device;
-}
-
-function gethostbyid($device_id)
-{
-    return DeviceCache::get((int) $device_id)->hostname;
-}
-
-function getifbyid($id)
-{
-    return dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$id]);
+    return DeviceCache::get((int) $device_id)->toArray();
 }
 
 function getidbyname($hostname)
@@ -205,19 +92,9 @@ function getidbyname($hostname)
     return DeviceCache::getByHostname($hostname)->device_id;
 }
 
-function set_dev_attrib($device, $attrib_type, $attrib_value)
-{
-    return DeviceCache::get((int) $device['device_id'])->setAttrib($attrib_type, $attrib_value);
-}
-
 function get_dev_attrib($device, $attrib_type)
 {
     return DeviceCache::get((int) $device['device_id'])->getAttrib($attrib_type);
-}
-
-function del_dev_attrib($device, $attrib_type)
-{
-    return DeviceCache::get((int) $device['device_id'])->forgetAttrib($attrib_type);
 }
 
 /**
@@ -262,70 +139,12 @@ function c_echo($string, $enabled = true)
     }
 }
 
-/*
- * @return true if client IP address is authorized to access graphs
- */
-function is_client_authorized($clientip)
-{
-    if (LibrenmsConfig::get('allow_unauth_graphs', false)) {
-        d_echo("Unauthorized graphs allowed\n");
-
-        return true;
-    }
-
-    foreach (LibrenmsConfig::get('allow_unauth_graphs_cidr', []) as $range) {
-        try {
-            if (IP::parse($clientip)->inNetwork($range)) {
-                d_echo("Unauthorized graphs allowed from $range\n");
-
-                return true;
-            }
-        } catch (InvalidIpException) {
-            d_echo("Client IP ($clientip) is invalid.\n");
-        }
-    }
-
-    return false;
-} // is_client_authorized
-
-/*
- * @return an array of all graph subtypes for the given type
- */
-function get_graph_subtypes($type, $device = null)
-{
-    $type = basename((string) $type);
-    $types = [];
-
-    // find the subtypes defined in files
-    if ($handle = opendir(LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/")) {
-        while (false !== ($file = readdir($handle))) {
-            if ($file != '.' && $file != '..' && $file != 'auth.inc.php' && strstr($file, '.inc.php')) {
-                $types[] = str_replace('.inc.php', '', $file);
-            }
-        }
-        closedir($handle);
-    }
-
-    sort($types);
-
-    return $types;
-} // get_graph_subtypes
-
 function generate_smokeping_file($device, $file = '')
 {
     $smokeping = new \LibreNMS\Util\Smokeping(DeviceCache::get((int) $device['device_id']));
 
     return $smokeping->generateFileName($file);
 }
-
-function is_customoid_graph($type, $subtype)
-{
-    if (! empty($subtype) && $type == 'customoid') {
-        return true;
-    }
-
-    return false;
-} // is_customoid_graph
 
 /**
  * Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.
@@ -650,12 +469,12 @@ function mw_to_dbm($value)
 }
 
 /**
- * @param  $value
- * @param  null  $default
- * @param  int  $min
- * @return null
+ * @param  mixed  $value
+ * @param  mixed  $default
+ * @param  int|null  $min
+ * @return mixed
  */
-function set_null($value, $default = null, $min = null)
+function set_null(mixed $value, mixed $default = null, ?int $min = null)
 {
     if (! is_numeric($value)) {
         return $default;

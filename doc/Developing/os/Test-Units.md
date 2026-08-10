@@ -29,11 +29,11 @@ make sure it is modified in a consistent manner.
 
 ### 1. Collect SNMP data
 
-`./scripts/collect-snmp-data.php` is provided to make it easy to
-collect data for tests.  Running collect-snmp-data.php with the
-`--hostname (-h) -v ''` allows you to capture all data used to discover and
+`lnms dev:collect-snmprec` is provided to make it easy to
+collect data for tests.  Running `dev:collect-snmprec` with
+`<device> --variant ''` allows you to capture all data used to discover and
 poll a device already added to LibreNMS.  Make sure to re-run the
-script if you add additional support. Check the command-line help for
+command if you add additional support. Check the command-line help for
 more options.
 
 ### 2. Save test data
@@ -98,7 +98,7 @@ Add/update a device called "snmpsim" to your install and set to use a specific s
 lnms dev:simulate ios_2960x
 ```
 
-You can then run `./discovery.php -h snmpsim -d -v` and `lnms device:poll snmpsim -vvv`
+You can then run `lnms device:discover snmpsim -vv` and `lnms device:poll snmpsim -vv`
 to discover and poll the simulated device.
 
 ## Snmprec format
@@ -154,12 +154,12 @@ must use a variant to store your test data (-v <variant>).
 ### Add initial detection
 
 1. Add device to LibreNMS. It is generic and device_id = 42
-1. Run `./scripts/collect-snmp-data.php -h 42 -v ''`, initial snmprec will be created
+1. Run `lnms dev:collect-snmprec 42 --variant ''`, initial snmprec will be created
 1. [Add initial detection](Initial-Detection.md) for `example-os`
-1. Run discovery to make sure it detects properly `./discovery.php -h 42`
+1. Run discovery to make sure it detects properly `lnms device:discover -vv 42`
 1. Add any additional os items like version, hardware, features, or serial.
 1. If there is additional snmp data required, run
-   `./scripts/collect-snmp-data.php -h 42 -v ''`
+   `lnms dev:collect-snmprec 42 --variant ''`
 1. Run `./scripts/save-test-data.php -o example-os` to update the
    dumped database data.
 1. Review data. If you modified the snmprec or code (don't modify json
@@ -170,7 +170,7 @@ must use a variant to store your test data (-v <variant>).
 ### Additional module support or test data
 
 1. Add code to support module or support already exists.
-1. `./scripts/collect-snmp-data.php -h 42 -v '' -m <module> `, this will add
+1. `lnms dev:collect-snmprec 42 --variant '' -m <module>`, this will add
    more data to the snmprec file
 1. Review data. If you modified the snmprec (don't modify json
    manually) run `./scripts/save-test-data.php -o example-os -v '' -m <module>`

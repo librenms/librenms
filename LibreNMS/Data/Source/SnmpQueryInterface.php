@@ -42,12 +42,6 @@ interface SnmpQueryInterface
     public function device(Device $device): SnmpQueryInterface;
 
     /**
-     * Specify a device by a device array.
-     * The device will be fetched from the cache if it is loaded, otherwise, it will fill the array into a new Device
-     */
-    public function deviceArray(array $device): SnmpQueryInterface;
-
-    /**
      * Cache the data for the rest of the runtime (or retrieve from cache if available)
      */
     public function cache(): SnmpQueryInterface;

@@ -3,17 +3,22 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\Customoid;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
+/**
+ * @extends SelectController<Customoid>
+ */
 class CustomoidController extends SelectController
 {
     /**
      * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Customoid::class);
+
         return Customoid::hasAccess($request->user())
             ->with(['device' => function ($query): void {
                 $query->select('device_id', 'hostname', 'sysName', 'display');
@@ -22,13 +27,14 @@ class CustomoidController extends SelectController
     }
 
     /**
-     * @param  Customoid  $customoid
+     * @param  Customoid  $model
+     * @return array{id: int|string, text: string, icon?: string}
      */
-    public function formatItem($customoid)
+    public function formatItem(Model $model): array
     {
         return [
-            'id' => $customoid->customoid_id,
-            'text' => $customoid->device->shortDisplayName() . ' (' . $customoid->customoid_descr . ')',
+            'id' => $model->customoid_id,
+            'text' => $model->device->shortDisplayName() . ' (' . $model->customoid_descr . ')',
         ];
     }
 }

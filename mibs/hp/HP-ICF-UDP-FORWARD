@@ -3,7 +3,7 @@
 HP-ICF-UDP-FORWARD DEFINITIONS ::= BEGIN
 
     IMPORTS
-        Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        Integer32,Counter32, MODULE-IDENTITY, OBJECT-TYPE
             FROM SNMPv2-SMI
         RowStatus
             FROM SNMPv2-TC
@@ -12,12 +12,13 @@ HP-ICF-UDP-FORWARD DEFINITIONS ::= BEGIN
         hpSwitch
             FROM HP-ICF-OID
         InetAddressType, InetAddress, InetPortNumber
-            FROM INET-ADDRESS-MIB;
+            FROM INET-ADDRESS-MIB
+        MODULE-COMPLIANCE, OBJECT-GROUP
+              FROM SNMPv2-CONF;
 
     hpicfUdpFwd MODULE-IDENTITY
-        LAST-UPDATED "200405190630Z" -- May 19, 2004
-        ORGANIZATION "Hewlett-Packard Company
-                      Network Infrastructure Solutions"
+        LAST-UPDATED "201706130630Z" -- June 13, 2017
+        ORGANIZATION "HP Networking"
         CONTACT-INFO "Hewlett-Packard Company
                       8000 Foothills Blvd.
                       Roseville, CA 95747"
@@ -25,8 +26,21 @@ HP-ICF-UDP-FORWARD DEFINITIONS ::= BEGIN
                      the UDP Broadcast Forwarding of HP networking
                      devices."
 
+        REVISION     "201706130630Z" -- June 13, 2017
+        DESCRIPTION  "The Mib object hpicfUdpFwdDhcpRelayAdminStatus description
+                      has been updated."
+
+        REVISION     "201301040630Z" -- Jan 04, 2013
+        DESCRIPTION  "Added Mib Objects for DHCP Relay Agent configuration 
+	              and policies."
+
+        REVISION     "200908040630Z" -- Aug 04, 2009
+        DESCRIPTION  "Added Mib Objects that display DHCP Relay Agent 
+	              packet statistics."
+
         REVISION     "200405190630Z" -- May 19, 2004
         DESCRIPTION  "Initial version of this MIB module."
+        
         ::= { hpSwitch 23 }
 
 
@@ -37,14 +51,14 @@ hpicfUdpFwdObjects         OBJECT IDENTIFIER ::= { hpicfUdpFwd 1 }
 
 hpicfUdpBcastFwdAdminStatus         OBJECT-TYPE
         SYNTAX      INTEGER {
-                        enable(1),
-                        disable(2)
+                        enabled(1),
+                        disabled(2)
                     }
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION "The operational status of the UDP Broadcast Forward
                     feature"
-        DEFVAL     { disable }
+        DEFVAL     { disabled }
         ::= { hpicfUdpFwdObjects 1 }
 
 -- UDP broadcast forwarding table
@@ -136,6 +150,146 @@ hpicfUdpFwdRowStatus  OBJECT-TYPE
         ::= { hpicfUdpFwdServersEntry 6 }
 
 
+-- DHCP Relay statistics mib 
+
+hpicfUdpFwdDhcpRelayClientDiscards OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "The number of DHCP client packets discarded
+		     by the relay agent for any reason."
+        ::= { hpicfUdpFwdObjects 3}
+
+hpicfUdpFwdDhcpRelayClientForwards OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "The number of DHCP client packets relayed 
+	             successfully to the DHCP server by the relay agent."
+        ::= { hpicfUdpFwdObjects 4}
+
+hpicfUdpFwdDhcpRelayServerDiscards OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "The number of DHCP server packets discarded 
+	             by the relay agent for any reason."
+        ::= { hpicfUdpFwdObjects 5 }
+
+hpicfUdpFwdDhcpRelayServerForwards OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "The number of DHCP server packets relayed 
+	            successfully to the DHCP server by the relay agent."
+        ::= { hpicfUdpFwdObjects 6 }
+
+hpicfUdpFwdDhcpRelayAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The operational status of the DHCP Relay protocol."
+        ::= { hpicfUdpFwdObjects 7 }
+
+hpicfUdpFwdDhcpRelayOption82Objects OBJECT IDENTIFIER ::= { hpicfUdpFwdObjects 8 }
+
+hpicfUdpFwdDhcpRelayOption82AdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The operational status of the option 82 in the 
+                     DHCP Relay Agent protocol. This mib object has a direct
+                     dependency on the hpicfUdpFwdDhcpRelayOption82Policy object 
+                     and should be present when operational status of this 
+                     object is changed to enable. 
+                     The status disable will reset the option 82 parameters
+                     to default values."
+        ::= { hpicfUdpFwdDhcpRelayOption82Objects 1 }
+
+hpicfUdpFwdDhcpRelayOption82Policy OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        replace(1),
+                        keep(2),
+                        drop(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The operational policies for option 82. This mib object 
+              can be configured only when 
+              hpicfUdpFwdDhcpRelayOption82AdminStatus is in enable state. 
+              This is the required parameter during configuration of option 82.
+              The policies currently supported are:
+              Keep    --- Append the option 82 field to the client request 
+                          only if not already present before forwarding 
+                          to the server.
+              Replace --- Replace the option 82 field(s) with switch 
+                          option 82 if present else add the option 82 
+                          field to the client
+                          request before forwarding to server.
+              Drop    --- Drop the request if option 82 field exists in the 
+                          client request else add the option 82 field to the 
+                          client request before forwarding to server."
+        ::= { hpicfUdpFwdDhcpRelayOption82Objects 2 }
+
+hpicfUdpFwdDhcpRelayOption82ResponseValidate OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Validate the server response for the 
+                     option 82 field before forwarding to client. This 
+              mib object can be configured only when 
+              hpicfUdpFwdDhcpRelayOption82AdminStatus is in enable state. This 
+              is an optional parameter during configuration of option 82 
+              and the default value in the switch is disable"
+        ::= { hpicfUdpFwdDhcpRelayOption82Objects 3 }
+
+hpicfUdpFwdDhcpRelayOption82RemoteId OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        mac(1),
+                        ip(2),
+                        mgmtvlan(3) 
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION  "Remote ID sub option that will be filled while 
+          forwarding the client request to the server. This mib object 
+          can be configured only when hpicfUdpFwdDhcpRelayOption82AdminStatus 
+          is in enable state. The default value for this mib object is mac.
+                     
+           mac ---  the switch MAC address is filled 
+                    as remote id sub option.
+           ip ---  IP address of the VLAN on which the client request is 
+                   received is filled as remote id sub option.
+           mgmtvlan ---   the management VLAN IP address will be filled for
+                           remote id sub option."
+
+        ::= { hpicfUdpFwdDhcpRelayOption82Objects 4 }
+
+hpicfUdpFwdDhcpRelayHopCount OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "If this mib object is disabled then DHCP Relay
+                     Agent will not increment the hop count field of
+                     the DHCP packet while transmitting packet to the
+                     DHCP server. If this mib object is enabled then
+                     DHCP Relay Agent will increment the hop count 
+                     field while transmitting the DHCP packet to the
+                     server. By default it is set to enabled."
+        ::= { hpicfUdpFwdObjects 9}
+
 -- Conformance information
 
 hpicfUdpFwdConformance OBJECT IDENTIFIER ::= { hpicfUdpFwd  2 }
@@ -155,7 +309,7 @@ hpicfUdpFwdCompliance MODULE-COMPLIANCE
                 packet forwarding"
         MODULE
         MANDATORY-GROUPS {  hpicfUdpFwdCfgGroup,
-                            hpicfUdpFwdServerTableGroup }
+                            hpicfUdpFwdServerTableGroup}
 
         GROUP       hpicfUdpFwdCfgGroup
         DESCRIPTION "A Collection of Object(s) that allow  
@@ -167,16 +321,43 @@ hpicfUdpFwdCompliance MODULE-COMPLIANCE
 
         ::= { hpicfUdpFwdCompliances 1 }
 
+hpicfUdpFwdStatCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "
+                A compliance statement for HP Routing switches with UDP 
+                packet forwarding statistics"
+        MODULE
+        MANDATORY-GROUPS { hpicfUdpFwdDhcpRelayStatsGroup }
+
+       
+        GROUP       hpicfUdpFwdDhcpRelayStatsGroup
+        DESCRIPTION "A collection of objects that give statistics 
+		     on packet processing done by the DHCP Relay."
+
+        ::= { hpicfUdpFwdCompliances 2 }
+
+hpicfUdpFwdDhcpRelayCfgCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "
+                A compliance statement for HP Routing switches with DHCP
+                Relay agent."
+        MODULE
+        MANDATORY-GROUPS {  hpicfUdpFwdDhcpRelayCfgGroup }
+
+        GROUP       hpicfUdpFwdDhcpRelayCfgGroup
+        DESCRIPTION "A Collection of Object(s) that allow
+                     configuration of DHCP Relay Agent and its policies."
+
+        ::= { hpicfUdpFwdCompliances 3 }
 
 hpicfUdpFwdCfgGroup OBJECT-GROUP
         OBJECTS     { hpicfUdpBcastFwdAdminStatus}
         STATUS      current
-        DESCRIPTION "Enable/Disable the UDP Forwader in the routing switch"
+        DESCRIPTION "Enable/Disable the UDP Forwarder in the routing switch"
         ::= { hpicfUdpFwdGroups 1 }
 
 hpicfUdpFwdServerTableGroup OBJECT-GROUP
         OBJECTS     { 
-                      hpicfUdpFwdVlanId,
                       hpicfUdpFwdServerAddressType,
                       hpicfUdpFwdServerAddress,
                       hpicfUdpFwdPortNumber,
@@ -185,6 +366,28 @@ hpicfUdpFwdServerTableGroup OBJECT-GROUP
         DESCRIPTION "A collection of objects allowing configuration of
                     UDP Forwarder Server Address table"
         ::= { hpicfUdpFwdGroups 2 }
+
+hpicfUdpFwdDhcpRelayStatsGroup OBJECT-GROUP
+        OBJECTS     {
+	              hpicfUdpFwdDhcpRelayClientDiscards,
+                      hpicfUdpFwdDhcpRelayClientForwards,
+                      hpicfUdpFwdDhcpRelayServerDiscards,
+                      hpicfUdpFwdDhcpRelayServerForwards}
+        STATUS      current
+        DESCRIPTION "A collection of statistics objects for DHCP Relay agent"
+        ::= { hpicfUdpFwdGroups 3 }
+
+hpicfUdpFwdDhcpRelayCfgGroup OBJECT-GROUP
+        OBJECTS     { hpicfUdpFwdDhcpRelayAdminStatus,
+                      hpicfUdpFwdDhcpRelayOption82AdminStatus,
+                      hpicfUdpFwdDhcpRelayOption82Policy,
+                      hpicfUdpFwdDhcpRelayOption82ResponseValidate,
+                      hpicfUdpFwdDhcpRelayOption82RemoteId,
+                      hpicfUdpFwdDhcpRelayHopCount}
+        STATUS      current
+        DESCRIPTION "A Collection of Object(s) that allow
+                     configuration of DHCP Relay Agent and its policies."
+        ::= { hpicfUdpFwdGroups 4 }
 
 END
 

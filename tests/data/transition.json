@@ -3841,8 +3841,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "S3290-42 (standalone) 2.0.4",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "true",
                     "entPhysicalModelName": "",
                     "entPhysicalVendorType": "zeroDotZero.0.0.0.0.0.0",
@@ -3850,6 +3850,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "Transition Networks",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

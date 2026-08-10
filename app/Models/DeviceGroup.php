@@ -26,13 +26,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use Permissions;
 
 class DeviceGroup extends BaseModel
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $fillable = ['name', 'desc', 'type'];
 
@@ -94,7 +98,7 @@ class DeviceGroup extends BaseModel
 
     public function scopeHasAccess($query, User $user)
     {
-        if ($user->hasGlobalRead()) {
+        if (Gate::allows('viewAll', DeviceGroup::class)) {
             return $query;
         }
 

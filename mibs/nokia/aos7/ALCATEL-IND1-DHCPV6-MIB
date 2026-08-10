@@ -2,7 +2,7 @@ ALCATEL-IND1-DHCPV6-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
         MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
-        IpAddress, Integer32, Unsigned32, Counter32
+        IpAddress, Integer32, Unsigned32, Counter32, TimeTicks
                 FROM SNMPv2-SMI
         TEXTUAL-CONVENTION, PhysAddress, DisplayString,RowStatus, TimeStamp, TruthValue, DateAndTime
                 FROM SNMPv2-TC
@@ -22,27 +22,21 @@ IMPORTS
 
 
 alcatelIND1DHCPv6MIB MODULE-IDENTITY
-    LAST-UPDATED "201303220000Z"
-    ORGANIZATION "Alcatel-Lucent"
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc."
     CONTACT-INFO
-        "Please consult with Customer Service to ensure the most appropriate
-         version of this document is used with the products in question:
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
 
-                    Alcatel-Lucent, Enterprise Solutions Division
-                   (Formerly Alcatel Internetworking, Incorporated)
-                           26801 West Agoura Road
-                        Agoura Hills, CA  91301-5122
-                          United States Of America
+                      ALE USA Inc. Enterprise
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
 
-        Telephone:               North America  +1 800 995 2696
-                                 Latin America  +1 877 919 9526
-                                 Europe         +31 23 556 0100
-                                 Asia           +65 394 7933
-                                 All Other      +1 818 878 4507
+     Telephone:          +1 800 995 2696
 
-        Electronic Mail:         support@ind.alcatel.com
-        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
 
     DESCRIPTION
         "This module describes an authoritative enterprise-specific Simple
@@ -61,13 +55,24 @@ alcatelIND1DHCPv6MIB MODULE-IDENTITY
          non-exclusive license to use this specification in connection with
          management of the products for which it is intended to be used.
 
-                     Copyright (C) 2013 Alcatel-Lucent
-                         ALL RIGHTS RESERVED WORLDWIDE"
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
+    REVISION      "201911270000Z"
+    DESCRIPTION
+        "Updated the latest contact and Copyright information for ALE USA Inc."
+
+    REVISION      "201812050000Z"
+    DESCRIPTION
+        "alaDHCPv6RelayMaximumHops added"
+
+    REVISION      "201807090000Z"
+    DESCRIPTION
+        "MIB updated to support DHCPv6 Snooping configuration"
 
     REVISION      "201303220000Z"
     DESCRIPTION
         "The first version of this MIB Module."
-
     ::= { softentIND1Ipv6 2 }
 
 
@@ -92,6 +97,82 @@ alaDHCPv6RelayAdminStatus OBJECT-TYPE
          DHCPv6 Relay must still be enabled on individual interfaces
          in order for relay operation to occur."
     ::= { alaDHCPv6RelayConfig 1 }
+
+alaDHCPv6RelayMaximumHops OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..32)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of relay hops allowed."
+    DEFVAL { 32 }
+    ::= { alaDHCPv6RelayConfig 2 }
+
+alaDHCPv6RelayInterfaceIDStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The interface-id status of DHCPv6 relay."
+    ::= { alaDHCPv6RelayConfig 3 }
+
+alaDHCPv6RelayInterfaceIDPrefix OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The interface-id prefix of DHCPv6 relay."
+    ::= { alaDHCPv6RelayConfig 4 }
+
+alaDHCPv6RelayRemoteIDStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The remote-id status of DHCPv6 relay."
+    ::= { alaDHCPv6RelayConfig 5 }
+
+alaDHCPv6RelayRemoteIDFormatType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    baseMac(1),
+                    systemName(2),
+                    vlan(3),
+                    userString(4),
+                    interfaceAlias(5),
+                    autoInterfaceAlias(6),
+                    disable(7)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The remote-id format type of DHCPv6 relay."
+    ::= { alaDHCPv6RelayConfig 6 }
+
+alaDHCPv6RelayRemoteIDStringValue OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The remote-id string value of DHCPv6 relay."
+    ::= { alaDHCPv6RelayConfig 7 }
+
+alaDHCPv6RelayRemoteIDEnterpriseNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (0|1..4294967295)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The remote-id enterprise number of DHCPv6 relay.
+         0   : If no value configured.
+         6486: Remote ID enabled without configuring enterprise number.
+         All other values: user-defined value."
+    DEFVAL { 0 }
+    ::= { alaDHCPv6RelayConfig 8 }
+
 
 alaDHCPv6SrvConfig OBJECT IDENTIFIER ::= { alcatelIND1DHCPv6MIBObjects 2 }
 
@@ -357,6 +438,935 @@ alaDHCPv6SrvSubnetDescriptor OBJECT-TYPE
                 "This object specifies the subnet Descriptor. Denotes the IPv6 address"
         ::= { alaDHCPv6SrvTrapsObj 2 }
 
+
+
+AlaDHCPv6GuardTrustedSourceIfIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value identifying a trusted source port or link aggregation.  
+        The ifIndex value is in network byte order."
+    SYNTAX      Integer32 (1..2147483647)
+
+--
+-- Alcatel DHCPv6 Guard Interface Table
+--
+
+alaDHCPv6GuardInterfaceTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaDHCPv6GuardInterfaceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "Table to control operation of DHCPv6 Guard on a VLAN."
+        ::= { alcatelIND1DHCPv6MIBObjects 7 }
+
+alaDHCPv6GuardInterfaceEntry OBJECT-TYPE
+        SYNTAX      AlaDHCPv6GuardInterfaceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "An DHCPv6 Guard interface entry."
+        INDEX       { ipv6IfIndex }
+        ::= { alaDHCPv6GuardInterfaceTable 1 }
+
+AlaDHCPv6GuardInterfaceEntry ::= SEQUENCE {	 
+        alaDHCPv6GuardInterfaceAdminStatus INTEGER,
+        alaDHCPv6GuardInterfaceRowStatus   RowStatus,
+        alaDHCPv6GuardInterfaceClient INTEGER,
+        alaDHCPv6GuardInterfaceLDRAAdminStatus INTEGER
+}
+
+alaDHCPv6GuardInterfaceAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        " DHCPv6 Guard administrative status."
+    DEFVAL { enable }
+    ::= { alaDHCPv6GuardInterfaceEntry 1 }
+
+
+alaDHCPv6GuardInterfaceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Used to control the addition and removal of a trusted source entry."
+    ::= { alaDHCPv6GuardInterfaceEntry 2 }
+
+alaDHCPv6GuardInterfaceClient OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable DHCPv6 Guard for client messages."
+    DEFVAL { disable }
+    ::= { alaDHCPv6GuardInterfaceEntry 3 }
+ 
+alaDHCPv6GuardInterfaceLDRAAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        " DHCPv6 Guard LDRA administrative status."
+    DEFVAL { disable }
+    ::= { alaDHCPv6GuardInterfaceEntry 4 }
+
+--
+-- Alcatel DHCPv6 Guard Trusted Source Table
+--
+
+alaDHCPv6GuardTrustedSourceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDHCPv6GuardTrustedSourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Table allowing the creation and removal of trusted sources
+      for a IPv6 interface DHCPv6 Guard."
+    ::= { alcatelIND1DHCPv6MIBObjects 8 }
+
+alaDHCPv6GuardTrustedSourceEntry OBJECT-TYPE
+    SYNTAX      AlaDHCPv6GuardTrustedSourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "An DHCPv6 Guard trusted source entry."
+    INDEX       { ipv6IfIndex, alaDHCPv6GuardTrustedSourceIfIndex }
+    ::= { alaDHCPv6GuardTrustedSourceTable 1 }
+
+AlaDHCPv6GuardTrustedSourceEntry ::= SEQUENCE {
+    alaDHCPv6GuardTrustedSourceIfIndex       AlaDHCPv6GuardTrustedSourceIfIndex,
+    alaDHCPv6GuardTrustedSourceRowStatus   RowStatus
+}
+
+
+alaDHCPv6GuardTrustedSourceIfIndex OBJECT-TYPE
+    SYNTAX      AlaDHCPv6GuardTrustedSourceIfIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value identifying a trusted source port or link aggregation."
+    ::= { alaDHCPv6GuardTrustedSourceEntry 1 }
+
+alaDHCPv6GuardTrustedSourceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Used to control the addition and removal of a trusted source entry."
+    ::= { alaDHCPv6GuardTrustedSourceEntry 2 }
+
+
+--
+-- DHCPv6 Snooping Interface Table
+--
+
+alaDHCPv6SnoopingInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDHCPv6SnoopingInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table to control operation of DHCPv6 Snooping on a VLAN."
+    ::= { alcatelIND1DHCPv6MIBObjects 9 }
+
+alaDHCPv6SnoopingInterfaceEntry OBJECT-TYPE
+    SYNTAX      AlaDHCPv6SnoopingInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A DHCPv6 Snooping interface entry."
+    INDEX       { alaDHCPv6SnoopingInterfaceIndex }
+    ::= { alaDHCPv6SnoopingInterfaceTable 1 }
+
+AlaDHCPv6SnoopingInterfaceEntry ::= SEQUENCE {	 
+    alaDHCPv6SnoopingInterfaceIndex       Ipv6IfIndexOrZero,
+    alaDHCPv6SnoopingInterfaceAdminStatus INTEGER,
+    alaDHCPv6SnoopingInterfaceRowStatus   RowStatus
+}
+
+alaDHCPv6SnoopingInterfaceIndex OBJECT-TYPE
+    SYNTAX      Ipv6IfIndexOrZero
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index identifying an IPv6 index or vlan for 
+        per-interface DHCPv6 snooping configuration.  The 
+        value 0 corresponds to the global DHCPv6
+        Snooping configuration.
+
+        DHCPv6 snooping does not require the presence of an
+        IPv6 Interface on a VLAN.  While this object's value
+        should be formed based on the convention described in 
+        alaIPv6InterfaceTable description, there may not
+        be a corresponding entry in that table."
+    ::= { alaDHCPv6SnoopingInterfaceEntry 1 }
+
+alaDHCPv6SnoopingInterfaceAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        " DHCPv6 Snooping administrative status."
+    DEFVAL { enable }
+    ::= { alaDHCPv6SnoopingInterfaceEntry 2 }
+
+alaDHCPv6SnoopingInterfaceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Used to control the addition and removal of an interface's
+	DHCPv6 Snooping configuration."
+    ::= { alaDHCPv6SnoopingInterfaceEntry 3 }
+
+---
+--- DHCPv6 Snooping Binding Table Configuration
+---
+
+alaDHCPv6BindingConfig OBJECT IDENTIFIER ::= { alcatelIND1DHCPv6MIBObjects 10 }
+
+alaDHCPv6BindingTimeout OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..600)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The amount of time between each automatic save of the DHCPv6 Snooping
+        binding table to permanent storage."
+    DEFVAL { 1 }
+    ::= { alaDHCPv6BindingConfig 1  }
+
+alaDHCPv6BindingAction OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   none(0),
+                   purge(1),
+                   renew(2),
+                   save(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Execute a binding table action.
+
+        purge(1) immediately clears the contents of the binding table
+        renew(2) restores the binding table to the values in permanent storage
+        save(3) immediate saves the binding table to permanent storage.
+
+        This object is essentially write-only.  The value none(0) will
+        be returned for any read attempts."
+    ::= { alaDHCPv6BindingConfig 2  }
+
+alaDHCPv6BindingPersistency OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+		   disable(2)
+	       }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Specifies whether to retain binding table entries for the duration of
+        the lease, even if the MAC address is removed from the MAC address
+        cache."
+    ::= { alaDHCPv6BindingConfig 3  }
+
+
+---
+--- DHCPv6 Snooping Binding Table
+---
+
+alaDHCPv6BindingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDHCPv6BindingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The DHCPv6 Snooping binding table."
+    ::= { alcatelIND1DHCPv6MIBObjects 11 }
+
+alaDHCPv6BindingEntry OBJECT-TYPE
+    SYNTAX      AlaDHCPv6BindingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A DHCPv6 Snooping binding table entry."
+    INDEX       { 
+                  alaDHCPv6BindingInterfaceIndex, 
+                  alaDHCPv6BindingLinkLocalAddress
+                }
+    ::= { alaDHCPv6BindingTable 1 }
+
+AlaDHCPv6BindingEntry ::= SEQUENCE {
+    alaDHCPv6BindingInterfaceIndex   Unsigned32,
+    alaDHCPv6BindingLinkLocalAddress Ipv6Address,
+    alaDHCPv6BindingPortIfIndex      Unsigned32,
+    alaDHCPv6BindingGlobalAddress    Ipv6Address,
+    alaDHCPv6BindingLeaseTime        Integer32,  
+    alaDHCPv6BindingPhysAddress      PhysAddress,
+    alaDHCPv6BindingType             INTEGER,
+    alaDHCPv6BindingRowStatus        RowStatus
+}
+
+alaDHCPv6BindingInterfaceIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ipv6IfIndex value identifying the interface on 
+	which the client resides.
+
+        DHCPv6 snooping does not require the presence of an
+        IPv6 Interface on a VLAN.  While this object's value
+        should be formed based on the convention described in 
+        alaIPv6InterfaceTable description, there may not
+        be a corresponding entry in that table."
+    ::= { alaDHCPv6BindingEntry 1 }
+
+alaDHCPv6BindingLinkLocalAddress OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The client's link-local address."
+    ::= { alaDHCPv6BindingEntry 2 }
+
+alaDHCPv6BindingPortIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the port used to reach the client."
+    ::= { alaDHCPv6BindingEntry 3 }
+
+alaDHCPv6BindingGlobalAddress OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The global address assigned to the client by
+        the DHCPv6 lease."
+    ::= { alaDHCPv6BindingEntry 4 }
+
+alaDHCPv6BindingLeaseTime OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The valid lifetime of the DHCPv6 lease.
+
+         A value of -1 indicates an indefinite lease. Binding
+         table entries that are manually added or modified will
+         automatically be given an indefinite lifetime."
+    DEFVAL { -1 }
+    ::= { alaDHCPv6BindingEntry 5 }
+
+alaDHCPv6BindingPhysAddress OBJECT-TYPE
+    SYNTAX      PhysAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The client's physical address."
+    ::= { alaDHCPv6BindingEntry 6 }
+
+alaDHCPv6BindingType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  dynamic(1),
+                  static(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Was this entry dynamically learned or statically
+         configured?"
+    ::= { alaDHCPv6BindingEntry 7 }
+
+alaDHCPv6BindingRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Used to control the addition and removal of a binding
+         table entry."
+    ::= { alaDHCPv6BindingEntry 8 }
+
+---
+--- DHCPv6 Source Filter VLAN Table
+---
+
+alaDHCPv6SourceFilterInterfaceTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDHCPv6SourceFilterInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table allows configuration of source filtering on a VLAN."
+    ::= { alcatelIND1DHCPv6MIBObjects 12 }
+
+alaDHCPv6SourceFilterInterfaceEntry OBJECT-TYPE
+    SYNTAX      AlaDHCPv6SourceFilterInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A DHCPv6 source filter VLAN table entry."
+    INDEX { alaDHCPv6SourceFilterInterfaceIndex }
+    ::= { alaDHCPv6SourceFilterInterfaceTable 1 }
+
+AlaDHCPv6SourceFilterInterfaceEntry ::= SEQUENCE {
+    alaDHCPv6SourceFilterInterfaceIndex          Unsigned32,
+    alaDHCPv6SourceFilterInterfaceRowStatus      RowStatus
+}
+
+alaDHCPv6SourceFilterInterfaceIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index identifying an IPv6 index or vlan for
+         per-interface DHCPv6 source filtering configuration."
+    ::= { alaDHCPv6SourceFilterInterfaceEntry 1 }
+
+alaDHCPv6SourceFilterInterfaceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Used to control the addition and removal of source filtering interface table entry"
+    ::= { alaDHCPv6SourceFilterInterfaceEntry 2 }
+
+---
+--- DHCPv6 Source Filter Port Table
+---
+
+alaDHCPv6SourceFilterPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDHCPv6SourceFilterPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table allows configuration of source filtering on a port or link aggregation."
+    ::= { alcatelIND1DHCPv6MIBObjects 13 }
+
+alaDHCPv6SourceFilterPortEntry OBJECT-TYPE
+    SYNTAX      AlaDHCPv6SourceFilterPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A DHCPv6 Source Filter table interface entry."
+    INDEX  { alaDHCPv6SourceFilterPortIndex}
+    ::= { alaDHCPv6SourceFilterPortTable 1 }
+
+AlaDHCPv6SourceFilterPortEntry ::= SEQUENCE {
+    alaDHCPv6SourceFilterPortIndex       Unsigned32,
+    alaDHCPv6SourceFilterPortRowStatus      RowStatus
+}
+
+alaDHCPv6SourceFilterPortIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value identifying a port or link aggregation."
+    ::= { alaDHCPv6SourceFilterPortEntry 1 }
+
+alaDHCPv6SourceFilterPortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        " Used to control the addition and removal of source filtering port table entry."
+    ::= { alaDHCPv6SourceFilterPortEntry 2 }
+
+
+--
+--
+alaDhcpv6IsfTrapsObj OBJECT IDENTIFIER ::= { alcatelIND1DHCPv6MIBObjects 14 }
+
+alaDhcpv6IsfTcamFail NOTIFICATION-TYPE
+        OBJECTS  {
+                    alaDhcpv6IsfTcamFailMsg 
+                 }
+        STATUS   current
+        DESCRIPTION
+                "Binding entry creation fail due to TCAM resource failure."
+        ::= { alcatelIND1DHCPv6MIBNotifications 2 }
+
+alaDhcpv6IsfTcamFailMsg OBJECT-TYPE
+        SYNTAX SnmpAdminString (SIZE (1..255)) 
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+                "This object specifies binding entry creation fail due to TCAM resource failure."
+        ::= { alaDhcpv6IsfTrapsObj 1 }
+
+alaDHCPv6SnoopingSourceFilter OBJECT IDENTIFIER ::= { alcatelIND1DHCPv6MIBObjects 15 }
+
+alaDHCPv6SnoopingSourceFilterAdminState OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The global DHCPv6 snooping IP source filtering admin state."
+        ::= { alaDHCPv6SnoopingSourceFilter 1 }
+
+alaDHCPv6SrvStats OBJECT IDENTIFIER ::= { alcatelIND1DHCPv6MIBObjects 16 }
+
+alaDHCPv6SrvStatsServerName OBJECT-TYPE
+        SYNTAX          SnmpAdminString ( SIZE( 0..128 ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "DHCPv6 server name."
+        DEFVAL { "" }
+::= { alaDHCPv6SrvStats 1 }
+
+alaDHCPv6SrvStatsServerStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            enable(1),
+                            disable(2)
+                          }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "DHCPv6 server status."
+        DEFVAL { disable }
+::= { alaDHCPv6SrvStats 2 }
+
+alaDHCPv6SrvStatsTotalSubnetsManaged  OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of subnets managed."
+::= { alaDHCPv6SrvStats 3 }
+
+alaDHCPv6SrvStatsTotalSubnetsUsed  OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of subnets used."
+::= { alaDHCPv6SrvStats 4 }
+
+alaDHCPv6SrvStatsTotalSubnetsUnused  OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of subnets left unused."
+::= { alaDHCPv6SrvStats 5 }
+
+alaDHCPv6SrvStatsTotalSubnetsFull  OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of subnets that are full."
+::= { alaDHCPv6SrvStats 6 }
+
+alaDHCPv6SrvStatsServerUpTime  OBJECT-TYPE
+        SYNTAX          TimeTicks
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "DHCPv6 server up time."
+        DEFVAL { 0 }
+::= { alaDHCPv6SrvStats 7 }
+
+alaDHCPv6SrvStatsLeaseDbSyncTime  OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Lease database sync time in seconds"
+::= { alaDHCPv6SrvStats 8 }
+
+alaDHCPv6SrvStatsLastSyncTime  OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The last time the server statistics were sync'd"
+::= { alaDHCPv6SrvStats 9 }
+
+alaDHCPv6SrvStatsNextSyncTime  OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The time at which the next sync will happen"
+::= { alaDHCPv6SrvStats 10 }
+
+--
+-- Alcatel DHCPv6 Guard Service Table
+--
+
+alaDHCPv6GuardServiceTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaDHCPv6GuardServiceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "Table to control operation of DHCPv6 Guard on a Service."
+        ::= { alcatelIND1DHCPv6MIBObjects 17 }
+
+alaDHCPv6GuardServiceEntry OBJECT-TYPE
+        SYNTAX      AlaDHCPv6GuardServiceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "An DHCPv6 Guard Service entry."
+        INDEX       { alaDHCPv6GuardServiceId }
+        ::= { alaDHCPv6GuardServiceTable 1 }
+
+AlaDHCPv6GuardServiceEntry ::= SEQUENCE {	 
+        alaDHCPv6GuardServiceId      Unsigned32,
+        alaDHCPv6GuardServiceAdminStatus    INTEGER,
+        alaDHCPv6GuardServiceClient         INTEGER,
+        alaDHCPv6GuardServiceRowStatus      RowStatus
+}
+
+alaDHCPv6GuardServiceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 Guard Service Id."
+    ::= { alaDHCPv6GuardServiceEntry 1 }
+
+alaDHCPv6GuardServiceAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        " DHCPv6 Guard Service administrative status."
+    DEFVAL { enable }
+    ::= { alaDHCPv6GuardServiceEntry 2 }
+
+alaDHCPv6GuardServiceClient OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable DHCPv6 Guard Service for client messages."
+    DEFVAL { disable }
+    ::= { alaDHCPv6GuardServiceEntry 3 }
+
+alaDHCPv6GuardServiceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Used to control the addition and removal of a guard service
+         table entry."
+    ::= { alaDHCPv6GuardServiceEntry 4 }
+
+--
+-- DHCPv6 Snooping Service Table
+--
+
+alaDHCPv6SnoopingServiceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDHCPv6SnoopingServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table to control operation of DHCPv6 Snooping on a Service."
+    ::= { alcatelIND1DHCPv6MIBObjects 18 }
+
+alaDHCPv6SnoopingServiceEntry OBJECT-TYPE
+    SYNTAX      AlaDHCPv6SnoopingServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A DHCPv6 Snooping Service entry."
+    INDEX       { alaDHCPv6SnoopingServiceId }
+    ::= { alaDHCPv6SnoopingServiceTable 1 }
+
+AlaDHCPv6SnoopingServiceEntry ::= SEQUENCE {	 
+    alaDHCPv6SnoopingServiceId       Unsigned32,
+    alaDHCPv6SnoopingServiceAdminStatus INTEGER,
+    alaDHCPv6SnoopingServiceRowStatus   RowStatus
+}
+
+alaDHCPv6SnoopingServiceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 Snooping Service Id."
+    ::= { alaDHCPv6SnoopingServiceEntry 1 }
+
+alaDHCPv6SnoopingServiceAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        " DHCPv6 Snooping Service administrative status."
+    DEFVAL { enable }
+    ::= { alaDHCPv6SnoopingServiceEntry 2 }
+
+alaDHCPv6SnoopingServiceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Used to control the addition and removal of a snooping service
+         table entry."
+    ::= { alaDHCPv6SnoopingServiceEntry 3 }
+
+---
+--- DHCPv6 Snooping Binding Service Table
+---
+
+alaDHCPv6BindingServiceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDHCPv6BindingServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The DHCPv6 Snooping binding service table."
+    ::= { alcatelIND1DHCPv6MIBObjects 19 }
+
+alaDHCPv6BindingServiceEntry OBJECT-TYPE
+    SYNTAX      AlaDHCPv6BindingServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A DHCPv6 Snooping binding service table entry."
+    INDEX       { 
+                  alaDHCPv6BindingServiceId,
+                  alaDHCPv6BindingServiceLinkLocalAddressType,
+                  alaDHCPv6BindingServiceLinkLocalAddress
+                }
+    ::= { alaDHCPv6BindingServiceTable 1 }
+
+AlaDHCPv6BindingServiceEntry ::= SEQUENCE {
+    alaDHCPv6BindingServiceId                   Unsigned32,
+    alaDHCPv6BindingServiceLinkLocalAddressType InetAddressType,
+    alaDHCPv6BindingServiceLinkLocalAddress     InetAddress,
+    alaDHCPv6BindingServicePortIfIndex          Unsigned32,
+    alaDHCPv6BindingServiceEncapVal             Unsigned32,
+    alaDHCPv6BindingServiceGlobalAddressType    InetAddressType,
+    alaDHCPv6BindingServiceGlobalAddress        InetAddress,
+    alaDHCPv6BindingServiceLeaseTime            Integer32,
+    alaDHCPv6BindingServicePhysAddress          PhysAddress,
+    alaDHCPv6BindingServiceType                 INTEGER,
+    alaDHCPv6BindingServiceRowStatus            RowStatus
+}
+
+alaDHCPv6BindingServiceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 Snooping binding Service Id."
+    ::= { alaDHCPv6BindingServiceEntry 1 }
+
+alaDHCPv6BindingServiceLinkLocalAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType { ipv6(2) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The client's link-local address type."
+    ::= { alaDHCPv6BindingServiceEntry 2 }
+
+alaDHCPv6BindingServiceLinkLocalAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The client's link-local address."
+    ::= { alaDHCPv6BindingServiceEntry 3 }
+
+alaDHCPv6BindingServicePortIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the port used to reach the client."
+    ::= { alaDHCPv6BindingServiceEntry 4 }
+
+alaDHCPv6BindingServiceEncapVal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The encapsulation to be used for the SAP connecting to the service."
+    ::= { alaDHCPv6BindingServiceEntry 5 }
+
+alaDHCPv6BindingServiceGlobalAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType { ipv6(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The global address type assigned to the client by
+        the DHCPv6 lease."
+    ::= { alaDHCPv6BindingServiceEntry 6 }
+
+alaDHCPv6BindingServiceGlobalAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The global address assigned to the client by
+        the DHCPv6 lease."
+    ::= { alaDHCPv6BindingServiceEntry 7 }
+
+alaDHCPv6BindingServiceLeaseTime OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The valid lifetime of the DHCPv6 lease.
+
+         A value of -1 indicates an indefinite lease. Binding
+         table entries that are manually added or modified will
+         automatically be given an indefinite lifetime."
+    DEFVAL { -1 }
+    ::= { alaDHCPv6BindingServiceEntry 8 }
+
+alaDHCPv6BindingServicePhysAddress OBJECT-TYPE
+    SYNTAX      PhysAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The client's physical address."
+    ::= { alaDHCPv6BindingServiceEntry 9 }
+
+alaDHCPv6BindingServiceType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  dynamic(1),
+                  static(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Was this entry dynamically learned or statically
+         configured?"
+    ::= { alaDHCPv6BindingServiceEntry 10 }
+
+alaDHCPv6BindingServiceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Used to control the addition and removal of a binding service
+         table entry."
+    ::= { alaDHCPv6BindingServiceEntry 11 }
+
+alaDHCPv6GuardServiceTrustSourceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDHCPv6GuardServiceTrustSourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The DHCPv6 Snooping Service Trust source table."
+    ::= { alcatelIND1DHCPv6MIBObjects 20 }
+
+alaDHCPv6GuardServiceTrustSourceEntry OBJECT-TYPE
+    SYNTAX      AlaDHCPv6GuardServiceTrustSourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A DHCPv6 Snooping Service Trust source table entry."
+    INDEX       { 
+                  alaDHCPv6GuardServiceTrustSourceServiceId,
+                  alaDHCPv6GuardServiceTrustSourceSdpId
+                }
+    ::= { alaDHCPv6GuardServiceTrustSourceTable 1 }
+
+AlaDHCPv6GuardServiceTrustSourceEntry ::= SEQUENCE {
+    alaDHCPv6GuardServiceTrustSourceServiceId   Unsigned32,
+    alaDHCPv6GuardServiceTrustSourceSdpId       Unsigned32,
+    alaDHCPv6GuardServiceTrustSourceType        INTEGER
+}
+
+alaDHCPv6GuardServiceTrustSourceServiceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 Guard Service Trust Source Service Id."
+    ::= { alaDHCPv6GuardServiceTrustSourceEntry 1 }
+
+alaDHCPv6GuardServiceTrustSourceSdpId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 Guard Service Trust Source SDP Id."
+    ::= { alaDHCPv6GuardServiceTrustSourceEntry 2 }
+
+alaDHCPv6GuardServiceTrustSourceType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  static(1),
+                  dynamic(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 Guard Service Trust Source Type."
+    ::= { alaDHCPv6GuardServiceTrustSourceEntry 3 }
+
+---
+--- DHCPv6 Snooping Source Filter Service Table
+---
+
+alaDHCPv6SourceFilterServiceTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDHCPv6SourceFilterServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table allows configuration of source filtering on a service."
+    ::= { alcatelIND1DHCPv6MIBObjects 21 }
+
+alaDHCPv6SourceFilterServiceEntry OBJECT-TYPE
+    SYNTAX      AlaDHCPv6SourceFilterServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A DHCPv6 source filter Service table entry."
+    INDEX { alaDHCPv6SourceFilterServiceIndex }
+    ::= { alaDHCPv6SourceFilterServiceTable 1 }
+
+AlaDHCPv6SourceFilterServiceEntry ::= SEQUENCE {
+    alaDHCPv6SourceFilterServiceIndex          Unsigned32,
+    alaDHCPv6SourceFilterServiceRowStatus      RowStatus
+}
+
+alaDHCPv6SourceFilterServiceIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index identifying an IPv6 service for
+         per-interface DHCPv6 source filtering configuration."
+    ::= { alaDHCPv6SourceFilterServiceEntry 1 }
+
+alaDHCPv6SourceFilterServiceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Used to control the addition and removal of source filtering service table entry"
+    ::= { alaDHCPv6SourceFilterServiceEntry 2 }
+
 --
 -- conformance information
 --
@@ -386,6 +1396,44 @@ alaDHCPv6Compliance MODULE-COMPLIANCE
     DESCRIPTION 
                " The alaDHCPv6SrvLeaseUtilizationThresholdGroup is mandatory when the
                  managed entity supports DHCPv6 server."
+    GROUP      alaDHCPv6GuardInterfaceGroup
+    DESCRIPTION
+               "The alaDHCPv6GuardInterfaceGroup is mandatory when the managed entity
+ 		supports DHCPv6 guard."
+		
+    GROUP      alaDHCPv6GuardTrustedGroup
+    DESCRIPTION
+               "The alaDHCPv6GuardTrustedGroup is mandatory when the managed entity
+ 		supports DHCPv6 guard."
+    GROUP      alaDHCPv6SnoopingGroup
+    DESCRIPTION
+               "The alaDHCPv6SnoopingGroup is mandatory when the managed entity
+ 		supports DHCPv6 snooping."
+
+    GROUP      alaDHCPv6IsfNotificationsGroup
+    DESCRIPTION
+               "The alaDHCPv6IsfNotificationsGroup is mandatory when the managed entity
+ 		supports DHCPv6 ISF."
+
+    GROUP      alaDHCPv6SrvStatsGroup
+    DESCRIPTION
+               "The alaDHCPv6SrvStatsGroup is mandatory when the managed entity
+ 		supports DHCPv6 server."
+
+    GROUP      alaDHCPv6GuardServiceGroup
+    DESCRIPTION
+               "The alaDHCPv6GuardServiceGroup is mandatory when the managed entity
+ 		supports DHCPv6 guard service."
+
+    GROUP      alaDHCPv6SnoopingServiceGroup
+    DESCRIPTION
+               "The alaDHCPv6SrvStatsGroup is mandatory when the managed entity
+ 		supports DHCPv6 snooping service."
+    GROUP      alaDHCPv6BindingServiceGroup
+    DESCRIPTION
+               "The alaDHCPv6SrvStatsGroup is mandatory when the managed entity
+ 		supports DHCPv6 binding service."
+
     ::= { alcatelIND1DHCPv6MIBCompliances 1 }
 
 
@@ -399,7 +1447,14 @@ alaDHCPv6RelayGroup OBJECT-GROUP
                   alaDHCPv6RelayInterfaceAdminStatus,
                   -- alaDHCPv6RelayDestinationAddressType,
                   -- alaDHCPv6RelayDestinationAddress,
-                  alaDHCPv6RelayDestinationRowStatus
+                  alaDHCPv6RelayDestinationRowStatus,
+		  alaDHCPv6RelayMaximumHops,
+                  alaDHCPv6RelayInterfaceIDStatus,
+                  alaDHCPv6RelayInterfaceIDPrefix,
+                  alaDHCPv6RelayRemoteIDStatus,
+                  alaDHCPv6RelayRemoteIDFormatType,
+                  alaDHCPv6RelayRemoteIDStringValue,
+                  alaDHCPv6RelayRemoteIDEnterpriseNumber
                 }
     STATUS     current
     DESCRIPTION
@@ -408,9 +1463,9 @@ alaDHCPv6RelayGroup OBJECT-GROUP
 
 alaDHCPv6SrvGroup OBJECT-GROUP
     OBJECTS     {
-		  alaDHCPv6SrvGlobalConfigStatus,
-		  alaDHCPv6SrvGlobalRestart,
-		  alaDHCPv6SrvGlobalClearStat,
+                  alaDHCPv6SrvGlobalConfigStatus,
+                  alaDHCPv6SrvGlobalRestart,
+                  alaDHCPv6SrvGlobalClearStat,
                   -- alaDHCPv6SrvLeaseIpv6Address,
                   alaDHCPv6SrvLeaseLeaseGrant,
                   alaDHCPv6SrvLeasePrefLeaseExpiry,
@@ -441,6 +1496,140 @@ alaDHCPv6SrvLeaseUtilizationThresholdGroup OBJECT-GROUP
                 value set by the application, a notification is sent to the Management Entity,
                 with the DHCPv6 Server lease utilization information."
 ::= { alcatelIND1DHCPv6MIBGroups 4 } 
+
+alaDHCPv6GuardInterfaceGroup OBJECT-GROUP
+     OBJECTS
+        {
+           alaDHCPv6GuardInterfaceAdminStatus,
+           alaDHCPv6GuardInterfaceRowStatus,
+           alaDHCPv6GuardInterfaceClient,
+           alaDHCPv6GuardInterfaceLDRAAdminStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            ""
+::= { alcatelIND1DHCPv6MIBGroups 5 } 
+
+alaDHCPv6GuardTrustedGroup OBJECT-GROUP
+     OBJECTS
+        {
+           alaDHCPv6GuardTrustedSourceRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            ""
+::= { alcatelIND1DHCPv6MIBGroups 6 } 
+
+alaDHCPv6SnoopingGroup OBJECT-GROUP
+    OBJECTS     {
+                  -- alaDHCPv6SnoopingInterfaceIndex,
+                  alaDHCPv6SnoopingInterfaceAdminStatus,
+                  alaDHCPv6SnoopingInterfaceRowStatus,
+                  alaDHCPv6BindingTimeout,
+                  alaDHCPv6BindingAction,
+                  alaDHCPv6BindingPersistency,
+                  -- alaDHCPv6BindingLinkLocalAddress,
+                  alaDHCPv6BindingPortIfIndex,
+                  alaDHCPv6BindingGlobalAddress,
+                  alaDHCPv6BindingLeaseTime,
+                  alaDHCPv6BindingPhysAddress,
+                  alaDHCPv6BindingType,
+                  alaDHCPv6BindingRowStatus,
+                  alaDHCPv6SourceFilterInterfaceRowStatus,
+                  alaDHCPv6SourceFilterPortRowStatus,
+                  alaDHCPv6SnoopingSourceFilterAdminState,
+                  alaDHCPv6SourceFilterServiceRowStatus
+                }
+    STATUS     current
+    DESCRIPTION
+        "A collection of objects to support management of DHCPv6 Snooping."
+    ::= { alcatelIND1DHCPv6MIBGroups 7 }
+
+alaDHCPv6IsfNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { alaDhcpv6IsfTcamFail }
+    STATUS     current
+    DESCRIPTION
+        "Notifications for DHCPv6 ISF."
+    ::= { alcatelIND1DHCPv6MIBGroups 8 }
+
+alaDHCPv6IsfNotificationsObjectsGroup OBJECT-GROUP
+    OBJECTS
+    {
+        alaDhcpv6IsfTcamFailMsg
+    }
+    STATUS  current
+    DESCRIPTION
+        "Notification objects for DHCPv6 ISF."
+    ::= { alcatelIND1DHCPv6MIBGroups 9 }
+
+alaDHCPv6SrvStatsGroup OBJECT-GROUP
+    OBJECTS
+    {
+        alaDHCPv6SrvStatsServerName,
+        alaDHCPv6SrvStatsServerStatus,
+        alaDHCPv6SrvStatsTotalSubnetsManaged,
+        alaDHCPv6SrvStatsTotalSubnetsUsed,
+        alaDHCPv6SrvStatsTotalSubnetsUnused,
+        alaDHCPv6SrvStatsTotalSubnetsFull,
+        alaDHCPv6SrvStatsServerUpTime,
+        alaDHCPv6SrvStatsLeaseDbSyncTime,
+        alaDHCPv6SrvStatsLastSyncTime,
+        alaDHCPv6SrvStatsNextSyncTime
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of objects for DHCPv6 Server Statistic."
+    ::= { alcatelIND1DHCPv6MIBGroups 10 }
+
+alaDHCPv6GuardServiceGroup OBJECT-GROUP
+    OBJECTS
+    {
+        alaDHCPv6GuardServiceAdminStatus,
+        alaDHCPv6GuardServiceClient,
+        alaDHCPv6GuardServiceRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of objects for DHCPv6 Guard Service Statistic."
+    ::= { alcatelIND1DHCPv6MIBGroups 11 }
+
+alaDHCPv6SnoopingServiceGroup OBJECT-GROUP
+    OBJECTS
+    {
+        alaDHCPv6SnoopingServiceAdminStatus,
+        alaDHCPv6SnoopingServiceRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of objects for DHCPv6 Snooping Service Statistic."
+    ::= { alcatelIND1DHCPv6MIBGroups 12 }
+
+alaDHCPv6BindingServiceGroup OBJECT-GROUP
+    OBJECTS
+    {
+        alaDHCPv6BindingServicePortIfIndex,
+        alaDHCPv6BindingServiceEncapVal,
+        alaDHCPv6BindingServiceGlobalAddressType,
+        alaDHCPv6BindingServiceGlobalAddress,
+        alaDHCPv6BindingServiceLeaseTime,
+        alaDHCPv6BindingServicePhysAddress,
+        alaDHCPv6BindingServiceType,
+        alaDHCPv6BindingServiceRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of objects for DHCPv6 Binding Service Statistic."
+    ::= { alcatelIND1DHCPv6MIBGroups 13 }
+
+alaDHCPv6GuardServiceTrustSourceGroup OBJECT-GROUP
+    OBJECTS
+    {
+        alaDHCPv6GuardServiceTrustSourceType
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of objects for DHCPv6 Guard Service Trust Source."
+    ::= { alcatelIND1DHCPv6MIBGroups 14 }
 
 END
 

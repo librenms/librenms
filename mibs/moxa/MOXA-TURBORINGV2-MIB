@@ -1,0 +1,318 @@
+-- ****************************************************************
+-- *  Moxa Switching - TurboRing V2 PRIVATE MIB
+-- *
+-- *  Copyright (c) 2019 by Moxa Inc.
+-- *  All rights reserved.
+-- *****************************************************************
+
+MOXA-TURBORINGV2-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, IpAddress
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DateAndTime, MacAddress, DisplayString, TruthValue
+            FROM SNMPv2-TC
+        layer2Redundancy
+          FROM MOXA-SWITCHING-MIB;
+
+    mxTrv2 MODULE-IDENTITY
+        LAST-UPDATED "202202170000Z"
+        ORGANIZATION "Moxa Inc."
+        CONTACT-INFO
+            "
+            Postal: Moxa Inc.
+            13F., No. 3, Sec. 4, New Taipei Blvd.
+            Xinzhuang Dist., New Taipei City 242032, Taiwan, R.O.C.
+
+            Tel: +866-2-89191230
+            Web: http://www.moxa.com/
+            "
+        DESCRIPTION
+            "The MIB module defines Moxa TurboRing V2"
+
+        REVISION    "202202170000Z"
+        DESCRIPTION "update CONTACT-INFO"
+
+        REVISION    "201906300000Z"
+        DESCRIPTION "Initial Revision"
+
+        ::= { layer2Redundancy 4 }
+
+-- -------------------------------------------------------------
+-- groups in the MOXA-TURBORINGV2-MIB MIB
+-- -------------------------------------------------------------
+
+    trv2Notification         OBJECT IDENTIFIER ::= { mxTrv2 0 }
+    trv2Configuration        OBJECT IDENTIFIER ::= { mxTrv2 1 }
+    trv2Status               OBJECT IDENTIFIER ::= { mxTrv2 2 }
+    -- trv2Extensions           OBJECT IDENTIFIER ::= { mxTrv2 3 }
+
+-- -------------------------------------------------------------
+-- TEXTUAL-CONVENTION in the MOXA-TURBORINGV2-MIB MIB
+-- -------------------------------------------------------------
+
+TR2PortStatus ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+         "Turbo Ring V2 Port Status
+             disabled means Turbo Chain is not enabled.
+             blocking means the port does not forward networking data to prevent looping.
+             listening means the port is checking the link status with its partner port.
+             forwarding means the port is forwarding networking data.
+             linkDown means the port link status is down. "
+    SYNTAX INTEGER {
+          disabled(1),
+          blocking(2),
+          listening(3),
+          learning(4),
+          forwarding(5),
+          linkDown(6)
+        }
+
+CouplingPortStatus ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+         "Ring Coupling Port Status 
+             disabled means Turbo Chain is not enabled.
+             blocking means the port does not forward networking data to prevent looping.
+             listening means the port is checking the link status with its partner port.
+             forwarding means the port is forwarding networking data.
+             linkDown means the port link status is down. "
+    SYNTAX INTEGER {
+          disabled(1),
+          blocking(2),
+          listening(3),
+          learning(4),
+          forwarding(5),
+          linkDown(6)
+        }
+
+-- -------------------------------------------------------------
+-- configuration group
+-- -------------------------------------------------------------
+    trv2ConfigEnable OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            "The administrative module status requested by management for the TurboRing V2
+            Module. This enables or disables TurboRing V2 in the system. "
+        ::= { trv2Configuration 1 }
+        
+    trv2ConfigRingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF TRv2ConfigRingEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table of the TurboRingV2 Port Config."
+        ::= { trv2Configuration 2 }
+
+    trv2ConfigRingEntry OBJECT-TYPE
+      SYNTAX        TRv2ConfigRingEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "An entry for a TurboRingV2 config."
+      INDEX { trv2ConfigRingTableEntryIndex }
+      ::= { trv2ConfigRingTable 1 }
+
+    TRv2ConfigRingEntry ::=
+        SEQUENCE {
+            trv2ConfigRingTableEntryIndex          INTEGER,
+            trv2ConfigRingTableEntryEnable         TruthValue,
+            trv2ConfigRingTableEntryMasterSetup    TruthValue,
+            trv2ConfigRingTableEntryInterface      OCTET STRING
+        }
+
+    trv2ConfigRingTableEntryIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Index of a TurboRingV2 Config Table."
+         ::= { trv2ConfigRingEntry 1 }
+
+    trv2ConfigRingTableEntryEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enable the TurboRingV2 Config Entry."
+        ::= { trv2ConfigRingEntry 2 }
+
+    trv2ConfigRingTableEntryMasterSetup OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+             "Is this a Master or Slave."
+        ::= { trv2ConfigRingEntry 3 }
+
+    trv2ConfigRingTableEntryInterface OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+             "The value configures two TurboRing ports at the same time.
+              The first  octet string is the primary interface.
+              The second octet string is the secondary interface."
+        ::= { trv2ConfigRingEntry 4 }
+
+  trv2ConfigCoupling OBJECT IDENTIFIER ::= { trv2Configuration 3 }
+
+  trv2ConfigCouplingEnable OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+             "Setting the ring coupling enable."
+        ::= { trv2ConfigCoupling 1 }
+
+  trv2ConfigCouplingMode OBJECT-TYPE
+        SYNTAX      INTEGER  { 
+            couplingBackup(1), 
+            couplingPrimary(2) 
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Setting the ring coupling mode."
+        ::= { trv2ConfigCoupling 2 }
+
+  trv2ConfigCouplingPort OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "In 'COUPLING' mode, port name is 'Coupling port'"
+        ::= { trv2ConfigCoupling 3 }
+
+-- -------------------------------------------------------------
+-- status group
+-- -------------------------------------------------------------
+
+    trv2StatRingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF TRv2StatRingEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table of the turbo Ring V2 Status."
+        ::= { trv2Status 1 }
+
+    trv2StatRingEntry OBJECT-TYPE
+      SYNTAX        TRv2StatRingEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "An entry for a turbo Ring V2 Port Status."
+      INDEX { trv2StatRingTableEntryIndex }
+      ::= { trv2StatRingTable 1 }
+
+    TRv2StatRingEntry ::=
+        SEQUENCE {
+            trv2StatRingTableEntryIndex              INTEGER,
+            trv2StatRingTableEntryMasterStatus       TruthValue,
+            trv2StatRingTableEntryDesignatedMaster   MacAddress,
+            trv2StatRingTableEntryFirstRingPort      INTEGER,
+            trv2StatRingTableEntrySecondRingPort     INTEGER,
+            trv2StatRingTableEntryBrokenStatus       INTEGER
+        }
+
+    trv2StatRingTableEntryIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Index of a Turbo Ring Table Status."
+         ::= { trv2StatRingEntry 1 }
+
+    trv2StatRingTableEntryMasterStatus OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "State of this turboRingV2 Table entry.  
+              True if this is the turboRingV2 Master  
+              else this is the turboRingV2 Slave."
+
+        ::= { trv2StatRingEntry 2 }
+
+    trv2StatRingTableEntryDesignatedMaster OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "The MAC address of the bridge which is the 
+              Master of the turboRingV2."
+        ::= { trv2StatRingEntry 3 }
+
+    trv2StatRingTableEntryFirstRingPort OBJECT-TYPE
+        SYNTAX      TR2PortStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "The status of 1st Redundant Port on the turboRingV2."
+        ::= { trv2StatRingEntry 4 }
+     
+    trv2StatRingTableEntrySecondRingPort OBJECT-TYPE
+        SYNTAX      TR2PortStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "The status of 2nd Redundant Port on the turboRingV2."
+        ::= { trv2StatRingEntry 5 }
+        
+    trv2StatRingTableEntryBrokenStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            na(0),
+            normal(1),
+            broken(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "turboRingV2 broken display."
+        ::= { trv2StatRingEntry 6 }
+
+    trv2StatCoupling OBJECT IDENTIFIER ::= { trv2Status 2 }
+  
+    trv2StatCouplingPortStatus OBJECT-TYPE
+        SYNTAX      CouplingPortStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "The coupling port status of coupling function."
+        ::= { trv2StatCoupling 1 }
+        
+-- -------------------------------------------------------------
+-- notification group
+-- -------------------------------------------------------------
+
+  trv2NotifyMasterChanged NOTIFICATION-TYPE
+        OBJECTS {
+            trv2StatRingTableEntryIndex
+        }
+        STATUS       current
+        DESCRIPTION
+            "The notification is sent when the bridge is Turbo Ring V2 master, 
+             and the master of Turbo Ring V2 changed. "
+        ::= { trv2Notification 1 }
+
+  trv2NotifyMasterMismatch NOTIFICATION-TYPE
+        OBJECTS {
+            trv2StatRingTableEntryIndex
+        }
+        STATUS       current
+        DESCRIPTION
+            "The notification is sent when the bridge is Turbo Ring V2 slave, 
+             and the trv2ConfigRing1MasterSetup is yes. "
+        ::= { trv2Notification 2 }
+        
+  trv2NotifyCouplingChanged NOTIFICATION-TYPE
+        STATUS       current
+        DESCRIPTION
+            "The notification is sent when Turbo Ring V2 coupling 
+             path status is changed. "
+        ::= { trv2Notification 3 }
+END

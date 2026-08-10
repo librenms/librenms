@@ -25,7 +25,7 @@
  */
 $power_frame_oid = '.1.3.6.1.4.1.2011.2.6.7.1.1.1.1.11.0';
 
-$power = snmp_get($device, $power_frame_oid, '-Ovq');
+$power = SnmpQuery::get($power_frame_oid)->value();
 $index = '0';
 
 discover_sensor(null, 'power', $device, $power_frame_oid, $index, 'smartax-total', 'Chassis Total', '1', '1', null, null, null, null, $power);

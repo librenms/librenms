@@ -26,32 +26,19 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
-use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class InventoryController implements DeviceTab
 {
-    private $type = null;
-
-    public function __construct()
-    {
-        if (LibrenmsConfig::get('enable_inventory')) {
-            $device = DeviceCache::getPrimary();
-
-            if ($device->entityPhysical()->exists()) {
-                $this->type = 'entphysical';
-            } elseif ($device->hostResources()->exists()) {
-                $this->type = 'hrdevice';
-            }
-        }
-    }
+    private ?string $type = null;
 
     public function visible(Device $device): bool
     {
-        return $this->type !== null;
+        return (bool) $this->getType($device);
     }
 
     public function slug(): string
@@ -72,7 +59,24 @@ class InventoryController implements DeviceTab
     public function data(Device $device, Request $request): array
     {
         return [
-            'tab' => $this->type, // inject to load correct legacy file
+            'tab' => $this->getType($device), // inject to load correct legacy file
         ];
+    }
+
+    private function getType(Device $device): string
+    {
+        if ($this->type === null) {
+            $this->type = '';
+
+            if (LibrenmsConfig::get('enable_inventory') && Gate::any(['inventory.view', 'inventory.viewAll'])) {
+                if ($device->entityPhysical()->exists()) {
+                    $this->type = 'entphysical';
+                } elseif ($device->hostResources()->exists()) {
+                    $this->type = 'hrdevice';
+                }
+            }
+        }
+
+        return $this->type;
     }
 }

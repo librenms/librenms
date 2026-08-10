@@ -37,11 +37,11 @@ $sql = 'SELECT D.device_id AS device_id, `hostname`, `D`.`sysName` AS `sysName` 
 $param = [];
 $where = '';
 
-$device_id = (int) ($_POST['device_id'] ?? 0);
-$searchby = $_POST['searchby'] ?? 'ip';
-$searchPhrase = $_POST['searchPhrase'] ?? '';
+$device_id = (int) ($vars['device_id'] ?? 0);
+$searchby = $vars['searchby'] ?? 'ip';
+$searchPhrase = $vars['searchPhrase'] ?? '';
 
-if (! Auth::user()->hasGlobalRead()) {
+if (Gate::denies('viewAll', \App\Models\Device::class)) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
     $where .= ' AND `D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);

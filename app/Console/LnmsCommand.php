@@ -29,14 +29,12 @@ namespace App\Console;
 use Illuminate\Console\Command;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use LibreNMS\Util\Debug;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
-use Symfony\Component\Console\Output\OutputInterface;
 use Validator;
 
 abstract class LnmsCommand extends Command
 {
-    protected $developer = false;
+    protected bool $developer = false;
 
     /** @var string[][]|callable[]|null */
     protected $optionValues;
@@ -58,7 +56,7 @@ abstract class LnmsCommand extends Command
     {
         $env = $this->getLaravel() ? $this->getLaravel()->environment() : getenv('APP_ENV');
 
-        return $this->hidden || ($this->developer && $env !== 'production');
+        return $this->hidden || ($this->developer && $env === 'production');
     }
 
     /**
@@ -161,27 +159,6 @@ abstract class LnmsCommand extends Command
                 $this->error($message);
             });
             exit(1);
-        }
-    }
-
-    protected function configureOutputOptions(): void
-    {
-        $verbosity = $this->getOutput()->getVerbosity();
-
-        if ($verbosity === OutputInterface::VERBOSITY_QUIET) {
-            \Log::setDefaultDriver('stack'); // this omits stdout
-            Debug::setCliQuietOutput();
-
-            return;
-        }
-
-        \Log::setDefaultDriver('console');
-
-        if ($verbosity >= OutputInterface::VERBOSITY_VERY_VERBOSE) {
-            Debug::set();
-            if ($verbosity >= OutputInterface::VERBOSITY_DEBUG) {
-                Debug::setVerbose();
-            }
         }
     }
 

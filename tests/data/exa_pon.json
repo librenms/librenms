@@ -179901,7 +179901,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -179926,7 +179926,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -179951,7 +179951,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -179976,7 +179976,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -180001,7 +180001,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -180026,7 +180026,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -180051,7 +180051,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -180076,7 +180076,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -180101,7 +180101,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -180126,7 +180126,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -180151,7 +180151,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -180176,7 +180176,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -180201,7 +180201,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -180226,7 +180226,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -180251,7 +180251,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -180276,7 +180276,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -180764,7 +180764,7 @@
                     "group": "transceiver",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0,
+                    "sensor_current": null,
                     "sensor_limit": 3.6,
                     "sensor_limit_warn": 3.5,
                     "sensor_limit_low": 3,
@@ -180964,7 +180964,7 @@
                     "group": "transceiver",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0,
+                    "sensor_current": null,
                     "sensor_limit": 3.6,
                     "sensor_limit_warn": 3.5,
                     "sensor_limit_low": 3,
@@ -181077,6 +181077,26 @@
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": null
+                }
+            ],
+            "state_indexes": [
+                {
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus",
+                    "state_descr": "invalid",
+                    "state_value": 0,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus",
+                    "state_descr": "linkUp",
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus",
+                    "state_descr": "linkDown",
+                    "state_value": 2,
+                    "state_generic_value": 2
                 }
             ]
         },
@@ -182305,7 +182325,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -182330,7 +182350,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -182355,7 +182375,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -182380,7 +182400,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -182405,7 +182425,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -182430,7 +182450,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -182455,7 +182475,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -182480,7 +182500,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -182505,7 +182525,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -182530,7 +182550,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -182555,7 +182575,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -182580,7 +182600,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -182605,7 +182625,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -182630,7 +182650,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -182655,7 +182675,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -182680,7 +182700,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -183168,7 +183188,7 @@
                     "group": "transceiver",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0,
+                    "sensor_current": null,
                     "sensor_limit": 3.6,
                     "sensor_limit_warn": 3.5,
                     "sensor_limit_low": 3,
@@ -183368,7 +183388,7 @@
                     "group": "transceiver",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0,
+                    "sensor_current": null,
                     "sensor_limit": 3.6,
                     "sensor_limit_warn": 3.5,
                     "sensor_limit_low": 3,
@@ -183481,6 +183501,26 @@
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": null
+                }
+            ],
+            "state_indexes": [
+                {
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus",
+                    "state_descr": "invalid",
+                    "state_value": 0,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus",
+                    "state_descr": "linkUp",
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "E7-Calix-MIB::e7OltPonPortStatus",
+                    "state_descr": "linkDown",
+                    "state_value": 2,
+                    "state_generic_value": 2
                 }
             ]
         }

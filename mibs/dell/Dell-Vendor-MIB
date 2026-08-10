@@ -6,7 +6,7 @@ IMPORTS
         MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32, IpAddress,
         NOTIFICATION-TYPE
                 FROM SNMPv2-SMI
-        DisplayString, RowStatus, TEXTUAL-CONVENTION
+        DisplayString, RowStatus, DateAndTime, TEXTUAL-CONVENTION
                 FROM SNMPv2-TC;
 
 -- Dell MIB tree
@@ -24,10 +24,14 @@ dellLanCommon OBJECT IDENTIFIER ::= { dellLanStandard 1 }
 dellLanExtension OBJECT IDENTIFIER ::= { dellLanStandard 2 }
 
 powerConnectVendorMIB MODULE-IDENTITY
-        LAST-UPDATED "200501150000Z"
+        LAST-UPDATED "201205071200Z"
         ORGANIZATION "Dell Inc."
         CONTACT-INFO
                 "support.dell.com"
+        DESCRIPTION
+                "Adding new objects - Dell PPID, Revision,
+                Express Service Code."
+        REVISION     "201205071200Z"
         DESCRIPTION
                 "The private MIB module definition for the Dell PowerConnect
                  Devices.  This MIB allows PowerConnect devices to be
@@ -70,6 +74,10 @@ EnvMonState ::= TEXTUAL-CONVENTION
                         notPresent(5),
                         notFunctioning(6)
                 }
+
+
+
+
 
 
 
@@ -169,7 +177,11 @@ ProductIdentificationPerBoxEntry ::= SEQUENCE {
   productIdentificationSerialNumber         DisplayString,
   productIdentificationAssetTag             DisplayString,
   productIdentificationServiceTag           DisplayString,
-  productIdentificationBootromVersion       DisplayString
+  productIdentificationChassisServiceTag    DisplayString,
+  productIdentificationBootromVersion       DisplayString,
+  productIdentificationPiecePartID          DisplayString,
+  productIdentificationPPIDRevision         DisplayString,
+  productIdentificationExpressServiceCode   DisplayString
 }
 
 productIdentificationPerBoxIndex OBJECT-TYPE
@@ -203,6 +215,12 @@ productIdentificationServiceTag OBJECT-TYPE
        DESCRIPTION "Service tag of the product."
        ::= { productIdentificationPerUnitEntry 4 }
 
+productIdentificationChassisServiceTag OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Chassis Service tag of the product."
+       ::= { productIdentificationPerUnitEntry 5 }
 
 productIdentificationBootromVersion OBJECT-TYPE
        SYNTAX      DisplayString
@@ -211,20 +229,30 @@ productIdentificationBootromVersion OBJECT-TYPE
        DESCRIPTION "The boot image version of the product."
        ::= { productIdentificationPerUnitEntry 6 }
 
-
-productIdentificationBannerMotd OBJECT-TYPE
-       SYNTAX      DisplayString (SIZE (0..1500))
-       MAX-ACCESS  read-write
-       STATUS      current
-       DESCRIPTION "Use to assign CLI attention banner. The banner should support 1500 characters."
-
-
-
-
-
-
-
-       ::= { productIdentification 9 }
+productIdentificationPiecePartID OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..24))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The piece part id of the product."
+        ::= { productIdentificationPerUnitEntry 7 }
+                
+productIdentificationPPIDRevision OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..3))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The PPID revision of the product."
+        ::= { productIdentificationPerUnitEntry 8 }
+                
+productIdentificationExpressServiceCode OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..14))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The express cervice code of the product."
+        ::= { productIdentificationPerUnitEntry 9 }
+                
 
 productIdentificationBannerMotdAckMode OBJECT-TYPE
        SYNTAX     INTEGER {
@@ -233,8 +261,15 @@ productIdentificationBannerMotdAckMode OBJECT-TYPE
                  }
        MAX-ACCESS  read-write
        STATUS      current
-       DESCRIPTION "If enable is selected, user will be required to acknowledge the banner displayed on the console. The user would have to type y or n to continue to the login prompt.  If n is typed, the session is terminated and no further communication is allowed on that session. However, serial connection will not get terminated if user does not enter y. Use disable option to disable banner acknowledge."
-       ::= { productIdentification 10 }
+       DESCRIPTION "If enable is selected, user will be required to acknowledge
+                    the banner displayed on the console. The user would have
+		    to type 'y' or 'n' to continue to the login prompt.
+		    If n is typed, the session is terminated and no future 
+		    communication is allowed on that session.
+		    However, serial connection will not get terminated
+		    if user does not enter 'y'.
+		    Use disable option to disable banner acknowledge."
+       ::= { productIdentification 9}
 
 --
 -- productStatus
@@ -336,7 +371,8 @@ EnvMonFanStatusEntry ::=
         SEQUENCE {
                 envMonFanStatusIndex       INTEGER,
                 envMonFanStatusDescr       DisplayString,
-                envMonFanState             EnvMonState
+                envMonFanState             EnvMonState,
+                envMonFanSpeed           INTEGER
         }
 
 envMonFanStatusIndex OBJECT-TYPE
@@ -372,6 +408,14 @@ envMonFanState OBJECT-TYPE
                 Not Supported by Dell Modular Blade Server switches."
         ::= { envMonFanStatusEntry 3 }
 
+envMonFanSpeed OBJECT-TYPE
+        SYNTAX     INTEGER (1..2147483647)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Speed of the fan being instrumented. Not 
+                Supported by Dell Modular Blade Server switches."
+        ::= { envMonFanStatusEntry 4 }
 
 
 envMonSupplyStatusTable OBJECT-TYPE
@@ -401,6 +445,9 @@ EnvMonSupplyStatusEntry ::=
                 envMonSupplyStatusIndex    INTEGER ,
                 envMonSupplyStatusDescr    DisplayString,
                 envMonSupplyState          EnvMonState,
+                envMonSupplyCurrentPower   INTEGER,
+                envMonSupplyAveragePower   INTEGER,
+                envMonSupplyAvgStartTime   DateAndTime,
                 envMonSupplySource         INTEGER
         }
 
@@ -457,8 +504,33 @@ envMonSupplySource OBJECT-TYPE
                 "
         ::= { envMonSupplyStatusEntry 4 }
 
+envMonSupplyCurrentPower OBJECT-TYPE
+        SYNTAX     INTEGER (0|1..2147483647)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Current power consumption of the power supply being instrumented.
+                 0 - indicates that Current power is not available for related supply."
+        ::= { envMonSupplyStatusEntry 5 }
 
+envMonSupplyAveragePower OBJECT-TYPE
+        SYNTAX     INTEGER (0|1..2147483647)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Average power consumption of the power supply being instrumented.
+                 0 - indicates that Average power is not available for related supply."
+        ::= { envMonSupplyStatusEntry 6 }
 
+envMonSupplyAvgStartTime OBJECT-TYPE
+        SYNTAX           DateAndTime
+        MAX-ACCESS read-only
+
+        STATUS     current
+        DESCRIPTION
+                "The power supply data start.
+                 0 - indicates that power and related start time is not available for supply."
+        ::= { envMonSupplyStatusEntry 7 }
 
 --
 -- trap definitions

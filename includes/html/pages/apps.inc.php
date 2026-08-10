@@ -182,6 +182,10 @@ $graphs['gpsd'] = [
     'satellites',
     'dop',
     'mode',
+    'altitude',
+    'location',
+    'latitude',
+    'longitude',
 ];
 $graphs['exim-stats'] = [
     'frozen',
@@ -631,6 +635,16 @@ $graphs['poudriere'] = [
     'context_switches_comparison',
     'voluntary_context_switches',
     'involuntary_context_switches',
+];
+$graphs['i2pd'] = [
+    'uptime',
+    'bw_1s',
+    'bw_15s',
+    'net_status',
+    'tunnels_participating',
+    'tunnels_successrate',
+    'peers',
+    'total_bytes',
 ];
 
 echo '<div class="panel panel-default">';

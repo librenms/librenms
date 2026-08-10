@@ -1,18 +1,32 @@
 RADLAN-COPY-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    rnd                                     FROM RADLAN-MIB
+    rnd, rndNotifications                   FROM RADLAN-MIB
+    rndErrorDesc , rndErrorSeverity         FROM RADLAN-DEVICEPARAMS-MIB
     OBJECT-TYPE, IpAddress, Unsigned32,Counter32, TimeTicks,
-    MODULE-IDENTITY                         FROM SNMPv2-SMI
-    DisplayString                           FROM SNMPv2-TC-v1
-    TEXTUAL-CONVENTION,
-    TruthValue, RowStatus                   FROM SNMPv2-TC;
+    MODULE-IDENTITY, NOTIFICATION-TYPE      FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION,
+    TruthValue, RowStatus                   FROM SNMPv2-TC
+    InetAddressType,InetAddress             FROM INET-ADDRESS-MIB
+    RlSecSdAccessType                       FROM RADLAN-SECSD-MIB; -- RFC2851
 
  rlCopy   MODULE-IDENTITY
-          LAST-UPDATED "200602020000Z"
+          LAST-UPDATED "201005110000Z"
           ORGANIZATION "Radlan Computer Communications Ltd."
           CONTACT-INFO
                   "radlan.com"
+          DESCRIPTION
+                  "Added field rlCopyInetSpecificCopyInfo"
+          REVISION "201007250000Z"
+          DESCRIPTION
+                  "Added USB file type."
+          REVISION "201005110000Z"
+          DESCRIPTION
+                  "Added objects rlCopyInetDestinationUnitList,rlCopyHistoryInetDestinationUnitList,rlCopyInetUnitStatusList,rlCopyHistoryInetUnitStatusList."
+          REVISION "201002170000Z"
+          DESCRIPTION
+                  "Added mirror-config and MIB rlCopyMirrorTimeout."
+          REVISION "200908100000Z"
           DESCRIPTION
                   "The private MIB module definition for file copy in Radlan devices."
           REVISION "200602020000Z"
@@ -46,7 +60,12 @@ RlCopyLocationType ::= TEXTUAL-CONVENTION
         tftp(3),
         xmodem(4),
         scp(5),
-        serial(6)
+        serial(6),
+        http(7),
+        https(8),
+        http-xml(9),
+        https-xml(10)
+
 }
 
 RlCopyFileType ::= TEXTUAL-CONVENTION
@@ -63,7 +82,22 @@ RlCopyFileType ::= TEXTUAL-CONVENTION
         backupMibConfig(7),
         image(8),
         boot(9),
-        null(10)
+        null(10),
+        logging(11),
+        mirrorConfig(12),
+        usb(13),
+        license(14)
+}
+RlCopySecSdAccessType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Sec sd access type"
+    SYNTAX  INTEGER {
+        exclude(1),
+        include-encrypted(2),
+        include-decrypted(3),
+        default(4)
+
 }
 
 rlCopyMibVersion OBJECT-TYPE
@@ -273,6 +307,7 @@ rlCopyHistoryIndex OBJECT-TYPE
          for this copy operation."
     DEFVAL { 0 }
     ::= { rlCopyEntry 18 }
+
 
 rlCopyFreeHistoryIndex OBJECT-TYPE
     SYNTAX  INTEGER
@@ -559,6 +594,653 @@ rlCopyMessagesTableRemoveEntries  OBJECT-TYPE
          i.e. all the entries with rlCopyMessagesCopyIndex = n."
     ::= { rlCopy 7 }
 
+--
+-- Copy Notifications
+--
+
+rlCopyFinished NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Informational trap indicating that the device has finished
+         a copy operation successfully."
+    ::= { rndNotifications 180 }
+
+rlCopyFailed NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+         "Informational trap indicating that the copy operation has failed."
+    ::= { rndNotifications 181 }
+
+rlCopySWFinished NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "A trap indicating that the device has finished a copy operation of
+         image successfully."
+    ::= { rndNotifications 211 }
+
+rlCopySWToUnits NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity, rlCopyUnitsList }
+    STATUS  current
+    DESCRIPTION
+        "A trap indicating to master unit that remote units have finished
+         a copy operation of image successfully."
+    ::= { rndNotifications 212 }
+
+rlCopyMirrorFileIllegal NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "A trap indicating that the mirror configuration file is illegal
+         due to failure of prevoius copy operation/s to mirror-config."
+    ::= { rndNotifications 220 }
+
+-- AlexeyK 30/11/06 IPv6 support
+
+rlCopyInetTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlCopyInetEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " The (conceptual) table listing only one entry at a time
+          with parameters needed for configuration
+          of the file copy action."
+    ::= {rlCopy 8 }
+
+rlCopyInetEntry  OBJECT-TYPE
+    SYNTAX RlCopyInetEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " An entry (conceptual row) in the CopyTable."
+    INDEX {rlCopyInetIndex }
+    ::= {rlCopyInetTable  1 }
+
+RlCopyInetEntry ::= SEQUENCE {
+    rlCopyInetIndex                         INTEGER,
+    rlCopyInetApplicationId                 RlCopyApplicationType,
+    rlCopyInetSourceLocation                RlCopyLocationType,
+    rlCopyInetSourceIpAddressType           InetAddressType,
+    rlCopyInetSourceIpAddress               InetAddress,
+    rlCopyInetSourceUnitNumber              INTEGER,
+    rlCopyInetSourceFileName                DisplayString,
+    rlCopyInetSourceFileType                RlCopyFileType,
+    rlCopyInetDestinationLocation           RlCopyLocationType,
+    rlCopyInetDestinationIpAddressType      InetAddressType,
+    rlCopyInetDestinationIpAddress          InetAddress,
+    rlCopyInetDestinationUnitNumber         INTEGER,
+    rlCopyInetDestinationFileName           DisplayString,
+    rlCopyInetDestinationFileType           RlCopyFileType,
+    rlCopyInetUpTime                        TimeTicks,
+    rlCopyInetOperationState                INTEGER,
+    rlCopyInetBytesTransferred              INTEGER,
+    rlCopyInetInBackground                  INTEGER,
+    rlCopyInetRowStatus                     RowStatus,
+    rlCopyInetHistoryIndex                  INTEGER,
+    rlCopyInetDestinationUnitList           INTEGER,
+    rlCopyInetUnitStatusList                INTEGER,
+    rlCopyInetSpecificCopyInfo              DisplayString
+}
+
+rlCopyInetIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The row index in the table."
+    ::=  { rlCopyInetEntry 1 }
+
+rlCopyInetApplicationId OBJECT-TYPE
+    SYNTAX RlCopyApplicationType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The applicatione activated this comand"
+    ::=  { rlCopyInetEntry 2}
+
+rlCopyInetSourceLocation OBJECT-TYPE
+    SYNTAX RlCopyLocationType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Source File Location"
+    ::=  { rlCopyInetEntry 3 }
+
+rlCopyInetSourceIpAddressType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Inet address type of the source remote host"
+    ::=  { rlCopyInetEntry  4 }
+
+rlCopyInetSourceIpAddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Inet address of the source remote host"
+    ::=  { rlCopyInetEntry  5 }
+
+
+rlCopyInetSourceUnitNumber OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The unit number of the source unit"
+    ::=  { rlCopyInetEntry  6 }
+
+rlCopyInetSourceFileName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The name of the source file."
+    ::=  { rlCopyInetEntry 7 }
+
+rlCopyInetSourceFileType OBJECT-TYPE
+    SYNTAX RlCopyFileType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The type of the source file."
+    ::=  { rlCopyInetEntry 8 }
+
+rlCopyInetDestinationLocation OBJECT-TYPE
+   SYNTAX RlCopyLocationType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Destination File Location"
+    ::=  { rlCopyInetEntry 9 }
+
+rlCopyInetDestinationIpAddressType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Inet address type of the destination remote host"
+    ::=  { rlCopyInetEntry  10 }
+
+rlCopyInetDestinationIpAddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Inet address of the destination remote host"
+    ::=  { rlCopyInetEntry  11 }
+
+
+rlCopyInetDestinationUnitNumber OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The unit number of the destination unit,
+         value 257 means all units"
+    ::=  { rlCopyInetEntry  12 }
+
+rlCopyInetDestinationFileName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The name of the destination file."
+    ::=  { rlCopyInetEntry 13 }
+
+rlCopyInetDestinationFileType OBJECT-TYPE
+    SYNTAX RlCopyFileType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The type of the destination file."
+    ::=  { rlCopyInetEntry 14 }
+
+rlCopyInetUpTime OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The time elapsed since this entry was created."
+    ::= { rlCopyInetEntry 15 }
+
+rlCopyInetOperationState OBJECT-TYPE
+    SYNTAX INTEGER {
+        uploadInProgress(1),
+        downloadInProgress(2),
+        copyFailed(3),
+        copyTimedout(4),
+        copyFinished(5)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of the copy operation."
+    ::=  { rlCopyInetEntry 16 }
+
+rlCopyInetBytesTransferred OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of bytes that were transferred by the copy operation."
+    ::=  { rlCopyInetEntry 17 }
+
+rlCopyInetInBackground OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "When enabled the copy operation is done in the background."
+    DEFVAL { disable }
+    ::=  { rlCopyInetEntry 18 }
+
+rlCopyInetRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "It is used to insert or delete an entry"
+    ::= { rlCopyInetEntry 19 }
+
+rlCopyInetHistoryIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The index of the entry corresponding to this one in the
+         rlCopyHistoryTable (equals rlCopyHistoryHistoryIndex).
+         A value of 0 indicates that no history entry should be kept
+         for this copy operation."
+    DEFVAL { 0 }
+    ::= { rlCopyInetEntry 20 }
+
+-- Liran 17-Feb-2010
+rlCopyInetDestinationUnitList OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "A bitmap of destination units for copy operation."
+    DEFVAL { 0 }
+    ::= { rlCopyInetEntry 21 }
+
+rlCopyInetUnitStatusList OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "A bitmap of copy operation status for each unit."
+    ::= { rlCopyInetEntry 22 }
+
+rlCopyInetSpecificCopyInfo OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Copy application specific information. For example: for SCP copy this
+         field can be used to pass username and password information."
+     DEFVAL { "" }
+    ::= { rlCopyInetEntry 23 }
+
+
+-- AlexeyK 30/11/06 IPv6
+
+rlCopyHistoryInetTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlCopyHistoryInetEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " The (conceptual) table listing only one entry at a time
+          with parameters needed for configuration
+          of the file copy action."
+    ::= {rlCopy 9 }
+
+rlCopyHistoryInetEntry  OBJECT-TYPE
+    SYNTAX RlCopyHistoryInetEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " An entry (conceptual row) in the rlCopyHistoryTable."
+    INDEX {rlCopyHistoryInetHistoryIndex }
+    ::= {rlCopyHistoryInetTable  1 }
+
+RlCopyHistoryInetEntry ::= SEQUENCE {
+    rlCopyHistoryInetHistoryIndex                  INTEGER,
+    rlCopyHistoryInetApplicationId                 RlCopyApplicationType,
+    rlCopyHistoryInetSourceLocation                RlCopyLocationType,
+    rlCopyHistoryInetSourceIpAddressType           InetAddressType,
+    rlCopyHistoryInetSourceIpAddress               InetAddress,
+    rlCopyHistoryInetSourceUnitNumber              INTEGER,
+    rlCopyHistoryInetSourceFileName                DisplayString,
+    rlCopyHistoryInetSourceFileType                RlCopyFileType,
+    rlCopyHistoryInetDestinationLocation           RlCopyLocationType,
+    rlCopyHistoryInetDestinationIpAddressType      InetAddressType,
+    rlCopyHistoryInetDestinationIpAddress          InetAddress,
+    rlCopyHistoryInetDestinationUnitNumber         INTEGER,
+    rlCopyHistoryInetDestinationFileName           DisplayString,
+    rlCopyHistoryInetDestinationFileType           RlCopyFileType,
+    rlCopyHistoryInetUpTime                        TimeTicks,
+    rlCopyHistoryInetOperationState                INTEGER,
+    rlCopyHistoryInetBytesTransferred              INTEGER,
+    rlCopyHistoryInetInBackground                  INTEGER,
+    rlCopyHistoryInetRowStatus                     RowStatus,
+    rlCopyHistoryInetErrorMessage                  DisplayString,
+    rlCopyHistoryInetDestinationUnitList           INTEGER,
+    rlCopyHistoryInetUnitStatusList                INTEGER,
+    rlCopyHistoryInetTotalFileSize		   INTEGER
+}
+
+rlCopyHistoryInetHistoryIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The row index in the table."
+    ::=  { rlCopyHistoryInetEntry 1 }
+
+rlCopyHistoryInetApplicationId OBJECT-TYPE
+    SYNTAX RlCopyApplicationType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The application that activated this comand"
+    ::=  { rlCopyHistoryInetEntry 2}
+
+rlCopyHistoryInetSourceLocation OBJECT-TYPE
+    SYNTAX RlCopyLocationType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Source File Location"
+    ::=  { rlCopyHistoryInetEntry 3 }
+
+rlCopyHistoryInetSourceIpAddressType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Inet address type of the source remote host"
+    ::=  { rlCopyHistoryInetEntry  4 }
+
+rlCopyHistoryInetSourceIpAddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Inet address of the source remote host"
+    ::=  { rlCopyHistoryInetEntry  5 }
+
+
+rlCopyHistoryInetSourceUnitNumber OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The unit number of the source unit"
+    ::=  { rlCopyHistoryInetEntry  6 }
+
+rlCopyHistoryInetSourceFileName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The name of the source file."
+    ::=  { rlCopyHistoryInetEntry 7 }
+
+rlCopyHistoryInetSourceFileType OBJECT-TYPE
+    SYNTAX RlCopyFileType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The type of the source file."
+    ::=  { rlCopyHistoryInetEntry 8 }
+
+rlCopyHistoryInetDestinationLocation OBJECT-TYPE
+   SYNTAX RlCopyLocationType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Destination File Location"
+    ::=  { rlCopyHistoryInetEntry 9 }
+
+rlCopyHistoryInetDestinationIpAddressType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Inet address type of the destination remote host"
+    ::=  { rlCopyHistoryInetEntry  10 }
+
+rlCopyHistoryInetDestinationIpAddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Inet address of the destination remote host"
+    ::=  { rlCopyHistoryInetEntry  11 }
+
+
+rlCopyHistoryInetDestinationUnitNumber OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The unit number of the destination unit"
+    ::=  { rlCopyHistoryInetEntry  12 }
+
+rlCopyHistoryInetDestinationFileName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The name of the destination file."
+    ::=  { rlCopyHistoryInetEntry 13 }
+
+rlCopyHistoryInetDestinationFileType OBJECT-TYPE
+    SYNTAX RlCopyFileType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The type of the destination file."
+    ::=  { rlCopyHistoryInetEntry 14 }
+
+rlCopyHistoryInetUpTime OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The time elapsed since this entry was created."
+    ::= { rlCopyHistoryInetEntry 15 }
+
+rlCopyHistoryInetOperationState OBJECT-TYPE
+    SYNTAX INTEGER {
+        uploadInProgress(1),
+        downloadInProgress(2),
+        copyFailed(3),
+        copyTimedout(4),
+        copyFinished(5)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of the copy operation."
+    ::=  { rlCopyHistoryInetEntry 16 }
+
+rlCopyHistoryInetBytesTransferred OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of bytes that were transferred by the copy operation."
+    ::=  { rlCopyHistoryInetEntry 17 }
+
+rlCopyHistoryInetInBackground OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "When enabled the copy operation is done in the background."
+    DEFVAL { disable }
+    ::=  { rlCopyHistoryInetEntry 18 }
+
+rlCopyHistoryInetRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "It is used delete an entry. No other operations are permitted since
+         the history table is populated and updated through the copy table only."
+    ::= { rlCopyHistoryInetEntry 19 }
+
+rlCopyHistoryInetErrorMessage OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Error message as a result of failed copy action."
+    ::=  { rlCopyHistoryInetEntry 20 }
+
+-- Liran 17-Feb-2010
+rlCopyHistoryInetDestinationUnitList OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "A bitmap of destination units for copy operation."
+    DEFVAL { 0 }
+    ::= { rlCopyHistoryInetEntry 21 }
+
+rlCopyHistoryInetUnitStatusList OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "A bitmap of copy operation status for each unit."
+    ::= { rlCopyHistoryInetEntry 22 }
+
+rlCopyHistoryInetTotalFileSize  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total length of image/static file"
+    ::= {  rlCopyHistoryInetEntry 23 }
+
+rlCopyUnitsList OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "Potential list of units used by trap rlCopySWToUnits"
+    ::= {rlCopy 10}
+
+rlCopyMirrorTimeout  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " This MIB should be used in order to change the time-interval of automatic copy of
+          startup-config to mirror-config.
+          The MIB is for debugging purposes only, and given value should be the
+          number of minutes for time-interval of this copy."
+    ::= { rlCopy 11 }
+
+rlCopyOptionsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlCopyOptionsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table includes more field options for the copy operation."
+    ::= {rlCopy 12 }
+
+rlCopyOptionsEntry OBJECT-TYPE
+    SYNTAX RlCopyOptionsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " An entry (conceptual row) in the rlCopyOptionsTable."
+    INDEX {rlCopyOptionsIndex }
+    ::= { rlCopyOptionsTable  1 }
+
+RlCopyOptionsEntry ::= SEQUENCE {
+    rlCopyOptionsIndex               		Unsigned32,
+    rlCopyOptionsRequestedSsdAccess  		RlCopySecSdAccessType,
+	rlCopyOptionsCheckFilePermission 		TruthValue,
+	rlCopyOptionsCheckSystemReservedStorage TruthValue
+}
+
+rlCopyOptionsIndex OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The index should be equal to the value of rlCopyInetIndex of the relevant rlCopyInetEntry."
+    ::= { rlCopyOptionsEntry 1 }
+
+rlCopyOptionsRequestedSsdAccess  OBJECT-TYPE
+    SYNTAX  RlCopySecSdAccessType
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The requested format for sensitive data in the copy. Relevant only for configuration file upload"
+    DEFVAL { default }
+    ::= { rlCopyOptionsEntry 2 }
+
+rlCopyOptionsCheckFilePermission  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Controls whether to check file permissions during copy."
+    DEFVAL { true }
+    ::= { rlCopyOptionsEntry 3 }
+	
+rlCopyOptionsCheckSystemReservedStorage  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Controls whether to check system reserved storage during copy."
+    DEFVAL { true }
+    ::= { rlCopyOptionsEntry 4 }
+	
+rlCopyMirror OBJECT IDENTIFIER ::= { rlCopy 13 }
+
+rlCopyMirrorEnable  OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " This MIB should be used in order to enable/disable automatic copy of
+          startup-config to mirror-config."
+    ::= { rlCopyMirror 1 }
+
+        ---         File Copy downgrade status
+
+rlCopyStaticDowngradeStatus  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Controls whether static downgrade in progress "
+    DEFVAL { false }
+    ::= { rlCopy 14 }
+
+
+	
 
 
 END

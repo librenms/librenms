@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class PortVlan extends PortRelatedModel implements Keyable
 {
+    use HasFactory;
     protected $table = 'ports_vlans';
     protected $primaryKey = 'port_vlan_id';
     public $timestamps = false;
@@ -32,7 +34,7 @@ class PortVlan extends PortRelatedModel implements Keyable
         return $value;
     }
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return $this->port_id . '-' . $this->vlan;
     }

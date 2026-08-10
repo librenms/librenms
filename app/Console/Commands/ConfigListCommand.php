@@ -25,7 +25,6 @@ class ConfigListCommand extends LnmsCommand
      */
     public function handle(): int
     {
-        $this->configureOutputOptions();
         $search = $this->argument('search') ?? '';
 
         $settings = (new DynamicConfig)->all()
@@ -49,6 +48,10 @@ class ConfigListCommand extends LnmsCommand
         return 0;
     }
 
+    /**
+     * @param  Collection<string, string>  $collection
+     * @return Collection<string, string>
+     */
     private function filter(Collection $collection, string $search): Collection
     {
         return $collection->filter(fn (string $value, string $key): bool => stripos($key, $search) !== false || stripos($value, $search) !== false);

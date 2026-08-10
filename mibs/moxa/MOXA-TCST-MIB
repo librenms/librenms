@@ -1,0 +1,634 @@
+-- ****************************************************************
+-- *  Moxa Switching - Traffic Statistics (TCST) PRIVATE MIB
+-- *
+-- *  Copyright (c) 2019 by Moxa Inc.
+-- *  All rights reserved.
+-- *****************************************************************
+
+MOXA-TCST-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, IpAddress, TimeTicks, Counter32
+        	FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DateAndTime, MacAddress, DisplayString, TruthValue, RowStatus
+        	FROM SNMPv2-TC
+        layer2Diagnosic
+          FROM MOXA-SWITCHING-MIB;
+
+    mxTcst MODULE-IDENTITY
+        LAST-UPDATED "202212010000Z"
+        ORGANIZATION "Moxa Inc."
+        CONTACT-INFO
+            "
+            Postal: Moxa Inc.
+            13F., No. 3, Sec. 4, New Taipei Blvd.
+            Xinzhuang Dist., New Taipei City 242032, Taiwan, R.O.C.
+
+            Tel: +866-2-89191230
+            Web: http://www.moxa.com/
+            "
+        DESCRIPTION
+            "The MIB module defines Moxa traffic statistics"
+
+        REVISION    "202202170000Z"
+        DESCRIPTION "update CONTACT-INFO"
+
+        REVISION    "201906300000Z"
+        DESCRIPTION "Initial Revision"
+
+        ::= { layer2Diagnosic 4 }
+
+-- -------------------------------------------------------------
+-- groups in the MOXA-TCST-MIB MIB
+-- -------------------------------------------------------------
+
+  -- tcstNotification		 OBJECT IDENTIFIER ::= { mxTcst 0 }
+  tcstConfiguration		 OBJECT IDENTIFIER ::= { mxTcst 1 }
+  tcstStatus		   OBJECT IDENTIFIER ::= { mxTcst 2 }
+  -- tcstExtensions		 OBJECT IDENTIFIER ::= { mxTcst 3 }
+
+-- -------------------------------------------------------------
+-- configuration group
+-- -------------------------------------------------------------
+  tcstConfigClearAllStatistics OBJECT-TYPE
+      SYNTAX  TruthValue
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+		  " Resets all the counter variables to initialization value (zero)"
+      ::= { tcstConfiguration 1 }
+
+  tcstConfigClearPortStatisticsTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF TcstConfigClearPortStatisticsEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+		  " Resets the port counter variables to initialization value (zero)"
+      ::= { tcstConfiguration 2 }
+  tcstConfigClearPortStatisticsEntry OBJECT-TYPE
+	  SYNTAX TcstConfigClearPortStatisticsEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "There is one entry in this table for each interface
+               port statistics."
+      INDEX { tcstConfigIfIndex }
+      ::= { tcstConfigClearPortStatisticsTable 1 }
+
+  TcstConfigClearPortStatisticsEntry ::=
+      SEQUENCE {
+          tcstConfigIfIndex
+              INTEGER,
+		  tcstConfigClearPortStatistics
+			  INTEGER
+	  }
+
+  tcstConfigIfIndex OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "The ifIndex of the port interface"
+      ::= { tcstConfigClearPortStatisticsEntry 1}
+
+  tcstConfigClearPortStatistics OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+          "Resets the port counter variables to initialization value (zero)"
+      ::= { tcstConfigClearPortStatisticsEntry 2}
+
+-- -------------------------------------------------------------
+-- Status group
+-- -------------------------------------------------------------
+  tcstStatGroupTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF TcstStatGroupEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "display traffic statistics information of interfaces."
+      ::= { tcstStatus 1 }
+
+  tcstStatGroupEntry OBJECT-TYPE
+      SYNTAX TcstStatGroupEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "There is one entry in this table for each interface
+               port statistics."
+      INDEX { tcstStatIfIndex }
+      ::= { tcstStatGroupTable 1 }
+
+  TcstStatGroupEntry ::=
+      SEQUENCE {
+          tcstStatIfIndex
+              INTEGER,
+          tcstStatTxTotalOctets
+              Counter32,
+          tcstStatTxTotalPackets
+              Counter32,
+          tcstStatTxUnicastPackets
+              Counter32,
+          tcstStatTxMulticastPackets
+              Counter32,
+          tcstStatTxBroadcastPackets
+              Counter32,
+          tcstStatRxTotalOctets
+              Counter32,
+          tcstStatRxTotalPackets
+              Counter32,
+          tcstStatRxUnicastPackets
+              Counter32,
+          tcstStatRxMulticastPackets
+              Counter32,
+          tcstStatRxBroadcastPackets
+              Counter32,
+          tcstStatRxPausePackets
+              Counter32,
+          tcstStatCollisionPackets
+              Counter32,
+          tcstStatLateCollisionPackets
+              Counter32,
+          tcstStatExcessiveCollisionPackets
+              Counter32,
+          tcstStatsCRCAlignErrorPackets
+              Counter32,
+          tcstStatDropPackets
+              Counter32,
+          tcstStatUndersizePackets
+              Counter32,
+          tcstStatOversizePackets
+              Counter32,
+          tcstStatFragmentPackets
+              Counter32,
+          tcstStatJabberPackets
+              Counter32,
+          tcstStatRxNonUnicastPackets
+              Counter32,
+          tcstStatRxErrorsPackets
+              Counter32,
+          tcstStatRxUnknownProtosPackets
+              Counter32,
+          tcstStatTxNonUnicastPackets
+              Counter32,
+          tcstStatTxDiscardsPackets
+              Counter32,
+          tcstStatTxErrorsPackets
+              Counter32,
+          tcstStatMultipleCollisionsPackets
+              Counter32,
+          tcstStatSQETestErrorsPackets
+              Counter32,
+          tcstStatDeferredTransmissionsPackets
+              Counter32,
+          tcstStatMacTransmitErrorsPackets
+              Counter32,
+          tcstStatCarrierSenseErrorsPackets
+              Counter32,
+          tcstStatFrameTooLongPackets
+              Counter32,
+          tcstStatMacReceiveErrorsPackets
+              Counter32,
+          tcstStatSymbolErrorsPackets
+              Counter32,
+          tcstStatAlignmentErrorsPackets
+              Counter32
+      }
+
+  tcstStatIfIndex OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "The ifIndex of the port interface"
+      ::= { tcstStatGroupEntry 1 }
+
+  tcstStatTxTotalOctets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of octets transimitted out of the
+		   interface."
+      ::= { tcstStatGroupEntry 2 }
+
+  tcstStatTxTotalPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets (including bad packets,
+         broadcast packets, and multicast packets) transimitted."
+      ::= { tcstStatGroupEntry 3 }
+
+  tcstStatTxUnicastPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of good packets sent that has a
+		 Unicast destination MAC Address."
+      ::= { tcstStatGroupEntry 4 }
+
+  tcstStatTxMulticastPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of good packets sent that has a
+		 Multicast destination MAC Address."
+      ::= { tcstStatGroupEntry 5 }
+
+  tcstStatTxBroadcastPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of good packets sent that has a
+		 Broadcast destination MAC Address."
+      ::= { tcstStatGroupEntry 6 }
+
+  tcstStatRxTotalOctets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of received in of the interface."
+      ::= { tcstStatGroupEntry 7 }
+
+  tcstStatRxTotalPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets (including bad packets,
+         broadcast packets, and multicast packets) received."
+      ::= { tcstStatGroupEntry 8 }
+
+  tcstStatRxUnicastPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of good packets received that has a
+		 Unicast destination MAC Address."
+      ::= { tcstStatGroupEntry 9 }
+
+  tcstStatRxMulticastPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of good packets received that has a
+		 Multicast destination MAC Address."
+      ::= { tcstStatGroupEntry 10 }
+
+  tcstStatRxBroadcastPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of good packets received that has a
+		 Broadcast destination MAC Address."
+      ::= { tcstStatGroupEntry 11 }
+
+  tcstStatRxPausePackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of 802.3x Flow Control packets
+		 received."
+      ::= { tcstStatGroupEntry 12 }
+
+  tcstStatCollisionPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of collision events seen
+		 by the MAC."
+      ::= { tcstStatGroupEntry 13 }
+
+  tcstStatLateCollisionPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of late collisions
+		 seen by the MAC."
+      ::= { tcstStatGroupEntry 14 }
+
+  tcstStatExcessiveCollisionPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of frames dropped in the transmit
+		 MAC due to excessive collision condition.
+		 This bit is applicable for Half-duplex mode only."
+      ::= { tcstStatGroupEntry 15 }
+
+   tcstStatsCRCAlignErrorPackets OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+          "The total number of packets received that
+          had a length (excluding framing bits, but
+          including FCS octets) of between 64 and 1518
+          octets, inclusive, but had either a bad
+          Frame Check Sequence (FCS) with an integral
+          number of octets (FCS Error) or a bad FCS with
+          a non-integral number of octets (Alignment Error)."
+      ::= { tcstStatGroupEntry 16 }
+
+
+  tcstStatDropPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of events in which packets were
+          dropped. Maximum update time of Drop Counter is
+          5 sec*max port number on device."
+      ::= { tcstStatGroupEntry 17 }
+
+  tcstStatUndersizePackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets received that were
+         less than 64 octets long (excluding framing bits,
+         but including FCS octets) and were otherwise well
+         formed."
+      ::= { tcstStatGroupEntry 18 }
+
+  tcstStatOversizePackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets received that were
+         longer than 1518 octets (excluding framing bits,
+         but including FCS octets) and were otherwise
+         well formed."
+      ::= { tcstStatGroupEntry 19 }
+
+  tcstStatFragmentPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+		  "The total number of packets received that were less than
+         64 octets in length (excluding framing bits but including
+         FCS octets) and had either a bad Frame Check Sequence
+         (FCS) with an integral number of octets (FCS Error) or a
+         bad FCS with a non-integral number of octets (Alignment
+         Error)."
+      ::= { tcstStatGroupEntry 20 }
+
+  tcstStatJabberPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+		  "The total number of packets received that were
+         longer than 1518 octets (excluding framing bits,
+         but including FCS octets), and had either a bad
+         Frame Check Sequence (FCS) with an integral number
+         of octets (FCS Error) or a bad FCS with a non-integral
+         number of octets (Alignment Error).
+
+         Note that this definition of jabber is different
+         than the definition in IEEE-802.3 section 8.2.1.5
+         (10BASE5) and section 10.3.1.4 (10BASE2).  These
+         documents define jabber as the condition where any
+         packet exceeds 20 ms.  The allowed range to detect
+         jabber is between 20 ms and 150 ms."
+      ::= { tcstStatGroupEntry 21}
+
+  tcstStatRxNonUnicastPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "The number of packets, delivered by this sub-layer to a
+         higher (sub-)layer, which were addressed to a multicast or
+         broadcast address at this sub-layer."
+      ::= { tcstStatGroupEntry 22 }
+
+  tcstStatRxErrorsPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "For packet-oriented interfaces, the number of inbound
+         packets that contained errors preventing them from being
+         deliverable to a higher-layer protocol.  For character-
+         oriented or fixed-length interfaces, the number of inbound
+         transmission units that contained errors preventing them
+         from being deliverable to a higher-layer protocol."
+      ::= { tcstStatGroupEntry 23 }
+
+  tcstStatRxUnknownProtosPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "For packet-oriented interfaces, the number of packets
+         received via the interface which were discarded because of
+         an unknown or unsupported protocol.  For character-oriented
+         or fixed-length interfaces that support protocol
+         multiplexing the number of transmission units received via
+         the interface which were discarded because of an unknown or
+         unsupported protocol.  For any interface that does not
+         support protocol multiplexing, this counter will always be 0."
+      ::= { tcstStatGroupEntry 24 }
+
+  tcstStatTxNonUnicastPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "The total number of packets that higher-level protocols
+         requested be transmitted, and which were addressed to a
+         multicast or broadcast address at this sub-layer, including
+         those that were discarded or not sent."
+      ::= { tcstStatGroupEntry 25 }
+
+  tcstStatTxDiscardsPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "The number of outbound packets which were chosen to be
+         discarded even though no errors had been detected to prevent
+         their being transmitted.  One possible reason for discarding
+         such a packet could be to free up buffer space."
+      ::= { tcstStatGroupEntry 26 }
+
+  tcstStatTxErrorsPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "For packet-oriented interfaces, the number of outbound
+         packets that could not be transmitted because of errors.
+         For character-oriented or fixed-length interfaces, the
+         number of outbound transmission units that could not be
+         transmitted because of errors."
+      ::= { tcstStatGroupEntry 27 }
+
+  tcstStatMultipleCollisionsPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "A count of frames that are involved in more
+         than one collision and are subsequently
+         transmitted successfully.
+         A frame that is counted by an instance of this
+         object is also counted by the corresponding
+         instance of either the ifOutUcastPkts,
+         ifOutMulticastPkts, or ifOutBroadcastPkts,
+         and is not counted by the corresponding
+         instance of the dot3StatsSingleCollisionFrames
+         object. This counter does not increment when the
+         interface is operating in full-duplex mode."
+      ::= { tcstStatGroupEntry 28 }
+
+  tcstStatSQETestErrorsPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "A count of times that the SQE TEST ERROR
+         is received on a particular interface. The
+         SQE TEST ERROR is set in accordance with the
+         rules for verification of the SQE detection
+         mechanism in the PLS Carrier Sense Function as
+         described in IEEE Std. 802.3, 2000 Edition,
+         section 7.2.4.6.
+         This counter does not increment on interfaces
+         operating at speeds greater than 10 Mb/s, or on
+         interfaces operating in full-duplex mode."
+      ::= { tcstStatGroupEntry 29 }
+
+  tcstStatDeferredTransmissionsPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "A count of frames for which the first
+         transmission attempt on a particular interface
+         is delayed because the medium is busy.
+         The count represented by an instance of this
+         object does not include frames involved in
+         collisions.
+         This counter does not increment when the
+         interface is operating in full-duplex mode."
+      ::= { tcstStatGroupEntry 30 }
+
+  tcstStatMacTransmitErrorsPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "A count of frames for which transmission on a
+         particular interface fails due to an internal
+         MAC sublayer transmit error. A frame is only
+         counted by an instance of this object if it is
+         not counted by the corresponding instance of
+         either the dot3StatsLateCollisions object, the
+         dot3StatsExcessiveCollisions object, or the
+         dot3StatsCarrierSenseErrors object."
+      ::= { tcstStatGroupEntry 31 }
+
+  tcstStatCarrierSenseErrorsPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "The number of times that the carrier sense
+         condition was lost or never asserted when
+         attempting to transmit a frame on a particular
+         interface.
+         This counter does not increment when the
+         interface is operating in full-duplex mode."
+      ::= { tcstStatGroupEntry 32 }
+
+  tcstStatFrameTooLongPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "A count of frames received on a particular
+         interface that exceed the maximum permitted
+         frame size."
+      ::= { tcstStatGroupEntry 33 }
+
+  tcstStatMacReceiveErrorsPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "A count of frames for which reception on a
+          particular interface fails due to an internal
+          MAC sublayer receive error. A frame is only
+          counted by an instance of this object if it is
+          not counted by the corresponding instance of
+          either the dot3StatsFrameTooLongs object, the
+          dot3StatsAlignmentErrors object, or the
+          dot3StatsFCSErrors object."
+      ::= { tcstStatGroupEntry 34 }
+
+  tcstStatSymbolErrorsPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "For an interface operating at 100 Mb/s, the
+          number of times there was an invalid data symbol
+          when a valid carrier was present.
+
+          For an interface operating in half-duplex mode
+          at 1000 Mb/s, the number of times the receiving
+          media is non-idle (a carrier event) for a period
+          of time equal to or greater than slotTime, and
+          during which there was at least one occurrence
+          of an event that causes the PHY to indicate
+          'Data reception error' or 'carrier extend error'
+          on the GMII.
+
+          For an interface operating in full-duplex mode
+          at 1000 Mb/s, the number of times the receiving
+          media is non-idle a carrier event) for a period
+          of time equal to or greater than minFrameSize,
+          and during which there was at least one
+          occurrence of an event that causes the PHY to
+          indicate 'Data reception error' on the GMII.
+
+          The count represented by an instance of this
+          object is incremented at most once per carrier
+          event, even if multiple symbol errors occur
+          during the carrier event.  This count does
+          not increment if a collision is present.
+
+          Discontinuities in the value of this counter can
+          occur at re-initialization of the management
+          system, and at other times as indicated by the
+          value of ifCounterDiscontinuityTime."
+      ::= { tcstStatGroupEntry 35 }
+
+  tcstStatAlignmentErrorsPackets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "A count of frames received on a particular
+          interface that are not an integral number of
+          octets in length and do not pass the FCS check."
+      ::= { tcstStatGroupEntry 36 }
+END

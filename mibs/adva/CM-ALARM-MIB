@@ -8,18 +8,14 @@ IMPORTS
     TimeStamp, DateAndTime, TruthValue, VariablePointer, DisplayString, 
     TEXTUAL-CONVENTION 
              FROM SNMPv2-TC
-    TrapAlarmSeverity
+    TrapAlarmSeverity, fsp150cm
              FROM ADVA-MIB
-    neIndex, shelfIndex, slotIndex
-             FROM  CM-ENTITY-MIB
-    cmEthernetAccPortIndex, cmEthernetNetPortIndex
-             FROM  CM-FACILITY-MIB
-    fsp150cm 
-             FROM  ADVA-MIB;
+    neIndex, shelfIndex
+             FROM  CM-ENTITY-MIB;
 
 
 cmAlarmMIB MODULE-IDENTITY
-    LAST-UPDATED    "202003010000Z"
+    LAST-UPDATED    "202102210000Z"
     ORGANIZATION    "ADVA Optical Networking SE"
     CONTACT-INFO
         "Web URL: http://adva.com/
@@ -35,13 +31,39 @@ cmAlarmMIB MODULE-IDENTITY
             "This module defines the Alarm Monitoring MIB definitions 
              used by the F3 (FSP150CM/CC) product lines.  
              Copyright (C) ADVA."
-    REVISION        "202003010000Z"
+    REVISION        "202102210000Z"
     DESCRIPTION
             "
+
+            Notes from release 202102210000Z
+               (1) Added new literals to CmConditionType for XG300 family (MRV)
+                 - fan-inactive(424),
+                 - ps-inactive(425)
+            
+            Notes from release 202010240000Z
+               (1) Added new literals to CmAlarmEntityType
+	         - oneru-xg108-shelf(240),
+                 - eth-xg-108-card(241),
+                 - oneru-xg108-h-shelf(242),
+                 - eth-xg-108-h-card(243),
+                 - oneru-xg108-sh-shelf(244),
+                 - eth-xg-108-sh-card(245)
+		 
+            Notes from release 202006240000Z
+               (1) Added new literals to CmAlarmEntityType
+                   - clk-x4-lpn-group(239)
+
+            Notes from release 202005280000Z
+               (1) Added new literals to CmAlarmEntityType
+                   - ru1-osa5412-shelf(235)
+                   - eth-osa5412-card(236)
+                   - display-card(237)
+                   - clk-x4-lpn-card(238)
+           
             Notes from release 202003010000Z
                (1) Added new literal to CmAlarmEntityType
                    l3ptpport(234)
-		   
+           
             Notes from release 202002200000Z
                (1) added new TEXTUAL-CONVENTION to CmConditionType
                    - invalid-syscfg
@@ -81,8 +103,8 @@ cmAlarmMIB MODULE-IDENTITY
             Notes from release 201907080000Z,
                (1) Added new TEXTUAL-CONVENTION to CmConditionType
                    - jamming, spoofing
-		   
-	    Notes from release 201903070000Z
+           
+        Notes from release 201903070000Z
                (1) Added new literals to CmAlarmEntityType.
                    - oneru-xg118proac-sh-shelf,
                    - eth-xg-118proac-sh-card
@@ -716,7 +738,10 @@ CmConditionType ::= TEXTUAL-CONVENTION
                  time-clock-degraded-system-time(419),
                  spoofing-pps(420),
                  spoofing-loc(421),
-                 invalid-syscfg(422)
+                 invalid-syscfg(422),
+                 incompatible-oscillator-type(423),
+                 fan-inactive(424),
+                 ps-inactive(425)
                }
 
 
@@ -961,7 +986,7 @@ CmAlarmEntityType ::= TEXTUAL-CONVENTION
                  oneru-xg118pro-sh-shelf(213),  
                  eth-xg-118pro-sh-card(214),    
                  ntp-clock(215),
-		 oneru-xg118proac-sh-shelf(216),
+                 oneru-xg118proac-sh-shelf(216),
                  eth-xg-118proac-sh-card(217),
                  oneru-ge114proVm-sh-shelf(218),
                  eth-ge-114proVm-sh-card(219),
@@ -979,10 +1004,22 @@ CmAlarmEntityType ::= TEXTUAL-CONVENTION
                  eth-softsync-card(231),
                  mb-gnss-card(232),
                  composite-clock-card(233),
-                 l3ptpport(234)
-               }                                
-                                                
-CmCondEffectType ::= TEXTUAL-CONVENTION         
+                 l3ptpport(234),
+                 ru1-osa5412-shelf(235), 
+                 eth-osa5412-card(236),
+                 display-card(237),
+                 clk-x4-lpn-card(238),
+                 clk-x4-lpn-group(239),
+		 
+                 oneru-xg108-shelf(240),
+                 eth-xg-108-card(241),
+                 oneru-xg108-h-shelf(242),
+                 eth-xg-108-h-card(243),
+                 oneru-xg108-sh-shelf(244),
+                 eth-xg-108-sh-card(245)
+               }
+
+CmCondEffectType ::= TEXTUAL-CONVENTION
     STATUS     current
     DESCRIPTION
         "Identifies the type of condition effect types."
@@ -1253,7 +1290,7 @@ CmSysCondEntry ::= SEQUENCE {
 
 cmSysCondIndex OBJECT-TYPE
     SYNTAX     Integer32 (1..65535)
-    MAX-ACCESS read-only
+    MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
           "An integer index value used to uniquely identify
@@ -1554,7 +1591,7 @@ CmNetworkElementCondEntry ::= SEQUENCE {
 
 cmNetworkElementCondIndex OBJECT-TYPE
     SYNTAX     Integer32 (1..65535)
-    MAX-ACCESS read-only
+    MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
           "An integer index value used to uniquely identify
@@ -1711,7 +1748,7 @@ CmAlarmSeverityAssignmentEntry ::= SEQUENCE {
 
 cmAlarmSeverityAssignmentEntityType  OBJECT-TYPE
     SYNTAX     CmAlarmEntityType 
-    MAX-ACCESS read-only
+    MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
         "Alarm Severity Assignment Entity Type."
@@ -1719,7 +1756,7 @@ cmAlarmSeverityAssignmentEntityType  OBJECT-TYPE
 
 cmAlarmSeverityAssignmentCondType OBJECT-TYPE
     SYNTAX     CmConditionType
-    MAX-ACCESS read-only
+    MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
          "This object identifies the type of the condition."
@@ -1727,7 +1764,7 @@ cmAlarmSeverityAssignmentCondType OBJECT-TYPE
 
 cmAlarmSeverityAssignmentSrvEff OBJECT-TYPE
     SYNTAX     CmServiceEffect
-    MAX-ACCESS read-only
+    MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
          "This object identifies whether the condition is service affecting
@@ -1792,7 +1829,7 @@ F3EnvAlarmInputEntry ::= SEQUENCE {
 }
 
 f3EnvAlarmInputIndex  OBJECT-TYPE
-    SYNTAX     Integer32 
+    SYNTAX     Integer32 (1..2147483647)
     MAX-ACCESS not-accessible 
     STATUS     current
     DESCRIPTION
@@ -1974,7 +2011,7 @@ cmAlmObjectGroup OBJECT-GROUP
         cmSysAlmDescr, cmSysAlmObject, cmSysAlmObjectName,
         cmSysAlmAdditionalInfoObject,  cmSysAlmAdditionalInfoName,
 
-        cmSysCondIndex, cmSysCondNotifCode, cmSysCondType,
+        cmSysCondNotifCode, cmSysCondType,
         cmSysCondSrvEff, cmSysCondTime, cmSysCondLocation,
         cmSysCondDirection, cmSysCondDescr, cmSysCondEffType,
         cmSysCondObject, cmSysCondObjectName,
@@ -1988,7 +2025,7 @@ cmAlmObjectGroup OBJECT-GROUP
         cmNetworkElementAlmAdditionalInfoObject,  
         cmNetworkElementAlmAdditionalInfoName,
     
-        cmNetworkElementCondIndex, cmNetworkElementCondNotifCode,
+        cmNetworkElementCondNotifCode,
         cmNetworkElementCondType, cmNetworkElementCondSrvEff,
         cmNetworkElementCondTime, cmNetworkElementCondLocation,
         cmNetworkElementCondDirection, cmNetworkElementCondDescr,
@@ -1997,9 +2034,6 @@ cmAlmObjectGroup OBJECT-GROUP
         cmNetworkElementCondAdditionalInfoObject,  
         cmNetworkElementCondAdditionalInfoName,
 
-        cmAlarmSeverityAssignmentEntityType,
-        cmAlarmSeverityAssignmentCondType,
-        cmAlarmSeverityAssignmentSrvEff,
         cmAlarmSeverityAssignmentLocation,
         cmAlarmSeverityAssignmentNotifCode,
         cmAlarmSeverityAssignmentDirection
@@ -2022,7 +2056,7 @@ cmAlmNotifGroup NOTIFICATION-GROUP
 
 f3EnvAlarmInputGroup OBJECT-GROUP
     OBJECTS {
-      f3EnvAlarmInputIndex, f3EnvAlarmInputDescr, f3EnvAlarmInputCondType,
+      f3EnvAlarmInputDescr, f3EnvAlarmInputCondType,
       f3EnvAlarmInputNotifCode, f3EnvAlarmInputMode, f3EnvAlarmInputAlmHoldOffEnabled
     }
     STATUS  current

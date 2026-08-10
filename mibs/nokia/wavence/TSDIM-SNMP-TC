@@ -1,0 +1,266 @@
+-- "CONFIDENTIAL. All rights reserved. Alcatel. This computer program is protected under Copyright.
+-- Recipient is to retain the program in confidence, and is not permitted to copy, use, distribute, modify or
+-- translate the program without authorization. Passing on and copying,use and communication of its
+-- contents is not permitted without written authorization."
+
+TSDIM-SNMP-TC DEFINITIONS ::= BEGIN
+    IMPORTS
+    MODULE-IDENTITY, Integer32, Counter32, TimeTicks  FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, TruthValue,
+    RowPointer, DateAndTime FROM SNMPv2-TC
+    tsdimBasicMib FROM TSDIM-BASICREG-MIB;
+
+tsdimSnmpTc MODULE-IDENTITY
+    LAST-UPDATED "0305090000Z"
+    ORGANIZATION "Alcatel TND"
+    CONTACT-INFO "Alcatel TND"
+    DESCRIPTION
+        "Added the possible type of information (OID | Integer) you can add to
+     Alarm Specific Problem attribute"
+    REVISION "0110190000Z"
+    DESCRIPTION
+        "Modified as a consequence of ATM Review Meeting dedcisions"
+    REVISION "0107180000Z"
+    DESCRIPTION
+        "Added Gen Log TC"
+    REVISION "0101290000Z"
+    DESCRIPTION
+        "The UserLabel became OpticsIMUserLabel"
+    REVISION "0009290000Z"
+    DESCRIPTION
+        "The alarm optional objects have been deleted.
+         Moreover The Signal Label TC has been added."
+    REVISION "0005090000Z"
+    DESCRIPTION
+        "It has been change the syntax and semantic of
+         TsdimObjectClassId. Moreover some minor errors have
+         been corrected."
+    REVISION "0002290000Z"
+    DESCRIPTION
+        "They have been added the textual conventions used in order to
+         make generic the event and alarm definitions."
+    REVISION "9910210000Z"
+    DESCRIPTION
+        "Initial Release TSD-IM SNMP Textual Conventions"
+::= { tsdimBasicMib 100 }
+
+
+
+-- TsdimManagerRole
+
+TsdimManagerRole ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The role of manager (main / spare)"
+    SYNTAX INTEGER {
+        main (1),
+        spare (2)
+}
+
+-- TsdimUdpPort
+
+TsdimUdpPort ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This textual convention define the SNMP UDP Port
+         associated to the application."
+    SYNTAX OCTET STRING
+
+-- TsdimAlmSeverity
+
+TsdimAlmSeverity ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+         "The value of this object identifies the severity of
+          an alarm that has occurred."
+    SYNTAX INTEGER {
+        critical(1),
+        major(2),
+        minor(3),
+        warning(4),
+        indeterminate(5),
+        cleared(6)
+    }
+
+-- TsdimAPTAlmSeverity
+
+TsdimAPTAlmSeverity ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+         "The value of this object identifies the severity of
+          an alarm stored in APT Table.
+          The cleared severity is not foreseen inside APT table."
+    SYNTAX INTEGER {
+        critical(1),
+        major(2),
+        minor(3),
+        warning(4),
+        indeterminate(5) }
+
+-- TsdimAlmSpecProblem
+
+TsdimAlmSpecProblem ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+         "This object contains the alarm specific problem description.
+          Indicates further refinements to the problem identified
+          by the alarm type.  If more than one specific problem
+          is described in this object, the problem descriptions are
+          separated by <;> characters. The format of the displayString
+          is defined as follow:
+          String | OID | ({String;}((OID | Integer);)*)"
+    SYNTAX DisplayString
+
+-- TsdimManagerType
+
+TsdimManagerType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This object indicates the admitted type of managers."
+    SYNTAX INTEGER {
+        eml      (1),
+        nml      (2),
+        mapper   (3),
+        localct  (4),
+        remotect (5)
+}
+
+-- TsdimAdministrativeState
+
+TsdimAdministrativeState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This textual convention defines a generic administrative state
+         object.
+         As generic behavior a Manager uses the administrative state
+         in order to activate or de-activate the associated functionality."
+    SYNTAX INTEGER {
+        locked       (0),
+        unlocked     (1),
+        shuttingDown (2)
+}
+
+-- TsdimOperationalState
+
+TsdimOperationalState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This textual convention defines a generic operational state
+         object.
+         As generic behavior an Agent uses the operational state
+         in order to enable or disable the associated functionality. "
+    SYNTAX INTEGER {
+        disabled (0),
+        enabled  (1)
+}
+
+-- TsdimAlmProbableCause
+
+TsdimAlmProbableCause ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This object is used to specify the OID of the
+         generated notification. The notification OID represent the
+         alarm probable cause."
+    SYNTAX OBJECT IDENTIFIER
+
+-- TsdimObjectClassId
+
+TsdimObjectClassId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This object represents the SNMP entry table
+         object identity (Managed Object Class) of the instance
+         where the event/alarm occured. It is defined as the length of the
+         SNMP instance identifier without the index values."
+    SYNTAX Integer32
+
+-- TsdimObjectInstanceId
+
+TsdimObjectInstanceId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This object is the SNMP instance identifier (row entry
+         identifier + indexes values) where the event/alarm occured."
+    SYNTAX OBJECT IDENTIFIER
+
+-- TsdimNotificationId
+
+TsdimNotificationId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This object contains a unique event/alarm numbering."
+    SYNTAX Counter32
+
+-- TsdimEventTimeInt
+
+TsdimEventTimeInt ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This is the translation in integer of the time at which
+         the event/alarm has been generated. It is calculated as the
+         number of seconds starting from the 1-1-1970."
+    SYNTAX TimeTicks
+
+-- OpticsIMUserLabel
+
+OpticsIMUserLabel ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This object assigns a user friendly name to the associated object.
+         The size of this string can not exceed 30 bytes."
+    SYNTAX DisplayString
+
+-- SLValue
+
+SLValue ::= TEXTUAL-CONVENTION
+    STATUS   current
+    DESCRIPTION
+        "Represents the signal label (SL) numeric value.
+         The value -1 represents a Null value for
+         interfaces not supporting the SL mechanism
+         (e.g. PDH 2Mb/s interfaces) or when
+         the SL value is not known by the agent.
+         In case of higher-order SDH VCs
+         (e.g. VC-3, VC-4 or VC-4-4c)
+         this value can be the null code
+         (i.e. the -1 value) or one of
+         the codes (in the 0-255 range)
+         defined for the C2 byte in G.707.
+         All the other values are invalid.
+         In case of lower-order SDH VCs (e.g. VC-12)
+         this value can be the null code
+         (i.e. the -1 value) or
+         one of the values that can be
+         obtained concatenating an 8bit word
+         representing the extended signal
+         label (ESL) value defined for the K4(1)
+         bits and a 3bit word representing
+         the SL value defined for the
+         V5[5-7] bits, according to G.707.
+         The first 8bits are all equal to 0 when
+         the V5[5-7] bits are different from 101.
+         The value 6 represents the escape
+         code in the V5[5-7] bits but an unknown
+         code in the K4(1) bits (e.g. because
+         the ESL mechanism is not supported).
+         All the other values are invalid.
+         In case of 34Mb/s PDH TPs, according to
+         the G.832 mapping, this value can be
+         the null code (i.e. the -1 value) or
+         one of the codes (in the 0-7 range)
+         defined for the MA[3-5] bits in G.832.
+         All the other values are invalid."
+    SYNTAX Integer32
+
+
+-- GenEventLogObj
+
+GenEventLogObj  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION "
+        The semantic of this field depends on the type of event."
+    SYNTAX OCTET STRING
+
+
+END

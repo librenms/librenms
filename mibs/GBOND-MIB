@@ -7,20 +7,20 @@ GBOND-MIB DEFINITIONS ::= BEGIN
     mib-2,
     Unsigned32,
     Gauge32
-      FROM SNMPv2-SMI           -- [RFC2578]
+      FROM SNMPv2-SMI           -- RFC 2578
     TEXTUAL-CONVENTION,
     TruthValue,
     RowStatus,
     PhysAddress
-      FROM SNMPv2-TC            -- [RFC2579]
+      FROM SNMPv2-TC            -- RFC 2579
     MODULE-COMPLIANCE,
     OBJECT-GROUP,
     NOTIFICATION-GROUP
-      FROM SNMPv2-CONF          -- [RFC2580]
+      FROM SNMPv2-CONF          -- RFC 2580
     SnmpAdminString
-      FROM SNMP-FRAMEWORK-MIB   -- [RFC3411]
+      FROM SNMP-FRAMEWORK-MIB   -- RFC 3411
     ifIndex
-      FROM IF-MIB               -- [RFC2863]
+      FROM IF-MIB               -- RFC 2863
     HCPerfCurrentCount,
     HCPerfIntervalCount,
     HCPerfIntervalThreshold,
@@ -28,15 +28,19 @@ GBOND-MIB DEFINITIONS ::= BEGIN
     HCPerfInvalidIntervals,
     HCPerfTimeElapsed,
     HCPerfTotalCount
-      FROM  HC-PerfHist-TC-MIB  -- [RFC3705]
+      FROM  HC-PerfHist-TC-MIB  -- RFC 3705
+    IANAgBondScheme,
+    IANAgBondSchemeList
+      FROM  IANA-GBOND-TC-MIB
     ;
 ------------------------------------------------------------------------
+
   gBondMIB MODULE-IDENTITY
-    LAST-UPDATED "201203120000Z"  -- Mar 12, 2012
+    LAST-UPDATED "201302200000Z"  -- 20 February 2013
     ORGANIZATION "IETF ADSL MIB Working Group"
     CONTACT-INFO
       "WG charter:
-        http://www.ietf.org/html.charters/adslmib-charter.html
+        http://datatracker.ietf.org/wg/adslmib/charter/
 
       Mailing Lists:
         General Discussion: adslmib@ietf.org
@@ -45,16 +49,16 @@ GBOND-MIB DEFINITIONS ::= BEGIN
 
        Chair: Menachem Dodge
       Postal: ECI Telecom, Ltd.
-              30 Hasivim St.,
-              Petach-Tikva 4951169
+              30 Hasivim St.
+              Petach-Tikva  4951169
               Israel
        Phone: +972-3-926-8421
-       EMail: menachem.dodge@ecitele.com
+       EMail: menachemdodge1@gmail.com
 
       Editor: Edward Beili
       Postal: Actelis Networks, Inc.
               25 Bazel St., P.O.B. 10173
-              Petach-Tikva 49103
+              Petach-Tikva  49103
               Israel
        Phone: +972-3-924-3491
        EMail: edward.beili@actelis.com
@@ -62,20 +66,18 @@ GBOND-MIB DEFINITIONS ::= BEGIN
       Editor: Moti Morgenstern
       Postal: ECI Telecom
               30 Hasivim St.
-              Petach-Tikva 4951169
+              Petach-Tikva  4951169
               Israel
-
        Phone: +972-3-926-6258
        EMail: moti.morgenstern@ecitele.com"
-
     DESCRIPTION
       "The objects in this MIB module are used to manage the
-      multi-pair bonded xDSL Interfaces, defined in ITU-T
-      recommendations G.998.1, G.998.2 and G.998.3.
+      multi-pair bonded xDSL interfaces, as defined in ITU-T
+      Recommendations G.998.1, G.998.2, and G.998.3.
 
       This MIB module MUST be used in conjunction with a bonding
-      scheme specific MIB module, that is, G9981-MIB, G9982-MIB or
-      G9983-MIB.
+      scheme-specific MIB module, that is, G9981-MIB, G9982-MIB,
+      or G9983-MIB.
 
       The following references are used throughout this MIB module:
 
@@ -97,32 +99,31 @@ GBOND-MIB DEFINITIONS ::= BEGIN
 
       Naming Conventions:
         BCE   - Bonding Channel Entity
-        BTU   - Bonding Transmission Unit
-        BTU-C - Bonding Transmission Unit, CO side
-        BTU-R - Bonding Transmission Unit, Remote Terminal (CPE) side
+        BTU   - Bonding Terminating Unit
+        BTU-C - Bonding Terminating Unit, CO side
+        BTU-R - Bonding Terminating Unit, Remote Terminal (CPE) side
         CO    - Central Office
         CPE   - Customer Premises Equipment
-        GBS   - Generic Bonding Sublayer
+        GBS   - Generic Bonding Sub-layer
         PM    - Performance Monitoring
         SNR   - Signal to Noise Ratio
         TCA   - Threshold Crossing Alert
 
-      Copyright (C) The IETF Trust (2012).
-      This version of this MIB module is part of RFC XXXX;
-      see the RFC itself for full legal notices."
+     Copyright (c) 2013 IETF Trust and the persons identified as
+     authors of the code.  All rights reserved.
 
-    REVISION    "201203120000Z"  -- Mar 12, 2012
-    DESCRIPTION "Initial version, published as RFC XXXX."
+     Redistribution and use in source and binary forms, with or without
+     modification, is permitted pursuant to, and subject to the license
+     terms contained in, the Simplified BSD License set forth in Section
+     4.c of the IETF Trust's Legal Provisions Relating to IETF Documents
+     (http://trustee.ietf.org/license-info)."
 
-      -- EdNote: Replace XXXX with the actual RFC number &
-      -- remove this note
-
-    ::= { mib-2 211 }	
-    
-      -- http://www.iana.org/assignments/smi-numbers.
+    REVISION    "201302200000Z"  -- 20 February 2013
+    DESCRIPTION "Initial version, published as RFC 6765."
+    ::= { mib-2 211 }
 
    -- Sections of the module
-   -- Structured as recommended by [RFC4181], Appendix D
+   -- Structured as recommended by RFC 4181, Appendix D
 
    gBondObjects     OBJECT IDENTIFIER ::= { gBondMIB 1 }
 
@@ -136,93 +137,55 @@ GBOND-MIB DEFINITIONS ::= BEGIN
 
    -- Textual Conventions
 
-   GBondSchemeList ::= TEXTUAL-CONVENTION
-     STATUS       current
-     DESCRIPTION
-       "This textual convention defines a bitmap of possible ITU-T
-       G.998 (G.Bond) bonding schemes. Currently there are 3 bonding
-       schemes defined: G.998.1, G.998.2 and G.998.3, identified by
-       bit values g9981(1), g9982(2) and g9983(3), respectively.
-       An additional value of none(0), can be returned as a result
-       of GET operation, when an value of the object cannot be
-       determined (for example a peer GBS cannot be reached), the port
-       does not support any kind of bonding or when a single-BCE
-       G.998.2 GBS supports bonding (frame fragmentation/reassembly)
-       bypass."
-     SYNTAX       BITS {
-       none(0),
-       g9981(1),
-       g9982(2),
-       g9983(3)
-     }
-
-   GBondScheme ::= TEXTUAL-CONVENTION
-     STATUS       current
-     DESCRIPTION
-       "This textual convention defines ITU-T G.998 bonding scheme
-       values. Possible values are:
-         none(0)    - no bonding (e.g. on single-BCE G.998.2 GBS) or
-                      unknown
-         g9981(1)   - G.998.1 (G.Bond/ATM)
-         g9982(2)   - G.998.2 (G.Bond/Ethernet)
-         g9983(3)   - G.998.3 (G.Bond/TDIM)."
-     SYNTAX       INTEGER {
-       none(0),
-       g9981(1),
-       g9982(2),
-       g9983(3)
-     }
-
    GBondPm1DayIntervalThreshold ::= TEXTUAL-CONVENTION
      DISPLAY-HINT "d"
-     STATUS       current
+     STATUS      current
      DESCRIPTION
        "This textual convention defines a range of values that may be
-       set in a fault threshold alarm control for a 1-day performance
-       monitoring interval.
+       set in a fault threshold alarm control for a 1-day Performance
+       Monitoring interval.
        As the number of seconds in a 1-day interval numbers at most
        86400, objects of this type may have a range of 0...86400,
        where the value of 0 disables the alarm."
-     SYNTAX       Unsigned32 (0..86400)
+     SYNTAX      Unsigned32 (0..86400)
 
-
-  -- Port Notifications Group
+   -- Port Notifications group
 
    gBondPortNotifications OBJECT IDENTIFIER ::= { gBondPort 0 }
 
    gBondLowUpRateCrossing NOTIFICATION-TYPE
      OBJECTS {
-       -- ifIndex is not needed here since we are under specific GBS
+       -- ifIndex is not needed here, since we are under specific GBS
        gBondPortStatUpDataRate,
        gBondPortConfThreshLowUpRate
      }
      STATUS      current
      DESCRIPTION
-       "This notification indicates that the G.Bond port' upstream
+       "This notification indicates that the G.Bond port's upstream
        data rate has reached/dropped below or exceeded the low
        upstream rate threshold, specified by
        gBondPortConfThreshLowUpRate.
 
        This notification MAY be sent for the -O subtype ports
-       while the port is up, on the crossing event in both
+       while the port is 'up', on the crossing event in both
        directions: from normal (rate is above the threshold) to low
-       (rate equals the threshold or below it) and from low to
-       normal. This notification is not applicable to the -R
+       (rate equals the threshold or is below it) and from low to
+       normal.  This notification is not applicable to the -R
        subtypes.
 
        It is RECOMMENDED that a small debouncing period of 2.5 sec,
        between the detection of the condition and notification,
-       is implemented to prevent simultaneous LinkUp/LinkDown and
-       gBondLowUpRateCrossing notifications to be sent.
+       be implemented to prevent simultaneous LinkUp/LinkDown and
+       gBondLowUpRateCrossing notifications from being sent.
 
        The adaptive nature of the G.Bond technology allows the port
-       to adapt itself to the changes in the copper environment,
+       to adapt itself to the changes in the copper environment;
        e.g., an impulse noise, alien crosstalk, or a
        micro-interruption may temporarily drop one or more BCEs in
        the aggregation group, causing a rate degradation of the
-       aggregated G.Bond link. The dropped BCEs would then try to
+       aggregated G.Bond link.  The dropped BCEs would then try to
        re-initialize, possibly at a lower rate than before, adjusting
-       the rate to provide required target SNR margin.
+       the rate to provide the required target SNR margin.
 
        Generation of this notification is controlled by the
        gBondPortConfLowRateCrossingEnable object.
@@ -230,42 +193,42 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        This object maps to the TR-159 notification
        nGroupLowUpRateCrossing."
      REFERENCE
-       "[TR-159] 5.5.1.24"
+       "[TR-159], Section 5.5.1.24"
      ::= { gBondPortNotifications 1 }
 
    gBondLowDnRateCrossing NOTIFICATION-TYPE
      OBJECTS {
-       -- ifIndex is not needed here since we are under specific GBS
+       -- ifIndex is not needed here, since we are under specific GBS
        gBondPortStatDnDataRate,
        gBondPortConfThreshLowDnRate
      }
      STATUS      current
      DESCRIPTION
-       "This notification indicates that the G.Bond port' downstream
+       "This notification indicates that the G.Bond port's downstream
        data rate has reached/dropped below or exceeded the low
        downstream rate threshold, specified by
        gBondPortConfThreshLowDnRate.
 
        This notification MAY be sent for the -O subtype ports
-       while the port is up, on the crossing event in both
+       while the port is 'up', on the crossing event in both
        directions: from normal (rate is above the threshold) to low
-       (rate equals the threshold or below it) and from low to
-       normal. This notification is not applicable to the -R
+       (rate equals the threshold or is below it) and from low to
+       normal.  This notification is not applicable to the -R
        subtypes.
 
        It is RECOMMENDED that a small debouncing period of 2.5 sec,
        between the detection of the condition and notification,
-       is implemented to prevent simultaneous LinkUp/LinkDown and
-       gBondLowDnRateCrossing notifications to be sent.
+       be implemented to prevent simultaneous LinkUp/LinkDown and
+       gBondLowDnRateCrossing notifications from being sent.
 
        The adaptive nature of the G.Bond technology allows the port
-       to adapt itself to the changes in the copper environment,
+       to adapt itself to the changes in the copper environment;
        e.g., an impulse noise, alien crosstalk, or a
        micro-interruption may temporarily drop one or more BCEs in
        the aggregation group, causing a rate degradation of the
-       aggregated G.Bond link. The dropped BCEs would then try to
+       aggregated G.Bond link.  The dropped BCEs would then try to
        re-initialize, possibly at a lower rate than before,
-       adjusting the rate to provide required target SNR margin.
+       adjusting the rate to provide the required target SNR margin.
 
        Generation of this notification is controlled by the
        gBondPortConfLowRateCrossingEnable object.
@@ -273,12 +236,12 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        This object maps to the TR-159 notification
        nGroupLowDownRateCrossing."
      REFERENCE
-       "[TR-159] 5.5.1.25"
+       "[TR-159], Section 5.5.1.25"
      ::= { gBondPortNotifications 2}
 
    gBondPmTca15MinESCrossing NOTIFICATION-TYPE
      OBJECTS {
-       -- ifIndex is not needed here since we are under specific GBS
+       -- ifIndex is not needed here, since we are under specific GBS
        gBondPortPmCur15MinES,
        gBondPortPmTcaProfileThresh15MinES
      }
@@ -286,21 +249,21 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      DESCRIPTION
        "This notification indicates that the Errored Seconds threshold,
        specified by gBondPortPmTcaProfileThresh15MinES, has been
-       reached or exceeded for the GPS port.
+       reached or exceeded for the GBS port.
 
-       Generation of this notification is controlled by
+       Generation of this notification is controlled by the
        gBondPortConfPmTcaEnable and
        gBondPortPmTcaProfileThresh15MinES objects.
 
        This object maps to the TR-159 notification
        nGroupPerfTca15MinES."
      REFERENCE
-       "[TR-159] 5.5.1.42"
+       "[TR-159], Section 5.5.1.42"
      ::= { gBondPortNotifications 3}
 
    gBondPmTca15MinSESCrossing NOTIFICATION-TYPE
      OBJECTS {
-       -- ifIndex is not needed here since we are under specific GBS
+       -- ifIndex is not needed here, since we are under specific GBS
        gBondPortPmCur15MinSES,
        gBondPortPmTcaProfileThresh15MinSES
      }
@@ -308,43 +271,43 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      DESCRIPTION
        "This notification indicates that the Severely Errored Seconds
        threshold, specified by gBondPortPmTcaProfileThresh15MinSES,
-       has been reached or exceeded for the GPS port.
+       has been reached or exceeded for the GBS port.
 
-       Generation of this notification is controlled by
+       Generation of this notification is controlled by the
        gBondPortConfPmTcaEnable and
        gBondPortPmTcaProfileThresh15MinSES objects.
 
        This object maps to the TR-159 notification
        nGroupPerfTca15MinSES."
      REFERENCE
-       "[TR-159] 5.5.1.43"
+       "[TR-159], Section 5.5.1.43"
      ::= { gBondPortNotifications 4}
 
    gBondPmTca15MinUASCrossing NOTIFICATION-TYPE
      OBJECTS {
-       -- ifIndex is not needed here since we are under specific GBS
+       -- ifIndex is not needed here, since we are under specific GBS
        gBondPortPmCur15MinUAS,
        gBondPortPmTcaProfileThresh15MinUAS
      }
      STATUS      current
      DESCRIPTION
        "This notification indicates that the Unavailable Seconds
-       threshold, specified by gBondPortPmTcaProfileThresh15MinES,
-       has been reached or exceeded for the GPS port.
+       threshold, specified by gBondPortPmTcaProfileThresh15MinUAS,
+       has been reached or exceeded for the GBS port.
 
-       Generation of this notification is controlled by
+       Generation of this notification is controlled by the
        gBondPortConfPmTcaEnable and
        gBondPortPmTcaProfileThresh15MinUAS objects.
 
        This object maps to the TR-159 notification
        nGroupPerfTca15MinUAS."
      REFERENCE
-       "[TR-159] 5.5.1.44"
+       "[TR-159], Section 5.5.1.44"
      ::= { gBondPortNotifications 5}
 
    gBondPmTca1DayESCrossing NOTIFICATION-TYPE
      OBJECTS {
-       -- ifIndex is not needed here since we are under specific GBS
+       -- ifIndex is not needed here, since we are under specific GBS
        gBondPortPmCur1DayES,
        gBondPortPmTcaProfileThresh1DayES
      }
@@ -352,21 +315,21 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      DESCRIPTION
        "This notification indicates that the Errored Seconds threshold,
        specified by gBondPortPmTcaProfileThresh1DayES, has been
-       reached or exceeded for the GPS port.
+       reached or exceeded for the GBS port.
 
-       Generation of this notification is controlled by
+       Generation of this notification is controlled by the
        gBondPortConfPmTcaEnable and
        gBondPortPmTcaProfileThresh1DayES objects.
 
        This object maps to the TR-159 notification
        nGroupPerfTca1DayES."
      REFERENCE
-       "[TR-159] 5.5.1.54"
+       "[TR-159], Section 5.5.1.54"
      ::= { gBondPortNotifications 6}
 
    gBondPmTca1DaySESCrossing NOTIFICATION-TYPE
      OBJECTS {
-       -- ifIndex is not needed here since we are under specific GBS
+       -- ifIndex is not needed here, since we are under specific GBS
        gBondPortPmCur1DaySES,
        gBondPortPmTcaProfileThresh1DaySES
      }
@@ -374,21 +337,21 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      DESCRIPTION
        "This notification indicates that the Severely Errored Seconds
        threshold, specified by gBondPortPmTcaProfileThresh1DaySES,
-       has been reached or exceeded for the GPS port.
+       has been reached or exceeded for the GBS port.
 
-       Generation of this notification is controlled by
+       Generation of this notification is controlled by the
        gBondPortConfPmTcaEnable and
        gBondPortPmTcaProfileThresh1DaySES objects.
 
        This object maps to the TR-159 notification
        nGroupPerfTca1DaySES."
      REFERENCE
-       "[TR-159] 5.5.1.55"
+       "[TR-159], Section 5.5.1.55"
      ::= { gBondPortNotifications 7}
 
    gBondPmTca1DayUASCrossing NOTIFICATION-TYPE
      OBJECTS {
-       -- ifIndex is not needed here since we are under specific GBS
+       -- ifIndex is not needed here, since we are under specific GBS
        gBondPortPmCur1DayUAS,
        gBondPortPmTcaProfileThresh1DayUAS
      }
@@ -396,17 +359,16 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      DESCRIPTION
        "This notification indicates that the Unavailable Seconds
        threshold, specified by gBondPortPmTcaProfileThresh1DayUAS,
-       has been reached or exceeded for the GPS port.
+       has been reached or exceeded for the GBS port.
 
-       Generation of this notification is controlled by
+       Generation of this notification is controlled by the
        gBondPortConfPmTcaEnable and
        gBondPortPmTcaProfileThresh1DayUAS objects.
 
        This object maps to the TR-159 notification
        nGroupPerfTca1DayUAS."
-
      REFERENCE
-       "[TR-159] 5.5.1.56"
+       "[TR-159], Section 5.5.1.56"
      ::= { gBondPortNotifications 8}
 
    -- G.Bond Port (GBS) group
@@ -416,8 +378,8 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      MAX-ACCESS  not-accessible
      STATUS      current
      DESCRIPTION
-       "Table for configuration of G.Bond GBS ports. Entries in this
-       table MUST be maintained in a persistent manner"
+       "Table for configuration of G.Bond GBS ports.  Entries in this
+       table MUST be maintained in a persistent manner."
      ::= { gBondPort 1 }
 
    gBondPortConfEntry OBJECT-TYPE
@@ -428,14 +390,14 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        "An entry in the G.Bond Port Configuration table.
        Each entry represents a G.Bond port indexed by the ifIndex.
        Note that a G.Bond GBS port runs on top of a single
-       or multiple BCE port(s), which are also indexed by ifIndex."
+       or multiple BCE port(s), which are also indexed by the ifIndex."
      INDEX  { ifIndex }
      ::= { gBondPortConfTable 1 }
 
    GBondPortConfEntry ::=
      SEQUENCE {
-       gBondPortConfAdminScheme              GBondScheme,
-       gBondPortConfPeerAdminScheme          GBondScheme,
+       gBondPortConfAdminScheme              IANAgBondScheme,
+       gBondPortConfPeerAdminScheme          IANAgBondScheme,
        gBondPortConfDiscoveryCode            PhysAddress,
        gBondPortConfTargetUpDataRate         Unsigned32,
        gBondPortConfTargetDnDataRate         Unsigned32,
@@ -447,112 +409,116 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      }
 
    gBondPortConfAdminScheme  OBJECT-TYPE
-     SYNTAX      GBondScheme
+     SYNTAX      IANAgBondScheme
      MAX-ACCESS  read-write
      STATUS      current
      DESCRIPTION
        "A desired bonding scheme for a G.Bond GBS port.
-       The following values instruct the port to use corresponding
+       The following values instruct the port to use the corresponding
        bonding scheme if supported:
          none(0)       - instructs the port not to use bonding
-                         (only on single-BCE G.998.2 GBS)
+                         (only on a single-BCE G.998.2 GBS)
          g9981(1)      - instructs the port to use G.998.1 bonding
          g9982(2)      - instructs the port to use G.998.2 bonding
          g9983(3)      - instructs the port to use G.998.3 bonding
 
-       Changing of gBondPortConfAdminScheme MUST be performed when the
-       link is administratively 'down', as indicated by the
-       ifAdminStatus object in IF-MIB.
-       Attempts to change this object MUST be rejected (in case of SNMP
-       with the error inconsistentValue), if the link is Up or
-       Initializing. Attempts to change this object to an unsupported
+       Changing of the gBondPortConfAdminScheme object MUST be
+       performed when the link is administratively 'down', as indicated
+       by the ifAdminStatus object in the IF-MIB.
+       Attempts to change this object MUST be rejected (in the case of
+       SNMP, with the error inconsistentValue), if the link is 'up' or
+       initializing.  Attempts to change this object to an unsupported
        bonding scheme (see gBondPortCapSchemesSupported) SHALL be
-       rejected (in case of SNMP with the error wrongValue).
+       rejected (in the case of SNMP, with the error wrongValue).
        Setting this object to the value of 'none' must be rejected for
        GBS ports with multiple BCEs (with the error inconsistentValue).
 
        This object maps to the TR-159 attribute aGroupAdminBondScheme."
      REFERENCE
-       "[TR-159] 5.5.1.6; IF-MIB, ifAdminStatus"
+       "[TR-159], Section 5.5.1.6; RFC 2863, IF-MIB, ifAdminStatus"
      ::= { gBondPortConfEntry 1 }
 
    gBondPortConfPeerAdminScheme  OBJECT-TYPE
-     SYNTAX      GBondScheme
+     SYNTAX      IANAgBondScheme
      MAX-ACCESS  read-write
      STATUS      current
      DESCRIPTION
        "A desired bonding scheme for a peer (link partner) G.Bond
        port (GBS).
-       The following values instruct the peer port to use
+       The following values instruct the peer port to use the
        corresponding bonding scheme if supported:
          none(0)       - instructs the port not to use bonding
-                         (only on single-BCE G.998.2 GBS)
+                         (only on a single-BCE G.998.2 GBS)
          g9981(1)      - instructs the port to use G.998.1 bonding
          g9982(2)      - instructs the port to use G.998.2 bonding
          g9983(3)      - instructs the port to use G.998.3 bonding
 
        Changing of this object MUST be performed when the link is
        administratively 'down', as indicated by the ifAdminStatus
-       object in IF-MIB.
-       Attempts to change this object MUST be rejected (in case of SNMP
-       with the error inconsistentValue), if the link is Up or
-       Initializing. Attempts to change this object to an unsupported
+       object in the IF-MIB.
+       Attempts to change this object MUST be rejected (in the case of
+       SNMP, with the error inconsistentValue), if the link is 'up' or
+       initializing.  Attempts to change this object to an unsupported
        bonding scheme (see gBondPortCapPeerSchemesSupported) SHALL be
-       rejected (in case of SNMP with the error wrongValue).
+
+       rejected (in the case of SNMP, with the error wrongValue).
+       Setting this object to the value of 'none' must be rejected for
+       GBS ports with multiple BCEs (with the error inconsistentValue).
 
        This object maps to the TR-159 attribute
        aGroupPeerAdminBondScheme."
      REFERENCE
-       "[TR-159] 5.5.1.7; IF-MIB, ifAdminStatus"
+       "[TR-159], Section 5.5.1.7; RFC 2863, IF-MIB, ifAdminStatus"
      ::= { gBondPortConfEntry 2 }
 
    gBondPortConfDiscoveryCode  OBJECT-TYPE
-     SYNTAX      PhysAddress (SIZE(6))
+     SYNTAX      PhysAddress (SIZE (6))
      MAX-ACCESS  read-write
      STATUS      current
      DESCRIPTION
-       "A Discovery Code of the G.Bond port (GBS).
-       A unique 6 octet long code used by the Discovery function.
+       "A discovery code of the G.Bond port (GBS).
+       A unique 6-octet-long code used by the Discovery function.
        This object MUST be instantiated for the -O subtype GBS before
-       writing operations on the gBondBceConfRemoteDiscoveryCode
+       write operations on the gBondBceConfRemoteDiscoveryCode
        (Set_if_Clear and Clear_if_Same) are performed by BCEs
        associated with the GBS.
        The initial value of this object for -R subtype ports after
-       reset is all zeroes. For -R subtype ports, the value of this
-       object cannot be changed directly. This value may be changed
-       as a result of writing operation on the
-       gBondBceConfRemoteDiscoveryCode object of remote BCE of -O
+       reset is all zeroes.  For -R subtype ports, the value of this
+       object cannot be changed directly.  This value may be changed
+       as a result of a write operation on the
+       gBondBceConfRemoteDiscoveryCode object of a remote BCE of -O
        subtype, connected to one of the local BCEs associated with
        the GBS.
 
        Discovery MUST be performed when the link is administratively
-       'down', as indicated by the ifAdminStatus object in IF-MIB.
-       Attempts to change this object MUST be rejected (in case of
-       SNMP with the error inconsistentValue), if the link is Up or
-       Initializing.
+       'down', as indicated by the ifAdminStatus object in the IF-MIB.
+       Attempts to change this object MUST be rejected (in the case of
+       SNMP, with the error inconsistentValue), if the link is 'up' or
+       initializing.
 
        This object maps to the TR-159 attribute
        aGroupDiscoveryCode."
      REFERENCE
-       "[TR-159] 5.5.1.20; [802.3] 61.2.2.8.3, 61.2.2.8.4,
-       45.2.6.6.1, 45.2.6.8, 61A.2; IF-MIB, ifAdminStatus"
+       "[TR-159], Section 5.5.1.20; [802.3], Sections 61.2.2.8.3,
+       61.2.2.8.4, 45.2.6.6.1, 45.2.6.8, 61A.2;
+       RFC 2863, IF-MIB, ifAdminStatus"
      ::= { gBondPortConfEntry 3 }
 
    gBondPortConfTargetUpDataRate  OBJECT-TYPE
-     SYNTAX      Unsigned32(0|1..10000000)
+     SYNTAX      Unsigned32 (0|1..10000000)
      UNITS       "Kbps"
      MAX-ACCESS  read-write
      STATUS      current
      DESCRIPTION
-       "A desired G.Bond port Data Rate in the upstream direction,
+       "A desired G.Bond port data rate in the upstream direction,
        in Kbps, to be achieved during initialization, under
        restrictions placed upon the member BCEs by their respective
        configuration settings.
        This object represents a sum of individual BCE upstream data
        rates, modified to compensate for fragmentation and
        encapsulation overhead (e.g., for an Ethernet service, the
-       target data rate of 10Mbps SHALL allow lossless transmission
-       of full-duplex 10Mbps Ethernet frame stream with minimal
+       target data rate of 10 Mbps SHALL allow lossless transmission
+       of full-duplex 10-Mbps Ethernet frame stream with minimal
        inter-frame gap).
        Note that the target upstream data rate may not be achieved
        during initialization (e.g., due to unavailability of required
@@ -561,55 +527,55 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        than gBondPortConfTargetUpDataRate.
 
        The value is limited above by 10 Gbps, to accommodate very
-       high speed bonded xDSL interfaces (e.g. 32 x 100Mbps).
+       high speed bonded xDSL interfaces (e.g., 32 x 100 Mbps).
 
        The value between 1 and 10000000 indicates that the total
        upstream data rate of the G.Bond port after initialization
        SHALL be equal to the target data rate or less, if the target
        upstream data rate cannot be achieved under the restrictions
-       configured for BCEs. In case the copper environment allows to
-       achieve higher upstream data rate than that specified by this
-       object, the excess capability SHALL be either converted to
-       additional SNR margin or reclaimed by minimizing transmit
-       power.
+       configured for BCEs.  In cases where the copper environment
+       allows a higher upstream data rate to be achieved than that
+       specified by this object, the excess capability SHALL be
+       either converted to an additional SNR margin or reclaimed by
+       minimizing transmit power.
 
        The value of 0 means that the target data rate is not
        fixed and SHALL be set to the maximum attainable rate during
-       initialization (Best Effort), under specified spectral
-       restrictions and with desired SNR Margin per BCE.
+       initialization (best effort), under specified spectral
+       restrictions and with a desired SNR margin per BCE.
 
        This object is read-write for the -O subtype G.Bond ports.
-       It is irrelevant for the -R subtypes - attempts to read or
-       change this object for such ports MUST be rejected (in case of
-       SNMP with the error inconsistentValue).
+       It is irrelevant for the -R subtypes -- attempts to read or
+       change this object for such ports MUST be rejected (in the case
+       of SNMP, with the error inconsistentValue).
 
-       Changing of the Target Upstream Data Rate MUST be performed
+       Changing of the target upstream data rate MUST be performed
        when the link is administratively 'down', as indicated by the
-       ifAdminStatus object in IF-MIB.
-       Attempts to change this object MUST be rejected (in case of SNMP
-       with the error inconsistentValue), if the link is Up or
-       Initializing.
+       ifAdminStatus object in the IF-MIB.
+       Attempts to change this object MUST be rejected (in the case of
+       SNMP, with the error inconsistentValue), if the link is 'up' or
+       initializing.
 
        This object maps to the TR-159 attribute aGroupTargetUpRate."
      REFERENCE
-       "[TR-159] 5.5.1.17; IF-MIB, ifAdminStatus"
+       "[TR-159], Section 5.5.1.17; RFC 2863, IF-MIB, ifAdminStatus"
      ::= { gBondPortConfEntry 4 }
 
    gBondPortConfTargetDnDataRate  OBJECT-TYPE
-     SYNTAX      Unsigned32(0|1..10000000)
+     SYNTAX      Unsigned32 (0|1..10000000)
      UNITS       "Kbps"
      MAX-ACCESS  read-write
      STATUS      current
      DESCRIPTION
-       "A desired G.Bond port Data Rate in the downstream direction,
+       "A desired G.Bond port data rate in the downstream direction,
        in Kbps, to be achieved during initialization, under
        restrictions placed upon the member BCEs by their respective
        configuration settings.
        This object represents a sum of individual BCE downstream data
        rates, modified to compensate for fragmentation and
        encapsulation overhead (e.g., for an Ethernet service, the
-       target data rate of 10Mbps SHALL allow lossless transmission
-       of full-duplex 10Mbps Ethernet frame stream with minimal
+       target data rate of 10 Mbps SHALL allow lossless transmission
+       of full-duplex 10-Mbps Ethernet frame stream with minimal
        inter-frame gap).
        Note that the target downstream data rate may not be achieved
        during initialization (e.g., due to unavailability of required
@@ -618,86 +584,86 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        less than gBondPortConfTargetDnDataRate.
 
        The value is limited above by 10 Gbps, to accommodate very
-       high speed bonded xDSL interfaces (e.g. 32 x 100Mbps).
+       high speed bonded xDSL interfaces (e.g., 32 x 100 Mbps).
 
        The value between 1 and 10000000 indicates that the total
        downstream data rate of the G.Bond port after initialization
        SHALL be equal to the target data rate or less, if the target
        downstream data rate cannot be achieved under the restrictions
-       configured for BCEs. In case the copper environment allows to
-       achieve higher downstream data rate than that specified by
-       this object, the excess capability SHALL be either converted
-       to additional SNR margin or reclaimed by minimizing transmit
-       power.
+       configured for BCEs.  In cases where the copper environment
+       allows a higher downstream data rate to be achieved than that
+       specified by this object, the excess capability SHALL be
+       either converted to an additional SNR margin or reclaimed by
+       minimizing transmit power.
 
        The value of 0 means that the target data rate is not
        fixed and SHALL be set to the maximum attainable rate during
-       initialization (Best Effort), under specified spectral
-       restrictions and with desired SNR Margin per BCE.
+       initialization (best effort), under specified spectral
+       restrictions and with a desired SNR margin per BCE.
 
        This object is read-write for the -O subtype G.Bond ports.
-       It is irrelevant for the -R subtypes - attempts to read or
-       change this object for such ports MUST be rejected (in case of
-       SNMP with the error inconsistentValue).
+       It is irrelevant for the -R subtypes -- attempts to read or
+       change this object for such ports MUST be rejected (in the case
+       of SNMP, with the error inconsistentValue).
 
-       Changing of the Target Downstream Data Rate MUST be performed
+       Changing of the target downstream data rate MUST be performed
        when the link is administratively 'down', as indicated by the
-       ifAdminStatus object in IF-MIB.
-       Attempts to change this object MUST be rejected (in case of SNMP
-       with the error inconsistentValue), if the link is Up or
-       Initializing.
+       ifAdminStatus object in the IF-MIB.
+       Attempts to change this object MUST be rejected (in the case of
+       SNMP, with the error inconsistentValue), if the link is 'up' or
+       initializing.
 
        This object maps to the TR-159 attribute aGroupTargetDownRate."
      REFERENCE
-       "[TR-159] 5.5.1.18; IF-MIB, ifAdminStatus"
+       "[TR-159], Section 5.5.1.18; RFC 2863, IF-MIB, ifAdminStatus"
      ::= { gBondPortConfEntry 5 }
 
    gBondPortConfThreshLowUpRate  OBJECT-TYPE
-     SYNTAX      Unsigned32(1..10000000)
+     SYNTAX      Unsigned32 (1..10000000)
      UNITS       "Kbps"
      MAX-ACCESS  read-write
      STATUS      current
      DESCRIPTION
        "This object configures the G.Bond port low upstream rate
-       crossing alarm threshold. When the current value of
+       crossing alarm threshold.  When the current value of
        gBondPortStatUpDataRate for this port reaches/drops below or
        exceeds this threshold, a gBondLowUpRateCrossing notification
        MAY be generated if enabled by
        gBondPortConfLowRateCrossingEnable.
 
        This object is read-write for the -O subtype G.Bond ports.
-       It is irrelevant for the -R subtypes - attempts to read or
-       change this object for such ports MUST be rejected (in case of
-       SNMP with the error inconsistentValue).
+       It is irrelevant for the -R subtypes -- attempts to read or
+       change this object for such ports MUST be rejected (in the case
+       of SNMP, with the error inconsistentValue).
 
        This object maps to the TR-159 attribute
        aGroupthreshLowUpRate."
      REFERENCE
-       "[TR-159] 5.5.1.21"
+       "[TR-159], Section 5.5.1.21"
      ::= { gBondPortConfEntry 6 }
 
    gBondPortConfThreshLowDnRate  OBJECT-TYPE
-     SYNTAX      Unsigned32(1..10000000)
+     SYNTAX      Unsigned32 (1..10000000)
      UNITS       "Kbps"
      MAX-ACCESS  read-write
      STATUS      current
      DESCRIPTION
        "This object configures the G.Bond port low downstream rate
-       crossing alarm threshold. When the current value of
+       crossing alarm threshold.  When the current value of
        gBondPortStatDnDataRate for this port reaches/drops below or
        exceeds this threshold, a gBondLowDnRateCrossing notification
        MAY be generated if enabled by
        gBondPortConfLowRateCrossingEnable.
 
        This object is read-write for the -O subtype G.Bond ports.
-       It is irrelevant for the -R subtypes - attempts to read or
-       change this object for such ports MUST be rejected (in case of
-       SNMP with the error inconsistentValue).
+       It is irrelevant for the -R subtypes -- attempts to read or
+       change this object for such ports MUST be rejected (in the case
+       of SNMP, with the error inconsistentValue).
 
        This object maps to the TR-159 attribute
-       aGroupThreshDownUpRate."
+       aGroupThreshLowDownRate."
      REFERENCE
-       "[TR-159] 5.5.1.22"
+       "[TR-159], Section 5.5.1.22"
      ::= { gBondPortConfEntry 7 }
 
    gBondPortConfLowRateCrossingEnable  OBJECT-TYPE
@@ -709,29 +675,29 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        gBondLowDnRateCrossing notifications should be generated
        for this interface.
 
-       Value of true(1) indicates that the notifications are enabled.
-       Value of false(2) indicates that the notifications are
-       disabled.
+       A value of true(1) indicates that the notifications are
+       enabled.  A value of false(2) indicates that the notifications
+       are disabled.
 
        This object is read-write for the -O subtype G.Bond ports.
-       It is irrelevant for the -R subtypes - attempts to read or
-       change this object for such ports MUST be rejected (in case of
-       SNMP with the error inconsistentValue).
+       It is irrelevant for the -R subtypes -- attempts to read or
+       change this object for such ports MUST be rejected (in the case
+       of SNMP, with the error inconsistentValue).
 
        This object maps to the TR-159 attribute
        aGroupLowRateCrossingEnable."
      REFERENCE
-       "[TR-159] 5.5.1.23"
+       "[TR-159], Section 5.5.1.23"
      ::= { gBondPortConfEntry 8 }
 
    gBondPortConfPmTcaConfProfile  OBJECT-TYPE
-     SYNTAX      SnmpAdminString (SIZE(1..32))
+     SYNTAX      SnmpAdminString (SIZE (1..32))
      MAX-ACCESS  read-write
      STATUS      current
      DESCRIPTION
        "The value of this object is the index of the row in the GBS
-       port Alarm Configuration Profile Table for Performance Monitoring
-       Threshold Crossing Alerts - gBondPortAlarmConfProfileTable,
+       Port Alarm Configuration Profile table for Performance Monitoring
+       Threshold Crossing Alerts -- the gBondPortAlarmConfProfileTable,
        which applies to this GBS port."
      DEFVAL  { "DEFVAL" }
      ::= { gBondPortConfEntry 9 }
@@ -741,26 +707,25 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      MAX-ACCESS  read-write
      STATUS      current
      DESCRIPTION
-       "Indicates whether gBondPerfTca*Crossing set of notifications
-       should be generated for this interface.
+       "Indicates whether the gBondPerfTca*Crossing set of
+       notifications should be generated for this interface.
 
-       Value of true(1) indicates that the notifications are enabled.
-       Value of false(2) indicates that the notifications are disabled.
+       A value of true(1) indicates that the notifications are
+       enabled.  A value of false(2) indicates that the notifications
+       are disabled.
 
        This object maps to the TR-159 attribute aGroupPerfTcaEnable."
-
      REFERENCE
-       "[TR-159] 5.5.1.38"
+       "[TR-159], Section 5.5.1.38"
      ::= { gBondPortConfEntry 10 }
-
 
    gBondPortCapTable OBJECT-TYPE
      SYNTAX      SEQUENCE OF GBondPortCapEntry
      MAX-ACCESS  not-accessible
      STATUS      current
      DESCRIPTION
-       "Table for capabilities of G.Bond Ports. Entries in this table
-       MUST be maintained in a persistent manner"
+       "Table for capabilities of G.Bond ports.  Entries in this table
+       MUST be maintained in a persistent manner."
      ::= { gBondPort 2 }
 
    gBondPortCapEntry OBJECT-TYPE
@@ -771,68 +736,69 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        "An entry in the G.Bond Port Capability table.
        Each entry represents a G.Bond port indexed by the ifIndex.
        Note that a G.Bond GBS port runs on top of a single
-       or multiple BCE port(s), which are also indexed by ifIndex."
+       or multiple BCE port(s), which are also indexed by the ifIndex."
      INDEX  { ifIndex }
      ::= { gBondPortCapTable 1 }
 
    GBondPortCapEntry ::=
      SEQUENCE {
-       gBondPortCapSchemesSupported          GBondSchemeList,
-       gBondPortCapPeerSchemesSupported      GBondSchemeList,
+       gBondPortCapSchemesSupported          IANAgBondSchemeList,
+       gBondPortCapPeerSchemesSupported      IANAgBondSchemeList,
        gBondPortCapCapacity                  Unsigned32,
        gBondPortCapPeerCapacity              Unsigned32
      }
 
    gBondPortCapSchemesSupported          OBJECT-TYPE
-     SYNTAX      GBondSchemeList
+     SYNTAX      IANAgBondSchemeList
      MAX-ACCESS  read-only
      STATUS      current
      DESCRIPTION
-       "Bonding Capability of the G.Bond port (GBS). This is a
+       "Bonding capability of the G.Bond port (GBS).  This is a
        read-only bitmap of the possible bonding schemes supported by
-       the GBS. The various bit-positions are:
+       the GBS.  The various bit positions are:
          none(0)       - GBS is capable of bonding bypass on a
-                         single-BCE (G.998.2 only)
+                         single-BCE G.998.2 GBS
          g9981(1)      - GBS is capable of G.998.1 bonding
          g9982(2)      - GBS is capable of G.998.2 bonding
          g9983(3)      - GBS is capable of G.998.3 bonding
 
-       Note that for ports supporting multiple bonding schemes the
+       Note that for ports supporting multiple bonding schemes, the
        actual administrative scheme is set via gBondPortConfAdminScheme
-       object. The current operating bonding scheme is reflected in
-       the gBondPortStatOperScheme.
+       object.  The current operating bonding scheme is reflected in
+       the gBondPortStatOperScheme object.
 
        This object maps to the TR-159 attribute
        aGroupBondSchemesSupported."
      REFERENCE
-       "[TR-159] 5.5.1.2"
+       "[TR-159], Section 5.5.1.2"
      ::= { gBondPortCapEntry 1 }
 
    gBondPortCapPeerSchemesSupported  OBJECT-TYPE
-     SYNTAX      GBondSchemeList
+     SYNTAX      IANAgBondSchemeList
      MAX-ACCESS  read-only
      STATUS      current
      DESCRIPTION
-       "Bonding Capability of the peer G.Bond port (GBS). This is a
+       "Bonding capability of the peer G.Bond port (GBS).  This is a
        read-only bitmap of the possible bonding schemes supported by
-       the link partner GBS. The various bit-positions are:
-         none(0)       - peer GBS does not support bonding or
-                         the peer unit could not be reached or
+       the link partner GBS.  The various bit positions are:
+         none(0)       - peer GBS does not support bonding, or
+                         the peer unit could not be reached, or
                          peer GBS is capable of bonding bypass on a
-                         single-BCE (G.998.2 only)
+                         single-BCE G.998.2 GBS
          g9981(1)      - peer GBS is capable of G.998.1 bonding
          g9982(2)      - peer GBS is capable of G.998.2 bonding
          g9983(3)      - peer GBS is capable of G.998.3 bonding
 
-       Note that for ports supporting multiple bonding schemes the
-       actual administrative scheme is set via
-       gBondPortConfPeerAdminScheme object. The current operating
-       bonding scheme is reflected in the gBondPortStatPeerOperScheme.
+       Note that for ports supporting multiple bonding schemes, the
+       actual administrative scheme is set via the
+       gBondPortConfPeerAdminScheme object.  The current operating
+       bonding scheme is reflected in the gBondPortStatPeerOperScheme
+       object.
 
        This object maps to the TR-159 attribute
-       aGroupBondPeerSchemesSupported."
+       aGroupPeerBondSchemesSupported."
      REFERENCE
-       "[TR-159] 5.5.1.3"
+       "[TR-159], Section 5.5.1.3"
      ::= { gBondPortCapEntry 2 }
 
    gBondPortCapCapacity  OBJECT-TYPE
@@ -847,7 +813,7 @@ GBOND-MIB DEFINITIONS ::= BEGIN
 
        This object maps to the TR-159 attribute aGroupCapacity."
      REFERENCE
-       "[TR-159] 5.5.1.12"
+       "[TR-159], Section 5.5.1.12"
      ::= { gBondPortCapEntry 3 }
 
    gBondPortCapPeerCapacity  OBJECT-TYPE
@@ -856,14 +822,13 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      STATUS      current
      DESCRIPTION
        "Number of BCEs that can be aggregated by the peer GBS port.
-       Value of 0 is returned when peer Bonding Capacity is unknown
+       A value of 0 is returned when peer Bonding capacity is unknown
        (peer cannot be reached).
 
        This object maps to the TR-159 attribute aGroupPeerCapacity."
      REFERENCE
-       "[TR-159] 5.5.1.13"
+       "[TR-159], Section 5.5.1.13"
      ::= { gBondPortCapEntry 4 }
-
 
    gBondPortStatTable OBJECT-TYPE
      SYNTAX      SEQUENCE OF GBondPortStatEntry
@@ -872,10 +837,10 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      DESCRIPTION
        "This table provides overall status information of G.Bond
        ports, complementing the generic status information from the
-       ifTable of IF-MIB. Additional status information about
-       connected BCEs is available from the relevant line MIBs
+       ifTable of the IF-MIB.  Additional status information about
+       connected BCEs is available from the relevant line MIBs.
 
-       This table contains live data from the equipment. As such,
+       This table contains live data from the equipment.  As such,
        it is NOT persistent."
      ::= { gBondPort 3 }
 
@@ -887,14 +852,14 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        "An entry in the G.Bond Port Status table.
        Each entry represents a G.Bond port indexed by the ifIndex.
        Note that a G.Bond GBS port runs on top of a single
-       or multiple BCE port(s), which are also indexed by ifIndex."
+       or multiple BCE port(s), which are also indexed by the ifIndex."
      INDEX  { ifIndex }
      ::= { gBondPortStatTable 1 }
 
    GBondPortStatEntry ::=
      SEQUENCE {
-       gBondPortStatOperScheme               GBondScheme,
-       gBondPortStatPeerOperScheme           GBondScheme,
+       gBondPortStatOperScheme               IANAgBondScheme,
+       gBondPortStatPeerOperScheme           IANAgBondScheme,
        gBondPortStatUpDataRate               Gauge32,
        gBondPortStatDnDataRate               Gauge32,
        gBondPortStatFltStatus                BITS,
@@ -903,13 +868,13 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      }
 
    gBondPortStatOperScheme  OBJECT-TYPE
-     SYNTAX      GBondScheme
+     SYNTAX      IANAgBondScheme
      MAX-ACCESS  read-only
      STATUS      current
      DESCRIPTION
        "Current operating bonding scheme of a G.Bond port.
        The possible values are:
-         none(0)       - bonding bypass on a single-BCE (G.998.2 only)
+         none(0)       - bonding bypass on a single-BCE G.998.2 GBS
          g9981(1)      - G.998.1 bonding
          g9982(2)      - G.998.2 bonding
          g9983(3)      - G.998.3 bonding
@@ -917,18 +882,18 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        This object maps to the TR-159 attribute
        aGroupOperBondScheme."
      REFERENCE
-       "[TR-159] 5.5.1.4"
+       "[TR-159], Section 5.5.1.4"
      ::= { gBondPortStatEntry 1 }
 
    gBondPortStatPeerOperScheme  OBJECT-TYPE
-     SYNTAX      GBondScheme
+     SYNTAX      IANAgBondScheme
      MAX-ACCESS  read-only
      STATUS      current
      DESCRIPTION
        "Current operating bonding scheme of a G.Bond port link partner.
        The possible values are:
          unknown(0)    - peer cannot be reached due to the link state or
-                         bonding bypass on a single-BCE (G.998.2 only)
+                         bonding bypass on a single-BCE G.998.2 GBS
          g9981(1)      - G.998.1 bonding
          g9982(2)      - G.998.2 bonding
          g9983(3)      - G.998.3 bonding
@@ -936,7 +901,7 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        This object maps to the TR-159 attribute
        aGroupPeerOperBondScheme."
      REFERENCE
-       "[TR-159] 5.5.1.5"
+       "[TR-159], Section 5.5.1.5"
      ::= { gBondPortStatEntry 2 }
 
    gBondPortStatUpDataRate  OBJECT-TYPE
@@ -945,21 +910,21 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      MAX-ACCESS  read-only
      STATUS      current
      DESCRIPTION
-       "A current G.Bond port operational Data Rate in the upstream
+       "A current G.Bond port operational data rate in the upstream
        direction, in bps.
        This object represents an estimation of the sum of individual
        BCE upstream data rates, modified to compensate for
        fragmentation and encapsulation overhead (e.g., for an
-       Ethernet service, the target data rate of 10Mbps SHALL allow
-       lossless transmission of full-duplex 10Mbps Ethernet frame
+       Ethernet service, the target data rate of 10 Mbps SHALL allow
+       lossless transmission of full-duplex 10-Mbps Ethernet frame
        stream with minimal inter-frame gap).
 
-       Note that for symmetrical interfaces gBondPortStatUpDataRate ==
+       Note that for symmetrical interfaces, gBondPortStatUpDataRate ==
        gBondPortStatDnDataRate == ifSpeed.
 
        This object maps to the TR-159 attribute aGroupUpRate."
      REFERENCE
-       "[TR-159] 5.5.1.15"
+       "[TR-159], Section 5.5.1.15"
      ::= { gBondPortStatEntry 3 }
 
    gBondPortStatDnDataRate  OBJECT-TYPE
@@ -968,23 +933,23 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      MAX-ACCESS  read-only
      STATUS      current
      DESCRIPTION
-       "A current G.Bond port operational Data Rate in the downstream
+       "A current G.Bond port operational data rate in the downstream
        direction, in bps.
        This object represents an estimation of the sum of individual
        BCE downstream data rates, modified to compensate for
+
        fragmentation and encapsulation overhead (e.g., for an
-       Ethernet service, the target data rate of 10Mbps SHALL allow
-       lossless transmission of full-duplex 10Mbps Ethernet frame
+       Ethernet service, the target data rate of 10 Mbps SHALL allow
+       lossless transmission of full-duplex 10-Mbps Ethernet frame
        stream with minimal inter-frame gap).
 
-       Note that for symmetrical interfaces gBondPortStatUpDataRate ==
+       Note that for symmetrical interfaces, gBondPortStatUpDataRate ==
        gBondPortStatDnDataRate == ifSpeed.
 
        This object maps to the TR-159 attribute aGroupDownRate."
      REFERENCE
-       "[TR-159] 5.5.1.16"
+       "[TR-159], Section 5.5.1.16"
      ::= { gBondPortStatEntry 4 }
-
 
    gBondPortStatFltStatus  OBJECT-TYPE
      SYNTAX      BITS {
@@ -999,37 +964,38 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      MAX-ACCESS  read-only
      STATUS      current
      DESCRIPTION
-       "G.Bond (GBS) port Fault Status. This is a bitmap of possible
-       conditions. The various bit positions are:
-         noPeer              - peer GBS cannot be reached (e.g.,
-                               no BCEs attached, all BCEs are Down
-                               etc.).
-         peerPowerLoss       - peer GBS has indicated impending unit
-                               failure due to loss of local power
-                               ('Dying Gasp').
-         peerBondSchemeMismatch - operating bonding scheme of a peer
-                               GBS is different from the local one.
-         bceSubTypeMismatch  - local BCEs in the aggregation group
-                               are not of the same sub-type, e.g.,
-                               some BCEs in the local device are -O
-                               while others are -R subtype.
-         lowRate             - gBondUpRate/gBondDnRate of the port
-                               has reached or dropped below
-                               gBondPortConfThreshLowUpRate/
-                               gBondPortConfThreshLowDnRate.
-         init                - The link is Initializing, as a result of
-                               ifAdminStatus being set to 'up' for a
-                               particular BCE or a GBS to which the BCE
-                               is connected.
-         ready               - at least one BCE in the aggregation
-                               group is detecting handshake tones.
+       "G.Bond (GBS) port fault status.  This is a bitmap of possible
+       conditions.  The various bit positions are:
+         noPeer                 - Peer GBS cannot be reached (e.g.,
+                                  no BCEs attached, all BCEs are
+                                  'down', etc.).
+         peerPowerLoss          - Peer GBS has indicated impending unit
+                                  failure due to loss of local power
+                                  ('Dying Gasp').
+         peerBondSchemeMismatch - Operating bonding scheme of a peer
+                                  GBS is different from the local one.
+         bceSubTypeMismatch     - Local BCEs in the aggregation group
+                                  are not of the same sub-type, e.g.,
+                                  some BCEs in the local device are -O
+                                  while others are -R subtype.
+         lowRate                - gBondUpRate/gBondDnRate of the port
+                                  has reached or dropped below
+                                  gBondPortConfThreshLowUpRate/
+                                  gBondPortConfThreshLowDnRate.
 
-       This object is intended to supplement ifOperStatus object
-       in IF-MIB.
+         init                   - The link is initializing, as a result
+                                  of ifAdminStatus being set to 'up'
+                                  for a particular BCE or a GBS
+                                  to which the BCE is connected.
+         ready                  - At least one BCE in the aggregation
+                                  group is detecting handshake tones.
+
+       This object is intended to supplement the ifOperStatus object
+       in the IF-MIB.
 
        This object maps to the TR-159 attribute aGroupStatus."
      REFERENCE
-       "[TR-159] 5.5.1.9; IF-MIB, ifOperStatus"
+       "[TR-159], Section 5.5.1.9; RFC 2863, IF-MIB, ifOperStatus"
      ::= { gBondPortStatEntry 5 }
 
    gBondPortStatSide  OBJECT-TYPE
@@ -1042,19 +1008,19 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      STATUS      current
      DESCRIPTION
        "G.Bond port mode of operation (subtype).
-       The value of 'subscriber' indicates the port is designated as
-       '-R' subtype (all BCEs assigned to this port are of subtype
-       '-R').
-       The value of the 'office' indicates that the port is
-       designated as '-O' subtype (all BCEs assigned to this port are
-       of subtype '-O').
+       The value of 'subscriber' indicates that the port is
+       designated as '-R' subtype (all BCEs assigned to this port are of
+       subtype '-R').
+       The value of 'office' indicates that the port is designated
+       as '-O' subtype (all BCEs assigned to this port are of
+       subtype '-O').
        The value of 'unknown' indicates that the port has no assigned
        BCEs yet or that the assigned BCEs are not of the same side
        (subTypeBCEMismatch).
 
        This object maps to the TR-159 attribute aGroupEnd."
      REFERENCE
-        "[TR-159] 5.5.1.11"
+       "[TR-159], Section 5.5.1.11"
      ::= { gBondPortStatEntry 6 }
 
    gBondPortStatNumBCEs  OBJECT-TYPE
@@ -1062,19 +1028,18 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      MAX-ACCESS  read-only
      STATUS      current
      DESCRIPTION
-       "Number of BCEs that is currently aggregated by the local GBS
-       (assigned to the G.Bond port using ifStackTable).
+       "Number of BCEs that are currently aggregated by the local GBS
+       (assigned to the G.Bond port using the ifStackTable).
        This number is never greater than gBondPortCapCapacity.
 
        This object SHALL be automatically incremented or decremented
        when a BCE is added or deleted to/from the G.Bond port using
-       ifStackTable.
+       the ifStackTable.
 
-       This object maps to the TR-159 attribute aGroupNumChannels"
+       This object maps to the TR-159 attribute aGroupNumChannels."
      REFERENCE
-       "[TR-159] 5.5.1.14"
+       "[TR-159], Section 5.5.1.14"
      ::= { gBondPortStatEntry 7 }
-
 
    -- Performance Monitoring group
 
@@ -1086,7 +1051,7 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      STATUS      current
      DESCRIPTION
        "This table contains current Performance Monitoring (PM)
-       information for a GBS port. This table contains live data from
+       information for a GBS port.  This table contains live data from
        the equipment and as such is NOT persistent."
      ::= { gBondPortPM 1 }
 
@@ -1098,7 +1063,7 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        "An entry in the G.Bond Port PM table.
        Each entry represents a G.Bond port indexed by the ifIndex.
        Note that a G.Bond GBS port runs on top of a single
-       or multiple BCE port(s), which are also indexed by ifIndex."
+       or multiple BCE port(s), which are also indexed by the ifIndex."
      INDEX  { ifIndex }
      ::= { gBondPortPmCurTable 1 }
 
@@ -1132,16 +1097,16 @@ GBOND-MIB DEFINITIONS ::= BEGIN
 
        An Errored Second for a G.998.x interface is defined as a count
        of 1-second intervals during which one or more GBS errors are
-       declared. The errors are specific for each bonding scheme, e.g.
-         - lost cells for the ATM bonding;
+       declared.  The errors are specific for each bonding scheme, e.g.,
+         - lost cells for the ATM bonding
          - lost or discarded (due to an error or a buffer overflow)
-           fragments for the Ethernet bonding;
-         - CRC4, CRC6 or CRC8 errors for the TDIM bonding
+           fragments for the Ethernet bonding
+         - CRC-4, CRC-6, or CRC-8 errors for the TDIM bonding
        This object is inhibited during Unavailable Seconds (UAS).
 
        This object maps to the TR-159 attribute aGroupPerfES."
      REFERENCE
-       "[TR-159] 5.5.1.29"
+       "[TR-159], Section 5.5.1.29"
      ::= { gBondPortPmCurEntry 1 }
 
    gBondPortPmCurSES  OBJECT-TYPE
@@ -1150,26 +1115,27 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      MAX-ACCESS  read-only
      STATUS      current
      DESCRIPTION
-       "A count of Severely Errored Seconds (SES) on the GBS since the
-       BTU was last restarted.
+       "A count of Severely Errored Seconds (SES) on the GBS
+       since the BTU was last restarted.
 
        A Severely Errored Second for a G.998.x interface is defined as
        a count of 1-second intervals during which GBS errors cause at
        least 1% traffic loss of the nominal bonded link rate or at
-       least 12ms for the TDM traffic. The exact definition is specific
-       for each bonding scheme, e.g.
-         - 234 lost cells for the ATM bonding with 10Mbps nominal link
+       least 12 ms for the TDM traffic.  The exact definition is
+       specific for each bonding scheme, e.g.,
+         - 234 lost cells for the ATM bonding with 10-Mbps nominal link
            rate
+
          - 60 lost/discarded fragments for the Ethernet bonding with
-           10Mbps nominal link rate and fixed 192 Byte-long fragment
-           size.
-         - 6 or more CRC4, one or more CRC6 or one or more CRC8 errors
-           for the TDM bonding
+           10-Mbps nominal link rate and fixed 192-byte-long fragment
+           size
+         - 6 or more CRC-4 errors, one or more CRC-6 errors, or one or
+           more CRC-8 errors for the TDM bonding
        This object is inhibited during Unavailable Seconds (UAS).
 
        This object maps to the TR-159 attribute aGroupPerfSES."
      REFERENCE
-       "[TR-159] 5.5.1.30"
+       "[TR-159], Section 5.5.1.30"
      ::= { gBondPortPmCurEntry 2 }
 
    gBondPortPmCurUAS  OBJECT-TYPE
@@ -1183,15 +1149,16 @@ GBOND-MIB DEFINITIONS ::= BEGIN
 
        An Unavailable Second for a G.998.x interface is defined as a
        count of 1-second intervals during which the bonded link is
-       unavailable. The G.998.x link becomes unavailable at the onset
-       of 10 contiguous SESs. The 10 SESs are included in the
-       unavailable time. Once unavailable, the G.998.x line becomes
+       unavailable.  The G.998.x link becomes unavailable at the onset
+       of 10 contiguous SESs.  The 10 SESs are included in the
+       unavailable time.  Once unavailable, the G.998.x line becomes
        available at the onset of 10 contiguous seconds with no SESs.
-       The 10 seconds with no SESs are excluded from unavailable time.
+       The 10 seconds with no SESs are excluded from the unavailable
+       time.
 
        This object maps to the TR-159 attribute aGroupPerfUAS."
      REFERENCE
-       "[TR-159] 5.5.1.31"
+       "[TR-159], Section 5.5.1.31"
      ::= { gBondPortPmCurEntry 3 }
 
    gBondPortPmCur15MinValidIntervals  OBJECT-TYPE
@@ -1201,18 +1168,19 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      DESCRIPTION
        "A number of 15-minute intervals for which data was collected.
        The value of this object will be 96 or the maximum number of
-       15-minute history intervals collected by the implementation
-       unless the measurement was (re-)started recently, in which case
-       the value will be the number of complete 15 minutes intervals
+       15-minute history intervals collected by the implementation,
+       unless the measurement was (re)started recently, in which case
+       the value will be the number of complete 15-minute intervals
        for which there are at least some data.
-       In certain cases it is possible that some intervals are
-       unavailable. In this case, this object reports the maximum
+
+       In certain cases, it is possible that some intervals are
+       unavailable.  In this case, this object reports the maximum
        interval number for which data is available.
 
        This object maps to the TR-159 attribute
        aGroupPerf15MinValidIntervals."
      REFERENCE
-       "[TR-159] 5.5.1.32"
+       "[TR-159], Section 5.5.1.32"
      ::= { gBondPortPmCurEntry 4 }
 
    gBondPortPmCur15MinInvalidIntervals  OBJECT-TYPE
@@ -1221,13 +1189,13 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      STATUS      current
      DESCRIPTION
        "A number of 15-minute intervals for which data was not always
-       available. The value will typically be zero except in cases
+       available.  The value will typically be zero, except in cases
        where the data for some intervals are not available.
 
        This object maps to the TR-159 attribute
        aGroupPerf15MinInvalidIntervals."
      REFERENCE
-       "[TR-159] 5.5.1.33"
+       "[TR-159], Section 5.5.1.33"
      ::= { gBondPortPmCurEntry 5 }
 
    gBondPortPmCur15MinTimeElapsed  OBJECT-TYPE
@@ -1242,7 +1210,7 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        This object maps to the TR-159 attribute
        aGroupPerfCurr15MinTimeElapsed."
      REFERENCE
-       "[TR-159] 5.5.1.34"
+       "[TR-159], Section 5.5.1.34"
      ::= { gBondPortPmCurEntry 6 }
 
    gBondPortPmCur15MinES  OBJECT-TYPE
@@ -1256,7 +1224,7 @@ GBOND-MIB DEFINITIONS ::= BEGIN
 
        This object maps to the TR-159 attribute aGroupPerfCurr15MinES."
      REFERENCE
-       "[TR-159] 5.5.1.35"
+       "[TR-159], Section 5.5.1.35"
      ::= { gBondPortPmCurEntry 7 }
 
    gBondPortPmCur15MinSES  OBJECT-TYPE
@@ -1265,12 +1233,12 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      MAX-ACCESS  read-only
      STATUS      current
      DESCRIPTION
-       "A count of Severely Errored Seconds (ES) on the GBS in the
+       "A count of Severely Errored Seconds (SES) on the GBS in the
        current 15-minute performance interval.
 
        This object maps to the TR-159 attribute aGroupPerfCurr15MinSES."
      REFERENCE
-       "[TR-159] 5.5.1.36"
+       "[TR-159], Section 5.5.1.36"
      ::= { gBondPortPmCurEntry 8 }
 
    gBondPortPmCur15MinUAS  OBJECT-TYPE
@@ -1284,7 +1252,7 @@ GBOND-MIB DEFINITIONS ::= BEGIN
 
        This object maps to the TR-159 attribute aGroupPerfCurr15MinUAS."
      REFERENCE
-       "[TR-159] 5.5.1.37"
+       "[TR-159], Section 5.5.1.37"
      ::= { gBondPortPmCurEntry 9 }
 
    gBondPortPmCur1DayValidIntervals  OBJECT-TYPE
@@ -1295,18 +1263,18 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      DESCRIPTION
        "A number of 1-day intervals for which data was collected.
        The value of this object will be 7 or the maximum number of
-       1-day history intervals collected by the implementation unless
-       the measurement was (re-)started recently, in which case the
+       1-day history intervals collected by the implementation, unless
+       the measurement was (re)started recently, in which case the
        value will be the number of complete 1-day intervals for which
        there are at least some data.
-       In certain cases it is possible that some intervals are
-       unavailable. In this case, this object reports the maximum
+       In certain cases, it is possible that some intervals are
+       unavailable.  In this case, this object reports the maximum
        interval number for which data is available.
 
        This object maps to the TR-159 attribute
        aGroupPerf1DayValidIntervals."
      REFERENCE
-       "[TR-159] 5.5.1.45"
+       "[TR-159], Section 5.5.1.45"
      ::= { gBondPortPmCurEntry 10 }
 
    gBondPortPmCur1DayInvalidIntervals  OBJECT-TYPE
@@ -1316,13 +1284,13 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      STATUS      current
      DESCRIPTION
        "A number of 1-day intervals for which data was not always
-       available. The value will typically be zero except in cases
+       available.  The value will typically be zero, except in cases
        where the data for some intervals are not available.
 
        This object maps to the TR-159 attribute
        aGroupPerf1DayInvalidIntervals."
      REFERENCE
-       "[TR-159] 5.5.1.46"
+       "[TR-159], Section 5.5.1.46"
      ::= { gBondPortPmCurEntry 11 }
 
    gBondPortPmCur1DayTimeElapsed  OBJECT-TYPE
@@ -1337,7 +1305,7 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        This object maps to the TR-159 attribute
        aGroupPerfCurr1DayTimeElapsed."
      REFERENCE
-       "[TR-159] 5.5.1.47"
+       "[TR-159], Section 5.5.1.47"
      ::= { gBondPortPmCurEntry 12 }
 
    gBondPortPmCur1DayES  OBJECT-TYPE
@@ -1351,7 +1319,7 @@ GBOND-MIB DEFINITIONS ::= BEGIN
 
        This object maps to the TR-159 attribute aGroupPerfCurr1DayES."
      REFERENCE
-       "[TR-159] 5.5.1.48"
+       "[TR-159], Section 5.5.1.48"
      ::= { gBondPortPmCurEntry 13 }
 
    gBondPortPmCur1DaySES  OBJECT-TYPE
@@ -1360,12 +1328,12 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      MAX-ACCESS  read-only
      STATUS      current
      DESCRIPTION
-       "A count of Severely Errored Seconds (ES) on the GBS in the
+       "A count of Severely Errored Seconds (SES) on the GBS in the
        current 1-day performance interval.
 
        This object maps to the TR-159 attribute aGroupPerfCurr1DaySES."
      REFERENCE
-       "[TR-159] 5.5.1.49"
+       "[TR-159], Section 5.5.1.49"
      ::= { gBondPortPmCurEntry 14 }
 
    gBondPortPmCur1DayUAS  OBJECT-TYPE
@@ -1379,7 +1347,7 @@ GBOND-MIB DEFINITIONS ::= BEGIN
 
        This object maps to the TR-159 attribute aGroupPerfCurr1DayUAS."
      REFERENCE
-       "[TR-159] 5.5.1.50"
+       "[TR-159], Section 5.5.1.50"
      ::= { gBondPortPmCurEntry 15 }
 
    -- PM history: 15-min buckets
@@ -1401,9 +1369,9 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      STATUS      current
      DESCRIPTION
        "An entry in the G.Bond Port historical 15-minute PM table.
-       Each entry represents performance monitoring data for a GBS port,
-       indexed by ifIndex, collected during a particular 15-minute
-       interval, indexed by gBondPortPm15MinIntervalIndex."
+       Each entry represents Performance Monitoring data for a GBS port,
+       indexed by the ifIndex, collected during a particular 15-minute
+       interval, indexed by the gBondPortPm15MinIntervalIndex."
      INDEX  { ifIndex, gBondPortPm15MinIntervalIndex }
      ::= { gBondPortPm15MinTable 1 }
 
@@ -1422,14 +1390,14 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      MAX-ACCESS  not-accessible
      STATUS      current
      DESCRIPTION
-       "Performance Data Interval number. 1 is the most recent previous
-       interval; interval 96 is 24 hours ago.
+       "Performance data interval number.  1 is the most recent
+       previous interval; interval 96 is 24 hours ago.
        Intervals 2..96 are OPTIONAL.
 
        This object maps to the TR-159 attribute
        aGroupPerf15MinIntervalNumber."
      REFERENCE
-       "[TR-159] 5.5.1.57"
+       "[TR-159], Section 5.5.1.57"
      ::= { gBondPortPm15MinEntry 1 }
 
    gBondPortPm15MinIntervalMoniTime  OBJECT-TYPE
@@ -1439,7 +1407,7 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      STATUS      current
      DESCRIPTION
        "A count of seconds over which the performance data was actually
-       monitored. This value will be the same as the interval duration
+       monitored.  This value will be the same as the interval duration
        (900 seconds), except in a situation where performance data
        could not be collected for any reason."
      ::= { gBondPortPm15MinEntry 2 }
@@ -1456,7 +1424,7 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        This object maps to the TR-159 attribute
        aGroupPerf15MinIntervalES."
      REFERENCE
-       "[TR-159] 5.5.1.59"
+       "[TR-159], Section 5.5.1.59"
      ::= { gBondPortPm15MinEntry 3 }
 
    gBondPortPm15MinIntervalSES  OBJECT-TYPE
@@ -1465,13 +1433,13 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      MAX-ACCESS  read-only
      STATUS      current
      DESCRIPTION
-       "A count of Severely Errored Seconds (ES) on the GBS in the
+       "A count of Severely Errored Seconds (SES) on the GBS in the
        15-minute performance history interval.
 
        This object maps to the TR-159 attribute
        aGroupPerf15MinIntervalSES."
      REFERENCE
-       "[TR-159] 5.5.1.60"
+       "[TR-159], Section 5.5.1.60"
      ::= { gBondPortPm15MinEntry 4 }
 
    gBondPortPm15MinIntervalUAS  OBJECT-TYPE
@@ -1483,9 +1451,10 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        "A count of Unavailable Seconds (UAS) on the GBS in the current
        15-minute performance interval.
 
-       This object maps to the TR-159 attribute aGroupPerfCurr15MinUAS."
+       This object maps to the TR-159 attribute
+       aGroupPerf15MinIntervalUAS."
      REFERENCE
-       "[TR-159] 5.5.1.61"
+       "[TR-159], Section 5.5.1.61"
      ::= { gBondPortPm15MinEntry 5 }
 
    gBondPortPm15MinIntervalValid  OBJECT-TYPE
@@ -1494,20 +1463,20 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      STATUS      current
      DESCRIPTION
        "A read-only object indicating whether or not this history
-       bucket contains valid data. Valid bucket is reported as true(1)
-       and invalid bucket as false(2).
-       If this history bucket is invalid the BTU-C MUST NOT produce
+       bucket contains valid data.  A valid bucket is reported as
+       true(1) and an invalid bucket as false(2).
+       If this history bucket is invalid, the BTU-C MUST NOT produce
        notifications based upon the value of the counters in this
        bucket.
        Note that an implementation may decide not to store invalid
-       history buckets in its data base. In such case this object is
-       not required as only valid history buckets are available while
-       invalid history buckets are simply not in the data base.
+       history buckets in its database.  In such a case, this object
+       is not required, as only valid history buckets are available
+       while invalid history buckets are simply not in the database.
 
        This object maps to the TR-159 attribute
        aGroupPerf15MinIntervalValid."
      REFERENCE
-       "[TR-159] 5.5.1.58"
+       "[TR-159], Section 5.5.1.58"
      ::= { gBondPortPm15MinEntry 6 }
 
    -- PM history: 1-day buckets
@@ -1529,9 +1498,9 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      STATUS      current
      DESCRIPTION
        "An entry in the G.Bond Port historical 1-day PM table.
-       Each entry represents performance monitoring data for a GBS port,
-       indexed by ifIndex, collected during a particular 1-day
-       interval, indexed by gBondPortPm1DayIntervalIndex."
+       Each entry represents Performance Monitoring data for a GBS port,
+       indexed by the ifIndex, collected during a particular 1-day
+       interval, indexed by the gBondPortPm1DayIntervalIndex."
      INDEX  { ifIndex, gBondPortPm1DayIntervalIndex }
      ::= { gBondPortPm1DayTable 1 }
 
@@ -1550,14 +1519,14 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      MAX-ACCESS  not-accessible
      STATUS      current
      DESCRIPTION
-       "Performance Data Interval number. 1 is the most recent previous
-       interval; interval 7 is 7 days ago.
+       "Performance data interval number.  1 is the most recent
+       previous interval; interval 7 is 7 days ago.
        Intervals 2..7 are OPTIONAL.
 
        This object maps to the TR-159 attribute
        aGroupPerf1DayIntervalNumber."
      REFERENCE
-       "[TR-159] 5.5.1.62"
+       "[TR-159], Section 5.5.1.62"
      ::= { gBondPortPm1DayEntry 1 }
 
    gBondPortPm1DayIntervalMoniTime  OBJECT-TYPE
@@ -1567,14 +1536,14 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      STATUS      current
      DESCRIPTION
        "A count of seconds over which the performance data was actually
-       monitored. This value will be the same as the interval duration
+       monitored.  This value will be the same as the interval duration
        (86400 seconds), except in a situation where performance data
        could not be collected for any reason.
 
        This object maps to the TR-159 attribute
        aGroupPerf1DayIntervalMoniSecs."
      REFERENCE
-       "[TR-159] 5.5.1.64"
+       "[TR-159], Section 5.5.1.64"
      ::= { gBondPortPm1DayEntry 2 }
 
    gBondPortPm1DayIntervalES  OBJECT-TYPE
@@ -1589,7 +1558,7 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        This object maps to the TR-159 attribute
        aGroupPerf1DayIntervalES."
      REFERENCE
-       "[TR-159] 5.5.1.65"
+       "[TR-159], Section 5.5.1.65"
      ::= { gBondPortPm1DayEntry 3 }
 
    gBondPortPm1DayIntervalSES  OBJECT-TYPE
@@ -1598,13 +1567,13 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      MAX-ACCESS  read-only
      STATUS      current
      DESCRIPTION
-       "A count of Severely Errored Seconds (ES) on the GBS in the
+       "A count of Severely Errored Seconds (SES) on the GBS in the
        1-day performance history interval.
 
        This object maps to the TR-159 attribute
        aGroupPerf1DayIntervalSES."
      REFERENCE
-       "[TR-159] 5.5.1.66"
+       "[TR-159], Section 5.5.1.66"
      ::= { gBondPortPm1DayEntry 4 }
 
    gBondPortPm1DayIntervalUAS  OBJECT-TYPE
@@ -1616,9 +1585,10 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        "A count of Unavailable Seconds (UAS) on the GBS in the current
        1-day performance interval.
 
-       This object maps to the TR-159 attribute aGroupPerfCurr1DayUAS."
+       This object maps to the TR-159 attribute
+       aGroupPerf1DayIntervalUAS."
      REFERENCE
-       "[TR-159] 5.5.1.67"
+       "[TR-159], Section 5.5.1.67"
      ::= { gBondPortPm1DayEntry 5 }
 
    gBondPortPm1DayIntervalValid  OBJECT-TYPE
@@ -1627,22 +1597,22 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      STATUS      current
      DESCRIPTION
        "A read-only object indicating whether or not this history
-       bucket contains valid data. Valid bucket is reported as true(1)
-       and invalid bucket as false(2).
-       If this history bucket is invalid the BTU-C MUST NOT produce
+       bucket contains valid data.  A valid bucket is reported as
+       true(1) and an invalid bucket as false(2).
+       If this history bucket is invalid, the BTU-C MUST NOT produce
        notifications based upon the value of the counters in this
        bucket.
+
        Note that an implementation may decide not to store invalid
-       history buckets in its data base. In such case this object is
-       not required as only valid history buckets are available while
-       invalid history buckets are simply not in the data base.
+       history buckets in its database.  In such a case, this object
+       is not required, as only valid history buckets are available
+       while invalid history buckets are simply not in the database.
 
        This object maps to the TR-159 attribute
        aGroupPerf1DayIntervalValid."
      REFERENCE
-       "[TR-159] 5.5.1.63"
+       "[TR-159], Section 5.5.1.63"
      ::= { gBondPortPm1DayEntry 6 }
-
 
    -- Performance Monitoring TCA Configuration profile
 
@@ -1652,7 +1622,7 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      STATUS      current
      DESCRIPTION
        "This table supports definitions of Performance Monitoring (PM)
-       Threshold Crossing Alerts (TCA) configuration profiles for GBS
+       Threshold Crossing Alert (TCA) configuration profiles for GBS
        ports.
        Entries in this table MUST be maintained in a persistent manner."
      ::= { gBondPortPM 4 }
@@ -1663,17 +1633,17 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      STATUS      current
      DESCRIPTION
        "An entry in the GBS PM TCA Configuration table.
-        Each entry corresponds to a single TCA configuration profile.
-        Each profile contains a set of parameters for setting alarm
-        thresholds for various performance attributes monitored at GBS
-        ports.  Profiles may be created/deleted using the row
-        creation/deletion mechanism via
-        gBondPortPmTcaProfileRowStatus. If an active entry is
-        referenced via gBondPortConfPmTcaConfProfile, the entry MUST
-        remain active until all references are removed.
-        A default profile with an index of 'DEFVAL', will always exist
-        and its parameters will be set to vendor specific values,
-        unless otherwise specified in this document."
+       Each entry corresponds to a single TCA configuration profile.
+       Each profile contains a set of parameters for setting alarm
+       thresholds for various performance attributes monitored at GBS
+       ports.  Profiles may be created/deleted using the row
+       creation/deletion mechanism via
+       gBondPortPmTcaProfileRowStatus.  If an active entry is
+       referenced via gBondPortConfPmTcaConfProfile, the entry MUST
+       remain active until all references are removed.
+       A default profile with an index of 'DEFVAL' will always exist,
+       and its parameters will be set to vendor-specific values
+       unless otherwise specified in this document."
      INDEX  { gBondPortPmTcaProfileName }
      ::= { gBondPortPmTcaProfileTable 1 }
 
@@ -1690,7 +1660,7 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      }
 
    gBondPortPmTcaProfileName  OBJECT-TYPE
-     SYNTAX      SnmpAdminString (SIZE(1..32))
+     SYNTAX      SnmpAdminString (SIZE (1..32))
      MAX-ACCESS  not-accessible
      STATUS      current
      DESCRIPTION
@@ -1712,12 +1682,12 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        enabled by gBondPortConfPmTcaEnable.
        At most one notification can be sent per interval.
        Setting this attribute to zero (default) effectively disables
-       gBondPmTca15MinESCrossing notification.
+       the gBondPmTca15MinESCrossing notification.
 
        This object maps to the TR-159 attribute
        aGroupPerfThreshold15MinES."
      REFERENCE
-       "[TR-159] 5.5.1.39"
+       "[TR-159], Section 5.5.1.39"
      ::= { gBondPortPmTcaProfileEntry 2 }
 
    gBondPortPmTcaProfileThresh15MinSES  OBJECT-TYPE
@@ -1735,12 +1705,12 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        enabled by gBondPortConfPmTcaEnable.
        At most one notification can be sent per interval.
        Setting this attribute to zero (default) effectively disables
-       gBondPmTca15MinSESCrossing notification.
+       the gBondPmTca15MinSESCrossing notification.
 
        This object maps to the TR-159 attribute
        aGroupPerfThreshold15MinSES."
      REFERENCE
-       "[TR-159] 5.5.1.40"
+       "[TR-159], Section 5.5.1.40"
      ::= { gBondPortPmTcaProfileEntry 3 }
 
    gBondPortPmTcaProfileThresh15MinUAS  OBJECT-TYPE
@@ -1757,12 +1727,12 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        enabled by gBondPortConfPmTcaEnable.
        At most one notification can be sent per interval.
        Setting this attribute to zero (default) effectively disables
-       gBondPmTca15MinUASCrossing notification.
+       the gBondPmTca15MinUASCrossing notification.
 
        This object maps to the TR-159 attribute
        aGroupPerfThreshold15MinUAS."
      REFERENCE
-       "[TR-159] 5.5.1.41"
+       "[TR-159], Section 5.5.1.41"
      ::= { gBondPortPmTcaProfileEntry 4 }
 
    gBondPortPmTcaProfileThresh1DayES  OBJECT-TYPE
@@ -1773,18 +1743,19 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      DESCRIPTION
        "A desired threshold for the number of Errored Seconds (ES)
        within any given 1-day performance data collection interval.
+
        If the number of ESs in a particular 1-day collection interval
        reaches or exceeds this value, a gBondPmTca1DayESCrossing
        notification MAY be generated if enabled by
        gBondPortConfPmTcaEnable.
        At most one notification can be sent per interval.
        Setting this attribute to zero (default) effectively disables
-       gBondPmTca1DayESCrossing notification.
+       the gBondPmTca1DayESCrossing notification.
 
        This object maps to the TR-159 attribute
        aGroupPerfThreshold1DayES."
      REFERENCE
-       "[TR-159] 5.5.1.51"
+       "[TR-159], Section 5.5.1.51"
      ::= { gBondPortPmTcaProfileEntry 5 }
 
    gBondPortPmTcaProfileThresh1DaySES  OBJECT-TYPE
@@ -1802,12 +1773,12 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        gBondPortConfPmTcaEnable.
        At most one notification can be sent per interval.
        Setting this attribute to zero (default) effectively disables
-       gBondPmTca1DaySESCrossing notification.
+       the gBondPmTca1DaySESCrossing notification.
 
        This object maps to the TR-159 attribute
        aGroupPerfThreshold1DaySES."
      REFERENCE
-       "[TR-159] 5.5.1.52"
+       "[TR-159], Section 5.5.1.52"
      ::= { gBondPortPmTcaProfileEntry 6 }
 
    gBondPortPmTcaProfileThresh1DayUAS  OBJECT-TYPE
@@ -1821,15 +1792,16 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        If the number of UASs in a particular 1-day collection interval
        reaches or exceeds this value, a gBondPmTca1DayUASCrossing
        notification MAY be generated if enabled by
+
        gBondPortConfPmTcaEnable.
        At most one notification can be sent per interval.
        Setting this attribute to zero (default) effectively disables
-       gBondPmTca1DayUASCrossing notification.
+       the gBondPmTca1DayUASCrossing notification.
 
        This object maps to the TR-159 attribute
        aGroupPerfThreshold1DayUAS."
      REFERENCE
-       "[TR-159] 5.5.1.53"
+       "[TR-159], Section 5.5.1.53"
      ::= { gBondPortPmTcaProfileEntry 7 }
 
    gBondPortPmTcaProfileRowStatus  OBJECT-TYPE
@@ -1838,19 +1810,18 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      STATUS      current
      DESCRIPTION
        "This object controls the creation, modification, or deletion
-        of the associated entry in the gBondPortPmTcaProfileTable
-        per the semantics of RowStatus.
+       of the associated entry in the gBondPortPmTcaProfileTable
+       per the semantics of RowStatus.
 
-        If an 'active' entry is referenced via
-        gBondPortConfPmTcaConfProfile instance(s), the entry MUST
-        remain 'active'.
+       If an 'active' entry is referenced via
+       gBondPortConfPmTcaConfProfile instance(s), the entry MUST
+       remain 'active'.
 
-        An 'active' entry SHALL NOT be modified. In order to modify an
-        existing entry, it MUST be taken out of service (by setting
-        this object to 'notInService'), modified, and set 'active'
-        again."
+       An 'active' entry SHALL NOT be modified.  In order to modify an
+       existing entry, it MUST be taken out of service (by setting
+       this object to 'notInService'), modified, and set to 'active'
+       again."
      ::= { gBondPortPmTcaProfileEntry 8 }
-
 
    -- The BCE group
 
@@ -1859,7 +1830,7 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      MAX-ACCESS  not-accessible
      STATUS      current
      DESCRIPTION
-       "Table for Configuration of G.Bond common aspects for the
+       "Table for configuration of G.Bond common aspects for the
        Bonding Channel Entity (BCE) ports (modems/channels).
 
        Entries in this table MUST be maintained in a persistent
@@ -1873,9 +1844,9 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      DESCRIPTION
        "An entry in the G.Bond BCE Configuration table.
        Each entry represents common aspects of a G.Bond BCE port
-       indexed by the ifIndex. Note that a G.Bond BCE port can be
-       stacked below a single GBS port, also indexed by ifIndex,
-       possibly together with other BCE ports if GAF is enabled."
+       indexed by the ifIndex.  Note that a G.Bond BCE port can be
+       stacked below a single GBS port, also indexed by the ifIndex,
+       possibly together with other BCE ports if bonding is enabled."
      INDEX  { ifIndex }
      ::= { gBondBceConfTable 1 }
 
@@ -1885,12 +1856,12 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      }
 
    gBondBceConfRemoteDiscoveryCode  OBJECT-TYPE
-     SYNTAX      PhysAddress (SIZE(0|6))
+     SYNTAX      PhysAddress (SIZE (0|6))
      MAX-ACCESS  read-write
      STATUS      current
      DESCRIPTION
-       "A Remote Discovery Code of the BCE port at CO.
-       A 6 octet long Discovery Code of the peer GBS connected via
+       "A remote discovery code of the BCE port at the CO.
+       A 6-octet-long discovery code of the peer GBS connected via
        the BCE.
        Reading this object results in a Discovery Get operation.
        Setting this object to all zeroes results in a Discovery
@@ -1901,23 +1872,23 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        Writing a non-zero value to this object results in a
        Discovery Set_if_Clear operation.
        A zero-length octet string SHALL be returned on an attempt to
-       read this object when GAF aggregation is not enabled.
+       read this object when bonding is not enabled.
 
        This object is irrelevant in BCE-R port subtypes (CPE side):
-       in this case a zero length octet string SHALL be returned on
-       an attempt to read this object, an attempt to change this object
-       MUST be rejected (in case of SNMP with the error
+       in this case, a zero-length octet string SHALL be returned on
+       an attempt to read this object.  An attempt to change this
+       object MUST be rejected (in the case of SNMP, with the error
        inconsistentValue).
 
-       Discovery MUST be performed when the link is Down.
-       Attempts to change this object MUST be rejected (in case of
-       SNMP with the error inconsistentValue), If the link is Up or
-       Initializing.
+       Discovery MUST be performed when the link is 'down'.
+       Attempts to change this object MUST be rejected (in the case of
+       SNMP, with the error inconsistentValue), If the link is 'up' or
+       initializing.
 
        This object maps to the TR-159 attribute
        aLineRemoteDiscoveryCode."
      REFERENCE
-       "[TR-159] 5.5.6.7"
+       "[TR-159], Section 5.5.6.7"
      ::= { gBondBceConfEntry 1 }
 
   --
@@ -2034,7 +2005,7 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      DESCRIPTION
        "A collection of objects supporting OPTIONAL historical
        Performance Monitoring information for G.Bond ports, during
-       previous 15-minute intervals ."
+       previous 15-minute intervals."
      ::= { gBondGroups 7 }
 
    gBondPm1DayGroup OBJECT-GROUP
@@ -2049,7 +2020,7 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      DESCRIPTION
        "A collection of objects supporting OPTIONAL historical
        Performance Monitoring information for G.Bond ports, during
-       previous 1-day intervals ."
+       previous 1-day intervals."
      ::= { gBondGroups 8 }
 
    gBondPmTcaConfGroup OBJECT-GROUP
@@ -2082,8 +2053,8 @@ GBOND-MIB DEFINITIONS ::= BEGIN
      }
      STATUS      current
      DESCRIPTION
-       "This group supports notifications of performance monitoring
-       thresholds crossing alerts associated with G.Bond ports."
+       "This group supports notifications of Performance Monitoring
+       Threshold Crossing Alerts associated with G.Bond ports."
      ::= { gBondGroups 10 }
 
   -- Compliance Statements
@@ -2118,7 +2089,7 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        GROUP       gBondDiscoveryGroup
        DESCRIPTION
          "Support for this group is only required for implementations
-         supporting G.Bond Discovery function."
+         supporting the G.Bond Discovery function."
 
        GROUP       gBondMultiSchemeGroup
        DESCRIPTION
@@ -2133,7 +2104,7 @@ GBOND-MIB DEFINITIONS ::= BEGIN
        GROUP       gBondPm15MinGroup
        DESCRIPTION
          "Support for this group is only required for implementations
-         supporting 15-min historical Performance Monitoring."
+         supporting 15-minute historical Performance Monitoring."
 
        GROUP       gBondPm1DayGroup
        DESCRIPTION
@@ -2153,16 +2124,16 @@ GBOND-MIB DEFINITIONS ::= BEGIN
          notifications."
 
        OBJECT      gBondPortCapSchemesSupported
-       SYNTAX      GBondSchemeList
+       SYNTAX      IANAgBondSchemeList
        DESCRIPTION
-         "Support for all bonding Schemes types is not required.
-         However at least one value SHALL be supported"
+         "Support for all bonding scheme types is not required.
+
+         However, at least one value SHALL be supported."
 
        OBJECT      gBondPortCapPeerSchemesSupported
-       SYNTAX      GBondSchemeList
+       SYNTAX      IANAgBondSchemeList
        DESCRIPTION
-         "Support for all bonding Schemes types is not required.
-         However at least one value SHALL be supported"
-
+         "Support for all bonding scheme types is not required.
+         However, at least one value SHALL be supported."
      ::= { gBondCompliances 1 }
 END

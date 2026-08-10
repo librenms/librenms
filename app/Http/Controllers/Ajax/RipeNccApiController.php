@@ -35,15 +35,17 @@ class RipeNccApiController extends Controller
 {
     public function raw(Request $request, RipeApi $api)
     {
+        $this->authorize('tools.ripe');
+
         $this->validate($request, [
             'data_param' => 'required|in:whois,abuse-contact-finder',
             'query_param' => 'required|ip_or_hostname',
         ]);
 
-        $is_whois = $request->get('data_param') == 'whois';
+        $is_whois = $request->input('data_param') == 'whois';
 
         try {
-            $resource = $request->get('query_param');
+            $resource = $request->input('query_param');
             $output = $is_whois ? $api->getWhois($resource) : $api->getAbuseContact($resource);
 
             return response()->json([

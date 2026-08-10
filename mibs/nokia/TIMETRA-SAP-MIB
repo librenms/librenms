@@ -15,7 +15,7 @@ IMPORTS
     Counter32, Counter64, Gauge32,
     Integer32, IpAddress, MODULE-IDENTITY,
     NOTIFICATION-TYPE, OBJECT-TYPE,
-    Unsigned32
+    TimeTicks, Unsigned32
                                                          FROM SNMPv2-SMI
     DisplayString, MacAddress, RowStatus,
     TEXTUAL-CONVENTION, TimeStamp,
@@ -31,9 +31,8 @@ IMPORTS
                                                          FROM TIMETRA-GLOBAL-MIB
     tmnxPortCemStatsReportAlarm
                                                          FROM TIMETRA-PORT-MIB
-    TmnxMcFrClassIndex, tQosPolicerLevel,
-    tSapEgrPolicerId, tSapIngPolicerId,
-    tSchedulerPolicyName,
+    tQosPolicerLevel, tSapEgrPolicerId,
+    tSapIngPolicerId, tSchedulerPolicyName,
     tVirtualSchedulerName
                                                          FROM TIMETRA-QOS-MIB
     BridgeId, CemSapEcid, CemSapReportAlarm,
@@ -84,25 +83,20 @@ IMPORTS
     DateAndTimeOrEmpty, QTag,
     QTagFullRangeOrNone, ServiceAdminStatus,
     ServiceOperStatus, SvcISID,
-    TAdaptationRule, TBurstLimit,
-    TBurstPercentOrDefault, TBurstSize,
-    TBurstSizeBytes, TCIRPercentOverride,
-    TCpmProtPolicyID,
+    TAdaptationRule, TAnyQosPolicyIDorZero,
+    TBurstLimit, TBurstPercentOrDefault,
+    TBurstSize, TBurstSizeBytes,
+    TCIRPercentOverride, TCpmProtPolicyID,
     TCpmProtPolicyIDOrDefault,
-    TDSCPNameOrEmpty,
-    TEgrHsmdaPerPacketOffsetOvr,
-    TEgrPolicerId, TEgressHsmdaCounterId,
-    TEgressHsmdaQueueId,
+    TDSCPNameOrEmpty, TEgrPolicerId,
     TEgressPerPacketOffsetOvr,
     TEgressPolicerId, TEgressQueueId,
     TFCSet, THPolCIRRateOverride,
     THPolPIRRateOverride,
     THPolVirtualScheCIRRate,
     THPolVirtualSchePIRRate,
-    THSMDABurstSizeBytesOverride,
     THsmdaCIRKRateOverride,
     THsmdaPIRKRateOverride,
-    THsmdaWrrWeightOverride,
     TIngHsmdaPerPacketOffsetOvr,
     TIngPolicerId, TIngressHsmdaCounterId,
     TIngressHsmdaQueueId, TIngressPolicerId,
@@ -118,7 +112,7 @@ IMPORTS
     TPortSchedulerPIR,
     TQosQGrpInstanceIDorZero,
     TQosQueueCIRRate, TQosQueuePIRRate,
-    TSapEgrEncapGroupActionType,
+    TRateType, TSapEgrEncapGroupActionType,
     TSapEgrEncapGroupType,
     TSapEgrEncapGrpQosPolicyIdOrZero,
     TSapEgressPolicyID, TSapIngressPolicyID,
@@ -149,8 +143,9 @@ IMPORTS
     TmnxLagPerLinkHashWeight,
     TmnxLinkMapProfileIdOrZero, TmnxLow32,
     TmnxManagedRouteStatus, TmnxOperState,
-    TmnxPortID, TmnxQosRateHigh32,
-    TmnxQosRateLow32, TmnxRipListenerStatus,
+    TmnxPacketMode, TmnxPortID,
+    TmnxQosRateHigh32, TmnxQosRateLow32,
+    TmnxRipListenerStatus,
     TmnxSapAASubScope, TmnxServId,
     TmnxSubIdentStringOrEmpty,
     TmnxSubShcvAction, TmnxSubShcvInterval,
@@ -162,7 +157,7 @@ IMPORTS
     ;
 
 timetraSvcSapMIBModule           MODULE-IDENTITY
-    LAST-UPDATED "202201200000Z"
+    LAST-UPDATED "202502210000Z"
     ORGANIZATION "Nokia"
     CONTACT-INFO
         "Nokia SROS Support
@@ -189,9 +184,14 @@ timetraSvcSapMIBModule           MODULE-IDENTITY
          either express or implied, as to the use, operation, condition, or
          performance of the Specification."
 
+    REVISION    "202502210000Z"
+    DESCRIPTION
+        "Rev 25.0               21 February 2025 24:00
+         Release 25 of the TIMETRA-SAP-MIB."
+
     REVISION    "202201200000Z"
     DESCRIPTION
-        "Rev 19.0               20 January 2022 00:00
+        "Rev 22.0               20 January 2022 00:00
          22 release of the TIMETRA-SAP-MIB."
 
     REVISION    "201903200000Z"
@@ -413,10 +413,10 @@ SapBaseInfoEntry                 ::= SEQUENCE
     sapDescription                   TItemLongDescription,
     sapAdminStatus                   ServiceAdminStatus,
     sapOperStatus                    INTEGER,
-    sapIngressQosPolicyId            TSapIngressPolicyID,
+    sapIngressQosPolicyId            TAnyQosPolicyIDorZero,
     sapIngressMacFilterId            TConfigOrVsdFilterID,
     sapIngressIpFilterId             TConfigOrVsdFilterID,
-    sapEgressQosPolicyId             TSapEgressPolicyID,
+    sapEgressQosPolicyId             TAnyQosPolicyIDorZero,
     sapEgressMacFilterId             TFilterID,
     sapEgressIpFilterId              TFilterID,
     sapMirrorStatus                  INTEGER,
@@ -449,9 +449,7 @@ SapBaseInfoEntry                 ::= SEQUENCE
     sapCpmProtMonitorMac             TruthValue,
     sapEgressFrameBasedAccounting    TruthValue,
     sapIngressAggRateLimit           TPortSchedulerPIR,
-    sapEgressHsmdaShaperOverride     TNamedItemOrEmpty,
     sapIngressHsmdaPacketOffOvr      TIngHsmdaPerPacketOffsetOvr,
-    sapEgressHsmdaPacketOffOverride  TEgrHsmdaPerPacketOffsetOvr,
     sapCallingStationId              DisplayString,
     sapIsaAaApplicationProfile       ServObjName,
     sapIngPolicerPolicy              TNamedItemOrEmpty,
@@ -463,7 +461,6 @@ SapBaseInfoEntry                 ::= SEQUENCE
     sapTransitIpPolicyId             TmnxBsxTransitIpPolicyIdOrZero,
     sapOperGrp                       TNamedItemOrEmpty,
     sapMonitorOperGrp                TNamedItemOrEmpty,
-    sapEgressHsmdaWrrPolicyOvr       TNamedItemOrEmpty,
     sapTransitPrefixPolicyId         TmnxBsxTransPrefPolicyIdOrZero,
     sapCpmProtMonitorIP              TruthValue,
     sapHostsAdminState               ServiceAdminStatus,
@@ -482,9 +479,13 @@ SapBaseInfoEntry                 ::= SEQUENCE
     sapEtreeLeafTag                  Integer32,
     sapEtreeLeafAc                   TruthValue,
     sapEgressAggRateLUB              TruthValue,
+    sapEgressAggBurstLimit           TBurstLimit,
     sapEgressAggRateLmtHi            TmnxQosRateHigh32,
     sapEgressAggRateLmt              TmnxQosRateLow32,
-    sapMulticastSource               TruthValue
+    sapMulticastSource               TruthValue,
+    sapEgressAggRateAdaptRule        TAdaptationRule,
+    sapQtagNormalization             INTEGER,
+    sapQtagNormalizationEncap        Unsigned32
 }
 
 sapPortId                        OBJECT-TYPE
@@ -557,14 +558,17 @@ sapOperStatus                    OBJECT-TYPE
     ::= { sapBaseInfoEntry 7 }
 
 sapIngressQosPolicyId            OBJECT-TYPE
-    SYNTAX      TSapIngressPolicyID
+    SYNTAX      TAnyQosPolicyIDorZero
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
         "The value of the object sapIngressQosPolicyId specifies the row index
          in the tSapIngressTable corresponding to this ingress QoS policy, or
          one if no policy is specified. The value 0 is needed for mirror SAPs
-         that cannot have a QoS policy assigned."
+         that cannot have a QoS policy assigned.
+
+         An SNMP SET request greater than 65540 will be rejected. These values
+         are set internally and cannot be set through SNMP."
     DEFVAL      { 1 }
     ::= { sapBaseInfoEntry 8 }
 
@@ -591,12 +595,15 @@ sapIngressIpFilterId             OBJECT-TYPE
     ::= { sapBaseInfoEntry 10 }
 
 sapEgressQosPolicyId             OBJECT-TYPE
-    SYNTAX      TSapEgressPolicyID
+    SYNTAX      TAnyQosPolicyIDorZero
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
         "The row index in the tSapEgressTable corresponding to this egress QoS
-         policy, or one if no policy is specified."
+         policy, or one if no policy is specified.
+
+         An SNMP SET request greater than 65539 will be rejected. These values
+         are set internally and cannot be set through SNMP."
     DEFVAL      { 1 }
     ::= { sapBaseInfoEntry 11 }
 
@@ -1172,19 +1179,6 @@ sapIngressAggRateLimit           OBJECT-TYPE
     DEFVAL      { -1 }
     ::= { sapBaseInfoEntry 43 }
 
-sapEgressHsmdaShaperOverride     OBJECT-TYPE
-    SYNTAX      TNamedItemOrEmpty
-    MAX-ACCESS  read-create
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of the object sapEgressHsmdaShaperOverride
-         specifies the name of the secondary shaper for this SAP.
-         The value must correspond to an entry in the
-         tmnxPortEgrShaperTable.  If the empty string is specified,
-         the default secondary shaper will be used."
-    DEFVAL      { "" }
-    ::= { sapBaseInfoEntry 44 }
-
 sapIngressHsmdaPacketOffOvr      OBJECT-TYPE
     SYNTAX      TIngHsmdaPerPacketOffsetOvr
     UNITS       "bytes"
@@ -1198,18 +1192,6 @@ sapIngressHsmdaPacketOffOvr      OBJECT-TYPE
          This object is obsoleted in 10.0 Release."
     DEFVAL      { -128 }
     ::= { sapBaseInfoEntry 45 }
-
-sapEgressHsmdaPacketOffOverride  OBJECT-TYPE
-    SYNTAX      TEgrHsmdaPerPacketOffsetOvr
-    UNITS       "bytes"
-    MAX-ACCESS  read-create
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgressHsmdaPacketOffOverride specifies the value, in
-         bytes, of the adjustment to make to the size of each packet for HSMDA
-         queue accounting on ingress."
-    DEFVAL      { -128 }
-    ::= { sapBaseInfoEntry 46 }
 
 sapCallingStationId              OBJECT-TYPE
     SYNTAX      DisplayString (SIZE (0..64))
@@ -1421,20 +1403,6 @@ sapMonitorOperGrp                OBJECT-TYPE
          non-default value."
     DEFVAL      { "" }
     ::= { sapBaseInfoEntry 57 }
-
-sapEgressHsmdaWrrPolicyOvr       OBJECT-TYPE
-    SYNTAX      TNamedItemOrEmpty
-    MAX-ACCESS  read-create
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of the sapEgressHsmdaWrrPolicyOvr specifies the egress hsmda
-         weighted round-robin policy override for this SAP. When no policy is
-         given, the hsmda weighted round-robin policy specified in the
-         sap-egress policy is honored. When a valid policy is given, it is used
-         instead of the hsmda weighted round-robin policy given in the
-         sap-egress policy."
-    DEFVAL      { "" }
-    ::= { sapBaseInfoEntry 58 }
 
 sapTransitPrefixPolicyId         OBJECT-TYPE
     SYNTAX      TmnxBsxTransPrefPolicyIdOrZero
@@ -1714,11 +1682,22 @@ sapEgressAggRateLUB              OBJECT-TYPE
     DEFVAL      { false }
     ::= { sapBaseInfoEntry 77 }
 
+sapEgressAggBurstLimit           OBJECT-TYPE
+    SYNTAX      TBurstLimit
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sapEgressAggBurstLimit specifies the explicit aggregate
+         shaping burst size of aggregate-rate-limit."
+    DEFVAL      { -1 }
+    ::= { sapBaseInfoEntry 78 }
+
 sapEgressAggRateLmtHi            OBJECT-TYPE
     SYNTAX      TmnxQosRateHigh32
     UNITS       "kilobps"
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sapEgressAggRateLmtHi specifies the upper 32 bits of the
          maximum total rate of all egress queues for this SAP.
@@ -1728,7 +1707,10 @@ sapEgressAggRateLmtHi            OBJECT-TYPE
 
          When the value of sapEgressAggRateLmtHi along with the value of
          sapEgressAggRateLmt is set to 4294967295 (0xFFFFFFFF), rate for this
-         SAP indicates maximum total rate of all egress queues."
+         SAP indicates maximum total rate of all egress queues.
+
+         This object is getting obsoleted in 24.3, it was replaced by
+         sapEgrAggRateLimitHi in R22.7."
     DEFVAL      { 4294967295 }
     ::= { sapBaseInfoEntry 79 }
 
@@ -1736,7 +1718,7 @@ sapEgressAggRateLmt              OBJECT-TYPE
     SYNTAX      TmnxQosRateLow32
     UNITS       "kilobps"
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sapEgressAggRateLmt specifies the maximum total rate of
          all egress queues for this SAP. The value of 4294967295 (0xFFFFFFFF)
@@ -1744,7 +1726,10 @@ sapEgressAggRateLmt              OBJECT-TYPE
 
          When the value of sapEgressAggRateLmtHi along with the value of
          sapEgressAggRateLmt is set to 4294967295 (0xFFFFFFFF), rate for this
-         SAP indicates maximum total rate of all egress queues."
+         SAP indicates maximum total rate of all egress queues.
+
+         This object is getting obsoleted in 24.3, it was replaced by
+         sapEgrAggRateLimitHi in R22.7."
     DEFVAL      { 4294967295 }
     ::= { sapBaseInfoEntry 80 }
 
@@ -1758,6 +1743,63 @@ sapMulticastSource               OBJECT-TYPE
          the row is created and is mutually exclusive with sapSplitHorizonGrp."
     DEFVAL      { false }
     ::= { sapBaseInfoEntry 81 }
+
+sapEgressAggRateAdaptRule        OBJECT-TYPE
+    SYNTAX      TAdaptationRule
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sapEgressAggRateAdaptRule specifies the adaptation rule
+         to be used while computing the operational PIR value. The adaptation
+         rule specifies the rules to compute the operational values while
+         maintaining minimum offset."
+    DEFVAL      { closest }
+    ::= { sapBaseInfoEntry 82 }
+
+sapQtagNormalization             OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none      (0),
+        sapEncap  (1),
+        singleTag (2),
+        doubleTag (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sapQtagNormalization specifies where the normalization is
+         derived from.
+
+         When the value is 'sapEncap' then the normalization is derived from
+         SAP encap type (single-tag for dot1q and double-tag for qinq) and the
+         normalized VID is  drived from SAP encap value. When the value is
+         'single-tag' then the normalization  is a single-tag tag value. When
+         the value is 'double-tag' then the normalization is  a s-tag and c-tag
+         value. If Normalization is set to 'single-tag' or 'double-tag' the
+         user must specify the normalized VID.
+
+         Normalization cannot be set to 'sapEncap' for *, NULL, or 0 tag SAPs.
+
+         Normalization cannot be set to 'none' in an FXC epipe service."
+    DEFVAL      { none }
+    ::= { sapBaseInfoEntry 83 }
+
+sapQtagNormalizationEncap        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sapQtagNormalizationEncap encodes the normalized encap
+         value of the SAP.
+
+         If sapQtagNormalization is set to single-tag, the right-most 12 bits
+         indicate the  tag value. If sapQtagNormalization is set to double-tag,
+         the right-most 12 bits indicate the c-tag and the left-most 12 bits
+         indicate the s-tag value.
+
+         This value must be set if sapQtagNormalization is set to 'single-tag'
+         or 'double-tag'."
+    DEFVAL      { 0 }
+    ::= { sapBaseInfoEntry 84 }
 
 sapTlsInfoTable                  OBJECT-TYPE
     SYNTAX      SEQUENCE OF SapTlsInfoEntry
@@ -1882,7 +1924,9 @@ SapTlsInfoEntry                  ::= SEQUENCE
     sapTlsDataMsapTrigger            TruthValue,
     sapTlsRestProtSrcMacOper         TruthValue,
     sapTlsRestProtSrcMacOperAct      INTEGER,
-    sapTlsLastMgmtChange             TimeStamp
+    sapTlsLastMgmtChange             TimeStamp,
+    sapTlsAutoLearnMacProtectOper    TruthValue,
+    sapTlsRestUnprotDstMacOper       TruthValue
 }
 
 sapTlsStpAdminStatus             OBJECT-TYPE
@@ -2358,8 +2402,8 @@ sapTlsStpException               OBJECT-TYPE
         "The value of the object sapTlsStpException indicates whether an STP
          exception condition is present on this Sap.
          - none : no exception condition found.
-         - oneWayCommuniation : The neighbor RSTP peer on this link
-                                is not able to detect our presence.
+         - oneWayCommunication : The neighbor RSTP peer on this link
+                                 is not able to detect our presence.
          - downstreamLoopDetected :A loop is detected on this link."
     ::= { sapTlsInfoEntry 40 }
 
@@ -2995,7 +3039,7 @@ sapTlsOutTcBitBpdus              OBJECT-TYPE
 sapTlsPppMsapTrigger             OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sapTlsPppMsapTrigger specifies whether the receipt of PPP
          trigger packets on a VPLS SAP with a sapSubType value of 'capture'
@@ -3005,14 +3049,16 @@ sapTlsPppMsapTrigger             OBJECT-TYPE
 
          An attempt to set the value sapTlsPppoeMsapTrigger to 'true' on a SAP
          with sapSubType other than 'capture' will return an
-         'inconsistentValue' error."
+         'inconsistentValue' error.
+
+         This object is obsoleted in release 23.3 and later."
     DEFVAL      { false }
     ::= { sapTlsInfoEntry 89 }
 
 sapTlsPppPolicy                  OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sapTlsPppPolicy specifies the policy (defined in
          TIMETRA-PPPOE-MIB::tmnxPppoePlcyTable) to use to create Managed SAPs
@@ -3029,7 +3075,9 @@ sapTlsPppPolicy                  OBJECT-TYPE
          opposed to 'oE' or 'oEoA'.
 
          In general, the default value is empty; for a SAP with a sapSubType
-         value of 'capture', the default value is equal to default."
+         value of 'capture', the default value is equal to default.
+
+         This object is obsoleted in release 23.3 and later."
     DEFVAL      { "" }
     ::= { sapTlsInfoEntry 90 }
 
@@ -3045,7 +3093,7 @@ sapTlsTrackSrrpInst              OBJECT-TYPE
 sapTlsPppUserDb                  OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sapTlsPppUserDb specifies the local user database to use
          for PPP PAP/CHAP based authentication.
@@ -3061,7 +3109,9 @@ sapTlsPppUserDb                  OBJECT-TYPE
 
          The value of sapTlsPppUserDb is used for PPP sessions where the value
          of TIMETRA-SUBSCRIBER-MGMT-MIB::tmnxSubPppType is equal to 'oA', as
-         opposed to 'oE' or 'oEoA'."
+         opposed to 'oE' or 'oEoA'.
+
+         This object is obsoleted in release 23.3 and later."
     DEFVAL      { "" }
     ::= { sapTlsInfoEntry 92 }
 
@@ -3204,10 +3254,31 @@ sapTlsLastMgmtChange             OBJECT-TYPE
          zero value."
     ::= { sapTlsInfoEntry 102 }
 
+sapTlsAutoLearnMacProtectOper    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sapTlsAutoLearnMacProtectOper indicates whether automatic
+         population of the MAC protect list is enabled with source MAC
+         addresses learned on the associated SAP."
+    ::= { sapTlsInfoEntry 103 }
+
+sapTlsRestUnprotDstMacOper       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapTlsRestUnprotDstMacOper indicates how the system will
+         forward packets destined to an unprotected MAC address. When the value
+         of this object is 'true' packets destined to an unprotected MAC
+         address are dropped."
+    ::= { sapTlsInfoEntry 104 }
+
 sapAtmInfoTable                  OBJECT-TYPE
     SYNTAX      SEQUENCE OF SapAtmInfoEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "A table that contains ATM SAP information."
     ::= { tmnxSapObjs 4 }
@@ -3215,7 +3286,7 @@ sapAtmInfoTable                  OBJECT-TYPE
 sapAtmInfoEntry                  OBJECT-TYPE
     SYNTAX      SapAtmInfoEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "Information about a specific ATM SAP."
     INDEX       {
@@ -3244,7 +3315,7 @@ SapAtmInfoEntry                  ::= SEQUENCE
 sapAtmEncapsulation              OBJECT-TYPE
     SYNTAX      TmnxSapAtmEncapsulation
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "This object specifies the data encapsulation used
          over the AAL5 SSCS layer.  The definition references
@@ -3275,7 +3346,7 @@ sapAtmEncapsulation              OBJECT-TYPE
 sapAtmIngressTrafficDescIndex    OBJECT-TYPE
     SYNTAX      AtmTrafficDescrParamIndex (1..1000)
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "This object specifies the index of the ATM traffic descriptor in the
          ATM traffic data encapsulation used in for the ingress direction over
@@ -3288,7 +3359,7 @@ sapAtmIngressTrafficDescIndex    OBJECT-TYPE
 sapAtmEgressTrafficDescIndex     OBJECT-TYPE
     SYNTAX      AtmTrafficDescrParamIndex (1..1000)
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "This object specifies the index of the ATM traffic descriptor in the
          ATM traffic data encapsulation used in for the egress direction over
@@ -3301,7 +3372,7 @@ sapAtmEgressTrafficDescIndex     OBJECT-TYPE
 sapAtmOamAlarmCellHandling       OBJECT-TYPE
     SYNTAX      ServiceAdminStatus
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "A value of up specifies that the OAM status of a pvc
          affects  the  sap  operational  status and OAM AIS/RDI
@@ -3316,7 +3387,7 @@ sapAtmOamAlarmCellHandling       OBJECT-TYPE
 sapAtmOamTerminate               OBJECT-TYPE
     SYNTAX      ServiceAdminStatus
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The sapAtmOamTerminate object specifies whether this SAP will act as
          an OAM termination point. If enabled, OAM cells will be sunk by the
@@ -3332,7 +3403,7 @@ sapAtmOamTerminate               OBJECT-TYPE
 sapAtmOamPeriodicLoopback        OBJECT-TYPE
     SYNTAX      ServiceAdminStatus
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The sapAtmOamPeriodicLoopback object specifies whether
          this SAP will run periodic OAM loopbacks or not.  If
@@ -3354,7 +3425,7 @@ sapAtmOamPeriodicLoopback        OBJECT-TYPE
 sapAtmLLFAdminStatus             OBJECT-TYPE
     SYNTAX      ServiceAdminStatus
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "sapAtmLLFAdminStatus specifies whether or not Link- Loss Forwarding is
          enabled ('up'). When this object is set to 'up' the underlying port
@@ -3375,7 +3446,7 @@ sapAtmLLFOperStatus              OBJECT-TYPE
         clear (2)
     }
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "sapAtmLLFOperStatus indicates whether or not the underlying port is
          forced operationally 'down' due to the service being operationally
@@ -3388,7 +3459,7 @@ sapAtmLLFOperStatus              OBJECT-TYPE
 sapAtmSubPppIndex                OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sapAtmSubPppIndex indicates the local identifier of the
          subscriber PPP session.
@@ -3403,7 +3474,7 @@ sapAtmSubPppIndex                OBJECT-TYPE
 sapAtmDetectedEncapsulation      OBJECT-TYPE
     SYNTAX      TmnxSapAtmEncapsulation
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "This object indicates the AAL5 data encapsulation detected by PPPoA
          (PPP over ATM) or PPPoEoA (PPP over Ethernet over ATM).
@@ -3419,7 +3490,7 @@ sapAtmDetectedEncapsulation      OBJECT-TYPE
 sapAtmIngressTrafficDescIndexOvr OBJECT-TYPE
     SYNTAX      AtmTrafficDescrParamIndex (0 | 1..1000)
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "This object indicates the index of the ATM ingress traffic descriptor
          override.
@@ -3432,7 +3503,7 @@ sapAtmIngressTrafficDescIndexOvr OBJECT-TYPE
 sapAtmEgressTrafficDescIndexOvr  OBJECT-TYPE
     SYNTAX      AtmTrafficDescrParamIndex (0 | 1..1000)
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "This object indicates the index of the ATM egress traffic descriptor
          override.
@@ -4856,12 +4927,11 @@ sapStaticHostAdminStatus         OBJECT-TYPE
 sapStaticHostFilterProfile       OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of the object sapStaticHostFilterProfile specifies the
          filter profile for this static host. The specified filter profile
-         needs to exists in the
-         TIMETRA-SUBSCRIBER-MGMT-MIB::tmnxSubFilterProfileTable."
+         needs to exist."
     DEFVAL      { "" }
     ::= { sapStaticHostEntry 20 }
 
@@ -7107,12 +7177,11 @@ sapSubMgmtDefInterDestIdString   OBJECT-TYPE
 sapSubMgmtDefFilterProfile       OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of the object sapSubMgmtDefFilterProfile specifies the
          default filter profile for this SAP. The specified filter profile
-         needs to exists in the
-         TIMETRA-SUBSCRIBER-MGMT-MIB::tmnxSubFilterProfileTable."
+         needs to exist."
     DEFVAL      { "" }
     ::= { sapSubMgmtInfoEntry 17 }
 
@@ -7419,7 +7488,7 @@ sapIpipeIpv6DiscoveredMacAddress OBJECT-TYPE
 sapIpipeLegacyFaultNotification  OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sapIpipeLegacyFaultNotification indicates whether SAP
          will propagate fault towards the legacy side."
@@ -7429,7 +7498,7 @@ sapIpipeRemainRecoveryTimer      OBJECT-TYPE
     SYNTAX      Unsigned32
     UNITS       "deciseconds"
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sapIpipeRemainRecoveryTimer indicates remaining value for
          the recovery timer.
@@ -8795,7 +8864,7 @@ sapCemCasTrunkFraming            OBJECT-TYPE
     ::= { sapCemInfoEntry 4 }
 
 sapCemPayloadSize                OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 | 16..2048)
+    SYNTAX      Unsigned32 (0 | 2..1514)
     UNITS       "bytes"
     MAX-ACCESS  read-write
     STATUS      current
@@ -8807,35 +8876,37 @@ sapCemPayloadSize                OBJECT-TYPE
          if the size of the data received is not consistent with
          the payload size then the packet is considered malformed.
 
-         The default value depends on the CEM SAP endpoint type
-         (sapCemEndpointType), and if applicable, the number of
-         timeslots (sapCemBitrate):
-         ---------------------------------------------------------
-         | Endpoint Type      | Timeslots | Default payload size |
-         ---------------------+-----------+-----------------------
-         | 'unstructuredE1'   | n/a       |    256 bytes         |
-         ---------------------+-----------+-----------------------
-         | 'unstructuredT1'   | n/a       |    192 bytes         |
-         ---------------------+-----------+-----------------------
-         | 'unstructuredE3'   | n/a       |   1024 bytes         |
-         ---------------------+-----------+-----------------------
-         | 'unstructuredT3'   | n/a       |   1024 bytes         |
-         ---------------------+-----------+-----------------------
-         | 'nxDS0' (E1/T1)    | N = 1     |     64 bytes         |
-         |                    +-----------+-----------------------
-         |                    | N = 2..4  | N x 32 bytes         |
-         |                    +-----------+-----------------------
-         |                    | N = 5..15 | N x 16 bytes         |
-         |                    +-----------+-----------------------
-         |                    | N >= 16   | N x  8 bytes         |
-         ---------------------+-----------+-----------------------
-         | 'nxDS0WithCas' (E1)| N         | N x 16 bytes         |
-         ---------------------+-----------+-----------------------
-         | 'nxDS0WithCas' (T1)| N         | N x 24 bytes         |
-         ---------------------------------------------------------
-
-         For 'nxDS0WithCas', the sapCemPayloadSize cannot be changed away from
-         the default value.
+         The default and minimum values depend on the CEM SAP
+         endpoint type (sapCemEndpointType), and if applicable,
+         the number of timeslots (sapCemBitrate):
+         ----------------------------------------------------------------
+         |                    |           |       Payload Sizes         |
+         | Endpoint Type      | Timeslots | Default      | Minimum      |
+         ---------------------+-----------+--------------+---------------
+         |'unstructuredE1'    | n/a       | 256 bytes    | 64 bytes     |
+         ---------------------+-----------+--------------+---------------
+         |'unstructuredT1'    | n/a       | 192 bytes    | 64 bytes     |
+         ---------------------+-----------+--------------+---------------
+         |'unstructuredE3'    | n/a       | 1024 bytes   | 1024 bytes   |
+         ---------------------+-----------+--------------+---------------
+         |'unstructuredT3'    | n/a       | 1024 bytes   | 1024 bytes   |
+         ---------------------+-----------+--------------+---------------
+         |'nxDS0' (E1)        | N = 1     | 64 bytes     | N x 2 bytes  |
+         |                    +-----------+--------------+              |
+         |                    | N = 2..4  | N x 32 bytes |              |
+         ---------------------+-----------+--------------+---------------
+         |'nxDS0' (T1)        | N = 1     | 64 bytes     | N x 2 bytes  |
+         |                    +-----------+--------------+              |
+         |                    | N = 2..4  | N x 32 bytes |              |
+         ---------------------+-----------+--------------+---------------
+         |'nxDS0' (E1/T1)     | N = 5..15 | N x 16 bytes | N x 2 bytes  |
+         |                    +-----------+--------------+              |
+         |                    | N >= 16   | N x  8 bytes |              |
+         ---------------------+-----------+--------------+---------------
+         |'nxDS0WithCas' (E1) | N         | N x 16 bytes | N x 16 bytes |
+         ---------------------+-----------+--------------+---------------
+         |'nxDS0WithCas' (T1) | N         | N x 24 bytes | N x 24 bytes |
+         ----------------------------------------------------------------
 
          For '1xDS0', sapCemPayloadSize must be a multiple of 2.
 
@@ -8846,35 +8917,14 @@ sapCemPayloadSize                OBJECT-TYPE
          'unstructuredT3', sapCemPayloadSize must be a multiple of 32 bytes.
 
          Configuring sapCemPayloadSize and sapCemJitterBuffer to values that
-         result in less than 2 packet buffers or greater than 32 packet buffers
+         result in less than 3 packet buffers or greater than 32 packet buffers
          is not allowed.
 
-         For all endpoint types except for 'nxDS0WithCas', the
-         minimum payload size is given below:
-         ---------------------------------------------------------
-         | Endpoint Type      | Timeslots | Minimum payload size |
-         ---------------------+-----------+-----------------------
-         | 'unstructuredE1'   | n/a       |    256 bytes         |
-         ---------------------+-----------+-----------------------
-         | 'unstructuredT1'   | n/a       |    192 bytes         |
-         ---------------------+-----------+-----------------------
-         | 'unstructuredE3'   | n/a       |   1024 bytes         |
-         ---------------------+-----------+-----------------------
-         | 'unstructuredT3'   | n/a       |   1024 bytes         |
-         ---------------------+-----------+-----------------------
-         | 'nxDS0' (E1)       | N = 1..4  | N x 16 bytes         |
-         ---------------------+-----------+-----------------------
-         | 'nxDS0' (T1)       | N = 1..4  | N x 24 bytes         |
-         ---------------------+-----------+-----------------------
-         | 'nxDS0' (E1/T1)    | N = 5..15 | N x 16 bytes         |
-         |                    +-----------+-----------------------
-         |                    | N >= 16   | N x  8 bytes         |
-         ---------------------+-----------+-----------------------
+         For 'nxDS0WithCas', multiple multi-frames is supported where the
+         sapCemPayloadSize value is a multiple of N x 16 bytes (E1) or N x 24
+         bytes (T1), up to a maximum of 8 multi-frames.
 
-         For all endpoints types except for 'nxDS0WithCas', the maximum payload
-         size is 2048 bytes.
-
-         Setting this object to 0 sets it back to the default value."
+         Configuring sapCemPayloadSize to 0 sets it back to the default value."
     ::= { sapCemInfoEntry 5 }
 
 sapCemJitterBuffer               OBJECT-TYPE
@@ -8913,7 +8963,7 @@ sapCemJitterBuffer               OBJECT-TYPE
          ---------------------------------------------------------
 
          Configuring sapCemPayloadSize and sapCemJitterBuffer to values that
-         result in less than 2 packet buffers or greater than 32 packet buffers
+         result in less than 3 packet buffers or greater than 32 packet buffers
          is not allowed.
 
          The valid range is 1 to 250 ms.  Setting this object
@@ -10283,7 +10333,7 @@ msapPlcyIgmpTrkMaxNbrSrcs        OBJECT-TYPE
 msapPlcySubMgmtDefFilterProfile  OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of msapPlcySubMgmtDefFilterProfile specifies the default
          filter profile applicable on the MSAP.
@@ -11980,386 +12030,6 @@ sapIngHsmdaCntrStAllOctOffered   OBJECT-TYPE
          of octets offered on ingress on this SAP."
     ::= { sapIngQosHsmdaCntrStatsEntry 12 }
 
-sapEgrQosHsmdaQueueTable         OBJECT-TYPE
-    SYNTAX      SEQUENCE OF SapEgrQosHsmdaQueueEntry
-    MAX-ACCESS  not-accessible
-    STATUS      obsolete
-    DESCRIPTION
-        "The sapEgrQosHsmdaQueueTable has an entry for each Hsmda SAP-level
-         egress queue override configured on the system."
-    ::= { tmnxSapObjs 55 }
-
-sapEgrQosHsmdaQueueEntry         OBJECT-TYPE
-    SYNTAX      SapEgrQosHsmdaQueueEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Each row entry represents a Hsmda SAP-level egress queue override
-         record.
-
-         Entries are created and deleted via SNMP SET operations on
-         sapEgrQosHsmdaQueueRowStatus."
-    INDEX       {
-        svcId,
-        sapPortId,
-        sapEncapValue,
-        sapEgrQosHsmdaQueueId
-    }
-    ::= { sapEgrQosHsmdaQueueTable 1 }
-
-SapEgrQosHsmdaQueueEntry         ::= SEQUENCE
-{
-    sapEgrQosHsmdaQueueId            TEgressHsmdaQueueId,
-    sapEgrQosHsmdaQueueRowStatus     RowStatus,
-    sapEgrQosHsmdaQueueLastChanged   TimeStamp,
-    sapEgrQosHsmdaQueueAdminPIR      THsmdaPIRKRateOverride,
-    sapEgrQosHsmdaQueueAdminCIR      THsmdaCIRKRateOverride,
-    sapEgrQosHsmdaQueueSlopePolicy   TNamedItemOrEmpty,
-    sapEgrQosHsmdaQueueWrrWeight     THsmdaWrrWeightOverride,
-    sapEgrQosHsmdaQueueMBS           THSMDABurstSizeBytesOverride
-}
-
-sapEgrQosHsmdaQueueId            OBJECT-TYPE
-    SYNTAX      TEgressHsmdaQueueId
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The value of sapEgrQosHsmdaQueueId index specifies the Hsmda egress
-         queue which this override record will affect."
-    ::= { sapEgrQosHsmdaQueueEntry 1 }
-
-sapEgrQosHsmdaQueueRowStatus     OBJECT-TYPE
-    SYNTAX      RowStatus
-    MAX-ACCESS  read-create
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrQosHsmdaQueueRowStatus controls the creation and
-         deletion of rows in this table."
-    ::= { sapEgrQosHsmdaQueueEntry 2 }
-
-sapEgrQosHsmdaQueueLastChanged   OBJECT-TYPE
-    SYNTAX      TimeStamp
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrQosHsmdaQueueLastChanged indicates the sysUpTime at
-         the time of the most recent management-initiated change to this table
-         row."
-    ::= { sapEgrQosHsmdaQueueEntry 3 }
-
-sapEgrQosHsmdaQueueAdminPIR      OBJECT-TYPE
-    SYNTAX      THsmdaPIRKRateOverride
-    UNITS       "kilobps"
-    MAX-ACCESS  read-create
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrQosHsmdaQueueAdminPIR specifies the PIR rate in
-         kbps allowed for this Hsmda ingress queue."
-    DEFVAL      { -2 }
-    ::= { sapEgrQosHsmdaQueueEntry 4 }
-
-sapEgrQosHsmdaQueueAdminCIR      OBJECT-TYPE
-    SYNTAX      THsmdaCIRKRateOverride
-    UNITS       "kilobps"
-    MAX-ACCESS  read-create
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrQosHsmdaQueueAdminCIR specifies the CIR rate in
-         kbps allowed for this Hsmda ingress queue.
-
-         This object is obsoleted in 10.0 Release."
-    DEFVAL      { -2 }
-    ::= { sapEgrQosHsmdaQueueEntry 5 }
-
-sapEgrQosHsmdaQueueSlopePolicy   OBJECT-TYPE
-    SYNTAX      TNamedItemOrEmpty
-    MAX-ACCESS  read-create
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrQosHsmdaQueueSlopePolicy specifies the slope policy
-         that defines the RED slopes for this Hsmda ingress queue."
-    DEFVAL      { "" }
-    ::= { sapEgrQosHsmdaQueueEntry 6 }
-
-sapEgrQosHsmdaQueueWrrWeight     OBJECT-TYPE
-    SYNTAX      THsmdaWrrWeightOverride
-    MAX-ACCESS  read-create
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrQosHsmdaQueueWrrWeight specifies the weighted
-         round-robin weight override for the given egress hsmda queue on this
-         SAP. When set to default value, the weighted round-robin weight is not
-         overridden and the weighted round-robin weight from the sap-egress qos
-         policy is honored.  When a non-default value is given, that is used
-         instead of the weighted round-robin weight given in the sap-egress
-         policy."
-    DEFVAL      { -2 }
-    ::= { sapEgrQosHsmdaQueueEntry 7 }
-
-sapEgrQosHsmdaQueueMBS           OBJECT-TYPE
-    SYNTAX      THSMDABurstSizeBytesOverride
-    UNITS       "bytes"
-    MAX-ACCESS  read-create
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrQosHsmdaQueueMBS specifies the maximum buffer space
-         (MBS) override in bytes for the given egress hsmda queue on this SAP.
-         When set to default value, the MBS is not overridden and the MBS from
-         the sap-egress qos policy is honored. When a non-default value is
-         given, that is used instead of the MBS given in the sap-egress policy."
-    DEFVAL      { -2 }
-    ::= { sapEgrQosHsmdaQueueEntry 8 }
-
-sapEgrQosHsmdaQueueStatsTable    OBJECT-TYPE
-    SYNTAX      SEQUENCE OF SapEgrQosHsmdaQueueStatsEntry
-    MAX-ACCESS  not-accessible
-    STATUS      obsolete
-    DESCRIPTION
-        "A table that contains egress QoS HSMDA queue SAP statistics."
-    ::= { tmnxSapObjs 56 }
-
-sapEgrQosHsmdaQueueStatsEntry    OBJECT-TYPE
-    SYNTAX      SapEgrQosHsmdaQueueStatsEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Egress statistics about a specific SAP's QoS HSMDA queue."
-    INDEX       {
-        svcId,
-        sapPortId,
-        sapEncapValue,
-        sapEgrQosHsmdaQueueId
-    }
-    ::= { sapEgrQosHsmdaQueueStatsTable 1 }
-
-SapEgrQosHsmdaQueueStatsEntry    ::= SEQUENCE
-{
-    sapEgrHsmdaQStatCustId           TmnxCustId,
-    sapEgrHsmdaQStatInProfPktFwd     Counter64,
-    sapEgrHsmdaQStatInProfPktDropd   Counter64,
-    sapEgrHsmdaQStatOutProfPktFwd    Counter64,
-    sapEgrHsmdaQStatOutProfPktDropd  Counter64,
-    sapEgrHsmdaQStatInProfOctFwd     Counter64,
-    sapEgrHsmdaQStatInProfOctDropd   Counter64,
-    sapEgrHsmdaQStatOutProfOctFwd    Counter64,
-    sapEgrHsmdaQStatOutProfOctDropd  Counter64
-}
-
-sapEgrHsmdaQStatCustId           OBJECT-TYPE
-    SYNTAX      TmnxCustId
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrHsmdaQStatCustId indicates the customer ID for the
-         statistics."
-    ::= { sapEgrQosHsmdaQueueStatsEntry 1 }
-
-sapEgrHsmdaQStatInProfPktFwd     OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrHsmdaQStatInProfPktFwd indicates the number of
-         in-profile packets forwarded on egress on this SAP."
-    ::= { sapEgrQosHsmdaQueueStatsEntry 2 }
-
-sapEgrHsmdaQStatInProfPktDropd   OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrHsmdaQStatInProfPktDropd indicates the number of
-         in-profile packets dropped on egress on this SAP."
-    ::= { sapEgrQosHsmdaQueueStatsEntry 3 }
-
-sapEgrHsmdaQStatOutProfPktFwd    OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrHsmdaQStatOutProfPktFwd indicates the number of
-         out-of-profile packets forwarded on egress on this SAP."
-    ::= { sapEgrQosHsmdaQueueStatsEntry 4 }
-
-sapEgrHsmdaQStatOutProfPktDropd  OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrHsmdaQStatOutProfPktDropd indicates the number of
-         out-of-profile packets dropped on egress on this SAP."
-    ::= { sapEgrQosHsmdaQueueStatsEntry 5 }
-
-sapEgrHsmdaQStatInProfOctFwd     OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrHsmdaQStatInProfOctFwd indicates the number of
-         out-of-profile packets forwarded on egress on this SAP."
-    ::= { sapEgrQosHsmdaQueueStatsEntry 6 }
-
-sapEgrHsmdaQStatInProfOctDropd   OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrHsmdaQStatInProfOctDropd indicates the number of
-         out-of-profile packets dropped on egress on this SAP."
-    ::= { sapEgrQosHsmdaQueueStatsEntry 7 }
-
-sapEgrHsmdaQStatOutProfOctFwd    OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrHsmdaQStatOutProfOctFwd indicates the number of
-         out-of-profile packets forwarded on egress on this SAP."
-    ::= { sapEgrQosHsmdaQueueStatsEntry 8 }
-
-sapEgrHsmdaQStatOutProfOctDropd  OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrHsmdaQStatOutProfOctDropd indicates the number of
-         out-of-profile packets dropped on egress on this SAP."
-    ::= { sapEgrQosHsmdaQueueStatsEntry 9 }
-
-sapEgrQosHsmdaCntrStatsTable     OBJECT-TYPE
-    SYNTAX      SEQUENCE OF SapEgrQosHsmdaCntrStatsEntry
-    MAX-ACCESS  not-accessible
-    STATUS      obsolete
-    DESCRIPTION
-        "A table that contains egress QoS HSMDA counter SAP statistics."
-    ::= { tmnxSapObjs 57 }
-
-sapEgrQosHsmdaCntrStatsEntry     OBJECT-TYPE
-    SYNTAX      SapEgrQosHsmdaCntrStatsEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Egress statistics about a specific SAP's QoS HSMDA counter."
-    INDEX       {
-        svcId,
-        sapPortId,
-        sapEncapValue,
-        sapEgrHsmdaCntrStCntrId
-    }
-    ::= { sapEgrQosHsmdaCntrStatsTable 1 }
-
-SapEgrQosHsmdaCntrStatsEntry     ::= SEQUENCE
-{
-    sapEgrHsmdaCntrStCntrId          TEgressHsmdaCounterId,
-    sapEgrHsmdaCntrStCustId          TmnxCustId,
-    sapEgrHsmdaCntrStInProfPktFwd    Counter64,
-    sapEgrHsmdaCntrStInProfPktDrop   Counter64,
-    sapEgrHsmdaCntrStOutProfPktFwd   Counter64,
-    sapEgrHsmdaCntrStOutProfPktDrop  Counter64,
-    sapEgrHsmdaCntrStInProfOctFwd    Counter64,
-    sapEgrHsmdaCntrStInProfOctDrop   Counter64,
-    sapEgrHsmdaCntrStOutProfOctFwd   Counter64,
-    sapEgrHsmdaCntrStOutProfOctDrop  Counter64
-}
-
-sapEgrHsmdaCntrStCntrId          OBJECT-TYPE
-    SYNTAX      TEgressHsmdaCounterId
-    MAX-ACCESS  not-accessible
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrHsmdaCntrStCntrId indicates the counter ID for the
-         statistics."
-    ::= { sapEgrQosHsmdaCntrStatsEntry 1 }
-
-sapEgrHsmdaCntrStCustId          OBJECT-TYPE
-    SYNTAX      TmnxCustId
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrHsmdaCntrStCustId indicates the customer ID for the
-         statistics."
-    ::= { sapEgrQosHsmdaCntrStatsEntry 2 }
-
-sapEgrHsmdaCntrStInProfPktFwd    OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrHsmdaCntrStInProfPktFwd indicates the number of
-         in-profile packets forwarded for the egress counter, specified by the
-         index sapIngHsmdaCntrStCntrId, on this SAP."
-    ::= { sapEgrQosHsmdaCntrStatsEntry 3 }
-
-sapEgrHsmdaCntrStInProfPktDrop   OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrHsmdaCntrStInProfPktDrop indicates the number of
-         in-profile packets dropped for the egress counter, specified by the
-         index sapIngHsmdaCntrStCntrId, on this SAP."
-    ::= { sapEgrQosHsmdaCntrStatsEntry 4 }
-
-sapEgrHsmdaCntrStOutProfPktFwd   OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrHsmdaCntrStOutProfPktFwd indicates the number of
-         out-of-profile packets forwarded for the egress counter, specified by
-         the index sapIngHsmdaCntrStCntrId, on this SAP."
-    ::= { sapEgrQosHsmdaCntrStatsEntry 5 }
-
-sapEgrHsmdaCntrStOutProfPktDrop  OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrHsmdaCntrStOutProfPktDrop indicates the number of
-         out-of-profile packets dropped for the egress counter, specified by
-         the index sapIngHsmdaCntrStCntrId, on this SAP."
-    ::= { sapEgrQosHsmdaCntrStatsEntry 6 }
-
-sapEgrHsmdaCntrStInProfOctFwd    OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrHsmdaCntrStInProfOctFwd indicates the number of
-         out-of-profile packets forwarded for the egress counter, specified by
-         the index sapIngHsmdaCntrStCntrId, on this SAP."
-    ::= { sapEgrQosHsmdaCntrStatsEntry 7 }
-
-sapEgrHsmdaCntrStInProfOctDrop   OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrHsmdaCntrStInProfOctDrop indicates the number of
-         out-of-profile packets dropped for the egress counter, specified by
-         the index sapIngHsmdaCntrStCntrId, on this SAP."
-    ::= { sapEgrQosHsmdaCntrStatsEntry 8 }
-
-sapEgrHsmdaCntrStOutProfOctFwd   OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrHsmdaCntrStOutProfOctFwd indicates the number of
-         out-of-profile packets forwarded for the egress counter, specified by
-         the index sapIngHsmdaCntrStCntrId, on this SAP."
-    ::= { sapEgrQosHsmdaCntrStatsEntry 9 }
-
-sapEgrHsmdaCntrStOutProfOctDrop  OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of sapEgrHsmdaCntrStOutProfOctDrop indicates the number of
-         out-of-profile packets dropped for the egress counter, specified by
-         the index sapIngHsmdaCntrStCntrId, on this SAP."
-    ::= { sapEgrQosHsmdaCntrStatsEntry 10 }
-
 msapL3PlcyTable                  OBJECT-TYPE
     SYNTAX      SEQUENCE OF MsapL3PlcyEntry
     MAX-ACCESS  not-accessible
@@ -12895,125 +12565,6 @@ sapIgmpTrkMaxNbrGrpSrcs          OBJECT-TYPE
          The value 0 means that no limit is imposed."
     DEFVAL      { 0 }
     ::= { sapIgmpTrkEntry 8 }
-
-sapFrInfoTable                   OBJECT-TYPE
-    SYNTAX      SEQUENCE OF SapFrInfoEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A table that contains FR SAP information."
-    ::= { tmnxSapObjs 71 }
-
-sapFrInfoEntry                   OBJECT-TYPE
-    SYNTAX      SapFrInfoEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Information about a specific FR SAP."
-    INDEX       {
-        svcId,
-        sapPortId,
-        sapEncapValue
-    }
-    ::= { sapFrInfoTable 1 }
-
-SapFrInfoEntry                   ::= SEQUENCE
-{
-    sapFrInfoFrf12Mode               TmnxEnabledDisabled,
-    sapFrInfoSchedulingClass         TmnxMcFrClassIndex,
-    sapFrInfoLastChanged             TimeStamp
-}
-
-sapFrInfoFrf12Mode               OBJECT-TYPE
-    SYNTAX      TmnxEnabledDisabled
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "The value of sapFrInfoFrf12Mode enables or disables the use of FRF12
-         headers. This must be set to disabled for this entry to be added to a
-         mlfr bundle."
-    DEFVAL      { disabled }
-    ::= { sapFrInfoEntry 1 }
-
-sapFrInfoSchedulingClass         OBJECT-TYPE
-    SYNTAX      TmnxMcFrClassIndex
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "The value of sapFrInfoSchedulingClass specifies the scheduling class
-         to use for this sap. This object is only applicable for a sapPortId
-         that has tmnxBundleType set to 'mlfr', sapFrInfoFrf12Mode SAPs set to
-         'enabled' or tmnxFrIntfFrf12Mode set to 'enabled' and
-         sapFrf12InfoInterleave set to 'disabled'."
-    DEFVAL      { 3 }
-    ::= { sapFrInfoEntry 2 }
-
-sapFrInfoLastChanged             OBJECT-TYPE
-    SYNTAX      TimeStamp
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of sapFrInfoLastChanged indicates the sysUpTime at the time
-         of the last modification of this entry."
-    ::= { sapFrInfoEntry 3 }
-
-sapFrf12InfoTable                OBJECT-TYPE
-    SYNTAX      SEQUENCE OF SapFrf12InfoEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A table that contains FRF12 SAP information."
-    ::= { tmnxSapObjs 74 }
-
-sapFrf12InfoEntry                OBJECT-TYPE
-    SYNTAX      SapFrf12InfoEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Information about a specific FR SAP."
-    INDEX       {
-        svcId,
-        sapPortId,
-        sapEncapValue
-    }
-    ::= { sapFrf12InfoTable 1 }
-
-SapFrf12InfoEntry                ::= SEQUENCE
-{
-    sapFrf12InfoFragmentThreshold    Unsigned32,
-    sapFrf12InfoLastChanged          TimeStamp,
-    sapFrf12InfoInterleave           TmnxEnabledDisabled
-}
-
-sapFrf12InfoFragmentThreshold    OBJECT-TYPE
-    SYNTAX      Unsigned32 (128..512)
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "The value of sapFrf12InfoFragmentThreshold specifies the maximum
-         length of a fragment to be transmitted."
-    DEFVAL      { 128 }
-    ::= { sapFrf12InfoEntry 1 }
-
-sapFrf12InfoLastChanged          OBJECT-TYPE
-    SYNTAX      TimeStamp
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of sapFrf12InfoLastChanged indicates the sysUpTime at the
-         time of the last modification of this entry.."
-    ::= { sapFrf12InfoEntry 2 }
-
-sapFrf12InfoInterleave           OBJECT-TYPE
-    SYNTAX      TmnxEnabledDisabled
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "The value of sapFrf12InfoInterleave specifies whether or not FRF12
-         interleave is enabled. If enabled, sapFrInfoSchedulingClass is not
-         applicable."
-    DEFVAL      { disabled }
-    ::= { sapFrf12InfoEntry 3 }
 
 sapArpHostStatTable              OBJECT-TYPE
     SYNTAX      SEQUENCE OF SapArpHostStatEntry
@@ -18801,7 +18352,7 @@ tmnxGreTunnelTooBigTxHi          OBJECT-TYPE
 sapAtmVcRangeTable               OBJECT-TYPE
     SYNTAX      SEQUENCE OF SapAtmVcRangeEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The  sapAtmVcRangeTable contains ATM Virtual Circuit ranges
          for ATM Capture SAPs.
@@ -18815,7 +18366,7 @@ sapAtmVcRangeTable               OBJECT-TYPE
 sapAtmVcRangeEntry               OBJECT-TYPE
     SYNTAX      SapAtmVcRangeEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "Each conceptual row represents an ATM Virtual Circuit range."
     INDEX       {
@@ -18840,7 +18391,7 @@ SapAtmVcRangeEntry               ::= SEQUENCE
 sapAtmVcRangeIndex               OBJECT-TYPE
     SYNTAX      Unsigned32 (1..5)
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sapAtmVcRangeIndex specifies the identifier of this ATM
          Virtual Circuit Range."
@@ -18849,7 +18400,7 @@ sapAtmVcRangeIndex               OBJECT-TYPE
 sapAtmVcRangeRowStatus           OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sapAtmVcRangeRowStatus specifies the row status of this
          row."
@@ -18858,7 +18409,7 @@ sapAtmVcRangeRowStatus           OBJECT-TYPE
 sapAtmVcRangeLastMgmtChange      OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sapAtmVcRangeLastMgmtChange indicates the sysUpTime at
          the time of the most recent management-initiated change to this table
@@ -18868,7 +18419,7 @@ sapAtmVcRangeLastMgmtChange      OBJECT-TYPE
 sapAtmVcRangeVpiStart            OBJECT-TYPE
     SYNTAX      AtmVpIdentifier
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sapAtmVcRangeVpiStart specifies the start Virtual Path
          Identifier (VPI) of this range."
@@ -18877,7 +18428,7 @@ sapAtmVcRangeVpiStart            OBJECT-TYPE
 sapAtmVcRangeVpiEnd              OBJECT-TYPE
     SYNTAX      AtmVpIdentifier
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sapAtmVcRangeVpiEnd specifies the end Virtual Path
          Identifier (VPI) of this range."
@@ -18886,7 +18437,7 @@ sapAtmVcRangeVpiEnd              OBJECT-TYPE
 sapAtmVcRangeVciStart            OBJECT-TYPE
     SYNTAX      AtmVcIdentifier (1..65535)
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sapAtmVcRangeVciStart specifies the start Virtual Circuit
          Identifier (VCI) of this range."
@@ -18895,7 +18446,7 @@ sapAtmVcRangeVciStart            OBJECT-TYPE
 sapAtmVcRangeVciEnd              OBJECT-TYPE
     SYNTAX      AtmVcIdentifier (1..65535)
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sapAtmVcRangeVciEnd specifies the end Virtual Circuit
          Identifier (VCI) of this range."
@@ -18904,7 +18455,7 @@ sapAtmVcRangeVciEnd              OBJECT-TYPE
 msapAtmPlcyTable                 OBJECT-TYPE
     SYNTAX      SEQUENCE OF MsapAtmPlcyEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The msapAtmPlcyTable has an entry for each managed SAP (MSAP) policy
          configured in the system."
@@ -18913,7 +18464,7 @@ msapAtmPlcyTable                 OBJECT-TYPE
 msapAtmPlcyEntry                 OBJECT-TYPE
     SYNTAX      MsapAtmPlcyEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "Each entry represents the ATM-related configuration for a managed SAP
          (MSAP) policy.
@@ -18935,7 +18486,7 @@ MsapAtmPlcyEntry                 ::= SEQUENCE
 msapAtmPlcyLastChanged           OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of msapAtmPlcyLastChanged indicates the sysUpTime at the
          time of the last modification of this entry.
@@ -18948,7 +18499,7 @@ msapAtmPlcyLastChanged           OBJECT-TYPE
 msapAtmPlcyIngTrafficDescIndex   OBJECT-TYPE
     SYNTAX      AtmTrafficDescrParamIndex (1..1000)
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of msapAtmPlcyIngTrafficDescIndex specifies the index of the
          ATM traffic descriptor in the ATM traffic data encapsulation used for
@@ -18962,7 +18513,7 @@ msapAtmPlcyIngTrafficDescIndex   OBJECT-TYPE
 msapAtmPlcyEgrTrafficDescIndex   OBJECT-TYPE
     SYNTAX      AtmTrafficDescrParamIndex (1..1000)
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of msapAtmPlcyEgrTrafficDescIndex specifies the index of the
          ATM traffic descriptor in the ATM traffic data encapsulation used for
@@ -18976,7 +18527,7 @@ msapAtmPlcyEgrTrafficDescIndex   OBJECT-TYPE
 msapAtmPlcyOamAlarmCellHandling  OBJECT-TYPE
     SYNTAX      ServiceAdminStatus
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of msapAtmPlcyOamAlarmCellHandling specifies the
          administrative state of the OAM Alarm Cell handling.
@@ -18994,7 +18545,7 @@ msapAtmPlcyOamAlarmCellHandling  OBJECT-TYPE
 msapAtmPlcyOamPeriodicLoopback   OBJECT-TYPE
     SYNTAX      ServiceAdminStatus
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of msapAtmPlcyOamPeriodicLoopback specifies if the MSAP will
          run periodic OAM loopbacks.
@@ -19014,7 +18565,7 @@ msapAtmPlcyOamPeriodicLoopback   OBJECT-TYPE
 msapAtmPlcyTblLastChgd           OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of msapAtmPlcyTblLastChgd indicates the sysUpTime at the
          time of the last modification of msapAtmPlcyTable.
@@ -19644,7 +19195,7 @@ sapEgrEncapGrpMemberLastChanged  OBJECT-TYPE
 sapAtmPppStatsTable              OBJECT-TYPE
     SYNTAX      SEQUENCE OF SapAtmPppStatsEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "A table that contains ATM SAP PPP statistics information."
     ::= { tmnxSapObjs 127 }
@@ -19652,7 +19203,7 @@ sapAtmPppStatsTable              OBJECT-TYPE
 sapAtmPppStatsEntry              OBJECT-TYPE
     SYNTAX      SapAtmPppStatsEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "PPP statistics about a specific ATM SAP."
     INDEX       {
@@ -19672,7 +19223,7 @@ SapAtmPppStatsEntry              ::= SEQUENCE
 sapAtmPppStatsRxPackets          OBJECT-TYPE
     SYNTAX      Counter32
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sapAtmPppStatsRxPackets indicates the number of PPP
          packets received on this ATM SAP since the last re-initialization of
@@ -19683,7 +19234,7 @@ sapAtmPppStatsRxPackets          OBJECT-TYPE
 sapAtmPppStatsRxDropped          OBJECT-TYPE
     SYNTAX      Counter32
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sapAtmPppStatsRxDropped indicates the number of PPP
          packets dropped on this ATM SAP since the last re-initialization of
@@ -19694,7 +19245,7 @@ sapAtmPppStatsRxDropped          OBJECT-TYPE
 sapAtmPppStatsTxPackets          OBJECT-TYPE
     SYNTAX      Counter32
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sapAtmPppStatsTxPackets indicates the number of PPP
          packets transmitted on this ATM SAP since the last re-initialization
@@ -22737,7 +22288,20 @@ SapExtEntry                      ::= SEQUENCE
     sapIngressIPCriteriaOvrTag       Integer32,
     sapIngressIPv6CriteriaOvrTag     Integer32,
     sapEgrVlanQosPlcyPortRedirect    TruthValue,
-    sapIngressIpFilterPair           TruthValue
+    sapIngressIpFilterPair           TruthValue,
+    sapQosSharedPolicerName          TNamedItemOrEmpty,
+    sapEgressQosAggRatePIRPercent    Unsigned32,
+    sapEgressQosAggRateCIRPercent    Unsigned32,
+    sapEgressQosAggRateType          TRateType,
+    sapEgrAggRateLimitHi             TmnxQosRateHigh32,
+    sapEgrAggRateLimit               TmnxQosRateLow32,
+    sapEgressVirtualPort             TNamedItemOrEmpty,
+    sapEgrShrdQAggRateBurstLmt       Integer32,
+    sapEgressLatencyBudget           Unsigned32,
+    sapIngressFilterSet              TNamedItemOrEmpty,
+    sapIngressAggregatePolicerMBS    Integer32,
+    sapIngressAggregatePlcrAlgoType  INTEGER,
+    sapEgressQosSinkExcessBW         TruthValue
 }
 
 sapExtLastChanged                OBJECT-TYPE
@@ -22902,12 +22466,15 @@ sapIngressQinqTranslation        OBJECT-TYPE
     ::= { sapExtEntry 13 }
 
 sapIngressQinqInnerTranslationId OBJECT-TYPE
-    SYNTAX      Integer32 (-1 | 0..4094)
+    SYNTAX      Integer32 (-1 | 0..4095)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
         "The value of sapIngressQinqInnerTranslationId specifies the inner
-         ingress vlan translation for two service delimiting vlan values."
+         ingress vlan translation for two service delimiting vlan values.
+
+         To configure a * c-tag, the value of sapIngressQinqInnerTranslationId
+         should be set to 4095."
     DEFVAL      { -1 }
     ::= { sapExtEntry 14 }
 
@@ -23068,7 +22635,7 @@ sapIngressAggregatePolicerRateHi OBJECT-TYPE
     ::= { sapExtEntry 82 }
 
 sapIngressAggregatePolicerRateLo OBJECT-TYPE
-    SYNTAX      TmnxLow32 (144..1000000000 | 4294967295)
+    SYNTAX      TmnxLow32 (1..1000000000 | 4294967295)
     UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
@@ -23089,7 +22656,7 @@ sapIngressAggregatePolicerRateLo OBJECT-TYPE
 sapIngressAggregatePolicerBurst  OBJECT-TYPE
     SYNTAX      Integer32 (-1 | 1..33292)
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sapIngressAggregatePolicerBurst specifies the burst to be
          used. The value -1 means maximum burst."
@@ -23232,6 +22799,176 @@ sapIngressIpFilterPair           OBJECT-TYPE
     DEFVAL      { false }
     ::= { sapExtEntry 91 }
 
+sapQosSharedPolicerName          OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sapQosSharedPolicerName specifies the row
+         index in the tSharedPolicersPolicerTable corresponding to this shared
+         policer."
+    DEFVAL      { "" }
+    ::= { sapExtEntry 92 }
+
+sapEgressQosAggRatePIRPercent    OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The administrative PIR percentage, in centipercent. An
+         'inconsistentValue' error is returned if sapEgressQosAggRatePIRPercent
+         is set to non-default value when the object sapEgressQosAggRateType is
+         set to 'kbps'."
+    DEFVAL      { 10000 }
+    ::= { sapExtEntry 93 }
+
+sapEgressQosAggRateCIRPercent    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The administrative CIR percentage, in centipercent. An
+         'inconsistentValue' error is returned if sapEgressQosAggRateCIRPercent
+         is set to non-default value when the object sapEgressQosAggRateType is
+         set to 'kbps'."
+    DEFVAL      { 0 }
+    ::= { sapExtEntry 94 }
+
+sapEgressQosAggRateType          OBJECT-TYPE
+    SYNTAX      TRateType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sapEgressQosAggRateType specifies the type of Egress
+         Queue rate.
+
+         When the value of the object is set to 'kbps', the ingresss queue
+         rates are specified in kbps. The objects sapEgressQosAggRateCIRPercent
+         and sapEgressQosAggRatePIRPercent will be set to their default values.
+
+         When the value of the object is set to 'percent', the egress queue
+         rates are specified in percentage. The objects
+         sapEgressQosAggRateCIRPercent and sapEgressQosAggRatePIRPercent will
+         be set to their default values."
+    DEFVAL      { kbps }
+    ::= { sapExtEntry 95 }
+
+sapEgrAggRateLimitHi             OBJECT-TYPE
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sapEgrAggRateLimitHi specifies the upper 32 bits of the
+         maximum total rate of all egress queues for this SAP.
+
+         This value should always be set along with sapEgrAggRateLimit,
+         otherwise an 'inconsistentValue' error is returned.
+
+         When the value of sapEgrAggRateLimitHi along with the value of
+         sapEgrAggRateLimit is set to 4294967295 (0xFFFFFFFF), rate for this
+         SAP indicates maximum total rate of all egress queues."
+    DEFVAL      { 4294967295 }
+    ::= { sapExtEntry 96 }
+
+sapEgrAggRateLimit               OBJECT-TYPE
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sapEgrAggRateLimit specifies the maximum total rate of
+         all egress queues for this SAP. The value of 4294967295 (0xFFFFFFFF)
+         means that there is no limit.
+
+         When the value of sapEgrAggRateLimitHi along with the value of
+         sapEgrAggRateLimit is set to 4294967295 (0xFFFFFFFF), rate for this
+         SAP indicates maximum total rate of all egress queues."
+    DEFVAL      { 4294967295 }
+    ::= { sapExtEntry 97 }
+
+sapEgressVirtualPort             OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sapEgressVirtualPort specifies the name of the virtual
+         port that is shaping and parenting on this service sap."
+    DEFVAL      { "" }
+    ::= { sapExtEntry 98 }
+
+sapEgrShrdQAggRateBurstLmt       OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 2)
+    UNITS       "kilobytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sapEgrShrdQAggRateBurstLmt specifies the burst limit  for
+         vlan qos aggregate shaper.
+
+         The value of -1 denotes the default burst limit."
+    DEFVAL      { -1 }
+    ::= { sapExtEntry 99 }
+
+sapEgressLatencyBudget           OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..1000000)
+    UNITS       "microseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sapEgressLatencyBudget specifies the delay-budget for the
+         given SAP.
+
+         When the value of sapEgressLatencyBudget is set to 0, the latency
+         budget for the given SAP is not configured."
+    DEFVAL      { 0 }
+    ::= { sapExtEntry 100 }
+
+sapIngressFilterSet              OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sapIngressFilterSet specifies
+         the filter-set to be used for configuration of ip,
+          ipv6 and mac filter on SAP ingress."
+    DEFVAL      { ''H }
+    ::= { sapExtEntry 101 }
+
+sapIngressAggregatePolicerMBS    OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 1..33292)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sapIngressAggregatePolicerMBS specifies the mbs to be
+         used. The value -1 means maximum mbs."
+    DEFVAL      { -1 }
+    ::= { sapExtEntry 102 }
+
+sapIngressAggregatePlcrAlgoType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        trtcmDs        (1),
+        trtcmDsCoupled (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sapIngressAggregatePlcrAlgoType specifies the policer
+         mode."
+    DEFVAL      { trtcmDsCoupled }
+    ::= { sapExtEntry 103 }
+
+sapEgressQosSinkExcessBW         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable the shared queue sink excess bandwidth."
+    DEFVAL      { false }
+    ::= { sapExtEntry 104 }
+
 sapDcpFpStaticStatTable          OBJECT-TYPE
     SYNTAX      SEQUENCE OF SapDcpFpStaticStatEntry
     MAX-ACCESS  not-accessible
@@ -23269,7 +23006,9 @@ SapDcpFpStaticStatEntry          ::= SEQUENCE
     sapDcpFpStaticExcdCountHi        Counter32,
     sapDcpFpStaticExcdCountLo        Counter32,
     sapDcpFpStaticHoldDown           TmnxDistCpuProtActionDuration,
-    sapDcpFpStaticDetectionTime      Unsigned32
+    sapDcpFpStaticDetectionTime      Unsigned32,
+    sapDcpFpStaticTotalExcdCount     Counter64,
+    sapDcpFpStaticExtCnfrmStateCount Counter32
 }
 
 sapDcpFpStaticPlcrName           OBJECT-TYPE
@@ -23338,6 +23077,24 @@ sapDcpFpStaticDetectionTime      OBJECT-TYPE
          remaining for a given static-policer."
     ::= { sapDcpFpStaticStatEntry 7 }
 
+sapDcpFpStaticTotalExcdCount     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapDcpFpStaticTotalExcdCount indicates the total number
+         of packets exceeding the policing parameters."
+    ::= { sapDcpFpStaticStatEntry 8 }
+
+sapDcpFpStaticExtCnfrmStateCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapDcpFpStaticExtCnfrmStateCount indicates the total
+         number of transition of the policer to the exceed state."
+    ::= { sapDcpFpStaticStatEntry 9 }
+
 sapDcpFpDynStatTable             OBJECT-TYPE
     SYNTAX      SEQUENCE OF SapDcpFpDynStatEntry
     MAX-ACCESS  not-accessible
@@ -23376,7 +23133,9 @@ SapDcpFpDynStatEntry             ::= SEQUENCE
     sapDcpFpDynExcdCountLo           Counter32,
     sapDcpFpDynHoldDown              TmnxDistCpuProtActionDuration,
     sapDcpFpDynDetectionTime         Unsigned32,
-    sapDcpFpDynAllocated             TruthValue
+    sapDcpFpDynAllocated             TruthValue,
+    sapDcpFpDynTotalExcdCount        Counter64,
+    sapDcpFpDynExitConformStateCount Counter32
 }
 
 sapDcpFpProtocol                 OBJECT-TYPE
@@ -23456,6 +23215,24 @@ sapDcpFpDynAllocated             OBJECT-TYPE
          has been allocated for this protocol."
     ::= { sapDcpFpDynStatEntry 8 }
 
+sapDcpFpDynTotalExcdCount        OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapDcpFpDynTotalExcdCount indicates the total number of
+         packets exceeding the policing parameters."
+    ::= { sapDcpFpDynStatEntry 9 }
+
+sapDcpFpDynExitConformStateCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapDcpFpDynExitConformStateCount indicates the total
+         number of transition of the policer to the exceed state."
+    ::= { sapDcpFpDynStatEntry 10 }
+
 sapDcpFpLocMonStatTable          OBJECT-TYPE
     SYNTAX      SEQUENCE OF SapDcpFpLocMonStatEntry
     MAX-ACCESS  not-accessible
@@ -23492,7 +23269,9 @@ SapDcpFpLocMonStatEntry          ::= SEQUENCE
     sapDcpFpLocMonExcdCount          Counter64,
     sapDcpFpLocMonExcdCountHi        Counter32,
     sapDcpFpLocMonExcdCountLo        Counter32,
-    sapDcpFpLocMonAllDynAlloc        TruthValue
+    sapDcpFpLocMonAllDynAlloc        TruthValue,
+    sapDcpFpLocMonTotalExcdCount     Counter64,
+    sapDcpFpLocMonExtCnfrmStateCount Counter32
 }
 
 sapDcpFpLocMonPlcrName           OBJECT-TYPE
@@ -23551,6 +23330,24 @@ sapDcpFpLocMonAllDynAlloc        OBJECT-TYPE
          dynamic policers associated with this local-monitor have been
          allocated."
     ::= { sapDcpFpLocMonStatEntry 6 }
+
+sapDcpFpLocMonTotalExcdCount     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapDcpFpLocMonTotalExcdCount indicates the total number
+         of packets exceeding the policing parameters."
+    ::= { sapDcpFpLocMonStatEntry 7 }
+
+sapDcpFpLocMonExtCnfrmStateCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapDcpFpLocMonExtCnfrmStateCount indicates the total
+         number of transition of the policer to the exceed state."
+    ::= { sapDcpFpLocMonStatEntry 8 }
 
 sapNotificationObjects           OBJECT IDENTIFIER ::= { tmnxSapObjs 151 }
 
@@ -23674,7 +23471,9 @@ SapTlsDhcp6InfoEntry             ::= SEQUENCE
     sapTlsDhcp6Snoop                 TmnxEnabledDisabled,
     sapTlsDhcp6InterfaceId           INTEGER,
     sapTlsDhcp6RemoteId              INTEGER,
-    sapTlsDhcp6RemoteIdString        DisplayString
+    sapTlsDhcp6RemoteIdString        DisplayString,
+    sapTlsDhcp6LdraAdminState        TmnxEnabledDisabled,
+    sapTlsDhcp6InterfaceType         INTEGER
 }
 
 sapTlsDhcp6AdminState            OBJECT-TYPE
@@ -23686,7 +23485,10 @@ sapTlsDhcp6AdminState            OBJECT-TYPE
          enabled/disabled state of all DHCP6 related actions on this SAP.
 
          The value 'disabled' allows the user to configure individual DHCP6
-         commands but administratively disables them."
+         commands but administratively disables them.
+
+         This object is currently not in use, since LDRA has its own state. It
+         is kept for future purposes."
     DEFVAL      { disabled }
     ::= { sapTlsDhcp6InfoEntry 1 }
 
@@ -23704,7 +23506,7 @@ sapTlsDhcp6Description           OBJECT-TYPE
 sapTlsDhcp6Snoop                 OBJECT-TYPE
     SYNTAX      TmnxEnabledDisabled
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of the object sapTlsDhcp6Snoop specifies the
          enabled/disabled state for DHCP6 snooping on this SAP. Note that in
@@ -23715,6 +23517,7 @@ sapTlsDhcp6Snoop                 OBJECT-TYPE
 
 sapTlsDhcp6InterfaceId           OBJECT-TYPE
     SYNTAX      INTEGER {
+        none           (0),
         asciiTuple     (1),
         vlanAsciiTuple (2)
     }
@@ -23722,40 +23525,43 @@ sapTlsDhcp6InterfaceId           OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of the object sapTlsDhcp6InterfaceId specifies
-         the content of the interface id option (18):
-         - 'asciiTuple'    the ASCII-encoded concatenated tuple
-                           consisting of the
+         the content of the interface id option (18) and is a
+         mandatory parameter for LDRA:
+         - 'none'           prevents LDRA from getting enabled, when
+                            interface-type is client-facing.
+         - 'asciiTuple'     the ASCII-encoded concatenated tuple
+                            consisting of the
                               - access-node-identifier
                               - service-id
                               - SAP ID
-                           is used.
+                            is used.
          - 'vlanAsciiTuple' the format will include VLAN ID and dot1p
-                           bits in addition to what is included in
-                           ascii-tuple already. The format is
-                           supported on dot1q and qinq encapsulated
-                           ports only."
+                            bits in addition to what is included in
+                            ascii-tuple already. The format is
+                            supported on dot1q and qinq encapsulated
+                            ports only."
     REFERENCE
         "Lightweight DHCPv6 Relay Agent
          draft-ietf-dhc-dhcpv6-ldra-03 paragraph 5.3.2"
-    DEFVAL      { asciiTuple }
+    DEFVAL      { none }
     ::= { sapTlsDhcp6InfoEntry 4 }
 
 sapTlsDhcp6RemoteId              OBJECT-TYPE
     SYNTAX      INTEGER {
-        none      (1),
-        mac       (2),
-        remote-id (3)
+        none     (1),
+        mac      (2),
+        remoteId (3)
     }
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of the object sapTlsDhcp6RemoteId specifies
          the presence and contents of the remote-id option (37):
-         - 'none'      the remote-id option will not be included
-                       in the RELAY-FORW (12) message.
-         - 'mac'       the MAC address of the remote end.
-         - 'remote-id' the value of the object
-                       sapTlsDhcp6RemoteIdString."
+         - 'none'     the remote-id option will not be included
+                      in the RELAY-FORW (12) message.
+         - 'mac'      the MAC address of the remote end.
+         - 'remoteId' the value of the object
+                      sapTlsDhcp6RemoteIdString."
     REFERENCE
         "RFC 4649 paragraph 3"
     DEFVAL      { none }
@@ -23773,6 +23579,31 @@ sapTlsDhcp6RemoteIdString        OBJECT-TYPE
          sapTlsDhcp6RemoteId has a value of 'remote-id'."
     DEFVAL      { "" }
     ::= { sapTlsDhcp6InfoEntry 6 }
+
+sapTlsDhcp6LdraAdminState        OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sapTlsDhcp6LdraAdminState specifies the
+         enabled/disabled state for DHCP6 snooping on this SAP."
+    DEFVAL      { disabled }
+    ::= { sapTlsDhcp6InfoEntry 7 }
+
+sapTlsDhcp6InterfaceType         OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none          (0),
+        clientFacing  (1),
+        networkFacing (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sapTlsDhcp6InterfaceType specifies the facing
+         for DHCP6 snooping on this SAP. This object is a mandatory parameter
+         for LDRA. The value 'none' prevents LDRA from getting enabled."
+    DEFVAL      { none }
+    ::= { sapTlsDhcp6InfoEntry 8 }
 
 sapTlsStaticIsidTable            OBJECT-TYPE
     SYNTAX      SEQUENCE OF SapTlsStaticIsidEntry
@@ -24011,7 +23842,17 @@ TmnxSapTlsExInfoEntry            ::= SEQUENCE
     tmnxSapTlsExEgressDestMac        MacAddress,
     sapTlsDisableSendBvplsEvpnFlush  TruthValue,
     sapTlsAutoLrnMacProtectExcList   TNamedItemOrEmpty,
-    sapTlsExBgpVplsMhVeId            TmnxVeId
+    sapTlsExBgpVplsMhVeId            TmnxVeId,
+    sapTlsAutoLrnMacPrtctExcListOper TNamedItemOrEmpty,
+    sapTlsFdbProtectedMacAddrRec     MacAddress,
+    sapTlsFdbProtMacAddrRecLastChgd  TimeStamp,
+    sapTlsExtPbbProtectedMacAddrRec  MacAddress,
+    sapTlsExtPbbProtMacAddrRecLstChg TimeStamp,
+    sapTlsExtTableHighUtilization    TruthValue,
+    sapTlsNonBlockMoveRateXMacAddr   MacAddress,
+    sapTlsNoBlckMvRateXMacAddrLstChg TimeStamp,
+    sapTlsMoveRateExceededMacAddr    MacAddress,
+    sapTlsMvRateExceedMacAddrLstChgd TimeStamp
 }
 
 tmnxSapTlsExLastChanged          OBJECT-TYPE
@@ -24200,6 +24041,97 @@ sapTlsExBgpVplsMhVeId            OBJECT-TYPE
          identifier range."
     DEFVAL      { -1 }
     ::= { tmnxSapTlsExInfoEntry 13 }
+
+sapTlsAutoLrnMacPrtctExcListOper OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapTlsAutoLrnMacPrtctExcListOper specifies  the
+         operational mac-list name which contains the MAC addresses  to be
+         excluded from auto learn mac protect."
+    ::= { tmnxSapTlsExInfoEntry 14 }
+
+sapTlsFdbProtectedMacAddrRec     OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sapTlsFdbProtectedMacAddrRec specifies the protected MAC address
+         detected."
+    ::= { tmnxSapTlsExInfoEntry 15 }
+
+sapTlsFdbProtMacAddrRecLastChgd  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapTlsFdbProtMacAddrRecLastChgd indicates the timestamp
+            of last change to sapTlsFdbProtectedMacAddrRec."
+    ::= { tmnxSapTlsExInfoEntry 16 }
+
+sapTlsExtPbbProtectedMacAddrRec  OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sapTlsExtPbbProtectedMacAddrRec specifies the PBB MAC address
+         received."
+    ::= { tmnxSapTlsExInfoEntry 17 }
+
+sapTlsExtPbbProtMacAddrRecLstChg OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapTlsExtPbbProtMacAddrRecLstChg indicates the timestamp
+            of last change to sapTlsExtPbbProtectedMacAddrRec."
+    ::= { tmnxSapTlsExInfoEntry 18 }
+
+sapTlsExtTableHighUtilization    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sapTlsExtTableHighUtilization specifies whether the utilization of
+         the MFIB table is high or low."
+    ::= { tmnxSapTlsExInfoEntry 19 }
+
+sapTlsNonBlockMoveRateXMacAddr   OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sapTlsNonBlockMoveRateXMacAddr specifies the non-blocking exceeded
+         MAC address received."
+    ::= { tmnxSapTlsExInfoEntry 20 }
+
+sapTlsNoBlckMvRateXMacAddrLstChg OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapTlsNoBlckMvRateXMacAddrLstChg indicates the timestamp
+            of last change to sapTlsNonBlockMoveRateXMacAddr."
+    ::= { tmnxSapTlsExInfoEntry 21 }
+
+sapTlsMoveRateExceededMacAddr    OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sapTlsMoveRateExceededMacAddr specifies the exceeded MAC address
+         received."
+    ::= { tmnxSapTlsExInfoEntry 22 }
+
+sapTlsMvRateExceedMacAddrLstChgd OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapTlsMvRateExceedMacAddrLstChgd indicates the timestamp
+            of last change to sapTlsMoveRateExceededMacAddr."
+    ::= { tmnxSapTlsExInfoEntry 23 }
 
 sapLagPerLinkHashTableLastChgd   OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -25758,7 +25690,7 @@ sapL2tpv3AdminState              OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The sapL2tpv3AdminState specifies the adminstrative state of this
+        "The sapL2tpv3AdminState specifies the administrative state of this
          entry."
     DEFVAL      { outOfService }
     ::= { sapL2tpv3Entry 8 }
@@ -26118,7 +26050,8 @@ tmnxSapOperFlags                 OBJECT-TYPE
         l2tpv3TunnelDown          (36),
         labelStackLimitExceeded   (37),
         sapIngQGrpRedirMismatch   (38),
-        sapEgrQGrpRedirMismatch   (39)
+        sapEgrQGrpRedirMismatch   (39),
+        reserved40                (40)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -26249,7 +26182,8 @@ TmnxIpTnlIPsecStatsEntry         ::= SEQUENCE
     tmnxIpTnlIPsecStatIsakmpEncrAlg  TmnxEncrAlgorithm,
     tmnxIpTnlIPsecStatIsakmpPfsDhGp  TmnxIkePolicyDHGroupOrZero,
     tmnxIpTnlIPsecStatIkeTranPrfAlg  INTEGER,
-    tmnxIpTnlIPsecMatchTrustAnchor   TNamedItemOrEmpty
+    tmnxIpTnlIPsecMatchTrustAnchor   TNamedItemOrEmpty,
+    tmnxIpTnlIPsecStatPpkNegotiated  TruthValue
 }
 
 tmnxIpTnlIPsecIsakmpState        OBJECT-TYPE
@@ -26458,6 +26392,15 @@ tmnxIpTnlIPsecMatchTrustAnchor   OBJECT-TYPE
          matched Certificate-Authority Profile name associated with this SAP Ip
          tunnel certificate."
     ::= { tmnxIpTnlIPsecStatsEntry 21 }
+
+tmnxIpTnlIPsecStatPpkNegotiated  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIpTnlIPsecStatPpkNegotiated indicates whether the
+         Post-quantum Preshared Key is negotiated for this IPsec tunnel."
+    ::= { tmnxIpTnlIPsecStatsEntry 22 }
 
 tmnxIpTnlIPsecSATable            OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxIpTnlIPsecSAEntry
@@ -26853,7 +26796,7 @@ tmnxSapSubMonOperGrpLastCh       OBJECT-TYPE
     ::= { tmnxSapSubMonOperGrpEntry 2 }
 
 tmnxSapSubMonOperGrpHlthDrop     OBJECT-TYPE
-    SYNTAX      Unsigned32 (1..255)
+    SYNTAX      Unsigned32 (1..100)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -26871,6 +26814,778 @@ tmnxSapSubMonOperGrpActHlthDrop  OBJECT-TYPE
         "The value of tmnxSapSubMonOperGrpActHlthDrop indicates the actual
          health drop."
     ::= { tmnxSapSubMonOperGrpEntry 4 }
+
+tmnxSapMRtCpeChkTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSapMRtCpeChkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSapMRtCpeChkTable contains objects to configure CPE checking
+         for SAP static host managed routes."
+    ::= { tmnxSapObjs 189 }
+
+tmnxSapMRtCpeChkEntry            OBJECT-TYPE
+    SYNTAX      TmnxSapMRtCpeChkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents CPE check configuration for a specific
+         managed route.
+
+         The creation of a row in this table starts the CPE reachability
+         checking."
+    INDEX       {
+        svcId,
+        sapPortId,
+        sapEncapValue,
+        tmnxSapMRtCpeChkHostAddrType,
+        tmnxSapMRtCpeChkHostAddr,
+        tmnxSapMRtCpeChkHostMacAddress,
+        tmnxSapMRtCpeChkMRtAddrType,
+        tmnxSapMRtCpeChkMRtAddr,
+        tmnxSapMRtCpeChkMRtPrefixLen
+    }
+    ::= { tmnxSapMRtCpeChkTable 1 }
+
+TmnxSapMRtCpeChkEntry            ::= SEQUENCE
+{
+    tmnxSapMRtCpeChkHostAddrType     InetAddressType,
+    tmnxSapMRtCpeChkHostAddr         InetAddress,
+    tmnxSapMRtCpeChkHostMacAddress   MacAddress,
+    tmnxSapMRtCpeChkMRtAddrType      InetAddressType,
+    tmnxSapMRtCpeChkMRtAddr          InetAddress,
+    tmnxSapMRtCpeChkMRtPrefixLen     InetAddressPrefixLength,
+    tmnxSapMRtCpeChkRowStatus        RowStatus,
+    tmnxSapMRtCpeChkLastMgmtChange   TimeStamp,
+    tmnxSapMRtCpeChkAddrType         InetAddressType,
+    tmnxSapMRtCpeChkAddr             InetAddress,
+    tmnxSapMRtCpeChkInterval         Unsigned32,
+    tmnxSapMRtCpeChkDropCnt          Unsigned32,
+    tmnxSapMRtCpeChkTimeout          Unsigned32,
+    tmnxSapMRtCpeChkPaddingSize      Unsigned32,
+    tmnxSapMRtCpeChkEnableLog        TruthValue,
+    tmnxSapMRtCpeChkFailMetric       Unsigned32,
+    tmnxSapMRtCpeChkFailPreference   Integer32,
+    tmnxSapMRtCpeChkFailTag          Unsigned32,
+    tmnxSapMRtCpeChkSrcAddrType      InetAddressType,
+    tmnxSapMRtCpeChkSrcAddr          InetAddress,
+    tmnxSapMRtCpeChkFailWithdraw     TruthValue
+}
+
+tmnxSapMRtCpeChkHostAddrType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkHostAddrType specifies the address type
+         of sapStaticHostMRtAddr."
+    ::= { tmnxSapMRtCpeChkEntry 1 }
+
+tmnxSapMRtCpeChkHostAddr         OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkHostAddr specifies the IP address of the
+         static host."
+    ::= { tmnxSapMRtCpeChkEntry 2 }
+
+tmnxSapMRtCpeChkHostMacAddress   OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSapMRtCpeChkHostMacAddress specifies the
+         MAC address associated with this static host. The value 0:0:0:0:0:0
+         indicates that no host MAC address is specified."
+    ::= { tmnxSapMRtCpeChkEntry 3 }
+
+tmnxSapMRtCpeChkMRtAddrType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkMRtAddrType specifies the address type of
+         tmnxSapMRtCpeChkMRtAddr.
+
+         It must always have the same value as tmnxSapMRtCpeChkHostAddrType."
+    ::= { tmnxSapMRtCpeChkEntry 4 }
+
+tmnxSapMRtCpeChkMRtAddr          OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkMRtAddr indicates the IP address of the
+         managed route."
+    ::= { tmnxSapMRtCpeChkEntry 5 }
+
+tmnxSapMRtCpeChkMRtPrefixLen     OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength (0..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkMRtPrefixLen indicates the prefix length
+         of the subnet associated with tmnxSapMRtCpeChkMRtAddr."
+    ::= { tmnxSapMRtCpeChkEntry 6 }
+
+tmnxSapMRtCpeChkRowStatus        OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkRowStatus controls the creation and
+         deletion of rows in this table."
+    ::= { tmnxSapMRtCpeChkEntry 7 }
+
+tmnxSapMRtCpeChkLastMgmtChange   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkLastMgmtChange indicates the value of
+         sysUpTime at the time of the last management change of any writable
+         object of this row."
+    ::= { tmnxSapMRtCpeChkEntry 8 }
+
+tmnxSapMRtCpeChkAddrType         OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkAddrType specifies the address type of
+         tmnxSapMRtCpeChkAddr address.
+
+         If the value of tmnxSapMRtCpeChkAddrType is equal to 'unknown', the
+         system uses the IP address of the static host."
+    ::= { tmnxSapMRtCpeChkEntry 9 }
+
+tmnxSapMRtCpeChkAddr             OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkAddr specifies the IP address of the
+         target CPE device. When this object is configured, ICMP pings will be
+         sent to this target IP address to determine CPE connectivity and
+         whether this static route should be active.
+
+         If the value of tmnxSapMRtCpeChkAddr is empty, the system uses the IP
+         address of the static host."
+    ::= { tmnxSapMRtCpeChkEntry 10 }
+
+tmnxSapMRtCpeChkInterval         OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkInterval specifies the interval, in
+         seconds, between ICMP pings to the target CPE IP address,
+         tmnxSapMRtCpeChkAddr."
+    DEFVAL      { 1 }
+    ::= { tmnxSapMRtCpeChkEntry 11 }
+
+tmnxSapMRtCpeChkDropCnt          OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkDropCnt specifies the number of
+         consecutive ping replies that must be missed before concluding the CPE
+         is down. If the CPE is determined to be down, the associated static
+         route will be deactivated."
+    DEFVAL      { 3 }
+    ::= { tmnxSapMRtCpeChkEntry 12 }
+
+tmnxSapMRtCpeChkTimeout          OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkTimeout specifies the time interval the
+         system waits for a reply to a specific ping before concluding the ping
+         is missed."
+    DEFVAL      { 1 }
+    ::= { tmnxSapMRtCpeChkEntry 13 }
+
+tmnxSapMRtCpeChkPaddingSize      OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..16384)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkPaddingSize specifies the padding size
+         for the ICMP ping test packet of the CPE connectivity check."
+    DEFVAL      { 56 }
+    ::= { tmnxSapMRtCpeChkEntry 14 }
+
+tmnxSapMRtCpeChkEnableLog        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkEnableLog specifies whether to enable the
+         logging of transitions connected and disconnected state based on the
+         CPE connectivity check.
+
+         A value of 'true (1)' indicates that logging should be enabled."
+    DEFVAL      { false }
+    ::= { tmnxSapMRtCpeChkEntry 15 }
+
+tmnxSapMRtCpeChkFailMetric       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkFailMetric specifies the route metric in
+         case the CPE check failed. A value of zero specifies there is no
+         override of the route metric in case the CPE check failed."
+    DEFVAL      { 0 }
+    ::= { tmnxSapMRtCpeChkEntry 16 }
+
+tmnxSapMRtCpeChkFailPreference   OBJECT-TYPE
+    SYNTAX      Integer32 (-1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkFailPreference specifies the route
+         preference in case the CPE check failed. A value of minus one
+         specifies there is no override of the route preference in case the CPE
+         check failed."
+    DEFVAL      { -1 }
+    ::= { tmnxSapMRtCpeChkEntry 17 }
+
+tmnxSapMRtCpeChkFailTag          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkFailTag specifies the route tag in case
+         the CPE check failed. A value of zero specifies there is no override
+         of the route tag in case the CPE check failed."
+    DEFVAL      { 0 }
+    ::= { tmnxSapMRtCpeChkEntry 18 }
+
+tmnxSapMRtCpeChkSrcAddrType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkSrcAddrType specifies the address type of
+         tmnxSapMRtCpeChkSrcAddr address."
+    ::= { tmnxSapMRtCpeChkEntry 19 }
+
+tmnxSapMRtCpeChkSrcAddr          OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkSrcAddr specifies the source IP address
+         to be used in the ICMP messages.
+
+         When a value for tmnxSapMRtCpeChkSrcAddr is not specified, the system
+         uses the system address of the appropriate address family."
+    DEFVAL      { ''H }
+    ::= { tmnxSapMRtCpeChkEntry 20 }
+
+tmnxSapMRtCpeChkFailWithdraw     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkFailWithdraw specifies  if the route
+         entry is withdrawn in case the CPE check failed.
+
+         A value of 'true' is mutually exclusive with non default values of the
+         objects tmnxSapMRtCpeChkFailTag, tmnxSapMRtCpeChkFailPreference or
+         tmnxSapMRtCpeChkFailMetric."
+    DEFVAL      { false }
+    ::= { tmnxSapMRtCpeChkEntry 21 }
+
+tmnxSapMRtCpeChkStatTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSapMRtCpeChkStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSapMRtCpeChkStatTable contains state and statistics
+         information about CPE checking for SAP static host managed routes.
+
+         The system automatically creates or deletes a row in this table when a
+         row is created or deleted in the tmnxSapMRtCpeChkTable."
+    ::= { tmnxSapObjs 190 }
+
+tmnxSapMRtCpeChkStatEntry        OBJECT-TYPE
+    SYNTAX      TmnxSapMRtCpeChkStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents CPE check state and statistics information
+         of a specific managed route."
+    AUGMENTS    { tmnxSapMRtCpeChkEntry }
+    ::= { tmnxSapMRtCpeChkStatTable 1 }
+
+TmnxSapMRtCpeChkStatEntry        ::= SEQUENCE
+{
+    tmnxSapMRtCpeChkUpTime           TimeTicks,
+    tmnxSapMRtCpeChkInPktCnt         Counter32,
+    tmnxSapMRtCpeChkOutPktCnt        Counter32,
+    tmnxSapMRtCpeChkDownTrans        Gauge32,
+    tmnxSapMRtCpeChkUpTrans          Gauge32,
+    tmnxSapMRtCpeChkTTL              Unsigned32,
+    tmnxSapMRtCpeChkStatus           INTEGER
+}
+
+tmnxSapMRtCpeChkUpTime           OBJECT-TYPE
+    SYNTAX      TimeTicks
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkUpTime indicates
+         how long  the connection to the CPE has been up."
+    ::= { tmnxSapMRtCpeChkStatEntry 1 }
+
+tmnxSapMRtCpeChkInPktCnt         OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkInPktCnt indicates the number of echo
+         reply packets received."
+    ::= { tmnxSapMRtCpeChkStatEntry 2 }
+
+tmnxSapMRtCpeChkOutPktCnt        OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkOutPktCnt indicates the number of echo
+         request packets sent."
+    ::= { tmnxSapMRtCpeChkStatEntry 3 }
+
+tmnxSapMRtCpeChkDownTrans        OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkDownTrans indicates the number of times
+         the CPE has transitioned to the unavailable state."
+    ::= { tmnxSapMRtCpeChkStatEntry 4 }
+
+tmnxSapMRtCpeChkUpTrans          OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkUpTrans indicates the number of times the
+         CPE has transitioned to the available state."
+    ::= { tmnxSapMRtCpeChkStatEntry 5 }
+
+tmnxSapMRtCpeChkTTL              OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapMRtCpeChkTTL indicates the time before the CPE
+         will be declared down.
+
+         Upon receipt of an echo reply, it is set to the value of
+         tmnxSapMRtCpeChkInterval * tmnxSapMRtCpeChkDropCnt and is decremented
+         by 1 every second."
+    ::= { tmnxSapMRtCpeChkStatEntry 6 }
+
+tmnxSapMRtCpeChkStatus           OBJECT-TYPE
+    SYNTAX      INTEGER {
+        reachable   (1),
+        unreachable (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSapMRtCpeChkStatus indicates if the CPE
+         associated with the address tmnxSapMRtCpeChkAddr is reachable."
+    ::= { tmnxSapMRtCpeChkStatEntry 7 }
+
+tmnxSapEgrQosAggShaperTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSapEgrQosAggShaperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tmnxSapEgrQosAggShaperTable has an entry for each sap  port
+         that makes use of an egress aggregate shaper. It gives state
+         information about the corresponding aggregate shaper."
+    ::= { tmnxSapObjs 191 }
+
+tmnxSapEgrQosAggShaperEntry      OBJECT-TYPE
+    SYNTAX      TmnxSapEgrQosAggShaperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents an aggregate shaper used by a sap."
+    INDEX       {
+        svcId,
+        sapPortId,
+        sapEncapValue,
+        tmnxSapEgrQosAggShapPort
+    }
+    ::= { tmnxSapEgrQosAggShaperTable 1 }
+
+TmnxSapEgrQosAggShaperEntry      ::= SEQUENCE
+{
+    tmnxSapEgrQosAggShapPort         TmnxPortID,
+    tmnxSapEgrQosAggShapSchedAssignd TruthValue,
+    tmnxSapEgrQosAggShapAssignedRate Counter32,
+    tmnxSapEgrQosAggShapOperRate     Counter32,
+    tmnxSapEgrQosAggShapConsumedRate Counter32,
+    tmnxSapEgrQosAggShapAvgFrameOvhd Integer32,
+    tmnxSapEgrQosAggShapAfoRealTime  TruthValue,
+    tmnxSapEgrQosAggShapSchedActive  TruthValue,
+    tmnxSapEgrQosAggShapSchedRunning TruthValue,
+    tmnxSapEgrQosAggShapInvlClassUse TruthValue,
+    tmnxSapEgrQosAggShapBurstLimit   Integer32,
+    tmnxSapEgrQosAggShapDepth        Unsigned32,
+    tmnxSapEgrQosAggShapPacketMode   TmnxPacketMode,
+    tmnxSapEgrQosAggShapOutOfDate    TruthValue,
+    tmnxSapEgrQosAggShapQSetSize     Unsigned32,
+    tmnxSapEgrQosAggShpQSetSzOvr     TruthValue
+}
+
+tmnxSapEgrQosAggShapPort         OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapEgrQosAggShapPort indicates the port to which the
+         active aggregate shaper of the subscriber is associated (the active
+         port of a lag)."
+    ::= { tmnxSapEgrQosAggShaperEntry 1 }
+
+tmnxSapEgrQosAggShapSchedAssignd OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapEgrQosAggShapSchedAssignd indicates if the
+         assigned rate of the aggregate shaper is set by a
+         hw-agg-shaper-scheduler."
+    ::= { tmnxSapEgrQosAggShaperEntry 2 }
+
+tmnxSapEgrQosAggShapAssignedRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapEgrQosAggShapAssignedRate indicates the rate that
+         is assigned by the hw-agg-shaper-scheduler, if any, or the value -1 if
+         none."
+    ::= { tmnxSapEgrQosAggShaperEntry 3 }
+
+tmnxSapEgrQosAggShapOperRate     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapEgrQosAggShapOperRate indicates the operational
+         rate of the aggregate shaper, based on hardware restrictions and based
+         on the average-frame-overhead and ATM adjustments)."
+    ::= { tmnxSapEgrQosAggShaperEntry 4 }
+
+tmnxSapEgrQosAggShapConsumedRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapEgrQosAggShapConsumedRate indicates the sum of the
+         FIR rates of the queues feeding into the aggregate shaper."
+    ::= { tmnxSapEgrQosAggShaperEntry 5 }
+
+tmnxSapEgrQosAggShapAvgFrameOvhd OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapEgrQosAggShapAvgFrameOvhd indicates the
+         encapsulation overhead of the aggregate shaper, in centipercent."
+    ::= { tmnxSapEgrQosAggShaperEntry 6 }
+
+tmnxSapEgrQosAggShapAfoRealTime  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapEgrQosAggShapAfoRealTime indicates if the average
+         frame overhead is real-time."
+    ::= { tmnxSapEgrQosAggShaperEntry 7 }
+
+tmnxSapEgrQosAggShapSchedActive  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapEgrQosAggShapSchedActive indicates if the
+         aggregate shaper is controlled by a hw-agg-shaper-scheduler."
+    ::= { tmnxSapEgrQosAggShaperEntry 8 }
+
+tmnxSapEgrQosAggShapSchedRunning OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapEgrQosAggShapSchedRunning indicates if a
+         hw-agg-shaper-scheduler is currently running, i.e. its configured
+         congestion-threshold is exceeded."
+    ::= { tmnxSapEgrQosAggShaperEntry 9 }
+
+tmnxSapEgrQosAggShapInvlClassUse OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapEgrQosAggShapInvlClassUse indicates if the
+         aggregate shaper has queues in multiple classes in same group in
+         hw-agg-shaper-scheduler."
+    ::= { tmnxSapEgrQosAggShaperEntry 10 }
+
+tmnxSapEgrQosAggShapBurstLimit   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapEgrQosAggShapBurstLimit indicates the implemented
+         burst-limit."
+    ::= { tmnxSapEgrQosAggShaperEntry 11 }
+
+tmnxSapEgrQosAggShapDepth        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapEgrQosAggShapDepth indicates the leaky-bucket
+         depth of the aggregate shaper PIR."
+    ::= { tmnxSapEgrQosAggShaperEntry 12 }
+
+tmnxSapEgrQosAggShapPacketMode   OBJECT-TYPE
+    SYNTAX      TmnxPacketMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapEgrQosAggShapPacketMode indicates the packet-mode
+         of the aggregate shaper."
+    ::= { tmnxSapEgrQosAggShaperEntry 13 }
+
+tmnxSapEgrQosAggShapOutOfDate    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapEgrQosAggShapOutOfDate indicates if the configured
+         or assigned rate of the aggregate shaper have been updated but the
+         aggregate shaper algorithm has not yet re-run, and therefore
+         tmnxSapEgrQosAggShapOperRate has not yet been recalculated."
+    ::= { tmnxSapEgrQosAggShaperEntry 14 }
+
+tmnxSapEgrQosAggShapQSetSize     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapEgrQosAggShapQSetSize indicates the for this SAP
+         at FP level when hardware aggregate shapers are enabled."
+    ::= { tmnxSapEgrQosAggShaperEntry 15 }
+
+tmnxSapEgrQosAggShpQSetSzOvr     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapEgrQosAggShpQSetSzOvr indicates if the shaper is
+         created using the override configured for sap egress policy. It will
+         be marked true if shaper is created using override and false means
+         that fp-resource-policy default-size setting is used to create the
+         shaper."
+    ::= { tmnxSapEgrQosAggShaperEntry 16 }
+
+sapTlsDhcp6StatsTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SapTlsDhcp6StatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The sapTlsDhcp6StatsTable contains DHCP6 statistics related to a TLS
+         SAP.
+
+         This table augments the sapTlsDhcpInfoTable and contains an entry for
+         each TLS SAP.
+
+         Rows in this table are created and deleted automatically by the
+         system."
+    ::= { tmnxSapObjs 192 }
+
+sapTlsDhcp6StatsEntry            OBJECT-TYPE
+    SYNTAX      SapTlsDhcp6StatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "DHCP6 statistics for a TLS SAP."
+    INDEX       {
+        svcId,
+        sapPortId,
+        sapEncapValue
+    }
+    ::= { sapTlsDhcp6StatsTable 1 }
+
+SapTlsDhcp6StatsEntry            ::= SEQUENCE
+{
+    sapTlsDhcp6StatsClntSnoopdPckts  Counter32,
+    sapTlsDhcp6StatsSrvrSnoopdPckts  Counter32,
+    sapTlsDhcp6StatsClntForwdPckts   Counter32,
+    sapTlsDhcp6StatsSrvrForwdPckts   Counter32,
+    sapTlsDhcp6StatsClntDropdPckts   Counter32,
+    sapTlsDhcp6StatsSrvrDropdPckts   Counter32
+}
+
+sapTlsDhcp6StatsClntSnoopdPckts  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sapTlsDhcp6StatsClntSnoopdPckts
+         indicates the number of  DHCP6 client packets that have
+         been snooped on this SAP."
+    ::= { sapTlsDhcp6StatsEntry 1 }
+
+sapTlsDhcp6StatsSrvrSnoopdPckts  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sapTlsDhcp6StatsSrvrSnoopdPckts indicates the
+         number of DHCP6 server packets that have been snooped on this SAP."
+    ::= { sapTlsDhcp6StatsEntry 2 }
+
+sapTlsDhcp6StatsClntForwdPckts   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sapTlsDhcp6StatsClntForwdPckts indicates the
+         number of DHCP6 client packets that have been forwarded on this SAP."
+    ::= { sapTlsDhcp6StatsEntry 3 }
+
+sapTlsDhcp6StatsSrvrForwdPckts   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sapTlsDhcp6StatsSrvrForwdPckts indicates the
+         number of DHCP6 server packets that have been forwarded on this SAP."
+    ::= { sapTlsDhcp6StatsEntry 4 }
+
+sapTlsDhcp6StatsClntDropdPckts   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sapTlsDhcp6StatsClntDropdPckts indicates the
+         number of DHCP6 client packets that have been dropped on this SAP."
+    ::= { sapTlsDhcp6StatsEntry 5 }
+
+sapTlsDhcp6StatsSrvrDropdPckts   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sapTlsDhcp6StatsSrvrDropdPckts indicates the
+         number of DHCP6 server packets that have been dropped on this SAP."
+    ::= { sapTlsDhcp6StatsEntry 6 }
+
+sapIngAggPolicerStatsTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SapIngAggPolicerStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains SAP ingress aggregate policer statistics. It
+         gives state information about the aggregate policer."
+    ::= { tmnxSapObjs 193 }
+
+sapIngAggPolicerStatsEntry       OBJECT-TYPE
+    SYNTAX      SapIngAggPolicerStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Ingress aggregate policer statistics about a specific SAP."
+    INDEX       {
+        svcId,
+        sapPortId,
+        sapEncapValue
+    }
+    ::= { sapIngAggPolicerStatsTable 1 }
+
+SapIngAggPolicerStatsEntry       ::= SEQUENCE
+{
+    sapIngAggPolStatsInProfFwdPkts   Counter64,
+    sapIngAggPolStatsInProfFwdOcts   Counter64,
+    sapIngAggPolStatsOutProfFwdPkts  Counter64,
+    sapIngAggPolStatsOutProfFwdOcts  Counter64,
+    sapIngAggPolStatsExcProfDropPkts Counter64,
+    sapIngAggPolStatsExcProfDropOcts Counter64
+}
+
+sapIngAggPolStatsInProfFwdPkts   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapIngAggPolStatsInProfFwdPkts indicates the aggregate
+         number of in-profile forwarded packets."
+    ::= { sapIngAggPolicerStatsEntry 47 }
+
+sapIngAggPolStatsInProfFwdOcts   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapIngAggPolStatsInProfFwdOcts indicates the aggregate
+         number of in-profile forwarded octets."
+    ::= { sapIngAggPolicerStatsEntry 48 }
+
+sapIngAggPolStatsOutProfFwdPkts  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapIngAggPolStatsOutProfFwdPkts indicates the aggregate
+         number of out-of profile forwarded packets."
+    ::= { sapIngAggPolicerStatsEntry 49 }
+
+sapIngAggPolStatsOutProfFwdOcts  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapIngAggPolStatsOutProfFwdOcts indicates the aggregate
+         number of out-of profile forwarded octets."
+    ::= { sapIngAggPolicerStatsEntry 50 }
+
+sapIngAggPolStatsExcProfDropPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapIngAggPolStatsExcProfDropPkts indicates the aggregate
+         number of exceed profile dropped packets."
+    ::= { sapIngAggPolicerStatsEntry 51 }
+
+sapIngAggPolStatsExcProfDropOcts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapIngAggPolStatsExcProfDropOcts indicates the aggregate
+         number of exceed profile dropped octets."
+    ::= { sapIngAggPolicerStatsEntry 52 }
 
 tmnxSapConformance               OBJECT IDENTIFIER ::= { tmnxServConformance 3 }
 
@@ -27124,7 +27839,6 @@ tmnxSap7750V7v0Compliance        MODULE-COMPLIANCE
             tmnxSapBsxV7v0Group,
             tmnxSapArpHostGroup,
             tmnxSapIgmpTrkGroup,
-            tmnxSapFrGroup,
             tmnxSapIpipeV7v0Group,
             tmnxSapPbbGroup,
             tmnxSapTlsV7v0Group
@@ -27159,7 +27873,6 @@ tmnxSap7710V7v0Compliance        MODULE-COMPLIANCE
             tmnxSapMrpV6v0Group,
             tmnxSapArpHostGroup,
             tmnxSapIgmpTrkGroup,
-            tmnxSapFrGroup,
             tmnxSapIpipeV7v0Group,
             tmnxSapPbbGroup,
             tmnxSapTlsV7v0Group
@@ -27240,7 +27953,6 @@ tmnxSap7750V8v0Compliance        MODULE-COMPLIANCE
             tmnxSapArpHostGroup,
             tmnxSapIgmpTrkGroup,
             tmnxSapIgmpTrkV8v0Group,
-            tmnxSapFrGroupV8v0,
             tmnxSapIpipeV8v0Group,
             tmnxSapRadiusFallbackGroup,
             tmnxSapPbbGroup,
@@ -27287,7 +27999,6 @@ tmnxSap7710V8v0Compliance        MODULE-COMPLIANCE
             tmnxSapArpHostGroup,
             tmnxSapIgmpTrkGroup,
             tmnxSapIgmpTrkV8v0Group,
-            tmnxSapFrGroupV8v0,
             tmnxSapIpipeV8v0Group,
             tmnxSapRadiusFallbackGroup,
             tmnxSapPbbGroup,
@@ -27385,7 +28096,6 @@ tmnxSap7750V9v0Compliance        MODULE-COMPLIANCE
             tmnxSapArpHostGroup,
             tmnxSapIgmpTrkGroup,
             tmnxSapIgmpTrkV8v0Group,
-            tmnxSapFrGroupV8v0,
             tmnxSapIpipeV8v0Group,
             tmnxSapRadiusFallbackGroup,
             tmnxSapPbbGroup,
@@ -27431,7 +28141,6 @@ tmnxSap7710V9v0Compliance        MODULE-COMPLIANCE
             tmnxSapMsapV9v0Group,
             tmnxSapMsapV8v0Group,
             tmnxSapMsapV6v1Group,
-            tmnxSapHsmdaV9v0Group,
             tmnxSapNotifyGroup,
             tmnxSapCemNotificationV6v0Group,
             tmnxTlsMsapPppoeV6v0Group,
@@ -27442,7 +28151,6 @@ tmnxSap7710V9v0Compliance        MODULE-COMPLIANCE
             tmnxSapArpHostGroup,
             tmnxSapIgmpTrkGroup,
             tmnxSapIgmpTrkV8v0Group,
-            tmnxSapFrGroupV8v0,
             tmnxSapIpipeV8v0Group,
             tmnxSapRadiusFallbackGroup,
             tmnxSapPbbGroup,
@@ -27556,7 +28264,6 @@ tmnxSap7750V10v0Compliance       MODULE-COMPLIANCE
             tmnxSapArpHostGroup,
             tmnxSapIgmpTrkGroup,
             tmnxSapIgmpTrkV8v0Group,
-            tmnxSapFrGroupV8v0,
             tmnxSapIpipeV8v0Group,
             tmnxSapRadiusFallbackGroup,
             tmnxSapPbbGroup,
@@ -27610,7 +28317,6 @@ tmnxSap7710V10v0Compliance       MODULE-COMPLIANCE
             tmnxSapMsapV9v0Group,
             tmnxSapMsapV8v0Group,
             tmnxSapMsapV6v1Group,
-            tmnxSapHsmdaV9v0Group,
             tmnxSapNotifyGroup,
             tmnxSapCemNotificationV6v0Group,
             tmnxTlsMsapPppoeV6v0Group,
@@ -27621,7 +28327,6 @@ tmnxSap7710V10v0Compliance       MODULE-COMPLIANCE
             tmnxSapArpHostGroup,
             tmnxSapIgmpTrkGroup,
             tmnxSapIgmpTrkV8v0Group,
-            tmnxSapFrGroupV8v0,
             tmnxSapIpipeV8v0Group,
             tmnxSapRadiusFallbackGroup,
             tmnxSapPbbGroup,
@@ -27667,7 +28372,6 @@ tmnxSap7450V11v0Compliance       MODULE-COMPLIANCE
             tmnxSapMsapV11v0Group,
             tmnxSapMsapV9v0Group,
             tmnxSapMsapV8v0Group,
-            tmnxSapHsmdaV10v0Group,
             tmnxSapNotifyGroup,
             tmnxSapDhcpV8v0Group,
             tmnxSapDhcpV11v0Group,
@@ -27742,7 +28446,6 @@ tmnxSap7750V11v0Compliance       MODULE-COMPLIANCE
             tmnxSapMsapV9v0Group,
             tmnxSapMsapV8v0Group,
             tmnxSapMsapV6v1Group,
-            tmnxSapHsmdaV10v0Group,
             tmnxSapNotifyGroup,
             tmnxSapCemNotificationV6v0Group,
             tmnxTlsMsapPppoeV6v0Group,
@@ -27758,7 +28461,6 @@ tmnxSap7750V11v0Compliance       MODULE-COMPLIANCE
             tmnxSapIgmpTrkGroup,
             tmnxSapIgmpTrkV8v0Group,
             tmnxSapIgmpTrkV11v0Group,
-            tmnxSapFrGroupV8v0,
             tmnxSapIpipeV8v0Group,
             tmnxSapRadiusFallbackGroup,
             tmnxSapPbbGroup,
@@ -27827,7 +28529,6 @@ tmnxSap7710V11v0Compliance       MODULE-COMPLIANCE
             tmnxSapMsapV9v0Group,
             tmnxSapMsapV8v0Group,
             tmnxSapMsapV6v1Group,
-            tmnxSapHsmdaV9v0Group,
             tmnxSapNotifyGroup,
             tmnxSapCemNotificationV6v0Group,
             tmnxTlsMsapPppoeV6v0Group,
@@ -27840,7 +28541,6 @@ tmnxSap7710V11v0Compliance       MODULE-COMPLIANCE
             tmnxSapIgmpTrkGroup,
             tmnxSapIgmpTrkV8v0Group,
             tmnxSapIgmpTrkV11v0Group,
-            tmnxSapFrGroupV8v0,
             tmnxSapIpipeV8v0Group,
             tmnxSapRadiusFallbackGroup,
             tmnxSapPbbGroup,
@@ -27899,7 +28599,6 @@ tmnxSap7450V12v0Compliance       MODULE-COMPLIANCE
             tmnxSapMsapV11v0Group,
             tmnxSapMsapV9v0Group,
             tmnxSapMsapV8v0Group,
-            tmnxSapHsmdaV10v0Group,
             tmnxSapNotifyGroup,
             tmnxSapDhcpV8v0Group,
             tmnxSapDhcpV11v0Group,
@@ -27983,7 +28682,6 @@ tmnxSap7750V12v0Compliance       MODULE-COMPLIANCE
             tmnxSapMsapV9v0Group,
             tmnxSapMsapV8v0Group,
             tmnxSapMsapV6v1Group,
-            tmnxSapHsmdaV10v0Group,
             tmnxSapNotifyGroup,
             tmnxSapCemNotificationV6v0Group,
             tmnxTlsMsapPppoeV6v0Group,
@@ -27999,7 +28697,6 @@ tmnxSap7750V12v0Compliance       MODULE-COMPLIANCE
             tmnxSapIgmpTrkGroup,
             tmnxSapIgmpTrkV8v0Group,
             tmnxSapIgmpTrkV11v0Group,
-            tmnxSapFrGroupV8v0,
             tmnxSapIpipeV8v0Group,
             tmnxSapRadiusFallbackGroup,
             tmnxSapPbbGroup,
@@ -28080,7 +28777,6 @@ tmnxSap7710V12v0Compliance       MODULE-COMPLIANCE
             tmnxSapMsapV9v0Group,
             tmnxSapMsapV8v0Group,
             tmnxSapMsapV6v1Group,
-            tmnxSapHsmdaV9v0Group,
             tmnxSapNotifyGroup,
             tmnxSapCemNotificationV6v0Group,
             tmnxTlsMsapPppoeV6v0Group,
@@ -28093,7 +28789,6 @@ tmnxSap7710V12v0Compliance       MODULE-COMPLIANCE
             tmnxSapIgmpTrkGroup,
             tmnxSapIgmpTrkV8v0Group,
             tmnxSapIgmpTrkV11v0Group,
-            tmnxSapFrGroupV8v0,
             tmnxSapIpipeV8v0Group,
             tmnxSapRadiusFallbackGroup,
             tmnxSapPbbGroup,
@@ -28159,7 +28854,6 @@ tmnxSap7450V13v0Compliance       MODULE-COMPLIANCE
             tmnxSapMsapV11v0Group,
             tmnxSapMsapV9v0Group,
             tmnxSapMsapV8v0Group,
-            tmnxSapHsmdaV10v0Group,
             tmnxSapNotifyGroup,
             tmnxSapDhcpV8v0Group,
             tmnxSapDhcpV11v0Group,
@@ -28255,7 +28949,6 @@ tmnxSap7750V13v0Compliance       MODULE-COMPLIANCE
             tmnxSapMsapV9v0Group,
             tmnxSapMsapV8v0Group,
             tmnxSapMsapV6v1Group,
-            tmnxSapHsmdaV10v0Group,
             tmnxSapNotifyGroup,
             tmnxSapCemNotificationV6v0Group,
             tmnxTlsMsapPppoeV6v0Group,
@@ -28271,7 +28964,6 @@ tmnxSap7750V13v0Compliance       MODULE-COMPLIANCE
             tmnxSapIgmpTrkGroup,
             tmnxSapIgmpTrkV8v0Group,
             tmnxSapIgmpTrkV11v0Group,
-            tmnxSapFrGroupV8v0,
             tmnxSapIpipeV8v0Group,
             tmnxSapRadiusFallbackGroup,
             tmnxSapPbbGroup,
@@ -28363,7 +29055,6 @@ tmnxSap7710V13v0Compliance       MODULE-COMPLIANCE
             tmnxSapMsapV9v0Group,
             tmnxSapMsapV8v0Group,
             tmnxSapMsapV6v1Group,
-            tmnxSapHsmdaV9v0Group,
             tmnxSapNotifyGroup,
             tmnxSapCemNotificationV6v0Group,
             tmnxTlsMsapPppoeV6v0Group,
@@ -28376,7 +29067,6 @@ tmnxSap7710V13v0Compliance       MODULE-COMPLIANCE
             tmnxSapIgmpTrkGroup,
             tmnxSapIgmpTrkV8v0Group,
             tmnxSapIgmpTrkV11v0Group,
-            tmnxSapFrGroupV8v0,
             tmnxSapIpipeV8v0Group,
             tmnxSapRadiusFallbackGroup,
             tmnxSapPbbGroup,
@@ -28465,8 +29155,6 @@ tmnxSap7xxxV14v0Compliance       MODULE-COMPLIANCE
             tmnxSapMsapV9v0Group,
             tmnxSapMsapV8v0Group,
             tmnxSapMsapV6v1Group,
-            tmnxSapHsmdaV9v0Group,
-            tmnxSapHsmdaV10v0Group,
             tmnxSapNotifyGroup,
             tmnxSapCemNotificationV6v0Group,
             tmnxTlsMsapPppoeV6v0Group,
@@ -28481,7 +29169,6 @@ tmnxSap7xxxV14v0Compliance       MODULE-COMPLIANCE
             tmnxSapIgmpTrkGroup,
             tmnxSapIgmpTrkV8v0Group,
             tmnxSapIgmpTrkV11v0Group,
-            tmnxSapFrGroupV8v0,
             tmnxSapIpipeV8v0Group,
             tmnxSapRadiusFallbackGroup,
             tmnxSapPbbGroup,
@@ -28595,8 +29282,6 @@ tmnxSap7xxxV15v0Compliance       MODULE-COMPLIANCE
             tmnxSapMsapV11v0Group,
             tmnxSapMsapV9v0Group,
             tmnxSapMsapV6v1Group,
-            tmnxSapHsmdaV9v0Group,
-            tmnxSapHsmdaV10v0Group,
             tmnxSapNotifyGroup,
             tmnxSapCemNotificationV6v0Group,
             tmnxTlsMsapPppoeV6v0Group,
@@ -28611,7 +29296,6 @@ tmnxSap7xxxV15v0Compliance       MODULE-COMPLIANCE
             tmnxSapIgmpTrkGroup,
             tmnxSapIgmpTrkV8v0Group,
             tmnxSapIgmpTrkV11v0Group,
-            tmnxSapFrGroupV8v0,
             tmnxSapIpipeV8v0Group,
             tmnxSapRadiusFallbackGroup,
             tmnxSapPbbGroup,
@@ -28739,8 +29423,6 @@ tmnxSap7xxxV16v0Compliance       MODULE-COMPLIANCE
             tmnxSapMsapV11v0Group,
             tmnxSapMsapV9v0Group,
             tmnxSapMsapV6v1Group,
-            tmnxSapHsmdaV9v0Group,
-            tmnxSapHsmdaV10v0Group,
             tmnxSapNotifyGroup,
             tmnxSapCemNotificationV6v0Group,
             tmnxTlsMsapPppoeV6v0Group,
@@ -28755,7 +29437,6 @@ tmnxSap7xxxV16v0Compliance       MODULE-COMPLIANCE
             tmnxSapIgmpTrkGroup,
             tmnxSapIgmpTrkV8v0Group,
             tmnxSapIgmpTrkV11v0Group,
-            tmnxSapFrGroupV8v0,
             tmnxSapIpipeV8v0Group,
             tmnxSapRadiusFallbackGroup,
             tmnxSapPbbGroup,
@@ -28891,8 +29572,6 @@ tmnxSap7xxxV15v1Compliance       MODULE-COMPLIANCE
             tmnxSapMsapV11v0Group,
             tmnxSapMsapV9v0Group,
             tmnxSapMsapV6v1Group,
-            tmnxSapHsmdaV9v0Group,
-            tmnxSapHsmdaV10v0Group,
             tmnxSapNotifyGroup,
             tmnxSapCemNotificationV6v0Group,
             tmnxTlsMsapPppoeV6v0Group,
@@ -28907,7 +29586,6 @@ tmnxSap7xxxV15v1Compliance       MODULE-COMPLIANCE
             tmnxSapIgmpTrkGroup,
             tmnxSapIgmpTrkV8v0Group,
             tmnxSapIgmpTrkV11v0Group,
-            tmnxSapFrGroupV8v0,
             tmnxSapIpipeV8v0Group,
             tmnxSapRadiusFallbackGroup,
             tmnxSapPbbGroup,
@@ -29035,8 +29713,6 @@ tmnxSap7xxxV19v0Compliance       MODULE-COMPLIANCE
             tmnxSapMsapV11v0Group,
             tmnxSapMsapV9v0Group,
             tmnxSapMsapV6v1Group,
-            tmnxSapHsmdaV9v0Group,
-            tmnxSapHsmdaV10v0Group,
             tmnxSapNotifyGroup,
             tmnxSapCemNotificationV6v0Group,
             tmnxTlsMsapPppoeV6v0Group,
@@ -29051,7 +29727,6 @@ tmnxSap7xxxV19v0Compliance       MODULE-COMPLIANCE
             tmnxSapIgmpTrkGroup,
             tmnxSapIgmpTrkV8v0Group,
             tmnxSapIgmpTrkV11v0Group,
-            tmnxSapFrGroupV8v0,
             tmnxSapIpipeV8v0Group,
             tmnxSapRadiusFallbackGroup,
             tmnxSapPbbGroup,
@@ -29170,7 +29845,6 @@ tmnxSap7xxxV19v0Compliance       MODULE-COMPLIANCE
             tmnxSapVlanQosPlcyV19v0Group,
             tmnxSapEgrAggRateCIRV19v0Group,
             tmnxSapIgPlcyPlcerStatV19v0Group,
-            tmnxSapIngressAggRateV19v0Group,
             tmnxIpTunnelEsaVmV19v0Group,
             sapNotifyObjsPortStateGroup,
             tmnxSapQosStatsV19v0Group
@@ -29228,7 +29902,6 @@ tmnxSap7xxxV21v0Compliance       MODULE-COMPLIANCE
             tmnxSapIgmpTrkGroup,
             tmnxSapIgmpTrkV8v0Group,
             tmnxSapIgmpTrkV11v0Group,
-            tmnxSapFrGroupV8v0,
             tmnxSapIpipeV8v0Group,
             tmnxSapRadiusFallbackGroup,
             tmnxSapPbbGroup,
@@ -29360,6 +30033,7 @@ tmnxSap7xxxV21v0Compliance       MODULE-COMPLIANCE
             tmnxIpTnlTransProfV21v0Group,
             sapCfmSquelchInCtagGroup,
             tmnxIPTunnelPMTUV21v0Group,
+            sapEgressAggRateV21v0Group,
             tmnxSapIngQMonQDepthV21v0Group,
             sapLastChangeV21v0Group,
             tmnxSapEgressHQosV21v0Group,
@@ -29370,7 +30044,7 @@ tmnxSap7xxxV21v0Compliance       MODULE-COMPLIANCE
     ::= { tmnxSapCompliances 134 }
 
 tmnxSapV22v0Compliance           MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for management of services SAPs on Nokia SROS
          series systems release 22."
@@ -29378,8 +30052,6 @@ tmnxSapV22v0Compliance           MODULE-COMPLIANCE
         MANDATORY-GROUPS {
             tmnxSapV9v0Group,
             tmnxSapBaseV6v0Group,
-            tmnxSapAtmV6v0Group,
-            tmnxSapAtmV9v0Group,
             tmnxSapStaticHostV9v0Group,
             tmnxSapStaticHostV11v0Group,
             tmnxSapPortIdV6v0Group,
@@ -29387,7 +30059,6 @@ tmnxSapV22v0Compliance           MODULE-COMPLIANCE
             tmnxSapMstiV6v0Group,
             tmnxSapL2ptV6v0Group,
             tmnxSapMsapV11v0Group,
-            tmnxSapMsapV9v0Group,
             tmnxSapMsapV6v1Group,
             tmnxSapNotifyGroup,
             tmnxSapCemNotificationV6v0Group,
@@ -29403,7 +30074,6 @@ tmnxSapV22v0Compliance           MODULE-COMPLIANCE
             tmnxSapIgmpTrkGroup,
             tmnxSapIgmpTrkV8v0Group,
             tmnxSapIgmpTrkV11v0Group,
-            tmnxSapFrGroupV8v0,
             tmnxSapIpipeV8v0Group,
             tmnxSapRadiusFallbackGroup,
             tmnxSapPbbGroup,
@@ -29422,7 +30092,6 @@ tmnxSapV22v0Compliance           MODULE-COMPLIANCE
             tmnxSapEthCfmMonitorGroup,
             tmnxSapEthCfmGroup,
             tmnxSapCflowdGroupV11v0,
-            tmnxSapNotificationV9v0Group,
             tmnxSapDefHostV9v0Group,
             tmnxSapDefHostV14v0Group,
             tmnxSapFilterProfileV9v0Group,
@@ -29535,15 +30204,571 @@ tmnxSapV22v0Compliance           MODULE-COMPLIANCE
             tmnxIpTnlTransProfV21v0Group,
             sapCfmSquelchInCtagGroup,
             tmnxIPTunnelPMTUV21v0Group,
+            sapEgressAggRateV21v0Group,
             tmnxSapIngQMonQDepthV21v0Group,
             sapLastChangeV21v0Group,
             tmnxSapEgressHQosV21v0Group,
             tmnxSapSubV21v0Group,
             sapIPFilterPairV22v0Group,
             tmnxSapQueueOvrV22v0Group,
-            tmnxSapStaticHostV22v0Group
+            tmnxSapStaticHostV22v0Group,
+            tmnxSapSharedPolicerV22v0Group,
+            tmnxSapNotifyV22v0Group,
+            tmnxSapDcpFpCountV22v0Group,
+            tmnxSapEgrAggRatePerV22v0Group,
+            tmnxSapEgrAggRateV22v0Group
         }
     ::= { tmnxSapCompliances 135 }
+
+tmnxSapV23v0Compliance           MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of services SAPs on Nokia SROS
+         series systems release 23."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxSapV9v0Group,
+            tmnxSapBaseV6v0Group,
+            tmnxSapStaticHostV9v0Group,
+            tmnxSapStaticHostV11v0Group,
+            tmnxSapPortIdV6v0Group,
+            tmnxSapSubMgmtV9v0Group,
+            tmnxSapMstiV6v0Group,
+            tmnxSapL2ptV6v0Group,
+            tmnxSapMsapV11v0Group,
+            tmnxSapMsapV6v1Group,
+            tmnxSapNotifyGroup,
+            tmnxSapCemNotificationV6v0Group,
+            tmnxTlsMsapPppoeV6v0Group,
+            tmnxSapCemV6v0Group,
+            tmnxSapDhcpV8v0Group,
+            tmnxSapDhcpV11v0Group,
+            tmnxSapMrpV8v0Group,
+            tmnxSapBsxV7v0Group,
+            tmnxSapBsxV9v0Group,
+            tmnxSapBsxV10v0Group,
+            tmnxSapArpHostGroup,
+            tmnxSapIgmpTrkGroup,
+            tmnxSapIgmpTrkV8v0Group,
+            tmnxSapIgmpTrkV11v0Group,
+            tmnxSapIpipeV8v0Group,
+            tmnxSapRadiusFallbackGroup,
+            tmnxSapPbbGroup,
+            tmnxSapPbbV12v0Group,
+            tmnxSapTlsV7v0Group,
+            tmnxSapFPropBMacV8v0Group,
+            tmnxSapPlcrV9v0Group,
+            tmnxSapEthRingGroup,
+            tmnxSapOverrideV8v0Group,
+            tmnxSapOverrideV9v0Group,
+            tmnxSapGreObsoletedGroup,
+            tmnxSapGreV11v0Group,
+            tmnxSapNotificationV11v0Group,
+            tmnxSapNotifObsoletedGroup,
+            tmnxSapMvrpNotificationV8v0Group,
+            tmnxSapEthCfmMonitorGroup,
+            tmnxSapEthCfmGroup,
+            tmnxSapCflowdGroupV11v0,
+            tmnxSapDefHostV9v0Group,
+            tmnxSapDefHostV14v0Group,
+            tmnxSapFilterProfileV9v0Group,
+            tmnxSapIpipeNotificationGroup,
+            tmnxSapSpbGroup,
+            tmnxSapNotificationV10v0Group,
+            tmnxSapIpTnlGroup,
+            tmnxSapLagV11v0Group,
+            tmnxSapMonitorIPGroup,
+            tmnxSapStatsV10v0Group,
+            tmnxSapFlowSPecV11v0Group,
+            tmnxSapDCpuProtV11v0Group,
+            tmnxSapDcpNotifyObjsV11v0Group,
+            tmnxSapDcpNotifyV11v0Group,
+            tmnxSapEgrPortQGrpV11v0Group,
+            tmnxSapSpbV11v0Group,
+            tmnxSapSchedulerRateV11v0Group,
+            tmnxSapEthLoopbackV11v0Group,
+            tmnxSapEthLpbkNotifyV11v0Group,
+            sapTlsFdbMacStatsGroup,
+            sapTlsEtreeGroup,
+            tmnxSapTlsV12v0Group,
+            tmnxMsapPlcyCpmProtV12v0Group,
+            tmnxSapQosV12v0Group,
+            tmnxSapEthCfmV12v0Group,
+            tmnxIpTunnelV12v0Group,
+            sapLagV12v0Group,
+            tmnxIPTunnelGreKeyV12v0Group,
+            tmnxIpTunnelFragStatV12v0Group,
+            tmnxIpTunnelEncapNotifyGroup,
+            tmnxIpTunnelEncaNotifyObjsGroup,
+            tmnxIpTnlOperChgGroup,
+            tmnxMsapQosV12v0Group,
+            tmnxSapMsapV12v0Group,
+            tmnxSapMsapV14v0Group,
+            tmnxSapStatHost6Group,
+            tmnxSapStatHost6V13v0Group,
+            tmnxSapIpoeV13v0Group,
+            tmnxSapDnGroup,
+            tmnxSapQosSchedV13v0Group,
+            tmnxSapIpipeFaultPropGroup,
+            tmnxSapStaticHostRipV13v0Group,
+            tmnxSapBaseStatsV13v0Group,
+            tmnxSapDiamNasreqGroup,
+            tmnxSapRipNotifyGroup,
+            tmnxSapQosRateV13v0Group,
+            tmnxSapNotificationV13v0Group,
+            tmnxSapDhcpV13v0Group,
+            tmnxSapShcvPolicyGroup,
+            tmnxSapMvrpV13v0Group,
+            tmnxSapEgrEncapGrpV13v0Group,
+            sapBgpEvpnMplsMhGroup,
+            tmnxSapV14v0Group,
+            tmnxSapVplsV14v0Group,
+            tmnxSapQosStatsGroup,
+            tmnxSapStickyMsapGroup,
+            tmnxSapInfoV19v0Group,
+            tmnxSapIpV6FilterV14v0Group,
+            tmnxEvpnMplsMacMovNotifGroup,
+            sapEthLoopbackV14v0Group,
+            tmnxSapTlsPbbV14v0Group,
+            tmnxSapVprnLoopbackV14v0Group,
+            tmnxSapL2tpv3V16v0Group,
+            tmnxSapBgpEvpnAlmpGroup,
+            sapL3LoopbackNotifGroup,
+            sapV14v0NotifyObjsGroup,
+            tmnxSapEgrQosStatsGroup,
+            tmnxSapCfmLmmPerQosV15v0Group,
+            tmnxSapQosQDropTailGroup,
+            tmnxSapQosV15v0Group,
+            tmnxSapEsmMacV15v0Group,
+            tmnxSapQosRateGroup,
+            tmnxSapQosHsQOvrGroup,
+            tSapQosQGrpIngRedirectListGroup,
+            tSapQosQGrpEgrRedirectListGroup,
+            tmnxDDosDCpuProtPolicyGrp,
+            tSapIpTnlTcpMssAdjustV15v0Grp,
+            tmnxSapTlsV15v0Group,
+            tmnxSapMsapV15v0Group,
+            tmnxSapQosHsWrrGrpOvrGroup,
+            sapEvpnMhEthSegV15v0Group,
+            tmnxSapQosQBurstLimitOvrGrp,
+            tmnxSapQosPlcrOvrV15v1Group,
+            sapPppoeRedirectGroup,
+            tmnxSapTemplateQosV16v0Group,
+            tmnxIpTunnelV16v0Group,
+            tmnxSapTmplFilterNameV16v0Group,
+            tmnxSapL2tpv3ExtGroup,
+            tmnxSapIngressQinqV16v0Group,
+            tmnxSapPfcpV19v0Group,
+            tmnxSapBaseStatsAggregateGroup,
+            tmnxSapOperStatusGroup,
+            tmnxSapBWGroup,
+            tmnxSapQtagV19v0Group,
+            tmnxSapVlanQosPlcyV19v0Group,
+            tmnxSapEgrAggRateCIRV19v0Group,
+            tmnxSapIgPlcyPlcerStatV19v0Group,
+            tmnxSapIngressAggRateV19v0Group,
+            tmnxIpTunnelEsaVmV19v0Group,
+            sapNotifyObjsPortStateGroup,
+            tmnxSapQosStatsV19v0Group,
+            sapNotifyV20v0Group,
+            sapTlsMacListV20v0Group,
+            sapTlsBgpVplsEvpnV20v0Group,
+            tmnxSapStickyMsapV20v0Group,
+            tmnxSapEgrQMonQDepthV20v0Group,
+            sapIngTrtcm2AggRateV20v10Group,
+            sapIngressIPCritOvrV20v10Group,
+            tmnxIpTnlTransProfV21v0Group,
+            sapCfmSquelchInCtagGroup,
+            tmnxIPTunnelPMTUV21v0Group,
+            sapEgressAggRateV21v0Group,
+            tmnxSapIngQMonQDepthV21v0Group,
+            sapLastChangeV21v0Group,
+            tmnxSapEgressHQosV21v0Group,
+            tmnxSapSubV21v0Group,
+            sapIPFilterPairV22v0Group,
+            tmnxSapQueueOvrV22v0Group,
+            tmnxSapStaticHostV22v0Group,
+            tmnxSapSharedPolicerV22v0Group,
+            tmnxSapNotifyV22v0Group,
+            tmnxSapDcpFpCountV22v0Group,
+            tmnxSapEgrAggRatePerV22v0Group,
+            tmnxSapEgrAggRateV22v0Group,
+            sapAlmpV23v0Group,
+            sapEgressVPortV23v0Group,
+            tmnxSapV23v0Group,
+            tmnxSapBaseSIngAggPolV23v0Group,
+            tmnxSapEgrQosAggShpOvrSapV230Grp
+        }
+    ::= { tmnxSapCompliances 136 }
+
+tmnxSapV24v0Compliance           MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of services SAPs on Nokia SROS
+         series systems release 24."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxSapV9v0Group,
+            tmnxSapBaseV6v0Group,
+            tmnxSapStaticHostV9v0Group,
+            tmnxSapStaticHostV11v0Group,
+            tmnxSapPortIdV6v0Group,
+            tmnxSapSubMgmtV9v0Group,
+            tmnxSapMstiV6v0Group,
+            tmnxSapL2ptV6v0Group,
+            tmnxSapMsapV11v0Group,
+            tmnxSapMsapV6v1Group,
+            tmnxSapNotifyGroup,
+            tmnxSapCemNotificationV6v0Group,
+            tmnxTlsMsapPppoeV6v0Group,
+            tmnxSapCemV6v0Group,
+            tmnxSapDhcpV8v0Group,
+            tmnxSapDhcpV11v0Group,
+            tmnxSapMrpV8v0Group,
+            tmnxSapBsxV7v0Group,
+            tmnxSapBsxV9v0Group,
+            tmnxSapBsxV10v0Group,
+            tmnxSapArpHostGroup,
+            tmnxSapIgmpTrkGroup,
+            tmnxSapIgmpTrkV8v0Group,
+            tmnxSapIgmpTrkV11v0Group,
+            tmnxSapIpipeV8v0Group,
+            tmnxSapRadiusFallbackGroup,
+            tmnxSapPbbGroup,
+            tmnxSapPbbV12v0Group,
+            tmnxSapTlsV7v0Group,
+            tmnxSapFPropBMacV8v0Group,
+            tmnxSapPlcrV9v0Group,
+            tmnxSapEthRingGroup,
+            tmnxSapOverrideV8v0Group,
+            tmnxSapOverrideV9v0Group,
+            tmnxSapGreObsoletedGroup,
+            tmnxSapGreV11v0Group,
+            tmnxSapNotificationV11v0Group,
+            tmnxSapNotifObsoletedGroup,
+            tmnxSapMvrpNotificationV8v0Group,
+            tmnxSapEthCfmMonitorGroup,
+            tmnxSapEthCfmGroup,
+            tmnxSapCflowdGroupV11v0,
+            tmnxSapDefHostV9v0Group,
+            tmnxSapDefHostV14v0Group,
+            tmnxSapFilterProfileV9v0Group,
+            tmnxSapIpipeNotificationGroup,
+            tmnxSapSpbGroup,
+            tmnxSapNotificationV10v0Group,
+            tmnxSapIpTnlGroup,
+            tmnxSapLagV11v0Group,
+            tmnxSapMonitorIPGroup,
+            tmnxSapStatsV10v0Group,
+            tmnxSapFlowSPecV11v0Group,
+            tmnxSapDCpuProtV11v0Group,
+            tmnxSapDcpNotifyObjsV11v0Group,
+            tmnxSapDcpNotifyV11v0Group,
+            tmnxSapEgrPortQGrpV11v0Group,
+            tmnxSapSpbV11v0Group,
+            tmnxSapSchedulerRateV11v0Group,
+            tmnxSapEthLoopbackV11v0Group,
+            tmnxSapEthLpbkNotifyV11v0Group,
+            sapTlsFdbMacStatsGroup,
+            sapTlsEtreeGroup,
+            tmnxSapTlsV12v0Group,
+            tmnxMsapPlcyCpmProtV12v0Group,
+            tmnxSapQosV12v0Group,
+            tmnxSapEthCfmV12v0Group,
+            tmnxIpTunnelV12v0Group,
+            sapLagV12v0Group,
+            tmnxIPTunnelGreKeyV12v0Group,
+            tmnxIpTunnelFragStatV12v0Group,
+            tmnxIpTunnelEncapNotifyGroup,
+            tmnxIpTunnelEncaNotifyObjsGroup,
+            tmnxIpTnlOperChgGroup,
+            tmnxMsapQosV12v0Group,
+            tmnxSapMsapV12v0Group,
+            tmnxSapMsapV14v0Group,
+            tmnxSapStatHost6Group,
+            tmnxSapStatHost6V13v0Group,
+            tmnxSapIpoeV13v0Group,
+            tmnxSapDnGroup,
+            tmnxSapQosSchedV13v0Group,
+            tmnxSapStaticHostRipV13v0Group,
+            tmnxSapBaseStatsV13v0Group,
+            tmnxSapDiamNasreqGroup,
+            tmnxSapRipNotifyGroup,
+            tmnxSapNotificationV13v0Group,
+            tmnxSapDhcpV13v0Group,
+            tmnxSapShcvPolicyGroup,
+            tmnxSapMvrpV13v0Group,
+            tmnxSapEgrEncapGrpV13v0Group,
+            sapBgpEvpnMplsMhGroup,
+            tmnxSapV14v0Group,
+            tmnxSapVplsV14v0Group,
+            tmnxSapQosStatsGroup,
+            tmnxSapStickyMsapGroup,
+            tmnxSapInfoV19v0Group,
+            tmnxSapIpV6FilterV14v0Group,
+            tmnxEvpnMplsMacMovNotifGroup,
+            sapEthLoopbackV14v0Group,
+            tmnxSapTlsPbbV14v0Group,
+            tmnxSapVprnLoopbackV14v0Group,
+            tmnxSapL2tpv3V16v0Group,
+            tmnxSapBgpEvpnAlmpGroup,
+            sapL3LoopbackNotifGroup,
+            sapV14v0NotifyObjsGroup,
+            tmnxSapEgrQosStatsGroup,
+            tmnxSapCfmLmmPerQosV15v0Group,
+            tmnxSapQosQDropTailGroup,
+            tmnxSapQosV15v0Group,
+            tmnxSapEsmMacV15v0Group,
+            tmnxSapQosHsQOvrGroup,
+            tSapQosQGrpIngRedirectListGroup,
+            tSapQosQGrpEgrRedirectListGroup,
+            tmnxDDosDCpuProtPolicyGrp,
+            tSapIpTnlTcpMssAdjustV15v0Grp,
+            tmnxSapTlsV15v0Group,
+            tmnxSapMsapV15v0Group,
+            tmnxSapQosHsWrrGrpOvrGroup,
+            sapEvpnMhEthSegV15v0Group,
+            tmnxSapQosQBurstLimitOvrGrp,
+            tmnxSapQosPlcrOvrV15v1Group,
+            sapPppoeRedirectGroup,
+            tmnxSapTemplateQosV16v0Group,
+            tmnxIpTunnelV16v0Group,
+            tmnxSapTmplFilterNameV16v0Group,
+            tmnxSapL2tpv3ExtGroup,
+            tmnxSapIngressQinqV16v0Group,
+            tmnxSapPfcpV19v0Group,
+            tmnxSapBaseStatsAggregateGroup,
+            tmnxSapOperStatusGroup,
+            tmnxSapBWGroup,
+            tmnxSapQtagV19v0Group,
+            tmnxSapVlanQosPlcyV19v0Group,
+            tmnxSapEgrAggRateCIRV19v0Group,
+            tmnxSapIgPlcyPlcerStatV19v0Group,
+            tmnxIpTunnelEsaVmV19v0Group,
+            sapNotifyObjsPortStateGroup,
+            tmnxSapQosStatsV19v0Group,
+            sapNotifyV20v0Group,
+            sapTlsMacListV20v0Group,
+            sapTlsBgpVplsEvpnV20v0Group,
+            tmnxSapStickyMsapV20v0Group,
+            tmnxSapEgrQMonQDepthV20v0Group,
+            sapIngTrtcm2AggRateV20v10Group,
+            sapIngressIPCritOvrV20v10Group,
+            tmnxIpTnlTransProfV21v0Group,
+            sapCfmSquelchInCtagGroup,
+            tmnxIPTunnelPMTUV21v0Group,
+            sapEgressAggRateV21v0Group,
+            tmnxSapIngQMonQDepthV21v0Group,
+            sapLastChangeV21v0Group,
+            tmnxSapEgressHQosV21v0Group,
+            tmnxSapSubV21v0Group,
+            sapIPFilterPairV22v0Group,
+            tmnxSapQueueOvrV22v0Group,
+            tmnxSapStaticHostV22v0Group,
+            tmnxSapSharedPolicerV22v0Group,
+            tmnxSapNotifyV22v0Group,
+            tmnxSapDcpFpCountV22v0Group,
+            tmnxSapEgrAggRatePerV22v0Group,
+            tmnxSapEgrAggRateV22v0Group,
+            sapAlmpV23v0Group,
+            sapEgressVPortV23v0Group,
+            tmnxSapV23v0Group,
+            tmnxSapBaseSIngAggPolV23v0Group,
+            tmnxSapEgrQosAggShpOvrSapV230Grp,
+            tmnxSapQosRateV24v0Group,
+            tmnxSapEgrAggRateV24v0Group,
+            tmnxSapEgressLatencyV24v0Group,
+            tmnxIpTnlTransProfV24v0Group,
+            sapQtagNormalizationV24v0Group,
+            sapIngFilterSetV24v0Group
+        }
+    ::= { tmnxSapCompliances 137 }
+
+tmnxSapV25v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of services SAPs on Nokia SROS
+         series systems release 25."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxSapV9v0Group,
+            tmnxSapBaseV6v0Group,
+            tmnxSapStaticHostV9v0Group,
+            tmnxSapStaticHostV11v0Group,
+            tmnxSapPortIdV6v0Group,
+            tmnxSapSubMgmtV9v0Group,
+            tmnxSapMstiV6v0Group,
+            tmnxSapL2ptV6v0Group,
+            tmnxSapMsapV11v0Group,
+            tmnxSapMsapV6v1Group,
+            tmnxSapNotifyGroup,
+            tmnxSapCemNotificationV6v0Group,
+            tmnxTlsMsapPppoeV6v0Group,
+            tmnxSapCemV6v0Group,
+            tmnxSapDhcpV8v0Group,
+            tmnxSapDhcpV11v0Group,
+            tmnxSapMrpV8v0Group,
+            tmnxSapBsxV7v0Group,
+            tmnxSapBsxV9v0Group,
+            tmnxSapBsxV10v0Group,
+            tmnxSapArpHostGroup,
+            tmnxSapIgmpTrkGroup,
+            tmnxSapIgmpTrkV8v0Group,
+            tmnxSapIgmpTrkV11v0Group,
+            tmnxSapIpipeV8v0Group,
+            tmnxSapRadiusFallbackGroup,
+            tmnxSapPbbGroup,
+            tmnxSapPbbV12v0Group,
+            tmnxSapTlsV7v0Group,
+            tmnxSapFPropBMacV8v0Group,
+            tmnxSapPlcrV9v0Group,
+            tmnxSapEthRingGroup,
+            tmnxSapOverrideV8v0Group,
+            tmnxSapOverrideV9v0Group,
+            tmnxSapGreObsoletedGroup,
+            tmnxSapGreV11v0Group,
+            tmnxSapNotificationV11v0Group,
+            tmnxSapNotifObsoletedGroup,
+            tmnxSapMvrpNotificationV8v0Group,
+            tmnxSapEthCfmMonitorGroup,
+            tmnxSapEthCfmGroup,
+            tmnxSapCflowdGroupV11v0,
+            tmnxSapDefHostV9v0Group,
+            tmnxSapDefHostV14v0Group,
+            tmnxSapIpipeNotificationGroup,
+            tmnxSapSpbGroup,
+            tmnxSapNotificationV10v0Group,
+            tmnxSapIpTnlGroup,
+            tmnxSapLagV11v0Group,
+            tmnxSapMonitorIPGroup,
+            tmnxSapStatsV10v0Group,
+            tmnxSapFlowSPecV11v0Group,
+            tmnxSapDCpuProtV11v0Group,
+            tmnxSapDcpNotifyObjsV11v0Group,
+            tmnxSapDcpNotifyV11v0Group,
+            tmnxSapEgrPortQGrpV11v0Group,
+            tmnxSapSpbV11v0Group,
+            tmnxSapSchedulerRateV11v0Group,
+            tmnxSapEthLoopbackV11v0Group,
+            tmnxSapEthLpbkNotifyV11v0Group,
+            sapTlsFdbMacStatsGroup,
+            sapTlsEtreeGroup,
+            tmnxSapTlsV12v0Group,
+            tmnxMsapPlcyCpmProtV12v0Group,
+            tmnxSapQosV12v0Group,
+            tmnxSapEthCfmV12v0Group,
+            tmnxIpTunnelV12v0Group,
+            sapLagV12v0Group,
+            tmnxIPTunnelGreKeyV12v0Group,
+            tmnxIpTunnelFragStatV12v0Group,
+            tmnxIpTunnelEncapNotifyGroup,
+            tmnxIpTunnelEncaNotifyObjsGroup,
+            tmnxIpTnlOperChgGroup,
+            tmnxMsapQosV12v0Group,
+            tmnxSapMsapV12v0Group,
+            tmnxSapMsapV14v0Group,
+            tmnxSapStatHost6Group,
+            tmnxSapStatHost6V13v0Group,
+            tmnxSapIpoeV13v0Group,
+            tmnxSapDnGroup,
+            tmnxSapQosSchedV13v0Group,
+            tmnxSapStaticHostRipV13v0Group,
+            tmnxSapBaseStatsV13v0Group,
+            tmnxSapDiamNasreqGroup,
+            tmnxSapRipNotifyGroup,
+            tmnxSapNotificationV13v0Group,
+            tmnxSapDhcpV13v0Group,
+            tmnxSapShcvPolicyGroup,
+            tmnxSapMvrpV13v0Group,
+            tmnxSapEgrEncapGrpV13v0Group,
+            sapBgpEvpnMplsMhGroup,
+            tmnxSapV14v0Group,
+            tmnxSapVplsV14v0Group,
+            tmnxSapQosStatsGroup,
+            tmnxSapStickyMsapGroup,
+            tmnxSapInfoV19v0Group,
+            tmnxSapIpV6FilterV14v0Group,
+            tmnxEvpnMplsMacMovNotifGroup,
+            sapEthLoopbackV14v0Group,
+            tmnxSapTlsPbbV14v0Group,
+            tmnxSapVprnLoopbackV14v0Group,
+            tmnxSapL2tpv3V16v0Group,
+            tmnxSapBgpEvpnAlmpGroup,
+            sapL3LoopbackNotifGroup,
+            sapV14v0NotifyObjsGroup,
+            tmnxSapEgrQosStatsGroup,
+            tmnxSapCfmLmmPerQosV15v0Group,
+            tmnxSapQosQDropTailGroup,
+            tmnxSapQosV15v0Group,
+            tmnxSapEsmMacV15v0Group,
+            tmnxSapQosHsQOvrGroup,
+            tSapQosQGrpIngRedirectListGroup,
+            tSapQosQGrpEgrRedirectListGroup,
+            tmnxDDosDCpuProtPolicyGrp,
+            tSapIpTnlTcpMssAdjustV15v0Grp,
+            tmnxSapTlsV15v0Group,
+            tmnxSapMsapV15v0Group,
+            tmnxSapQosHsWrrGrpOvrGroup,
+            sapEvpnMhEthSegV15v0Group,
+            tmnxSapQosQBurstLimitOvrGrp,
+            tmnxSapQosPlcrOvrV15v1Group,
+            sapPppoeRedirectGroup,
+            tmnxSapTemplateQosV16v0Group,
+            tmnxIpTunnelV16v0Group,
+            tmnxSapTmplFilterNameV16v0Group,
+            tmnxSapL2tpv3ExtGroup,
+            tmnxSapIngressQinqV16v0Group,
+            tmnxSapPfcpV19v0Group,
+            tmnxSapBaseStatsAggregateGroup,
+            tmnxSapOperStatusGroup,
+            tmnxSapBWGroup,
+            tmnxSapQtagV19v0Group,
+            tmnxSapVlanQosPlcyV19v0Group,
+            tmnxSapEgrAggRateCIRV19v0Group,
+            tmnxSapIgPlcyPlcerStatV19v0Group,
+            tmnxIpTunnelEsaVmV19v0Group,
+            sapNotifyObjsPortStateGroup,
+            tmnxSapQosStatsV19v0Group,
+            sapNotifyV20v0Group,
+            sapTlsMacListV20v0Group,
+            sapTlsBgpVplsEvpnV20v0Group,
+            tmnxSapStickyMsapV20v0Group,
+            tmnxSapEgrQMonQDepthV20v0Group,
+            sapIngTrtcm2AggRateV20v10Group,
+            sapIngressIPCritOvrV20v10Group,
+            tmnxIpTnlTransProfV21v0Group,
+            sapCfmSquelchInCtagGroup,
+            tmnxIPTunnelPMTUV21v0Group,
+            sapEgressAggRateV21v0Group,
+            tmnxSapIngQMonQDepthV21v0Group,
+            sapLastChangeV21v0Group,
+            tmnxSapEgressHQosV21v0Group,
+            tmnxSapSubV21v0Group,
+            sapIPFilterPairV22v0Group,
+            tmnxSapQueueOvrV22v0Group,
+            tmnxSapStaticHostV22v0Group,
+            tmnxSapSharedPolicerV22v0Group,
+            tmnxSapNotifyV22v0Group,
+            tmnxSapDcpFpCountV22v0Group,
+            tmnxSapEgrAggRatePerV22v0Group,
+            tmnxSapEgrAggRateV22v0Group,
+            sapAlmpV23v0Group,
+            sapEgressVPortV23v0Group,
+            tmnxSapV23v0Group,
+            tmnxSapBaseSIngAggPolV23v0Group,
+            tmnxSapEgrQosAggShpOvrSapV230Grp,
+            tmnxSapQosRateV24v0Group,
+            tmnxSapEgrAggRateV24v0Group,
+            tmnxSapEgressLatencyV24v0Group,
+            tmnxIpTnlTransProfV24v0Group,
+            sapQtagNormalizationV24v0Group,
+            sapIngFilterSetV24v0Group,
+            sapIngAggPolicerV25v0Group,
+            sapIngAggRateV25v0Group,
+            sapTlsMacAddrV25v0Group,
+            sapEgrQosSinkExcessBWV25v0Grp
+        }
+    ::= { tmnxSapCompliances 138 }
 
 tmnxSapGroups                    OBJECT IDENTIFIER ::= { tmnxSapConformance 2 }
 
@@ -29696,7 +30921,7 @@ tmnxSapAtmV6v0Group              OBJECT-GROUP
         sapAtmLLFAdminStatus,
         sapAtmLLFOperStatus
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of SAP ATM capabilities on
          Nokia SROS series systems."
@@ -30216,19 +31441,12 @@ tmnxSapMrpV6v0Group              OBJECT-GROUP
 tmnxSapHsmdaV6v0Group            OBJECT-GROUP
     OBJECTS     {
         sapIngressAggRateLimit,
-        sapEgressHsmdaShaperOverride,
         sapIngressHsmdaPacketOffOvr,
-        sapEgressHsmdaPacketOffOverride,
         sapIngQosHsmdaQueueRowStatus,
         sapIngQosHsmdaQueueLastChanged,
         sapIngQosHsmdaQueueAdminPIR,
         sapIngQosHsmdaQueueAdminCIR,
         sapIngQosHsmdaQueueSlopePolicy,
-        sapEgrQosHsmdaQueueRowStatus,
-        sapEgrQosHsmdaQueueLastChanged,
-        sapEgrQosHsmdaQueueAdminPIR,
-        sapEgrQosHsmdaQueueAdminCIR,
-        sapEgrQosHsmdaQueueSlopePolicy,
         sapIngHsmdaQStatCustId,
         sapIngHsmdaQStatHiPktsDropped,
         sapIngHsmdaQStatLoPktsDropped,
@@ -30250,25 +31468,7 @@ tmnxSapHsmdaV6v0Group            OBJECT-GROUP
         sapIngHsmdaCntrStInProfOctFwd,
         sapIngHsmdaCntrStOutProfOctFwd,
         sapIngHsmdaCntrStAllPktOffered,
-        sapIngHsmdaCntrStAllOctOffered,
-        sapEgrHsmdaQStatCustId,
-        sapEgrHsmdaQStatInProfPktFwd,
-        sapEgrHsmdaQStatInProfPktDropd,
-        sapEgrHsmdaQStatOutProfPktFwd,
-        sapEgrHsmdaQStatOutProfPktDropd,
-        sapEgrHsmdaQStatInProfOctFwd,
-        sapEgrHsmdaQStatInProfOctDropd,
-        sapEgrHsmdaQStatOutProfOctFwd,
-        sapEgrHsmdaQStatOutProfOctDropd,
-        sapEgrHsmdaCntrStCustId,
-        sapEgrHsmdaCntrStInProfPktFwd,
-        sapEgrHsmdaCntrStInProfPktDrop,
-        sapEgrHsmdaCntrStOutProfPktFwd,
-        sapEgrHsmdaCntrStOutProfPktDrop,
-        sapEgrHsmdaCntrStInProfOctFwd,
-        sapEgrHsmdaCntrStInProfOctDrop,
-        sapEgrHsmdaCntrStOutProfOctFwd,
-        sapEgrHsmdaCntrStOutProfOctDrop
+        sapIngHsmdaCntrStAllOctOffered
     }
     STATUS      obsolete
     DESCRIPTION
@@ -30537,20 +31737,6 @@ tmnxSapIgmpTrkGroup              OBJECT-GROUP
          capabilities for SAPs on Nokia SROS series systems."
     ::= { tmnxSapGroups 125 }
 
-tmnxSapFrGroup                   OBJECT-GROUP
-    OBJECTS     {
-        sapFrInfoFrf12Mode,
-        sapFrInfoSchedulingClass,
-        sapFrInfoLastChanged,
-        sapFrf12InfoFragmentThreshold,
-        sapFrf12InfoLastChanged
-    }
-    STATUS      obsolete
-    DESCRIPTION
-        "The group of objects supporting management of SAP FR capabilities on
-         Nokia SROS series systems."
-    ::= { tmnxSapGroups 126 }
-
 tmnxSapIpipeV7v0Group            OBJECT-GROUP
     OBJECTS     {
         sapIpipeCeInetAddress,
@@ -30608,21 +31794,6 @@ tmnxSapPbbGroup                  OBJECT-GROUP
          Bridging (PBB/IEEE 802.1ah) capabilities for SAPs on Nokia SROS series
          systems."
     ::= { tmnxSapGroups 130 }
-
-tmnxSapFrGroupV8v0               OBJECT-GROUP
-    OBJECTS     {
-        sapFrInfoFrf12Mode,
-        sapFrInfoSchedulingClass,
-        sapFrInfoLastChanged,
-        sapFrf12InfoFragmentThreshold,
-        sapFrf12InfoLastChanged,
-        sapFrf12InfoInterleave
-    }
-    STATUS      current
-    DESCRIPTION
-        "The group of objects supporting management of SAP FR capabilities on
-         Nokia SROS series systems."
-    ::= { tmnxSapGroups 131 }
 
 tmnxSapTlsV8v0Group              OBJECT-GROUP
     OBJECTS     {
@@ -31433,7 +32604,7 @@ tmnxSapAtmV9v0Group              OBJECT-GROUP
         sapAtmPppStatsRxDropped,
         sapAtmPppStatsTxPackets
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of SAP ATM capabilities
          that were added in release 9.0 of Nokia SROS series systems."
@@ -31543,7 +32714,7 @@ tmnxSapMsapV9v0Group             OBJECT-GROUP
         msapAtmPlcyOamPeriodicLoopback,
         msapAtmPlcyTblLastChgd
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of managed SAP capabilities
          on Nokia SROS series systems added in release 9.0."
@@ -31782,18 +32953,6 @@ tmnxSapSubMgmtV9v0Group          OBJECT-GROUP
          capabilities on Nokia SROS series 9.x systems."
     ::= { tmnxSapGroups 157 }
 
-tmnxSapHsmdaV9v0Group            OBJECT-GROUP
-    OBJECTS     {
-        sapEgrQosHsmdaQueueMBS,
-        sapEgrQosHsmdaQueueWrrWeight,
-        sapEgressHsmdaWrrPolicyOvr
-    }
-    STATUS      obsolete
-    DESCRIPTION
-        "The group of objects supporting management of SAP Egress QOS Hsmda
-         capabilities on Nokia SROS series systems release 9.0."
-    ::= { tmnxSapGroups 158 }
-
 tmnxSapDefHostV9v0Group          OBJECT-GROUP
     OBJECTS     {
         sapDefHostTableLastChanged,
@@ -31813,7 +32972,7 @@ tmnxSapFilterProfileV9v0Group    OBJECT-GROUP
         sapSubMgmtDefFilterProfile,
         msapPlcySubMgmtDefFilterProfile
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of SAP Filter Profiles on
          Nokia SROS series systems."
@@ -32137,7 +33296,7 @@ tmnxSapNotificationV9v0Group     NOTIFICATION-GROUP
         sapAtmPppSessionFailure,
         sapAtmPppNcpFailure
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of SAP notifications added in release 9.0 of Nokia SROS
          series system."
@@ -32195,7 +33354,7 @@ tmnxSapV11v0Group                OBJECT-GROUP
         sapIgnoreOperDown,
         sapTlsDhcp6UserDb
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting SAP feature on Nokia SROS series
          release 11.0 systems."
@@ -32287,46 +33446,10 @@ tmnxSapNotificationV10v0Group    NOTIFICATION-GROUP
          Nokia SROS series systems."
     ::= { tmnxSapGroups 413 }
 
-tmnxSapHsmdaV10v0Group           OBJECT-GROUP
-    OBJECTS     {
-        sapEgressHsmdaShaperOverride,
-        sapIngressHsmdaPacketOffOvr,
-        sapEgressHsmdaPacketOffOverride,
-        sapEgrQosHsmdaQueueRowStatus,
-        sapEgrQosHsmdaQueueLastChanged,
-        sapEgrQosHsmdaQueueAdminPIR,
-        sapEgrQosHsmdaQueueAdminCIR,
-        sapEgrQosHsmdaQueueSlopePolicy,
-        sapEgrHsmdaQStatCustId,
-        sapEgrHsmdaQStatInProfPktFwd,
-        sapEgrHsmdaQStatInProfPktDropd,
-        sapEgrHsmdaQStatOutProfPktFwd,
-        sapEgrHsmdaQStatOutProfPktDropd,
-        sapEgrHsmdaQStatInProfOctFwd,
-        sapEgrHsmdaQStatInProfOctDropd,
-        sapEgrHsmdaQStatOutProfOctFwd,
-        sapEgrHsmdaQStatOutProfOctDropd,
-        sapEgrHsmdaCntrStCustId,
-        sapEgrHsmdaCntrStInProfPktFwd,
-        sapEgrHsmdaCntrStInProfPktDrop,
-        sapEgrHsmdaCntrStOutProfPktFwd,
-        sapEgrHsmdaCntrStOutProfPktDrop,
-        sapEgrHsmdaCntrStInProfOctFwd,
-        sapEgrHsmdaCntrStInProfOctDrop,
-        sapEgrHsmdaCntrStOutProfOctFwd,
-        sapEgrHsmdaCntrStOutProfOctDrop
-    }
-    STATUS      obsolete
-    DESCRIPTION
-        "The group of objects supporting management of SAP Ingress/Egress QoS
-         Hsmda capabilities on Nokia SROS series systems in 10.0 release."
-    ::= { tmnxSapGroups 414 }
-
 tmnxSapObsoletedV10v0Group       OBJECT-GROUP
     OBJECTS     {
         sapIngressAggRateLimit,
         sapIngressHsmdaPacketOffOvr,
-        sapEgrQosHsmdaQueueAdminCIR,
         sapIngHsmdaQStatCustId,
         sapIngHsmdaQStatHiPktsDropped,
         sapIngHsmdaQStatLoPktsDropped,
@@ -33292,7 +34415,7 @@ tmnxSapIpipeFaultPropGroup       OBJECT-GROUP
         sapIpipeLegacyFaultNotification,
         sapIpipeRemainRecoveryTimer
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of IPIPE fault propagation
          on SAP for release 13.0 on Nokia SROS series systems."
@@ -33393,7 +34516,7 @@ tmnxSapQosRateV13v0Group         OBJECT-GROUP
         sapTmplEgrAggRateLimit,
         sapEgrEncapGrpAggRateLimit
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of SAP QoS capabilities for
          release 13.0 on Nokia SROS series systems."
@@ -34605,7 +35728,7 @@ tmnxSapQosRateGroup              OBJECT-GROUP
         sapTmplEgrAggRateLimitHi,
         sapEgressAggRateLmtHi
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of additional objects enhancing the management of SAP QOS
          rates configuration on Nokia SROS series systems in Release 15.0."
@@ -35251,9 +36374,10 @@ tmnxSapIngressAggRateV19v0Group  OBJECT-GROUP
     OBJECTS     {
         sapIngressAggregatePolicerRateLo,
         sapIngressAggregatePolicerRateHi,
-        sapIngressAggregatePolicerBurst
+        sapIngressAggregatePolicerBurst,
+        sapIngressAggregatePolicerMBS
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of the SAP Ingress
          Aggregate Rate on Nokia SROS series systems in release 19.0."
@@ -35442,42 +36566,16 @@ sapIngressIPCritOvrV20v10Group   OBJECT-GROUP
          on Nokia SROS series systems."
     ::= { tmnxSapGroups 554 }
 
-sapHsmdaObsoleteV21v0Group       OBJECT-GROUP
+sapEgressAggRateV21v0Group       OBJECT-GROUP
     OBJECTS     {
-        sapEgressHsmdaShaperOverride,
-        sapEgressHsmdaPacketOffOverride,
-        sapEgrQosHsmdaQueueRowStatus,
-        sapEgrQosHsmdaQueueLastChanged,
-        sapEgrQosHsmdaQueueAdminPIR,
-        sapEgrQosHsmdaQueueAdminCIR,
-        sapEgrQosHsmdaQueueSlopePolicy,
-        sapEgrHsmdaQStatCustId,
-        sapEgrHsmdaQStatInProfPktFwd,
-        sapEgrHsmdaQStatInProfPktDropd,
-        sapEgrHsmdaQStatOutProfPktFwd,
-        sapEgrHsmdaQStatOutProfPktDropd,
-        sapEgrHsmdaQStatInProfOctFwd,
-        sapEgrHsmdaQStatInProfOctDropd,
-        sapEgrHsmdaQStatOutProfOctFwd,
-        sapEgrHsmdaQStatOutProfOctDropd,
-        sapEgrHsmdaCntrStCustId,
-        sapEgrHsmdaCntrStInProfPktFwd,
-        sapEgrHsmdaCntrStInProfPktDrop,
-        sapEgrHsmdaCntrStOutProfPktFwd,
-        sapEgrHsmdaCntrStOutProfPktDrop,
-        sapEgrHsmdaCntrStInProfOctFwd,
-        sapEgrHsmdaCntrStInProfOctDrop,
-        sapEgrHsmdaCntrStOutProfOctFwd,
-        sapEgrHsmdaCntrStOutProfOctDrop,
-        sapEgrQosHsmdaQueueMBS,
-        sapEgrQosHsmdaQueueWrrWeight,
-        sapEgressHsmdaWrrPolicyOvr
+        sapEgressAggRateAdaptRule,
+        sapEgressAggBurstLimit
     }
     STATUS      current
     DESCRIPTION
-        "The group of objects supporting management of SAP Egress QOS Hsmda
-         capabilities on Nokia SROS series systems release 9.0."
-    ::= { tmnxSapGroups 556 }
+        "The group of objects supporting management of hardware aggregate
+         shaping for SAP egress on Nokia SROS series systems."
+    ::= { tmnxSapGroups 555 }
 
 sapQueueOvrObsoleteV21v0Group    OBJECT-GROUP
     OBJECTS     {
@@ -35542,8 +36640,8 @@ sapLastChangeV21v0Group          OBJECT-GROUP
     }
     STATUS      current
     DESCRIPTION
-        "The group of objects supporting last-change objs on Nokia SROS release
-         21 series systems."
+        "The group of objects supporting last-change objects on Nokia SROS
+         release 21 series systems."
     ::= { tmnxSapGroups 560 }
 
 tmnxSapEgressHQosV21v0Group      OBJECT-GROUP
@@ -35630,13 +36728,406 @@ tmnxSapStaticHostV22v0Group      OBJECT-GROUP
         sapStaticHostMRtPreference,
         sapStaticHostMRtTag,
         sapStatHost6MRtPreference,
-        sapStatHost6MRtTag
+        sapStatHost6MRtTag,
+        tmnxSapMRtCpeChkLastMgmtChange,
+        tmnxSapMRtCpeChkRowStatus,
+        tmnxSapMRtCpeChkAddr,
+        tmnxSapMRtCpeChkAddrType,
+        tmnxSapMRtCpeChkInterval,
+        tmnxSapMRtCpeChkDropCnt,
+        tmnxSapMRtCpeChkTimeout,
+        tmnxSapMRtCpeChkPaddingSize,
+        tmnxSapMRtCpeChkEnableLog,
+        tmnxSapMRtCpeChkFailMetric,
+        tmnxSapMRtCpeChkFailPreference,
+        tmnxSapMRtCpeChkFailTag,
+        tmnxSapMRtCpeChkSrcAddrType,
+        tmnxSapMRtCpeChkSrcAddr,
+        tmnxSapMRtCpeChkFailWithdraw,
+        tmnxSapMRtCpeChkUpTime,
+        tmnxSapMRtCpeChkInPktCnt,
+        tmnxSapMRtCpeChkOutPktCnt,
+        tmnxSapMRtCpeChkDownTrans,
+        tmnxSapMRtCpeChkUpTrans,
+        tmnxSapMRtCpeChkTTL,
+        tmnxSapMRtCpeChkStatus
     }
     STATUS      current
     DESCRIPTION
         "The group of objects supporting management of SAP static hosts added
          in release 22 of the Nokia SROS series systems."
     ::= { tmnxSapGroups 566 }
+
+tmnxSapSharedPolicerV22v0Group   OBJECT-GROUP
+    OBJECTS     {
+        sapQosSharedPolicerName
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of SAP Shared policer added
+         in release 22 of the Nokia SROS series systems."
+    ::= { tmnxSapGroups 567 }
+
+tmnxSapNotifyV22v0Group          NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxSapMRtCpeChkStatusChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting SAPs added to Nokia SROS series
+         systems in release 22."
+    ::= { tmnxSapGroups 568 }
+
+tmnxSapDcpFpCountV22v0Group      OBJECT-GROUP
+    OBJECTS     {
+        sapDcpFpStaticTotalExcdCount,
+        sapDcpFpStaticExtCnfrmStateCount,
+        sapDcpFpDynTotalExcdCount,
+        sapDcpFpDynExitConformStateCount,
+        sapDcpFpLocMonTotalExcdCount,
+        sapDcpFpLocMonExtCnfrmStateCount
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of DCPU objects for which exceed counter will not reset for
+         release 22.0 on Nokia SROS series systems."
+    ::= { tmnxSapGroups 569 }
+
+tmnxSapEgrAggRatePerV22v0Group   OBJECT-GROUP
+    OBJECTS     {
+        sapEgressQosAggRatePIRPercent,
+        sapEgressQosAggRateCIRPercent,
+        sapEgressQosAggRateType
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of SAP Egress Agg-rate
+         percent added in release 22 of the Nokia SROS series systems."
+    ::= { tmnxSapGroups 570 }
+
+tmnxSapEgrAggRateV22v0Group      OBJECT-GROUP
+    OBJECTS     {
+        sapEgrAggRateLimitHi,
+        sapEgrAggRateLimit,
+        tmnxSapEgrQosAggShapSchedAssignd,
+        tmnxSapEgrQosAggShapAssignedRate,
+        tmnxSapEgrQosAggShapOperRate,
+        tmnxSapEgrQosAggShapConsumedRate,
+        tmnxSapEgrQosAggShapAvgFrameOvhd,
+        tmnxSapEgrQosAggShapAfoRealTime,
+        tmnxSapEgrQosAggShapSchedActive,
+        tmnxSapEgrQosAggShapSchedRunning,
+        tmnxSapEgrQosAggShapInvlClassUse,
+        tmnxSapEgrQosAggShapBurstLimit,
+        tmnxSapEgrQosAggShapDepth,
+        tmnxSapEgrQosAggShapPacketMode,
+        tmnxSapEgrQosAggShapOutOfDate,
+        tmnxSapEgrQosAggShapQSetSize
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of SAP Egress Agg-rate
+         percent added in release 22 of the Nokia SROS series systems."
+    ::= { tmnxSapGroups 571 }
+
+sapAlmpV23v0Group                OBJECT-GROUP
+    OBJECTS     {
+        sapTlsAutoLearnMacProtectOper,
+        sapTlsRestUnprotDstMacOper,
+        sapTlsAutoLrnMacPrtctExcListOper
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of SAP
+         auto-learn-mac-protect feature in release 23 of the Nokia SROS series
+         systems."
+    ::= { tmnxSapGroups 572 }
+
+sapAtmObsoleteGroup              OBJECT-GROUP
+    OBJECTS     {
+        msapAtmPlcyEgrTrafficDescIndex,
+        msapAtmPlcyIngTrafficDescIndex,
+        msapAtmPlcyLastChanged,
+        msapAtmPlcyOamAlarmCellHandling,
+        msapAtmPlcyOamPeriodicLoopback,
+        msapAtmPlcyTblLastChgd,
+        sapAtmDetectedEncapsulation,
+        sapAtmEgressTrafficDescIndex,
+        sapAtmEgressTrafficDescIndexOvr,
+        sapAtmEncapsulation,
+        sapAtmIngressTrafficDescIndex,
+        sapAtmIngressTrafficDescIndexOvr,
+        sapAtmLLFAdminStatus,
+        sapAtmLLFOperStatus,
+        sapAtmOamAlarmCellHandling,
+        sapAtmOamPeriodicLoopback,
+        sapAtmOamTerminate,
+        sapAtmPppStatsRxDropped,
+        sapAtmPppStatsRxPackets,
+        sapAtmPppStatsTxPackets,
+        sapAtmSubPppIndex,
+        sapAtmVcRangeLastMgmtChange,
+        sapAtmVcRangeRowStatus,
+        sapAtmVcRangeVciEnd,
+        sapAtmVcRangeVciStart,
+        sapAtmVcRangeVpiEnd,
+        sapAtmVcRangeVpiStart
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of ATM objects obsoleted release 23 of the Nokia SROS series
+         systems."
+    ::= { tmnxSapGroups 573 }
+
+sapTlsPppObsoletedGroup          OBJECT-GROUP
+    OBJECTS     {
+        sapTlsPppMsapTrigger,
+        sapTlsPppPolicy,
+        sapTlsPppUserDb
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of SAP TLS PPP objects obsoleted in release 23 of the Nokia
+         SROS series systems."
+    ::= { tmnxSapGroups 575 }
+
+sapEgressVPortV23v0Group         OBJECT-GROUP
+    OBJECTS     {
+        sapEgressVirtualPort
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of service sap virtual port
+         for SAP egress on Nokia SROS series systems."
+    ::= { tmnxSapGroups 576 }
+
+sapTlsObsoletedV23v0Group        OBJECT-GROUP
+    OBJECTS     {
+        sapTlsDhcp6Snoop
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of SAP TLS objects obsoleted in release 23 of the Nokia SROS
+         series systems."
+    ::= { tmnxSapGroups 577 }
+
+tmnxSapV23v0Group                OBJECT-GROUP
+    OBJECTS     {
+        sapTlsDhcp6AdminState,
+        sapTlsDhcp6Description,
+        sapTlsDhcp6InterfaceId,
+        sapTlsDhcp6RemoteId,
+        sapTlsDhcp6RemoteIdString,
+        sapTlsDhcp6LdraAdminState,
+        sapTlsDhcp6InterfaceType,
+        sapTlsDhcp6StatsClntSnoopdPckts,
+        sapTlsDhcp6StatsSrvrSnoopdPckts,
+        sapTlsDhcp6StatsClntForwdPckts,
+        sapTlsDhcp6StatsSrvrForwdPckts,
+        sapTlsDhcp6StatsClntDropdPckts,
+        sapTlsDhcp6StatsSrvrDropdPckts,
+        sapTlsDhcp6UserDb,
+        sapSiteName,
+        sapTlsDhcpUserDb,
+        sapHostLockoutPolicy,
+        sapTlsAutoLearnMacProtect,
+        sapIngressFPQGrp,
+        sapIngressFPQGrpInstanceId,
+        sapIpv6HostInfoIpoeSLAACHosts,
+        sapIgnoreOperDown
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting SAP feature on Nokia SROS series
+         release 23 systems."
+    ::= { tmnxSapGroups 578 }
+
+tmnxSapBaseSIngAggPolV23v0Group  OBJECT-GROUP
+    OBJECTS     {
+        sapIngAggPolStatsInProfFwdPkts,
+        sapIngAggPolStatsInProfFwdOcts,
+        sapIngAggPolStatsOutProfFwdPkts,
+        sapIngAggPolStatsOutProfFwdOcts,
+        sapIngAggPolStatsExcProfDropPkts,
+        sapIngAggPolStatsExcProfDropOcts
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of ingress aggregate SAP
+         statistics on Nokia SROS series systems in release 23.0."
+    ::= { tmnxSapGroups 579 }
+
+tmnxSapEgrQosAggShpOvrSapV230Grp OBJECT-GROUP
+    OBJECTS     {
+        tmnxSapEgrQosAggShpQSetSzOvr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of SAP Egress Aggregate
+         shapers sap override added in release 23 of the Nokia SROS series
+         systems."
+    ::= { tmnxSapGroups 580 }
+
+sapIpipeFaultPropObsoleteGroup   OBJECT-GROUP
+    OBJECTS     {
+        sapIpipeLegacyFaultNotification,
+        sapIpipeRemainRecoveryTimer
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for management of IPIPE fault propagation on SAP
+         obsoleted in release 24.3 on Nokia SROS series systems."
+    ::= { tmnxSapGroups 581 }
+
+tSapQosRateObsoletedV24v0Group   OBJECT-GROUP
+    OBJECTS     {
+        sapEgressAggRateLmt,
+        sapEgressAggRateLmtHi
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for SAP QoS capabilities obsoleted in release
+         24.3 on Nokia SROS series systems."
+    ::= { tmnxSapGroups 582 }
+
+tmnxSapQosRateV24v0Group         OBJECT-GROUP
+    OBJECTS     {
+        sapTmplEgrAggRateLimit,
+        sapEgrEncapGrpAggRateLimit,
+        sapIngQosQAdminPIRHi,
+        sapIngQosQAdminPIRLo,
+        sapIngQosQAdminCIRHi,
+        sapIngQosQAdminCIRLo,
+        sapEgrQosQAdminPIRHi,
+        sapEgrQosQAdminPIRLo,
+        sapEgrQosQAdminCIRHi,
+        sapEgrQosQAdminCIRLo,
+        sapIngPlcrCtrlOvrMaxRateHi,
+        sapIngPlcrCtrlOvrMaxRateLo,
+        sapEgrPlcrCtrlOvrMaxRateHi,
+        sapEgrPlcrCtrlOvrMaxRateLo,
+        sapEgrEncapGrpAggRateLimitHi,
+        sapTmplEgrAggRateLimitHi
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for SAP QoS capabilities and the objects
+         enhancing the management of SAP QOS rates configuration  on Nokia SROS
+         series systems in Release 24.3."
+    ::= { tmnxSapGroups 583 }
+
+tmnxSapEgrAggRateV24v0Group      OBJECT-GROUP
+    OBJECTS     {
+        sapEgrShrdQAggRateBurstLmt
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of SAP Egress Agg-rate
+         percent added in release 24 of the Nokia SROS series systems."
+    ::= { tmnxSapGroups 584 }
+
+tmnxSapEgressLatencyV24v0Group   OBJECT-GROUP
+    OBJECTS     {
+        sapEgressLatencyBudget
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of SAP Egress Latency
+         Budget in release 24 of Nokia SROS series systems."
+    ::= { tmnxSapGroups 585 }
+
+tmnxIpTnlTransProfV24v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tmnxIpTnlIPsecStatPpkNegotiated
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the IPsec transport mode
+         on Nokia SROS series systems in release 24.0."
+    ::= { tmnxSapGroups 586 }
+
+sapQtagNormalizationV24v0Group   OBJECT-GROUP
+    OBJECTS     {
+        sapQtagNormalization,
+        sapQtagNormalizationEncap
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of sap q-tag normalization
+         for EVPN VPWS services on Nokia SROS series systems in release 24.0."
+    ::= { tmnxSapGroups 587 }
+
+sapIngFilterSetV24v0Group        OBJECT-GROUP
+    OBJECTS     {
+        sapIngressFilterSet
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of filter set for SAP
+         ingress on Nokia SROS series systems."
+    ::= { tmnxSapGroups 588 }
+
+sapIngAggPolicerV25v0Group       OBJECT-GROUP
+    OBJECTS     {
+        sapIngressAggregatePlcrAlgoType
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of aggregate policer for
+         SAP ingress on Nokia SROS series systems."
+    ::= { tmnxSapGroups 589 }
+
+sapIngAggRateV25v0Group          OBJECT-GROUP
+    OBJECTS     {
+        sapIngressAggregatePolicerRateLo,
+        sapIngressAggregatePolicerRateHi,
+        sapIngressAggregatePolicerMBS
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for SAP QoS capabilities in release  25.3 on
+         Nokia SROS series systems."
+    ::= { tmnxSapGroups 590 }
+
+tmnxSapObsoletedV25v0Group       OBJECT-GROUP
+    OBJECTS     {
+        sapIngressAggregatePolicerBurst,
+        sapStaticHostFilterProfile,
+        sapSubMgmtDefFilterProfile,
+        msapPlcySubMgmtDefFilterProfile
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects obsoleted in release 25 of the Nokia SROS series."
+    ::= { tmnxSapGroups 592 }
+
+sapTlsMacAddrV25v0Group          OBJECT-GROUP
+    OBJECTS     {
+        sapTlsFdbProtectedMacAddrRec,
+        sapTlsFdbProtMacAddrRecLastChgd,
+        sapTlsExtPbbProtectedMacAddrRec,
+        sapTlsExtPbbProtMacAddrRecLstChg,
+        sapTlsExtTableHighUtilization,
+        sapTlsNonBlockMoveRateXMacAddr,
+        sapTlsNoBlckMvRateXMacAddrLstChg,
+        sapTlsMoveRateExceededMacAddr,
+        sapTlsMvRateExceedMacAddrLstChgd
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects support SAP TLS MAC addresses on Nokia SROS
+         series release 25 systems."
+    ::= { tmnxSapGroups 593 }
+
+sapEgrQosSinkExcessBWV25v0Grp    OBJECT-GROUP
+    OBJECTS     {
+        sapEgressQosSinkExcessBW
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of SAP egress sink excess
+         bandwidth on Nokia SROS series systems."
+    ::= { tmnxSapGroups 598 }
 
 tmnxDCSapCompliances             OBJECT IDENTIFIER ::= { tmnxSapConformance 3 }
 
@@ -36180,7 +37671,7 @@ sapAtmPppSessionFailure          NOTIFICATION-TYPE
         sapNotifyName,
         sapNotifyReason
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "[CAUSE] The sapAtmPppSessionFailure notification indicates that the
          system could not create a new PPPoA session.
@@ -36207,7 +37698,7 @@ sapAtmPppNcpFailure              NOTIFICATION-TYPE
         sapPppNcpFailureProtocol,
         sapNotifyReason
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "[CAUSE] The sapAtmPppNcpFailure notification indicates that there is a
          NCP phase setup problem.
@@ -36795,6 +38286,30 @@ sapReceivedPbbProtSrcMac         NOTIFICATION-TYPE
 
          [RECOVERY] None needed."
     ::= { sapTraps 63 }
+
+tmnxSapMRtCpeChkStatusChange     NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxSapMRtCpeChkStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSapMRtCpeChkStatusChange notification is generated when a CPE
+         associated with a managed route  and monitored with an entry in the
+         tmnxSapMRtCpeChkTable where the value of tmnxSapMRtCpeChkEnableLog is
+         equal to 'true' becomes reachable or unreachable. [CAUSE] The CPE with
+         address tmnxSapMRtCpeChkAddr becomes unreachable or reachable again
+         according to the conditions specified in the tmnxSapMRtCpeChkEntry and
+         while the value of tmnxSapMRtCpeChkEnableLog is equal to 'true'.
+
+         [EFFECT] The system can not forward traffic to the CPE while it is
+         unreachable; the CPE may be reachable via another system. While the
+         CPE is unreachable, the system can change the operational metric or
+         preference of the associated managed route, according to the
+         tmnxSapMRtCpeChkEntry configuration.
+
+         [RECOVERY] Depending on the situation. If the CPE is reachable via
+         another system, no recovery may be necessary."
+    ::= { sapTraps 64 }
 
 sapMgNotification                OBJECT IDENTIFIER ::= { sapTrapsPrefix 1 }
 

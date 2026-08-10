@@ -28,6 +28,7 @@ namespace App\Polling\Measure;
 
 use Illuminate\Support\Collection;
 
+/** @extends Collection<string, MeasurementSummary> */
 class MeasurementCollection extends Collection
 {
     public function getTotalCount(): int

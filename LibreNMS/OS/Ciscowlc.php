@@ -28,6 +28,7 @@ namespace LibreNMS\OS;
 
 use App\Models\AccessPoint;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -43,12 +44,12 @@ class Ciscowlc extends Cisco implements
 {
     public function pollOS(DataStorageInterface $datastore): void
     {
-        if (! $this->getDevice()->wirelessSensors()->where('sensor_class', 'ap-count')->exists()) {
-            return; // if ap count doesn't exist, skip this polling TODO replace with wireless controller module
+        $apNames = SnmpQuery::enumStrings()->walk('AIRESPACE-WIRELESS-MIB::bsnAPName')->table(1);
+        if (empty($apNames)) {
+            return; // no AP data on this controller, nothing to poll
         }
 
         $device = $this->getDeviceArray();
-        $apNames = SnmpQuery::enumStrings()->walk('AIRESPACE-WIRELESS-MIB::bsnAPName')->table(1);
         $radios = SnmpQuery::enumStrings()->walk('AIRESPACE-WIRELESS-MIB::bsnAPIfTable')->table(2);
         SnmpQuery::walk('AIRESPACE-WIRELESS-MIB::bsnAPIfLoadChannelUtilization')->table(2, $radios);
         $interferences = SnmpQuery::walk('AIRESPACE-WIRELESS-MIB::bsnAPIfInterferencePower')->table(3);
@@ -169,7 +170,7 @@ class Ciscowlc extends Cisco implements
             $total += $count;
 
             $sensors[] = new WirelessSensor(
-                'clients',
+                WirelessSensorType::Clients,
                 $this->getDeviceId(),
                 $oid,
                 'ciscowlc-ssid',
@@ -180,7 +181,7 @@ class Ciscowlc extends Cisco implements
         }
 
         $sensors[] = new WirelessSensor(
-            'clients',
+            WirelessSensorType::Clients,
             $this->getDeviceId(),
             $total_oids,
             'ciscowlc',
@@ -210,7 +211,7 @@ class Ciscowlc extends Cisco implements
         if (isset($data['CISCO-LWAPP-AP-MIB::cLApGlobalAPConnectCount.0'])) {
             return [
                 new WirelessSensor(
-                    'ap-count',
+                    WirelessSensorType::ApCount,
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.9.9.513.1.3.35.0',
                     'ciscowlc',
@@ -230,7 +231,7 @@ class Ciscowlc extends Cisco implements
         if (isset($data['CISCO-LWAPP-SYS-MIB::clsSysApConnectCount.0'])) {
             return [
                 new WirelessSensor(
-                    'ap-count',
+                    WirelessSensorType::ApCount,
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.9.9.618.1.8.4.0',
                     'ciscowlc',

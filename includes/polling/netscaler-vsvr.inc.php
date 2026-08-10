@@ -86,7 +86,7 @@ if ($device['os'] == 'netscaler') {
                 if (is_numeric($vsvr[$oid])) {
                     $fields[$oid_ds] = $vsvr[$oid];
                 } else {
-                    $fields[$oid_ds] = 'U';
+                    $fields[$oid_ds] = null;
                 }
             }
 
@@ -128,7 +128,7 @@ if ($device['os'] == 'netscaler') {
     foreach ($vsvrs as $db_name => $db_id) {
         if (! $vsvr_exist[$db_name]) {
             echo '-' . $db_name;
-            dbDelete('netscaler_vservers', '`vsvr_id` =  ?', [$db_id['vsvr_id']]);
+            \App\Models\NetscalerVserver::where('vsvr_id', $db_id['vsvr_id'])->delete();
         }
     }
 }//end if

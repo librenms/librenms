@@ -3,13 +3,19 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Device;
+use App\Models\Vlan;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\Url;
 
+/**
+ * @extends TableController<Device>
+ */
 class VlanDevicesController extends TableController
 {
-    protected function sortFields($request)
+    protected function sortFields(Request $request): array
     {
         return [
             'device' => 'device_id',
@@ -23,10 +29,12 @@ class VlanDevicesController extends TableController
 
     private int $vlanId;
 
-    protected function baseQuery(Request $request)
+    protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Vlan::class);
+
         $this->validate($request, ['vlan' => 'integer']);
-        $this->vlanId = $request->get('vlan', 1);
+        $this->vlanId = $request->input('vlan', 1);
 
         return Device::distinct()
             ->hasAccess($request->user())
@@ -53,8 +61,9 @@ class VlanDevicesController extends TableController
 
     /**
      * @param  Device  $model
+     * @return array<string, scalar>
      */
-    public function formatItem($model): array
+    public function formatItem(Model $model): array
     {
         return [
             'device' => Url::deviceLink($model),

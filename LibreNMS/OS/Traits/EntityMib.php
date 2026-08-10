@@ -49,7 +49,7 @@ trait EntityMib
             $entityPhysical = new EntPhysical($data);
             $entityPhysical->entPhysicalIndex = $entityPhysicalIndex;
             // get ifIndex. also if parent has an ifIndex, set it too
-            $entityPhysical->ifIndex = $entPhysicalToIfIndexMap[$entityPhysicalIndex] ?? $entPhysicalToIfIndexMap[$entityPhysical->entPhysicalContainedIn] ?? null;
+            $entityPhysical->ifIndex = $entPhysicalToIfIndexMap[$entityPhysicalIndex] ?? $entPhysicalToIfIndexMap[(int) $entityPhysical->entPhysicalContainedIn] ?? null;
 
             return $entityPhysical;
         });

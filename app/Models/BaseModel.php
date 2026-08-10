@@ -28,6 +28,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
 
 abstract class BaseModel extends Model
 {
@@ -55,15 +56,10 @@ abstract class BaseModel extends Model
 
     /**
      * Helper function to determine if user has access based on device permissions
-     *
-     * @param  Builder  $query
-     * @param  User  $user
-     * @param  string  $table
-     * @return Builder
      */
-    protected function hasDeviceAccess($query, User $user, $table = null)
+    protected function hasDeviceAccess(Builder $query, User $user, ?string $table = null): Builder
     {
-        if ($user->hasGlobalRead()) {
+        if (Gate::forUser($user)->allows('viewAll', Device::class)) {
             return $query;
         }
 
@@ -76,15 +72,10 @@ abstract class BaseModel extends Model
 
     /**
      * Helper function to determine if user has access based on port permissions
-     *
-     * @param  Builder  $query
-     * @param  User  $user
-     * @param  string  $table
-     * @return Builder
      */
-    protected function hasPortAccess($query, User $user, $table = null)
+    protected function hasPortAccess(Builder $query, User $user, ?string $table = null): Builder
     {
-        if ($user->hasGlobalRead()) {
+        if (Gate::forUser($user)->allows('viewAll', Port::class)) {
             return $query;
         }
 
@@ -94,6 +85,22 @@ abstract class BaseModel extends Model
 
         return $query->where(fn ($query) => $query->whereIntegerInRaw("$table.port_id", \Permissions::portsForUser($user))
             ->orWhereIntegerInRaw("$table.device_id", \Permissions::devicesForUser($user)));
+    }
+
+    /**
+     * Helper function to determine if user has access based on bill permissions
+     */
+    protected function hasBillAccess(Builder $query, User $user, ?string $table = null): Builder
+    {
+        if (Gate::forUser($user)->allows('viewAll', Bill::class)) {
+            return $query;
+        }
+
+        if (is_null($table)) {
+            $table = $this->getTable();
+        }
+
+        return $query->whereIntegerInRaw("$table.bill_id", \Permissions::billsForUser($user));
     }
 
     public static function definedRelations(): array

@@ -6,7 +6,7 @@ $scale_max = '100';
 require 'includes/html/graphs/common.inc.php';
 
 $iter = '1';
-$rrd_options .= " COMMENT:'                        Size      Used    % Used\\l'";
+$rrd_options[] = 'COMMENT:                        Size      Used    % Used\\l';
 
 $storages = dbFetchRows('SELECT * FROM storage where device_id = ?', [$device['device_id']]);
 
@@ -35,13 +35,13 @@ foreach ($storages as $storage) {
 
     $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($storage['storage_descr'], 16);
     $rrd = Rrd::name($device['hostname'], ['storage', $storage['type'], $storage['storage_descr']]);
-    $rrd_options .= " DEF:{$storage['storage_id']}used=$rrd:used:AVERAGE";
-    $rrd_options .= " DEF:{$storage['storage_id']}free=$rrd:free:AVERAGE";
-    $rrd_options .= " CDEF:{$storage['storage_id']}size={$storage['storage_id']}used,{$storage['storage_id']}free,+";
-    $rrd_options .= " CDEF:{$storage['storage_id']}perc={$storage['storage_id']}used,{$storage['storage_id']}size,/,100,*";
-    $rrd_options .= " LINE1.25:{$storage['storage_id']}perc#" . $colour . ":'$descr'";
-    $rrd_options .= " GPRINT:{$storage['storage_id']}size:LAST:%6.2lf%sB";
-    $rrd_options .= " GPRINT:{$storage['storage_id']}used:LAST:%6.2lf%sB";
-    $rrd_options .= " GPRINT:{$storage['storage_id']}perc:LAST:%5.2lf%%\\l";
+    $rrd_options[] = "DEF:{$storage['storage_id']}used=$rrd:used:AVERAGE";
+    $rrd_options[] = "DEF:{$storage['storage_id']}free=$rrd:free:AVERAGE";
+    $rrd_options[] = "CDEF:{$storage['storage_id']}size={$storage['storage_id']}used,{$storage['storage_id']}free,+";
+    $rrd_options[] = "CDEF:{$storage['storage_id']}perc={$storage['storage_id']}used,{$storage['storage_id']}size,/,100,*";
+    $rrd_options[] = "LINE1.25:{$storage['storage_id']}perc#" . $colour . ":$descr";
+    $rrd_options[] = "GPRINT:{$storage['storage_id']}size:LAST:%6.2lf%sB";
+    $rrd_options[] = "GPRINT:{$storage['storage_id']}used:LAST:%6.2lf%sB";
+    $rrd_options[] = "GPRINT:{$storage['storage_id']}perc:LAST:%5.2lf%%\\l";
     $iter++;
 }//end foreach

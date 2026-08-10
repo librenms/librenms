@@ -87,9 +87,10 @@ pip install \
  mkdocs-macros-plugin \
  mkdocs-material \
  mkdocs-minify-plugin \
- mkdocs-redirects
+ mkdocs-redirects \
+ pymdown-extensions
 ```
-If you encounter permissions issues, these might be reoslved by using the
+If you encounter permissions issues, these might be resolved by using the
 user option, with whatever user you are building as, e.g. `-u librenms`
 
 2. A configuration file for building LibreNMS docs is already included in the
@@ -145,4 +146,3 @@ mkdocs serve --dev-addr=0.0.0.0:8000
 
 WARNING: this is not a secure webserver, do this at your own risk, with
 appropriate host security and do not leave the server running.
-

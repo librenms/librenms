@@ -1,4 +1,3 @@
-mib: GAM-SYSUTIL-MIB
 modules:
     os:
         hardware: GAM-SYSUTIL-MIB::gamSysutilStatusBoardInfoBoardType.0
@@ -19,9 +18,9 @@ modules:
                     descr: GAM-SYSUTIL-MIB::gamSysutilStatusPowerSupplyDescription
                     index: 'gamSysutilStatusPowerSupplyState.{{ $index }}'
                     states:
-                        - { value: 0, descr: Active, graph: 1, generic: 0 }
-                        - { value: 1, descr: Standby, graph: 1, generic: 1 }
-                        - { value: 2, descr: 'Not Present', graph: 1, generic: 3 }
+                        - { value: 0, descr: Active, generic: 0 }
+                        - { value: 1, descr: Standby, generic: 1 }
+                        - { value: 2, descr: 'Not Present', generic: 3 }
 
         temperature:
             data:

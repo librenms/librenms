@@ -1,5 +1,5 @@
 <?php
 
-$class = 'power_factor';
+$class = \LibreNMS\Enum\Sensor::PowerFactor;
 
 require 'sensors.inc.php';

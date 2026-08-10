@@ -1,0 +1,40 @@
+CUBO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, enterprises FROM SNMPv2-SMI
+;
+cubo MODULE-IDENTITY
+    LAST-UPDATED  "201902261441Z"
+    ORGANIZATION
+        "HUBER+SUHNER Cube Optics AG"
+    CONTACT-INFO
+        "HUBER+SUHNER Cube Optics
+        Customer Service
+        http://support.cubeoptics.com
+
+        Postal: Eindhoven-Allee 3
+                55129 Mainz
+                Germany
+        E-mail: cs.cubo@hubersuhner.com
+        Tel: +49-6131-4995-520"
+    DESCRIPTION
+        "MIB tree definition for the CUBO devices"
+    REVISION
+        "201909031128Z"
+    DESCRIPTION
+        "Added cuco-cube group"
+    REVISION
+        "201902261441Z"
+    DESCRIPTION
+        "Added cmini-cube group"
+    REVISION
+        "201004301900Z"
+    DESCRIPTION
+        "First revision"
+::= { enterprises 27894 }
+
+transport-cube OBJECT IDENTIFIER ::= { cubo 9 }
+cuco-cube      OBJECT IDENTIFIER ::= { cubo 10 }
+cmini-cube     OBJECT IDENTIFIER ::= { cubo 11 }
+
+END

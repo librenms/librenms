@@ -23,7 +23,11 @@
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-if (! Auth::user()->hasGlobalAdmin()) {
+
+use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
+
+if (\Illuminate\Support\Facades\Gate::denies('debug', \App\Models\Device::class)) {
     echo 'Insufficient Privileges';
     exit;
 }
@@ -37,14 +41,14 @@ switch ($type) {
         $filename = "poller-$hostname.txt";
         break;
     case 'snmpwalk':
-        $device = device_by_name($hostname);
+        $device = DeviceCache::getByHostname($hostname);
 
         $cmd = gen_snmpwalk_cmd($device, '.', '-OUneb');
 
-        $filename = $device['os'] . '-' . $device['hostname'] . '.snmpwalk';
+        $filename = $device->os . '-' . $device->hostname . '.snmpwalk';
         break;
     case 'discovery':
-        $cmd = ['php', \App\Facades\LibrenmsConfig::get('install_dir') . '/discovery.php', '-h', $hostname, '-d'];
+        $cmd = ['php', \App\Facades\LibrenmsConfig::get('install_dir') . '/lnms', 'device:discover', $hostname, '-vv'];
         $filename = "discovery-$hostname.txt";
         break;
     default:
@@ -54,7 +58,7 @@ switch ($type) {
 
 // ---- Output ----
 $proc = new \Symfony\Component\Process\Process($cmd);
-$proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
+$proc->setTimeout(LibrenmsConfig::get('snmp.exec_timeout', 1200));
 
 if ($_GET['format'] == 'text') {
     header('Content-type: text/plain');

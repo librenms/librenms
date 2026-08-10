@@ -29,6 +29,7 @@ namespace LibreNMS\Tests;
 use App\Facades\LibrenmsConfig;
 use Exception;
 use Illuminate\Support\Str;
+use LibreNMS\Util\DataProviderCache;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use RecursiveDirectoryIterator;
@@ -132,40 +133,49 @@ final class MibTest extends TestCase
      */
     public static function mibFiles(): array
     {
-        $file_list = [];
-        foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(LibrenmsConfig::get('mib_dir'))) as $file) {
-            /** @var SplFileInfo $file */
-            if ($file->isDir()) {
-                continue;
-            }
-            $mib_path = str_replace(LibrenmsConfig::get('mib_dir') . '/', '', $file->getPathname());
-            $file_list[$mib_path] = [
-                str_replace(LibrenmsConfig::get('install_dir'), '.', $file->getPath()),
-                $file->getFilename(),
-                self::extractMibName($file->getPathname()),
-            ];
-        }
+        $mib_base = self::basePath('mibs');
+        $install_dir = self::basePath();
 
-        return $file_list;
+        return DataProviderCache::remember('mib_files', $mib_base, function () use ($mib_base, $install_dir) {
+            $file_list = [];
+            foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($mib_base)) as $file) {
+                /** @var SplFileInfo $file */
+                if ($file->isDir()) {
+                    continue;
+                }
+                $mib_path = str_replace($mib_base . '/', '', $file->getPathname());
+                $file_list[$mib_path] = [
+                    str_replace($install_dir, '.', $file->getPath()),
+                    $file->getFilename(),
+                    self::extractMibName($file->getPathname()),
+                ];
+            }
+
+            return $file_list;
+        });
     }
 
     /**
-     * List all directories inside the mib directory
+     * Data provider: returns all MIB directories (main dir + subdirectories)
      *
      * @return array
      */
     public static function mibDirs(): array
     {
-        $dirs = glob(LibrenmsConfig::get('mib_dir') . '/*', GLOB_ONLYDIR);
-        array_unshift($dirs, LibrenmsConfig::get('mib_dir'));
+        $mib_base = self::basePath('mibs');
 
-        $final_list = [];
-        foreach ($dirs as $dir) {
-            $relative_dir = str_replace(LibrenmsConfig::get('mib_dir') . '/', '', $dir);
-            $final_list[$relative_dir] = [$dir];
-        }
+        return DataProviderCache::remember('mib_dirs', $mib_base, function () use ($mib_base) {
+            $dirs = glob($mib_base . '/*', GLOB_ONLYDIR);
+            array_unshift($dirs, $mib_base);
 
-        return $final_list;
+            $final_list = [];
+            foreach ($dirs as $dir) {
+                $relative_dir = ltrim(str_replace($mib_base, '', $dir), '/');
+                $final_list[$relative_dir] = [$dir];
+            }
+
+            return $final_list;
+        });
     }
 
     /**
@@ -196,5 +206,14 @@ final class MibTest extends TestCase
         }
 
         throw new Exception("Could not extract mib name from file ($file)");
+    }
+
+    private static function basePath(string $subdir = ''): string
+    {
+        $dir = rtrim(realpath(__DIR__ . '/..'), '/');
+
+        return $subdir
+            ? $dir . '/' . $subdir
+            : $dir;
     }
 }

@@ -1,0 +1,501 @@
+--
+-- All Rights Reserved, Copyright (c) 2013, 2016, ALAXALA Networks Corp.
+--
+-- AX-SYSTEM-MIB.my axSystem group MIB file.
+--
+
+AX-SYSTEM-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        Integer32
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        DisplayString
+            FROM SNMPv2-TC
+        axMib
+            FROM AX-SMI-MIB
+;
+
+axSystem MODULE-IDENTITY
+    LAST-UPDATED    "201802130000Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+        "The MIB module to provide the basic information."
+    REVISION        "201802130000Z"
+    DESCRIPTION
+        "+Modified axModelType (added ax8304S)"
+    REVISION        "201512250000Z"
+    DESCRIPTION
+        "+Modified axModelType (added ax8308S)"
+    REVISION        "201403310000Z"
+    DESCRIPTION
+        "Modified axSystemGroup"
+    REVISION        "201402280001Z"
+    DESCRIPTION
+        "Added axLicense"
+    REVISION        "201402280000Z"
+    DESCRIPTION
+        "Modified axModelType"
+    REVISION        "201306200000Z"
+    DESCRIPTION
+        "Initial release."
+::= { axMib 1001 }
+
+
+--------------------------------------------------
+-- Object Identifiers
+--------------------------------------------------
+
+axSoftware              OBJECT IDENTIFIER ::= { axSystem 2 }
+axSystemMsg             OBJECT IDENTIFIER ::= { axSystem 3 }
+axSystemAlarm           OBJECT IDENTIFIER ::= { axSystem 4 }
+axLicense               OBJECT IDENTIFIER ::= { axSystem 6 }
+
+--------------------------------------------------
+-- Object Type definitions
+--------------------------------------------------
+
+--
+--  axModelType
+--
+
+axModelType OBJECT-TYPE
+    SYNTAX INTEGER {
+                      other(1),
+                      ax8608R(3000),
+                      ax8616R(3001),
+                      ax8632R(3002),
+                      ax8608S(4000),
+                      ax8616S(4001),
+                      ax8632S(4002),
+                      ax8308S(4100),
+                      ax8304S(4103)
+              }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Model type of this system."
+    ::= {axSystem 1}
+
+--
+--  axSoftware
+--
+
+axSoftwareName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Software name of this system."
+    ::= {axSoftware 1}
+
+axSoftwareAbbreviation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The abbreviated name of software."
+    ::= {axSoftware 2}
+
+--
+--  axSystemMsg
+--
+
+axSystemMsgText OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The text of the system log message."
+    ::= {axSystemMsg 1}
+
+axSystemMsgTimeStamp OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The time that event occured. And that is expressed as type of
+        YYYY/MM/DD hh:mm:ss[.nnn] zzzzzzz
+            YYYY:year(1969-2037)
+            MM:month(01-12)
+            DD:day(01-31)
+            hh:hour(00-23)
+            mm:minute(00-59)
+            ss:second(00-59)
+            nnn:second(000-999)
+            zzzzzzz:timezone
+        Insert space between DD and hh, and ss[.nnn] and zzzzzzz."
+    ::= {axSystemMsg 2}
+
+axSystemMsgLevel OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The newest system message event level."
+    ::= {axSystemMsg 3}
+
+axSystemMsgSwitchCode OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of system of system messages."
+    ::= {axSystemMsg 4}
+
+axSystemMsgBcuNumber OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of BCU of system messages."
+    ::= {axSystemMsg 5}
+
+axSystemMsgDuplexCode OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Character of duplex of system messages."
+    ::= {axSystemMsg 6}
+
+axSystemMsgEventType OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Event type of system messages."
+    ::= {axSystemMsg 7}
+
+axSystemMsgEventPoint OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The code of part that system message error occured."
+    ::= {axSystemMsg 8}
+
+axSystemMsgEventCode OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Event kind code of system messages."
+    ::= {axSystemMsg 9}
+
+axSystemMsgAdditionalCode1 OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Additional code1 of system messages."
+    ::= {axSystemMsg 10}
+
+axSystemMsgAdditionalCode2 OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Additional code2 of system messages."
+    ::= {axSystemMsg 11}
+
+axSystemMsgMsgText OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Message text of system messages."
+    ::= {axSystemMsg 12}
+
+--
+--  axSystemAlarmTable
+--
+
+axSystemAlarmTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxSystemAlarmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing alarm information."
+    ::= {axSystemAlarm 1}
+
+axSystemAlarmEntry OBJECT-TYPE
+    SYNTAX AxSystemAlarmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing alarm information."
+    INDEX       { axSystemAlarmIndex }
+    ::= {axSystemAlarmTable 1}
+
+AxSystemAlarmEntry ::= SEQUENCE {
+    axSystemAlarmIndex         Integer32,
+    axSystemAlarmEventLevel    DisplayString,
+    axSystemAlarmEventType     DisplayString,
+    axSystemAlarmEventCode     OCTET STRING,
+    axSystemAlarmEventPoint    DisplayString,
+    axSystemAlarmMsgText       DisplayString
+}
+
+axSystemAlarmIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An Index of alarm information."
+    ::= {axSystemAlarmEntry 1}
+
+axSystemAlarmEventLevel OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The event level of alarm informatin."
+    ::= {axSystemAlarmEntry 2}
+
+axSystemAlarmEventType OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The event type of alarm information."
+    ::= {axSystemAlarmEntry 3}
+
+axSystemAlarmEventCode OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The event code of alarm information."
+    ::= {axSystemAlarmEntry 4}
+
+axSystemAlarmEventPoint OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The event point of alarm information."
+    ::= {axSystemAlarmEntry 5}
+
+axSystemAlarmMsgText OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The message text of alarm information."
+    ::= {axSystemAlarmEntry 6}
+
+
+--
+--  axLicense
+--
+axLicenseNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of the configured license serial numbers."
+    ::= {axLicense 1}
+
+axLicenseTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxLicenseEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table containing the license information."
+    ::= {axLicense 2}
+
+axLicenseEntry OBJECT-TYPE
+    SYNTAX AxLicenseEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry of license information."
+    INDEX { axLicenseIndex }
+    ::= {axLicenseTable 1}
+
+AxLicenseEntry ::= SEQUENCE {
+    axLicenseIndex            Integer32,
+    axLicenseSerialNumber     DisplayString,
+    axLicenseOptionNumber     Integer32
+}
+
+axLicenseIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The unique index number given for each serial number. The number is from 1 to axLicenseNumber."
+    ::= {axLicenseEntry 1}
+
+axLicenseSerialNumber OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The serial number."
+    ::= {axLicenseEntry 2}
+
+axLicenseOptionNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of option licenses associated with the serial number."
+    ::= {axLicenseEntry 3}
+
+axLicenseOptionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxLicenseOptionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table containing option licenses information associated with the serial number."
+    ::= {axLicense 3}
+
+axLicenseOptionEntry OBJECT-TYPE
+    SYNTAX AxLicenseOptionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry of the option license information associated with the serial number."
+    INDEX { axLicenseIndex,
+            axLicenseOptionNumberIndex }
+    ::= {axLicenseOptionTable 1}
+
+AxLicenseOptionEntry ::= SEQUENCE {
+    axLicenseOptionNumberIndex            Integer32,
+    axLicenseOptionSoftwareName           DisplayString,
+    axLicenseOptionSoftwareAbbreviation   DisplayString
+}
+
+axLicenseOptionNumberIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The unique index number of option licenses information which is given for each serial number. The number is from 1 to axLicenseOptionNumber."
+    ::= {axLicenseOptionEntry 1}
+
+axLicenseOptionSoftwareName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The software model name of the option license information associated with the serial number."
+    ::= {axLicenseOptionEntry 2}
+
+axLicenseOptionSoftwareAbbreviation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The software abbreviated name of the option license information associated with the serial number."
+    ::= {axLicenseOptionEntry 3}
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+
+--
+-- axSystemMsg
+--
+
+axSystemMsgPrefix       OBJECT IDENTIFIER ::= { axSystemMsg 0 }
+
+axSystemMsgTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axSystemMsgText,
+                    axSystemMsgTimeStamp,
+                    axSystemMsgLevel,
+                    axSystemMsgSwitchCode,
+                    axSystemMsgBcuNumber,
+                    axSystemMsgDuplexCode,
+                    axSystemMsgEventType,
+                    axSystemMsgEventPoint,
+                    axSystemMsgEventCode,
+                    axSystemMsgAdditionalCode1,
+                    axSystemMsgAdditionalCode2,
+                    axSystemMsgMsgText
+                }
+    STATUS      current
+    DESCRIPTION
+        "System message is displayed."
+    ::= { axSystemMsgPrefix 1 }
+
+
+--------------------------------------------------
+-- Conformance Statements
+--------------------------------------------------
+
+--
+-- Conformance identifier
+--
+
+axSystemConformance       OBJECT IDENTIFIER ::= { axSystem 1000 }
+axSystemCompliances       OBJECT IDENTIFIER ::= { axSystemConformance 1 }
+axSystemGroups            OBJECT IDENTIFIER ::= { axSystemConformance 2 }
+
+-- Compliance
+--
+
+axSystemCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "AX System"
+    MODULE        -- this module
+        MANDATORY-GROUPS {  axSystemGroup,
+                            axSystemNotificationGroup }
+    ::= { axSystemCompliances 1 }
+
+--
+-- Object Group
+--
+
+axSystemGroup OBJECT-GROUP
+    OBJECTS     {
+                    axModelType,
+                    axSoftwareName,
+                    axSoftwareAbbreviation,
+                    axSystemMsgText,
+                    axSystemMsgTimeStamp,
+                    axSystemMsgLevel,
+                    axSystemMsgSwitchCode,
+                    axSystemMsgBcuNumber,
+                    axSystemMsgDuplexCode,
+                    axSystemMsgEventType,
+                    axSystemMsgEventPoint,
+                    axSystemMsgEventCode,
+                    axSystemMsgAdditionalCode1,
+                    axSystemMsgAdditionalCode2,
+                    axSystemMsgMsgText,
+                    axSystemAlarmEventLevel,
+                    axSystemAlarmEventType,
+                    axSystemAlarmEventCode,
+                    axSystemAlarmEventPoint,
+                    axSystemAlarmMsgText,
+                    axLicenseNumber,
+                    axLicenseSerialNumber,
+                    axLicenseOptionNumber,
+                    axLicenseOptionSoftwareName,
+                    axLicenseOptionSoftwareAbbreviation
+                }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects which are used to provide
+         axSystem group."
+    ::= { axSystemGroups 1 }
+
+--
+-- Notification Group
+--
+
+axSystemNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   { axSystemMsgTrap }
+    STATUS          current
+    DESCRIPTION
+        "The set of notifications of axSystem."
+    ::= { axSystemGroups 10 }
+
+END

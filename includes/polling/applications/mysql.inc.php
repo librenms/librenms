@@ -9,7 +9,8 @@ if (! empty($agent_data['app'][$name])) {
     $mysql = $agent_data['app'][$name];
 } else {
     // Polls MySQL  statistics from script via SNMP
-    $mysql = snmp_get($device, '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.109.121.115.113.108', '-Ovq');
+    $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.109.121.115.113.108';
+    $mysql = SnmpQuery::get($oid)->value();
 }
 
 $metrics = [];
@@ -114,7 +115,7 @@ foreach ($data as $str) {
 
 $fields = [];
 foreach ($mapping as $k => $v) {
-    $fields[$k] = (isset($map[$v]) && $map[$v] >= 0) ? $map[$v] : 'U';
+    $fields[$k] = (isset($map[$v]) && $map[$v] >= 0) ? $map[$v] : null;
 }
 $metrics = $fields;
 
@@ -235,7 +236,7 @@ $rrd_def->disableNameChecking();
 
 $fields = [];
 foreach ($mapping_status as $desc => $id) {
-    $fields[$desc] = (isset($map[$id]) && $map[$id] >= 0) ? $map[$id] : 'U';
+    $fields[$desc] = (isset($map[$id]) && $map[$id] >= 0) ? $map[$id] : null;
     $rrd_def->addDataset($id, 'GAUGE', 0, 125000000000);
 }
 $metrics += $fields;

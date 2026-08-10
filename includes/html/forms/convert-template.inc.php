@@ -27,11 +27,12 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 header('Content-type: application/json');
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('alert-template.update')) {
     exit(json_encode([
         'status' => 'error',
         'message' => 'You need to be admin',

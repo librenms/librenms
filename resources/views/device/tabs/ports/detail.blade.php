@@ -1,4 +1,9 @@
-<x-panel body-class="tw:p-0!">
+<div class="tw:pb-4 tw:-mt-4">
+    <x-filter name="device.ports" :fields="$data['filterFields']"  :initial="$data['filter']" :reload="true"/>
+</div>
+
+<x-panel>
+    <x-slot:slot class="tw:p-0!">
     <table id="ports-fdb" class="table table-condensed table-hover table-striped tw:mt-1 tw:mb-0!">
         <thead>
         <tr>
@@ -33,4 +38,5 @@
                       class="tw:mx-4"></x-select>
         @endisset
     </div>
+    </x-slot:slot>
 </x-panel>

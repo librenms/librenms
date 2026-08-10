@@ -16,7 +16,7 @@ if (! isset($vars['view'])) {
 
 print_optionbar_start();
 
-echo '<strong>Local AS : ' . $device['bgpLocalAs'] . '</strong> ';
+echo '<strong>Local AS : ' . e($device['bgpLocalAs']) . '</strong> ';
 
 echo "<span style='font-weight: bold;'>BGP</span> &#187; ";
 
@@ -225,9 +225,9 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     $peeraddresslink = '<span class=list-large>' . \LibreNMS\Util\Url::overlibLink($link, $peerIdentifierIp?->compressed(), \LibreNMS\Util\Url::graphTag($graph_array_zoom)) . '</span>';
 
     if ($peer['bgpPeerLastErrorCode'] == 0 && $peer['bgpPeerLastErrorSubCode'] == 0) {
-        $last_error = $peer['bgpPeerLastErrorText'];
+        $last_error = e($peer['bgpPeerLastErrorText']);
     } else {
-        $last_error = describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']) . '<br/>' . $peer['bgpPeerLastErrorText'];
+        $last_error = e(describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode'])) . '<br/>' . e($peer['bgpPeerLastErrorText']);
     }
 
     echo '<tr class="bgp"' . (empty($peer['alert']) ? '' : ' bordercolor="#cc0000"') . (empty($peer['disabled']) ? '' : ' bordercolor="#cccccc"') . '>
@@ -236,10 +236,10 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     echo '
         <td>' . $peeraddresslink . '<br />' . ($peername ?? '') . "</td>
         <td>$peer_type</td>
-        <td style='font-size: 10px; font-weight: bold; line-height: 10px;'>" . ($peer['afi'] ?? '') . '</td>
-        <td><strong>AS' . $peer['bgpPeerRemoteAs'] . '</strong><br />' . $peer['astext'] . '</td>
-        <td>' . $peer['bgpPeerDescr'] . "</td>
-        <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "<span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . '</span></strong></td>
+        <td style='font-size: 10px; font-weight: bold; line-height: 10px;'>" . e($peer['afi'] ?? '') . '</td>
+        <td><strong>AS' . e($peer['bgpPeerRemoteAs']) . '</strong><br />' . e($peer['astext']) . '</td>
+        <td>' . e($peer['bgpPeerDescr']) . "</td>
+        <td><strong><span style='color: $admin_col;'>" . e($peer['bgpPeerAdminStatus']) . "<span><br /><span style='color: $col;'>" . e($peer['bgpPeerState']) . '</span></strong></td>
         <td>' . $last_error . '</td>
         <td>' . \LibreNMS\Util\Time::formatInterval($peer['bgpPeerFsmEstablishedTime']) . "<br />
         Updates <i class='fa fa-arrow-down icon-theme' aria-hidden='true'></i> " . $peer['bgpPeerInUpdates'] . "

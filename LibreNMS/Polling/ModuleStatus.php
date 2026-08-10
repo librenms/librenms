@@ -35,6 +35,7 @@ class ModuleStatus implements \Stringable
         public ?bool $os = null,
         public ?bool $device = null,
         public ?bool $manual = null,
+        public ?array $submodules = null,
     ) {
     }
 
@@ -78,11 +79,17 @@ class ModuleStatus implements \Stringable
 
     public function isEnabledAndDeviceUp(Device $device, bool $check_snmp = true): bool
     {
-        if ($check_snmp && $device->snmp_disable) {
+        $connectivity = new ConnectivityHelper($device);
+        if ($check_snmp && ! $connectivity->snmpIsAvailable()) {
             return false;
         }
 
-        return $this->isEnabled() && $device->status;
+        return $this->isEnabled() && $connectivity->isAvailable();
+    }
+
+    public function hasSubModules(): bool
+    {
+        return ! empty($this->submodules);
     }
 
     public function __toString(): string

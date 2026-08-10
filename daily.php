@@ -7,6 +7,7 @@
  */
 
 use App\Facades\LibrenmsConfig;
+use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Database\Eloquent\Collection;
@@ -52,8 +53,18 @@ if ($options['f'] === 'update') {
         exit(0);
     }
 
+    $on_days = LibrenmsConfig::get('update_on_days', []);
+
+    if (is_array($on_days) && ! empty($on_days)) {
+        $today = strtolower(date('l')); // monday..sunday
+
+        if (! in_array($today, $on_days, true)) {
+            exit(0);
+        }
+    }
+
     if (LibrenmsConfig::get('update_channel') == 'master') {
-        exit(1);
+        exit(2);
     } elseif (LibrenmsConfig::get('update_channel') == 'release') {
         exit(3);
     }
@@ -68,7 +79,7 @@ if ($options['f'] === 'rrd_purge') {
 
         if (is_numeric($rrd_purge) && $rrd_purge > 0) {
             $cmd = "find $rrd_dir -name .gitignore -prune -o -type f -mtime +$rrd_purge -print -exec rm -f {} +";
-            $purge = `$cmd`;
+            $purge = shell_exec($cmd);
             if (! empty($purge)) {
                 echo "Purged the following RRD files due to old age (over $rrd_purge days old):\n";
                 echo $purge;
@@ -173,26 +184,11 @@ if ($options['f'] === 'handle_notifiable') {
                     2
                 );
                 exit(1);
-            } elseif ($options['r'] === 'python3-deps') {
-                Notifications::create($error_title,
-                    'Python 3 dependencies are missing. You need to install them via pip3 install -r requirements.txt or system packages to continue to receive updates.  If you do not install Python 3 and required packages, LibreNMS will continue to function but stop receiving bug fixes and updates.',
-                    'daily.sh',
-                    2
-                );
-                exit(1);
             }
         }
 
         Notifications::remove($error_title);
         exit(0);
-    }
-}
-
-if ($options['f'] === 'notifications') {
-    $lock = Cache::lock('notifications', 86000);
-    if ($lock->get()) {
-        Notifications::post();
-        $lock->release();
     }
 }
 
@@ -272,15 +268,11 @@ if ($options['f'] === 'refresh_alert_rules') {
     $lock = Cache::lock('refresh_alert_rules', 86000);
     if ($lock->get()) {
         echo 'Refreshing alert rules queries' . PHP_EOL;
-        $rules = dbFetchRows('SELECT `id`, `builder`, `extra` FROM `alert_rules`');
+        $rules = AlertRule::query()->select(['id', 'builder', 'extra'])->get();
         foreach ($rules as $rule) {
-            $rule_options = json_decode($rule['extra'], true);
-            if ($rule_options['options']['override_query'] !== 'on' && $rule_options['options']['override_query'] !== true) {
-                $data['query'] = QueryBuilderParser::fromJson($rule['builder'])->toSql();
-                if (! empty($data['query'])) {
-                    dbUpdate($data, 'alert_rules', 'id=?', [$rule['id']]);
-                    unset($data);
-                }
+            if (($rule->extra['options']['override_query'] ?? false) !== 'on' && ($rule->extra['options']['override_query'] ?? false) !== true) {
+                $rule->query = QueryBuilderParser::fromJson($rule->builder)->toSql();
+                $rule->save();
             }
         }
         $lock->release();

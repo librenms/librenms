@@ -41,8 +41,6 @@ abstract class SnmpFetch extends LnmsCommand
      */
     public function handle(): int
     {
-        $this->configureOutputOptions();
-
         $this->validate([
             'output' => ['nullable', Rule::in(['value', 'values', 'table', 'index-table'])],
         ]);
@@ -154,6 +152,9 @@ abstract class SnmpFetch extends LnmsCommand
         }
     }
 
+    /**
+     * @return \Illuminate\Support\Collection<int, \App\Models\Device>
+     */
     protected function getDevices(): \Illuminate\Support\Collection
     {
         return Device::whereDeviceSpec($this->deviceSpec)->pluck('device_id')

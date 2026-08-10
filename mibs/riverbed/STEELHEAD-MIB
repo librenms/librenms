@@ -7,12 +7,18 @@ IMPORTS
     products FROM RBT-MIB;
 
 steelhead MODULE-IDENTITY
-          LAST-UPDATED        "201202030000Z"
+          LAST-UPDATED        "201401070000Z"
           ORGANIZATION        "Riverbed Technology, Inc."
           CONTACT-INFO
           "  Riverbed Technical Support
              support@riverbed.com"
           DESCRIPTION         "Steelhead MIB"
+          REVISION            "201401070000Z"
+          DESCRIPTION         "Connection forwarding cluster incompatible trap"
+          REVISION            "201301250000Z"
+          DESCRIPTION         "Corrections in descriptions of some traps"
+          REVISION            "201210170000Z"
+          DESCRIPTION         "Added trap for CF Peer IPv6 incompatible alarm"
           REVISION            "201202030000Z"
           DESCRIPTION         "Updated for 7.0.1"
           ::= { products 1 }
@@ -1292,13 +1298,13 @@ lanWanLoopError NOTIFICATION-TYPE
     STATUS current
     DESCRIPTION
             "LAN-WAN loop detected. System will not optimize new connections un
-till this error is cleared"
+til this error is cleared"
     ::= { alarmsPrefix 63 }
 
 optimizationServiceStatusError NOTIFICATION-TYPE
     STATUS current
     DESCRIPTION
-            "Optimization service currently not optimizing any connecntions."
+            "Optimization service currently not optimizing any connections."
     ::= { alarmsPrefix 64 }
 
 upgradeFailure NOTIFICATION-TYPE
@@ -1349,6 +1355,42 @@ storageProfSwitchFailed NOTIFICATION-TYPE
     DESCRIPTION
             "Storage profile switch failed"
     ::= { alarmsPrefix 73 }
+
+clusterIpv6IncompatiblePeerError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "A cluster Steelhead has been reported as IPv6 incompatible"
+    ::= { alarmsPrefix 74 }
+
+flashProtectionFailed NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Flash disk hasn't been backed up due to no enough free space on /var filesystem"
+    ::= { alarmsPrefix 75 }
+
+datastoreNeedClean NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "The data store needs to be cleaned"
+    ::= { alarmsPrefix 76 }
+
+pathSelectionPathDown NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Path Selection - A path went down"
+    ::= { alarmsPrefix 77 }
+
+clusterNeighborIncompatibleError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "A cluster Steelhead has been reported as incompatible"
+    ::= { alarmsPrefix 80 }
+
+pathSelectionPathProbingError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Path Selection - At least one path has probing error"
+    ::= { alarmsPrefix 81 }
 
 cpuUtilClear NOTIFICATION-TYPE
     STATUS  current
@@ -1479,8 +1521,8 @@ cfConnLostEosClear NOTIFICATION-TYPE
      OBJECTS { neighborAddress }
      STATUS current
      DESCRIPTION
-             "Connection restablished after a prior termination due to
-              receiving end of strem from the specified neighbor" 
+             "Connection reestablished after a prior termination due to
+              receiving end of stream from the specified neighbor" 
      ::= { alarmsPrefix 1029 }
 
 cfConnLostErrClear NOTIFICATION-TYPE
@@ -1663,6 +1705,30 @@ linkIoErrorsClear NOTIFICATION-TYPE
     DESCRIPTION
             "An interface on the appliance has cleared the I/O errors state"
     ::= { alarmsPrefix 1071  }
+
+clusterIpv6IncompatiblePeerClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "All cluster Steelheads are IPv6 compatible"
+    ::= { alarmsPrefix 1074 }
+
+pathSelectionPathDownClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Path Selection - A path came back up"
+    ::= { alarmsPrefix 1077 }
+
+clusterNeighborIncompatibleClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "All cluster Steelheads are compatible"
+    ::= { alarmsPrefix 1080 }
+
+pathSelectionPathProbingErrorClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Path Selection - No paths have probing errors"
+    ::= { alarmsPrefix 1081 }
 
 
 

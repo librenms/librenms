@@ -27,14 +27,14 @@ foreach ($tables as $tablevalue) {
         $state_name = $tablevalue[2];
         if ($state_name == 'quantaPowerSupplyStatus') {
             $states = [
-                ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'other'],
-                ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'notpresent'],
-                ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'operational'],
-                ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'failed'],
-                ['value' => 4, 'generic' => 0, 'graph' => 0, 'descr' => 'powering'],
-                ['value' => 5, 'generic' => 1, 'graph' => 0, 'descr' => 'nopower'],
-                ['value' => 6, 'generic' => 1, 'graph' => 0, 'descr' => 'notpowering'],
-                ['value' => 7, 'generic' => 2, 'graph' => 0, 'descr' => 'incompatible'],
+                ['value' => 0, 'generic' => 3, 'descr' => 'other'],
+                ['value' => 1, 'generic' => 3, 'descr' => 'notpresent'],
+                ['value' => 2, 'generic' => 0, 'descr' => 'operational'],
+                ['value' => 3, 'generic' => 2, 'descr' => 'failed'],
+                ['value' => 4, 'generic' => 0, 'descr' => 'powering'],
+                ['value' => 5, 'generic' => 1, 'descr' => 'nopower'],
+                ['value' => 6, 'generic' => 1, 'descr' => 'notpowering'],
+                ['value' => 7, 'generic' => 2, 'descr' => 'incompatible'],
             ];
         }
         create_state_index($state_name, $states);

@@ -26,6 +26,7 @@
 
 namespace App;
 
+use App\Events\SettingChanged;
 use App\Models\Callback;
 use App\Models\GraphType;
 use Exception;
@@ -240,7 +241,7 @@ class ConfigRepository
                 echo $e;
             }
 
-            if ($e instanceof QueryException && $e->getCode() !== '42S02') {
+            if ($e instanceof QueryException && $e->getCode() !== '42S02' && ! str_contains($e->getMessage(), 'no such table')) {
                 // re-throw, else Config service provider get stuck in a loop
                 // if there is an error (database not connected)
                 // unless it is table not found (migrations have not been run yet)
@@ -255,15 +256,20 @@ class ConfigRepository
     /**
      * Forget a key and all it's descendants from persistent storage.
      * This will effectively set it back to default.
-     *
-     * @param  string  $key
-     * @return int|false
      */
-    public function erase($key): bool|int
+    public function erase(string $key): bool
     {
         $this->forget($key);
         try {
-            return Models\Config::withChildren($key)->delete();
+            $deleted = Models\Config::withChildren($key)->delete();
+
+            if ($deleted > 0) {
+                // delete statement above doens't trigger Eloquent events
+                $this->invalidateCache();
+                event("setting.changed.$key", new SettingChanged($key, $this->get($key)));
+            }
+
+            return true;
         } catch (Exception) {
             return false;
         }
@@ -431,6 +437,9 @@ class ConfigRepository
         $this->deprecatedVariable('poller_modules.toner', 'poller_modules.printer-supplies');
         $this->deprecatedVariable('discovery_modules.cisco-sla', 'discovery_modules.slas');
         $this->deprecatedVariable('poller_modules.cisco-sla', 'poller_modules.slas');
+        $this->deprecatedVariable('discovery_modules.cisco-mac-accounting', 'discovery_modules.mac-accounting');
+        $this->deprecatedVariable('poller_modules.cisco-mac-accounting', 'poller_modules.mac-accounting');
+        $this->deprecatedVariable('poller_modules.ipSystemStats', 'poller_modules.ip-system-stats');
         $this->deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
         // migrate device display
@@ -526,11 +535,11 @@ class ConfigRepository
     public function locateBinary($binary): mixed
     {
         if (! Str::contains($binary, '/')) {
-            $output = `whereis -b $binary`;
+            $output = shell_exec("whereis -b $binary");
             $list = trim(substr((string) $output, strpos((string) $output, ':') + 1));
             $targets = explode(' ', $list);
             foreach ($targets as $target) {
-                if (is_executable($target)) {
+                if (is_executable($target) && ! is_dir($target)) {
                     return $target;
                 }
             }

@@ -10,12 +10,12 @@
                     <thead>
                     <tr>
                         <th data-column-id="label"></th>
-                        <th data-column-id="timestamp" data-order="desc">Timestamp</th>
-                        <th data-column-id="level">Level</th>
-                        <th data-column-id="device_id">Hostname</th>
-                        <th data-column-id="program">Program</th>
-                        <th data-column-id="msg">Message</th>
-                        <th data-column-id="priority">Priority</th>
+                        <th data-column-id="timestamp" data-order="desc">{{ __('Timestamp') }}</th>
+                        <th data-column-id="level">{{ __('Level') }}</th>
+                        <th data-column-id="device_id">{{ __('device.attributes.hostname') }}</th>
+                        <th data-column-id="program">{{ __('Program') }}</th>
+                        <th data-column-id="msg">{{ __('Message') }}</th>
+                        <th data-column-id="priority">{{ __('Priority') }}</th>
                     </tr>
                     </thead>
                 </table>
@@ -63,7 +63,7 @@
             '<select name="program" id="program" class="form-control">' +
                 '<option value="">All Programs&nbsp;&nbsp;</option>' +
             @if($program)
-                '<option value=\"' + @json($program) + '\">' + @json($program) + '</option>' +";
+                '<option value=\"' + @json($program) + '\">' + @json($program) + '</option>' +
             @endif
             '</select>' +
             '</div>' +
@@ -71,7 +71,7 @@
             '<select name="priority" id="priority" class="form-control">' +
                 '<option value="">All Priorities</option>' +
             @if($priority)
-                '<option value=\"' + @json($priority) + '\">' + @json($priority) + '</option>' +";
+                '<option value=\"' + @json($priority) + '\">' + @json($priority) + '</option>' +
             @endif
             '</select>' +
             '</div>' +
@@ -131,7 +131,7 @@
             $("#dtpickerto").data("DateTimePicker").maxDate('{{ $now }}');
         }
 
-        init_select2("select#device", "device", {limit: 100}, "{{ $device->device_id }}");
+        init_select2("select#device", "device", {limit: 100}, "{{ $device->device_id }}", 'All Devices');
         init_select2("#program", "syslog", function(params) {
             return {
                 field: "program",
@@ -139,7 +139,7 @@
                 term: params.term,
                 page: params.page || 1
             }
-        }, @json($program));
+        }, @json($program), 'All Programs');
         init_select2("#priority", "syslog", function(params) {
             return {
                 field: "priority",
@@ -147,6 +147,6 @@
                 term: params.term,
                 page: params.page || 1
             }
-        }, @json($priority));
+        }, @json($priority), 'All Priorities');
     </script>
 @endsection

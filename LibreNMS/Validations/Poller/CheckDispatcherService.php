@@ -73,7 +73,7 @@ class CheckDispatcherService implements \LibreNMS\Interfaces\Validation
 
             if ($inactive->isNotEmpty()) {
                 return ValidationResult::fail(trans('validation.validations.poller.CheckDispatcherService.nodes_down'))
-                    ->setList('Inactive Nodes', $inactive->toArray());
+                    ->setList('Inactive Nodes', $inactive->all());
             }
 
             // all ok

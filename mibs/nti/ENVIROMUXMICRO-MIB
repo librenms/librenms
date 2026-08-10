@@ -6,7 +6,7 @@ IMPORTS
    DisplayString                                FROM  SNMPv2-TC;
       
 enviromuxMicro MODULE-IDENTITY
-     LAST-UPDATED "202103071400Z"
+     LAST-UPDATED "202207221400Z"
      ORGANIZATION "Network Technologies Inc."
      CONTACT-INFO 
          "Network Technologies Inc.
@@ -23,6 +23,8 @@ enviromuxMicro MODULE-IDENTITY
      DESCRIPTION 
          "E-MICRO MIB file." 
 
+    REVISION     "202207221400Z" 
+         DESCRIPTION  "Rev. 1.05 - Added alertName variables"
     REVISION     "202103071400Z" 
          DESCRIPTION  "Rev. 1.04 - Added hostSystem variables"
     REVISION     "201509271400Z" 
@@ -314,7 +316,9 @@ AlertEntry ::=
         alertThresholdType
             INTEGER,
         alertStatus
-            INTEGER
+            INTEGER,
+        alertName
+            DisplayString
 	}
 
 alertIndex	         	OBJECT-TYPE
@@ -365,7 +369,12 @@ alertStatus     		OBJECT-TYPE
 	STATUS				current
 	DESCRIPTION	        "The current status of the alert"
 	::= { alertEntry 7 }
-
+alertName             OBJECT-TYPE
+	SYNTAX				DisplayString
+	MAX-ACCESS  	read-only
+	STATUS				current
+	DESCRIPTION	  "Alert Name"
+	::= { alertEntry 8 }
 -- smart alerts description
 
 smAlertTable    		OBJECT-TYPE

@@ -938,392 +938,336 @@
                 {
                     "state_name": "batteryBreakerStatus.{{ $index }}",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "batteryBreakerStatus.{{ $index }}",
                     "state_descr": "Alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifierInstalledRectifiers",
                     "state_descr": "1",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierInstalledRectifiers",
                     "state_descr": "2",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierInstalledRectifiers",
                     "state_descr": "3",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierInstalledRectifiers",
                     "state_descr": "4",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierInstalledRectifiers",
                     "state_descr": "5",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierInstalledRectifiers",
                     "state_descr": "6",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierInstalledRectifiers",
                     "state_descr": "7",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierInstalledRectifiers",
                     "state_descr": "8",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierInstalledRectifiers",
                     "state_descr": "9",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierInstalledRectifiers",
                     "state_descr": "10",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierInstalledRectifiers",
                     "state_descr": "11",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierInstalledRectifiers",
                     "state_descr": "12",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierInstalledRectifiers",
                     "state_descr": "13",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierInstalledRectifiers",
                     "state_descr": "14",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierInstalledRectifiers",
                     "state_descr": "15",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierInstalledRectifiers",
                     "state_descr": "16",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierInstalledRectifiers",
                     "state_descr": "17",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierInstalledRectifiers",
                     "state_descr": "18",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierInstalledRectifiers",
                     "state_descr": "19",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierInstalledRectifiers",
                     "state_descr": "20",
-                    "state_draw_graph": 0,
                     "state_value": 20,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierRectifiersActive",
                     "state_descr": "1",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierRectifiersActive",
                     "state_descr": "2",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierRectifiersActive",
                     "state_descr": "3",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierRectifiersActive",
                     "state_descr": "4",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierRectifiersActive",
                     "state_descr": "5",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierRectifiersActive",
                     "state_descr": "6",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierRectifiersActive",
                     "state_descr": "7",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierRectifiersActive",
                     "state_descr": "8",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierRectifiersActive",
                     "state_descr": "9",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierRectifiersActive",
                     "state_descr": "10",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierRectifiersActive",
                     "state_descr": "11",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierRectifiersActive",
                     "state_descr": "12",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierRectifiersActive",
                     "state_descr": "13",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierRectifiersActive",
                     "state_descr": "14",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierRectifiersActive",
                     "state_descr": "15",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierRectifiersActive",
                     "state_descr": "16",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierRectifiersActive",
                     "state_descr": "17",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierRectifiersActive",
                     "state_descr": "18",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierRectifiersActive",
                     "state_descr": "19",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierRectifiersActive",
                     "state_descr": "20",
-                    "state_draw_graph": 0,
                     "state_value": 20,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierStatusStatus.{{ $index }}",
                     "state_descr": "not present",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "rectifierStatusStatus.{{ $index }}",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "rectifierStatusStatus.{{ $index }}",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifierStatusStatus.{{ $index }}",
                     "state_descr": "not used",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatusStatus.{{ $index }}",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "systemNominalVoltage.{{ $index }}",
                     "state_descr": "48V",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "systemNominalVoltage.{{ $index }}",
                     "state_descr": "24V",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "systemNominalVoltage.{{ $index }}",
                     "state_descr": "N/A",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "systemNominalVoltage.{{ $index }}",
                     "state_descr": "N/A",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "systemNominalVoltage.{{ $index }}",
                     "state_descr": "60V",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "systemOperationalStatus.{{ $index }}",
                     "state_descr": "Float - voltage regulated",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemOperationalStatus.{{ $index }}",
                     "state_descr": "Float - temp. comp. regulated",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemOperationalStatus.{{ $index }}",
                     "state_descr": "Boost",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "systemOperationalStatus.{{ $index }}",
                     "state_descr": "Battery test",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 }

@@ -32,6 +32,7 @@ use App\Models\Device;
 use App\Models\UserPref;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Authentication\TwoFactor;
@@ -65,7 +66,7 @@ class UserPreferencesController extends Controller
         $data = [
             'user' => $user,
             'can_change_password' => LegacyAuth::get()->canUpdatePasswords($user->username),
-            'dashboards' => Dashboard::allAvailable($user)->with('user')->get(),
+            'dashboards' => Dashboard::hasAccess($user)->with('user')->get(),
             'default_dashboard' => UserPref::getPref($user, 'dashboard'),
             'note_to_device' => UserPref::getPref($user, 'add_schedule_note_to_device'),
             'locale' => UserPref::getPref($user, 'locale'),
@@ -77,7 +78,6 @@ class UserPreferencesController extends Controller
             'timezone' => UserPref::getPref($user, 'timezone'),
             'temp_units' => UserPref::getPref($user, 'temp_units'),
             'hide_dashboard_editor' => UserPref::getPref($user, 'hide_dashboard_editor') ?? 0,
-            'global_search_ctrlf_focus' => UserPref::getPref($user, 'global_search_ctrlf_focus'),
         ];
 
         if (LibrenmsConfig::get('twofactor')) {
@@ -88,7 +88,7 @@ class UserPreferencesController extends Controller
             $data['twofactor'] = $twofactor;
         }
 
-        if (! $user->hasGlobalRead()) {
+        if (Gate::denies('viewAll', Device::class)) {
             $data['devices'] = Device::hasAccess($user)->get();
         }
 
@@ -120,7 +120,6 @@ class UserPreferencesController extends Controller
             ],
             'temp_units' => 'required|in:default,f',
             'hide_dashboard_editor' => 'required|integer',
-            'global_search_ctrlf_focus' => 'required|integer',
         ];
 
         $this->validate($request, [
@@ -131,6 +130,20 @@ class UserPreferencesController extends Controller
         $this->updatePreference($request->pref, $request->value);
 
         return response()->json(['status' => 'success']);
+    }
+
+    public function update(Request $request, string $preference)
+    {
+        $request->validate([
+            'name' => ['required', 'string'],
+            'filters' => ['array'],
+        ]);
+
+        if ($preference == 'filters') {
+            $name = 'filters.' . $request->string('name');
+            $filters = $request->array('filters');
+            $this->updatePreference($name, $filters ? json_encode($filters) : 'default');
+        }
     }
 
     private function getValidLocales()

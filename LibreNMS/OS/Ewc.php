@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorsDiscovery;
@@ -65,7 +66,7 @@ class Ewc extends OS implements
 
         return [
             new WirelessSensor(
-                'ap-count',
+                WirelessSensorType::ApCount,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.2.1.0',
                 'ewc',
@@ -73,7 +74,7 @@ class Ewc extends OS implements
                 'Connected APs'
             ),
             new WirelessSensor(
-                'ap-count',
+                WirelessSensorType::ApCount,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.1.1.0',
                 'ewc',
@@ -98,7 +99,7 @@ class Ewc extends OS implements
     {
         $sensors = [
             new WirelessSensor(
-                'clients',
+                WirelessSensorType::Clients,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.6.1.0',
                 'ewc',
@@ -114,7 +115,7 @@ class Ewc extends OS implements
             $apStatsMuCounts = $entry['apStatsMuCounts'];
             $name = $apnames[$index];
             $sensors[] = new WirelessSensor(
-                'clients',
+                WirelessSensorType::Clients,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.2.2.1.14.' . $index,
                 'ewc',
@@ -130,7 +131,7 @@ class Ewc extends OS implements
         foreach ($wlanstats as $index => $entry) {
             $name = $wlannames[$index];
             $sensors[] = new WirelessSensor(
-                'clients',
+                WirelessSensorType::Clients,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.3.4.5.1.2.' . $index,
                 'ewc',
@@ -157,7 +158,7 @@ class Ewc extends OS implements
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[explode('.', (string) $index)[0]];
             $sensors[] = new WirelessSensor(
-                'errors',
+                WirelessSensorType::Errors,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.18.' . $index,
                 'ewc',
@@ -184,7 +185,7 @@ class Ewc extends OS implements
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[$index];
             $sensors[] = new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.2.4.1.1.' . $index,
                 'ewc',
@@ -212,7 +213,7 @@ class Ewc extends OS implements
             $name = $ap_interfaces[$index];
             $noisefloor = $entry['dot11ExtRadioMaxNfCount'];
             $sensors[] = new WirelessSensor(
-                'noise-floor',
+                WirelessSensorType::NoiseFloor,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.1.4.3.1.32.' . $index,
                 'ewc',
@@ -245,7 +246,7 @@ class Ewc extends OS implements
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[explode('.', (string) $index)[0]];
             $sensors[] = new WirelessSensor(
-                'rssi',
+                WirelessSensorType::Rssi,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.9.' . $index,
                 'ewc',
@@ -272,7 +273,7 @@ class Ewc extends OS implements
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[explode('.', (string) $index)[0]];
             $sensors[] = new WirelessSensor(
-                'snr',
+                WirelessSensorType::Snr,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.13.' . $index,
                 'ewc',
@@ -299,7 +300,7 @@ class Ewc extends OS implements
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[explode('.', (string) $index)[0]];
             $sensors[] = new WirelessSensor(
-                'utilization',
+                WirelessSensorType::Utilization,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.5.' . $index,
                 'ewc',

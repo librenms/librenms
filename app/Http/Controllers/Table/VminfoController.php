@@ -28,51 +28,57 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\Device;
 use App\Models\Vminfo;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use LibreNMS\Util\Url;
 
+/**
+ * @extends TableController<Vminfo>
+ */
 class VminfoController extends TableController
 {
-    public function searchFields($request)
+    public function searchFields(Request $request): array
     {
         return ['vmwVmDisplayName', 'vmwVmGuestOS', 'devices.hostname', 'devices.sysname'];
     }
 
-    public function sortFields($request)
+    public function sortFields(Request $request): array
     {
         return ['vmwVmDisplayName', 'vmwVmGuestOS', 'vmwVmMemSize', 'vmwVmCpus', 'vmwVmState', 'hostname'];
     }
 
     /**
      * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    public function baseQuery($request)
+    public function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Vminfo::class);
+
         return Vminfo::hasAccess($request->user())
             ->select('vminfo.*')
             ->with('device')
             ->with('parentDevice')
-            ->when($request->get('searchPhrase') || in_array('hostname', array_keys($request->get('sort', []))), function ($query): void {
+            ->when($request->input('searchPhrase') || in_array('hostname', array_keys($request->input('sort', []))), function ($query): void {
                 $query->leftJoin('devices', 'devices.device_id', 'vminfo.device_id');
             });
     }
 
     /**
-     * @param  Vminfo  $vm
+     * @param  Vminfo  $model
+     * @return array<string, scalar>
      */
-    public function formatItem($vm)
+    public function formatItem(Model $model): array
     {
         return [
-            'vmwVmState' => '<span class="label ' . $vm->stateLabel[1] . '">' . $vm->stateLabel[0] . '</span>',
-            'vmwVmDisplayName' => is_null($vm->parentDevice) ? $vm->vmwVmDisplayName : self::getHostname($vm->parentDevice),
-            'vmwVmGuestOS' => $vm->operatingSystem,
-            'vmwVmMemSize' => $vm->memoryFormatted,
-            'vmwVmCpus' => $vm->vmwVmCpus,
-            'hostname' => self::getHostname($vm->device),
-            'deviceid' => $vm->device_id,
-            'sysname' => $vm->device->sysName,
+            'vmwVmState' => '<span class="label ' . $model->stateLabel[1] . '">' . $model->stateLabel[0] . '</span>',
+            'vmwVmDisplayName' => is_null($model->parentDevice) ? $model->vmwVmDisplayName : self::getHostname($model->parentDevice),
+            'vmwVmGuestOS' => $model->operatingSystem,
+            'vmwVmMemSize' => $model->memoryFormatted,
+            'vmwVmCpus' => $model->vmwVmCpus,
+            'hostname' => self::getHostname($model->device),
+            'deviceid' => $model->device_id,
+            'sysname' => $model->device->sysName,
 
         ];
     }

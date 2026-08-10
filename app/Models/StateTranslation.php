@@ -28,6 +28,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use LibreNMS\Enum\SensorState;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Models\Keyable;
 
@@ -38,17 +39,33 @@ class StateTranslation extends Model implements Keyable
     protected $primaryKey = 'state_translation_id';
     protected $fillable = [
         'state_descr',
-        'state_draw_graph',
         'state_value',
         'state_generic_value',
     ];
 
+    public static function define(string $descr, int $value, Severity $severity): self
+    {
+        $genericValue = match ($severity) {
+            Severity::Ok => 0,
+            Severity::Warning => 1,
+            Severity::Error => 2,
+            Severity::Unknown => 3,
+            default => throw new \Exception("Severity $severity->name is not supported for state sensors"),
+        };
+
+        return new self([
+            'state_descr' => $descr,
+            'state_value' => $value,
+            'state_generic_value' => $genericValue,
+        ]);
+    }
+
     public function severity(): Severity
     {
         return match ((int) $this->getAttribute('state_generic_value')) {
-            0 => Severity::Ok,
-            1 => Severity::Warning,
-            2 => Severity::Error,
+            SensorState::Ok->value => Severity::Ok,
+            SensorState::Warning->value => Severity::Warning,
+            SensorState::Error->value => Severity::Error,
             default => Severity::Unknown,
         };
     }
@@ -61,8 +78,8 @@ class StateTranslation extends Model implements Keyable
         return $this->belongsTo(StateIndex::class, 'state_index_id', 'state_index_id');
     }
 
-    public function getCompositeKey()
+    public function getCompositeKey(): int
     {
-        return $this->state_value;
+        return (int) $this->state_value;
     }
 }

@@ -7,7 +7,6 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use LibreNMS\Authentication\LegacyAuth;
-use Spatie\Permission\Models\Role;
 
 class StoreUserRequest extends FormRequest
 {
@@ -18,15 +17,7 @@ class StoreUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        if ($this->user()->can('create', User::class)) {
-            if ($this->user()->cannot('manage', Role::class)) {
-                unset($this['roles']);
-            }
-
-            return true;
-        }
-
-        return false;
+        return $this->user()->can('create', User::class);
     }
 
     /**
@@ -46,7 +37,10 @@ class StoreUserRequest extends FormRequest
             'realname' => 'nullable|max:64|alpha_space',
             'email' => 'nullable|email|max:64',
             'descr' => 'nullable|max:30|alpha_space',
-            'roles' => 'array',
+            'roles' => [
+                'array',
+                Rule::when($this->user()->cannot('role.update'), 'size:0'),
+            ],
             'roles.*' => 'exists:roles,name',
             'new_password' => ['required', 'confirmed', Password::defaults()],
             'dashboard' => 'int',

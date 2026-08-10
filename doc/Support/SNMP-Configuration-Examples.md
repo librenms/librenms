@@ -217,7 +217,7 @@ CLI SNMP v2 Configuration
 set [ find default=yes ] read-access=no
 add addresses=<ALLOWED-SRC-IPs/NETMASK> name=<COMMUNITY>
 /snmp
-set contact="<NAME>" enabled=yes engine-id=<ENGINE ID> location="<LOCALTION>"
+set contact="<NAME>" enabled=yes engine-id=<ENGINE ID> location="<LOCATION>"
 ```
 
 !!! note
@@ -236,12 +236,12 @@ CLI SNMP v3 Configuration for *authPriv*
 /snmp community
 add name="<COMMUNITY>" addresses="<ALLOWED-SRC-IPs/NETMASK>"
 set "<COMMUNITY>" authentication-password="<AUTH_PASS>" authentication-protocol=MD5
-set "<COMMUNITY>" encryption-password="<ENCRYP_PASS>" encryption-protocol=AES
+set "<COMMUNITY>" encryption-password="<ENCRYPT_PASS>" encryption-protocol=AES
 set "<COMMUNITY>" read-access=yes write-access=no security=private
 #Disable public SNMP
 set public read-access=no write-access=no security=private
 /snmp
-set contact="<NAME>" enabled=yes engine-id="<ENGINE ID>" location="<LOCALTION>"
+set contact="<NAME>" enabled=yes engine-id="<ENGINE ID>" location="<LOCATION>"
 ```
 
 !!! note
@@ -435,15 +435,39 @@ chmod +x /usr/bin/distro
 
 ### Linux (snmpd v3)
 
-Go to /etc/snmp/snmpd.conf
+#### Stop the snmpd service
 
-Open the file in vi or nano /etc/snmp/snmpd.conf and add the following
+##### CentOS 6 / Red hat 6
+
+```bash
+service snmpd stop
+```
+
+##### CentOS 7 / Red hat 7
+
+```bash
+systemctl stop snmpd
+```
+
+##### Ubuntu
+
+```bash
+service snmpd stop
+```
+
+Go to /var/lib/snmp/snmpd.conf
+
+Open the file in vi or nano /var/lib/snmp/snmpd.conf and add the following
 line to create SNMPV3 User (replace username and passwords with your
 own):
 
 ```bash
 createUser authPrivUser SHA "authPassword" AES "privPassword"
 ```
+
+This line will be removed and processed into an equivalent line starting with usmUser once the service is started again.
+
+Go to /etc/snmp/snmpd.conf
 
 Make sure the agent listens to all interfaces by adding the following
 line inside snmpd.conf:

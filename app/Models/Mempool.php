@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Observers\MempoolObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InsufficientDataException;
@@ -9,8 +12,11 @@ use LibreNMS\Exceptions\UncorrectableNegativeException;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
+#[ObservedBy([MempoolObserver::class])]
 class Mempool extends DeviceRelatedModel implements Keyable
 {
+    use HasFactory;
+
     protected $table = 'mempools';
     protected $primaryKey = 'mempool_id';
     public $timestamps = false;
@@ -127,7 +133,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
         $this->attributes['mempool_perc'] = is_numeric($percent) ? round($percent) : null;
     }
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return "$this->mempool_type-$this->mempool_index";
     }

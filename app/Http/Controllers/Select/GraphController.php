@@ -28,6 +28,7 @@ namespace App\Http\Controllers\Select;
 
 use App\Http\Controllers\Controller;
 use App\Models\Device;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -36,20 +37,20 @@ use LibreNMS\Util\StringHelpers;
 
 class GraphController extends Controller
 {
-    private $rules = [
+    private array $rules = [
         'limit' => 'int',
         'page' => 'int',
         'term' => 'nullable|string',
         'device' => 'nullable|int',
     ];
 
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): JsonResponse
     {
         $this->validate($request, $this->rules);
 
         $data = [];
-        $search = $request->get('term');
-        $device_id = $request->get('device');
+        $search = $request->input('term', '');
+        $device_id = $request->input('device');
         $device = $device_id ? Device::find($device_id) : null;
 
         foreach (Graph::getTypes() as $type) {
@@ -69,6 +70,7 @@ class GraphController extends Controller
             'core' => 'Core',
             'custom' => 'Custom',
             'ports' => 'Manual Ports',
+            'sensors' => 'Manual Sensors',
         ]), 'aggregators', $search);
         if ($aggregators->isNotEmpty()) {
             $data[] = [
@@ -103,7 +105,10 @@ class GraphController extends Controller
         ]);
     }
 
-    private function formatGraph($top, $graph)
+    /**
+     * @return array{id: int|string, text: string, icon?: string}
+     */
+    private function formatGraph(string $top, string $graph): array
     {
         $text = $graph;
         if (Str::contains('_', $graph)) {
@@ -124,12 +129,12 @@ class GraphController extends Controller
     }
 
     /**
-     * @param  Collection  $graphs
+     * @param  Collection<string, string>  $graphs
      * @param  string  $type
      * @param  string  $search
-     * @return Collection
+     * @return Collection<string, string>
      */
-    private function filterTypeGraphs($graphs, $type, $search)
+    private function filterTypeGraphs(Collection $graphs, string $type, string $search): Collection
     {
         $search = strtolower($search);
 

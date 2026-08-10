@@ -7,7 +7,7 @@ IMPORTS
             FROM RFC1155-SMI;
 
 arris MODULE-IDENTITY
-    LAST-UPDATED    "0402020000Z" -- February 2, 2004
+    LAST-UPDATED    "1009250000Z" -- September 25th, 2010
     ORGANIZATION    "Arris Interactive"
     CONTACT-INFO   
         "Robert Coley
@@ -32,6 +32,19 @@ arris MODULE-IDENTITY
          elsewhere."        
                   
 -- Revision history 
+   REVISION     "1009250000Z"  -- September 25th, 2010
+   DESCRIPTION
+       "Added Product Identifier 'arrisD5AM' for D5 Application Manager to the arrisProdIdVideo group"
+
+   REVISION     "0503140000Z"  -- March 14, 2005
+   DESCRIPTION
+       "Updated Q5 naming to D5"
+
+   REVISION     "0409100000Z"  -- September 10, 2004
+   DESCRIPTION
+       "Added Product Group 'arrisProdIdVideo' for ARRIS video products.
+        Also added Product Identifier 'arrisQ5Wan' for Q5 WAN device."
+
    REVISION     "0402020000Z"  -- February 2, 2004
    DESCRIPTION
        "Added Product Identifier 'cmtsCommon' for common CMTS products."
@@ -67,6 +80,7 @@ arrisProdIdCM    OBJECT IDENTIFIER ::= { arrisProducts 3 }  -- Cable Modem
 arrisProdIdCMTS  OBJECT IDENTIFIER ::= { arrisProducts 4 }  -- Cable Modem Termination System
 arrisProdIdMRC   OBJECT IDENTIFIER ::= { arrisProducts 5 }  -- Modular Redundant Chassis
 arrisProdIdGlobalAccess  OBJECT IDENTIFIER ::= { arrisProducts 6 }  -- Global Access (Fiber) products
+arrisProdIdVideo  OBJECT IDENTIFIER ::= { arrisProducts 8 }  -- Video Products (D5 et al)
 
 
 
@@ -92,6 +106,10 @@ arrisGlobalAccessMib OBJECT IDENTIFIER ::= { arrisProdIdGlobalAccess 1 }
 -- add Global Access sysObjectId values here.
 arrisGlobalAccessProductUas OBJECT IDENTIFIER ::= { arrisProdIdGlobalAccess 2 } -- FttH Universal Access Switch
 
+-- add Video Product sysObjectId values here.
+arrisD5UEQam OBJECT IDENTIFIER ::= { arrisProdIdVideo 1 } -- D5 WAN card
 
+-- add D5AM Video Product sysObjectId values here.
+arrisD5AM OBJECT IDENTIFIER ::= { arrisProdIdVideo 2 } -- D5 Application Manager
 
 END

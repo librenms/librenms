@@ -1,0 +1,1114 @@
+SPEED-MULTILINE-MIB DEFINITIONS ::= BEGIN
+
+--*****************************************************************************************
+
+IMPORTS
+	DisplayString FROM SNMPv2-TC
+	Integer32, TimeTicks, OBJECT-TYPE, MODULE-IDENTITY FROM SNMPv2-SMI
+	converter	FROM SPEEDCARRIER-MIB
+	FixedDiv100 FROM PanDacom-MIB
+; -- END of IMPORTS
+
+--*******************************************************************
+    speedMultiline MODULE-IDENTITY
+        LAST-UPDATED "201911040000Z"
+        ORGANIZATION "Pan Dacom Direkt GmbH"
+        CONTACT-INFO
+            "Pan Dacom Direkt GmbH
+            Dreieich Plaza 1B
+            63303 Dreieich
+            Germany
+            Tel. : +49 6103/932-333
+            Fax. : +49 6103/932-444
+            email: kontakt@pandacomdirekt.de
+            web  : www.pandacomdirekt.de"
+        DESCRIPTION "This MIB defines objects for cards of the SPEED Multiline family"
+
+        REVISION "201911040000Z"
+        DESCRIPTION "Rev. 7.4.7 protocol fix"
+        
+        REVISION "201910310000Z"
+        DESCRIPTION "Rev. 7.4.6 new protocols"
+        
+        REVISION "201907310000Z"
+        DESCRIPTION "Rev. 7.4.1 removed eth1000MBhdx copper speed"
+        
+        REVISION "201905220000Z"
+        DESCRIPTION "Init with Release 7.3"
+
+        ::= { converter 6 }
+
+--*******************************************************************
+
+    speedMultilineMOverviewTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SpeedMultilineMOverviewEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Speed-Multiline Module Overview table"
+        ::= { speedMultiline 1 }
+
+    speedMultilineMOverviewEntry OBJECT-TYPE
+        SYNTAX SpeedMultilineMOverviewEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Module Overview entries"
+        INDEX { speedMultilineMOverviewIndex }
+        ::= { speedMultilineMOverviewTable 1 }
+
+    SpeedMultilineMOverviewEntry ::=
+        SEQUENCE
+        {
+            speedMultilineMOverviewIndex Integer32,
+            speedMultilineMSlot Integer32,
+            speedMultilineMDevice INTEGER,
+            speedMultilineMState INTEGER,
+            speedMultilineMSysName DisplayString,
+            speedMultilineMSysUpTime TimeTicks,
+            speedMultilineMTemperature Integer32,
+            speedMultilineMAlarmState INTEGER,
+            speedMultilineMAppImage DisplayString,
+            speedMultilineMHwVersion DisplayString,
+            speedMultilineMDevSerialNumber DisplayString,
+            speedMultilineMTemperatureAlarm INTEGER,
+            speedMultilineMBoardHWAlarm INTEGER,
+            speedMultilineMPortTxConnection INTEGER,
+            speedMultilineMTempWarningLevel Integer32,
+            speedMultilineMTempAlarmLevel Integer32,
+            speedMultilineMCLIUserTimeout Integer32
+        }
+
+    speedMultilineMOverviewIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..100)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Overview Table Index"
+        ::= { speedMultilineMOverviewEntry 1 }
+
+    speedMultilineMSlot OBJECT-TYPE
+        SYNTAX Integer32 (1..19)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Slot number"
+        ::= { speedMultilineMOverviewEntry 2 }
+
+    speedMultilineMDevice OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            speedDuallineSFP2R(21),
+            speedDualline10G3R(22),
+            speedQuadline10G3R(23),
+            speedSixline10G3R(24),
+            unknown(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "device type"
+        ::= { speedMultilineMOverviewEntry 3 }
+
+    speedMultilineMState OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            running(1),
+            resetSoftware(2),
+            resetConfig(3),
+            resetRegistration(4),
+            resetHardware(5),
+--            resetStats(6),
+            unknown(255)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Device oper state. If setting resetConfig, you also have to reset the hardware."
+        ::= { speedMultilineMOverviewEntry 4 }
+
+    speedMultilineMSysName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Modules name or description"
+        ::= { speedMultilineMOverviewEntry 5 }
+
+    speedMultilineMSysUpTime OBJECT-TYPE
+        SYNTAX TimeTicks
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "System Up Time in Seconds"
+        ::= { speedMultilineMOverviewEntry 6 }
+
+    speedMultilineMTemperature OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Board temperature [C]"
+        ::= { speedMultilineMOverviewEntry 7 }
+
+    speedMultilineMAlarmState OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeWarning(2),
+            activeAlarm(3),
+            lowWarning(4),
+            lowAlarm(5),
+            highWarning(6),
+            highAlarm(7),
+            noAlarms(128),
+            activeWarnings(129),
+            activeAlarms(130),
+            lowWarnings(131),
+            lowAlarms(132),
+            highWarnings(133),
+            highAlarms(134)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "global device alarm state"
+        ::= { speedMultilineMOverviewEntry 8 }
+
+    speedMultilineMAppImage OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "software version"
+        ::= { speedMultilineMOverviewEntry 9 }
+
+    speedMultilineMHwVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "board hardware version"
+        ::= { speedMultilineMOverviewEntry 10 }
+
+    speedMultilineMDevSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..17))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "board serial number"
+        ::= { speedMultilineMOverviewEntry 11 }
+              
+    speedMultilineMTemperatureAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            noAlarm(0),
+            activeWarning(1),
+            activeAlarm(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Board Temperature Alarm"
+        ::= { speedMultilineMOverviewEntry 12 }       
+           
+        
+    speedMultilineMBoardHWAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeWarning(2),
+            activeAlarm(3),
+            lowWarning(4),
+            lowAlarm(5),
+            highWarning(6),
+            highAlarm(7),
+            noAlarms(128),
+            activeWarnings(129),
+            activeAlarms(130),
+            lowWarnings(131),
+            lowAlarms(132),
+            highWarnings(133),
+            highAlarms(134),
+            unknown(255)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Board other Hardware Alarm"
+        ::= { speedMultilineMOverviewEntry 13 }    
+
+    speedMultilineMPortTxConnection OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            connect1to3and2to4(1),
+            connect1to4and2to3(2),
+            unknown(255)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "port tx connection"
+        ::= { speedMultilineMOverviewEntry 14 }
+
+    speedMultilineMTempWarningLevel OBJECT-TYPE
+        SYNTAX Integer32 (5..60)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "high temperature warning level"
+        ::= { speedMultilineMOverviewEntry 15 }
+
+    speedMultilineMTempAlarmLevel OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "high temperature alarm level"
+        ::= { speedMultilineMOverviewEntry 16 }
+
+    speedMultilineMCLIUserTimeout OBJECT-TYPE
+        SYNTAX Integer32 (120..3600)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "CLI user timeout. Valid from 120 to 3600 seconds."
+        ::= { speedMultilineMOverviewEntry 17 }       
+
+-- ********************************* 
+
+        speedMultilinePortConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF SpeedMultilinePortConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Port table"
+                    ::= { speedMultiline 2 }
+            
+        speedMultilinePortConfigEntry OBJECT-TYPE
+            SYNTAX SpeedMultilinePortConfigEntry
+            MAX-ACCESS not-accessible	
+            STATUS current
+            DESCRIPTION
+                "Port config Entries"
+            INDEX { speedMultilinePortIndex }
+            ::= { speedMultilinePortConfigTable 1 }
+        
+        SpeedMultilinePortConfigEntry ::=
+        SEQUENCE
+        {
+            speedMultilinePortIndex Integer32,
+            speedMultilinePortSlot Integer32,
+            speedMultilinePort Integer32,
+            speedMultilinePortDescription DisplayString,
+            speedMultilinePortOperState INTEGER,
+            speedMultilinePortAdminConfig INTEGER,
+            speedMultilinePortLoopConfig INTEGER,
+            speedMultilinePortAlarmDeactivation INTEGER,
+            speedMultilinePortAlarmSchedule Integer32,
+            speedMultilinePortProtocol INTEGER,
+            speedMultilinePortLLCFconfig INTEGER,
+            speedMultilinePortXCVtunableConfigSelection INTEGER,
+            speedMultilinePortXCVtunChannelConfig DisplayString,
+            speedMultilinePortXCVTunWavelengthConfig Integer32,
+            speedMultilinePortCopperSpeed INTEGER,
+            speedMultilinePortCopperMDI INTEGER
+        }
+            
+        speedMultilinePortIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..1900)
+            MAX-ACCESS not-accessible
+            STATUS current	
+            DESCRIPTION
+                "Port Index"
+        ::= { speedMultilinePortConfigEntry 1 }
+        
+        speedMultilinePortSlot OBJECT-TYPE
+            SYNTAX Integer32 (1..19)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Slot number"
+            ::= { speedMultilinePortConfigEntry 2 }
+            
+        speedMultilinePort OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "port number"
+            ::= { speedMultilinePortConfigEntry 3 }
+            
+        speedMultilinePortDescription OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "Module Client port description."
+            ::= { speedMultilinePortConfigEntry 4 }
+
+        speedMultilinePortOperState OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                notAvailable(0),
+                down(1),
+                up(2),
+                loop(3),
+                downLLCF(4),
+                downTxFault(5),
+                downRxLevel(6),
+                downTxLevel(7),
+                bertRunning(8),
+                unknown(255)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "Module Port Operation State"
+            ::= { speedMultilinePortConfigEntry 5 }   
+     
+        speedMultilinePortAdminConfig OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                notAvailable(0),
+                adminDown(1),
+                adminUp(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "Module Port Configuration. "
+            ::= { speedMultilinePortConfigEntry 6 }
+        
+        speedMultilinePortLoopConfig OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                notAvailable(0),
+                off(1),
+                on(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "Port loop config"
+            ::= { speedMultilinePortConfigEntry 7 }
+        
+        speedMultilinePortAlarmDeactivation OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                notAvailable(0),
+                activateAlarms(1),
+                deactivateBySchedule(2),
+                deactivatePermanently(3)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "Port Alarm Deactivation Configuration"
+            ::= { speedMultilinePortConfigEntry 8 }
+        
+        speedMultilinePortAlarmSchedule OBJECT-TYPE
+            SYNTAX Integer32 (1..1200)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "Port alarm deactivation schedule. Value in hours. After this time has elapsed, the alarms are active again. Valid range: 1..1200."
+            ::= { speedMultilinePortConfigEntry 9 }
+
+        speedMultilinePortProtocol OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                notavailable(0),  
+                fc8G(5), 
+                eth10G(7), 
+                eth1G(18),
+                fc4G(20),
+                fc2G(21),
+                eth2G(22),
+                ib5G(24),
+                ib10G(25),
+                stm64(26),
+                stm16(27)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "Port Protocol"
+            ::= { speedMultilinePortConfigEntry 10 }
+        
+        speedMultilinePortLLCFconfig OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                notAvailable(0),
+                off(1),
+                on(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "Port link loss cary forward config"
+            ::= { speedMultilinePortConfigEntry 11 }
+         
+        speedMultilinePortXCVtunableConfigSelection OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                notAvailable(0),
+                xcvInternal(1),
+                configFile(2),
+                unknown(255)
+            }
+            MAX-ACCESS read-write	
+            STATUS current
+            DESCRIPTION
+            "Port XCV tunable Config Selection either from XCV or Module Config File"
+            ::= { speedMultilinePortConfigEntry 12 }
+ 
+        speedMultilinePortXCVtunChannelConfig OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..4))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "Port XCV tunable Channel Configuration"
+            ::= { speedMultilinePortConfigEntry 13 }
+ 
+
+        speedMultilinePortXCVTunWavelengthConfig OBJECT-TYPE
+            SYNTAX Integer32 (1528350..1577100)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "Port XCV tunable Wavelength Configuration [pm]"
+                    ::= { speedMultilinePortConfigEntry 14 }
+       
+        speedMultilinePortCopperSpeed OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                notAvailable(0), 
+                eth10MBhdxFORCED(1),
+                eth10MBhdxAUTO(2),
+                eth10MBfdxFORCED(3),
+                eth10MB(4),
+                eth100MBhdxFORCED(5),
+                eth100MBhdx(6),
+                eth100MBfdxFORCED(7),
+                eth100MB(8),
+                eth1000MB(12)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "Port Speed of Copper SFP"
+            ::= { speedMultilinePortConfigEntry 15 }
+
+        speedMultilinePortCopperMDI OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                notAvailable(0),
+                mdi(2),
+                auto(3)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "Port Copper SFP medium dependent interface crossover"
+            ::= { speedMultilinePortConfigEntry 16 }     
+
+ --********************************************
+
+
+    speedMultilinePortXCVInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SpeedMultilinePortXCVInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Speed-Dualline FC transceiver overview table"
+        ::= { speedMultiline 3 }
+
+    speedMultilinePortXCVInfoEntry OBJECT-TYPE
+        SYNTAX SpeedMultilinePortXCVInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Module transceiver overview entries"
+        INDEX { speedMultilinePortXCVIndex }
+        ::= { speedMultilinePortXCVInfoTable 1 }
+
+    SpeedMultilinePortXCVInfoEntry ::=
+        SEQUENCE
+        {
+            speedMultilinePortXCVIndex Integer32,
+            speedMultilinePortXCVSlot Integer32,
+            speedMultilinePortXCVPort Integer32,
+            speedMultilinePortXCVState INTEGER,
+            speedMultilinePortXCVVendorName DisplayString,
+            speedMultilinePortXCVVendorPartNumber DisplayString,
+            speedMultilinePortXCVVendorSerialNumber DisplayString,
+            speedMultilinePortXCVType INTEGER,
+            speedMultilinePortXCVConnector INTEGER,
+            speedMultilinePortXCVWavelength Integer32,
+            speedMultilinePortXCVDMIState INTEGER
+        }
+
+    speedMultilinePortXCVIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..1900)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Port Index"
+        ::= { speedMultilinePortXCVInfoEntry 1 }
+
+    speedMultilinePortXCVSlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Slot number"
+        ::= { speedMultilinePortXCVInfoEntry 2 }
+
+    speedMultilinePortXCVPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "port number"
+        ::= { speedMultilinePortXCVInfoEntry 3 }
+
+    speedMultilinePortXCVState OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            xcvRemoved(1),
+            xcvInstalled(2),
+            xcvTxFault(3),
+            unknown(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver installation state"
+        ::= { speedMultilinePortXCVInfoEntry 4 }
+    
+    speedMultilinePortXCVVendorName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver vendor name"
+        ::= { speedMultilinePortXCVInfoEntry 5 }
+
+    speedMultilinePortXCVVendorPartNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver part number"
+        ::= { speedMultilinePortXCVInfoEntry 6 }
+
+    speedMultilinePortXCVVendorSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver serial number"
+        ::= { speedMultilinePortXCVInfoEntry 7 }
+
+    speedMultilinePortXCVType OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            unspecified(0),
+            tSFP(1),
+            tXFP(2),
+            tDWDMSFP(3),
+            tQSFP(4),
+            tQSFPP(5),
+            tQSFP28(10),
+            tCopperSFP(254),
+            vendorSpecific(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver type"
+        ::= { speedMultilinePortXCVInfoEntry 8 }
+
+    speedMultilinePortXCVConnector OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            unspecified(0),
+            cLC(1),
+            cSC(2),
+            cMPO(3),
+            cRJ45(4),
+            cFC(5),
+            cBNC(6),
+            cFJ(7),
+            cMTRJ(8),
+            cMU(9),
+            cSG(10),
+            cOpticalPigtail(11),
+            cHSSDC(12),
+            cCP(13),
+            cMXC(14),
+            unknown(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver connector"
+        ::= { speedMultilinePortXCVInfoEntry 9 }
+
+    speedMultilinePortXCVWavelength OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver supported wavelength (value * 100)"
+        ::= { speedMultilinePortXCVInfoEntry 10 }
+
+    speedMultilinePortXCVDMIState OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notAvailable(0),
+            dmiAvailable(1),
+            notImplemented(2),
+            unknown(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver DMI compliance"
+        ::= { speedMultilinePortXCVInfoEntry 11 }
+
+-- *********************************
+
+    speedMultilinePortXCVValueTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SpeedMultilinePortXCVValueEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Speed-Multiline FC transceiver DMI meassurement table"
+        ::= { speedMultiline 4 }
+
+    speedMultilinePortXCVValueEntry OBJECT-TYPE
+        SYNTAX SpeedMultilinePortXCVValueEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Module transceiver DMI meassurement entries"
+        INDEX { speedMultilinePortXCVDMIIndex }
+        ::= { speedMultilinePortXCVValueTable 1 }
+
+    SpeedMultilinePortXCVValueEntry ::=
+        SEQUENCE
+        {
+            speedMultilinePortXCVDMIIndex Integer32,
+            speedMultilinePortXCVDMISlot Integer32,
+            speedMultilinePortXCVDMIPort Integer32,
+            speedMultilinePortXCVDMIRxLevel FixedDiv100,
+            speedMultilinePortXCVDMITxLevel FixedDiv100,
+            speedMultilinePortXCVDMITxBias FixedDiv100,
+            speedMultilinePortXCVDMITemp Integer32
+        }
+
+    speedMultilinePortXCVDMIIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..1900)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Port Index"
+        ::= { speedMultilinePortXCVValueEntry 1 }
+
+    speedMultilinePortXCVDMISlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Slot number"
+        ::= { speedMultilinePortXCVValueEntry 2 }
+
+    speedMultilinePortXCVDMIPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "port number"
+        ::= { speedMultilinePortXCVValueEntry 3 }
+
+    speedMultilinePortXCVDMIRxLevel OBJECT-TYPE
+        SYNTAX FixedDiv100
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "optical receive level (dBm)"
+        ::= { speedMultilinePortXCVValueEntry 4 }
+
+    speedMultilinePortXCVDMITxLevel OBJECT-TYPE
+        SYNTAX FixedDiv100
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "optical transmit level (dBm)"
+        ::= { speedMultilinePortXCVValueEntry 5 }
+
+    speedMultilinePortXCVDMITxBias OBJECT-TYPE
+        SYNTAX FixedDiv100
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transmitter TX bias current (mA)"
+        ::= { speedMultilinePortXCVValueEntry 6 }
+
+    speedMultilinePortXCVDMITemp OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transmitter temperature (degree Celsius)"
+        ::= { speedMultilinePortXCVValueEntry 7 }
+
+    -- *********************************
+
+    speedMultilinePortXCVAlarmTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SpeedMultilinePortXCVAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Speed-Multiline FC transceiver alarm table"
+        ::= { speedMultiline 5 }
+
+    speedMultilinePortXCVAlarmEntry OBJECT-TYPE
+        SYNTAX SpeedMultilinePortXCVAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Module transceiver alarm entries"
+        INDEX { speedMultilinePortAIndex }
+        ::= { speedMultilinePortXCVAlarmTable 1 }
+
+    SpeedMultilinePortXCVAlarmEntry ::=
+        SEQUENCE
+        {
+            speedMultilinePortAIndex Integer32,
+            speedMultilinePortASlot Integer32,
+            speedMultilinePortAPort Integer32,
+            speedMultilinePortXCVDMIRxLowAlarm INTEGER,
+            speedMultilinePortXCVDMIRxHighAlarm INTEGER,
+            speedMultilinePortXCVDMITxLowAlarm INTEGER,
+            speedMultilinePortXCVDMIBiasLowAlarm INTEGER,
+            speedMultilinePortXCVDMIBiasHighAlarm INTEGER,
+            speedMultilinePortXCVTempHighAlarm INTEGER,
+            speedMultilinePortXCVVCCAlarm INTEGER,
+            speedMultilinePortXCVDWDMAlarm INTEGER,
+            speedMultilinePortXCVLCalAlarm INTEGER,
+            speedMultilinePortXCVCDRLOLAlarm INTEGER
+        }
+
+    speedMultilinePortAIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..1900)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Port Index"
+        ::= { speedMultilinePortXCVAlarmEntry 1 }
+
+    speedMultilinePortASlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Slot number"
+        ::= { speedMultilinePortXCVAlarmEntry 2 }
+
+    speedMultilinePortAPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "port number"
+        ::= { speedMultilinePortXCVAlarmEntry 3 }
+
+    speedMultilinePortXCVDMIRxLowAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            noAlarm(0),
+            activeWarning(1),
+            activeAlarm(2),
+            unknown(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver RX power event"
+        ::= { speedMultilinePortXCVAlarmEntry 4 }
+
+    speedMultilinePortXCVDMIRxHighAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            noAlarm(0),
+            activeWarning(1),
+            activeAlarm(2),
+            unknown(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver RX power event"
+        ::= { speedMultilinePortXCVAlarmEntry 5 }
+
+    speedMultilinePortXCVDMITxLowAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            noAlarm(0),
+            activeWarning(1),
+            activeAlarm(2),
+            unknown(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver TX power event"
+        ::= { speedMultilinePortXCVAlarmEntry 6 }
+
+    speedMultilinePortXCVDMIBiasLowAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            noAlarm(0),
+            activeAlarm(2),
+            unknown(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver bias current event"
+        ::= { speedMultilinePortXCVAlarmEntry 7 }
+
+    speedMultilinePortXCVDMIBiasHighAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            noAlarm(0),
+            activeAlarm(2),
+            unknown(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver bias current event"
+        ::= { speedMultilinePortXCVAlarmEntry 8 }
+
+
+    speedMultilinePortXCVTempHighAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            noAlarm(0),
+            activeWarning(1),
+            activeAlarm(2),
+            unknown(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver temperature event"
+        ::= { speedMultilinePortXCVAlarmEntry 9 }
+
+    speedMultilinePortXCVVCCAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            noAlarm(0),
+            activeAlarm(2),
+            unknown(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver supply voltage event"
+        ::= { speedMultilinePortXCVAlarmEntry 10 }
+
+    speedMultilinePortXCVDWDMAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            noAlarm(0),
+            activeAlarm(2),
+            unknown(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver DWDM alarm"
+        ::= { speedMultilinePortXCVAlarmEntry 11 }
+
+    speedMultilinePortXCVLCalAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            noAlarm(0),
+            activeAlarm(2),
+            unknown(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver lane calibration alarm"
+        ::= { speedMultilinePortXCVAlarmEntry 12 }
+
+    speedMultilinePortXCVCDRLOLAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            noAlarm(0),
+            activeAlarm(2),
+            unknown(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver CDR loss of lock alarm"
+        ::= { speedMultilinePortXCVAlarmEntry 13 }
+        
+-- **************************************
+
+    speedMultilinePortXCVThresholdTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SpeedMultilinePortXCVThresholdEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "SPEED-Multiline XFP Threshold table"
+        ::= { speedMultiline 6 }
+
+    speedMultilinePortXCVThresholdEntry OBJECT-TYPE
+        SYNTAX SpeedMultilinePortXCVThresholdEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "XFP threshold Entries"
+        INDEX { speedMultilinePortXCVThresIndex }
+        ::= { speedMultilinePortXCVThresholdTable 1 }
+
+    SpeedMultilinePortXCVThresholdEntry ::=
+        SEQUENCE
+        {
+            speedMultilinePortXCVThresIndex Integer32,
+            speedMultilinePortXCVThresSlot Integer32,
+            speedMultilinePortXCVThresPort	Integer32,
+            speedMultilinePortXCVRxLowAlarmLevel FixedDiv100,
+            speedMultilinePortXCVRxHighAlarmLevel FixedDiv100,
+            speedMultilinePortXCVRxLowWarningLevel FixedDiv100,
+            speedMultilinePortXCVRxHighWarningLevel FixedDiv100,
+            speedMultilinePortXCVTxLowAlarmLevel FixedDiv100,
+            speedMultilinePortXCVTxLowWarningLevel FixedDiv100,
+            speedMultilinePortXCVTxBiasLowAlarmLevel FixedDiv100,
+            speedMultilinePortXCVTxBiasHighAlarmLevel FixedDiv100,
+            speedMultilinePortXCVTempHighAlarmLevel Integer32,
+            speedMultilinePortXCVTempHighWarningLevel Integer32
+        }
+
+    speedMultilinePortXCVThresIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..1999)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "port index"
+        ::= { speedMultilinePortXCVThresholdEntry 1 }
+
+    speedMultilinePortXCVThresSlot OBJECT-TYPE
+        SYNTAX Integer32 (0..19)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "slot number of port"
+        ::= { speedMultilinePortXCVThresholdEntry 2 }
+
+    speedMultilinePortXCVThresPort OBJECT-TYPE
+        SYNTAX Integer32 (0..34)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "port number"
+        ::= { speedMultilinePortXCVThresholdEntry 3 }
+
+    speedMultilinePortXCVRxLowAlarmLevel OBJECT-TYPE
+        SYNTAX FixedDiv100
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "XFP receiver input low alarm level"
+        ::= { speedMultilinePortXCVThresholdEntry 4 }
+
+    speedMultilinePortXCVRxHighAlarmLevel OBJECT-TYPE
+        SYNTAX FixedDiv100
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "XFP receiver input high alarm level"
+        ::= { speedMultilinePortXCVThresholdEntry 5 }
+
+    speedMultilinePortXCVRxLowWarningLevel OBJECT-TYPE
+        SYNTAX FixedDiv100
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "XFP receiver input low warning level"
+        ::= { speedMultilinePortXCVThresholdEntry 6 }
+
+    speedMultilinePortXCVRxHighWarningLevel OBJECT-TYPE
+        SYNTAX FixedDiv100
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "XFP receiver input high warning level"
+        ::= { speedMultilinePortXCVThresholdEntry 7 }
+
+    speedMultilinePortXCVTxLowAlarmLevel OBJECT-TYPE
+        SYNTAX FixedDiv100
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "XFP transmitter output low alarm level"
+        ::= { speedMultilinePortXCVThresholdEntry 8 }
+
+    speedMultilinePortXCVTxLowWarningLevel OBJECT-TYPE
+        SYNTAX FixedDiv100
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "XFP transmitter output low warning level"
+        ::= { speedMultilinePortXCVThresholdEntry 9 }
+
+    speedMultilinePortXCVTxBiasLowAlarmLevel OBJECT-TYPE
+        SYNTAX FixedDiv100
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "XFP transmitter bias low alarm level"
+        ::= { speedMultilinePortXCVThresholdEntry 10 }
+
+    speedMultilinePortXCVTxBiasHighAlarmLevel OBJECT-TYPE
+        SYNTAX FixedDiv100
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "XFP transmitter bias high alarm level"
+        ::= { speedMultilinePortXCVThresholdEntry 11 }
+
+    speedMultilinePortXCVTempHighAlarmLevel OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "XFP temperature high alarm level"
+        ::= { speedMultilinePortXCVThresholdEntry 12 }
+
+    speedMultilinePortXCVTempHighWarningLevel OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "XFP temperature high warning level"
+        ::= { speedMultilinePortXCVThresholdEntry 13 }
+
+-- **************************************
+ 
+
+END

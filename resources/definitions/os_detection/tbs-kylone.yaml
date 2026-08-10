@@ -1,0 +1,17 @@
+os: tbs-kylone
+group: tbs
+text: 'Kylone'
+type: network
+icon: tbs
+mib_dir: tbs
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -   sysObjectID:
+        - .1.3.6.1.4.1.8072.3.2.10
+        snmpget:
+            oid: SKYLONE-MIB::productName
+            op: '!='
+            value: false

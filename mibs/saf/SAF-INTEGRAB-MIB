@@ -8,31 +8,42 @@ IMPORTS
           FROM SNMPv2-SMI                -- [RFC2578]
       pointToPoint
           FROM SAF-ENTERPRISE
+      DateAndTime
+          FROM SNMPv2-TC
+      DisplayString, PhysAddress
+          FROM RFC1213-MIB
       safIntegra
           FROM SAF-INTEGRA-MIB
-      DisplayString, DateAndTime, PhysAddress
-          FROM SNMPv2-TC
       OBJECT-GROUP, MODULE-COMPLIANCE
           FROM SNMPv2-CONF               -- [RFC2580]
       IpAddress
           FROM SNMPv2-SMI                -- [RFC2578]
       IANAifType
           FROM IANAifType-MIB;
- 
--- saf            OBJECT IDENTIFIER ::= { enterprises 7571 }
+	
+-- saf   	        OBJECT IDENTIFIER ::= { enterprises 7571 }
 -- microwaveRadio   OBJECT IDENTIFIER ::= { tehnika 1 }
 -- pointToPoint     OBJECT IDENTIFIER ::= { microwaveRadio 1 }
 -- safIntegra       OBJECT IDENTIFIER ::= { pointToPoint 7 }
 
 integraB MODULE-IDENTITY
-       LAST-UPDATED "201509170000Z" --  17 sep 2015
+       LAST-UPDATED "201904230000Z" --  23 apr 2019
        ORGANIZATION "SAF Tehnika"
        CONTACT-INFO
                "SAF Tehnika technical support
-                <techsupport>"
+                <techsupport@saftehnika.com>"
        DESCRIPTION
                "SAF Integra-B device management base"
 -- Revision history
+       REVISION   "201904230000Z" --  23 apr 2019
+       DESCRIPTION
+               "Added device type, serial number and product code."
+       REVISION   "201806280000Z" --  28 jun 2018
+       DESCRIPTION
+               "Modem performance counters added"
+       REVISION   "201605110000Z" --  11 may 2016
+       DESCRIPTION
+               "Rx Level State added"
        REVISION   "201509170000Z" --  17 sep 2015
        DESCRIPTION
                "Conformance updated"
@@ -111,7 +122,7 @@ integraB MODULE-IDENTITY
        REVISION   "201406110000Z" --  11 jun 2014
        DESCRIPTION
                "Public Release 1.09. ifPortType syntax 
-        declared by IANAifType"
+	       declared by IANAifType"
        REVISION   "201404160000Z" --  16 apr 2014
        DESCRIPTION
                "Public Release 1.08"
@@ -152,7 +163,7 @@ integraBtimestamp OBJECT-TYPE
    DESCRIPTION "Last data update time"
    ::= { integraB 1 }
 
-integraBradio  OBJECT IDENTIFIER ::=   { integraB 2 }
+integraBradio		OBJECT IDENTIFIER ::=   { integraB 2 }
 
 integraBradioTxPower OBJECT-TYPE
               SYNTAX  Integer32
@@ -199,8 +210,8 @@ integraBradioTxMute   OBJECT-TYPE
               STATUS  current
               DESCRIPTION
                       "Status of 'Tx mute'
-       1 - Tx is muted,
-       2 - Tx is not muted.
+					  1 - Tx is muted,
+					  2 - Tx is not muted.
                       3 - Status information unavailable"
               ::= { integraBradio 5 }
 
@@ -310,15 +321,27 @@ integraBradioRangeTxFrequency OBJECT-TYPE
 integraBradioPLL OBJECT-TYPE
               SYNTAX  INTEGER {
                 error(1),
-          ok(2)
+		        ok(2)
               }
               MAX-ACCESS  read-only
               STATUS  current
               DESCRIPTION "PLL state of local-oscillator generator"
               ::= { integraBradio 11 }
 
+integraBradioRxLevelState OBJECT-TYPE
+              SYNTAX  INTEGER {
+                ok(1),
+                low(2),
+                high(3),
+                error(4)
+              }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Received signal level state"
+              ::= { integraBradio 12 }
+
             
-integraBmodem  OBJECT IDENTIFIER ::=   { integraB 3 }
+integraBmodem		OBJECT IDENTIFIER ::=   { integraB 3 }
 
 integraBmodemAcquireStatus OBJECT-TYPE
               SYNTAX  INTEGER {
@@ -435,8 +458,90 @@ integraBmodemCarrierOffset OBJECT-TYPE
               DESCRIPTION "Modem carrier offset"
               ::= { integraBmodem 13 }
 
+integraBmodemCountTime OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "s"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance count time"
+              ::= { integraBmodem 14 }
 
-integraBsystem  OBJECT IDENTIFIER ::=   { integraB 4 }
+integraBmodemErroredBlock OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance errored blocks"
+              ::= { integraBmodem 15 }
+
+integraBmodemErroredSecond OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "s"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance errored seconds"
+              ::= { integraBmodem 16 }
+
+integraBmodemSeverelyErroredSecond OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "s"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance severely errored seconds"
+              ::= { integraBmodem 17 }
+
+integraBmodemBackgroundBlockError OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance background block errors"
+              ::= { integraBmodem 18 }
+
+integraBmodemTotalBlockNumber OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance total block number"
+              ::= { integraBmodem 19 }
+
+integraBmodemErroredSecondRatio OBJECT-TYPE
+              SYNTAX DisplayString
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance errored second ratio"
+              ::= { integraBmodem 20 }
+
+integraBmodemSeverelyErroredSecondRatio OBJECT-TYPE
+              SYNTAX DisplayString
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance severely errored second ratio"
+              ::= { integraBmodem 21 }
+
+integraBmodemBackgroundBlockErrorRatio OBJECT-TYPE
+              SYNTAX DisplayString
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance background block error ratio"
+              ::= { integraBmodem 22 }
+
+integraBmodemUptime OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "s"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance : uptime"
+              ::= { integraBmodem 23 }
+
+integraBmodemUnavailtime OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "s"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance : unavailtime"
+              ::= { integraBmodem 24 }
+
+
+integraBsystem		OBJECT IDENTIFIER ::=   { integraB 4 }
 
 integraBsysCPUtemperature OBJECT-TYPE
               SYNTAX  Integer32
@@ -510,6 +615,26 @@ integraBsysCPUidle OBJECT-TYPE
               DESCRIPTION "System CPU idle *10 %"
               ::= { integraBsystem 10 }
 
+integraBsysDeviceType OBJECT-TYPE
+              SYNTAX DisplayString
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Device type name"
+              ::= { integraBsystem 11 }
+
+integraBsysDeviceSerial OBJECT-TYPE
+              SYNTAX DisplayString
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Device serial number"
+              ::= { integraBsystem 12 }
+
+integraBsysDeviceProductModel OBJECT-TYPE
+              SYNTAX DisplayString
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Device product model code"
+              ::= { integraBsystem 13 }
 
 -- Ethernet
 integraBethernet      OBJECT IDENTIFIER ::=   { integraB 5 }
@@ -559,8 +684,8 @@ IntegraBifPortEntry   ::=
                         INTEGER,
                     integraBifPortSyncEthPrio
                         Integer32,
-      integraBifPortFlowControl
-   INTEGER
+		    integraBifPortFlowControl
+			INTEGER
               }
 
 integraBifPortStatIndex OBJECT-TYPE
@@ -2542,7 +2667,8 @@ integraBRadioGroup OBJECT-GROUP
           integraBradioRangeDescr,
           integraBradioRangeTxPower,
           integraBradioRangeTxFrequency,
-          integraBradioPLL
+          integraBradioPLL,
+          integraBradioRxLevelState
    }
    STATUS   current
    DESCRIPTION "Radio group."
@@ -2562,7 +2688,18 @@ integraBModemGroup OBJECT-GROUP
           integraBmodemRxCapacity,
           integraBmodemTxCapacity,
           integraBmodemACMengine,
-          integraBmodemCarrierOffset
+          integraBmodemCarrierOffset,
+          integraBmodemCountTime,
+          integraBmodemErroredBlock,
+          integraBmodemErroredSecond,
+          integraBmodemSeverelyErroredSecond,
+          integraBmodemBackgroundBlockError,
+          integraBmodemTotalBlockNumber,
+          integraBmodemErroredSecondRatio,
+          integraBmodemSeverelyErroredSecondRatio,
+          integraBmodemBackgroundBlockErrorRatio,
+          integraBmodemUptime,
+          integraBmodemUnavailtime
    }
    STATUS   current
    DESCRIPTION "Modem group."
@@ -2579,6 +2716,9 @@ integraBSystemGroup OBJECT-GROUP
           integraBsysBoardTemperature,
           integraBsysFreeMemory,
           integraBsysCPUidle,
+          integraBsysDeviceType,
+          integraBsysDeviceSerial,
+          integraBsysDeviceProductModel,
           integraBexecuteConfig,
           integraBneedStore,
           integraBstoreConfig
