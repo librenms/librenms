@@ -51,7 +51,7 @@ class CheckDatabaseSchemaVersion implements Validation, ValidationFixer
 
         $migrations = Schema::getUnexpectedMigrations();
         if ($migrations->isNotEmpty()) {
-            return ValidationResult::warn(trans('validation.validations.database.CheckSchemaVersion.warn_extra_migrations', ['migrations' => $migrations->implode(', ')]));
+             return ValidationResult::warn(trans('validation.validations.database.CheckSchemaVersion.warn_extra_migrations', ['migrations' => $migrations->implode(', ')]));
         }
 
         self::$current = true;

@@ -19,6 +19,7 @@ access_points:
     PRIMARY: { Name: PRIMARY, Columns: [accesspoint_id], Unique: true, Type: BTREE }
     access_points_deleted_index: { Name: access_points_deleted_index, Columns: [deleted], Unique: false, Type: BTREE }
     name: { Name: name, Columns: [name, radio_number], Unique: false, Type: BTREE }
+  Constraints: {  }
 alerts:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -35,6 +36,7 @@ alerts:
     alerts_device_id_index: { Name: alerts_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     alerts_device_id_rule_id_unique: { Name: alerts_device_id_rule_id_unique, Columns: [device_id, rule_id], Unique: true, Type: BTREE }
     alerts_rule_id_index: { Name: alerts_rule_id_index, Columns: [rule_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 alert_device_map:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -43,6 +45,7 @@ alert_device_map:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     alert_device_map_rule_id_device_id_unique: { Name: alert_device_map_rule_id_device_id_unique, Columns: [rule_id, device_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 alert_group_map:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -51,6 +54,7 @@ alert_group_map:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     alert_group_map_rule_id_group_id_unique: { Name: alert_group_map_rule_id_group_id_unique, Columns: [rule_id, group_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 alert_location_map:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -59,6 +63,7 @@ alert_location_map:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     alert_location_map_rule_id_location_id_uindex: { Name: alert_location_map_rule_id_location_id_uindex, Columns: [rule_id, location_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 alert_log:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -72,6 +77,7 @@ alert_log:
     alert_log_device_id_rule_id_time_logged_index: { Name: alert_log_device_id_rule_id_time_logged_index, Columns: [device_id, rule_id, time_logged], Unique: false, Type: BTREE }
     alert_log_rule_id_device_id_state_index: { Name: alert_log_rule_id_device_id_state_index, Columns: [rule_id, device_id, state], Unique: false, Type: BTREE }
     alert_log_time_logged_index: { Name: alert_log_time_logged_index, Columns: [time_logged], Unique: false, Type: BTREE }
+  Constraints: {  }
 alert_operations:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -80,6 +86,7 @@ alert_operations:
     - { Field: notifications_suppressed, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+  Constraints: {  }
 alert_operation_segments:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -93,6 +100,7 @@ alert_operation_segments:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     alert_operation_segments_alert_operation_id_index: { Name: alert_operation_segments_alert_operation_id_index, Columns: [alert_operation_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 alert_operation_transport_map:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -102,6 +110,7 @@ alert_operation_transport_map:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     alert_operation_transport_map_segment_id_index: { Name: alert_operation_transport_map_segment_id_index, Columns: [segment_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 alert_rules:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -119,6 +128,7 @@ alert_rules:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     alert_rules_alert_operation_id_index: { Name: alert_rules_alert_operation_id_index, Columns: [alert_operation_id], Unique: false, Type: BTREE }
     alert_rules_name_unique: { Name: alert_rules_name_unique, Columns: [name], Unique: true, Type: BTREE }
+  Constraints: {  }
 alert_schedulables:
   Columns:
     - { Field: item_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -129,6 +139,7 @@ alert_schedulables:
     PRIMARY: { Name: PRIMARY, Columns: [item_id], Unique: true, Type: BTREE }
     alert_schedulables_schedule_id_index: { Name: alert_schedulables_schedule_id_index, Columns: [schedule_id], Unique: false, Type: BTREE }
     schedulable_morph_index: { Name: schedulable_morph_index, Columns: [alert_schedulable_type, alert_schedulable_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 alert_schedule:
   Columns:
     - { Field: schedule_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -141,6 +152,7 @@ alert_schedule:
     - { Field: behavior, Type: int, 'Null': false, Extra: '', Default: '1' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [schedule_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 alert_templates:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -150,6 +162,7 @@ alert_templates:
     - { Field: title_rec, Type: varchar(255), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+  Constraints: {  }
 alert_template_map:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -158,6 +171,7 @@ alert_template_map:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     alert_templates_id: { Name: alert_templates_id, Columns: [alert_templates_id, alert_rule_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 alert_transports:
   Columns:
     - { Field: transport_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -167,12 +181,14 @@ alert_transports:
     - { Field: transport_config, Type: text, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [transport_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 alert_transport_groups:
   Columns:
     - { Field: transport_group_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: transport_group_name, Type: varchar(30), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [transport_group_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 alert_transport_map:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -181,6 +197,7 @@ alert_transport_map:
     - { Field: target_type, Type: varchar(16), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+  Constraints: {  }
 api_tokens:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -191,6 +208,7 @@ api_tokens:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     api_tokens_token_hash_unique: { Name: api_tokens_token_hash_unique, Columns: [token_hash], Unique: true, Type: BTREE }
+  Constraints: {  }
 applications:
   Columns:
     - { Field: app_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -207,6 +225,7 @@ applications:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [app_id], Unique: true, Type: BTREE }
     applications_device_id_app_type_unique: { Name: applications_device_id_app_type_unique, Columns: [device_id, app_type], Unique: true, Type: BTREE }
+  Constraints: {  }
 application_metrics:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -217,6 +236,7 @@ application_metrics:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     application_metrics_app_id_metric_unique: { Name: application_metrics_app_id_metric_unique, Columns: [app_id, metric], Unique: true, Type: BTREE }
+  Constraints: {  }
 authlog:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -226,6 +246,7 @@ authlog:
     - { Field: result, Type: text, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+  Constraints: {  }
 availability:
   Columns:
     - { Field: availability_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -236,6 +257,7 @@ availability:
     PRIMARY: { Name: PRIMARY, Columns: [availability_id], Unique: true, Type: BTREE }
     availability_device_id_duration_unique: { Name: availability_device_id_duration_unique, Columns: [device_id, duration], Unique: true, Type: BTREE }
     availability_device_id_index: { Name: availability_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 bgpPeers:
   Columns:
     - { Field: bgpPeer_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -263,6 +285,7 @@ bgpPeers:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [bgpPeer_id], Unique: true, Type: BTREE }
     bgppeers_device_id_context_name_index: { Name: bgppeers_device_id_context_name_index, Columns: [device_id, context_name], Unique: false, Type: BTREE }
+  Constraints: {  }
 bgpPeers_cbgp:
   Columns:
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -291,6 +314,7 @@ bgpPeers_cbgp:
   Indexes:
     bgppeers_cbgp_device_id_bgppeeridentifier_afi_safi_unique: { Name: bgppeers_cbgp_device_id_bgppeeridentifier_afi_safi_unique, Columns: [device_id, bgpPeerIdentifier, afi, safi], Unique: true, Type: BTREE }
     bgppeers_cbgp_device_id_bgppeeridentifier_context_name_index: { Name: bgppeers_cbgp_device_id_bgppeeridentifier_context_name_index, Columns: [device_id, bgpPeerIdentifier, context_name], Unique: false, Type: BTREE }
+  Constraints: {  }
 bills:
   Columns:
     - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -316,6 +340,7 @@ bills:
     - { Field: bill_autoadded, Type: tinyint, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [bill_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 bill_data:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -329,6 +354,7 @@ bill_data:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     bill_data_bill_id_index: { Name: bill_data_bill_id_index, Columns: [bill_id], Unique: false, Type: BTREE }
     bill_data_bill_id_timestamp_index: { Name: bill_data_bill_id_timestamp_index, Columns: [bill_id, timestamp], Unique: false, Type: BTREE }
+  Constraints: {  }
 bill_history:
   Columns:
     - { Field: bill_hist_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -358,6 +384,7 @@ bill_history:
     PRIMARY: { Name: PRIMARY, Columns: [bill_hist_id], Unique: true, Type: BTREE }
     bill_history_bill_id_bill_datefrom_bill_dateto_unique: { Name: bill_history_bill_id_bill_datefrom_bill_dateto_unique, Columns: [bill_id, bill_datefrom, bill_dateto], Unique: true, Type: BTREE }
     bill_history_bill_id_index: { Name: bill_history_bill_id_index, Columns: [bill_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 bill_perms:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -365,6 +392,7 @@ bill_perms:
     - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+  Constraints: {  }
 bill_ports:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -373,6 +401,7 @@ bill_ports:
     - { Field: bill_port_autoadded, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+  Constraints: {  }
 bill_port_counters:
   Columns:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -384,6 +413,7 @@ bill_port_counters:
     - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_id, bill_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 cache:
   Columns:
     - { Field: key, Type: varchar(255), 'Null': false, Extra: '' }
@@ -391,6 +421,7 @@ cache:
     - { Field: expiration, Type: int, 'Null': false, Extra: '' }
   Indexes:
     cache_key_unique: { Name: cache_key_unique, Columns: [key], Unique: true, Type: BTREE }
+  Constraints: {  }
 cache_locks:
   Columns:
     - { Field: key, Type: varchar(255), 'Null': false, Extra: '' }
@@ -398,6 +429,7 @@ cache_locks:
     - { Field: expiration, Type: int, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [key], Unique: true, Type: BTREE }
+  Constraints: {  }
 callback:
   Columns:
     - { Field: callback_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -405,6 +437,7 @@ callback:
     - { Field: value, Type: char(64), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [callback_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 cef_switching:
   Columns:
     - { Field: cef_switching_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -424,6 +457,7 @@ cef_switching:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [cef_switching_id], Unique: true, Type: BTREE }
     cef_switching_device_id_entphysicalindex_afi_cef_index_unique: { Name: cef_switching_device_id_entphysicalindex_afi_cef_index_unique, Columns: [device_id, entPhysicalIndex, afi, cef_index], Unique: true, Type: BTREE }
+  Constraints: {  }
 component:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -438,6 +472,7 @@ component:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     component_device_id_index: { Name: component_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     component_type_index: { Name: component_type_index, Columns: [type], Unique: false, Type: BTREE }
+  Constraints: {  }
 component_prefs:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -469,6 +504,7 @@ config:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [config_id], Unique: true, Type: BTREE }
     config_config_name_unique: { Name: config_config_name_unique, Columns: [config_name], Unique: true, Type: BTREE }
+  Constraints: {  }
 customers:
   Columns:
     - { Field: customer_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -479,6 +515,7 @@ customers:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [customer_id], Unique: true, Type: BTREE }
     customers_username_unique: { Name: customers_username_unique, Columns: [username], Unique: true, Type: BTREE }
+  Constraints: {  }
 customoids:
   Columns:
     - { Field: customoid_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -502,6 +539,7 @@ customoids:
     - { Field: user_func, Type: varchar(100), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [customoid_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 custom_maps:
   Columns:
     - { Field: custom_map_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -528,6 +566,7 @@ custom_maps:
     - { Field: background_data, Type: text, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [custom_map_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 custom_map_backgrounds:
   Columns:
     - { Field: custom_map_background_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -616,6 +655,7 @@ custom_map_node_images:
     - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [custom_map_node_image_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 dashboards:
   Columns:
     - { Field: dashboard_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -624,6 +664,7 @@ dashboards:
     - { Field: access, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [dashboard_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 devices:
   Columns:
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -686,11 +727,12 @@ devices:
     PRIMARY: { Name: PRIMARY, Columns: [device_id], Unique: true, Type: BTREE }
     devices_display_index: { Name: devices_display_index, Columns: [display], Unique: false, Type: BTREE }
     devices_hostname_sysname_display_index: { Name: devices_hostname_sysname_display_index, Columns: [hostname, sysName, display], Unique: false, Type: BTREE }
-    devices_last_poll_attempted_index: { Name: devices_last_poll_attempted_index, Columns: [last_poll_attempted], Unique: false, Type: BTREE }
     devices_last_polled_index: { Name: devices_last_polled_index, Columns: [last_polled], Unique: false, Type: BTREE }
+    devices_last_poll_attempted_index: { Name: devices_last_poll_attempted_index, Columns: [last_poll_attempted], Unique: false, Type: BTREE }
     devices_os_index: { Name: devices_os_index, Columns: [os], Unique: false, Type: BTREE }
     devices_status_index: { Name: devices_status_index, Columns: [status], Unique: false, Type: BTREE }
     devices_sysname_index: { Name: devices_sysname_index, Columns: [sysName], Unique: false, Type: BTREE }
+  Constraints: {  }
 devices_attribs:
   Columns:
     - { Field: attrib_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -701,6 +743,7 @@ devices_attribs:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [attrib_id], Unique: true, Type: BTREE }
     devices_attribs_device_id_index: { Name: devices_attribs_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 devices_group_perms:
   Columns:
     - { Field: user_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -709,6 +752,7 @@ devices_group_perms:
     PRIMARY: { Name: PRIMARY, Columns: [device_group_id, user_id], Unique: true, Type: BTREE }
     devices_group_perms_device_group_id_index: { Name: devices_group_perms_device_group_id_index, Columns: [device_group_id], Unique: false, Type: BTREE }
     devices_group_perms_user_id_index: { Name: devices_group_perms_user_id_index, Columns: [user_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 devices_perms:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -717,6 +761,7 @@ devices_perms:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     devices_perms_user_id_index: { Name: devices_perms_user_id_index, Columns: [user_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 device_graphs:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -725,6 +770,7 @@ device_graphs:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_graphs_device_id_index: { Name: device_graphs_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 device_groups:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -736,6 +782,7 @@ device_groups:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_groups_name_unique: { Name: device_groups_name_unique, Columns: [name], Unique: true, Type: BTREE }
+  Constraints: {  }
 device_group_device:
   Columns:
     - { Field: device_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -759,6 +806,7 @@ device_outages:
     device_outages_device_id_index: { Name: device_outages_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     device_outages_going_down_index: { Name: device_outages_going_down_index, Columns: [going_down], Unique: false, Type: BTREE }
     device_outages_up_again_index: { Name: device_outages_up_again_index, Columns: [up_again], Unique: false, Type: BTREE }
+  Constraints: {  }
 device_relationships:
   Columns:
     - { Field: parent_device_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
@@ -803,6 +851,7 @@ entityState:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [entity_state_id], Unique: true, Type: BTREE }
     entitystate_device_id_index: { Name: entitystate_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 entPhysical:
   Columns:
     - { Field: entPhysical_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -828,6 +877,7 @@ entPhysical:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [entPhysical_id], Unique: true, Type: BTREE }
     entphysical_device_id_index: { Name: entphysical_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 entPhysical_state:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -840,6 +890,7 @@ entPhysical_state:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_id_index: { Name: device_id_index, Columns: [device_id, entPhysicalIndex], Unique: false, Type: BTREE }
+  Constraints: {  }
 eventlog:
   Columns:
     - { Field: event_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -854,6 +905,7 @@ eventlog:
     PRIMARY: { Name: PRIMARY, Columns: [event_id], Unique: true, Type: BTREE }
     eventlog_datetime_index: { Name: eventlog_datetime_index, Columns: [datetime], Unique: false, Type: BTREE }
     eventlog_device_id_index: { Name: eventlog_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 graph_types:
   Columns:
     - { Field: graph_type, Type: varchar(32), 'Null': false, Extra: '' }
@@ -866,6 +918,7 @@ graph_types:
     graph_types_graph_section_index: { Name: graph_types_graph_section_index, Columns: [graph_section], Unique: false, Type: BTREE }
     graph_types_graph_subtype_index: { Name: graph_types_graph_subtype_index, Columns: [graph_subtype], Unique: false, Type: BTREE }
     graph_types_graph_type_index: { Name: graph_types_graph_type_index, Columns: [graph_type], Unique: false, Type: BTREE }
+  Constraints: {  }
 hrDevice:
   Columns:
     - { Field: hrDevice_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -879,6 +932,7 @@ hrDevice:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [hrDevice_id], Unique: true, Type: BTREE }
     hrdevice_device_id_index: { Name: hrdevice_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 hrSystem:
   Columns:
     - { Field: hrSystem_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -889,6 +943,7 @@ hrSystem:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [hrSystem_id], Unique: true, Type: BTREE }
     hrsystem_device_id_index: { Name: hrsystem_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 ipsec_tunnels:
   Columns:
     - { Field: tunnel_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -902,6 +957,7 @@ ipsec_tunnels:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [tunnel_id], Unique: true, Type: BTREE }
     ipsec_tunnels_device_id_peer_addr_unique: { Name: ipsec_tunnels_device_id_peer_addr_unique, Columns: [device_id, peer_addr], Unique: true, Type: BTREE }
+  Constraints: {  }
 ipv4_addresses:
   Columns:
     - { Field: ipv4_address_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -914,6 +970,7 @@ ipv4_addresses:
     PRIMARY: { Name: PRIMARY, Columns: [ipv4_address_id], Unique: true, Type: BTREE }
     ipv4_addresses_ipv4_network_id_index: { Name: ipv4_addresses_ipv4_network_id_index, Columns: [ipv4_network_id], Unique: false, Type: BTREE }
     ipv4_addresses_port_id_index: { Name: ipv4_addresses_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 ipv4_mac:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -927,6 +984,7 @@ ipv4_mac:
     ipv4_mac_device_id_index: { Name: ipv4_mac_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     ipv4_mac_mac_address_index: { Name: ipv4_mac_mac_address_index, Columns: [mac_address], Unique: false, Type: BTREE }
     ipv4_mac_port_id_index: { Name: ipv4_mac_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 ipv4_networks:
   Columns:
     - { Field: ipv4_network_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -934,6 +992,7 @@ ipv4_networks:
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ipv4_network_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 ipv6_addresses:
   Columns:
     - { Field: ipv6_address_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -947,6 +1006,7 @@ ipv6_addresses:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ipv6_address_id], Unique: true, Type: BTREE }
     ipv6_addresses_port_id_index: { Name: ipv6_addresses_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 ipv6_nd:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -961,6 +1021,7 @@ ipv6_nd:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     ipv6_nd_device_id_index: { Name: ipv6_nd_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     ipv6_nd_port_id_index: { Name: ipv6_nd_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 ipv6_networks:
   Columns:
     - { Field: ipv6_network_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -968,6 +1029,7 @@ ipv6_networks:
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ipv6_network_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 isis_adjacencies:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -989,6 +1051,7 @@ isis_adjacencies:
     isis_adjacencies_device_id_index: { Name: isis_adjacencies_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     isis_adjacencies_ifindex_index: { Name: isis_adjacencies_ifindex_index, Columns: [ifIndex], Unique: false, Type: BTREE }
     isis_adjacencies_port_id_index: { Name: isis_adjacencies_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 juniAtmVp:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -999,6 +1062,7 @@ juniAtmVp:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     juniatmvp_port_id_index: { Name: juniatmvp_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 links:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1017,6 +1081,7 @@ links:
     links_local_port_id_index: { Name: links_local_port_id_index, Columns: [local_port_id], Unique: false, Type: BTREE }
     links_remote_port_id_index: { Name: links_remote_port_id_index, Columns: [remote_port_id], Unique: false, Type: BTREE }
     local_device_id: { Name: local_device_id, Columns: [local_device_id, remote_device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 loadbalancer_rservers:
   Columns:
     - { Field: rserver_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1025,6 +1090,7 @@ loadbalancer_rservers:
     - { Field: StateDescr, Type: varchar(64), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [rserver_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 loadbalancer_vservers:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -1035,6 +1101,7 @@ loadbalancer_vservers:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     loadbalancer_vservers_device_id_index: { Name: loadbalancer_vservers_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 locations:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1046,6 +1113,7 @@ locations:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     locations_location_unique: { Name: locations_location_unique, Columns: [location], Unique: true, Type: BTREE }
+  Constraints: {  }
 mac_accounting:
   Columns:
     - { Field: ma_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1066,6 +1134,7 @@ mac_accounting:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ma_id], Unique: true, Type: BTREE }
     mac_accounting_port_id_index: { Name: mac_accounting_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 mefinfo:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1080,6 +1149,7 @@ mefinfo:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     mefinfo_device_id_index: { Name: mefinfo_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     mefinfo_mefid_index: { Name: mefinfo_mefid_index, Columns: [mefID], Unique: false, Type: BTREE }
+  Constraints: {  }
 mempools:
   Columns:
     - { Field: mempool_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1105,6 +1175,7 @@ mempools:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [mempool_id], Unique: true, Type: BTREE }
     mempools_device_id_index: { Name: mempools_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 migrations:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1112,6 +1183,7 @@ migrations:
     - { Field: batch, Type: int, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+  Constraints: {  }
 model_has_permissions:
   Columns:
     - { Field: permission_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
@@ -1159,6 +1231,7 @@ mpls_lsps:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [lsp_id], Unique: true, Type: BTREE }
     mpls_lsps_device_id_index: { Name: mpls_lsps_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 mpls_lsp_paths:
   Columns:
     - { Field: lsp_path_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1185,6 +1258,7 @@ mpls_lsp_paths:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [lsp_path_id], Unique: true, Type: BTREE }
     mpls_lsp_paths_device_id_index: { Name: mpls_lsp_paths_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 mpls_saps:
   Columns:
     - { Field: sap_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1204,6 +1278,7 @@ mpls_saps:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [sap_id], Unique: true, Type: BTREE }
     mpls_saps_device_id_index: { Name: mpls_saps_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 mpls_sdps:
   Columns:
     - { Field: sdp_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1224,6 +1299,7 @@ mpls_sdps:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [sdp_id], Unique: true, Type: BTREE }
     mpls_sdps_device_id_index: { Name: mpls_sdps_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 mpls_sdp_binds:
   Columns:
     - { Field: bind_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1246,6 +1322,7 @@ mpls_sdp_binds:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [bind_id], Unique: true, Type: BTREE }
     mpls_sdp_binds_device_id_index: { Name: mpls_sdp_binds_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 mpls_services:
   Columns:
     - { Field: svc_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1271,6 +1348,7 @@ mpls_services:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [svc_id], Unique: true, Type: BTREE }
     mpls_services_device_id_index: { Name: mpls_services_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 mpls_tunnel_ar_hops:
   Columns:
     - { Field: ar_hop_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1291,6 +1369,7 @@ mpls_tunnel_ar_hops:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ar_hop_id], Unique: true, Type: BTREE }
     mpls_tunnel_ar_hops_device_id_index: { Name: mpls_tunnel_ar_hops_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 mpls_tunnel_c_hops:
   Columns:
     - { Field: c_hop_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1307,6 +1386,7 @@ mpls_tunnel_c_hops:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [c_hop_id], Unique: true, Type: BTREE }
     mpls_tunnel_c_hops_device_id_index: { Name: mpls_tunnel_c_hops_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 munin_plugins:
   Columns:
     - { Field: mplug_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1324,6 +1404,7 @@ munin_plugins:
     PRIMARY: { Name: PRIMARY, Columns: [mplug_id], Unique: true, Type: BTREE }
     munin_plugins_device_id_index: { Name: munin_plugins_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     munin_plugins_device_id_mplug_type_unique: { Name: munin_plugins_device_id_mplug_type_unique, Columns: [device_id, mplug_type], Unique: true, Type: BTREE }
+  Constraints: {  }
 munin_plugins_ds:
   Columns:
     - { Field: mplug_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -1346,6 +1427,7 @@ munin_plugins_ds:
     - { Field: ds_line, Type: varchar(64), 'Null': false, Extra: '' }
   Indexes:
     munin_plugins_ds_mplug_id_ds_name_unique: { Name: munin_plugins_ds_mplug_id_ds_name_unique, Columns: [mplug_id, ds_name], Unique: true, Type: BTREE }
+  Constraints: {  }
 netscaler_vservers:
   Columns:
     - { Field: vsvr_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1362,6 +1444,7 @@ netscaler_vservers:
     - { Field: vsvr_bps_out, Type: int, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [vsvr_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 notifications:
   Columns:
     - { Field: notifications_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1375,6 +1458,7 @@ notifications:
     PRIMARY: { Name: PRIMARY, Columns: [notifications_id], Unique: true, Type: BTREE }
     notifications_checksum_unique: { Name: notifications_checksum_unique, Columns: [checksum], Unique: true, Type: BTREE }
     notifications_severity_index: { Name: notifications_severity_index, Columns: [severity], Unique: false, Type: BTREE }
+  Constraints: {  }
 notifications_attribs:
   Columns:
     - { Field: attrib_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1385,6 +1469,7 @@ notifications_attribs:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [attrib_id], Unique: true, Type: BTREE }
     notifications_attribs_notifications_id_user_id_index: { Name: notifications_attribs_notifications_id_user_id_index, Columns: [notifications_id, user_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 ospfv3_areas:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1408,8 +1493,9 @@ ospfv3_areas:
     - { Field: context_name, Type: varchar(128), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    ospfv3AreaId: { Name: ospfv3AreaId, Columns: [ospfv3_instance_id], Unique: false, Type: BTREE }
+    ospfv3areaid: { Name: ospfv3areaid, Columns: [ospfv3_instance_id], Unique: false, Type: BTREE }
     ospfv3_areas_device_id_ospfv3areaid_context_name_unique: { Name: ospfv3_areas_device_id_ospfv3areaid_context_name_unique, Columns: [device_id, ospfv3AreaId, context_name], Unique: true, Type: BTREE }
+  Constraints: {  }
 ospfv3_instances:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1442,6 +1528,7 @@ ospfv3_instances:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     ospfv3_instances_device_id_context_name_unique: { Name: ospfv3_instances_device_id_context_name_unique, Columns: [device_id, context_name], Unique: true, Type: BTREE }
+  Constraints: {  }
 ospfv3_nbrs:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1469,6 +1556,7 @@ ospfv3_nbrs:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     ospfv3_nbrs_device_id_index_context_name_unique: { Name: ospfv3_nbrs_device_id_index_context_name_unique, Columns: [device_id, ospfv3NbrIfIndex, ospfv3NbrIfInstId, ospfv3NbrRtrId, context_name], Unique: true, Type: BTREE }
     ospfv3_nbrs_ospfv3_instance_id_index: { Name: ospfv3_nbrs_ospfv3_instance_id_index, Columns: [ospfv3_instance_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 ospfv3_ports:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1505,6 +1593,7 @@ ospfv3_ports:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     ospfv3_area_id: { Name: ospfv3_area_id, Columns: [ospfv3_instance_id], Unique: false, Type: BTREE }
     ospfv3_ports_device_id_index_context_name_unique: { Name: ospfv3_ports_device_id_index_context_name_unique, Columns: [device_id, ospfv3IfIndex, ospfv3IfInstId, context_name], Unique: true, Type: BTREE }
+  Constraints: {  }
 ospf_areas:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1523,6 +1612,7 @@ ospf_areas:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     ospf_areas_device_id_ospfareaid_context_name_unique: { Name: ospf_areas_device_id_ospfareaid_context_name_unique, Columns: [device_id, ospfAreaId, context_name], Unique: true, Type: BTREE }
+  Constraints: {  }
 ospf_instances:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1546,6 +1636,7 @@ ospf_instances:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     ospf_instances_device_id_ospf_instance_id_context_name_unique: { Name: ospf_instances_device_id_ospf_instance_id_context_name_unique, Columns: [device_id, ospf_instance_id, context_name], Unique: true, Type: BTREE }
+  Constraints: {  }
 ospf_nbrs:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1567,6 +1658,7 @@ ospf_nbrs:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     ospf_nbrs_device_id_ospf_nbr_id_context_name_unique: { Name: ospf_nbrs_device_id_ospf_nbr_id_context_name_unique, Columns: [device_id, ospf_nbr_id, context_name], Unique: true, Type: BTREE }
+  Constraints: {  }
 ospf_ports:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1602,6 +1694,7 @@ ospf_ports:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     ospf_ports_device_id_ospf_port_id_context_name_unique: { Name: ospf_ports_device_id_ospf_port_id_context_name_unique, Columns: [device_id, ospf_port_id, context_name], Unique: true, Type: BTREE }
+  Constraints: {  }
 packages:
   Columns:
     - { Field: pkg_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1617,6 +1710,7 @@ packages:
     PRIMARY: { Name: PRIMARY, Columns: [pkg_id], Unique: true, Type: BTREE }
     packages_device_id_index: { Name: packages_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     packages_device_id_name_manager_arch_version_build_unique: { Name: packages_device_id_name_manager_arch_version_build_unique, Columns: [device_id, name, manager, arch, version, build], Unique: true, Type: BTREE }
+  Constraints: {  }
 pdb_ix:
   Columns:
     - { Field: pdb_ix_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1626,6 +1720,7 @@ pdb_ix:
     - { Field: timestamp, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [pdb_ix_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 pdb_ix_peers:
   Columns:
     - { Field: pdb_ix_peers_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1638,6 +1733,7 @@ pdb_ix_peers:
     - { Field: timestamp, Type: 'int unsigned', 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [pdb_ix_peers_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 permissions:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -1648,6 +1744,7 @@ permissions:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     permissions_name_guard_name_unique: { Name: permissions_name_guard_name_unique, Columns: [name, guard_name], Unique: true, Type: BTREE }
+  Constraints: {  }
 plugins:
   Columns:
     - { Field: plugin_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1658,6 +1755,7 @@ plugins:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [plugin_id], Unique: true, Type: BTREE }
     plugins_version_plugin_name_unique: { Name: plugins_version_plugin_name_unique, Columns: [version, plugin_name], Unique: true, Type: BTREE }
+  Constraints: {  }
 pollers:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1668,6 +1766,7 @@ pollers:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     pollers_poller_name_unique: { Name: pollers_poller_name_unique, Columns: [poller_name], Unique: true, Type: BTREE }
+  Constraints: {  }
 poller_cluster:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1702,6 +1801,7 @@ poller_cluster:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     poller_cluster_node_id_unique: { Name: poller_cluster_node_id_unique, Columns: [node_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 poller_cluster_stats:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1715,6 +1815,7 @@ poller_cluster_stats:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     poller_cluster_stats_parent_poller_poller_type_unique: { Name: poller_cluster_stats_parent_poller_poller_type_unique, Columns: [parent_poller, poller_type], Unique: true, Type: BTREE }
+  Constraints: {  }
 poller_groups:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1722,6 +1823,7 @@ poller_groups:
     - { Field: descr, Type: varchar(255), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+  Constraints: {  }
 ports:
   Columns:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1796,6 +1898,7 @@ ports:
     ports_device_id_ifindex_index: { Name: ports_device_id_ifindex_index, Columns: [device_id, ifIndex], Unique: false, Type: BTREE }
     ports_ifalias_port_descr_descr_portname_index: { Name: ports_ifalias_port_descr_descr_portname_index, Columns: [ifAlias, port_descr_descr, portName], Unique: false, Type: BTREE }
     ports_ifdescr_ifname_index: { Name: ports_ifdescr_ifname_index, Columns: [ifDescr, ifName], Unique: false, Type: BTREE }
+  Constraints: {  }
 ports_adsl:
   Columns:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -1819,6 +1922,7 @@ ports_adsl:
     - { Field: adslAturCurrAttainableRate, Type: int, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     ports_adsl_port_id_unique: { Name: ports_adsl_port_id_unique, Columns: [port_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 ports_fdb:
   Columns:
     - { Field: ports_fdb_id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -1834,6 +1938,7 @@ ports_fdb:
     ports_fdb_mac_address_index: { Name: ports_fdb_mac_address_index, Columns: [mac_address], Unique: false, Type: BTREE }
     ports_fdb_port_id_index: { Name: ports_fdb_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
     ports_fdb_vlan_id_index: { Name: ports_fdb_vlan_id_index, Columns: [vlan_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 ports_nac:
   Columns:
     - { Field: ports_nac_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1860,6 +1965,7 @@ ports_nac:
     PRIMARY: { Name: PRIMARY, Columns: [ports_nac_id], Unique: true, Type: BTREE }
     ports_nac_device_id_index: { Name: ports_nac_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     ports_nac_port_id_mac_address_index: { Name: ports_nac_port_id_mac_address_index, Columns: [port_id, mac_address], Unique: false, Type: BTREE }
+  Constraints: {  }
 ports_perms:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -1867,6 +1973,7 @@ ports_perms:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+  Constraints: {  }
 ports_stack:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -1879,6 +1986,7 @@ ports_stack:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     ports_stack_device_id_port_id_high_port_id_low_unique: { Name: ports_stack_device_id_port_id_high_port_id_low_unique, Columns: [device_id, high_ifIndex, low_ifIndex], Unique: true, Type: BTREE }
+  Constraints: {  }
 ports_statistics:
   Columns:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -1920,6 +2028,7 @@ ports_statistics:
     - { Field: ifOutMulticastPkts_rate, Type: bigint, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 ports_stp:
   Columns:
     - { Field: port_stp_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1939,6 +2048,7 @@ ports_stp:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_stp_id], Unique: true, Type: BTREE }
     ports_stp_device_id_vlan_port_index_unique: { Name: ports_stp_device_id_vlan_port_index_unique, Columns: [device_id, vlan, port_index], Unique: true, Type: BTREE }
+  Constraints: {  }
 ports_vdsl:
   Columns:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -1951,6 +2061,7 @@ ports_vdsl:
     - { Field: xdsl2LineStatusActAtpUs, Type: 'decimal(8,2)', 'Null': false, Extra: '', Default: '0.00' }
   Indexes:
     ports_vdsl_port_id_unique: { Name: ports_vdsl_port_id_unique, Columns: [port_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 ports_vlans:
   Columns:
     - { Field: port_vlan_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1966,6 +2077,7 @@ ports_vlans:
     PRIMARY: { Name: PRIMARY, Columns: [port_vlan_id], Unique: true, Type: BTREE }
     ports_vlans_device_id_port_id_vlan_unique: { Name: ports_vlans_device_id_port_id_vlan_unique, Columns: [device_id, port_id, vlan], Unique: true, Type: BTREE }
     ports_vlans_port_id_index: { Name: ports_vlans_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 port_groups:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1974,6 +2086,7 @@ port_groups:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     port_groups_name_unique: { Name: port_groups_name_unique, Columns: [name], Unique: true, Type: BTREE }
+  Constraints: {  }
 port_group_port:
   Columns:
     - { Field: port_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -2002,6 +2115,7 @@ port_security:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     port_security_device_id_index: { Name: port_security_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     port_security_port_id_unique: { Name: port_security_port_id_unique, Columns: [port_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 printer_supplies:
   Columns:
     - { Field: supply_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2016,6 +2130,7 @@ printer_supplies:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [supply_id], Unique: true, Type: BTREE }
     toner_device_id_index: { Name: toner_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 processes:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -2029,6 +2144,7 @@ processes:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     processes_device_id_index: { Name: processes_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 processors:
   Columns:
     - { Field: processor_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2045,6 +2161,7 @@ processors:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [processor_id], Unique: true, Type: BTREE }
     processors_device_id_index: { Name: processors_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 proxmox:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2056,6 +2173,7 @@ proxmox:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     proxmox_cluster_vmid_unique: { Name: proxmox_cluster_vmid_unique, Columns: [cluster, vmid], Unique: true, Type: BTREE }
+  Constraints: {  }
 proxmox_ports:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2065,6 +2183,7 @@ proxmox_ports:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     proxmox_ports_vm_id_port_unique: { Name: proxmox_ports_vm_id_port_unique, Columns: [vm_id, port], Unique: true, Type: BTREE }
+  Constraints: {  }
 pseudowires:
   Columns:
     - { Field: pseudowire_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2081,6 +2200,7 @@ pseudowires:
     - { Field: pw_descr, Type: varchar(128), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [pseudowire_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 push_subscriptions:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -2097,6 +2217,7 @@ push_subscriptions:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     push_subscriptions_endpoint_unique: { Name: push_subscriptions_endpoint_unique, Columns: [endpoint], Unique: true, Type: BTREE }
     push_subscriptions_subscribable_type_subscribable_id_index: { Name: push_subscriptions_subscribable_type_subscribable_id_index, Columns: [subscribable_type, subscribable_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 qos:
   Columns:
     - { Field: qos_id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -2157,6 +2278,7 @@ roles:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     roles_name_guard_name_unique: { Name: roles_name_guard_name_unique, Columns: [name, guard_name], Unique: true, Type: BTREE }
+  Constraints: {  }
 role_has_permissions:
   Columns:
     - { Field: permission_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
@@ -2188,6 +2310,7 @@ route:
     - { Field: inetCidrRoutePfxLen, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [route_id], Unique: true, Type: BTREE }
+  Constraints: {  }
 sensors:
   Columns:
     - { Field: sensor_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2253,6 +2376,7 @@ services:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [service_id], Unique: true, Type: BTREE }
     services_device_id_index: { Name: services_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 service_templates:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2268,6 +2392,7 @@ service_templates:
     - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+  Constraints: {  }
 service_templates_device:
   Columns:
     - { Field: service_template_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -2301,6 +2426,7 @@ session:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [session_id], Unique: true, Type: BTREE }
     session_session_value_unique: { Name: session_session_value_unique, Columns: [session_value], Unique: true, Type: BTREE }
+  Constraints: {  }
 sessions:
   Columns:
     - { Field: id, Type: varchar(255), 'Null': false, Extra: '' }
@@ -2313,6 +2439,7 @@ sessions:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     sessions_last_activity_index: { Name: sessions_last_activity_index, Columns: [last_activity], Unique: false, Type: BTREE }
     sessions_user_id_index: { Name: sessions_user_id_index, Columns: [user_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 slas:
   Columns:
     - { Field: sla_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2329,6 +2456,7 @@ slas:
     PRIMARY: { Name: PRIMARY, Columns: [sla_id], Unique: true, Type: BTREE }
     slas_device_id_index: { Name: slas_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     slas_device_id_sla_nr_unique: { Name: slas_device_id_sla_nr_unique, Columns: [device_id, sla_nr], Unique: true, Type: BTREE }
+  Constraints: {  }
 ssl_certificates:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -2372,6 +2500,7 @@ state_indexes:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [state_index_id], Unique: true, Type: BTREE }
     state_indexes_state_name_unique: { Name: state_indexes_state_name_unique, Columns: [state_name], Unique: true, Type: BTREE }
+  Constraints: {  }
 state_translations:
   Columns:
     - { Field: state_translation_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2383,6 +2512,7 @@ state_translations:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [state_translation_id], Unique: true, Type: BTREE }
     state_translations_state_index_id_state_value_unique: { Name: state_translations_state_index_id_state_value_unique, Columns: [state_index_id, state_value], Unique: true, Type: BTREE }
+  Constraints: {  }
 storage:
   Columns:
     - { Field: storage_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2405,6 +2535,7 @@ storage:
     PRIMARY: { Name: PRIMARY, Columns: [storage_id], Unique: true, Type: BTREE }
     storage_device_id_index: { Name: storage_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     storage_device_id_storage_mib_storage_index_unique: { Name: storage_device_id_storage_mib_storage_index_unique, Columns: [device_id, type, storage_index], Unique: true, Type: BTREE }
+  Constraints: {  }
 stp:
   Columns:
     - { Field: stp_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2429,6 +2560,7 @@ stp:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [stp_id], Unique: true, Type: BTREE }
     stp_device_id_index: { Name: stp_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 syslog:
   Columns:
     - { Field: device_id, Type: 'int unsigned', 'Null': true, Extra: '' }
@@ -2449,6 +2581,7 @@ syslog:
     syslog_priority_level_index: { Name: syslog_priority_level_index, Columns: [priority, level], Unique: false, Type: BTREE }
     syslog_program_index: { Name: syslog_program_index, Columns: [program], Unique: false, Type: BTREE }
     syslog_timestamp_index: { Name: syslog_timestamp_index, Columns: [timestamp], Unique: false, Type: BTREE }
+  Constraints: {  }
 tnmsneinfo:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2464,6 +2597,7 @@ tnmsneinfo:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     tnmsneinfo_device_id_index: { Name: tnmsneinfo_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     tnmsneinfo_neid_index: { Name: tnmsneinfo_neid_index, Columns: [neID], Unique: false, Type: BTREE }
+  Constraints: {  }
 transceivers:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -2490,6 +2624,7 @@ transceivers:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     transceivers_device_id_entity_physical_index_index: { Name: transceivers_device_id_entity_physical_index_index, Columns: [device_id, entity_physical_index], Unique: false, Type: BTREE }
+  Constraints: {  }
 transport_group_transport:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -2497,6 +2632,7 @@ transport_group_transport:
     - { Field: transport_id, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+  Constraints: {  }
 ucd_diskio:
   Columns:
     - { Field: diskio_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2506,6 +2642,7 @@ ucd_diskio:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [diskio_id], Unique: true, Type: BTREE }
     ucd_diskio_device_id_index: { Name: ucd_diskio_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 users:
   Columns:
     - { Field: user_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2524,6 +2661,7 @@ users:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [user_id], Unique: true, Type: BTREE }
     users_auth_type_username_unique: { Name: users_auth_type_username_unique, Columns: [auth_type, username], Unique: true, Type: BTREE }
+  Constraints: {  }
 users_prefs:
   Columns:
     - { Field: user_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -2531,6 +2669,7 @@ users_prefs:
     - { Field: value, Type: varchar(128), 'Null': false, Extra: '' }
   Indexes:
     users_prefs_user_id_pref_unique: { Name: users_prefs_user_id_pref_unique, Columns: [user_id, pref], Unique: true, Type: BTREE }
+  Constraints: {  }
 users_widgets:
   Columns:
     - { Field: user_widget_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2547,6 +2686,7 @@ users_widgets:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [user_widget_id], Unique: true, Type: BTREE }
     user_id: { Name: user_id, Columns: [user_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 vendor_ouis:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -2555,6 +2695,7 @@ vendor_ouis:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     vendor_ouis_oui_unique: { Name: vendor_ouis_oui_unique, Columns: [oui], Unique: true, Type: BTREE }
+  Constraints: {  }
 vlans:
   Columns:
     - { Field: vlan_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2567,6 +2708,7 @@ vlans:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [vlan_id], Unique: true, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id, vlan_vlan], Unique: false, Type: BTREE }
+  Constraints: {  }
 vminfo:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2582,6 +2724,7 @@ vminfo:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     vminfo_device_id_index: { Name: vminfo_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     vminfo_vmwvmvmid_index: { Name: vminfo_vmwvmvmid_index, Columns: [vmwVmVMID], Unique: false, Type: BTREE }
+  Constraints: {  }
 vrfs:
   Columns:
     - { Field: vrf_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2594,6 +2737,7 @@ vrfs:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [vrf_id], Unique: true, Type: BTREE }
     vrfs_device_id_index: { Name: vrfs_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints: {  }
 vrf_lite_cisco:
   Columns:
     - { Field: vrf_lite_cisco_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2607,6 +2751,7 @@ vrf_lite_cisco:
     vrf_lite_cisco_device_id_context_name_vrf_name_index: { Name: vrf_lite_cisco_device_id_context_name_vrf_name_index, Columns: [device_id, context_name, vrf_name], Unique: false, Type: BTREE }
     vrf_lite_cisco_device_id_index: { Name: vrf_lite_cisco_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     vrf_lite_cisco_vrf_name_index: { Name: vrf_lite_cisco_vrf_name_index, Columns: [vrf_name], Unique: false, Type: BTREE }
+  Constraints: {  }
 wireless_sensors:
   Columns:
     - { Field: sensor_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

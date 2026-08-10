@@ -57,7 +57,7 @@ class CheckMysqlEngine implements Validation, ValidationFixer
      */
     public function enabled(): bool
     {
-        return Eloquent::isConnected();
+        return Eloquent::isConnected() && DB::getDriverName() === 'mysql';
     }
 
     /**
