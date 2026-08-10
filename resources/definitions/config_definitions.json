@@ -7522,6 +7522,48 @@
             "order": 0,
             "type": "integer"
         },
+        "webui.global_search.arp": {
+            "default": true,
+            "group": "webui",
+            "section": "search",
+            "order": 1,
+            "type": "boolean"
+        },
+        "webui.global_search.fdb": {
+            "default": true,
+            "group": "webui",
+            "section": "search",
+            "order": 1,
+            "type": "boolean"
+        },
+        "webui.global_search.eventlogs": {
+            "default": true,
+            "group": "webui",
+            "section": "search",
+            "order": 2,
+            "type": "boolean"
+        },
+        "webui.global_search.health": {
+            "default": true,
+            "group": "webui",
+            "section": "search",
+            "order": 3,
+            "type": "boolean"
+        },
+        "webui.global_search.ports": {
+            "default": true,
+            "group": "webui",
+            "section": "search",
+            "order": 4,
+            "type": "boolean"
+        },
+        "webui.global_search.routing": {
+            "default": true,
+            "group": "webui",
+            "section": "search",
+            "order": 5,
+            "type": "boolean"
+        },
         "webui.graph_stacked": {
             "default": false,
             "group": "webui",
