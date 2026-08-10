@@ -1648,6 +1648,23 @@ permissions:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     permissions_name_guard_name_unique: { Name: permissions_name_guard_name_unique, Columns: [name, guard_name], Unique: true, Type: BTREE }
+personal_access_tokens:
+  Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: tokenable_type, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: tokenable_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+    - { Field: name, Type: text, 'Null': false, Extra: '' }
+    - { Field: token, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: abilities, Type: text, 'Null': true, Extra: '' }
+    - { Field: last_used_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: expires_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    personal_access_tokens_expires_at_index: { Name: personal_access_tokens_expires_at_index, Columns: [expires_at], Unique: false, Type: BTREE }
+    personal_access_tokens_token_unique: { Name: personal_access_tokens_token_unique, Columns: [token], Unique: true, Type: BTREE }
+    personal_access_tokens_tokenable_type_tokenable_id_index: { Name: personal_access_tokens_tokenable_type_tokenable_id_index, Columns: [tokenable_type, tokenable_id], Unique: false, Type: BTREE }
 plugins:
   Columns:
     - { Field: plugin_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
