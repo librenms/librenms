@@ -77,6 +77,7 @@ readonly class SnmpConfig implements PollingMethodConfigInterface
     public function toNetSnmpOptions(?string $context = null): array
     {
         $options = ['-' . $this->version];
+        $resolvedContext = $context ?? $this->context;
 
         if ($this->version === 'v3') {
             if ($this->authname !== null) {
@@ -101,13 +102,13 @@ readonly class SnmpConfig implements PollingMethodConfigInterface
                 }
             }
 
-            $resolvedContext = $context ?? $this->context;
             if ($resolvedContext !== null) {
                 array_push($options, '-n', $resolvedContext);
             }
         } else {
             if ($this->community !== null) {
-                array_push($options, '-c', $this->community);
+                $community = $resolvedContext ? "$this->community@$resolvedContext" : $this->community;
+                array_push($options, '-c', $community);
             }
         }
 
