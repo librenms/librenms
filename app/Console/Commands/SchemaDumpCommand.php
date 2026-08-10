@@ -55,6 +55,7 @@ class SchemaDumpCommand extends DumpCommand
             $parameters['--database'] = $database;
         }
 
+        /** @var \Illuminate\Database\Connection $connection */
         $connection = $connections->connection($database);
         if ($connection->getDriverName() !== 'mysql') {
             $this->warn('You are dumping the schema from a ' . $connection->getDriverName() . ' database.');

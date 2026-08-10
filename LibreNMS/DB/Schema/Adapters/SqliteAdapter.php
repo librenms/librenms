@@ -9,12 +9,17 @@ class SqliteAdapter extends BaseAdapter
         return 'main';
     }
 
+    /**
+     * @param  array<string, mixed>  $master
+     * @param  array<string, mixed>  $current
+     */
     public function columnsMatch(array $master, array $current): bool
     {
         $masterType = strtolower((string) $master['Type']);
         $currentType = strtolower((string) $current['Type']);
 
         // Normalize SQLite types to MySQL types for comparison
+        /** @var array<string, string[]> $typeMap */
         $typeMap = [
             'integer' => ['int', 'tinyint', 'smallint', 'mediumint', 'bigint', 'integer'],
             'text' => ['text', 'mediumtext', 'longtext', 'blob', 'mediumblob', 'longblob', 'json', 'varbinary', 'binary'],
@@ -41,12 +46,12 @@ class SqliteAdapter extends BaseAdapter
         }
 
         // Handle ENUM vs VARCHAR/TEXT
-        if (!$typeMatch && str_starts_with($masterClean, 'enum')) {
+        if (! $typeMatch && str_starts_with((string) $masterClean, 'enum')) {
             $typeMatch = in_array($currentClean, ['varchar', 'text', 'string']);
         }
 
         // Check if types match
-        if (!$typeMatch) {
+        if (! $typeMatch) {
             return false;
         }
 
@@ -79,7 +84,7 @@ class SqliteAdapter extends BaseAdapter
             }
         }
 
-        if (!$extraMatch) {
+        if (! $extraMatch) {
             return false;
         }
 
@@ -104,12 +109,20 @@ class SqliteAdapter extends BaseAdapter
         return false;
     }
 
+    /**
+     * @param  array<string, mixed>  $master
+     * @param  array<string, mixed>  $current
+     */
     public function indexesMatch(array $master, array $current): bool
     {
         return array_map(strtolower(...), $master['Columns']) === array_map(strtolower(...), $current['Columns']) &&
             $master['Unique'] == $current['Unique'];
     }
 
+    /**
+     * @param  array<string, mixed>  $master
+     * @param  array<string, mixed>  $current
+     */
     public function constraintsMatch(array $master, array $current): bool
     {
         return $master['foreign_key'] === $current['foreign_key'] &&
@@ -118,13 +131,17 @@ class SqliteAdapter extends BaseAdapter
             $master['extra'] === $current['extra'];
     }
 
-    public function dropConstraintSql(string $table, string $name): string
+    public function dropConstraintSql(string $table, string $name): array
     {
-        return "-- SQLite does not support dropping foreign keys by name ($table/$name)";
+        return ["-- SQLite does not support dropping foreign keys by name ($table/$name)"];
     }
 
-    public function addConstraintSql(string $table, array $c): string
+    /**
+     * @param  array<string, mixed>  $c
+     * @return string[]
+     */
+    public function addConstraintSql(string $table, array $c): array
     {
-        return "-- SQLite does not support adding foreign keys to existing tables ($table/{$c['name']})";
+        return ["-- SQLite does not support adding foreign keys to existing tables ($table/{$c['name']})"];
     }
 }

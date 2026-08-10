@@ -37,7 +37,7 @@ class CheckSchemaStructure implements Validation, ValidationFixer
 {
     private array $descriptions = [];
     private array $schema_update = [];
-    private Schema $schemaManager;
+    private readonly Schema $schemaManager;
     private readonly string $schema_file;
 
     public function __construct(?string $schema_file = null)

@@ -11,7 +11,7 @@ class CheckSchemaStructureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_it_validates_correct_schema()
+    public function test_it_validates_correct_schema(): void
     {
         $validator = new CheckSchemaStructure();
         $result = $validator->validate();
@@ -19,7 +19,7 @@ class CheckSchemaStructureTest extends TestCase
         $this->assertEquals(\LibreNMS\ValidationResult::SUCCESS, $result->getStatus(), 'Schema validation failed: ' . $result->getMessage());
     }
 
-    public function test_it_detects_extra_table()
+    public function test_it_detects_extra_table(): void
     {
         DB::statement('CREATE TABLE `extra_table` (`id` int primary key NOT NULL)');
 
@@ -34,7 +34,7 @@ class CheckSchemaStructureTest extends TestCase
         }
     }
 
-    public function test_it_detects_missing_column()
+    public function test_it_detects_missing_column(): void
     {
         $table = 'test_table';
         DB::statement("CREATE TABLE `$table` (`id` int primary key NOT NULL)");
@@ -66,7 +66,7 @@ class CheckSchemaStructureTest extends TestCase
         }
     }
 
-    public function test_it_detects_incorrect_column()
+    public function test_it_detects_incorrect_column(): void
     {
         $table = 'test_table_incorrect';
         DB::statement("CREATE TABLE `$table` (`id` int primary key NOT NULL, `col` varchar(100))");
@@ -98,7 +98,7 @@ class CheckSchemaStructureTest extends TestCase
         }
     }
 
-    public function test_it_detects_json_column()
+    public function test_it_detects_json_column(): void
     {
         $table = 'test_table_json';
         DB::statement("DROP TABLE IF EXISTS `$table` ");

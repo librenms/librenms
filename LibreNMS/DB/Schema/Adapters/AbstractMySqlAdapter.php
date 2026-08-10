@@ -23,6 +23,10 @@ abstract class AbstractMySqlAdapter extends BaseAdapter
         return [];
     }
 
+    /**
+     * @param  array<int, array{name: string}>  $tables
+     * @return array<string, array<string, mixed>>
+     */
     public function fetchExtras(array $tables): array
     {
         if (empty($tables)) {
@@ -32,14 +36,22 @@ abstract class AbstractMySqlAdapter extends BaseAdapter
         $names = array_column($tables, 'name');
         $placeholders = implode(',', array_fill(0, count($names), '?'));
 
-        return collect($this->db->select(
+        /** @var array<int, array{TABLE_NAME: string, COLUMN_NAME: string, EXTRA: string}> $result */
+        $result = $this->db->select(
             "SELECT TABLE_NAME, COLUMN_NAME, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME IN ($placeholders)",
             array_merge([$this->getSchemaName()], $names)
-        ))->groupBy('TABLE_NAME')
+        );
+
+        return collect($result)->groupBy('TABLE_NAME')
             ->map(fn ($cols) => $cols->pluck('EXTRA', 'COLUMN_NAME')->all())
             ->all();
     }
 
+    /**
+     * @param  array<string, mixed>  $col
+     * @param  array<string, mixed>  $tableExtras
+     * @return array{Field: string, Type: string, Null: bool, Default?: mixed, Extra: string}
+     */
     public function mapColumn(array $col, array $tableExtras): array
     {
         $def = parent::mapColumn($col, $tableExtras);
@@ -49,6 +61,10 @@ abstract class AbstractMySqlAdapter extends BaseAdapter
         return $def;
     }
 
+    /**
+     * @param  array<string, mixed>  $master
+     * @param  array<string, mixed>  $current
+     */
     public function columnsMatch(array $master, array $current): bool
     {
         $typeMatch = ($master['Type'] === $current['Type']) ||

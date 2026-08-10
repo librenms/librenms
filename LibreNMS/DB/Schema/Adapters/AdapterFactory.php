@@ -11,13 +11,15 @@ class AdapterFactory
         $driver = $db->getDriverName();
 
         if ($driver === 'mysql') {
-            return $db->isMaria() ? new MariaDbAdapter($db) : new MySqlAdapter($db);
+            $isMaria = str_contains((string) $db->getPdo()->getAttribute(\PDO::ATTR_SERVER_VERSION), 'MariaDB');
+
+            return $isMaria ? new MariaDbAdapter($db) : new MySqlAdapter($db);
         }
 
         return match ($driver) {
             'sqlite' => new SqliteAdapter($db),
             default => new class($db) extends BaseAdapter {
-                protected function getSchemaName(): string
+                public function getSchemaName(): string
                 {
                     return $this->db->getDatabaseName();
                 }

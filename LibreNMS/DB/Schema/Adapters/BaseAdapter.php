@@ -21,11 +21,20 @@ abstract class BaseAdapter implements SchemaAdapter
 
     abstract public function getSchemaName(): string;
 
+    /**
+     * @param  array<int, array{name: string}>  $tables
+     * @return array<string, array<string, mixed>>
+     */
     public function fetchExtras(array $tables): array
     {
         return [];
     }
 
+    /**
+     * @param  array<string, mixed>  $col
+     * @param  array<string, mixed>  $tableExtras
+     * @return array{Field: string, Type: string, Null: bool, Default?: mixed, Extra: string}
+     */
     public function mapColumn(array $col, array $tableExtras): array
     {
         $def = [
@@ -43,6 +52,10 @@ abstract class BaseAdapter implements SchemaAdapter
         return $def;
     }
 
+    /**
+     * @param  array<string, mixed>  $master
+     * @param  array<string, mixed>  $current
+     */
     public function columnsMatch(array $master, array $current): bool
     {
         return $master['Type'] === $current['Type'] &&
@@ -51,6 +64,10 @@ abstract class BaseAdapter implements SchemaAdapter
             $master['Extra'] == $current['Extra'];
     }
 
+    /**
+     * @param  array<string, mixed>  $master
+     * @param  array<string, mixed>  $current
+     */
     public function indexesMatch(array $master, array $current): bool
     {
         return $master['Name'] === $current['Name'] &&
@@ -58,18 +75,26 @@ abstract class BaseAdapter implements SchemaAdapter
             $master['Unique'] == $current['Unique'];
     }
 
+    /**
+     * @param  array<string, mixed>  $master
+     * @param  array<string, mixed>  $current
+     */
     public function constraintsMatch(array $master, array $current): bool
     {
         return $master === $current;
     }
 
+    /**
+     * @param  array<string, mixed>  $c
+     * @return string[]
+     */
     public function addConstraintSql(string $table, array $c): array
     {
-        return ["-- addConstraintSql not implemented for this driver"];
+        return ['-- addConstraintSql not implemented for this driver'];
     }
 
     public function dropConstraintSql(string $table, string $name): array
     {
-        return ["-- dropConstraintSql not implemented for this driver"];
+        return ['-- dropConstraintSql not implemented for this driver'];
     }
 }

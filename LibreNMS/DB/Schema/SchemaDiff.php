@@ -32,6 +32,7 @@ use LibreNMS\DB\Schema\Adapters\SchemaAdapter;
 
 class SchemaDiff
 {
+    /** @var array<int, array{description: string, sql: string|string[]}> */
     private array $changes = [];
 
     public function __construct(
@@ -40,6 +41,12 @@ class SchemaDiff
     ) {
     }
 
+    /**
+     * @param  array<string, array<string, mixed>>  $master
+     * @param  array<string, array<string, mixed>>  $current
+     * @param  string[]  $liveTables
+     * @return array<int, array{description: string, sql: string|string[]}>
+     */
     public function compare(array $master, array $current, array $liveTables): array
     {
         $this->changes = [];
@@ -59,14 +66,7 @@ class SchemaDiff
             $this->addChange("Database: extra table ($table)", $this->dropTableSql($table));
         }
 
-        $allSql = [];
-        foreach ($this->changes as $c) {
-            if (is_array($c['sql'])) {
-                $allSql = [...$allSql, ...$c['sql']];
-            } else {
-                $allSql[] = $c['sql'];
-            }
-        }
+        $allSql = collect($this->changes)->pluck('sql')->flatten()->map(fn ($s) => (string) $s)->all();
 
         $preSql = $this->adapter->getPreSql($allSql);
         if (! empty($preSql)) {
@@ -79,81 +79,123 @@ class SchemaDiff
         return $this->changes;
     }
 
+    /**
+     * @param  string|string[]  $sql
+     */
     protected function addChange(string $desc, string|array $sql): void
     {
         $this->changes[] = ['description' => $desc, 'sql' => $sql];
     }
 
+    /**
+     * @param  array<int, array<string, mixed>>  $master
+     * @param  array<int, array<string, mixed>>  $current
+     */
     protected function syncColumns(string $table, array $master, array $current): void
     {
-        $currentCols = collect($current)->keyBy(fn ($c) => strtolower($c['Field']));
+        $currentCols = [];
+        foreach ($current as $c) {
+            $currentCols[strtolower((string) $c['Field'])] = $c;
+        }
 
-        collect($master)->each(function ($cdata, $i) use ($table, $master, &$currentCols) {
-            $field = $cdata['Field'];
-            $current = $currentCols->pull(strtolower($field));
+        foreach ($master as $i => $cdata) {
+            $field = (string) $cdata['Field'];
+            $lowerField = strtolower($field);
 
-            if (! $current) {
-                $this->addChange("Database: missing column ($table/$field)", $this->addColumnSql($table, $cdata, $master[$i - 1]['Field'] ?? null));
-            } elseif (! $this->adapter->columnsMatch($cdata, $current)) {
-                $this->addChange("Database: incorrect column ($table/$field)", $this->updateColumnSql($table, $field, $cdata));
+            if (isset($currentCols[$lowerField])) {
+                $match = $currentCols[$lowerField];
+                unset($currentCols[$lowerField]);
+
+                if (! $this->adapter->columnsMatch($cdata, $match)) {
+                    $this->addChange("Database: incorrect column ($table/$field)", $this->updateColumnSql($table, $field, $cdata));
+                }
+            } else {
+                $prevField = $master[$i - 1]['Field'] ?? null;
+                $this->addChange("Database: missing column ($table/$field)", $this->addColumnSql($table, $cdata, $prevField));
             }
-        });
+        }
 
-        $currentCols->each(fn ($c) => $this->addChange("Database: extra column ($table/{$c['Field']})", $this->dropColumnSql($table, $c['Field'])));
+        foreach ($currentCols as $c) {
+            $this->addChange("Database: extra column ($table/{$c['Field']})", $this->dropColumnSql($table, (string) $c['Field']));
+        }
     }
 
+    /**
+     * @param  array<string, array<string, mixed>>  $master
+     * @param  array<string, array<string, mixed>>  $current
+     */
     protected function syncIndexes(string $table, array $master, array $current): void
     {
-        $currentIdx = collect($current)->keyBy(fn ($c) => strtolower($c['Name']));
+        $currentIdx = [];
+        foreach ($current as $c) {
+            $currentIdx[strtolower((string) $c['Name'])] = $c;
+        }
 
-        collect($master)->each(function ($data, $name) use ($table, &$currentIdx) {
-            $lower = strtolower($name);
-            $match = $currentIdx->get($lower);
+        foreach ($master as $name => $data) {
+            $lower = strtolower((string) $name);
+            $match = $currentIdx[$lower] ?? null;
 
             if (! $match) {
-                $match = $currentIdx->first(fn ($iData) => $this->adapter->indexesMatch($data, $iData));
+                $match = array_find($currentIdx, fn ($iData) => $this->adapter->indexesMatch($data, (array) $iData));
                 if ($match) {
-                    $lower = strtolower($match['Name']);
+                    $lower = strtolower((string) $match['Name']);
                 }
             }
 
             if (! $match) {
                 $this->addChange("Database: missing index ($table/$name)", $this->addIndexSql($table, $data));
-            } elseif (! $this->adapter->indexesMatch($data, $match)) {
-                $this->addChange("Database: incorrect index ($table/$name)", $this->updateIndexSql($table, $name, $data));
+            } elseif (! $this->adapter->indexesMatch($data, (array) $match)) {
+                $this->addChange("Database: incorrect index ($table/$name)", $this->updateIndexSql($table, (string) $name, $data));
             }
-            $currentIdx->forget($lower);
-        });
 
-        $currentIdx->each(fn ($_, $name) => $this->addChange("Database: extra index ($table/$name)", $this->dropIndexSql($table, $name)));
+            unset($currentIdx[$lower]);
+        }
+
+        foreach ($currentIdx as $name => $data) {
+            $this->addChange("Database: extra index ($table/$name)", $this->dropIndexSql($table, (string) $name));
+        }
     }
 
+    /**
+     * @param  array<string, array<string, mixed>>  $master
+     * @param  array<string, array<string, mixed>>  $current
+     */
     protected function syncConstraints(string $table, array $master, array $current): void
     {
-        $currentFk = collect($current)->keyBy(fn ($c) => strtolower($c['name']));
+        $currentFk = [];
+        foreach ($current as $c) {
+            $currentFk[strtolower((string) $c['name'])] = $c;
+        }
 
-        collect($master)->each(function ($data, $name) use ($table, &$currentFk) {
-            $lower = strtolower($name);
-            $match = $currentFk->get($lower);
+        foreach ($master as $name => $data) {
+            $lower = strtolower((string) $name);
+            $match = $currentFk[$lower] ?? null;
 
             if (! $match) {
-                $match = $currentFk->first(fn ($cData) => $this->adapter->constraintsMatch($data, $cData));
+                $match = array_find($currentFk, fn ($cData) => $this->adapter->constraintsMatch($data, (array) $cData));
                 if ($match) {
-                    $lower = strtolower($match['name']);
+                    $lower = strtolower((string) $match['name']);
                 }
             }
 
             if (! $match) {
                 $this->addChange("Database: missing constraint ($table/$name)", $this->addConstraintSql($table, $data));
-            } elseif (! $this->adapter->constraintsMatch($data, $match)) {
-                $this->addChange("Database: incorrect constraint ($table/$name)", [...$this->dropConstraintSql($table, $name), ...$this->addConstraintSql($table, $data)]);
+            } elseif (! $this->adapter->constraintsMatch($data, (array) $match)) {
+                $this->addChange("Database: incorrect constraint ($table/$name)", [...$this->dropConstraintSql($table, (string) $name), ...$this->addConstraintSql($table, $data)]);
             }
-            $currentFk->forget($lower);
-        });
 
-        $currentFk->each(fn ($_, $name) => $this->addChange("Database: extra constraint ($table/$name)", $this->dropConstraintSql($table, $name)));
+            unset($currentFk[$lower]);
+        }
+
+        foreach ($currentFk as $name => $data) {
+            $this->addChange("Database: extra constraint ($table/$name)", $this->dropConstraintSql($table, (string) $name));
+        }
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return string[]
+     */
     protected function addTableSql(string $table, array $data): array
     {
         return $this->pretend(fn () => $this->db->getSchemaBuilder()->create($table, function (Blueprint $b) use ($data): void {
@@ -169,6 +211,10 @@ class SchemaDiff
         }));
     }
 
+    /**
+     * @param  array<string, mixed>  $cdata
+     * @return string[]
+     */
     protected function addColumnSql(string $table, array $cdata, ?string $prev): array
     {
         return $this->pretend(fn () => $this->db->getSchemaBuilder()->table($table, function (Blueprint $b) use ($cdata, $prev): void {
@@ -179,6 +225,10 @@ class SchemaDiff
         }));
     }
 
+    /**
+     * @param  array<string, mixed>  $cdata
+     * @return string[]
+     */
     protected function updateColumnSql(string $table, string $column, array $cdata): array
     {
         return $this->pretend(fn () => $this->db->getSchemaBuilder()->table($table, function (Blueprint $b) use ($cdata, $column): void {
@@ -189,16 +239,27 @@ class SchemaDiff
         }));
     }
 
+    /**
+     * @return string[]
+     */
     protected function dropColumnSql(string $table, string $column): array
     {
         return $this->pretend(fn () => $this->db->getSchemaBuilder()->table($table, fn (Blueprint $b) => $b->dropColumn($column)));
     }
 
+    /**
+     * @param  array<string, mixed>  $idata
+     * @return string[]
+     */
     protected function addIndexSql(string $table, array $idata): array
     {
         return $this->pretend(fn () => $this->db->getSchemaBuilder()->table($table, fn (Blueprint $b) => $this->applyIndexToBlueprint($b, $idata)));
     }
 
+    /**
+     * @param  array<string, mixed>  $idata
+     * @return string[]
+     */
     protected function updateIndexSql(string $table, string $name, array $idata): array
     {
         return $this->pretend(fn () => $this->db->getSchemaBuilder()->table($table, function (Blueprint $b) use ($name, $idata): void {
@@ -207,16 +268,25 @@ class SchemaDiff
         }));
     }
 
+    /**
+     * @return string[]
+     */
     protected function dropIndexSql(string $table, string $name): array
     {
         return $this->pretend(fn () => $this->db->getSchemaBuilder()->table($table, fn (Blueprint $b) => $b->dropIndex($name)));
     }
 
+    /**
+     * @return string[]
+     */
     protected function dropTableSql(string $table): array
     {
         return $this->pretend(fn () => $this->db->getSchemaBuilder()->drop($table));
     }
 
+    /**
+     * @param  array<string, mixed>  $cdata
+     */
     protected function applyColumnToBlueprint(Blueprint $b, array $cdata, ?string $old = null): ?\Illuminate\Database\Schema\ColumnDefinition
     {
         $type = (string) $cdata['Type'];
@@ -227,7 +297,7 @@ class SchemaDiff
 
         if (preg_match('/^(\w+)\((.*)\)$/', $clean, $m)) {
             $clean = $m[1];
-            $params = str_getcsv($m[2], ',', "'", '\\');
+            $params = str_getcsv((string) $m[2], ',', "'", '\\');
         }
 
         $method = match ($clean) {
@@ -246,7 +316,7 @@ class SchemaDiff
             return null;
         }
 
-        $col = ($method === 'enum') ? $b->enum($field, $params) : $b->{$method}($field, ...$params);
+        $col = ($method === 'enum') ? $b->enum((string) $field, (array) $params) : $b->{$method}((string) $field, ...$params);
 
         if ($unsigned) {
             $col->unsigned();
@@ -267,16 +337,19 @@ class SchemaDiff
         }
 
         if ($old && $old !== $cdata['Field']) {
-            $b->renameColumn($old, $cdata['Field']);
+            $b->renameColumn($old, (string) $cdata['Field']);
         }
 
         return $col;
     }
 
+    /**
+     * @param  array<string, mixed>  $idata
+     */
     protected function applyIndexToBlueprint(Blueprint $b, array $idata): void
     {
-        $cols = $idata['Columns'];
-        $name = $idata['Name'];
+        $cols = (array) $idata['Columns'];
+        $name = (string) $idata['Name'];
         if ($name === 'PRIMARY') {
             $b->primary($cols);
         } elseif ($idata['Unique']) {
@@ -286,6 +359,10 @@ class SchemaDiff
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $c
+     * @return string[]
+     */
     protected function addConstraintSql(string $table, array $c): array
     {
         try {
@@ -297,6 +374,9 @@ class SchemaDiff
         }
     }
 
+    /**
+     * @return string[]
+     */
     protected function dropConstraintSql(string $table, string $name): array
     {
         try {
@@ -306,14 +386,20 @@ class SchemaDiff
         }
     }
 
+    /**
+     * @return string[]
+     */
     private function pretend(callable $callback): array
     {
         return array_map(fn ($q) => $q['query'] . ';', $this->db->pretend($callback));
     }
 
+    /**
+     * @param  array<string, mixed>  $c
+     */
     protected function applyConstraintToBlueprint(Blueprint $b, array $c): void
     {
-        $fk = $b->foreign($c['foreign_key'], $c['name'])->references($c['key'])->on($c['table']);
+        $fk = $b->foreign((string) $c['foreign_key'], (string) $c['name'])->references((string) $c['key'])->on((string) $c['table']);
         if (str_contains(strtoupper((string) ($c['extra'] ?? '')), 'ON DELETE CASCADE')) {
             $fk->onDelete('cascade');
         } elseif (str_contains(strtoupper((string) ($c['extra'] ?? '')), 'ON DELETE SET NULL')) {

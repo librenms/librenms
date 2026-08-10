@@ -140,16 +140,29 @@ class Schema
 
     public function getTableRelationships(): array
     {
-        return $this->relationships ??= collect($this->getSchema())
-            ->map(fn ($data, $table) => collect($data['Columns'])
-                ->pluck('Field')
-                ->map(fn ($column) => $this->getTableFromKey($column))
-                ->filter(fn ($guess) => $guess && $guess !== $table)
-                ->values()
-                ->all()
-            )
-            ->except(self::$relationship_blacklist)
-            ->all();
+        if (isset($this->relationships)) {
+            return $this->relationships;
+        }
+
+        $relationships = [];
+        $schema = $this->getSchema();
+
+        foreach ($schema as $table => $data) {
+            if (in_array($table, self::$relationship_blacklist)) {
+                continue;
+            }
+
+            $relations = [];
+            foreach ($data['Columns'] as $column) {
+                $guess = $this->getTableFromKey($column['Field']);
+                if ($guess && $guess !== $table) {
+                    $relations[] = $guess;
+                }
+            }
+            $relationships[$table] = array_values(array_unique($relations));
+        }
+
+        return $this->relationships = $relationships;
     }
 
     public function getTableFromKey(string $key): ?string
@@ -172,95 +185,127 @@ class Schema
         return in_array($column, $this->getColumns($table));
     }
 
-    public static function dump($connection = null, array $tables_to_dump = []): array
+    /**
+     * @param  string|Connection|null  $connection
+     * @param  string[]  $tables_to_dump
+     * @return array<string, array<string, mixed>>
+     */
+    public static function dump(string|Connection|null $connection = null, array $tables_to_dump = []): array
     {
-        return (new static(DB::connection($connection)))->dumpInstance($tables_to_dump);
+        $db = $connection instanceof Connection ? $connection : DB::connection((string) $connection);
+
+        return (new static($db))->dumpInstance($tables_to_dump);
     }
 
+    /**
+     * @param  string[]  $tables
+     * @return array<string, array<string, mixed>>
+     */
     public function dumpInstance(array $tables = []): array
     {
         $this->adapter->setSessionState();
 
         $builder = $this->db->getSchemaBuilder();
+        $schemaName = $this->adapter->getSchemaName();
         $tableList = empty($tables) ?
-            collect($builder->getTables())->where('schema', $this->adapter->getSchemaName())->all() :
+            array_filter($builder->getTables(), fn ($t) => $t['schema'] === $schemaName) :
             array_map(fn ($t) => ['name' => $t], $tables);
 
         usort($tableList, fn ($a, $b) => strnatcasecmp((string) $a['name'], (string) $b['name']));
 
+        /** @var array<int, array{name: string}> $tableList */
         $extras = $this->adapter->fetchExtras($tableList);
 
-        return collect($tableList)
-            ->mapWithKeys(function ($table) use ($builder, $extras) {
-                $name = $table['name'];
-                try {
-                    return [$name => [
-                        'Columns' => array_map(fn ($c) => $this->adapter->mapColumn($c, $extras[$name] ?? []), $builder->getColumns($name)),
-                        'Indexes' => $this->mapIndexes($builder->getIndexes($name)),
-                        'Constraints' => $this->mapConstraints($name, $builder->getForeignKeys($name)),
-                    ]];
-                } catch (\Exception) {
-                    return [];
-                }
-            })
-            ->all();
-    }
+        $dump = [];
+        foreach ($tableList as $table) {
+            $name = $table['name'];
+            try {
+                $dump[$name] = [
+                    'Columns' => array_map(fn ($c) => $this->adapter->mapColumn($c, $extras[$name] ?? []), $builder->getColumns($name)),
+                    'Indexes' => $this->mapIndexes($builder->getIndexes($name)),
+                    'Constraints' => $this->mapConstraints($name, $builder->getForeignKeys($name)),
+                ];
+            } catch (\Exception) {
+                // skip failed tables
+            }
+        }
 
+        return $dump;
+    }
 
     public function getLiveTables(): array
     {
-        return collect($this->db->getSchemaBuilder()->getTables())
-            ->where('schema', $this->adapter->getSchemaName())
-            ->pluck('name')
-            ->toArray();
+        $schemaName = $this->adapter->getSchemaName();
+        $tables = array_filter($this->db->getSchemaBuilder()->getTables(), fn ($t) => $t['schema'] === $schemaName);
+
+        return array_column($tables, 'name');
     }
 
+    /**
+     * @param  array<int, array<string, mixed>>  $indexes
+     * @return array<string, array{Name: string, Columns: string[], Unique: bool, Type: string}>
+     */
     protected function mapIndexes(array $indexes): array
     {
-        return collect($indexes)
-            ->sort(fn ($a, $b) => $a['primary'] ? -1 : ($b['primary'] ? 1 : strnatcasecmp((string) $a['name'], (string) $b['name'])))
-            ->mapWithKeys(fn ($i) => [
-                ($name = $i['primary'] ? 'PRIMARY' : $i['name']) => [
-                    'Name' => $name,
-                    'Columns' => $i['columns'],
-                    'Unique' => (bool) $i['unique'],
-                    'Type' => strtoupper((string) ($i['type'] ?? 'BTREE')),
-                ],
-            ])
-            ->all();
+        usort($indexes, fn ($a, $b) => $a['primary'] ? -1 : ($b['primary'] ? 1 : strnatcasecmp((string) $a['name'], (string) $b['name'])));
+
+        $mapped = [];
+        foreach ($indexes as $i) {
+            $name = $i['primary'] ? 'PRIMARY' : $i['name'];
+            $mapped[$name] = [
+                'Name' => $name,
+                'Columns' => $i['columns'],
+                'Unique' => (bool) $i['unique'],
+                'Type' => strtoupper((string) ($i['type'] ?? 'BTREE')),
+            ];
+        }
+
+        return $mapped;
     }
 
+    /**
+     * @param  array<int, array<string, mixed>>  $fks
+     * @return array<string, array{name: string, foreign_key: string, table: string, key: string, extra: string}>
+     */
     protected function mapConstraints(string $table, array $fks): array
     {
-        return collect($fks)
-            ->sort(fn ($a, $b) => strnatcasecmp((string) ($a['name'] ?? ''), (string) ($b['name'] ?? '')))
-            ->mapWithKeys(function ($fk) use ($table) {
-                $name = (string) ($fk['name'] ?: $table . '_' . implode('_', $fk['columns']) . '_foreign');
-                $extra = collect(['on_delete', 'on_update'])
-                    ->map(function ($action) use ($fk) {
-                        $val = strtoupper((string) ($fk[$action] ?? ''));
-                        return ($val && ! in_array($val, ['RESTRICT', 'NO ACTION']))
-                            ? strtoupper(str_replace('_', ' ', $action)) . ' ' . $val
-                            : null;
-                    })
-                    ->filter()
-                    ->implode(' ');
+        usort($fks, fn ($a, $b) => strnatcasecmp((string) ($a['name'] ?? ''), (string) ($b['name'] ?? '')));
 
-                return [$name => [
-                    'name' => $name,
-                    'foreign_key' => $fk['columns'][0],
-                    'table' => $fk['foreign_table'],
-                    'key' => $fk['foreign_columns'][0],
-                    'extra' => $extra,
-                ]];
-            })
-            ->all();
+        $mapped = [];
+        foreach ($fks as $fk) {
+            $name = (string) ($fk['name'] ?: $table . '_' . implode('_', $fk['columns']) . '_foreign');
+
+            $extraParts = [];
+            foreach (['on_delete', 'on_update'] as $action) {
+                $val = strtoupper((string) ($fk[$action] ?? ''));
+                if ($val && ! in_array($val, ['RESTRICT', 'NO ACTION'])) {
+                    $extraParts[] = strtoupper(str_replace('_', ' ', $action)) . ' ' . $val;
+                }
+            }
+            $extra = implode(' ', $extraParts);
+
+            $mapped[$name] = [
+                'name' => $name,
+                'foreign_key' => $fk['columns'][0],
+                'table' => $fk['foreign_table'],
+                'key' => $fk['foreign_columns'][0],
+                'extra' => $extra,
+            ];
+        }
+
+        return $mapped;
     }
 
-    public function compare(string|null $schema_file = null): array
+    /**
+     * @param  array<string, mixed>|string|null  $master
+     * @return array<int, array{description: string, sql: string|string[]}>
+     */
+    public function compare(array|string|null $master = null): array
     {
-        $schema_file ??= resource_path('definitions/schema/db_schema.yaml');
-        $master = (array) Yaml::parse(file_get_contents($schema_file));
+        if (is_string($master) || $master === null) {
+            $schema_file = $master ?? resource_path('definitions/schema/db_schema.yaml');
+            $master = (array) Yaml::parse(file_get_contents($schema_file));
+        }
 
         $dbTables = $this->getLiveTables();
         $current = $this->dumpInstance(array_intersect(array_keys($master), $dbTables));
