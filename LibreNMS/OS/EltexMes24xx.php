@@ -37,10 +37,6 @@ class EltexMes24xx extends OS implements Ipv6AddressDiscovery, TransceiverDiscov
 
         $moduleIndex = $inventory->where('entPhysicalClass', 'module')->value('entPhysicalIndex');
         foreach ($oidSfp as $ifIndex => $data) {
-            if (($data['eltexPhyTransceiverInfoType'] ?? 'unknown') === 'unknown') {
-                continue;
-            }
-
             $inventory->push(new EntPhysical([
                 'entPhysicalIndex' => $ifIndexToEntIndexMap[$ifIndex] ?? 1000000 + $ifIndex,
                 'entPhysicalSerialNum' => $data['eltexPhyTransceiverInfoSerialNumber'] ?? null,
