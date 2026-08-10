@@ -8,6 +8,7 @@
 
 namespace LibreNMS\Tests\Feature\Api\V1;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Sanctum\Sanctum;
@@ -19,41 +20,17 @@ final class HealthPingTest extends DBTestCase
 
     protected function setUp(): void
     {
-        // v1 route registration reads librenms.api.v1.enabled (API_V1_ENABLED env)
-        // during application boot, so the env value must be in place before
-        // parent::setUp() creates the application.
-        self::putEnv('API_V1_ENABLED', 'true');
-
         parent::setUp();
-    }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        self::putEnv('API_V1_ENABLED', null);
-    }
-
-    private static function putEnv(string $name, ?string $value): void
-    {
-        if ($value === null) {
-            putenv($name);
-            unset($_ENV[$name], $_SERVER[$name]);
-
-            return;
-        }
-
-        putenv("$name=$value");
-        $_ENV[$name] = $value;
-        $_SERVER[$name] = $value;
+        // The v1 gate is enforced at request time by the EnsureApiV1Enabled
+        // middleware, so a runtime-only config set is enough; it does not
+        // persist beyond this test's application instance.
+        LibrenmsConfig::set('api.v1.enabled', true);
     }
 
     public function testV1IsDisabledByDefault(): void
     {
-        // An explicit 'false' (not an unset) so a stray API_V1_ENABLED in a
-        // local .env cannot leak in when the application re-reads it.
-        self::putEnv('API_V1_ENABLED', 'false');
-        $this->refreshApplication();
+        LibrenmsConfig::set('api.v1.enabled', false);
 
         $this->getJson('/api/v1/ping')->assertNotFound();
         $this->getJson('/api/v1/health')->assertNotFound();

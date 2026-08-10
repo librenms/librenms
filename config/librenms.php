@@ -62,19 +62,4 @@
      */
 
      'config_cache_ttl' => env('CONFIG_CACHE_TTL', 300),
-
-     /*
-     |--------------------------------------------------------------------------
-     | API v1
-     |--------------------------------------------------------------------------
-     |
-     | Opt-in switch for the whole v1 API. When disabled, no v1 routes are
-     | registered and /api/v1/* returns 404.
-     */
-
-     'api' => [
-         'v1' => [
-             'enabled' => (bool) env('API_V1_ENABLED', false),
-         ],
-     ],
  ];
