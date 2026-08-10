@@ -116,9 +116,13 @@
                     </div>
                     <div class="row" id="success-message">
                         <div class="col-12">
-                            <div class="alert alert-success">
+                            <div class="alert alert-success mb-2">
                                 <i class="fa-solid fa-2x fa-heart" style="color: #ff4033;"></i>
                                 <span class="h4 align-text-bottom">{{ __('install.finish.thanks') }}</span>
+                            </div>
+                            <div class="alert alert-warning">
+                                <i class="fa-solid fa-triangle-exclamation mr-2"></i>
+                                <span>{{ __('install.finish.app_key_warning') }}</span>
                             </div>
                         </div>
                     </div>
