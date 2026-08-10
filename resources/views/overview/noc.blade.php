@@ -6,14 +6,14 @@
 <div class="container-fluid" style="padding: 0;">
     <div class="row" style="margin: 0;">
         <div class="col-md-12" style="padding: 0;">
-            @if($noc_dashboards->isEmpty())
+            @if ($noc_dashboards->isEmpty())
                 <div class="alert alert-info" style="margin: 15px;">{{ __('dashboard.noc.empty') }}</div>
             @else
                 <div id="noc-viewport" class="noc-startup" style="margin-bottom: 0;">
                     <div id="noc-topbar" style="display: flex; align-items: center; gap: 12px;">
                         <strong id="noc-current-name">{{ $noc_dashboards->first()->dashboard_name }}</strong>
                         <div id="noc-topbar-controls" style="display: flex; align-items: center; gap: 10px;">
-                            <span id="noc-countdown" style="font-size: 12px; color: inherit;">{{ __('dashboard.noc.next_in') }}: <span id="noc-countdown-value"></span>s</span>
+                            <span id="noc-countdown" style="font-size: 14px; color: inherit;">{{ __('dashboard.noc.next_in') }}: <span id="noc-countdown-value"></span>s</span>
                             <button id="noc-exit-btn" type="button" class="btn btn-primary btn-lg" style="display: none; font-size: 16px; padding: 8px 18px; gap: 8px; align-items: center;">
                                 <i class="fa fa-compress" aria-hidden="true"></i>
                                 <span>{{ __('dashboard.noc.exit_fullscreen') }}</span>
@@ -170,101 +170,102 @@
 
 @push('scripts')
 <script>
-    @if($noc_dashboards->isNotEmpty())
-    var nocDashboards = @json($noc_dashboards->map(fn ($dashboard) => [
-        'id' => $dashboard->dashboard_id,
-        'name' => $dashboard->dashboard_name,
-    ])->values());
-    var nocRotateSeconds = {{ (int) $rotate_seconds }};
-    var nocCurrentIndex = 0;
-    var nocCountdown = nocRotateSeconds;
-    var nocCountdownRunning = false;
-    var nocRedirectAfterExit = false;
+    @if ($noc_dashboards->isNotEmpty())
+        var nocDashboards = @json($noc_dashboards->map(fn ($dashboard) => [
+            'id' => $dashboard->dashboard_id,
+            'name' => $dashboard->dashboard_name,
+        ])->values());
+        var nocRotateSeconds = {{ (int) $rotate_seconds }};
+        var nocCurrentIndex = 0;
+        var nocCountdown = nocRotateSeconds;
+        var nocCountdownRunning = false;
+        var nocRedirectAfterExit = false;
 
-    function nocDashboardUrl(dashboardId) {
-        return '{{ route('overview') }}' + '?dashboard=' + dashboardId + '&bare=yes';
-    }
-
-    function updateCountdown() {
-        $('#noc-countdown-value').text(nocCountdown);
-    }
-
-    function setNocDashboard(index) {
-        var dashboard = nocDashboards[index];
-        if (! dashboard) {
-            return;
+        function nocDashboardUrl(dashboardId) {
+            return '{{ route('overview') }}' + '?dashboard=' + dashboardId + '&bare=yes';
         }
 
-        $('#noc-current-name').text(dashboard.name);
-        $('#noc-dashboard-frame').attr('src', nocDashboardUrl(dashboard.id));
-        nocCountdown = nocRotateSeconds;
-        updateCountdown();
-    }
-
-    setInterval(function () {
-        if (! nocCountdownRunning) {
-            return;
+        function updateCountdown() {
+            $('#noc-countdown-value').text(nocCountdown);
         }
 
-        nocCountdown--;
-        if (nocCountdown <= 0) {
-            if (nocDashboards.length > 1) {
-                nocCurrentIndex = (nocCurrentIndex + 1) % nocDashboards.length;
-                setNocDashboard(nocCurrentIndex);
+        function setNocDashboard(index) {
+            var dashboard = nocDashboards[index];
+            if (! dashboard) {
+                return;
             }
-            nocCountdown = nocRotateSeconds;
-        }
-        updateCountdown();
-    }, 1000);
 
-    updateCountdown();
-
-    function updateFullscreenControls() {
-        var startupOverlay = $('#noc-startup-overlay');
-        var exitButton = $('#noc-exit-btn');
-
-        startupOverlay.toggle(! document.fullscreenElement);
-        exitButton.toggle(!!document.fullscreenElement);
-    }
-
-    $('#noc-start-fullscreen-btn').on('click', function () {
-        var viewport = document.getElementById('noc-viewport');
-
-        if (viewport && viewport.requestFullscreen) {
-            viewport.requestFullscreen().catch(function () {
-                toastr.error('{{ __('dashboard.noc.fullscreen_error') }}');
-            });
-        }
-    });
-
-    $('#noc-exit-btn').on('click', function () {
-        nocRedirectAfterExit = true;
-        nocCountdownRunning = false;
-        $('#noc-startup-overlay').hide();
-        document.exitFullscreen().catch(function () {
-            window.location.href = '{{ route('noc.playlists') }}';
-        });
-    });
-
-    document.addEventListener('fullscreenchange', function () {
-        if (! document.fullscreenElement && nocRedirectAfterExit) {
-            $('#noc-startup-overlay').hide();
-            window.location.href = '{{ route('noc.playlists') }}';
-            return;
-        }
-
-        nocCountdownRunning = !!document.fullscreenElement;
-        if (nocCountdownRunning) {
+            $('#noc-current-name').text(dashboard.name);
+            $('#noc-dashboard-frame').attr('src', nocDashboardUrl(dashboard.id));
             nocCountdown = nocRotateSeconds;
             updateCountdown();
         }
 
+        setInterval(function () {
+            if (! nocCountdownRunning) {
+                return;
+            }
+
+            nocCountdown--;
+            if (nocCountdown <= 0) {
+                if (nocDashboards.length > 1) {
+                    nocCurrentIndex = (nocCurrentIndex + 1) % nocDashboards.length;
+                    setNocDashboard(nocCurrentIndex);
+                }
+                nocCountdown = nocRotateSeconds;
+            }
+            updateCountdown();
+        }, 1000);
+
+        updateCountdown();
+
+        function updateFullscreenControls() {
+            var startupOverlay = $('#noc-startup-overlay');
+            var exitButton = $('#noc-exit-btn');
+
+            startupOverlay.toggle(! document.fullscreenElement);
+            exitButton.toggle(!!document.fullscreenElement);
+        }
+
+        $('#noc-start-fullscreen-btn').on('click', function () {
+            var viewport = document.getElementById('noc-viewport');
+
+            if (viewport && viewport.requestFullscreen) {
+                viewport.requestFullscreen().catch(function () {
+                    toastr.error('{{ __('dashboard.noc.fullscreen_error') }}');
+                });
+            }
+        });
+
+        $('#noc-exit-btn').on('click', function () {
+            nocRedirectAfterExit = true;
+            nocCountdownRunning = false;
+            $('#noc-startup-overlay').hide();
+            document.exitFullscreen().catch(function () {
+                window.location.href = '{{ route('noc.playlists') }}';
+            });
+        });
+
+        document.addEventListener('fullscreenchange', function () {
+            if (! document.fullscreenElement && nocRedirectAfterExit) {
+                $('#noc-startup-overlay').hide();
+                window.location.href = '{{ route('noc.playlists') }}';
+                return;
+            }
+
+            nocCountdownRunning = !!document.fullscreenElement;
+            if (nocCountdownRunning) {
+                nocCountdown = nocRotateSeconds;
+                updateCountdown();
+            }
+
+            $('#noc-viewport')
+                .toggleClass('noc-startup', ! document.fullscreenElement);
+            updateFullscreenControls();
+        });
+
         $('#noc-viewport').toggleClass('noc-startup', ! document.fullscreenElement);
         updateFullscreenControls();
-    });
-
-    $('#noc-viewport').toggleClass('noc-startup', ! document.fullscreenElement);
-    updateFullscreenControls();
     @endif
 </script>
 @endpush
