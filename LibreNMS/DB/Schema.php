@@ -26,6 +26,7 @@
 
 namespace LibreNMS\DB;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Version;
@@ -80,28 +81,18 @@ class Schema
 
     public function getAllRelationshipPaths(string $base = 'devices'): array
     {
-        $cache_file = base_path("cache/{$base}_relationships.cache");
         $db_version = Version::get()->databaseMigrationCount();
 
-        if (is_file($cache_file)) {
-            $cache = unserialize(file_get_contents($cache_file));
-            if (($cache['version'] ?? null) == $db_version) {
-                return $cache[$base];
+        return Cache::remember("schema_relationships_{$base}_{$db_version}", 86400, function () use ($base) {
+            $paths = [];
+            foreach ($this->getTables() as $table) {
+                if ($path = $this->findPathRecursive([$table], $base)) {
+                    $paths[$table] = $path;
+                }
             }
-        }
 
-        $paths = [];
-        foreach ($this->getTables() as $table) {
-            if ($path = $this->findPathRecursive([$table], $base)) {
-                $paths[$table] = $path;
-            }
-        }
-
-        if (is_writable(dirname($cache_file))) {
-            file_put_contents($cache_file, serialize(['version' => $db_version, $base => $paths]));
-        }
-
-        return $paths;
+            return $paths;
+        });
     }
 
     public function findRelationshipPath(string $target, string $start = 'devices'): array|bool
