@@ -8,6 +8,12 @@ class SecretDecryptionException extends RuntimeException
 {
     public static function failedToDecrypt(?string $reason = null): self
     {
-        return new self($reason ?? 'Failed to decrypt secret data.');
+        $message = 'Failed to decrypt secret data. Ensure APP_KEY in .env has not changed.';
+
+        if ($reason) {
+            $message .= " ($reason)";
+        }
+
+        return new self($message);
     }
 }
