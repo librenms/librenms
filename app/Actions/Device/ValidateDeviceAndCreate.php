@@ -220,7 +220,7 @@ class ValidateDeviceAndCreate
                     if (PollingMethodType::Snmp->definition()->probe()->check($this->device)->isSuccess()) {
                         return;
                     } else {
-                        $host_unreachable_exception->addReason($snmp_version, $community);
+                        $host_unreachable_exception->addReason($snmp_version, (string) ($community ?? ''));
                     }
                 }
             } else {
