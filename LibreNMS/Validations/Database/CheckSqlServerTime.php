@@ -60,6 +60,6 @@ class CheckSqlServerTime implements Validation
      */
     public function enabled(): bool
     {
-        return Eloquent::isConnected();
+        return Eloquent::isConnected() && \DB::getDriverName() === 'mysql';
     }
 }
