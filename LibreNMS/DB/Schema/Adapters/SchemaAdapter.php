@@ -49,11 +49,15 @@ interface SchemaAdapter
 
     /**
      * Generate platform-specific SQL to add a foreign key constraint.
+     *
+     * @return string[]
      */
-    public function addConstraintSql(string $table, array $c): string;
+    public function addConstraintSql(string $table, array $c): array;
 
     /**
      * Generate platform-specific SQL to drop a foreign key constraint.
+     *
+     * @return string[]
      */
-    public function dropConstraintSql(string $table, string $name): string;
+    public function dropConstraintSql(string $table, string $name): array;
 }

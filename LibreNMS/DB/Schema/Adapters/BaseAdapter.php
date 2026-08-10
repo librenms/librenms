@@ -63,13 +63,13 @@ abstract class BaseAdapter implements SchemaAdapter
         return $master === $current;
     }
 
-    public function addConstraintSql(string $table, array $c): string
+    public function addConstraintSql(string $table, array $c): array
     {
-        return "-- addConstraintSql not implemented for this driver";
+        return ["-- addConstraintSql not implemented for this driver"];
     }
 
-    public function dropConstraintSql(string $table, string $name): string
+    public function dropConstraintSql(string $table, string $name): array
     {
-        return "-- dropConstraintSql not implemented for this driver";
+        return ["-- dropConstraintSql not implemented for this driver"];
     }
 }

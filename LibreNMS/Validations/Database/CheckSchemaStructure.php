@@ -32,14 +32,13 @@ use LibreNMS\DB\Schema;
 use LibreNMS\Interfaces\Validation;
 use LibreNMS\Interfaces\ValidationFixer;
 use LibreNMS\ValidationResult;
-use Symfony\Component\Yaml\Yaml;
 
 class CheckSchemaStructure implements Validation, ValidationFixer
 {
     private array $descriptions = [];
     private array $schema_update = [];
-    private readonly string $schema_file;
     private Schema $schemaManager;
+    private readonly string $schema_file;
 
     public function __construct(?string $schema_file = null)
     {
@@ -85,8 +84,7 @@ class CheckSchemaStructure implements Validation, ValidationFixer
 
     private function checkSchema(): void
     {
-        $master = (array) Yaml::parse(file_get_contents($this->schema_file));
-        $changes = $this->schemaManager->compare($master);
+        $changes = $this->schemaManager->compare($this->schema_file);
 
         $this->descriptions = array_column($changes, 'description');
         $this->schema_update = [];

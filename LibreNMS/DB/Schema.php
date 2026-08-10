@@ -27,13 +27,14 @@
 namespace LibreNMS\DB;
 
 use Illuminate\Database\Connection;
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema as LaravelSchema;
 use Illuminate\Support\Str;
 use LibreNMS\DB\Schema\Adapters\AdapterFactory;
 use LibreNMS\DB\Schema\Adapters\SchemaAdapter;
+use LibreNMS\DB\Schema\SchemaDiff;
 use LibreNMS\Util\Version;
 use Symfony\Component\Yaml\Yaml;
 
@@ -56,17 +57,17 @@ class Schema
         return LaravelSchema::hasTable('migrations') && self::getMigrationFiles()->diff(self::getAppliedMigrations())->isEmpty();
     }
 
-    public static function getUnexpectedMigrations(): \Illuminate\Support\Collection
+    public static function getUnexpectedMigrations(): Collection
     {
         return self::getAppliedMigrations()->diff(self::getMigrationFiles());
     }
 
-    private static function getMigrationFiles(): \Illuminate\Support\Collection
+    private static function getMigrationFiles(): Collection
     {
         return collect(glob(base_path('database/migrations/*.php')))->map(fn ($f) => basename($f, '.php'));
     }
 
-    private static function getAppliedMigrations(): \Illuminate\Support\Collection
+    private static function getAppliedMigrations(): Collection
     {
         return Eloquent::DB()->table('migrations')->pluck('migration');
     }
@@ -205,6 +206,7 @@ class Schema
             ->all();
     }
 
+
     public function getLiveTables(): array
     {
         return collect($this->db->getSchemaBuilder()->getTables())
@@ -255,285 +257,15 @@ class Schema
             ->all();
     }
 
-    public function compare(array $master): array
+    public function compare(string|null $schema_file = null): array
     {
-        $changes = [];
+        $schema_file ??= resource_path('definitions/schema/db_schema.yaml');
+        $master = (array) Yaml::parse(file_get_contents($schema_file));
+
         $dbTables = $this->getLiveTables();
         $current = $this->dumpInstance(array_intersect(array_keys($master), $dbTables));
 
-        foreach ($master as $table => $data) {
-            if (empty($current[$table])) {
-                $this->addChange("Database: missing table ($table)", $this->addTableSql($table, $data), $changes);
-                continue;
-            }
-
-            $this->syncColumns($table, $data['Columns'], $current[$table]['Columns'], $changes);
-            $this->syncIndexes($table, $data['Indexes'] ?? [], $current[$table]['Indexes'] ?? [], $changes);
-            $this->syncConstraints($table, $data['Constraints'] ?? [], $current[$table]['Constraints'] ?? [], $changes);
-        }
-
-        foreach (array_diff($dbTables, array_keys($master)) as $table) {
-            $this->addChange("Database: extra table ($table)", $this->dropTableSql($table), $changes);
-        }
-
-        $allSql = [];
-        foreach ($changes as $c) {
-            is_array($c['sql']) ? $allSql = [...$allSql, ...$c['sql']] : $allSql[] = $c['sql'];
-        }
-
-        $preSql = $this->adapter->getPreSql($allSql);
-        if (! empty($preSql)) {
-            array_unshift($changes, [
-                'description' => 'Platform specific session setup',
-                'sql' => $preSql,
-            ]);
-        }
-
-        return $changes;
-    }
-
-    private function addChange(string $desc, string|array $sql, array &$changes): void
-    {
-        $changes[] = ['description' => $desc, 'sql' => $sql];
-    }
-
-    private function syncColumns(string $table, array $master, array $current, array &$changes): void
-    {
-        $currentCols = collect($current)->keyBy(fn ($c) => strtolower($c['Field']));
-
-        collect($master)->each(function ($cdata, $i) use ($table, $master, &$currentCols, &$changes) {
-            $field = $cdata['Field'];
-            $current = $currentCols->pull(strtolower($field));
-
-            if (! $current) {
-                $this->addChange("Database: missing column ($table/$field)", $this->addColumnSql($table, $cdata, $master[$i - 1]['Field'] ?? null), $changes);
-            } elseif (! $this->adapter->columnsMatch($cdata, $current)) {
-                $this->addChange("Database: incorrect column ($table/$field)", $this->updateColumnSql($table, $field, $cdata), $changes);
-            }
-        });
-
-        $currentCols->each(fn ($c) => $this->addChange("Database: extra column ($table/{$c['Field']})", $this->dropColumnSql($table, $c['Field']), $changes));
-    }
-
-    private function syncIndexes(string $table, array $master, array $current, array &$changes): void
-    {
-        $currentIdx = collect($current)->keyBy(fn ($c) => strtolower($c['Name']));
-
-        collect($master)->each(function ($data, $name) use ($table, &$currentIdx, &$changes) {
-            $lower = strtolower($name);
-            $match = $currentIdx->get($lower);
-
-            if (! $match) {
-                $match = $currentIdx->first(fn ($iData) => $this->adapter->indexesMatch($data, $iData));
-                if ($match) {
-                    $lower = strtolower($match['Name']);
-                }
-            }
-
-            if (! $match) {
-                $this->addChange("Database: missing index ($table/$name)", $this->addIndexSql($table, $data), $changes);
-            } elseif (! $this->adapter->indexesMatch($data, $match)) {
-                $this->addChange("Database: incorrect index ($table/$name)", $this->updateIndexSql($table, $name, $data), $changes);
-            }
-            $currentIdx->forget($lower);
-        });
-
-        $currentIdx->each(fn ($_, $name) => $this->addChange("Database: extra index ($table/$name)", $this->dropIndexSql($table, $name), $changes));
-    }
-
-    private function syncConstraints(string $table, array $master, array $current, array &$changes): void
-    {
-        $currentFk = collect($current)->keyBy(fn ($c) => strtolower($c['name']));
-
-        collect($master)->each(function ($data, $name) use ($table, &$currentFk, &$changes) {
-            $lower = strtolower($name);
-            $match = $currentFk->get($lower);
-
-            if (! $match) {
-                $match = $currentFk->first(fn ($cData) => $this->adapter->constraintsMatch($data, $cData));
-                if ($match) {
-                    $lower = strtolower($match['name']);
-                }
-            }
-
-            if (! $match) {
-                $this->addChange("Database: missing constraint ($table/$name)", $this->addConstraintSql($table, $data), $changes);
-            } elseif (! $this->adapter->constraintsMatch($data, $match)) {
-                $this->addChange("Database: incorrect constraint ($table/$name)", [$this->dropConstraintSql($table, $name), $this->addConstraintSql($table, $data)], $changes);
-            }
-            $currentFk->forget($lower);
-        });
-
-        $currentFk->each(fn ($_, $name) => $this->addChange("Database: extra constraint ($table/$name)", $this->dropConstraintSql($table, $name), $changes));
-    }
-
-    public function addTableSql(string $table, array $data): array
-    {
-        return $this->pretend(fn () => LaravelSchema::create($table, function (Blueprint $b) use ($data): void {
-            foreach ($data['Columns'] as $c) {
-                $this->applyColumnToBlueprint($b, $c);
-            }
-            foreach ($data['Indexes'] ?? [] as $i) {
-                $this->applyIndexToBlueprint($b, $i);
-            }
-            foreach ($data['Constraints'] ?? [] as $c) {
-                $this->applyConstraintToBlueprint($b, $c);
-            }
-        }));
-    }
-
-    public function addColumnSql(string $table, array $cdata, ?string $prev): array
-    {
-        return $this->pretend(fn () => LaravelSchema::table($table, function (Blueprint $b) use ($cdata, $prev): void {
-            $col = $this->applyColumnToBlueprint($b, $cdata);
-            if ($col) {
-                empty($prev) ? $col->first() : $col->after($prev);
-            }
-        }));
-    }
-
-    public function updateColumnSql(string $table, string $column, array $cdata): array
-    {
-        return $this->pretend(fn () => LaravelSchema::table($table, function (Blueprint $b) use ($cdata, $column): void {
-            $col = $this->applyColumnToBlueprint($b, $cdata, $column);
-            if ($col) {
-                $col->change();
-            }
-        }));
-    }
-
-    public function dropColumnSql(string $table, string $column): array
-    {
-        return $this->pretend(fn () => LaravelSchema::table($table, fn (Blueprint $b) => $b->dropColumn($column)));
-    }
-
-    public function addIndexSql(string $table, array $idata): array
-    {
-        return $this->pretend(fn () => LaravelSchema::table($table, fn (Blueprint $b) => $this->applyIndexToBlueprint($b, $idata)));
-    }
-
-    public function updateIndexSql(string $table, string $name, array $idata): array
-    {
-        return $this->pretend(fn () => LaravelSchema::table($table, function (Blueprint $b) use ($name, $idata): void {
-            $b->dropIndex($name);
-            $this->applyIndexToBlueprint($b, $idata);
-        }));
-    }
-
-    public function dropIndexSql(string $table, string $name): array
-    {
-        return $this->pretend(fn () => LaravelSchema::table($table, fn (Blueprint $b) => $b->dropIndex($name)));
-    }
-
-    public function dropTableSql(string $table): array
-    {
-        return $this->pretend(fn () => LaravelSchema::drop($table));
-    }
-
-    protected function applyColumnToBlueprint(Blueprint $b, array $cdata, ?string $old = null): ?\Illuminate\Database\Schema\ColumnDefinition
-    {
-        $type = (string) $cdata['Type'];
-        $field = $old ?? $cdata['Field'];
-        $unsigned = str_contains($type, 'unsigned');
-        $clean = str_replace(' unsigned', '', $type);
-        $params = [];
-
-        if (preg_match('/^(\w+)\((.*)\)$/', $clean, $m)) {
-            $clean = $m[1];
-            $params = str_getcsv($m[2], ',', "'", '\\');
-        }
-
-        $method = match ($clean) {
-            'int' => 'integer',
-            'tinyint' => 'tinyInteger',
-            'smallint' => 'smallInteger',
-            'mediumint' => 'mediumInteger',
-            'bigint' => 'bigInteger',
-            'varchar' => 'string',
-            'blob', 'mediumblob', 'longblob' => 'binary',
-            'datetime' => 'dateTime',
-            default => $clean,
-        };
-
-        if (! method_exists($b, $method)) {
-            return null;
-        }
-
-        $col = ($method === 'enum') ? $b->enum($field, $params) : $b->{$method}($field, ...$params);
-
-        if ($unsigned) {
-            $col->unsigned();
-        }
-
-        $col->nullable((bool) $cdata['Null']);
-
-        if (isset($cdata['Default'])) {
-            $cdata['Default'] === 'CURRENT_TIMESTAMP' ? $col->useCurrent() : $col->default($cdata['Default']);
-        }
-
-        if ($cdata['Extra'] === 'auto_increment') {
-            $col->autoIncrement();
-        }
-
-        if ($cdata['Extra'] === 'on update CURRENT_TIMESTAMP') {
-            $col->useCurrentOnUpdate();
-        }
-
-        if ($old && $old !== $cdata['Field']) {
-            $b->renameColumn($old, $cdata['Field']);
-        }
-
-        return $col;
-    }
-
-    protected function applyIndexToBlueprint(Blueprint $b, array $idata): void
-    {
-        $cols = $idata['Columns'];
-        $name = $idata['Name'];
-        if ($name === 'PRIMARY') {
-            $b->primary($cols);
-        } elseif ($idata['Unique']) {
-            $b->unique($cols, $name);
-        } else {
-            $b->index($cols, $name);
-        }
-    }
-
-    public function addConstraintSql(string $table, array $c): array
-    {
-        try {
-            return $this->pretend(fn () => LaravelSchema::table($table, function (Blueprint $b) use ($c): void {
-                $this->applyConstraintToBlueprint($b, $c);
-            }));
-        } catch (\Exception) {
-            return (array) $this->adapter->addConstraintSql($table, $c);
-        }
-    }
-
-    public function dropConstraintSql(string $table, string $name): array
-    {
-        try {
-            return $this->pretend(fn () => LaravelSchema::table($table, fn (Blueprint $b) => $b->dropForeign($name)));
-        } catch (\Exception) {
-            return (array) $this->adapter->dropConstraintSql($table, $name);
-        }
-    }
-
-    private function pretend(callable $callback): array
-    {
-        return array_map(fn ($q) => $q['query'] . ';', $this->db->pretend($callback));
-    }
-
-    protected function applyConstraintToBlueprint(Blueprint $b, array $c): void
-    {
-        $fk = $b->foreign($c['foreign_key'], $c['name'])->references($c['key'])->on($c['table']);
-        if (str_contains(strtoupper((string) ($c['extra'] ?? '')), 'ON DELETE CASCADE')) {
-            $fk->onDelete('cascade');
-        } elseif (str_contains(strtoupper((string) ($c['extra'] ?? '')), 'ON DELETE SET NULL')) {
-            $fk->onDelete('set null');
-        }
-        if (str_contains(strtoupper((string) ($c['extra'] ?? '')), 'ON UPDATE CASCADE')) {
-            $fk->onUpdate('cascade');
-        }
+        return (new SchemaDiff($this->db, $this->adapter))
+            ->compare($master, $current, $dbTables);
     }
 }
