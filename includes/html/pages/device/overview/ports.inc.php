@@ -5,7 +5,7 @@ use LibreNMS\Util\Rewrite;
 
 if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     echo '<div class="overview-panel tw:mb-5">
-            <div class="tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:border-b tw:border-gray-300 tw:text-neutral-700 tw:dark:bg-dark-gray-200 tw:dark:border-zinc-800 tw:dark:text-dark-white-200">
+            <div class="tw:rounded-t-xl tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:border-b tw:border-gray-300 tw:text-neutral-700 tw:dark:bg-dark-gray-200 tw:dark:border-zinc-800 tw:dark:text-dark-white-200">
               <i class="fa fa-road fa-lg icon-theme" aria-hidden="true"></i><strong> Overall Traffic</strong>
             </div>';
 
@@ -30,7 +30,7 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     $graph_array['width'] = '210';
     $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . ' - Device Traffic');
 
-    echo '<div class="tw:flex tw:min-w-0 tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-zinc-800">';
+    echo '<div class="tw:tw:rounded-b-xl flex tw:min-w-0 tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-zinc-800">';
     echo '<div class="tw:px-2 tw:py-2">';
     echo \LibreNMS\Util\Url::overlibLink($link, $graph, $overlib_content);
     echo '</div>';
@@ -43,7 +43,7 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     <a class="lnms-btn lnms-btn-primary" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports', 'filter' => ['disabled' => ['eq' => '1']]]) . '">Disabled: <span class="lnms-btn-badge">' . $ports['disabled'] . '</span></a>
     </div>';
 
-    echo '<div class="tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:border-t tw:border-gray-300 tw:dark:bg-dark-gray-200 tw:dark:border-zinc-800">';
+    echo '<div class="tw:rounded-b-xl tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:border-t tw:border-gray-300 tw:dark:bg-dark-gray-200 tw:dark:border-zinc-800">';
 
     $ifsep = '';
 

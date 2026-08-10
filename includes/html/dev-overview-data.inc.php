@@ -13,7 +13,7 @@ echo '<script src="js/leaflet.markercluster.js"></script>';
 echo '<script src="js/leaflet.awesome-markers.min.js"></script>';
 
 echo "<div class='overview-panel tw:mb-5'>
-            <div class='tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:border-b tw:border-gray-300 tw:text-neutral-700 tw:dark:bg-dark-gray-200 tw:dark:border-zinc-800 tw:dark:text-dark-white-200'>";
+            <div class='tw:rounded-t-xl tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:border-b tw:border-gray-300 tw:text-neutral-700 tw:dark:bg-dark-gray-200 tw:dark:border-zinc-800 tw:dark:text-dark-white-200'>";
 
 if (LibrenmsConfig::get('overview_show_sysDescr')) {
     echo '<i class="fa fa-id-card fa-lg icon-theme" aria-hidden="true"></i> <strong>';
@@ -21,7 +21,7 @@ if (LibrenmsConfig::get('overview_show_sysDescr')) {
     echo '</strong>';
 }
 
-echo '</div><div class="tw:flex tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-zinc-800">';
+echo '</div><div class="tw:rounded-b-xl tw:flex tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-zinc-800">';
 
 if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
     \LibreNMS\Util\Rewrite::ciscoHardware($device, false);

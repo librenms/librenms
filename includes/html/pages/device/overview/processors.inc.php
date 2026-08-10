@@ -5,12 +5,12 @@ $processors = dbFetchRows('SELECT * FROM `processors` WHERE device_id = ?', [$de
 if (count($processors)) {
     echo '
           <div class="overview-panel tw:mb-5">
-            <div class="tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:border-b tw:border-gray-300 tw:text-neutral-700 tw:dark:bg-dark-gray-200 tw:dark:border-zinc-800 tw:dark:text-dark-white-200">
+            <div class="tw:rounded-t-xl tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:border-b tw:border-gray-300 tw:text-neutral-700 tw:dark:bg-dark-gray-200 tw:dark:border-zinc-800 tw:dark:text-dark-white-200">
 ';
     echo '<a href="device/device=' . $device['device_id'] . '/tab=health/metric=processor/">';
     echo '<i class="fa fa-microchip fa-lg icon-theme" aria-hidden="true"></i> <strong>Processors</strong></a>';
     echo '</div>
-        <div class="tw:flex tw:min-w-0 tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-zinc-800">';
+        <div class="tw:rounded-b-xl tw:flex tw:min-w-0 tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-zinc-800">';
 
     $graph_array = [];
     $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');

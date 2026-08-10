@@ -71,13 +71,13 @@ if ($app) {
     $failure_class = $metrics['events_failure'] ? 'tw:text-red-500' : '';
 
     echo '<div class="overview-panel tw:mb-5">
-        <div class="tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:border-b tw:border-gray-300 tw:text-neutral-700 tw:dark:bg-dark-gray-200 tw:dark:border-zinc-800 tw:dark:text-dark-white-200">
+        <div class="tw:rounded-t-xl tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:border-b tw:border-gray-300 tw:text-neutral-700 tw:dark:bg-dark-gray-200 tw:dark:border-zinc-800 tw:dark:text-dark-white-200">
             <a href="device/device=' . $device['device_id'] . '/tab=apps/app=puppet-agent/">
                 <i class="fa fa-cogs fa-lg icon-theme" aria-hidden="true"></i>
                 <strong>Puppet Agent</strong>
             </a>
         </div>
-        <div class="tw:flex tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-zinc-800">
+        <div class="tw:rounded-b-xl tw:flex tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-zinc-800">
             <div class="' . $row_class . '">
                 <div class="tw:font-medium">Summary</div>
                 <div class="tw:min-w-0">
