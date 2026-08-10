@@ -84,7 +84,7 @@ class CheckSchemaCollation implements Validation, ValidationFixer
      */
     public function enabled(): bool
     {
-        return Eloquent::isConnected() && \DB::getDriverName() === 'mysql' && CheckDatabaseSchemaVersion::isCurrent();
+        return Eloquent::isConnected() && CheckDatabaseSchemaVersion::isCurrent();
     }
 
     public function fix(): bool

@@ -55,6 +55,6 @@ class CheckDatabaseTableNamesCase implements Validation
      */
     public function enabled(): bool
     {
-        return Eloquent::isConnected() && DB::getDriverName() === 'mysql';
+        return Eloquent::isConnected();
     }
 }
