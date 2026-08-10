@@ -99,7 +99,11 @@ class DeviceAdd extends LnmsCommand
             $device->sysName = $this->option('sysName');
         }
 
-        $input = array_merge($this->options(), ['auth' => $auth, 'priv' => $priv]);
+        $input = array_merge($this->options(), [
+            'auth' => $auth,
+            'priv' => $priv,
+            'ping_only' => (bool) $this->option('ping-only'),
+        ]);
 
         try {
             $result = (new ValidateDeviceAndCreate(
