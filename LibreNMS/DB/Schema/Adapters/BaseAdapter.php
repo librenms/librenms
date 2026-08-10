@@ -36,10 +36,7 @@ abstract class BaseAdapter implements SchemaAdapter
         ];
 
         if (isset($col['default']) && strtoupper((string) $col['default']) !== 'NULL') {
-            $default = (string) $col['default'];
-            if (str_starts_with($default, "'") && str_ends_with($default, "'")) {
-                $default = substr($default, 1, -1);
-            }
+            $default = trim((string) $col['default'], "'");
             $def['Default'] = str_contains(strtolower($default), 'current_timestamp') ? 'CURRENT_TIMESTAMP' : $default;
         }
 

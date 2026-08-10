@@ -31,17 +31,13 @@ abstract class AbstractMySqlAdapter extends BaseAdapter
 
         $names = array_column($tables, 'name');
         $placeholders = implode(',', array_fill(0, count($names), '?'));
-        $rows = $this->db->select(
+
+        return collect($this->db->select(
             "SELECT TABLE_NAME, COLUMN_NAME, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME IN ($placeholders)",
             array_merge([$this->getSchemaName()], $names)
-        );
-
-        $extras = [];
-        foreach ($rows as $r) {
-            $extras[$r->TABLE_NAME][$r->COLUMN_NAME] = $r->EXTRA;
-        }
-
-        return $extras;
+        ))->groupBy('TABLE_NAME')
+            ->map(fn ($cols) => $cols->pluck('EXTRA', 'COLUMN_NAME')->all())
+            ->all();
     }
 
     public function mapColumn(array $col, array $tableExtras): array
