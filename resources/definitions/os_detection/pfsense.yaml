@@ -9,5 +9,5 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
     -
-        sysDescr:
-            - pfSense
+        sysDescr_regex:
+            - '/pfsense/i'

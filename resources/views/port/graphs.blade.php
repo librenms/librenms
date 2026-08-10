@@ -1,6 +1,6 @@
 <div class="@if($hideFilter) tw:hidden @else tw:flex tw:justify-between @endif">
     <x-filter name="ports" :fields="$filterFields" id="port-filter" :hide="$hideFilter" :initial="$filter" :reload="true"/>
-    <x-date-range-picker :start="$graphTemplate['from'] ?? null" :end="$graphTemplate['to'] ?? null"></x-date-range-picker>
+    <x-date-range-picker :start="$graphTemplate['from'] ?? null" :end="$graphTemplate['to'] ?? null" :reload="true"></x-date-range-picker>
 </div>
 <hr class="tw:my-5 @if($hideFilter) tw:hidden @endif"/>
 
@@ -37,25 +37,4 @@
     </div>
 </x-slot>
 
-@push('scripts')
-<script>
-    window.addEventListener('date-range-changed', (event) => {
-        const { relativeStartSeconds, relativeEndSeconds, start, end } = event.detail;
-        const url = new URL(window.location.href);
 
-        const setOrDelete = (param, value) =>
-            value ? url.searchParams.set(param, value) : url.searchParams.delete(param);
-
-        const prevFrom = url.searchParams.get('from');
-        const prevTo = url.searchParams.get('to');
-
-        const fromOffset = relativeStartSeconds && LibreNMS.Date.toShortOffset(relativeStartSeconds);
-        setOrDelete('from', fromOffset === '-1d' ? null : fromOffset || (start && LibreNMS.Date.toUrl(start)));
-        setOrDelete('to', relativeEndSeconds ? LibreNMS.Date.toShortOffset(relativeEndSeconds) : end && LibreNMS.Date.toUrl(end));
-
-        if (url.searchParams.get('from') !== prevFrom || url.searchParams.get('to') !== prevTo) {
-            window.location.href = url.toString();
-        }
-    });
-</script>
-@endpush

@@ -188,7 +188,10 @@ class ServiceConfig(DBConfig):
             if config.get("schedule_type").get("ping", "legacy") == "legacy"
             else config.get("schedule_type").get("ping", "legacy") == "dispatcher"
         )
-        self.ping.frequency = config.get("ping_rrd_step", ServiceConfig.ping.frequency)
+        self.ping.frequency = config.get(
+            "service_ping_frequency",
+            config.get("ping_rrd_step", ServiceConfig.ping.frequency),
+        )
         self.down_retry = config.get(
             "service_poller_down_retry", ServiceConfig.down_retry
         )
@@ -633,7 +636,7 @@ class Service:
                     `last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL COALESCE(`last_polled_timetaken`, 0) SECOND) OR
                     `last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL COALESCE(`last_discovered_timetaken`, 0) SECOND)
                 )
-                ORDER BY `last_polled_timetaken` DESC""",
+                ORDER BY `last_discovered` IS NULL DESC, `last_polled_timetaken` DESC""",
                 (
                     poller_find_time,
                     self.service_age(),

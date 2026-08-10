@@ -52,7 +52,7 @@ export default function popup(url = '', options = {}) {
             this.popupElement = document.createElement('div');
             // this.popupElement.className = 'tw:hidden tw:bg-white tw:dark:bg-dark-gray-300 tw:dark:text-white tw:border-2 tw:border-gray-200 tw:dark:border-dark-gray-200 tw:z-50 tw:font-normal tw:leading-normal tw:text-sm tw:text-left tw:no-underline tw:rounded-lg tw:absolute tw:shadow-lg tw:max-w-sm';
             this.popupElement.className = 'tw:hidden';
-            this.popupElement.style.cssText = 'max-width: 95vw; z-index: 9999;';
+            this.popupElement.style.cssText = 'position: fixed; max-width: 95vw; z-index: 9999;';
 
             // Add mouse events to popup
             this.popupElement.addEventListener('mouseenter', () => {
@@ -280,7 +280,7 @@ export default function popup(url = '', options = {}) {
                 left = window.innerWidth - popupRect.width - 8;
             }
 
-            this.popupElement.style.top = `${top + window.scrollY}px`;
+            this.popupElement.style.top = `${top}px`;
             this.popupElement.style.left = `${left}px`;
         },
 

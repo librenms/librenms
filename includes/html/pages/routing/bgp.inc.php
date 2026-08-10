@@ -285,7 +285,9 @@ if (\Illuminate\Support\Facades\Gate::denies('viewAny', BgpPeer::class)) {
         $graph_array['width'] = $width;
 
         // Peer Address
-        $peer_device = Device::whereHas('bgppeers', fn ($q) => $q->where('bgpLocalAddr', $peer['bgpPeerIdentifier']))->first();
+        $peer_address = $peer['bgpPeerIdentifier'];
+        $peer_device = Device::whereHas('bgppeers', fn ($q) => $q->where('bgpLocalAddr', $peer_address))->first()
+            ?? Device::findByIp($peer_address);
         $peeraddresslink = '<span class=list-large>' . Url::deviceLink($peer_device, $peer_addr, ['tab' => 'routing', 'proto' => 'bgp']) . '</span>';
 
         // Local Address

@@ -20,10 +20,12 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     //Generate tooltip
     $graph_array['width'] = 210;
     $graph_array['height'] = 100;
-    $link_array = $graph_array;
-    $link_array['page'] = 'graphs';
-    unset($link_array['height'], $link_array['width']);
-    $link = \LibreNMS\Util\Url::generate($link_array);
+    $link = \LibreNMS\Util\Url::graphPageUrl('device_bits', [
+        'device' => $device['device_id'],
+        'from' => $graph_array['from'],
+        'to' => $graph_array['to'],
+        'legend' => $graph_array['legend'],
+    ]);
 
     $graph_array['width'] = '210';
     $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . ' - Device Traffic');
@@ -36,8 +38,8 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     $ports = ObjectCache::portCounts(['total', 'up', 'down', 'disabled'], $device['device_id']);
     echo '<div class="tw:flex tw:flex-wrap tw:gap-3 tw:p-3">
     <a class="lnms-btn lnms-btn-default" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports']) . '">Total: <span class="lnms-btn-badge">' . $ports['total'] . '</span></a>
-    <a class="lnms-btn lnms-btn-success" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports', 'filter' => ['state' => ['eq' => 'up'], 'disabled' => ['eq' => '0'], 'ignore' => ['eq' => '0'], 'deleted' => ['eq' => '0']]]) . '">Up: <span class="lnms-btn-badge">' . $ports['up'] . '</span></a>
-    <a class="lnms-btn lnms-btn-danger" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports', 'filter' => ['state' => ['eq' => 'down'], 'disabled' => ['eq' => '0'], 'ignore' => ['eq' => '0'], 'deleted' => ['eq' => '0']]]) . '">Down: <span class="lnms-btn-badge">' . $ports['down'] . '</span></a>
+    <a class="lnms-btn lnms-btn-success" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports', 'filter' => ['state' => ['eq' => 'up'], 'ignore' => ['eq' => 0], 'disabled' => ['eq' => 0], 'deleted' => ['eq' => 0]]]) . '">Up: <span class="lnms-btn-badge">' . $ports['up'] . '</span></a>
+    <a class="lnms-btn lnms-btn-danger" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports', 'filter' => ['state' => ['eq' => 'down'], 'ignore' => ['eq' => 0], 'disabled' => ['eq' => 0], 'deleted' => ['eq' => 0]]]) . '">Down: <span class="lnms-btn-badge">' . $ports['down'] . '</span></a>
     <a class="lnms-btn lnms-btn-primary" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports', 'filter' => ['disabled' => ['eq' => '1']]]) . '">Disabled: <span class="lnms-btn-badge">' . $ports['disabled'] . '</span></a>
     </div>';
 

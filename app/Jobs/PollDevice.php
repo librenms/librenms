@@ -6,6 +6,7 @@ use App\Actions\Device\CheckDeviceAvailability;
 use App\Events\DevicePolled;
 use App\Events\PollingDevice;
 use App\Facades\LibrenmsConfig;
+use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
@@ -54,6 +55,7 @@ class PollDevice implements ShouldQueue
     public function handle(): void
     {
         $this->initDevice();
+        $connectivity = new ConnectivityHelper($this->device);
         $this->initRrdDirectory();
         PollingDevice::dispatch($this->device);
         $this->os = OS::make($this->deviceArray);
@@ -64,7 +66,7 @@ class PollDevice implements ShouldQueue
         // check and save status
         app(CheckDeviceAvailability::class)->execute($this->device, true);
 
-        $this->pollModules();
+        $this->pollModules($connectivity);
 
         $measurement->end();
 
@@ -74,7 +76,7 @@ class PollDevice implements ShouldQueue
                 $this->recordPerformance($measurement);
             }
 
-            if (ConnectivityHelper::pingIsAllowed($this->device)) {
+            if ($connectivity->icmpIsEnabled()) {
                 $this->os->enableGraph('ping_perf');
             }
 
@@ -108,7 +110,7 @@ class PollDevice implements ShouldQueue
         DevicePolled::dispatch($this->device);
     }
 
-    private function pollModules(): void
+    private function pollModules(ConnectivityHelper $connectivity): void
     {
         // update $device array status
         $this->deviceArray['status'] = $this->device->status;
@@ -129,7 +131,7 @@ class PollDevice implements ShouldQueue
 
             try {
                 $instance = Module::fromName($module);
-                $should_poll = $instance->shouldPoll($this->os, $module_status);
+                $should_poll = $instance->shouldPoll($this->os, $module_status, $connectivity);
 
                 if ($should_poll) {
                     Log::info("#### Load poller module $module ####\n");
@@ -184,7 +186,7 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
 
     private function initRrdDirectory(): void
     {
-        $host_rrd = \Rrd::name($this->device->hostname, '', '');
+        $host_rrd = Rrd::dirFromHost($this->device->hostname);
         if (LibrenmsConfig::get('rrd.enable', true) && ! is_dir($host_rrd)) {
             try {
                 mkdir($host_rrd);

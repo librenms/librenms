@@ -250,6 +250,11 @@ Route: `/api/v0/devices/:hostname/health(/:type)(/:sensor_id)`
 - type (optional) is health type / sensor class
 - sensor_id (optional) is the sensor id to retrieve specific information.
 
+`type` may be a sensor class (e.g. `device_voltage`) or one of the special
+classes `device_processor`, `device_storage` and `device_mempool`, which are
+stored in their own tables rather than the `sensors` table. The `device_`
+prefix is optional, so `processor` and `device_processor` are equivalent.
+
 Input:
 
   -
@@ -262,7 +267,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "message": "",
@@ -288,7 +293,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "message": "",
@@ -314,7 +319,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "message": "",
@@ -348,6 +353,28 @@ Output:
 }
 ```
 
+Example (processor list):
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/health/processor
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "",
+    "count": 1,
+    "graphs": [
+        {
+            "sensor_id": "1",
+            "desc": "Processor"
+        }
+    ]
+}
+```
+
 ### `list_available_wireless_graphs`
 
 This function allows to do three things:
@@ -374,7 +401,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "graphs": [
@@ -399,7 +426,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "graphs": [
@@ -424,7 +451,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "graphs": [
@@ -896,23 +923,23 @@ Output:
 
 ```json
 {
-  "status": "ok",
-  "message": "",
-  "count": 2,
-  "mappings": [
-    {
-      "device_id": "3742",
-      "port_id_high": "1001000",
-      "port_id_low": "51001",
-      "ifStackStatus": "active"
-    },
-    {
-      "device_id": "3742",
-      "port_id_high": "1001000",
-      "port_id_low": "52001",
-      "ifStackStatus": "active"
-    }
-  ]
+    "status": "ok",
+    "message": "",
+    "count": 2,
+    "mappings": [
+        {
+            "device_id": "3742",
+            "port_id_high": "1001000",
+            "port_id_low": "51001",
+            "ifStackStatus": "active"
+        },
+        {
+            "device_id": "3742",
+            "port_id_high": "1001000",
+            "port_id_low": "52001",
+            "ifStackStatus": "active"
+        }
+    ]
 }
 ```
 
@@ -1162,14 +1189,14 @@ Output:
 
 ```json
 {
- "status": "ok",
- "port": {
-  "port_id": "2",
-  "device_id": "1",
-  ...
-  "poll_prev": "1418412902",
-  "poll_period": "300"
- }
+    "status": "ok",
+    "port": {
+        "port_id": "2",
+        "device_id": "1",
+        ...
+        "poll_prev": "1418412902",
+        "poll_period": "300"
+    }
 }
 ```
 
@@ -1311,17 +1338,17 @@ Output:
 
 ```json
 {
- "status": "ok",
- "count": 1,
- "devices": [
-  {
-   "device_id": "1",
-   "hostname": "localhost",
-   ...
-   "serial": null,
-   "icon": null
-  }
- ]
+    "status": "ok",
+    "count": 1,
+    "devices": [
+        {
+            "device_id": "1",
+            "hostname": "localhost",
+            ...
+            "serial": null,
+            "icon": null
+        }
+    ]
 }
 ```
 
@@ -1335,17 +1362,17 @@ Output:
 
 ```json
 {
- "status": "ok",
- "count": 1,
- "devices": [
-  {
-   "device_id": "1",
-   "hostname": "localhost",
-   ...
-   "serial": null,
-   "icon": null
-  }
- ]
+    "status": "ok",
+    "count": 1,
+    "devices": [
+        {
+            "device_id": "1",
+            "hostname": "localhost",
+            ...
+            "serial": null,
+            "icon": null
+        }
+    ]
 }
 ```
 
@@ -1401,10 +1428,10 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
   -X POST https://foo.example/api/v0/devices/localhost/maintenance/ \
   --data-raw '
 {
- "title":"Device Maintenance",
-  "notes":"A 2 hour Maintenance triggered via API with start time",
-  "start":"2022-08-01 08:00:00",
-  "duration":"2:00"
+    "title":"Device Maintenance",
+    "notes":"A 2 hour Maintenance triggered via API with start time",
+    "start":"2022-08-01 08:00:00",
+    "duration":"2:00"
 }
 '
 ```
@@ -1424,9 +1451,10 @@ Example with no start time:
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
   -X POST https://foo.example/api/v0/devices/localhost/maintenance/ \
   --data-raw '
- "title":"Device Maintenance",
-  "notes":"A 2 hour Maintenance triggered via API with no start time",
-  "duration":"2:00"
+{
+    "title":"Device Maintenance",
+    "notes":"A 2 hour Maintenance triggered via API with no start time",
+    "duration":"2:00"
 }
 '
 ```

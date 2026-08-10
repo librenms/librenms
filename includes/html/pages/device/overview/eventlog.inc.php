@@ -15,16 +15,18 @@ foreach ($eventlog as $entry) {
     $severity_colour = eventlog_severity($entry['severity']);
     $icon = '<span class="alert-status ' . $severity_colour . '"></span>';
 
-    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[auto_auto_100px_1fr]">';
+    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[auto_auto_150px_1fr]">';
     echo '<div>' . $icon . '</div>';
     echo '<div class="tw:whitespace-nowrap">' . Time::format($entry['datetime'], 'compact') . '</div>';
-    echo '<div class="tw:whitespace-nowrap">';
 
     if ($entry['type'] == 'interface') {
-        echo '<b>' . \LibreNMS\Util\Url::portLink(Port::find($entry['reference'])) . '</b>';
+        $port = Port::find($entry['reference']);
+        echo '<div class="tw:min-w-0 tw:truncate" title="' . htmlspecialchars((string) $port?->getLabel()) . '"><b>' . \LibreNMS\Util\Url::portLink($port) . '</b></div>';
+    } else {
+        echo '<div class="tw:min-w-0 tw:truncate"></div>';
     }
 
-    echo '</div><div>' . htmlspecialchars((string) $entry['message']) . '</div>';
+    echo '<div>' . htmlspecialchars((string) $entry['message']) . '</div>';
     echo '</div>';
 }
 

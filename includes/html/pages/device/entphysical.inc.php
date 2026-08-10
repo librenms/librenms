@@ -3,6 +3,7 @@
 use App\Models\EntPhysical;
 use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Util\Html;
+use LibreNMS\Util\Url;
 
 function printEntPhysical($device, $ent, $level, $class)
 {
@@ -41,7 +42,7 @@ function printEntPhysical($device, $ent, $level, $class)
         $display_entPhysicalName = e($ent['entPhysicalName']);
         if ($ent['ifIndex']) {
             $port = PortCache::getByIfIndex($ent['ifIndex'], $device['device_id']);
-            $display_entPhysicalName = \LibreNMS\Util\Url::modernPortLink($port);
+            $display_entPhysicalName = Url::modernPortLink($port);
         }
 
         if ($ent['entPhysicalModelName'] && $display_entPhysicalName) {
@@ -61,11 +62,12 @@ function printEntPhysical($device, $ent, $level, $class)
         // Display matching sensor value (without descr, as we have only one)
         if ($sensors->count() == 1) {
             foreach ($sensors as $sensor) {
-                echo "<a href='graphs/id=" . $sensor->sensor_id . '/type=sensor_' . $sensor->sensor_class . "/' onmouseover=\"return overlib('<img src=\'graph.php?id=" . $sensor->sensor_id . '&amp;type=sensor_' . $sensor->sensor_class . '&amp;from=-2d&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'><img src=\'graph.php?id=" . $sensor->sensor_id . '&amp;type=sensor_' . $sensor->sensor_class . '&amp;from=-2w&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'>', LEFT,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\">";
-                //echo "<span style='color: #000099;'>" . $sensor->sensor_class . ': ' . $sensor->sensor_descr . '</span>';
-                echo ' ';
-                echo Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue());
-                echo '</a>';
+                echo Url::graphPopup(
+                    ['type' => 'sensor_' . $sensor->sensor_class, 'id' => $sensor->sensor_id, 'from' => '-2w', 'width' => 400, 'height' => 150, 'popup_title' => e($sensor->sensor_descr . ' ' . $sensor->sensor_class)],
+                    Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue()),
+                    null,
+                    ['-2d', '-2w'],
+                );
             }
         }
 
@@ -120,12 +122,14 @@ function printEntPhysical($device, $ent, $level, $class)
         if ($sensors->count() > 1) {
             echo "<br>Sensors:<div class='interface-desc' style='margin-left: 20px;'>";
             foreach ($sensors as $sensor) {
-                $disp_name = str_replace([$ent['entPhysicalDescr'], $ent['entPhysicalName']], ['', ''], $sensor->sensor_descr);
-                echo "<a href='graphs/id=" . $sensor->sensor_id . '/type=sensor_' . $sensor->sensor_class . "/' onmouseover=\"return overlib('<img src=\'graph.php?id=" . $sensor->sensor_id . '&amp;type=sensor_' . $sensor->sensor_class . '&amp;from=-2d&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'><img src=\'graph.php?id=" . $sensor->sensor_id . '&amp;type=sensor_' . $sensor->sensor_class . '&amp;from=-2w&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'>', LEFT,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\">";
-                echo "<span class='text-info'>" . e($disp_name) . ' ' . e($sensor->sensor_class) . '</span>';
-                echo ' ';
-                echo Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue());
-                echo '</a><br>';
+                $disp_name = e(str_replace([$ent['entPhysicalDescr'], $ent['entPhysicalName']], ['', ''], $sensor->sensor_descr) . ' ' . $sensor->sensor_class);
+                echo Url::graphPopup(
+                    ['type' => 'sensor_' . $sensor->sensor_class, 'id' => $sensor->sensor_id, 'from' => '-2w', 'width' => 400, 'height' => 150, 'popup_title' => $disp_name],
+                    "<span class='text-info'>" . $disp_name . '</span> ' . Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue()),
+                    null,
+                    ['-2d', '-2w'],
+                );
+                echo '<br>';
             }
             echo '</div>';
         }

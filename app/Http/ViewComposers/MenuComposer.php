@@ -294,6 +294,7 @@ class MenuComposer
             ->where('devices.ignore', '=', '0')
             ->groupBy('severity')
             ->pluck('severity');
+        $vars['alert_count'] = $alert_status->count() ?? 0;
 
         if ($alert_status->contains('critical')) {
             $vars['alert_menu_class'] = 'danger';
@@ -315,10 +316,6 @@ class MenuComposer
 
         // Poller Settings
         $vars['poller_clusters'] = \App\Models\PollerCluster::exists();
-
-        // Search bar
-        $vars['typeahead_limit'] = LibrenmsConfig::get('webui.global_search_result_limit');
-        $vars['global_search_ctrlf_focus'] = UserPref::getPref(Auth::user(), 'global_search_ctrlf_focus');
 
         // Plugins
         $vars['has_v1_plugins'] = Plugins::count() != 0;
