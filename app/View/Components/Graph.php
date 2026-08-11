@@ -6,6 +6,7 @@ use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Support\Arr;
 use Illuminate\View\Component;
+use Illuminate\View\View;
 
 class Graph extends Component
 {
@@ -16,125 +17,55 @@ class Graph extends Component
 
     /** @var array<string, int> */
     const BREAKPOINTS = [
-        'sm' => 640,
-        'md' => 768,
-        'lg' => 1024,
-        'xl' => 1280,
         '2xl' => 1536,
+        'xl' => 1280,
+        'lg' => 1024,
+        'md' => 768,
+        'sm' => 640,
     ];
 
-    /**
-     * @var array
-     */
-    public $vars;
-    /**
-     * @var int|null
-     */
-    public $width;
-    /**
-     * @var int|null
-     */
-    public $height;
-    /**
-     * @var string
-     */
-    public $type;
-    /**
-     * @var string
-     */
-    public $legend;
-    /**
-     * @var int
-     */
-    public $absolute_size;
-    /**
-     * @var bool
-     */
-    private $popup;
+    public ?int $width;
+    public ?int $height;
+    private bool $popup;
 
-    /**
-     * Create a new component instance.
-     *
-     * @param  string  $type
-     * @param  array  $vars
-     * @param  int|string  $from
-     * @param  int|string  $to
-     * @param  string  $legend
-     * @param  string  $aspect
-     * @param  int|null  $width
-     * @param  int|null  $height
-     * @param  array<string, int>  $columns
-     * @param  int  $absolute_size
-     * @param  Device|int|null  $device
-     * @param  Port|int|null  $port
-     * @param  bool  $link
-     * @param  string  $popupTitle
-     */
     public function __construct(
-        string $type = '',
-        array $vars = [],
-        public $from = '-1d',
-        public $to = null,
-        string $legend = 'no',
+        public string $type = '',
+        public array $vars = [],
+        public int|string $from = '-1d',
+        public int|string|null $to = null,
+        public string $legend = 'no',
         string $aspect = 'normal',
         ?int $width = null,
         ?int $height = null,
         public array $columns = [],
-        int $absolute_size = 0,
-        private $link = true,
-        $popup = false,
+        public int $absolute_size = 0,
+        private readonly bool|string $link = true,
+        bool|string $popup = false,
         public mixed $popupTitle = '',
-        $device = null,
-        $port = null
+        Device|int|null $device = null,
+        Port|int|null $port = null
     ) {
-        $this->type = $type;
-        $this->vars = $vars;
-        $this->legend = $legend;
-        $this->absolute_size = $absolute_size;
-        [$this->width, $this->height] = $this->graphDimensions($aspect, $width, $height);
+        [$this->width, $this->height] = $this->graphDimensions($width, $height, $aspect === 'wide');
         $this->popup = filter_var($popup, FILTER_VALIDATE_BOOLEAN);
-
-        // handle device and port ids/models for convenience could be set in $vars
-        if ($device instanceof Device) {
-            $this->vars['device'] = $device->device_id;
-        } elseif (is_numeric($device)) {
-            $this->vars['device'] = $device;
-        } elseif ($port instanceof Port) {
-            $this->vars['id'] = $port->port_id;
-        } elseif (is_numeric($port)) {
-            $this->vars['id'] = $port;
-        }
+        $this->vars = $this->resolveVars($this->vars, $device, $port);
     }
 
     /**
      * Get the view / contents that represent the component.
-     *
-     * @return \Illuminate\Contracts\View\View|\Closure|string
      */
-    public function render()
+    public function render(): View
     {
         $view = $this->popup ? 'components.graph-popup' : ($this->link === false ? 'components.graph' : 'components.linked-graph');
-        $data = [
+
+        return view($view, [
             'link' => $this->getLink(),
             'src' => $this->getSrc(),
-        ];
-
-        return view($view, $data);
+        ]);
     }
 
-    /**
-     * @param  mixed  $value
-     * @param  int|string  $key
-     * @return bool
-     */
-    public function filterAttributes($value, $key): bool
+    public function filterAttributes(mixed $value, int|string $key): bool
     {
-        $filtered = [
-            'legend',
-            'height',
-            'loading',
-            'img-class',
-        ];
+        $filtered = ['legend', 'height', 'loading', 'img-class'];
 
         // do not add class and style to the image, add them to the outer link
         if ($this->link) {
@@ -143,6 +74,32 @@ class Graph extends Component
         }
 
         return ! in_array($key, $filtered);
+    }
+
+    /**
+     * Fold a device or port reference into the graph vars, preferring device over port.
+     *
+     * @return array<string, mixed>
+     */
+    private function resolveVars(array $vars, Device|int|null $device, Port|int|null $port): array
+    {
+        if ($device instanceof Device) {
+            return [...$vars, 'device' => $device->device_id];
+        }
+
+        if (is_numeric($device)) {
+            return [...$vars, 'device' => $device];
+        }
+
+        if ($port instanceof Port) {
+            return [...$vars, 'id' => $port->port_id];
+        }
+
+        if (is_numeric($port)) {
+            return [...$vars, 'id' => $port];
+        }
+
+        return $vars;
     }
 
     private function getSrc(): string
@@ -162,54 +119,43 @@ class Graph extends Component
     /**
      * @return array{0: int, 1: int}
      */
-    private function graphDimensions(string $aspect, ?int $width, ?int $height): array
+    private function graphDimensions(?int $width, ?int $height, bool $isWide): array
     {
-        [$defaultWidth, $aspectRatio] = $this->defaultGraphDimensions($aspect);
+        $aspectRatio = $isWide ? self::DEFAULT_WIDE_ASPECT_RATIO : self::DEFAULT_NORMAL_ASPECT_RATIO;
 
-        $width = $width ?: $defaultWidth;
+        $width = $width ?: $this->resolveDefaultWidth($isWide);
         $height = $height ?: (int) round($width / $aspectRatio);
 
         return [$width, $height];
     }
 
     /**
-     * @return array{0: int, 1: float}
+     * Base width for this aspect, divided across configured columns when the graph
+     * is in a column grid and the screen width is known.
      */
-    private function defaultGraphDimensions(string $aspect): array
-    {
-        [$defaultWidth, $aspectRatio] = $aspect === 'wide'
-            ? [self::DEFAULT_WIDE_WIDTH, self::DEFAULT_WIDE_ASPECT_RATIO]
-            : [self::DEFAULT_NORMAL_WIDTH, self::DEFAULT_NORMAL_ASPECT_RATIO];
-
-        if ($aspect === 'wide' || $this->columns !== []) {
-            $defaultWidth = $this->responsiveGraphWidth($defaultWidth);
-        }
-
-        return [$defaultWidth, $aspectRatio];
-    }
-
-    private function responsiveGraphWidth(int $defaultWidth): int
+    private function resolveDefaultWidth(bool $isWide): int
     {
         $screenWidth = session('screen_width');
-        if (! is_numeric($screenWidth)) {
-            return $defaultWidth;
+
+        if ($this->columns === [] || ! is_numeric($screenWidth)) {
+            return $isWide ? self::DEFAULT_WIDE_WIDTH : self::DEFAULT_NORMAL_WIDTH;
         }
 
-        $screenWidth = (int) $screenWidth;
-
-        return intdiv($screenWidth, $this->columnsFor($screenWidth));
+        return intdiv((int) $screenWidth, $this->columnsFor((int) $screenWidth));
     }
 
+    /**
+     * Column count for the largest configured breakpoint the screen width satisfies.
+     */
     private function columnsFor(int $screenWidth): int
     {
-        $columns = 1;
         foreach (self::BREAKPOINTS as $breakpoint => $minimumWidth) {
             if ($screenWidth >= $minimumWidth && array_key_exists($breakpoint, $this->columns)) {
-                $columns = max(1, $this->columns[$breakpoint]);
+                return max(1, $this->columns[$breakpoint]);
             }
         }
 
-        return $columns;
+        return 1;
     }
 
     private function getLink(): string
