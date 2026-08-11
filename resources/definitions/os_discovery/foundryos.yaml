@@ -1,3 +1,89 @@
 modules:
-  os:
-    sysDescr_regex: '/Foundry Networks, Inc. (?<hardware>[^,]+), IronWare Version (?<version>\S+)/'
+    # snAgGblDynMemTotal/Free are marked deprecated in FOUNDRY-SN-AGENT-MIB in
+    # favour of snAgSystemDRAMTotal/Free (which is why ironware.yaml uses the
+    # latter). The legacy hardware this OS covers implements only the deprecated
+    # pair: snAgSystemDRAM* returns no such object on every device tested
+    # (FES4802, FES2402-PREM-ILP, FWSX448 on 04.x, and NetIron MLX), while
+    # snAgGblDynMem* is populated on all of them.
+    mempools:
+        data:
+            -
+                total: FOUNDRY-SN-AGENT-MIB::snAgGblDynMemTotal
+                free: FOUNDRY-SN-AGENT-MIB::snAgGblDynMemFree
+                descr: 'Dynamic Memory'
+    os:
+        sysDescr_regex: '/Foundry Networks, Inc. (?<hardware>[^,]+), IronWare Version (?<version>\S+)/'
+        serial: FOUNDRY-SN-AGENT-MIB::snChasSerNum.0
+    processors:
+        data:
+            -
+                oid: FOUNDRY-SN-AGENT-MIB::snAgGblCpuUtil1MinAvg
+                num_oid: '.1.3.6.1.4.1.1991.1.1.2.1.52.{{ $index }}'
+                descr: 'Processor'
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - FOUNDRY-SN-AGENT-MIB::snAgentTempSensorDescr
+                        - FOUNDRY-SN-AGENT-MIB::snChasWarningTemperature
+                        - FOUNDRY-SN-AGENT-MIB::snChasShutdownTemperature
+        temperature:
+            data:
+                # Chassis-based platforms (e.g. NetIron MLX) expose per-module
+                # sensors here. Fixed-configuration platforms (FES) do not
+                # implement this table at all.
+                -
+                    oid: FOUNDRY-SN-AGENT-MIB::snAgentTempTable
+                    value: FOUNDRY-SN-AGENT-MIB::snAgentTempValue
+                    divisor: 2
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.2.13.1.1.4.{{ $index }}'
+                    descr: FOUNDRY-SN-AGENT-MIB::snAgentTempSensorDescr
+                    index: '{{ $index }}'
+                    group: 'Module Temperatures'
+                # Fixed-configuration platforms (FES4802, FES2402) expose only a
+                # single chassis temperature, with the device's own warning and
+                # shutdown thresholds. Skipped where the per-module table exists
+                # so platforms implementing both (FWSX448) are not double-counted.
+                -
+                    oid: FOUNDRY-SN-AGENT-MIB::snChasActualTemperature
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.1.1.18.{{ $index }}'
+                    divisor: 2
+                    descr: 'Chassis'
+                    index: 'snChasActualTemperature.{{ $index }}'
+                    warn_limit: FOUNDRY-SN-AGENT-MIB::snChasWarningTemperature.0
+                    high_limit: FOUNDRY-SN-AGENT-MIB::snChasShutdownTemperature.0
+                    skip_values:
+                        -
+                            oid: FOUNDRY-SN-AGENT-MIB::snAgentTempSensorDescr.1.1
+                            op: 'exists'
+                            value: true
+        state:
+            data:
+                # snChasPwrSupplyDescription is an empty string on some platforms
+                # (observed on NetIron MLX), so the index is used for the label to
+                # stay consistent with the ironware definition.
+                -
+                    oid: FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyTable
+                    value: FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyOperStatus
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.1.2.1.1.3.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    index: 'snChasPwrSupplyOperStatus.{{ $index }}'
+                    group: 'Power Supply Status'
+                    state_name: snChasPwrSupplyOperStatus
+                    states:
+                        - { value: 1, descr: other, generic: 3 }
+                        - { value: 2, descr: normal, generic: 0 }
+                        - { value: 3, descr: failure, generic: 2 }
+                -
+                    oid: FOUNDRY-SN-AGENT-MIB::snChasFanTable
+                    value: FOUNDRY-SN-AGENT-MIB::snChasFanOperStatus
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.1.3.1.1.3.{{ $index }}'
+                    descr: '{{ FOUNDRY-SN-AGENT-MIB::snChasFanDescription }}'
+                    index: 'snChasFanOperStatus.{{ $index }}'
+                    group: 'Fan Status'
+                    state_name: snChasFanOperStatus
+                    states:
+                        - { value: 1, descr: other, generic: 3 }
+                        - { value: 2, descr: normal, generic: 0 }
+                        - { value: 3, descr: failure, generic: 2 }
