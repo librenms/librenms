@@ -282,12 +282,21 @@ class AlertsController extends TableController
     private function renderHostname(Alert $alert): string
     {
         $faultDetail = $this->renderFaultDetail($alert->latestLog);
-        $collapseClass = $this->incidentCollapseClass(implode('', $alert->latestlog->details));
+        $collapseClass = $this->incidentCollapseClass($faultDetail);
 
         return '<div class="incident">'
             . Url::modernDeviceLink($alert->device)
             . '<div id="incident' . $alert->id . '"' . $collapseClass . '>' . $faultDetail . '</div>'
             . '</div>';
+    }
+
+    private function countPrintableCharacters(string $string): int
+    {
+        $string = trim(strip_tags($string));
+        $string = preg_replace('/[[:^print:]]\s/u', '', $string);
+        $string = preg_replace('/ +/', ' ', $string);
+
+        return strlen($string);
     }
 
     private function incidentCollapseClass(string $detail): string
@@ -297,7 +306,7 @@ class AlertsController extends TableController
         }
 
         $uncollapseKeyCount = request()->input('uncollapse_key_count');
-        $maxRowLength = strlen(strip_tags($detail));
+        $maxRowLength = $this->countPrintableCharacters($detail);
 
         return (is_numeric($uncollapseKeyCount) && $maxRowLength < (int) $uncollapseKeyCount)
             ? ''

@@ -65,6 +65,7 @@ use App\Http\Controllers\Widgets;
 use App\Http\Controllers\WidgetSettingsController;
 use App\Http\Controllers\WirelessSensorController;
 use App\Http\Middleware\AuthenticateGraph;
+use App\Http\Middleware\EnsureApiV1Enabled;
 use Illuminate\Support\Facades\Auth as AuthFacade;
 use Illuminate\Support\Facades\Route;
 
@@ -142,6 +143,11 @@ Route::middleware(['auth'])->group(function (): void {
         Route::patch('api-access/{id}', [ApiAccessController::class, 'update'])->name('api-access.update')->whereNumber('id');
         Route::post('api-access/{id}/reset', [ApiAccessController::class, 'reset'])->name('api-access.reset')->whereNumber('id');
         Route::delete('api-access/{id}', [ApiAccessController::class, 'destroy'])->name('api-access.destroy')->whereNumber('id');
+        Route::middleware(EnsureApiV1Enabled::class)->group(function (): void {
+            Route::post('api-access/v1', [ApiAccessController::class, 'storeV1'])->name('api-access.v1.store');
+            Route::patch('api-access/v1/{id}/renew', [ApiAccessController::class, 'renewV1'])->name('api-access.v1.renew')->whereNumber('id');
+            Route::delete('api-access/v1/{id}', [ApiAccessController::class, 'destroyV1'])->name('api-access.v1.destroy')->whereNumber('id');
+        });
     });
     Route::resource('users', UserController::class);
     Route::prefix('users/{user}/permissions')->name('users.permissions.')->group(function (): void {
@@ -190,6 +196,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('config/backups', [Device\Tabs\ConfigController::class, 'backups'])->name('config.backups');
         Route::get('config/backup', [Device\Tabs\ConfigController::class, 'backup'])->name('config.backup');
         Route::get('config/diff', [Device\Tabs\ConfigController::class, 'diff'])->name('config.diff');
+        Route::get('accesspoints/{accessPoint}', [Device\Tabs\AccessPointsController::class, 'show'])->name('accesspoints.show')->scopeBindings();
         Route::put('module/{module}', [Device\Tabs\ModuleController::class, 'update'])->name('module.update');
         Route::delete('module/{module}', [Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
     });
@@ -310,6 +317,8 @@ Route::middleware(['auth'])->group(function (): void {
         // misc ajax controllers
         Route::get('search/devices', Ajax\Search\DevicesSearchController::class)->name('ajax.search.devices');
         Route::get('search/ports', Ajax\Search\PortsSearchController::class)->name('ajax.search.ports');
+        Route::get('search/fdb', Ajax\Search\FdbSearchController::class)->name('ajax.search.fdb');
+        Route::get('search/arp', Ajax\Search\ArpSearchController::class)->name('ajax.search.arp');
         Route::get('search/health', Ajax\Search\HealthSearchController::class)->name('ajax.search.health');
         Route::get('search/routing', Ajax\Search\RoutingSearchController::class)->name('ajax.search.routing');
         Route::get('search/logs', Ajax\Search\LogsSearchController::class)->name('ajax.search.logs');
@@ -364,6 +373,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('alertlog/export', [Table\AlertLogController::class, 'export'])->name('table.alertlog.export');
             Route::post('alerts', Table\AlertsController::class)->name('table.alerts');
             Route::post('alert-schedule', Table\AlertScheduleController::class);
+            Route::post('access-points', Table\AccessPointController::class)->name('table.access-points');
             Route::post('customers', Table\CustomersController::class);
             Route::post('diskio', Table\DiskioController::class)->name('table.diskio');
             Route::post('device', Table\DeviceController::class)->name('table.device');
@@ -458,6 +468,8 @@ Route::prefix('install')->group(function (): void {
 // Legacy routes
 Route::any('/dummy_legacy_auth/{path?}', [LegacyController::class, 'dummy'])->middleware('auth');
 Route::any('/dummy_legacy_unauth/{path?}', [LegacyController::class, 'dummy']);
+// api/v1 is excluded so those URLs 404 when the v1 API is disabled instead
+// of falling through to the legacy page handler.
 Route::any('/{path?}', [LegacyController::class, 'index'])
-    ->where('path', '^((?!_debugbar).)*')
+    ->where('path', '^(?!api/v1($|/))((?!_debugbar).)*')
     ->middleware('auth');

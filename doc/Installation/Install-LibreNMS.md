@@ -14,57 +14,36 @@ Connect to the server command line and follow the instructions below.
     at `mysql>` prompts) or temporarily become a user with root
     privileges with `sudo -s` or `sudo -i`.
 
-**Please note the minimum supported PHP version is @= php.version_min =@**
+**Please note the minimum supported PHP version is @= php.version_min =@, the recommended version is @= php.version_recommended =@**
 
 ## Install Required Packages
 
-=== "Ubuntu 24.04"
+=== "Ubuntu 26.04"
     === "NGINX"
         ```
         apt install acl curl fping git mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip python3-command-runner python3-dotenv python3-pip python3-psutil python3-pymysql python3-redis python3-setuptools python3-systemd rrdtool snmp snmpd traceroute unzip whois
         ```
 
-=== "Ubuntu 22.04"
+=== "Ubuntu 24.04"
     === "NGINX"
         ```
-        apt install software-properties-common
-        LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
+        apt install lsb-release ca-certificates curl
+        curl -sSLo /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb
+        dpkg -i /tmp/debsuryorg-archive-keyring.deb
+        echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
         apt update
-        apt install acl curl fping git mariadb-client mariadb-server mtr-tiny nginx-full nmap php8.3-cli php8.3-curl php8.3-fpm php8.3-gd php8.3-gmp php8.3-mbstring php8.3-mysql php8.3-snmp php8.3-xml php8.3-zip python3-dotenv python3-pip python3-psutil python3-pymysql python3-redis python3-setuptools python3-systemd rrdtool snmp snmpd traceroute unzip whois
-        ```
-
-    === "Apache"
-        ```
-        apt install software-properties-common
-        add-apt-repository universe
-        LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
-        apt update
-        apt install acl apache2 curl fping git libapache2-mod-fcgid mariadb-client mariadb-server mtr-tiny nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip python3-dotenv python3-pip python3-psutil python3-pymysql python3-redis python3-setuptools python3-systemd rrdtool snmp snmpd traceroute unzip whois
-        ```
-
-=== "CentOS 8"
-    === "NGINX"
-        ```
-        dnf -y install epel-release
-        dnf -y install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
-        dnf module reset php
-        dnf module enable php:8.2
-        dnf install bash-completion cronie fping git mariadb-server mtr net-snmp net-snmp-utils nginx nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip
-        ```
-
-    === "Apache"
-        ```
-        dnf -y install epel-release
-        dnf -y install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
-        dnf module reset php
-        dnf module enable php:8.2
-        dnf install bash-completion cronie fping gcc git httpd mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-devel python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip
+        apt install acl curl fping git mariadb-client mariadb-server mtr-tiny nginx-full nmap php@= php.version_recommended =@-cli php@= php.version_recommended =@-curl php@= php.version_recommended =@-fpm php@= php.version_recommended =@-gd php@= php.version_recommended =@-gmp php@= php.version_recommended =@-mbstring php@= php.version_recommended =@-mysql php@= php.version_recommended =@-snmp php@= php.version_recommended =@-xml php@= php.version_recommended =@-zip python3-command-runner python3-dotenv python3-pip python3-psutil python3-pymysql python3-redis python3-setuptools python3-systemd rrdtool snmp snmpd traceroute unzip whois
         ```
 
 === "Debian 12"
     === "NGINX"
         ```
-        apt install acl ca-certificates curl fping git lsb-release mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-mbstring php-mysql php-snmp php-xml php-zip python3-dotenv python3-pip python3-psutil python3-pymysql python3-redis python3-setuptools python3-systemd rrdtool snmp snmpd unzip wget whois
+        apt install lsb-release ca-certificates curl
+        curl -sSLo /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb
+        dpkg -i /tmp/debsuryorg-archive-keyring.deb
+        echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
+        apt update
+        apt install acl curl fping git mariadb-client mariadb-server mtr-tiny nginx-full nmap php@= php.version_recommended =@-cli php@= php.version_recommended =@-curl php@= php.version_recommended =@-fpm php@= php.version_recommended =@-gd php@= php.version_recommended =@-gmp php@= php.version_recommended =@-mbstring php@= php.version_recommended =@-mysql php@= php.version_recommended =@-snmp php@= php.version_recommended =@-xml php@= php.version_recommended =@-zip python3-dotenv python3-pip python3-psutil python3-pymysql python3-redis python3-setuptools python3-systemd rrdtool snmp snmpd unzip whois
         ```
 
 === "Debian 13"
@@ -123,27 +102,22 @@ See <https://php.net/manual/en/timezones.php> for a list of supported
 timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
 Ensure date.timezone is set in php.ini to your preferred time zone.
 
+=== "Ubuntu 26.04"
+    ```bash
+    vi /etc/php/8.4/fpm/php.ini
+    vi /etc/php/8.4/cli/php.ini
+    ```
+
 === "Ubuntu 24.04"
     ```bash
-    vi /etc/php/8.3/fpm/php.ini
-    vi /etc/php/8.3/cli/php.ini
-    ```
-
-=== "Ubuntu 22.04"
-    ```bash
-    vi /etc/php/8.3/fpm/php.ini
-    vi /etc/php/8.3/cli/php.ini
-    ```
-
-=== "CentOS 8"
-    ```
-    vi /etc/php.ini
+    vi /etc/php/@= php.version_recommended =@/fpm/php.ini
+    vi /etc/php/@= php.version_recommended =@/cli/php.ini
     ```
 
 === "Debian 12"
     ```bash
-    vi /etc/php/8.2/fpm/php.ini
-    vi /etc/php/8.2/cli/php.ini
+    vi /etc/php/@= php.version_recommended =@/fpm/php.ini
+    vi /etc/php/@= php.version_recommended =@/cli/php.ini
     ```
 
 === "Debian 13"
@@ -161,7 +135,7 @@ timedatectl set-timezone Etc/UTC
 
 ## Configure MariaDB
 
-=== "Ubuntu 24.04"
+=== "Ubuntu 26.04"
     ```
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
     ```
@@ -173,21 +147,9 @@ timedatectl set-timezone Etc/UTC
     lower_case_table_names=0
     ```
 
-=== "Ubuntu 22.04"
+=== "Ubuntu 24.04"
     ```
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
-    ```
-
-    Within the `[mysqld]` section add:
-
-    ```
-    innodb_file_per_table=1
-    lower_case_table_names=0
-    ```
-
-=== "CentOS 8"
-    ```
-    vi /etc/my.cnf.d/mariadb-server.cnf
     ```
 
     Within the `[mysqld]` section add:
@@ -246,28 +208,22 @@ exit
 
 ## Configure PHP-FPM
 
+=== "Ubuntu 26.04"
+    ```bash
+    cp /etc/php/8.4/fpm/pool.d/www.conf /etc/php/8.4/fpm/pool.d/librenms.conf
+    vi /etc/php/8.4/fpm/pool.d/librenms.conf
+    ```
+
 === "Ubuntu 24.04"
     ```bash
-    cp /etc/php/8.3/fpm/pool.d/www.conf /etc/php/8.3/fpm/pool.d/librenms.conf
-    vi /etc/php/8.3/fpm/pool.d/librenms.conf
-    ```
-
-=== "Ubuntu 22.04"
-    ```bash
-    cp /etc/php/8.3/fpm/pool.d/www.conf /etc/php/8.3/fpm/pool.d/librenms.conf
-    vi /etc/php/8.3/fpm/pool.d/librenms.conf
-    ```
-
-=== "CentOS 8"
-    ```bash
-    cp /etc/php-fpm.d/www.conf /etc/php-fpm.d/librenms.conf
-    vi /etc/php-fpm.d/librenms.conf
+    cp /etc/php/@= php.version_recommended =@/fpm/pool.d/www.conf /etc/php/@= php.version_recommended =@/fpm/pool.d/librenms.conf
+    vi /etc/php/@= php.version_recommended =@/fpm/pool.d/librenms.conf
     ```
 
 === "Debian 12"
     ```bash
-    cp /etc/php/8.2/fpm/pool.d/www.conf /etc/php/8.2/fpm/pool.d/librenms.conf
-    vi /etc/php/8.2/fpm/pool.d/librenms.conf
+    cp /etc/php/@= php.version_recommended =@/fpm/pool.d/www.conf /etc/php/@= php.version_recommended =@/fpm/pool.d/librenms.conf
+    vi /etc/php/@= php.version_recommended =@/fpm/pool.d/librenms.conf
     ```
 
 === "Debian 13"
@@ -297,7 +253,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
 
 ## Configure Web Server
 
-=== "Ubuntu 24.04"
+=== "Ubuntu 26.04"
     === "NGINX"
         ```bash
         vi /etc/nginx/conf.d/librenms.conf
@@ -332,10 +288,10 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         ```bash
         rm /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default
         systemctl restart nginx
-        systemctl restart php8.3-fpm
+        systemctl restart php8.4-fpm
         ```
 
-=== "Ubuntu 22.04"
+=== "Ubuntu 24.04"
     === "NGINX"
         ```bash
         vi /etc/nginx/conf.d/librenms.conf
@@ -370,89 +326,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         ```bash
         rm /etc/nginx/sites-enabled/default
         systemctl restart nginx
-        systemctl restart php8.3-fpm
-        ```
-
-=== "CentOS 8"
-    === "NGINX"
-        ```
-        vi /etc/nginx/conf.d/librenms.conf
-        ```
-
-        Add the following config, edit `server_name` as required:
-
-        ```nginx
-        server {
-         listen      80;
-         server_name librenms.example.com;
-         root        /opt/librenms/html;
-         index       index.php;
-
-         charset utf-8;
-         gzip on;
-         gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
-         location / {
-          try_files $uri $uri/ /index.php?$query_string;
-         }
-         location ~ [^/]\.php(/|$) {
-          fastcgi_pass unix:/run/php-fpm-librenms.sock;
-          fastcgi_split_path_info ^(.+\.php)(/.+)$;
-          include fastcgi.conf;
-         }
-         location ~ /\.(?!well-known).* {
-          deny all;
-         }
-        }
-        ```
-
-        > NOTE: If this is the only site you are hosting on this server (it
-        > should be :)) then you will need to disable the default site.
-
-        Delete the `server` section from `/etc/nginx/nginx.conf`
-
-        ```
-        systemctl enable --now nginx
-        systemctl enable --now php-fpm
-        ```
-
-    === "Apache"
-        Create the librenms.conf:
-
-        ```
-        vi /etc/httpd/conf.d/librenms.conf
-        ```
-
-        Add the following config, edit `ServerName` as required:
-
-        ```apache
-        <VirtualHost *:80>
-          DocumentRoot /opt/librenms/html/
-          ServerName  librenms.example.com
-
-          AllowEncodedSlashes NoDecode
-          <Directory "/opt/librenms/html/">
-            Require all granted
-            AllowOverride All
-            Options FollowSymLinks MultiViews
-          </Directory>
-
-          # Enable http authorization headers
-          <IfModule setenvif_module>
-            SetEnvIfNoCase ^Authorization$ "(.+)" HTTP_AUTHORIZATION=$1
-          </IfModule>
-
-          <FilesMatch ".+\.php$">
-            SetHandler "proxy:unix:/run/php-fpm-librenms.sock|fcgi://localhost"
-          </FilesMatch>
-        </VirtualHost>
-        ```
-
-        > NOTE: If this is the only site you are hosting on this server (it
-        > should be :)) then you will need to disable the default site. `rm -f /etc/httpd/conf.d/welcome.conf`
-
-        ```
-        systemctl enable --now httpd
-        systemctl enable --now php-fpm
+        systemctl restart php@= php.version_recommended =@-fpm
         ```
 
 === "Debian 12"
@@ -490,7 +364,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         ```bash
         rm /etc/nginx/sites-enabled/default
         systemctl reload nginx
-        systemctl restart php8.2-fpm
+        systemctl restart php@= php.version_recommended =@-fpm
         ```
 
 === "Debian 13"
@@ -533,68 +407,11 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
 
 ## SELinux
 
+=== "Ubuntu 26.04"
+    SELinux not enabled by default
+
 === "Ubuntu 24.04"
     SELinux not enabled by default
-
-=== "Ubuntu 22.04"
-    SELinux not enabled by default
-
-=== "CentOS 8"
-    Install the policy tool for SELinux:
-
-    ```
-    dnf install policycoreutils-python-utils
-    ```
-
-    <h3>Configure the contexts needed by LibreNMS</h3>
-
-    ```
-    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/html(/.*)?'
-    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/(rrd|storage)(/.*)?'
-    semanage fcontext -a -t httpd_log_t "/opt/librenms/logs(/.*)?"
-    semanage fcontext -a -t httpd_cache_t '/opt/librenms/cache(/.*)?'
-    semanage fcontext -a -t bin_t '/opt/librenms/librenms-service.py'
-    semanage fcontext -a -t httpd_cache_t '/opt/librenms/cache(/.*)?'
-    restorecon -RFvv /opt/librenms
-    setsebool -P httpd_can_sendmail=1
-    setsebool -P httpd_execmem 1
-    chcon -t httpd_sys_rw_content_t /opt/librenms/.env
-    ```
-
-    <h3>Allow fping</h3>
-
-    Create the file http_fping.tt with the following contents. You can
-    create this file anywhere, as it is a throw-away file. The last step
-    in this install procedure will install the module in the proper
-    location.
-
-    ```
-    module http_fping 1.0;
-
-    require {
-    type httpd_t;
-    class capability net_raw;
-    class rawip_socket { getopt create setopt write read };
-    }
-
-    #============= httpd_t ==============
-    allow httpd_t self:capability net_raw;
-    allow httpd_t self:rawip_socket { getopt create setopt write read };
-    ```
-
-    Then run these commands
-
-    ```
-    checkmodule -M -m -o http_fping.mod http_fping.tt
-    semodule_package -o http_fping.pp -m http_fping.mod
-    semodule -i http_fping.pp
-    ```
-
-    Additional SELinux problems may be found by executing the following command
-
-    ```
-    audit2why < /var/log/audit/audit.log
-    ```
 
 === "Debian 12"
     SELinux not enabled by default
@@ -603,18 +420,11 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
     SELinux not enabled by default
 
 ## Allow access through firewall
+=== "Ubuntu 26.04"
+    Firewall not enabled by default
+
 === "Ubuntu 24.04"
     Firewall not enabled by default
-
-=== "Ubuntu 22.04"
-    Firewall not enabled by default
-
-=== "CentOS 8"
-
-    ```
-    firewall-cmd --zone public --add-service http --add-service https
-    firewall-cmd --permanent --zone public --add-service http --add-service https
-    ```
 
 === "Debian 12"
     Firewall not enabled by default
