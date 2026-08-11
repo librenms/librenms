@@ -1,7 +1,7 @@
 <x-device.overview.panel :title="__('Recent Events')" icon="fa fa-bookmark" :href="route('device.eventlog', ['device' => $device->device_id])">
     <div class="tw:divide-y tw:divide-gray-300 tw:dark:divide-zinc-800">
         @forelse($rows as $row)
-            <div class="tw:flex tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
+            <div class="tw:flex tw:items-center tw:gap-2.5 tw:px-2 tw:py-1 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
                 <span class="alert-status {{ $row['severityClass'] }}"></span>
                 <span class="tw:shrink-0 tw:whitespace-nowrap">{{ \LibreNMS\Util\Time::format($row['entry']->datetime, 'compact') }}</span>
                 <span class="tw:w-36 tw:shrink-0 tw:truncate" title="{{ $row['port']?->getLabel() }}">

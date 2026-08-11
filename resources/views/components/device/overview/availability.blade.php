@@ -1,5 +1,5 @@
 <x-device.overview.panel :title="__('Availability (90 days)')" icon="fa fa-check-circle">
-    <div class="tw:p-4">
+    <div class="tw:p-3">
         <div class="tw:flex tw:items-center tw:gap-px">
             @foreach($availability['days'] as $day)
                 <div x-data="{ open: false, x: 0, y: 0, place() { const rect = this.$el.getBoundingClientRect(); this.x = rect.left + rect.width / 2; this.y = rect.top; this.$nextTick(() => { const width = this.$refs.tip?.offsetWidth || 0; const padding = 8; this.x = Math.max(padding + width / 2, Math.min(window.innerWidth - padding - width / 2, this.x)); }); } }"
