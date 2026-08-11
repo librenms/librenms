@@ -4,7 +4,7 @@
     <x-device.overview.panel :title="__('Overall Traffic')" icon="fa fa-road">
         <div class="tw:divide-y tw:divide-gray-300 tw:dark:divide-zinc-800">
             <div class="tw:p-2">
-                <x-graph type="device_bits" :device="$device" aspect="wide" class="tw:w-full" img-class="tw:w-full tw:h-auto" popup
+                <x-graph type="device_bits" :device="$device" aspect="wide" :columns="['md' => 2]" class="tw:w-full" img-class="tw:w-full tw:h-auto" popup
                          :popup-title="$device->display . ' - ' . __('Device Traffic')" />
             </div>
             <div class="tw:flex tw:flex-wrap tw:gap-3 tw:p-3">

@@ -3,7 +3,7 @@
         :href="route('device', ['device' => $device->device_id, 'tab' => 'health', 'vars' => 'metric=mempool'])">
         <div class="tw:divide-y tw:divide-gray-300 tw:dark:divide-zinc-800">
             <div class="tw:p-2">
-                <x-graph type="device_mempool" :device="$device" aspect="wide" class="tw:w-full" img-class="tw:w-full tw:h-auto"
+                <x-graph type="device_mempool" :device="$device" aspect="wide" :columns="['md' => 2]" class="tw:w-full" img-class="tw:w-full tw:h-auto"
                          popup :popup-title="$device->display . ' - ' . __('Memory Usage')" />
             </div>
             @foreach($mempools as $data)

@@ -17,7 +17,7 @@
                 @endforeach
             @else
                 <div class="tw:p-2">
-                    <x-graph type="device_processor" :device="$device" aspect="wide" class="tw:w-full" img-class="tw:w-full tw:h-auto"
+                    <x-graph type="device_processor" :device="$device" aspect="wide" :columns="['md' => 2]" class="tw:w-full" img-class="tw:w-full tw:h-auto"
                              popup :popup-title="$device->display . ' - ' . __('CPU usage')" />
                 </div>
                 @foreach($processorGroups as $data)
