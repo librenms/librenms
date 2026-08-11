@@ -10,9 +10,18 @@ use Illuminate\View\Component;
 class Graph extends Component
 {
     const DEFAULT_WIDE_WIDTH = 340;
-    const DEFAULT_WIDE_HEIGHT = 100;
+    const DEFAULT_WIDE_ASPECT_RATIO = 3.4;
     const DEFAULT_NORMAL_WIDTH = 300;
-    const DEFAULT_NORMAL_HEIGHT = 150;
+    const DEFAULT_NORMAL_ASPECT_RATIO = 2.0;
+
+    /** @var array<string, int> */
+    const BREAKPOINTS = [
+        'sm' => 640,
+        'md' => 768,
+        'lg' => 1024,
+        'xl' => 1280,
+        '2xl' => 1536,
+    ];
 
     /**
      * @var array
@@ -54,6 +63,7 @@ class Graph extends Component
      * @param  string  $aspect
      * @param  int|null  $width
      * @param  int|null  $height
+     * @param  array<string, int>  $columns
      * @param  int  $absolute_size
      * @param  Device|int|null  $device
      * @param  Port|int|null  $port
@@ -69,6 +79,7 @@ class Graph extends Component
         string $aspect = 'normal',
         ?int $width = null,
         ?int $height = null,
+        public array $columns = [],
         int $absolute_size = 0,
         private $link = true,
         $popup = false,
@@ -80,8 +91,7 @@ class Graph extends Component
         $this->vars = $vars;
         $this->legend = $legend;
         $this->absolute_size = $absolute_size;
-        $this->width = $width ?: ($aspect == 'wide' ? self::DEFAULT_WIDE_WIDTH : self::DEFAULT_NORMAL_WIDTH);
-        $this->height = $height ?: ($aspect == 'wide' ? self::DEFAULT_WIDE_HEIGHT : self::DEFAULT_NORMAL_HEIGHT);
+        [$this->width, $this->height] = $this->graphDimensions($aspect, $width, $height);
         $this->popup = filter_var($popup, FILTER_VALIDATE_BOOLEAN);
 
         // handle device and port ids/models for convenience could be set in $vars
@@ -147,6 +157,59 @@ class Graph extends Component
             'to' => $this->to,
             ...$this->vars,
         ]);
+    }
+
+    /**
+     * @return array{0: int, 1: int}
+     */
+    private function graphDimensions(string $aspect, ?int $width, ?int $height): array
+    {
+        [$defaultWidth, $aspectRatio] = $this->defaultGraphDimensions($aspect);
+
+        $width = $width ?: $defaultWidth;
+        $height = $height ?: (int) round($width / $aspectRatio);
+
+        return [$width, $height];
+    }
+
+    /**
+     * @return array{0: int, 1: float}
+     */
+    private function defaultGraphDimensions(string $aspect): array
+    {
+        [$defaultWidth, $aspectRatio] = $aspect === 'wide'
+            ? [self::DEFAULT_WIDE_WIDTH, self::DEFAULT_WIDE_ASPECT_RATIO]
+            : [self::DEFAULT_NORMAL_WIDTH, self::DEFAULT_NORMAL_ASPECT_RATIO];
+
+        if ($aspect === 'wide' || $this->columns !== []) {
+            $defaultWidth = $this->responsiveGraphWidth($defaultWidth);
+        }
+
+        return [$defaultWidth, $aspectRatio];
+    }
+
+    private function responsiveGraphWidth(int $defaultWidth): int
+    {
+        $screenWidth = session('screen_width');
+        if (! is_numeric($screenWidth)) {
+            return $defaultWidth;
+        }
+
+        $screenWidth = (int) $screenWidth;
+
+        return intdiv($screenWidth, $this->columnsFor($screenWidth));
+    }
+
+    private function columnsFor(int $screenWidth): int
+    {
+        $columns = 1;
+        foreach (self::BREAKPOINTS as $breakpoint => $minimumWidth) {
+            if ($screenWidth >= $minimumWidth && array_key_exists($breakpoint, $this->columns)) {
+                $columns = max(1, $this->columns[$breakpoint]);
+            }
+        }
+
+        return $columns;
     }
 
     private function getLink(): string
