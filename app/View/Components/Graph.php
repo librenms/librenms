@@ -140,7 +140,7 @@ class Graph extends Component
     {
         $aspectRatio = $isWide ? self::DEFAULT_WIDE_ASPECT_RATIO : self::DEFAULT_NORMAL_ASPECT_RATIO;
 
-        return (int) round($width / ($aspectRatio));
+        return (int) round($width / $aspectRatio);
     }
 
     /**
