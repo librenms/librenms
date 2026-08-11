@@ -45,7 +45,9 @@ class Graph extends Component
         Device|int|null $device = null,
         Port|int|null $port = null
     ) {
-        [$this->width, $this->height] = $this->graphDimensions($width, $height, $aspect === 'wide');
+        $isWide = $aspect === 'wide';
+        $this->width = $width ?: $this->resolveDefaultWidth($isWide);
+        $this->height = $height ?: $this->calculateDefaultHeight($this->width, $isWide);
         $this->popup = filter_var($popup, FILTER_VALIDATE_BOOLEAN);
         $this->vars = $this->resolveVars($this->vars, $device, $port);
     }
@@ -117,19 +119,6 @@ class Graph extends Component
     }
 
     /**
-     * @return array{0: int, 1: int}
-     */
-    private function graphDimensions(?int $width, ?int $height, bool $isWide): array
-    {
-        $aspectRatio = $isWide ? self::DEFAULT_WIDE_ASPECT_RATIO : self::DEFAULT_NORMAL_ASPECT_RATIO;
-
-        $width = $width ?: $this->resolveDefaultWidth($isWide);
-        $height = $height ?: (int) round($width / $aspectRatio);
-
-        return [$width, $height];
-    }
-
-    /**
      * Base width for this aspect, divided across configured columns when the graph
      * is in a column grid and the screen width is known.
      */
@@ -142,6 +131,16 @@ class Graph extends Component
         }
 
         return intdiv((int) $screenWidth, $this->columnsFor((int) $screenWidth));
+    }
+
+    /**
+     * Use the default aspect ratio to calculate the graph height based on the resolved width.
+     */
+    private function calculateDefaultHeight(int $width, bool $isWide): int
+    {
+        $aspectRatio = $isWide ? self::DEFAULT_WIDE_ASPECT_RATIO : self::DEFAULT_NORMAL_ASPECT_RATIO;
+
+        return (int) round($width / ($aspectRatio));
     }
 
     /**
