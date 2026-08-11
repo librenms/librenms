@@ -908,15 +908,10 @@ Route: `/api/v0/devices/:hostname/port_stack`
 
 - hostname can be either the device hostname or id
 
-Input:
-
-- valid_mappings: Filter the result by only showing valid mappings
-  ("0" values not shown).
-
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/port_stack?valid_mappings
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/port_stack
 ```
 
 Output:
@@ -928,15 +923,21 @@ Output:
     "count": 2,
     "mappings": [
         {
-            "device_id": "3742",
-            "port_id_high": "1001000",
-            "port_id_low": "51001",
+            "id": 2795,
+            "device_id": 3742,
+            "high_ifIndex": 17,
+            "high_port_id": 1001000,
+            "low_ifIndex": 18,
+            "low_port_id": 51001,
             "ifStackStatus": "active"
         },
         {
-            "device_id": "3742",
-            "port_id_high": "1001000",
-            "port_id_low": "52001",
+            "id": 2796,
+            "device_id": 3742,
+            "high_ifIndex": 17,
+            "high_port_id": 1001000,
+            "low_ifIndex": 24,
+            "low_port_id": 52001,
             "ifStackStatus": "active"
         }
     ]
