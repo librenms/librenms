@@ -10,6 +10,9 @@ use LibreNMS\Util\Color;
 class Percentage extends Component
 {
     public float $value;
+    /**
+     * @var string[]
+     */
     public array $colors;
     public ?float $shadowWidth;
     public ?string $graphUrl;

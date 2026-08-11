@@ -12,7 +12,7 @@ use Illuminate\View\Component;
 class Processors extends Component
 {
     /**
-     * @var Collection<int|string, array{processors: \Illuminate\Support\Collection, usage: int, warning: float}>
+     * @var Collection<(int|string), array{processors: Collection, usage: int, warning: float}>
      */
     public Collection $processorGroups;
 

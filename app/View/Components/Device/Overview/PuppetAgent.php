@@ -3,6 +3,7 @@
 namespace App\View\Components\Device\Overview;
 
 use App\Models\Application;
+use App\Models\ApplicationMetric;
 use App\Models\Device;
 use Closure;
 use Illuminate\Contracts\View\View;
@@ -11,6 +12,9 @@ use Illuminate\View\Component;
 
 class PuppetAgent extends Component
 {
+    /**
+     * @var \Illuminate\Database\Eloquent\Collection<int, ApplicationMetric>
+     */
     public Collection $metrics;
 
     public function __construct(
