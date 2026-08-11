@@ -199,6 +199,41 @@ final class IpTest extends TestCase
         $this->assertSame('2001:db8:85a3:341a::370:7334', IP::parse('2001:db8:85a3:341a::370:7334/128')->getNetworkAddress());
     }
 
+    public function testIterateIpv4Network(): void
+    {
+        $this->assertSame(
+            ['192.0.2.1', '192.0.2.2'],
+            iterator_to_array(IP::parse('192.0.2.2/30'))
+        );
+        $this->assertSame(['192.0.2.1'], iterator_to_array(IP::parse('192.0.2.1')));
+        $this->assertSame(['192.0.2.0', '192.0.2.1'], iterator_to_array(IP::parse('192.0.2.0/31')));
+    }
+
+    public function testIterateIpv6Network(): void
+    {
+        $this->assertSame(
+            ['2001:db8::1', '2001:db8::2'],
+            iterator_to_array(IP::parse('2001:db8::2/126'))
+        );
+        $this->assertSame(['2001:db8::1'], iterator_to_array(IP::parse('2001:db8::1')));
+        $this->assertSame(['2001:db8::', '2001:db8::1'], iterator_to_array(IP::parse('2001:db8::/127')));
+    }
+
+    public function testNetworkIterationIsLazy(): void
+    {
+        $addresses = IP::parse('2001:db8::/64')->getIterator();
+
+        $this->assertSame('2001:db8::1', $addresses->current());
+        $addresses->next();
+        $this->assertSame('2001:db8::2', $addresses->current());
+    }
+
+    public function testInvalidCidr(): void
+    {
+        $this->expectException(\LibreNMS\Exceptions\InvalidIpException::class);
+        IP::parse('192.0.2.1/33');
+    }
+
     public function testToSnmpIndex(): void
     {
         $this->assertSame('192.168.1.5', IP::parse('192.168.1.5')->toSnmpIndex());

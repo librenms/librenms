@@ -26,9 +26,13 @@
 
 namespace LibreNMS\Util;
 
+use Generator;
 use LibreNMS\Exceptions\InvalidIpException;
 
-abstract class IP implements \Stringable
+/**
+ * @implements \IteratorAggregate<int, string>
+ */
+abstract class IP implements \IteratorAggregate, \Stringable
 {
     public $ip;
     public $cidr;
@@ -177,6 +181,17 @@ abstract class IP implements \Stringable
     abstract public function inNetwork($network);
 
     /**
+     * Iterate over the usable addresses in this IP's network.
+     *
+     * A host address (a /32 or /128) yields only itself. Implementations may
+     * omit addresses which are not usable by hosts, such as an IPv4 network
+     * and broadcast address.
+     *
+     * @return Generator<int, string>
+     */
+    abstract public function getIterator(): Generator;
+
+    /**
      * Check if this IP is in one of multiple networks
      *
      * @param  array  $networks
@@ -273,6 +288,10 @@ abstract class IP implements \Stringable
         $parts = explode('/', $ip, 2);
         $addr = $parts[0];
         $cidr = $parts[1] ?? $this->host_bits;
+
+        if (! ctype_digit((string) $cidr) || (int) $cidr < 0 || (int) $cidr > $this->host_bits) {
+            throw new InvalidIpException("$ip does not contain a valid CIDR prefix");
+        }
 
         return [$addr, (int) $cidr];
     }

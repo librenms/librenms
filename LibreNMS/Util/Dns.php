@@ -89,6 +89,32 @@ class Dns implements Geocoder
         }, $result);
     }
 
+    public function resolveHostname(string $ip): ?string
+    {
+        try {
+            $ptr = $this->resolver->query($ip, 'PTR')->answer[0]->ptrdname ?? null;
+
+            if (! $ptr) {
+                return null;
+            }
+
+            $type = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? 'AAAA' : 'A';
+            $response = $this->resolver->query($ptr, $type);
+
+            foreach ($response->answer as $record) {
+                $address = $record->address ?? null;
+
+                if ($address !== null && (string) $address === $ip) {
+                    return rtrim((string) $ptr, '.');
+                }
+            }
+
+            return null;
+        } catch (\Net_DNS2_Exception) {
+            return null;
+        }
+    }
+
     /**
      * @param  string  $domain  Domain which has to be parsed
      * @param  string  $record  DNS Record which should be searched

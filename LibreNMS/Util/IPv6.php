@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Util;
 
+use Generator;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
 
@@ -126,6 +127,59 @@ class IPv6 extends IP
         array_unshift($net_bytes, 'n*'); // add pack format
 
         return self::ntop(call_user_func_array(pack(...), $net_bytes));
+    }
+
+    /**
+     * @return Generator<int, string>
+     */
+    public function getIterator(): Generator
+    {
+        $address = inet_pton($this->getNetworkAddress());
+        $last = $address;
+
+        for ($bit = $this->cidr; $bit < $this->host_bits; $bit++) {
+            $byte = intdiv($bit, 8);
+            $last[$byte] = chr(ord($last[$byte]) | (1 << (7 - ($bit % 8))));
+        }
+
+        // Preserve the scanner's existing convention of skipping the first
+        // and last address except for point-to-point and host prefixes.
+        if ($this->cidr < 127) {
+            $this->increment($address);
+            $this->decrement($last);
+        }
+
+        while (strcmp($address, $last) <= 0) {
+            yield self::ntop($address);
+
+            if ($address === $last) {
+                break;
+            }
+
+            $this->increment($address);
+        }
+    }
+
+    private function increment(string &$address): void
+    {
+        for ($byte = strlen($address) - 1; $byte >= 0; $byte--) {
+            $value = ord($address[$byte]);
+            $address[$byte] = chr(($value + 1) & 0xFF);
+            if ($value < 0xFF) {
+                break;
+            }
+        }
+    }
+
+    private function decrement(string &$address): void
+    {
+        for ($byte = strlen($address) - 1; $byte >= 0; $byte--) {
+            $value = ord($address[$byte]);
+            $address[$byte] = chr(($value - 1) & 0xFF);
+            if ($value > 0) {
+                break;
+            }
+        }
     }
 
     /**

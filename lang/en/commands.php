@@ -510,6 +510,25 @@ return [
             'devices-as-array' => 'Return the output as a JSON array instead of a JSON entry per device per line',
         ],
     ],
+    'scan:network' => [
+        'description' => 'Scan network for snmp hosts and add them to LibreNMS',
+        'arguments' => [
+            'network' => 'CIDR noted IP-Range to scan. Can be specified multiple times. This argument is only required if \'nets\' config is not set',
+        ],
+        'options' => [
+            'threads' => 'How many IPs to scan at a time. More will increase the scan speed, but could overload your system',
+            'poller-group' => 'The poller group all scanned devices will be added to',
+            'dns-only' => 'Only DNS resolved Devices',
+            'legend' => 'Print the legend',
+            'ping-fallback' => 'Add the device as an ICMP only device if it replies to ping but not SNMP',
+            'ping-only' => 'Always add the device as an ICMP only device',
+        ],
+        'errors' => [
+            'no_network' => 'Network is required if \'nets\' is not set in the config',
+            'invalid_network' => 'Invalid network format :network',
+            'invalid_excluded_network' => 'Invalid excluded network format :network',
+        ],
+    ],
     'smokeping:generate' => [
         'args-nonsense' => 'Use one of --probes and --targets',
         'config-insufficient' => 'To generate a smokeping configuration, you must set "smokeping.probes", "fping", and "fping6" in your configuration',
