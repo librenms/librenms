@@ -26,7 +26,7 @@ class Graph extends Component
 
     public ?int $width;
     public ?int $height;
-    private bool $popup;
+    private readonly bool $popup;
 
     public function __construct(
         public string $type = '',
