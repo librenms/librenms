@@ -3,17 +3,17 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.9.6.1.80",
-                    "sysDescr": "Linux, Cisco Systems, Inc WAP371 (WAP371-A-K9), Version 1.3.0.4",
-                    "sysContact": "<private>",
-                    "version": "Software 1.3.0.4",
-                    "hardware": "WAP371-A-K9 V03",
+                    "sysName": null,
+                    "sysObjectID": ".1.3.6.1.4.1.9.1.3413",
+                    "sysDescr": "Catalyst 1300X Series Managed Switch, 24GE+4SFP28,PoE (C1300X-24P-4X)",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": "",
                     "features": null,
-                    "location": "<private>",
+                    "location": null,
                     "os": "ciscosb",
                     "type": "network",
-                    "serial": "CCQ22111GBS",
+                    "serial": null,
                     "icon": "cisco.svg"
                 }
             ]
