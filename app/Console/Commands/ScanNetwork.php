@@ -29,10 +29,11 @@ namespace App\Console\Commands;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\ScanOutcome;
+use LibreNMS\Scan\NetworkScanner;
+use LibreNMS\Scan\ScanOptions;
 use LibreNMS\Util\IP;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Process\Process;
 
 class ScanNetwork extends LnmsCommand
 {
@@ -143,65 +144,40 @@ class ScanNetwork extends LnmsCommand
             ScanOutcome::Error->value => 0,
         ];
 
-        $ipsToScan = (function () use ($networksToScan, $excludedNets, $verbosity, &$stats): \Generator {
-            foreach ($networksToScan as $network) {
-                foreach ($network as $ip) {
-                    if ($this->isIpExcluded($ip, $excludedNets)) {
-                        if ($verbosity >= 64) {
-                            $this->line("<fg=red>{$ip} excluded by autodiscovery.nets-exclude</>");
-                        }
-                        $stats[ScanOutcome::Excluded->value]++;
-
-                        continue;
+        $allIps = [];
+        foreach ($networksToScan as $network) {
+            foreach ($network as $ip) {
+                if ($this->isIpExcluded($ip, $excludedNets)) {
+                    if ($verbosity >= 64) {
+                        $this->line("<fg=red>{$ip} excluded by autodiscovery.nets-exclude</>");
                     }
+                    $stats[ScanOutcome::Excluded->value]++;
 
-                    yield $ip;
+                    continue;
                 }
+
+                $allIps[] = $ip;
             }
-        })();
-
-        /** @var array<string, Process> $running */
-        $running = [];
-
-        try {
-            while ($ipsToScan->valid() || ! empty($running)) {
-                while (count($running) < $threads && $ipsToScan->valid()) {
-                    $scanIp = $ipsToScan->current();
-                    $ipsToScan->next();
-                    $process = new Process($this->buildWorkerCommand($scanIp, $dnsOnly, $pollerGroup, $pingFallback, $pingOnly));
-                    $process->start();
-                    $running[$scanIp] = $process;
-                }
-
-                foreach ($running as $scanIp => $process) {
-                    if (! $process->isRunning()) {
-                        $exitCode = $process->getExitCode();
-                        $output = trim($process->getOutput());
-                        $outcome = $this->determineOutcome($exitCode, $output);
-
-                        $stats['count']++;
-                        $stats[$outcome->value]++;
-
-                        if ($verbosity >= 64) {
-                            $this->line(sprintf('Scanned <options=bold>%s</options=bold> %s', $scanIp, $output));
-                        } else {
-                            $this->output->write($outcome->symbol());
-                        }
-
-                        unset($running[$scanIp]);
-                    }
-                }
-
-                usleep(5000);
-            }
-        } catch (\Throwable $e) {
-            foreach ($running as $process) {
-                if ($process->isRunning()) {
-                    $process->stop();
-                }
-            }
-            throw $e;
         }
+
+        $options = ScanOptions::fromConfig(
+            pollerGroup: $pollerGroup,
+            dnsOnly: $dnsOnly,
+            pingFallback: $pingFallback,
+            pingOnly: $pingOnly,
+        );
+
+        $scanner = new NetworkScanner();
+        $scanner->scan($allIps, $options, $threads, function (string $ip, ScanOutcome $outcome) use (&$stats, $verbosity): void {
+            $stats['count']++;
+            $stats[$outcome->value]++;
+
+            if ($verbosity >= 64) {
+                $this->line(sprintf('Scanned <options=bold>%s</options=bold> %s', $ip, $outcome->name));
+            } else {
+                $this->output->write($outcome->symbol());
+            }
+        });
 
         if ($verbosity < 64) {
             $this->newLine(2);
@@ -229,42 +205,6 @@ class ScanNetwork extends LnmsCommand
         $this->line(sprintf('Runtime: %.2f seconds', microtime(true) - $startTime));
 
         return 0;
-    }
-
-    /**
-     * Build worker command targeting `scan:host`.
-     *
-     * @return array<string>
-     */
-    private function buildWorkerCommand(string $scanIp, bool $dnsOnly, string $pollerGroup, bool $pingFallback, bool $pingOnly): array
-    {
-        $cmd = [PHP_BINARY, base_path('artisan'), 'scan:host', $scanIp];
-
-        if ($pollerGroup !== '') {
-            $cmd[] = '-g';
-            $cmd[] = $pollerGroup;
-        }
-
-        if ($dnsOnly) {
-            $cmd[] = '-o';
-        }
-
-        if ($pingOnly) {
-            $cmd[] = '-P';
-        } elseif ($pingFallback) {
-            $cmd[] = '-b';
-        }
-
-        return $cmd;
-    }
-
-    private function determineOutcome(?int $exitCode, string $output): ScanOutcome
-    {
-        if ($exitCode === 2) {
-            return str_contains($output, 'Could not ping') ? ScanOutcome::Unpingable : ScanOutcome::Failed;
-        }
-
-        return ScanOutcome::tryFrom($exitCode ?? -1) ?? ScanOutcome::Error;
     }
 
     private function isIpExcluded(string $ip, array $excludedNets): bool
