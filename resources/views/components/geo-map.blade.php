@@ -42,6 +42,9 @@
 
                 let runInit = function () {
                     let mapId = @json($id);
+                    if (get_map(mapId)) {
+                        return;
+                    }
                     let config = @json($config);
                     let leafletMap = init_map(mapId, config);
 
@@ -70,8 +73,8 @@
                         }
                     }
 
-                    if (@json($fullscreen)) {
-                        L.control.fullscreen({ position: "topright" }).addTo(leafletMap);
+                    if (@json($fullscreen) && ! leafletMap.fullscreenControl) {
+                        leafletMap.fullscreenControl = L.control.fullscreen({ position: "topright" }).addTo(leafletMap);
                     }
 
                     let targetLocation = new L.LatLng(config.lat, config.lng);
