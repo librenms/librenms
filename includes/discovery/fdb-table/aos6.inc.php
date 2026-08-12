@@ -29,7 +29,6 @@ use LibreNMS\Util\Mac;
  * @author    JoseUPV
  * @author    Paul Iercosan <mail@paulierco.ro>
  */
-
 if (empty($fdbPort_table)) {
     $dot1d = snmpwalk_group(
         $device,
