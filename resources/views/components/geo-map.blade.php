@@ -9,6 +9,7 @@
     'layer' => null,
     'readonly' => false,
     'fullscreen' => false,
+    'marker' => false,
     'showDevices' => false,
     'showDependencies' => false,
     'editableLocationId' => null,
@@ -76,25 +77,27 @@
                     let targetLocation = new L.LatLng(config.lat, config.lng);
                     leafletMap.setView(targetLocation, config.zoom);
 
-                    let deviceMarker = L.marker(targetLocation).addTo(leafletMap);
-                    if (@json((bool) $editableLocationId)) {
-                        deviceMarker.dragging.enable();
-                        deviceMarker.on("dragend", function () {
-                            var new_location = deviceMarker.getLatLng();
-                            if (confirm("Update location to " + new_location + "? This will update this location for all devices!")) {
-                                update_location(@json($editableLocationId), new_location, function(success) {
-                                    if (success) {
-                                        targetLocation = new_location;
-                                        $("#coordinates-text").text(new_location.lat.toFixed(5) + ", " + new_location.lng.toFixed(5));
-                                        $("#map-it-button").attr("href", "https://maps.google.com/?q=" + new_location.lat + "," + new_location.lng);
-                                    } else {
-                                        deviceMarker.setLatLng(targetLocation);
-                                    }
-                                });
-                            } else {
-                                deviceMarker.setLatLng(targetLocation);
-                            }
-                        });
+                    if (@json($marker || (bool) $editableLocationId)) {
+                        let deviceMarker = L.marker(targetLocation).addTo(leafletMap);
+                        if (@json((bool) $editableLocationId)) {
+                            deviceMarker.dragging.enable();
+                            deviceMarker.on("dragend", function () {
+                                var new_location = deviceMarker.getLatLng();
+                                if (confirm("Update location to " + new_location + "? This will update this location for all devices!")) {
+                                    update_location(@json($editableLocationId), new_location, function(success) {
+                                        if (success) {
+                                            targetLocation = new_location;
+                                            $("#coordinates-text").text(new_location.lat.toFixed(5) + ", " + new_location.lng.toFixed(5));
+                                            $("#map-it-button").attr("href", "https://maps.google.com/?q=" + new_location.lat + "," + new_location.lng);
+                                        } else {
+                                            deviceMarker.setLatLng(targetLocation);
+                                        }
+                                    });
+                                } else {
+                                    deviceMarker.setLatLng(targetLocation);
+                                }
+                            });
+                        }
                     }
 
                     if (@json($showDevices)) {

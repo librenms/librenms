@@ -48,6 +48,7 @@
                         :lng="$device->location->lng"
                         :init="false"
                         fullscreen
+                        marker
                         :show-devices="$showDevices"
                         :show-dependencies="$showDependencies"
                         :editable-location-id="$canUpdateLocation ? $device->location->id : null"
