@@ -34,7 +34,7 @@ class FormatJsonApiError
 
     protected function generateJsonApiErrorResponse(int $code): ?Response
     {
-        return match($code) {
+        return match ($code) {
             404 => $this->toJsonApiResponse(404, 'Not Found', 'The requested resource could not be found.'),
             403 => $this->toJsonApiResponse(403, 'Forbidden', 'You do not have the necessary permissions to access this resource.'),
             default => null,
@@ -52,8 +52,8 @@ class FormatJsonApiError
                     'status' => "$code", // JSON:API enforces string here
                     'title' => $title,
                     'detail' => $detail,
-                ]
-            ]
+                ],
+            ],
         ], $code, [
             'Content-Type' => 'application/vnd.api+json',
         ]);
