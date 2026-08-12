@@ -30,8 +30,8 @@ use App\Models\Device;
 use App\Models\Location;
 use App\View\SimpleTemplate;
 use Illuminate\Support\Arr;
-use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Util\Oid;
+use LibreNMS\Util\StringHelpers;
 use Log;
 use SnmpQuery;
 
@@ -72,11 +72,11 @@ trait YamlOSDiscovery
         $oids = Arr::only($os_yaml, $this->osFields);
         $fetch_oids = array_unique(Arr::flatten($oids));
         $numeric = Oid::hasNumeric($fetch_oids);
-        $data = SnmpQuery::numeric($numeric)->get($fetch_oids);
+        $data = $this->fetch($fetch_oids, $numeric);
 
-        Log::debug('Yaml OS data:', $data->values());
+        Log::debug('Yaml OS data:', $data);
 
-        $template_data = array_merge($this->getDevice()->only($this->osFields), $data->values());
+        $template_data = array_merge($this->getDevice()->only($this->osFields), $data);
         foreach ($oids as $field => $oid_list) {
             if ($value = $this->findFirst($data, $oid_list, $numeric)) {
                 // extract via regex if requested
@@ -103,29 +103,33 @@ trait YamlOSDiscovery
 
         $oids = array_filter([$name, $lat, $lng]);
         $numeric = Oid::hasNumeric($oids);
-        $data = SnmpQuery::numeric($numeric)->get($oids);
+        $data = $this->fetch($oids, $numeric);
 
-        Log::debug('Yaml location data:', $data->values());
+        Log::debug('Yaml location data:', $data);
 
-        $location = $this->findFirst($data, $name, $numeric)
-            ?? SnmpQuery::get('SNMPv2-MIB::sysLocation.0')->value();
+        $location = $this->findFirst($data, $name, $numeric) ?? snmp_get($this->getDeviceArray(), 'SNMPv2-MIB::sysLocation.0', '-Oqv');
 
         return new Location([
-            'location' => $location,
+            'location' => StringHelpers::inferEncoding($location),
             'lat' => $this->findFirst($data, $lat, $numeric),
             'lng' => $this->findFirst($data, $lng, $numeric),
         ]);
     }
 
-    private function findFirst(SnmpResponse $data, array|string|null $oids, bool $numeric = false): ?string
+    private function findFirst($data, $oids, $numeric = false)
     {
-        $oids = array_map(
-            fn (string $oid): string => $numeric ? Oid::of($oid)->toNumeric() : $oid,
-            Arr::wrap($oids)
-        );
-        $value = $data->value($oids);
+        foreach (Arr::wrap($oids) as $oid) {
+            // translate all to numeric to make it easier to match
+            if ($numeric) {
+                $oid = Oid::of($oid)->toNumeric();
+            }
 
-        return $value !== '' ? $value : null;
+            if (! empty($data[$oid])) {
+                return $data[$oid];
+            }
+        }
+
+        return null;
     }
 
     private function parseRegex($regexes, $subject)
@@ -141,6 +145,11 @@ trait YamlOSDiscovery
                 }
             }
         }
+    }
+
+    private function fetch(array $oids, $numeric)
+    {
+        return snmp_get_multi_oid($this->getDeviceArray(), $oids, $numeric ? '-OUQn' : '-OUQ');
     }
 
     private function replaceStringsInFields(Device $device, array $os_yaml): void
