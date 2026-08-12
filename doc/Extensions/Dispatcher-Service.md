@@ -93,7 +93,7 @@ setting, as dispatchers sharing one LibreNMS install commonly have different
 memory limits):
 
 ```bash
-export LIBRENMS_DISTRIBUTED_POLLER_MEMORY_PRESSURE_PERCENT=85
+export DISPATCHER_MEMORY_PRESSURE_PERCENT=85
 ```
 
 ### Restrict Processing to Dispatcher

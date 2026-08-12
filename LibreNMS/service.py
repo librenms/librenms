@@ -129,7 +129,7 @@ class ServiceConfig(DBConfig):
             config.get("distributed_poller_group", ServiceConfig.group)
         )
         self.memory_pressure_percent = os.getenv(
-            "LIBRENMS_DISTRIBUTED_POLLER_MEMORY_PRESSURE_PERCENT",
+            "DISPATCHER_MEMORY_PRESSURE_PERCENT",
             ServiceConfig.memory_pressure_percent,
         )
 
