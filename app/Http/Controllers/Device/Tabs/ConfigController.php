@@ -47,7 +47,7 @@ class ConfigController extends Controller implements DeviceTab
 
     public function visible(Device $device): bool
     {
-        return Gate::allows('showConfig', $device) && $this->manager->handles($device);
+        return Gate::allows('configBackupView', $device) && $this->manager->handles($device);
     }
 
     public function slug(): string
@@ -97,7 +97,7 @@ class ConfigController extends Controller implements DeviceTab
             'hostname' => $device->hostname,
             'os' => $device->os,
             'config_highlighting' => LibrenmsConfig::getOsSetting($device->os, 'config_highlighting'),
-            'can_refresh' => $provider instanceof RefreshableConfigBackupProvider && Gate::allows('refreshConfig', $device),
+            'can_refresh' => $provider instanceof RefreshableConfigBackupProvider && Gate::allows('configBackupRefresh', $device),
         ];
 
         if ($provider === null) {
@@ -123,7 +123,7 @@ class ConfigController extends Controller implements DeviceTab
 
     public function backups(Device $device, Request $request): JsonResponse
     {
-        Gate::authorize('showConfig', $device);
+        Gate::authorize('configBackupView', $device);
 
         $validated = $request->validate([
             'page' => 'nullable|integer|min:0',
@@ -144,7 +144,7 @@ class ConfigController extends Controller implements DeviceTab
 
     public function backup(Device $device, Request $request): JsonResponse
     {
-        Gate::authorize('showConfig', $device);
+        Gate::authorize('configBackupView', $device);
 
         $validated = $request->validate([
             'backup' => ['nullable', 'string', 'max:191', 'regex:/^[A-Za-z0-9._\\|-]+$/'],
@@ -180,7 +180,7 @@ class ConfigController extends Controller implements DeviceTab
 
     public function diff(Device $device, Request $request): JsonResponse
     {
-        Gate::authorize('showConfig', $device);
+        Gate::authorize('configBackupView', $device);
 
         $validated = $request->validate([
             'orig' => 'required|string|max:191',
@@ -202,7 +202,7 @@ class ConfigController extends Controller implements DeviceTab
 
     public function refresh(Device $device, Request $request): JsonResponse
     {
-        Gate::authorize('refreshConfig', $device);
+        Gate::authorize('configBackupRefresh', $device);
 
         $provider = $this->manager->providerFor($device);
         if (! $provider instanceof RefreshableConfigBackupProvider) {

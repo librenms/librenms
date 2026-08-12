@@ -14,7 +14,7 @@ return [
 
     'config-backup' => [
         'title' => 'Config Backup',
-        'show' => ['label' => 'Show Device Config', 'description' => 'View device configuration backups'],
+        'view' => ['label' => 'View Device Config', 'description' => 'View device configuration backups'],
         'refresh' => ['label' => 'Refresh Device Config', 'description' => 'Trigger an on-demand device configuration backup'],
     ],
 
@@ -139,7 +139,7 @@ return [
 
     'oxidized' => [
         'title' => 'Oxidized',
-        'view' => ['label' => 'View Oxidized', 'description' => 'View device configuration backups'],
+        'list' => ['label' => 'List Devices for Oxidized', 'description' => 'Allow Oxidized to retrieve its device list through the API'],
         'search' => ['label' => 'Search Oxidized', 'description' => 'Search through Oxidized configuration backups'],
     ],
 

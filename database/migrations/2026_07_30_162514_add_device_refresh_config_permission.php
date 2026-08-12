@@ -9,13 +9,13 @@ return new class extends Migration
     /** @var array<string, string> old permission name => new permission name */
     private array $moves = [
         'oxidized.refresh' => 'config-backup.refresh',
-        'device.showConfig' => 'config-backup.show',
+        'device.showConfig' => 'config-backup.view',
     ];
 
     /**
      * Move the config backup permissions into their own "Config Backup" group,
      * replacing the Oxidized-specific refresh permission and the device-scoped
-     * show config permission, preserving which roles hold them.
+     * show config permission, preserving existing grants.
      */
     public function up(): void
     {
@@ -35,8 +35,8 @@ return new class extends Migration
     }
 
     /**
-     * Create $to (if missing), copy every role assignment from $from onto it,
-     * then drop $from — moving the permission without losing which roles use it.
+     * Create $to (if missing), copy every role and direct model assignment from
+     * $from onto it, then drop $from.
      */
     private function movePermission(string $from, string $to): void
     {
@@ -64,7 +64,22 @@ return new class extends Migration
             DB::table('role_has_permissions')->insertOrIgnore($rows);
         }
 
-        // Removing the permission cascades its role assignments away.
+        $rows = DB::table('model_has_permissions')
+            ->where('permission_id', $fromId)
+            ->get()
+            ->map(function ($row) use ($toId) {
+                $assignment = (array) $row;
+                $assignment['permission_id'] = $toId;
+
+                return $assignment;
+            })
+            ->all();
+
+        if ($rows !== []) {
+            DB::table('model_has_permissions')->insertOrIgnore($rows);
+        }
+
+        // Removing the permission cascades its old assignments away.
         DB::table('permissions')->where('id', $fromId)->delete();
     }
 };

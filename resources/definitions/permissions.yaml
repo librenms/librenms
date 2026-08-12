@@ -57,7 +57,7 @@ groups:
         - component.update
 
     config-backup:
-        - config-backup.show
+        - config-backup.view
         - config-backup.refresh
 
     custom-map:

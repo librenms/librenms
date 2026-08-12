@@ -3,7 +3,7 @@
 /**
  * ConfigBackupAuthorizationTest.php
  *
- * Verifies the showConfig / refreshConfig gates across roles, in particular
+ * Verifies the configBackupView / configBackupRefresh policy abilities across roles, in particular
  * that a user restricted to some devices cannot show/refresh config of others.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,7 +48,7 @@ final class ConfigBackupAuthorizationTest extends TestCase
         Role::findOrCreate('admin');
         Role::findOrCreate('global-read');
         Role::findOrCreate('user');
-        Permission::findOrCreate('config-backup.show');
+        Permission::findOrCreate('config-backup.view');
         Permission::findOrCreate('config-backup.refresh');
         Permission::findOrCreate('device.view');
 
@@ -66,37 +66,37 @@ final class ConfigBackupAuthorizationTest extends TestCase
         $admin = User::factory()->create(['enabled' => 1]);
         $admin->assignRole('admin');
 
-        $this->assertTrue($this->can($admin, 'showConfig', $this->accessible));
-        $this->assertTrue($this->can($admin, 'showConfig', $this->other));
-        $this->assertTrue($this->can($admin, 'refreshConfig', $this->accessible));
-        $this->assertTrue($this->can($admin, 'refreshConfig', $this->other));
+        $this->assertTrue($this->can($admin, 'configBackupView', $this->accessible));
+        $this->assertTrue($this->can($admin, 'configBackupView', $this->other));
+        $this->assertTrue($this->can($admin, 'configBackupRefresh', $this->accessible));
+        $this->assertTrue($this->can($admin, 'configBackupRefresh', $this->other));
     }
 
-    public function testGlobalReadCanShowAnyDeviceButNotRefresh(): void
+    public function testGlobalReadNeedsExplicitConfigBackupPermissions(): void
     {
         $user = User::factory()->create(['enabled' => 1]);
         $user->assignRole('global-read');
 
-        $this->assertTrue($this->can($user, 'showConfig', $this->accessible));
-        $this->assertTrue($this->can($user, 'showConfig', $this->other));
-        $this->assertFalse($this->can($user, 'refreshConfig', $this->accessible));
-        $this->assertFalse($this->can($user, 'refreshConfig', $this->other));
+        $this->assertFalse($this->can($user, 'configBackupView', $this->accessible));
+        $this->assertFalse($this->can($user, 'configBackupView', $this->other));
+        $this->assertFalse($this->can($user, 'configBackupRefresh', $this->accessible));
+        $this->assertFalse($this->can($user, 'configBackupRefresh', $this->other));
     }
 
     public function testUserIsRestrictedToAccessibleDevices(): void
     {
         $user = User::factory()->create(['enabled' => 1]);
         $user->assignRole('user');
-        $user->givePermissionTo('config-backup.show', 'config-backup.refresh');
+        $user->givePermissionTo('config-backup.view', 'config-backup.refresh');
         $user->devicesOwned()->attach($this->accessible->device_id);
 
         // device the user can access
-        $this->assertTrue($this->can($user, 'showConfig', $this->accessible));
-        $this->assertTrue($this->can($user, 'refreshConfig', $this->accessible));
+        $this->assertTrue($this->can($user, 'configBackupView', $this->accessible));
+        $this->assertTrue($this->can($user, 'configBackupRefresh', $this->accessible));
 
         // device the user cannot access — must be denied
-        $this->assertFalse($this->can($user, 'showConfig', $this->other));
-        $this->assertFalse($this->can($user, 'refreshConfig', $this->other));
+        $this->assertFalse($this->can($user, 'configBackupView', $this->other));
+        $this->assertFalse($this->can($user, 'configBackupRefresh', $this->other));
     }
 
     public function testUserWithoutConfigPermissionCannotShowOrRefresh(): void
@@ -105,23 +105,23 @@ final class ConfigBackupAuthorizationTest extends TestCase
         $user->assignRole('user');
         $user->devicesOwned()->attach($this->accessible->device_id);
 
-        $this->assertFalse($this->can($user, 'showConfig', $this->accessible));
-        $this->assertFalse($this->can($user, 'refreshConfig', $this->accessible));
+        $this->assertFalse($this->can($user, 'configBackupView', $this->accessible));
+        $this->assertFalse($this->can($user, 'configBackupRefresh', $this->accessible));
     }
 
     public function testCustomerRoleIsRestrictedToAccessibleDevices(): void
     {
         $customer = Role::findOrCreate('customer');
-        $customer->givePermissionTo('config-backup.show', 'config-backup.refresh', 'device.view');
+        $customer->givePermissionTo('config-backup.view', 'config-backup.refresh', 'device.view');
 
         $user = User::factory()->create(['enabled' => 1]);
         $user->assignRole('customer');
         $user->devicesOwned()->attach($this->accessible->device_id);
 
-        $this->assertTrue($this->can($user, 'showConfig', $this->accessible));
-        $this->assertTrue($this->can($user, 'refreshConfig', $this->accessible));
+        $this->assertTrue($this->can($user, 'configBackupView', $this->accessible));
+        $this->assertTrue($this->can($user, 'configBackupRefresh', $this->accessible));
 
-        $this->assertFalse($this->can($user, 'showConfig', $this->other));
-        $this->assertFalse($this->can($user, 'refreshConfig', $this->other));
+        $this->assertFalse($this->can($user, 'configBackupView', $this->other));
+        $this->assertFalse($this->can($user, 'configBackupRefresh', $this->other));
     }
 }
