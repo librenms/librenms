@@ -3,7 +3,6 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Support\Facades\Route;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->registered(function ($app) {
@@ -15,16 +14,6 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__ . '/../routes/console.php',
         // channels: __DIR__.'/../routes/channels.php',
         health: '/up',
-        then: function () {
-            Route::prefix('api/v1')
-                ->name('api.')
-                ->middleware([
-                    App\Http\Middleware\EnforceJsonApi::class,
-                    \App\Http\Middleware\JsonApiError::class,
-                    \App\Http\Middleware\EnsureApiV1Enabled::class,
-                ])
-                ->group(base_path('routes/api_v1.php'));
-        },
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->validateCsrfTokens(except: [
