@@ -31,6 +31,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Oid;
+use LibreNMS\Util\StringHelpers;
 use Log;
 
 class SnmpResponse implements \Stringable
@@ -41,6 +42,7 @@ class SnmpResponse implements \Stringable
 
     private ?string $errorMessage = null;
     private ?array $values = null;
+    private ?bool $inferValueEncoding = null;
 
     /**
      * Create a new response object filling with output from the net-snmp command.
@@ -144,6 +146,7 @@ class SnmpResponse implements \Stringable
             return $this->values;
         }
 
+        $this->inferValueEncoding ??= ! StringHelpers::isValidUtf8($this->raw);
         $this->values = [];
         $line = strtok($this->raw, PHP_EOL);
         while ($line !== false) {
@@ -172,10 +175,14 @@ class SnmpResponse implements \Stringable
 
             if (Str::startsWith($value, '"') && Str::endsWith($value, '"')) {
                 // unformatted string from net-snmp, remove extra escapes
-                $this->values[$oid] = trim(stripslashes($value), "\" \n\r");
+                $value = trim(stripslashes($value), "\" \n\r");
             } else {
-                $this->values[$oid] = trim($value);
+                $value = trim($value);
             }
+
+            $this->values[$oid] = $this->inferValueEncoding
+                ? StringHelpers::inferEncoding($value)
+                : $value;
         }
 
         return $this->values;
