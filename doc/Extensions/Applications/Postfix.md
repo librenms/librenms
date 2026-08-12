@@ -21,7 +21,7 @@
     chmod +x /etc/snmp/postfixdetailed /etc/snmp/postfix-queues
     ```
 
-4. Edit your snmpd.conf file and add:
+4. Edit your `snmpd.conf` file and add:
 
     ```bash
     extend mailq /etc/snmp/postfix-queues
@@ -42,16 +42,16 @@ between various values between each time it is called by snmpd. Also
 make sure the path for pflogsumm is correct.
 
 8. Run `/etc/snmp/postfixdetailed` to create the initial cache file so
-you don't end up with some crazy initial starting value. 
+the first value is then correct. 
 
 !!! note 
     that each time `/etc/snmp/postfixdetailed` is ran, the cache file is
     updated, so if this happens in between LibreNMS doing it then the
-    values will be thrown off for that polling period.
+    values are then wrong for that polling period.
 
-The application should be auto-discovered as described at the top of
-the page. If it is not, please follow the steps set out under `SNMP
-Extend` heading top of page.
+LibreNMS discovers the application automatically, as described at the
+top of the page. If the discovery fails, do the steps under the `SNMP
+Extend` heading at the top of the page.
 
 !!! note Redhat
     If using RHEL for your postfix server, `qshape` must be installed manually as it is not officially supported. CentOs 6 rpms seem to work without issues.
