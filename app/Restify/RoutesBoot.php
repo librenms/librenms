@@ -24,9 +24,8 @@ class RoutesBoot extends BaseRoutesBoot
     public function defaultRoutes($config): self
     {
         Route::group($config, function (): void {
-            // Repository CRUD/actions/getters/etc. via the {repository}
-            // wildcard. Intentionally omit ->once() so profile, search and
-            // restifyjs/setup are not registered.
+            // Repository CRUD/actions/getters/etc. via the {repository} wildcard.
+            // Intentionally omit app(RoutesDefinition::class)->once() so profile, search and restifyjs/setup are not registered.
             app(RoutesDefinition::class)();
         });
 
