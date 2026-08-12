@@ -13,6 +13,10 @@ class PingController extends Controller
      */
     public function __invoke(): JsonResponse
     {
-        return response()->json(['status' => 'ok']);
+        return response()->json(['meta' => [
+            "status" => "healthy",
+            "message" => "pong",
+            "timestamp" => now()->toIso8601ZuluString(),
+      ]]);
     }
 }

@@ -2,48 +2,72 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Exceptions\HealthCheckException;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Throwable;
+use Illuminate\Support\Str;
+use LibreNMS\Util\Version;
 
 class HealthController extends Controller
 {
     public function __invoke(): JsonResponse
     {
-        $checks = [
-            'database' => $this->check(fn () => DB::connection()->select('SELECT 1')),
-            'cache' => $this->check(function (): void {
-                $key = 'health:ping:' . bin2hex(random_bytes(4));
-                Cache::put($key, '1', 5);
-                if (Cache::get($key) !== '1') {
-                    throw new \RuntimeException('cache round-trip mismatch');
-                }
-                Cache::forget($key);
-            }),
-        ];
-
-        $status = collect($checks)->every(fn ($c) => $c['ok']) ? 'ok' : 'down';
-        $httpStatus = $status === 'ok' ? 200 : 503;
-
-        return response()->json([
-            'status' => $status,
-            'checks' => $checks,
-        ], $httpStatus);
+        try {
+            return response()->json(['meta' => [
+                'status' => '200',
+                'version' => Version::VERSION,
+                'checks' => [
+                    ...$this->checkDatabase(),
+                    ...$this->checkCache(),
+                ],
+            ]]);
+        } catch (HealthCheckException $e) {
+            return response()->json(['errors' => [
+                'status' => '503',
+                'code' => $e->errorCode,
+                'title' => $e->title,
+                'detail' => $e->detail,
+                'meta' => [
+                    'component' => $e->component,
+                    'timestamp' => now()->toIso8601ZuluString(),
+                ]
+            ]], 503);
+        }
     }
 
     /**
-     * @return array{ok: bool, error?: string}
+     * @return array{string, string: 'up'}
+     * @throws HealthCheckException
      */
-    private function check(callable $probe): array
+    private function checkDatabase(): array
     {
         try {
-            $probe();
+            DB::connection()->select('SELECT 1');
 
-            return ['ok' => true];
-        } catch (Throwable $e) {
-            return ['ok' => false, 'error' => $e->getMessage()];
+            return ['database' => 'up'];
+        } catch (\Exception $e) {
+            throw new HealthCheckException('database', 'DATABASE_DISCONNECTED', 'Service Unavailable', $e->getMessage());
         }
+    }
+
+    /**
+     * @return array{string, string: 'up'}
+     * @throws HealthCheckException
+     */
+    private function checkCache()
+    {
+        $key = 'health:ping:' . Str::random();
+
+        Cache::put($key, '1', 5);
+        $fetched = Cache::get($key);
+        Cache::forget($key);
+
+        if ($fetched !== '1') {
+            throw new HealthCheckException('cache', 'CACHE_DISCONNECTED', 'Service Unavailable', '');
+        }
+
+        return ['cache' => 'up'];
     }
 }
