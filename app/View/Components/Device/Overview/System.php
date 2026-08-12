@@ -15,8 +15,14 @@ class System extends Component
      * @var array<int, array{label: string, value: mixed, title?: string}>
      */
     public array $rows;
-
     public string $title;
+    public bool $showMap = false;
+    public bool $mapOpen = false;
+    public string $mapsEngine = '';
+    public string $mapsApi = '';
+    public bool $showDevices = false;
+    public bool $showDependencies = false;
+    public bool $canUpdateLocation = false;
 
     public function __construct(public Device $device)
     {
@@ -40,6 +46,16 @@ class System extends Component
                 : null,
             $this->uptimeRow(),
         ], fn (?array $row): bool => $row !== null && filled($row['value'])));
+
+        if ($this->device->location_id && $this->device->location && $this->device->location->coordinatesValid()) {
+            $this->showMap = true;
+            $this->mapsApi = (string) LibrenmsConfig::get('geoloc.api_key', '');
+            $this->mapsEngine = $this->mapsApi ? (string) LibrenmsConfig::get('geoloc.engine', '') : '';
+            $this->mapOpen = (bool) LibrenmsConfig::get('device_location_map_open', false);
+            $this->showDevices = (bool) LibrenmsConfig::get('device_location_map_show_devices', false);
+            $this->showDependencies = (bool) LibrenmsConfig::get('device_location_map_show_device_dependencies', false);
+            $this->canUpdateLocation = \Illuminate\Support\Facades\Gate::allows('location.update');
+        }
     }
 
     public function render(): View|Closure|string

@@ -23,8 +23,55 @@
                 <div class="tw:font-medium">{{ __('Location') }}</div>
                 <div class="tw:col-span-2">{{ $device->location->display() }}</div>
             </div>
-            @if($device->location->coordinatesValid())
-                <x-geo-map class="tw:w-full!" height="180px" :lat="$device->location->lat" :lng="$device->location->lng" :zoom="14" readonly />
+            @if($showMap)
+                <div class="tw:grid tw:grid-cols-3 tw:items-center tw:gap-2.5 tw:px-2 tw:py-1 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300" id="coordinates-row" data-toggle="collapse" data-target="#toggle-map">
+                    <div class="tw:font-medium">{{ __('Lat / Lng') }}</div>
+                    <div class="tw:col-span-2 tw:flex tw:items-center tw:justify-between tw:gap-2">
+                        <span id="coordinates-text">{{ $device->location->lat }}, {{ $device->location->lng }}</span>
+                        <div class="btn-group" role="group" aria-label="Map actions">
+                            <button type="button" id="toggle-map-button" class="btn btn-primary btn-xs" data-toggle="collapse" data-target="#toggle-map">
+                                <i class="fa {{ $mapOpen ? 'fa-map-o' : 'fa-map' }}" style="color:white" aria-hidden="true"></i>
+                                <span>{{ $mapOpen ? __('Hide') : __('View') }}</span>
+                            </button>
+                            <a id="map-it-button" href="https://maps.google.com/?q={{ $device->location->lat }},{{ $device->location->lng }}" target="_blank" class="btn btn-success btn-xs" role="button">
+                                <i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> {{ __('Map') }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div id="toggle-map" class="collapse {{ $mapOpen ? 'in' : '' }}">
+                    <x-geo-map
+                        id="location-map"
+                        width="100%"
+                        height="180px"
+                        :lat="$device->location->lat"
+                        :lng="$device->location->lng"
+                        :init="false"
+                        fullscreen
+                        :show-devices="$showDevices"
+                        :show-dependencies="$showDependencies"
+                        :editable-location-id="$canUpdateLocation ? $device->location->id : null"
+                    />
+                </div>
+                <script>
+                    $("#toggle-map").on("shown.bs.collapse", function () {
+                        if (typeof init_geo_map_location_map === 'function') {
+                            init_geo_map_location_map();
+                        }
+                        if (window.maps && window.maps['location-map']) {
+                            window.maps['location-map'].invalidateSize();
+                        }
+                        $("#toggle-map-button").find(".fa").removeClass("fa-map").addClass("fa-map-o");
+                        $("#toggle-map-button span").text("{{ __('Hide') }}");
+                    }).on("hidden.bs.collapse", function () {
+                        $("#toggle-map-button").find(".fa").removeClass("fa-map-o").addClass("fa-map");
+                        $("#toggle-map-button span").text("{{ __('View') }}");
+                    });
+
+                    @if($mapOpen)
+                        $("#toggle-map").trigger("shown.bs.collapse");
+                    @endif
+                </script>
             @endif
         @endif
     </div>
