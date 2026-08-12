@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Aos6.php
  *
@@ -27,6 +28,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  * @author     Paul Iercosan <mail@paulierco.ro>
  */
+
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
