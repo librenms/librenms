@@ -48,6 +48,7 @@ final class StringHelperTest extends TestCase
         $this->assertEquals('', StringHelpers::inferEncoding(''));
         $this->assertEquals('~null', StringHelpers::inferEncoding('~null'));
         $this->assertEquals('Øverbyvegen', StringHelpers::inferEncoding('Øverbyvegen'));
+        $this->assertEquals("first\nsecond", StringHelpers::inferEncoding("first\xDAsecond"));
 
         $this->assertEquals('Øverbyvegen', StringHelpers::inferEncoding(base64_decode('w5h2ZXJieXZlZ2Vu')));
         $this->assertEquals('Øverbyvegen', StringHelpers::inferEncoding(base64_decode('2HZlcmJ5dmVnZW4=')));

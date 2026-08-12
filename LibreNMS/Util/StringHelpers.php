@@ -102,7 +102,13 @@ class StringHelpers
      */
     public static function inferEncoding(?string $string): ?string
     {
-        if (empty($string) || self::isValidUtf8($string) || ! function_exists('iconv')) {
+        if (empty($string) || self::isValidUtf8($string)) {
+            return $string;
+        }
+
+        $string = str_replace(chr(218), "\n", $string);
+
+        if (! function_exists('iconv')) {
             return $string;
         }
 
