@@ -29,7 +29,6 @@ class FormatJsonApiError
             $errorResponse = $this->generateJsonApiErrorResponse($response->getStatusCode());
 
             return $errorResponse ?? $response;
-
         } catch (HttpException $e) {
             $errorResponse = $this->generateJsonApiErrorResponse($e->getStatusCode());
 
