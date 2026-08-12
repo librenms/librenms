@@ -3,12 +3,15 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use LibreNMS\Exceptions\DatabaseConnectException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Throwable;
 
 /**
- * Ensure errors are formatted correctly for JSON:API.  Right now this only handles 403 and 404 errors.
+ * Ensure errors are formatted correctly for JSON:API.
  */
 class FormatJsonApiError
 {
@@ -16,6 +19,12 @@ class FormatJsonApiError
     {
         try {
             $response = $next($request);
+
+            // Laravel's pipeline may render middleware exceptions before
+            // returning control here instead of allowing them to be caught.
+            if ($request->routeIs('api.v1.health') && $response->isServerError()) {
+                return $this->generateJsonApiErrorResponse(503);
+            }
 
             $errorResponse = $this->generateJsonApiErrorResponse($response->getStatusCode());
 
@@ -29,6 +38,18 @@ class FormatJsonApiError
             }
 
             throw $e;
+        } catch (QueryException $e) {
+            if (DatabaseConnectException::upgrade($e) !== null) {
+                return $this->generateJsonApiErrorResponse(503);
+            }
+
+            throw $e;
+        } catch (Throwable $e) {
+            if ($request->routeIs('api.v1.health')) {
+                return $this->generateJsonApiErrorResponse(503);
+            }
+
+            throw $e;
         }
     }
 
@@ -37,6 +58,8 @@ class FormatJsonApiError
         return match ($code) {
             404 => $this->toJsonApiResponse(404, 'Not Found', 'The requested resource could not be found.'),
             403 => $this->toJsonApiResponse(403, 'Forbidden', 'You do not have the necessary permissions to access this resource.'),
+            429 => $this->toJsonApiResponse(429, 'Too Many Requests', 'Too many requests. Please try again later.'),
+            503 => $this->toJsonApiResponse(503, 'Service Unavailable', 'A required service is unavailable.'),
             default => null,
         };
     }
