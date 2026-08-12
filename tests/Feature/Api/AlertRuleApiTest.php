@@ -92,7 +92,11 @@ class AlertRuleApiTest extends DBTestCase
     public function testUnauthenticatedRequestReturns401(): void
     {
         $this->getJson('/api/v1/alert-rules')
-            ->assertStatus(401);
+            ->assertStatus(401)
+            ->assertHeader('Content-Type', EnforceJsonApi::CONTENT_TYPE)
+            ->assertJsonMissingPath('message')
+            ->assertJsonPath('errors.0.status', '401')
+            ->assertJsonPath('errors.0.code', 'unauthenticated');
     }
 
     public function testDisabledApiReturns404(): void
@@ -103,7 +107,9 @@ class AlertRuleApiTest extends DBTestCase
         Sanctum::actingAs($user);
 
         $this->getJson('/api/v1/alert-rules')
-            ->assertStatus(404);
+            ->assertStatus(404)
+            ->assertJsonPath('errors.0.status', '404')
+            ->assertJsonPath('errors.0.code', 'not_found');
     }
 
     public function testUserWithoutApiAccessPermissionCannotAccessAlertRules(): void
@@ -216,7 +222,6 @@ class AlertRuleApiTest extends DBTestCase
             'condition' => 'AND',
             'rules' => [['id' => 'devices.status', 'operator' => 'equal', 'value' => 0]],
         ];
-        $extra = ['mute' => false, 'count' => '-1', 'delay' => 300, 'interval' => 300];
         $query = 'devices.status = 0';
 
         $response = $this->postJsonApi('/api/v1/alert-rules', [
@@ -225,9 +230,13 @@ class AlertRuleApiTest extends DBTestCase
             'isEnabled' => true,
             'procedure' => 'Page on-call',
             'notes' => 'Triggered when ICMP fails for 5m',
-            'isInverted' => false,
+            'isScopeInverted' => false,
+            'isConditionInverted' => false,
+            'isMuted' => true,
+            'sendsRecoveryAlerts' => false,
+            'sendsAcknowledgementAlerts' => true,
+            'overridesQuery' => true,
             'builder' => $builder,
-            'extra' => $extra,
             'query' => $query,
         ]);
 
@@ -237,13 +246,24 @@ class AlertRuleApiTest extends DBTestCase
             ->assertJsonPath('data.attributes.isEnabled', true)
             ->assertJsonPath('data.attributes.procedure', 'Page on-call')
             ->assertJsonPath('data.attributes.notes', 'Triggered when ICMP fails for 5m')
-            ->assertJsonPath('data.attributes.isInverted', false)
+            ->assertJsonPath('data.attributes.isScopeInverted', false)
+            ->assertJsonPath('data.attributes.isConditionInverted', false)
+            ->assertJsonPath('data.attributes.isMuted', true)
+            ->assertJsonPath('data.attributes.sendsRecoveryAlerts', false)
+            ->assertJsonPath('data.attributes.sendsAcknowledgementAlerts', true)
+            ->assertJsonPath('data.attributes.overridesQuery', true)
             ->assertJsonPath('data.attributes.builder', $builder)
             ->assertJsonPath('data.attributes.query', $query);
 
         $created = AlertRule::where('name', 'Device Unreachable')->firstOrFail();
         $this->assertSame($builder, $created->builder);
-        $this->assertSame($extra, $created->extra);
+        $this->assertEquals([
+            'invert' => false,
+            'mute' => true,
+            'recovery' => false,
+            'acknowledgement' => true,
+            'options' => ['override_query' => true],
+        ], $created->extra);
         $this->assertSame($query, $created->query);
         $this->assertSame('Page on-call', $created->proc);
         $this->assertSame(0, (int) $created->disabled);
@@ -259,7 +279,12 @@ class AlertRuleApiTest extends DBTestCase
             'name' => 'Bare Minimum Rule',
             'severity' => 'warning',
             'isEnabled' => true,
-        ])->assertStatus(201);
+        ])->assertStatus(201)
+            ->assertJsonPath('data.attributes.isMuted', false)
+            ->assertJsonPath('data.attributes.isConditionInverted', false)
+            ->assertJsonPath('data.attributes.sendsRecoveryAlerts', true)
+            ->assertJsonPath('data.attributes.sendsAcknowledgementAlerts', true)
+            ->assertJsonPath('data.attributes.overridesQuery', false);
 
         $created = AlertRule::where('name', 'Bare Minimum Rule')->firstOrFail();
         $this->assertSame([], $created->builder);
@@ -272,9 +297,89 @@ class AlertRuleApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/alert-rules', [
+        $response = $this->postJsonApi('/api/v1/alert-rules', [
             'notes' => 'no name, no severity',
+        ]);
+
+        // JSON:API error document: errors must be an array of error objects
+        // with source pointers, not Laravel's field-keyed object
+        $response->assertStatus(422)
+            ->assertJsonMissingPath('message')
+            ->assertJsonPath('errors.0.status', '422')
+            ->assertJsonPath('errors.0.code', 'validation_failed');
+
+        $pointers = array_column(array_column($response->json('errors'), 'source'), 'pointer');
+        $this->assertContains('/name', $pointers);
+        $this->assertContains('/severity', $pointers);
+    }
+
+    public function testShowUnknownAlertRuleReturns404(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/alert-rules/999999')
+            ->assertStatus(404)
+            ->assertJsonPath('errors.0.status', '404')
+            ->assertJsonPath('errors.0.code', 'not_found');
+    }
+
+    public function testRawExtraAttributeIsIgnored(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        // extra is not an API field; the legacy pacing keys inside it
+        // (delay/interval/count) were replaced by alert operations
+        $this->postJsonApi('/api/v1/alert-rules', [
+            'name' => 'Raw Extra',
+            'severity' => 'warning',
+            'isEnabled' => true,
+            'extra' => ['mute' => true, 'count' => '-1', 'delay' => 300, 'interval' => 300],
+        ])->assertStatus(201);
+
+        $created = AlertRule::where('name', 'Raw Extra')->firstOrFail();
+        $this->assertSame([], $created->extra);
+    }
+
+    public function testAlertRuleCreateRejectsNonBooleanFlagValues(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/alert-rules', [
+            'name' => 'Bad Flag Type',
+            'severity' => 'warning',
+            'isEnabled' => true,
+            'isConditionInverted' => 'yes',
         ])->assertStatus(422);
+    }
+
+    public function testUpdatingFlagPreservesOtherExtraKeys(): void
+    {
+        $user = User::factory()->admin()->create();
+        $rule = AlertRule::factory()->create([
+            'name' => 'Flag Merge',
+            'severity' => 'warning',
+            'extra' => ['invert' => true, 'options' => ['override_query' => true]],
+        ]);
+        Sanctum::actingAs($user);
+
+        $this->putJsonApi("/api/v1/alert-rules/{$rule->id}", [
+            'name' => 'Flag Merge',
+            'severity' => 'warning',
+            'isEnabled' => true,
+            'isMuted' => true,
+        ])->assertStatus(200)
+            ->assertJsonPath('data.attributes.isMuted', true)
+            ->assertJsonPath('data.attributes.isConditionInverted', true)
+            ->assertJsonPath('data.attributes.overridesQuery', true);
+
+        $this->assertEquals([
+            'invert' => true,
+            'options' => ['override_query' => true],
+            'mute' => true,
+        ], $rule->fresh()->extra);
     }
 
     public function testAlertRuleCreateRejectsInvalidSeverity(): void
