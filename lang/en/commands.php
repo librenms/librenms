@@ -182,8 +182,9 @@ return [
             'type' => 'Discover devices only with specified type',
         ],
         'errors' => [
-            'none_up' => 'Device was down, unable to discover.|All devices were down, unable to discover.',
+            'none_up' => 'Device was down due to :reason.|All devices were down.',
             'none_actioned' => 'No devices were discovered.',
+            'status_reason_unkown' => 'unknown',
         ],
         'actioned' => 'Discovered :count devices in :time',
         'starting' => 'Starting discovery:',
@@ -212,8 +213,9 @@ return [
             'type' => 'Poll devices only with specified type',
         ],
         'errors' => [
-            'none_up' => 'Device was down, unable to poll.|All devices were down, unable to poll.',
+            'none_up' => 'Device was down due to :reason.|All devices were down.',
             'none_actioned' => 'No devices were polled.',
+            'status_reason_unkown' => 'unknown',
         ],
         'actioned' => 'Polled :count devices in :time',
         'starting' => 'Starting polling run:',
@@ -243,6 +245,7 @@ return [
         'new_key' => 'New APP_KEY: :key',
         'old_key' => 'Old APP_KEY: :key',
         'save_key' => 'Save new key to .env?',
+        'ha_notice' => 'If running distributed pollers or a high-availability setup, update APP_KEY in .env on all remote poller/web nodes to match.',
         'success' => 'Successfully rotated keys!',
         'validation-errors' => [
             'not_in' => ':attribute must not match current APP_KEY',

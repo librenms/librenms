@@ -521,12 +521,10 @@ chown librenms:librenms /opt/librenms/config.php
 That's it!  You now should be able to log in to
 <http://librenms.example.com/>.
 
-!!! danger
-    Please note that we have not covered
-    HTTPS setup in this example, so your LibreNMS install is not secure
-    by default.  Please do not expose it to the public Internet unless
-    you have configured HTTPS and taken appropriate web server hardening
-    steps.
+!!! danger "Security & Backup Warning"
+    - Please note that we have not covered HTTPS setup in this example, so your LibreNMS install is not secure by default. Please do not expose it to the public Internet unless you have configured HTTPS and taken appropriate web server hardening steps.
+    - **Back up your `.env` file!** Your `.env` contains the `APP_KEY`, which is the master encryption key used to protect secrets and credentials stored in the database. If you lose your `APP_KEY`, encrypted data will be unrecoverable from backups or during server migrations.
+
 
 ## Add the first device
 

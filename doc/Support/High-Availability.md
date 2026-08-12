@@ -47,7 +47,8 @@ The WebUI achieves HA through multiple LibreNMS instances sharing these backend 
 3. **Deploy multiple LibreNMS instances**:
    - Install LibreNMS on multiple servers
    - Configure each instance to use the same database and Redis Sentinel cluster
-   - Ensure identical `.env` configurations across all instances. Remember to set `APP_KEY` to the same value on all instances.
+   - Ensure identical `.env` configurations across all instances. Remember to set `APP_KEY` to the same value on all
+     instances; `APP_KEY` is used to encrypt secrets in the database and must match across all nodes.
    - Each install should have a unique `NODE_ID` in your `.env`.
 
 4. **Configure RRD Access**:

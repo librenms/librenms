@@ -31,10 +31,12 @@ use App\Facades\LibrenmsConfig;
 use App\Jobs\DiscoverDevice;
 use App\Jobs\PollDevice;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
 
@@ -270,14 +272,23 @@ class ModuleTestHelper
         try {
             $new_device = new Device([
                 'hostname' => $snmpSimIp,
-                'snmpver' => 'v2c',
-                'transport' => 'udp',
-                'community' => $this->file_name,
-                'port' => $snmpSimPort,
                 'disabled' => 1, // disable to block normal pollers
             ]);
             (new ValidateDeviceAndCreate($new_device, true))->execute();
             $device_id = $new_device->device_id;
+
+            $method = DevicePollingMethod::saveForDevice(
+                $new_device,
+                PollingMethodType::Snmp,
+                settings: ['transport' => 'udp', 'port' => $snmpSimPort],
+            );
+            $secret = \App\Models\Secret::create([
+                'description' => "SNMP for device $new_device->hostname",
+                'secret_type' => PollingMethodType::Snmp->value,
+                'default' => false,
+                'data' => ['version' => 'v2c', 'community' => $this->file_name],
+            ]);
+            $method->secret()->associate($secret)->save();
 
             $this->qPrint("Added device: $device_id\n");
         } catch (\Exception $e) {

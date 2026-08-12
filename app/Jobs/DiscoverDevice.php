@@ -108,6 +108,7 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
         $this->deviceArray['status'] = $this->device->status;
         $this->deviceArray['status_reason'] = $this->device->status_reason;
         $os = OS::make($this->deviceArray);
+        $connectivity = new ConnectivityHelper($this->device);
         Event::listen(OsChangedEvent::class, function () use (&$os): void {
             $os = $this->handleOsChange($os);
         });

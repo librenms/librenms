@@ -28,7 +28,9 @@ namespace App\Actions\Device;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use Illuminate\Support\Arr;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostIpExistsException;
 use LibreNMS\Exceptions\HostNameEmptyException;
@@ -38,12 +40,21 @@ use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\HostUnreachableSnmpException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
+use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 use SnmpQuery;
 
 class ValidateDeviceAndCreate
 {
-    public function __construct(private readonly Device $device, private readonly bool $force = false, private readonly bool $ping_fallback = false)
-    {
+    /**
+     * @param  array<string, mixed>  $input
+     */
+    public function __construct(
+        private readonly Device $device,
+        private readonly bool $force = false,
+        private readonly bool $ping_fallback = false,
+        private readonly array $input = [],
+        private readonly BuildDefaultPollingMethods $builder = new BuildDefaultPollingMethods,
+    ) {
     }
 
     /**
@@ -66,18 +77,20 @@ class ValidateDeviceAndCreate
 
         $this->exceptIfHostnameExists();
         $this->fillDefaults();
+        $this->fillDefaultRelations();
 
         if (! $this->force) {
             $this->exceptIfIpExists();
 
-            if (! app(DeviceIsPingable::class)->execute($this->device)->isAlive()) {
+            $icmpMethod = $this->device->pollingMethod(PollingMethodType::Icmp)
+                ?? DevicePollingMethod::transient(PollingMethodType::Icmp, device: $this->device, affectsAvailability: false);
+            if (! PollingMethodType::Icmp->definition()->probe()->check($this->device)->isSuccess()) {
                 throw new HostUnreachablePingException($this->device->hostname);
             }
 
             $this->detectCredentials();
-            $this->cleanCredentials();
 
-            if (! $this->device->snmp_disable) {
+            if (! $this->device->getAttribute('snmp_disable')) {
                 $this->device->sysName = SnmpQuery::device($this->device)->get('SNMPv2-MIB::sysName.0')->value();
                 $this->exceptIfSysNameExists();
 
@@ -85,7 +98,29 @@ class ValidateDeviceAndCreate
             }
         }
 
-        return $this->device->save();
+        $saved = $this->device->save();
+
+        if ($saved) {
+            if ($this->device->relationLoaded('pollingMethods')) {
+                foreach ($this->device->pollingMethods as $method) {
+                    $method->device_id = $this->device->device_id;
+
+                    // If the method has an associated secret, save it first to get its ID
+                    if ($method->relationLoaded('secret') && $method->secret) {
+                        $secret = $method->secret;
+                        if (! $secret->exists && empty($secret->description)) {
+                            $secret->description = strtoupper((string) $method->method_type->value) . ' ' . $this->device->hostname;
+                        }
+                        $secret->save();
+                        $method->secret_id = $secret->id;
+                    }
+
+                    $method->save();
+                }
+            }
+        }
+
+        return $saved;
     }
 
     /**
@@ -94,47 +129,98 @@ class ValidateDeviceAndCreate
      */
     private function detectCredentials(): void
     {
-        if ($this->device->snmp_disable) {
+        if ($this->device->getAttribute('snmp_disable')) {
             return;
         }
 
         $host_unreachable_exception = new HostUnreachableSnmpException($this->device->hostname);
 
-        // which snmp version should we try (and in what order)
-        $snmp_versions = $this->device->snmpver ? [$this->device->snmpver] : LibrenmsConfig::get('snmp.version');
+        // Retrieve existing SNMP secret from relations if set
+        $existingSnmpSecret = $this->device->relationLoaded('pollingMethods')
+            ? $this->device->pollingMethods->firstWhere('method_type', PollingMethodType::Snmp)?->secret
+            : null;
 
-        $communities = Arr::where(Arr::wrap(LibrenmsConfig::get('snmp.community')), fn ($community) => $community && is_string($community));
-        if ($this->device->community) {
-            array_unshift($communities, $this->device->community);
+        if ($existingSnmpSecret !== null) {
+            $secretData = $existingSnmpSecret->asSecretData(SnmpSecretData::class);
+            $snmp_versions = [$secretData->version];
+            if ($secretData->version === 'v3') {
+                $v3_credentials = [[
+                    'authlevel' => $secretData->authlevel,
+                    'authname' => $secretData->authname,
+                    'authpass' => $secretData->authpass,
+                    'authalgo' => $secretData->authalgo,
+                    'cryptopass' => $secretData->cryptopass,
+                    'cryptoalgo' => $secretData->cryptoalgo,
+                ]];
+                $communities = [];
+            } else {
+                $communities = [$secretData->community];
+                $v3_credentials = [];
+            }
+        } else {
+            $snmp_versions = array_unique(LibrenmsConfig::get('snmp.version', []));
+            $communities = array_unique(Arr::where(Arr::wrap(LibrenmsConfig::get('snmp.community')), fn ($community) => $community && is_string($community)));
+            $v3_credentials = array_unique(LibrenmsConfig::get('snmp.v3', []), SORT_REGULAR);
         }
-        $communities = array_unique($communities);
 
-        $v3_credentials = LibrenmsConfig::get('snmp.v3');
-        array_unshift($v3_credentials, $this->device->only(['authlevel', 'authname', 'authpass', 'authalgo', 'cryptopass', 'cryptoalgo']));
-        $v3_credentials = array_unique($v3_credentials, SORT_REGULAR);
+        // Keep track of other polling methods so we do not overwrite them when setting the relation
+        $otherPollingMethods = collect();
+        if ($this->device->relationLoaded('pollingMethods')) {
+            $otherPollingMethods = $this->device->pollingMethods->filter(fn ($m) => $m->method_type !== PollingMethodType::Snmp);
+        }
 
         foreach ($snmp_versions as $snmp_version) {
-            $this->device->snmpver = $snmp_version;
-
             if ($snmp_version === 'v3') {
                 // Try each set of parameters from config
                 foreach ($v3_credentials as $v3) {
-                    $this->device->fill(Arr::only($v3, ['authlevel', 'authname', 'authpass', 'authalgo', 'cryptopass', 'cryptoalgo']));
+                    $snmpData = [
+                        'version' => 'v3',
+                        'authlevel' => $v3['authlevel'] ?? 'noAuthNoPriv',
+                        'authname' => $v3['authname'] ?? null,
+                        'authpass' => $v3['authpass'] ?? null,
+                        'authalgo' => $v3['authalgo'] ?? 'SHA',
+                        'cryptopass' => $v3['cryptopass'] ?? null,
+                        'cryptoalgo' => $v3['cryptoalgo'] ?? 'AES',
+                    ];
 
-                    if (app(DeviceIsSnmpable::class)->execute($this->device)) {
+                    $snmpMethod = DevicePollingMethod::transient(
+                        PollingMethodType::Snmp,
+                        secretData: $snmpData,
+                        device: $this->device,
+                        affectsAvailability: true,
+                    );
+
+                    // Set the relation temporarily for testing
+                    $this->device->setRelation('pollingMethods', $otherPollingMethods->concat([$snmpMethod]));
+
+                    if (PollingMethodType::Snmp->definition()->probe()->check($this->device)->isSuccess()) {
                         return;
                     } else {
-                        $host_unreachable_exception->addReason($snmp_version, $this->device->authname . '/' . $this->device->authlevel);
+                        $host_unreachable_exception->addReason($snmp_version, $snmpData['authname'] . '/' . $snmpData['authlevel']);
                     }
                 }
             } elseif ($snmp_version === 'v2c' || $snmp_version === 'v1') {
                 // try each community from config
                 foreach ($communities as $community) {
-                    $this->device->community = $community;
-                    if (app(DeviceIsSnmpable::class)->execute($this->device)) {
+                    $snmpData = [
+                        'version' => $snmp_version,
+                        'community' => $community,
+                    ];
+
+                    $snmpMethod = DevicePollingMethod::transient(
+                        PollingMethodType::Snmp,
+                        secretData: $snmpData,
+                        device: $this->device,
+                        affectsAvailability: true,
+                    );
+
+                    // Set the relation temporarily for testing
+                    $this->device->setRelation('pollingMethods', $otherPollingMethods->concat([$snmpMethod]));
+
+                    if (PollingMethodType::Snmp->definition()->probe()->check($this->device)->isSuccess()) {
                         return;
                     } else {
-                        $host_unreachable_exception->addReason($snmp_version, $this->device->community);
+                        $host_unreachable_exception->addReason($snmp_version, (string) ($community ?? ''));
                     }
                 }
             } else {
@@ -143,8 +229,9 @@ class ValidateDeviceAndCreate
         }
 
         if ($this->ping_fallback) {
-            $this->device->snmp_disable = true;
+            $this->device->setAttribute('snmp_disable', true);
             $this->device->os = 'ping';
+            $this->device->setRelation('pollingMethods', $otherPollingMethods);
 
             return;
         }
@@ -152,23 +239,16 @@ class ValidateDeviceAndCreate
         throw $host_unreachable_exception;
     }
 
-    private function cleanCredentials(): void
+    private function fillDefaultRelations(): void
     {
-        if ($this->device->snmpver == 'v3') {
-            $this->device->community = null;
-        } else {
-            $this->device->authlevel = null;
-            $this->device->authname = null;
-            $this->device->authalgo = null;
-            $this->device->cryptopass = null;
-            $this->device->cryptoalgo = null;
+        if (! $this->device->relationLoaded('pollingMethods')) {
+            $pollingMethods = $this->builder->execute($this->device, $this->input);
+            $this->device->setRelation('pollingMethods', $pollingMethods);
         }
     }
 
     private function fillDefaults(): void
     {
-        $this->device->port = $this->device->port ?: LibrenmsConfig::get('snmp.port', 161);
-        $this->device->transport = $this->device->transport ?: LibrenmsConfig::get('snmp.transports.0', 'udp');
         $this->device->poller_group = $this->device->poller_group ?: LibrenmsConfig::get('default_poller_group', 0);
         $this->device->os = $this->device->os ?: 'generic';
         $this->device->status_reason = '';
