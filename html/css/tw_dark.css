@@ -2,6 +2,11 @@
     color: #bfc0c0
 }
 
+.dark .widget-header {
+    background-color: #3e444c;
+    color: #f9fafb
+}
+
 .dark .icon-theme {
     color: #bfc0c0
 }
