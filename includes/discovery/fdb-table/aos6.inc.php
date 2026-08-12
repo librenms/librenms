@@ -71,7 +71,7 @@ if (! empty($fdbPort_table)) {
             continue;
         }
 
-        [$parent, $child] = array_map('intval', $parts);
+        [$parent, $child] = array_map(intval(...), $parts);
 
         if ($parent && $child && (int) ($data['IF-MIB::ifStackStatus'] ?? 0) === 1) {
             $lag_ports[$child] = $parent;
