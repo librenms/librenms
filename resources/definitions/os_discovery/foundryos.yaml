@@ -30,9 +30,6 @@ modules:
                         - FOUNDRY-SN-AGENT-MIB::snChasShutdownTemperature
         temperature:
             data:
-                # Chassis-based platforms (e.g. NetIron MLX) expose per-module
-                # sensors here. Fixed-configuration platforms (FES) do not
-                # implement this table at all.
                 -
                     oid: FOUNDRY-SN-AGENT-MIB::snAgentTempTable
                     value: FOUNDRY-SN-AGENT-MIB::snAgentTempValue
@@ -41,10 +38,6 @@ modules:
                     descr: FOUNDRY-SN-AGENT-MIB::snAgentTempSensorDescr
                     index: '{{ $index }}'
                     group: 'Module Temperatures'
-                # Fixed-configuration platforms (FES4802, FES2402) expose only a
-                # single chassis temperature, with the device's own warning and
-                # shutdown thresholds. Skipped where the per-module table exists
-                # so platforms implementing both (FWSX448) are not double-counted.
                 -
                     oid: FOUNDRY-SN-AGENT-MIB::snChasActualTemperature
                     num_oid: '.1.3.6.1.4.1.1991.1.1.1.1.18.{{ $index }}'
@@ -60,9 +53,6 @@ modules:
                             value: true
         state:
             data:
-                # snChasPwrSupplyDescription is an empty string on some platforms
-                # (observed on NetIron MLX), so the index is used for the label to
-                # stay consistent with the ironware definition.
                 -
                     oid: FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyTable
                     value: FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyOperStatus
