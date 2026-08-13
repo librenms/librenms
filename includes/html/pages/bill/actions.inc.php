@@ -4,11 +4,13 @@ $action = $_POST['action'] ?? 'none';
 $confirm = $_POST['confirm'] ?? 'none';
 
 if ($action == 'delete_bill' && $confirm == 'confirm') {
-    \App\Models\BillHistory::where('bill_id', $bill_id)->delete();
-    \App\Models\BillPort::where('bill_id', $bill_id)->delete();
-    \App\Models\BillData::where('bill_id', $bill_id)->delete();
-    \App\Models\BillPerm::where('bill_id', $bill_id)->delete();
-    \App\Models\Bill::where('bill_id', $bill_id)->delete();
+    App\Models\BillHistory::where('bill_id', $bill_id)->delete();
+    App\Models\BillPort::where('bill_id', $bill_id)->delete();
+    App\Models\BillSap::where('bill_id', $bill_id)->delete();
+    App\Models\BillSapCounter::where('bill_id', $bill_id)->delete();
+    App\Models\BillData::where('bill_id', $bill_id)->delete();
+    App\Models\BillPerm::where('bill_id', $bill_id)->delete();
+    App\Models\Bill::where('bill_id', $bill_id)->delete();
 
     echo '<div class=infobox>Bill Deleted. Redirecting to Bills list.</div>';
 
@@ -17,8 +19,8 @@ if ($action == 'delete_bill' && $confirm == 'confirm') {
 
 if ($action == 'reset_bill' && ($confirm == 'rrd' || $confirm == 'mysql')) {
     if ($confirm == 'mysql') {
-        \App\Models\BillHistory::where('bill_id', $bill_id)->delete();
-        \App\Models\BillData::where('bill_id', $bill_id)->delete();
+        App\Models\BillHistory::where('bill_id', $bill_id)->delete();
+        App\Models\BillData::where('bill_id', $bill_id)->delete();
     }
 
     if ($confirm == 'rrd') {
@@ -35,7 +37,16 @@ if ($action == 'add_bill_port') {
 }
 
 if ($action == 'delete_bill_port') {
-    \App\Models\BillPort::where('bill_id', $bill_id)->where('port_id', $_POST['port_id'])->delete();
+    App\Models\BillPort::where('bill_id', $bill_id)->where('port_id', $_POST['port_id'])->delete();
+}
+
+if ($action == 'add_bill_sap') {
+    App\Models\BillSap::create(['bill_id' => $_POST['bill_id'], 'sap_id' => $_POST['sap_id']]);
+}
+
+if ($action == 'delete_bill_sap') {
+    App\Models\BillSap::where('bill_id', $bill_id)->where('sap_id', $_POST['sap_id'])->delete();
+    App\Models\BillSapCounter::where('bill_id', $bill_id)->where('sap_id', $_POST['sap_id'])->delete();
 }
 
 if ($action == 'update_bill') {
@@ -43,18 +54,18 @@ if ($action == 'update_bill') {
         if ($_POST['bill_type'] == 'quota') {
             if (isset($_POST['bill_quota_type'])) {
                 if ($_POST['bill_quota_type'] == 'MB') {
-                    $multiplier = (1 * \App\Facades\LibrenmsConfig::get('billing.base'));
+                    $multiplier = (1 * App\Facades\LibrenmsConfig::get('billing.base'));
                 }
 
                 if ($_POST['bill_quota_type'] == 'GB') {
-                    $multiplier = (1 * \App\Facades\LibrenmsConfig::get('billing.base') * \App\Facades\LibrenmsConfig::get('billing.base'));
+                    $multiplier = (1 * App\Facades\LibrenmsConfig::get('billing.base') * App\Facades\LibrenmsConfig::get('billing.base'));
                 }
 
                 if ($_POST['bill_quota_type'] == 'TB') {
-                    $multiplier = (1 * \App\Facades\LibrenmsConfig::get('billing.base') * \App\Facades\LibrenmsConfig::get('billing.base') * \App\Facades\LibrenmsConfig::get('billing.base'));
+                    $multiplier = (1 * App\Facades\LibrenmsConfig::get('billing.base') * App\Facades\LibrenmsConfig::get('billing.base') * App\Facades\LibrenmsConfig::get('billing.base'));
                 }
 
-                $bill_quota = (is_numeric($_POST['bill_quota']) ? $_POST['bill_quota'] * \App\Facades\LibrenmsConfig::get('billing.base') * $multiplier : 0);
+                $bill_quota = (is_numeric($_POST['bill_quota']) ? $_POST['bill_quota'] * App\Facades\LibrenmsConfig::get('billing.base') * $multiplier : 0);
                 $bill_cdr = 0;
             }
         }
@@ -62,15 +73,15 @@ if ($action == 'update_bill') {
         if ($_POST['bill_type'] == 'cdr') {
             if (isset($_POST['bill_cdr_type'])) {
                 if ($_POST['bill_cdr_type'] == 'Kbps') {
-                    $multiplier = (1 * \App\Facades\LibrenmsConfig::get('billing.base'));
+                    $multiplier = (1 * App\Facades\LibrenmsConfig::get('billing.base'));
                 }
 
                 if ($_POST['bill_cdr_type'] == 'Mbps') {
-                    $multiplier = (1 * \App\Facades\LibrenmsConfig::get('billing.base') * \App\Facades\LibrenmsConfig::get('billing.base'));
+                    $multiplier = (1 * App\Facades\LibrenmsConfig::get('billing.base') * App\Facades\LibrenmsConfig::get('billing.base'));
                 }
 
                 if ($_POST['bill_cdr_type'] == 'Gbps') {
-                    $multiplier = (1 * \App\Facades\LibrenmsConfig::get('billing.base') * \App\Facades\LibrenmsConfig::get('billing.base') * \App\Facades\LibrenmsConfig::get('billing.base'));
+                    $multiplier = (1 * App\Facades\LibrenmsConfig::get('billing.base') * App\Facades\LibrenmsConfig::get('billing.base') * App\Facades\LibrenmsConfig::get('billing.base'));
                 }
 
                 $bill_cdr = (is_numeric($_POST['bill_cdr']) ? $_POST['bill_cdr'] * $multiplier : 0);

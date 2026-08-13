@@ -47,6 +47,12 @@ $port_device_id = -1;
                         <select class="form-control input-sm" id="port_id" name="port_id"></select>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="sap_id">SAP</label>
+                    <div class="col-sm-8">
+                        <select class="form-control input-sm" id="sap_id" name="sap_id"></select>
+                    </div>
+                </div>
     <script type="text/javascript">
         const makePortData = function (param) {
             param.device = $('#device').val();
@@ -54,8 +60,10 @@ $port_device_id = -1;
         }
         init_select2('#device', 'device', {}, <?php echo "{id: $port_device_id, text: '" . (isset($device) ? format_hostname($device) : 'No Device') . "'}"; ?>, '', {dropdownParent: $('#create-bill .modal-content')});
         init_select2('#port_id', 'port', makePortData, <?php echo '{id: ' . ($port['port_id'] ?? '0') . ", text: '" . (isset($port['ifAlias']) ? htmlentities($port['ifAlias']) : 'No Port') . "'}"; ?>, '', {dropdownParent: $('#create-bill .modal-content')});
+        init_select2('#sap_id', 'sap', makePortData, {id: 0, text: 'No SAP'}, '', {dropdownParent: $('#create-bill .modal-content')});
         function billDeviceChanged() {
             $('#port_id').val(null).trigger('change'); // clear port selection
+            $('#sap_id').val(null).trigger('change'); // clear sap selection
         }
     </script>
     <?php
