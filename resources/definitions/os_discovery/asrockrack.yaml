@@ -1,8 +1,623 @@
 modules:
     os:
-        # ASRock Rack BMC MIB (enterprise 49622) has per-board module names,
-        # so raw numeric OIDs are used instead of MIB translation
-        hardware: .1.3.6.1.4.1.49622.1.1.0 # MBModelName
-        version: .1.3.6.1.4.1.49622.1.3.0 # BMCVersion
-        features: .1.3.6.1.4.1.49622.1.4.0 # BIOSVersion
-        serial: .1.3.6.1.4.1.49622.4.1.4.8.0 # FRU Product serial
+        hardware: ASROCKRACK-AM5D4ID-MIB::MBModelName.0
+        version: ASROCKRACK-AM5D4ID-MIB::BMCVersion.0
+        features: ASROCKRACK-AM5D4ID-MIB::BIOSVersion.0
+        serial: ASROCKRACK-AM5D4ID-MIB::PSerialNumber.0
+    sensors:
+        current:
+            data:
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-38
+                    num_oid: '.1.3.6.1.4.1.49622.6.38.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-38
+                    index: 'sensor38.{{ $index }}'
+                    high_limit: 132
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-38
+                            op: '='
+                            value: '0.00 amps'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-44
+                    num_oid: '.1.3.6.1.4.1.49622.6.44.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-44
+                    index: 'sensor44.{{ $index }}'
+                    high_limit: 132
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-44
+                            op: '='
+                            value: '0.00 amps'
+        fanspeed:
+            data:
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-16
+                    num_oid: '.1.3.6.1.4.1.49622.6.16.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-16
+                    index: 'sensor16.{{ $index }}'
+                    low_warn_limit: 100
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-16
+                            op: '='
+                            value: '0.00 rpm'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-17
+                    num_oid: '.1.3.6.1.4.1.49622.6.17.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-17
+                    index: 'sensor17.{{ $index }}'
+                    low_warn_limit: 100
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-17
+                            op: '='
+                            value: '0.00 rpm'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-18
+                    num_oid: '.1.3.6.1.4.1.49622.6.18.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-18
+                    index: 'sensor18.{{ $index }}'
+                    low_warn_limit: 100
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-18
+                            op: '='
+                            value: '0.00 rpm'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-19
+                    num_oid: '.1.3.6.1.4.1.49622.6.19.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-19
+                    index: 'sensor19.{{ $index }}'
+                    low_warn_limit: 100
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-19
+                            op: '='
+                            value: '0.00 rpm'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-20
+                    num_oid: '.1.3.6.1.4.1.49622.6.20.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-20
+                    index: 'sensor20.{{ $index }}'
+                    low_warn_limit: 100
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-20
+                            op: '='
+                            value: '0.00 rpm'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-21
+                    num_oid: '.1.3.6.1.4.1.49622.6.21.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-21
+                    index: 'sensor21.{{ $index }}'
+                    low_warn_limit: 100
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-21
+                            op: '='
+                            value: '0.00 rpm'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-22
+                    num_oid: '.1.3.6.1.4.1.49622.6.22.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-22
+                    index: 'sensor22.{{ $index }}'
+                    low_warn_limit: 100
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-22
+                            op: '='
+                            value: '0.00 rpm'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-23
+                    num_oid: '.1.3.6.1.4.1.49622.6.23.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-23
+                    index: 'sensor23.{{ $index }}'
+                    low_warn_limit: 100
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-23
+                            op: '='
+                            value: '0.00 rpm'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-42
+                    num_oid: '.1.3.6.1.4.1.49622.6.42.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-42
+                    index: 'sensor42.{{ $index }}'
+                    low_warn_limit: 100
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-42
+                            op: '='
+                            value: '0.00 rpm'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-48
+                    num_oid: '.1.3.6.1.4.1.49622.6.48.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-48
+                    index: 'sensor48.{{ $index }}'
+                    low_warn_limit: 100
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-48
+                            op: '='
+                            value: '0.00 rpm'
+        power:
+            data:
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-39
+                    num_oid: '.1.3.6.1.4.1.49622.6.39.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-39
+                    index: 'sensor39.{{ $index }}'
+                    high_limit: 1800
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-39
+                            op: '='
+                            value: '0.00 watts'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-40
+                    num_oid: '.1.3.6.1.4.1.49622.6.40.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-40
+                    index: 'sensor40.{{ $index }}'
+                    high_limit: 1596
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-40
+                            op: '='
+                            value: '0.00 watts'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-45
+                    num_oid: '.1.3.6.1.4.1.49622.6.45.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-45
+                    index: 'sensor45.{{ $index }}'
+                    high_limit: 1800
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-45
+                            op: '='
+                            value: '0.00 watts'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-46
+                    num_oid: '.1.3.6.1.4.1.49622.6.46.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-46
+                    index: 'sensor46.{{ $index }}'
+                    high_limit: 1596
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-46
+                            op: '='
+                            value: '0.00 watts'
+        temperature:
+            data:
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-24
+                    num_oid: '.1.3.6.1.4.1.49622.6.24.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-24
+                    index: 'sensor24.{{ $index }}'
+                    warn_limit: 98
+                    high_limit: 99
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-24
+                            op: '='
+                            value: '0.00 deg_c'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-25
+                    num_oid: '.1.3.6.1.4.1.49622.6.25.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-25
+                    index: 'sensor25.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-25
+                            op: '='
+                            value: '0.00 deg_c'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-26
+                    num_oid: '.1.3.6.1.4.1.49622.6.26.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-26
+                    index: 'sensor26.{{ $index }}'
+                    warn_limit: 84
+                    high_limit: 85
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-26
+                            op: '='
+                            value: '0.00 deg_c'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-27
+                    num_oid: '.1.3.6.1.4.1.49622.6.27.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-27
+                    index: 'sensor27.{{ $index }}'
+                    warn_limit: 84
+                    high_limit: 85
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-27
+                            op: '='
+                            value: '0.00 deg_c'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-28
+                    num_oid: '.1.3.6.1.4.1.49622.6.28.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-28
+                    index: 'sensor28.{{ $index }}'
+                    warn_limit: 84
+                    high_limit: 85
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-28
+                            op: '='
+                            value: '0.00 deg_c'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-29
+                    num_oid: '.1.3.6.1.4.1.49622.6.29.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-29
+                    index: 'sensor29.{{ $index }}'
+                    warn_limit: 84
+                    high_limit: 85
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-29
+                            op: '='
+                            value: '0.00 deg_c'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-30
+                    num_oid: '.1.3.6.1.4.1.49622.6.30.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-30
+                    index: 'sensor30.{{ $index }}'
+                    warn_limit: 93
+                    high_limit: 94
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-30
+                            op: '='
+                            value: '0.00 deg_c'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-31
+                    num_oid: '.1.3.6.1.4.1.49622.6.31.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-31
+                    index: 'sensor31.{{ $index }}'
+                    warn_limit: 93
+                    high_limit: 94
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-31
+                            op: '='
+                            value: '0.00 deg_c'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-32
+                    num_oid: '.1.3.6.1.4.1.49622.6.32.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-32
+                    index: 'sensor32.{{ $index }}'
+                    warn_limit: 55
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-32
+                            op: '='
+                            value: '0.00 deg_c'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-33
+                    num_oid: '.1.3.6.1.4.1.49622.6.33.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-33
+                    index: 'sensor33.{{ $index }}'
+                    warn_limit: 93
+                    high_limit: 94
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-33
+                            op: '='
+                            value: '0.00 deg_c'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-34
+                    num_oid: '.1.3.6.1.4.1.49622.6.34.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-34
+                    index: 'sensor34.{{ $index }}'
+                    warn_limit: 93
+                    high_limit: 94
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-34
+                            op: '='
+                            value: '0.00 deg_c'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-35
+                    num_oid: '.1.3.6.1.4.1.49622.6.35.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-35
+                    index: 'sensor35.{{ $index }}'
+                    warn_limit: 99
+                    high_limit: 100
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-35
+                            op: '='
+                            value: '0.00 deg_c'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-36
+                    num_oid: '.1.3.6.1.4.1.49622.6.36.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-36
+                    index: 'sensor36.{{ $index }}'
+                    warn_limit: 94
+                    high_limit: 95
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-36
+                            op: '='
+                            value: '0.00 deg_c'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-41
+                    num_oid: '.1.3.6.1.4.1.49622.6.41.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-41
+                    index: 'sensor41.{{ $index }}'
+                    warn_limit: 93
+                    high_limit: 94
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-41
+                            op: '='
+                            value: '0.00 deg_c'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-47
+                    num_oid: '.1.3.6.1.4.1.49622.6.47.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-47
+                    index: 'sensor47.{{ $index }}'
+                    warn_limit: 93
+                    high_limit: 94
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-47
+                            op: '='
+                            value: '0.00 deg_c'
+        voltage:
+            data:
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-1
+                    num_oid: '.1.3.6.1.4.1.49622.6.1.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-1
+                    index: 'sensor1.{{ $index }}'
+                    low_limit: 3.04
+                    high_limit: 3.72
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-1
+                            op: '='
+                            value: '0.00 volts'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-2
+                    num_oid: '.1.3.6.1.4.1.49622.6.2.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-2
+                    index: 'sensor2.{{ $index }}'
+                    low_limit: 4.26
+                    high_limit: 5.49
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-2
+                            op: '='
+                            value: '0.00 volts'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-3
+                    num_oid: '.1.3.6.1.4.1.49622.6.3.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-3
+                    index: 'sensor3.{{ $index }}'
+                    high_limit: 1.64
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-3
+                            op: '='
+                            value: '0.00 volts'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-4
+                    num_oid: '.1.3.6.1.4.1.49622.6.4.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-4
+                    index: 'sensor4.{{ $index }}'
+                    low_limit: 0.23
+                    high_limit: 1.65
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-4
+                            op: '='
+                            value: '0.00 volts'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-5
+                    num_oid: '.1.3.6.1.4.1.49622.6.5.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-5
+                    index: 'sensor5.{{ $index }}'
+                    low_limit: 0.81
+                    high_limit: 1.32
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-5
+                            op: '='
+                            value: '0.00 volts'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-6
+                    num_oid: '.1.3.6.1.4.1.49622.6.6.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-6
+                    index: 'sensor6.{{ $index }}'
+                    low_limit: 0.42
+                    high_limit: 3.84
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-6
+                            op: '='
+                            value: '0.00 volts'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-7
+                    num_oid: '.1.3.6.1.4.1.49622.6.7.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-7
+                    index: 'sensor7.{{ $index }}'
+                    low_limit: 1.62
+                    high_limit: 1.98
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-7
+                            op: '='
+                            value: '0.00 volts'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-8
+                    num_oid: '.1.3.6.1.4.1.49622.6.8.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-8
+                    index: 'sensor8.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-8
+                            op: '='
+                            value: '0.00 volts'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-9
+                    num_oid: '.1.3.6.1.4.1.49622.6.9.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-9
+                    index: 'sensor9.{{ $index }}'
+                    low_limit: 1.6
+                    high_limit: 2.24
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-9
+                            op: '='
+                            value: '0.00 volts'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-10
+                    num_oid: '.1.3.6.1.4.1.49622.6.10.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-10
+                    index: 'sensor10.{{ $index }}'
+                    low_limit: 1.33
+                    high_limit: 1.96
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-10
+                            op: '='
+                            value: '0.00 volts'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-11
+                    num_oid: '.1.3.6.1.4.1.49622.6.11.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-11
+                    index: 'sensor11.{{ $index }}'
+                    low_limit: 0.7
+                    high_limit: 1.42
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-11
+                            op: '='
+                            value: '0.00 volts'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-12
+                    num_oid: '.1.3.6.1.4.1.49622.6.12.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-12
+                    index: 'sensor12.{{ $index }}'
+                    low_limit: 2.4
+                    high_limit: 3.3
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-12
+                            op: '='
+                            value: '0.00 volts'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-13
+                    num_oid: '.1.3.6.1.4.1.49622.6.13.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-13
+                    index: 'sensor13.{{ $index }}'
+                    low_limit: 2.96
+                    high_limit: 3.62
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-13
+                            op: '='
+                            value: '0.00 volts'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-14
+                    num_oid: '.1.3.6.1.4.1.49622.6.14.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-14
+                    index: 'sensor14.{{ $index }}'
+                    low_limit: 4.5
+                    high_limit: 5.49
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-14
+                            op: '='
+                            value: '0.00 volts'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-15
+                    num_oid: '.1.3.6.1.4.1.49622.6.15.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-15
+                    index: 'sensor15.{{ $index }}'
+                    low_limit: 10.8
+                    high_limit: 13.2
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-15
+                            op: '='
+                            value: '0.00 volts'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-37
+                    num_oid: '.1.3.6.1.4.1.49622.6.37.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-37
+                    index: 'sensor37.{{ $index }}'
+                    low_limit: 180
+                    low_warn_limit: 198
+                    warn_limit: 242
+                    high_limit: 264
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-37
+                            op: '='
+                            value: '0.00 volts'
+                -
+                    oid: ASROCKRACK-AM5D4ID-MIB::SensorInfo
+                    value: ASROCKRACK-AM5D4ID-MIB::Reading-43
+                    num_oid: '.1.3.6.1.4.1.49622.6.43.5.{{ $index }}'
+                    descr: ASROCKRACK-AM5D4ID-MIB::Name-43
+                    index: 'sensor43.{{ $index }}'
+                    low_limit: 180
+                    low_warn_limit: 198
+                    warn_limit: 242
+                    high_limit: 264
+                    skip_values:
+                        -
+                            oid: ASROCKRACK-AM5D4ID-MIB::Reading-43
+                            op: '='
+                            value: '0.00 volts'
