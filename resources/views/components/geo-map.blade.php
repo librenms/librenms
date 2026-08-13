@@ -76,7 +76,7 @@
                     leafletMap.setView(targetLocation, config.zoom);
 
                     if (@json($marker || (bool) $editableLocationId)) {
-                        let deviceMarker = L.marker(targetLocation).addTo(leafletMap);
+                        let deviceMarker = L.marker(targetLocation, { zIndexOffset: 20000 }).addTo(leafletMap);
                         if (@json((bool) $editableLocationId)) {
                             deviceMarker.dragging.enable();
                             deviceMarker.on("dragend", function () {
