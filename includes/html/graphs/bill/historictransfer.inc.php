@@ -7,8 +7,10 @@ use Amenadiel\JpGraph\Plot\LinePlot;
 use LibreNMS\Billing;
 use LibreNMS\Util\Number;
 
-if (is_numeric($vars['bill_hist_id'])) {
-    $graph_data = Billing::getBandwidthGraphData($vars['id'], $vars['bill_hist_id'], null, null, $vars['imgtype']);
+$bill_hist_id = $vars['bill_hist_id'] ?? null;
+
+if (is_numeric($bill_hist_id)) {
+    $graph_data = Billing::getBandwidthGraphData($vars['id'], $bill_hist_id, null, null, $vars['imgtype']);
 } elseif (is_numeric($vars['from'])) {
     $graph_data = Billing::getBandwidthGraphData($vars['id'], null, $vars['from'], $vars['to'], $vars['imgtype']);
 } else {

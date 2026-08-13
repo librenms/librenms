@@ -17,7 +17,7 @@ wget https://github.com/librenms/docker/archive/refs/heads/master.zip
 unzip master.zip
 cd docker-master/examples/compose
 ```
-3. Set a new mysql password in .env and inspect compose.yml
+3. Set a new mariadb/mysql password in .env (`MARIADB_PASSWORD` or `MYSQL_PASSWORD`) and inspect compose.yml
 4. Bring up the docker containers
 ```
 sudo docker compose -f compose.yml up -d

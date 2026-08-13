@@ -5228,6 +5228,31 @@
                     "sensor_deleted": 0,
                     "sensor_class": "count",
                     "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.25461.2.1.2.3.6.0",
+                    "sensor_index": "panSessionActiveICMP.0",
+                    "sensor_type": "panos",
+                    "sensor_descr": "Active ICMP Sessions",
+                    "group": "Sessions",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.25461.2.1.2.3.7.0",
                     "sensor_index": "panSessionActiveSslProxy.0",
                     "sensor_type": "panos",
@@ -5558,6 +5583,31 @@
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 38,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.25461.2.1.2.3.6.0",
+                    "sensor_index": "panSessionActiveICMP.0",
+                    "sensor_type": "panos",
+                    "sensor_descr": "Active ICMP Sessions",
+                    "group": "Sessions",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -5978,7 +6028,8 @@
                     "ifStackStatus": "active"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "hr-device": {
         "discovery": {

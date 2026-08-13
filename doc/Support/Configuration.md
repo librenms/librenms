@@ -31,6 +31,23 @@ use some snmp configuration as an example:
 
     `$config['snmp']['v3'][0]['authalgo']`
 
+## CLI
+`lnms config:get <setting>` will fetch the current config settings (composite of database, config.php, and defaults).  
+`lnms config:set <setting> <value>` will set the config setting in the database.
+Calling `lnms config:set <setting>` on a setting with no value will prompt you to reset
+it to its default.
+
+Parameters are:
+```
+    <setting>   dot notation of config item
+                trailing .+ instructs to append <value> to existing value
+
+    <value>     JSON formatted config value
+                string, number, true and false are all valid JSON value
+```
+
+If you set up bash completion, you can use tab completion to find config settings.
+
 !!! note
     Not all documentation has been updated to reflect using `lnms config:set` to
     set configuration items, but it will work and is the preferred option over `config.php`.
@@ -40,14 +57,6 @@ use some snmp configuration as an example:
     validity, please be careful of inputting bad values when using `--ignore-checks`. 
 
     Please report missing settings.
-
-## CLI
-`lnms config:get <setting>` will fetch the current config settings (composite of database, config.php, and defaults).  
-`lnms config:set <setting> <value>` will set the config setting in the database.
-Calling `lnms config:set <setting>` on a setting with no value will prompt you to reset
-it to its default.
-
-If you set up bash completion, you can use tab completion to find config settings.
 
 ### Getting a list of all current values
 
@@ -555,13 +564,6 @@ which will force a full discovery run within the configured time window.
 !!! setting "webui/device"
     ```bash
     lnms config:set enable_clear_discovery true
-    ```
-
-Disable the footer of the WebUI by setting `enable_footer` to 0.
-
-!!! setting "webui/general"
-    ```bash
-    lnms config:set enable_footer true
     ```
 
 Show the `X`th percentile in the graph instead of the default 95th percentile.

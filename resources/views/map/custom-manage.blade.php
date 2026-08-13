@@ -10,15 +10,15 @@
 
     <x-panel id="manage-custom-maps" class="tw:mx-auto tw:max-w-(--breakpoint-lg)">
         <x-slot:title>
-            <div class="tw:flex tw:justify-between tw:items-center">
+            <div class="tw:flex tw:justify-between tw:items-center tw:gap-3 tw:flex-wrap">
+                <x-filter name="custom-maps" :fields="$filterFields" :initial="$filter" :reload="true" />
+                @can('custom-map.create')
                 <div>
-                    {{ __('map.custom.title.manage') }}
-                </div>
-                <div>
-                    <button class="btn btn-primary" onclick="$('#mapModal').modal({backdrop: 'static', keyboard: false}, 'show');">
+                    <button class="lnms-btn lnms-btn-primary" onclick="$('#mapModal').modal({backdrop: 'static', keyboard: false}, 'show');">
                         {{ __('map.custom.create_map') }}
                     </button>
                 </div>
+                @endcan
             </div>
         </x-slot:title>
         <x-slot:slot class="tw:p-0!">
@@ -36,18 +36,22 @@
                                 <a href="{{ route('maps.custom.show', $map->custom_map_id) }}">{{ $map->name }}</a>
                             </div>
                             <div class="tw:whitespace-nowrap">
-                                <button class="btn btn-info"
+                                <a href="{{ route('maps.custom.show', $map->custom_map_id) }}" class="lnms-btn lnms-btn-default"><i class="fa fa-eye" aria-hidden="true"></i>
+                                    <span class="tw:hidden tw:sm:inline" aria-hidden="false">{{ __('View') }}</span>
+                                </a>
+                                @can('custom-map.update')
+                                <button class="lnms-btn lnms-btn-primary"
                                         onclick="startMapClone(this)"
                                         data-map-name="{{ $map->name }}"
                                         data-map-id="{{ $map->custom_map_id }}"
                                 ><i class="fa fa-copy" aria-hidden="true"></i>
                                     <span class="tw:hidden tw:sm:inline" aria-hidden="false">{{ __('Clone') }}</span>
                                 </button>
-                                <a class="btn btn-default" href="{{ route('maps.custom.edit', $map->custom_map_id) }}">
+                                <a class="lnms-btn lnms-btn-warning" href="{{ route('maps.custom.edit', $map->custom_map_id) }}">
                                     <i class="fa fa-pencil" aria-hidden="true"></i>
                                     <span class="tw:hidden tw:sm:inline" aria-hidden="false">{{ __('Edit') }}</span>
                                 </a>
-                                <button class="btn btn-danger"
+                                <button class="lnms-btn lnms-btn-danger"
                                         onclick="startMapDelete(this)"
                                         data-map-name="{{ $map->name }}"
                                         data-map-group-id="#map-group-{{ $group_uuid }}"
@@ -55,6 +59,7 @@
                                 ><i class="fa fa-trash" aria-hidden="true"></i>
                                     <span class="tw:hidden tw:sm:inline" aria-hidden="false">{{ __('Delete') }}</span>
                                 </button>
+                                @endcan
                             </div>
                         </div>
                     </div>

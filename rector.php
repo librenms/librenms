@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Rector\CodingStyle\Rector\Enum_\EnumCaseToPascalCaseRector;
 use Rector\Config\RectorConfig;
 use Rector\Php74\Rector\StaticCall\ExportToReflectionFunctionRector;
 
@@ -27,5 +26,4 @@ return RectorConfig::configure()
     ->withPhpSets()
     ->withTypeCoverageLevel(0)
     ->withDeadCodeLevel(0)
-    ->withCodeQualityLevel(0)
-    ->withRules([EnumCaseToPascalCaseRector::class]);
+    ->withCodeQualityLevel(0);

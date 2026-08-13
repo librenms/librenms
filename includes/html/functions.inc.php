@@ -18,6 +18,7 @@ use App\Models\Device;
 use App\Models\Port;
 use App\Models\Sensor;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\HtmlString;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
@@ -25,7 +26,7 @@ use LibreNMS\Util\Url;
 
 function toner2colour($descr, $percent)
 {
-    $colour = \LibreNMS\Util\Color::percentage(100 - $percent, null);
+    $colour = LibreNMS\Util\Color::percentage(100 - $percent, null);
 
     if (str_ends_with((string) $descr, 'C') || stripos((string) $descr, 'cyan') !== false) {
         $colour['left'] = '55D6D3';
@@ -82,7 +83,11 @@ function generate_device_link($device, $text = null, $vars = [], $start = 0, $en
 {
     $deviceModel = DeviceCache::get((int) ($device['device_id'] ?? 0));
 
-    return Url::deviceLink($deviceModel, $text, $vars, $start, $end, $escape_text, $overlib);
+    if (! $escape_text) {
+        $text = new HtmlString($text);
+    }
+
+    return Url::deviceLink($deviceModel, $text, $vars, $start, $end, $overlib);
 }
 
 function bill_permitted($bill_id)
@@ -91,7 +96,7 @@ function bill_permitted($bill_id)
         return true;
     }
 
-    return \Permissions::canAccessBill($bill_id, Auth::id());
+    return Permissions::canAccessBill($bill_id, Auth::id());
 }
 
 function port_permitted($port_id, $device_id = null)
@@ -108,7 +113,7 @@ function port_permitted($port_id, $device_id = null)
         return true;
     }
 
-    return \Permissions::canAccessPort($port_id, Auth::id());
+    return Permissions::canAccessPort($port_id, Auth::id());
 }
 
 function device_permitted($device_id)
@@ -117,7 +122,7 @@ function device_permitted($device_id)
         return true;
     }
 
-    return \Permissions::canAccessDevice($device_id, Auth::id());
+    return Permissions::canAccessDevice($device_id, Auth::id());
 }
 
 function alert_layout($severity)
@@ -149,83 +154,6 @@ function alert_layout($severity)
         'background_color' => $background, ];
 }
 
-function generate_dynamic_graph_tag($args)
-{
-    $urlargs = [];
-    $width = 0;
-    foreach ($args as $key => $arg) {
-        switch (strtolower((string) $key)) {
-            case 'width':
-                $width = $arg;
-                $value = '{{width}}';
-                break;
-            case 'from':
-                $value = '{{start}}';
-                break;
-            case 'to':
-                $value = '{{end}}';
-                break;
-            default:
-                $value = $arg;
-                break;
-        }
-        $urlargs[] = $key . '=' . $value;
-    }
-
-    return '<img style="width:' . $width . 'px;height:100%" class="graph graph-image img-responsive" data-src-template="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
-}//end generate_dynamic_graph_tag()
-
-function generate_dynamic_graph_js($args)
-{
-    $from = (is_numeric($args['from']) ? $args['from'] : '(new Date()).getTime() / 1000 - 24*3600');
-    $range = (is_numeric($args['to']) ? $args['to'] - $args['from'] : '24*3600');
-
-    $output = '<script src="js/RrdGraphJS/q-5.0.2.min.js"></script>
-        <script src="js/RrdGraphJS/moment-timezone-with-data.js"></script>
-        <script src="js/RrdGraphJS/rrdGraphPng.js"></script>
-          <script type="text/javascript">
-              q.ready(function(){
-                  var graphs = [];
-                  q(\'.graph\').forEach(function(item){
-                      graphs.push(
-                          q(item).rrdGraphPng({
-                              canvasPadding: 120,
-                                initialStart: ' . $from . ',
-                                initialRange: ' . $range . '
-                          })
-                      );
-                  });
-              });
-              // needed for dynamic height
-              window.onload = function(){ window.dispatchEvent(new Event(\'resize\')); }
-          </script>';
-
-    return $output;
-}//end generate_dynamic_graph_js()
-
-function generate_graph_js_state($args)
-{
-    // we are going to assume we know roughly what the graph url looks like here.
-    // TODO: Add sensible defaults
-    $from = (is_numeric($args['from']) ? $args['from'] : 0);
-    $to = (is_numeric($args['to']) ? $args['to'] : 0);
-    $width = (is_numeric($args['width']) ? $args['width'] : 0);
-    $height = (is_numeric($args['height']) ? $args['height'] : 0);
-    $legend = str_replace("'", '', $args['legend'] ?? '');
-
-    $state = <<<STATE
-<script type="text/javascript" language="JavaScript">
-document.graphFrom = $from;
-document.graphTo = $to;
-document.graphWidth = $width;
-document.graphHeight = $height;
-document.graphLegend = '$legend';
-</script>
-STATE;
-
-    return $state;
-}//end generate_graph_js_state()
-
 function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
 {
     if (is_null($port)) {
@@ -255,8 +183,8 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         $port = cleanPort($port);
     }
 
-    $content = '<div class="overlib-text">' . ($port['hostname'] ?? '') . ' - ' . Rewrite::normalizeIfName(addslashes(\LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
-    $content .= addslashes(\LibreNMS\Util\Clean::html($port['ifAlias'], [])) . '<br />';
+    $content = '<div class="overlib-text">' . ($port['hostname'] ?? '') . ' - ' . Rewrite::normalizeIfName(addslashes(LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
+    $content .= addslashes(LibreNMS\Util\Clean::html($port['ifAlias'], [])) . '<br />';
 
     $content .= "<div style=\'width: 850px\'>";
     $graph_array['type'] = $port['graph_type'];
@@ -304,15 +232,6 @@ function generate_sap_url($sap, $vars = [])
     return Url::graphPopup(['device' => $sap['device_id'], 'page' => 'graphs', 'type' => 'device_sap', 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps', 'traffic_id' => $sap['svc_oid'] . '.' . $sap['sapPortId'] . '.' . $sap['sapEncapValue']], $vars);
 }//end generate_sap_url()
 
-function generate_port_image($args)
-{
-    if (! $args['bg']) {
-        $args['bg'] = 'FFFFFF00';
-    }
-
-    return "<img src='graph.php?type=" . $args['graph_type'] . '&amp;id=' . $args['port_id'] . '&amp;from=' . $args['from'] . '&amp;to=' . $args['to'] . '&amp;width=' . $args['width'] . '&amp;height=' . $args['height'] . '&amp;bg=' . $args['bg'] . "'>";
-}//end generate_port_image()
-
 /**
  * Create image to output text instead of a graph.
  *
@@ -322,13 +241,8 @@ function generate_port_image($args)
 function graph_error($text, $short = null, $color = [128, 0, 0])
 {
     header('Content-Type: ' . ImageFormat::forGraph()->contentType());
-    echo \LibreNMS\Util\Graph::error($text, $short, 300, null, $color);
+    echo LibreNMS\Util\Graph::error($text, $short, 300, null, $color);
 }
-
-function print_port_thumbnail($args)
-{
-    echo generate_port_link($args, generate_port_image($args));
-}//end print_port_thumbnail()
 
 function print_optionbar_start($height = 0, $width = 0, $marginbottom = 5)
 {
@@ -367,7 +281,7 @@ function generate_ap_link($args, $text = null, $type = null)
 
     $content = '<div class=list-large>' . $args['text'] . ' - ' . Rewrite::normalizeIfName($args['label']) . '</div>';
     if ($args['ifAlias']) {
-        $content .= \LibreNMS\Util\Clean::html($args['ifAlias'], []) . '<br />';
+        $content .= LibreNMS\Util\Clean::html($args['ifAlias'], []) . '<br />';
     }
 
     $content .= "<div style=\'width: 850px\'>";
@@ -433,14 +347,6 @@ function generate_pagination($count, $limit, $page, $links = 2)
 
     return $return;
 }//end generate_pagination()
-
-function clean_bootgrid($string)
-{
-    $output = str_replace(["\r", "\n"], '', $string);
-    $output = addslashes($output);
-
-    return $output;
-}//end clean_bootgrid()
 
 function get_url()
 {
@@ -554,7 +460,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
           ->map(fn ($value, $key) => "$key: $value")
           ->implode(', ');
 
-        $fault_detail .= Url::sensorLink($sensor, $tmp_alerts['name']) . ';&nbsp; <br>' . $details;
+        $fault_detail .= Url::sensorLink($sensor, $tmp_alerts['name'] ?? null) . ';&nbsp; <br>' . $details;
         $fallback = false;
     }
 

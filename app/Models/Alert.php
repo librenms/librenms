@@ -27,14 +27,26 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Enum\AlertState;
 
-class Alert extends Model
+class Alert extends DeviceRelatedModel
 {
+    use HasFactory;
     public $timestamps = false;
+    protected $fillable = [
+        'device_id',
+        'rule_id',
+        'state',
+        'open',
+        'alerted',
+        'info',
+        'timestamp',
+        'note',
+    ];
 
     /**
      * @return array{info: 'array'}
@@ -43,6 +55,7 @@ class Alert extends Model
     {
         return [
             'info' => 'array',
+            'timestamp' => 'datetime',
         ];
     }
 
@@ -71,13 +84,6 @@ class Alert extends Model
     }
 
     // ---- Define Relationships ----
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Device, $this>
-     */
-    public function device(): BelongsTo
-    {
-        return $this->belongsTo(Device::class, 'device_id');
-    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\AlertRule, $this>
@@ -85,6 +91,29 @@ class Alert extends Model
     public function rule(): BelongsTo
     {
         return $this->belongsTo(AlertRule::class, 'rule_id', 'id');
+    }
+
+    /**
+     * All alert_log entries for this alert (matched by rule_id + device_id).
+     *
+     * Note: this relationship cannot be eager-loaded across a collection because
+     * Eloquent only supports a single foreign key for HasMany, and the constraint
+     * on rule_id uses whereColumn which is not available in eager-load queries.
+     *
+     * @return HasMany<AlertLog, $this>
+     */
+    public function logs(): HasMany
+    {
+        return $this->hasMany(AlertLog::class, 'device_id', 'device_id')
+            ->whereColumn('alert_log.rule_id', 'alerts.rule_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\AlertLog, $this>
+     */
+    public function latestLog(): BelongsTo
+    {
+        return $this->belongsTo(AlertLog::class, 'latest_alert_log_id', 'id');
     }
 
     /**

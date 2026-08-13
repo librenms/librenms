@@ -18,6 +18,8 @@ class SensorFactory extends Factory
         return [
             'sensor_index' => $this->faker->randomDigit(),
             'sensor_class' => $this->faker->randomElement(Sensor::values()),
+            'sensor_type' => $this->faker->randomElement(['lmsensors', 'cisco', 'snmp']),
+            'sensor_descr' => $this->faker->randomElement(['CPU Temp', 'PSU Voltage', 'Fan Speed', 'Humidity']),
             'sensor_current' => $this->faker->randomDigit(),
             'sensor_oid' => $sensor_oid,
         ];

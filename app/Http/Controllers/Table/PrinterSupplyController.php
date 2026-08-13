@@ -63,7 +63,7 @@ class PrinterSupplyController extends TableController
     {
         $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $model->device]);
         $type = StringHelpers::camelToTitle($model->supply_type == 'opc' ? 'organicPhotoConductor' : $model->supply_type);
-        $descr = $model->supply_descr;
+        $descr = htmlspecialchars((string) $model->supply_descr);
         $percent = Number::calculatePercent($model->supply_current, $model->supply_capacity);
         $used = $percent . '%';
 

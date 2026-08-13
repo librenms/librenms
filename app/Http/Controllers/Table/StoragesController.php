@@ -68,7 +68,7 @@ class StoragesController extends TableController
     public function formatItem(Model $model): array
     {
         $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $model->device]);
-        $descr = $model->storage_descr;
+        $descr = htmlentities((string) $model->storage_descr);
         $graph_array = [
             'type' => 'storage_usage',
             'popup_title' => htmlentities(strip_tags($model->device?->displayName() . ': ' . $model->storage_descr)),

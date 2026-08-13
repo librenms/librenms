@@ -27,6 +27,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -49,6 +50,8 @@ use LibreNMS\Enum\AlertState;
  */
 class AlertRule extends BaseModel
 {
+    use HasFactory;
+
     public $timestamps = false;
 
     protected static function booted(): void
@@ -84,6 +87,34 @@ class AlertRule extends BaseModel
     ];
 
     // ---- Query scopes ----
+
+    /**
+     * @param  Builder<AlertRule>  $query
+     * @param  Device  $device
+     * @return Builder<AlertRule>
+     */
+    public function scopeForDevice(Builder $query, Device $device): Builder
+    {
+        return $query->where(function (Builder $query) use ($device): void {
+            $query->where(function (Builder $query): void {
+                $query->whereDoesntHave('devices')
+                    ->whereDoesntHave('groups')
+                    ->whereDoesntHave('locations');
+            })->orWhere(function (Builder $query) use ($device): void {
+                $query->where('invert_map', 0)
+                    ->where(function (Builder $query) use ($device): void {
+                        $query->whereHas('devices', fn ($q) => $q->where('devices.device_id', $device->device_id))
+                            ->orWhereHas('groups.devices', fn ($q) => $q->where('devices.device_id', $device->device_id))
+                            ->orWhereHas('locations', fn ($q) => $q->where('locations.id', $device->location_id));
+                    });
+            })->orWhere(function (Builder $query) use ($device): void {
+                $query->where('invert_map', 1)
+                    ->whereDoesntHave('devices', fn ($q) => $q->where('devices.device_id', $device->device_id))
+                    ->whereDoesntHave('groups.devices', fn ($q) => $q->where('devices.device_id', $device->device_id))
+                    ->whereDoesntHave('locations', fn ($q) => $q->where('locations.id', $device->location_id));
+            });
+        });
+    }
 
     /**
      * @param  Builder<AlertRule>  $query

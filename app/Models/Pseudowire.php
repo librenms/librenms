@@ -26,10 +26,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pseudowire extends PortRelatedModel
 {
+    use HasFactory;
     public $timestamps = false;
     protected $primaryKey = 'pseudowire_id';
 

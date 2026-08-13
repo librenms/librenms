@@ -16,7 +16,27 @@ if (empty($bgpLocalAs)) {
     $bgpLocalAs = \SnmpQuery::get('BGP4-MIB::bgpLocalAs.0')->value();
 }
 
-foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
+if (! empty($bgpLocalAs) && $bgpLocalAs == '23456') { // 4Byte ASN
+    if ($device['os_group'] === 'arista') {
+        $bgpLocalAs = \SnmpQuery::next('ARISTA-BGP4V2-MIB::aristaBgp4V2PeerLocalAs')->value();
+    } elseif ($device['os'] == 'junos') {
+        $bgpLocalAs = \SnmpQuery::next('BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAs')->value();
+    } elseif ($device['os_group'] === 'cisco') {
+        $bgpLocalAs = \SnmpQuery::next('CISCO-BGP4-MIB::cbgpPeer2LocalAs')->value();
+    } elseif ($device['os'] === 'cumulus') {
+        $bgpLocalAs = \SnmpQuery::get('CUMULUS-BGPUN-MIB::bgpLocalAs.0')->value();
+    }
+}
+
+$routing_snmp_contexts_raw = DeviceCache::getPrimary()->getAttrib('routing_snmp_contexts', '[]');
+$routing_snmp_contexts = json_decode((string) $routing_snmp_contexts_raw, true);
+
+$contexts = array_values(array_unique(array_merge(
+    DeviceCache::getPrimary()->getVrfContexts(),
+    $routing_snmp_contexts
+)));
+
+foreach ($contexts as $context_name) {
     $device['context_name'] = $context_name;
     $peer2 = false;
     $peers_data = '';
@@ -40,6 +60,26 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         } elseif ($device['os'] === 'cumulus') {
             $peers_data = snmp_walk($device, 'bgpPeerRemoteAs', '-Oq', 'CUMULUS-BGPUN-MIB');
             $peer2 = ! empty($peers_data);
+        } elseif ($device['os'] === 'vyos') {
+            foreach (\SnmpQuery::walk('BGP4V2-MIB::bgp4V2PeerRemoteAs')->valuesByIndex() as $index => $data) {
+                $remote_as = $data['BGP4V2-MIB::bgp4V2PeerRemoteAs'] ?? null;
+                if (! is_numeric($remote_as)) {
+                    continue;
+                }
+                // With the BGP4V2-MIB loaded, SnmpQuery formats the OID index as:
+                // "1.ipv4..192.0.2.1"  (dot-notation, real FRR devices)
+                // "1.ipv4.\"192.0.2.1\""  (quoted, some snmpsim/implementations)
+                if (! preg_match('/\.(ipv4|ipv6)\.(?:\.([0-9.]+)|"([^"]+)")$/', (string) $index, $m)) {
+                    continue;
+                }
+                $addrStr = $m[2] !== '' ? $m[2] : $m[3];
+                try {
+                    $ip = str_contains($addrStr, ':') ? IP::fromHexString($addrStr) : IP::fromSnmpString($addrStr);
+                    // toSnmpString() produces the colon-hex-byte format build_bgp_peers expects for IPv6
+                    $peers_data .= $ip->toSnmpString() . " $remote_as\n";
+                } catch (InvalidIpException) {
+                }
+            }
         }
 
         if (empty($peers_data)) {
@@ -157,7 +197,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     }
 
     // clean up peers
-    $bgpQuery = \App\Models\BgpPeer::where('device_id', $device['device_id'])
+    $bgpQuery = BgpPeer::where('device_id', $device['device_id'])
         ->where('context_name', $device['context_name']);
     $cbgpQuery = BgpPeerCbgp::where('device_id', $device['device_id'])
         ->where('context_name', $device['context_name']);
@@ -184,10 +224,13 @@ $contexts = BgpPeer::where('device_id', $device['device_id'])
     ->pluck('context_name')
     ->all();
 
-$existing_contexts = DeviceCache::getPrimary()->getVrfContexts();
+$existing_contexts = array_values(array_unique(array_merge(
+    DeviceCache::getPrimary()->getVrfContexts(),
+    $routing_snmp_contexts
+)));
 foreach ($contexts as $context) {
     if (! in_array($context, $existing_contexts)) {
-        \App\Models\BgpPeer::where('device_id', $device['device_id'])->where('context_name', $context)->delete();
+        BgpPeer::where('device_id', $device['device_id'])->where('context_name', $context)->delete();
         BgpPeerCbgp::where('device_id', $device['device_id'])->where('context_name', $context)->delete();
         echo '-';
     }

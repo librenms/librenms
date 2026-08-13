@@ -95,6 +95,14 @@ Description: Only select devices that aren't deleted, ignored or disabled.
 
 Source: `(devices.disabled = 0 AND devices.ignore = 0)`
 
+#### Device CPU average percentage (Decimal)
+
+Entity: `macros.device_cpu_avg_perc`
+
+Description: Returns the average CPU usage percentage across all processors on the device. Returns `0` when no processor data is available.
+
+Source: `COALESCE((SELECT AVG(p.processor_usage) FROM processors AS p WHERE p.device_id = %devices.device_id), 0)`
+
 #### Device component down [JunOS]
 
 Entity: `macros.device_component_down_junos`
@@ -132,6 +140,24 @@ Description: Only select devices that are down.
 Implies: macros.device
 
 Source: `(devices.status = 0 AND macros.device)`
+
+### ICMP
+
+#### ICMP Latency Variance (Decimal)
+
+Entity: `macros.ping_rtt_variance_perc`
+
+Description: The percentage difference between the last ICMP latency and the rolling average.
+
+Source: `((device_stats.ping_rtt_last - device_stats.ping_rtt_avg) \/ device_stats.ping_rtt_avg) * 100`
+
+#### ICMP Packet Loss Variance (Decimal)
+
+Entity: `macros.ping_loss_variance_perc`
+
+Description: The percentage difference between the last ICMP packet loss and the rolling average.
+
+Source: `((device_stats.ping_loss_last - device_stats.ping_loss_avg) \/ device_stats.ping_loss_avg) * 100`
 
 ### Time
 

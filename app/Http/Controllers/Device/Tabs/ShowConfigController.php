@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\ConfigBackup\ConfigBackupManager;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
@@ -40,9 +41,18 @@ class ShowConfigController extends Controller implements DeviceTab
     private $rancidPath;
     private $rancidFile;
 
+    public function __construct(
+        private readonly ConfigBackupManager $configBackupManager,
+    ) {
+    }
+
     public function visible(Device $device): bool
     {
-        if (Gate::allows('show-config', $device)) {
+        if ($this->configBackupManager->handles($device)) {
+            return false; // a modern config backup provider takes over the Config tab
+        }
+
+        if (Gate::allows('configBackupView', $device)) {
             return $this->oxidizedEnabled($device) || $this->getRancidConfigFile() !== false;
         }
 

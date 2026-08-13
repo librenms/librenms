@@ -27,12 +27,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Exceptions\InvalidNameException;
 
 class PollerCluster extends Model
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $table = 'poller_cluster';
     protected $primaryKey = 'id';
@@ -241,8 +244,8 @@ class PollerCluster extends Model
             ],
             [
                 'name' => 'ping_frequency',
-                'default' => \App\Facades\LibrenmsConfig::get('ping_rrd_step'),
-                'value' => $this->ping_frequency ?? \App\Facades\LibrenmsConfig::get('ping_rrd_step'),
+                'default' => \App\Facades\LibrenmsConfig::get('service_ping_frequency'),
+                'value' => $this->ping_frequency ?? \App\Facades\LibrenmsConfig::get('service_ping_frequency'),
                 'type' => 'integer',
                 'units' => 'seconds',
                 'advanced' => true,

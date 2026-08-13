@@ -61,4 +61,9 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         new \App\Exceptions\ErrorReporting($exceptions);
+
+        $exceptions->map(
+            \Binaryk\LaravelRestify\Exceptions\RepositoryNotFoundException::class,
+            fn (\Binaryk\LaravelRestify\Exceptions\RepositoryNotFoundException $e) => new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException($e->getMessage(), $e),
+        );
     })->create();

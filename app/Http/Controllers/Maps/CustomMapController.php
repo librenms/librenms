@@ -32,6 +32,7 @@ use App\Http\Requests\CustomMapSettingsRequest;
 use App\Models\CustomMap;
 use App\Models\CustomMapNodeImage;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -40,12 +41,20 @@ use Illuminate\Support\Facades\Storage;
 
 class CustomMapController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         $this->authorize('viewAny', CustomMap::class);
 
+        $request->validate([
+            ...CustomMap::filterValidationRules(),
+        ]);
+
         return view('map.custom-manage', [
-            'maps' => CustomMap::orderBy('name')->get(['custom_map_id', 'name', 'menu_group'])->groupBy('menu_group')->sortKeys(),
+            'maps' => CustomMap::orderBy('name')
+                ->when($request->array('filter'), fn (Builder $query, $filters) => $query->applyFilters($filters))
+                ->get(['custom_map_id', 'name', 'menu_group'])->groupBy('menu_group')->sortKeys(),
+            'filter' => $request->array('filter'),
+            'filterFields' => $this->filterFields(),
             'name' => 'New Map',
             'menu_group' => null,
             'node_align' => LibrenmsConfig::get('custom_map.node_align', 10),
@@ -297,6 +306,38 @@ class CustomMapController extends Controller
         return response()->json([
             'id' => $newmap->custom_map_id,
         ]);
+    }
+
+    /**
+     * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: string[]|array<string, string>, params?: array<string, string>}>
+     */
+    private function filterFields(): array
+    {
+        return [
+            [
+                'key' => 'name',
+                'label' => __('Name'),
+                'type' => 'text',
+            ],
+            [
+                'key' => 'menu_group',
+                'label' => __('map.custom.edit.map.menu_group'),
+                'type' => 'select',
+                'endpoint' => route('ajax.select.custom-map-menu-group'),
+            ],
+            [
+                'key' => 'nodes.device_id',
+                'label' => __('Device'),
+                'type' => 'select',
+                'endpoint' => route('ajax.select.device'),
+            ],
+            [
+                'key' => 'edges.port_id',
+                'label' => __('Interface'),
+                'type' => 'select',
+                'endpoint' => route('ajax.select.port'),
+            ],
+        ];
     }
 
     /**

@@ -77,6 +77,35 @@ modules:
                             oid: CPS-MIB::envirContactName
                             op: 'regex'
                             value: "/^Contact#[0-9]+/"
+                -
+                    oid: CPS-MIB::envir2ContactTable
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.8.4.2.1.5.{{ $index }}'
+                    value: CPS-MIB::envir2ContactStatus
+                    descr: CPS-MIB::envir2ContactName
+                    index: 'envir2ContactStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: 'Contact Normal', generic: 0 }
+                        - { value: 2, descr: 'Contact Abnormal', generic: 2 }
+                    skip_values:
+                        -
+                            oid: CPS-MIB::envir2ContactName
+                            op: 'regex'
+                            value: "/^ENV_Contact#[0-9-]+/"
+                -
+                    oid: CPS-MIB::ePDU2OutletSwitchedStatusTable
+                    value: CPS-MIB::ePDU2OutletSwitchedStatusState
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.6.6.1.4.1.5.{{ $index }}'
+                    index: 'ePDU2OutletSwitchedStatusState.{{ $index }}'
+                    descr: '{{ CPS-MIB::ePDU2OutletSwitchedStatusName }}'
+                    group: 'Outlets'
+                    skip_values:
+                        -
+                            oid: CPS-MIB::ePDU2OutletSwitchedStatusNumber
+                            op: '='
+                            value: 0
+                    states:
+                        - { value: 1, descr: 'On', generic: 0 }
+                        - { value: 2, descr: 'Off', generic: 2 }
         charge:
             data:
                 -
@@ -98,6 +127,19 @@ modules:
                     index: 'ePDULoadStatusVoltage.{{ $index }}'
                     descr: 'Input'
                     divisor: 10
+                -
+                    oid: CPS-MIB::ePDU2OutletMeteredStatusTable
+                    value: CPS-MIB::ePDU2OutletMeteredStatusLoad
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.6.6.2.4.1.6.{{ $index }}'
+                    index: 'ePDU2OutletMeteredStatusLoad.{{ $index }}'
+                    descr: '{{ CPS-MIB::ePDU2OutletMeteredStatusName }}'
+                    divisor: 10
+                    group: 'Outlets'
+                    skip_values:
+                        -
+                            oid: CPS-MIB::ePDU2OutletMeteredStatusNumber
+                            op: '='
+                            value: 0
         voltage:
             data:
                 -
@@ -132,6 +174,34 @@ modules:
                     index: 'ePDULoadStatusActivePower.{{ $index }}'
                     descr: 'PDU Active Power {{ $index }}'
                     divisor: 1
+                -
+                    oid: CPS-MIB::ePDU2OutletMeteredStatusTable
+                    value: CPS-MIB::ePDU2OutletMeteredStatusActivePower
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.6.6.2.4.1.7.{{ $index }}'
+                    index: 'ePDU2OutletMeteredStatusActivePower.{{ $index }}'
+                    descr: '{{ CPS-MIB::ePDU2OutletMeteredStatusName }}'
+                    divisor: 1
+                    group: 'Outlets'
+                    skip_values:
+                        -
+                            oid: CPS-MIB::ePDU2OutletMeteredStatusNumber
+                            op: '='
+                            value: 0
+        power_consumed:
+            data:
+                -
+                    oid: CPS-MIB::ePDU2OutletMeteredStatusTable
+                    value: CPS-MIB::ePDU2OutletMeteredStatusEnergy
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.6.6.2.4.1.11.{{ $index }}'
+                    index: 'ePDU2OutletMeteredStatusEnergy.{{ $index }}'
+                    descr: '{{ CPS-MIB::ePDU2OutletMeteredStatusName }}'
+                    divisor: 10
+                    group: 'Outlets'
+                    skip_values:
+                        -
+                            oid: CPS-MIB::ePDU2OutletMeteredStatusNumber
+                            op: '='
+                            value: 0
         load:
             data:
                 -
@@ -153,7 +223,16 @@ modules:
                     descr: 'Environment Sensor Temperature'
                     user_func: fahrenheit_to_celsius
                     divisor: 10
-
+                -
+                    oid: CPS-MIB::envir2TempTable
+                    value: CPS-MIB::envir2Temperature
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.8.2.3.1.3.{{ $index }}'
+                    index: 'envir2Temperature.{{ $index }}'
+                    descr: 'Environment Sensor Temperature'
+                    user_func: fahrenheit_to_celsius
+                    divisor: 100
+                    high_limit: envir2TempHighThreshold.{{ $index }}
+                    low_limit: envir2TempLowThreshold.{{ $index }}
         runtime:
             data:
                 -
@@ -183,3 +262,10 @@ modules:
                     num_oid:  '.1.3.6.1.4.1.3808.1.1.4.3.1.{{ $index }}'
                     index: 'envirHumidity.{{ $index }}'
                     descr: 'Environment Sensor Humidity'
+                -
+                    oid: CPS-MIB::envir2HumidTable
+                    value: CPS-MIB::envir2Humidity
+                    num_oid:  '.1.3.6.1.4.1.3808.1.1.8.3.2.1.3.{{ $index }}'
+                    index: 'envir2Humidity.{{ $index }}'
+                    descr: 'Environment Sensor Humidity'
+                    divisor: 100

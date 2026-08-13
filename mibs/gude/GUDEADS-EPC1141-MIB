@@ -1,0 +1,1257 @@
+GUDEADS-EPC1141-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises,
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	Gauge32,
+	Integer32,
+	Unsigned32
+		FROM SNMPv2-SMI
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP
+		FROM SNMPv2-CONF;
+
+gudeads MODULE-IDENTITY
+	LAST-UPDATED "202305210559Z"	-- May 21, 2023, 5:59:00 AM
+	ORGANIZATION "GUDE Systems GmbH"
+	CONTACT-INFO
+		"Von-der-Wettern-Str. 23
+		51149 Cologne
+		Germany
+		https://www.gude-systems.com"
+	DESCRIPTION
+		"Expert Power Control 1141 MIB"
+	-- 1.3.6.1.4.1.28507
+	::= { enterprises 28507 }
+
+
+epc1141DeviceInfo OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.106.1.1.2
+	::= { epc1141CommonConfig 2 }
+
+epc1141ProdName OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The Product Name of the device."
+	-- 1.3.6.1.4.1.28507.106.1.1.2.1
+	::= { epc1141DeviceInfo 1 }
+
+
+epc1141FWVersion OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Firmware Version of the device."
+	-- 1.3.6.1.4.1.28507.106.1.1.2.2
+	::= { epc1141DeviceInfo 2 }
+
+
+epc1141HostName OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The configured Host Name."
+	-- 1.3.6.1.4.1.28507.106.1.1.2.3
+	::= { epc1141DeviceInfo 3 }
+
+
+epc1141PhysAddress OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The MAC address of the device."
+	-- 1.3.6.1.4.1.28507.106.1.1.2.4
+	::= { epc1141DeviceInfo 4 }
+
+
+epc1141SerialNumber OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The Serial Number of the device. Not available for all devices. Production start 2026."
+	-- 1.3.6.1.4.1.28507.106.1.1.2.5
+	::= { epc1141DeviceInfo 5 }
+
+
+epc1141ExtInputToggleCount OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of times the Input has changed its state."
+	-- 1.3.6.1.4.1.28507.106.1.6.2.2.1.3
+	::= { epc1141ExtInputEntry 3 }
+
+
+epc1141CPUSensors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.106.1.5.14
+	::= { epc1141IntSensors 14 }
+
+epc1141CPUSensorVsystem OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"System Voltage on CPU Board"
+	-- 1.3.6.1.4.1.28507.106.1.5.14.1
+	::= { epc1141CPUSensors 1 }
+
+
+epc1141CPUSensorVaux OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Auxiliary Voltage on CPU Board"
+	-- 1.3.6.1.4.1.28507.106.1.5.14.2
+	::= { epc1141CPUSensors 2 }
+
+
+epc1141CPUSensorVmain OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Main Voltage on CPU Board"
+	-- 1.3.6.1.4.1.28507.106.1.5.14.3
+	::= { epc1141CPUSensors 3 }
+
+
+epc1141OVPTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc1141OVPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Overvoltage Protection Table
+		This table may not be present
+		on devices without OVP feature"
+	-- 1.3.6.1.4.1.28507.106.1.5.2
+	::= { epc1141IntSensors 2 }
+
+
+epc1141OVPEntry OBJECT-TYPE
+	SYNTAX  Epc1141OVPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc1141OVPIndex }
+	-- 1.3.6.1.4.1.28507.106.1.5.2.1
+	::= { epc1141OVPTable 1 }
+
+
+Epc1141OVPEntry ::= SEQUENCE {
+
+	epc1141OVPIndex  Integer32,
+	epc1141OVPStatus INTEGER }
+
+
+epc1141OVPStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+			unknown(2),
+			ok(1),
+			failure(0) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"shows the status of the
+		built-in Overvoltage Protection"
+	-- 1.3.6.1.4.1.28507.106.1.5.2.1.2
+	::= { epc1141OVPEntry 2 }
+
+
+epc1141OVPIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.106.1.5.2.1.1
+	::= { epc1141OVPEntry 1 }
+
+
+epc1141ExtInputs OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.106.1.6.2
+	::= { epc1141ExtSensors 2 }
+
+epc1141ExtInputEntry OBJECT-TYPE
+	SYNTAX  Epc1141ExtInputEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc1141ExtInputIndex }
+	-- 1.3.6.1.4.1.28507.106.1.6.2.2.1
+	::= { epc1141ExtInputTable 1 }
+
+
+Epc1141ExtInputEntry ::= SEQUENCE {
+
+	epc1141ExtInputIndex       Unsigned32,
+	epc1141ExtInput            INTEGER,
+	epc1141ExtInputToggleCount Unsigned32,
+	epc1141ExtInputName        OCTET STRING,
+	epc1141ExtInputPortNum     Integer32,
+	epc1141ExtInputBlockIndex  Integer32 }
+
+
+epc1141ExtInput OBJECT-TYPE
+	SYNTAX  INTEGER {
+			lo(0),
+			hi(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Input state of device"
+	-- 1.3.6.1.4.1.28507.106.1.6.2.2.1.2
+	::= { epc1141ExtInputEntry 2 }
+
+
+epc1141ExtActiveInputs OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of suppported Input Channels."
+	-- 1.3.6.1.4.1.28507.106.1.6.2.1
+	::= { epc1141ExtInputs 1 }
+
+
+epc1141ExtInputTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc1141ExtInputEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.106.1.6.2.2
+	::= { epc1141ExtInputs 2 }
+
+
+epc1141ExtInputIndex OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.106.1.6.2.2.1.1
+	::= { epc1141ExtInputEntry 1 }
+
+
+epc1141ExtInputName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of
+		the Input"
+	-- 1.3.6.1.4.1.28507.106.1.6.2.2.1.32
+	::= { epc1141ExtInputEntry 32 }
+
+
+epc1141ExtInputPortNum OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of external Sensor Port when value greater zero, else device built-in Input."
+	-- 1.3.6.1.4.1.28507.106.1.6.2.2.1.33
+	::= { epc1141ExtInputEntry 33 }
+
+
+epc1141ExtInputBlockIndex OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Either index of device built-in Input, or index of Input in external sensor."
+	-- 1.3.6.1.4.1.28507.106.1.6.2.2.1.34
+	::= { epc1141ExtInputEntry 34 }
+
+
+epc1141NTPClient OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.106.1.5.15
+	::= { epc1141IntSensors 15 }
+
+epc1141NTPUnixTime OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"show received NTP time as unixtime (secs since 1 January 1970)"
+	-- 1.3.6.1.4.1.28507.106.1.5.15.2
+	::= { epc1141NTPClient 2 }
+
+
+epc1141NTPLastValidTimestamp OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"show seconds since last valid NTP timestamp received"
+	-- 1.3.6.1.4.1.28507.106.1.5.15.3
+	::= { epc1141NTPClient 3 }
+
+
+epc1141NTPTimeValid OBJECT-TYPE
+	SYNTAX  INTEGER {
+			notime(0),
+			valid(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Show if valid Time is received"
+	-- 1.3.6.1.4.1.28507.106.1.5.15.1
+	::= { epc1141NTPClient 1 }
+
+
+epc1141PortResetDuration OBJECT-TYPE
+	SYNTAX  Integer32 (0..65535)
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for turning Port on again after Reset action"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.106.1.3.1.2.1.8
+	::= { epc1141portEntry 8 }
+
+
+epc1141LineSensorName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a
+		Line Sensor"
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.100
+	::= { epc1141PowerEntry 100 }
+
+
+epc1141ExtSensorName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a
+		external Sensor"
+	-- 1.3.6.1.4.1.28507.106.1.6.1.1.32
+	::= { epc1141SensorEntry 32 }
+
+
+epc1141TrapCtrl OBJECT-TYPE
+	SYNTAX  Integer32 (0..3)
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"0 = off
+		1 = Ver. 1
+		2 = Ver. 2c
+		3 = Ver. 3"
+	-- 1.3.6.1.4.1.28507.106.1.1.1.1
+	::= { epc1141SNMPaccess 1 }
+
+
+gadsEPC1141 OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.106
+	::= { gudeads 106 }
+
+-- Notification Types
+--
+
+events OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.106.3
+	::= { gadsEPC1141 3 }
+
+-- Scalars and Tables
+--
+
+epc1141Objects OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.106.1
+	::= { gadsEPC1141 1 }
+
+epc1141CommonConfig OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.106.1.1
+	::= { epc1141Objects 1 }
+
+epc1141SNMPaccess OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.106.1.1.1
+	::= { epc1141CommonConfig 1 }
+
+epc1141TrapIPTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc1141TrapIPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"list of all Trap receiver"
+	-- 1.3.6.1.4.1.28507.106.1.1.1.2
+	::= { epc1141SNMPaccess 2 }
+
+
+epc1141TrapIPEntry OBJECT-TYPE
+	SYNTAX  Epc1141TrapIPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"an entry containing management
+		informations regarding the list of trap
+		receivers"
+	INDEX {
+		epc1141TrapIPIndex }
+	-- 1.3.6.1.4.1.28507.106.1.1.1.2.1
+	::= { epc1141TrapIPTable 1 }
+
+
+Epc1141TrapIPEntry ::= SEQUENCE {
+
+	epc1141TrapIPIndex Integer32,
+	epc1141TrapAddr    OCTET STRING }
+
+
+epc1141TrapIPIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..8)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A unique value, greater than zero, for each receiver slot."
+	-- 1.3.6.1.4.1.28507.106.1.1.1.2.1.1
+	::= { epc1141TrapIPEntry 1 }
+
+
+epc1141TrapAddr OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..99))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"DNS name or IP address specifying one Trap receiver slot.
+		A port can optionally be specified: 'name:port' An empty
+		string disables this slot."
+	-- 1.3.6.1.4.1.28507.106.1.1.1.2.1.2
+	::= { epc1141TrapIPEntry 2 }
+
+
+epc1141DeviceConfig OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.106.1.2
+	::= { epc1141Objects 2 }
+
+epc1141IntActors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.106.1.3
+	::= { epc1141Objects 3 }
+
+epc1141relayports OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.106.1.3.1
+	::= { epc1141IntActors 1 }
+
+epc1141portNumber OBJECT-TYPE
+	SYNTAX  Integer32 (1..4)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The number of Relay Ports"
+	-- 1.3.6.1.4.1.28507.106.1.3.1.1
+	::= { epc1141relayports 1 }
+
+
+-- the Interfaces table
+-- The Interfaces table contains information on the entity's
+-- interfaces.  Each sub-layer below the internetwork-layer
+-- of a network interface is considered to be an interface.
+
+epc1141portTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc1141portEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"list of all EPC Relay Ports"
+	-- 1.3.6.1.4.1.28507.106.1.3.1.2
+	::= { epc1141relayports 2 }
+
+
+epc1141portEntry OBJECT-TYPE
+	SYNTAX  Epc1141portEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry containing management information applicable to a
+		particular relay port."
+	INDEX {
+		epc1141PortIndex }
+	-- 1.3.6.1.4.1.28507.106.1.3.1.2.1
+	::= { epc1141portTable 1 }
+
+
+Epc1141portEntry ::= SEQUENCE {
+
+	epc1141PortIndex         Integer32,
+	epc1141PortName          OCTET STRING,
+	epc1141PortState         INTEGER,
+	epc1141PortSwitchCount   Integer32,
+	epc1141PortStartupMode   INTEGER,
+	epc1141PortStartupDelay  Integer32,
+	epc1141PortRepowerTime   Integer32,
+	epc1141PortResetDuration Integer32 }
+
+
+epc1141PortIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..4)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A unique value, greater than zero, for each Relay Port."
+	-- 1.3.6.1.4.1.28507.106.1.3.1.2.1.1
+	::= { epc1141portEntry 1 }
+
+
+epc1141PortName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..15))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a Relay Port."
+	-- 1.3.6.1.4.1.28507.106.1.3.1.2.1.2
+	::= { epc1141portEntry 2 }
+
+
+epc1141PortState OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1) }
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"current state a Relay Port"
+	-- 1.3.6.1.4.1.28507.106.1.3.1.2.1.3
+	::= { epc1141portEntry 3 }
+
+
+epc1141PortSwitchCount OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The total number of switch actions ocurred on a Relay Port.
+		Does not count switch commands which will not switch
+		the ralay state, so just real relay switches are displayed here."
+	-- 1.3.6.1.4.1.28507.106.1.3.1.2.1.4
+	::= { epc1141portEntry 4 }
+
+
+epc1141PortStartupMode OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1),
+			laststate(2) }
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"set Mode of startup sequence (off, on , remember last state)"
+	DEFVAL { off }
+	-- 1.3.6.1.4.1.28507.106.1.3.1.2.1.5
+	::= { epc1141portEntry 5 }
+
+
+epc1141PortStartupDelay OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for startup action"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.106.1.3.1.2.1.6
+	::= { epc1141portEntry 6 }
+
+
+epc1141PortRepowerTime OBJECT-TYPE
+	SYNTAX  Integer32 (0..65535)
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for repower port after switching off"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.106.1.3.1.2.1.7
+	::= { epc1141portEntry 7 }
+
+
+epc1141ExtActors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.106.1.4
+	::= { epc1141Objects 4 }
+
+epc1141IntSensors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.106.1.5
+	::= { epc1141Objects 5 }
+
+epc1141PowerChan OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.106.1.5.1
+	::= { epc1141IntSensors 1 }
+
+epc1141ActivePowerChan OBJECT-TYPE
+	SYNTAX  Unsigned32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of suppported Power Channels."
+	-- 1.3.6.1.4.1.28507.106.1.5.1.1
+	::= { epc1141PowerChan 1 }
+
+
+epc1141PowerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc1141PowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"All available Channel Interfaces."
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2
+	::= { epc1141PowerChan 2 }
+
+
+epc1141PowerEntry OBJECT-TYPE
+	SYNTAX  Epc1141PowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry containing management information
+		applicable to a particular Power Channel."
+	INDEX {
+		epc1141PowerIndex }
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1
+	::= { epc1141PowerTable 1 }
+
+
+Epc1141PowerEntry ::= SEQUENCE {
+
+	epc1141PowerIndex                   Integer32,
+	epc1141ChanStatus                   Integer32,
+	epc1141AbsEnergyActive              Unsigned32,
+	epc1141PowerActive                  Integer32,
+	epc1141Current                      Unsigned32,
+	epc1141Voltage                      Unsigned32,
+	epc1141Frequency                    Unsigned32,
+	epc1141PowerFactor                  Integer32,
+	epc1141Pangle                       Integer32,
+	epc1141PowerApparent                Integer32,
+	epc1141PowerReactive                Integer32,
+	epc1141AbsEnergyReactive            Unsigned32,
+	epc1141AbsEnergyActiveResettable    Unsigned32,
+	epc1141AbsEnergyReactiveResettable  Unsigned32,
+	epc1141ResetTime                    Unsigned32,
+	epc1141ForwEnergyActive             Unsigned32,
+	epc1141ForwEnergyReactive           Unsigned32,
+	epc1141ForwEnergyActiveResettable   Unsigned32,
+	epc1141ForwEnergyReactiveResettable Unsigned32,
+	epc1141RevEnergyActive              Unsigned32,
+	epc1141RevEnergyReactive            Unsigned32,
+	epc1141RevEnergyActiveResettable    Unsigned32,
+	epc1141RevEnergyReactiveResettable  Unsigned32,
+	epc1141LineSensorName               OCTET STRING }
+
+
+epc1141PowerIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Index of Power Channel entries"
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.1
+	::= { epc1141PowerEntry 1 }
+
+
+epc1141ChanStatus OBJECT-TYPE
+	SYNTAX  Integer32 (0..1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"0 = data not active, 1 = data valid"
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.2
+	::= { epc1141PowerEntry 2 }
+
+
+epc1141AbsEnergyActive OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Absolute Active Energy counter."
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.3
+	::= { epc1141PowerEntry 3 }
+
+
+epc1141PowerActive OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Active Power"
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.4
+	::= { epc1141PowerEntry 4 }
+
+
+epc1141Current OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Curent on Power Channel."
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.5
+	::= { epc1141PowerEntry 5 }
+
+
+epc1141Voltage OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Voltage on Power Channel"
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.6
+	::= { epc1141PowerEntry 6 }
+
+
+epc1141Frequency OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"0.01 hz"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Frequency of Power Channel"
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.7
+	::= { epc1141PowerEntry 7 }
+
+
+epc1141PowerFactor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.001"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Power Factor of Channel between
+		-1.0 and 1.00"
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.8
+	::= { epc1141PowerEntry 8 }
+
+
+epc1141Pangle OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 degree"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Phase Angle between Voltage
+		and L Line Current between
+		-180.0 and 180.0"
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.9
+	::= { epc1141PowerEntry 9 }
+
+
+epc1141PowerApparent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"VA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"L Line Mean Apparent Power"
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.10
+	::= { epc1141PowerEntry 10 }
+
+
+epc1141PowerReactive OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"VAR"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"L Line Mean Reactive Power"
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.11
+	::= { epc1141PowerEntry 11 }
+
+
+epc1141AbsEnergyReactive OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Absolute Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.12
+	::= { epc1141PowerEntry 12 }
+
+
+epc1141AbsEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"Wh"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Resettable Absolute Active Energy counter.
+		Writing '0' resets all resettable counter."
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.13
+	::= { epc1141PowerEntry 13 }
+
+
+epc1141AbsEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Absolute Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.14
+	::= { epc1141PowerEntry 14 }
+
+
+epc1141ResetTime OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Time in seconds since last Energy
+		Counter reset."
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.15
+	::= { epc1141PowerEntry 15 }
+
+
+epc1141ForwEnergyActive OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Forward Active Energy counter."
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.16
+	::= { epc1141PowerEntry 16 }
+
+
+epc1141ForwEnergyReactive OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Forward Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.17
+	::= { epc1141PowerEntry 17 }
+
+
+epc1141ForwEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Forward Active Energy counter."
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.18
+	::= { epc1141PowerEntry 18 }
+
+
+epc1141ForwEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Forward Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.19
+	::= { epc1141PowerEntry 19 }
+
+
+epc1141RevEnergyActive OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reverse Active Energy counter."
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.20
+	::= { epc1141PowerEntry 20 }
+
+
+epc1141RevEnergyReactive OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reverse Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.21
+	::= { epc1141PowerEntry 21 }
+
+
+epc1141RevEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Reverse Active Energy counter."
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.22
+	::= { epc1141PowerEntry 22 }
+
+
+epc1141RevEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Reverse Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.106.1.5.1.2.1.23
+	::= { epc1141PowerEntry 23 }
+
+
+epc1141ExtSensors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.106.1.6
+	::= { epc1141Objects 6 }
+
+epc1141SensorTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc1141SensorEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.106.1.6.1
+	::= { epc1141ExtSensors 1 }
+
+
+epc1141SensorEntry OBJECT-TYPE
+	SYNTAX  Epc1141SensorEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc1141SensorIndex }
+	-- 1.3.6.1.4.1.28507.106.1.6.1.1
+	::= { epc1141SensorTable 1 }
+
+
+Epc1141SensorEntry ::= SEQUENCE {
+
+	epc1141SensorIndex   Integer32,
+	epc1141TempSensor    Integer32,
+	epc1141HygroSensor   Integer32,
+	epc1141AirPressure   Integer32,
+	epc1141DewPoint      Integer32,
+	epc1141DewPointDiff  Integer32,
+	epc1141ExtSensorName OCTET STRING }
+
+
+epc1141SensorIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.106.1.6.1.1.1
+	::= { epc1141SensorEntry 1 }
+
+
+epc1141TempSensor OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual temperature"
+	-- 1.3.6.1.4.1.28507.106.1.6.1.1.2
+	::= { epc1141SensorEntry 2 }
+
+
+epc1141HygroSensor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 percent humidity"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual humidity"
+	-- 1.3.6.1.4.1.28507.106.1.6.1.1.3
+	::= { epc1141SensorEntry 3 }
+
+
+-- Conformance
+--
+
+epc1141Conf OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.106.2
+	::= { gadsEPC1141 2 }
+
+-- Groups
+--
+
+epc1141Groups OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.106.2.1
+	::= { epc1141Conf 1 }
+
+-- Compliance
+--
+
+epc1141Compls OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.106.2.2
+	::= { epc1141Conf 2 }
+
+epc1141BasicGroup OBJECT-GROUP
+	OBJECTS {
+		epc1141TrapCtrl,
+		epc1141TrapIPIndex,
+		epc1141TrapAddr,
+		epc1141portNumber,
+		epc1141PortIndex,
+		epc1141PortName,
+		epc1141PortState,
+		epc1141PortSwitchCount,
+		epc1141PortStartupMode,
+		epc1141PortStartupDelay,
+		epc1141PortRepowerTime,
+		epc1141ActivePowerChan,
+		epc1141PowerIndex,
+		epc1141ChanStatus,
+		epc1141AbsEnergyActive,
+		epc1141PowerActive,
+		epc1141Current,
+		epc1141Voltage,
+		epc1141Frequency,
+		epc1141PowerFactor,
+		epc1141Pangle,
+		epc1141PowerApparent,
+		epc1141PowerReactive,
+		epc1141AbsEnergyReactive,
+		epc1141AbsEnergyActiveResettable,
+		epc1141AbsEnergyReactiveResettable,
+		epc1141ResetTime,
+		epc1141ForwEnergyActive,
+		epc1141ForwEnergyReactive,
+		epc1141ForwEnergyActiveResettable,
+		epc1141ForwEnergyReactiveResettable,
+		epc1141RevEnergyActive,
+		epc1141RevEnergyReactive,
+		epc1141RevEnergyActiveResettable,
+		epc1141RevEnergyReactiveResettable,
+		epc1141SensorIndex,
+		epc1141TempSensor,
+		epc1141HygroSensor,
+		epc1141AirPressure,
+		epc1141DewPoint,
+		epc1141DewPointDiff,
+		epc1141LineSensorName,
+		epc1141ExtSensorName,
+		epc1141PortResetDuration,
+		epc1141NTPTimeValid,
+		epc1141NTPUnixTime,
+		epc1141NTPLastValidTimestamp,
+		epc1141ExtActiveInputs,
+		epc1141ExtInputIndex,
+		epc1141ExtInput,
+		epc1141ExtInputName,
+		epc1141ExtInputPortNum,
+		epc1141ExtInputBlockIndex,
+		epc1141OVPIndex,
+		epc1141OVPStatus,
+		epc1141CPUSensorVsystem,
+		epc1141CPUSensorVaux,
+		epc1141CPUSensorVmain,
+		epc1141ExtInputToggleCount,
+		epc1141ProdName,
+		epc1141FWVersion,
+		epc1141HostName,
+		epc1141PhysAddress,
+		epc1141SerialNumber }
+	STATUS  current
+	DESCRIPTION
+		"Basic objects."
+	-- 1.3.6.1.4.1.28507.106.2.1.1
+	::= { epc1141Groups 1 }
+
+epc1141NotificationGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		epc1141SwitchEvtPort,
+		epc1141TempEvtSen,
+		epc1141HygroEvtSen,
+		epc1141AirPressureEvtSen,
+		epc1141DewPtDiffEvtSen,
+		epc1141LineAmperageEvt,
+		epc1141ExtInputEvt,
+		epc1141OVPEvt,
+		epc1141LineVoltageEvt,
+		epc1141LinePowerEvt }
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.106.2.1.2
+	::= { epc1141Groups 2 }
+
+epc1141AirPressure OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual air pressure"
+	-- 1.3.6.1.4.1.28507.106.1.6.1.1.5
+	::= { epc1141SensorEntry 5 }
+
+
+epc1141DewPoint OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"dew point for actual temperature and humidity"
+	-- 1.3.6.1.4.1.28507.106.1.6.1.1.6
+	::= { epc1141SensorEntry 6 }
+
+
+epc1141DewPointDiff OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"difference between dew point and actual
+		temperature (Temp - DewPoint)"
+	-- 1.3.6.1.4.1.28507.106.1.6.1.1.7
+	::= { epc1141SensorEntry 7 }
+
+
+
+epc1141SwitchEvtPort NOTIFICATION-TYPE
+	OBJECTS {
+		epc1141PortIndex,
+		epc1141PortName,
+		epc1141PortState,
+		epc1141PortSwitchCount}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a port is switched"
+	-- 1.3.6.1.4.1.28507.106.3.1
+	::= { events 1 }
+
+
+epc1141TempEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc1141SensorIndex,
+		epc1141TempSensor}
+	STATUS  current
+	DESCRIPTION
+		"temperature limits exceeded"
+	-- 1.3.6.1.4.1.28507.106.3.2
+	::= { events 2 }
+
+
+epc1141HygroEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc1141SensorIndex,
+		epc1141HygroSensor}
+	STATUS  current
+	DESCRIPTION
+		"hygro limits exceeded"
+	-- 1.3.6.1.4.1.28507.106.3.3
+	::= { events 3 }
+
+
+epc1141LineAmperageEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc1141PowerIndex,
+		epc1141PowerActive,
+		epc1141Current,
+		epc1141Voltage,
+		epc1141Frequency,
+		epc1141PowerApparent,
+		epc1141PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		current is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.106.3.7
+	::= { events 7 }
+
+
+epc1141OVPEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc1141OVPIndex,
+		epc1141OVPStatus}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when the OVP status changes"
+	-- 1.3.6.1.4.1.28507.106.3.6
+	::= { events 6 }
+
+
+epc1141DewPtDiffEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc1141SensorIndex,
+		epc1141DewPointDiff}
+	STATUS  current
+	DESCRIPTION
+		"Dew Point Difference limits exceeded"
+	-- 1.3.6.1.4.1.28507.106.3.5
+	::= { events 5 }
+
+
+epc1141AirPressureEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc1141SensorIndex,
+		epc1141AirPressure}
+	STATUS  current
+	DESCRIPTION
+		"Air Pressure limits exceeded
+
+		"
+	-- 1.3.6.1.4.1.28507.106.3.4
+	::= { events 4 }
+
+
+epc1141LineVoltageEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc1141PowerIndex,
+		epc1141PowerActive,
+		epc1141Current,
+		epc1141Voltage,
+		epc1141Frequency,
+		epc1141PowerApparent,
+		epc1141PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		voltage is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.106.3.26
+	::= { events 26 }
+
+
+epc1141LinePowerEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc1141PowerIndex,
+		epc1141PowerActive,
+		epc1141Current,
+		epc1141Voltage,
+		epc1141Frequency,
+		epc1141PowerApparent,
+		epc1141PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		power is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.106.3.27
+	::= { events 27 }
+
+
+epc1141ExtInputEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc1141ExtInputIndex,
+		epc1141ExtInput,
+		epc1141ExtInputToggleCount,
+		epc1141ExtInputName,
+		epc1141ExtInputPortNum,
+		epc1141ExtInputBlockIndex}
+	STATUS  current
+	DESCRIPTION
+		"Change of external sensor input."
+	-- 1.3.6.1.4.1.28507.106.3.25
+	::= { events 25 }
+
+END
