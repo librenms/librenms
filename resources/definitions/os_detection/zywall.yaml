@@ -15,4 +15,6 @@ discovery:
         sysDescr_regex_except:
             - '/^NWA/'
             - '/^XGS/'
+            - '/^XS/'
+            - '/^XMG/'
             - '/^NXC/'
