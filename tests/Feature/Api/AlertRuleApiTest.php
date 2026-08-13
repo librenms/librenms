@@ -5,7 +5,10 @@ namespace LibreNMS\Tests\Feature\Api;
 use App\Facades\LibrenmsConfig;
 use App\Http\Middleware\EnforceJsonApi;
 use App\Models\AlertOperation;
+use App\Models\Alert;
+use App\Models\AlertLog;
 use App\Models\AlertRule;
+use App\Models\Device;
 use App\Models\User;
 use Database\Seeders\RolesSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -436,6 +439,37 @@ class AlertRuleApiTest extends DBTestCase
             ->assertStatus(204);
 
         $this->assertDatabaseMissing('alert_rules', ['id' => $rule->id]);
+    }
+
+    public function testDeletingAlertRuleCleansUpRelatedRecords(): void
+    {
+        $user = User::factory()->admin()->create();
+        $rule = AlertRule::factory()->create();
+        $device = Device::factory()->create();
+        $rule->devices()->attach($device->device_id);
+        Alert::factory()->create(['rule_id' => $rule->id, 'device_id' => $device->device_id]);
+        AlertLog::factory()->create(['rule_id' => $rule->id, 'device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->deleteJsonApi("/api/v1/alert-rules/{$rule->id}")
+            ->assertStatus(204);
+
+        $this->assertDatabaseMissing('alert_rules', ['id' => $rule->id]);
+        $this->assertDatabaseMissing('alerts', ['rule_id' => $rule->id]);
+        $this->assertDatabaseMissing('alert_log', ['rule_id' => $rule->id]);
+        $this->assertDatabaseMissing('alert_device_map', ['rule_id' => $rule->id]);
+    }
+
+    public function testReadOnlyUserCannotDeleteAlertRule(): void
+    {
+        $user = User::factory()->read()->create();
+        $rule = AlertRule::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->deleteJsonApi("/api/v1/alert-rules/{$rule->id}")
+            ->assertStatus(403);
+
+        $this->assertDatabaseHas('alert_rules', ['id' => $rule->id]);
     }
 
     public function testReadOnlyUserCannotModifyAlertRule(): void
