@@ -3,47 +3,26 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Foundation\Events\DiagnosingHealth;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
-use Throwable;
+use Illuminate\Support\Facades\Event;
 
 class HealthController extends Controller
 {
     public function __invoke(): JsonResponse
     {
-        $checks = [
-            'database' => $this->check(fn () => DB::connection()->select('SELECT 1')),
-            'cache' => $this->check(function (): void {
-                $key = 'health:ping:' . bin2hex(random_bytes(4));
-                Cache::put($key, '1', 5);
-                if (Cache::get($key) !== '1') {
-                    throw new \RuntimeException('cache round-trip mismatch');
-                }
-                Cache::forget($key);
-            }),
-        ];
-
-        $status = collect($checks)->every(fn ($c) => $c['ok']) ? 'ok' : 'down';
-        $httpStatus = $status === 'ok' ? 200 : 503;
-
-        return response()->json([
-            'status' => $status,
-            'checks' => $checks,
-        ], $httpStatus);
-    }
-
-    /**
-     * @return array{ok: bool, error?: string}
-     */
-    private function check(callable $probe): array
-    {
         try {
-            $probe();
+            Event::dispatch(new DiagnosingHealth);
 
-            return ['ok' => true];
-        } catch (Throwable $e) {
-            return ['ok' => false, 'error' => $e->getMessage()];
+            return response()->json(['meta' => [
+                'status' => 'healthy',
+            ]]);
+        } catch (\Throwable) {
+            return response()->json(['errors' => [[
+                'status' => '503',
+                'title' => 'Service Unavailable',
+                'detail' => 'A required service is unavailable.',
+            ]]], 503);
         }
     }
 }
