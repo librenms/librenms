@@ -68,7 +68,7 @@ class AlertRuleRepository extends Repository
             field('name')->rules('required', 'string', 'max:255'),
             field('severity')->rules('required', 'in:ok,warning,critical'),
             field('isEnabled', fn ($value, $model) => ! $model->disabled)
-                ->fillCallback(function ($request, $model, $attribute) {
+                ->fillCallback(function ($request, $model, $attribute): void {
                     if ($request->exists($attribute)) {
                         $model->disabled = ! $request->boolean($attribute);
                     }
@@ -81,35 +81,35 @@ class AlertRuleRepository extends Repository
             // so they are exposed as first-class attributes instead of a raw blob.
             // recovery and acknowledgement are treated as enabled when absent.
             field('isConditionInverted', fn ($value, $model) => (bool) ($model->extra['invert'] ?? false))
-                ->fillCallback(function ($request, $model, $attribute) {
+                ->fillCallback(function ($request, $model, $attribute): void {
                     if ($request->exists($attribute)) {
                         self::setExtra($model, 'invert', $request->boolean($attribute));
                     }
                 })
                 ->rules('boolean'),
             field('isMuted', fn ($value, $model) => (bool) ($model->extra['mute'] ?? false))
-                ->fillCallback(function ($request, $model, $attribute) {
+                ->fillCallback(function ($request, $model, $attribute): void {
                     if ($request->exists($attribute)) {
                         self::setExtra($model, 'mute', $request->boolean($attribute));
                     }
                 })
                 ->rules('boolean'),
             field('sendsRecoveryAlerts', fn ($value, $model) => (bool) ($model->extra['recovery'] ?? true))
-                ->fillCallback(function ($request, $model, $attribute) {
+                ->fillCallback(function ($request, $model, $attribute): void {
                     if ($request->exists($attribute)) {
                         self::setExtra($model, 'recovery', $request->boolean($attribute));
                     }
                 })
                 ->rules('boolean'),
             field('sendsAcknowledgementAlerts', fn ($value, $model) => (bool) ($model->extra['acknowledgement'] ?? true))
-                ->fillCallback(function ($request, $model, $attribute) {
+                ->fillCallback(function ($request, $model, $attribute): void {
                     if ($request->exists($attribute)) {
                         self::setExtra($model, 'acknowledgement', $request->boolean($attribute));
                     }
                 })
                 ->rules('boolean'),
             field('overridesQuery', fn ($value, $model) => (bool) ($model->extra['options']['override_query'] ?? false))
-                ->fillCallback(function ($request, $model, $attribute) {
+                ->fillCallback(function ($request, $model, $attribute): void {
                     if ($request->exists($attribute)) {
                         $options = $model->extra['options'] ?? [];
                         $options['override_query'] = $request->boolean($attribute);
@@ -118,7 +118,7 @@ class AlertRuleRepository extends Repository
                 })
                 ->rules('boolean'),
             field('procedure', fn ($value, $model) => $model->proc)
-                ->fillCallback(function ($request, $model, $attribute) {
+                ->fillCallback(function ($request, $model, $attribute): void {
                     if ($request->exists($attribute)) {
                         $model->proc = $request->input($attribute);
                     }
@@ -126,14 +126,14 @@ class AlertRuleRepository extends Repository
                 ->rules('nullable', 'string', 'max:80'),
             field('notes')->rules('nullable', 'string'),
             field('isScopeInverted', fn ($value, $model) => (bool) $model->invert_map)
-                ->fillCallback(function ($request, $model, $attribute) {
+                ->fillCallback(function ($request, $model, $attribute): void {
                     if ($request->exists($attribute)) {
                         $model->invert_map = $request->boolean($attribute);
                     }
                 })
                 ->rules('boolean'),
             field('alertOperationId', fn ($value, $model) => $model->alert_operation_id)
-                ->fillCallback(function ($request, $model, $attribute) {
+                ->fillCallback(function ($request, $model, $attribute): void {
                     if ($request->exists($attribute)) {
                         $model->alert_operation_id = $request->input($attribute);
                     }
