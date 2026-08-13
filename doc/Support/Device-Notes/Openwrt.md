@@ -25,7 +25,7 @@ chmod +x /usr/libexec/openwrt-snmp/*.sh
 
 ```
 config pass
-	option miboid '.1.3.6.1.4.1.60652.102.1.10'
+	option miboid '.1.3.6.1.4.1.66510.1.10'
 	option prog '/usr/libexec/openwrt-snmp/openwrt-snmp-pass.sh'
 	option persist '1'
 
@@ -67,7 +67,7 @@ Exercise the handler directly on OpenWrt:
 Walk the wireless subtree from the LibreNMS host:
 
 ```bash
-snmpwalk -v2c -c your_community_string <openwrt-host> .1.3.6.1.4.1.60652.102.1.10
+snmpwalk -v2c -c your_community_string <openwrt-host> .1.3.6.1.4.1.66510.1.10
 ```
 
 Then re-run discovery for the wireless module:

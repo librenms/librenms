@@ -49,11 +49,11 @@ class Openwrt extends OS implements
 {
     // OPENWRT-WIRELESS-MIB openwrtWirelessInterfaceEntry columns, addressed as
     // <WL_ENTRY>.<column>.<ifIndex>. Wireless data is served by the agent's
-    // pass_persist handler under { openwrtObjects 10 } (.60652.102.1.10).
-    private const WL_ENTRY = '.1.3.6.1.4.1.60652.102.1.10.3.1';
+    // pass_persist handler under { openwrtObjects 10 } (.66510.1.10).
+    private const WL_ENTRY = '.1.3.6.1.4.1.66510.1.10.3.1';
 
     // openwrtWirelessClientCount scalar: device-wide de-duplicated client count.
-    private const WL_CLIENT_COUNT = '.1.3.6.1.4.1.60652.102.1.10.2.0';
+    private const WL_CLIENT_COUNT = '.1.3.6.1.4.1.66510.1.10.2.0';
 
     // Rates are exported in Mbit/s (so Wi-Fi 6E/7 multi-Gbit/s rates do not
     // overflow Unsigned32); LibreNMS Rate sensors are stored in bps.

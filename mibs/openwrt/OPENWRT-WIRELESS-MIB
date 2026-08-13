@@ -7,7 +7,7 @@
 -- per-interface or per-metric snmpd configuration is required.
 --
 -- Registers under OPENWRT-MIB at { openwrtObjects 10 }
---   -> OID base .1.3.6.1.4.1.60652.102.1.10
+--   -> OID base .1.3.6.1.4.1.66510.1.10
 --
 -- Rows in openwrtWirelessInterfaceTable are indexed by IF-MIB ifIndex so the
 -- table joins directly onto the standard ifTable/ifXTable for the same VAP.
@@ -29,18 +29,18 @@ IMPORTS
         FROM OPENWRT-MIB;
 
 openwrtWirelessMIB MODULE-IDENTITY
-    LAST-UPDATED "202607030000Z"
-    ORGANIZATION "LibreNMS"
+    LAST-UPDATED "202608130000Z"
+    ORGANIZATION "OpenWrt"
     CONTACT-INFO
-        "       LibreNMS Community
-                https://www.librenms.org
-                https://github.com/librenms/librenms
+        "       OpenWrt Project
+                https://openwrt.org
+                https://github.com/openwrt/openwrt
         "
     DESCRIPTION
         "MIB module describing OpenWrt wireless metrics (aggregate scalars
          and a per-interface table) exported by the LibreNMS OpenWrt SNMP
          agent's pass_persist handler."
-    REVISION "202607030000Z"
+    REVISION "202608130000Z"
     DESCRIPTION
         "Initial version: wireless aggregate scalars and per-interface table,
          including per-interface channel utilisation and transmit power."

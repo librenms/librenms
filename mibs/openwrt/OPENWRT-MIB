@@ -8,15 +8,11 @@
 -- themselves live in per-subsystem modules that register beneath
 -- openwrtObjects, for example OPENWRT-WIRELESS-MIB at { openwrtObjects 10 }.
 --
--- Enterprise Number: 60652 (LibreNMS, IANA PEN)
--- OID Base: .1.3.6.1.4.1.60652.102
+-- Enterprise Number: 66510 (OpenWrt, IANA PEN)
+-- OID Base: .1.3.6.1.4.1.66510
 --
--- NOTE: the sub-arc { enterprises 60652 102 } is PROVISIONAL, following the
--- LibreNMS agent-MIB convention where OS/agent MIBs occupy the 100-block
--- (XCP-NG-VMINFO-MIB uses { enterprises 60652 100 }). openwrtMIB is rooted
--- directly under the enterprise number, with no intermediate node, so a future
--- enterprise-number reassignment is a single-line change.
--- Pending final assignment by a LibreNMS maintainer.
+-- openwrtMIB is rooted directly under OpenWrt's own IANA-assigned enterprise
+-- number, with no intermediate node.
 --
 -- Device metadata scalars (e.g. openwrtMIBversion, openwrtOSversion) are
 -- reserved for a future revision and are intentionally not defined yet, so
@@ -31,22 +27,22 @@ IMPORTS
         FROM SNMPv2-SMI;
 
 openwrtMIB MODULE-IDENTITY
-    LAST-UPDATED "202607030000Z"
-    ORGANIZATION "LibreNMS"
+    LAST-UPDATED "202608130000Z"
+    ORGANIZATION "OpenWrt"
     CONTACT-INFO
-        "       LibreNMS Community
-                https://www.librenms.org
-                https://github.com/librenms/librenms
+        "       OpenWrt Project
+                https://openwrt.org
+                https://github.com/openwrt/openwrt
         "
     DESCRIPTION
         "Base module describing the OpenWrt OID structure used by the
          LibreNMS OpenWrt SNMP agent. Per-subsystem metrics register under
          openwrtObjects (wireless at { openwrtObjects 10 }); conformance
          registers under openwrtConformance."
-    REVISION "202607030000Z"
+    REVISION "202608130000Z"
     DESCRIPTION
         "Initial version: base registration nodes for the OpenWrt subtree."
-    ::= { enterprises 60652 102 }
+    ::= { enterprises 66510 }
 
 -- **********************************************************
 -- Structure
