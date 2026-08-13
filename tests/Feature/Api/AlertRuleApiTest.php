@@ -4,9 +4,9 @@ namespace LibreNMS\Tests\Feature\Api;
 
 use App\Facades\LibrenmsConfig;
 use App\Http\Middleware\EnforceJsonApi;
-use App\Models\AlertOperation;
 use App\Models\Alert;
 use App\Models\AlertLog;
+use App\Models\AlertOperation;
 use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\User;
