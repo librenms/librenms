@@ -43,7 +43,7 @@
                     <x-geo-map
                         id="location-map"
                         width="100%"
-                        height="360px"
+                        height="280px"
                         :lat="$device->location->lat"
                         :lng="$device->location->lng"
                         :init="false"
