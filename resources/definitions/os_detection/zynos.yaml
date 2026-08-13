@@ -17,6 +17,7 @@ discovery:
             - '/^MES/'
             - '/^MGS/'
             - '/^XS/'
+            - '/^XMG/'
             - '/^XGS/'
             - '/^ZyXEL/'
 oids:
