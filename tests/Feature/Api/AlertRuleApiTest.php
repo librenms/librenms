@@ -40,6 +40,7 @@ class AlertRuleApiTest extends DBTestCase
      *
      * @param  array<string, mixed>  $data
      * @param  array<string, string>  $headers
+     * @return TestResponse<\Symfony\Component\HttpFoundation\Response>
      */
     protected function postJsonApi(string $uri, array $data = [], array $headers = []): TestResponse
     {
@@ -54,6 +55,7 @@ class AlertRuleApiTest extends DBTestCase
      *
      * @param  array<string, mixed>  $data
      * @param  array<string, string>  $headers
+     * @return TestResponse<\Symfony\Component\HttpFoundation\Response>
      */
     protected function putJsonApi(string $uri, array $data = [], array $headers = []): TestResponse
     {
@@ -67,6 +69,7 @@ class AlertRuleApiTest extends DBTestCase
      * Send a JSON:API DELETE request.
      *
      * @param  array<string, string>  $headers
+     * @return TestResponse<\Symfony\Component\HttpFoundation\Response>
      */
     protected function deleteJsonApi(string $uri, array $headers = []): TestResponse
     {

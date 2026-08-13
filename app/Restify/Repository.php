@@ -5,6 +5,7 @@ namespace App\Restify;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Binaryk\LaravelRestify\Repositories\Repository as RestifyRepository;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -27,6 +28,9 @@ abstract class Repository extends RestifyRepository
     /**
      * Restify does not authorize index requests against the model policy by
      * itself, so gate them on viewAny here.
+     *
+     * @param  Builder<Model>|Relation<Model, Model, mixed>  $query
+     * @return Builder<Model>|Relation<Model, Model, mixed>
      */
     public static function mainQuery(RestifyRequest $request, Builder|Relation $query)
     {

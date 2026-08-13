@@ -18,6 +18,9 @@ class AlertRuleRepository extends Repository
 
     public static string $title = 'name';
 
+    /**
+     * @return array<string, SearchableFilter>
+     */
     public static function searchables(): array
     {
         return [
@@ -25,6 +28,9 @@ class AlertRuleRepository extends Repository
         ];
     }
 
+    /**
+     * @return array<string, MatchFilter>
+     */
     public static function matches(): array
     {
         return [
@@ -39,6 +45,9 @@ class AlertRuleRepository extends Repository
         ];
     }
 
+    /**
+     * @return array<string, SortableFilter>
+     */
     public static function sorts(): array
     {
         return [
@@ -50,6 +59,9 @@ class AlertRuleRepository extends Repository
         ];
     }
 
+    /**
+     * @return array<int, \Binaryk\LaravelRestify\Fields\Field>
+     */
     public function fields(RestifyRequest $request): array
     {
         return [
