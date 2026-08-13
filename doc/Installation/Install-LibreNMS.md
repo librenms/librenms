@@ -104,8 +104,8 @@ Ensure date.timezone is set in php.ini to your preferred time zone.
 
 === "Ubuntu 26.04"
     ```bash
-    vi /etc/php/8.4/fpm/php.ini
-    vi /etc/php/8.4/cli/php.ini
+    vi /etc/php/8.5/fpm/php.ini
+    vi /etc/php/8.5/cli/php.ini
     ```
 
 === "Ubuntu 24.04"
@@ -140,7 +140,7 @@ timedatectl set-timezone Etc/UTC
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
     ```
     
-    Within the `[mysqld]` section add:
+    Within the `[mariadbd]` section add:
 
     ```
     innodb_file_per_table=1
@@ -210,8 +210,8 @@ exit
 
 === "Ubuntu 26.04"
     ```bash
-    cp /etc/php/8.4/fpm/pool.d/www.conf /etc/php/8.4/fpm/pool.d/librenms.conf
-    vi /etc/php/8.4/fpm/pool.d/librenms.conf
+    cp /etc/php/8.5/fpm/pool.d/www.conf /etc/php/8.5/fpm/pool.d/librenms.conf
+    vi /etc/php/8.5/fpm/pool.d/librenms.conf
     ```
 
 === "Ubuntu 24.04"
@@ -288,7 +288,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         ```bash
         rm /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default
         systemctl restart nginx
-        systemctl restart php8.4-fpm
+        systemctl restart php8.5-fpm
         ```
 
 === "Ubuntu 24.04"

@@ -529,7 +529,7 @@ class Device extends BaseModel
 
     public function setSysDescrAttribute(?string $sysDescr): void
     {
-        $this->attributes['sysDescr'] = $sysDescr === null ? null : trim(str_replace(chr(218), "\n", $sysDescr), "\\\" \r\n\t\0");
+        $this->attributes['sysDescr'] = $sysDescr === null ? null : trim($sysDescr, "\\\" \r\n\t\0");
     }
 
     public function setSysNameAttribute(?string $sysName): void
