@@ -1,0 +1,8 @@
+modules:
+    os:
+        # ASRock Rack BMC MIB (enterprise 49622) has per-board module names,
+        # so raw numeric OIDs are used instead of MIB translation
+        hardware: .1.3.6.1.4.1.49622.1.1.0 # MBModelName
+        version: .1.3.6.1.4.1.49622.1.3.0 # BMCVersion
+        features: .1.3.6.1.4.1.49622.1.4.0 # BIOSVersion
+        serial: .1.3.6.1.4.1.49622.4.1.4.8.0 # FRU Product serial
