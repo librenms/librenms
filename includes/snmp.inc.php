@@ -22,6 +22,7 @@ use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\StringHelpers;
 
 /**
  * @deprecated Please use SnmpQuery instead
@@ -424,6 +425,8 @@ function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = n
         return $array;
     }
 
+    $inferValueEncoding = ! StringHelpers::isValidUtf8($data);
+
     foreach (explode("\n", (string) $data) as $entry) {
         if (! Str::contains($entry, ' =')) {
             if (! empty($entry) && isset($index, $oid)) {
@@ -436,6 +439,9 @@ function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = n
         [$oid,$value] = explode('=', $entry, 2);
         $oid = trim($oid);
         $value = trim($value, "\" \\\n\r");
+        if ($inferValueEncoding) {
+            $value = StringHelpers::inferEncoding($value);
+        }
         $index = '';
         if (Str::contains($oid, '.')) {
             [$oid, $index] = explode('.', $oid, 2);

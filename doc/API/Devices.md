@@ -267,7 +267,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "message": "",
@@ -293,7 +293,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "message": "",
@@ -319,7 +319,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "message": "",
@@ -361,7 +361,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "message": "",
@@ -401,7 +401,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "graphs": [
@@ -426,7 +426,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "graphs": [
@@ -451,7 +451,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "graphs": [
@@ -908,38 +908,39 @@ Route: `/api/v0/devices/:hostname/port_stack`
 
 - hostname can be either the device hostname or id
 
-Input:
-
-- valid_mappings: Filter the result by only showing valid mappings
-  ("0" values not shown).
-
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/port_stack?valid_mappings
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/port_stack
 ```
 
 Output:
 
 ```json
 {
-  "status": "ok",
-  "message": "",
-  "count": 2,
-  "mappings": [
-    {
-      "device_id": "3742",
-      "port_id_high": "1001000",
-      "port_id_low": "51001",
-      "ifStackStatus": "active"
-    },
-    {
-      "device_id": "3742",
-      "port_id_high": "1001000",
-      "port_id_low": "52001",
-      "ifStackStatus": "active"
-    }
-  ]
+    "status": "ok",
+    "message": "",
+    "count": 2,
+    "mappings": [
+        {
+            "id": 2795,
+            "device_id": 3742,
+            "high_ifIndex": 17,
+            "high_port_id": 1001000,
+            "low_ifIndex": 18,
+            "low_port_id": 51001,
+            "ifStackStatus": "active"
+        },
+        {
+            "id": 2796,
+            "device_id": 3742,
+            "high_ifIndex": 17,
+            "high_port_id": 1001000,
+            "low_ifIndex": 24,
+            "low_port_id": 52001,
+            "ifStackStatus": "active"
+        }
+    ]
 }
 ```
 
@@ -1189,14 +1190,14 @@ Output:
 
 ```json
 {
- "status": "ok",
- "port": {
-  "port_id": "2",
-  "device_id": "1",
-  ...
-  "poll_prev": "1418412902",
-  "poll_period": "300"
- }
+    "status": "ok",
+    "port": {
+        "port_id": "2",
+        "device_id": "1",
+        ...
+        "poll_prev": "1418412902",
+        "poll_period": "300"
+    }
 }
 ```
 
@@ -1338,17 +1339,17 @@ Output:
 
 ```json
 {
- "status": "ok",
- "count": 1,
- "devices": [
-  {
-   "device_id": "1",
-   "hostname": "localhost",
-   ...
-   "serial": null,
-   "icon": null
-  }
- ]
+    "status": "ok",
+    "count": 1,
+    "devices": [
+        {
+            "device_id": "1",
+            "hostname": "localhost",
+            ...
+            "serial": null,
+            "icon": null
+        }
+    ]
 }
 ```
 
@@ -1362,17 +1363,17 @@ Output:
 
 ```json
 {
- "status": "ok",
- "count": 1,
- "devices": [
-  {
-   "device_id": "1",
-   "hostname": "localhost",
-   ...
-   "serial": null,
-   "icon": null
-  }
- ]
+    "status": "ok",
+    "count": 1,
+    "devices": [
+        {
+            "device_id": "1",
+            "hostname": "localhost",
+            ...
+            "serial": null,
+            "icon": null
+        }
+    ]
 }
 ```
 
@@ -1428,10 +1429,10 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
   -X POST https://foo.example/api/v0/devices/localhost/maintenance/ \
   --data-raw '
 {
- "title":"Device Maintenance",
-  "notes":"A 2 hour Maintenance triggered via API with start time",
-  "start":"2022-08-01 08:00:00",
-  "duration":"2:00"
+    "title":"Device Maintenance",
+    "notes":"A 2 hour Maintenance triggered via API with start time",
+    "start":"2022-08-01 08:00:00",
+    "duration":"2:00"
 }
 '
 ```
@@ -1451,9 +1452,10 @@ Example with no start time:
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
   -X POST https://foo.example/api/v0/devices/localhost/maintenance/ \
   --data-raw '
- "title":"Device Maintenance",
-  "notes":"A 2 hour Maintenance triggered via API with no start time",
-  "duration":"2:00"
+{
+    "title":"Device Maintenance",
+    "notes":"A 2 hour Maintenance triggered via API with no start time",
+    "duration":"2:00"
 }
 '
 ```

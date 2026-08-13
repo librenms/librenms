@@ -121,6 +121,13 @@ modules:
                     group: Sessions
                     high_limit: PAN-COMMON-MIB::panSessionMax
                 -
+                    oid: PAN-COMMON-MIB::panSessionActiveICMP
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.6.{{ $index }}'
+                    index: 'panSessionActiveICMP.{{ $index }}'
+                    descr: Active ICMP Sessions
+                    group: Sessions
+                    high_limit: PAN-COMMON-MIB::panSessionMax
+                -
                     oid: PAN-COMMON-MIB::panVsysActiveSessions
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.1.4.{{ $index }}'
                     index: 'panVsysActiveSessions.{{ $index }}'
@@ -157,6 +164,7 @@ modules:
                     index: 'panGPGWUtilizationActiveTunnels.{{ $index }}'
                     descr: GlobalProtect VPN Active Sessions
                     group: VPN
+                    high_limit: PAN-COMMON-MIB::panGPGWUtilizationMaxTunnels
                     low_limit: 0
                     low_warn_limit: 0
         load:
@@ -167,6 +175,12 @@ modules:
                     index: 'panSessionUtilization.{{ $index }}'
                     descr: Session Utilization
                     group: Sessions
+                -
+                    oid: PAN-COMMON-MIB::panGPGWUtilizationPct
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.5.1.1.{{ $index }}'
+                    index: 'panGPGWUtilizationPct.{{ $index }}'
+                    descr: GlobalProtect Gateway Utilization
+                    group: VPN
                 -
                     oid: PAN-COMMON-MIB::panSessionSslProxyUtilization
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.8.{{ $index }}'

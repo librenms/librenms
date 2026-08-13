@@ -95,6 +95,14 @@ Description: Only select devices that aren't deleted, ignored or disabled.
 
 Source: `(devices.disabled = 0 AND devices.ignore = 0)`
 
+#### Device CPU average percentage (Decimal)
+
+Entity: `macros.device_cpu_avg_perc`
+
+Description: Returns the average CPU usage percentage across all processors on the device. Returns `0` when no processor data is available.
+
+Source: `COALESCE((SELECT AVG(p.processor_usage) FROM processors AS p WHERE p.device_id = %devices.device_id), 0)`
+
 #### Device component down [JunOS]
 
 Entity: `macros.device_component_down_junos`

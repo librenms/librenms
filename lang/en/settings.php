@@ -27,6 +27,7 @@ return [
         ],
         'api' => [
             'cors' => ['name' => 'CORS'],
+            'v1' => ['name' => 'API v1 (Beta)'],
         ],
         'apps' => [
             'powerdns-recursor' => ['name' => 'PowerDNS Recursor'],
@@ -287,6 +288,12 @@ return [
                 'origin' => [
                     'description' => 'Allow Request Origins',
                     'help' => 'Matches the request origin. Wildcards can be used, eg. *.mydomain.com',
+                ],
+            ],
+            'v1' => [
+                'enabled' => [
+                    'description' => 'Enable the v1 API (Beta)',
+                    'help' => 'Opt in to the new v1 REST API. When disabled, all /api/v1 endpoints return 404 and v1 token management is hidden from the web UI.',
                 ],
             ],
         ],
@@ -2517,23 +2524,27 @@ return [
                 'description' => 'Set the max search result limit',
                 'help' => 'Global search results limit',
             ],
-            'global_search_device_fdb' => [
-                'description' => 'Global search device FDB table',
-                'help' => 'Find devices with matching FDB table entries in the global search results',
+            'global_search.arp' => [
+                'description' => 'Global search ARP',
+                'help' => 'Find where devices are connected by searching your devices ARP caches',
             ],
-            'global_search_eventlogs' => [
+            'global_search.fdb' => [
+                'description' => 'Global search FDB entries',
+                'help' => 'Find where devices are connected by searching your devices bridge forwarding tables',
+            ],
+            'global_search.eventlogs' => [
                 'description' => 'Global search event logs',
                 'help' => 'Find matching event logs in the global search results',
             ],
-            'global_search_health' => [
+            'global_search.health' => [
                 'description' => 'Global search health',
                 'help' => 'Find matching health sensors in the global search results',
             ],
-            'global_search_ports' => [
+            'global_search.ports' => [
                 'description' => 'Global search ports',
                 'help' => 'Find matching ports in the global search results',
             ],
-            'global_search_routing' => [
+            'global_search.routing' => [
                 'description' => 'Global search route peers',
                 'help' => 'Find matching routing peers in the global search results',
             ],

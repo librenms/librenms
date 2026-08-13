@@ -150,7 +150,7 @@ class PollDevice implements ShouldQueue
                 }
 
                 // isolate module exceptions so they don't disrupt the polling process
-                Eventlog::log("Error polling $module module. Check log file for more details.", $this->device, 'poller', Severity::Error);
+                Eventlog::log("Error polling $module module: " . class_basename($e) . '. Check log file for more details.', $this->device, 'poller', Severity::Error);
                 report($e);
             }
 
