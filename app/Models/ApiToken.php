@@ -47,7 +47,10 @@ class ApiToken extends BaseModel
      */
     public static function isValid(string $token, ?int $user_id = null): bool
     {
-        $query = self::query()->isEnabled()->where('token_hash', $token);
+        $query = self::query()
+            ->isEnabled()
+            ->where('token_hash', $token)
+            ->whereHas('user', fn ($query) => $query->where('enabled', true));
 
         if (! is_null($user_id)) {
             $query->where('user_id', $user_id);
@@ -58,13 +61,13 @@ class ApiToken extends BaseModel
 
     /**
      * Get User model based on the given API token (or null if invalid)
-     *
-     * @param  string  $token
-     * @return User|null
      */
-    public static function userFromToken($token)
+    public static function userFromToken(string $token): ?User
     {
-        return User::find(self::idFromToken($token));
+        return User::query()
+            ->where('enabled', true)
+            ->whereHas('apiTokens', fn ($query) => $query->isEnabled()->where('token_hash', $token))
+            ->first();
     }
 
     public static function randomTokenValue(): string
@@ -93,17 +96,6 @@ class ApiToken extends BaseModel
         $this->save();
 
         return $this->token_hash;
-    }
-
-    /**
-     * Get the user_id for the given token.
-     *
-     * @param  string  $token
-     * @return int
-     */
-    public static function idFromToken($token)
-    {
-        return self::query()->isEnabled()->where('token_hash', $token)->value('user_id');
     }
 
     // ---- Query scopes ----
