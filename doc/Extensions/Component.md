@@ -1,12 +1,12 @@
 # About
 
-The Component extension provides a generic database storage mechanism
-for discovery and poller modules. The Driver behind this extension was
-to provide the features of ports, in a generic manner to
-discovery/poller modules.
+The Component extension gives generic database storage to the discovery
+modules and the poller modules. It brings the features of ports to
+these modules in a generic form.
 
-It provides a status (Nagios convention), the ability to Disable (do
-not poll), or Ignore (do not Alert).
+It gives a status in the Nagios convention. It also gives a Disable
+option, which stops the poll, and an Ignore option, which stops the
+alert.
 
 ## Database Structure
 
@@ -29,8 +29,8 @@ These fields are described below:
 - `type` - name from the component_type table
 - `label` - Display label for the component
 - `status` - The status of the component, retrieved from the device
-- `disabled` - Should this component be polled?
-- `ignore` - Should this component be alerted on
+- `disabled` - it stops the poll of this component
+- `ignore` - it stops the alerts of this component
 - `error` - Error message if in Alert state
 
 The component_prefs table holds custom data in an Attribute/Value format:
@@ -47,13 +47,12 @@ mysql> select * from component_prefs limit 1;
 
 ### <a name="reserved">Reserved Fields</a>
 
-When this data from both the `component` and `component_prefs` tables
-is returned in one single consolidated array, there is the potential
-for someone to attempt to set an attribute (in the `component_prefs`)
-table that is used in the `component` table. Because of this all
-fields of the `component` table are reserved, they cannot be used as
-custom attributes, if you update these the module will attempt to
-write them to the `component` table, not the `component_prefs` table.
+The data of the `component` table and the `component_prefs` table comes
+back in one array. A user can therefore try to set an attribute in
+`component_prefs` with the name of a `component` field. All fields of
+the `component` table are therefore reserved. You cannot use them as
+custom attributes. An update of such a field goes to the `component`
+table, not to the `component_prefs` table.
 
 ## Using Components
 
@@ -76,7 +75,7 @@ $ARRAY = $COMPONENT->getComponents($DEVICE_ID, $OPTIONS);
 - `DEVICE_ID` or null for all devices.
 - `OPTIONS` - an array of various options.
 
-`getComponents` will return an array containing components in the following format:
+`getComponents` returns an array of the components in this format:
 
 ```php
 Array
@@ -109,18 +108,19 @@ Array
 )
 ```
 
-Where X is the Device ID and Y1/Y2 is the Component ID. In the example
-above, `TEST_ATTR` is a custom field, the rest are reserved fields.
+Here, X is the device ID. Y1 and Y2 are the component IDs. In the
+example above, `TEST_ATTR` is a custom field. The other fields are
+reserved fields.
 
 ### Options
 
-Options can be supplied to `getComponents` to influence which and how
-components are returned.
+The options of `getComponents` control the selection and the format of
+the components.
 
 #### Filtering
 
-You can filter on any of the [reserved](#reserved) fields. Filters are
-created in the following format:
+You can filter on each [reserved](#reserved) field. A filter has this
+format:
 
 ```php
 $options['filter']['FIELD'] = array ('OPERATOR', 'CRITERIA');
@@ -129,8 +129,8 @@ $options['filter']['FIELD'] = array ('OPERATOR', 'CRITERIA');
 Where:
 
 - `FIELD` - The [reserved](#reserved) field to filter on
-- `OPERATOR` - 'LIKE' or '=', are we checking if the FIELD equals or
-  contains the CRITERIA.
+- `OPERATOR` - 'LIKE' or '='. '=' tests for an equal FIELD. 'LIKE'
+  tests for a FIELD that holds the CRITERIA.
 - `CRITERIA` - The criteria to search on
 
 There are 2 filtering shortcuts:
@@ -149,7 +149,7 @@ $OPTIONS['filter']['type'] = array ('=', $TYPE);
 
 #### Sorting
 
-You can sort the records that are returned by specifying the following option:
+This option sorts the returned records:
 
 ```php
 $OPTIONS['sort'][FIELD] = 'DIRECTION';
@@ -173,8 +173,8 @@ $ARRAY = $COMPONENT->createComponent($DEVICE_ID, $TYPE);
 - `DEVICE_ID` - The ID of the device to attach the component to.
 - `TYPE` - The unique type for your module.
 
-This will return a new, empty array with a component ID and Type set,
-all other fields will be set to defaults.
+It returns a new empty array with a component ID and a type. All other
+fields have their default values.
 
 ```php
 Array
@@ -199,7 +199,7 @@ When a component is no longer needed, it can be deleted.
 $COMPONENT->deleteComponent($COMPONENT_ID)
 ```
 
-This will return `True` on success or `False` on failure.
+It returns `True` at a success and `False` at a failure.
 
 ## Editing Components
 
@@ -211,30 +211,29 @@ To edit a component, the procedure is:
 
 ### Edit the Array
 
-Once you have a component array from `getComponents` the first thing
-to do is extract the components for only the single device you are
-editing. This is required because the `setComponentPrefs` function
-only saves a single device at a time.
+First get a component array from `getComponents`. Then extract the
+components of the device of your edit. This step is necessary, because
+the `setComponentPrefs` function saves only one device at a time.
 
 ```php
 $ARRAY = $COMPONENT->getComponents($DEVICE_ID, $OPTIONS);
 $ARRAY = $ARRAY[$DEVICE_ID];
 ```
 
-Then simply edit this array to suit your needs.
-If you need to add a new Attribute/Value pair you can:
+Then edit this array for your own needs.
+To add a new attribute and value pair:
 
 ```php
 $ARRAY[COMPONENT_ID]['New Attribute'] = "Value";
 ```
 
-If you need to delete a previously set Attribute/Value pair you can:
+To remove an attribute and value pair:
 
 ```php
 unset($ARRAY[COMPONENT_ID]['New Attribute']);
 ```
 
-If you need to edit a previously set Attribute/Value pair you can:
+To edit an attribute and value pair:
 
 ```php
 $ARRAY[COMPONENT_ID]['Existing Attribute'] = "New Value";
@@ -242,33 +241,32 @@ $ARRAY[COMPONENT_ID]['Existing Attribute'] = "New Value";
 
 ### <a name="update-write">Write the components </a> 
 
-To write component changes back to the database simply:
+To write the component changes back to the database:
 
 ```php
 $COMPONENT->setComponentPrefs($DEVICE_ID, $ARRAY)
 ```
 
-When writing the component array there are several caveats to be aware
-of, these are:
+The write of a component array has these limits:
 
 - `$ARRAY` must be in the format of a single device ID -
   `$ARRAY[$COMPONENT_ID][Attribute] = 'Value';` NOT in the multi
   device format returned by `getComponents` -
   `$ARRAY[$DEVICE_ID][$COMPONENT_ID][Attribute] = 'Value';`
-- You cannot edit the Component ID or the Device ID
-- [reserved](#reserved) fields can not be removed
-- if a change is found an entry will be written to the eventlog.
+- You cannot edit the component ID or the device ID
+- You cannot remove a [reserved](#reserved) field
+- A change writes an entry to the eventlog
 
 ## API
 
 Component details are available via the API.
-Please see the [API-Docs](../API/Devices.md#get_components) for details.
+For the details, read the [API docs](../API/Devices.md#get_components).
 
 ## Alerting
 
-It is intended that discovery/poller modules will detect the status of
-a component during the polling cycle. Status is logged using the
-Nagios convention for status codes, where:
+A discovery module or a poller module detects the status of a component
+in the polling cycle. LibreNMS logs the status with the Nagios status
+codes:
 
 ```
 0 = Ok,
@@ -276,21 +274,20 @@ Nagios convention for status codes, where:
 2 = Critical
 ```
 
-If you are creating a poller module which can detect a fault condition
-simply set STATUS to something other than 0 and ERROR to a message
-that indicates the problem.
+In a poller module that detects a fault, set STATUS to a value other
+than 0. Set ERROR to a message with the description of the problem.
 
-To actually raise an alert, the user will need to create an alert
-rule. To assist with this several Alerting Macro's have been created:
+The user creates an alert rule for the alert. These alerting macros
+help:
 
 - `%macro.component_normal` - A component that is not disabled or
   ignored and in a Normal state.
-- `%macro.component_warning` - A component that is not disabled or
-  ignored and NOT in a Warning state.
-- `%macro.component_critical` - A component that is not disabled or
-  ignored and NOT in a Critical state.
+- `%macro.component_warning` - a component that is not disabled and not
+  ignored, and is in a warning state.
+- `%macro.component_critical` - a component that is not disabled and
+  not ignored, and is in a critical state.
 
-To raise alerts for components, the following rules could be created:
+These rules raise alerts for components:
 
 - `%macros.component_critical = "1"` - To alert on all Critical
   components
@@ -298,17 +295,15 @@ To raise alerts for components, the following rules could be created:
   Component>"` - To alert on all Critical components of a particular
   type.
 
-If there is a particular component you would like excluded from
-alerting, simply set the ignore field to 1.
+To exclude a component from the alerting, set its ignore field to 1.
 
-The data that is written to each alert when it is raised is in the following format:
+Each raised alert holds the data in this format:
 
 `COMPONENT_TYPE - LABEL - ERROR`
 
 # Example Code
 
-To see an example of how the component module can used, please see the
-following modules:
+These modules give an example of the component module:
 
 - Cisco OTV
   - `includes/discovery/cisco-otv.inc.php`

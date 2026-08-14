@@ -1,14 +1,13 @@
 ### `get_inventory`
 
-Retrieve the inventory for a device. If you call this without any
-parameters then you will only get part of the inventory. This is
-because a lot of devices nest each component, for instance you may
-initially have the chassis, within this the ports - 1 being an sfp
-cage, then the sfp itself. The way this API call is designed is to
-enable a recursive lookup. The first call will retrieve the root
-entry, included within this response will be entPhysicalIndex, you can
-then call for entPhysicalContainedIn which will then return the next
-layer of results.  To retrieve all items together, see
+Retrieve the inventory of a device. A call without parameters returns
+only a part of the inventory, because many devices nest their
+components. For example, the chassis holds the ports, one port is an
+SFP cage, and the cage holds the SFP itself. This API call therefore
+does a recursive lookup. The first call returns the root entry. The
+response holds entPhysicalIndex. You then call for
+entPhysicalContainedIn, and this call returns the next layer of
+results. To get all items at one time, read
 [get_inventory_for_device](#get_inventory_for_device).
 
 Route: `/api/v0/inventory/:hostname`
@@ -17,13 +16,11 @@ Route: `/api/v0/inventory/:hostname`
 
 Input:
 
-- entPhysicalClass: This is used to restrict the class of the
-  inventory, for example you can specify chassis to only return items
-  in the inventory that are labelled as chassis.
-- entPhysicalContainedIn: This is used to retrieve items within the
-  inventory assigned to a previous component, for example specifying
-  the chassis (entPhysicalIndex) will retrieve all items where the
-  chassis is the parent.
+- entPhysicalClass: it limits the class of the inventory. For example,
+  the value `chassis` returns only the items with the chassis label.
+- entPhysicalContainedIn: it returns the items inside a previous
+  component. For example, the entPhysicalIndex of the chassis returns
+  all items with the chassis as their parent.
 
 Example:
 
@@ -66,9 +63,9 @@ Output:
 
 ### `get_inventory_for_device`
 
-Retrieve the flattened inventory for a device.  This retrieves all
-inventory items for a device regardless of their structure, and may be
-more useful for devices with with nested components.
+Retrieve the flat inventory of a device. This call returns all
+inventory items of the device at any structure level. It is therefore
+more useful for a device with nested components.
 
 Route: `/api/v0/inventory/:hostname/all`
 

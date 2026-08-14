@@ -1,23 +1,22 @@
 # Check_MK Setup
 
-The agent can be used to gather data from remote systems you can use
-LibreNMS in combination with check_mk (found
-[here](https://github.com/librenms/librenms-agent)). The agent can be
-extended to include data about [applications](Applications.md) on the
+The agent collects data from remote systems. LibreNMS works with
+check_mk, at [the librenms-agent
+repository](https://github.com/librenms/librenms-agent). You can extend
+the agent with data about the [applications](Applications.md) on the
 remote system.
 
 ## Installation
 
 ### Linux / BSD
 
-Make sure that systemd or xinetd is installed on the host you want to
-run the agent on.
+Install systemd or xinetd on the host of the agent.
 
-The agent uses TCP-Port 6556, please allow access from the **LibreNMS
-host** and **poller nodes** if you're using the [Distributed Polling](Distributed-Poller.md)
-setup.
+The agent uses TCP port 6556. Permit access from the **LibreNMS host**.
+With the [Distributed Polling](Distributed-Poller.md) setup, also
+permit access from the **poller nodes**.
 
-On each of the hosts you would like to use the agent on, you need to do the following:
+On each host with the agent, do these steps:
 
 1: Clone the `librenms-agent` repository:
 
@@ -49,12 +48,12 @@ chmod +x /usr/bin/check_mk_agent
 mkdir -p /usr/lib/check_mk_agent/plugins /usr/lib/check_mk_agent/local
 ```
 
-5: Copy each of the scripts from `agent-local/` into
-`/usr/lib/check_mk_agent/local` that you require to be graphed.  You
-can find detail setup instructions for specific applications above.
+5: Copy each necessary script from `agent-local/` into
+`/usr/lib/check_mk_agent/local`. The sections above give the full setup
+instructions of each application.
 
-6: Make each one executable that you want to use with `chmod +x
-/usr/lib/check_mk_agent/local/$script`
+6: Make each necessary script executable with
+`chmod +x /usr/lib/check_mk_agent/local/$script`.
 
 7: Enable the check_mk service
 
@@ -62,25 +61,28 @@ can find detail setup instructions for specific applications above.
 | --- | --- |
 | `/etc/init.d/xinetd restart` | `systemctl enable check_mk.socket && systemctl start check_mk.socket` |
 
-8: Login to the LibreNMS web interface and edit the device you want to
-monitor. Under the modules section, ensure that unix-agent is enabled.
+8: Log in to the LibreNMS web interface and edit the monitored device.
+In the modules section, enable unix-agent.
 
-9: Then under Applications, enable the apps that you plan to monitor.
+9: Then enable your applications under Applications.
 
-10: Wait for around 10 minutes and you should start seeing data in
-your graphs under Apps for the device.
+10: Wait about 10 minutes. The data then appears in the graphs under
+Apps for that device.
 
 #### Restrict the devices on which the agent listens: Linux systemd
-If you want to restrict which network adapter the agent listens on, do the following:
+To limit the network adapter of the agent, do these steps:
 
 1: Edit `/etc/systemd/system/check_mk.socket`
 
 2: Under the `[Socket]` section, add a new line `BindToDevice=` and the name of your network adapter.
 
-3: If the script has already been enabled in systemd, you may need to issue a `systemctl daemon-reload` and then `systemctl restart check_mk.socket`
+3: If systemd already holds the script, run `systemctl daemon-reload`.
+Then run `systemctl restart check_mk.socket`.
 
 
 ### Windows
-1. Grab version 1.2.6b5 of the check_mk agent from the check_mk github repo (exe/msi or compile it yourself depending on your usage): <https://github.com/tribe29/checkmk/tree/v1.2.6b5/agents/windows>
+1. Get version 1.2.6b5 of the check_mk agent from the check_mk GitHub
+   repository. Use the exe or msi file, or compile it yourself:
+   <https://github.com/tribe29/checkmk/tree/v1.2.6b5/agents/windows>
 2. Run the msi / exe
-3. Make sure your LibreNMS instance can reach TCP port 6556 on your target.
+3. Your LibreNMS instance must reach TCP port 6556 on the target.
