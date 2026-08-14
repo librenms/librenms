@@ -52,7 +52,7 @@ if ($device['os'] == 'timos') {
         d_echo($vrfId);
 
         foreach ($vrf as $address => $value) {
-            $astext = \LibreNMS\Util\AutonomousSystem::get($value['TIMETRA-BGP-MIB::tBgpPeerNgPeerAS4Byte'] ?? null)->name();
+            $astext = \LibreNMS\Util\AutonomousSystem::get($value['TIMETRA-BGP-MIB::tBgpPeerNgPeerAS4Byte'])->name();
             if (! DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->exists()) {
                 $peers = [
                     'device_id' => $device['device_id'],
