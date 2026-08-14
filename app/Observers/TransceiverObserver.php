@@ -8,7 +8,7 @@ use LibreNMS\Enum\Severity;
 
 class TransceiverObserver
 {
-    private const IDENTITY_ATTRIBUTES = ['serial', 'vendor', 'model', 'type'];
+    private const IDENTITY_ATTRIBUTES = ['vendor', 'model', 'type', 'serial'];
 
     public function created(Transceiver $transceiver): void
     {
