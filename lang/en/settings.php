@@ -2,7 +2,7 @@
 
 return [
     'title' => 'Settings',
-    'readonly' => 'Set in config.php, remove from config.php to enable.',
+    'readonly' => 'Set in config.php. Remove it from config.php to enable this field.',
     'groups' => [
         'alerting' => 'Alerting',
         'api' => 'API',
@@ -121,17 +121,17 @@ return [
         'active_directory' => [
             'users_purge' => [
                 'description' => 'Keep inactive users for',
-                'help' => 'Users will be deleted from LibreNMS after this many days of not logging in. 0 means never and users will be recreated if the user logs back in.',
+                'help' => 'A user is deleted after this many days without a login. Set 0 to never delete users. A deleted user is recreated when that user logs in again.',
             ],
         ],
         'addhost_alwayscheckip' => [
             'description' => 'Check for duplicate IP when adding devices',
-            'help' => 'If a host is added as an ip address it is checked to ensure the ip is not already present. If the ip is present the host is not added. If host is added by hostname this check is not performed. If the setting is true hostnames are resolved and the check is also performed. This helps prevents accidental duplicate hosts.',
+            'help' => 'If you add a host by IP address, the IP is checked to make sure that it is not already present. If the IP is present, the host is not added. If you add a host by hostname, this check is not made. If this setting is enabled, hostnames are resolved and the check is made. This helps to prevent accidental duplicate hosts.',
         ],
         'alert_rule' => [
             'acknowledged_alerts' => [
                 'description' => 'Acknowledged Alerts',
-                'help' => 'Send alerts when an alert is acknowledged',
+                'help' => 'Send alerts when a user acknowledges an alert',
             ],
             'severity' => [
                 'description' => 'Severity',
@@ -155,19 +155,19 @@ return [
             ],
             'invert_rule_match' => [
                 'description' => 'Invert Rule Match',
-                'help' => 'Alert only if rule doesn\'t match',
+                'help' => 'Alert only if the rule does not match',
             ],
             'recovery_alerts' => [
                 'description' => 'Recovery Alerts',
-                'help' => 'Notify if Alert recovers',
+                'help' => 'Notify when an alert recovers',
             ],
             'acknowledgement_alerts' => [
                 'description' => 'Acknowledgement Alerts',
-                'help' => 'Notify if Alert is acknowledged',
+                'help' => 'Notify when a user acknowledges an alert',
             ],
             'invert_map' => [
                 'description' => 'All devices except in list',
-                'help' => 'Alert only for Devices which are not listed',
+                'help' => 'Alert only for devices that are not in the list',
             ],
         ],
         'alert' => [
@@ -197,15 +197,15 @@ return [
             ],
             'disable' => [
                 'description' => 'Disable alerting',
-                'help' => 'Stop alerts being generated',
+                'help' => 'Do not generate any alerts',
             ],
             'acknowledged' => [
                 'description' => 'Send acknowledged alerts',
-                'help' => 'Notify if Alert has been acknowledged',
+                'help' => 'Notify when a user acknowledges an alert',
             ],
             'fixed-contacts' => [
                 'description' => 'Disable contact changes for active alerts',
-                'help' => 'If TRUE any changes to sysContact or users emails will not be honoured whilst alert is active',
+                'help' => 'If enabled, changes to sysContact or user emails do not apply while an alert is active',
             ],
             'globals' => [
                 'description' => 'Issue alerts to read only users (deprecated)',
@@ -249,11 +249,11 @@ return [
         ],
         'allow_duplicate_sysName' => [
             'description' => 'Allow Duplicate sysName',
-            'help' => 'By default duplicate sysNames are disabled from being added to prevent a device with multiple interfaces from being added multiple times',
+            'help' => 'By default, a device with a duplicate sysName is not added. This prevents multiple entries for one device with multiple interfaces.',
         ],
         'allow_unauth_graphs' => [
             'description' => 'Allow unauthenticated graph access',
-            'help' => 'Allows any one to access graphs without login',
+            'help' => 'Allow anyone to access graphs without a login',
         ],
         'allow_unauth_graphs_cidr' => [
             'description' => 'Allow the given networks graph access',
@@ -293,7 +293,7 @@ return [
             'v1' => [
                 'enabled' => [
                     'description' => 'Enable the v1 API (Beta)',
-                    'help' => 'Opt in to the new v1 REST API. When disabled, all /api/v1 endpoints return 404 and v1 token management is hidden from the web UI.',
+                    'help' => 'Opt in to the new v1 REST API. When disabled, all /api/v1 endpoints return 404 and the web UI hides v1 token management.',
                 ],
             ],
         ],
@@ -315,7 +315,7 @@ return [
             'oslv_monitor' => [
                 'seen_age' => [
                     'description' => 'Seen age threshold',
-                    'help' => 'Age in seconds after which items are considered stale',
+                    'help' => 'Age in seconds before items are treated as stale',
                 ],
                 'linux_pg_memory_stats' => [
                     'description' => 'Linux page memory stats',
@@ -355,12 +355,12 @@ return [
         'auth' => [
             'allow_get_login' => [
                 'description' => 'Allow get login (Insecure)',
-                'help' => 'Allow login by putting username and password variables in the url get request, useful for display systems where you cannot interactively log in. This is considered insecure because the password will be shown in logs and logins are not rate limited so it could open you up to brute force attacks.',
+                'help' => 'Allow login with username and password variables in the URL get request. This is useful for display systems where you cannot log in interactively. This is insecure. Logs show the password, and logins have no rate limit. This can open you up to brute force attacks.',
             ],
             'socialite' => [
                 'redirect' => [
                     'description' => 'Redirect Login page',
-                    'help' => 'Login page should redirect immediately to the first defined provider.<br><br>TIPS: You can prevent it by appending ?redirect=0 in the url',
+                    'help' => 'The login page redirects immediately to the first defined provider.<br><br>TIP: To prevent this, add ?redirect=0 to the URL.',
                 ],
                 'register' => [
                     'description' => 'Allow registration via provider',
@@ -369,7 +369,7 @@ return [
                     'description' => 'Provider configs',
                 ],
                 'scopes' => [
-                    'description' => 'Scopes that should be included with in the authentication request',
+                    'description' => 'Scopes to include in the authentication request',
                     'help' => 'See https://laravel.com/docs/10.x/socialite#access-scopes',
                 ],
                 'default_role' => [
@@ -383,15 +383,15 @@ return [
         ],
         'auth_ad_base_dn' => [
             'description' => 'Base DN',
-            'help' => 'groups and users must be under this dn. Example: dc=example,dc=com',
+            'help' => 'Groups and users must be under this DN. Example: dc=example,dc=com',
         ],
         'auth_ad_check_certificates' => [
             'description' => 'Check certificate',
-            'help' => 'Check certificates for validity. Some servers use self signed certificates, disabling this allows those.',
+            'help' => 'Check that certificates are valid. Some servers use self-signed certificates. Disable this setting to allow them.',
         ],
         'auth_ad_debug' => [
             'description' => 'Debug',
-            'help' => 'Show detailed error messages, do not leave this enabled as it can leak data.',
+            'help' => 'Show detailed error messages. Do not leave this enabled, because it can leak data.',
         ],
         'auth_ad_domain' => [
             'description' => 'Active Directory Domain',
@@ -419,7 +419,7 @@ return [
         ],
         'auth_ad_timeout' => [
             'description' => 'Connection timeout',
-            'help' => 'If one or more servers are unresponsive, higher timeouts will cause slow logins. To low may cause connection failures in some cases',
+            'help' => 'If one or more servers do not respond, a higher timeout causes slow logins. A timeout that is too low can cause connection failures.',
         ],
         'auth_ad_user_filter' => [
             'description' => 'User LDAP filter',
@@ -470,11 +470,11 @@ return [
         ],
         'auth_ldap_cache_ttl' => [
             'description' => 'LDAP cache expiration',
-            'help' => 'Temporarily stores LDAP query results.  Improves speeds, but the data may be stale.',
+            'help' => 'Temporarily stores LDAP query results. This improves speed, but the data can be stale.',
         ],
         'auth_ldap_debug' => [
             'description' => 'Show debug',
-            'help' => 'Shows debug information.  May expose private information, do not leave enabled.',
+            'help' => 'Shows debug information. This can expose private data. Do not leave it enabled.',
         ],
         'auth_ldap_cacertfile' => [
             'description' => 'Override system TLS CA Cert',
@@ -512,11 +512,11 @@ return [
         ],
         'auth_ldap_require_groupmembership' => [
             'description' => 'LDAP Group membership verification',
-            'help' => 'Perform (or skip) ldap_compare when the provider allows (or does not) for the Compare action.',
+            'help' => 'Run ldap_compare if the provider supports the Compare action. Skip it if the provider does not.',
         ],
         'auth_ldap_port' => [
             'description' => 'LDAP port',
-            'help' => 'Port to connect to servers on. For LDAP it should be 389, for LDAPS it should be 636',
+            'help' => 'Port to connect to servers on. Use 389 for LDAP and 636 for LDAPS.',
         ],
         'auth_ldap_prefix' => [
             'description' => 'User prefix',
@@ -541,7 +541,7 @@ return [
         ],
         'auth_ldap_timeout' => [
             'description' => 'Connection timeout',
-            'help' => 'If one or more servers are unresponsive, higher timeouts will cause slow access. To low may cause connection failures in some cases',
+            'help' => 'If one or more servers do not respond, a higher timeout causes slow access. A timeout that is too low can cause connection failures.',
         ],
         'auth_ldap_uid_attribute' => [
             'description' => 'Unique ID attribute',
@@ -549,19 +549,19 @@ return [
         ],
         'auth_ldap_userdn' => [
             'description' => 'Use full user DN',
-            'help' => "Uses a user's full DN as the value of the member attribute in a group instead of member: username using the prefix and suffix. (it's member: uid=username,ou=groups,dc=domain,dc=com)",
+            'help' => "Uses a user's full DN as the value of the member attribute in a group. The alternative is member: username, built from the prefix and suffix. (for example, member: uid=username,ou=groups,dc=domain,dc=com)",
         ],
         'auth_ldap_userlist_filter' => [
             'description' => 'Custom LDAP User filter',
-            'help' => 'Custom ldap filter to limit the number of responses if you have an ldap directory with thousand of users',
+            'help' => 'Custom LDAP filter to limit the number of responses. Use it if your LDAP directory has thousands of users.',
         ],
         'auth_ldap_wildcard_ou' => [
             'description' => 'Wildcard user OU',
-            'help' => 'Search for user matching user name independently of OU set in user suffix. Useful if your users are in different OU. Bind username, if set, still user suffix',
+            'help' => 'Search for a user by name in any OU, not only the OU in the user suffix. Use this if your users are in different OUs. The bind username, if set, still uses the user suffix.',
         ],
         'auth_ldap_version' => [
             'description' => 'LDAP version',
-            'help' => 'LDAP version to use to talk to the server.  Usually this should be v3',
+            'help' => 'LDAP version to use to talk to the server. Usually this must be 3.',
             'options' => [
                 '2' => '2',
                 '3' => '3',
@@ -569,7 +569,7 @@ return [
         ],
         'auth_mechanism' => [
             'description' => 'Authorization Method (Caution!)',
-            'help' => "Authorization method.  Caution, you may lose the ability to log in. You can override this back to mysql by setting \$config['auth_mechanism'] = 'mysql'; in your config.php",
+            'help' => "Authorization method. Caution: you can lose the ability to log in. To set it back to mysql, set \$config['auth_mechanism'] = 'mysql'; in your config.php",
             'options' => [
                 'mysql' => 'MySQL (default)',
                 'active_directory' => 'Active Directory',
@@ -583,7 +583,7 @@ return [
         ],
         'auth_remember' => [
             'description' => 'Remember me duration',
-            'help' => 'Number of days to keep a user logged in when checking the remember me checkbox at log in.',
+            'help' => 'Number of days to keep a user logged in when the user selects the remember me checkbox.',
         ],
         'authlog_purge' => [
             'description' => 'Auth log entries older than',
@@ -595,13 +595,13 @@ return [
                 'help' => 'Threshold for green color',
             ],
             'threshold_warning' => [
-                'description' => 'Availablilty Warning Threshold',
+                'description' => 'Availability Warning Threshold',
                 'help' => 'Threshold for orange color',
             ],
         ],
         'bad_entity_sensor_regex' => [
             'description' => 'Bad Entity Sensor Regex',
-            'help' => 'Regex to match bad entity sensors, these will not be displayed in the web interface.',
+            'help' => 'Regex to match bad entity sensors. These sensors are not displayed in the web interface.',
         ],
         'billing' => [
             '95th_default_agg' => [
@@ -611,31 +611,31 @@ return [
         ],
         'enable_billing' => [
             'description' => 'Enable Billing',
-            'help' => 'Enable billing module, this allows you to monitor port usage.',
+            'help' => 'Enable the billing module. This lets you monitor port usage.',
         ],
         'peering_descr' => [
             'description' => 'Peering Port Types',
-            'help' => 'Ports of the listed description type(s) will be shown under the peering ports menu entry.  See Interface Description Parsing docs for more info.',
+            'help' => 'Ports of the listed description type(s) are shown under the peering ports menu entry. For more information, see the Interface Description Parsing documentation.',
         ],
         'transit_descr' => [
             'description' => 'Transit Port Types',
-            'help' => 'Ports of the listed description type(s) will be shown under the transit ports menu entry.  See Interface Description Parsing docs for more info.',
+            'help' => 'Ports of the listed description type(s) are shown under the transit ports menu entry. For more information, see the Interface Description Parsing documentation.',
         ],
         'collectd_dir' => [
             'description' => 'Collectd Directory',
-            'help' => 'Directory where collectd stores its RRD files.  This is used to display data from collectd into LibreNMS.',
+            'help' => 'Directory where collectd stores its RRD files. This is used to display collectd data.',
         ],
         'collectd_sock' => [
             'description' => 'Collectd Socket',
-            'help' => 'Socket collectd is listening on.  This is used to display data from collectd into LibreNMS.',
+            'help' => 'Socket that collectd listens on. This is used to display collectd data.',
         ],
         'core_descr' => [
             'description' => 'Core Port Types',
-            'help' => 'Ports of the listed description type(s) will be shown under the core ports menu entry.  See Interface Description Parsing docs for more info.',
+            'help' => 'Ports of the listed description type(s) are shown under the core ports menu entry. For more information, see the Interface Description Parsing documentation.',
         ],
         'custom_descr' => [
             'description' => 'Custom Port Types',
-            'help' => 'Ports of the listed description type(s) will be shown under the custom ports menu entry.  See Interface Description Parsing docs for more info.',
+            'help' => 'Ports of the listed description type(s) are shown under the custom ports menu entry. For more information, see the Interface Description Parsing documentation.',
         ],
         'custom_map' => [
             'background_type' => [
@@ -648,8 +648,8 @@ return [
                     'help' => 'Initial color for map background',
                 ],
                 'lat' => [
-                    'description' => 'Background Map Lattitude',
-                    'help' => 'Initial lattitude for background geo map',
+                    'description' => 'Background Map Latitude',
+                    'help' => 'Initial latitude for background geo map',
                 ],
                 'lng' => [
                     'description' => 'Background Map Longitude',
@@ -677,8 +677,8 @@ return [
                 'help' => 'Default font size for edge labels',
             ],
             'edge_seperation' => [
-                'description' => 'Edge Seperation',
-                'help' => 'Default edge seperation for new maps',
+                'description' => 'Edge Separation',
+                'help' => 'Default edge separation for new maps',
             ],
             'height' => [
                 'description' => 'Map Height',
@@ -686,7 +686,7 @@ return [
             ],
             'node_align' => [
                 'description' => 'Node Alignment',
-                'help' => 'Default node aligment for new maps',
+                'help' => 'Default node alignment for new maps',
             ],
             'node_background' => [
                 'description' => 'Node Background',
@@ -727,19 +727,19 @@ return [
         ],
         'customers_descr' => [
             'description' => 'Customer Port Types',
-            'help' => 'Ports of the listed description type(s) will be shown under the customers ports menu entry.  See Interface Description Parsing docs for more info.',
+            'help' => 'Ports of the listed description type(s) are shown under the customers ports menu entry. For more information, see the Interface Description Parsing documentation.',
         ],
         'base_url' => [
             'description' => 'Base URL',
-            'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname',
+            'help' => 'Set this *only* if you want to *force* a particular hostname/port. It prevents use of the web interface from any other hostname.',
         ],
         'disabled_sensors' => [
             'description' => 'Disabled Sensors',
-            'help' => 'Sensors that should not be polled or displayed in the web interface.',
+            'help' => 'Sensors that must not be polled or displayed in the web interface.',
         ],
         'disabled_sensors_regex' => [
             'description' => 'Disabled Sensors Regex',
-            'help' => 'Sensors that match this regex will not be polled or displayed in the web interface.',
+            'help' => 'Sensors that match this regex are not polled or displayed in the web interface.',
         ],
         'discovery_modules' => [
             'arp-table' => [
@@ -876,15 +876,15 @@ return [
         ],
         'distributed_poller' => [
             'description' => 'Enable Distributed Polling (requires additional setup)',
-            'help' => 'Enable distributed polling system wide. This is intended for load sharing, not remote polling. You must read the documentation for steps to enable: https://docs.librenms.org/Extensions/Distributed-Poller/',
+            'help' => 'Enable distributed polling system wide. This is for load sharing, not for remote polling. To enable it, you must read the documentation: https://docs.librenms.org/Extensions/Distributed-Poller/',
         ],
         'default_poller_group' => [
             'description' => 'Default Poller Group',
-            'help' => 'The default poller group all pollers should poll if none is set in config.php',
+            'help' => 'The default poller group for all pollers when config.php sets none',
         ],
         'device_traffic_iftype' => [
             'description' => 'Device Traffic Interface Types',
-            'help' => 'Interface types to be excluded from device graphs.',
+            'help' => 'Interface types to exclude from device graphs.',
         ],
         'distributed_poller_memcached_host' => [
             'description' => 'Memcached host',
@@ -899,23 +899,23 @@ return [
         ],
         'email_auto_tls' => [
             'description' => 'Auto TLS support',
-            'help' => 'Tries to use TLS before falling back to un-encrypted',
+            'help' => 'Tries TLS first, then falls back to an unencrypted connection',
         ],
         'email_smtp_verifypeer' => [
             'description' => 'Verify peer certificate',
-            'help' => 'Do not verify peer certificate when connecting to SMTP server via TLS',
+            'help' => 'Do not verify the peer certificate for TLS connections to the SMTP server',
         ],
         'email_smtp_allowselfsigned' => [
             'description' => 'Allow self-signed certificate',
-            'help' => 'Allow self-signed certificate when connecting to SMTP server via TLS',
+            'help' => 'Allow a self-signed certificate for TLS connections to the SMTP server',
         ],
         'email_attach_graphs' => [
             'description' => 'Attach graph images',
-            'help' => 'This will generate a graph when the alert is raised and attach it and embed it in the email.',
+            'help' => 'Generates a graph when an alert occurs and embeds it in the email.',
         ],
         'email_backend' => [
             'description' => 'How to deliver mail',
-            'help' => 'The backend to use for sending email, can be mail, sendmail or SMTP',
+            'help' => 'The backend for email delivery. It can be mail, sendmail, or SMTP.',
             'options' => [
                 'mail' => 'mail',
                 'sendmail' => 'sendmail',
@@ -924,7 +924,7 @@ return [
         ],
         'email_from' => [
             'description' => 'From email address',
-            'help' => 'Email address used for sending emails (from)',
+            'help' => 'Email address used as the from address',
         ],
         'email_html' => [
             'description' => 'Use HTML emails',
@@ -939,7 +939,7 @@ return [
         ],
         'email_smtp_host' => [
             'description' => 'SMTP Server',
-            'help' => 'IP or dns name for the SMTP server to deliver mail to',
+            'help' => 'IP or DNS name of the SMTP server to deliver mail to',
         ],
         'email_smtp_password' => [
             'description' => 'SMTP Auth password',
@@ -967,7 +967,7 @@ return [
         ],
         'enable_clear_discovery' => [
             'description' => 'Enable Clear Discovery',
-            'help' => 'Enables the ability to clear discovery date and time for a device. This will force a rediscovery of the device.',
+            'help' => 'Lets you clear the discovery date and time for a device. This forces a rediscovery of the device.',
         ],
         'enable_inventory' => [
             'description' => 'Enable Inventory',
@@ -975,7 +975,7 @@ return [
         ],
         'enable_lazy_load' => [
             'description' => 'Enable Lazy Loading',
-            'help' => 'Lazy loading is used to speed up the loading of pages by only loading the data that is needed at the time. This can be disabled if you have issues with it.',
+            'help' => 'Lazy loading speeds up pages. It loads only the data that the page needs at the time. Disable this setting if you have problems with it.',
         ],
         'enable_libvirt' => [
             'description' => 'Enable Libvirt',
@@ -991,7 +991,7 @@ return [
         ],
         'enable_syslog' => [
             'description' => 'Enable Syslog',
-            'help' => 'Enables visibility for syslog within the WebUI.',
+            'help' => 'Shows syslog in the web interface.',
         ],
         'eventlog_purge' => [
             'description' => 'Event log entries older than',
@@ -1003,7 +1003,7 @@ return [
         ],
         'front_page' => [
             'description' => 'Front Page',
-            'help' => 'Set a custom front page, this is the page you see when you first log in. For example, if you create `resources/views/overview/custom/foobar.blade.php`, set `front_page` to `foobar`',
+            'help' => 'Set a custom front page. This is the page you see when you first log in. For example, if you create `resources/views/overview/custom/foobar.blade.php`, set `front_page` to `foobar`.',
         ],
         'front_page_down_box_limit' => [
             'description' => 'Down Devices Limit',
@@ -1032,11 +1032,11 @@ return [
             ],
             'interval' => [
                 'description' => 'fping interval',
-                'help' => 'The amount of milliseconds to wait between pings',
+                'help' => 'The number of milliseconds to wait between pings',
             ],
             'timeout' => [
                 'description' => 'fping timeout',
-                'help' => 'The amount of milliseconds to wait for an echo response before giving up',
+                'help' => 'The number of milliseconds to wait for an echo response',
             ],
         ],
         'geoloc' => [
@@ -1067,7 +1067,7 @@ return [
                 'help' => 'Initial map layer to display. *Not all layers are available for all mapping engines.',
                 'options' => [
                     'Streets' => 'Streets',
-                    'Sattelite' => 'Sattelite',
+                    'Sattelite' => 'Satellite',
                     'Topography' => 'Topography',
                 ],
             ],
@@ -1087,7 +1087,7 @@ return [
             ],
             'prefix' => [
                 'description' => 'Prefix (Optional)',
-                'help' => 'Will add the prefix to the start of all metrics.  Must be alphanumeric separated by dots',
+                'help' => 'Adds the prefix to the start of all metrics. The prefix must be alphanumeric and separated by dots.',
             ],
         ],
         'graphing' => [
@@ -1097,7 +1097,7 @@ return [
             ],
             'availability_consider_maintenance' => [
                 'description' => 'Scheduled maintenance does not affect availability',
-                'help' => 'Disables the creation of outages and decreasing of availability for devices which are in maintenance mode.',
+                'help' => 'Does not create outages or decrease availability for devices in maintenance mode.',
             ],
         ],
         'graphs' => [
@@ -1118,13 +1118,13 @@ return [
             ],
             'port_speed_zoom' => [
                 'description' => 'Zoom port graphs to port speed',
-                'help' => 'Zoom port graphs so the max is always the port speed, disabled port graphs zoom to traffic',
+                'help' => 'Zoom port graphs so that the maximum is always the port speed. When disabled, port graphs zoom to traffic.',
             ],
         ],
         'graylog' => [
             'base_uri' => [
                 'description' => 'Base URI',
-                'help' => 'Override the base uri in the case you have modified the Graylog default.',
+                'help' => 'Override the base URI if you changed the Graylog default.',
             ],
             'device-page' => [
                 'loglevel' => [
@@ -1133,7 +1133,7 @@ return [
                 ],
                 'rowCount' => [
                     'description' => 'Device Overview Row Count',
-                    'help' => 'Sets the number of rows show on the device overview page.',
+                    'help' => 'Sets the number of rows shown on the device overview page.',
                 ],
             ],
             'password' => [
@@ -1142,15 +1142,15 @@ return [
             ],
             'port' => [
                 'description' => 'Port',
-                'help' => 'The port used to access the Graylog API. If none give, it will be 80 for http and 443 for https.',
+                'help' => 'The port used to access the Graylog API. If you give none, the port is 80 for HTTP and 443 for HTTPS.',
             ],
             'server' => [
                 'description' => 'Server',
-                'help' => 'The ip or hostname of the Graylog server API endpoint.',
+                'help' => 'The IP or hostname of the Graylog server API endpoint.',
             ],
             'timezone' => [
                 'description' => 'Display Timezone',
-                'help' => 'Graylog times are stored in GMT, this setting will change the displayed timezone. The value must be a valid PHP timezone.',
+                'help' => 'Graylog stores times in GMT. This setting changes the displayed timezone. The value must be a valid PHP timezone.',
             ],
             'username' => [
                 'description' => 'Username',
@@ -1158,7 +1158,7 @@ return [
             ],
             'version' => [
                 'description' => 'Version',
-                'help' => 'This is used to automatically create the base_uri for the Graylog API. If you have modified the API uri from the default, set this to other and specify your base_uri.',
+                'help' => 'This is used to create the base_uri for the Graylog API. If you changed the API URI from the default, set this to other and specify your base_uri.',
             ],
             'query' => [
                 'field' => [
@@ -1168,7 +1168,7 @@ return [
             ],
             'match-any-address' => [
                 'description' => 'Match any address',
-                'help' => 'This is used to match any address of a device to the source of a graylog log message, by default, only the primary address is used',
+                'help' => 'Match any address of a device to the source of a Graylog log message. By default, only the primary address is used.',
             ],
         ],
         'html' => [
@@ -1181,11 +1181,11 @@ return [
         ],
         'http_auth_header' => [
             'description' => 'Field name containing username',
-            'help' => 'Can be a ENV or HTTP-header field like REMOTE_USER, PHP_AUTH_USER or a custom variant',
+            'help' => 'Can be an ENV or HTTP header field such as REMOTE_USER, PHP_AUTH_USER, or a custom variant',
         ],
         'http_auth_guest' => [
             'description' => 'Http Auth guest user',
-            'help' => 'If set, allows all http users to authenticate and assigns unknown users to give local username',
+            'help' => 'If set, allows all HTTP users to authenticate and assigns unknown users to the given local username',
         ],
         'http_proxy' => [
             'description' => 'HTTP Proxy',
@@ -1197,31 +1197,31 @@ return [
         ],
         'icmp_check' => [
             'description' => 'ICMP Check',
-            'help' => 'Enable ICMP check for all devices globally, this will ping devices to check if they are up or down. Disabling this could lead to polling not completing in time.',
+            'help' => 'Enable the ICMP check for all devices. Devices are pinged to check if they are up or down. If you disable this, polling can fail to complete in time.',
         ],
         'ignore_mount' => [
             'description' => 'Mountpoints to be ignored',
-            'help' => 'Don\'t monitor Disc Usage of this Mountpoints',
+            'help' => 'Do not monitor disk usage of these mountpoints',
         ],
         'ignore_mount_network' => [
             'description' => 'Ignore Network Mountpoints',
-            'help' => 'Don\'t monitor Disc Usage of Network Mountpoints',
+            'help' => 'Do not monitor disk usage of network mountpoints',
         ],
         'ignore_mount_optical' => [
             'description' => 'Ignore Optical Drives',
-            'help' => 'Don\'t monitor Disc Usage of optical Drives',
+            'help' => 'Do not monitor disk usage of optical drives',
         ],
         'ignore_mount_removable' => [
             'description' => 'Ignore Removable Drives',
-            'help' => 'Don\'t monitor Disc Usage of removable Devices',
+            'help' => 'Do not monitor disk usage of removable devices',
         ],
         'ignore_mount_regexp' => [
             'description' => 'Mountpoints matching Regex to be ignored',
-            'help' => 'Don\'t monitor Disc Usage of Mountpoints which are matching at least one of this Regular Expressions',
+            'help' => 'Do not monitor disk usage of mountpoints that match at least one of these regular expressions',
         ],
         'ignore_mount_string' => [
             'description' => 'Mountpoints containing String to be ignored',
-            'help' => 'Don\'t monitor Disc Usage of Mountpoints which contains at least one of this Strings',
+            'help' => 'Do not monitor disk usage of mountpoints that contain at least one of these strings',
         ],
         'influxdb' => [
             'db' => [
@@ -1250,11 +1250,11 @@ return [
             ],
             'transport' => [
                 'description' => 'Transport',
-                'help' => 'The port to use to connect to the InfluxDB server',
+                'help' => 'The transport to use to connect to the InfluxDB server',
                 'options' => [
                     'http' => 'HTTP',
                     'https' => 'HTTPS',
-                    'udp' => 'UDPRRRRRRR',
+                    'udp' => 'UDP',
                 ],
             ],
             'username' => [
@@ -1263,7 +1263,7 @@ return [
             ],
             'batch_size' => [
                 'description' => 'Batch Size',
-                'help' => 'Number of metrics to send in a single batch, 0 means no batching',
+                'help' => 'Number of metrics to send in a single batch. 0 disables batches.',
             ],
             'measurements' => [
                 'description' => 'Measurements',
@@ -1301,7 +1301,7 @@ return [
             ],
             'transport' => [
                 'description' => 'Transport',
-                'help' => 'The port to use to connect to the InfluxDB server',
+                'help' => 'The transport to use to connect to the InfluxDB server',
                 'options' => [
                     'http' => 'HTTP',
                     'https' => 'HTTPS',
@@ -1325,7 +1325,7 @@ return [
             ],
             'groups-exclude' => [
                 'description' => 'Excluded device groups',
-                'help' => 'Device groups excluded from sending data to InfluxDBv2',
+                'help' => 'Device groups to exclude from the data sent to InfluxDBv2',
             ],
             'timeout' => [
                 'description' => 'Timeout',
@@ -1337,11 +1337,11 @@ return [
             ],
             'batch_size' => [
                 'description' => 'Batch size',
-                'help' => 'How many metrics should be bundled before sending',
+                'help' => 'How many metrics to bundle before they are sent',
             ],
             'max_retry' => [
                 'description' => 'Max retry',
-                'help' => 'How many reties we should try',
+                'help' => 'How many times to retry',
             ],
         ],
         'kafka' => [
@@ -1351,11 +1351,11 @@ return [
             ],
             'groups-exclude' => [
                 'description' => 'Excluded device groups id',
-                'help' => 'Device groups ids excluded from sending data to Kafka',
+                'help' => 'Device group IDs to exclude from the data sent to Kafka',
             ],
             'measurement-exclude' => [
                 'description' => 'Excluded measurements',
-                'help' => 'Discovery modules to be excluded from sending to kafka',
+                'help' => 'Discovery modules to exclude from the data sent to Kafka',
             ],
             'debug' => [
                 'description' => 'Debug',
@@ -1364,18 +1364,18 @@ return [
             'security' => [
                 'debug' => [
                     'description' => 'Security Debug',
-                    'help' => 'Show more detailed info about security comunication with Kafka brokers',
+                    'help' => 'Show more detailed information about security communication with Kafka brokers',
                 ],
             ],
             'broker' => [
                 'list' => [
-                    'description' => 'List of Kafka Brokers servers in format of host!:port',
+                    'description' => 'List of Kafka broker servers in the format host!:port',
                     'help' => 'List of kafka brokers in format of host!:port. https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md',
                 ],
             ],
             'idempotence' => [
                 'description' => 'Idempotence',
-                'help' => 'When set to true, the producer will ensure that messages are successfully produced exactly once and in the original produce order',
+                'help' => 'When enabled, the producer produces each message exactly once and in the original order',
             ],
             'topic' => [
                 'description' => 'Topic',
@@ -1426,14 +1426,14 @@ return [
             'flush' => [
                 'timeout' => [
                     'description' => 'Kafka Flush Timeout',
-                    'help' => 'Kafka wait this timeout to flush messages in queue',
+                    'help' => 'Time that Kafka waits to flush messages in the queue',
                 ],
             ],
             'buffer' => [
                 'max' => [
                     'message' => [
-                        'description' => 'Kafka buffer maximum number of messages hold in poller memory',
-                        'help' => 'Kafka buffer maximum number of allowed messages hold in poller memory',
+                        'description' => 'Kafka buffer maximum number of messages held in poller memory',
+                        'help' => 'Kafka buffer maximum number of allowed messages held in poller memory',
                     ],
                 ],
             ],
@@ -1447,8 +1447,8 @@ return [
             ],
             'linger' => [
                 'ms' => [
-                    'description' => 'Kafka wait time in ms to acumulate messages in poller memory before sending the batch',
-                    'help' => 'Kafka wait time in ms to acumulate messages in poller memory before sending the batch',
+                    'description' => 'Kafka wait time in ms to accumulate messages in poller memory before the batch is sent',
+                    'help' => 'Kafka wait time in ms to accumulate messages in poller memory before the batch is sent',
                 ],
             ],
             'request' => [
@@ -1518,7 +1518,7 @@ return [
         'mac_oui' => [
             'enabled' => [
                 'description' => 'Enable MAC OUI lookup',
-                'help' => 'Enable mac-address vendor (OUI) lookup (data is downloaded by daily.sh)',
+                'help' => 'Enable MAC address vendor (OUI) lookup. daily.sh downloads the data.',
             ],
         ],
         'mono_font' => [
@@ -1535,11 +1535,11 @@ return [
         ],
         'mydomain' => [
             'description' => 'Primary Domain',
-            'help' => 'This domain is used for network auto-discovery and other processes. LibreNMS will attempt to append it to unqualified hostnames.',
+            'help' => 'This domain is used for network auto-discovery and other processes. It is appended to unqualified hostnames.',
         ],
         'network_map_show_on_worldmap' => [
             'description' => 'Display network links on the map',
-            'help' => 'Show the networks links between the different location on the worldmap (weathermap-like)',
+            'help' => 'Show the network links between locations on the world map (weathermap style)',
         ],
         'network_map_worldmap_show_disabled_alerts' => [
             'description' => 'Show devices with alerts disabled',
@@ -1559,7 +1559,7 @@ return [
         ],
         'nfsen_subdirlayout' => [
             'description' => 'Set NfSen subdir layout',
-            'help' => 'This must match the subdir layout you have set in NfSen. 1 is the default.',
+            'help' => 'This must match the subdir layout that you set in NfSen. The default is 1.',
         ],
         'nfsen_last_max' => [
             'description' => 'Last Max',
@@ -1592,15 +1592,15 @@ return [
         ],
         'nfsen_split_char' => [
             'description' => 'Split Char',
-            'help' => 'This value tells us what to replace the full stops `.` in the devices hostname with. Usually: `_`',
+            'help' => 'The character that replaces the full stops `.` in the device hostname. Usually `_`.',
         ],
         'nfsen_suffix' => [
             'description' => 'File name suffix',
-            'help' => 'This is a very important bit as device names in NfSen are limited to 21 characters. This means full domain names for devices can be very problematic to squeeze in, so therefor this chunk is usually removed.',
+            'help' => 'NfSen limits device names to 21 characters. Full domain names for devices often do not fit, so this suffix is usually removed.',
         ],
         'no_proxy' => [
             'description' => 'Proxy Exceptions',
-            'help' => 'Set this as a fallback if no_proxy environment variable is not available. Comma seperated list of IPs, hosts or domains to ignore.',
+            'help' => 'Set this as a fallback if the no_proxy environment variable is not available. Comma separated list of IPs, hosts, or domains to ignore.',
         ],
         'opentsdb' => [
             'enable' => [
@@ -1622,7 +1622,7 @@ return [
         ],
         'own_hostname' => [
             'description' => 'LibreNMS hostname',
-            'help' => 'Should be set to the hostname/ip the librenms server is added as',
+            'help' => 'Set this to the hostname or IP that the LibreNMS server is added as',
         ],
         'oxidized' => [
             'default_group' => [
@@ -1630,7 +1630,7 @@ return [
             ],
             'ignore_groups' => [
                 'description' => 'Do not backup these Oxidized groups',
-                'help' => 'Groups (set via Variable Mapping) excluded from being sent to Oxidized',
+                'help' => 'Groups (set with Variable Mapping) that are not sent to Oxidized',
             ],
             'enabled' => [
                 'description' => 'Enable Oxidized support',
@@ -1646,7 +1646,7 @@ return [
             ],
             'ignore_os' => [
                 'description' => 'Do not backup these OS',
-                'help' => 'Do not backup the listed OS with Oxidized.  The OS must match the LibreNMS OS name (these are all lowercase with no spaces).  Only allows existing OS.',
+                'help' => 'Do not backup the listed OS with Oxidized. The OS must match the LibreNMS OS name, which is lowercase with no spaces. Only existing OS names are allowed.',
             ],
             'ignore_types' => [
                 'description' => 'Do not backup these device types',
@@ -1666,22 +1666,22 @@ return [
         ],
         'page_refresh' => [
             'description' => 'Page Refresh',
-            'help' => 'How often to refresh the page in seconds. Set to 0 to disable.',
+            'help' => 'How often to refresh the page, in seconds. Set to 0 to disable the refresh.',
         ],
         'password' => [
             'min_length' => [
                 'description' => 'Minimum password length',
-                'help' => 'Passwords shorter than the given length will be rejected',
+                'help' => 'Passwords shorter than this length are rejected',
             ],
             'uncompromised' => [
                 'description' => 'Require password to be uncompromised',
-                'help' => 'Checks password against HaveIBeenPwned database using k-anonymity',
+                'help' => 'Checks the password against the HaveIBeenPwned database with k-anonymity',
             ],
         ],
         'peeringdb' => [
             'enabled' => [
                 'description' => 'Enable PeeringDB lookup',
-                'help' => 'Enable PeeringDB lookup (data is downloaded with daily.sh)',
+                'help' => 'Enable PeeringDB lookup. daily.sh downloads the data.',
             ],
         ],
         'percentile_value' => [
@@ -1697,27 +1697,27 @@ return [
         ],
         'bad_if' => [
             'description' => 'Bad Interface ifDescr',
-            'help' => 'Network interface IF-MIB:!:ifDescr which should be ignored',
+            'help' => 'Network interface IF-MIB:!:ifDescr to ignore',
         ],
         'bad_if_regexp' => [
             'description' => 'Bad Interface ifDescr Regex',
-            'help' => 'Network interface IF-MIB:!:ifDescr which should be ignored using regular expressions',
+            'help' => 'Network interface IF-MIB:!:ifDescr to ignore, as regular expressions',
         ],
         'bad_ifalias_regexp' => [
             'description' => 'Bad Interface ifAlias Regex',
-            'help' => 'Network interface IF-MIB:!:ifAlias which should be ignored using regular expressions',
+            'help' => 'Network interface IF-MIB:!:ifAlias to ignore, as regular expressions',
         ],
         'bad_ifname_regexp' => [
             'description' => 'Bad Interface ifName Regex',
-            'help' => 'Network interface IF-MIB:!:ifName which should be ignored using regular expressions',
+            'help' => 'Network interface IF-MIB:!:ifName to ignore, as regular expressions',
         ],
         'bad_ifoperstatus' => [
             'description' => 'Bad Interface ifOperStatus Status',
-            'help' => 'Network interface IF-MIB:!:ifOperStatus which should be ignored',
+            'help' => 'Network interface IF-MIB:!:ifOperStatus to ignore',
         ],
         'bad_iftype' => [
             'description' => 'Bad Interface ifType',
-            'help' => 'Network interface IF-MIB:!:ifType which should be ignored',
+            'help' => 'Network interface IF-MIB:!:ifType to ignore',
         ],
         'ping' => [
             'description' => 'Path to ping',
@@ -1873,7 +1873,7 @@ return [
         ],
         'polling.selected_ports' => [
             'description' => 'Selected Port Polling',
-            'help' => 'Enable selected port polling to only poll ports that are up and enabled',
+            'help' => 'Poll only the ports that are up and enabled',
         ],
         'ports_fdb_purge' => [
             'description' => 'Port FDB entries older than',
@@ -1881,7 +1881,7 @@ return [
         ],
         'ports_ipv4_neighbours' => [
             'description' => 'Port IPv4 neighbour lookup method',
-            'help' => 'Method to use for looking up IPv4 neighours when viewing port details.  ARP will use the ARP table to find devices with matching IP and MAC addresses.  Subnet will just look for devices with IP addresses in the same subnet.',
+            'help' => 'Method to look up IPv4 neighbors when you view port details. ARP uses the ARP table to find devices with matching IP and MAC addresses. Subnet finds devices with IP addresses in the same subnet.',
         ],
         'ports_nac_purge' => [
             'description' => 'Port NAC entries older than',
@@ -1889,7 +1889,7 @@ return [
         ],
         'ports_page_default' => [
             'description' => 'Default ports tab',
-            'help' => 'Default tab to open when viewing ports on the device page',
+            'help' => 'Default tab to open when you view ports on the device page',
         ],
         'ports_purge' => [
             'description' => 'Purge ports deleted',
@@ -1897,7 +1897,7 @@ return [
         ],
         'processor.default_perc_warn' => [
             'description' => 'Default Processor Percentage Warning',
-            'help' => 'Default Percentage of processor used before a warning is raised.',
+            'help' => 'Default percentage of processor use before a warning is raised.',
         ],
         'prometheus' => [
             'enable' => [
@@ -1914,7 +1914,7 @@ return [
             ],
             'attach_sysname' => [
                 'description' => 'Attach Device sysName',
-                'help' => 'Attach sysName information put to Prometheus.',
+                'help' => 'Attach sysName information to the data sent to Prometheus.',
             ],
             'prefix' => [
                 'description' => 'Prefix',
@@ -1927,15 +1927,15 @@ return [
         ],
         'routes_max_number' => [
             'description' => 'Max number of routes allowed for discovery',
-            'help' => 'No route will be discovered if the size of the routing table is bigger than this number',
+            'help' => 'No routes are discovered if the routing table is larger than this number',
         ],
         'default_port_group' => [
             'description' => 'Default Port Group',
-            'help' => 'New discovered Ports will be assigned to this port Group.',
+            'help' => 'Newly discovered ports are assigned to this port group.',
         ],
         'nets' => [
             'description' => 'Autodiscovery Networks',
-            'help' => 'Networks from which devices will be discovered automatically.',
+            'help' => 'Networks where devices are discovered automatically.',
         ],
         'autodiscovery' => [
             'bgp' => [
@@ -1945,12 +1945,12 @@ return [
             'cdp_exclude' => [
                 'platform_regexp' => [
                     'description' => 'CDP exclude platform regex',
-                    'help' => 'Prevent devices from being added by CDP if sysName matches regular expression',
+                    'help' => 'Do not add devices found by CDP if the sysName matches this regular expression',
                 ],
             ],
             'nets-exclude' => [
                 'description' => 'Networks/IPs to be ignored',
-                'help' => 'Networks/IPs which will not be discovered automatically. Excludes also IPs from Autodiscovery Networks',
+                'help' => 'Networks and IPs that are not discovered automatically. This also excludes IPs from Autodiscovery Networks.',
             ],
             'ospf' => [
                 'description' => 'Enable OSPF neighbor discovery',
@@ -1962,27 +1962,27 @@ return [
             ],
             'xdp' => [
                 'description' => 'Enable xDP discovery protocols',
-                'help' => 'Use LLDP, CDP, etc protocols to discover network topology and neighbors and add them to LibreNMS',
+                'help' => 'Use LLDP, CDP, and other protocols to discover the network topology and neighbors, then add them to LibreNMS',
             ],
             'xdp_exclude' => [
                 'sysname_regexp' => [
                     'description' => 'xDP exclude sysName regex',
-                    'help' => 'Prevent devices from being added if sysName matches regular expression',
+                    'help' => 'Do not add devices if the sysName matches this regular expression',
                 ],
                 'sysdesc_regexp' => [
                     'description' => 'xDP exclude sysDescr regex',
-                    'help' => 'Prevent devices from being added if sysDescr matches regular expression',
+                    'help' => 'Do not add devices if the sysDescr matches this regular expression',
                 ],
             ],
         ],
         'radius' => [
             'default_roles' => [
                 'description' => 'Default user roles',
-                'help' => 'Sets the roles that will be assigned to the user unless Radius sends attributes that specify role(s)',
+                'help' => 'Sets the roles for the user, unless Radius sends attributes that specify roles',
             ],
             'enforce_roles' => [
                 'description' => 'Enforce roles at login',
-                'help' => 'If enabled, roles will be set to the ones specified by the Filter-ID attribute or radius.default_roles at login.  Otherwise, they will be set when the user is created and never changed after that.',
+                'help' => 'If enabled, the roles are set from the Filter-ID attribute or radius.default_roles at each login. If disabled, the roles are set when the user is created and never changed.',
             ],
         ],
         'rancid_configs' => [
@@ -2004,7 +2004,7 @@ return [
         'reporting' => [
             'error' => [
                 'description' => 'Send Error Reports',
-                'help' => 'Sends some errors to LibreNMS for analysis and fixing',
+                'help' => 'Sends some errors to LibreNMS for analysis and repair',
             ],
             'usage' => [
                 'description' => 'Send Usage Reports',
@@ -2012,16 +2012,16 @@ return [
             ],
             'dump_errors' => [
                 'description' => 'Dump debug errors (Will break your install)',
-                'help' => 'Dump out errors that are normally hidden so you as a developer can find and fix the possible issues.',
+                'help' => 'Dumps errors that are normally hidden, so that a developer can find and fix the problems.',
             ],
             'throttle' => [
                 'description' => 'Throttle Error Reports',
-                'help' => 'Reports will only be sent every specified amount of seconds. Without this if you have an error in common code reporting can get out of hand. Set to 0 to disable throttling.',
+                'help' => 'Reports are sent only once in this number of seconds. Without this limit, an error in common code can produce many reports. Set to 0 to disable the throttle.',
             ],
         ],
         'rewrite_if' => [
             'description' => 'Rewrite ifDescr',
-            'help' => 'Rewrite ifDescr to remove the interface type and number, e.g. GigabitEthernet0/1 becomes GigabitEthernet',
+            'help' => 'Rewrite ifDescr to remove the interface type and number. For example, GigabitEthernet0/1 becomes GigabitEthernet.',
         ],
         'route_purge' => [
             'description' => 'Route entries older than',
@@ -2037,7 +2037,7 @@ return [
         ],
         'rrd_dir' => [
             'description' => 'RRD Location',
-            'help' => 'Location of rrd files.  Default is rrd inside the LibreNMS directory.  Changing this setting does not move the rrd files.',
+            'help' => 'Location of rrd files. The default is rrd inside the LibreNMS directory. A change to this setting does not move the rrd files.',
         ],
         'rrd_purge' => [
             'description' => 'RRD Files entries older than',
@@ -2045,11 +2045,11 @@ return [
         ],
         'rrd_rra' => [
             'description' => 'RRD Format Settings',
-            'help' => 'These cannot be changed without deleting your existing RRD files. Though one could conceivably increase or decrease the size of each RRA if one had performance problems or if one had a very fast I/O subsystem with no performance worries.',
+            'help' => 'You cannot change these values without deletion of your existing RRD files. You can increase or decrease the size of each RRA for performance reasons.',
         ],
         'rrdcached' => [
             'description' => 'Enable rrdcached (socket)',
-            'help' => 'Enables rrdcached by setting the location of the rrdcached socket. Can be unix or network socket (unix:/run/rrdcached.sock or localhost:42217)',
+            'help' => 'Set the location of the rrdcached socket to enable rrdcached. This can be a unix or network socket (unix:/run/rrdcached.sock or localhost:42217).',
         ],
         'rrdtool' => [
             'description' => 'Path to rrdtool',
@@ -2060,12 +2060,12 @@ return [
         ],
         'rrdtool_version' => [
             'description' => 'Sets the version of rrdtool on your server',
-            'help' => 'Anything over 1.5.5 supports all features LibreNMS uses, do not set higher than your installed version',
+            'help' => 'Version 1.5.5 and higher supports all required features. Do not set a version higher than your installed version.',
         ],
         'schedule_type' => [
             'alerting' => [
                 'description' => 'Alerting',
-                'help' => 'Alerting task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_billing_enabled is set to true.',
+                'help' => 'Alerting task schedule method. Legacy uses cron if the crontab entry exists. Legacy uses the dispatcher service if the legacy config option service_billing_enabled is true.',
                 'options' => [
                     'legacy' => 'Legacy (Unrestricted)',
                     'cron' => 'Cron (alerts.php)',
@@ -2074,7 +2074,7 @@ return [
             ],
             'billing' => [
                 'description' => 'Billing',
-                'help' => 'Billing task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_billing_enabled is set to true.',
+                'help' => 'Billing task schedule method. Legacy uses cron if the crontab entry exists. Legacy uses the dispatcher service if the legacy config option service_billing_enabled is true.',
                 'options' => [
                     'legacy' => 'Legacy (Unrestricted)',
                     'cron' => 'Cron (poll-billing.php and billing-calculate.php)',
@@ -2083,7 +2083,7 @@ return [
             ],
             'discovery' => [
                 'description' => 'Discovery',
-                'help' => 'Discovery task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_discovery_enabled is set to true.',
+                'help' => 'Discovery task schedule method. Legacy uses cron if the crontab entry exists. Legacy uses the dispatcher service if the legacy config option service_discovery_enabled is true.',
                 'options' => [
                     'legacy' => 'Legacy (Unrestricted)',
                     'cron' => 'Cron (lnms device:discover)',
@@ -2092,7 +2092,7 @@ return [
             ],
             'ping' => [
                 'description' => 'Fast Ping',
-                'help' => 'Fast ping task scheduling method. Legacy will use cron if the crontab entry exists and use the dispatcher service if the legacy config option service_ping_enabled is set to true.',
+                'help' => 'Fast ping task schedule method. Legacy uses cron if the crontab entry exists. Legacy uses the dispatcher service if the legacy config option service_ping_enabled is true.',
                 'options' => [
                     'legacy' => 'Legacy (Unrestricted)',
                     'disabled' => 'Disabled (pings only during polling)',
@@ -2102,7 +2102,7 @@ return [
             ],
             'poller' => [
                 'description' => 'Poller',
-                'help' => 'Poller task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_poller_enabled is set to true.',
+                'help' => 'Poller task schedule method. Legacy uses cron if the crontab entry exists. Legacy uses the dispatcher service if the legacy config option service_poller_enabled is true.',
                 'options' => [
                     'legacy' => 'Legacy (Unrestricted)',
                     'cron' => 'Cron (poller.php)',
@@ -2111,7 +2111,7 @@ return [
             ],
             'services' => [
                 'description' => 'Services',
-                'help' => 'Services task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_services_enabled is set to true.',
+                'help' => 'Services task schedule method. Legacy uses cron if the crontab entry exists. Legacy uses the dispatcher service if the legacy config option service_services_enabled is true.',
                 'options' => [
                     'legacy' => 'Legacy (Unrestricted)',
                     'cron' => 'Cron (check-services.php)',
@@ -2122,12 +2122,12 @@ return [
         'sensors' => [
             'guess_limits' => [
                 'description' => 'Guess sensor limits',
-                'help' => 'If enabled, LibreNMS will try to guess the sensor limits based on the sensor type and value. This is not always accurate and may lead to incorrect limits.',
+                'help' => 'If enabled, the sensor limits are guessed from the sensor type and value. This is not always accurate and can produce incorrect limits.',
             ],
         ],
         'service_master_timeout' => [
             'description' => 'Master Dispatcher Timeout',
-            'help' => 'The amount of time before the master lock expires.  If master goes away, it will take this much time for another node to take over.  However if it takes longer than the timeout to dispatch the work, you will have multiple masters',
+            'help' => 'The time before the master lock expires. If the master stops, another node takes over after this time. If the dispatch of work takes longer than the timeout, you get multiple masters.',
         ],
         'service_ping_frequency' => [
             'description' => 'Ping Frequency',
@@ -2135,31 +2135,31 @@ return [
         ],
         'service_poller_workers' => [
             'description' => 'Poller Workers',
-            'help' => 'Amount of poller workers to spawn. Sets the default value for all nodes.',
+            'help' => 'Number of poller workers to spawn. Sets the default value for all nodes.',
         ],
         'service_poller_frequency' => [
             'description' => 'Poller Frequency (Warning!)',
-            'help' => 'How often to poll devices. Sets the default value for all nodes. Warning! Changing this without fixing rrd files will break graphs. See docs for more info.',
+            'help' => 'How often to poll devices. Sets the default value for all nodes. Warning! If you change this without a fix to the rrd files, graphs break. For more information, see the documentation.',
         ],
         'service_poller_down_retry' => [
             'description' => 'Device Down Retry',
-            'help' => 'If a device is down when polling is attempted. This is the amount of time to wait before retrying. Sets the default value for all nodes.',
+            'help' => 'Time to wait before a retry when a device is down at the poll attempt. Sets the default value for all nodes.',
         ],
         'service_discovery_workers' => [
             'description' => 'Discovery Workers',
-            'help' => 'Amount of discovery workers to run. Setting too high can cause overload. Sets the default value for all nodes.',
+            'help' => 'Number of discovery workers to run. A value that is too high can cause an overload. Sets the default value for all nodes.',
         ],
         'service_discovery_frequency' => [
             'description' => 'Discovery Frequency',
-            'help' => 'How often to run device discovery. Sets the default value for all nodes. Default is 4 times a day.',
+            'help' => 'How often to run device discovery. Sets the default value for all nodes. The default is 4 times a day.',
         ],
         'service_services_workers' => [
             'description' => 'Services Workers',
-            'help' => 'Amount of services workers. Sets the default value for all nodes.',
+            'help' => 'Number of services workers. Sets the default value for all nodes.',
         ],
         'service_services_frequency' => [
             'description' => 'Services Frequency',
-            'help' => 'How often to run services. This should match poller frequency. Sets the default value for all nodes.',
+            'help' => 'How often to run services. This must match the poller frequency. Sets the default value for all nodes.',
         ],
         'service_billing_frequency' => [
             'description' => 'Billing Frequency',
@@ -2171,7 +2171,7 @@ return [
         ],
         'service_alerting_frequency' => [
             'description' => 'Alerting Frequency',
-            'help' => 'How often alert rules are checked. Note that data is only updated based on poller frequency. Sets the default value for all nodes.',
+            'help' => 'How often to check alert rules. Data is updated only at the poller frequency. Sets the default value for all nodes.',
         ],
         'service_update_enabled' => [
             'description' => 'Daily Maintenance Enabled',
@@ -2179,7 +2179,7 @@ return [
         ],
         'service_update_frequency' => [
             'description' => 'Maintenance Frequency',
-            'help' => 'How often to run daily maintenance. Default is 1 Day. It is highly suggested not to change this. Sets the default value for all nodes.',
+            'help' => 'How often to run daily maintenance. The default is 1 day. Do not change this. Sets the default value for all nodes.',
         ],
         'service_loglevel' => [
             'description' => 'Log Level',
@@ -2187,11 +2187,11 @@ return [
         ],
         'service_watchdog_enabled' => [
             'description' => 'Watchdog Enabled',
-            'help' => 'Watchdog monitors the log file and restarts the service if it has not been updated. Sets the default value for all nodes.',
+            'help' => 'The watchdog monitors the log file and restarts the service if the log file does not update. Sets the default value for all nodes.',
         ],
         'service_watchdog_log' => [
             'description' => 'Log File to Watch',
-            'help' => 'Default is the LibreNMS log file. Sets the default value for all nodes.',
+            'help' => 'The default is the LibreNMS log file. Sets the default value for all nodes.',
         ],
         'service_health_file' => [
             'description' => 'Service Health File',
@@ -2199,7 +2199,7 @@ return [
         ],
         'shorthost_target_length' => [
             'description' => 'Shortened hostname maximum length',
-            'help' => 'Shrinks hostname to maximum length, but always complete subdomain parts',
+            'help' => 'Shrinks the hostname to this maximum length, but keeps complete subdomain parts',
         ],
         'show_locations' => [
             'description' => 'Show locations in navigation',
@@ -2226,19 +2226,19 @@ return [
         'snmp' => [
             'transports' => [
                 'description' => 'Transport (priority)',
-                'help' => 'Select enabled transports and order them as you want them to be tried.',
+                'help' => 'Select the enabled transports and put them in the order to try.',
             ],
             'version' => [
                 'description' => 'Version (priority)',
-                'help' => 'Select enabled versions and order them as you want them to be tried.',
+                'help' => 'Select the enabled versions and put them in the order to try.',
             ],
             'community' => [
                 'description' => 'Communities (priority)',
-                'help' => 'Enter community strings for v1 and v2c and order them as you want them to be tried',
+                'help' => 'Enter the community strings for v1 and v2c and put them in the order to try',
             ],
             'max_oid' => [
                 'description' => 'Max OIDs',
-                'help' => 'Maximum OIDs per query.  Can be overriden at OS and device levels.',
+                'help' => 'Maximum OIDs per query. You can override this at the OS and device level.',
             ],
             'max_repeaters' => [
                 'description' => 'Max Repeaters',
@@ -2247,11 +2247,11 @@ return [
             'oids' => [
                 'no_bulk' => [
                     'description' => 'Disable snmp bulk for OIDs',
-                    'help' => 'Disable snmp bulk operation for certain OIDs. Generally, this should be set on an OS instead. Format should be MIB::OID',
+                    'help' => 'Disable the snmp bulk operation for certain OIDs. Usually you must set this on an OS instead. The format is MIB::OID.',
                 ],
                 'unordered' => [
                     'description' => 'Allow out of order snmp responses for OIDs',
-                    'help' => 'Ignore unordered OIDs in snmp responses for certain OIDs. Unordered OIDs could result in an oid loop during an snmpwalk. Generally, this should be set on an OS instead. Format should be MIB::OID',
+                    'help' => 'Ignore unordered OIDs in snmp responses for certain OIDs. Unordered OIDs can cause an OID loop during an snmpwalk. Usually you must set this on an OS instead. The format is MIB::OID.',
                 ],
             ],
             'port' => [
@@ -2264,11 +2264,11 @@ return [
             ],
             'retries' => [
                 'description' => 'Retries',
-                'help' => 'how many times to retry the query',
+                'help' => 'How many times to retry the query',
             ],
             'v3' => [
                 'description' => 'SNMP v3 Authentication (priority)',
-                'help' => 'Set up v3 authentication variables and order them as you want them to be tried',
+                'help' => 'Set up the v3 authentication variables and put them in the order to try',
                 'auth' => 'Auth',
                 'crypto' => 'Crypto',
                 'fields' => [
@@ -2301,7 +2301,7 @@ return [
         'snmptraps' => [
             'eventlog' => [
                 'description' => 'Create eventlog for snmptraps',
-                'help' => 'Independently of the action that may be mapped to the trap',
+                'help' => 'Independently of the action that is mapped to the trap',
             ],
             'eventlog_detailed' => [
                 'description' => 'Enable detailed logs',
@@ -2322,17 +2322,17 @@ return [
             ],
             'days_until_expiry_warning' => [
                 'description' => 'Warning (days)',
-                'help' => 'Number of days until certificate expiry to trigger a warning',
+                'help' => 'Number of days before certificate expiry to trigger a warning',
             ],
             'days_until_expiry_danger' => [
                 'description' => 'Danger (days)',
-                'help' => 'Number of days until certificate expiry to trigger a danger alert',
+                'help' => 'Number of days before certificate expiry to trigger a danger alert',
             ],
         ],
         'sso' => [
             'create_users' => [
                 'description' => 'Create Users',
-                'help' => 'If new users should be created upon login.',
+                'help' => 'Create new users at login.',
             ],
             'descr_attr' => [
                 'description' => 'User Description Attribute',
@@ -2360,7 +2360,7 @@ return [
             ],
             'group_strategy' => [
                 'description' => 'Group Strategy',
-                'help' => 'How the group mapping should be done.',
+                'help' => 'The method for group mapping.',
             ],
             'level_attr' => [
                 'description' => 'Level Attribute',
@@ -2368,7 +2368,7 @@ return [
             ],
             'mode' => [
                 'description' => 'Mode',
-                'help' => 'If it should use the evironment variables or HTTP header.',
+                'help' => 'Use the environment variables or the HTTP header.',
             ],
             'realname_attr' => [
                 'description' => 'Realname Attribute',
@@ -2376,15 +2376,15 @@ return [
             ],
             'static_level' => [
                 'description' => 'Static Level',
-                'help' => 'If static is in use, the role level value to use for every one with access.',
+                'help' => 'If static is in use, the role level value for everyone with access.',
             ],
             'trusted_proxies' => [
                 'description' => 'Trusted Proxies',
-                'help' => 'A listed of trusted proxies.',
+                'help' => 'A list of trusted proxies.',
             ],
             'update_users' => [
                 'description' => 'Update Users',
-                'help' => 'If users should be updated upon login.',
+                'help' => 'Update users at login.',
             ],
             'user_attr' => [
                 'description' => 'User Attribute',
@@ -2393,7 +2393,7 @@ return [
         ],
         'storage_perc_warn' => [
             'description' => 'Default Storage Percentage Warning',
-            'help' => 'Default Percentage of storage used before a warning is raised. 0 disables warning.',
+            'help' => 'Default percentage of storage use before a warning is raised. 0 disables the warning.',
         ],
         'syslog_filter' => [
             'description' => 'Filter syslog messages containing',
@@ -2404,7 +2404,7 @@ return [
         ],
         'title_image' => [
             'description' => 'Title Image',
-            'help' => 'Overrides the default Title Image. SVG from the same server will be include and can use currentColor to match the current theme dynamically.',
+            'help' => 'Overrides the default title image. An SVG from the same server is included, and the SVG can use currentColor to match the current theme.',
         ],
         'traceroute' => [
             'description' => 'Path to traceroute',
@@ -2415,7 +2415,7 @@ return [
         ],
         'twofactor_lock' => [
             'description' => 'Two-Factor Throttle Time (seconds)',
-            'help' => 'Lock-out time to wait in seconds before allowing further attempts if Two-Factor authentication is failed 3 times consecutively - will prompt user to wait this long.  Set to 0 to disable resulting in a permanent account lock-out and a message to user to contact administrator',
+            'help' => 'Lock-out time in seconds after 3 consecutive Two-Factor failures. The user is prompted to wait this long. Set to 0 for a permanent account lock-out, with a message to contact an administrator.',
         ],
         'unimus' => [
             'api_version' => [
@@ -2458,11 +2458,11 @@ return [
         ],
         'update_on_days' => [
             'description' => 'Only run updates on these days',
-            'help' => 'If set (non-empty), daily.sh will only run code updates when today matches one of these values: monday-sunday or mon-sun. Leave empty to allow updates every day.',
+            'help' => 'If set, daily.sh runs code updates only when today matches one of these values: monday-sunday or mon-sun. Leave empty to allow updates every day.',
         ],
         'uptime_warning' => [
             'description' => 'Show Device as warning if Uptime below (seconds)',
-            'help' => 'Shows Device as warning if Uptime is below this value. Custom maps status will reflect this setting. 0 disables warning. Default 24h',
+            'help' => 'Shows a device as a warning if the uptime is below this value. The custom map status also uses this setting. 0 disables the warning. The default is 24h.',
         ],
         'virsh' => [
             'description' => 'Path to virsh',
@@ -2474,7 +2474,7 @@ return [
         'webui' => [
             'scheduled_maintenance_default_behavior' => [
                 'description' => 'Default Behaviour',
-                'help' => 'When managing scheduled maintenances, this will be the default option for the Behavior option.',
+                'help' => 'The default option for the Behavior field when you manage scheduled maintenance.',
             ],
             'alert_map_compact' => [
                 'description' => 'Alert map compact view',
@@ -2490,11 +2490,11 @@ return [
             ],
             'alert_map_box_size' => [
                 'description' => 'Alert box width',
-                'help' => 'Input desired tile width in pixels for box size in full view',
+                'help' => 'Tile width in pixels for the box size in full view',
             ],
             'availability_map_box_size' => [
                 'description' => 'Availability box width',
-                'help' => 'Input desired tile width in pixels for box size in full view',
+                'help' => 'Tile width in pixels for the box size in full view',
             ],
             'availability_map_compact' => [
                 'description' => 'Availability map compact view',
@@ -2518,7 +2518,7 @@ return [
             ],
             'dynamic_graphs' => [
                 'description' => 'Enable dynamic graphs',
-                'help' => 'Enable dynamic graphs, enables zooming and panning on graphs',
+                'help' => 'Enable dynamic graphs. Dynamic graphs support zoom and pan.',
             ],
             'global_search_result_limit' => [
                 'description' => 'Set the max search result limit',
@@ -2526,11 +2526,11 @@ return [
             ],
             'global_search.arp' => [
                 'description' => 'Global search ARP',
-                'help' => 'Find where devices are connected by searching your devices ARP caches',
+                'help' => 'Search the ARP caches of your devices to find where devices are connected',
             ],
             'global_search.fdb' => [
                 'description' => 'Global search FDB entries',
-                'help' => 'Find where devices are connected by searching your devices bridge forwarding tables',
+                'help' => 'Search the bridge forwarding tables of your devices to find where devices are connected',
             ],
             'global_search.eventlogs' => [
                 'description' => 'Global search event logs',
@@ -2566,12 +2566,12 @@ return [
             ],
             'graph_stat_percentile_disable' => [
                 'description' => 'Disable Percentile for stats graphs globally',
-                'help' => 'Disables display of the percentile values and lines for graphs that display those',
+                'help' => 'Hides the percentile values and lines on graphs that show them',
             ],
         ],
         'device_display_default' => [
             'description' => 'Default device display name template',
-            'help' => 'Sets the default display name for all devices (can be overridden per-device).  Hostname/IP: Just show the hostname or IP the device was added with. sysName: Just show the sysName from snmp. Hostname or sysName: Show hostname, but if it is an IP, show sysName.',
+            'help' => 'Sets the default display name for all devices. You can override this per device. Hostname/IP shows the hostname or IP that the device was added with. sysName shows the sysName from SNMP. Hostname or sysName shows the hostname, or the sysName if the hostname is an IP.',
             'options' => [
                 'hostname' => 'Hostname / IP',
                 'sysName_fallback' => 'Hostname, fallback to sysName for IPs',
@@ -2593,7 +2593,7 @@ return [
         ],
         'device_stats_avg_factor' => [
             'description' => 'Averaging factor',
-            'help' => 'We calculate a moving average using an exponential weighted moving average function.  This is the factor used by the function to control how much the current value affects the average.  Values closer to 1 will make the average change quicker.',
+            'help' => 'A moving average is calculated with an exponential weighted moving average function. This factor controls how much the current value affects the average. Values closer to 1 make the average change more quickly.',
         ],
         'smokeping.integration' => [
             'description' => 'Enable',
@@ -2614,7 +2614,7 @@ return [
     ],
     'twofactor' => [
         'description' => 'Enable Two-Factor Auth',
-        'help' => 'Enables the built in Two-Factor authentication. You must set up each account to make it active.',
+        'help' => 'Enables the built-in Two-Factor authentication. You must set up each account to make it active.',
     ],
     'units' => [
         'days' => 'days',
@@ -2626,7 +2626,7 @@ return [
         'boolean' => ':value is not a valid boolean',
         'color' => ':value is not a valid hex color code',
         'email' => ':value is not a valid email',
-        'float' => ':value is not an float',
+        'float' => ':value is not a float',
         'integer' => ':value is not an integer',
         'password' => 'The password is incorrect',
         'select' => ':value is not an allowed value',
