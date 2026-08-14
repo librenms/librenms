@@ -1,15 +1,15 @@
-This document will provide the information you should need to add
-basic detection for a new OS.
+This document gives the information for the basic detection of a new
+OS.
 
 ### Discovery
 
-OS discovery is how LibreNMS detects which OS should be used for a device.
-Generally detection should use sysObjectID or sysDescr, but you can also
-snmpget an oid and check for a value.  snmpget is discouraged because it slows
-down all os detections, not just the added os.
+OS discovery selects the OS of a device. Detection normally uses
+sysObjectID or sysDescr. An snmpget of an OID with a value test also
+works. Do not use snmpget, because it makes all OS detections slower,
+not only the new one.
 
-To begin, create the new OS file which should be called
-`resources/definitions/os_detection/pulse.yaml`. Here is a working example:
+First create the new OS file `resources/definitions/os_detection/pulse.yaml`.
+This example works:
 
 ```yaml
 os: pulse
@@ -25,22 +25,22 @@ discovery:
         - .1.3.6.1.4.1.12532.
 ```
 
-`over`: This is a list of the graphs which will be shown within the
-device header bar (mini graphs top right).
+`over`: a list of the graphs in the device header bar. These are the
+mini graphs at the top right.
 
-`discovery`: Here we are detecting this new OS using sysObjectID, this
-is the preferred method for detection.  Other options are available:
+`discovery`: this example detects the new OS with sysObjectID. This
+method is the preferred one. Other options are available:
 
-- `sysObjectID` The preferred operator. Checks if the sysObjectID
+- `sysObjectID` the preferred operator. It tests whether the sysObjectID
   starts with one of the strings under this item
-- `sysDescr` Use this in addition to sysObjectID if required. Check
-  that the sysDescr contains one of the strings under this item
-- `sysObjectID_regex` Please avoid use of this. Checks if the
-  sysObjectID matches one of the regex statements under this item
-- `sysDescr_regex` Please avoid use of this. Checks if the sysDescr
-  matches one of the regex statements under this item
-- `snmpget` Do not use this unless none of the other methods
-  work. Fetch an oid and compare it against a value.
+- `sysDescr` use it with sysObjectID where necessary. It tests whether
+  the sysDescr holds one of the strings under this item
+- `sysObjectID_regex` do not use this operator. It tests the
+  sysObjectID against the regular expressions under this item
+- `sysDescr_regex` do not use this operator. It tests the sysDescr
+  against the regular expressions under this item
+- `snmpget` use it only when no other method works. It gets an OID and
+  compares it to a value.
 ```yaml
 discovery:
     -
@@ -49,8 +49,8 @@ discovery:
         - op: <["=","!=","==","!==","<=",">=","<",">","starts","ends","contains","regex","not_starts","not_ends","not_contains","not_regex","in_array","not_in_array","exists"]>
         - value: <'string' | boolean>
 ```
-- `_except` You can add this to any of the above to exclude that
-  element. As an example:
+- `_except` add it to any operator above to exclude an element. For
+  example:
 
 ```yaml
 discovery:
@@ -61,11 +61,11 @@ discovery:
           - 'Not some pulse'
 ```
 
-`group`: You can group certain OS' together by using group, for
-instance ios, nx-os, iosxr are all within a group called cisco.
+`group`: it puts several operating systems into one group. For example,
+ios, nx-os, and iosxr are in the group `cisco`.
 
-`bad_ifXEntry`: This is a list of models for which to tell LibreNMS
-that the device doesn't support ifXEntry and to ignore it:
+`bad_ifXEntry`: a list of the models without ifXEntry support. LibreNMS
+then ignores ifXEntry on these models:
 
 ```yaml
  bad_ifXEntry:
@@ -74,20 +74,22 @@ that the device doesn't support ifXEntry and to ignore it:
      - cisco2811
 ```
 
-`mib_dir`: You can use this to specify an additional directory to
-look in for MIBs. An array is not accepted, only one directory may be specified.
+`mib_dir`: it adds one directory for the MIB search. An array is not
+valid. Give only one directory.
 
 ```yaml
 mib_dir: juniper
 ```
 
-We would recommend that only discovery or poller modules that cause issues for a device be disabled.
+Disable only the discovery modules and the poller modules that cause a
+problem on a device.
 
-In general, Discovery will run first and if it doesn't discover any data then polling will not occur.
+Discovery runs first. Without discovered data, the polling does not
+run.
 
-`discovery_modules`: This is the list of discovery modules to either
-enable (1) or disable (0). Check `resources/definitions/config_definitions.json` to see
-which modules are enabled/disabled by default.
+`discovery_modules`: the list of the discovery modules. Use 1 to enable
+and 0 to disable. `resources/definitions/config_definitions.json` gives
+the default state of each module.
 
 ```yaml
 discovery_modules:
@@ -95,9 +97,9 @@ discovery_modules:
      slas: true
 ```
 
-`poller_modules`: This is a list of poller modules to either enable
-(1) or disable (0). Check `resources/definitions/config_definitions.json` to see which
-modules are enabled/disabled by default.
+`poller_modules`: the list of the poller modules. Use 1 to enable and 0
+to disable. `resources/definitions/config_definitions.json` gives the
+default state of each module.
 
 ```yaml
 poller_modules:
@@ -107,7 +109,7 @@ poller_modules:
 
 ##### Discovery Logic
 
-YAML is converted to an array in PHP.  Consider the following YAML:
+PHP converts the YAML to an array. Take this YAML:
 
 ```yaml
 discovery:
@@ -118,7 +120,7 @@ discovery:
 
 ```
 
-This is how the discovery array would look in PHP:
+The discovery array in PHP is:
 
 ```php
 [
@@ -135,13 +137,13 @@ This is how the discovery array would look in PHP:
 ]
 ```
 
-The logic for the discovery is as follows:
+The discovery logic is:
 
 1. One of the first level items must match
 1. ALL of the second level items must match (sysObjectID, sysDescr)
 1. One of the third level items (foo, [snafu,exodar], bar) must match
 
-So, considering the example:
+In the example above:
 
 - `sysObjectID: foo, sysDescr: ANYTHING` matches
 - `sysObjectID: bar, sysDescr: ANYTHING` does not match
@@ -150,23 +152,32 @@ So, considering the example:
 
 #### OS discovery
 
-OS discovery collects additional standardized data about the OS.  These are specified in
-the discovery yaml `resources/definitions/os_discovery/<os>.yaml` or `LibreNMS/OS/<os>.php` if
-more complex collection is required.
+OS discovery also collects standard data about the OS. Give this data
+in the discovery YAML file
+`resources/definitions/os_discovery/<os>.yaml`. For a more complex
+collection, use `LibreNMS/OS/<os>.php`.
 
-- `version` The version of the OS running on the device.
-- `hardware` The hardware version for the device. For example: 'WS-C3560X-24T-S'
-- `features` Features for the device, for example a list of enabled software features.
-- `serial` The main serial number of the device.
+- `version` the OS version of the device.
+- `hardware` the hardware version of the device. An example is 'WS-C3560X-24T-S'.
+- `features` the features of the device, for example a list of the
+  enabled software features.
+- `serial` the main serial number of the device.
 
 ##### Yaml based OS discovery
 
-- `sysDescr_regex` apply a regex or list of regexes to the sysDescr to extract named groups, this data has the lowest precedence
-- `<field>` specify an oid or list of oids to attempt to pull the data from, the first non-empty response will be used
-- `<field>_regex` parse the value out of the returned oid data, must use a named group
-- `<field>_template` combine multiple oid results together to create a final string value.  The result is trimmed.
-- `<field>_replace` An array of replacements ['search regex', 'replace'] or regex to remove
-- `hardware_mib` MIB used to translate sysObjectID to get hardware. hardware_regex can process the result.
+- `sysDescr_regex` it applies one or more regular expressions to the
+  sysDescr and extracts the named groups. This data has the lowest
+  precedence
+- `<field>` one or more OIDs of the data. LibreNMS uses the first
+  response that is not empty
+- `<field>_regex` it extracts the value from the OID data. It must use
+  a named group
+- `<field>_template` it combines several OID results into a final
+  string value. LibreNMS trims the result
+- `<field>_replace` an array of replacements in the form
+  ['search regex', 'replace'], or a regular expression to remove
+- `hardware_mib` the MIB that converts the sysObjectID to the hardware.
+  `hardware_regex` can then process the result
 
 ```yaml
 modules:
@@ -196,49 +207,55 @@ public function discoverOS(\App\Models\Device $device): void
 
 ### MIBs
 
-If the device has MIBs available and you use it in the detection then you can add these in. It is highly
-recommended that you add mibs to a vendor specific directory. For instance HP mibs are in `mibs/hp`. Please
- ensure that these directories are specified in the yaml detection file, see `mib_dir` above.
+If the device has MIBs and the detection uses them, add them to the
+repository. Put the MIBs in a vendor directory. For example, the HP
+MIBs are in `mibs/hp`. Give these directories in the YAML detection
+file with `mib_dir`, as above.
 
 ### Icon and Logo
 
-It is highly recommended to use SVG images where possible, these scale and provide a nice visual image for users
-with HiDPI screens. If you can't find SVG images then please use png.
+Use an SVG image where possible. An SVG image scales and looks correct
+on a HiDPI screen. Without an SVG image, use a png image.
 
-Create an SVG image of the icon and logo.  Legacy PNG bitmaps are also supported but look bad on HiDPI.
+Create an SVG image of the icon and of the logo. Legacy PNG bitmaps
+also work, but they look bad on a HiDPI screen.
 
-- A vector image should not contain padding.
-- The file should not be larger than 20 Kb. Simplify paths to reduce large files.
+- A vector image must have no padding.
+- The file must not be larger than 20 Kb. Simplify the paths to make a
+  large file smaller.
 - Use plain SVG without gzip compression.
-- The SVG root element must not contain length and width attributes, only viewBox.
+- The SVG root element must hold only viewBox. It must have no length
+  attribute and no width attribute.
 
 ##### Icon
 
 - Save the icon SVG to `html/images/os/$os.svg`.
-- Icons should look good when viewed at 32x32 px.
-- Square icons are preferred to full logos with text.
-- Remove small ornaments that are almost not visible when displayed with 32px width (e.g. ® or ™).
+- An icon must look correct at 32x32 px.
+- We prefer a square icon to a full logo with text.
+- Remove the small ornaments that are not visible at a width of 32 px,
+  such as ® or ™.
 
 ##### Logo
 
 - Save the logo SVG to `html/images/logos/$os.svg`.
-- Logos can be any dimension, but often are wide and contain the company name.
-- If a logo is not present, the icon will be used.
+- A logo can have any dimension. It is usually wide and holds the
+  company name.
+- Without a logo, LibreNMS uses the icon.
 
 ##### Hints
 
 Hints for [Inkscape](https://inkscape.org/):
 
-- You can open a PDF or EPS to extract the logo.
-- Ungroup elements to isolate the logo.
+- Open a PDF file or an EPS file to extract the logo.
+- Ungroup the elements to isolate the logo.
 - Use `Path -> Simplify` to simplify paths of large files.
 - Use `File -> Document Properties… -> Resize page to content…` to remove padding.
 - Use `File -> Clean up document` to remove unused gradients, patterns, or markers.
 - Use `File -> Save As -> Plain SVG` to save the final image.
 
-By optimizing the SVG you can shrink the file size in some cases to less than 20 %.
-[SVG Optimizer](https://github.com/svg/svgo) does a great job. There
-is also an [online version](https://jakearchibald.github.io/svgomg/).
+An optimization of the SVG can reduce the file size to less than 20 %.
+[SVG Optimizer](https://github.com/svg/svgo) does this work. An [online
+version](https://jakearchibald.github.io/svgomg/) is also available.
 
 #### The final check
 
@@ -254,12 +271,11 @@ Polling
 lnms device:poll HOSTNAME
 ```
 
-At this step we should see all the values retrieved in LibreNMS.
+All the collected values then appear in LibreNMS.
 
-Note: If you have made a number of changes to either the OS's
-Discovery files, it's possible earlier edits have been cached. As
-such, if you do not get expected behaviour when completing the final
-check above, try removing the cache file first:
+Note: after several changes to the discovery files of the OS, the cache
+can hold an earlier edit. If the final check gives an unexpected
+result, remove the cache file first:
 
 ```bash
 lnms config:clear

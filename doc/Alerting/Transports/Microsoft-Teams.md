@@ -1,13 +1,24 @@
 ## Microsoft Teams
 
-LibreNMS can send alerts to a Microsoft Teams channel using an Incoming Webhook. The transport supports both the **legacy Office 365 Connector** webhooks and the newer **Power Automate Workflow** webhooks, and automatically selects the correct payload format based on the webhook URL — no manual configuration is required.
+LibreNMS sends alerts to a Microsoft Teams channel through an incoming
+webhook. The transport accepts the **legacy Office 365 Connector**
+webhooks and the newer **Power Automate Workflow** webhooks. It selects
+the correct payload format from the webhook URL. No manual
+configuration is necessary.
 
 !!! note
-    Microsoft retired Office 365 Connectors in Teams and replaced them with Power Automate Workflow webhooks (retirement deadline: **April 30, 2026**). If you are still using a legacy connector URL (`outlook.office.com`, `outlook office365.com`, or `*.webhook.office.com`), migrate to a Workflow webhook before that date. See the [Microsoft 365 Dev Blog](https://devblogs.microsoft.com/microsoft365dev/retirement-of-office-365-connectors-within-microsoft-teams/) for details.
+    Microsoft removed the Office 365 Connectors from Teams and replaced
+    them with Power Automate Workflow webhooks. The retirement deadline is
+    **April 30, 2026**. If you still use a legacy connector URL
+    (`outlook.office.com`, `outlook.office365.com`, or
+    `*.webhook.office.com`), move to a Workflow webhook before that date.
+    For the details, read the [Microsoft 365 Dev
+    Blog](https://devblogs.microsoft.com/microsoft365dev/retirement-of-office-365-connectors-within-microsoft-teams/).
 
 ### Webhook types
 
-The transport detects the webhook type automatically from the URL hostname and adjusts the payload accordingly:
+The transport detects the webhook type from the URL hostname. It then
+sets the correct payload:
 
 | Webhook type | URL pattern | Payload sent (Use JSON?: OFF)) |
 | --- | --- | --- |
@@ -17,22 +28,23 @@ The transport detects the webhook type automatically from the URL hostname and a
 | Workflow webhook (public/commercial) | `<region>.logic.azure.com/workflows/…` | `MessageCard` wrapped in `message`/`attachments` envelope |
 | Workflow webhook (corporate/GCC) | `<default>.<region>.environment.api.powerplatform.com/powerautomate/…` | `MessageCard` wrapped in `message`/`attachments` envelope |
 
-No configuration change is needed when migrating from a legacy connector URL to a Workflow webhook URL — simply replace the URL in the transport settings.
+A move from a legacy connector URL to a Workflow webhook URL needs no
+configuration change. Replace the URL in the transport settings.
 
 ### Configuration
 
 | Config | Description |
 | --- | --- |
-| Webhook URL | The full incoming webhook URL provided by Teams (required) |
-| Use JSON | When enabled, the raw body of the alert template is sent as-is. Use this for Adaptive Card payloads. When disabled, LibreNMS builds a `MessageCard` from the alert data automatically |
+| Webhook URL | The full incoming webhook URL from Teams. This field is required |
+| Use JSON | With this option on, LibreNMS sends the raw body of the alert template. Use it for Adaptive Card payloads. With this option off, LibreNMS builds a `MessageCard` from the alert data |
 
 ### Creating a Workflow webhook
 
 1. Open the target Teams channel, click **`…`** → **Workflows**.
-2. Search for and select the template **"Post to a channel when a webhook request is received"**. *(Use this specific template — older "Send webhook alerts to a channel" templates do not support `MessageCard` payloads.)*
-3. Follow the wizard, then copy the generated webhook URL.
+2. Find and select the template **"Post to a channel when a webhook request is received"**. *Use this template. The older "Send webhook alerts to a channel" templates do not accept `MessageCard` payloads.*
+3. Obey the wizard. Then copy the generated webhook URL.
 4. Paste the URL into the LibreNMS transport configuration.
-5. Leave **Use JSON** unchecked — your existing alert templates work without modification.
+5. Leave **Use JSON** off. Your existing alert templates then work without a change.
 
 ### Alert templates
 

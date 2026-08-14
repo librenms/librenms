@@ -9,20 +9,21 @@ benefits:
   grouping to ease credential management
 - Configuration searching (Requires oxidized-web 0.8.0 or newer)
 
-First you will need to [install Oxidized following their documentation](https://github.com/ytti/oxidized#installation).
+First [install Oxidized with their
+documentation](https://github.com/ytti/oxidized#installation).
 
 Then you can procede to the LibreNMS Web UI and go to Oxidized
 Settings in the External Settings section of Global Settings. Enable
 it and enter the url to your oxidized instance.
 
-To have devices automatically added, you will need to configure
+For an automatic add of the devices, configure
 oxidized to pull them from LibreNMS [Feeding
-Oxidized](#feeding-oxidized) Note: this means devices will be controlled by
-the LibreNMS API, and not router.db, passwords will still need to be in the
+Oxidized](#feeding-oxidized). Note: the LibreNMS API then controls the
+devices, not router.db. The passwords stay in the
 oxidized config file.
 
-LibreNMS will automatically map the OS to the Oxidized model name if
-they don't match. this means you shouldn't need to use the model_map
+LibreNMS maps the OS to the Oxidized model name automatically when the
+two names differ. You therefore do not need the model_map
 config option within Oxidized.
 
 ## Detailed integration information
@@ -46,7 +47,7 @@ to work with the git output module.
     lnms config:set oxidized.features.versioning true
     ```
 
-Oxidized supports various ways to utilise credentials to login to
+Oxidized has several methods for the login credentials of
 devices, you can specify global username/password within Oxidized,
 Group level username/password or per device. LibreNMS currently
 supports sending groups back to Oxidized so that you can then define
@@ -58,7 +59,7 @@ switch on 'Enable the return of groups to Oxidized':
     lnms config:set oxidized.group_support true
     ```
 
-You can set a default group that devices will fall back to with:
+This setting gives a default group for the devices:
 
 !!! setting "external/oxidized"
     ```bash
@@ -82,9 +83,9 @@ One trick you can do to ignore all ungrouped devices is set both of these settin
 
 ## SELinux
 
-If you're running SELinux, you'll need to allow httpd to connect
+With SELinux, permit httpd to connect
 outbound to the network, otherwise Oxidized integration in the web UI
-will silently fail:
+fails without a message:
 
 ```
 setsebool -P httpd_can_network_connect 1
@@ -95,11 +96,11 @@ setsebool -P httpd_can_network_connect 1
 ----
 
 Oxidized has support for feeding devices into it via an API call,
-support for Oxidized has been added to the LibreNMS API. A sample
+the LibreNMS API supports Oxidized. A sample
 config for Oxidized is provided below.
 
-You will need to configure default credentials for your devices in the
-Oxidized config, LibreNMS doesn't provide login credentials at this
+Configure the default credentials of your devices in the Oxidized
+config. LibreNMS does not supply login credentials at this
 time.
 
 ```bash
@@ -116,7 +117,7 @@ time.
             X-Auth-Token: '01582bf94c03104ecb7953dsadsadwed'
 ```
 
-LibreNMS is able to reload the Oxidized list of nodes, each time a
+LibreNMS can reload the Oxidized list of nodes each time that a
 device is added to LibreNMS. To do so, edit the option in Global
 Settings>External Settings>Oxidized Integration or add the following
 to your config.
@@ -131,7 +132,7 @@ to your config.
 To return an override to Oxidized you can do this by providing the
 override key, followed by matching a lookup for a host (or hosts), and
 finally by defining the overriding value itself. LibreNMS does not
-check for the validity of these attributes but will deliver them to
+test the validity of these attributes. It sends them to
 Oxidized as defined.
 
 Matching of hosts can be done using `hostname`, `sysname`, `os`,
@@ -149,7 +150,7 @@ key and value, or a 'regex' key and value. The order of matching is:
 - `notes`
 
 To match on the device hostnames or sysNames that contain 'lon-sw' or
-if the location contains 'London' then you would set the following:
+for a location that holds 'London', use this setting:
 
 !!! setting "external/oxidized"
     ```bash
@@ -166,9 +167,10 @@ To match on a device os of edgeos then please use the following:
     ```
 
 Matching on OS requires system name of the OS. For example, "match": "RouterOS"
-will not work, while "match": "routeros" will.
+does not work. "match": "routeros" works.
 
-To match on a device purpose or device notes that contains 'lon-net' then you would set the following:
+To match a device purpose or device note that holds 'lon-net', use this
+setting:
 
 !!! setting "external/oxidized"
     ```bash
@@ -206,14 +208,14 @@ To override the IP Oxidized uses to poll the device, set the following:
 This allows extending the configuration further by providing a
 completely flexible model for custom flags and settings, for example,
 below shows the ability to add an ssh_proxy host within Oxidized
-simply by adding the below to your configuration:
+Add these lines to your configuration:
 
 !!! setting "external/oxidized"
     ```bash
     lnms config:set oxidized.maps.ssh_proxy.sysName.+ '{"regex": "/^my.node/", "value": "my-ssh-gateway.node"}'
     ```
 
-Or of course, any custom value that could be needed or wanted can be
+You can also add any other necessary value
 applied, for example, setting a "myAttribute" to "Super cool value"
 for any configured and enabled "routeros" device.
 
@@ -255,7 +257,9 @@ hooks:
     async: true
     cmd: 'curl -k -s -X POST -d "{\"text\": \"Config change observed on check. Commit Ref: ${OX_REPO_COMMITREF} Group: ${OX_NODE_GROUP} Timetaken: ${OX_JOB_TIME}\",\"severity\":\"2\",\"type\":\"oxidized\"}" -H "X-Auth-Token: YOURAPITOKENHERE" https://foo.example/api/v0/devices/${OX_NODE_NAME}/eventlog'
 ```
-Note: Ensure /bin/sh uses bash or substitutions may fail. [Ruby only executes commands with the shell defined as /bin/sh.](https://ruby-doc.org/core-2.6.5/Process.html#method-c-exec)
+Note: `/bin/sh` must be bash, or the substitutions fail. [Ruby runs
+commands only with the shell at
+/bin/sh.](https://ruby-doc.org/core-2.6.5/Process.html#method-c-exec)
 
 ## Miscellaneous
 
@@ -277,7 +281,7 @@ The use of custom ssh and telnet ports can be set through device settings misc t
             telnet_port: telnet_port
 ```
 
-It's also possible to exclude certain device types and OS' from being
+You can also exclude some device types and operating systems from
 output via the API.
 
 !!! setting "external/oxidized"
@@ -297,7 +301,7 @@ You can also ignore whole groups of devices
 
 Using the Oxidized REST API and [Syslog
 Hooks](Syslog.md#external-hooks), Oxidized can trigger
-configuration downloads whenever a configuration change event has been
+configuration downloads at each configuration change event that LibreNMS
 logged. An example script to do this is included in
 `./scripts/syslog-notify-oxidized.php`. Oxidized can spawn a new
 worker thread and perform the download immediately with the following
@@ -309,8 +313,9 @@ next_adds_job: true
 
 ## Accessing configuration of a disabled/removed device
 
-When you're disabling or removing a device from LibreNMS, the
-configuration will no longer be available via the LibreNMS web interface.  
+At the disable or the removal of a device in LibreNMS, the
+configuration is then no longer available in the LibreNMS web
+interface.  
 You can gain access to these configurations directly in the Git repository of
 Oxidized (if using Git for version control).
 

@@ -5,7 +5,7 @@ the vis.js library, which affects the way the maps are rendered as well
 as the way that users can interact with the maps. This configuration can
 be adjusted by following the instructions below.
 
-[This link](https://visjs.github.io/vis-network/docs/network/) will
+[This link](https://visjs.github.io/vis-network/docs/network/)
 show you all the options and explain what they do.
 
 The commands to run to use the defaults is as follows:
@@ -87,14 +87,14 @@ lnms config:set network_map_devicedependency_vis_options '{ layout:{ hierarchica
 
 ### Configurator Output
 
-You may also access the dynamic configuration interface [example
+You can also open the dynamic configuration interface. [Example
 here](https://visjs.github.io/vis-network/examples/network/other/configuration.html)
 from within LibreNMS by adding the following to config.php
 
-Once you've achieved your desired map appearance, click the generate
+After you set your map appearance, click the generate
 options button at the bottom to be given the necessary parameters to
-set in the lnms command. Note that the configurator will output the config
-with `const options` you will need to strip this out.
+set in the `lnms` command. Note: the configurator gives the
+configuration with `const options`. Remove this text.
 
 ```bash
 lnms config:set network_map_vis_options '{

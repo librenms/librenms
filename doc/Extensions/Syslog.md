@@ -82,8 +82,8 @@ semodule -i mycustom-librenms-rsyslog.pp
 
 If you prefer rsyslog, here are some hints on how to get it working.
 
-Add the following to your rsyslog config somewhere (could be at the
-top of the file in the step below, could be in `rsyslog.conf` if you
+Add these lines to your rsyslog config. Put them at the top of the file
+in the step below, or in `rsyslog.conf` if you
 are using remote logs for something else on this host)
 
 ```
@@ -133,7 +133,7 @@ Create a file called `/etc/rsyslog.d/30-librenms.conf`and add the following depe
     ```
 
 If your rsyslog server is receiving messages relayed by another syslog
-server, you may try replacing `%fromhost%` with `%hostname%`, since
+server, replace `%fromhost%` with `%hostname%`, because
 `fromhost` is the host the message was received from, not the host
 that generated the message.  The `fromhost` property is preferred as
 it avoids problems caused by devices sending incorrect hostnames in
@@ -179,9 +179,14 @@ logstash config file that works except for the LibreNMS export, take
 only the "exec" section from output and add it.
 
 ### Remote Logstash (or any json source)
-If you have a large logstash / elastic installation for collecting and filtering syslogs, you can simply pass the relevant logs as json to the LibreNMS API "syslog sink". This variant may be more flexible and secure in transport. It does not require any major changes to existing ELK setup. You can also pass simple json kv messages from any kind of application or script (example below) to this sink. 
+With a large logstash or elastic installation, send the relevant logs
+as JSON to the LibreNMS API "syslog sink". This method is more flexible
+and more secure in transport. It needs no major change to an existing
+ELK setup. You can also send simple JSON key-value messages to this
+sink from any application or script. The example below shows this. 
 
-For long term or advanced aggregation searches you might still use Kibana/Grafana/Graylog etc. It is recommended to keep `config['syslog_purge']` short.
+For a long term search or an advanced aggregation search, use Kibana,
+Grafana, or Graylog. Keep `config['syslog_purge']` short.
 
 A schematic setup can look like this:
 ```
@@ -266,9 +271,9 @@ This variant method use a external Graylog installation and its database. Please
 
 ## Client configuration
 
-Below are sample configurations for a variety of clients. You should
-understand the config before using it as you may want to make some
-slight changes. Further configuration hints may be found in the file Graylog.md.
+The sections below give example configurations of several clients. Read
+each configuration before you use it. You often need a small change.
+The file `Graylog.md` gives more configuration advice.
 
 Replace librenms.ip with IP or hostname of your LibreNMS install.
 
@@ -370,7 +375,7 @@ write memory
 ```
 
 If you have permitted udp and tcp 514 through any firewall then that
-should be all you need. Logs should start appearing and displayed
+is enough. The logs then appear and LibreNMS shows them
 within the LibreNMS web UI.
 
 ### Windows
@@ -383,11 +388,11 @@ to a remote syslog server (LibreNMS).
 #### Note
 
 Keep in mind you can use any agent or program to send the logs. We are
-just using this Datagram-Syslog Agent for this example.
+This example uses the Datagram-Syslog Agent.
 
 [Link to How to](http://techgenix.com/configuring-syslog-agent-windows-server-2012/)
 
-You will need to download and install "Datagram-Syslog Agent" for this how to
+Download and install "Datagram-Syslog Agent" for this procedure
 [Link to Download](http://download.cnet.com/Datagram-SyslogAgent/3001-2085_4-10370938.html)
 
 ## External hooks
@@ -478,7 +483,7 @@ devices.
 ### Allied Telesis Alliedware Plus
 
 **Note:** At least software version 5.4.8-2.1 is required. `log host
-x.x.x.x level notices program imi` may also be required depending on
+x.x.x.x level notices program imi` can also be necessary, from
 configuration. This is to ensure the syslog hook log message gets sent
 to the syslog server.
 
@@ -526,9 +531,9 @@ Options [Link](../Support/Cleanup-options.md)
 
 ### Matching syslogs to hosts with different names
 
-In some cases, you may get logs that aren't being associated with the
+Some logs have no association with the
 device in LibreNMS. For example, in LibreNMS the device is known as
-"ne-core-01", and that's how DNS resolves. However, the received
+"ne-core-01", and DNS resolves it in that form. The received
 syslogs are for "loopback.core-nw".
 
 To fix this issue, you can configure LibreNMS to translate the
