@@ -36,6 +36,17 @@ LIBRENMS_USER="${LIBRENMS_USER:-librenms}"
 LIBRENMS_USER_ID=$(id -u "$LIBRENMS_USER")
 
 #######################################
+# Append a timestamped line to the daily log
+# Globals:
+#   LOG_DIR
+# Arguments:
+#   Text
+#######################################
+log_line() {
+    printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1" >> "${LOG_DIR}/daily.log"
+}
+
+#######################################
 # Fancy-Print and run commands
 # Globals:
 #   LOG_DIR
@@ -59,11 +70,11 @@ status_run() {
     # otherwise we default to ./logs/daily.log
 
     printf "%-50s" "${arg_text}"
-    echo "${arg_text}" >> "${log_file}"
+    log_line "${arg_text}"
     tmp=$(bash -c "${arg_command}" 2>&1)
     exit_code=$?
     echo "${tmp}" >> "${log_file}"
-    echo "Returned: ${exit_code}" >> "${log_file}"
+    log_line "Returned: ${exit_code}"
 
     # print OK if the command ran successfully
     # or FAIL otherwise (non-zero exit code)
