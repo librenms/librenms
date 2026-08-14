@@ -22,6 +22,10 @@ return [
         'sysname_exists' => 'Already have device :hostname due to duplicate sysName: :sysname',
     ],
     'host_name_empty' => 'Hostname is empty',
+    'invalid_auth_mechanism' => [
+        'title' => 'Invalid authentication mechanism',
+        'message' => 'No valid authentication mechanism is configured. Please check the auth_mechanism setting.',
+    ],
     'host_unreachable' => [
         'unpingable' => 'Could not ping :hostname (:ip)',
         'unsnmpable' => 'Could not connect to :hostname, please check the snmp details and snmp reachability',
