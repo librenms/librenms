@@ -9,7 +9,7 @@ Shell script that reports load average/memory/open-files stats of Icecast
     wget https://github.com/librenms/librenms-agent/raw/master/snmp/icecast-stats.sh -O /etc/snmp/icecast-stats.sh
     ```
 
-2. Make the script executable
+2. Make the script executable.
 
     ```bash
     chmod +x /etc/snmp/icecast-stats.sh

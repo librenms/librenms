@@ -1,9 +1,9 @@
 ## Alerta
 
-The [alerta](https://alerta.io) monitoring system is a tool used to
-consolidate and de-duplicate alerts from multiple sources for quick
-‘at-a-glance’ visualisation. With just one system you can monitor
-alerts from many other monitoring tools on a single screen.
+The [alerta](https://alerta.io) monitoring system combines the alerts
+of many sources and removes the duplicates. It gives a quick overview.
+One system therefore shows the alerts of many monitoring tools on one
+screen.
 
 **Example:**
 
