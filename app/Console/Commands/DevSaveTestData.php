@@ -65,7 +65,7 @@ class DevSaveTestData extends LnmsCommand
                 }
                 $this->newLine();
 
-                LibrenmsConfig::invalidateAndReload();
+                LibrenmsConfig::reloadDefaults();
                 $tester = new ModuleTestHelper(new ModuleList($resolvedModules), $targetOs, $targetVariant);
                 $testData = $tester->generateTestData($snmpsim->ip, $snmpsim->port);
 
@@ -83,6 +83,7 @@ class DevSaveTestData extends LnmsCommand
             return 1;
         } finally {
             $snmpsim->stop();
+            LibrenmsConfig::reload();
         }
 
         return 0;

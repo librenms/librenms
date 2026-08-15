@@ -49,8 +49,19 @@ class ConfigRepository
      *
      * return &array
      */
-    public function __construct()
+    public function __construct(private readonly bool $loadUserConfiguration = true)
     {
+        if (! $this->loadUserConfiguration) {
+            $this->config = [];
+            $this->loadPreUserConfigDefaults();
+            $this->loadAllOsDefinitions();
+            $this->loadPostUserConfigDefaults();
+
+            $this->loadRuntimeSettings();
+
+            return;
+        }
+
         // load config settings that can be cached
         $cache_ttl = config('librenms.config_cache_ttl');
         $this->config = Cache::driver($cache_ttl == 0 ? 'null' : 'file')->remember('librenms-config', $cache_ttl, function () {
@@ -451,24 +462,24 @@ class ConfigRepository
                 $display_value = '{{ $sysName_fallback }}';
             }
 
-            $this->persist('device_display_default', $display_value);
+            $this->persistDefault('device_display_default', $display_value);
         }
 
         // make sure we have full path to binaries in case PATH isn't set
         foreach (['fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute'] as $bin) {
             if (! is_executable($this->get($bin))) {
-                $this->persist($bin, $this->locateBinary($bin));
+                $this->persistDefault($bin, $this->locateBinary($bin));
             }
         }
 
         if (! $this->has('rrdtool_version')) {
-            $this->persist('rrdtool_version', (new Version($this))->rrdtool());
+            $this->persistDefault('rrdtool_version', (new Version($this))->rrdtool());
         }
         if (! $this->has('snmp.unescape')) {
-            $this->persist('snmp.unescape', version_compare((new Version($this))->netSnmp(), '5.8.0', '<'));
+            $this->persistDefault('snmp.unescape', version_compare((new Version($this))->netSnmp(), '5.8.0', '<'));
         }
         if (! $this->has('reporting.usage')) {
-            $this->persist('reporting.usage', (bool) Callback::get('enabled'));
+            $this->persistDefault('reporting.usage', (bool) Callback::get('enabled'));
         }
 
         // populate legacy DB credentials, just in case something external uses them.  Maybe remove this later
@@ -508,6 +519,17 @@ class ConfigRepository
                 $this->set($key, $value);
             }
         }
+    }
+
+    private function persistDefault(string $key, mixed $value): void
+    {
+        if ($this->loadUserConfiguration) {
+            $this->persist($key, $value);
+
+            return;
+        }
+
+        $this->set($key, $value);
     }
 
     /**
