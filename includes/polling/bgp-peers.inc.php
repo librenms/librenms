@@ -128,7 +128,12 @@ if (! empty($peers)) {
         $vrfId = $peer['vrf_id'];
 
         try {
-            $peer_ip = IP::parse($peer['bgpPeerIdentifier']);
+            $peer_address = $peer['bgpPeerIdentifier'];
+            if ($device['os_group'] === 'arista') {
+                // Arista reports link-local BGP peers as ipv6z with a numeric zone index.
+                $peer_address = explode('%', $peer_address, 2)[0];
+            }
+            $peer_ip = IP::parse($peer_address);
 
             d_echo("Checking BGP peer $peer_ip ");
 
@@ -371,7 +376,7 @@ if (! empty($peers)) {
                     }
 
                     if ($device['os_group'] === 'arista') {
-                        $peer_identifier = '1.' . $ip_type . '.' . $ip_len . '.' . $bgp_peer_ident;
+                        $peer_identifier = '1.' . IP::toSnmpInetAddressIndex($peer['bgpPeerIdentifier']);
                         $mib = 'ARISTA-BGP4V2-MIB';
                         $oid_map = [
                             'aristaBgp4V2PeerState' => 'bgpPeerState',

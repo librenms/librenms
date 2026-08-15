@@ -136,6 +136,40 @@ abstract class IP implements \Stringable
     }
 
     /**
+     * Convert an InetAddress value to its SNMP index representation.
+     *
+     * Scoped addresses use the ipv4z/ipv6z InetAddress types and append the
+     * four-byte zone index to the address bytes.
+     *
+     * @throws InvalidIpException
+     */
+    public static function toSnmpInetAddressIndex(string $address): string
+    {
+        $zone = null;
+        if (str_contains($address, '%')) {
+            [$address, $zone] = explode('%', $address, 2);
+
+            if ($zone === '' || ! ctype_digit($zone) || (int) $zone > 4294967295) {
+                throw new InvalidIpException("Invalid InetAddress zone index: $zone");
+            }
+        }
+
+        $ip = self::parse($address);
+        $isIpv6 = $ip->getFamily() === 'ipv6';
+        $type = $isIpv6 ? 2 : 1;
+        $length = $isIpv6 ? 16 : 4;
+        $index = $ip->toSnmpIndex();
+
+        if ($zone !== null) {
+            $type += 2; // ipv4z(3) or ipv6z(4)
+            $length += 4;
+            $index .= '.' . implode('.', unpack('C*', pack('N', (int) $zone)));
+        }
+
+        return "$type.$length.$index";
+    }
+
+    /**
      * Check if the supplied IP is valid.
      *
      * @param  string  $ip
