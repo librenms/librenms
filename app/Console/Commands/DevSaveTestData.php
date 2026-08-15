@@ -37,7 +37,13 @@ class DevSaveTestData extends LnmsCommand
         $variant = $this->option('variant');
         $modulesInput = $this->option('modules') ?: 'all';
         $modules = $modulesInput === 'all' ? [] : explode(',', $modulesInput);
-        $osList = $this->findOsWithData($os, $variant, $modules);
+        try {
+            $osList = $this->findOsWithData($os, $variant, $modules);
+        } catch (InvalidModuleException $e) {
+            $this->error($e->getMessage());
+
+            return 1;
+        }
 
         if (empty($osList)) {
             $this->error('No matching snmprec(s) found.');
@@ -77,7 +83,7 @@ class DevSaveTestData extends LnmsCommand
                     $this->info("Saved to $targetFile" . PHP_EOL . 'Ready for testing!');
                 }
             }
-        } catch (InvalidModuleException|RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $this->error($e->getMessage());
 
             return 1;
