@@ -119,6 +119,17 @@ return [
         'no_data' => 'No data for :file',
         'verify_private_data' => 'Verify these file(s) do not contain any private data before sharing!',
     ],
+    'dev:save-test-data' => [
+        'description' => 'Save database test data from snmpsim recordings',
+        'options' => [
+            'os' => 'Name of the OS to save test data for',
+            'variant' => 'The variant of the OS to use, usually the device model',
+            'modules' => 'The discovery/poller module(s) to collect data for, comma delimited',
+            'no-save' => 'Do not save database entries; print them instead',
+            'file' => 'Save data to a file instead of the standard location',
+            'debug' => 'Enable debug output',
+        ],
+    ],
     'dev:simulate' => [
         'description' => 'Simulate devices using test data',
         'arguments' => [

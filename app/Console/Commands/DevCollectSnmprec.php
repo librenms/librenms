@@ -30,7 +30,7 @@ class DevCollectSnmprec extends LnmsCommand
         parent::__construct();
 
         $this->addArgument('device', mode: InputArgument::REQUIRED);
-        $this->addOption('variant', null, InputOption::VALUE_REQUIRED);
+        $this->addOption('variant', 'r', InputOption::VALUE_REQUIRED);
         $this->addOption('modules', 'm', InputOption::VALUE_OPTIONAL);
         $this->addOption('prefer-new', null, InputOption::VALUE_NONE);
         $this->addOption('os', 'o', InputOption::VALUE_OPTIONAL);
