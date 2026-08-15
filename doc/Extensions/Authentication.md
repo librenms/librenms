@@ -1,7 +1,7 @@
 # Authentication Options
 
 LibreNMS supports multiple authentication modules along with [Two Factor Auth](Two-Factor-Auth.md).
-Here we will provide configuration details for these modules. Alternatively,
+This document gives the configuration details of these modules.
 you can use [Socialite Providers](OAuth-SAML.md) which supports a wide variety
 of social/OAuth/SAML authentication methods.
 
@@ -21,14 +21,14 @@ of social/OAuth/SAML authentication methods.
 
 - Single Sign-on: [sso](#single-sign-on)
 
-⚠️ **When enabling a new authentication module, the local users will no
+⚠️ **A new authentication module makes the local users no
 longer be available to log in.**
 
 ## Enable authentication module
 
 To enable a particular authentication module you need to set this up
-in config.php. Please note that only ONE module can be
-enabled. LibreNMS doesn't support multiple authentication mechanisms at
+in `config.php`. Note: only ONE module can be
+on. LibreNMS does not support more than one authentication mechanism at
 the same time.
 
 !!! setting "auth/general"
@@ -42,7 +42,7 @@ See [Authorization](Authorization.md) for more details on roles and permissions.
 
 #### Built-in Roles
 
-- **user**: You will need to assign device / port
+- **user**: you must assign the device permissions or the port
   permissions for users in this role.
 
 - **global-read**: Read only Administrator.
@@ -77,7 +77,8 @@ Enable debug output to troubleshoot issues
     lnms config:set auth_mechanism mysql
     ```
 
-This is default option with LibreNMS so you should have already have the following configuration setup
+This option is the LibreNMS default. Your configuration therefore
+already holds these settings
 in your environment file (.env).
 
 ```dotenv
@@ -102,7 +103,7 @@ If you have issues with secure LDAP try setting
     ```bash
     lnms config:set auth_ad_check_certificates 0
     ```
-this will ignore certificate errors.
+this option ignores the certificate errors.
 
 ### Require actual membership of the configured groups
 
@@ -113,19 +114,19 @@ this will ignore certificate errors.
 
 If you set `auth_ad_require_groupmembership` to 1, the
 authenticated user has to be a member of the specific group.
-Otherwise all users can authenticate, and will have no default roles or
-you may set `auth_ad_global_read` to 1 and all users will
+Without this setting, all users can authenticate and get no default
+role. You can also set `auth_ad_global_read` to 1. All users then
 have the role 'global-read' and have read only access to all devices.
 
 ### Old account cleanup
 
-Cleanup of old accounts is done by checking the authlog. You will need
-to set the number of days when old accounts will be purged
+The cleanup of the old accounts reads the authlog. Set the number of
+days before the purge of an old account
 AUTOMATICALLY by daily.sh.
 
 Please ensure that you set the `authlog_purge` value to be
 greater than `active_directory.users_purge` otherwise old
-users won't be removed.
+users stay.
 
 ### Sample configuration
 
@@ -149,7 +150,7 @@ users won't be removed.
 Replace `ad-admingroup` with your Active Directory admin-user group
 and `ad-usergroup` with your standard user group. It is __highly
 suggested__ to create a bind user, otherwise "remember me", alerting
-users, and the API will not work.
+users, and the API does not work.
 
 ### Active Directory redundancy
 
@@ -240,7 +241,7 @@ lets say we have a prefix of `uid=`, the user `derp`, and the suffix of
 
 If your ldap server does not allow anonymous bind, it is highly
 suggested to create a bind user, otherwise "remember me", alerting
-users, and the API will not work.
+users, and the API does not work.
 
 !!! setting "auth/ldap"
     ```bash
@@ -297,7 +298,7 @@ setsebool -P httpd_can_connect_ldap 1
 
 ## Radius Authentication
 
-Please note that a mysql user is created for each user the logs in
+Note: LibreNMS creates a MySQL user for each user that logs in
 successfully. Users are assigned the `user` role by default,
 unless radius sends a reply attribute with a role.
 
@@ -318,7 +319,8 @@ The following strings correspond to the built-in roles, but any defined role can
 - `librenms_role_admin` - Sets the administrator role.
 - `librenms_role_global-read` - Sets the global-read role
 
-LibreNMS will ignore any other strings sent in `Filter-ID` and revert to default role that is set in your config.
+LibreNMS ignores any other string in `Filter-ID`. It then uses the
+default role of your configuration.
 
 !!! setting "auth/radius"
     ```bash
@@ -333,25 +335,26 @@ LibreNMS will ignore any other strings sent in `Filter-ID` and revert to default
 ### Radius Huntgroup
 
 Freeradius has a function called `Radius Huntgroup` which allows to send different attributes based on NAS.
-This may be utilized if you already use `Filter-ID` in your environment and also want to use radius with LibreNMS.
+Use this option when your environment already uses `Filter-ID` and you
+also want radius with LibreNMS.
 
 ### Old account cleanup
 
-Cleanup of old accounts is done by checking the authlog. You will need
-to set the number of days when old accounts will be purged
+The cleanup of the old accounts reads the authlog. Set the number of
+days before the purge of an old account
 AUTOMATICALLY by daily.sh.
 
 Please ensure that you set the `authlog_purge` value to be
 greater than `radius.users_purge` otherwise old users
-won't be removed.
+stay.
 
 ## <a name="http-auth"> HTTP Authentication</a>
 
 
 Config option: `http-auth`
 
-LibreNMS will expect the user to have authenticated via your
-webservice already. At this stage it will need to assign a local user
+LibreNMS expects an authenticated user from your web service. It then
+assigns a local user
 for that user which is done in one of two ways:
 
 - A user exists in MySQL still where the usernames match up.
@@ -363,7 +366,7 @@ for that user which is done in one of two ways:
     lnms config:set http_auth_guest guest
     ```
 
-This will then assign the guest user to all authenticated users.
+This setting assigns the guest user to all authenticated users.
 
 ### HTTP Authentication / AD Authorization
 
@@ -371,18 +374,18 @@ Config option: `ad-authorization`
 
 This module is a combination of ___http-auth___ and ___active\_directory___
 
-LibreNMS will expect the user to have authenticated via your
-webservice already (e.g. using Kerberos Authentication in Apache) but
-will use Active Directory lookups to determine and assign the
-role(s) of a user. The roles will be calculated by using AD
+LibreNMS expects an authenticated user from your
+webservice already, for example with Kerberos Authentication in Apache. It
+uses Active Directory lookups to find and assign the roles of a user.
+The roles come from the AD
 group membership information as the ___active\_directory___ module
 does.
 
 The configuration is the same as for the ___active\_directory___ module
 with two extra, optional options: auth_ad_binduser and
-auth_ad_bindpassword. These should be set to a AD user with read
-capabilities in your AD Domain in order to be able to perform
-searches. If these options are omitted, the module will attempt an
+auth_ad_bindpassword. Set them to an AD user with read
+capability in your AD domain. This user then does the
+searches. Without these options, the module tries an
 anonymous bind (which then of course must be allowed by your Active
 Directory server(s)).
 
@@ -405,10 +408,10 @@ Config option: `ldap-authorization`
 
 This module is a combination of ___http-auth___ and ___ldap___
 
-LibreNMS will expect the user to have authenticated via your
-webservice already (e.g. using Kerberos Authentication in Apache) but
-will use LDAP to determine and assign the role(s) of a user. The
-roles will be calculated by using LDAP group membership
+LibreNMS expects an authenticated user from your
+webservice already, for example with Kerberos Authentication in Apache. It
+uses LDAP to find and assign the roles of a user. The roles come from
+the LDAP group membership
 information as the ___ldap___ module does.
 
 The configuration is similar to the ___ldap___ module with one extra option: auth_ldap_cache_ttl.
@@ -460,7 +463,7 @@ auth_ldap_userlist_filter: Replace 'service=informatique' by your ldap filter to
 
 If your ldap server does not allow anonymous bind, it is highly
 suggested to create a bind user, otherwise "remember me", alerting
-users, and the API will not work.
+users, and the API does not work.
 
 !!! setting "auth/ldap"
     ```bash
@@ -486,11 +489,11 @@ authentication providers that are managed outside of LibreNMS - such
 as ADFS, Shibboleth, EZProxy, BeyondCorp, and others. A large number
 of these methods use
 [SAML](https://en.wikipedia.org/wiki/Security_Assertion_Markup_Language)
-the module has been written assuming the use of SAML, and therefore
-these instructions contain some SAML terminology, but it should be
+the module assumes SAML, and therefore
+these instructions hold some SAML terms. They are
 possible to use any software that works in a similar way.
 
-In order to make use of the single sign-on module, you need to have an
+The single sign-on module needs an
 Identity Provider up and running, and know how to configure your
 Relying Party to pass attributes to LibreNMS via header injection or
 environment variables. Setting these up is outside of the scope of
@@ -498,7 +501,7 @@ this documentation.
 
 As this module deals with authentication, it is extremely careful
 about validating the configuration - if it finds that certain values
-in the configuration are not set, it will reject access rather than
+in the configuration are absent, it blocks the access and does not
 try and guess.
 
 ### Basic Configuration
@@ -515,36 +518,36 @@ lnms config:set sso.static_level 10
 This, along with the defaults, sets up a basic Single Sign-on setup that:
 
 - Reads values from environment variables
-- Automatically creates users when they're first seen
+- It creates a user at their first login
 - Automatically updates users with new values
 - Gives everyone privilege level 10
 
 This happens to mimic the behaviour of [http-auth](#http-auth), so if
-this is the kind of setup you want, you're probably better of just
+you want this type of setup, it is usually better to
 going and using that mechanism.
 
 ### Security
 
-If there is a proxy involved (e.g. EZProxy, Azure AD Application
-Proxy, NGINX, mod_proxy) it's ___essential___ that you have some means
+With a proxy, for example EZProxy, Azure AD Application
+Proxy, NGINX, mod_proxy), you ___must___ have a method
 in place to prevent headers being injected between the proxy and the
 end user, and also prevent end users from contacting LibreNMS
 directly.
 
-This should also apply to user connections to the proxy itself - the
+This rule also applies to the user connections to the proxy. The
 proxy ___must not___ be allowed to blindly pass through HTTP
-headers. ___mod_security___ should be considered a minimum, with a
+headers. ___mod_security___ is the minimum. Add a
 full [WAF](https://en.wikipedia.org/wiki/Web_application_firewall)
 being strongly recommended. This advice applies to the IDP too.
 
 The mechanism includes very basic protection, in the form of an IP
-whitelist with should contain the source addresses of your proxies:
+allow list holds the source addresses of your proxies:
 
 ```bash
 lnms config:set sso.trusted_proxies '["127.0.0.1/8", "::1/128", "192.0.2.0", "2001:DB8::"]'
 ```
 
-This configuration item should contain an array with a list of IP
+This configuration item holds an array with a list of IP
 addresses or CIDR prefixes that are allowed to connect to LibreNMS and
 supply environment variables or headers.
 
@@ -552,7 +555,7 @@ supply environment variables or headers.
 
 #### User Attribute
 
-If for some reason your relying party doesn't store the username in
+If your relying party does not store the username in
 ___REMOTE\_USER___, you can override this choice.
 
 ```bash
@@ -561,7 +564,7 @@ lnms config:set sso.trusted_proxies HTTP_UID
 
 Note that the user lookup is a little special - normally headers are
 prefixed with ___HTTP\____, however this is not the case for remote
-user - it's a special case. If you're using something different you
+user. It is a special case. With a different setting, you
 need to figure out of the ___HTTP\____ prefix is required or not
 yourself.
 
@@ -574,10 +577,10 @@ lnms config:set sso.create_users true
 lnms config:set sso.update_users true
 ```
 
-If these are not enabled, user logins will be (somewhat silently)
+Without these settings, LibreNMS blocks the user logins almost
 rejected unless an administrator has created the account in
 advance. Note that in the case of SAML federations, unless release of
-the users true identity has been negotiated with the IDP, the username
+the IDP confirms the true identity of the user. The username
 (probably ePTID) is not likely to be predicable.
 
 ### Personalisation
@@ -602,7 +605,7 @@ SSO currently uses legacy levels instead of roles. Here is a map:
 ##### Static
 
 As used above, ___static___ gives every single user the same privilege
-level. If you're working with a small team, or don't need access
+level. With a small team, or without an access
 control, this is probably suitable.
 
 ##### Attribute
@@ -614,9 +617,9 @@ lnms config:set sso.level_attr entitlement
 
 If your Relying Party is capable of calculating the necessary
 privilege level, you can configure the module to read the privilege
-number straight from an attribute. ___sso\_level\_attr___ should contain
+number from an attribute. ___sso\_level\_attr___ holds
 the name of the attribute that the Relying Party exposes to LibreNMS -
-as long as ___sso\_mode___ is correctly set, the mechanism should find
+With a correct ___sso\_mode___, the mechanism finds
 the value.
 
 ##### Group Map
@@ -631,21 +634,21 @@ lnms config:set sso.group_delimiter ';'
 ```
 
 This mechanism expects to find a delimited list of groups within the
-attribute that ___sso\_group\_attr___ points to. This should be an
+attribute of ___sso\_group\_attr___. This attribute is an
 associative array of group name keys, with privilege levels as
-values. The mechanism will scan the list and find the ___highest___
+values. The mechanism reads the list and finds the ___highest___
 privilege level that the user is entitled to, and assign that value to
 the user.
 
 If there are no matches between the user's groups and the
-___sso\_group\_level\_map___, the user will be assigned the privilege level
+___sso\_group\_level\_map___. The user then gets the privilege level
 specified in the ___sso\_static\_level___ variable, with a default of 0 (no access).
 This feature can be used to provide a default access level (such as read-only)
 to all authenticated users.
 
-Additionally, this format may be specific to Shibboleth; other relying party
-software may need changes to the mechanism (e.g. ___mod\_auth\_mellon___
-may create pseudo arrays).
+This format can be specific to Shibboleth. Other relying party software
+needs a change to the mechanism. For example,
+___mod\_auth\_mellon___ creates pseudo arrays.
 
 There is an optional value for sites with large numbers of groups:
 

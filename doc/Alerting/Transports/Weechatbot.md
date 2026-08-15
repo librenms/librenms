@@ -1,10 +1,13 @@
 ## Weechat BOT
 
-The Weechat BOT transport can be used to send alerts to an IRC channel via Weechat Bot UDP listener.
+The Weechat bot transport sends alerts to an IRC channel through the
+Weechat bot UDP listener.
 
-Documentation on how to enable UDP listener can be on [the project site](https://github.com/sndrsmnk/weechatbot#udp-listener)
+For the steps to enable the UDP listener, read [the project
+site](https://github.com/sndrsmnk/weechatbot#udp-listener).
 
-This transport should also be compatible with Gozerbot. Gozerbot does not have the concept of IRC server, so just leave this field empty for Gozerbot compatibility.
+This transport also works with Gozerbot. Gozerbot has no IRC server
+field. For Gozerbot, leave this field empty.
 
 **Example:**
 | Config | Example |

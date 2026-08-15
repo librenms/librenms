@@ -3,7 +3,7 @@
  - [Github: Oetiker RRDCached](https://github.com/oetiker/rrdtool-1.x/)
  - [RRDCached](https://oss.oetiker.ch/rrdtool/doc/rrdcached.en.html)
 
-This document will explain how to set up RRDCached for LibreNMS.
+This document describes the setup of RRDCached for LibreNMS.
 
 Since version 1.5, rrdtool / rrdcached now supports creating rrd files
 over rrdcached. If you have rrdcached 1.5.5 or above, you can also
@@ -21,7 +21,8 @@ or newer, in addition to your rrdcached version.
 
 ## High-Availability
 
-It's advised to only run one active instance of RRDCached and have a failover instance ready to take over in case of failure.
+Run only one active instance of RRDCached. Keep a failover instance
+ready for a failure.
 A recommended setup is to use a network socket for RRDCached and have a load balancer in front of it such as Nginx.
 See [Securing RRDCached](#securing-rrcached) for more information.
 
@@ -142,7 +143,9 @@ Ubuntu and Debian are very similar, the main difference is the location of the `
     !!! note
         `rrdcached` is installed as part of the `rrdtool` package, but the `rrdcached` service is not setup by default, unlike the Ubuntu/Debian setup.
 
-        The intermediate files generated during the process for the SELinux policy (e.g., `rrdcached_librenms.mod` and `rrdcached_librenms.pp`) do not need to be saved after the policy module is successfully installed.
+        The SELinux policy process generates intermediate files, for example
+        `rrdcached_librenms.mod` and `rrdcached_librenms.pp`. After a successful
+        installation of the policy module, you can remove these files.
 
 
      1. link in the service and reload:
@@ -194,7 +197,7 @@ Ubuntu and Debian are very similar, the main difference is the location of the `
 === "CentOS 6"
 
     This example is based on a fresh LibreNMS install, on a minimal CentOS 6 installation.
-    In this example, we'll use the Repoforge repository.
+    This example uses the Repoforge repository.
 
     ```bash
     rpm -ivh http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
@@ -276,11 +279,12 @@ Edit your LibreNMS config by running the following:
 
 ## Verify
 
-Check to see if the graphs are being drawn in LibreNMS. This might take a few minutes.
+Make sure that LibreNMS draws the graphs. This step takes some minutes.
 After at least one poll cycle (5 mins), check the LibreNMS disk I/O performance delta.
 Disk I/O can be found under the menu Devices>All Devices>[localhost_hostname]>Health>Disk I/O.
 
-Depending on many factors, you should see the Ops/sec drop by ~30-40%.
+The Ops/sec value usually decreases by 30% to 40%. The exact value
+depends on many factors.
 
 ### Verify SELINUX
 
@@ -296,12 +300,15 @@ Test Functionality: Ensure LibreNMS can successfully interact with RRDcached wit
 ausearch -m avc -ts recent
 ```
 
-If there are no denials, the policy module has been successfully installed and Librenms can interact with RRDcached.
+Without a denial, the policy module works and LibreNMS can reach RRDcached.
 
 ## Securing RRCached
 
 According to the [man page](https://linux.die.net/man/1/rrdcached),
-under "SECURITY CONSIDERATIONS", rrdcached has no authentication or security except for running under a unix socket. If you choose to use a network socket instead of a unix socket, you will need to secure your rrdcached installation. To do so you can proxy rrdcached using
+under "SECURITY CONSIDERATIONS", rrdcached has no authentication and no
+security. A unix socket is its only protection. With a network socket,
+you must secure your rrdcached installation. Put a proxy in front of
+rrdcached with
 nginx to allow only specific IPs to connect.
 
 Using the same setup above, using nginx version 1.9.0 or later, you can follow this setup to proxy the default rrdcached port to the local unix socket.
@@ -336,9 +343,12 @@ server {
 
 ```
 
-Replace `$LibreNMS_IP` with the ip of the server that will be using rrdcached. You can specify more than one `allow` statement. This will bind nginx to TCP 42217 (the default rrdcached port), allow the specified IPs to connect, and deny all others.
+Replace `$LibreNMS_IP` with the IP address of the rrdcached server. You
+can give more than one `allow` statement. This configuration binds
+nginx to TCP 42217, the default rrdcached port. It permits the given IP
+addresses and blocks all others.
 
-next, we'll symlink the config to streams-enabled:
+Then symlink the config to streams-enabled:
 `ln -s /etc/nginx/streams-{available,enabled}/rrd`
 
 and reload nginx

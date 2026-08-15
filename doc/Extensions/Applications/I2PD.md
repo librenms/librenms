@@ -10,7 +10,7 @@ Script communicates with I2PD via I2PControl protocol. Enable and configure that
 
 2. Set `enabled = true`
 
-3. Make sure that I2PC listens only on localhost! Config should look like this:
+3. I2PC must listen only on localhost. The configuration is:
 
    ```ini
    [i2pcontrol]
@@ -56,7 +56,7 @@ Script communicates with I2PD via I2PControl protocol. Enable and configure that
 
 ### Script requirements
 
-You should already have everything needed, but:
+You usually have all the necessary components:
 
 - python3
 - python3-urllib3
@@ -75,7 +75,9 @@ I2PControl protocol is not enabled in i2pd daemon, or **I2PC_URL** is incorrect 
 
 - `ERROR(3): Connection timed out to I2PControl socket!`
 
-I2PControl protocol is not enabled in i2pd daemon, or **I2PC_URL** is incorrect in `i2pd-stats.py`.  Your i2pd daemon may be stuck, try to restart `i2pd.service`.
+The I2PControl protocol is not enabled in the i2pd daemon, or
+**I2PC_URL** in `i2pd-stats.py` is wrong. Your i2pd daemon can also be
+blocked. Restart `i2pd.service`.
 
 ## Alerting
 

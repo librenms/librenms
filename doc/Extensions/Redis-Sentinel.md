@@ -2,17 +2,24 @@
 
 ## Overview
 
-High-Availability with Redis can be achieved through multiple Redis nodes connected with multiple Sentinel nodes. A typical production setup includes 3 Redis instances with 3 Redis Sentinel processes running on separate servers. Three nodes are required to establish a quorum in case of a failure.
+High availability with Redis needs several Redis nodes and several
+Sentinel nodes. A typical production setup has 3 Redis instances and 3
+Redis Sentinel processes on separate servers. A quorum after a failure
+needs three nodes.
 
-For more information about high availability using Redis with Sentinel, refer to the official [Redis Sentinel Documentation](https://redis.io/docs/latest/operate/oss_and_stack/management/sentinel/).
+For more information about high availability with Redis and Sentinel,
+read the official [Redis Sentinel
+Documentation](https://redis.io/docs/latest/operate/oss_and_stack/management/sentinel/).
 
 ## Configure Redis Sentinel cluster with LibreNMS
 
-Both LibreNMS WebUI and Poller can be configured to use a Redis Sentinel cluster as their backend.
+The LibreNMS web interface and the poller can both use a Redis Sentinel
+cluster as their backend.
 
 ### Web UI Configuration
 
-To configure the Web UI to use a Redis Sentinel cluster, add the following parameters to your `.env` file:
+For a Redis Sentinel cluster in the web interface, add these parameters
+to your `.env` file:
 
 ```
 # Configure these values according to your environment
@@ -31,8 +38,10 @@ SESSION_CONNECTION=sentinel_session
 
 ### Redis Sentinel Authentication
 
-If your Redis Sentinel cluster is password-protected, you need to append `password=your_redis_password` to each Redis Sentinel URL in the `REDIS_SENTINEL_HOSTS` variable.
-Optionally, if you are using ACLs, you must also include `username=your_redis_username` in the URL.
+If your Redis Sentinel cluster has a password, add
+`password=your_redis_password` to the end of each Redis Sentinel URL in
+the `REDIS_SENTINEL_HOSTS` variable.
+With ACLs, also add `username=your_redis_username` to the URL.
 
 For example:
 
@@ -42,7 +51,8 @@ REDIS_SENTINEL_HOSTS=redis://192.168.1.10:26379?password=your_redis_password,red
 
 ### Poller Configuration
 
-To configure the Poller to use a Redis Sentinel cluster, add the following to your `.env` file:
+For a Redis Sentinel cluster in the poller, add these lines to your
+`.env` file:
 
 ```
 # Configure these values according to your environment
@@ -57,8 +67,11 @@ REDIS_SENTINEL_USERNAME=SentinelUsernameGoesHere
 REDIS_PASSWORD=your_redis_password
 ```
 
-For additional information on distributed polling configuration, see [Distributed-Poller.md](Distributed-Poller.md#redis).
+For more information about the distributed polling configuration, read
+[Distributed-Poller.md](Distributed-Poller.md#redis).
 
 ## Testing Your Configuration
 
-To verify your Redis Sentinel setup is working correctly with LibreNMS you can connect to the Redis Sentinel cluster using the `redis-cli` and execute the `MONITOR` command. This command will show you the commands being executed on the Redis cluster.
+To test your Redis Sentinel setup with LibreNMS, connect to the Redis
+Sentinel cluster with `redis-cli`. Then run the `MONITOR` command. This
+command shows the commands of the Redis cluster.

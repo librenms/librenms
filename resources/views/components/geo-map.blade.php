@@ -35,11 +35,6 @@
     function init_geo_map_{{ Str::slug($id, '_') }}() {
         loadjs('js/leaflet.js', function () {
             loadjs('js/L.Control.Locate.min.js', function () {
-                let dependencies = [];
-                if (@json($showDevices)) {
-                    dependencies.push('js/leaflet.markercluster.js', 'js/leaflet.awesome-markers.min.js');
-                }
-
                 let runInit = function () {
                     let mapId = @json($id);
                     if (get_map(mapId)) {
@@ -81,7 +76,7 @@
                     leafletMap.setView(targetLocation, config.zoom);
 
                     if (@json($marker || (bool) $editableLocationId)) {
-                        let deviceMarker = L.marker(targetLocation).addTo(leafletMap);
+                        let deviceMarker = L.marker(targetLocation, { zIndexOffset: 20000 }).addTo(leafletMap);
                         if (@json((bool) $editableLocationId)) {
                             deviceMarker.dragging.enable();
                             deviceMarker.on("dragend", function () {
@@ -163,8 +158,10 @@
                     }
                 };
 
-                if (dependencies.length > 0) {
-                    loadjs(dependencies, runInit);
+                if (@json($showDevices)) {
+                    loadjs('js/leaflet.markercluster.js', function () {
+                        loadjs('js/leaflet.awesome-markers.min.js', runInit);
+                    });
                 } else {
                     runInit();
                 }

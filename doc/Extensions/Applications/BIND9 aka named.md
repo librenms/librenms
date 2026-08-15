@@ -8,7 +8,7 @@ Create stats file with appropriate permissions:
 touch /var/cache/bind/stats
 chown bind:bind /var/cache/bind/stats
 ```
-Change `user:group` to the user and group that's running bind/named.
+Change `user:group` to the user and the group of bind or named.
 
 ### 2. Bind/named configuration:
 
@@ -55,11 +55,11 @@ The script for this also requires the Perl module `File::ReadBackwards`.
 
 If it is not available, it can be installed by `cpan -i File::ReadBackwards`.
 
-### 7. You may possibly need to configure the agent/extend script as well.
+### 7. The agent script or the extend script can also need configuration.
 
 The config file's path defaults to the same path as the script, but
 with .config appended. So if the script is located at
-`/etc/snmp/bind`, the config file will be
+`/etc/snmp/bind`, the config file is
 `/etc/snmp/bind.config`. Alternatively you can also specify a config
 via `-c $file`.
 
@@ -82,7 +82,7 @@ zero_stats = A 0/1 boolean for if the stats file should be zeroed
 ```
 
 If you want to guess at the configuration, call the script with `-g`
-and it will print out what it thinks it should be.
+The script then prints its own estimate of the configuration.
 
 ## Configure Agent or Extend
 
@@ -94,13 +94,13 @@ and it will print out what it thinks it should be.
         wget https://github.com/librenms/librenms-agent/raw/master/snmp/bind -O /etc/snmp/bind
         ```
 
-    2. Make the script executable
+    2. Make the script executable.
 
         ```bash
         chmod +x /etc/snmp/bind
         ```
 
-    3. Edit your snmpd.conf file and add:
+    3. Edit your `snmpd.conf` file and add:
 
         ```bash
         extend bind /etc/snmp/bind
@@ -108,13 +108,13 @@ and it will print out what it thinks it should be.
 
     4. Restart snmpd on the host in question.
 
-    The application should be auto-discovered as described at the top of
-    the page. If it is not, please follow the steps set out under `SNMP
-    Extend` heading top of page.
+    LibreNMS discovers the application automatically, as described at
+    the top of the page. If the discovery fails, do the steps under the
+    `SNMP Extend` heading at the top of the page.
 
 === "Agent"
 
-    1. [Install the agent](../Agent-Setup.md)) on this device if it isn't
+    1. If this device has no agent, [install the agent](../Agent-Setup.md).
     
     2. Download the script onto the desired host:
 
@@ -122,7 +122,7 @@ and it will print out what it thinks it should be.
         wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/bind -O /usr/lib/check_mk_agent/local/bind
         ```
 
-    3. Make the script executable
+    3. Make the script executable.
 
         ```bash
         chmod +x /usr/lib/check_mk_agent/local/bind
