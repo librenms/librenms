@@ -1,0 +1,11 @@
+---
+os: fs-fmt
+text: 'Fiberstore FMT'
+type: network
+icon: fs
+group: fs
+mib_dir: fs
+discovery:
+    - sysDescr:
+        - 'GLCY SNMP'
+        - 'Linux HTNICE'
