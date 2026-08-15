@@ -103,6 +103,11 @@ class DevSaveTestData extends LnmsCommand
         $this->newLine();
     }
 
+    /**
+     * @param array<string> $modules
+     * @return array<string, array{string, string, array<string, bool|array<string>>}>
+     * @throws InvalidModuleException
+     */
     private function findOsWithData(?string $os, ?string $variant, array $modules): array
     {
         if ($os !== null && $variant !== null) {
@@ -112,6 +117,9 @@ class DevSaveTestData extends LnmsCommand
         return ModuleTestHelper::findOsWithData($modules, $os);
     }
 
+    /**
+     * @param  array<string, array{discovery?: array<string, array<int, array<string, mixed>>>, poller?: array<string, array<int, array<string, mixed>>>}>  $testData
+     */
     protected function persistTestData(array $testData, string $outputFile): void
     {
         d_echo($testData);

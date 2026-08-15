@@ -42,6 +42,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class ConfigRepository
 {
+    /** @var array<string, mixed> */
     private array $config;
 
     /**
@@ -83,7 +84,7 @@ class ConfigRepository
     /**
      * Get the config setting definitions
      *
-     * @return array
+     * @return array<string, array<string, mixed>>
      */
     public function getDefinitions(): array
     {
@@ -93,7 +94,7 @@ class ConfigRepository
     /**
      * Load the user config from config.php
      *
-     * @param  array  $config  (this should be $this->config)
+     * @param  array<string, mixed>  $config  (this should be $this->config)
      */
     private function loadUserConfigFile(&$config): void
     {
@@ -128,7 +129,7 @@ class ConfigRepository
      * Unset a config setting
      * or multiple
      *
-     * @param  string|array  $key
+     * @param  string|array<string>  $key
      */
     public function forget($key): void
     {
@@ -140,7 +141,7 @@ class ConfigRepository
      * fall back to the global config setting prefixed by $global_prefix
      * The key must be the same for the global setting and the device setting.
      *
-     * @param  array  $device  Device array
+     * @param  array<string, mixed>  $device  Device array
      * @param  string  $key  Name of setting to fetch
      * @param  string  $global_prefix  specify where the global setting lives in the global config
      * @param  mixed  $default  will be returned if the setting is not set on the device or globally
@@ -184,8 +185,8 @@ class ConfigRepository
      * @param  string|null  $os  The os name
      * @param  string  $key  period separated config variable name
      * @param  string  $global_prefix  prefix for global setting
-     * @param  array  $default  optional array to return if the setting is not set
-     * @return array
+     * @param  array<array-key, mixed>  $default  optional array to return if the setting is not set
+     * @return array<array-key, mixed>
      */
     public function getCombined(?string $os, string $key, string $global_prefix = '', array $default = []): array
     {
@@ -318,7 +319,7 @@ class ConfigRepository
     /**
      * Get the full configuration array
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function getAll(): array
     {
@@ -358,7 +359,10 @@ class ConfigRepository
         $this->loadGraphsFromDb($this->config);
     }
 
-    private function loadGraphsFromDb(&$config): void
+    /**
+     * @param  array<string, mixed>  $config
+     */
+    private function loadGraphsFromDb(array &$config): void
     {
         try {
             $graph_types = GraphType::all()->toArray();
@@ -507,7 +511,7 @@ class ConfigRepository
      *
      * @param  string  $key
      * @param  string  $value  value to set to key or vsprintf() format string for values below
-     * @param  array  $format_values  array of keys to send to vsprintf()
+     * @param  array<string>  $format_values  array of keys to send to vsprintf()
      */
     private function setDefault($key, $value, $format_values = []): void
     {
