@@ -110,8 +110,9 @@ class DevSaveTestData extends LnmsCommand
     }
 
     /**
-     * @param array<string> $modules
+     * @param  array<string>  $modules
      * @return array<string, array{string, string, array<string, bool|array<string>>}>
+     *
      * @throws InvalidModuleException
      */
     private function findOsWithData(?string $os, ?string $variant, array $modules): array
