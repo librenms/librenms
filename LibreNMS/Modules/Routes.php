@@ -148,7 +148,8 @@ class Routes implements Module
             $data->inetCidrRouteIfIndex = intval($data->inetCidrRouteIfIndex);
             $data->inetCidrRouteType = intval($data->inetCidrRouteType);
             $data->inetCidrRouteProto = intval($data->inetCidrRouteProto);
-            $data->inetCidrRouteNextHopAS = intval($data->inetCidrRouteNextHopAS);
+            $nextHopAS = intval($data->inetCidrRouteNextHopAS);
+            $data->inetCidrRouteNextHopAS = $nextHopAS < 0 ? $nextHopAS + 4294967296 : $nextHopAS; //32bit ASN wrapped negative by signed Integer32 in RFC2096 ipCidrRouteTable
             $data->inetCidrRouteMetric1 = intval($data->inetCidrRouteMetric1) < 0 ? 0 : intval($data->inetCidrRouteMetric1); //negative val from RFC1213
             $data->inetCidrRouteDestType ??= '';
             $data->inetCidrRouteDest = $dst;
