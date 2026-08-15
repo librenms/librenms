@@ -187,6 +187,15 @@ final class SnmpResponseTest extends TestCase
         $this->assertEquals(['SNMPv2-MIB::sysDescr' => [1 => "something\n on two lines"]], $response->table());
     }
 
+    public function testMultiLineKeepsBlankLines(): void
+    {
+        // agent scripts (nsExtendOutputFull) commonly separate blocks with blank lines, they must not be dropped
+        $response = new SnmpResponse("NET-SNMP-EXTEND-MIB::nsExtendOutputFull[bird2] = first block\nstill first\n\nsecond block\n\n\nthird block\n");
+
+        $this->assertTrue($response->isValid());
+        $this->assertEquals("first block\nstill first\n\nsecond block\n\n\nthird block", $response->value());
+    }
+
     public function numericTest(): void
     {
         $response = new SnmpResponse(".1.3.6.1.2.1.2.2.1.10.1 = 495813425\n.1.3.6.1.2.1.2.2.1.10.2 = 3495809228\n");

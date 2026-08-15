@@ -148,11 +148,22 @@ class SnmpResponse implements \Stringable
 
         $this->inferValueEncoding ??= ! StringHelpers::isValidUtf8($this->raw);
         $this->values = [];
-        $line = strtok($this->raw, PHP_EOL);
-        while ($line !== false) {
+        // don't use strtok() here, it collapses consecutive delimiters, dropping blank lines inside multi-line values
+        $lines = explode(PHP_EOL, $this->raw);
+        while ($lines !== [] && trim(end($lines)) === '') {
+            array_pop($lines); // trailing blank lines are never part of a value
+        }
+        $count = count($lines);
+        $index = 0;
+        while ($index < $count) {
+            $line = $lines[$index++];
+
+            if (trim($line) === '') {
+                continue; // blank line where an oid is expected
+            }
+
             if (Str::contains($line, ['at this OID', 'this MIB View', 'End of MIB']) || str_ends_with($line, ' = NULL')) {
                 // these occur when we seek past the end of data, usually the end of the response, but grab the next line and continue
-                $line = strtok(PHP_EOL);
                 continue;
             }
 
@@ -162,10 +173,9 @@ class SnmpResponse implements \Stringable
             }
             [$oid, $value] = $parts;
 
-            $line = strtok(PHP_EOL); // get the next line and concatenate multi-line values
-            while ($line !== false && ! Str::contains($line, self::KEY_VALUE_DELIMITER)) {
-                $value .= PHP_EOL . $line;
-                $line = strtok(PHP_EOL);
+            // consume following lines that aren't a new oid, they are part of a multi-line value
+            while ($index < $count && ! Str::contains($lines[$index], self::KEY_VALUE_DELIMITER)) {
+                $value .= PHP_EOL . $lines[$index++];
             }
 
             // remove extra escapes
