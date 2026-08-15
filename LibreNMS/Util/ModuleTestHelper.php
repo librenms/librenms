@@ -43,7 +43,7 @@ class ModuleTestHelper
     private bool $quiet = false;
     private readonly string $variant;
     private readonly string $snmprec_file;
-    private string $json_file;
+    private readonly string $json_file;
     private readonly string $snmprec_dir;
     private readonly string $json_dir;
     private readonly string $file_name;
