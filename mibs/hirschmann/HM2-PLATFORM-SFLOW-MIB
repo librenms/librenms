@@ -1,0 +1,52 @@
+HM2-PLATFORM-SFLOW-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hm2PlatformMibs
+        FROM HM2-TC-MIB
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    InterfaceIndexOrZero                
+    	FROM IF-MIB;        
+        
+
+    hm2PlatformSflow  MODULE-IDENTITY
+    LAST-UPDATED "201110120000Z"
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION 
+        "The Hirschmann Private Platform2 MIB for sFlow.
+         Copyright (C) 2011. All Rights Reserved."
+    REVISION "201110120000Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { hm2PlatformMibs 59 }
+
+    --***********************************************************************
+    -- MIB Objects
+    --***********************************************************************
+
+
+    hm2AgentFastPathSflowObjects  OBJECT IDENTIFIER  ::= { hm2PlatformSflow 1 }
+
+    --**************************************************************************************
+    -- hm2AgentSflowSourceInterface
+    --
+    --**************************************************************************************
+  hm2AgentSflowSourceInterface OBJECT-TYPE
+         SYNTAX      InterfaceIndexOrZero
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+              "A source-interface selection on an Interface Index (like vlan based
+              routing interface, port based routing interface, loopback interface,
+              tunnel interface). A non-zero value indicates ifIndex for the
+              corresponding interface entry in the ifTable is selected.
+              A zero value indicates source-interface is un-configured."
+         ::= { hm2AgentFastPathSflowObjects 1 }
+
+END

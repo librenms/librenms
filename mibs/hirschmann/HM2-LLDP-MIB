@@ -1,0 +1,114 @@
+HM2-LLDP-MIB DEFINITIONS ::= BEGIN
+
+-- *************************************************************
+-- Hirschmann LLDP MIB
+-- *************************************************************
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    Integer32              FROM SNMPv2-SMI
+    hm2ConfigurationMibs,
+    HmEnabledStatus        FROM HM2-TC-MIB
+    ifIndex                FROM IF-MIB;
+    
+
+hm2LLDPMib MODULE-IDENTITY
+   LAST-UPDATED "201104110000Z" -- April 11, 2011
+   ORGANIZATION "Hirschmann Automation and Control GmbH"
+   CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+   DESCRIPTION
+      "Hirschmann LLDP MIB.
+       Copyright (C) 2011. All Rights Reserved."
+   REVISION "201104110000Z" -- April 11, 2011
+   DESCRIPTION
+      "Initial version."
+   ::= { hm2ConfigurationMibs 34 }
+
+-- *************************************************************
+-- hm2LLDPMib
+-- *************************************************************
+hm2LLDPMibObjects  		OBJECT IDENTIFIER ::= { hm2LLDPMib 1 }
+-- hm2LLDPMibConformance  	OBJECT IDENTIFIER ::= { hm2LLDPMib 2 }
+
+-- *************************************************************
+-- hm2LLDP groups
+-- *************************************************************
+hm2LLDPConfigGroup OBJECT IDENTIFIER ::= { hm2LLDPMibObjects 1 }
+         
+-- *************************************************************
+-- hm2LLDPConfigGroup
+-- *************************************************************
+hm2LLDPAdminStatus OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Enable/Disable LLDP operation. A (1) enables, a (2) disables."
+   DEFVAL { enable }           
+   ::= { hm2LLDPConfigGroup 1 }
+
+hm2LLDPIfTable   OBJECT-TYPE
+   SYNTAX   SEQUENCE OF Hm2LLDPIfEntry
+   MAX-ACCESS     not-accessible
+   STATUS   current
+   DESCRIPTION
+      "This table contains variables for each interface of the switch."
+   ::= { hm2LLDPConfigGroup 2 }
+
+
+hm2LLDPIfEntry   OBJECT-TYPE
+   SYNTAX   Hm2LLDPIfEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION 
+      "The entry of the hmLLDPInterfaceTable."
+   INDEX { ifIndex }
+   ::= { hm2LLDPIfTable 1 }
+
+Hm2LLDPIfEntry ::= SEQUENCE {
+   hm2LLDPIfMaxNeighbors Integer32,
+   hm2LLDPIfFDBMode INTEGER
+   }
+
+hm2LLDPIfMaxNeighbors OBJECT-TYPE
+   SYNTAX Integer32 (1..50)
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Configure Hirschmann LLDP on this physical port.
+      This value limits the number of entries in the remTable for this port."
+   DEFVAL { 10 }                
+   ::= { hm2LLDPIfEntry 1 }
+   
+hm2LLDPIfFDBMode   OBJECT-TYPE
+   SYNTAX INTEGER { 
+      lldpOnly(1),
+      macOnly(2),
+      both(3),
+      autoDetect(4)
+   }
+   MAX-ACCESS     read-write
+   STATUS   current
+   DESCRIPTION
+      "If configured to lldpOnly(1), only received LLDP messages
+      will be used to populate the LLDP-MIB's remTable.
+      If configured to macOnly(2), a learned mac addresses out of the 
+      switch's forwarding database (FDB) will be used to populate the 
+      LLDP-MIB's remTable. A learned mac address will only be used when exactly 
+      one mac address entry is present in the FDB for the interface.
+      If configured to both(3), both received LLDP messages
+      and a learned mac addresses out of the switch's FDB
+      will be used to populate the LLDP-MIB's remTable.
+      If configured to autoDetect(4) and LLDP messages are received on this 
+      port, this mode will behave like lldpOnly(1), 
+      otherwise it will behave like macOnly(2)."
+   DEFVAL { autoDetect }
+   ::= { hm2LLDPIfEntry 2 }
+
+END

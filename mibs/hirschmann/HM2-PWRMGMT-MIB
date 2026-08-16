@@ -1,0 +1,390 @@
+
+HM2-PWRMGMT-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Hirschmann Power Management MIB
+-- *************************************************************
+--
+
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE,
+    OBJECT-TYPE, 
+    Integer32					FROM SNMPv2-SMI -- RFC 2578
+	SnmpAdminString             FROM SNMP-FRAMEWORK-MIB
+    hm2ConfigurationMibs        FROM HM2-TC-MIB;
+
+hm2PowerMgmtMib MODULE-IDENTITY
+	LAST-UPDATED "201103160000Z" -- March 16, 2011
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann Power Management MIB.
+         Copyright (C) 2011. All Rights Reserved."
+    REVISION     "201103160000Z" -- March 16, 2011
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 11 }
+
+--
+-- *************************************************************
+-- hm2PowerMgmtMib
+-- *************************************************************
+--
+hm2PowerMgmtMibNotifications	OBJECT IDENTIFIER ::= { hm2PowerMgmtMib 0 }
+hm2PowerMgmtMibObjects			OBJECT IDENTIFIER ::= { hm2PowerMgmtMib 1 }
+-- hm2PowerMgmtMibConformance			OBJECT IDENTIFIER ::= { hm2PowerMgmtMib 2 }
+
+--
+-- *************************************************************
+-- hm2PowerMgmtMib groups
+-- *************************************************************
+--
+hm2PowerSupplyGroup OBJECT IDENTIFIER ::= { hm2PowerMgmtMibObjects 1 }
+
+
+--
+-- chassis / Power Supply Table  --
+--
+
+hm2PSTable	OBJECT-TYPE
+			 SYNTAX 		SEQUENCE OF Hm2PSEntry
+			 MAX-ACCESS 	not-accessible
+			 STATUS 		current
+			 DESCRIPTION
+				 "This table contains all variables related to the power supply
+				 units of the chassis/switch. For each power supply slot exists
+				 one instance."
+			 ::= { hm2PowerSupplyGroup 1 }
+
+hm2PSEntry	OBJECT-TYPE
+			 SYNTAX 		Hm2PSEntry
+			 MAX-ACCESS 	not-accessible
+			 STATUS 		current
+			 DESCRIPTION   	"The entry of the hm2PSTable."
+			 INDEX			{ hm2PSID }
+			 ::= { hm2PSTable 1}
+
+Hm2PSEntry ::= SEQUENCE {
+			 hm2PSID 		Integer32,
+			 hm2PSState		INTEGER	 
+			 }
+
+hm2PSID	 OBJECT-TYPE
+			 SYNTAX 		Integer32 (1..8)
+			 MAX-ACCESS    	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "This index is used to identify the associated power supply
+				 unit."
+			 ::= { hm2PSEntry 1 }
+
+hm2PSState	OBJECT-TYPE
+			 SYNTAX 		INTEGER {
+							present (1),
+							defective (2),
+							notInstalled (3),
+							unknown (4)
+							}
+			 MAX-ACCESS 	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "Indicates the operational state of the associated power
+				 supply. If the value of this variable changes, a hm2PowerSupply
+				 trap is sent."
+			 ::= { hm2PSEntry 2 }
+
+--
+-- hm2PSUSlotInfoTable
+--			
+hm2PSUSlotInfoTable	OBJECT-TYPE
+			 SYNTAX 		SEQUENCE OF Hm2PSUSlotInfoEntry
+			 MAX-ACCESS 	not-accessible
+			 STATUS 		current
+			 DESCRIPTION
+				 "This table contains all EEPROM variables related to the power supply
+				 slot modules of the chassis/switch. For each power supply slot module exists
+				 one instance."
+			 ::= { hm2PowerSupplyGroup 10 }
+
+hm2PSUSlotInfoEntry	OBJECT-TYPE
+			 SYNTAX 		Hm2PSUSlotInfoEntry
+			 MAX-ACCESS 	not-accessible
+			 STATUS 		current
+			 DESCRIPTION   	"The entry of the hm2PSUSlotInfoTable."
+			 INDEX			{ hm2PSUSlotIndex }
+			 ::= { hm2PSUSlotInfoTable 1}
+
+Hm2PSUSlotInfoEntry ::= SEQUENCE {
+			 hm2PSUSlotIndex 			Integer32,
+			 hm2PSUSlotChassisTypeId	INTEGER,
+			 hm2PSUSlotManufacturerId	INTEGER,
+			 hm2PSUSlotManufacturerDate SnmpAdminString,
+			 hm2PSUSlotSerialNumber		SnmpAdminString,
+			 hm2PSUSlotProductCode		SnmpAdminString,
+			 hm2PSUSlotDescription		SnmpAdminString,
+			 hm2PSUSlotCombinationType  INTEGER,
+			 hm2PSUSlotTemperatureRange INTEGER,
+			 hm2PSUSlotRevisionId		Integer32
+			 }
+
+hm2PSUSlotIndex	 OBJECT-TYPE
+			 SYNTAX 		Integer32 (1..4)
+			 MAX-ACCESS    	not-accessible
+			 STATUS 		current
+			 DESCRIPTION
+				 "This index is used to identify the associated power supply
+				 slot module."
+			 ::= { hm2PSUSlotInfoEntry 1 }
+			 
+hm2PSUSlotChassisTypeId	 OBJECT-TYPE
+			 SYNTAX INTEGER {
+			 				  other(0),
+							  mach1020(1),
+							  mach4000(2),
+							  railswitch(3),
+							  grs(4)
+							}
+			 MAX-ACCESS    	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "The chassis type id of the associated power supply
+				 slot module."
+			 ::= { hm2PSUSlotInfoEntry 2 }
+
+hm2PSUSlotManufacturerId	 OBJECT-TYPE
+			 SYNTAX 		INTEGER {
+										  other(0),
+										  hirschmann(1)
+									   }
+			 MAX-ACCESS    	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "The manufacturer id of the associated power supply
+				 slot module."
+			 ::= { hm2PSUSlotInfoEntry 3 }
+
+hm2PSUSlotManufacturerDate	 OBJECT-TYPE
+			 SYNTAX 		SnmpAdminString
+			 MAX-ACCESS    	read-only
+			 STATUS 		obsolete
+			 DESCRIPTION
+				 "The manufacturer date of the associated power supply
+				 slot module.
+				 *** NOTE this is set to OBSOLETE ***"
+			 ::= { hm2PSUSlotInfoEntry 4 }			 
+			 
+hm2PSUSlotSerialNumber	 OBJECT-TYPE
+			 SYNTAX 		SnmpAdminString
+			 MAX-ACCESS    	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "The serial number of the associated power supply
+				 slot module."
+			 ::= { hm2PSUSlotInfoEntry 5 }
+			 
+hm2PSUSlotProductCode	 OBJECT-TYPE
+			 SYNTAX 		SnmpAdminString
+			 MAX-ACCESS    	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "The product code of the associated power supply
+				 slot module."
+			 ::= { hm2PSUSlotInfoEntry 6 }
+			 
+hm2PSUSlotDescription	 OBJECT-TYPE
+			 SYNTAX 		SnmpAdminString
+			 MAX-ACCESS    	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "The description of the associated power supply
+				 slot module."
+			 ::= { hm2PSUSlotInfoEntry 7 }
+			 
+hm2PSUSlotCombinationType	 OBJECT-TYPE
+			 SYNTAX 		INTEGER {
+									  only-on-psu1(0),
+									  psu1-sys-psu2-poe(1),
+									  psu1-poe-psu2-sys(2),
+									  two-separate-psus(3)
+								   }
+			 MAX-ACCESS    	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "The combination type of the associated power supply
+				 slot module."
+			 ::= { hm2PSUSlotInfoEntry 8 }
+			 
+hm2PSUSlotTemperatureRange	 OBJECT-TYPE
+			 SYNTAX 		INTEGER {
+									  tr-0-60(0),
+									  tr-minus40-60(1),
+									  tr-minus40-70(2),
+									  tr-minus40-70cc(3),
+									  tr-minus40-85(4),
+									  tr-minus40-85cc(5)
+								   }
+			 MAX-ACCESS    	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "The temperature range of the associated power supply
+				 slot module."
+			 ::= { hm2PSUSlotInfoEntry 9 }
+
+hm2PSUSlotRevisionId	 	OBJECT-TYPE
+		 	 SYNTAX 		Integer32 (0..255)
+			 MAX-ACCESS    	read-only
+			 STATUS 		current
+			 DESCRIPTION
+			 	 "Hardware revision of the PSU"
+		 ::= { hm2PSUSlotInfoEntry 10 }			 
+			 		 
+--
+-- hm2PSUUnitInfoTable
+--			 
+hm2PSUUnitInfoTable	OBJECT-TYPE
+			 SYNTAX 		SEQUENCE OF Hm2PSUUnitInfoEntry
+			 MAX-ACCESS 	not-accessible
+			 STATUS 		current
+			 DESCRIPTION
+				 "This table contains all EEPROM variables related to the power supply
+				 slot module units. For each power supply slot module exists
+				 up to two instances."
+			 ::= { hm2PowerSupplyGroup 20 }
+
+hm2PSUUnitInfoEntry	OBJECT-TYPE
+			 SYNTAX 		Hm2PSUUnitInfoEntry
+			 MAX-ACCESS 	not-accessible
+			 STATUS 		current
+			 DESCRIPTION   	"The entry of the hm2PSUUnitInfoTable."
+			 INDEX			{ hm2PSUSlotIndex, hm2PSUUnitIndex }
+			 ::= { hm2PSUUnitInfoTable 1}
+
+Hm2PSUUnitInfoEntry ::= SEQUENCE {
+			 hm2PSUUnitIndex 			 Integer32,
+			 hm2PSUUnitConverterType	 INTEGER,
+			 hm2PSUUnitNumberOfInputs	 Integer32,
+			 hm2PSUUnitOutputType        INTEGER,
+			 hm2PSUUnitSystemBudget      Integer32,
+			 hm2PSUUnitPoeBudget         Integer32,
+			 hm2PSUUnitFanCount			 Integer32,
+			 hm2PSUUnitVoltageRange      INTEGER,
+			 hm2PSUUnitPowerInterruption INTEGER 
+			 }
+
+hm2PSUUnitIndex	 OBJECT-TYPE
+			 SYNTAX 		Integer32 (1..2)
+			 MAX-ACCESS    	not-accessible
+			 STATUS 		current
+			 DESCRIPTION
+				 "The number of PSU units on the associated power supply
+				 slot module."
+			 ::= { hm2PSUUnitInfoEntry 1 }
+			 
+hm2PSUUnitConverterType	 OBJECT-TYPE
+			 SYNTAX 		INTEGER {
+									  ac(1),
+									  dc(2)
+								   }
+			 MAX-ACCESS    	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "The converter type of the associated power supply
+				 slot module unit."
+			 ::= { hm2PSUUnitInfoEntry 2 }
+			 
+hm2PSUUnitNumberOfInputs	 OBJECT-TYPE
+			 SYNTAX 		Integer32(0..2)
+			 MAX-ACCESS    	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "The number of inputs of the associated power supply
+				 slot module unit."
+			 ::= { hm2PSUUnitInfoEntry 3 }
+			 
+hm2PSUUnitOutputType	 OBJECT-TYPE
+			 SYNTAX 		INTEGER {
+									  system(1),
+									  both(2),
+									  poe(3)
+									}
+			 MAX-ACCESS    	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "The output type of the associated power supply
+				 slot module unit."
+			 ::= { hm2PSUUnitInfoEntry 4 }
+			 
+hm2PSUUnitSystemBudget	 OBJECT-TYPE
+			 SYNTAX 		Integer32(0..1000)
+			 MAX-ACCESS    	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "The system budget of the associated power supply
+				 slot module unit."
+			 ::= { hm2PSUUnitInfoEntry 5 }
+			 
+hm2PSUUnitPoeBudget	 OBJECT-TYPE
+			 SYNTAX 		Integer32(0..1000)
+			 MAX-ACCESS    	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "The PoE budget of the associated power supply
+				 slot module unit."
+			 ::= { hm2PSUUnitInfoEntry 6 }
+
+hm2PSUUnitFanCount	 OBJECT-TYPE
+			 SYNTAX 		Integer32(0..2)
+			 MAX-ACCESS    	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "The fan count of the associated power supply
+				 slot module unit."
+			 ::= { hm2PSUUnitInfoEntry 7 }
+			 
+hm2PSUUnitVoltageRange	 OBJECT-TYPE
+			 SYNTAX 		INTEGER {
+									  vr-18-60vdc(0),
+									  vr-24-60vdc(1),
+									  vr-24-48vdc(2),
+									  vr-60-250vdc-110-240vac(3),
+									  vr-48-54vdc-poe(4)
+								   }
+			 MAX-ACCESS    	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "The voltage range of the associated power supply
+				 slot module unit."
+			 ::= { hm2PSUUnitInfoEntry 8 }
+			 
+hm2PSUUnitPowerInterruption	 OBJECT-TYPE
+			 SYNTAX 		INTEGER {
+									  yes(1),
+									  no(2)
+								   }
+			 MAX-ACCESS    	read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "The power interruption value of the associated power supply
+				 slot module unit."
+			 ::= { hm2PSUUnitInfoEntry 9 }
+
+-- 
+-- ***********************************************************
+-- hm2PowerMgmtMibMibNotifications
+-- ***********************************************************
+--
+hm2PowerSupplyTrap	NOTIFICATION-TYPE
+		OBJECTS		{ hm2PSID, hm2PSState }
+		STATUS  	current
+		DESCRIPTION	
+			"This trap is sent when the value of hm2PSState has been changed."
+		::= { hm2PowerMgmtMibNotifications 1 }
+		
+END
+

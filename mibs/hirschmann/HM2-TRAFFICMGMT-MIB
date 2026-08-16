@@ -1,0 +1,248 @@
+
+HM2-TRAFFICMGMT-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Hirschmann Traffic Management MIB
+-- *************************************************************
+--
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32					FROM SNMPv2-SMI -- RFC 2578
+    ifIndex             		FROM IF-MIB
+    hm2ConfigurationMibs,
+    HmEnabledStatus             FROM HM2-TC-MIB;
+
+hm2TrafficMgmtMib MODULE-IDENTITY
+    LAST-UPDATED "201103160000Z" -- March 16, 2011
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann Traffic Management MIB.
+         Copyright (C) 2011. All Rights Reserved."
+    REVISION     "201103160000Z" -- March 16, 2011
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 31 }
+
+--
+-- *************************************************************
+-- hm2TrafficMgmtMib
+-- *************************************************************
+--
+hm2TrafficMgmtMibNotifications		OBJECT IDENTIFIER ::= { hm2TrafficMgmtMib 0 }
+hm2TrafficMgmtMibObjects			OBJECT IDENTIFIER ::= { hm2TrafficMgmtMib 1 }
+-- hm2TrafficMgmtMibConformance			OBJECT IDENTIFIER ::= { hm2TrafficMgmtMib 2 }
+hm2TrafficMgmtMibExtensionGroup		OBJECT IDENTIFIER ::= { hm2TrafficMgmtMib 3 }
+
+--
+-- *************************************************************
+-- hm2TrafficTable
+-- *************************************************************
+--
+
+hm2TrafficMgmtIfTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2TrafficMgmtIfEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "A list of management objects for traffic control per interface."
+	::= { hm2TrafficMgmtMibObjects 1 }
+
+hm2TrafficMgmtIfEntry OBJECT-TYPE
+	SYNTAX Hm2TrafficMgmtIfEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Traffic Mgmt table entry."
+	INDEX { ifIndex }
+	::= { hm2TrafficMgmtIfTable 1 }
+
+Hm2TrafficMgmtIfEntry ::= SEQUENCE {
+						 hm2TrafficMgmtIfFlowControl 						HmEnabledStatus,
+						 hm2TrafficMgmtIfEgressShapingRate					Unsigned32,
+						 hm2TrafficMgmtIfEgressShapingRateUnit				INTEGER,
+ 					     hm2TrafficMgmtIfIngressStormCtlThresholdUnit 		INTEGER,
+						 hm2TrafficMgmtIfIngressStormCtlBcastMode			HmEnabledStatus,
+						 hm2TrafficMgmtIfIngressStormCtlBcastThreshold		Unsigned32,
+						 hm2TrafficMgmtIfIngressStormCtlMcastMode			HmEnabledStatus,
+						 hm2TrafficMgmtIfIngressStormCtlMcastThreshold		Unsigned32,
+						 hm2TrafficMgmtIfIngressStormCtlUcastMode			HmEnabledStatus,
+						 hm2TrafficMgmtIfIngressStormCtlUcastThreshold		Unsigned32 
+						}
+
+hm2TrafficMgmtIfFlowControl OBJECT-TYPE
+	SYNTAX 			HmEnabledStatus
+	MAX-ACCESS 		read-write
+	STATUS 		 	current
+	DESCRIPTION		"Enables or disables flow control per port"
+	DEFVAL  		{ enable }
+	::= { hm2TrafficMgmtIfEntry 1 }
+
+hm2TrafficMgmtIfEgressShapingRate OBJECT-TYPE
+	SYNTAX      	Unsigned32 
+    MAX-ACCESS  	read-write
+    STATUS     		current
+    DESCRIPTION     "Maximum bandwidth allowed for this interface as a 
+                     whole, typically used to shape the outbound 
+                     transmission rate. The value is either specified in terms 
+                     of percentage of overall link speed for the port in 
+                     1% increments or absolute in kbps. 
+                     A value of 0 means there is no maximum bandwidth limit 
+                     in effect. The default value is 0.
+                     Valid value ranges depend on the value returned by 
+                     object hm2TrafficMgmtIfEgressShapingRateUnit. If that 
+                     object returns percent(1), hm2TrafficMgmtIfEgressShapingRate
+                     accepts values 0..100.  If that object returns kbps(2),
+                     hm2TrafficMgmtIfEgressShapingRate accepts values 
+                     0,64..4294967295."
+	DEFVAL 			{ 0 }	
+	::= { hm2TrafficMgmtIfEntry 2 }
+	
+hm2TrafficMgmtIfEgressShapingRateUnit OBJECT-TYPE
+    SYNTAX      	INTEGER {
+                   		percent(1),
+                   		kbps(2)
+                	}
+	MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+                    "The unit of the interface shaping value.
+                     Can be either percentage of port speed 
+                     or kilobits per second (kbps)."
+	DEFVAL 			{ percent }
+    ::= { hm2TrafficMgmtIfEntry 3 }
+
+
+hm2TrafficMgmtIfIngressStormCtlThresholdUnit OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     percent(1),
+                     pps(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Configures the units of the threshold value(s) to percentage of
+                     port speed or absolute packets per second."
+         DEFVAL { percent }
+         ::= { hm2TrafficMgmtIfEntry 4}
+
+     
+hm2TrafficMgmtIfIngressStormCtlBcastMode OBJECT-TYPE
+	SYNTAX      	HmEnabledStatus
+    MAX-ACCESS  	read-write
+    STATUS      	current
+    DESCRIPTION
+                     "If enabled, broadcast storm recovery will function on this port.
+                     When you specify Enable for Broadcast Storm Recovery and the broadcast
+                     traffic on this Ethernet port exceeds the configured threshold, the
+                     switch blocks (discards) the broadcast traffic."
+    DEFVAL 		{ disable }
+    ::= { hm2TrafficMgmtIfEntry 5 }      
+    
+
+hm2TrafficMgmtIfIngressStormCtlBcastThreshold OBJECT-TYPE
+	SYNTAX      	Unsigned32 (0..14880000)
+   	MAX-ACCESS 		read-write
+   	STATUS      	current
+   	DESCRIPTION
+                    "Configures the broadcast storm recovery threshold for this port
+                     as a percentage of port speed in 1% increments or as an absolute pps rate.
+                     This threshold is also valid for multicasts or unknown unicasts,
+                     when the device does not support a separate limiter per storm type.
+                     (A separate limiter per storm-type is supported when 
+                      hm2TrafficMgmtIngressStormBucketType has the value 'multi-bucket')"
+	DEFVAL 			{ 0 }
+   ::= { hm2TrafficMgmtIfEntry 6 }
+
+                    
+hm2TrafficMgmtIfIngressStormCtlMcastMode OBJECT-TYPE
+	SYNTAX      	HmEnabledStatus
+    MAX-ACCESS  	read-write
+    STATUS      	current
+    DESCRIPTION
+                     "If enabled, multicast storm recovery will function on this port.
+                     When you specify Enable for multicast Storm Recovery and the multicast
+                     traffic on this Ethernet port exceeds the configured threshold, the
+                     switch blocks (discards) the multicast traffic."
+    DEFVAL 		{ disable }
+    ::= { hm2TrafficMgmtIfEntry 7 }      
+    
+
+hm2TrafficMgmtIfIngressStormCtlMcastThreshold OBJECT-TYPE
+	SYNTAX      	Unsigned32 (0..14880000)
+   	MAX-ACCESS 		read-write
+   	STATUS      	current
+   	DESCRIPTION
+                    "Configures the multicast storm recovery threshold for this port
+                     as a percentage of port speed in 1% increments or as an absolute pps rate."
+	DEFVAL 			{ 0 }
+   ::= { hm2TrafficMgmtIfEntry 8 }
+
+                  
+hm2TrafficMgmtIfIngressStormCtlUcastMode OBJECT-TYPE
+	SYNTAX      	HmEnabledStatus
+    MAX-ACCESS  	read-write
+    STATUS      	current
+    DESCRIPTION
+                     "If enabled, unknown unicast storm recovery will function on this port.
+                     When you specify Enable for unicast Storm Recovery and the unknown 
+                     unicast traffic on this Ethernet port exceeds the configured threshold, the
+                     switch blocks (discards) the unknown unicast traffic."
+    DEFVAL 		{ disable }
+    ::= { hm2TrafficMgmtIfEntry 9 }      
+    
+
+hm2TrafficMgmtIfIngressStormCtlUcastThreshold OBJECT-TYPE
+	SYNTAX      	Unsigned32 (0..14880000)
+   	MAX-ACCESS 		read-write
+   	STATUS      	current
+   	DESCRIPTION
+                    "Configures the unicast storm recovery threshold for this port
+                     as a percentage of port speed in 1% increments or as an absolute pps rate."
+	DEFVAL 			{ 0 }
+   ::= { hm2TrafficMgmtIfEntry 10 }
+
+        
+--
+-- *************************************************************
+-- hm2TrafficMgmt Objects
+-- *************************************************************
+--
+
+hm2TrafficMgmtFlowControl OBJECT-TYPE
+	  SYNTAX HmEnabledStatus
+	  MAX-ACCESS read-write
+	  STATUS	 current
+      DESCRIPTION
+	        	 "Enables or disables flow control for the
+	             switch unit."
+	  DEFVAL  { disable }
+	  ::= { hm2TrafficMgmtMibObjects 2 }
+
+hm2TrafficMgmtIngressStormBucketType OBJECT-TYPE
+	  SYNTAX  INTEGER {
+                  single-bucket(1),
+                  multi-bucket(2)
+              }
+	  MAX-ACCESS read-only
+	  STATUS	 current
+	  DESCRIPTION
+			"Enables or disables ingress storm admin state."
+	  ::= { hm2TrafficMgmtMibObjects 3 }
+
+--
+--***************************************************************************
+-- hm2TrafficMgmtMibExtensionGroup
+--***************************************************************************
+
+hm2TrafficMgmtNoFlowControl OBJECT-IDENTITY
+	  STATUS        current
+	  DESCRIPTION  "Do not change the flowcontrol settings for the Fast/Gigabit Ethernet SFP ports."
+	  ::= { hm2TrafficMgmtMibExtensionGroup 1 }
+
+END
