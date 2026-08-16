@@ -4,10 +4,10 @@ use LibreNMS\Util\IP;
 
 $extra_sql = '';
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'routing',
-    'proto'  => 'bgp',
+    'tab' => 'routing',
+    'proto' => 'bgp',
 ];
 
 if (! isset($vars['view'])) {
@@ -195,8 +195,9 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
         $afi = $afisafi['afi'];
         $safi = $afisafi['safi'];
         $this_afisafi = $afi . $safi;
-        $peer['afi'] = $sep . $afi . '.' . $safi;
-        $sep = '<br />';
+        // several families per session, and the cell is escaped
+        $peer['afi'] = ($peer['afi'] ?? '') . $sep . $afi . '.' . $safi;
+        $sep = ', ';
         $peer['afisafi'][$this_afisafi] = 1;
         // Build a list of valid AFI/SAFI for this peer
     }
