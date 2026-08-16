@@ -1,27 +1,14 @@
-#
-# Populates version / hardware / serial for hopf-8029ntsm devices using
-# scalar objects defined under hopf8029NTSMGeneral (hopf8029NTSM.1)
-# in HOPF8029NTSM-MIB.
-#
-# Install at: includes/definitions/discovery/hopf-8029ntsm.yaml   (LibreNMS 22.11.0 layout)
-#
-
 modules:
     os:
-        # hopf8029NTSMDeviceType, e.g. "8029NTSM1"
         hardware: HOPF8029NTSM-MIB::hopf8029NTSMDeviceType.0
 
-        # hopf8029NTSMFirmwareVersion, e.g. "01.00"
         version: HOPF8029NTSM-MIB::hopf8029NTSMFirmwareVersion.0
 
-        # hopf8029NTSMSerialNumber
         serial: HOPF8029NTSM-MIB::hopf8029NTSMSerialNumber.0
 
     sensors:
         state:
             data:
-                # --- Sync module lock state (SyncModule.6) ---
-                # 0 invalid, 1 crystal (holdover), 2 radio low precision, 3 radio high precision
                 -
                     oid: HOPF8029NTSM-MIB::SyncModuleTimeSyncStateInt
                     value: HOPF8029NTSM-MIB::SyncModuleTimeSyncStateInt
@@ -36,7 +23,6 @@ modules:
                         - { value: 2, generic: 1, descr: 'radio synchronous, low precision' }
                         - { value: 3, generic: 0, descr: 'radio synchronous, high precision' }
 
-                # --- Daylight saving time indicator (SyncModule.2) --- informational only
                 -
                     oid: HOPF8029NTSM-MIB::SyncModuleTimeDST
                     value: HOPF8029NTSM-MIB::SyncModuleTimeDST
@@ -49,7 +35,6 @@ modules:
                         - { value: 0, generic: 0, descr: 'Off' }
                         - { value: 1, generic: 0, descr: 'On' }
 
-                # --- DST change announcement (SyncModule.3) --- warn while a change is imminent
                 -
                     oid: HOPF8029NTSM-MIB::SyncModuleTimeDSTChange
                     value: HOPF8029NTSM-MIB::SyncModuleTimeDSTChange
@@ -62,7 +47,6 @@ modules:
                         - { value: 0, generic: 0, descr: 'Off' }
                         - { value: 1, generic: 1, descr: 'On (change within 1 hour)' }
 
-                # --- Leap second announcement (SyncModule.4) --- warn while insertion is imminent
                 -
                     oid: HOPF8029NTSM-MIB::SyncModuleTimeLEAP
                     value: HOPF8029NTSM-MIB::SyncModuleTimeLEAP
@@ -75,7 +59,6 @@ modules:
                         - { value: 0, generic: 0, descr: 'Off' }
                         - { value: 1, generic: 1, descr: 'On (insertion within 1 hour)' }
 
-                # --- Hardware error bits (SyncModuleError.5-7) ---
                 -
                     oid: HOPF8029NTSM-MIB::SyncModuleErrorCrystalRegulation
                     value: HOPF8029NTSM-MIB::SyncModuleErrorCrystalRegulation
@@ -110,7 +93,6 @@ modules:
                         - { value: 0, generic: 0, descr: 'error off' }
                         - { value: 1, generic: 2, descr: 'error on' }
 
-                # --- Software / config error bits (SyncModuleError.1-4) ---
                 -
                     oid: HOPF8029NTSM-MIB::SyncModuleErrorPCID
                     value: HOPF8029NTSM-MIB::SyncModuleErrorPCID
@@ -156,7 +138,6 @@ modules:
                         - { value: 0, generic: 0, descr: 'error off' }
                         - { value: 1, generic: 2, descr: 'error on' }
 
-                # --- NTP leap indicator (ntpSystem.1) ---
                 -
                     oid: HOPF8029NTSM-MIB::ntpSysLeap
                     value: HOPF8029NTSM-MIB::ntpSysLeap
@@ -171,7 +152,6 @@ modules:
                         - { value: 2, generic: 1, descr: 'leap second to be subtracted' }
                         - { value: 3, generic: 2, descr: 'alarm (clock not synchronized)' }
 
-                # --- Calculated NTP accuracy (ntp.3) ---
                 -
                     oid: HOPF8029NTSM-MIB::ntpAccuracy
                     value: HOPF8029NTSM-MIB::ntpAccuracy
