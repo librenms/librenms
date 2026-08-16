@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Facades\LibrenmsConfig;
+use App\Observers\SensorObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -15,6 +17,7 @@ use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 
+#[ObservedBy([SensorObserver::class])]
 class Sensor extends SensorModel implements Keyable
 {
     use HasFactory;
@@ -112,7 +115,7 @@ class Sensor extends SensorModel implements Keyable
         return match ($this->sensor_class) {
             'temperature' => $user && UserPref::getPref($user, 'temp_units') == 'f' ? Rewrite::celsiusToFahrenheit($value) . ' °F' : round($value, 2) . ' °C',
             'state' => $this->currentTranslation()->state_descr ?? 'Unknown',
-            'current', 'power' => Number::formatSi($value, 3, 0, $this->unit()),
+            'current', 'power', 'frequency' => Number::formatSi($value, 3, 0, $this->unit()),
             'runtime' => Time::formatInterval($value * 60),
             'power_consumed' => trim(Number::formatSi($value * 1000, 5, 5, 'Wh')),
             'dbm' => round($value, 3) . ' ' . $this->unit(),

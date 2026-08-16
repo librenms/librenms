@@ -1,26 +1,25 @@
 # GateOne integration
 
-We have simple integration for
-[GateOne](https://github.com/liftoff/GateOne), you will be redirected
-to your Gateone command line frontend to access your
-equipment. (Currently this only works with SSH)
+LibreNMS has a simple integration for
+[GateOne](https://github.com/liftoff/GateOne). It sends you to your
+GateOne command line frontend for access to your equipment. This
+integration works only with SSH.
 
-GateOne itself isn't included within LibreNMS, you will need to
-install this separately either on the same infrastructure as LibreNMS
-or as a totally  standalone appliance. The installation is beyond the
-scope of this document.
+LibreNMS does not include GateOne. Install it separately on the
+LibreNMS infrastructure or on a standalone appliance. This document
+does not describe that installation.
 
-Config is simple, include the following in your `config.php`:
+Add this line to your `config.php`:
 
 ```php
 $config['gateone']['server'] = 'http://<your_gateone_url/';
 ```
 
-**Note:** You *must* use the full url including the trailing `/`!
+**Note:** use the full URL with the `/` at the end.
 
-We also support prefixing the currently logged in Librenms user to the
-SSH connection URL that is created, eg. `ssh://admin@localhost`\ To
-enable this, put the following in your `config.php`:
+LibreNMS can also put the current LibreNMS user at the start of the SSH
+connection URL, for example `ssh://admin@localhost`. To enable this
+behaviour, add this line to your `config.php`:
 
 ```php
 $config['gateone']['use_librenms_user'] = true;

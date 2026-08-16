@@ -26,11 +26,14 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Http\Controllers\Controller;
+use App\Models\AccessPoint;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
-class AccessPointsController implements DeviceTab
+class AccessPointsController extends Controller implements DeviceTab
 {
     public function visible(Device $device): bool
     {
@@ -55,5 +58,25 @@ class AccessPointsController implements DeviceTab
     public function data(Device $device, Request $request): array
     {
         return [];
+    }
+
+    public function show(Device $device, AccessPoint $accessPoint): View
+    {
+        $this->authorize('view', $device);
+        abort_if($accessPoint->deleted, 404);
+
+        return view('device.tabs.accesspoints.show', [
+            'device' => $device,
+            'accessPoint' => $accessPoint,
+            'graphs' => [
+                ['type' => 'accesspoints_numasoclients', 'title' => __('Associated Clients')],
+                ['type' => 'accesspoints_interference', 'title' => __('Interference Index')],
+                ['type' => 'accesspoints_channel', 'title' => __('Channel')],
+                ['type' => 'accesspoints_txpow', 'title' => __('Transmit Power')],
+                ['type' => 'accesspoints_radioutil', 'title' => __('Radio Utilization')],
+                ['type' => 'accesspoints_nummonclients', 'title' => __('Monitored Clients')],
+                ['type' => 'accesspoints_nummonbssid', 'title' => __('Number of monitored BSSIDs')],
+            ],
+        ]);
     }
 }

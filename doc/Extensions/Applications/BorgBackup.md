@@ -2,13 +2,13 @@
 
 ### SNMP Extend
 
-1. Copy the shell script to the desired host.
+1. Copy the shell script to the host.
 
 ```bash
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/borgbackup -O /etc/snmp/borgbackup
 ```
 
-2. Make the script executable
+2. Make the script executable.
 
 ```bash
 chmod +x /etc/snmp/borgbackup
@@ -78,7 +78,7 @@ repo=1234abc
 
 For multi, each section outside of the root represents a repo. So if
 there is '/backup/borg1' with a passphrase of 'foobar' and
-'/backup/derp' with a passcommand of 'pass show backup' it would be
+'/backup/derp' with the passcommand 'pass show backup' is
 like below.
 
 ```bash
@@ -102,7 +102,7 @@ The metrics are all from `.data.totals` in the extend return.
 
 | Value                    | Type    | Description                                               |
 |--------------------------|---------|-----------------------------------------------------------|
-| errored                  | repos   | Total number of repos that info could not be fetched for. |
+| errored                  | repos   | The number of repos without information. |
 | locked                   | repos   | Total number of locked repos                              |
 | locked_for               | seconds | Longest time any repo has been locked.                    |
 | time_since_last_modified | seconds | Largest time - mtime for the repo nonce                   |

@@ -72,12 +72,20 @@ class DevicePolicy
     }
 
     /**
-     * Determine whether the user can view the stored configuration of the device
-     * from Oxidized or Rancid
+     * Determine whether the user can view configuration backups for the device.
      */
-    public function showConfig(User $user, Device $device): bool
+    public function configBackupView(User $user, Device $device): bool
     {
-        return $this->hasGlobalPermission($user, 'showConfig')
+        return $user->can('config-backup.view')
+            && $this->view($user, $device);
+    }
+
+    /**
+     * Determine whether the user can trigger a configuration backup for the device.
+     */
+    public function configBackupRefresh(User $user, Device $device): bool
+    {
+        return $user->can('config-backup.refresh')
             && $this->view($user, $device);
     }
 

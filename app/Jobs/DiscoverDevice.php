@@ -138,7 +138,7 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
                 }
 
                 // isolate module exceptions so they don't disrupt the discovery process
-                Eventlog::log("Error discovering $module module. Check log file for more details.", $this->device, 'discovery', Severity::Error);
+                Eventlog::log("Error discovering $module module: " . class_basename($e) . '. Check log file for more details.', $this->device, 'discovery', Severity::Error);
                 report($e);
             }
 
