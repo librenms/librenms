@@ -25,8 +25,16 @@ namespace LibreNMS\Util;
 
 class Bird2
 {
-    /** bird pads this header to a fixed width */
     public const HEADER = 'Name       Proto      Table      State  Since         Info';
+
+    /** cbgp rrd datasets, in the order the rrd expects them */
+    public const PREFIX_DATASETS = [
+        'AcceptedPrefixes',
+        'DeniedPrefixes',
+        'AdvertisedPrefixes',
+        'SuppressedPrefixes',
+        'WithdrawnPrefixes',
+    ];
 
     /**
      * Parse `birdc show protocols all` into one entry per BGP protocol.
@@ -37,20 +45,16 @@ class Bird2
     {
         $protocolsData = [];
 
-        // Remove headers
-        $birdOutput = trim(explode(self::HEADER, $output, 2)[1]);
-        $protocolSegments = explode("\n\n", $birdOutput);
+        $parts = explode(self::HEADER, $output, 2);
+        if (! isset($parts[1])) {
+            return $protocolsData;
+        }
 
-        // Remove the first title
-        unset($protocolSegments[0]);
-
-        foreach ($protocolSegments as $protocolSegment) {
-            // Deal with the title first
+        foreach (self::splitProtocols($parts[1]) as $protocolSegment) {
             $protocolSegmentParts = explode("\n", $protocolSegment, 2);
             $titleParts = preg_split("/\s+/", $protocolSegmentParts[0], 5);
 
-            // make sure we only look at BGP protocols
-            if ($titleParts[1] !== 'BGP') {
+            if (($titleParts[1] ?? null) !== 'BGP' || ! isset($protocolSegmentParts[1])) {
                 continue;
             }
 
@@ -62,75 +66,157 @@ class Bird2
                 'since' => preg_split("/\s+/", $titleParts[4], 3)[0] . ' ' . preg_split("/\s+/", $titleParts[4], 3)[1],
             ];
 
-            // Deal with the rest of the body
+            // same indent as the blocks below, so take it before splitting them
+            if (preg_match('/^\s+Description:\s*(.+)$/m', $protocolSegmentParts[1], $descriptionMatch)) {
+                $protocolData['description'] = trim($descriptionMatch[1]);
+            }
+
             $protocolBodys = preg_split("/^\s{2}([A-Z])/m", $protocolSegmentParts[1]);
 
-            // Loop through all BGP protocols
             foreach ($protocolBodys as $protocolBody) {
-                // Deal with the BGP block
                 if (str_starts_with($protocolBody, 'GP')) {
-                    foreach (explode("\n", 'B' . $protocolBody) as $protocolBodyLine) {
-                        if (str_contains($protocolBodyLine, ':')) {
-                            $lineParts = explode(':', $protocolBodyLine, 2);
-                            $protocolData[str_replace(' ', '_', strtolower(trim($lineParts[0])))] = trim($lineParts[1]);
-                        }
-                    }
+                    $protocolData = array_merge($protocolData, self::parseKeyedLines('B' . $protocolBody));
 
-                    // Fix up the error string
                     if (isset($protocolData['last_error'])) {
-                        // Trim the received
                         $protocolData['last_error'] = trim(str_ireplace('Received:', '', $protocolData['last_error']));
                     }
                 }
 
-                // Process the Ip channel (v4/v6)
-                $IpVersion = 4;
-                if (isset($protocolData['neighbor_address']) && filter_var($protocolData['neighbor_address'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-                    $IpVersion = 6;
+                if (! str_starts_with($protocolBody, 'hannel ')) {
+                    continue;
                 }
 
-                if (str_starts_with($protocolBody, 'hannel ipv' . $IpVersion)) {
-                    foreach (explode("\n", 'C' . $protocolBody) as $protocolBodyLine) {
-                        if (str_contains($protocolBodyLine, ':')) {
-                            $lineParts = explode(':', $protocolBodyLine, 2);
-                            $protocolData[str_replace(' ', '_', strtolower(trim($lineParts[0])))] = trim($lineParts[1]);
-                        }
-                    }
-
-                    // Fix up the ROUTES
-                    if (isset($protocolData['routes'])) {
-                        $routeParts = explode(', ', $protocolData['routes']);
-                        unset($protocolData['routes']);
-                        foreach ($routeParts as $routePart) {
-                            $routeDetail = explode(' ', $routePart);
-                            $protocolData['routes'][$routeDetail[1]] = $routeDetail[0];
-                        }
-                    }
-
-                    // Set the route updates
-                    unset($protocolData['route_change_stats']);
-                    foreach (['import_updates', 'import_withdraws', 'export_updates', 'export_withdraws'] as $key) {
-                        if (! isset($protocolData[$key])) {
-                            continue;
-                        }
-
-                        $routeChange_parts = preg_split("/\s+/", trim($protocolData[$key]));
-
-                        unset($protocolData[$key]);
-                        $protocolData['route_change_stats'][$key] = [
-                            'received' => $routeChange_parts[0],
-                            'rejected' => $routeChange_parts[1],
-                            'filtered' => $routeChange_parts[2],
-                            'ignored' => $routeChange_parts[3],
-                            'accepted' => $routeChange_parts[4],
-                        ];
-                    }
-                }
+                $channel = self::parseChannel('C' . $protocolBody);
+                $protocolData['channels'][$channel['afi'] . '.' . $channel['safi']] = $channel;
             }
 
-            $protocolsData[] = $protocolData;
+            // the peer's own family also populates the peer itself
+            $ipVersion = isset($protocolData['neighbor_address'])
+                && filter_var($protocolData['neighbor_address'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? 6 : 4;
+            $primaryChannel = $protocolData['channels']['ipv' . $ipVersion . '.unicast'] ?? [];
+            unset($primaryChannel['afi'], $primaryChannel['safi']);
+
+            $protocolsData[] = array_merge($protocolData, $primaryChannel);
         }
 
         return $protocolsData;
+    }
+
+    /**
+     * Channel counters mapped onto the bgpPeers_cbgp columns.
+     * Key order must match PREFIX_DATASETS, rrd updates are positional.
+     *
+     * @param  array<string, mixed>  $channel
+     * @return array<string, int>
+     */
+    public static function channelPrefixCounters(array $channel): array
+    {
+        $counters = [
+            'AcceptedPrefixes' => $channel['routes']['imported'] ?? 0,
+            'DeniedPrefixes' => $channel['route_change_stats']['import_updates']['rejected'] ?? 0,
+            'AdvertisedPrefixes' => $channel['routes']['exported'] ?? 0,
+            'SuppressedPrefixes' => $channel['route_change_stats']['import_updates']['filtered'] ?? 0,
+            'WithdrawnPrefixes' => $channel['route_change_stats']['import_withdraws']['accepted'] ?? 0,
+        ];
+
+        return array_map(fn ($value) => (int) Number::cast($value), $counters);
+    }
+
+    /**
+     * Split the protocol table into one block per protocol.
+     * Protocols start at column 0 and their detail is indented, blank lines are not reliable.
+     *
+     * @return list<string>
+     */
+    private static function splitProtocols(string $body): array
+    {
+        $segments = [];
+        $current = null;
+
+        foreach (explode("\n", $body) as $line) {
+            $line = rtrim($line, "\r");
+
+            if (trim($line) === '') {
+                continue;
+            }
+
+            if (ctype_space($line[0])) {
+                $current .= "\n" . $line; // continuation of the current protocol
+                continue;
+            }
+
+            if ($current !== null) {
+                $segments[] = $current;
+            }
+            $current = $line;
+        }
+
+        if ($current !== null) {
+            $segments[] = $current;
+        }
+
+        return $segments;
+    }
+
+    /**
+     * "Field: value" lines into snake_cased keys.
+     *
+     * @return array<string, string>
+     */
+    private static function parseKeyedLines(string $block): array
+    {
+        $data = [];
+
+        foreach (explode("\n", $block) as $line) {
+            if (str_contains($line, ':')) {
+                [$key, $value] = explode(':', $line, 2);
+                $data[str_replace(' ', '_', strtolower(trim($key)))] = trim($value);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function parseChannel(string $block): array
+    {
+        // "Channel ipv6" or "Channel ipv4 multicast"
+        $channelParts = preg_split("/\s+/", trim(explode("\n", $block, 2)[0]));
+
+        $channel = array_merge([
+            'afi' => $channelParts[1] ?? '',
+            'safi' => $channelParts[2] ?? 'unicast',
+        ], self::parseKeyedLines($block));
+
+        if (isset($channel['routes'])) {
+            $routeParts = explode(', ', $channel['routes']);
+            unset($channel['routes']);
+            foreach ($routeParts as $routePart) {
+                $routeDetail = explode(' ', $routePart);
+                $channel['routes'][$routeDetail[1]] = $routeDetail[0];
+            }
+        }
+
+        unset($channel['route_change_stats']);
+        foreach (['import_updates', 'import_withdraws', 'export_updates', 'export_withdraws'] as $key) {
+            if (! isset($channel[$key])) {
+                continue;
+            }
+
+            $routeChangeParts = preg_split("/\s+/", trim($channel[$key]));
+
+            unset($channel[$key]);
+            $channel['route_change_stats'][$key] = [
+                'received' => $routeChangeParts[0],
+                'rejected' => $routeChangeParts[1],
+                'filtered' => $routeChangeParts[2],
+                'ignored' => $routeChangeParts[3],
+                'accepted' => $routeChangeParts[4],
+            ];
+        }
+
+        return $channel;
     }
 }
