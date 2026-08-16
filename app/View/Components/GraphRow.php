@@ -5,11 +5,14 @@ namespace App\View\Components;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\View\Component;
+use Illuminate\View\View;
 
 class GraphRow extends Component
 {
     public bool $responsive;
     public ?int $rowWidth;
+    /** @var array<string, int> */
+    public array $graphColumns;
 
     /**
      * Create a new component instance.
@@ -35,14 +38,13 @@ class GraphRow extends Component
     {
         $this->responsive = $columns == 'responsive';
         $this->rowWidth = $this->calculateRowWidth((int) $columns);
+        $this->graphColumns = $this->responsive ? ['sm' => 2, 'lg' => 4] : [];
     }
 
     /**
      * Get the view / contents that represent the component.
-     *
-     * @return \Illuminate\Contracts\View\View|\Closure|string
      */
-    public function render()
+    public function render(): View
     {
         return view('components.graph-row');
     }

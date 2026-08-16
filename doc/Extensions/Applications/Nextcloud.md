@@ -29,13 +29,13 @@
 
 ### SNMP Extend
 
-1. Copy the shell script to the desired host.
+1. Copy the shell script to the host.
 
     ```bash
     wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/nextcloud -O /etc/snmp/nextcloud
     ```
 
-2. Make the script executable
+2. Make the script executable.
 
     ```bash
     chmod +x /etc/snmp/nextcloud
@@ -63,4 +63,4 @@
     extend nextcloud /bin/cat /var/cache/nextcloud_extend/snmp
     ```
 
-Then just wait for it to be rediscovered.
+Then wait for the rediscovery.

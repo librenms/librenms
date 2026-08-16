@@ -26,7 +26,7 @@ metrics below are provided.
 | errored             | Total checks that errored                                                                                             |
 | time_to_polling     | Difference in seconds between when polling data was generated and when polled                                         |
 | time_to_polling_abs | The absolute value of time_to_polling.                                                                                |
-| check_$CHECK        | Exit status of a specific check `$CHECK` is equal to the name of the check in question. So `foo` would be `check_foo` |
+| check_$CHECK        | Exit status of a specific check `$CHECK` is equal to the name of the check in question. So `foo` gives `check_foo` |
 
 The standard Nagios/Icinga style exit codes are used and those are as
 below.
@@ -38,10 +38,10 @@ below.
 | 2    | critical |
 | 3+   | unknown  |
 
-To use `time_to_polling`, it will need to enabled via setting the
+To use `time_to_polling`, enable it. Set the
 config item below. The default is false. Unless set to true, this
-value will default to 0. If enabling this, one will want to make sure
-that NTP is in use every were or it will alert if it goes over a
+value defaults to 0. With this option on, run NTP on every host.
+Without NTP, the check alerts above a
 difference of 540s.
 
 ```
@@ -85,9 +85,9 @@ at [MetaCPAN](https://metacpan.org/dist/Monitoring-Sneck-Boop_Snoot) and
    `/usr/local/etc/sneck.conf`. You con find it documented
    [here](https://metacpan.org/pod/Monitoring::Sneck#CONFIG-FORMAT).
 
-3. Set it up in cron. This will mean you don't need to wait for all
+3. Add it to cron. You then do not wait for all
    the checks to complete when polled via SNMP, which for like SMART
-   or other long running checks will mean it timing out. Also means it
+   or another long check. These checks cause a timeout. This method also
    does not need called via sudo as well.
 
     ```bash

@@ -28,13 +28,13 @@ working by running `unbound-control stats`.
     wget https://github.com/librenms/librenms-agent/raw/master/snmp/unbound -O /etc/snmp/unbound
     ```
 
-    2. Make the script executable
+    2. Make the script executable.
 
     ```bash
     chmod +x /etc/snmp/unbound
     ```
 
-    3. Edit your snmpd.conf file and add:
+    3. Edit your `snmpd.conf` file and add:
 
     ```bash
     extend unbound /usr/bin/sudo /etc/snmp/unbound
@@ -42,10 +42,10 @@ working by running `unbound-control stats`.
 
     4. Restart snmpd.
 
-    The application should be auto-discovered as described at the top of
-    the page. If it is not, please follow the steps set out under `SNMP
-    Extend` heading top of page.
+    LibreNMS discovers the application automatically, as described at
+    the top of the page. If the discovery fails, do the steps under the
+    `SNMP Extend` heading at the top of the page.
 
 === "Agent"
 
-    [Install the agent](../Agent-Setup.md) on this device if it isn't already and copy the `unbound.sh` script to `/usr/lib/check_mk_agent/local/`
+    If this device has no agent, [install the agent](../Agent-Setup.md) and copy the `unbound.sh` script to `/usr/lib/check_mk_agent/local/`

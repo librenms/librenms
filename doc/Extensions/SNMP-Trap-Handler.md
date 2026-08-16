@@ -26,7 +26,8 @@ authCommunity log,execute,net COMMUNITYSTRING
 traphandle default /opt/librenms/snmptrap.php
 ```
 
-To enable snmptrapd to properly parse traps, we will need to add MIBs to service.
+snmptrapd needs the MIBs in the service for a correct parse of the
+traps.
 
 ### Option 1
 
@@ -34,7 +35,7 @@ Make the folder `/etc/systemd/system/snmptrapd.service.d/` and edit
 the file `/etc/systemd/system/snmptrapd.service.d/mibs.conf` and add
 the following content.
 
-You may want to tweak to add vendor directories
+You can add vendor directories
 for devices you care about. In the example below, standard and cisco
 directories are defined, and only IF-MIB is loaded.
 
@@ -49,13 +50,13 @@ For non-systemd systems, you can edit TRAPDOPTS in the init script in /etc/init.
 `TRAPDOPTS="-Lsd  -M /opt/librenms/mibs -m IF-MIB -f -p $TRAPD_PID"`
 
 Along with any necessary configuration to receive the traps from your
-devices (community, etc.)
+devices, such as the community
 
 
 ### Option 2
 > Tested on Ubuntu 18
 
-Just set up your service like:
+Configure your service in this way:
 
 ```
 [Unit]
@@ -84,8 +85,8 @@ Here is a list of snmptrapd options:
 |   -m   | MIBLIST: use MIBLIST (`FILE1-MIB:FILE2-MIB`). `ALL` = Load all MIBS in DIRLIST. (usually fails) |
 |   -M   | DIRLIST: use DIRLIST as the list of locations to look for MIBs. Option is not recursive, so you need to specify each DIR individually, separated by `:`. (For example: /opt/librenms/mibs:/opt/librenms/mibs/cisco:/opt/librenms/mibs/edgecos)|
 
-Good practice is to avoid `-m ALL` because then it will try to load all the MIBs in DIRLIST, which
-will typically fail (snmptrapd cannot load that many mibs). Better is to specify the
+Do not use `-m ALL`. It loads all the MIBs of DIRLIST and usually
+fails, because snmptrapd cannot load that number of MIBs. Give the
 exact MIB files defining the traps you are interested in, for example for LinkDown and LinkUp
 as well as BGP traps, use `-m IF-MIB:BGP4-MIB`. Multiple files can be added, separated with `:`.
 
@@ -139,7 +140,9 @@ sudo systemctl restart snmptrapd
 ## Testing
 
 The easiest test is to generate a trap from your device. Usually, changing the configuration on a network device, or
-plugging/unplugging a network cable (LinkUp, LinkDown) will generate a trap. You can confirm it using a with `tcpdump`, `tshark` or `wireshark`.
+the connection or the disconnection of a network cable generates a
+trap, that is LinkUp or LinkDown. To confirm it, use `tcpdump`,
+`tshark`, or `wireshark`.
 
 You can also generate a trap using the `snmptrap` command from the LibreNMS server itself (if and only if the LibreNMS server is monitored).
 
@@ -157,7 +160,8 @@ Using OID's:
 snmptrap -v 2c -c public localhost '' 1.3.6.1.4.1.8072.2.3.0.1 1.3.6.1.4.1.8072.2.3.2.1 i 123456
 ```
 
-If you have configured logging of traps to ```/var/log/snmptrap/traps.log``` then you will see in `traps.log` new entry:
+With trap logging to ```/var/log/snmptrap/traps.log```, a new entry
+appears in `traps.log`:
 
 ```
 2020-03-09 16:22:59 localhost [UDP: [127.0.0.1]:58942->[127.0.0.1]:162]:
@@ -172,16 +176,20 @@ and in LibreNMS your localhost device eventlog like:
 
 ### Why we need Uptime
 
-When you send a trap, it must of course conform to a set of standards. Every trap needs an uptime value. Uptime is how long the system has been running since boot. Sometimes this is the operating system, other devices might use the SNMP engine uptime. Regardless, a value will be sent.
+A trap obeys a set of standards. Every trap needs an uptime value. The
+uptime is the time since the boot of the system. On some devices, this
+value comes from the operating system. Other devices use the uptime of
+the SNMP engine. Every trap sends a value.
 
-So what value should you type in the commands below? Oddly enough, simply supplying no value by using two single quotes '' will instruct the command to obtain the value from the operating system you are executing this on.
+Enter two single quotation marks `''` in the commands below. The
+command then takes the value from your operating system.
 
 ### Event logging
 
-You can configure generic event logging for snmp traps.  This will log
+You can configure generic event logging for SNMP traps. It logs
 an event of the type trap for received traps. These events can be used for alerting.
 By default, only the TrapOID is logged. But you can enable the "detailed" variant,
-and all the data received with the trap will be logged.
+and all the data of the trap.
 
 The parameter can be found in General Settings / External / SNMP Traps Integration.
 
@@ -195,6 +203,7 @@ It can also be configured in your config.
 
 Valid options are:
 
-- `unhandled` only unhandled traps will be logged (default value)
+- `unhandled` it logs only the unhandled traps. This value is the default
 - `all` log all traps
-- `none` no traps will create a generic event log (handled traps may still log events)
+- `none` no trap creates a generic event log. A handled trap can still
+  log an event
