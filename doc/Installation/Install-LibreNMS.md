@@ -342,25 +342,8 @@ group = librenms
 ```
 
 Change `listen` to a unique path that must match your webserver's config (`fastcgi_pass` for NGINX and `SetHandler` for Apache) :
-=== "Ubuntu 26.04"
     ```
     listen = /run/php-fpm-librenms.sock
-    ```
-=== "Ubuntu 24.04"
-    ```
-    listen = /run/php-fpm-librenms.sock
-    ```
-=== "Debian 12"
-    ```
-    listen = /run/php-fpm-librenms.sock
-    ```
-=== "Debian 13"
-    ```
-    listen = /run/php-fpm-librenms.sock
-    ```
-=== "RHEL Derivatives"
-    ```
-    listen = /run/php-fpm/librenms.sock
     ```
 
 If there are no other PHP web applications on this server, you may remove www.conf to save some resources.
@@ -542,7 +525,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
           try_files $uri $uri/ /index.php?$query_string;
          }
          location ~ [^/]\.php(/|$) {
-          fastcgi_pass unix:/run/php-fpm/librenms.sock;
+          fastcgi_pass unix:/run/php-fpm-librenms.sock;
           fastcgi_split_path_info ^(.+\.php)(/.+)$;
           include fastcgi.conf;
          }
@@ -589,7 +572,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
           </IfModule>
 
           <FilesMatch ".+\.php$">
-            SetHandler "proxy:unix:/run/php-fpm/librenms.sock|fcgi://localhost"
+            SetHandler "proxy:unix:/run/php-fpm-librenms.sock|fcgi://localhost"
           </FilesMatch>
         </VirtualHost>
         ```
