@@ -1,0 +1,104 @@
+NET-SNMP-EXTEND-MIB::nsExtendOutputFull[bird2] = BIRD 2.17.5 ready.
+Access restricted
+Name       Proto      Table      State  Since         Info
+device1    Device     ---        up     2026-08-15 13:45:12  
+
+internal   Static     master6    up     2026-08-15 13:45:12  
+  Channel ipv6
+    State:          UP
+    Table:          master6
+    Preference:     200
+    Input filter:   ACCEPT
+    Output filter:  REJECT
+    Routes:         1 imported, 0 exported, 1 preferred
+    Route change stats:     received   rejected   filtered    ignored   accepted
+      Import updates:              1          0          0          0          1
+      Import withdraws:            0          0        ---          0          0
+      Export updates:              0          0          0        ---          0
+      Export withdraws:            0        ---        ---        ---          0
+
+rr_one     BGP        ---        up     2026-08-15 13:45:16  Established   
+  Description:    route reflector one
+  BGP state:          Established
+    Neighbor address: 2001:db8:0:1::2
+    Neighbor AS:      64496
+    Local AS:         64496
+    Neighbor ID:      192.0.2.10
+    Local capabilities
+      Multiprotocol
+        AF announced: ipv6
+      Route refresh
+      Graceful restart
+      4-octet AS numbers
+      Enhanced refresh
+      Long-lived graceful restart
+    Neighbor capabilities
+      Multiprotocol
+        AF announced: ipv6
+      Route refresh
+      Graceful restart
+      4-octet AS numbers
+      Enhanced refresh
+      Long-lived graceful restart
+    Session:          internal multihop AS4
+    Source address:   2001:db8:0:1::1
+    Hold timer:       207.795/240
+    Keepalive timer:  65.630/80
+    Send hold timer:  469.975/480
+  Channel ipv6
+    State:          UP
+    Table:          master6
+    Preference:     100
+    Input filter:   ACCEPT
+    Output filter:  ACCEPT
+    Routes:         12 imported, 1 exported, 12 preferred
+    Route change stats:     received   rejected   filtered    ignored   accepted
+      Import updates:             12          0          0          0         12
+      Import withdraws:            0          0        ---          0          0
+      Export updates:             20         19          0        ---          1
+      Export withdraws:            0        ---        ---        ---          0
+    BGP Next hop:   2001:db8:0:1::1
+    IGP IPv6 table: master6
+
+rr_two     BGP        ---        up     2026-08-15 13:45:16  Established   
+  BGP state:          Established
+    Neighbor address: 2001:db8:0:1::3
+    Neighbor AS:      64496
+    Local AS:         64496
+    Neighbor ID:      192.0.2.11
+    Local capabilities
+      Multiprotocol
+        AF announced: ipv6
+      Route refresh
+      Graceful restart
+      4-octet AS numbers
+      Enhanced refresh
+      Long-lived graceful restart
+    Neighbor capabilities
+      Multiprotocol
+        AF announced: ipv6
+      Route refresh
+      Graceful restart
+      4-octet AS numbers
+      Enhanced refresh
+      Long-lived graceful restart
+    Session:          internal multihop AS4
+    Source address:   2001:db8:0:1::1
+    Hold timer:       188.847/240
+    Keepalive timer:  67.784/80
+    Send hold timer:  367.049/480
+  Channel ipv6
+    State:          UP
+    Table:          master6
+    Preference:     100
+    Input filter:   ACCEPT
+    Output filter:  ACCEPT
+    Routes:         7 imported, 1 exported, 7 preferred
+    Route change stats:     received   rejected   filtered    ignored   accepted
+      Import updates:              7          0          0          0          7
+      Import withdraws:            0          0        ---          0          0
+      Export updates:             20         19          0        ---          1
+      Export withdraws:            0        ---        ---        ---          0
+    BGP Next hop:   2001:db8:0:1::1
+    IGP IPv6 table: master6
+
