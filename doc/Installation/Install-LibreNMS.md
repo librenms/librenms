@@ -342,9 +342,9 @@ group = librenms
 ```
 
 Change `listen` to a unique path that must match your webserver's config (`fastcgi_pass` for NGINX and `SetHandler` for Apache) :
-    ```
-    listen = /run/php-fpm-librenms.sock
-    ```
+```
+listen = /run/php-fpm-librenms.sock
+```
 
 If there are no other PHP web applications on this server, you may remove www.conf to save some resources.
 Feel free to tune the performance settings in librenms.conf to meet your needs.
