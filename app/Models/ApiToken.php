@@ -47,7 +47,10 @@ class ApiToken extends BaseModel
      */
     public static function isValid(string $token, ?int $user_id = null): bool
     {
-        $query = self::query()->isEnabled()->where('token_hash', $token);
+        $query = self::query()
+            ->isEnabled()
+            ->where('token_hash', $token)
+            ->whereHas('user', fn ($query) => $query->where('enabled', true));
 
         if (! is_null($user_id)) {
             $query->where('user_id', $user_id);
@@ -103,7 +106,11 @@ class ApiToken extends BaseModel
      */
     public static function idFromToken($token)
     {
-        return self::query()->isEnabled()->where('token_hash', $token)->value('user_id');
+        return self::query()
+            ->isEnabled()
+            ->where('token_hash', $token)
+            ->whereHas('user', fn ($query) => $query->where('enabled', true))
+            ->value('user_id');
     }
 
     // ---- Query scopes ----
