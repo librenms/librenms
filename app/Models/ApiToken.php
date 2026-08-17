@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ApiToken extends BaseModel
@@ -66,7 +67,9 @@ class ApiToken extends BaseModel
     {
         return User::query()
             ->where('enabled', true)
-            ->whereHas('apiTokens', fn ($query) => $query->isEnabled()->where('token_hash', $token))
+            ->whereHas('apiTokens', function (Builder $query) use ($token): void {
+                $query->isEnabled()->where('token_hash', $token);
+            })
             ->first();
     }
 
@@ -100,7 +103,11 @@ class ApiToken extends BaseModel
 
     // ---- Query scopes ----
 
-    public function scopeIsEnabled($query)
+    /**
+     * @param  Builder<ApiToken>  $query
+     * @return Builder<ApiToken>
+     */
+    public function scopeIsEnabled(Builder $query): Builder
     {
         return $query->where('disabled', 0);
     }
