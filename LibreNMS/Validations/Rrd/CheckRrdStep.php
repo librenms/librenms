@@ -22,7 +22,10 @@ class CheckRrdStep implements Validation
     {
         $this->rrd_step = (int) LibrenmsConfig::get('rrd.step', self::DEFAULT_RRD_STEP);
 
-        $this->rrdtool = app(RrdProcess::class, ['timeout' => 120]);
+        // lifetime bounds the whole check so validate cannot grind through a very
+        // large number of files; the ProcessTimedOutException is caught below and
+        // reported as "check skipped".
+        $this->rrdtool = app(RrdProcess::class, ['timeout' => 120, 'lifetime' => 120]);
     }
 
     public function enabled(): bool

@@ -22,7 +22,13 @@ class RrdProcess
     private ?Process $process = null;
     private Closure $processFactory;
 
-    public function __construct(private readonly LoggerInterface $logger, private readonly int $timeout = 300, ?Closure $processFactory = null)
+    /**
+     * @param  int  $timeout  seconds to wait for rrdtool to answer a single command
+     * @param  int|null  $lifetime  total seconds the process may live, regardless of
+     *                              whether rrdtool is answering. Null means unbounded,
+     *                              which is what a long-running poll needs.
+     */
+    public function __construct(private readonly LoggerInterface $logger, private readonly int $timeout = 300, ?Closure $processFactory = null, private readonly ?int $lifetime = null)
     {
         $this->rrdcached = (string) LibrenmsConfig::get('rrdcached', '');
         $this->rrd_dir = Str::finish(LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd'), '/');
@@ -53,10 +59,47 @@ class RrdProcess
         if ($this->process === null || ! $this->process->isRunning()) {
             $this->process = ($this->processFactory)();
             $this->process->setInput($this->input);
-            $this->process->setTimeout($this->timeout);
+            $this->process->setTimeout($this->lifetime);
             $this->process->setIdleTimeout($this->timeout);
             $this->process->start();
         }
+    }
+
+    /**
+     * Give rrdtool $timeout seconds from now to say something.
+     *
+     * Called twice per command: once when the command is sent, and again each time
+     * rrdtool produces output, so the deadline always sits $timeout seconds ahead
+     * of the last thing that actually happened.
+     *
+     * Symfony compares the idle timeout against the process's *last output*, and
+     * that timestamp is not ours to move. rrdtool only speaks when spoken to, so
+     * between commands "time since last output" is really "time since we last
+     * asked for something" -- which for the poller includes every SNMP walk it
+     * does between writes. Left alone, a device that walks for longer than the
+     * timeout has its perfectly healthy rrdtool killed, and the failure surfaces
+     * at the next write.
+     *
+     * Since the timestamp cannot be moved forward, the allowance is padded by the
+     * time already elapsed against it, which puts the deadline in the same place.
+     * At send time that pad is the caller's think-time; once rrdtool is replying
+     * the elapsed time is ~0 and the allowance is simply $timeout again, so a
+     * command that answers in pieces does not inherit the gap that preceded it.
+     *
+     * An unresponsive rrdtool is still caught either way: nothing extends the
+     * deadline except rrdtool actually speaking.
+     */
+    private function renewIdleTimeout(): void
+    {
+        $lastOutput = $this->process->getLastOutputTime();
+
+        if ($lastOutput === null) {
+            return;
+        }
+
+        $elapsed = max(0, microtime(true) - $lastOutput);
+
+        $this->process->setIdleTimeout($this->timeout + $elapsed);
     }
 
     public function stop(): void
@@ -76,6 +119,8 @@ class RrdProcess
         $this->runAsync($command);
 
         $this->process->waitUntil(function ($type, $buffer) use ($waitFor) {
+            $this->renewIdleTimeout();
+
             if ($type === Process::ERR) {
                 if (str_contains($buffer, 'rrdtool: not found')) {
                     throw new RrdExecutableNotFoundException(trim($buffer));
@@ -119,6 +164,7 @@ class RrdProcess
 
         $this->logger->debug("RRD[%g$command%n]", ['color' => true]);
         $this->process->clearOutput();
+        $this->renewIdleTimeout();
         $this->input->write("$command\n");
     }
 
