@@ -20,6 +20,9 @@
 
 namespace LibreNMS\Tests\Unit\RRD;
 
+use LibreNMS\Exceptions\RrdException;
+use LibreNMS\Exceptions\RrdStoreException;
+use LibreNMS\Exceptions\RrdTimeoutException;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Tests\TestCase;
 use Mockery;
@@ -100,7 +103,7 @@ class RrdProcessTimeoutTest extends TestCase
     {
         $rrd = $this->rrdProcess(self::UNRESPONSIVE, 1);
 
-        $this->expectException(ProcessTimedOutException::class);
+        $this->expectException(RrdTimeoutException::class);
 
         $rrd->run('update wedged.rrd N:1');
     }
@@ -125,7 +128,7 @@ class RrdProcessTimeoutTest extends TestCase
         try {
             $rrd->run('update wedged.rrd N:2');
             $this->fail('expected the unresponsive process to time out');
-        } catch (ProcessTimedOutException) {
+        } catch (RrdTimeoutException) {
             $elapsed = microtime(true) - $start;
         }
 
@@ -177,12 +180,14 @@ class RrdProcessTimeoutTest extends TestCase
                 $rrd->run("info file$completed.rrd");
                 $completed++;
             }
-        } catch (ProcessTimedOutException $e) {
+        } catch (RrdTimeoutException $e) {
             $caught = $e;
         }
 
         $this->assertNotNull($caught, 'an explicit lifetime must still be enforced');
-        $this->assertTrue($caught->isGeneralTimeout(), 'the lifetime axis should be what fires here');
+        $previous = $caught->getPrevious();
+        $this->assertInstanceOf(ProcessTimedOutException::class, $previous, 'the Symfony exception should be kept as the cause');
+        $this->assertTrue($previous->isGeneralTimeout(), 'the lifetime axis should be what fires here');
         $this->assertGreaterThan(0, $completed, 'commands should succeed until the lifetime is reached');
     }
 
@@ -206,13 +211,54 @@ class RrdProcessTimeoutTest extends TestCase
         try {
             $rrd->run('update stalls.rrd N:2');
             $this->fail('expected the stalled command to time out');
-        } catch (ProcessTimedOutException) {
+        } catch (RrdTimeoutException) {
             $elapsed = microtime(true) - $start;
         }
 
         // ~1s: the deadline runs from the send, then is renewed when "partial" arrives.
         // Without that renewal the 2s pad is still in place, giving ~3s.
         $this->assertLessThan(2.5, $elapsed, 'the caller gap was still inflating the window after rrdtool replied');
+    }
+
+    /**
+     * An unresponsive rrdtool is a datastore fault, and must be reported as one.
+     *
+     * Before this change it escaped as a raw ProcessTimedOutException, which is not
+     * part of the RrdException hierarchy. Rrd::write() catches RrdStoreException and
+     * RrdException and neither matches, so the exception left the datastore
+     * entirely and was caught by the per-module handler in PollDevice -- which logs
+     * "Error polling <module> module", blaming whichever module happened to be
+     * writing when the pipe died. It also never reached the three-strikes counter
+     * that exists to disable a datastore that is not working.
+     */
+    public function testAnUnresponsiveRrdtoolIsReportedAsADatastoreFault(): void
+    {
+        $rrd = $this->rrdProcess(self::UNRESPONSIVE, 1);
+
+        try {
+            $rrd->run('update wedged.rrd N:1');
+            $this->fail('expected the unresponsive process to time out');
+        } catch (RrdException $e) {
+            $this->assertInstanceOf(RrdStoreException::class, $e, 'a timeout must reach the three-strikes counter');
+            $this->assertInstanceOf(ProcessTimedOutException::class, $e->getPrevious(), 'the Symfony exception should be kept as the cause');
+        }
+    }
+
+    /**
+     * The message must say which axis fired, because they mean different things:
+     * the per-command timeout means rrdtool did not answer, the lifetime means a
+     * caller-imposed budget ran out.
+     */
+    public function testTheTimeoutMessageSaysWhatActuallyRanOut(): void
+    {
+        $rrd = $this->rrdProcess(self::UNRESPONSIVE, 1);
+
+        try {
+            $rrd->run('update wedged.rrd N:1');
+            $this->fail('expected the unresponsive process to time out');
+        } catch (RrdException $e) {
+            $this->assertStringContainsString('did not respond', $e->getMessage());
+        }
     }
 
     /**

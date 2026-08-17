@@ -7,7 +7,9 @@ use Closure;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdExecutableNotFoundException;
+use LibreNMS\Exceptions\RrdTimeoutException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\Process;
 
@@ -118,6 +120,29 @@ class RrdProcess
     {
         $this->runAsync($command);
 
+        try {
+            $this->waitFor($waitFor);
+        } catch (ProcessTimedOutException $e) {
+            throw RrdTimeoutException::fromProcessTimeout($e, $command);
+        }
+
+        $output = $this->process->getOutput();
+
+        if ($waitFor === self::COMMAND_COMPLETE) {
+            $output = substr($output, 0, strrpos($output, $waitFor)); // remove OK line
+        }
+
+        return rtrim($output);
+    }
+
+    /**
+     * The RrdException paths are raised inside the waitUntil() callback, so they are
+     * declared on run() where callers see them rather than repeated here.
+     *
+     * @throws ProcessTimedOutException
+     */
+    private function waitFor(string $waitFor): void
+    {
         $this->process->waitUntil(function ($type, $buffer) use ($waitFor) {
             $this->renewIdleTimeout();
 
@@ -143,14 +168,6 @@ class RrdProcess
 
             return str_contains($buffer, $waitFor);
         });
-
-        $output = $this->process->getOutput();
-
-        if ($waitFor === self::COMMAND_COMPLETE) {
-            $output = substr($output, 0, strrpos($output, $waitFor)); // remove OK line
-        }
-
-        return rtrim($output);
     }
 
     private function runAsync(string $command): void
