@@ -215,23 +215,23 @@ class GraphParameters implements \Stringable
         }
 
         if ($this->visible('title')) {
-            $options[] = '--title=' . $this->formatTitle();
+            $options[] = '--title=' . $this->escapeParameter($this->formatTitle());
         }
 
         if ($this->right_axis !== null) {
-            array_push($options, '--right-axis', $this->right_axis);
+            array_push($options, '--right-axis', $this->escapeParameter($this->right_axis));
         }
         if ($this->right_axis_label !== null) {
-            array_push($options, '--right-axis-label', $this->right_axis_label);
+            array_push($options, '--right-axis-label', $this->escapeParameter($this->right_axis_label));
         }
         if ($this->left_axis_format !== null) {
-            array_push($options, '--left-axis-format', $this->left_axis_format);
+            array_push($options, '--left-axis-format', $this->escapeParameter($this->left_axis_format));
         }
         if ($this->units_length !== null) {
             array_push($options, '--units-length', $this->units_length);
         }
         if ($this->vertical_label !== null) {
-            array_push($options, '--vertical-label', $this->vertical_label);
+            array_push($options, '--vertical-label', $this->escapeParameter($this->vertical_label));
         }
 
         return $options;
@@ -292,7 +292,7 @@ class GraphParameters implements \Stringable
 
     private function defaultTitle(): string
     {
-        $title = DeviceCache::getPrimary()->displayName() ?: ucfirst($this->type);
+        $title = DeviceCache::getPrimary()->display ?: ucfirst($this->type);
         $title .= '::';
         $title .= Str::title(str_replace('_', ' ', $this->subtype));
 
@@ -301,7 +301,7 @@ class GraphParameters implements \Stringable
 
     private function formatTitle(): string
     {
-        $title = str_replace("'", '', $this->getTitle());
+        $title = $this->getTitle();
 
         // linear approximation
         $slope = 0.1332;
@@ -320,5 +320,10 @@ class GraphParameters implements \Stringable
         }
 
         return substr($title, 0, max(0, $maxChars - 3)) . '...';
+    }
+
+    private function escapeParameter(string $input): string
+    {
+        return str_replace(["'", '"', "\n", "\r"], '', $input);
     }
 }

@@ -1,0 +1,407 @@
+DEVICE-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    generic
+        FROM VERSA-MIB
+;
+
+device MODULE-IDENTITY
+    LAST-UPDATED "201702260000Z"
+    ORGANIZATION "Versa Networks"
+    CONTACT-INFO "
+        2953 Bunker Hill Lane, Suite 210
+        Santa Clara, CA - 95035 (USA)
+        Email: support@versa-networks.com"
+    DESCRIPTION "This MIB module provides device information"
+    REVISION "201702260000Z"
+    DESCRIPTION "Initial revision"
+    ::= { generic 1 }
+
+UnsignedByte ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedByte"
+    SYNTAX      Unsigned32 (0 .. 255)
+
+UnsignedShort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedShort"
+    SYNTAX      Unsigned32 (0 .. 65535)
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+-- Device software information
+deviceSoftwareInfo OBJECT IDENTIFIER ::= { device 6 }
+
+packageVersionMajor OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Release Major Version"
+    ::= { deviceSoftwareInfo 1 }
+
+packageVersionMinor OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Release Minor Version"
+    ::= { deviceSoftwareInfo 2 }
+
+packageVersionService OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Release Service Version"
+    ::= { deviceSoftwareInfo 3 }
+
+packageReleaseDate OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Release Date"
+    ::= { deviceSoftwareInfo 4 }
+
+packageId OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Package Id"
+    ::= { deviceSoftwareInfo 5 }
+
+packageName OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Package name"
+    ::= { deviceSoftwareInfo 6 }
+
+packageReleaseType OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Release type"
+    ::= { deviceSoftwareInfo 7 }
+
+packageSpackApiVersion OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Security package API version"
+    ::= { deviceSoftwareInfo 8 }
+
+packageSpackLibVersion OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Security package library version"
+    ::= { deviceSoftwareInfo 9 }
+
+-- Device hardware info v2
+deviceHardwareTableV2 OBJECT IDENTIFIER ::= { device 7 }
+
+deviceHardwareSkuV2 OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { deviceHardwareTableV2 1 }
+
+deviceHardwareModelV2 OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { deviceHardwareTableV2 2 }
+
+deviceHardwareSerialnumberV2 OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { deviceHardwareTableV2 3 }
+
+softSerialNumberV2 OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { deviceHardwareTableV2 4 }
+
+deviceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DeviceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Connected device information"
+    ::= { device 1 }
+
+deviceEntry OBJECT-TYPE
+    SYNTAX      DeviceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { deviceClientId }
+        ::= { deviceTable 1 }
+
+DeviceEntry ::=
+    SEQUENCE {
+        deviceVSNId UnsignedByte,
+        deviceCPULoad UnsignedShort,
+        deviceMemoryLoad UnsignedShort,
+        deviceBuffer UnsignedShort,
+        deviceActiveSessions Unsigned32,
+        deviceFailedSessions Unsigned32,
+        deviceMaxSessions Unsigned32,
+        deviceClientId UnsignedByte
+    }
+
+deviceVSNId OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "VSN-ID of the device"
+    ::= { deviceEntry 1 }
+
+deviceCPULoad OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "CPU load of the device"
+    ::= { deviceEntry 2 }
+
+deviceMemoryLoad OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Memory load of the device"
+    ::= { deviceEntry 3 }
+
+deviceBuffer OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Buffer"
+    ::= { deviceEntry 4 }
+
+deviceActiveSessions OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Active sessions on device"
+    ::= { deviceEntry 5 }
+
+deviceFailedSessions OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Active sessions on device"
+    ::= { deviceEntry 6 }
+
+deviceMaxSessions OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Max sessions supported on device"
+    ::= { deviceEntry 7 }
+
+deviceClientId OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Client-ID of the device"
+    ::= { deviceEntry 8 }
+
+deviceAlarmStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DeviceAlarmStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Org alarm statistics"
+    ::= { device 3 }
+
+deviceAlarmStatsEntry OBJECT-TYPE
+    SYNTAX      DeviceAlarmStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { deviceAlarmId }
+        ::= { deviceAlarmStatsTable 1 }
+
+DeviceAlarmStatsEntry ::=
+    SEQUENCE {
+        deviceAlarmId UnsignedShort,
+        deviceAlarmName String,
+        deviceAlarmNewCnt Unsigned32,
+        deviceAlarmChangedCnt Unsigned32,
+        deviceAlarmClearedCnt Unsigned32,
+        deviceAlarmNetconfCnt Unsigned32,
+        deviceAlarmSnmpCnt Unsigned32,
+        deviceAlarmSyslogCnt Unsigned32,
+        deviceAlarmAnalyticsCnt Unsigned32
+    }
+
+deviceAlarmId OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Organization id"
+    ::= { deviceAlarmStatsEntry 1 }
+
+deviceAlarmName OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Organization name"
+    ::= { deviceAlarmStatsEntry 2 }
+
+deviceAlarmNewCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of new alarms"
+    ::= { deviceAlarmStatsEntry 5 }
+
+deviceAlarmChangedCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of changed alarms"
+    ::= { deviceAlarmStatsEntry 6 }
+
+deviceAlarmClearedCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of cleared alarms"
+    ::= { deviceAlarmStatsEntry 7 }
+
+deviceAlarmNetconfCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of alarms sent over NETCONF"
+    ::= { deviceAlarmStatsEntry 8 }
+
+deviceAlarmSnmpCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of alarms sent to SNMP target"
+    ::= { deviceAlarmStatsEntry 9 }
+
+deviceAlarmSyslogCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of alarms syslogged"
+    ::= { deviceAlarmStatsEntry 10 }
+
+deviceAlarmAnalyticsCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of alarms sent to Analytics"
+    ::= { deviceAlarmStatsEntry 11 }
+
+deviceHardwareTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DeviceHardwareEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Device hardware info"
+    ::= { device 4 }
+
+deviceHardwareEntry OBJECT-TYPE
+    SYNTAX      DeviceHardwareEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { deviceHardwareSerialnumber }
+        ::= { deviceHardwareTable 1 }
+
+DeviceHardwareEntry ::=
+    SEQUENCE {
+        deviceHardwareSku String,
+        deviceHardwareModel String,
+        deviceHardwareSerialnumber String,
+        softSerialNumber String
+    }
+
+deviceHardwareSku OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { deviceHardwareEntry 1 }
+
+deviceHardwareModel OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { deviceHardwareEntry 2 }
+
+deviceHardwareSerialnumber OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { deviceHardwareEntry 3 }
+
+softSerialNumber OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { deviceHardwareEntry 4 }
+
+deviceCpuInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DeviceCpuInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Device CPU load information"
+    ::= { device 5 }
+
+deviceCpuInfoEntry OBJECT-TYPE
+    SYNTAX      DeviceCpuInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { deviceCpuId }
+        ::= { deviceCpuInfoTable 1 }
+
+DeviceCpuInfoEntry ::=
+    SEQUENCE {
+        deviceCpuId String,
+        deviceCpuLoadPercentage ConfdString
+    }
+
+deviceCpuId OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { deviceCpuInfoEntry 1 }
+
+deviceCpuLoadPercentage OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { deviceCpuInfoEntry 2 }
+
+END

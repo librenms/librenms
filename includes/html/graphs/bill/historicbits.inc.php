@@ -4,8 +4,8 @@ use Amenadiel\JpGraph\Graph\Graph;
 use Amenadiel\JpGraph\Plot\LinePlot;
 use LibreNMS\Billing;
 
-$bill_hist_id = $vars['bill_hist_id'];
-$reducefactor = $vars['reducefactor'];
+$bill_hist_id = $vars['bill_hist_id'] ?? null;
+$reducefactor = $vars['reducefactor'] ?? 0;
 
 if (is_numeric($bill_hist_id)) {
     if ($reducefactor < 2) {
@@ -61,7 +61,7 @@ function YCallback($y)
     return \LibreNMS\Util\Number::formatSi($y, 0, 0, '');
 }
 
-$graph = new Graph($vars['width'], $vars['height'], $graph_data['graph_name']);
+$graph = new Graph($vars['width'], $vars['height'], $graph_data['graph_name'] ?? 'Bill Graph');
 $graph->img->SetImgFormat('png');
 
 // work around bug in jpgraph error handling

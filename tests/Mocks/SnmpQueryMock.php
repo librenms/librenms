@@ -168,11 +168,12 @@ class SnmpQueryMock implements SnmpQueryInterface
     {
         $community = $this->community();
         $num_oid = $this->translateNumber($oid);
-        $data = $this->getSnmprec($community)[$num_oid] ?? [0, ''];
+        // real snmpget reports missing OIDs inline with exit code 0; SnmpResponse::isValid() keys off this text
+        $data = $this->getSnmprec($community)[$num_oid] ?? ['4', 'No Such Instance currently exists at this OID'];
 
         Log::debug("[SNMP] snmpget $community $num_oid: ");
 
-        return new SnmpResponse($this->outputLine($oid, $num_oid, $data[0], $data[1]));
+        return new SnmpResponse($this->outputLine($oid, $num_oid, $num_oid, $data[0], $data[1]));
     }
 
     /**
@@ -192,8 +193,8 @@ class SnmpQueryMock implements SnmpQueryInterface
 
             $output = '';
             foreach ($dev as $key => $data) {
-                if (Str::startsWith($key, $num_oid)) {
-                    $output .= $this->outputLine($oid, $num_oid, $data[0], $data[1]);
+                if ($key === $num_oid || Str::startsWith($key, $num_oid . '.')) {
+                    $output .= $this->outputLine($oid, $num_oid, $key, $data[0], $data[1]);
                 }
             }
 
@@ -218,8 +219,8 @@ class SnmpQueryMock implements SnmpQueryInterface
         Log::debug("[SNMP] snmpnext $community $num_oid: ");
         while (Str::contains($num_oid, '.')) {
             foreach ($dev as $key => $data) {
-                if (Str::startsWith($key, $num_oid)) {
-                    return new SnmpResponse($this->outputLine($oid, $num_oid, $data[0], $data[1]));
+                if ($key === $num_oid || Str::startsWith($key, $num_oid . '.')) {
+                    return new SnmpResponse($this->outputLine($oid, $num_oid, $key, $data[0], $data[1]));
                 }
             }
 
@@ -283,24 +284,25 @@ class SnmpQueryMock implements SnmpQueryInterface
         throw new Exception("SNMPREC: community $community not cached");
     }
 
-    private function outputLine(string $oid, string $num_oid, string $type, string $data): string
+    private function outputLine(string $oid, string $num_oid, string $key, string $type, string $data): string
     {
-        $oid = new Oid($oid);
+        $oidObj = new Oid($oid);
+        $indexSuffix = substr($key, strlen($num_oid));
 
         if ($type == 6) {
-            $mib = $oid->getMib();
+            $mib = $oidObj->getMib();
             $data = $this->numeric ? ".$data" : $this->mibs($mib ? [$mib] : [])->translate($data);
         }
 
         if ($this->numeric) {
-            return "$num_oid = $data";
+            return ".$key = $data\n"; // net-snmp -On prints numeric OIDs with a leading dot
         }
 
-        if (! empty($oid->oid) && $oid->isNumeric()) {
-            $oid = $this->translate($oid);
+        if (! empty($oidObj->oid) && $oidObj->isNumeric()) {
+            $oid = $this->translate($oidObj);
         }
 
-        return "$oid = $data";
+        return "$oid$indexSuffix = $data\n";
     }
 
     /**

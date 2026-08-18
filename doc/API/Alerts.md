@@ -45,7 +45,8 @@ Route: `/api/v0/alerts/:id`
 
 - id is the alert id, you can obtain a list of alert ids from [`list_alerts`](#list_alerts).
 - note is the note to add to the alert
-- until_clear is a boolean and if set to false, the alert will re-alert if it gets worse/better or changes.
+- until_clear is a boolean. With the value false, the alert triggers
+  again when it becomes worse, becomes better, or changes.
 
 Input:
 
@@ -298,14 +299,16 @@ Route: `/api/v0/rules`
 
 Input (JSON):
 
-- devices: This is either an array of device ids or -1 for a global rule
+- devices: an array of device ids, or -1 for a global rule
 - groups: Array of device group ids
 - locations: Array of location ids
-- builder: The rule which should be in the format entity.condition
-  value (i.e devices.status != 0 for devices marked as down). It must
-  be json encoded in the format rules are currently stored.
-- severity: The severity level the alert will be raised against, Ok, Warning, Critical.
-- disabled: Whether the rule will be disabled or not, 0 = enabled, 1 = disabled
+- invert_map: Optional boolean. When `true`, the rule applies to all
+  devices except the selected devices, groups and locations.
+- builder: the rule in the format `entity.condition value`. An example
+  is `devices.status != 0` for the devices with a down mark. Encode it
+  as JSON in the current storage format of the rules.
+- severity: the severity level of the alert. The values are Ok, Warning, and Critical.
+- disabled: the state of the rule. 0 is enabled and 1 is disabled
 - default_operation_step_duration: Optional. When `alert_operation_id` is set, updates that **operation’s** default step duration (for example `5 m`). The value is stored on the global operation, not on the rule. When a segment’s `step_duration_seconds` is `0`, this default (or the global config default if unset) is used as the repeat interval.
 - alert_operation_id: ID of a global alert operation (see **Alerts → Operations** in the UI), or `null` to suppress notifications for this rule
 - operations: (optional) If `alert_operation_id` is not sent, a legacy array of operation objects is converted into a new global operation (with one **segment** per array element) and linked to the rule. Each segment has its own escalation range, timing, and transports.
@@ -317,9 +320,9 @@ Input (JSON):
   - transports: required array of targets
     - single transport id: `3`
     - transport group id: `\"g2\"`
-- invert: This would invert the rules check.
-- name: This is the name of the rule and is mandatory.
-- notes: Some informal notes for this rule
+- invert: it inverts the check of the rule.
+- name: the name of the rule. This field is mandatory.
+- notes: your own notes about this rule
 
 Example:
 
@@ -345,16 +348,18 @@ Route: `/api/v0/rules`
 
 Input (JSON):
 
-- rule_id: You must specify the rule_id to edit an existing rule, if
-  this is absent then a new rule will be created.
-- devices: This is either an array of device ids or -1 for a global rule
+- rule_id: give the rule_id to edit an existing rule. Without this
+  field, the API creates a new rule.
+- devices: an array of device ids, or -1 for a global rule
 - groups: Array of device group ids
 - locations: Array of location ids
-- builder: The rule which should be in the format entity.condition
-  value (i.e devices.status != 0 for devices marked as down). It must
-  be json encoded in the format rules are currently stored.
-- severity: The severity level the alert will be raised against, Ok, Warning, Critical.
-- disabled: Whether the rule will be disabled or not, 0 = enabled, 1 = disabled
+- invert_map: Optional boolean. When `true`, the rule applies to all
+  devices except the selected devices, groups and locations.
+- builder: the rule in the format `entity.condition value`. An example
+  is `devices.status != 0` for the devices with a down mark. Encode it
+  as JSON in the current storage format of the rules.
+- severity: the severity level of the alert. The values are Ok, Warning, and Critical.
+- disabled: the state of the rule. 0 is enabled and 1 is disabled
 - default_operation_step_duration: Optional. When `alert_operation_id` is set, updates that **operation’s** default step duration (for example `5 m`). Stored on the operation, not the rule.
 - alert_operation_id: ID of a global alert operation, or `null` to suppress notifications for this rule
 - operations: (optional) Legacy array of operation objects; used only when `alert_operation_id` is not present in the request
@@ -366,9 +371,9 @@ Input (JSON):
   - transports: required array of targets
     - single transport id: `3`
     - transport group id: `\"g2\"`
-- invert: This would invert the rules check.
-- name: This is the name of the rule and is mandatory.
-- notes: Some informal notes for this rule
+- invert: it inverts the check of the rule.
+- name: the name of the rule. This field is mandatory.
+- notes: your own notes about this rule
 
 Example:
 
@@ -469,7 +474,8 @@ Input (JSON):
 - template: (Required) Template code used to generate the alert message
 - title: Title that is used when an alert is generated
 - title_rec: Title that is used when an alert has recovered
-- alert_rules: an array of rule_id's for which this template should apply (see also: [`list_alert_rules`](#list_alert_rules).)
+- alert_rules: an array of rule_id values for this template. See also
+  [`list_alert_rules`](#list_alert_rules).
 
 Example:
 
@@ -479,7 +485,7 @@ curl -X POST -d '{"name":"new alert template","template":"---","title":"CREATED 
 
 Output:
 - status: Status of the request. Can be: ok, warning, error
-- message: The output of this call. Error messages will be displayed here.
+- message: the output of this call. It also holds the error messages.
 - id: The id of the newly created alert template
 
 ```json
@@ -500,10 +506,12 @@ Input (JSON):
 
 - name: (Required) Name for the new template
 - template: (Required) Template code used to generate the alert message
-- template_id: (Required) template id that will be changed. If this is not present a new alert template will be created.
+- template_id: (Required) the id of the template to change. Without
+  this field, the API creates a new alert template.
 - title: Title that is used when an alert is generated
 - title_rec: Title that is used when an alert has recovered
-- alert_rules: an array of rule_id's for which this template should apply (see also: [`list_alert_rules`](#list_alert_rules).)
+- alert_rules: an array of rule_id values for this template. See also
+  [`list_alert_rules`](#list_alert_rules).
 
 Example:
 

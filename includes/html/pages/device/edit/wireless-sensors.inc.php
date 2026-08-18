@@ -38,9 +38,9 @@ foreach (dbFetchRows("SELECT * FROM `wireless_sensors` WHERE `device_id` = ? AND
 
     echo '
         <tr>
-        <td>' . $sensor['sensor_class'] . '</td>
-        <td>' . $sensor['sensor_type'] . '</td>
-        <td style="white-space: nowrap">' . $sensor['sensor_descr'] . '</td>
+        <td>' . htmlspecialchars((string) $sensor['sensor_class']) . '</td>
+        <td>' . htmlspecialchars((string) $sensor['sensor_type']) . '</td>
+        <td style="white-space: nowrap">' . htmlspecialchars((string) $sensor['sensor_descr']) . '</td>
         <td>' . $sensor['sensor_current'] . ($sensor['sensor_class'] == 'temperature' ? '°C' : '') . '</td>
         <td>
         <div class="form-group has-feedback">
@@ -63,7 +63,7 @@ foreach (dbFetchRows("SELECT * FROM `wireless_sensors` WHERE `device_id` = ? AND
         </div>
         </td>
         <td>
-        <input type="checkbox" name="alert-status" data-device_id="' . $sensor['device_id'] . '" data-sensor_id="' . $sensor['sensor_id'] . '" data-sensor_desc="' . $sensor['sensor_descr'] . '" ' . $alert_status . '>
+        <input type="checkbox" name="alert-status" data-device_id="' . $sensor['device_id'] . '" data-sensor_id="' . $sensor['sensor_id'] . '" data-sensor_desc="' . htmlspecialchars((string) $sensor['sensor_descr']) . '" ' . $alert_status . '>
         </td>
         <td>
         <a type="button" class="btn btn-danger btn-sm ' . $custom . ' remove-custom" id="remove-custom" name="remove-custom" data-sensor_id="' . $sensor['sensor_id'] . '">Reset</a>

@@ -26,11 +26,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class Ospfv3Area extends DeviceRelatedModel implements Keyable
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $fillable = [
         'device_id',

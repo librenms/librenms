@@ -250,6 +250,11 @@ Route: `/api/v0/devices/:hostname/health(/:type)(/:sensor_id)`
 - type (optional) is health type / sensor class
 - sensor_id (optional) is the sensor id to retrieve specific information.
 
+`type` is a sensor class, such as `device_voltage`, or one of the special
+classes `device_processor`, `device_storage` and `device_mempool`, which are
+stored in their own tables rather than the `sensors` table. The `device_`
+prefix is optional, so `processor` and `device_processor` are equivalent.
+
 Input:
 
   -
@@ -262,7 +267,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "message": "",
@@ -288,7 +293,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "message": "",
@@ -314,7 +319,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "message": "",
@@ -348,6 +353,28 @@ Output:
 }
 ```
 
+Example (processor list):
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/health/processor
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "",
+    "count": 1,
+    "graphs": [
+        {
+            "sensor_id": "1",
+            "desc": "Processor"
+        }
+    ]
+}
+```
+
 ### `list_available_wireless_graphs`
 
 This function allows to do three things:
@@ -374,7 +401,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "graphs": [
@@ -399,7 +426,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "graphs": [
@@ -424,7 +451,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/loca
 
 Output:
 
-```
+```json
 {
     "status": "ok",
     "graphs": [
@@ -472,7 +499,7 @@ Input:
 
 - class (optional): filter rows by `sensor_class`. Must be one of the
   wireless sensor types (`clients`, `rssi`, `snr`, `mcs`, `frequency`,
-  `capacity`, `distance`, `quality`, etc.).
+  `capacity`, `distance`, and `quality`).
 - columns (optional): comma-separated list of `wireless_sensors` columns to
   return. Defaults to all columns.
 
@@ -539,8 +566,8 @@ Output:
 ### `get_health_graph`
 
 Get a particular health class graph for a device, if you provide a
-sensor_id as well then a single sensor graph will be provided. If no
-sensor_id value is provided then you will be sent a stacked sensor graph.
+sensor_id, the call returns a single sensor graph. Without a sensor_id
+value, the call returns a stacked sensor graph.
 
 Route: `/api/v0/devices/:hostname/graphs/health/:type(/:sensor_id)`
 
@@ -575,8 +602,8 @@ Output is the graph of the particular health type sensor provided.
 ### `get_wireless_graph`
 
 Get a particular wireless class graph for a device, if you provide a
-sensor_id as well then a single sensor graph will be provided. If no
-sensor_id value is provided then you will be sent a stacked wireless graph.
+sensor_id, the call returns a single sensor graph. Without a sensor_id
+value, the call returns a stacked wireless graph.
 
 Route: `/api/v0/devices/:hostname/graphs/wireless/:type(/:sensor_id)`
 
@@ -622,15 +649,15 @@ Route: `/api/v0/devices/:hostname/:type`
 
 Input:
 
-- from: This is the date you would like the graph to start - See
+- from: the start date of the graph. See
   [http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html](http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html)
   for more information.
-- to: This is the date you would like the graph to end - See
+- to: the end date of the graph. See
   [http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html](http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html)
   for more information.
 - width: The graph width, defaults to 1075.
 - height: The graph height, defaults to 300.
-- output: Set how the graph should be outputted (base64, display), defaults to display.
+- output: the output format of the graph, `base64` or `display`. The default is `display`.
 
 Example:
 
@@ -654,10 +681,10 @@ Route: `/api/v0/devices/:hostname/services/:service_id/graphs/:datasource`
 
 Input:
 
-- from: This is the date you would like the graph to start - See
+- from: the start date of the graph. See
   [http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html](http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html)
   for more information.
-- to: This is the date you would like the graph to end - See
+- to: the end date of the graph. See
   [http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html](http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html)
   for more information.
 - width: The graph width, defaults to 1075.
@@ -758,7 +785,7 @@ Output:
 }
 ```
 
-> **Note:** Using `with=vlans` on devices with many ports may increase response
+> **Note:** `with=vlans` on a device with many ports can increase the response
 > size and memory usage. Consider using the `columns` parameter to limit
 > returned fields when fetching VLAN data for large devices.
 
@@ -881,38 +908,39 @@ Route: `/api/v0/devices/:hostname/port_stack`
 
 - hostname can be either the device hostname or id
 
-Input:
-
-- valid_mappings: Filter the result by only showing valid mappings
-  ("0" values not shown).
-
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/port_stack?valid_mappings
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/port_stack
 ```
 
 Output:
 
 ```json
 {
-  "status": "ok",
-  "message": "",
-  "count": 2,
-  "mappings": [
-    {
-      "device_id": "3742",
-      "port_id_high": "1001000",
-      "port_id_low": "51001",
-      "ifStackStatus": "active"
-    },
-    {
-      "device_id": "3742",
-      "port_id_high": "1001000",
-      "port_id_low": "52001",
-      "ifStackStatus": "active"
-    }
-  ]
+    "status": "ok",
+    "message": "",
+    "count": 2,
+    "mappings": [
+        {
+            "id": 2795,
+            "device_id": 3742,
+            "high_ifIndex": 17,
+            "high_port_id": 1001000,
+            "low_ifIndex": 18,
+            "low_port_id": 51001,
+            "ifStackStatus": "active"
+        },
+        {
+            "id": 2796,
+            "device_id": 3742,
+            "high_ifIndex": 17,
+            "high_port_id": 1001000,
+            "low_ifIndex": 24,
+            "low_port_id": 52001,
+            "ifStackStatus": "active"
+        }
+    ]
 }
 ```
 
@@ -1109,7 +1137,7 @@ Output:
 }
 ```
 
-Just take the JSON array from add_components or edit_components, edit
+Take the JSON array from add_components or edit_components, edit
 as you wish and submit it back to edit components.
 
 ### `delete_components`
@@ -1145,8 +1173,8 @@ Route: `/api/v0/devices/:hostname/ports/:ifname`
 - hostname can be either the device hostname or id
 - ifname can be any of the interface names for the device which can be
   obtained using
-  [`get_device_ports`](#get_device_ports). Please ensure that
-  the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need to be urlencoded.
+  [`get_device_ports`](#get_device_ports). Urlencode the ifName where
+  necessary. For example, `Gi0/1/0` needs urlencoding.
 
 Input:
 
@@ -1162,14 +1190,14 @@ Output:
 
 ```json
 {
- "status": "ok",
- "port": {
-  "port_id": "2",
-  "device_id": "1",
-  ...
-  "poll_prev": "1418412902",
-  "poll_period": "300"
- }
+    "status": "ok",
+    "port": {
+        "port_id": "2",
+        "device_id": "1",
+        ...
+        "poll_prev": "1418412902",
+        "poll_period": "300"
+    }
 }
 ```
 
@@ -1182,25 +1210,24 @@ Route: `/api/v0/devices/:hostname/ports/:ifname/:type`
 - hostname can be either the device hostname or id
 - ifname can be any of the interface names for the device which can be
   obtained using
-  [`get_device_ports`](#get_device_ports). Please ensure that
-  the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need
-  to be urlencoded.
+  [`get_device_ports`](#get_device_ports). Urlencode the ifName where
+  necessary. For example, `Gi0/1/0` needs urlencoding.
 - type is the port type you want the graph for, you can request a list
   of ports for a device with [`get_device_ports`](#get_device_ports).
 
 Input:
 
-- from: This is the date you would like the graph to start - See
+- from: the start date of the graph. See
   [http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html](http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html)
   for more information.
-- to: This is the date you would like the graph to end - See
+- to: the end date of the graph. See
   [http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html](http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html)
   for more information.
 - width: The graph width, defaults to 1075.
 - height: The graph height, defaults to 300.
-- ifDescr: If this is set to true then we will use ifDescr to lookup
+- ifDescr: with the value true, LibreNMS uses ifDescr for the lookup
   the port instead of ifName. Pass the ifDescr value you want to
-  search as you would ifName.
+  search in the same way as ifName.
 - graph_type: This can be png or svg to force the output as required.
 
 Example:
@@ -1299,7 +1326,7 @@ Input:
     - version: Software version of the device (wildcard)
     - hardware: The model of the device (wildcard)
     - features: Software license features (wildcard)
-- query: If searching by, then this will be used as the input.
+- query: the input of the search.
 
 Example:
 
@@ -1311,17 +1338,17 @@ Output:
 
 ```json
 {
- "status": "ok",
- "count": 1,
- "devices": [
-  {
-   "device_id": "1",
-   "hostname": "localhost",
-   ...
-   "serial": null,
-   "icon": null
-  }
- ]
+    "status": "ok",
+    "count": 1,
+    "devices": [
+        {
+            "device_id": "1",
+            "hostname": "localhost",
+            ...
+            "serial": null,
+            "icon": null
+        }
+    ]
 }
 ```
 
@@ -1335,17 +1362,17 @@ Output:
 
 ```json
 {
- "status": "ok",
- "count": 1,
- "devices": [
-  {
-   "device_id": "1",
-   "hostname": "localhost",
-   ...
-   "serial": null,
-   "icon": null
-  }
- ]
+    "status": "ok",
+    "count": 1,
+    "devices": [
+        {
+            "device_id": "1",
+            "hostname": "localhost",
+            ...
+            "serial": null,
+            "icon": null
+        }
+    ]
 }
 ```
 
@@ -1383,14 +1410,15 @@ Route: `/api/v0/devices/:hostname/maintenance`
 Input (JSON):
 
 - `title`: *optional* -  Some title for the Maintenance  
-  Will be replaced with hostname if omitted
+  Without this field, LibreNMS uses the hostname
 - `behavior`: *optional* - id of maintenance behavior desired
   Defaults to alert.scheduled_maintenance_default_behavior if omitted
 - `notes`: *optional* -  Some description for the Maintenance  
-  Will also be added to device notes if user prefs "Add schedule notes to devices notes" is set
+  LibreNMS also adds it to the device notes when the user preference
+  "Add schedule notes to devices notes" is on
 - `start`: *optional* - start time of Maintenance in full format `Y-m-d H:i:00`  
   eg: 2022-08-01 22:45:00  
-  Current system time `now()` will be used if omitted
+  Without this field, LibreNMS uses the current system time `now()`
 - `duration`: *required* - Duration of Maintenance in format `H:i` / `Hrs:Mins`  
   eg: 02:00
 
@@ -1401,10 +1429,10 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
   -X POST https://foo.example/api/v0/devices/localhost/maintenance/ \
   --data-raw '
 {
- "title":"Device Maintenance",
-  "notes":"A 2 hour Maintenance triggered via API with start time",
-  "start":"2022-08-01 08:00:00",
-  "duration":"2:00"
+    "title":"Device Maintenance",
+    "notes":"A 2 hour Maintenance triggered via API with start time",
+    "start":"2022-08-01 08:00:00",
+    "duration":"2:00"
 }
 '
 ```
@@ -1424,9 +1452,10 @@ Example with no start time:
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
   -X POST https://foo.example/api/v0/devices/localhost/maintenance/ \
   --data-raw '
- "title":"Device Maintenance",
-  "notes":"A 2 hour Maintenance triggered via API with no start time",
-  "duration":"2:00"
+{
+    "title":"Device Maintenance",
+    "notes":"A 2 hour Maintenance triggered via API with no start time",
+    "duration":"2:00"
 }
 '
 ```
@@ -1443,10 +1472,10 @@ Output:
 
 ### `add_device`
 
-Add a new device.  Most fields are optional. You may omit snmp
+Add a new device. Most fields are optional. You can omit the SNMP
 credentials to attempt each system credential in order. See snmp.version, snmp.community, and snmp.v3
 
-To guarantee device is added, use force_add. This will skip checks 
+For a guaranteed add, use force_add. This option skips the checks 
 for duplicate device and snmp reachability, but not duplicate hostname.
 
 Route: `/api/v0/devices`
@@ -1456,10 +1485,10 @@ Input (JSON):
 Fields:
 
 - hostname (required): device hostname or IP
-- display: A string to display as the name of this device, defaults to 
-  hostname (or device_display_default setting). May be a simple
+- display_template: A string to display as the name of this device, defaults to 
+  hostname, or the device_display_default setting. It is a simple
   template using replacements: {{ $hostname }}, {{ $sysName }},
-  {{ $sysName_fallback }}, {{ $ip }}
+  {{ $sysName_fallback }}, {{ $ip }}. LibreNMS then generates the display field.
 - snmpver: SNMP version to use, v1, v2c or v3. During checks detection order is v2c,v3,v1
 - port: SNMP port (defaults to port defined in config).
 - transport: SNMP protocol (udp,tcp,udp6,tcp6) Defaults to transport defined in config.
@@ -1519,10 +1548,10 @@ Output:
 ### `list_oxidized`
 
 List devices for use with Oxidized. If you have group support enabled
-then a group will also be returned based on your config.
+the response also holds a group from your configuration.
 
-> LibreNMS will automatically map the OS to the Oxidized model name if
-> they don't match.
+> LibreNMS maps the OS to the Oxidized model name automatically when
+> the two names differ.
 
 Route: `/api/v0/oxidized(/:hostname)`
 
@@ -1699,7 +1728,7 @@ search all oxidized device configs for a string.
 
 Route: `api/v0/oxidized/config/search/:searchstring`
 
-  - searchstring is the specific string you would like to search for.
+  - searchstring is the string of the search.
 
 Input:
 

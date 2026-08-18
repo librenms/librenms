@@ -75,6 +75,19 @@ class EditMiscController
     {
         if ($value === true) {
             $device->setAttrib($attrib, 'true');
+            if ($attrib === 'override_icmp_disable') {
+                $reasons = collect(explode(',', (string) $device->status_reason))
+                    ->reject(fn ($v) => $v === 'icmp')
+                    ->filter()
+                    ->implode(',');
+                if ($device->status_reason !== $reasons) {
+                    $device->status_reason = $reasons;
+                    if ($device->status == 0 && empty($reasons)) {
+                        $device->status = 1;
+                    }
+                    $device->save();
+                }
+            }
         } elseif ($value === null || $value === '' || $value === false) {
             $device->forgetAttrib($attrib);
         } else {

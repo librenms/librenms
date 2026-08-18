@@ -3,6 +3,7 @@ text: VyOS
 group: unix
 type: network
 ifname: true
+mib_dir: vyos
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'Processor Usage' }

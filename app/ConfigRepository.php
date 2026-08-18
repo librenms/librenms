@@ -26,6 +26,7 @@
 
 namespace App;
 
+use App\Events\SettingChanged;
 use App\Models\Callback;
 use App\Models\GraphType;
 use Exception;
@@ -34,7 +35,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use LibreNMS\DB\Eloquent;
-use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Version;
 use Log;
@@ -43,8 +43,6 @@ use Symfony\Component\Yaml\Yaml;
 class ConfigRepository
 {
     private array $config;
-    private ?array $fping4_cmd = null;
-    private ?array $fping6_cmd = null;
 
     /**
      * Load the config, if the database connected, pull in database settings.
@@ -266,7 +264,9 @@ class ConfigRepository
             $deleted = Models\Config::withChildren($key)->delete();
 
             if ($deleted > 0) {
+                // delete statement above doens't trigger Eloquent events
                 $this->invalidateCache();
+                event("setting.changed.$key", new SettingChanged($key, $this->get($key)));
             }
 
             return true;
@@ -539,7 +539,7 @@ class ConfigRepository
             $list = trim(substr((string) $output, strpos((string) $output, ':') + 1));
             $targets = explode(' ', $list);
             foreach ($targets as $target) {
-                if (is_executable($target)) {
+                if (is_executable($target) && ! is_dir($target)) {
                     return $target;
                 }
             }
@@ -600,25 +600,5 @@ class ConfigRepository
 
             $this->set("os.$os", $os_def);
         }
-    }
-
-    /**
-     * Get the fping command for a given address family
-     */
-    public function fpingCommand(AddressFamily $af): array
-    {
-        if ($this->fping4_cmd == null) {
-            $fping_bin = $this->get('fping', 'fping');
-            $fping6 = $this->get('fping6', 'fping6');
-            $fping6_bin = is_executable($fping6) ? $fping6 : false;
-
-            $this->fping4_cmd = $fping6_bin === false ? [$fping_bin, '-4'] : [$fping_bin];
-            $this->fping6_cmd = $fping6_bin === false ? [$fping_bin, '-6'] : [$fping6_bin];
-        }
-
-        return match ($af) {
-            AddressFamily::IPv4 => $this->fping4_cmd,
-            AddressFamily::IPv6 => $this->fping6_cmd,
-        };
     }
 }

@@ -1,12 +1,13 @@
 # Cleanup Options
 
-As the number of devices starts to grow in your LibreNMS install, so
-will things such as the RRD files, MySQL database containing
-eventlogs, Syslogs and performance data etc. Your LibreNMS install
-could become quite large so it becomes necessary to clean up those
-entries. With Cleanup Options, you can stay in control.
+The number of devices in your LibreNMS install increases with time. The
+RRD files and the MySQL database also become larger. The database holds
+the eventlog, the syslog, and the performance data. A large install
+therefore needs a cleanup of these entries. The cleanup options give
+you this control.
 
-These options rely on ```daily.sh``` running from cron as per the installation instructions.
+These options need `daily.sh` in cron, as in the installation
+instructions.
 
 !!! setting "system/cleanup"
     ```bash
@@ -22,31 +23,34 @@ These options rely on ```daily.sh``` running from cron as per the installation i
     lnms config:set networks_purge true
     ```
 
-These options will ensure data within LibreNMS over X days old is
-automatically purged. You can alter these individually, values are in
-days.
+These options purge data that is more than X days old. You can change
+each option on its own. Each value is a day count.
 
-**NOTE**: Please be aware that `rrd_purge` is NOT set
-by default. This option will remove any RRD files that have not been
-updated for the set amount of days automatically - only enable this if
-you are comfortable with that happening. (All active RRD files are
-updated every polling period.)
+**NOTE**: `rrd_purge` is NOT set by default. This option removes each
+RRD file that had no update for the set number of days. Enable this
+option only when you accept this behaviour. LibreNMS updates all active
+RRD files in each polling period.
+
+!!! note
+    `rrd_purge` does not work over rrdcached. The rrd folder must be
+    available on the local file system or on a remote file share. This
+    condition also applies to docker and Kubernetes.
 
 ## Ports Purge
 
-Over time as you add devices some interfaces will need to be purged as
-they are set to be ignored or bad interfaces or marked as deleted.
+You add devices with time. Some interfaces then need a purge, because
+they are ignored, bad, or marked as deleted.
 
-You can purge all deleted ports from the WebUI (see below) or by
-setting `lnms config:set ports_purge true`.
+To purge all deleted ports, use the web interface or set
+`lnms config:set ports_purge true`.
 
-In the Web UI Under the Ports Tab in the Nav Bar, Click on "Deleted"
-then click on "Purge all deleted". This will purge all the ports.
+In the web interface, open the Ports tab in the navigation bar. Click
+"Deleted", then click "Purge all deleted". This action purges all the
+ports.
 
 ## Networks Purge
 
-If you add and remove subnets, over time you may end up with subnets in
-the database that no longer have any IP addresses attached to them. These
-unused networks can be removed from the database if you enable the 
-networks_purge option.
+If you add and remove subnets, the database can hold subnets without IP
+addresses. The `networks_purge` option removes these unused networks
+from the database.
 

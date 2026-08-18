@@ -222,6 +222,7 @@ function update_application($app, $response, $metrics = [], $status = '')
         // if the response indicates an error, set it and set app_status to the raw response
         if (Str::contains($response, [
             'Traceback (most recent call last):',
+            'Connection refused',
         ])) {
             $app->app_state = 'ERROR';
             $app->app_status = $response;

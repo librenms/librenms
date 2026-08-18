@@ -53,8 +53,18 @@ if ($options['f'] === 'update') {
         exit(0);
     }
 
+    $on_days = LibrenmsConfig::get('update_on_days', []);
+
+    if (is_array($on_days) && ! empty($on_days)) {
+        $today = strtolower(date('l')); // monday..sunday
+
+        if (! in_array($today, $on_days, true)) {
+            exit(0);
+        }
+    }
+
     if (LibrenmsConfig::get('update_channel') == 'master') {
-        exit(1);
+        exit(2);
     } elseif (LibrenmsConfig::get('update_channel') == 'release') {
         exit(3);
     }
@@ -170,13 +180,6 @@ if ($options['f'] === 'handle_notifiable') {
             if ($options['r'] === 'python3-missing') {
                 Notifications::create($error_title,
                     'Python 3 is required to run LibreNMS as of May, 2020. You need to install Python 3 to continue to receive updates.  If you do not install Python 3 and required packages, LibreNMS will continue to function but stop receiving bug fixes and updates.',
-                    'daily.sh',
-                    2
-                );
-                exit(1);
-            } elseif ($options['r'] === 'python3-deps') {
-                Notifications::create($error_title,
-                    'Python 3 dependencies are missing. You need to install them via pip3 install -r requirements.txt or system packages to continue to receive updates.  If you do not install Python 3 and required packages, LibreNMS will continue to function but stop receiving bug fixes and updates.',
                     'daily.sh',
                     2
                 );

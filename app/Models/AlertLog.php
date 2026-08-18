@@ -14,6 +14,12 @@ class AlertLog extends DeviceRelatedModel
     public const UPDATED_AT = null;
     public const CREATED_AT = 'time_logged';
     protected $table = 'alert_log';
+    protected $fillable = [
+        'device_id',
+        'rule_id',
+        'state',
+        'details',
+    ];
     protected $casts = [
         'state' => AlertLogState::class,
         'details' => CompressedJson::class,

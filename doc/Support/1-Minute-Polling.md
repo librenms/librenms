@@ -1,48 +1,46 @@
 # 1-Minute Polling
 
-We now have support for polling data at intervals to fit your needs.
+LibreNMS can poll data at the interval that you select.
 
-> Please be aware of the following:
+> Read these conditions first:
 
-- If you just want faster up/down alerts, [Fast Ping](../Extensions/Fast-Ping-Check.md) is a much
-  easier path to that goal.
-- You must also change your cron entry for `poller-wrapper.py` for
-  this to work (if you change from the default 300 seconds).
-- Your polling _MUST_ complete in the time you configure for the
-  heartbeat step value. See `/poller` in your WebUI for
-  your current value.
-- This will only affect RRD files created from the moment you change
-  your settings.
-- This change will affect all data storage mechanisms such as MySQL,
-  RRD and InfluxDB. If you decrease the values then please be aware of
-  the increase in space use for MySQL and InfluxDB.
-- It's **highly recommended** to configure some [performance
-  optimizations](Performance.md). Keep in mind that all your devices
-  will write all graphs every minute to the disk and that every device
-  has many graphs. The most important thing is probably the
-  [RRDCached](../Extensions/RRDCached.md) configuration that can save
-  a lot of write IOPS.
+- For faster up and down alerts, [Fast
+  Ping](../Extensions/Fast-Ping-Check.md) is a much easier method.
+- If you change the interval from the default of 300 seconds, you must
+  also change the cron entry for `poller-wrapper.py`.
+- The polling _MUST_ complete within the heartbeat step value. Open
+  `/poller` in your web interface to see the current value.
+- The change applies only to RRD files that LibreNMS creates after the
+  change.
+- The change applies to all storage mechanisms, such as MySQL, RRD, and
+  InfluxDB. A lower value increases the disk space for MySQL and
+  InfluxDB.
+- Configure some [performance optimizations](Performance.md). Each
+  device has many graphs, and each device writes all its graphs to the
+  disk every minute. The [RRDCached](../Extensions/RRDCached.md)
+  configuration is the most important one, because it saves many write
+  IOPS.
 
-To make the changes, please navigate to `/settings/poller/rrdtool/`
-within your WebUI. Select RRDTool Setup and then update the two values
-for step and heartbeat intervals:
+To make the change, open `/settings/poller/rrdtool/` in your web
+interface. Select RRDTool Setup. Then set the two values for the step
+interval and the heartbeat interval:
 
-- Step is how often you want to insert data, so if you change to 1
-  minute polling then this should be 60.
-- Heartbeat is how long to wait for data before registering a null
-  value, i.e 120 seconds.
+- Step is the interval between two data inserts. For 1-minute polling,
+  set this value to 60.
+- Heartbeat is the time to wait for data before LibreNMS records a null
+  value. An example value is 120 seconds.
 
 ## Converting existing RRD files
 
-We provide a basic script to convert the default rrd files we generate
-to utilise your configured step and heartbeat values. Please do ensure
-that you backup your RRD files before running this just in case. The
-script runs on a per device basis or all devices at once.
+We supply a basic script. This script converts the default RRD files to
+your step value and your heartbeat value. Back up your RRD files before
+you run the script. The script runs for one device or for all devices.
 
-> The rrd files must be accessible from the server you run this script from.
+> The RRD files must be available on the server that runs this script.
 
 `lnms maintenance:rrd-step`
 
-This will provide the help information. To run it for localhost just run:
+This command shows the help information. To run the script for
+localhost, run:
 
 `lnms maintenance:rrd-step localhost`
