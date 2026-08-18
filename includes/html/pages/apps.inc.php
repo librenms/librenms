@@ -661,6 +661,13 @@ $graphs['syslog-ng'] = [
     'truncated_count',
     'written',
 ];
+$graphs['adguard'] = [
+    'queries',
+    'blocked',
+    'proc_time',
+    'protection',
+];
+
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
