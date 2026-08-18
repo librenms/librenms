@@ -1,6 +1,6 @@
 modules:
     os:
-        hardware: MERAKI-CLOUD-CONTROLLER-MIB::organizationName.0
+        features: MERAKI-CLOUD-CONTROLLER-MIB::organizationName.0
     sensors:
         state:
             data:
