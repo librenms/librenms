@@ -3,14 +3,14 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "<private>",
+                    "sysName": "lab-chassis01",
                     "sysObjectID": ".1.3.6.1.4.1.10456.2.625",
                     "sysDescr": "LAB-CHASSIS01",
                     "sysContact": "support@planet.com.tw",
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "location": "<private>",
+                    "location": "NYC",
                     "os": "planet-chassis",
                     "type": "network",
                     "serial": null,
