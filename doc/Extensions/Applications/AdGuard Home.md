@@ -6,6 +6,10 @@ exports them with SNMP Extend. It graphs DNS queries vs blocked queries,
 the blocked-query breakdown (filters, safe browsing, safe search,
 parental), average processing time, and the running/protection state.
 
+Values are totals over AdGuard's configured statistics interval (24 hours
+by default), not per-second rates. Changing that interval in AdGuard
+will rescale the graphs.
+
 ## SNMP Extend
 
 1. Download the script onto the AdGuard Home host
@@ -32,8 +36,9 @@ parental), average processing time, and the running/protection state.
     }
     ```
 
-    Optional keys: `timeout` (seconds, default 10) and `insecure` (set to
-    `true` to skip TLS certificate verification on https URLs).
+    Optional keys: `timeout` (seconds, default 5) and `insecure` (set to
+    `true` to skip TLS certificate verification on https URLs). The script
+    makes two API calls, so the SNMP timeout must exceed `2 * timeout`.
 
     The file holds credentials, so restrict it to the user snmpd runs
     extend scripts as. On Debian/Ubuntu that is `Debian-snmp`:
