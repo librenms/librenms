@@ -36,9 +36,11 @@ will rescale the graphs.
     }
     ```
 
-    Optional keys: `timeout` (seconds, default 5) and `insecure` (set to
-    `true` to skip TLS certificate verification on https URLs). The script
-    makes two API calls, so the SNMP timeout must exceed `2 * timeout`.
+    Optional keys: `timeout` (seconds, default 1) and `insecure` (set to
+    `true` to skip TLS certificate verification on https URLs). LibreNMS
+    defaults to a 1 second SNMP timeout. Local AdGuard answers well inside
+    that. If the API is remote or polls come back empty, cache via cron
+    instead of raising the SNMP timeout (see below).
 
     The file holds credentials, so restrict it to the user snmpd runs
     extend scripts as. On Debian/Ubuntu that is `Debian-snmp`:
@@ -52,6 +54,17 @@ will rescale the graphs.
 
     ```bash
     extend adguard /etc/snmp/adguard
+    ```
+
+    If a live extend times out, run the script from cron and have snmpd
+    cat the cache:
+
+    ```
+    */5 * * * * /etc/snmp/adguard > /var/cache/adguard
+    ```
+
+    ```
+    extend adguard /bin/cat /var/cache/adguard
     ```
 
 5. Restart snmpd service on the host
