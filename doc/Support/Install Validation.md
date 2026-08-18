@@ -1,54 +1,54 @@
 # Install validation
 
-With a lot of configuration possibilities, it's not uncommon that
-mistakes get made.
+LibreNMS has many configuration options. A mistake in the configuration
+is therefore common.
 
-So, to try and help with some of the general issues people come across
-we've put together a simple validation tool which at present will:
+We supply a validation tool for the most common problems. The tool does
+these tests:
 
-- Validate config.php from a php perspective including whitespace
-  where it shouldn't be.
-- Connection to your MySQL server to verify credentials.
-- Checks if you are running the older alerting system.
-- Checks your rrd directory setup if not running rrdcached.
-- Checks disk space for where /opt/librenms is installed.
-- Checks location to fping.
-- Tests MySQL strict mode being enabled.
-- Tests for files not owned by librenms user (if configured).
-- And more added all the time.
+- It validates `config.php` as PHP code. It also finds whitespace in
+  the wrong place.
+- It connects to your MySQL server to test the credentials.
+- It tests whether you run the older alerting system.
+- It tests your rrd directory when you do not run rrdcached.
+- It tests the disk space for the location of `/opt/librenms`.
+- It tests the location of fping.
+- It tests whether MySQL strict mode is enabled.
+- It finds files that the `librenms` user does not own, when you
+  configure this user.
+- We add more tests continuously.
 
-Optionally you can also pass -m and a module name for that to be
-tested. Current modules are:
+You can also give the `-m` option and a module name. The tool then
+tests that module. These modules are available:
 
-- mail - This will validate your mail transport configuration.
-- dist-poller - This will test your distributed poller configuration.
-- rrdcheck - This will test your rrd files to see if they are
-  unreadable or corrupted (source of broken graphs).
+- `mail` - it validates your mail transport configuration.
+- `dist-poller` - it tests your distributed poller configuration.
+- `rrdcheck` - it tests your rrd files for unreadable data or corrupt
+  data. Such data is a cause of broken graphs.
 
-You can run validate.php as `librenms` by executing `./validate.php`
-within your install directory.
+To run the tool, become the `librenms` user. Then run `./validate.php`
+in your install directory.
 
-The output will provide you either a clean bill of health or a list of
-things you need to fix:
+The output gives a clean result or a list of the problems to correct:
 
-**OK** - This is a good thing, you can skip over these :)
+**OK** - no action is necessary.
 
-**WARN** - You probably want to check this out.
+**WARN** - examine this item.
 
-**FAIL** - This is going to need your attention!
+**FAIL** - this item needs your attention.
 
 # Validate from the WebUI
 
-You can validate your LibreNMS install from the WebUI, using the nav
-bar and clicking on the little Gear Icon -> Validate Config.
+You can also validate your LibreNMS install from the web interface. In
+the navigation bar, click the gear icon. Then select Validate Config.
 
-It's worth running validate on both the WebUI and CLI as they test
-for different things.
+Run the validation in both the web interface and the command line. The
+two methods test different items.
 
 ![Validate Config Icon](../img/validate-config-icon.png) 
 
-Then You should see the results of validate.
+The results then appear on the screen.
 
-Below is just example of the results.
+The image below shows an example of the results.
 
 ![Validate results](../img/validate-results.png)

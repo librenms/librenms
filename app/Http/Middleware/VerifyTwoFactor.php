@@ -23,7 +23,7 @@ class VerifyTwoFactor
         if (auth()->check() && LibrenmsConfig::get('twofactor') === true) {
             // don't apply on 2fa checking routes
             $route_name = $request->route()->getName();
-            if ($route_name && Str::startsWith($route_name, '2fa.')) {
+            if ($route_name && Str::startsWith($route_name, ['2fa.verify', '2fa.form'])) {
                 return $next($request);
             }
 
