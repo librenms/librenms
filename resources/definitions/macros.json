@@ -8,6 +8,7 @@
     "device": "(%devices.disabled = 0 && %devices.ignore = 0)",
     "device_component_down_junos": "%sensors.sensor_class = \"state\" && %sensors.sensor_current != \"6\" && (%sensors.sensor_type = \"jnxFruState\" || %sensors.sensor_type = \"jnxFruTable\") && %sensors.sensor_current != \"2\" && %sensors.sensor_alert = \"1\"",
     "device_component_down_cisco": "%sensors.sensor_current != \"1\" && %sensors.sensor_current != \"5\" && %sensors.sensor_type REGEXP \"^cisco.*State$\" && %sensors.sensor_alert = \"1\"",
+    "device_cpu_avg_perc": "COALESCE((SELECT AVG(p.processor_usage) FROM processors AS p WHERE p.device_id = %devices.device_id), 0)",
     "device_up": "(%devices.status = 1 && %macros.device)",
     "device_down": "(%devices.status = 0 && %macros.device)",
     "now": "NOW()",

@@ -19,6 +19,8 @@ return [
     'copied' => 'Copied!',
     'load_more' => 'Load more',
     'loading' => 'Loading...',
+    'refresh' => 'Refresh Config',
+    'refresh_unavailable' => 'This provider does not support queuing a refresh.',
 
     'messages' => [
         'unreachable' => ':provider is not reachable.',
@@ -30,5 +32,7 @@ return [
         'device_not_found' => 'This device could not be found in :provider. It is matched by hostname or IP address.',
         'binary_not_supported' => 'This is a binary backup and cannot be displayed. View it in :provider instead.',
         'request_failed' => 'The request failed. Please try again.',
+        'refresh_queued' => 'Queued a refresh in :provider for this device.',
+        'refresh_failed' => 'Could not queue a refresh in :provider.',
     ],
 ];
