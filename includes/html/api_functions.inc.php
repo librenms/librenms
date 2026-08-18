@@ -309,9 +309,10 @@ function get_device(Illuminate\Http\Request $request)
     }
 
     return check_device_permission($device->device_id, function () use ($device) {
-        $device['location'] = $device->location?->location;
-        $device['lat'] = $device->location?->lat;
-        $device['lng'] = $device->location?->lng;
+        $location = $device->location;
+        $device['location'] = $location?->location;
+        $device['lat'] = $location?->lat;
+        $device['lng'] = $location?->lng;
 
         $host_id = get_vm_parent_id($device);
         if (is_numeric($host_id)) {
