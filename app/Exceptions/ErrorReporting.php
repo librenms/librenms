@@ -96,6 +96,10 @@ class ErrorReporting
             }
         }
 
+        if ($request->is('api/v1/*') || $request->is('api/v1')) {
+            return JsonApiErrorRenderer::render($exception);
+        }
+
         return null; // use default rendering
     }
 
