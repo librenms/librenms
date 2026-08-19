@@ -1,0 +1,12 @@
+os: abb-cms700
+text: 'ABB CMS-700 Circuit Measurement System'
+type: power
+icon: abb
+mib_dir: abb
+over:
+    - { graph: device_abb_current_total, text: 'Total Current' }
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_percent, text: 'Voltage THD' }
+discovery:
+    - sysDescr:
+        - ABBCircuitMeasurementSystemCMS700
