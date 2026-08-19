@@ -43,6 +43,7 @@ class WorldMapController extends WidgetController
             'init_zoom' => LibrenmsConfig::get('leaflet.default_zoom'),
             'init_layer' => LibrenmsConfig::get('geoloc.layer'),
             'group_radius' => LibrenmsConfig::get('leaflet.group_radius'),
+            'auto_scale' => 1,
             'status' => '0,1',
             'device_group' => null,
         ];
