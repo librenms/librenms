@@ -1,7 +1,12 @@
 <?php
 
 use App\Models\BgpPeer;
+use App\Models\BgpPeerCbgp;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use LibreNMS\Data\Store\Rrd;
+use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Bird2;
 use LibreNMS\Util\Oid;
 
 $name = 'bird2';
@@ -17,101 +22,7 @@ if (empty($birdOutput)) {
 
 // ========
 // Process the actual BIRD2 output
-$protocolsData = [];
-
-// Remove headers
-$birdOutput = trim(explode('Name       Proto      Table      State  Since         Info', (string) $birdOutput, 2)[1]);
-$protocolSegments = explode("\n\n", $birdOutput);
-
-// Remove the first title
-unset($protocolSegments[0]);
-
-foreach ($protocolSegments as $protocolSegment) {
-    // Deal with the title first
-    $protocolSegmentParts = explode("\n", $protocolSegment, 2);
-    $titleParts = preg_split("/\s+/", $protocolSegmentParts[0], 5);
-
-    // make sure we only look at BGP protocols
-    if ($titleParts[1] !== 'BGP') {
-        continue;
-    }
-
-    $protocolData = [
-        'name' => $titleParts[0],
-        'type' => $titleParts[1],
-        'table' => $titleParts[2],
-        'protocol_state' => $titleParts[3],
-        'since' => preg_split("/\s+/", $titleParts[4], 3)[0] . ' ' . preg_split("/\s+/", $titleParts[4], 3)[1],
-    ];
-
-    // Deal with the rest of the body
-    $protocolBodys = preg_split("/^\s{2}([A-Z])/m", $protocolSegmentParts[1]);
-
-    // Loop through all BGP protocols
-    foreach ($protocolBodys as $protocolBody) {
-        // Deal with the BGP block
-        if (str_starts_with($protocolBody, 'GP')) {
-            foreach (explode("\n", 'B' . $protocolBody) as $protocolBodyLine) {
-                if (str_contains($protocolBodyLine, ':')) {
-                    $lineParts = explode(':', $protocolBodyLine, 2);
-                    $protocolData[str_replace(' ', '_', strtolower(trim($lineParts[0])))] = trim($lineParts[1]);
-                }
-            }
-
-            // Fix up the error string
-            if (isset($protocolData['last_error'])) {
-                // Trim the received
-                $protocolData['last_error'] = trim(str_ireplace('Received:', '', $protocolData['last_error']));
-            }
-        }
-
-        // Process the Ip channel (v4/v6)
-        $IpVersion = 4;
-        if (isset($protocolData['neighbor_address']) && filter_var($protocolData['neighbor_address'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-            $IpVersion = 6;
-        }
-
-        if (str_starts_with($protocolBody, 'hannel ipv' . $IpVersion)) {
-            foreach (explode("\n", 'C' . $protocolBody) as $protocolBodyLine) {
-                if (str_contains($protocolBodyLine, ':')) {
-                    $lineParts = explode(':', $protocolBodyLine, 2);
-                    $protocolData[str_replace(' ', '_', strtolower(trim($lineParts[0])))] = trim($lineParts[1]);
-                }
-            }
-
-            // Fix up the ROUTES
-            if (isset($protocolData['routes'])) {
-                $routeParts = explode(', ', $protocolData['routes']);
-                unset($protocolData['routes']);
-                foreach ($routeParts as $routePart) {
-                    $routeDetail = explode(' ', $routePart);
-                    $protocolData['routes'][$routeDetail[1]] = $routeDetail[0];
-                }
-            }
-
-            // Set the route updates
-            unset($protocolData['route_change_stats']);
-            foreach (['import_updates', 'import_withdraws', 'export_updates', 'export_withdraws'] as $key) {
-                if (! isset($protocolData[$key])) {
-                    continue;
-                }
-
-                $routeChange_parts = preg_split("/\s+/", trim($protocolData[$key]));
-
-                unset($protocolData[$key]);
-                $protocolData['route_change_stats'][$key] = [
-                    'received' => $routeChange_parts[0],
-                    'rejected' => $routeChange_parts[1],
-                    'filtered' => $routeChange_parts[2],
-                    'ignored' => $routeChange_parts[3],
-                    'accepted' => $routeChange_parts[4],
-                ];
-            }
-        }
-    }
-
-    $protocolsData[] = $protocolData;
-}
+$protocolsData = Bird2::parseProtocols((string) $birdOutput);
 
 // ---
 $deviceObj = DeviceCache::getPrimary();
@@ -135,6 +46,7 @@ $deviceObj->save();
 
 // Going through all BGP Peers
 $bgpPeerIds = [];
+$peerAfiKeys = [];
 
 foreach ($protocolsData as $protocol) {
     // Skip peers that don't have neighbor_address (incomplete BGP handshakes/errors)
@@ -152,28 +64,29 @@ foreach ($protocolsData as $protocol) {
 
     $bgpPeer->device_id = $device['device_id'];
     $bgpPeer->astext = \LibreNMS\Util\AutonomousSystem::get($protocol['neighbor_as'])->name();
-    $bgpPeer->bgpPeerIdentifier = $protocol['neighbor_id'] ?? '0.0.0.0';
+    // key on the address, not the router id, the routing page filters v4/v6 on it
+    $bgpPeer->bgpPeerIdentifier = $protocol['neighbor_address'];
     $bgpPeer->bgpPeerRemoteAs = $protocol['neighbor_as'];
     $bgpPeer->bgpPeerState = strtolower((string) $protocol['bgp_state']);
     $bgpPeer->bgpPeerAdminStatus = str_replace('up', 'start', strtolower((string) $protocol['protocol_state']));
 
-    if (isset($protocolData['last_error'])) {
+    if (isset($protocol['last_error'])) {
         // Find the subcode if its there and set it
         foreach (trans('bgp.error_subcodes') as $mainCode => $subCodes) {
             foreach ($subCodes as $subCode => $message) {
-                if ($message == $protocolData['last_error']) {
+                if ($message == $protocol['last_error']) {
                     $bgpPeer->bgpPeerLastErrorCode = $mainCode;
                     $bgpPeer->bgpPeerLastErrorSubCode = $subCode;
                 }
             }
         }
 
-        $bgpPeer->bgpPeerLastErrorText = $protocol['neighbor_id'] ?? '0.0.0.0';
+        $bgpPeer->bgpPeerLastErrorText = $protocol['last_error'];
     }
 
     $bgpPeer->bgpLocalAddr = $protocol['source_address'] ?? '0.0.0.0';
     $bgpPeer->bgpPeerRemoteAddr = $protocol['neighbor_address'];
-    $bgpPeer->bgpPeerDescr = $protocol['description'] ?: $protocol['name'];
+    $bgpPeer->bgpPeerDescr = $protocol['description'] ?? $protocol['name'];
     $bgpPeer->bgpPeerInUpdates = intval($protocol['route_change_stats']['import_updates']['accepted'] ?? 0);
     $bgpPeer->bgpPeerOutUpdates = intval($protocol['route_change_stats']['export_updates']['accepted'] ?? 0);
     $bgpPeer->bgpPeerInTotalMessages = intval($protocol['route_change_stats']['import_updates']['received'] ?? 0);
@@ -182,6 +95,66 @@ foreach ($protocolsData as $protocol) {
     $bgpPeer->bgpPeerFsmEstablishedTime = (int) Carbon::parse($protocol['since'])->diffInSeconds(Carbon::now(), true);
     $bgpPeer->bgpPeerInUpdateElapsedTime = (int) Carbon::parse($protocol['since'])->diffInSeconds(Carbon::now(), true);
     $bgpPeer->save();
+
+    // write same graphs as bgp-peers
+    app('Datastore')->put($device, 'bgp', [
+        'bgpPeerIdentifier' => $bgpPeer->bgpPeerIdentifier,
+        'rrd_name' => Rrd::safeName('bgp-' . $bgpPeer->bgpPeerIdentifier),
+        'rrd_def' => RrdDefinition::make()
+            ->addDataset('bgpPeerOutUpdates', 'COUNTER', null, 100000000000)
+            ->addDataset('bgpPeerInUpdates', 'COUNTER', null, 100000000000)
+            ->addDataset('bgpPeerOutTotal', 'COUNTER', null, 100000000000)
+            ->addDataset('bgpPeerInTotal', 'COUNTER', null, 100000000000)
+            ->addDataset('bgpPeerEstablished', 'GAUGE', 0),
+    ], [
+        'bgpPeerOutUpdates' => $bgpPeer->bgpPeerOutUpdates,
+        'bgpPeerInUpdates' => $bgpPeer->bgpPeerInUpdates,
+        'bgpPeerOutTotal' => $bgpPeer->bgpPeerOutTotalMessages,
+        'bgpPeerInTotal' => $bgpPeer->bgpPeerInTotalMessages,
+        'bgpPeerEstablished' => $bgpPeer->bgpPeerFsmEstablishedTime,
+    ]);
+
+    foreach ($protocol['channels'] ?? [] as $channel) {
+        // no id column, match on the composite key
+        $afiKey = [
+            'device_id' => $device['device_id'],
+            'bgpPeerIdentifier' => $bgpPeer->bgpPeerIdentifier,
+            'afi' => $channel['afi'],
+            'safi' => $channel['safi'],
+        ];
+        $existing = BgpPeerCbgp::where($afiKey)->first();
+
+        // bird has no prefix limits, but these are NOT NULL
+        $values = [
+            'PrefixAdminLimit' => (int) ($existing->PrefixAdminLimit ?? 0),
+            'PrefixThreshold' => (int) ($existing->PrefixThreshold ?? 0),
+            'PrefixClearThreshold' => (int) ($existing->PrefixClearThreshold ?? 0),
+        ];
+
+        foreach (Bird2::channelPrefixCounters($channel) as $field => $value) {
+            $previous = (int) ($existing->$field ?? 0);
+
+            $values[$field] = $value;
+            $values[$field . '_prev'] = $previous;
+            $values[$field . '_delta'] = $value - $previous;
+        }
+
+        DB::table('bgpPeers_cbgp')->updateOrInsert($afiKey, $values);
+
+        app('Datastore')->put($device, 'cbgp', [
+            'bgpPeerIdentifier' => $bgpPeer->bgpPeerIdentifier,
+            'afi' => $channel['afi'],
+            'safi' => $channel['safi'],
+            'rrd_name' => Rrd::safeName('cbgp-' . $bgpPeer->bgpPeerIdentifier . '.' . $channel['afi'] . '.' . $channel['safi']),
+            'rrd_def' => array_reduce(
+                Bird2::PREFIX_DATASETS,
+                fn ($def, $ds) => $def->addDataset($ds, 'GAUGE', null, 100000000000),
+                RrdDefinition::make()
+            ),
+        ], Bird2::channelPrefixCounters($channel));
+
+        $peerAfiKeys[] = [$bgpPeer->bgpPeerIdentifier, $channel['afi'], $channel['safi']];
+    }
 
     echo PHP_EOL . $name . ': Processed peer AS' . $bgpPeer->bgpPeerRemoteAs . ' (' . $bgpPeer->astext . ')';
 
@@ -192,3 +165,11 @@ echo PHP_EOL;
 
 // Clean up any bgpPeers that arent on the list for this device
 BgpPeer::where('device_id', $device['device_id'])->whereNotIn('bgpPeer_id', $bgpPeerIds)->delete();
+
+BgpPeerCbgp::where('device_id', $device['device_id'])
+    ->where(function ($query) use ($peerAfiKeys): void {
+        foreach ($peerAfiKeys as [$identifier, $afi, $safi]) {
+            $query->whereNot(fn ($q) => $q->where('bgpPeerIdentifier', $identifier)->where('afi', $afi)->where('safi', $safi));
+        }
+    })
+    ->delete();
