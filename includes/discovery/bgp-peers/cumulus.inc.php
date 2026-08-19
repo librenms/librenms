@@ -18,7 +18,15 @@ foreach ($bgpPeers as $bgpPeer) {
     $bgpLocalAs = \SnmpQuery::hideMib()->get("CUMULUS-BGPVRF-MIB::bgpLocalAs.{$bgpPeer['vrfId']}")->value();
     $astext = \LibreNMS\Util\AutonomousSystem::get($bgpPeer['bgpPeerRemoteAs'])->name();
     echo "AS$bgpLocalAs \n";
-    $bgpPeer['bgpPeerIdentifier'] = $bgpPeer['bgpPeerRemoteAddr'] ?? $bgpPeer['bgpPeerIdentifier']; // bgpPeerIdentifier is not unique.
+    // The MIB bgpPeerIdentifier is the peer's router-id (not unique). Unnumbered peers have
+    // no learned remote address until the session is up (bgpPeerRemoteAddr = "Unknown"), so
+    // key interface-type peers by their interface for a unique, stable identity.
+    if (($bgpPeer['peerIdType'] ?? null) === 'interface') {
+        $ifName = DeviceCache::getPrimary()->ports()->where('ifIndex', $bgpPeer['ifIndex'])->value('ifName');
+        $bgpPeer['bgpPeerIdentifier'] = $ifName ?: ('ifIndex.' . $bgpPeer['ifIndex']);
+    } else {
+        $bgpPeer['bgpPeerIdentifier'] = $bgpPeer['bgpPeerRemoteAddr'] ?? $bgpPeer['bgpPeerIdentifier'];
+    }
     echo "BGP Peer {$bgpPeer['bgpPeerIdentifier']} ";
 
     $vrf = $vrfs->where('vrf_oid', $bgpPeer['vrfId'])->first();
@@ -50,7 +58,9 @@ foreach ($bgpPeers as $bgpPeer) {
 
         DeviceCache::getPrimary()->bgppeers()->create($peers);
 
-        if (LibrenmsConfig::get('autodiscovery.bgp')) {
+        // Only reverse-resolve / autodiscover when there is a real peer IP. Unnumbered
+        // peers that have never established report bgpPeerRemoteAddr = "Unknown".
+        if (LibrenmsConfig::get('autodiscovery.bgp') && filter_var($bgpPeer['bgpPeerRemoteAddr'], FILTER_VALIDATE_IP)) {
             $name = gethostbyaddr($bgpPeer['bgpPeerRemoteAddr']);
             discover_new_device($name, $device, 'BGP');
         }
@@ -60,7 +70,7 @@ foreach ($bgpPeers as $bgpPeer) {
             'bgpPeerRemoteAs' => $bgpPeer['bgpPeerRemoteAs'],
             'astext' => $astext,
         ];
-        $affected = DeviceCache::getPrimary()->bgppeers()->where('bgpPeer_id', $bgpPeer['bgpPeerIdentifier'])->update($peers);
+        $affected = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $bgpPeer['bgpPeerIdentifier'])->where('vrf_id', $vrfId)->update($peers);
         echo str_repeat('.', $affected);
     }
     $seenPeerID[] = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $bgpPeer['bgpPeerIdentifier'])->where('vrf_id', $vrfId)->select('bgpPeer_id')->orderBy('bgpPeer_id', 'ASC')->first()->bgpPeer_id;
