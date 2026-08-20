@@ -8,7 +8,7 @@
                     "sysDescr": "pfSense 2.3.2-RELEASE pfSense FreeBSD 10.3-RELEASE-p5 amd64",
                     "sysContact": "<private>",
                     "version": "2.3.2-RELEASE",
-                    "hardware": "amd64",
+                    "hardware": "cpu0: ACPI CPU",
                     "features": null,
                     "location": "<private>",
                     "os": "pfsense",
