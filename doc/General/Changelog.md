@@ -1,3 +1,19 @@
+## 26.8.1
+*(2026-08-19)*
+
+A big thank you to the following 4 contributors this last month:
+
+  - [laf](https://github.com/laf) (2)
+  - [bennetgallein](https://github.com/bennetgallein) (1)
+  - [omichelbraga](https://github.com/omichelbraga) (1)
+  - [kate-james](https://github.com/kate-james) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [Jellyfrog](https://github.com/Jellyfrog) (2)
+  - [laf](https://github.com/laf) (1)
+
+
 ## 26.8.0
 *(2026-08-17)*
 
