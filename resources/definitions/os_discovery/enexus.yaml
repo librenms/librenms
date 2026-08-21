@@ -81,7 +81,7 @@ modules:
                     oid: SP2-MIB::mainsMainsFailure
                     value: SP2-MIB::mainsMainsFailureStatus
                     num_oid: '.1.3.6.1.4.1.12148.10.3.2.1.{{ $index }}'
-                    descr: SP2-MIB::mainsMainsFailureDescription
+                    descr: 'Mains Failure Status'
                     state_name: mainsMainsFailureStatus
                     group: System
                     states:
@@ -344,10 +344,10 @@ modules:
                     state_name: outputStatus
                     group: Alarm Output
                     states:
-                        - { descr: notenergized, value: 0, generic: 3 }
-                        - { descr: energized, value: 1, generic: 3 }
-                        - { descr: disconnected, value: 2, generic: 3 }
-                        - { descr: connected, value: 3, generic: 3 }
+                        - { descr: notenergized, value: 0, generic: 1 }
+                        - { descr: energized, value: 1, generic: 0 }
+                        - { descr: disconnected, value: 2, generic: 2 }
+                        - { descr: connected, value: 3, generic: 0 }
                     skip_values: 4
                 -
                     oid: SP2-MIB::powerSystem
@@ -530,7 +530,6 @@ modules:
                     index: 'batteryCurrent.{{ $index }}'
                     entPhysicalIndex: '100'
                     group: Battery
-                    divisor: 10
                     low_limit: SP2-MIB::batteryCurrentsMinorLowLevel
                     low_warn_limit: SP2-MIB::batteryCurrentsMinorLowLevel
                     warn_limit: SP2-MIB::batteryCurrentsMinorHighLevel
@@ -539,11 +538,10 @@ modules:
                     oid: SP2-MIB::batteryBankCurrentTable
                     value: SP2-MIB::batteryCurrentValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.18.4.1.6.{{ $index }}'
-                    descr: 'Battery {{ $index }}'
+                    descr: 'Battery {{ $index }} Current'
                     index: 'batteryBankCurrent.{{ $index }}'
                     entPhysicalIndex: '3{{ $index }}'
                     group: Battery
-                    divisor: 10
                     low_limit: SP2-MIB::batteryCurrentMinorLowLevel
                     low_warn_limit: SP2-MIB::batteryCurrentMinorLowLevel
                     warn_limit: SP2-MIB::batteryCurrentMinorHighLevel
@@ -656,7 +654,7 @@ modules:
                     oid: SP2-MIB::batteryAhCharged
                     value: SP2-MIB::batteryAhChargedValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.23.5.{{ $index }}'
-                    descr: SP2-MIB::batteryAhChargedDescription
+                    descr: 'Battery Ah Charged (cumulative)'
                     entPhysicalIndex: '100'
                     divisor: 100
                     index: 'batteryAhCharged.{{ $index }}'
@@ -666,7 +664,7 @@ modules:
                     oid: SP2-MIB::batteryTotalCapacity
                     value: SP2-MIB::batteryTotalCapacityValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.11.5.{{ $index }}'
-                    descr: "Battery Total Capacity"
+                    descr: 'Battery Total Capacity (Ah)'
                     entPhysicalIndex: '100'
                     index: 'batteryTotalCapacity.{{ $index }}'
                     low_warn_limit: SP2-MIB::batteryTotalCapacityMinorLowLevel
