@@ -8,6 +8,19 @@ be adjusted by following the instructions below.
 [This link](https://visjs.github.io/vis-network/docs/network/)
 show you all the options and explain what they do.
 
+!!! warning
+
+    There is currently a known issue with lnms set when setting JSON values.
+    As a workaround, the JSON must be double-encoded, and the resulting string 
+    must be properly escaped for the CLI. Until this issue is resolved, using 
+    the Web UI or config.php is generally less error-prone..
+
+example config with working encoding
+
+```bash
+lnms config:set network_map_vis_options '"{\"nodes\":{\"shape\":\"box\",\"margin\":8,\"font\":{\"size\":20,\"face\":\"Segoe UI\",\"color\":\"#000000\",\"strokeWidth\":1,\"strokeColor\":\"#ffffff\"},\"shadow\":true},\"edges\":{\"width\":2,\"font\":{\"size\":14,\"align\":\"bottom\",\"strokeWidth\":4,\"strokeColor\":\"#1f2937\",\"color\":\"#ffffff\"},\"smooth\":{\"enabled\":true,\"type\":\"dynamic\",\"roundness\":0.3}},\"physics\":{\"enabled\":true,\"solver\":\"forceAtlas2Based\",\"forceAtlas2Based\":{\"gravitationalConstant\":-200,\"centralGravity\":0.01,\"springLength\":250,\"springConstant\":0.04,\"damping\":0.90,\"avoidOverlap\":1},\"stabilization\":{\"enabled\":true,\"iterations\":1000}},\"layout\":{\"improvedLayout\":true}}"'
+```
+
 The commands to run to use the defaults is as follows:
 
 ```bash
