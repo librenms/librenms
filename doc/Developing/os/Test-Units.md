@@ -1,12 +1,31 @@
-# Tests
+# Unit Tests
 
-Tests keep LibreNMS correct, now and in the future. A new OS must
-supply enough test data. Test data for an existing OS is also welcome.
+## Concepts
 
-The saved SNMP data is in `tests/snmpsim/*.snmprec`. The saved database
-data is in `tests/data/*.json`. Read this data for sensitive
-information **before** you submit it. Replace the data in a consistent
-way.
+**Unit testing** is a popular type of software testing. It is used to
+ensure that future **code** modifications don't break past existing
+**behaviors**.
+
+In LibreNMS, one crucial behavior to keep is **result** of polling /
+discovery code over past **input**. **Input** is SNMP data from
+devices, and **result** is database entries generated / updated.
+
+Since none of us have access to *all* physical devices supported by
+LibreNMS, we keep SNMP data collected and database data saved in our
+repository. The collected SNMP data is in
+`tests/snmpsim/*.snmprec`. The saved database is in
+`tests/data/*.json`.
+
+Whenever you submit polling / discovery code modifications, or OS yaml
+definition changes, please add or update these data. Test data for an
+existing OS is also welcome.
+
+> One small note is that providing these data doesn't promise
+> eternally same behavior, though unreasoned change would be
+> prevented.
+
+Read this data for sensitive information **before** you submit
+it. Replace the data in a consistent way.
 
 > We use [snmpsim](http://snmpsim.sourceforge.net/) for the unit tests.
 > For OS discovery, we can mock snmpsim. The other tests need an
