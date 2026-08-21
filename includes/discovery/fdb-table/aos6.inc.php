@@ -1,10 +1,11 @@
 <?php
 
+use App\Facades\PortCache;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\Mac;
 
 /**
- * aos.inc.php
+ * aos6.inc.php
  *
  * Discover FDB data with ALCATEL-IND1-MAC-ADDRESS-MIB
  *
@@ -26,53 +27,138 @@ use LibreNMS\Util\Mac;
  * @copyright LibreNMS contributors
  * @author    Tony Murray <murraytony@gmail.com>
  * @author    JoseUPV
+ * @author    Paul Iercosan <mail@paulierco.ro>
  */
-if (empty($fdbPort_table)) { // no empty if come from aos7 script
-    // try nokia/ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressDisposition
-    $dot1d = snmpwalk_group($device, 'slMacAddressDisposition', 'ALCATEL-IND1-MAC-ADDRESS-MIB', 0, [], 'nokia/aos6');
+if (empty($fdbPort_table)) {
+    $dot1d = snmpwalk_group(
+        $device,
+        'slMacAddressDisposition',
+        'ALCATEL-IND1-MAC-ADDRESS-MIB',
+        0,
+        [],
+        'nokia/aos6'
+    );
+
     if (! empty($dot1d)) {
         echo 'AOS6 MAC-ADDRESS-MIB: ';
         $fdbPort_table = [];
+
         foreach ($dot1d['slMacAddressDisposition'] as $portLocal => $data) {
             foreach ($data as $vlanLocal => $data2) {
                 if (! isset($fdbPort_table[$vlanLocal]['dot1qTpFdbPort'])) {
                     $fdbPort_table[$vlanLocal] = ['dot1qTpFdbPort' => []];
                 }
+
                 foreach ($data2 as $macLocal => $one) {
-                    $fdbPort_table[$vlanLocal]['dot1qTpFdbPort'][$macLocal] = $portLocal;
+                    $fdbPort_table[$vlanLocal]['dot1qTpFdbPort'][$macLocal] = (int) $portLocal;
                 }
             }
         }
     }
 }
+
 if (! empty($fdbPort_table)) {
-    // Build dot1dBasePort to port_id dictionary
-    $portid_dict = [];
-    $dot1dBasePortIfIndex = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
-    foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
-        $portid_dict[$portLocal] = PortCache::getIdFromIfIndex($data['dot1dBasePortIfIndex'], $device['device_id']);
+    $device_id = $device['device_id'];
+
+    // Map physical LAG members to their parent aggregate interface.
+    $lag_ports = [];
+    $ifStack = SnmpQuery::walk('IF-MIB::ifStackStatus')->valuesByIndex();
+
+    foreach ($ifStack as $index => $data) {
+        $parts = explode('.', (string) $index);
+
+        if (count($parts) !== 2) {
+            continue;
+        }
+
+        [$parent, $child] = array_map(intval(...), $parts);
+
+        if ($parent && $child && (int) ($data['IF-MIB::ifStackStatus'] ?? 0) === 1) {
+            $lag_ports[$child] = $parent;
+        }
     }
-    // Collect data and populate $insert
-    foreach ($fdbPort_table as $vlan => $data) {
-        foreach ($data['dot1qTpFdbPort'] as $mac => $dot1dBasePort) {
-            if ($dot1dBasePort == 0) {
-                Log::debug("No port known for $mac\n");
+
+    // Build dot1dBasePort to port_id dictionary.
+    $portid_dict = [];
+    $dot1dBasePortIfIndex = snmpwalk_group(
+        $device,
+        'dot1dBasePortIfIndex',
+        'BRIDGE-MIB'
+    );
+
+    foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
+        $ifIndex = (int) $data['dot1dBasePortIfIndex'];
+        $ifIndex = $lag_ports[$ifIndex] ?? $ifIndex;
+
+        $portid_dict[(int) $portLocal] = PortCache::getIdFromIfIndex(
+            $ifIndex,
+            $device_id
+        );
+    }
+
+    /*
+     * AOS6 may report an ifIndex directly instead of a bridge port.
+     * Aggregate bridge ports start at 4098 and map to 40000001, etc.
+     */
+    foreach ($fdbPort_table as $data) {
+        foreach ($data['dot1qTpFdbPort'] as $portLocal) {
+            $portLocal = (int) $portLocal;
+
+            if (isset($portid_dict[$portLocal])) {
                 continue;
             }
 
-            if (! isset($portid_dict[$dot1dBasePort])) {
+            if ($portLocal >= 40000000) {
+                $ifIndex = $portLocal;
+            } elseif ($portLocal >= 4098 && $portLocal < 5000) {
+                $ifIndex = 40000000 + ($portLocal - 4097);
+            } else {
+                $ifIndex = $lag_ports[$portLocal] ?? $portLocal;
+            }
+
+            $port_id = PortCache::getIdFromIfIndex($ifIndex, $device_id);
+
+            if ($port_id) {
+                $portid_dict[$portLocal] = $port_id;
+            }
+        }
+    }
+
+    // Collect data and populate $insert.
+    foreach ($fdbPort_table as $vlan => $data) {
+        foreach ($data['dot1qTpFdbPort'] as $mac => $portLocal) {
+            $portLocal = (int) $portLocal;
+
+            if ($portLocal === 0) {
+                Log::debug("No port known for $mac\n");
+
+                continue;
+            }
+
+            if (! isset($portid_dict[$portLocal])) {
+                Log::debug("No port mapping for bridge port $portLocal\n");
+
                 continue;
             }
 
             $mac_address = Mac::parse($mac)->hex();
+
             if (strlen($mac_address) != 12) {
                 Log::debug("MAC address padding failed for $mac\n");
+
                 continue;
             }
-            $port_id = $portid_dict[$dot1dBasePort];
+
             $vlan_id = $vlans_dict[$vlan] ?? 0;
+
+            if (! $vlan_id) {
+                continue;
+            }
+
+            $port_id = $portid_dict[$portLocal];
             $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
-            Log::debug("vlan $vlan_id mac $mac_address port ($dot1dBasePort) $port_id\n");
+
+            Log::debug("vlan $vlan_id mac $mac_address port ($portLocal) $port_id\n");
         }
     }
 }
