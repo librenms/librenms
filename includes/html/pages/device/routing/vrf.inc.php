@@ -20,7 +20,7 @@ $menu_options = ['basic' => 'Basic',
     // 'detail' => 'Detail',
 ];
 
-if (! $_GET['opta']) {
+if (empty($_GET['opta'])) {
     $_GET['opta'] = 'basic';
 }
 
@@ -42,6 +42,7 @@ unset($sep);
 
 echo ' Graphs: ';
 
+$type_sep = '';
 $graph_types = [
     'bits' => 'Bits',
     'upkts' => 'Unicast Packets',
@@ -52,12 +53,12 @@ $graph_types = [
 
 foreach ($graph_types as $type => $descr) {
     echo "$type_sep";
-    if ($vars['graph'] == $type) {
+    if (isset($vars['graph']) && $vars['graph'] == $type) {
         echo "<span class='pagemenu-selected'>";
     }
 
     echo generate_link($descr, $link_array, ['view' => 'graphs', 'graph' => $type]);
-    if ($vars['graph'] == $type) {
+    if (isset($vars['graph']) && $vars['graph'] == $type) {
         echo '</span>';
     }
 

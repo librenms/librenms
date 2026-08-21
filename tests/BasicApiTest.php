@@ -30,11 +30,11 @@ use App\Models\ApiToken;
 use App\Models\Device;
 use App\Models\User;
 use App\Models\WirelessSensor;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-final class BasicApiTest extends DBTestCase
+final class BasicApiTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function testListDevices(): void
     {

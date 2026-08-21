@@ -29,12 +29,15 @@ namespace LibreNMS\Tests;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Tests\Traits\RequiresMysql;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Validate;
 
 final class CommonFunctionsTest extends TestCase
 {
+    use RequiresMysql;
+
     public function testStrContains(): void
     {
         $data = 'This is a test. Just Testing.';
@@ -150,8 +153,6 @@ final class CommonFunctionsTest extends TestCase
 
     public function testResolveGlues(): void
     {
-        $this->dbSetUp();
-
         $this->assertFalse(ResolveGlues(['dbSchema'], 'device_id'));
 
         $this->assertSame(['devices.device_id'], ResolveGlues(['devices'], 'device_id'));
@@ -169,8 +170,6 @@ final class CommonFunctionsTest extends TestCase
 
         $expected = ['ipv4_addresses.port_id', 'ports.device_id'];
         $this->assertSame($expected, ResolveGlues(['ipv4_addresses'], 'device_id'));
-
-        $this->dbTearDown();
     }
 
     public function testFormatHostname(): void

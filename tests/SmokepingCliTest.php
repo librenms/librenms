@@ -28,13 +28,13 @@ namespace LibreNMS\Tests;
 
 use App\Console\Commands\SmokepingGenerateCommand;
 use App\Models\Device;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
-final class SmokepingCliTest extends DBTestCase
+final class SmokepingCliTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected $groups = [
         'Le23HKVMvN' => [

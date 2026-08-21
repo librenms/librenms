@@ -1,7 +1,7 @@
 <?php
 
 /**
- * RequiresDatabase.php
+ * RequiresMysql.php
  *
  * -Description-
  *
@@ -26,14 +26,21 @@
 
 namespace LibreNMS\Tests\Traits;
 
-trait RequiresDatabase
+trait RequiresMysql
 {
     public static function setUpBeforeClass(): void
     {
         if (! getenv('DBTEST')) {
-            static::markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
+            static::markTestSkipped('MySQL Database tests not enabled.  Set DBTEST=1 to enable.');
         }
 
         parent::setUpBeforeClass();
+    }
+
+    public function setUpRequiresMysql(): void
+    {
+        config(['database.default' => 'testing']);
+        \DB::purge();
+        \DB::reconnect('testing');
     }
 }

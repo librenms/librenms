@@ -34,6 +34,7 @@ use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\FpingResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
+use LibreNMS\Tests\Traits\RequiresMysql;
 use LibreNMS\Util\ModuleList;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Number;
@@ -43,8 +44,9 @@ use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Util\Color;
 
 #[TestDox('OS Modules')]
-final class OSModulesTest extends DBTestCase
+final class OSModulesTest extends TestCase
 {
+    use RequiresMysql;
     use DatabaseTransactions;
 
     private $discoveryModules;

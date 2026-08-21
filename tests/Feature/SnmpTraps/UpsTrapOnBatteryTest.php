@@ -27,15 +27,10 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
 use App\Models\Sensor;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Tests\Traits\RequiresDatabase;
 
 final class UpsTrapOnBatteryTest extends SnmpTrapTestCase
 {
-    use RequiresDatabase;
-    use DatabaseTransactions;
-
     public function testOnBattery(): void
     {
         $device = Device::factory()->create();

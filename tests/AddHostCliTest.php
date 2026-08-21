@@ -27,13 +27,13 @@
 namespace LibreNMS\Tests;
 
 use App\Models\Device;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\TestDox;
 
 #[TestDox('Add Host CLI')]
-final class AddHostCliTest extends DBTestCase
+final class AddHostCliTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     /** @var string */
     private $hostName = 'testHost';
