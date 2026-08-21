@@ -646,6 +646,12 @@ $graphs['i2pd'] = [
     'peers',
     'total_bytes',
 ];
+$graphs['adguard'] = [
+    'queries',
+    'blocked',
+    'proc_time',
+    'protection',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
