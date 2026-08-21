@@ -139,3 +139,4 @@ if (strtolower((string) $graph_data['bill_type']) == 'cdr') {
 }
 
 $graph->stroke();
+exit;
