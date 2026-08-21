@@ -105,3 +105,4 @@ $graph->Add($lineplot_allow);
 
 // Display the graph
 $graph->Stroke();
+exit;
