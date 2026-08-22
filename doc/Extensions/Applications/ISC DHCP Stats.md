@@ -42,7 +42,7 @@ modules.
     ```
 
 3.  Edit your snmpd.conf file
-    If on a slow system running it via cron may be needed.
+    On a slow system, run the script from cron.
 
     === "If not using cron"
 
@@ -78,6 +78,6 @@ modules.
 
 5.  Restart snmpd on your host
 
-    The application should be auto-discovered as described at the top of
-    the page. If it is not, please follow the steps set out under `SNMP
-    Extend` heading top of page.
+    LibreNMS discovers the application automatically, as described at
+    the top of the page. If the discovery fails, do the steps under the
+    `SNMP Extend` heading at the top of the page.
