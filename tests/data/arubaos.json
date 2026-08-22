@@ -21200,7 +21200,7 @@
                     "sensor_current": 58,
                     "sensor_limit": 78,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 48,
+                    "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
