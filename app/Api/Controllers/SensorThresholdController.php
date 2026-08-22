@@ -22,7 +22,7 @@ class SensorThresholdController extends Controller
     public function update(Sensor $sensor, Request $request): JsonResponse
     {
         $this->authorize('update', $sensor);
-        abort_if($sensor->sensor_deleted, 404);
+        abort_if($sensor->sensor_deleted !== 0, 404);
 
         $validated = $this->validateUpdate($request);
         $this->applyUpdate($sensor, $validated);
@@ -156,16 +156,34 @@ class SensorThresholdController extends Controller
         return response()->json([
             'status' => 'ok',
             'count' => $sensors->count(),
-            'sensors' => $sensors->map(fn (Sensor $sensor) => $sensor->only([
-                'sensor_id',
-                'device_id',
-                'sensor_class',
-                'sensor_descr',
-                'sensor_current',
-                ...self::THRESHOLD_FIELDS,
-                'sensor_alert',
-                'sensor_custom',
-            ]))->values(),
+            'sensors' => $sensors->map(fn (Sensor $sensor) => $this->sensorData($sensor))->values(),
         ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function sensorData(Sensor $sensor): array
+    {
+        $data = $sensor->only([
+            'sensor_id',
+            'device_id',
+            'sensor_class',
+            'sensor_descr',
+            'sensor_current',
+            ...self::THRESHOLD_FIELDS,
+            'sensor_alert',
+            'sensor_custom',
+        ]);
+
+        $data['sensor_id'] = (int) $data['sensor_id'];
+        $data['device_id'] = (int) $data['device_id'];
+        $data['sensor_alert'] = (bool) $data['sensor_alert'];
+
+        foreach (['sensor_current', ...self::THRESHOLD_FIELDS] as $field) {
+            $data[$field] = $data[$field] === null ? null : (float) $data[$field];
+        }
+
+        return $data;
     }
 }
