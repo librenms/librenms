@@ -18,6 +18,16 @@ class SensorObserverTest extends TestCase
         $this->assertNull($sensor->sensor_limit_low);
     }
 
+    public function test_discovery_clears_legacy_low_guess_with_hardware_high_limit(): void
+    {
+        $sensor = $this->sensorWithOriginalLimits(42.0, 30.0);
+
+        $this->observer()->updating($sensor);
+
+        $this->assertSame(42.0, $sensor->sensor_limit);
+        $this->assertNull($sensor->sensor_limit_low);
+    }
+
     public function test_discovery_preserves_non_legacy_temperature_limits(): void
     {
         $sensor = $this->sensorWithOriginalLimits(90.0, 5.0);
