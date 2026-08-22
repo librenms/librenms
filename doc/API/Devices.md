@@ -1294,6 +1294,54 @@ Output:
 }
 ```
 
+### `update_sensor_thresholds`
+
+Update the thresholds or alert state for one sensor. Threshold changes are
+stored as custom values and are preserved during subsequent discovery runs.
+
+Route: `PATCH /api/v0/resources/sensors/:sensor_id`
+
+Input (at least one field is required):
+
+- `sensor_limit`: critical high threshold; nullable number
+- `sensor_limit_warn`: warning high threshold; nullable number
+- `sensor_limit_low_warn`: warning low threshold; nullable number
+- `sensor_limit_low`: critical low threshold; nullable number
+- `sensor_alert`: enable or disable alerting for this sensor
+- `reset`: reset all custom thresholds during the next discovery; cannot be combined with other fields
+
+The non-null thresholds must be ordered from low to high.
+
+Example:
+
+```curl
+curl -X PATCH -H 'X-Auth-Token: YOURAPITOKENHERE' \
+  -H 'Content-Type: application/json' \
+  -d '{"sensor_limit_low":5,"sensor_limit_low_warn":10,"sensor_limit_warn":75,"sensor_limit":85}' \
+  https://foo.example/api/v0/resources/sensors/218810
+```
+
+### `bulk_update_sensor_thresholds`
+
+Apply the same threshold or alert changes atomically to up to 500 explicitly
+selected sensors. Every sensor is checked against the API user's device access.
+
+Route: `PATCH /api/v0/resources/sensors`
+
+Input:
+
+- `sensor_ids`: array of unique sensor IDs
+- any update field accepted by `update_sensor_thresholds`
+
+Example:
+
+```curl
+curl -X PATCH -H 'X-Auth-Token: YOURAPITOKENHERE' \
+  -H 'Content-Type: application/json' \
+  -d '{"sensor_ids":[218810,218811],"sensor_limit_warn":75,"sensor_limit":85}' \
+  https://foo.example/api/v0/resources/sensors
+```
+
 ### `list_devices`
 
 Return a list of devices.
