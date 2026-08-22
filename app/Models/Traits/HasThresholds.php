@@ -92,7 +92,10 @@ trait HasThresholds
 
         if ($low) {
             $this->sensor_limit_low = match ($class) {
-                'temperature' => $this->sensor_current - 10,
+                // A low temperature limit cannot be inferred from the current
+                // reading. Hardware that has a meaningful lower bound must
+                // provide it through discovery (or the user can set one).
+                'temperature' => null,
                 'voltage' => $this->sensor_current * 0.85,
                 'humidity' => 30,
                 'fanspeed' => $this->sensor_current * 0.80,
