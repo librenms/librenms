@@ -2,6 +2,7 @@ os: foundryos
 text: 'Foundry Networking'
 type: network
 icon: foundry
+group: brocade
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
