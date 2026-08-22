@@ -37,7 +37,7 @@ final class BasicApiTest extends DBTestCase
 {
     use DatabaseTransactions;
 
-    public function testListDevices(): void
+    public function test_list_devices(): void
     {
         /** @var User $user */
         $user = User::factory()->admin()->create();
@@ -53,7 +53,7 @@ final class BasicApiTest extends DBTestCase
             ]);
     }
 
-    public function testDisabledUserTokenCannotAccessApi(): void
+    public function test_disabled_user_token_cannot_access_api(): void
     {
         /** @var User $user */
         $user = User::factory()->admin()->create(['enabled' => false]);
@@ -66,7 +66,7 @@ final class BasicApiTest extends DBTestCase
         $this->assertNull(ApiToken::userFromToken($token->token_hash));
     }
 
-    public function testTokenWithoutUserIsInvalid(): void
+    public function test_token_without_user_is_invalid(): void
     {
         $token = new ApiToken;
         $token->user_id = 999999;
@@ -79,7 +79,7 @@ final class BasicApiTest extends DBTestCase
         $this->assertNull(ApiToken::userFromToken($token->token_hash));
     }
 
-    public function testGetDeviceWirelessSensors(): void
+    public function test_get_device_wireless_sensors(): void
     {
         /** @var User $user */
         $user = User::factory()->admin()->create();
@@ -118,7 +118,7 @@ final class BasicApiTest extends DBTestCase
         $this->assertSame('snr', $response->json('wireless_sensors.1.sensor_class'));
     }
 
-    public function testGetDeviceWirelessSensorsSupportsFilteringAndColumns(): void
+    public function test_get_device_wireless_sensors_supports_filtering_and_columns(): void
     {
         /** @var User $user */
         $user = User::factory()->admin()->create();
@@ -160,7 +160,7 @@ final class BasicApiTest extends DBTestCase
         $this->assertArrayNotHasKey('sensor_type', $row);
     }
 
-    public function testGetDeviceWirelessSensorsRejectsInvalidClass(): void
+    public function test_get_device_wireless_sensors_rejects_invalid_class(): void
     {
         /** @var User $user */
         $user = User::factory()->admin()->create();
@@ -179,7 +179,7 @@ final class BasicApiTest extends DBTestCase
             ]);
     }
 
-    public function testUpdateSensorThresholds(): void
+    public function test_update_sensor_thresholds(): void
     {
         /** @var User $user */
         $user = User::factory()->admin()->create();
@@ -211,7 +211,7 @@ final class BasicApiTest extends DBTestCase
         $this->assertSame('Yes', $sensor->sensor_custom);
     }
 
-    public function testBulkUpdateSensorThresholds(): void
+    public function test_bulk_update_sensor_thresholds(): void
     {
         /** @var User $user */
         $user = User::factory()->admin()->create();
@@ -244,7 +244,7 @@ final class BasicApiTest extends DBTestCase
         }
     }
 
-    public function testSensorThresholdsRejectInvalidOrder(): void
+    public function test_sensor_thresholds_reject_invalid_order(): void
     {
         /** @var User $user */
         $user = User::factory()->admin()->create();
@@ -272,7 +272,7 @@ final class BasicApiTest extends DBTestCase
         $this->assertSame('No', $sensor->sensor_custom);
     }
 
-    public function testReadOnlyUserCannotUpdateSensorThresholds(): void
+    public function test_read_only_user_cannot_update_sensor_thresholds(): void
     {
         /** @var User $user */
         $user = User::factory()->read()->create();
