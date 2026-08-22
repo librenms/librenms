@@ -530,6 +530,29 @@ modules:
                     index: 'batteryCurrent.{{ $index }}'
                     entPhysicalIndex: '100'
                     group: Battery
+                    skip_values:
+                        -
+                            oid: 'SP2-MIB::powerSystemCurrentDecimalSetting.0'
+                            op: '='
+                            value: 1
+                    low_limit: SP2-MIB::batteryCurrentsMinorLowLevel
+                    low_warn_limit: SP2-MIB::batteryCurrentsMinorLowLevel
+                    warn_limit: SP2-MIB::batteryCurrentsMinorHighLevel
+                    high_limit: SP2-MIB::batteryCurrentsMajorHighLevel
+                -
+                    oid: SP2-MIB::batteryCurrents
+                    value: SP2-MIB::batteryCurrentsValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.6.5.{{ $index }}'
+                    descr: Overall Battery Current
+                    index: 'batteryCurrent.{{ $index }}'
+                    entPhysicalIndex: '100'
+                    group: Battery
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: 'SP2-MIB::powerSystemCurrentDecimalSetting.0'
+                            op: '='
+                            value: 0
                     low_limit: SP2-MIB::batteryCurrentsMinorLowLevel
                     low_warn_limit: SP2-MIB::batteryCurrentsMinorLowLevel
                     warn_limit: SP2-MIB::batteryCurrentsMinorHighLevel
@@ -542,6 +565,29 @@ modules:
                     index: 'batteryBankCurrent.{{ $index }}'
                     entPhysicalIndex: '3{{ $index }}'
                     group: Battery
+                    skip_values:
+                        -
+                            oid: 'SP2-MIB::powerSystemCurrentDecimalSetting.0'
+                            op: '='
+                            value: 1
+                    low_limit: SP2-MIB::batteryCurrentMinorLowLevel
+                    low_warn_limit: SP2-MIB::batteryCurrentMinorLowLevel
+                    warn_limit: SP2-MIB::batteryCurrentMinorHighLevel
+                    high_limit: SP2-MIB::batteryCurrentMajorHighLevel
+                -
+                    oid: SP2-MIB::batteryBankCurrentTable
+                    value: SP2-MIB::batteryCurrentValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.18.4.1.6.{{ $index }}'
+                    descr: 'Battery {{ $index }} Current'
+                    index: 'batteryBankCurrent.{{ $index }}'
+                    entPhysicalIndex: '3{{ $index }}'
+                    group: Battery
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: 'SP2-MIB::powerSystemCurrentDecimalSetting.0'
+                            op: '='
+                            value: 0
                     low_limit: SP2-MIB::batteryCurrentMinorLowLevel
                     low_warn_limit: SP2-MIB::batteryCurrentMinorLowLevel
                     warn_limit: SP2-MIB::batteryCurrentMinorHighLevel
@@ -554,6 +600,27 @@ modules:
                     entPhysicalIndex: '10'
                     index: 'load.{{ $index }}'
                     group: Load
+                    skip_values:
+                        -
+                            oid: 'SP2-MIB::powerSystemCurrentDecimalSetting.0'
+                            op: '='
+                            value: 1
+                    warn_limit: SP2-MIB::loadCurrentMinorHighLevel
+                    high_limit: SP2-MIB::loadCurrentMajorHighLevel
+                -
+                    oid: SP2-MIB::loadCurrent
+                    value: SP2-MIB::loadCurrentValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.9.2.5.{{ $index }}'
+                    descr: SP2-MIB::loadCurrentDescription
+                    entPhysicalIndex: '10'
+                    index: 'load.{{ $index }}'
+                    group: Load
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: 'SP2-MIB::powerSystemCurrentDecimalSetting.0'
+                            op: '='
+                            value: 0
                     warn_limit: SP2-MIB::loadCurrentMinorHighLevel
                     high_limit: SP2-MIB::loadCurrentMajorHighLevel
         temperature:
