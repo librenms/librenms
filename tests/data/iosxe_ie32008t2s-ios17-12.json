@@ -3580,7 +3580,7 @@
                     "sensor_current": 48,
                     "sensor_limit": 105,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 38,
+                    "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
