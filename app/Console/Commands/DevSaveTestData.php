@@ -96,6 +96,7 @@ class DevSaveTestData extends LnmsCommand
         $snmpsim = new Snmpsim;
         try {
             $this->startSnmpsim($snmpsim, $output === '-');
+            $saved = false;
 
             foreach ($osList as [$targetOs, $targetVariant, $resolvedModules]) {
                 if ($output !== '-') {
@@ -107,7 +108,7 @@ class DevSaveTestData extends LnmsCommand
 
                 LibrenmsConfig::reloadDefaults();
                 $tester = new ModuleTestHelper(new ModuleList($resolvedModules), $targetOs, $targetVariant);
-                $tester->setQuiet($output === '-');
+                $tester->setQuiet($output === '-' || ! $this->output->isVerbose());
                 $testData = $tester->generateTestData($snmpsim->ip, $snmpsim->port);
 
                 if ($testData !== null) {
@@ -119,8 +120,14 @@ class DevSaveTestData extends LnmsCommand
 
                     $targetFile = $output ?: $tester->getJsonFilepath();
                     $this->persistTestData($testData, $targetFile);
-                    $this->info("Saved to $targetFile" . PHP_EOL . 'Ready for testing!');
+                    $this->info("Saved to $targetFile");
+                    $saved = true;
                 }
+            }
+
+            if ($saved) {
+                $this->newLine();
+                $this->info('Ready for testing!');
             }
         } catch (RuntimeException $e) {
             $this->error($e->getMessage());
@@ -237,8 +244,6 @@ class DevSaveTestData extends LnmsCommand
      */
     protected function persistTestData(array $testData, string $outputFile): void
     {
-        d_echo($testData);
-
         $existingData = is_readable($outputFile)
             ? json_decode(file_get_contents($outputFile), true)
             : [];

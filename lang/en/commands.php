@@ -126,7 +126,7 @@ return [
         'description' => 'Generate JSON test data from snmpsim recordings',
         'help' => "Regenerate existing JSON fixtures, or explicitly recreate fixtures with --variant.\n\n" .
             "Examples:\n  lnms dev:save-test-data --os=routeros\n  lnms dev:save-test-data --os=routeros --variant=crs317,wifi --modules=ports,sensors\n\n" .
-            'Use -vv for LibreNMS debug output or -vvv for full verbose debug and SNMP output.',
+            'Use -v to show discovery and poller output, -vv for LibreNMS debug output, or -vvv for full verbose debug and SNMP output.',
         'options' => [
             'all' => 'Process every existing JSON fixture',
             'os' => 'Process existing JSON fixtures for this OS, including their variants',
