@@ -14,7 +14,7 @@
                     "os": "sophos-xg",
                     "type": "appliance",
                     "serial": "C01001GF24TPDE1",
-                    "icon": "sophos-xg.png"
+                    "icon": "sophos-xg.svg"
                 }
             ]
         },

@@ -28,13 +28,13 @@
     wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/linux_softnet_stat -O /etc/snmp/linux_softnet_stat
     ```
 
-3. Make the script executable
+3. Make the script executable.
 
     ```bash
     chmod +x /etc/snmp/linux_softnet_stat
     ```
 
-4. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+4. Edit your `snmpd.conf` file, usually `/etc/snmp/snmpd.conf`, and add:
 
     ```bash
     extend linux_softnet_stat /etc/snmp/linux_softnet_stat -b

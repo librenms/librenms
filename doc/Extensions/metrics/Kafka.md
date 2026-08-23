@@ -1,31 +1,26 @@
 # Enabling support for Kafka
 
-Before we get started it is important that you know and understand
-that Kafka support is currently alpha at best. All it provides is
-the sending of data to a Kafka brocker topic. Due to the current changes
-that are constantly being made to Kafka itself then we cannot
-guarantee that your data will be ok so enabling this support is at
-your own risk!
+Kafka support is alpha quality. It only sends the data to a Kafka brocker topic.
+Kafka changes often, so we cannot guarantee the integrity of your data.
+Use this support at your own risk.
 
-It is also important to understand that Kafka only supports the
-PHP Kafka Client used in librdkafka version 2.0 or higher. If you are
-looking to send data to any other version of Kafka than you should adapt the source code.
+Kafka supports only the PHP Kafka Client of librdkafka version 2.0 and
+later. For any other Kafka version, change the source code.
 
 ## Requirements
 
 - Extensions FFI and xmlwriter enabled
 - In case of debian, install at system level the librdkafka-dev package, or equivalent for your OS
 
-The setup of the above is completely out of scope here and we aren't
-really able to provide any help with this side of things.
+This document does not describe the setup of these components. We
+cannot help with them.
 
-## What you don't get
+## What you do not get
 
-- Support for Kafka, we would highly recommend that you
-  have some level of experience with these.
+- Support for Kafka. You need experience with this tool.
 
-RRD will continue to function as normal so LibreNMS itself should
-continue to function as normal.
+RRD continues to work in the normal way. LibreNMS therefore also
+continues to work in the normal way.
 
 ## Configuration
 
@@ -82,21 +77,23 @@ lmns config:set kafka.device-fields-exclude "device_id,ip"
 lnms config:set kafka.flush.timeout 1000
 ```
 
-For more information about the configuration, please consult https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md
+For more information about the configuration, read
+https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md
 
-The same data stored within rrd will be sent to Kafka and
-recorded. You can then create graphs within Grafana or Kafka to display the
-information you need.
+LibreNMS sends the same data from rrd to Kafka, and Kafka records it.
+You can then create graphs in Grafana or in Kafka for the information
+that you need.
 
-Please note that polling will slow down when the poller isn't able to reach or write data to Kafka.
+Note: the polling becomes slower when the poller cannot reach Kafka or
+cannot write data to it.
 
 # Kafka Data Store Testing
 
-This document describes how to test the Kafka data store functionality in LibreNMS.
+This document describes the tests of the Kafka data store in LibreNMS.
 
 ## Prerequisites
 
-Before running Kafka tests, you need to set up the following components:
+The Kafka tests need these components:
 
 ### 1. System Dependencies
 
@@ -119,7 +116,7 @@ composer require ext-ffi --dev
 
 ### 3. Kafka Instance
 
-You need a running Kafka instance. The tests expect it to be available at `localhost:9092`.
+You need a running Kafka instance. The tests use `localhost:9092`.
 
 #### Option A: Using Docker
 
@@ -136,11 +133,13 @@ docker run -d \
 
 #### Option B: Local Installation
 
-Follow the [Apache Kafka Quickstart Guide](https://kafka.apache.org/quickstart) to install and run Kafka locally.
+To install and run Kafka on your machine, obey the [Apache Kafka
+Quickstart Guide](https://kafka.apache.org/quickstart).
 
 ## Running Kafka Tests
 
-The Kafka tests are tagged with the `external-dependencies` group and are excluded from the default test suite.
+The Kafka tests have the tag `external-dependencies`. The default test
+suite excludes them.
 
 ### Run Kafka Tests Only
 
@@ -205,5 +204,5 @@ Config::set('kafka.debug', 'all');
 
 ## Notes
 
-- Kafka tests use an actual Kafka connection during unit testing
-- The `external-dependencies` group allows you to easily include/exclude these tests
+- The Kafka tests use a real Kafka connection in the unit tests
+- The `external-dependencies` group includes and excludes these tests

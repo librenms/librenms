@@ -22,12 +22,13 @@
     chmod +x /usr/local/etc/snmp/poudriere
     ```
 
-4. Setup the cronjob. The extend needs to be ran as root. See `poudriere --help` for option info.
+4. Add the cronjob. The extend runs as root. For the options, read
+`poudriere --help`.
     ```
     4/5 * * * * root /usr/local/etc/snmp/poudriere -q -a -w -z
     ```
 
-5. Add the extend to snmpd.conf and restart snmpd
+5. Add the extend to `snmpd.conf` and restart snmpd.
     ```
     extend poudriere cat /var/cache/poudriere.json.snmp
     ```
