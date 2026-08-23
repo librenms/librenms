@@ -76,6 +76,7 @@ function poll_service($service)
     d_echo("\nNagios Service - $service_id\n");
     // the check_service function runs $check_cmd through escapeshellcmd, so
     [$new_status, $msg, $perf] = check_service($check_cmd);
+    $update['service_checked'] = time();
     d_echo("Response: $msg\n");
 
     // If we have performance data we will store it.

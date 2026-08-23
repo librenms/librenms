@@ -26,8 +26,10 @@
 
 namespace LibreNMS\Tests;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\ApiToken;
 use App\Models\Device;
+use App\Models\Service;
 use App\Models\User;
 use App\Models\WirelessSensor;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -50,6 +52,30 @@ final class BasicApiTest extends DBTestCase
                 'devices' => [$device->toArray()],
                 'count' => 1,
             ]);
+    }
+
+    public function testListServicesIncludesCheckTiming(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create();
+        $token = ApiToken::generateToken($user);
+        $device = Device::factory()->create();
+        $checkedAt = 1787468400;
+        $service = Service::factory()->for($device)->create(['service_checked' => $checkedAt]);
+        $originalFrequency = LibrenmsConfig::get('service_services_frequency');
+
+        try {
+            LibrenmsConfig::set('service_services_frequency', 120);
+
+            $this->json('GET', "/api/v0/services/{$device->device_id}", [], ['X-Auth-Token' => $token->token_hash])
+                ->assertStatus(200)
+                ->assertJsonPath('status', 'ok')
+                ->assertJsonPath('services.0.0.service_id', $service->service_id)
+                ->assertJsonPath('services.0.0.service_checked', $checkedAt)
+                ->assertJsonPath('services.0.0.service_check_interval', 120);
+        } finally {
+            LibrenmsConfig::set('service_services_frequency', $originalFrequency);
+        }
     }
 
     public function testDisabledUserTokenCannotAccessApi(): void
