@@ -149,7 +149,7 @@ final class AlertOperationRunAlertsTest extends TestCase
 
         DB::table('device_relationships')->insert([
             'parent_device_id' => $parent->device_id,
-            'child_device_id'  => $context['device']->device_id,
+            'child_device_id' => $context['device']->device_id,
         ]);
 
         // Run several times while parent is down.
@@ -159,7 +159,7 @@ final class AlertOperationRunAlertsTest extends TestCase
 
         $segmentId = $context['segments'][0]['segment']->id;
         $details = $this->latestAlertLogDetails($context['rule']->id);
-        $fires = (int) (($details['op_seg'][(string) $segmentId]['fires'] ?? 0));
+        $fires = (int) ($details['op_seg'][(string) $segmentId]['fires'] ?? 0);
         $this->assertSame(0, $fires, 'Segment timer must not advance while parent is suppressing the alert');
 
         // Bring parent back up.  The child alert must fire immediately on the next cycle.
