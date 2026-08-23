@@ -32,7 +32,6 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Git;
 use Spatie\LaravelIgnition\Facades\Flare;
@@ -67,7 +66,7 @@ class ErrorReporting
 
     public function reportable(Throwable $e): bool
     {
-        Log::critical('%RException: ' . $e::class . ' ' . $e->getMessage() . '%n @ %G' . $e->getFile() . ':' . $e->getLine() . '%n' . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
+        \Log::critical('%RException: ' . $e::class . ' ' . $e->getMessage() . '%n @ %G' . $e->getFile() . ':' . $e->getLine() . '%n' . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
 
         return false; // false = block default log message
     }
@@ -118,14 +117,14 @@ class ErrorReporting
 
         // check the user setting
         if (LibrenmsConfig::get('reporting.error') !== true) {
-            Log::debug('Reporting disabled by user setting');
+            \Log::debug('Reporting disabled by user setting');
 
             return false;
         }
 
         // Only run in production
         if (! app()->isProduction()) {
-            Log::debug('Reporting disabled because app is not in production mode');
+            \Log::debug('Reporting disabled because app is not in production mode');
 
             return false;
         }
@@ -134,19 +133,19 @@ class ErrorReporting
         $git = Git::make(180);
         if ($git->isAvailable()) {
             if (! Str::contains($git->remoteUrl(), ['git@github.com:librenms/librenms.git', 'https://github.com/librenms/librenms.git'])) {
-                Log::debug('Reporting disabled because LibreNMS is not from the official repository');
+                \Log::debug('Reporting disabled because LibreNMS is not from the official repository');
 
                 return false;
             }
 
             if ($git->hasChanges()) {
-                Log::debug('Reporting disabled because LibreNMS is not from the official repository');
+                \Log::debug('Reporting disabled because LibreNMS is not from the official repository');
 
                 return false;
             }
 
             if (! $git->isOfficialCommits()) {
-                Log::debug('Reporting disabled due to local modifications');
+                \Log::debug('Reporting disabled due to local modifications');
 
                 return false;
             }
@@ -181,9 +180,7 @@ class ErrorReporting
             }
 
             if ((error_reporting() & $severity) !== 0) { // this check primarily allows @ to suppress errors
-                if (($severity & (E_DEPRECATED | E_USER_DEPRECATED)) !== 0) {
-                    Log::warning("PHP Deprecation($severity): $message in $file:$line");
-                } elseif ($this->errorCount++ < self::MAX_PROD_ERRORS) {
+                if ($this->errorCount++ < self::MAX_PROD_ERRORS) {
                     // limit reported errors so php-fpm headers don't get too large
                     $max_errors = $this->errorCount == self::MAX_PROD_ERRORS ? ' (max reported errors reached)' : '';
 
@@ -191,8 +188,8 @@ class ErrorReporting
                 }
             }
 
-            // For notices, warnings, and deprecations, prevent conversion to exceptions
-            if (($severity & (E_NOTICE | E_WARNING | E_USER_NOTICE | E_USER_WARNING | E_DEPRECATED | E_USER_DEPRECATED)) !== 0) {
+            // For notices and warnings, prevent conversion to exceptions
+            if (($severity & (E_NOTICE | E_WARNING | E_USER_NOTICE | E_USER_WARNING | E_DEPRECATED)) !== 0) {
                 return true; // Prevent the standard error handler from running
             }
 

@@ -2,7 +2,6 @@
 
 $graphs = [
     'ntp-client_stats' => 'NTP Client - Statistics',
-    'ntp-client_offset' => 'NTP Client - Offset',
     'ntp-client_freq' => 'NTP Client - Frequency',
 ];
 
