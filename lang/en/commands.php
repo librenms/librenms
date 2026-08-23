@@ -98,36 +98,41 @@ return [
     ],
     'dev:collect-snmprec' => [
         'description' => 'Collect SNMP data from a device for snmpsim test files',
+        'help' => "Collect the OIDs used by discovery and polling into an snmprec fixture.\n\n" .
+            "Example:\n  lnms dev:collect-snmprec 123 --variant=crs317 --modules=ports,sensors\n\n" .
+            'Use -v to show captured OIDs, -vv for LibreNMS debug output, or -vvv for full verbose debug and SNMP output.',
         'arguments' => [
             'device' => 'ID, IP, or hostname of the device to collect data from',
         ],
         'options' => [
-            'variant' => 'The variant of the OS to use, usually the device model',
-            'modules' => 'The discovery/poller module(s) to collect data for, comma delimited',
-            'prefer-new' => 'Prefer new snmprec data over existing data',
+            'variant' => 'Required fixture variant, usually the device model; use an empty value to explicitly select the base fixture',
+            'modules' => 'Comma-delimited discovery/poller modules to collect data for',
+            'prefer-collected' => 'Use newly collected values when an OID already exists (other existing OIDs are preserved)',
             'os' => 'Name of the OS to save test data for (only used if device is generic)',
-            'file' => 'Save data to file instead of the standard location',
-            'debug' => 'Enable debug output',
-            'full' => 'Walk the whole device (default: only used OIDs)',
+            'output' => 'Write to this snmprec file instead of the standard fixture path',
+            'full' => 'Walk the whole device instead of running discovery and polling modules',
         ],
         'device_not_found' => 'Device \':device\' not found.',
-        'variant_required' => 'The --variant (-v) option is required.',
+        'variant_required' => 'The --variant (-r) option is required to avoid accidentally updating the base fixture; use --variant= to select it explicitly.',
         'variant_underscore' => 'Variant name cannot contain an underscore (_).',
+        'variant_single' => 'Only one variant can be collected at a time.',
         'os_required' => 'OS (-o, --os) is required because device is generic.',
-        'capturing_data' => 'Capturing Data:',
+        'capturing_data' => 'Capturing SNMP data...',
         'saved_snmprec' => 'Saved snmprec data :file',
         'no_data' => 'No data for :file',
         'verify_private_data' => 'Verify these file(s) do not contain any private data before sharing!',
     ],
     'dev:save-test-data' => [
-        'description' => 'Save database test data from snmpsim recordings',
+        'description' => 'Generate JSON test data from snmpsim recordings',
+        'help' => "Regenerate existing JSON fixtures, or explicitly recreate fixtures with --variant.\n\n" .
+            "Examples:\n  lnms dev:save-test-data --os=routeros\n  lnms dev:save-test-data --os=routeros --variant=crs317,wifi --modules=ports,sensors\n\n" .
+            'Use -vv for LibreNMS debug output or -vvv for full verbose debug and SNMP output.',
         'options' => [
-            'os' => 'Name of the OS to save test data for',
-            'variant' => 'The variant of the OS to use, usually the device model',
-            'modules' => 'The discovery/poller module(s) to collect data for, comma delimited',
-            'no-save' => 'Do not save database entries; print them instead',
-            'file' => 'Save data to a file instead of the standard location',
-            'debug' => 'Enable debug output',
+            'all' => 'Process every existing JSON fixture',
+            'os' => 'Process existing JSON fixtures for this OS, including their variants',
+            'variant' => 'Comma-delimited OS variants to process or recreate (requires --os; use an empty value for the base fixture)',
+            'modules' => 'Comma-delimited modules to regenerate (default: existing fixture modules, or configured defaults with --variant)',
+            'output' => 'Write one fixture to this file, or use - for standard output',
         ],
     ],
     'dev:simulate' => [

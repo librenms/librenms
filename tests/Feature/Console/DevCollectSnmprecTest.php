@@ -28,7 +28,7 @@ final class DevCollectSnmprecTest extends TestCase
         $device = Device::factory()->create();
 
         $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id])
-            ->expectsOutput('The --variant (-v) option is required.')
+            ->expectsOutput('The --variant (-r) option is required to avoid accidentally updating the base fixture; use --variant= to select it explicitly.')
             ->assertExitCode(1);
     }
 
@@ -38,6 +38,17 @@ final class DevCollectSnmprecTest extends TestCase
 
         $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--variant' => 'invalid_variant'])
             ->expectsOutput('Variant name cannot contain an underscore (_).')
+            ->assertExitCode(1);
+    }
+
+    public function testFullWalkRejectsModules(): void
+    {
+        $this->artisan('dev:collect-snmprec', [
+            'device' => 'unused',
+            '--variant' => 'test',
+            '--full' => true,
+            '--modules' => 'ports',
+        ])->expectsOutput('--full and --modules cannot be used together because a full walk does not run modules.')
             ->assertExitCode(1);
     }
 
@@ -54,5 +65,11 @@ final class DevCollectSnmprecTest extends TestCase
 
         $completionsById = $cmd->completeArgument('device', (string) $device->device_id);
         $this->assertContains('router.example.com', $completionsById);
+
+        $moduleCompletions = $cmd->completeOptionValue($cmd->getDefinition()->getOption('modules'), 'ports,sen');
+        $this->assertContains('ports,sensors', $moduleCompletions);
+
+        $variantCompletions = $cmd->completeOptionValue($cmd->getDefinition()->getOption('variant'), 'wi');
+        $this->assertContains('wifi', $variantCompletions);
     }
 }

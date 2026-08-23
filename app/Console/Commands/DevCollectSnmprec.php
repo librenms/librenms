@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Console\DynamicInputOption;
 use App\Console\LnmsCommand;
 use App\Events\SnmpQueryExecuted;
 use App\Facades\DeviceCache;
@@ -9,16 +10,21 @@ use App\Facades\LibrenmsConfig;
 use App\Jobs\DiscoverDevice;
 use App\Jobs\PollDevice;
 use App\Models\Device;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleList;
+use LibreNMS\Util\ModuleTestHelper;
 use SnmpQuery;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use function Laravel\Prompts\spin;
 
 class DevCollectSnmprec extends LnmsCommand
 {
@@ -31,30 +37,48 @@ class DevCollectSnmprec extends LnmsCommand
 
         $this->addArgument('device', mode: InputArgument::REQUIRED);
         $this->addOption('variant', 'r', InputOption::VALUE_REQUIRED);
-        $this->addOption('modules', 'm', InputOption::VALUE_OPTIONAL);
-        $this->addOption('prefer-new', null, InputOption::VALUE_NONE);
-        $this->addOption('os', 'o', InputOption::VALUE_OPTIONAL);
-        $this->addOption('file', 'f', InputOption::VALUE_OPTIONAL);
-        $this->addOption('debug', 'd', InputOption::VALUE_NONE);
+        $this->addOption('modules', 'm', InputOption::VALUE_REQUIRED);
+        $this->addOption('prefer-collected', null, InputOption::VALUE_NONE);
+        $this->addOption('os', 'o', InputOption::VALUE_REQUIRED);
+        $this->addOption('output', null, InputOption::VALUE_REQUIRED);
         $this->addOption('full', null, InputOption::VALUE_NONE);
+        $this->setHelp(__('commands.dev:collect-snmprec.help'));
     }
 
     public function handle(): int
     {
-        $device = $this->resolveDevice();
-        if (! $device) {
-            return 1;
-        }
-
         $variant = $this->option('variant');
         if ($variant === null) {
             $this->error(__('commands.dev:collect-snmprec.variant_required'));
 
             return 1;
         }
+        $variant = trim($variant);
 
         if (str_contains($variant, '_')) {
             $this->error(__('commands.dev:collect-snmprec.variant_underscore'));
+
+            return 1;
+        }
+        if (str_contains($variant, ',')) {
+            $this->error(__('commands.dev:collect-snmprec.variant_single'));
+
+            return 1;
+        }
+
+        if ($this->option('full') && $this->option('modules') !== null) {
+            $this->error('--full and --modules cannot be used together because a full walk does not run modules.');
+
+            return 1;
+        }
+
+        $device = $this->resolveDevice();
+        if (! $device) {
+            return 1;
+        }
+
+        if ($device->os !== 'generic' && $this->option('os') !== null) {
+            $this->error("--os cannot be used because the device is already detected as '{$device->os}'.");
 
             return 1;
         }
@@ -66,17 +90,23 @@ class DevCollectSnmprec extends LnmsCommand
             return 1;
         }
 
-        Debug::set((bool) $this->option('debug'));
-
         $modulesInput = $this->option('modules');
-        $modules = ($modulesInput === null || $modulesInput === '') ? [] : explode(',', $modulesInput);
-        $modulesInput = $modulesInput ?: 'all';
+        $modules = ($modulesInput === null || $modulesInput === '')
+            ? []
+            : array_values(array_filter(array_map('trim', explode(',', $modulesInput))));
+        $modulesInput = $modulesInput ?: 'configured defaults';
+        foreach ($modules as $module) {
+            $moduleName = explode('/', $module, 2)[0];
+            if (! Module::exists($moduleName)) {
+                $this->error("Invalid module name: $moduleName");
+
+                return 1;
+            }
+        }
 
         $this->line("OS: $targetOs");
-        $this->line("Module(s): $modulesInput");
-        if ($variant !== '') {
-            $this->line("Variant: $variant");
-        }
+        $this->line('Variant: ' . ($variant === '' ? '(base; explicitly selected)' : $variant));
+        $this->line("Modules: $modulesInput");
         $this->newLine();
 
         try {
@@ -87,7 +117,7 @@ class DevCollectSnmprec extends LnmsCommand
                 $device,
                 $moduleList,
                 $snmprecFile,
-                (bool) $this->option('prefer-new'),
+                (bool) $this->option('prefer-collected'),
                 (bool) $this->option('full'),
             );
 
@@ -123,7 +153,7 @@ class DevCollectSnmprec extends LnmsCommand
 
     private function getSnmprecFilePath(string $os, string $variant): string
     {
-        if ($customFile = $this->option('file')) {
+        if ($customFile = $this->option('output')) {
             return (string) $customFile;
         }
 
@@ -133,13 +163,15 @@ class DevCollectSnmprec extends LnmsCommand
         return "$installDir/tests/snmpsim/" . $os . $variantSuffix . '.snmprec';
     }
 
-    private function captureData(Device $device, ModuleList $moduleList, string $snmprecFile, bool $preferNew, bool $full): void
+    private function captureData(Device $device, ModuleList $moduleList, string $snmprecFile, bool $preferCollected, bool $full): void
     {
         if ($full) {
-            $this->output->write(__('commands.dev:collect-snmprec.capturing_data') . ' .');
-            $data = SnmpQuery::options(['-OUneb', '-Ih'])->walk('.');
+            $data = $this->runWithProgress(
+                fn () => SnmpQuery::options(['-OUneb', '-Ih'])->walk('.'),
+                __('commands.dev:collect-snmprec.capturing_data')
+            );
             if ($data->getExitCode() === 0) {
-                $this->saveSnmprec($snmprecFile, [$this->convertSnmpToSnmprec($data)], '', $preferNew);
+                $this->saveSnmprec($snmprecFile, [$this->convertSnmpToSnmprec($data)], '', $preferCollected);
             }
 
             return;
@@ -162,7 +194,9 @@ class DevCollectSnmprec extends LnmsCommand
             }
 
             foreach ($event->oids as $oid) {
-                $this->output->write(' ' . $oid);
+                if ($this->output->isVerbose()) {
+                    $this->output->writeln($oid);
+                }
             }
 
             $parsed = $this->convertSnmpToSnmprec($event->response);
@@ -182,8 +216,6 @@ class DevCollectSnmprec extends LnmsCommand
             }
         };
 
-        $this->output->write(__('commands.dev:collect-snmprec.capturing_data'));
-
         DeviceCache::setPrimary($device->device_id);
 
         Event::listen(SnmpQueryExecuted::class, $listener);
@@ -193,16 +225,34 @@ class DevCollectSnmprec extends LnmsCommand
             config(['logging.channels.stdout.level' => 'emergency']);
         }
 
-        (new DiscoverDevice($device->device_id, $moduleList))->handle();
-        (new PollDevice($device->device_id, $moduleList))->handle();
-
-        config(['logging.channels.stdout.level' => $previous_level]);
-
-        Event::forget(SnmpQueryExecuted::class);
+        try {
+            $this->runWithProgress(function () use ($device, $moduleList) {
+                (new DiscoverDevice($device->device_id, $moduleList))->handle();
+                (new PollDevice($device->device_id, $moduleList))->handle();
+            }, __('commands.dev:collect-snmprec.capturing_data'));
+        } finally {
+            config(['logging.channels.stdout.level' => $previous_level]);
+            Event::forget(SnmpQueryExecuted::class);
+        }
 
         foreach ($snmprecDataByContext as $context => $snmprecData) {
-            $this->saveSnmprec($snmprecFile, $snmprecData, $context, $preferNew);
+            $this->saveSnmprec($snmprecFile, $snmprecData, $context, $preferCollected);
         }
+    }
+
+    private function runWithProgress(\Closure $callback, string $message): mixed
+    {
+        if ($this->output->getVerbosity() === OutputInterface::VERBOSITY_QUIET) {
+            return $callback();
+        }
+
+        if ($this->output->isVerbose()) {
+            $this->line($message);
+
+            return $callback();
+        }
+
+        return spin($callback, $message);
     }
 
     /**
@@ -341,7 +391,7 @@ class DevCollectSnmprec extends LnmsCommand
     /**
      * @param  array<int, array<int, string>>  $data
      */
-    private function saveSnmprec(string $baseFile, array $data, ?string $context, bool $preferNew): void
+    private function saveSnmprec(string $baseFile, array $data, ?string $context, bool $preferCollected): void
     {
         $filename = $baseFile;
 
@@ -358,7 +408,7 @@ class DevCollectSnmprec extends LnmsCommand
 
         $this->cleanSnmprecData($newData);
 
-        $results = $preferNew ? array_merge($existingData, $newData) : array_merge($newData, $existingData);
+        $results = $preferCollected ? array_merge($existingData, $newData) : array_merge($newData, $existingData);
 
         uksort($results, fn ($a, $b) => $this->compareOids((string) $a, (string) $b));
 
@@ -462,5 +512,44 @@ class DevCollectSnmprec extends LnmsCommand
         }
 
         return false;
+    }
+
+    /**
+     * @return Collection<int, string>|null
+     */
+    public function completeOptionValue(DynamicInputOption $option, string $current): ?Collection
+    {
+        return match ($option->getName()) {
+            'os' => $this->filterCompletions(array_map(
+                fn ($file) => basename($file, '.yaml'),
+                glob(resource_path('definitions/os_detection/*.yaml'))
+            ), $current),
+            'variant' => $this->filterCompletions(array_values(array_unique(array_filter(array_map(
+                fn ($file) => ModuleTestHelper::extractVariant(basename($file, '.snmprec'))[1],
+                glob(base_path('tests/snmpsim/*.snmprec'))
+            )))), $current),
+            'modules' => $this->filterCompletions(array_values(array_unique(array_merge(
+                array_keys(LibrenmsConfig::get('discovery_modules', [])),
+                array_keys(LibrenmsConfig::get('poller_modules', [])),
+            ))), $current, true),
+            default => null,
+        };
+    }
+
+    private function filterCompletions(array $values, string $current, bool $commaDelimited = false): Collection
+    {
+        $prefix = '';
+        $partial = $current;
+        if ($commaDelimited && str_contains($current, ',')) {
+            $position = strrpos($current, ',') + 1;
+            $prefix = substr($current, 0, $position);
+            $partial = substr($current, $position);
+        }
+
+        return collect($values)
+            ->filter(fn ($value) => str_starts_with((string) $value, $partial))
+            ->map(fn ($value) => $prefix . $value)
+            ->sort()
+            ->values();
     }
 }
