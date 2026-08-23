@@ -4,8 +4,16 @@ namespace App\Console\Commands;
 
 use App\Console\DynamicInputOption;
 use App\Console\LnmsCommand;
+use App\Events\DeviceDiscovered;
+use App\Events\DevicePolled;
+use App\Events\DiscoveringModule;
+use App\Events\ModuleDiscovered;
+use App\Events\ModulePolled;
+use App\Events\PollingModule;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
+use Laravel\Prompts\Progress;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleList;
@@ -13,6 +21,8 @@ use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Snmpsim;
 use RuntimeException;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use function Laravel\Prompts\progress;
 
 class DevSaveTestData extends LnmsCommand
 {
@@ -92,14 +102,24 @@ class DevSaveTestData extends LnmsCommand
 
             return 1;
         }
+        $showProgress = count($osList) > 1
+            && $output !== '-'
+            && $this->output->getVerbosity() === OutputInterface::VERBOSITY_NORMAL;
 
         $snmpsim = new Snmpsim;
         try {
             $this->startSnmpsim($snmpsim, $output === '-');
-            $saved = false;
+            $progressBar = $showProgress ? progress('Generating test data', count($osList) * 2, hint: count($osList) . ' fixtures') : null;
+            $fixtureName = '';
+            if ($progressBar) {
+                $this->registerProgressListeners($progressBar, $fixtureName);
+            }
+            $progressBar?->start();
+            $saved = 0;
 
             foreach ($osList as [$targetOs, $targetVariant, $resolvedModules]) {
-                if ($output !== '-') {
+                $fixtureName = $targetVariant === '' ? $targetOs : $targetOs . '_' . $targetVariant;
+                if ($output !== '-' && ! $showProgress) {
                     $this->line("OS: $targetOs");
                     $this->line('Variant: ' . ($targetVariant === '' ? '(base)' : $targetVariant));
                     $this->line('Modules: ' . ($resolvedModules === [] ? 'configured defaults' : implode(',', array_keys($resolvedModules))));
@@ -120,13 +140,22 @@ class DevSaveTestData extends LnmsCommand
 
                     $targetFile = $output ?: $tester->getJsonFilepath();
                     $this->persistTestData($testData, $targetFile);
-                    $this->info("Saved to $targetFile");
-                    $saved = true;
+                    if (! $showProgress) {
+                        $this->info("Saved to $targetFile");
+                        $this->newLine();
+                    }
+                    $saved++;
                 }
             }
 
-            if ($saved) {
-                $this->newLine();
+            if ($progressBar) {
+                $progressBar->label('Generated test data')->finish();
+            }
+
+            if ($saved > 0) {
+                if ($showProgress) {
+                    $this->info('Generated ' . $saved . ' ' . ($saved === 1 ? 'fixture.' : 'fixtures.'));
+                }
                 $this->info('Ready for testing!');
             }
         } catch (RuntimeException $e) {
@@ -139,6 +168,28 @@ class DevSaveTestData extends LnmsCommand
         }
 
         return 0;
+    }
+
+    private function registerProgressListeners(Progress $progressBar, string &$fixtureName): void
+    {
+        Event::listen(DiscoveringModule::class, function (DiscoveringModule $event) use ($progressBar, &$fixtureName): void {
+            $progressBar->label("$fixtureName: discovering $event->module")->render();
+        });
+        Event::listen(ModuleDiscovered::class, function (ModuleDiscovered $event) use ($progressBar, &$fixtureName): void {
+            $progressBar->label("$fixtureName: discovered $event->module")->render();
+        });
+        Event::listen(PollingModule::class, function (PollingModule $event) use ($progressBar, &$fixtureName): void {
+            $progressBar->label("$fixtureName: polling $event->module")->render();
+        });
+        Event::listen(ModulePolled::class, function (ModulePolled $event) use ($progressBar, &$fixtureName): void {
+            $progressBar->label("$fixtureName: polled $event->module")->render();
+        });
+        Event::listen(DeviceDiscovered::class, function () use ($progressBar, &$fixtureName): void {
+            $progressBar->label("$fixtureName: discovery complete")->advance();
+        });
+        Event::listen(DevicePolled::class, function () use ($progressBar, &$fixtureName): void {
+            $progressBar->label("$fixtureName: polling complete")->advance();
+        });
     }
 
     private function startSnmpsim(Snmpsim $snmpsim, bool $quiet = false): void
