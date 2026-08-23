@@ -20,13 +20,14 @@ use LibreNMS\Util\ModuleList;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Snmpsim;
 use RuntimeException;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use function Laravel\Prompts\progress;
 
-class DevSaveTestData extends LnmsCommand
+class DevGenerateTestData extends LnmsCommand
 {
-    protected $name = 'dev:save-test-data';
+    protected $name = 'dev:generate-test-data';
     protected bool $developer = true;
 
     public function __construct()
@@ -38,7 +39,7 @@ class DevSaveTestData extends LnmsCommand
         $this->addOption('variant', 'r', InputOption::VALUE_REQUIRED);
         $this->addOption('modules', 'm', InputOption::VALUE_REQUIRED);
         $this->addOption('output', null, InputOption::VALUE_REQUIRED);
-        $this->setHelp(__('commands.dev:save-test-data.help'));
+        $this->setHelp(__('commands.dev:generate-test-data.help'));
     }
 
     public function handle(): int
@@ -50,17 +51,17 @@ class DevSaveTestData extends LnmsCommand
             ? []
             : array_values(array_unique(array_map('trim', explode(',', $variantInput))));
         if (! $all && $os === null) {
-            $this->error('Specify --all or --os.');
+            $this->error(__('commands.dev:generate-test-data.scope_required'));
 
             return 1;
         }
         if ($all && $os !== null) {
-            $this->error('--all and --os cannot be used together.');
+            $this->error(__('commands.dev:generate-test-data.scope_conflict'));
 
             return 1;
         }
         if ($variants !== [] && $os === null) {
-            $this->error('--variant requires --os.');
+            $this->error(__('commands.dev:generate-test-data.variant_requires_os'));
 
             return 1;
         }
@@ -70,7 +71,7 @@ class DevSaveTestData extends LnmsCommand
         foreach ($modules as $module) {
             $moduleName = explode('/', $module, 2)[0];
             if (! Module::exists($moduleName)) {
-                $this->error("Invalid module name: $moduleName");
+                $this->error(__('commands.dev:generate-test-data.invalid_module', ['module' => $moduleName]));
 
                 return 1;
             }
@@ -85,11 +86,12 @@ class DevSaveTestData extends LnmsCommand
         }
 
         if (empty($osList)) {
-            $scope = $os === null ? '' : " for OS '$os'";
-            $this->error("No matching JSON test fixtures found$scope.");
-            $this->line('OS-wide selection is based on existing tests/data/*.json files so detection-only snmprec files are not included.');
+            $this->error($os === null
+                ? __('commands.dev:generate-test-data.no_fixtures')
+                : __('commands.dev:generate-test-data.no_fixtures_for_os', ['os' => $os]));
+            $this->line(__('commands.dev:generate-test-data.fixture_selection_note'));
             if ($os !== null && $variants === []) {
-                $this->line('To recreate a deleted fixture, specify its variant explicitly with --variant (use --variant= for the base OS fixture).');
+                $this->line(__('commands.dev:generate-test-data.recreate_hint'));
             }
 
             return 1;
@@ -97,8 +99,8 @@ class DevSaveTestData extends LnmsCommand
 
         $output = $this->option('output');
         if ($output !== null && count($osList) !== 1) {
-            $this->error('--output can only be used with one OS/variant combination.');
-            $this->error('Multiple combinations (' . count($osList) . ') found.');
+            $this->error(__('commands.dev:generate-test-data.output_single'));
+            $this->error(__('commands.dev:generate-test-data.combinations_found', ['count' => count($osList)]));
 
             return 1;
         }
@@ -109,7 +111,11 @@ class DevSaveTestData extends LnmsCommand
         $snmpsim = new Snmpsim;
         try {
             $this->startSnmpsim($snmpsim, $output === '-');
-            $progressBar = $showProgress ? progress('Generating test data', count($osList) * 2, hint: count($osList) . ' fixtures') : null;
+            $progressBar = $showProgress ? progress(
+                __('commands.dev:generate-test-data.progress.generating'),
+                count($osList) * 2,
+                hint: trans_choice('commands.dev:generate-test-data.progress.fixtures', count($osList), ['count' => count($osList)])
+            ) : null;
             $fixtureName = '';
             if ($progressBar) {
                 $this->registerProgressListeners($progressBar, $fixtureName);
@@ -120,9 +126,15 @@ class DevSaveTestData extends LnmsCommand
             foreach ($osList as [$targetOs, $targetVariant, $resolvedModules]) {
                 $fixtureName = $targetVariant === '' ? $targetOs : $targetOs . '_' . $targetVariant;
                 if ($output !== '-' && ! $showProgress) {
-                    $this->line("OS: $targetOs");
-                    $this->line('Variant: ' . ($targetVariant === '' ? '(base)' : $targetVariant));
-                    $this->line('Modules: ' . ($resolvedModules === [] ? 'configured defaults' : implode(',', array_keys($resolvedModules))));
+                    $this->line(__('commands.dev:generate-test-data.labels.os', ['os' => $targetOs]));
+                    $this->line(__('commands.dev:generate-test-data.labels.variant', [
+                        'variant' => $targetVariant === '' ? __('commands.dev:generate-test-data.labels.base') : $targetVariant,
+                    ]));
+                    $this->line(__('commands.dev:generate-test-data.labels.modules', [
+                        'modules' => $resolvedModules === []
+                            ? __('commands.dev:generate-test-data.labels.configured_defaults')
+                            : implode(',', array_keys($resolvedModules)),
+                    ]));
                     $this->newLine();
                 }
 
@@ -141,7 +153,7 @@ class DevSaveTestData extends LnmsCommand
                     $targetFile = $output ?: $tester->getJsonFilepath();
                     $this->persistTestData($testData, $targetFile);
                     if (! $showProgress) {
-                        $this->info("Saved to $targetFile");
+                        $this->info(__('commands.dev:generate-test-data.saved_to', ['file' => $targetFile]));
                         $this->newLine();
                     }
                     $saved++;
@@ -149,14 +161,14 @@ class DevSaveTestData extends LnmsCommand
             }
 
             if ($progressBar) {
-                $progressBar->label('Generated test data')->finish();
+                $progressBar->label(__('commands.dev:generate-test-data.progress.generated'))->finish();
             }
 
             if ($saved > 0) {
                 if ($showProgress) {
-                    $this->info('Generated ' . $saved . ' ' . ($saved === 1 ? 'fixture.' : 'fixtures.'));
+                    $this->info(trans_choice('commands.dev:generate-test-data.generated_count', $saved, ['count' => $saved]));
                 }
-                $this->info('Ready for testing!');
+                $this->info(__('commands.dev:generate-test-data.ready'));
             }
         } catch (RuntimeException $e) {
             $this->error($e->getMessage());
@@ -173,22 +185,22 @@ class DevSaveTestData extends LnmsCommand
     private function registerProgressListeners(Progress $progressBar, string &$fixtureName): void
     {
         Event::listen(DiscoveringModule::class, function (DiscoveringModule $event) use ($progressBar, &$fixtureName): void {
-            $progressBar->label("$fixtureName: discovering $event->module")->render();
+            $progressBar->label(__('commands.dev:generate-test-data.progress.discovering_module', ['fixture' => $fixtureName, 'module' => $event->module]))->render();
         });
         Event::listen(ModuleDiscovered::class, function (ModuleDiscovered $event) use ($progressBar, &$fixtureName): void {
-            $progressBar->label("$fixtureName: discovered $event->module")->render();
+            $progressBar->label(__('commands.dev:generate-test-data.progress.discovered_module', ['fixture' => $fixtureName, 'module' => $event->module]))->render();
         });
         Event::listen(PollingModule::class, function (PollingModule $event) use ($progressBar, &$fixtureName): void {
-            $progressBar->label("$fixtureName: polling $event->module")->render();
+            $progressBar->label(__('commands.dev:generate-test-data.progress.polling_module', ['fixture' => $fixtureName, 'module' => $event->module]))->render();
         });
         Event::listen(ModulePolled::class, function (ModulePolled $event) use ($progressBar, &$fixtureName): void {
-            $progressBar->label("$fixtureName: polled $event->module")->render();
+            $progressBar->label(__('commands.dev:generate-test-data.progress.polled_module', ['fixture' => $fixtureName, 'module' => $event->module]))->render();
         });
         Event::listen(DeviceDiscovered::class, function () use ($progressBar, &$fixtureName): void {
-            $progressBar->label("$fixtureName: discovery complete")->advance();
+            $progressBar->label(__('commands.dev:generate-test-data.progress.discovery_complete', ['fixture' => $fixtureName]))->advance();
         });
         Event::listen(DevicePolled::class, function () use ($progressBar, &$fixtureName): void {
-            $progressBar->label("$fixtureName: polling complete")->advance();
+            $progressBar->label(__('commands.dev:generate-test-data.progress.polling_complete', ['fixture' => $fixtureName]))->advance();
         });
     }
 
@@ -197,12 +209,12 @@ class DevSaveTestData extends LnmsCommand
         $snmpsim->setupVenv(true);
         $snmpsim->start();
         if (! $quiet) {
-            $this->line('Waiting for snmpsim to initialize...');
+            $this->line(__('commands.dev:generate-test-data.waiting_for_snmpsim'));
         }
         $snmpsim->waitForStartup();
 
         if (! $snmpsim->isRunning()) {
-            throw new RuntimeException("Failed to start snmpsim, make sure it is installed, working, and there are no bad snmprec files.\n" . $snmpsim->getErrorOutput());
+            throw new RuntimeException(__('commands.dev:generate-test-data.snmpsim_failed', ['error' => $snmpsim->getErrorOutput()]));
         }
 
         if (! $quiet) {
@@ -239,11 +251,11 @@ class DevSaveTestData extends LnmsCommand
     /**
      * @return Collection<int, string>|null
      */
-    public function completeOptionValue(DynamicInputOption $option, string $current): ?Collection
+    public function completeOptionValue(DynamicInputOption $option, string $current, ?InputInterface $input = null): ?Collection
     {
         return match ($option->getName()) {
             'os' => $this->filterCompletions($this->fixtureOsNames(), $current),
-            'variant' => $this->filterCompletions($this->fixtureVariants(), $current, true),
+            'variant' => $this->filterCompletions($this->fixtureVariants($this->selectedOs($input)), $current, true),
             'modules' => $this->filterCompletions($this->moduleNames(), $current, true),
             default => null,
         };
@@ -257,12 +269,23 @@ class DevSaveTestData extends LnmsCommand
         )));
     }
 
-    private function fixtureVariants(): array
+    private function fixtureVariants(?string $os = null): array
     {
         return array_values(array_unique(array_filter(array_map(
-            fn ($file) => ModuleTestHelper::extractVariant($file)[1],
+            function ($file) use ($os) {
+                [$fixtureOs, $variant] = ModuleTestHelper::extractVariant($file);
+
+                return $os === null || $fixtureOs === $os ? $variant : null;
+            },
             glob(base_path('tests/data/*.json'))
-        ), fn ($variant) => $variant !== '')));
+        ), fn ($variant) => $variant !== null && $variant !== '')));
+    }
+
+    private function selectedOs(?InputInterface $input): ?string
+    {
+        $os = $input?->getOption('os');
+
+        return is_string($os) ? $os : null;
     }
 
     private function moduleNames(): array

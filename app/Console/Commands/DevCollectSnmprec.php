@@ -22,6 +22,7 @@ use LibreNMS\Util\ModuleList;
 use LibreNMS\Util\ModuleTestHelper;
 use SnmpQuery;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use function Laravel\Prompts\spin;
@@ -517,7 +518,7 @@ class DevCollectSnmprec extends LnmsCommand
     /**
      * @return Collection<int, string>|null
      */
-    public function completeOptionValue(DynamicInputOption $option, string $current): ?Collection
+    public function completeOptionValue(DynamicInputOption $option, string $current, ?InputInterface $input = null): ?Collection
     {
         return match ($option->getName()) {
             'os' => $this->filterCompletions(array_map(

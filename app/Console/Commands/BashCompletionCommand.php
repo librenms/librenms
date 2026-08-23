@@ -72,11 +72,12 @@ class BashCompletionCommand extends Command
 
                 if ($option = $this->optionExpectsValue($current, $previous, $command_def)) {
                     $command_completions = null;
+                    $optionCurrent = str_contains($current, '=') ? explode('=', $current, 2)[1] : $current;
                     if (method_exists($command, 'completeOptionValue')) {
-                        $command_completions = $command->completeOptionValue($option, $current);
+                        $command_completions = $command->completeOptionValue($option, $optionCurrent, $input);
                     }
 
-                    $completions = $command_completions ?? $this->completeOptionValue($option, $current);
+                    $completions = $command_completions ?? $this->completeOptionValue($option, $optionCurrent);
                 } else {
                     $completions = new Collection();
                     if (! Str::startsWith($previous, '-')) {

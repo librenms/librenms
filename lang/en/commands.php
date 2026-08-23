@@ -122,10 +122,10 @@ return [
         'no_data' => 'No data for :file',
         'verify_private_data' => 'Verify these file(s) do not contain any private data before sharing!',
     ],
-    'dev:save-test-data' => [
+    'dev:generate-test-data' => [
         'description' => 'Generate JSON test data from snmpsim recordings',
         'help' => "Regenerate existing JSON fixtures, or explicitly recreate fixtures with --variant.\n\n" .
-            "Examples:\n  lnms dev:save-test-data --os=routeros\n  lnms dev:save-test-data --os=routeros --variant=crs317,wifi --modules=ports,sensors\n\n" .
+            "Examples:\n  lnms dev:generate-test-data --os=routeros\n  lnms dev:generate-test-data --os=routeros --variant=crs317,wifi --modules=ports,sensors\n\n" .
             'Use -v to show discovery and poller output, -vv for LibreNMS debug output, or -vvv for full verbose debug and SNMP output.',
         'options' => [
             'all' => 'Process every existing JSON fixture',
@@ -134,6 +134,39 @@ return [
             'modules' => 'Comma-delimited modules to regenerate (default: existing fixture modules, or configured defaults with --variant)',
             'output' => 'Write one fixture to this file, or use - for standard output',
         ],
+        'scope_required' => 'Specify --all or --os.',
+        'scope_conflict' => '--all and --os cannot be used together.',
+        'variant_requires_os' => '--variant requires --os.',
+        'invalid_module' => 'Invalid module name: :module',
+        'no_fixtures' => 'No matching JSON test fixtures found.',
+        'no_fixtures_for_os' => 'No matching JSON test fixtures found for OS ":os".',
+        'fixture_selection_note' => 'OS-wide selection is based on existing tests/data/*.json files so detection-only snmprec files are not included.',
+        'recreate_hint' => 'To recreate a deleted fixture, specify its variant explicitly with --variant (use --variant= for the base OS fixture).',
+        'output_single' => '--output can only be used with one OS/variant combination.',
+        'combinations_found' => 'Multiple combinations (:count) found.',
+        'labels' => [
+            'os' => 'OS: :os',
+            'variant' => 'Variant: :variant',
+            'base' => '(base)',
+            'modules' => 'Modules: :modules',
+            'configured_defaults' => 'configured defaults',
+        ],
+        'progress' => [
+            'generating' => 'Generating test data',
+            'generated' => 'Generated test data',
+            'fixtures' => '{1} :count fixture|[2,*] :count fixtures',
+            'discovering_module' => ':fixture: discovering :module',
+            'discovered_module' => ':fixture: discovered :module',
+            'polling_module' => ':fixture: polling :module',
+            'polled_module' => ':fixture: polled :module',
+            'discovery_complete' => ':fixture: discovery complete',
+            'polling_complete' => ':fixture: polling complete',
+        ],
+        'saved_to' => 'Saved to :file',
+        'generated_count' => '{1} Generated :count fixture.|[2,*] Generated :count fixtures.',
+        'ready' => 'Ready for testing!',
+        'waiting_for_snmpsim' => 'Waiting for snmpsim to initialize...',
+        'snmpsim_failed' => "Failed to start snmpsim. Make sure it is installed and working, and that the snmprec files are valid.\n:error",
     ],
     'dev:simulate' => [
         'description' => 'Simulate devices using test data',
