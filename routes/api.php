@@ -207,6 +207,7 @@ Route::prefix('v0')->group(function (): void {
         });
         Route::middleware('can:updateAny,App\Models\Port')->group(function (): void {
             Route::patch('{portid}/description', [App\Api\Controllers\LegacyApiController::class, 'update_port_description'])->name('update_port_description');
+            Route::patch('{portid}/speed', [App\Api\Controllers\LegacyApiController::class, 'update_port_speed'])->name('update_port_speed');
         });
     });
 
