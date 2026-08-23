@@ -70,14 +70,18 @@ class BashCompletionCommand extends Command
                     }
                 }
 
-                if ($option = $this->optionExpectsValue($current, $previous, $command_def)) {
+                $optionPrevious = $this->optionPreviousFromLine($current, $previous, end($words));
+                if ($option = $this->optionExpectsValue($current, $optionPrevious, $command_def)) {
                     $command_completions = null;
-                    $optionCurrent = str_contains($current, '=') ? explode('=', $current, 2)[1] : $current;
+                    [$optionPrefix, $optionCurrent] = $this->splitOptionValue($current);
                     if (method_exists($command, 'completeOptionValue')) {
                         $command_completions = $command->completeOptionValue($option, $optionCurrent, $input);
                     }
 
                     $completions = $command_completions ?? $this->completeOptionValue($option, $optionCurrent);
+                    if ($optionPrefix !== '') {
+                        $completions = $completions->map(fn ($completion) => $optionPrefix . $completion);
+                    }
                 } else {
                     $completions = new Collection();
                     if (! Str::startsWith($previous, '-')) {
@@ -254,5 +258,31 @@ class BashCompletionCommand extends Command
             default:
                 return new Collection();
         }
+    }
+
+    /**
+     * @return array{string, string}
+     */
+    private function splitOptionValue(string $current): array
+    {
+        if (str_starts_with($current, '--') && str_contains($current, '=')) {
+            [$name, $value] = explode('=', $current, 2);
+
+            return ["$name=", $value];
+        }
+
+        return ['', $current];
+    }
+
+    private function optionPreviousFromLine(string $current, string $previous, string|false $lineToken): string
+    {
+        if (is_string($lineToken) && str_starts_with($lineToken, '--') && str_contains($lineToken, '=')) {
+            [$option, $value] = explode('=', $lineToken, 2);
+            if (! str_contains($current, '=') && $current === $value) {
+                return $option;
+            }
+        }
+
+        return $previous;
     }
 }

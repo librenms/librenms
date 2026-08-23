@@ -43,4 +43,19 @@ final class DevGenerateTestDataTest extends TestCase
         $this->assertContains('c3560', $completions);
         $this->assertNotContains('debian', $completions);
     }
+
+    public function testVariantCompletionIncludesSnmprecWithoutJson(): void
+    {
+        $command = new \App\Console\Commands\DevGenerateTestData;
+        $input = new ArrayInput(['--os' => 'routeros']);
+        $input->bind($command->getDefinition());
+
+        $completions = $command->completeOptionValue(
+            $command->getDefinition()->getOption('variant'),
+            'rbl',
+            $input,
+        );
+
+        $this->assertContains('rblhgr', $completions);
+    }
 }
