@@ -27,7 +27,7 @@ class GraphsPageRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $this->merge(Url::parseLegacyPathVars($this->fullUrl()));
+        $this->mergeIfMissing(Url::parseLegacyPathVars($this->path()));
     }
 
     /**
