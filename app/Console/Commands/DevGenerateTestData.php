@@ -29,6 +29,7 @@ class DevGenerateTestData extends LnmsCommand
 {
     protected $name = 'dev:generate-test-data';
     protected bool $developer = true;
+    private string $currentFixture = '';
 
     public function __construct()
     {
@@ -46,28 +47,28 @@ class DevGenerateTestData extends LnmsCommand
     {
         $os = $this->option('os');
         $all = (bool) $this->option('all');
-        $variantInput = $this->option('variant');
-        $variants = $variantInput === null
-            ? []
-            : array_values(array_unique(array_map('trim', explode(',', $variantInput))));
+        $variants = $this->commaSeparatedOption('variant', filterEmpty: false);
+
         if (! $all && $os === null) {
             $this->error(__('commands.dev:generate-test-data.scope_required'));
 
             return 1;
         }
+
         if ($all && $os !== null) {
             $this->error(__('commands.dev:generate-test-data.scope_conflict'));
 
             return 1;
         }
+
         if ($variants !== [] && $os === null) {
             $this->error(__('commands.dev:generate-test-data.variant_requires_os'));
 
             return 1;
         }
 
-        $modulesInput = $this->option('modules');
-        $modules = $modulesInput === null ? [] : array_values(array_filter(array_map('trim', explode(',', $modulesInput))));
+        $modules = $this->commaSeparatedOption('modules');
+
         foreach ($modules as $module) {
             $moduleName = explode('/', $module, 2)[0];
             if (! Module::exists($moduleName)) {
@@ -104,6 +105,7 @@ class DevGenerateTestData extends LnmsCommand
 
             return 1;
         }
+
         $showProgress = count($osList) > 1
             && $output !== '-'
             && $this->output->getVerbosity() === OutputInterface::VERBOSITY_NORMAL;
@@ -111,20 +113,21 @@ class DevGenerateTestData extends LnmsCommand
         $snmpsim = new Snmpsim;
         try {
             $this->startSnmpsim($snmpsim, $output === '-');
+
             $progressBar = $showProgress ? progress(
                 __('commands.dev:generate-test-data.progress.generating'),
                 count($osList) * 2,
                 hint: trans_choice('commands.dev:generate-test-data.progress.fixtures', count($osList), ['count' => count($osList)])
             ) : null;
-            $fixtureName = '';
+
             if ($progressBar) {
-                $this->registerProgressListeners($progressBar, $fixtureName);
+                $this->registerProgressListeners($progressBar);
             }
             $progressBar?->start();
             $saved = 0;
 
             foreach ($osList as [$targetOs, $targetVariant, $resolvedModules]) {
-                $fixtureName = $targetVariant === '' ? $targetOs : $targetOs . '_' . $targetVariant;
+                $this->currentFixture = $targetVariant === '' ? $targetOs : "{$targetOs}_{$targetVariant}";
                 if ($output !== '-' && ! $showProgress) {
                     $this->line(__('commands.dev:generate-test-data.labels.os', ['os' => $targetOs]));
                     $this->line(__('commands.dev:generate-test-data.labels.variant', [
@@ -160,9 +163,7 @@ class DevGenerateTestData extends LnmsCommand
                 }
             }
 
-            if ($progressBar) {
-                $progressBar->label(__('commands.dev:generate-test-data.progress.generated'))->finish();
-            }
+            $progressBar?->label(__('commands.dev:generate-test-data.progress.generated'))->finish();
 
             if ($saved > 0) {
                 if ($showProgress) {
@@ -182,26 +183,14 @@ class DevGenerateTestData extends LnmsCommand
         return 0;
     }
 
-    private function registerProgressListeners(Progress $progressBar, string &$fixtureName): void
+    private function registerProgressListeners(Progress $progressBar): void
     {
-        Event::listen(DiscoveringModule::class, function (DiscoveringModule $event) use ($progressBar, &$fixtureName): void {
-            $progressBar->label(__('commands.dev:generate-test-data.progress.discovering_module', ['fixture' => $fixtureName, 'module' => $event->module]))->render();
-        });
-        Event::listen(ModuleDiscovered::class, function (ModuleDiscovered $event) use ($progressBar, &$fixtureName): void {
-            $progressBar->label(__('commands.dev:generate-test-data.progress.discovered_module', ['fixture' => $fixtureName, 'module' => $event->module]))->render();
-        });
-        Event::listen(PollingModule::class, function (PollingModule $event) use ($progressBar, &$fixtureName): void {
-            $progressBar->label(__('commands.dev:generate-test-data.progress.polling_module', ['fixture' => $fixtureName, 'module' => $event->module]))->render();
-        });
-        Event::listen(ModulePolled::class, function (ModulePolled $event) use ($progressBar, &$fixtureName): void {
-            $progressBar->label(__('commands.dev:generate-test-data.progress.polled_module', ['fixture' => $fixtureName, 'module' => $event->module]))->render();
-        });
-        Event::listen(DeviceDiscovered::class, function () use ($progressBar, &$fixtureName): void {
-            $progressBar->label(__('commands.dev:generate-test-data.progress.discovery_complete', ['fixture' => $fixtureName]))->advance();
-        });
-        Event::listen(DevicePolled::class, function () use ($progressBar, &$fixtureName): void {
-            $progressBar->label(__('commands.dev:generate-test-data.progress.polling_complete', ['fixture' => $fixtureName]))->advance();
-        });
+        Event::listen(DiscoveringModule::class, fn ($event) => $progressBar->label(__('commands.dev:generate-test-data.progress.discovering_module', ['fixture' => $this->currentFixture, 'module' => $event->module]))->render());
+        Event::listen(ModuleDiscovered::class, fn ($event) => $progressBar->label(__('commands.dev:generate-test-data.progress.discovered_module', ['fixture' => $this->currentFixture, 'module' => $event->module]))->render());
+        Event::listen(PollingModule::class, fn ($event) => $progressBar->label(__('commands.dev:generate-test-data.progress.polling_module', ['fixture' => $this->currentFixture, 'module' => $event->module]))->render());
+        Event::listen(ModulePolled::class, fn ($event) => $progressBar->label(__('commands.dev:generate-test-data.progress.polled_module', ['fixture' => $this->currentFixture, 'module' => $event->module]))->render());
+        Event::listen(DeviceDiscovered::class, fn () => $progressBar->label(__('commands.dev:generate-test-data.progress.discovery_complete', ['fixture' => $this->currentFixture]))->advance());
+        Event::listen(DevicePolled::class, fn () => $progressBar->label(__('commands.dev:generate-test-data.progress.polling_complete', ['fixture' => $this->currentFixture]))->advance());
     }
 
     private function startSnmpsim(Snmpsim $snmpsim, bool $quiet = false): void
@@ -231,18 +220,14 @@ class DevGenerateTestData extends LnmsCommand
     private function findOsWithData(?string $os, array $variants, array $modules): array
     {
         if ($os !== null && $variants !== []) {
-            $osList = [];
             $moduleOverrides = ModuleList::fromUserOverrides($modules)->overrides;
-            foreach ($variants as $variant) {
-                $baseName = $variant === '' ? $os : $os . '_' . $variant;
-                $osList[$baseName] = [$os, $variant, $moduleOverrides];
-            }
 
-            return $osList;
+            return collect($variants)
+                ->mapWithKeys(fn ($variant) => [$variant === '' ? $os : "{$os}_$variant" => [$os, $variant, $moduleOverrides]])
+                ->all();
         }
 
         $osList = ModuleTestHelper::findOsWithData($modules, $os);
-
         ksort($osList);
 
         return $osList;
@@ -253,39 +238,27 @@ class DevGenerateTestData extends LnmsCommand
      */
     public function completeOptionValue(DynamicInputOption $option, string $current, ?InputInterface $input = null): ?Collection
     {
-        return match ($option->getName()) {
-            'os' => $this->filterCompletions($this->fixtureOsNames(), $current),
-            'variant' => $this->filterCompletions($this->fixtureVariants($this->selectedOs($input)), $current, true),
-            'modules' => $this->filterCompletions($this->moduleNames(), $current, true),
-            default => null,
-        };
-    }
-
-    private function fixtureOsNames(): array
-    {
-        return array_values(array_unique(array_map(
-            fn ($file) => ModuleTestHelper::extractVariant($file)[0],
-            glob(base_path('tests/data/*.json'))
-        )));
-    }
-
-    private function fixtureVariants(?string $os = null): array
-    {
-        return array_values(array_unique(array_filter(array_map(
-            function ($file) use ($os) {
-                [$fixtureOs, $variant] = ModuleTestHelper::extractVariant($file);
-
-                return $os === null || $fixtureOs === $os ? $variant : null;
-            },
-            glob(base_path('tests/data/*.json'))
-        ), fn ($variant) => $variant !== null && $variant !== '')));
-    }
-
-    private function selectedOs(?InputInterface $input): ?string
-    {
         $os = $input?->getOption('os');
 
-        return is_string($os) ? $os : null;
+        return match ($option->getName()) {
+            'os' => $this->filterCompletions(
+                collect(glob(base_path('tests/data/*.json')))->map(fn ($f) => ModuleTestHelper::extractVariant($f)[0])->unique()->values()->all(),
+                $current
+            ),
+            'variant' => $this->filterCompletions(
+                collect(glob(base_path('tests/data/*.json')))
+                    ->map(fn ($f) => ModuleTestHelper::extractVariant($f))
+                    ->filter(fn ($v) => (! $os || $v[0] === $os) && $v[1] !== '')
+                    ->pluck(1)
+                    ->unique()
+                    ->values()
+                    ->all(),
+                $current,
+                commaDelimited: true
+            ),
+            'modules' => $this->filterCompletions($this->moduleNames(), $current, commaDelimited: true),
+            default => null,
+        };
     }
 
     private function moduleNames(): array

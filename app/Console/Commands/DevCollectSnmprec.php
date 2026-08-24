@@ -31,6 +31,7 @@ class DevCollectSnmprec extends LnmsCommand
 {
     protected $name = 'dev:collect-snmprec';
     protected bool $developer = true;
+    private bool $isRequerying = false;
 
     public function __construct()
     {
@@ -54,8 +55,8 @@ class DevCollectSnmprec extends LnmsCommand
 
             return 1;
         }
-        $variant = trim($variant);
 
+        $variant = trim($variant);
         if (str_contains($variant, '_')) {
             $this->error(__('commands.dev:collect-snmprec.variant_underscore'));
 
@@ -91,11 +92,8 @@ class DevCollectSnmprec extends LnmsCommand
             return 1;
         }
 
-        $modulesInput = $this->option('modules');
-        $modules = ($modulesInput === null || $modulesInput === '')
-            ? []
-            : array_values(array_filter(array_map('trim', explode(',', $modulesInput))));
-        $modulesInput = $modulesInput ?: 'configured defaults';
+        $modules = $this->commaSeparatedOption('modules');
+
         foreach ($modules as $module) {
             $moduleName = explode('/', $module, 2)[0];
             if (! Module::exists($moduleName)) {
@@ -107,17 +105,14 @@ class DevCollectSnmprec extends LnmsCommand
 
         $this->line("OS: $targetOs");
         $this->line('Variant: ' . ($variant === '' ? '(base; explicitly selected)' : $variant));
-        $this->line("Modules: $modulesInput");
+        $this->line('Modules: ' . ($this->option('modules') ?: 'configured defaults'));
         $this->newLine();
 
         try {
-            $moduleList = ModuleList::fromUserOverrides($modules);
-            $snmprecFile = $this->getSnmprecFilePath($targetOs, $variant);
-
             $this->captureData(
                 $device,
-                $moduleList,
-                $snmprecFile,
+                ModuleList::fromUserOverrides($modules),
+                $this->getSnmprecFilePath($targetOs, $variant),
                 (bool) $this->option('prefer-collected'),
                 (bool) $this->option('full'),
             );
@@ -143,7 +138,7 @@ class DevCollectSnmprec extends LnmsCommand
             $device = null;
         }
 
-        if (! $device || ! $device->exists) {
+        if (! $device?->exists) {
             $this->error(__('commands.dev:collect-snmprec.device_not_found', ['device' => $deviceSpec]));
 
             return null;
@@ -158,10 +153,9 @@ class DevCollectSnmprec extends LnmsCommand
             return (string) $customFile;
         }
 
-        $variantSuffix = strtolower($variant) ? '_' . strtolower($variant) : '';
-        $installDir = LibrenmsConfig::get('install_dir');
+        $variantSuffix = $variant !== '' ? '_' . strtolower($variant) : '';
 
-        return "$installDir/tests/snmpsim/" . $os . $variantSuffix . '.snmprec';
+        return base_path("tests/snmpsim/$os$variantSuffix.snmprec");
     }
 
     private function captureData(Device $device, ModuleList $moduleList, string $snmprecFile, bool $preferCollected, bool $full): void
@@ -188,26 +182,24 @@ class DevCollectSnmprec extends LnmsCommand
             }
         }
 
-        $isRequerying = false;
-        $listener = function (SnmpQueryExecuted $event) use (&$snmprecDataByContext, $device, &$isRequerying): void {
-            if ($isRequerying || $event->response->getExitCode() !== 0) { // @phpstan-ignore booleanOr.leftAlwaysFalse
+        $listener = function (SnmpQueryExecuted $event) use (&$snmprecDataByContext, $device): void {
+            if ($this->isRequerying || $event->response->getExitCode() !== 0) {
                 return;
             }
 
-            foreach ($event->oids as $oid) {
-                if ($this->output->isVerbose()) {
+            if ($this->output->isVerbose()) {
+                foreach ($event->oids as $oid) {
                     $this->output->writeln($oid);
                 }
             }
 
             $parsed = $this->convertSnmpToSnmprec($event->response);
 
-            // If the captured response could not be parsed into snmprec lines (e.g. non-numeric OID format or missing type info),
-            // re-query the device with optimal options (-OUneb -Ih -m +MIB)
+            // Re-query if bulk response couldn't be parsed into numeric snmprec lines
             if (empty($parsed) && ! empty($event->oids)) {
-                $isRequerying = true;
+                $this->isRequerying = true;
                 $this->requeryOids($device, $event, $snmprecDataByContext);
-                $isRequerying = false;
+                $this->isRequerying = false;
 
                 return;
             }
@@ -227,7 +219,7 @@ class DevCollectSnmprec extends LnmsCommand
         }
 
         try {
-            $this->runWithProgress(function () use ($device, $moduleList) {
+            $this->runWithProgress(function () use ($device, $moduleList): void {
                 (new DiscoverDevice($device->device_id, $moduleList))->handle();
                 (new PollDevice($device->device_id, $moduleList))->handle();
             }, __('commands.dev:collect-snmprec.capturing_data'));
@@ -295,7 +287,7 @@ class DevCollectSnmprec extends LnmsCommand
         $result = [];
 
         foreach (explode(PHP_EOL, $snmpData->getRawWithoutBadLines()) as $line) {
-            if (empty($line)) {
+            if ($line === '') {
                 continue;
             }
 
@@ -321,7 +313,7 @@ class DevCollectSnmprec extends LnmsCommand
         $oid = ltrim($oid, '.');
         $rawData = trim($rawData);
 
-        if (empty($rawData) || $rawData == '""') {
+        if ($rawData === '' || $rawData === '""') {
             return "$oid|4|";
         }
 
@@ -332,7 +324,7 @@ class DevCollectSnmprec extends LnmsCommand
 
         $type = $this->getSnmprecType($rawType);
         if ($type === null) {
-            Log::debug('Skipped line, bad type: ' . $line);
+            Log::debug("Skipped line, bad type: $line");
 
             return null;
         }
@@ -364,9 +356,9 @@ class DevCollectSnmprec extends LnmsCommand
             return;
         }
 
-        [$oid, $type, $data] = array_pad(explode('|', (string) $result[$lastKey], 3), 3, '');
+        [$oid, $type, $data] = array_pad(explode('|', $result[$lastKey], 3), 3, '');
 
-        $result[$lastKey] = $type == '4x'
+        $result[$lastKey] = $type === '4x'
             ? $result[$lastKey] . bin2hex(PHP_EOL . $line)
             : "$oid|4x|" . bin2hex($data . PHP_EOL . $line);
     }
@@ -385,7 +377,7 @@ class DevCollectSnmprec extends LnmsCommand
             'Gauge32' => '66',
             'Opaque' => '68',
             'Counter64' => '70',
-            default => null
+            default => null,
         };
     }
 
@@ -394,11 +386,9 @@ class DevCollectSnmprec extends LnmsCommand
      */
     private function saveSnmprec(string $baseFile, array $data, ?string $context, bool $preferCollected): void
     {
-        $filename = $baseFile;
-
-        if ($context) {
-            $filename = str_replace('.snmprec', '', $filename) . "@$context.snmprec";
-        }
+        $filename = $context
+            ? str_replace('.snmprec', '', $baseFile) . "@$context.snmprec"
+            : $baseFile;
 
         $existingData = is_file($filename) ? $this->indexSnmprec(explode(PHP_EOL, file_get_contents($filename))) : [];
 
@@ -437,7 +427,7 @@ class DevCollectSnmprec extends LnmsCommand
                 return 1;
             }
 
-            $cmp = $part <=> $bParts[$index];
+            $cmp = (int) $part <=> (int) $bParts[$index];
             if ($cmp !== 0) {
                 return $cmp;
             }
@@ -455,8 +445,8 @@ class DevCollectSnmprec extends LnmsCommand
         $result = [];
 
         foreach ($snmprecData as $line) {
-            if (! empty($line)) {
-                [$oid] = explode('|', (string) $line, 2);
+            if ($line !== '') {
+                [$oid] = explode('|', $line, 2);
                 $result[$oid] = $line;
             }
         }
@@ -485,7 +475,7 @@ class DevCollectSnmprec extends LnmsCommand
 
         foreach ($data as $oid => $oidData) {
             if (str_starts_with((string) $oid, '1.3.6.1.2.1.2.2.1.6.')) {
-                $parts = explode('|', (string) $oidData, 3);
+                $parts = explode('|', $oidData, 3);
                 $mac = Mac::parse($parts[2])->hex();
                 if ($mac) {
                     $parts[2] = $mac;
@@ -521,18 +511,27 @@ class DevCollectSnmprec extends LnmsCommand
     public function completeOptionValue(DynamicInputOption $option, string $current, ?InputInterface $input = null): ?Collection
     {
         return match ($option->getName()) {
-            'os' => $this->filterCompletions(array_map(
-                fn ($file) => basename($file, '.yaml'),
-                glob(resource_path('definitions/os_detection/*.yaml'))
-            ), $current),
-            'variant' => $this->filterCompletions(array_values(array_unique(array_filter(array_map(
-                fn ($file) => ModuleTestHelper::extractVariant(basename($file, '.snmprec'))[1],
-                glob(base_path('tests/snmpsim/*.snmprec'))
-            )))), $current),
-            'modules' => $this->filterCompletions(array_values(array_unique(array_merge(
-                array_keys(LibrenmsConfig::get('discovery_modules', [])),
-                array_keys(LibrenmsConfig::get('poller_modules', [])),
-            ))), $current, true),
+            'os' => $this->filterCompletions(
+                collect(glob(resource_path('definitions/os_detection/*.yaml')))->map(fn ($file) => basename($file, '.yaml'))->all(),
+                $current
+            ),
+            'variant' => $this->filterCompletions(
+                collect(glob(base_path('tests/snmpsim/*.snmprec')))
+                    ->map(fn ($file) => ModuleTestHelper::extractVariant(basename($file, '.snmprec'))[1])
+                    ->filter(fn ($variant) => $variant !== '')
+                    ->unique()
+                    ->values()
+                    ->all(),
+                $current
+            ),
+            'modules' => $this->filterCompletions(
+                array_values(array_unique(array_merge(
+                    array_keys(LibrenmsConfig::get('discovery_modules', [])),
+                    array_keys(LibrenmsConfig::get('poller_modules', [])),
+                ))),
+                $current,
+                commaDelimited: true
+            ),
             default => null,
         };
     }
