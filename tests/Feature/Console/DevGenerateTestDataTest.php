@@ -2,6 +2,8 @@
 
 namespace LibreNMS\Tests\Feature\Console;
 
+use App\Console\Commands\DevGenerateTestData;
+use App\Console\DynamicInputOption;
 use LibreNMS\Tests\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
@@ -30,12 +32,14 @@ final class DevGenerateTestDataTest extends TestCase
 
     public function testVariantCompletionIsFilteredByOs(): void
     {
-        $command = new \App\Console\Commands\DevGenerateTestData;
+        $command = new DevGenerateTestData;
         $input = new ArrayInput(['--os' => 'ios']);
         $input->bind($command->getDefinition());
+        $option = $command->getDefinition()->getOption('variant');
+        $this->assertInstanceOf(DynamicInputOption::class, $option);
 
         $completions = $command->completeOptionValue(
-            $command->getDefinition()->getOption('variant'),
+            $option,
             'c35',
             $input,
         );
@@ -46,12 +50,14 @@ final class DevGenerateTestDataTest extends TestCase
 
     public function testVariantCompletionIncludesSnmprecWithoutJson(): void
     {
-        $command = new \App\Console\Commands\DevGenerateTestData;
+        $command = new DevGenerateTestData;
         $input = new ArrayInput(['--os' => 'routeros']);
         $input->bind($command->getDefinition());
+        $option = $command->getDefinition()->getOption('variant');
+        $this->assertInstanceOf(DynamicInputOption::class, $option);
 
         $completions = $command->completeOptionValue(
-            $command->getDefinition()->getOption('variant'),
+            $option,
             'rbl',
             $input,
         );

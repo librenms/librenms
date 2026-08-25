@@ -184,6 +184,11 @@ class DevGenerateTestData extends LnmsCommand
         return 0;
     }
 
+    /**
+     * @template TSteps of iterable<mixed>|int
+     *
+     * @param  Progress<TSteps>  $progressBar
+     */
     private function registerProgressListeners(Progress $progressBar): void
     {
         Event::listen(DiscoveringModule::class, fn ($event) => $progressBar->label(__('commands.dev:generate-test-data.progress.discovering_module', ['fixture' => $this->currentFixture, 'module' => $event->module]))->render());
@@ -213,6 +218,7 @@ class DevGenerateTestData extends LnmsCommand
     }
 
     /**
+     * @param  array<string>  $variants
      * @param  array<string>  $modules
      * @return array<string, array{string, string, array<string, bool|array<string>>}>
      *
@@ -262,6 +268,9 @@ class DevGenerateTestData extends LnmsCommand
         };
     }
 
+    /**
+     * @return array<int, string>
+     */
     private function moduleNames(): array
     {
         return array_values(array_unique(array_merge(
@@ -270,6 +279,10 @@ class DevGenerateTestData extends LnmsCommand
         )));
     }
 
+    /**
+     * @param  array<int, string>  $values
+     * @return Collection<int, string>
+     */
     private function filterCompletions(array $values, string $current, bool $commaDelimited = false): Collection
     {
         $prefix = '';
