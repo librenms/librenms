@@ -21,11 +21,13 @@ if (strcmp((string) $data['mode'], 'multi') == 0 || isset($errored['0'])) {
         $repos = $app->data['repos'] ?? [];
         sort($pools);
         foreach ($pools as $index => $repo) {
-            $label = $vars['borgbackup'] == $repo
-                ? '<span class="pagemenu-selected">' . htmlspecialchars((string) $repo) . '</span>'
-                : htmlspecialchars((string) $repo);
+            $link = generate_link(htmlspecialchars((string) $repo), $link_array, ['borgbackup' => $repo]);
 
-            echo generate_link($label, $link_array, ['borgbackup' => $repo]);
+            $label = $vars['borgbackup'] == $repo
+                ? '<span class="pagemenu-selected">' . $link . '</span>'
+                : $link;
+
+            echo $label;
 
             if ($index < (count($repos) - 1)) {
                 echo ', ';
