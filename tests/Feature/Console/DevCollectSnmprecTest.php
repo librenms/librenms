@@ -2,6 +2,8 @@
 
 namespace LibreNMS\Tests\Feature\Console;
 
+use App\Console\Commands\DevCollectSnmprec;
+use App\Console\DynamicInputOption;
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\TestCase;
@@ -58,7 +60,7 @@ final class DevCollectSnmprecTest extends TestCase
             'hostname' => 'router.example.com',
         ]);
 
-        $cmd = new \App\Console\Commands\DevCollectSnmprec();
+        $cmd = new DevCollectSnmprec;
 
         $completionsByHost = $cmd->completeArgument('device', 'router.');
         $this->assertContains('router.example.com', $completionsByHost);
@@ -66,10 +68,14 @@ final class DevCollectSnmprecTest extends TestCase
         $completionsById = $cmd->completeArgument('device', (string) $device->device_id);
         $this->assertContains('router.example.com', $completionsById);
 
-        $moduleCompletions = $cmd->completeOptionValue($cmd->getDefinition()->getOption('modules'), 'ports,sen');
+        $modulesOption = $cmd->getDefinition()->getOption('modules');
+        $this->assertInstanceOf(DynamicInputOption::class, $modulesOption);
+        $moduleCompletions = $cmd->completeOptionValue($modulesOption, 'ports,sen');
         $this->assertContains('ports,sensors', $moduleCompletions);
 
-        $variantCompletions = $cmd->completeOptionValue($cmd->getDefinition()->getOption('variant'), 'wi');
+        $variantOption = $cmd->getDefinition()->getOption('variant');
+        $this->assertInstanceOf(DynamicInputOption::class, $variantOption);
+        $variantCompletions = $cmd->completeOptionValue($variantOption, 'wi');
         $this->assertContains('wifi', $variantCompletions);
     }
 }
