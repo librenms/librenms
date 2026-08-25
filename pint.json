@@ -11,6 +11,7 @@
         "blank_line_before_statement": {
             "statements": ["return"]
         },
+        "blank_line_between_import_groups": true,
         "blank_lines_before_namespace": true,
         "cast_spaces": true,
         "class_attributes_separation": {

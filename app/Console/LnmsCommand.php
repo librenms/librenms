@@ -188,7 +188,7 @@ abstract class LnmsCommand extends Command
         }
 
         $items = is_array($value) ? $value : explode(',', $value);
-        $trimmed = array_map('trim', $items);
+        $trimmed = array_map(trim(...), $items);
 
         if ($filterEmpty) {
             $trimmed = array_filter($trimmed, fn (string $item) => $item !== '');
