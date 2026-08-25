@@ -165,13 +165,12 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
             dbUpdate($snmp_data, 'ports', '`port_id` = ?', [$port_id]);
             echo '.';
         }
-    } elseif ($port_id !== null && isset($ports_db[$port_id]) && is_array($ports_db[$port_id])) {
+    } else {
         // Port vanished (mark as deleted)
-            if ($ports_db[$port_id]['deleted'] != 1) {
-                dbUpdate(['deleted' => 1], 'ports', '`port_id` = ?', [$port_id]);
-                $ports_db[$port_id]['deleted'] = 1;
-                echo '-';
-            }
+        if ($port_id !== null && is_array($ports_db[$port_id] ?? null) && empty($ports_db[$port_id]['deleted'])) {
+            dbUpdate(['deleted' => 1], 'ports', '`port_id` = ?', [$port_id]);
+            $ports_db[$port_id]['deleted'] = 1;
+            echo '-';
         }
     }//end if
 }//end foreach
