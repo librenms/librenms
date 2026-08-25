@@ -165,9 +165,8 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
             dbUpdate($snmp_data, 'ports', '`port_id` = ?', [$port_id]);
             echo '.';
         }
-    } else {
+    } elseif ($port_id !== null && isset($ports_db[$port_id]) && is_array($ports_db[$port_id])) {
         // Port vanished (mark as deleted)
-        if (isset($ports_db[$port_id]) && is_array($ports_db[$port_id])) {
             if ($ports_db[$port_id]['deleted'] != 1) {
                 dbUpdate(['deleted' => 1], 'ports', '`port_id` = ?', [$port_id]);
                 $ports_db[$port_id]['deleted'] = 1;
