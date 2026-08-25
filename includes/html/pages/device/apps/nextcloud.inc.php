@@ -34,7 +34,7 @@ foreach ($nextcloud_users as $index => $nextcloud_user) {
         ? '<span class="pagemenu-selected">' . $link . '</span>'
         : $link;
 
-    echo $link. "\n";
+    echo $link . "\n";
 
     if ($index < (count($nextcloud_users) - 1)) {
         echo ', ';

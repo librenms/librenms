@@ -84,13 +84,6 @@ if ($vars['vmpage'] == 'snapshots') {
 }
 $page_links[] = $link;
 
-
-
-
-
-
-
-
 echo implode(', ', $page_links);
 
 if (isset($vars['vm'])) {

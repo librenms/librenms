@@ -37,7 +37,6 @@ if (isset($vars['log_set']) && isset($sets[$vars['log_set']])) {
     sort($log_files);
 
     foreach ($log_files as $index => $log_file) {
-
         $link = generate_link($log_file, $link_array, ['log_set' => $vars['log_set'], 'log_file' => $log_file]);
 
         $label = $vars['log_file'] == $log_file

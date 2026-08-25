@@ -305,7 +305,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
 
             $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
                 ? $link
-                : '<span class="pagemenu-selected">' . $link. '</span>';
+                : '<span class="pagemenu-selected">' . $link . '</span>';
 
             $index_int++;
             echo $link;

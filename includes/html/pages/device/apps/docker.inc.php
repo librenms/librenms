@@ -15,7 +15,6 @@ echo ' | Containers:';
 $containers = $app->data['containers'] ?? [];
 sort($containers);
 foreach ($containers as $index => $container) {
-
     $link = generate_link($container, $link_array, ['container' => $container]);
 
     $label = $vars['container'] == $container
