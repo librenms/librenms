@@ -53,7 +53,7 @@ if (count($packages) > 0) {
         $link = generate_link($package, $link_array, ['app' => 'cape', 'stddev' => $vars['stddev'], 'bypkg' => $vars['bypkg'], 'bytimeslot' => $vars['bytimeslot'], 'package' => $package, 'statsavg' => $vars['statsavg'], 'runstats' => $vars['runstats']]) . $append;
 
         if ($vars['package'] == $package) {
-            $label = '<span class="pagemenu-selected">' . $link . '</span>';
+            $link = '<span class="pagemenu-selected">' . $link . '</span>';
         }
 
         echo $link;
