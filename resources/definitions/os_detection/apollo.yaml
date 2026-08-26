@@ -1,0 +1,15 @@
+os: apollo
+text: 'Ribbon/ECI Apollo'
+type: server
+icon: ribbon
+group: eci
+ifname: true
+empty_ifdescr: true
+bad_ifname_regexp:
+  - '/^(?!osc100-u).*/i'
+over:
+  - { graph: device_dbm, text: 'Optical Power'}
+  - { graph: device_temperature, text: 'Temperature'}
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.5395.1.1.1.
