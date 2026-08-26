@@ -22,7 +22,7 @@ return new class extends Migration
             $table->boolean('enabled')->default(true);
             $table->boolean('affects_availability')->default(false);
             $table->foreignId('secret_id')->nullable()->constrained('secrets')->nullOnDelete();
-            $table->longtext('settings')->nullable();
+            $table->longText('settings')->nullable();
             $table->timestamp('last_checked_at')->nullable();
             $table->boolean('last_check_successful')->nullable();
             $table->timestamps();

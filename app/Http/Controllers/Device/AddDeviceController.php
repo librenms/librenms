@@ -72,6 +72,7 @@ class AddDeviceController
         $device->port_association_mode = $validated['port_assoc_mode']
             ?? (int) LibrenmsConfig::get('default_port_association_mode', 1);
 
+        /** @var array<string, array<string, mixed>> $rawMethods */
         $rawMethods = $validated['polling_methods'] ?? [];
 
         // When SNMP is explicitly disabled / inactive in the submitted payload
