@@ -7,18 +7,17 @@
  * 9603/9608 DWDM equipment via SNMP and registers them as dBm
  * sensors with the description of the corresponding port.
  */
-echo ' Apollo Optical Power';
+use App\Models\Port;
+
+echo 'Apollo Optical Power ';
 
 $multiplier = 1;
 $divisor = 1;
 
-$ports = dbFetchRows(
-    'SELECT port_id, ifIndex, ifName
-     FROM ports
-     WHERE device_id = ?
-     ORDER BY ifIndex',
-    [$device['device_id']]
-);
+$ports = Port::where('device_id', $device['device_id'])
+    ->orderBy('ifIndex')
+    ->get(['port_id', 'ifIndex', 'ifName'])
+    ->toArray();
 
 $directions = [
     'rx' => ['oid' => '5', 'label' => 'RX'],
@@ -32,14 +31,9 @@ foreach ($ports as $port) {
     foreach ($directions as $dir => $meta) {
         $oid = ".1.3.6.1.4.1.5395.3.7.5.1.{$meta['oid']}.$ifIndex";
 
-        $value = snmp_get(
-            $device,
-            $oid,
-            '-OQv',
-            ''
-        );
+        $value = \SnmpQuery::options('-OQv')->get($oid)->value();
 
-        if ($value === false || ! preg_match('/(-?\d+(?:\.\d+)?)/', $value, $m)) {
+        if ($value === null || $value === '' || ! preg_match('/(-?\d+(?:\.\d+)?)/', (string) $value, $m)) {
             continue;
         }
 

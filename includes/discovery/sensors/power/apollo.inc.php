@@ -7,13 +7,13 @@
  * to extract the current system power consumption via regex, registering
  * it as a standard 'power' sensor in Watts.
  */
-echo 'Apollo Power';
+echo 'Apollo Power ';
 
 $oid = '.1.3.6.1.4.1.5395.3.7.2.1.8.1';
 
-$value = snmp_get($device, $oid, '-Oqv');
+$value = \SnmpQuery::options('-OQv')->get($oid)->value();
 
-if (! empty($value) && preg_match('/([-+]?[0-9]*\.?[0-9]+)/', $value, $match)) {
+if ($value !== null && $value !== '' && preg_match('/([-+]?[0-9]*\.?[0-9]+)/', (string) $value, $match)) {
     $current = (float) $match[1];
 
     discover_sensor(
@@ -30,6 +30,7 @@ if (! empty($value) && preg_match('/([-+]?[0-9]*\.?[0-9]+)/', $value, $match)) {
         null,
         null,
         null,
-        $current
+        $current,
+        'snmp'
     );
 }
