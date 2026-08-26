@@ -152,9 +152,7 @@ class AddDeviceControllerTest extends TestCase
         $admin->givePermissionTo('device.create');
 
         $mock = Mockery::mock('overload:App\Actions\Device\ValidateDeviceAndCreate');
-        $mock->shouldReceive('execute')->once()->andReturnUsing(function () {
-            return true;
-        });
+        $mock->shouldReceive('execute')->once()->andReturnUsing(fn () => true);
 
         $response = $this->actingAs($admin)->postJson(route('device.add.store'), [
             'hostname' => 'test-device.example.com',
