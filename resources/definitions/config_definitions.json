@@ -391,6 +391,13 @@
             "order": 3,
             "type": "array"
         },
+        "api.v1.enabled": {
+            "default": false,
+            "group": "api",
+            "section": "v1",
+            "order": 1,
+            "type": "boolean"
+        },
         "apps.powerdns-recursor.api-key": {
             "type": "text",
             "group": "apps",
@@ -7521,6 +7528,13 @@
             "section": "search",
             "order": 0,
             "type": "integer"
+        },
+        "webui.global_search.arp": {
+            "default": true,
+            "group": "webui",
+            "section": "search",
+            "order": 1,
+            "type": "boolean"
         },
         "webui.global_search.fdb": {
             "default": true,

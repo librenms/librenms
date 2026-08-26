@@ -1,8 +1,8 @@
 ## Nagios Compatible
 
-The nagios transport will feed a FIFO at the defined location with the
-same format that nagios would. This allows you to use other alerting
-systems with LibreNMS, for example [Flapjack](http://flapjack.io).
+The Nagios transport writes to a FIFO at the given location. It uses
+the Nagios format. Other alerting systems can then work with LibreNMS.
+One example is [Flapjack](http://flapjack.io).
 
 **Example:**
 
