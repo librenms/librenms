@@ -696,10 +696,10 @@ class Port extends DeviceRelatedModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PortVlan, $this>
+     * @return int
      */
-    public function voiceVlan(): HasOne
+    public function voiceVlan(): int
     {
-        return $this->hasOne(PortVlan::class, 'port_id')->where('voice', 1)->first();
+        return $this->hasOne(PortVlan::class, 'port_id')->where('voice', 1)->first()->vlan;
     }
 }
