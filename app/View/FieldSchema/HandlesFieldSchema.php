@@ -76,9 +76,11 @@ trait HandlesFieldSchema
     public function schemaDefaults(): array
     {
         return collect($this->fields())
-            ->mapWithKeys(fn (FieldDefinition $field, string $key): array => [
-                $key => $field->getDefault(),
-            ])
+            ->mapWithKeys(function (FieldDefinition $field, string $key): array {
+                $val = $field->getDefault() ?? $field->getFallback();
+
+                return [$key => $val !== null ? $field->castValue($val) : null];
+            })
             ->filter(fn (mixed $v): bool => $v !== null)
             ->all();
     }

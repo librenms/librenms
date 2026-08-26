@@ -11,7 +11,7 @@ use App\Models\PollerGroup;
 use App\Models\Secret;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
@@ -39,58 +39,46 @@ class AddDeviceController
                 'settings_fields' => $definition->buildSchemaFields(dataVar: "methods['" . $type->value . "'].settingsData"),
                 'settings_defaults' => $definition->schemaDefaults(),
             ];
-        });
+        })->all();
 
-        $availableSecrets = Secret::query()->orderBy('description')->get()->groupBy(
-            fn (Secret $s): string => $s->secret_type->value
-        );
+        $defaultPollerGroup = LibrenmsConfig::get('default_poller_group', 0);
+        $pollerGroups = PollerGroup::orderBy('group_name')->get();
+        $defaultPortAssocMode = LibrenmsConfig::get('default_port_association_mode', 'ifIndex');
+        $portAssocModes = PortAssociationMode::getModes();
+        $secrets = Secret::all();
+
+        $oldActiveMethods = old('active_methods', [PollingMethodType::Icmp->value, PollingMethodType::Snmp->value]);
 
         return view('device.add', [
             'availableMethods' => $availableMethods,
-            'availableSecrets' => $availableSecrets,
-            'poller_groups' => PollerGroup::orderBy('group_name')->pluck('group_name', 'id'),
-            'default_poller_group' => LibrenmsConfig::get('default_poller_group', 0),
-            'port_association_modes' => PortAssociationMode::getModes(),
-            'default_port_association_mode' => LibrenmsConfig::get('default_port_association_mode', 'ifIndex'),
-            'oldActiveMethods' => old('active_methods', ['snmp', 'icmp']),
+            'default_poller_group' => $defaultPollerGroup,
+            'poller_groups' => $pollerGroups,
+            'default_port_association_mode' => $defaultPortAssocMode,
+            'port_association_modes' => $portAssocModes,
+            'secrets' => $secrets,
+            'oldActiveMethods' => $oldActiveMethods,
         ]);
     }
 
-    public function store(StoreDeviceRequest $request, ToastInterface $toast): RedirectResponse
+    public function store(StoreDeviceRequest $request, ToastInterface $toast): JsonResponse
     {
         $this->authorize('create', Device::class);
 
         $validated = $request->validated();
 
-        /** @var array<string, array<string, mixed>> $rawMethods */
+        $device = new Device;
+        $device->hostname = $validated['hostname'];
+        $device->poller_group = $validated['poller_group'] ?? LibrenmsConfig::get('default_poller_group', 0);
+        $device->port_association_mode = $validated['port_assoc_mode']
+            ?? (int) LibrenmsConfig::get('default_port_association_mode', 1);
+
         $rawMethods = $validated['polling_methods'] ?? [];
-        $snmpActive = (bool) ($rawMethods['snmp']['active'] ?? false);
 
-        $portAssocModeStr = $rawMethods['snmp']['settings']['port_association_mode']
-            ?? $validated['port_assoc_mode']
-            ?? LibrenmsConfig::get('default_port_association_mode', 'ifIndex');
-
-        $device = new Device([
-            'hostname' => $validated['hostname'],
-            'poller_group' => $validated['poller_group'] ?? LibrenmsConfig::get('default_poller_group', 0),
-            'port_association_mode' => PortAssociationMode::getId($portAssocModeStr) ?? 1,
-        ]);
-
-        $pollingMethods = collect();
-
-        if (isset($rawMethods['snmp']['settings'])) {
-            $settings = $rawMethods['snmp']['settings'];
-            $device->setAttribute('port', (int) ($settings['port'] ?? LibrenmsConfig::get('snmp.port', 161)));
-            $device->setAttribute('transport', $settings['transport'] ?? LibrenmsConfig::get('snmp.transports.0', 'udp'));
-            if (isset($settings['port_association_mode'])) {
-                $device->port_association_mode = PortAssociationMode::getId($settings['port_association_mode']) ?? 1;
-            }
-        }
-
-        if (! $snmpActive) {
+        // When SNMP is explicitly disabled / inactive in the submitted payload
+        if (empty($rawMethods['snmp']['active'])) {
             $device->setAttribute('snmp_disable', true);
-            $device->os = $validated['os'] ?: 'ping';
             $device->sysName = $validated['sysName'] ?: '';
+            $device->os = $validated['os'] ?: 'ping';
             $device->hardware = $validated['hardware'] ?: '';
         } else {
             $device->setAttribute('snmp_disable', false);
@@ -103,24 +91,35 @@ class AddDeviceController
             ->every(fn (array $data): bool => empty($data['validate']));
 
         try {
-            $validator = new ValidateDeviceAndCreate($device, $forceAdd, input: ['methods' => $rawMethods]);
+            $validator = new ValidateDeviceAndCreate($device, $forceAdd, false, ['methods' => $rawMethods]);
             $success = $validator->execute();
 
             if (! $success) {
-                return back()->withInput()->withErrors(['hostname' => __('Failed to save device.')]);
+                return response()->json([
+                    'message' => __('Failed to save device.'),
+                    'errors' => ['hostname' => [__('Failed to save device.')]],
+                ], 422);
             }
         } catch (HostUnreachableException $e) {
             $errors = array_merge([$e->getMessage()], $e->getReasons());
 
-            return back()->withInput()->withErrors([
-                'hostname' => $errors,
-            ]);
+            return response()->json([
+                'message' => $e->getMessage(),
+                'errors' => ['hostname' => $errors],
+            ], 422);
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['hostname' => $e->getMessage()]);
+            return response()->json([
+                'message' => $e->getMessage(),
+                'errors' => ['hostname' => [$e->getMessage()]],
+            ], 422);
         }
 
         $toast->success(__('Device added successfully'));
 
-        return redirect()->route('device', ['device' => $device->device_id]);
+        return response()->json([
+            'status' => 'ok',
+            'message' => __('Device added successfully'),
+            'redirect' => route('device', ['device' => $device->device_id ?? 0]),
+        ]);
     }
 }
