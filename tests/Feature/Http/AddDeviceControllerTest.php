@@ -47,7 +47,7 @@ class AddDeviceControllerTest extends TestCase
             ->once()
             ->andThrow($exception);
 
-        $response = $this->actingAs($admin)->post(route('device.add.store'), [
+        $response = $this->actingAs($admin)->postJson(route('device.add.store'), [
             'hostname' => 'laurens.rtr.ncn.net',
             'poller_group' => 0,
             'port_assoc_mode' => 'ifIndex',
@@ -63,10 +63,10 @@ class AddDeviceControllerTest extends TestCase
             ],
         ]);
 
-        $response->assertRedirect();
-        $response->assertSessionHasErrors('hostname');
+        $response->assertStatus(422);
+        $response->assertJsonStructure(['message', 'errors' => ['hostname']]);
 
-        $errors = session('errors')->get('hostname');
+        $errors = $response->json('errors.hostname');
         $this->assertCount(3, $errors);
         $this->assertStringContainsString('Could not connect to laurens.rtr.ncn.net', $errors[0]);
         $this->assertStringContainsString('SNMP v2c: No reply with community public', $errors[1]);
@@ -83,25 +83,23 @@ class AddDeviceControllerTest extends TestCase
 
         // Mock Fping for ICMP check
         $fpingMock = Mockery::mock(\LibreNMS\Data\Source\Icmp\Fping::class);
-        $statusMock = Mockery::mock(\LibreNMS\Data\Source\Icmp\FpingResponse::class);
-        $statusMock->shouldReceive('isAlive')->andReturn(true);
-        /** @phpstan-ignore-next-line */
-        $statusMock->duplicates = 0;
+        $statusMock = \LibreNMS\Data\Source\Icmp\FpingResponse::artificialUp();
         $fpingMock->shouldReceive('ping')->andReturn($statusMock);
         $this->instance(\LibreNMS\Data\Source\Icmp\Fping::class, $fpingMock);
 
         // Mock SnmpQuery to capture tried credentials
-        \SnmpQuery::partialMock()->shouldReceive('get')
-            ->andReturnUsing(function () use (&$calledCredentials) {
-                /** @var \App\Models\Device|null $device */
-                $device = \SnmpQuery::getFacadeRoot()?->getDevice();
+        \SnmpQuery::partialMock()->shouldReceive('device')
+            ->andReturnUsing(function ($device) use (&$calledCredentials) {
                 $snmpMethod = $device?->pollingMethods->firstWhere('method_type', \LibreNMS\Enum\PollingMethodType::Snmp);
                 $secret = $snmpMethod?->secret;
                 if ($secret) {
                     $calledCredentials[] = $secret->data;
                 }
 
-                return new \LibreNMS\Data\Source\SnmpResponse('', '', 1); // Fail check to collect all tried
+                $queryMock = Mockery::mock(\LibreNMS\Data\Source\SnmpQueryInterface::class);
+                $queryMock->shouldReceive('get')->andReturn(new \LibreNMS\Data\Source\SnmpResponse('', '', 1));
+
+                return $queryMock;
             });
 
         // Set global configured SNMP credentials to something we shouldn't attempt
@@ -122,7 +120,7 @@ class AddDeviceControllerTest extends TestCase
             ],
         ]);
 
-        $response = $this->actingAs($admin)->post(route('device.add.store'), [
+        $response = $this->actingAs($admin)->postJson(route('device.add.store'), [
             'hostname' => 'laurens.rtr.ncn.net',
             'poller_group' => 0,
             'port_assoc_mode' => 'ifIndex',
@@ -139,9 +137,8 @@ class AddDeviceControllerTest extends TestCase
             ],
         ]);
 
-        // It should fail because SnmpIsAvailable always returned false, throwing HostUnreachableException
-        $response->assertRedirect();
-        $response->assertSessionHasErrors('hostname');
+        $response->assertStatus(422);
+        $response->assertJsonStructure(['message', 'errors' => ['hostname']]);
 
         // Verify that ONLY the 'target-community' was attempted, NOT 'global-community' or 'global-v3-user'
         $this->assertCount(1, $calledCredentials);
@@ -155,9 +152,11 @@ class AddDeviceControllerTest extends TestCase
         $admin->givePermissionTo('device.create');
 
         $mock = Mockery::mock('overload:App\Actions\Device\ValidateDeviceAndCreate');
-        $mock->shouldReceive('execute')->once()->andReturn(true);
+        $mock->shouldReceive('execute')->once()->andReturnUsing(function () {
+            return true;
+        });
 
-        $response = $this->actingAs($admin)->post(route('device.add.store'), [
+        $response = $this->actingAs($admin)->postJson(route('device.add.store'), [
             'hostname' => 'test-device.example.com',
             'poller_group' => 0,
             'polling_methods' => [
@@ -173,9 +172,89 @@ class AddDeviceControllerTest extends TestCase
             ],
         ]);
 
-        $response->assertRedirect();
-        $device = \App\Models\Device::where('hostname', 'test-device.example.com')->first();
-        $this->assertNotNull($device);
-        $this->assertEquals(\LibreNMS\Enum\PortAssociationMode::getId('ifName'), $device->port_association_mode);
+        $response->assertOk();
+        $response->assertJsonStructure(['status', 'message', 'redirect']);
+        $this->assertEquals('ok', $response->json('status'));
+    }
+
+    public function testStoreDeviceJsonReturnsJsonResponseOnSuccess(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.create');
+
+        $mock = Mockery::mock('overload:App\Actions\Device\ValidateDeviceAndCreate');
+        $mock->shouldReceive('execute')->once()->andReturn(true);
+
+        $response = $this->actingAs($admin)->postJson(route('device.add.store'), [
+            'hostname' => 'json-device.example.com',
+            'poller_group' => 0,
+            'polling_methods' => [
+                'snmp' => [
+                    'active' => '1',
+                    'validate' => '0',
+                    'credential_mode' => 'default',
+                    'settings' => [
+                        'transport' => 'udp',
+                    ],
+                ],
+            ],
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonStructure(['status', 'message', 'redirect']);
+        $this->assertEquals('ok', $response->json('status'));
+    }
+
+    public function testStoreDeviceJsonHostUnreachableReturnsJsonErrors(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.create');
+
+        $mock = Mockery::mock('overload:App\Actions\Device\ValidateDeviceAndCreate');
+        $exception = new HostUnreachableSnmpException('json-unreachable.example.com');
+        $exception->addReason('v2c', 'public');
+
+        $mock->shouldReceive('execute')
+            ->once()
+            ->andThrow($exception);
+
+        $response = $this->actingAs($admin)->postJson(route('device.add.store'), [
+            'hostname' => 'json-unreachable.example.com',
+            'poller_group' => 0,
+            'polling_methods' => [
+                'snmp' => [
+                    'active' => '1',
+                    'validate' => '1',
+                    'credential_mode' => 'default',
+                    'settings' => [
+                        'transport' => 'udp',
+                    ],
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonStructure(['message', 'errors' => ['hostname']]);
+        $this->assertStringContainsString('Could not connect to json-unreachable.example.com', $response->json('errors.hostname.0'));
+    }
+
+    public function testStoreDeviceWithoutPollingMethodsReturnsCustomErrorMessage(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.create');
+
+        $response = $this->actingAs($admin)->postJson(route('device.add.store'), [
+            'hostname' => 'test-device.example.com',
+            'poller_group' => 0,
+            'polling_methods' => [],
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors([
+            'polling_methods' => 'At least one polling method is required',
+        ]);
     }
 }

@@ -31,7 +31,7 @@ class StoreDeviceRequest extends FormRequest
             'port_assoc_mode' => ['nullable', 'string', Rule::in(PortAssociationMode::getModes())],
             'force_add' => ['nullable', 'boolean'],
             'ping_fallback' => ['nullable', 'boolean'],
-            'polling_methods' => ['required', 'array'],
+            'polling_methods' => ['required', 'array', 'min:1'],
             'sysName' => ['nullable', 'string', 'max:255'],
             'hardware' => ['nullable', 'string', 'max:255'],
             'os' => ['nullable', 'string', 'max:255'],
@@ -104,6 +104,10 @@ class StoreDeviceRequest extends FormRequest
         // Merge flags in polling_methods
         $methods = $this->input('polling_methods', []);
         foreach ($methods as $method => $data) {
+            $type = PollingMethodType::tryFrom($method);
+            if ($type && isset($data['settings']) && is_array($data['settings'])) {
+                $methods[$method]['settings'] = array_merge($type->definition()->schemaDefaults(), $data['settings']);
+            }
             if (isset($data['active'])) {
                 $methods[$method]['active'] = $this->boolean("polling_methods.{$method}.active");
             }
@@ -121,5 +125,18 @@ class StoreDeviceRequest extends FormRequest
             }
         }
         $this->merge(['polling_methods' => $methods]);
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'polling_methods.required' => __('At least one polling method is required'),
+            'polling_methods.min' => __('At least one polling method is required'),
+        ];
     }
 }

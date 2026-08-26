@@ -35,35 +35,35 @@ class SnmpPollingMethodDefinition implements PollingMethodDefinitionInterface
                 ->rules(['required', 'string', 'in:udp,tcp,udp6,tcp6']),
 
             'port' => FieldDefinition::make('port', 'number')
-                ->fallback(fn () => LibrenmsConfig::get('snmp.port'))
+                ->fallback(fn () => (int) LibrenmsConfig::get('snmp.port', 161))
                 ->min(1)
                 ->max(65535)
                 ->rules(['required', 'integer', 'min:1', 'max:65535'])
                 ->cast('int'),
 
             'timeout' => FieldDefinition::make('timeout', 'number')
-                ->fallback(fn () => LibrenmsConfig::get('snmp.timeout'))
+                ->fallback(fn () => max(1, (int) LibrenmsConfig::get('snmp.timeout', 1)))
                 ->min(1)
                 ->max(60)
                 ->rules(['required', 'integer', 'min:1', 'max:60'])
                 ->cast('int'),
 
             'retries' => FieldDefinition::make('retries', 'number')
-                ->fallback(fn () => LibrenmsConfig::get('snmp.retries'))
+                ->fallback(fn () => (int) LibrenmsConfig::get('snmp.retries', 5))
                 ->min(0)
                 ->max(10)
                 ->rules(['required', 'integer', 'min:0', 'max:10'])
                 ->cast('int'),
 
             'max_repeaters' => FieldDefinition::make('max_repeaters', 'number')
-                ->fallback(fn () => LibrenmsConfig::get('snmp.max_repeaters'))
+                ->fallback(fn () => (int) LibrenmsConfig::get('snmp.max_repeaters', 10))
                 ->min(0)
                 ->max(30)
                 ->rules(['required', 'integer', 'min:0', 'max:30'])
                 ->cast('int'),
 
             'max_oid' => FieldDefinition::make('max_oid', 'number')
-                ->fallback(fn () => LibrenmsConfig::get('snmp.max_oid'))
+                ->fallback(fn () => max(1, (int) LibrenmsConfig::get('snmp.max_oid', 10)))
                 ->min(1)
                 ->max(100)
                 ->rules(['required', 'integer', 'min:1', 'max:100'])
