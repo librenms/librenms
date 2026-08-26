@@ -854,7 +854,7 @@ modules:
                     high_limit: wirelessSensorStatusMaxTempThresh
                     descr: '{{ PowerNet-MIB::wirelessSensorStatusName }}'
                     index: 'wirelessSensorStatusTemperature.{{ $index }}'
-                    skip_value_lt: 0
+                    skip_values: -2147483647
         humidity:
             data:
                 -
