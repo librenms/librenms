@@ -104,6 +104,13 @@
                 </a>
             </div>
         @endif
+       @if($port->voiceVlan->first()->vlan)
+            <div class="tw:text-blue-800">
+                <a href="{{ \LibreNMS\Util\Url::deviceUrl($port->device_id, ['tab' => 'vlans']) }}">
+                    {{ __('port.voice_vlan_label', ['label' => $port->voiceVlan->first()->vlan]) }}
+               	</a>
+            </div>
+        @endif
         @if($port->ifVrf)
             <div>
                 {{ __('port.vrf_label', ['name' => $port->vrf?->vrf_name]) }}

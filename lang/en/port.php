@@ -88,4 +88,5 @@ return [
         'snr' => 'SNR Margin',
         'power' => 'Output Powers',
     ],
+    'voice_vlan_label' => 'Voice VLAN: :label',
 ];
