@@ -27,6 +27,7 @@
 namespace App\Http\Controllers;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\AlertLog;
 use App\Models\Application;
 use App\Models\Callback;
 use App\Models\Device;
@@ -48,7 +49,6 @@ use App\Models\Sensor;
 use App\Models\Service;
 use App\Models\Sla;
 use App\Models\Storage;
-use App\Models\Syslog;
 use App\Models\Vlan;
 use App\Models\Vrf;
 use App\Models\WirelessSensor;
@@ -102,7 +102,7 @@ class AboutController extends Controller
             'stat_services' => Service::count(),
             'stat_slas' => Sla::count(),
             'stat_storage' => Storage::count(),
-            'stat_syslog' => Syslog::count(),
+            'stat_alertlogs' => AlertLog::count(),
             'stat_toner' => PrinterSupply::count(),
             'stat_vlans' => Vlan::count(),
             'stat_vrf' => Vrf::count(),

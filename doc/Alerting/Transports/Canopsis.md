@@ -1,7 +1,7 @@
 ## Canopsis
 
-Canopsis is a hypervision tool. LibreNMS can send alerts to Canopsis
-which are then converted to canopsis events.
+Canopsis is a hypervision tool. LibreNMS sends alerts to Canopsis.
+Canopsis converts them to Canopsis events.
 
 [Canopsis Docs](https://doc.canopsis.net/guide-developpement/structures/#structure-des-evenements)
 

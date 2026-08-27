@@ -40,14 +40,10 @@ class Grafana extends Transport
             'title' => 'yes',
         ];
 
-        //$graph_url = url('graph.php') . '?' . http_build_query($graph_args);
-        // FIXME - workaround for https://github.com/grafana/oncall/issues/3031
-        $graph_url = url('graph.php') . '/' . str_replace('&', '/', http_build_query($graph_args));
-
         $data = [
             'alert_uid' => $alert_data['id'],
             'title' => $alert_data['title'] ?? null,
-            'image_url' => $graph_url,
+            'image_url' => route('graph', $graph_args),
             'link_to_upstream_details' => Url::deviceUrl($device),
             'state' => ($alert_data['state'] == AlertState::ACTIVE) ? 'alerting' : 'ok',
             'raw_state' => $alert_data['state'],

@@ -1,15 +1,15 @@
 # Availability Map
 
-LibreNMS has the following page to show an availability map:
+This page shows an availability map:
 
  - Overview -> Maps -> Availability
 
-This map will show all devices on a single page, with each device
-having either a box or a coloured square representing its status.
+The map shows all devices on one page. Each device has a box or a
+coloured square with its status.
 
 ## Widget
-There is an availability map widget that can be added to a dashboard
-to give a quick overview of the status of all devices on the network.
+An availability map widget is available for a dashboard. It gives a
+quick overview of the status of all network devices.
 
 ## Settings
 ```bash

@@ -2,75 +2,75 @@
 
 ## Stats data and your privacy
 
-This document has been put together to explain what LibreNMS does when
-it calls back home to report some anonymous statistics.
+This document explains what LibreNMS sends when it reports anonymous
+statistics to us.
 
-Let's start off by saying, all of the code that processes the data and
-submits it is included in the standard LibreNMS branch you've
-installed, the code that accepts this data and in turn generates some
-pretty graphs is all open source and available on GitHub. Please feel
-free to review the code, comment on it and suggest changes /
-improvements. Also, don't forget - by default installations DO NOT
-call back home, you need to opt into this.
+The code that collects and sends the data is part of the standard
+LibreNMS branch that you installed. The code that accepts the data and
+draws the graphs is also open source and available on GitHub. You can
+read this code, comment on it, and suggest changes.
 
-Above all we respect users privacy which is why this system has been
-designed like it has.
+By default, an install does not send any data. You must opt in.
 
-Now onto the bit you're interested in, what is submitted and what we
-do with that data.
+We respect the privacy of our users. This principle controls the design
+of the whole system.
 
 ## What is submitted
 
 - All data is anonymous.
-- Generic statistics are taken from the database, these include things
-  like device count, device type, device OS, port types, port speeds,
-  port count and BGP peer count. Take a look at the code for full
-  details.
-- Pairs of sysDescr and sysObjectID from devices with a small amount
-  of sanitation to prevent things like hostnames from being submitted.
-- We record version numbers of php, mysql, net-snmp and rrdtool
-- A random UUID is generated on your own install.
-- That's it!
-- Your IP isn't logged, even via our web service accepting the
-  data. We don't need to know who you are so we don't ask.
+- Generic statistics come from the database. These statistics include
+  the device count, the device type, the device OS, the port types, the
+  port speeds, the port count, and the BGP peer count. The code gives
+  the full list.
+- Pairs of sysDescr and sysObjectID come from your devices. LibreNMS
+  sanitizes these pairs to keep out data such as hostnames.
+- LibreNMS records the version numbers of php, mysql, net-snmp, and
+  rrdtool.
+- LibreNMS generates a random UUID on your own install.
+- LibreNMS sends nothing else.
+- We do not log your IP address, not even in the web service that
+  accepts the data. We do not need to know who you are.
 
 ## What we do with the data
 
-- We store it, not for long - 3 months at the moment although this could change.
-- We use it to generate pretty graphs for people to see.
-- We use it to help prioritise issues and features that need to be worked on.
-- We use sysDescr and sysObjectID to create unit tests and improve OS discovery
+- We store the data for 3 months. This period can change.
+- We use the data to draw graphs for people to see.
+- We use the data to set the priority of the problems and the features
+  that need work.
+- We use sysDescr and sysObjectID to write unit tests and to improve OS
+  discovery.
 
 ## How do I enable stats submission?
 
-If you're happy with all of this - please consider switching the call
-back system on, you can do this within the About LibreNMS page within
-your control panel. In the Statistics section you will find a toggle
-switch to enable / disable the feature. If you've previously had it
-switched on and want to opt out and remove your data, click the 'Clear
-remote stats' button and on the next submission all the data you've
-sent us will be removed!
+To enable the callback system, open the About LibreNMS page in your
+control panel. In the Statistics section, use the toggle switch.
 
+To opt out and remove your data, click the `Clear remote stats` button.
+LibreNMS removes all the data that you sent on the next submission.
 
 ## Questions?
 
 ### How often is data submitted?
-We submit the data once a day as part of daily.sh.
-If you disable daily.sh then opting in will not have any affect.
+
+LibreNMS sends the data one time each day as part of `daily.sh`.
+If you disable `daily.sh`, an opt-in has no effect.
 
 ### Where can I see the data I submitted?
-You can't see the data raw, but we collate all of the data together and provide a
-dynamic site so you can see the results of all contributed stats [here](https://stats.librenms.org)
+
+You cannot see your raw data. We combine all the data and show the
+result on a dynamic site. See the [statistics
+site](https://stats.librenms.org).
 
 ### I want my data removed.
-That's easy, simply press 'Clear remote stats' in the About LibreNMS page of your control
-panel, the next time the call back script is run it will remove all the data we have.
+
+Click `Clear remote stats` on the About LibreNMS page of your control
+panel. The callback script removes all the data that we hold on the
+next run.
 
 ### I clicked the 'Clear remote stats' button by accident.
-No problem, before daily.sh runs again - just opt back in, all of
-your existing data will stay.
 
-Hopefully this answers the questions you might have on why and what we
-are doing here, if not, please pop into our [discord
-server](https://t.libren.ms/discord) or community forum and ask any
-questions you like.
+Opt back in before the next run of `daily.sh`. All your existing data
+stays.
+
+If you have more questions, ask on our [discord
+server](https://t.libren.ms/discord) or on the community forum.

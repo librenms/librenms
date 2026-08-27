@@ -288,6 +288,13 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
                         urlParams.push('searchPhrase=' + encodeURIComponent(searchPhrase));
                     }
 
+                    const currentParams = new URLSearchParams(window.location.search);
+                    currentParams.forEach((value, key) => {
+                        if (key.startsWith("filter[")) {
+                            urlParams.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
+                        }
+                    });
+
                     // Only include pagination for visible records export
                     if (exportType === 'visible') {
                         var currentPage = grid.bootgrid('getCurrentPage');
