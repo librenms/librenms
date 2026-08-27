@@ -22,7 +22,7 @@ if ((int) SnmpQuery::get('WHISP-BOX-MIBV2-MIB::cnMaestroEnable.0')->value() !== 
 
 $status = SnmpQuery::get('WHISP-BOX-MIBV2-MIB::cnMaestroStatus.0')->value();
 
-if ($status === null || $status === '') {
+if ($status === '') {
     return;
 }
 

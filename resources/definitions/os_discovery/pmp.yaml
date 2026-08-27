@@ -36,13 +36,18 @@ modules:
                             op: '!='
                             value: 1
                     states:
-                        - { value: 0, generic: 0, descr: Registered }
-                        - { value: 1, generic: 0, descr: Granted }
-                        - { value: 2, generic: 0, descr: Authorized }
-                        - { value: 3, generic: 0, descr: Operational }
-                        - { value: 4, generic: 2, descr: Suspended }
-                        - { value: 5, generic: 2, descr: Terminated }
-                        - { value: 6, generic: 2, descr: Deregistered }
+                        - { value: 0, generic: 2, descr: Unregistered }
+                        - { value: 1, generic: 1, descr: Registering }
+                        - { value: 2, generic: 0, descr: Registered }
+                        - { value: 3, generic: 1, descr: Grant }
+                        - { value: 4, generic: 0, descr: Authorized }
+                        - { value: 5, generic: 1, descr: Grant Suspended }
+                        - { value: 6, generic: 2, descr: Grant Terminate }
+                        - { value: 7, generic: 1, descr: Relinquishing Spectrum }
+                        - { value: 8, generic: 1, descr: Relinquished Spectrum }
+                        - { value: 9, generic: 1, descr: Deregistering }
+                        - { value: 10, generic: 2, descr: Deregistered }
+                        - { value: 11, generic: 3, descr: Unknown }
         dbm:
             data:
                 -
