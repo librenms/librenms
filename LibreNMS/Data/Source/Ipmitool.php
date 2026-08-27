@@ -33,6 +33,7 @@ use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
 use LibreNMS\Exceptions\IpmiConnectionFailed;
+use LibreNMS\Polling\ConnectivityHelper;
 
 class Ipmitool
 {
@@ -64,7 +65,7 @@ class Ipmitool
     {
         $device ??= DeviceCache::getPrimary();
 
-        if ($device->getAttrib('ipmi_hostname') === null) {
+        if (! (new ConnectivityHelper($device))->ipmiIsEnabled()) {
             return null;
         }
 

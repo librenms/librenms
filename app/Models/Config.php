@@ -26,6 +26,10 @@
 
 namespace App\Models;
 
+use App\Observers\ConfigObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+
+#[ObservedBy([ConfigObserver::class])]
 class Config extends BaseModel
 {
     public $timestamps = false;

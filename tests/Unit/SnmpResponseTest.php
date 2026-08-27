@@ -32,6 +32,14 @@ use LibreNMS\Tests\TestCase;
 
 final class SnmpResponseTest extends TestCase
 {
+    public function testInfersOutputEncoding(): void
+    {
+        $response = new SnmpResponse("IF-MIB::ifDescr[1] = \xD8verbyvegen\n");
+
+        $this->assertSame('Øverbyvegen', $response->value());
+        $this->assertSame("IF-MIB::ifDescr[1] = \xD8verbyvegen\n", $response->raw);
+    }
+
     public function testSimple(): void
     {
         $response = new SnmpResponse("IF-MIB::ifDescr[1] = lo\nIF-MIB::ifDescr[2] = enp4s0\n");

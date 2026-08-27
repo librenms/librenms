@@ -38,13 +38,15 @@ final class ConnectivityHelperTest extends TestCase
             return $mock;
         });
 
-        // not called when snmp is disabled or ping up
+        // not called when snmp is disabled
         $up = new SnmpResponse('SNMPv2-MIB::sysObjectID.0 = .1');
         $down = new SnmpResponse('', '', 1);
         SnmpQuery::partialMock()->shouldReceive('get')
-            ->times(6)
+            ->times(8)
             ->andReturn(
                 $up,
+                $up,
+                $down,
                 $down,
                 $up,
                 $up,
@@ -76,7 +78,7 @@ final class ConnectivityHelperTest extends TestCase
         // ping down, snmp down
         $this->assertFalse(app(CheckDeviceAvailability::class)->execute($device));
         $this->assertFalse($device->status);
-        $this->assertEquals('icmp', $device->status_reason);
+        $this->assertEquals('icmp,snmp', $device->status_reason);
 
         /** ping disabled and snmp enabled */
         LibrenmsConfig::set('icmp_check', false);

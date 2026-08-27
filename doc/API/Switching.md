@@ -201,7 +201,7 @@ Get a list of all ports FDB.
 
 Route: `/api/v0/resources/fdb/:mac`
 
-- mac is the specific MAC address you would like to query
+- mac is the MAC address of the query
 
 Input:
 
@@ -242,7 +242,7 @@ Get a list of all ports FDB with human readable device  and interface names.
 
 Route: `/api/v0/resources/fdb/:mac/detail`
 
-  - mac is the specific MAC address you would like to query
+  - mac is the MAC address of the query
 
 Input:
 
@@ -290,7 +290,7 @@ Get a list of all ports NAC.
 
 Route: `/api/v0/resources/nac/:mac`
 
-- mac is the specific MAC address you would like to query
+- mac is the MAC address of the query
 
 Input:
 

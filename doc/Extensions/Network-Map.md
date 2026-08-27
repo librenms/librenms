@@ -1,33 +1,31 @@
 # Network Map
 
-LibreNMS has the ability to show you a dynamic network map based on
-data collected from devices.  These maps are accessed through the
-following menu options:
+LibreNMS shows a dynamic network map from the data of your devices.
+These menu options open the maps:
 
  - Overview -> Maps -> Network
  - Overview -> Maps -> Device Group Maps
  - The Neighbours -> Map tab when viewing a single device
-   (the Neighbours tab will only show if a device has xDP neighbours)
+   The Neighbours tab appears only for a device with xDP neighbours
 
-These network maps can be based on:
+A network map uses one of these sources:
 
 - xDP Discovery
 - MAC addresses (ARP entries matching interface IP and MAC)
 
-By default, both are are included but you can enable / disable either
-one using the following config option:
+By default, LibreNMS uses both sources. This configuration option
+enables and disables each source:
 
 ```bash
 lnms config:set network_map_items '["mac","xdp"]'
 ```
 
-Either remove mac or xdp depending on which you want.
-XDP is based on FDP, CDP and LLDP support based on the device type.
+Remove `mac` or `xdp` from the list. xDP uses FDP, CDP, or LLDP,
+from the device type.
 
-It is worth noting that the global map could lead to a large network
-map that is slow to render and interact with. The network map on the
-device neighbour page, or building device groups and using the device
-group maps will be more usable on large networks.
+The global map can become large. A large map draws slowly and responds
+slowly. On a large network, use the network map of the device neighbour
+page. You can also build device groups and use the device group maps.
 
 ## Settings
-The map display can be configured by altering the [Vis JS Options](VisJS-Config.md)
+The [Vis JS Options](VisJS-Config.md) configure the map display.

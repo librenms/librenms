@@ -1,38 +1,63 @@
 <?php
 
-/**
- * LibreNMS
- *
- *   This file is part of LibreNMS.
- *
- * @copyright  (C) 2006 - 2012 Adam Armstrong
- */
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Http\Request;
 
-use LibreNMS\Util\Debug;
+define('LARAVEL_START', microtime(true));
 
-$auth = false;
-$start = microtime(true);
+/*
+|--------------------------------------------------------------------------
+| Check If Application Is Under Maintenance
+|--------------------------------------------------------------------------
+|
+| If the application is maintenance / demo mode via the "down" command we
+| will require this file so that any prerendered template can be shown
+| instead of starting the framework, which could cause an exception.
+|
+*/
 
-$init_modules = ['web', 'auth'];
-require realpath(__DIR__ . '/..') . '/includes/init.php';
-
-if (! Auth::check()) {
-    // check for unauthenticated graphs and set auth
-    $auth = is_client_authorized($_SERVER['REMOTE_ADDR']);
-    if (! $auth) {
-        exit('Unauthorized');
-    }
+if (file_exists(__DIR__ . '/../storage/framework/maintenance.php')) {
+    require __DIR__ . '/../storage/framework/maintenance.php';
 }
 
-Debug::set(isset($_GET['debug']));
+/*
+|--------------------------------------------------------------------------
+| Register The Auto Loader
+|--------------------------------------------------------------------------
+|
+| Composer provides a convenient, automatically generated class loader for
+| this application. We just need to utilize it! We'll simply require it
+| into the script here so we don't need to manually load our classes.
+|
+*/
 
-require \App\Facades\LibrenmsConfig::get('install_dir') . '/includes/html/graphs/graph.inc.php';
+require __DIR__ . '/../vendor/autoload.php';
 
-app('Datastore')->terminate();
+/*
+|--------------------------------------------------------------------------
+| Run The Application
+|--------------------------------------------------------------------------
+|
+| Once we have the application, we can handle the incoming request using
+| the application's HTTP kernel. Then, we will send the response back
+| to this client's browser, allowing them to enjoy our application.
+|
+*/
 
-if (Debug::isEnabled()) {
-    echo '<br />';
-    printf('Runtime %.3fs', microtime(true) - $start);
-    echo '<br />';
-    app(\App\Polling\Measure\MeasurementManager::class)->printStats();
+$app = require_once __DIR__ . '/../bootstrap/app.php';
+
+$kernel = $app->make(Kernel::class);
+
+// Rewrite request URI and script name to route via the modern Laravel "graph" route
+if (isset($_SERVER['REQUEST_URI'])) {
+    $_SERVER['REQUEST_URI'] = preg_replace('/\/graph\.php/', '/graph', (string) $_SERVER['REQUEST_URI'], 1);
 }
+if (isset($_SERVER['SCRIPT_NAME'])) {
+    $_SERVER['SCRIPT_NAME'] = str_replace('/graph.php', '/index.php', $_SERVER['SCRIPT_NAME']);
+}
+
+$response = tap($kernel->handle(
+    $request = Request::capture()
+))->send();
+
+$kernel->terminate($request, $response);

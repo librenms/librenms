@@ -1,9 +1,10 @@
 # Example hardware setups
 
-The information in this document is direct from users, it's a place for people to share their
-setups so you have an idea of what may be required for your install.
+Users supply the information in this document. They share their setups
+here. The tables show what your own install can need.
 
-To obtain the device, port and sensor counts you can run:
+To get the device count, the port count, and the sensor count, run
+these queries:
 
 ```mysql
 select count(*) from devices;

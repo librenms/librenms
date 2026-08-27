@@ -310,9 +310,10 @@ function get_device(Illuminate\Http\Request $request)
     }
 
     return check_device_permission($device->device_id, function () use ($device) {
-        $device['location'] = $device->location?->location;
-        $device['lat'] = $device->location?->lat;
-        $device['lng'] = $device->location?->lng;
+        $location = $device->location;
+        $device['location'] = $location?->location;
+        $device['lat'] = $location?->lat;
+        $device['lng'] = $location?->lng;
 
         $host_id = get_vm_parent_id($device);
         if (is_numeric($host_id)) {
@@ -2124,6 +2125,11 @@ function search_oxidized(Illuminate\Http\Request $request)
 function get_oxidized_config(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('device_name');
+    $device = DeviceCache::get($hostname);
+    if (! $device || Gate::denies('configBackupView', $device)) {
+        return api_error(403, 'Insufficient permissions');
+    }
+
     $node_info = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/show/' . $hostname . '?format=json'), true);
     $result = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/fetch/' . $node_info['full_name'] . '?format=json'), true);
     if (! $result) {
@@ -2634,18 +2640,18 @@ function update_device(Illuminate\Http\Request $request)
 function rename_device(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = DeviceCache::get($hostname);
     $new_hostname = $request->route('new_hostname');
-    $new_device = getidbyname($new_hostname);
 
     if (empty($new_hostname)) {
         return api_error(500, 'Missing new hostname');
-    } elseif ($new_device) {
-        return api_error(500, 'Device failed to rename, new hostname already exists');
+    } elseif (! $device->exists) {
+        return api_error(404, 'Existing device not found');
     } else {
-        if (renamehost($device_id, $new_hostname, 'api') == '') {
-            return api_success_noresult(200, 'Device has been renamed');
-        } else {
+        try {
+            $device->hostname = $new_hostname;
+            $device->save();
+        } catch (\Throwable) {
             return api_error(500, 'Device failed to be renamed');
         }
     }
@@ -3709,7 +3715,7 @@ function add_service_for_host(Illuminate\Http\Request $request)
     $service_param = $data['param'] ?: '';
     $service_ignore = $data['ignore'] ? true : false; // Default false
     $service_disable = $data['disable'] ? true : false; // Default false
-    $service_name = $data['name'];
+    $service_name = $data['name'] ?? '';
     $service_id = \LibreNMS\Services::addService($device_id, $service_type, $service_desc, $service_ip, $service_param, (int) $service_ignore, (int) $service_disable, 0, $service_name);
     if ($service_id != false) {
         return api_success_noresult(201, "Service $service_type has been added to device $hostname (#$service_id)");
@@ -3807,17 +3813,23 @@ function add_location(Illuminate\Http\Request $request)
 
 function edit_location(Illuminate\Http\Request $request)
 {
-    $location = $request->route('location_id_or_name');
-    if (empty($location)) {
+    $location_input = $request->route('location_id_or_name');
+    if (empty($location_input)) {
         return api_error(400, 'No location has been provided to edit');
     }
-    $location_id = ctype_digit($location) ? $location : get_location_id_by_name($location);
-    $data = json_decode($request->getContent(), true);
-    if (empty($location_id)) {
-        return api_error(400, 'Failed to delete location');
+
+    $location = Location::query()
+        ->when(ctype_digit($location_input), fn ($q) => $q->where('id', $location_input), fn ($q) => $q->where('location', $location_input))
+        ->hasAccess($request->user)
+        ->first();
+
+    if ($location === null) {
+        return api_error(400, 'Failed to update location');
     }
-    $result = dbUpdate($data, 'locations', '`id` = ?', [$location_id]);
-    if ($result == 1) {
+
+    $location->fill($request->json());
+
+    if ($location->save()) {
         return api_success_noresult(201, 'Location updated successfully');
     }
 
@@ -3826,39 +3838,41 @@ function edit_location(Illuminate\Http\Request $request)
 
 function get_location(Illuminate\Http\Request $request)
 {
-    $location = $request->route('location_id_or_name');
-    if (empty($location)) {
+    $location_input = $request->route('location_id_or_name');
+    if (empty($location_input)) {
         return api_error(400, 'No location has been provided to get');
     }
-    $data = ctype_digit($location) ? Location::find($location) : Location::where('location', $location)->first();
-    if (empty($data)) {
+    $location = Location::query()
+        ->when(ctype_digit($location_input), fn ($q) => $q->where('id', $location_input), fn ($q) => $q->where('location', $location_input))
+        ->hasAccess($request->user)
+        ->first();
+
+    if ($location === null) {
         return api_error(404, 'Location does not exist');
     }
 
-    return api_success($data, 'get_location');
-}
-
-function get_location_id_by_name($location)
-{
-    return dbFetchCell('SELECT id FROM locations WHERE location = ?', $location);
+    return api_success($location, 'get_location');
 }
 
 function del_location(Illuminate\Http\Request $request)
 {
-    $location = $request->route('location');
-    if (empty($location)) {
+    $location_input = $request->route('location');
+    if (empty($location_input)) {
         return api_error(400, 'No location has been provided to delete');
     }
-    $location_id = ctype_digit($location) ? $location : get_location_id_by_name($location);
-    if (empty($location_id)) {
+
+    $location = Location::query()
+        ->when(ctype_digit($location_input), fn ($q) => $q->where('id', $location_input), fn ($q) => $q->where('location', $location_input))
+        ->hasAccess($request->user)
+        ->first();
+
+    if ($location === null) {
         return api_error(400, "Failed to delete $location (Does not exists)");
     }
-    $data = [
-        'location_id' => 0,
-    ];
-    dbUpdate($data, 'devices', '`location_id` = ?', [$location_id]);
-    $result = \App\Models\Location::where('id', $location_id)->delete();
-    if ($result == 1) {
+
+    Device::where('location_id', $location->id)->update(['location_id' => null]);
+
+    if ($location->delete()) {
         return api_success_noresult(201, "Location $location has been deleted successfully");
     }
 
@@ -3873,8 +3887,8 @@ function maintenance_location(Illuminate\Http\Request $request)
         return api_error(400, 'No information has been provided to set this location into maintenance');
     }
 
-    $loc = $request->route('location');
-    if (! $loc) {
+    $location_input = $request->route('location');
+    if (! $location_input) {
         return api_error(400, 'No location was provided');
     }
 
@@ -3882,9 +3896,13 @@ function maintenance_location(Illuminate\Http\Request $request)
         return api_error(400, 'Duration not provided');
     }
 
-    $location = ctype_digit($loc) ? Location::find($loc) : Location::where('location', $loc)->first();
-    if (empty($location)) {
-        return api_error(404, "Location $loc does not exist");
+    $location = Location::query()
+        ->when(ctype_digit($location_input), fn ($q) => $q->where('id', $location_input), fn ($q) => $q->where('location', $location_input))
+        ->hasAccess($request->user)
+        ->first();
+
+    if ($location === null) {
+        return api_error(404, "Location $location_input does not exist");
     }
 
     $notes = $data['notes'] ?? '';
