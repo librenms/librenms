@@ -13,6 +13,7 @@ class PortVlanFactory extends Factory
             'device_id' => $this->faker->numberBetween(1, 100),
             'port_id' => $this->faker->numberBetween(1, 100),
             'vlan' => $this->faker->numberBetween(1, 4094),
+            'voice' => $this->faker->numberBetween(0, 4096),
             'baseport' => $this->faker->numberBetween(1, 48),
             'priority' => 0,
             'state' => 'forwarding',
