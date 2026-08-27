@@ -60,7 +60,7 @@ class Url
             self::deviceUrl($device),
             $class,
             $device->device_id,
-            e($text ?: $device->display),
+            e($text ?: $device->displayName()),
             $extra ? '<br />' . e($extra) : $extra
         );
     }
