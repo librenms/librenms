@@ -52,6 +52,32 @@ final class BasicApiTest extends DBTestCase
             ]);
     }
 
+    public function testDisabledUserTokenCannotAccessApi(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create(['enabled' => false]);
+        $token = ApiToken::generateToken($user);
+
+        $this->json('GET', '/api/v0/devices', [], ['X-Auth-Token' => $token->token_hash])
+            ->assertStatus(401);
+
+        $this->assertFalse(ApiToken::isValid($token->token_hash));
+        $this->assertNull(ApiToken::userFromToken($token->token_hash));
+    }
+
+    public function testTokenWithoutUserIsInvalid(): void
+    {
+        $token = new ApiToken;
+        $token->user_id = 999999;
+        $token->token_hash = ApiToken::randomTokenValue();
+        $token->description = 'Missing user';
+        $token->disabled = false;
+        $token->save();
+
+        $this->assertFalse(ApiToken::isValid($token->token_hash));
+        $this->assertNull(ApiToken::userFromToken($token->token_hash));
+    }
+
     public function testGetDeviceWirelessSensors(): void
     {
         /** @var User $user */

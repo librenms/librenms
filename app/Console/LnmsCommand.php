@@ -175,6 +175,32 @@ abstract class LnmsCommand extends Command
         };
     }
 
+    /**
+     * Parse a comma-separated option into an array of strings.
+     *
+     * @return array<int, string>
+     */
+    protected function commaSeparatedOption(string $name, bool $filterEmpty = true, bool $unique = true): array
+    {
+        $value = $this->option($name);
+        if (! is_string($value) && ! is_array($value)) {
+            return [];
+        }
+
+        $items = is_array($value) ? $value : explode(',', $value);
+        $trimmed = array_map(trim(...), $items);
+
+        if ($filterEmpty) {
+            $trimmed = array_filter($trimmed, fn (string $item) => $item !== '');
+        }
+
+        if ($unique) {
+            $trimmed = array_unique($trimmed);
+        }
+
+        return array_values($trimmed);
+    }
+
     private function getCallable(string $type, string $name): ?callable
     {
         if (empty($this->{'option' . $type}[$name])) {

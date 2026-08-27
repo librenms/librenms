@@ -15,5 +15,5 @@ return [
 
     'title' => 'Auth',
 
-    'disabled' => 'Your Account is disabled, please contact Admin.',
+    'disabled' => 'Your account is disabled. Contact your administrator.',
 ];
