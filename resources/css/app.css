@@ -72,16 +72,12 @@
   @apply tw:underline;
 }
 
-.overview-panel {
-  @apply tw:rounded-xl tw:border tw:border-gray-300 tw:shadow-sm tw:dark:border-dark-gray-200;
-}
-
 .lnms-btn {
-  @apply tw:inline-flex tw:items-center tw:gap-2 tw:rounded-xl tw:px-4 tw:py-2 tw:font-normal tw:no-underline;
+  @apply tw:inline-flex tw:items-center tw:gap-1 tw:rounded-lg tw:px-2 tw:py-1 tw:font-normal tw:no-underline;
 }
 
 .lnms-btn-badge {
-  @apply tw:inline-flex tw:min-w-9 tw:items-center tw:justify-center tw:rounded-xl tw:px-2.5 tw:py-0.5 tw:text-base tw:font-bold;
+  @apply tw:inline-flex tw:text-xs tw:min-w-5 tw:px-1.5 tw:items-center tw:justify-center tw:rounded-xl tw:font-bold;
 }
 
 .lnms-btn-default {

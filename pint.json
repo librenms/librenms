@@ -11,6 +11,7 @@
         "blank_line_before_statement": {
             "statements": ["return"]
         },
+        "blank_line_between_import_groups": true,
         "blank_lines_before_namespace": true,
         "cast_spaces": true,
         "class_attributes_separation": {
@@ -75,17 +76,7 @@
         "no_trailing_comma_in_singleline": true,
         "no_trailing_whitespace": true,
         "no_trailing_whitespace_in_comment": true,
-        "no_unneeded_control_parentheses": {
-            "statements": [
-                "break",
-                "clone",
-                "continue",
-                "echo_print",
-                "return",
-                "switch_case",
-                "yield"
-            ]
-        },
+        "no_unneeded_control_parentheses": true,
         "no_unreachable_default_argument_value": true,
         "no_unused_imports": true,
         "no_useless_return": true,
