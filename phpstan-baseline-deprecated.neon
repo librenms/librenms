@@ -7103,6 +7103,33 @@ parameters:
 
 		-
 			message: '''
+				#^Call to deprecated function dbFetchCell\(\)\:
+				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
+			'''
+			identifier: function.deprecated
+			count: 2
+			path: tests/DbFacileTest.php
+
+		-
+			message: '''
+				#^Call to deprecated function dbFetchRow\(\)\:
+				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
+			'''
+			identifier: function.deprecated
+			count: 1
+			path: tests/DbFacileTest.php
+
+		-
+			message: '''
+				#^Call to deprecated function dbFetchRows\(\)\:
+				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
+			'''
+			identifier: function.deprecated
+			count: 1
+			path: tests/DbFacileTest.php
+
+		-
+			message: '''
 				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
 				use display field directly$#
 			'''
