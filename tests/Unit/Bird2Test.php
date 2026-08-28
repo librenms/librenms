@@ -21,9 +21,9 @@
 
 namespace LibreNMS\Tests\Unit;
 
+use LibreNMS\Data\Source\Bird2;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Tests\TestCase;
-use LibreNMS\Util\Bird2;
 
 /**
  * Fixtures are verbatim snmpget captures from BIRD 2.17.5 behind net-snmp, using

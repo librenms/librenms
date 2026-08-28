@@ -4,9 +4,9 @@ use App\Models\BgpPeer;
 use App\Models\BgpPeerCbgp;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use LibreNMS\Data\Source\Bird2;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\Util\Bird2;
 use LibreNMS\Util\Oid;
 
 $name = 'bird2';
