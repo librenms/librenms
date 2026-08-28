@@ -56,7 +56,10 @@
                     <div class="form-group">
                         <label for="authname" class="col-sm-3 control-label" v-text="$t('settings.settings.snmp.v3.fields.authname')"></label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" id="authname" :value="item.authname" @input="updateItem(id, $event.target.id, $event.target.value)">
+                            <input type="text" class="form-control" id="authname" :value="item.authname" @input="updateItem(id, $event.target.id, $event.target.value)" @blur="trimAuthname(id)">
+                            <span v-if="hasWhitespace(item.authname)" class="help-block text-warning small">
+                                <i class="fa fa-exclamation-triangle"></i> {{ $t('Warning: Username contains leading or trailing spaces (will be trimmed)') }}
+                            </span>
                         </div>
                     </div>
                     <div class="form-group">
@@ -138,6 +141,15 @@ export default {
             updateItem(index, key, value) {
                 this.localList[index][key] = value;
                 this.$emit('input', this.localList);
+            },
+            hasWhitespace(str) {
+                return typeof str === 'string' && /^\s+|\s+$/.test(str);
+            },
+            trimAuthname(index) {
+                if (typeof this.localList[index].authname === 'string') {
+                    this.localList[index].authname = this.localList[index].authname.trim();
+                    this.$emit('input', this.localList);
+                }
             },
             dragged() {
                 this.$emit('input', this.localList);
