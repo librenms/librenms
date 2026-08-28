@@ -21,7 +21,7 @@
  * @link       https://www.librenms.org
  */
 
-namespace LibreNMS\Util;
+namespace LibreNMS\Data\Source;
 
 class Bird2
 {
