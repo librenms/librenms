@@ -125,18 +125,18 @@ return [
     'dev:generate-test-data' => [
         'description' => 'Generate JSON test data from snmpsim recordings',
         'help' => "Regenerate existing JSON fixtures, or explicitly recreate fixtures with --variant.\n\n" .
-            "Examples:\n  lnms dev:generate-test-data --os=routeros\n  lnms dev:generate-test-data --os=routeros --variant=crs317,wifi --modules=ports,sensors\n\n" .
+            "Examples:\n  lnms dev:generate-test-data routeros\n  lnms dev:generate-test-data all\n  lnms dev:generate-test-data routeros --variant=crs317,wifi --modules=ports,sensors\n\n" .
             'Use -v to show discovery and poller output, -vv for LibreNMS debug output, or -vvv for full verbose debug and SNMP output.',
+        'arguments' => [
+            'os' => 'Process existing JSON fixtures for this OS, including their variants, or specify "all" for all OS fixtures',
+        ],
         'options' => [
-            'all' => 'Process every existing JSON fixture',
-            'os' => 'Process existing JSON fixtures for this OS, including their variants',
-            'variant' => 'Comma-delimited OS variants to process or recreate (requires --os; use an empty value for the base fixture)',
+            'variant' => 'Comma-delimited OS variants to process or recreate (requires an OS; use an empty value for the base fixture)',
             'modules' => 'Comma-delimited modules to regenerate (default: existing fixture modules, or configured defaults with --variant)',
             'output' => 'Write one fixture to this file, or use - for standard output',
         ],
-        'scope_required' => 'Specify --all or --os.',
-        'scope_conflict' => '--all and --os cannot be used together.',
-        'variant_requires_os' => '--variant requires --os.',
+        'scope_required' => 'Specify an OS (or all).',
+        'variant_requires_os' => '--variant requires an OS.',
         'invalid_module' => 'Invalid module name: :module',
         'no_fixtures' => 'No matching JSON test fixtures found.',
         'no_fixtures_for_os' => 'No matching JSON test fixtures found for OS ":os".',
