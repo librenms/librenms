@@ -12,28 +12,42 @@ final class DevGenerateTestDataTest extends TestCase
     public function testRequiresExplicitScope(): void
     {
         $this->artisan('dev:generate-test-data')
-            ->expectsOutput('Specify --all or --os.')
-            ->assertExitCode(1);
-    }
-
-    public function testAllAndOsAreMutuallyExclusive(): void
-    {
-        $this->artisan('dev:generate-test-data', ['--all' => true, '--os' => 'routeros'])
-            ->expectsOutput('--all and --os cannot be used together.')
+            ->expectsOutput('Specify an OS (or all).')
             ->assertExitCode(1);
     }
 
     public function testVariantRequiresOs(): void
     {
-        $this->artisan('dev:generate-test-data', ['--all' => true, '--variant' => 'wifi'])
-            ->expectsOutput('--variant requires --os.')
+        $this->artisan('dev:generate-test-data', ['os' => 'all', '--variant' => 'wifi'])
+            ->expectsOutput('--variant requires an OS.')
             ->assertExitCode(1);
     }
 
-    public function testVariantCompletionIsFilteredByOs(): void
+    public function testAcceptsOsAsArgument(): void
+    {
+        $this->artisan('dev:generate-test-data', ['os' => 'nonexistent-os-xyz'])
+            ->expectsOutput('No matching JSON test fixtures found for OS "nonexistent-os-xyz".')
+            ->assertExitCode(1);
+    }
+
+    public function testOsArgumentCompletionIncludesAllAndOsList(): void
     {
         $command = new DevGenerateTestData;
-        $input = new ArrayInput(['--os' => 'ios']);
+
+        $completions = $command->completeArgument('os', 'al');
+        $this->assertIsArray($completions);
+        $this->assertContains('all', $completions);
+
+        $completions = $command->completeArgument('os', 'io');
+        $this->assertIsArray($completions);
+        $this->assertContains('ios', $completions);
+        $this->assertNotContains('all', $completions);
+    }
+
+    public function testVariantCompletionIsFilteredByOsArgument(): void
+    {
+        $command = new DevGenerateTestData;
+        $input = new ArrayInput(['os' => 'ios']);
         $input->bind($command->getDefinition());
         $option = $command->getDefinition()->getOption('variant');
         $this->assertInstanceOf(DynamicInputOption::class, $option);
@@ -51,7 +65,7 @@ final class DevGenerateTestDataTest extends TestCase
     public function testVariantCompletionIncludesSnmprecWithoutJson(): void
     {
         $command = new DevGenerateTestData;
-        $input = new ArrayInput(['--os' => 'routeros']);
+        $input = new ArrayInput(['os' => 'routeros']);
         $input->bind($command->getDefinition());
         $option = $command->getDefinition()->getOption('variant');
         $this->assertInstanceOf(DynamicInputOption::class, $option);
