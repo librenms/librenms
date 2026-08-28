@@ -30,6 +30,7 @@ way.
 all the discovery data and the polling data of a device in LibreNMS.
 Run the command again after you add more support. For more options,
 read the command line help.
+Example command: 'lnms dev:collect-snmprec 126 --variant sg300-28PP' will create an SNMPsim record for the device with deviceID 126 (http://librenms-IP/device/deviceID), in my case ciscosb with the variant sg300-28PP
 
 ### 2. Save test data
 
