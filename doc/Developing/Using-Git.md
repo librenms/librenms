@@ -1,32 +1,30 @@
-Git can have a bit of a steep learning curve, stick with it as it is
-worth learning the [basics][1][2] at least.
+Git is difficult at the start. Learn the [basics][1][2] at least.
 
-If you want to help develop LibreNMS and haven't really used Git
-before then this quick primer will help you get started.
+This short guide helps a new Git user to start work on LibreNMS.
 
-Some assumptions:
+This guide assumes these conditions:
 
-- Work is being done on a Linux box.
-- LibreNMS is to be installed in /opt/librenms
-- You have git installed.
+- The work is on a Linux machine.
+- LibreNMS goes into `/opt/librenms`.
+- Git is installed.
 - You have a [GitHub Account](https://github.com/).
-- You are using ssh to connect to GitHub (If not, replace
-  git@github.com:/yourusername/librenms.git with <https://github.com/yourusername/librenms.git>.
+- You connect to GitHub with ssh. Without ssh, replace
+  `git@github.com:/yourusername/librenms.git` with
+  <https://github.com/yourusername/librenms.git>.
 
 ** Replace yourusername with your GitHub username. **
 
 #### Fork LibreNMS repo
 
-You do this directly within
-[GitHub](https://github.com/librenms/librenms/fork), click the 'Fork'
-button near the top right.
+Open [GitHub](https://github.com/librenms/librenms/fork). Then click
+the 'Fork' button near the top right corner.
 
-If you are associated with multiple organisations within GitHub then
-you might need to select which account you want to push the fork to.
+If you belong to several GitHub organisations, select the account of
+the fork.
 
 #### Prepare your git environment
 
-These are the defaults that are recommended.
+We recommend these defaults.
 
 ```bash
 git config branch.autosetupmerge true
@@ -36,8 +34,8 @@ git config --global user.email johndoe@example.com
 
 #### Clone the repo
 
-Ok so now that you have forked the repo, you now need to clone it to
-your local install where you can then make the changes you need and submit them back.
+Clone the fork to your local install. You can then make your changes
+and send them back.
 
 ```bash
 cd /opt/
@@ -46,25 +44,24 @@ git clone git@github.com:/yourusername/librenms.git
 
 #### Add Upstream repo
 
-To be able to pull in changes from the master LibreNMS repo you need
-to have it setup on your system.
+Add the master LibreNMS repository to your system. You can then pull
+its changes.
 
 ```bash
 git remote add upstream https://github.com/librenms/librenms.git
 ```
 
-Now you have two configured remotes:
+You then have two remotes:
 
-- origin: This is your repository, you can push and pull changes here.
-- upstream: This is the main LibreNMS repository and you can only pull changes.
+- origin: your own repository. You can push and pull changes here.
+- upstream: the main LibreNMS repository. You can only pull changes.
 
 #### Workflow guide
 
-As you become more familiar you may find a better workflow that fits
-your needs, until then this should be a safe workflow for you to follow.
+You can find a better workflow for your own needs later. The workflow
+below is a safe start.
 
-Before you start work on a new branch / feature. Make sure you are up
-to date.
+Before you start a new branch or feature, update your repository.
 
 ```bash
 cd /opt/librenms
@@ -73,29 +70,26 @@ git pull upstream master
 git push origin master
 ```
 
-At this stage it's worth pointing out that we have some standard
-checks that are performed when you submit a pull request, you can run
-these checks [yourself](Validating-Code.md) to be sure no issues are
-present in your  pull request.
+Standard checks run at each pull request. You can run these checks
+[yourself](Validating-Code.md). Your pull request then has no known
+problem.
 
-Now, create a new branch to do you work on. It's important that you do
-this as you are then able to work on more than one feature at a time
-and submit them as pull requests individually. If you did all your
-work in the master branch then it gets a bit messy!
+Create a new branch for your work. This step is important. You can then
+work on several features at the same time and submit each one as a
+separate pull request. All the work in the master branch becomes
+difficult to manage.
 
-You need to give your branch a name. If an issue is open (or closed on
-GitHub) then you can use that, in this example if the issue number is
-123 then we will use issue-123. If a post exists on the community
-forum then you can use the post id like community-123. You're also
-welcome to use any arbitrary name for your branch but try and make it
-relevant to what the branch is.
+Give your branch a name. You can use the number of an open or closed
+GitHub issue. For issue number 123, use `issue-123`. You can also use
+the id of a post on the community forum, such as `community-123`. Any
+other name is valid. Make the name relevant to the work of the branch.
 
 ```bash
 git checkout -b issue-123
 ```
 
-Now, code away. Make the changes you need, test, change and test again
-:) When you are ready to submit the updates as a pull request then commit away.
+Make your changes. Test them, change them, and test them again. Then
+commit the updates for the pull request.
 
 ```bash
 git add path/to/new/files/or/folders
@@ -103,30 +97,27 @@ git commit -a -m 'Added feature to do X, Y and Z'
 git push origin issue-123
 ```
 
-If you need to rebase against master then you can do this with:
+To rebase against master, run these commands:
 
 ```bash
 git pull upstream master
 git push origin issue-123
 ```
 
-If after do this you get some merge conflicts then you need to resolve
-these before carrying on.
+If a merge conflict occurs, correct it before you continue.
 
-Please try to squash all commits into one, this isn't essential as we
-can do this when we merge but it would be helpful to do this before
-you submit your pull request.
+Squash all commits into one commit. This step is not essential, because
+we can do it at the merge. It still helps us.
 
-Now you will be ready to submit a pull request from within GitHub. To
-do this, go to your GitHub page for the LibreNMS repo. Now select the
-branch you have just been working on (issue-123) from the drop down to
-the left and then click 'Pull Request'. Fill in the details to
-describe the work you have done and click 'Create pull request'.
+You can now submit a pull request in GitHub. Open your GitHub page of
+the LibreNMS repository. Select your branch, such as `issue-123`, in
+the dropdown on the left. Then click 'Pull Request'. Describe your work
+in the details and click 'Create pull request'.
 
-Thanks for your first pull request :)
+Thank you for your first pull request.
 
-Ok, that should get you started on the contributing path. If you have
-any other questions then stop by our [Discord Server](https://t.libren.ms/discord)
+This guide starts you on the path of a contributor. For more questions,
+join our [Discord server](https://t.libren.ms/discord).
 
 ### Hints and tips
 
@@ -146,10 +137,10 @@ Merge last two commits
 
 `git rebase --interactive HEAD~2`
 
-In the text file that opens, change the last commit to squash from
-pick then save an exit.
+In the text file, change the last commit from `pick` to `squash`. Then
+save the file and close it.
 
-For more tips take a look at [Oh shit, git!](http://ohshitgit.com/)
+For more advice, read [Oh shit, git!](http://ohshitgit.com/).
 
 [1]: http://gitready.com
 [2]: http://git-scm.com/book

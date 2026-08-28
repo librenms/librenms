@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Traits\Filterable;
+use App\Observers\DeviceObserver;
 use App\View\SimpleTemplate;
 use Carbon\Carbon;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -19,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LibreNMS\Cache\DeviceMaintenanceCache;
 use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
@@ -37,11 +40,10 @@ use LibreNMS\Util\Url;
  *
  * @method static \Database\Factories\DeviceFactory factory(...$parameters)
  */
+#[ObservedBy([DeviceObserver::class])]
 class Device extends BaseModel
 {
     use PivotEventTrait, HasFactory, Filterable;
-
-    private ?MaintenanceStatus $maintenanceStatus = null;
 
     public $timestamps = false;
     protected $primaryKey = 'device_id';
@@ -274,34 +276,7 @@ class Device extends BaseModel
             return MaintenanceStatus::None;
         }
 
-        // use cached status
-        if ($this->maintenanceStatus !== null) {
-            return $this->maintenanceStatus;
-        }
-
-        $behavior = AlertSchedule::isActive()
-            ->where(function (Builder $query): void {
-                $query->whereHas('devices', function (Builder $query): void {
-                    $query->where('alert_schedulables.alert_schedulable_id', $this->device_id);
-                });
-
-                if ($this->groups->isNotEmpty()) {
-                    $query->orWhereHas('deviceGroups', function (Builder $query): void {
-                        $query->whereIntegerInRaw('alert_schedulables.alert_schedulable_id', $this->groups->pluck('id'));
-                    });
-                }
-
-                if ($this->location) {
-                    $query->orWhereHas('locations', function (Builder $query): void {
-                        $query->where('alert_schedulables.alert_schedulable_id', $this->location->id);
-                    });
-                }
-            })
-            ->value('behavior');
-
-        $this->maintenanceStatus = MaintenanceStatus::fromBehavior($behavior);
-
-        return $this->maintenanceStatus;
+        return app(DeviceMaintenanceCache::class)->statusFor($this->device_id);
     }
 
     public function getDeviceStatus(): DeviceStatus
@@ -554,7 +529,7 @@ class Device extends BaseModel
 
     public function setSysDescrAttribute(?string $sysDescr): void
     {
-        $this->attributes['sysDescr'] = $sysDescr === null ? null : trim(str_replace(chr(218), "\n", $sysDescr), "\\\" \r\n\t\0");
+        $this->attributes['sysDescr'] = $sysDescr === null ? null : trim($sysDescr, "\\\" \r\n\t\0");
     }
 
     public function setSysNameAttribute(?string $sysName): void

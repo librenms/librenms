@@ -2,7 +2,7 @@
 
 ### SNMP Extend
 
-1. Add the following to your snmpd config and restart. Path may have
+1. Add these lines to your snmpd config and restart it. The path can
 to be adjusted depending on where `suricata_extract_submit_extend` is
 installed to.
 
@@ -16,4 +16,4 @@ installed to.
     sudo systemctl restart snmpd
     ```
 
-    Then just wait for the system to be rediscovered or enable it manually for the server in question.
+    Then wait for the rediscovery of the system. You can also enable it manually for that server.

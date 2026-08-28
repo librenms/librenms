@@ -1,6 +1,6 @@
 ### `get_all_port_security`
 
-Get all port security info by inputting port_id
+Get all the port security information of a port_id.
 
 Route: `/api/v0/port_security`
 

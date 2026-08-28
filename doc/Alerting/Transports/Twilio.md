@@ -1,9 +1,9 @@
 ## Twilio SMS
 
-Twilio will send your alert via SMS.  From your Twilio account you
-will need your account SID, account token and your Twilio SMS phone
-number that you would like to send the alerts from.  Twilio's APIs are
-located at: [https://www.twilio.com/docs/api?filter-product=sms](https://www.twilio.com/docs/api?filter-product=sms)
+Twilio sends your alert by SMS. From your Twilio account, you need the
+account SID, the account token, and the Twilio SMS phone number of the
+sender. The Twilio APIs are at
+[https://www.twilio.com/docs/api?filter-product=sms](https://www.twilio.com/docs/api?filter-product=sms).
 
 **Example:**
 

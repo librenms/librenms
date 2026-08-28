@@ -116,7 +116,7 @@ class Ipv6Nd implements Module
                         $neighbors->push(new \App\Models\Ipv6Nd([
                             'port_id' => $port_id,
                             'device_id' => $device->device_id,
-                            'mac_address' => Mac::parse($raw_mac)->readable(),
+                            'mac_address' => Mac::parse($raw_mac)->hex(),
                             'ipv6_address' => IPv6::fromHexString($ipv6)->uncompressed(),
                             'context_name' => $context_name,
                         ]));

@@ -43,6 +43,7 @@
                     });
 
                     var map = get_map(map_id);
+                    var isFirstLoad = ! map.markerCluster;
                     if (! map.markerCluster) {
                         map.markerCluster = L.markerClusterGroup({
                             maxClusterRadius: group_radius,
@@ -71,6 +72,13 @@
 
                     map.markerCluster.clearLayers();
                     map.markerCluster.addLayers(markers);
+
+                    if (isFirstLoad && markers.length > 0) {
+                        map.fitBounds(map.markerCluster.getBounds(), {
+                            padding: [30, 30],
+                            maxZoom: 12
+                        });
+                    }
                 },
                 error: function(error){
                     toastr.error(error.statusText);

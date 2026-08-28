@@ -44,13 +44,13 @@ Route: `/api/v0/devicegroups`
 Input (JSON):
 
 - `name`: *required* - The name of the device group
-- `type`: *required* - should be `static` or `dynamic`. Setting this to static
-  requires that the devices input be provided
+- `type`: *required* - `static` or `dynamic`. The value static
+  needs the devices input
 - `desc`: *optional* - Description of the device group
-- `rules`: *required if type == dynamic* - A set of rules to determine which
-  devices should be included in this device group
-- `devices`: *present if type == static* - A list of devices that should be
-  included in this group. This is a static list of devices
+- `rules`: *required if type == dynamic* - a set of rules. These rules
+  select the devices of this device group
+- `devices`: *present if type == static* - a static list of the devices
+  in this group
 
 Examples:
 
@@ -104,20 +104,19 @@ Updates a device group.
 Route: `/api/v0/devicegroups/:name`
 
 - name Is the name of the device group which can be obtained using
-  [`get_devicegroups`](#get_devicegroups). Please ensure that
-  the name is urlencoded if it needs to be (i.e Linux Servers would
-  need to be urlencoded.
+  [`get_devicegroups`](#get_devicegroups). Urlencode the name where
+  necessary. For example, `Linux Servers` needs urlencoding.
 
 Input (JSON):
 
 - `name`: *optional* - The name of the device group
-- `type`: *optional* - should be `static` or `dynamic`. Setting this to static
-  requires that the devices input be provided
+- `type`: *optional* - `static` or `dynamic`. The value static
+  needs the devices input
 - `desc`: *optional* - Description of the device group
-- `rules`: *required if type == dynamic* - A set of rules to determine which
-  devices should be included in this device group
-- `devices`: *required if type == static* - A list of devices that should be
-  included in this group. This is a static list of devices
+- `rules`: *required if type == dynamic* - a set of rules. These rules
+  select the devices of this device group
+- `devices`: *required if type == static* - a static list of the
+  devices in this group
 
 Examples:
 
@@ -141,9 +140,8 @@ Deletes a device group.
 Route: `/api/v0/devicegroups/:name`
 
 - name Is the name of the device group which can be obtained using
-  [`get_devicegroups`](#get_devicegroups). Please ensure that
-  the name is urlencoded if it needs to be (i.e Linux Servers would
-  need to be urlencoded.
+  [`get_devicegroups`](#get_devicegroups). Urlencode the name where
+  necessary. For example, `Linux Servers` needs urlencoding.
 
 Input:
 
@@ -171,9 +169,8 @@ List all devices matching the group provided.
 Route: `/api/v0/devicegroups/:name`
 
 - name Is the name of the device group which can be obtained using
-  [`get_devicegroups`](#get_devicegroups). Please ensure that
-  the name is urlencoded if it needs to be (i.e Linux Servers would
-  need to be urlencoded.
+  [`get_devicegroups`](#get_devicegroups). Urlencode the name where
+  necessary. For example, `Linux Servers` needs urlencoding.
 
 Input (JSON):
 
@@ -217,13 +214,13 @@ Route: `/api/v0/devicegroups/:name/maintenance`
 Input (JSON):
 
 - `title`: *optional* - Some title for the Maintenance
-  Will be replaced with device group name if omitted
+  Without this field, LibreNMS uses the device group name
 - `behavior`: *optional* - id of maintenance behavior desired
   Defaults to alert.scheduled_maintenance_default_behavior if omitted
 - `notes`: *optional* - Some description for the Maintenance
 - `start`: *optional* - start time of Maintenance in full format `Y-m-d H:i:00`
   eg: 2022-08-01 22:45:00
-  Current system time `now()` will be used if omitted
+  Without this field, LibreNMS uses the current system time `now()`
 - `duration`: *required* - Duration of Maintenance in format `H:i` / `Hrs:Mins`
   eg: 02:00
 
@@ -281,9 +278,8 @@ Add devices to a device group.
 Route: `/api/v0/devicegroups/:name/devices`
 
 - name Is the name of the device group which can be obtained using
-  [`get_devicegroups`](#get_devicegroups). Please ensure that
-  the name is urlencoded if it needs to be (i.e Linux Servers would
-  need to be urlencoded.
+  [`get_devicegroups`](#get_devicegroups). Urlencode the name where
+  necessary. For example, `Linux Servers` needs urlencoding.
 
 Input (JSON):
 
@@ -313,9 +309,8 @@ Removes devices from a device group.
 Route: `/api/v0/devicegroups/:name/devices`
 
 - name Is the name of the device group which can be obtained using
-  [`get_devicegroups`](#get_devicegroups). Please ensure that
-  the name is urlencoded if it needs to be (i.e Linux Servers would
-  need to be urlencoded.
+  [`get_devicegroups`](#get_devicegroups). Urlencode the name where
+  necessary. For example, `Linux Servers` needs urlencoding.
 
 Input (JSON):
 
