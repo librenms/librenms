@@ -20,9 +20,7 @@
  * @see https://laravel.com/docs/eloquent
  */
 
-use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Event;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Laravel;
 
@@ -115,17 +113,11 @@ function dbUpdate($data, $table, $where = null, $parameters = [])
 function dbFetchRows($sql, $parameters = [])
 {
     try {
-        $startTime = microtime(true);
-        $connection = DB::connection();
+        $rows = DB::connection()->select($sql, (array) $parameters, false);
 
-        $query = $connection->getPdo()->prepare($sql);
-        $query->execute((array) $parameters);
-        $all = $query->fetchAll(PDO::FETCH_ASSOC);
-
-        $executionTime = round((microtime(true) - $startTime) * 1000, 2);
-        Event::dispatch(new QueryExecuted($sql, $parameters, $executionTime, $connection));
-
-        return $all;
+        return array_map(fn ($row) => (array) $row, $rows);
+    } catch (QueryException $qe) {
+        dbHandleException($qe);
     } catch (PDOException $pdoe) {
         dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
     }
@@ -143,17 +135,11 @@ function dbFetchRows($sql, $parameters = [])
 function dbFetchRow($sql = null, $parameters = []): ?array
 {
     try {
-        $startTime = microtime(true);
-        $connection = DB::connection();
+        $row = DB::connection()->selectOne($sql, (array) $parameters, false);
 
-        $query = $connection->getPdo()->prepare($sql);
-        $query->execute((array) $parameters);
-        $row = $query->fetch(PDO::FETCH_ASSOC);
-
-        $executionTime = round((microtime(true) - $startTime) * 1000, 2);
-        Event::dispatch(new QueryExecuted($sql, $parameters, $executionTime, $connection));
-
-        return $row === false ? null : $row;
+        return $row === null ? null : (array) $row;
+    } catch (QueryException $qe) {
+        dbHandleException($qe);
     } catch (PDOException $pdoe) {
         dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
     }
@@ -170,17 +156,12 @@ function dbFetchRow($sql = null, $parameters = []): ?array
 function dbFetchCell($sql, $parameters = [])
 {
     try {
-        $startTime = microtime(true);
-        $connection = DB::connection();
+        // cast to array rather than using scalar(), which rejects multi-column selects
+        $row = (array) DB::connection()->selectOne($sql, (array) $parameters, false);
 
-        $query = $connection->getPdo()->prepare($sql);
-        $query->execute((array) $parameters);
-        $value = $query->fetchColumn();
-
-        $executionTime = round((microtime(true) - $startTime) * 1000, 2);
-        Event::dispatch(new QueryExecuted($sql, $parameters, $executionTime, $connection));
-
-        return $value === false ? null : $value;
+        return $row === [] ? null : reset($row);
+    } catch (QueryException $qe) {
+        dbHandleException($qe);
     } catch (PDOException $pdoe) {
         dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
     }
