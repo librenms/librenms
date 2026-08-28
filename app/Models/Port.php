@@ -698,7 +698,7 @@ class Port extends DeviceRelatedModel
     /**
      * @return int VLAN or null
      */
-    public function voiceVlan(): int|null
+    public function voiceVlan(): ?int
     {
         return $this->hasOne(PortVlan::class, 'port_id')->where('voice', 1)->first()->vlan;
     }
