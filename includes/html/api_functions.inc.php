@@ -443,24 +443,11 @@ function add_device(Illuminate\Http\Request $request)
             'port',
             'transport',
             'poller_group',
-            'snmpver',
             'port_association_mode',
-            'community',
-            'authlevel',
-            'authname',
-            'authpass',
-            'authalgo',
-            'cryptopass',
-            'cryptoalgo',
         ]));
 
         if (! empty($data['location'])) {
             $device->location_id = \App\Models\Location::firstOrCreate(['location' => $data['location']])->id;
-        }
-
-        // uses different name in legacy call
-        if (! empty($data['version'])) {
-            $device->snmpver = $data['version'];
         }
 
         $force_add = ! empty($data['force_add']);
@@ -470,11 +457,15 @@ function add_device(Illuminate\Http\Request $request)
             $device->sysName = $data['sysName'] ?? '';
             $device->hardware = $data['hardware'] ?? '';
             $device->snmp_disable = 1;
-        } elseif ($force_add && ! $device->hasSnmpInfo()) {
+        } else {
+            $device->snmp_disable = 0;
+        }
+
+        if ($force_add && empty($data['snmp_disable']) && ! $device->hasSnmpInfo()) {
             return api_error(400, 'SNMP information is required when force adding a device');
         }
 
-        (new ValidateDeviceAndCreate($device, $force_add, ! empty($data['ping_fallback'])))->execute();
+        (new ValidateDeviceAndCreate($device, $force_add, ! empty($data['ping_fallback']), $data))->execute();
     } catch (\LibreNMS\Exceptions\HostExistsException|\LibreNMS\Exceptions\HostUnreachableException|\LibreNMS\Exceptions\SnmpVersionUnsupportedException $e) {
         return api_error(500, $e->getMessage());
     } catch (Exception $e) {

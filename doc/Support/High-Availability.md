@@ -50,10 +50,11 @@ For HA, many LibreNMS instances share these backend services:
    - For the configuration details, read [Redis-Sentinel.md](../Extensions/Redis-Sentinel.md)
 
 3. **Deploy multiple LibreNMS instances**:
-   - Install LibreNMS on more than one server
-   - Configure each instance for the same database and the same Redis Sentinel cluster
-   - Make the `.env` configuration identical on all instances. Set `APP_KEY` to the same value on all instances.
-   - Give each install a unique `NODE_ID` in the `.env` file.
+   - Install LibreNMS on two or more servers.
+   - Configure each instance for the same database and Redis Sentinel cluster.
+   - Make the `.env` configuration identical on all instances.
+   - Set `APP_KEY` to the same value on all instances. LibreNMS uses `APP_KEY` to encrypt secrets in the database. The key must match across all nodes.
+   - Set a unique `NODE_ID` in the `.env` file on each instance.
 
 4. **Configure RRD Access**:
     Use RRDCached, which gives all instances access to the same RRD files. You can also use shared storage for the RRD files over NFS.
