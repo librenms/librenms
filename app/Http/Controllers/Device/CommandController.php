@@ -102,7 +102,9 @@ class CommandController
         return new StreamedResponse(function () use ($cmd, $args): void {
             config(['logging.default' => 'browser']);
 
-            Artisan::call($cmd, $args, new BrowserOutput());
+            $exitCode = Artisan::call($cmd, $args, new BrowserOutput());
+
+            echo PHP_EOL . "exit_status:$exitCode" . PHP_EOL;
         }, 200, $headers);
     }
 
@@ -127,10 +129,12 @@ class CommandController
         $headers = $this->headers($validated, $device);
 
         return new StreamedResponse(function () use ($cmd): void {
-            Process::run($cmd, function (string $type, string $output): void {
+            $result = Process::run($cmd, function (string $type, string $output): void {
                 echo $output;
                 flush();
             });
+
+            echo PHP_EOL . 'exit_status:' . $result->exitCode() . PHP_EOL;
         }, 200, $headers);
     }
 
