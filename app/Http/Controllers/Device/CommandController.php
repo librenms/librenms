@@ -99,7 +99,7 @@ class CommandController
 
         $headers = $this->headers($validated, $device);
 
-        return new StreamedResponse(function () use ($cmd, $args) {
+        return new StreamedResponse(function () use ($cmd, $args): void {
             config(['logging.default' => 'browser']);
 
             Artisan::call($cmd, $args, new BrowserOutput());
@@ -126,8 +126,8 @@ class CommandController
 
         $headers = $this->headers($validated, $device);
 
-        return new StreamedResponse(function () use ($cmd) {
-            Process::run($cmd, function (string $type, string $output) {
+        return new StreamedResponse(function () use ($cmd): void {
+            Process::run($cmd, function (string $type, string $output): void {
                 echo $output;
                 flush();
             });
@@ -204,7 +204,7 @@ class CommandController
 
         $headers = $this->headers($validated, $device);
 
-        return new StreamedResponse(function () use ($output) {
+        return new StreamedResponse(function () use ($output): void {
             echo $output;
         }, 200, $headers);
     }

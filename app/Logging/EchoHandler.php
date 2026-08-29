@@ -29,7 +29,7 @@ use Monolog\LogRecord;
 
 class EchoHandler extends AbstractProcessingHandler
 {
-    private \Console_Color2 $color_convert;
+    private readonly \Console_Color2 $color_convert;
 
     public function __construct()
     {
