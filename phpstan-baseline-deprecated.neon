@@ -1658,6 +1658,24 @@ parameters:
 
 		-
 			message: '''
+				#^Call to deprecated function gen_snmpwalk_cmd\(\)\:
+				Please use SnmpQuery instead$#
+			'''
+			identifier: function.deprecated
+			count: 1
+			path: app/Http/Controllers/Device/CommandController.php
+
+		-
+			message: '''
+				#^Call to deprecated function dbFetchRow\(\)\:
+				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
+			'''
+			identifier: function.deprecated
+			count: 1
+			path: app/Http/Controllers/Device/CommandController.php
+
+		-
+			message: '''
 				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
 				use display field directly$#
 			'''
@@ -4859,24 +4877,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/html/modal/new_bill.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function gen_snmpwalk_cmd\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/output/capture.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRow\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/output/query.inc.php
 
 		-
 			message: '''

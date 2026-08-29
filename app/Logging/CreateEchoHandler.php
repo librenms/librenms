@@ -28,6 +28,9 @@ use Monolog\Logger;
 
 class CreateEchoHandler
 {
+    /**
+     * @param  array<string, mixed>  $config
+     */
     public function __invoke(array $config): Logger
     {
         // Create a new Monolog instance using the channel config name

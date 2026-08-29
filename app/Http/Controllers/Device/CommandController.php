@@ -27,29 +27,185 @@
 namespace App\Http\Controllers\Device;
 
 use App\BrowserOutput;
+use App\Facades\LibrenmsConfig;
+use App\Models\AlertRule;
 use App\Models\Device;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
-use Symfony\Component\Console\Output\Output;
+use Illuminate\Support\Facades\Process;
+use Illuminate\Validation\Rule;
+use LibreNMS\Alert\AlertUtil;
+use LibreNMS\Alerting\QueryBuilderParser;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CommandController
 {
     use AuthorizesRequests;
 
-    public function show(Device $device, Request $request): StreamedResponse
+    /**
+     * @param  array{'format': string, 'type': string}  $validated
+     * @return array<string, string>
+     */
+    private function headers(array $validated, Device $device): array
+    {
+        $headers = [
+            'Cache-Control' => 'no-cache',
+            'X-Accel-Buffering' => 'no',
+            'Content-Type' => 'text/plain',
+        ];
+
+        switch($validated['format']) {
+            case 'text':
+                break;
+            case 'download':
+                $headers += [
+                    'Content-Description' => 'File Transfer',
+                    'Content-Disposition' => 'attachment; filename=' . $validated['type'] . '-' . $device->hostname . '.txt',
+                    'Content-Transfer-Encoding' => 'binary',
+                    'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                    'Expires' => '0',
+                    'Pragma' => 'public',
+                ];
+                break;
+            default:
+                throw new \Exception('Format type ' . $validated['format'] . ' needs to be implemented');
+        }
+
+        return $headers;
+    }
+
+    public function artisan(Device $device, Request $request): StreamedResponse
     {
         $this->authorize('debug', $device);
 
-        return new StreamedResponse(function () use ($device) {
+        $validated = $request->validate([
+            'format' => ['required', Rule::in(['text', 'download'])],
+            'type' => ['required', Rule::in(['poller', 'discovery'])],
+        ]);
+
+        switch($validated['type']) {
+            case 'poller':
+                $cmd = 'device:poll';
+                $args = ['device spec' => $device->device_id, '-vv' => true, '--no-data' => true];
+                break;
+            case 'discovery':
+                $cmd = 'device:discover';
+                $args = ['device spec' => $device->device_id, '-vv' => true];
+                break;
+            default:
+                throw new \Exception('Request type ' . $validated['type'] . ' needs to be implemented');
+        }
+
+        $headers = $this->headers($validated, $device);
+
+        return new StreamedResponse(function () use ($cmd, $args) {
             config(['logging.default' => 'browser']);
 
-            Artisan::call('device:poll', ['device spec' => $device->device_id, '-vv' => true, '--no-data' => true], new BrowserOutput());
-        }, 200, [
-            'Cache-Control' => 'no-cache',
-            'Content-Type' => 'text/plain',
-            'X-Accel-Buffering' => 'no',
+            Artisan::call($cmd, $args, new BrowserOutput());
+        }, 200, $headers);
+    }
+
+    public function command(Device $device, Request $request): StreamedResponse
+    {
+        $this->authorize('debug', $device);
+
+        $validated = $request->validate([
+            'format' => ['required', Rule::in(['text', 'download'])],
+            'type' => ['required', Rule::in(['snmpwalk'])],
         ]);
+
+        switch($validated['type']) {
+            case 'snmpwalk':
+                include_once base_path('includes/snmp.inc.php');
+                $cmd = gen_snmpwalk_cmd($device->toArray(), '.', '-OUneb');
+                break;
+            default:
+                throw new \Exception('Request type ' . $validated['type'] . ' needs to be implemented');
+        }
+
+        $headers = $this->headers($validated, $device);
+
+        return new StreamedResponse(function () use ($cmd) {
+            Process::run($cmd, function (string $type, string $output) {
+                echo $output;
+                flush();
+            });
+        }, 200, $headers);
+    }
+
+    public function query(Device $device, Request $request): StreamedResponse
+    {
+        $this->authorize('debug', $device);
+
+        $validated = $request->validate([
+            'format' => ['required', Rule::in(['text', 'download'])],
+            'type' => ['required', Rule::in(['alerts'])],
+        ]);
+
+        switch($validated['type']) {
+            case 'alerts':
+                include_once base_path('includes/dbFacile.php');
+                $rules = AlertRule::enabled()->forDevice($device)->get();
+                $output = '';
+                $results = [];
+                foreach ($rules as $rule) {
+                    $sql = $rule->query ?: QueryBuilderParser::fromJson($rule->builder)->toSql();
+                    $qry = dbFetchRow($sql, [$device->device_id]);
+                    if (is_array($qry)) {
+                        $results[] = $qry;
+                        $response = 'matches';
+                    } else {
+                        $response = 'no match';
+                    }
+
+                    $extra = $rule->extra;
+                    if (($extra['options']['override_query'] ?? null) === 'on' || ($extra['options']['override_query'] ?? null) === true) {
+                        $qb = $extra['options']['override_query'];
+                    } else {
+                        $qb = QueryBuilderParser::fromJson($rule->builder ?? []);
+                    }
+
+                    $output .= 'Rule name: ' . $rule->name . PHP_EOL;
+                    if ($qb instanceof QueryBuilderParser) {
+                        $output .= 'Alert rule: ' . $qb->toSql(false) . PHP_EOL;
+                    } else {
+                        $output .= 'Alert rule: Custom SQL Query' . PHP_EOL;
+                    }
+                    $output .= 'Alert query: ' . ($rule->query ?: $sql) . PHP_EOL;
+                    $output .= 'Rule match: ' . $response . PHP_EOL . PHP_EOL;
+                }
+                if (LibrenmsConfig::get('alert.transports.mail') === true) {
+                    $contacts = AlertUtil::getContacts($results);
+                    if (count($contacts) > 0) {
+                        $output .= 'Found ' . count($contacts) . ' contacts to send alerts to.' . PHP_EOL;
+                    }
+                    foreach ($contacts as $email => $name) {
+                        $output .= $name . '<' . $email . '>' . PHP_EOL;
+                    }
+                    $output .= PHP_EOL;
+                }
+                $transports = '';
+                $x = 0;
+                foreach (LibrenmsConfig::get('alert.transports') as $name => $v) {
+                    if (LibrenmsConfig::get("alert.transports.$name") === true) {
+                        $transports .= 'Transport: ' . $name . PHP_EOL;
+                        $x++;
+                    }
+                }
+                if (! empty($transports)) {
+                    $output .= 'Found ' . $x . ' transports to send alerts to.' . PHP_EOL;
+                    $output .= $transports;
+                }
+                break;
+            default:
+                throw new \Exception('Request type ' . $validated['type'] . ' needs to be implemented');
+        }
+
+        $headers = $this->headers($validated, $device);
+
+        return new StreamedResponse(function () use ($output) {
+            echo $output;
+        }, 200, $headers);
     }
 }
