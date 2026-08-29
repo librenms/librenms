@@ -8,6 +8,7 @@
  | request an environment variable to be created upstream or send a pull request.
  */
 
+use App\Logging\CreateEchoHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
 
@@ -38,6 +39,12 @@ return [
             'formatter' => App\Logging\LogFileFormatter::class,
             'level' => env('LOG_LEVEL', 'warning'),
             'replace_placeholders' => true,
+        ],
+
+        'browser' => [
+            'driver' => 'custom',
+            'via' => CreateEchoHandler::class,
+            'level' => 'debug',
         ],
 
         'stdout' => [

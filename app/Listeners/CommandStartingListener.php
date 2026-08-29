@@ -94,6 +94,12 @@ class CommandStartingListener
     private function ensureChannelWithStdout(): void
     {
         $defaultChannel = config('logging.default');
+
+        // Browser channel does not need stdout
+        if($defaultChannel == 'browser') {
+            return;
+        }
+
         $channelConfig = config("logging.channels.$defaultChannel");
 
         $channels = $channelConfig['channels'] ?? [$defaultChannel];

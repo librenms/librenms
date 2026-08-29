@@ -38,10 +38,7 @@ class CommandController
     public function show(Device $device, Request $request): StreamedResponse
     {
         return new StreamedResponse(function () use ($device) {
-            // Disable PHP output buffering limit
-            while (ob_get_level() > 0) {
-                ob_end_flush();
-            }
+            config(['logging.default' => 'browser']);
 
             Artisan::call('device:poll', ['device spec' => $device->device_id, '-v' => true, '-v' => true, '--no-data' => true], new BrowserOutput());
         }, 200, [
