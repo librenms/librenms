@@ -31,40 +31,21 @@ use LibreNMS\Util\Mac;
  * @author    Paul Iercosan <mail@paulierco.ro>
  */
 if (empty($fdbPort_table)) {
-<<<<<<< HEAD
-    $dot1d = snmpwalk_group(
-        $device,
-        'slMacAddressDisposition',
-        'ALCATEL-IND1-MAC-ADDRESS-MIB',
-        0,
-        [],
-        'nokia/aos6'
-    );
-=======
     $dot1d = SnmpQuery::mibDir('nokia/aos6')
         ->walk('ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressDisposition')
         ->table(3);
->>>>>>> b70482c60d (Refactor AOS6 FDB discovery)
 
     if (! empty($dot1d)) {
         echo 'AOS6 MAC-ADDRESS-MIB: ';
         $fdbPort_table = [];
 
-<<<<<<< HEAD
-        foreach ($dot1d['slMacAddressDisposition'] as $portLocal => $data) {
-=======
         foreach ($dot1d as $portLocal => $data) {
->>>>>>> b70482c60d (Refactor AOS6 FDB discovery)
             foreach ($data as $vlanLocal => $data2) {
                 if (! isset($fdbPort_table[$vlanLocal]['dot1qTpFdbPort'])) {
                     $fdbPort_table[$vlanLocal] = ['dot1qTpFdbPort' => []];
                 }
 
-<<<<<<< HEAD
-                foreach ($data2 as $macLocal => $one) {
-=======
                 foreach ($data2 as $macLocal => $entry) {
->>>>>>> b70482c60d (Refactor AOS6 FDB discovery)
                     $fdbPort_table[$vlanLocal]['dot1qTpFdbPort'][$macLocal] = (int) $portLocal;
                 }
             }
@@ -75,36 +56,6 @@ if (empty($fdbPort_table)) {
 if (! empty($fdbPort_table)) {
     $device_id = $device['device_id'];
 
-<<<<<<< HEAD
-    // Map physical LAG members to their parent aggregate interface.
-    $lag_ports = [];
-    $ifStack = SnmpQuery::walk('IF-MIB::ifStackStatus')->valuesByIndex();
-
-    foreach ($ifStack as $index => $data) {
-        $parts = explode('.', (string) $index);
-
-        if (count($parts) !== 2) {
-            continue;
-        }
-
-        [$parent, $child] = array_map(intval(...), $parts);
-
-        if ($parent && $child && (int) ($data['IF-MIB::ifStackStatus'] ?? 0) === 1) {
-            $lag_ports[$child] = $parent;
-        }
-    }
-
-    // Build dot1dBasePort to port_id dictionary.
-    $portid_dict = [];
-    $dot1dBasePortIfIndex = snmpwalk_group(
-        $device,
-        'dot1dBasePortIfIndex',
-        'BRIDGE-MIB'
-    );
-
-    foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
-        $ifIndex = (int) $data['dot1dBasePortIfIndex'];
-=======
     // Map physical LAG members using data discovered by the ports-stack module.
     $lag_ports = DB::table('ports_stack')
         ->where('device_id', $device_id)
@@ -127,7 +78,6 @@ if (! empty($fdbPort_table)) {
             continue;
         }
 
->>>>>>> b70482c60d (Refactor AOS6 FDB discovery)
         $ifIndex = $lag_ports[$ifIndex] ?? $ifIndex;
 
         $portid_dict[(int) $portLocal] = PortCache::getIdFromIfIndex(
