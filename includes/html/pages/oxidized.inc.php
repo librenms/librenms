@@ -19,7 +19,6 @@ $no_refresh = true;
         <ul class="nav nav-tabs">
             <li class="active"><a href="#list" data-toggle="tab">Node List</a></li>
             <li><a href="#search" data-toggle="tab">Config Search</a></li>
-            <li><a href="<?php echo \LibreNMS\Util\Url::generate(['page' => 'tools', 'tool' => 'oxidized-cfg-check']); ?>">Oxidized config validation</a></li>
         </ul>
     </div>
     <div class="panel with-nav-tabs panel-default">
@@ -94,7 +93,7 @@ $no_refresh = true;
                     return '<button class="btn btn-default btn-sm" name="btn-refresh-node-devId' + row.id +
                             '" id="btn-refresh-node-devId' + row.id + '" onclick="refresh_oxidized_node(\'' + row.hostname + '\');" title="Refetch config">' +
                             '<i class="fa fa-refresh"></i></button> ' +
-                            '<a href="<?= url('device') ?>/' + row.id + '/tab=showconfig/" title="View config"><i class="fa fa-align-justify fa-lg icon-theme"></i></a>';
+                            '<a href="<?= url('device') ?>/' + row.id + '/config" title="View config"><i class="fa fa-align-justify fa-lg icon-theme"></i></a>';
                 }
             },
             "status": function(column, row) {
@@ -123,7 +122,7 @@ $no_refresh = true;
                     $('#search-output').append('<p>Config appears on the following device(s):</p>');
                     $.each(data.output, function (row, value) {
                         if (value['dev_id']) {
-                            $('#search-output').append('<p><a href="<?= url('device') ?>/' + value['dev_id'] + '/tab=showconfig/">' + value['full_name'] + '</p>');
+                            $('#search-output').append('<p><a href="<?= url('device') ?>/' + value['dev_id'] + '/config">' + value['full_name'] + '</p>');
                         } else {
                             $('#search-output').append('<p>' + value['full_name'] + '</p>');
                         }

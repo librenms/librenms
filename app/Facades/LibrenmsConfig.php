@@ -26,6 +26,7 @@
 
 namespace App\Facades;
 
+use App\ConfigRepository;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Log;
@@ -49,5 +50,11 @@ class LibrenmsConfig extends Facade
         self::reload();
 
         Log::info('LibreNMS config cache cleared and config reloaded.');
+    }
+
+    public static function reloadDefaults(): void
+    {
+        App::instance('librenms-config', new ConfigRepository(loadUserConfiguration: false));
+        self::clearResolvedInstances();
     }
 }
