@@ -50,11 +50,9 @@ Route::prefix('v0')->group(function (): void {
     });
 
     // Oxidized
-    Route::middleware(['can:showConfig,App\Models\Device'])->group(function (): void {
-        Route::get('oxidized/{hostname?}', [App\Api\Controllers\LegacyApiController::class, 'list_oxidized'])->name('list_oxidized');
-        Route::get('oxidized/config/search/{searchstring}', [App\Api\Controllers\LegacyApiController::class, 'search_oxidized'])->name('search_oxidized');
-        Route::get('oxidized/config/{device_name}', [App\Api\Controllers\LegacyApiController::class, 'get_oxidized_config'])->name('get_oxidized_config');
-    });
+    Route::get('oxidized/{hostname?}', [App\Api\Controllers\LegacyApiController::class, 'list_oxidized'])->middleware(['can:viewAny,App\Models\Device'])->name('list_oxidized');
+    Route::get('oxidized/config/search/{searchstring}', [App\Api\Controllers\LegacyApiController::class, 'search_oxidized'])->middleware(['can:oxidized.search'])->name('search_oxidized');
+    Route::get('oxidized/config/{device_name}', [App\Api\Controllers\LegacyApiController::class, 'get_oxidized_config'])->middleware(['can:viewAny,App\Models\Device'])->name('get_oxidized_config');
 
     // Device Groups
     Route::middleware(['can:viewAny,App\Models\DeviceGroup'])->group(function (): void {
@@ -181,6 +179,14 @@ Route::prefix('v0')->group(function (): void {
         Route::middleware('can:delete,App\Models\Component')->group(function (): void {
             Route::delete('{hostname}/components/{component}', [App\Api\Controllers\LegacyApiController::class, 'delete_components'])->name('delete_components');
         });
+    });
+
+    // Logs
+    Route::prefix('logs')->group(function (): void {
+        Route::get('eventlog/{hostname?}', [App\Api\Controllers\LegacyApiController::class, 'list_logs'])->name('list_eventlog')->middleware('can:viewAny,App\Models\Eventlog');
+        Route::get('syslog/{hostname?}', [App\Api\Controllers\LegacyApiController::class, 'list_logs'])->name('list_syslog')->middleware('can:viewAny,App\Models\Syslog');
+        Route::get('alertlog/{hostname?}', [App\Api\Controllers\LegacyApiController::class, 'list_logs'])->name('list_alertlog')->middleware('can:viewAny,App\Models\AlertLog');
+        Route::get('authlog', [App\Api\Controllers\LegacyApiController::class, 'list_logs'])->name('list_authlog')->middleware('can:viewAny,App\Models\AuthLog');
     });
 
     // Ports

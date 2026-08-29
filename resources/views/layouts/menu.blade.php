@@ -106,25 +106,25 @@
                                                                 aria-hidden="true"></i> {{ __('Inventory') }}</a></li>
                         @if($package_count)
                             <li><a href="{{ url('search/search=packages') }}"><i class="fa fa-archive fa-fw fa-lg"
-                                                                                 aria-hidden="true"></i> {{ __('Packages') }}
+                                                                                 aria-hidden="true"></i> {{ __('search.packages') }}
                                 </a></li>
                         @endif
 
                         <li role="presentation" class="divider"></li>
                         <li><a href="{{ url('search/search=ipv4') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                         aria-hidden="true"></i> {{ __('IPv4 Address') }}
+                                                                         aria-hidden="true"></i> {{ __('search.ipv4') }}
                             </a></li>
                         <li><a href="{{ url('search/search=ipv6') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                         aria-hidden="true"></i> {{ __('IPv6 Address') }}
+                                                                         aria-hidden="true"></i> {{ __('search.ipv6') }}
                             </a></li>
                         <li><a href="{{ url('search/search=mac') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                        aria-hidden="true"></i> {{ __('MAC Address') }}</a>
+                                                                        aria-hidden="true"></i> {{ __('search.mac') }}</a>
                         </li>
                         <li><a href="{{ url('search/search=arp') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                        aria-hidden="true"></i> {{ __('ARP Tables') }}</a>
+                                                                        aria-hidden="true"></i> {{ __('search.arp_tables') }}</a>
                         </li>
                         <li><a href="{{ url('search/search=fdb') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                        aria-hidden="true"></i> {{ __('FDB Tables') }}</a>
+                                                                        aria-hidden="true"></i> {{ __('search.fdb_tables') }}</a>
                         </li>
                     </ul>
                 </li>
@@ -600,9 +600,10 @@
                 @endif
 {{-- Alerts --}}
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i
-                            class="fa fa-exclamation-circle text-{{ $alert_menu_class }} fa-fw fa-lg"
-                            aria-hidden="true"></i> <span class="tw:md:hidden tw:2xl:inline-block">{{ __('Alerts') }}</span></a>
+                    <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">
+                        <span class="badge badge-{{ $alert_menu_class }} tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:px-1.5" aria-label="{{ trans_choice(':count alert|:count alerts', $alert_count, ['count' => $alert_count]) }}">{{ $alert_count }}</span>
+                        <span class="tw:md:hidden tw:2xl:inline-block">{{ __('Alerts') }}</span>
+                    </a>
                     <ul class="dropdown-menu">
                         <li><a href="{{ url('alerts') }}"><i class="fa fa-bell fa-fw fa-lg"
                                                              aria-hidden="true"></i> {{ __('Notifications') }}</a></li>
@@ -647,26 +648,28 @@
                  @keydown.escape="close()" @click.outside="close()">
                 <div class="form-group">
                     <input class="form-control" type="search" id="gsearch" name="gsearch" autocomplete="off"
-                           placeholder="{{ __('Type / to search') }}"
+                           placeholder="{{ __('search.placeholder') }}"
                            x-model="query" x-ref="input"
                            @input.debounce.250ms="run()" @focus="open = flat.length > 0"
-                           @keydown="onKey($event)">
+                           @keydown.down.prevent="move(1)"
+                           @keydown.up.prevent="move(-1)"
+                           @keydown.enter.prevent="goOrRun()">
                 </div>
-                <div x-show="open" x-cloak
-                     class="global-search-dropdown tw:absolute tw:right-0 tw:mt-1 tw:w-[50rem] tw:max-w-[90vw] tw:max-h-[70vh] tw:overflow-y-auto tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200 tw:rounded-lg tw:shadow-xl tw:z-50">
+                <div x-show="open" x-cloak x-ref="dropdown"
+                     class="global-search-dropdown tw:absolute tw:right-0 tw:mt-1 tw:min-w-70 tw:max-w-[90vw] tw:max-h-[70vh] tw:overflow-y-auto tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200 tw:rounded-lg tw:shadow-xl tw:z-50">
                     <div x-show="loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-gray-500 tw:dark:text-dark-white-400">
-                        <i class="fa fa-spinner fa-spin"></i> {{ __('Searching...') }}
+                        <i class="fa fa-spinner fa-spin"></i> {{ __('search.searching') }}
                     </div>
                     <div x-show="!loading && flat.length === 0" class="tw:px-4 tw:py-3 tw:text-gray-500 tw:dark:text-dark-white-400">
-                        {{ __('No results') }}
+                        {{ __('search.no_results') }}
                     </div>
                     <template x-for="group in groups" :key="group.type">
                         <div>
                             <div class="tw:px-4 tw:py-1.5 tw:bg-gray-100 tw:dark:bg-dark-gray-200 tw:text-gray-600 tw:dark:text-dark-white-300 tw:text-xs tw:font-bold tw:uppercase" x-text="group.label"></div>
                             <template x-for="item in group.results" :key="group.type + item.url">
-                                <a :href="item.url" @mouseenter="active = item.url"
+                                <a :href="item.url" x-ref="item" @mouseenter="activeIndex = flat.findIndex(i => i === item)"
                                    class="tw:flex tw:items-center tw:gap-2.5 tw:px-4 tw:py-2 tw:no-underline tw:text-gray-800 tw:dark:text-dark-white-100 tw:hover:bg-gray-50 tw:dark:hover:bg-dark-gray-300"
-                                   :class="(active === item.url ? 'tw:bg-gray-100 tw:dark:bg-dark-gray-300 ' : '') + (item.status ? 'tw:border-l-5 ' + item.status : '')">
+                                   :class="(flat[activeIndex] === item ? 'tw:bg-gray-100 tw:dark:bg-dark-gray-300 ' : '') + (item.status ? 'tw:border-l-5 ' + item.status : '')">
                                     <template x-if="item.image">
                                         <img :src="item.image" class="tw:h-7 tw:w-7 tw:shrink-0 tw:object-contain tw:dark:bg-gray-50 tw:dark:rounded tw:dark:p-0.5">
                                     </template>
@@ -855,23 +858,30 @@
             flat: [],
             open: false,
             loading: false,
-            active: '',
+            navigateOnLoad: false,
+            lastRunQuery: '',
+            activeIndex: -1,
             seq: 0,
             controllers: [],
             endpoints: @js([
                 route('ajax.search.devices'),
                 route('ajax.search.ports'),
+                route('ajax.search.fdb'),
+                route('ajax.search.arp'),
                 route('ajax.search.health'),
                 route('ajax.search.routing'),
                 route('ajax.search.logs'),
             ]),
-            order: ['devices', 'ports', 'sensors', 'wireless', 'storage', 'mempools', 'processors', 'bgp', 'eventlog'],
+            order: ['devices', 'ports', 'fdb_tables', 'arp_tables', 'sensors', 'wireless', 'storage', 'mempools', 'processors', 'bgp', 'eventlog'],
             run() {
                 let q = this.query.trim();
                 if (q === '') { this.reset(); return; }
+                if (q !== this.lastRunQuery) { this.navigateOnLoad = false; }
+                if (q === this.lastRunQuery && (this.open || this.loading)) { return; }
+                this.lastRunQuery = q;
                 this.open = true;
                 this.loading = true;
-                this.active = '';
+                this.activeIndex = -1;
                 this.groups = [];
                 this.flat = [];
                 this.controllers.forEach(c => c.abort());
@@ -892,29 +902,52 @@
                             (data.groups || []).forEach(g => { collected[g.type] = g; });
                             this.groups = this.order.filter(t => collected[t]).map(t => collected[t]);
                             this.flat = this.groups.flatMap(g => g.results);
+
+                            if (this.navigateOnLoad && this.flat.length > 0) {
+                                this.go();
+                                this.navigateOnLoad = false;
+                            }
                         })
                         .catch(() => {})
                         .finally(() => { pending--; if (seq === this.seq && pending === 0) { this.loading = false; } });
                 });
             },
-            onKey(e) {
-                if (e.key === 'ArrowDown') { e.preventDefault(); this.move(1); }
-                else if (e.key === 'ArrowUp') { e.preventDefault(); this.move(-1); }
-                else if (e.key === 'Enter') { e.preventDefault(); this.go(); }
+            goOrRun() {
+                if (this.flat.length > 0) {
+                    this.go();
+                } else if (this.query.trim() !== '') {
+                    this.run();
+                    this.navigateOnLoad = true;
+                }
             },
             move(dir) {
                 if (this.flat.length === 0) { return; }
                 this.open = true;
-                let i = this.flat.findIndex(it => it.url === this.active);
-                i = (i + dir + this.flat.length) % this.flat.length;
-                this.active = this.flat[i].url;
+
+                if (this.activeIndex === -1) {
+                    this.activeIndex = dir > 0 ? 0 : this.flat.length - 1;
+                } else {
+                    this.activeIndex = (this.activeIndex + dir + this.flat.length) % this.flat.length;
+                }
+
+                this.$nextTick(() => {
+                    let dropdown = this.$refs.dropdown;
+                    if (!dropdown) { return; }
+                    let items = dropdown.querySelectorAll('a');
+                    let activeEl = items[this.activeIndex];
+                    if (activeEl) {
+                        activeEl.scrollIntoView({ block: 'nearest' });
+                    }
+                });
             },
             go() {
-                let url = this.active || (this.flat[0] && this.flat[0].url);
-                if (url) { window.location.href = url; }
+                let target = this.activeIndex >= 0 ? this.flat[this.activeIndex] : this.flat[0];
+                if (target && target.url) {
+                    window.location.href = target.url;
+                }
             },
-            close() { this.open = false; },
-            reset() { this.controllers.forEach(c => c.abort()); this.controllers = []; this.groups = []; this.flat = []; this.open = false; this.active = ''; this.loading = false; },
+            close() { this.open = false; this.navigateOnLoad = false; },
+            reset() { this.controllers.forEach(c => c.abort()); this.controllers = []; this.groups = []; this.flat = []; this.open = false; this.activeIndex = -1; this.loading = false; this.navigateOnLoad = false; this.lastRunQuery = ''; },
         }));
     });
 

@@ -108,6 +108,11 @@ class TwoFactorController extends Controller
             'twofactor' => Rule::in('time', 'counter'),
         ]);
 
+        // Already enabled in the DB, or mid-setup in session - don't generate a new secret
+        if (UserPref::getPref($request->user(), 'twofactor') || Session::has('twofactoradd')) {
+            return redirect()->intended();
+        }
+
         $key = TwoFactor::genKey();
 
         // assume time based

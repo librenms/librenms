@@ -1,0 +1,213 @@
+modules:
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - PowerNet-MIB::airIRRCUnitThresholdsRackInletHighTempMetric
+                        - PowerNet-MIB::airIRRCUnitThresholdsSupplyAirHighTempMetric
+                        - PowerNet-MIB::airIRRCUnitThresholdsReturnAirHighTempMetric
+                        - PowerNet-MIB::airIRRCUnitThresholdsEnteringFluidHighTempMetric
+        state:
+            data:
+                -
+                    oid: PowerNet-MIB::airIRRCGroupStatusActiveFlowControlStatus
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.1.1.9.{{ $index }}'
+                    index: 'airIRRCGroupStatusActiveFlowControlStatus.{{ $index }}'
+                    descr: FlowControlStatus
+                    state_name: airIRRCGroupStatusActiveFlowControlStatus
+                    states:
+                        - { descr: under, value: 1, generic: 2 }
+                        - { descr: okey, value: 2, generic: 0 }
+                        - { descr: over, value: 3, generic: 1 }
+                        - { descr: notApplicable, value: 4, generic: 0 }
+                -
+                    oid: PowerNet-MIB::airIRRCUnitStatusOperateMode
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.2.1.{{ $index }}'
+                    index: 'airIRRCUnitStatusOperateMode.{{ $index }}'
+                    descr: Unit Status
+                    state_name: airIRRCUnitStatusOperateMode
+                    states:
+                        - { descr: standby, value: 1, generic: 1 }
+                        - { descr: on, value: 2, generic: 0 }
+                        - { descr: idle, value: 3, generic: 1 }
+                -
+                    oid: PowerNet-MIB::airIRRCUnitStatusInputState
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.2.17.{{ $index }}'
+                    index: 'airIRRCUnitStatusInputState.{{ $index }}'
+                    descr: Input State
+                    state_name: airIRRCUnitStatusInputState
+                    states:
+                        - { descr: open, value: 1, generic: 0 }
+                        - { descr: closed, value: 2, generic: 2 }
+                -
+                    oid: PowerNet-MIB::airIRRCUnitStatusOutputState
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.2.18.{{ $index }}'
+                    index: 'airIRRCUnitStatusOutputState.{{ $index }}'
+                    descr: Output State
+                    state_name: airIRRCUnitStatusOutputState
+                    states:
+                        - { descr: open, value: 1, generic: 0 }
+                        - { descr: closed, value: 2, generic: 2 }
+                -
+                    oid: PowerNet-MIB::airIRRCUnitStatusLeakSensor
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.2.27.{{ $index }}'
+                    index: 'airIRRCUnitStatusLeakSensor.{{ $index }}'
+                    descr: Leak Sensor
+                    state_name: airIRRCUnitStatusLeakSensor
+                    states:
+                        - { descr: no-leak, value: 1, generic: 0 }
+                        - { descr: leak, value: 2, generic: 2 }
+                -
+                    oid: PowerNet-MIB::airIRRCUnitStatusActivePowerSource
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.2.19.{{ $index }}'
+                    index: 'airIRRCUnitStatusActivePowerSource.{{ $index }}'
+                    descr: UnitPowerSource
+                    state_name: airIRRCUnitStatusActivePowerSource
+                    states:
+                        - { descr: sourceA, value: 1, generic: 0 }
+                        - { descr: sourceB, value: 2, generic: 0 }
+
+        temperature:
+            data:
+                -
+                    oid: PowerNet-MIB::airIRRCUnitStatusRackInletTempMetric
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.2.7.{{ $index }}'
+                    index: 'airIRRCUnitStatusRackInletTempMetric.{{ $index }}'
+                    descr: Inlet Air Temp
+                    divisor: 10
+                    high_limit: PowerNet-MIB::airIRRCUnitThresholdsRackInletHighTempMetric
+                -
+                    oid: PowerNet-MIB::airIRRCUnitStatusSupplyAirTempMetric
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.2.9.{{ $index }}'
+                    index: 'airIRRCUnitStatusSupplyAirTempMetric.{{ $index }}'
+                    descr: Supply Air Temp
+                    divisor: 10
+                    high_limit: PowerNet-MIB::airIRRCUnitThresholdsSupplyAirHighTempMetric
+                -
+                    oid: PowerNet-MIB::airIRRCUnitStatusReturnAirTempMetric
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.2.11.{{ $index }}'
+                    index: 'airIRRCUnitStatusReturnAirTempMetric.{{ $index }}'
+                    descr: Return Air Temp
+                    divisor: 10
+                    high_limit: PowerNet-MIB::airIRRCUnitThresholdsReturnAirHighTempMetric
+                -
+                    oid: PowerNet-MIB::airIRRCUnitStatusEnteringFluidTemperatureMetric
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.2.24.{{ $index }}'
+                    index: 'airIRRCUnitStatusEnteringFluidTemperatureMetric.{{ $index }}'
+                    descr: Entering Fluid
+                    divisor: 10
+                    high_limit: PowerNet-MIB::airIRRCUnitThresholdsEnteringFluidHighTempMetric
+                -
+                    oid: PowerNet-MIB::airIRRCUnitStatusLeavingFluidTemperatureMetric
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.2.26.{{ $index }}'
+                    index: 'airIRRCUnitStatusLeavingFluidTemperatureMetric.{{ $index }}'
+                    descr: Leaving Fluid
+                    divisor: 10
+                    high_limit: 25
+
+        airflow:
+            data:
+                -
+                    oid: PowerNet-MIB::airIRRCUnitStatusAirFlowUS
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.2.4.{{ $index }}'
+                    index: 'airIRRCUnitStatusAirFlowUS.{{ $index }}'
+                    descr: Air Flow (cfm)
+
+        pressure:
+            data:
+                -
+                    oid: PowerNet-MIB::airIRRCUnitStatusContainmtDPMetric
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.2.13.{{ $index }}'
+                    index: 'airIRRCUnitStatusContainmtDPMetric.{{ $index }}'
+                    descr: Unit Diff Pressure
+                    divisor: 1000
+                    skip_values: -1
+                -
+                    oid: PowerNet-MIB::airIRRCUnitStatusFilterDPMetric
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.2.15.{{ $index }}'
+                    index: 'airIRRCUnitStatusFilterDPMetric.{{ $index }}'
+                    descr: Unit Filter Pressure
+                    divisor: 1000
+                    skip_values: -1
+
+        cooling:
+            data:
+                -
+                    oid: PowerNet-MIB::airIRRCUnitStatusCoolOutput
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.2.2.{{ $index }}'
+                    index: 'airIRRCUnitStatusCoolOutput.{{ $index }}'
+                    descr: UnitCoolingOutput
+                    multiplier: 100
+                -
+                    oid: PowerNet-MIB::airIRRCUnitStatusCoolDemand
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.2.3.{{ $index }}'
+                    index: 'airIRRCUnitStatusCoolDemand.{{ $index }}'
+                    descr: UnitCoolingOutputDemand
+                    multiplier: 100
+                -
+                    oid: PowerNet-MIB::airIRRCGroupStatusCoolOutput
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.1.1.1.{{ $index }}'
+                    index: 'airIRRCGroupStatusCoolOutput.{{ $index }}'
+                    descr: GroupCoolingOutput
+                    multiplier: 100
+                -
+                    oid: PowerNet-MIB::airIRRCGroupStatusCoolDemand
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.1.1.2.{{ $index }}'
+                    index: 'airIRRCGroupStatusCoolDemand.{{ $index }}'
+                    descr: GroupCoolingOutputDemand
+                    multiplier: 100
+
+        percent:
+            data:
+                -
+                    oid: PowerNet-MIB::airIRRCUnitStatusFanSpeed
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.2.16.{{ $index }}'
+                    index: 'airIRRCUnitStatusFanSpeed.{{ $index }}'
+                    descr: 'FanSpeed (%)'
+                    divisor: 10
+                -
+                    oid: PowerNet-MIB::airIRRCUnitStatusFluidValvePosition
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.2.20.{{ $index }}'
+                    index: 'airIRRCUnitStatusFluidValvePosition.{{ $index }}'
+                    descr: 'ValvePosition (%)'
+
+        count:
+            data:
+                -
+                    oid: PowerNet-MIB::airIRAlarmConditionsTableSize
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.1.1.{{ $index }}'
+                    index: 'airIRAlarmConditionsTableSize.{{ $index }}'
+                    descr: 'Active Alarms'
+                    warn_limit: 1
+                    high_limit: 3
+                -
+                    oid: PowerNet-MIB::airIRRCUnitServiceIntervalsAirFilter
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.4.1.{{ $index }}'
+                    index: 'airIRRCUnitServiceIntervalsAirFilter.{{ $index }}'
+                    descr: 'ServiceIntervalsAirFilter'
+
+        runtime:
+            data:
+                -
+                    oid: PowerNet-MIB::airIRRCUnitRunHoursAirFilter
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.3.1.{{ $index }}'
+                    index: 'airIRRCUnitRunHoursAirFilter.{{ $index }}'
+                    descr: 'RuntimeAirFilter'
+                    multiplier: 60
+                -
+                    oid: PowerNet-MIB::airIRRCUnitRunHoursCondensatePump
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.3.12.{{ $index }}'
+                    index: 'airIRRCUnitRunHoursCondensatePump.{{ $index }}'
+                    descr: 'RuntimeCondensatePump'
+                    multiplier: 60
+
+        waterflow:
+            data:
+                -
+                    oid: PowerNet-MIB::airIRRCUnitStatusFluidFlowMetric
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.2.2.2.22.{{ $index }}'
+                    index: 'airIRRCUnitStatusFluidFlowMetric.{{ $index }}'
+                    descr: 'FluidFlow'
+                    divisor: 100
+                    multiplier: 60
