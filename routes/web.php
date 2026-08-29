@@ -200,6 +200,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('accesspoints/{accessPoint}', [Device\Tabs\AccessPointsController::class, 'show'])->name('accesspoints.show')->scopeBindings();
         Route::put('module/{module}', [Device\Tabs\ModuleController::class, 'update'])->name('module.update');
         Route::delete('module/{module}', [Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
+        Route::get('command', [Device\CommandController::class, 'show'])->name('command');
     });
 
     // fallback device routes
