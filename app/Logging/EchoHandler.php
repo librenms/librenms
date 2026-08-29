@@ -29,12 +29,18 @@ use Monolog\LogRecord;
 
 class EchoHandler extends AbstractProcessingHandler
 {
+    private $color_convert;
+
+    public function __construct() {
+        $this->color_convert = new \Console_Color2();
+    }
+
     /**
      * @return void
      */
     protected function write (LogRecord $record): void
     {
-        echo  preg_replace('/\033\[[\d;]+m/', '', $record->message) . PHP_EOL;
+        echo  preg_replace('/\033\[[\d;]+m/', '', $this->color_convert->convert($record->message)) . PHP_EOL;
         flush();
     }
 }

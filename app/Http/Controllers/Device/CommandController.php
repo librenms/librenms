@@ -28,6 +28,7 @@ namespace App\Http\Controllers\Device;
 
 use App\BrowserOutput;
 use App\Models\Device;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Symfony\Component\Console\Output\Output;
@@ -35,12 +36,16 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CommandController
 {
+    use AuthorizesRequests;
+
     public function show(Device $device, Request $request): StreamedResponse
     {
+        $this->authorize('debug', $device);
+
         return new StreamedResponse(function () use ($device) {
             config(['logging.default' => 'browser']);
 
-            Artisan::call('device:poll', ['device spec' => $device->device_id, '-v' => true, '-v' => true, '--no-data' => true], new BrowserOutput());
+            Artisan::call('device:poll', ['device spec' => $device->device_id, '-vv' => true, '--no-data' => true], new BrowserOutput());
         }, 200, [
             'Cache-Control' => 'no-cache',
             'Content-Type' => 'text/plain',

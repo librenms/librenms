@@ -38,7 +38,6 @@ class CreateEchoHandler
 
         // Optional: Set a minimum logging level dynamically from config
         $handler->setLevel($config['level'] ?? \Monolog\Level::Debug);
-        $handler->setFormatter(new BrowserColorFormatter());
 
         $logger->pushHandler($handler);
 
