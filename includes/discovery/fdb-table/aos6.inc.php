@@ -152,5 +152,4 @@ if (! empty($fdbPort_table)) {
         }
     }
 }
-
 echo PHP_EOL;
