@@ -1,6 +1,6 @@
 # Mdadm
 
-It allows you to checks mdadm health and array data
+It monitors the mdadm health and the array data.
 
 ##  Install prereqs
 
@@ -14,19 +14,19 @@ This script require: `jq`
 
 ### SNMP Extend
 
-1. Download the script onto the desired host.
+1. Download the script onto the host.
 
     ```bash
     sudo wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mdadm -O /etc/snmp/mdadm
     ```
 
-3. Make the script executable
+3. Make the script executable.
 
     ```bash
     sudo chmod +x /etc/snmp/mdadm
     ```
 
-4. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+4. Edit your `snmpd.conf` file, usually `/etc/snmp/snmpd.conf`, and add:
 
     ```bash
     extend mdadm /etc/snmp/mdadm
@@ -38,12 +38,12 @@ This script require: `jq`
     sudo /etc/snmp/mdadm
     ```
 
-6. Restart snmpd on your host
+6. Restart snmpd on your host.
 
     ```bash
     sudo service snmpd restart
     ```
 
-    The application should be auto-discovered as described at the
-    top of the page. If it is not, please follow the steps set out
-    under `SNMP Extend` heading top of page.
+    LibreNMS discovers the application automatically, as described at
+    the top of the page. If the discovery fails, do the steps under the
+    `SNMP Extend` heading at the top of the page.

@@ -8,7 +8,6 @@ use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Number;
-use LibreNMS\Util\StringHelpers;
 
 // Build SNMP Cache Array
 $data_oids = [
@@ -587,9 +586,6 @@ foreach ($ports as $port) {
             $this_port['ifName'] = $matches[1];
         }
 
-        $this_port['ifName'] = StringHelpers::inferEncoding($this_port['ifName'] ?? null);
-        $this_port['ifDescr'] = StringHelpers::inferEncoding($this_port['ifDescr'] ?? null);
-
         $polled_period = max($polled - $port['poll_time'], 1);
 
         $port['update'] = [];
@@ -689,7 +685,6 @@ foreach ($ports as $port) {
                 } else {
                     $current_oid = $this_port['ifAlias'];
                 }
-                $current_oid = StringHelpers::inferEncoding($current_oid); // prevent invalid non-utf8 characters
             }
             if ($oid == 'ifSpeed') {
                 $ifSpeed_override = DeviceCache::getPrimary()->getAttrib('ifSpeed:' . $port['ifName']);

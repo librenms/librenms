@@ -3,38 +3,51 @@
 namespace App\Actions\Device;
 
 use App\Models\Device;
-use LibreNMS\Enum\AvailabilitySource;
+use Carbon\Carbon;
 use LibreNMS\Polling\ConnectivityHelper;
 
-class CheckDeviceAvailability
+readonly class CheckDeviceAvailability
 {
     public function __construct(
-        private readonly SetDeviceAvailability $setDeviceAvailability,
-        private readonly DeviceIsPingable $deviceIsPingable,
-        private readonly DeviceIsSnmpable $deviceIsSnmpable,
-        private readonly DeviceMtuTest $deviceMtuTest,
+        private SetDeviceAvailability $setDeviceAvailability,
+        private DeviceIsPingable $deviceIsPingable,
+        private DeviceIsSnmpable $deviceIsSnmpable,
+        private DeviceMtuTest $deviceMtuTest,
+        private UpdateDeviceOutage $updateDeviceOutage,
     ) {
     }
 
     public function execute(Device $device, bool $commit = false): bool
     {
+        $connectivity = new ConnectivityHelper($device);
         $ping_response = $this->deviceIsPingable->execute($device);
 
-        if ($ping_response->success()) {
-            $is_up_snmp = ! ConnectivityHelper::snmpIsAllowed($device) || $this->deviceIsSnmpable->execute($device);
-            $this->setDeviceAvailability->execute($device, $is_up_snmp, AvailabilitySource::Snmp, $commit);
+        $results = [];
+        if ($connectivity->icmpIsEnabled()) {
+            $results['icmp'] = $ping_response->isAlive();
+            $device->last_ping = Carbon::now();
+            $device->last_ping_timetaken = $ping_response->avg_latency ?: $device->last_ping_timetaken;
+        }
+        if ($connectivity->snmpIsEnabled()) {
+            $results['snmp'] = $this->deviceIsSnmpable->execute($device);
+        }
 
+        $changed = $this->setDeviceAvailability->execute($device, $results);
+
+        if ($ping_response->isAlive()) {
             $device->mtu_status = $this->deviceMtuTest->execute($device);
-        } else { // icmp down
-            $this->setDeviceAvailability->execute($device, false, AvailabilitySource::Icmp, $commit);
         }
 
         if ($commit) {
-            if (ConnectivityHelper::pingIsAllowed($device)) {
+            if ($connectivity->icmpIsEnabled()) {
                 $ping_response->saveStats($device);
             }
 
-            $device->save(); // confirm device is saved
+            $device->save();
+
+            if ($changed) {
+                $this->updateDeviceOutage->execute($device);
+            }
         }
 
         return $device->status;

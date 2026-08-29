@@ -1,3 +1,5 @@
+import LibreNMSDate from './datetime.js';
+
 function flattenNestedParams(obj, prefix) {
     return Object.entries(obj).flatMap(([key, value]) => {
         const fullKey = `${prefix}[${key}]`;
@@ -28,4 +30,24 @@ function applyNestedParamsToUrl(url, prefix, params, includeEmpty = false) {
     return url;
 }
 
-export default { applyNestedParamsToUrl };
+function updateDateRange(relativeStartSeconds, relativeEndSeconds, start, end) {
+    const url = new URL(window.location.href);
+    const prevFrom = url.searchParams.get('from');
+    const prevTo = url.searchParams.get('to');
+
+    const fromValue = relativeStartSeconds
+        ? LibreNMSDate.toShortOffset(relativeStartSeconds)
+        : (start && LibreNMSDate.toUrl(start));
+    const toValue = relativeEndSeconds
+        ? LibreNMSDate.toShortOffset(relativeEndSeconds)
+        : (end && LibreNMSDate.toUrl(end));
+
+    if (fromValue) url.searchParams.set('from', fromValue); else url.searchParams.delete('from');
+    if (toValue) url.searchParams.set('to', toValue); else url.searchParams.delete('to');
+
+    if (url.searchParams.get('from') !== prevFrom || url.searchParams.get('to') !== prevTo) {
+        window.location.href = url.toString();
+    }
+}
+
+export default { applyNestedParamsToUrl, updateDateRange };

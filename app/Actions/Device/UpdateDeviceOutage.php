@@ -9,14 +9,14 @@ use LibreNMS\Enum\MaintenanceStatus;
 
 class UpdateDeviceOutage
 {
-    public function execute(Device $device, bool $available): void
+    public function execute(Device $device): void
     {
         if (LibrenmsConfig::get('graphing.availability_consider_maintenance')
             && $device->getMaintenanceStatus() !== MaintenanceStatus::None) {
             return;
         }
 
-        if ($available) {
+        if ($device->status) {
             // Device is up, close any open outages
             $device->outages()->whereNull('up_again')->get()->each(function (DeviceOutage $outage): void {
                 $outage->up_again = time();

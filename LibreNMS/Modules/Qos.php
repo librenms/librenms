@@ -32,6 +32,7 @@ use LibreNMS\Interfaces\Discovery\QosDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\QosPolling;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -47,9 +48,9 @@ class Qos implements Module
         return [];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice()) && $os instanceof QosDiscovery;
+        return $status->isEnabled() && $connectivity->snmpIsAvailable() && $os instanceof QosDiscovery;
     }
 
     /**
@@ -68,9 +69,9 @@ class Qos implements Module
         }
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice()) && $os instanceof QosPolling;
+        return $status->isEnabled() && $connectivity->snmpIsAvailable() && $os instanceof QosPolling;
     }
 
     /**

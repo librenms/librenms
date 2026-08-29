@@ -39,6 +39,7 @@ use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
@@ -57,9 +58,9 @@ class Ospfv3 implements Module
         return ['ports', 'vrf'];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
@@ -127,9 +128,9 @@ class Ospfv3 implements Module
         Log::info(' (Total neighbors: ' . $ospf_neighbors->count() . ')');
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
@@ -216,7 +217,7 @@ class Ospfv3 implements Module
             'neighbours' => $ospf_neighbors->count(),
         ];
 
-        $datastore->put($os->getDeviceArray(), 'ospf-statistics', ['rrd_def' => $rrd_def], $fields);
+        $datastore->put($os->getDeviceArray(), 'ospfv3-statistics', ['rrd_def' => $rrd_def], $fields);
     }
 
     public function dataExists(Device $device): bool

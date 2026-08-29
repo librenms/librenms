@@ -26,15 +26,14 @@
 
 namespace LibreNMS\Data\Source;
 
+use App\Events\SnmpQueryExecuted;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use DeviceCache;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
@@ -44,33 +43,6 @@ use Symfony\Component\Process\Process;
 class NetSnmpQuery implements SnmpQueryInterface
 {
     private const DEFAULT_FLAGS = '-OQXUte';
-
-    /** @var string[] */
-    private array $commandCleanupPatterns = [
-        '/-c\' \'[\S]+\'/',
-        '/-u\' \'[\S]+\'/',
-        '/-U\' \'[\S]+\'/',
-        '/-A\' \'[\S]+\'/',
-        '/-X\' \'[\S]+\'/',
-        '/-P\' \'[\S]+\'/',
-        '/-H\' \'[\S]+\'/',
-        '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
-    ];
-
-    /** @var string[] */
-    private array $commandReplacementPatterns = [
-        '-c\' \'COMMUNITY\'',
-        '-u\' \'USER\'',
-        '-U\' \'USER\'',
-        '-A\' \'PASSWORD\'',
-        '-X\' \'PASSWORD\'',
-        '-P\' \'PASSWORD\'',
-        '-H\' \'HOSTNAME\'',
-        '\1:HOSTNAME:\3',
-    ];
-
-    private string $output_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
-    private string $output_replacement = '*';
 
     /**
      * @var string[]
@@ -413,23 +385,32 @@ class NetSnmpQuery implements SnmpQueryInterface
 
         return Cache::driver($driver)->rememberForever($key, function () use ($command, $oids) {
             $measure = Measurement::start($command);
-            $proc = new Process($this->buildCli($command, $oids));
+            $cliCommand = $this->buildCli($command, $oids);
+            $proc = new Process($cliCommand);
             $proc->setTimeout(LibrenmsConfig::get('snmp.exec_timeout', 1200));
 
-            $this->logCommand($proc->getCommandLine());
-
             $proc->run();
-            $exitCode = $proc->getExitCode();
-            $output = $proc->getOutput();
-            $stderr = $proc->getErrorOutput();
 
-            // check exit code and log possible bad auth
-            $this->checkExitCode($exitCode, $stderr);
-            $this->logOutput($output, $stderr);
+            $response = new SnmpResponse(
+                $proc->getOutput(),
+                $proc->getErrorOutput(),
+                $proc->getExitCode(),
+            );
+
+            event(new SnmpQueryExecuted(
+                method: $command,
+                oids: $oids,
+                cliCommand: $cliCommand,
+                response: $response,
+                device: $this->device,
+                context: $this->context,
+                mibs: $this->mibs,
+                mibDir: implode(':', $this->mibDirs),
+            ));
 
             $measure->manager()->recordSnmp($measure->end());
 
-            return new SnmpResponse($output, $stderr, $exitCode);
+            return $response;
         });
     }
 
@@ -488,38 +469,6 @@ class NetSnmpQuery implements SnmpQueryInterface
         $dirs = array_unique(array_filter(array_map(fn ($dir) => rtrim((string) $dir, '/'), $dirs)));
 
         return implode(':', $dirs);
-    }
-
-    private function checkExitCode(int $code, string $error): void
-    {
-        if ($code) {
-            if (Str::startsWith($error, 'Invalid authentication protocol specified')) {
-                Eventlog::log('Unsupported SNMP authentication algorithm - ' . $code, $this->device, 'poller', Severity::Error);
-            } elseif (Str::startsWith($error, 'Invalid privacy protocol specified')) {
-                Eventlog::log('Unsupported SNMP privacy algorithm - ' . $code, $this->device, 'poller', Severity::Error);
-            }
-            Log::debug('Exitcode: ' . $code, [$error]);
-        }
-    }
-
-    private function logCommand(string $command): void
-    {
-        if (Debug::isEnabled() && ! Debug::isVerbose()) {
-            $debug_command = preg_replace($this->commandCleanupPatterns, $this->commandReplacementPatterns, $command);
-            Log::debug('SNMP[%c' . $debug_command . '%n]', ['color' => true]);
-        } elseif (Debug::isVerbose()) {
-            Log::debug('SNMP[%c' . $command . '%n]', ['color' => true]);
-        }
-    }
-
-    private function logOutput(string $output, string $error): void
-    {
-        if (Debug::isEnabled() && ! Debug::isVerbose()) {
-            Log::debug(preg_replace($this->output_regex, $this->output_replacement, $output));
-        } elseif (Debug::isVerbose()) {
-            Log::debug($output);
-        }
-        Log::debug($error);
     }
 
     private function limitOids(array $oids): array

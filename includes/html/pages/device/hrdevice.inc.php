@@ -11,10 +11,10 @@ foreach (dbFetchRows('SELECT * FROM `hrDevice` WHERE `device_id` = ? ORDER BY `h
     if ($hrdevice['hrDeviceType'] == 'hrDeviceProcessor') {
         $proc_id = dbFetchCell("SELECT processor_id FROM processors WHERE device_id = '" . $device['device_id'] . "' AND hrDeviceIndex = '" . $hrdevice['hrDeviceIndex'] . "'");
         $proc_url = 'device/device=' . $device['device_id'] . '/tab=health/metric=processor/';
-        $proc_popup = "onmouseover=\"return overlib('<div class=list-large>" . $device['hostname'] . ' - ' . $hrdevice['hrDeviceDescr'];
-        $proc_popup .= "</div><img src=\'graph.php?id=" . $proc_id . '&amp;type=processor_usage&amp;from=' . \App\Facades\LibrenmsConfig::get('time.month') . '&amp;to=' . \App\Facades\LibrenmsConfig::get('time.now') . "&amp;width=400&amp;height=125\'>";
-        $proc_popup .= "', RIGHT" . \App\Facades\LibrenmsConfig::get('overlib_defaults') . ');" onmouseout="return nd();"';
-        echo "<td><a href='$proc_url' $proc_popup>" . $hrdevice['hrDeviceDescr'] . '</a></td>';
+        $popup_content = '<div class="list-large">' . e($device['hostname']) . ' - ' . e($hrdevice['hrDeviceDescr']) . '</div>' .
+            LibreNMS\Util\Url::graphTag(['id' => $proc_id, 'type' => 'processor_usage', 'from' => App\Facades\LibrenmsConfig::get('time.month'), 'to' => App\Facades\LibrenmsConfig::get('time.now'), 'width' => 400, 'height' => 125]);
+        $proc_link = LibreNMS\Util\Url::overlibLink($proc_url, e($hrdevice['hrDeviceDescr']), $popup_content);
+        echo "<td>$proc_link</td>";
 
         $graph_array['height'] = '20';
         $graph_array['width'] = '100';

@@ -1,0 +1,1652 @@
+GUDEADS-EPC8291-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises,
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	Gauge32,
+	Integer32,
+	Unsigned32
+		FROM SNMPv2-SMI
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP
+		FROM SNMPv2-CONF;
+
+gudeads MODULE-IDENTITY
+	LAST-UPDATED "202409261526Z"	-- Sep 26, 2024, 3:26:00 PM
+	ORGANIZATION "GUDE Systems GmbH"
+	CONTACT-INFO
+		"Von-der-Wettern-Str. 23
+		51149 Cologne
+		Germany
+		https://www.gude-systems.com"
+	DESCRIPTION
+		"Expert Power Control 8291 MIB"
+	-- 1.3.6.1.4.1.28507
+	::= { enterprises 28507 }
+
+
+
+epc8291PortAmperageEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8291DCPowerIndex,
+		epc8291DCVoltage,
+		epc8291DCCurrent,
+		epc8291DCPower}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		current is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.98.3.11
+	::= { events 11 }
+
+epc8291DCVoltage OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Voltage on DC Power Channel (eFuse)"
+	-- 1.3.6.1.4.1.28507.98.1.5.17.2.1.2
+	::= { epc8291DCPowerEntry 2 }
+
+
+epc8291DCPowerChan OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.98.1.5.17
+	::= { epc8291IntSensors 17 }
+
+epc8291ActiveDCPowerChan OBJECT-TYPE
+	SYNTAX  Unsigned32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of suppported DC Power Channels."
+	-- 1.3.6.1.4.1.28507.98.1.5.17.1
+	::= { epc8291DCPowerChan 1 }
+
+
+epc8291DCPowerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8291DCPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"All available DC Channel Interfaces."
+	-- 1.3.6.1.4.1.28507.98.1.5.17.2
+	::= { epc8291DCPowerChan 2 }
+
+
+epc8291DCPowerEntry OBJECT-TYPE
+	SYNTAX  Epc8291DCPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry containing management information
+		applicable to a particular DC Power Channel."
+	INDEX {
+		epc8291DCPowerIndex }
+	-- 1.3.6.1.4.1.28507.98.1.5.17.2.1
+	::= { epc8291DCPowerTable 1 }
+
+
+Epc8291DCPowerEntry ::= SEQUENCE {
+
+	epc8291DCPowerIndex Integer32,
+	epc8291DCVoltage    Gauge32,
+	epc8291DCCurrent    Gauge32,
+	epc8291DCPower      Integer32 }
+
+
+epc8291DCPower OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"mW"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Power on DC Power Channel (eFuse)"
+	-- 1.3.6.1.4.1.28507.98.1.5.17.2.1.4
+	::= { epc8291DCPowerEntry 4 }
+
+
+epc8291DCCurrent OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Current on DC Power Channel (eFuse)"
+	-- 1.3.6.1.4.1.28507.98.1.5.17.2.1.3
+	::= { epc8291DCPowerEntry 3 }
+
+
+epc8291DCPowerIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Index of Power Channel entries"
+	-- 1.3.6.1.4.1.28507.98.1.5.17.2.1.1
+	::= { epc8291DCPowerEntry 1 }
+
+
+epc8291DeviceInfo OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.98.1.1.2
+	::= { epc8291CommonConfig 2 }
+
+epc8291ProdName OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The Product Name of the device."
+	-- 1.3.6.1.4.1.28507.98.1.1.2.1
+	::= { epc8291DeviceInfo 1 }
+
+
+epc8291FWVersion OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Firmware Version of the device."
+	-- 1.3.6.1.4.1.28507.98.1.1.2.2
+	::= { epc8291DeviceInfo 2 }
+
+
+epc8291HostName OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The configured Host Name."
+	-- 1.3.6.1.4.1.28507.98.1.1.2.3
+	::= { epc8291DeviceInfo 3 }
+
+
+epc8291PhysAddress OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The MAC address of the device."
+	-- 1.3.6.1.4.1.28507.98.1.1.2.4
+	::= { epc8291DeviceInfo 4 }
+
+
+epc8291SerialNumber OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The Serial Number of the device. Not available for all devices. Production start 2026."
+	-- 1.3.6.1.4.1.28507.98.1.1.2.5
+	::= { epc8291DeviceInfo 5 }
+
+
+epc8291ExtInputToggleCount OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of times the Input has changed its state."
+	-- 1.3.6.1.4.1.28507.98.1.6.2.2.1.3
+	::= { epc8291ExtInputEntry 3 }
+
+
+epc8291ExtInputs OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.98.1.6.2
+	::= { epc8291ExtSensors 2 }
+
+epc8291ExtInputEntry OBJECT-TYPE
+	SYNTAX  Epc8291ExtInputEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc8291ExtInputIndex }
+	-- 1.3.6.1.4.1.28507.98.1.6.2.2.1
+	::= { epc8291ExtInputTable 1 }
+
+
+Epc8291ExtInputEntry ::= SEQUENCE {
+
+	epc8291ExtInputIndex       Unsigned32,
+	epc8291ExtInput            INTEGER,
+	epc8291ExtInputToggleCount Unsigned32,
+	epc8291ExtInputName        OCTET STRING,
+	epc8291ExtInputPortNum     Integer32,
+	epc8291ExtInputBlockIndex  Integer32 }
+
+
+epc8291ExtInput OBJECT-TYPE
+	SYNTAX  INTEGER {
+			lo(0),
+			hi(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Input state of device"
+	-- 1.3.6.1.4.1.28507.98.1.6.2.2.1.2
+	::= { epc8291ExtInputEntry 2 }
+
+
+epc8291ExtActiveInputs OBJECT-TYPE
+	SYNTAX  Unsigned32 (1..12)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of suppported Input Channels."
+	-- 1.3.6.1.4.1.28507.98.1.6.2.1
+	::= { epc8291ExtInputs 1 }
+
+
+epc8291ExtInputTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8291ExtInputEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.98.1.6.2.2
+	::= { epc8291ExtInputs 2 }
+
+
+epc8291ExtInputIndex OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.98.1.6.2.2.1.1
+	::= { epc8291ExtInputEntry 1 }
+
+
+epc8291ExtInputName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of
+		the Input"
+	-- 1.3.6.1.4.1.28507.98.1.6.2.2.1.32
+	::= { epc8291ExtInputEntry 32 }
+
+
+epc8291ExtInputPortNum OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of external Sensor Port when value greater zero, else device built-in Input."
+	-- 1.3.6.1.4.1.28507.98.1.6.2.2.1.33
+	::= { epc8291ExtInputEntry 33 }
+
+
+epc8291ExtInputBlockIndex OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Either index of device built-in Input, or index of Input in external sensor."
+	-- 1.3.6.1.4.1.28507.98.1.6.2.2.1.34
+	::= { epc8291ExtInputEntry 34 }
+
+
+epc8291NTPClient OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.98.1.5.15
+	::= { epc8291IntSensors 15 }
+
+epc8291NTPUnixTime OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"show received NTP time as unixtime (secs since 1 January 1970)"
+	-- 1.3.6.1.4.1.28507.98.1.5.15.2
+	::= { epc8291NTPClient 2 }
+
+
+epc8291NTPTimeValid OBJECT-TYPE
+	SYNTAX  INTEGER {
+			notime(0),
+			valid(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Show if valid Time is received"
+	-- 1.3.6.1.4.1.28507.98.1.5.15.1
+	::= { epc8291NTPClient 1 }
+
+
+epc8291CPUSensors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.98.1.5.14
+	::= { epc8291IntSensors 14 }
+
+epc8291CPUSensorVsystem OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"System Voltage on CPU Board"
+	-- 1.3.6.1.4.1.28507.98.1.5.14.1
+	::= { epc8291CPUSensors 1 }
+
+
+epc8291CPUSensorVaux OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Auxiliary Voltage on CPU Board"
+	-- 1.3.6.1.4.1.28507.98.1.5.14.2
+	::= { epc8291CPUSensors 2 }
+
+
+epc8291CPUSensorVmain OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Main Voltage on CPU Board"
+	-- 1.3.6.1.4.1.28507.98.1.5.14.3
+	::= { epc8291CPUSensors 3 }
+
+
+epc8291CPUSensorTcpu OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Temperature on CPU Board"
+	-- 1.3.6.1.4.1.28507.98.1.5.14.4
+	::= { epc8291CPUSensors 4 }
+
+
+epc8291BankPowerSource OBJECT-TYPE
+	SYNTAX  Integer32 (1..6)
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Power Source of Port Bank"
+	-- 1.3.6.1.4.1.28507.98.1.5.8.1.2
+	::= { epc8291BankPowerEntry 2 }
+
+
+
+epc8291LineAmperageEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8291PowerIndex,
+		epc8291PowerActive,
+		epc8291Current,
+		epc8291Voltage,
+		epc8291Frequency,
+		epc8291PowerApparent,
+		epc8291PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		current is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.98.3.9
+	::= { events 9 }
+
+
+epc8291LineResidualCurrentEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8291PowerIndex,
+		epc8291PowerActive,
+		epc8291Current,
+		epc8291ResidualCurrent,
+		epc8291Voltage,
+		epc8291Frequency,
+		epc8291PowerApparent,
+		epc8291PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured residual
+		current Type A is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.98.3.10
+	::= { events 10 }
+
+epc8291FanTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8291FanEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Fan Control Table
+
+		"
+	-- 1.3.6.1.4.1.28507.98.1.3.5
+	::= { epc8291IntActors 5 }
+
+
+epc8291FanEntry OBJECT-TYPE
+	SYNTAX  Epc8291FanEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc8291FanIndex }
+	-- 1.3.6.1.4.1.28507.98.1.3.5.1
+	::= { epc8291FanTable 1 }
+
+
+Epc8291FanEntry ::= SEQUENCE {
+
+	epc8291FanIndex Integer32,
+	epc8291FanMode  INTEGER,
+	epc8291FanLevel Gauge32 }
+
+
+epc8291FanIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.98.1.3.5.1.1
+	::= { epc8291FanEntry 1 }
+
+
+epc8291FanMode OBJECT-TYPE
+	SYNTAX  INTEGER {
+			full(1),
+			auto(0) }
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"shows the Fan Mode"
+	-- 1.3.6.1.4.1.28507.98.1.3.5.1.2
+	::= { epc8291FanEntry 2 }
+
+
+epc8291FanLevel OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"shows the actual Fan level"
+	-- 1.3.6.1.4.1.28507.98.1.3.5.1.3
+	::= { epc8291FanEntry 3 }
+
+
+epc8291PowerSourceVoltage OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Voltage of Power Source"
+	-- 1.3.6.1.4.1.28507.98.1.5.9.1.2
+	::= { epc8291PowerSourceEntry 2 }
+
+
+epc8291BankPowerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8291BankPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Electrical Values for Port Bank"
+	-- 1.3.6.1.4.1.28507.98.1.5.8
+	::= { epc8291IntSensors 8 }
+
+
+epc8291PowerSourceTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8291PowerSourceEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Electrical Values for Power Source"
+	-- 1.3.6.1.4.1.28507.98.1.5.9
+	::= { epc8291IntSensors 9 }
+
+
+epc8291BankPowerEntry OBJECT-TYPE
+	SYNTAX  Epc8291BankPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc8291BankPowerIndex }
+	-- 1.3.6.1.4.1.28507.98.1.5.8.1
+	::= { epc8291BankPowerTable 1 }
+
+
+Epc8291BankPowerEntry ::= SEQUENCE {
+
+	epc8291BankPowerIndex   Integer32,
+	epc8291BankPowerSource  Integer32,
+	epc8291BankPowerVoltage Gauge32,
+	epc8291BankPowerCurrent Gauge32 }
+
+
+epc8291PowerSourceEntry OBJECT-TYPE
+	SYNTAX  Epc8291PowerSourceEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc8291PowerSourceIndex }
+	-- 1.3.6.1.4.1.28507.98.1.5.9.1
+	::= { epc8291PowerSourceTable 1 }
+
+
+Epc8291PowerSourceEntry ::= SEQUENCE {
+
+	epc8291PowerSourceIndex   Integer32,
+	epc8291PowerSourceVoltage Gauge32,
+	epc8291PowerSourceCurrent Gauge32 }
+
+
+epc8291BankPowerIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.98.1.5.8.1.1
+	::= { epc8291BankPowerEntry 1 }
+
+
+epc8291PowerSourceIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.98.1.5.9.1.1
+	::= { epc8291PowerSourceEntry 1 }
+
+
+
+epc8291eFuseFailEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8291PortIndex,
+		epc8291PortName,
+		epc8291PortState}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when an eFuse fails"
+	-- 1.3.6.1.4.1.28507.98.3.7
+	::= { events 7 }
+
+epc8291PowerSourceCurrent OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Current of Power Source"
+	-- 1.3.6.1.4.1.28507.98.1.5.9.1.3
+	::= { epc8291PowerSourceEntry 3 }
+
+
+epc8291BankPowerCurrent OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Current of Port Bank"
+	-- 1.3.6.1.4.1.28507.98.1.5.8.1.4
+	::= { epc8291BankPowerEntry 4 }
+
+
+epc8291BankPowerVoltage OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Voltage of Port Bank"
+	-- 1.3.6.1.4.1.28507.98.1.5.8.1.3
+	::= { epc8291BankPowerEntry 3 }
+
+
+-- Notification Types
+--
+
+events OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.98.3
+	::= { gadsEPC8291 3 }
+
+
+epc8291SwitchEvtPort NOTIFICATION-TYPE
+	OBJECTS {
+		epc8291PortIndex,
+		epc8291PortName,
+		epc8291PortState,
+		epc8291PortSwitchCount}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a port is switched"
+	-- 1.3.6.1.4.1.28507.98.3.1
+	::= { events 1 }
+
+
+epc8291TempEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8291SensorIndex,
+		epc8291TempSensor}
+	STATUS  current
+	DESCRIPTION
+		"temperature limits exceeded"
+	-- 1.3.6.1.4.1.28507.98.3.2
+	::= { events 2 }
+
+
+epc8291AirPressureEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8291SensorIndex,
+		epc8291AirPressure}
+	STATUS  current
+	DESCRIPTION
+		"Air Pressure limits exceeded
+
+		"
+	-- 1.3.6.1.4.1.28507.98.3.5
+	::= { events 5 }
+
+
+epc8291DewPtDiffEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8291SensorIndex,
+		epc8291DewPointDiff}
+	STATUS  current
+	DESCRIPTION
+		"Dew Point Difference limits exceeded"
+	-- 1.3.6.1.4.1.28507.98.3.6
+	::= { events 6 }
+
+
+epc8291OVPEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8291OVPIndex,
+		epc8291OVPStatus}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when the OVP status changes"
+	-- 1.3.6.1.4.1.28507.98.3.8
+	::= { events 8 }
+
+epc8291Voltage OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Voltage on Power Channel"
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.6
+	::= { epc8291PowerEntry 6 }
+
+
+epc8291Frequency OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 hz"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Frequency of Power Channel"
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.7
+	::= { epc8291PowerEntry 7 }
+
+
+epc8291AbsEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Absolute Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.12
+	::= { epc8291PowerEntry 12 }
+
+
+epc8291AbsEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Resettable Absolute Active Energy counter.
+		Writing '0' resets all resettable counter."
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.13
+	::= { epc8291PowerEntry 13 }
+
+
+epc8291AbsEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Absolute Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.14
+	::= { epc8291PowerEntry 14 }
+
+
+epc8291ResetTime OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Time in seconds since last Energy
+		Counter reset."
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.15
+	::= { epc8291PowerEntry 15 }
+
+
+epc8291ForwEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Forward Active Energy counter."
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.16
+	::= { epc8291PowerEntry 16 }
+
+
+epc8291ForwEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Forward Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.17
+	::= { epc8291PowerEntry 17 }
+
+
+epc8291ForwEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Forward Active Energy counter."
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.18
+	::= { epc8291PowerEntry 18 }
+
+
+epc8291ForwEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Forward Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.19
+	::= { epc8291PowerEntry 19 }
+
+
+epc8291RevEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reverse Active Energy counter."
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.20
+	::= { epc8291PowerEntry 20 }
+
+
+epc8291RevEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reverse Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.21
+	::= { epc8291PowerEntry 21 }
+
+
+epc8291RevEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Reverse Active Energy counter."
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.22
+	::= { epc8291PowerEntry 22 }
+
+
+epc8291RevEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Reverse Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.23
+	::= { epc8291PowerEntry 23 }
+
+
+epc8291AbsEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Absolute Active Energy counter."
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.3
+	::= { epc8291PowerEntry 3 }
+
+
+gadsEPC8291 OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.98
+	::= { gudeads 98 }
+
+-- Scalars and Tables
+--
+
+epc8291Objects OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.98.1
+	::= { gadsEPC8291 1 }
+
+epc8291CommonConfig OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.98.1.1
+	::= { epc8291Objects 1 }
+
+epc8291SNMPaccess OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.98.1.1.1
+	::= { epc8291CommonConfig 1 }
+
+epc8291TrapCtrl OBJECT-TYPE
+	SYNTAX  Integer32 (0..3)
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"0 = off
+		1 = Ver. 1
+		2 = Ver. 2c
+		3 = Ver. 3"
+	-- 1.3.6.1.4.1.28507.98.1.1.1.1
+	::= { epc8291SNMPaccess 1 }
+
+
+epc8291TrapIPTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8291TrapIPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"list of all Trap receiver"
+	-- 1.3.6.1.4.1.28507.98.1.1.1.2
+	::= { epc8291SNMPaccess 2 }
+
+
+epc8291TrapIPEntry OBJECT-TYPE
+	SYNTAX  Epc8291TrapIPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"an entry containing management
+		informations regarding the list of trap
+		receivers"
+	INDEX {
+		epc8291TrapIPIndex }
+	-- 1.3.6.1.4.1.28507.98.1.1.1.2.1
+	::= { epc8291TrapIPTable 1 }
+
+
+Epc8291TrapIPEntry ::= SEQUENCE {
+
+	epc8291TrapIPIndex Integer32,
+	epc8291TrapAddr    OCTET STRING }
+
+
+epc8291TrapIPIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..8)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A unique value, greater than zero, for each receiver slot."
+	-- 1.3.6.1.4.1.28507.98.1.1.1.2.1.1
+	::= { epc8291TrapIPEntry 1 }
+
+
+epc8291TrapAddr OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..99))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"DNS name or IP address specifying one Trap receiver slot.
+		A port can optionally be specified: 'name:port' An empty
+		string disables this slot."
+	-- 1.3.6.1.4.1.28507.98.1.1.1.2.1.2
+	::= { epc8291TrapIPEntry 2 }
+
+
+epc8291DeviceConfig OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.98.1.2
+	::= { epc8291Objects 2 }
+
+epc8291IntActors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.98.1.3
+	::= { epc8291Objects 3 }
+
+epc8291relayports OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.98.1.3.1
+	::= { epc8291IntActors 1 }
+
+-- the Interfaces table
+-- The Interfaces table contains information on the entity's
+-- interfaces.  Each sub-layer below the internetwork-layer
+-- of a network interface is considered to be an interface.
+
+epc8291portTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8291portEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"list of all EPC Relay Ports"
+	-- 1.3.6.1.4.1.28507.98.1.3.1.2
+	::= { epc8291relayports 2 }
+
+
+epc8291portEntry OBJECT-TYPE
+	SYNTAX  Epc8291portEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry containing management information applicable to a
+		particular relay port."
+	INDEX {
+		epc8291PortIndex }
+	-- 1.3.6.1.4.1.28507.98.1.3.1.2.1
+	::= { epc8291portTable 1 }
+
+
+Epc8291portEntry ::= SEQUENCE {
+
+	epc8291PortIndex         Integer32,
+	epc8291PortName          OCTET STRING,
+	epc8291PortState         INTEGER,
+	epc8291PortSwitchCount   Integer32,
+	epc8291PortStartupMode   INTEGER,
+	epc8291PortStartupDelay  Integer32,
+	epc8291PortRepowerTime   Integer32,
+	epc8291PortResetDuration Integer32 }
+
+
+epc8291PortName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..15))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a Relay Port."
+	-- 1.3.6.1.4.1.28507.98.1.3.1.2.1.2
+	::= { epc8291portEntry 2 }
+
+
+epc8291PortState OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1),
+			fuseblown(2),
+			error(3) }
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"current state of a Relay Port"
+	-- 1.3.6.1.4.1.28507.98.1.3.1.2.1.3
+	::= { epc8291portEntry 3 }
+
+
+epc8291PortSwitchCount OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The total number of switch actions ocurred on a Relay Port.
+		Does not count switch commands which will not switch
+		the ralay state, so just real relay switches are displayed here."
+	-- 1.3.6.1.4.1.28507.98.1.3.1.2.1.4
+	::= { epc8291portEntry 4 }
+
+
+epc8291PortStartupMode OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1),
+			laststate(2) }
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"set Mode of startup sequence (off, on , remember last state)"
+	DEFVAL { off }
+	-- 1.3.6.1.4.1.28507.98.1.3.1.2.1.5
+	::= { epc8291portEntry 5 }
+
+
+epc8291PortStartupDelay OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for startup action"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.98.1.3.1.2.1.6
+	::= { epc8291portEntry 6 }
+
+
+epc8291PortRepowerTime OBJECT-TYPE
+	SYNTAX  Integer32 (0..65535)
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for repower port after switching off"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.98.1.3.1.2.1.7
+	::= { epc8291portEntry 7 }
+
+
+epc8291PortResetDuration OBJECT-TYPE
+	SYNTAX  Integer32 (0..65535)
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for turning Port on again after Reset action"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.98.1.3.1.2.1.8
+	::= { epc8291portEntry 8 }
+
+
+epc8291Buzzer OBJECT-TYPE
+	SYNTAX  Integer32 (0..1)
+	UNITS	"0 = Off, 1 = On"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"turn Buzzer on and off"
+	-- 1.3.6.1.4.1.28507.98.1.3.10
+	::= { epc8291IntActors 10 }
+
+
+epc8291ExtActors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.98.1.4
+	::= { epc8291Objects 4 }
+
+epc8291IntSensors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.98.1.5
+	::= { epc8291Objects 5 }
+
+epc8291PowerChan OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.98.1.5.1
+	::= { epc8291IntSensors 1 }
+
+epc8291ActivePowerChan OBJECT-TYPE
+	SYNTAX  Unsigned32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of suppported Power Channels."
+	-- 1.3.6.1.4.1.28507.98.1.5.1.1
+	::= { epc8291PowerChan 1 }
+
+
+epc8291PowerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8291PowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"All available Channel Interfaces."
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2
+	::= { epc8291PowerChan 2 }
+
+
+epc8291PowerEntry OBJECT-TYPE
+	SYNTAX  Epc8291PowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry containing management information
+		applicable to a particular Power Channel."
+	INDEX {
+		epc8291PowerIndex }
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1
+	::= { epc8291PowerTable 1 }
+
+
+Epc8291PowerEntry ::= SEQUENCE {
+
+	epc8291PowerIndex                   Integer32,
+	epc8291ChanStatus                   Integer32,
+	epc8291AbsEnergyActive              Gauge32,
+	epc8291PowerActive                  Integer32,
+	epc8291Current                      Gauge32,
+	epc8291Voltage                      Gauge32,
+	epc8291Frequency                    Gauge32,
+	epc8291PowerFactor                  Integer32,
+	epc8291Pangle                       Integer32,
+	epc8291PowerApparent                Integer32,
+	epc8291PowerReactive                Integer32,
+	epc8291AbsEnergyReactive            Gauge32,
+	epc8291AbsEnergyActiveResettable    Gauge32,
+	epc8291AbsEnergyReactiveResettable  Gauge32,
+	epc8291ResetTime                    Gauge32,
+	epc8291ForwEnergyActive             Gauge32,
+	epc8291ForwEnergyReactive           Gauge32,
+	epc8291ForwEnergyActiveResettable   Gauge32,
+	epc8291ForwEnergyReactiveResettable Gauge32,
+	epc8291RevEnergyActive              Gauge32,
+	epc8291RevEnergyReactive            Gauge32,
+	epc8291RevEnergyActiveResettable    Gauge32,
+	epc8291RevEnergyReactiveResettable  Gauge32,
+	epc8291ResidualCurrent              Unsigned32,
+	epc8291LineSensorName               OCTET STRING }
+
+
+epc8291ChanStatus OBJECT-TYPE
+	SYNTAX  Integer32 (0..1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"0 = data not active, 1 = data valid"
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.2
+	::= { epc8291PowerEntry 2 }
+
+
+epc8291PowerActive OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Active Power"
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.4
+	::= { epc8291PowerEntry 4 }
+
+
+epc8291Current OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Curent on Power Channel."
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.5
+	::= { epc8291PowerEntry 5 }
+
+
+epc8291PowerFactor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.001"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Power Factor of Channel between
+		-1.0 and 1.00"
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.8
+	::= { epc8291PowerEntry 8 }
+
+
+epc8291Pangle OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 degree"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Phase Angle between Voltage
+		and L Line Current between
+		-180.0 and 180.0"
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.9
+	::= { epc8291PowerEntry 9 }
+
+
+epc8291PowerApparent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"VA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"L Line Mean Apparent Power"
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.10
+	::= { epc8291PowerEntry 10 }
+
+
+epc8291PowerReactive OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"VAR"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"L Line Mean Reactive Power"
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.11
+	::= { epc8291PowerEntry 11 }
+
+
+epc8291OVPTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8291OVPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Overvoltage Protection Table
+		This table may not be present
+		on devices without OVP feature"
+	-- 1.3.6.1.4.1.28507.98.1.5.2
+	::= { epc8291IntSensors 2 }
+
+
+epc8291OVPEntry OBJECT-TYPE
+	SYNTAX  Epc8291OVPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc8291OVPIndex }
+	-- 1.3.6.1.4.1.28507.98.1.5.2.1
+	::= { epc8291OVPTable 1 }
+
+
+Epc8291OVPEntry ::= SEQUENCE {
+
+	epc8291OVPIndex  Integer32,
+	epc8291OVPStatus INTEGER }
+
+
+epc8291ExtSensors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.98.1.6
+	::= { epc8291Objects 6 }
+
+epc8291SensorTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8291SensorEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.98.1.6.1
+	::= { epc8291ExtSensors 1 }
+
+
+epc8291SensorEntry OBJECT-TYPE
+	SYNTAX  Epc8291SensorEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc8291SensorIndex }
+	-- 1.3.6.1.4.1.28507.98.1.6.1.1
+	::= { epc8291SensorTable 1 }
+
+
+Epc8291SensorEntry ::= SEQUENCE {
+
+	epc8291SensorIndex   Integer32,
+	epc8291TempSensor    Integer32,
+	epc8291HygroSensor   Integer32,
+	epc8291AirPressure   Integer32,
+	epc8291DewPoint      Integer32,
+	epc8291DewPointDiff  Integer32,
+	epc8291ExtSensorName OCTET STRING }
+
+
+epc8291SensorIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.98.1.6.1.1.1
+	::= { epc8291SensorEntry 1 }
+
+
+epc8291TempSensor OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual temperature"
+	-- 1.3.6.1.4.1.28507.98.1.6.1.1.2
+	::= { epc8291SensorEntry 2 }
+
+
+epc8291AirPressure OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual air pressure"
+	-- 1.3.6.1.4.1.28507.98.1.6.1.1.5
+	::= { epc8291SensorEntry 5 }
+
+
+epc8291DewPoint OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"dew point for actual temperature and humidity"
+	-- 1.3.6.1.4.1.28507.98.1.6.1.1.6
+	::= { epc8291SensorEntry 6 }
+
+
+epc8291DewPointDiff OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"difference between dew point and actual
+		temperature (Temp - DewPoint)"
+	-- 1.3.6.1.4.1.28507.98.1.6.1.1.7
+	::= { epc8291SensorEntry 7 }
+
+
+epc8291HygroSensor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 percent humidity"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual humidity"
+	-- 1.3.6.1.4.1.28507.98.1.6.1.1.3
+	::= { epc8291SensorEntry 3 }
+
+
+-- Conformance
+--
+
+epc8291Conf OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.98.2
+	::= { gadsEPC8291 2 }
+
+-- Groups
+--
+
+epc8291Groups OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.98.2.1
+	::= { epc8291Conf 1 }
+
+-- Compliance
+--
+
+epc8291Compls OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.98.2.2
+	::= { epc8291Conf 2 }
+
+epc8291BasicGroup OBJECT-GROUP
+	OBJECTS {
+		epc8291TrapCtrl,
+		epc8291TrapIPIndex,
+		epc8291TrapAddr,
+		epc8291portNumber,
+		epc8291PortIndex,
+		epc8291PortName,
+		epc8291PortState,
+		epc8291PortSwitchCount,
+		epc8291PortStartupMode,
+		epc8291PortStartupDelay,
+		epc8291PortRepowerTime,
+		epc8291Buzzer,
+		epc8291ActivePowerChan,
+		epc8291PowerIndex,
+		epc8291ChanStatus,
+		epc8291AbsEnergyActive,
+		epc8291PowerActive,
+		epc8291Current,
+		epc8291Voltage,
+		epc8291Frequency,
+		epc8291PowerFactor,
+		epc8291Pangle,
+		epc8291PowerApparent,
+		epc8291PowerReactive,
+		epc8291AbsEnergyReactive,
+		epc8291AbsEnergyActiveResettable,
+		epc8291AbsEnergyReactiveResettable,
+		epc8291ResetTime,
+		epc8291ForwEnergyActive,
+		epc8291ForwEnergyReactive,
+		epc8291ForwEnergyActiveResettable,
+		epc8291ForwEnergyReactiveResettable,
+		epc8291RevEnergyActive,
+		epc8291RevEnergyReactive,
+		epc8291RevEnergyActiveResettable,
+		epc8291RevEnergyReactiveResettable,
+		epc8291ResidualCurrent,
+		epc8291LineSensorName,
+		epc8291OVPIndex,
+		epc8291OVPStatus,
+		epc8291SensorIndex,
+		epc8291TempSensor,
+		epc8291HygroSensor,
+		epc8291AirPressure,
+		epc8291DewPoint,
+		epc8291DewPointDiff,
+		epc8291ExtSensorName,
+		epc8291PortResetDuration,
+		epc8291BankPowerIndex,
+		epc8291BankPowerVoltage,
+		epc8291BankPowerCurrent,
+		epc8291PowerSourceIndex,
+		epc8291PowerSourceVoltage,
+		epc8291PowerSourceCurrent,
+		epc8291FanIndex,
+		epc8291FanMode,
+		epc8291FanLevel,
+		epc8291CPUSensorVsystem,
+		epc8291CPUSensorVaux,
+		epc8291CPUSensorVmain,
+		epc8291CPUSensorTcpu,
+		epc8291BankPowerSource,
+		epc8291NTPTimeValid,
+		epc8291NTPUnixTime,
+		epc8291NTPLastValidTimestamp,
+		epc8291ExtActiveInputs,
+		epc8291ExtInputIndex,
+		epc8291ExtInput,
+		epc8291ExtInputName,
+		epc8291ExtInputPortNum,
+		epc8291ExtInputBlockIndex,
+		epc8291ExtInputToggleCount,
+		epc8291ProdName,
+		epc8291FWVersion,
+		epc8291HostName,
+		epc8291PhysAddress,
+		epc8291SerialNumber,
+		epc8291ActiveDCPowerChan,
+		epc8291DCPowerIndex,
+		epc8291DCVoltage,
+		epc8291DCCurrent,
+		epc8291DCPower }
+	STATUS  current
+	DESCRIPTION
+		"Basic objects."
+	-- 1.3.6.1.4.1.28507.98.2.1.1
+	::= { epc8291Groups 1 }
+
+epc8291NotificationGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		epc8291SwitchEvtPort,
+		epc8291TempEvtSen,
+		epc8291HygroEvtSen,
+		epc8291AirPressureEvtSen,
+		epc8291DewPtDiffEvtSen,
+		epc8291OVPEvt,
+		epc8291eFuseFailEvt,
+		epc8291LineAmperageEvt,
+		epc8291LineResidualCurrentEvt,
+		epc8291BankAmperageEvt,
+		epc8291ExtInputEvt,
+		epc8291LineVoltageEvt,
+		epc8291LinePowerEvt,
+		epc8291PortAmperageEvt }
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.98.2.1.2
+	::= { epc8291Groups 2 }
+
+
+epc8291HygroEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8291SensorIndex,
+		epc8291HygroSensor}
+	STATUS  current
+	DESCRIPTION
+		"hygro limits exceeded"
+	-- 1.3.6.1.4.1.28507.98.3.3
+	::= { events 3 }
+
+epc8291OVPStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+			unknown(2),
+			ok(1),
+			failure(0) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"shows the status of the
+		built-in Overvoltage Protection"
+	-- 1.3.6.1.4.1.28507.98.1.5.2.1.2
+	::= { epc8291OVPEntry 2 }
+
+
+epc8291LineSensorName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a
+		Line Sensor"
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.100
+	::= { epc8291PowerEntry 100 }
+
+
+epc8291ExtSensorName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a
+		external Sensor"
+	-- 1.3.6.1.4.1.28507.98.1.6.1.1.32
+	::= { epc8291SensorEntry 32 }
+
+
+epc8291PortIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..21)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A unique value, greater than zero, for each Relay Port."
+	-- 1.3.6.1.4.1.28507.98.1.3.1.2.1.1
+	::= { epc8291portEntry 1 }
+
+
+epc8291PowerIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Index of Power Channel entries"
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.1
+	::= { epc8291PowerEntry 1 }
+
+
+epc8291OVPIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.98.1.5.2.1.1
+	::= { epc8291OVPEntry 1 }
+
+
+epc8291portNumber OBJECT-TYPE
+	SYNTAX  Integer32 (1..21)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The number of Relay Ports"
+	-- 1.3.6.1.4.1.28507.98.1.3.1.1
+	::= { epc8291relayports 1 }
+
+
+epc8291NTPLastValidTimestamp OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"show seconds since last valid NTP timestamp received"
+	-- 1.3.6.1.4.1.28507.98.1.5.15.3
+	::= { epc8291NTPClient 3 }
+
+
+
+epc8291BankAmperageEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8291BankPowerIndex,
+		epc8291BankPowerSource,
+		epc8291BankPowerVoltage,
+		epc8291BankPowerCurrent}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		current is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.98.3.20
+	::= { events 20 }
+
+epc8291ResidualCurrent OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"0.1 mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Residual Current on Power Channel.
+		According Type A IEC 60755. Only visible on
+		models that support this feature."
+	-- 1.3.6.1.4.1.28507.98.1.5.1.2.1.24
+	::= { epc8291PowerEntry 24 }
+
+
+
+epc8291ExtInputEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8291ExtInputIndex,
+		epc8291ExtInput,
+		epc8291ExtInputToggleCount,
+		epc8291ExtInputName,
+		epc8291ExtInputPortNum,
+		epc8291ExtInputBlockIndex}
+	STATUS  current
+	DESCRIPTION
+		"Change of external sensor input."
+	-- 1.3.6.1.4.1.28507.98.3.25
+	::= { events 25 }
+
+
+epc8291LineVoltageEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8291PowerIndex,
+		epc8291PowerActive,
+		epc8291Current,
+		epc8291Voltage,
+		epc8291Frequency,
+		epc8291PowerApparent,
+		epc8291PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		voltage is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.98.3.26
+	::= { events 26 }
+
+
+epc8291LinePowerEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8291PowerIndex,
+		epc8291PowerActive,
+		epc8291Current,
+		epc8291Voltage,
+		epc8291Frequency,
+		epc8291PowerApparent,
+		epc8291PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		power is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.98.3.27
+	::= { events 27 }
+
+END

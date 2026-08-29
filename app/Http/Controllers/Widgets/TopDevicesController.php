@@ -36,6 +36,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use LibreNMS\Enum\IfOperStatus;
@@ -138,7 +139,7 @@ class TopDevicesController extends WidgetController
     {
         return [
             Url::deviceLink($device, $device->shortDisplayName()),
-            Url::deviceLink($device, Url::minigraphImage(
+            Url::deviceLink($device, new HtmlString(Url::minigraphImage(
                 $device,
                 Carbon::now()->subDays(1)->timestamp,
                 Carbon::now()->timestamp,
@@ -146,7 +147,7 @@ class TopDevicesController extends WidgetController
                 'no',
                 150,
                 21
-            ), $graph_params, 0, 0, 0),
+            )), $graph_params, 0, 0),
         ];
     }
 

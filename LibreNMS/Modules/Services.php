@@ -29,6 +29,7 @@ use App\Models\Device;
 use App\Models\Service;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Services as ServicesHelper;
 use SnmpQuery;
@@ -46,11 +47,11 @@ class Services implements Module
     /**
      * @inheritDoc
      */
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
         $device = $os->getDevice();
 
-        if (! $status->isEnabledAndDeviceUp($device)) {
+        if (! $status->isEnabled() || ! $connectivity->snmpIsAvailable()) {
             return false;
         }
 
@@ -103,7 +104,7 @@ class Services implements Module
     /**
      * @inheritDoc
      */
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
         // Services currently only support discovery, not polling.
         return false;

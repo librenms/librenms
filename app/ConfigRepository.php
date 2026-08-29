@@ -26,6 +26,7 @@
 
 namespace App;
 
+use App\Events\SettingChanged;
 use App\Models\Callback;
 use App\Models\GraphType;
 use Exception;
@@ -34,7 +35,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use LibreNMS\DB\Eloquent;
-use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Version;
 use Log;
@@ -42,17 +42,27 @@ use Symfony\Component\Yaml\Yaml;
 
 class ConfigRepository
 {
+    /** @var array<string, mixed> */
     private array $config;
-    private ?array $fping4_cmd = null;
-    private ?array $fping6_cmd = null;
 
     /**
      * Load the config, if the database connected, pull in database settings.
      *
      * return &array
      */
-    public function __construct()
+    public function __construct(private readonly bool $loadUserConfiguration = true)
     {
+        if (! $this->loadUserConfiguration) {
+            $this->config = [];
+            $this->loadPreUserConfigDefaults();
+            $this->loadAllOsDefinitions();
+            $this->loadPostUserConfigDefaults();
+
+            $this->loadRuntimeSettings();
+
+            return;
+        }
+
         // load config settings that can be cached
         $cache_ttl = config('librenms.config_cache_ttl');
         $this->config = Cache::driver($cache_ttl == 0 ? 'null' : 'file')->remember('librenms-config', $cache_ttl, function () {
@@ -74,7 +84,7 @@ class ConfigRepository
     /**
      * Get the config setting definitions
      *
-     * @return array
+     * @return array<string, array<string, mixed>>
      */
     public function getDefinitions(): array
     {
@@ -84,7 +94,7 @@ class ConfigRepository
     /**
      * Load the user config from config.php
      *
-     * @param  array  $config  (this should be $this->config)
+     * @param  array<string, mixed>  $config  (this should be $this->config)
      */
     private function loadUserConfigFile(&$config): void
     {
@@ -119,7 +129,7 @@ class ConfigRepository
      * Unset a config setting
      * or multiple
      *
-     * @param  string|array  $key
+     * @param  string|array<string>  $key
      */
     public function forget($key): void
     {
@@ -131,7 +141,7 @@ class ConfigRepository
      * fall back to the global config setting prefixed by $global_prefix
      * The key must be the same for the global setting and the device setting.
      *
-     * @param  array  $device  Device array
+     * @param  array<string, mixed>  $device  Device array
      * @param  string  $key  Name of setting to fetch
      * @param  string  $global_prefix  specify where the global setting lives in the global config
      * @param  mixed  $default  will be returned if the setting is not set on the device or globally
@@ -175,8 +185,8 @@ class ConfigRepository
      * @param  string|null  $os  The os name
      * @param  string  $key  period separated config variable name
      * @param  string  $global_prefix  prefix for global setting
-     * @param  array  $default  optional array to return if the setting is not set
-     * @return array
+     * @param  array<array-key, mixed>  $default  optional array to return if the setting is not set
+     * @return array<array-key, mixed>
      */
     public function getCombined(?string $os, string $key, string $global_prefix = '', array $default = []): array
     {
@@ -266,7 +276,9 @@ class ConfigRepository
             $deleted = Models\Config::withChildren($key)->delete();
 
             if ($deleted > 0) {
+                // delete statement above doens't trigger Eloquent events
                 $this->invalidateCache();
+                event("setting.changed.$key", new SettingChanged($key, $this->get($key)));
             }
 
             return true;
@@ -307,7 +319,7 @@ class ConfigRepository
     /**
      * Get the full configuration array
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function getAll(): array
     {
@@ -347,7 +359,10 @@ class ConfigRepository
         $this->loadGraphsFromDb($this->config);
     }
 
-    private function loadGraphsFromDb(&$config): void
+    /**
+     * @param  array<string, mixed>  $config
+     */
+    private function loadGraphsFromDb(array &$config): void
     {
         try {
             $graph_types = GraphType::all()->toArray();
@@ -451,24 +466,24 @@ class ConfigRepository
                 $display_value = '{{ $sysName_fallback }}';
             }
 
-            $this->persist('device_display_default', $display_value);
+            $this->persistDefault('device_display_default', $display_value);
         }
 
         // make sure we have full path to binaries in case PATH isn't set
         foreach (['fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute'] as $bin) {
             if (! is_executable($this->get($bin))) {
-                $this->persist($bin, $this->locateBinary($bin));
+                $this->persistDefault($bin, $this->locateBinary($bin));
             }
         }
 
         if (! $this->has('rrdtool_version')) {
-            $this->persist('rrdtool_version', (new Version($this))->rrdtool());
+            $this->persistDefault('rrdtool_version', (new Version($this))->rrdtool());
         }
         if (! $this->has('snmp.unescape')) {
-            $this->persist('snmp.unescape', version_compare((new Version($this))->netSnmp(), '5.8.0', '<'));
+            $this->persistDefault('snmp.unescape', version_compare((new Version($this))->netSnmp(), '5.8.0', '<'));
         }
         if (! $this->has('reporting.usage')) {
-            $this->persist('reporting.usage', (bool) Callback::get('enabled'));
+            $this->persistDefault('reporting.usage', (bool) Callback::get('enabled'));
         }
 
         // populate legacy DB credentials, just in case something external uses them.  Maybe remove this later
@@ -496,7 +511,7 @@ class ConfigRepository
      *
      * @param  string  $key
      * @param  string  $value  value to set to key or vsprintf() format string for values below
-     * @param  array  $format_values  array of keys to send to vsprintf()
+     * @param  array<string>  $format_values  array of keys to send to vsprintf()
      */
     private function setDefault($key, $value, $format_values = []): void
     {
@@ -508,6 +523,17 @@ class ConfigRepository
                 $this->set($key, $value);
             }
         }
+    }
+
+    private function persistDefault(string $key, mixed $value): void
+    {
+        if ($this->loadUserConfiguration) {
+            $this->persist($key, $value);
+
+            return;
+        }
+
+        $this->set($key, $value);
     }
 
     /**
@@ -600,25 +626,5 @@ class ConfigRepository
 
             $this->set("os.$os", $os_def);
         }
-    }
-
-    /**
-     * Get the fping command for a given address family
-     */
-    public function fpingCommand(AddressFamily $af): array
-    {
-        if ($this->fping4_cmd == null) {
-            $fping_bin = $this->get('fping', 'fping');
-            $fping6 = $this->get('fping6', 'fping6');
-            $fping6_bin = is_executable($fping6) ? $fping6 : false;
-
-            $this->fping4_cmd = $fping6_bin === false ? [$fping_bin, '-4'] : [$fping_bin];
-            $this->fping6_cmd = $fping6_bin === false ? [$fping_bin, '-6'] : [$fping6_bin];
-        }
-
-        return match ($af) {
-            AddressFamily::IPv4 => $this->fping4_cmd,
-            AddressFamily::IPv6 => $this->fping6_cmd,
-        };
     }
 }

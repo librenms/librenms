@@ -7,6 +7,7 @@ use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'zfs';
+$all_return = ['version' => null];
 // Is set to false later if missing keys are found.
 $not_legacy = 1;
 

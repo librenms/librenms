@@ -1,15 +1,20 @@
-To use wireless sensors on OpenWrt, install the OpenWrt scripts from
-`librenms-agent/snmp/Openwrt` on the device. Wireless metrics are served by a
-single net-snmp `pass_persist` handler (`openwrt-snmp-pass.sh`) that exposes the
-OPENWRT-WIRELESS-MIB subtree; radios and VAPs are discovered live, so no
-per-radio snmpd configuration is required. Temperatures (thermal zones) and
-fan speeds (hwmon tachometer inputs) ride a second `pass_persist` handler
-using LM-SENSORS-MIB emulation.
+Wireless sensors on OpenWrt need an agent. Install the scripts from
+`librenms-agent/snmp/Openwrt` on the device.
+
+One net-snmp `pass_persist` handler (`openwrt-snmp-pass.sh`) serves the
+wireless metrics. It exposes the OPENWRT-WIRELESS-MIB subtree. The handler
+finds the radios and the VAPs at each request, so snmpd needs no per-radio
+configuration.
+
+A second handler (`lm-sensors-pass.sh`) serves the temperatures and the fan
+speeds. It reads the thermal zones and the hwmon tachometer inputs, and it
+emulates LM-SENSORS-MIB.
 
 # Installation
 
-1. Copy the scripts to `/usr/libexec/openwrt-snmp` on OpenWrt (the `wl*.sh` helpers must sit
-   next to `openwrt-snmp-pass.sh`, which calls them by relative path):
+1: Copy the scripts to `/usr/libexec/openwrt-snmp` on OpenWrt. The `wl*.sh`
+helpers must stay next to `openwrt-snmp-pass.sh`, because it calls them with a
+relative path:
 
 ```bash
 mkdir -p /usr/libexec/openwrt-snmp
@@ -21,7 +26,7 @@ done
 chmod +x /usr/libexec/openwrt-snmp/*.sh
 ```
 
-2. Register the two handlers in `/etc/config/snmpd`:
+2: Register the two handlers in `/etc/config/snmpd`:
 
 ```
 config pass
@@ -35,8 +40,8 @@ config pass
 	option persist '1'
 ```
 
-   OS detection reads a `distro` and a `hardware` extend, produced by inline
-   commands rather than scripts:
+OS detection reads a `distro` extend and a `hardware` extend. Inline commands
+produce these values, so no script is necessary:
 
 ```
 config extend
@@ -50,7 +55,7 @@ config extend
 	option args '/tmp/sysinfo/model'
 ```
 
-3. Restart snmpd:
+3: Restart snmpd:
 
 ```bash
 /etc/init.d/snmpd restart
@@ -58,19 +63,19 @@ config extend
 
 # Validation and troubleshooting
 
-Exercise the handler directly on OpenWrt:
+To test the handler on OpenWrt, run this command:
 
 ```bash
 /usr/libexec/openwrt-snmp/openwrt-snmp-pass.sh --snapshot
 ```
 
-Walk the wireless subtree from the LibreNMS host:
+To walk the wireless subtree from the LibreNMS host, run this command:
 
 ```bash
 snmpwalk -v2c -c your_community_string <openwrt-host> .1.3.6.1.4.1.66510.1.10
 ```
 
-Then re-run discovery for the wireless module:
+Then run the discovery for the wireless module again:
 
 ```bash
 lnms device:discover <openwrt-host> -m wireless
