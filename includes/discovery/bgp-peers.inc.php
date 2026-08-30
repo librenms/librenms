@@ -16,8 +16,8 @@ if (empty($bgpLocalAs)) {
     $bgpLocalAs = \SnmpQuery::get('BGP4-MIB::bgpLocalAs.0')->value();
 }
 
-if (is_numeric($bgpLocalAs) && $bgpLocalAs < 0) {
-    $bgpLocalAs += 4294967296;
+if (is_numeric($bgpLocalAs)) {
+    $bgpLocalAs = \LibreNMS\Util\Number::correctIntegerOverflow($bgpLocalAs);
 }
 
 if (! empty($bgpLocalAs) && $bgpLocalAs == '23456') { // 4Byte ASN
