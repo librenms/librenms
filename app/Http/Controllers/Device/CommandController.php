@@ -154,15 +154,19 @@ class CommandController
                 $output = '';
                 $results = [];
                 foreach ($rules as $rule) {
+                    $output .= 'Rule name: ' . $rule->name . PHP_EOL;
+
                     $sql = $rule->query ?: QueryBuilderParser::fromJson($rule->builder)->toSql();
 
                     if (empty($sql)) {
+                        $output .= 'SQL Query generation failed' . PHP_EOL;
                         continue;
                     }
 
                     try {
                         $rows = DB::select($sql, [$device->device_id]);
                     } catch (\Exception) {
+                        $output .= 'SQL Query execution failed' . PHP_EOL;
                         continue;
                     }
 
@@ -180,7 +184,6 @@ class CommandController
                         $qb = QueryBuilderParser::fromJson($rule->builder ?? []);
                     }
 
-                    $output .= 'Rule name: ' . $rule->name . PHP_EOL;
                     if ($qb instanceof QueryBuilderParser) {
                         $output .= 'Alert rule: ' . $qb->toSql(false) . PHP_EOL;
                     } else {
