@@ -124,7 +124,6 @@ groups:
         - outage.view
 
     oxidized:
-        - oxidized.list
         - oxidized.search
 
     peering-db:

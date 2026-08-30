@@ -20,6 +20,7 @@ use LibreNMS\Util\ModuleList;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Snmpsim;
 use RuntimeException;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -36,8 +37,7 @@ class DevGenerateTestData extends LnmsCommand
     {
         parent::__construct();
 
-        $this->addOption('all', 'a', InputOption::VALUE_NONE);
-        $this->addOption('os', 'o', InputOption::VALUE_REQUIRED);
+        $this->addArgument('os', InputArgument::OPTIONAL);
         $this->addOption('variant', 'r', InputOption::VALUE_REQUIRED);
         $this->addOption('modules', 'm', InputOption::VALUE_REQUIRED);
         $this->addOption('output', null, InputOption::VALUE_REQUIRED);
@@ -46,8 +46,17 @@ class DevGenerateTestData extends LnmsCommand
 
     public function handle(): int
     {
-        $os = $this->option('os');
-        $all = (bool) $this->option('all');
+        $os = $this->argument('os');
+        $all = $os === 'all';
+        if ($all) {
+            $os = null;
+        }
+
+        if (! $all && $os === null) {
+            $this->error(__('commands.dev:generate-test-data.scope_required'));
+
+            return 1;
+        }
         $variants = $this->commaSeparatedOption('variant', filterEmpty: false);
 
         if (! $all && $os === null) {
@@ -241,17 +250,36 @@ class DevGenerateTestData extends LnmsCommand
     }
 
     /**
+     * @return array<int, string>|false
+     */
+    public function completeArgument(string $name, string $value, mixed $previous = null): array|false
+    {
+        if ($name === 'os') {
+            $osList = collect(glob(base_path('tests/data/*.json')))
+                ->map(fn ($f) => ModuleTestHelper::extractVariant($f)[0])
+                ->unique()
+                ->values();
+
+            return $this->filterCompletions(
+                $osList->prepend('all')->all(),
+                $value
+            )->all();
+        }
+
+        return false;
+    }
+
+    /**
      * @return Collection<int, string>|null
      */
     public function completeOptionValue(DynamicInputOption $option, string $current, ?InputInterface $input = null): ?Collection
     {
-        $os = $input?->getOption('os');
+        $os = $input?->getArgument('os');
+        if ($os === 'all') {
+            $os = null;
+        }
 
         return match ($option->getName()) {
-            'os' => $this->filterCompletions(
-                collect(glob(base_path('tests/data/*.json')))->map(fn ($f) => ModuleTestHelper::extractVariant($f)[0])->unique()->values()->all(),
-                $current
-            ),
             'variant' => $this->filterCompletions(
                 collect(glob(base_path('tests/data/*.json')))
                     ->map(fn ($f) => ModuleTestHelper::extractVariant($f))
