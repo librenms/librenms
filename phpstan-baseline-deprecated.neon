@@ -1667,15 +1667,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbFetchRow\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: app/Http/Controllers/Device/CommandController.php
-
-		-
-			message: '''
 				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
 				use display field directly$#
 			'''

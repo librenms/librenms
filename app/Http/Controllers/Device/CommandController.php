@@ -33,6 +33,7 @@ use App\Models\Device;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Validation\Rule;
 use LibreNMS\Alert\AlertUtil;
@@ -149,15 +150,24 @@ class CommandController
 
         switch($validated['type']) {
             case 'alerts':
-                include_once base_path('includes/dbFacile.php');
                 $rules = AlertRule::enabled()->forDevice($device)->get();
                 $output = '';
                 $results = [];
                 foreach ($rules as $rule) {
                     $sql = $rule->query ?: QueryBuilderParser::fromJson($rule->builder)->toSql();
-                    $qry = dbFetchRow($sql, [$device->device_id]);
-                    if (is_array($qry)) {
-                        $results[] = $qry;
+
+                    if (empty($sql)) {
+                        continue;
+                    }
+
+                    try {
+                        $rows = DB::select($sql, [$device->device_id]);
+                    } catch (\Exception) {
+                        continue;
+                    }
+
+                    if (count($rows)) {
+                        $results[] = $rows;
                         $response = 'matches';
                     } else {
                         $response = 'no match';
