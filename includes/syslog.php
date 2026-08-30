@@ -1,6 +1,9 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
+use App\Models\Ipv4Address;
+use App\Models\Syslog;
 
 function get_cache($host, $value)
 {
@@ -9,29 +12,33 @@ function get_cache($host, $value)
     if (! isset($dev_cache[$host][$value])) {
         switch ($value) {
             case 'device_id':
-                // Try by hostname
-                $ip = inet_pton($host);
-                if (inet_ntop($ip) === false) {
-                    $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM devices WHERE `hostname` = ? OR `sysName` = ?', [$host, $host]);
-                } else {
-                    $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM devices WHERE `hostname` = ? OR `sysName` = ? OR `ip` = ?', [$host, $host, $ip]);
-                }
-                // If failed, try by IP
+                // Try by hostname or sysName, plus the device address when the sender is an IP
+                $dev_cache[$host]['device_id'] = Device::where(function ($query) use ($host): void {
+                    $query->where('hostname', $host)->orWhere('sysName', $host);
+
+                    $ip = inet_pton($host);
+                    if ($ip !== false) {
+                        $query->orWhere('ip', $ip);
+                    }
+                })->value('device_id');
+
+                // If failed, try by an address configured on one of the device's ports
                 if (! is_numeric($dev_cache[$host]['device_id'])) {
-                    $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM `ipv4_addresses` AS A, `ports` AS I WHERE A.ipv4_address = ? AND I.port_id = A.port_id', [$host]);
+                    $dev_cache[$host]['device_id'] = Ipv4Address::where('ipv4_address', $host)
+                        ->join('ports', 'ports.port_id', '=', 'ipv4_addresses.port_id')
+                        ->value('ports.device_id');
                 }
                 break;
 
             case 'os':
-                $dev_cache[$host]['os'] = dbFetchCell('SELECT `os` FROM devices WHERE `device_id` = ?', [get_cache($host, 'device_id')]);
-                break;
-
             case 'version':
-                $dev_cache[$host]['version'] = dbFetchCell('SELECT `version` FROM devices WHERE `device_id`= ?', [get_cache($host, 'device_id')]);
-                break;
-
             case 'hostname':
-                $dev_cache[$host]['hostname'] = dbFetchCell('SELECT `hostname` FROM devices WHERE `device_id` = ?', [get_cache($host, 'device_id')]);
+                // all three live in the same row, so fetch them in one query
+                $device_id = get_cache($host, 'device_id');
+                $device = $device_id ? Device::select(['os', 'version', 'hostname'])->find($device_id) : null;
+                $dev_cache[$host]['os'] = $device?->os;
+                $dev_cache[$host]['version'] = $device?->version;
+                $dev_cache[$host]['hostname'] = $device?->hostname;
                 break;
 
             default:
@@ -150,19 +157,18 @@ function process_syslog($entry, $update)
         $entry = array_map(trim(...), $entry);
 
         if ($update) {
-            dbInsert(
-                [
-                    'device_id' => $entry['device_id'],
-                    'program' => $entry['program'],
-                    'facility' => $entry['facility'],
-                    'priority' => $entry['priority'],
-                    'level' => $entry['level'],
-                    'tag' => $entry['tag'],
-                    'msg' => $entry['msg'],
-                    'timestamp' => $entry['timestamp'],
-                ],
-                'syslog'
-            );
+            // insertOrIgnore() keeps the INSERT IGNORE dbInsert() used: syslog is a
+            // firehose and a single malformed message must not stop the ones behind it
+            Syslog::query()->insertOrIgnore([
+                'device_id' => $entry['device_id'],
+                'program' => $entry['program'],
+                'facility' => $entry['facility'],
+                'priority' => $entry['priority'],
+                'level' => $entry['level'],
+                'tag' => $entry['tag'],
+                'msg' => $entry['msg'],
+                'timestamp' => $entry['timestamp'],
+            ]);
         }
 
         unset($os);
