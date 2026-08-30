@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Traits\Filterable;
 use App\Observers\DeviceObserver;
@@ -11,7 +12,6 @@ use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -27,8 +27,6 @@ use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
-use LibreNMS\Util\IPv4;
-use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
@@ -154,41 +152,30 @@ class Device extends BaseModel
 
     public static function findByIp(?string $ip): ?Device
     {
-        if (! IP::isValid($ip)) {
+        if ($ip === null) {
+            return null;
+        }
+
+        try {
+            $parsed = IP::parse($ip);
+        } catch (InvalidIpException) {
             return null;
         }
 
         $device = static::where('hostname', $ip)->orWhere('ip', inet_pton($ip))->first();
-
         if ($device) {
             return $device;
         }
 
-        try {
-            $ipv4 = new IPv4($ip);
-            $port = Ipv4Address::where('ipv4_address', (string) $ipv4)
-                ->with('port', 'port.device')
-                ->firstOrFail()->port;
-            if ($port) {
-                return $port->device;
-            }
-        } catch (InvalidIpException|ModelNotFoundException) {
-            //
-        }
+        $deviceId = match ($parsed->getFamily()) {
+            'ipv4' => Port::whereHas('ipv4', fn ($q) => $q->where('ipv4_address', (string) $parsed))->value('device_id'),
+            'ipv6' => Port::whereHas('ipv6', fn ($q) => $q->where('ipv6_address', $parsed->uncompressed()))->value('device_id'),
+            default => null,
+        };
 
-        try {
-            $ipv6 = new IPv6($ip);
-            $port = Ipv6Address::where('ipv6_address', $ipv6->uncompressed())
-                ->with(['port', 'port.device'])
-                ->firstOrFail()->port;
-            if ($port) {
-                return $port->device;
-            }
-        } catch (InvalidIpException|ModelNotFoundException) {
-            //
-        }
+        $device = DeviceCache::get($deviceId);
 
-        return null;
+        return $device->exists ? $device : null;
     }
 
     public function hasSnmpInfo(): bool
