@@ -33,6 +33,8 @@
                             :vars="['id' => $item['processor']->processor_id]"
                             :height="20"
                             :width="100"
+                            popup
+                            :popup-title="$device->display . ' - ' . $item['hr']->hrDeviceDescr"
                         />
                     @elseif($item['hr']->hrDeviceType === 'hrDeviceNetwork' && $item['port'])
                         <x-graph
@@ -40,6 +42,8 @@
                             type="port_bits"
                             :height="20"
                             :width="100"
+                            popup
+                            :popup-title="$device->display . ' - ' . ($item['interface_text'] ?? $item['hr']->hrDeviceDescr)"
                         />
                     @endif
                 </td>
