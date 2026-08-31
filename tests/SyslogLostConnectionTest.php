@@ -43,6 +43,9 @@ use Illuminate\Support\Facades\DB;
  */
 final class SyslogLostConnectionTest extends DBTestCase
 {
+    /** @var array<string, int|null> sender to device_id, as syslog.php would hold it */
+    private array $deviceCache = [];
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -69,10 +72,13 @@ final class SyslogLostConnectionTest extends DBTestCase
         try {
             $killed = $this->killCurrentConnection();
 
-            $this->assertEquals($device->device_id, get_cache($device->hostname, 'device_id'));
-            $this->assertSame('generic', get_cache($device->hostname, 'os'));
-            $this->assertSame('1.2.3', get_cache($device->hostname, 'version'));
-            $this->assertSame($device->hostname, get_cache($device->hostname, 'hostname'));
+            $found = syslog_device($device->hostname, $this->deviceCache);
+
+            $this->assertNotNull($found, 'Expected the device lookup to survive the lost connection.');
+            $this->assertEquals($device->device_id, $found->device_id);
+            $this->assertSame('generic', $found->os);
+            $this->assertSame('1.2.3', $found->version);
+            $this->assertSame($device->hostname, $found->hostname);
             $this->assertNotSame($killed, $this->connectionId(), 'Expected a new connection, not the killed one.');
         } finally {
             $device->delete();
@@ -96,7 +102,7 @@ final class SyslogLostConnectionTest extends DBTestCase
                 'timestamp' => '2024-01-01 00:00:00',
                 'msg' => 'lost connection test',
                 'program' => 'TEST',
-            ], 1);
+            ], 1, $this->deviceCache);
 
             $this->assertSame(1, Syslog::where('device_id', $device->device_id)->count());
             $this->assertNotSame($killed, $this->connectionId(), 'Expected a new connection, not the killed one.');
@@ -108,8 +114,7 @@ final class SyslogLostConnectionTest extends DBTestCase
 
     private function clearCaches(): void
     {
-        global $dev_cache;
-        $dev_cache = [];
+        $this->deviceCache = [];
 
         DeviceCache::flush();
     }

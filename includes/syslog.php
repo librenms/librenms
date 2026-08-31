@@ -4,40 +4,40 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Syslog;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Util\IP;
+use LibreNMS\Util\IPv6;
 
-function get_cache($host, $value)
+/**
+ * Find the device a syslog message came from.
+ *
+ * $cache maps a sender (a name or an address) to a device_id, the part DeviceCache cannot
+ * key on.  Misses are not cached, so a device added after the caller started is still
+ * picked up.
+ */
+function syslog_device(string $host, array &$cache): ?Device
 {
-    global $dev_cache;
+    $cache[$host] ??= syslog_device_id($host);
 
-    // $dev_cache maps a sender (an address or a name) to a device_id; DeviceCache holds
-    // the device itself. Misses are deliberately not cached, so a device added after this
-    // process started is still picked up without restarting it.
-    if (! isset($dev_cache[$host])) {
-        $device = Device::findByIp($host)
-            ?: Device::where('hostname', $host)->orWhere('sysName', $host)->first();
+    return $cache[$host] ? DeviceCache::get($cache[$host]) : null;
+}
 
-        if (! $device) {
-            return null;
-        }
+function syslog_device_id(string $host): ?int
+{
+    $query = Device::where('hostname', $host)->orWhere('sysName', $host);
 
-        $dev_cache[$host] = $device->device_id;
+    if ($ip = IP::parse($host, true)) {
+        $addresses = $ip instanceof IPv6 ? 'ipv6' : 'ipv4';
+        $query->orWhere('ip', $ip->packed())
+            ->orWhereHas($addresses, fn ($address) => $address->where($addresses . '_address', $ip->uncompressed()));
     }
 
-    $device = DeviceCache::get($dev_cache[$host]);
+    return $query->value('device_id');
+}
 
-    return match ($value) {
-        'device_id' => $device->device_id,
-        'os' => $device->os,
-        'version' => $device->version,
-        'hostname' => $device->hostname,
-        default => null,
-    };
-}//end get_cache()
-
-function process_syslog($entry, $update)
+function process_syslog($entry, $update, array &$device_cache = [])
 {
-    global $dev_cache;
-
     foreach (LibrenmsConfig::get('syslog_filter') as $bi) {
         if (str_contains((string) $entry['msg'], $bi)) {
             return $entry;
@@ -49,10 +49,11 @@ function process_syslog($entry, $update)
     if (! empty($syslog_xlate[$entry['host']])) {
         $entry['host'] = $syslog_xlate[$entry['host']];
     }
-    $entry['device_id'] = get_cache($entry['host'], 'device_id');
-    if ($entry['device_id']) {
-        $os = get_cache($entry['host'], 'os');
-        $hostname = get_cache($entry['host'], 'hostname');
+    $device = syslog_device($entry['host'], $device_cache);
+    $entry['device_id'] = $device?->device_id;
+    if ($device) {
+        $os = $device->os;
+        $hostname = $device->hostname;
 
         if (LibrenmsConfig::get('enable_syslog_hooks') && is_array(LibrenmsConfig::getOsSetting($os, 'syslog_hook'))) {
             foreach (LibrenmsConfig::getOsSetting($os, 'syslog_hook') as $v) {
@@ -82,7 +83,7 @@ function process_syslog($entry, $update)
                     unset($entry['msg']);
                 }
             }
-        } elseif ($os == 'linux' and get_cache($entry['host'], 'version') == 'Point') {
+        } elseif ($os == 'linux' and $device->version == 'Point') {
             // Cisco WAP200 and similar
             $matches = [];
             if (preg_match('#Log: \[(?P<program>.*)\] - (?P<msg>.*)#', (string) $entry['msg'], $matches)) {
@@ -142,18 +143,21 @@ function process_syslog($entry, $update)
         $entry = array_map(trim(...), $entry);
 
         if ($update) {
-            // insertOrIgnore() keeps the INSERT IGNORE dbInsert() used: syslog is a
-            // firehose and a single malformed message must not stop the ones behind it
-            Syslog::query()->insertOrIgnore([
-                'device_id' => $entry['device_id'],
-                'program' => $entry['program'],
-                'facility' => $entry['facility'],
-                'priority' => $entry['priority'],
-                'level' => $entry['level'],
-                'tag' => $entry['tag'],
-                'msg' => $entry['msg'],
-                'timestamp' => $entry['timestamp'],
-            ]);
+            try {
+                Syslog::query()->insert([
+                    'device_id' => $entry['device_id'],
+                    // program is varchar(32), so trim it rather than lose the message
+                    'program' => mb_substr((string) $entry['program'], 0, 32),
+                    'facility' => $entry['facility'],
+                    'priority' => $entry['priority'],
+                    'level' => $entry['level'],
+                    'tag' => $entry['tag'],
+                    'msg' => $entry['msg'],
+                    'timestamp' => $entry['timestamp'],
+                ]);
+            } catch (QueryException $e) {
+                Log::error("Failed to store syslog message from {$entry['host']}: " . $e->getMessage());
+            }
         }
 
         unset($os);

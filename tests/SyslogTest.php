@@ -35,18 +35,19 @@ final class SyslogTest extends TestCase
     // $SOURCEIP||$FACILITY||$PRIORITY||$LEVEL||$TAG||$YEAR-$MONTH-$DAY $HOUR:$MIN:$SEC||$MSG||$PROGRAM
     // There add an IP for each OS you want to test and use that in the input file
 
+    /** @var array<string, int|null> sender to device_id, as syslog.php would hold it */
+    private array $deviceCache = [];
+
     /**
      * Stand a device in for the lookup process_syslog() would otherwise make.
      */
     private function fakeDevice(array $attributes): void
     {
-        global $dev_cache;
-
         $device = new Device($attributes);
         $device->device_id = 1;
 
         DeviceCache::fake($device);
-        $dev_cache['1.1.1.1'] = $device->device_id;
+        $this->deviceCache = ['1.1.1.1' => $device->device_id];
     }
 
     private function fillLine($line)
@@ -77,7 +78,7 @@ final class SyslogTest extends TestCase
     private function checkSyslog($inputline, $modified)
     {
         $data = $this->createData($inputline, $modified);
-        $res = process_syslog($data['input'], 0);
+        $res = process_syslog($data['input'], 0, $this->deviceCache);
         $this->assertEquals($data['result'], $res);
     }
 
