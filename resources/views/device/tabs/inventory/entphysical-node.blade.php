@@ -11,6 +11,18 @@
         <strong>{{ $node['label'] }}</strong>
     @endif
 
+    @if(count($node['sensors']) === 1)
+        <x-popup>
+            <a href="{{ $node['sensors'][0]['graph_url'] }}">
+                <x-label :status="$node['sensors'][0]['status']">{{ $node['sensors'][0]['value'] }}</x-label>
+            </a>
+            <x-slot name="title">{{ $node['sensors'][0]['popup_title'] }}</x-slot>
+            <x-slot name="body">
+                <x-graph-row loading="lazy" :type="$node['sensors'][0]['graph_type']" :vars="$node['sensors'][0]['graph_vars']" />
+            </x-slot>
+        </x-popup>
+    @endif
+
     @foreach($node['states'] as $state)
         <span class="label label-{{ $state['color'] }}" data-toggle="tooltip" title="{{ $state['name'] }} ({{ $state['value'] }})">
             {{ $state['text'] }}
@@ -41,7 +53,7 @@
             <br><span class="text-info">{{ __('Serial No.') }} {{ $node['entity']->entPhysicalSerialNum }}</span>
         @endif
 
-        @if(!empty($node['sensors']))
+        @if(count($node['sensors']) > 1)
             <br>{{ __('Sensors') }}:
             <div class="interface-desc tw:ml-5">
                 @foreach($node['sensors'] as $sensor)

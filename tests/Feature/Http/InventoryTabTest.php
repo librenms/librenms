@@ -48,7 +48,32 @@ class InventoryTabTest extends TestCase
             ->assertSee('Catalyst 3850');
     }
 
-    public function testAuthorizedUserCanRenderInventoryEntPhysicalWithSensor(): void
+    public function testAuthorizedUserCanRenderInventoryEntPhysicalWithSingleSensor(): void
+    {
+        $device = Device::factory()->create();
+        EntPhysical::factory()->for($device)->create([
+            'entPhysicalIndex' => 1,
+            'entPhysicalContainedIn' => 0,
+            'entPhysicalName' => 'Temperature Sensor 1',
+            'entPhysicalClass' => 'sensor',
+        ]);
+        $sensor = \App\Models\Sensor::factory()->for($device)->create([
+            'entPhysicalIndex' => 1,
+            'sensor_class' => 'temperature',
+            'sensor_descr' => 'Temp Sensor 1',
+            'sensor_current' => 35.0,
+            'sensor_prev' => 35.0,
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device', ['device' => $device, 'tab' => 'inventory']))
+            ->assertOk()
+            ->assertSee('Temperature Sensor 1')
+            ->assertSee(route('graphs', ['type' => 'sensor_temperature', 'id' => $sensor->sensor_id]))
+            ->assertDontSee(__('Sensors') . ':');
+    }
+
+    public function testAuthorizedUserCanRenderInventoryEntPhysicalWithMultipleSensors(): void
     {
         $device = Device::factory()->create();
         EntPhysical::factory()->for($device)->create([
@@ -57,20 +82,30 @@ class InventoryTabTest extends TestCase
             'entPhysicalName' => 'Power Supply 1',
             'entPhysicalClass' => 'powerSupply',
         ]);
-        $sensor = \App\Models\Sensor::factory()->for($device)->create([
+        $sensor1 = \App\Models\Sensor::factory()->for($device)->create([
             'entPhysicalIndex' => 1,
             'sensor_class' => 'voltage',
-            'sensor_descr' => 'PSU 1 Voltage',
+            'sensor_descr' => 'Power Supply 1 Voltage',
             'sensor_current' => 12.0,
             'sensor_prev' => 12.0,
+        ]);
+        $sensor2 = \App\Models\Sensor::factory()->for($device)->create([
+            'entPhysicalIndex' => 1,
+            'sensor_class' => 'current',
+            'sensor_descr' => 'Power Supply 1 Current',
+            'sensor_current' => 5.0,
+            'sensor_prev' => 5.0,
         ]);
 
         $this->actingAs($this->admin())
             ->get(route('device', ['device' => $device, 'tab' => 'inventory']))
             ->assertOk()
             ->assertSee('Power Supply 1')
-            ->assertSee('PSU 1 Voltage voltage')
-            ->assertSee(route('graphs', ['type' => 'sensor_voltage', 'id' => $sensor->sensor_id]));
+            ->assertSee(__('Sensors') . ':')
+            ->assertSee('Voltage voltage')
+            ->assertSee('Current current')
+            ->assertSee(route('graphs', ['type' => 'sensor_voltage', 'id' => $sensor1->sensor_id]))
+            ->assertSee(route('graphs', ['type' => 'sensor_current', 'id' => $sensor2->sensor_id]));
     }
 
     public function testAuthorizedUserCanRenderInventoryHrDeviceTab(): void

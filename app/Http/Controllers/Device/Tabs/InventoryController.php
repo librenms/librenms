@@ -146,7 +146,8 @@ class InventoryController implements DeviceTab
 
         $sensorData = [];
         foreach ($entSensors as $sensor) {
-            $description = trim($sensor->sensor_descr . ' ' . $sensor->sensor_class);
+            $cleaned = trim(str_replace([$ent->entPhysicalDescr, $ent->entPhysicalName], ['', ''], (string) $sensor->sensor_descr));
+            $description = trim(($cleaned ?: $sensor->sensor_descr) . ' ' . $sensor->sensor_class);
 
             $sensorData[] = [
                 'sensor' => $sensor,
@@ -156,7 +157,7 @@ class InventoryController implements DeviceTab
                 'graph_url' => route('graphs', ['type' => 'sensor_' . $sensor->sensor_class, 'id' => $sensor->sensor_id]),
                 'graph_type' => 'sensor_' . $sensor->sensor_class,
                 'graph_vars' => ['id' => $sensor->sensor_id],
-                'popup_title' => $device->display ? $device->display . ' - ' . $description : $description,
+                'popup_title' => $device->display ? $device->display . ' - ' . $sensor->sensor_descr . ' ' . $sensor->sensor_class : $sensor->sensor_descr . ' ' . $sensor->sensor_class,
             ];
         }
 
