@@ -45,22 +45,24 @@ The interface follows an asymmetrical **Two-Pane Master-Detail** architecture.
 +------------------------------------+-------------------------------------------------------------+
 | BACKUPS (Timeline Sidebar)         | CONFIGURATION / DIFF PANE                                   |
 |                                    |                                                             |
-| [ Backups (14) ]  [Compare] [↻] [?] | [ - 2026-08-30 ▼ ] ➔ [ + 2026-08-31 ▼ ]  [💾] [📋]        |
+| [ Backups (14) ]  [Compare] [↻] [?] | [ - Aug 29, 2026 19:15 ▼ ] ➔ [ + Aug 31, 2026 14:00 ▼ ]    |
 | ══════════════════════════════════ | ═══════════════════════════════════════════════════════════ |
 |                                    | ── Top Linear Activity Bar (during content load)            |
-|  [●] 2026-08-31 14:00 (Latest)     |                                                             |
+|  [●]  Aug 31, 2026 14:00 (Latest)  |                                                             |
 |   |                                |  1  hostname core-switch-01                                 |
-|  [+] 2026-08-30 08:30              |  2  !                                                       |
-|   |  (Diff Compare)                |  3 -interface GigabitEthernet0/1                            |
-|  [-] 2026-08-29 19:15              |  3 +interface GigabitEthernet0/1                            |
-|      (Diff Base)                   |  4 - description Uplink to Distribution (Old)               |
-|  [○] 2026-08-25 12:00              |  4 + description Uplink to Distribution 100G (New)          |
+|  [+]  Aug 30, 2026 08:30            |  2  !                                                       |
+|   |  (Compare)                     |  3 -interface GigabitEthernet0/1                            |
+|  [-]  Aug 29, 2026 19:15            |  3 +interface GigabitEthernet0/1                            |
+|      (Base)                         |  4 - description Uplink to Distribution (Old)               |
+|  [○]  Aug 25, 2026 12:00            |  4 + description Uplink to Distribution 100G (New)          |
 |   |                                |  5   ip address 10.0.0.1 255.255.255.252                    |
-|  [○] 2026-08-20 04:00              |                                                             |
+|  [○]  Aug 20, 2026 04:00            |                                                             |
 |   |                                |                                                             |
 | [ Load More Backups ]              |                                                             |
 +------------------------------------+-------------------------------------------------------------+
 ```
+
+The actual interface displays the full date and time for backup revisions. Examples in this document should preserve that convention.
 
 ### 2.1 Left Pane - Interactive Timeline Sidebar
 
@@ -93,7 +95,9 @@ The interface follows an asymmetrical **Two-Pane Master-Detail** architecture.
 | Highlighted Rail | Intermediate revisions included in the active comparison range |
 | `○` Gray Ring    | Inactive historical backup                                     |
 
-The node state represents the current selection state. It must update immediately when the user changes selection, without waiting for configuration content to load.
+The Base and Compare endpoints should have a **subtle visual distinction beyond the connecting rail**, but the timeline should not add persistent textual labels or other prominent UI solely to communicate their roles. The existing `+` and `-` node markers provide the primary semantic distinction.
+
+The node state represents the current selection state and must update immediately when the user changes selection, without waiting for configuration content to load.
 
 ---
 
@@ -106,7 +110,7 @@ The node state represents the current selection state. It must update immediatel
 **Single Mode**
 
 ```text
-Configuration: [Formatted Date/Time]
+Configuration: [Full Date/Time]
 ```
 
 An inline activity spinner is displayed while the selected configuration is loading.
@@ -114,10 +118,12 @@ An inline activity spinner is displayed while the selected configuration is load
 **Diff Mode**
 
 ```text
-[ - Base Date ▼ ] [ ➔ ] [ + Compare Date ▼ ]
+[ - Base Date/Time ▼ ] [ ➔ ] [ + Compare Date/Time ▼ ]
 ```
 
 The Base and Compare selectors allow arbitrary revisions to be compared.
+
+The full date and time should be displayed in the controls. The `-` and `+` indicators visually correspond to the Base and Compare roles without requiring additional explanatory labels elsewhere in the interface.
 
 #### Actions
 
@@ -243,7 +249,7 @@ Range selection uses an **Anchor + Focus** model.
 [min(anchorIndex, focusIndex), max(anchorIndex, focusIndex)]
 ```
 
-The Base and Compare revisions are derived from the two endpoints of the selected range.
+The Base and Compare revisions are the two endpoints of the selected range.
 
 #### Normal Click
 
@@ -285,7 +291,7 @@ The focus may equal the anchor as an intermediate selection state, but a revisio
 
 #### Direction Crossing
 
-The focus may move across the anchor. The range automatically reverses its visual direction while remaining contiguous.
+The focus may move across the anchor. The range automatically changes to the contiguous span between the two endpoints while the anchor remains fixed.
 
 For example:
 
@@ -311,7 +317,7 @@ The anchor does not change.
 
 The Base and Compare dropdowns provide direct selection of arbitrary revisions.
 
-Dropdown selection is another interaction method for establishing the same canonical diff selection. It must remain synchronized with the timeline.
+Dropdown selection is another interaction method for establishing the same canonical diff selection and must remain synchronized with the timeline.
 
 Changing either endpoint:
 
@@ -322,7 +328,7 @@ Changing either endpoint:
 
 The timeline and header must never represent different comparison ranges.
 
-When a range is established through dropdowns, the implementation should synchronize `anchorIndex` and `focusIndex` to the selected endpoints so subsequent Shift-click and Shift-keyboard interactions behave predictably.
+When a range is established through dropdowns, `anchorIndex` and `focusIndex` are synchronized to the selected endpoints so subsequent Shift-click and Shift-keyboard interactions behave predictably.
 
 ---
 
@@ -356,6 +362,8 @@ The arrow rotates 180 degrees to communicate the new direction.
 
 Reversing a diff does not change the selected timeline range.
 
+The reverse control is intentionally compact. Because direction reversal is an infrequent interaction, it does not require prominent explanatory UI. It should have an accessible name and a tooltip describing its function.
+
 ---
 
 ### 3.6 Exiting Diff Mode
@@ -365,6 +373,21 @@ Press `Esc` or click **Exit Diff**.
 The interface returns to Single Configuration mode.
 
 The currently active configuration should remain selected and visible. Exiting Diff mode should not trigger an unnecessary configuration request if that configuration is already resolved.
+
+---
+
+### 3.7 No Configuration Changes
+
+A valid comparison may contain no differences.
+
+When Base and Compare configurations are identical, the viewer should display a concise empty-state message rather than an empty diff:
+
+> **No configuration changes**
+> These revisions contain identical configurations.
+
+This is a successful comparison result and should not be presented as a loading, error, or unavailable state.
+
+No special configuration semantics should be inferred from the contents of the configuration. The UI must not attempt to categorize changes into areas such as interfaces, BGP, SNMP, or system configuration because configuration formats and semantics vary by device and provider.
 
 ---
 
@@ -401,7 +424,16 @@ anchorIndex = unchanged
 focusIndex  = currentIndex ± 1
 ```
 
-The timeline automatically scrolls the active row into view when keyboard navigation changes the selection.
+The timeline automatically ensures the active row is visible when keyboard navigation changes the selection.
+
+The Help modal should explicitly identify the direction represented by `j` and `k`:
+
+```text
+j / ↓   Older
+k / ↑   Newer
+```
+
+This directional guidance is provided in the Help UI rather than persistently displayed in the main interface.
 
 ### Input Focus
 
@@ -429,7 +461,9 @@ No redundant network request should be generated by a boundary no-op.
 
 When additional history is available, **Load More Backups** loads the next page of revisions.
 
-Keyboard navigation at the end of the currently loaded history should not silently produce an invalid selection. If automatic pagination is implemented, loading additional history must complete before advancing to the newly available revision.
+Keyboard navigation at the end of the currently loaded history must not silently produce an invalid selection.
+
+If automatic pagination is implemented, loading additional history must complete before advancing to the newly available revision.
 
 Otherwise, reaching the end of the loaded history is treated as a no-op and the user can explicitly select **Load More Backups**.
 
@@ -495,7 +529,17 @@ The viewer must not temporarily unmount its content merely because a new request
 
 A centered spinner is reserved for the initial state when no content has yet been rendered.
 
-### 6.3 Copy Feedback
+### 6.3 Viewer Scroll Preservation
+
+When stepping through adjacent revisions, preserve the viewer's scroll position where practical rather than automatically returning to the top after every navigation request.
+
+This is particularly important for keyboard-driven investigation of a recurring area of a large configuration.
+
+For a newly established, non-adjacent comparison, such as one created through arbitrary dropdown selections, resetting to the top is acceptable.
+
+The implementation should favor preserving the user's context without allowing stale scroll positioning to become confusing.
+
+### 6.4 Copy Feedback
 
 After a successful copy:
 
@@ -532,6 +576,8 @@ Copy failures should leave the normal copy control available and provide appropr
 | Diff Line Added (`+`)            | `tw:bg-green-100 tw:text-green-900`               | `tw:bg-green-900/40 tw:text-green-200`                                              |
 | Modal Key Tag (`<kbd>`)          | `tw:bg-white tw:text-gray-800 tw:border-gray-300` | `tw:dark:bg-dark-gray-300 tw:dark:text-dark-white-100 tw:dark:border-dark-gray-100` |
 
+The Base and Compare colors should remain distinguishable through both color and their `-` / `+` markers.
+
 ### 7.2 Action Sizing
 
 Interactive header controls use a consistent 32px height:
@@ -564,9 +610,45 @@ tw:lg:w-md
 
 ---
 
-## 8. Performance & Engineering Guidelines
+## 8. Help & Keyboard Shortcuts UI
 
-### 8.1 Prism Web Worker
+The Help modal should explain the interface in terms of **tasks and workflows**, not merely provide a list of key bindings.
+
+### Navigate History
+
+| Key       | Action                 |
+| --------- | ---------------------- |
+| `j` / `↓` | Move to older revision |
+| `k` / `↑` | Move to newer revision |
+
+### Compare Revisions
+
+| Key                   | Action                              |
+| --------------------- | ----------------------------------- |
+| `d` / `c`             | Enter or exit Diff mode             |
+| `Shift+j` / `Shift+↓` | Extend range toward older revisions |
+| `Shift+k` / `Shift+↑` | Extend range toward newer revisions |
+| `r`                   | Reverse comparison direction        |
+
+### General
+
+| Key   | Action                       |
+| ----- | ---------------------------- |
+| `?`   | Open this help               |
+| `Esc` | Close Help or exit Diff mode |
+
+The Help UI should also briefly explain the two primary selection gestures:
+
+* **Click** a backup to select it.
+* **Shift-click** a backup to extend the comparison from the current anchor.
+
+The Help modal should remain concise. It is intended as an interactive reference, not a full user manual.
+
+---
+
+## 9. Performance & Engineering Guidelines
+
+### 9.1 Prism Web Worker
 
 Syntax parsing and highlighting are performed in:
 
@@ -578,7 +660,7 @@ resources/js/configHighlight.worker.js
 
 The main UI thread should not perform expensive configuration syntax parsing.
 
-### 8.2 State Decoupling
+### 9.2 State Decoupling
 
 Selection intent and resolved content are deliberately separate.
 
@@ -600,7 +682,7 @@ When the user selects a new backup:
 
 This prevents unnecessary unmounting and visual flashes during navigation.
 
-### 8.3 Diff State
+### 9.3 Diff State
 
 The implementation should maintain a single canonical representation of the currently requested comparison:
 
@@ -621,7 +703,27 @@ sortedDiff
 diffRoleMap
 ```
 
-### 8.4 Alpine.js Lifecycle
+### 9.4 Optional Diff Metadata
+
+Diff statistics such as:
+
+```text
++14 / -3
+```
+
+or:
+
+```text
+14 additions · 3 removals
+```
+
+may be displayed if they can be obtained without significant additional computation or visual clutter.
+
+This information is considered supplemental rather than required. It must not justify additional network requests or expensive diff processing solely for presentation purposes.
+
+A revision-count indicator for multi-version ranges may similarly be displayed if it fits naturally into the existing header. Neither statistic should introduce a new persistent UI element merely to expose low-value metadata.
+
+### 9.5 Alpine.js Lifecycle
 
 Modal dismissal uses:
 
@@ -632,7 +734,7 @@ x-on:keydown.escape.window
 
 Event listeners and worker resources must be cleaned up when the component is destroyed.
 
-### 8.5 Touch Interaction
+### 9.6 Touch Interaction
 
 Timeline interaction must use normal browser scrolling behavior.
 
@@ -646,7 +748,7 @@ Do not introduce custom pointer capture, drag-selection, or gesture handling tha
 
 ---
 
-## 9. Implementation Invariants
+## 10. Implementation Invariants
 
 The following conditions must always hold:
 
@@ -662,10 +764,14 @@ The following conditions must always hold:
 10. Keyboard navigation cannot create an invalid index.
 11. Keyboard shortcuts do not interfere with active form controls.
 12. Reversing a diff changes direction without changing the selected revision range.
+13. A comparison containing identical configurations displays an explicit no-changes state.
+14. The UI does not infer or display semantic configuration categories that cannot be reliably determined.
+15. Adjacent revision navigation should preserve viewer context, including scroll position, where practical.
+16. Supplemental diff statistics must not introduce significant computation or visual clutter.
 
 ---
 
-## 10. Summary
+## 11. Summary
 
 The Device Configuration Tab is designed around a simple operational workflow:
 
@@ -687,4 +793,6 @@ Identify the configuration change
 
 The timeline is the primary navigation surface, while the right-hand viewer provides the detailed configuration or diff. Mouse, touch, and keyboard interactions operate on the same underlying selection model so that switching between interaction methods does not change the user's current context.
 
-The implementation should prioritize predictable state transitions, stable rendering during asynchronous operations, and minimal redundant network activity.
+The design intentionally favors **clarity and information density without unnecessary controls**. Supplemental information such as diff statistics or range size should only be surfaced where it naturally fits the existing interface. The application should not attempt to interpret configuration semantics that vary across vendors and configuration formats.
+
+The implementation should prioritize predictable state transitions, stable rendering during asynchronous operations, preserved investigation context, and minimal redundant network activity.
