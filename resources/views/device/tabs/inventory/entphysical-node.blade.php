@@ -45,17 +45,18 @@
             <br>{{ __('Sensors') }}:
             <div class="interface-desc tw:ml-5">
                 @foreach($node['sensors'] as $sensor)
-                    <x-popup>
-                        <a href="{{ $sensor['graph_url'] }}">
-                            <span class="text-info">{{ $sensor['description'] }}</span>
-                            <x-label :status="$sensor['status']">{{ $sensor['value'] }}</x-label>
-                        </a>
-                        <x-slot name="title">{{ $sensor['popup_title'] }}</x-slot>
-                        <x-slot name="body">
-                            <x-graph-row loading="lazy" :type="$sensor['graph_type']" :vars="$sensor['graph_vars']" />
-                        </x-slot>
-                    </x-popup>
-                    <br>
+                    <div>
+                        <x-popup>
+                            <a href="{{ $sensor['graph_url'] }}">
+                                <span class="text-info">{{ $sensor['description'] }}</span>
+                                <x-label :status="$sensor['status']">{{ $sensor['value'] }}</x-label>
+                            </a>
+                            <x-slot name="title">{{ $sensor['popup_title'] }}</x-slot>
+                            <x-slot name="body">
+                                <x-graph-row loading="lazy" :type="$sensor['graph_type']" :vars="$sensor['graph_vars']" />
+                            </x-slot>
+                        </x-popup>
+                    </div>
                 @endforeach
             </div>
         @endif
