@@ -2,11 +2,8 @@
 
 @section('content')
 <x-device.page :device="$device">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">{{ __('Packages') }}</h3>
-        </div>
-        <div class="panel-body">
+    <x-panel :title="__('Packages')">
+        <x-slot:table>
             <table class="table table-hover table-condensed table-striped">
                 <thead>
                     <tr>
@@ -32,14 +29,14 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="text-center" style="padding: 20px;">
+                        <td colspan="5" class="tw:text-center tw:p-5">
                             <em>{{ __('No packages found for this device.') }}</em>
                         </td>
                     </tr>
                 @endforelse
                 </tbody>
             </table>
-        </div>
-    </div>
+        </x-slot:table>
+    </x-panel>
 </x-device.page>
 @endsection
