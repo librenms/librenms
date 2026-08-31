@@ -69,17 +69,13 @@
                             @foreach($item['graphs'] as $graph)
                                 <tr>
                                     <td colspan="7" class="tw:p-2.5 tw:bg-gray-50 tw:dark:bg-dark-gray-500">
-                                        <div class="row">
-                                            <div class="col-md-12 text-center">
-                                                <strong>{{ $graph['title'] }}</strong>
-                                                <x-graph
-                                                    :device="$device"
-                                                    type="service_graph"
-                                                    :id="$service->service_id"
-                                                    :ds="$graph['ds']"
-                                                />
-                                            </div>
-                                        </div>
+                                        <x-graph-row
+                                            :device="$device"
+                                            type="service_graph"
+                                            :title="$graph['title']"
+                                            :vars="['id' => $service->service_id, 'ds' => $graph['ds']]"
+                                            columns="responsive"
+                                        />
                                     </td>
                                 </tr>
                             @endforeach
