@@ -41,7 +41,8 @@ class EchoHandler extends AbstractProcessingHandler
      */
     protected function write(LogRecord $record): void
     {
-        echo  preg_replace('/\033\[[\d;]+m/', '', $this->color_convert->convert($record->message)) . PHP_EOL;
+        // Strip any ascii colours from lines that have not used the color_convert class, while also removing pending colour conversions
+        echo $this->color_convert->strip($this->color_convert->convert($record->message, false)) . PHP_EOL;
         flush();
     }
 }
