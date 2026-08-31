@@ -118,6 +118,11 @@ class InventoryTabTest extends TestCase
             'hrDeviceStatus' => 'running',
             'hrProcessorLoad' => 25,
         ]);
+        $processor = \App\Models\Processor::factory()->for($device)->create([
+            'hrDeviceIndex' => 1,
+            'processor_descr' => 'Intel Xeon CPU E5-2680',
+            'processor_usage' => 25,
+        ]);
 
         $this->actingAs($this->admin())
             ->get(route('device', ['device' => $device, 'tab' => 'inventory']))
@@ -125,7 +130,8 @@ class InventoryTabTest extends TestCase
             ->assertSee('Intel Xeon CPU E5-2680')
             ->assertSee('hrDeviceProcessor')
             ->assertSee('running')
-            ->assertSee('25%');
+            ->assertSee('25%')
+            ->assertSee(route('graphs', ['type' => 'processor_usage', 'from' => '-1d', 'id' => $processor->processor_id]));
     }
 
     public function testUserWithoutInventoryPermissionGetsForbidden(): void

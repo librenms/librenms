@@ -29,17 +29,15 @@
                 <td>
                     @if($item['hr']->hrDeviceType === 'hrDeviceProcessor' && $item['processor'])
                         <x-graph
-                            :device="$device"
                             type="processor_usage"
-                            :id="$item['processor']->processor_id"
+                            :vars="['id' => $item['processor']->processor_id]"
                             :height="20"
                             :width="100"
                         />
                     @elseif($item['hr']->hrDeviceType === 'hrDeviceNetwork' && $item['port'])
                         <x-graph
-                            :device="$device"
+                            :port="$item['port']"
                             type="port_bits"
-                            :id="$item['port']->port_id"
                             :height="20"
                             :width="100"
                         />
