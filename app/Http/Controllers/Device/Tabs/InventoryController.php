@@ -103,9 +103,7 @@ class InventoryController implements DeviceTab
         $grouped = $entities->groupBy('entPhysicalContainedIn');
 
         $allIndices = $entities->pluck('entPhysicalIndex')->flip();
-        $roots = $entities->filter(function (EntPhysical $ent) use ($allIndices) {
-            return $ent->entPhysicalContainedIn == 0 || ! $allIndices->has($ent->entPhysicalContainedIn);
-        });
+        $roots = $entities->filter(fn(EntPhysical $ent) => $ent->entPhysicalContainedIn == 0 || ! $allIndices->has($ent->entPhysicalContainedIn));
 
         return $roots->map(fn (EntPhysical $root) => $this->buildNode($root, $grouped, $entityStates, $ports, $sensors, $device))->values()->all();
     }
