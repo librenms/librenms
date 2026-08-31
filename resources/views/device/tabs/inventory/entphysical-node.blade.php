@@ -2,13 +2,15 @@
     <i class="fa {{ $node['icon'] }} fa-lg icon-theme" aria-hidden="true"></i>
 
     @if($node['entity']->entPhysicalParentRelPos > -1)
-        <strong>{{ $node['entity']->entPhysicalParentRelPos }}.</strong>
+        <span class="tw:font-semibold">{{ $node['entity']->entPhysicalParentRelPos }}.</span>
     @endif
 
     @if($node['port'])
-        <strong><x-port-link :port="$node['port']" /></strong>
+        <x-port-link :port="$node['port']" class="tw:font-semibold" />
+    @elseif($node['entity']->entPhysicalModelName && $node['entity']->entPhysicalName)
+        <span class="tw:font-semibold">{{ $node['entity']->entPhysicalModelName }}</span> ({{ $node['entity']->entPhysicalName }})
     @elseif($node['label'])
-        <strong>{{ $node['label'] }}</strong>@if($node['label_suffix']){{ $node['label_suffix'] }}@endif
+        <span class="tw:font-semibold">{{ $node['label'] }}</span>
     @endif
 
     @if(count($node['sensors']) === 1)
