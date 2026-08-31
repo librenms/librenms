@@ -107,6 +107,7 @@ function getWorker() {
 }
 
 export default function highlightConfig(element, content) {
+    const rawContent = typeof content === "string" ? content : (content?.content ? String(content.content) : "");
     const language = resolveLanguage(element.dataset.os, element.dataset.configHighlighting);
     const pre = element.parentElement;
 
@@ -116,10 +117,10 @@ export default function highlightConfig(element, content) {
     }
 
     // Immediate display of raw text so user never waits for parsing
-    element.textContent = content ?? "";
+    element.textContent = rawContent;
     activeElement = element;
 
-    const lines = content ? (content.match(/\n(?!$)/g) || []).length + 1 : 1;
+    const lines = rawContent ? (rawContent.match(/\n(?!$)/g) || []).length + 1 : 1;
 
     if (pre) {
         renderLineNumbers(element, lines, pre);
@@ -128,10 +129,10 @@ export default function highlightConfig(element, content) {
     // Cancel / supercede any ongoing tokenization job
     const jobId = ++currentJobId;
 
-    if (content) {
+    if (rawContent) {
         getWorker().postMessage({
             id: jobId,
-            content,
+            content: rawContent,
             language,
             lines,
         });
