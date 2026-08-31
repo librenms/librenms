@@ -47,7 +47,9 @@ class PseudowiresTabTest extends TestCase
             ->assertOk()
             ->assertSee('101')
             ->assertSee('Test-PW-101')
-            ->assertSee('unresolved remote device');
+            ->assertSee('unresolved remote device')
+            ->assertSee('fa-arrow-up report-up')
+            ->assertDontSee('fa-question report-warning');
     }
 
     public function testPseudowiresTabWithResolvedPeerEndpoint(): void
@@ -80,7 +82,10 @@ class PseudowiresTabTest extends TestCase
             ->assertSee('200')
             ->assertSee('Local-PW-200')
             ->assertSee('Remote-PW-200')
-            ->assertSee($deviceB->displayName());
+            ->assertSee($deviceB->display)
+            ->assertSee('fa-arrow-up report-up')
+            ->assertSee('fa-arrow-down report-down')
+            ->assertDontSee('fa-question report-warning');
     }
 
     public function testPseudowiresTabMiniGraphsView(): void

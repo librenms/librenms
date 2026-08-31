@@ -10,7 +10,7 @@
                 <th>{{ __('PW ID') }}</th>
                 <th>{{ __('Local PW Name') }}</th>
                 <th>{{ __('Local Port') }}</th>
-                <th style="width: 40px;"></th>
+                <th class="tw:w-10"></th>
                 <th>{{ __('Remote Device/PW Name') }}</th>
                 <th>{{ __('Remote Port') }}</th>
             </tr>
@@ -22,36 +22,36 @@
                 $peerPw = $row['peerPw'];
             @endphp
             <tr>
-                <td style="font-size: 18px; padding: 4px; vertical-align: middle;">
+                <td class="tw:text-lg tw:p-1 tw:align-middle">
                     {{ $pw->cpwVcID }}
                 </td>
                 <td>
                     {{ $pw->pw_descr }}
-                    <br/><span class="box-desc">{{ $pw->pw_type }} {{ $pw->pw_psntype }}</span>
+                    <br/><span class="tw:text-xs">{{ $pw->pw_type }} {{ $pw->pw_psntype }}</span>
                 </td>
                 <td>
                     @if($pw->port)
                         <x-port-link :port="$pw->port" />
-                        @if($pw->port->ifOperStatus === 'up')
+                        @if($pw->port->ifOperStatus === \LibreNMS\Enum\IfOperStatus::Up)
                             <i class="fa fa-arrow-up report-up" aria-hidden="true"></i>
-                        @elseif($pw->port->ifOperStatus === 'down')
+                        @elseif($pw->port->ifOperStatus === \LibreNMS\Enum\IfOperStatus::Down)
                             <i class="fa fa-arrow-down report-down" aria-hidden="true"></i>
                         @else
                             <i class="fa fa-question report-warning" aria-hidden="true"></i>
                         @endif
-                        <br/><span class="interface-desc">{{ $pw->port->ifAlias }}</span>
+                        <br/><span class="tw:text-xs">{{ $pw->port->ifAlias }}</span>
                         @if($pw->port->ifMtu)
-                            <br/><span class="box-desc">MTU {{ $pw->port->ifMtu }}</span>
+                            <br/><span class="tw:text-xs">MTU {{ $pw->port->ifMtu }}</span>
                         @endif
                         @if($pw->pw_local_mtu != 0)
-                            <br/><span class="box-desc">PW MTU {{ $pw->pw_local_mtu }}</span>
+                            <br/><span class="tw:text-xs">PW MTU {{ $pw->pw_local_mtu }}</span>
                         @endif
                     @endif
                 </td>
-                <td style="vertical-align: middle; text-align: center;">
-                    <i class="fa fa-times" aria-hidden="true" style="font-size: 2em;"></i>
+                <td class="tw:align-middle tw:text-center">
+                    <i class="fa fa-times tw:text-2xl" aria-hidden="true"></i>
                 </td>
-                <td style="vertical-align: middle;">
+                <td class="tw:align-middle">
                     @if($peerPw)
                         @if($peerPw->device)
                             <x-device-link :device="$peerPw->device" />
@@ -59,30 +59,30 @@
                             <x-device-link :device="$pw->peerDevice" />
                         @endif
                         @if($peerPw->pw_descr)
-                            <br/><span class="box-desc">{{ $peerPw->pw_descr }}</span>
+                            <br/><span class="tw:text-xs">{{ $peerPw->pw_descr }}</span>
                         @endif
                     @elseif($pw->peerDevice)
                         <x-device-link :device="$pw->peerDevice" />
                     @else
-                        <span style="font-style: italic;">{{ __('unresolved remote device') }}</span>
+                        <span class="tw:italic">{{ __('unresolved remote device') }}</span>
                     @endif
                 </td>
                 <td>
                     @if($peerPw && $peerPw->port)
                         <x-port-link :port="$peerPw->port" />
-                        @if($peerPw->port->ifOperStatus === 'up')
+                        @if($peerPw->port->ifOperStatus === \LibreNMS\Enum\IfOperStatus::Up)
                             <i class="fa fa-arrow-up report-up" aria-hidden="true"></i>
-                        @elseif($peerPw->port->ifOperStatus === 'down')
+                        @elseif($peerPw->port->ifOperStatus === \LibreNMS\Enum\IfOperStatus::Down)
                             <i class="fa fa-arrow-down report-down" aria-hidden="true"></i>
                         @else
                             <i class="fa fa-question report-warning" aria-hidden="true"></i>
                         @endif
-                        <br/><span class="interface-desc">{{ $peerPw->port->ifAlias }}</span>
+                        <br/><span class="tw:text-xs">{{ $peerPw->port->ifAlias }}</span>
                         @if($peerPw->port->ifMtu)
-                            <br/><span class="box-desc">MTU {{ $peerPw->port->ifMtu }}</span>
+                            <br/><span class="tw:text-xs">MTU {{ $peerPw->port->ifMtu }}</span>
                         @endif
                         @if($peerPw->pw_local_mtu != 0)
-                            <br/><span class="box-desc">PW MTU {{ $peerPw->pw_local_mtu }}</span>
+                            <br/><span class="tw:text-xs">PW MTU {{ $peerPw->pw_local_mtu }}</span>
                         @endif
                     @endif
                 </td>
@@ -114,7 +114,7 @@
             @endif
         @empty
             <tr>
-                <td colspan="6" class="text-center" style="padding: 20px;">
+                <td colspan="6" class="text-center tw:p-5">
                     <em>{{ __('No pseudowires found for this device.') }}</em>
                 </td>
             </tr>
