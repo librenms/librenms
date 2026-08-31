@@ -62,9 +62,7 @@
             <div class="interface-desc" style="margin-left: 20px;">
                 @foreach($node['sensors'] as $sensor)
                     <span class="text-info">{{ $sensor->sensor_descr }} {{ $sensor->sensor_class }}</span>
-                    <span class="label label-{{ \LibreNMS\Util\Html::severityToColor($sensor->currentStatus()) }}">
-                        {{ $sensor->formatValue() }}
-                    </span>
+                    {!! \LibreNMS\Util\Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue()) !!}
                     <br>
                 @endforeach
             </div>
