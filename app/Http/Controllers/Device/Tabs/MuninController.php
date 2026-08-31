@@ -61,12 +61,23 @@ class MuninController implements DeviceTab
             ->get();
 
         $categories = $plugins->pluck('mplug_category')->unique()->values();
-        $currentGroup = (string) Url::parseOptions('group', $categories->first() ?: '');
+
+        $currentGroup = $categories->contains($request->input('group'))
+            ? $request->input('group')
+            : ($categories->first() ?? '');
+
+        $categoryOptions = $categories->mapWithKeys(fn ($category) => [
+            $category => [
+                'text' => ucfirst($category),
+                'link' => Url::deviceUrl($device, ['tab' => 'munin', 'group' => $category]),
+            ],
+        ])->all();
 
         $selectedPlugins = $plugins->where('mplug_category', $currentGroup)->values();
 
         return [
             'categories' => $categories,
+            'categoryOptions' => $categoryOptions,
             'currentGroup' => $currentGroup,
             'plugins' => $selectedPlugins,
         ];
