@@ -138,6 +138,9 @@ final class PortGroupTest extends DBTestCase
         $this->assertEquals(['attached' => 0, 'detached' => 0], $changes);
     }
 
+    /**
+     * @return array{condition: string, rules: array<int, array<string, string>>, valid: bool}
+     */
     private function rulesFor(string $field, string $operator, string $value): array
     {
         return [

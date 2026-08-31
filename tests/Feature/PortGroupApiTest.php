@@ -126,6 +126,9 @@ final class PortGroupApiTest extends DBTestCase
         return ['X-Auth-Token' => $token->token_hash];
     }
 
+    /**
+     * @return array{condition: string, rules: array<int, array<string, string>>, valid: bool}
+     */
     private function rulesFor(string $field, string $operator, string $value): array
     {
         return [
