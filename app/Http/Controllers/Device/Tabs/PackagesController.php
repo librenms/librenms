@@ -54,6 +54,8 @@ class PackagesController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        return [];
+        return [
+            'packages' => $device->packages()->orderBy('name')->get(),
+        ];
     }
 }
