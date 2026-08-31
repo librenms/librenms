@@ -8,7 +8,7 @@
     @if($node['port'])
         <strong><x-port-link :port="$node['port']" /></strong>
     @elseif($node['label'])
-        <strong>{{ $node['label'] }}</strong>
+        <strong>{{ $node['label'] }}</strong>@if($node['label_suffix']){{ $node['label_suffix'] }}@endif
     @endif
 
     @if(count($node['sensors']) === 1)

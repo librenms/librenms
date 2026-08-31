@@ -165,9 +165,12 @@ class InventoryController implements DeviceTab
             ->map(fn (EntPhysical $child) => $this->buildNode($child, $grouped, $entityStates, $ports, $sensors, $device))
             ->all();
 
+        $labelData = $this->resolveEntityLabel($ent);
+
         return [
             'entity' => $ent,
-            'label' => $this->resolveEntityLabel($ent),
+            'label' => $labelData['label'],
+            'label_suffix' => $labelData['suffix'],
             'icon' => $this->resolveEntityIcon($ent),
             'port' => $port,
             'sensors' => $sensorData,
@@ -177,30 +180,36 @@ class InventoryController implements DeviceTab
         ];
     }
 
-    private function resolveEntityLabel(EntPhysical $ent): ?string
+    /**
+     * @return array{label: string|null, suffix: string|null}
+     */
+    private function resolveEntityLabel(EntPhysical $ent): array
     {
         $displayName = $ent->entPhysicalName;
 
         if ($ent->entPhysicalModelName && $displayName) {
-            return $ent->entPhysicalModelName . ' (' . $displayName . ')';
+            return [
+                'label' => $ent->entPhysicalModelName,
+                'suffix' => ' (' . $displayName . ')',
+            ];
         }
         if ($ent->entPhysicalModelName) {
-            return $ent->entPhysicalModelName;
+            return ['label' => $ent->entPhysicalModelName, 'suffix' => null];
         }
         if (is_numeric($displayName) && $ent->entPhysicalVendorType) {
-            return $displayName . ' ' . $ent->entPhysicalVendorType;
+            return ['label' => $displayName . ' ' . $ent->entPhysicalVendorType, 'suffix' => null];
         }
         if ($displayName) {
-            return $displayName;
+            return ['label' => $displayName, 'suffix' => null];
         }
         if ($ent->entPhysicalDescr) {
-            return $ent->entPhysicalDescr;
+            return ['label' => $ent->entPhysicalDescr, 'suffix' => null];
         }
         if ($ent->entPhysicalClass) {
-            return $ent->entPhysicalClass;
+            return ['label' => $ent->entPhysicalClass, 'suffix' => null];
         }
 
-        return null;
+        return ['label' => null, 'suffix' => null];
     }
 
     private function resolveEntityIcon(EntPhysical $ent): string
