@@ -39,8 +39,10 @@
                         @php $service = $item['service']; @endphp
                         <tr id="row_{{ $service->service_id }}">
                             <td class="col-sm-2">
-                                <span class="label {{ $item['status_class'] }} text-nowrap">
-                                    {{ $service->service_name ?: $service->service_type }}
+                                <span class="alert-status {{ $item['status_class'] }}">
+                                    <span class="device-services-page text-nowrap">
+                                        {{ $service->service_name ?: $service->service_type }}
+                                    </span>
                                 </span>
                             </td>
                             <td class="col-sm-1 text-muted">{{ $service->service_type }}</td>
@@ -49,7 +51,7 @@
                             <td class="col-sm-2 text-muted">{{ $service->service_desc }}</td>
                             <td class="col-sm-1 text-muted">{{ $item['last_changed'] }}</td>
                             <td class="col-sm-1 text-right">
-                                <div class="btn-group btn-group-xs">
+                                <div class="btn-group">
                                     @can('service.update')
                                         <button type="button" class="btn btn-primary btn-sm" aria-label="{{ __('Edit') }}" data-toggle="modal" data-target="#create-service" data-service_id="{{ $service->service_id }}" name="edit-service">
                                             <i class="fa fa-pencil" aria-hidden="true"></i>
