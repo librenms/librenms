@@ -29,6 +29,7 @@ namespace App\Http\Controllers\Device\Tabs;
 use App\Models\Device;
 use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use LibreNMS\Util\Url;
 
 class MuninController implements DeviceTab
 {
@@ -54,6 +55,20 @@ class MuninController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        return [];
+        $plugins = $device->muninPlugins()
+            ->orderBy('mplug_category')
+            ->orderBy('mplug_type')
+            ->get();
+
+        $categories = $plugins->pluck('mplug_category')->unique()->values();
+        $currentGroup = (string) Url::parseOptions('group', $categories->first() ?: '');
+
+        $selectedPlugins = $plugins->where('mplug_category', $currentGroup)->values();
+
+        return [
+            'categories' => $categories,
+            'currentGroup' => $currentGroup,
+            'plugins' => $selectedPlugins,
+        ];
     }
 }
