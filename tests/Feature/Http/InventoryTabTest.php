@@ -48,6 +48,31 @@ class InventoryTabTest extends TestCase
             ->assertSee('Catalyst 3850');
     }
 
+    public function testAuthorizedUserCanRenderInventoryEntPhysicalWithSensor(): void
+    {
+        $device = Device::factory()->create();
+        EntPhysical::factory()->for($device)->create([
+            'entPhysicalIndex' => 1,
+            'entPhysicalContainedIn' => 0,
+            'entPhysicalName' => 'Power Supply 1',
+            'entPhysicalClass' => 'powerSupply',
+        ]);
+        $sensor = \App\Models\Sensor::factory()->for($device)->create([
+            'entPhysicalIndex' => 1,
+            'sensor_class' => 'voltage',
+            'sensor_descr' => 'PSU 1 Voltage',
+            'sensor_current' => 12.0,
+            'sensor_prev' => 12.0,
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device', ['device' => $device, 'tab' => 'inventory']))
+            ->assertOk()
+            ->assertSee('Power Supply 1')
+            ->assertSee('PSU 1 Voltage voltage')
+            ->assertSee(route('graphs', ['type' => 'sensor_voltage', 'id' => $sensor->sensor_id]));
+    }
+
     public function testAuthorizedUserCanRenderInventoryHrDeviceTab(): void
     {
         $device = Device::factory()->create();

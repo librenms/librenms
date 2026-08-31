@@ -13,22 +13,21 @@
         </thead>
         <tbody>
         @forelse($data['items'] as $item)
-            @php $hr = $item['device']; @endphp
             <tr>
-                <td>{{ $hr->hrDeviceIndex }}</td>
+                <td>{{ $item['device']->hrDeviceIndex }}</td>
                 <td>
-                    @if($hr->hrDeviceType === 'hrDeviceProcessor' && $item['processor'])
+                    @if($item['device']->hrDeviceType === 'hrDeviceProcessor' && $item['processor'])
                         <a href="{{ route('device', ['device' => $device, 'tab' => 'health', 'vars' => 'metric=processor']) }}" class="tw:font-semibold">
-                            {{ $hr->hrDeviceDescr }}
+                            {{ $item['device']->hrDeviceDescr }}
                         </a>
-                    @elseif($hr->hrDeviceType === 'hrDeviceNetwork' && $item['port'])
+                    @elseif($item['device']->hrDeviceType === 'hrDeviceNetwork' && $item['port'])
                         <x-port-link :port="$item['port']" :text="$item['interface_text']" />
                     @else
-                        {{ $hr->hrDeviceDescr }}
+                        {{ $item['device']->hrDeviceDescr }}
                     @endif
                 </td>
                 <td>
-                    @if($hr->hrDeviceType === 'hrDeviceProcessor' && $item['processor'])
+                    @if($item['device']->hrDeviceType === 'hrDeviceProcessor' && $item['processor'])
                         <x-graph
                             :device="$device"
                             type="processor_usage"
@@ -36,7 +35,7 @@
                             :height="20"
                             :width="100"
                         />
-                    @elseif($hr->hrDeviceType === 'hrDeviceNetwork' && $item['port'])
+                    @elseif($item['device']->hrDeviceType === 'hrDeviceNetwork' && $item['port'])
                         <x-graph
                             :device="$device"
                             type="port_bits"
@@ -46,14 +45,14 @@
                         />
                     @endif
                 </td>
-                <td>{{ $hr->hrDeviceType }}</td>
-                <td>{{ $hr->hrDeviceStatus }}</td>
-                <td>{{ $hr->hrDeviceErrors }}</td>
-                <td>{{ $hr->hrProcessorLoad !== null ? $hr->hrProcessorLoad . '%' : '-' }}</td>
+                <td>{{ $item['device']->hrDeviceType }}</td>
+                <td>{{ $item['device']->hrDeviceStatus }}</td>
+                <td>{{ $item['device']->hrDeviceErrors }}</td>
+                <td>{{ $item['device']->hrProcessorLoad !== null ? $item['device']->hrProcessorLoad . '%' : '-' }}</td>
             </tr>
         @empty
             <tr>
-                <td colspan="7" class="text-center" style="padding: 20px;">
+                <td colspan="7" class="text-center tw:p-5">
                     <em>{{ __('No Host Resources items found for this device.') }}</em>
                 </td>
             </tr>

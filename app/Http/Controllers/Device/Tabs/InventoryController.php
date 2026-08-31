@@ -32,6 +32,7 @@ use App\Models\EntityState;
 use App\Models\EntPhysical;
 use App\Models\Port;
 use App\Models\Processor;
+use App\Models\Sensor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
@@ -108,57 +109,104 @@ class InventoryController implements DeviceTab
 
         $grouped = $entities->groupBy('entPhysicalContainedIn');
 
-        $buildNode = function (EntPhysical $ent) use (&$buildNode, $grouped, $entityStates, $ports, $sensors): array {
-            $entSensors = $sensors->filter(fn ($s) => $s->entPhysicalIndex == $ent->entPhysicalIndex || $s->sensor_index == $ent->entPhysicalIndex);
-            $entState = $entityStates->get($ent->entPhysical_id);
-            $port = $ent->ifIndex ? $ports->get($ent->ifIndex) : null;
-
-            $states = [];
-            $alarms = [];
-            if ($entState) {
-                foreach (['entStateOper', 'entStateUsage', 'entStateStandby'] as $stateName) {
-                    $val = $entState->{$stateName};
-                    if ($val !== null && $val !== '') {
-                        $states[] = array_merge(['name' => $stateName, 'value' => $val], parse_entity_state($stateName, $val));
-                    }
-                }
-
-                if ($entState->entStateAlarm && ! in_array($entState->entStateAlarm, ['00', '80'], true)) {
-                    $alarms = parse_entity_state_alarm($entState->entStateAlarm);
-                }
-            }
-
-            $children = ($grouped->get($ent->entPhysicalIndex) ?? collect())->map(fn ($child) => $buildNode($child))->all();
-
-            $iconClass = match ($ent->entPhysicalClass) {
-                'chassis' => 'fa-server',
-                'module' => 'fa-database',
-                'port' => 'fa-link',
-                'container' => 'fa-square',
-                'sensor' => 'fa-heartbeat',
-                'backplane' => 'fa-bars',
-                'stack' => 'fa-list-ol',
-                'powerSupply' => 'fa-bolt',
-                default => 'fa-cube',
-            };
-
-            return [
-                'entity' => $ent,
-                'icon' => $iconClass,
-                'port' => $port,
-                'sensors' => $entSensors,
-                'states' => $states,
-                'alarms' => $alarms,
-                'children' => $children,
-            ];
-        };
-
         $allIndices = $entities->pluck('entPhysicalIndex')->flip();
-        $roots = $entities->filter(function ($ent) use ($allIndices) {
+        $roots = $entities->filter(function (EntPhysical $ent) use ($allIndices) {
             return $ent->entPhysicalContainedIn == 0 || ! $allIndices->has($ent->entPhysicalContainedIn);
         });
 
-        return $roots->map(fn ($root) => $buildNode($root))->values()->all();
+        return $roots->map(fn (EntPhysical $root) => $this->buildNode($root, $grouped, $entityStates, $ports, $sensors, $device))->values()->all();
+    }
+
+    /**
+     * @param  \Illuminate\Support\Collection<int|string, \Illuminate\Database\Eloquent\Collection<int, EntPhysical>>  $grouped
+     * @param  \Illuminate\Database\Eloquent\Collection<int, EntityState>  $entityStates
+     * @param  \Illuminate\Database\Eloquent\Collection<int, Port>  $ports
+     * @param  \Illuminate\Database\Eloquent\Collection<int, Sensor>  $sensors
+     * @return array<string, mixed>
+     */
+    private function buildNode(
+        EntPhysical $ent,
+        \Illuminate\Support\Collection $grouped,
+        \Illuminate\Database\Eloquent\Collection $entityStates,
+        \Illuminate\Database\Eloquent\Collection $ports,
+        \Illuminate\Database\Eloquent\Collection $sensors,
+        Device $device
+    ): array {
+        $entSensors = $sensors->filter(fn (Sensor $s) => $s->entPhysicalIndex == $ent->entPhysicalIndex || $s->sensor_index == $ent->entPhysicalIndex);
+        $entState = $entityStates->get($ent->entPhysical_id);
+        $port = $ent->ifIndex ? $ports->get($ent->ifIndex) : null;
+
+        $states = [];
+        $alarms = [];
+        if ($entState) {
+            foreach (['entStateOper', 'entStateUsage', 'entStateStandby'] as $stateName) {
+                $val = $entState->{$stateName};
+                if ($val !== null && $val !== '') {
+                    $states[] = array_merge(['name' => $stateName, 'value' => $val], parse_entity_state($stateName, $val));
+                }
+            }
+
+            if ($entState->entStateAlarm && ! in_array($entState->entStateAlarm, ['00', '80'], true)) {
+                $alarms = parse_entity_state_alarm($entState->entStateAlarm);
+            }
+        }
+
+        $displayName = $ent->entPhysicalName;
+        $label = null;
+        if ($ent->entPhysicalModelName && $displayName) {
+            $label = $ent->entPhysicalModelName . ' (' . $displayName . ')';
+        } elseif ($ent->entPhysicalModelName) {
+            $label = $ent->entPhysicalModelName;
+        } elseif (is_numeric($displayName) && $ent->entPhysicalVendorType) {
+            $label = $displayName . ' ' . $ent->entPhysicalVendorType;
+        } elseif ($displayName) {
+            $label = $displayName;
+        } elseif ($ent->entPhysicalDescr) {
+            $label = $ent->entPhysicalDescr;
+        } elseif ($ent->entPhysicalClass) {
+            $label = $ent->entPhysicalClass;
+        }
+
+        $sensorData = [];
+        foreach ($entSensors as $sensor) {
+            $description = trim($sensor->sensor_descr . ' ' . $sensor->sensor_class);
+
+            $sensorData[] = [
+                'sensor' => $sensor,
+                'description' => $description,
+                'status' => $sensor->currentStatus(),
+                'value' => $sensor->formatValue(),
+                'graph_url' => route('graphs', ['type' => 'sensor_' . $sensor->sensor_class, 'id' => $sensor->sensor_id]),
+                'graph_type' => 'sensor_' . $sensor->sensor_class,
+                'graph_vars' => ['id' => $sensor->sensor_id],
+                'popup_title' => $device->display ? $device->display . ' - ' . $description : $description,
+            ];
+        }
+
+        $children = ($grouped->get($ent->entPhysicalIndex) ?? collect())->map(fn (EntPhysical $child) => $this->buildNode($child, $grouped, $entityStates, $ports, $sensors, $device))->all();
+
+        $iconClass = match ($ent->entPhysicalClass) {
+            'chassis' => 'fa-server',
+            'module' => 'fa-database',
+            'port' => 'fa-link',
+            'container' => 'fa-square',
+            'sensor' => 'fa-heartbeat',
+            'backplane' => 'fa-bars',
+            'stack' => 'fa-list-ol',
+            'powerSupply' => 'fa-bolt',
+            default => 'fa-cube',
+        };
+
+        return [
+            'entity' => $ent,
+            'label' => $label,
+            'icon' => $iconClass,
+            'port' => $port,
+            'sensors' => $sensorData,
+            'states' => $states,
+            'alarms' => $alarms,
+            'children' => $children,
+        ];
     }
 
     /**

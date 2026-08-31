@@ -5,26 +5,10 @@
         <strong>{{ $node['entity']->entPhysicalParentRelPos }}.</strong>
     @endif
 
-    @php
-        $ent = $node['entity'];
-        $displayName = $ent->entPhysicalName;
-        $port = $node['port'];
-    @endphp
-
-    @if($port)
-        <strong><x-port-link :port="$port" /></strong>
-    @elseif($ent->entPhysicalModelName && $displayName)
-        <strong>{{ $ent->entPhysicalModelName }}</strong> ({{ $displayName }})
-    @elseif($ent->entPhysicalModelName)
-        <strong>{{ $ent->entPhysicalModelName }}</strong>
-    @elseif(is_numeric($displayName) && $ent->entPhysicalVendorType)
-        <strong>{{ $displayName }} {{ $ent->entPhysicalVendorType }}</strong>
-    @elseif($displayName)
-        <strong>{{ $displayName }}</strong>
-    @elseif($ent->entPhysicalDescr)
-        <strong>{{ $ent->entPhysicalDescr }}</strong>
-    @elseif($ent->entPhysicalClass)
-        <strong>{{ $ent->entPhysicalClass }}</strong>
+    @if($node['port'])
+        <strong><x-port-link :port="$node['port']" /></strong>
+    @elseif($node['label'])
+        <strong>{{ $node['label'] }}</strong>
     @endif
 
     @foreach($node['states'] as $state)
@@ -35,7 +19,7 @@
 
     @if(!empty($node['alarms']))
         <br>
-        <span style="margin-left: 20px;">{{ __('Alarms') }}:
+        <span class="tw:ml-5">{{ __('Alarms') }}:
             @foreach($node['alarms'] as $alarm)
                 <span class="label label-{{ $alarm['color'] }}">{{ $alarm['text'] }}</span>
             @endforeach
@@ -43,26 +27,34 @@
     @endif
 
     <br>
-    <div class="interface-desc" style="margin-left: 20px;">
-        {{ $ent->entPhysicalDescr }}
-        @if($ent->entPhysicalAlias && $ent->entPhysicalAssetID)
-            <br>{{ __('Alias') }}: {{ $ent->entPhysicalAlias }} - {{ __('AssetID') }}: {{ $ent->entPhysicalAssetID }}
-        @elseif($ent->entPhysicalAlias)
-            <br>{{ __('Alias') }}: {{ $ent->entPhysicalAlias }}
-        @elseif($ent->entPhysicalAssetID)
-            <br>{{ __('AssetID') }}: {{ $ent->entPhysicalAssetID }}
+    <div class="interface-desc tw:ml-5">
+        {{ $node['entity']->entPhysicalDescr }}
+        @if($node['entity']->entPhysicalAlias && $node['entity']->entPhysicalAssetID)
+            <br>{{ __('Alias') }}: {{ $node['entity']->entPhysicalAlias }} - {{ __('AssetID') }}: {{ $node['entity']->entPhysicalAssetID }}
+        @elseif($node['entity']->entPhysicalAlias)
+            <br>{{ __('Alias') }}: {{ $node['entity']->entPhysicalAlias }}
+        @elseif($node['entity']->entPhysicalAssetID)
+            <br>{{ __('AssetID') }}: {{ $node['entity']->entPhysicalAssetID }}
         @endif
 
-        @if($ent->entPhysicalSerialNum)
-            <br><span class="text-info">{{ __('Serial No.') }} {{ $ent->entPhysicalSerialNum }}</span>
+        @if($node['entity']->entPhysicalSerialNum)
+            <br><span class="text-info">{{ __('Serial No.') }} {{ $node['entity']->entPhysicalSerialNum }}</span>
         @endif
 
-        @if($node['sensors']->isNotEmpty())
+        @if(!empty($node['sensors']))
             <br>{{ __('Sensors') }}:
-            <div class="interface-desc" style="margin-left: 20px;">
+            <div class="interface-desc tw:ml-5">
                 @foreach($node['sensors'] as $sensor)
-                    <span class="text-info">{{ $sensor->sensor_descr }} {{ $sensor->sensor_class }}</span>
-                    {!! \LibreNMS\Util\Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue()) !!}
+                    <x-popup>
+                        <a href="{{ $sensor['graph_url'] }}">
+                            <span class="text-info">{{ $sensor['description'] }}</span>
+                            <x-label :status="$sensor['status']">{{ $sensor['value'] }}</x-label>
+                        </a>
+                        <x-slot name="title">{{ $sensor['popup_title'] }}</x-slot>
+                        <x-slot name="body">
+                            <x-graph-row loading="lazy" :type="$sensor['graph_type']" :vars="$sensor['graph_vars']" />
+                        </x-slot>
+                    </x-popup>
                     <br>
                 @endforeach
             </div>
