@@ -401,16 +401,26 @@
                                 <div class="tw:grid tw:grid-cols-1 sm:tw:grid-cols-2 tw:gap-2.5 tw:text-xs">
                                     <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
                                         <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_older') }}</span>
-                                        <div class="tw:flex tw:gap-1">
+                                        <div class="tw:flex tw:items-center tw:gap-1.5">
                                             <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">j</kbd>
-                                            <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">↓</kbd>
+                                            <span class="tw:text-gray-400 tw:dark:text-dark-white-400">/</span>
+                                            <div class="tw:flex tw:items-center tw:gap-0.5">
+                                                <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">Ctrl</kbd>
+                                                <span class="tw:text-gray-400 tw:dark:text-dark-white-400">+</span>
+                                                <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">↓</kbd>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
                                         <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_newer') }}</span>
-                                        <div class="tw:flex tw:gap-1">
+                                        <div class="tw:flex tw:items-center tw:gap-1.5">
                                             <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">k</kbd>
-                                            <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">↑</kbd>
+                                            <span class="tw:text-gray-400 tw:dark:text-dark-white-400">/</span>
+                                            <div class="tw:flex tw:items-center tw:gap-0.5">
+                                                <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">Ctrl</kbd>
+                                                <span class="tw:text-gray-400 tw:dark:text-dark-white-400">+</span>
+                                                <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">↑</kbd>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -497,15 +507,16 @@
             });
 
             window.Alpine.data('configBackups', (config) => ({
-                // Data
+                // ── Data & Config ──────────────────────────────────────────
                 backups: [],
                 page: 0,
                 totalPages: 0,
                 total: 0,
                 urls: config.urls || {},
                 messages: config.messages || {},
+                canRefresh: config.can_refresh || false,
 
-                // UI State
+                // ── UI State ───────────────────────────────────────────────
                 selected: null,
                 selectedBackupId: null,
                 anchorIndex: null,
@@ -518,21 +529,21 @@
                 error: null,
                 copied: false,
                 copiedDiff: false,
-                canRefresh: config.can_refresh || false,
                 refreshing: false,
 
-                // Diff State
+                // ── Diff State ─────────────────────────────────────────────
                 diffMode: false,
                 diffSelection: [],
                 diffGroups: null,
                 diffReversed: false,
 
+                // ── Lifecycle ──────────────────────────────────────────────
                 async init() {
                     await this.loadLatest();
                     this.loadBackupPage(0);
                 },
 
-                // --- Loading Logic ---
+                // ── Loading Helpers ────────────────────────────────────────
                 beginLoading() {
                     this.loading = true;
                     this.showSpinner = false;
@@ -547,15 +558,47 @@
                     this.showSpinner = false;
                 },
 
-                // ── Backup list ──────────────────────────────────────────
+                // ── Navigation & Index Helpers ─────────────────────────────
+                indexOfId(id) {
+                    return this.backups.findIndex(b => b.id === id);
+                },
 
+                get currentSingleIndex() {
+                    const id = this.selectedBackupId ?? this.selected?.id;
+                    const idx = this.indexOfId(id);
+                    return idx !== -1 ? idx : 0;
+                },
+
+                get textBackups() {
+                    return this.backups.filter(b => b.type === 'TEXT');
+                },
+
+                scrollToIndex(index) {
+                    const list = this.$refs.timelineList;
+                    if (!list) return;
+                    const row = list.querySelector(`[data-backup-index="${index}"]`);
+                    row?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                },
+
+                scrollToTop() {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    const panel = this.$refs.viewerPanel;
+                    if (panel) {
+                        const scrollable = panel.querySelector('pre, .tw\\:overflow-x-auto');
+                        if (scrollable) {
+                            scrollable.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                    }
+                },
+
+                // ── Backup List & Fetching ─────────────────────────────────
                 async loadBackupPage(page, append = false) {
                     const loadingKey = append ? 'loadingMore' : 'loadingBackups';
                     this[loadingKey] = true;
 
                     try {
                         const { data } = await window.axios.get(this.urls.backups, { params: { page } });
-                        const mapped = data.backups.map((b) => ({ ...b, page }));
+                        const mapped = data.backups.map(b => ({ ...b, page }));
 
                         if (append) {
                             this.backups.push(...mapped);
@@ -567,9 +610,7 @@
                         this.totalPages = data.totalPages;
                         this.total = data.total;
                     } catch (error) {
-                        if (!this.error) {
-                            this.error = this.requestError(error);
-                        }
+                        if (!this.error) this.error = this.requestError(error);
                     } finally {
                         this[loadingKey] = false;
                     }
@@ -583,8 +624,6 @@
                     return this.page < this.totalPages - 1;
                 },
 
-                // ── Backup content ───────────────────────────────────────
-
                 async loadLatest() {
                     const timer = this.beginLoading();
                     try {
@@ -594,9 +633,7 @@
                             this.selectedBackupId = data.id;
                         }
                     } catch (error) {
-                        if (!this.selected) {
-                            this.error = this.requestError(error);
-                        }
+                        if (!this.selected) this.error = this.requestError(error);
                     } finally {
                         this.endLoading(timer);
                     }
@@ -620,7 +657,121 @@
                     }
                 },
 
-                // ── Keyboard Shortcuts ──────────────────────────────────
+                // ── Unified Selection & Navigation ─────────────────────────
+                applyDiffRange(anchor, focus) {
+                    const minIdx = Math.min(anchor, focus);
+                    const maxIdx = Math.max(anchor, focus);
+                    const older = this.backups[maxIdx];
+                    const newer = this.backups[minIdx];
+
+                    if (!older || !newer || older.type !== 'TEXT' || newer.type !== 'TEXT') return;
+
+                    if (this.diffMode && this.diffSelection.length === 2 &&
+                        this.diffSelection[0].id === older.id && this.diffSelection[1].id === newer.id && !this.diffReversed) {
+                        this.scrollToTop();
+                        return;
+                    }
+
+                    this.anchorIndex = anchor;
+                    this.focusIndex = focus;
+                    this.diffMode = true;
+                    this.diffReversed = false;
+                    this.diffSelection = [older, newer];
+                    this.loadDiff();
+                },
+
+                selectBackup(backup, index, event = null) {
+                    if (backup.type !== 'TEXT') {
+                        if (!this.diffMode) {
+                            this.selected = backup;
+                            this.selectedBackupId = backup.id;
+                            this.anchorIndex = index;
+                            this.focusIndex = index;
+                            this.selected.content = null;
+                        }
+                        return;
+                    }
+
+                    // Shift-click range selection
+                    if (event && event.shiftKey) {
+                        const curAnchor = this.anchorIndex ?? this.indexOfId(this.selectedBackupId ?? this.selected?.id ?? this.activeDiffRev?.id);
+                        this.applyDiffRange(curAnchor !== -1 ? curAnchor : 0, index);
+                        return;
+                    }
+
+                    // Step-through diff mode
+                    if (this.diffMode) {
+                        const predecessorIdx = index + 1 < this.backups.length && this.backups[index + 1].type === 'TEXT'
+                            ? index + 1
+                            : (index - 1 >= 0 && this.backups[index - 1].type === 'TEXT' ? index - 1 : null);
+
+                        if (predecessorIdx !== null) {
+                            this.applyDiffRange(index, predecessorIdx);
+                        }
+                        return;
+                    }
+
+                    // Single mode: re-click active config scrolls to top
+                    if ((this.selectedBackupId ?? this.selected?.id) === backup.id && this.selected?.content != null) {
+                        this.scrollToTop();
+                        return;
+                    }
+
+                    this.selectedBackupId = backup.id;
+                    this.anchorIndex = index;
+                    this.focusIndex = index;
+                    this.error = null;
+                    this.loadBackupContent(backup);
+                },
+
+                navigateHistory(step, isShift = false) {
+                    if (!this.backups.length) return;
+
+                    if (this.diffMode) {
+                        if (isShift) {
+                            const curAnchor = this.anchorIndex ?? (this.activeDiffRev ? this.indexOfId(this.activeDiffRev.id) : 0);
+                            const curFocus = this.focusIndex ?? (this.activeDiffOrig ? this.indexOfId(this.activeDiffOrig.id) : curAnchor + 1);
+
+                            let nextFocus = curFocus + step;
+                            if (nextFocus === curAnchor) nextFocus += step;
+                            if (nextFocus < 0 || nextFocus >= this.backups.length) return;
+
+                            this.applyDiffRange(curAnchor, nextFocus);
+                            this.scrollToIndex(nextFocus);
+                            return;
+                        }
+
+                        // Regular Step-Through Diff Navigation
+                        const currentAnchor = this.anchorIndex ?? (this.activeDiffRev ? this.indexOfId(this.activeDiffRev.id) : 0);
+                        const nextAnchor = currentAnchor + step;
+                        if (nextAnchor < 0 || nextAnchor >= this.backups.length) return;
+
+                        const nextBackup = this.backups[nextAnchor];
+                        if (nextBackup) {
+                            this.selectBackup(nextBackup, nextAnchor);
+                            this.scrollToIndex(nextAnchor);
+                        }
+                        return;
+                    }
+
+                    // Single Mode Navigation
+                    const currentIdx = this.currentSingleIndex;
+                    const nextIndex = currentIdx + step;
+                    if (nextIndex < 0 || nextIndex >= this.backups.length) return;
+
+                    if (isShift) {
+                        this.applyDiffRange(currentIdx, nextIndex);
+                        this.scrollToIndex(nextIndex);
+                        return;
+                    }
+
+                    const nextBackup = this.backups[nextIndex];
+                    if (nextBackup) {
+                        this.selectBackup(nextBackup, nextIndex);
+                        this.scrollToIndex(nextIndex);
+                    }
+                },
+
                 handleKeyDown(e) {
                     if (e.target.closest('input, textarea, select')) return;
 
@@ -643,11 +794,9 @@
                         return;
                     }
 
-                    if (e.key === 'd' || e.key === 'c') {
-                        if (this.total > 1) {
-                            e.preventDefault();
-                            this.toggleDiffMode();
-                        }
+                    if ((e.key === 'd' || e.key === 'c') && this.total > 1) {
+                        e.preventDefault();
+                        this.toggleDiffMode();
                         return;
                     }
 
@@ -657,209 +806,32 @@
                         return;
                     }
 
-                    if (e.key === 'j' || e.key === 'ArrowDown') {
+                    if (e.key === 'j' || e.key === 'J' || ((e.ctrlKey || e.metaKey) && e.key === 'ArrowDown')) {
                         e.preventDefault();
                         this.navigateHistory(1, e.shiftKey);
                         return;
                     }
 
-                    if (e.key === 'k' || e.key === 'ArrowUp') {
+                    if (e.key === 'k' || e.key === 'K' || ((e.ctrlKey || e.metaKey) && e.key === 'ArrowUp')) {
                         e.preventDefault();
                         this.navigateHistory(-1, e.shiftKey);
                         return;
                     }
-                },
 
-                navigateHistory(step, isShift = false) {
-                    if (!this.backups.length) return;
-
-                    if (this.diffMode) {
-                        if (isShift) {
-                            if (this.anchorIndex === null) {
-                                const revIdx = this.activeDiffRev ? this.backups.findIndex(b => b.id === this.activeDiffRev.id) : 0;
-                                this.anchorIndex = revIdx !== -1 ? revIdx : 0;
-                            }
-                            if (this.focusIndex === null) {
-                                const origIdx = this.activeDiffOrig ? this.backups.findIndex(b => b.id === this.activeDiffOrig.id) : this.anchorIndex + 1;
-                                this.focusIndex = origIdx !== -1 ? origIdx : this.anchorIndex + 1;
-                            }
-
-                            let nextFocus = this.focusIndex + step;
-                            if (nextFocus === this.anchorIndex) {
-                                nextFocus = this.anchorIndex + step;
-                            }
-
-                            if (nextFocus < 0 || nextFocus >= this.backups.length) {
-                                return; // Boundary reached
-                            }
-
-                            this.focusIndex = nextFocus;
-                            const minIdx = Math.min(this.anchorIndex, this.focusIndex);
-                            const maxIdx = Math.max(this.anchorIndex, this.focusIndex);
-
-                            const older = this.backups[maxIdx];
-                            const newer = this.backups[minIdx];
-
-                            if (older && newer && older.type === 'TEXT' && newer.type === 'TEXT') {
-                                if (this.diffSelection.length === 2 && this.diffSelection[0].id === older.id && this.diffSelection[1].id === newer.id && !this.diffReversed) {
-                                    return;
-                                }
-                                this.diffReversed = false;
-                                this.diffSelection = [older, newer];
-                                this.loadDiff();
-                                this.scrollToIndex(this.focusIndex);
-                            }
-                            return;
-                        }
-
-                        // Regular Step-Through Diff Navigation (step = +1 / -1)
-                        const currentAnchor = this.anchorIndex ?? (this.activeDiffRev ? this.backups.findIndex(b => b.id === this.activeDiffRev.id) : 0);
-                        const nextAnchor = currentAnchor + step;
-                        if (nextAnchor < 0 || nextAnchor >= this.backups.length) {
-                            return; // Boundary reached - do nothing
-                        }
-
-                        const nextBackup = this.backups[nextAnchor];
-                        if (!nextBackup) return;
-
-                        this.selectBackup(nextBackup, nextAnchor);
-                        this.scrollToIndex(nextAnchor);
+                    if (e.shiftKey && e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        this.navigateHistory(1, true);
                         return;
                     }
 
-                    // Single Mode Navigation
-                    const curId = this.selectedBackupId ?? this.selected?.id;
-                    const currentIndex = this.backups.findIndex(b => b.id === curId);
-                    const currentIdx = currentIndex !== -1 ? currentIndex : 0;
-
-                    if (isShift) {
-                        const targetIdx = currentIdx + step;
-                        if (targetIdx < 0 || targetIdx >= this.backups.length) {
-                            return;
-                        }
-                        this.anchorIndex = currentIdx;
-                        this.focusIndex = targetIdx;
-                        const minIdx = Math.min(this.anchorIndex, this.focusIndex);
-                        const maxIdx = Math.max(this.anchorIndex, this.focusIndex);
-
-                        this.diffMode = true;
-                        this.diffReversed = false;
-                        this.diffSelection = [this.backups[maxIdx], this.backups[minIdx]];
-                        this.loadDiff();
-                        this.scrollToIndex(targetIdx);
+                    if (e.shiftKey && e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        this.navigateHistory(-1, true);
                         return;
-                    }
-
-                    const nextIndex = currentIdx + step;
-                    if (nextIndex < 0 || nextIndex >= this.backups.length) {
-                        return; // Boundary reached - do nothing
-                    }
-
-                    const nextBackup = this.backups[nextIndex];
-                    if (!nextBackup) return;
-
-                    this.selectBackup(nextBackup, nextIndex);
-                    this.scrollToIndex(nextIndex);
-                },
-
-                scrollToIndex(index) {
-                    const list = this.$refs.timelineList;
-                    if (!list) return;
-                    const row = list.querySelector(`[data-backup-index="${index}"]`);
-                    row?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-                },
-
-                scrollToTop() {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    const panel = this.$refs.viewerPanel;
-                    if (panel) {
-                        const scrollable = panel.querySelector('pre, .tw\\:overflow-x-auto');
-                        if (scrollable) {
-                            scrollable.scrollTo({ top: 0, behavior: 'smooth' });
-                        }
                     }
                 },
 
-                selectBackup(backup, index, event = null) {
-                    if (backup.type !== 'TEXT') {
-                        if (!this.diffMode) {
-                            this.selected = backup;
-                            this.selectedBackupId = backup.id;
-                            this.anchorIndex = index;
-                            this.focusIndex = index;
-                            this.selected.content = null;
-                        }
-                        return;
-                    }
-
-                    // Shift-Click Range Selection (Method C)
-                    if (event && event.shiftKey) {
-                        if (this.anchorIndex === null) {
-                            const curId = this.selectedBackupId ?? this.selected?.id ?? this.activeDiffRev?.id;
-                            const found = this.backups.findIndex(b => b.id === curId);
-                            this.anchorIndex = found !== -1 ? found : 0;
-                        }
-
-                        this.focusIndex = index;
-                        const minIdx = Math.min(this.anchorIndex, this.focusIndex);
-                        const maxIdx = Math.max(this.anchorIndex, this.focusIndex);
-
-                        const older = this.backups[maxIdx];
-                        const newer = this.backups[minIdx];
-
-                        if (older && newer && older.type === 'TEXT' && newer.type === 'TEXT') {
-                            if (this.diffMode && this.diffSelection.length === 2 && this.diffSelection[0].id === older.id && this.diffSelection[1].id === newer.id && !this.diffReversed) {
-                                this.scrollToTop();
-                                return;
-                            }
-                            this.diffMode = true;
-                            this.diffReversed = false;
-                            this.diffSelection = [older, newer];
-                            this.loadDiff();
-                            return;
-                        }
-                    }
-
-                    if (this.diffMode) {
-                        // Step-through diff: clicking row N sets anchor = N, focus = predecessor (N+1)
-                        const predecessorIdx = index + 1 < this.backups.length && this.backups[index + 1].type === 'TEXT'
-                            ? index + 1
-                            : (index - 1 >= 0 && this.backups[index - 1].type === 'TEXT' ? index - 1 : null);
-
-                        if (predecessorIdx !== null) {
-                            this.anchorIndex = index;
-                            this.focusIndex = predecessorIdx;
-
-                            const minIdx = Math.min(this.anchorIndex, this.focusIndex);
-                            const maxIdx = Math.max(this.anchorIndex, this.focusIndex);
-                            const older = this.backups[maxIdx];
-                            const newer = this.backups[minIdx];
-
-                            if (this.diffSelection.length === 2 && this.diffSelection[0].id === older.id && this.diffSelection[1].id === newer.id && !this.diffReversed) {
-                                this.scrollToTop();
-                                return; // Diff is already loaded
-                            }
-                            this.diffReversed = false;
-                            this.diffSelection = [older, newer];
-                            this.loadDiff();
-                        }
-                        return;
-                    }
-
-                    if ((this.selectedBackupId ?? this.selected?.id) === backup.id && this.selected?.content != null) {
-                        this.scrollToTop();
-                        return;
-                    }
-
-                    this.selectedBackupId = backup.id;
-                    this.anchorIndex = index;
-                    this.focusIndex = index;
-                    this.error = null;
-                    this.loadBackupContent(backup);
-                },
-
-                // ── Diff ─────────────────────────────────────────────────
-
+                // ── Diff Management & Dropdowns ────────────────────────────
                 toggleDiffMode() {
                     this.diffMode = !this.diffMode;
                     this.error = null;
@@ -868,27 +840,19 @@
                 },
 
                 enterDiffMode() {
-                    const textBackups = [];
-                    let selectedIdx = -1;
+                    const text = this.textBackups;
                     const curId = this.selectedBackupId ?? this.selected?.id;
-                    for (const b of this.backups) {
-                        if (b.type !== 'TEXT') continue;
-                        if (selectedIdx === -1 && curId === b.id) {
-                            selectedIdx = textBackups.length;
-                        }
-                        textBackups.push(b);
-                    }
+                    const selectedIdx = text.findIndex(b => b.id === curId);
 
                     if (selectedIdx !== -1) {
-                        const pair = textBackups[selectedIdx + 1] ?? textBackups[selectedIdx - 1];
-                        this.diffSelection = pair ? [textBackups[selectedIdx], pair] : [textBackups[selectedIdx]];
-                        this.anchorIndex = this.backups.findIndex(b => b.id === textBackups[selectedIdx].id);
-                        this.focusIndex = pair ? this.backups.findIndex(b => b.id === pair.id) : this.anchorIndex;
+                        const pair = text[selectedIdx + 1] ?? text[selectedIdx - 1];
+                        this.diffSelection = pair ? [text[selectedIdx], pair] : [text[selectedIdx]];
                     } else {
-                        this.diffSelection = textBackups.slice(0, 2);
-                        this.anchorIndex = this.diffSelection[0] ? this.backups.findIndex(b => b.id === this.diffSelection[0].id) : 0;
-                        this.focusIndex = this.diffSelection[1] ? this.backups.findIndex(b => b.id === this.diffSelection[1].id) : this.anchorIndex;
+                        this.diffSelection = text.slice(0, 2);
                     }
+
+                    this.anchorIndex = this.diffSelection[0] ? this.indexOfId(this.diffSelection[0].id) : 0;
+                    this.focusIndex = this.diffSelection[1] ? this.indexOfId(this.diffSelection[1].id) : this.anchorIndex;
 
                     if (this.diffSelection.length === 2) {
                         this.loadDiff();
@@ -901,7 +865,7 @@
                     if (this.diffSelection[0]) {
                         const target = this.diffSelection[0];
                         this.selectedBackupId = target.id;
-                        const idx = this.backups.findIndex(b => b.id === target.id);
+                        const idx = this.indexOfId(target.id);
                         this.anchorIndex = idx !== -1 ? idx : 0;
                         this.focusIndex = this.anchorIndex;
                         if (this.selected?.id !== target.id || this.selected?.content == null) {
@@ -918,15 +882,32 @@
                     this.loadDiff();
                 },
 
-                get textBackups() {
-                    return this.backups.filter(b => b.type === 'TEXT');
+                setDiffEndpoint(role, selectedId) {
+                    const backup = this.backups.find(b => String(b.id) === String(selectedId));
+                    const currentOther = role === 'orig' ? this.activeDiffRev : this.activeDiffOrig;
+                    if (!backup || backup.type !== 'TEXT' || !currentOther) return;
+
+                    const other = String(backup.id) === String(currentOther.id)
+                        ? this.textBackups.find(b => String(b.id) !== String(selectedId))
+                        : currentOther;
+
+                    if (!other) return;
+                    const [b1, b2] = role === 'orig' ? [backup, other] : [other, backup];
+                    this.applyDiffRange(this.indexOfId(b1.id), this.indexOfId(b2.id));
+                },
+
+                onOrigDropdownChange(selectedId) {
+                    this.setDiffEndpoint('orig', selectedId);
+                },
+
+                onRevDropdownChange(selectedId) {
+                    this.setDiffEndpoint('rev', selectedId);
                 },
 
                 get sortedDiff() {
                     if (this.diffSelection.length !== 2) return null;
                     const [b1, b2] = this.diffSelection;
                     const [older, newer] = b1.date <= b2.date ? [b1, b2] : [b2, b1];
-
                     return this.diffReversed ? { orig: newer, rev: older } : { orig: older, rev: newer };
                 },
 
@@ -946,59 +927,21 @@
                     return this.activeDiffRev?.id ?? '';
                 },
 
-                onOrigDropdownChange(selectedId) {
-                    const backup = this.backups.find(b => String(b.id) === String(selectedId));
-                    if (!backup || backup.type !== 'TEXT' || !this.activeDiffRev) return;
-
-                    if (String(backup.id) === String(this.activeRevId)) {
-                        const other = this.textBackups.find(b => String(b.id) !== String(selectedId));
-                        if (other) this.diffSelection = [backup, other];
-                    } else {
-                        this.diffSelection = [backup, this.activeDiffRev];
-                    }
-                    const idxOrig = this.backups.findIndex(b => b.id === this.diffSelection[0].id);
-                    const idxRev = this.backups.findIndex(b => b.id === this.diffSelection[1].id);
-                    this.anchorIndex = idxOrig !== -1 ? idxOrig : 0;
-                    this.focusIndex = idxRev !== -1 ? idxRev : this.anchorIndex;
-                    this.loadDiff();
-                },
-
-                onRevDropdownChange(selectedId) {
-                    const backup = this.backups.find(b => String(b.id) === String(selectedId));
-                    if (!backup || backup.type !== 'TEXT' || !this.activeDiffOrig) return;
-
-                    if (String(backup.id) === String(this.activeOrigId)) {
-                        const other = this.textBackups.find(b => String(b.id) !== String(selectedId));
-                        if (other) this.diffSelection = [this.activeDiffOrig, other];
-                    } else {
-                        this.diffSelection = [this.activeDiffOrig, backup];
-                    }
-                    const idxOrig = this.backups.findIndex(b => b.id === this.diffSelection[0].id);
-                    const idxRev = this.backups.findIndex(b => b.id === this.diffSelection[1].id);
-                    this.anchorIndex = idxOrig !== -1 ? idxOrig : 0;
-                    this.focusIndex = idxRev !== -1 ? idxRev : this.anchorIndex;
-                    this.loadDiff();
-                },
-
                 get diffReady() {
                     return this.diffGroups !== null && this.diffSelection.length === 2;
                 },
 
                 get hasDiffChanges() {
-                    if (!this.diffGroups) return false;
-                    return this.diffGroups.some(g => g.type !== 'COMMON');
+                    return !this.diffGroups ? false : this.diffGroups.some(g => g.type !== 'COMMON');
                 },
 
                 get diffStats() {
                     if (!this.diffGroups) return null;
-                    let additions = 0;
-                    let deletions = 0;
+                    let additions = 0, deletions = 0;
                     this.diffGroups.forEach((g) => {
-                        if (g.type === 'INSERTED') {
-                            additions += g.revised.length;
-                        } else if (g.type === 'DELETED') {
-                            deletions += g.original.length;
-                        } else if (g.type === 'CHANGED') {
+                        if (g.type === 'INSERTED') additions += g.revised.length;
+                        else if (g.type === 'DELETED') deletions += g.original.length;
+                        else if (g.type === 'CHANGED') {
                             deletions += g.original.length;
                             additions += g.revised.length;
                         }
@@ -1010,10 +953,9 @@
                     const range = this.selectedRangeIndices;
                     if (!range) return '{{ __('config_backups.revision_step') }}';
                     const count = range[1] - range[0] + 1;
-                    if (count <= 2) {
-                        return '{{ __('config_backups.revision_step') }}';
-                    }
-                    return '{{ __('config_backups.revisions_spanned', ['count' => '__COUNT__']) }}'.replace('__COUNT__', count);
+                    return count <= 2
+                        ? '{{ __('config_backups.revision_step') }}'
+                        : '{{ __('config_backups.revisions_spanned', ['count' => '__COUNT__']) }}'.replace('__COUNT__', count);
                 },
 
                 get diffRoleMap() {
@@ -1045,34 +987,15 @@
                 },
 
                 get diffRows() {
-                    if (!this.diffGroups) {
-                        return [];
-                    }
-
+                    if (!this.diffGroups) return [];
                     const rows = [];
-                    const push = (mode, lines) => {
-                        lines.forEach((line) => {
-                            rows.push({
-                                mode,
-                                line: line.line,
-                                text: line.text,
-                            });
-                        });
-                    };
+                    const push = (mode, lines) => lines.forEach(l => rows.push({ mode, line: l.line, text: l.text }));
 
                     this.diffGroups.forEach((group) => {
-                        if (group.type === 'COMMON') {
-                            push('common', group.original);
-                            return;
-                        }
-                        if (group.type === 'DELETED' || group.type === 'CHANGED') {
-                            push('removed', group.original);
-                        }
-                        if (group.type === 'INSERTED' || group.type === 'CHANGED') {
-                            push('added', group.revised);
-                        }
+                        if (group.type === 'COMMON') push('common', group.original);
+                        if (group.type === 'DELETED' || group.type === 'CHANGED') push('removed', group.original);
+                        if (group.type === 'INSERTED' || group.type === 'CHANGED') push('added', group.revised);
                     });
-
                     return rows;
                 },
 
@@ -1080,12 +1003,11 @@
                     return this.diffRoleMap[backup.id] ?? null;
                 },
 
-                // ── Timeline Styling Helpers ─────────────────────────────
-
+                // ── Timeline Styling Helpers ───────────────────────────────
                 get selectedRangeIndices() {
                     if (this.diffMode && this.diffSelection.length === 2) {
-                        const idx1 = this.backups.findIndex(b => b.id === this.diffSelection[0].id);
-                        const idx2 = this.backups.findIndex(b => b.id === this.diffSelection[1].id);
+                        const idx1 = this.indexOfId(this.diffSelection[0].id);
+                        const idx2 = this.indexOfId(this.diffSelection[1].id);
                         if (idx1 !== -1 && idx2 !== -1) {
                             return [Math.min(idx1, idx2), Math.max(idx1, idx2)];
                         }
@@ -1099,12 +1021,8 @@
                 },
 
                 getRowRangeClass(backup, index) {
-                    if (this.isIndexInRange(index)) {
-                        return 'tw:bg-blue-50/70 tw:dark:bg-blue-950/30';
-                    }
-                    if (!this.diffMode && this.isSelected(backup)) {
-                        return 'tw:bg-gray-100 tw:dark:bg-dark-gray-300';
-                    }
+                    if (this.isIndexInRange(index)) return 'tw:bg-blue-50/70 tw:dark:bg-blue-950/30';
+                    if (!this.diffMode && this.isSelected(backup)) return 'tw:bg-gray-100 tw:dark:bg-dark-gray-300';
                     return 'tw:hover:bg-gray-50 tw:dark:hover:bg-dark-gray-300';
                 },
 
@@ -1118,8 +1036,7 @@
                     return !!(range && index >= range[0] && index < range[1]);
                 },
 
-                // ── View visibility ─────────────────────────────────────
-
+                // ── View Visibility & UI Helpers ───────────────────────────
                 get showDiffView() {
                     return this.diffMode && this.diffReady;
                 },
@@ -1136,23 +1053,18 @@
                     return !this.diffMode && this.selected?.content != null && (!this.selected || this.selected.type === 'TEXT');
                 },
 
-                // ── UI helpers ───────────────────────────────────────────
-
                 isBackupDisabled(backup) {
                     return this.diffMode && backup.type !== 'TEXT';
                 },
 
                 get diffSelectionIdSet() {
-                    return new Set(this.diffSelection.map((b) => b.id));
+                    return new Set(this.diffSelection.map(b => b.id));
                 },
 
                 isSelected(backup) {
-                    if (this.diffMode) {
-                        return this.diffSelectionIdSet.has(backup.id);
-                    }
-
-                    const currentId = this.selectedBackupId ?? this.selected?.id;
-                    return currentId === backup.id;
+                    return this.diffMode
+                        ? this.diffSelectionIdSet.has(backup.id)
+                        : (this.selectedBackupId ?? this.selected?.id) === backup.id;
                 },
 
                 get selectedDisplayDate() {
@@ -1175,125 +1087,80 @@
                     return error.response?.data?.error ?? 'request_failed';
                 },
 
-                // ── Export Actions (Config & Diff) ───────────────────────
+                // ── Download & Clipboard Actions ───────────────────────────
+                downloadFile(content, filename, mimeType) {
+                    const blob = new Blob([content], { type: `${mimeType};charset=utf-8` });
+                    const url = URL.createObjectURL(blob);
+                    Object.assign(document.createElement('a'), { href: url, download: filename }).click();
+                    URL.revokeObjectURL(url);
+                },
+
+                copyText(text, successKey) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        this[successKey] = true;
+                        setTimeout(() => { this[successKey] = false; }, 2000);
+                    }).catch(err => console.error('Failed to copy to clipboard:', err));
+                },
 
                 generateUnifiedDiff() {
-                    if (!this.diffGroups || !this.activeDiffOrig || !this.activeDiffRev) {
-                        return '';
-                    }
+                    if (!this.diffGroups || !this.activeDiffOrig || !this.activeDiffRev) return '';
 
                     const origDate = this.formatDate(this.activeDiffOrig.date);
                     const revDate = this.formatDate(this.activeDiffRev.date);
-                    let diffText = `--- Base (${origDate})\n+++ Compare (${revDate})\n`;
+                    let text = `--- Base (${origDate})\n+++ Compare (${revDate})\n`;
 
                     this.diffGroups.forEach((group) => {
                         if (group.type === 'COMMON') {
-                            group.original.forEach((l) => {
-                                diffText += `  ${l.text}\n`;
-                            });
+                            group.original.forEach(l => { text += `  ${l.text}\n`; });
                         } else if (group.type === 'DELETED') {
-                            group.original.forEach((l) => {
-                                diffText += `-${l.text}\n`;
-                            });
+                            group.original.forEach(l => { text += `-${l.text}\n`; });
                         } else if (group.type === 'INSERTED') {
-                            group.revised.forEach((l) => {
-                                diffText += `+${l.text}\n`;
-                            });
+                            group.revised.forEach(l => { text += `+${l.text}\n`; });
                         } else if (group.type === 'CHANGED') {
-                            group.original.forEach((l) => {
-                                diffText += `-${l.text}\n`;
-                            });
-                            group.revised.forEach((l) => {
-                                diffText += `+${l.text}\n`;
-                            });
+                            group.original.forEach(l => { text += `-${l.text}\n`; });
+                            group.revised.forEach(l => { text += `+${l.text}\n`; });
                         }
                     });
-
-                    return diffText;
+                    return text;
                 },
 
                 downloadDiff() {
                     const diffText = this.generateUnifiedDiff();
                     if (!diffText) return;
 
-                    const origDateStr = this.activeDiffOrig?.date
-                        ? new Date(this.activeDiffOrig.date * 1000).toISOString().split('T')[0]
-                        : 'orig';
-                    const revDateStr = this.activeDiffRev?.date
-                        ? new Date(this.activeDiffRev.date * 1000).toISOString().split('T')[0]
-                        : 'rev';
+                    const origDate = this.activeDiffOrig?.date ? new Date(this.activeDiffOrig.date * 1000).toISOString().split('T')[0] : 'orig';
+                    const revDate = this.activeDiffRev?.date ? new Date(this.activeDiffRev.date * 1000).toISOString().split('T')[0] : 'rev';
                     const hostname = config.hostname ? `${config.hostname}-` : '';
-                    const filename = `${hostname}config-diff-${origDateStr}-to-${revDateStr}.diff`;
 
-                    const blob = new Blob([diffText], { type: 'text/x-diff;charset=utf-8' });
-                    const url = URL.createObjectURL(blob);
-
-                    Object.assign(document.createElement('a'), { href: url, download: filename }).click();
-                    URL.revokeObjectURL(url);
+                    this.downloadFile(diffText, `${hostname}config-diff-${origDate}-to-${revDate}.diff`, 'text/x-diff');
                 },
 
                 copyDiff() {
                     const diffText = this.generateUnifiedDiff();
-                    if (!diffText) return;
-
-                    navigator.clipboard.writeText(diffText).then(() => {
-                        this.copiedDiff = true;
-                        setTimeout(() => {
-                            this.copiedDiff = false;
-                        }, 2000);
-                    }).catch((error) => {
-                        console.error('Failed to copy diff to clipboard:', error);
-                    });
+                    if (diffText) this.copyText(diffText, 'copiedDiff');
                 },
 
                 downloadConfig() {
-                    if (!this.selected?.content) {
-                        return;
-                    }
+                    if (!this.selected?.content) return;
 
-                    const dateStr = this.selected?.date
-                        ? new Date(this.selected.date * 1000).toISOString().split('T')[0]
-                        : 'latest';
+                    const dateStr = this.selected?.date ? new Date(this.selected.date * 1000).toISOString().split('T')[0] : 'latest';
                     const hostname = config.hostname ? `${config.hostname}-` : '';
-                    const filename = `${hostname}config-${dateStr}.txt`;
-                    const blob = new Blob([this.selected.content], { type: 'text/plain;charset=utf-8' });
-                    const url = URL.createObjectURL(blob);
 
-                    Object.assign(document.createElement('a'), { href: url, download: filename }).click();
-                    URL.revokeObjectURL(url);
+                    this.downloadFile(this.selected.content, `${hostname}config-${dateStr}.txt`, 'text/plain');
                 },
 
                 copyToClipboard() {
-                    if (!this.selected?.content) {
-                        return;
-                    }
-
-                    navigator.clipboard.writeText(this.selected.content).then(() => {
-                        this.copied = true;
-                        setTimeout(() => {
-                            this.copied = false;
-                        }, 2000);
-                    }).catch((error) => {
-                        console.error('Failed to copy configuration to clipboard:', error);
-                    });
+                    if (this.selected?.content) this.copyText(this.selected.content, 'copied');
                 },
 
                 refresh() {
-                    if (this.refreshing) {
-                        return;
-                    }
-
+                    if (this.refreshing) return;
                     this.refreshing = true;
+
                     window.axios.post(this.urls.refresh)
-                        .then(({ data }) => {
-                            window.toastr?.success(data.message);
-                        })
-                        .catch((error) => {
-                            window.toastr?.error(error.response?.data?.message || this.messages.request_failed);
-                        })
-                        .finally(() => {
-                            this.refreshing = false;
-                        });
+                        .then(({ data }) => window.toastr?.success(data.message))
+                        .catch(err => window.toastr?.error(err.response?.data?.message || this.messages.request_failed))
+                        .finally(() => { this.refreshing = false; });
                 },
             }));
         });

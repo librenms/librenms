@@ -399,14 +399,16 @@ Global keyboard shortcuts are active when focus is outside text-entry controls a
 
 | Key                   | Action             | Behavior                                                                                                   |
 | --------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------- |
-| `j` / `↓`             | Older revision     | Move one revision older. In Single mode, select the revision. In Diff mode, establish a new one-step diff. |
-| `k` / `↑`             | Newer revision     | Move one revision newer. In Single mode, select the revision. In Diff mode, establish a new one-step diff. |
+| `j` / `Ctrl+↓`        | Older revision     | Move one revision older. In Single mode, select the revision. In Diff mode, establish a new one-step diff. |
+| `k` / `Ctrl+↑`        | Newer revision     | Move one revision newer. In Single mode, select the revision. In Diff mode, establish a new one-step diff. |
 | `Shift+j` / `Shift+↓` | Expand range older | Move `focusIndex` one revision older while preserving `anchorIndex`.                                       |
 | `Shift+k` / `Shift+↑` | Expand range newer | Move `focusIndex` one revision newer while preserving `anchorIndex`.                                       |
 | `d` / `c`             | Toggle Diff mode   | Enter or exit Diff mode.                                                                                   |
 | `r`                   | Reverse Diff       | Swap Base and Compare revisions.                                                                           |
 | `Esc`                 | Dismiss / Exit     | Close Help if open; otherwise exit Diff mode.                                                              |
 | `?`                   | Help               | Open the keyboard shortcut and interaction help modal.                                                     |
+
+> **Note**: Bare arrow keys (`↑` / `↓`) remain dedicated to native document/viewer scrolling. Modifiers (`Ctrl+↓/↑` for navigation, `Shift+↓/↑` for range extension) provide full keyboard parity.
 
 ### Keyboard State Transitions
 
@@ -618,10 +620,10 @@ The Help modal should explain the interface in terms of **tasks and workflows**,
 
 ### Navigate History
 
-| Key       | Action                 |
-| --------- | ---------------------- |
-| `j` / `↓` | Move to older revision |
-| `k` / `↑` | Move to newer revision |
+| Key            | Action                 |
+| -------------- | ---------------------- |
+| `j` / `Ctrl+↓` | Move to older revision |
+| `k` / `Ctrl+↑` | Move to newer revision |
 
 ### Compare Revisions
 
