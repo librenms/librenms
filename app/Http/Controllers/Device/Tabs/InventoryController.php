@@ -31,7 +31,6 @@ use App\Models\Device;
 use App\Models\EntityState;
 use App\Models\EntPhysical;
 use App\Models\Port;
-use App\Models\Processor;
 use App\Models\Sensor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -151,22 +150,6 @@ class InventoryController implements DeviceTab
             }
         }
 
-        $displayName = $ent->entPhysicalName;
-        $label = null;
-        if ($ent->entPhysicalModelName && $displayName) {
-            $label = $ent->entPhysicalModelName . ' (' . $displayName . ')';
-        } elseif ($ent->entPhysicalModelName) {
-            $label = $ent->entPhysicalModelName;
-        } elseif (is_numeric($displayName) && $ent->entPhysicalVendorType) {
-            $label = $displayName . ' ' . $ent->entPhysicalVendorType;
-        } elseif ($displayName) {
-            $label = $displayName;
-        } elseif ($ent->entPhysicalDescr) {
-            $label = $ent->entPhysicalDescr;
-        } elseif ($ent->entPhysicalClass) {
-            $label = $ent->entPhysicalClass;
-        }
-
         $sensorData = [];
         foreach ($entSensors as $sensor) {
             $description = trim($sensor->sensor_descr . ' ' . $sensor->sensor_class);
@@ -183,9 +166,51 @@ class InventoryController implements DeviceTab
             ];
         }
 
-        $children = ($grouped->get($ent->entPhysicalIndex) ?? collect())->map(fn (EntPhysical $child) => $this->buildNode($child, $grouped, $entityStates, $ports, $sensors, $device))->all();
+        $children = ($grouped->get($ent->entPhysicalIndex) ?? collect())
+            ->map(fn (EntPhysical $child) => $this->buildNode($child, $grouped, $entityStates, $ports, $sensors, $device))
+            ->all();
 
-        $iconClass = match ($ent->entPhysicalClass) {
+        return [
+            'entity' => $ent,
+            'label' => $this->resolveEntityLabel($ent),
+            'icon' => $this->resolveEntityIcon($ent),
+            'port' => $port,
+            'sensors' => $sensorData,
+            'states' => $states,
+            'alarms' => $alarms,
+            'children' => $children,
+        ];
+    }
+
+    private function resolveEntityLabel(EntPhysical $ent): ?string
+    {
+        $displayName = $ent->entPhysicalName;
+
+        if ($ent->entPhysicalModelName && $displayName) {
+            return $ent->entPhysicalModelName . ' (' . $displayName . ')';
+        }
+        if ($ent->entPhysicalModelName) {
+            return $ent->entPhysicalModelName;
+        }
+        if (is_numeric($displayName) && $ent->entPhysicalVendorType) {
+            return $displayName . ' ' . $ent->entPhysicalVendorType;
+        }
+        if ($displayName) {
+            return $displayName;
+        }
+        if ($ent->entPhysicalDescr) {
+            return $ent->entPhysicalDescr;
+        }
+        if ($ent->entPhysicalClass) {
+            return $ent->entPhysicalClass;
+        }
+
+        return null;
+    }
+
+    private function resolveEntityIcon(EntPhysical $ent): string
+    {
+        return match ($ent->entPhysicalClass) {
             'chassis' => 'fa-server',
             'module' => 'fa-database',
             'port' => 'fa-link',
@@ -196,17 +221,6 @@ class InventoryController implements DeviceTab
             'powerSupply' => 'fa-bolt',
             default => 'fa-cube',
         };
-
-        return [
-            'entity' => $ent,
-            'label' => $label,
-            'icon' => $iconClass,
-            'port' => $port,
-            'sensors' => $sensorData,
-            'states' => $states,
-            'alarms' => $alarms,
-            'children' => $children,
-        ];
     }
 
     /**
@@ -215,7 +229,7 @@ class InventoryController implements DeviceTab
     private function getHrDeviceItems(Device $device): array
     {
         $hrDevices = $device->hostResources()->orderBy('hrDeviceIndex')->get();
-        $processors = Processor::where('device_id', $device->device_id)->get()->keyBy('hrDeviceIndex');
+        $processors = $device->processors()->get()->keyBy('hrDeviceIndex');
         $ports = $device->ports()->get();
 
         return $hrDevices->map(function ($hr) use ($processors, $ports) {
@@ -234,7 +248,7 @@ class InventoryController implements DeviceTab
             }
 
             return [
-                'device' => $hr,
+                'hr' => $hr,
                 'processor' => $processor,
                 'port' => $port,
                 'interface_text' => $interfaceText,

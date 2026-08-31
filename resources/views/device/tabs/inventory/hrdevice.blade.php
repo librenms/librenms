@@ -14,20 +14,20 @@
         <tbody>
         @forelse($data['items'] as $item)
             <tr>
-                <td>{{ $item['device']->hrDeviceIndex }}</td>
+                <td>{{ $item['hr']->hrDeviceIndex }}</td>
                 <td>
-                    @if($item['device']->hrDeviceType === 'hrDeviceProcessor' && $item['processor'])
+                    @if($item['hr']->hrDeviceType === 'hrDeviceProcessor' && $item['processor'])
                         <a href="{{ route('device', ['device' => $device, 'tab' => 'health', 'vars' => 'metric=processor']) }}" class="tw:font-semibold">
-                            {{ $item['device']->hrDeviceDescr }}
+                            {{ $item['hr']->hrDeviceDescr }}
                         </a>
-                    @elseif($item['device']->hrDeviceType === 'hrDeviceNetwork' && $item['port'])
+                    @elseif($item['hr']->hrDeviceType === 'hrDeviceNetwork' && $item['port'])
                         <x-port-link :port="$item['port']" :text="$item['interface_text']" />
                     @else
-                        {{ $item['device']->hrDeviceDescr }}
+                        {{ $item['hr']->hrDeviceDescr }}
                     @endif
                 </td>
                 <td>
-                    @if($item['device']->hrDeviceType === 'hrDeviceProcessor' && $item['processor'])
+                    @if($item['hr']->hrDeviceType === 'hrDeviceProcessor' && $item['processor'])
                         <x-graph
                             :device="$device"
                             type="processor_usage"
@@ -35,7 +35,7 @@
                             :height="20"
                             :width="100"
                         />
-                    @elseif($item['device']->hrDeviceType === 'hrDeviceNetwork' && $item['port'])
+                    @elseif($item['hr']->hrDeviceType === 'hrDeviceNetwork' && $item['port'])
                         <x-graph
                             :device="$device"
                             type="port_bits"
@@ -45,10 +45,10 @@
                         />
                     @endif
                 </td>
-                <td>{{ $item['device']->hrDeviceType }}</td>
-                <td>{{ $item['device']->hrDeviceStatus }}</td>
-                <td>{{ $item['device']->hrDeviceErrors }}</td>
-                <td>{{ $item['device']->hrProcessorLoad !== null ? $item['device']->hrProcessorLoad . '%' : '-' }}</td>
+                <td>{{ $item['hr']->hrDeviceType }}</td>
+                <td>{{ $item['hr']->hrDeviceStatus }}</td>
+                <td>{{ $item['hr']->hrDeviceErrors }}</td>
+                <td>{{ $item['hr']->hrProcessorLoad !== null ? $item['hr']->hrProcessorLoad . '%' : '-' }}</td>
             </tr>
         @empty
             <tr>
