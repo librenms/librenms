@@ -28,11 +28,20 @@ namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use LibreNMS\Interfaces\UI\DeviceTab;
-use LibreNMS\Util\Url;
 
 class ProcessesController implements DeviceTab
 {
+    private const COLUMNS = [
+        'pid' => ['label' => 'PID'],
+        'vsz' => ['label' => 'VSZ', 'title' => 'Virtual Memory'],
+        'rss' => ['label' => 'RSS', 'title' => 'Resident Memory'],
+        'cputime' => ['label' => 'cputime'],
+        'user' => ['label' => 'user'],
+        'command' => ['label' => 'command'],
+    ];
+
     public function visible(Device $device): bool
     {
         return $device->processes()->exists();
@@ -55,22 +64,37 @@ class ProcessesController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        $order = Url::parseOptions('order', 'pid');
-        $validOrders = ['pid', 'vsz', 'rss', 'cputime', 'user', 'command'];
-        if (! in_array($order, $validOrders, true)) {
-            $order = 'pid';
-        }
+        $validated = $request->validate([
+            'order' => ['nullable', 'string', Rule::in(array_keys(self::COLUMNS))],
+            'by' => ['nullable', 'string', Rule::in(['asc', 'desc'])],
+        ]);
 
-        $by = strtolower((string) Url::parseOptions('by', 'asc'));
-        if (! in_array($by, ['asc', 'desc'], true)) {
-            $by = 'asc';
-        }
+        $order = $validated['order'] ?? 'pid';
+        $by = $validated['by'] ?? 'asc';
 
         $processes = $device->processes()->orderBy($order, $by)->get();
+
+        $columns = [];
+        foreach (self::COLUMNS as $colKey => $colMeta) {
+            $isSorted = $order === $colKey;
+            $nextBy = ($isSorted && $by === 'asc') ? 'desc' : 'asc';
+            $columns[$colKey] = [
+                'label' => $colMeta['label'],
+                'title' => isset($colMeta['title']) ? __($colMeta['title']) : null,
+                'icon' => $isSorted ? ($by === 'asc' ? 'fa fa-chevron-up' : 'fa fa-chevron-down') : '',
+                'url' => route('device', [
+                    'device' => $device,
+                    'tab' => 'processes',
+                    'order' => $colKey,
+                    'by' => $nextBy,
+                ]),
+            ];
+        }
 
         return [
             'order' => $order,
             'by' => $by,
+            'columns' => $columns,
             'processes' => $processes,
         ];
     }

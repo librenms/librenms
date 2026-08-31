@@ -51,6 +51,39 @@ class ProcessesTabTest extends TestCase
             ->assertSee(\LibreNMS\Util\Number::formatSi(2048 * 1024, 2, 0, ''));
     }
 
+    public function testAuthorizedUserCanSortProcesses(): void
+    {
+        $device = Device::factory()->create();
+        Process::factory()->for($device)->create([
+            'pid' => 10,
+            'user' => 'zebra',
+        ]);
+        Process::factory()->for($device)->create([
+            'pid' => 20,
+            'user' => 'alpha',
+        ]);
+
+        $response = $this->actingAs($this->admin())
+            ->get(route('device', ['device' => $device, 'tab' => 'processes', 'order' => 'user', 'by' => 'asc']))
+            ->assertOk();
+
+        $content = $response->getContent();
+        $alphaPos = strpos($content, 'alpha');
+        $zebraPos = strpos($content, 'zebra');
+
+        $this->assertTrue($alphaPos !== false && $zebraPos !== false && $alphaPos < $zebraPos);
+    }
+
+    public function testInvalidSortParametersFailValidation(): void
+    {
+        $device = Device::factory()->create();
+        Process::factory()->for($device)->create();
+
+        $this->actingAs($this->admin())
+            ->get(route('device', ['device' => $device, 'tab' => 'processes', 'order' => 'invalid_col', 'by' => 'invalid_dir']))
+            ->assertSessionHasErrors(['order', 'by']);
+    }
+
     public function testUserWithoutAccessGetsForbidden(): void
     {
         $device = Device::factory()->create();
