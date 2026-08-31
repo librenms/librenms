@@ -3,7 +3,7 @@
 @section('content')
 <x-device.page :device="$device">
     <x-panel :title="__('Toner')">
-        <x-graph-row :device="$device" :type="'device_toner'" columns="responsive" />
+        <x-graph-row :device="$device" :type="'device_toner'" columns="responsive" legend="yes" />
     </x-panel>
 </x-device.page>
 @endsection

@@ -38,7 +38,8 @@ class PrinterTabTest extends TestCase
             ->get(route('device', ['device' => $device, 'tab' => 'printer']))
             ->assertOk()
             ->assertSee('Toner')
-            ->assertSee('device_toner');
+            ->assertSee('device_toner')
+            ->assertSee('legend=yes');
     }
 
     public function testUserWithoutAccessGetsForbidden(): void
