@@ -2,23 +2,15 @@
 
 @section('content')
 <x-device.page :device="$device">
-    <div class="panel panel-default">
-        <div class="panel-heading" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-            <div style="display: flex; align-items: center;">
-                <h3 class="panel-title" style="margin-right: 15px;">{{ __('Services') }}</h3>
-                <ul class="nav nav-pills" style="margin: 0;">
-                    <li class="{{ $data['view'] === 'basic' ? 'active' : '' }}">
-                        <a href="{{ route('device', ['device' => $device, 'tab' => 'services', 'vars' => 'view=basic']) }}">
-                            {{ __('Basic') }}
-                        </a>
-                    </li>
-                    <li class="{{ $data['view'] === 'details' ? 'active' : '' }}">
-                        <a href="{{ route('device', ['device' => $device, 'tab' => 'services', 'vars' => 'view=details']) }}">
-                            {{ __('Details') }}
-                        </a>
-                    </li>
-                </ul>
-            </div>
+    <x-panel>
+        <x-slot name="heading" class="tw:flex tw:items-center tw:justify-between tw:flex-wrap">
+            <x-option-bar
+                :name="__('Services')"
+                :options="$data['options']"
+                :selected="$data['view']"
+                border="none"
+                class="tw:inline-block"
+            />
             @can('create', \App\Models\Service::class)
                 <div>
                     <a data-toggle="modal" href="#create-service" class="btn btn-success btn-sm">
@@ -26,10 +18,11 @@
                     </a>
                 </div>
             @endcan
-        </div>
-        <div class="panel-body" style="padding: 0;">
+        </x-slot>
+
+        <x-slot name="table">
             <div class="table-responsive">
-                <table class="table table-hover table-condensed table-striped" style="margin-bottom: 0;">
+                <table class="table table-hover table-condensed table-striped tw:mb-0">
                     <thead>
                         <tr>
                             <th class="col-sm-2">{{ __('Name') }}</th>
@@ -73,7 +66,7 @@
                         @if($data['view'] === 'details' && !empty($item['graphs']))
                             @foreach($item['graphs'] as $graph)
                                 <tr>
-                                    <td colspan="7" style="padding: 10px; background-color: #fafafa;">
+                                    <td colspan="7" class="tw:p-2.5 tw:bg-gray-50 tw:dark:bg-dark-gray-500">
                                         <div class="row">
                                             <div class="col-md-12 text-center">
                                                 <strong>{{ $graph['title'] }}</strong>
@@ -91,7 +84,7 @@
                         @endif
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center" style="padding: 20px;">
+                            <td colspan="7" class="text-center tw:p-5">
                                 <em>{{ __('No services found for this device.') }}</em>
                             </td>
                         </tr>
@@ -99,8 +92,8 @@
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
+        </x-slot>
+    </x-panel>
 
     @php
         if (is_file(base_path('includes/html/modal/new_service.inc.php'))) {

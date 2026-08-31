@@ -33,7 +33,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Time;
-use LibreNMS\Util\Url;
 
 class ServicesController implements DeviceTab
 {
@@ -62,10 +61,10 @@ class ServicesController implements DeviceTab
         Gate::authorize('view', $device);
         abort_if(Gate::none(['service.view', 'service.viewAll']), 403);
 
-        $view = (string) Url::parseOptions('view', 'basic');
-        if (! in_array($view, ['basic', 'details'], true)) {
-            $view = 'basic';
-        }
+        $validated = $request->validate([
+            'view' => 'nullable|string|in:basic,details',
+        ]);
+        $view = $validated['view'] ?? 'basic';
 
         $services = $device->services()
             ->hasAccess($request->user())
@@ -109,8 +108,20 @@ class ServicesController implements DeviceTab
                 ];
             });
 
+        $options = [
+            'basic' => [
+                'text' => __('Basic'),
+                'link' => route('device', ['device' => $device, 'tab' => 'services', 'view' => 'basic']),
+            ],
+            'details' => [
+                'text' => __('Details'),
+                'link' => route('device', ['device' => $device, 'tab' => 'services', 'view' => 'details']),
+            ],
+        ];
+
         return [
             'view' => $view,
+            'options' => $options,
             'services' => $services,
         ];
     }

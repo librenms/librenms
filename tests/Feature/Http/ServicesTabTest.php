@@ -64,10 +64,24 @@ class ServicesTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'services', 'vars' => 'view=details']))
+            ->get(route('device', ['device' => $device, 'tab' => 'services', 'view' => 'details']))
             ->assertOk()
             ->assertSee('Ping Check')
             ->assertSee('Round Trip Average');
+    }
+
+    public function testServicesViewValidationFailsOnInvalidView(): void
+    {
+        $device = Device::factory()->create();
+        Service::factory()->for($device)->create([
+            'service_type' => 'http',
+            'service_ignore' => 0,
+            'service_disabled' => 0,
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device', ['device' => $device, 'tab' => 'services', 'view' => 'invalid']))
+            ->assertInvalid(['view']);
     }
 
     public function testUserWithoutServicePermissionGetsForbidden(): void
