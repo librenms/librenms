@@ -305,9 +305,11 @@ if ($options['f'] === 'refresh_port_groups') {
                 $portGroup->rules = $portGroup->getParser()->generateJoins()->toArray();
                 $portGroup->save();
                 // membership is normally maintained per device as it is polled; resync the
-                // whole group here so any drift is repaired, save() only does it when the
-                // stored joins actually changed
-                $portGroup->updatePorts();
+                // whole group here so any drift is repaired (save() already resynced it if
+                // the stored joins changed)
+                if (! $portGroup->wasChanged('rules')) {
+                    $portGroup->updatePorts();
+                }
             }
         });
         $lock->release();
