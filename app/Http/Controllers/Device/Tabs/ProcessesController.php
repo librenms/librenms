@@ -28,14 +28,14 @@ namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use LibreNMS\Util\Url;
 
 class ProcessesController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        return DB::table('processes')->where('device_id', $device->device_id)->exists();
+        return $device->processes()->exists();
     }
 
     public function slug(): string
@@ -55,6 +55,23 @@ class ProcessesController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        return [];
+        $order = Url::parseOptions('order', 'pid');
+        $validOrders = ['pid', 'vsz', 'rss', 'cputime', 'user', 'command'];
+        if (! in_array($order, $validOrders, true)) {
+            $order = 'pid';
+        }
+
+        $by = strtolower((string) Url::parseOptions('by', 'asc'));
+        if (! in_array($by, ['asc', 'desc'], true)) {
+            $by = 'asc';
+        }
+
+        $processes = $device->processes()->orderBy($order, $by)->get();
+
+        return [
+            'order' => $order,
+            'by' => $by,
+            'processes' => $processes,
+        ];
     }
 }
