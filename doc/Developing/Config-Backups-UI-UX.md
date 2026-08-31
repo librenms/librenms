@@ -154,8 +154,10 @@ The full date and time should be displayed in the controls. The `-` and `+` indi
 **Diff Viewer**
 
 * Unified split-line presentation.
+* Table header row displaying gutter column identifiers (`#`, `±`) and a gutter-aligned metadata summary:
+  * Revisions span (e.g. `1 revision step` or `N revisions spanned`)
+  * Additions (`+X additions`) and Removals (`-Y deletions`)
 * Line gutter markers:
-
   * `+` added
   * `-` removed
   * ` ` unchanged
@@ -184,7 +186,7 @@ Click backup row `N`.
 5. The existing content is displayed at reduced opacity during the request.
 6. Once the request completes, the new configuration replaces the previous content.
 
-No configuration request is made when the selected backup is already the currently resolved configuration.
+No configuration request is made when the selected backup is already the currently resolved configuration. Clicking an already active backup row smoothly scrolls the configuration viewer back to the top (line 1).
 
 ---
 
@@ -215,7 +217,7 @@ If `N` is the oldest loaded revision and no older revision is available, a one-s
 
 **Stepping**
 
-Clicking another row normally selects that revision and establishes a new one-step diff.
+Clicking another row normally selects that revision and establishes a new one-step diff. Clicking the already active diff step smoothly scrolls the diff table back to the top.
 
 Keyboard navigation provides the same behavior:
 
@@ -703,25 +705,21 @@ sortedDiff
 diffRoleMap
 ```
 
-### 9.4 Optional Diff Metadata
+### 9.4 Diff Metadata & Table Header Summary
 
-Diff statistics such as:
-
-```text
-+14 / -3
-```
-
-or:
+Diff metadata is displayed within the top header row of the diff table itself:
 
 ```text
-14 additions · 3 removals
++------+---+------------------------------------------------------------------+
+| #    | ± | 1 revision step · +14 additions, -3 deletions                    |
++------+---+------------------------------------------------------------------+
 ```
 
-may be displayed if they can be obtained without significant additional computation or visual clutter.
+This communicates:
+1. **Revisions Spanned**: Identifies whether the comparison is an adjacent step (`1 revision step`) or a multi-version range (`N revisions spanned`).
+2. **Additions & Deletions**: Net change magnitude (`+X additions, -Y deletions`).
 
-This information is considered supplemental rather than required. It must not justify additional network requests or expensive diff processing solely for presentation purposes.
-
-A revision-count indicator for multi-version ranges may similarly be displayed if it fits naturally into the existing header. Neither statistic should introduce a new persistent UI element merely to expose low-value metadata.
+This placement keeps the main action toolbar uncluttered while anchoring the summary directly to the diff table.
 
 ### 9.5 Alpine.js Lifecycle
 

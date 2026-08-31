@@ -144,7 +144,7 @@
                 </x-panel>
 
                 {{-- Config / diff pane --}}
-                <x-panel class="tw:w-full tw:flex-1 tw:min-w-0 tw:overflow-hidden tw:self-start tw:mb-0!">
+                <x-panel class="tw:w-full tw:flex-1 tw:min-w-0 tw:overflow-hidden tw:self-start tw:mb-0!" x-ref="viewerPanel">
                     <x-slot name="heading" class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
                         <h3 class="panel-title tw:flex tw:items-center tw:gap-2 tw:flex-wrap">
                             <template x-if="diffMode">
@@ -275,10 +275,29 @@
                         </div>
 
                         {{-- diff view --}}
-                        <template x-if="showDiffView">
+                        <template x-if="showDiffView && hasDiffChanges">
                             <div class="tw:overflow-x-auto tw:transition-opacity tw:duration-150"
                                  :class="{ 'tw:opacity-60': loading }">
                                 <table class="tw:w-full tw:m-0 tw:font-mono tw:text-xs tw:border-collapse">
+                                    <thead class="tw:bg-gray-100/90 tw:dark:bg-dark-gray-400/90 tw:border-b tw:border-gray-200 tw:dark:border-dark-gray-200 tw:text-gray-600 tw:dark:text-dark-white-300 tw:select-none">
+                                        <tr>
+                                            <th class="tw:w-12 tw:px-2 tw:py-1.5 tw:text-right tw:font-medium tw:text-gray-400 tw:dark:text-dark-white-400 tw:border-r tw:border-gray-200 tw:dark:border-dark-gray-200">#</th>
+                                            <th class="tw:w-6 tw:px-1 tw:py-1.5 tw:text-center tw:font-medium tw:text-gray-400 tw:dark:text-dark-white-400">±</th>
+                                            <th class="tw:px-2 tw:py-1.5 tw:text-left tw:font-normal">
+                                                <div class="tw:flex tw:items-center tw:gap-2">
+                                                    <span class="tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200" x-text="diffRangeSummaryText"></span>
+                                                    <span class="tw:text-gray-300 tw:dark:text-dark-gray-100">·</span>
+                                                    <template x-if="diffStats">
+                                                        <span class="tw:inline-flex tw:items-center tw:gap-1.5">
+                                                            <span class="tw:text-green-600 tw:dark:text-green-400" x-text="'+' + diffStats.additions + ' {{ __('config_backups.additions') }}'"></span>
+                                                            <span class="tw:text-gray-400 tw:dark:text-dark-white-400">,</span>
+                                                            <span class="tw:text-red-600 tw:dark:text-red-400" x-text="'-' + diffStats.deletions + ' {{ __('config_backups.deletions') }}'"></span>
+                                                        </span>
+                                                    </template>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
                                     <tbody class="tw:align-text-top">
                                         <template x-for="(row, index) in diffRows" :key="index">
                                             <tr :class="{
@@ -300,6 +319,13 @@
                                 </table>
                             </div>
                         </template>
+
+                        {{-- no configuration changes empty state --}}
+                        <div x-show="showDiffView && !hasDiffChanges" x-cloak
+                             class="tw:py-16 tw:m-0 tw:text-center tw:space-y-1.5 tw:text-gray-500 tw:dark:text-dark-white-400">
+                            <div class="tw:font-semibold tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('config_backups.no_changes_title') }}</div>
+                            <div class="tw:text-xs">{{ __('config_backups.no_changes_desc') }}</div>
+                        </div>
 
                         {{-- waiting for diff selection --}}
                         <p x-show="showDiffPrompt" x-cloak
@@ -351,18 +377,14 @@
                                 <h5 class="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2.5">
                                     {{ __('config_backups.interactions') }}
                                 </h5>
-                                <ul class="tw:list-none tw:p-0 tw:m-0 tw:space-y-2">
+                                <ul class="tw:list-none tw:p-0 tw:m-0 tw:space-y-2 tw:text-xs">
                                     <li class="tw:flex tw:items-start tw:gap-2">
                                         <i class="fa fa-check tw:text-blue-500 tw:mt-0.5 tw:text-xs" aria-hidden="true"></i>
-                                        <span>{{ __('config_backups.interaction_click_config') }}</span>
+                                        <span>{{ __('config_backups.interaction_click') }}</span>
                                     </li>
                                     <li class="tw:flex tw:items-start tw:gap-2">
                                         <i class="fa fa-check tw:text-blue-500 tw:mt-0.5 tw:text-xs" aria-hidden="true"></i>
-                                        <span>{{ __('config_backups.interaction_click_diff') }}</span>
-                                    </li>
-                                    <li class="tw:flex tw:items-start tw:gap-2">
-                                        <i class="fa fa-check tw:text-blue-500 tw:mt-0.5 tw:text-xs" aria-hidden="true"></i>
-                                        <span>{{ __('config_backups.interaction_shift_click') }}</span>
+                                        <span>{{ __('config_backups.interaction_shift_click_range') }}</span>
                                     </li>
                                     <li class="tw:flex tw:items-start tw:gap-2">
                                         <i class="fa fa-check tw:text-blue-500 tw:mt-0.5 tw:text-xs" aria-hidden="true"></i>
@@ -371,34 +393,35 @@
                                 </ul>
                             </div>
 
-                            {{-- Keyboard Shortcuts Table --}}
+                            {{-- Navigate History --}}
                             <div>
                                 <h5 class="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2.5">
-                                    {{ __('config_backups.shortcuts') }}
+                                    {{ __('config_backups.navigate_history') }}
                                 </h5>
                                 <div class="tw:grid tw:grid-cols-1 sm:tw:grid-cols-2 tw:gap-2.5 tw:text-xs">
                                     <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
-                                        <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_next') }}</span>
+                                        <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_older') }}</span>
                                         <div class="tw:flex tw:gap-1">
                                             <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">j</kbd>
                                             <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">↓</kbd>
                                         </div>
                                     </div>
                                     <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
-                                        <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_prev') }}</span>
+                                        <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_newer') }}</span>
                                         <div class="tw:flex tw:gap-1">
                                             <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">k</kbd>
                                             <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">↑</kbd>
                                         </div>
                                     </div>
-                                    <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
-                                        <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_expand_range') }}</span>
-                                        <div class="tw:flex tw:items-center tw:gap-1">
-                                            <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">Shift</kbd>
-                                            <span class="tw:text-gray-500 tw:dark:text-dark-white-300">+</span>
-                                            <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">↓/↑</kbd>
-                                        </div>
-                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Compare Revisions --}}
+                            <div>
+                                <h5 class="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2.5">
+                                    {{ __('config_backups.compare_revisions') }}
+                                </h5>
+                                <div class="tw:grid tw:grid-cols-1 sm:tw:grid-cols-2 tw:gap-2.5 tw:text-xs">
                                     <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
                                         <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_toggle_diff') }}</span>
                                         <div class="tw:flex tw:gap-1">
@@ -409,6 +432,35 @@
                                     <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
                                         <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_reverse_diff') }}</span>
                                         <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">r</kbd>
+                                    </div>
+                                    <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
+                                        <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_expand_older') }}</span>
+                                        <div class="tw:flex tw:items-center tw:gap-1">
+                                            <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">Shift</kbd>
+                                            <span class="tw:text-gray-500 tw:dark:text-dark-white-300">+</span>
+                                            <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">j/↓</kbd>
+                                        </div>
+                                    </div>
+                                    <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
+                                        <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_expand_newer') }}</span>
+                                        <div class="tw:flex tw:items-center tw:gap-1">
+                                            <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">Shift</kbd>
+                                            <span class="tw:text-gray-500 tw:dark:text-dark-white-300">+</span>
+                                            <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">k/↑</kbd>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- General --}}
+                            <div>
+                                <h5 class="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2.5">
+                                    {{ __('config_backups.general') }}
+                                </h5>
+                                <div class="tw:grid tw:grid-cols-1 sm:tw:grid-cols-2 tw:gap-2.5 tw:text-xs">
+                                    <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
+                                        <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_help') }}</span>
+                                        <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">?</kbd>
                                     </div>
                                     <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
                                         <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_exit_diff') }}</span>
@@ -717,6 +769,17 @@
                     row?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
                 },
 
+                scrollToTop() {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    const panel = this.$refs.viewerPanel;
+                    if (panel) {
+                        const scrollable = panel.querySelector('pre, .tw\\:overflow-x-auto');
+                        if (scrollable) {
+                            scrollable.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                    }
+                },
+
                 selectBackup(backup, index, event = null) {
                     if (backup.type !== 'TEXT') {
                         if (!this.diffMode) {
@@ -746,6 +809,7 @@
 
                         if (older && newer && older.type === 'TEXT' && newer.type === 'TEXT') {
                             if (this.diffMode && this.diffSelection.length === 2 && this.diffSelection[0].id === older.id && this.diffSelection[1].id === newer.id && !this.diffReversed) {
+                                this.scrollToTop();
                                 return;
                             }
                             this.diffMode = true;
@@ -772,6 +836,7 @@
                             const newer = this.backups[minIdx];
 
                             if (this.diffSelection.length === 2 && this.diffSelection[0].id === older.id && this.diffSelection[1].id === newer.id && !this.diffReversed) {
+                                this.scrollToTop();
                                 return; // Diff is already loaded
                             }
                             this.diffReversed = false;
@@ -782,6 +847,7 @@
                     }
 
                     if ((this.selectedBackupId ?? this.selected?.id) === backup.id && this.selected?.content != null) {
+                        this.scrollToTop();
                         return;
                     }
 
@@ -890,6 +956,10 @@
                     } else {
                         this.diffSelection = [backup, this.activeDiffRev];
                     }
+                    const idxOrig = this.backups.findIndex(b => b.id === this.diffSelection[0].id);
+                    const idxRev = this.backups.findIndex(b => b.id === this.diffSelection[1].id);
+                    this.anchorIndex = idxOrig !== -1 ? idxOrig : 0;
+                    this.focusIndex = idxRev !== -1 ? idxRev : this.anchorIndex;
                     this.loadDiff();
                 },
 
@@ -903,11 +973,47 @@
                     } else {
                         this.diffSelection = [this.activeDiffOrig, backup];
                     }
+                    const idxOrig = this.backups.findIndex(b => b.id === this.diffSelection[0].id);
+                    const idxRev = this.backups.findIndex(b => b.id === this.diffSelection[1].id);
+                    this.anchorIndex = idxOrig !== -1 ? idxOrig : 0;
+                    this.focusIndex = idxRev !== -1 ? idxRev : this.anchorIndex;
                     this.loadDiff();
                 },
 
                 get diffReady() {
                     return this.diffGroups !== null && this.diffSelection.length === 2;
+                },
+
+                get hasDiffChanges() {
+                    if (!this.diffGroups) return false;
+                    return this.diffGroups.some(g => g.type !== 'COMMON');
+                },
+
+                get diffStats() {
+                    if (!this.diffGroups) return null;
+                    let additions = 0;
+                    let deletions = 0;
+                    this.diffGroups.forEach((g) => {
+                        if (g.type === 'INSERTED') {
+                            additions += g.revised.length;
+                        } else if (g.type === 'DELETED') {
+                            deletions += g.original.length;
+                        } else if (g.type === 'CHANGED') {
+                            deletions += g.original.length;
+                            additions += g.revised.length;
+                        }
+                    });
+                    return { additions, deletions };
+                },
+
+                get diffRangeSummaryText() {
+                    const range = this.selectedRangeIndices;
+                    if (!range) return '{{ __('config_backups.revision_step') }}';
+                    const count = range[1] - range[0] + 1;
+                    if (count <= 2) {
+                        return '{{ __('config_backups.revision_step') }}';
+                    }
+                    return '{{ __('config_backups.revisions_spanned', ['count' => '__COUNT__']) }}'.replace('__COUNT__', count);
                 },
 
                 get diffRoleMap() {
@@ -919,6 +1025,10 @@
                 async loadDiff() {
                     if (!this.sortedDiff) return;
                     const { orig, rev } = this.sortedDiff;
+                    if (orig.id === rev.id) {
+                        this.diffGroups = [];
+                        return;
+                    }
                     const timer = this.beginLoading();
                     this.error = null;
 
