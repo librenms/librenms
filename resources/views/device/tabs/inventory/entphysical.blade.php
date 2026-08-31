@@ -1,11 +1,11 @@
 <x-panel>
     <x-slot:heading class="tw:flex tw:items-center tw:justify-between">
         <h3 class="panel-title">{{ __('Physical Entities') }}</h3>
-        <div>
-            <a href="#" class="btn btn-default btn-xs" onClick="expandTree('enttree');return false;">
+        <div class="tw:flex tw:gap-1">
+            <a href="#" class="btn btn-default btn-xs" onclick="expandTree('enttree'); return false;">
                 <i class="fa fa-plus fa-lg icon-theme" aria-hidden="true"></i> {{ __('Expand All') }}
             </a>
-            <a href="#" class="btn btn-default btn-xs" onClick="collapseTree('enttree');return false;">
+            <a href="#" class="btn btn-default btn-xs" onclick="collapseTree('enttree'); return false;">
                 <i class="fa fa-minus fa-lg icon-theme" aria-hidden="true"></i> {{ __('Collapse All') }}
             </a>
         </div>

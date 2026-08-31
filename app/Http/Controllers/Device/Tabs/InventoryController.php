@@ -65,27 +65,21 @@ class InventoryController implements DeviceTab
         Gate::authorize('view', $device);
         abort_if(Gate::none(['inventory.view', 'inventory.viewAll']), 403);
 
-        $type = $this->getType($device);
-
-        if ($type === 'entphysical') {
-            return [
+        return match ($this->getType($device)) {
+            'entphysical' => [
                 'type' => 'entphysical',
                 'tree' => $this->getEntPhysicalTree($device),
-            ];
-        }
-
-        if ($type === 'hrdevice') {
-            return [
+            ],
+            'hrdevice' => [
                 'type' => 'hrdevice',
                 'items' => $this->getHrDeviceItems($device),
-            ];
-        }
-
-        return [
-            'type' => '',
-            'items' => [],
-            'tree' => [],
-        ];
+            ],
+            default => [
+                'type' => '',
+                'items' => [],
+                'tree' => [],
+            ],
+        };
     }
 
     /**
