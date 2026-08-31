@@ -24,7 +24,6 @@ final class UpdateDeviceOutageTest extends DBTestCase
         $this->action = app(UpdateDeviceOutage::class);
     }
 
-    // Device UP: open outage gets closed
 
     public function testClosesOpenOutageWhenDeviceComesUp(): void
     {
@@ -39,8 +38,7 @@ final class UpdateDeviceOutageTest extends DBTestCase
 
     public function testClosesOpenOutageWhenDeviceComesUpDuringMaintenance(): void
     {
-        // Regression: the old code returned early for the "device is up" path
-        // when consider_maintenance was true, leaving up_again=NULL forever.
+        // Regression: old code returned early during maintenance, leaving up_again=NULL.
         LibrenmsConfig::set('graphing.availability_consider_maintenance', true);
 
         $device = Device::factory()->create(['status' => 1]);
@@ -73,7 +71,6 @@ final class UpdateDeviceOutageTest extends DBTestCase
         $this->assertNotNull($device->outages()->first()->up_again);
     }
 
-    // Device DOWN: new outage is opened when appropriate
 
     public function testOpensNewOutageWhenDeviceGoesDown(): void
     {
