@@ -29,12 +29,17 @@ namespace App\Models;
 use App\Facades\Permissions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 
 class PortGroup extends BaseModel
 {
     use HasFactory;
+
+    /** Rows written per query when syncing the pivot */
+    private const PIVOT_CHUNK = 1000;
+
     public $timestamps = false;
     protected $fillable = ['name', 'desc', 'type'];
 
@@ -73,12 +78,57 @@ class PortGroup extends BaseModel
 
     /**
      * Update ports included in this group (dynamic only)
+     *
+     * A port group can hold far more rows than a device group ever does, so the
+     * pivot is diffed and written in bulk instead of going through sync(), which
+     * inserts one row at a time.
      */
     public function updatePorts(): void
     {
-        if ($this->type == 'dynamic') {
-            $this->ports()->sync($this->getPortIdQuery()?->pluck('ports.port_id') ?? []);
+        if ($this->type != 'dynamic') {
+            return;
         }
+
+        $matching = $this->getPortIdQuery()?->pluck('ports.port_id') ?? collect();
+        $current = DB::table('port_group_port')->where('port_group_id', $this->id)->pluck('port_id');
+
+        $this->detachPorts($current->diff($matching));
+        $this->attachPorts($matching->diff($current));
+    }
+
+    /**
+     * Remove the given port ids from this group's pivot. Returns the number of rows deleted.
+     *
+     * @param  \Illuminate\Support\Collection<int, int>  $port_ids
+     */
+    public function detachPorts($port_ids): int
+    {
+        $deleted = 0;
+
+        foreach ($port_ids->chunk(self::PIVOT_CHUNK) as $chunk) {
+            $deleted += DB::table('port_group_port')
+                ->where('port_group_id', $this->id)
+                ->whereIntegerInRaw('port_id', $chunk)
+                ->delete();
+        }
+
+        return $deleted;
+    }
+
+    /**
+     * Add the given port ids to this group's pivot. Returns the number of rows inserted.
+     *
+     * @param  \Illuminate\Support\Collection<int, int>  $port_ids
+     */
+    public function attachPorts($port_ids): int
+    {
+        foreach ($port_ids->chunk(self::PIVOT_CHUNK) as $chunk) {
+            DB::table('port_group_port')->insert(
+                $chunk->map(fn ($port_id) => ['port_group_id' => $this->id, 'port_id' => $port_id])->all()
+            );
+        }
+
+        return $port_ids->count();
     }
 
     /**
@@ -90,6 +140,7 @@ class PortGroup extends BaseModel
     {
         return $this->getParser()->toQuery()
             ?->whereNotNull('ports.port_id')
+            ->select('ports.port_id')
             ->distinct();
     }
 
