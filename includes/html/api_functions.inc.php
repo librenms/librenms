@@ -2642,6 +2642,10 @@ function add_port_group(Illuminate\Http\Request $request)
 
     $rules = [
         'name' => 'required|string|unique:port_groups',
+        'type' => 'sometimes|in:dynamic,static',
+        'ports' => 'array|present_if:type,static',
+        'ports.*' => 'integer',
+        'rules' => 'json|required_if:type,dynamic',
     ];
 
     $v = Validator::make($data, $rules);
@@ -2649,8 +2653,26 @@ function add_port_group(Illuminate\Http\Request $request)
         return api_error(422, $v->messages());
     }
 
-    $portGroup = new PortGroup(['name' => $data['name'], 'desc' => $data['desc']]);
+    // type is optional for backwards compatibility, port groups used to always be static
+    $type = $data['type'] ?? 'static';
+
+    if (! empty($data['rules'])) {
+        // Only use the rules if they are able to be parsed by the QueryBuilder
+        $query = QueryBuilderParser::fromJson($data['rules'])->toSql();
+        if (empty($query)) {
+            return api_error(500, "We couldn't parse your rule");
+        }
+    }
+
+    $portGroup = new PortGroup(['name' => $data['name'], 'type' => $type, 'desc' => $data['desc']]);
+    if ($type == 'dynamic') {
+        $portGroup->rules = json_decode((string) $data['rules']);
+    }
     $portGroup->save();
+
+    if ($type == 'static' && isset($data['ports'])) {
+        $portGroup->ports()->sync($data['ports']);
+    }
 
     return api_success($portGroup->id, 'id', 'Port group ' . $portGroup->name . ' created', 201);
 }
@@ -2709,6 +2731,10 @@ function assign_port_group(Illuminate\Http\Request $request)
         return api_error(404, 'Port Group ID ' . $port_group_id . ' not found');
     }
 
+    if ($port_group->type == 'dynamic') {
+        return api_error(400, 'Port Group ID ' . $port_group_id . ' is dynamic, its members are set by its rules');
+    }
+
     $port_group->ports()->attach($port_id_list);
 
     return api_success(200, 'Port Ids ' . implode(', ', $port_id_list) . ' have been added to Port Group Id ' . $port_group_id);
@@ -2731,6 +2757,10 @@ function remove_port_group(Illuminate\Http\Request $request)
     $port_group = PortGroup::find($port_group_id);
     if (! isset($port_group)) {
         return api_error(404, 'Port Group ID ' . $port_group_id . ' not found');
+    }
+
+    if ($port_group->type == 'dynamic') {
+        return api_error(400, 'Port Group ID ' . $port_group_id . ' is dynamic, its members are set by its rules');
     }
 
     $port_group->ports()->detach($port_id_list);

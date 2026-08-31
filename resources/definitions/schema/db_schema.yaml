@@ -1988,6 +1988,8 @@ port_groups:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: desc, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: type, Type: varchar(16), 'Null': false, Extra: '', Default: static }
+    - { Field: rules, Type: text, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     port_groups_name_unique: { Name: port_groups_name_unique, Columns: [name], Unique: true, Type: BTREE }

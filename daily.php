@@ -10,6 +10,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\DeviceGroup;
+use App\Models\PortGroup;
 use Illuminate\Database\Eloquent\Collection;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Util\Debug;
@@ -288,6 +289,21 @@ if ($options['f'] === 'refresh_device_groups') {
                 /** @var DeviceGroup $deviceGroup */
                 $deviceGroup->rules = $deviceGroup->getParser()->generateJoins()->toArray();
                 $deviceGroup->save();
+            }
+        });
+        $lock->release();
+    }
+}
+
+if ($options['f'] === 'refresh_port_groups') {
+    $lock = Cache::lock('refresh_port_groups', 86000);
+    if ($lock->get()) {
+        echo 'Refreshing port group table relationships' . PHP_EOL;
+        PortGroup::all()->each(function ($portGroup) {
+            if ($portGroup->type == 'dynamic') {
+                /** @var PortGroup $portGroup */
+                $portGroup->rules = $portGroup->getParser()->generateJoins()->toArray();
+                $portGroup->save();
             }
         });
         $lock->release();
