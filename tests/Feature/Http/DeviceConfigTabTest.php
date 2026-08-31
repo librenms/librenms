@@ -37,9 +37,17 @@ class DeviceConfigTabTest extends TestCase
 {
     use RefreshDatabase;
 
+    private array $originalProviders;
+
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->originalProviders = \App\ConfigBackup\ConfigBackupManager::$providers;
+        \App\ConfigBackup\ConfigBackupManager::$providers = [
+            \App\ConfigBackup\Providers\UnimusProvider::class,
+            \App\ConfigBackup\Providers\OxidizedProvider::class,
+        ];
 
         Role::findOrCreate('admin');
         Role::findOrCreate('user');
@@ -48,6 +56,12 @@ class DeviceConfigTabTest extends TestCase
         LibrenmsConfig::set('unimus.url', 'http://unimus:8085');
         LibrenmsConfig::set('unimus.api_version', 'v2');
         LibrenmsConfig::set('unimus.token', 'test-token');
+    }
+
+    protected function tearDown(): void
+    {
+        \App\ConfigBackup\ConfigBackupManager::$providers = $this->originalProviders;
+        parent::tearDown();
     }
 
     private function admin(): User
