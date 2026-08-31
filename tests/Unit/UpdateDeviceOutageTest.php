@@ -24,7 +24,6 @@ final class UpdateDeviceOutageTest extends DBTestCase
         $this->action = app(UpdateDeviceOutage::class);
     }
 
-
     public function testClosesOpenOutageWhenDeviceComesUp(): void
     {
         $device = Device::factory()->create(['status' => 1]);
@@ -70,7 +69,6 @@ final class UpdateDeviceOutageTest extends DBTestCase
         $this->assertCount(1, $device->outages);
         $this->assertNotNull($device->outages()->first()->up_again);
     }
-
 
     public function testOpensNewOutageWhenDeviceGoesDown(): void
     {
