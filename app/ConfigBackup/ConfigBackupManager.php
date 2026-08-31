@@ -39,6 +39,7 @@ class ConfigBackupManager
     public static array $providers = [
         \App\ConfigBackup\Providers\UnimusProvider::class,
         \App\ConfigBackup\Providers\OxidizedProvider::class,
+        // \App\ConfigBackup\Providers\FakeConfigBackupProvider::class,
         // future: RancidProvider::class
     ];
 

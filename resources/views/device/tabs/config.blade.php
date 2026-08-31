@@ -11,7 +11,7 @@
                 class="tw:mt-4 tw:flex tw:flex-col tw:lg:flex-row tw:gap-4 tw:items-start">
 
                 {{-- Backup list --}}
-                <x-panel class="tw:w-full tw:lg:w-lg tw:lg:shrink-0 tw:overflow-hidden tw:self-start tw:mb-0!">
+                <x-panel class="tw:w-full tw:lg:w-md tw:lg:shrink-0 tw:overflow-hidden tw:self-start tw:lg:sticky tw:lg:top-4 tw:mb-0!">
                     <x-slot name="heading" class="tw:flex tw:items-center tw:justify-between">
                         <h3 class="panel-title">
                             {{ __('config_backups.backups') }}
@@ -59,10 +59,10 @@
                                             <span :class="isSelected(backup) ? 'tw:bg-blue-600 tw:border-blue-600' : 'tw:border-gray-400 tw:dark:border-dark-gray-100'"
                                                   class="tw:inline-block tw:w-4 tw:h-4 tw:shrink-0 tw:rounded tw:border-2"></span>
                                         </template>
-                                        <span class="tw:flex-1">
-                                            <span class="tw:block tw:text-gray-800 tw:dark:text-dark-white-100" x-text="formatDate(backup.date)"></span>
+                                        <span class="tw:flex-1 tw:min-w-0">
+                                            <span class="tw:block tw:text-gray-800 tw:dark:text-dark-white-100 tw:whitespace-nowrap" x-text="formatDate(backup.date)"></span>
                                             <template x-if="backup.until">
-                                                <span class="tw:block tw:text-gray-500 tw:dark:text-dark-white-400">
+                                                <span class="tw:block tw:text-gray-500 tw:dark:text-dark-white-400 tw:whitespace-nowrap tw:text-xs">
                                                     {{ __('config_backups.valid_until') }} <span x-text="formatDate(backup.until)"></span>
                                                 </span>
                                             </template>
@@ -71,11 +71,11 @@
                                             <span :class="getDiffRole(backup) === 'old'
                                                       ? 'tw:bg-red-100 tw:text-red-800 tw:dark:bg-red-900/40 tw:dark:text-red-300'
                                                       : 'tw:bg-green-100 tw:text-green-800 tw:dark:bg-green-900/40 tw:dark:text-green-300'"
-                                                  class="tw:text-xs tw:font-medium tw:rounded tw:px-1.5 tw:py-0.5"
+                                                  class="tw:text-xs tw:font-medium tw:rounded tw:px-1.5 tw:py-0.5 tw:shrink-0"
                                                   x-text="getDiffRole(backup) === 'old' ? '{{ __('config_backups.old') }}' : '{{ __('config_backups.new') }}'"></span>
                                         </template>
                                         <template x-if="backup.type !== 'TEXT'">
-                                            <span class="tw:text-xs tw:font-medium tw:rounded tw:px-1.5 tw:py-0.5 tw:bg-gray-200 tw:text-gray-700 tw:dark:bg-dark-gray-200 tw:dark:text-dark-white-300"
+                                            <span class="tw:text-xs tw:font-medium tw:rounded tw:px-1.5 tw:py-0.5 tw:bg-gray-200 tw:text-gray-700 tw:dark:bg-dark-gray-200 tw:dark:text-dark-white-300 tw:shrink-0"
                                                   x-text="backup.type"></span>
                                         </template>
                                     </button>
@@ -126,60 +126,62 @@
                         </div>
                     </x-slot>
 
-                    {{-- error --}}
-                    <div x-show="error" x-cloak
-                         class="tw:mb-3 tw:rounded-lg tw:border tw:border-red-300 tw:bg-red-50 tw:text-red-800 tw:dark:border-red-900 tw:dark:bg-red-900/30 tw:dark:text-red-300 tw:px-4 tw:py-3 tw:text-sm"
-                         x-text="errorMessage()"></div>
+                    <x-slot name="table">
+                        {{-- error --}}
+                        <div x-show="error" x-cloak
+                             class="tw:m-3 tw:rounded-lg tw:border tw:border-red-300 tw:bg-red-50 tw:text-red-800 tw:dark:border-red-900 tw:dark:bg-red-900/30 tw:dark:text-red-300 tw:px-4 tw:py-3 tw:text-sm"
+                             x-text="errorMessage()"></div>
 
-                    {{-- loading --}}
-                    <div x-show="showSpinner" x-cloak class="tw:py-10 tw:text-center tw:text-gray-500 tw:dark:text-dark-white-400">
-                        <i class="fa fa-spinner tw:animate-spin fa-2x"></i>
-                    </div>
-
-                    {{-- diff view --}}
-                    <template x-if="showDiffView">
-                        <div class="tw:rounded-lg tw:overflow-x-auto tw:max-h-[70vh] tw:overflow-y-auto tw:border tw:border-gray-200 tw:dark:border-dark-gray-200">
-                            <table class="tw:w-full tw:m-0 tw:font-mono tw:border-collapse">
-                                <tbody class="tw:align-text-top">
-                                    <template x-for="(row, index) in diffRows" :key="index">
-                                        <tr :class="{
-                                                'tw:bg-green-100 tw:dark:bg-green-900/40': row.mode === 'added',
-                                                'tw:bg-red-100 tw:dark:bg-red-900/40': row.mode === 'removed',
-                                            }">
-                                            <td class="tw:w-12 tw:px-2 tw:py-0.5 tw:text-right tw:select-none tw:text-gray-400 tw:dark:text-dark-white-400 tw:border-r tw:border-gray-200 tw:dark:border-dark-gray-200"
-                                                x-text="row.line ?? ''"></td>
-                                            <td class="tw:w-6 tw:px-1 tw:py-0.5 tw:text-center tw:select-none"
-                                                :class="{
-                                                    'tw:text-green-700 tw:dark:text-green-400': row.mode === 'added',
-                                                    'tw:text-red-700 tw:dark:text-red-400': row.mode === 'removed',
-                                                }"
-                                                x-text="row.mode === 'added' ? '+' : (row.mode === 'removed' ? '-' : '')"></td>
-                                            <td class="tw:px-2 tw:py-0.5 tw:whitespace-pre-wrap tw:text-gray-800 tw:dark:text-dark-white-100" x-text="row.text"></td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
+                        {{-- loading --}}
+                        <div x-show="showSpinner" x-cloak class="tw:py-10 tw:text-center tw:text-gray-500 tw:dark:text-dark-white-400">
+                            <i class="fa fa-spinner tw:animate-spin fa-2x"></i>
                         </div>
-                    </template>
 
-                    {{-- waiting for diff selection --}}
-                    <p x-show="showDiffPrompt" x-cloak
-                       class="tw:py-10 tw:m-0 tw:text-center tw:text-gray-500 tw:dark:text-dark-white-400">
-                        {{ __('config_backups.select_two_hint') }}
-                    </p>
+                        {{-- diff view --}}
+                        <template x-if="showDiffView">
+                            <div class="tw:overflow-x-auto">
+                                <table class="tw:w-full tw:m-0 tw:font-mono tw:border-collapse">
+                                    <tbody class="tw:align-text-top">
+                                        <template x-for="(row, index) in diffRows" :key="index">
+                                            <tr :class="{
+                                                    'tw:bg-green-100 tw:dark:bg-green-900/40': row.mode === 'added',
+                                                    'tw:bg-red-100 tw:dark:bg-red-900/40': row.mode === 'removed',
+                                                }">
+                                                <td class="tw:w-12 tw:px-2 tw:py-0.5 tw:text-right tw:select-none tw:text-gray-400 tw:dark:text-dark-white-400 tw:border-r tw:border-gray-200 tw:dark:border-dark-gray-200"
+                                                    x-text="row.line ?? ''"></td>
+                                                <td class="tw:w-6 tw:px-1 tw:py-0.5 tw:text-center"
+                                                    :class="{
+                                                        'tw:text-green-700 tw:dark:text-green-400': row.mode === 'added',
+                                                        'tw:text-red-700 tw:dark:text-red-400': row.mode === 'removed',
+                                                    }"
+                                                    x-text="row.mode === 'added' ? '+' : (row.mode === 'removed' ? '-' : '')"></td>
+                                                <td class="tw:px-2 tw:py-0.5 tw:whitespace-pre-wrap tw:text-gray-800 tw:dark:text-dark-white-100" x-text="row.text"></td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </template>
 
-                    {{-- binary backup notice --}}
-                    <p x-show="showBinaryNotice" x-cloak
-                       class="tw:py-10 tw:m-0 tw:text-center tw:text-gray-500 tw:dark:text-dark-white-400"
-                       x-text="messages.binary_not_supported"></p>
+                        {{-- waiting for diff selection --}}
+                        <p x-show="showDiffPrompt" x-cloak
+                           class="tw:py-10 tw:m-0 tw:text-center tw:text-gray-500 tw:dark:text-dark-white-400">
+                            {{ __('config_backups.select_two_hint') }}
+                        </p>
 
-                    {{-- config view --}}
-                    <template x-if="showConfigView">
-                        <pre class="config-highlight line-numbers tw:m-0 tw:p-3 tw:font-mono tw:whitespace-pre-wrap tw:overflow-x-auto tw:max-h-[70vh] tw:overflow-y-auto tw:rounded-lg tw:bg-gray-50 tw:text-gray-800 tw:dark:bg-dark-gray-500 tw:dark:text-dark-white-200 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200"><code
-                                x-config-highlight="selected.content"
-                                data-os="{{ $data['os'] }}"
-                                data-config-highlighting="{{ $data['config_highlighting'] }}"></code></pre>
-                    </template>
+                        {{-- binary backup notice --}}
+                        <p x-show="showBinaryNotice" x-cloak
+                           class="tw:py-10 tw:m-0 tw:text-center tw:text-gray-500 tw:dark:text-dark-white-400"
+                           x-text="messages.binary_not_supported"></p>
+
+                        {{-- config view --}}
+                        <template x-if="showConfigView">
+                            <pre class="config-highlight line-numbers tw:m-0 tw:p-3 tw:border-0! tw:rounded-none! tw:font-mono tw:whitespace-pre-wrap tw:overflow-x-auto tw:bg-gray-50 tw:text-gray-800 tw:dark:bg-dark-gray-500 tw:dark:text-dark-white-200"><code
+                                    x-config-highlight="selected.content"
+                                    data-os="{{ $data['os'] }}"
+                                    data-config-highlighting="{{ $data['config_highlighting'] }}"></code></pre>
+                        </template>
+                    </x-slot>
                 </x-panel>
             </div>
         @endif
