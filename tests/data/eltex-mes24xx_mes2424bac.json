@@ -10971,7 +10971,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.35265.52.1.1.3.2.1.8.28.3.1",
                     "sensor_index": "SfpTxBias28",
-                    "sensor_type": "eltex-mes24xx",
+                    "sensor_type": "ELTEX-PHY-MIB",
                     "sensor_descr": "SfpTxBias-te 0/4",
                     "group": "transceiver",
                     "sensor_divisor": 1000,
@@ -10983,7 +10983,7 @@
                     "sensor_limit_low_warn": 0.012,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "32",
+                    "entPhysicalIndex": "28",
                     "entPhysicalIndex_measured": "port",
                     "sensor_prev": null,
                     "user_func": null,
@@ -10996,7 +10996,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.35265.52.1.1.3.2.1.8.28.5.1",
                     "sensor_index": "SfpRxDbm28",
-                    "sensor_type": "eltex-mes24xx",
+                    "sensor_type": "ELTEX-PHY-MIB",
                     "sensor_descr": "SfpRxDbm-te 0/4",
                     "group": "transceiver",
                     "sensor_divisor": 1000,
@@ -11008,7 +11008,7 @@
                     "sensor_limit_low_warn": -7.943,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "32",
+                    "entPhysicalIndex": "28",
                     "entPhysicalIndex_measured": "port",
                     "sensor_prev": null,
                     "user_func": null,
@@ -11021,7 +11021,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.35265.52.1.1.3.2.1.8.28.4.1",
                     "sensor_index": "SfpTxDbm28",
-                    "sensor_type": "eltex-mes24xx",
+                    "sensor_type": "ELTEX-PHY-MIB",
                     "sensor_descr": "SfpTxDbm-te 0/4",
                     "group": "transceiver",
                     "sensor_divisor": 1000,
@@ -11033,7 +11033,82 @@
                     "sensor_limit_low_warn": -15.849,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "32",
+                    "entPhysicalIndex": "28",
+                    "entPhysicalIndex_measured": "port",
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.35265.52.1.1.3.2.1.8.25.6.1",
+                    "sensor_index": "SfpLoss25",
+                    "sensor_type": "ELTEX-PHY-MIB",
+                    "sensor_descr": "SfpLoss-te 0/1",
+                    "group": "transceiver",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": 1,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "25",
+                    "entPhysicalIndex_measured": "port",
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.35265.52.1.1.3.2.1.8.26.6.1",
+                    "sensor_index": "SfpLoss26",
+                    "sensor_type": "ELTEX-PHY-MIB",
+                    "sensor_descr": "SfpLoss-te 0/2",
+                    "group": "transceiver",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": 1,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "26",
+                    "entPhysicalIndex_measured": "port",
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.35265.52.1.1.3.2.1.8.27.6.1",
+                    "sensor_index": "SfpLoss27",
+                    "sensor_type": "ELTEX-PHY-MIB",
+                    "sensor_descr": "SfpLoss-te 0/3",
+                    "group": "transceiver",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": 1,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "27",
                     "entPhysicalIndex_measured": "port",
                     "sensor_prev": null,
                     "user_func": null,
@@ -11046,7 +11121,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.35265.52.1.1.3.2.1.8.28.6.1",
                     "sensor_index": "SfpLoss28",
-                    "sensor_type": "eltex-mes24xx",
+                    "sensor_type": "ELTEX-PHY-MIB",
                     "sensor_descr": "SfpLoss-te 0/4",
                     "group": "transceiver",
                     "sensor_divisor": 1,
@@ -11058,12 +11133,12 @@
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "32",
+                    "entPhysicalIndex": "28",
                     "entPhysicalIndex_measured": "port",
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "eltex-mes24xx"
+                    "state_name": null
                 },
                 {
                     "sensor_deleted": 0,
@@ -11121,7 +11196,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.35265.52.1.1.3.2.1.8.28.1.1",
                     "sensor_index": "SfpTemp28",
-                    "sensor_type": "eltex-mes24xx",
+                    "sensor_type": "ELTEX-PHY-MIB",
                     "sensor_descr": "SfpTemp-te 0/4",
                     "group": "transceiver",
                     "sensor_divisor": 1,
@@ -11133,7 +11208,7 @@
                     "sensor_limit_low_warn": -5,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "32",
+                    "entPhysicalIndex": "28",
                     "entPhysicalIndex_measured": "port",
                     "sensor_prev": null,
                     "user_func": null,
@@ -11171,7 +11246,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.35265.52.1.1.3.2.1.8.28.2.1",
                     "sensor_index": "SfpVolt28",
-                    "sensor_type": "eltex-mes24xx",
+                    "sensor_type": "ELTEX-PHY-MIB",
                     "sensor_descr": "SfpVolt-te 0/4",
                     "group": "transceiver",
                     "sensor_divisor": 1,
@@ -11183,7 +11258,7 @@
                     "sensor_limit_low_warn": 3,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "32",
+                    "entPhysicalIndex": "28",
                     "entPhysicalIndex_measured": "port",
                     "sensor_prev": null,
                     "user_func": null,
@@ -11192,18 +11267,6 @@
                 }
             ],
             "state_indexes": [
-                {
-                    "state_name": "eltex-mes24xx",
-                    "state_descr": "false",
-                    "state_value": 0,
-                    "state_generic_value": 0
-                },
-                {
-                    "state_name": "eltex-mes24xx",
-                    "state_descr": "true",
-                    "state_value": 1,
-                    "state_generic_value": 2
-                },
                 {
                     "state_name": "eltMesIssBatteryStatusTable",
                     "state_descr": "NotSupported",
@@ -11368,7 +11431,7 @@
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 1
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 6,
@@ -11388,7 +11451,7 @@
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 2
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 7,
@@ -11408,7 +11471,7 @@
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 3
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 8,
@@ -11428,7 +11491,7 @@
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 4
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 9,
@@ -11448,7 +11511,7 @@
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 5
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10,
@@ -11468,7 +11531,7 @@
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 6
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 11,
@@ -11488,7 +11551,7 @@
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 7
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 12,
@@ -11508,7 +11571,7 @@
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 8
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 13,
@@ -11528,7 +11591,7 @@
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 9
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 14,
@@ -11548,7 +11611,7 @@
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 10
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 15,
@@ -11568,7 +11631,7 @@
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 11
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 16,
@@ -11588,7 +11651,7 @@
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 12
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 17,
@@ -11608,7 +11671,7 @@
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 13
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 18,
@@ -11628,7 +11691,7 @@
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 14
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 19,
@@ -11648,7 +11711,7 @@
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 15
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 20,
@@ -11668,7 +11731,7 @@
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 16
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 21,
@@ -11688,7 +11751,7 @@
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 17
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 22,
@@ -11708,7 +11771,7 @@
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 18
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 23,
@@ -11728,7 +11791,7 @@
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 19
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 24,
@@ -11748,7 +11811,7 @@
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 20
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 25,
@@ -11768,7 +11831,7 @@
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 21
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 26,
@@ -11788,7 +11851,7 @@
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 22
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 27,
@@ -11808,7 +11871,7 @@
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 23
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 28,
@@ -11828,10 +11891,90 @@
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 24
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 29,
+                    "entPhysicalDescr": "tengigabitethernet0/1",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "te 0/1",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 4,
+                    "entPhysicalParentRelPos": 25,
+                    "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 30,
+                    "entPhysicalDescr": "tengigabitethernet0/2",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "te 0/2",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 4,
+                    "entPhysicalParentRelPos": 26,
+                    "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 31,
+                    "entPhysicalDescr": "tengigabitethernet0/3",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "te 0/3",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 4,
+                    "entPhysicalParentRelPos": 27,
+                    "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 32,
+                    "entPhysicalDescr": "tengigabitethernet0/4",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "te 0/4",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "trunk: Up (p28)",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 4,
+                    "entPhysicalParentRelPos": 28,
+                    "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 1000025,
                     "entPhysicalDescr": "unknown",
                     "entPhysicalClass": "sfp-cage",
                     "entPhysicalName": "unknown",
@@ -11844,14 +11987,14 @@
                     "entPhysicalModelName": "",
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
-                    "entPhysicalContainedIn": 4,
-                    "entPhysicalParentRelPos": 25,
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": null,
                     "ifIndex": 25
                 },
                 {
-                    "entPhysicalIndex": 30,
+                    "entPhysicalIndex": 1000026,
                     "entPhysicalDescr": "unknown",
                     "entPhysicalClass": "sfp-cage",
                     "entPhysicalName": "unknown",
@@ -11864,14 +12007,14 @@
                     "entPhysicalModelName": "",
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
-                    "entPhysicalContainedIn": 4,
-                    "entPhysicalParentRelPos": 26,
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": null,
                     "ifIndex": 26
                 },
                 {
-                    "entPhysicalIndex": 31,
+                    "entPhysicalIndex": 1000027,
                     "entPhysicalDescr": "unknown",
                     "entPhysicalClass": "sfp-cage",
                     "entPhysicalName": "unknown",
@@ -11884,14 +12027,14 @@
                     "entPhysicalModelName": "",
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
-                    "entPhysicalContainedIn": 4,
-                    "entPhysicalParentRelPos": 27,
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": null,
                     "ifIndex": 27
                 },
                 {
-                    "entPhysicalIndex": 32,
+                    "entPhysicalIndex": 1000028,
                     "entPhysicalDescr": "sfp-sfpplus",
                     "entPhysicalClass": "sfp-cage",
                     "entPhysicalName": "lc",
@@ -11904,8 +12047,8 @@
                     "entPhysicalModelName": "KYBP-3327192-LRC",
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "GS2201190408",
-                    "entPhysicalContainedIn": 4,
-                    "entPhysicalParentRelPos": 28,
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "OEM",
                     "entPhysicalMfgDate": null,
                     "ifIndex": 28
@@ -11922,7 +12065,7 @@
                     "ipv6_compressed": "fdfd:0:2:255::39",
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "manual",
-                    "context_name": "",
+                    "context_name": null,
                     "ipv6_network": "fdfd:0:2:255::/64",
                     "ifIndex": 90
                 }
@@ -11933,8 +12076,65 @@
         "discovery": {
             "transceivers": [
                 {
+                    "index": "25",
+                    "entity_physical_index": 25,
+                    "type": null,
+                    "vendor": "",
+                    "oui": null,
+                    "model": "",
+                    "revision": "",
+                    "serial": "",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": 0,
+                    "wavelength": 0,
+                    "connector": "UNKNOWN",
+                    "channels": 1,
+                    "ifIndex": 25
+                },
+                {
+                    "index": "26",
+                    "entity_physical_index": 26,
+                    "type": null,
+                    "vendor": "",
+                    "oui": null,
+                    "model": "",
+                    "revision": "",
+                    "serial": "",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": 0,
+                    "wavelength": 0,
+                    "connector": "UNKNOWN",
+                    "channels": 1,
+                    "ifIndex": 26
+                },
+                {
+                    "index": "27",
+                    "entity_physical_index": 27,
+                    "type": null,
+                    "vendor": "",
+                    "oui": null,
+                    "model": "",
+                    "revision": "",
+                    "serial": "",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": 0,
+                    "wavelength": 0,
+                    "connector": "UNKNOWN",
+                    "channels": 1,
+                    "ifIndex": 27
+                },
+                {
                     "index": "28",
-                    "entity_physical_index": 32,
+                    "entity_physical_index": 28,
                     "type": null,
                     "vendor": "OEM",
                     "oui": null,
@@ -12067,8 +12267,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12076,8 +12275,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12085,8 +12283,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12094,8 +12291,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12103,8 +12299,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12112,8 +12307,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12121,8 +12315,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12130,8 +12323,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12139,8 +12331,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12148,8 +12339,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12157,8 +12347,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12166,8 +12355,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12175,8 +12363,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12184,8 +12371,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12193,8 +12379,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12202,8 +12387,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12211,8 +12395,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12220,8 +12403,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12229,8 +12411,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12238,8 +12419,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12247,8 +12427,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12256,8 +12435,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12265,8 +12443,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12274,8 +12451,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12283,8 +12459,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12292,8 +12467,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12301,8 +12475,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12310,8 +12483,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12319,8 +12491,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12328,8 +12499,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12337,8 +12507,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12346,8 +12515,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12355,8 +12523,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12364,8 +12531,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12373,8 +12539,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -12382,8 +12547,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 2,
@@ -12391,8 +12555,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2,
@@ -12400,8 +12563,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2,
@@ -12409,8 +12571,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2,
@@ -12418,8 +12579,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2,
@@ -12427,8 +12587,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2,
@@ -12436,8 +12595,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 39,
@@ -12445,8 +12603,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 39,
@@ -12454,8 +12611,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 39,
@@ -12463,8 +12619,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 39,
@@ -12472,8 +12627,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 39,
@@ -12481,8 +12635,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 39,
@@ -12490,8 +12643,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 39,
@@ -12499,8 +12651,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 39,
@@ -12508,8 +12659,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 39,
@@ -12517,8 +12667,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 39,
@@ -12526,8 +12675,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 40,
@@ -12535,8 +12683,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 40,
@@ -12544,8 +12691,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 40,
@@ -12553,8 +12699,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 40,
@@ -12562,8 +12707,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 40,
@@ -12571,8 +12715,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 40,
@@ -12580,8 +12723,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 40,
@@ -12589,8 +12731,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 40,
@@ -12598,8 +12739,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 40,
@@ -12607,8 +12747,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 40,
@@ -12616,8 +12755,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 40,
@@ -12625,8 +12763,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 40,
@@ -12634,8 +12771,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 98,
@@ -12643,8 +12779,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 98,
@@ -12652,8 +12787,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 98,
@@ -12661,8 +12795,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 98,
@@ -12670,8 +12803,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 98,
@@ -12679,8 +12811,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 98,
@@ -12688,8 +12819,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 99,
@@ -12697,8 +12827,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 99,
@@ -12706,8 +12835,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 99,
@@ -12715,8 +12843,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 99,
@@ -12724,8 +12851,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 99,
@@ -12733,8 +12859,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 99,
@@ -12742,8 +12867,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 99,
@@ -12751,8 +12875,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 99,
@@ -12760,8 +12883,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 100,
@@ -12769,8 +12891,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 100,
@@ -12778,8 +12899,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 100,
@@ -12787,8 +12907,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 100,
@@ -12796,8 +12915,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 100,
@@ -12805,8 +12923,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 100,
@@ -12814,8 +12931,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 100,
@@ -12823,8 +12939,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 100,
@@ -12832,8 +12947,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 100,
@@ -12841,8 +12955,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 100,
@@ -12850,8 +12963,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 200,
@@ -12859,8 +12971,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 200,
@@ -12868,8 +12979,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 200,
@@ -12877,8 +12987,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 200,
@@ -12886,8 +12995,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 255,
@@ -12895,8 +13003,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 255,
@@ -12904,8 +13011,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 255,
@@ -12913,8 +13019,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 255,
@@ -12922,8 +13027,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 255,
@@ -12931,8 +13035,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 255,
@@ -12940,8 +13043,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 }
             ]
         }

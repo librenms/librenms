@@ -12878,8 +12878,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 1,
@@ -12887,8 +12886,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2,
@@ -12896,8 +12894,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2,
@@ -12905,8 +12902,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 5,
@@ -12914,8 +12910,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 5,
@@ -12923,8 +12918,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 10,
@@ -12932,8 +12926,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 10,
@@ -12941,8 +12934,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 112,
@@ -12950,8 +12942,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 112,
@@ -12959,8 +12950,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 }
             ]
         }

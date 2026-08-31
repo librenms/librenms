@@ -33344,12 +33344,6 @@
             "state_indexes": [
                 {
                     "state_name": "hwMemberStackRole",
-                    "state_descr": "Standalone",
-                    "state_value": 0,
-                    "state_generic_value": 3
-                },
-                {
-                    "state_name": "hwMemberStackRole",
                     "state_descr": "Master",
                     "state_value": 1,
                     "state_generic_value": 0
@@ -33986,12 +33980,6 @@
             "state_indexes": [
                 {
                     "state_name": "hwMemberStackRole",
-                    "state_descr": "Standalone",
-                    "state_value": 0,
-                    "state_generic_value": 3
-                },
-                {
-                    "state_name": "hwMemberStackRole",
                     "state_descr": "Master",
                     "state_value": 1,
                     "state_generic_value": 0
@@ -34472,8 +34460,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34481,8 +34468,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34490,8 +34476,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34499,8 +34484,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34508,8 +34492,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34517,8 +34500,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34526,8 +34508,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34535,8 +34516,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34544,8 +34524,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34553,8 +34532,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34562,8 +34540,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34571,8 +34548,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34580,8 +34556,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34589,8 +34564,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34598,8 +34572,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34607,8 +34580,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34616,8 +34588,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34625,8 +34596,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34634,8 +34604,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34643,8 +34612,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34652,8 +34620,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34661,8 +34628,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34670,8 +34636,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34679,8 +34644,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34688,8 +34652,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34697,8 +34660,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34706,8 +34668,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34715,8 +34676,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34724,8 +34684,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34733,8 +34692,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34742,8 +34700,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34751,8 +34708,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34760,8 +34716,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34769,8 +34724,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34778,8 +34732,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34787,8 +34740,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34796,8 +34748,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34805,8 +34756,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34814,8 +34764,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34823,8 +34772,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34832,8 +34780,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34841,8 +34788,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34850,8 +34796,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34859,8 +34804,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34868,8 +34812,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34877,8 +34820,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34886,8 +34828,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34895,8 +34836,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34904,8 +34844,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34913,8 +34852,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34922,8 +34860,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34931,8 +34868,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34940,8 +34876,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34949,8 +34884,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34958,8 +34892,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34967,8 +34900,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34976,8 +34908,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34985,8 +34916,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -34994,8 +34924,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35003,8 +34932,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35012,8 +34940,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35021,8 +34948,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35030,8 +34956,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35039,8 +34964,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35048,8 +34972,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35057,8 +34980,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35066,8 +34988,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35075,8 +34996,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35084,8 +35004,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35093,8 +35012,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35102,8 +35020,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35111,8 +35028,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35120,8 +35036,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35129,8 +35044,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35138,8 +35052,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35147,8 +35060,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35156,8 +35068,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35165,8 +35076,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35174,8 +35084,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35183,8 +35092,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35192,8 +35100,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35201,8 +35108,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35210,8 +35116,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35219,8 +35124,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35228,8 +35132,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35237,8 +35140,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35246,8 +35148,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35255,8 +35156,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35264,8 +35164,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35273,8 +35172,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -35282,8 +35180,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 30,
@@ -35291,8 +35188,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 70,
@@ -35300,8 +35196,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 70,
@@ -35309,8 +35204,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 71,
@@ -35318,8 +35212,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 106,
@@ -35327,8 +35220,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 199,
@@ -35336,8 +35228,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 203,
@@ -35345,8 +35236,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35354,8 +35244,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35363,8 +35252,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35372,8 +35260,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35381,8 +35268,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35390,8 +35276,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35399,8 +35284,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35408,8 +35292,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35417,8 +35300,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35426,8 +35308,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35435,8 +35316,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35444,8 +35324,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35453,8 +35332,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35462,8 +35340,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35471,8 +35348,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35480,8 +35356,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35489,8 +35364,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35498,8 +35372,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35507,8 +35380,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35516,8 +35388,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35525,8 +35396,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35534,8 +35404,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35543,8 +35412,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35552,8 +35420,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35561,8 +35428,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35570,8 +35436,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35579,8 +35444,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35588,8 +35452,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35597,8 +35460,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35606,8 +35468,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35615,8 +35476,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35624,8 +35484,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35633,8 +35492,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35642,8 +35500,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35651,8 +35508,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35660,8 +35516,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35669,8 +35524,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35678,8 +35532,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 220,
@@ -35687,8 +35540,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35696,8 +35548,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35705,8 +35556,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35714,8 +35564,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35723,8 +35572,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35732,8 +35580,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35741,8 +35588,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35750,8 +35596,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35759,8 +35604,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35768,8 +35612,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35777,8 +35620,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35786,8 +35628,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 220,
@@ -35795,8 +35636,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 300,
@@ -35804,8 +35644,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 301,
@@ -35813,8 +35652,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 302,
@@ -35822,8 +35660,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 303,
@@ -35831,8 +35668,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 304,
@@ -35840,8 +35676,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 304,
@@ -35849,8 +35684,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 305,
@@ -35858,8 +35692,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 306,
@@ -35867,8 +35700,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 307,
@@ -35876,8 +35708,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 308,
@@ -35885,8 +35716,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 308,
@@ -35894,8 +35724,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 308,
@@ -35903,8 +35732,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 308,
@@ -35912,8 +35740,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 308,
@@ -35921,8 +35748,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 308,
@@ -35930,8 +35756,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 308,
@@ -35939,8 +35764,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 308,
@@ -35948,8 +35772,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 310,
@@ -35957,8 +35780,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 311,
@@ -35966,8 +35788,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 312,
@@ -35975,8 +35796,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 312,
@@ -35984,8 +35804,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 313,
@@ -35993,8 +35812,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 314,
@@ -36002,8 +35820,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 321,
@@ -36011,8 +35828,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 322,
@@ -36020,8 +35836,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 331,
@@ -36029,8 +35844,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 332,
@@ -36038,8 +35852,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 341,
@@ -36047,8 +35860,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 342,
@@ -36056,8 +35868,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 351,
@@ -36065,8 +35876,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 352,
@@ -36074,8 +35884,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 361,
@@ -36083,8 +35892,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 362,
@@ -36092,8 +35900,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 371,
@@ -36101,8 +35908,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 372,
@@ -36110,8 +35916,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 375,
@@ -36119,8 +35924,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 391,
@@ -36128,8 +35932,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 391,
@@ -36137,8 +35940,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 392,
@@ -36146,8 +35948,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 401,
@@ -36155,8 +35956,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 403,
@@ -36164,8 +35964,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 407,
@@ -36173,8 +35972,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 410,
@@ -36182,8 +35980,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 419,
@@ -36191,8 +35988,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 424,
@@ -36200,8 +35996,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 425,
@@ -36209,8 +36004,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 433,
@@ -36218,8 +36012,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 452,
@@ -36227,8 +36020,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 454,
@@ -36236,8 +36028,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36245,8 +36036,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36254,8 +36044,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36263,8 +36052,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36272,8 +36060,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36281,8 +36068,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36290,8 +36076,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36299,8 +36084,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36308,8 +36092,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36317,8 +36100,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36326,8 +36108,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36335,8 +36116,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36344,8 +36124,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36353,8 +36132,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36362,8 +36140,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36371,8 +36148,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36380,8 +36156,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36389,8 +36164,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36398,8 +36172,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36407,8 +36180,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36416,8 +36188,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36425,8 +36196,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36434,8 +36204,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36443,8 +36212,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36452,8 +36220,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36461,8 +36228,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36470,8 +36236,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36479,8 +36244,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36488,8 +36252,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36497,8 +36260,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36506,8 +36268,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36515,8 +36276,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36524,8 +36284,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36533,8 +36292,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36542,8 +36300,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36551,8 +36308,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36560,8 +36316,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36569,8 +36324,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36578,8 +36332,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36587,8 +36340,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36596,8 +36348,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36605,8 +36356,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36614,8 +36364,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36623,8 +36372,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36632,8 +36380,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36641,8 +36388,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36650,8 +36396,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36659,8 +36404,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36668,8 +36412,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 },
                 {
                     "vlan": 2500,
@@ -36677,8 +36420,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 }
             ]
         }

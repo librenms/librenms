@@ -3080,12 +3080,12 @@
         "discovery": {
             "ipv6_nd": [
                 {
-                    "mac_address": "e45f01c46e34",
+                    "mac_address": "e4:5f:01:c4:6e:34",
                     "ipv6_address": "fd56:b63c:d9fe:0000:f691:f22f:8ee6:3102",
                     "context_name": ""
                 },
                 {
-                    "mac_address": "e45f01c46e34",
+                    "mac_address": "e4:5f:01:c4:6e:34",
                     "ipv6_address": "fe80:0000:0000:0000:3c60:676b:3592:eb87",
                     "context_name": ""
                 }

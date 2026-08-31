@@ -2988,22 +2988,22 @@
         "discovery": {
             "ipv6_nd": [
                 {
-                    "mac_address": "0008e3fffcc8",
+                    "mac_address": "00:08:e3:ff:fc:c8",
                     "ipv6_address": "2a0b:6880:0000:0001:0000:0000:0000:0001",
                     "context_name": ""
                 },
                 {
-                    "mac_address": "6c2b59863f1e",
+                    "mac_address": "6c:2b:59:86:3f:1e",
                     "ipv6_address": "2a0b:6880:0000:0001:0000:0000:0000:0010",
                     "context_name": ""
                 },
                 {
-                    "mac_address": "0008e3fffcc8",
+                    "mac_address": "00:08:e3:ff:fc:c8",
                     "ipv6_address": "fe80:0000:0000:0000:0208:e3ff:feff:fcc8",
                     "context_name": ""
                 },
                 {
-                    "mac_address": "6c2b59863f1e",
+                    "mac_address": "6c:2b:59:86:3f:1e",
                     "ipv6_address": "fe80:0000:0000:0000:6e2b:59ff:fe86:3f1e",
                     "context_name": ""
                 }

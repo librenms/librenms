@@ -339,7 +339,7 @@
                     "ifIndex": 1079377920,
                     "ifSpeed": 1000000000,
                     "ifSpeed_prev": null,
-                    "ifConnectorPresent": "false",
+                    "ifConnectorPresent": null,
                     "ifOperStatus": null,
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
