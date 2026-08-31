@@ -49,7 +49,7 @@
                     @endif
                 </td>
                 <td class="tw:align-middle tw:text-center">
-                    <i class="fa fa-times tw:text-2xl" aria-hidden="true"></i>
+                    <i class="fa fa-arrows-alt tw:text-2xl" aria-hidden="true"></i>
                 </td>
                 <td class="tw:align-middle">
                     @if($peerPw)
