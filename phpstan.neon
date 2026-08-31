@@ -35,6 +35,7 @@ parameters:
 
     checkModelProperties: true
     checkAuthCallsWhenInRequestScope: true
+    checkModelMethodVisibility: true
     noUnnecessaryEnumerableToArrayCalls: true
 
     ignoreErrors:
