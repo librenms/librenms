@@ -1,5 +1,5 @@
-<div class="panel panel-default">
-    <div class="panel-heading tw:flex tw:items-center tw:justify-between">
+<x-panel>
+    <x-slot:heading class="tw:flex tw:items-center tw:justify-between">
         <h3 class="panel-title">{{ __('Physical Entities') }}</h3>
         <div>
             <a href="#" class="btn btn-default btn-xs" onClick="expandTree('enttree');return false;">
@@ -9,16 +9,15 @@
                 <i class="fa fa-minus fa-lg icon-theme" aria-hidden="true"></i> {{ __('Collapse All') }}
             </a>
         </div>
-    </div>
-    <div class="panel-body">
-        <ul class="mktree" id="enttree">
-            @forelse($data['tree'] as $node)
-                @include('device.tabs.inventory.entphysical-node', ['node' => $node])
-            @empty
-                <li class="text-center text-muted tw:list-none tw:p-5">
-                    <em>{{ __('No physical entities found for this device.') }}</em>
-                </li>
-            @endforelse
-        </ul>
-    </div>
-</div>
+    </x-slot>
+
+    <ul class="mktree" id="enttree">
+        @forelse($data['tree'] as $node)
+            @include('device.tabs.inventory.entphysical-node', ['node' => $node])
+        @empty
+            <li class="text-center text-muted tw:list-none tw:p-5">
+                <em>{{ __('No physical entities found for this device.') }}</em>
+            </li>
+        @endforelse
+    </ul>
+</x-panel>
