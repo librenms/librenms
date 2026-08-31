@@ -12,23 +12,23 @@
 
                 {{-- Backup list --}}
                 <x-panel class="tw:w-full tw:lg:w-md tw:lg:shrink-0 tw:overflow-hidden tw:self-start tw:lg:sticky tw:lg:top-4 tw:mb-0!">
-                    <x-slot name="heading" class="tw:flex tw:items-center tw:justify-between">
-                        <h3 class="panel-title">
+                    <x-slot name="heading" class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
+                        <h3 class="panel-title tw:whitespace-nowrap">
                             {{ __('config_backups.backups') }}
                             <span x-show="!loadingBackups" x-cloak class="tw:font-normal tw:text-gray-500 tw:dark:text-dark-white-400" x-text="'(' + total + ')'"></span>
                         </h3>
-                        <div class="tw:flex tw:items-center tw:gap-2">
+                        <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
                             <button type="button"
                                     :class="total > 1 ? '' : 'tw:invisible'" x-cloak
                                     x-on:click="toggleDiffMode()"
                                     x-text="diffMode ? '{{ __('config_backups.show_config') }}' : '{{ __('config_backups.show_diff') }}'"
-                                    class="lnms-btn lnms-btn-primary tw:transition-colors">
+                                    class="lnms-btn lnms-btn-primary tw:whitespace-nowrap tw:transition-colors">
                             </button>
                             <button type="button"
                                     x-show="canRefresh" x-cloak
                                     x-on:click="refresh()"
                                     :disabled="refreshing"
-                                    class="lnms-btn lnms-btn-success tw:flex tw:items-center tw:gap-1.5 tw:transition-colors tw:disabled:opacity-50">
+                                    class="lnms-btn lnms-btn-success tw:flex tw:items-center tw:gap-1.5 tw:whitespace-nowrap tw:transition-colors tw:disabled:opacity-50">
                                 <i class="fa fa-refresh" :class="refreshing ? 'tw:animate-spin' : ''" aria-hidden="true"></i>
                                 <span>{{ __('config_backups.refresh') }}</span>
                             </button>
@@ -60,9 +60,9 @@
                                                   class="tw:inline-block tw:w-4 tw:h-4 tw:shrink-0 tw:rounded tw:border-2"></span>
                                         </template>
                                         <span class="tw:flex-1 tw:min-w-0">
-                                            <span class="tw:block tw:text-gray-800 tw:dark:text-dark-white-100 tw:whitespace-nowrap" x-text="formatDate(backup.date)"></span>
+                                            <span class="tw:block tw:text-gray-800 tw:dark:text-dark-white-100" x-text="formatDate(backup.date)"></span>
                                             <template x-if="backup.until">
-                                                <span class="tw:block tw:text-gray-500 tw:dark:text-dark-white-400 tw:whitespace-nowrap tw:text-xs">
+                                                <span class="tw:block tw:text-gray-500 tw:dark:text-dark-white-400 tw:text-xs">
                                                     {{ __('config_backups.valid_until') }} <span x-text="formatDate(backup.until)"></span>
                                                 </span>
                                             </template>
