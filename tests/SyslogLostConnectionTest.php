@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Tests;
 
+use App\Facades\DeviceCache;
 use App\Models\Device;
 use App\Models\Syslog;
 use Illuminate\Support\Facades\DB;
@@ -50,14 +51,12 @@ final class SyslogLostConnectionTest extends DBTestCase
             $this->markTestSkipped('Killing a connection from a second session requires MySQL/MariaDB.');
         }
 
-        global $dev_cache;
-        $dev_cache = [];
+        $this->clearCaches();
     }
 
     protected function tearDown(): void
     {
-        global $dev_cache;
-        $dev_cache = [];
+        $this->clearCaches();
 
         parent::tearDown();
     }
@@ -105,6 +104,14 @@ final class SyslogLostConnectionTest extends DBTestCase
             Syslog::where('device_id', $device->device_id)->delete();
             $device->delete();
         }
+    }
+
+    private function clearCaches(): void
+    {
+        global $dev_cache;
+        $dev_cache = [];
+
+        DeviceCache::flush();
     }
 
     /**

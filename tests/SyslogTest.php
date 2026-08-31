@@ -26,11 +26,28 @@
 
 namespace LibreNMS\Tests;
 
+use App\Facades\DeviceCache;
+use App\Models\Device;
+
 final class SyslogTest extends TestCase
 {
     // The format is:
     // $SOURCEIP||$FACILITY||$PRIORITY||$LEVEL||$TAG||$YEAR-$MONTH-$DAY $HOUR:$MIN:$SEC||$MSG||$PROGRAM
     // There add an IP for each OS you want to test and use that in the input file
+
+    /**
+     * Stand a device in for the lookup process_syslog() would otherwise make.
+     */
+    private function fakeDevice(array $attributes): void
+    {
+        global $dev_cache;
+
+        $device = new Device($attributes);
+        $device->device_id = 1;
+
+        DeviceCache::fake($device);
+        $dev_cache['1.1.1.1'] = $device->device_id;
+    }
 
     private function fillLine($line)
     {
@@ -66,9 +83,7 @@ final class SyslogTest extends TestCase
 
     public function testCiscoSyslog(): void
     {
-        // populate fake $dev_cache
-        global $dev_cache;
-        $dev_cache['1.1.1.1'] = ['device_id' => 1, 'os' => 'ios', 'version' => 1, 'hostname' => 'cisco-switch1'];
+        $this->fakeDevice(['os' => 'ios', 'version' => 1, 'hostname' => 'cisco-switch1']);
 
         // ---- IOS ----
         $this->checkSyslog(
@@ -146,9 +161,7 @@ final class SyslogTest extends TestCase
 
     public function testLinuxSyslog(): void
     {
-        // populate fake $dev_cache
-        global $dev_cache;
-        $dev_cache['1.1.1.1'] = ['device_id' => 1, 'os' => 'linux', 'version' => 1, 'hostname' => 'linux-server1'];
+        $this->fakeDevice(['os' => 'linux', 'version' => 1, 'hostname' => 'linux-server1']);
 
         // ---- PAM ----
         $this->checkSyslog(
@@ -197,9 +210,7 @@ final class SyslogTest extends TestCase
 
     public function testProcurveSyslog(): void
     {
-        // populate fake $dev_cache
-        global $dev_cache;
-        $dev_cache['1.1.1.1'] = ['device_id' => 1, 'os' => 'procurve', 'version' => 1, 'hostname' => 'procurve-switch1'];
+        $this->fakeDevice(['os' => 'procurve', 'version' => 1, 'hostname' => 'procurve-switch1']);
 
         // ---- 2900/2910/3800/5400 ----
         $this->checkSyslog(
@@ -232,9 +243,7 @@ final class SyslogTest extends TestCase
 
     public function testZywallSyslog(): void
     {
-        // populate fake $dev_cache
-        global $dev_cache;
-        $dev_cache['1.1.1.1'] = ['device_id' => 1, 'os' => 'zywall', 'version' => 1, 'hostname' => 'zywall'];
+        $this->fakeDevice(['os' => 'zywall', 'version' => 1, 'hostname' => 'zywall']);
 
         // ---- USG60W ----
         $this->checkSyslog(

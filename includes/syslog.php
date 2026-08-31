@@ -1,52 +1,37 @@
 <?php
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use App\Models\Ipv4Address;
 use App\Models\Syslog;
 
 function get_cache($host, $value)
 {
     global $dev_cache;
 
-    if (! isset($dev_cache[$host][$value])) {
-        switch ($value) {
-            case 'device_id':
-                // Try by hostname or sysName, plus the device address when the sender is an IP
-                $dev_cache[$host]['device_id'] = Device::where(function ($query) use ($host): void {
-                    $query->where('hostname', $host)->orWhere('sysName', $host);
+    // $dev_cache maps a sender (an address or a name) to a device_id; DeviceCache holds
+    // the device itself. Misses are deliberately not cached, so a device added after this
+    // process started is still picked up without restarting it.
+    if (! isset($dev_cache[$host])) {
+        $device = Device::findByIp($host)
+            ?: Device::where('hostname', $host)->orWhere('sysName', $host)->first();
 
-                    $ip = inet_pton($host);
-                    if ($ip !== false) {
-                        $query->orWhere('ip', $ip);
-                    }
-                })->value('device_id');
+        if (! $device) {
+            return null;
+        }
 
-                // If failed, try by an address configured on one of the device's ports
-                if (! is_numeric($dev_cache[$host]['device_id'])) {
-                    $dev_cache[$host]['device_id'] = Ipv4Address::where('ipv4_address', $host)
-                        ->join('ports', 'ports.port_id', '=', 'ipv4_addresses.port_id')
-                        ->value('ports.device_id');
-                }
-                break;
+        $dev_cache[$host] = $device->device_id;
+    }
 
-            case 'os':
-            case 'version':
-            case 'hostname':
-                // all three live in the same row, so fetch them in one query
-                $device_id = get_cache($host, 'device_id');
-                $device = $device_id ? Device::select(['os', 'version', 'hostname'])->find($device_id) : null;
-                $dev_cache[$host]['os'] = $device?->os;
-                $dev_cache[$host]['version'] = $device?->version;
-                $dev_cache[$host]['hostname'] = $device?->hostname;
-                break;
+    $device = DeviceCache::get($dev_cache[$host]);
 
-            default:
-                return null;
-        }//end switch
-    }//end if
-
-    return $dev_cache[$host][$value];
+    return match ($value) {
+        'device_id' => $device->device_id,
+        'os' => $device->os,
+        'version' => $device->version,
+        'hostname' => $device->hostname,
+        default => null,
+    };
 }//end get_cache()
 
 function process_syslog($entry, $update)
