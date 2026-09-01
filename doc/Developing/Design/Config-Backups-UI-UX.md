@@ -633,6 +633,7 @@ The Help modal should explain the interface in terms of **tasks and workflows**,
 | Key                   | Action                              |
 | --------------------- | ----------------------------------- |
 | `d` / `c`             | Enter or exit Diff mode             |
+| `Shift + Click`       | Compare range of revisions          |
 | `Shift+j` / `Shift+↓` | Extend range toward older revisions |
 | `Shift+k` / `Shift+↑` | Extend range toward newer revisions |
 | `r`                   | Reverse comparison direction        |
@@ -643,11 +644,6 @@ The Help modal should explain the interface in terms of **tasks and workflows**,
 | ----- | ---------------------------- |
 | `?`   | Open this help               |
 | `Esc` | Close Help or exit Diff mode |
-
-The Help UI should also briefly explain the two primary selection gestures:
-
-* **Click** a backup to select it.
-* **Shift-click** a backup to extend the comparison from the current anchor.
 
 The Help modal should remain concise. It is intended as an interactive reference, not a full user manual.
 

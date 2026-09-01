@@ -111,7 +111,7 @@
                                             <span class="tw:text-sm tw:font-semibold tw:text-gray-900 tw:dark:text-dark-white-100"
                                                   x-text="formatDate(backup.date)"></span>
                                             <template x-if="index === 0">
-                                                <span class="tw:text-[11px] tw:font-medium tw:text-gray-500 tw:dark:text-dark-white-400">(Latest)</span>
+                                                <span class="tw:text-[11px] tw:font-medium tw:text-gray-500 tw:dark:text-dark-white-400">({{ __('config_backups.latest') }})</span>
                                             </template>
                                         </div>
                                         <template x-if="backup.until">
@@ -248,7 +248,7 @@
                                             class="lnms-btn lnms-btn-default tw:h-8 tw:min-w-8 tw:px-2 tw:flex tw:items-center tw:justify-center tw:gap-1.5 tw:text-sm tw:transition-colors tw:shrink-0"
                                             aria-label="{{ __('config_backups.download_diff') }}">
                                         <i class="fa fa-download" aria-hidden="true"></i>
-                                        <span class="tw:hidden tw:xl:inline">{{ __('config_backups.download') }}</span>
+                                        <span class="tw:hidden tw:xl:inline">{{ __('config_backups.download_diff') }}</span>
                                     </button>
                                     <button type="button"
                                             x-on:click="copyDiff()"
@@ -256,7 +256,7 @@
                                             class="lnms-btn lnms-btn-default tw:h-8 tw:min-w-8 tw:px-2 tw:flex tw:items-center tw:justify-center tw:gap-1.5 tw:text-sm tw:transition-colors tw:shrink-0"
                                             aria-label="{{ __('config_backups.copy_diff') }}">
                                         <i class="fa" :class="copiedDiff ? 'fa-check tw:text-green-400' : 'fa-copy'" aria-hidden="true"></i>
-                                        <span class="tw:hidden tw:xl:inline" x-text="copiedDiff ? '{{ __('config_backups.copied') }}' : '{{ __('config_backups.copy') }}'"></span>
+                                        <span class="tw:hidden tw:xl:inline" x-text="copiedDiff ? '{{ __('config_backups.copied_diff') }}' : '{{ __('config_backups.copy_diff') }}'"></span>
                                     </button>
                                 </div>
                             </template>
@@ -362,27 +362,6 @@
                         </h4>
                     </x-slot>
 
-                    {{-- UI Interactions --}}
-                    <div>
-                        <h5 class="tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2">
-                            {{ __('config_backups.interactions') }}
-                        </h5>
-                        <ul class="tw:list-none tw:p-0 tw:m-0 tw:space-y-2">
-                            <li class="tw:flex tw:items-start tw:gap-2">
-                                <i class="fa fa-check tw:text-blue-500 tw:mt-0.5" aria-hidden="true"></i>
-                                <span>{{ __('config_backups.interaction_click') }}</span>
-                            </li>
-                            <li class="tw:flex tw:items-start tw:gap-2">
-                                <i class="fa fa-check tw:text-blue-500 tw:mt-0.5" aria-hidden="true"></i>
-                                <span>{{ __('config_backups.interaction_shift_click_range') }}</span>
-                            </li>
-                            <li class="tw:flex tw:items-start tw:gap-2">
-                                <i class="fa fa-check tw:text-blue-500 tw:mt-0.5" aria-hidden="true"></i>
-                                <span>{{ __('config_backups.interaction_dropdowns') }}</span>
-                            </li>
-                        </ul>
-                    </div>
-
                     {{-- Navigate History --}}
                     <div>
                         <h5 class="tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2">
@@ -418,7 +397,7 @@
 
                     {{-- Compare Revisions --}}
                     <div>
-                        <h5 class="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2">
+                        <h5 class="tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2">
                             {{ __('config_backups.compare_revisions') }}
                         </h5>
                         <div class="tw:grid tw:grid-cols-1 tw:gap-2">
@@ -430,8 +409,12 @@
                                 </div>
                             </div>
                             <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
-                                <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_reverse_diff') }}</span>
-                                <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">r</kbd>
+                                <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_shift_click') }}</span>
+                                <div class="tw:flex tw:items-center tw:gap-1">
+                                    <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">Shift</kbd>
+                                    <span class="tw:text-gray-500 tw:dark:text-dark-white-300">+</span>
+                                    <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">{{ __('config_backups.click') }}</kbd>
+                                </div>
                             </div>
                             <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
                                 <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_expand_older') }}</span>
@@ -448,6 +431,10 @@
                                     <span class="tw:text-gray-500 tw:dark:text-dark-white-300">+</span>
                                     <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">k/↑</kbd>
                                 </div>
+                            </div>
+                            <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
+                                <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_reverse_diff') }}</span>
+                                <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">r</kbd>
                             </div>
                         </div>
                     </div>

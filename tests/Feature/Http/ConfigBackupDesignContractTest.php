@@ -294,11 +294,6 @@ class ConfigBackupDesignContractTest extends TestCase
         // Diff Table Header Contract (Concept B)
         $view->assertSee('diffRangeSummaryText', false);
 
-        // Help Modal Interaction Strings
-        $view->assertSee(__('config_backups.interaction_click'));
-        $view->assertSee(__('config_backups.interaction_shift_click_range'));
-        $view->assertSee(__('config_backups.interaction_dropdowns'));
-
         // Keyboard Shortcut Localization Strings & Modifiers
         $view->assertSee('x-text="modifierKey"', false);
         $view->assertSee(__('config_backups.navigate_history'));
@@ -306,6 +301,7 @@ class ConfigBackupDesignContractTest extends TestCase
         $view->assertSee(__('config_backups.shortcut_older'));
         $view->assertSee(__('config_backups.shortcut_newer'));
         $view->assertSee(__('config_backups.shortcut_toggle_diff'));
+        $view->assertSee(__('config_backups.shortcut_shift_click'));
         $view->assertSee(__('config_backups.shortcut_reverse_diff'));
         $view->assertSee(__('config_backups.shortcut_expand_older'));
         $view->assertSee(__('config_backups.shortcut_expand_newer'));
