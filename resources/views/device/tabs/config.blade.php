@@ -12,7 +12,7 @@
                 class="tw:mt-4 tw:flex tw:flex-col tw:lg:flex-row tw:gap-4 tw:items-start">
 
                 {{-- Backup list (Interactive Timeline Sidebar) --}}
-                <x-panel class="tw:w-full tw:lg:w-md tw:lg:shrink-0 tw:overflow-hidden tw:self-start tw:lg:sticky tw:lg:top-4 tw:mb-0!">
+                <x-panel class="tw:w-full tw:lg:w-md tw:lg:shrink-0 tw:overflow-hidden tw:self-start tw:lg:sticky tw:lg:top-4 tw:mb-0">
                     <x-slot name="heading" class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
                         <h3 class="panel-title tw:whitespace-nowrap tw:flex tw:items-center tw:gap-2">
                             {{ __('config_backups.backups') }}
@@ -23,7 +23,7 @@
                             <button type="button"
                                     x-show="total > 1" x-cloak
                                     x-on:click="toggleDiffMode()"
-                                    class="lnms-btn tw:h-8! tw:px-3 tw:flex tw:items-center tw:gap-1.5 tw:whitespace-nowrap tw:text-sm tw:transition-colors"
+                                    class="lnms-btn tw:h-8 tw:px-3 tw:flex tw:items-center tw:gap-1.5 tw:whitespace-nowrap tw:text-sm tw:transition-colors"
                                     :class="{ 'lnms-btn-default': diffMode, 'lnms-btn-primary': !diffMode }">
                                 <i class="fa" :class="diffMode ? 'fa-times' : 'fa-exchange'" aria-hidden="true"></i>
                                 <span x-text="diffMode ? '{{ __('config_backups.exit_diff') }}' : '{{ __('config_backups.compare') }}'"></span>
@@ -33,14 +33,14 @@
                                     x-on:click="refresh()"
                                     :disabled="refreshing"
                                     title="{{ __('config_backups.refresh') }}"
-                                    class="lnms-btn lnms-btn-success tw:h-8! tw:w-8! tw:p-0! tw:flex tw:items-center tw:justify-center tw:text-xs tw:transition-colors tw:disabled:opacity-50 tw:shrink-0"
+                                    class="lnms-btn lnms-btn-success tw:h-8 tw:w-8 tw:flex tw:items-center tw:justify-center tw:text-xs tw:transition-colors tw:disabled:opacity-50 tw:shrink-0"
                                     aria-label="{{ __('config_backups.refresh') }}">
                                 <i class="fa fa-refresh" :class="refreshing ? 'tw:animate-spin' : ''" aria-hidden="true"></i>
                             </button>
                             <button type="button"
                                     x-on:click="showHelp = true"
                                     title="{{ __('config_backups.help') }}"
-                                    class="lnms-btn lnms-btn-default tw:h-8! tw:w-8! tw:p-0! tw:flex tw:items-center tw:justify-center tw:text-xs tw:transition-colors tw:shrink-0"
+                                    class="lnms-btn lnms-btn-default tw:h-8 tw:w-8 tw:flex tw:items-center tw:justify-center tw:text-xs tw:transition-colors tw:shrink-0"
                                     aria-label="{{ __('config_backups.help') }}">
                                 <i class="fa fa-question" aria-hidden="true"></i>
                             </button>
@@ -134,7 +134,7 @@
                                     <button type="button"
                                             x-on:click="loadMore()"
                                             :disabled="loadingMore"
-                                            class="lnms-btn lnms-btn-default tw:w-full tw:min-h-11 tw:rounded-none! tw:border-0! tw:border-t! tw:border-gray-200 tw:dark:border-dark-gray-200"
+                                            class="lnms-btn lnms-btn-default tw:w-full tw:min-h-11 tw:rounded-none tw:border-0 tw:border-t tw:border-gray-200 tw:dark:border-dark-gray-200"
                                             x-text="loadingMore ? '{{ __('config_backups.loading') }}' : '{{ __('config_backups.load_more') }}'">
                                     </button>
                                 </li>
@@ -144,7 +144,7 @@
                 </x-panel>
 
                 {{-- Config / diff pane --}}
-                <x-panel class="tw:w-full tw:flex-1 tw:min-w-0 tw:overflow-hidden tw:self-start tw:mb-0!" x-ref="viewerPanel">
+                <x-panel class="tw:w-full tw:flex-1 tw:min-w-0 tw:overflow-hidden tw:self-start tw:mb-0" x-ref="viewerPanel">
                     <x-slot name="heading" class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
                         <h3 class="panel-title tw:flex tw:items-center tw:gap-2 tw:flex-wrap">
                             <template x-if="diffMode">
@@ -176,7 +176,7 @@
                                             <button type="button"
                                                     x-on:click="toggleDiffDirection()"
                                                     title="{{ __('config_backups.reverse_direction') }}"
-                                                    class="lnms-btn lnms-btn-default tw:h-8! tw:w-8! tw:p-0! tw:flex tw:items-center tw:justify-center tw:rounded-full tw:transition-transform tw:shrink-0"
+                                                    class="lnms-btn lnms-btn-default tw:h-8 tw:w-8 tw:flex tw:text-sm tw:items-center tw:justify-center tw:rounded-full tw:transition-transform tw:shrink-0"
                                                     aria-label="{{ __('config_backups.reverse_direction') }}">
                                                 <i class="fa fa-arrow-right tw:transition-transform tw:duration-300"
                                                    :class="diffReversed ? 'tw:rotate-180' : ''"
@@ -223,7 +223,7 @@
                                     <button type="button"
                                             x-on:click="downloadConfig()"
                                             title="{{ __('config_backups.download') }}"
-                                            class="lnms-btn lnms-btn-default tw:h-8! tw:px-2! tw:flex tw:items-center tw:justify-center tw:gap-1.5 tw:text-sm tw:transition-colors tw:shrink-0"
+                                            class="lnms-btn lnms-btn-default tw:h-8 tw:min-w-8 tw:px-2 tw:flex tw:items-center tw:justify-center tw:gap-1.5 tw:text-sm tw:transition-colors tw:shrink-0"
                                             aria-label="{{ __('config_backups.download') }}">
                                         <i class="fa fa-download" aria-hidden="true"></i>
                                         <span class="tw:hidden tw:xl:inline">{{ __('config_backups.download') }}</span>
@@ -231,7 +231,7 @@
                                     <button type="button"
                                             x-on:click="copyToClipboard()"
                                             :title="copied ? '{{ __('config_backups.copied') }}' : '{{ __('config_backups.copy') }}'"
-                                            class="lnms-btn lnms-btn-default tw:h-8! tw:px-2! tw:flex tw:items-center tw:justify-center tw:gap-1.5 tw:text-sm tw:transition-colors tw:shrink-0"
+                                            class="lnms-btn lnms-btn-default tw:h-8 tw:min-w-8 tw:px-2 tw:flex tw:items-center tw:justify-center tw:gap-1.5 tw:text-sm tw:transition-colors tw:shrink-0"
                                             aria-label="{{ __('config_backups.copy') }}">
                                         <i class="fa" :class="copied ? 'fa-check tw:text-green-400' : 'fa-copy'" aria-hidden="true"></i>
                                         <span class="tw:hidden tw:xl:inline" x-text="copied ? '{{ __('config_backups.copied') }}' : '{{ __('config_backups.copy') }}'"></span>
@@ -245,7 +245,7 @@
                                     <button type="button"
                                             x-on:click="downloadDiff()"
                                             title="{{ __('config_backups.download_diff') }}"
-                                            class="lnms-btn lnms-btn-default tw:h-8! tw:px-2! tw:flex tw:items-center tw:justify-center tw:gap-1.5 tw:text-sm tw:transition-colors tw:shrink-0"
+                                            class="lnms-btn lnms-btn-default tw:h-8 tw:min-w-8 tw:px-2 tw:flex tw:items-center tw:justify-center tw:gap-1.5 tw:text-sm tw:transition-colors tw:shrink-0"
                                             aria-label="{{ __('config_backups.download_diff') }}">
                                         <i class="fa fa-download" aria-hidden="true"></i>
                                         <span class="tw:hidden tw:xl:inline">{{ __('config_backups.download') }}</span>
@@ -253,7 +253,7 @@
                                     <button type="button"
                                             x-on:click="copyDiff()"
                                             :title="copiedDiff ? '{{ __('config_backups.copied_diff') }}' : '{{ __('config_backups.copy_diff') }}'"
-                                            class="lnms-btn lnms-btn-default tw:h-8! tw:px-2! tw:flex tw:items-center tw:justify-center tw:gap-1.5 tw:text-sm tw:transition-colors tw:shrink-0"
+                                            class="lnms-btn lnms-btn-default tw:h-8 tw:min-w-8 tw:px-2 tw:flex tw:items-center tw:justify-center tw:gap-1.5 tw:text-sm tw:transition-colors tw:shrink-0"
                                             aria-label="{{ __('config_backups.copy_diff') }}">
                                         <i class="fa" :class="copiedDiff ? 'fa-check tw:text-green-400' : 'fa-copy'" aria-hidden="true"></i>
                                         <span class="tw:hidden tw:xl:inline" x-text="copiedDiff ? '{{ __('config_backups.copied') }}' : '{{ __('config_backups.copy') }}'"></span>
@@ -344,7 +344,7 @@
 
                         {{-- config view --}}
                         <template x-if="showConfigView">
-                            <pre class="config-highlight line-numbers tw:m-0 tw:p-3 tw:border-0! tw:rounded-none! tw:font-mono tw:whitespace-pre-wrap tw:overflow-x-auto tw:bg-gray-50 tw:text-gray-800 tw:dark:bg-dark-gray-500 tw:dark:text-dark-white-200 tw:transition-opacity tw:duration-150"
+                            <pre class="config-highlight line-numbers tw:m-0 tw:p-3 tw:border-0 tw:rounded-none tw:font-mono tw:whitespace-pre-wrap tw:overflow-x-auto tw:bg-gray-50 tw:text-gray-800 tw:dark:bg-dark-gray-500 tw:dark:text-dark-white-200 tw:transition-opacity tw:duration-150"
                                  :class="{ 'tw:opacity-60': loading }"><code
                                     x-config-highlight="selected.content"
                                     data-os="{{ $data['os'] }}"
@@ -368,7 +368,7 @@
                             </h4>
                             <button type="button"
                                     x-on:click="showHelp = false"
-                                    class="lnms-btn lnms-btn-default tw:h-7! tw:w-7! tw:p-0! tw:flex tw:items-center tw:justify-center tw:text-xs tw:rounded-full"
+                                    class="lnms-btn lnms-btn-default tw:h-7 tw:w-7 tw:p-0 tw:flex tw:items-center tw:justify-center tw:text-xs tw:rounded-full"
                                     aria-label="{{ __('config_backups.shortcut_exit_diff') }}">
                                 <i class="fa fa-times" aria-hidden="true"></i>
                             </button>
