@@ -699,8 +699,8 @@ class Device extends BaseModel
 
             return $query->where('hostname', $ip_string)
                 ->orWhere('ip', $ip->packed())
-                ->when($family === 'ipv4', fn(Builder $q) => $q->orWhereHas('ipv4', fn (Builder $qi) => $qi->where('ipv4_address', $ip_string)))
-                ->when($family === 'ipv6', fn(Builder $q) => $q->orWhereHas('ipv6', fn (Builder $qi) => $qi->where('ipv6_address', $ip_string)));
+                ->when($family === 'ipv4', fn (Builder $q) => $q->orWhereHas('ipv4', fn (Builder $qi) => $qi->where('ipv4_address', $ip_string)))
+                ->when($family === 'ipv6', fn (Builder $q) => $q->orWhereHas('ipv6', fn (Builder $qi) => $qi->where('ipv6_address', $ip_string)));
         });
     }
 
