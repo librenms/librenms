@@ -44,15 +44,11 @@ class Processor
     /** How long a sender that resolves to nothing is remembered, in seconds.  0 looks it up every message. */
     private const MISS_TTL = 60;
 
+    /** @var array<string, int> sender to device_id, the part DeviceCache cannot key on */
+    private array $devices = [];
+
     /** @var array<string, int> senders that did not resolve, and when they last failed */
     private array $misses = [];
-
-    /**
-     * @param  array<string, int>  $devices  sender to device_id, the part DeviceCache cannot key on
-     */
-    public function __construct(private array $devices = [])
-    {
-    }
 
     /**
      * Parse a message, and store it if it belongs to a known device.
