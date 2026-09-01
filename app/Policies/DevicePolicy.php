@@ -85,7 +85,7 @@ class DevicePolicy
      */
     public function configBackupRefresh(User $user, Device $device): bool
     {
-        return $user->checkPermissionTo('config-backup.refresh')
+        return $user->can('config-backup.refresh')
             && $user->can('view', $device);
     }
 
