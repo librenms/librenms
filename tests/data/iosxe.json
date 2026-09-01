@@ -6734,5 +6734,1026 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "vlans": {
+        "discovery": {
+            "vlans": [
+                {
+                    "vlan_vlan": 1,
+                    "vlan_domain": 1,
+                    "vlan_name": "default",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 2,
+                    "vlan_domain": 1,
+                    "vlan_name": "jh152as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 3,
+                    "vlan_domain": 1,
+                    "vlan_name": "jh152as02",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 4,
+                    "vlan_domain": 1,
+                    "vlan_name": "jh211Aas01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 5,
+                    "vlan_domain": 1,
+                    "vlan_name": "jh211Aas02",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 6,
+                    "vlan_domain": 1,
+                    "vlan_name": "jh021as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 8,
+                    "vlan_domain": 1,
+                    "vlan_name": "ION-INFRASTRUCTURE-APPS",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 9,
+                    "vlan_domain": 1,
+                    "vlan_name": "Telecom-Admin",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 10,
+                    "vlan_domain": 1,
+                    "vlan_name": "ION-INFRASTRUCTURE-APPS2",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 11,
+                    "vlan_domain": 1,
+                    "vlan_name": "ION-APPs",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 12,
+                    "vlan_domain": 1,
+                    "vlan_name": "ENDPOINT-TEST-LAB",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 13,
+                    "vlan_domain": 1,
+                    "vlan_name": "CAS-IT-PXE",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 16,
+                    "vlan_domain": 1,
+                    "vlan_name": "Diggs-eSports",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 22,
+                    "vlan_domain": 1,
+                    "vlan_name": "stv226Cas01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 23,
+                    "vlan_domain": 1,
+                    "vlan_name": "stv321Cas01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 24,
+                    "vlan_domain": 1,
+                    "vlan_name": "stv418Cas01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 25,
+                    "vlan_domain": 1,
+                    "vlan_name": "stv117as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 26,
+                    "vlan_domain": 1,
+                    "vlan_name": "stv250as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 27,
+                    "vlan_domain": 1,
+                    "vlan_name": "stv439as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 30,
+                    "vlan_domain": 1,
+                    "vlan_name": "SQL-DB-Access-COE",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 31,
+                    "vlan_domain": 1,
+                    "vlan_name": "upc209as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 32,
+                    "vlan_domain": 1,
+                    "vlan_name": "slb121as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 33,
+                    "vlan_domain": 1,
+                    "vlan_name": "slb257as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 34,
+                    "vlan_domain": 1,
+                    "vlan_name": "slb357as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 35,
+                    "vlan_domain": 1,
+                    "vlan_name": "slb436as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 36,
+                    "vlan_domain": 1,
+                    "vlan_name": "slb131as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 37,
+                    "vlan_domain": 1,
+                    "vlan_name": "slb151as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 38,
+                    "vlan_domain": 1,
+                    "vlan_name": "slb226as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 39,
+                    "vlan_domain": 1,
+                    "vlan_name": "slb355as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 40,
+                    "vlan_domain": 1,
+                    "vlan_name": "alamoIIas01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 41,
+                    "vlan_domain": 1,
+                    "vlan_name": "eabHas01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 42,
+                    "vlan_domain": 1,
+                    "vlan_name": "fhs106as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 43,
+                    "vlan_domain": 1,
+                    "vlan_name": "fhs204as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 44,
+                    "vlan_domain": 1,
+                    "vlan_name": "fhs405as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 45,
+                    "vlan_domain": 1,
+                    "vlan_name": "fsa125as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 46,
+                    "vlan_domain": 1,
+                    "vlan_name": "fsa141Aas01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 47,
+                    "vlan_domain": 1,
+                    "vlan_name": "fsa325as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 48,
+                    "vlan_domain": 1,
+                    "vlan_name": "fsa447Aas01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 50,
+                    "vlan_domain": 1,
+                    "vlan_name": "JH-LAB-BIO/CHE",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 51,
+                    "vlan_domain": 1,
+                    "vlan_name": "General_Lab_VLAN_for_SLB",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 52,
+                    "vlan_domain": 1,
+                    "vlan_name": "Research_Lab1",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 53,
+                    "vlan_domain": 1,
+                    "vlan_name": "Research_Lab2",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 54,
+                    "vlan_domain": 1,
+                    "vlan_name": "Geo-Research",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 55,
+                    "vlan_domain": 1,
+                    "vlan_name": "Bio-Research",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 56,
+                    "vlan_domain": 1,
+                    "vlan_name": "HSC-labs",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 57,
+                    "vlan_domain": 1,
+                    "vlan_name": "CAST-IT-PXE",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 62,
+                    "vlan_domain": 1,
+                    "vlan_name": "mlt204as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 63,
+                    "vlan_domain": 1,
+                    "vlan_name": "mlt316Fas01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 64,
+                    "vlan_domain": 1,
+                    "vlan_name": "mlt123Fas01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 65,
+                    "vlan_domain": 1,
+                    "vlan_name": "mlt204-xgrid",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 70,
+                    "vlan_domain": 1,
+                    "vlan_name": "UPC-Contact-Tracing",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 71,
+                    "vlan_domain": 1,
+                    "vlan_name": "SHIELD-Lab",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 80,
+                    "vlan_domain": 1,
+                    "vlan_name": "Ansible-Test",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 95,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN0095",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 98,
+                    "vlan_domain": 1,
+                    "vlan_name": "IPv6-Dual-Stack-Test",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 99,
+                    "vlan_domain": 1,
+                    "vlan_name": "NAC-PublicJacks-trusted",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 102,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-jh152as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 103,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-jh152as02",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 104,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-jh211Aas01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 105,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-jh211Aas02",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 106,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-jh021as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 122,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-stv226Cas01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 123,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-stv321Cas01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 124,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-stv418Cas01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 125,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-stv117as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 126,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-stv250as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 127,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-stv439as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 131,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-upc209as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 132,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-slb121as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 133,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-slb257as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 134,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-slb357as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 135,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-slb436as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 136,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-slb131as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 137,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-slb151as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 138,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-slb226as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 139,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-slb355as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 140,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-alamoIIas01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 141,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-eabHas01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 142,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-fhs106as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 143,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-fhs204as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 144,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-fhs405as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 145,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-fsa125as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 146,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-fsa141Aas01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 147,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-fsa325as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 148,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-fsa447Aas01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 162,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-mlt204as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 163,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-mlt316Fas01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 164,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-mlt123Fas01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 170,
+                    "vlan_domain": 1,
+                    "vlan_name": "VoIP-JH-Testing",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 190,
+                    "vlan_domain": 1,
+                    "vlan_name": "Wireless-Testing",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 191,
+                    "vlan_domain": 1,
+                    "vlan_name": "AVequipment-Testing",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 195,
+                    "vlan_domain": 1,
+                    "vlan_name": "JH-DC-PoE-Lights",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 199,
+                    "vlan_domain": 1,
+                    "vlan_name": "Security-Devices",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 222,
+                    "vlan_domain": 1,
+                    "vlan_name": "Gencyber-Temp",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 299,
+                    "vlan_domain": 1,
+                    "vlan_name": "NAC-PublicJacks-untrusted",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 300,
+                    "vlan_domain": 1,
+                    "vlan_name": "Public-Internet-Only",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 315,
+                    "vlan_domain": 1,
+                    "vlan_name": "Public-Servers-SLB",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 317,
+                    "vlan_domain": 1,
+                    "vlan_name": "Public-Server-CAS",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 318,
+                    "vlan_domain": 1,
+                    "vlan_name": "Public-Server-PHY",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 319,
+                    "vlan_domain": 1,
+                    "vlan_name": "Public-Server-Registrar",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 400,
+                    "vlan_domain": 1,
+                    "vlan_name": "Private-Server-CISS",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 401,
+                    "vlan_domain": 1,
+                    "vlan_name": "Private-Server-AIS",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 402,
+                    "vlan_domain": 1,
+                    "vlan_name": "Private-Server-BIO/CHE",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 406,
+                    "vlan_domain": 1,
+                    "vlan_name": "Private-Servers-CAS",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 409,
+                    "vlan_domain": 1,
+                    "vlan_name": "Private-Server-FAC",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 411,
+                    "vlan_domain": 1,
+                    "vlan_name": "Private-Servers-SLB",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 412,
+                    "vlan_domain": 1,
+                    "vlan_name": "Private-Servers-CAST",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 414,
+                    "vlan_domain": 1,
+                    "vlan_name": "Private-Server-PHY",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 415,
+                    "vlan_domain": 1,
+                    "vlan_name": "Private-Server-Registrar",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 416,
+                    "vlan_domain": 1,
+                    "vlan_name": "Private-Server-DeepLearners",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 420,
+                    "vlan_domain": 1,
+                    "vlan_name": "CTSS-AVequipment",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 421,
+                    "vlan_domain": 1,
+                    "vlan_name": "SVSI-fsa325as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 422,
+                    "vlan_domain": 1,
+                    "vlan_name": "SVSI-jh021as01",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 424,
+                    "vlan_domain": 1,
+                    "vlan_name": "ITK-Restrict-Resrch",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 430,
+                    "vlan_domain": 1,
+                    "vlan_name": "Printer-CISS",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 431,
+                    "vlan_domain": 1,
+                    "vlan_name": "Printer-AIS",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 432,
+                    "vlan_domain": 1,
+                    "vlan_name": "Printer-CFA",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 433,
+                    "vlan_domain": 1,
+                    "vlan_name": "Printer-CAS",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 434,
+                    "vlan_domain": 1,
+                    "vlan_name": "Printers-CAST",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 436,
+                    "vlan_domain": 1,
+                    "vlan_name": "Printer-PHY",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 437,
+                    "vlan_domain": 1,
+                    "vlan_name": "Printer-Registrar",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 438,
+                    "vlan_domain": 1,
+                    "vlan_name": "Printer-COE",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 439,
+                    "vlan_domain": 1,
+                    "vlan_name": "Printer-MCN",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 461,
+                    "vlan_domain": 1,
+                    "vlan_name": "Instructor-MFA-Exempt",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 475,
+                    "vlan_domain": 1,
+                    "vlan_name": "stv-slbVSS-KeyVault",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 476,
+                    "vlan_domain": 1,
+                    "vlan_name": "Ethernet-Clock",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 477,
+                    "vlan_domain": 1,
+                    "vlan_name": "Informacast-Speakers",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 484,
+                    "vlan_domain": 1,
+                    "vlan_name": "PCI-CreditCard-CCWEB",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 487,
+                    "vlan_domain": 1,
+                    "vlan_name": "Instruments",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 488,
+                    "vlan_domain": 1,
+                    "vlan_name": "Digital-Signage",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 490,
+                    "vlan_domain": 1,
+                    "vlan_name": "uPrint",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 491,
+                    "vlan_domain": 1,
+                    "vlan_name": "CreditCard-Global-Payments",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 492,
+                    "vlan_domain": 1,
+                    "vlan_name": "Redbird-Card-AIS",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 493,
+                    "vlan_domain": 1,
+                    "vlan_name": "HVAC-FireAlarm",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 496,
+                    "vlan_domain": 1,
+                    "vlan_name": "Security-Camera",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 497,
+                    "vlan_domain": 1,
+                    "vlan_name": "Security-Door-Access",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 500,
+                    "vlan_domain": 1,
+                    "vlan_name": "Network-Management",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 501,
+                    "vlan_domain": 1,
+                    "vlan_name": "Cisco-PnP(dhcp)",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 502,
+                    "vlan_domain": 1,
+                    "vlan_name": "ZTP-MGMT",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 503,
+                    "vlan_domain": 1,
+                    "vlan_name": "Test-Network_Management",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 524,
+                    "vlan_domain": 1,
+                    "vlan_name": "arubatest",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 525,
+                    "vlan_domain": 1,
+                    "vlan_name": "WAP",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 599,
+                    "vlan_domain": 1,
+                    "vlan_name": "trunk-native-vlan",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 601,
+                    "vlan_domain": 1,
+                    "vlan_name": "Dev-Reg-Test",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                },
+                {
+                    "vlan_vlan": 800,
+                    "vlan_domain": 1,
+                    "vlan_name": "RSPAN-TEST",
+                    "vlan_type": "ethernet",
+                    "vlan_state": 1
+                }
+            ]
+        }
     }
 }
