@@ -148,10 +148,10 @@
                     <x-slot name="heading" class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
                         <h3 class="panel-title tw:flex tw:items-center tw:gap-2 tw:flex-wrap">
                             <template x-if="diffMode">
-                                <div class="tw:flex tw:items-center tw:gap-2.5 tw:flex-wrap">
+                                <div class="tw:flex tw:items-center tw:gap-2 tw:flex-wrap">
                                     <span class="tw:font-semibold">{{ __('config_backups.diff') }}:</span>
                                     <template x-if="activeDiffOrig && activeDiffRev">
-                                        <div class="tw:inline-flex tw:items-center tw:gap-2.5 tw:flex-wrap">
+                                        <div class="tw:inline-flex tw:items-center tw:gap-2 tw:flex-wrap">
                                             {{-- Base (Old) Version Dropdown --}}
                                             <div class="tw:inline-flex tw:items-center tw:gap-1.5">
                                                 <span class="tw:w-5 tw:h-5 tw:rounded-full tw:bg-red-600 tw:text-white tw:text-[9px] tw:flex tw:items-center tw:justify-center tw:shrink-0" title="{{ __('config_backups.base') }}">
@@ -161,18 +161,18 @@
                                                     <select :value="activeOrigId"
                                                             x-on:change="onOrigDropdownChange($event.target.value)"
                                                             aria-label="{{ __('config_backups.base') }}"
-                                                            class="tw:appearance-none tw:cursor-pointer tw:text-lg tw:font-medium tw:h-8 tw:py-0 tw:pl-2.5 tw:pr-7 tw:rounded-md tw:border tw:border-gray-300 tw:bg-white tw:text-gray-900 tw:dark:bg-dark-gray-400 tw:dark:text-dark-white-100 tw:dark:border-dark-gray-100 tw:focus:ring-2 tw:focus:ring-blue-500 tw:focus:outline-none">
+                                                            class="tw:appearance-none tw:cursor-pointer tw:text-lg tw:font-medium tw:h-8 tw:py-0 tw:pl-2 tw:pr-7 tw:rounded-md tw:border tw:border-gray-300 tw:bg-white tw:text-gray-900 tw:dark:bg-dark-gray-400 tw:dark:text-dark-white-100 tw:dark:border-dark-gray-100 tw:focus:ring-2 tw:focus:ring-blue-500 tw:focus:outline-none">
                                                         <template x-for="b in textBackups" :key="'orig-' + b.id">
                                                             <option :value="b.id"
                                                                     :selected="b.id === activeOrigId"
-                                                                    x-text="formatDate(b.date) + (b.id === backups[0]?.id ? ' (Latest)' : '')"></option>
+                                                                    x-text="formatDate(b.date)"></option>
                                                         </template>
                                                     </select>
-                                                    <i class="fa fa-chevron-down tw:absolute tw:right-2.5 tw:text-[9px] tw:text-gray-500 tw:dark:text-dark-white-300 tw:pointer-events-none" aria-hidden="true"></i>
+                                                    <i class="fa fa-chevron-down tw:absolute tw:right-2 tw:text-[9px] tw:text-gray-500 tw:dark:text-dark-white-300 tw:pointer-events-none" aria-hidden="true"></i>
                                                 </div>
                                             </div>
 
-                                            {{-- Interactive direction toggle button --}}
+                                            {{-- direction toggle button --}}
                                             <button type="button"
                                                     x-on:click="toggleDiffDirection()"
                                                     title="{{ __('config_backups.reverse_direction') }}"
@@ -192,14 +192,14 @@
                                                     <select :value="activeRevId"
                                                             x-on:change="onRevDropdownChange($event.target.value)"
                                                             aria-label="{{ __('config_backups.compare') }}"
-                                                            class="tw:appearance-none tw:cursor-pointer tw:text-lg tw:font-medium tw:h-8 tw:py-0 tw:pl-2.5 tw:pr-7 tw:rounded-md tw:border tw:border-gray-300 tw:bg-white tw:text-gray-900 tw:dark:bg-dark-gray-400 tw:dark:text-dark-white-100 tw:dark:border-dark-gray-100 tw:focus:ring-2 tw:focus:ring-blue-500 tw:focus:outline-none">
+                                                            class="tw:appearance-none tw:cursor-pointer tw:text-lg tw:font-medium tw:h-8 tw:py-0 tw:pl-2 tw:pr-7 tw:rounded-md tw:border tw:border-gray-300 tw:bg-white tw:text-gray-900 tw:dark:bg-dark-gray-400 tw:dark:text-dark-white-100 tw:dark:border-dark-gray-100 tw:focus:ring-2 tw:focus:ring-blue-500 tw:focus:outline-none">
                                                         <template x-for="b in textBackups" :key="'rev-' + b.id">
                                                             <option :value="b.id"
                                                                     :selected="b.id === activeRevId"
-                                                                    x-text="formatDate(b.date) + (b.id === backups[0]?.id ? ' (Latest)' : '')"></option>
+                                                                    x-text="formatDate(b.date)"></option>
                                                         </template>
                                                     </select>
-                                                    <i class="fa fa-chevron-down tw:absolute tw:right-2.5 tw:text-[9px] tw:text-gray-500 tw:dark:text-dark-white-300 tw:pointer-events-none" aria-hidden="true"></i>
+                                                    <i class="fa fa-chevron-down tw:absolute tw:right-2 tw:text-[9px] tw:text-gray-500 tw:dark:text-dark-white-300 tw:pointer-events-none" aria-hidden="true"></i>
                                                 </div>
                                             </div>
                                         </div>
@@ -215,7 +215,7 @@
                             <i x-show="loading" x-cloak class="fa fa-spinner tw:animate-spin tw:text-blue-500 tw:text-xs" aria-hidden="true"></i>
                         </h3>
 
-                        {{-- Action buttons (Standard 32px icon buttons with tooltips) --}}
+                        {{-- Action buttons --}}
                         <div class="tw:flex tw:items-center tw:gap-2" x-cloak>
                             {{-- Single Config Actions --}}
                             <template x-if="showConfigView">
@@ -239,7 +239,6 @@
                                 </div>
                             </template>
 
-
                             {{-- Diff Actions --}}
                             <template x-if="showDiffView">
                                 <div class="tw:flex tw:items-center tw:gap-2">
@@ -261,7 +260,6 @@
                                     </button>
                                 </div>
                             </template>
-
                         </div>
                     </x-slot>
 
@@ -380,7 +378,7 @@
                         <div class="tw:p-5 tw:overflow-y-auto tw:space-y-5 tw:text-sm">
                             {{-- UI Interactions --}}
                             <div>
-                                <h5 class="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2.5">
+                                <h5 class="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2">
                                     {{ __('config_backups.interactions') }}
                                 </h5>
                                 <ul class="tw:list-none tw:p-0 tw:m-0 tw:space-y-2 tw:text-xs">
@@ -401,10 +399,10 @@
 
                             {{-- Navigate History --}}
                             <div>
-                                <h5 class="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2.5">
+                                <h5 class="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2">
                                     {{ __('config_backups.navigate_history') }}
                                 </h5>
-                                <div class="tw:grid tw:grid-cols-1 tw:sm:grid-cols-2 tw:gap-2.5 tw:text-xs">
+                                <div class="tw:grid tw:grid-cols-1 tw:gap-2 tw:text-xs">
                                     <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
                                         <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_older') }}</span>
                                         <div class="tw:flex tw:items-center tw:gap-1.5">
@@ -434,10 +432,10 @@
 
                             {{-- Compare Revisions --}}
                             <div>
-                                <h5 class="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2.5">
+                                <h5 class="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2">
                                     {{ __('config_backups.compare_revisions') }}
                                 </h5>
-                                <div class="tw:grid tw:grid-cols-1 tw:sm:grid-cols-2 tw:gap-2.5 tw:text-xs">
+                                <div class="tw:grid tw:grid-cols-1 tw:gap-2 tw:text-xs">
                                     <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
                                         <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_toggle_diff') }}</span>
                                         <div class="tw:flex tw:gap-1">
@@ -470,10 +468,10 @@
 
                             {{-- General --}}
                             <div>
-                                <h5 class="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2.5">
+                                <h5 class="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2">
                                     {{ __('config_backups.general') }}
                                 </h5>
-                                <div class="tw:grid tw:grid-cols-1 tw:sm:grid-cols-2 tw:gap-2.5 tw:text-xs">
+                                <div class="tw:grid tw:grid-cols-1 tw:gap-2 tw:text-xs">
                                     <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
                                         <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_help') }}</span>
                                         <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">?</kbd>
