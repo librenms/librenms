@@ -37,6 +37,9 @@ class DeviceConfigTabTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * @var list<class-string<\LibreNMS\Interfaces\ConfigBackupProvider>>
+     */
     private array $originalProviders;
 
     protected function setUp(): void
