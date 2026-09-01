@@ -496,18 +496,14 @@
                 effect(() => {
                     evaluateContent((content) => {
                         const currentUpdateId = ++updateId;
-
                         window.LibreNMS.loadConfigHighlight().then(({ default: highlightConfig }) => {
-                            if (currentUpdateId === updateId) {
-                                highlightConfig(element, content);
-                            }
+                            if (currentUpdateId === updateId) highlightConfig(element, content);
                         });
                     });
                 });
             });
 
             window.Alpine.data('configBackups', (config) => ({
-                // ── Data & Config ──────────────────────────────────────────
                 backups: [],
                 page: 0,
                 totalPages: 0,
@@ -516,7 +512,6 @@
                 messages: config.messages || {},
                 canRefresh: config.can_refresh || false,
 
-                // ── UI State ───────────────────────────────────────────────
                 selected: null,
                 selectedBackupId: null,
                 anchorIndex: null,
@@ -531,25 +526,20 @@
                 copiedDiff: false,
                 refreshing: false,
 
-                // ── Diff State ─────────────────────────────────────────────
                 diffMode: false,
                 diffSelection: [],
                 diffGroups: null,
                 diffReversed: false,
 
-                // ── Lifecycle ──────────────────────────────────────────────
                 async init() {
                     await this.loadLatest();
                     this.loadBackupPage(0);
                 },
 
-                // ── Loading Helpers ────────────────────────────────────────
                 beginLoading() {
                     this.loading = true;
                     this.showSpinner = false;
-                    return setTimeout(() => {
-                        if (this.loading) this.showSpinner = true;
-                    }, 300);
+                    return setTimeout(() => { if (this.loading) this.showSpinner = true; }, 300);
                 },
 
                 endLoading(timer) {
@@ -558,14 +548,12 @@
                     this.showSpinner = false;
                 },
 
-                // ── Navigation & Index Helpers ─────────────────────────────
                 indexOfId(id) {
                     return this.backups.findIndex(b => b.id === id);
                 },
 
                 get currentSingleIndex() {
-                    const id = this.selectedBackupId ?? this.selected?.id;
-                    const idx = this.indexOfId(id);
+                    const idx = this.indexOfId(this.selectedBackupId ?? this.selected?.id);
                     return idx !== -1 ? idx : 0;
                 },
 
@@ -574,55 +562,38 @@
                 },
 
                 scrollToIndex(index) {
-                    const list = this.$refs.timelineList;
-                    if (!list) return;
-                    const row = list.querySelector(`[data-backup-index="${index}"]`);
-                    row?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                    this.$refs.timelineList
+                        ?.querySelector(`[data-backup-index="${index}"]`)
+                        ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
                 },
 
                 scrollToTop() {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
-                    const panel = this.$refs.viewerPanel;
-                    if (panel) {
-                        const scrollable = panel.querySelector('pre, .tw\\:overflow-x-auto');
-                        if (scrollable) {
-                            scrollable.scrollTo({ top: 0, behavior: 'smooth' });
-                        }
-                    }
+                    this.$refs.viewerPanel
+                        ?.querySelector('pre, .tw\\:overflow-x-auto')
+                        ?.scrollTo({ top: 0, behavior: 'smooth' });
                 },
 
-                // ── Backup List & Fetching ─────────────────────────────────
                 async loadBackupPage(page, append = false) {
                     const loadingKey = append ? 'loadingMore' : 'loadingBackups';
                     this[loadingKey] = true;
-
                     try {
                         const { data } = await window.axios.get(this.urls.backups, { params: { page } });
                         const mapped = data.backups.map(b => ({ ...b, page }));
-
-                        if (append) {
-                            this.backups.push(...mapped);
-                        } else {
-                            this.backups = mapped;
-                        }
-
+                        append ? this.backups.push(...mapped) : this.backups = mapped;
                         this.page = data.page;
                         this.totalPages = data.totalPages;
                         this.total = data.total;
-                    } catch (error) {
-                        if (!this.error) this.error = this.requestError(error);
+                    } catch (e) {
+                        if (!this.error) this.error = this.requestError(e);
                     } finally {
                         this[loadingKey] = false;
                     }
                 },
 
-                loadMore() {
-                    this.loadBackupPage(this.page + 1, true);
-                },
+                loadMore() { this.loadBackupPage(this.page + 1, true); },
 
-                get hasMore() {
-                    return this.page < this.totalPages - 1;
-                },
+                get hasMore() { return this.page < this.totalPages - 1; },
 
                 async loadLatest() {
                     const timer = this.beginLoading();
@@ -632,8 +603,8 @@
                             this.selected = data;
                             this.selectedBackupId = data.id;
                         }
-                    } catch (error) {
-                        if (!this.selected) this.error = this.requestError(error);
+                    } catch (e) {
+                        if (!this.selected) this.error = this.requestError(e);
                     } finally {
                         this.endLoading(timer);
                     }
@@ -645,25 +616,20 @@
                         const { data } = await window.axios.get(this.urls.backup, {
                             params: { backup: backup.id, page: backup.page },
                         });
-                        if (this.selectedBackupId === backup.id || (!this.selectedBackupId && this.selected?.id === backup.id)) {
+                        if (this.selectedBackupId === backup.id) {
                             this.selected = { ...backup, content: data.content };
                         }
-                    } catch (error) {
-                        if (this.selectedBackupId === backup.id) {
-                            this.error = this.requestError(error);
-                        }
+                    } catch (e) {
+                        if (this.selectedBackupId === backup.id) this.error = this.requestError(e);
                     } finally {
                         this.endLoading(timer);
                     }
                 },
 
-                // ── Unified Selection & Navigation ─────────────────────────
                 applyDiffRange(anchor, focus) {
-                    const minIdx = Math.min(anchor, focus);
-                    const maxIdx = Math.max(anchor, focus);
+                    const [minIdx, maxIdx] = [Math.min(anchor, focus), Math.max(anchor, focus)];
                     const older = this.backups[maxIdx];
                     const newer = this.backups[minIdx];
-
                     if (!older || !newer || older.type !== 'TEXT' || newer.type !== 'TEXT') return;
 
                     if (this.diffMode && this.diffSelection.length === 2 &&
@@ -683,35 +649,26 @@
                 selectBackup(backup, index, event = null) {
                     if (backup.type !== 'TEXT') {
                         if (!this.diffMode) {
-                            this.selected = backup;
+                            this.selected = { ...backup, content: null };
                             this.selectedBackupId = backup.id;
                             this.anchorIndex = index;
                             this.focusIndex = index;
-                            this.selected.content = null;
                         }
                         return;
                     }
 
-                    // Shift-click range selection
-                    if (event && event.shiftKey) {
+                    if (event?.shiftKey) {
                         const curAnchor = this.anchorIndex ?? this.indexOfId(this.selectedBackupId ?? this.selected?.id ?? this.activeDiffRev?.id);
                         this.applyDiffRange(curAnchor !== -1 ? curAnchor : 0, index);
                         return;
                     }
 
-                    // Step-through diff mode
                     if (this.diffMode) {
-                        const predecessorIdx = index + 1 < this.backups.length && this.backups[index + 1].type === 'TEXT'
-                            ? index + 1
-                            : (index - 1 >= 0 && this.backups[index - 1].type === 'TEXT' ? index - 1 : null);
-
-                        if (predecessorIdx !== null) {
-                            this.applyDiffRange(index, predecessorIdx);
-                        }
+                        const adjIdx = this.findAdjacentTextIndex(index);
+                        if (adjIdx !== null) this.applyDiffRange(index, adjIdx);
                         return;
                     }
 
-                    // Single mode: re-click active config scrolls to top
                     if ((this.selectedBackupId ?? this.selected?.id) === backup.id && this.selected?.content != null) {
                         this.scrollToTop();
                         return;
@@ -724,37 +681,35 @@
                     this.loadBackupContent(backup);
                 },
 
+                findAdjacentTextIndex(index) {
+                    if (index + 1 < this.backups.length && this.backups[index + 1].type === 'TEXT') return index + 1;
+                    if (index - 1 >= 0 && this.backups[index - 1].type === 'TEXT') return index - 1;
+                    return null;
+                },
+
                 navigateHistory(step, isShift = false) {
                     if (!this.backups.length) return;
 
-                    if (this.diffMode) {
-                        if (isShift) {
-                            const curAnchor = this.anchorIndex ?? (this.activeDiffRev ? this.indexOfId(this.activeDiffRev.id) : 0);
-                            const curFocus = this.focusIndex ?? (this.activeDiffOrig ? this.indexOfId(this.activeDiffOrig.id) : curAnchor + 1);
-
-                            let nextFocus = curFocus + step;
-                            if (nextFocus === curAnchor) nextFocus += step;
-                            if (nextFocus < 0 || nextFocus >= this.backups.length) return;
-
-                            this.applyDiffRange(curAnchor, nextFocus);
-                            this.scrollToIndex(nextFocus);
-                            return;
-                        }
-
-                        // Regular Step-Through Diff Navigation
-                        const currentAnchor = this.anchorIndex ?? (this.activeDiffRev ? this.indexOfId(this.activeDiffRev.id) : 0);
-                        const nextAnchor = currentAnchor + step;
-                        if (nextAnchor < 0 || nextAnchor >= this.backups.length) return;
-
-                        const nextBackup = this.backups[nextAnchor];
-                        if (nextBackup) {
-                            this.selectBackup(nextBackup, nextAnchor);
-                            this.scrollToIndex(nextAnchor);
-                        }
+                    if (this.diffMode && isShift) {
+                        const curAnchor = this.anchorIndex ?? (this.activeDiffRev ? this.indexOfId(this.activeDiffRev.id) : 0);
+                        const curFocus = this.focusIndex ?? (this.activeDiffOrig ? this.indexOfId(this.activeDiffOrig.id) : curAnchor + 1);
+                        let nextFocus = curFocus + step;
+                        if (nextFocus === curAnchor) nextFocus += step;
+                        if (nextFocus < 0 || nextFocus >= this.backups.length) return;
+                        this.applyDiffRange(curAnchor, nextFocus);
+                        this.scrollToIndex(nextFocus);
                         return;
                     }
 
-                    // Single Mode Navigation
+                    if (this.diffMode) {
+                        const currentAnchor = this.anchorIndex ?? (this.activeDiffRev ? this.indexOfId(this.activeDiffRev.id) : 0);
+                        const nextAnchor = currentAnchor + step;
+                        if (nextAnchor < 0 || nextAnchor >= this.backups.length) return;
+                        this.selectBackup(this.backups[nextAnchor], nextAnchor);
+                        this.scrollToIndex(nextAnchor);
+                        return;
+                    }
+
                     const currentIdx = this.currentSingleIndex;
                     const nextIndex = currentIdx + step;
                     if (nextIndex < 0 || nextIndex >= this.backups.length) return;
@@ -765,73 +720,38 @@
                         return;
                     }
 
-                    const nextBackup = this.backups[nextIndex];
-                    if (nextBackup) {
-                        this.selectBackup(nextBackup, nextIndex);
-                        this.scrollToIndex(nextIndex);
-                    }
+                    this.selectBackup(this.backups[nextIndex], nextIndex);
+                    this.scrollToIndex(nextIndex);
                 },
 
                 handleKeyDown(e) {
                     if (e.target.closest('input, textarea, select')) return;
 
-                    if (e.key === '?' || (e.key === '/' && e.shiftKey)) {
+                    const key = e.key;
+                    const ctrl = e.ctrlKey || e.metaKey;
+                    const shift = e.shiftKey;
+
+                    if (key === '?' || (key === '/' && shift)) {
                         e.preventDefault();
                         this.showHelp = !this.showHelp;
-                        return;
-                    }
-
-                    if (e.key === 'Escape') {
-                        if (this.showHelp) {
-                            e.preventDefault();
-                            this.showHelp = false;
-                            return;
-                        }
-                        if (this.diffMode) {
-                            e.preventDefault();
-                            this.toggleDiffMode();
-                        }
-                        return;
-                    }
-
-                    if ((e.key === 'd' || e.key === 'c') && this.total > 1) {
+                    } else if (key === 'Escape') {
+                        if (this.showHelp) { e.preventDefault(); this.showHelp = false; }
+                        else if (this.diffMode) { e.preventDefault(); this.toggleDiffMode(); }
+                    } else if ((key === 'd' || key === 'c') && this.total > 1) {
                         e.preventDefault();
                         this.toggleDiffMode();
-                        return;
-                    }
-
-                    if (e.key === 'r' && this.diffMode && this.diffReady) {
+                    } else if (key === 'r' && this.diffMode && this.diffReady) {
                         e.preventDefault();
                         this.toggleDiffDirection();
-                        return;
-                    }
-
-                    if (e.key === 'j' || e.key === 'J' || ((e.ctrlKey || e.metaKey) && e.key === 'ArrowDown')) {
+                    } else if (key === 'j' || key === 'J' || (ctrl && key === 'ArrowDown') || (shift && key === 'ArrowDown')) {
                         e.preventDefault();
-                        this.navigateHistory(1, e.shiftKey);
-                        return;
-                    }
-
-                    if (e.key === 'k' || e.key === 'K' || ((e.ctrlKey || e.metaKey) && e.key === 'ArrowUp')) {
+                        this.navigateHistory(1, shift);
+                    } else if (key === 'k' || key === 'K' || (ctrl && key === 'ArrowUp') || (shift && key === 'ArrowUp')) {
                         e.preventDefault();
-                        this.navigateHistory(-1, e.shiftKey);
-                        return;
-                    }
-
-                    if (e.shiftKey && e.key === 'ArrowDown') {
-                        e.preventDefault();
-                        this.navigateHistory(1, true);
-                        return;
-                    }
-
-                    if (e.shiftKey && e.key === 'ArrowUp') {
-                        e.preventDefault();
-                        this.navigateHistory(-1, true);
-                        return;
+                        this.navigateHistory(-1, shift);
                     }
                 },
 
-                // ── Diff Management & Dropdowns ────────────────────────────
                 toggleDiffMode() {
                     this.diffMode = !this.diffMode;
                     this.error = null;
@@ -854,11 +774,7 @@
                     this.anchorIndex = this.diffSelection[0] ? this.indexOfId(this.diffSelection[0].id) : 0;
                     this.focusIndex = this.diffSelection[1] ? this.indexOfId(this.diffSelection[1].id) : this.anchorIndex;
 
-                    if (this.diffSelection.length === 2) {
-                        this.loadDiff();
-                    } else {
-                        this.diffGroups = null;
-                    }
+                    this.diffSelection.length === 2 ? this.loadDiff() : this.diffGroups = null;
                 },
 
                 exitDiffMode() {
@@ -890,19 +806,14 @@
                     const other = String(backup.id) === String(currentOther.id)
                         ? this.textBackups.find(b => String(b.id) !== String(selectedId))
                         : currentOther;
-
                     if (!other) return;
+
                     const [b1, b2] = role === 'orig' ? [backup, other] : [other, backup];
                     this.applyDiffRange(this.indexOfId(b1.id), this.indexOfId(b2.id));
                 },
 
-                onOrigDropdownChange(selectedId) {
-                    this.setDiffEndpoint('orig', selectedId);
-                },
-
-                onRevDropdownChange(selectedId) {
-                    this.setDiffEndpoint('rev', selectedId);
-                },
+                onOrigDropdownChange(id) { this.setDiffEndpoint('orig', id); },
+                onRevDropdownChange(id) { this.setDiffEndpoint('rev', id); },
 
                 get sortedDiff() {
                     if (this.diffSelection.length !== 2) return null;
@@ -911,41 +822,21 @@
                     return this.diffReversed ? { orig: newer, rev: older } : { orig: older, rev: newer };
                 },
 
-                get activeDiffOrig() {
-                    return this.sortedDiff?.orig ?? null;
-                },
-
-                get activeDiffRev() {
-                    return this.sortedDiff?.rev ?? null;
-                },
-
-                get activeOrigId() {
-                    return this.activeDiffOrig?.id ?? '';
-                },
-
-                get activeRevId() {
-                    return this.activeDiffRev?.id ?? '';
-                },
-
-                get diffReady() {
-                    return this.diffGroups !== null && this.diffSelection.length === 2;
-                },
-
-                get hasDiffChanges() {
-                    return !this.diffGroups ? false : this.diffGroups.some(g => g.type !== 'COMMON');
-                },
+                get activeDiffOrig() { return this.sortedDiff?.orig ?? null; },
+                get activeDiffRev() { return this.sortedDiff?.rev ?? null; },
+                get activeOrigId() { return this.activeDiffOrig?.id ?? ''; },
+                get activeRevId() { return this.activeDiffRev?.id ?? ''; },
+                get diffReady() { return this.diffGroups !== null && this.diffSelection.length === 2; },
+                get hasDiffChanges() { return this.diffGroups?.some(g => g.type !== 'COMMON') ?? false; },
 
                 get diffStats() {
                     if (!this.diffGroups) return null;
                     let additions = 0, deletions = 0;
-                    this.diffGroups.forEach((g) => {
+                    for (const g of this.diffGroups) {
                         if (g.type === 'INSERTED') additions += g.revised.length;
                         else if (g.type === 'DELETED') deletions += g.original.length;
-                        else if (g.type === 'CHANGED') {
-                            deletions += g.original.length;
-                            additions += g.revised.length;
-                        }
-                    });
+                        else if (g.type === 'CHANGED') { deletions += g.original.length; additions += g.revised.length; }
+                    }
                     return { additions, deletions };
                 },
 
@@ -967,20 +858,15 @@
                 async loadDiff() {
                     if (!this.sortedDiff) return;
                     const { orig, rev } = this.sortedDiff;
-                    if (orig.id === rev.id) {
-                        this.diffGroups = [];
-                        return;
-                    }
+                    if (orig.id === rev.id) { this.diffGroups = []; return; }
+
                     const timer = this.beginLoading();
                     this.error = null;
-
                     try {
-                        const { data } = await window.axios.get(this.urls.diff, {
-                            params: { orig: orig.id, rev: rev.id },
-                        });
+                        const { data } = await window.axios.get(this.urls.diff, { params: { orig: orig.id, rev: rev.id } });
                         this.diffGroups = data.groups;
-                    } catch (error) {
-                        this.error = this.requestError(error);
+                    } catch (e) {
+                        this.error = this.requestError(e);
                     } finally {
                         this.endLoading(timer);
                     }
@@ -990,27 +876,21 @@
                     if (!this.diffGroups) return [];
                     const rows = [];
                     const push = (mode, lines) => lines.forEach(l => rows.push({ mode, line: l.line, text: l.text }));
-
-                    this.diffGroups.forEach((group) => {
-                        if (group.type === 'COMMON') push('common', group.original);
-                        if (group.type === 'DELETED' || group.type === 'CHANGED') push('removed', group.original);
-                        if (group.type === 'INSERTED' || group.type === 'CHANGED') push('added', group.revised);
-                    });
+                    for (const g of this.diffGroups) {
+                        if (g.type === 'COMMON') push('common', g.original);
+                        if (g.type === 'DELETED' || g.type === 'CHANGED') push('removed', g.original);
+                        if (g.type === 'INSERTED' || g.type === 'CHANGED') push('added', g.revised);
+                    }
                     return rows;
                 },
 
-                getDiffRole(backup) {
-                    return this.diffRoleMap[backup.id] ?? null;
-                },
+                getDiffRole(backup) { return this.diffRoleMap[backup.id] ?? null; },
 
-                // ── Timeline Styling Helpers ───────────────────────────────
                 get selectedRangeIndices() {
                     if (this.diffMode && this.diffSelection.length === 2) {
                         const idx1 = this.indexOfId(this.diffSelection[0].id);
                         const idx2 = this.indexOfId(this.diffSelection[1].id);
-                        if (idx1 !== -1 && idx2 !== -1) {
-                            return [Math.min(idx1, idx2), Math.max(idx1, idx2)];
-                        }
+                        if (idx1 !== -1 && idx2 !== -1) return [Math.min(idx1, idx2), Math.max(idx1, idx2)];
                     }
                     return null;
                 },
@@ -1036,35 +916,16 @@
                     return !!(range && index >= range[0] && index < range[1]);
                 },
 
-                // ── View Visibility & UI Helpers ───────────────────────────
-                get showDiffView() {
-                    return this.diffMode && this.diffReady;
-                },
-
-                get showDiffPrompt() {
-                    return !this.showSpinner && this.diffMode && !this.diffReady && !this.error;
-                },
-
-                get showBinaryNotice() {
-                    return !this.showSpinner && !this.diffMode && this.selected && this.selected.type !== 'TEXT';
-                },
-
-                get showConfigView() {
-                    return !this.diffMode && this.selected?.content != null && (!this.selected || this.selected.type === 'TEXT');
-                },
-
-                isBackupDisabled(backup) {
-                    return this.diffMode && backup.type !== 'TEXT';
-                },
-
-                get diffSelectionIdSet() {
-                    return new Set(this.diffSelection.map(b => b.id));
-                },
+                get showDiffView() { return this.diffMode && this.diffReady; },
+                get showDiffPrompt() { return !this.showSpinner && this.diffMode && !this.diffReady && !this.error; },
+                get showBinaryNotice() { return !this.showSpinner && !this.diffMode && this.selected && this.selected.type !== 'TEXT'; },
+                get showConfigView() { return !this.diffMode && this.selected?.content != null && this.selected?.type === 'TEXT'; },
 
                 isSelected(backup) {
-                    return this.diffMode
-                        ? this.diffSelectionIdSet.has(backup.id)
-                        : (this.selectedBackupId ?? this.selected?.id) === backup.id;
+                    if (this.diffMode) {
+                        return this.diffSelection.some(b => b.id === backup.id);
+                    }
+                    return (this.selectedBackupId ?? this.selected?.id) === backup.id;
                 },
 
                 get selectedDisplayDate() {
@@ -1075,19 +936,10 @@
                     return this.selected?.date;
                 },
 
-                errorMessage() {
-                    return this.messages[this.error] || this.messages.request_failed || this.error;
-                },
+                errorMessage() { return this.messages[this.error] || this.messages.request_failed || this.error; },
+                formatDate(ts) { return ts ? window.LibreNMS.Date.display(ts) : ''; },
+                requestError(e) { return e.response?.data?.error ?? 'request_failed'; },
 
-                formatDate(ts) {
-                    return ts ? window.LibreNMS.Date.display(ts) : '';
-                },
-
-                requestError(error) {
-                    return error.response?.data?.error ?? 'request_failed';
-                },
-
-                // ── Download & Clipboard Actions ───────────────────────────
                 downloadFile(content, filename, mimeType) {
                     const blob = new Blob([content], { type: `${mimeType};charset=utf-8` });
                     const url = URL.createObjectURL(blob);
@@ -1099,54 +951,38 @@
                     navigator.clipboard.writeText(text).then(() => {
                         this[successKey] = true;
                         setTimeout(() => { this[successKey] = false; }, 2000);
-                    }).catch(err => console.error('Failed to copy to clipboard:', err));
+                    }).catch(err => console.error('Clipboard copy failed:', err));
                 },
 
                 generateUnifiedDiff() {
                     if (!this.diffGroups || !this.activeDiffOrig || !this.activeDiffRev) return '';
-
-                    const origDate = this.formatDate(this.activeDiffOrig.date);
-                    const revDate = this.formatDate(this.activeDiffRev.date);
-                    let text = `--- Base (${origDate})\n+++ Compare (${revDate})\n`;
-
-                    this.diffGroups.forEach((group) => {
-                        if (group.type === 'COMMON') {
-                            group.original.forEach(l => { text += `  ${l.text}\n`; });
-                        } else if (group.type === 'DELETED') {
-                            group.original.forEach(l => { text += `-${l.text}\n`; });
-                        } else if (group.type === 'INSERTED') {
-                            group.revised.forEach(l => { text += `+${l.text}\n`; });
-                        } else if (group.type === 'CHANGED') {
-                            group.original.forEach(l => { text += `-${l.text}\n`; });
-                            group.revised.forEach(l => { text += `+${l.text}\n`; });
-                        }
-                    });
+                    let text = `--- Base (${this.formatDate(this.activeDiffOrig.date)})\n+++ Compare (${this.formatDate(this.activeDiffRev.date)})\n`;
+                    for (const g of this.diffGroups) {
+                        if (g.type === 'COMMON') g.original.forEach(l => { text += `  ${l.text}\n`; });
+                        if (g.type === 'DELETED' || g.type === 'CHANGED') g.original.forEach(l => { text += `-${l.text}\n`; });
+                        if (g.type === 'INSERTED' || g.type === 'CHANGED') g.revised.forEach(l => { text += `+${l.text}\n`; });
+                    }
                     return text;
                 },
 
                 downloadDiff() {
-                    const diffText = this.generateUnifiedDiff();
-                    if (!diffText) return;
-
-                    const origDate = this.activeDiffOrig?.date ? new Date(this.activeDiffOrig.date * 1000).toISOString().split('T')[0] : 'orig';
-                    const revDate = this.activeDiffRev?.date ? new Date(this.activeDiffRev.date * 1000).toISOString().split('T')[0] : 'rev';
-                    const hostname = config.hostname ? `${config.hostname}-` : '';
-
-                    this.downloadFile(diffText, `${hostname}config-diff-${origDate}-to-${revDate}.diff`, 'text/x-diff');
+                    const text = this.generateUnifiedDiff();
+                    if (!text) return;
+                    const dateStr = (ts) => ts ? new Date(ts * 1000).toISOString().split('T')[0] : 'unknown';
+                    const prefix = config.hostname ? `${config.hostname}-` : '';
+                    this.downloadFile(text, `${prefix}config-diff-${dateStr(this.activeDiffOrig?.date)}-to-${dateStr(this.activeDiffRev?.date)}.diff`, 'text/x-diff');
                 },
 
                 copyDiff() {
-                    const diffText = this.generateUnifiedDiff();
-                    if (diffText) this.copyText(diffText, 'copiedDiff');
+                    const text = this.generateUnifiedDiff();
+                    if (text) this.copyText(text, 'copiedDiff');
                 },
 
                 downloadConfig() {
                     if (!this.selected?.content) return;
-
                     const dateStr = this.selected?.date ? new Date(this.selected.date * 1000).toISOString().split('T')[0] : 'latest';
-                    const hostname = config.hostname ? `${config.hostname}-` : '';
-
-                    this.downloadFile(this.selected.content, `${hostname}config-${dateStr}.txt`, 'text/plain');
+                    const prefix = config.hostname ? `${config.hostname}-` : '';
+                    this.downloadFile(this.selected.content, `${prefix}config-${dateStr}.txt`, 'text/plain');
                 },
 
                 copyToClipboard() {
@@ -1156,7 +992,6 @@
                 refresh() {
                     if (this.refreshing) return;
                     this.refreshing = true;
-
                     window.axios.post(this.urls.refresh)
                         .then(({ data }) => window.toastr?.success(data.message))
                         .catch(err => window.toastr?.error(err.response?.data?.message || this.messages.request_failed))
