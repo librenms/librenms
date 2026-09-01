@@ -125,7 +125,17 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
                 'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserAuthStatus'
             ) ?? 0);
 
-            if ($authStatus === 1) {
+            $classificationSource = (int) ($this->rowValue(
+                $row,
+                'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserClassificationSource'
+            ) ?? 0);
+
+            $isNoMatchingUnpBlock = $classificationSource === 60;
+
+            // AOS normally reports inactive users as idle(1), which we do not
+            // need to retain. However, "No Matching UNP - Block" is also
+            // reported as idle(1), so keep that entry visible in LibreNMS.
+            if ($authStatus === 1 && ! $isNoMatchingUnpBlock) {
                 continue;
             }
 
@@ -213,6 +223,10 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
                 $serverMessage
             );
 
+            if ($isNoMatchingUnpBlock) {
+                $authzStatus = 'authzFail';
+            }
+
             $hostMode = (($authenticatedCountByIfIndex[$ifIndex] ?? 0) > 1)
                 ? 'multiAuth'
                 : 'singleHost';
@@ -221,13 +235,17 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
                 ? ($portTimeoutByIfIndex[$ifIndex] ?? 0)
                 : 0;
 
-            $authzBy = ($authServer !== '' && $authServer !== '-')
-                ? $authServer
-                : 'RADIUS';
+            $authzBy = $isNoMatchingUnpBlock
+                ? 'UNP'
+                : (($authServer !== '' && $authServer !== '-')
+                    ? $authServer
+                    : 'RADIUS');
 
-            $domain = $unpUsed !== ''
-                ? $unpUsed
-                : ($unpFromAuthServer !== '' ? $unpFromAuthServer : 'UNP');
+            $domain = $isNoMatchingUnpBlock
+                ? 'No Matching UNP - Block'
+                : ($unpUsed !== ''
+                    ? $unpUsed
+                    : ($unpFromAuthServer !== '' ? $unpFromAuthServer : 'UNP'));
 
             $entry = new PortsNac([
                 'port_id' => $portId,
