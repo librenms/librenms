@@ -40,7 +40,7 @@
                             <button type="button"
                                     x-on:click="showHelp = true"
                                     title="{{ __('config_backups.help') }}"
-                                    class="lnms-btn lnms-btn-default tw:h-8 tw:w-8 tw:flex tw:items-center tw:justify-center tw:text-xs tw:transition-colors tw:shrink-0"
+                                    class="lnms-btn lnms-btn-default tw:h-8 tw:w-8 tw:flex tw:items-center tw:justify-center tw:text-sm tw:transition-colors tw:shrink-0"
                                     aria-label="{{ __('config_backups.help') }}">
                                 <i class="fa fa-question" aria-hidden="true"></i>
                             </button>
@@ -212,7 +212,7 @@
                                     <span class="tw:font-semibold">{{ __('config_backups.configuration') }}: <span class="tw:font-medium" x-show="selectedDisplayDate" x-text="formatDate(selectedDisplayDate)"></span></span>
                                 </span>
                             </template>
-                            <i x-show="loading" x-cloak class="fa fa-spinner tw:animate-spin tw:text-blue-500 tw:text-xs" aria-hidden="true"></i>
+                            <i x-show="loading" x-cloak class="fa fa-spinner tw:animate-spin tw:text-blue-500 tw:text-sm" aria-hidden="true"></i>
                         </h3>
 
                         {{-- Action buttons --}}
@@ -364,20 +364,20 @@
 
                     {{-- UI Interactions --}}
                     <div>
-                        <h5 class="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2">
+                        <h5 class="tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2">
                             {{ __('config_backups.interactions') }}
                         </h5>
-                        <ul class="tw:list-none tw:p-0 tw:m-0 tw:space-y-2 tw:text-xs">
+                        <ul class="tw:list-none tw:p-0 tw:m-0 tw:space-y-2">
                             <li class="tw:flex tw:items-start tw:gap-2">
-                                <i class="fa fa-check tw:text-blue-500 tw:mt-0.5 tw:text-xs" aria-hidden="true"></i>
+                                <i class="fa fa-check tw:text-blue-500 tw:mt-0.5" aria-hidden="true"></i>
                                 <span>{{ __('config_backups.interaction_click') }}</span>
                             </li>
                             <li class="tw:flex tw:items-start tw:gap-2">
-                                <i class="fa fa-check tw:text-blue-500 tw:mt-0.5 tw:text-xs" aria-hidden="true"></i>
+                                <i class="fa fa-check tw:text-blue-500 tw:mt-0.5" aria-hidden="true"></i>
                                 <span>{{ __('config_backups.interaction_shift_click_range') }}</span>
                             </li>
                             <li class="tw:flex tw:items-start tw:gap-2">
-                                <i class="fa fa-check tw:text-blue-500 tw:mt-0.5 tw:text-xs" aria-hidden="true"></i>
+                                <i class="fa fa-check tw:text-blue-500 tw:mt-0.5" aria-hidden="true"></i>
                                 <span>{{ __('config_backups.interaction_dropdowns') }}</span>
                             </li>
                         </ul>
@@ -385,31 +385,31 @@
 
                     {{-- Navigate History --}}
                     <div>
-                        <h5 class="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2">
+                        <h5 class="tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2">
                             {{ __('config_backups.navigate_history') }}
                         </h5>
-                        <div class="tw:grid tw:grid-cols-1 tw:gap-2 tw:text-xs">
+                        <div class="tw:grid tw:grid-cols-1 tw:gap-2">
                             <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
                                 <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_older') }}</span>
                                 <div class="tw:flex tw:items-center tw:gap-1.5">
-                                    <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">j</kbd>
+                                    <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">j</kbd>
                                     <span class="tw:text-gray-400 tw:dark:text-dark-white-400">/</span>
                                     <div class="tw:flex tw:items-center tw:gap-0.5">
-                                        <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs" x-text="modifierKey">Ctrl</kbd>
+                                        <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs" x-text="modifierKey">Ctrl</kbd>
                                         <span class="tw:text-gray-400 tw:dark:text-dark-white-400">+</span>
-                                        <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">↓</kbd>
+                                        <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">↓</kbd>
                                     </div>
                                 </div>
                             </div>
                             <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
                                 <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_newer') }}</span>
                                 <div class="tw:flex tw:items-center tw:gap-1.5">
-                                    <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">k</kbd>
+                                    <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">k</kbd>
                                     <span class="tw:text-gray-400 tw:dark:text-dark-white-400">/</span>
                                     <div class="tw:flex tw:items-center tw:gap-0.5">
-                                        <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs" x-text="modifierKey">Ctrl</kbd>
+                                        <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs" x-text="modifierKey">Ctrl</kbd>
                                         <span class="tw:text-gray-400 tw:dark:text-dark-white-400">+</span>
-                                        <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">↑</kbd>
+                                        <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">↑</kbd>
                                     </div>
                                 </div>
                             </div>
@@ -421,32 +421,32 @@
                         <h5 class="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2">
                             {{ __('config_backups.compare_revisions') }}
                         </h5>
-                        <div class="tw:grid tw:grid-cols-1 tw:gap-2 tw:text-xs">
+                        <div class="tw:grid tw:grid-cols-1 tw:gap-2">
                             <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
                                 <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_toggle_diff') }}</span>
                                 <div class="tw:flex tw:gap-1">
-                                    <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">d</kbd>
-                                    <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">c</kbd>
+                                    <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">d</kbd>
+                                    <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">c</kbd>
                                 </div>
                             </div>
                             <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
                                 <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_reverse_diff') }}</span>
-                                <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">r</kbd>
+                                <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">r</kbd>
                             </div>
                             <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
                                 <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_expand_older') }}</span>
                                 <div class="tw:flex tw:items-center tw:gap-1">
-                                    <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">Shift</kbd>
+                                    <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">Shift</kbd>
                                     <span class="tw:text-gray-500 tw:dark:text-dark-white-300">+</span>
-                                    <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">j/↓</kbd>
+                                    <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">j/↓</kbd>
                                 </div>
                             </div>
                             <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
                                 <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_expand_newer') }}</span>
                                 <div class="tw:flex tw:items-center tw:gap-1">
-                                    <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">Shift</kbd>
+                                    <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">Shift</kbd>
                                     <span class="tw:text-gray-500 tw:dark:text-dark-white-300">+</span>
-                                    <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">k/↑</kbd>
+                                    <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">k/↑</kbd>
                                 </div>
                             </div>
                         </div>
@@ -454,17 +454,17 @@
 
                     {{-- General --}}
                     <div>
-                        <h5 class="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2">
+                        <h5 class="tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2">
                             {{ __('config_backups.general') }}
                         </h5>
-                        <div class="tw:grid tw:grid-cols-1 tw:gap-2 tw:text-xs">
+                        <div class="tw:grid tw:grid-cols-1 tw:gap-2">
                             <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
                                 <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_help') }}</span>
-                                <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">?</kbd>
+                                <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">?</kbd>
                             </div>
                             <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
                                 <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_exit_diff') }}</span>
-                                <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">Esc</kbd>
+                                <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">Esc</kbd>
                             </div>
                         </div>
                     </div>
