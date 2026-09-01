@@ -128,18 +128,18 @@ The full date and time should be displayed in the controls. The `-` and `+` indi
 #### Actions
 
 * **Download**
-
   * Single configuration: `.txt`
   * Diff: `.diff`
+  * Displays text label on larger viewports (`xl:`), condensing to compact icon button on smaller viewports.
 * **Copy to Clipboard**
-
   * Displays temporary success feedback after a successful copy.
+  * Displays text label on larger viewports (`xl:`), condensing to compact icon button on smaller viewports.
 
 #### Loading & Activity Indication
 
 * A slim linear activity bar spans the top of the content area while content is being fetched.
 * Existing content remains mounted while a new request is pending.
-* Existing content transitions to reduced opacity during the request.
+* Existing content transitions to reduced opacity (`tw:opacity-60`) during the request.
 * A centered loading indicator is used only during initial bootstrap when no content is available.
 
 #### Viewer Body
@@ -186,7 +186,7 @@ Click backup row `N`.
 5. The existing content is displayed at reduced opacity during the request.
 6. Once the request completes, the new configuration replaces the previous content.
 
-No configuration request is made when the selected backup is already the currently resolved configuration. Clicking an already active backup row smoothly scrolls the configuration viewer back to the top (line 1).
+No configuration request is made when the selected backup is already the currently resolved configuration. Clicking an already active backup row smoothly scrolls the page and viewer back to the top (`window.scrollTo({ top: 0, behavior: 'smooth' })`).
 
 ---
 
@@ -217,12 +217,12 @@ If `N` is the oldest loaded revision and no older revision is available, a one-s
 
 **Stepping**
 
-Clicking another row normally selects that revision and establishes a new one-step diff. Clicking the already active diff step smoothly scrolls the diff table back to the top.
+Clicking another row normally selects that revision and establishes a new one-step diff. Clicking the already active diff step smoothly scrolls the page and viewer back to the top.
 
 Keyboard navigation provides the same behavior:
 
-* `j` / `↓` moves to the next older revision.
-* `k` / `↑` moves to the next newer revision.
+* `j` / `Ctrl+↓` moves to the next older revision.
+* `k` / `Ctrl+↑` moves to the next newer revision.
 
 Normal navigation updates both the anchor and focus:
 
@@ -433,8 +433,8 @@ The timeline automatically ensures the active row is visible when keyboard navig
 The Help modal should explicitly identify the direction represented by `j` and `k`:
 
 ```text
-j / ↓   Older
-k / ↑   Newer
+j / Ctrl+↓   Older
+k / Ctrl+↑   Newer
 ```
 
 This directional guidance is provided in the Help UI rather than persistently displayed in the main interface.
@@ -571,13 +571,16 @@ Copy failures should leave the normal copy control available and provide appropr
 
 | UI Element                       | Light Mode Token                                  | Dark Mode Token                                                                     |
 | -------------------------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| Timeline Default Rail            | `tw:bg-gray-200`                                  | `tw:bg-dark-gray-200`                                                               |
-| Timeline Active Rail Range       | `tw:bg-blue-400`                                  | `tw:bg-blue-600`                                                                    |
-| Timeline Node (Single)           | `tw:bg-blue-600`                                  | `tw:bg-blue-500`                                                                    |
-| Timeline Node (Diff Base `-`)    | `tw:bg-red-600`                                   | `tw:bg-red-500`                                                                     |
-| Timeline Node (Diff Compare `+`) | `tw:bg-emerald-600`                               | `tw:bg-emerald-500`                                                                 |
-| Diff Line Removed (`-`)          | `tw:bg-red-100 tw:text-red-900`                   | `tw:bg-red-900/40 tw:text-red-200`                                                  |
-| Diff Line Added (`+`)            | `tw:bg-green-100 tw:text-green-900`               | `tw:bg-green-900/40 tw:text-green-200`                                              |
+| Timeline Default Rail            | `tw:bg-gray-300`                                  | `tw:dark:bg-dark-gray-100`                                                          |
+| Timeline Active Rail Range       | `tw:bg-blue-500`                                  | `tw:dark:bg-blue-400`                                                               |
+| Timeline Node (Single Selected)  | `tw:bg-blue-600`                                  | `tw:bg-blue-600`                                                                    |
+| Timeline Node (Diff Base `-`)    | `tw:bg-red-600`                                   | `tw:bg-red-600`                                                                     |
+| Timeline Node (Diff Compare `+`) | `tw:bg-emerald-600`                               | `tw:bg-emerald-600`                                                                 |
+| Timeline Selected Row (Single)   | `tw:bg-gray-100`                                  | `tw:dark:bg-dark-gray-300`                                                          |
+| Timeline Selected Range (Diff)   | `tw:bg-blue-50/70`                                | `tw:dark:bg-dark-gray-300`                                                          |
+| Diff Line Removed (`-`)          | `tw:bg-red-100 tw:text-red-700`                   | `tw:dark:bg-red-900/40 tw:dark:text-red-400`                                        |
+| Diff Line Added (`+`)            | `tw:bg-green-100 tw:text-green-700`               | `tw:dark:bg-green-900/40 tw:dark:text-green-400`                                    |
+| Default Button (`.lnms-btn-default`)| `tw:bg-[#3a3f44] tw:text-white`                | `tw:dark:bg-dark-gray-400 tw:dark:border-dark-gray-100 tw:dark:text-dark-white-100` |
 | Modal Key Tag (`<kbd>`)          | `tw:bg-white tw:text-gray-800 tw:border-gray-300` | `tw:dark:bg-dark-gray-300 tw:dark:text-dark-white-100 tw:dark:border-dark-gray-100` |
 
 The Base and Compare colors should remain distinguishable through both color and their `-` / `+` markers.
@@ -723,14 +726,13 @@ This communicates:
 
 This placement keeps the main action toolbar uncluttered while anchoring the summary directly to the diff table.
 
-### 9.5 Alpine.js Lifecycle
+### 9.5 Modal Architecture & Lifecycle
 
-Modal dismissal uses:
-
-```text
-x-on:click.outside
-x-on:keydown.escape.window
-```
+Modal dialogs use the centralized `<x-modal>` Blade component (`resources/views/components/modal.blade.php`), which provides:
+* Backdrop blur and centered alignment.
+* Keyboard escape window handler (`@keydown.escape.window="show = false"`).
+* Click outside dismissal (`x-on:click.outside="show = false"`).
+* Standard header with title and close button.
 
 Event listeners and worker resources must be cleaned up when the component is destroyed.
 
