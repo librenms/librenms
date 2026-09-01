@@ -13,8 +13,8 @@ require __DIR__ . '/includes/init.php';
 
 $keys = ['host', 'facility', 'priority', 'level', 'tag', 'timestamp', 'msg', 'program'];
 
-// maps each sender to a device_id for the life of this process
-$device_cache = [];
+// one processor for the life of this process, so its caches survive between messages
+$processor = new LibreNMS\Syslog\Processor();
 
 $s = fopen('php://stdin', 'r');
 while ($line = fgets($s)) {
@@ -22,7 +22,7 @@ while ($line = fgets($s)) {
 
     $fields = explode('||', trim($line));
     if (count($fields) === 8) {
-        process_syslog(array_combine($keys, $fields), 1, $device_cache);
+        $processor->process(array_combine($keys, $fields));
     }
 
     unset($line, $fields);

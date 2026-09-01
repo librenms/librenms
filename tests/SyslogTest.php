@@ -28,6 +28,7 @@ namespace LibreNMS\Tests;
 
 use App\Facades\DeviceCache;
 use App\Models\Device;
+use LibreNMS\Syslog\Processor;
 
 final class SyslogTest extends TestCase
 {
@@ -35,11 +36,10 @@ final class SyslogTest extends TestCase
     // $SOURCEIP||$FACILITY||$PRIORITY||$LEVEL||$TAG||$YEAR-$MONTH-$DAY $HOUR:$MIN:$SEC||$MSG||$PROGRAM
     // There add an IP for each OS you want to test and use that in the input file
 
-    /** @var array<string, int|null> sender to device_id, as syslog.php would hold it */
-    private array $deviceCache = [];
+    private Processor $processor;
 
     /**
-     * Stand a device in for the lookup process_syslog() would otherwise make.
+     * Stand a device in for the lookup the processor would otherwise make.
      */
     private function fakeDevice(array $attributes): void
     {
@@ -48,7 +48,7 @@ final class SyslogTest extends TestCase
         $device->exists = true; // stand in for a device that is in the database
 
         DeviceCache::fake($device);
-        $this->deviceCache = ['1.1.1.1' => $device->device_id];
+        $this->processor = new Processor(['1.1.1.1' => $device->device_id]);
     }
 
     private function fillLine($line)
@@ -79,7 +79,7 @@ final class SyslogTest extends TestCase
     private function checkSyslog($inputline, $modified)
     {
         $data = $this->createData($inputline, $modified);
-        $res = process_syslog($data['input'], 0, $this->deviceCache);
+        $res = $this->processor->process($data['input'], false);
         $this->assertEquals($data['result'], $res);
     }
 

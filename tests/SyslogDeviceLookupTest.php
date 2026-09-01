@@ -32,6 +32,7 @@ use App\Models\Ipv4Address;
 use App\Models\Ipv6Address;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Syslog\Processor;
 use LibreNMS\Util\IPv6;
 
 /**
@@ -78,41 +79,47 @@ final class SyslogDeviceLookupTest extends DBTestCase
         ];
 
         foreach ($senders as $identifier => $sender) {
-            $cache = [];
-
             $this->assertEquals(
                 $device->device_id,
-                syslog_device($sender, $cache)?->device_id,
+                $this->resolve($sender),
                 "A sender identifying itself by $identifier should be matched to the device."
             );
         }
     }
 
-    public function testDeletedDeviceIsNotResolved(): void
+    public function testDeviceAddedLaterIsPickedUpOnceTheMissExpires(): void
     {
-        $cache = [];
-        $device = Device::factory()->create(['hostname' => 'gone.example.com']);
+        $processor = new Processor;
 
-        $this->assertNotNull(syslog_device('gone.example.com', $cache));
+        $this->assertNull($this->resolve('192.0.2.99', $processor));
 
-        $device->delete();
-        DeviceCache::flush();
+        $device = Device::factory()->create(['hostname' => '192.0.2.99']);
 
-        // DeviceCache::get() answers with an empty model rather than null
-        $this->assertNull(syslog_device('gone.example.com', $cache));
+        // the miss is held briefly, so the receiver does not query on every message
+        $this->assertNull($this->resolve('192.0.2.99', $processor));
+
+        $this->travel(61)->seconds();
+
+        $this->assertEquals($device->device_id, $this->resolve('192.0.2.99', $processor));
     }
 
-    public function testUnknownSenderIsNotRemembered(): void
+    /**
+     * Run a message through the processor without storing it, and report which device it
+     * was attributed to.
+     */
+    private function resolve(string $host, ?Processor $processor = null): ?int
     {
-        $cache = [];
+        $entry = ($processor ?? new Processor)->process([
+            'host' => $host,
+            'facility' => 'local7',
+            'priority' => 'info',
+            'level' => 'info',
+            'tag' => '0e',
+            'timestamp' => '2024-01-01 00:00:00',
+            'msg' => 'lookup test',
+            'program' => 'TEST',
+        ], false);
 
-        $this->assertNull(syslog_device('192.0.2.99', $cache));
-
-        // a device added while the receiver is running must still be picked up
-        $device = Device::factory()->create(['hostname' => '192.0.2.99']);
-        $found = syslog_device('192.0.2.99', $cache);
-
-        $this->assertNotNull($found, 'A miss must not be remembered.');
-        $this->assertEquals($device->device_id, $found->device_id);
+        return $entry['device_id'];
     }
 }

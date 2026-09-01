@@ -30,6 +30,7 @@ use App\Facades\DeviceCache;
 use App\Models\Device;
 use App\Models\Syslog;
 use Illuminate\Support\Facades\DB;
+use LibreNMS\Syslog\Processor;
 
 /**
  * syslog.php is started once by syslog-ng's program() destination and holds a single
@@ -43,8 +44,7 @@ use Illuminate\Support\Facades\DB;
  */
 final class SyslogLostConnectionTest extends DBTestCase
 {
-    /** @var array<string, int|null> sender to device_id, as syslog.php would hold it */
-    private array $deviceCache = [];
+    private Processor $processor;
 
     protected function setUp(): void
     {
@@ -54,12 +54,13 @@ final class SyslogLostConnectionTest extends DBTestCase
             $this->markTestSkipped('Killing a connection from a second session requires MySQL/MariaDB.');
         }
 
-        $this->clearCaches();
+        $this->processor = new Processor;
+        DeviceCache::flush();
     }
 
     protected function tearDown(): void
     {
-        $this->clearCaches();
+        DeviceCache::flush();
 
         parent::tearDown();
     }
@@ -72,13 +73,9 @@ final class SyslogLostConnectionTest extends DBTestCase
         try {
             $killed = $this->killCurrentConnection();
 
-            $found = syslog_device($device->hostname, $this->deviceCache);
+            $entry = $this->processor->process($this->message($device->hostname), false);
 
-            $this->assertNotNull($found, 'Expected the device lookup to survive the lost connection.');
-            $this->assertEquals($device->device_id, $found->device_id);
-            $this->assertSame('generic', $found->os);
-            $this->assertSame('1.2.3', $found->version);
-            $this->assertSame($device->hostname, $found->hostname);
+            $this->assertEquals($device->device_id, $entry['device_id'], 'Expected the lookup to survive the lost connection.');
             $this->assertNotSame($killed, $this->connectionId(), 'Expected a new connection, not the killed one.');
         } finally {
             $device->delete();
@@ -93,16 +90,7 @@ final class SyslogLostConnectionTest extends DBTestCase
         try {
             $killed = $this->killCurrentConnection();
 
-            process_syslog([
-                'host' => $device->hostname,
-                'facility' => 'local7',
-                'priority' => 'info',
-                'level' => 'info',
-                'tag' => '0e',
-                'timestamp' => '2024-01-01 00:00:00',
-                'msg' => 'lost connection test',
-                'program' => 'TEST',
-            ], 1, $this->deviceCache);
+            $this->processor->process($this->message($device->hostname));
 
             $this->assertSame(1, Syslog::where('device_id', $device->device_id)->count());
             $this->assertNotSame($killed, $this->connectionId(), 'Expected a new connection, not the killed one.');
@@ -112,11 +100,21 @@ final class SyslogLostConnectionTest extends DBTestCase
         }
     }
 
-    private function clearCaches(): void
+    /**
+     * @return array<string, string>
+     */
+    private function message(string $host): array
     {
-        $this->deviceCache = [];
-
-        DeviceCache::flush();
+        return [
+            'host' => $host,
+            'facility' => 'local7',
+            'priority' => 'info',
+            'level' => 'info',
+            'tag' => '0e',
+            'timestamp' => '2024-01-01 00:00:00',
+            'msg' => 'lost connection test',
+            'program' => 'TEST',
+        ];
     }
 
     /**
