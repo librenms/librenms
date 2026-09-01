@@ -221,8 +221,8 @@ Clicking another row normally selects that revision and establishes a new one-st
 
 Keyboard navigation provides the same behavior:
 
-* `j` / `Ctrl+↓` moves to the next older revision.
-* `k` / `Ctrl+↑` moves to the next newer revision.
+* `j` / `Ctrl+↓` (`⌘+↓` on macOS) moves to the next older revision.
+* `k` / `Ctrl+↑` (`⌘+↑` on macOS) moves to the next newer revision.
 
 Normal navigation updates both the anchor and focus:
 
@@ -397,18 +397,18 @@ No special configuration semantics should be inferred from the contents of the c
 
 Global keyboard shortcuts are active when focus is outside text-entry controls and other elements that consume keyboard input.
 
-| Key                   | Action             | Behavior                                                                                                   |
-| --------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------- |
-| `j` / `Ctrl+↓`        | Older revision     | Move one revision older. In Single mode, select the revision. In Diff mode, establish a new one-step diff. |
-| `k` / `Ctrl+↑`        | Newer revision     | Move one revision newer. In Single mode, select the revision. In Diff mode, establish a new one-step diff. |
-| `Shift+j` / `Shift+↓` | Expand range older | Move `focusIndex` one revision older while preserving `anchorIndex`.                                       |
-| `Shift+k` / `Shift+↑` | Expand range newer | Move `focusIndex` one revision newer while preserving `anchorIndex`.                                       |
-| `d` / `c`             | Toggle Diff mode   | Enter or exit Diff mode.                                                                                   |
-| `r`                   | Reverse Diff       | Swap Base and Compare revisions.                                                                           |
-| `Esc`                 | Dismiss / Exit     | Close Help if open; otherwise exit Diff mode.                                                              |
-| `?`                   | Help               | Open the keyboard shortcut and interaction help modal.                                                     |
+| Key                            | Action             | Behavior                                                                                                   |
+| ------------------------------ | ------------------ | ---------------------------------------------------------------------------------------------------------- |
+| `j` / `Ctrl+↓` (`⌘+↓` on macOS)| Older revision     | Move one revision older. In Single mode, select the revision. In Diff mode, establish a new one-step diff. |
+| `k` / `Ctrl+↑` (`⌘+↑` on macOS)| Newer revision     | Move one revision newer. In Single mode, select the revision. In Diff mode, establish a new one-step diff. |
+| `Shift+j` / `Shift+↓`          | Expand range older | Move `focusIndex` one revision older while preserving `anchorIndex`.                                       |
+| `Shift+k` / `Shift+↑`          | Expand range newer | Move `focusIndex` one revision newer while preserving `anchorIndex`.                                       |
+| `d` / `c`                      | Toggle Diff mode   | Enter or exit Diff mode.                                                                                   |
+| `r`                            | Reverse Diff       | Swap Base and Compare revisions.                                                                           |
+| `Esc`                          | Dismiss / Exit     | Close Help if open; otherwise exit Diff mode.                                                              |
+| `?`                            | Help               | Open the keyboard shortcut and interaction help modal.                                                     |
 
-> **Note**: Bare arrow keys (`↑` / `↓`) remain dedicated to native document/viewer scrolling. Modifiers (`Ctrl+↓/↑` for navigation, `Shift+↓/↑` for range extension) provide full keyboard parity.
+> **Note**: Bare arrow keys (`↑` / `↓`) remain dedicated to native document/viewer scrolling.
 
 ### Keyboard State Transitions
 
@@ -430,11 +430,11 @@ focusIndex  = currentIndex ± 1
 
 The timeline automatically ensures the active row is visible when keyboard navigation changes the selection.
 
-The Help modal should explicitly identify the direction represented by `j` and `k`:
+The Help modal dynamically displays the appropriate modifier keys for the user's platform and explicitly identifies the direction represented by `j` and `k`:
 
 ```text
-j / Ctrl+↓   Older
-k / Ctrl+↑   Newer
+j / Ctrl+↓ (or ⌘+↓)   Older
+k / Ctrl+↑ (or ⌘+↑)   Newer
 ```
 
 This directional guidance is provided in the Help UI rather than persistently displayed in the main interface.
@@ -623,10 +623,10 @@ The Help modal should explain the interface in terms of **tasks and workflows**,
 
 ### Navigate History
 
-| Key            | Action                 |
-| -------------- | ---------------------- |
-| `j` / `Ctrl+↓` | Move to older revision |
-| `k` / `Ctrl+↑` | Move to newer revision |
+| Key                             | Action                 |
+| ------------------------------- | ---------------------- |
+| `j` / `Ctrl+↓` (`⌘+↓` on macOS) | Move to older revision |
+| `k` / `Ctrl+↑` (`⌘+↑` on macOS) | Move to newer revision |
 
 ### Compare Revisions
 

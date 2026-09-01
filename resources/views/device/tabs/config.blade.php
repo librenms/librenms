@@ -395,7 +395,7 @@
                                     <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">j</kbd>
                                     <span class="tw:text-gray-400 tw:dark:text-dark-white-400">/</span>
                                     <div class="tw:flex tw:items-center tw:gap-0.5">
-                                        <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">Ctrl</kbd>
+                                        <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs" x-text="modifierKey">Ctrl</kbd>
                                         <span class="tw:text-gray-400 tw:dark:text-dark-white-400">+</span>
                                         <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">↓</kbd>
                                     </div>
@@ -407,7 +407,7 @@
                                     <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">k</kbd>
                                     <span class="tw:text-gray-400 tw:dark:text-dark-white-400">/</span>
                                     <div class="tw:flex tw:items-center tw:gap-0.5">
-                                        <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">Ctrl</kbd>
+                                        <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs" x-text="modifierKey">Ctrl</kbd>
                                         <span class="tw:text-gray-400 tw:dark:text-dark-white-400">+</span>
                                         <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">↑</kbd>
                                     </div>
@@ -538,6 +538,14 @@
 
                 indexOfId(id) {
                     return this.backups.findIndex(b => b.id === id);
+                },
+
+                get isMac() {
+                    return typeof navigator !== 'undefined' && (/Mac|iPod|iPhone|iPad/.test(navigator.userAgentData?.platform || navigator.platform || navigator.userAgent || ''));
+                },
+
+                get modifierKey() {
+                    return this.isMac ? '⌘' : 'Ctrl';
                 },
 
                 get currentSingleIndex() {
@@ -713,28 +721,28 @@
                 },
 
                 handleKeyDown(e) {
-                    if (e.target.closest('input, textarea, select')) return;
+                    if (e.altKey || e.target.closest('input, textarea, select')) return;
 
                     const key = e.key;
                     const ctrl = e.ctrlKey || e.metaKey;
                     const shift = e.shiftKey;
 
-                    if (key === '?' || (key === '/' && shift)) {
+                    if (!ctrl && (key === '?' || (key === '/' && shift))) {
                         e.preventDefault();
                         this.showHelp = !this.showHelp;
                     } else if (key === 'Escape') {
                         if (this.showHelp) { e.preventDefault(); this.showHelp = false; }
                         else if (this.diffMode) { e.preventDefault(); this.toggleDiffMode(); }
-                    } else if ((key === 'd' || key === 'c') && this.total > 1) {
+                    } else if (!ctrl && (key === 'd' || key === 'c') && this.total > 1) {
                         e.preventDefault();
                         this.toggleDiffMode();
-                    } else if (key === 'r' && this.diffMode && this.diffReady) {
+                    } else if (!ctrl && key === 'r' && this.diffMode && this.diffReady) {
                         e.preventDefault();
                         this.toggleDiffDirection();
-                    } else if (key === 'j' || key === 'J' || (ctrl && key === 'ArrowDown') || (shift && key === 'ArrowDown')) {
+                    } else if ((!ctrl && (key === 'j' || key === 'J')) || (ctrl && key === 'ArrowDown') || (shift && key === 'ArrowDown')) {
                         e.preventDefault();
                         this.navigateHistory(1, shift);
-                    } else if (key === 'k' || key === 'K' || (ctrl && key === 'ArrowUp') || (shift && key === 'ArrowUp')) {
+                    } else if ((!ctrl && (key === 'k' || key === 'K')) || (ctrl && key === 'ArrowUp') || (shift && key === 'ArrowUp')) {
                         e.preventDefault();
                         this.navigateHistory(-1, shift);
                     }

@@ -296,7 +296,8 @@ class ConfigBackupDesignContractTest extends TestCase
         $view->assertSee(__('config_backups.interaction_shift_click_range'));
         $view->assertSee(__('config_backups.interaction_dropdowns'));
 
-        // Keyboard Shortcut Localization Strings
+        // Keyboard Shortcut Localization Strings & Modifiers
+        $view->assertSee('x-text="modifierKey"', false);
         $view->assertSee(__('config_backups.navigate_history'));
         $view->assertSee(__('config_backups.compare_revisions'));
         $view->assertSee(__('config_backups.shortcut_older'));
