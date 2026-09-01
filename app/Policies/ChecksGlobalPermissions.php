@@ -19,8 +19,18 @@ trait ChecksGlobalPermissions
         // Guess prefix
         $this->globalPrefix ??= Str::kebab(Str::before(class_basename($this), 'Policy'));
 
+        return $this->hasPermission($user, "$this->globalPrefix.$action");
+    }
+
+    /**
+     * Check a permission directly, without the global-read gate shortcut.
+     *
+     * Use this for permissions that must stay explicit, such as config backup access.
+     */
+    protected function hasPermission(User $user, string $permission): bool
+    {
         try {
-            return $user->hasPermissionTo("$this->globalPrefix.$action");
+            return $user->hasPermissionTo($permission);
         } catch (PermissionDoesNotExist) {
             // do not log, there is no problem with permissions not existing
 
