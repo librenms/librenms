@@ -65,8 +65,9 @@ abstract class Transport implements TransportInterface
      * @param  array  $replacements  for SimpleTemplate if desired
      * @return array
      */
-    protected function parseUserOptions(string $input, array $replacements = []): array
+    protected function parseUserOptions(?string $input, array $replacements = []): array
     {
+        $input ??= '';
         $options = [];
         foreach (preg_split('/\\r\\n|\\r|\\n/', $input, -1, PREG_SPLIT_NO_EMPTY) as $option) {
             if (Str::contains($option, '=')) {

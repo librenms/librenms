@@ -51,7 +51,7 @@ class Api extends Transport
         ->withHeaders($request_headers); //get each line of key-values and process the variables for Headers
 
         if ($method !== 'get') {
-            $request_body = SimpleTemplate::parse($this->config['api-body'], $alert_data);
+            $request_body = SimpleTemplate::parse($this->config['api-body'] ?? '', $alert_data);
             if ($as_form == true) {
                 $request_body = $this->parseUserOptions($request_body);
                 $method = 'postform';
