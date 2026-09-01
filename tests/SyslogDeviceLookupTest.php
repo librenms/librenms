@@ -88,6 +88,20 @@ final class SyslogDeviceLookupTest extends DBTestCase
         }
     }
 
+    public function testDeletedDeviceIsNotResolved(): void
+    {
+        $cache = [];
+        $device = Device::factory()->create(['hostname' => 'gone.example.com']);
+
+        $this->assertNotNull(syslog_device('gone.example.com', $cache));
+
+        $device->delete();
+        DeviceCache::flush();
+
+        // DeviceCache::get() answers with an empty model rather than null
+        $this->assertNull(syslog_device('gone.example.com', $cache));
+    }
+
     public function testUnknownSenderIsNotRemembered(): void
     {
         $cache = [];

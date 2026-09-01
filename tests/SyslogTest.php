@@ -45,6 +45,7 @@ final class SyslogTest extends TestCase
     {
         $device = new Device($attributes);
         $device->device_id = 1;
+        $device->exists = true; // stand in for a device that is in the database
 
         DeviceCache::fake($device);
         $this->deviceCache = ['1.1.1.1' => $device->device_id];

@@ -20,7 +20,19 @@ function syslog_device(string $host, array &$cache): ?Device
 {
     $cache[$host] ??= syslog_device_id($host);
 
-    return $cache[$host] ? DeviceCache::get($cache[$host]) : null;
+    if (! $cache[$host]) {
+        return null;
+    }
+
+    $device = DeviceCache::get($cache[$host]);
+
+    if (! $device->exists) {
+        unset($cache[$host]); // the device has gone since it was cached, look it up again
+
+        return null;
+    }
+
+    return $device;
 }
 
 function syslog_device_id(string $host): ?int
