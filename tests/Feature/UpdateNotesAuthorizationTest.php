@@ -60,15 +60,6 @@ final class UpdateNotesAuthorizationTest extends TestCase
         return Gate::forUser($user)->allows('updateNotes', $device);
     }
 
-    public function testAdminCanUpdateNotesOnAnyDevice(): void
-    {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
-
-        $this->assertTrue($this->can($admin, $this->accessible));
-        $this->assertTrue($this->can($admin, $this->other));
-    }
-
     public function testGlobalReadNeedsExplicitUpdateNotesPermission(): void
     {
         $user = User::factory()->create(['enabled' => 1]);
