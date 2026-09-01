@@ -161,7 +161,7 @@
                                                     <select :value="activeOrigId"
                                                             x-on:change="onOrigDropdownChange($event.target.value)"
                                                             aria-label="{{ __('config_backups.base') }}"
-                                                            class="tw:appearance-none tw:cursor-pointer tw:text-sm tw:font-medium tw:h-8 tw:py-0 tw:pl-2.5 tw:pr-7 tw:rounded-md tw:border tw:border-gray-300 tw:bg-white tw:text-gray-900 tw:dark:bg-dark-gray-400 tw:dark:text-dark-white-100 tw:dark:border-dark-gray-100 focus:tw:ring-2 focus:tw:ring-blue-500 focus:tw:outline-none">
+                                                            class="tw:appearance-none tw:cursor-pointer tw:text-lg tw:font-medium tw:h-8 tw:py-0 tw:pl-2.5 tw:pr-7 tw:rounded-md tw:border tw:border-gray-300 tw:bg-white tw:text-gray-900 tw:dark:bg-dark-gray-400 tw:dark:text-dark-white-100 tw:dark:border-dark-gray-100 focus:tw:ring-2 focus:tw:ring-blue-500 focus:tw:outline-none">
                                                         <template x-for="b in textBackups" :key="'orig-' + b.id">
                                                             <option :value="b.id"
                                                                     :selected="b.id === activeOrigId"
@@ -192,7 +192,7 @@
                                                     <select :value="activeRevId"
                                                             x-on:change="onRevDropdownChange($event.target.value)"
                                                             aria-label="{{ __('config_backups.compare') }}"
-                                                            class="tw:appearance-none tw:cursor-pointer tw:text-sm tw:font-medium tw:h-8 tw:py-0 tw:pl-2.5 tw:pr-7 tw:rounded-md tw:border tw:border-gray-300 tw:bg-white tw:text-gray-900 tw:dark:bg-dark-gray-400 tw:dark:text-dark-white-100 tw:dark:border-dark-gray-100 focus:tw:ring-2 focus:tw:ring-blue-500 focus:tw:outline-none">
+                                                            class="tw:appearance-none tw:cursor-pointer tw:text-lg tw:font-medium tw:h-8 tw:py-0 tw:pl-2.5 tw:pr-7 tw:rounded-md tw:border tw:border-gray-300 tw:bg-white tw:text-gray-900 tw:dark:bg-dark-gray-400 tw:dark:text-dark-white-100 tw:dark:border-dark-gray-100 focus:tw:ring-2 focus:tw:ring-blue-500 focus:tw:outline-none">
                                                         <template x-for="b in textBackups" :key="'rev-' + b.id">
                                                             <option :value="b.id"
                                                                     :selected="b.id === activeRevId"
@@ -209,7 +209,7 @@
 
                             <template x-if="!diffMode">
                                 <span class="tw:flex tw:items-center tw:gap-1.5">
-                                    <span>{{ __('config_backups.configuration') }}<span x-show="selectedDisplayDate" x-text="': ' + formatDate(selectedDisplayDate)"></span></span>
+                                    <span class="tw:font-semibold">{{ __('config_backups.configuration') }}: <span class="tw:font-medium" x-show="selectedDisplayDate" x-text="formatDate(selectedDisplayDate)"></span></span>
                                 </span>
                             </template>
                             <i x-show="loading" x-cloak class="fa fa-spinner tw:animate-spin tw:text-blue-500 tw:text-xs" aria-hidden="true"></i>
@@ -260,7 +260,7 @@
                     </x-slot>
 
                     <x-slot name="table">
-                        {{-- Sleek top activity line --}}
+                        {{-- top activity line --}}
                         <div x-show="loading" x-cloak class="tw:h-0.5 tw:w-full tw:bg-blue-100 tw:dark:bg-blue-950 tw:overflow-hidden tw:relative">
                             <div class="tw:h-full tw:bg-blue-500 tw:dark:bg-blue-400 tw:animate-pulse tw:w-full"></div>
                         </div>
