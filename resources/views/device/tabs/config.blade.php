@@ -63,10 +63,10 @@
                                     :class="getRowRangeClass(backup, index)">
 
                                     {{-- Dedicated Timeline Column (Line & Circle share exact same center axis) --}}
-                                    <div class="tw:relative tw:w-7 tw:self-stretch tw:shrink-0 tw:flex tw:items-center tw:justify-center">
+                                    <div class="tw:relative tw:w-7 tw:-my-3 tw:self-stretch tw:shrink-0 tw:flex tw:items-center tw:justify-center">
                                         {{-- Top connector line --}}
                                         <template x-if="index > 0">
-                                            <div class="tw:absolute tw:top-0 tw:h-1/2 tw:left-1/2 tw:-translate-x-1/2 tw:z-0 tw:transition-colors"
+                                            <div class="tw:absolute tw:-top-px tw:h-[calc(50%+1px)] tw:left-1/2 tw:-translate-x-1/2 tw:z-0 tw:transition-colors"
                                                  :class="isTopConnectorActive(index) ? 'tw:w-[3px] tw:bg-blue-500 tw:dark:bg-blue-400' : 'tw:w-[2px] tw:bg-gray-300 tw:dark:bg-dark-gray-100'"></div>
                                         </template>
 
