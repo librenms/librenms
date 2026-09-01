@@ -76,7 +76,7 @@ class DevicePolicy
      */
     public function configBackupView(User $user, Device $device): bool
     {
-        return $this->hasPermission($user, 'config-backup.view')
+        return $user->checkPermissionTo('config-backup.view')
             && $user->can('view', $device);
     }
 
@@ -85,7 +85,7 @@ class DevicePolicy
      */
     public function configBackupRefresh(User $user, Device $device): bool
     {
-        return $this->hasPermission($user, 'config-backup.refresh')
+        return $user->checkPermissionTo('config-backup.refresh')
             && $user->can('view', $device);
     }
 
