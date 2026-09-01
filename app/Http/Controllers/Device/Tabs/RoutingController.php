@@ -32,9 +32,9 @@ use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Number;
-use LibreNMS\Util\Url;
 
 class RoutingController implements DeviceTab
 {
@@ -84,17 +84,58 @@ class RoutingController implements DeviceTab
         Gate::authorize('view', $device);
         abort_if(Gate::none(['routing.view', 'routing.viewAll']), 403);
 
+        $validProtos = [
+            'ospf',
+            'ospfv3',
+            'isis',
+            'bgp',
+            'vrf',
+            'cef',
+            'mpls',
+            'cisco-otv',
+            'loadbalancer_rservers',
+            'ipsec_tunnels',
+            'routes',
+        ];
+
+        $validViews = [
+            'basic',
+            'graphs',
+            'updates',
+            'prefixes_ipv4unicast',
+            'prefixes_ipv4vpn',
+            'prefixes_ipv6unicast',
+            'prefixes_ipv6vpn',
+            'macaccounting_bits',
+            'macaccounting_pkts',
+            'lsp',
+            'paths',
+            'sdps',
+            'sdpbinds',
+            'services',
+            'saps',
+        ];
+
+        $validGraphs = ['bits', 'pkts', 'upkts', 'nupkts', 'errors'];
+
+        Validator::validate($request->all(), [
+            'proto' => 'nullable|in:' . implode(',', $validProtos),
+            'section' => 'nullable|in:' . implode(',', $validProtos),
+            'view' => 'nullable|in:' . implode(',', $validViews),
+            'graph' => 'nullable|in:' . implode(',', $validGraphs),
+        ]);
+
         $routingTabs = $this->getRoutingTabs($device);
         $tabLabels = $this->getTabLabels();
 
-        $proto = Url::parseOptions('proto') ?? Url::parseOptions('section') ?? array_key_first($routingTabs) ?? 'cef';
+        $proto = $request->query('proto') ?? $request->query('section') ?? array_key_first($routingTabs) ?? 'cef';
 
         $options = [];
         foreach ($routingTabs as $type => $typeCount) {
             $label = ($tabLabels[$type] ?? ucfirst($type)) . ' (' . $typeCount . ')';
             $options[$type] = [
                 'text' => $label,
-                'link' => route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=' . $type]),
+                'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => $type]),
             ];
         }
 
@@ -140,7 +181,7 @@ class RoutingController implements DeviceTab
 
     private function cefData(Device $device, Request $request): array
     {
-        $view = Url::parseOptions('view', 'basic');
+        $view = $request->query('view', 'basic');
         if (! in_array($view, ['basic', 'graphs'], true)) {
             $view = 'basic';
         }
@@ -195,11 +236,11 @@ class RoutingController implements DeviceTab
             'cef_options' => [
                 'basic' => [
                     'text' => __('Basic'),
-                    'link' => route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=cef/view=basic']),
+                    'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'cef', 'view' => 'basic']),
                 ],
                 'graphs' => [
                     'text' => __('Graphs'),
-                    'link' => route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=cef/view=graphs']),
+                    'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'cef', 'view' => 'graphs']),
                 ],
             ],
             'cef_rows' => $rows,
@@ -208,8 +249,8 @@ class RoutingController implements DeviceTab
 
     private function ipsecTunnelsData(Device $device, Request $request): array
     {
-        $view = Url::parseOptions('view', 'basic');
-        $graph = Url::parseOptions('graph');
+        $view = $request->query('view', 'basic');
+        $graph = $request->query('graph');
         if ($view === 'graphs' && empty($graph)) {
             $graph = 'bits';
         }
@@ -234,15 +275,15 @@ class RoutingController implements DeviceTab
             'ipsec_options' => [
                 'basic' => [
                     'text' => __('Basic'),
-                    'link' => route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=ipsec_tunnels/view=basic']),
+                    'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'ipsec_tunnels', 'view' => 'basic']),
                 ],
                 'bits' => [
                     'text' => __('Bits'),
-                    'link' => route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=ipsec_tunnels/view=graphs/graph=bits']),
+                    'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'ipsec_tunnels', 'view' => 'graphs', 'graph' => 'bits']),
                 ],
                 'pkts' => [
                     'text' => __('Packets'),
-                    'link' => route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=ipsec_tunnels/view=graphs/graph=pkts']),
+                    'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'ipsec_tunnels', 'view' => 'graphs', 'graph' => 'pkts']),
                 ],
             ],
             'tunnels' => $tunnels,
@@ -251,8 +292,8 @@ class RoutingController implements DeviceTab
 
     private function vrfData(Device $device, Request $request): array
     {
-        $view = Url::parseOptions('view', 'basic');
-        $graph = Url::parseOptions('graph');
+        $view = $request->query('view', 'basic');
+        $graph = $request->query('graph');
         if ($view === 'graphs' && empty($graph)) {
             $graph = 'bits';
         }
@@ -271,23 +312,23 @@ class RoutingController implements DeviceTab
             'vrf_options' => [
                 'basic' => [
                     'text' => __('Basic'),
-                    'link' => route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=vrf/view=basic']),
+                    'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'vrf', 'view' => 'basic']),
                 ],
                 'bits' => [
                     'text' => __('Bits'),
-                    'link' => route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=vrf/view=graphs/graph=bits']),
+                    'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'vrf', 'view' => 'graphs', 'graph' => 'bits']),
                 ],
                 'upkts' => [
                     'text' => __('Unicast Packets'),
-                    'link' => route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=vrf/view=graphs/graph=upkts']),
+                    'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'vrf', 'view' => 'graphs', 'graph' => 'upkts']),
                 ],
                 'nupkts' => [
                     'text' => __('Non-Unicast Packets'),
-                    'link' => route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=vrf/view=graphs/graph=nupkts']),
+                    'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'vrf', 'view' => 'graphs', 'graph' => 'nupkts']),
                 ],
                 'errors' => [
                     'text' => __('Errors'),
-                    'link' => route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=vrf/view=graphs/graph=errors']),
+                    'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'vrf', 'view' => 'graphs', 'graph' => 'errors']),
                 ],
             ],
             'vrfs' => $vrfs,
@@ -309,9 +350,15 @@ class RoutingController implements DeviceTab
                 $adjacencies = [];
                 foreach ($deviceComponents as $adj) {
                     if (($adj['otvtype'] ?? null) === 'adjacency' && ($adj['index'] ?? null) === ($comp['index'] ?? null)) {
+                        $adjNormal = ($adj['status'] ?? 0) == 0;
+                        $adj['is_normal'] = $adjNormal;
+                        $adj['item_class'] = $adjNormal ? '' : 'list-group-item-danger';
                         $adjacencies[] = $adj;
                     }
                 }
+                $isNormal = ($comp['status'] ?? 0) == 0;
+                $comp['is_normal'] = $isNormal;
+                $comp['item_class'] = $isNormal ? '' : 'list-group-item-danger';
                 $comp['adjacencies'] = $adjacencies;
                 $overlays[] = $comp;
             }
@@ -399,7 +446,66 @@ class RoutingController implements DeviceTab
                 'nbrs.port',
                 'ospfv3Ports.port',
             ])
-            ->get();
+            ->get()
+            ->map(function ($instance) {
+                $portCountEnabled = $instance->ospfv3Ports->where('ospfv3IfAdminStatus', 'enabled')->count();
+                $statusColor = $instance->ospfv3AdminStatus === 'enabled' ? 'success' : 'default';
+                $abrColor = $instance->ospfv3AreaBdrRtrStatus === 'true' ? 'success' : 'default';
+                $asbrColor = $instance->ospfv3ASBdrRtrStatus === 'true' ? 'success' : 'default';
+
+                $areas = $instance->areas->map(function ($area) use ($instance, $statusColor) {
+                    return [
+                        'area_id_ip' => long2ip($area->ospfv3AreaId),
+                        'port_count' => $area->ospfv3Ports->count(),
+                        'port_count_enabled' => $area->ospfv3Ports->where('ospfv3IfAdminStatus', 'enabled')->count(),
+                        'lsa_count' => $area->ospfv3AreaScopeLsaCount,
+                        'status' => $instance->ospfv3AdminStatus,
+                        'status_color' => $statusColor,
+                    ];
+                });
+
+                $ports = $instance->ospfv3Ports->map(function ($ospfPort) {
+                    return [
+                        'port' => $ospfPort->port,
+                        'port_id' => $ospfPort->port_id,
+                        'type' => $ospfPort->ospfv3IfType,
+                        'state' => $ospfPort->ospfv3IfState,
+                        'cost' => $ospfPort->ospfv3IfMetricValue,
+                        'area_id_ip' => long2ip($ospfPort->ospfv3IfAreaId),
+                    ];
+                });
+
+                $nbrs = $instance->nbrs->map(function ($nbr) {
+                    return [
+                        'router_id' => $nbr->router_id,
+                        'device_id' => $nbr->port?->device_id,
+                        'address' => $nbr->ospfv3NbrAddress,
+                        'state' => $nbr->ospfv3NbrState,
+                        'status_color' => match ($nbr->ospfv3NbrState) {
+                            'full' => 'success',
+                            'down' => 'danger',
+                            default => 'default',
+                        },
+                    ];
+                });
+
+                return [
+                    'router_id' => $instance->router_id,
+                    'admin_status' => $instance->ospfv3AdminStatus,
+                    'status_color' => $statusColor,
+                    'abr_status' => $instance->ospfv3AreaBdrRtrStatus,
+                    'abr_color' => $abrColor,
+                    'asbr_status' => $instance->ospfv3ASBdrRtrStatus,
+                    'asbr_color' => $asbrColor,
+                    'area_count' => $instance->areas->count(),
+                    'port_count' => $instance->ospfv3Ports->count(),
+                    'port_count_enabled' => $portCountEnabled,
+                    'nbr_count' => $instance->nbrs->count(),
+                    'areas' => $areas,
+                    'ports' => $ports,
+                    'nbrs' => $nbrs,
+                ];
+            });
 
         return [
             'instances' => $instances,
@@ -410,7 +516,21 @@ class RoutingController implements DeviceTab
     {
         $adjacencies = $device->isisAdjacencies()
             ->with('port')
-            ->get();
+            ->get()
+            ->map(function ($adj) {
+                return [
+                    'port' => $adj->port,
+                    'port_id' => $adj->port_id,
+                    'ip_address' => $adj->isisISAdjIPAddrAddress,
+                    'neighbour_sys_id' => $adj->isisISAdjNeighSysID,
+                    'area_address' => $adj->isisISAdjAreaAddress,
+                    'neighbour_sys_type' => $adj->isisISAdjNeighSysType,
+                    'admin_state' => $adj->isisCircAdminState,
+                    'state' => $adj->isisISAdjState,
+                    'state_color' => $adj->isisISAdjState === 'up' ? 'success' : 'danger',
+                    'last_uptime' => \LibreNMS\Util\Time::formatInterval($adj->isisISAdjLastUpTime),
+                ];
+            });
 
         return [
             'adjacencies' => $adjacencies,
@@ -426,7 +546,7 @@ class RoutingController implements DeviceTab
 
     private function bgpData(Device $device, Request $request): array
     {
-        $view = (string) Url::parseOptions('view', 'basic');
+        $view = (string) $request->query('view', 'basic');
         $validViews = [
             'basic',
             'updates',
@@ -524,6 +644,14 @@ class RoutingController implements DeviceTab
 
                 return [
                     'peer' => $peer,
+                    'remote_as' => $peer->bgpPeerRemoteAs,
+                    'astext' => $peer->astext,
+                    'descr' => $peer->bgpPeerDescr,
+                    'admin_status' => $peer->bgpPeerAdminStatus,
+                    'state' => $peer->bgpPeerState,
+                    'fsm_established_time' => \LibreNMS\Util\Time::formatInterval($peer->bgpPeerFsmEstablishedTime),
+                    'in_updates' => $peer->bgpPeerInUpdates,
+                    'out_updates' => $peer->bgpPeerOutUpdates,
                     'identifier_compressed' => $peerIdentifierIp?->compressed() ?: $peer->bgpPeerIdentifier,
                     'peer_type' => $peerType,
                     'peer_type_class' => $peerTypeClass,
@@ -538,16 +666,52 @@ class RoutingController implements DeviceTab
                 ];
             });
 
+        $bgpOptions = [
+            'basic' => [
+                'text' => __('Basic'),
+                'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'bgp', 'view' => 'basic']),
+            ],
+            'updates' => [
+                'text' => __('Updates'),
+                'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'bgp', 'view' => 'updates']),
+            ],
+            'prefixes_ipv4unicast' => [
+                'text' => __('IPv4 Ucast'),
+                'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'bgp', 'view' => 'prefixes_ipv4unicast']),
+            ],
+            'prefixes_ipv4vpn' => [
+                'text' => __('VPNv4 Ucast'),
+                'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'bgp', 'view' => 'prefixes_ipv4vpn']),
+            ],
+            'prefixes_ipv6unicast' => [
+                'text' => __('IPv6 Ucast'),
+                'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'bgp', 'view' => 'prefixes_ipv6unicast']),
+            ],
+            'prefixes_ipv6vpn' => [
+                'text' => __('VPNv6 Ucast'),
+                'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'bgp', 'view' => 'prefixes_ipv6vpn']),
+            ],
+            'macaccounting_bits' => [
+                'text' => __('Bits'),
+                'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'bgp', 'view' => 'macaccounting_bits']),
+            ],
+            'macaccounting_pkts' => [
+                'text' => __('Packets'),
+                'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'bgp', 'view' => 'macaccounting_pkts']),
+            ],
+        ];
+
         return [
             'view' => $view,
             'local_as' => $device->bgpLocalAs,
+            'bgp_options' => $bgpOptions,
             'peers' => $peers,
         ];
     }
 
     private function mplsData(Device $device, Request $request): array
     {
-        $view = (string) Url::parseOptions('view', 'lsp');
+        $view = (string) $request->query('view', 'lsp');
         $validViews = ['lsp', 'paths', 'sdps', 'sdpbinds', 'services', 'saps'];
         if (! in_array($view, $validViews, true)) {
             $view = 'lsp';
@@ -587,6 +751,19 @@ class RoutingController implements DeviceTab
 
                     return [
                         'lsp' => $lsp,
+                        'name' => $lsp->mplsLspName,
+                        'to_addr' => $lsp->mplsLspToAddr,
+                        'vrf_name' => $lsp->vrf_name,
+                        'admin_state' => $lsp->mplsLspAdminState,
+                        'oper_state' => $lsp->mplsLspOperState,
+                        'last_change' => \LibreNMS\Util\Time::formatInterval($lsp->mplsLspLastChange),
+                        'transitions' => $lsp->mplsLspTransitions,
+                        'last_transition' => \LibreNMS\Util\Time::formatInterval($lsp->mplsLspLastTransition),
+                        'configured_paths' => $lsp->mplsLspConfiguredPaths,
+                        'standby_paths' => $lsp->mplsLspStandbyPaths,
+                        'operational_paths' => $lsp->mplsLspOperationalPaths,
+                        'type' => $lsp->mplsLspType,
+                        'fast_reroute' => $lsp->mplsLspFastReroute,
                         'destination_device' => $host,
                         'admin_color' => $adminStateColor,
                         'oper_color' => $operStateColor,
@@ -617,6 +794,20 @@ class RoutingController implements DeviceTab
 
                     return [
                         'path' => $path,
+                        'name' => $path->mplsLspName,
+                        'path_oid' => $path->path_oid,
+                        'type' => $path->mplsLspPathType,
+                        'admin_state' => $path->mplsLspPathAdminState,
+                        'oper_state' => $path->mplsLspPathOperState,
+                        'last_change' => \LibreNMS\Util\Time::formatInterval($path->mplsLspPathLastChange),
+                        'transition_count' => $path->mplsLspPathTransitionCount,
+                        'bandwidth' => $path->mplsLspPathBandwidth,
+                        'oper_bandwidth' => $path->mplsLspPathOperBandwidth,
+                        'state' => $path->mplsLspPathState,
+                        'fail_code' => $path->mplsLspPathFailCode,
+                        'fail_node_addr' => $path->mplsLspPathFailNodeAddr,
+                        'metric' => $path->mplsLspPathMetric,
+                        'oper_metric' => $path->mplsLspPathOperMetric,
                         'fail_node_device' => $host,
                         'admin_color' => $adminStateColor,
                         'oper_color' => $operStateColor,
@@ -643,6 +834,17 @@ class RoutingController implements DeviceTab
 
                     return [
                         'sdp' => $sdp,
+                        'sdp_oid' => $sdp->sdp_oid,
+                        'far_end_addr' => $sdp->sdpFarEndInetAddress,
+                        'delivery' => $sdp->sdpDelivery,
+                        'active_lsp_type' => $sdp->sdpActiveLspType,
+                        'description' => $sdp->sdpDescription,
+                        'admin_status' => $sdp->sdpAdminStatus,
+                        'oper_status' => $sdp->sdpOperStatus,
+                        'admin_path_mtu' => $sdp->sdpAdminPathMtu,
+                        'oper_path_mtu' => $sdp->sdpOperPathMtu,
+                        'last_mgmt_change' => \LibreNMS\Util\Time::formatInterval($sdp->sdpLastMgmtChange),
+                        'last_status_change' => \LibreNMS\Util\Time::formatInterval($sdp->sdpLastStatusChange),
                         'destination_device' => $host,
                         'admin_color' => $adminColor,
                         'oper_color' => $operColor,
@@ -665,6 +867,19 @@ class RoutingController implements DeviceTab
 
                     return [
                         'sdpbind' => $sdpbind,
+                        'svc_id' => $sdpbind->svcId,
+                        'sdp_oid' => $sdpbind->sdp_oid,
+                        'svc_oid' => $sdpbind->svc_oid,
+                        'bind_type' => $sdpbind->sdpBindType,
+                        'vc_type' => $sdpbind->sdpBindVcType,
+                        'admin_status' => $sdpbind->sdpBindAdminStatus,
+                        'oper_status' => $sdpbind->sdpBindOperStatus,
+                        'last_mgmt_change' => \LibreNMS\Util\Time::formatInterval($sdpbind->sdpBindLastMgmtChange),
+                        'last_status_change' => \LibreNMS\Util\Time::formatInterval($sdpbind->sdpLastStatusChange),
+                        'ing_fwd_packets' => $sdpbind->sdpBindBaseStatsIngFwdPackets,
+                        'ing_fwd_octets' => $sdpbind->sdpBindBaseStatsIngFwdOctets,
+                        'egr_fwd_packets' => $sdpbind->sdpBindBaseStatsEgrFwdPackets,
+                        'egr_fwd_octets' => $sdpbind->sdpBindBaseStatsEgrFwdOctets,
                         'admin_color' => $adminColor,
                         'oper_color' => $operColor,
                     ];
@@ -695,6 +910,22 @@ class RoutingController implements DeviceTab
 
                     return [
                         'service' => $svc,
+                        'svc_oid' => $svc->svc_oid,
+                        'type' => $svc->svcType,
+                        'cust_id' => $svc->svcCustId,
+                        'admin_status' => $svc->svcAdminStatus,
+                        'oper_status' => $svc->svcOperStatus,
+                        'description' => $svc->svcDescription,
+                        'mtu' => $svc->svcMtu,
+                        'num_saps' => $svc->svcNumSaps,
+                        'last_mgmt_change' => \LibreNMS\Util\Time::formatInterval($svc->svcLastMgmtChange),
+                        'last_status_change' => \LibreNMS\Util\Time::formatInterval($svc->svcLastStatusChange),
+                        'vrf_name' => $svc->vrf_name,
+                        'mac_learning' => $svc->svcTlsMacLearning,
+                        'fdb_table_size' => $svc->svcTlsFdbTableSize,
+                        'fdb_num_entries' => $svc->svcTlsFdbNumEntries,
+                        'stp_admin_status' => $svc->svcTlsStpAdminStatus,
+                        'stp_oper_status' => $svc->svcTlsStpOperStatus,
                         'admin_color' => $adminColor,
                         'oper_color' => $operColor,
                         'fdb_usage' => $fdbUsage,
@@ -718,15 +949,54 @@ class RoutingController implements DeviceTab
 
                     return [
                         'sap' => $sap,
+                        'svc_oid' => $sap->svc_oid,
+                        'port' => $sap->port,
+                        'port_id' => $sap->port_id,
+                        'encap_value' => $sap->sapEncapValue,
+                        'type' => $sap->sapType,
+                        'description' => $sap->sapDescription,
+                        'admin_status' => $sap->sapAdminStatus,
+                        'oper_status' => $sap->sapOperStatus,
+                        'last_mgmt_change' => \LibreNMS\Util\Time::formatInterval($sap->sapLastMgmtChange),
+                        'last_oper_change' => \LibreNMS\Util\Time::formatInterval($sap->sapLastStatusChange),
                         'admin_color' => $adminColor,
                         'oper_color' => $operColor,
                     ];
                 }),
         };
 
+        $mplsOptions = [
+            'lsp' => [
+                'text' => __('LSPs'),
+                'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'lsp']),
+            ],
+            'paths' => [
+                'text' => __('Paths'),
+                'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'paths']),
+            ],
+            'sdps' => [
+                'text' => __('SDPs'),
+                'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'sdps']),
+            ],
+            'sdpbinds' => [
+                'text' => __('SDP binds'),
+                'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'sdpbinds']),
+            ],
+            'services' => [
+                'text' => __('Services'),
+                'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'services']),
+            ],
+            'saps' => [
+                'text' => __('SAPs'),
+                'link' => route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps']),
+            ],
+        ];
+
         return [
             'view' => $view,
+            'mpls_options' => $mplsOptions,
             'items' => $items,
         ];
     }
 }
+

@@ -2,22 +2,17 @@
 
 @if($data['view'] === 'graphs')
     @forelse($data['tunnels'] as $entry)
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">{{ $entry['local_addr'] }} » {{ $entry['peer_addr'] }}</h3>
+        <x-panel title="{{ $entry['local_addr'] }} » {{ $entry['peer_addr'] }}">
+            <div class="row">
+                <x-graph-row :type="'ipsectunnel_' . $data['graph']" :vars="['id' => $entry['id']]" />
             </div>
-            <div class="panel-body">
-                <div class="row">
-                    <x-graph-row :type="'ipsectunnel_' . $data['graph']" :vars="['id' => $entry['id']]" />
-                </div>
-            </div>
-        </div>
+        </x-panel>
     @empty
         <div class="alert alert-info">{{ __('No IPsec tunnels found for this device.') }}</div>
     @endforelse
 @else
-    <div class="panel panel-default">
-        <div class="panel-body">
+    <x-panel>
+        <div class="table-responsive">
             <table class="table table-condensed table-hover">
                 <thead>
                     <tr>
@@ -39,7 +34,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="text-center" style="padding: 20px;">
+                        <td colspan="4" class="tw:text-center tw:p-5">
                             <em>{{ __('No IPsec tunnels found for this device.') }}</em>
                         </td>
                     </tr>
@@ -47,5 +42,6 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </x-panel>
 @endif
+

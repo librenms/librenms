@@ -1,8 +1,8 @@
 <x-option-bar name="CEF" :options="$data['cef_options']" :selected="$data['view']" />
 
-<div class="panel panel-default">
-    <div class="panel-body">
-        <table class="table table-condensed table-hover" style="border-collapse: collapse;">
+<x-panel>
+    <div class="table-responsive">
+        <table class="table table-condensed table-hover tw:border-collapse">
             <thead>
                 <tr>
                     <th><span title="{{ __('Physical hardware entity') }}">{{ __('Entity') }}</span></th>
@@ -28,19 +28,19 @@
                     <td>
                         {{ $cef['drop'] }}
                         @if($cef['drop_rate'] !== null)
-                            <span style="color: red;">({{ $cef['drop_rate'] }}/sec)</span>
+                            <span class="tw:text-red-600 dark:tw:text-red-400">({{ $cef['drop_rate'] }}/sec)</span>
                         @endif
                     </td>
                     <td>
                         {{ $cef['punt'] }}
                         @if($cef['punt_rate'] !== null)
-                            <span style="color: red;">({{ $cef['punt_rate'] }}/sec)</span>
+                            <span class="tw:text-red-600 dark:tw:text-red-400">({{ $cef['punt_rate'] }}/sec)</span>
                         @endif
                     </td>
                     <td>
                         {{ $cef['punt2host'] }}
                         @if($cef['punt2host_rate'] !== null)
-                            <span style="color: red;">({{ $cef['punt2host_rate'] }}/sec)</span>
+                            <span class="tw:text-red-600 dark:tw:text-red-400">({{ $cef['punt2host_rate'] }}/sec)</span>
                         @endif
                     </td>
                 </tr>
@@ -54,7 +54,7 @@
                 @endif
             @empty
                 <tr>
-                    <td colspan="6" class="text-center" style="padding: 20px;">
+                    <td colspan="6" class="tw:text-center tw:p-5">
                         <em>{{ __('No CEF switching entries found for this device.') }}</em>
                     </td>
                 </tr>
@@ -62,4 +62,5 @@
             </tbody>
         </table>
     </div>
-</div>
+</x-panel>
+

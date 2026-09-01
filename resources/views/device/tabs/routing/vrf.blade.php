@@ -1,13 +1,13 @@
 <x-option-bar name="{{ __('VRFs') }}" :options="$data['vrf_options']" :selected="$data['selected_option']" />
 
-<div class="panel panel-default">
-    <div class="panel-body">
-        <table class="table table-condensed table-hover" style="border-collapse: collapse;">
+<x-panel>
+    <div class="table-responsive">
+        <table class="table table-condensed table-hover tw:border-collapse">
             <thead>
                 <tr>
-                    <th style="width: 200px;">{{ __('VRF') }}</th>
-                    <th style="width: 150px;">{{ __('Description') }}</th>
-                    <th style="width: 100px;">{{ __('RD') }}</th>
+                    <th class="tw:w-[200px]">{{ __('VRF') }}</th>
+                    <th class="tw:w-[150px]">{{ __('Description') }}</th>
+                    <th class="tw:w-[100px]">{{ __('RD') }}</th>
                     <th>{{ __('Interfaces') }}</th>
                 </tr>
             </thead>
@@ -23,12 +23,12 @@
                         @if($data['view'] === 'graphs')
                             <div class="tw:flex tw:flex-wrap tw:gap-1">
                                 @foreach($vrf->ports as $port)
-                                    <div style="display: block; padding: 2px; margin: 2px; min-width: 139px; max-width: 139px; min-height: 85px; max-height: 85px; text-align: center; float: left; background-color: #e9e9e9;">
-                                        <div style="font-weight: bold;">{{ $port->getShortLabel() }}</div>
+                                    <div class="tw:block tw:p-0.5 tw:m-0.5 tw:w-[139px] tw:min-w-[139px] tw:max-w-[139px] tw:h-[85px] tw:min-h-[85px] tw:max-h-[85px] tw:text-center tw:bg-[#e9e9e9] dark:tw:bg-dark-gray-300 tw:rounded">
+                                        <div class="tw:font-bold">{{ $port->getShortLabel() }}</div>
                                         <x-port-link :port="$port">
                                             <x-graph :port="$port" :type="'port_' . $data['graph']" from="-2d" width="132" height="40" legend="no" />
                                         </x-port-link>
-                                        <div style="font-size: 9px;">{{ $port->ifAlias }}</div>
+                                        <div class="tw:text-[9px] tw:truncate">{{ $port->ifAlias }}</div>
                                     </div>
                                 @endforeach
                             </div>
@@ -41,7 +41,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" class="text-center" style="padding: 20px;">
+                    <td colspan="4" class="tw:text-center tw:p-5">
                         <em>{{ __('No VRFs found for this device.') }}</em>
                     </td>
                 </tr>
@@ -49,4 +49,5 @@
             </tbody>
         </table>
     </div>
-</div>
+</x-panel>
+

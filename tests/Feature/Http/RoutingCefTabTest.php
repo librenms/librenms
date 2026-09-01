@@ -54,7 +54,7 @@ class RoutingCefTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=cef']))
+            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'cef']))
             ->assertOk()
             ->assertSee('RP0 (ASR1000-RP2)')
             ->assertSee('RP RIB')
@@ -73,7 +73,7 @@ class RoutingCefTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=cef/view=graphs']))
+            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'cef', 'view' => 'graphs']))
             ->assertOk()
             ->assertSee('cefswitching_graph');
     }
@@ -90,7 +90,7 @@ class RoutingCefTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=ipsec_tunnels']))
+            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'ipsec_tunnels']))
             ->assertOk()
             ->assertSee('SiteA-to-SiteB')
             ->assertSee('192.168.1.1')
@@ -98,7 +98,7 @@ class RoutingCefTabTest extends TestCase
             ->assertSee('active');
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=ipsec_tunnels/view=graphs/graph=bits']))
+            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'ipsec_tunnels', 'view' => 'graphs', 'graph' => 'bits']))
             ->assertOk()
             ->assertSee('ipsectunnel_bits');
     }
@@ -115,7 +115,7 @@ class RoutingCefTabTest extends TestCase
         $port->update(['ifVrf' => $vrf->vrf_id]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=vrf']))
+            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'vrf']))
             ->assertOk()
             ->assertSee('MGMT_VRF')
             ->assertSee('Management Network')
@@ -123,7 +123,7 @@ class RoutingCefTabTest extends TestCase
             ->assertSee('Gi0/1');
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=vrf/view=graphs/graph=bits']))
+            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'vrf', 'view' => 'graphs', 'graph' => 'bits']))
             ->assertOk()
             ->assertSee('type=port_bits', false);
     }
@@ -147,7 +147,7 @@ class RoutingCefTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=cisco-otv']))
+            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'cisco-otv']))
             ->assertOk()
             ->assertSee('Overlay1')
             ->assertSee('Multicast')
@@ -174,7 +174,7 @@ class RoutingCefTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=ospf']))
+            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'ospf']))
             ->assertOk()
             ->assertSee('10.255.255.1')
             ->assertSee('0.0.0.0')
@@ -206,7 +206,7 @@ class RoutingCefTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=ospfv3']))
+            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'ospfv3']))
             ->assertOk()
             ->assertSee('10.0.0.1')
             ->assertSee('0.0.0.0')
@@ -226,7 +226,7 @@ class RoutingCefTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=isis']))
+            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'isis']))
             ->assertOk()
             ->assertSee('10.10.10.1')
             ->assertSee('0000.0000.0001')
@@ -239,7 +239,7 @@ class RoutingCefTabTest extends TestCase
         $device = Device::factory()->create();
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=routes']))
+            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'routes']))
             ->assertOk()
             ->assertSee('routes')
             ->assertSee('ajax/table/routes')
@@ -258,7 +258,7 @@ class RoutingCefTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=bgp']))
+            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'bgp']))
             ->assertOk()
             ->assertSee('65000')
             ->assertSee('192.0.2.1')
@@ -279,12 +279,21 @@ class RoutingCefTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'vars' => 'proto=mpls']))
+            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'mpls']))
             ->assertOk()
             ->assertSee('LSP-To-Router-2')
             ->assertSee('10.0.0.2')
             ->assertSee('inService')
             ->assertSee('dynamic');
+    }
+
+    public function testInvalidQueryParamsTriggerValidationError(): void
+    {
+        $device = Device::factory()->create();
+
+        $this->actingAs($this->admin())
+            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'invalid_proto']))
+            ->assertSessionHasErrors(['proto']);
     }
 
     public function testUserWithoutRoutingPermissionGetsForbidden(): void

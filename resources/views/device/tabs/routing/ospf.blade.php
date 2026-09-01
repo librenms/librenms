@@ -1,9 +1,9 @@
-<div class="panel panel-default">
-    <div class="panel-body">
-        <table class="table table-condensed" style="border-collapse: collapse;">
+<x-panel>
+    <div class="table-responsive">
+        <table class="table table-condensed tw:border-collapse">
             <thead>
                 <tr>
-                    <th style="width: 40px;">&nbsp;</th>
+                    <th class="tw:w-10">&nbsp;</th>
                     <th>{{ __('Router ID') }}</th>
                     <th>{{ __('Status') }}</th>
                     <th>{{ __('ABR') }}</th>
@@ -15,7 +15,7 @@
             </thead>
             @forelse($data['instances'] as $index => $inst)
                 <tbody>
-                    <tr data-toggle="collapse" data-target="#ospf-panel-{{ $index }}" class="accordion-toggle" style="cursor: pointer;">
+                    <tr data-toggle="collapse" data-target="#ospf-panel-{{ $index }}" class="accordion-toggle tw:cursor-pointer">
                         <td>
                             <button id="ospf-panel_button-{{ $index }}" class="btn btn-default btn-xs">
                                 <i id="ospf-panel_span-{{ $index }}" class="fa fa-plus" aria-hidden="true"></i>
@@ -30,8 +30,8 @@
                         <td>{{ $inst['nbr_count'] }}</td>
                     </tr>
                     <tr>
-                        <td colspan="8" style="padding: 0; border: none;">
-                            <div class="collapse" id="ospf-panel-{{ $index }}" style="padding: 15px;">
+                        <td colspan="8" class="tw:p-0 tw:border-none">
+                            <div class="collapse tw:p-4" id="ospf-panel-{{ $index }}">
                                 <div class="row">
                                     <div class="col-xs-12 col-md-4">
                                         <h4><span class="label label-primary">{{ __('Areas') }}</span></h4>
@@ -108,7 +108,7 @@
                                                     <td>{{ $nbr['router_id'] }}</td>
                                                     <td>
                                                         @if($nbr['device'])
-                                                            <x-device-link :device="$nbr['device']" tab="routing" vars="proto=ospf" />
+                                                            <x-device-link :device="$nbr['device']" tab="routing" proto="ospf" />
                                                         @else
                                                             <span class="text-muted">{{ __('Unknown') }}</span>
                                                         @endif
@@ -130,7 +130,7 @@
             @empty
                 <tbody>
                     <tr>
-                        <td colspan="8" class="text-center" style="padding: 20px;">
+                        <td colspan="8" class="tw:text-center tw:p-5">
                             <em>{{ __('No OSPF instances found for this device.') }}</em>
                         </td>
                     </tr>
@@ -138,4 +138,5 @@
             @endforelse
         </table>
     </div>
-</div>
+</x-panel>
+
