@@ -161,7 +161,7 @@
                                                     <select :value="activeOrigId"
                                                             x-on:change="onOrigDropdownChange($event.target.value)"
                                                             aria-label="{{ __('config_backups.base') }}"
-                                                            class="tw:appearance-none tw:cursor-pointer tw:text-lg tw:font-medium tw:h-8 tw:py-0 tw:pl-2.5 tw:pr-7 tw:rounded-md tw:border tw:border-gray-300 tw:bg-white tw:text-gray-900 tw:dark:bg-dark-gray-400 tw:dark:text-dark-white-100 tw:dark:border-dark-gray-100 focus:tw:ring-2 focus:tw:ring-blue-500 focus:tw:outline-none">
+                                                            class="tw:appearance-none tw:cursor-pointer tw:text-lg tw:font-medium tw:h-8 tw:py-0 tw:pl-2.5 tw:pr-7 tw:rounded-md tw:border tw:border-gray-300 tw:bg-white tw:text-gray-900 tw:dark:bg-dark-gray-400 tw:dark:text-dark-white-100 tw:dark:border-dark-gray-100 tw:focus:ring-2 tw:focus:ring-blue-500 tw:focus:outline-none">
                                                         <template x-for="b in textBackups" :key="'orig-' + b.id">
                                                             <option :value="b.id"
                                                                     :selected="b.id === activeOrigId"
@@ -192,7 +192,7 @@
                                                     <select :value="activeRevId"
                                                             x-on:change="onRevDropdownChange($event.target.value)"
                                                             aria-label="{{ __('config_backups.compare') }}"
-                                                            class="tw:appearance-none tw:cursor-pointer tw:text-lg tw:font-medium tw:h-8 tw:py-0 tw:pl-2.5 tw:pr-7 tw:rounded-md tw:border tw:border-gray-300 tw:bg-white tw:text-gray-900 tw:dark:bg-dark-gray-400 tw:dark:text-dark-white-100 tw:dark:border-dark-gray-100 focus:tw:ring-2 focus:tw:ring-blue-500 focus:tw:outline-none">
+                                                            class="tw:appearance-none tw:cursor-pointer tw:text-lg tw:font-medium tw:h-8 tw:py-0 tw:pl-2.5 tw:pr-7 tw:rounded-md tw:border tw:border-gray-300 tw:bg-white tw:text-gray-900 tw:dark:bg-dark-gray-400 tw:dark:text-dark-white-100 tw:dark:border-dark-gray-100 tw:focus:ring-2 tw:focus:ring-blue-500 tw:focus:outline-none">
                                                         <template x-for="b in textBackups" :key="'rev-' + b.id">
                                                             <option :value="b.id"
                                                                     :selected="b.id === activeRevId"
@@ -223,19 +223,22 @@
                                     <button type="button"
                                             x-on:click="downloadConfig()"
                                             title="{{ __('config_backups.download') }}"
-                                            class="lnms-btn lnms-btn-default tw:h-8! tw:w-8! tw:p-0! tw:flex tw:items-center tw:justify-center tw:text-xs tw:transition-colors tw:shrink-0"
+                                            class="lnms-btn lnms-btn-default tw:h-8! tw:px-2! tw:flex tw:items-center tw:justify-center tw:gap-1.5 tw:text-sm tw:transition-colors tw:shrink-0"
                                             aria-label="{{ __('config_backups.download') }}">
                                         <i class="fa fa-download" aria-hidden="true"></i>
+                                        <span class="tw:hidden tw:xl:inline">{{ __('config_backups.download') }}</span>
                                     </button>
                                     <button type="button"
                                             x-on:click="copyToClipboard()"
                                             :title="copied ? '{{ __('config_backups.copied') }}' : '{{ __('config_backups.copy') }}'"
-                                            class="lnms-btn lnms-btn-default tw:h-8! tw:w-8! tw:p-0! tw:flex tw:items-center tw:justify-center tw:text-xs tw:transition-colors tw:shrink-0"
+                                            class="lnms-btn lnms-btn-default tw:h-8! tw:px-2! tw:flex tw:items-center tw:justify-center tw:gap-1.5 tw:text-sm tw:transition-colors tw:shrink-0"
                                             aria-label="{{ __('config_backups.copy') }}">
                                         <i class="fa" :class="copied ? 'fa-check tw:text-green-400' : 'fa-copy'" aria-hidden="true"></i>
+                                        <span class="tw:hidden tw:xl:inline" x-text="copied ? '{{ __('config_backups.copied') }}' : '{{ __('config_backups.copy') }}'"></span>
                                     </button>
                                 </div>
                             </template>
+
 
                             {{-- Diff Actions --}}
                             <template x-if="showDiffView">
@@ -243,19 +246,22 @@
                                     <button type="button"
                                             x-on:click="downloadDiff()"
                                             title="{{ __('config_backups.download_diff') }}"
-                                            class="lnms-btn lnms-btn-default tw:h-8! tw:w-8! tw:p-0! tw:flex tw:items-center tw:justify-center tw:text-xs tw:transition-colors tw:shrink-0"
+                                            class="lnms-btn lnms-btn-default tw:h-8! tw:px-2! tw:flex tw:items-center tw:justify-center tw:gap-1.5 tw:text-sm tw:transition-colors tw:shrink-0"
                                             aria-label="{{ __('config_backups.download_diff') }}">
                                         <i class="fa fa-download" aria-hidden="true"></i>
+                                        <span class="tw:hidden tw:xl:inline">{{ __('config_backups.download') }}</span>
                                     </button>
                                     <button type="button"
                                             x-on:click="copyDiff()"
                                             :title="copiedDiff ? '{{ __('config_backups.copied_diff') }}' : '{{ __('config_backups.copy_diff') }}'"
-                                            class="lnms-btn lnms-btn-default tw:h-8! tw:w-8! tw:p-0! tw:flex tw:items-center tw:justify-center tw:text-xs tw:transition-colors tw:shrink-0"
+                                            class="lnms-btn lnms-btn-default tw:h-8! tw:px-2! tw:flex tw:items-center tw:justify-center tw:gap-1.5 tw:text-sm tw:transition-colors tw:shrink-0"
                                             aria-label="{{ __('config_backups.copy_diff') }}">
                                         <i class="fa" :class="copiedDiff ? 'fa-check tw:text-green-400' : 'fa-copy'" aria-hidden="true"></i>
+                                        <span class="tw:hidden tw:xl:inline" x-text="copiedDiff ? '{{ __('config_backups.copied') }}' : '{{ __('config_backups.copy') }}'"></span>
                                     </button>
                                 </div>
                             </template>
+
                         </div>
                     </x-slot>
 
@@ -398,7 +404,7 @@
                                 <h5 class="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2.5">
                                     {{ __('config_backups.navigate_history') }}
                                 </h5>
-                                <div class="tw:grid tw:grid-cols-1 sm:tw:grid-cols-2 tw:gap-2.5 tw:text-xs">
+                                <div class="tw:grid tw:grid-cols-1 tw:sm:grid-cols-2 tw:gap-2.5 tw:text-xs">
                                     <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
                                         <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_older') }}</span>
                                         <div class="tw:flex tw:items-center tw:gap-1.5">
@@ -431,7 +437,7 @@
                                 <h5 class="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2.5">
                                     {{ __('config_backups.compare_revisions') }}
                                 </h5>
-                                <div class="tw:grid tw:grid-cols-1 sm:tw:grid-cols-2 tw:gap-2.5 tw:text-xs">
+                                <div class="tw:grid tw:grid-cols-1 tw:sm:grid-cols-2 tw:gap-2.5 tw:text-xs">
                                     <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
                                         <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_toggle_diff') }}</span>
                                         <div class="tw:flex tw:gap-1">
@@ -467,7 +473,7 @@
                                 <h5 class="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2.5">
                                     {{ __('config_backups.general') }}
                                 </h5>
-                                <div class="tw:grid tw:grid-cols-1 sm:tw:grid-cols-2 tw:gap-2.5 tw:text-xs">
+                                <div class="tw:grid tw:grid-cols-1 tw:sm:grid-cols-2 tw:gap-2.5 tw:text-xs">
                                     <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
                                         <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('config_backups.shortcut_help') }}</span>
                                         <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">?</kbd>
