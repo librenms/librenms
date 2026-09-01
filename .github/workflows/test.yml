@@ -165,7 +165,7 @@ jobs:
         run: |
           .python_venvs/snmpsim/bin/snmpsim-command-responder-lite --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --log-level=error --logging-method=file:/tmp/snmpsimd.log &
           # Wait for snmpsim to start
-          timeout 30 bash -c '
+          timeout 60 bash -c '
             until grep -q "127.1.6.2:1162" /tmp/snmpsimd.log 2>/dev/null; do
               sleep 0.1
             done
