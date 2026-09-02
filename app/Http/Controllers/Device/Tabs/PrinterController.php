@@ -54,8 +54,6 @@ class PrinterController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        return [
-            'tab' => 'toner',
-        ];
+        return [];
     }
 }
