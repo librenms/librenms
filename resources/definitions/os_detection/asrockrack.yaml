@@ -1,0 +1,13 @@
+os: asrockrack
+text: 'ASRock Rack BMC'
+type: appliance
+mib_dir: asrockrack
+snmp_bulk: false
+discovery:
+    -   sysObjectID: .1.3.6.1.4.1.8072.
+        snmpwalk:
+            # snmpwalk instead of snmpget: some ASRock/AMI BMC firmwares answer
+            # GETNEXT but not direct GET on the vendor tree
+            oid: .1.3.6.1.4.1.49622.1
+            op: 'contains'
+            value: '49622.1.1.0'
