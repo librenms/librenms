@@ -1,8 +1,11 @@
 os: altalabs
 text: Alta Labs
 type: network
+mib_dir: altalabs
 over:
     - { graph: device_bits, text: Traffic }
+    - { graph: device_temperature, text: Temperature }
+    - { graph: device_percent, text: 'Fan Duty' }
 discovery:
     -
         sysObjectID:
