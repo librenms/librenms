@@ -173,7 +173,7 @@ class NetSnmpTranslate
         $output = $proc->getOutput();
         $stderr = $proc->getErrorOutput();
 
-        // check exit code and log possible bad auth
+        // check exit code and log errors
         $this->checkExitCode($exitCode, $stderr);
         $this->logOutput($output, $stderr);
 
@@ -215,29 +215,20 @@ class NetSnmpTranslate
     private function checkExitCode(int $code, string $error): void
     {
         if ($code) {
-            if (Str::startsWith($error, 'Invalid authentication protocol specified')) {
-                Eventlog::log('Unsupported SNMP authentication algorithm - ' . $code, $this->device, 'poller', Severity::Error);
-            } elseif (Str::startsWith($error, 'Invalid privacy protocol specified')) {
-                Eventlog::log('Unsupported SNMP privacy algorithm - ' . $code, $this->device, 'poller', Severity::Error);
-            }
             Log::debug('Exitcode: ' . $code, [$error]);
         }
     }
 
     private function logCommand(string $command): void
     {
-        if (Debug::isEnabled() && ! Debug::isVerbose()) {
-            Log::debug('SNMP[%c' . $command . '%n]', ['color' => true]);
-        } elseif (Debug::isVerbose()) {
+        if (Debug::isEnabled() || Debug::isVerbose()) {
             Log::debug('SNMP[%c' . $command . '%n]', ['color' => true]);
         }
     }
 
     private function logOutput(string $output, string $error): void
     {
-        if (Debug::isEnabled() && ! Debug::isVerbose()) {
-            Log::debug($output);
-        } elseif (Debug::isVerbose()) {
+        if (Debug::isEnabled() || Debug::isVerbose()) {
             Log::debug($output);
         }
         Log::debug($error);
