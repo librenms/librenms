@@ -1,0 +1,121 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.12356.101.1.9001",
+                    "sysDescr": "FortiGate",
+                    "sysContact": "<private>",
+                    "version": "v7.4.13,build2933,260929 (GA.M)",
+                    "hardware": "FortiGate 900G",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "fortigate",
+                    "type": "firewall",
+                    "serial": "FG9H0GTB00000000",
+                    "icon": "fortinet.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "wireless": {
+        "discovery": {
+            "wireless_sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "ap-count",
+                    "sensor_index": "1",
+                    "sensor_type": "fortigate",
+                    "sensor_descr": "Connected APs",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": 73,
+                    "sensor_prev": null,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".1.3.6.1.4.1.12356.101.14.2.5.0\"]",
+                    "rrd_type": "GAUGE"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "clients",
+                    "sensor_index": "1",
+                    "sensor_type": "fortigate",
+                    "sensor_descr": "Clients: Total",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": 394,
+                    "sensor_prev": null,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".1.3.6.1.4.1.12356.101.14.2.7.0\"]",
+                    "rrd_type": "GAUGE"
+                }
+            ]
+        },
+        "poller": {
+            "wireless_sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "ap-count",
+                    "sensor_index": "1",
+                    "sensor_type": "fortigate",
+                    "sensor_descr": "Connected APs",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": 73,
+                    "sensor_prev": 73,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".1.3.6.1.4.1.12356.101.14.2.5.0\"]",
+                    "rrd_type": "GAUGE"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "clients",
+                    "sensor_index": "1",
+                    "sensor_type": "fortigate",
+                    "sensor_descr": "Clients: Total",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": 394,
+                    "sensor_prev": 394,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".1.3.6.1.4.1.12356.101.14.2.7.0\"]",
+                    "rrd_type": "GAUGE"
+                }
+            ]
+        }
+    }
+}
