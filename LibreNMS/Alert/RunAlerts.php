@@ -627,12 +627,6 @@ class RunAlerts
                 $noacc = true;
             }
 
-            if ($this->isParentDown($alert['device_id'])) {
-                $noiss = true;
-                $updet = false;
-                Eventlog::log('Skipped alerts because all parent devices are down', $alert['device_id'], 'alert', Severity::Ok);
-            }
-
             if ($updet) {
                 dbUpdate(['details' => gzcompress(json_encode($alert['details']), 9)], 'alert_log', 'id = ?', [$alert['id']]);
             }
@@ -640,6 +634,11 @@ class RunAlerts
             if (! empty($rextra['mute'])) {
                 echo 'Muted Alert-UID #' . $alert['id'] . "\r\n";
                 $noiss = true;
+            }
+
+            if ($this->isParentDown($alert['device_id'])) {
+                $noiss = true;
+                Eventlog::log('Skipped alerts because all parent devices are down', $alert['device_id'], 'alert', Severity::Ok);
             }
 
             if ($alert['state'] == AlertState::RECOVERED && $rextra['recovery'] == false) {
