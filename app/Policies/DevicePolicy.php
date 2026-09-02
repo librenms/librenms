@@ -37,6 +37,10 @@ class DevicePolicy
      */
     public function view(User $user, Device $device): bool
     {
+        if ($user->can('global-read')) {
+            return true;
+        }
+
         if ($this->hasGlobalPermission($user, 'viewAll')) {
             return true;
         }
@@ -77,7 +81,7 @@ class DevicePolicy
     public function configBackupView(User $user, Device $device): bool
     {
         return $user->checkPermissionTo('config-backup.view')
-            && $user->can('view', $device);
+            && $this->view($user, $device);
     }
 
     /**
@@ -86,7 +90,7 @@ class DevicePolicy
     public function configBackupRefresh(User $user, Device $device): bool
     {
         return $user->can('config-backup.refresh')
-            && $user->can('view', $device);
+            && $this->view($user, $device);
     }
 
     /**
@@ -95,6 +99,6 @@ class DevicePolicy
     public function updateNotes(User $user, Device $device): bool
     {
         return $this->hasGlobalPermission($user, 'updateNotes')
-            && $user->can('view', $device);
+            && $this->view($user, $device);
     }
 }
