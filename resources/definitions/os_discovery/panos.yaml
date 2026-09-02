@@ -165,8 +165,6 @@ modules:
                     descr: GlobalProtect VPN Active Sessions
                     group: VPN
                     high_limit: PAN-COMMON-MIB::panGPGWUtilizationMaxTunnels
-                    low_limit: 0
-                    low_warn_limit: 0
         load:
             data:
                 -

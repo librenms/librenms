@@ -40,18 +40,18 @@ trait HasThresholds
             return Severity::Unknown;
         }
 
-        if ($this->sensor_limit !== null && $this->sensor_current > $this->sensor_limit) {
+        if ($this->sensor_limit !== null && $this->sensor_current >= $this->sensor_limit) {
             return Severity::Error;
         }
-        if ($this->sensor_limit_low !== null && $this->sensor_current < $this->sensor_limit_low) {
+        if ($this->sensor_limit_low !== null && $this->sensor_current <= $this->sensor_limit_low) {
             return Severity::Error;
         }
 
-        if ($this->sensor_limit_warn !== null && $this->sensor_current > $this->sensor_limit_warn) {
+        if ($this->sensor_limit_warn !== null && $this->sensor_current >= $this->sensor_limit_warn) {
             return Severity::Warning;
         }
 
-        if ($this->sensor_limit_low_warn !== null && $this->sensor_current < $this->sensor_limit_low_warn) {
+        if ($this->sensor_limit_low_warn !== null && $this->sensor_current <= $this->sensor_limit_low_warn) {
             return Severity::Warning;
         }
 
