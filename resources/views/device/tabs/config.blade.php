@@ -7,22 +7,32 @@
                 {{ $data['error_message'] }}
             </x-panel>
         @else
-            <div x-data="configBackups(@js($data))"
+            <div x-data="configBackups(@js($data))" data-config-backups
                 class="tw:mt-4 tw:flex tw:flex-col tw:lg:flex-row tw:gap-4 tw:items-start">
 
                 {{-- Backup list --}}
-                <x-panel class="tw:w-full tw:lg:w-md tw:lg:shrink-0 tw:overflow-hidden tw:self-start tw:mb-0!">
+                <x-panel class="tw:w-full tw:lg:w-lg tw:lg:shrink-0 tw:overflow-hidden tw:self-start tw:mb-0!">
                     <x-slot name="heading" class="tw:flex tw:items-center tw:justify-between">
                         <h3 class="panel-title">
                             {{ __('config_backups.backups') }}
                             <span x-show="!loadingBackups" x-cloak class="tw:font-normal tw:text-gray-500 tw:dark:text-dark-white-400" x-text="'(' + total + ')'"></span>
                         </h3>
-                        <button type="button"
-                                :class="total > 1 ? '' : 'tw:invisible'" x-cloak
-                                x-on:click="toggleDiffMode()"
-                                x-text="diffMode ? '{{ __('config_backups.show_config') }}' : '{{ __('config_backups.show_diff') }}'"
-                                class="lnms-btn lnms-btn-primary tw:transition-colors">
-                        </button>
+                        <div class="tw:flex tw:items-center tw:gap-2">
+                            <button type="button"
+                                    :class="total > 1 ? '' : 'tw:invisible'" x-cloak
+                                    x-on:click="toggleDiffMode()"
+                                    x-text="diffMode ? '{{ __('config_backups.show_config') }}' : '{{ __('config_backups.show_diff') }}'"
+                                    class="lnms-btn lnms-btn-primary tw:transition-colors">
+                            </button>
+                            <button type="button"
+                                    x-show="canRefresh" x-cloak
+                                    x-on:click="refresh()"
+                                    :disabled="refreshing"
+                                    class="lnms-btn lnms-btn-success tw:flex tw:items-center tw:gap-1.5 tw:transition-colors tw:disabled:opacity-50">
+                                <i class="fa fa-refresh" :class="refreshing ? 'tw:animate-spin' : ''" aria-hidden="true"></i>
+                                <span>{{ __('config_backups.refresh') }}</span>
+                            </button>
+                        </div>
                     </x-slot>
 
                     <x-slot name="table">
@@ -98,7 +108,7 @@
                                     x-show="selected"
                                     x-text="': ' + formatDate(selected?.date)"></span></span>
                         </h3>
-                        <div :class="showActions ? '' : 'tw:invisible'"
+                        <div :class="showActions ? '' : 'tw:invisible tw:w-0'"
                              x-cloak
                              class="tw:flex tw:items-center tw:gap-2">
                             <button type="button"
@@ -130,7 +140,7 @@
                     <template x-if="showDiffView">
                         <div class="tw:rounded-lg tw:overflow-x-auto tw:max-h-[70vh] tw:overflow-y-auto tw:border tw:border-gray-200 tw:dark:border-dark-gray-200">
                             <table class="tw:w-full tw:m-0 tw:font-mono tw:border-collapse">
-                                <tbody>
+                                <tbody class="tw:align-text-top">
                                     <template x-for="(row, index) in diffRows" :key="index">
                                         <tr :class="{
                                                 'tw:bg-green-100 tw:dark:bg-green-900/40': row.mode === 'added',
@@ -165,9 +175,10 @@
 
                     {{-- config view --}}
                     <template x-if="showConfigView">
-                        <pre class="tw:m-0 tw:p-3 tw:font-mono tw:whitespace-pre-wrap tw:overflow-x-auto tw:max-h-[70vh] tw:overflow-y-auto tw:rounded-lg tw:bg-gray-50 tw:text-gray-800 tw:dark:bg-dark-gray-500 tw:dark:text-dark-white-200 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200"
-                             style="white-space: pre-wrap;"
-                             x-text="selected.content"></pre>
+                        <pre class="config-highlight line-numbers tw:m-0 tw:p-3 tw:font-mono tw:whitespace-pre-wrap tw:overflow-x-auto tw:max-h-[70vh] tw:overflow-y-auto tw:rounded-lg tw:bg-gray-50 tw:text-gray-800 tw:dark:bg-dark-gray-500 tw:dark:text-dark-white-200 tw:border tw:border-gray-200 tw:dark:border-dark-gray-200"><code
+                                x-config-highlight="selected.content"
+                                data-os="{{ $data['os'] }}"
+                                data-config-highlighting="{{ $data['config_highlighting'] }}"></code></pre>
                     </template>
                 </x-panel>
             </div>
@@ -178,6 +189,23 @@
 @push('scripts')
     <script>
         document.addEventListener('alpine:init', () => {
+            window.Alpine.directive('config-highlight', (element, { expression }, { effect, evaluateLater }) => {
+                const evaluateContent = evaluateLater(expression);
+                let updateId = 0;
+
+                effect(() => {
+                    evaluateContent((content) => {
+                        const currentUpdateId = ++updateId;
+
+                        window.LibreNMS.loadConfigHighlight().then(({ default: highlightConfig }) => {
+                            if (currentUpdateId === updateId) {
+                                highlightConfig(element, content);
+                            }
+                        });
+                    });
+                });
+            });
+
             window.Alpine.data('configBackups', (config) => ({
                 // Data
                 backups: [],
@@ -195,6 +223,8 @@
                 showSpinner: false,
                 error: null,
                 copied: false,
+                canRefresh: config.can_refresh || false,
+                refreshing: false,
 
                 // Diff State
                 diffMode: false,
@@ -524,6 +554,24 @@
                     }).catch((error) => {
                         console.error('Failed to copy configuration to clipboard:', error);
                     });
+                },
+
+                refresh() {
+                    if (this.refreshing) {
+                        return;
+                    }
+
+                    this.refreshing = true;
+                    window.axios.post(this.urls.refresh)
+                        .then(({ data }) => {
+                            window.toastr?.success(data.message);
+                        })
+                        .catch((error) => {
+                            window.toastr?.error(error.response?.data?.message || this.messages.request_failed);
+                        })
+                        .finally(() => {
+                            this.refreshing = false;
+                        });
                 },
             }));
         });

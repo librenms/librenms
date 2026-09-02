@@ -12,24 +12,31 @@ export default function popup(url = "", options = {}) {
             this.showTimeout = setTimeout(() => {
                 this.popupShow = true;
 
-                if (this.popperInstance) {
-                    this.popperInstance.destroy();
-                }
+                this.$nextTick(() => {
+                    if (this.popperInstance) {
+                        this.popperInstance.destroy();
+                    }
 
-                if (typeof Popper !== 'undefined') {
-                    this.popperInstance = new Popper(this.$refs.targetRef, this.$refs.popupRef, {
-                        placement: options.placement || 'bottom',
-                        positionFixed: true,
-                        modifiers: {
-                            offset: {
-                                offset: '0, 8'
-                            },
-                            preventOverflow: {
-                                boundariesElement: 'viewport'
+                    if (typeof Popper !== 'undefined') {
+                        this.popperInstance = new Popper(this.$refs.targetRef, this.$refs.popupRef, {
+                            placement: options.placement || 'bottom',
+                            positionFixed: true,
+                            modifiers: {
+                                offset: {
+                                    offset: '0, 8'
+                                },
+                                preventOverflow: {
+                                    boundariesElement: 'viewport',
+                                    padding: 8
+                                },
+                                flip: {
+                                    boundariesElement: 'viewport',
+                                    padding: 8
+                                }
                             }
-                        }
-                    });
-                }
+                        });
+                    }
+                });
 
                 // close other popups, except this one
                 this.ignoreNextShownEvent = true;

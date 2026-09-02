@@ -12,8 +12,8 @@ Query can be:
 
 Input:
 
-- device if you specify all for the query then you need to populate this
-  with the hostname or id of the device.
+- device: with the query `all`, give the hostname or the id of the
+  device here.
 
 Example:
 

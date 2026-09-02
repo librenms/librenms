@@ -84,6 +84,21 @@ canopySnmpAgent      OBJECT IDENTIFIER ::= { whispRoot 250 }
 --Canopy SNMP agent OID definition
 ucos           OBJECT IDENTIFIER ::= { canopySnmpAgent 256 }
 
+--Canopy SNMP agent OID definition for 450 devices
+cambium450            OBJECT IDENTIFIER ::= { canopySnmpAgent 257 }
+
+--Canopy SNMP agent OID definition for 450i devices
+cambium450i           OBJECT IDENTIFIER ::= { canopySnmpAgent 258 }
+
+--Canopy SNMP agent OID definition for 450m devices
+cambium450m           OBJECT IDENTIFIER ::= { canopySnmpAgent 259 }
+
+--Canopy SNMP agent OID definition for 450b devices (including MicroPoP)
+cambium450b           OBJECT IDENTIFIER ::= { canopySnmpAgent 260 }
+
+--Canopy SNMP agent OID definition for 450v devices
+cambium450v           OBJECT IDENTIFIER ::= { canopySnmpAgent 261 }
+
 -- prizm snmp agent 
 prizmSnmpAgent	OBJECT IDENTIFIER ::= { whispRoot 1250 }
 

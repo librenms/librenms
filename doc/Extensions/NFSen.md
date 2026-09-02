@@ -27,7 +27,7 @@ live. This can also be an array to specify more directories like:
     lnms config:set nfsen_rrds.+ '/var/nfsen/profiles-stat/siteb/'
     ```
 
-Although for most setups, it will look like below, with the
+Most setups look like the example below, with the
 profiles-stat/live directory being where it stores the general RRDs
 for data sources.
 
@@ -38,7 +38,7 @@ for data sources.
 
 If you wish to render info for configure channels for a device, you
 need add the various profile-stat directories your system uses, which
-for most systems will be as below.
+of most systems is below.
 
 !!! setting "external/nfsen"
     ```bash
@@ -47,7 +47,7 @@ for most systems will be as below.
 
 When adding sources to nfsen.conf, it is important to use the hostname
 that matches what is configured in LibreNMS, because the rrd files
-NfSen creates is named after the source name (ident), and it doesn't
+NfSen creates has the name of the source, that is the ident. It does not
 allow you to use an IP address instead. However, in LibreNMS, if your
 device is added by an IP address, add your source with any name of
 your choice, and create a symbolic link to the rrd file.
@@ -74,7 +74,7 @@ The above is a very important bit as device names in NfSen are limited
 to 21 characters. This means full domain names for devices can be very
 problematic to squeeze in, so therefor this chunk is usually removed.
 
-On a similar note, NfSen profiles for channels should be created with
+Create the NfSen profiles of the channels with
 the same name.
 
 ## Stats Defaults and Settings
@@ -107,10 +107,10 @@ is located elsewhere, set it with
     lnms config:set nfsen_last_max 153600
     ```
 
-The above is the max value in seconds one may pull stats for. The
-higher this is, the more CPU and disk intensive the search will be.
+This value is the maximum period of the statistics, in seconds. A
+higher value increases the CPU use and the disk use of the search.
 
-Numbers larger than this will be set to this.
+LibreNMS reduces a larger number to this value.
 
 !!! setting "external/nfsen"
     ```bash
@@ -119,7 +119,7 @@ Numbers larger than this will be set to this.
 
 The above is max number of items to be displayed.
 
-Numbers larger than this will be set to this.
+LibreNMS reduces a larger number to this value.
 
 !!! setting "external/nfsen"
     ```bash
@@ -127,7 +127,7 @@ Numbers larger than this will be set to this.
     ```
 
 The above is a array containing a list for the drop down menu how many
-top items should be returned.
+top items to return.
 
 !!! setting "external/nfsen"
     ```bash
@@ -190,5 +190,5 @@ The above is the last default to use from the drop down.
 
 The above associative array contains time intervals for how
 far back to go. The keys are the length in seconds and the
-value is just a description to display.
+value is a description for the display.
 

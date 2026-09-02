@@ -315,7 +315,7 @@ class RunAlerts
      */
     public function runAcks()
     {
-        foreach ($this->loadAlerts('alerts.state = ' . AlertState::ACKNOWLEDGED . ' && alerts.open = ' . AlertState::ACTIVE) as $alert) {
+        foreach ($this->loadAlerts('alerts.state = ' . AlertState::ACKNOWLEDGED . ' AND alerts.open = ' . AlertState::ACTIVE) as $alert) {
             $rextra = json_decode((string) $alert['extra'], true);
             if (! isset($rextra['acknowledgement'])) {
                 // backwards compatibility check
@@ -325,7 +325,7 @@ class RunAlerts
             if ($rextra['acknowledgement']) {
                 // Rule is set to send an acknowledgement alert
                 $this->issueAlert($alert);
-                dbUpdate(['open' => AlertState::CLEAR], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
+                dbUpdate(['open' => AlertState::CLEAR], 'alerts', 'rule_id = ? AND device_id = ?', [$alert['rule_id'], $alert['device_id']]);
             }
         }
     }
@@ -337,7 +337,7 @@ class RunAlerts
      */
     public function runFollowUp()
     {
-        foreach ($this->loadAlerts('alerts.state > ' . AlertState::CLEAR . ' && alerts.open = 0') as $alert) {
+        foreach ($this->loadAlerts('alerts.state > ' . AlertState::CLEAR . ' AND alerts.open = 0') as $alert) {
             if ($alert['state'] != AlertState::ACKNOWLEDGED || ($alert['info']['until_clear'] === false)) {
                 $rextra = json_decode((string) $alert['extra'], true);
                 if ($rextra['invert']) {
@@ -395,7 +395,7 @@ class RunAlerts
                         'rule_id' => $alert['rule_id'],
                         'details' => gzcompress(json_encode($alert['details']), 9),
                     ], 'alert_log')) {
-                        dbUpdate(['state' => $state, 'open' => 1, 'alerted' => 1], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
+                        dbUpdate(['state' => $state, 'open' => 1, 'alerted' => 1], 'alerts', 'rule_id = ? AND device_id = ?', [$alert['rule_id'], $alert['device_id']]);
                     }
 
                     echo $ret . ' (' . $previous_alert_count . '/' . $current_alert_count . ")\r\n";
@@ -479,7 +479,7 @@ class RunAlerts
         $alerts = [];
         foreach (dbFetchRows("SELECT alerts.id, alerts.alerted, alerts.device_id, alerts.rule_id, alerts.state, alerts.note, alerts.info FROM alerts WHERE $where") as $alert_status) {
             $alert = dbFetchRow(
-                'SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.severity,alert_rules.extra,alert_rules.name,alert_rules.query,alert_rules.builder,alert_rules.proc FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1',
+                'SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.severity,alert_rules.extra,alert_rules.name,alert_rules.query,alert_rules.builder,alert_rules.proc FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id AND alert_log.device_id = ? AND alert_log.rule_id = ? AND alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1',
                 [$alert_status['device_id'], $alert_status['rule_id']]
             );
 
@@ -513,7 +513,7 @@ class RunAlerts
      */
     public function runAlerts()
     {
-        foreach ($this->loadAlerts('alerts.state != ' . AlertState::ACKNOWLEDGED . ' && alerts.open = 1') as $alert) {
+        foreach ($this->loadAlerts('alerts.state != ' . AlertState::ACKNOWLEDGED . ' AND alerts.open = 1') as $alert) {
             $noiss = false;
             $noacc = false;
             $updet = false;
@@ -627,6 +627,12 @@ class RunAlerts
                 $noacc = true;
             }
 
+            if ($this->isParentDown($alert['device_id'])) {
+                $noiss = true;
+                $updet = false;
+                Eventlog::log('Skipped alerts because all parent devices are down', $alert['device_id'], 'alert', Severity::Ok);
+            }
+
             if ($updet) {
                 dbUpdate(['details' => gzcompress(json_encode($alert['details']), 9)], 'alert_log', 'id = ?', [$alert['id']]);
             }
@@ -636,22 +642,17 @@ class RunAlerts
                 $noiss = true;
             }
 
-            if ($this->isParentDown($alert['device_id'])) {
-                $noiss = true;
-                Eventlog::log('Skipped alerts because all parent devices are down', $alert['device_id'], 'alert', Severity::Ok);
-            }
-
             if ($alert['state'] == AlertState::RECOVERED && $rextra['recovery'] == false) {
                 // Rule is set to not send a recovery alert
                 $noiss = true;
             }
 
             if (! $noacc) {
-                dbUpdate(['open' => 0], 'alerts', 'rule_id = ? && device_id = ? && state = 0', [$alert['rule_id'], $alert['device_id']]);
+                dbUpdate(['open' => 0], 'alerts', 'rule_id = ? AND device_id = ? AND state = 0', [$alert['rule_id'], $alert['device_id']]);
             }
 
             if (! $noiss) {
-                dbUpdate(['alerted' => $alert['state']], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
+                dbUpdate(['alerted' => $alert['state']], 'alerts', 'rule_id = ? AND device_id = ?', [$alert['rule_id'], $alert['device_id']]);
                 $this->issueAlert($alert, ! empty($dueTransports) ? $dueTransports : null);
             }
         }

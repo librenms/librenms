@@ -28,6 +28,11 @@ namespace LibreNMS\Util;
 
 class StringHelpers
 {
+    public static function isValidUtf8(string $string): bool
+    {
+        return preg_match('//u', $string) === 1;
+    }
+
     public static function niceCase($string)
     {
         $replacements = [
@@ -98,7 +103,13 @@ class StringHelpers
      */
     public static function inferEncoding(?string $string): ?string
     {
-        if (empty($string) || preg_match('//u', $string) || ! function_exists('iconv')) {
+        if (empty($string) || self::isValidUtf8($string)) {
+            return $string;
+        }
+
+        $string = str_replace(chr(218), "\n", $string);
+
+        if (! function_exists('iconv')) {
             return $string;
         }
 
