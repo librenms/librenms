@@ -124,6 +124,11 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     // load the peer identifier into an object
     $peerIdentifierIp = IP::parse($peer['bgpPeerIdentifier'], true);
 
+    // Unnumbered peers are keyed by their local interface (e.g. swp29), which is not an IP.
+    // Resolve the neighbouring device/port from the learned remote address (bgpPeerRemoteAddr)
+    // in that case; numbered peers keep resolving from the identifier as before.
+    $peerResolveIp = $peerIdentifierIp ?? IP::parse($peer['bgpPeerRemoteAddr'] ?? '', true);
+
     if ($peer['bgpPeerState'] == 'established') {
         $col = 'green';
     } else {
@@ -157,12 +162,12 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     $query = 'SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE ';
     $query .= '(A.ipv4_address = ? AND I.port_id = A.port_id)';
     $query .= ' AND D.device_id = I.device_id';
-    $ipv4_host = dbFetchRow($query, [$peer['bgpPeerIdentifier']]);
+    $ipv4_host = dbFetchRow($query, [(string) $peerResolveIp]);
 
     $query = 'SELECT * FROM ipv6_addresses AS A, ports AS I, devices AS D WHERE ';
     $query .= '(A.ipv6_address = ? AND I.port_id = A.port_id)';
     $query .= ' AND D.device_id = I.device_id';
-    $ipv6_host = dbFetchRow($query, [$peerIdentifierIp?->uncompressed()]);
+    $ipv6_host = dbFetchRow($query, [$peerResolveIp?->uncompressed()]);
 
     if ($ipv4_host) {
         $peerhost = $ipv4_host;
@@ -222,7 +227,10 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     $link_array['page'] = 'graphs';
     unset($link_array['height'], $link_array['width']);
     $link = \LibreNMS\Util\Url::generate($link_array);
-    $peeraddresslink = '<span class=list-large>' . \LibreNMS\Util\Url::overlibLink($link, $peerIdentifierIp?->compressed(), \LibreNMS\Util\Url::graphTag($graph_array_zoom)) . '</span>';
+    // Unnumbered peers are identified by their interface (e.g. swp27), which is not an IP,
+    // so $peerIdentifierIp is null; fall back to showing the identifier itself.
+    $peerLabel = $peerIdentifierIp?->compressed() ?? e($peer['bgpPeerIdentifier']);
+    $peeraddresslink = '<span class=list-large>' . \LibreNMS\Util\Url::overlibLink($link, $peerLabel, \LibreNMS\Util\Url::graphTag($graph_array_zoom)) . '</span>';
 
     if ($peer['bgpPeerLastErrorCode'] == 0 && $peer['bgpPeerLastErrorSubCode'] == 0) {
         $last_error = e($peer['bgpPeerLastErrorText']);

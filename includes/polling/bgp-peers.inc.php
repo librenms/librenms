@@ -96,7 +96,15 @@ if (! empty($peers)) {
                     $data['vrfId'] = $vrfId;
                     $data['peerIdType'] = $peerIdType;
                     $data['ifIndex'] = explode('.', (string) $ifFace)[4];
-                    $peer[$data['bgpPeerIdentifier']] = $data;
+                    // Unnumbered (interface-type) peers have no learned remote address
+                    // (bgpPeerRemoteAddr = "Unknown" until up), so key them by interface —
+                    // matching how discovery stores bgpPeerIdentifier for these peers.
+                    if ($peerIdType === 'interface') {
+                        $ifName = DeviceCache::getPrimary()->ports()->where('ifIndex', $data['ifIndex'])->value('ifName');
+                        $peer[$ifName ?: ('ifIndex.' . $data['ifIndex'])] = $data;
+                    } else {
+                        $peer[$data['bgpPeerRemoteAddr'] ?? $data['bgpPeerIdentifier']] = $data;
+                    }
 
                     return $peer;
                 });
@@ -128,7 +136,8 @@ if (! empty($peers)) {
         $vrfId = $peer['vrf_id'];
 
         try {
-            $peer_ip = IP::parse($peer['bgpPeerIdentifier']);
+            // Unnumbered peers are identified by their local interface (e.g. swp25), not an IP
+            $peer_ip = IP::parse($peer['bgpPeerIdentifier'], true) ?? $peer['bgpPeerIdentifier'];
 
             d_echo("Checking BGP peer $peer_ip ");
 
@@ -360,14 +369,18 @@ if (! empty($peers)) {
                         }
                     }
                 } else {
-                    $bgp_peer_ident = $peer_ip->toSnmpIndex();
-                    $ip_ver = $peer_ip->getFamily();
-                    if ($ip_ver == 'ipv6') {
-                        $ip_type = 2;
-                        $ip_len = 16;
-                    } else {
-                        $ip_type = 1;
-                        $ip_len = 4;
+                    // interface-identified (unnumbered) peers have no IP to index by;
+                    // the branches that need these are never reached for them
+                    if ($peer_ip instanceof IP) {
+                        $bgp_peer_ident = $peer_ip->toSnmpIndex();
+                        $ip_ver = $peer_ip->getFamily();
+                        if ($ip_ver == 'ipv6') {
+                            $ip_type = 2;
+                            $ip_len = 16;
+                        } else {
+                            $ip_type = 1;
+                            $ip_len = 4;
+                        }
                     }
 
                     if ($device['os_group'] === 'arista') {
