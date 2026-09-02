@@ -191,6 +191,19 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('logs/graylog', Device\Tabs\GraylogController::class)->name('graylog');
         Route::get('logs/outages', Device\Tabs\OutagesController::class)->name('outages');
         Route::get('logs/syslog', Device\Tabs\SyslogController::class)->name('syslog');
+        Route::prefix('routing')->name('routing.')->group(function (): void {
+            Route::get('', Device\Tabs\RoutingController::class)->name('index');
+            Route::get('bgp', Device\Tabs\Routing\BgpController::class)->name('bgp');
+            Route::get('cef', Device\Tabs\Routing\CefController::class)->name('cef');
+            Route::get('cisco-otv', Device\Tabs\Routing\CiscoOtvController::class)->name('cisco-otv');
+            Route::get('ipsec-tunnels', Device\Tabs\Routing\IpsecTunnelsController::class)->name('ipsec-tunnels');
+            Route::get('isis', Device\Tabs\Routing\IsisController::class)->name('isis');
+            Route::get('mpls', Device\Tabs\Routing\MplsController::class)->name('mpls');
+            Route::get('ospf', Device\Tabs\Routing\OspfController::class)->name('ospf');
+            Route::get('ospfv3', Device\Tabs\Routing\Ospfv3Controller::class)->name('ospfv3');
+            Route::get('routes', Device\Tabs\Routing\RoutesController::class)->name('routes');
+            Route::get('vrf', Device\Tabs\Routing\VrfController::class)->name('vrf');
+        });
         Route::get('popup', App\Http\Controllers\DevicePopupController::class)->name('popup');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
         Route::get('config/backups', [Device\Tabs\ConfigController::class, 'backups'])->name('config.backups');
