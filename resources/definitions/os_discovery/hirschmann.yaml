@@ -6,22 +6,60 @@ modules:
                 free: HMPRIV-MGMT-SNMP-MIB::hmMemoryFree
                 descr: 'Main Memory'
                 precision: 1024
+            -
+                used: HM2-DIAGNOSTIC-MIB::hm2DiagMemoryRamAllocated.0
+                free: HM2-DIAGNOSTIC-MIB::hm2DiagMemoryRamFree.0
+                descr: 'Main Memory'
+                precision: 1024
     os:
         hardware:
+            - HM2-DEVMGMT-MIB::hm2DevMgmtProductDescr.0
             - HMPRIV-MGMT-SNMP-MIB::hmPNIOOrderID.0
             - HMPRIV-MGMT-SNMP-MIB::hmSysGroupDescription.1
         version:
+            - HM2-DEVMGMT-MIB::hm2DevMgmtSwVersion.1.1.1
+            - HM2-DEVMGMT-MIB::hm2DevMgmtSwVersion.2.1.1
+            - HM2-DEVMGMT-MIB::hm2DevMgmtSwVersion.2.1.2
             - HMPRIV-MGMT-SNMP-MIB::hmPNIOSoftwareRelease.0
             - HMPRIV-MGMT-SNMP-MIB::hmSysVersion.0
-        serial: HMPRIV-MGMT-SNMP-MIB::hmSysGroupSerialNum.1
+        serial:
+            - HM2-DEVMGMT-MIB::hm2DevMgmtSerialNumber.0
+            - HMPRIV-MGMT-SNMP-MIB::hmSysGroupSerialNum.1
     processors:
         data:
             -
                 oid: HMPRIV-MGMT-SNMP-MIB::hmCpuUtilization
                 num_oid: '.1.3.6.1.4.1.248.14.2.15.2.1.{{ $index }}'
+            -
+                oid: HM2-DIAGNOSTIC-MIB::hm2DiagCpuUtilization
+                num_oid: '.1.3.6.1.4.1.248.11.22.1.8.10.1.{{ $index }}'
+                descr: 'CPU'
     sensors:
         temperature:
             data:
+                -
+                    oid: HM2-DEVMGMT-MIB::hm2DevMgmtTemperature.0
+                    value: HM2-DEVMGMT-MIB::hm2DevMgmtTemperature
+                    index: 'hm2DevMgmtTemperature.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.248.11.10.1.5.1.0{{ $noindex }}'
+                    descr: 'System Temperature'
+                    low_limit: HM2-DEVMGMT-MIB::hm2DevMgmtTemperatureLowerLimit.0
+                    high_limit: HM2-DEVMGMT-MIB::hm2DevMgmtTemperatureUpperLimit.0
+                -
+                    oid: HM2-DEVMGMT-MIB::hm2DevMgmtTemperatureExtTable
+                    value: HM2-DEVMGMT-MIB::hm2DevMgmtTemperatureExt
+                    index: 'hm2DevMgmtTemperatureExt.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.248.11.10.1.5.10.1.3.{{ $index }}'
+                    descr: 'Temperature {{ $subindex1 }}'
+                    low_limit: HM2-DEVMGMT-MIB::hm2DevMgmtTemperatureExtLowerLimit
+                    high_limit: HM2-DEVMGMT-MIB::hm2DevMgmtTemperatureExtUpperLimit
+                -
+                    oid: HM2-DEVMGMT-MIB::hm2SfpDiagTable
+                    value: HM2-DEVMGMT-MIB::hm2SfpCurrentTemperature
+                    index: 'hm2SfpCurrentTemperature.{{ $index }}'
+                    group: SFP
+                    num_oid: '.1.3.6.1.4.1.248.11.10.1.7.2.1.2.{{ $index }}'
+                    descr: 'SFP {{ $index }} Temperature'
                 -
                     oid: HMPRIV-MGMT-SNMP-MIB::hmSFPTable
                     value: HMPRIV-MGMT-SNMP-MIB::hmSfpTemperature
@@ -40,6 +78,20 @@ modules:
         dbm:
             data:
                 -
+                    oid: HM2-DEVMGMT-MIB::hm2SfpDiagTable
+                    value: HM2-DEVMGMT-MIB::hm2SfpCurrentTxPowerdBm
+                    index: 'hm2SfpCurrentTxPowerdBm.{{ $index }}'
+                    group: 'SFP {{ $index }}'
+                    descr: 'SFP {{ $index }} TX Power'
+                    num_oid: '.1.3.6.1.4.1.248.11.10.1.7.2.1.5.{{ $index }}'
+                -
+                    oid: HM2-DEVMGMT-MIB::hm2SfpDiagTable
+                    value: HM2-DEVMGMT-MIB::hm2SfpCurrentRxPowerdBm
+                    index: 'hm2SfpCurrentRxPowerdBm.{{ $index }}'
+                    group: 'SFP {{ $index }}'
+                    descr: 'SFP {{ $index }} RX Power'
+                    num_oid: '.1.3.6.1.4.1.248.11.10.1.7.2.1.6.{{ $index }}'
+                -
                     oid: HMPRIV-MGMT-SNMP-MIB::hmSFPTable
                     value: HMPRIV-MGMT-SNMP-MIB::hmSfpTxPowerdBm
                     index: 'hmSfpTxPowerdBm{{ $index }}'
@@ -53,8 +105,42 @@ modules:
                     group: 'SFP {{ $subindex0 }}/{{ $subindex1 }}'
                     descr: 'Power RX {{ HMPRIV-MGMT-SNMP-MIB::hmSfpInfoPartId }} {{ $subindex0 }}/{{ $subindex1 }}'
                     num_oid: '.1.3.6.1.4.1.248.14.1.1.13.1.35.{{ $index }}'
+        humidity:
+            data:
+                -
+                    oid: HM2-DEVMGMT-MIB::hm2DevMgmtHumidity.0
+                    value: HM2-DEVMGMT-MIB::hm2DevMgmtHumidity
+                    index: 'hm2DevMgmtHumidity.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.248.11.10.1.12.1.0{{ $noindex }}'
+                    descr: 'System Humidity'
+                    low_limit: HM2-DEVMGMT-MIB::hm2DevMgmtHumidityLowerLimit.0
+                    high_limit: HM2-DEVMGMT-MIB::hm2DevMgmtHumidityUpperLimit.0
         state:
             data:
+                -
+                    oid: HM2-PWRMGMT-MIB::hm2PSTable
+                    value: HM2-PWRMGMT-MIB::hm2PSState
+                    num_oid: '.1.3.6.1.4.1.248.11.11.1.1.1.1.2.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    index: 'hm2PowerSupplyStatus{{ $index }}'
+                    state_name: hm2PowerSupplyStatus
+                    states:
+                        - { descr: present, value: 1, generic: 0 }
+                        - { descr: defective, value: 2, generic: 2 }
+                        - { descr: notInstalled, value: 3, generic: 1 }
+                        - { descr: unknown, value: 4, generic: 3 }
+                -
+                    oid: HM2-DEVMGMT-MIB::hm2SfpDiagTable
+                    value: HM2-DEVMGMT-MIB::hm2SfpCurrentRxPowerState
+                    num_oid: '.1.3.6.1.4.1.248.11.10.1.7.2.1.7.{{ $index }}'
+                    descr: 'SFP {{ $index }} RX Power State'
+                    index: 'hm2SfpCurrentRxPowerState{{ $index }}'
+                    state_name: hm2SfpCurrentRxPowerState
+                    states:
+                        - { descr: ok, value: 1, generic: 0 }
+                        - { descr: warning, value: 2, generic: 1 }
+                        - { descr: alarm, value: 3, generic: 2 }
+                        - { descr: unsupported, value: 4, generic: 3 }
                 -
                     oid: HMPRIV-MGMT-SNMP-MIB::hmRS2OperMode
                     num_oid: '.1.3.6.1.4.1.248.14.1.10.1.{{ $index }}'

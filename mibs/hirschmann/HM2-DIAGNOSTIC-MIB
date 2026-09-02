@@ -1,0 +1,2767 @@
+
+HM2-DIAGNOSTIC-MIB DEFINITIONS ::= BEGIN
+
+--
+-- ***********************************************************
+-- Hirschmann Diagnostic MIB
+-- ***********************************************************
+--
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    OBJECT-IDENTITY,
+	Integer32, Unsigned32       FROM SNMPv2-SMI -- RFC 2578
+    TEXTUAL-CONVENTION, 
+    TruthValue			        FROM SNMPv2-TC
+    ifIndex					    FROM IF-MIB
+    hm2ConfigurationMibs,
+    HmEnabledStatus,
+    HmTimeSeconds1970			FROM HM2-TC-MIB
+    hm2PSID                     FROM HM2-PWRMGMT-MIB
+    hm2IfacePhysIndex			FROM HM2-DEVMGMT-MIB;
+
+hm2DiagnosticMib MODULE-IDENTITY
+	LAST-UPDATED "201208280000Z" -- Aug 28, 2012
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann Diagnostic MIB.
+         Copyright (C) 2012. All Rights Reserved."
+	REVISION     "201208280000Z" -- Aug 28, 2012
+    DESCRIPTION
+         	 " Type of LEDs available updated.
+         	 "         
+    REVISION     "201103160000Z" -- March 16, 2011
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 22 }
+
+
+--
+-- *************************************************************
+-- Textual Conventions
+-- *************************************************************
+--
+Hm2LedType 	::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Types of LEDs available"
+    SYNTAX       INTEGER { 
+					        power(1),
+        					status(2),
+        					rm(3),
+        					envm(4),
+        					i1(5),
+        					i2(6)
+        				 }
+
+Hm2LedStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Status of LEDs available"
+    SYNTAX       INTEGER { 
+				off(1),
+				greenSolid(2),		-- Solid green
+				greenBlink1(3),		-- Blinking green 1 time per period
+				greenBlink3(4),		-- Blinking green 3 time per period
+				greenBlink4(5),		-- Blinking green 4 time per period
+				greenBlink5(6),		-- Blinking green 5 time per period
+				greenBlink5i(7),	-- Blinking green 5 time per period inverse
+				yellowSolid(8),		-- Solid yellow
+				yellowBlink1(9),	-- Blinking yellow 1 time per period
+				yellowBlink3(10),	-- Blinking yellow 3 time per period
+				yellowBlink4(11),	-- Blinking yellow 4 time per period
+				yellowBlink5(12),	-- Blinking yellow 5 time per period
+				redSolid(13),		-- Solid red
+				redBlink1(14),		-- Blinking red 1 time per period
+				redBlink3(15),		-- Blinking red 3 time per period
+				redBlink4(16),		-- Blinking red 4 time per period
+				redBlink5(17)		-- Blinking red 5 time per period
+			    }
+
+-- 
+-- ***********************************************************
+-- hm2DiagnosticMib
+-- ***********************************************************
+--
+hm2DiagnosticMibNotifications		OBJECT IDENTIFIER ::= { hm2DiagnosticMib 0 }
+hm2DiagnosticMibObjects				OBJECT IDENTIFIER ::= { hm2DiagnosticMib 1 }
+-- hm2DiagnosticMibConformance			OBJECT IDENTIFIER ::= { hm2DiagnosticMib 2 }
+hm2DiagnosticSNMPExtensionGroup     OBJECT IDENTIFIER ::= { hm2DiagnosticMib 3 }
+        
+--
+-- ***********************************************************
+-- hm2Diagnostic groups
+-- ***********************************************************
+--
+
+hm2DiagSelftestGroup 				OBJECT IDENTIFIER ::= { hm2DiagnosticMibObjects 1 }
+hm2DiagBootGroup				    OBJECT IDENTIFIER ::= { hm2DiagnosticMibObjects 2 }
+hm2DiagDeviceMonitorGroup 	        OBJECT IDENTIFIER ::= { hm2DiagnosticMibObjects 3 }
+hm2DiagLedGroup						OBJECT IDENTIFIER ::= { hm2DiagnosticMibObjects 4 }
+hm2DiagIfaceUtilizationGroup        OBJECT IDENTIFIER ::= { hm2DiagnosticMibObjects 5 }
+hm2DiagCableTesterGroup             OBJECT IDENTIFIER ::= { hm2DiagnosticMibObjects 6 }
+hm2PortMonitorGroup		    		OBJECT IDENTIFIER ::= { hm2DiagnosticMibObjects 7 }
+hm2DiagResourcesGroup				OBJECT IDENTIFIER ::= { hm2DiagnosticMibObjects 8 }
+--
+-- ***********************************************************
+-- hm2DiagSelftestGroup
+-- ***********************************************************
+--
+hm2DiagSelftestRAM   OBJECT-TYPE
+			 SYNTAX			 HmEnabledStatus
+			 MAX-ACCESS      read-write
+			 STATUS			 current
+			 DESCRIPTION
+				 "Controls RAM self-test on cold start of the device.
+				 When disabled the device booting time is reduced."
+			 DEFVAL			 { enable }
+			 ::= { hm2DiagSelftestGroup 1 }
+			 
+hm2DiagSelftestBootTime   OBJECT-TYPE
+            SYNTAX      Integer32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+              "Internal boot time in Milliseconds until activating ports."
+            ::= { hm2DiagSelftestGroup 2 }
+ 
+
+hm2DiagSelftestActionTable OBJECT-TYPE
+			SYNTAX		SEQUENCE OF Hm2DiagSelftestActionEntry
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION "Diag self test action group."
+			::= { hm2DiagSelftestGroup 10 }
+
+hm2DiagSelftestActionEntry OBJECT-TYPE
+			SYNTAX		Hm2DiagSelftestActionEntry
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION 
+					"Diag self test action entry."
+			INDEX { hm2DiagSelftestActionCause }
+			::= { hm2DiagSelftestActionTable 1 }
+
+Hm2DiagSelftestActionEntry::= SEQUENCE {
+			hm2DiagSelftestActionCause			INTEGER,
+			hm2DiagSelftestAction				INTEGER
+}
+
+hm2DiagSelftestActionCause OBJECT-TYPE
+			SYNTAX		INTEGER{
+							task(1),
+							resource(2),
+							software(3),
+							hardware(4) 
+						}
+			
+			MAX-ACCESS	read-only
+			STATUS	current
+			DESCRIPTION
+					"The area of the cause for the action the self-test
+					wants to take."
+			::= { hm2DiagSelftestActionEntry 1 }
+
+hm2DiagSelftestAction OBJECT-TYPE
+			SYNTAX		INTEGER{
+							logOnly(1),
+							sendTrap(2),
+							reboot(3)
+						}
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"The action that the self-test component should take.
+					The cause is always logged to the system log,
+					additionally a trap can be sent to the management 
+					station or a reboot can be performed."
+			DEFVAL { reboot }
+			::= { hm2DiagSelftestActionEntry 2 }
+
+--
+-- ***********************************************************
+-- hm2DiagBootGroup
+-- ***********************************************************
+--
+
+hm2BootSystemMonitor	OBJECT-TYPE
+        	SYNTAX  	HmEnabledStatus
+         	MAX-ACCESS	read-write
+         	STATUS		current
+         	DESCRIPTION	"Enable or disable the System Monitor access during 
+						the boot phase. Please note: If the System Monitor 
+						is disabled, it is possible to lose access to the 
+						device permanently in case of loosing administrator
+						password or misconfiguration."
+        	DEFVAL		{ enable }
+         	         	::= { hm2DiagBootGroup 1 }
+
+hm2BootDefaultConfigOnError	OBJECT-TYPE
+        	SYNTAX  	HmEnabledStatus
+         	MAX-ACCESS	read-write
+         	STATUS		current
+         	DESCRIPTION	"Enable or disable loading of the default configuration
+         				in case there is any error loading the configuration during
+         				the boot phase. If disabled the system will be halted."
+        	DEFVAL		{ enable }
+         	         	::= { hm2DiagBootGroup 2 }
+
+hm2BootConfigPushButton OBJECT-TYPE
+			SYNTAX 		HmEnabledStatus
+			MAX-ACCESS 	read-write
+			STATUS 		current
+			DESCRIPTION "Enable or disable the push button functionality on the device."
+			DEFVAL 		{ enable }
+						::= { hm2DiagBootGroup 3 }
+
+--
+-- ***********************************************************
+-- hm2SignalContactGroup
+-- ***********************************************************
+--
+hm2SignalContactGroup OBJECT IDENTIFIER ::= { hm2DiagDeviceMonitorGroup 1 }
+
+-- *************************************************************
+-- Signal Contact Common Table
+-- *************************************************************
+hm2SigConCommonTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2SigConCommonEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "This table contains all variables to configure the behavior
+      of the signalling contacts."
+   ::= { hm2SignalContactGroup 1 }
+
+hm2SigConCommonEntry OBJECT-TYPE
+   SYNTAX Hm2SigConCommonEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION 
+      "The entry of the hm2SigConConfigTable."
+   INDEX { hm2SigConID }
+   ::= { hm2SigConCommonTable 1 }
+
+Hm2SigConCommonEntry ::= SEQUENCE {
+   hm2SigConID Integer32,
+   hm2SigConTrapEnable HmEnabledStatus,
+   hm2SigConTrapCause INTEGER,
+   hm2SigConTrapCauseIndex Integer32,
+   hm2SigConMode INTEGER,
+   hm2SigConOperState INTEGER,
+   hm2SigConOperTimeStamp HmTimeSeconds1970,
+   hm2SigConManualActivate INTEGER,
+   hm2SigConSenseLinkFailure HmEnabledStatus,
+   hm2SigConSenseTemperature HmEnabledStatus,
+   hm2SigConSenseFan HmEnabledStatus,
+   hm2SigConSenseModuleRemoval HmEnabledStatus,
+   hm2SigConSenseExtNvmRemoval HmEnabledStatus,
+   hm2SigConSenseExtNvmNotInSync HmEnabledStatus,
+   hm2SigConSenseRingRedundancy HmEnabledStatus,
+   hm2SigConSenseEthernetLoops HmEnabledStatus,
+   hm2SigConSenseHumidity HmEnabledStatus,
+   hm2SigConSenseStpPortBlock HmEnabledStatus
+   }
+
+hm2SigConID OBJECT-TYPE
+   SYNTAX Integer32 (1..2)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "This index is used to identify the associated signalling contact."
+   ::= { hm2SigConCommonEntry 1 }
+
+hm2SigConTrapEnable OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Determines whether a trap shall be sent or not, when
+      the signal contact operating state changes."
+   DEFVAL  { disable }                
+   ::= { hm2SigConCommonEntry 2 }
+
+hm2SigConTrapCause OBJECT-TYPE
+   SYNTAX INTEGER {
+      none(1),
+      power-supply(2),
+      link-failure(3),
+      temperature(4),
+      fan-failure(5),
+      module-removal(6),
+      ext-nvm-removal(7),
+      ext-nvm-not-in-sync(8),
+      ring-redundancy(9),
+      password-change(10),
+      password-min-length(11),
+      password-policy-not-configured(12),
+      password-policy-inactive(13),
+      telnet-enabled(14),
+      http-enabled(15),
+      snmp-unsecure(16),
+      sysmon-enabled(17),
+      ext-nvm-update-enabled(18),
+      no-link(19),
+      hidisc-enabled(20),
+      ext-nvm-config-load-unsecure(21),
+      https-certificate-warning(23),
+      modbus-tcp-enabled(24),
+      ethernet-ip-enabled(25),
+      profinet-io-enabled(26),
+      ethernet-loops(27),
+      humidity(28),
+      pml-disabled(29),
+      stp-port-blocked(30)
+      }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "This object identifies the cause for a trap. 
+      The index of the entity which produces the trap
+      is specified by hm2SigConTrapCauseIndex."
+   ::= { hm2SigConCommonEntry 3 }
+
+hm2SigConTrapCauseIndex OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "This attribute specifies the entity which produces the trap.
+      power-supply: 		index of power-supply table
+      link-failure: 		index of interface table
+      temperature:  		0
+      ext-nvm-removal:		(1) sd, (2) usb, (3) serial (not supported yet)
+      ext-nvm-not-in-sync: 	(1) sd, (2) usb, (3) serial (not supported yet)
+      ring-redundancy:		(1) MRP, (2) PRP, (3) HSR, (4) DLR  
+      ext-nvm-update-enabled:	(1) sd, (2) usb, (3) serial (not supported yet)
+      no-link:			index of interface table
+      ethernet-loops:       index of interface table
+      humidity:         0
+      stp-port-blocked:          index of interface table    
+      0: other errors"
+   ::= { hm2SigConCommonEntry 4 }
+
+hm2SigConMode   OBJECT-TYPE
+   SYNTAX INTEGER { 
+      manual(1), 
+      monitor(2), 
+      deviceState(3),
+      deviceSecurity(4),
+      deviceStateAndSecurity(5)
+   }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "This attribute specifies the behavior of the relay contact.
+      The factory settings for signal contact 1 is monitoring the
+      correct operation of entries specified to be survived.
+      When the device has also a second signal contact, the factory 
+      setting for it is the manual mode."
+   ::= { hm2SigConCommonEntry 5 }
+
+hm2SigConOperState OBJECT-TYPE
+   SYNTAX INTEGER { 
+      open(1), 
+      close(2) }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "This attribute shows the current operating state of the
+      signal contact."
+   ::= { hm2SigConCommonEntry 6 }
+
+hm2SigConOperTimeStamp OBJECT-TYPE
+   SYNTAX HmTimeSeconds1970
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   		"This attribute shows local system time (hm2SystemLocalTime) of the last hm2SigConOperState change."
+      ::= { hm2SigConCommonEntry 7 }
+      
+hm2SigConManualActivate OBJECT-TYPE
+   SYNTAX INTEGER { 
+      open(1),
+      close(2) } 
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "When operating in manual mode, the signal contact state can
+      be set by this attribute."
+   ::= { hm2SigConCommonEntry 8 }
+
+hm2SigConSenseLinkFailure OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Sets the monitoring of the network connection(s)."
+   DEFVAL { disable }                
+   ::= { hm2SigConCommonEntry 9 }
+
+hm2SigConSenseTemperature OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Sets the monitoring of the device temperature."
+   DEFVAL  { enable }                
+   ::= { hm2SigConCommonEntry 10 }
+
+hm2SigConSenseFan OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Sets the monitoring of the device fan modules." 
+   DEFVAL  { enable }                
+   ::= { hm2SigConCommonEntry 11 }
+
+hm2SigConSenseModuleRemoval OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Sets the monitoring of module removal (platform dependant)."
+   DEFVAL  { disable }                
+   ::= { hm2SigConCommonEntry 12 }
+
+hm2SigConSenseExtNvmRemoval OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Sets the monitoring of the external non-volatile memory removal."
+   DEFVAL { disable }                
+   ::= { hm2SigConCommonEntry 13 }
+
+hm2SigConSenseExtNvmNotInSync OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS     read-write
+   STATUS      current
+   DESCRIPTION
+      "Sets the monitoring whether the external non-volatile memory is in
+      sync with the configuration in NVRAM."
+   DEFVAL  { disable }
+   ::= { hm2SigConCommonEntry 14 }
+
+hm2SigConSenseRingRedundancy OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Sets the monitoring of the ring redundancy."
+   DEFVAL  { disable }                
+   ::= { hm2SigConCommonEntry 15 }
+
+hm2SigConSenseEthernetLoops OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Sets the monitoring for Ethernet loops."
+   DEFVAL  { disable }                
+   ::= { hm2SigConCommonEntry 16 }
+   
+hm2SigConSenseHumidity OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Sets the monitoring of the device humidity."
+   DEFVAL  { enable }
+   ::= { hm2SigConCommonEntry 17 }
+
+hm2SigConSenseStpPortBlock OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Sets the monitoring for STP loops."
+   DEFVAL  { enable }
+   ::= { hm2SigConCommonEntry 18 }
+
+-- *************************************************************
+-- Signal Contact Power Supply Table
+-- *************************************************************
+hm2SigConPSTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2SigConPSEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "This table contains the configuration of all power supply states."
+   ::= { hm2SignalContactGroup 2 }
+   
+hm2SigConPSEntry OBJECT-TYPE
+   SYNTAX Hm2SigConPSEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION 
+      "The entry of the hm2SigConPSTable."
+   INDEX { hm2SigConID, hm2PSID }
+   ::= { hm2SigConPSTable 1 }
+
+Hm2SigConPSEntry ::= SEQUENCE {
+   hm2SigConSensePSState HmEnabledStatus
+   }
+
+hm2SigConSensePSState OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Sets the monitoring of the power supply state."
+   DEFVAL { enable }                
+   ::= { hm2SigConPSEntry 1 }
+
+-- *************************************************************
+-- Signal Contact Interface Table
+-- *************************************************************
+hm2SigConInterfaceTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2SigConInterfaceEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "This table contains all variables to mask an alarm for the
+      signalling relay, produced by a link. The index for a link
+      corresponds with ifIndex. The table is also used
+      for the device monitoring configuration."
+   ::= { hm2SignalContactGroup 3 }
+
+hm2SigConInterfaceEntry OBJECT-TYPE
+   SYNTAX Hm2SigConInterfaceEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "The entry of the hm2SigConLinkTable."
+   INDEX { hm2SigConID, ifIndex }
+   ::= { hm2SigConInterfaceTable 1 }
+
+Hm2SigConInterfaceEntry ::= SEQUENCE {
+   hm2SigConSenseIfLinkAlarm HmEnabledStatus
+   }
+
+hm2SigConSenseIfLinkAlarm OBJECT-TYPE
+   SYNTAX HmEnabledStatus 
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Indicates whether an alarm for the signalling relay of the
+      associated link will be produced or not, so you can mask the
+      value of ifMauMediaAvailable."
+   DEFVAL { disable }                
+   ::= { hm2SigConInterfaceEntry 1 }
+
+-- *************************************************************
+-- Signal Contact Module Table
+-- *************************************************************
+hm2SigConModuleTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2SigConModuleEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "This table contains all variables to mask a module for the
+      signaling relay. The index for a module corresponds with the 
+      slot number."
+   ::= { hm2SignalContactGroup 4 }
+
+hm2SigConModuleEntry OBJECT-TYPE
+   SYNTAX Hm2SigConModuleEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "The entry of the hm2SigConModuleTable."
+   INDEX { hm2SigConID, hm2SigConModID }
+   ::= { hm2SigConModuleTable 1 }
+
+Hm2SigConModuleEntry ::= SEQUENCE {
+   hm2SigConModID Integer32,
+   hm2SigConSenseModule HmEnabledStatus
+   }
+
+hm2SigConModID OBJECT-TYPE
+   SYNTAX Integer32 (1..7)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "This index is used to identify the associated module."
+   ::= { hm2SigConModuleEntry 1 }
+   
+hm2SigConSenseModule OBJECT-TYPE
+   SYNTAX HmEnabledStatus 
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Indicates whether an alarm for the signalling relay of the
+      associated module will be produced or not."
+   DEFVAL { disable }                
+   ::= { hm2SigConModuleEntry 2 }
+   
+-- *************************************************************
+-- Signal Contact Fan Module Table
+-- *************************************************************
+hm2SigConFanModuleTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2SigConFanModuleEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "This table contains all variables to mask a fan module for the
+      signaling relay. The index for a module corresponds with the 
+      module number."
+   ::= { hm2SignalContactGroup 5 }
+
+hm2SigConFanModuleEntry OBJECT-TYPE
+   SYNTAX Hm2SigConFanModuleEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "The entry of the hm2SigConFanModuleTable."
+   INDEX { hm2SigConID, hm2SigConFanModID }
+   ::= { hm2SigConFanModuleTable 1 }
+
+Hm2SigConFanModuleEntry ::= SEQUENCE {
+   hm2SigConFanModID Integer32,
+   hm2SigConSenseFanModule HmEnabledStatus
+   }
+
+hm2SigConFanModID OBJECT-TYPE
+   SYNTAX Integer32 (1..7)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "This index is used to identify the associated fan module."
+   ::= { hm2SigConFanModuleEntry 1 }
+   
+hm2SigConSenseFanModule OBJECT-TYPE
+   SYNTAX HmEnabledStatus 
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Indicates whether an alarm for the signalling relay of the
+      associated fan module will be produced or not."
+   DEFVAL { enable }                
+   ::= { hm2SigConFanModuleEntry 2 }
+
+-- *************************************************************
+-- Signal Contact Status Table
+-- *************************************************************
+hm2SigConStatusTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2SigConStatusEntry
+   MAX-ACCESS 	not-accessible
+   STATUS 		current
+   DESCRIPTION
+      "This table shows the current monitored entities
+       for which there is a trap cause (hm2SigConTrapCause) active."
+   ::= { hm2SignalContactGroup 10 }
+
+hm2SigConStatusEntry OBJECT-TYPE
+   SYNTAX Hm2SigConStatusEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION 
+      "The entry of the hm2SigConStatusTable."
+   INDEX { hm2SigConID, hm2SigConStatusIndex }
+   ::= { hm2SigConStatusTable 1 }
+
+Hm2SigConStatusEntry ::= SEQUENCE {
+   hm2SigConStatusIndex             Integer32,
+   hm2SigConStatusTimeStamp         HmTimeSeconds1970,
+   hm2SigConStatusTrapCause 		INTEGER,
+   hm2SigConStatusTrapCauseIndex 	Integer32
+   }
+
+hm2SigConStatusIndex OBJECT-TYPE
+   SYNTAX 		Integer32
+   MAX-ACCESS 	not-accessible
+   STATUS 		current
+   DESCRIPTION
+      "This index is used to identify the occured event."
+   ::= { hm2SigConStatusEntry 1 }
+
+hm2SigConStatusTimeStamp OBJECT-TYPE
+   SYNTAX 		HmTimeSeconds1970
+   MAX-ACCESS 	read-only
+   STATUS 		current
+   DESCRIPTION
+      "This attribute shows the local system time (hm2SystemLocalTime) of occuration the event."
+   ::= { hm2SigConStatusEntry 2 }
+
+hm2SigConStatusTrapCause OBJECT-TYPE
+   SYNTAX INTEGER {
+      none(1),
+      power-supply(2),
+      link-failure(3),
+      temperature(4),
+      fan-failure(5),
+      module-removal(6),
+      ext-nvm-removal(7),
+      ext-nvm-not-in-sync(8),
+      ring-redundancy(9),
+      password-change(10),
+      password-min-length(11),
+      password-policy-not-configured(12),
+      password-policy-inactive(13),
+      telnet-enabled(14),
+      http-enabled(15),
+      snmp-unsecure(16),
+      sysmon-enabled(17),
+      ext-nvm-update-enabled(18),
+      no-link(19),
+      hidisc-enabled(20),
+      ext-nvm-config-load-unsecure(21),
+      iec61850-mms-enabled(22),
+      https-certificate-warning(23),
+      modbus-tcp-enabled(24),
+      ethernet-ip-enabled(25),
+      profinet-io-enabled(26),
+      ethernet-loops(27),
+      humidity(28),
+      stp-port-blocked(30)
+      }
+   MAX-ACCESS 	read-only
+   STATUS 		current
+   DESCRIPTION
+      "This object identifies the cause for a trap. 
+      The index of the entity which produces the trap
+      is specified by hm2SigConTrapCauseIndex."
+   ::= { hm2SigConStatusEntry 3 }
+
+hm2SigConStatusTrapCauseIndex OBJECT-TYPE
+   SYNTAX 		Integer32
+   MAX-ACCESS 	read-only
+   STATUS 		current
+   DESCRIPTION
+      "This attribute specifies the entity which produces the trap.
+      power-supply: 			index of power-supply table
+      link-failure: 			index of interface table
+      temperature:  			0
+      ext-nvm-removal:			(1) sd, (2) usb, (3) serial (not supported yet)
+      ext-nvm-not-in-sync: 		(1) sd, (2) usb, (3) serial (not supported yet)
+      ring-redundancy:			(1) MRP, (2) PRP, (3) HSR, (4) DLR 
+      ext-nvm-update-enabled:	(1) sd, (2) usb, (3) serial (not supported yet)
+      no-link:					index of interface table
+      ethernet-loops:           index of interface table
+      humidity:                 0
+      stp-port-blocked:              index of interface table
+      0: 						other errors"
+   ::= { hm2SigConStatusEntry 4 }
+   
+-- ### part 2
+--
+-- ***********************************************************
+-- hm2DeviceMonitorGroup
+-- ***********************************************************
+--
+hm2DeviceMonitorGroup OBJECT IDENTIFIER ::= { hm2DiagDeviceMonitorGroup 2 }
+
+-- *************************************************************
+-- hm2DeviceMonitorConfigGroup
+-- *************************************************************
+hm2DevMonCommonTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2DevMonCommonEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "This table contains all variables to configure the behavior
+      of the signalling contacts."
+   ::= { hm2DeviceMonitorGroup 1 }
+
+hm2DevMonCommonEntry OBJECT-TYPE
+   SYNTAX Hm2DevMonCommonEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION 
+      "The entry of the hm2DevMonConfigTable."
+   INDEX { hm2DevMonID }
+   ::= { hm2DevMonCommonTable 1 }
+
+Hm2DevMonCommonEntry ::= SEQUENCE {
+   hm2DevMonID Integer32,
+   hm2DevMonTrapEnable HmEnabledStatus,
+   hm2DevMonTrapCause INTEGER,
+   hm2DevMonTrapCauseIndex Integer32,
+   hm2DevMonOperState INTEGER,
+   hm2DevMonOperTimeStamp HmTimeSeconds1970,
+   hm2DevMonSenseLinkFailure HmEnabledStatus,
+   hm2DevMonSenseTemperature HmEnabledStatus,
+   hm2DevMonSenseFan HmEnabledStatus,
+   hm2DevMonSenseModuleRemoval HmEnabledStatus,
+   hm2DevMonSenseExtNvmRemoval HmEnabledStatus,
+   hm2DevMonSenseExtNvmNotInSync HmEnabledStatus,
+   hm2DevMonSenseRingRedundancy HmEnabledStatus,
+   hm2DevMonSenseHumidity HmEnabledStatus,
+   hm2DevMonSenseStpPortBlock HmEnabledStatus
+   }
+
+hm2DevMonID OBJECT-TYPE
+   SYNTAX Integer32 (1..1)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "This index is used to identify the associated device monitoring group.
+      Currently only one group is supported"
+   ::= { hm2DevMonCommonEntry 1 }
+
+hm2DevMonTrapEnable OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Determines whether a trap shall be sent or not when
+      the signal contact operating state changes."
+   DEFVAL  { enable }                
+   ::= { hm2DevMonCommonEntry 2 }
+
+hm2DevMonTrapCause OBJECT-TYPE
+   SYNTAX INTEGER {
+      none(1),
+      power-supply(2),
+      link-failure(3),
+      temperature(4),
+      fan-failure(5),
+      module-removal(6),
+      ext-nvm-removal(7),
+      ext-nvm-not-in-sync(8),
+      ring-redundancy(9),
+      humidity(28),
+      stp-port-blocked(30)
+      }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "This object identifies the cause for a trap. 
+      The index of the entity which produces the trap
+      is specified by hm2DevMonTrapCauseIndex."
+   ::= { hm2DevMonCommonEntry 3 }
+
+hm2DevMonTrapCauseIndex OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "This attribute specifies the entity which produces the trap.
+      power-supply: 		index of power supply table
+      link-failure: 		index of interface table
+      temperature:  		0
+      ext-nvm-removal:		(1) sd, (2) usb, (3) Serial (not supported yet)
+      ext-nvm-not-in-sync: 	(1) sd, (2) usb, (3) Serial (not supported yet)
+      ring-redundancy:		(1) MRP, (2) PRP, (3), HSR, (4) DLR 
+      humidity:         0
+      stp-port-blocked:          index of interface table    
+      0: other errors"
+   ::= { hm2DevMonCommonEntry 4 }
+
+hm2DevMonOperState OBJECT-TYPE
+   SYNTAX INTEGER { 
+      noerror(1), 
+      error(2) }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "This attribute shows the current operating state of the
+      signal contact."
+   ::= { hm2DevMonCommonEntry 5 }
+
+hm2DevMonOperTimeStamp OBJECT-TYPE
+   SYNTAX HmTimeSeconds1970
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   		"This attribute shows the local system time (hm2SystemLocalTime) of the last hm2DevMonOperState change."
+   ::= { hm2DevMonCommonEntry 6 }
+      
+hm2DevMonSenseLinkFailure OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Sets the monitoring of the network connection(s)."
+   DEFVAL { disable }                
+   ::= { hm2DevMonCommonEntry 7 }
+   
+hm2DevMonSenseTemperature OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Sets the monitoring of the device temperature."
+   DEFVAL  { enable }                
+   ::= { hm2DevMonCommonEntry 8 }
+
+hm2DevMonSenseFan OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Sets the monitoring of the device fan modules."
+   DEFVAL  { enable }                
+   ::= { hm2DevMonCommonEntry 9 }
+
+hm2DevMonSenseModuleRemoval OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Sets the monitoring of module removal (platform dependent)."
+   DEFVAL  { disable }                
+   ::= { hm2DevMonCommonEntry 10 }
+
+hm2DevMonSenseExtNvmRemoval OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Sets the monitoring of the external non-volatile memory removal."
+   DEFVAL { disable }                
+   ::= { hm2DevMonCommonEntry 11 }
+
+hm2DevMonSenseExtNvmNotInSync OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS     read-write
+   STATUS      current
+   DESCRIPTION
+      "Sets the monitoring whether the external non-volatile memory is in
+      sync with the configuration in NVRAM."
+   DEFVAL  { disable }
+   ::= { hm2DevMonCommonEntry 12 }
+
+hm2DevMonSenseRingRedundancy OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Sets the monitoring of the ring redundancy."
+   DEFVAL  { disable }                
+   ::= { hm2DevMonCommonEntry 13 }
+
+hm2DevMonSenseHumidity OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Sets the monitoring of the device humidity."
+   DEFVAL  { enable }
+   ::= { hm2DevMonCommonEntry 14 }
+
+hm2DevMonSenseStpPortBlock OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Sets the monitoring whether a port was blocked by STP."
+   DEFVAL  { enable }
+   ::= { hm2DevMonCommonEntry 15 }
+
+-- *************************************************************
+-- Device Monitor Power Supply Table
+-- *************************************************************
+hm2DevMonPSTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2DevMonPSEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "This table contains the configuration of all power supply states."
+   ::= { hm2DeviceMonitorGroup 2 }
+   
+hm2DevMonPSEntry OBJECT-TYPE
+   SYNTAX Hm2DevMonPSEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION 
+      "The entry of the hm2DevMonPSTable."
+   INDEX { hm2DevMonID, hm2PSID }
+   ::= { hm2DevMonPSTable 1 }
+
+Hm2DevMonPSEntry ::= SEQUENCE {
+   hm2DevMonSensePSState HmEnabledStatus
+   }
+
+hm2DevMonSensePSState OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Sets the monitoring of the power supply state."
+   DEFVAL { enable }                
+   ::= { hm2DevMonPSEntry 1 }
+
+-- *************************************************************
+-- Device Monitor Interface Table
+-- *************************************************************
+hm2DevMonInterfaceTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2DevMonInterfaceEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "This table contains all variables to mask an alarm for the
+      signalling relay, produced by a link. The index for a link
+      corresponds with ifIndex. The table is also used
+      for the device monitoring configuration."
+   ::= { hm2DeviceMonitorGroup 3 }
+
+hm2DevMonInterfaceEntry OBJECT-TYPE
+   SYNTAX Hm2DevMonInterfaceEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "The entry of the hm2DevMonLinkTable."
+   INDEX { hm2DevMonID, ifIndex }
+   ::= { hm2DevMonInterfaceTable 1 }
+
+Hm2DevMonInterfaceEntry ::= SEQUENCE {
+   hm2DevMonSenseIfLinkAlarm HmEnabledStatus
+   }
+
+hm2DevMonSenseIfLinkAlarm OBJECT-TYPE
+   SYNTAX HmEnabledStatus 
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Indicates whether an alarm for the signalling relay of the
+      associated link will be produced or not, so you can mask the
+      value of ifMauMediaAvailable."
+   DEFVAL { disable }                
+   ::= { hm2DevMonInterfaceEntry 1 }
+
+-- *************************************************************
+-- Device Monitor Module Table
+-- *************************************************************
+hm2DevMonModuleTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2DevMonModuleEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "This table contains all variables to mask a module for the
+      device status. The index for a module corresponds with the
+      slot number."
+   ::= { hm2DeviceMonitorGroup 4 }
+
+hm2DevMonModuleEntry OBJECT-TYPE
+   SYNTAX Hm2DevMonModuleEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "The entry of the hm2DevMonModuleTable."
+   INDEX { hm2DevMonID, hm2DevMonModID }
+   ::= { hm2DevMonModuleTable 1 }
+
+Hm2DevMonModuleEntry ::= SEQUENCE {
+   hm2DevMonModID Integer32,
+   hm2DevMonSenseModule HmEnabledStatus   
+   }
+
+hm2DevMonModID OBJECT-TYPE
+   SYNTAX Integer32 (1..7)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "This index is used to identify the associated module."
+   ::= { hm2DevMonModuleEntry 1 }
+   
+hm2DevMonSenseModule OBJECT-TYPE
+   SYNTAX HmEnabledStatus 
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Indicates whether an alarm for the device status of the
+      associated module will be produced or not."
+   DEFVAL { disable }                
+   ::= { hm2DevMonModuleEntry 2 }
+   
+-- *************************************************************
+-- Device Monitor Fan Module Table
+-- *************************************************************
+hm2DevMonFanModuleTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2DevMonFanModuleEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "This table contains all variables to mask a fan module for the
+      device status. The index for a module corresponds with the
+      module number."
+   ::= { hm2DeviceMonitorGroup 5 }
+
+hm2DevMonFanModuleEntry OBJECT-TYPE
+   SYNTAX Hm2DevMonFanModuleEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "The entry of the hm2DevMonFanModuleTable."
+   INDEX { hm2DevMonID, hm2DevMonFanModID }
+   ::= { hm2DevMonFanModuleTable 1 }
+
+Hm2DevMonFanModuleEntry ::= SEQUENCE {
+   hm2DevMonFanModID Integer32,
+   hm2DevMonSenseFanModule HmEnabledStatus   
+   }
+
+hm2DevMonFanModID OBJECT-TYPE
+   SYNTAX Integer32 (1..7)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "This index is used to identify the associated fan module."
+   ::= { hm2DevMonFanModuleEntry 1 }
+   
+hm2DevMonSenseFanModule OBJECT-TYPE
+   SYNTAX HmEnabledStatus 
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Indicates whether an alarm for the device status of the
+      associated fan module will be produced or not."
+   DEFVAL { enable }                
+   ::= { hm2DevMonFanModuleEntry 2 }
+
+-- *************************************************************
+-- Device Monitor Status Table
+-- *************************************************************
+hm2DevMonStatusTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2DevMonStatusEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "This table shows the current monitored entities in the hm2DeviceMonitorGroup
+       for which there is a trap cause (hm2DevMonStatusTrapCause) active."
+   ::= { hm2DeviceMonitorGroup 10 }
+
+hm2DevMonStatusEntry OBJECT-TYPE
+   SYNTAX Hm2DevMonStatusEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION 
+      "The entry of the hm2DevMonStatusTable."
+   INDEX { hm2DevMonID, hm2DevMonStatusIndex }
+   ::= { hm2DevMonStatusTable 1 }
+
+Hm2DevMonStatusEntry ::= SEQUENCE {
+   hm2DevMonStatusIndex             Integer32,
+   hm2DevMonStatusTimeStamp         HmTimeSeconds1970,
+   hm2DevMonStatusTrapCause 		INTEGER,
+   hm2DevMonStatusTrapCauseIndex 	Integer32
+   }
+
+hm2DevMonStatusIndex OBJECT-TYPE
+   SYNTAX 		Integer32
+   MAX-ACCESS 	not-accessible
+   STATUS 		current
+   DESCRIPTION
+      "This index is used to identify the occured event."
+   ::= { hm2DevMonStatusEntry 1 }
+
+hm2DevMonStatusTimeStamp OBJECT-TYPE
+   SYNTAX 		HmTimeSeconds1970
+   MAX-ACCESS 	read-only
+   STATUS 		current
+   DESCRIPTION
+      "This attribute shows the local system time (hm2SystemLocalTime) of occuration the event."
+   ::= { hm2DevMonStatusEntry 2 }
+
+hm2DevMonStatusTrapCause OBJECT-TYPE
+   SYNTAX 		INTEGER {
+      none(1),
+      power-supply(2),
+      link-failure(3),
+      temperature(4),
+      fan-failure(5),
+      module-removal(6),
+      ext-nvm-removal(7),
+      ext-nvm-not-in-sync(8),
+      ring-redundancy(9),
+      humidity(28),
+      stp-port-blocked(30)
+      }
+   MAX-ACCESS 	read-only
+   STATUS 		current
+   DESCRIPTION
+      "This object identifies the cause for a trap. 
+      The index of the entity which produces the trap
+      is specified by hm2DevMonTrapCauseIndex."
+   ::= { hm2DevMonStatusEntry 3 }
+
+hm2DevMonStatusTrapCauseIndex OBJECT-TYPE
+   SYNTAX 		Integer32
+   MAX-ACCESS 	read-only
+   STATUS 		current
+   DESCRIPTION
+      "This attribute specifies the entity which produces the trap.
+      power-supply: 		index of power supply table
+      link-failure: 		index of interface table
+      temperature:  		0
+      ext-nvm-removal:		(1) sd, (2) usb, (3) Serial (not supported yet)
+      ext-nvm-not-in-sync: 	(1) sd, (2) usb, (3) Serial (not supported yet)
+      ring-redundancy:		(1) MRP, (2) PRP, (3) HSR, (4) DLR 
+      humidity:         0
+      stp-port-blocked: 		    index of interface table
+      0: other errors"
+   ::= { hm2DevMonStatusEntry 4 }
+         
+-- ### part 3
+--
+-- ***********************************************************
+-- hm2DeviceSecurityGroup
+-- ***********************************************************
+--
+hm2DeviceSecurityGroup OBJECT IDENTIFIER ::= { hm2DiagDeviceMonitorGroup 3 }
+
+-- *************************************************************
+-- Device Security Config Group
+-- *************************************************************
+hm2DevSecConfigGroup OBJECT IDENTIFIER ::= { hm2DeviceSecurityGroup 1 }
+hm2DevSecTrapEnable OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Determines whether a trap shall be sent or not, when
+      the device security operating state changes."
+   DEFVAL  { disable }                
+   ::= { hm2DevSecConfigGroup 1 }
+
+hm2DevSecTrapCause OBJECT-TYPE
+   SYNTAX INTEGER {
+      none(1),
+      password-change(10),
+      password-min-length(11),
+      password-policy-not-configured(12),
+      password-policy-inactive(13),
+      telnet-enabled(14),
+      http-enabled(15),
+      snmp-unsecure(16),
+      sysmon-enabled(17),
+      ext-nvm-update-enabled(18),
+      no-link(19),
+      hidisc-enabled(20),
+      ext-nvm-config-load-unsecure(21),
+      iec61850-mms-enabled(22),
+      https-certificate-warning(23),
+      modbus-tcp-enabled(24),
+      ethernet-ip-enabled(25),
+      profinet-io-enabled(26),
+      pml-disabled(29)
+      }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "This object identifies the cause for a trap. 
+       The index of the entity which produces the trap
+       is specified by hm2DevMonTrapCauseIndex."
+   ::= { hm2DevSecConfigGroup 2 }
+
+hm2DevSecTrapCauseIndex OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "This attribute specifies the entity which produces the trap.
+       ext-nvm-update-enabled:	(1) sd, (2) usb, (3) serial (not supported yet)
+       no-link:	index of interface table
+       0: other errors."
+   ::= { hm2DevSecConfigGroup 3 }
+
+hm2DevSecOperState OBJECT-TYPE
+   SYNTAX INTEGER { 
+      noerror(1), 
+      error(2) }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "This attribute shows the current operating state of the signal contact."
+   ::= { hm2DevSecConfigGroup 4 }
+
+hm2DevSecOperTimeStamp OBJECT-TYPE
+   SYNTAX HmTimeSeconds1970
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   		"This attribute shows the local system time (hm2SystemLocalTime) of the last hm2DevSecOperState change."
+   ::= { hm2DevSecConfigGroup 5 }
+
+hm2DevSecSensePasswordChange OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Enable or disable to check if default passwords for 'user' and 'admin' are not changed."
+   DEFVAL { enable }
+   ::= { hm2DevSecConfigGroup 6 }
+   
+hm2DevSecSensePasswordMinLength OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Enable or disable to check if configured minimum password length is < 8 characters."
+   DEFVAL { enable }
+   ::= { hm2DevSecConfigGroup 7 }
+   
+hm2DevSecSensePasswordStrengthNotConfigured OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Enable or disable minimum password strength to check if
+       (1 uppercase, 1 lowercase, 1 number, 1 non-alphanumeric) is not configured."
+   DEFVAL { enable }   
+   ::= { hm2DevSecConfigGroup 8 }
+
+hm2DevSecSenseBypassPasswordStrength OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Enable or disable to check if at least one user is configured to bypass strength check."
+   DEFVAL { disable }
+   ::= { hm2DevSecConfigGroup 9 }
+
+hm2DevSecSenseTelnetEnabled OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Enable or disable to check if telnet is enabled on the switch."
+   DEFVAL { enable }
+   ::= { hm2DevSecConfigGroup 10 }
+
+hm2DevSecSenseHttpEnabled OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Enable or disable to check if HTTP is enabled on the switch."
+   DEFVAL { enable }   
+   ::= { hm2DevSecConfigGroup 11 }
+
+hm2DevSecSenseSnmpUnsecure OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Enable or disable to check if SNMP v1/v2 is enabled or v3 encryption is disabled."
+   DEFVAL { enable }
+   ::= { hm2DevSecConfigGroup 12 }
+
+hm2DevSecSenseSysmonEnabled OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Enable or disable to check if sysmon1 access is not disabled."
+   DEFVAL { disable }
+   ::= { hm2DevSecConfigGroup 13 }
+   
+hm2DevSecSenseExtNvmUpdateEnabled OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Enable or disable to check if external non-volatile memory update is not disabled."
+   DEFVAL { disable }
+   ::= { hm2DevSecConfigGroup 14 }
+
+hm2DevSecSenseNoLinkEnabled OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Enable or disable to check if at least one port has no link but admin state is up."
+   DEFVAL { disable }
+   ::= { hm2DevSecConfigGroup 15 }   
+
+hm2DevSecSenseHiDiscoveryEnabled OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Enable or disable to check if HiDiscovery is enabled and the mode is 'read-write'."
+   DEFVAL { enable }
+   ::= { hm2DevSecConfigGroup 16 }   
+
+hm2DevSecSenseExtNvmConfigLoadUnsecure OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Enable or disable to check if the configuration load from external NVM is unsecure.
+       (The configuration priority of the external NVM is set 
+       to 'first', 'second' or 'third' and the configuration encryption
+       is not active.)"
+   DEFVAL { enable }
+   ::= { hm2DevSecConfigGroup 17 }
+   
+hm2DevSecSenseIec61850MmsEnabled OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Enable or disable to check if IEC 61850 MMS is enabled on the switch."
+   DEFVAL { enable }
+   ::= { hm2DevSecConfigGroup 18 }
+
+hm2DevSecSenseHttpsCertificateWarning OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+       "Enable or disable to check for the presence of the auto generated self-signed HTTPS certificate."
+   DEFVAL { enable }
+   ::= { hm2DevSecConfigGroup 19 }
+
+hm2DevSecSenseModbusTcpEnabled OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Enable or disable to check if Modbus/TCP server is enabled on the switch."
+   DEFVAL { enable }
+   ::= { hm2DevSecConfigGroup 20 } 
+  
+hm2DevSecSenseEtherNetIpEnabled OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Enable or disable to check if EtherNet/IP protocol is enabled on the switch."
+   DEFVAL { enable }
+   ::= { hm2DevSecConfigGroup 21 } 
+   
+hm2DevSecSenseProfinetIOEnabled OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Enable or disable to check if ProfinetIO protocol is enabled on the switch."
+   DEFVAL { enable }
+   ::= { hm2DevSecConfigGroup 22 }
+   
+hm2DevSecSensePMLDisabled OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Enable or disable to check if Port MAC Locking is disabled on the switch."
+   DEFVAL { enable }   
+   ::= { hm2DevSecConfigGroup 23 }
+
+-- *************************************************************
+-- Device Security Interface Table
+-- *************************************************************
+hm2DevSecInterfaceTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2DevSecInterfaceEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "This table contains all variables to mask an alarm for the
+      signalling relay, produced by a link. The index for a link
+      corresponds with ifIndex. The table is also used
+      for the device monitoring configuration."
+   ::= { hm2DeviceSecurityGroup 2 }
+
+hm2DevSecInterfaceEntry OBJECT-TYPE
+   SYNTAX Hm2DevSecInterfaceEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "The entry of the hm2DevSecLinkTable."
+   INDEX { ifIndex }
+   ::= { hm2DevSecInterfaceTable 1 }
+
+Hm2DevSecInterfaceEntry ::= SEQUENCE {
+   hm2DevSecSenseIfNoLink HmEnabledStatus
+   }
+
+hm2DevSecSenseIfNoLink OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Port has no link but admin state is up"
+   DEFVAL { disable }
+   ::= { hm2DevSecInterfaceEntry 1 }
+
+-- *************************************************************
+-- Device Security Status Group
+-- *************************************************************
+hm2DevSecStatusTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2DevSecStatusEntry
+   MAX-ACCESS 		not-accessible
+   STATUS 			current
+   DESCRIPTION
+      "This table shows the current monitored entities in the hm2DevSecConfigGroup
+       for which there is a trap cause (hm2DevSecStatusTrapCause) active."
+   ::= { hm2DeviceSecurityGroup 10 }
+
+hm2DevSecStatusEntry OBJECT-TYPE
+   SYNTAX 		Hm2DevSecStatusEntry
+   MAX-ACCESS 	not-accessible
+   STATUS 		current
+   DESCRIPTION 
+      "The entry of the hm2DevSecStatusTable."
+   INDEX { hm2DevSecStatusIndex }
+   ::= { hm2DevSecStatusTable 1 }
+
+Hm2DevSecStatusEntry ::= SEQUENCE {
+   hm2DevSecStatusIndex             Integer32,
+   hm2DevSecStatusTimeStamp         HmTimeSeconds1970,
+   hm2DevSecStatusTrapCause 		INTEGER,
+   hm2DevSecStatusTrapCauseIndex	Integer32
+   }
+
+hm2DevSecStatusIndex OBJECT-TYPE
+   SYNTAX 		Integer32
+   MAX-ACCESS 	not-accessible
+   STATUS 		current
+   DESCRIPTION
+      "This index is used to identify the occured event."
+   ::= { hm2DevSecStatusEntry 1 }
+
+hm2DevSecStatusTimeStamp OBJECT-TYPE
+   SYNTAX 		HmTimeSeconds1970
+   MAX-ACCESS 	read-only
+   STATUS 		current
+   DESCRIPTION
+      "This attribute shows the local system time (hm2SystemLocalTime) of occuration the event."
+   ::= { hm2DevSecStatusEntry 2 }
+   
+hm2DevSecStatusTrapCause OBJECT-TYPE
+   SYNTAX   	INTEGER {
+      none(1),
+      password-change(10),
+      password-min-length(11),
+      password-policy-not-configured(12),
+      password-policy-inactive(13),
+      telnet-enabled(14),
+      http-enabled(15),
+      snmp-unsecure(16),
+      sysmon-enabled(17),
+      ext-nvm-update-enabled(18),
+      no-link(19),
+      hidisc-enabled(20),
+      ext-nvm-config-load-unsecure(21),
+      iec61850-mms-enabled(22),
+      https-certificate-warning(23),
+      modbus-tcp-enabled(24),
+      ethernet-ip-enabled(25),
+      profinet-io-enabled(26),
+      pml-disabled(29)
+      }
+   MAX-ACCESS 	read-only
+   STATUS 		current
+   DESCRIPTION
+      "This object identifies the cause for a trap. 
+       The index of the entity which produces the trap
+       is specified by hm2DevSecTrapCauseIndex."
+   ::= { hm2DevSecStatusEntry 3 }
+
+hm2DevSecStatusTrapCauseIndex OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "This attribute specifies the entity which produces the trap.
+       ext-nvm-update-enabled:	(1) sd, (2) usb, (3) serial (not supported yet)
+       no-link:					index of interface table
+       0: 						other errors."
+   ::= { hm2DevSecStatusEntry 4 }
+
+--
+-- *************************************************************
+-- Led Group
+-- *************************************************************
+--
+
+--
+-- *************************************************************
+-- hm2LedGlobalTable
+-- *************************************************************
+--
+hm2LedGlobalTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2LedGlobalEntry
+   MAX-ACCESS 		not-accessible
+   STATUS 			current
+   DESCRIPTION
+      "."
+   ::= { hm2DiagLedGroup 1 }
+
+hm2LedGlobalEntry OBJECT-TYPE
+   SYNTAX 		Hm2LedGlobalEntry
+   MAX-ACCESS	not-accessible
+   STATUS 		current
+   DESCRIPTION
+      "."
+   INDEX { hm2LedGlobalLedType }
+   ::= { hm2LedGlobalTable 1 }
+
+Hm2LedGlobalEntry ::= SEQUENCE {
+	   	hm2LedGlobalLedType		Hm2LedType,
+	   	hm2LedGlobalStatus		Hm2LedStatus
+   }
+
+hm2LedGlobalLedType 	OBJECT-TYPE
+   SYNTAX 			Hm2LedType
+   MAX-ACCESS 		not-accessible
+   STATUS 			current
+   DESCRIPTION
+      "."
+   ::= { hm2LedGlobalEntry 1 }
+
+hm2LedGlobalStatus 	OBJECT-TYPE
+   SYNTAX 			Hm2LedStatus
+   MAX-ACCESS 		read-only
+   STATUS 			current
+   DESCRIPTION
+      "."
+   ::= { hm2LedGlobalEntry 2 }
+
+--
+-- *************************************************************
+-- hm2LedPortTable
+-- *************************************************************
+--
+hm2LedPortTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2LedPortEntry
+   MAX-ACCESS 		not-accessible
+   STATUS 			current
+   DESCRIPTION
+      "."
+   ::= { hm2DiagLedGroup 2 }
+
+hm2LedPortEntry OBJECT-TYPE
+   SYNTAX 		Hm2LedPortEntry
+   MAX-ACCESS	not-accessible
+   STATUS 		current
+   DESCRIPTION
+      "."
+   INDEX { hm2IfacePhysIndex }
+   ::= { hm2LedPortTable 1 }
+
+Hm2LedPortEntry ::= SEQUENCE {
+	   	hm2LedPortStatus		Hm2LedStatus,
+	   	hm2LedPortPoeStatus		Hm2LedStatus,
+	   	hm2LedPortSignaling     HmEnabledStatus
+   }
+
+hm2LedPortStatus 	OBJECT-TYPE
+   SYNTAX 			Hm2LedStatus
+   MAX-ACCESS 		read-only
+   STATUS 			current
+   DESCRIPTION
+      "."
+   ::= { hm2LedPortEntry 1 }
+
+hm2LedPortPoeStatus OBJECT-TYPE
+   SYNTAX 			Hm2LedStatus
+   MAX-ACCESS 		read-only
+   STATUS 			current
+   DESCRIPTION
+      "."
+   ::= { hm2LedPortEntry 2 }
+   
+hm2LedPortSignaling OBJECT-TYPE
+   SYNTAX 			HmEnabledStatus
+   MAX-ACCESS 		read-write
+   STATUS 			current
+   DESCRIPTION
+      "Enable for LED port signaling."
+   DEFVAL  { disable } 
+   ::= { hm2LedPortEntry 3 }
+   
+--
+-- *************************************************************
+-- hm2LedControlGroup
+-- *************************************************************
+--
+hm2LedControlGroup						OBJECT IDENTIFIER ::= { hm2DiagLedGroup 3 }
+
+hm2LedPortMode 	OBJECT-TYPE
+   SYNTAX 					INTEGER {
+         			  			portpanel (0),
+                     			servicepanel (1)
+                  			  }
+   MAX-ACCESS 		read-write
+   STATUS 			current
+   DESCRIPTION
+      "Switch LED signalling between the port LEDs on front side (port panel) and 
+	   the port LEDs on the back side (service panel) of the device."
+   DEFVAL  { servicepanel } 
+   ::= { hm2LedControlGroup 1 }
+ 
+-- *************************************************************
+-- hm2DiagIfaceUtilizationTable
+-- *************************************************************
+
+hm2DiagIfaceUtilizationTable   OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2DiagIfaceUtilizationEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+       "This table contains variables for each interface of
+       the switch."
+   ::= { hm2DiagIfaceUtilizationGroup 1 }
+
+hm2DiagIfaceUtilizationEntry     OBJECT-TYPE
+   SYNTAX Hm2DiagIfaceUtilizationEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "The entry of the hm2DiagIfaceUtilizationTable."
+   INDEX { ifIndex }
+   ::= { hm2DiagIfaceUtilizationTable 1 }
+
+Hm2DiagIfaceUtilizationEntry ::= SEQUENCE {
+   hm2DiagIfaceUtilization Integer32,
+   hm2DiagIfaceUtilizationControlInterval Integer32,
+   hm2DiagIfaceUtilizationAlarmLowerThreshold Integer32,
+   hm2DiagIfaceUtilizationAlarmUpperThreshold Integer32,
+   hm2DiagIfaceUtilizationAlarmCondition TruthValue
+   }
+
+hm2DiagIfaceUtilization OBJECT-TYPE
+   SYNTAX Integer32 (0..10000)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+       "The best estimate of the mean physical layer
+       network utilization on this interface during the 
+       last sampling interval, in hundredth of one percent.
+       The first historyControlInterval (rfc1757) of this
+       interface is used as sampling interval."
+   DEFVAL { 0 }
+   ::= { hm2DiagIfaceUtilizationEntry 1 }
+
+hm2DiagIfaceUtilizationControlInterval    OBJECT-TYPE
+   SYNTAX Integer32 (1..3600)
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "The interval in seconds over which the data is
+      sampled for hm2DiagIfaceUtilization.
+      This interval can be any number of seconds
+      between 1 and 3600 (1 hour).
+      The first historyControlInterval (rfc1757) of this
+      interface is used as sampling interval."
+   DEFVAL { 30 }
+   ::= { hm2DiagIfaceUtilizationEntry 2 }
+
+hm2DiagIfaceUtilizationAlarmLowerThreshold OBJECT-TYPE
+   SYNTAX Integer32 (0..10000)
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+        "Surveys the interface utilization hm2DiagIfaceUtilization and
+         generates an alarm for this interfaces, if  
+         the utilization value is below the given limit.
+         A value of 0 disables the alarm generation."
+   DEFVAL { 0 }
+   ::= { hm2DiagIfaceUtilizationEntry 3 }
+
+hm2DiagIfaceUtilizationAlarmUpperThreshold OBJECT-TYPE
+   SYNTAX Integer32 (0..10000)
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+        "Surveys the interface utilization hm2DiagIfaceUtilization and
+         generates an alarm for this interfaces, if the given
+         limit is exceeded. 
+         A value of 0 disables the alarm generation."
+   DEFVAL { 0 }
+   ::= { hm2DiagIfaceUtilizationEntry 4 }
+
+
+hm2DiagIfaceUtilizationAlarmCondition OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+        "The alarm condition is given (true), if the given
+         hm2DiagIfaceUtilizationAlarmUpperThreshold limit is exceeded 
+         by the interface utilization or if the utilization value falls below 
+         hm2DiagIfaceUtilizationAlarmLowerThreshold limit. 
+         The alarm condition will be removed, when the interface utilization 
+         value falls in between hm2DiagIfaceUtilizationAlarmLowerThreshold 
+         hm2DiagIfaceUtilizationAlarmUpperThreshold."
+   
+   ::= { hm2DiagIfaceUtilizationEntry 5 }
+
+-- *************************************************************
+-- hm2DiagEgressIfaceUtilizationTable
+-- *************************************************************
+
+hm2DiagEgressIfaceUtilizationTable   OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2DiagEgressIfaceUtilizationEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+       "This table contains egress variables for each interface of
+       the switch."
+   ::= { hm2DiagIfaceUtilizationGroup 2 }
+
+hm2DiagEgressIfaceUtilizationEntry     OBJECT-TYPE
+   SYNTAX Hm2DiagEgressIfaceUtilizationEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "The entry of the hm2DiagEgressIfaceUtilizationTable."
+   INDEX { ifIndex }
+   ::= { hm2DiagEgressIfaceUtilizationTable 1 }
+
+Hm2DiagEgressIfaceUtilizationEntry ::= SEQUENCE {
+   hm2DiagEgressIfaceUtilization Integer32,
+   hm2DiagEgressIfaceUtilizationControlInterval Integer32,
+   hm2DiagEgressIfaceUtilizationAlarmLowerThreshold Integer32,
+   hm2DiagEgressIfaceUtilizationAlarmUpperThreshold Integer32,
+   hm2DiagEgressIfaceUtilizationAlarmCondition TruthValue
+   }
+
+hm2DiagEgressIfaceUtilization OBJECT-TYPE
+   SYNTAX Integer32 (0..10000)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+       "The best estimate of the mean physical layer
+       network egress utilization on this interface during the
+       last sampling interval, in hundredth of one percent.
+       The first historyControlInterval (rfc1757) of this
+       interface is used as sampling interval."
+   DEFVAL { 0 }
+   ::= { hm2DiagEgressIfaceUtilizationEntry 1 }
+
+hm2DiagEgressIfaceUtilizationControlInterval    OBJECT-TYPE
+   SYNTAX Integer32 (1..3600)
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "The interval in seconds over which the egress data is
+      sampled for hm2DiagEgressIfaceUtilization.
+      This interval can be any number of seconds
+      between 1 and 3600 (1 hour).
+      The first historyControlInterval (rfc1757) of this
+      interface is used as sampling interval."
+   DEFVAL { 30 }
+   ::= { hm2DiagEgressIfaceUtilizationEntry 2 }
+
+hm2DiagEgressIfaceUtilizationAlarmLowerThreshold OBJECT-TYPE
+   SYNTAX Integer32 (0..10000)
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+        "Surveys the egress interface utilization hm2DiagEgressIfaceUtilization and
+         generates an alarm for this interface, if
+         the utilization value is below the given limit.
+         A value of 0 disables the alarm generation."
+   DEFVAL { 0 }
+   ::= { hm2DiagEgressIfaceUtilizationEntry 3 }
+
+hm2DiagEgressIfaceUtilizationAlarmUpperThreshold OBJECT-TYPE
+   SYNTAX Integer32 (0..10000)
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+        "Surveys the egress interface utilization hm2DiagEgressIfaceUtilization and
+         generates an alarm for this interface, if the given
+         limit is exceeded.
+         A value of 0 disables the alarm generation."
+   DEFVAL { 0 }
+   ::= { hm2DiagEgressIfaceUtilizationEntry 4 }
+
+
+hm2DiagEgressIfaceUtilizationAlarmCondition OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+        "The alarm condition is given (true), if the given
+         hm2DiagEgressIfaceUtilizationAlarmUpperThreshold limit is exceeded 
+         by the egress interface utilization or if the utilization value falls below 
+         hm2DiagEgressIfaceUtilizationAlarmLowerThreshold limit. 
+         The alarm condition will be removed, when the egress interface utilization 
+         value falls in between hm2DiagEgressIfaceUtilizationAlarmLowerThreshold 
+         hm2DiagEgressIfaceUtilizationAlarmUpperThreshold."
+
+   ::= { hm2DiagEgressIfaceUtilizationEntry 5 }
+
+
+--
+-- *************************************************************
+-- Cable Tester Group
+-- *************************************************************
+--
+
+hm2DiagCableTesterStatus OBJECT-TYPE
+   SYNTAX     INTEGER {
+         active(1),
+         success(2),
+         failure(3),
+         uninitialized(4)
+         }
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+         "Status of the Virtual Cable Tester
+          active(1)        - Cable testing is in progress.  
+                             Set to this value to start the test.
+          success(2)       - A successful test was performed.  
+                             Cannot be set.
+          failure(3)       - A failure was encountered during the test.
+                             Cannot be set.
+          uninitialized(4) - No test has been performed yet. 
+                             Cannot be set."
+   DEFVAL { uninitialized }
+   ::= { hm2DiagCableTesterGroup 1 }
+
+hm2DiagCableTesterIfIndex OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+         "Determines on which port to perform the cable test.  
+          Limited to copper based ports."
+   DEFVAL { 0 }
+   ::= { hm2DiagCableTesterGroup 2 }
+
+hm2DiagCableTesterCableTable   OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2DiagCableTesterCableEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+         "This table contains variables for each pair of
+          the cable."
+   ::= { hm2DiagCableTesterGroup 10 }
+
+hm2DiagCableTesterCableEntry     OBJECT-TYPE
+   SYNTAX      Hm2DiagCableTesterCableEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION "The entry of the hm2DiagCableTesterCableTable."
+   INDEX { hm2DiagCableTesterCablePair }
+   ::= { hm2DiagCableTesterCableTable 1 }
+
+Hm2DiagCableTesterCableEntry ::= SEQUENCE {
+   hm2DiagCableTesterCablePair Integer32,
+   hm2DiagCableTesterCableStatus INTEGER,
+   hm2DiagCableTesterCableMinimumLength Unsigned32,
+   hm2DiagCableTesterCableMaximumLength Unsigned32,
+   hm2DiagCableTesterCableFailureLocation Unsigned32
+   }
+
+hm2DiagCableTesterCablePair OBJECT-TYPE
+   SYNTAX      Integer32 (1..4)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+         "Index of the hm2DiagCableTesterCableTable.
+          If a PHY does not support the measurement per pair, 
+          the first index is used to show the values."
+   ::= { hm2DiagCableTesterCableEntry 1 }
+      
+hm2DiagCableTesterCableStatus OBJECT-TYPE
+   SYNTAX      INTEGER {
+         normal(1),
+         open(2),
+         short(3),
+         unknown(4)
+         }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+         "Indicates the results of the Cable Test.
+          normal(1)        - The cable is working correctly.
+          open(2)          - The cable is disconnected or there is a faulty
+                             connector.
+          short(3)         - There is an electrical short in the cable.
+          unknown(4)       - No test has been performed yet, or a test is
+                             currently in progress."
+   DEFVAL { unknown }
+   ::= { hm2DiagCableTesterCableEntry 2 }
+
+hm2DiagCableTesterCableMinimumLength OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+         "The estimated length of the cable in meters.  This value
+          indicates the shortest length estimated.  This object will
+          return 0 if hm2DiagCableTesterStatus is not success(2) or the cable
+          length is unknown."
+   DEFVAL { 0 }
+   ::= { hm2DiagCableTesterCableEntry 3 }
+
+hm2DiagCableTesterCableMaximumLength OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+         "The estimated length of the cable in meters.  This value
+          indicates the longest length estimated.  This object will
+          return 0 if hm2DiagCableTesterStatus is not success(2) or the cable
+          length is unknown."
+   DEFVAL { 0 }
+   ::= { hm2DiagCableTesterCableEntry 4 }
+
+hm2DiagCableTesterCableFailureLocation OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+         "The estimated distance in meters from the end of the cable to
+          the failure location.  This object will return 0 if
+          hm2DiagCableTesterStatus is not success(2)."
+   DEFVAL { 0 }
+   ::= { hm2DiagCableTesterCableEntry 5 }
+         
+   
+--
+-- *************************************************************
+-- hm2PortMonitorGroup
+-- *************************************************************
+--
+
+--hm2PortMonitorGroup		OBJECT IDENTIFIER ::= { hm2ConfigurationMibs 0 }
+
+hm2PortMonitorAdminMode	OBJECT-TYPE
+			SYNTAX			TruthValue
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION
+			"Global switch to enable / disable the port state actions,
+			which are performed if a condition becomes true"
+			DEFVAL			{ false }
+			::= { hm2PortMonitorGroup 1 }
+
+hm2PortMonitorIntfTable	OBJECT-TYPE
+			SYNTAX			SEQUENCE OF Hm2PortMonitorIntfEntry
+			MAX-ACCESS		not-accessible
+			STATUS			current
+			DESCRIPTION
+			"Port state mode interface table."
+			::= { hm2PortMonitorGroup 2 }
+
+hm2PortMonitorIntfEntry	OBJECT-TYPE
+			SYNTAX			Hm2PortMonitorIntfEntry
+			MAX-ACCESS		not-accessible
+			STATUS			current
+			DESCRIPTION
+			"Port state mode interface entry."
+			INDEX			{ ifIndex }
+			::= { hm2PortMonitorIntfTable 1 }
+
+Hm2PortMonitorIntfEntry ::=
+			SEQUENCE		{				
+					hm2PortMonitorIntfReset	TruthValue,
+					hm2PortMonitorIntfAction	INTEGER
+					}
+
+
+
+hm2PortMonitorIntfReset	OBJECT-TYPE
+			SYNTAX			TruthValue
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION
+			"Port monitor interface reset."
+			DEFVAL			{ false }
+			::= { hm2PortMonitorIntfEntry 2 }
+
+hm2PortMonitorIntfAction	OBJECT-TYPE
+			SYNTAX			INTEGER {
+							port-disable(1),
+							trap-only (2),
+							auto-disable(3)
+							}
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION
+			"Interface link disable state."
+			DEFVAL			{ auto-disable }
+			::= { hm2PortMonitorIntfEntry 3 }
+
+
+
+hm2PortMonitorConditionGroup	OBJECT IDENTIFIER ::= { hm2PortMonitorGroup 3 }
+
+hm2KbpsUnitTrafficTypeInvalid OBJECT-IDENTITY
+			STATUS        current
+			DESCRIPTION   "Interface {0}: 'Kbps' unit can only be used for traffic type 'all'."
+			 ::= { hm2PortMonitorGroup 4}
+
+hm2PortMonitorConditionIntfTable	OBJECT-TYPE
+			SYNTAX			SEQUENCE OF Hm2PortMonitorConditionIntfEntry
+			MAX-ACCESS		not-accessible
+			STATUS			current
+			DESCRIPTION
+			"Port state condition interface table."
+			::= { hm2PortMonitorConditionGroup 1 }
+
+hm2PortMonitorConditionIntfEntry	OBJECT-TYPE
+			SYNTAX			Hm2PortMonitorConditionIntfEntry
+			MAX-ACCESS		not-accessible
+			STATUS			current
+			DESCRIPTION
+			"Port state action interface entry."
+			INDEX			{ ifIndex }
+			::= { hm2PortMonitorConditionIntfTable 1 }
+			
+Hm2PortMonitorConditionIntfEntry ::=
+			SEQUENCE		{
+				hm2PortMonitorConditionField BITS,
+				hm2PortMonitorConditionLinkFlapMode TruthValue,
+				hm2PortMonitorConditionCrcFragmentsMode TruthValue,
+				hm2PortMonitorConditionDuplexMismatchDetectionMode TruthValue,
+				hm2PortMonitorConditionOverloadDetectionMode TruthValue,				
+				hm2PortMonitorConditionSpeedDuplexMode		 TruthValue
+					}
+
+hm2PortMonitorConditionField				OBJECT-TYPE
+		   	SYNTAX      		BITS {
+		   					none(0),
+		   					link-flap(1),
+		   					crcFragments(2),
+		   					duplexMismatch(3),
+		   					overload-detection(4),
+    	               		speed-duplex (5)}
+			MAX-ACCESS		read-only
+			STATUS			current
+			DESCRIPTION
+			"Condition type field."
+			::= { hm2PortMonitorConditionIntfEntry 1 }
+
+hm2PortMonitorConditionLinkFlapMode			OBJECT-TYPE
+			SYNTAX			TruthValue
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION
+			"Interface link flap mode."
+			DEFVAL			{ false }
+			::= { hm2PortMonitorConditionIntfEntry 2 }
+
+hm2PortMonitorConditionCrcFragmentsMode		OBJECT-TYPE
+			SYNTAX			TruthValue
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION
+			"Interface CrcFragments mode."
+			DEFVAL			{ false }
+			::= { hm2PortMonitorConditionIntfEntry 3 }
+			
+hm2PortMonitorConditionDuplexMismatchDetectionMode OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"Interface duplex mismatch detection mode."
+			DEFVAL { false }
+			::= { hm2PortMonitorConditionIntfEntry 4 }
+
+hm2PortMonitorConditionOverloadDetectionMode		OBJECT-TYPE
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"Interface Overload Detection mode."
+		DEFVAL			{ false }
+	::= { hm2PortMonitorConditionIntfEntry 5 }
+			
+hm2PortMonitorConditionSpeedDuplexMode		OBJECT-TYPE
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"Interface Speed and Duplex monitor mode."
+		DEFVAL			{ false }
+	::= { hm2PortMonitorConditionIntfEntry 6 }
+	
+hm2PortMonitorConditionLinkFlapGroup	OBJECT IDENTIFIER ::= { hm2PortMonitorConditionGroup 2 }
+
+hm2PortMonitorConditionLinkFlapIntfTable	OBJECT-TYPE
+			SYNTAX			SEQUENCE OF Hm2PortMonitorConditionLinkFlapIntfEntry
+			MAX-ACCESS		not-accessible
+			STATUS			current
+			DESCRIPTION
+			"Port condition link flap interface table."
+			::= { hm2PortMonitorConditionLinkFlapGroup 1 }
+
+hm2PortMonitorConditionLinkFlapIntfEntry	OBJECT-TYPE
+			SYNTAX			Hm2PortMonitorConditionLinkFlapIntfEntry
+			MAX-ACCESS		not-accessible
+			STATUS			current
+			DESCRIPTION
+			"Port condition link flap interface entry."
+			INDEX			{ ifIndex }
+			::= { hm2PortMonitorConditionLinkFlapIntfTable 1 }
+
+Hm2PortMonitorConditionLinkFlapIntfEntry ::=
+			SEQUENCE		{					
+					hm2PortMonitorConditionLinkFlapInterval Integer32,
+					hm2PortMonitorConditionLinkFlapCount Integer32,
+					hm2PortMonitorConditionLinkFlapCountInterval Integer32,
+					hm2PortMonitorConditionLinkFlapCountTotal Integer32
+					}
+
+hm2PortMonitorConditionLinkFlapInterval		OBJECT-TYPE
+			SYNTAX			Integer32(1..180)
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION
+			"Measure interval in seconds (1-180s) for link flap detection."
+			DEFVAL			{ 10 }
+			::= { hm2PortMonitorConditionLinkFlapIntfEntry 1 }
+
+hm2PortMonitorConditionLinkFlapCount	OBJECT-TYPE
+			SYNTAX			Integer32(1..100)
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION
+			"Link flap counter (1-100)."
+			DEFVAL			{ 5 }
+			::= { hm2PortMonitorConditionLinkFlapIntfEntry 2 }
+			
+hm2PortMonitorConditionLinkFlapCountInterval	OBJECT-TYPE
+			SYNTAX			Integer32
+			MAX-ACCESS		read-only
+			STATUS			current
+			DESCRIPTION
+			"Link flap count that occured in last interval."
+			::= { hm2PortMonitorConditionLinkFlapIntfEntry 3 }
+
+hm2PortMonitorConditionLinkFlapCountTotal	OBJECT-TYPE
+			SYNTAX			Integer32
+			MAX-ACCESS		read-only
+			STATUS			current
+			DESCRIPTION
+			"Total link flap count."
+			::= { hm2PortMonitorConditionLinkFlapIntfEntry 4 }
+
+	
+hm2PortMonitorConditionCrcFragmentsGroup	OBJECT IDENTIFIER ::= { hm2PortMonitorConditionGroup 3 }
+
+hm2PortMonitorConditionCrcFragmentsIntfTable	OBJECT-TYPE
+			SYNTAX			SEQUENCE OF Hm2PortMonitorConditionCrcFragmentsIntfEntry
+			MAX-ACCESS		not-accessible
+			STATUS			current
+			DESCRIPTION
+			"Port condition CrcFragments interface table."
+			::= { hm2PortMonitorConditionCrcFragmentsGroup 1 }
+
+hm2PortMonitorConditionCrcFragmentsIntfEntry	OBJECT-TYPE
+			SYNTAX			Hm2PortMonitorConditionCrcFragmentsIntfEntry
+			MAX-ACCESS		not-accessible
+			STATUS			current
+			DESCRIPTION
+			"Port condition CrcFragments interface entry."
+			INDEX			{ ifIndex }
+			::= { hm2PortMonitorConditionCrcFragmentsIntfTable 1 }
+
+Hm2PortMonitorConditionCrcFragmentsIntfEntry ::=
+			SEQUENCE		{
+					hm2PortMonitorConditionCrcFragmentsInterval Integer32,
+					hm2PortMonitorConditionCrcFragmentsCount Integer32,
+					hm2PortMonitorConditionCrcFragmentsCountInterval Integer32,
+					hm2PortMonitorConditionCrcFragmentsCountTotal Integer32
+					}
+hm2PortMonitorConditionCrcFragmentsInterval		OBJECT-TYPE
+			SYNTAX			Integer32(5..180)
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION
+			"Measure interval in seconds (5-180s) for CrcFragments detection."
+			DEFVAL			{ 10 }
+			::= { hm2PortMonitorConditionCrcFragmentsIntfEntry 1 }
+
+hm2PortMonitorConditionCrcFragmentsCount		OBJECT-TYPE
+			SYNTAX			Integer32(1..1000000)
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION
+			"CrcFragments counter (1-1000000)."
+			DEFVAL			{ 1000 }
+			::= { hm2PortMonitorConditionCrcFragmentsIntfEntry 2 }
+
+hm2PortMonitorConditionCrcFragmentsCountInterval	OBJECT-TYPE
+			SYNTAX			Integer32
+			MAX-ACCESS		read-only
+			STATUS			current
+			DESCRIPTION
+			"CrcFragments count that occured in last interval."
+			::= { hm2PortMonitorConditionCrcFragmentsIntfEntry 3 }
+
+hm2PortMonitorConditionCrcFragmentsCountTotal	OBJECT-TYPE
+			SYNTAX			Integer32
+			MAX-ACCESS		read-only
+			STATUS			current
+			DESCRIPTION
+			"Total CrcFragments count."
+			::= { hm2PortMonitorConditionCrcFragmentsIntfEntry 4 }
+
+
+			
+hm2PortMonitorConditionOverloadDetectionGroup	OBJECT IDENTIFIER ::= { hm2PortMonitorConditionGroup 4 }
+
+
+hm2PortMonitorConditionOvldDetIntfTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF Hm2PortMonitorConditionOvldDetIntfEntry
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+			"Port condition overload detection interface table."
+	::= { hm2PortMonitorConditionOverloadDetectionGroup 1 }
+
+hm2PortMonitorConditionOvldDetIntfEntry	OBJECT-TYPE
+		SYNTAX			Hm2PortMonitorConditionOvldDetIntfEntry
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+				"Port condition overload detection interface entry."
+		INDEX			{ ifIndex }
+	::= { hm2PortMonitorConditionOvldDetIntfTable 1 }
+	
+	
+	Hm2PortMonitorConditionOvldDetIntfEntry ::= SEQUENCE		
+	{
+	hm2PortMonitorConditionOvldDetTrfcType 			INTEGER,
+	hm2PortMonitorConditionOvldDetTholdType 			INTEGER,
+	hm2PortMonitorConditionOvldDetLwrTholdVal 	Integer32,
+	hm2PortMonitorConditionOvldDetUprTholdVal 	Integer32,
+	hm2PortMonitorConditionOvldDetIntvl 				Integer32,
+	hm2PortMonitorConditionOvldDetPkgCntAll 			Integer32,
+	hm2PortMonitorConditionOvldDetPkgCntBC 	Integer32,
+	hm2PortMonitorConditionOvldDetPkgCntMC 	Integer32,
+	hm2PortMonitorConditionOvldDetPkgCntKbit 			Integer32
+	}
+
+
+hm2PortMonitorConditionOvldDetTrfcType 	OBJECT-TYPE
+		SYNTAX 		INTEGER{
+							all (1),
+					 		bc (2),
+					 		bc-mc (3)
+							}
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"Overload detection condition traffic type."
+		DEFVAL			{ bc }
+	::= { hm2PortMonitorConditionOvldDetIntfEntry 1 }
+
+hm2PortMonitorConditionOvldDetTholdType 	OBJECT-TYPE
+			SYNTAX 		INTEGER{
+						pps(1),
+						kbps(2)
+						}
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"Overload detection conditon threshold type."
+		DEFVAL			{ pps }
+	::= { hm2PortMonitorConditionOvldDetIntfEntry 2 }
+
+hm2PortMonitorConditionOvldDetLwrTholdVal 	OBJECT-TYPE
+		SYNTAX			Integer32 (0..10000000)
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"Overload detection condition lower threshold value."
+		DEFVAL			{ 0 }
+	::= { hm2PortMonitorConditionOvldDetIntfEntry 3 }
+
+
+hm2PortMonitorConditionOvldDetUprTholdVal 	OBJECT-TYPE
+		SYNTAX			Integer32 (0..10000000)
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"Overload detection condition upper threshold value."
+		DEFVAL			{ 0 }
+	::= { hm2PortMonitorConditionOvldDetIntfEntry 4 }
+			
+hm2PortMonitorConditionOvldDetIntvl 		OBJECT-TYPE
+		SYNTAX			Integer32(1..20)
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"Measure interval in seconds (1-20s) for overload detection."
+		DEFVAL			{ 1 }
+	::= { hm2PortMonitorConditionOvldDetIntfEntry 5 }			
+	
+
+hm2PortMonitorConditionOvldDetPkgCntAll 	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"All package count from last interval."
+		DEFVAL			{ 0 }
+	::= { hm2PortMonitorConditionOvldDetIntfEntry 6}
+
+
+hm2PortMonitorConditionOvldDetPkgCntBC 	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Broadcast package count from last interval."
+		DEFVAL			{ 0 }
+	::= { hm2PortMonitorConditionOvldDetIntfEntry 7}
+	
+hm2PortMonitorConditionOvldDetPkgCntMC   	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Overload detection condition lower threshold value."
+		DEFVAL			{ 0 }
+	::= { hm2PortMonitorConditionOvldDetIntfEntry 8}	
+
+hm2PortMonitorConditionOvldDetPkgCntKbit   	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Overload detection condition lower threshold value."
+		DEFVAL			{ 0 }
+	::= { hm2PortMonitorConditionOvldDetIntfEntry 9}		
+
+
+hm2PortMonitorConditionSpeedDuplexGroup	OBJECT IDENTIFIER ::= { hm2PortMonitorConditionGroup 5 }
+
+
+hm2PortMonitorConditionSpeedDuplexTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF Hm2PortMonitorConditionSpeedDuplexEntry
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+			"Port condition speed-duplex interface table."
+	::= { hm2PortMonitorConditionSpeedDuplexGroup 1 }
+
+hm2PortMonitorConditionSpeedDuplexEntry	OBJECT-TYPE
+		SYNTAX			Hm2PortMonitorConditionSpeedDuplexEntry
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+				"Port condition speed-duplex interface entry."
+		INDEX			{ ifIndex }
+	::= { hm2PortMonitorConditionSpeedDuplexTable 1 }
+	
+	
+Hm2PortMonitorConditionSpeedDuplexEntry ::= SEQUENCE {
+	hm2PortMonitorConditionSpeedDuplexValue 			BITS
+}
+    
+hm2PortMonitorConditionSpeedDuplexValue  	OBJECT-TYPE
+	SYNTAX			BITS  {
+						hdx-10(0),
+						fdx-10(1),
+						hdx-100(2),
+						fdx-100(3),
+						hdx-1000(4),
+						fdx-1000(5),
+						fdx-2500(6),
+						fdx-10000(7)
+						}
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION
+		"Speed and duplex combination allowed by port-monitor."
+	DEFVAL			{{ hdx-10, fdx-10, hdx-100, fdx-100, hdx-1000, fdx-1000, fdx-2500, fdx-10000 }}
+::= { hm2PortMonitorConditionSpeedDuplexEntry 1} 
+	
+-- **************************************************************************
+-- *																		*
+-- *	System Resources including CPU, memory, network						*
+-- *																		*
+-- **************************************************************************
+
+hm2DiagEnableMeasurement OBJECT-TYPE
+	SYNTAX		HmEnabledStatus
+	MAX-ACCESS  read-write
+    STATUS  	current
+    DESCRIPTION
+            "Enable or disable the resources measurement If disabled, the
+             task - needed for measurement - is also deleted."
+	DEFVAL  { enable }
+    ::= { hm2DiagResourcesGroup 1 }
+
+-- 
+-- ***********************************************************
+-- 
+--                  C P U    R E S O U R C E S 
+-- 
+-- *********************************************************** 
+--
+hm2DiagCpuResourcesGroup           	   OBJECT IDENTIFIER ::= { hm2DiagResourcesGroup 10 }
+
+hm2DiagCpuUtilization OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    UNITS		"percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current cpu utilization of the device in percent."
+
+    ::= { hm2DiagCpuResourcesGroup 1 }
+
+hm2DiagCpuAverageUtilization OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    UNITS		"percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The average cpu utilization of the device in percent,
+             max. measured over the last 30 minutes."
+ 
+    ::= { hm2DiagCpuResourcesGroup 2 }
+
+hm2DiagCpuRunningProcesses OBJECT-TYPE
+    SYNTAX      Integer32 (0..32768)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current number of processes running."
+
+    ::= { hm2DiagCpuResourcesGroup 3 }
+
+hm2DiagCpuMaxRunningProcesses OBJECT-TYPE
+    SYNTAX      Integer32 (0..32768)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The maximum number of processes running, max. since
+             the last 30 minutes." 
+ 
+    ::= { hm2DiagCpuResourcesGroup 4 }
+
+-- 
+-- ***********************************************************
+-- 
+--               M E M O R Y    R E S O U R C E S 
+-- 
+-- *********************************************************** 
+--
+hm2DiagMemoryResourcesGroup	           OBJECT IDENTIFIER ::= { hm2DiagResourcesGroup 11 }
+
+hm2DiagMemoryRamAllocated OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    UNITS		"kBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current allocated RAM of the device in kBytes."
+
+    ::= { hm2DiagMemoryResourcesGroup 1 }
+
+hm2DiagMemoryRamFree OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    UNITS		"kBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current free RAM of the device in kBytes."
+ 
+    ::= { hm2DiagMemoryResourcesGroup 2 }
+
+hm2DiagMemoryRamAllocatedAverage OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    UNITS		"kBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The average allocated RAM of the device in kBytes,
+             measured over the last 30 minutes."
+
+    ::= { hm2DiagMemoryResourcesGroup 3 }
+
+hm2DiagMemoryRamFreeAverage OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    UNITS		"kBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The average free RAM of the device in kBytes,
+             measured over the last 30 minutes."
+   
+    ::= { hm2DiagMemoryResourcesGroup 4 }
+
+hm2DiagMemoryRawFlashMainAllocated OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    UNITS		"kBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current allocated flash memory for the main 
+			 software image in kBytes."
+   
+    ::= { hm2DiagMemoryResourcesGroup 10 }
+	
+hm2DiagMemoryRawFlashMainFree OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    UNITS		"kBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current free flash memory for the main 
+			 software image in kBytes."
+   
+    ::= { hm2DiagMemoryResourcesGroup 11 }
+
+hm2DiagMemoryFlashFileSystemAllocated OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    UNITS		"kBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current allocated memory within the flash 
+			 file system in kBytes."
+   
+    ::= { hm2DiagMemoryResourcesGroup 12 }
+	
+hm2DiagMemoryFlashFileSystemFree OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    UNITS		"kBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current free memory within the flash 
+			 file system in kBytes."
+   
+    ::= { hm2DiagMemoryResourcesGroup 13 }
+	
+-- 
+-- ***********************************************************
+-- 
+--             N E T W O R K    R E S O U R C E S 
+-- 
+-- *********************************************************** 
+--
+hm2DiagNetworkResourcesGroup           OBJECT IDENTIFIER ::= { hm2DiagResourcesGroup 12 } 
+
+hm2DiagNetworkCpuIfUtilization OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    UNITS		"precent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current network utilization of the internal cpu interface in percent."
+
+    ::= { hm2DiagNetworkResourcesGroup 1 }
+
+hm2DiagNetworkCpuIfAverageUtilization OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    UNITS		"precent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The average network utilization of the internal cpu interface in percent,
+             measured over the last 30 minutes."
+ 
+    ::= { hm2DiagNetworkResourcesGroup 2 }  
+
+-- 
+-- ***********************************************************
+-- hm2DiagnosticMibNotifications
+-- ***********************************************************
+--
+
+hm2SigConStateChangeTrap NOTIFICATION-TYPE
+		OBJECTS  { 
+					hm2SigConID,
+					hm2SigConOperState, 
+					hm2SigConTrapCause, 
+					hm2SigConTrapCauseIndex 
+		  		 }
+		STATUS  current
+		DESCRIPTION
+			"This trap is sent if the value of hm2SigConState changes its value."
+		::= { hm2DiagnosticMibNotifications 1 }
+
+hm2DevMonStateChangeTrap NOTIFICATION-TYPE
+		OBJECTS  { 
+					hm2DevMonID,
+					hm2DevMonOperState, 
+					hm2DevMonTrapCause, 
+					hm2DevMonTrapCauseIndex 
+				 }
+		STATUS  current
+		DESCRIPTION
+			"This trap is sent if the value of hm2DevMonState changes its value."
+		::= { hm2DiagnosticMibNotifications 2 }
+
+
+hm2DevSecStateChangeTrap NOTIFICATION-TYPE
+		OBJECTS {
+					hm2DevSecOperState,
+					hm2DevSecTrapCause,
+					hm2DevSecTrapCauseIndex
+				}
+		STATUS  current
+		DESCRIPTION
+			"This trap is sent if the value of hm2DevSecState changes its value."
+		::= { hm2DiagnosticMibNotifications 3 }
+
+hm2DiagSelftestActionTrap NOTIFICATION-TYPE
+		OBJECTS		{ hm2DiagSelftestActionCause }
+		STATUS		current
+		DESCRIPTION	
+			"This trap is sent if a self-test action is performed and
+			hm2DiagSelftestAction is configured to sendTrap(2)."
+		::= { hm2DiagnosticMibNotifications 4 }
+
+-- *************************************************************
+-- hm2DiagIfaceUtilization notifications
+-- *************************************************************
+hm2DiagIfaceUtilizationTrap NOTIFICATION-TYPE
+   OBJECTS { 
+      hm2DiagIfaceUtilization,
+      hm2DiagIfaceUtilizationAlarmCondition
+      }
+   STATUS  current
+   DESCRIPTION "This trap is sent if the value of hm2DiagIfaceUtilization 
+      exceeds or falls back below the interface utilization thresholds
+      hm2DiagIfaceUtilizationAlarmConditionThreshold and 
+      hm2DiagIfaceUtilizationAlarmRemovalThreshold."
+   ::= { hm2DiagnosticMibNotifications 5 }
+   
+-- *************************************************************
+-- hm2PortMonitorPortTrap 
+-- *************************************************************
+
+	hm2PortMonitorPortTrap NOTIFICATION-TYPE
+	OBJECTS  { ifIndex, 
+			   hm2PortMonitorConditionField
+			 }
+		STATUS current
+		DESCRIPTION
+		"This trap is sent if the a port has been disabled by port disable action by port monitor."
+		::= { hm2DiagnosticMibNotifications 6 }   
+
+-- *************************************************************
+-- hm2DiagEgressIfaceUtilization notifications
+-- *************************************************************
+hm2DiagEgressIfaceUtilizationTrap NOTIFICATION-TYPE
+   OBJECTS { 
+      hm2DiagEgressIfaceUtilization,
+      hm2DiagEgressIfaceUtilizationAlarmCondition
+      }
+   STATUS  current
+   DESCRIPTION "This trap is sent if the value of hm2DiagEgressIfaceUtilizationAlarmCondition is true."
+   ::= { hm2DiagnosticMibNotifications 7 }
+
+--
+-- ***********************************************************
+-- hm2DiagnosticSNMPExtensionGroup
+-- ***********************************************************
+--
+
+hm2PortMonitorSpeedDuplexErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the specified speed value is not supported by the port capabilities"
+           ::= { hm2DiagnosticSNMPExtensionGroup 1 }
+           
+hm2PortMonitorCndOvldDetInconsistenTholdVal OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the configured upper and lower threshold values are inconsistent"
+           ::= { hm2DiagnosticSNMPExtensionGroup 2 }
+
+END
+
