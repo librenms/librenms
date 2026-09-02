@@ -26,6 +26,9 @@ namespace App\Http\Controllers\Device\Tabs\Routing;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
 use App\Models\Ipv4Address;
+use App\Models\OspfArea;
+use App\Models\OspfNbr;
+use App\Models\OspfPort;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
@@ -37,48 +40,84 @@ class OspfController extends Controller
         $this->authorize('view', $device);
         abort_if(Gate::none(['routing.view', 'routing.viewAll']), 403);
 
-        $portCount = $device->ospfPorts()->count();
-        $portCountEnabled = $device->ospfPorts()->where('ospfIfAdminStat', 'enabled')->count();
-        $ports = $device->ospfPorts()
+        $ports = $this->getPorts($device);
+        $nbrs = $this->getNbrs($device);
+        $instances = $this->getInstances($device, $ports, $nbrs);
+
+        return view('device.tabs.routing.ospf', [
+            'device' => $device,
+            'instances' => $instances,
+        ]);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function getPorts(Device $device): array
+    {
+        return $device->ospfPorts()
             ->with('port')
             ->where('ospfIfAdminStat', 'enabled')
             ->orderBy('ospfIfAreaId')
-            ->get();
+            ->get()
+            ->map(fn (OspfPort $p) => [
+                'port' => $p->port,
+                'port_id' => $p->port_id,
+                'type' => $p->ospfIfType,
+                'state' => $p->ospfIfState,
+                'cost' => $p->ospfIfMetricValue,
+                'area_id' => $p->ospfIfAreaId,
+            ])
+            ->all();
+    }
 
-        $nbrs = $device->ospfNbrs()->get()->map(function ($nbr) {
-            $host = Ipv4Address::where('ipv4_address', $nbr->ospfNbrRtrId)
-                ->with('port.device')
-                ->first()
-                ?->port
-                ?->device;
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function getNbrs(Device $device): array
+    {
+        return $device->ospfNbrs()
+            ->get()
+            ->map(function (OspfNbr $nbr) {
+                $host = Ipv4Address::where('ipv4_address', $nbr->ospfNbrRtrId)
+                    ->with('port.device')
+                    ->first()
+                    ?->port
+                    ?->device;
 
-            return [
-                'router_id' => $nbr->ospfNbrRtrId,
-                'device_id' => $host?->device_id,
-                'ip_address' => $nbr->ospfNbrIpAddr,
-                'state' => $nbr->ospfNbrState,
-                'status_color' => match ($nbr->ospfNbrState) {
-                    'full' => 'success',
-                    'down' => 'danger',
-                    default => 'default',
-                },
-            ];
-        });
+                return [
+                    'router_id' => $nbr->ospfNbrRtrId,
+                    'device_id' => $host?->device_id,
+                    'ip_address' => $nbr->ospfNbrIpAddr,
+                    'state' => $nbr->ospfNbrState,
+                    'status_color' => match ($nbr->ospfNbrState) {
+                        'full' => 'success',
+                        'down' => 'danger',
+                        default => 'default',
+                    },
+                ];
+            })
+            ->all();
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $ports
+     * @param  array<int, array<string, mixed>>  $nbrs
+     * @return array<int, array<string, mixed>>
+     */
+    private function getInstances(Device $device, array $ports, array $nbrs): array
+    {
+        $portCount = $device->ospfPorts()->count();
+        $portCountEnabled = $device->ospfPorts()->where('ospfIfAdminStat', 'enabled')->count();
 
         $instances = [];
         foreach ($device->ospfInstances()->with('areas')->get() as $instance) {
-            $areas = [];
-            foreach ($instance->areas as $area) {
-                $areaPortCount = $device->ospfPorts()->where('ospfIfAreaId', $area->ospfAreaId)->count();
-                $areaPortCountEnabled = $device->ospfPorts()->where('ospfIfAdminStat', 'enabled')->where('ospfIfAreaId', $area->ospfAreaId)->count();
-
-                $areas[] = [
-                    'area_id' => $area->ospfAreaId,
-                    'port_count' => $areaPortCount,
-                    'port_count_enabled' => $areaPortCountEnabled,
-                    'status' => $instance->ospfAdminStat,
-                ];
-            }
+            $areas = $instance->areas->map(fn (OspfArea $area) => [
+                'area_id' => $area->ospfAreaId,
+                'port_count' => $device->ospfPorts()->where('ospfIfAreaId', $area->ospfAreaId)->count(),
+                'port_count_enabled' => $device->ospfPorts()->where('ospfIfAdminStat', 'enabled')->where('ospfIfAreaId', $area->ospfAreaId)->count(),
+                'status' => $instance->ospfAdminStat,
+            ])->all();
 
             $instances[] = [
                 'instance' => $instance,
@@ -89,26 +128,16 @@ class OspfController extends Controller
                 'abr_status_color' => $instance->ospfAreaBdrRtrStatus === 'true' ? 'success' : 'default',
                 'asbr_status' => $instance->ospfASBdrRtrStatus,
                 'asbr_status_color' => $instance->ospfASBdrRtrStatus === 'true' ? 'success' : 'default',
-                'area_count' => $instance->areas->count(),
+                'area_count' => count($areas),
                 'port_count' => $portCount,
                 'port_count_enabled' => $portCountEnabled,
-                'nbr_count' => $nbrs->count(),
+                'nbr_count' => count($nbrs),
                 'areas' => $areas,
-                'ports' => $ports->map(fn ($p) => [
-                    'port' => $p->port,
-                    'port_id' => $p->port_id,
-                    'type' => $p->ospfIfType,
-                    'state' => $p->ospfIfState,
-                    'cost' => $p->ospfIfMetricValue,
-                    'area_id' => $p->ospfIfAreaId,
-                ]),
+                'ports' => $ports,
                 'nbrs' => $nbrs,
             ];
         }
 
-        return view('device.tabs.routing.ospf', [
-            'device' => $device,
-            'instances' => $instances,
-        ]);
+        return $instances;
     }
 }

@@ -82,7 +82,7 @@ class VrfController extends Controller
         $selectedOption = $view === 'graphs' ? $graph : $view;
 
         $vrfs = $device->vrfs()
-            ->with(['ports' => function ($query) {
+            ->with(['ports' => function ($query): void {
                 $query->orderBy('ifDescr');
             }])
             ->get();

@@ -28,6 +28,7 @@ use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
+use LibreNMS\Component;
 
 class CiscoOtvController extends Controller
 {
@@ -36,47 +37,76 @@ class CiscoOtvController extends Controller
         $this->authorize('view', $device);
         abort_if(Gate::none(['routing.view', 'routing.viewAll']), 403);
 
-        $component = new \LibreNMS\Component();
+        $component = new Component();
         $otvComponents = $component->getComponents($device->device_id, ['type' => 'Cisco-OTV']);
         $rawOverlays = $otvComponents[$device->device_id] ?? [];
 
-        $overlays = [];
-        foreach ($rawOverlays as $index => $overlay) {
-            if (($overlay['otvtype'] ?? '') === 'overlay') {
-                $isNormal = ($overlay['status'] ?? 0) == 0 && ($overlay['ignore'] ?? 0) == 0 && ($overlay['disabled'] ?? 0) == 0;
-                $itemClass = $isNormal ? '' : 'list-group-item-danger';
-
-                $adjacencies = [];
-                foreach ($rawOverlays as $adjIndex => $adjacency) {
-                    if (($adjacency['otvtype'] ?? '') === 'adjacency' && ($adjacency['overlay'] ?? null) == ($overlay['index'] ?? null)) {
-                        $adjNormal = ($adjacency['status'] ?? 0) == 0 && ($adjacency['ignore'] ?? 0) == 0 && ($adjacency['disabled'] ?? 0) == 0;
-                        $adjClass = $adjNormal ? '' : 'list-group-item-danger';
-                        $adjacencies[$adjIndex] = [
-                            'index' => $adjIndex,
-                            'label' => $adjacency['label'] ?? '',
-                            'endpoint' => $adjacency['endpoint'] ?? '',
-                            'error' => $adjacency['error'] ?? '',
-                            'is_normal' => $adjNormal,
-                            'item_class' => $adjClass,
-                        ];
-                    }
-                }
-
-                $overlays[$index] = [
-                    'index' => $index,
-                    'label' => $overlay['label'] ?? '',
-                    'transport' => $overlay['transport'] ?? '',
-                    'error' => $overlay['error'] ?? '',
-                    'is_normal' => $isNormal,
-                    'item_class' => $itemClass,
-                    'adjacencies' => $adjacencies,
-                ];
-            }
-        }
+        $overlays = $this->parseOverlays($rawOverlays);
 
         return view('device.tabs.routing.cisco-otv', [
             'device' => $device,
             'overlays' => $overlays,
         ]);
+    }
+
+    /**
+     * @param  array<int|string, array<string, mixed>>  $rawOverlays
+     * @return array<int|string, array<string, mixed>>
+     */
+    private function parseOverlays(array $rawOverlays): array
+    {
+        $overlays = [];
+        foreach ($rawOverlays as $index => $overlay) {
+            if (($overlay['otvtype'] ?? '') !== 'overlay') {
+                continue;
+            }
+
+            $isNormal = $this->isNormalComponent($overlay);
+            $overlays[$index] = [
+                'index' => $index,
+                'label' => $overlay['label'] ?? '',
+                'transport' => $overlay['transport'] ?? '',
+                'error' => $overlay['error'] ?? '',
+                'is_normal' => $isNormal,
+                'item_class' => $isNormal ? '' : 'list-group-item-danger',
+                'adjacencies' => $this->getAdjacenciesForOverlay($rawOverlays, $overlay['index'] ?? null),
+            ];
+        }
+
+        return $overlays;
+    }
+
+    /**
+     * @param  array<int|string, array<string, mixed>>  $rawOverlays
+     * @return array<int|string, array<string, mixed>>
+     */
+    private function getAdjacenciesForOverlay(array $rawOverlays, mixed $overlayIndex): array
+    {
+        $adjacencies = [];
+        foreach ($rawOverlays as $adjIndex => $adjacency) {
+            if (($adjacency['otvtype'] ?? '') !== 'adjacency' || ($adjacency['overlay'] ?? null) != $overlayIndex) {
+                continue;
+            }
+
+            $adjNormal = $this->isNormalComponent($adjacency);
+            $adjacencies[$adjIndex] = [
+                'index' => $adjIndex,
+                'label' => $adjacency['label'] ?? '',
+                'endpoint' => $adjacency['endpoint'] ?? '',
+                'error' => $adjacency['error'] ?? '',
+                'is_normal' => $adjNormal,
+                'item_class' => $adjNormal ? '' : 'list-group-item-danger',
+            ];
+        }
+
+        return $adjacencies;
+    }
+
+    /**
+     * @param  array<string, mixed>  $component
+     */
+    private function isNormalComponent(array $component): bool
+    {
+        return empty($component['status']) && empty($component['ignore']) && empty($component['disabled']);
     }
 }
