@@ -144,7 +144,7 @@
                 </x-panel>
 
                 {{-- Config / diff pane --}}
-                <x-panel class="tw:w-full tw:flex-1 tw:min-w-0 tw:overflow-hidden tw:self-start tw:mb-0" x-ref="viewerPanel">
+                <x-panel class="tw:w-full tw:flex-1 tw:min-w-0 tw:overflow-hidden tw:self-start" x-ref="viewerPanel">
                     <x-slot name="heading" class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
                         <h3 class="panel-title tw:flex tw:items-center tw:gap-2 tw:flex-wrap">
                             <template x-if="diffMode">
