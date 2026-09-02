@@ -45,7 +45,7 @@ Queries Syslog-NG via `syslog-ng-ctl stats` and returns stats based on that info
     extend syslog-ng /bin/cat /var/cache/syslog-ng.extend/snmp
     ```
 
-    Setup cronjob to run every 5 minutes. add the following to cron `\etc/crontab.d/librenms_dhcp`:
+    Setup cronjob to run every 5 minutes. add the following to cron `\etc/crontab.d/syslog-ng`:
 
     ```bash
     */5 * * * * /etc/snmp/syslog-ng -w -q
