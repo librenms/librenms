@@ -515,13 +515,11 @@ if (! empty($peers)) {
                 $peer_data_raw = reset($peer_data_raw);  // get the first element of the array
             } elseif (empty($peer_data) && isset($peer_identifiers, $oid_map)) {
                 d_echo("Walking data... \n");
-
-                if (! isset($bgp_cache)) {
-                    $bgp_cache = SnmpQuery::enumStrings()->walk(array_keys($oid_map))->table(count($peer_identifiers));
+                $context_key = $device['context_name'] ?? '';
+                if (! isset($bgp_cache[$context_key])) {
+                    $bgp_cache[$context_key] = SnmpQuery::context($context_key)->enumStrings()->walk(array_keys($oid_map))->table(count($peer_identifiers));
                 }
-
-                // Fetch the snmp item related to this peer
-                $peer_data_raw = array_reduce($peer_identifiers, fn ($ret, $item) => $ret[$item] ?? [], $bgp_cache);
+                $peer_data_raw = array_reduce($peer_identifiers, fn ($ret, $item) => $ret[$item] ?? [], $bgp_cache[$context_key]);
             }
 
             // --- Fill in peer data if raw data has been fetched ---
