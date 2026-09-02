@@ -281,7 +281,7 @@ class SnmpQueryMock implements SnmpQueryInterface
         }
 
         if (! empty($oidObj->oid) && $oidObj->isNumeric()) {
-            $oid = NetSnmpTranslate::make()->translate($oidObj);
+            $oid = NetSnmpTranslate::make()->translate($oidObj->oid);
         }
 
         return "$oid$indexSuffix = $data\n";

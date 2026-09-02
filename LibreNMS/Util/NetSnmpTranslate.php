@@ -39,10 +39,13 @@ use Symfony\Component\Process\Process;
 
 class NetSnmpTranslate
 {
+    /** @var string[] */
     private array $options = [];
+    /** @var string[] */
     private array $mibDirs = [];
     private Device $device;
     // defaults for net-snmp https://net-snmp.sourceforge.io/docs/man/snmpcmd.html
+    /** @var string[] */
     private array $mibs = ['SNMPv2-TC', 'SNMPv2-MIB', 'IF-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'NET-SNMP-VACM-MIB'];
 
     public function __construct()
@@ -83,6 +86,8 @@ class NetSnmpTranslate
     /**
      * Set MIBs to use for this query. Base mibs are included by default.
      * They will be appended to existing mibs unless $append is set to false.
+     *
+     * @param  string[]  $mibs
      */
     public function mibs(array $mibs, bool $append = true): NetSnmpTranslate
     {
@@ -138,6 +143,10 @@ class NetSnmpTranslate
         return $this->exec('snmptranslate', [$oid])->value();
     }
 
+    /**
+     * @param  string[]  $oids
+     * @return string[]
+     */
     private function buildCli(string $command, array $oids): array
     {
         $cmd = [LibrenmsConfig::get($command, $command)];
@@ -148,6 +157,9 @@ class NetSnmpTranslate
         return array_merge($cmd, $this->options, $oids);
     }
 
+    /**
+     * @param  string[]  $oids
+     */
     private function exec(string $command, array $oids): SnmpResponse
     {
         $measure = Measurement::start($command);
