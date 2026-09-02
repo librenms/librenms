@@ -27,6 +27,7 @@
     },
     "dependencies": {
         "@alpinejs/intersect": "^3.15.12",
+        "@popperjs/core": "^2.11.8",
         "alpinejs": "^3.14.9",
         "babel-helper-vue-jsx-merge-props": "^2.0.3",
         "es6-object-assign": "^1.1.0",
