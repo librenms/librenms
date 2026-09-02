@@ -1,0 +1,194 @@
+-- **********************************************************
+-- LIBRENMS-AMDGPU-MIB
+--
+-- Power and clock of the AMD GPUs in a host, served by the
+-- 'amdgpu' pass_persist script from librenms-agent.
+--
+-- Enterprise Number: 60652
+-- OID Base: .1.3.6.1.4.1.60652.101
+--
+-- **********************************************************
+
+LIBRENMS-AMDGPU-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Gauge32,
+    enterprises
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF;
+
+amdGpuMIB MODULE-IDENTITY
+    LAST-UPDATED "202608110000Z"
+    ORGANIZATION "LibreNMS"
+    CONTACT-INFO
+        "       LibreNMS Community
+                https://www.librenms.org
+                https://github.com/librenms/librenms
+        "
+    DESCRIPTION
+        "This MIB module provides the power draw and core clock of the
+         AMD GPUs in a host, as the hwmon nodes of the amdgpu kernel
+         driver report them.
+
+         These two readings cannot reach SNMP on their own: the net-snmp
+         lmSensors module maps only the temperature, fan and voltage
+         features of libsensors, so watts and hertz are given no index at
+         all. Temperature and voltages arrive through LM-SENSORS-MIB as
+         before; this module carries only what is missing.
+
+         The table is filled by the 'amdgpu' pass_persist script from
+         librenms-agent."
+    REVISION "202608110000Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { librenms 101 }
+
+-- **********************************************************
+-- Top-level enterprise OID
+-- **********************************************************
+
+librenms OBJECT IDENTIFIER ::= { enterprises 60652 }
+
+-- **********************************************************
+-- GPU Table
+-- **********************************************************
+
+amdGpuTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AmdGpuEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing one row per AMD GPU bound to the amdgpu
+         driver on this host.
+
+         The table is sparse by design. Which readings a card publishes
+         depends on the model and on its SMU firmware, and a reading the
+         card does not publish is absent rather than substituted: that
+         column of that row simply does not answer."
+    ::= { amdGpuMIB 1 }
+
+amdGpuEntry OBJECT-TYPE
+    SYNTAX      AmdGpuEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The readings of a single AMD GPU."
+    INDEX { amdGpuPciAddress }
+    ::= { amdGpuTable 1 }
+
+AmdGpuEntry ::= SEQUENCE {
+    amdGpuPciAddress    DisplayString,
+    amdGpuProductName   DisplayString,
+    amdGpuPower         Gauge32,
+    amdGpuPowerAverage  Gauge32,
+    amdGpuClock         Gauge32
+}
+
+amdGpuPciAddress OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (12..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The PCI address of the card in the form the kernel writes it,
+         domain:bus:device.function - for example '0000:c7:00.0'. This
+         is the index of the table.
+
+         The address indexes the table because it is what stays put. A
+         row number would move as soon as a card is added, removed or
+         unbound from the driver, and readings stored against it would
+         then be filed under the neighbouring card. The address also
+         tells two identical cards in one host apart."
+    ::= { amdGpuEntry 1 }
+
+amdGpuProductName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The marketing name of the card, as the libdrm ids table gives
+         it for this PCI device id and revision - for example
+         'AMD Radeon 780M Graphics'.
+
+         Absent on a host without that table, and on a card the table
+         does not list; the PCI address in the index names the card in
+         either case."
+    ::= { amdGpuEntry 2 }
+
+amdGpuPower OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "microwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The power the card is drawing, as read at that moment from the
+         power1_input hwmon attribute of the amdgpu driver.
+
+         Reported in the unit sysfs uses, leaving the scaling to the
+         poller."
+    ::= { amdGpuEntry 3 }
+
+amdGpuPowerAverage OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "microwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The power the card drew over the sampling window of its SMU,
+         from the power1_average hwmon attribute of the amdgpu driver.
+
+         Reported in the unit sysfs uses, leaving the scaling to the
+         poller. Not every card publishes this: on APUs the SMU may
+         decline the reading while idle, and the object is then absent
+         for that card."
+    ::= { amdGpuEntry 4 }
+
+amdGpuClock OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "hertz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The core (shader) clock of the card, from the freq1_input
+         hwmon attribute of the amdgpu driver, which the driver labels
+         sclk.
+
+         Reported in the unit sysfs uses, hertz. A boost clock of a few
+         gigahertz does not fit into a signed 32-bit integer, which is
+         why this object, and the power objects beside it, are gauges."
+    ::= { amdGpuEntry 5 }
+
+-- **********************************************************
+-- Conformance
+-- **********************************************************
+
+amdGpuMIBConformance OBJECT IDENTIFIER ::= { amdGpuMIB 2 }
+amdGpuMIBGroups      OBJECT IDENTIFIER ::= { amdGpuMIBConformance 1 }
+amdGpuMIBCompliances OBJECT IDENTIFIER ::= { amdGpuMIBConformance 2 }
+
+amdGpuTableGroup OBJECT-GROUP
+    OBJECTS {
+        amdGpuProductName,
+        amdGpuPower,
+        amdGpuPowerAverage,
+        amdGpuClock
+    }
+    STATUS      current
+    DESCRIPTION
+        "The objects a row of amdGpuTable carries. The PCI address is
+         not among them: it is the index, and not-accessible."
+    ::= { amdGpuMIBGroups 1 }
+
+amdGpuMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for agents serving this MIB. A card
+         that publishes no value for one of these objects leaves that
+         cell absent; the object is implemented all the same."
+    MODULE  -- this module
+        MANDATORY-GROUPS { amdGpuTableGroup }
+    ::= { amdGpuMIBCompliances 1 }
+
+END
