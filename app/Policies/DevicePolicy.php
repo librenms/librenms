@@ -80,7 +80,7 @@ class DevicePolicy
      */
     public function configBackupView(User $user, Device $device): bool
     {
-        return $user->checkPermissionTo('config-backup.view')
+        return $user->checkPermissionTo('config-backup.view') // avoid can to skip Gate::before check
             && $this->view($user, $device);
     }
 
