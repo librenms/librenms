@@ -306,8 +306,7 @@ if (\Illuminate\Support\Facades\Gate::denies('viewAny', BgpPeer::class)) {
         if ($peer['bgpPeerLastErrorCode'] == 0 && $peer['bgpPeerLastErrorSubCode'] == 0) {
             $last_error = e($peer['bgpPeerLastErrorText']);
         } else {
-            $last_error = e(Rewrite::bgpErrorCode($peer['bgpPeerLastErrorCode'],
-                    $peer['bgpPeerLastErrorSubCode'])) . '<br/>' . e($peer['bgpPeerLastErrorText']);
+            $last_error = e(Rewrite::bgpErrorCode($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode'])) . '<br/>' . e($peer['bgpPeerLastErrorText']);
         }
 
         echo '<tr class="bgp"' . ($peer['alert'] ? ' bordercolor="#cc0000"' : '') . ($peer['disabled'] ? ' bordercolor="#cccccc"' : '') . '>';

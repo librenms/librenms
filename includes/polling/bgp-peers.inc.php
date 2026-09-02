@@ -599,12 +599,12 @@ if (! empty($peers)) {
             ) {
                 if ($peer['bgpPeerState'] == $peer_data['bgpPeerState']) {
                     Eventlog::log('BGP Session Flap: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ' ' . $peer['bgpPeerDescr'] . '), last error: ' . Rewrite::bgpErrorCode($peer['bgpPeerLastErrorCode'],
-                            $peer['bgpPeerLastErrorSubCode']), $device['device_id'], 'bgpPeer', Severity::Warning, $peer_ip);
+                        $peer['bgpPeerLastErrorSubCode']), $device['device_id'], 'bgpPeer', Severity::Warning, $peer_ip);
                 } elseif ($peer_data['bgpPeerState'] == 'established') {
                     Eventlog::log('BGP Session Up: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ' ' . $peer['bgpPeerDescr'] . ')', $device['device_id'], 'bgpPeer', Severity::Ok, $peer_ip);
                 } elseif ($peer['bgpPeerState'] == 'established') {
                     Eventlog::log('BGP Session Down: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ' ' . $peer['bgpPeerDescr'] . '), last error: ' . Rewrite::bgpErrorCode($peer['bgpPeerLastErrorCode'],
-                            $peer['bgpPeerLastErrorSubCode']), $device['device_id'], 'bgpPeer', Severity::Error, $peer_ip);
+                        $peer['bgpPeerLastErrorSubCode']), $device['device_id'], 'bgpPeer', Severity::Error, $peer_ip);
                 }
             }
         }
