@@ -12,7 +12,7 @@
                 class="tw:mt-4 tw:flex tw:flex-col tw:lg:flex-row tw:gap-4 tw:items-start">
 
                 {{-- Backup list (Interactive Timeline Sidebar) --}}
-                <x-panel class="tw:w-full tw:lg:w-md tw:lg:shrink-0 tw:overflow-hidden tw:self-start tw:lg:sticky tw:lg:top-4 tw:mb-0">
+                <x-panel class="tw:w-full tw:lg:w-md tw:lg:shrink-0 tw:overflow-hidden tw:self-start tw:lg:sticky tw:lg:top-[calc(52px+1rem)] tw:mb-0">
                     <x-slot name="heading" class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
                         <h3 class="panel-title tw:whitespace-nowrap tw:flex tw:items-center tw:gap-2">
                             {{ __('config_backups.backups') }}
