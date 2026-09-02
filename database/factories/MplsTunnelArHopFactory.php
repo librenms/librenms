@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Device;
+use App\Models\MplsLspPath;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /** @extends Factory<\App\Models\MplsTunnelArHop> */
@@ -10,12 +12,17 @@ class MplsTunnelArHopFactory extends Factory
     public function definition(): array
     {
         return [
-            'mplsTunnelARHopListIndex' => $this->faker->numberBetween(1, 100),
-            'mplsTunnelARHopIndex' => $this->faker->numberBetween(1, 10),
-            'lsp_path_id' => $this->faker->numberBetween(1, 100),
+            'device_id' => Device::factory(),
+            'lsp_path_id' => MplsLspPath::factory(),
+            'mplsTunnelARHopListIndex' => 1,
+            'mplsTunnelARHopIndex' => 1,
             'mplsTunnelARHopAddrType' => 'ipV4',
             'mplsTunnelARHopIpv4Addr' => $this->faker->ipv4(),
             'mplsTunnelARHopStrictOrLoose' => 'strict',
+            'localProtected' => 'false',
+            'linkProtectionInUse' => 'false',
+            'bandwidthProtected' => 'false',
+            'nextNodeProtected' => 'false',
         ];
     }
 }
