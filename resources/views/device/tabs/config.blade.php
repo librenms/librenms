@@ -79,7 +79,7 @@
                                         {{-- Node Circle / Dot --}}
                                         <div class="tw:relative tw:z-10 tw:flex tw:items-center tw:justify-center">
                                             <template x-if="diffMode && getDiffRole(backup) === 'old'">
-                                                <span class="tw:w-6 tw:h-6 tw:rounded-full tw:bg-red-600 tw:text-white tw:shadow-xs tw:ring-4 tw:ring-red-100 tw:dark:ring-red-900/50 tw:flex tw:items-center tw:justify-center" title="{{ __('config_backups.base') }}">
+                                                <span class="tw:w-6 tw:h-6 tw:rounded-full tw:bg-red-500 tw:text-white tw:shadow-xs tw:ring-4 tw:ring-red-100 tw:dark:ring-red-900/50 tw:flex tw:items-center tw:justify-center" title="{{ __('config_backups.base') }}">
                                                     <i class="fa fa-minus tw:text-[9px]" aria-hidden="true"></i>
                                                 </span>
                                             </template>
@@ -154,7 +154,7 @@
                                         <div class="tw:inline-flex tw:items-center tw:gap-2 tw:flex-wrap">
                                             {{-- Base (Old) Version Dropdown --}}
                                             <div class="tw:inline-flex tw:items-center tw:gap-1.5">
-                                                <span class="tw:w-5 tw:h-5 tw:rounded-full tw:bg-red-600 tw:text-white tw:text-[9px] tw:flex tw:items-center tw:justify-center tw:shrink-0" title="{{ __('config_backups.base') }}">
+                                                <span class="tw:w-5 tw:h-5 tw:rounded-full tw:bg-red-500 tw:text-white tw:text-[9px] tw:flex tw:items-center tw:justify-center tw:shrink-0" title="{{ __('config_backups.base') }}">
                                                     <i class="fa fa-minus" aria-hidden="true"></i>
                                                 </span>
                                                 <div class="tw:relative tw:inline-flex tw:items-center">
