@@ -29,9 +29,12 @@ namespace LibreNMS\Tests;
 use Artisan;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\DB\Schema;
+use LibreNMS\Tests\Traits\RequiresMysql;
 
-final class DBSetupTest extends DBTestCase
+final class DBSetupTest extends TestCase
 {
+    use RequiresMysql;
+
     protected $db_name;
     protected $connection = 'testing';
 

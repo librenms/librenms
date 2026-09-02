@@ -5,11 +5,14 @@ namespace LibreNMS\Tests\Feature;
 use App\Models\AlertSchedule;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use LibreNMS\Enum\AlertScheduleStatus;
-use LibreNMS\Tests\DBTestCase;
+use LibreNMS\Tests\TestCase;
 
-final class TestScheduledMaintenance extends DBTestCase
+final class ScheduledMaintenanceTest extends TestCase
 {
+    use RefreshDatabase;
+
     private $timezone;
 
     public function testNormal(): void

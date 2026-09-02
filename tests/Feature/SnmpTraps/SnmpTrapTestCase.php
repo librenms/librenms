@@ -29,6 +29,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use App\Models\Location;
 use App\View\SimpleTemplate;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Arr;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Tests\TestCase;
@@ -36,6 +37,8 @@ use Mockery;
 
 abstract class SnmpTrapTestCase extends TestCase
 {
+    use RefreshDatabase;
+
     protected function assertTrapLogsMessage(string $rawTrap, string|array $log, string $failureMessage = '', array $args = [], ?Device $device = null): void
     {
         if ($device === null) {

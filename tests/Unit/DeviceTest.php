@@ -29,12 +29,12 @@ namespace LibreNMS\Tests\Unit;
 use App\Models\Device;
 use App\Models\Ipv4Address;
 use App\Models\Port;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use LibreNMS\Tests\DBTestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use LibreNMS\Tests\TestCase;
 
-final class DeviceTest extends DBTestCase
+final class DeviceTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function testFindByHostname(): void
     {

@@ -55,7 +55,9 @@ final class QueryBuilderTest extends TestCase
         $this->assertEquals($sql, $qb->toSql());
 
         $qbq = $qb->toQuery();
-        $this->assertEquals($query[0], $qbq->toSql(), 'Fluent SQL does not match');
+        $expectedSql = str_replace('`', '"', (string) $query[0]);
+        $actualSql = str_replace('`', '"', (string) $qbq->toSql());
+        $this->assertEquals($expectedSql, $actualSql, 'Fluent SQL does not match');
         $this->assertEquals($query[1], $qbq->getBindings(), 'Fluent bindings do not match');
     }
 

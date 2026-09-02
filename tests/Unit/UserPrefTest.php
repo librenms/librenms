@@ -27,12 +27,12 @@ namespace LibreNMS\Tests\Unit;
 
 use App\Models\User;
 use App\Models\UserPref;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use LibreNMS\Tests\DBTestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use LibreNMS\Tests\TestCase;
 
-final class UserPrefTest extends DBTestCase
+final class UserPrefTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function testSetPref(): void
     {

@@ -28,9 +28,12 @@ namespace LibreNMS\Tests;
 
 use App\ConfigRepository;
 use App\Facades\LibrenmsConfig;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 final class ConfigTest extends TestCase
 {
+    use RefreshDatabase;
+
     private \ReflectionProperty $config;
 
     protected function setUp(): void
@@ -162,8 +165,6 @@ final class ConfigTest extends TestCase
 
     public function testSetPersist(): void
     {
-        $this->dbSetUp();
-
         $key = 'testing.persist';
 
         $query = \App\Models\Config::query()->where('config_name', $key);
@@ -174,8 +175,6 @@ final class ConfigTest extends TestCase
         $this->assertEquals('one', $query->value('config_value'));
         LibrenmsConfig::persist($key, 'two');
         $this->assertEquals('two', $query->value('config_value'));
-
-        $this->dbTearDown();
     }
 
     public function testHas(): void

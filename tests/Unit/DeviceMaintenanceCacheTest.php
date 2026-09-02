@@ -7,15 +7,15 @@ use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Location;
 use Carbon\Carbon;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use LibreNMS\Cache\DeviceMaintenanceCache;
 use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Enum\MaintenanceStatus;
-use LibreNMS\Tests\DBTestCase;
+use LibreNMS\Tests\TestCase;
 
-final class DeviceMaintenanceCacheTest extends DBTestCase
+final class DeviceMaintenanceCacheTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function testReturnsNoneWhenNoSchedulesActive(): void
     {

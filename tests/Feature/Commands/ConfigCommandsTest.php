@@ -27,10 +27,13 @@
 namespace LibreNMS\Tests\Feature\Commands;
 
 use App\Facades\LibrenmsConfig;
-use LibreNMS\Tests\InMemoryDbTestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use LibreNMS\Tests\TestCase;
 
-final class TestConfigCommands extends InMemoryDbTestCase
+final class ConfigCommandsTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function testSetting(): void
     {
         // simple

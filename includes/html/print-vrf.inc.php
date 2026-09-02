@@ -14,8 +14,8 @@ echo '<td width=100 class=box-desc>' . e($vrf['mplsVpnVrfRouteDistinguisher']) .
 echo '<td class="list-bold">';
 foreach (dbFetchRows('SELECT * FROM ports WHERE `device_id` = ? AND `ifVrf` = ?', [$device['device_id'], $vrf['vrf_id']]) as $port) {
     $port = cleanPort($port, $device);
-    if ($vars['view'] == 'graphs') {
-        $graph_type = 'port_' . $vars['graph'];
+    if (isset($vars['view']) && $vars['view'] == 'graphs') {
+        $graph_type = 'port_' . ($vars['graph'] ?? 'bits');
         $popup_content = '<div style="font-size: 16px; padding:5px; font-weight: bold; color: #e5e5e5;">' . e($device['hostname'] . ' - ' . $port['ifDescr']) . '</div>' .
             e($port['ifAlias']) .
             Url::graphTag(['type' => $graph_type, 'id' => $port['port_id'], 'from' => '-2d', 'width' => 450, 'height' => 150]);
@@ -28,7 +28,7 @@ foreach (dbFetchRows('SELECT * FROM ports WHERE `device_id` = ? AND `ifVrf` = ?'
     <div style='font-size: 9px;'>" . substr((string) short_port_descr($port['ifAlias']), 0, 22) . '</div>
    </div>';
     } else {
-        echo $vrf['port_sep'] . generate_port_link($port, Rewrite::shortenIfName($port['ifDescr']));
+        echo ($vrf['port_sep'] ?? '') . generate_port_link($port, Rewrite::shortenIfName($port['ifDescr']));
         $vrf['port_sep'] = ', ';
     }
 }
