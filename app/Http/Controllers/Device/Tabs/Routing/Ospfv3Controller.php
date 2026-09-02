@@ -44,7 +44,8 @@ class Ospfv3Controller extends Controller
             ])
             ->get();
 
-        $instances = $ospfv3Instances->map(function ($instance) {
+        $instances = [];
+        foreach ($ospfv3Instances as $instance) {
             $statusColor = match ($instance->ospfv3AdminStatus) {
                 'enabled' => 'success',
                 'disabled' => 'danger',
@@ -63,14 +64,15 @@ class Ospfv3Controller extends Controller
                 default => 'default',
             };
 
-            $areas = $instance->areas->map(function ($area) {
+            $areas = [];
+            foreach ($instance->areas as $area) {
                 $areaStatusColor = match ($area->ospfv3AreaAdminStatus ?? $area->ospfv3AdminStatus ?? 'enabled') {
                     'enabled' => 'success',
                     'disabled' => 'danger',
                     default => 'default',
                 };
 
-                return [
+                $areas[] = [
                     'area_id_ip' => long2ip($area->ospfv3AreaId),
                     'port_count' => $area->ospfv3Ports->count(),
                     'port_count_enabled' => $area->ospfv3Ports->where('ospfv3IfAdminStatus', 'enabled')->count(),
@@ -78,36 +80,38 @@ class Ospfv3Controller extends Controller
                     'status' => $area->ospfv3AreaAdminStatus ?? $area->ospfv3AdminStatus ?? 'enabled',
                     'status_color' => $areaStatusColor,
                 ];
-            });
+            }
 
-            $ports = $instance->ospfv3Ports->map(function ($port) {
-                return [
+            $ports = [];
+            foreach ($instance->ospfv3Ports as $port) {
+                $ports[] = [
                     'port' => $port->port,
                     'port_id' => $port->port_id,
                     'type' => $port->ospfv3IfType,
                     'state' => $port->ospfv3IfState,
                     'cost' => $port->ospfv3IfMetricValue,
-                    'area_id_ip' => long2ip($port->ospfv3AreaId),
+                    'area_id_ip' => long2ip($port->ospfv3IfAreaId),
                 ];
-            });
+            }
 
-            $nbrs = $instance->nbrs->map(function ($nbr) {
+            $nbrs = [];
+            foreach ($instance->nbrs as $nbr) {
                 $nbrStatusColor = match ($nbr->ospfv3NbrState) {
                     'full' => 'success',
                     'down' => 'danger',
                     default => 'warning',
                 };
 
-                return [
+                $nbrs[] = [
                     'router_id' => $nbr->router_id,
                     'device_id' => $nbr->device_id,
                     'address' => $nbr->ospfv3NbrAddress,
                     'state' => $nbr->ospfv3NbrState,
                     'status_color' => $nbrStatusColor,
                 ];
-            });
+            }
 
-            return [
+            $instances[] = [
                 'router_id' => $instance->router_id,
                 'admin_status' => $instance->ospfv3AdminStatus,
                 'status_color' => $statusColor,
@@ -115,15 +119,15 @@ class Ospfv3Controller extends Controller
                 'abr_color' => $abrColor,
                 'asbr_status' => $instance->ospfv3ASBdrRtrStatus,
                 'asbr_color' => $asbrColor,
-                'area_count' => $areas->count(),
-                'port_count' => $ports->count(),
+                'area_count' => count($areas),
+                'port_count' => count($ports),
                 'port_count_enabled' => $instance->ospfv3Ports->where('ospfv3IfAdminStatus', 'enabled')->count(),
-                'nbr_count' => $nbrs->count(),
+                'nbr_count' => count($nbrs),
                 'areas' => $areas,
                 'ports' => $ports,
                 'nbrs' => $nbrs,
             ];
-        });
+        }
 
         return view('device.tabs.routing.ospfv3', [
             'device' => $device,

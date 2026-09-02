@@ -25,6 +25,7 @@ namespace App\Http\Controllers\Device\Tabs\Routing;
 
 use App\Http\Controllers\Controller;
 use App\Models\Device;
+use App\Models\IsisAdjacency;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
@@ -39,7 +40,7 @@ class IsisController extends Controller
         $adjacencies = $device->isisAdjacencies()
             ->with('port')
             ->get()
-            ->map(function ($adj) {
+            ->map(function (IsisAdjacency $adj): array {
                 $stateColor = match ($adj->isisISAdjState) {
                     'up' => 'success',
                     'down' => 'danger',
@@ -54,7 +55,7 @@ class IsisController extends Controller
                     'neighbour_sys_id' => $adj->isisISAdjNeighSysID,
                     'area_address' => $adj->isisISAdjAreaAddress,
                     'neighbour_sys_type' => $adj->isisISAdjNeighSysType,
-                    'admin_state' => $adj->isisISAdjAdminState,
+                    'admin_state' => $adj->isisCircAdminState,
                     'state' => $adj->isisISAdjState,
                     'state_color' => $stateColor,
                     'last_uptime' => \LibreNMS\Util\Time::formatInterval($adj->isisISAdjLastUpTime),

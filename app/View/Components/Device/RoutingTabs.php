@@ -33,6 +33,9 @@ use Illuminate\View\Component as BladeComponent;
 
 class RoutingTabs extends BladeComponent
 {
+    /**
+     * @var array<string, array{text: string, link: string}>
+     */
     public array $tabs = [];
 
     public function __construct(
@@ -51,6 +54,9 @@ class RoutingTabs extends BladeComponent
         }
     }
 
+    /**
+     * @return array<string, int>
+     */
     public static function getRoutingTabs(Device $device): array
     {
         if (Gate::none(['routing.view', 'routing.viewAll'])) {
@@ -71,6 +77,9 @@ class RoutingTabs extends BladeComponent
         ]);
     }
 
+    /**
+     * @return array<string, string>
+     */
     public static function getTabLabels(): array
     {
         return [
