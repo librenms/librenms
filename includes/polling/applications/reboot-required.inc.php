@@ -23,9 +23,9 @@ $rrd_def = RrdDefinition::make()->addDataset('reboot', 'GAUGE', 0, 1);
 $fields = ['reboot' => $reboot];
 
 $tags = [
-    'name'     => $name,
-    'app_id'   => $app->app_id,
-    'rrd_def'  => $rrd_def,
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_def' => $rrd_def,
     'rrd_name' => $rrd_name,
 ];
 

@@ -16,8 +16,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Reboot Required',
-        'ds'       => 'reboot',
+        'descr' => 'Reboot Required',
+        'ds' => 'reboot',
     ];
 }
 
