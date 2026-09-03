@@ -89,7 +89,7 @@ final class SyslogTest extends DBTestCase
     private function checkSyslog($inputline, $modified)
     {
         $data = $this->createData($inputline, $modified);
-        $res = $this->processor->process($data['input'], false);
+        $res = $this->processor->process($data['input']);
         $this->assertEquals($data['result'], $res);
     }
 

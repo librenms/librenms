@@ -32,6 +32,7 @@ use App\Models\Ipv4Address;
 use App\Models\Ipv6Address;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Syslog\Entry;
 use LibreNMS\Syslog\Processor;
 use LibreNMS\Util\IPv6;
 
@@ -109,16 +110,16 @@ final class SyslogDeviceLookupTest extends DBTestCase
      */
     private function resolve(string $host, ?Processor $processor = null): ?int
     {
-        $entry = ($processor ?? new Processor)->process([
-            'host' => $host,
-            'facility' => 'local7',
-            'priority' => 'info',
-            'level' => 'info',
-            'tag' => '0e',
-            'timestamp' => '2024-01-01 00:00:00',
-            'msg' => 'lookup test',
-            'program' => 'TEST',
-        ], false);
+        $entry = ($processor ?? new Processor)->parse(new Entry(
+            host: $host,
+            facility: 'local7',
+            priority: 'info',
+            level: 'info',
+            tag: '0e',
+            timestamp: '2024-01-01 00:00:00',
+            msg: 'lookup test',
+            program: 'TEST',
+        ));
 
         return $entry['device_id'];
     }
