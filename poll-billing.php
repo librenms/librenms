@@ -49,9 +49,9 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
     $bill_id = $bill->bill_id;
 
     if (LibrenmsConfig::get('distributed_poller') && LibrenmsConfig::get('distributed_billing')) {
-        $port_list = dbFetchRows('SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND I.ifOperStatus="up" AND D.device_id = I.device_id AND D.status=1 AND D.poller_group IN (' . LibrenmsConfig::get('distributed_poller_group') . ')', [$bill_id]);
+        $port_list = dbFetchRows('SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND I.ifOperStatus IN ("up", "dormant") AND D.device_id = I.device_id AND D.status=1 AND D.poller_group IN (' . LibrenmsConfig::get('distributed_poller_group') . ')', [$bill_id]);
     } else {
-        $port_list = dbFetchRows('SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND I.ifOperStatus="up" AND D.device_id = I.device_id AND D.status=1', [$bill_id]);
+        $port_list = dbFetchRows('SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND I.ifOperStatus IN ("up", "dormant") AND D.device_id = I.device_id AND D.status=1', [$bill_id]);
     }
 
     $now = dbFetchCell('SELECT NOW()');
