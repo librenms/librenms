@@ -7,6 +7,21 @@ modules:
     sensors:
         temperature:
             data:
+                # LT2-OF variant
+                -
+                    oid: .1.3.6.1.4.1.35616.7.3.2.1.8
+                    num_oid: '.1.3.6.1.4.1.35616.7.3.2.1.8.{{ $index }}'
+                    value: enterprises
+                    index: 'lt2ofLineTemp.{{ $index }}'
+                    descr: 'Line {{ $subindex6 }} Temp'
+                    divisor: 10
+                -
+                    oid: .1.3.6.1.4.1.35616.7.4.2.1.8
+                    num_oid: '.1.3.6.1.4.1.35616.7.4.2.1.8.{{ $index }}'
+                    value: enterprises
+                    index: 'lt2ofClientTemp.{{ $index }}'
+                    descr: 'Client {{ $subindex6 }} Temp'
+                    divisor: 10
                 #LT2-S Variant
                 -
                     oid: Lambdatrail2s-MIB::lt2sMgmtPortTable
@@ -74,6 +89,39 @@ modules:
                     divisor: 100
         dbm:
             data:
+                # LT2-OF variant ports
+                -
+                    oid: .1.3.6.1.4.1.35616.7.3.2.1.6
+                    num_oid: '.1.3.6.1.4.1.35616.7.3.2.1.6.{{ $index }}'
+                    value: enterprises
+                    index: 'lt2ofLineTxPower.{{ $index }}'
+                    descr: 'Line {{ $subindex6 }} Tx'
+                    group: 'Line {{ $subindex6 }}'
+                    divisor: 100
+                -
+                    oid: .1.3.6.1.4.1.35616.7.3.2.1.7
+                    num_oid: '.1.3.6.1.4.1.35616.7.3.2.1.7.{{ $index }}'
+                    value: enterprises
+                    index: 'lt2ofLineRxPower.{{ $index }}'
+                    descr: 'Line {{ $subindex6 }} Rx'
+                    group: 'Line {{ $subindex6 }}'
+                    divisor: 100
+                -
+                    oid: .1.3.6.1.4.1.35616.7.4.2.1.6
+                    num_oid: '.1.3.6.1.4.1.35616.7.4.2.1.6.{{ $index }}'
+                    value: enterprises
+                    index: 'lt2ofClientTxPower.{{ $index }}'
+                    descr: 'Client {{ $subindex6 }} Tx'
+                    group: 'Client {{ $subindex6 }}'
+                    divisor: 100
+                -
+                    oid: .1.3.6.1.4.1.35616.7.4.2.1.7
+                    num_oid: '.1.3.6.1.4.1.35616.7.4.2.1.7.{{ $index }}'
+                    value: enterprises
+                    index: 'lt2ofClientRxPower.{{ $index }}'
+                    descr: 'Client {{ $subindex6 }} Rx'
+                    group: 'Client {{ $subindex6 }}'
+                    divisor: 100
                 #LT2-S Variant
                 -
                     oid: Lambdatrail2s-MIB::lt2sMgmtPortTable
