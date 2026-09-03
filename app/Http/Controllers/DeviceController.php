@@ -29,8 +29,6 @@ class DeviceController
             abort(404);
         }
 
-        $this->authorize('view', $device);
-
         DeviceCache::setPrimary($device_id);
 
         $current_tab = str_replace('tab=', '', $current_tab) ?: 'overview';
