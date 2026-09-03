@@ -30,6 +30,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use DeviceCache;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Source\SnmpResponse;
 use Log;
@@ -123,7 +124,7 @@ class NetSnmpTranslate
      * Calling with null will reset to the default options (-OQXUte).
      * Try to avoid setting options this way to keep the API generic.
      *
-     * @param  array|string|null  $options
+     * @param  string[]|string|null  $options
      * @return $this
      */
     public function options($options = []): NetSnmpTranslate
