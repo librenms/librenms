@@ -26,7 +26,6 @@
 
 namespace App\Http\Controllers\Traits;
 
-use App\Logging\FlushHandler;
 use App\Logging\NoColorFormatter;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Support\Facades\Log;
@@ -43,7 +42,14 @@ trait StreamsOutputToBrowser
 
     protected function stream(callable $function): StreamedResponse
     {
-        return new StreamedResponse($function, 200, $this->headers());
+        return new StreamedResponse(function () use ($function): void {
+            while (ob_get_level() > 0) {
+                ob_end_flush();
+            }
+            ob_implicit_flush();
+
+            $function();
+        }, 200, $this->headers());
     }
 
     protected function enableDownload(string $downloadFile): void
@@ -82,7 +88,6 @@ trait StreamsOutputToBrowser
             'driver' => 'custom',
             'via' => fn (): Logger => new Logger('stream', [
                 (new StreamHandler('php://output', Level::Debug))->setFormatter(new NoColorFormatter()),
-                new FlushHandler(),
             ]),
             'level' => 'debug',
         ]]);
