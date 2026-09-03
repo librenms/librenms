@@ -1,0 +1,186 @@
+NET-SNMP-EXTEND-MIB::nsExtendOutputFull[bird2] = BIRD 2.17.5 ready.
+Access restricted
+Name       Proto      Table      State  Since         Info
+device1    Device     ---        up     2026-08-15 13:45:25  
+
+kernel1    Kernel     master6    up     2026-08-15 13:45:25  
+  Channel ipv6
+    State:          UP
+    Table:          master6
+    Preference:     10
+    Input filter:   ACCEPT
+    Output filter:  ACCEPT
+    Routes:         0 imported, 68 exported, 0 preferred
+    Route change stats:     received   rejected   filtered    ignored   accepted
+      Import updates:              0          0          0          0          0
+      Import withdraws:            0          0        ---          0          0
+      Export updates:             70          0          0        ---         70
+      Export withdraws:            0        ---        ---        ---          0
+
+local_nets Static     master6    up     2026-08-15 13:45:25  
+  Channel ipv6
+    State:          UP
+    Table:          master6
+    Preference:     200
+    Input filter:   ACCEPT
+    Output filter:  REJECT
+    Routes:         2 imported, 0 exported, 2 preferred
+    Route change stats:     received   rejected   filtered    ignored   accepted
+      Import updates:              2          0          0          0          2
+      Import withdraws:            0          0        ---          0          0
+      Export updates:              0          0          0        ---          0
+      Export withdraws:            0        ---        ---        ---          0
+
+internal   OSPF       master6    up     2026-08-15 13:45:25  Alone
+  Channel ipv6
+    State:          UP
+    Table:          master6
+    Preference:     150
+    Input filter:   ACCEPT
+    Output filter:  REJECT
+    Routes:         1 imported, 0 exported, 1 preferred
+    Route change stats:     received   rejected   filtered    ignored   accepted
+      Import updates:              1          0          0          0          1
+      Import withdraws:            0          0        ---          0          0
+      Export updates:             68          1         67        ---          0
+      Export withdraws:            0        ---        ---        ---          0
+
+upstream_a BGP        ---        up     2026-08-15 13:45:30  Established   
+  Description:    documentation transit
+  BGP state:          Established
+    Neighbor address: 2001:db8:0:1::2
+    Neighbor AS:      64497
+    Local AS:         64496
+    Neighbor ID:      192.0.2.10
+    Local capabilities
+      Multiprotocol
+        AF announced: ipv6
+      Route refresh
+      Graceful restart
+      4-octet AS numbers
+      Enhanced refresh
+      Long-lived graceful restart
+    Neighbor capabilities
+      Multiprotocol
+        AF announced: ipv6
+      Route refresh
+      Graceful restart
+      4-octet AS numbers
+      Enhanced refresh
+      Long-lived graceful restart
+    Session:          external AS4
+    Source address:   2001:db8:0:1::1
+    Hold timer:       191.148/240
+    Keepalive timer:  61.171/80
+    Send hold timer:  399.241/480
+  Channel ipv6
+    State:          UP
+    Table:          master6
+    Preference:     100
+    Input filter:   ACCEPT
+    Output filter:  ACCEPT
+    Routes:         40 imported, 28 exported, 40 preferred
+    Route change stats:     received   rejected   filtered    ignored   accepted
+      Import updates:             40          0          0          0         40
+      Import withdraws:            0          0        ---          0          0
+      Export updates:             68         40          0        ---         28
+      Export withdraws:            0        ---        ---        ---          0
+    BGP Next hop:   2001:db8:0:1::1 fe80::a0e8:7dff:fe5f:270c
+
+peering_b  BGP        ---        up     2026-08-15 13:45:29  Established   
+  BGP state:          Established
+    Neighbor address: 192.0.2.2
+    Neighbor AS:      64498
+    Local AS:         64496
+    Neighbor ID:      192.0.2.11
+    Local capabilities
+      Multiprotocol
+        AF announced: ipv4 ipv6
+      Route refresh
+      Graceful restart
+      4-octet AS numbers
+      Enhanced refresh
+      Long-lived graceful restart
+    Neighbor capabilities
+      Multiprotocol
+        AF announced: ipv4 ipv6
+      Route refresh
+      Graceful restart
+      4-octet AS numbers
+      Enhanced refresh
+      Long-lived graceful restart
+    Session:          external AS4
+    Source address:   192.0.2.1
+    Hold timer:       215.712/240
+    Keepalive timer:  71.234/80
+    Send hold timer:  398.142/480
+  Channel ipv4
+    State:          UP
+    Table:          master4
+    Preference:     100
+    Input filter:   ACCEPT
+    Output filter:  ACCEPT
+    Routes:         18 imported, 0 exported, 18 preferred
+    Route change stats:     received   rejected   filtered    ignored   accepted
+      Import updates:             18          0          0          0         18
+      Import withdraws:            0          0        ---          0          0
+      Export updates:             18         18          0        ---          0
+      Export withdraws:            0        ---        ---        ---          0
+    BGP Next hop:   192.0.2.1
+  Channel ipv6
+    State:          UP
+    Table:          master6
+    Preference:     100
+    Input filter:   ACCEPT
+    Output filter:  ACCEPT
+    Routes:         25 imported, 43 exported, 25 preferred
+    Route change stats:     received   rejected   filtered    ignored   accepted
+      Import updates:             25          0          0          0         25
+      Import withdraws:            0          0        ---          0          0
+      Export updates:             68         25          0        ---         43
+      Export withdraws:            0        ---        ---        ---          0
+    BGP Next hop:   2001:db8:0:1::1 fe80::a0e8:7dff:fe5f:270c
+
+collector_c BGP        ---        up     2026-08-15 13:45:29  Established   
+  Description:    route collector
+  BGP state:          Established
+    Neighbor address: 2001:db8:0:1::3
+    Neighbor AS:      64499
+    Local AS:         64496
+    Neighbor ID:      192.0.2.12
+    Local capabilities
+      Multiprotocol
+        AF announced: ipv6
+      Route refresh
+      Graceful restart
+      4-octet AS numbers
+      Enhanced refresh
+      Long-lived graceful restart
+    Neighbor capabilities
+      Multiprotocol
+        AF announced: ipv6
+      Route refresh
+      Graceful restart
+      4-octet AS numbers
+      Enhanced refresh
+      Long-lived graceful restart
+    Session:          external multihop AS4
+    Source address:   2001:db8:0:1::1
+    Hold timer:       202.621/240
+    Keepalive timer:  59.354/80
+    Send hold timer:  366.225/480
+  Channel ipv6
+    State:          UP
+    Table:          master6
+    Preference:     100
+    Input filter:   REJECT
+    Output filter:  ACCEPT
+    Routes:         0 imported, 68 exported, 0 preferred
+    Route change stats:     received   rejected   filtered    ignored   accepted
+      Import updates:              0          0          0          0          0
+      Import withdraws:            0          0        ---          0          0
+      Export updates:             68          0          0        ---         68
+      Export withdraws:            0        ---        ---        ---          0
+    BGP Next hop:   2001:db8:0:1::1
+    IGP IPv6 table: master6
+

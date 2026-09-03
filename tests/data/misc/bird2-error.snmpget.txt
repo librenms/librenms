@@ -1,0 +1,20 @@
+NET-SNMP-EXTEND-MIB::nsExtendOutputFull[bird2] = BIRD 2.17.5 ready.
+Access restricted
+Name       Proto      Table      State  Since         Info
+device1    Device     ---        up     2026-08-15 16:49:25  
+
+mismatched BGP        ---        start  2026-08-15 16:49:29  Idle          BGP Error: Bad peer AS
+  Description:    as mismatch peer
+  BGP state:          Idle
+    Neighbor address: 2001:db8:0:1::2
+    Neighbor AS:      64497
+    Local AS:         64496
+    Error wait:       46.342/60
+    Last error:       BGP Error: Bad peer AS
+  Channel ipv6
+    State:          DOWN
+    Table:          master6
+    Preference:     100
+    Input filter:   ACCEPT
+    Output filter:  ACCEPT
+
