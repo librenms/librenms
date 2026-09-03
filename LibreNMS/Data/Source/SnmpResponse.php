@@ -74,6 +74,11 @@ class SnmpResponse implements \Stringable
         return true;
     }
 
+    public function isTimeout(): bool
+    {
+        return (bool) preg_match('/Timeout: No Response from /', $this->stderr);
+    }
+
     /**
      * Get the error message if any
      */

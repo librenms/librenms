@@ -28,6 +28,7 @@ namespace LibreNMS\OS\Traits;
 
 use App\Models\EntPhysical;
 use Illuminate\Support\Collection;
+use LibreNMS\Exceptions\EntityPhysicalCollectionException;
 
 trait EntityMib
 {
@@ -38,6 +39,10 @@ trait EntityMib
             $snmpQuery = $snmpQuery->mibs([$this->entityVendorTypeMib]);
         }
         $data = $snmpQuery->walk('ENTITY-MIB::entPhysicalTable');
+
+        if ($data->isTimeout()) {
+            throw new EntityPhysicalCollectionException($data->getErrorMessage());
+        }
 
         if (! $data->isValid()) {
             return new Collection;

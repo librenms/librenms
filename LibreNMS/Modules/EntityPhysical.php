@@ -7,6 +7,7 @@ use App\Models\EntPhysical;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Exceptions\EntityPhysicalCollectionException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
@@ -46,16 +47,11 @@ class EntityPhysical implements Module
      */
     public function discover(OS $os): void
     {
-        $inventory = $os->discoverEntityPhysical();
-
-        // A failed SNMP walk (e.g. a timeout) yields an empty collection that is
-        // indistinguishable from a device that genuinely has no entPhysical data.
-        // Syncing that empty result would delete all existing inventory rows, so if
-        // the device already has inventory we keep the last-known-good and warn
-        // rather than wipe it on a transient collection failure.
-        if ($inventory->isEmpty() && $os->getDevice()->entityPhysical()->exists()) {
-            Log::warning('entPhysical discovery returned no data for ' . $os->getDevice()->hostname
-                . '; keeping existing inventory (possible SNMP collection failure)');
+        try {
+            $inventory = $os->discoverEntityPhysical();
+        } catch (EntityPhysicalCollectionException $e) {
+            Log::warning('entPhysical collection failed for ' . $os->getDevice()->hostname
+                . ', keeping existing inventory: ' . $e->getMessage());
 
             return;
         }

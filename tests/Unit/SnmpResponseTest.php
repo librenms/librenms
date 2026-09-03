@@ -357,4 +357,38 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
             $this->fail('There should be no data in the array.');
         });
     }
+
+    public function testIsTimeout(): void
+    {
+        // the device did not answer: we learned nothing about it
+        $response = new SnmpResponse('', "Timeout: No Response from udp:127.1.6.1:1161.\n", 1);
+        $this->assertTrue($response->isTimeout());
+
+        // a partial walk that then timed out is still a timeout: the rows we got
+        // are not the whole table, so the result must not be treated as complete
+        $response = new SnmpResponse(
+            "ENTITY-MIB::entPhysicalDescr[1] = Chassis\n",
+            "Timeout: No Response from udp:127.1.6.1:1161.\n",
+            1
+        );
+        $this->assertTrue($response->isTimeout());
+        $this->assertFalse($response->isValid());
+
+        // the agent answered, it just has nothing at that OID — not a timeout
+        $response = new SnmpResponse("ENTITY-MIB::entPhysicalTable = No Such Object available on this agent at this OID\n");
+        $this->assertFalse($response->isTimeout());
+        $this->assertFalse($response->isValid());
+
+        $response = new SnmpResponse("SNMPv2-SMI::enterprises.9.9.661.1.3.2.1.1 = No Such Instance currently exists at this OID.\n");
+        $this->assertFalse($response->isTimeout());
+
+        // other transport-level failures are not timeouts
+        $response = new SnmpResponse('', "snmpget: Authentication failure (incorrect password, community or key)\n", 1);
+        $this->assertFalse($response->isTimeout());
+
+        // a good response is not a timeout
+        $response = new SnmpResponse("ENTITY-MIB::entPhysicalDescr[1] = Chassis\n");
+        $this->assertFalse($response->isTimeout());
+        $this->assertTrue($response->isValid());
+    }
 }
