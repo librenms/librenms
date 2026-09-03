@@ -39,10 +39,13 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 trait StreamsOutputToBrowser
 {
     private ?string $downloadFile = null;
+    private ?OutputStyle $outputBuffer = null;
 
     protected function stream(callable $function): StreamedResponse
     {
         return new StreamedResponse(function () use ($function): void {
+            $this->setupLogger();
+
             while (ob_get_level() > 0) {
                 ob_end_flush();
             }
@@ -55,6 +58,16 @@ trait StreamsOutputToBrowser
     protected function enableDownload(string $downloadFile): void
     {
         $this->downloadFile = $downloadFile;
+    }
+
+    protected function getCliStreamOutput(): OutputStyle
+    {
+        $this->outputBuffer ??= new OutputStyle(
+            new ArrayInput([]),
+            new StreamOutput(fopen('php://output', 'w'), decorated: false)
+        );
+
+        return $this->outputBuffer;
     }
 
     /**
@@ -82,7 +95,7 @@ trait StreamsOutputToBrowser
         return $headers;
     }
 
-    protected function configureLoggerToStreamOutput(): OutputStyle
+    private function setupLogger(): void
     {
         config(['logging.channels.stream' => [
             'driver' => 'custom',
@@ -92,10 +105,5 @@ trait StreamsOutputToBrowser
             'level' => 'debug',
         ]]);
         Log::setDefaultDriver('stream');
-
-        return new OutputStyle(
-            new ArrayInput([]),
-            new StreamOutput(fopen('php://output', 'w'), decorated: false)
-        );
     }
 }

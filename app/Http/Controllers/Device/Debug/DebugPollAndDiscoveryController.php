@@ -59,10 +59,9 @@ class DebugPollAndDiscoveryController extends Controller
         };
 
         return $this->stream(function () use ($cmd, $args): void {
-            $output = $this->configureLoggerToStreamOutput();
             Event::forget(CommandStarting::class); // prevent normal cli setup and checks
 
-            $exitCode = Artisan::call($cmd, $args, $output);
+            $exitCode = Artisan::call($cmd, $args, $this->getCliStreamOutput());
 
             if ($exitCode) {
                 echo PHP_EOL . 'exit_status:' . $exitCode . PHP_EOL;
