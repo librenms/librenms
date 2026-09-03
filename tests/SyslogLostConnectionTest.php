@@ -75,7 +75,7 @@ final class SyslogLostConnectionTest extends DBTestCase
 
             $entry = $this->processor->process($this->message($device->hostname));
 
-            $this->assertEquals($device->device_id, $entry['device_id'], 'Expected the lookup to survive the lost connection.');
+            $this->assertEquals($device->device_id, $entry->device_id, 'Expected the lookup to survive the lost connection.');
             $this->assertNotSame($killed, $this->connectionId(), 'Expected a new connection, not the killed one.');
         } finally {
             $device->delete();

@@ -121,6 +121,6 @@ final class SyslogDeviceLookupTest extends DBTestCase
             program: 'TEST',
         ));
 
-        return $entry['device_id'];
+        return $entry->device_id;
     }
 }

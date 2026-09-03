@@ -52,9 +52,15 @@ class Processor
     /**
      * Parse a message and store it if it belongs to a known device.
      */
-    public function process(string $line): Entry
+    public function process(string $line): ?Entry
     {
-        $entry = $this->parse($this->parseLogLine($line));
+        $entry = $this->parseLogLine($line);
+
+        if ($entry === null) {
+            return null;
+        }
+
+        $entry = $this->parse($entry);
 
         if (isset($entry->device_id)) {
             $this->storeEntry($entry);
@@ -76,8 +82,6 @@ class Processor
 
     /**
      * Parse a message without storing it.
-     *
-     * @return array<string, mixed>
      */
     public function parse(Entry $entry): Entry
     {
@@ -98,12 +102,8 @@ class Processor
 
         $entry = $this->parseMessage($os, $os_version, $entry);
 
-        if (empty($entry->program)) {
-            $entry->program = $entry->msg;
-            $entry->msg = '';
-        }
-
-        $entry->program = strtoupper($entry->program);
+        $entry->program = trim(strtoupper($entry->program));
+        $entry->msg = trim($entry->msg);
 
         return $entry;
     }
@@ -153,7 +153,7 @@ class Processor
     /**
      * Split program/msg apart based on the conventions each OS's syslog implementation uses.
      */
-    private function parseMessage(string $os, string $os_version, Entry $entry): Entry
+    private function parseMessage(string $os, ?string $os_version, Entry $entry): Entry
     {
         return match ($os) {
             'ios', 'iosxe', 'catos' => $this->parseCiscoIosMessage($entry),
@@ -259,7 +259,7 @@ class Processor
         $msg = preg_replace('/" /', '";', stripslashes($entry->program . ':' . $entry->msg));
         $fields = str_getcsv((string) $msg, ';', escape: '\\');
 
-        $entry->program = null;
+        $entry->program = '';
 
         foreach ($fields as $field) {
             [$var, $val] = array_pad(explode('=', (string) $field, 2), 2, null);
@@ -294,13 +294,7 @@ class Processor
     }
 
     /**
-     * @param  string  $host
-     * @return array{
-     *     int,    # device id
-     *     string, # hostname
-     *     string, # os
-     *     ?string # os version
-     * }
+     * @return array{int, string, string, ?string}
      */
     private function deviceInfo(string $host): array
     {
@@ -308,22 +302,26 @@ class Processor
             return $this->deviceInfo[$host];
         }
 
-        if (isset($this->misses[$host]) && (time() - $this->misses[$host]) < self::MISS_TTL) {
+        if (isset($this->misses[$host]) && (now()->timestamp - $this->misses[$host]) < self::MISS_TTL) {
             return [0, $host, 'generic', null];
         }
 
+        $ip = IP::parse($host, true);
+        /** @var Device|null $deviceInfo */
         $deviceInfo = Device::query()
             ->where('hostname', $host)
-            ->when(IP::parse($host, true), fn (Builder $q, string $ip) => $q->orWhere(fn ($q) => $q->hasIp($ip)))
-            ->get(['device_id', 'hostname', 'os', 'version']);
+            ->orWhere('sysName', $host)
+            ->when($ip, fn (Builder $q) => $q->orWhere(fn (Builder $q) => $q->hasIp($ip)))
+            ->first(['device_id', 'hostname', 'os', 'version']);
 
         if ($deviceInfo === null) {
-            $this->misses[$host] = time();
+            $this->misses[$host] = now()->timestamp;
 
             return [0, $host, 'generic', null];
         }
 
-        $this->deviceInfo[$host] = [$deviceInfo->device_id, $deviceInfo->hostname, $deviceInfo->os, $deviceInfo->version];
+        unset($this->misses[$host]);
+        $this->deviceInfo[$host] = [$deviceInfo->device_id, $deviceInfo->hostname, $deviceInfo->os ?? 'generic', $deviceInfo->version];
 
         return $this->deviceInfo[$host];
     }

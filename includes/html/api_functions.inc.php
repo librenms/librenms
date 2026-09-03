@@ -4003,7 +4003,17 @@ function post_syslogsink(Illuminate\Http\Request $request)
     $processor = new Processor();
 
     foreach ($logs as $entry) {
-        $entryObject = $processor->parse(Entry::fromArray($entry));
+        $entryObject = $processor->parse(new Entry(
+            host: $entry['host'] ?? '',
+            facility: $entry['facility'] ?? '',
+            priority: $entry['priority'] ?? '',
+            level: $entry['level'] ?? '',
+            tag: $entry['tag'] ?? '',
+            timestamp: $entry['timestamp'] ?? '',
+            msg: $entry['msg'] ?? '',
+            program: $entry['program'] ?? '',
+            device_id: $entry['device_id'] ?? null,
+        ));
         $processor->storeEntry($entryObject);
     }
 

@@ -15,19 +15,4 @@ class Entry
         public string $program,
         public ?int $device_id = null,
     ) {}
-
-    public static function fromArray(array $entry): static
-    {
-        return new static(
-            $entry['host'] ?? '',
-            $entry['facility'] ?? '',
-            $entry['priority'] ?? '',
-            $entry['level'] ?? '',
-            $entry['tag'] ?? '',
-            $entry['timestamp'] ?? '',
-            $entry['msg'] ?? '',
-            $entry['program'] ?? '',
-            $entry['device_id'] ?? null,
-        );
-    }
 }
