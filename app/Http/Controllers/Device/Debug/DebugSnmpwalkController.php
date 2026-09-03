@@ -32,6 +32,8 @@ use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Validation\Rule;
+use LibreNMS\Data\Source\NetSnmpQuery;
+use ReflectionMethod;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DebugSnmpwalkController extends Controller
@@ -44,28 +46,35 @@ class DebugSnmpwalkController extends Controller
 
         $validated = $request->validate([
             'format' => ['required', Rule::in(['text', 'download'])],
-            'type' => ['required', Rule::in(['snmpwalk'])],
         ]);
-
-        switch ($validated['type']) {
-            case 'snmpwalk':
-                include_once base_path('includes/snmp.inc.php');
-                $cmd = gen_snmpwalk_cmd($device->toArray(), '.', '-OUneb');
-                break;
-            default:
-                throw new \Exception('Request type ' . $validated['type'] . ' needs to be implemented');
-        }
 
         $downloadFile = $validated['format'] == 'download' ? 'snmpwalk-' . $device->hostname . '.txt' : null;
         $headers = $this->headers($downloadFile);
 
-        return new StreamedResponse(function () use ($cmd): void {
+        return new StreamedResponse(function () use ($device): void {
+            $cmd = $this->buildCommandLine($device);
+
             $result = Process::run($cmd, function (string $type, string $output): void {
                 echo $output;
                 flush();
             });
 
-            echo PHP_EOL . 'exit_status:' . $result->exitCode() . PHP_EOL;
+            if ($result->failed()) {
+                echo PHP_EOL . 'exit_status:' . $result->exitCode() . PHP_EOL;
+            }
         }, 200, $headers);
+    }
+
+    /**
+     * @return array<int, string>
+     * @throws \ReflectionException
+     */
+    private function buildCommandLine(Device $device): array
+    {
+        $query = NetSnmpQuery::make()->device($device)->options(['-OUneb']);
+
+        $buildCli = new ReflectionMethod($query, 'buildCli');
+
+        return $buildCli->invoke($query, 'snmpwalk', ['.']);
     }
 }
