@@ -580,6 +580,7 @@
 
                 async loadLatest() {
                     const timer = this.beginLoading();
+                    this.error = null;
                     try {
                         const { data } = await window.axios.get(this.urls.backup);
                         if (!this.selected) {
@@ -587,7 +588,10 @@
                             this.selectedBackupId = data.id;
                         }
                     } catch (e) {
-                        if (!this.selected) this.error = this.requestError(e);
+                        if (!this.selected) {
+                            this.error = this.requestError(e);
+                            this.selected = null;
+                        }
                     } finally {
                         this.endLoading(timer);
                     }
@@ -595,6 +599,7 @@
 
                 async loadBackupContent(backup) {
                     const timer = this.beginLoading();
+                    this.error = null;
                     try {
                         const { data } = await window.axios.get(this.urls.backup, {
                             params: { backup: backup.id, page: backup.page },
@@ -603,7 +608,10 @@
                             this.selected = { ...backup, content: data.content };
                         }
                     } catch (e) {
-                        if (this.selectedBackupId === backup.id) this.error = this.requestError(e);
+                        if (this.selectedBackupId === backup.id) {
+                            this.error = this.requestError(e);
+                            this.selected = null;
+                        }
                     } finally {
                         this.endLoading(timer);
                     }
@@ -850,6 +858,7 @@
                         this.diffGroups = data.groups;
                     } catch (e) {
                         this.error = this.requestError(e);
+                        this.diffGroups = null;
                     } finally {
                         this.endLoading(timer);
                     }
