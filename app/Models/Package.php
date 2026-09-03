@@ -28,11 +28,14 @@ namespace App\Models;
 
 use App\Observers\PackageObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use LibreNMS\Interfaces\Models\Keyable;
 
 #[ObservedBy([PackageObserver::class])]
 class Package extends DeviceRelatedModel implements Keyable
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $primaryKey = 'pkg_id';
     protected $fillable = [
