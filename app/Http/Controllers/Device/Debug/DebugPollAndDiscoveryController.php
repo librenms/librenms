@@ -34,7 +34,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\Rule;
-use LibreNMS\Util\Debug;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DebugPollAndDiscoveryController extends Controller
@@ -48,37 +47,22 @@ class DebugPollAndDiscoveryController extends Controller
         $validated = $request->validate([
             'format' => ['required', Rule::in(['text', 'download'])],
             'type' => ['required', Rule::in(['poller', 'discovery'])],
-            'quiet' => 'sometimes|boolean',
-            'verbose' => 'sometimes|boolean',
         ]);
 
         if ($validated['format'] == 'download') {
             $this->enableDownload($validated['type'] . '-' . $device->hostname . '.txt');
         }
 
-        $args = ['device spec' => $device->device_id];
-        if ($validated['quiet']) {
-            Debug::setCliQuietOutput();
-            $args['-q'] = true;
-        } elseif ($validated['verbose']) {
-            Debug::set();
-            $args['-vv'] = true;
-        }
-
-        if ($validated['type'] == 'poller') {
-            $args['--no-data'] = true;
-        }
-
-        $command = match ($validated['type']) {
-            'poller' => 'device:poll',
-            default => 'device:discover',
+        [$cmd, $args] = match ($validated['type']) {
+            'poller' => ['device:poll', ['device spec' => $device->device_id, '-vv' => true, '--no-data' => true]],
+            default => ['device:discover', ['device spec' => $device->device_id, '-vv' => true]],
         };
 
-        return $this->stream(function () use ($command, $args): void {
+        return $this->stream(function () use ($cmd, $args): void {
             $output = $this->configureLoggerToStreamOutput();
             Event::forget(CommandStarting::class); // prevent normal cli setup and checks
 
-            $exitCode = Artisan::call($command, $args, $output);
+            $exitCode = Artisan::call($cmd, $args, $output);
 
             if ($exitCode) {
                 echo PHP_EOL . 'exit_status:' . $exitCode . PHP_EOL;
