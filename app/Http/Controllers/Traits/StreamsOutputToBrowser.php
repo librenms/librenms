@@ -80,7 +80,7 @@ trait StreamsOutputToBrowser
         config(['logging.channels.stream' => [
             'driver' => 'custom',
             'via' => fn (): Logger => new Logger('stream', [
-                (new StreamHandler('php://output', Level::Debug))->setFormatter(new NoColorFormatter())
+                (new StreamHandler('php://output', Level::Debug))->setFormatter(new NoColorFormatter()),
             ]),
             'level' => 'debug',
         ]]);

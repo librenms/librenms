@@ -37,7 +37,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class DebugProcessController extends Controller
+class DebugPollAndDiscoveryController extends Controller
 {
     use StreamsOutputToBrowser;
 
@@ -54,7 +54,7 @@ class DebugProcessController extends Controller
             $this->enableDownload($validated['type'] . '-' . $device->hostname . '.txt');
         }
 
-        $command = match($validated['type']) {
+        $command = match ($validated['type']) {
             'poller' => 'device:poll',
             default => 'device:discover',
         };
