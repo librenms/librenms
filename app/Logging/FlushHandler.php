@@ -38,6 +38,7 @@ class FlushHandler extends AbstractProcessingHandler
      */
     protected function write(LogRecord $record): void
     {
+        ob_flush();
         flush();
     }
 }
