@@ -467,7 +467,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
                 app('sensor-discovery')->discover(new \App\Models\Sensor([
                     'poller_type' => 'snmp',
                     'sensor_class' => 'temperature',
-                    'sensor_oid' => "$switchThermalTempTableOidPrefix.1.3.$unit.$unit",
+                    'sensor_oid' => "$switchThermalTempTableOidPrefix.1.3.$unit.$index",
                     'sensor_index' => "edgecos-switchThermalTempValue.$unit.$index",
                     'sensor_type' => 'edgecos',
                     'sensor_descr' => "Switch Temperature $unit.$index",
