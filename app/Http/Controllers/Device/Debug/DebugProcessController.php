@@ -63,7 +63,7 @@ class DebugProcessController extends Controller
         $process = match ($validated['type']) {
             'poller' => new PerDeviceProcess(ProcessType::Poller, (string) $device->device_id, PollDevice::class, DevicePolled::class, new ModuleList),
             'discovery' => new PerDeviceProcess(ProcessType::Discovery, (string) $device->device_id, DiscoverDevice::class, DeviceDiscovered::class, new ModuleList),
-            default => throw new \Exception('Request type ' . $validated['type'] . ' needs to be implemented'),
+            default => throw new \Exception('Unsupported type'),
         };
 
         return $this->stream(function () use ($process, $measurements): void {
