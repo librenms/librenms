@@ -30,7 +30,7 @@ use App\Models\Device;
 use App\Models\Location;
 use App\View\SimpleTemplate;
 use Illuminate\Support\Arr;
-use LibreNMS\Util\NetSnmpTranslate;
+use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\StringHelpers;
 use Log;
@@ -62,7 +62,7 @@ trait YamlOSDiscovery
         }
 
         if (isset($os_yaml['hardware_mib'])) {
-            $device->hardware = NetSnmpTranslate::make()->mibs([$os_yaml['hardware_mib']])->hideMib()->translate($device->sysObjectID);
+            $device->hardware = NetSnmpQuery::make()->mibs([$os_yaml['hardware_mib']])->hideMib()->translate($device->sysObjectID);
 
             if (! empty($os_yaml['hardware_regex'])) {
                 $this->parseRegex($os_yaml['hardware_regex'], $device->hardware);

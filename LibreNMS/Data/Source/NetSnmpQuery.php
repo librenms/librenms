@@ -44,33 +44,6 @@ class NetSnmpQuery implements SnmpQueryInterface
 {
     private const DEFAULT_FLAGS = '-OQXUte';
 
-    /** @var string[] */
-    private array $commandCleanupPatterns = [
-        '/-c\' \'[\S]+\'/',
-        '/-u\' \'[\S]+\'/',
-        '/-U\' \'[\S]+\'/',
-        '/-A\' \'[\S]+\'/',
-        '/-X\' \'[\S]+\'/',
-        '/-P\' \'[\S]+\'/',
-        '/-H\' \'[\S]+\'/',
-        '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
-    ];
-
-    /** @var string[] */
-    private array $commandReplacementPatterns = [
-        '-c\' \'COMMUNITY\'',
-        '-u\' \'USER\'',
-        '-U\' \'USER\'',
-        '-A\' \'PASSWORD\'',
-        '-X\' \'PASSWORD\'',
-        '-P\' \'PASSWORD\'',
-        '-H\' \'HOSTNAME\'',
-        '\1:HOSTNAME:\3',
-    ];
-
-    private string $output_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
-    private string $output_replacement = '*';
-
     /**
      * @var string[]
      */
@@ -277,6 +250,32 @@ class NetSnmpQuery implements SnmpQueryInterface
     public function next($oid): SnmpResponse
     {
         return $this->execMultiple('snmpgetnext', $this->limitOids($this->parseOid($oid)));
+    }
+
+    /**
+     * Translate an OID.
+     * call numeric() on the query to output numeric OID
+     */
+    public function translate(string $oid): string
+    {
+        $oid = new Oid($oid);
+        $this->options = array_diff($this->options, [self::DEFAULT_FLAGS]); // remove default options
+
+        // user did not specify numeric, output full text
+        if (! in_array('-On', $this->options)) {
+            if (! in_array('-Os', $this->options)) {
+                $this->options[] = '-OS'; // show full oid, unless hideMib is set
+            }
+        } elseif ($oid->isNumeric()) {
+            return Str::start($oid, '.'); // numeric to numeric optimization
+        }
+
+        // if mib is not directly specified and it doesn't have a numeric root
+        if (! $oid->hasMib() && ! $oid->hasNumericRoot()) {
+            $this->options[] = '-IR'; // search for mib
+        }
+
+        return $this->exec('snmptranslate', [$oid])->value();
     }
 
     private function buildCli(string $command, array $oids): array

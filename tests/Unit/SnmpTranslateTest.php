@@ -27,125 +27,125 @@
 namespace LibreNMS\Tests\Unit;
 
 use App\Models\Device;
+use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Tests\TestCase;
-use LibreNMS\Util\NetSnmpTranslate;
 
 final class SnmpTranslateTest extends TestCase
 {
     public function testSimpleInput(): void
     {
-        $actual = NetSnmpTranslate::make()->numeric()->translate('IF-MIB::ifTable');
+        $actual = NetSnmpQuery::make()->numeric()->translate('IF-MIB::ifTable');
         $this->assertEquals('.1.3.6.1.2.1.2.2', $actual);
 
-        $actual = NetSnmpTranslate::make()->numeric()->mibs(['IF-MIB'], append: false)->translate('ifTable');
+        $actual = NetSnmpQuery::make()->numeric()->mibs(['IF-MIB'], append: false)->translate('ifTable');
         $this->assertEquals('.1.3.6.1.2.1.2.2', $actual);
 
-        $actual = NetSnmpTranslate::make()->numeric()->mibs(['ALL'], append: false)->translate('ifTable');
+        $actual = NetSnmpQuery::make()->numeric()->mibs(['ALL'], append: false)->translate('ifTable');
         $this->assertEquals('.1.3.6.1.2.1.2.2', $actual);
 
-        $actual = NetSnmpTranslate::make()->translate('IF-MIB::ifTable');
+        $actual = NetSnmpQuery::make()->translate('IF-MIB::ifTable');
         $this->assertEquals('IF-MIB::ifTable', $actual);
 
-        $actual = NetSnmpTranslate::make()->numeric()->translate('.1.3.6.1.2.1.2.2');
+        $actual = NetSnmpQuery::make()->numeric()->translate('.1.3.6.1.2.1.2.2');
         $this->assertEquals('.1.3.6.1.2.1.2.2', $actual);
 
-        $actual = NetSnmpTranslate::make()->mibs(['IF-MIB'])->translate('.1.3.6.1.2.1.2.2');
+        $actual = NetSnmpQuery::make()->mibs(['IF-MIB'])->translate('.1.3.6.1.2.1.2.2');
         $this->assertEquals('IF-MIB::ifTable', $actual);
 
-        $actual = NetSnmpTranslate::make()->numeric()->translate('1.3.6.1.2.1.2.2');
+        $actual = NetSnmpQuery::make()->numeric()->translate('1.3.6.1.2.1.2.2');
         $this->assertEquals('.1.3.6.1.2.1.2.2', $actual);
 
-        $actual = NetSnmpTranslate::make()->mibs(['ALL'], append: false)->translate('.1.3.6.1.2.1.2.2');
+        $actual = NetSnmpQuery::make()->mibs(['ALL'], append: false)->translate('.1.3.6.1.2.1.2.2');
         $this->assertEquals('RFC1213-MIB::ifTable', $actual);
 
-        $actual = NetSnmpTranslate::make()->numeric()->mibs(['IP-MIB'])->translate('ifTable');
+        $actual = NetSnmpQuery::make()->numeric()->mibs(['IP-MIB'])->translate('ifTable');
         $this->assertEquals('.1.3.6.1.2.1.2.2', $actual);
 
-        $actual = NetSnmpTranslate::make()->mibs(['IP-MIB'])->translate('ifTable');
+        $actual = NetSnmpQuery::make()->mibs(['IP-MIB'])->translate('ifTable');
         $this->assertEquals('IF-MIB::ifTable', $actual);
 
         // with index
-        $actual = NetSnmpTranslate::make()->numeric()->translate('IF-MIB::ifTable.0');
+        $actual = NetSnmpQuery::make()->numeric()->translate('IF-MIB::ifTable.0');
         $this->assertEquals('.1.3.6.1.2.1.2.2.0', $actual);
 
-        $actual = NetSnmpTranslate::make()->numeric()->mibs(['IF-MIB'])->translate('ifTable.0');
+        $actual = NetSnmpQuery::make()->numeric()->mibs(['IF-MIB'])->translate('ifTable.0');
         $this->assertEquals('.1.3.6.1.2.1.2.2.0', $actual);
 
-        $actual = NetSnmpTranslate::make()->numeric()->mibs(['ALL'], append: false)->translate('ifTable.0');
+        $actual = NetSnmpQuery::make()->numeric()->mibs(['ALL'], append: false)->translate('ifTable.0');
         $this->assertEquals('.1.3.6.1.2.1.2.2.0', $actual);
 
-        $actual = NetSnmpTranslate::make()->translate('IF-MIB::ifTable.0');
+        $actual = NetSnmpQuery::make()->translate('IF-MIB::ifTable.0');
         $this->assertEquals('IF-MIB::ifTable.0', $actual);
 
-        $actual = NetSnmpTranslate::make()->numeric()->translate('.1.3.6.1.2.1.2.2.0');
+        $actual = NetSnmpQuery::make()->numeric()->translate('.1.3.6.1.2.1.2.2.0');
         $this->assertEquals('.1.3.6.1.2.1.2.2.0', $actual);
 
-        $actual = NetSnmpTranslate::make()->mibs(['IF-MIB'])->translate('.1.3.6.1.2.1.2.2.0');
+        $actual = NetSnmpQuery::make()->mibs(['IF-MIB'])->translate('.1.3.6.1.2.1.2.2.0');
         $this->assertEquals('IF-MIB::ifTable.0', $actual);
 
-        $actual = NetSnmpTranslate::make()->numeric()->translate('1.3.6.1.2.1.2.2.0');
+        $actual = NetSnmpQuery::make()->numeric()->translate('1.3.6.1.2.1.2.2.0');
         $this->assertEquals('.1.3.6.1.2.1.2.2.0', $actual);
 
-        $actual = NetSnmpTranslate::make()->mibs(['ALL'], append: false)->translate('.1.3.6.1.2.1.2.2.0');
+        $actual = NetSnmpQuery::make()->mibs(['ALL'], append: false)->translate('.1.3.6.1.2.1.2.2.0');
         $this->assertEquals('RFC1213-MIB::ifTable.0', $actual);
 
-        $actual = NetSnmpTranslate::make()->mibs(['IP-MIB'])->translate('ifTable.0');
+        $actual = NetSnmpQuery::make()->mibs(['IP-MIB'])->translate('ifTable.0');
         $this->assertEquals('IF-MIB::ifTable.0', $actual);
 
-        $actual = NetSnmpTranslate::make()->mibs(['SNMPv2-MIB'])->translate('iso.3.6.1.2.1.1.1.0');
+        $actual = NetSnmpQuery::make()->mibs(['SNMPv2-MIB'])->translate('iso.3.6.1.2.1.1.1.0');
         $this->assertEquals('SNMPv2-MIB::sysDescr.0', $actual);
 
-        $actual = NetSnmpTranslate::make()->numeric()->mibs(['SNMPv2-MIB'])->translate('iso.3.6.1.2.1.1.1.0');
+        $actual = NetSnmpQuery::make()->numeric()->mibs(['SNMPv2-MIB'])->translate('iso.3.6.1.2.1.1.1.0');
         $this->assertEquals('.1.3.6.1.2.1.1.1.0', $actual);
     }
 
     public function testFailedInput(): void
     {
-        $actual = NetSnmpTranslate::make()->translate('ifTable');
+        $actual = NetSnmpQuery::make()->translate('ifTable');
         $this->assertEquals('IF-MIB::ifTable', $actual);
 
-        $actual = NetSnmpTranslate::make()->numeric()->mibs([], append: false)->translate('ifTable');
+        $actual = NetSnmpQuery::make()->numeric()->mibs([], append: false)->translate('ifTable');
         $this->assertEquals('', $actual);
 
-        $actual = NetSnmpTranslate::make()->mibs([], append: false)->translate('ifTable');
+        $actual = NetSnmpQuery::make()->mibs([], append: false)->translate('ifTable');
         $this->assertEquals('', $actual);
 
-        $actual = NetSnmpTranslate::make()->numeric()->mibs(['ASDF-MIB', 'SNMPv2-MIB'], append: false)->translate('ifTable');
+        $actual = NetSnmpQuery::make()->numeric()->mibs(['ASDF-MIB', 'SNMPv2-MIB'], append: false)->translate('ifTable');
         $this->assertEquals('', $actual);
 
-        $actual = NetSnmpTranslate::make()->mibs([], append: false)->translate('ifTable');
+        $actual = NetSnmpQuery::make()->mibs([], append: false)->translate('ifTable');
         $this->assertEquals('', $actual);
 
-        $actual = NetSnmpTranslate::make()->numeric()->mibs([], append: false)->translate('ifTable');
+        $actual = NetSnmpQuery::make()->numeric()->mibs([], append: false)->translate('ifTable');
         $this->assertEquals('', $actual);
 
-        $actual = NetSnmpTranslate::make()->mibs([], append: false)->translate('ifTable');
+        $actual = NetSnmpQuery::make()->mibs([], append: false)->translate('ifTable');
         $this->assertEquals('', $actual);
     }
 
     public function testComplexInput(): void
     {
-        $actual = NetSnmpTranslate::make()->mibs(['RFC1213-MIB', 'IF-MIB'], append: false)->translate('.1.3.6.1.2.1.2.2');
+        $actual = NetSnmpQuery::make()->mibs(['RFC1213-MIB', 'IF-MIB'], append: false)->translate('.1.3.6.1.2.1.2.2');
         $this->assertEquals('RFC1213-MIB::ifTable', $actual);
 
-        $actual = NetSnmpTranslate::make()->mibs(['IF-MIB', 'RFC1213-MIB'], append: false)->translate('.1.3.6.1.2.1.2.2');
+        $actual = NetSnmpQuery::make()->mibs(['IF-MIB', 'RFC1213-MIB'], append: false)->translate('.1.3.6.1.2.1.2.2');
         $this->assertEquals('IF-MIB::ifTable', $actual);
 
-        $actual = NetSnmpTranslate::make()->translate('ifTable');
+        $actual = NetSnmpQuery::make()->translate('ifTable');
         $this->assertEquals('IF-MIB::ifTable', $actual);
 
-        $actual = NetSnmpTranslate::make()->mibs(['RFC1213-MIB', 'IF-MIB'], append: false)->translate('ifTable');
+        $actual = NetSnmpQuery::make()->mibs(['RFC1213-MIB', 'IF-MIB'], append: false)->translate('ifTable');
         $this->assertEquals('RFC1213-MIB::ifTable', $actual);
 
-        $actual = NetSnmpTranslate::make()->mibs(['IF-MIB', 'RFC1213-MIB'], append: false)->translate('ifTable');
+        $actual = NetSnmpQuery::make()->mibs(['IF-MIB', 'RFC1213-MIB'], append: false)->translate('ifTable');
         $this->assertEquals('IF-MIB::ifTable', $actual);
 
         // partial numeric
         $device = Device::factory()->make(['os' => 'dlink']);
-        $actual = NetSnmpTranslate::make()->device($device)->numeric()->mibs(['EQUIPMENT-MIB', 'DLINKSW-ENTITY-EXT-MIB'], append: false)->translate('.1.3.6.1.4.1.171.14.5.1.4.1.4.1.dram');
+        $actual = NetSnmpQuery::make()->device($device)->numeric()->mibs(['EQUIPMENT-MIB', 'DLINKSW-ENTITY-EXT-MIB'], append: false)->translate('.1.3.6.1.4.1.171.14.5.1.4.1.4.1.dram');
         $this->assertEquals('.1.3.6.1.4.1.171.14.5.1.4.1.4.1.1', $actual);
 
-        $actual = NetSnmpTranslate::make()->device($device)->numeric()->mibs(['EQUIPMENT-MIB', 'DLINKSW-ENTITY-EXT-MIB'], append: false)->translate('iso.3.6.1.4.1.171.14.5.1.4.1.4.1.dram');
+        $actual = NetSnmpQuery::make()->device($device)->numeric()->mibs(['EQUIPMENT-MIB', 'DLINKSW-ENTITY-EXT-MIB'], append: false)->translate('iso.3.6.1.4.1.171.14.5.1.4.1.4.1.dram');
         $this->assertEquals('.1.3.6.1.4.1.171.14.5.1.4.1.4.1.1', $actual);
     }
 }
