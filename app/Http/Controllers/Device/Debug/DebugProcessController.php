@@ -64,8 +64,12 @@ class DebugProcessController extends Controller
             Event::forget(CommandStarting::class); // prevent normal cli setup and checks
 
             DB::beginTransaction();
-            Artisan::call($command, ['device spec' => $device->device_id, '-vv' => true], $output);
+            $exitCode = Artisan::call($command, ['device spec' => $device->device_id, '-vv' => true], $output);
             DB::rollBack();
+
+            if ($exitCode) {
+                echo PHP_EOL . 'exit_status:' . $exitCode . PHP_EOL;
+            }
         });
     }
 }
