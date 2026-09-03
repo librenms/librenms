@@ -36,8 +36,8 @@ class EntityPhysicalCollectionException extends Exception
         public readonly bool $defaultTimeout = true,
     ) {
         parent::__construct('entPhysical collection timed out'
-            .($rowCount > 0 ? " after $rowCount rows" : '')
-            .', keeping existing inventory.'
-            .($defaultTimeout ? ' Raising devices.timeout may help.' : ''));
+            . ($rowCount > 0 ? " after $rowCount rows" : '')
+            . ', keeping existing inventory.'
+            . ($defaultTimeout ? ' Raising devices.timeout may help.' : ''));
     }
 }
