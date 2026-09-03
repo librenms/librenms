@@ -4,6 +4,7 @@ namespace LibreNMS\Tests\Feature;
 
 use App\Models\Device;
 use App\Models\EntPhysical;
+use App\Models\Eventlog;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use LibreNMS\Exceptions\EntityPhysicalCollectionException;
@@ -30,7 +31,7 @@ class EntityPhysicalDiscoveryTest extends TestCase
 
         if ($collectionFailed) {
             $os->shouldReceive('discoverEntityPhysical')
-                ->andThrow(new EntityPhysicalCollectionException('Timeout: No Response from udp:127.0.0.1:161'));
+                ->andThrow(new EntityPhysicalCollectionException('Timeout: No Response from udp:127.0.0.1:161', 120, true));
         } else {
             $os->shouldReceive('discoverEntityPhysical')->andReturn($discovered);
         }
@@ -104,6 +105,44 @@ class EntityPhysicalDiscoveryTest extends TestCase
         $this->assertEquals(2, $device->entityPhysical()->count());
         $this->assertEquals('new-chassis',
             $device->entityPhysical()->where('entPhysicalIndex', 1)->first()->entPhysicalDescr);
+    }
+
+    public function testTheExceptionMessageNamesTheRowCountAndTheTimeoutHint(): void
+    {
+        // partial walk on a device still using the default 1s timeout: the operator
+        // needs to know rows arrived (so the agent is alive, just slow) and that the
+        // timeout is theirs to raise.
+        $partial = new EntityPhysicalCollectionException('Timeout: No Response from udp:10.0.0.1:161', 120, true);
+        $this->assertStringContainsString('120 rows', $partial->getMessage());
+        $this->assertStringContainsString('keeping existing inventory', $partial->getMessage());
+        $this->assertStringContainsString('devices.timeout', $partial->getMessage());
+
+        // nothing came back at all: "after 0 rows" is noise, omit it
+        $nothing = new EntityPhysicalCollectionException('Timeout: No Response from udp:10.0.0.1:161', 0, true);
+        $this->assertStringNotContainsString('0 rows', $nothing->getMessage());
+        $this->assertStringContainsString('keeping existing inventory', $nothing->getMessage());
+
+        // the timeout was already raised and it still failed: do not advise raising it
+        $tuned = new EntityPhysicalCollectionException('Timeout: No Response from udp:10.0.0.1:161', 120, false);
+        $this->assertStringContainsString('120 rows', $tuned->getMessage());
+        $this->assertStringNotContainsString('devices.timeout', $tuned->getMessage());
+    }
+
+    public function testFailedCollectionIsRecordedOnTheDeviceEventlog(): void
+    {
+        $device = Device::factory()->create();
+        EntPhysical::factory()->count(5)->create(['device_id' => $device->device_id]);
+
+        $this->runDiscovery($device, new Collection, collectionFailed: true);
+
+        $this->assertDatabaseHas('eventlog', [
+            'device_id' => $device->device_id,
+            'type' => 'discovery',
+        ]);
+        $event = Eventlog::where('device_id', $device->device_id)
+            ->where('type', 'discovery')->first();
+        $this->assertStringContainsString('keeping existing inventory', $event->message,
+            'the operator must be told on the device page, not only in librenms.log');
     }
 
     protected function tearDown(): void

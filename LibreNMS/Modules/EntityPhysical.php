@@ -4,9 +4,11 @@ namespace LibreNMS\Modules;
 
 use App\Models\Device;
 use App\Models\EntPhysical;
+use App\Models\Eventlog;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\EntityPhysicalCollectionException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
@@ -50,8 +52,8 @@ class EntityPhysical implements Module
         try {
             $inventory = $os->discoverEntityPhysical();
         } catch (EntityPhysicalCollectionException $e) {
-            Log::warning('entPhysical collection failed for ' . $os->getDevice()->hostname
-                . ', keeping existing inventory: ' . $e->getMessage());
+            Eventlog::log($e->getMessage(), $os->getDevice(), 'discovery', Severity::Warning);
+            Log::debug('entPhysical collection failed: ' . $e->error);
 
             return;
         }

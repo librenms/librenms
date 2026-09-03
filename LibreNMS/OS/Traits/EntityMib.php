@@ -41,7 +41,11 @@ trait EntityMib
         $data = $snmpQuery->walk('ENTITY-MIB::entPhysicalTable');
 
         if ($data->isTimeout()) {
-            throw new EntityPhysicalCollectionException($data->getErrorMessage());
+            throw new EntityPhysicalCollectionException(
+                $data->getErrorMessage(),
+                count($data->values()),
+                ($this->getDevice()->timeout ?? \LibrenmsConfig::get('snmp.timeout')) == 1,
+            );
         }
 
         if (! $data->isValid()) {

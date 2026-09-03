@@ -30,4 +30,14 @@ use Exception;
 
 class EntityPhysicalCollectionException extends Exception
 {
+    public function __construct(
+        public readonly string $error,
+        public readonly int $rowCount = 0,
+        public readonly bool $defaultTimeout = true,
+    ) {
+        parent::__construct('entPhysical collection timed out'
+            .($rowCount > 0 ? " after $rowCount rows" : '')
+            .', keeping existing inventory.'
+            .($defaultTimeout ? ' Raising devices.timeout may help.' : ''));
+    }
 }
