@@ -60,11 +60,11 @@ class DebugProcessController extends Controller
             $this->enableDownload($validated['type'] . '-' . $device->hostname . '.txt');
         }
 
-        $process = match ($validated['type']) {
-            'poller' => new PerDeviceProcess(ProcessType::Poller, (string) $device->device_id, PollDevice::class, DevicePolled::class, new ModuleList),
-            'discovery' => new PerDeviceProcess(ProcessType::Discovery, (string) $device->device_id, DiscoverDevice::class, DeviceDiscovered::class, new ModuleList),
-            default => throw new \Exception('Unsupported type'),
-        };
+        if ($validated['type'] == 'discovery') {
+            $process = new PerDeviceProcess(ProcessType::Discovery, (string) $device->device_id, DiscoverDevice::class, DeviceDiscovered::class, new ModuleList);
+        } else {
+            $process = new PerDeviceProcess(ProcessType::Poller, (string) $device->device_id, PollDevice::class, DevicePolled::class, new ModuleList);
+        }
 
         return $this->stream(function () use ($process, $measurements): void {
             $output = $this->configureLoggerToStreamOutput();
