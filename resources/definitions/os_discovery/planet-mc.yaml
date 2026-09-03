@@ -1,13 +1,3 @@
-# No temperature sensor here on purpose: PLANET-MC1610MR-MIB::chassisTemperature
-# (.1.3.6.1.4.1.10456.2.625.3) exists and was tested against a real device,
-# but its reading is unreliable - it alternates unpredictably between a
-# plausible value and a "-1.0" sentinel, in irregular blocks lasting
-# anywhere from ~25 seconds to several minutes, with no consistent period.
-# That doesn't match an intentional/documented behavior (PLANET's own MIB
-# text doesn't mention -1.0 as meaningful), so it looks like a flaky probe
-# or its readout circuit rather than something worth building sensor logic
-# around. If a future device/firmware revision reports it reliably, this
-# can be revisited.
 modules:
     sensors:
         state:

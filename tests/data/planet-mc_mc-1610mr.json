@@ -11,7 +11,7 @@
                     "hardware": null,
                     "features": null,
                     "location": "NYC",
-                    "os": "planet-chassis",
+                    "os": "planet-mc",
                     "type": "network",
                     "serial": null,
                     "icon": "planet.png"

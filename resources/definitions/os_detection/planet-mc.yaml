@@ -1,5 +1,5 @@
-os: planet-chassis
-text: PLANET
+os: planet-mc
+text: Planet Media Chassis
 type: network
 icon: planet
 mib_dir: planet
