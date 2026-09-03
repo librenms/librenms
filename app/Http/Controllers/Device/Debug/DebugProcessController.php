@@ -26,28 +26,22 @@
 
 namespace App\Http\Controllers\Device\Debug;
 
-use App\Events\DeviceDiscovered;
-use App\Events\DevicePolled;
-use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\StreamsOutputToBrowser;
-use App\Jobs\DiscoverDevice;
-use App\Jobs\PollDevice;
 use App\Models\Device;
-use App\PerDeviceProcess;
-use App\Polling\Measure\MeasurementManager;
+use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\Rule;
-use LibreNMS\Enum\ProcessType;
-use LibreNMS\Util\ModuleList;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DebugProcessController extends Controller
 {
     use StreamsOutputToBrowser;
 
-    public function __invoke(Device $device, Request $request, MeasurementManager $measurements): StreamedResponse
+    public function __invoke(Device $device, Request $request): StreamedResponse
     {
         $this->authorize('debug', $device);
 
@@ -60,32 +54,18 @@ class DebugProcessController extends Controller
             $this->enableDownload($validated['type'] . '-' . $device->hostname . '.txt');
         }
 
-        if ($validated['type'] == 'discovery') {
-            $process = new PerDeviceProcess(ProcessType::Discovery, (string) $device->device_id, DiscoverDevice::class, DeviceDiscovered::class, new ModuleList);
-        } else {
-            $process = new PerDeviceProcess(ProcessType::Poller, (string) $device->device_id, PollDevice::class, DevicePolled::class, new ModuleList);
-        }
+        $command = match($validated['type']) {
+            'poller' => 'device:poll',
+            default => 'device:discover',
+        };
 
-        return $this->stream(function () use ($process, $measurements): void {
+        return $this->stream(function () use ($command, $device): void {
             $output = $this->configureLoggerToStreamOutput();
-
-            $this->disableDatastores();
+            Event::forget(CommandStarting::class); // prevent normal cli setup and checks
 
             DB::beginTransaction();
-            $process->run();
+            Artisan::call($command, ['device spec' => $device->device_id, '-vv' => true], $output);
             DB::rollBack();
-
-            $process->processResults($measurements, $output);
         });
-    }
-
-    private function disableDatastores(): void
-    {
-        LibrenmsConfig::set('rrd.enable', false);
-        LibrenmsConfig::set('influxdb.enable', false);
-        LibrenmsConfig::set('influxdbv2.enable', false);
-        LibrenmsConfig::set('prometheus.enable', false);
-        LibrenmsConfig::set('graphite.enable', false);
-        LibrenmsConfig::set('kafka.enable', false);
     }
 }
