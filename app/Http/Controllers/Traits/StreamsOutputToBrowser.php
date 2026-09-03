@@ -1,6 +1,7 @@
 <?php
+
 /**
- * StreamingController.php
+ * StreamsOutputToBrowser.php
  *
  * -Description-
  *
@@ -23,7 +24,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Traits;
 
 use App\Logging\NoColorFormatter;
 use Illuminate\Console\OutputStyle;
@@ -33,10 +34,26 @@ use Monolog\Level;
 use Monolog\Logger;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 trait StreamsOutputToBrowser
 {
-    protected function headers(?string $downloadFile = null): array
+    private ?string $downloadFile = null;
+
+    protected function stream(callable $function): StreamedResponse
+    {
+        return new StreamedResponse($function, 200, $this->headers());
+    }
+
+    protected function enableDownload(string $downloadFile): void
+    {
+        $this->downloadFile = $downloadFile;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function headers(): array
     {
         $headers = [
             'Cache-Control' => 'no-cache',
@@ -44,10 +61,10 @@ trait StreamsOutputToBrowser
             'Content-Type' => 'text/plain',
         ];
 
-        if ($downloadFile) {
+        if ($this->downloadFile) {
             $headers += [
                 'Content-Description' => 'File Transfer',
-                'Content-Disposition' => 'attachment; filename=' . $downloadFile,
+                'Content-Disposition' => 'attachment; filename=' . $this->downloadFile,
                 'Content-Transfer-Encoding' => 'binary',
                 'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
                 'Expires' => '0',

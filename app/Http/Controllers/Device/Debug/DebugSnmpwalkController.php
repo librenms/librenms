@@ -27,7 +27,7 @@
 namespace App\Http\Controllers\Device\Debug;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\StreamsOutputToBrowser;
+use App\Http\Controllers\Traits\StreamsOutputToBrowser;
 use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Process;
@@ -44,14 +44,13 @@ class DebugSnmpwalkController extends Controller
     {
         $this->authorize('debug', $device);
 
-        $validated = $request->validate([
-            'format' => ['required', Rule::in(['text', 'download'])],
-        ]);
+        $validated = $request->validate(['format' => ['required', Rule::in(['text', 'download'])]]);
 
-        $downloadFile = $validated['format'] == 'download' ? 'snmpwalk-' . $device->hostname . '.txt' : null;
-        $headers = $this->headers($downloadFile);
+        if ($validated['format'] == 'download') {
+            $this->enableDownload('snmpwalk-' . $device->hostname . '.txt');
+        }
 
-        return new StreamedResponse(function () use ($device): void {
+        return $this->stream(function () use ($device): void {
             $cmd = $this->buildCommandLine($device);
 
             $result = Process::run($cmd, function (string $type, string $output): void {
@@ -62,11 +61,12 @@ class DebugSnmpwalkController extends Controller
             if ($result->failed()) {
                 echo PHP_EOL . 'exit_status:' . $result->exitCode() . PHP_EOL;
             }
-        }, 200, $headers);
+        });
     }
 
     /**
      * @return array<int, string>
+     *
      * @throws \ReflectionException
      */
     private function buildCommandLine(Device $device): array

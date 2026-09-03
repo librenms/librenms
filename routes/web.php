@@ -200,9 +200,9 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('accesspoints/{accessPoint}', [Device\Tabs\AccessPointsController::class, 'show'])->name('accesspoints.show')->scopeBindings();
         Route::put('module/{module}', [Device\Tabs\ModuleController::class, 'update'])->name('module.update');
         Route::delete('module/{module}', [Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
-        Route::get('artisan', Device\Debug\DebugProcessController::class)->name('artisan');
-        Route::get('command', Device\Debug\DebugSnmpwalkController::class)->name('command');
-        Route::get('query', Device\Debug\DebugAlertsController::class)->name('query');
+        Route::get('debug/process', Device\Debug\DebugProcessController::class)->name('debug.process');
+        Route::get('debug/snmp', Device\Debug\DebugSnmpwalkController::class)->name('debug.snmp');
+        Route::get('debug/alerts', Device\Debug\DebugAlertsController::class)->name('debug.alerts');
     });
 
     // fallback device routes

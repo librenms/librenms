@@ -30,7 +30,7 @@ use App\Events\DeviceDiscovered;
 use App\Events\DevicePolled;
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\StreamsOutputToBrowser;
+use App\Http\Controllers\Traits\StreamsOutputToBrowser;
 use App\Jobs\DiscoverDevice;
 use App\Jobs\PollDevice;
 use App\Models\Device;
@@ -55,6 +55,10 @@ class DebugProcessController extends Controller
             'type' => ['required', Rule::in(['poller', 'discovery'])],
         ]);
 
+        if ($validated['format'] == 'download') {
+            $this->enableDownload($validated['type'] . '-' . $device->hostname . '.txt');
+        }
+
         $this->disableDatastores();
 
         $process = match ($validated['type']) {
@@ -63,15 +67,12 @@ class DebugProcessController extends Controller
             default => throw new \Exception('Request type ' . $validated['type'] . ' needs to be implemented'),
         };
 
-        $downloadFile = $validated['format'] === 'download' ? $validated['type'] . '-' . $device->hostname . '.txt' : null;
-        $headers = $this->headers($downloadFile);
-
-        return new StreamedResponse(function () use ($process, $measurements): void {
+        return $this->stream(function () use ($process, $measurements): void {
             $output = $this->configureLoggerToStreamOutput();
 
             $process->run();
             $process->processResults($measurements, $output);
-        }, 200, $headers);
+        });
     }
 
     private function disableDatastores(): void

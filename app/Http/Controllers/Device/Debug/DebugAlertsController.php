@@ -28,7 +28,7 @@ namespace App\Http\Controllers\Device\Debug;
 
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\StreamsOutputToBrowser;
+use App\Http\Controllers\Traits\StreamsOutputToBrowser;
 use App\Models\AlertRule;
 use App\Models\Device;
 use Illuminate\Http\Request;
@@ -46,11 +46,13 @@ class DebugAlertsController extends Controller
     {
         $this->authorize('debug', $device);
 
-        $validated = $request->validate(['format' => ['required', Rule::in(['text', 'download'])],]);
-        $downloadFile = $validated['format'] == 'download' ? 'alerts-' . $device->hostname . '.txt' : null;
-        $headers = $this->headers($downloadFile);
+        $validated = $request->validate(['format' => ['required', Rule::in(['text', 'download'])]]);
 
-        return new StreamedResponse(function () use ($device): void {
+        if ($validated['format'] == 'download') {
+            $this->enableDownload('alerts-' . $device->hostname . '.txt');
+        }
+
+        return $this->stream(function () use ($device): void {
             $rules = AlertRule::enabled()->forDevice($device)->get();
             $results = [];
             foreach ($rules as $rule) {
@@ -116,6 +118,6 @@ class DebugAlertsController extends Controller
                 echo 'Found ' . $x . ' transports to send alerts to.' . PHP_EOL;
                 echo $transports;
             }
-        }, 200, $headers);
+        });
     }
 }
