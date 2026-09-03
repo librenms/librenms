@@ -37,6 +37,7 @@ use App\Models\Device;
 use App\PerDeviceProcess;
 use App\Polling\Measure\MeasurementManager;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Util\ModuleList;
@@ -59,8 +60,6 @@ class DebugProcessController extends Controller
             $this->enableDownload($validated['type'] . '-' . $device->hostname . '.txt');
         }
 
-        $this->disableDatastores();
-
         $process = match ($validated['type']) {
             'poller' => new PerDeviceProcess(ProcessType::Poller, (string) $device->device_id, PollDevice::class, DevicePolled::class, new ModuleList),
             'discovery' => new PerDeviceProcess(ProcessType::Discovery, (string) $device->device_id, DiscoverDevice::class, DeviceDiscovered::class, new ModuleList),
@@ -70,7 +69,12 @@ class DebugProcessController extends Controller
         return $this->stream(function () use ($process, $measurements): void {
             $output = $this->configureLoggerToStreamOutput();
 
+            $this->disableDatastores();
+
+            DB::beginTransaction();
             $process->run();
+            DB::rollBack();
+
             $process->processResults($measurements, $output);
         });
     }
