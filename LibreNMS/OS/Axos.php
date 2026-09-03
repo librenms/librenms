@@ -31,10 +31,10 @@ use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Transceiver;
 use Illuminate\Support\Collection;
-use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
+use LibreNMS\Util\NetSnmpTranslate;
 use SnmpQuery;
 
 class Axos extends OS implements OSDiscovery, TransceiverDiscovery
@@ -76,7 +76,7 @@ class Axos extends OS implements OSDiscovery, TransceiverDiscovery
         $inventory = new Collection;
         $physical_index = 1;
 
-        $physical_name = NetSnmpQuery::make()->hideMib()->mibs(['CALIX-PRODUCT-MIB'])->translate($this->getDevice()->sysObjectID);
+        $physical_name = NetSnmpTranslate::make()->hideMib()->mibs(['CALIX-PRODUCT-MIB'])->translate($this->getDevice()->sysObjectID);
         $serial_number = \SnmpQuery::get('Axos-System-MIB::axosSystemChassisSerialNumber.0')->value();
         $inventory->push(new EntPhysical([
             'entPhysicalIndex' => $physical_index++,

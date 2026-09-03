@@ -40,9 +40,36 @@ use LibreNMS\Util\Rewrite;
 use Log;
 use Symfony\Component\Process\Process;
 
-class NetSnmpQuery implements SnmpTranslateInterface, SnmpQueryInterface
+class NetSnmpQuery implements SnmpQueryInterface
 {
     private const DEFAULT_FLAGS = '-OQXUte';
+
+    /** @var string[] */
+    private array $commandCleanupPatterns = [
+        '/-c\' \'[\S]+\'/',
+        '/-u\' \'[\S]+\'/',
+        '/-U\' \'[\S]+\'/',
+        '/-A\' \'[\S]+\'/',
+        '/-X\' \'[\S]+\'/',
+        '/-P\' \'[\S]+\'/',
+        '/-H\' \'[\S]+\'/',
+        '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
+    ];
+
+    /** @var string[] */
+    private array $commandReplacementPatterns = [
+        '-c\' \'COMMUNITY\'',
+        '-u\' \'USER\'',
+        '-U\' \'USER\'',
+        '-A\' \'PASSWORD\'',
+        '-X\' \'PASSWORD\'',
+        '-P\' \'PASSWORD\'',
+        '-H\' \'HOSTNAME\'',
+        '\1:HOSTNAME:\3',
+    ];
+
+    private string $output_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
+    private string $output_replacement = '*';
 
     /**
      * @var string[]
@@ -64,7 +91,7 @@ class NetSnmpQuery implements SnmpTranslateInterface, SnmpQueryInterface
     /**
      * Easy way to start a new instance
      */
-    public static function make(): SnmpTranslateInterface|SnmpQueryInterface
+    public static function make(): SnmpQueryInterface
     {
         return new static;
     }
@@ -73,7 +100,7 @@ class NetSnmpQuery implements SnmpTranslateInterface, SnmpQueryInterface
      * Specify a device to make the snmp query against.
      * By default the query will use the primary device.
      */
-    public function device(Device $device): SnmpTranslateInterface|SnmpQueryInterface
+    public function device(Device $device): SnmpQueryInterface
     {
         $this->device = $device;
 
@@ -110,7 +137,7 @@ class NetSnmpQuery implements SnmpTranslateInterface, SnmpQueryInterface
      * Set an additional MIB directory to search for MIBs.
      * You do not need to specify the base and os directories, they are already included.
      */
-    public function mibDir(?string $dir): SnmpTranslateInterface|SnmpQueryInterface
+    public function mibDir(?string $dir): SnmpQueryInterface
     {
         $this->mibDirs[] = $dir;
 
@@ -121,7 +148,7 @@ class NetSnmpQuery implements SnmpTranslateInterface, SnmpQueryInterface
      * Set MIBs to use for this query. Base mibs are included by default.
      * They will be appended to existing mibs unless $append is set to false.
      */
-    public function mibs(array $mibs, bool $append = true): SnmpTranslateInterface|SnmpQueryInterface
+    public function mibs(array $mibs, bool $append = true): SnmpQueryInterface
     {
         $this->mibs = $append ? array_merge($this->mibs, $mibs) : $mibs;
 
@@ -153,7 +180,7 @@ class NetSnmpQuery implements SnmpTranslateInterface, SnmpQueryInterface
     /**
      * Output all OIDs numerically
      */
-    public function numeric(bool $numeric = true): SnmpTranslateInterface|SnmpQueryInterface
+    public function numeric(bool $numeric = true): SnmpQueryInterface
     {
         $this->options = $numeric
             ? array_merge($this->options, ['-On'])
@@ -177,7 +204,7 @@ class NetSnmpQuery implements SnmpTranslateInterface, SnmpQueryInterface
     /**
      * Hide MIB in output
      */
-    public function hideMib(): SnmpTranslateInterface|SnmpQueryInterface
+    public function hideMib(): SnmpQueryInterface
     {
         $this->options = array_merge($this->options, ['-Os']);
 
@@ -250,32 +277,6 @@ class NetSnmpQuery implements SnmpTranslateInterface, SnmpQueryInterface
     public function next($oid): SnmpResponse
     {
         return $this->execMultiple('snmpgetnext', $this->limitOids($this->parseOid($oid)));
-    }
-
-    /**
-     * Translate an OID.
-     * call numeric() on the query to output numeric OID
-     */
-    public function translate(string $oid): string
-    {
-        $oid = new Oid($oid);
-        $this->options = array_diff($this->options, [self::DEFAULT_FLAGS]); // remove default options
-
-        // user did not specify numeric, output full text
-        if (! in_array('-On', $this->options)) {
-            if (! in_array('-Os', $this->options)) {
-                $this->options[] = '-OS'; // show full oid, unless hideMib is set
-            }
-        } elseif ($oid->isNumeric()) {
-            return Str::start($oid, '.'); // numeric to numeric optimization
-        }
-
-        // if mib is not directly specified and it doesn't have a numeric root
-        if (! $oid->hasMib() && ! $oid->hasNumericRoot()) {
-            $this->options[] = '-IR'; // search for mib
-        }
-
-        return $this->exec('snmptranslate', [$oid])->value();
     }
 
     private function buildCli(string $command, array $oids): array

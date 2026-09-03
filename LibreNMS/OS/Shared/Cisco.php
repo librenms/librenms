@@ -46,7 +46,6 @@ use App\Models\Vlan;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MacAccountingDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
@@ -68,6 +67,7 @@ use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\NetSnmpTranslate;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
@@ -170,7 +170,7 @@ class Cisco extends OS implements
 
         $device->hardware = $hardware;
         if (empty($device->hardware) && $device->sysObjectID) {
-            $device->hardware = NetSnmpQuery::make()->mibDir('cisco')->mibs(['SNMPv2-MIB', 'CISCO-PRODUCTS-MIB'])->hideMib()->translate($device->sysObjectID);
+            $device->hardware = NetSnmpTranslate::make()->mibDir('cisco')->mibs(['SNMPv2-MIB', 'CISCO-PRODUCTS-MIB'])->hideMib()->translate($device->sysObjectID);
         }
     }
 

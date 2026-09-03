@@ -5,11 +5,11 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use App\Models\Mempool;
 use Illuminate\Support\Str;
-use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
+use LibreNMS\Util\NetSnmpTranslate;
 use SnmpQuery;
 
 class Alaxala extends OS implements MempoolsDiscovery, ProcessorDiscovery
@@ -682,7 +682,7 @@ class Alaxala extends OS implements MempoolsDiscovery, ProcessorDiscovery
     {
         $oid = Str::contains($oid, '::') ? $oid : $mib . '::' . $oid;
 
-        $numeric = NetSnmpQuery::make()
+        $numeric = NetSnmpTranslate::make()
             ->device($device)
             ->mibDir('alaxala')
             ->mibs(['AX-SMI-MIB', $mib])

@@ -27,7 +27,7 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
-use LibreNMS\Data\Source\NetSnmpQuery;
+use LibreNMS\Util\NetSnmpTranslate;
 
 class Junose extends \LibreNMS\OS
 {
@@ -39,7 +39,7 @@ class Junose extends \LibreNMS\OS
             return;
         }
 
-        $junose_hardware = NetSnmpQuery::make()->mibs(['Juniper-Products-MIB'])->translate($device->sysObjectID);
+        $junose_hardware = NetSnmpTranslate::make()->mibs(['Juniper-Products-MIB'])->translate($device->sysObjectID);
         $device->hardware = $this->rewriteHardware($junose_hardware) ?: null;
 
         $junose_version = \SnmpQuery::get('Juniper-System-MIB::juniSystemSwVersion.0')->value();
