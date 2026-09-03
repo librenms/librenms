@@ -79,10 +79,9 @@ trait StreamsOutputToBrowser
     {
         config(['logging.channels.stream' => [
             'driver' => 'custom',
-            'via' => fn (array $config): Logger => new Logger(
-                $config['name'] ?? 'stream',
-                [(new StreamHandler('php://output', $config['level'] ?? Level::Debug))->setFormatter(new NoColorFormatter())]
-            ),
+            'via' => fn (): Logger => new Logger('stream', [
+                (new StreamHandler('php://output', Level::Debug))->setFormatter(new NoColorFormatter())
+            ]),
             'level' => 'debug',
         ]]);
         Log::setDefaultDriver('stream');
