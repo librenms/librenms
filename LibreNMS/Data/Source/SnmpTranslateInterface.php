@@ -51,7 +51,7 @@ interface SnmpTranslateInterface
      * Set MIBs to use for this query. Base mibs are included by default.
      * They will be appended to existing mibs unless $append is set to false.
      *
-     * @param string[] $mibs
+     * @param  string[]  $mibs
      */
     public function mibs(array $mibs, bool $append = true): SnmpTranslateInterface;
 
