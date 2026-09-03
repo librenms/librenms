@@ -41,8 +41,8 @@ if (Gate::denies('debug', Device::class)) {
     <div class="tab-content">
     <?php
     $tabs = [
-        'discovery' => route('device.debug.process', ['device' => $device['device_id'], 'format' => 'text', 'type' => 'discovery']),
-        'poller' => route('device.debug.process', ['device' => $device['device_id'], 'format' => 'text', 'type' => 'poller']),
+        'discovery' => route('device.debug.process', ['device' => $device['device_id'], 'format' => 'text', 'type' => 'discovery', 'verbose' => 1]),
+        'poller' => route('device.debug.process', ['device' => $device['device_id'], 'format' => 'text', 'type' => 'poller', 'verbose' => 1]),
         'snmp' => route('device.debug.snmp', ['device' => $device['device_id'], 'format' => 'text']),
         'alerts' => route('device.debug.alerts', ['device' => $device['device_id'], 'format' => 'text']),
     ];
