@@ -1,20 +1,23 @@
 <?php
 
+use LibreNMS\Exceptions\JsonAppException;
+use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'reboot-required';
-$oid = 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."reboot-required"';
 
-$response = \SnmpQuery::get($oid);
-
-if (! $response->isValid()) {
-    echo PHP_EOL . $name . ': ' . $response->getErrorMessage() . PHP_EOL;
+try {
+    $reboot_required_data = json_app_get($device, $name, 1)['data'];
+} catch (JsonAppMissingKeysException $e) {
+    $reboot_required_data = $e->getParsedJson();
+} catch (JsonAppException $e) {
+    echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+    update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
 
     return;
 }
 
-$raw = trim($response->value());
-$reboot = ($raw === '1') ? 1 : 0;
+$reboot = $reboot_required_data['reboot'] ? 1 : 0;
 $status = $reboot ? 'Reboot required' : 'No reboot required';
 
 $rrd_name = ['app', $name, $app->app_id];

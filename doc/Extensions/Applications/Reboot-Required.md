@@ -7,21 +7,21 @@ Monitors whether a host requires a reboot to apply a pending kernel or library u
 - SUSE/SLES/openSUSE: `zypper needs-rebooting`.
 - Arch Linux: compares the running kernel against `/usr/lib/modules/$(uname -r)`, since Arch has no official tool for this.
 
-On an unsupported distro, or when the expected detection tool is missing, the script exits non-zero with no output, which surfaces as a poll error rather than a silent false "no reboot needed".
+On an unsupported distro, or when the expected detection tool is missing, the script reports an error in its JSON output rather than a silent false "no reboot needed", which surfaces as a poll error.
 
 ### SNMP Extend
 
 1. Fetch the script in question and make it executable.
 
 ```bash
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/reboot-required -O /etc/snmp/reboot-required
-chmod +x /etc/snmp/reboot-required
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/reboot-required.py -O /etc/snmp/reboot-required.py
+chmod +x /etc/snmp/reboot-required.py
 ```
 
 2. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
 ```bash
-extend reboot-required /etc/snmp/reboot-required
+extend reboot-required /etc/snmp/reboot-required.py
 ```
 
 3. Restart snmpd on your host.
