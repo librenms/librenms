@@ -117,6 +117,25 @@ class NetSnmpTranslate
     }
 
     /**
+     * Set option(s) for net-snmp command line. Overrides the default options.
+     * Some options may break parsing, but you can manually parse the raw output if needed.
+     * This will override other options set such as setting numeric.
+     * Calling with null will reset to the default options (-OQXUte).
+     * Try to avoid setting options this way to keep the API generic.
+     *
+     * @param  array|string|null  $options
+     * @return $this
+     */
+    public function options($options = []): NetSnmpTranslate
+    {
+        $this->options = $options !== null
+            ? Arr::wrap($options)
+            : [];
+
+        return $this;
+    }
+
+    /**
      * Translate an OID.
      * call numeric() on the query to output numeric OID
      */

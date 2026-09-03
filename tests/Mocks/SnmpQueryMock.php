@@ -46,7 +46,7 @@ class SnmpQueryMock implements SnmpQueryInterface
     private ?string $mibDir = null;
     private array $mibs = [];
     private bool $numeric = false;
-    private bool $hideMib = false;
+    // Unused: private bool $hideMib = false;
     private array $options = [];
     private bool $abort = false;
 
@@ -108,7 +108,7 @@ class SnmpQueryMock implements SnmpQueryInterface
 
     public function hideMib(): SnmpQueryInterface
     {
-        $this->hideMib = true;
+        // Unused: $this->hideMib = true;
 
         return $this;
     }
