@@ -309,9 +309,10 @@ function get_device(Illuminate\Http\Request $request)
     }
 
     return check_device_permission($device->device_id, function () use ($device) {
-        $device['location'] = $device->location?->location;
-        $device['lat'] = $device->location?->lat;
-        $device['lng'] = $device->location?->lng;
+        $location = $device->location;
+        $device['location'] = $location?->location;
+        $device['lat'] = $location?->lat;
+        $device['lng'] = $location?->lng;
 
         $host_id = get_vm_parent_id($device);
         if (is_numeric($host_id)) {
@@ -2117,14 +2118,15 @@ function list_oxidized(Illuminate\Http\Request $request)
 {
     $return = [];
     $devices = Device::query()
-            ->with('attribs')
-             ->where('disabled', 0)
-             ->when($request->route('hostname'), fn ($query, $hostname) => $query->where('hostname', $hostname))
-             ->whereNotIn('type', LibrenmsConfig::get('oxidized.ignore_types', []))
-             ->whereNotIn('os', LibrenmsConfig::get('oxidized.ignore_os', []))
-             ->whereAttributeDisabled('override_Oxidized_disable')
-             ->select(['devices.device_id', 'hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes', 'poller_group'])
-             ->get();
+        ->with('attribs')
+        ->where('disabled', 0)
+        ->hasAccess($request->user())
+        ->when($request->route('hostname'), fn ($query, $hostname) => $query->where('hostname', $hostname))
+        ->whereNotIn('type', LibrenmsConfig::get('oxidized.ignore_types', []))
+        ->whereNotIn('os', LibrenmsConfig::get('oxidized.ignore_os', []))
+        ->whereAttributeDisabled('override_Oxidized_disable')
+        ->select(['devices.device_id', 'hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes', 'poller_group'])
+        ->get();
 
     /** @var Device $device */
     foreach ($devices as $device) {
@@ -3996,9 +3998,10 @@ function post_syslogsink(Illuminate\Http\Request $request)
     }
 
     $logs = array_is_list($json) ? $json : [$json];
+    $processor = new LibreNMS\Syslog\Processor();
 
     foreach ($logs as $entry) {
-        process_syslog($entry, 1);
+        $processor->process($entry);
     }
 
     return api_success_noresult(200, 'Syslog received: ' . count($logs));

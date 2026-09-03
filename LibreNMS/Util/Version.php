@@ -73,7 +73,7 @@ class Version
                 $month = 1;
             }
 
-            return sprintf('%d.%d.%d-dev.%s+%s', $year, $month, $matches['minor'], $matches['commits'], $matches['sha']);
+            return sprintf('%d.%d.%d-dev.%s+%s', $year, $month, '0', $matches['commits'], $matches['sha']);
         }
 
         return self::VERSION;
