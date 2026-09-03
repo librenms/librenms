@@ -93,12 +93,7 @@ class CommandStartingListener
 
     private function ensureChannelWithStdout(): void
     {
-        if (! app()->runningInConsole()) {
-            return;
-        }
-
         $defaultChannel = config('logging.default');
-
         $channelConfig = config("logging.channels.$defaultChannel");
 
         $channels = $channelConfig['channels'] ?? [$defaultChannel];
