@@ -29,4 +29,9 @@ namespace App\Logging;
 class NoColorFormatter extends CliColorFormatter
 {
     protected bool $console = false;
+
+    public function format(\Monolog\LogRecord $record): string
+    {
+        return $this->console_color->strip($this->console_color->convert(parent::format($record), false));
+    }
 }

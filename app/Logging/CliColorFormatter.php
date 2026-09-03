@@ -31,7 +31,7 @@ class CliColorFormatter extends \Monolog\Formatter\LineFormatter
     /**
      * @var \Console_Color2
      */
-    private $console_color;
+    protected $console_color;
 
     protected bool $console;
 

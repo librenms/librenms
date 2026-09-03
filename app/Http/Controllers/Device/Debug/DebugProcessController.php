@@ -26,14 +26,17 @@
 
 namespace App\Http\Controllers\Device\Debug;
 
+use App\Events\DeviceDiscovered;
+use App\Events\DevicePolled;
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\StreamingController;
+use App\Http\Controllers\StreamsOutputToBrowser;
+use App\Jobs\DiscoverDevice;
 use App\Jobs\PollDevice;
 use App\Models\Device;
 use App\PerDeviceProcess;
+use App\Polling\Measure\MeasurementManager;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Util\ModuleList;
@@ -41,9 +44,9 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DebugProcessController extends Controller
 {
-    use StreamingController;
+    use StreamsOutputToBrowser;
 
-    public function __invoke(Device $device, Request $request): StreamedResponse
+    public function __invoke(Device $device, Request $request, MeasurementManager $measurements): StreamedResponse
     {
         $this->authorize('debug', $device);
 
@@ -54,24 +57,20 @@ class DebugProcessController extends Controller
 
         $this->disableDatastores();
 
-        $process = match($validated['type']) {
-            'poller' => new PerDeviceProcess(ProcessType::Poller, $device->device_id, PollDevice::class, [], new ModuleList),
-            'discovery' => new PerDeviceProcess(ProcessType::Discovery, $device->device_id, PollDevice::class, [], new ModuleList),
+        $process = match ($validated['type']) {
+            'poller' => new PerDeviceProcess(ProcessType::Poller, (string) $device->device_id, PollDevice::class, DevicePolled::class, new ModuleList),
+            'discovery' => new PerDeviceProcess(ProcessType::Discovery, (string) $device->device_id, DiscoverDevice::class, DeviceDiscovered::class, new ModuleList),
+            default => throw new \Exception('Request type ' . $validated['type'] . ' needs to be implemented'),
         };
 
         $downloadFile = $validated['format'] === 'download' ? $validated['type'] . '-' . $device->hostname . '.txt' : null;
         $headers = $this->headers($downloadFile);
 
-        return new StreamedResponse(function () use ($process): void {
-            // Create an unbuffered logging channels with colours disabled
-            config(['logging.channels.browser' => [
-                'driver' => 'custom',
-                'via' => \App\Logging\CreateEchoHandler::class,
-                'level' => 'debug',
-            ]]);
-            Log::setDefaultDriver('browser');
+        return new StreamedResponse(function () use ($process, $measurements): void {
+            $output = $this->configureLoggerToStreamOutput();
 
             $process->run();
+            $process->processResults($measurements, $output);
         }, 200, $headers);
     }
 

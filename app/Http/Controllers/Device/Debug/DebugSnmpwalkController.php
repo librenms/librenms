@@ -27,7 +27,7 @@
 namespace App\Http\Controllers\Device\Debug;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\StreamingController;
+use App\Http\Controllers\StreamsOutputToBrowser;
 use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Process;
@@ -36,7 +36,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DebugSnmpwalkController extends Controller
 {
-    use StreamingController;
+    use StreamsOutputToBrowser;
 
     public function __invoke(Device $device, Request $request): StreamedResponse
     {
@@ -56,7 +56,7 @@ class DebugSnmpwalkController extends Controller
                 throw new \Exception('Request type ' . $validated['type'] . ' needs to be implemented');
         }
 
-        $downloadFile = $validated['format'] == 'download' ? 'alerts-' . $device->hostname . '.txt' : null;
+        $downloadFile = $validated['format'] == 'download' ? 'snmpwalk-' . $device->hostname . '.txt' : null;
         $headers = $this->headers($downloadFile);
 
         return new StreamedResponse(function () use ($cmd): void {

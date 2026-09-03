@@ -44,7 +44,7 @@ class PerDeviceProcess
         public readonly ProcessType $type,
         private readonly string $deviceSpec,
         private readonly string $job,
-        private readonly string|array $completionEvent,
+        private readonly string $completionEvent,
         private readonly ModuleList $moduleList,
         private readonly ?string $os = null,
         private readonly ?string $deviceType = null,

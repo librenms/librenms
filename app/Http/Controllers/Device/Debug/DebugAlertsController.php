@@ -28,7 +28,7 @@ namespace App\Http\Controllers\Device\Debug;
 
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\StreamingController;
+use App\Http\Controllers\StreamsOutputToBrowser;
 use App\Models\AlertRule;
 use App\Models\Device;
 use Illuminate\Http\Request;
@@ -40,7 +40,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DebugAlertsController extends Controller
 {
-    use StreamingController;
+    use StreamsOutputToBrowser;
 
     public function __invoke(Device $device, Request $request): StreamedResponse
     {
