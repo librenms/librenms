@@ -14,5 +14,6 @@ class Entry
         public string $msg,
         public string $program,
         public ?int $device_id = null,
-    ) {}
+    ) {
+    }
 }
