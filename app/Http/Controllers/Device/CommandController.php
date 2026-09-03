@@ -102,7 +102,7 @@ class CommandController
         $headers = $this->headers($validated, $device);
 
         return new StreamedResponse(function () use ($cmd, $args): void {
-            # Create an unbuffered logging channels with colours disabled
+            // Create an unbuffered logging channels with colours disabled
             config(['logging.channels.browser' => [
                 'driver' => 'custom',
                 'via' => \App\Logging\CreateEchoHandler::class,

@@ -93,7 +93,7 @@ class CommandStartingListener
 
     private function ensureChannelWithStdout(): void
     {
-        if(! app()->runningInConsole()) {
+        if (! app()->runningInConsole()) {
             return;
         }
 

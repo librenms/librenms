@@ -8,7 +8,6 @@
  | request an environment variable to be created upstream or send a pull request.
  */
 
-use App\Logging\CreateEchoHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
 
