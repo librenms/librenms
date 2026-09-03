@@ -64,7 +64,7 @@ class NetSnmpQuery implements SnmpTranslateInterface, SnmpQueryInterface
     /**
      * Easy way to start a new instance
      */
-    public static function make(): SnmpQueryInterface
+    public static function make(): SnmpTranslateInterface|SnmpQueryInterface
     {
         return new static;
     }
@@ -73,7 +73,7 @@ class NetSnmpQuery implements SnmpTranslateInterface, SnmpQueryInterface
      * Specify a device to make the snmp query against.
      * By default the query will use the primary device.
      */
-    public function device(Device $device): SnmpQueryInterface
+    public function device(Device $device): SnmpTranslateInterface|SnmpQueryInterface
     {
         $this->device = $device;
 
@@ -110,7 +110,7 @@ class NetSnmpQuery implements SnmpTranslateInterface, SnmpQueryInterface
      * Set an additional MIB directory to search for MIBs.
      * You do not need to specify the base and os directories, they are already included.
      */
-    public function mibDir(?string $dir): SnmpQueryInterface
+    public function mibDir(?string $dir): SnmpTranslateInterface|SnmpQueryInterface
     {
         $this->mibDirs[] = $dir;
 
@@ -121,7 +121,7 @@ class NetSnmpQuery implements SnmpTranslateInterface, SnmpQueryInterface
      * Set MIBs to use for this query. Base mibs are included by default.
      * They will be appended to existing mibs unless $append is set to false.
      */
-    public function mibs(array $mibs, bool $append = true): SnmpQueryInterface
+    public function mibs(array $mibs, bool $append = true): SnmpTranslateInterface|SnmpQueryInterface
     {
         $this->mibs = $append ? array_merge($this->mibs, $mibs) : $mibs;
 
@@ -153,7 +153,7 @@ class NetSnmpQuery implements SnmpTranslateInterface, SnmpQueryInterface
     /**
      * Output all OIDs numerically
      */
-    public function numeric(bool $numeric = true): SnmpQueryInterface
+    public function numeric(bool $numeric = true): SnmpTranslateInterface|SnmpQueryInterface
     {
         $this->options = $numeric
             ? array_merge($this->options, ['-On'])
@@ -177,7 +177,7 @@ class NetSnmpQuery implements SnmpTranslateInterface, SnmpQueryInterface
     /**
      * Hide MIB in output
      */
-    public function hideMib(): SnmpQueryInterface
+    public function hideMib(): SnmpTranslateInterface|SnmpQueryInterface
     {
         $this->options = array_merge($this->options, ['-Os']);
 
