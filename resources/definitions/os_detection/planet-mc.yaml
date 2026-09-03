@@ -1,5 +1,5 @@
 os: planet-mc
-text: Planet Media Chassis
+text: Planet Media Converter Chassis
 type: network
 icon: planet
 mib_dir: planet
