@@ -74,7 +74,7 @@ class DebugPollAndDiscoveryController extends Controller
             default => 'device:discover',
         };
 
-        return $this->stream(function () use ($command, $args, $device): void {
+        return $this->stream(function () use ($command, $args): void {
             $output = $this->configureLoggerToStreamOutput();
             Event::forget(CommandStarting::class); // prevent normal cli setup and checks
 
