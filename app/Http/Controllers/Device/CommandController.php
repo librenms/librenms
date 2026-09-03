@@ -34,6 +34,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Validation\Rule;
 use LibreNMS\Alert\AlertUtil;
@@ -101,7 +102,13 @@ class CommandController
         $headers = $this->headers($validated, $device);
 
         return new StreamedResponse(function () use ($cmd, $args): void {
-            config(['logging.default' => 'browser']);
+            # Create an unbuffered logging channels with colours disabled
+            config(['logging.channels.browser' => [
+                'driver' => 'custom',
+                'via' => \App\Logging\CreateEchoHandler::class,
+                'level' => 'debug',
+            ]]);
+            Log::setDefaultDriver('browser');
 
             $exitCode = Artisan::call($cmd, $args, new BrowserOutput());
 

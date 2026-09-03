@@ -41,12 +41,6 @@ return [
             'replace_placeholders' => true,
         ],
 
-        'browser' => [
-            'driver' => 'custom',
-            'via' => CreateEchoHandler::class,
-            'level' => 'debug',
-        ],
-
         'stdout' => [
             'driver' => 'monolog',
             'handler' => StreamHandler::class,
