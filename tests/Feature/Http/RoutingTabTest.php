@@ -260,7 +260,7 @@ class RoutingTabTest extends TestCase
         $this->actingAs($this->admin())
             ->get(route('device.routing.bgp', ['device' => $device]))
             ->assertOk()
-            ->assertSee('Local AS : 65000 BGP')
+            ->assertSee('Local AS: 65000 :: BGP')
             ->assertDontSee('Prefixes:')
             ->assertDontSee('Traffic:')
             ->assertSee('Basic')
