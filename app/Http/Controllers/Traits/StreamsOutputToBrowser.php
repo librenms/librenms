@@ -42,6 +42,7 @@ trait StreamsOutputToBrowser
     private bool $bufferedOutput = false;
     private bool $colour = false;
     private ?string $downloadFile = null;
+    private bool $logfile = false;
     private ?OutputStyle $outputBuffer = null;
 
     protected function stream(callable $function): StreamedResponse
@@ -68,6 +69,11 @@ trait StreamsOutputToBrowser
     protected function enableColour(): void
     {
         $this->colour = true;
+    }
+
+    protected function enableLogFile(): void
+    {
+        $this->logfile = true;
     }
 
     protected function enableDownload(string $downloadFile): void
@@ -120,6 +126,15 @@ trait StreamsOutputToBrowser
             ]),
             'level' => 'debug',
         ]]);
-        Log::setDefaultDriver('stream');
+        if($this->logfile) {
+            config(['logging.channels.stream_and_log' => [
+               'driver' => 'stack',
+               'channels' => ['log_file', 'stream'],
+               'ignore_exceptions' => false,
+            ]]);
+            Log::setDefaultDriver('stream_and_log');
+        } else {
+            Log::setDefaultDriver('stream');
+        }
     }
 }
