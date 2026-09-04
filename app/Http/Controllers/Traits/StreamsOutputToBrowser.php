@@ -43,6 +43,7 @@ trait StreamsOutputToBrowser
     private bool $colour = false;
     private ?string $downloadFile = null;
     private bool $logfile = false;
+    private Level $loglevel = Level::Info;
     private ?OutputStyle $outputBuffer = null;
 
     protected function stream(callable $function): StreamedResponse
@@ -74,6 +75,11 @@ trait StreamsOutputToBrowser
     protected function enableLogFile(): void
     {
         $this->logfile = true;
+    }
+
+    protected function setLogLevel(Level $level): void
+    {
+        $this->loglevel = $level;
     }
 
     protected function enableDownload(string $downloadFile): void
@@ -122,9 +128,8 @@ trait StreamsOutputToBrowser
         config(['logging.channels.stream' => [
             'driver' => 'custom',
             'via' => fn (): Logger => new Logger('stream', [
-                (new StreamHandler('php://output', Level::Debug))->setFormatter($formatter),
+                (new StreamHandler('php://output', $this->loglevel))->setFormatter($formatter),
             ]),
-            'level' => 'debug',
         ]]);
         if ($this->logfile) {
             config(['logging.channels.stream_and_log' => [
