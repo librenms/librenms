@@ -255,4 +255,81 @@ class AddDeviceControllerTest extends TestCase
             'polling_methods' => 'At least one polling method is required',
         ]);
     }
+
+    public function testIndexProvidesDefaultDisplayTemplate(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.create');
+
+        \App\Facades\LibrenmsConfig::set('device_display_default', '{{ $hostname }} - {{ $sysName }}');
+
+        $response = $this->actingAs($admin)->get(route('device.add'));
+
+        $response->assertOk();
+        $response->assertViewHas('default_display_template', '{{ $hostname }} - {{ $sysName }}');
+        $response->assertSee('name="display_template"', false);
+        $response->assertSee('x-html="computedDisplayNameHtml"', false);
+    }
+
+    public function testStoreDeviceWithDisplayTemplate(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.create');
+
+        $capturedDevice = null;
+        $mock = Mockery::mock('overload:App\Actions\Device\ValidateDeviceAndCreate');
+        $mock->shouldReceive('__construct')
+            ->andReturnUsing(function ($device) use (&$capturedDevice) {
+                $capturedDevice = $device;
+            });
+        $mock->shouldReceive('execute')->once()->andReturn(true);
+
+        $response = $this->actingAs($admin)->postJson(route('device.add.store'), [
+            'hostname' => 'display-test.example.com',
+            'display_template' => '{{ $hostname }} ({{ $ip }})',
+            'poller_group' => 0,
+            'polling_methods' => [
+                'snmp' => [
+                    'active' => '1',
+                    'validate' => '0',
+                    'credential_mode' => 'default',
+                    'settings' => [
+                        'transport' => 'udp',
+                    ],
+                ],
+            ],
+        ]);
+
+        $response->assertOk();
+        $this->assertNotNull($capturedDevice);
+        $this->assertEquals('{{ $hostname }} ({{ $ip }})', $capturedDevice->display_template);
+    }
+
+    public function testStoreDeviceWithInvalidDisplayTemplateLengthFails(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.create');
+
+        $response = $this->actingAs($admin)->postJson(route('device.add.store'), [
+            'hostname' => 'display-test.example.com',
+            'display_template' => str_repeat('a', 129),
+            'poller_group' => 0,
+            'polling_methods' => [
+                'snmp' => [
+                    'active' => '1',
+                    'validate' => '0',
+                    'credential_mode' => 'default',
+                    'settings' => [
+                        'transport' => 'udp',
+                    ],
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['display_template']);
+    }
 }

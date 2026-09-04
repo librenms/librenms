@@ -12,139 +12,7 @@
 
             <form method="POST" action="{{ route('device.add.store') }}"
                   @submit.prevent="submitForm()"
-                  x-data="{
-                      hostname: @js(old('hostname', '')),
-                      poller_group: @js(old('poller_group', $default_poller_group)),
-                      sysName: @js(old('sysName', '')),
-                      hardware: @js(old('hardware', '')),
-                      os: @js(old('os', '')),
-                      activeTab: '{{ old('active_tab', 'snmp') }}',
-                      activeMethods: @js($oldActiveMethods),
-                      methods: {
-                          @foreach($availableMethods as $method)
-                          '{{ $method['type'] }}': {
-                               validate: {{ old("polling_methods.{$method['type']}.validate") !== null ? (old("polling_methods.{$method['type']}.validate") ? 'true' : 'false') : 'true' }},
-                               affects_availability: {{ old("polling_methods.{$method['type']}.affects_availability") !== null ? (old("polling_methods.{$method['type']}.affects_availability") ? 'true' : 'false') : (in_array($method['type'], ['snmp', 'icmp']) ? 'true' : 'false') }},
-                               credential_mode: '{{ old("polling_methods.{$method['type']}.credential_mode", 'default') }}',
-                               secret_id: '{{ old("polling_methods.{$method['type']}.secret_id", '') }}',
-                               description: '{{ old("polling_methods.{$method['type']}.description", '') }}',
-                               default: {{ old("polling_methods.{$method['type']}.default") ? 'true' : 'false' }},
-                               formData: @js(old("polling_methods.{$method['type']}.secret_data", $method['schema_defaults'] ?? [])),
-                               settingsData: @js(old("polling_methods.{$method['type']}.settings", $method['settings_defaults'] ?? []))
-                          },
-                          @endforeach
-                      },
-                      allTypes: @js(collect($availableMethods)->map(fn($m) => ['type' => $m['type'], 'label' => $m['label']])->values()),
-                      loading: false,
-                      errors: [],
-                      get addableRemaining() {
-                          return this.allTypes.filter(m => !this.activeMethods.includes(m.type));
-                      },
-                      addMethod(type) {
-                          if (!this.activeMethods.includes(type)) {
-                              this.activeMethods.push(type);
-                              this.activeTab = type;
-                          }
-                      },
-                      removeMethod(type) {
-                          this.activeMethods = this.activeMethods.filter(t => t !== type);
-                          if (this.activeTab === type) {
-                              this.activeTab = this.activeMethods[0] ?? '';
-                          }
-                      },
-                      async submitForm() {
-                          if (this.loading) return;
-                          this.loading = true;
-                          this.errors = [];
-
-                          const pollingMethods = {};
-                          for (const type of this.activeMethods) {
-                              const m = this.methods[type] || {};
-                              const methodPayload = {
-                                  active: 1,
-                                  validate: m.validate ? 1 : 0,
-                                  affects_availability: m.affects_availability ? 1 : 0,
-                                  credential_mode: m.credential_mode,
-                                  settings: m.settingsData || {},
-                              };
-
-                              if (m.credential_mode === 'existing') {
-                                  methodPayload.secret_id = m.secret_id;
-                              } else if (m.credential_mode === 'new') {
-                                  methodPayload.description = m.description;
-                                  methodPayload.default = m.default ? 1 : 0;
-                                  methodPayload.secret_data = m.formData || {};
-                              }
-
-                              pollingMethods[type] = methodPayload;
-                          }
-
-                          let selectedOs = this.os;
-                          if (!this.activeMethods.includes('snmp')) {
-                              const osSelect = document.getElementById('os-select');
-                              if (osSelect && typeof $ !== 'undefined' && $(osSelect).val()) {
-                                  selectedOs = $(osSelect).val();
-                              }
-                          }
-
-                          const payload = {
-                              _token: '{{ csrf_token() }}',
-                              hostname: this.hostname,
-                              poller_group: this.poller_group,
-                              active_tab: this.activeTab,
-                              active_methods: this.activeMethods,
-                              polling_methods: pollingMethods,
-                              sysName: this.sysName,
-                              hardware: this.hardware,
-                              os: selectedOs,
-                          };
-
-                          try {
-                              const response = await fetch('{{ route('device.add.store') }}', {
-                                  method: 'POST',
-                                  headers: {
-                                      'Content-Type': 'application/json',
-                                      'Accept': 'application/json',
-                                      'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                      'X-Requested-With': 'XMLHttpRequest',
-                                  },
-                                  body: JSON.stringify(payload),
-                              });
-
-                              const data = await response.json().catch(() => ({}));
-
-                              if (response.ok && data.redirect) {
-                                  window.location.href = data.redirect;
-                                  return;
-                              }
-
-                              if (data.errors) {
-                                  const flatErrors = [];
-                                  for (const field in data.errors) {
-                                      const fieldErrors = data.errors[field];
-                                      if (Array.isArray(fieldErrors)) {
-                                          flatErrors.push(...fieldErrors);
-                                      } else if (typeof fieldErrors === 'string') {
-                                          flatErrors.push(fieldErrors);
-                                      }
-                                  }
-                                  this.errors = flatErrors.length > 0 ? flatErrors : [data.message || '{{ __('Failed to save device.') }}'];
-                              } else if (data.message) {
-                                  this.errors = [data.message];
-                              } else {
-                                  this.errors = ['{{ __('Failed to save device.') }}'];
-                              }
-
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
-                          } catch (err) {
-                              console.error(err);
-                              this.errors = [err.message || '{{ __('An unexpected error occurred.') }}'];
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
-                          } finally {
-                              this.loading = false;
-                          }
-                      },
-                  }">
+                  x-data="addDeviceForm(@js($add_device_config))">
                 @csrf
                 <template x-if="errors.length > 0">
                     <div class="alert alert-danger tw:mb-6">
@@ -167,19 +35,25 @@
                         <i class="fa fa-info-circle tw:text-[#337ab7]"></i>
                         {{ __('General Properties') }}
                     </div>
-                    <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:bg-white tw:dark:bg-dark-gray-500">
-                        <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-6">
+                    <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:bg-white tw:dark:bg-dark-gray-500 tw:space-y-5">
+                        {{-- Hostname & Poller Group --}}
+                        <div class="tw:grid tw:grid-cols-1 @config('distributed_poller') tw:md:grid-cols-2 @endconfig tw:gap-5">
                             <div class="form-group @error('hostname') has-error @enderror tw:mb-0">
-                                <label for="hostname" class="control-label">{{ __('Hostname or IP') }}</label>
+                                <label for="hostname" class="control-label tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">
+                                    {{ __('Hostname or IP') }} <span class="tw:text-red-500">*</span>
+                                </label>
                                 <input type="text" id="hostname" name="hostname" class="form-control"
-                                       x-model="hostname" placeholder="device.example.com" required autofocus>
+                                       x-model="hostname" placeholder="device.example.com or 192.168.1.1" required autofocus>
                                 @error('hostname')
                                     <span class="help-block">{{ $message }}</span>
                                 @enderror
                             </div>
+
                             @config('distributed_poller')
                             <div class="form-group tw:mb-0">
-                                <label for="poller_group" class="control-label">{{ __('Poller Group') }}</label>
+                                <label for="poller_group" class="control-label tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">
+                                    {{ __('Poller Group') }}
+                                </label>
                                 <select id="poller_group" name="poller_group" x-model="poller_group" class="form-control">
                                     <option value="0">{{ __('Default poller group') }}</option>
                                     @foreach($poller_groups as $group)
@@ -188,6 +62,78 @@
                                 </select>
                             </div>
                             @endconfig
+                        </div>
+
+                        {{-- Display Name Section --}}
+                        <div class="tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:bg-gray-50/70 tw:dark:bg-dark-gray-600/40 tw:p-4 tw:space-y-2.5">
+                            {{-- Header with title and status badges --}}
+                            <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2 tw:min-h-[28px]">
+                                <div class="tw:flex tw:items-center tw:gap-2">
+                                    <span class="tw:text-sm tw:font-semibold tw:uppercase tw:tracking-wider tw:whitespace-nowrap tw:text-gray-600 tw:dark:text-dark-white-200">
+                                        {{ __('Display Name') }}
+                                    </span>
+                                </div>
+                                <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                                    <template x-if="display_template && display_template.trim() !== ''">
+                                        <span class="tw:inline-flex tw:items-center tw:gap-1 tw:px-2 tw:py-0.5 tw:rounded tw:text-sm tw:font-medium tw:whitespace-nowrap tw:bg-purple-100 tw:text-purple-800 tw:dark:bg-purple-900/60 tw:dark:text-purple-300"
+                                              title="{{ __('Custom template override') }}">
+                                            <i class="fa fa-info-circle"></i> {{ __('Custom Template') }}
+                                        </span>
+                                    </template>
+                                    <template x-if="hasPlaceholders">
+                                        <span class="tw:inline-flex tw:items-center tw:gap-1 tw:px-2 tw:py-0.5 tw:rounded tw:text-sm tw:font-medium tw:whitespace-nowrap tw:bg-amber-100 tw:text-amber-800 tw:dark:bg-amber-900/60 tw:dark:text-amber-300"
+                                              title="{{ __('Highlighted values are placeholders that will be replaced during discovery or polling') }}">
+                                            <i class="fa fa-info-circle"></i> {{ __('Placeholder data') }}
+                                        </span>
+                                    </template>
+                                    <template x-if="!showTemplateInput">
+                                        <button type="button" @click="showTemplateInput = true"
+                                                class="tw:text-sm tw:font-medium tw:whitespace-nowrap tw:text-blue-600 hover:tw:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:inline-flex tw:items-center tw:gap-1.5 tw:cursor-pointer tw:ml-1">
+                                            <i class="fa fa-pencil"></i> {{ __('Edit Template') }}
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+
+                            {{-- Computed Display Name Output (Preview) - Natural typography, NOT an input box --}}
+                            <div class="tw:flex tw:items-center tw:gap-2 tw:min-h-[36px]">
+                                <i class="fa fa-tag tw:text-gray-400 tw:dark:text-dark-white-400 tw:shrink-0"></i>
+                                <span class="tw:text-base tw:font-bold tw:text-gray-900 tw:dark:text-white tw:tracking-tight tw:break-all tw:leading-normal" x-html="computedDisplayNameHtml"></span>
+                            </div>
+
+                            {{-- Template Input (Hidden by default until user indicates they want to modify it) --}}
+                            <div x-show="showTemplateInput" x-cloak class="tw:pt-2.5 tw:border-t tw:border-gray-200/80 tw:dark:border-dark-gray-400/80">
+                                <div class="form-group @error('display_template') has-error @enderror tw:mb-0">
+                                    <div class="tw:flex tw:items-center tw:justify-between tw:mb-1.5">
+                                        <div class="tw:flex tw:items-center tw:gap-1.5">
+                                            <label for="display_template" class="control-label tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200 tw:mb-0">
+                                                {{ __('Template') }}
+                                            </label>
+                                            <i class="fa fa-question-circle tw:text-gray-400 hover:tw:text-gray-600 tw:dark:hover:text-dark-white-200 tw:cursor-help tw:text-sm"
+                                               data-toggle="tooltip"
+                                               data-placement="top"
+                                               title="{{ __('Leave blank to use system default. Available variables:') }} &#123;&#123; $hostname &#125;&#125;, &#123;&#123; $sysName &#125;&#125;, &#123;&#123; $sysName_fallback &#125;&#125;, &#123;&#123; $ip &#125;&#125;"></i>
+                                        </div>
+                                        <div class="tw:flex tw:items-center tw:gap-2">
+                                            <template x-if="display_template && display_template.trim() !== ''">
+                                                <button type="button" @click="display_template = ''"
+                                                        class="tw:text-blue-600 hover:tw:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:cursor-pointer">
+                                                    {{ __('Reset to default') }}
+                                                </button>
+                                            </template>
+                                            <button type="button" @click="showTemplateInput = false"
+                                                    class="tw:text-gray-500 hover:tw:text-gray-700 tw:dark:text-dark-white-300 tw:dark:hover:text-white tw:cursor-pointer">
+                                                <i class="fa fa-times"></i> {{ __('Close') }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <input type="text" id="display_template" name="display_template" class="form-control"
+                                           x-model="display_template" :placeholder="defaultDisplayTemplate">
+                                    @error('display_template')
+                                        <span class="help-block">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -470,6 +416,219 @@
 
 @push('scripts')
     <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('addDeviceForm', (config) => ({
+                hostname: config.hostname || '',
+                display_template: config.display_template || '',
+                defaultDisplayTemplate: config.default_display_template || '',
+                showTemplateInput: !!(config.display_template && config.display_template.trim() !== ''),
+                poller_group: config.poller_group || 0,
+                sysName: config.sysName || '',
+                hardware: config.hardware || '',
+                os: config.os || '',
+                activeTab: config.active_tab || 'snmp',
+                activeMethods: config.active_methods || [],
+                methods: config.methods || {},
+                allTypes: config.all_types || [],
+                loading: false,
+                errors: [],
+
+                get activeDisplayTemplate() {
+                    return (this.display_template && this.display_template.trim() !== '')
+                        ? this.display_template.trim()
+                        : this.defaultDisplayTemplate;
+                },
+
+                get isCustomDisplayTemplate() {
+                    return !!(this.display_template && this.display_template.trim() !== '');
+                },
+
+                get displayPreview() {
+                    const isIp = (str) => {
+                        if (!str) return false;
+                        return /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(str) || str.includes(':');
+                    };
+
+                    const host = this.hostname ? this.hostname.trim() : '';
+                    const sys = this.sysName ? this.sysName.trim() : '';
+                    const isHostIp = isIp(host);
+
+                    const values = {};
+                    const placeholders = {};
+
+                    if (host) {
+                        values.hostname = host;
+                    } else {
+                        placeholders.hostname = 'hostname';
+                    }
+
+                    if (sys) {
+                        values.sysName = sys;
+                    } else if (host && !isHostIp) {
+                        values.sysName = host;
+                    } else {
+                        placeholders.sysName = 'sysName';
+                    }
+
+                    if (sys) {
+                        values.sysName_fallback = sys;
+                    } else if (host && !isHostIp) {
+                        values.sysName_fallback = host;
+                    } else {
+                        placeholders.sysName_fallback = 'sysName_fallback';
+                    }
+
+                    if (isHostIp) {
+                        values.ip = host;
+                    } else {
+                        placeholders.ip = 'ip';
+                    }
+
+                    if (this.hardware && this.hardware.trim()) {
+                        values.hardware = this.hardware.trim();
+                    } else {
+                        placeholders.hardware = 'hardware';
+                    }
+
+                    if (this.os && this.os.trim()) {
+                        values.os = this.os.trim();
+                    } else {
+                        placeholders.os = 'os';
+                    }
+
+                    if (window.LibreNMS && window.LibreNMS.SimpleTemplate) {
+                        return window.LibreNMS.SimpleTemplate.parseWithPlaceholders(this.activeDisplayTemplate, values, placeholders);
+                    }
+
+                    return { html: this.activeDisplayTemplate, text: this.activeDisplayTemplate, hasPlaceholders: false };
+                },
+
+                get computedDisplayName() {
+                    return this.displayPreview.text;
+                },
+
+                get computedDisplayNameHtml() {
+                    return this.displayPreview.html;
+                },
+
+                get hasPlaceholders() {
+                    return this.displayPreview.hasPlaceholders;
+                },
+
+                get addableRemaining() {
+                    return this.allTypes.filter(m => !this.activeMethods.includes(m.type));
+                },
+
+                addMethod(type) {
+                    if (!this.activeMethods.includes(type)) {
+                        this.activeMethods.push(type);
+                        this.activeTab = type;
+                    }
+                },
+
+                removeMethod(type) {
+                    this.activeMethods = this.activeMethods.filter(t => t !== type);
+                    if (this.activeTab === type) {
+                        this.activeTab = this.activeMethods[0] ?? '';
+                    }
+                },
+
+                async submitForm() {
+                    if (this.loading) return;
+                    this.loading = true;
+                    this.errors = [];
+
+                    const pollingMethods = {};
+                    for (const type of this.activeMethods) {
+                        const m = this.methods[type] || {};
+                        const methodPayload = {
+                            active: 1,
+                            validate: m.validate ? 1 : 0,
+                            affects_availability: m.affects_availability ? 1 : 0,
+                            credential_mode: m.credential_mode,
+                            settings: m.settingsData || {},
+                        };
+
+                        if (m.credential_mode === 'existing') {
+                            methodPayload.secret_id = m.secret_id;
+                        } else if (m.credential_mode === 'new') {
+                            methodPayload.description = m.description;
+                            methodPayload.default = m.default ? 1 : 0;
+                            methodPayload.secret_data = m.formData || {};
+                        }
+
+                        pollingMethods[type] = methodPayload;
+                    }
+
+                    let selectedOs = this.os;
+                    if (!this.activeMethods.includes('snmp')) {
+                        const osSelect = document.getElementById('os-select');
+                        if (osSelect && typeof $ !== 'undefined' && $(osSelect).val()) {
+                            selectedOs = $(osSelect).val();
+                        }
+                    }
+
+                    const payload = {
+                        _token: config.csrf_token,
+                        hostname: this.hostname,
+                        display_template: this.display_template,
+                        poller_group: this.poller_group,
+                        active_tab: this.activeTab,
+                        active_methods: this.activeMethods,
+                        polling_methods: pollingMethods,
+                        sysName: this.sysName,
+                        hardware: this.hardware,
+                        os: selectedOs,
+                    };
+
+                    try {
+                        const response = await fetch(config.store_url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': config.csrf_token,
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                            body: JSON.stringify(payload),
+                        });
+
+                        const data = await response.json().catch(() => ({}));
+
+                        if (response.ok && data.redirect) {
+                            window.location.href = data.redirect;
+                            return;
+                        }
+
+                        if (data.errors) {
+                            const flatErrors = [];
+                            for (const field in data.errors) {
+                                const fieldErrors = data.errors[field];
+                                if (Array.isArray(fieldErrors)) {
+                                    flatErrors.push(...fieldErrors);
+                                } else if (typeof fieldErrors === 'string') {
+                                    flatErrors.push(fieldErrors);
+                                }
+                            }
+                            this.errors = flatErrors.length > 0 ? flatErrors : [data.message || '{{ __('Failed to save device.') }}'];
+                        } else if (data.message) {
+                            this.errors = [data.message];
+                        } else {
+                            this.errors = ['{{ __('Failed to save device.') }}'];
+                        }
+
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } catch (err) {
+                        console.error(err);
+                        this.errors = [err.message || '{{ __('An unexpected error occurred.') }}'];
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+            }));
+        });
+
         function togglePasswordVisibility(inputId, btn) {
             var input = document.getElementById(inputId);
             var icon = btn.querySelector('i');

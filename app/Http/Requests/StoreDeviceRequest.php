@@ -25,6 +25,7 @@ class StoreDeviceRequest extends FormRequest
     {
         $rules = [
             'hostname' => ['required', 'ip_or_hostname'],
+            'display_template' => ['nullable', 'string', 'max:128'],
             'port' => ['nullable', 'integer', 'between:1,65535'],
             'transport' => ['nullable', 'string', 'in:udp,udp6,tcp,tcp6'],
             'poller_group' => ['nullable', 'integer', Rule::in(PollerGroup::pluck('id')->prepend(0))],
