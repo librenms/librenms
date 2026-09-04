@@ -310,6 +310,7 @@ echo "        </select>
     <label for='authname' class='col-sm-2 control-label'>Auth User Name</label>
     <div class='col-sm-4'>
     <input type='text' id='authname' name='authname' class='form-control' value='" . htmlspecialchars($device->authname ?? '') . "' autocomplete='off'>
+    <span id='authname-warning' class='help-block text-warning' style='display: none;'><i class='fa fa-exclamation-triangle'></i> " . __('Warning: Username contains leading or trailing spaces (will be trimmed)') . "</span>
     </div>
     </div>
     <div class='form-group'>
@@ -442,6 +443,18 @@ var current_os = <?php echo json_encode(['id' => $device->os, 'text' => Librenms
 init_select2('#os', 'os', {}, current_os, 'OS (optional)');
 
 $("[name='snmp']").bootstrapSwitch('offColor','danger');
+
+$('#authname').on('input', function() {
+    var val = $(this).val();
+    if (/^\s+|\s+$/.test(val)) {
+        $('#authname-warning').show();
+    } else {
+        $('#authname-warning').hide();
+    }
+}).on('blur', function() {
+    $(this).val($.trim($(this).val()));
+    $('#authname-warning').hide();
+});
 
 <?php
 if ($device->snmpver == 'v3') {

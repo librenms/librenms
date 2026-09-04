@@ -502,6 +502,11 @@ class Device extends BaseModel
         $this->attributes['status'] = (int) $status;
     }
 
+    public function setAuthnameAttribute(?string $authname): void
+    {
+        $this->attributes['authname'] = $authname === null ? null : trim($authname);
+    }
+
     public function setSysDescrAttribute(?string $sysDescr): void
     {
         $this->attributes['sysDescr'] = $sysDescr === null ? null : trim($sysDescr, "\\\" \r\n\t\0");
