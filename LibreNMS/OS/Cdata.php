@@ -267,6 +267,9 @@ class Cdata extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
         return strlen($bytes) === 8 ? substr($bytes, 0, 4) . strtoupper(bin2hex(substr($bytes, 4))) : $raw;
     }
 
+    /**
+     * @return Collection<int, EntPhysical>
+     */
     public function discoverEntityPhysical(): Collection
     {
         $inventory = $this->discoverEntityMib();
@@ -339,6 +342,9 @@ class Cdata extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
         return $inventory;
     }
 
+    /**
+     * @return Collection<int, Transceiver>
+     */
     public function discoverTransceivers(): Collection
     {
         return (new Collection($this->ponOptics()))

@@ -7,7 +7,7 @@ use LibreNMS\OS\Cdata;
 
 $onuNames = $os->onuNames();
 
-$state = function (string $oid, string $index, string $type, string $descr, $value, string $group, array $translations) {
+$state = function (string $oid, string $index, string $type, string $descr, $value, string $group, array $translations): void {
     app('sensor-discovery')->discover(new Sensor([
         'poller_type' => 'snmp',
         'sensor_class' => 'state',
