@@ -16,6 +16,7 @@ class PortVlan extends PortRelatedModel implements Keyable
         'device_id',
         'port_id',
         'vlan',
+        'voice',
         'baseport',
         'priority',
         'state',
