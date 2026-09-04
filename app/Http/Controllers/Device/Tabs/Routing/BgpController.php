@@ -30,6 +30,7 @@ use App\Models\Device;
 use App\Models\Ipv4Address;
 use App\Models\Ipv6Address;
 use App\Models\Port;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -65,19 +66,61 @@ class BgpController extends Controller
 
         $view = $request->query('view', 'basic');
 
+        $allPeers = $device->bgppeers()
+            ->orderBy('bgpPeerRemoteAs')
+            ->orderBy('bgpPeerIdentifier')
+            ->get();
+
+        if ($allPeers->isEmpty()) {
+            return view('device.tabs.routing.bgp', [
+                'device' => $device,
+                'view' => $view,
+                'local_as' => $device->bgpLocalAs,
+                'bgp_menu' => $this->buildMenu($device, [], false),
+                'peers' => collect(),
+            ]);
+        }
+
+        $peers = match ($view) {
+            'prefixes_ipv4unicast' => $allPeers->reject(fn ($p) => str_contains($p->bgpPeerIdentifier, ':')),
+            'prefixes_ipv6unicast', 'prefixes_ipv6vpn' => $allPeers->filter(fn ($p) => str_contains($p->bgpPeerIdentifier, ':')),
+            default => $allPeers,
+        };
+
+        $cbgp = $device->bgpPeersCbgp()->get();
+        $activeAfis = $cbgp->map(fn ($c) => $c->afi . $c->safi)->unique()->all();
+        $cbgpGrouped = $cbgp->groupBy('bgpPeerIdentifier');
+
+        $ipv4Identifiers = $allPeers->pluck('bgpPeerIdentifier')
+            ->filter(fn ($ip) => ! str_contains($ip, ':'))
+            ->values()
+            ->all();
+
+        $macAccountingIds = [];
+        if (! empty($ipv4Identifiers)) {
+            $macAccountingIds = DB::table('ipv4_mac')
+                ->join('mac_accounting', 'mac_accounting.mac', '=', 'ipv4_mac.mac_address')
+                ->join('ports', 'ports.port_id', '=', 'mac_accounting.port_id')
+                ->where('ports.device_id', $device->device_id)
+                ->whereIn('ipv4_mac.ipv4_address', $ipv4Identifiers)
+                ->pluck('mac_accounting.ma_id', 'ipv4_mac.ipv4_address')
+                ->all();
+        }
+
         return view('device.tabs.routing.bgp', [
             'device' => $device,
             'view' => $view,
             'local_as' => $device->bgpLocalAs,
-            'bgp_menu' => $this->buildMenu($device),
-            'peers' => $this->getPeers($device, $view),
+            'bgp_menu' => $this->buildMenu($device, $activeAfis, ! empty($macAccountingIds)),
+            'peers' => $this->formatPeers($device, $peers, $view, $cbgpGrouped, $macAccountingIds),
         ]);
     }
 
     /**
+     * @param  array<string>  $activeAfis
      * @return array<int|string, array<int, array<string, string>>>
      */
-    private function buildMenu(Device $device): array
+    private function buildMenu(Device $device, array $activeAfis, bool $hasMacAccounting): array
     {
         $menu = [
             [
@@ -93,12 +136,6 @@ class BgpController extends Controller
                 ],
             ],
         ];
-
-        $activeAfis = $device->bgpPeersCbgp()
-            ->selectRaw('CONCAT(afi, safi) as afisafi')
-            ->distinct()
-            ->pluck('afisafi')
-            ->all();
 
         $prefixViews = [
             'ipv4unicast' => __('IPv4 Ucast'),
@@ -122,13 +159,6 @@ class BgpController extends Controller
             $menu[__('Prefixes')] = $prefixItems;
         }
 
-        $hasMacAccounting = DB::table('ipv4_mac')
-            ->join('mac_accounting', 'mac_accounting.mac', '=', 'ipv4_mac.mac_address')
-            ->join('ports', 'ports.port_id', '=', 'mac_accounting.port_id')
-            ->where('ports.device_id', $device->device_id)
-            ->whereIn('ipv4_mac.ipv4_address', $device->bgppeers()->select('bgpPeerIdentifier'))
-            ->exists();
-
         if ($hasMacAccounting) {
             $menu[__('Traffic')] = [
                 [
@@ -148,59 +178,54 @@ class BgpController extends Controller
     }
 
     /**
+     * @param  Collection<int, BgpPeer>  $peers
+     * @param  Collection<array-key, EloquentCollection<int, \App\Models\BgpPeerCbgp>>  $cbgpGrouped
+     * @param  array<string, int>  $macAccountingIds
      * @return Collection<int, array<string, mixed>>
      */
-    private function getPeers(Device $device, string $view): Collection
+    private function formatPeers(Device $device, Collection $peers, string $view, Collection $cbgpGrouped, array $macAccountingIds): Collection
     {
-        $peers = $device->bgppeers()
-            ->when($view === 'prefixes_ipv4unicast', fn ($q) => $q->where('bgpPeerIdentifier', 'not like', '%:%'))
-            ->when(in_array($view, ['prefixes_ipv6unicast', 'prefixes_ipv6vpn'], true), fn ($q) => $q->where('bgpPeerIdentifier', 'like', '%:%'))
-            ->orderBy('bgpPeerRemoteAs')
-            ->orderBy('bgpPeerIdentifier')
-            ->get();
-
-        if ($peers->isEmpty()) {
-            return collect();
-        }
-
-        $cbgpGrouped = $device->bgpPeersCbgp()
-            ->whereIn('bgpPeerIdentifier', $peers->pluck('bgpPeerIdentifier'))
-            ->get()
-            ->groupBy('bgpPeerIdentifier');
-
         $linkedPorts = $this->resolveLinkedPorts($peers);
-        $macAccountingIds = $this->resolveMacAccountingIds($device, $view, $peers);
 
-        return $peers->map(function (BgpPeer $peer) use ($device, $view, $cbgpGrouped, $linkedPorts, $macAccountingIds) {
-            $peerCbgp = $cbgpGrouped->get($peer->bgpPeerIdentifier, collect());
-            $peerIdentifierIp = IP::parse($peer->bgpPeerIdentifier, true);
+        return $peers->map(fn (BgpPeer $peer) => $this->formatPeer($peer, $device, $view, $cbgpGrouped, $linkedPorts, $macAccountingIds));
+    }
 
-            [$peerType, $peerTypeClass] = $this->determinePeerType($peer->bgpPeerRemoteAs, $device->bgpLocalAs);
+    /**
+     * @param  Collection<array-key, EloquentCollection<int, \App\Models\BgpPeerCbgp>>  $cbgpGrouped
+     * @param  array<string, Port>  $linkedPorts
+     * @param  array<string, int>  $macAccountingIds
+     * @return array<string, mixed>
+     */
+    private function formatPeer(BgpPeer $peer, Device $device, string $view, Collection $cbgpGrouped, array $linkedPorts, array $macAccountingIds): array
+    {
+        $peerCbgp = $cbgpGrouped->get($peer->bgpPeerIdentifier, collect());
+        $peerIdentifierIp = IP::parse($peer->bgpPeerIdentifier, true);
 
-            $afiList = $peerCbgp->map(fn ($c) => "$c->afi.$c->safi")->implode(', ');
-            $afisafiMap = array_fill_keys($peerCbgp->map(fn ($c) => $c->afi . $c->safi)->all(), true);
+        [$peerType, $peerTypeClass] = $this->determinePeerType($peer->bgpPeerRemoteAs, $device->bgpLocalAs);
 
-            return [
-                'peer' => $peer,
-                'identifier_compressed' => $peerIdentifierIp?->compressed() ?: $peer->bgpPeerIdentifier,
-                'remote_as' => $peer->bgpPeerRemoteAs,
-                'astext' => $peer->astext,
-                'descr' => $peer->bgpPeerDescr,
-                'admin_status' => $peer->bgpPeerAdminStatus,
-                'admin_color' => in_array($peer->bgpPeerAdminStatus, ['start', 'running'], true) ? 'success' : 'default',
-                'state' => $peer->bgpPeerState,
-                'state_color' => $peer->bgpPeerState === 'established' ? 'success' : 'danger',
-                'fsm_established_time' => Time::formatInterval($peer->bgpPeerFsmEstablishedTime),
-                'in_updates' => $peer->bgpPeerInUpdates,
-                'out_updates' => $peer->bgpPeerOutUpdates,
-                'last_error' => $this->formatLastError($peer),
-                'afi_list' => $afiList,
-                'linked_port' => $linkedPorts[$peer->bgpPeerIdentifier] ?? null,
-                'peer_type' => $peerType,
-                'peer_type_class' => $peerTypeClass,
-                ...$this->resolveGraphSettings($peer, $view, $afisafiMap, $macAccountingIds),
-            ];
-        });
+        $afiList = $peerCbgp->map(fn ($c) => "$c->afi.$c->safi")->implode(', ');
+        $afisafiMap = array_fill_keys($peerCbgp->map(fn ($c) => $c->afi . $c->safi)->all(), true);
+
+        return [
+            'peer' => $peer,
+            'identifier_compressed' => $peerIdentifierIp?->compressed() ?: $peer->bgpPeerIdentifier,
+            'remote_as' => $peer->bgpPeerRemoteAs,
+            'astext' => $peer->astext,
+            'descr' => $peer->bgpPeerDescr,
+            'admin_status' => $peer->bgpPeerAdminStatus,
+            'admin_color' => in_array($peer->bgpPeerAdminStatus, ['start', 'running'], true) ? 'success' : 'default',
+            'state' => $peer->bgpPeerState,
+            'state_color' => $peer->bgpPeerState === 'established' ? 'success' : 'danger',
+            'fsm_established_time' => Time::formatInterval($peer->bgpPeerFsmEstablishedTime),
+            'in_updates' => $peer->bgpPeerInUpdates,
+            'out_updates' => $peer->bgpPeerOutUpdates,
+            'last_error' => $this->formatLastError($peer),
+            'afi_list' => $afiList,
+            'linked_port' => $linkedPorts[$peer->bgpPeerIdentifier] ?? null,
+            'peer_type' => $peerType,
+            'peer_type_class' => $peerTypeClass,
+            ...$this->resolveGraphSettings($peer, $view, $afisafiMap, $macAccountingIds),
+        ];
     }
 
     /**
@@ -250,25 +275,6 @@ class BgpController extends Controller
         }
 
         return $ports;
-    }
-
-    /**
-     * @param  Collection<int, BgpPeer>  $peers
-     * @return array<string, int>
-     */
-    private function resolveMacAccountingIds(Device $device, string $view, Collection $peers): array
-    {
-        if (! in_array($view, ['macaccounting_bits', 'macaccounting_pkts'], true)) {
-            return [];
-        }
-
-        return DB::table('ipv4_mac')
-            ->join('mac_accounting', 'mac_accounting.mac', '=', 'ipv4_mac.mac_address')
-            ->join('ports', 'ports.port_id', '=', 'mac_accounting.port_id')
-            ->where('ports.device_id', $device->device_id)
-            ->whereIn('ipv4_mac.ipv4_address', $peers->pluck('bgpPeerIdentifier'))
-            ->pluck('mac_accounting.ma_id', 'ipv4_mac.ipv4_address')
-            ->all();
     }
 
     /**
