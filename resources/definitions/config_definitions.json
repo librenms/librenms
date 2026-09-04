@@ -6748,7 +6748,7 @@
             "section": "sensors",
             "order": 4
         },
-        "service_poller_api_key": {
+        "service_api_key": {
             "default": null,
             "group": "poller",
             "section": "dispatcherservice",
