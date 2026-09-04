@@ -59,6 +59,41 @@ final class QueryBuilderTest extends TestCase
         $this->assertEquals($query[1], $qbq->getBindings(), 'Fluent bindings do not match');
     }
 
+    public function testRequiredTablesAreJoined(): void
+    {
+        // a rule that only references devices, as a dynamic port group matching on device attributes would be
+        $builder = [
+            'condition' => 'AND',
+            'rules' => [
+                [
+                    'id' => 'devices.os',
+                    'field' => 'devices.os',
+                    'type' => 'string',
+                    'input' => 'text',
+                    'operator' => 'equal',
+                    'value' => 'ios',
+                ],
+            ],
+            'valid' => true,
+        ];
+
+        // without requiring ports, nothing changes: ports is not part of the query
+        $plain = QueryBuilderFluentParser::fromJson($builder);
+        $this->assertNotContains('ports', $plain->getTables());
+        $this->assertStringNotContainsString('ports', $plain->toQuery()->toSql());
+
+        // requiring ports joins it in so port_id can be selected
+        $required = QueryBuilderFluentParser::fromJson($builder)->requireTables('ports');
+        $this->assertContains('ports', $required->getTables());
+        $this->assertStringContainsString(
+            'left join `ports` on `devices`.`device_id` = `ports`.`device_id`',
+            $required->toQuery()->toSql()
+        );
+
+        // and the where clause is untouched
+        $this->assertEquals($plain->toQuery()->getBindings(), $required->toQuery()->getBindings());
+    }
+
     public static function loadQueryData(): array
     {
         $base = realpath(__DIR__ . '/..');
