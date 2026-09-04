@@ -284,6 +284,10 @@ class SnmpQueryMock implements SnmpQueryInterface
             $oid = NetSnmpQuery::make()->translate($oidObj);
         }
 
+        if ($this->hideMib) {
+            $oid = Str::after($oid, '::');
+        }
+
         return "$oid$indexSuffix = $data\n";
     }
 
